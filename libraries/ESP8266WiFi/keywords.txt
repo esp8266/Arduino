@@ -15,8 +15,18 @@ ESP8266WiFi	KEYWORD3
 WiFi	KEYWORD1
 WiFiClient	KEYWORD1
 WiFiServer	KEYWORD1
+WiFiServerSecure	KEYWORD1
 WiFiUDP	KEYWORD1
 WiFiClientSecure	KEYWORD1
+ESP8266WiFiMulti	KEYWORD1
+BearSSL	KEYWORD1
+X509List	KEYWORD1
+PrivateKey	KEYWORD1
+PublicKey	KEYWORD1
+CertStoreSPIFFSBearSSL	KEYWORD1
+CertStoreSDBearSSL	KEYWORD1
+Session	KEYWORD1
+
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -59,6 +69,7 @@ softAPgetStationNum	KEYWORD2
 
 #ESP8266WiFiMulti
 addAP	KEYWORD2
+existsAP	KEYWORD2
 run	KEYWORD2
 
 #ESP8266WiFiScan
@@ -97,6 +108,9 @@ psk	KEYWORD2
 BSSID	KEYWORD2
 BSSIDstr	KEYWORD2
 RSSI	KEYWORD2
+enableInsecureWEP	KEYWORD2
+getListenInterval	KEYWORD2
+isSleepLevelMax		KEYWORD2
 beginWPSConfig	KEYWORD2
 beginSmartConfig	KEYWORD2
 stopSmartConfig	KEYWORD2
@@ -130,9 +144,14 @@ verify	KEYWORD2
 verifyCertChain	KEYWORD2
 setCertificate	KEYWORD2
 setPrivateKey	KEYWORD2
+setCACert	KEYWORD2
+setCertificate_P	KEYWORD2
+setPrivateKey_P	KEYWORD2
+setCACert_P	KEYWORD2
 loadCertificate	KEYWORD2
 loadPrivateKey	KEYWORD2
 loadCACert	KEYWORD2
+allowSelfSignedCerts	KEYWORD2
 
 #WiFiServer
 hasClient	KEYWORD2
@@ -151,6 +170,29 @@ localPort	KEYWORD2
 stopAll	KEYWORD2
 stopAllExcept	KEYWORD2
 
+#WiFiClientBearSSL
+setInsecure	KEYWORD2
+setKnownKey	KEYWORD2
+setFingerprint	KEYWORD2
+allowSelfSignedCerts	KEYWORD2
+setTrustAnchors	KEYWORD2
+setX509Time	KEYWORD2
+setClientRSACert	KEYWORD2
+setClientECCert	KEYWORD2
+setBufferSizes	KEYWORD2
+getLastSSLError	KEYWORD2
+setCertStore	KEYWORD2
+probeMaxFragmentLength	KEYWORD2
+getMFLNStatus	KEYWORD2
+
+#WiFiServerBearSSL
+setRSACert	KEYWORD2
+setECCert	KEYWORD2
+setClientTrustAnchor	KEYWORD2
+
+#CertStoreBearSSL
+initCertStore	KEYWORD2
+
 #######################################
 # Constants (LITERAL1)
 #######################################
@@ -164,6 +206,6 @@ WIFI_PHY_MODE_11N	LITERAL1
 WIFI_NONE_SLEEP	LITERAL1
 WIFI_LIGHT_SLEEP	LITERAL1
 WIFI_MODEM_SLEEP	LITERAL1
-WIFICLIENT_MAX_PACKET_SIZE LITERAL1
+WIFICLIENT_MAX_PACKET_SIZE	LITERAL1
 UDP_TX_PACKET_MAX_SIZE	LITERAL1
 DEBUG_ESP_WIFI	LITERAL1

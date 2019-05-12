@@ -2,6 +2,7 @@
 #define _CTYPE_H_
 
 #include "_ansi.h"
+#include <sys/ctype.h>
 
 _BEGIN_STD_C
 
@@ -54,7 +55,11 @@ extern	__IMPORT char	*__ctype_ptr__;
    Meanwhile, the real index to __ctype_ptr__+1 must be cast to int,
    since isalpha(0x100000001LL) must equal isalpha(1), rather than being
    an out-of-bounds reference on a 64-bit machine.  */
-#define __ctype_lookup(__c) ((__ctype_ptr__+sizeof(""[__c]))[(int)(__c)])
+#ifdef pgm_read_byte
+  #define __ctype_lookup(__c) pgm_read_byte(&(__ctype_ptr__+sizeof(""[__c]))[(int)(__c)])
+#else
+  #define __ctype_lookup(__c) ((__ctype_ptr__+sizeof(""[__c]))[(int)(__c)])
+#endif
 
 #define	isalpha(__c)	(__ctype_lookup(__c)&(_U|_L))
 #define	isupper(__c)	((__ctype_lookup(__c)&(_U|_L))==_U)

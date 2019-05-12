@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  *
  * All rights reserved.
  *
@@ -75,6 +75,7 @@ extern "C" {
 // struct SSL_CTX_;
 typedef struct SSL_CTX_ SSL_CTX;
 typedef struct SSL_ SSL;
+typedef struct SSL_EXTENSIONS_ SSL_EXTENSIONS;
 
 /* The optional parameters that can be given to the client/server SSL engine */
 #define SSL_CLIENT_AUTHENTICATION               0x00010000
@@ -93,13 +94,16 @@ typedef struct SSL_ SSL;
 #define SSL_ERROR_DEAD                          -2
 #define SSL_CLOSE_NOTIFY                        -3
 #define SSL_ERROR_CONN_LOST                     -256
+#define SSL_ERROR_RECORD_OVERFLOW               -257
 #define SSL_ERROR_SOCK_SETUP_FAILURE            -258
 #define SSL_ERROR_INVALID_HANDSHAKE             -260
 #define SSL_ERROR_INVALID_PROT_MSG              -261
 #define SSL_ERROR_INVALID_HMAC                  -262
 #define SSL_ERROR_INVALID_VERSION               -263
+#define SSL_ERROR_UNSUPPORTED_EXTENSION         -264
 #define SSL_ERROR_INVALID_SESSION               -265
 #define SSL_ERROR_NO_CIPHER                     -266
+#define SSL_ERROR_INVALID_CERT_HASH_ALG         -267
 #define SSL_ERROR_BAD_CERTIFICATE               -268
 #define SSL_ERROR_INVALID_KEY                   -269
 #define SSL_ERROR_FINISHED_INVALID              -271
@@ -109,6 +113,19 @@ typedef struct SSL_ SSL;
 #define SSL_X509_OFFSET                         -512
 #define SSL_X509_ERROR(A)                       (SSL_X509_OFFSET+A)
 
+#define X509_OK                             0
+#define X509_NOT_OK                         -1
+#define X509_VFY_ERROR_NO_TRUSTED_CERT      -2
+#define X509_VFY_ERROR_BAD_SIGNATURE        -3
+#define X509_VFY_ERROR_NOT_YET_VALID        -4
+#define X509_VFY_ERROR_EXPIRED              -5
+#define X509_VFY_ERROR_SELF_SIGNED          -6
+#define X509_VFY_ERROR_INVALID_CHAIN        -7
+#define X509_VFY_ERROR_UNSUPPORTED_DIGEST   -8
+#define X509_INVALID_PRIV_KEY               -9
+#define X509_MAX_CERTS                      -10
+#define X509_VFY_ERROR_BASIC_CONSTRAINT     -11
+
 /* alert types that are recognized */
 #define SSL_ALERT_TYPE_WARNING                  1
 #define SLL_ALERT_TYPE_FATAL                    2
@@ -117,19 +134,25 @@ typedef struct SSL_ SSL;
 #define SSL_ALERT_CLOSE_NOTIFY                  0
 #define SSL_ALERT_UNEXPECTED_MESSAGE            10
 #define SSL_ALERT_BAD_RECORD_MAC                20
+#define SSL_ALERT_RECORD_OVERFLOW               22
 #define SSL_ALERT_HANDSHAKE_FAILURE             40
 #define SSL_ALERT_BAD_CERTIFICATE               42
+#define SSL_ALERT_UNSUPPORTED_CERTIFICATE       43
+#define SSL_ALERT_CERTIFICATE_EXPIRED           45
+#define SSL_ALERT_CERTIFICATE_UNKNOWN           46
 #define SSL_ALERT_ILLEGAL_PARAMETER             47
+#define SSL_ALERT_UNKNOWN_CA                    48
 #define SSL_ALERT_DECODE_ERROR                  50
 #define SSL_ALERT_DECRYPT_ERROR                 51
 #define SSL_ALERT_INVALID_VERSION               70
 #define SSL_ALERT_NO_RENEGOTIATION              100
+#define SSL_ALERT_UNSUPPORTED_EXTENSION         110
 
 /* The ciphers that are supported */
 #define SSL_AES128_SHA                          0x2f
 #define SSL_AES256_SHA                          0x35
-#define SSL_RC4_128_SHA                         0x05
-#define SSL_RC4_128_MD5                         0x04
+#define SSL_AES128_SHA256                       0x3c
+#define SSL_AES256_SHA256                       0x3d
 
 /* build mode ids' */
 #define SSL_BUILD_SKELETON_MODE                 0x01
@@ -219,6 +242,36 @@ EXP_FUNC SSL_CTX * STDCALL ssl_ctx_new(uint32_t options, int num_sessions);
 EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx);
 
 /**
+ * @brief Allocates new SSL extensions structure and returns pointer to it
+ *
+ * @return ssl_ext Pointer to SSL_EXTENSIONS structure
+ *
+ */
+EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new();
+
+/**
+ * @brief Set the host name for SNI extension
+ * @param ssl_ext pointer returned by ssl_ext_new
+ * @param host_name pointer to a zero-terminated string containing host name
+ */
+EXP_FUNC void STDCALL ssl_ext_set_host_name(SSL_EXTENSIONS * ext, const char* host_name);
+
+/**
+ * @brief Set the maximum fragment size for the fragment size negotiation extension
+ * @param ssl_ext pointer returned by ssl_ext_new
+ * @param fragment_size fragment size, allowed values: 2^9, 2^10 ... 2^14
+ */
+EXP_FUNC void STDCALL ssl_ext_set_max_fragment_size(SSL_EXTENSIONS * ext, unsigned fragment_size);
+
+/**
+ * @brief Frees SSL extensions structure
+ *
+ * @param ssl_ext [in] Pointer to SSL_EXTENSION structure
+ *
+ */
+EXP_FUNC void STDCALL ssl_ext_free(SSL_EXTENSIONS *ssl_ext);
+
+/**
  * @brief (server only) Establish a new SSL connection to an SSL client.
  *
  * It is up to the application to establish the logical connection (whether it
@@ -244,11 +297,11 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * can be null if no session resumption is being used or required. This option
  * is not used in skeleton mode.
  * @param sess_id_size The size of the session id (max 32)
- * @param host_name If non-zero, host name to be sent to server for SNI support
+ * @param ssl_ext pointer to a structure with the activated SSL extensions and their values
  * @return An SSL object reference. Use ssl_handshake_status() to check
  * if a handshake succeeded.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size, const char* host_name);
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size, SSL_EXTENSIONS* ssl_ext);
 
 /**
  * @brief Free any used resources on this connection.
@@ -288,6 +341,15 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data);
  * @see ssl.h for the error code list.
  */
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len);
+
+/**
+ * @brief Calculate the size of the encrypted data from what you are about to send 
+ * @param ssl [in] An SSL obect reference.
+ * @param out_len [in] The number of bytes to be written.
+ * @return The number of bytes that will be sent, or if < 0 if an error.
+ * @see ssl.h for the error code list.
+ */
+EXP_FUNC int STDCALL ssl_calculate_write_length(SSL *ssl, int out_len);
 
 /**
  * @brief Find an ssl object based on a file descriptor.
@@ -383,6 +445,15 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
  * @return SSL_OK if the certificate is verified.
  */
 EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp);
+
+/**
+ * @brief Check if SHA256 hash of Subject Public Key Info matches the one given.
+ *
+ * @param ssl [in] An SSL object reference.
+ * @param fp [in] SHA256 hash to match against
+ * @return SSL_OK if the certificate is verified.
+ */
+EXP_FUNC int STDCALL ssl_match_spki_sha256(const SSL *ssl, const uint8_t* hash);
 
 /**
  * @brief Retrieve an X.509 distinguished name component.

@@ -118,7 +118,7 @@ size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 int EthernetUDP::parsePacket()
 {
   // discard any remaining bytes in the last packet
-  flush();
+  clear_remaining();
 
   if (recvAvailable(_sock) > 0)
   {
@@ -204,7 +204,7 @@ int EthernetUDP::peek()
   return b;
 }
 
-void EthernetUDP::flush()
+void EthernetUDP::clear_remaining()
 {
   // could this fail (loop endlessly) if _remaining > 0 and recv in read fails?
   // should only occur if recv fails after telling us the data is there, lets
@@ -214,5 +214,10 @@ void EthernetUDP::flush()
   {
     read();
   }
+}
+
+void EthernetUDP::flush()
+{
+  endPacket();  
 }
 
