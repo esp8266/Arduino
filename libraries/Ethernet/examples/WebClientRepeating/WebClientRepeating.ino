@@ -1,26 +1,26 @@
 /*
   Repeating Web client
 
- This sketch connects to a a web server and makes a request
- using a Wiznet Ethernet shield. You can use the Arduino Ethernet shield, or
- the Adafruit Ethernet shield, either one will work, as long as it's got
- a Wiznet Ethernet module on board.
+  This sketch connects to a a web server and makes a request
+  using a Wiznet Ethernet shield. You can use the Arduino Ethernet shield, or
+  the Adafruit Ethernet shield, either one will work, as long as it's got
+  a Wiznet Ethernet module on board.
 
- This example uses DNS, by assigning the Ethernet client with a MAC address,
- IP address, and DNS address.
+  This example uses DNS, by assigning the Ethernet client with a MAC address,
+  IP address, and DNS address.
 
- Circuit:
- * Ethernet shield attached to pins 10, 11, 12, 13
+  Circuit:
+   Ethernet shield attached to pins 10, 11, 12, 13
 
- created 19 Apr 2012
- by Tom Igoe
- modified 21 Jan 2014
- by Federico Vanzati
+  created 19 Apr 2012
+  by Tom Igoe
+  modified 21 Jan 2014
+  by Federico Vanzati
 
- http://www.arduino.cc/en/Tutorial/WebClientRepeating
- This code is in the public domain.
+  http://www.arduino.cc/en/Tutorial/WebClientRepeating
+  This code is in the public domain.
 
- */
+*/
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -98,8 +98,7 @@ void httpRequest() {
 
     // note the time that the connection was made:
     lastConnectionTime = millis();
-  }
-  else {
+  } else {
     // if you couldn't make a connection:
     Serial.println("connection failed");
   }

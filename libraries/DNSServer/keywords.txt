@@ -1,0 +1,45 @@
+#######################################
+# Syntax Coloring Map For DNSServer
+#######################################
+
+#######################################
+# Library (KEYWORD3)
+#######################################
+
+DNSServer	KEYWORD3		RESERVED_WORD
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+DNSReplyCode	KEYWORD1		DATA_TYPE
+DNSHeader	KEYWORD1		DATA_TYPE
+DNSServer	KEYWORD1		DATA_TYPE
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+processNextRequest	KEYWORD2
+setErrorReplyCode	KEYWORD2
+setTTL	KEYWORD2
+start	KEYWORD2
+stop	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+DNS_QR_QUERY	LITERAL1		RESERVED_WORD_2
+DNS_QR_RESPONSE	LITERAL1		RESERVED_WORD_2
+DNS_OPCODE_QUERY	LITERAL1		RESERVED_WORD_2
+MAX_DNSNAME_LENGTH	LITERAL1		RESERVED_WORD_2
+NoError	LITERAL1		RESERVED_WORD_2
+FormError	LITERAL1		RESERVED_WORD_2
+ServerFailure	LITERAL1		RESERVED_WORD_2
+NonExistentDomain	LITERAL1		RESERVED_WORD_2
+NotImplemented	LITERAL1		RESERVED_WORD_2
+Refused	LITERAL1		RESERVED_WORD_2
+YXDomain	LITERAL1		RESERVED_WORD_2
+YXRRSet	LITERAL1		RESERVED_WORD_2
+NXRRSet	LITERAL1		RESERVED_WORD_2

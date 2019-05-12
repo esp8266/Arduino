@@ -21,16 +21,16 @@
 #include "Arduino.h"
 #include "debug.h"
 
-void ICACHE_RAM_ATTR hexdump(uint8_t *mem, uint32_t len, uint8_t cols) {
-    os_printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (size_t)mem, len, len);
+void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
+    const uint8_t* src = (const uint8_t*) mem;
+    os_printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
     for(uint32_t i = 0; i < len; i++) {
         if(i % cols == 0) {
-            os_printf("\n[0x%08X] 0x%08X: ", (size_t)mem, i);
+            os_printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
         	yield();
         }
-        os_printf("%02X ", *mem);
-        mem++;
+        os_printf("%02X ", *src);
+        src++;
     }
     os_printf("\n");
 }
-

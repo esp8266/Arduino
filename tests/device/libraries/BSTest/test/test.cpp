@@ -49,3 +49,12 @@ TEST_CASE("this test also runs successfully", "[bluesmoke]")
 {
 
 }
+
+TEST_CASE("environment variables can be set and read from python", "[bluesmoke]")
+{
+    const char* res = getenv("VAR_FROM_PYTHON");
+    REQUIRE(res != NULL);
+    CHECK(strcmp(res, "42") == 0);
+    setenv("VAR_FROM_TEST", "24", 1);
+}
+

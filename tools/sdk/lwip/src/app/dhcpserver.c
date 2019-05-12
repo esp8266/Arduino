@@ -92,16 +92,19 @@ void ICACHE_FLASH_ATTR node_remove_from_list(list_node **phead, list_node* pdele
     } else {
         if (plist == pdelete){
             *phead = plist->pnext;
+            pdelete->pnext = NULL;
         } else {
             while (plist != NULL) {
                 if (plist->pnext == pdelete){
                     plist->pnext = pdelete->pnext;
+                    pdelete->pnext = NULL;
                 }
                 plist = plist->pnext;
             }
         }
     }
 }
+
 ///////////////////////////////////////////////////////////////////////////////////
 /*
  * ��DHCP msg��Ϣ�ṹ����������
@@ -135,21 +138,16 @@ static uint8_t* ICACHE_FLASH_ATTR add_offer_options(uint8_t *optptr)
 
         ipadd.addr = *( (uint32_t *) &server_address);
 
-#ifdef USE_CLASS_B_NET
+        struct ip_info if_ip;
+        os_bzero(&if_ip, sizeof(struct ip_info));
+        wifi_get_ip_info(SOFTAP_IF, &if_ip);
+    
         *optptr++ = DHCP_OPTION_SUBNET_MASK;
-        *optptr++ = 4;  //length
-        *optptr++ = 255;
-        *optptr++ = 240;
-        *optptr++ = 0;
-        *optptr++ = 0;
-#else
-        *optptr++ = DHCP_OPTION_SUBNET_MASK;
-        *optptr++ = 4;  
-        *optptr++ = 255;
-        *optptr++ = 255;
-        *optptr++ = 255;
-        *optptr++ = 0;
-#endif
+        *optptr++ = 4;
+        *optptr++ = ip4_addr1( &if_ip.netmask);
+        *optptr++ = ip4_addr2( &if_ip.netmask);
+        *optptr++ = ip4_addr3( &if_ip.netmask);
+        *optptr++ = ip4_addr4( &if_ip.netmask);
 
         *optptr++ = DHCP_OPTION_LEASE_TIME;
         *optptr++ = 4;  
@@ -166,10 +164,6 @@ static uint8_t* ICACHE_FLASH_ATTR add_offer_options(uint8_t *optptr)
         *optptr++ = ip4_addr4( &ipadd);
 
         if (dhcps_router_enabled(offer)){
-            struct ip_info if_ip;
-            os_bzero(&if_ip, sizeof(struct ip_info));
-            wifi_get_ip_info(SOFTAP_IF, &if_ip);
-
             *optptr++ = DHCP_OPTION_ROUTER;
             *optptr++ = 4;
             *optptr++ = ip4_addr1( &if_ip.gw);
@@ -269,7 +263,10 @@ static void ICACHE_FLASH_ATTR create_msg(struct dhcps_msg *m)
         os_memset((char *) m->file, 0, sizeof(m->file));
 
         os_memset((char *) m->options, 0, sizeof(m->options));
-        os_memcpy((char *) m->options, &magic_cookie, sizeof(magic_cookie));
+
+//For xiaomi crash bug
+		uint32 magic_cookie1 = magic_cookie;
+        os_memcpy((char *) m->options, &magic_cookie1, sizeof(magic_cookie1));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
@@ -760,11 +757,18 @@ void ICACHE_FLASH_ATTR dhcps_stop(void)
     //udp_remove(pcb_dhcps);
     list_node *pnode = NULL;
     list_node *pback_node = NULL;
+    struct dhcps_pool* dhcp_node = NULL;
+    struct ip_addr ip_zero;
+
+    os_memset(&ip_zero,0x0,sizeof(ip_zero));
     pnode = plist;
     while (pnode != NULL) {
         pback_node = pnode;
         pnode = pback_node->pnext;
         node_remove_from_list(&plist, pback_node);
+        dhcp_node = (struct dhcps_pool*)pback_node->pnode;
+        //wifi_softap_dhcps_client_leave(dhcp_node->mac,&dhcp_node->ip,TRUE); // force to delete
+        wifi_softap_set_station_info(dhcp_node->mac, &ip_zero);
         os_free(pback_node->pnode);
         pback_node->pnode = NULL;
         os_free(pback_node);
@@ -1077,10 +1081,10 @@ uint32 ICACHE_FLASH_ATTR wifi_softap_dhcps_client_update(u8 *bssid, struct ip_ad
                 return IPADDR_ANY;
             }
         } else {
-            if (start_ip == end_ip) {
+            if (start_ip > end_ip) {
                 return IPADDR_ANY;
             }
-            start_ip = htonl((ntohl(start_ip) + 1));
+            //start_ip = htonl((ntohl(start_ip) + 1));
             flag = TRUE;
         }
     }
@@ -1096,6 +1100,8 @@ uint32 ICACHE_FLASH_ATTR wifi_softap_dhcps_client_update(u8 *bssid, struct ip_ad
 
                 // mac exists and ip exists in other node,delete mac
                 node_remove_from_list(&plist,pmac_node);
+                os_free(pmac_node->pnode);
+                pmac_node->pnode = NULL;
                 os_free(pmac_node);
                 pmac_node = pip_node;
                 os_memcpy(pdhcps_pool->mac, bssid, sizeof(pdhcps_pool->mac));
@@ -1141,6 +1147,10 @@ uint32 ICACHE_FLASH_ATTR wifi_softap_dhcps_client_update(u8 *bssid, struct ip_ad
             } else if (flag == TRUE) {
                 pdhcps_pool->ip.addr = start_ip;
             } else {    // no ip to distribute
+                os_free(pdhcps_pool);
+                return IPADDR_ANY;
+            }
+            if (pdhcps_pool->ip.addr > end_ip) {
                 os_free(pdhcps_pool);
                 return IPADDR_ANY;
             }

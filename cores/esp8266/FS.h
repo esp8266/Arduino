@@ -28,6 +28,7 @@ namespace fs {
 
 class File;
 class Dir;
+class FS;
 
 class FileImpl;
 typedef std::shared_ptr<FileImpl> FileImplPtr;
@@ -48,7 +49,7 @@ enum SeekMode {
 class File : public Stream
 {
 public:
-    File(FileImplPtr p = FileImplPtr()) : _p(p) {}
+    File(FileImplPtr p = FileImplPtr(), FS *baseFS = nullptr) : _p(p), _fakeDir(nullptr), _baseFS(baseFS) { }
 
     // Print methods:
     size_t write(uint8_t) override;
@@ -64,27 +65,74 @@ public:
     }
     size_t read(uint8_t* buf, size_t size);
     bool seek(uint32_t pos, SeekMode mode);
+    bool seek(uint32_t pos) {
+        return seek(pos, SeekSet);
+    }
     size_t position() const;
     size_t size() const;
     void close();
     operator bool() const;
     const char* name() const;
+    const char* fullName() const; // Includes path
+    bool truncate(uint32_t size);
+
+    bool isFile() const;
+    bool isDirectory() const;
+
+    // Arduino "class SD" methods for compatibility
+    template<typename T> size_t write(T &src){
+      uint8_t obuf[256];
+      size_t doneLen = 0;
+      size_t sentLen;
+      int i;
+
+      while (src.available() > sizeof(obuf)){
+        src.read(obuf, sizeof(obuf));
+        sentLen = write(obuf, sizeof(obuf));
+        doneLen = doneLen + sentLen;
+        if(sentLen != sizeof(obuf)){
+          return doneLen;
+        }
+      }
+
+      size_t leftLen = src.available();
+      src.read(obuf, leftLen);
+      sentLen = write(obuf, leftLen);
+      doneLen = doneLen + sentLen;
+      return doneLen;
+    }
+    using Print::write;
+
+    void rewindDirectory();
+    File openNextFile();
+
+    String readString() override;
 
 protected:
     FileImplPtr _p;
+
+    // Arduino SD class emulation
+    std::shared_ptr<Dir> _fakeDir;
+    FS                  *_baseFS;
 };
 
 class Dir {
 public:
-    Dir(DirImplPtr impl = DirImplPtr()): _impl(impl) { }
+    Dir(DirImplPtr impl = DirImplPtr(), FS *baseFS = nullptr): _impl(impl), _baseFS(baseFS) { }
 
     File openFile(const char* mode);
+
     String fileName();
     size_t fileSize();
+    bool isFile() const;
+    bool isDirectory() const;
+
     bool next();
+    bool rewind();
 
 protected:
     DirImplPtr _impl;
+    FS       *_baseFS;
 };
 
 struct FSInfo {
@@ -96,14 +144,44 @@ struct FSInfo {
     size_t maxPathLength;
 };
 
+class FSConfig
+{
+public:
+    FSConfig(bool autoFormat = true) {
+        _type = FSConfig::fsid::FSId;
+	_autoFormat = autoFormat;
+    }
+
+    enum fsid { FSId = 0x00000000 };
+    FSConfig setAutoFormat(bool val = true) {
+        _autoFormat = val;
+        return *this;
+    }
+
+    uint32_t _type;
+    bool     _autoFormat;
+};
+
+class SPIFFSConfig : public FSConfig
+{
+public:
+    SPIFFSConfig(bool autoFormat = true) {
+        _type = SPIFFSConfig::fsid::FSId;
+	_autoFormat = autoFormat;
+    }
+    enum fsid { FSId = 0x53504946 };
+};
+
 class FS
 {
 public:
     FS(FSImplPtr impl) : _impl(impl) { }
 
+    bool setConfig(const FSConfig &cfg);
+
     bool begin();
     void end();
-    
+
     bool format();
     bool info(FSInfo& info);
 
@@ -122,6 +200,14 @@ public:
     bool rename(const char* pathFrom, const char* pathTo);
     bool rename(const String& pathFrom, const String& pathTo);
 
+    bool mkdir(const char* path);
+    bool mkdir(const String& path);
+
+    bool rmdir(const char* path);
+    bool rmdir(const String& path);
+
+    bool gc();
+
 protected:
     FSImplPtr _impl;
 };
@@ -137,6 +223,7 @@ using fs::SeekSet;
 using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
+using fs::FSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

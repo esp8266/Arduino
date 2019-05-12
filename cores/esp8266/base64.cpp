@@ -35,13 +35,21 @@ extern "C" {
  * @param length size_t
  * @return String
  */
-String base64::encode(uint8_t * data, size_t length) {
-    // base64 needs more size then the source data
-    size_t size = ((length * 1.6f) + 1);
+String base64::encode(uint8_t * data, size_t length, bool doNewLines) {
+    // base64 needs more size then the source data, use cencode.h macros
+    size_t size = ((doNewLines ? base64_encode_expected_len(length)
+                               : base64_encode_expected_len_nonewlines(length)) + 1);
     char * buffer = (char *) malloc(size);
     if(buffer) {
         base64_encodestate _state;
-        base64_init_encodestate(&_state);
+        if(doNewLines)
+        {
+            base64_init_encodestate(&_state);
+        }
+        else 
+        {
+            base64_init_encodestate_nonewlines(&_state);
+        }
         int len = base64_encode_block((const char *) &data[0], length, &buffer[0], &_state);
         len = base64_encode_blockend((buffer + len), &_state);
 
@@ -57,7 +65,7 @@ String base64::encode(uint8_t * data, size_t length) {
  * @param text String
  * @return String
  */
-String base64::encode(String text) {
-    return base64::encode((uint8_t *) text.c_str(), text.length());
+String base64::encode(String text, bool doNewLines) {
+    return base64::encode((uint8_t *) text.c_str(), text.length(), doNewLines);
 }
 

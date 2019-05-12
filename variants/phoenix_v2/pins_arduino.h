@@ -26,14 +26,16 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#include "../generic/common.h"
-
 #define PHOENIX_VERSION   2
 
-static const uint8_t SDA = 4;
-static const uint8_t SCL = 5;
+#define PIN_WIRE_SDA (4)
+#define PIN_WIRE_SCL (5)
 
-static const uint8_t LED_BUILTIN = 2;
-static const uint8_t BUILTIN_LED = 2;
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
+
+#define LED_BUILTIN 2
+
+#include "../generic/common.h"
 
 #endif /* Pins_Arduino_h */

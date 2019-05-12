@@ -239,6 +239,10 @@ void ICACHE_FLASH_ATTR espconn_tcp_memp_free(espconn_msg *pmemp)
 		os_free(pmemp->pespconn);
 		pmemp->pespconn = NULL;
 	}
+
+	if (pmemp->readbuf != NULL){
+		ringbuf_free(&pmemp->readbuf);
+	}
 	os_free(pmemp);
 	pmemp = NULL;
 }
@@ -397,34 +401,46 @@ espconn_tcp_disconnect_successful(void *arg)
 static void ICACHE_FLASH_ATTR
 espconn_Task(os_event_t *events)
 {
+	espconn_msg *plist = NULL;
+	bool active_flag = false;
 	espconn_msg *task_msg = NULL;
 	struct espconn *pespconn = NULL;
 
 	task_msg = (espconn_msg *) events->par;
-	switch (events->sig) {
-		case SIG_ESPCONN_WRITE: {
-			pespconn = task_msg->pespconn;
-			if (pespconn == NULL) {
-				return;
-			}
-
-			if (pespconn->proto.tcp->write_finish_fn != NULL) {
-				pespconn->proto.tcp->write_finish_fn(pespconn);
-			}
+	/*find the active connection node*/
+	for (plist = plink_active; plist != NULL; plist = plist->pnext){
+		if (task_msg == plist) {
+			active_flag = true;
+			break;
 		}
-			break;
-		case SIG_ESPCONN_ERRER:
-			/*remove the node from the client's active connection list*/
-			espconn_list_delete(&plink_active, task_msg);
-			espconn_tcp_reconnect(task_msg);
-			break;
-		case SIG_ESPCONN_CLOSE:
-			/*remove the node from the client's active connection list*/
-			espconn_list_delete(&plink_active, task_msg);
-			espconn_tcp_disconnect_successful(task_msg);
-			break;
-		default:
-			break;
+	}
+
+	if (active_flag){
+		switch (events->sig) {
+			case SIG_ESPCONN_WRITE: {
+				pespconn = task_msg->pespconn;
+				if (pespconn == NULL) {
+					return;
+				}
+
+				if (pespconn->proto.tcp->write_finish_fn != NULL) {
+					pespconn->proto.tcp->write_finish_fn(pespconn);
+				}
+			}
+				break;
+			case SIG_ESPCONN_ERRER:
+				/*remove the node from the client's active connection list*/
+				espconn_list_delete(&plink_active, task_msg);
+				espconn_tcp_reconnect(task_msg);
+				break;
+			case SIG_ESPCONN_CLOSE:
+				/*remove the node from the client's active connection list*/
+				espconn_list_delete(&plink_active, task_msg);
+				espconn_tcp_disconnect_successful(task_msg);
+				break;
+			default:
+				break;
+		}
 	}
 }
 
@@ -478,9 +494,13 @@ espconn_tcp_sent(void *arg, uint8 *psent, uint16 length)
 			err = tcp_write(pcb, psent, len, 0);
 
         if (err == ERR_MEM) {
-            len /= 2;
+			if(len < 3)
+				len--;
+			else
+            	len /= 2;
         }
-    } while (err == ERR_MEM && len > 1);
+
+    } while (err == ERR_MEM && len > 0);
 
 	/*Find out what we can send and send it, offset the buffer point for next send*/
     if (err == ERR_OK) {
@@ -615,7 +635,37 @@ espconn_recv_unhold(struct espconn *pespconn)
 }
 
 //***********Code for WIFI_BLOCK from upper**************
+sint8 ICACHE_FLASH_ATTR
+espconn_lock_recv(espconn_msg *plockmsg)
+{
+	if (plockmsg == NULL || plockmsg->pespconn == NULL) {
+		return ESPCONN_ARG;
+	}
 
+	if (plockmsg->pespconn->recv_callback == NULL){
+		if (plockmsg->readbuf == NULL){
+			plockmsg->readbuf = ringbuf_new(TCP_WND);
+			if (plockmsg->readbuf == NULL)
+				return ESPCONN_MEM;
+		}
+		return espconn_recv_hold(plockmsg->pespconn);
+	}
+
+	return ESPCONN_OK;
+}
+
+sint8 ICACHE_FLASH_ATTR
+espconn_unlock_recv(espconn_msg *punlockmsg)
+{
+	if (punlockmsg == NULL || punlockmsg->pespconn == NULL) {
+		return ESPCONN_ARG;
+	}
+
+	if (punlockmsg->pespconn->recv_callback != NULL)
+		return espconn_recv_unhold(punlockmsg->pespconn);
+
+	return ESPCONN_OK;
+}
 /******************************************************************************
  * FunctionName : espconn_client_recv
  * Description  : Data has been received on this pcb.
@@ -631,6 +681,8 @@ espconn_client_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 	espconn_msg *precv_cb = arg;
 
 	tcp_arg(pcb, arg);
+	/*lock the window because of application layer don't need the data*/
+	espconn_lock_recv(precv_cb);
 
     if (p != NULL) {
     	/*To update and advertise a larger window*/
@@ -640,30 +692,38 @@ espconn_client_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 			precv_cb->recv_holded_buf_Len += p->tot_len;
     }
 
-    if (err == ERR_OK && p != NULL) {
-    	char *pdata = NULL;
-    	u16_t length = 0;
-    	/*Copy the contents of a packet buffer to an application buffer.
-    	 *to prevent memory leaks, ensure that each allocated is deleted*/
-        pdata = (char *)os_zalloc(p ->tot_len + 1);
-        length = pbuf_copy_partial(p, pdata, p ->tot_len, 0);
-        pbuf_free(p);
+    if (precv_cb->pespconn->recv_callback != NULL){
+		if (err == ERR_OK && p != NULL) {
+			char *pdata = NULL;
+			u16_t length = 0;
+			/*Copy the contents of a packet buffer to an application buffer.
+			 *to prevent memory leaks, ensure that each allocated is deleted*/
+			pdata = (char *)os_zalloc(p ->tot_len + 1);
+			length = pbuf_copy_partial(p, pdata, p ->tot_len, 0);
+			pbuf_free(p);
 
-        if (length != 0) {
-        	/*switch the state of espconn for application process*/
-        	precv_cb->pespconn ->state = ESPCONN_READ;
-        	precv_cb->pcommon.pcb = pcb;
-            if (precv_cb->pespconn->recv_callback != NULL) {
-            	precv_cb->pespconn->recv_callback(precv_cb->pespconn, pdata, length);
-            }
-            /*switch the state of espconn for next packet copy*/
-            if (pcb->state == ESTABLISHED)
-            	precv_cb->pespconn ->state = ESPCONN_CONNECT;
-        }
+			if (length != 0) {
+				/*switch the state of espconn for application process*/
+				precv_cb->pespconn ->state = ESPCONN_READ;
+				precv_cb->pcommon.pcb = pcb;
+				precv_cb->pespconn->recv_callback(precv_cb->pespconn, pdata, length);
 
-        /*to prevent memory leaks, ensure that each allocated is deleted*/
-        os_free(pdata);
-        pdata = NULL;
+				/*switch the state of espconn for next packet copy*/
+				if (pcb->state == ESTABLISHED)
+					precv_cb->pespconn ->state = ESPCONN_CONNECT;
+			}
+
+			/*to prevent memory leaks, ensure that each allocated is deleted*/
+			os_free(pdata);
+			pdata = NULL;
+		}
+    } else{
+    	/*unregister receive function*/
+    	struct pbuf *pthis = NULL;
+    	for (pthis = p; pthis != NULL; pthis = pthis->next) {
+    		ringbuf_memcpy_into(precv_cb->readbuf, pthis->payload, pthis->len);
+    		pbuf_free(pthis);
+    	}
     }
 
     if (err == ERR_OK && p == NULL) {
@@ -877,6 +937,8 @@ espconn_client_connect(void *arg, struct tcp_pcb *tpcb, err_t err)
 		if (espconn_keepalive_disabled(pcon))
 			espconn_keepalive_enable(tpcb);
 
+//		/*lock the window because of application layer don't need the data*/
+//		espconn_lock_recv(pcon);
     } else{
     	os_printf("err in host connected (%s)\n",lwip_strerr(err));
     }
@@ -1015,6 +1077,9 @@ espconn_server_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 
     tcp_arg(pcb, arg);
     espconn_printf("server has application data received: %d\n", system_get_free_heap_size());
+    /*lock the window because of application layer don't need the data*/
+    espconn_lock_recv(precv_cb);
+
     if (p != NULL) {
     	/*To update and advertise a larger window*/
 		if(precv_cb->recv_hold_flag == 0)
@@ -1023,42 +1088,47 @@ espconn_server_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 			precv_cb->recv_holded_buf_Len += p->tot_len;
     }
 
-    if (err == ERR_OK && p != NULL) {
-    	u8_t *data_ptr = NULL;
-    	u32_t data_cntr = 0;
-    	/*clear the count for connection timeout*/
-		precv_cb->pcommon.recv_check = 0;
-		/*Copy the contents of a packet buffer to an application buffer.
-		 *to prevent memory leaks, ensure that each allocated is deleted*/
-        data_ptr = (u8_t *)os_zalloc(p ->tot_len + 1);
-        data_cntr = pbuf_copy_partial(p, data_ptr, p ->tot_len, 0);
-        pbuf_free(p);
+    /*register receive function*/
+	if (precv_cb->pespconn->recv_callback != NULL) {
+		if (err == ERR_OK && p != NULL) {
+			u8_t *data_ptr = NULL;
+			u32_t data_cntr = 0;
+			/*clear the count for connection timeout*/
+			precv_cb->pcommon.recv_check = 0;
+			/*Copy the contents of a packet buffer to an application buffer.
+			 *to prevent memory leaks, ensure that each allocated is deleted*/
+			data_ptr = (u8_t *) os_zalloc(p ->tot_len + 1);
+			data_cntr = pbuf_copy_partial(p, data_ptr, p->tot_len, 0);
+			pbuf_free(p);
 
-        if (data_cntr != 0) {
-        	/*switch the state of espconn for application process*/
-        	precv_cb->pespconn ->state = ESPCONN_READ;
-        	precv_cb->pcommon.pcb = pcb;
-            if (precv_cb->pespconn->recv_callback != NULL) {
-            	precv_cb->pespconn->recv_callback(precv_cb->pespconn, data_ptr, data_cntr);
-            }
+			if (data_cntr != 0) {
+				/*switch the state of espconn for application process*/
+				precv_cb->pespconn->state = ESPCONN_READ;
+				precv_cb->pcommon.pcb = pcb;
+				precv_cb->pespconn->recv_callback(precv_cb->pespconn, data_ptr, data_cntr);
 
-            /*switch the state of espconn for next packet copy*/
-            if (pcb->state == ESTABLISHED)
-            	precv_cb->pespconn ->state = ESPCONN_CONNECT;
-        }
+				/*switch the state of espconn for next packet copy*/
+				if (pcb->state == ESTABLISHED)
+					precv_cb->pespconn->state = ESPCONN_CONNECT;
+			}
 
-        /*to prevent memory leaks, ensure that each allocated is deleted*/
-        os_free(data_ptr);
-        data_ptr = NULL;
-        espconn_printf("server's application data has been processed: %d\n", system_get_free_heap_size());
-    } else {
-        if (p != NULL) {
-            pbuf_free(p);
-        }
+			/*to prevent memory leaks, ensure that each allocated is deleted*/
+			os_free(data_ptr);
+			data_ptr = NULL;
+			espconn_printf("server's application data has been processed: %d\n", system_get_free_heap_size());
+		}
+	} else {
+		/*unregister receive function*/
+		struct pbuf *pthis = NULL;
+		for (pthis = p; pthis != NULL; pthis = pthis->next) {
+			ringbuf_memcpy_into(precv_cb->readbuf, pthis->payload, pthis->len);
+			pbuf_free(pthis);
+		}
+	}
 
-        espconn_server_close(precv_cb, pcb,0);
-    }
-
+	if (err == ERR_OK && p == NULL) {
+		espconn_server_close(precv_cb, pcb, 0);
+	}
     return ERR_OK;
 }
 
@@ -1292,6 +1362,8 @@ espconn_tcp_accept(void *arg, struct tcp_pcb *pcb, err_t err)
 	if (espconn_keepalive_disabled(paccept))
 		espconn_keepalive_enable(pcb);
 
+//	/*lock the window because of application layer don't need the data*/
+//	espconn_lock_recv(paccept);
     return ERR_OK;
 }
 

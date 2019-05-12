@@ -26,12 +26,14 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
+#define PIN_WIRE_SDA (2)
+#define PIN_WIRE_SCL (14)
+
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
+
+#define LED_BUILTIN 5
+
 #include "../generic/common.h"
-
-static const uint8_t SDA = 2;
-static const uint8_t SCL = 14;
-
-static const uint8_t LED_BUILTIN = 5;
-static const uint8_t BUILTIN_LED = 5;
 
 #endif /* Pins_Arduino_h */

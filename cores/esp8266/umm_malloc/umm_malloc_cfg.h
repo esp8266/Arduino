@@ -9,10 +9,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdlib.h>
+#include <osapi.h>
+
 #include "c_types.h"
-#ifdef __cplusplus
-}
-#endif
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.
@@ -59,7 +60,33 @@ extern "C" {
  * ----------------------------------------------------------------------------
  */
 
+/////////////////////////////////////////////////
+#ifdef DEBUG_ESP_OOM
+
+#define MEMLEAK_DEBUG
+
+// umm_*alloc are not renamed to *alloc
+
+void *umm_malloc( size_t size );
+void *umm_calloc( size_t num, size_t size );
+void *umm_realloc( void *ptr, size_t size );
+#define umm_free    free
+#define umm_zalloc(s) umm_calloc(1,s)
+
+void* malloc_loc (size_t s, const char* file, int line);
+void* calloc_loc (size_t n, size_t s, const char* file, int line);
+void* realloc_loc (void* p, size_t s, const char* file, int line);
+
+// *alloc are macro calling *alloc_loc calling+checking umm_*alloc()
+// they are defined at the bottom of this file
+
+/////////////////////////////////////////////////
+#else // !defined(ESP_DEBUG_OOM)
+
+ // umm_*alloc are renamed to *alloc
  #define UMM_REDEFINE_MEM_FUNCTIONS
+
+#endif
 
  #define UMM_BEST_FIT
 
@@ -140,4 +167,19 @@ extern char _heap_start;
 #define UMM_POISONED_BLOCK_LEN_TYPE uint32_t
 
 #define UMM_HEAP_CORRUPTION_CB() panic()
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* _UMM_MALLOC_CFG_H */
+
+#ifdef DEBUG_ESP_OOM
+// this must be outside from "#ifndef _UMM_MALLOC_CFG_H"
+// because Arduino.h's <cstdlib> does #undef *alloc
+// Arduino.h recall us to redefine them
+#include <pgmspace.h>
+#define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; malloc_loc(s, mem_debug_file, __LINE__); })
+#define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; calloc_loc(n, s, mem_debug_file, __LINE__); })
+#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; realloc_loc(p, s, mem_debug_file, __LINE__); })
+#endif /* DEBUG_ESP_OOM */

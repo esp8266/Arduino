@@ -54,6 +54,15 @@ extern "C" {
 #define SPIFFS_ERR_RO_ABORTED_OPERATION -10033
 #define SPIFFS_ERR_PROBE_TOO_FEW_BLOCKS -10034
 #define SPIFFS_ERR_PROBE_NOT_A_FS       -10035
+#define SPIFFS_ERR_NAME_TOO_LONG        -10036
+
+#define SPIFFS_ERR_IX_MAP_UNMAPPED      -10037
+#define SPIFFS_ERR_IX_MAP_MAPPED        -10038
+#define SPIFFS_ERR_IX_MAP_BAD_RANGE     -10039
+
+#define SPIFFS_ERR_SEEK_BOUNDS          -10040
+
+
 #define SPIFFS_ERR_INTERNAL             -10050
 
 #define SPIFFS_ERR_TEST                 -10100
@@ -104,7 +113,7 @@ typedef enum {
   SPIFFS_CHECK_FIX_LOOKUP,
   SPIFFS_CHECK_DELETE_ORPHANED_INDEX,
   SPIFFS_CHECK_DELETE_PAGE,
-  SPIFFS_CHECK_DELETE_BAD_FILE,
+  SPIFFS_CHECK_DELETE_BAD_FILE
 } spiffs_check_report;
 
 /* file system check callback function */
@@ -123,7 +132,7 @@ typedef enum {
   /* the file has been updated or moved to another page */
   SPIFFS_CB_UPDATED,
   /* the file has been deleted */
-  SPIFFS_CB_DELETED,
+  SPIFFS_CB_DELETED
 } spiffs_fileop_type;
 
 /* file system listener callback function */
@@ -131,7 +140,7 @@ typedef void (*spiffs_file_callback)(struct spiffs_t *fs, spiffs_fileop_type op,
 
 #ifndef SPIFFS_DBG
 #define SPIFFS_DBG(...) \
-    print(__VA_ARGS__)
+    printf(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_GC_DBG
 #define SPIFFS_GC_DBG(...) printf(__VA_ARGS__)
@@ -145,20 +154,28 @@ typedef void (*spiffs_file_callback)(struct spiffs_t *fs, spiffs_fileop_type op,
 
 /* Any write to the filehandle is appended to end of the file */
 #define SPIFFS_APPEND                   (1<<0)
+#define SPIFFS_O_APPEND                 SPIFFS_APPEND
 /* If the opened file exists, it will be truncated to zero length before opened */
 #define SPIFFS_TRUNC                    (1<<1)
+#define SPIFFS_O_TRUNC                  SPIFFS_TRUNC
 /* If the opened file does not exist, it will be created before opened */
 #define SPIFFS_CREAT                    (1<<2)
+#define SPIFFS_O_CREAT                  SPIFFS_CREAT
 /* The opened file may only be read */
 #define SPIFFS_RDONLY                   (1<<3)
-/* The opened file may only be writted */
+#define SPIFFS_O_RDONLY                 SPIFFS_RDONLY
+/* The opened file may only be written */
 #define SPIFFS_WRONLY                   (1<<4)
-/* The opened file may be both read and writted */
+#define SPIFFS_O_WRONLY                 SPIFFS_WRONLY
+/* The opened file may be both read and written */
 #define SPIFFS_RDWR                     (SPIFFS_RDONLY | SPIFFS_WRONLY)
-/* Any writes to the filehandle will never be cached */
+#define SPIFFS_O_RDWR                   SPIFFS_RDWR
+/* Any writes to the filehandle will never be cached but flushed directly */
 #define SPIFFS_DIRECT                   (1<<5)
-/* If SPIFFS_CREAT and SPIFFS_EXCL are set, SPIFFS_open() shall fail if the file exists */
+#define SPIFFS_O_DIRECT                 SPIFFS_DIRECT
+/* If SPIFFS_O_CREAT and SPIFFS_O_EXCL are set, SPIFFS_open() shall fail if the file exists */
 #define SPIFFS_EXCL                     (1<<6)
+#define SPIFFS_O_EXCL                   SPIFFS_EXCL
 
 #define SPIFFS_SEEK_SET                 (0)
 #define SPIFFS_SEEK_CUR                 (1)
@@ -283,6 +300,9 @@ typedef struct {
   spiffs_obj_type type;
   spiffs_page_ix pix;
   u8_t name[SPIFFS_OBJ_NAME_LEN];
+#if SPIFFS_OBJ_META_LEN
+  u8_t meta[SPIFFS_OBJ_META_LEN];
+#endif
 } spiffs_stat;
 
 struct spiffs_dirent {
@@ -291,6 +311,9 @@ struct spiffs_dirent {
   spiffs_obj_type type;
   u32_t size;
   spiffs_page_ix pix;
+#if SPIFFS_OBJ_META_LEN
+  u8_t meta[SPIFFS_OBJ_META_LEN];
+#endif
 };
 
 typedef struct {
@@ -298,6 +321,21 @@ typedef struct {
   spiffs_block_ix block;
   int entry;
 } spiffs_DIR;
+
+#if SPIFFS_IX_MAP
+
+typedef struct {
+  // buffer with looked up data pixes
+  spiffs_page_ix *map_buf;
+  // precise file byte offset
+  u32_t offset;
+  // start data span index of lookup buffer
+  spiffs_span_ix start_spix;
+  // end data span index of lookup buffer
+  spiffs_span_ix end_spix;
+} spiffs_ix_map;
+
+#endif
 
 // functions
 
@@ -375,8 +413,8 @@ s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
  * @param fs            the file system struct
  * @param path          the path of the new file
  * @param flags         the flags for the open command, can be combinations of
- *                      SPIFFS_APPEND, SPIFFS_TRUNC, SPIFFS_CREAT, SPIFFS_RD_ONLY,
- *                      SPIFFS_WR_ONLY, SPIFFS_RDWR, SPIFFS_DIRECT
+ *                      SPIFFS_O_APPEND, SPIFFS_O_TRUNC, SPIFFS_O_CREAT, SPIFFS_O_RDONLY,
+ *                      SPIFFS_O_WRONLY, SPIFFS_O_RDWR, SPIFFS_O_DIRECT, SPIFFS_O_EXCL
  * @param mode          ignored, for posix compliance
  */
 spiffs_file SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode);
@@ -495,6 +533,24 @@ s32_t SPIFFS_close(spiffs *fs, spiffs_file fh);
  * @param newPath       new path of file
  */
 s32_t SPIFFS_rename(spiffs *fs, const char *old, const char *newPath);
+
+#if SPIFFS_OBJ_META_LEN
+/**
+ * Updates file's metadata
+ * @param fs            the file system struct
+ * @param path          path to the file
+ * @param meta          new metadata. must be SPIFFS_OBJ_META_LEN bytes long.
+ */
+s32_t SPIFFS_update_meta(spiffs *fs, const char *name, const void *meta);
+
+/**
+ * Updates file's metadata
+ * @param fs            the file system struct
+ * @param fh            file handle of the file
+ * @param meta          new metadata. must be SPIFFS_OBJ_META_LEN bytes long.
+ */
+s32_t SPIFFS_fupdate_meta(spiffs *fs, spiffs_file fh, const void *meta);
+#endif
 
 /**
  * Returns last error of last file operation.
@@ -647,6 +703,85 @@ s32_t SPIFFS_tell(spiffs *fs, spiffs_file fh);
  * @param cb_func       the callback on file operations
  */
 s32_t SPIFFS_set_file_callback_func(spiffs *fs, spiffs_file_callback cb_func);
+
+#if SPIFFS_IX_MAP
+
+/**
+ * Maps the first level index lookup to a given memory map.
+ * This will make reading big files faster, as the memory map will be used for
+ * looking up data pages instead of searching for the indices on the physical
+ * medium. When mapping, all affected indicies are found and the information is
+ * copied to the array.
+ * Whole file or only parts of it may be mapped. The index map will cover file
+ * contents from argument offset until and including arguments (offset+len).
+ * It is valid to map a longer range than the current file size. The map will
+ * then be populated when the file grows.
+ * On garbage collections and file data page movements, the map array will be
+ * automatically updated. Do not tamper with the map array, as this contains
+ * the references to the data pages. Modifying it from outside will corrupt any
+ * future readings using this file descriptor.
+ * The map will no longer be used when the file descriptor closed or the file
+ * is unmapped.
+ * This can be useful to get faster and more deterministic timing when reading
+ * large files, or when seeking and reading a lot within a file.
+ * @param fs      the file system struct
+ * @param fh      the file handle of the file to map
+ * @param map     a spiffs_ix_map struct, describing the index map
+ * @param offset  absolute file offset where to start the index map
+ * @param len     length of the mapping in actual file bytes
+ * @param map_buf the array buffer for the look up data - number of required
+ *                elements in the array can be derived from function
+ *                SPIFFS_bytes_to_ix_map_entries given the length
+ */
+s32_t SPIFFS_ix_map(spiffs *fs, spiffs_file fh, spiffs_ix_map *map,
+    u32_t offset, u32_t len, spiffs_page_ix *map_buf);
+
+/**
+ * Unmaps the index lookup from this filehandle. All future readings will
+ * proceed as normal, requiring reading of the first level indices from
+ * physical media.
+ * The map and map buffer given in function SPIFFS_ix_map will no longer be
+ * referenced by spiffs.
+ * It is not strictly necessary to unmap a file before closing it, as closing
+ * a file will automatically unmap it.
+ * @param fs      the file system struct
+ * @param fh      the file handle of the file to unmap
+ */
+s32_t SPIFFS_ix_unmap(spiffs *fs, spiffs_file fh);
+
+/**
+ * Moves the offset for the index map given in function SPIFFS_ix_map. Parts or
+ * all of the map buffer will repopulated.
+ * @param fs      the file system struct
+ * @param fh      the mapped file handle of the file to remap
+ * @param offset  new absolute file offset where to start the index map
+ */
+s32_t SPIFFS_ix_remap(spiffs *fs, spiffs_file fh, u32_t offs);
+
+/**
+ * Utility function to get number of spiffs_page_ix entries a map buffer must
+ * contain on order to map given amount of file data in bytes.
+ * See function SPIFFS_ix_map and SPIFFS_ix_map_entries_to_bytes.
+ * @param fs      the file system struct
+ * @param bytes   number of file data bytes to map
+ * @return        needed number of elements in a spiffs_page_ix array needed to
+ *                map given amount of bytes in a file
+ */
+s32_t SPIFFS_bytes_to_ix_map_entries(spiffs *fs, u32_t bytes);
+
+/**
+ * Utility function to amount of file data bytes that can be mapped when
+ * mapping a file with buffer having given number of spiffs_page_ix entries.
+ * See function SPIFFS_ix_map and SPIFFS_bytes_to_ix_map_entries.
+ * @param fs      the file system struct
+ * @param map_page_ix_entries   number of entries in a spiffs_page_ix array
+ * @return        amount of file data in bytes that can be mapped given a map
+ *                buffer having given amount of spiffs_page_ix entries
+ */
+s32_t SPIFFS_ix_map_entries_to_bytes(spiffs *fs, u32_t map_page_ix_entries);
+
+#endif // SPIFFS_IX_MAP
+
 
 #if SPIFFS_TEST_VISUALISATION
 /**
