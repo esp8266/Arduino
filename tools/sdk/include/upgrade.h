@@ -29,8 +29,8 @@
 extern "C" {
 #endif
 
+#include <spi_flash_geometry.h>
 
-#define SPI_FLASH_SEC_SIZE      4096
 #define LIMIT_ERASE_SIZE		0x10000
 
 #define USER_BIN1               0x00

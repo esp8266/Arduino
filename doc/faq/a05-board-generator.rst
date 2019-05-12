@@ -34,7 +34,9 @@ It needs to be run from the root directory,
     C:\...> python tools\boards.txt.py
 
 Running without parameters will show the command line help.  They are
-generally self-explanatory.
+generally self-explanatory.  Running with the parameters will show no output but will generate a new boards.txt file (and a backup boards.txt.orig).
+
+The core root directory varies depending on your development environment.  In Windows, core root is found under your home directory; for Arduino it is in AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.2\ for PlatformIO it is in .platformio\packages\framework-arduinoespressif8266.
 
 
 What can I do with it ?
@@ -47,8 +49,6 @@ As of today you can:
 * in the IDE: add new serial programming speed
 
 * increase available flash space by disabling floats in ``*printf`` functions
-
-* enable WPS which is now disabled by default (at the cost of a smaller heap by ~4KB)
 
 * change led pin ``LED_BUILTIN`` for the two generic boards
 

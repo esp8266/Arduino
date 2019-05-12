@@ -67,7 +67,7 @@ class CertStore {
   protected:
     CertStoreFile *_index = nullptr;
     CertStoreFile *_data = nullptr;
-    BearSSLX509List *_x509 = nullptr;
+    X509List *_x509 = nullptr;
 
     // These need to be static as they are callbacks from BearSSL C code
     static const br_x509_trust_anchor *findHashedTA(void *ctx, void *hashed_dn, size_t len);

@@ -5,10 +5,16 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
 #include <time.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
 const char *   host = "api.github.com";
 const uint16_t port = 443;
@@ -38,6 +44,8 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     path = "/";
   }
 
+  ESP.resetFreeContStack();
+  uint32_t freeStackStart = ESP.getFreeContStack();
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
   if (!client->connected()) {
@@ -72,7 +80,8 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     } while (millis() < to);
   }
   client->stop();
-  Serial.printf("\n-------\n\n");
+  uint32_t freeStackEnd = ESP.getFreeContStack();
+  Serial.printf("\nCONT stack used: %d\n-------\n\n", freeStackStart - freeStackEnd);
 }
 
 void fetchNoConfig() {
@@ -102,7 +111,7 @@ instead of the while certificate.  This is not nearly as secure as real
 X.509 validation, but is better than nothing.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  const uint8_t fp[20] = {0x5F, 0xF1, 0x60, 0x31, 0x09, 0x04, 0x3E, 0xF2, 0x90, 0xD2, 0xB0, 0x8A, 0x50, 0x38, 0x04, 0xE8, 0x37, 0x9F, 0xBC, 0x76};
+  static const char fp[] PROGMEM = "5F:F1:60:31:09:04:3E:F2:90:D2:B0:8A:50:38:04:E8:37:9F:BC:76";
   client.setFingerprint(fp);
   fetchURL(&client, host, port, path);
 }
@@ -131,17 +140,17 @@ able to establish communications.
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
   static const char pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqcCPMEktuxLoDAxdHQgI
-95FweH4Fa6+LslU2qmmUBF+pu4ZOUvpIQxVU5wqdWaxZauxG1nYUTrAWdPb1n0um
-gLsGE7WYXJnQPJewIK4Qhua0LsrirIdHkcwHQ83NEYj+lswhg0fUQURt06Uta5ak
-LovDdJPLqTuTS/nshOa76hR0ouWnrqucLL1szcvX/obB+Nsbmr58Mrg8prQfRoK6
-ibzlZysV88qPcCpc57lq6QBKQ2F9WgQMssQigXfTNm8lAAQ+L6gCZngd4KfHYPSJ
-YA07oFWmuSOalgh00Wh8PUjuRGrcNxWpmgfALQHHFYgoDcD+a8+GoJk+GdJd3ong
-ZQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+3Up8qBkIn/7S9AfWlH
+Od8SdXmnWx+JCIHvnWzjFcLeLvQb2rMqqCDL5XDlvkyC5SZ8ZyLITemej5aJYuBv
+zcKPzyZ0QfYZiskU9nzL2qBQj8alzJJ/Cc32AWuuWrPrzVxBmOEW9gRCGFCD3m0z
+53y6GjcmBS2wcX7RagqbD7g2frEGko4G7kmW96H6dyh2j9Rou8TwAK6CnbiXPAM/
+5Q6dyfdYlHOCgP75F7hhdKB5gpprm9A/OnQsmZjUPzy4u0EKCxE8MfhBerZrZdod
+88ZdDG3CvTgm050bc+lGlbsT+s09lp0dgxSZIeI8+syV2Owt4YF/PdjeeymtzQdI
+wQIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
   BearSSL::WiFiClientSecure client;
-  BearSSLPublicKey key(pubkey);
+  BearSSL::PublicKey key(pubkey);
   client.setKnownKey(&key);
   fetchURL(&client, host, port, path);
 }
@@ -183,7 +192,7 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSLX509List cert(digicert);
+  BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
   fetchURL(&client, host, port, path);
@@ -191,6 +200,32 @@ BearSSL does verify the notValidBefore/After fields.
   Serial.printf("Try again after setting NTP time (should pass)\n");
   setClock();
   fetchURL(&client, host, port, path);
+}
+
+void fetchFaster() {
+  Serial.printf(R"EOF(
+The ciphers used to set up the SSL connection can be configured to
+only support faster but less secure ciphers.  If you care about security
+you won't want to do this.  If you need to maximize battery life, these
+may make sense
+)EOF");
+  BearSSL::WiFiClientSecure client;
+  client.setInsecure();
+  uint32_t now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta = millis() - now;
+  client.setInsecure();
+  client.setCiphersLessSecure();
+  now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta2 = millis() - now;
+  std::vector<uint16_t> myCustomList = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
+  client.setInsecure();
+  client.setCiphers(myCustomList);
+  now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta3 = millis() - now;
+  Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n", delta, delta2, delta3);
 }
 
 void setup() {
@@ -220,6 +255,7 @@ void setup() {
   fetchSelfSigned();
   fetchKnownKey();
   fetchCertAuthority();
+  fetchFaster();
 }
 
 

@@ -19,8 +19,13 @@
 
 ////////////////////////////////////////////////////////
 
-#define SSID            "open"
-#define SSIDPWD         ""
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+#define SSID            STASSID
+#define SSIDPWD         STAPSK
 #define TZ              1       // (utc+) TZ in hours
 #define DST_MN          60      // use 60mn for summer time in some countries
 
@@ -46,7 +51,7 @@ void setup() {
   Serial.begin(115200);
   settimeofday_cb(time_is_set);
 
-  #if NTP0_OR_LOCAL1
+#if NTP0_OR_LOCAL1
   // local
 
   ESP.eraseConfig();
@@ -55,14 +60,14 @@ void setup() {
   timezone tz = { TZ_MN + DST_MN, 0 };
   settimeofday(&tv, &tz);
 
-  #else // ntp
+#else // ntp
 
   configTime(TZ_SEC, DST_SEC, "pool.ntp.org");
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, SSIDPWD);
   // don't wait, observe time changing when ntp timestamp is received
 
-  #endif // ntp
+#endif // ntp
 }
 
 // for testing purpose:

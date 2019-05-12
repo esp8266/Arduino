@@ -17,6 +17,7 @@
 #include <string.h>
 #include <WString.h>
 #include <limits.h>
+#include <StreamString.h>
 
 TEST_CASE("String::trim", "[core][String]")
 {
@@ -83,6 +84,12 @@ TEST_CASE("String constructors", "[core][String]")
     REQUIRE(ssh == "3.14159_abcd");
     String flash = (F("hello from flash"));
     REQUIRE(flash == "hello from flash");
+    const char textarray[6] = {'h', 'e', 'l', 'l', 'o', 0};
+    String hello(textarray);
+    REQUIRE(hello == "hello");
+    String hello2;
+    hello2 = textarray;
+    REQUIRE(hello2 == "hello");
 }
 
 TEST_CASE("String concantenation", "[core][String]")
@@ -115,6 +122,15 @@ TEST_CASE("String concantenation", "[core][String]")
     str = "clean";
     REQUIRE(str.concat(str) == true);
     REQUIRE(str == "cleanclean");
+    // non-decimal negative #s should be as if they were unsigned
+    str = String((int)-100, 16);
+    REQUIRE(str == "ffffff9c");
+    str = String((long)-101, 16);
+    REQUIRE(str == "ffffff9b");
+    str = String((int)-100, 10);
+    REQUIRE(str == "-100");
+    str = String((long)-100, 10);
+    REQUIRE(str == "-100");
 }
 
 TEST_CASE("String comparison", "[core][String]")
@@ -258,4 +274,181 @@ TEST_CASE("String sizes near 8b", "[core][String]")
     REQUIRE(!strcmp(s15.c_str(),"12345678901234_"));
     REQUIRE(!strcmp(s16.c_str(),"123456789012345_"));
     REQUIRE(!strcmp(s17.c_str(),"1234567890123456_"));
+}
+
+TEST_CASE("String SSO works", "[core][String]")
+{
+  // This test assumes that SSO_SIZE==8, if that changes the test must as well
+  String s;
+  s += "0";
+  REQUIRE(s == "0");
+  REQUIRE(s.length() == 1);
+  const char *savesso = s.c_str();
+  s += 1;
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "01");
+  REQUIRE(s.length() == 2);
+  s += "2";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "012");
+  REQUIRE(s.length() == 3);
+  s += 3;
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "0123");
+  REQUIRE(s.length() == 4);
+  s += "4";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "01234");
+  REQUIRE(s.length() == 5);
+  s += "5";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "012345");
+  REQUIRE(s.length() == 6);
+  s += "6";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "0123456");
+  REQUIRE(s.length() == 7);
+  s += "7";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "01234567");
+  REQUIRE(s.length() == 8);
+  s += "8";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "012345678");
+  REQUIRE(s.length() == 9);
+  s += "9";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "0123456789");
+  REQUIRE(s.length() == 10);
+  s += "a";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "0123456789a");
+  REQUIRE(s.length() == 11);
+  if (sizeof(savesso) == 4) {
+    s += "b";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789ab");
+    REQUIRE(s.length() == 12);
+    s += "c";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789abc");
+    REQUIRE(s.length() == 13);
+  } else {
+    s += "bcde";
+    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s == "0123456789abcde");
+    REQUIRE(s.length() == 15);
+    s += "fghi";
+    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s == "0123456789abcdefghi");
+    REQUIRE(s.length() == 19);
+    s += "j";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789abcdefghij");
+    REQUIRE(s.length() == 20);
+    s += "k";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789abcdefghijk");
+    REQUIRE(s.length() == 21);
+    s += "l";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789abcdefghijkl");
+    REQUIRE(s.length() == 22);
+    s += "m";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789abcdefghijklm");
+    REQUIRE(s.length() == 23);
+    s += "nopq";
+    REQUIRE(s.c_str() != savesso);
+      REQUIRE(s == "0123456789abcdefghijklmnopq");
+    REQUIRE(s.length() == 27);
+    s += "rstu";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789abcdefghijklmnopqrstu");
+    REQUIRE(s.length() == 31);
+  }
+  s = "0123456789abcde";
+  s = s.substring(s.indexOf('a'));
+  REQUIRE(s == "abcde");
+  REQUIRE(s.length() == 5);
+}
+
+#include <new>
+void repl(const String& key, const String& val, String& s, boolean useURLencode)
+{
+    s.replace(key, val);
+}
+
+
+TEST_CASE("String SSO handles junk in memory", "[core][String]")
+{
+  // We fill the SSO space with garbage then construct an object in it and check consistency
+  // This is NOT how you want to use Strings outside of this testing!
+  unsigned char space[64];
+  String *s = (String*)space;
+  memset(space, 0xff, 64);
+  new(s) String;
+  REQUIRE(*s == "");
+  s->~String();
+
+  // Tests from #5883
+  bool useURLencode = false;
+  const char euro[4] = {(char)0xe2, (char)0x82, (char)0xac, 0}; // Unicode euro symbol
+  const char yen[3]   = {(char)0xc2, (char)0xa5, 0}; // Unicode yen symbol
+
+  memset(space, 0xff, 64);
+  new(s) String("%ssid%");
+  repl(("%ssid%"), "MikroTik", *s, useURLencode);
+  REQUIRE(*s == "MikroTik");
+  s->~String();
+
+  memset(space, 0xff, 64);
+  new(s) String("{E}");
+  repl(("{E}"), euro, *s, useURLencode);
+  REQUIRE(*s == "€");
+  s->~String();
+  memset(space, 0xff, 64);
+  new(s) String("&euro;");
+  repl(("&euro;"), euro, *s, useURLencode);
+  REQUIRE(*s == "€");
+  s->~String();
+  memset(space, 0xff, 64);
+  new(s) String("{Y}");
+  repl(("{Y}"), yen, *s, useURLencode);
+  REQUIRE(*s == "¥");
+  s->~String();
+  memset(space, 0xff, 64);
+  new(s) String("&yen;");
+  repl(("&yen;"), yen, *s, useURLencode);
+  REQUIRE(*s == "¥");
+  s->~String();
+
+  memset(space, 0xff, 64);
+  new(s) String("%sysname%");
+  repl(("%sysname%"), "CO2_defect", *s, useURLencode);
+  REQUIRE(*s == "CO2_defect");
+  s->~String();
+}
+
+
+TEST_CASE("Issue #5949 - Overlapping src/dest in replace", "[core][String]")
+{
+  String blah = "blah";
+  blah.replace("xx", "y");
+  REQUIRE(blah == "blah");
+  blah.replace("x", "yy");
+  REQUIRE(blah == "blah");
+  blah.replace(blah, blah);
+  REQUIRE(blah == "blah");
+}
+
+
+TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
+{
+    StreamString s;
+    s.print('{');
+    s.print('\"');
+    s.print(String("message"));
+    s.print('\"');
+    REQUIRE(s == "{\"message\"");
 }

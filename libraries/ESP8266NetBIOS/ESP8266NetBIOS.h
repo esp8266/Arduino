@@ -28,13 +28,9 @@ protected:
     void _getnbname(char *nbname, char *name, uint8_t maxlen);
     void _makenbname(char *name, char *nbname, uint8_t outlen);
    
-#if LWIP_VERSION_MAJOR == 1 
-    void _recv(udp_pcb *upcb, pbuf *pb, struct ip_addr *addr, uint16_t port);
-    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port);
-#else
-    void _recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port);
-    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port);
-#endif
+    void _recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint16_t port);
+    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, CONST ip_addr_t *addr, uint16_t port);
+
 public:
     ESP8266NetBIOS();
     ~ESP8266NetBIOS();

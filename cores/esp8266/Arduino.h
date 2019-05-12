@@ -38,6 +38,7 @@ extern "C" {
 #include "esp8266_peri.h"
 #include "twi.h"
 #include "core_esp8266_features.h"
+#include "core_esp8266_version.h"
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -187,7 +188,7 @@ typedef uint16_t word;
 #define bit(b) (1UL << (b))
 #define _BV(b) (1UL << (b))
 
-typedef uint8_t boolean;
+typedef bool boolean;
 typedef uint8_t byte;
 
 void init(void);
@@ -218,6 +219,7 @@ uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 void attachInterrupt(uint8_t pin, void (*)(void), int mode);
 void detachInterrupt(uint8_t pin);
 
+void preinit(void);
 void setup(void);
 void loop(void);
 
@@ -253,7 +255,7 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 #ifdef __cplusplus
 
 #include <algorithm>
-#include "pgmspace.h"
+#include <pgmspace.h>
 
 #include "WCharacter.h"
 #include "WString.h"

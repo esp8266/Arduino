@@ -39,7 +39,7 @@ private:
   String _SSID;
   String _meshName;
   String _nodeID;
-  int _serverPort;
+  uint16_t _serverPort;
   String _meshPassword;
   uint8 _meshWiFiChannel;
   bool _verboseMode;
@@ -47,6 +47,12 @@ private:
   uint32_t _lwipVersion[3];
   static const uint32_t lwipVersion203Signature[3];
   String _message = WIFI_MESH_EMPTY_STRING;
+  bool _scanHidden = false;
+  bool _apHidden = false;
+  uint8_t _maxAPStations = 4;
+  int32_t _connectionAttemptTimeoutMs = 10000;
+  int _stationModeTimeoutMs = 5000; // int is the type used in the Arduino core for this particular API, not uint32_t, which is why we use int here.
+  uint32_t _apModeTimeoutMs = 4500;
 
   static String lastSSID;
   static bool staticIPActivated;
@@ -69,7 +75,7 @@ private:
   void initiateConnectionToAP(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
   transmission_status_t connectToNode(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
   transmission_status_t exchangeInfo(WiFiClient &currClient);
-  bool waitForClientTransmission(WiFiClient &currClient, int maxWait);
+  bool waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait);
   transmission_status_t attemptDataTransfer();
   transmission_status_t attemptDataTransferKernel();
   void storeLwipVersion();
@@ -153,7 +159,7 @@ public:
    */
   ESP8266WiFiMesh(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
                   const String &meshPassword, const String &meshName = "MeshNode_", const String &nodeID = WIFI_MESH_EMPTY_STRING, bool verboseMode = false, 
-                  uint8 meshWiFiChannel = 1, int serverPort = 4011);
+                  uint8 meshWiFiChannel = 1, uint16_t serverPort = 4011);
   
   /** 
   * A vector that contains the NetworkInfo for each WiFi network to connect to. 
@@ -170,6 +176,11 @@ public:
   * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
   */
   static std::vector<TransmissionResult> latestTransmissionOutcomes;
+
+  /**
+   * @returns True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   */
+  static bool latestTransmissionSuccessful();
 
   /**
    * Initialises the node.
@@ -202,11 +213,9 @@ public:
    */
   bool isAPController();
 
-  uint8 getWiFiChannel();
-  
   /**
    * Change the WiFi channel used by this ESP8266WiFiMesh instance. 
-   * Will also change the AP WiFi channel if this ESP8266WiFiMesh instance is the current AP controller.
+   * Will also change the WiFi channel for the active AP if this ESP8266WiFiMesh instance is the current AP controller and it is possible to change channel.
    * 
    * WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
    * This can cause problems if several ESP8266WiFiMesh instances exist on the same ESP8266 and use different WiFi channels. 
@@ -218,44 +227,43 @@ public:
    *                          
    */
   void setWiFiChannel(uint8 newWiFiChannel);
-
-  String getMeshName();
+  uint8 getWiFiChannel();
 
   /**
    * Change the mesh name used by this ESP8266WiFiMesh instance. 
-   * Will also change the AP mesh name (SSID prefix) if this ESP8266WiFiMesh instance is the current AP controller.
+   * Will also change the mesh name (SSID prefix) for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
    *
    * @param newMeshName The mesh name to change to.                        
    */
   void setMeshName(const String &newMeshName);
-  
-  String getNodeID();
-  
+  String getMeshName();
+      
   /**
    * Change the node id used by this ESP8266WiFiMesh instance. 
-   * Will also change the AP node id (SSID suffix) if this ESP8266WiFiMesh instance is the current AP controller.
+   * Will also change the node id (SSID suffix) for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
    *
    * @param newNodeID The node id to change to.                        
    */
   void setNodeID(const String &newNodeID);
-  
+  String getNodeID();
+    
   /**
    * Change the SSID (mesh name + node id) used by this ESP8266WiFiMesh instance. 
-   * Will also change the AP SSID if this ESP8266WiFiMesh instance is the current AP controller.
+   * Will also change the SSID for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
    *
    * @param newMeshName The mesh name to change to. Will be the SSID prefix.                    
    * @param newNodeID The node id to change to. Will be the SSID suffix.
    */  
   void setSSID(const String &newMeshName, const String &newNodeID);
-
-  String getMessage();
-
+  String getSSID();
+  
   /**
    * Set the message that will be sent to other nodes when calling attemptTransmission.
    * 
    * @param newMessage The message to send.
    */
   void setMessage(const String &newMessage);
+  String getMessage();
 
   /**
    * If AP connection already exists, and the initialDisconnect argument is set to false, send message only to the already connected AP.
@@ -282,7 +290,6 @@ public:
    * The static IP needs to be at the same subnet as the server's gateway.
    */
   void setStaticIP(const IPAddress &newIP);
-  
   IPAddress getStaticIP();
   void disableStaticIP();
 
@@ -291,11 +298,77 @@ public:
    */
   static const IPAddress emptyIP;
 
-  static String uint64ToString(uint64_t number, byte base = 16);
-  static uint64_t stringToUint64(const String &string, byte base = 16);
-
-  networkFilterType getNetworkFilter();
+  void setRequestHandler(requestHandlerType requestHandler);
+  requestHandlerType getRequestHandler();
+  
+  void setResponseHandler(responseHandlerType responseHandler);
+  responseHandlerType getResponseHandler();
+    
   void setNetworkFilter(networkFilterType networkFilter);
+  networkFilterType getNetworkFilter();
+
+  /**
+   * Set whether scan results from this ESP8266WiFiMesh instance will include WiFi networks with hidden SSIDs.
+   * This is false by default.
+   * The SSID field of a found hidden network will be blank in the scan results.
+   * WiFi.isHidden(networkIndex) can be used to verify that a found network is hidden.
+   *
+   * @param scanHidden If true, WiFi networks with hidden SSIDs will be included in scan results.
+   */
+  void setScanHidden(bool scanHidden);
+  bool getScanHidden();
+
+  /**
+   * Set whether the AP controlled by this ESP8266WiFiMesh instance will have a WiFi network with hidden SSID.
+   * This is false by default.
+   * Will also change the setting for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
+   *
+   * @param apHidden If true, the WiFi network created will have a hidden SSID.
+   */
+  void setAPHidden(bool apHidden);
+  bool getAPHidden();
+
+  /**
+   * Set the maximum number of stations that can simultaneously be connected to the AP controlled by this ESP8266WiFiMesh instance. 
+   * This number is 4 by default.
+   * Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects.
+   * The more stations that are connected, the more memory is required.
+   * Will also change the setting for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
+   *
+   * @param maxAPStations The maximum number of simultaneous station connections allowed. Valid values are 0 to 8.
+   */
+  void setMaxAPStations(uint8_t maxAPStations);
+  bool getMaxAPStations();
+
+  /**
+   * Set the timeout for each attempt to connect to another AP that occurs through the attemptTransmission method by this ESP8266WiFiMesh instance.
+   * The timeout is 10 000 ms by default.
+   * 
+   * @param connectionAttemptTimeoutMs The timeout for each connection attempt, in milliseconds.
+   */
+  void setConnectionAttemptTimeout(int32_t connectionAttemptTimeoutMs);
+  int32_t getConnectionAttemptTimeout();
+
+  /**
+   * Set the timeout to use for transmissions when this ESP8266WiFiMesh instance acts as a station (i.e. when connected to another AP).
+   * This will affect the timeout of the attemptTransmission method once a connection to an AP has been established.
+   * The timeout is 5 000 ms by default.
+   * 
+   * @param stationModeTimeoutMs The timeout to use, in milliseconds.
+   */
+  void setStationModeTimeout(int stationModeTimeoutMs);
+  int getStationModeTimeout();
+
+  /**
+   * Set the timeout to use for transmissions when this ESP8266WiFiMesh instance acts as an AP (i.e. when receiving connections from other stations).
+   * This will affect the timeout of the acceptRequest method.
+   * The timeout is 4 500 ms by default.
+   * Will also change the setting for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
+   *
+   * @param apModeTimeoutMs The timeout to use, in milliseconds.
+   */
+  void setAPModeTimeout(uint32_t apModeTimeoutMs);
+  uint32_t getAPModeTimeout();
 };
 
 #endif

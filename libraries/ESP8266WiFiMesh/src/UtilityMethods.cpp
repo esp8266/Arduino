@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
+#include "TypeConversionFunctions.h"
 #include "ESP8266WiFiMesh.h"
-#include <assert.h>
 
 void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline)
 {
@@ -35,52 +35,6 @@ void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline
     else
       Serial.print(stringToPrint);
   }
-}
-
-/**
- * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
- * 
- * @param number The number to convert to a string with radix "base".
- * @param base The radix to convert "number" into. Must be between 2 and 36.
- * @returns A string of "number" encoded in radix "base".
- */
-String ESP8266WiFiMesh::uint64ToString(uint64_t number, byte base)
-{
-  assert(2 <= base && base <= 36);
-  
-  String result = "";
-
-  while(number > 0)
-  {
-    result = String((uint32_t)(number % base), base) + result;
-    number /= base;
-  }
-
-  return (result == "" ? "0" : result);
-}
-
-/**
- * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
- * 
- * @param string The string to convert to uint64_t. String must use radix "base".
- * @param base The radix of "string". Must be between 2 and 36.
- * @returns A uint64_t of the string, using radix "base" during decoding.
- */
-uint64_t ESP8266WiFiMesh::stringToUint64(const String &string, byte base)
-{
-  assert(2 <= base && base <= 36);
-  
-  uint64_t result = 0;
-
-  char currentCharacter[1];
-  for(uint32_t i = 0; i < string.length(); i++)
-  {
-    result *= base;
-    currentCharacter[0] = string.charAt(i);
-    result += strtoul(currentCharacter, NULL, base);
-  }
-  
-  return result;
 }
 
 /**

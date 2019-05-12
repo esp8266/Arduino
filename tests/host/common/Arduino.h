@@ -20,6 +20,8 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#define MOCK "mock: "
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,6 +34,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
     
 #include "binary.h"
 #include "twi.h"
@@ -188,8 +191,6 @@ extern "C" {
     void init(void);
     void initVariant(void);
     
-    int atexit(void (*func)()) __attribute__((weak));
-    
     void pinMode(uint8_t pin, uint8_t mode);
     void digitalWrite(uint8_t pin, uint8_t val);
     int digitalRead(uint8_t pin);
@@ -216,6 +217,7 @@ extern "C" {
     void loop(void);
     
     void yield(void);
+    void esp_yield(void);
     void optimistic_yield(uint32_t interval_us);
     
 #define digitalPinToPort(pin)       (0)
@@ -236,7 +238,7 @@ extern "C" {
 
 #ifdef __cplusplus
 
-#include "pgmspace.h"
+#include <pgmspace.h>
 
 #include "WCharacter.h"
 #include "WString.h"
@@ -246,10 +248,12 @@ extern "C" {
 #include "Updater.h"
 #include "debug.h"
 
+#if 0
 #ifndef _GLIBCXX_VECTOR
 // arduino is not compatible with std::vector
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
 #endif
 
 #define _min(a,b) ((a)<(b)?(a):(b))

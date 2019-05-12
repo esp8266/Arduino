@@ -29,11 +29,26 @@
 #undef max
 #undef min
 #include "FSImpl.h"
-#include "spiffs/spiffs.h"
+extern "C" {
+    #include "spiffs/spiffs.h"
+    #include "spiffs/spiffs_nucleus.h"
+};
 #include "debug.h"
 #include "flash_utils.h"
 
 using namespace fs;
+
+#ifdef ARDUINO
+extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _SPIFFS_end;
+extern "C" uint32_t _SPIFFS_page;
+extern "C" uint32_t _SPIFFS_block;
+
+#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
+#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
+#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
+#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+#endif
 
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
@@ -112,6 +127,27 @@ public:
         return true;
     }
 
+    bool mkdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
+    bool rmdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
+    bool setConfig(const FSConfig &cfg) override
+    {
+        if ((cfg._type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
+            return false;
+        }
+        _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
+	return true;
+    }
+
     bool begin() override
     {
         if (SPIFFS_mounted(&_fs) != 0) {
@@ -124,12 +160,16 @@ public:
         if (_tryMount()) {
             return true;
         }
-        auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+	if (_cfg._autoFormat) {
+            auto rc = SPIFFS_format(&_fs);
+            if (rc != SPIFFS_OK) {
+                DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+                return false;
+            }
+            return _tryMount();
+        } else {
             return false;
         }
-        return _tryMount();
     }
 
     void end() override
@@ -138,6 +178,9 @@ public:
             return;
         }
         SPIFFS_unmount(&_fs);
+        _workBuf.reset(nullptr);
+        _fdsBuf.reset(nullptr);
+        _cacheBuf.reset(nullptr);
     }
 
     bool format() override
@@ -163,6 +206,11 @@ public:
         }
 
         return true;
+    }
+
+    bool gc() override
+    {
+        return SPIFFS_gc_quick( &_fs, 0 ) == SPIFFS_OK;
     }
 
 protected:
@@ -220,7 +268,7 @@ protected:
         size_t cacheBufSize = SPIFFS_buffer_bytes_for_cache(&_fs, _maxOpenFds);
 
         if (!_workBuf) {
-            DEBUGV("SPIFFSImpl: allocating %d+%d+%d=%d bytes\r\n",
+            DEBUGV("SPIFFSImpl: allocating %zd+%zd+%zd=%zd bytes\r\n",
                    workBufSize, fdsBufSize, cacheBufSize,
                    workBufSize + fdsBufSize + cacheBufSize);
             _workBuf.reset(new uint8_t[workBufSize]);
@@ -247,7 +295,7 @@ protected:
         (void) report;
         (void) arg1;
         (void) arg2;
-        
+
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
@@ -264,6 +312,8 @@ protected:
     std::unique_ptr<uint8_t[]> _workBuf;
     std::unique_ptr<uint8_t[]> _fdsBuf;
     std::unique_ptr<uint8_t[]> _cacheBuf;
+
+    SPIFFSConfig _cfg;
 };
 
 #define CHECKFD() while (_fd == 0) { panic(); }
@@ -360,6 +410,29 @@ public:
         return _stat.size;
     }
 
+    bool truncate(uint32_t size) override
+    {
+        CHECKFD();
+        spiffs_fd *sfd;
+        if (spiffs_fd_get(_fs->getFs(), _fd, &sfd) == SPIFFS_OK) {
+            return SPIFFS_OK == spiffs_object_truncate(sfd, size, 0);
+        } else {
+          return false;
+        }
+    }
+
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _fd ? true : false;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     void close() override
     {
         CHECKFD();
@@ -373,6 +446,11 @@ public:
         CHECKFD();
 
         return (const char*) _stat.name;
+    }
+
+    const char* fullName() const override
+    {
+        return name(); // No dirs, they're the same on SPIFFS
     }
 
 protected:
@@ -400,6 +478,7 @@ public:
         : _pattern(pattern)
         , _fs(fs)
         , _dir(dir)
+        , _dirHead(dir)
         , _valid(false)
     {
     }
@@ -443,6 +522,18 @@ public:
         return _dirent.size;
     }
 
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _valid;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     bool next() override
     {
         const int n = _pattern.length();
@@ -453,13 +544,20 @@ public:
         return _valid;
     }
 
+    bool rewind() override
+    {
+        _dir = _dirHead;
+        _valid = false;
+        return true;
+    }
+
 protected:
     String _pattern;
     SPIFFSImpl* _fs;
     spiffs_DIR  _dir;
+    spiffs_DIR  _dirHead; // The pointer to the start of this dir
     spiffs_dirent _dirent;
     bool _valid;
 };
-
 
 #endif//spiffs_api_h

@@ -19,6 +19,8 @@ If you want to add emulation of a certain feature, add it into tests/host/common
 
 ### Running test cases
 
+**NOTE!** The test-on-host environment is dependent on some submodules. Make sure to run `git submodule update --init` before running any test.
+
 To run test cases, go to tests/host/ directory and run `make`. This will compile and run the tests. 
 
 If all tests pass, you will see "All tests passed" message and the exit code will be 0.
@@ -114,6 +116,7 @@ Some tests need to connect to WiFi AP or to the PC running the tests. In the tes
 
 Environment variables can also be used to pass some information from the test code to the host side helper. To do that, test code can set an environment variable using `setenv` C function. Then the `teardown` host side helper can obtain the value of that variable using `request_env` function defined in `mock_decorators`.
 
+A SPIFFS filesystem may be generated on the host and uploade before a test by including a file called `make_spiffs.py` in the individual test directory.
 
 ### Building and running the tests
 

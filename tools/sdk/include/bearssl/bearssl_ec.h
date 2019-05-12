@@ -28,6 +28,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "bearssl_rand.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -450,6 +452,42 @@ extern const br_ec_impl br_ec_p256_m15;
 extern const br_ec_impl br_ec_p256_m31;
 
 /**
+ * \brief EC implementation "m62" (specialised code) for P-256.
+ *
+ * This implementation uses custom code relying on multiplication of
+ * integers up to 64 bits, with a 128-bit result. This implementation is
+ * defined only on platforms that offer the 64x64->128 multiplication
+ * support; use `br_ec_p256_m62_get()` to dynamically obtain a pointer
+ * to that implementation.
+ */
+extern const br_ec_impl br_ec_p256_m62;
+
+/**
+ * \brief Get the "m62" implementation of P-256, if available.
+ *
+ * \return  the implementation, or 0.
+ */
+const br_ec_impl *br_ec_p256_m62_get(void);
+
+/**
+ * \brief EC implementation "m64" (specialised code) for P-256.
+ *
+ * This implementation uses custom code relying on multiplication of
+ * integers up to 64 bits, with a 128-bit result. This implementation is
+ * defined only on platforms that offer the 64x64->128 multiplication
+ * support; use `br_ec_p256_m64_get()` to dynamically obtain a pointer
+ * to that implementation.
+ */
+extern const br_ec_impl br_ec_p256_m64;
+
+/**
+ * \brief Get the "m64" implementation of P-256, if available.
+ *
+ * \return  the implementation, or 0.
+ */
+const br_ec_impl *br_ec_p256_m64_get(void);
+
+/**
  * \brief EC implementation "i15" (generic code) for Curve25519.
  *
  * This implementation uses the generic code for modular integers (with
@@ -504,6 +542,54 @@ extern const br_ec_impl br_ec_c25519_m15;
  *     three bits systematically).
  */
 extern const br_ec_impl br_ec_c25519_m31;
+
+/**
+ * \brief EC implementation "m62" (specialised code) for Curve25519.
+ *
+ * This implementation uses custom code relying on multiplication of
+ * integers up to 62 bits, with a 124-bit result. This implementation is
+ * defined only on platforms that offer the 64x64->128 multiplication
+ * support; use `br_ec_c25519_m62_get()` to dynamically obtain a pointer
+ * to that implementation. Due to the specificities of the curve
+ * definition, the following applies:
+ *
+ *   - `muladd()` is not implemented (the function returns 0 systematically).
+ *   - `order()` returns 2^255-1, since the point multiplication algorithm
+ *     accepts any 32-bit integer as input (it clears the top bit and low
+ *     three bits systematically).
+ */
+extern const br_ec_impl br_ec_c25519_m62;
+
+/**
+ * \brief Get the "m62" implementation of Curve25519, if available.
+ *
+ * \return  the implementation, or 0.
+ */
+const br_ec_impl *br_ec_c25519_m62_get(void);
+
+/**
+ * \brief EC implementation "m64" (specialised code) for Curve25519.
+ *
+ * This implementation uses custom code relying on multiplication of
+ * integers up to 64 bits, with a 128-bit result. This implementation is
+ * defined only on platforms that offer the 64x64->128 multiplication
+ * support; use `br_ec_c25519_m64_get()` to dynamically obtain a pointer
+ * to that implementation. Due to the specificities of the curve
+ * definition, the following applies:
+ *
+ *   - `muladd()` is not implemented (the function returns 0 systematically).
+ *   - `order()` returns 2^255-1, since the point multiplication algorithm
+ *     accepts any 32-bit integer as input (it clears the top bit and low
+ *     three bits systematically).
+ */
+extern const br_ec_impl br_ec_c25519_m64;
+
+/**
+ * \brief Get the "m64" implementation of Curve25519, if available.
+ *
+ * \return  the implementation, or 0.
+ */
+const br_ec_impl *br_ec_c25519_m64_get(void);
 
 /**
  * \brief Aggregate EC implementation "m15".
@@ -796,6 +882,83 @@ br_ecdsa_vrfy br_ecdsa_vrfy_asn1_get_default(void);
  * \return  the default implementation.
  */
 br_ecdsa_vrfy br_ecdsa_vrfy_raw_get_default(void);
+
+/**
+ * \brief Maximum size for EC private key element buffer.
+ *
+ * This is the largest number of bytes that `br_ec_keygen()` may need or
+ * ever return.
+ */
+#define BR_EC_KBUF_PRIV_MAX_SIZE   72
+
+/**
+ * \brief Maximum size for EC public key element buffer.
+ *
+ * This is the largest number of bytes that `br_ec_compute_public()` may
+ * need or ever return.
+ */
+#define BR_EC_KBUF_PUB_MAX_SIZE    145
+
+/**
+ * \brief Generate a new EC private key.
+ *
+ * If the specified `curve` is not supported by the elliptic curve
+ * implementation (`impl`), then this function returns zero.
+ *
+ * The `sk` structure fields are set to the new private key data. In
+ * particular, `sk.x` is made to point to the provided key buffer (`kbuf`),
+ * in which the actual private key data is written. That buffer is assumed
+ * to be large enough. The `BR_EC_KBUF_PRIV_MAX_SIZE` defines the maximum
+ * size for all supported curves.
+ *
+ * The number of bytes used in `kbuf` is returned. If `kbuf` is `NULL`, then
+ * the private key is not actually generated, and `sk` may also be `NULL`;
+ * the minimum length for `kbuf` is still computed and returned.
+ *
+ * If `sk` is `NULL` but `kbuf` is not `NULL`, then the private key is
+ * still generated and stored in `kbuf`.
+ *
+ * \param rng_ctx   source PRNG context (already initialized).
+ * \param impl      the elliptic curve implementation.
+ * \param sk        the private key structure to fill, or `NULL`.
+ * \param kbuf      the key element buffer, or `NULL`.
+ * \param curve     the curve identifier.
+ * \return  the key data length (in bytes), or zero.
+ */
+size_t br_ec_keygen(const br_prng_class **rng_ctx,
+	const br_ec_impl *impl, br_ec_private_key *sk,
+	void *kbuf, int curve);
+
+/**
+ * \brief Compute EC public key from EC private key.
+ *
+ * This function uses the provided elliptic curve implementation (`impl`)
+ * to compute the public key corresponding to the private key held in `sk`.
+ * The public key point is written into `kbuf`, which is then linked from
+ * the `*pk` structure. The size of the public key point, i.e. the number
+ * of bytes used in `kbuf`, is returned.
+ *
+ * If `kbuf` is `NULL`, then the public key point is NOT computed, and
+ * the public key structure `*pk` is unmodified (`pk` may be `NULL` in
+ * that case). The size of the public key point is still returned.
+ *
+ * If `pk` is `NULL` but `kbuf` is not `NULL`, then the public key
+ * point is computed and stored in `kbuf`, and its size is returned.
+ *
+ * If the curve used by the private key is not supported by the curve
+ * implementation, then this function returns zero.
+ *
+ * The private key MUST be valid. An off-range private key value is not
+ * necessarily detected, and leads to unpredictable results.
+ *
+ * \param impl   the elliptic curve implementation.
+ * \param pk     the public key structure to fill (or `NULL`).
+ * \param kbuf   the public key point buffer (or `NULL`).
+ * \param sk     the source private key.
+ * \return  the public key point length (in bytes), or zero.
+ */
+size_t br_ec_compute_pub(const br_ec_impl *impl, br_ec_public_key *pk,
+	void *kbuf, const br_ec_private_key *sk);
 
 #ifdef __cplusplus
 }
