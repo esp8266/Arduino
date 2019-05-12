@@ -180,6 +180,11 @@ Once you have verified (or know beforehand) that MFLN is supported you can use t
 
 In certain applications where the TLS server does not support MFLN (not many do as of this writing as it is relatively new to OpenSSL), but you control both the ESP8266 and the server to which it is communicating, you may still be able to `setBufferSizes()` smaller if you guarantee no chunk of data will overflow those buffers.
 
+bool getMFLNStatus()
+^^^^^^^^^^^^^^^^^^^^
+
+After a successful connection, this method returns whether or not MFLN negotiation succeeded or not.  If it did not succeed, and you reduced the receive buffer with `setBufferSizes` then you may experience reception errors if the server attempts to send messages larger than your receive buffer.
+
 Sessions (Resuming connections fast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

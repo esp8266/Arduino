@@ -265,6 +265,13 @@ void TwoWire::onRequestService(void)
 	user_onRequest();
 }
 
+void TwoWire::onReceive( void (*function)(int) ) {
+  // arduino api compatibility fixer:
+  // really hope size parameter will not exceed 2^31 :)
+  static_assert(sizeof(int) == sizeof(size_t), "something is wrong in Arduino kingdom");
+  user_onReceive = reinterpret_cast<void(*)(size_t)>(function);
+}
+
 void TwoWire::onReceive( void (*function)(size_t) ) {
   user_onReceive = function;
 }
