@@ -43,10 +43,10 @@ protected:
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
-  bool _noDelay = false;
+  enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:
-  WiFiServer(IPAddress addr, uint16_t port);
+  WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);

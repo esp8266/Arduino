@@ -1,6 +1,6 @@
 {
   "name": "GDBStub",
-  "version": "0.2",  
+  "version": "0.3",
   "keywords": "gdb, debug",
   "description": "GDB server stub helps debug crashes when JTAG isn't an option.",
   "repository":

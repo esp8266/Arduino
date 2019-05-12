@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #include "_ansi.h"
-#include <pgmspace.h>
+#include <sys/pgmspace.h>
 
 #undef assert
 
@@ -15,7 +15,7 @@ extern "C" {
 # define assert(__e) ((void)0)
 #else
 # define assert(__e) ((__e) ? (void)0 : __assert_func (PSTR(__FILE__), __LINE__, \
-						       __ASSERT_FUNC, #__e))
+						       __ASSERT_FUNC, PSTR(#__e)))
 
 # ifndef __ASSERT_FUNC
   /* Use g++'s demangled names in C++.  */

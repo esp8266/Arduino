@@ -13,28 +13,32 @@
     - For Mac OSX and iOS support is built in through Bonjour already.
   - Point your browser to http://esp8266.local, you should see a response.
 
- */
+*/
 
 
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiClient.h>
 
-const char* ssid = "............";
-const char* password = "..............";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 // TCP server at port 80 will respond to HTTP requests
 WiFiServer server(80);
 
-void setup(void)
-{  
+void setup(void) {
   Serial.begin(115200);
-  
+
   // Connect to WiFi network
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("");  
-  
+  Serial.println("");
+
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -53,22 +57,24 @@ void setup(void)
   //   we send our IP address on the WiFi network
   if (!MDNS.begin("esp8266")) {
     Serial.println("Error setting up MDNS responder!");
-    while(1) { 
+    while (1) {
       delay(1000);
     }
   }
   Serial.println("mDNS responder started");
-  
+
   // Start TCP (HTTP) server
   server.begin();
   Serial.println("TCP server started");
-  
+
   // Add service to MDNS-SD
   MDNS.addService("http", "tcp", 80);
 }
 
-void loop(void)
-{
+void loop(void) {
+
+  MDNS.update();
+
   // Check if a client has connected
   WiFiClient client = server.available();
   if (!client) {
@@ -78,13 +84,13 @@ void loop(void)
   Serial.println("New client");
 
   // Wait for data from client to become available
-  while(client.connected() && !client.available()){
+  while (client.connected() && !client.available()) {
     delay(1);
   }
-  
+
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
-  
+
   // First line of HTTP request looks like "GET /path HTTP/1.1"
   // Retrieve the "/path" part by finding the spaces
   int addr_start = req.indexOf(' ');
@@ -98,24 +104,21 @@ void loop(void)
   Serial.print("Request: ");
   Serial.println(req);
   client.flush();
-  
+
   String s;
-  if (req == "/")
-  {
+  if (req == "/") {
     IPAddress ip = WiFi.localIP();
     String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
     s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
     s += ipStr;
     s += "</html>\r\n\r\n";
     Serial.println("Sending 200");
-  }
-  else
-  {
+  } else {
     s = "HTTP/1.1 404 Not Found\r\n\r\n";
     Serial.println("Sending 404");
   }
   client.print(s);
-  
+
   Serial.println("Done with client");
 }
 

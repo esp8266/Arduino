@@ -46,12 +46,17 @@
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 
-const char* ssid = "........";
-const char* password = "........";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServerSecure server(443);
 
-// The certificate is stored in PMEM 
+// The certificate is stored in PMEM
 static const uint8_t x509[] PROGMEM = {
   0x30, 0x82, 0x01, 0x3d, 0x30, 0x81, 0xe8, 0x02, 0x09, 0x00, 0xfe, 0x56,
   0x46, 0xf2, 0x78, 0xc6, 0x51, 0x17, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86,
@@ -121,24 +126,24 @@ void handleRoot() {
   digitalWrite(led, 0);
 }
 
-void handleNotFound(){
+void handleNotFound() {
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i=0; i<server.args(); i++){
+  for (uint8_t i = 0; i < server.args(); i++) {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
 
-void setup(void){
+void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -164,7 +169,7 @@ void setup(void){
 
   server.on("/", handleRoot);
 
-  server.on("/inline", [](){
+  server.on("/inline", []() {
     server.send(200, "text/plain", "this works as well");
   });
 
@@ -174,6 +179,7 @@ void setup(void){
   Serial.println("HTTPS server started");
 }
 
-void loop(void){
+void loop(void) {
   server.handleClient();
+  MDNS.update();
 }

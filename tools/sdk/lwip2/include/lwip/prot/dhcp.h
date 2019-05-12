@@ -39,14 +39,12 @@
 #define LWIP_HDR_PROT_DHCP_H
 
 #include "lwip/opt.h"
+#include "lwip/arch.h"
+#include "lwip/prot/ip4.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define DHCP_CLIENT_PORT  68
-#define DHCP_SERVER_PORT  67
-
 
  /* DHCP message item offsets and length */
 #define DHCP_CHADDR_LEN   16U
@@ -128,9 +126,6 @@ typedef enum {
 #define DHCP_RELEASE                7
 #define DHCP_INFORM                 8
 
-/** DHCP hardware type, currently only ethernet is supported */
-#define DHCP_HTYPE_ETH              1
-
 #define DHCP_MAGIC_COOKIE           0x63825363UL
 
 /* This is a list of options for BOOTP and DHCP, see RFC 2132 for descriptions */
@@ -180,4 +175,4 @@ typedef enum {
 }
 #endif
 
-#endif /*LWIP_HDR_PROT_DHCP_H*/
+#endif /* LWIP_HDR_PROT_DHCP_H */

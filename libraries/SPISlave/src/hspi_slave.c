@@ -85,19 +85,40 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
     pinMode(MISO, SPECIAL);
     pinMode(MOSI, SPECIAL);
 
-    SPI1S = SPISE | SPISBE | 0x3E0;
-    SPI1U = SPIUMISOH | SPIUCOMMAND | SPIUSSE;
+    SPI1S = SPISE | SPISBE | 0x3E0; // SPI_SLAVE_REG
+    SPI1U = SPIUMISOH | SPIUCOMMAND | SPIUSSE; // SPI_USER_REG
     SPI1CLK = 0;
-    SPI1U2 = (7 << SPILCOMMAND);
-    SPI1S1 = (((status_len * 8) - 1) << SPIS1LSTA) | (0xff << SPIS1LBUF) | (7 << SPIS1LWBA) | (7 << SPIS1LRBA) | SPIS1RSTA;
+    SPI1U2 = (7 << SPILCOMMAND); // SPI_USER2_REG
+    SPI1S1 = (((status_len * 8) - 1) << SPIS1LSTA) | (0xff << SPIS1LBUF) | (7 << SPIS1LWBA) | (7 << SPIS1LRBA) | SPIS1RSTA; // SPI_SLAVE1_REG
     SPI1P = (1 << 19);
     SPI1CMD = SPIBUSY;
+
+    // Setting SPIC2MISODM_S makes slave to change MISO value on falling edge on CLK signal as is required for SPIMode 1
+    // Setting SPIC2MOSIDN_S is probably not critical, all tests run fine with this setting
+    SPI1C2 = (0x2 << SPIC2MOSIDN_S) | (0x1 << SPIC2MISODM_S);
 
     ETS_SPI_INTR_ATTACH(_hspi_slave_isr_handler,arg);
     ETS_SPI_INTR_ENABLE();
 }
 
-void hspi_slave_setStatus(uint32_t status)
+void hspi_slave_end()
+{
+  ETS_SPI_INTR_DISABLE();
+  ETS_SPI_INTR_ATTACH(NULL, NULL);
+
+  pinMode(SS, INPUT);
+  pinMode(SCK, INPUT);
+  pinMode(MISO, INPUT);
+  pinMode(MOSI, INPUT);
+
+  // defaults
+  SPI1S = 0;
+  SPI1U = SPIUSSE | SPIUCOMMAND;
+  SPI1S1 = 0;
+  SPI1P = B110;
+}
+
+void ICACHE_RAM_ATTR hspi_slave_setStatus(uint32_t status)
 {
     SPI1WS = status;
 }

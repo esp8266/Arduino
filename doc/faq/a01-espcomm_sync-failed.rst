@@ -3,7 +3,7 @@
 I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to resolve this issue?
 --------------------------------------------------------------------------------------------------
 
--  `Introduction <#Introduction>`__
+-  `Introduction <#introduction>`__
 -  `Initial Checks <#initial-checks>`__
 -  `Advanced Checks <#advanced-checks>`__
 -  `Reset Methods <#reset-methods>`__
@@ -264,7 +264,7 @@ by user [@mytrain](https://github.com/mytrain) and discussed in
 
 If you prefer external terminal program, then for Windows users we can
 recommend free and handy
-`Termite <http://www.compuphase.com/software_termite.htm>`__.
+`Termite <https://www.compuphase.com/software_termite.htm>`__.
 
 Nodemcu
 ^^^^^^^
@@ -332,35 +332,45 @@ GitHub.
 I'm Stuck
 ~~~~~~~~~
 
-Hopefully at this point you were able to resolve ``espcomm_sync failed``
-issue and now enjoy quick and reliable uploads of your ESP modules.
+Hopefully at this point you were able to resolve ``espcomm_sync failed`` issue and now enjoy quick and reliable uploads of your ESP modules.
 
-If this is still not the case, then review once more all discussed steps
-in the checklist below.
+If this is still not the case, then review once more all discussed steps in the checklist below.
 
-**Initial Checks** \* [ ] Is your module connected to serial port and
-visible in IDE? \* [ ] Is connected device responding to IDE? What is
-exact message in debug window? \* [ ] Have you selected correct ESP
-module type in *Board* menu? What is the selection? \* [ ] Have you
-tried to reduce upload speed? What speeds have you tried?
+**Initial Checks**
 
-**Advanced Checks** \* [ ] What message is reported by ESP at 74880 baud
-when entering boot loading mode? \* [ ] Have you checked your USB to
-serial converter by looping it back? What is the result? \* [ ] Is your
-detailed upload log consistent with settings in IDE? What is the log?
+* [ ] Is your module connected to serial port and visible in IDE?
 
-**Reset Method** \* [ ] What reset method do you use? \* [ ] What is
-your connection diagram? Does it match diagram in this FAQ? \* [ ] What
-is your wave-form of board reset? Does it match wave-form in this FAQ?
-\* [ ] What is your wave-form of complete upload? Does it match
-wave-form in this FAQ?
+* [ ] Is connected device responding to IDE? What is exact message in debug window?
 
-**Software** \* [ ] Do you use the latest stable version of `esp8266 /
-Arduino <https://github.com/esp8266/Arduino>`__? What is it? \* [ ] What
-is the name and version of your IDE and O/S?
+* [ ] Have you selected correct ESP module type in *Board* menu? What is the selection?
 
-If you are stuck at certain step, then post this list on `ESP8266
-Community Forum <http://www.esp8266.com/>`__ asking for support.
+* [ ] Have you tried to reduce upload speed? What speeds have you tried?
+
+**Advanced Checks**
+
+* [ ] What message is reported by ESP at 74880 baud when entering boot loading mode?
+
+* [ ] Have you checked your USB to serial converter by looping it back? What is the result?
+
+* [ ] Is your detailed upload log consistent with settings in IDE? What is the log?
+
+**Reset Method**
+
+* [ ] What reset method do you use?
+
+* [ ] What is your connection diagram? Does it match diagram in this FAQ?
+
+* [ ] What is your wave-form of board reset? Does it match wave-form in this FAQ?
+
+* [ ] What is your wave-form of complete upload? Does it match wave-form in this FAQ?
+
+**Software**
+
+* [ ] Do you use the latest stable version of `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__? What is it?
+
+* [ ] What is the name and version of your IDE and O/S?
+
+If you are stuck at certain step, then post this list on `ESP8266 Community Forum <https://www.esp8266.com/>`__ asking for support.
 
 Conclusion
 ~~~~~~~~~~
@@ -379,7 +389,7 @@ detailed upload log for inconsistencies with IDE settings.
 Verify your connection diagram and wave-form for consistency with
 selected reset method.
 
-If you get stuck, then ask `community <http://www.esp8266.com/>`__ for
+If you get stuck, then ask `community <https://www.esp8266.com/>`__ for
 support providing summary of all completed checks.
 
 .. figure:: pictures/a01-test-stand.jpg

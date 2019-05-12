@@ -65,9 +65,23 @@ void Ticker::detach()
 	os_timer_disarm(_timer);
 	delete _timer;
 	_timer = nullptr;
+	_callback_function = nullptr;
 }
 
-bool Ticker::active()
+bool Ticker::active() const
 {
 	return (bool)_timer;
+}
+
+void Ticker::_static_callback(void* arg)
+{
+	Ticker* _this = (Ticker*)arg;
+	if (_this == nullptr)
+	{
+		return;
+	}
+	if (_this->_callback_function)
+	{
+		_this->_callback_function();
+	}
 }

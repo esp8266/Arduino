@@ -144,6 +144,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     sock.close()
     return 1
 
+  received_ok = False
+
   try:
     f = open(filename, "rb")
     if (PROGRESS):
@@ -160,7 +162,9 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       connection.settimeout(10)
       try:
         connection.sendall(chunk)
-        res = connection.recv(4)
+        if connection.recv(32).decode().find('O') >= 0:
+          # connection will receive only digits or 'OK'
+          received_ok = True;
       except:
         sys.stderr.write('\n')
         logging.error('Error Uploading')
@@ -176,8 +180,10 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     # the connection before receiving the 'O' of 'OK'
     try:
       connection.settimeout(60)
-      while True:
-        if connection.recv(32).decode().find('O') >= 0: break
+      while not received_ok:
+        if connection.recv(32).decode().find('O') >= 0:
+          # connection will receive only digits or 'OK'
+          received_ok = True;
       logging.info('Result: OK')
       connection.close()
       f.close()

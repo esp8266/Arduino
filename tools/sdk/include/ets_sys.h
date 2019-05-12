@@ -215,6 +215,7 @@ int ets_vprintf(int (*print_function)(int), const char * format, va_list arg) __
 int ets_putc(int);
 bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
 bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
+void ets_update_cpu_frequency(uint32_t ticks_per_us);
 
 
 #ifdef __cplusplus

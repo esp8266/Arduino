@@ -19,37 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <WiFiClientSecure.h>
 
-#ifndef ESP8266WEBSERVERSECURE_H
-#define ESP8266WEBSERVERSECURE_H
-
-#include <ESP8266WebServer.h>
-#include <WiFiServerSecure.h>
-
-class ESP8266WebServerSecure : public ESP8266WebServer
-{
-public:
-  ESP8266WebServerSecure(IPAddress addr, int port = 443);
-  ESP8266WebServerSecure(int port = 443);
-  virtual ~ESP8266WebServerSecure();
-
-  void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
-  void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
-
-  WiFiClient client() override { return _currentClientSecure; }
-
-  void begin() override;
-  void handleClient() override;
-  void close() override;
-
-private:
-  size_t _currentClientWrite (const char *bytes, size_t len) override { return _currentClientSecure.write((const uint8_t *)bytes, len); }
-  size_t _currentClientWrite_P (PGM_P bytes, size_t len) override { return _currentClientSecure.write_P(bytes, len); }
-
-protected:
-  WiFiServerSecure _serverSecure;
-  WiFiClientSecure _currentClientSecure;
-};
-
-
-#endif //ESP8266WEBSERVERSECURE_H
+//#include "ESP8266WebServerSecureAxTLS.h"
+#include "ESP8266WebServerSecureBearSSL.h"
