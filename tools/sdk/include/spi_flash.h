@@ -25,6 +25,8 @@
 #ifndef SPI_FLASH_H
 #define SPI_FLASH_H
 
+#include <spi_flash_geometry.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,8 +45,6 @@ typedef struct{
 	uint32  page_size;
 	uint32  status_mask;
 } SpiFlashChip;
-
-#define SPI_FLASH_SEC_SIZE      4096
 
 extern SpiFlashChip * flashchip; // in ram ROM-BIOS
 

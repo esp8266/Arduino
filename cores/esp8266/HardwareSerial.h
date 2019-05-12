@@ -28,6 +28,7 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
+#include <time.h>
 #include "Stream.h"
 #include "uart.h"
 
@@ -88,6 +89,10 @@ public:
     void end();
 
     size_t setRxBufferSize(size_t size);
+    size_t getRxBufferSize()
+    {
+        return uart_get_rx_buffer_size(_uart);
+    }
 
     void swap()
     {
@@ -120,13 +125,23 @@ public:
 
     int peek(void) override
     {
-        // this may return -1, but that's okay
+        // return -1 when data is unvailable (arduino api)
         return uart_peek_char(_uart);
     }
     int read(void) override
     {
-        // this may return -1, but that's okay
+        // return -1 when data is unvailable (arduino api)
         return uart_read_char(_uart);
+    }
+    // ::read(buffer, size): same as readBytes without timeout
+    size_t read(char* buffer, size_t size)
+    {
+        return uart_read(_uart, buffer, size);
+    }
+    size_t readBytes(char* buffer, size_t size) override;
+    size_t readBytes(uint8_t* buffer, size_t size) override
+    {
+        return readBytes((char*)buffer, size);
     }
     int availableForWrite(void)
     {
@@ -137,30 +152,11 @@ public:
     {
         return uart_write_char(_uart, c);
     }
-    inline size_t write(unsigned long n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(long n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(unsigned int n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(int n)
-    {
-        return write((uint8_t) n);
-    }
-    size_t write(const uint8_t *buffer, size_t size)
+    size_t write(const uint8_t *buffer, size_t size) override
     {
         return uart_write(_uart, (const char*)buffer, size);
     }
-    size_t write(const char *buffer)
-    {
-        return buffer? uart_write(_uart, buffer, strlen(buffer)): 0;
-    }
+    using Print::write; // Import other write() methods to support things like write(0) properly
     operator bool() const
     {
         return _uart != 0;
@@ -182,6 +178,11 @@ public:
     bool hasOverrun(void)
     {
         return uart_has_overrun(_uart);
+    }
+
+    bool hasRxError(void)
+    {
+        return uart_has_rx_error(_uart);
     }
 
     void startDetectBaudrate();

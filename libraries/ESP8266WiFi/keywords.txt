@@ -19,11 +19,14 @@ WiFiServerSecure	KEYWORD1
 WiFiUDP	KEYWORD1
 WiFiClientSecure	KEYWORD1
 ESP8266WiFiMulti	KEYWORD1
-BearSSLX509List	KEYWORD1
-BearSSLPrivateKey	KEYWORD1
-BearSSLPublicKey	KEYWORD1
+BearSSL	KEYWORD1
+X509List	KEYWORD1
+PrivateKey	KEYWORD1
+PublicKey	KEYWORD1
 CertStoreSPIFFSBearSSL	KEYWORD1
 CertStoreSDBearSSL	KEYWORD1
+Session	KEYWORD1
+
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -66,6 +69,7 @@ softAPgetStationNum	KEYWORD2
 
 #ESP8266WiFiMulti
 addAP	KEYWORD2
+existsAP	KEYWORD2
 run	KEYWORD2
 
 #ESP8266WiFiScan
@@ -179,6 +183,7 @@ setBufferSizes	KEYWORD2
 getLastSSLError	KEYWORD2
 setCertStore	KEYWORD2
 probeMaxFragmentLength	KEYWORD2
+getMFLNStatus	KEYWORD2
 
 #WiFiServerBearSSL
 setRSACert	KEYWORD2

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,10 +19,13 @@ Arduino Wiring-based Framework allows writing cross-platform software to
 control devices attached to a wide range of Arduino boards to create all
 kinds of creative coding, interactive objects, spaces or physical experiences.
 
-http://arduino.cc/en/Reference/HomePage
+https://arduino.cc/en/Reference/HomePage
 """
 
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py
+
+import os
+import subprocess
 
 from os.path import isdir, join
 
@@ -70,12 +73,12 @@ env.Append(
         "-U__STRICT_ANSI__",
         "-ffunction-sections",
         "-fdata-sections",
+        "-fno-exceptions",
         "-Wall"
     ],
 
     CXXFLAGS=[
         "-fno-rtti",
-        "-fno-exceptions",
         "-std=c++11"
     ],
 
@@ -97,8 +100,8 @@ env.Append(
         "__ets__",
         "ICACHE_FLASH",
         ("ARDUINO", 10805),
-        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"'
-            % env.BoardConfig().id.upper()),
+        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
+        "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
         "LWIP_OPEN_SRC"
     ],
 
@@ -133,36 +136,69 @@ env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 
 #
+# SDK
+#
+if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK3V0", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0"),]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x"),]
+    )
+# PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x (default)
+else:
+    env.Append(
+        CPPDEFINES=[("NONOSDK221", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221"),]
+    )
+
+#
 # lwIP
 #
-if "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY" in flatten_cppdefines:
+if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
+        LIBS=["lwip_gcc"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-536-feat"]
+        LIBS=["lwip6-536-feat"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_HIGHER_BANDWIDTH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip6-1460-feat"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1)],
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-1460-feat"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0)],
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-536"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0)],
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-1460"]
     )
+# PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
 else:
     env.Append(
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
-        LIBS=["lwip_gcc"]
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-536-feat"]
     )
 
 #
@@ -186,6 +222,41 @@ app_ld = env.Command(
         "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
+
+#
+# Dynamic core_version.h for staging builds
+#
+
+def platform_txt_version(default):
+    with open(join(FRAMEWORK_DIR, "platform.txt"), "r") as platform_txt:
+        for line in platform_txt:
+            if not line:
+                continue
+            k, delim, v = line.partition("=")
+            if not delim:
+                continue
+            if k == "version":
+                return v.strip()
+
+    return default
+
+if isdir(join(FRAMEWORK_DIR, ".git")):
+    cmd = '"$PYTHONEXE" "{script}" -b "$BUILD_DIR" -p "{framework_dir}" -v {version}'
+    fmt = {
+        "script": join(FRAMEWORK_DIR, "tools", "makecorever.py"),
+        "framework_dir": FRAMEWORK_DIR,
+        "version": platform_txt_version("unspecified")
+    }
+
+    env.Prepend(CPPPATH=[
+        join("$BUILD_DIR", "core")
+    ])
+    core_version = env.Command(
+        join("$BUILD_DIR", "core", "core_version.h"),
+        join(FRAMEWORK_DIR, ".git"),
+        env.VerboseAction(cmd.format(**fmt), "Generating $TARGET")
+    )
+    env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", core_version)
 
 
 #

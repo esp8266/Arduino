@@ -83,14 +83,14 @@ extern "C" {
 #endif
 
 #if BYTE_ORDER == BIG_ENDIAN
-#define lwip_htons(x) (x)
-#define lwip_ntohs(x) (x)
-#define lwip_htonl(x) (x)
-#define lwip_ntohl(x) (x)
-#define PP_HTONS(x) (x)
-#define PP_NTOHS(x) (x)
-#define PP_HTONL(x) (x)
-#define PP_NTOHL(x) (x)
+#define lwip_htons(x) ((u16_t)(x))
+#define lwip_ntohs(x) ((u16_t)(x))
+#define lwip_htonl(x) ((u32_t)(x))
+#define lwip_ntohl(x) ((u32_t)(x))
+#define PP_HTONS(x)   ((u16_t)(x))
+#define PP_NTOHS(x)   ((u16_t)(x))
+#define PP_HTONL(x)   ((u32_t)(x))
+#define PP_NTOHL(x)   ((u32_t)(x))
 #else /* BYTE_ORDER != BIG_ENDIAN */
 #ifndef lwip_htons
 u16_t lwip_htons(u16_t x);

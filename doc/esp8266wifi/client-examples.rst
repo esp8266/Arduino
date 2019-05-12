@@ -87,11 +87,11 @@ If connection is successful, we should send request the host to provide specific
 Read Reply from the Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Then, while connection by our client is still alive (``while (client.connected())``, see below) we can read line by line and print out server's response:
+Then, while connection by our client is still alive or while data are available to read (``while (client.connected() || client.available())``, see below) we can read line by line and print out server's response:
 
 .. code:: cpp
 
-    while (client.connected())
+    while (client.connected() || client.available())
     {
       if (client.available())
       {
@@ -102,7 +102,9 @@ Then, while connection by our client is still alive (``while (client.connected()
 
 The inner ``if (client.available())`` is checking if there are any data available from the server. If so, then they are printed out.
 
-Once server sends all requested data it will disconnect and program will exit the ``while`` loop.
+Data can be unavailable while the TCP connection is still alive. That means data could be later received.
+
+Once server sends all requested data it will disconnect, then once all received data are read, program will exit the ``while`` loop.
 
 Now to the Sketch
 ~~~~~~~~~~~~~~~~~
@@ -152,7 +154,7 @@ Complete sketch, including a case when contention to the server fails, is presen
                     );
 
         Serial.println("[Response:]");
-        while (client.connected())
+        while (client.connected() || client.available())
         {
           if (client.available())
           {
@@ -228,7 +230,7 @@ End of header is marked with an empty line and then you should see the HTML code
         <h1>Example Domain</h1>
         <p>This domain is established to be used for illustrative examples in documents. You may use this
         domain in examples without prior coordination or asking for permission.</p>
-        <p><a href="http://www.iana.org/domains/example">More information...</a></p>
+        <p><a href="https://www.iana.org/domains/example">More information...</a></p>
     </div>
     </body>
     </html>
@@ -245,6 +247,66 @@ In case server's web address is incorrect, or server is not accessible, you shou
     Connecting to sensor-net ........ connected
 
     [Connecting to www.wrong-example.com ... connection failed!]
+
+
+General client loop
+~~~~~~~~~~~~~~~~~~~
+
+Here is a general TCP sending / receiving loop:
+
+.. code:: cpp
+
+    while (client.available() || client.connected())
+    {
+        if (client.available())
+        {
+            // client.available() bytes are immediately available for reading
+            // warning: reading them *allows* peer to send more, so they should
+            // be read *only* when they can immediately be processed, see below
+            // for flow control
+        }
+        if (client.connected())
+        {
+            if (client.availableForWrite() >= N)
+            {
+                // TCP layer will be able to *bufferize* our N bytes,
+                // and send them *asynchronously*, with by default
+                // a small delay if those data are small
+                // because Nagle is around (~200ms)
+                // unless client.setNoDelay(true) was called.
+                //
+                // In any case client.write() will *never* block here
+            }
+            else
+            {
+                // or we can send but it will take time because data are too
+                // big to be asynchronously bufferized: TCP needs to receive
+                // some ACKs to release its buffers.
+                // That means that write() will block until it receives
+                // authorization to send because we are not in a
+                // multitasking environment
+
+                // It is always OK to do this, client.availableForWrite() is
+                // only needed when efficiency is a priority and when data
+                // to send can wait where they currently are, especially
+                // when they are in another tcp client.
+
+                // Flow control:
+                // It is also important to know that the ACKs we are sending
+                // to remote are directly generated from client.read().
+                // It means that:
+                // Not immediately reading available data can be good for
+                // flow control and avoid useless memory filling/overflow by
+                // preventing peer from sending more data, and slow down
+                // incoming bandwidth
+                // (tcp is really a nice and efficient beast)
+            }
+        }
+
+        // this is necessary for long duration loops (harmless otherwise)
+
+        yield();
+    }
 
 Conclusion
 ~~~~~~~~~~
