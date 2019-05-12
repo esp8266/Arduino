@@ -235,4 +235,4 @@ The ``networkItem`` is a zero based index of network discovered during scan. All
     5: , Ch:11 (-77dBm)  hidden
     6: UPC Wi-Free, Ch:11 (-79dBm)
 
-For code samples please refer to separate section with `examples <scan-examples.md>`__ dedicated specifically to the Scan Class.
+For code samples please refer to separate section with `examples <scan-examples.rst>`__ dedicated specifically to the Scan Class.

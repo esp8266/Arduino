@@ -14,32 +14,32 @@ static const char serverIndex[] PROGMEM =
                </form>
          </body></html>)";
 static const char successResponse[] PROGMEM = 
-  "<META http-equiv=\"refresh\" content=\"15;URL=\">Update Success! Rebooting...\n";
+  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
 ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
-  _username = NULL;
-  _password = NULL;
+  _username = emptyString;
+  _password = emptyString;
   _authenticated = false;
 }
 
-void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path, const char * username, const char * password)
+void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path, const String& username, const String& password)
 {
     _server = server;
-    _username = (char *)username;
-    _password = (char *)password;
+    _username = username;
+    _password = password;
 
     // handler for the /update form page
-    _server->on(path, HTTP_GET, [&](){
-      if(_username != NULL && _password != NULL && !_server->authenticate(_username, _password))
+    _server->on(path.c_str(), HTTP_GET, [&](){
+      if(_username != emptyString && _password != emptyString && !_server->authenticate(_username.c_str(), _password.c_str()))
         return _server->requestAuthentication();
       _server->send_P(200, PSTR("text/html"), serverIndex);
     });
 
     // handler for the /update form POST (once file upload finishes)
-    _server->on(path, HTTP_POST, [&](){
+    _server->on(path.c_str(), HTTP_POST, [&](){
       if(!_authenticated)
         return _server->requestAuthentication();
       if (Update.hasError()) {
@@ -61,7 +61,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
         if (_serial_output)
           Serial.setDebugOutput(true);
 
-        _authenticated = (_username == NULL || _password == NULL || _server->authenticate(_username, _password));
+        _authenticated = (_username == emptyString || _password == emptyString || _server->authenticate(_username.c_str(), _password.c_str()));
         if(!_authenticated){
           if (_serial_output)
             Serial.printf("Unauthenticated Update\n");

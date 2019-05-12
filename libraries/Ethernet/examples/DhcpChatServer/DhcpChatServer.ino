@@ -1,22 +1,22 @@
 /*
- DHCP Chat  Server
+  DHCP Chat  Server
 
- A simple server that distributes any incoming messages to all
- connected clients.  To use telnet to  your device's IP address and type.
- You can see the client's input in the serial monitor as well.
- Using an Arduino Wiznet Ethernet shield.
+  A simple server that distributes any incoming messages to all
+  connected clients.  To use telnet to  your device's IP address and type.
+  You can see the client's input in the serial monitor as well.
+  Using an Arduino Wiznet Ethernet shield.
 
- THis version attempts to get an IP address using DHCP
+  THis version attempts to get an IP address using DHCP
 
- Circuit:
- * Ethernet shield attached to pins 10, 11, 12, 13
+  Circuit:
+   Ethernet shield attached to pins 10, 11, 12, 13
 
- created 21 May 2011
- modified 9 Apr 2012
- by Tom Igoe
- Based on ChatServer example by David A. Mellis
+  created 21 May 2011
+  modified 9 Apr 2012
+  by Tom Igoe
+  Based on ChatServer example by David A. Mellis
 
- */
+*/
 
 #include <SPI.h>
 #include <Ethernet.h>

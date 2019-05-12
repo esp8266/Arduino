@@ -35,11 +35,27 @@ public:
         return len;
     }
 
-    bool read_int(int& result)
+    size_t read_line(char* dest, size_t dest_size)
     {
-        // TODO: fix this for 0 value
-        result = m_stream.parseInt();
-        return result != 0;
+        size_t len = 0;
+        // Can't use Stream::readBytesUntil here because it can't tell the
+        // difference between timing out and receiving the terminator.
+        while (len < dest_size - 1) {
+            int c = m_stream.read();
+            if (c < 0) {
+                delay(1);
+                continue;
+            }
+            if (c == '\r') {
+                continue;
+            }
+            if (c == '\n') {
+                dest[len] = 0;
+                break;
+            }
+            dest[len++] = c;
+        }
+        return len;
     }
 
 protected:

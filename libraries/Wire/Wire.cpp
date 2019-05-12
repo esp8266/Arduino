@@ -19,6 +19,7 @@
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
   Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
   Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
+  Modified January 2017 by Bjorn Hammarberg (bjoham@esp8266.com) - i2c slave support
 */
 
 extern "C" {
@@ -29,6 +30,13 @@ extern "C" {
 
 #include "twi.h"
 #include "Wire.h"
+
+
+//Some boards don't have these pins available, and hence don't support Wire.
+//Check here for compile-time error.
+#if !defined(PIN_WIRE_SDA) || !defined(PIN_WIRE_SCL)
+#error Wire library is not supported on this board
+#endif
 
 // Initialize Class Variables //////////////////////////////////////////////////
 
@@ -43,7 +51,7 @@ uint8_t TwoWire::txBufferLength = 0;
 
 uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);
-void (*TwoWire::user_onReceive)(int);
+void (*TwoWire::user_onReceive)(size_t);
 
 static int default_sda_pin = SDA;
 static int default_scl_pin = SCL;
@@ -61,6 +69,16 @@ void TwoWire::begin(int sda, int scl){
   flush();
 }
 
+void TwoWire::begin(int sda, int scl, uint8_t address){
+  default_sda_pin = sda;
+  default_scl_pin = scl;
+  twi_setAddress(address);
+  twi_init(sda, scl);
+  twi_attachSlaveTxEvent(onRequestService);
+  twi_attachSlaveRxEvent(onReceiveService);
+  flush();
+}
+
 void TwoWire::pins(int sda, int scl){
   default_sda_pin = sda;
   default_scl_pin = scl;
@@ -71,10 +89,9 @@ void TwoWire::begin(void){
 }
 
 void TwoWire::begin(uint8_t address){
-  (void)address;
-  // twi_setAddress(address);
-  // twi_attachSlaveTxEvent(onRequestService);
-  // twi_attachSlaveRxEvent(onReceiveService);
+  twi_setAddress(address);
+  twi_attachSlaveTxEvent(onRequestService);
+  twi_attachSlaveRxEvent(onReceiveService);
   begin();
 }
 
@@ -153,7 +170,7 @@ size_t TwoWire::write(uint8_t data){
     ++txBufferIndex;
     txBufferLength = txBufferIndex;
   } else {
-    // i2c_slave_transmit(&data, 1);
+    twi_transmit(&data, 1);
   }
   return 1;
 }
@@ -164,7 +181,7 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity){
       if(!write(data[i])) return i;
     }
   }else{
-    // i2c_slave_transmit(data, quantity);
+    twi_transmit(data, quantity);
   }
   return quantity;
 }
@@ -205,53 +222,62 @@ void TwoWire::flush(void){
   txBufferLength = 0;
 }
 
-void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
+void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
 {
-  (void)inBytes;
-  (void)numBytes;
   // don't bother if user hasn't registered a callback
-  // if(!user_onReceive){
-  //   return;
-  // }
+  if (!user_onReceive) {
+	return;
+  }
   // // don't bother if rx buffer is in use by a master requestFrom() op
   // // i know this drops data, but it allows for slight stupidity
   // // meaning, they may not have read all the master requestFrom() data yet
   // if(rxBufferIndex < rxBufferLength){
   //   return;
   // }
-  // // copy twi rx buffer into local read buffer
-  // // this enables new reads to happen in parallel
-  // for(uint8_t i = 0; i < numBytes; ++i){
-  //   rxBuffer[i] = inBytes[i];
-  // }
-  // // set rx iterator vars
-  // rxBufferIndex = 0;
-  // rxBufferLength = numBytes;
-  // // alert user program
-  // user_onReceive(numBytes);
+  
+  // copy twi rx buffer into local read buffer
+  // this enables new reads to happen in parallel
+  for (uint8_t i = 0; i < numBytes; ++i) {
+	rxBuffer[i] = inBytes[i];
+  }
+  
+  // set rx iterator vars
+  rxBufferIndex = 0;
+  rxBufferLength = numBytes;
+  
+  // alert user program
+  user_onReceive(numBytes);
 }
 
-void TwoWire::onRequestService(void){
-  // // don't bother if user hasn't registered a callback
-  // if(!user_onRequest){
-  //   return;
-  // }
-  // // reset tx buffer iterator vars
-  // // !!! this will kill any pending pre-master sendTo() activity
-  // txBufferIndex = 0;
-  // txBufferLength = 0;
-  // // alert user program
-  // user_onRequest();
+void TwoWire::onRequestService(void)
+{
+	// don't bother if user hasn't registered a callback
+	if (!user_onRequest) {
+		return;
+	}
+	
+	// reset tx buffer iterator vars
+	// !!! this will kill any pending pre-master sendTo() activity
+	txBufferIndex = 0;
+	txBufferLength = 0;
+	
+	// alert user program
+	user_onRequest();
 }
 
-void TwoWire::onReceive( void (*function)(int) ){
-  (void)function;
-  //user_onReceive = function;
+void TwoWire::onReceive( void (*function)(int) ) {
+  // arduino api compatibility fixer:
+  // really hope size parameter will not exceed 2^31 :)
+  static_assert(sizeof(int) == sizeof(size_t), "something is wrong in Arduino kingdom");
+  user_onReceive = reinterpret_cast<void(*)(size_t)>(function);
+}
+
+void TwoWire::onReceive( void (*function)(size_t) ) {
+  user_onReceive = function;
 }
 
 void TwoWire::onRequest( void (*function)(void) ){
-  (void)function;
-  //user_onRequest = function;
+  user_onRequest = function;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

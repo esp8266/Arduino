@@ -240,4 +240,4 @@ Conclusion
 
 The scan class API provides comprehensive set of methods to do scanning in both synchronous as well as in asynchronous mode. Therefore we can easy implement code that is doing scanning in background without disturbing other processes running on ESP8266 module.
 
-For the list of functions provided to manage scan mode please refer to the `Scan Class <scan-class.md>`__ documentation.
+For the list of functions provided to manage scan mode please refer to the `Scan Class <scan-class.rst>`__ documentation.

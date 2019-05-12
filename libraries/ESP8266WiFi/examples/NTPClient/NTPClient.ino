@@ -1,34 +1,39 @@
 /*
 
- Udp NTP Client
+  Udp NTP Client
 
- Get the time from a Network Time Protocol (NTP) time server
- Demonstrates use of UDP sendPacket and ReceivePacket
- For more on NTP time servers and the messages needed to communicate with them,
- see http://en.wikipedia.org/wiki/Network_Time_Protocol
+  Get the time from a Network Time Protocol (NTP) time server
+  Demonstrates use of UDP sendPacket and ReceivePacket
+  For more on NTP time servers and the messages needed to communicate with them,
+  see http://en.wikipedia.org/wiki/Network_Time_Protocol
 
- created 4 Sep 2010
- by Michael Margolis
- modified 9 Apr 2012
- by Tom Igoe
- updated for the ESP8266 12 Apr 2015 
- by Ivan Grokhotkov
+  created 4 Sep 2010
+  by Michael Margolis
+  modified 9 Apr 2012
+  by Tom Igoe
+  updated for the ESP8266 12 Apr 2015
+  by Ivan Grokhotkov
 
- This code is in the public domain.
+  This code is in the public domain.
 
- */
+*/
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-char ssid[] = "*************";  //  your network SSID (name)
-char pass[] = "********";       // your network password
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char * ssid = STASSID; // your network SSID (name)
+const char * pass = STAPSK;  // your network password
 
 
 unsigned int localPort = 123;      // local port to listen for UDP packets
 
 /* Don't hardwire the IP address or we won't get the benefits of the pool.
- *  Lookup the IP address for the host name instead */
+    Lookup the IP address for the host name instead */
 //IPAddress timeServer(129, 6, 15, 28); // time.nist.gov NTP server
 IPAddress timeServerIP; // time.nist.gov NTP server address
 const char* ntpServerName = "time.nist.gov";
@@ -40,8 +45,7 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing pack
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udp;
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -49,14 +53,15 @@ void setup()
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
   Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println("");
-  
+
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
@@ -67,20 +72,18 @@ void setup()
   Serial.println(udp.localPort());
 }
 
-void loop()
-{
+void loop() {
   //get a random server from the pool
-  WiFi.hostByName(ntpServerName, timeServerIP); 
+  WiFi.hostByName(ntpServerName, timeServerIP);
 
   sendNTPpacket(timeServerIP); // send an NTP packet to a time server
   // wait to see if a reply is available
   delay(1000);
-  
+
   int cb = udp.parsePacket();
   if (!cb) {
     Serial.println("no packet yet");
-  }
-  else {
+  } else {
     Serial.print("packet received, length=");
     Serial.println(cb);
     // We've received a packet, read the data from it
@@ -94,7 +97,7 @@ void loop()
     // combine the four bytes (two words) into a long integer
     // this is NTP time (seconds since Jan 1 1900):
     unsigned long secsSince1900 = highWord << 16 | lowWord;
-    Serial.print("Seconds since Jan 1 1900 = " );
+    Serial.print("Seconds since Jan 1 1900 = ");
     Serial.println(secsSince1900);
 
     // now convert NTP time into everyday time:
@@ -111,13 +114,13 @@ void loop()
     Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
     Serial.print((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
     Serial.print(':');
-    if ( ((epoch % 3600) / 60) < 10 ) {
+    if (((epoch % 3600) / 60) < 10) {
       // In the first 10 minutes of each hour, we'll want a leading '0'
       Serial.print('0');
     }
     Serial.print((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
     Serial.print(':');
-    if ( (epoch % 60) < 10 ) {
+    if ((epoch % 60) < 10) {
       // In the first 10 seconds of each minute, we'll want a leading '0'
       Serial.print('0');
     }
@@ -128,8 +131,7 @@ void loop()
 }
 
 // send an NTP request to the time server at the given address
-unsigned long sendNTPpacket(IPAddress& address)
-{
+void sendNTPpacket(IPAddress& address) {
   Serial.println("sending NTP packet...");
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);

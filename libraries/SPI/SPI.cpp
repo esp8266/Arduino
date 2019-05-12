@@ -161,6 +161,11 @@ void SPIClass::setDataMode(uint8_t dataMode) {
     bool CPOL = (dataMode & 0x10); ///< CPOL (Clock Polarity)
     bool CPHA = (dataMode & 0x01); ///< CPHA (Clock Phase)
 
+    // https://github.com/esp8266/Arduino/issues/2416
+    // https://github.com/esp8266/Arduino/pull/2418
+    if(CPOL)          // Ensure same behavior as
+        CPHA ^= 1;    // SAM, AVR and Intel Boards
+
     if(CPHA) {
         SPI1U |= (SPIUSME);
     } else {
@@ -323,6 +328,25 @@ uint16_t SPIClass::transfer16(uint16_t data) {
     return out.val;
 }
 
+void SPIClass::transfer(void *buf, uint16_t count) {
+    uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
+
+    // cbuf may not be 32bits-aligned
+    for (; (((unsigned long)cbuf) & 3) && count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+
+    // cbuf is now aligned
+    // count may not be a multiple of 4
+    uint16_t count4 = count & ~3;
+    transferBytes(cbuf, cbuf, count4);
+
+    // finish the last <4 bytes
+    cbuf += count4;
+    count -= count4;
+    for (; count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+}
+
 void SPIClass::write(uint8_t data) {
     while(SPI1CMD & SPIBUSY) {}
     // reset to 8Bit mode
@@ -380,7 +404,7 @@ void SPIClass::write32(uint32_t data, bool msb) {
  * @param data uint8_t *
  * @param size uint32_t
  */
-void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
+void SPIClass::writeBytes(const uint8_t * data, uint32_t size) {
     while(size) {
         if(size > 64) {
             writeBytes_(data, 64);
@@ -393,13 +417,13 @@ void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
     }
 }
 
-void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
+void SPIClass::writeBytes_(const uint8_t * data, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
     // Set Bits to transfer
     setDataBits(size * 8);
 
     uint32_t * fifoPtr = (uint32_t*)&SPI1W0;
-    uint32_t * dataPtr = (uint32_t*) data;
+    const uint32_t * dataPtr = (uint32_t*) data;
     uint32_t dataSize = ((size + 3) / 4);
 
     while(dataSize--) {
@@ -418,14 +442,14 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
  * @param size uint8_t  max for size is 64Byte
  * @param repeat uint32_t
  */
-void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
+void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
 
     while(SPI1CMD & SPIBUSY) {}
 
     uint32_t buffer[16];
     uint8_t *bufferPtr=(uint8_t *)&buffer;
-    uint8_t *dataPtr = data;
+    const uint8_t *dataPtr = data;
     volatile uint32_t * fifoPtr = &SPI1W0;
     uint8_t r;
     uint32_t repeatRem;
@@ -490,14 +514,11 @@ void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
 }
 
 /**
- * Note:
- *  in and out need to be aligned to 32Bit
- *  or you get an Fatal exception (9)
  * @param out uint8_t *
  * @param in  uint8_t *
  * @param size uint32_t
  */
-void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
+void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size) {
     while(size) {
         if(size > 64) {
             transferBytes_(out, in, 64);
@@ -511,43 +532,80 @@ void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
     }
 }
 
-void SPIClass::transferBytes_(uint8_t * out, uint8_t * in, uint8_t size) {
+/**
+ * Note:
+ *  in and out need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param out uint8_t *
+ * @param in  uint8_t *
+ * @param size uint8_t (max 64)
+ */
+
+void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t size) {
+    if (!size)
+        return;
+
     while(SPI1CMD & SPIBUSY) {}
     // Set in/out Bits to transfer
 
     setDataBits(size * 8);
 
-    volatile uint32_t * fifoPtr = &SPI1W0;
-    uint8_t dataSize = ((size + 3) / 4);
+    volatile uint32_t *fifoPtr = &SPI1W0;
 
-    if(out) {
-        uint32_t * dataPtr = (uint32_t*) out;
-        while(dataSize--) {
-            *fifoPtr = *dataPtr;
-            dataPtr++;
-            fifoPtr++;
+    if (out) {
+        uint8_t outSize = ((size + 3) / 4);
+        uint32_t *dataPtr = (uint32_t*) out;
+        while (outSize--) {
+            *(fifoPtr++) = *(dataPtr++);
         }
     } else {
+        uint8_t outSize = ((size + 3) / 4);
         // no out data only read fill with dummy data!
-        while(dataSize--) {
-            *fifoPtr = 0xFFFFFFFF;
-            fifoPtr++;
+        while (outSize--) {
+            *(fifoPtr++) = 0xFFFFFFFF;
         }
     }
 
     SPI1CMD |= SPIBUSY;
     while(SPI1CMD & SPIBUSY) {}
 
-    if(in) {
-        volatile uint8_t * fifoPtr8 = (volatile uint8_t *) &SPI1W0;
-        dataSize = size;
-        while(dataSize--) {
-            *in = *fifoPtr8;
-            in++;
-            fifoPtr8++;
+    if (in) {
+        uint32_t *dataPtr = (uint32_t*) in;
+        fifoPtr = &SPI1W0;
+        int inSize = size;
+        // Unlike outSize above, inSize tracks *bytes* since we must transfer only the requested bytes to the app to avoid overwriting other vars.
+        while (inSize >= 4) {
+            *(dataPtr++) = *(fifoPtr++);
+            inSize -= 4;
+            in += 4;
+        }
+        volatile uint8_t *fifoPtrB = (volatile uint8_t *)fifoPtr;
+        while (inSize--) {
+            *(in++) = *(fifoPtrB++);
         }
     }
 }
+
+
+void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
+    if (!((uint32_t)out & 3) && !((uint32_t)in & 3)) {
+        // Input and output are both 32b aligned or NULL
+        transferBytesAligned_(out, in, size);
+    } else {
+        // HW FIFO has 64b limit and ::transferBytes breaks up large xfers into 64byte chunks before calling this function
+        // We know at this point at least one direction is misaligned, so use temporary buffer to align everything
+        // No need for separate out and in aligned copies, we can overwrite our out copy with the input data safely
+        uint8_t aligned[64]; // Stack vars will be 32b aligned
+        if (out) {
+            memcpy(aligned, out, size);
+        }
+        transferBytesAligned_(out ? aligned : nullptr, in ? aligned : nullptr, size);
+        if (in) {
+            memcpy(in, aligned, size);
+        }
+    }
+}
+
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPI)
 SPIClass SPI;

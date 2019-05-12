@@ -31,27 +31,29 @@ which is selected in IDE, you have the following options for flash size:
 +---------------------------------+--------------------------+---------------------------+
 | Generic module                  | 2M                       | 1M                        |
 +---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 4M                       | 3M                        |
+| Generic module                  | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| Adafruit HUZZAH                 | 4M                       | 1M, 3M                    |
+| Adafruit HUZZAH                 | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 1.0               | 4M                       | 1M, 3M                    |
+| ESPresso Lite 1.0               | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 2.0               | 4M                       | 1M, 3M                    |
+| ESPresso Lite 2.0               | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| NodeMCU 0.9                     | 4M                       | 1M, 3M                    |
+| NodeMCU 0.9                     | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| NodeMCU 1.0                     | 4M                       | 1M, 3M                    |
+| NodeMCU 1.0                     | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
 | Olimex MOD-WIFI-ESP8266(-DEV)   | 2M                       | 1M                        |
 +---------------------------------+--------------------------+---------------------------+
 | SparkFun Thing                  | 512k                     | 64k                       |
 +---------------------------------+--------------------------+---------------------------+
-| SweetPea ESP-210                | 4M                       | 1M, 3M                    |
+| SweetPea ESP-210                | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| WeMos D1 & D1 mini              | 4M                       | 1M, 3M                    |
+| WeMos D1 R1, R2 & mini          | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| ESPDuino                        | 4M                       | 1M, 3M                    |
+| ESPDuino                        | 4M                       | 1M, 2M, 3M                |
++---------------------------------+--------------------------+---------------------------+
+| WiFiduino                       | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
 
 **Note:** to use any of file system functions in the sketch, add the
@@ -105,11 +107,18 @@ Uploading files to file system
 menu item to *Tools* menu for uploading the contents of sketch data
 directory into ESP8266 flash file system.
 
--  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.3.0/ESP8266FS-0.3.0.zip.
+**Warning**: Due to the move from the obsolete esptool-ck.exe to the
+supported esptool.py upload tool, upgraders from pre 2.5.1 will need to
+update the ESP8266FS tool referenced below to 0.4.0 or later.  Prior versions
+will fail with a "esptool not found" error because they don't know how to
+use esptool.py.
+
+-  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.4.0/ESP8266FS-0.4.0.zip
 -  In your Arduino sketchbook directory, create ``tools`` directory if
    it doesn't exist yet
 -  Unpack the tool into ``tools`` directory (the path will look like
    ``<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar``)
+   If upgrading, overwrite the existing JAR file with the newer version.
 -  Restart Arduino IDE
 -  Open a sketch (or create a new one and save it)
 -  Go to sketch directory (choose Sketch > Show Sketch Folder)
@@ -123,6 +132,24 @@ directory into ESP8266 flash file system.
 File system object (SPIFFS)
 ---------------------------
 
+setConfig
+~~~~~~~~~
+
+.. code:: cpp
+
+    SPIFFSConfig cfg;
+    cfg.setAutoFormat(false);
+    SPIFFS.setConfig(cfg);
+
+This method allows you to configure the parameters of a filesystem
+before mounting.  All filesystems have their own ``*Config`` (i.e.
+``SDFSConfig`` or ``SPIFFSConfig`` with their custom set of options.
+All filesystems allow explicitly enabling/disabling formatting when
+mounts fail.  If you do not call this ``setConfig`` method before
+perforing ``begin()``, you will get the filesystem's default
+behavior and configuration. By default, SPIFFS will autoformat the
+filesystem if it cannot mount it, while SDFS will not.
+
 begin
 ~~~~~
 
@@ -132,7 +159,8 @@ begin
 
 This method mounts SPIFFS file system. It must be called before any
 other FS APIs are used. Returns *true* if file system was mounted
-successfully, false otherwise.
+successfully, false otherwise.  With no options it will format SPIFFS
+if it is unable to mount it on the first try.
 
 end
 ~~~
@@ -276,7 +304,7 @@ Directory object (Dir)
 ----------------------
 
 The purpose of *Dir* object is to iterate over files inside a directory.
-It provides three methods: ``next()``, ``fileName()``, and
+It provides the methods: ``next()``, ``fileName()``, ``fileSize()`` , and
 ``openFile(mode)``.
 
 The following example shows how it should be used:
@@ -286,21 +314,41 @@ The following example shows how it should be used:
     Dir dir = SPIFFS.openDir("/data");
     while (dir.next()) {
         Serial.print(dir.fileName());
-        File f = dir.openFile("r");
-        Serial.println(f.size());
+        if(dir.fileSize()) {
+            File f = dir.openFile("r");
+            Serial.println(f.size());
+        }
     }
 
-``dir.next()`` returns true while there are files in the directory to
-iterate over. It must be called before calling ``fileName`` and
-``openFile`` functions.
+next
+~~~~
 
-``openFile`` method takes *mode* argument which has the same meaning as
-for ``SPIFFS.open`` function.
+Returns true while there are files in the directory to
+iterate over. It must be called before calling ``fileName()``, ``fileSize()``,
+and ``openFile()`` functions.
+
+fileName
+~~~~~~~~~
+
+Returns the name of the current file pointed to
+by the internal iterator.
+
+fileSize
+~~~~~~~~
+
+Returns the size of the current file pointed to
+by the internal iterator.
+
+openFile
+~~~~~~~~
+
+This method takes *mode* argument which has the same meaning as
+for ``SPIFFS.open()`` function.
 
 File object
 -----------
 
-``SPIFFS.open`` and ``dir.openFile`` functions return a *File* object.
+``SPIFFS.open()`` and ``dir.openFile()`` functions return a *File* object.
 This object supports all the functions of *Stream*, so you can use
 ``readBytes``, ``findUntil``, ``parseInt``, ``println``, and all other
 *Stream* methods.

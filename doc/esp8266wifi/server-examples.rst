@@ -53,7 +53,7 @@ Then let's write a short function ``prepareHtmlPage()``, that will return a ``St
       return htmlPage;
     }
 
-The function does nothing fancy but just puts together a text header and `HTML <http://www.w3schools.com/html/>`__ contents of the page.
+The function does nothing fancy but just puts together a text header and `HTML <https://www.w3schools.com/html/>`__ contents of the page.
 
 Header First
 ~~~~~~~~~~~~
@@ -75,7 +75,7 @@ In our example the content type is ``text/html``, the connection will be closed 
     Analog input:  [Value]
     </html>
 
-The content contains two basic `HTML <http://www.w3schools.com/html/>`__ tags, one to denote HTML document type ``<!DOCTYPE HTML>`` and another to mark beginning ``<html>`` and end ``</html>`` of the document. Inside there is a raw value read from ESP's analog input ``analogRead(A0)`` converted to the ``String`` type.
+The content contains two basic `HTML <https://www.w3schools.com/html/>`__ tags, one to denote HTML document type ``<!DOCTYPE HTML>`` and another to mark beginning ``<html>`` and end ``</html>`` of the document. Inside there is a raw value read from ESP's analog input ``analogRead(A0)`` converted to the ``String`` type.
 
 .. code:: cpp
 
@@ -223,8 +223,6 @@ Enter provided IP address in a web browser. You should see the page served by ES
 .. figure:: pictures/server-browser-output.png
    :alt: Output from server in a web browser
 
-   alt text
-
 The page would be refreshed every 5 seconds. Each time this happens, you should see a request from the client (your web browser) printed out on the serial monitor:
 
 ::
@@ -243,7 +241,7 @@ The page would be refreshed every 5 seconds. Each time this happens, you should 
 What Else?
 ~~~~~~~~~~
 
-Looking on :doc:`client examples <client-examples>` you will quickly find out the similarities in protocol to the server. The protocol starts with a header that contains information what communication will be about. It contains what content type is communicated or accepted like ``text/html``. It states whether connection will be kept alive or closed after submission of the header. It contains identification of the sender like ``User-Agent: Mozilla/5.0 (Windows NT 6.1)``, etc.
+Looking on `client examples <client-examples.rst>`__ you will quickly find out the similarities in protocol to the server. The protocol starts with a header that contains information what communication will be about. It contains what content type is communicated or accepted like ``text/html``. It states whether connection will be kept alive or closed after submission of the header. It contains identification of the sender like ``User-Agent: Mozilla/5.0 (Windows NT 6.1)``, etc.
 
 Conclusion
 ~~~~~~~~~~
@@ -252,4 +250,4 @@ The above example shows that a web server on ESP8266 can be set up in almost no 
 
 If you like to try another server example, check out `WiFiWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiWebServer/WiFiWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
 
-For the list of functions provided to implement and manage servers, please refer to the :doc:`Server Class <server-class>` documentation.
+For the list of functions provided to implement and manage servers, please refer to the `Server Class <server-class.rst>`__ documentation.

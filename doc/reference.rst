@@ -42,7 +42,12 @@ either to read voltage at ADC pin, or to read module supply voltage
 (VCC).
 
 To read external voltage applied to ADC pin, use ``analogRead(A0)``.
-Input voltage range is 0 — 1.0V.
+Input voltage range of bare ESP8266 is 0 — 1.0V, however some many 
+boards may implement voltage dividers. To be on the safe side, <1.0V 
+can be tested. If e.g. 0.5V delivers values around ~512, then maximum 
+voltage is very likely to be 1.0V and 3.3V may harm the ESP8266. 
+However values around ~150 indicates that the maximum voltage is 
+likely to be 3.3V.
 
 To read VCC voltage, use ``ESP.getVcc()`` and ADC pin must be kept
 unconnected. Additionally, the following line has to be added to the
@@ -65,7 +70,13 @@ equal to 1023 by default. PWM range may be changed by calling
 ``analogWriteRange(new_range)``.
 
 PWM frequency is 1kHz by default. Call
-``analogWriteFreq(new_frequency)`` to change the frequency.
+``analogWriteFreq(new_frequency)`` to change the frequency. Valid values 
+are from 100Hz up to 40000Hz.
+
+The ESP doesn't have hardware PWM, so the implementation is by software. 
+With one PWM output at 40KHz, the CPU is already rather loaded. The more 
+PWM outputs used, and the higher their frequency, the closer you get to 
+the CPU limits, and the less CPU cycles are available for sketch execution. 
 
 Timing and delays
 -----------------
@@ -94,10 +105,11 @@ Serial
 ------
 
 ``Serial`` object works much the same way as on a regular Arduino. Apart
-from hardware FIFO (128 bytes for TX and RX) HardwareSerial has
+from hardware FIFO (128 bytes for TX and RX) ``Serial`` has
 additional 256-byte TX and RX buffers. Both transmit and receive is
 interrupt-driven. Write and read functions only block the sketch
-execution when the respective FIFO/buffers are full/empty.
+execution when the respective FIFO/buffers are full/empty. Note that
+the length of additional 256-bit buffer can be customized.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
@@ -121,6 +133,9 @@ instead, call ``Serial1.setDebugOutput(true)``.
 You also need to use ``Serial.setDebugOutput(true)`` to enable output
 from ``printf()`` function.
 
+The method ``Serial.setRxBufferSize(size_t size)`` allows to define the
+receiving buffer depth. The default value is 256.
+
 Both ``Serial`` and ``Serial1`` objects support 5, 6, 7, 8 data bits,
 odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the
 desired mode, call ``Serial.begin(baudrate, SERIAL_8N1)``,
@@ -142,12 +157,25 @@ current speed. For example
     // Will print "Serial is 57600 bps"
     Serial.printf("Serial is %d bps", br);
 
+| ``Serial`` and ``Serial1`` objects are both instances of the
+  ``HardwareSerial`` class.
 | I've done this also for official ESP8266 `Software
-  Serial <https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#softwareserial>`__
+  Serial <libraries.rst#softwareserial>`__
   library, see this `pull
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
 | Note that this implementation is **only for ESP8266 based boards**,
   and will not works with other Arduino boards.
+
+
+To detect an unknown baudrate of data coming into Serial use ``Serial.detectBaudrate(time_t timeoutMillis)``. This method tries to detect the baudrate for a maximum of timeoutMillis ms. It returns zero if no baudrate was detected, or the detected baudrate otherwise. The ``detectBaudrate()`` function may be called before ``Serial.begin()`` is called, because it does not need the receive buffer nor the SerialConfig parameters.
+
+The uart can not detect other parameters like number of start- or stopbits, number of data bits or parity.
+
+The detection itself does not change the baudrate, after detection it should be set as usual using ``Serial.begin(detectedBaudrate)``.
+
+Detection is very fast, it takes only a few incoming bytes.
+
+SerialDetectBaudrate.ino is a full example of usage.
 
 Progmem
 -------

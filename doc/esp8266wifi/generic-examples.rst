@@ -3,7 +3,7 @@
 Generic
 -------
 
-In the first `example <readme.md#quick-start>`__ of the ESP8266WiFi library documentation we have discussed how to check when module connects to the Wi-Fi network. We were waiting until connection is established. If network is not available, the module could wait like that for ever doing nothing else. Another `example <scan-examples.md#async-scan>`__ on the Wi-Fi asynchronous scan mode demonstrated how to wait for scan result and do in parallel something else - blink a LED not disturbing the blink pattern. Let's apply similar functionality when connecting the module to an access point.
+In the first `example <readme.rst#quick-start>`__ of the ESP8266WiFi library documentation we have discussed how to check when module connects to the Wi-Fi network. We were waiting until connection is established. If network is not available, the module could wait like that for ever doing nothing else. Another `example <scan-examples.rst#async-scan>`__ on the Wi-Fi asynchronous scan mode demonstrated how to wait for scan result and do in parallel something else - blink a LED not disturbing the blink pattern. Let's apply similar functionality when connecting the module to an access point.
 
 Table of Contents
 -----------------
@@ -29,7 +29,7 @@ We would like to write a code that will inform us that connection to Wi-Fi netwo
 Event Driven Methods
 ~~~~~~~~~~~~~~~~~~~~
 
-The list of all such methods is provided in `Generic Class <generic-class.md>`__ documentation.
+The list of all such methods is provided in `Generic Class <generic-class.rst>`__ documentation.
 
 We would like to use two of them: \* ``onStationModeGotIP`` called when station is assigned IP address. This assignment may be done by DHCP client or by executing ``WiFi.config(...)``. \* ``onStationModeDisconnected`` called when station is disconnected from Wi-Fi network. The reason of disconnection does not matter. Event will be triggered both if disconnection is done from the code by executing ``WiFi.disconnect()``, because the Wi-Fi signal is weak, or because the access point is switched off.
 
@@ -122,4 +122,4 @@ Conclusion
 
 Check out events from generic class. They will help you to write more compact code. Use them to practice splitting your code into separate tasks that are executed asynchronously.
 
-For review of functions included in generic class, please refer to the `Generic Class <generic-class.md>`__ documentation.
+For review of functions included in generic class, please refer to the `Generic Class <generic-class.rst>`__ documentation.
