@@ -90,6 +90,10 @@ env.Append(
         "-Wl,--gc-sections",
         "-Wl,-wrap,system_restart_local",
         "-Wl,-wrap,spi_flash_read",
+        # Ensure IRQ handler stuff linked in properly
+        "-Wl,--whole-archive",
+        "-lmain",
+        "-Wl,--no-whole-archive",
         "-u", "app_entry",
         "-u", "_printf_float",
         "-u", "_scanf_float"
@@ -120,7 +124,7 @@ env.Append(
     ],
 
     LIBS=[
-        "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
+        "hal", "phy", "pp", "net80211", "wpa", "crypto",
         "wps", "bearssl", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
         "stdc++", "m", "c", "gcc"
     ],
