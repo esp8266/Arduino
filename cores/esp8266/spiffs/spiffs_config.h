@@ -1,9 +1,9 @@
 /*
-    spiffs_config.h
-
-    Created on: Jul 3, 2013
-        Author: petera
-*/
+ * spiffs_config.h
+ *
+ *  Created on: Jul 3, 2013
+ *      Author: petera
+ */
 
 #ifndef SPIFFS_CONFIG_H_
 #define SPIFFS_CONFIG_H_

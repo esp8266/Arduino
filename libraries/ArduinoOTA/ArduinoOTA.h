@@ -7,28 +7,26 @@
 
 class UdpContext;
 
-typedef enum
-{
-    OTA_IDLE,
-    OTA_WAITAUTH,
-    OTA_RUNUPDATE
+typedef enum {
+  OTA_IDLE,
+  OTA_WAITAUTH,
+  OTA_RUNUPDATE
 } ota_state_t;
 
-typedef enum
-{
-    OTA_AUTH_ERROR,
-    OTA_BEGIN_ERROR,
-    OTA_CONNECT_ERROR,
-    OTA_RECEIVE_ERROR,
-    OTA_END_ERROR
+typedef enum {
+  OTA_AUTH_ERROR,
+  OTA_BEGIN_ERROR,
+  OTA_CONNECT_ERROR,
+  OTA_RECEIVE_ERROR,
+  OTA_END_ERROR
 } ota_error_t;
 
 class ArduinoOTAClass
 {
-public:
-    typedef std::function<void(void)> THandlerFunction;
-    typedef std::function<void(ota_error_t)> THandlerFunction_Error;
-    typedef std::function<void(unsigned int, unsigned int)> THandlerFunction_Progress;
+  public:
+	typedef std::function<void(void)> THandlerFunction;
+	typedef std::function<void(ota_error_t)> THandlerFunction_Error;
+	typedef std::function<void(unsigned int, unsigned int)> THandlerFunction_Progress;
 
     ArduinoOTAClass();
     ~ArduinoOTAClass();
@@ -70,7 +68,7 @@ public:
     //Gets update command type after OTA has started. Either U_FLASH or U_SPIFFS
     int getCommand();
 
-private:
+  private:
     int _port;
     String _password;
     String _hostname;

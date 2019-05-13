@@ -1,20 +1,20 @@
 /*
-    SD.h - A thin shim for Arduino ESP8266 Filesystems
-    Copyright (c) 2019 Earle F. Philhower, III.  All rights reserved.
+ SD.h - A thin shim for Arduino ESP8266 Filesystems
+ Copyright (c) 2019 Earle F. Philhower, III.  All rights reserved.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #ifndef __SD_H__
@@ -29,144 +29,103 @@
 #undef FILE_WRITE
 #define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT)
 
-class SDClass
-{
+class SDClass {
 public:
-    boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED)
-    {
-        SDFS.setConfig(SDFSConfig(csPin, cfg));
+    boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
+	SDFS.setConfig(SDFSConfig(csPin, cfg));
         return (boolean)SDFS.begin();
     }
 
-    void end(bool endSPI = true)
-    {
+    void end(bool endSPI = true) {
         SDFS.end();
-        if (endSPI)
-        {
+        if (endSPI) {
             SPI.end();
         }
     }
 
-    File open(const char *filename, uint8_t mode = FILE_READ)
-    {
+    File open(const char *filename, uint8_t mode = FILE_READ) {
         return SDFS.open(filename, getMode(mode));
     }
 
-    File open(const String &filename, uint8_t mode = FILE_READ)
-    {
+    File open(const String &filename, uint8_t mode = FILE_READ) {
         return open(filename.c_str(), mode);
     }
 
-    boolean exists(const char *filepath)
-    {
+    boolean exists(const char *filepath) {
         return (boolean)SDFS.exists(filepath);
     }
 
-    boolean exists(const String &filepath)
-    {
+    boolean exists(const String &filepath) {
         return (boolean)SDFS.exists(filepath.c_str());
     }
 
-    boolean mkdir(const char *filepath)
-    {
+    boolean mkdir(const char *filepath) {
         return (boolean)SDFS.mkdir(filepath);
     }
 
-    boolean mkdir(const String &filepath)
-    {
+    boolean mkdir(const String &filepath) {
         return (boolean)SDFS.mkdir(filepath.c_str());
     }
-
-    boolean remove(const char *filepath)
-    {
+  
+    boolean remove(const char *filepath) {
         return (boolean)SDFS.remove(filepath);
     }
 
-    boolean remove(const String &filepath)
-    {
+    boolean remove(const String &filepath) {
         return remove(filepath.c_str());
     }
-
-    boolean rmdir(const char *filepath)
-    {
+  
+    boolean rmdir(const char *filepath) {
         return (boolean)SDFS.rmdir(filepath);
     }
 
-    boolean rmdir(const String &filepath)
-    {
+    boolean rmdir(const String &filepath) {
         return rmdir(filepath.c_str());
     }
 
-    uint8_t type()
-    {
+    uint8_t type() {
         return 0;//card.type();
     }
 
-    uint8_t fatType()
-    {
+    uint8_t fatType() {
         return 0;//volume.fatType();
     }
 
-    size_t blocksPerCluster()
-    {
+    size_t blocksPerCluster() {
         return 0;//volume.blocksPerCluster();
     }
 
-    size_t totalClusters()
-    {
+    size_t totalClusters() {
         return 0;//volume.clusterCount();
     }
 
-    size_t blockSize()
-    {
+    size_t blockSize() {
         return 512;
     }
 
-    size_t totalBlocks()
-    {
+    size_t totalBlocks() {
         return 0;//(totalClusters() / blocksPerCluster());
     }
 
-    size_t clusterSize()
-    {
+    size_t clusterSize() {
         return 0;//blocksPerCluster() * blockSize();
     }
 
-    size_t size()
-    {
+    size_t size() {
         return 0;//(clusterSize() * totalClusters());
     }
 
 private:
-    const char *getMode(uint8_t mode)
-    {
+    const char *getMode(uint8_t mode) {
         bool read = (mode & sdfat::O_READ) ? true : false;
         bool write = (mode & sdfat::O_WRITE) ? true : false;
         bool append = (mode & sdfat::O_APPEND) ? true : false;
-        if (read & !write)
-        {
-            return "r";
-        }
-        else if (!read &  write & !append)
-        {
-            return "w+";
-        }
-        else if (!read &  write &  append)
-        {
-            return "a";
-        }
-        else if (read &  write & !append)
-        {
-            return "w+";    // may be a bug in FS::mode interpretation, "r+" seems proper
-        }
-        else if (read &  write &  append)
-        {
-            return "a+";
-        }
-        else
-        {
-            return "r";
-        }
+        if      (  read & !write )           { return "r";  }
+        else if ( !read &  write & !append ) { return "w+"; }
+        else if ( !read &  write &  append ) { return "a";  }
+        else if (  read &  write & !append ) { return "w+"; } // may be a bug in FS::mode interpretation, "r+" seems proper
+        else if (  read &  write &  append ) { return "a+"; }
+        else                                 { return "r";  }
     }
 
 };

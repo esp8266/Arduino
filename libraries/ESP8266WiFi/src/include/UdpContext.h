@@ -1,22 +1,22 @@
 /*
-    UdpContext.h - UDP connection handling on top of lwIP
+  UdpContext.h - UDP connection handling on top of lwIP
 
-    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
-    This file is part of the esp8266 core for Arduino environment.
+  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef UDPCONTEXT_H
 #define UDPCONTEXT_H
@@ -24,8 +24,8 @@
 class UdpContext;
 
 extern "C" {
-    void esp_yield();
-    void esp_schedule();
+void esp_yield();
+void esp_schedule();
 #include "lwip/init.h" // LWIP_VERSION_
 #include <assert.h>
 }
@@ -42,14 +42,14 @@ public:
     typedef std::function<void(void)> rxhandler_t;
 
     UdpContext()
-        : _pcb(0)
-        , _rx_buf(0)
-        , _first_buf_taken(false)
-        , _rx_buf_offset(0)
-        , _refcnt(0)
-        , _tx_buf_head(0)
-        , _tx_buf_cur(0)
-        , _tx_buf_offset(0)
+    : _pcb(0)
+    , _rx_buf(0)
+    , _first_buf_taken(false)
+    , _rx_buf_offset(0)
+    , _refcnt(0)
+    , _tx_buf_head(0)
+    , _tx_buf_cur(0)
+    , _tx_buf_offset(0)
     {
         _pcb = udp_new();
 #ifdef LWIP_MAYBE_XCC
@@ -83,11 +83,9 @@ public:
 
     void unref()
     {
-        if (this != 0)
-        {
+        if(this != 0) {
             DEBUGV(":ur %d\r\n", _refcnt);
-            if (--_refcnt == 0)
-            {
+            if(--_refcnt == 0) {
                 delete this;
             }
         }
@@ -144,7 +142,7 @@ public:
 
         if (!addr.isV4())
         {
-            for (auto a : addrList)
+            for (auto a: addrList)
                 if (a.addr() == addr)
                 {
                     // found the IPv6 address,
@@ -181,17 +179,14 @@ public:
 
     // warning: handler is called from tcp stack context
     // esp_yield and non-reentrant functions which depend on it will fail
-    void onRx(rxhandler_t handler)
-    {
+    void onRx(rxhandler_t handler) {
         _on_rx = handler;
     }
 
     size_t getSize() const
     {
         if (!_rx_buf)
-        {
             return 0;
-        }
 
         return _rx_buf->len - _rx_buf_offset;
     }
@@ -207,8 +202,7 @@ public:
         _rx_buf_offset = pos;
     }
 
-    bool isValidOffset(const size_t pos) const
-    {
+    bool isValidOffset(const size_t pos) const {
         return (pos <= _rx_buf->len);
     }
 
@@ -230,18 +224,14 @@ public:
     uint16_t getLocalPort() const
     {
         if (!_pcb)
-        {
             return 0;
-        }
         return _pcb->local_port;
     }
 
     bool next()
     {
         if (!_rx_buf)
-        {
             return false;
-        }
         if (!_first_buf_taken)
         {
             _first_buf_taken = true;
@@ -282,9 +272,7 @@ public:
     int read()
     {
         if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
-        {
             return -1;
-        }
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
         _consume(1);
@@ -294,9 +282,7 @@ public:
     size_t read(char* dst, size_t size)
     {
         if (!_rx_buf)
-        {
             return 0;
-        }
 
         size_t max_size = _rx_buf->len - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
@@ -311,9 +297,7 @@ public:
     int peek() const
     {
         if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
-        {
             return -1;
-        }
 
         return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
     }
@@ -322,9 +306,7 @@ public:
     {
         //XXX this does not follow Arduino's flush definition
         if (!_rx_buf)
-        {
             return;
-        }
 
         _consume(_rx_buf->len - _rx_buf_offset);
     }
@@ -342,7 +324,7 @@ public:
         }
 
         size_t left_to_copy = size;
-        while (left_to_copy)
+        while(left_to_copy)
         {
             // size already used in current pbuf
             size_t used_cur = _tx_buf_offset - (_tx_buf_head->tot_len - _tx_buf_cur->tot_len);
@@ -365,15 +347,12 @@ public:
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
-        if (!tx_copy)
-        {
+        if(!tx_copy){
             DEBUGV("failed pbuf_alloc");
         }
-        else
-        {
+        else{
             uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
-            for (pbuf* p = _tx_buf_head; p; p = p->next)
-            {
+            for (pbuf* p = _tx_buf_head; p; p = p->next) {
                 size_t will_copy = (data_size < p->len) ? data_size : p->len;
                 memcpy(dst, p->payload, will_copy);
                 dst += will_copy;
@@ -381,33 +360,27 @@ public:
             }
         }
         if (_tx_buf_head)
-        {
             pbuf_free(_tx_buf_head);
-        }
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
-        if (!tx_copy)
-        {
+        if(!tx_copy){
             return false;
         }
 
 
-        if (!addr)
-        {
+        if (!addr) {
             addr = &_pcb->remote_ip;
             port = _pcb->remote_port;
         }
 #ifdef LWIP_MAYBE_XCC
         uint16_t old_ttl = _pcb->ttl;
-        if (ip_addr_ismulticast(addr))
-        {
+        if (ip_addr_ismulticast(addr)) {
             _pcb->ttl = _mcast_ttl;
         }
 #endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
-        if (err != ERR_OK)
-        {
+        if (err != ERR_OK) {
             DEBUGV(":ust rc=%d\r\n", (int) err);
         }
 #ifdef LWIP_MAYBE_XCC
@@ -435,13 +408,11 @@ private:
 
         size_t cur_size = _tx_buf_head->tot_len;
         if (size < cur_size)
-        {
             return;
-        }
 
         size_t grow_size = size - cur_size;
 
-        while (grow_size)
+        while(grow_size)
         {
             pbuf* pb = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
             if (!pb)
@@ -450,9 +421,7 @@ private:
             }
             pbuf_cat(_tx_buf_head, pb);
             if (grow_size < pbuf_unit_size)
-            {
                 return;
-            }
             grow_size -= pbuf_unit_size;
         }
     }
@@ -460,21 +429,20 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
-        if (_rx_buf_offset > _rx_buf->len)
-        {
+        if (_rx_buf_offset > _rx_buf->len) {
             _rx_buf_offset = _rx_buf->len;
         }
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-               const ip_addr_t *srcaddr, u16_t srcport)
+            const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
 
 #if LWIP_VERSION_MAJOR == 1
-#define TEMPDSTADDR (&current_iphdr_dest)
+    #define TEMPDSTADDR (&current_iphdr_dest)
 #else
-#define TEMPDSTADDR (ip_current_dest_addr())
+    #define TEMPDSTADDR (ip_current_dest_addr())
 #endif
 
         // chain this helper pbuf first
@@ -502,7 +470,7 @@ private:
                 return;
             }
             // construct in place
-            new (PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
 
@@ -522,18 +490,17 @@ private:
             _rx_buf_offset = 0;
         }
 
-        if (_on_rx)
-        {
+        if (_on_rx) {
             _on_rx();
         }
 
-#undef TEMPDSTADDR
+    #undef TEMPDSTADDR
 
     }
 
     static void _s_recv(void *arg,
-                        udp_pcb *upcb, pbuf *p,
-                        CONST ip_addr_t *srcaddr, u16_t srcport)
+            udp_pcb *upcb, pbuf *p,
+            CONST ip_addr_t *srcaddr, u16_t srcport)
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, srcaddr, srcport);
     }

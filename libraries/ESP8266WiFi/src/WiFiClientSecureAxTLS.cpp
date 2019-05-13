@@ -1,22 +1,22 @@
 /*
-    WiFiClientSecure.cpp - Variant of WiFiClient with TLS support
-    Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
-    This file is part of the esp8266 core for Arduino environment.
+  WiFiClientSecure.cpp - Variant of WiFiClient with TLS support
+  Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
 
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
 
@@ -42,8 +42,7 @@
 #include "include/SSLContext.h"
 #include "include/ClientContext.h"
 
-namespace axTLS
-{
+namespace axTLS {
 
 SSL_CTX* SSLContext::_ssl_client_ctx = nullptr;
 int SSLContext::_ssl_client_ctx_refcnt = 0;
@@ -58,7 +57,7 @@ WiFiClientSecure::WiFiClientSecure()
 
 WiFiClientSecure::~WiFiClientSecure()
 {
-    _ssl = nullptr;
+   _ssl = nullptr;
 }
 
 // Only called by the WifiServerSecure, need to get the keys/certs loaded before beginning
@@ -78,25 +77,18 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM,
     std::shared_ptr<SSLContext> _new_ssl_shared(_new_ssl);
     _ssl = _new_ssl_shared;
 
-    if (usePMEM)
-    {
-        if (rsakey && rsakeyLen)
-        {
+    if (usePMEM) {
+        if (rsakey && rsakeyLen) {
             _ssl->loadObject_P(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
-        if (cert && certLen)
-        {
+        if (cert && certLen) {
             _ssl->loadObject_P(SSL_OBJ_X509_CERT, cert, certLen);
         }
-    }
-    else
-    {
-        if (rsakey && rsakeyLen)
-        {
+    } else {
+        if (rsakey && rsakeyLen) {
             _ssl->loadObject(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
-        if (cert && certLen)
-        {
+        if (cert && certLen) {
             _ssl->loadObject(SSL_OBJ_X509_CERT, cert, certLen);
         }
     }
@@ -105,8 +97,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM,
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
 {
-    if (!WiFiClient::connect(ip, port))
-    {
+    if (!WiFiClient::connect(ip, port)) {
         return 0;
     }
 
@@ -116,12 +107,10 @@ int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
 int WiFiClientSecure::connect(const char* name, uint16_t port)
 {
     IPAddress remote_addr;
-    if (!WiFi.hostByName(name, remote_addr))
-    {
+    if (!WiFi.hostByName(name, remote_addr)) {
         return 0;
     }
-    if (!WiFiClient::connect(remote_addr, port))
-    {
+    if (!WiFiClient::connect(remote_addr, port)) {
         return 0;
     }
     return _connectSSL(name);
@@ -134,15 +123,13 @@ int WiFiClientSecure::connect(const String& host, uint16_t port)
 
 int WiFiClientSecure::_connectSSL(const char* hostName)
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         _ssl = std::make_shared<SSLContext>();
     }
     _ssl->connect(_client, hostName, _timeout);
 
     auto status = ssl_handshake_status(*_ssl);
-    if (status != SSL_OK)
-    {
+    if (status != SSL_OK) {
         _ssl = nullptr;
         return 0;
     }
@@ -152,19 +139,16 @@ int WiFiClientSecure::_connectSSL(const char* hostName)
 
 size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return 0;
     }
 
     int rc = _ssl->write(buf, size);
-    if (rc >= 0)
-    {
+    if (rc >= 0) {
         return rc;
     }
 
-    if (rc != SSL_CLOSE_NOTIFY)
-    {
+    if (rc != SSL_CLOSE_NOTIFY) {
         _ssl = nullptr;
     }
 
@@ -190,25 +174,22 @@ size_t WiFiClientSecure::write(Stream& stream)
     {
         return 0;
     }
-    do
-    {
+    do {
         uint8_t temp[256]; // Temporary chunk size same as ClientContext
         countSent = 0;
         countRead = stream.readBytes(temp, sizeof(temp));
-        if (countRead)
-        {
+        if (countRead) {
             countSent = write(temp, countRead);
             totalSent += countSent;
         }
         yield(); // Feed the WDT
-    } while ((countSent == countRead) && (countSent > 0));
+    } while ( (countSent == countRead) && (countSent > 0) );
     return totalSent;
 }
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return 0;
     }
 
@@ -217,8 +198,7 @@ int WiFiClientSecure::read(uint8_t *buf, size_t size)
 
 int WiFiClientSecure::read()
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return -1;
     }
 
@@ -227,8 +207,7 @@ int WiFiClientSecure::read()
 
 int WiFiClientSecure::peek()
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return -1;
     }
 
@@ -239,28 +218,22 @@ size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length)
 {
     size_t count = 0;
 
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return 0;
     }
 
     _startMillis = millis();
-    while ((available() < (int) length) && ((millis() - _startMillis) < _timeout))
-    {
+    while ((available() < (int) length) && ((millis() - _startMillis) < _timeout)) {
         yield();
     }
 
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return 0;
     }
 
-    if (available() < (int) length)
-    {
+    if (available() < (int) length) {
         count = available();
-    }
-    else
-    {
+    } else {
         count = length;
     }
 
@@ -269,8 +242,7 @@ size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length)
 
 int WiFiClientSecure::available()
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return 0;
     }
 
@@ -279,23 +251,20 @@ int WiFiClientSecure::available()
 
 
 /*
-    SSL     TCP     RX data     connected
-    null    x       x           N
-    !null   x       Y           Y
-    Y       Y       x           Y
-    x       N       N           N
-    err     x       N           N
+SSL     TCP     RX data     connected
+null    x       x           N
+!null   x       Y           Y
+Y       Y       x           Y
+x       N       N           N
+err     x       N           N
 */
 uint8_t WiFiClientSecure::connected()
 {
-    if (_ssl)
-    {
-        if (_ssl->hasData())
-        {
+    if (_ssl) {
+        if (_ssl->hasData()) {
             return true;
         }
-        if (_client && _client->state() == ESTABLISHED && _ssl->connected())
-        {
+        if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
             return true;
         }
     }
@@ -304,8 +273,7 @@ uint8_t WiFiClientSecure::connected()
 
 bool WiFiClientSecure::stop(unsigned int maxWaitMs)
 {
-    if (_ssl)
-    {
+    if (_ssl) {
         _ssl->stop();
     }
     return WiFiClient::stop(maxWaitMs);
@@ -313,17 +281,12 @@ bool WiFiClientSecure::stop(unsigned int maxWaitMs)
 
 static bool parseHexNibble(char pb, uint8_t* res)
 {
-    if (pb >= '0' && pb <= '9')
-    {
-        *res = (uint8_t)(pb - '0'); return true;
-    }
-    else if (pb >= 'a' && pb <= 'f')
-    {
-        *res = (uint8_t)(pb - 'a' + 10); return true;
-    }
-    else if (pb >= 'A' && pb <= 'F')
-    {
-        *res = (uint8_t)(pb - 'A' + 10); return true;
+    if (pb >= '0' && pb <= '9') {
+        *res = (uint8_t) (pb - '0'); return true;
+    } else if (pb >= 'a' && pb <= 'f') {
+        *res = (uint8_t) (pb - 'a' + 10); return true;
+    } else if (pb >= 'A' && pb <= 'F') {
+        *res = (uint8_t) (pb - 'A' + 10); return true;
     }
     return false;
 }
@@ -332,27 +295,23 @@ static bool parseHexNibble(char pb, uint8_t* res)
 static bool matchName(const String& name, const String& domainName)
 {
     int wildcardPos = name.indexOf('*');
-    if (wildcardPos == -1)
-    {
+    if (wildcardPos == -1) {
         // Not a wildcard, expect an exact match
         return name == domainName;
     }
     int firstDotPos = name.indexOf('.');
-    if (wildcardPos > firstDotPos)
-    {
+    if (wildcardPos > firstDotPos) {
         // Wildcard is not part of leftmost component of domain name
         // Do not attempt to match (rfc6125 6.4.3.1)
         return false;
     }
-    if (wildcardPos != 0 || firstDotPos != 1)
-    {
+    if (wildcardPos != 0 || firstDotPos != 1) {
         // Matching of wildcards such as baz*.example.com and b*z.example.com
         // is optional. Maybe implement this in the future?
         return false;
     }
     int domainNameFirstDotPos = domainName.indexOf('.');
-    if (domainNameFirstDotPos < 0)
-    {
+    if (domainNameFirstDotPos < 0) {
         return false;
     }
     return domainName.substring(domainNameFirstDotPos) == name.substring(firstDotPos);
@@ -360,36 +319,30 @@ static bool matchName(const String& name, const String& domainName)
 
 bool WiFiClientSecure::verify(const char* fp, const char* domain_name)
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return false;
     }
 
     uint8_t sha1[20];
     int len = strlen(fp);
     int pos = 0;
-    for (size_t i = 0; i < sizeof(sha1); ++i)
-    {
-        while (pos < len && ((fp[pos] == ' ') || (fp[pos] == ':')))
-        {
+    for (size_t i = 0; i < sizeof(sha1); ++i) {
+        while (pos < len && ((fp[pos] == ' ') || (fp[pos] == ':'))) {
             ++pos;
         }
-        if (pos > len - 2)
-        {
+        if (pos > len - 2) {
             DEBUGV("pos:%d len:%d fingerprint too short\r\n", pos, len);
             return false;
         }
         uint8_t high, low;
-        if (!parseHexNibble(fp[pos], &high) || !parseHexNibble(fp[pos + 1], &low))
-        {
-            DEBUGV("pos:%d len:%d invalid hex sequence: %c%c\r\n", pos, len, fp[pos], fp[pos + 1]);
+        if (!parseHexNibble(fp[pos], &high) || !parseHexNibble(fp[pos+1], &low)) {
+            DEBUGV("pos:%d len:%d invalid hex sequence: %c%c\r\n", pos, len, fp[pos], fp[pos+1]);
             return false;
         }
         pos += 2;
         sha1[i] = low | (high << 4);
     }
-    if (ssl_match_fingerprint(*_ssl, sha1) != 0)
-    {
+    if (ssl_match_fingerprint(*_ssl, sha1) != 0) {
         DEBUGV("fingerprint doesn't match\r\n");
         return false;
     }
@@ -399,18 +352,16 @@ bool WiFiClientSecure::verify(const char* fp, const char* domain_name)
 
 bool WiFiClientSecure::_verifyDN(const char* domain_name)
 {
-    DEBUGV("domain name: '%s'\r\n", (domain_name) ? domain_name : "(null)");
+    DEBUGV("domain name: '%s'\r\n", (domain_name)?domain_name:"(null)");
     String domain_name_str(domain_name);
     domain_name_str.toLowerCase();
 
     const char* san = nullptr;
     int i = 0;
-    while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != nullptr)
-    {
+    while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != nullptr) {
         String san_str(san);
         san_str.toLowerCase();
-        if (matchName(san_str, domain_name_str))
-        {
+        if (matchName(san_str, domain_name_str)) {
             return true;
         }
         DEBUGV("SAN %d: '%s', no match\r\n", i, san);
@@ -419,23 +370,20 @@ bool WiFiClientSecure::_verifyDN(const char* domain_name)
     const char* common_name = ssl_get_cert_dn(*_ssl, SSL_X509_CERT_COMMON_NAME);
     String common_name_str(common_name);
     common_name_str.toLowerCase();
-    if (common_name && matchName(common_name_str, domain_name_str))
-    {
+    if (common_name && matchName(common_name_str, domain_name_str)) {
         return true;
     }
-    DEBUGV("CN: '%s', no match\r\n", (common_name) ? common_name : "(null)");
+    DEBUGV("CN: '%s', no match\r\n", (common_name)?common_name:"(null)");
 
     return false;
 }
 
 bool WiFiClientSecure::verifyCertChain(const char* domain_name)
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         return false;
     }
-    if (!_ssl->verifyCert())
-    {
+    if (!_ssl->verifyCert()) {
         return false;
     }
     return _verifyDN(domain_name);
@@ -443,8 +391,7 @@ bool WiFiClientSecure::verifyCertChain(const char* domain_name)
 
 void WiFiClientSecure::_initSSLContext()
 {
-    if (!_ssl)
-    {
+    if (!_ssl) {
         _ssl = std::make_shared<SSLContext>();
     }
 }
@@ -512,42 +459,37 @@ void WiFiClientSecure::allowSelfSignedCerts()
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
 {
     ClientContext* _client = SSLContext::getIOContext(fd);
-    if (!_client || (_client->state() != ESTABLISHED && !_client->getSize()))
-    {
+    if (!_client || (_client->state() != ESTABLISHED && !_client->getSize())) {
         errno = EIO;
         return -1;
     }
     size_t cb = _client->read((char*) buffer, count);
-    if (cb != count)
-    {
+    if (cb != count) {
         errno = EAGAIN;
     }
-    if (cb == 0)
-    {
+    if (cb == 0) {
         optimistic_yield(100);
         return -1;
     }
     return cb;
 }
-extern "C" void ax_port_read() __attribute__((weak, alias("__ax_port_read")));
+extern "C" void ax_port_read() __attribute__ ((weak, alias("__ax_port_read")));
 
 extern "C" int __ax_port_write(int fd, uint8_t* buffer, size_t count)
 {
     ClientContext* _client = SSLContext::getIOContext(fd);
-    if (!_client || _client->state() != ESTABLISHED)
-    {
+    if (!_client || _client->state() != ESTABLISHED) {
         errno = EIO;
         return -1;
     }
 
     size_t cb = _client->write(buffer, count);
-    if (cb != count)
-    {
+    if (cb != count) {
         errno = EAGAIN;
     }
     return cb;
 }
-extern "C" void ax_port_write() __attribute__((weak, alias("__ax_port_write")));
+extern "C" void ax_port_write() __attribute__ ((weak, alias("__ax_port_write")));
 
 extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
 {
@@ -555,12 +497,12 @@ extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
     *buf = 0;
     return 0;
 }
-extern "C" void ax_get_file() __attribute__((weak, alias("__ax_get_file")));
+extern "C" void ax_get_file() __attribute__ ((weak, alias("__ax_get_file")));
 
 extern "C" void __ax_wdt_feed()
 {
     optimistic_yield(10000);
 }
-extern "C" void ax_wdt_feed() __attribute__((weak, alias("__ax_wdt_feed")));
+extern "C" void ax_wdt_feed() __attribute__ ((weak, alias("__ax_wdt_feed")));
 
 };
