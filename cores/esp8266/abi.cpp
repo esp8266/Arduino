@@ -1,20 +1,20 @@
 /*
- Copyright (c) 2014 Arduino.  All right reserved.
+    Copyright (c) 2014 Arduino.  All right reserved.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- See the GNU Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include <stdlib.h>
 #include <assert.h>
@@ -28,8 +28,8 @@ using __cxxabiv1::__guard;
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
 
-extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
-extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
+extern "C" void __cxa_pure_virtual(void) __attribute__((__noreturn__));
+extern "C" void __cxa_deleted_virtual(void) __attribute__((__noreturn__));
 
 void __cxa_pure_virtual(void)
 {
@@ -41,7 +41,8 @@ void __cxa_deleted_virtual(void)
     panic();
 }
 
-typedef struct {
+typedef struct
+{
     uint8_t guard;
     uint8_t ps;
 } guard_t;
@@ -49,7 +50,8 @@ typedef struct {
 extern "C" int __cxa_guard_acquire(__guard* pg)
 {
     uint8_t ps = xt_rsil(15);
-    if (reinterpret_cast<guard_t*>(pg)->guard) {
+    if (reinterpret_cast<guard_t*>(pg)->guard)
+    {
         xt_wsr_ps(ps);
         return 0;
     }

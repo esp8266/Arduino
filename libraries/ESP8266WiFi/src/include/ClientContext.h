@@ -1,23 +1,23 @@
 /*
- ClientContext.h - TCP connection handling on top of lwIP
+    ClientContext.h - TCP connection handling on top of lwIP
 
- Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 #ifndef CLIENTCONTEXT_H
 #define CLIENTCONTEXT_H
 
@@ -31,7 +31,7 @@ extern "C" void esp_schedule();
 
 #include "DataSource.h"
 
-bool getDefaultPrivateGlobalSyncValue ();
+bool getDefaultPrivateGlobalSyncValue();
 
 class ClientContext
 {
@@ -53,7 +53,8 @@ public:
 
     err_t abort()
     {
-        if(_pcb) {
+        if (_pcb)
+        {
             DEBUGV(":abort\r\n");
             tcp_arg(_pcb, NULL);
             tcp_sent(_pcb, NULL);
@@ -69,7 +70,8 @@ public:
     err_t close()
     {
         err_t err = ERR_OK;
-        if(_pcb) {
+        if (_pcb)
+        {
             DEBUGV(":close\r\n");
             tcp_arg(_pcb, NULL);
             tcp_sent(_pcb, NULL);
@@ -77,7 +79,8 @@ public:
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
             err = tcp_close(_pcb);
-            if(err != ERR_OK) {
+            if (err != ERR_OK)
+            {
                 DEBUGV(":tc err %d\r\n", (int) err);
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
@@ -111,10 +114,12 @@ public:
     void unref()
     {
         DEBUGV(":ur %d\r\n", _refcnt);
-        if(--_refcnt == 0) {
+        if (--_refcnt == 0)
+        {
             discard_received();
             close();
-            if(_discard_cb) {
+            if (_discard_cb)
+            {
                 _discard_cb(_discard_cb_arg, this);
             }
             DEBUGV(":del\r\n");
@@ -125,7 +130,8 @@ public:
     int connect(CONST ip_addr_t* addr, uint16_t port)
     {
         err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
-        if (err != ERR_OK) {
+        if (err != ERR_OK)
+        {
             return 0;
         }
         _connect_pending = 1;
@@ -133,11 +139,13 @@ public:
         // This delay will be interrupted by esp_schedule in the connect callback
         delay(_timeout_ms);
         _connect_pending = 0;
-        if (!_pcb) {
+        if (!_pcb)
+        {
             DEBUGV(":cabrt\r\n");
             return 0;
         }
-        if (state() != ESTABLISHED) {
+        if (state() != ESTABLISHED)
+        {
             DEBUGV(":ctmo\r\n");
             abort();
             return 0;
@@ -147,24 +155,29 @@ public:
 
     size_t availableForWrite() const
     {
-        return _pcb? tcp_sndbuf(_pcb): 0;
+        return _pcb ? tcp_sndbuf(_pcb) : 0;
     }
 
     void setNoDelay(bool nodelay)
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return;
         }
-        if(nodelay) {
+        if (nodelay)
+        {
             tcp_nagle_disable(_pcb);
-        } else {
+        }
+        else
+        {
             tcp_nagle_enable(_pcb);
         }
     }
 
     bool getNoDelay() const
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return false;
         }
         return tcp_nagle_disabled(_pcb);
@@ -182,7 +195,8 @@ public:
 
     const ip_addr_t* getRemoteAddress() const
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
 
@@ -191,7 +205,8 @@ public:
 
     uint16_t getRemotePort() const
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
 
@@ -200,7 +215,8 @@ public:
 
     const ip_addr_t* getLocalAddress() const
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
 
@@ -209,7 +225,8 @@ public:
 
     uint16_t getLocalPort() const
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
 
@@ -218,7 +235,8 @@ public:
 
     size_t getSize() const
     {
-        if(!_rx_buf) {
+        if (!_rx_buf)
+        {
             return 0;
         }
 
@@ -227,7 +245,8 @@ public:
 
     char read()
     {
-        if(!_rx_buf) {
+        if (!_rx_buf)
+        {
             return 0;
         }
 
@@ -238,7 +257,8 @@ public:
 
     size_t read(char* dst, size_t size)
     {
-        if(!_rx_buf) {
+        if (!_rx_buf)
+        {
             return 0;
         }
 
@@ -247,7 +267,8 @@ public:
 
         DEBUGV(":rd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
         size_t size_read = 0;
-        while(size) {
+        while (size)
+        {
             size_t buf_size = _rx_buf->len - _rx_buf_offset;
             size_t copy_size = (size < buf_size) ? size : buf_size;
             DEBUGV(":rdi %d, %d\r\n", buf_size, copy_size);
@@ -262,7 +283,8 @@ public:
 
     char peek() const
     {
-        if(!_rx_buf) {
+        if (!_rx_buf)
+        {
             return 0;
         }
 
@@ -271,7 +293,8 @@ public:
 
     size_t peekBytes(char *dst, size_t size) const
     {
-        if(!_rx_buf) {
+        if (!_rx_buf)
+        {
             return 0;
         }
 
@@ -288,10 +311,12 @@ public:
 
     void discard_received()
     {
-        if(!_rx_buf) {
+        if (!_rx_buf)
+        {
             return;
         }
-        if(_pcb) {
+        if (_pcb)
+        {
             tcp_recved(_pcb, (size_t) _rx_buf->tot_len);
         }
         pbuf_free(_rx_buf);
@@ -306,14 +331,18 @@ public:
         // option 2 / _write_some() not necessary since _datasource is always nullptr here
 
         if (!_pcb)
+        {
             return true;
+        }
 
         int prevsndbuf = -1;
 
         // wait for peer's acks to flush lwIP's output buffer
         uint32_t last_sent = millis();
-        while (1) {
-            if (millis() - last_sent > (uint32_t) max_wait_ms) {
+        while (1)
+        {
+            if (millis() - last_sent > (uint32_t) max_wait_ms)
+            {
 #ifdef DEBUGV
                 // wait until sent: timeout
                 DEBUGV(":wustmo\n");
@@ -326,7 +355,8 @@ public:
             tcp_output(_pcb);
 
             int sndbuf = tcp_sndbuf(_pcb);
-            if (sndbuf != prevsndbuf) {
+            if (sndbuf != prevsndbuf)
+            {
                 // send buffer has changed (or first iteration)
                 prevsndbuf = sndbuf;
                 // We just sent a bit, move timeout forward
@@ -335,7 +365,8 @@ public:
 
             delay(0); // from sys or os context
 
-            if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
+            if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF))
+            {
                 break;
             }
         }
@@ -346,7 +377,8 @@ public:
 
     uint8_t state() const
     {
-        if(!_pcb) {
+        if (!_pcb)
+        {
             return CLOSED;
         }
 
@@ -355,7 +387,8 @@ public:
 
     size_t write(const uint8_t* data, size_t size)
     {
-        if (!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
         return _write_from_source(new BufferDataSource(data, size));
@@ -363,7 +396,8 @@ public:
 
     size_t write(Stream& stream)
     {
-        if (!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
         return _write_from_source(new BufferedStreamDataSource<Stream>(stream, stream.available()));
@@ -371,51 +405,55 @@ public:
 
     size_t write_P(PGM_P buf, size_t size)
     {
-        if (!_pcb) {
+        if (!_pcb)
+        {
             return 0;
         }
         ProgmemStream stream(buf, size);
         return _write_from_source(new BufferedStreamDataSource<ProgmemStream>(stream, size));
     }
 
-    void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
+    void keepAlive(uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
     {
-        if (idle_sec && intv_sec && count) {
+        if (idle_sec && intv_sec && count)
+        {
             _pcb->so_options |= SOF_KEEPALIVE;
             _pcb->keep_idle = (uint32_t)1000 * idle_sec;
             _pcb->keep_intvl = (uint32_t)1000 * intv_sec;
             _pcb->keep_cnt = count;
         }
         else
+        {
             _pcb->so_options &= ~SOF_KEEPALIVE;
+        }
     }
 
-    bool isKeepAliveEnabled () const
+    bool isKeepAliveEnabled() const
     {
         return !!(_pcb->so_options & SOF_KEEPALIVE);
     }
 
-    uint16_t getKeepAliveIdle () const
+    uint16_t getKeepAliveIdle() const
     {
-        return isKeepAliveEnabled()? (_pcb->keep_idle + 500) / 1000: 0;
+        return isKeepAliveEnabled() ? (_pcb->keep_idle + 500) / 1000 : 0;
     }
 
-    uint16_t getKeepAliveInterval () const
+    uint16_t getKeepAliveInterval() const
     {
-        return isKeepAliveEnabled()? (_pcb->keep_intvl + 500) / 1000: 0;
+        return isKeepAliveEnabled() ? (_pcb->keep_intvl + 500) / 1000 : 0;
     }
 
-    uint8_t getKeepAliveCount () const
+    uint8_t getKeepAliveCount() const
     {
-        return isKeepAliveEnabled()? _pcb->keep_cnt: 0;
+        return isKeepAliveEnabled() ? _pcb->keep_cnt : 0;
     }
 
-    bool getSync () const
+    bool getSync() const
     {
         return _sync;
     }
 
-    void setSync (bool sync)
+    void setSync(bool sync)
     {
         _sync = sync;
     }
@@ -429,7 +467,8 @@ protected:
 
     void _notify_error()
     {
-        if (_connect_pending || _send_waiting) {
+        if (_connect_pending || _send_waiting)
+        {
             esp_schedule();
         }
     }
@@ -441,13 +480,17 @@ protected:
         _datasource = ds;
         _written = 0;
         _op_start_time = millis();
-        do {
-            if (_write_some()) {
+        do
+        {
+            if (_write_some())
+            {
                 _op_start_time = millis();
             }
 
-            if (!_datasource->available() || _is_timeout() || state() == CLOSED) {
-                if (_is_timeout()) {
+            if (!_datasource->available() || _is_timeout() || state() == CLOSED)
+            {
+                if (_is_timeout())
+                {
                     DEBUGV(":wtmo\r\n");
                 }
                 delete _datasource;
@@ -457,18 +500,21 @@ protected:
 
             ++_send_waiting;
             esp_yield();
-        } while(true);
+        } while (true);
         _send_waiting = 0;
 
         if (_sync)
+        {
             wait_until_sent();
+        }
 
         return _written;
     }
 
     bool _write_some()
     {
-        if (!_datasource || !_pcb) {
+        if (!_datasource || !_pcb)
+        {
             return false;
         }
 
@@ -476,12 +522,17 @@ protected:
 
         bool has_written = false;
 
-        while (_datasource) {
+        while (_datasource)
+        {
             if (state() == CLOSED)
+            {
                 return false;
+            }
             size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->available());
             if (!next_chunk_size)
+            {
                 break;
+            }
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
 
             uint8_t flags = 0;
@@ -491,23 +542,30 @@ protected:
                 //   PUSH does not break Nagle
                 //   #5173: windows needs this flag
                 //   more info: https://lists.gnu.org/archive/html/lwip-users/2009-11/msg00018.html
-                flags |= TCP_WRITE_FLAG_MORE; // do not tcp-PuSH (yet)
+            {
+                flags |= TCP_WRITE_FLAG_MORE;    // do not tcp-PuSH (yet)
+            }
             if (!_sync)
                 // user data must be copied when data are sent but not yet acknowledged
                 // (with sync, we wait for acknowledgment before returning to user)
+            {
                 flags |= TCP_WRITE_FLAG_COPY;
+            }
 
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
 
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
 
-            if (err == ERR_OK) {
+            if (err == ERR_OK)
+            {
                 _datasource->release_buffer(buf, next_chunk_size);
                 _written += next_chunk_size;
                 has_written = true;
-            } else {
-		// ERR_MEM(-1) is a valid error meaning
-		// "come back later". It leaves state() opened
+            }
+            else
+            {
+                // ERR_MEM(-1) is a valid error meaning
+                // "come back later". It leaves state() opened
                 break;
             }
         }
@@ -525,7 +583,8 @@ protected:
 
     void _write_some_from_cb()
     {
-        if (_send_waiting == 1) {
+        if (_send_waiting == 1)
+        {
             _send_waiting--;
             esp_schedule();
         }
@@ -542,17 +601,24 @@ protected:
 
     void _consume(size_t size)
     {
-        if(_pcb)
+        if (_pcb)
+        {
             tcp_recved(_pcb, size);
+        }
         ptrdiff_t left = _rx_buf->len - _rx_buf_offset - size;
-        if(left > 0) {
+        if (left > 0)
+        {
             _rx_buf_offset += size;
-        } else if(!_rx_buf->next) {
+        }
+        else if (!_rx_buf->next)
+        {
             DEBUGV(":c0 %d, %d\r\n", size, _rx_buf->tot_len);
             pbuf_free(_rx_buf);
             _rx_buf = 0;
             _rx_buf_offset = 0;
-        } else {
+        }
+        else
+        {
             DEBUGV(":c %d, %d, %d\r\n", size, _rx_buf->len, _rx_buf->tot_len);
             auto head = _rx_buf;
             _rx_buf = _rx_buf->next;
@@ -566,17 +632,21 @@ protected:
     {
         (void) pcb;
         (void) err;
-        if(pb == 0) { // connection closed
+        if (pb == 0)  // connection closed
+        {
             DEBUGV(":rcl\r\n");
             _notify_error();
             abort();
             return ERR_ABRT;
         }
 
-        if(_rx_buf) {
+        if (_rx_buf)
+        {
             DEBUGV(":rch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
             pbuf_cat(_rx_buf, pb);
-        } else {
+        }
+        else
+        {
             DEBUGV(":rn %d\r\n", pb->tot_len);
             _rx_buf = pb;
             _rx_buf_offset = 0;

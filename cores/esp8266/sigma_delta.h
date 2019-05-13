@@ -1,45 +1,45 @@
-/* 
- sigma_delta.h - esp8266 sigma-delta source
+/*
+    sigma_delta.h - esp8266 sigma-delta source
 
- Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
- 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
- 
- /*******************************************************************************
- * Info Sigma delta module
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-This module controls the esp8266 internal sigma delta source
-Each pin can be connected to the sigma delta source
-The target duty and frequency can be modified via the register GPIO_SIGMA_DELTA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
-THE TARGET FREQUENCY IS DEFINED AS:
+/*******************************************************************************
+    Info Sigma delta module
 
-FREQ = 80,000,000/prescaler * target /256  HZ,     0<target<128
-FREQ = 80,000,000/prescaler * (256-target) /256  HZ,     128<target<256
-target: duty cycle,range 0-255
-prescaler: is a clock divider, range 0-255
-so the target and prescale will both affect the freq.
-CPU_FREQ has no influence on the sigma delta frequency.
+    This module controls the esp8266 internal sigma delta source
+    Each pin can be connected to the sigma delta source
+    The target duty and frequency can be modified via the register GPIO_SIGMA_DELTA
 
-Usage :
-1. sigmaDeltaSetup(0,f) : activate the sigma delta source with frequency f and default duty cycle (0)
-2. sigmaDeltaAttachPin(pin), any pin 0..15, TBC if gpio16 supports sigma-delta source
-     This will set the pin to NORMAL output mode (pinMode(pin,OUTPUT))
-3. sigmaDeltaWrite(0,dc) : set the output signal duty cycle, duty cycle = dc/256
+    THE TARGET FREQUENCY IS DEFINED AS:
+
+    FREQ = 80,000,000/prescaler * target /256  HZ,     0<target<128
+    FREQ = 80,000,000/prescaler * (256-target) /256  HZ,     128<target<256
+    target: duty cycle,range 0-255
+    prescaler: is a clock divider, range 0-255
+    so the target and prescale will both affect the freq.
+    CPU_FREQ has no influence on the sigma delta frequency.
+
+    Usage :
+    1. sigmaDeltaSetup(0,f) : activate the sigma delta source with frequency f and default duty cycle (0)
+    2. sigmaDeltaAttachPin(pin), any pin 0..15, TBC if gpio16 supports sigma-delta source
+    This will set the pin to NORMAL output mode (pinMode(pin,OUTPUT))
+    3. sigmaDeltaWrite(0,dc) : set the output signal duty cycle, duty cycle = dc/256
 
 *******************************************************************************/
 

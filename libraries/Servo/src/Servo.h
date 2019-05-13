@@ -1,21 +1,21 @@
 /*
-  Servo.h - Interrupt driven Servo library for Esp8266 using timers
-  Original Copyright (c) 2015 Michael C. Miller. All right reserved.
+    Servo.h - Interrupt driven Servo library for Esp8266 using timers
+    Original Copyright (c) 2015 Michael C. Miller. All right reserved.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 
 //   A servo is activated by creating an instance of the Servo class passing
@@ -37,7 +37,7 @@
 //   readMicroseconds()   - Gets the last written servo pulse width in microseconds. (was read_us() in first release)
 //   attached()  - Returns true if there is a servo attached.
 //   detach()    - Stops an attached servos from pulsing its i/o pin.
-  
+
 
 #ifndef Servo_h
 #define Servo_h
@@ -63,18 +63,18 @@ public:
     Servo();
     ~Servo();
     uint8_t attach(int pin);           // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
-    uint8_t attach(int pin, uint16_t min, uint16_t max); // as above but also sets min and max values for writes. 
+    uint8_t attach(int pin, uint16_t min, uint16_t max); // as above but also sets min and max values for writes.
     void detach();
-    void write(int value);             // if value is < 200 its treated as an angle, otherwise as pulse width in microseconds 
-    void writeMicroseconds(int value); // Write pulse width in microseconds 
+    void write(int value);             // if value is < 200 its treated as an angle, otherwise as pulse width in microseconds
+    void writeMicroseconds(int value); // Write pulse width in microseconds
     int read();                        // returns current pulse width as an angle between 0 and 180 degrees
     int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
-    bool attached();                   // return true if this servo is attached, otherwise false 
+    bool attached();                   // return true if this servo is attached, otherwise false
 private:
     bool     _attached;
     uint8_t  _pin;
-    uint16_t _minUs;                   
-    uint16_t _maxUs;                   
+    uint16_t _minUs;
+    uint16_t _maxUs;
     uint16_t _valueUs;
 };
 

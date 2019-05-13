@@ -1,20 +1,20 @@
 /*
-  WiFiServerBearSSL.h - Library for Arduino ESP8266
-  Copyright (c) 2018 Earle F. Philhower, III
+    WiFiServerBearSSL.h - Library for Arduino ESP8266
+    Copyright (c) 2018 Earle F. Philhower, III
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #ifndef wifiserverbearssl_h
@@ -25,21 +25,24 @@
 #include "BearSSLHelpers.h"
 #include <bearssl/bearssl.h>
 
-namespace BearSSL {
+namespace BearSSL
+{
 
 class WiFiClientSecure;
 
-class WiFiServerSecure : public WiFiServer {
-  public:
+class WiFiServerSecure : public WiFiServer
+{
+public:
     WiFiServerSecure(IPAddress addr, uint16_t port);
     WiFiServerSecure(uint16_t port);
     WiFiServerSecure(const WiFiServerSecure &rhs);
     virtual ~WiFiServerSecure();
 
     // Override the default buffer sizes, if you know what you're doing...
-    void setBufferSizes(int recv, int xmit) {
-      _iobuf_in_size = recv;
-      _iobuf_out_size = xmit;
+    void setBufferSizes(int recv, int xmit)
+    {
+        _iobuf_in_size = recv;
+        _iobuf_out_size = xmit;
     }
 
     // Set the server's RSA key and x509 certificate (required, pick one).
@@ -51,8 +54,9 @@ class WiFiServerSecure : public WiFiServer {
 
     // Require client certificates validated against the passed in x509 trust anchor
     // Caller needs to preserve the cert throughout the life of the server.
-    void setClientTrustAnchor(const X509List *client_CA_ta) {
-      _client_CA_ta = client_CA_ta;
+    void setClientTrustAnchor(const X509List *client_CA_ta)
+    {
+        _client_CA_ta = client_CA_ta;
     }
 
     // If awaiting connection available and authenticated (i.e. client cert), return it.
@@ -62,7 +66,7 @@ class WiFiServerSecure : public WiFiServer {
     void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
     void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
 
-  private:
+private:
     const X509List *_chain = nullptr;
     unsigned _cert_issuer_key_type = 0;
     const PrivateKey *_sk = nullptr;

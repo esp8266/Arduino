@@ -15,11 +15,11 @@ extern bool timeshift64_is_set;
 
 void esp_yield();
 void esp_schedule();
-void tune_timeshift64 (uint64_t now_us);
-void settimeofday_cb (void (*cb)(void));
-void disable_extra4k_at_link_time (void) __attribute__((noinline));
+void tune_timeshift64(uint64_t now_us);
+void settimeofday_cb(void (*cb)(void));
+void disable_extra4k_at_link_time(void) __attribute__((noinline));
 
-uint32_t sqrt32 (uint32_t n);
+uint32_t sqrt32(uint32_t n);
 
 #ifdef __cplusplus
 }

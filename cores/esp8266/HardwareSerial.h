@@ -1,28 +1,28 @@
 /*
- HardwareSerial.h - Hardware serial library for Wiring
- Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+    HardwareSerial.h - Hardware serial library for Wiring
+    Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- Modified 28 September 2010 by Mark Sproul
- Modified 14 August 2012 by Alarus
- Modified 3 December 2013 by Matthijs Kooijman
- Modified 18 December 2014 by Ivan Grokhotkov (esp8266 platform support)
- Modified 31 March 2015 by Markus Sattler (rewrite the code for UART0 + UART1 support in ESP8266)
- Modified 25 April 2015 by Thomas Flayols (add configuration different from 8N1 in ESP8266)
- */
+    Modified 28 September 2010 by Mark Sproul
+    Modified 14 August 2012 by Alarus
+    Modified 3 December 2013 by Matthijs Kooijman
+    Modified 18 December 2014 by Ivan Grokhotkov (esp8266 platform support)
+    Modified 31 March 2015 by Markus Sattler (rewrite the code for UART0 + UART1 support in ESP8266)
+    Modified 25 April 2015 by Thomas Flayols (add configuration different from 8N1 in ESP8266)
+*/
 
 #ifndef HardwareSerial_h
 #define HardwareSerial_h
@@ -32,7 +32,8 @@
 #include "Stream.h"
 #include "uart.h"
 
-enum SerialConfig {
+enum SerialConfig
+{
     SERIAL_5N1 = UART_5N1,
     SERIAL_6N1 = UART_6N1,
     SERIAL_7N1 = UART_7N1,
@@ -59,7 +60,8 @@ enum SerialConfig {
     SERIAL_8O2 = UART_8O2,
 };
 
-enum SerialMode {
+enum SerialMode
+{
     SERIAL_FULL = UART_FULL,
     SERIAL_RX_ONLY = UART_RX_ONLY,
     SERIAL_TX_ONLY = UART_TX_ONLY
@@ -104,18 +106,18 @@ public:
     }
 
     /*
-     * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
-     * Note: UART 1 can't be used if GPIO2 is used with UART 0!
-     */
+        Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
+        Note: UART 1 can't be used if GPIO2 is used with UART 0!
+    */
     void set_tx(uint8_t tx_pin)
     {
         uart_set_tx(_uart, tx_pin);
     }
 
     /*
-     * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
-     * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
-     */
+        UART 0 possible options are (1, 3), (2, 3) or (15, 13)
+        UART 1 allows only TX on 2 if UART 0 is not (2, 3)
+    */
     void pins(uint8_t tx, uint8_t rx)
     {
         uart_set_pins(_uart, tx, rx);
