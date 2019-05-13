@@ -13,23 +13,20 @@ extern "C" {
 
 // Structures for communication
 
-struct InterruptInfo
-{
-    uint8_t pin = 0;
-    uint8_t value = 0;
-    uint32_t micro = 0;
+struct InterruptInfo {
+	uint8_t pin = 0;
+	uint8_t value = 0;
+	uint32_t micro = 0;
 };
 
-struct FunctionInfo
-{
+struct FunctionInfo {
     std::function<void(void)> reqFunction = nullptr;
-    std::function<void(InterruptInfo)> reqScheduledFunction = nullptr;
+	std::function<void(InterruptInfo)> reqScheduledFunction = nullptr;
 };
 
-struct ArgStructure
-{
-    InterruptInfo* interruptInfo = nullptr;
-    FunctionInfo* functionInfo = nullptr;
+struct ArgStructure {
+	InterruptInfo* interruptInfo = nullptr;
+	FunctionInfo* functionInfo = nullptr;
 };
 
 static ScheduledFunctions* scheduledInterrupts;

@@ -1,34 +1,34 @@
 /*
-    xtensa/corebits.h - Xtensa Special Register field positions, masks, values.
-
-    (In previous releases, these were defined in specreg.h, a generated file.
-    This file is not generated, ie. it is processor configuration independent.)
-*/
+ * xtensa/corebits.h - Xtensa Special Register field positions, masks, values.
+ *
+ * (In previous releases, these were defined in specreg.h, a generated file.
+ *  This file is not generated, ie. it is processor configuration independent.)
+ */
 
 /* $Id: //depot/rel/Boreal/Xtensa/OS/include/xtensa/corebits.h#2 $ */
 
 /*
-    Copyright (c) 2005-2007 Tensilica Inc.
-
-    Permission is hereby granted, free of charge, to any person obtaining
-    a copy of this software and associated documentation files (the
-    "Software"), to deal in the Software without restriction, including
-    without limitation the rights to use, copy, modify, merge, publish,
-    distribute, sublicense, and/or sell copies of the Software, and to
-    permit persons to whom the Software is furnished to do so, subject to
-    the following conditions:
-
-    The above copyright notice and this permission notice shall be included
-    in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ * Copyright (c) 2005-2007 Tensilica Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 #ifndef XTENSA_COREBITS_H
 #define XTENSA_COREBITS_H
@@ -38,10 +38,10 @@
 #define EXCCAUSE_EXCCAUSE_MASK	0x3F
 /*  EXCCAUSE register values:  */
 /*
-    General Exception Causes
-    (values of EXCCAUSE special register set by general exceptions,
-     which vector to the user, kernel, or double-exception vectors).
-*/
+ *  General Exception Causes
+ *  (values of EXCCAUSE special register set by general exceptions,
+ *   which vector to the user, kernel, or double-exception vectors).
+ */
 #define EXCCAUSE_ILLEGAL		0	/* Illegal Instruction */
 #define EXCCAUSE_SYSCALL		1	/* System Call (SYSCALL instruction) */
 #define EXCCAUSE_INSTR_ERROR		2	/* Instruction Fetch Error */
@@ -143,7 +143,7 @@
 #define MESR_DME_SHIFT		1
 #define MESR_RCE		0x00000010	/* recorded memory error */
 #define MESR_RCE_SHIFT		4
-#define MESR_LCE
+#define MESR_LCE		
 #define MESR_LCE_SHIFT		?
 #define MESR_LCE_L
 #define MESR_ERRENAB		0x00000100
