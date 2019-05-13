@@ -17,40 +17,39 @@
 
 enum class DNSReplyCode
 {
-    NoError = 0,
-    FormError = 1,
-    ServerFailure = 2,
-    NonExistentDomain = 3,
-    NotImplemented = 4,
-    Refused = 5,
-    YXDomain = 6,
-    YXRRSet = 7,
-    NXRRSet = 8
+  NoError = 0,
+  FormError = 1,
+  ServerFailure = 2,
+  NonExistentDomain = 3,
+  NotImplemented = 4,
+  Refused = 5,
+  YXDomain = 6,
+  YXRRSet = 7,
+  NXRRSet = 8
 };
 
 struct DNSHeader
 {
-    uint16_t ID;               // identification number
-    unsigned char RD : 1;      // recursion desired
-    unsigned char TC : 1;      // truncated message
-    unsigned char AA : 1;      // authoritive answer
-    unsigned char OPCode : 4;  // message_type
-    unsigned char QR : 1;      // query/response flag
-    unsigned char RCode : 4;   // response code
-    unsigned char Z : 3;       // its z! reserved
-    unsigned char RA : 1;      // recursion available
-    uint16_t QDCount;          // number of question entries
-    uint16_t ANCount;          // number of answer entries
-    uint16_t NSCount;          // number of authority entries
-    uint16_t ARCount;          // number of resource entries
+  uint16_t ID;               // identification number
+  unsigned char RD : 1;      // recursion desired
+  unsigned char TC : 1;      // truncated message
+  unsigned char AA : 1;      // authoritive answer
+  unsigned char OPCode : 4;  // message_type
+  unsigned char QR : 1;      // query/response flag
+  unsigned char RCode : 4;   // response code
+  unsigned char Z : 3;       // its z! reserved
+  unsigned char RA : 1;      // recursion available
+  uint16_t QDCount;          // number of question entries
+  uint16_t ANCount;          // number of answer entries
+  uint16_t NSCount;          // number of authority entries
+  uint16_t ARCount;          // number of resource entries
 };
 
 class DNSServer
 {
-public:
+  public:
     DNSServer();
-    ~DNSServer()
-    {
+    ~DNSServer() {
         stop();
     };
     void processNextRequest();
@@ -59,12 +58,12 @@ public:
 
     // Returns true if successful, false if there are no sockets available
     bool start(const uint16_t &port,
-               const String &domainName,
-               const IPAddress &resolvedIP);
+              const String &domainName,
+              const IPAddress &resolvedIP);
     // stops the DNS server
     void stop();
 
-private:
+  private:
     WiFiUDP _udp;
     uint16_t _port;
     String _domainName;
@@ -74,14 +73,14 @@ private:
 
     void downcaseAndRemoveWwwPrefix(String &domainName);
     void replyWithIP(DNSHeader *dnsHeader,
-                     unsigned char * query,
-                     size_t queryLength);
+		     unsigned char * query,
+		     size_t queryLength);
     void replyWithError(DNSHeader *dnsHeader,
-                        DNSReplyCode rcode,
-                        unsigned char *query,
-                        size_t queryLength);
+			DNSReplyCode rcode,
+			unsigned char *query,
+			size_t queryLength);
     void replyWithError(DNSHeader *dnsHeader,
-                        DNSReplyCode rcode);
+			DNSReplyCode rcode);
     void respondToRequest(uint8_t *buffer, size_t length);
     void writeNBOShort(uint16_t value);
 };

@@ -1,35 +1,35 @@
-/*  Copyright (c) 2002, Marek Michalkiewicz
-    Copyright (c) 2005, 2007 Joerg Wunsch
-    All rights reserved.
+/* Copyright (c) 2002, Marek Michalkiewicz
+   Copyright (c) 2005, 2007 Joerg Wunsch
+   All rights reserved.
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
 
-     Redistributions of source code must retain the above copyright
+   * Redistributions of source code must retain the above copyright
      notice, this list of conditions and the following disclaimer.
 
-     Redistributions in binary form must reproduce the above copyright
+   * Redistributions in binary form must reproduce the above copyright
      notice, this list of conditions and the following disclaimer in
      the documentation and/or other materials provided with the
      distribution.
 
-     Neither the name of the copyright holders nor the names of
+   * Neither the name of the copyright holders nor the names of
      contributors may be used to endorse or promote products derived
      from this software without specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-
-    Modified January 2017 by Bjorn Hammarberg (bjoham@esp8266.com) - i2c slave support
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE. 
+  
+  Modified January 2017 by Bjorn Hammarberg (bjoham@esp8266.com) - i2c slave support
 */
 
 /* $Id$ */
@@ -49,12 +49,12 @@
 */
 /** \name TWSR values
 
-    Mnemonics:
-    <br>TW_MT_xxx - master transmitter
-    <br>TW_MR_xxx - master receiver
-    <br>TW_ST_xxx - slave transmitter
-    <br>TW_SR_xxx - slave receiver
-*/
+  Mnemonics:
+  <br>TW_MT_xxx - master transmitter
+  <br>TW_MR_xxx - master receiver
+  <br>TW_ST_xxx - slave transmitter
+  <br>TW_SR_xxx - slave receiver
+  */
 
 /*@{*/
 /* Master */
@@ -206,27 +206,27 @@
 #if 0
 
 /**
-    \ingroup util_twi
-    \def TW_STATUS_MASK
-    The lower 3 bits of TWSR are reserved on the ATmega163.
-    The 2 LSB carry the prescaler bits on the newer ATmegas.
-*/
+ * \ingroup util_twi
+ * \def TW_STATUS_MASK
+ * The lower 3 bits of TWSR are reserved on the ATmega163.
+ * The 2 LSB carry the prescaler bits on the newer ATmegas.
+ */
 #define TW_STATUS_MASK		(_BV(TWS7)|_BV(TWS6)|_BV(TWS5)|_BV(TWS4)|\
 				_BV(TWS3))
 /**
-    \ingroup util_twi
-    \def TW_STATUS
-
-    TWSR, masked by TW_STATUS_MASK
-*/
+ * \ingroup util_twi
+ * \def TW_STATUS
+ *
+ * TWSR, masked by TW_STATUS_MASK
+ */
 #define TW_STATUS		(TWSR & TW_STATUS_MASK)
 /*@}*/
 #endif
 
 
 /**
-    \name R/~W bit in SLA+R/W address field.
-*/
+ * \name R/~W bit in SLA+R/W address field.
+ */
 
 /*@{*/
 /** \ingroup util_twi

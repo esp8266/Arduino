@@ -1,5 +1,5 @@
-/*  Klient sluzby NBNS
-*/
+/* Klient sluzby NBNS
+ */
 
 #include "ESP8266NetBIOS.h"
 
@@ -25,8 +25,7 @@ extern "C" {
 #endif
 
 // Definice struktury NBNS dotazu (alespon veci, ktere jsem vypozoroval):
-struct NBNSQUESTION
-{
+struct NBNSQUESTION {
     uint16_t NBNSQ_ID; // ID dotazu
     uint8_t NBNSQ_FLAGS1;
     uint8_t NBNSQ_FLAGS2;
@@ -35,14 +34,13 @@ struct NBNSQUESTION
     uint16_t NBNSQ_AUTHORITYCOUNT;
     uint16_t NBNSQ_ADDITIONALRECORDCOUNT;
     uint8_t NBNSQ_NAMESIZE; // delka nasledujiciho retezce
-    char NBNSQ_NAME[32 + 1]; // POZOR!!! mozna tato polozka muze byt ruzne dlouha
+    char NBNSQ_NAME[32+1]; // POZOR!!! mozna tato polozka muze byt ruzne dlouha
     uint16_t NBNSQ_TYPE;
     uint16_t NBNSQ_CLASS;
 } __attribute__((packed));
 
 // Definice struktury NBNS odpovedi (stejne jako u dotazu)
-struct NBNSANSWER
-{
+struct NBNSANSWER {
     uint16_t NBNSA_ID; // ID dotazu
     uint8_t NBNSA_FLAGS1;
     uint8_t NBNSA_FLAGS2;
@@ -61,8 +59,7 @@ struct NBNSANSWER
 } __attribute__((packed));
 
 // Definice struktury NBNS odpovedi na dotaz na jmeno
-struct NBNSANSWERN
-{
+struct NBNSANSWERN {
     uint16_t NBNSAN_ID; // ID dotazu
     uint8_t NBNSAN_FLAGS1;
     uint8_t NBNSAN_FLAGS2;
@@ -83,21 +80,19 @@ struct NBNSANSWERN
 } __attribute__((packed));
 
 /** Metoda pro ziskani jmena z kodovani NETBIOS.
- 	\param nbname Ukazatel na jmeno v NETBIOS kodovani.
- 	\param name Ukazatel na misto, kam prevadime jmeno.
- 	\param maxlen Maximalni pocet znaku v nbname.
-*/
+ *	\param nbname Ukazatel na jmeno v NETBIOS kodovani.
+ *	\param name Ukazatel na misto, kam prevadime jmeno.
+ *	\param maxlen Maximalni pocet znaku v nbname.
+ */
 void ESP8266NetBIOS::_getnbname(char *nbname, char *name, uint8_t maxlen)
 {
     uint8_t b;
     uint8_t c = 0;
 
-    while ((*nbname != 0x0) && (c < maxlen))
-    {
+    while ((*nbname != 0x0) && (c < maxlen)) {
         b = (*nbname++ - 'A') << 4; // opravime nibble a prevedeme ho do vyssich bitu
         c++; // pocitame pocet odebranych bytu
-        if (*nbname != 0x0)
-        {
+        if (*nbname != 0x0) {
             b |= *nbname++ - 'A'; // pridame nizsi nibble
             c++; // opet spocitame pocet odebranych znaku
         }
@@ -107,24 +102,20 @@ void ESP8266NetBIOS::_getnbname(char *nbname, char *name, uint8_t maxlen)
 }
 
 /** Prevod zadaneho textu do NETBIOS kodovani
- 	\param name Ukazatel na prevadene jmeno.
- 	\param nbname Ukazatel na misto, kam vytvarime jmeno.
- 	\param outlen Pocet vystupnich znaku (mimo ukoncovaci 0) musi byt delitelne 2
-*/
+ *	\param name Ukazatel na prevadene jmeno.
+ *	\param nbname Ukazatel na misto, kam vytvarime jmeno.
+ *	\param outlen Pocet vystupnich znaku (mimo ukoncovaci 0) musi byt delitelne 2
+ */
 void ESP8266NetBIOS::_makenbname(char *name, char *nbname, uint8_t outlen)
 {
     uint8_t b;
     uint8_t c = 0;
 
-    while (c < (outlen - 2))
-    {
+    while (c < (outlen - 2)) {
         b = *name; // prevadeny znak
-        if (b)
-        {
+        if (b) {
             name++;    // zatim se posunujeme
-        }
-        else
-        {
+        } else {
             b = 0x20;    // konec retezce je nahrazeny mezerou
         }
         *nbname++ = (b >> 4) + 'A'; // jeden nibble ze znaku
@@ -136,7 +127,7 @@ void ESP8266NetBIOS::_makenbname(char *name, char *nbname, uint8_t outlen)
     *nbname = 0; // ulozime ukoncovaci 0 retezce
 }
 
-ESP8266NetBIOS::ESP8266NetBIOS(): _pcb(NULL)
+ESP8266NetBIOS::ESP8266NetBIOS():_pcb(NULL)
 {
 
 }
@@ -149,28 +140,24 @@ ESP8266NetBIOS::~ESP8266NetBIOS()
 bool ESP8266NetBIOS::begin(const char *name)
 {
     size_t n = strlen(name);
-    if (n > sizeof(_name))
-    {
+    if (n > sizeof(_name)) {
         // prilis dlouhe jmeno
         return false;
     }
 
     // presuneme jmeno zarizeni se soucasnou upravou na UPPER case
-    for (size_t  i = 0; i < n; ++i)
-    {
+    for (size_t  i = 0; i < n; ++i) {
         _name[i] = toupper(name[i]);
     }
     _name[n] = '\0';
 
-    if (_pcb != NULL)
-    {
+    if(_pcb != NULL) {
         return true;
     }
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
     err_t err = udp_bind(_pcb, INADDR_ANY, NBNS_PORT);
-    if (err != ERR_OK)
-    {
+    if(err != ERR_OK) {
         end();
         return false;
     }
@@ -179,8 +166,7 @@ bool ESP8266NetBIOS::begin(const char *name)
 
 void ESP8266NetBIOS::end()
 {
-    if (_pcb != NULL)
-    {
+    if(_pcb != NULL) {
         udp_remove(_pcb);
         _pcb = NULL;
     }
@@ -191,8 +177,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
     (void)upcb;
     (void)addr;
     (void)port;
-    while (pb != NULL)
-    {
+    while(pb != NULL) {
         uint8_t * data = (uint8_t*)((pb)->payload);
         size_t len = pb->len;
 #if LWIP_VERSION_MAJOR == 1
@@ -203,22 +188,18 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
         const ip_addr_t* saddr = &ip_data.current_iphdr_src;
 #endif
 
-        if (len >= sizeof(struct NBNSQUESTION))
-        {
+        if (len >= sizeof(struct NBNSQUESTION)) {
             struct NBNSQUESTION * question = (struct NBNSQUESTION *)data;
-            if (0 == (question->NBNSQ_FLAGS1 & 0x80))
-            {
+            if (0 == (question->NBNSQ_FLAGS1 & 0x80)) {
                 char name[ NBNS_MAX_HOSTNAME_LEN + 1 ]; // dekodovane dotazovane jmeno
                 char *str; // pomocna promenna, pouze pro praci s retezcem
 
                 _getnbname(&question->NBNSQ_NAME[0], (char *)&name, question->NBNSQ_NAMESIZE); // prevedeme dotazovane jmeno
-                if ((str = strchr(name, ' ')) != NULL)   // jmeno hledaneho zarizeni v tomto pripade ukoncuje i mezera
-                {
+                if ((str = strchr(name, ' ')) != NULL) { // jmeno hledaneho zarizeni v tomto pripade ukoncuje i mezera
                     *str = '\0';    // ukoncime retezec na vyskytu prvni mezery
                 }
 
-                if (0 == strcmp(name, _name))
-                {
+                if (0 == strcmp(name, _name)) {
                     // dotaz primo na nas
                     struct NBNSANSWER nbnsa; // buffer, do ktereho je sestavena odpoved na dotaz
 
@@ -239,16 +220,13 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
                     nbnsa.NBNSA_NODEADDRESS = WiFi.localIP(); // ulozime nasi IP adresu
 
                     pbuf* pbt = pbuf_alloc(PBUF_TRANSPORT, sizeof(nbnsa), PBUF_RAM);
-                    if (pbt != NULL)
-                    {
+                    if(pbt != NULL) {
                         uint8_t* dst = reinterpret_cast<uint8_t*>(pbt->payload);
                         memcpy(dst, (uint8_t *)&nbnsa, sizeof(nbnsa));
                         udp_sendto(_pcb, pbt, saddr, NBNS_PORT);
                         pbuf_free(pbt);
                     }
-                }
-                else if (0 == strcmp(name, "*"))
-                {
+                } else if (0 == strcmp(name, "*")) {
                     // obecny dotaz - mireny nejspis na nasi IP adresu
                     struct NBNSANSWERN nbnsan; // buffer, do ktereho je sestavena odpoved na dotaz
 
@@ -272,8 +250,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
                     nbnsan.NBNSAN_NFLAGS = LWIP_PLATFORM_HTONS(0x400); // b-node, unique, active
 
                     pbuf* pbt = pbuf_alloc(PBUF_TRANSPORT, sizeof(nbnsan), PBUF_RAM);
-                    if (pbt != NULL)
-                    {
+                    if(pbt != NULL) {
                         uint8_t* dst = reinterpret_cast<uint8_t*>(pbt->payload);
                         memcpy(dst, (uint8_t *)&nbnsan, sizeof(nbnsan));
                         udp_sendto(_pcb, pbt, saddr, NBNS_PORT);

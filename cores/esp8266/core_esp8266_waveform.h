@@ -1,40 +1,40 @@
 /*
-    esp8266_waveform - General purpose waveform generation and control,
+  esp8266_waveform - General purpose waveform generation and control,
                      supporting outputs on all pins in parallel.
 
-    Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
+  Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
-    The core idea is to have a programmable waveform generator with a unique
-    high and low period (defined in microseconds).  TIMER1 is set to 1-shot
-    mode and is always loaded with the time until the next edge of any live
-    waveforms.
+  The core idea is to have a programmable waveform generator with a unique
+  high and low period (defined in microseconds).  TIMER1 is set to 1-shot
+  mode and is always loaded with the time until the next edge of any live
+  waveforms.
 
-    Up to one waveform generator per pin supported.
+  Up to one waveform generator per pin supported.
 
-    Each waveform generator is synchronized to the ESP cycle counter, not the
-    timer.  This allows for removing interrupt jitter and delay as the counter
-    always increments once per 80MHz clock.  Changes to a waveform are
-    contiguous and only take effect on the next waveform transition,
-    allowing for smooth transitions.
+  Each waveform generator is synchronized to the ESP cycle counter, not the
+  timer.  This allows for removing interrupt jitter and delay as the counter
+  always increments once per 80MHz clock.  Changes to a waveform are
+  contiguous and only take effect on the next waveform transition,
+  allowing for smooth transitions.
 
-    This replaces older tone(), analogWrite(), and the Servo classes.
+  This replaces older tone(), analogWrite(), and the Servo classes.
 
-    Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
-    cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
+  Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
+  cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 #include <Arduino.h>
