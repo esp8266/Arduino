@@ -1,13 +1,14 @@
-/* DataSource.h - a read-only object similar to Stream, but with less methods
- * Copyright (c) 2016 Ivan Grokhotkov. All rights reserved.
- * This file is distributed under MIT license.
- */
+/*  DataSource.h - a read-only object similar to Stream, but with less methods
+    Copyright (c) 2016 Ivan Grokhotkov. All rights reserved.
+    This file is distributed under MIT license.
+*/
 #ifndef DATASOURCE_H
 #define DATASOURCE_H
 
 #include <assert.h>
 
-class DataSource {
+class DataSource
+{
 public:
     virtual ~DataSource() {}
     virtual size_t available() = 0;
@@ -16,7 +17,8 @@ public:
 
 };
 
-class BufferDataSource : public DataSource {
+class BufferDataSource : public DataSource
+{
 public:
     BufferDataSource(const uint8_t* data, size_t size) :
         _data(data),
@@ -50,7 +52,8 @@ protected:
 };
 
 template<typename TStream>
-class BufferedStreamDataSource : public DataSource {
+class BufferedStreamDataSource : public DataSource
+{
 public:
     BufferedStreamDataSource(TStream& stream, size_t size) :
         _stream(stream),
@@ -74,10 +77,12 @@ public:
         const size_t min_buffer_size = size > stream_read ? size : stream_read;
 
         //Buffer too small?
-        if (_bufferSize < min_buffer_size) {
+        if (_bufferSize < min_buffer_size)
+        {
             uint8_t *new_buffer = new uint8_t[min_buffer_size];
             //If stream reading is ahead, than some data is already in the old buffer and needs to be copied to new resized buffer
-            if (_buffer && stream_read > 0) {
+            if (_buffer && stream_read > 0)
+            {
                 memcpy(new_buffer, _buffer.get(), stream_read);
             }
             _buffer.reset(new_buffer);
@@ -86,7 +91,8 @@ public:
 
         //Fetch remaining data from stream
         //If error in tcp_write in ClientContext::_write_some() occured earlier and therefore release_buffer was not called last time, than the requested stream data is already in the buffer.
-        if (size > stream_read) {
+        if (size > stream_read)
+        {
             //Remaining bytes to read from stream
             const size_t stream_rem = size - stream_read;
             const size_t cb = _stream.readBytes(reinterpret_cast<char*>(_buffer.get() + stream_read), stream_rem);
@@ -100,18 +106,20 @@ public:
 
     void release_buffer(const uint8_t* buffer, size_t size) override
     {
-        if (size == 0) {
+        if (size == 0)
+        {
             return;
         }
 
         (void)buffer;
-        _pos += size;     
+        _pos += size;
 
         //Cannot release more than acquired through get_buffer
         assert(_pos <= _streamPos);
 
         //Release less than requested with get_buffer?
-        if (_pos < _streamPos) {
+        if (_pos < _streamPos)
+        {
             // Move unreleased stream data in buffer to front
             assert(_buffer);
             memmove(_buffer.get(), _buffer.get() + size, _streamPos - _pos);

@@ -1,24 +1,24 @@
 /*
- 2012 Copyright (c) Seeed Technology Inc.
+    2012 Copyright (c) Seeed Technology Inc.
 
- Authors: Albert.Miao & Loovee, 
- Visweswara R (with initializtion code from TFT vendor)
+    Authors: Albert.Miao & Loovee,
+    Visweswara R (with initializtion code from TFT vendor)
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-Modified by Sermus for ESP8266
+    Modified by Sermus for ESP8266
 */
 #ifndef TFTv2_h
 #define TFTv2_h
@@ -41,10 +41,10 @@ Modified by Sermus for ESP8266
 #define WHITE	0xffff
 
 //Other Colors
-#define CYAN		0x07ff	
-#define BRIGHT_RED	0xf810	
-#define GRAY1		0x8410  
-#define GRAY2		0x4208  
+#define CYAN		0x07ff
+#define BRIGHT_RED	0xf810
+#define GRAY1		0x8410
+#define GRAY2		0x4208
 
 //TFT resolution 240*320
 #define MIN_X	0
@@ -138,11 +138,11 @@ public:
         SPI.transfer(data);
         TFT_CS_HIGH;
     }
-    
+
     inline void sendData(INT16U data)
     {
-        INT8U data1 = data>>8;
-        INT8U data2 = data&0xff;
+        INT8U data1 = data >> 8;
+        INT8U data2 = data & 0xff;
         TFT_DC_HIGH;
         TFT_CS_LOW;
         SPI.transfer(data1);
@@ -157,11 +157,11 @@ public:
 
         TFT_DC_HIGH;
         TFT_CS_LOW;
-        INT8U count=0;
-        for(count=0;count<howmany;count++)
+        INT8U count = 0;
+        for (count = 0; count < howmany; count++)
         {
-            data1 = data[count]>>8;
-            data2 = data[count]&0xff;
+            data1 = data[count] >> 8;
+            data2 = data[count] & 0xff;
             SPI.transfer(data1);
             SPI.transfer(data2);
         }
@@ -170,9 +170,9 @@ public:
 
     INT8U Read_Register(INT8U Addr, INT8U xParameter)
     {
-        INT8U data=0;
+        INT8U data = 0;
         sendCMD(0xd9);                                                      /* ext command                  */
-        WRITE_DATA(0x10+xParameter);                                        /* 0x11 is the first Parameter  */
+        WRITE_DATA(0x10 + xParameter);                                      /* 0x11 is the first Parameter  */
         TFT_DC_LOW;
         TFT_CS_LOW;
         SPI.transfer(Addr);
@@ -182,34 +182,34 @@ public:
         return data;
     }
 
-    
-	void TFTinit (void);
-	void setCol(INT16U StartCol,INT16U EndCol);
-	void setPage(INT16U StartPage,INT16U EndPage);
-	void setXY(INT16U poX, INT16U poY);
-    void setPixel(INT16U poX, INT16U poY,INT16U color);
-	
-	void fillScreen(INT16U XL,INT16U XR,INT16U YU,INT16U YD,INT16U color);
-	void fillScreen(void);
-	INT8U readID(void);
-	
-	void drawChar(INT8U ascii,INT16U poX, INT16U poY,INT16U size, INT16U fgcolor);
-    void drawString(const char *string,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
-	void fillRectangle(INT16U poX, INT16U poY, INT16U length, INT16U width, INT16U color);
-	
-	void drawLine(INT16U x0,INT16U y0,INT16U x1,INT16U y1,INT16U color);
-    void drawVerticalLine(INT16U poX, INT16U poY,INT16U length,INT16U color);
-    void drawHorizontalLine(INT16U poX, INT16U poY,INT16U length,INT16U color);
-    void drawRectangle(INT16U poX, INT16U poY, INT16U length,INT16U width,INT16U color);
-	
-	void drawCircle(int poX, int poY, int r,INT16U color);
-    void fillCircle(int poX, int poY, int r,INT16U color);
-	
-	void drawTraingle(int poX1, int poY1, int poX2, int poY2, int poX3, int poY3, INT16U color);
-    
-    INT8U drawNumber(long long_num,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
-    INT8U drawFloat(float floatNumber,INT8U decimal,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
-    INT8U drawFloat(float floatNumber,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
+
+    void TFTinit(void);
+    void setCol(INT16U StartCol, INT16U EndCol);
+    void setPage(INT16U StartPage, INT16U EndPage);
+    void setXY(INT16U poX, INT16U poY);
+    void setPixel(INT16U poX, INT16U poY, INT16U color);
+
+    void fillScreen(INT16U XL, INT16U XR, INT16U YU, INT16U YD, INT16U color);
+    void fillScreen(void);
+    INT8U readID(void);
+
+    void drawChar(INT8U ascii, INT16U poX, INT16U poY, INT16U size, INT16U fgcolor);
+    void drawString(const char *string, INT16U poX, INT16U poY, INT16U size, INT16U fgcolor);
+    void fillRectangle(INT16U poX, INT16U poY, INT16U length, INT16U width, INT16U color);
+
+    void drawLine(INT16U x0, INT16U y0, INT16U x1, INT16U y1, INT16U color);
+    void drawVerticalLine(INT16U poX, INT16U poY, INT16U length, INT16U color);
+    void drawHorizontalLine(INT16U poX, INT16U poY, INT16U length, INT16U color);
+    void drawRectangle(INT16U poX, INT16U poY, INT16U length, INT16U width, INT16U color);
+
+    void drawCircle(int poX, int poY, int r, INT16U color);
+    void fillCircle(int poX, int poY, int r, INT16U color);
+
+    void drawTraingle(int poX1, int poY1, int poX2, int poY2, int poX3, int poY3, INT16U color);
+
+    INT8U drawNumber(long long_num, INT16U poX, INT16U poY, INT16U size, INT16U fgcolor);
+    INT8U drawFloat(float floatNumber, INT8U decimal, INT16U poX, INT16U poY, INT16U size, INT16U fgcolor);
+    INT8U drawFloat(float floatNumber, INT16U poX, INT16U poY, INT16U size, INT16U fgcolor);
 
 };
 
@@ -220,5 +220,5 @@ extern TFT Tft;
 #endif
 
 /*********************************************************************************************************
-  END FILE
+    END FILE
 *********************************************************************************************************/

@@ -1,24 +1,24 @@
 /*
-  TwoWire.h - TWI/I2C library for Arduino & Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+    TwoWire.h - TWI/I2C library for Arduino & Wiring
+    Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
-  Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
-  Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
+    Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
+    Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
+    Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
 */
 
 #ifndef TwoWire_h
@@ -33,7 +33,7 @@
 
 class TwoWire : public Stream
 {
-  private:
+private:
     static uint8_t rxBuffer[];
     static uint8_t rxBufferIndex;
     static uint8_t rxBufferLength;
@@ -48,10 +48,10 @@ class TwoWire : public Stream
     static void (*user_onReceive)(size_t);
     static void onRequestService(void);
     static void onReceiveService(uint8_t*, size_t);
-  public:
+public:
     TwoWire();
     void begin(int sda, int scl);
-    void begin(int sda, int scl, uint8_t address);    
+    void begin(int sda, int scl, uint8_t address);
     void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
     void begin();
     void begin(uint8_t);
@@ -63,27 +63,39 @@ class TwoWire : public Stream
     uint8_t endTransmission(void);
     uint8_t endTransmission(uint8_t);
     size_t requestFrom(uint8_t address, size_t size, bool sendStop);
-	uint8_t status();
+    uint8_t status();
 
     uint8_t requestFrom(uint8_t, uint8_t);
     uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
     uint8_t requestFrom(int, int);
     uint8_t requestFrom(int, int, int);
-    
+
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive( void (*)(int) );    // arduino api
-    void onReceive( void (*)(size_t) ); // legacy esp8266 backward compatibility
-    void onRequest( void (*)(void) );
+    void onReceive(void (*)(int));      // arduino api
+    void onReceive(void (*)(size_t));   // legacy esp8266 backward compatibility
+    void onRequest(void (*)(void));
 
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
+    inline size_t write(unsigned long n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(long n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(unsigned int n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(int n)
+    {
+        return write((uint8_t)n);
+    }
     using Print::write;
 };
 
