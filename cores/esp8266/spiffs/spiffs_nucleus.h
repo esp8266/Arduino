@@ -1,112 +1,112 @@
 /*
-    spiffs_nucleus.h
+ * spiffs_nucleus.h
+ *
+ *  Created on: Jun 15, 2013
+ *      Author: petera
+ */
 
-    Created on: Jun 15, 2013
-        Author: petera
-*/
-
-/*  SPIFFS layout
-
-    spiffs is designed for following spi flash characteristics:
-     - only big areas of data (blocks) can be erased
-     - erasing resets all bits in a block to ones
-     - writing pulls ones to zeroes
-     - zeroes cannot be pulled to ones, without erase
-     - wear leveling
-
-    spiffs is also meant to be run on embedded, memory constraint devices.
-
-    Entire area is divided in blocks. Entire area is also divided in pages.
-    Each block contains same number of pages. A page cannot be erased, but a
-    block can be erased.
-
-    Entire area must be block_size * x
-    page_size must be block_size / (2^y) where y > 2
-
-    ex: area = 1024*1024 bytes, block size = 65536 bytes, page size = 256 bytes
-
-    BLOCK 0  PAGE 0       object lookup 1
-            PAGE 1       object lookup 2
-            ...
-            PAGE n-1     object lookup n
-            PAGE n       object data 1
-            PAGE n+1     object data 2
-            ...
-            PAGE n+m-1   object data m
-
-    BLOCK 1  PAGE n+m     object lookup 1
-            PAGE n+m+1   object lookup 2
-            ...
-            PAGE 2n+m-1  object lookup n
-            PAGE 2n+m    object data 1
-            PAGE 2n+m    object data 2
-            ...
-            PAGE 2n+2m-1 object data m
-    ...
-
-    n is number of object lookup pages, which is number of pages needed to index all pages
-    in a block by object id
-     : block_size / page_size * sizeof(obj_id) / page_size
-    m is number data pages, which is number of pages in block minus number of lookup pages
-     : block_size / page_size - block_size / page_size * sizeof(obj_id) / page_size
-    thus, n+m is total number of pages in a block
-     : block_size / page_size
-
-    ex: n = 65536/256*2/256 = 2, m = 65536/256 - 2 = 254 => n+m = 65536/256 = 256
-
-    Object lookup pages contain object id entries. Each entry represent the corresponding
-    data page.
-    Assuming a 16 bit object id, an object id being 0xffff represents a free page.
-    An object id being 0x0000 represents a deleted page.
-
-    ex: page 0 : lookup : 0008 0001 0aaa ffff ffff ffff ffff ffff ..
-       page 1 : lookup : ffff ffff ffff ffff ffff ffff ffff ffff ..
-       page 2 : data   : data for object id 0008
-       page 3 : data   : data for object id 0001
-       page 4 : data   : data for object id 0aaa
-       ...
-
-
-    Object data pages can be either object index pages or object content.
-    All object data pages contains a data page header, containing object id and span index.
-    The span index denotes the object page ordering amongst data pages with same object id.
-    This applies to both object index pages (when index spans more than one page of entries),
-    and object data pages.
-    An object index page contains page entries pointing to object content page. The entry index
-    in a object index page correlates to the span index in the actual object data page.
-    The first object index page (span index 0) is called object index header page, and also
-    contains object flags (directory/file), size, object name etc.
-
-    ex:
-    BLOCK 1
-      PAGE 256: objectl lookup page 1
-        [*123] [ 123] [ 123] [ 123]
-        [ 123] [*123] [ 123] [ 123]
-        [free] [free] [free] [free] ...
-      PAGE 257: objectl lookup page 2
-        [free] [free] [free] [free] ...
-      PAGE 258: object index page (header)
-        obj.id:0123 span.ix:0000 flags:INDEX
-        size:1600 name:ex.txt type:file
-        [259] [260] [261] [262]
-      PAGE 259: object data page
-        obj.id:0123 span.ix:0000 flags:DATA
-      PAGE 260: object data page
-        obj.id:0123 span.ix:0001 flags:DATA
-      PAGE 261: object data page
-        obj.id:0123 span.ix:0002 flags:DATA
-      PAGE 262: object data page
-        obj.id:0123 span.ix:0003 flags:DATA
-      PAGE 263: object index page
-        obj.id:0123 span.ix:0001 flags:INDEX
-        [264] [265] [fre] [fre]
-        [fre] [fre] [fre] [fre]
-      PAGE 264: object data page
-        obj.id:0123 span.ix:0004 flags:DATA
-      PAGE 265: object data page
-        obj.id:0123 span.ix:0005 flags:DATA
-
-*/
+/* SPIFFS layout
+ *
+ * spiffs is designed for following spi flash characteristics:
+ *   - only big areas of data (blocks) can be erased
+ *   - erasing resets all bits in a block to ones
+ *   - writing pulls ones to zeroes
+ *   - zeroes cannot be pulled to ones, without erase
+ *   - wear leveling
+ *
+ * spiffs is also meant to be run on embedded, memory constraint devices.
+ *
+ * Entire area is divided in blocks. Entire area is also divided in pages.
+ * Each block contains same number of pages. A page cannot be erased, but a
+ * block can be erased.
+ *
+ * Entire area must be block_size * x
+ * page_size must be block_size / (2^y) where y > 2
+ *
+ * ex: area = 1024*1024 bytes, block size = 65536 bytes, page size = 256 bytes
+ *
+ * BLOCK 0  PAGE 0       object lookup 1
+ *          PAGE 1       object lookup 2
+ *          ...
+ *          PAGE n-1     object lookup n
+ *          PAGE n       object data 1
+ *          PAGE n+1     object data 2
+ *          ...
+ *          PAGE n+m-1   object data m
+ *
+ * BLOCK 1  PAGE n+m     object lookup 1
+ *          PAGE n+m+1   object lookup 2
+ *          ...
+ *          PAGE 2n+m-1  object lookup n
+ *          PAGE 2n+m    object data 1
+ *          PAGE 2n+m    object data 2
+ *          ...
+ *          PAGE 2n+2m-1 object data m
+ * ...
+ *
+ * n is number of object lookup pages, which is number of pages needed to index all pages
+ * in a block by object id
+ *   : block_size / page_size * sizeof(obj_id) / page_size
+ * m is number data pages, which is number of pages in block minus number of lookup pages
+ *   : block_size / page_size - block_size / page_size * sizeof(obj_id) / page_size
+ * thus, n+m is total number of pages in a block
+ *   : block_size / page_size
+ *
+ * ex: n = 65536/256*2/256 = 2, m = 65536/256 - 2 = 254 => n+m = 65536/256 = 256
+ *
+ * Object lookup pages contain object id entries. Each entry represent the corresponding
+ * data page.
+ * Assuming a 16 bit object id, an object id being 0xffff represents a free page.
+ * An object id being 0x0000 represents a deleted page.
+ *
+ * ex: page 0 : lookup : 0008 0001 0aaa ffff ffff ffff ffff ffff ..
+ *     page 1 : lookup : ffff ffff ffff ffff ffff ffff ffff ffff ..
+ *     page 2 : data   : data for object id 0008
+ *     page 3 : data   : data for object id 0001
+ *     page 4 : data   : data for object id 0aaa
+ *     ...
+ *
+ *
+ * Object data pages can be either object index pages or object content.
+ * All object data pages contains a data page header, containing object id and span index.
+ * The span index denotes the object page ordering amongst data pages with same object id.
+ * This applies to both object index pages (when index spans more than one page of entries),
+ * and object data pages.
+ * An object index page contains page entries pointing to object content page. The entry index
+ * in a object index page correlates to the span index in the actual object data page.
+ * The first object index page (span index 0) is called object index header page, and also
+ * contains object flags (directory/file), size, object name etc.
+ *
+ * ex:
+ *  BLOCK 1
+ *    PAGE 256: objectl lookup page 1
+ *      [*123] [ 123] [ 123] [ 123]
+ *      [ 123] [*123] [ 123] [ 123]
+ *      [free] [free] [free] [free] ...
+ *    PAGE 257: objectl lookup page 2
+ *      [free] [free] [free] [free] ...
+ *    PAGE 258: object index page (header)
+ *      obj.id:0123 span.ix:0000 flags:INDEX
+ *      size:1600 name:ex.txt type:file
+ *      [259] [260] [261] [262]
+ *    PAGE 259: object data page
+ *      obj.id:0123 span.ix:0000 flags:DATA
+ *    PAGE 260: object data page
+ *      obj.id:0123 span.ix:0001 flags:DATA
+ *    PAGE 261: object data page
+ *      obj.id:0123 span.ix:0002 flags:DATA
+ *    PAGE 262: object data page
+ *      obj.id:0123 span.ix:0003 flags:DATA
+ *    PAGE 263: object index page
+ *      obj.id:0123 span.ix:0001 flags:INDEX
+ *      [264] [265] [fre] [fre]
+ *      [fre] [fre] [fre] [fre]
+ *    PAGE 264: object data page
+ *      obj.id:0123 span.ix:0004 flags:DATA
+ *    PAGE 265: object data page
+ *      obj.id:0123 span.ix:0005 flags:DATA
+ *
+ */
 #ifndef SPIFFS_NUCLEUS_H_
 #define SPIFFS_NUCLEUS_H_
 
@@ -148,15 +148,15 @@ extern "C" {
 
 
 #if defined(__GNUC__) || defined(__clang__)
-/* For GCC and clang */
+    /* For GCC and clang */
 #define SPIFFS_PACKED __attribute__((packed))
 #elif defined(__ICCARM__) || defined(__CC_ARM)
-/* For IAR ARM and Keil MDK-ARM compilers */
-#define SPIFFS_PACKED
+    /* For IAR ARM and Keil MDK-ARM compilers */
+#define SPIFFS_PACKED 
 
 #else
-/* Unknown compiler */
-#define SPIFFS_PACKED
+    /* Unknown compiler */
+#define SPIFFS_PACKED 
 #endif
 
 
@@ -342,7 +342,7 @@ extern "C" {
     if (((ph).flags & SPIFFS_PH_FLAG_INDEX) != 0) return SPIFFS_ERR_NOT_INDEX; \
     if (((objid) & SPIFFS_OBJ_ID_IX_FLAG) == 0) return SPIFFS_ERR_NOT_INDEX; \
     if ((ph).span_ix != (spix)) return SPIFFS_ERR_INDEX_SPAN_MISMATCH;
-//if ((spix) == 0 && ((ph).flags & SPIFFS_PH_FLAG_IXDELE) == 0) return SPIFFS_ERR_DELETED;
+    //if ((spix) == 0 && ((ph).flags & SPIFFS_PH_FLAG_IXDELE) == 0) return SPIFFS_ERR_DELETED;
 
 #define SPIFFS_VALIDATE_DATA(ph, objid, spix) \
     if (((ph).flags & SPIFFS_PH_FLAG_USED) != 0) return SPIFFS_ERR_IS_FREE; \
@@ -402,85 +402,79 @@ extern "C" {
   ((u8_t *)(&((c)->cpages[(ix) * SPIFFS_CACHE_PAGE_SIZE(fs)])) + sizeof(spiffs_cache_page))
 
 // cache page struct
-typedef struct
-{
-    // cache flags
-    u8_t flags;
-    // cache page index
-    u8_t ix;
-    // last access of this cache page
-    u32_t last_access;
-    union
-    {
-        // type read cache
-        struct
-        {
-            // read cache page index
-            spiffs_page_ix pix;
-        };
-#if SPIFFS_CACHE_WR
-        // type write cache
-        struct
-        {
-            // write cache
-            spiffs_obj_id obj_id;
-            // offset in cache page
-            u32_t offset;
-            // size of cache page
-            u16_t size;
-        };
-#endif
+typedef struct {
+  // cache flags
+  u8_t flags;
+  // cache page index
+  u8_t ix;
+  // last access of this cache page
+  u32_t last_access;
+  union {
+    // type read cache
+    struct {
+      // read cache page index
+      spiffs_page_ix pix;
     };
+#if SPIFFS_CACHE_WR
+    // type write cache
+    struct {
+      // write cache
+      spiffs_obj_id obj_id;
+      // offset in cache page
+      u32_t offset;
+      // size of cache page
+      u16_t size;
+    };
+#endif
+  };
 } spiffs_cache_page;
 
 // cache struct
-typedef struct
-{
-    u8_t cpage_count;
-    u32_t last_access;
-    u32_t cpage_use_map;
-    u32_t cpage_use_mask;
-    u8_t *cpages;
+typedef struct {
+  u8_t cpage_count;
+  u32_t last_access;
+  u32_t cpage_use_map;
+  u32_t cpage_use_mask;
+  u8_t *cpages;
 } spiffs_cache;
 
 #endif
 
 
 // spiffs nucleus file descriptor
-typedef struct
-{
-    // the filesystem of this descriptor
-    spiffs *fs;
-    // number of file descriptor - if 0, the file descriptor is closed
-    spiffs_file file_nbr;
-    // object id - if SPIFFS_OBJ_ID_ERASED, the file was deleted
-    spiffs_obj_id obj_id;
-    // size of the file
-    u32_t size;
-    // cached object index header page index
-    spiffs_page_ix objix_hdr_pix;
-    // cached offset object index page index
-    spiffs_page_ix cursor_objix_pix;
-    // cached offset object index span index
-    spiffs_span_ix cursor_objix_spix;
-    // current absolute offset
-    u32_t offset;
-    // current file descriptor offset (cached)
-    u32_t fdoffset;
-    // fd flags
-    spiffs_flags flags;
+typedef struct {
+  // the filesystem of this descriptor
+  spiffs *fs;
+  // number of file descriptor - if 0, the file descriptor is closed
+  spiffs_file file_nbr;
+  // object id - if SPIFFS_OBJ_ID_ERASED, the file was deleted
+  spiffs_obj_id obj_id;
+  // size of the file
+  u32_t size;
+  // cached object index header page index
+  spiffs_page_ix objix_hdr_pix;
+  // cached offset object index page index
+  spiffs_page_ix cursor_objix_pix;
+  // cached offset object index span index
+  spiffs_span_ix cursor_objix_spix;
+  // current absolute offset
+  u32_t offset;
+  // current file descriptor offset (cached)
+  u32_t fdoffset;
+  // fd flags
+  spiffs_flags flags;
 #if SPIFFS_CACHE_WR
-    spiffs_cache_page *cache_page;
+  spiffs_cache_page *cache_page;
 #endif
 #if SPIFFS_TEMPORAL_FD_CACHE
-    // djb2 hash of filename
-    u32_t name_hash;
-    // hit score (score == 0 indicates never used fd)
-    u16_t score;
+  // djb2 hash of filename
+  u32_t name_hash;
+  // hit score (score == 0 indicates never used fd)
+  u16_t score;
 #endif
 #if SPIFFS_IX_MAP
-    // spiffs index map, if 0 it means unmapped
-    spiffs_ix_map *ix_map;
+  // spiffs index map, if 0 it means unmapped
+  spiffs_ix_map *ix_map;
 #endif
 } spiffs_fd;
 
@@ -490,48 +484,46 @@ typedef struct
 // page header, part of each page except object lookup pages
 // NB: this is always aligned when the data page is an object index,
 // as in this case struct spiffs_page_object_ix is used
-typedef struct SPIFFS_PACKED
-{
-    // object id
-    spiffs_obj_id obj_id;
-    // object span index
-    spiffs_span_ix span_ix;
-    // flags
-    u8_t flags;
+typedef struct SPIFFS_PACKED {
+  // object id
+  spiffs_obj_id obj_id;
+  // object span index
+  spiffs_span_ix span_ix;
+  // flags
+  u8_t flags;
 } spiffs_page_header;
 
 // object index header page header
 typedef struct SPIFFS_PACKED
 #if SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
-__attribute((aligned(sizeof(spiffs_page_ix))))
+                __attribute(( aligned(sizeof(spiffs_page_ix)) ))
 #endif
 {
-    // common page header
-    spiffs_page_header p_hdr;
-    // alignment
-    u8_t _align[4 - ((sizeof(spiffs_page_header) & 3) == 0 ? 4 : (sizeof(spiffs_page_header) & 3))];
-    // size of object
-    u32_t size;
-    // type of object
-    spiffs_obj_type type;
-    // name of object
-    u8_t name[SPIFFS_OBJ_NAME_LEN];
+  // common page header
+  spiffs_page_header p_hdr;
+  // alignment
+  u8_t _align[4 - ((sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3))];
+  // size of object
+  u32_t size;
+  // type of object
+  spiffs_obj_type type;
+  // name of object
+  u8_t name[SPIFFS_OBJ_NAME_LEN];
 #if SPIFFS_OBJ_META_LEN
-    // metadata. not interpreted by SPIFFS in any way.
-    u8_t meta[SPIFFS_OBJ_META_LEN];
+  // metadata. not interpreted by SPIFFS in any way.
+  u8_t meta[SPIFFS_OBJ_META_LEN];
 #endif
 } spiffs_page_object_ix_header;
 
 // object index page header
-typedef struct SPIFFS_PACKED
-{
-    spiffs_page_header p_hdr;
-    u8_t _align[4 - ((sizeof(spiffs_page_header) & 3) == 0 ? 4 : (sizeof(spiffs_page_header) & 3))];
+typedef struct SPIFFS_PACKED {
+ spiffs_page_header p_hdr;
+ u8_t _align[4 - ((sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3))];
 } spiffs_page_object_ix;
 
 // callback func for object lookup visitor
 typedef s32_t (*spiffs_visitor_f)(spiffs *fs, spiffs_obj_id id, spiffs_block_ix bix, int ix_entry,
-                                  const void *user_const_p, void *user_var_p);
+    const void *user_const_p, void *user_var_p);
 
 
 #if SPIFFS_CACHE

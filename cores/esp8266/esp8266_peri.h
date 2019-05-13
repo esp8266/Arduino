@@ -1,22 +1,22 @@
-/*
-    esp8266_peri.h - Peripheral registers exposed in more AVR style for esp8266
+/* 
+  esp8266_peri.h - Peripheral registers exposed in more AVR style for esp8266
 
-    Copyright (c) 2015 Hristo Gochkov. All rights reserved.
-    This file is part of the esp8266 core for Arduino environment.
+  Copyright (c) 2015 Hristo Gochkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
+ 
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef ESP8266_PERI_H_INCLUDED
 #define ESP8266_PERI_H_INCLUDED
@@ -842,8 +842,8 @@ extern uint8_t esp8266_gpioToFn[16];
 #define I2STXCM  (0)        //I2S_TX_CHAN_MOD_S
 
 /**
-    Random Number Generator 32bit
-    http://esp8266-re.foogod.com/wiki/Random_Number_Generator
+ Random Number Generator 32bit
+ http://esp8266-re.foogod.com/wiki/Random_Number_Generator
 **/
 #define RANDOM_REG32  ESP8266_DREG(0x20E44)
 
