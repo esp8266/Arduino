@@ -1,27 +1,27 @@
 /*
-    wl_definitions.h - Library for Arduino Wifi shield.
-    Copyright (c) 2011-2014 Arduino.  All right reserved.
+  wl_definitions.h - Library for Arduino Wifi shield.
+  Copyright (c) 2011-2014 Arduino.  All right reserved.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 /*
-    wl_definitions.h
-
-    Created on: Mar 6, 2011
-        Author: dlafauci
-*/
+ * wl_definitions.h
+ *
+ *  Created on: Mar 6, 2011
+ *      Author: dlafauci
+ */
 
 #ifndef WL_DEFINITIONS_H_
 #define WL_DEFINITIONS_H_
@@ -47,8 +47,7 @@
 //Maximum number of attempts to establish wifi connection
 #define WL_MAX_ATTEMPT_CONNECTION	10
 
-typedef enum
-{
+typedef enum {
     WL_NO_SHIELD        = 255,   // for compatibility with WiFi Shield library
     WL_IDLE_STATUS      = 0,
     WL_NO_SSID_AVAIL    = 1,
@@ -60,30 +59,28 @@ typedef enum
 } wl_status_t;
 
 /* Encryption modes */
-enum wl_enc_type    /* Values map to 802.11 encryption suites... */
-{
-    ENC_TYPE_WEP  = 5,
-    ENC_TYPE_TKIP = 2,
-    ENC_TYPE_CCMP = 4,
-    /* ... except these two, 7 and 8 are reserved in 802.11-2007 */
-    ENC_TYPE_NONE = 7,
-    ENC_TYPE_AUTO = 8
+enum wl_enc_type {  /* Values map to 802.11 encryption suites... */
+        ENC_TYPE_WEP  = 5,
+        ENC_TYPE_TKIP = 2,
+        ENC_TYPE_CCMP = 4,
+        /* ... except these two, 7 and 8 are reserved in 802.11-2007 */
+        ENC_TYPE_NONE = 7,
+        ENC_TYPE_AUTO = 8
 };
 
 #if !defined(LWIP_INTERNAL) && !defined(__LWIP_TCP_H__)
-enum wl_tcp_state
-{
-    CLOSED      = 0,
-    LISTEN      = 1,
-    SYN_SENT    = 2,
-    SYN_RCVD    = 3,
-    ESTABLISHED = 4,
-    FIN_WAIT_1  = 5,
-    FIN_WAIT_2  = 6,
-    CLOSE_WAIT  = 7,
-    CLOSING     = 8,
-    LAST_ACK    = 9,
-    TIME_WAIT   = 10
+enum wl_tcp_state {
+  CLOSED      = 0,
+  LISTEN      = 1,
+  SYN_SENT    = 2,
+  SYN_RCVD    = 3,
+  ESTABLISHED = 4,
+  FIN_WAIT_1  = 5,
+  FIN_WAIT_2  = 6,
+  CLOSE_WAIT  = 7,
+  CLOSING     = 8,
+  LAST_ACK    = 9,
+  TIME_WAIT   = 10
 };
 #endif
 

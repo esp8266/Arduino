@@ -9,33 +9,29 @@ extern "C" {
 }
 
 // these auto classes wrap up xt_rsil so your code can be simplier, but can only be
-// used in an ino or cpp files.
+// used in an ino or cpp files. 
 
 // InterruptLock is used when you want to completely disable interrupts
 //{
 //    {
-//      InterruptLock lock;
+//      InterruptLock lock; 
 //      // do work within interrupt lock here
 //    }
 //    do work outside of interrupt lock here outside its scope
 //}
 //
 
-class InterruptLock
-{
+class InterruptLock {
 public:
-    InterruptLock()
-    {
+    InterruptLock() {
         _state = xt_rsil(15);
     }
 
-    ~InterruptLock()
-    {
+    ~InterruptLock() {
         xt_wsr_ps(_state);
     }
 
-    uint32_t savedInterruptLevel() const
-    {
+    uint32_t savedInterruptLevel() const {
         return _state & 0x0f;
     }
 
@@ -61,6 +57,6 @@ public: \
 private: \
     uint32_t _savedPS; \
     }; \
-_AutoDisableIntr _autoDisableIntr
+_AutoDisableIntr _autoDisableIntr 
 
 #endif //INTERRUPTS_H

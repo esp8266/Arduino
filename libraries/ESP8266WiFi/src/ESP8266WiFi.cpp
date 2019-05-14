@@ -1,26 +1,26 @@
 /*
-    ESP8266WiFi.cpp - WiFi library for esp8266
+ ESP8266WiFi.cpp - WiFi library for esp8266
 
-    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
-    This file is part of the esp8266 core for Arduino environment.
+ Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-    Reworked on 28 Dec 2015 by Markus Sattler
+ Reworked on 28 Dec 2015 by Markus Sattler
 
-*/
+ */
 
 #include "ESP8266WiFi.h"
 
@@ -45,11 +45,10 @@ extern "C" {
 
 
 /**
-    Output WiFi settings to an object derived from Print interface (like Serial).
-    @param p Print interface
-*/
-void ESP8266WiFiClass::printDiag(Print& p)
-{
+ * Output WiFi settings to an object derived from Print interface (like Serial).
+ * @param p Print interface
+ */
+void ESP8266WiFiClass::printDiag(Print& p) {
     const char* modes[] = { "NULL", "STA", "AP", "STA+AP" };
     p.print("Mode: ");
     p.println(modes[wifi_get_opmode()]);
@@ -76,7 +75,7 @@ void ESP8266WiFiClass::printDiag(Print& p)
     char ssid[33]; //ssid can be up to 32chars, => plus null term
     memcpy(ssid, conf.ssid, sizeof(conf.ssid));
     ssid[32] = 0; //nullterm in case of 32 char ssid
-
+ 
     p.print("SSID (");
     p.print(strlen(ssid));
     p.print("): ");

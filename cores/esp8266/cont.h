@@ -1,22 +1,22 @@
 /*
-    cont.h - continuations support for Xtensa call0 ABI
-    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
-    This file is part of the esp8266 core for Arduino environment.
+ cont.h - continuations support for Xtensa call0 ABI
+ Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 #ifndef CONT_H_
 #define CONT_H_
@@ -31,23 +31,22 @@
 extern "C" {
 #endif
 
-typedef struct cont_
-{
-    void (*pc_ret)(void);
-    unsigned* sp_ret;
+typedef struct cont_ {
+        void (*pc_ret)(void);
+        unsigned* sp_ret;
 
-    void (*pc_yield)(void);
-    unsigned* sp_yield;
+        void (*pc_yield)(void);
+        unsigned* sp_yield;
 
-    unsigned* stack_end;
-    unsigned unused1;
-    unsigned unused2;
-    unsigned stack_guard1;
+        unsigned* stack_end;
+        unsigned unused1;
+        unsigned unused2;
+        unsigned stack_guard1;
 
-    unsigned stack[CONT_STACKSIZE / 4];
+        unsigned stack[CONT_STACKSIZE / 4];
 
-    unsigned stack_guard2;
-    unsigned* struct_start;
+        unsigned stack_guard2;
+        unsigned* struct_start;
 } cont_t;
 
 extern cont_t* g_pcont;
