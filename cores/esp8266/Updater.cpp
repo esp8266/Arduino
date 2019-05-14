@@ -37,10 +37,16 @@ UpdaterClass::UpdaterClass()
 , _command(U_FLASH)
 , _hash(nullptr)
 , _verify(nullptr)
+, _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
   installSignature(&hash, &sign);
 #endif
+}
+
+UpdaterClass& UpdaterClass::onProgress(THandlerFunction_Progress fn) {
+    _progress_callback = fn;
+    return *this;
 }
 
 void UpdaterClass::_reset() {
@@ -440,7 +446,9 @@ size_t UpdaterClass::writeStream(Stream &data) {
         _reset();
         return 0;
     }
-
+    if (_progress_callback) {
+        _progress_callback(0, _size);
+    }
     if(_ledPin != -1) {
         pinMode(_ledPin, OUTPUT);
     }
@@ -471,7 +479,13 @@ size_t UpdaterClass::writeStream(Stream &data) {
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
         written += toRead;
+        if(_progress_callback) {
+            _progress_callback(progress(), _size);
+        }
         yield();
+    }
+    if(_progress_callback) {
+        _progress_callback(progress(), _size);
     }
     return written;
 }

@@ -375,7 +375,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
     response += String(code);
     response += ' ';
-    response += _responseCodeToString(code);
+    response += responseCodeToString(code);
     response += "\r\n";
 
     using namespace mime;
@@ -423,7 +423,9 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
     _currentClientWrite(header.c_str(), header.length());
-    sendContent_P(content);
+    if (contentLength) {
+        sendContent_P(content);
+    }
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
@@ -627,7 +629,7 @@ void ESP8266WebServer::_finalizeResponse() {
   }
 }
 
-const String ESP8266WebServer::_responseCodeToString(int code) {
+const String ESP8266WebServer::responseCodeToString(const int code) {
   switch (code) {
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");

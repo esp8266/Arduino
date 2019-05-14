@@ -125,22 +125,22 @@ Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be tol
 There are multiple modes to tell BearSSL how to verify the identity of the remote server.  See the `BearSSL_Validation` example for real uses of the following methods:
 
 setInsecure()
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 Don't verify any X509 certificates.  There is no guarantee that the server connected to is the one you think it is in this case, but this call will mimic the behavior of the deprecated axTLS code.
 
-setKnownKey(const BearSSL::PublicKey *pk)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setKnownKey(const BearSSL::PublicKey \*pk)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Assume the server is using the specific public key.  This does not verify the identity of the server or the X509 certificate it sends, it simply assumes that its public key is the one given.  If the server updates its public key at a later point then connections will fail.
 
-setFingerprint(const uint8_t fp[20]) / setFingerprint(const char *fpStr)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setFingerprint(const uint8_t fp[20]) / setFingerprint(const char \*fpStr)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
 
-setTrustAnchors(BearSSL::X509List *ta)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setTrustAnchors(BearSSL::X509List \*ta)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the passed-in certificate(s) as a trust anchor, accepting remote certificates signed by any of these.  If you have many trust anchors it may make sense to use a `BearSSL::CertStore` because it will only require RAM for a single trust anchor (while the `setTrustAnchors` call requires memory for all certificates in the list).
 
@@ -180,11 +180,16 @@ Once you have verified (or know beforehand) that MFLN is supported you can use t
 
 In certain applications where the TLS server does not support MFLN (not many do as of this writing as it is relatively new to OpenSSL), but you control both the ESP8266 and the server to which it is communicating, you may still be able to `setBufferSizes()` smaller if you guarantee no chunk of data will overflow those buffers.
 
+bool getMFLNStatus()
+^^^^^^^^^^^^^^^^^^^^
+
+After a successful connection, this method returns whether or not MFLN negotiation succeeded or not.  If it did not succeed, and you reduced the receive buffer with `setBufferSizes` then you may experience reception errors if the server attempts to send messages larger than your receive buffer.
+
 Sessions (Resuming connections fast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setSession(BearSSL::Session &sess)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you are connecting to a server repeatedly in a fixed time period (usually 30 or 60 minutes, but normally configurable at the server), a TLS session can be used to cache crypto settings and speed up connections significantly.
 
@@ -193,8 +198,8 @@ Errors
 
 BearSSL can fail in many more unique and interesting ways then the deprecated axTLS.  Use these calls to get more information when something fails.  
 
-getLastSSLError(char *dest = NULL, size_t len = 0)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+getLastSSLError(char \*dest = NULL, size_t len = 0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Returns the last BearSSL error code encountered and optionally set a user-allocated buffer to a human-readable form of the error.  To only get the last error integer code, just call without any parameters (`int errCode = getLastSSLError();`).
 

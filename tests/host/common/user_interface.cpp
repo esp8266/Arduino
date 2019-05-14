@@ -84,7 +84,9 @@ bool wifi_station_get_config (struct station_config *config)
 		config->bssid[i] = i;
 	config->threshold.rssi = 1;
 	config->threshold.authmode = AUTH_WPA_PSK;
+#ifdef NONOSDK3V0
 	config->open_and_wep_mode_disable = true;
+#endif
 	return true;
 }
 
@@ -190,10 +192,14 @@ uint8 wifi_get_opmode_default (void)
 	return STATION_MODE;
 }
 
+#ifdef NONOSDK3V0
+
 sleep_level_t wifi_get_sleep_level (void)
 {
 	return MIN_SLEEP_T;
 }
+
+#endif // nonos-sdk-pre-3
 
 sleep_type_t wifi_get_sleep_type (void)
 {
@@ -210,7 +216,7 @@ wifi_event_handler_cb_t wifi_event_handler_cb_emu = nullptr;
 void wifi_set_event_handler_cb (wifi_event_handler_cb_t cb)
 {
 	wifi_event_handler_cb_emu = cb;
-	fprintf(stderr, MOCK "TODO: wifi_set_event_handler_cb set\n");
+	mockverbose("TODO: wifi_set_event_handler_cb set\n");
 }
 
 bool wifi_set_ip_info (uint8 if_index, struct ip_info *info)
@@ -242,11 +248,15 @@ bool wifi_set_phy_mode (phy_mode_t mode)
 	return true;
 }
 
+#ifdef NONOSDK3V0
+
 bool wifi_set_sleep_level (sleep_level_t level)
 {
 	(void)level;
 	return true;
 }
+
+#endif
 
 bool wifi_set_sleep_type (sleep_type_t type)
 {
@@ -280,7 +290,7 @@ bool wifi_station_get_config_default (struct station_config *config)
 }
 
 char wifi_station_get_hostname_str [128];
-char* wifi_station_get_hostname (void)
+const char* wifi_station_get_hostname (void)
 {
 	return strcpy(wifi_station_get_hostname_str, "esposix");
 }
@@ -312,7 +322,7 @@ bool wifi_station_set_config_current (struct station_config *config)
 	return true;
 }
 
-bool wifi_station_set_hostname (char *name)
+bool wifi_station_set_hostname (const char *name)
 {
 	(void)name;
 	return true;
@@ -422,11 +432,6 @@ void ets_isr_unmask (int intr)
 
 void esp_schedule (void)
 {
-}
-
-void optimistic_yield (uint32_t ms)
-{
-	usleep(ms * 1000);
 }
 
 void dns_setserver (u8_t numdns, ip_addr_t *dnsserver)

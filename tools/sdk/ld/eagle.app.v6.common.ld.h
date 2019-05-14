@@ -93,6 +93,44 @@ SECTIONS
 #include "eagle.app.v6.common.ld.vtables.h"
 #endif
 
+  /* IRAM is split into .text and .text1 to allow for moving specific */
+  /* functions into IRAM that would be matched by the irom0.text matcher */
+  .text : ALIGN(4)
+  {
+    _stext = .;
+    _text_start = ABSOLUTE(.);
+     *(.UserEnter.text)
+    . = ALIGN(16);
+    *(.DebugExceptionVector.text)
+    . = ALIGN(16);
+    *(.NMIExceptionVector.text)
+    . = ALIGN(16);
+    *(.KernelExceptionVector.text)
+    LONG(0)
+    LONG(0)
+    LONG(0)
+    LONG(0)
+    . = ALIGN(16);
+    *(.UserExceptionVector.text)
+    LONG(0)
+    LONG(0)
+    LONG(0)
+    LONG(0)
+    . = ALIGN(16);
+    *(.DoubleExceptionVector.text)
+    LONG(0)
+    LONG(0)
+    LONG(0)
+    LONG(0)
+    . = ALIGN (16);
+    *(.entry.text)
+    *(.init.literal)
+    *(.init)
+
+    /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
+    *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
+  } >iram1_0_seg :iram1_0_phdr
+
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
@@ -140,6 +178,8 @@ SECTIONS
 
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)
+    *(.rodata._ZZ*__PRETTY_FUNCTION__)
+    *(.rodata._ZZ*__func__)
 
     /* std::* exception strings, in their own section to allow string coalescing */
     *(.irom.exceptiontext)
@@ -161,38 +201,11 @@ SECTIONS
     _flash_code_end = ABSOLUTE(.);
   } >irom0_0_seg :irom0_0_phdr
 
-  .text : ALIGN(4)
+
+
+  .text1 : ALIGN(4)
   {
-    _stext = .;
-    _text_start = ABSOLUTE(.);
-     *(.UserEnter.text)
-    . = ALIGN(16);
-    *(.DebugExceptionVector.text)
-    . = ALIGN(16);
-    *(.NMIExceptionVector.text)
-    . = ALIGN(16);
-    *(.KernelExceptionVector.text)
-    LONG(0)
-    LONG(0)
-    LONG(0)
-    LONG(0)
-    . = ALIGN(16);
-    *(.UserExceptionVector.text)
-    LONG(0)
-    LONG(0)
-    LONG(0)
-    LONG(0)
-    . = ALIGN(16);
-    *(.DoubleExceptionVector.text)
-    LONG(0)
-    LONG(0)
-    LONG(0)
-    LONG(0)
-    . = ALIGN (16);
-    *(.entry.text)
-    *(.init.literal)
-    *(.init)
-    *(.literal .text .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+    *(.literal .text .iram.literal .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
 #ifdef VTABLES_IN_IRAM
     *(.rodata._ZTV*) /* C++ vtables */
 #endif

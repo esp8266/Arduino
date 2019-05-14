@@ -19,8 +19,10 @@ extern "C" {
 #include "lwip/igmp.h"
 #include "lwip/mem.h"
 #include "include/UdpContext.h"
-#include <ESP8266mDNS.h>
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
+#include <ESP8266mDNS.h>
+#endif
 
 #ifdef DEBUG_ESP_OTA
 #ifdef DEBUG_ESP_PORT
@@ -130,7 +132,8 @@ void ArduinoOTAClass::begin(bool useMDNS) {
   if(!_udp_ota->listen(IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
-
+  
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
   if(_useMDNS) {
     MDNS.begin(_hostname.c_str());
 
@@ -140,6 +143,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
       MDNS.enableArduino(_port);
     }
   }
+#endif
   _initialized = true;
   _state = OTA_IDLE;
 #ifdef OTA_DEBUG
@@ -361,8 +365,10 @@ void ArduinoOTAClass::handle() {
     _state = OTA_IDLE;
   }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
   if(_useMDNS)
     MDNS.update(); //handle MDNS update as well, given that ArduinoOTA relies on it anyways
+#endif
 }
 
 int ArduinoOTAClass::getCommand() {

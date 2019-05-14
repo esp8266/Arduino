@@ -65,6 +65,17 @@ jobs:
       env:
         - BUILD_PARITY=odd
 
+    - name: "Build lwIP-v1.4 (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build1.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build lwIP-v1.4 (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build1.sh
+      env:
+        - BUILD_PARITY=odd
+
     - name: "Host tests"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
@@ -92,6 +103,7 @@ jobs:
       stage: deploy
       script: tests/ci/build_package.sh
       env: BUILD_TYPE=package
+      before_deploy: git submodule update --init
       deploy:
       # Create Github release, upload artifacts
       - provider: releases

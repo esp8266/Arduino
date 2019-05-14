@@ -34,6 +34,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <ESP8266WebServer.h>
 #include <time.h>
 
 /*
@@ -72,9 +73,8 @@ char*                         pcHostDomain            = 0;        // Negociated 
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
-// TCP server at port 'SERVICE_PORT' will respond to HTTP requests
-WiFiServer                    server(SERVICE_PORT);
-
+// HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
+ESP8266WebServer              server(SERVICE_PORT);
 
 /*
    getTimeString
@@ -135,18 +135,13 @@ bool setStationHostname(const char* p_pcHostname) {
    This can be triggered by calling MDNS.announce().
 
 */
-bool MDNSDynamicServiceTxtCallback(MDNSResponder* p_pMDNSResponder,
-                                   const MDNSResponder::hMDNSService p_hService,
-                                   void* p_pUserdata) {
+void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService) {
   Serial.println("MDNSDynamicServiceTxtCallback");
-  (void) p_pUserdata;
 
-  if ((p_pMDNSResponder) &&
-      (hMDNSService == p_hService)) {
+  if (hMDNSService == p_hService) {
     Serial.printf("Updating curtime TXT item to: %s\n", getTimeString());
-    p_pMDNSResponder->addDynamicServiceTxt(p_hService, "curtime", getTimeString());
+    MDNS.addDynamicServiceTxt(p_hService, "curtime", getTimeString());
   }
-  return true;
 }
 
 
@@ -160,77 +155,47 @@ bool MDNSDynamicServiceTxtCallback(MDNSResponder* p_pMDNSResponder,
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
-                             const char* p_pcDomainName,
-                             const MDNSResponder::hMDNSService p_hService,
-                             bool p_bProbeResult,
-                             void* p_pUserdata) {
+void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
+
   Serial.println("MDNSProbeResultCallback");
-  (void) p_pUserdata;
+  Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
+  if (true == p_bProbeResult) {
+    // Set station hostname
+    setStationHostname(pcHostDomain);
 
-  if ((p_pMDNSResponder) &&
-      (0 == p_hService)) {  // Called for host domain
-    Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName, (p_bProbeResult ? "free" : "already USED!"));
-    if (true == p_bProbeResult) {
-      // Set station hostname
-      setStationHostname(pcHostDomain);
+    if (!bHostDomainConfirmed) {
+      // Hostname free -> setup clock service
+      bHostDomainConfirmed = true;
 
-      if (!bHostDomainConfirmed) {
-        // Hostname free -> setup clock service
-        bHostDomainConfirmed = true;
-
-        if (!hMDNSService) {
-          // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-          hMDNSService = p_pMDNSResponder->addService(0, "espclk", "tcp", SERVICE_PORT);
-          if (hMDNSService) {
-            // Add a simple static MDNS service TXT item
-            p_pMDNSResponder->addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
-            // Set the callback function for dynamic service TXTs
-            p_pMDNSResponder->setDynamicServiceTxtCallback(hMDNSService, MDNSDynamicServiceTxtCallback, 0);
-          }
+      if (!hMDNSService) {
+        // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
+        hMDNSService = MDNS.addService(0, "espclk", "tcp", SERVICE_PORT);
+        if (hMDNSService) {
+          // Add a simple static MDNS service TXT item
+          MDNS.addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
+          // Set the callback function for dynamic service TXTs
+          MDNS.setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
         }
       }
+    }
+  } else {
+    // Change hostname, use '-' as divider between base name and index
+    if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+      MDNS.setHostname(pcHostDomain);
     } else {
-      // Change hostname, use '-' as divider between base name and index
-      if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-        p_pMDNSResponder->setHostname(pcHostDomain);
-      } else {
-        Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-      }
+      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
     }
   }
-  return true;
 }
 
 
 /*
    handleHTTPClient
 */
-void handleHTTPClient(WiFiClient& client) {
+
+void handleHTTPRequest() {
   Serial.println("");
-  Serial.println("New client");
-
-  // Wait for data from client to become available
-  while (client.connected() && !client.available()) {
-    delay(1);
-  }
-
-  // Read the first line of HTTP request
-  String req = client.readStringUntil('\r');
-
-  // First line of HTTP request looks like "GET /path HTTP/1.1"
-  // Retrieve the "/path" part by finding the spaces
-  int addr_start = req.indexOf(' ');
-  int addr_end = req.indexOf(' ', addr_start + 1);
-  if (addr_start == -1 || addr_end == -1) {
-    Serial.print("Invalid request: ");
-    Serial.println(req);
-    return;
-  }
-  req = req.substring(addr_start + 1, addr_end);
-  Serial.print("Request: ");
-  Serial.println(req);
-  client.flush();
+  Serial.println("HTTP Request");
 
   // Get current time
   time_t now = time(nullptr);;
@@ -238,26 +203,17 @@ void handleHTTPClient(WiFiClient& client) {
   gmtime_r(&now, &timeinfo);
 
   String s;
-  if (req == "/") {
-    IPAddress ip = WiFi.localIP();
-    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ";
-    s += WiFi.hostname() + " at " + ipStr;
-    // Simple addition of the current time
-    s += "\r\nCurrent time is: ";
-    s += getTimeString();
-    // done :-)
-    s += "</html>\r\n\r\n";
-    Serial.println("Sending 200");
-  } else {
-    s = "HTTP/1.1 404 Not Found\r\n\r\n";
-    Serial.println("Sending 404");
-  }
-  client.print(s);
 
-  Serial.println("Done with client");
+  s = "<!DOCTYPE HTML>\r\n<html>Hello from ";
+  s += WiFi.hostname() + " at " + WiFi.localIP().toString();
+  // Simple addition of the current time
+  s += "\r\nCurrent time is: ";
+  s += getTimeString();
+  // done :-)
+  s += "</html>\r\n\r\n";
+  Serial.println("Sending 200");
+  server.send(200, "text/html", s);
 }
-
 
 /*
    setup
@@ -285,7 +241,7 @@ void setup(void) {
   setClock();
 
   // Setup MDNS responder
-  MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
+  MDNS.setHostProbeResultCallback(hostProbeResult);
   // Init the (currently empty) host domain string with 'esp8266'
   if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
       (!MDNS.begin(pcHostDomain))) {
@@ -296,27 +252,23 @@ void setup(void) {
   }
   Serial.println("MDNS responder started");
 
-  // Start TCP (HTTP) server
+  // Setup HTTP server
+  server.on("/", handleHTTPRequest);
   server.begin();
-  Serial.println("TCP server started");
+  Serial.println("HTTP server started");
 }
-
 
 /*
    loop
 */
 void loop(void) {
-  // Check if a client has connected
-  WiFiClient    client = server.available();
-  if (client) {
-    handleHTTPClient(client);
-  }
 
+  // Check if a request has come in
+  server.handleClient();
   // Allow MDNS processing
   MDNS.update();
 
-  // Update time (if needed)
-  static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
+  static esp8266::polledTimeout::periodicMs timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
 
     if (hMDNSService) {
@@ -326,5 +278,3 @@ void loop(void) {
     }
   }
 }
-
-
