@@ -137,6 +137,7 @@ SECTIONS
     *(.ver_number)
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, EXCLUDE_FILE (umm_malloc.c.o) .text* )
     *.cpp.o(.literal*, .text*)
+    *.cc.o(.literal*, .text*)
 #ifdef VTABLES_IN_FLASH
     *(.rodata._ZTV*) /* C++ vtables */
 #endif
