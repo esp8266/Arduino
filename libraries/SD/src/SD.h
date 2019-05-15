@@ -115,8 +115,8 @@ public:
         return blocksPerCluster() * blockSize();
     }
 
-    size_t size() {
-        return (clusterSize() * totalClusters());
+    uint64_t size() {
+        return ((uint64_t)clusterSize() * (uint64_t)totalClusters());
     }
 
 private:
