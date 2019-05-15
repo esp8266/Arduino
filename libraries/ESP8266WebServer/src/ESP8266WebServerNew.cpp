@@ -512,7 +512,7 @@ void ESP8266WebServer::_prepareHeader(String& response, HTTPStatus code, const c
 	response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
 	response += String(code);
 	response += ' ';
-	response += _responseCodeToString(code);
+	response += responseCodeToString(code);
 	response += "\r\n";
 
 	using namespace mime;
@@ -768,7 +768,7 @@ void ESP8266WebServer::_finalizeResponse() {
 ////////////////////////////////////////////////////////////////////////////////
 // ??
 ////////////////////////////////////////////////////////////////////////////////
-String ESP8266WebServer::_responseCodeToString(HTTPStatus code) {
+String ESP8266WebServer::responseCodeToString(HTTPStatus code) {
 	switch (code) {
 		case HTTP_CONTINUE:				return F("Continue");
 		case HTTP_SWITCH_PROTO:			return F("Switching Protocols");

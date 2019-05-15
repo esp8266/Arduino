@@ -146,7 +146,7 @@ protected:
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
-  static const String _responseCodeToString(int code);
+  static const String responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, const String& boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);

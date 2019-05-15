@@ -227,7 +227,7 @@ protected:
 	void _handleRequest();
 	void _finalizeResponse();
 	HTTPStatus _parseRequest(WiFiClient& client);
-	static String _responseCodeToString(HTTPStatus code);
+	static String responseCodeToString(HTTPStatus code);
 
 	//THIS IS A RESPONSE HEADER, NOT A REQUEST HEADER
 	void _prepareHeader(String& response, HTTPStatus code, const char* content_type, size_t contentLength);
