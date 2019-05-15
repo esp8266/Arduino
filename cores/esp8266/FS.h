@@ -54,6 +54,10 @@ public:
     // Print methods:
     size_t write(uint8_t) override;
     size_t write(const uint8_t *buf, size_t size) override;
+    // Enable silent promotion of char->uint8_t for backward compatibilty with File::write('a');
+    size_t write(char c) {
+        return write((uint8_t) c);
+    }
 
     // Stream methods:
     int available() override;
