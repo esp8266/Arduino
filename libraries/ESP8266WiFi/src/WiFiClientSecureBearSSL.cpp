@@ -255,7 +255,7 @@ bool WiFiClientSecure::_clientConnected() {
 }
 
 uint8_t WiFiClientSecure::connected() {
-  if (available() || (_clientConnected() && _handshake_done)) {
+  if (available() || (_clientConnected() && _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED))) {
     return true;
   }
   return false;
@@ -1003,6 +1003,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     DEBUG_BSSL("Connected!\n");
   }
 #endif
+
+  // Session is already validated here, there is no need to keep following
+  _x509_minimal = nullptr;
+  _x509_insecure = nullptr;
+  _x509_knownkey = nullptr;
+
   return ret;
 }
 
