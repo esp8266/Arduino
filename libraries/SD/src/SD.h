@@ -115,7 +115,12 @@ public:
         return blocksPerCluster() * blockSize();
     }
 
-    uint64_t size() {
+    size_t size() {
+        uint64_t sz = size64();
+	return (size_t)std::min( (uint64_t)SIZE_MAX, sz );
+    }
+
+    uint64_t size64() {
         return ((uint64_t)clusterSize() * (uint64_t)totalClusters());
     }
 
