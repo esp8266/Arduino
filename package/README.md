@@ -65,6 +65,8 @@ Here is an overview of the release process. See the section below for detailed i
 
 ## Creating a release (for maintainers)
 
+0. Open a new issue to track activities, which will be closed after the release is done.
+
 1. Assemble release notes.
 
     * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
@@ -113,11 +115,17 @@ The following points assume work in a direct clone of the repository, and not in
    git tag -a -m "Release 2.5.0" 2.5.0
    ```
 
-4. Push the tag created in step 3 to esp8266/Arduino Github repository:
+   then push the tag created in step 3 to esp8266/Arduino Github repository:
 
    ```
    git push origin 2.5.0
    ```
+
+4. In case something goes wrong, release can be canceled at any time:
+
+    * Tag must be removed (`git tag -d X.Y.Z; git push --delete origin X.Y.Z`)
+
+    * Release must be deleted: github > releases > edit x.y.z > remove all files > delete button appears
 
 5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds. 
 
