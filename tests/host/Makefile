@@ -268,12 +268,11 @@ ARDUINO_LIBS := \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-	) \
-	ArduinoOTA/ArduinoOTA.cpp \
-	DNSServer/src/DNSServer.cpp \
-	ESP8266AVRISP/src/ESP8266AVRISP.cpp \
-	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-)
+		ArduinoOTA/ArduinoOTA.cpp \
+		DNSServer/src/DNSServer.cpp \
+		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
+		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+	)
 
 MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	ClientContextSocket.cpp \
