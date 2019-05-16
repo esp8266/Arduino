@@ -117,7 +117,12 @@ public:
 
     size_t size() {
         uint64_t sz = size64();
-	return (size_t)std::min( (uint64_t)SIZE_MAX, sz );
+	if (sz > (uint64_t)SIZE_MAX) {
+            Serial.printf_P(PSTR("WARNING: SD card size overflow (>= 4GB).  Please update source to use size64().  Returning 0.\n"));
+            return 0;
+        } else {
+            return sz;
+        }
     }
 
     uint64_t size64() {
