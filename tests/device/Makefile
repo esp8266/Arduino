@@ -4,10 +4,12 @@ TEST_LIST ?= $(wildcard test_*/*.ino)
 ESP8266_CORE_PATH ?= ../..
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
-ESPTOOL ?= $(ESP8266_CORE_PATH)/tools/esptool/esptool
+#PYTHON ?= python3
+PYTHON ?= python
+ESPTOOL ?= $(PYTHON) $(ESP8266_CORE_PATH)/tools/esptool/esptool.py
 MKSPIFFS ?= $(ESP8266_CORE_PATH)/tools/mkspiffs/mkspiffs
 UPLOAD_PORT ?= $(shell ls /dev/tty* | grep -m 1 -i USB)
-UPLOAD_BAUD ?= 921600
+UPLOAD_BAUD ?= 460800
 UPLOAD_BOARD ?= nodemcu
 BS_DIR ?= libraries/BSTest
 DEBUG_LEVEL ?= DebugLevel=None____
@@ -24,7 +26,7 @@ ifneq ("$(V)","1")
 else
 	BUILDER_DEBUG_FLAG = -verbose
 	RUNNER_DEBUG_FLAG = -d
-	UPLOAD_VERBOSE_FLAG = -v
+	#UPLOAD_VERBOSE_FLAG = -v
 endif
 
 
@@ -57,28 +59,34 @@ endif
 ifneq ("$(NO_UPLOAD)","1")
 	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
 	@test -e $(dir $@)/make_spiffs.py && (echo "Generating and uploading SPIFFS" && \
-		(cd $(dir $@) && python ./make_spiffs.py) && \
-		$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
+		(cd $(dir $@) && $(PYTHON) ./make_spiffs.py) && \
+		$(SILENT)$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
 			--block 8192 --page 256 $(LOCAL_BUILD_DIR)/spiffs.img && \
-		$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
-			-cp $(UPLOAD_PORT) \
-			-cb $(UPLOAD_BAUD) \
-			-cd $(UPLOAD_BOARD) \
-			-ca 0x300000 \
-			-cf $(LOCAL_BUILD_DIR)/spiffs.img ) || (echo "No SPIFFS to upload")
+		$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
+			--chip esp8266 \
+			--port $(UPLOAD_PORT) \
+			--baud $(UPLOAD_BAUD) \
+			--after no_reset \
+			write_flash 0x300000 $(LOCAL_BUILD_DIR)/spiffs.img ) \
+			|| (echo "No SPIFFS to upload")
 	@echo Uploading binary
 	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG)  \
-		-cp $(UPLOAD_PORT) \
-		-cb $(UPLOAD_BAUD) \
-		-cd $(UPLOAD_BOARD) \
-		-cf $(LOCAL_BUILD_DIR)/$(notdir $@).bin
+		--chip esp8266 \
+		--port $(UPLOAD_PORT) \
+		--baud $(UPLOAD_BAUD) \
+		--after no_reset \
+		write_flash 0x0 $(LOCAL_BUILD_DIR)/$(notdir $@).bin # no reset
 endif
 ifneq ("$(NO_RUN)","1")
 	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
 	@echo Running tests
-	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) -cp $(UPLOAD_PORT) -cd $(UPLOAD_BOARD) -cr
+	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG)  \
+		--chip esp8266 \
+		--port $(UPLOAD_PORT) \
+		--baud $(UPLOAD_BAUD) \
+		read_flash_status # reset
 	@source $(BS_DIR)/virtualenv/bin/activate && \
-		python $(BS_DIR)/runner.py \
+		$(PYTHON) $(BS_DIR)/runner.py \
 			$(RUNNER_DEBUG_FLAG) \
 			-p $(UPLOAD_PORT) \
 			-n $(basename $(notdir $@)) \
@@ -88,10 +96,10 @@ ifneq ("$(NO_RUN)","1")
 endif
 
 $(TEST_REPORT_XML): $(HARDWARE_DIR) virtualenv
-	@$(BS_DIR)/virtualenv/bin/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
+	$(SILENT)$(BS_DIR)/virtualenv/bin/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
 
 $(TEST_REPORT_HTML): $(TEST_REPORT_XML) | virtualenv
-	@$(BS_DIR)/virtualenv/bin/junit2html $< $@
+	$(SILENT)$(BS_DIR)/virtualenv/bin/junit2html $< $@
 
 test_report: $(TEST_REPORT_HTML)
 	@echo "Test report generated in $(TEST_REPORT_HTML)"
@@ -104,12 +112,16 @@ $(HARDWARE_DIR):
 	cd $(HARDWARE_DIR)/esp8266com && ln -s $(realpath $(ESP8266_CORE_PATH)) esp8266
 
 virtualenv:
-	@make -C $(BS_DIR) virtualenv
+	@make -C $(BS_DIR) PYTHON=$(PYTHON) virtualenv
 
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(HARDWARE_DIR)
 	rm -f $(TEST_REPORT_HTML) $(TEST_REPORT_XML)
+
+distclean: clean
+	rm -rf libraries/BSTest/virtualenv/
+	find . -name "*pyc" -exec rm -f {} \;
 
 $(TEST_CONFIG):
 	@echo "******    "
