@@ -455,7 +455,7 @@ protected:
                 break;
             }
 
-            ++_send_waiting;
+            _send_waiting = 1;
             esp_yield();
         } while(true);
         _send_waiting = 0;
