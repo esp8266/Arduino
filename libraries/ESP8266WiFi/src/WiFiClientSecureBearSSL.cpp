@@ -248,6 +248,7 @@ void WiFiClientSecure::_freeSSL() {
   _recvapp_len = 0;
   // This connection is toast
   _handshake_done = false;
+  _timeout = 15000;
 }
 
 bool WiFiClientSecure::_clientConnected() {
