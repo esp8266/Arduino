@@ -48,9 +48,9 @@ Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.1/](https://arduin
     ```bash
     cd <application-directory>/Arduino.app/Contents/Java
     ```
-  - For Linux, it is ~/arduino by default.
+  - For Linux, it is ~/Arduino by default.
     ```bash
-    cd ~arduino
+    cd ~/Arduino
     ```
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash

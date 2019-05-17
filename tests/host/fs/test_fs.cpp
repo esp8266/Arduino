@@ -148,7 +148,6 @@ TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
     f.write("append", 6);
     f.close();
     REQUIRE(readFile("/file.txt") == "aAbbcctheendxyz@@@@append");
-
     File g = SD.open("/file2.txt", FILE_WRITE);
     g.write(0);
     g.close();
