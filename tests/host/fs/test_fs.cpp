@@ -24,7 +24,7 @@
 #include "../../../libraries/SDFS/src/SDFS.h"
 #include "../../../libraries/SD/src/SD.h"
 
-#if 1
+
 namespace spiffs_test {
 #define FSTYPE SPIFFS
 #define TESTPRE "SPIFFS - "
@@ -90,7 +90,7 @@ TEST_CASE("LittleFS checks the config object passed in", "[fs]")
 }
 
 };
-#endif
+
 namespace sdfs_test {
 #define FSTYPE SDFS
 #define TESTPRE "SDFS - "
@@ -123,6 +123,40 @@ TEST_CASE("SDFS checks the config object passed in", "[fs]")
     REQUIRE_FALSE(SDFS.setConfig(s));
     REQUIRE(SDFS.setConfig(d));
     REQUIRE_FALSE(SDFS.setConfig(l));
+}
+
+// Also a SD specific test to check that FILE_OPEN is really an append operation:
+
+TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
+{
+    SDFS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(SDFS.begin());
+    REQUIRE(SD.begin(4));
+
+    File f = SD.open("/file.txt", FILE_WRITE);
+    f.write('a');
+    f.write(65);
+    f.write("bbcc");
+    f.write("theend", 6);
+    char block[3]={'x','y','z'};
+    f.write(block, 3);
+    uint32_t bigone = 0x40404040;
+    f.write((const uint8_t*)&bigone, 4);
+    f.close();
+    REQUIRE(readFile("/file.txt") == "aAbbcctheendxyz@@@@");
+    f = SD.open("/file.txt", FILE_WRITE);
+    f.write("append", 6);
+    f.close();
+    REQUIRE(readFile("/file.txt") == "aAbbcctheendxyz@@@@append");
+
+    File g = SD.open("/file2.txt", FILE_WRITE);
+    g.write(0);
+    g.close();
+    g = SD.open("/file2.txt", FILE_READ);
+    uint8_t u = 0x66;
+    g.read(&u, 1);
+    g.close();
+    REQUIRE(u == 0);
 }
 
 };
