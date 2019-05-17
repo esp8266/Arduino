@@ -27,7 +27,7 @@
 #undef FILE_READ
 #define FILE_READ sdfat::O_READ
 #undef FILE_WRITE
-#define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT)
+#define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT | sdfat::O_APPEND)
 
 class SDClass {
 public:
