@@ -456,7 +456,7 @@ protected:
             }
 
             _send_waiting = true;
-            esp_yield();
+            delay(_timeout_ms);
         } while(true);
         _send_waiting = false;
 
