@@ -350,10 +350,10 @@ TEST_CASE("Multisplendored File::writes", "[fs]")
     f.write((const uint8_t*)&bigone, 4);
     f.close();
     REQUIRE(readFileSD("/file.txt") == "aAbbcctheendxyz@@@@");
-    File g = SD.open("/file.txt", FILE_WRITE);
+    File g = SD.open("/file2.txt", FILE_WRITE);
     g.write(0);
     g.close();
-    g = SD.open("/file.txt", FILE_READ);
+    g = SD.open("/file2.txt", FILE_READ);
     uint8_t u = 0x66;
     g.read(&u, 1);
     g.close();
