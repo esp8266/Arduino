@@ -117,12 +117,12 @@ public:
 
     size_t size() {
         uint64_t sz = size64();
+#ifdef DEBUG_ESP_PORT
 	if (sz > (uint64_t)SIZE_MAX) {
-            Serial.printf_P(PSTR("WARNING: SD card size overflow (>= 4GB).  Please update source to use size64().  Returning 0.\n"));
-            return 0;
-        } else {
-            return sz;
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use size64().\n"), sz);
         }
+#endif
+        return (size_t)sz;
     }
 
     uint64_t size64() {
