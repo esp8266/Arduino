@@ -69,6 +69,8 @@ class Print {
         size_t write(unsigned int t) { return write((uint8_t)t); }
         size_t write(long t) { return write((uint8_t)t); }
         size_t write(unsigned long t) { return write((uint8_t)t); }
+        // Enable write(char) to fall through to write(uint8_t)
+        size_t write(char c) { return write((uint8_t) c); }
 
         size_t printf(const char * format, ...)  __attribute__ ((format (printf, 2, 3)));
         size_t printf_P(PGM_P format, ...) __attribute__((format(printf, 2, 3)));
