@@ -456,7 +456,8 @@ protected:
             }
 
             _send_waiting = true;
-            esp_yield();
+            // This delay will be interrupted by esp_schedule on next received ack
+            delay(_timeout_ms);
         } while(true);
         _send_waiting = false;
 
