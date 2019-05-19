@@ -433,7 +433,7 @@ bool UpdaterClass::_verifyEnd() {
     return false;
 }
 
-size_t UpdaterClass::writeStream(Stream &data) {
+size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
     size_t written = 0;
     size_t toRead = 0;
     if(hasError() || !isRunning())
@@ -446,6 +446,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
         _reset();
         return 0;
     }
+    unsigned long timeout = millis();
     if (_progress_callback) {
         _progress_callback(0, _size);
     }
@@ -463,14 +464,15 @@ size_t UpdaterClass::writeStream(Stream &data) {
         }
         toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
-            delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
-            if(toRead == 0) { //Timeout
-                _currentAddress = (_startAddress + _size);
-                _setError(UPDATE_ERROR_STREAM);
-                _reset();
-                return written;
-            }
+          if (millis() - timeout > streamTimeout) {
+            _currentAddress = (_startAddress + _size);
+            _setError(UPDATE_ERROR_STREAM);
+            _reset();
+            return written;
+          }
+          delay(100);
+        } else {
+          timeout = millis();
         }
         if(_ledPin != -1) {
             digitalWrite(_ledPin, !_ledOn); // Switch LED off
