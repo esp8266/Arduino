@@ -227,6 +227,8 @@ size_t Stream::readBytesUntil(char terminator, char *buffer, size_t length) {
     size_t index = 0;
     while(index < length) {
         int c = timedRead();
+        if (c == '\r')
+            continue;
         if(c < 0 || c == terminator)
             break;
         *buffer++ = (char) c;
@@ -249,7 +251,8 @@ String Stream::readStringUntil(char terminator) {
     String ret;
     int c = timedRead();
     while(c >= 0 && c != terminator) {
-        ret += (char) c;
+        if (c != '\r')
+            ret += (char) c;
         c = timedRead();
     }
     return ret;
