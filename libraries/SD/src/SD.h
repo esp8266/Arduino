@@ -84,19 +84,23 @@ public:
     }
 
     uint8_t type() {
-        return 0;//card.type();
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->type();
     }
 
     uint8_t fatType() {
-        return 0;//volume.fatType();
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->fatType();
     }
 
     size_t blocksPerCluster() {
-        return 0;//volume.blocksPerCluster();
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->blocksPerCluster();
     }
 
     size_t totalClusters() {
-        return 0;//volume.clusterCount();
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->totalClusters();
     }
 
     size_t blockSize() {
@@ -104,15 +108,25 @@ public:
     }
 
     size_t totalBlocks() {
-        return 0;//(totalClusters() / blocksPerCluster());
+        return (totalClusters() / blocksPerCluster());
     }
 
     size_t clusterSize() {
-        return 0;//blocksPerCluster() * blockSize();
+        return blocksPerCluster() * blockSize();
     }
 
     size_t size() {
-        return 0;//(clusterSize() * totalClusters());
+        uint64_t sz = size64();
+#ifdef DEBUG_ESP_PORT
+	if (sz > (uint64_t)SIZE_MAX) {
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use size64().\n"), sz);
+        }
+#endif
+        return (size_t)sz;
+    }
+
+    uint64_t size64() {
+        return ((uint64_t)clusterSize() * (uint64_t)totalClusters());
     }
 
 private:
