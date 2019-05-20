@@ -248,6 +248,7 @@ void WiFiClientSecure::_freeSSL() {
   _recvapp_len = 0;
   // This connection is toast
   _handshake_done = false;
+  _timeout = 15000;
 }
 
 bool WiFiClientSecure::_clientConnected() {
@@ -1008,6 +1009,9 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
   _x509_minimal = nullptr;
   _x509_insecure = nullptr;
   _x509_knownkey = nullptr;
+
+  // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
+  if (ret) _timeout = 5000;
 
   return ret;
 }

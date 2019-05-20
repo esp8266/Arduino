@@ -133,7 +133,8 @@ TEST_CPP_FILES := \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp \
-	core/test_PolledTimeout.cpp
+	core/test_PolledTimeout.cpp \
+	core/test_Print.cpp
 
 PREINCLUDES := \
 	-include common/mock.h \

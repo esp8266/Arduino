@@ -24,6 +24,8 @@
 #include <memory>
 #include <Arduino.h>
 
+class SDClass;
+
 namespace fs {
 
 class File;
@@ -208,8 +210,10 @@ public:
 
     bool gc();
 
+    friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
     FSImplPtr _impl;
+    FSImplPtr getImpl() { return _impl; }
 };
 
 } // namespace fs

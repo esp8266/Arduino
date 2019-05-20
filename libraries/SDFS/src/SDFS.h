@@ -159,6 +159,30 @@ public:
 
     bool format() override;
 
+    // The following are not common FS interfaces, but are needed only to
+    // support the older SD.h exports
+    uint8_t type() {
+        return _fs.card()->type();
+    }
+    uint8_t fatType() {
+        return _fs.vol()->fatType();
+    }
+    size_t blocksPerCluster() {
+        return _fs.vol()->blocksPerCluster();
+    }
+    size_t totalClusters() {
+        return _fs.vol()->clusterCount();
+    }
+    size_t totalBlocks() {
+        return (totalClusters() / blocksPerCluster());
+    }
+    size_t clusterSize() {
+        return blocksPerCluster() * 512; // 512b block size
+    }
+    size_t size() {
+        return (clusterSize() * totalClusters());
+    }
+
 protected:
     friend class SDFileImpl;
     friend class SDFSDirImpl;
