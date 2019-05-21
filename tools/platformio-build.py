@@ -135,16 +135,16 @@ env.Append(
         ElfToBin=Builder(
             action=env.VerboseAction(" ".join([
                 '"$PYTHONEXE"',
-                '"%s"' % env.subst(join(FRAMEWORK_DIR, "tools", "elf2bin.py")),
-                "--eboot", '"%s"' % env.subst(join(
-                    FRAMEWORK_DIR, "bootloaders", "eboot", "eboot.elf")),
-                "--app", '"%s"' % "$SOURCE",
+                '"%s"' % join(FRAMEWORK_DIR, "tools", "elf2bin.py"),
+                "--eboot", '"%s"' % join(
+                    FRAMEWORK_DIR, "bootloaders", "eboot", "eboot.elf"),
+                "--app", "$SOURCE",
                 "--flash_mode", "$BOARD_FLASH_MODE",
                 "--flash_freq", "${__get_board_f_flash(__env__)}",
                 "--flash_size", "${__get_flash_size(__env__)}",
-                "--path", '"%s"' % env.subst(join(
-                    platform.get_package_dir("toolchain-xtensa"), "bin")),
-                "--out", '"$TARGET"'
+                "--path", '"%s"' % join(
+                    platform.get_package_dir("toolchain-xtensa"), "bin"),
+                "--out", "$TARGET"
             ]), "Building $TARGET"),
             suffix=".bin"
         )
