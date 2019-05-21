@@ -90,8 +90,8 @@ bool schedule_function(std::function<void(void)> fn)
 
 void run_scheduled_functions()
 {
-	scheduled_fn_t* lastRecurring = nullptr;
-	scheduled_fn_t* toCall = sFirst;
+    scheduled_fn_t* lastRecurring = nullptr;
+    scheduled_fn_t* toCall = sFirst;
     while (toCall) {
         scheduled_fn_t* item = toCall;
         toCall = item->mNext;
