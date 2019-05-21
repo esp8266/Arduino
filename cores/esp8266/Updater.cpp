@@ -3,6 +3,7 @@
 #include "eboot_command.h"
 #include <interrupts.h>
 #include <esp8266_peri.h>
+#include <PolledTimeout.h>
 
 //#define DEBUG_UPDATER Serial
 
@@ -446,7 +447,7 @@ size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
         _reset();
         return 0;
     }
-    unsigned long timeout = millis();
+    esp8266::polledTimeout::oneShotMs timeOut(streamTimeout);
     if (_progress_callback) {
         _progress_callback(0, _size);
     }
@@ -464,7 +465,7 @@ size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
         }
         toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
-          if (millis() - timeout > streamTimeout) {
+          if (timeOut) {
             _currentAddress = (_startAddress + _size);
             _setError(UPDATE_ERROR_STREAM);
             _reset();
@@ -472,7 +473,7 @@ size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
           }
           delay(100);
         } else {
-          timeout = millis();
+          timeOut.reset();
         }
         if(_ledPin != -1) {
             digitalWrite(_ledPin, !_ledOn); // Switch LED off
