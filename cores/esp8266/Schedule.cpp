@@ -105,7 +105,7 @@ void run_scheduled_functions()
     while (toCall)
     {
         scheduled_fn_t* item = toCall;
-        toCall = item->mNext;
+        toCall = toCall->mNext;
         if (item->callNow)
         {
             if (item->mFunc())
