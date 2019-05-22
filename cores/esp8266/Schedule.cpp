@@ -1,3 +1,6 @@
+
+#include <assert.h>
+
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
@@ -22,22 +25,24 @@ static scheduled_fn_t* sLastUnused = 0;
 static int sCount = 0;
 
 IRAM_ATTR // called from ISR
-static scheduled_fn_t* get_fn() {
-    InterruptLock lockAllInterruptsInThisScope;
-
-    scheduled_fn_t* result = NULL;
+static scheduled_fn_t* get_fn_unsafe()
+{
+    scheduled_fn_t* result = nullptr;
     // try to get an item from unused items list
-    if (sFirstUnused) {
+    if (sFirstUnused)
+    {
         result = sFirstUnused;
-        sFirstUnused = result->mNext;
-        if (sFirstUnused == NULL) {
-            sLastUnused = NULL;
+        sFirstUnused = sFirstUnused->mNext;
+        if (sFirstUnused == nullptr)
+        {
+            sLastUnused = nullptr;
         }
     }
     // if no unused items, and count not too high, allocate a new one
-    else if (sCount != SCHEDULED_FN_MAX_COUNT) {
+    else if (sCount != SCHEDULED_FN_MAX_COUNT)
+    {
         result = new scheduled_fn_t;
-        result->mNext = NULL;
+        result->mNext = nullptr;
         ++sCount;
     }
     return result;
@@ -47,37 +52,39 @@ static void recycle_fn(scheduled_fn_t* fn)
 {
     InterruptLock lockAllInterruptsInThisScope;
 
-    if (!sLastUnused) {
+    if (!sLastUnused)
+    {
         sFirstUnused = fn;
     }
-    else {
+    else
+    {
         sLastUnused->mNext = fn;
     }
-    fn->mNext = NULL;
+    fn->mNext = nullptr;
     sLastUnused = fn;
 }
 
 IRAM_ATTR // called from ISR
 bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
 {
+    assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //26800000us (26.8s)
+
     InterruptLock lockAllInterruptsInThisScope;
 
-    scheduled_fn_t* item = get_fn();
-    if (!item) {
+    scheduled_fn_t* item = get_fn_unsafe();
+    if (!item)
         return false;
-    }
-    item->mFunc = fn;
-    item->mNext = NULL;
-    if (!sFirst) {
-        sFirst = item;
-    }
-    else {
-        sLast->mNext = item;
-    }
-    sLast = item;
 
     if (repeat_us)
         item->callNow.reset(repeat_us);
+
+    item->mFunc = fn;
+    item->mNext = nullptr;
+    if (sFirst)
+        sLast->mNext = item;
+    else
+        sFirst = item;
+    sLast = item;
 
     return true;
 }
@@ -90,9 +97,16 @@ bool schedule_function(std::function<void(void)> fn)
 
 void run_scheduled_functions()
 {
+    // Note to the reader:
+    // There is no exposed API to remove a scheduled function:
+    // Scheduled functions are removed in this function, and
+    // its purpose is that it is never called from an interrupt /
+    // always called from cont stack.
+
     scheduled_fn_t* lastRecurring = nullptr;
     scheduled_fn_t* toCall = sFirst;
-    while (toCall) {
+    while (toCall)
+    {
         scheduled_fn_t* item = toCall;
         toCall = item->mNext;
         if (item->callNow)
