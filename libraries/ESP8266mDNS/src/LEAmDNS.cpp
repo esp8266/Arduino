@@ -97,14 +97,14 @@ bool MDNSResponder::begin(const char* p_pcHostname) {
             m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
                 (void) pEvent;
                 // Ensure that _restart() runs in USER context
-				schedule_function([this]() { MDNSResponder::_restart(); });
+                schedule_function([this]() { MDNSResponder::_restart(); });
             });
 
             m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
                 (void) pEvent;
                 // Ensure that _restart() runs in USER context
-				schedule_function([this]() { MDNSResponder::_restart(); });
-				});
+                schedule_function([this]() { MDNSResponder::_restart(); });
+                });
 
             bResult = _restart();
         }
@@ -137,10 +137,10 @@ bool MDNSResponder::begin(const char* p_pcHostname,
  */
 bool MDNSResponder::close(void) {
     
-	m_GotIPHandler.reset();			// reset WiFi event callbacks.
-	m_DisconnectedHandler.reset();
+    m_GotIPHandler.reset();			// reset WiFi event callbacks.
+    m_DisconnectedHandler.reset();
 
-	_announce(false, true);
+    _announce(false, true);
     _resetProbeStatus(false);   // Stop probing
 
     _releaseServiceQueries();
@@ -159,7 +159,7 @@ bool MDNSResponder::close(void) {
  */
 
 bool MDNSResponder::end(void) {
-	return close();
+    return close();
 }
 
 /*
@@ -832,11 +832,11 @@ uint32_t MDNSResponder::answerCount(const MDNSResponder::hMDNSServiceQuery p_hSe
 
 std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo (const MDNSResponder::hMDNSServiceQuery p_hServiceQuery) {
     std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
-	for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
+    for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
     {
-		tempVector.emplace_back(*this,p_hServiceQuery,i);
+        tempVector.emplace_back(*this,p_hServiceQuery,i);
     }
-	return tempVector;
+    return tempVector;
 }
 
 /*
@@ -1053,14 +1053,14 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
  */
 bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeFn p_fnCallback) {
 
-	m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
+    m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
     
     return true;
 }
 
 bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn) {
-	using namespace std::placeholders;
-	return setHostProbeResultCallback([obj=std::ref(*this), pfn](const char* _1, bool _2) { pfn(obj, _1, _2); });
+    using namespace std::placeholders;
+    return setHostProbeResultCallback([obj=std::ref(*this), pfn](const char* _1, bool _2) { pfn(obj, _1, _2); });
 }
 
 /*
@@ -1088,8 +1088,8 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
 
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
                                                   MDNSResponder::MDNSServiceProbeFn1 p_fnCallback) {
-	using namespace std::placeholders;
-	return setServiceProbeResultCallback(p_hService, [obj=std::ref(*this), p_fnCallback](const char* _1, const hMDNSService _2, bool _3) { p_fnCallback(obj, _1, _2, _3); });
+    using namespace std::placeholders;
+    return setServiceProbeResultCallback(p_hService, [obj=std::ref(*this), p_fnCallback](const char* _1, const hMDNSService _2, bool _3) { p_fnCallback(obj, _1, _2, _3); });
 }
 
 
