@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.1/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -36,7 +36,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.1/](https://arduino-esp8266.readthedocs.io/en/2.5.1/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.2/](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
 
 ### Using git version (basic instructions)
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -48,9 +48,9 @@ Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.1/](https://arduin
     ```bash
     cd <application-directory>/Arduino.app/Contents/Java
     ```
-  - For Linux, it is ~/arduino by default.
+  - For Linux, it is ~/Arduino by default.
     ```bash
-    cd ~arduino
+    cd ~/Arduino
     ```
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
