@@ -50,14 +50,10 @@ static void recycle_fn(scheduled_fn_t* fn)
 {
     InterruptLock lockAllInterruptsInThisScope;
 
-    if (!sLastUnused)
-    {
-        sFirstUnused = fn;
-    }
-    else
-    {
+    if (sLastUnused)
         sLastUnused->mNext = fn;
-    }
+    else
+        sFirstUnused = fn;
     fn->mNext = nullptr;
     sLastUnused = fn;
 }
@@ -65,7 +61,7 @@ static void recycle_fn(scheduled_fn_t* fn)
 IRAM_ATTR // called from ISR
 bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
 {
-    assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //26800000us (26.8s)
+    assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
     InterruptLock lockAllInterruptsInThisScope;
 
@@ -96,9 +92,9 @@ void run_scheduled_functions()
 {
     // Note to the reader:
     // There is no exposed API to remove a scheduled function:
-    // Scheduled functions are removed in this function, and
-    // its purpose is that it is never called from an interrupt /
-    // always called from cont stack.
+    // Scheduled functions are removed only from this function, and
+    // its purpose is that it is never called from an interrupt
+    // (always on cont stack).
 
     scheduled_fn_t* lastRecurring = nullptr;
     scheduled_fn_t* toCall = sFirst;
