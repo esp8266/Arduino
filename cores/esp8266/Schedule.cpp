@@ -34,17 +34,15 @@ static scheduled_fn_t* get_fn_unsafe()
         result = sFirstUnused;
         sFirstUnused = sFirstUnused->mNext;
         if (sFirstUnused == nullptr)
-        {
             sLastUnused = nullptr;
-        }
     }
     // if no unused items, and count not too high, allocate a new one
     else if (sCount != SCHEDULED_FN_MAX_COUNT)
     {
         result = new scheduled_fn_t;
-        result->mNext = nullptr;
         ++sCount;
     }
+    result->mNext = nullptr;
     return result;
 }
 
@@ -79,7 +77,6 @@ bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
         item->callNow.reset(repeat_us);
 
     item->mFunc = fn;
-    item->mNext = nullptr;
     if (sFirst)
         sLast->mNext = item;
     else
@@ -120,7 +117,7 @@ void run_scheduled_functions()
                 {
                     InterruptLock lockAllInterruptsInThisScope;
                     if (sFirst == item)
-                        sFirst = item->mNext;
+                        sFirst = sFirst->mNext;
                     if (sLast == item)
                         sLast = lastRecurring;
                 }
