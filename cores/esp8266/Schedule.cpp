@@ -103,8 +103,12 @@ void run_scheduled_functions()
             else
             {
                 InterruptLock lockAllInterruptsInThisScope;
+
                 if (sFirst == item)
                     sFirst = sFirst->mNext;
+                else if (lastRecurring)
+                    lastRecurring->mNext = item->mNext;
+
                 if (sLast == item)
                     sLast = lastRecurring;
 
