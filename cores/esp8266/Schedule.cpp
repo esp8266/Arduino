@@ -51,7 +51,7 @@ static void recycle_fn_unsafe(scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // called from ISR
-bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
+bool schedule_function_us(const mFuncT& fn, uint32_t repeat_us)
 {
     assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -75,9 +75,9 @@ bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
 }
 
 IRAM_ATTR // called from ISR
-bool schedule_function(std::function<void(void)> fn)
+bool schedule_function(const std::function<void(void)>& fn)
 {
-    return schedule_function_us([&fn](){ fn(); return false; }, 0);
+    return schedule_function_us([fn](){ fn(); return false; }, 0);
 }
 
 void run_scheduled_functions()
