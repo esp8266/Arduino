@@ -9,11 +9,11 @@ typedef std::function<bool(void)> mFuncT;
 
 struct scheduled_fn_t
 {
-    scheduled_fn_t* mNext;
+    scheduled_fn_t* mNext = nullptr;
     mFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
 
-    scheduled_fn_t(): callNow(esp8266::polledTimeout::periodicFastUs::alwaysExpired) { }
+    scheduled_fn_t() : callNow(esp8266::polledTimeout::periodicFastUs::alwaysExpired) { }
 };
 
 static scheduled_fn_t* sFirst = nullptr;
@@ -32,6 +32,7 @@ static scheduled_fn_t* get_fn_unsafe()
     {
         result = sUnused;
         sUnused = sUnused->mNext;
+        result->mNext = nullptr;
     }
     // if no unused items, and count not too high, allocate a new one
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
@@ -39,19 +40,18 @@ static scheduled_fn_t* get_fn_unsafe()
         result = new scheduled_fn_t;
         ++sCount;
     }
-    result->mNext = nullptr;
     return result;
 }
 
 static void recycle_fn_unsafe(scheduled_fn_t* fn)
 {
-    fn->mFunc = mFuncT();
+    fn->mFunc = nullptr; // special overload in c++ std lib
     fn->mNext = sUnused;
     sUnused = fn;
 }
 
-IRAM_ATTR // called from ISR
-bool schedule_function_us(const mFuncT& fn, uint32_t repeat_us)
+IRAM_ATTR // (not only) called from ISR
+bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
 {
     assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -74,10 +74,20 @@ bool schedule_function_us(const mFuncT& fn, uint32_t repeat_us)
     return true;
 }
 
-IRAM_ATTR // called from ISR
-bool schedule_function(const std::function<void(void)>& fn)
+bool ICACHE_RAM_ATTR schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us)
 {
-    return schedule_function_us([fn](){ fn(); return false; }, 0);
+    return schedule_function_us(std::function<bool(void)>(fn), repeat_us);
+}
+
+IRAM_ATTR // called from ISR
+bool schedule_function(std::function<void(void)>&& fn)
+{
+    return schedule_function_us([fn]() { fn(); return false; }, 0);
+}
+
+bool ICACHE_RAM_ATTR schedule_function(const std::function<void(void)>& fn)
+{
+    return schedule_function(std::function<void(void)>(fn));
 }
 
 void run_scheduled_functions()
