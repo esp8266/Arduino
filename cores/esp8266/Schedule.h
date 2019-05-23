@@ -4,7 +4,6 @@
 #include <functional>
 
 #define SCHEDULED_FN_MAX_COUNT 32
-#define SCHEDULED_FN_INITIAL_COUNT 4
 
 // This API was not considered stable but is now stabilizing.
 // Function signatures may change, queue must stay FIFO.
