@@ -14,12 +14,18 @@ try:
 except:
     from ConfigParser import ConfigParser
 import itertools
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse, urlencode
+except ImportError:
+    from urlparse import urlparse
 from junit_xml import TestSuite, TestCase
 try:
     from cStringIO import StringIO
 except:
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
 import mock_decorators
 
 debug = False
