@@ -91,13 +91,15 @@ extern "C" void esp_yield() {
 }
 
 extern "C" void esp_schedule() {
+    // always on CONT stack here
+    run_scheduled_functions();
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
     if (cont_can_yield(g_pcont)) {
         esp_schedule();
-        esp_yield();
+        cont_yield(g_pcont); //esp_yield();
     }
     else {
         panic();
@@ -122,7 +124,6 @@ static void loop_wrapper() {
         setup_done = true;
     }
     loop();
-    run_scheduled_functions();
     esp_schedule();
 }
 
