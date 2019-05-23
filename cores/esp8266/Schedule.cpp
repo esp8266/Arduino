@@ -74,7 +74,8 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
     return true;
 }
 
-bool ICACHE_RAM_ATTR schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us)
+IRAM_ATTR // (not only) called from ISR
+bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us)
 {
     return schedule_function_us(std::function<bool(void)>(fn), repeat_us);
 }
@@ -85,7 +86,8 @@ bool schedule_function(std::function<void(void)>&& fn)
     return schedule_function_us([fn]() { fn(); return false; }, 0);
 }
 
-bool ICACHE_RAM_ATTR schedule_function(const std::function<void(void)>& fn)
+IRAM_ATTR // called from ISR
+bool schedule_function(const std::function<void(void)>& fn)
 {
     return schedule_function(std::function<void(void)>(fn));
 }
