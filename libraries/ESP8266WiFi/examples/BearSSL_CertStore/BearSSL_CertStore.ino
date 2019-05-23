@@ -159,6 +159,9 @@ void loop() {
   do {
     site = Serial.readString();
   } while (site == "");
+  // Strip newline if present
+  site.replace(String("\r"), emptyString);
+  site.replace(String("\n"), emptyString);
   Serial.printf("https://%s/\n", site.c_str());
 
   BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
