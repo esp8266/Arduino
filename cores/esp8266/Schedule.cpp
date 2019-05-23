@@ -16,11 +16,10 @@ struct scheduled_fn_t
     scheduled_fn_t(): callNow(esp8266::polledTimeout::periodicFastUs::alwaysExpired) { }
 };
 
-static scheduled_fn_t* sFirst = 0;
-static scheduled_fn_t* sLast = 0;
+static scheduled_fn_t* sFirst = nullptr;
+static scheduled_fn_t* sLast = nullptr;
 
-static scheduled_fn_t* sFirstUnused = 0;
-static scheduled_fn_t* sLastUnused = 0;
+static scheduled_fn_t* sUnused = nullptr;
 
 static int sCount = 0;
 
@@ -29,15 +28,13 @@ static scheduled_fn_t* get_fn_unsafe()
 {
     scheduled_fn_t* result = nullptr;
     // try to get an item from unused items list
-    if (sFirstUnused)
+    if (sUnused)
     {
-        result = sFirstUnused;
-        sFirstUnused = sFirstUnused->mNext;
-        if (sFirstUnused == nullptr)
-            sLastUnused = nullptr;
+        result = sUnused;
+        sUnused = sUnused->mNext;
     }
     // if no unused items, and count not too high, allocate a new one
-    else if (sCount != SCHEDULED_FN_MAX_COUNT)
+    else if (sCount < SCHEDULED_FN_MAX_COUNT)
     {
         result = new scheduled_fn_t;
         ++sCount;
@@ -46,16 +43,11 @@ static scheduled_fn_t* get_fn_unsafe()
     return result;
 }
 
-static void recycle_fn(scheduled_fn_t* fn)
+static void recycle_fn_unsafe(scheduled_fn_t* fn)
 {
-    InterruptLock lockAllInterruptsInThisScope;
-
-    if (sLastUnused)
-        sLastUnused->mNext = fn;
-    else
-        sFirstUnused = fn;
-    fn->mNext = nullptr;
-    sLastUnused = fn;
+    fn->mFunc = mFuncT();
+    fn->mNext = sUnused;
+    sUnused = fn;
 }
 
 IRAM_ATTR // called from ISR
@@ -110,16 +102,13 @@ void run_scheduled_functions()
             }
             else
             {
-                {
-                    InterruptLock lockAllInterruptsInThisScope;
-                    if (sFirst == item)
-                        sFirst = sFirst->mNext;
-                    if (sLast == item)
-                        sLast = lastRecurring;
-                }
+                InterruptLock lockAllInterruptsInThisScope;
+                if (sFirst == item)
+                    sFirst = sFirst->mNext;
+                if (sLast == item)
+                    sLast = lastRecurring;
 
-                item->mFunc = mFuncT();
-                recycle_fn(item);
+                recycle_fn_unsafe(item);
             }
         }
     }
