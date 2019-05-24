@@ -3,7 +3,7 @@ FAQ
 
 The purpose of this FAQ / Troubleshooting is to respond to questions
 commonly asked in `Issues <https://github.com/esp8266/Arduino/issues>`__
-section and on `ESP8266 Community forum <http://www.esp8266.com/>`__.
+section and on `ESP8266 Community forum <https://www.esp8266.com/>`__.
 
 Where possible we are going right to the answer and provide it within
 one or two paragraphs. If it takes more than that, you will see a link
@@ -46,21 +46,30 @@ How can I get some extra KBs in flash ?
 * Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
   be saved by using the option ``--nofloat`` with the boards generator:
 
-  ``./tools/boards.txt.py --nofloat --allgen``
+  ``./tools/boards.txt.py --nofloat --boardsgen``
 
 * Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
 `Read more <a05-board-generator.rst>`__.
 
-Why can't I use WPS ?
-~~~~~~~~~~~~~~~~~~~~~
+About WPS
+~~~~~~~~~
 
-WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
-WPS (and lose 4KB of useable ram), use this boards generator option:
+From release 2.4.2 and ahead, not using WPS will give an exra ~4.5KB in
+heap.
 
-``./tools/boards.txt.py --allowWPS --allgen``
+In release 2.4.2 only, WPS is disabled by default and the board generator is
+required to enable it:
+
+``./tools/boards.txt.py --allowWPS --boardsgen``
 
 `Read more <a05-board-generator.rst>`__.
+
+For platformIO (and maybe other build environments), you will also need to add the build flag: -D NO_EXTRA_4K_HEAP
+
+This manual selection is not needed starting from 2.5.0 (and in git
+version).  WPS is always available, and not using it will give an extra
+~4.5KB compared to releases until 2.4.1 included.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

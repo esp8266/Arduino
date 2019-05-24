@@ -13,24 +13,22 @@
 
 #include <ESP8266HTTPClient.h>
 
-#define USE_SERIAL Serial
-
 ESP8266WiFiMulti WiFiMulti;
 
 HTTPClient http;
 
 void setup() {
 
-  USE_SERIAL.begin(115200);
-  // USE_SERIAL.setDebugOutput(true);
+  Serial.begin(115200);
+  // Serial.setDebugOutput(true);
 
-  USE_SERIAL.println();
-  USE_SERIAL.println();
-  USE_SERIAL.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
 
   for (uint8_t t = 4; t > 0; t--) {
-    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-    USE_SERIAL.flush();
+    Serial.printf("[SETUP] WAIT %d...\n", t);
+    Serial.flush();
     delay(1000);
   }
 
@@ -45,19 +43,21 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    http.begin("http://192.168.1.12/test.html");
-    //http.begin("192.168.1.12", 80, "/test.html");
+    WiFiClient client;
+
+    http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
+    //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
 
     int httpCode = http.GET();
     if (httpCode > 0) {
-      USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
+      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 
       // file found at server
       if (httpCode == HTTP_CODE_OK) {
-        http.writeToStream(&USE_SERIAL);
+        http.writeToStream(&Serial);
       }
     } else {
-      USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
     }
 
     http.end();
@@ -65,6 +65,3 @@ void loop() {
 
   delay(1000);
 }
-
-
-

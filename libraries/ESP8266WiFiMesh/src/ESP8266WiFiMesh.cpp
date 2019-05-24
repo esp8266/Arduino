@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "ESP8266WiFiMesh.h"
+#include "TypeConversionFunctions.h"
 
 #define SERVER_IP_ADDR      "192.168.4.1"
 
@@ -44,15 +45,12 @@ std::vector<TransmissionResult> ESP8266WiFiMesh::latestTransmissionOutcomes = {}
 
 ESP8266WiFiMesh::~ESP8266WiFiMesh()
 {
-  if(isAPController())
-  {
-    apController = nullptr;
-  }
+  deactivateAP();
 }
 
 ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHandler, ESP8266WiFiMesh::responseHandlerType responseHandler, 
                                  ESP8266WiFiMesh::networkFilterType networkFilter, const String &meshPassword, const String &meshName, 
-                                 const String &nodeID, bool verboseMode, uint8 meshWiFiChannel, int serverPort) 
+                                 const String &nodeID, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
                                  : _server(serverPort), _lwipVersion{0, 0, 0}
 {
   storeLwipVersion();
@@ -73,12 +71,17 @@ void ESP8266WiFiMesh::updateNetworkNames(const String &newMeshName, const String
     _meshName = newMeshName;
   if(newNodeID != "")
     _nodeID = newNodeID;
-    
-  _SSID = _meshName + _nodeID;
 
-  // Apply SSID changes to active AP.
-  if(isAPController())
-    restartAP();
+  String newSSID = _meshName + _nodeID;
+
+  if(_SSID != newSSID)
+  {
+    _SSID = newSSID;
+  
+    // Apply SSID changes to active AP.
+    if(isAPController())
+      restartAP();
+  }
 }
 
 void ESP8266WiFiMesh::begin()
@@ -93,16 +96,17 @@ void ESP8266WiFiMesh::begin()
   else
   {
   ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
-    WiFi.mode(WIFI_AP_STA);
+    if(!ESP8266WiFiMesh::getAPController()) // If there is no active AP controller
+      WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
     
     #ifdef ENABLE_STATIC_IP_OPTIMIZATION
     if(atLeastLwipVersion(lwipVersion203Signature))
     {
-      verboseModePrint("lwIP version is at least 2.0.3. Static ip optimizations enabled.\n");
+      verboseModePrint(F("lwIP version is at least 2.0.3. Static ip optimizations enabled.\n"));
     }
     else
     {
-      verboseModePrint("lwIP version is less than 2.0.3. Static ip optimizations DISABLED.\n");
+      verboseModePrint(F("lwIP version is less than 2.0.3. Static ip optimizations DISABLED.\n"));
     }
     #endif
   }
@@ -139,8 +143,11 @@ void ESP8266WiFiMesh::activateAP()
   // Deactivate active AP to avoid two servers using the same port, which can lead to crashes.
   if(ESP8266WiFiMesh *currentAPController = ESP8266WiFiMesh::getAPController())
     currentAPController->deactivateAP();
-  
-  WiFi.softAP( _SSID.c_str(), _meshPassword.c_str(), _meshWiFiChannel ); // Note that a maximum of 5 stations can be connected at a time to each AP
+
+  WiFi.softAP( _SSID.c_str(), _meshPassword.c_str(), _meshWiFiChannel, _apHidden, _maxAPStations ); // Note that a maximum of 8 stations can be connected at a time to each AP
+  WiFi.mode(WIFI_AP_STA);
+
+  _server = WiFiServer(_serverPort); // Fixes an occasional crash bug that occurs when using the copy constructor to duplicate the AP controller.
   _server.begin(); // Actually calls _server.stop()/_server.close() first.
 
   apController = this;
@@ -152,6 +159,7 @@ void ESP8266WiFiMesh::deactivateAP()
   {
     _server.stop();
     WiFi.softAPdisconnect();
+    WiFi.mode(WIFI_STA);
 
     // Since there is no active AP controller now, make the apController variable point to nothing. 
     apController = nullptr;
@@ -176,46 +184,130 @@ bool ESP8266WiFiMesh::isAPController()
   return (this == apController);
 }
 
-uint8 ESP8266WiFiMesh::getWiFiChannel()
-{
-  return _meshWiFiChannel;
-}
-
 void ESP8266WiFiMesh::setWiFiChannel(uint8 newWiFiChannel)
 {
   assert(1 <= newWiFiChannel && newWiFiChannel <= 13);
   
   _meshWiFiChannel = newWiFiChannel;
 
-  // Apply changes to active AP.
-  if(isAPController())
-    restartAP();
+  // WiFi.channel() will change if this node connects to an AP with another channel, 
+  // so there is no guarantee we are using _meshWiFiChannel.
+  // Also, we cannot change the WiFi channel while we are still connected to the other AP.
+  if(WiFi.channel() != _meshWiFiChannel && WiFi.status() != WL_CONNECTED)
+  {  
+    // Apply changes to active AP.
+    if(isAPController())
+      restartAP();
+  }
 }
 
-String ESP8266WiFiMesh::getMeshName() {return _meshName;}
+uint8 ESP8266WiFiMesh::getWiFiChannel()
+{
+  return _meshWiFiChannel;
+}
 
 void ESP8266WiFiMesh::setMeshName(const String &newMeshName)
 {
   updateNetworkNames(newMeshName);
 }
 
-String ESP8266WiFiMesh::getNodeID() {return _nodeID;}
+String ESP8266WiFiMesh::getMeshName() {return _meshName;}
 
 void ESP8266WiFiMesh::setNodeID(const String &newNodeID)
 {
   updateNetworkNames("", newNodeID);
 }
 
+String ESP8266WiFiMesh::getNodeID() {return _nodeID;}
+
 void ESP8266WiFiMesh::setSSID(const String &newMeshName, const String &newNodeID)
 {
   updateNetworkNames(newMeshName, newNodeID);
 }
 
-String ESP8266WiFiMesh::getMessage() {return _message;}
-void ESP8266WiFiMesh::setMessage(const String &newMessage) {_message = newMessage;}
+String ESP8266WiFiMesh::getSSID() {return _SSID;}
 
-ESP8266WiFiMesh::networkFilterType ESP8266WiFiMesh::getNetworkFilter() {return _networkFilter;}
+void ESP8266WiFiMesh::setMessage(const String &newMessage) {_message = newMessage;}
+String ESP8266WiFiMesh::getMessage() {return _message;}
+
+void ESP8266WiFiMesh::setRequestHandler(ESP8266WiFiMesh::requestHandlerType requestHandler) {_requestHandler = requestHandler;}
+ESP8266WiFiMesh::requestHandlerType ESP8266WiFiMesh::getRequestHandler() {return _requestHandler;}
+
+void ESP8266WiFiMesh::setResponseHandler(ESP8266WiFiMesh::responseHandlerType responseHandler) {_responseHandler = responseHandler;}
+ESP8266WiFiMesh::responseHandlerType ESP8266WiFiMesh::getResponseHandler() {return _responseHandler;}
+
 void ESP8266WiFiMesh::setNetworkFilter(ESP8266WiFiMesh::networkFilterType networkFilter) {_networkFilter = networkFilter;}
+ESP8266WiFiMesh::networkFilterType ESP8266WiFiMesh::getNetworkFilter() {return _networkFilter;}
+
+void ESP8266WiFiMesh::setScanHidden(bool scanHidden)
+{
+  _scanHidden = scanHidden;
+}
+
+bool ESP8266WiFiMesh::getScanHidden() {return _scanHidden;}
+
+void ESP8266WiFiMesh::setAPHidden(bool apHidden)
+{
+  if(_apHidden != apHidden)
+  {
+    _apHidden = apHidden;
+    
+    // Apply changes to active AP.
+    if(isAPController())
+      restartAP();
+  }
+}
+
+bool ESP8266WiFiMesh::getAPHidden() {return _apHidden;}
+
+void ESP8266WiFiMesh::setMaxAPStations(uint8_t maxAPStations)
+{
+  assert(maxAPStations <= 8); // Valid values are 0 to 8, but uint8_t is always at least 0.
+  
+  if(_maxAPStations != maxAPStations)
+  {
+    _maxAPStations = maxAPStations;
+    
+    // Apply changes to active AP.
+    if(isAPController())
+      restartAP();
+  }
+}
+
+bool ESP8266WiFiMesh::getMaxAPStations() {return _maxAPStations;}
+
+void ESP8266WiFiMesh::setConnectionAttemptTimeout(int32_t connectionAttemptTimeoutMs)
+{
+  _connectionAttemptTimeoutMs = connectionAttemptTimeoutMs;
+}
+
+int32_t ESP8266WiFiMesh::getConnectionAttemptTimeout() {return _connectionAttemptTimeoutMs;}
+
+void ESP8266WiFiMesh::setStationModeTimeout(int stationModeTimeoutMs)
+{
+  _stationModeTimeoutMs = stationModeTimeoutMs;
+}
+
+int ESP8266WiFiMesh::getStationModeTimeout() {return _stationModeTimeoutMs;}
+
+void ESP8266WiFiMesh::setAPModeTimeout(uint32_t apModeTimeoutMs)
+{
+  _apModeTimeoutMs = apModeTimeoutMs;
+}
+
+uint32_t ESP8266WiFiMesh::getAPModeTimeout() {return _apModeTimeoutMs;}
+
+bool ESP8266WiFiMesh::latestTransmissionSuccessful()
+{
+  if(ESP8266WiFiMesh::latestTransmissionOutcomes.empty())
+    return false;
+  else
+    for(TransmissionResult &transmissionResult : ESP8266WiFiMesh::latestTransmissionOutcomes) 
+      if(transmissionResult.transmissionStatus != TS_TRANSMISSION_COMPLETE) 
+        return false;
+
+  return true;
+}
 
 /**
  * Disconnect completely from a network.
@@ -234,16 +326,20 @@ void ESP8266WiFiMesh::fullStop(WiFiClient &currClient)
  * @returns: True if the client is ready, false otherwise.
  * 
  */
-bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient &currClient, int maxWait)
+bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait)
 {
-  int wait = maxWait;
-  while(currClient.connected() && !currClient.available() && wait--)
-    delay(3);
+  uint32_t connectionStartTime = millis();
+  uint32_t waitingTime = millis() - connectionStartTime;
+  while(currClient.connected() && !currClient.available() && waitingTime < maxWait)
+  {
+    delay(1);
+    waitingTime = millis() - connectionStartTime;
+  }
 
   /* Return false if the client isn't ready to communicate */
   if (WiFi.status() == WL_DISCONNECTED && !currClient.available())
   {
-    verboseModePrint("Disconnected!"); 
+    verboseModePrint(F("Disconnected!")); 
     return false;
   }
   
@@ -260,12 +356,12 @@ bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient &currClient, int maxW
  */
 transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
 {
-  verboseModePrint("Transmitting");
+  verboseModePrint("Transmitting");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
     
   currClient.print(getMessage() + "\r");
   yield();
 
-  if (!waitForClientTransmission(currClient, 1000))
+  if (!waitForClientTransmission(currClient, _stationModeTimeoutMs))
   {
     fullStop(currClient);
     return TS_CONNECTION_FAILED;
@@ -273,7 +369,7 @@ transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
 
   if (!currClient.available()) 
   {
-    verboseModePrint("No response!");
+    verboseModePrint(F("No response!"));
     return TS_TRANSMISSION_FAILED; // WiFi.status() != WL_DISCONNECTED so we do not want to use fullStop(currClient) here since that would force the node to scan for WiFi networks.
   }
 
@@ -295,10 +391,11 @@ transmission_status_t ESP8266WiFiMesh::attemptDataTransfer()
   // Unlike WiFi.mode(WIFI_AP);, WiFi.mode(WIFI_AP_STA); allows us to stay connected to the AP we connected to in STA mode, at the same time as we can receive connections from other stations. 
   // We cannot send data to the AP in STA_AP mode though, that requires STA mode. 
   // Switching to STA mode will disconnect all stations connected to the node AP (though they can request a reconnect even while we are in STA mode).
+  WiFiMode_t storedWiFiMode = WiFi.getMode();
   WiFi.mode(WIFI_STA);
   delay(1);
   transmission_status_t transmissionOutcome = attemptDataTransferKernel();
-  WiFi.mode(WIFI_AP_STA); 
+  WiFi.mode(storedWiFiMode);
   delay(1);
   
   return transmissionOutcome;
@@ -312,19 +409,20 @@ transmission_status_t ESP8266WiFiMesh::attemptDataTransfer()
 transmission_status_t ESP8266WiFiMesh::attemptDataTransferKernel()
 {
   WiFiClient currClient;
-  
+  currClient.setTimeout(_stationModeTimeoutMs);
+
   /* Connect to the node's server */
   if (!currClient.connect(SERVER_IP_ADDR, _serverPort)) 
   {
     fullStop(currClient);
-    verboseModePrint("Server unavailable");
+    verboseModePrint(F("Server unavailable"));
     return TS_CONNECTION_FAILED;
   }  
 
   transmission_status_t transmissionOutcome = exchangeInfo(currClient);
   if (transmissionOutcome <= 0)
   {
-    verboseModePrint("Transmission failed during exchangeInfo.");
+    verboseModePrint(F("Transmission failed during exchangeInfo."));
     return transmissionOutcome;
   }
   
@@ -361,36 +459,37 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, i
     if(atLeastLwipVersion(lwipVersion203Signature))
     {
       // Can be used with Arduino core for ESP8266 version 2.4.2 or higher with lwIP2 enabled to keep static IP on even during network switches.
+      WiFiMode_t storedWiFiMode = WiFi.getMode();
       WiFi.mode(WIFI_OFF);
-      WiFi.mode(WIFI_AP_STA);
+      WiFi.mode(storedWiFiMode);
       yield();
     }
     else
     {
       // Disable static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
       disableStaticIP();
-      verboseModePrint("\nConnecting to a different network. Static IP deactivated to make this possible.");
+      verboseModePrint(F("\nConnecting to a different network. Static IP deactivated to make this possible."));
     }
     #else
     // Disable static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
     disableStaticIP();
-    verboseModePrint("\nConnecting to a different network. Static IP deactivated to make this possible.");
+    verboseModePrint(F("\nConnecting to a different network. Static IP deactivated to make this possible."));
     #endif
   }
   lastSSID = targetSSID;
   
-  verboseModePrint("Connecting... ", false);
+  verboseModePrint(F("Connecting... "), false);
   initiateConnectionToAP(targetSSID, targetChannel, targetBSSID);
 
   int connectionStartTime = millis();
   int attemptNumber = 1;
 
   int waitingTime = millis() - connectionStartTime;
-  while((WiFi.status() == WL_DISCONNECTED) && waitingTime <= 10000)
+  while((WiFi.status() == WL_DISCONNECTED) && waitingTime <= _connectionAttemptTimeoutMs)
   {
-    if(waitingTime > attemptNumber * 10000) // 10000 can be lowered if you want to limit the time allowed for each connection attempt.
+    if(waitingTime > attemptNumber * _connectionAttemptTimeoutMs) // _connectionAttemptTimeoutMs can be replaced (lowered) if you want to limit the time allowed for each connection attempt.
     {
-      verboseModePrint("... ", false);
+      verboseModePrint(F("... "), false);
       WiFi.disconnect();
       yield();
       initiateConnectionToAP(targetSSID, targetChannel, targetBSSID);
@@ -405,7 +504,7 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, i
   /* If the connection timed out */
   if (WiFi.status() != WL_CONNECTED)
   {
-    verboseModePrint("Timeout");
+    verboseModePrint(F("Timeout"));
     return TS_CONNECTION_FAILED;
   }
 
@@ -433,7 +532,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
   {
     if(!noScan)
     {
-      verboseModePrint("Scanning... ", false);
+      verboseModePrint(F("Scanning... "), false);
       
       /* Scan for APs */
       connectionQueue.clear();
@@ -444,15 +543,15 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
       #ifdef ENABLE_WIFI_SCAN_OPTIMIZATION
       if(scanAllWiFiChannels)
       {
-        n = WiFi.scanNetworks();
+        n = WiFi.scanNetworks(false, _scanHidden);
       }
       else
       {
         // Scan function argument overview: scanNetworks(bool async = false, bool show_hidden = false, uint8 channel = 0, uint8* ssid = NULL)
-        n = WiFi.scanNetworks(false, false, _meshWiFiChannel);
+        n = WiFi.scanNetworks(false, _scanHidden, _meshWiFiChannel);
       }
       #else
-      n = WiFi.scanNetworks();
+      n = WiFi.scanNetworks(false, _scanHidden);
       #endif
       
       _networkFilter(n, *this); // Update the connectionQueue.
@@ -483,15 +582,15 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
 
       if(_verboseMode) // Avoid string generation if not required
       {
-        verboseModePrint("AP acquired: " + currentSSID + ", Ch:" + String(currentWiFiChannel) + " ", false);
+        verboseModePrint(String(F("AP acquired: ")) + currentSSID + String(F(", Ch:")) + String(currentWiFiChannel) + " ", false);
 
         if(currentNetwork.networkIndex != NETWORK_INFO_DEFAULT_INT)
         {
-          verboseModePrint("(" + String(WiFi.RSSI(currentNetwork.networkIndex)) + "dBm) " + 
-                           (WiFi.encryptionType(currentNetwork.networkIndex) == ENC_TYPE_NONE ? "open" : ""), false);
+          verboseModePrint("(" + String(WiFi.RSSI(currentNetwork.networkIndex)) + String(F("dBm) ")) + 
+                           (WiFi.encryptionType(currentNetwork.networkIndex) == ENC_TYPE_NONE ? String(F("open")) : ""), false);
         }
 
-        verboseModePrint("... ", false);
+        verboseModePrint(F("... "), false);
       }
 
       transmission_status_t transmissionResult = connectToNode(currentSSID, currentWiFiChannel, currentBSSID);
@@ -502,7 +601,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
 
   if(WiFi.status() == WL_CONNECTED && staticIP != emptyIP && !staticIPActivated)
   {
-    verboseModePrint("Reactivating static IP to allow for faster re-connects.");
+    verboseModePrint(F("Reactivating static IP to allow for faster re-connects."));
     setStaticIP(staticIP);
   }
 
@@ -524,7 +623,7 @@ void ESP8266WiFiMesh::acceptRequest()
       if (!_client)
         break;
 
-      if (!waitForClient(_client, 1500)) {
+      if (!waitForClient(_client, _apModeTimeoutMs)) {
         continue;
       }
 
@@ -548,7 +647,7 @@ void ESP8266WiFiMesh::acceptRequest()
       if (!_client)
         break;
 
-      if (!waitForClientTransmission(_client, 1500) || !_client.available()) {
+      if (!waitForClientTransmission(_client, _apModeTimeoutMs) || !_client.available()) {
         continue;
       }
 
@@ -562,7 +661,7 @@ void ESP8266WiFiMesh::acceptRequest()
       /* Send the response back to the client */
       if (_client.connected())
       {
-        verboseModePrint("Responding");
+        verboseModePrint("Responding"); // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
         _client.print(response + "\r");
         _client.flush();
         yield();

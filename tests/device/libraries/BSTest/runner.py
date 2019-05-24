@@ -14,12 +14,18 @@ try:
 except:
     from ConfigParser import ConfigParser
 import itertools
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse, urlencode
+except ImportError:
+    from urlparse import urlparse
 from junit_xml import TestSuite, TestCase
 try:
     from cStringIO import StringIO
 except:
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
 import mock_decorators
 
 debug = False
@@ -132,7 +138,7 @@ class BSTestRunner(object):
 
     def run_test(self, index):
         self.sp.sendline('{}'.format(index))
-        timeout = 10
+        timeout = 20 # 10
         while timeout > 0:
             res = self.sp.expect(['>>>>>bs_test_start', EOF, TIMEOUT])
             if res == 0:

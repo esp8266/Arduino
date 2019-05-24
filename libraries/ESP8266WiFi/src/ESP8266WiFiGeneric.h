@@ -29,12 +29,12 @@
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_WIFI_GENERIC(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_WIFI_GENERIC(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ##__VA_ARGS__ )
 #endif
 #endif
 
 #ifndef DEBUG_WIFI_GENERIC
-#define DEBUG_WIFI_GENERIC(...)
+#define DEBUG_WIFI_GENERIC(...) do { (void)0; } while (0)
 #endif
 
 struct WiFiEventHandlerOpaque;
@@ -66,8 +66,11 @@ class ESP8266WiFiGenericClass {
 
         int32_t channel(void);
 
-        bool setSleepMode(WiFiSleepType_t type);
+        bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
+
         WiFiSleepType_t getSleepMode();
+        uint8_t getListenInterval ();
+        bool isSleepLevelMax ();
 
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
@@ -84,6 +87,8 @@ class ESP8266WiFiGenericClass {
 
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
+
+        static void preinitWiFiOff (); //meant to be called in user-defined preinit()
 
     protected:
         static bool _persistent;

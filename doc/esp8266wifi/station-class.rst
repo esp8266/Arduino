@@ -73,7 +73,10 @@ The simplest overload of ``begin`` is as follows:
 
 Calling it will enable station mode and connect to the last used access point based on configuration saved in flash memory.
 
-Notes: \* It is possible that calling ``begin`` will result in the module being in STA + softAP mode if the module was previously placed into AP mode. \* If you notice strange behavior with DNS or other network functionality, check which mode your module is in (see ``WiFi.mode()`` in the `Generic Class Documentation <generic-class.rst#mode>`__).
+Notes:
+
+- It is possible that calling ``begin`` will result in the module being in STA + softAP mode if the module was previously placed into AP mode. 
+- If you notice strange behavior with DNS or other network functionality, check which mode your module is in (see ``WiFi.mode()`` in the `Generic Class Documentation <generic-class.rst#mode>`__).
 
 Below is the syntax of another overload of ``begin`` with the all possible parameters:
 
@@ -81,8 +84,13 @@ Below is the syntax of another overload of ``begin`` with the all possible param
 
     WiFi.begin(ssid, password, channel, bssid, connect)
 
-Meaning of parameters is as follows: \* ``ssid`` - a character string containing the SSID of Access Point we would like to connect to, may have up to 32 characters \* ``password`` to the access point, a character string that should be minimum 8 characters long and not longer than 64 characters \* ``channel`` of AP, if we like to operate using specific channel, otherwise this parameter may be omitted \* ``bssid`` -
-mac address of AP, this parameter is also optional \* ``connect`` - a ``boolean`` parameter that if set to ``false``, will instruct module just to save the other parameters without actually establishing connection to the access point
+Meaning of parameters is as follows:
+
+- ``ssid`` - a character string containing the SSID of Access Point we would like to connect to, may have up to 32 characters
+- ``password`` to the access point, a character string that should be minimum 8 characters long and not longer than 64 characters 
+- ``channel`` of AP, if we like to operate using specific channel, otherwise this parameter may be omitted 
+- ``bssid`` - mac address of AP, this parameter is also optional 
+- ``connect`` - a ``boolean`` parameter that if set to ``false``, will instruct module just to save the other parameters without actually establishing connection to the access point
 
 config
 ^^^^^^
@@ -127,8 +135,8 @@ The following IP configuration may be provided:
       Serial.println();
 
       Serial.printf("Connecting to %s\n", ssid);
-      WiFi.begin(ssid, password);
       WiFi.config(staticIP, gateway, subnet);
+      WiFi.begin(ssid, password);
       while (WiFi.status() != WL_CONNECTED)
       {
         delay(500);
@@ -239,7 +247,13 @@ Wait until module connects to the access point. This function is intended for mo
 
     WiFi.waitForConnectResult()
 
-Function returns one of the following connection statuses: \* ``WL_CONNECTED`` after successful connection is established \* ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached \* ``WL_CONNECT_FAILED`` if password is incorrect \* ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses \* ``WL_DISCONNECTED`` if module is not configured in station mode
+Function returns one of the following connection statuses: 
+
+- ``WL_CONNECTED`` after successful connection is established 
+- ``WL_NO_SSID_AVAIL`` in case configured SSID cannot be reached 
+- ``WL_CONNECT_FAILED`` if password is incorrect 
+- ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
+- ``WL_DISCONNECTED`` if module is not configured in station mode
 
 Configuration
 ~~~~~~~~~~~~~
@@ -487,7 +501,7 @@ Basing on this example, when running above code, module is initially disconnecte
 SSID
 ^^^^
 
-Return the name of Wi-Fi network, formally called `Service Set Identification (SSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e34>`__.
+Return the name of Wi-Fi network, formally called `Service Set Identification (SSID) <https://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e34>`__.
 
 .. code:: cpp
 
@@ -521,7 +535,7 @@ Function returns value of the ``String`` type.
 BSSID
 ^^^^^
 
-Return the mac address the access point where ESP module is connected to. This address is formally called `Basic Service Set Identification (BSSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__.
+Return the mac address of the access point to which the ESP module was directed to connect to. This address is formally called `Basic Service Set Identification (BSSID) <https://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__. The returned pointer is what the user configured when calling begin() with a bssid argument. It does _not_ necessarily reflect the mac address of the access point to which the ESP module's station interface is currently connected to.
 
 .. code:: cpp
 
@@ -573,12 +587,12 @@ Signal strength value is provided in dBm. The type of returned value is ``int32_
 Connect Different
 ~~~~~~~~~~~~~~~~~
 
-`ESP8266 SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ provides alternate methods to connect ESP station to an access point. Out of them `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core implements `WPS <#wps>`__ and `Smart Config <#smart-config>`__ as described in more details below.
+`ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ provides alternate methods to connect ESP station to an access point. Out of them `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core implements `WPS <#wps>`__ and `Smart Config <#smart-config>`__ as described in more details below.
 
 WPS
 ^^^
 
-The following ``beginWPSConfig`` function allows connecting to a network using `Wi-Fi Protected Setup (WPS) <https://en.wikipedia.org/wiki/Wi-Fi_Protected_Setup>`__. Currently only `push-button configuration <http://www.wi-fi.org/knowledge-center/faq/how-does-wi-fi-protected-setup-work>`__ (``WPS_TYPE_PBC`` mode) is supported (SDK 1.5.4).
+The following ``beginWPSConfig`` function allows connecting to a network using `Wi-Fi Protected Setup (WPS) <https://en.wikipedia.org/wiki/Wi-Fi_Protected_Setup>`__. Currently only `push-button configuration <https://www.wi-fi.org/knowledge-center/faq/how-does-wi-fi-protected-setup-work>`__ (``WPS_TYPE_PBC`` mode) is supported (SDK 1.5.4).
 
 .. code:: cpp
 
@@ -647,4 +661,4 @@ Stop smart config, free the buffer taken by ``beginSmartConfig()``. Depending on
 
     stopSmartConfig()
 
-For additional details regarding Smart Config please refer to `ESP8266 API User Guide <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__.
+For additional details regarding Smart Config please refer to `ESP8266 API User Guide <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__.

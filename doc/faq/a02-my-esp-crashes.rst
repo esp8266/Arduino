@@ -120,7 +120,7 @@ ESP provides two watchdog timers (wdt) that observe application for lock
 up.
 
 -  **Software Watchdog** - provided by
-   `SDK <http://bbs.espressif.com/viewforum.php?f=46>`__, that is part
+   `SDK <https://bbs.espressif.com/viewforum.php?f=46>`__, that is part
    of `esp8266 / arduino <https://github.com/esp8266/Arduino>`__ core
    loaded to module together with your application.
 -  **Hardware Watchdog** - build in ESP8266 hardware and acting if
@@ -291,9 +291,12 @@ Memory, memory, memory
    rely on exceptions for error handling, which is not available for the ESP, and in any
    case there is no access to the underlying code.
 
-   Instrumenting the code with the OOM debug option and calls to ``ESP.getFreeHeap()`` will
-   help the process of finding leaks. Now is time to re-read about the
-   `exception decoder <#exception-decoder>`__.
+   Instrumenting the code with the OOM debug option and calls to
+   ``ESP.getFreeHeap()`` / ``ESP.getHeapFragmentation()`` /
+   ``ESP.getMaxFreeBlockSize()`` will help the process of finding memory issues.
+
+   Now is time to re-read about the `exception decoder
+   <#exception-decoder>`__.
 
 
 *Some techniques for reducing memory usage*
@@ -305,9 +308,9 @@ Memory, memory, memory
 Stack
    The amount of stack in the ESP is tiny at only 4KB. For normal developement in large systems, it 
    is good practice to use and abuse the stack, because it is faster for allocation/deallocation, the scope of the object is well defined, and deallocation automatically happens in reverse order as allocation, which means no mem fragmentation. However, with the tiny amount of stack available in the ESP, that practice is not really viable, at least not for big objects.
-      * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
-      * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and be dynamically allocated (consider smart pointers).
-      * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamicaly allocated (consider smart pointers).
+   * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
+   * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and be dynamically allocated (consider smart pointers).
+   * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamicaly allocated (consider smart pointers).
 
 
 If at the Wall, Enter an Issue Report

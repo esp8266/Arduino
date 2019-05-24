@@ -1920,6 +1920,24 @@ typedef struct {
 } br_aes_pwr8_ctr_keys;
 
 /**
+ * \brief Context for AES subkeys (`aes_pwr8` implementation, CTR encryption
+ * and decryption + CBC-MAC).
+ *
+ * First field is a pointer to the vtable; it is set by the initialisation
+ * function. Other fields are not supposed to be accessed by user code.
+ */
+typedef struct {
+	/** \brief Pointer to vtable for this context. */
+	const br_block_ctrcbc_class *vtable;
+#ifndef BR_DOXYGEN_IGNORE
+	union {
+		unsigned char skni[16 * 15];
+	} skey;
+	unsigned num_rounds;
+#endif
+} br_aes_pwr8_ctrcbc_keys;
+
+/**
  * \brief Class instance for AES CBC encryption (`aes_pwr8` implementation).
  *
  * Since this implementation might be omitted from the library, or the
@@ -1946,6 +1964,16 @@ extern const br_block_cbcdec_class br_aes_pwr8_cbcdec_vtable;
  * instance should be obtained through `br_aes_pwr8_ctr_get_vtable()`.
  */
 extern const br_block_ctr_class br_aes_pwr8_ctr_vtable;
+
+/**
+ * \brief Class instance for AES CTR encryption/decryption + CBC-MAC
+ * (`aes_pwr8` implementation).
+ *
+ * Since this implementation might be omitted from the library, or the
+ * AES opcode unavailable on the current CPU, a pointer to this class
+ * instance should be obtained through `br_aes_pwr8_ctrcbc_get_vtable()`.
+ */
+extern const br_block_ctrcbc_class br_aes_pwr8_ctrcbc_vtable;
 
 /**
  * \brief Context initialisation (key schedule) for AES CBC encryption
@@ -1978,6 +2006,17 @@ void br_aes_pwr8_cbcdec_init(br_aes_pwr8_cbcdec_keys *ctx,
  * \param len   secret key length (in bytes).
  */
 void br_aes_pwr8_ctr_init(br_aes_pwr8_ctr_keys *ctx,
+	const void *key, size_t len);
+
+/**
+ * \brief Context initialisation (key schedule) for AES CTR + CBC-MAC
+ * (`aes_pwr8` implementation).
+ *
+ * \param ctx   context to initialise.
+ * \param key   secret key.
+ * \param len   secret key length (in bytes).
+ */
+void br_aes_pwr8_ctrcbc_init(br_aes_pwr8_ctrcbc_keys *ctx,
 	const void *key, size_t len);
 
 /**
@@ -2016,6 +2055,52 @@ uint32_t br_aes_pwr8_ctr_run(const br_aes_pwr8_ctr_keys *ctx,
 	const void *iv, uint32_t cc, void *data, size_t len);
 
 /**
+ * \brief CTR encryption + CBC-MAC with AES (`aes_pwr8` implementation).
+ *
+ * \param ctx      context (already initialised).
+ * \param ctr      counter for CTR (16 bytes, updated).
+ * \param cbcmac   IV for CBC-MAC (updated).
+ * \param data     data to encrypt (updated).
+ * \param len      data length (in bytes, MUST be a multiple of 16).
+ */
+void br_aes_pwr8_ctrcbc_encrypt(const br_aes_pwr8_ctrcbc_keys *ctx,
+	void *ctr, void *cbcmac, void *data, size_t len);
+
+/**
+ * \brief CTR decryption + CBC-MAC with AES (`aes_pwr8` implementation).
+ *
+ * \param ctx      context (already initialised).
+ * \param ctr      counter for CTR (16 bytes, updated).
+ * \param cbcmac   IV for CBC-MAC (updated).
+ * \param data     data to decrypt (updated).
+ * \param len      data length (in bytes, MUST be a multiple of 16).
+ */
+void br_aes_pwr8_ctrcbc_decrypt(const br_aes_pwr8_ctrcbc_keys *ctx,
+	void *ctr, void *cbcmac, void *data, size_t len);
+
+/**
+ * \brief CTR encryption/decryption with AES (`aes_pwr8` implementation).
+ *
+ * \param ctx      context (already initialised).
+ * \param ctr      counter for CTR (16 bytes, updated).
+ * \param data     data to MAC (updated).
+ * \param len      data length (in bytes, MUST be a multiple of 16).
+ */
+void br_aes_pwr8_ctrcbc_ctr(const br_aes_pwr8_ctrcbc_keys *ctx,
+	void *ctr, void *data, size_t len);
+
+/**
+ * \brief CBC-MAC with AES (`aes_pwr8` implementation).
+ *
+ * \param ctx      context (already initialised).
+ * \param cbcmac   IV for CBC-MAC (updated).
+ * \param data     data to MAC (unmodified).
+ * \param len      data length (in bytes, MUST be a multiple of 16).
+ */
+void br_aes_pwr8_ctrcbc_mac(const br_aes_pwr8_ctrcbc_keys *ctx,
+	void *cbcmac, const void *data, size_t len);
+
+/**
  * \brief Obtain the `aes_pwr8` AES-CBC (encryption) implementation, if
  * available.
  *
@@ -2052,6 +2137,19 @@ const br_block_cbcdec_class *br_aes_pwr8_cbcdec_get_vtable(void);
  * \return  the `aes_pwr8` AES-CTR implementation, or `NULL`.
  */
 const br_block_ctr_class *br_aes_pwr8_ctr_get_vtable(void);
+
+/**
+ * \brief Obtain the `aes_pwr8` AES-CTR + CBC-MAC implementation, if
+ * available.
+ *
+ * This function returns a pointer to `br_aes_pwr8_ctrcbc_vtable`, if
+ * that implementation was compiled in the library _and_ the POWER8 AES
+ * opcodes are available on the currently running CPU. If either of
+ * these conditions is not met, then this function returns `NULL`.
+ *
+ * \return  the `aes_pwr8` AES-CTR implementation, or `NULL`.
+ */
+const br_block_ctrcbc_class *br_aes_pwr8_ctrcbc_get_vtable(void);
 
 /**
  * \brief Aggregate structure large enough to be used as context for
@@ -2105,10 +2203,8 @@ typedef union {
 	br_aes_small_ctrcbc_keys c_small;
 	br_aes_ct_ctrcbc_keys c_ct;
 	br_aes_ct64_ctrcbc_keys c_ct64;
-	/* FIXME
 	br_aes_x86ni_ctrcbc_keys c_x86ni;
 	br_aes_pwr8_ctrcbc_keys c_pwr8;
-	*/
 } br_aes_gen_ctrcbc_keys;
 
 /*

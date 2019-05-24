@@ -28,36 +28,6 @@ using __cxxabiv1::__guard;
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
 
-void *operator new(size_t size)
-{
-    void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
-        umm_last_fail_alloc_addr = __builtin_return_address(0);
-        umm_last_fail_alloc_size = size;
-    }
-    return ret;
-}
-
-void *operator new[](size_t size)
-{
-    void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
-        umm_last_fail_alloc_addr = __builtin_return_address(0);
-        umm_last_fail_alloc_size = size;
-    }
-    return ret;
-}
-
-void operator delete(void * ptr)
-{
-    free(ptr);
-}
-
-void operator delete[](void * ptr)
-{
-    free(ptr);
-}
-
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
@@ -96,37 +66,6 @@ extern "C" void __cxa_guard_release(__guard* pg)
 extern "C" void __cxa_guard_abort(__guard* pg)
 {
     xt_wsr_ps(reinterpret_cast<guard_t*>(pg)->ps);
-}
-
-
-namespace std
-{
-void __throw_bad_function_call()
-{
-    panic();
-}
-
-void __throw_length_error(char const*)
-{
-    panic();
-}
-
-void __throw_bad_alloc()
-{
-    panic();
-}
-
-void __throw_logic_error(const char* str)
-{
-    (void) str;
-    panic();
-}
-
-void __throw_out_of_range(const char* str)
-{
-    (void) str;
-    panic();
-}
 }
 
 // TODO: rebuild windows toolchain to make this unnecessary:

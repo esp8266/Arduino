@@ -91,12 +91,12 @@ void Servo::detach()
 void Servo::write(int value)
 {
   // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
-  if (value < MIN_PULSE_WIDTH) {
+  if (value < _minUs) {
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
     // writeMicroseconds will contrain the calculated value for us
     // for any user defined min and max, but we must use default min max
-    value = improved_map(value, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+    value = improved_map(value, 0, 180, _minUs, _maxUs);
   }
   writeMicroseconds(value);
 }
@@ -113,7 +113,7 @@ int Servo::read() // return the value as degrees
 {
   // read returns the angle for an assumed 0-180, so we calculate using 
   // the normal min/max constants and not user defined ones
-  return improved_map(readMicroseconds(), MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180);
+  return improved_map(readMicroseconds(), _minUs, _maxUs, 0, 180);
 }
 
 int Servo::readMicroseconds()

@@ -178,7 +178,8 @@ extern char _heap_start;
 // this must be outside from "#ifndef _UMM_MALLOC_CFG_H"
 // because Arduino.h's <cstdlib> does #undef *alloc
 // Arduino.h recall us to redefine them
-#define malloc(s) ({ static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; malloc_loc(s, mem_debug_file, __LINE__); })
-#define calloc(n,s) ({ static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; calloc_loc(n, s, mem_debug_file, __LINE__); })
-#define realloc(p,s) ({ static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; realloc_loc(p, s, mem_debug_file, __LINE__); })
+#include <pgmspace.h>
+#define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; malloc_loc(s, mem_debug_file, __LINE__); })
+#define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; calloc_loc(n, s, mem_debug_file, __LINE__); })
+#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; realloc_loc(p, s, mem_debug_file, __LINE__); })
 #endif /* DEBUG_ESP_OOM */

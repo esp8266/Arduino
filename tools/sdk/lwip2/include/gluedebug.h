@@ -18,14 +18,18 @@
 #define ULWIPDEBUG	0	// 0 or 1 (trigger lwip debug)
 #define ULWIPASSERT	0	// 0 or 1 (trigger lwip self-check, 0 saves flash)
 
+#if ARDUINO
 #define STRING_IN_FLASH 1	// *print("fmt is stored in flash")
+#else
+#define STRING_IN_FLASH 0	// *print("fmt is stored in flash")
+#endif
 
 #define ROTBUFLEN_BIT	11	// (UDEBUGSTORE=1) doprint()'s buffer: 11=2048B
 
 #if ULWIPDEBUG
 //#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT)
-//#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH)
-#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON)
+#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH)
+//#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON)
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -39,6 +43,9 @@ extern "C"
 void (*phy_capture) (int netif_idx, const char* data, size_t len, int out, int success);
 
 /////////////////////////////////////////////////////////////////////////////
+#if ARDUINO
+#include <sys/pgmspace.h>
+#endif
 
 #if UDEBUG && UDEBUGSTORE
 #warning use 'doprint_allow=1' right after Serial is enabled
@@ -93,6 +100,7 @@ int doprint_minus (const char* format, ...) __attribute__ ((format (printf, 1, 2
 #define uprint(x...)		do { (void)0; } while (0)
 #endif
 
+#if ARDUINO
 #define udoassert(assertion...)	\
 do { if ((assertion) == 0) { \
 		static const char assrt[] ICACHE_RODATA_ATTR STORE_ATTR = #assertion " wrong@"; \
@@ -103,6 +111,9 @@ do { if ((assertion) == 0) { \
 		os_printf_plus(assrt_line, __LINE__); \
 		uhalt(); \
 } } while (0)
+#else
+#define udoassert(assertion...)   do { if ((assertion) == 0) { os_printf("assert fail: " #assertion " @%s:%d\n", __FILE__, __LINE__); uhalt(); } } while (0)
+#endif
 
 #if UNDEBUG
 #define uassert(assertion...)	do { (void)0; } while (0)
