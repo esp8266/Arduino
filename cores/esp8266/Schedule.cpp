@@ -33,6 +33,7 @@ static scheduled_fn_t* get_fn_unsafe()
         result = sUnused;
         sUnused = sUnused->mNext;
         result->mNext = nullptr;
+        result->callNow.reset(esp8266::polledTimeout::periodicFastUs::alwaysExpired);
     }
     // if no unused items, and count not too high, allocate a new one
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
