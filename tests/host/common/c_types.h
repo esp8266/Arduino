@@ -44,7 +44,7 @@ typedef signed long long    sint64_t;
 typedef float               real32_t;
 typedef double              real64_t;
 
-typedef unsigned char       uint8;
+// CONFLICT typedef unsigned char       uint8;
 typedef unsigned char       u8;
 typedef signed char         sint8;
 typedef signed char         int8;
@@ -53,7 +53,7 @@ typedef unsigned short      uint16;
 typedef unsigned short      u16;
 typedef signed short        sint16;
 typedef signed short        s16;
-typedef unsigned int        uint32;
+// CONFLICT typedef unsigned int        uint32;
 typedef unsigned int        u_int;
 typedef unsigned int        u32;
 typedef signed int          sint32;
@@ -101,6 +101,9 @@ typedef enum {
 #define ICACHE_RAM_ATTR
 #define ICACHE_RODATA_ATTR
 #endif /* ICACHE_FLASH */
+
+// counterpart https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp8266-compat.h
+#define IRAM_ATTR ICACHE_RAM_ATTR
 
 #define STORE_ATTR __attribute__((aligned(4)))
 

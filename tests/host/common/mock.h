@@ -29,6 +29,8 @@
  DEALINGS WITH THE SOFTWARE.
 */
 
+#define CORE_MOCK 1
+
 // include host's STL before any other include file
 // because core definition like max() is in the way
 
@@ -77,7 +79,11 @@ extern "C" {
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 
+int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
+
 extern const char* host_interface; // cmdline parameter
+
+extern int mock_port_shifter;
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
@@ -91,33 +97,46 @@ extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 #ifdef __cplusplus
 
 #ifndef CCBUFSIZE
-#define CCBUFSIZE 8192
+#define CCBUFSIZE 65536
+#endif
+
+// uart
+#ifdef __cplusplus
+extern "C" {
+#endif
+void uart_new_data(const int uart_nr, uint8_t data);
+#ifdef __cplusplus
+}
 #endif
 
 // tcp
-int    mockConnect   (uint32_t addr, int& sock, int port);
-size_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize);
-size_t mockPeekBytes (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
-size_t mockRead      (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
-size_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms);
+int    mockSockSetup  (int sock);
+int    mockConnect    (uint32_t addr, int& sock, int port);
+ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize);
+ssize_t mockPeekBytes (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
+ssize_t mockRead      (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
+ssize_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms);
 int serverAccept (int sock);
 
 // udp
+void check_incoming_udp ();
 int mockUDPSocket ();
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
 size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
+void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize);
 
 class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
 
-class InterruptLock { };
-
 //
 
-#define CORE_MOCK 1
+void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_stop_spiffs ();
+
+//
 
 #define ARDUINO 267
 #define ESP8266 1
@@ -139,6 +158,10 @@ class InterruptLock { };
 #define D6 6
 #define D7 7
 #define D8 8
+
+//
+
+#include <common/esp8266_peri.h>
 
 //
 

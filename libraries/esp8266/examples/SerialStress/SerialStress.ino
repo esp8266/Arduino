@@ -16,12 +16,15 @@
 #define BUFFER_SIZE     4096    // may be useless to use more than 2*SERIAL_SIZE_RX
 #define SERIAL_SIZE_RX  1024    // Serial.setRxBufferSize()
 
+#define FAKE_INCREASED_AVAILABLE 100 // test readBytes's timeout
+
 #define TIMEOUT 5000
 #define DEBUG(x...) //x
 
 uint8_t buf [BUFFER_SIZE];
 uint8_t temp [BUFFER_SIZE];
 bool reading = true;
+size_t testReadBytesTimeout = 0;
 
 static size_t out_idx = 0, in_idx = 0;
 static size_t local_receive_size = 0;
@@ -71,6 +74,7 @@ void setup() {
   // so we can still log to the regular usbserial chips
   SoftwareSerial* ss = new SoftwareSerial(3, 1);
   ss->begin(SSBAUD);
+  ss->enableIntTx(false);
   logger = ss;
   logger->println();
   logger->printf("\n\nOn Software Serial for logging\n");
@@ -83,6 +87,7 @@ void setup() {
   size_for_1sec = baud / 10; // 8n1=10baudFor8bits
   logger->printf("led changes state every %zd bytes (= 1 second)\n", size_for_1sec);
   logger->printf("press 's' to stop reading, not writing (induces overrun)\n");
+  logger->printf("press 't' to toggle timeout testing on readBytes\n");
 
   // prepare send/compare buffer
   for (size_t i = 0; i < sizeof buf; i++) {
@@ -136,7 +141,7 @@ void loop() {
 
   if (reading) {
     // receive data
-    maxlen = Serial.available();
+    maxlen = Serial.available() + testReadBytesTimeout;
     if (maxlen > maxavail) {
       maxavail = maxlen;
     }
@@ -180,8 +185,16 @@ void loop() {
     timeout = (last_ms = now_ms) + TIMEOUT;
   }
 
-  if (logger->read() == 's') {
-    logger->println("now stopping reading, keeping writing");
-    reading = false;
-  }
+  if (logger->available())
+    switch (logger->read()) {
+      case 's':
+        logger->println("now stopping reading, keeping writing");
+        reading = false;
+        break;
+      case 't':
+        testReadBytesTimeout ^= FAKE_INCREASED_AVAILABLE;
+        logger->printf("testing readBytes timeout: %d\n", !!testReadBytesTimeout);
+        break;
+      default:;
+    }
 }

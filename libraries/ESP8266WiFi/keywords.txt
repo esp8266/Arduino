@@ -183,6 +183,7 @@ setBufferSizes	KEYWORD2
 getLastSSLError	KEYWORD2
 setCertStore	KEYWORD2
 probeMaxFragmentLength	KEYWORD2
+getMFLNStatus	KEYWORD2
 
 #WiFiServerBearSSL
 setRSACert	KEYWORD2

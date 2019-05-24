@@ -32,37 +32,87 @@
 #include <Arduino.h>
 #include <user_interface.h> // wifi_get_ip_info()
 
-#include <functional>
-#include "lwip/opt.h"
-#include "lwip/udp.h"
-#include "lwip/inet.h"
-#include "lwip/igmp.h"
-#include "lwip/mem.h"
-#include <include/UdpContext.h>
-#include <poll.h>
-
-#include <unistd.h> // usleep
+#include <signal.h>
+#include <unistd.h>
 #include <getopt.h>
+#include <termios.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-#include <map>
+#define MOCK_PORT_SHIFTER 9000
 
-#if 0
-#include "../common/spiffs_mock.h"
-#include <spiffs/spiffs.h>
-SPIFFS_MOCK_DECLARE(/*size_kb*/1024, /(blovk_kb*/8, /*page_b*/512);
-#endif
+bool user_exit = false;
+const char* host_interface = nullptr;
+size_t spiffs_kb = 1024;
+bool ignore_sigint = false;
+bool restore_tty = false;
+bool mockdebug = false;
+int mock_port_shifter = MOCK_PORT_SHIFTER;
 
-std::map<int,UdpContext*> udps;
+#define STDIN STDIN_FILENO
 
-void register_udp (int sock, UdpContext* udp)
+static struct termios initial_settings;
+
+int mockverbose (const char* fmt, ...)
 {
-	if (udp)
-		udps[sock] = udp;
-	else
-		udps.erase(sock);
+	va_list ap;
+	va_start(ap, fmt);
+	if (mockdebug)
+		return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
+	return 0;
 }
 
-const char* host_interface = nullptr;
+static int mock_start_uart(void)
+{
+	struct termios settings;
+
+	if (!isatty(STDIN))
+	{
+		perror("setting tty in raw mode: isatty(STDIN)");
+		return -1;
+	}
+	if (tcgetattr(STDIN, &initial_settings) < 0)
+	{
+		perror("setting tty in raw mode: tcgetattr(STDIN)");
+		return -1;
+	}
+	settings = initial_settings;
+	settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
+	settings.c_lflag &= ~(ECHO	| ICANON);
+	settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON);
+	settings.c_oflag |=	(ONLCR);
+	settings.c_cc[VMIN]	= 0;
+	settings.c_cc[VTIME] = 0;
+	if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
+	{
+		perror("setting tty in raw mode: tcsetattr(STDIN)");
+		return -1;
+	}
+	restore_tty = true;
+	return 0;
+}
+
+static int mock_stop_uart(void)
+{
+	if (!restore_tty) return 0;
+	if (!isatty(STDIN)) {
+		perror("restoring tty: isatty(STDIN)");
+		return -1;
+	}
+	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
+	{
+		perror("restoring tty: tcsetattr(STDIN)");
+		return -1;
+	}
+	printf("\e[?25h"); // show cursor
+	return (0);
+}
+
+static uint8_t mock_read_uart(void)
+{
+	uint8_t ch = 0;
+	return (read(STDIN, &ch, 1) == 1) ? ch : 0;
+}
 
 void help (const char* argv0, int exitcode)
 {
@@ -72,8 +122,14 @@ void help (const char* argv0, int exitcode)
 		"	-h\n"
 		"	-i <interface> - use this interface for IP address\n"
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+		"	-s             - port shifter (default: %d, when root: 0)\n"
+		"	-c             - ignore CTRL-C (send it via Serial)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
-		, argv0);
+		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
+		"	-S             - spiffs size in KBytes (default: %zd)\n"
+		"	-v             - mock verbose\n"
+		"                  (negative value will force mismatched size)\n"
+		, argv0, MOCK_PORT_SHIFTER, spiffs_kb);
 	exit(exitcode);
 }
 
@@ -82,16 +138,47 @@ static struct option options[] =
 	{ "help",		no_argument,		NULL, 'h' },
 	{ "fast",		no_argument,		NULL, 'f' },
 	{ "local",		no_argument,		NULL, 'l' },
+	{ "sigint",		no_argument,		NULL, 'c' },
+	{ "blockinguart",	no_argument,		NULL, 'b' },
+	{ "verbose",		no_argument,		NULL, 'v' },
 	{ "interface",		required_argument,	NULL, 'i' },
+	{ "spiffskb",		required_argument,	NULL, 'S' },
+	{ "portshifter",	required_argument,	NULL, 's' },
 };
+
+void cleanup ()
+{
+	mock_stop_spiffs();
+	mock_stop_uart();
+}
+
+void control_c (int sig)
+{
+	(void)sig;
+
+	if (user_exit)
+	{
+		fprintf(stderr, MOCK "stuck, killing\n");
+		cleanup();
+		exit(1);
+	}
+	user_exit = true;
+}
 
 int main (int argc, char* const argv [])
 {
 	bool fast = false;
+	bool blocking_uart = false;
+
+	signal(SIGINT, control_c);
+	if (geteuid() == 0)
+		mock_port_shifter = 0;
+	else
+		mock_port_shifter = MOCK_PORT_SHIFTER;
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlfi:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvi:S:s:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -105,39 +192,65 @@ int main (int argc, char* const argv [])
 		case 'l':
 			global_ipv4_netfmt = NO_GLOBAL_BINDING;
 			break;
+		case 's':
+			mock_port_shifter = atoi(optarg);
+			break;
+		case 'c':
+			ignore_sigint = true;
+			break;
 		case 'f':
 			fast = true;
 			break;
+		case 'S':
+			spiffs_kb = atoi(optarg);
+			break;
+		case 'b':
+			blocking_uart = true;
+			break;
+		case 'v':
+			mockdebug = true;
+			break;
 		default:
-			fprintf(stderr, MOCK "bad option '%c'\n", n);
-			exit(EXIT_FAILURE);
+			help(argv[0], EXIT_FAILURE);
 		}
+	}
+
+	mockverbose("server port shifter: %d\n", mock_port_shifter);
+
+	if (spiffs_kb)
+	{
+		String name = argv[0];
+		name += "-spiffs";
+		name += String(spiffs_kb > 0? spiffs_kb: -spiffs_kb, DEC);
+		name += "KB";
+		mock_start_spiffs(name, spiffs_kb);
 	}
 
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
 
-	setup();
-	while (true)
+	if (!blocking_uart)
 	{
-		if (!fast)
-			usleep(10000); // not 100% cpu
-
-		loop();
-
-		// check incoming udp
-		for (auto& udp: udps)
-		{
-			pollfd p;
-			p.fd = udp.first;
-			p.events = POLLIN;
-			if (poll(&p, 1, 0) && p.revents == POLLIN)
-			{
-				fprintf(stderr, MOCK "UDP poll(%d) -> cb\r", p.fd);
-				udp.second->mock_cb();
-			}
-		}
+		// set stdin to non blocking mode
+		mock_start_uart();
 	}
+
+	// install exit handler in case Esp.restart() is called
+	atexit(cleanup);
+
+	setup();
+	while (!user_exit)
+	{
+		uint8_t data = mock_read_uart();
+
+		if (data)
+			uart_new_data(UART0, data);
+		if (!fast)
+			usleep(1000); // not 100% cpu, ~1000 loops per second
+		loop();
+		check_incoming_udp();
+	}
+	cleanup();
+
 	return 0;
 }
-

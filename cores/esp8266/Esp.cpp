@@ -589,9 +589,7 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
 static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
 
 bool EspClass::flashEraseSector(uint32_t sector) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = spi_flash_erase_sector(sector);
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 
@@ -639,7 +637,6 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
 #endif
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = 0;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
@@ -650,14 +647,11 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     {
         rc = spi_flash_write(offset, data, size);
     }
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = spi_flash_read(offset, (uint32_t*) data, size);
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 

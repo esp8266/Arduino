@@ -38,20 +38,34 @@ void ledToggle() {
 }
 
 
-
-esp8266::polledTimeout::periodic halfPeriod(500); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
+esp8266::polledTimeout::periodicFastUs halfPeriod(500000); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 // the setup function runs only once at start
 void setup() {
+  Serial.begin(115200);
+
+  Serial.println();
+  Serial.printf("periodic/oneShotMs::timeMax()     = %u ms\n", (uint32_t)esp8266::polledTimeout::periodicMs::timeMax());
+  Serial.printf("periodic/oneShotFastMs::timeMax() = %u ms\n", (uint32_t)esp8266::polledTimeout::periodicFastMs::timeMax());
+  Serial.printf("periodic/oneShotFastUs::timeMax() = %u us\n", (uint32_t)esp8266::polledTimeout::periodicFastUs::timeMax());
+  Serial.printf("periodic/oneShotFastNs::timeMax() = %u ns\n", (uint32_t)esp8266::polledTimeout::periodicFastNs::timeMax());
+
+#if 0 // 1 for debugging polledTimeout
+  Serial.printf("periodic/oneShotMs::rangeCompensate     = %u\n", (uint32_t)esp8266::polledTimeout::periodicMs::rangeCompensate);
+  Serial.printf("periodic/oneShotFastMs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastMs::rangeCompensate);
+  Serial.printf("periodic/oneShotFastUs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastUs::rangeCompensate);
+  Serial.printf("periodic/oneShotFastNs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastNs::rangeCompensate);
+#endif
+
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
 
-  using esp8266::polledTimeout::oneShot; //import the type to the local namespace
+  using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace
 
   //STEP1; turn the led ON
   ledOn();
 
   //STEP2: wait for ON timeout
-  oneShot timeoutOn(2000);
+  oneShotMs timeoutOn(2000);
   while (!timeoutOn) {
     yield();
   }
@@ -60,7 +74,7 @@ void setup() {
   ledOff();
 
   //STEP4: wait for OFF timeout to assure the led is kept off for this time before exiting setup
-  oneShot timeoutOff(2000);
+  oneShotMs timeoutOff(2000);
   while (!timeoutOff) {
     yield();
   }

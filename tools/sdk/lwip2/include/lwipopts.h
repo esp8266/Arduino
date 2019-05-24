@@ -660,7 +660,7 @@
  * packet in a row to an IP address that is not in the ARP cache.
  */
 #if !defined ARP_QUEUEING || defined __DOXYGEN__
-#define ARP_QUEUEING                    0
+#define ARP_QUEUEING                    1
 #endif
 
 /** The maximum number of packets which may be queued for each
@@ -2705,7 +2705,7 @@
  * void dhcp6_set_ntp_servers(u8_t num_ntp_servers, ip_addr_t* ntp_server_addrs);
 */
 #if !defined LWIP_DHCP6_GET_NTP_SRV || defined __DOXYGEN__
-#define LWIP_DHCP6_GET_NTP_SRV          0 // with 1: dhcp6_set_ntp_servers() must be implemented
+#define LWIP_DHCP6_GET_NTP_SRV          1 // with 1: dhcp6_set_ntp_servers() must be implemented
 #endif
 
 /**
@@ -3533,6 +3533,12 @@
 #ifndef LWIP_FEATURES
 #error LWIP_FEATURES must be defined
 #endif
+
+
+/**
+ * TCP_RANDOM_PORT: randomize port instead of simply increasing
+ */
+#define TCP_RANDOM_PORT 1
 
 /*
    --------------------------------------------------

@@ -4,10 +4,8 @@
 
 set -ev
 
-find $TRAVIS_BUILD_DIR/libraries -name '*.ino' -exec \
-    astyle \
-        --suffix=none \
-        --options=$TRAVIS_BUILD_DIR/tests/examples_style.conf {} \;
+org=$(cd ${0%/*}; pwd)
+${org}/../restyle.sh
 
 # Revert changes which astyle might have done to the submodules,
 # as we don't want to fail the build because of the 3rd party libraries

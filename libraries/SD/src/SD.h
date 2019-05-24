@@ -1,154 +1,147 @@
 /*
+ SD.h - A thin shim for Arduino ESP8266 Filesystems
+ Copyright (c) 2019 Earle F. Philhower, III.  All rights reserved.
 
- SD - a slightly more friendly wrapper for sdfatlib
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
 
- This library aims to expose a subset of SD card functionality
- in the form of a higher level "wrapper" object.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
- License: GNU General Public License V3
-          (Because sdfatlib is licensed with this.)
-
- (C) Copyright 2010 SparkFun Electronics
-
- */
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef __SD_H__
 #define __SD_H__
 
 #include <Arduino.h>
+#include <FS.h>
+#include <SDFS.h>
 
-#include <utility/SdFat.h>
-#include <utility/SdFatUtil.h>
-
-#define FILE_READ O_READ
-#define FILE_WRITE (O_READ | O_WRITE | O_CREAT)
-
-class File : public Stream {
- private:
-  char _name[13]; // our name
-  SdFile *_file;  // underlying file pointer
-
-public:
-  File(SdFile f, const char *name);     // wraps an underlying SdFile
-  File(void);      // 'empty' constructor
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
-  virtual int read();
-  virtual size_t readBytes(char *buffer, size_t length);
-  virtual int peek();
-  virtual int available();
-  virtual void flush();
-  int read(void *buf, uint16_t nbyte);
-  boolean seek(uint32_t pos);
-  uint32_t position();
-  uint32_t size();
-  void close();
-  operator bool();
-  char * name();
-
-  boolean isDirectory(void);
-  File openNextFile(uint8_t mode = O_RDONLY);
-  void rewindDirectory(void);
-
-  template<typename T> size_t write(T &src){
-    uint8_t obuf[512];
-    size_t doneLen = 0;
-    size_t sentLen;
-    int i;
-
-    while (src.available() > 512){
-      src.read(obuf, 512);
-      sentLen = write(obuf, 512);
-      doneLen = doneLen + sentLen;
-      if(sentLen != 512){
-        return doneLen;
-      }
-    }
-  
-    size_t leftLen = src.available();
-    src.read(obuf, leftLen);
-    sentLen = write(obuf, leftLen);
-    doneLen = doneLen + sentLen;
-    return doneLen;
-  }
-  
-  using Print::write;
-};
+#undef FILE_READ
+#define FILE_READ sdfat::O_READ
+#undef FILE_WRITE
+#define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT | sdfat::O_APPEND)
 
 class SDClass {
-
-private:
-  // These are required for initialisation and use of sdfatlib
-  Sd2Card card;
-  SdVolume volume;
-  SdFile root;
-  
-  // my quick&dirty iterator, should be replaced
-  SdFile getParentDir(const char *filepath, int *indx);
 public:
-  // This needs to be called to set up the connection to the SD card
-  // before other methods are used.
-  boolean begin(uint8_t csPin = SD_CHIP_SELECT_PIN, uint32_t speed = SPI_HALF_SPEED);
+    boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
+	SDFS.setConfig(SDFSConfig(csPin, cfg));
+        return (boolean)SDFS.begin();
+    }
 
-/*
-  In the following sequence:
-  //Insert SD Card A
-  SD.begin()
-  //do operations
-  //remove card A
-  //insert SD card B
-  SD.end()
+    void end(bool endSPI = true) {
+        SDFS.end();
+        if (endSPI) {
+            SPI.end();
+        }
+    }
 
-  It is possible that card A becomes corrupted due to removal before calling SD.end().
-  It is possible that card B becomes corrupted if there were ops pending for card A at the time SD.end() is called.
+    File open(const char *filename, uint8_t mode = FILE_READ) {
+        return SDFS.open(filename, getMode(mode));
+    }
 
-  Call SD.end() or SD.end(true) to shut everything down.
-  Call SD.end(false) to shut everything but the SPI object down.
- */
-  void end(bool endSPI = true);
+    File open(const String &filename, uint8_t mode = FILE_READ) {
+        return open(filename.c_str(), mode);
+    }
 
+    boolean exists(const char *filepath) {
+        return (boolean)SDFS.exists(filepath);
+    }
 
-  // Open the specified file/directory with the supplied mode (e.g. read or
-  // write, etc). Returns a File object for interacting with the file.
-  // Note that currently only one file can be open at a time.
-  File open(const char *filename, uint8_t mode = FILE_READ);
-  File open(const String &filename, uint8_t mode = FILE_READ) { return open( filename.c_str(), mode ); }
+    boolean exists(const String &filepath) {
+        return (boolean)SDFS.exists(filepath.c_str());
+    }
 
-  // Methods to determine if the requested file path exists.
-  boolean exists(const char *filepath);
-  boolean exists(const String &filepath) { return exists(filepath.c_str()); }
+    boolean mkdir(const char *filepath) {
+        return (boolean)SDFS.mkdir(filepath);
+    }
 
-  // Create the requested directory heirarchy--if intermediate directories
-  // do not exist they will be created.
-  boolean mkdir(const char *filepath);
-  boolean mkdir(const String &filepath) { return mkdir(filepath.c_str()); }
+    boolean mkdir(const String &filepath) {
+        return (boolean)SDFS.mkdir(filepath.c_str());
+    }
   
-  // Delete the file.
-  boolean remove(const char *filepath);
-  boolean remove(const String &filepath) { return remove(filepath.c_str()); }
-  
-  boolean rmdir(const char *filepath);
-  boolean rmdir(const String &filepath) { return rmdir(filepath.c_str()); }
+    boolean remove(const char *filepath) {
+        return (boolean)SDFS.remove(filepath);
+    }
 
-  uint8_t type(){ return card.type(); }
-  uint8_t fatType(){ return volume.fatType(); }
-  size_t blocksPerCluster(){ return volume.blocksPerCluster(); }
-  size_t totalClusters(){ return volume.clusterCount(); }
-  size_t blockSize(){ return (size_t)0x200; }
-  size_t totalBlocks(){ return (totalClusters() / blocksPerCluster()); }
-  size_t clusterSize(){ return blocksPerCluster() * blockSize(); }
-  size_t size(){ return (clusterSize() * totalClusters()); }
+    boolean remove(const String &filepath) {
+        return remove(filepath.c_str());
+    }
+  
+    boolean rmdir(const char *filepath) {
+        return (boolean)SDFS.rmdir(filepath);
+    }
+
+    boolean rmdir(const String &filepath) {
+        return rmdir(filepath.c_str());
+    }
+
+    uint8_t type() {
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->type();
+    }
+
+    uint8_t fatType() {
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->fatType();
+    }
+
+    size_t blocksPerCluster() {
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->blocksPerCluster();
+    }
+
+    size_t totalClusters() {
+        sdfs::SDFSImpl* sd = static_cast<sdfs::SDFSImpl*>(SDFS.getImpl().get());
+        return sd->totalClusters();
+    }
+
+    size_t blockSize() {
+        return 512;
+    }
+
+    size_t totalBlocks() {
+        return (totalClusters() / blocksPerCluster());
+    }
+
+    size_t clusterSize() {
+        return blocksPerCluster() * blockSize();
+    }
+
+    size_t size() {
+        uint64_t sz = size64();
+#ifdef DEBUG_ESP_PORT
+	if (sz > (uint64_t)SIZE_MAX) {
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use size64().\n"), sz);
+        }
+#endif
+        return (size_t)sz;
+    }
+
+    uint64_t size64() {
+        return ((uint64_t)clusterSize() * (uint64_t)totalClusters());
+    }
+
 private:
+    const char *getMode(uint8_t mode) {
+        bool read = (mode & sdfat::O_READ) ? true : false;
+        bool write = (mode & sdfat::O_WRITE) ? true : false;
+        bool append = (mode & sdfat::O_APPEND) ? true : false;
+        if      (  read & !write )           { return "r";  }
+        else if ( !read &  write & !append ) { return "w+"; }
+        else if ( !read &  write &  append ) { return "a";  }
+        else if (  read &  write & !append ) { return "w+"; } // may be a bug in FS::mode interpretation, "r+" seems proper
+        else if (  read &  write &  append ) { return "a+"; }
+        else                                 { return "r";  }
+    }
 
-  // This is used to determine the mode used to open a file
-  // it's here because it's the easiest place to pass the 
-  // information through the directory walking function. But
-  // it's probably not the best place for it.
-  // It shouldn't be set directly--it is set via the parameters to `open`.
-  int fileOpenMode;
-  
-  friend class File;
-  friend boolean callback_openPath(SdFile&, char *, boolean, void *); 
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)
