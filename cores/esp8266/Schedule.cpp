@@ -101,32 +101,43 @@ void run_scheduled_functions()
     // its purpose is that it is never called from an interrupt
     // (always on cont stack).
 
-    scheduled_fn_t* lastRecurring = nullptr;
-    scheduled_fn_t* toCall = sFirst;
-    while (toCall)
+    static bool fence = false;
     {
-        scheduled_fn_t* item = toCall;
-        toCall = toCall->mNext;
-        if (item->callNow)
+        InterruptLock lockAllInterruptsInThisScope;
+        if (fence)
+            // prevent recursive calls from yield()
+            return;
+        fence = true;
+    }
+
+    scheduled_fn_t* lastRecurring = nullptr;
+    scheduled_fn_t* nextCall = sFirst;
+    while (nextCall)
+    {
+        scheduled_fn_t* toCall = nextCall;
+        nextCall = nextCall->mNext;
+        if (toCall->callNow)
         {
-            if (item->mFunc())
+            if (toCall->mFunc())
             {
-                lastRecurring = item;
+                lastRecurring = toCall;
             }
             else
             {
                 InterruptLock lockAllInterruptsInThisScope;
 
-                if (sFirst == item)
+                if (sFirst == toCall)
                     sFirst = sFirst->mNext;
                 else if (lastRecurring)
-                    lastRecurring->mNext = item->mNext;
+                    lastRecurring->mNext = toCall->mNext;
 
-                if (sLast == item)
+                if (sLast == toCall)
                     sLast = lastRecurring;
 
-                recycle_fn_unsafe(item);
+                recycle_fn_unsafe(toCall);
             }
         }
     }
+
+    fence = false;
 }
