@@ -1,5 +1,8 @@
 /*
- spiffs_mock.h - SPIFFS HAL mock for host side testing
+ littlefs_mock.h - LittleFS HAL mock for host side testing
+ Copyright © 2019 Earle F. Philhower, III
+
+ Based on spiffs_mock:
  Copyright © 2016 Ivan Grokhotkov
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +16,8 @@
  all copies or substantial portions of the Software.
 */
 
-#ifndef spiffs_mock_hpp
-#define spiffs_mock_hpp
+#ifndef littlefs_mock_hpp
+#define littlefs_mock_hpp
 
 #include <stdint.h>
 #include <stddef.h>
@@ -22,13 +25,13 @@
 #include <FS.h>
 #include "flash_hal_mock.h"
 
-#define DEFAULT_SPIFFS_FILE_NAME "spiffs.bin"
+#define DEFAULT_LITTLEFS_FILE_NAME "littlefs.bin"
 
-class SpiffsMock {
+class LittleFSMock {
 public:
-    SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
+    LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
-    ~SpiffsMock();
+    ~LittleFSMock();
     
 protected:
     void load ();
@@ -39,7 +42,7 @@ protected:
     bool m_overwrite;
 };
 
-#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
-#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
+#define LITTLEFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) LittleFSMock littlefs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
+#define LITTLEFS_MOCK_RESET() littlefs_mock.reset()
 
-#endif /* spiffs_mock_hpp */
+#endif /* littlefs_mock_hpp */

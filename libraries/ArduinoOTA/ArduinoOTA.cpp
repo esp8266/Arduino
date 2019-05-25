@@ -186,7 +186,7 @@ void ArduinoOTAClass::_onRx(){
 
   if (_state == OTA_IDLE) {
     int cmd = parseInt();
-    if (cmd != U_FLASH && cmd != U_SPIFFS)
+    if (cmd != U_FLASH && cmd != U_FS)
       return;
     _ota_ip = _udp_ota->getRemoteAddress();
     _cmd  = cmd;

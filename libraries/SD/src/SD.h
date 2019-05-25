@@ -47,7 +47,15 @@ public:
         return SDFS.open(filename, getMode(mode));
     }
 
+    File open(const char *filename, const char *mode) {
+        return SDFS.open(filename, mode);
+    }
+
     File open(const String &filename, uint8_t mode = FILE_READ) {
+        return open(filename.c_str(), mode);
+    }
+
+    File open(const String &filename, const char *mode) {
         return open(filename.c_str(), mode);
     }
 

@@ -63,10 +63,39 @@ following include to the sketch:
 
     #include "FS.h"
 
-File system limitations
------------------------
+SPIFFS and LittleFS
+-------------------
 
-The filesystem implementation for ESP8266 had to accomodate the
+There are two filesystems for utilizing the onboard flash on the ESP8266:
+SPIFFS and LittleFS.
+
+SPIFFS is the original filesystem and is ideal for space and RAM
+constrained applications that utilize many small files and care
+about static and dynamic wear levelling and don't need true directory
+support.  Filesystem overhead on the flash is minimal as well.
+
+LittleFS is recently added and focuses on higher performance and
+directory support, but has higher filesystem and per-file overhead
+(4K minimum vs. SPIFFS' 256 byte minimum file allocation unit).
+
+They share a compatible API but have incompatible on-flash
+implementations, so it is important to choose one or the per project
+as attempting to mount a SPIFFS volume under LittleFS may result
+in a format operation and definitely will not preserve any files,
+and vice-versa.
+
+The actual ``File`` and ``Dir`` objects returned from either
+filesystem behave in the same manner and documentation is applicable
+to both.  To convert most applications from SPIFFS to LittleFS
+simply requires changing the ``SPIFFS.begin()`` to ``LittleFS.begin()``
+and ``SPIFFS.open()`` to ``LittleFS.open()`` with the rest of the
+code remaining untouched.
+
+
+SPIFFS file system limitations
+------------------------------
+
+The SPIFFS implementation for ESP8266 had to accomodate the
 constraints of the chip, among which its limited RAM.
 `SPIFFS <https://github.com/pellepl/spiffs>`__ was selected because it
 is designed for small systems, but that comes at the cost of some
@@ -100,6 +129,37 @@ For more details on the internals of SPIFFS implementation, see the
 `SPIFFS readme
 file <https://github.com/esp8266/Arduino/blob/master/cores/esp8266/spiffs/README.md>`__.
 
+
+LittleFS file system limitations
+--------------------------------
+
+The LittleFS implementation for the ESP8266 supports filenames of up
+to 31 characters + terminating zero (i.e. ``char filename[32]``), and
+as many subdirectories as space permits.
+
+Filenames are assumed to be in the root directory if no initial "/" is
+present.
+
+Opening files in subdirectories requires specifying the complete path to
+the file (i.e. ``open("/sub/dir/file.txt");``).  Subdirectories are
+automatically created when you attempt to create a file in a subdirectory,
+and when the last file in a subdirectory is removed the subdirectory
+itself is automatically deleted.  This is because there was no ``mkdir()``
+method in the existing SPIFFS filesystem.
+
+Unlike SPIFFS, the actual file descriptors are allocated as requested
+by the application, so in low memory conditions you may not be able to
+open new files.  Conversely, this also means that only file descriptors
+used will actually take space on the heap.
+
+Because there are directories, the ``openDir`` method behaves differently
+than SPIFFS.  Whereas SPIFFS will return files in "subdirectories" when
+you traverse a ``Dir::next()`` (because they really aren't subdirs but
+simply files with "/"s in their names), LittleFS will only return files
+in the specific subdirectory.  This mimics the POSIX behavior for
+directory traversal most C programmers are used to.
+
+
 Uploading files to file system
 ------------------------------
 
@@ -129,8 +189,15 @@ use esptool.py.
    uploading the files into ESP8266 flash file system. When done, IDE
    status bar will display ``SPIFFS Image Uploaded`` message.
 
-File system object (SPIFFS)
----------------------------
+*ESP8266LittleFS* is the equivalent tool for LittleFS.
+
+- Download the tool: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
+- Install as above
+- To upload a LittleFS filesystem use Tools > ESP8266 LittleFS Data Upload
+
+
+File system object (SPIFFS/LittleFS)
+------------------------------------
 
 setConfig
 ~~~~~~~~~
@@ -156,11 +223,17 @@ begin
 .. code:: cpp
 
     SPIFFS.begin()
+    or LittleFS.begin()
 
-This method mounts SPIFFS file system. It must be called before any
+This method mounts file system. It must be called before any
 other FS APIs are used. Returns *true* if file system was mounted
 successfully, false otherwise.  With no options it will format SPIFFS
 if it is unable to mount it on the first try.
+
+Note that both methods will automatically format the filesystem
+if one is not detected.  This means that if you attempt a
+``SPIFFS.begin()`` on a LittleFS filesystem you will lose all data
+on that filesystem, and vice-versa.
 
 end
 ~~~
@@ -168,9 +241,10 @@ end
 .. code:: cpp
 
     SPIFFS.end()
+    or LittleFS.end()
 
-This method unmounts SPIFFS file system. Use this method before updating
-SPIFFS using OTA.
+This method unmounts the file system. Use this method before updating
+the file system using OTA.
 
 format
 ~~~~~~
@@ -178,6 +252,7 @@ format
 .. code:: cpp
 
     SPIFFS.format()
+    or LittleFS.format()
 
 Formats the file system. May be called either before or after calling
 ``begin``. Returns *true* if formatting was successful.
@@ -188,6 +263,7 @@ open
 .. code:: cpp
 
     SPIFFS.open(path, mode)
+    or LittleFS.open(path, mode)
 
 Opens a file. ``path`` should be an absolute path starting with a slash
 (e.g. ``/dir/filename.txt``). ``mode`` is a string specifying access
@@ -234,8 +310,28 @@ exists
 .. code:: cpp
 
     SPIFFS.exists(path)
+    or LittleFS.exists(path)
 
 Returns *true* if a file with given path exists, *false* otherwise.
+
+mkdir
+~~~~~
+
+.. code:: cpp
+
+    LittleFS.mkdir(path)
+
+Returns *true* if the directory creation succeeded, *false* otherwise.
+
+rmdir
+~~~~~
+
+.. code:: cpp
+
+    LittleFS.rmdir(path)
+
+Returns *true* if the directory was successfully removed, *false* otherwise.
+
 
 openDir
 ~~~~~~~
@@ -243,8 +339,11 @@ openDir
 .. code:: cpp
 
     SPIFFS.openDir(path)
+    or LittleFS.openDir(path)
 
 Opens a directory given its absolute path. Returns a *Dir* object.
+Please note the previous discussion on the difference in behavior between
+LittleFS and SPIFFS for this call.
 
 remove
 ~~~~~~
@@ -252,6 +351,7 @@ remove
 .. code:: cpp
 
     SPIFFS.remove(path)
+    or LittleFS.remove(path)
 
 Deletes the file given its absolute path. Returns *true* if file was
 deleted successfully.
@@ -262,6 +362,7 @@ rename
 .. code:: cpp
 
     SPIFFS.rename(pathFrom, pathTo)
+    or LittleFS.rename(pathFrom, pathTo)
 
 Renames file from ``pathFrom`` to ``pathTo``. Paths must be absolute.
 Returns *true* if file was renamed successfully.
@@ -273,6 +374,7 @@ info
 
     FSInfo fs_info;
     SPIFFS.info(fs_info);
+    or LittleFS.info(fs_info);
 
 Fills `FSInfo structure <#filesystem-information-structure>`__ with
 information about the file system. Returns ``true`` is successful,
@@ -294,8 +396,8 @@ Filesystem information structure
 
 This is the structure which may be filled using FS::info method. -
 ``totalBytes`` — total size of useful data on the file system -
-``usedBytes`` — number of bytes used by files - ``blockSize`` — SPIFFS
-block size - ``pageSize`` — SPIFFS logical page size - ``maxOpenFiles``
+``usedBytes`` — number of bytes used by files - ``blockSize`` — filesystem
+block size - ``pageSize`` — filesystem logical page size - ``maxOpenFiles``
 — max number of files which may be open simultaneously -
 ``maxPathLength`` — max file name length (including one byte for zero
 termination)
@@ -304,14 +406,14 @@ Directory object (Dir)
 ----------------------
 
 The purpose of *Dir* object is to iterate over files inside a directory.
-It provides the methods: ``next()``, ``fileName()``, ``fileSize()`` , and
-``openFile(mode)``.
+It provides multiple access methods.
 
 The following example shows how it should be used:
 
 .. code:: cpp
 
     Dir dir = SPIFFS.openDir("/data");
+    // or Dir dir = LittleFS.openDir("/data");
     while (dir.next()) {
         Serial.print(dir.fileName());
         if(dir.fileSize()) {
@@ -339,16 +441,33 @@ fileSize
 Returns the size of the current file pointed to
 by the internal iterator.
 
+isFile
+~~~~~~
+
+Returns *true* if the current file pointed to by
+the internal iterator is a File.
+
+isDirectory
+~~~~~~~~~~~
+
+Returns *true* if the current file pointed to by
+the internal iterator is a Directory.
+
 openFile
 ~~~~~~~~
 
 This method takes *mode* argument which has the same meaning as
-for ``SPIFFS.open()`` function.
+for ``SPIFFS/LittleFS.open()`` function.
+
+rewind
+~~~~~~
+
+Resets the internal pointer to the start of the directory.
 
 File object
 -----------
 
-``SPIFFS.open()`` and ``dir.openFile()`` functions return a *File* object.
+``SPIFFS/LittleFS.open()`` and ``dir.openFile()`` functions return a *File* object.
 This object supports all the functions of *Stream*, so you can use
 ``readBytes``, ``findUntil``, ``parseInt``, ``println``, and all other
 *Stream* methods.
@@ -399,8 +518,41 @@ name
 
     String name = file.name();
 
-Returns file name, as ``const char*``. Convert it to *String* for
+Returns short (no-path) file name, as ``const char*``. Convert it to *String* for
 storage.
+
+fullName
+~~~~~~~~
+
+.. code:: cpp
+
+    // Filesystem:
+    //   testdir/
+    //           file1
+    Dir d = LittleFS.openDir("testdir/");
+    File f = d.openFile("r");
+    // f.name() == "file1", f.fullName() == "testdir/file1"
+
+Returns the full path file name as a ``const char*``.
+
+isFile
+~~~~~~
+
+.. code:: cpp
+
+    bool amIAFile = file.isFile();
+
+Returns *true* if this File points to a real file.
+
+isDirectory
+~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool amIADir = file.isDir();
+
+Returns *true* if this File points to a directory (used for emulation
+of the SD.* interfaces with the ``openNextFile`` method).
 
 close
 ~~~~~
@@ -411,3 +563,29 @@ close
 
 Close the file. No other operations should be performed on *File* object
 after ``close`` function was called.
+
+openNextFile  (compatibiity method, not recommended for new code)
+~~~~~~~~~~~~
+
+.. code:: cpp
+
+    File root = LittleFS.open("/");
+    File file1 = root.openNextFile();
+    File files = root.openNextFile();
+
+Opens the next file in the directory pointed to by the File.  Only valid
+when ``File.isDirectory() == true``.
+
+rewindDirectory  (compatibiity method, not recommended for new code)
+~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    File root = LittleFS.open("/");
+    File file1 = root.openNextFile();
+    file1.close();
+    root.rewindDirectory();
+    file1 = root.openNextFile(); // Opens first file in dir again
+
+Resets the ``openNextFile`` pointer to the top of the directory.  Only
+valid when ``File.isDirectory() == true``.
