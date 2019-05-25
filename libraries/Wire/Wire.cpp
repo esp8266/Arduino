@@ -51,7 +51,7 @@ uint8_t TwoWire::txBufferLength = 0;
 
 uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);
-void (*TwoWire::user_onReceive)(int);
+void (*TwoWire::user_onReceive)(size_t);
 
 static int default_sda_pin = SDA;
 static int default_scl_pin = SCL;
@@ -66,6 +66,16 @@ void TwoWire::begin(int sda, int scl){
   default_sda_pin = sda;
   default_scl_pin = scl;
   twi_init(sda, scl);
+  flush();
+}
+
+void TwoWire::begin(int sda, int scl, uint8_t address){
+  default_sda_pin = sda;
+  default_scl_pin = scl;
+  twi_setAddress(address);
+  twi_init(sda, scl);
+  twi_attachSlaveTxEvent(onRequestService);
+  twi_attachSlaveRxEvent(onReceiveService);
   flush();
 }
 
@@ -256,6 +266,13 @@ void TwoWire::onRequestService(void)
 }
 
 void TwoWire::onReceive( void (*function)(int) ) {
+  // arduino api compatibility fixer:
+  // really hope size parameter will not exceed 2^31 :)
+  static_assert(sizeof(int) == sizeof(size_t), "something is wrong in Arduino kingdom");
+  user_onReceive = reinterpret_cast<void(*)(size_t)>(function);
+}
+
+void TwoWire::onReceive( void (*function)(size_t) ) {
   user_onReceive = function;
 }
 

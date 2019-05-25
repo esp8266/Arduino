@@ -43,7 +43,7 @@ public:
 
 	void attach_scheduled(float seconds, callback_function_t callback)
 	{
-		attach(seconds,std::bind(schedule_function, callback));
+		attach(seconds, [callback]() { schedule_function(callback); });
 	}
 
 	void attach(float seconds, callback_function_t callback)
@@ -54,7 +54,7 @@ public:
 
 	void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
 	{
-		attach_ms(milliseconds, std::bind(schedule_function, callback));
+		attach_ms(milliseconds, [callback]() { schedule_function(callback); });
 	}
 
 	void attach_ms(uint32_t milliseconds, callback_function_t callback)
@@ -84,7 +84,7 @@ public:
 
 	void once_scheduled(float seconds, callback_function_t callback)
 	{
-		once(seconds, std::bind(schedule_function, callback));
+		once(seconds, [callback]() { schedule_function(callback); });
 	}
 
 	void once(float seconds, callback_function_t callback)
@@ -95,7 +95,7 @@ public:
 
 	void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
 	{
-		once_ms(milliseconds, std::bind(schedule_function, callback));
+		once_ms(milliseconds, [callback]() { schedule_function(callback); });
 	}
 
 	void once_ms(uint32_t milliseconds, callback_function_t callback)
@@ -121,7 +121,7 @@ public:
 	}
 
 	void detach();
-	bool active();
+	bool active() const;
 
 protected:	
 	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);

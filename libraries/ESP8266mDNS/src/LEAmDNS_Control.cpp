@@ -24,7 +24,6 @@
 
 #include <arch/cc.h>
 #include <sys/time.h>
-#include <HardwareSerial.h>
 #include <IPAddress.h>
 #include <lwip/ip_addr.h>
 #include <WString.h>
@@ -79,9 +78,10 @@ bool MDNSResponder::_process(bool p_bUserContext) {
         }
     }
     else {
-        bResult = ((WiFi.isConnected()) &&          // Has connection?
-                   (_updateProbeStatus()) &&        // Probing
-                   (_checkServiceQueryCache()));    // Service query cache check
+        bResult = ((WiFi.isConnected() ||               // Either station is connected
+                    WiFi.softAPgetStationNum()>0) &&    // Or AP has stations connected
+                   (_updateProbeStatus()) &&            // Probing
+                   (_checkServiceQueryCache()));        // Service query cache check
     }
     return bResult;
 }
@@ -188,7 +188,6 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                     // See: RFC 6762, 8.2 (Tiebraking)
                     // However, we're using a max. reduced approach for tiebreaking here: The higher IP-address wins!
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for host domain detected while probing.\n")););
-                    Serial.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for host domain detected while probing.\n"));
 
                     m_HostProbeInformation.m_bTiebreakNeeded = true;
                 }
@@ -214,7 +213,6 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                         // See: RFC 6762, 8.2 (Tiebraking)
                         // However, we're using a max. reduced approach for tiebreaking here: The 'higher' SRV host wins!
                         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for service domain %s.%s.%s detected while probing.\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
-                        Serial.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for service domain %s.%s.%s detected while probing.\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol);
 
                         pService->m_ProbeInformation.m_bTiebreakNeeded = true;
                     }
@@ -776,10 +774,10 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                     pSQAnswer->releaseServiceDomain();
                     
                     bResult = pServiceQuery->addAnswer(pSQAnswer);
-                    
                     p_rbFoundNewKeyAnswer = true;
                     if (pServiceQuery->m_fnCallback) {
-                        pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_ServiceDomain, true, pServiceQuery->m_pUserdata);
+                    	MDNSServiceInfo serviceInfo(*this,(hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                        pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_ServiceDomain), true);
                     }
                 }
             }
@@ -823,7 +821,8 @@ bool MDNSResponder::_processSRVAnswer(const MDNSResponder::stcMDNS_RRAnswerSRV* 
 
                         p_rbFoundNewKeyAnswer = true;
                         if (pServiceQuery->m_fnCallback) {
-                            pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_HostDomainAndPort, true, pServiceQuery->m_pUserdata);
+                        	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                            pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_HostDomainAndPort), true);
                         }
                     }
                 }
@@ -870,7 +869,8 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                         pSQAnswer->releaseTxts();
                         
                         if (pServiceQuery->m_fnCallback) {
-                            pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_Txts, true, pServiceQuery->m_pUserdata);
+                        	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                            pServiceQuery->m_fnCallback(serviceInfo , static_cast<AnswerType>(ServiceQueryAnswerType_Txts), true);
                         }
                     }
                 }
@@ -933,9 +933,9 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                                 (pSQAnswer->addIP4Address(pIP4Address))) {
                                 
                                 pSQAnswer->m_u32ContentFlags |= ServiceQueryAnswerType_IP4Address;
-
                                 if (pServiceQuery->m_fnCallback) {
-                                    pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_IP4Address, true, pServiceQuery->m_pUserdata);
+                                	MDNSServiceInfo serviceInfo (*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                                    pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_IP4Address), true);
                                 }
                             }
                             else {   
@@ -1047,7 +1047,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         m_HostProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
     }
     else if ((ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus) &&                // Probing AND
-             (m_HostProbeInformation.m_Timeout.checkExpired(millis()))) {                           // Time for next probe
+             (m_HostProbeInformation.m_Timeout.expired())) {                                        // Time for next probe
 
         if (MDNS_PROBE_COUNT > m_HostProbeInformation.m_u8SentCount) {                              // Send next probe
             if ((bResult = _sendHostProbe())) {
@@ -1059,10 +1059,9 @@ bool MDNSResponder::_updateProbeStatus(void) {
         else {                                                                                      // Probing finished
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host probing.\n")););
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
-            m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
-
-            if (m_HostProbeInformation.m_fnProbeResultCallback) {
-                m_HostProbeInformation.m_fnProbeResultCallback(this, m_pcHostname, 0, true, m_HostProbeInformation.m_pProbeResultCallbackUserdata);
+            m_HostProbeInformation.m_Timeout.resetToNeverExpires();
+            if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
+                m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, true);
             }
 
             // Prepare to announce host
@@ -1072,7 +1071,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         }
     }   // else: Probing already finished OR waiting for next time slot
     else if ((ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus) &&
-             (m_HostProbeInformation.m_Timeout.checkExpired(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()))) {
+             (m_HostProbeInformation.m_Timeout.expired())) {
 
         if ((bResult = _announce(true, false))) {   // Don't announce services here
             ++m_HostProbeInformation.m_u8SentCount;
@@ -1082,7 +1081,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing host (%lu).\n\n"), m_HostProbeInformation.m_u8SentCount););
             }
             else {
-                m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                m_HostProbeInformation.m_Timeout.resetToNeverExpires();
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host announcing.\n\n")););
             }
         }
@@ -1097,7 +1096,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
         }
         else if ((ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
-                 (pService->m_ProbeInformation.m_Timeout.checkExpired(millis()))) {             // Time for next probe
+                 (pService->m_ProbeInformation.m_Timeout.expired())) {             // Time for next probe
 
             if (MDNS_PROBE_COUNT > pService->m_ProbeInformation.m_u8SentCount) {                // Send next probe
                 if ((bResult = _sendServiceProbe(*pService))) {
@@ -1109,22 +1108,10 @@ bool MDNSResponder::_updateProbeStatus(void) {
             else {                                                                                      // Probing finished
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service probing %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
-                pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
-
-                MDNSProbeResultCallbackFn   fnProbeResultCallback = 0;
-                void*                       pProbeResultCallbackUserdata = 0;
-                if (pService->m_ProbeInformation.m_fnProbeResultCallback) {
-                    fnProbeResultCallback = pService->m_ProbeInformation.m_fnProbeResultCallback;
-                    pProbeResultCallbackUserdata = pService->m_ProbeInformation.m_pProbeResultCallbackUserdata;
+                pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
+                if (pService->m_ProbeInformation.m_fnServiceProbeResultCallback) {
+                	pService->m_ProbeInformation.m_fnServiceProbeResultCallback(pService->m_pcName, pService, true);
                 }
-                else {
-                    fnProbeResultCallback = m_HostProbeInformation.m_fnProbeResultCallback;
-                    pProbeResultCallbackUserdata = m_HostProbeInformation.m_pProbeResultCallbackUserdata;
-                }
-                if (fnProbeResultCallback) {
-                    fnProbeResultCallback(this, (pService->m_pcName ?: m_pcHostname), pService, true, pProbeResultCallbackUserdata);
-                }
-
                 // Prepare to announce service
                 pService->m_ProbeInformation.m_u8SentCount = 0;
                 pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
@@ -1132,7 +1119,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             }
         }   // else: Probing already finished OR waiting for next time slot
         else if ((ProbingStatus_Done == pService->m_ProbeInformation.m_ProbingStatus) &&
-                 (pService->m_ProbeInformation.m_Timeout.checkExpired(millis()))) {
+                 (pService->m_ProbeInformation.m_Timeout.expired())) {
 
             if ((bResult = _announceService(*pService))) {   // Announce service
                 ++pService->m_ProbeInformation.m_u8SentCount;
@@ -1142,7 +1129,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing service %s.%s.%s (%lu)\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, pService->m_ProbeInformation.m_u8SentCount););
                 }
                 else {
-                    pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                    pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service announcing for %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 }
             }
@@ -1287,10 +1274,9 @@ bool MDNSResponder::_cancelProbingForHost(void) {
     bool    bResult = false;
 
     m_HostProbeInformation.clear(false);
-
     // Send host notification
-    if (m_HostProbeInformation.m_fnProbeResultCallback) {
-        m_HostProbeInformation.m_fnProbeResultCallback(this, m_pcHostname, 0, false, m_HostProbeInformation.m_pProbeResultCallbackUserdata);
+    if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
+        m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, false);
 
         bResult = true;
     }
@@ -1309,21 +1295,10 @@ bool MDNSResponder::_cancelProbingForService(stcMDNSService& p_rService) {
     bool    bResult = false;
 
     p_rService.m_ProbeInformation.clear(false);
-
     // Send notification
-    MDNSProbeResultCallbackFn   fnProbeResultCallback = 0;
-    void*                       pProbeResultCallbackUserdata = 0;
-    if (p_rService.m_ProbeInformation.m_fnProbeResultCallback) {
-        fnProbeResultCallback = p_rService.m_ProbeInformation.m_fnProbeResultCallback;
-        pProbeResultCallbackUserdata = p_rService.m_ProbeInformation.m_pProbeResultCallbackUserdata;
-    }
-    else {
-        fnProbeResultCallback = m_HostProbeInformation.m_fnProbeResultCallback;
-        pProbeResultCallbackUserdata = m_HostProbeInformation.m_pProbeResultCallbackUserdata;
-    }
-    if (fnProbeResultCallback) {
-        fnProbeResultCallback(this, (p_rService.m_pcName ?: m_pcHostname), &p_rService, false, pProbeResultCallbackUserdata);
-        bResult = true;
+    if (p_rService.m_ProbeInformation.m_fnServiceProbeResultCallback) {
+    	p_rService.m_ProbeInformation.m_fnServiceProbeResultCallback(p_rService.m_pcName,&p_rService,false);
+    	bResult = true;
     }
     return bResult;
 }
@@ -1466,13 +1441,13 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
         // Resend dynamic service queries, if not already done often enough
         if ((!pServiceQuery->m_bLegacyQuery) &&
             (MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount) &&
-            (pServiceQuery->m_ResendTimeout.checkExpired(millis()))) {
+            (pServiceQuery->m_ResendTimeout.expired())) {
 
             if ((bResult = _sendMDNSServiceQuery(*pServiceQuery))) {
                 ++pServiceQuery->m_u8SentCount;
                 pServiceQuery->m_ResendTimeout.reset((MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount)
                                                         ? (MDNS_DYNAMIC_QUERY_RESEND_DELAY * (pServiceQuery->m_u8SentCount - 1))
-                                                        : std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                                                        : esp8266::polledTimeout::oneShotMs::neverExpires);
             }
             DEBUG_EX_INFO(
                     DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: %s to resend service query!"), (bResult ? "Succeeded" : "FAILED"));
@@ -1506,7 +1481,8 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                     else {
                         // Timed out! -> Delete
                         if (pServiceQuery->m_fnCallback) {
-                            pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_ServiceDomain, false, pServiceQuery->m_pUserdata);
+                        	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                            pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_ServiceDomain), false);
                         }
                         DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: Will remove PTR answer for "));
@@ -1563,9 +1539,9 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
 
                         // Remove content flags for deleted answer parts
                         pSQAnswer->m_u32ContentFlags &= ~u32ContentFlags;
-
                         if (pServiceQuery->m_fnCallback) {
-                            pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), u32ContentFlags, false, pServiceQuery->m_pUserdata);
+                        	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                            pServiceQuery->m_fnCallback(serviceInfo,static_cast<AnswerType>(u32ContentFlags), false);
                         }
                     }
                 }   // HostDomainAndPort flagged
@@ -1601,7 +1577,8 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                         pSQAnswer->m_u32ContentFlags &= ~ServiceQueryAnswerType_Txts;
 
                         if (pServiceQuery->m_fnCallback) {
-                            pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_Txts, false, pServiceQuery->m_pUserdata);
+                        	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                            pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_Txts), false);
                         }
                     }
                 }   // TXTs flagged
@@ -1648,7 +1625,8 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                             }
                             // Notify client
                             if (pServiceQuery->m_fnCallback) {
-                                pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_IP4Address, false, pServiceQuery->m_pUserdata);
+                                MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
+                                pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_IP4Address), false);
                             }
                         }
                     }   // IP4 flagged

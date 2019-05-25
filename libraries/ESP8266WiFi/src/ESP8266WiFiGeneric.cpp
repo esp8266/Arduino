@@ -273,13 +273,17 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
    wifi_set_listen_interval():
    Set listen interval of maximum sleep level for modem sleep and light sleep
    It only works when sleep level is set as MAX_SLEEP_T
-   It should be called following the order:
-     wifi_set_sleep_level(MAX_SLEEP_T)
-     wifi_set_listen_interval
-     wifi_set_sleep_type
    forum: https://github.com/espressif/ESP8266_NONOS_SDK/issues/165#issuecomment-416121920
    default value seems to be 3 (as recommended by https://routerguide.net/dtim-interval-period-best-setting/)
+
+   call order:
+     wifi_set_sleep_level(MAX_SLEEP_T) (SDK3)
+     wifi_set_listen_interval          (SDK3)
+     wifi_set_sleep_type               (all SDKs)
+
     */
+
+#ifdef NONOSDK3V0
 
 #ifdef DEBUG_ESP_WIFI
     if (listenInterval && type == WIFI_NONE_SLEEP)
@@ -311,6 +315,10 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
             }
         }
     }
+#else  // !defined(NONOSDK3V0)
+    (void)listenInterval;
+#endif // !defined(NONOSDK3V0)
+
     bool ret = wifi_set_sleep_type((sleep_type_t)type);
     if (!ret) {
         DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)type);
@@ -398,6 +406,11 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m)
     }
 
     bool ret = false;
+
+    if (m != WIFI_STA && m != WIFI_AP_STA)
+        // calls lwIP's dhcp_stop(),
+        // safe to call even if not started
+        wifi_station_dhcpc_stop();
 
     ETS_UART_INTR_DISABLE();
     if (_persistent) {
@@ -512,18 +525,24 @@ bool ESP8266WiFiGenericClass::forceSleepWake()
  * Get listen interval of maximum sleep level for modem sleep and light sleep.
  * @return interval
  */
-uint8_t ESP8266WiFiGenericClass::getListenInterval()
-{
+uint8_t ESP8266WiFiGenericClass::getListenInterval () {
+#ifndef NONOSDK3V0
+    return 0;
+#else
     return wifi_get_listen_interval();
+#endif
 }
 
 /**
  * Get sleep level of modem sleep and light sleep
  * @return true if max level
  */
-bool ESP8266WiFiGenericClass::isSleepLevelMax()
-{
+bool ESP8266WiFiGenericClass::isSleepLevelMax () {
+#ifndef NONOSDK3V0
+    return false;
+#else
     return wifi_get_sleep_level() == MAX_SLEEP_T;
+#endif
 }
 
 // -----------------------------------------------------------------------------------------------------------------------

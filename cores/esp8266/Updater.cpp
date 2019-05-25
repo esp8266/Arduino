@@ -24,7 +24,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
-extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _FS_start;
 
 UpdaterClass::UpdaterClass()
 : _async(false)
@@ -37,10 +37,16 @@ UpdaterClass::UpdaterClass()
 , _command(U_FLASH)
 , _hash(nullptr)
 , _verify(nullptr)
+, _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
   installSignature(&hash, &sign);
 #endif
+}
+
+UpdaterClass& UpdaterClass::onProgress(THandlerFunction_Progress fn) {
+    _progress_callback = fn;
+    return *this;
 }
 
 void UpdaterClass::_reset() {
@@ -81,8 +87,8 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   }
   
 #ifdef DEBUG_UPDATER
-  if (command == U_SPIFFS) {
-    DEBUG_UPDATER.println(F("[begin] Update SPIFFS."));
+  if (command == U_FS) {
+    DEBUG_UPDATER.println(F("[begin] Update Filesystem."));
   }
 #endif
 
@@ -106,7 +112,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     //size of current sketch rounded to a sector
     size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uintptr_t updateEndAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
+    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
     //size of the update rounded to a sector
     size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
@@ -124,8 +130,8 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
       return false;
     }
   }
-  else if (command == U_SPIFFS) {
-     updateStartAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
+  else if (command == U_FS) {
+     updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
   }
   else {
     // unknown command
@@ -273,8 +279,8 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("Staged: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
   }
-  else if (_command == U_SPIFFS) {
-    DEBUG_UPDATER.printf_P(PSTR("SPIFFS: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
+  else if (_command == U_FS) {
+    DEBUG_UPDATER.printf_P(PSTR("Filesystem: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
 #endif
   }
 
@@ -386,7 +392,7 @@ bool UpdaterClass::_verifyHeader(uint8_t data) {
             return false;
         }
         return true;
-    } else if(_command == U_SPIFFS) {
+    } else if(_command == U_FS) {
         // no check of SPIFFS possible with first byte.
         return true;
     }
@@ -420,7 +426,7 @@ bool UpdaterClass::_verifyEnd() {
         }
 
         return true;
-    } else if(_command == U_SPIFFS) {
+    } else if(_command == U_FS) {
         // SPIFFS is already over written checks make no sense any more.
         return true;
     }
@@ -440,7 +446,9 @@ size_t UpdaterClass::writeStream(Stream &data) {
         _reset();
         return 0;
     }
-
+    if (_progress_callback) {
+        _progress_callback(0, _size);
+    }
     if(_ledPin != -1) {
         pinMode(_ledPin, OUTPUT);
     }
@@ -471,7 +479,13 @@ size_t UpdaterClass::writeStream(Stream &data) {
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
         written += toRead;
+        if(_progress_callback) {
+            _progress_callback(progress(), _size);
+        }
         yield();
+    }
+    if(_progress_callback) {
+        _progress_callback(progress(), _size);
     }
     return written;
 }

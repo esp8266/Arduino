@@ -82,6 +82,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
+  bool authenticateDigest(const String& username, const String& H1);
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
@@ -127,6 +128,8 @@ public:
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
 
+  static String credentialHash(const String& username, const String& realm, const String& password);
+
   static String urlDecode(const String& text);
 
   template<typename T>
@@ -134,6 +137,8 @@ public:
     _streamFileCore(file.size(), file.name(), contentType);
     return _currentClient.write(file);
   }
+
+  static const String responseCodeToString(const int code);
 
 protected:
   virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }
@@ -144,7 +149,6 @@ protected:
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
-  static const String _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, const String& boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
