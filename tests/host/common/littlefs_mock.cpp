@@ -1,5 +1,8 @@
 /*
- spiffs_mock.cpp - SPIFFS HAL mock for host side testing
+ littlefs_mock.cpp - LittleFS mock for host side testing
+ Copyright © 2019 Earle F. Philhower, III
+
+ Based off spiffs_mock.cpp:
  Copyright © 2016 Ivan Grokhotkov
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -14,11 +17,13 @@
 */
 
 
+#include "littlefs_mock.h"
 #include "spiffs_mock.h"
 #include "spiffs/spiffs.h"
 #include "debug.h"
 #include <flash_utils.h>
 #include <stdlib.h>
+#include <LittleFS.h>
 
 #include <spiffs_api.h>
 
@@ -26,20 +31,19 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
 #include "flash_hal_mock.h"
 
-#define SPIFFS_FILE_NAME "spiffs.bin"
+#define LITTLEFS_FILE_NAME "littlefs.bin"
 
-FS SPIFFS(nullptr);
+FS LittleFS(nullptr);
 
-SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage)
+LittleFSMock::LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage)
 {
     m_storage = storage;
     if ((m_overwrite = (fs_size < 0)))
         fs_size = -fs_size;
 
-    fprintf(stderr, "SPIFFS: %zd bytes\n", fs_size);
+    fprintf(stderr, "LittleFS: %zd bytes\n", fs_size);
 
     m_fs.resize(fs_size, 0xff);
     s_phys_addr  = 0;
@@ -50,13 +54,13 @@ SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const S
     reset();
 }
 
-void SpiffsMock::reset()
+void LittleFSMock::reset()
 {
-    SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
+    LittleFS = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
     load();
 }
 
-SpiffsMock::~SpiffsMock()
+LittleFSMock::~LittleFSMock()
 {
     save();
     s_phys_addr  = 0;
@@ -65,10 +69,10 @@ SpiffsMock::~SpiffsMock()
     s_phys_block = 0;
     s_phys_data  = nullptr;
     m_fs.resize(0);
-    SPIFFS = FS(FSImplPtr(nullptr));
+    LittleFS = FS(FSImplPtr(nullptr));
 }
 
-void SpiffsMock::load ()
+void LittleFSMock::load ()
 {
     if (!m_fs.size() || !m_storage.length())
         return;
@@ -76,39 +80,39 @@ void SpiffsMock::load ()
     int fs = ::open(m_storage.c_str(), O_RDONLY);
     if (fs == -1)
     {
-        fprintf(stderr, "SPIFFS: loading '%s': %s\n", m_storage.c_str(), strerror(errno));
+        fprintf(stderr, "LittleFS: loading '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
     
     off_t flen = lseek(fs, 0, SEEK_END);
     if (flen == (off_t)-1)
     {
-        fprintf(stderr, "SPIFFS: checking size of '%s': %s\n", m_storage.c_str(), strerror(errno));
+        fprintf(stderr, "LittleFS: checking size of '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
     lseek(fs, 0, SEEK_SET);
     
     if (flen != (off_t)m_fs.size())
     {
-        fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
+        fprintf(stderr, "LittleFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
         if (!m_overwrite)
         {
-            fprintf(stderr, "SPIFFS: aborting at user request\n");
+            fprintf(stderr, "LittleFS: aborting at user request\n");
             exit(1);
         }
-        fprintf(stderr, "SPIFFS: continuing without loading at user request, '%s' will be overwritten\n", m_storage.c_str());
+        fprintf(stderr, "LittleFS: continuing without loading at user request, '%s' will be overwritten\n", m_storage.c_str());
     }
     else
     {
-        fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs.size(), m_storage.c_str());
+        fprintf(stderr, "LittleFS: loading %zi bytes from '%s'\n", m_fs.size(), m_storage.c_str());
         ssize_t r = ::read(fs, m_fs.data(), m_fs.size());
         if (r != (ssize_t)m_fs.size())
-            fprintf(stderr, "SPIFFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r, strerror(errno));
+            fprintf(stderr, "LittleFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r, strerror(errno));
     }
     ::close(fs);
 }
 
-void SpiffsMock::save ()
+void LittleFSMock::save ()
 {
     if (!m_fs.size() || !m_storage.length())
         return;
@@ -116,13 +120,13 @@ void SpiffsMock::save ()
     int fs = ::open(m_storage.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644);
     if (fs == -1)
     {
-        fprintf(stderr, "SPIFFS: saving '%s': %s\n", m_storage.c_str(), strerror(errno));
+        fprintf(stderr, "LittleFS: saving '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
-    fprintf(stderr, "SPIFFS: saving %zi bytes to '%s'\n", m_fs.size(), m_storage.c_str());
+    fprintf(stderr, "LittleFS: saving %zi bytes to '%s'\n", m_fs.size(), m_storage.c_str());
 
     if (::write(fs, m_fs.data(), m_fs.size()) != (ssize_t)m_fs.size())
-        fprintf(stderr, "SPIFFS: writing %zi bytes: %s\n", m_fs.size(), strerror(errno));
+        fprintf(stderr, "LittleFS: writing %zi bytes: %s\n", m_fs.size(), strerror(errno));
     if (::close(fs) == -1)
-        fprintf(stderr, "SPIFFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
+        fprintf(stderr, "LittleFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
 }

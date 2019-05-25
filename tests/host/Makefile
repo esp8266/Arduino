@@ -57,6 +57,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	MD5Builder.cpp \
+	../../libraries/LittleFS/src/LittleFS.cpp \
 	core_esp8266_noniso.cpp \
 	spiffs/spiffs_cache.cpp \
 	spiffs/spiffs_check.cpp \
@@ -81,11 +82,15 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	$(LIBRARIES_PATH)/SD/src/SD.cpp
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
+	../../libraries/LittleFS/src/lfs.c \
+	../../libraries/LittleFS/src/lfs_util.c \
 )
 
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
+	flash_hal_mock.cpp \
 	spiffs_mock.cpp \
+	littlefs_mock.cpp \
 	sdfs_mock.cpp \
 	WMath.cpp \
 	MockUART.cpp \
@@ -101,6 +106,7 @@ MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMain.cpp \
 	ArduinoMainUdp.cpp \
 	ArduinoMainSpiffs.cpp \
+	ArduinoMainLittlefs.cpp \
 	user_interface.cpp \
 )
 
