@@ -120,10 +120,12 @@ void run_scheduled_functions()
         {
             if (toCall->mFunc())
             {
+                // function stays in list
                 lastRecurring = toCall;
             }
             else
             {
+                // function removed from list
                 InterruptLock lockAllInterruptsInThisScope;
 
                 if (sFirst == toCall)
@@ -137,6 +139,9 @@ void run_scheduled_functions()
                 recycle_fn_unsafe(toCall);
             }
         }
+        else
+            // function stays in list
+            lastRecurring = toCall;
     }
 
     fence = false;
