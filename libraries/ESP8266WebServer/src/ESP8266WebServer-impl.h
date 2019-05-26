@@ -156,7 +156,8 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
   return false;
 }
 
-bool ESP8266WebServer::authenticateDigest(const String& username, const String& H1)
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& username, const String& H1)
 {
   if(hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
     String authReq = header(FPSTR(AUTHORIZATION_HEADER));
@@ -517,7 +518,8 @@ void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t s
   }
 }
 
-String ESP8266WebServer::credentialHash(const String& username, const String& realm, const String& password)
+template <typename ServerType>
+String ESP8266WebServerTemplate<ServerType>::credentialHash(const String& username, const String& realm, const String& password)
 {
   MD5Builder md5;
   md5.begin();
