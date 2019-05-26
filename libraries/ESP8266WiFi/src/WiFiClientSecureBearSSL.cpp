@@ -248,6 +248,7 @@ void WiFiClientSecure::_freeSSL() {
   _recvapp_len = 0;
   // This connection is toast
   _handshake_done = false;
+  _timeout = 15000;
 }
 
 bool WiFiClientSecure::_clientConnected() {
@@ -255,7 +256,7 @@ bool WiFiClientSecure::_clientConnected() {
 }
 
 uint8_t WiFiClientSecure::connected() {
-  if (available() || (_clientConnected() && _handshake_done)) {
+  if (available() || (_clientConnected() && _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED))) {
     return true;
   }
   return false;
@@ -1003,6 +1004,15 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     DEBUG_BSSL("Connected!\n");
   }
 #endif
+
+  // Session is already validated here, there is no need to keep following
+  _x509_minimal = nullptr;
+  _x509_insecure = nullptr;
+  _x509_knownkey = nullptr;
+
+  // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
+  if (ret) _timeout = 5000;
+
   return ret;
 }
 

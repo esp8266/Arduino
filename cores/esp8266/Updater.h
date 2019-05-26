@@ -21,7 +21,7 @@
 #define UPDATE_ERROR_SIGN               (12)
 
 #define U_FLASH   0
-#define U_SPIFFS  100
+#define U_FS      100
 #define U_AUTH    200
 
 #ifdef DEBUG_ESP_UPDATER

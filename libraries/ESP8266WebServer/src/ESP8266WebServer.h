@@ -86,6 +86,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
+  bool authenticateDigest(const String& username, const String& H1);
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
@@ -133,6 +134,8 @@ public:
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
+
+  static String credentialHash(const String& username, const String& realm, const String& password);
 
   static String urlDecode(const String& text);
 

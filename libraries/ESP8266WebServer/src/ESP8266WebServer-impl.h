@@ -147,6 +147,20 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       delete[] toencode;
       delete[] encoded;
     } else if(authReq.startsWith(F("Digest"))) {
+      String _realm    = _extractParam(authReq, F("realm=\""));
+      String _H1 = credentialHash((String)username,_realm,(String)password);
+      return authenticateDigest((String)username,_H1);
+    }
+    authReq = "";
+  }
+  return false;
+}
+
+bool ESP8266WebServer::authenticateDigest(const String& username, const String& H1)
+{
+  if(hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
+    String authReq = header(FPSTR(AUTHORIZATION_HEADER));
+    if(authReq.startsWith(F("Digest"))) {
       authReq = authReq.substring(7);
       #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.println(authReq);
@@ -177,14 +191,10 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
         _nc = _extractParam(authReq, F("nc="), ',');
         _cnonce = _extractParam(authReq, F("cnonce=\""));
       }
-      MD5Builder md5;
-      md5.begin();
-      md5.add(String(username) + ':' + _realm + ':' + String(password));  // md5 of the user:realm:user
-      md5.calculate();
-      String _H1 = md5.toString();
       #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + _H1);
+      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + H1);
       #endif
+      MD5Builder md5;
       md5.begin();
       if(_currentMethod == HTTP_GET){
         md5.add(String(F("GET:")) + _uri);
@@ -204,9 +214,9 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       #endif
       md5.begin();
       if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
-        md5.add(_H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
+        md5.add(H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
       } else {
-        md5.add(_H1 + ':' + _nonce + ':' + _H2);
+        md5.add(H1 + ':' + _nonce + ':' + _H2);
       }
       md5.calculate();
       String _responsecheck = md5.toString();
@@ -507,6 +517,14 @@ void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t s
   }
 }
 
+String ESP8266WebServer::credentialHash(const String& username, const String& realm, const String& password)
+{
+  MD5Builder md5;
+  md5.begin();
+  md5.add(username + ":" + realm + ":" + password);  // md5 of the user:realm:password
+  md5.calculate();
+  return md5.toString();
+}
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)

@@ -32,7 +32,8 @@ pins 9 and 11. These may be used as IO if flash chip works in DIO mode
 Pin interrupts are supported through ``attachInterrupt``,
 ``detachInterrupt`` functions. Interrupts may be attached to any GPIO
 pin, except GPIO16. Standard Arduino interrupt types are supported:
-``CHANGE``, ``RISING``, ``FALLING``.
+``CHANGE``, ``RISING``, ``FALLING``. ISRs need to have
+``ICACHE_RAM_ATTR`` before the function definition.
 
 Analog input
 ------------
@@ -70,7 +71,13 @@ equal to 1023 by default. PWM range may be changed by calling
 ``analogWriteRange(new_range)``.
 
 PWM frequency is 1kHz by default. Call
-``analogWriteFreq(new_frequency)`` to change the frequency.
+``analogWriteFreq(new_frequency)`` to change the frequency. Valid values 
+are from 100Hz up to 40000Hz.
+
+The ESP doesn't have hardware PWM, so the implementation is by software. 
+With one PWM output at 40KHz, the CPU is already rather loaded. The more 
+PWM outputs used, and the higher their frequency, the closer you get to 
+the CPU limits, and the less CPU cycles are available for sketch execution. 
 
 Timing and delays
 -----------------
