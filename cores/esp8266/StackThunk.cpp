@@ -36,7 +36,7 @@ uint32_t *stack_thunk_top = NULL;
 uint32_t *stack_thunk_save = NULL;  /* Saved A1 while in BearSSL */
 uint32_t stack_thunk_refcnt = 0;
 
-#define _stackSize (5600/4)
+#define _stackSize (5750/4)
 #define _stackPaint 0xdeadbeef
 
 /* Add a reference, and allocate the stack if necessary */
