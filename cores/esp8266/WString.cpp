@@ -31,7 +31,7 @@
 
 String::String(const char *cstr) {
     init();
-    if(cstr)
+    if (cstr)
         copy(cstr, strlen(cstr));
 }
 
@@ -157,7 +157,9 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     if (maxStrLen < sizeof(sso.buff) - 1) {
         if (isSSO() || !buffer()) {
             // Already using SSO, nothing to do
+	    uint16_t oldLen = len();
             setSSO(true);
+	    setLen(oldLen);
             return 1;
         } else { // if bufptr && !isSSO()
             // Using bufptr, need to shrink into sso.buff
