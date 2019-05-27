@@ -183,7 +183,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         size_t oldSize = capacity() + 1; // include NULL.
         if (isSSO()) {
             // Copy the SSO buffer into allocated space
-            memcpy(newbuffer, sso.buff, sizeof(sso.buff));
+            memmove(newbuffer, sso.buff, sizeof(sso.buff));
         }
         if (newSize > oldSize)
         {
@@ -208,7 +208,7 @@ String & String::copy(const char *cstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    strcpy(wbuffer(), cstr);
+    memmove(wbuffer(), cstr, length + 1);
     return *this;
 }
 
@@ -218,7 +218,7 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    strcpy_P(wbuffer(), (PGM_P)pstr);
+    memcpy_P(wbuffer(), (PGM_P)pstr, length + 1); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
     return *this;
 }
 
@@ -226,7 +226,7 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
 void String::move(String &rhs) {
     if(buffer()) {
         if(capacity() >= rhs.len()) {
-            strcpy(wbuffer(), rhs.buffer());
+            memmove(wbuffer(), rhs.buffer(), rhs.length() + 1);
             setLen(rhs.len());
 	    rhs.invalidate();
             return;
@@ -311,7 +311,7 @@ unsigned char String::concat(const String &s) {
             return 1;
         if (!reserve(newlen))
             return 0;
-        memcpy(wbuffer() + len(), buffer(), len());
+        memmove(wbuffer() + len(), buffer(), len());
         setLen(newlen);
         wbuffer()[len()] = 0;
         return 1;
@@ -328,7 +328,7 @@ unsigned char String::concat(const char *cstr, unsigned int length) {
         return 1;
     if(!reserve(newlen))
         return 0;
-    strcpy(wbuffer() + len(), cstr);
+    memmove(wbuffer() + len(), cstr, length + 1);
     setLen(newlen);
     return 1;
 }
@@ -394,7 +394,7 @@ unsigned char String::concat(const __FlashStringHelper * str) {
     if (length == 0) return 1;
     unsigned int newlen = len() + length;
     if (!reserve(newlen)) return 0;
-    strcpy_P(wbuffer() + len(), (PGM_P)str);
+    memcpy_P(wbuffer() + len(), (PGM_P)str, length + 1);
     setLen(newlen);
     return 1;
 }

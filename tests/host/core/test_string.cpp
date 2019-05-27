@@ -456,3 +456,38 @@ TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
     s.print('\"');
     REQUIRE(s == "{\"message\"");
 }
+
+TEST_CASE("Strings with NULs", "[core][String]")
+{
+  // The following should never be done in a real app! This is only to inject 0s in the middle of a string.
+  // Fits in SSO...
+  String str("01234567");
+  REQUIRE(str.length() == 8);
+  char *ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  String str2;
+  str2 = str;
+  REQUIRE(str2.length() == 8);
+  // Needs a buffer pointer
+  str = "0123456789012345678901234567890123456789";
+  ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  str2 = str;
+  REQUIRE(str2.length() == 40);
+  String str3("a");
+  ptr = (char *)str3.c_str();
+  *ptr = 0;
+  REQUIRE(str3.length() == 1);
+  str3 += str3;
+  REQUIRE(str3.length() == 2);
+  str3 += str3;
+  REQUIRE(str3.length() == 4);
+  str3 += str3;
+  REQUIRE(str3.length() == 8);
+  str3 += str3;
+  REQUIRE(str3.length() == 16);
+  str3 += str3;
+  REQUIRE(str3.length() == 32);
+  str3 += str3;
+  REQUIRE(str3.length() == 64);
+}
