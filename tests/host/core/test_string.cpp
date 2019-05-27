@@ -490,4 +490,7 @@ TEST_CASE("Strings with NULs", "[core][String]")
   REQUIRE(str3.length() == 32);
   str3 += str3;
   REQUIRE(str3.length() == 64);
+  static char zeros[64] = {0};
+  const char *p = str3.c_str();
+  REQUIRE(!memcmp(p, zeros, 64));
 }
