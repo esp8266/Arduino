@@ -320,11 +320,11 @@ TEST_CASE("String SSO works", "[core][String]")
   REQUIRE(s.c_str() == savesso);
   REQUIRE(s == "0123456789");
   REQUIRE(s.length() == 10);
-  s += "a";
-  REQUIRE(s.c_str() == savesso);
-  REQUIRE(s == "0123456789a");
-  REQUIRE(s.length() == 11);
   if (sizeof(savesso) == 4) {
+    s += "a";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "b";
     REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789ab");
@@ -334,12 +334,16 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s == "0123456789abc");
     REQUIRE(s.length() == 13);
   } else {
+  s += "a";
+    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "bcde";
     REQUIRE(s.c_str() == savesso);
     REQUIRE(s == "0123456789abcde");
     REQUIRE(s.length() == 15);
     s += "fghi";
-    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789abcdefghi");
     REQUIRE(s.length() == 19);
     s += "j";
@@ -360,7 +364,7 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s.length() == 23);
     s += "nopq";
     REQUIRE(s.c_str() != savesso);
-      REQUIRE(s == "0123456789abcdefghijklmnopq");
+    REQUIRE(s == "0123456789abcdefghijklmnopq");
     REQUIRE(s.length() == 27);
     s += "rstu";
     REQUIRE(s.c_str() != savesso);

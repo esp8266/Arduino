@@ -136,7 +136,7 @@ inline void String::init(void) {
 }
 
 void String::invalidate(void) {
-    if(!sso() && wbuffer())
+    if(!isSSO() && wbuffer())
         free(wbuffer());
     init();
 }
@@ -154,17 +154,19 @@ unsigned char String::reserve(unsigned int size) {
 
 unsigned char String::changeBuffer(unsigned int maxStrLen) {
     // Can we use SSO here to avoid allocation?
-    if (maxStrLen < sizeof(sso_buf)) {
-        if (sso() || !buffer()) {
+    if (maxStrLen < sizeof(sso.buff) - 1) {
+        if (isSSO() || !buffer()) {
             // Already using SSO, nothing to do
             setSSO(true);
             return 1;
-        } else { // if bufptr && !sso()
-            // Using bufptr, need to shrink into sso_buff
-            char temp[sizeof(sso_buf)];
+        } else { // if bufptr && !isSSO()
+            // Using bufptr, need to shrink into sso.buff
+            char temp[sizeof(sso.buff)];
             memcpy(temp, buffer(), maxStrLen);
             free(wbuffer());
+            uint16_t oldLen = len();
             setSSO(true);
+	    setLen(oldLen);
             memcpy(wbuffer(), temp, maxStrLen);
             return 1;
         }
@@ -176,12 +178,12 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         return false;
     }
     uint16_t oldLen = len();
-    char *newbuffer = (char *) realloc(sso() ? nullptr : wbuffer(), newSize);
-    if(newbuffer) {
+    char *newbuffer = (char *) realloc(isSSO() ? nullptr : wbuffer(), newSize);
+    if (newbuffer) {
         size_t oldSize = capacity() + 1; // include NULL.
-        if (sso()) {
+        if (isSSO()) {
             // Copy the SSO buffer into allocated space
-            memcpy(newbuffer, sso_buf, sizeof(sso_buf));
+            memcpy(newbuffer, sso.buff, sizeof(sso.buff));
         }
         if (newSize > oldSize)
         {
@@ -229,15 +231,15 @@ void String::move(String &rhs) {
 	    rhs.invalidate();
             return;
         } else {
-            if (!sso()) {
+            if (!isSSO()) {
                 free(wbuffer());
                 setBuffer(nullptr);
             }
         }
     }
-    if (rhs.sso()) {
+    if (rhs.isSSO()) {
         setSSO(true);
-        memmove(sso_buf, rhs.sso_buf, sizeof(sso_buf));
+        memmove(sso.buff, rhs.sso.buff, sizeof(sso.buff));
     } else {
         setSSO(false);
         setBuffer(rhs.wbuffer());
