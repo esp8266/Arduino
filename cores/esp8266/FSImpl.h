@@ -22,6 +22,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <FS.h>
 
 namespace fs {
 
@@ -75,6 +76,20 @@ public:
     virtual void end() = 0;
     virtual bool format() = 0;
     virtual bool info(FSInfo& info) = 0;
+    // For seamless backward compatibilty, supply default which just copies form the 32bit version
+    virtual bool info64(FSInfo64& info64) {
+        FSInfo i;
+        if (!info(i)) {
+            return false;
+        }
+        info64.blockSize     = i.blockSize;
+        info64.pageSize      = i.pageSize;
+        info64.maxOpenFiles  = i.maxOpenFiles;
+        info64.maxPathLength = i.maxPathLength;
+        info64.totalBytes    = i.totalBytes;
+        info64.usedBytes     = i.usedBytes;
+        return true;
+    }
     virtual FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) = 0;
     virtual bool exists(const char* path) = 0;
     virtual DirImplPtr openDir(const char* path) = 0;

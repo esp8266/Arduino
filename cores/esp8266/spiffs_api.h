@@ -85,7 +85,6 @@ public:
 
     bool info(FSInfo& info) override
     {
-        info.maxOpenFiles = _maxOpenFds;
         info.blockSize = _blockSize;
         info.pageSize = _pageSize;
         info.maxOpenFiles = _maxOpenFds;

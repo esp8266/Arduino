@@ -94,7 +94,7 @@ public:
 
     FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) override;
 
-    bool exists(const char* path) {
+    bool exists(const char* path) override {
         return _mounted ? _fs.exists(path) : false;
     }
 
@@ -104,7 +104,7 @@ public:
         return _mounted ? _fs.rename(pathFrom, pathTo) : false;
     }
 
-    bool info(FSInfo& info) override {
+    bool info64(FSInfo64& info) override {
         if (!_mounted) {
             DEBUGV("SDFS::info: FS not mounted\n");
             return false;
@@ -113,8 +113,22 @@ public:
         info.blockSize = _fs.vol()->blocksPerCluster() * 512;
         info.pageSize = 0; // TODO ?
         info.maxPathLength = 255; // TODO ?
-        info.totalBytes =_fs.vol()->volumeBlockCount() * 512;
-        info.usedBytes = info.totalBytes - (_fs.vol()->freeClusterCount() * _fs.vol()->blocksPerCluster() * 512);
+        info.totalBytes =_fs.vol()->volumeBlockCount() * 512LL;
+        info.usedBytes = info.totalBytes - (_fs.vol()->freeClusterCount() * _fs.vol()->blocksPerCluster() * 512LL);
+        return true;
+    }
+
+    bool info(FSInfo& info) override {
+        FSInfo64 i;
+        if (!info64(i)) {
+            return false;
+        }
+        info.blockSize     = i.blockSize;
+        info.pageSize      = i.pageSize;
+        info.maxOpenFiles  = i.maxOpenFiles;
+        info.maxPathLength = i.maxPathLength;
+        info.totalBytes    = (size_t)i.totalBytes;
+        info.usedBytes     = (size_t)i.usedBytes;
         return true;
     }
 
