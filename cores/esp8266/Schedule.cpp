@@ -19,9 +19,7 @@ struct scheduled_fn_t
 
 static scheduled_fn_t* sFirst = nullptr;
 static scheduled_fn_t* sLast = nullptr;
-
 static scheduled_fn_t* sUnused = nullptr;
-
 static int sCount = 0;
 
 IRAM_ATTR // called from ISR
@@ -118,12 +116,18 @@ void run_scheduled_functions(schedule_e policy)
     {
         scheduled_fn_t* toCall = nextCall;
         nextCall = nextCall->mNext;
-        if ((toCall->policy == SCHEDULE_OFTEN_NO_YIELDELAYCALL || policy == SCHEDULE_CAN_USE_DELAY)
+
+        // run scheduled function:
+        // - when its schedule policy allows it anytime
+        // - or if we are called at loop() time
+        // and
+        // - its time policy allows it
+        if (   (   toCall->policy == SCHEDULED_FUNCTION_WITHOUT_YIELDELAYCALLS
+                || policy == SCHEDULED_FUNCTION_ONCE_PER_LOOP)
             && toCall->callNow)
         {
             if (toCall->mFunc())
             {
-Serial.printf("(%d/%d)",policy, toCall->policy);
                 // function stays in list
                 lastRecurring = toCall;
             }
