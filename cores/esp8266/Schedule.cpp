@@ -4,6 +4,7 @@
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
+#include "coredecls.h"
 
 typedef std::function<bool(void)> mFuncT;
 
@@ -110,6 +111,7 @@ void run_scheduled_functions(schedule_e policy)
         fence = true;
     }
 
+    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
     scheduled_fn_t* lastRecurring = nullptr;
     scheduled_fn_t* nextCall = sFirst;
     while (nextCall)
@@ -150,6 +152,13 @@ void run_scheduled_functions(schedule_e policy)
         else
             // function stays in list
             lastRecurring = toCall;
+
+        if (policy == SCHEDULED_FUNCTION_ONCE_PER_LOOP && yieldNow)
+        {
+            // this is yield() in cont stack:
+            esp_schedule();
+            cont_yield(g_pcont);
+        }
     }
 
     fence = false;
