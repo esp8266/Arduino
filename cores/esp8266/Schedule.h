@@ -26,9 +26,12 @@
 
 #define SCHEDULED_FN_MAX_COUNT 32
 
+enum schedule_e { SCHEDULE_CAN_USE_DELAY, SCHEDULE_OFTEN_NO_YIELDELAYCALL };
+
 // * Run the lambda only once next time
 //bool schedule_function(std::function<void(void)>&& fn);
-bool schedule_function(const std::function<void(void)>& fn);
+bool schedule_function(const std::function<void(void)>& fn,
+                       schedule_e policy = SCHEDULE_CAN_USE_DELAY);
 
 // * Run the lambda periodically about every <repeat_us> microseconds until
 //   it returns false.
@@ -36,11 +39,13 @@ bool schedule_function(const std::function<void(void)>& fn);
 //   `yield` is not called frequently, and therefore should not be used for
 //   timing critical operations.
 //bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us);
-bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us);
+bool schedule_function_us(const std::function<bool(void)>& fn,
+                          uint32_t repeat_us,
+                          schedule_e policy = SCHEDULE_CAN_USE_DELAY);
 
 // Run all scheduled functions.
 // Use this function if your are not using `loop`, or `loop` does not return
 // on a regular basis.
-void run_scheduled_functions();
+void run_scheduled_functions(schedule_e policy = SCHEDULE_CAN_USE_DELAY);
 
 #endif //ESP_SCHEDULE_H

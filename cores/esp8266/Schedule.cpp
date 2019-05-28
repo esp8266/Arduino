@@ -12,6 +12,7 @@ struct scheduled_fn_t
     scheduled_fn_t* mNext = nullptr;
     mFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
+    schedule_e policy;
 
     scheduled_fn_t() : callNow(esp8266::polledTimeout::periodicFastUs::alwaysExpired) { }
 };
@@ -52,7 +53,7 @@ static void recycle_fn_unsafe(scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
+bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us, schedule_e policy)
 {
     assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -64,8 +65,9 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
 
     if (repeat_us)
         item->callNow.reset(repeat_us);
-
+    item->policy = policy;
     item->mFunc = fn;
+
     if (sFirst)
         sLast->mNext = item;
     else
@@ -76,24 +78,24 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us)
+bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us, schedule_e policy)
 {
-    return schedule_function_us(std::function<bool(void)>(fn), repeat_us);
+    return schedule_function_us(std::function<bool(void)>(fn), repeat_us, policy);
 }
 
 IRAM_ATTR // called from ISR
-bool schedule_function(std::function<void(void)>&& fn)
+bool schedule_function(std::function<void(void)>&& fn, schedule_e policy)
 {
-    return schedule_function_us([fn]() { fn(); return false; }, 0);
+    return schedule_function_us([fn]() { fn(); return false; }, 0, policy);
 }
 
 IRAM_ATTR // called from ISR
-bool schedule_function(const std::function<void(void)>& fn)
+bool schedule_function(const std::function<void(void)>& fn, schedule_e policy)
 {
-    return schedule_function(std::function<void(void)>(fn));
+    return schedule_function(std::function<void(void)>(fn), policy);
 }
 
-void run_scheduled_functions()
+void run_scheduled_functions(schedule_e policy)
 {
     // Note to the reader:
     // There is no exposed API to remove a scheduled function:
@@ -116,10 +118,12 @@ void run_scheduled_functions()
     {
         scheduled_fn_t* toCall = nextCall;
         nextCall = nextCall->mNext;
-        if (toCall->callNow)
+        if ((toCall->policy == SCHEDULE_OFTEN_NO_YIELDELAYCALL || policy == SCHEDULE_CAN_USE_DELAY)
+            && toCall->callNow)
         {
             if (toCall->mFunc())
             {
+Serial.printf("(%d/%d)",policy, toCall->policy);
                 // function stays in list
                 lastRecurring = toCall;
             }
