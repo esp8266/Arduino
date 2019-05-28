@@ -33,22 +33,22 @@ enum schedule_e
 };
 
 // * Run the lambda only once next time
-//bool schedule_function(const std::function<void(void)>&& fn,
-//                       schedule_e policy = SCHEDULED_FUNCTION_ONCE_PER_LOOP);
-bool schedule_function(const std::function<void(void)>& fn,
+bool schedule_function(std::function<void(void)>&& fn,
                        schedule_e policy = SCHEDULED_FUNCTION_ONCE_PER_LOOP);
+//bool schedule_function(const std::function<void(void)>& fn,
+//                       schedule_e policy = SCHEDULED_FUNCTION_ONCE_PER_LOOP);
 
 // * Run the lambda periodically about every <repeat_us> microseconds until
 //   it returns false.
 // * Note that it may be more than <repeat_us> microseconds between calls if
 //   `yield` is not called frequently, and therefore should not be used for
 //   timing critical operations.
-//bool schedule_function_us(const std::function<bool(void)>&& fn,
-//                          uint32_t repeat_us,
-//                          schedule_e policy = SCHEDULED_FUNCTION_ONCE_PER_LOOP);
-bool schedule_function_us(const std::function<bool(void)>& fn,
+bool schedule_function_us(std::function<bool(void)>&& fn,
                           uint32_t repeat_us,
                           schedule_e policy = SCHEDULED_FUNCTION_ONCE_PER_LOOP);
+//bool schedule_function_us(const std::function<bool(void)>& fn,
+//                          uint32_t repeat_us,
+//                          schedule_e policy = SCHEDULED_FUNCTION_ONCE_PER_LOOP);
 
 // Run all scheduled functions.
 // Use this function if your are not using `loop`, or `loop` does not return

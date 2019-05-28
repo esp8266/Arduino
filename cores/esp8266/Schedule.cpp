@@ -75,11 +75,11 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us, sc
     return true;
 }
 
-IRAM_ATTR // (not only) called from ISR
-bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us, schedule_e policy)
-{
-    return schedule_function_us(std::function<bool(void)>(fn), repeat_us, policy);
-}
+//IRAM_ATTR // (not only) called from ISR
+//bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us, schedule_e policy)
+//{
+//    return schedule_function_us(std::function<bool(void)>(fn), repeat_us, policy);
+//}
 
 IRAM_ATTR // called from ISR
 bool schedule_function(std::function<void(void)>&& fn, schedule_e policy)
@@ -87,11 +87,11 @@ bool schedule_function(std::function<void(void)>&& fn, schedule_e policy)
     return schedule_function_us([fn]() { fn(); return false; }, 0, policy);
 }
 
-IRAM_ATTR // called from ISR
-bool schedule_function(const std::function<void(void)>& fn, schedule_e policy)
-{
-    return schedule_function(std::function<void(void)>(fn), policy);
-}
+//IRAM_ATTR // called from ISR
+//bool schedule_function(const std::function<void(void)>& fn, schedule_e policy)
+//{
+//    return schedule_function(std::function<void(void)>(fn), policy);
+//}
 
 void run_scheduled_functions(schedule_e policy)
 {
