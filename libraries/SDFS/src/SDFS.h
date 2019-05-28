@@ -127,6 +127,12 @@ public:
         info.pageSize      = i.pageSize;
         info.maxOpenFiles  = i.maxOpenFiles;
         info.maxPathLength = i.maxPathLength;
+#ifdef DEBUG_ESP_PORT
+        if (i.totalBytes > (uint64_t)SIZE_MAX) {
+            // This catches both total and used cases, since used must always be < total.
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use info64().\n"), i.totalBytes);
+        }
+#endif
         info.totalBytes    = (size_t)i.totalBytes;
         info.usedBytes     = (size_t)i.usedBytes;
         return true;

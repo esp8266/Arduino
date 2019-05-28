@@ -100,6 +100,20 @@ public:
         return true;
     }
 
+    virtual bool info64(FSInfo64& info64) {
+        FSInfo i;
+        if (!info(i)) {
+            return false;
+        }
+        info64.blockSize     = i.blockSize;
+        info64.pageSize      = i.pageSize;
+        info64.maxOpenFiles  = i.maxOpenFiles;
+        info64.maxPathLength = i.maxPathLength;
+        info64.totalBytes    = i.totalBytes;
+        info64.usedBytes     = i.usedBytes;
+        return true;
+    }
+
     bool remove(const char* path) override
     {
         if (!isSpiffsFilenameValid(path)) {
