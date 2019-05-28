@@ -254,19 +254,19 @@ class String {
         enum { SSOSIZE = sizeof(struct _ptr) + 4 - 1 }; // Characters to allocate space for SSO, must be 12 or more
         struct _sso {
             char     buff[SSOSIZE];
-            unsigned len  : 7;
-            unsigned flag : 1;
+            unsigned len   : 7;
+            unsigned isSSO : 1;
         };
-        enum { CAPACITY_MAX = 65535 }; // If size of capacity changed, be sure to update this enum
+        enum { CAPACITY_MAX = 65535 }; // If typeof(cap) changed from uint16_t, be sure to update this enum to the max value storable in the type
         union {
             struct _ptr ptr;
             struct _sso sso;
         };
         // Accessor functions
-        inline bool isSSO() const { return sso.flag; }
+        inline bool isSSO() const { return sso.isSSO; }
         inline unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
-        inline unsigned int capacity() const { return isSSO() ? (unsigned int)SSOSIZE - 1 : ptr.cap; }
-        inline void setSSO(bool set) { sso.flag = set; }
+        inline unsigned int capacity() const { return isSSO() ? (unsigned int)SSOSIZE - 1 : ptr.cap; } // Size of max string not including terminal NUL
+        inline void setSSO(bool set) { sso.isSSO = set; }
         inline void setLen(int len) { if (isSSO()) sso.len = len; else ptr.len = len; }
         inline void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
 	inline void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
