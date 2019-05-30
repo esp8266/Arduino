@@ -129,8 +129,10 @@ protected:
 
 protected:
 	ETSTimer* _timer;
-	char _etsTimerMemory[sizeof(ETSTimer)];
 	callback_function_t _callback_function = nullptr;
+
+private:
+	char _etsTimerMemory[sizeof(ETSTimer)];
 };
 
 
