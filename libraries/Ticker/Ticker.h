@@ -27,10 +27,7 @@
 #include <stddef.h>
 #include <functional>
 #include <Schedule.h>
-
-extern "C" {
-	typedef struct _ETSTIMER_ ETSTimer;
-}
+#include <ets_sys.h>
 
 class Ticker
 {

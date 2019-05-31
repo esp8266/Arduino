@@ -24,7 +24,6 @@
 
 #include "c_types.h"
 #include "eagle_soc.h"
-#include "ets_sys.h"
 #include "osapi.h"
 
 static const int ONCE   = 0;
