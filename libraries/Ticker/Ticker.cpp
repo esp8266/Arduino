@@ -41,7 +41,7 @@ Ticker::~Ticker()
 	detach();
 }
 
-void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg)
+void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg)
 {
 	if (_timer)
 	{
@@ -52,7 +52,7 @@ void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t 
 		_timer = new(_etsTimerMemory) ETSTimer;
 	}
 
-	os_timer_setfn(_timer, reinterpret_cast<ETSTimerFunc*>(callback), reinterpret_cast<void*>(arg));
+	os_timer_setfn(_timer, reinterpret_cast<ETSTimerFunc*>(callback), arg);
 	os_timer_arm(_timer, milliseconds, (repeat)?REPEAT:ONCE);
 }
 
@@ -74,7 +74,7 @@ bool Ticker::active() const
 
 void Ticker::_static_callback(void* arg)
 {
-	Ticker* _this = (Ticker*)arg;
+	Ticker* _this = reinterpret_cast<Ticker*>(arg);
 	if (_this == nullptr)
 	{
 		return;
