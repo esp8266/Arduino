@@ -19,9 +19,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include "c_types.h"
 #include "eagle_soc.h"
 #include "osapi.h"
@@ -69,7 +66,7 @@ void Ticker::detach()
 
 bool Ticker::active() const
 {
-	return (bool)_timer;
+	return _timer;
 }
 
 void Ticker::_static_callback(void* arg)

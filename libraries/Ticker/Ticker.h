@@ -22,9 +22,6 @@
 #ifndef TICKER_H
 #define TICKER_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <functional>
 #include <Schedule.h>
 #include <ets_sys.h>
