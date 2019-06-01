@@ -84,20 +84,27 @@ void preloop_update_frequency() {
 }
 
 
+static inline void esp_yield_within_cont() __attribute__((always_inline));
+static void esp_yield_within_cont() {
+        cont_yield(g_pcont);
+        run_scheduled_functions(SCHEDULED_FUNCTION_WITHOUT_YIELDELAYCALLS);
+}
+
 extern "C" void esp_yield() {
     if (cont_can_yield(g_pcont)) {
-        cont_yield(g_pcont);
+        esp_yield_within_cont();
     }
 }
 
 extern "C" void esp_schedule() {
+    // always on CONT stack here
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
     if (cont_can_yield(g_pcont)) {
         esp_schedule();
-        esp_yield();
+        esp_yield_within_cont();
     }
     else {
         panic();
@@ -122,7 +129,7 @@ static void loop_wrapper() {
         setup_done = true;
     }
     loop();
-    run_scheduled_functions();
+    run_scheduled_functions(SCHEDULED_FUNCTION_ONCE_PER_LOOP);
     esp_schedule();
 }
 
