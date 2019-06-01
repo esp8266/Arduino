@@ -1,9 +1,9 @@
-/* 
+/*
   Ticker.h - esp8266 library that calls functions periodically
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -34,7 +34,7 @@ class Ticker
 public:
 	Ticker();
 	~Ticker();
-	typedef void (*callback_t)(void);
+
 	typedef void (*callback_with_arg_t)(void*);
 	typedef std::function<void(void)> callback_function_t;
 
@@ -45,8 +45,8 @@ public:
 
 	void attach(float seconds, callback_function_t callback)
 	{
-		_callback_function = callback;
-		attach(seconds, _static_callback, static_cast<void*>(this));
+		_callback_function = std::move(callback);
+		_attach_ms(seconds * 1000, true, _static_callback, this);
 	}
 
 	void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
@@ -56,8 +56,8 @@ public:
 
 	void attach_ms(uint32_t milliseconds, callback_function_t callback)
 	{
-		_callback_function = callback;
-		attach_ms(milliseconds, _static_callback, static_cast<void*>(this));
+		_callback_function = std::move(callback);
+		_attach_ms(milliseconds, true, _static_callback, this);
 	}
 
 	template<typename TArg>
@@ -67,14 +67,14 @@ public:
 		// C-cast serves two purposes:
 		// static_cast for smaller integer types,
 		// reinterpret_cast + const_cast for pointer types
-		_attach_ms(seconds * 1000, true, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_ms(seconds * 1000, true, callback, arg);
 	}
 
 	template<typename TArg>
 	void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_ms(milliseconds, true, callback, arg);
 	}
 
 	void once_scheduled(float seconds, callback_function_t callback)
@@ -84,8 +84,8 @@ public:
 
 	void once(float seconds, callback_function_t callback)
 	{
-		_callback_function = callback;
-		once(seconds, _static_callback, static_cast<void*>(this));
+		_callback_function = std::move(callback);
+		_attach_ms(seconds * 1000, false, _static_callback, this);
 	}
 
 	void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
@@ -95,37 +95,36 @@ public:
 
 	void once_ms(uint32_t milliseconds, callback_function_t callback)
 	{
-		_callback_function = callback;
-		once_ms(milliseconds, _static_callback, static_cast<void*>(this));
+		_callback_function = std::move(callback);
+		_attach_ms(milliseconds, false, _static_callback, this);
 	}
 
 	template<typename TArg>
 	void once(float seconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-		_attach_ms(seconds * 1000, false, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_ms(seconds * 1000, false, callback, arg);
 	}
 
 	template<typename TArg>
 	void once_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-		_attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_ms(milliseconds, false, callback, arg);
 	}
 
 	void detach();
 	bool active() const;
 
-protected:	
-	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg);
-	static void _static_callback (void* arg);
-
 protected:
+	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg);
+	static void _static_callback(void* arg);
+
 	ETSTimer* _timer;
 	callback_function_t _callback_function = nullptr;
 
 private:
-	char _etsTimerMemory[sizeof(ETSTimer)];
+	ETSTimer _etsTimer;
 };
 
 

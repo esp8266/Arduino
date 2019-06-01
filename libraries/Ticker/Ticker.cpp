@@ -1,9 +1,9 @@
-/* 
+/*
   Ticker.cpp - esp8266 library that calls functions periodically
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -26,13 +26,13 @@
 #include "eagle_soc.h"
 #include "osapi.h"
 
-static const int ONCE   = 0;
+static const int ONCE = 0;
 static const int REPEAT = 1;
 
 #include "Ticker.h"
 
 Ticker::Ticker()
-: _timer(nullptr)
+	: _timer(nullptr)
 {
 }
 
@@ -49,11 +49,11 @@ void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t 
 	}
 	else
 	{
-		_timer = new(_etsTimerMemory) ETSTimer;
+		_timer = new(&_etsTimer) ETSTimer;
 	}
 
-	os_timer_setfn(_timer, reinterpret_cast<ETSTimerFunc*>(callback), arg);
-	os_timer_arm(_timer, milliseconds, (repeat)?REPEAT:ONCE);
+	os_timer_setfn(_timer, callback, arg);
+	os_timer_arm(_timer, milliseconds, (repeat) ? REPEAT : ONCE);
 }
 
 void Ticker::detach()
@@ -62,8 +62,8 @@ void Ticker::detach()
 		return;
 
 	os_timer_disarm(_timer);
-	_timer->~ETSTimer();
 	_timer = nullptr;
+	_etsTimer.~ETSTimer();
 	_callback_function = nullptr;
 }
 
@@ -75,12 +75,6 @@ bool Ticker::active() const
 void Ticker::_static_callback(void* arg)
 {
 	Ticker* _this = reinterpret_cast<Ticker*>(arg);
-	if (_this == nullptr)
-	{
-		return;
-	}
-	if (_this->_callback_function)
-	{
-		_this->_callback_function();
-	}
+	if (!_this) return;
+	if (_this->_callback_function) _this->_callback_function();
 }
