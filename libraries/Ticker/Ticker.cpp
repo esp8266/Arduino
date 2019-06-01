@@ -49,7 +49,7 @@ void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t 
 	}
 	else
 	{
-		_timer = new(&_etsTimer) ETSTimer;
+		_timer = new(_etsTimerMem) ETSTimer;
 	}
 
 	os_timer_setfn(_timer, callback, arg);
@@ -62,8 +62,8 @@ void Ticker::detach()
 		return;
 
 	os_timer_disarm(_timer);
+	_timer->~ETSTimer();
 	_timer = nullptr;
-	_etsTimer.~ETSTimer();
 	_callback_function = nullptr;
 }
 
