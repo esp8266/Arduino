@@ -121,7 +121,8 @@ protected:
 	callback_function_t _callback_function = nullptr;
 
 private:
-	char _etsTimerMem[sizeof(ETSTimer)];
+	//char _etsTimerMem[sizeof(ETSTimer)];
+	ETSTimer _etsTimer;
 };
 
 
