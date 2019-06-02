@@ -1248,6 +1248,8 @@ int HTTPClient::handleHeaderResponse()
         return HTTPC_ERROR_NOT_CONNECTED;
     }
 
+    _canReuse = !_useHTTP10;
+
     String transferEncoding;
     _returnCode = -1;
     _size = -1;
@@ -1266,6 +1268,7 @@ int HTTPClient::handleHeaderResponse()
 
             if(headerLine.startsWith("HTTP/1.")) {
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
+                _canReuse = (_returnCode != '0');
             } else if(headerLine.indexOf(':')) {
                 String headerName = headerLine.substring(0, headerLine.indexOf(':'));
                 String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
