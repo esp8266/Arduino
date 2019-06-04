@@ -23,10 +23,13 @@
 #include "eagle_soc.h"
 #include "osapi.h"
 
-static const int ONCE = 0;
-static const int REPEAT = 1;
-
 #include "Ticker.h"
+
+namespace
+{
+	constexpr int ONCE = 0;
+	constexpr int REPEAT = 1;
+}
 
 Ticker::Ticker()
 	: _timer(nullptr)
@@ -46,7 +49,6 @@ void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t 
 	}
 	else
 	{
-		//_timer = new(_etsTimerMem) ETSTimer;
 		_timer = &_etsTimer;
 	}
 
@@ -60,7 +62,6 @@ void Ticker::detach()
 		return;
 
 	os_timer_disarm(_timer);
-	//_timer->~ETSTimer();
 	_timer = nullptr;
 	_callback_function = nullptr;
 }
@@ -73,6 +74,6 @@ bool Ticker::active() const
 void Ticker::_static_callback(void* arg)
 {
 	Ticker* _this = reinterpret_cast<Ticker*>(arg);
-	if (!_this) return;
-	if (_this->_callback_function) _this->_callback_function();
+	if (_this && _this->_callback_function)
+		_this->_callback_function();
 }
