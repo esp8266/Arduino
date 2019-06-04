@@ -41,6 +41,11 @@ Ticker::~Ticker()
 	detach();
 }
 
+void Ticker::_attach_s(float seconds, bool repeat, callback_with_arg_t callback, void* arg)
+{
+	_attach_ms(1000 * seconds, repeat, callback, arg);
+}
+
 void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg)
 {
 	if (_timer)
