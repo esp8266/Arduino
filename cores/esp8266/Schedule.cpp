@@ -4,6 +4,7 @@
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
+#include "coredecls.h"
 
 typedef std::function<bool(void)> mFuncT;
 
@@ -12,15 +13,14 @@ struct scheduled_fn_t
     scheduled_fn_t* mNext = nullptr;
     mFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
+    schedule_e policy;
 
     scheduled_fn_t() : callNow(esp8266::polledTimeout::periodicFastUs::alwaysExpired) { }
 };
 
 static scheduled_fn_t* sFirst = nullptr;
 static scheduled_fn_t* sLast = nullptr;
-
 static scheduled_fn_t* sUnused = nullptr;
-
 static int sCount = 0;
 
 IRAM_ATTR // called from ISR
@@ -52,7 +52,7 @@ static void recycle_fn_unsafe(scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
+bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us, schedule_e policy)
 {
     assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -64,8 +64,9 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
 
     if (repeat_us)
         item->callNow.reset(repeat_us);
-
+    item->policy = policy;
     item->mFunc = fn;
+
     if (sFirst)
         sLast->mNext = item;
     else
@@ -76,24 +77,24 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us)
+bool schedule_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us, schedule_e policy)
 {
-    return schedule_function_us(std::function<bool(void)>(fn), repeat_us);
+    return schedule_function_us(std::function<bool(void)>(fn), repeat_us, policy);
 }
 
 IRAM_ATTR // called from ISR
-bool schedule_function(std::function<void(void)>&& fn)
+bool schedule_function(std::function<void(void)>&& fn, schedule_e policy)
 {
-    return schedule_function_us([fn]() { fn(); return false; }, 0);
+    return schedule_function_us([fn]() { fn(); return false; }, 0, policy);
 }
 
 IRAM_ATTR // called from ISR
-bool schedule_function(const std::function<void(void)>& fn)
+bool schedule_function(const std::function<void(void)>& fn, schedule_e policy)
 {
-    return schedule_function(std::function<void(void)>(fn));
+    return schedule_function(std::function<void(void)>(fn), policy);
 }
 
-void run_scheduled_functions()
+void run_scheduled_functions(schedule_e policy)
 {
     // Note to the reader:
     // There is no exposed API to remove a scheduled function:
@@ -110,13 +111,22 @@ void run_scheduled_functions()
         fence = true;
     }
 
+    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
     scheduled_fn_t* lastRecurring = nullptr;
     scheduled_fn_t* nextCall = sFirst;
     while (nextCall)
     {
         scheduled_fn_t* toCall = nextCall;
         nextCall = nextCall->mNext;
-        if (toCall->callNow)
+
+        // run scheduled function:
+        // - when its schedule policy allows it anytime
+        // - or if we are called at loop() time
+        // and
+        // - its time policy allows it
+        if (   (   toCall->policy == SCHEDULED_FUNCTION_WITHOUT_YIELDELAYCALLS
+                || policy == SCHEDULED_FUNCTION_ONCE_PER_LOOP)
+            && toCall->callNow)
         {
             if (toCall->mFunc())
             {
@@ -142,6 +152,13 @@ void run_scheduled_functions()
         else
             // function stays in list
             lastRecurring = toCall;
+
+        if (policy == SCHEDULED_FUNCTION_ONCE_PER_LOOP && yieldNow)
+        {
+            // this is yield() in cont stack:
+            esp_schedule();
+            cont_yield(g_pcont);
+        }
     }
 
     fence = false;

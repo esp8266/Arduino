@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 V ?= 0
 TEST_LIST ?= $(wildcard test_*/*.ino)
-ESP8266_CORE_PATH ?= ../..
+ESP8266_CORE_PATH ?= $(realpath ../..)
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
 #PYTHON ?= python3
@@ -60,9 +60,9 @@ ifneq ("$(NO_UPLOAD)","1")
 	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
 	@test -e $(dir $@)/make_spiffs.py && (echo "Generating and uploading SPIFFS" && \
 		(cd $(dir $@) && $(PYTHON) ./make_spiffs.py) && \
-		$(SILENT)$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
+		$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
 			--block 8192 --page 256 $(LOCAL_BUILD_DIR)/spiffs.img && \
-		$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
+		$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
 			--chip esp8266 \
 			--port $(UPLOAD_PORT) \
 			--baud $(UPLOAD_BAUD) \

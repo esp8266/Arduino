@@ -13,6 +13,8 @@
 
 #include <time.h>
 
+#include <FS.h>
+
 #define USE_SERIAL Serial
 
 #ifndef APSSID
@@ -27,40 +29,6 @@ ESP8266WiFiMulti WiFiMulti;
 // the WiFiClientBearSSLs are present.
 #include <CertStoreBearSSL.h>
 BearSSL::CertStore certStore;
-
-#include <FS.h>
-class SPIFFSCertStoreFile : public BearSSL::CertStoreFile {
-  public:
-    SPIFFSCertStoreFile(const char *name) {
-      _name = name;
-    };
-    virtual ~SPIFFSCertStoreFile() override {};
-
-    // The main API
-    virtual bool open(bool write = false) override {
-      _file = SPIFFS.open(_name, write ? "w" : "r");
-      return _file;
-    }
-    virtual bool seek(size_t absolute_pos) override {
-      return _file.seek(absolute_pos, SeekSet);
-    }
-    virtual ssize_t read(void *dest, size_t bytes) override {
-      return _file.readBytes((char*)dest, bytes);
-    }
-    virtual ssize_t write(void *dest, size_t bytes) override {
-      return _file.write((uint8_t*)dest, bytes);
-    }
-    virtual void close() override {
-      _file.close();
-    }
-
-  private:
-    File _file;
-    const char *_name;
-};
-
-SPIFFSCertStoreFile certs_idx("/certs.idx");
-SPIFFSCertStoreFile certs_ar("/certs.ar");
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
@@ -102,7 +70,7 @@ void setup() {
 
   SPIFFS.begin();
 
-  int numCerts = certStore.initCertStore(&certs_idx, &certs_ar);
+  int numCerts = certStore.initCertStore(SPIFFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   USE_SERIAL.print(F("Number of CA certs read: ")); USE_SERIAL.println(numCerts);
   if (numCerts == 0) {
     USE_SERIAL.println(F("No certs found. Did you run certs-from-mozill.py and upload the SPIFFS directory before running?"));
