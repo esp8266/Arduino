@@ -254,9 +254,9 @@ class String {
         enum { SSOSIZE = sizeof(struct _ptr) + 4 - 1 }; // Characters to allocate space for SSO, must be 12 or more
         struct _sso {
             char     buff[SSOSIZE];
-            unsigned len   : 7;
-            unsigned isSSO : 1;
-        };
+            unsigned char len   : 7; // Ensure only one byte is allocated by GCC for the bitfields
+            unsigned char isSSO : 1;
+        } __attribute__((packed)); // Ensure that GCC doesn't expand the flag byte to a 32-bit word for alignment issues
         enum { CAPACITY_MAX = 65535 }; // If typeof(cap) changed from uint16_t, be sure to update this enum to the max value storable in the type
         union {
             struct _ptr ptr;
