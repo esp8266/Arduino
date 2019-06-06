@@ -2,6 +2,7 @@
 tools/dist/
 tools/xtensa-lx106-elf/
 tools/mkspiffs/
+tools/mklittlefs/
 tools/python/
 package/versions/
 exclude.txt
