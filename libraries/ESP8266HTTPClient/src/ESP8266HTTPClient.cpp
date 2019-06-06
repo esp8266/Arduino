@@ -563,6 +563,7 @@ void HTTPClient::setRedirectLimit(uint16_t limit)
 void HTTPClient::useHTTP10(bool useHTTP10)
 {
     _useHTTP10 = useHTTP10;
+    _reuse = !useHTTP10;
 }
 
 /**
@@ -1190,7 +1191,7 @@ bool HTTPClient::connect(void)
  * @return status
  */
 bool HTTPClient::sendHeader(const char * type)
-{
+{ 
     if(!connected()) {
         return false;
     }
