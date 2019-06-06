@@ -320,11 +320,11 @@ TEST_CASE("String SSO works", "[core][String]")
   REQUIRE(s.c_str() == savesso);
   REQUIRE(s == "0123456789");
   REQUIRE(s.length() == 10);
-  s += "a";
-  REQUIRE(s.c_str() == savesso);
-  REQUIRE(s == "0123456789a");
-  REQUIRE(s.length() == 11);
   if (sizeof(savesso) == 4) {
+    s += "a";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "b";
     REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789ab");
@@ -334,12 +334,16 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s == "0123456789abc");
     REQUIRE(s.length() == 13);
   } else {
+  s += "a";
+    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "bcde";
     REQUIRE(s.c_str() == savesso);
     REQUIRE(s == "0123456789abcde");
     REQUIRE(s.length() == 15);
     s += "fghi";
-    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789abcdefghi");
     REQUIRE(s.length() == 19);
     s += "j";
@@ -360,7 +364,7 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s.length() == 23);
     s += "nopq";
     REQUIRE(s.c_str() != savesso);
-      REQUIRE(s == "0123456789abcdefghijklmnopq");
+    REQUIRE(s == "0123456789abcdefghijklmnopq");
     REQUIRE(s.length() == 27);
     s += "rstu";
     REQUIRE(s.c_str() != savesso);
@@ -451,4 +455,42 @@ TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
     s.print(String("message"));
     s.print('\"');
     REQUIRE(s == "{\"message\"");
+}
+
+TEST_CASE("Strings with NULs", "[core][String]")
+{
+  // The following should never be done in a real app! This is only to inject 0s in the middle of a string.
+  // Fits in SSO...
+  String str("01234567");
+  REQUIRE(str.length() == 8);
+  char *ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  String str2;
+  str2 = str;
+  REQUIRE(str2.length() == 8);
+  // Needs a buffer pointer
+  str = "0123456789012345678901234567890123456789";
+  ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  str2 = str;
+  REQUIRE(str2.length() == 40);
+  String str3("a");
+  ptr = (char *)str3.c_str();
+  *ptr = 0;
+  REQUIRE(str3.length() == 1);
+  str3 += str3;
+  REQUIRE(str3.length() == 2);
+  str3 += str3;
+  REQUIRE(str3.length() == 4);
+  str3 += str3;
+  REQUIRE(str3.length() == 8);
+  str3 += str3;
+  REQUIRE(str3.length() == 16);
+  str3 += str3;
+  REQUIRE(str3.length() == 32);
+  str3 += str3;
+  REQUIRE(str3.length() == 64);
+  static char zeros[64] = {0};
+  const char *p = str3.c_str();
+  REQUIRE(!memcmp(p, zeros, 64));
 }
