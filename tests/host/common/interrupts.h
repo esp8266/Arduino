@@ -3,9 +3,20 @@
 
 class InterruptLock {
 public:
-    uint32_t savedInterruptLevel() const {
-        return 0x0f;
+    InterruptLock() {
+        _state = 0x00;
     }
+
+    ~InterruptLock() {
+        _state = 0x0f;
+    }
+
+    uint32_t savedInterruptLevel() const {
+        return _state & 0x0f;
+    }
+
+protected:
+    uint32_t _state;
 };
 
 #define AutoInterruptLock(intrLevel) \
