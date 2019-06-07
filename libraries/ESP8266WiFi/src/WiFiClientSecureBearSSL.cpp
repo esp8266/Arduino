@@ -795,32 +795,38 @@ extern "C" {
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
 #endif
   };
-  // Server w/EC has one set
+#ifndef BEARSSL_BASIC
+  // Server w/EC has one set, not possible with basic SSL config
   static const uint16_t suites_server_ec_P [] PROGMEM = {
-#ifndef BEARSSL_BASIC
-    BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
-    BR_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-    BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-    BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
-    BR_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,
-    BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-    BR_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-    BR_TLS_RSA_WITH_AES_128_GCM_SHA256,
-    BR_TLS_RSA_WITH_AES_256_GCM_SHA384,
-    BR_TLS_RSA_WITH_AES_128_CCM,
-    BR_TLS_RSA_WITH_AES_256_CCM,
-    BR_TLS_RSA_WITH_AES_128_CCM_8,
-    BR_TLS_RSA_WITH_AES_256_CCM_8,
-#endif
-    BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
-    BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
-    BR_TLS_RSA_WITH_AES_128_CBC_SHA,
-    BR_TLS_RSA_WITH_AES_256_CBC_SHA,
-#ifndef BEARSSL_BASIC
-    BR_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
-    BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
-#endif
+    BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA,
+    BR_TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA,
+    BR_TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA
   };
+#endif
+
   static const uint16_t suites_server_rsa_P[] PROGMEM = {
 #ifndef BEARSSL_BASIC
     BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
@@ -904,6 +910,7 @@ extern "C" {
   static void br_ssl_server_base_init(br_ssl_server_context *cc, const uint16_t *cipher_list, int cipher_cnt) {
     uint16_t suites[cipher_cnt];
     memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
+#if 0
     br_ssl_server_zero(cc);
     br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegociation, as we free the Private Key after handshake
     br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
@@ -923,7 +930,59 @@ extern "C" {
     br_ssl_engine_set_default_des_cbc(&cc->eng);
     br_ssl_engine_set_default_chapol(&cc->eng);
 #endif
+#endif
+            /*
+         * Reset server context and set supported versions from TLS-1.0
+         * to TLS-1.2 (inclusive).
+         */
+        br_ssl_server_zero(cc);
+        br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
+
+        /*
+         * Set suites and elliptic curve implementation (for ECDHE).
+         */
+        br_ssl_engine_set_suites(&cc->eng, suites,
+                (sizeof suites) / (sizeof suites[0]));
+        br_ssl_engine_set_default_ec(&cc->eng);
+
+        /*
+         * Set the "server policy": handler for the certificate chain
+         * and private key operations.
+         */
+//        br_ssl_server_set_single_rsa(cc, chain, chain_len, sk,
+//                BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
+//                br_rsa_private_get_default(),
+//                br_rsa_pkcs1_sign_get_default());
+
+        /*
+         * Set supported hash functions.
+         */
+    br_ssl_client_install_hashes(&cc->eng);
+
+//        for (id = br_md5_ID; id <= br_sha512_ID; id ++) {
+//                const br_hash_class *hc;
+//
+//`                hc = hashes[id - 1];
+//                br_ssl_engine_set_hash(&cc->eng, id, hc);
+//        }
+
+        /*
+         * Set the PRF implementations.
+         */
+        br_ssl_engine_set_prf10(&cc->eng, &br_tls10_prf);
+        br_ssl_engine_set_prf_sha256(&cc->eng, &br_tls12_sha256_prf);
+        br_ssl_engine_set_prf_sha384(&cc->eng, &br_tls12_sha384_prf);
+
+        /*
+         * Symmetric encryption.
+         */
+        br_ssl_engine_set_default_aes_cbc(&cc->eng);
+        br_ssl_engine_set_default_aes_ccm(&cc->eng);
+        br_ssl_engine_set_default_aes_gcm(&cc->eng);
+        br_ssl_engine_set_default_des_cbc(&cc->eng);
+        br_ssl_engine_set_default_chapol(&cc->eng);
   }
+
 }
 
 // Set custom list of ciphers
