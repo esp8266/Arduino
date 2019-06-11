@@ -51,7 +51,7 @@ long random(long howsmall, long howbig) {
         return howsmall;
     }
     long diff = howbig - howsmall;
-    return random(diff) + howsmall;
+    return random(diff + 1) + howsmall;
 }
 
 long secureRandom(long howbig) {
@@ -66,7 +66,7 @@ long secureRandom(long howsmall, long howbig) {
         return howsmall;
     }
     long diff = howbig - howsmall;
-    return secureRandom(diff) + howsmall;
+    return secureRandom(diff + 1) + howsmall;
 }
 
 long map(long x, long in_min, long in_max, long out_min, long out_max) {
