@@ -67,6 +67,7 @@ class ESP8266WiFiSTAClass {
 
         IPAddress subnetMask();
         IPAddress gatewayIP();
+        IPAddress broadcastIP();
         IPAddress dnsIP(uint8_t dns_no = 0);
 
         String hostname();
