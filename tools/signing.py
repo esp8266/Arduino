@@ -51,10 +51,9 @@ def main():
         try:
             with open(args.bin, "rb") as b:
                 bin = b.read()
-                sha256 = hashlib.sha256(bin)
-                signcmd = [ 'openssl', 'rsautl', '-sign', '-inkey', args.privatekey ]
+                signcmd = [ 'openssl', 'dgst', '-sha256', '-sign', args.privatekey ]
                 proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-                signout, signerr = proc.communicate(input=sha256.digest())
+                signout, signerr = proc.communicate(input=bin)
                 if proc.returncode:
                     sys.stderr.write("OpenSSL returned an error signing the binary: " + str(proc.returncode) + "\nSTDERR: " + str(signerr))
                 else:
