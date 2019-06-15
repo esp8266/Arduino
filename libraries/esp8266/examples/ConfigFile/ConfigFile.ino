@@ -4,7 +4,7 @@
 // https://github.com/bblanchon/ArduinoJson
 //
 // Created Aug 10, 2015 by Ivan Grokhotkov.
-// Updated Jun 15, 2019 by Ruan de Villiers to use ArduinoJson6 
+//
 // This example code is in the public domain.
 
 #include <ArduinoJson.h>
@@ -63,7 +63,7 @@ bool saveConfig() {
     return false;
   }
 
-  deserializeJson(doc,configFile);
+  serializeJson(doc,configFile);
   return true;
 }
 
