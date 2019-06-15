@@ -53,7 +53,6 @@ bool loadConfig() {
 
 bool saveConfig() {
   StaticJsonDocument<200> doc;
-  
   doc["serverName"] = "api.example.com";
   doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 
