@@ -4,7 +4,7 @@
 // https://github.com/bblanchon/ArduinoJson
 //
 // Created Aug 10, 2015 by Ivan Grokhotkov.
-//
+// Updated Jun 15, 2019 by Ruan de Villiers to use ArduinoJson6 
 // This example code is in the public domain.
 
 #include <ArduinoJson.h>
@@ -31,16 +31,15 @@ bool loadConfig() {
   // use configFile.readString instead.
   configFile.readBytes(buf.get(), size);
 
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.parseObject(buf.get());
-
-  if (!json.success()) {
+  StaticJsonDocument<200> doc;
+  auto error = deserializeJson(doc, buf.get());
+  if (error) {
     Serial.println("Failed to parse config file");
     return false;
   }
 
-  const char* serverName = json["serverName"];
-  const char* accessToken = json["accessToken"];
+  const char* serverName = doc["serverName"];
+  const char* accessToken = doc["accessToken"];
 
   // Real world application would store these values in some variables for
   // later use.
@@ -53,10 +52,10 @@ bool loadConfig() {
 }
 
 bool saveConfig() {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
-  json["serverName"] = "api.example.com";
-  json["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
+  StaticJsonDocument<200> doc;
+  
+  doc["serverName"] = "api.example.com";
+  doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
@@ -64,7 +63,7 @@ bool saveConfig() {
     return false;
   }
 
-  json.printTo(configFile);
+  deserializeJson(doc,configFile);
   return true;
 }
 
