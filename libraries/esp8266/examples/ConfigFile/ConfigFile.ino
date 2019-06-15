@@ -62,7 +62,7 @@ bool saveConfig() {
     return false;
   }
 
-  serializeJson(doc,configFile);
+  serializeJson(doc, configFile);
   return true;
 }
 
