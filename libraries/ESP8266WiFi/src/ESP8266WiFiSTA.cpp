@@ -309,6 +309,13 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
     return false;
   }
 
+#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+  // get current->previous IP address
+  // (check below)
+  struct ip_info previp;
+  wifi_get_ip_info(STATION_IF, &previp);
+#endif
+
   struct ip_info info;
   info.ip.addr = local_ip.v4();
   info.gw.addr = gateway.v4();
@@ -334,7 +341,9 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 #if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
   // trigger address change by calling lwIP-v1.4 api
   // (see explanation above)
-  netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+  // only when ip is already set by other mean (generally dhcp)
+  if (previp.ip.addr != 0 && previp.ip.addr != info.ip.addr)
+      netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
 #endif
 
   return true;
