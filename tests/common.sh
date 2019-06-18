@@ -135,7 +135,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0 || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip ArduinoJson-v6.11.0
+    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip ArduinoJson-v6.11.0.zip
 
     popd
 }
