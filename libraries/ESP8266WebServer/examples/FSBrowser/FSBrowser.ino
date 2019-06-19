@@ -27,6 +27,10 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <FS.h>
+#include <LittleFS.h>
+
+//FS* filesystem = &SPIFFS;
+FS* filesystem = &LittleFS;
 
 #define DBG_OUTPUT_PORT Serial
 
@@ -94,11 +98,11 @@ bool handleFileRead(String path) {
   }
   String contentType = getContentType(path);
   String pathWithGz = path + ".gz";
-  if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
-    if (SPIFFS.exists(pathWithGz)) {
+  if (filesystem->exists(pathWithGz) || filesystem->exists(path)) {
+    if (filesystem->exists(pathWithGz)) {
       path += ".gz";
     }
-    File file = SPIFFS.open(path, "r");
+    File file = filesystem->open(path, "r");
     server.streamFile(file, contentType);
     file.close();
     return true;
@@ -117,7 +121,7 @@ void handleFileUpload() {
       filename = "/" + filename;
     }
     DBG_OUTPUT_PORT.print("handleFileUpload Name: "); DBG_OUTPUT_PORT.println(filename);
-    fsUploadFile = SPIFFS.open(filename, "w");
+    fsUploadFile = filesystem->open(filename, "w");
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     //DBG_OUTPUT_PORT.print("handleFileUpload Data: "); DBG_OUTPUT_PORT.println(upload.currentSize);
@@ -141,10 +145,10 @@ void handleFileDelete() {
   if (path == "/") {
     return server.send(500, "text/plain", "BAD PATH");
   }
-  if (!SPIFFS.exists(path)) {
+  if (!filesystem->exists(path)) {
     return server.send(404, "text/plain", "FileNotFound");
   }
-  SPIFFS.remove(path);
+  filesystem->remove(path);
   server.send(200, "text/plain", "");
   path = String();
 }
@@ -158,10 +162,10 @@ void handleFileCreate() {
   if (path == "/") {
     return server.send(500, "text/plain", "BAD PATH");
   }
-  if (SPIFFS.exists(path)) {
+  if (filesystem->exists(path)) {
     return server.send(500, "text/plain", "FILE EXISTS");
   }
-  File file = SPIFFS.open(path, "w");
+  File file = filesystem->open(path, "w");
   if (file) {
     file.close();
   } else {
@@ -179,7 +183,7 @@ void handleFileList() {
 
   String path = server.arg("dir");
   DBG_OUTPUT_PORT.println("handleFileList: " + path);
-  Dir dir = SPIFFS.openDir(path);
+  Dir dir = filesystem->openDir(path);
   path = String();
 
   String output = "[";
@@ -192,7 +196,10 @@ void handleFileList() {
     output += "{\"type\":\"";
     output += (isDir) ? "dir" : "file";
     output += "\",\"name\":\"";
-    output += String(entry.name()).substring(1);
+    if (entry.name()[0] == '/')
+        output += String(entry.name()).substring(1);
+    else
+        output += entry.name();
     output += "\"}";
     entry.close();
   }
@@ -205,9 +212,9 @@ void setup(void) {
   DBG_OUTPUT_PORT.begin(115200);
   DBG_OUTPUT_PORT.print("\n");
   DBG_OUTPUT_PORT.setDebugOutput(true);
-  SPIFFS.begin();
+  filesystem->begin();
   {
-    Dir dir = SPIFFS.openDir("/");
+    Dir dir = filesystem->openDir("/");
     while (dir.next()) {
       String fileName = dir.fileName();
       size_t fileSize = dir.fileSize();

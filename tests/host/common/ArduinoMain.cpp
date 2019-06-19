@@ -152,7 +152,7 @@ static struct option options[] =
 void cleanup ()
 {
 	mock_stop_spiffs();
-//	mock_stop_littlefs();
+	mock_stop_littlefs();
 	mock_stop_uart();
 }
 
@@ -239,7 +239,7 @@ int main (int argc, char* const argv [])
 		name += "-littlefs";
 		name += String(littlefs_kb > 0? littlefs_kb: -littlefs_kb, DEC);
 		name += "KB";
-//		mock_start_littlefs(name, littlefs_kb);
+		mock_start_littlefs(name, littlefs_kb);
 	}
 
 	// setup global global_ipv4_netfmt
