@@ -107,9 +107,8 @@ MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMainUdp.cpp \
 	ArduinoMainSpiffs.cpp \
 	user_interface.cpp \
-
-	#(not in tree) ArduinoMainLittlefs.cpp
 )
+	#(not in tree) ArduinoMainLittlefs.cpp
 
 MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
