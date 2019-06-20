@@ -196,10 +196,11 @@ void handleFileList() {
     output += "{\"type\":\"";
     output += (isDir) ? "dir" : "file";
     output += "\",\"name\":\"";
-    if (entry.name()[0] == '/')
-        output += String(entry.name()).substring(1);
-    else
-        output += entry.name();
+    if (entry.name()[0] == '/') {
+      output += &(entry.name[1]);
+    } else {
+      output += entry.name();
+    }
     output += "\"}";
     entry.close();
   }
