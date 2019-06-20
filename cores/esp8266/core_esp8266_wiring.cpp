@@ -44,15 +44,17 @@ void delay_end(void* arg) {
 }
 
 void delay(unsigned long ms) {
-    if(ms) {
-        os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
-        os_timer_arm(&delay_timer, ms, ONCE);
+    if (ms) {
+        unsigned long delay_start = millis();
+        while(millis() - delay_start < ms) {
+            os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
+            os_timer_arm(&delay_timer, 1, ONCE);
+            esp_yield();
+            os_timer_disarm(&delay_timer);
+        }
     } else {
         esp_schedule();
-    }
-    esp_yield();
-    if(ms) {
-        os_timer_disarm(&delay_timer);
+        esp_yield();
     }
 }
 
