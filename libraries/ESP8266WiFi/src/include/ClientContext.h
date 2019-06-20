@@ -130,8 +130,10 @@ public:
         }
         _connect_pending = 1;
         _op_start_time = millis();
-        // This delay will be interrupted by esp_schedule in the connect callback
-        delay(_timeout_ms);
+        for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
+               // let a chance to recurrent scheduled functions (ethernet)
+               delay(1);
+       }
         _connect_pending = 0;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -456,8 +458,10 @@ protected:
             }
 
             _send_waiting = true;
-            // This delay will be interrupted by esp_schedule on next received ack
-            delay(_timeout_ms);
+            for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
+               // let a chance to recurrent scheduled functions (ethernet)
+               delay(1);
+            }
         } while(true);
         _send_waiting = false;
 
@@ -603,6 +607,7 @@ protected:
         (void) pcb;
         assert(pcb == _pcb);
         assert(_connect_pending);
+        _connect_pending = 0;
         esp_schedule();
         return ERR_OK;
     }
