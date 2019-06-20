@@ -640,7 +640,7 @@ uint32_t MDNSResponder::queryService(const char* p_pcService,
         if (_sendMDNSServiceQuery(*pServiceQuery)) {
             // Wait for answers to arrive
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryService: Waiting %u ms for answers...\n"), p_u16Timeout););
-            delay(p_u16Timeout);
+            interruptable_delay(p_u16Timeout);
 
             // All answers should have arrived by now -> stop adding new answers
             pServiceQuery->m_bAwaitingAnswers = false;
