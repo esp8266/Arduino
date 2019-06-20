@@ -197,7 +197,7 @@ void handleFileList() {
     output += (isDir) ? "dir" : "file";
     output += "\",\"name\":\"";
     if (entry.name()[0] == '/') {
-      output += &(entry.name[1]);
+      output += &(entry.name()[1]);
     } else {
       output += entry.name();
     }
