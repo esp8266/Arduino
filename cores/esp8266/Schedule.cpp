@@ -7,8 +7,6 @@
 #include "coredecls.h"
 
 typedef std::function<void(void)> mSchedFuncT;
-typedef std::function<bool(void)> mRecFuncT;
-
 struct scheduled_fn_t
 {
     scheduled_fn_t* mNext = nullptr;
@@ -20,18 +18,19 @@ static scheduled_fn_t* sLast = nullptr;
 static scheduled_fn_t* sUnused = nullptr;
 static int sCount = 0;
 
+typedef std::function<bool(void)> mRecFuncT;
 struct recurrent_fn_t
 {
     recurrent_fn_t* mNext = nullptr;
     mRecFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
-    recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
+    recurrent_fn_t (esp8266::polledTimeout::periodicFastUs interval): callNow(interval) { }
 };
 
-static recurrent_fn_t* rFirst = nullptr; // stack, fifo not needed
+static recurrent_fn_t* rFirst = nullptr; // fifo not needed
 
 IRAM_ATTR // called from ISR
-static scheduled_fn_t* get_fn_unsafe()
+static scheduled_fn_t* get_fn_unsafe ()
 {
     scheduled_fn_t* result = nullptr;
     // try to get an item from unused items list
@@ -45,12 +44,13 @@ static scheduled_fn_t* get_fn_unsafe()
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
     {
         result = new scheduled_fn_t;
-        ++sCount;
+        if (result)
+            ++sCount;
     }
     return result;
 }
 
-static void recycle_fn_unsafe(scheduled_fn_t* fn)
+static void recycle_fn_unsafe (scheduled_fn_t* fn)
 {
     fn->mFunc = nullptr; // special overload in c++ std lib
     fn->mNext = sUnused;
@@ -58,7 +58,7 @@ static void recycle_fn_unsafe(scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function_us(std::function<void(void)>&& fn)
+bool schedule_function (std::function<void(void)>&& fn)
 {
     InterruptLock lockAllInterruptsInThisScope;
 
@@ -83,7 +83,6 @@ bool schedule_function (const std::function<void(void)>& fn)
     return schedule_function(std::function<void(void)>(fn));
 }
 
-IRAM_ATTR // (not only) called from ISR
 bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t repeat_us)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
@@ -107,7 +106,7 @@ bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t re
     return true;
 }
 
-void run_scheduled_functions()
+void run_scheduled_functions ()
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
