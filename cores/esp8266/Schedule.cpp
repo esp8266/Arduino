@@ -66,7 +66,7 @@ bool schedule_function (std::function<void(void)>&& fn)
     if (!item)
         return false;
 
-    item->mFunc = fn;
+    item->mFunc = std::move(fn);
 
     if (sFirst)
         sLast->mNext = item;
@@ -75,12 +75,6 @@ bool schedule_function (std::function<void(void)>&& fn)
     sLast = item;
 
     return true;
-}
-
-IRAM_ATTR // called from ISR
-bool schedule_function (const std::function<void(void)>& fn)
-{
-    return schedule_function(std::function<void(void)>(fn));
 }
 
 bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t repeat_us)
@@ -93,7 +87,7 @@ bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t re
     if (!item)
         return false;
 
-    item->mFunc = fn;
+    item->mFunc = std::move(fn);
 
     if (rFirst)
     {
