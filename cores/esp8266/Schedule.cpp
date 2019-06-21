@@ -58,7 +58,7 @@ static void recycle_fn_unsafe (scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function (std::function<void(void)>&& fn)
+bool schedule_function (const std::function<void(void)>& fn)
 {
     InterruptLock lockAllInterruptsInThisScope;
 
@@ -66,7 +66,7 @@ bool schedule_function (std::function<void(void)>&& fn)
     if (!item)
         return false;
 
-    item->mFunc = std::move(fn);
+    item->mFunc = fn;
 
     if (sFirst)
         sLast->mNext = item;
@@ -77,7 +77,7 @@ bool schedule_function (std::function<void(void)>&& fn)
     return true;
 }
 
-bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t repeat_us)
+bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -87,7 +87,7 @@ bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t re
     if (!item)
         return false;
 
-    item->mFunc = std::move(fn);
+    item->mFunc = fn;
 
     if (rFirst)
     {

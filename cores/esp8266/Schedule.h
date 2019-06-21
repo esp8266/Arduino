@@ -20,7 +20,7 @@
 //   SCHEDULED_FN_MAX_COUNT.
 // * Run the lambda only once next time.
 
-bool schedule_function (std::function<void(void)>&& fn);
+bool schedule_function (const std::function<void(void)>& fn);
 
 // Run all scheduled functions.
 // Use this function if your are not using `loop`, or `loop` does not return
@@ -39,7 +39,7 @@ void run_scheduled_functions();
 // * There is no mechanism for cancelling recurrent scheduled functions.
 // * long running operations or yield() or delay() are not wise in the lambda.
 
-bool schedule_recurrent_function_us (std::function<bool(void)>&& fn, uint32_t repeat_us);
+bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
