@@ -1,65 +1,73 @@
-#include <FunctionalInterrupt.h>
+#include "FunctionalInterrupt.h"
 #include <Schedule.h>
-#include "Arduino.h"
+#include <Arduino.h>
 
-// Duplicate typedefs from core_esp8266_wiring_digital_c
-typedef void (*voidFuncPtr)(void);
-typedef void (*voidFuncPtrArg)(void*);
+namespace {
 
-// Helper functions for Functional interrupt routines
-extern "C" void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtr userFunc, void*fp, int mode, bool functional);
+    struct ArgStructure
+    {
+        std::function<void()> function = nullptr;
+    };
 
+    void ICACHE_RAM_ATTR interruptFunctional(void* arg)
+    {
+        ArgStructure* localArg = static_cast<ArgStructure*>(arg);
+        localArg->function();
+    }
 
-void ICACHE_RAM_ATTR interruptFunctional(void* arg)
-{
-    ArgStructure* localArg = (ArgStructure*)arg;
-	if (localArg->functionInfo->reqScheduledFunction)
-	{
-		schedule_function(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))));
-	}
-	if (localArg->functionInfo->reqFunction)
-	{
-	  localArg->functionInfo->reqFunction();
-	}
-}
+    void cleanupFunctional(void* arg)
+    {
+        ArgStructure* localArg = static_cast<ArgStructure*>(arg);
+        delete localArg;
+    }
 
-extern "C"
-{
-   void cleanupFunctional(void* arg)
-   {
-	 ArgStructure* localArg = (ArgStructure*)arg;
-	 delete (FunctionInfo*)localArg->functionInfo;
-     delete (InterruptInfo*)localArg->interruptInfo;
-	 delete localArg;
-   }
 }
 
 void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
 {
-	// use the local interrupt routine which takes the ArgStructure as argument
+    void* localArg = detachInterruptArg(pin);
+    if (localArg)
+    {
+        cleanupFunctional(localArg);
+    }
 
-	InterruptInfo* ii = nullptr;
+    if (intRoutine)
+    {
+        ArgStructure* arg = new ArgStructure;
+        arg->function = std::move(intRoutine);
 
-	FunctionInfo* fi = new FunctionInfo;
-	fi->reqFunction = intRoutine;
-
-	ArgStructure* as = new ArgStructure;
-	as->interruptInfo = ii;
-	as->functionInfo = fi;
-
-    __attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
+        attachInterruptArg(pin, interruptFunctional, arg, mode);
+    }
 }
 
 void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
 {
-	InterruptInfo* ii = new InterruptInfo;
+    void* localArg = detachInterruptArg(pin);
+    if (localArg)
+    {
+        cleanupFunctional(localArg);
+    }
 
-	FunctionInfo* fi = new FunctionInfo;
-	fi->reqScheduledFunction = scheduledIntRoutine;
+    if (scheduledIntRoutine)
+    {
+        ArgStructure* arg = new ArgStructure;
+        arg->function = [scheduledIntRoutine = std::move(scheduledIntRoutine), pin]()
+        {
+            InterruptInfo interruptInfo(pin);
+            interruptInfo.value = digitalRead(pin);
+            interruptInfo.micro = micros();
+            schedule_function([scheduledIntRoutine, interruptInfo]() { scheduledIntRoutine(std::move(interruptInfo)); });
+        };
 
-	ArgStructure* as = new ArgStructure;
-	as->interruptInfo = ii;
-	as->functionInfo = fi;
+        attachInterruptArg(pin, interruptFunctional, arg, mode);
+    }
+}
 
-    __attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
+void detachFunctionalInterrupt(uint8_t pin)
+{
+    void* localArg = detachInterruptArg(pin);
+    if (localArg)
+    {
+        cleanupFunctional(localArg);
+    }
 }
