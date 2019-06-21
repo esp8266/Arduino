@@ -43,7 +43,7 @@ void delay_end(void* arg) {
     esp_schedule();
 }
 
-void interruptible_delay(unsigned long ms) {
+void interruptable_delay(unsigned long ms) {
     if(ms) {
         os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
         os_timer_arm(&delay_timer, ms, ONCE);
