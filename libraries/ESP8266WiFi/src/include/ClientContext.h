@@ -130,6 +130,7 @@ public:
         }
         _connect_pending = 1;
         _op_start_time = millis();
+        // Following delay will be interrupted by connect callback
         for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
                // let a chance to recurrent scheduled functions (ethernet)
                delay(1);
@@ -458,6 +459,7 @@ protected:
             }
 
             _send_waiting = true;
+            // Following delay will be interrupted by on next received ack
             for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
                // let a chance to recurrent scheduled functions (ethernet)
                delay(1);
