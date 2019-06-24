@@ -29,6 +29,9 @@ struct recurrent_fn_t
 
 static recurrent_fn_t* rFirst = nullptr; // fifo not needed
 
+// Returns a pointer to an unused sched_fn_t,
+// or if none are available allocates a new one,
+// or nullptr if limit is reached
 IRAM_ATTR // called from ISR
 static scheduled_fn_t* get_fn_unsafe ()
 {
@@ -43,7 +46,7 @@ static scheduled_fn_t* get_fn_unsafe ()
     // if no unused items, and count not too high, allocate a new one
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
     {
-        result = new scheduled_fn_t;
+        result = (scheduled_fn_t*)malloc(sizeof(scheduled_fn_t));
         if (result)
             ++sCount;
     }
@@ -141,7 +144,10 @@ void run_scheduled_recurrent_functions ()
 
     static bool fence = false;
     {
-        InterruptLock lockAllInterruptsInThisScope;
+        // fence is like a mutex but as we are never called from ISR,
+        // locking is useless here. Leaving comment for reference.
+        //InterruptLock lockAllInterruptsInThisScope;
+
         if (fence)
             // prevent recursive calls from yield()
             // (even if they are not allowed)
@@ -153,16 +159,25 @@ void run_scheduled_recurrent_functions ()
     recurrent_fn_t* current = rFirst;
 
     while (current)
+    {
         if (current->callNow && !current->mFunc())
         {
             // remove function from stack
             InterruptLock lockAllInterruptsInThisScope;
 
             auto to_ditch = current;
+
             if (prev)
-                prev->mNext = current = current->mNext;
+            {
+                current = current->mNext;
+                prev->mNext = current;
+            }
             else
-                current = rFirst = rFirst->mNext;
+            {
+                rFirst = rFirst->mNext;
+                current = rFirst;
+            }
+
             delete(to_ditch);
         }
         else
@@ -170,6 +185,7 @@ void run_scheduled_recurrent_functions ()
             prev = current;
             current = current->mNext;
         }
+    }
 
     fence = false;
 }
