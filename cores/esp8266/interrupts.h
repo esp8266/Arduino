@@ -1,12 +1,7 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 
-#include <stddef.h>
-#include <stdint.h>
-extern "C" {
-#include "c_types.h"
-#include "ets_sys.h"
-}
+#include <Arduino.h>
 
 // these auto classes wrap up xt_rsil so your code can be simplier, but can only be
 // used in an ino or cpp files. 
