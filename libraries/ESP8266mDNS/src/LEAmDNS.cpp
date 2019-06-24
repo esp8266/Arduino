@@ -87,12 +87,15 @@ MDNSResponder::~MDNSResponder(void) {
  * Finally the responder is (re)started
  *
  */
-bool MDNSResponder::begin(const char* p_pcHostname) {
+bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress, uint32_t p_u32TTL) {
     
+    (void)p_u32TTL; // ignored
     bool    bResult = false;
     
     if (0 == m_pUDPContext) {
         if (_setHostname(p_pcHostname)) {
+
+            m_IPAddress = p_IPAddress;
             
             m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
                 (void) pEvent;
@@ -114,18 +117,6 @@ bool MDNSResponder::begin(const char* p_pcHostname) {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls to begin (Ignored host domain: '%s')!\n"), (p_pcHostname ?: "-")););
     }
     return bResult;
-}
-
-/*
- * MDNSResponder::begin (LEGACY)
- */
-bool MDNSResponder::begin(const char* p_pcHostname,
-                          IPAddress p_IPAddress,
-                          uint32_t p_u32TTL /*= 120*/) {
-    
-    (void) p_IPAddress;
-    (void) p_u32TTL;
-    return begin(p_pcHostname);
 }
 
 /*
