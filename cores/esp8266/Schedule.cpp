@@ -84,7 +84,7 @@ bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
-    InterruptLock lockAllInterruptsInThisScope;
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     recurrent_fn_t* item = new recurrent_fn_t(repeat_us);
     if (!item)
@@ -112,7 +112,7 @@ void run_scheduled_functions ()
         sFirst->mFunc();
 
         {
-            InterruptLock lockAllInterruptsInThisScope;
+            esp8266::InterruptLock lockAllInterruptsInThisScope;
 
             auto to_recycle = sFirst;
             sFirst = sFirst->mNext;
@@ -163,7 +163,7 @@ void run_scheduled_recurrent_functions ()
         if (current->callNow && !current->mFunc())
         {
             // remove function from stack
-            InterruptLock lockAllInterruptsInThisScope;
+            esp8266::InterruptLock lockAllInterruptsInThisScope;
 
             auto to_ditch = current;
 
