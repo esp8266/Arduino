@@ -103,6 +103,10 @@ class BSTestRunner(object):
                     if res != BSTestRunner.SUCCESS:
                         print('failed to set environment variables')
                         break;
+                    res = self.pretest()
+                    if res != BSTestRunner.SUCCESS:
+                        print('failed to run pretest init')
+                        break;
                     should_update_env = False
                 if name in self.mocks:
                     debug_print('setting up mocks')
@@ -126,7 +130,7 @@ class BSTestRunner(object):
                 debug_print('test output was:')
                 debug_print(test_output.getvalue())
                 if result == BSTestRunner.SUCCESS:
-                    test_case.stdout = test_output.getvalue()
+                    test_case.stdout = filter(lambda c: ord(c) < 128, test_output.getvalue())
                     print('test "{}" passed'.format(name))
                 else:
                     print('test "{}" failed'.format(name))
@@ -196,6 +200,21 @@ class BSTestRunner(object):
             else:
                 return BSTestRunner.TIMEOUT
         return BSTestRunner.SUCCESS
+
+    def pretest(self):
+        # Environment now set up, call the pretest init (wifi connect, etc.)
+        self.sp.sendline('pretest');
+        timeout = 10
+        while timeout > 0:
+            res = self.sp.expect(['>>>>>bs_test_pretest result=1', EOF, TIMEOUT]) # Only expect a pass, abort testing if failure
+            if res == 0:
+                break
+            time.sleep(0.1)
+            timeout -= 0.1
+        if res != 0:
+            return BSTestRunner.TIMEOUT
+        else:
+            return BSTestRunner.SUCCESS
 
     def request_env(self, key):
         self.sp.sendline('getenv "{}"'.format(key))
@@ -269,7 +288,7 @@ def main():
         ts = run_tests(sp, name, mocks, env_vars)
         if args.output:
             with open(args.output, "w") as f:
-                TestSuite.to_file(f, [ts])
+                TestSuite.to_file(f, [ts], encoding='raw_unicode_escape')
         return 0
 
 if __name__ == '__main__':

@@ -11,12 +11,17 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
-    BS_RUN(Serial);
+    return true;
 }
 
 const char* fp = "44 40 9E 34 92 2D E4 61 A4 89 A8 D5 7F 71 B7 62 B3 FD DD E1";

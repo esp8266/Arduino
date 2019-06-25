@@ -5,6 +5,8 @@
 
 #define BS_LINE_PREFIX ">>>>>bs_test_"
 
+extern bool pretest();
+
 namespace bs
 {
 namespace protocol
@@ -59,6 +61,12 @@ void output_getenv_result(IO& io, const char* key, const char* value)
 }
 
 template<typename IO>
+void output_pretest_result(IO& io, bool res)
+{
+    io.printf(BS_LINE_PREFIX "pretest result=%d\n", res?1:0);
+}
+
+template<typename IO>
 bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
 {
     int cb_read = io.read_line(line_buf, line_buf_size);
@@ -86,6 +94,15 @@ bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
         const char* value = getenv(argv[1]);
         output_getenv_result(io, argv[1], (value != NULL) ? value : "");
         return false;
+    }
+    if (strcmp(argv[0], "pretest") == 0) {
+        if (argc != 1) {
+            return false;
+        }
+	io.printf("pretest started\n");
+        bool res = ::pretest();
+        output_pretest_result(io, res);
+        return res;
     }
     /* not one of the commands, try to parse as test number */
     char* endptr;

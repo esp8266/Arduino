@@ -33,6 +33,11 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.mode(WIFI_STA);
     WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
@@ -45,9 +50,9 @@ void setup()
     Serial.printf("Number of CA certs read: %d\n", numCerts);
     if (numCerts == 0) {
         Serial.printf("No certs found. Did you run certs-from-mozill.py and upload the SPIFFS directory before running?\n");
-        REQUIRE(1==0);
+        return false;
     }
-    BS_RUN(Serial);
+    return true;
 }
 
 static void stopAll()

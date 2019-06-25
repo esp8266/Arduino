@@ -8,6 +8,11 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 
 TEST_CASE("If randomSeed is not called, random() uses hardware PRNG", "[random]")
 {

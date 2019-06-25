@@ -461,10 +461,16 @@ void setup ()
 {
   Serial.begin(115200);
   WiFi.mode( WIFI_OFF );
-  us_count_init();        // Start up timer overflow sampling  
   BS_RUN(Serial);
-
 } //setup
+
+
+//---------------------------------------------------------------------------
+bool pretest ()
+{
+  us_count_init();        // Start up timer overflow sampling  
+  return true;
+} //pretest
 
 //---------------------------------------------------------------------------
 void loop(void)

@@ -11,9 +11,14 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(false);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.mode(WIFI_OFF);
-    BS_RUN(Serial);
+    return true;
 }
 
 static std::map<WiFiEvent_t, int> sEventsReceived;
