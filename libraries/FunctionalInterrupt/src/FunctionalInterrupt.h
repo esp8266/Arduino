@@ -31,5 +31,4 @@ struct ArgStructure {
 void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode);
 void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode);
 
-
-#endif //INTERRUPTS_H
+#endif //FUNCTIONALINTERRUPT_H
