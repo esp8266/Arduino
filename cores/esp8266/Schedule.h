@@ -37,7 +37,7 @@ void run_scheduled_functions();
 //   `yield` is not called frequently, and therefore should not be used for
 //   timing critical operations.
 // * There is no mechanism for cancelling recurrent scheduled functions.
-// * long running operations or yield() or delay() are not wise in the lambda.
+// * long running operations or yield() or delay() are not allowed in the lambda.
 
 bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us);
 

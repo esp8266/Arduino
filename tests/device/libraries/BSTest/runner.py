@@ -29,6 +29,7 @@ except:
 import mock_decorators
 
 debug = False
+#debug = True
 
 sys.path.append(os.path.abspath(__file__))
 
