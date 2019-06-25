@@ -45,6 +45,7 @@ $(TEST_LIST):
 ifneq ("$(NO_BUILD)","1")
 	@test -n "$(ARDUINO_IDE_PATH)" || (echo "Please export ARDUINO_IDE_PATH" && exit 1)
 	@echo Compiling $(notdir $@)
+	@rm -f $(LOCAL_BUILD_DIR)/build.options.json
 	$(SILENT)$(BUILD_TOOL) -compile -logger=human \
 		-libraries "$(PWD)/libraries" \
 		-core-api-version="10608" \
