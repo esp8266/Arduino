@@ -63,7 +63,7 @@ static void recycle_fn_unsafe (scheduled_fn_t* fn)
 IRAM_ATTR // (not only) called from ISR
 bool schedule_function (const std::function<void(void)>& fn)
 {
-    InterruptLock lockAllInterruptsInThisScope;
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     scheduled_fn_t* item = get_fn_unsafe();
     if (!item)
@@ -146,8 +146,7 @@ void run_scheduled_recurrent_functions ()
     {
         // fence is like a mutex but as we are never called from ISR,
         // locking is useless here. Leaving comment for reference.
-        //InterruptLock lockAllInterruptsInThisScope;
-
+        //esp8266::InterruptLock lockAllInterruptsInThisScope;
         if (fence)
             // prevent recursive calls from yield()
             // (even if they are not allowed)

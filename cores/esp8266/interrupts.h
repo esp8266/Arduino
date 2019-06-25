@@ -16,6 +16,9 @@
 //}
 //
 
+namespace esp8266
+{
+
 class InterruptLock {
 public:
     InterruptLock() {
@@ -53,5 +56,7 @@ private: \
     uint32_t _savedPS; \
     }; \
 _AutoDisableIntr _autoDisableIntr 
+
+} // esp8266
 
 #endif //INTERRUPTS_H
