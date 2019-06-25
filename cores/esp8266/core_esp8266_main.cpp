@@ -23,7 +23,6 @@
 //This may be used to change user task stack size:
 //#define CONT_STACKSIZE 4096
 #include <Arduino.h>
-#include "Schedule.h"
 extern "C" {
 #include "ets_sys.h"
 #include "os_type.h"
@@ -90,12 +89,11 @@ void preloop_update_frequency() {
 #endif
 }
 
-
-static inline void esp_yield_within_cont() __attribute__((always_inline));
-static void esp_yield_within_cont() {
+extern "C" void __esp_yield_within_cont() {
         cont_yield(g_pcont);
-        run_scheduled_recurrent_functions();
 }
+
+extern "C" void esp_yield_within_cont() __attribute__ ((weak, alias("__esp_yield_within_cont")));
 
 extern "C" void esp_yield() {
     if (cont_can_yield(g_pcont)) {
@@ -159,8 +157,6 @@ extern "C" bool IRAM_ATTR ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
 
 extern "C" void __loop_end (void)
 {
-    run_scheduled_functions();
-    run_scheduled_recurrent_functions();
 }
 
 extern "C" void loop_end (void) __attribute__ ((weak, alias("__loop_end")));

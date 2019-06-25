@@ -2,9 +2,20 @@
 #include <assert.h>
 
 #include "Schedule.h"
-#include "PolledTimeout.h"
-#include "interrupts.h"
-#include "coredecls.h"
+#include <PolledTimeout.h>
+#include <interrupts.h>
+#include <coredecls.h>
+
+extern "C" void loop_end()
+{
+    run_scheduled_functions();
+    run_scheduled_recurrent_functions();}
+
+extern "C" void esp_yield_within_cont()
+{
+    cont_yield(g_pcont);
+    run_scheduled_recurrent_functions();
+}
 
 typedef std::function<void(void)> mSchedFuncT;
 struct scheduled_fn_t
