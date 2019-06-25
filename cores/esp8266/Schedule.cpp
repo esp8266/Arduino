@@ -56,7 +56,7 @@ bool schedule_function_us(std::function<bool(void)>&& fn, uint32_t repeat_us, sc
 {
     assert(repeat_us < decltype(scheduled_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
-    InterruptLock lockAllInterruptsInThisScope;
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     scheduled_fn_t* item = get_fn_unsafe();
     if (!item)
@@ -104,7 +104,7 @@ void run_scheduled_functions(schedule_e policy)
 
     static bool fence = false;
     {
-        InterruptLock lockAllInterruptsInThisScope;
+        esp8266::InterruptLock lockAllInterruptsInThisScope;
         if (fence)
             // prevent recursive calls from yield()
             return;
@@ -136,7 +136,7 @@ void run_scheduled_functions(schedule_e policy)
             else
             {
                 // function removed from list
-                InterruptLock lockAllInterruptsInThisScope;
+                esp8266::InterruptLock lockAllInterruptsInThisScope;
 
                 if (sFirst == toCall)
                     sFirst = sFirst->mNext;
