@@ -99,10 +99,9 @@ bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
         if (argc != 1) {
             return false;
         }
-	io.printf("pretest started\n");
         bool res = ::pretest();
         output_pretest_result(io, res);
-        return res;
+        return false;
     }
     /* not one of the commands, try to parse as test number */
     char* endptr;
