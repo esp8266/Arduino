@@ -67,7 +67,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_nucleus.cpp \
 	libb64/cencode.cpp \
 	libb64/cdecode.cpp \
-	Schedule.cpp \
+	../../libraries/Schedule/src/Schedule.cpp \
 	HardwareSerial.cpp \
 	) \
 	$(addprefix $(LIBRARIES_PATH)/ESP8266SdFat/src/, \
