@@ -147,6 +147,7 @@ void run_scheduled_recurrent_functions ()
         // fence is like a mutex but as we are never called from ISR,
         // locking is useless here. Leaving comment for reference.
         //esp8266::InterruptLock lockAllInterruptsInThisScope;
+
         if (fence)
             // prevent recursive calls from yield()
             // (even if they are not allowed)
