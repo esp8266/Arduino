@@ -55,17 +55,6 @@ bool pretest()
     return true;
 }
 
-static void stopAll()
-{
-    WiFiClient::stopAll();
-}
-
-static void disconnectWiFI()
-{
-    wifi_station_disconnect();
-}
-
-
 // Set time via NTP, as required for x.509 validation
 void setClock() {
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
@@ -148,7 +137,7 @@ int run(const char *str)
     return maxUsage;
 }
 
-#define TC(x) TEST_CASE("BearSSL - Maximum stack usage < 5600 bytes @ "x".badssl.org", "[bearssl]") { REQUIRE(run(x) < 5600); }
+#define TC(x) TEST_CASE("BearSSL - Maximum stack usage < 5600 bytes @ " x ".badssl.org", "[bearssl]") { REQUIRE(run(x) < 5600); }
 
 TC("expired")
 TC("wrong.host")

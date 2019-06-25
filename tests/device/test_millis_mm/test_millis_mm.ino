@@ -40,6 +40,8 @@ static uint32_t    cntref = 0;             // Ref. comparision count
 // Callback for usec counter overflow timer interrupt
 void  us_overflow_tick ( void* arg )
 {
+  (void) arg;
+
   us_cnt = system_get_time();
 
   // Check for usec counter overflow

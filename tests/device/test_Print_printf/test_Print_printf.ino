@@ -20,7 +20,7 @@ TEST_CASE("Print::printf works for any reasonable output length", "[Print]")
     auto test_printf = [](size_t size) {
         StreamString str;
         auto buf = new char[size + 1];
-        for (int i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             buf[i] = 'a';
         }
         buf[size] = 0;

@@ -49,7 +49,7 @@ ifneq ("$(NO_BUILD)","1")
 	$(SILENT)$(BUILD_TOOL) -compile -logger=human \
 		-libraries "$(PWD)/libraries" \
 		-core-api-version="10608" \
-		-warnings=none \
+		-warnings=all \
 		$(BUILDER_DEBUG_FLAG) \
 		-build-path $(LOCAL_BUILD_DIR) \
 		-tools $(ARDUINO_IDE_PATH)/tools-builder \
