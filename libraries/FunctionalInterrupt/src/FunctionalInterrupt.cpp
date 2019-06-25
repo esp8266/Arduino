@@ -23,17 +23,6 @@ void ICACHE_RAM_ATTR interruptFunctional(void* arg)
 	}
 }
 
-extern "C"
-{
-   void cleanupFunctional(void* arg)
-   {
-	 ArgStructure* localArg = (ArgStructure*)arg;
-	 delete (FunctionInfo*)localArg->functionInfo;
-     delete (InterruptInfo*)localArg->interruptInfo;
-	 delete localArg;
-   }
-}
-
 void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
 {
 	// use the local interrupt routine which takes the ArgStructure as argument

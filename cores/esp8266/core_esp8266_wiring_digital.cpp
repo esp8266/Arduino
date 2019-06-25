@@ -115,16 +115,21 @@ typedef struct {
   bool functional;
 } interrupt_handler_t;
 
-//duplicate from functionalInterrupt.h keep in sync
+//duplicates from functionalInterrupt.h keep in sync
 typedef struct InterruptInfo {
 	uint8_t pin;
 	uint8_t value;
 	uint32_t micro;
 } InterruptInfo;
 
-typedef struct {
+typedef struct FunctionInfo {
+  std::function<void(void)> reqFunction;
+  std::function<void(InterruptInfo)> reqScheduledFunction;
+} FunctionInfo;
+
+typedef struct ArgStructure {
 	InterruptInfo* interruptInfo;
-	void* functionInfo;
+	FunctionInfo* functionInfo;
 } ArgStructure;
 
 static interrupt_handler_t interrupt_handlers[16] = { {0, 0, 0, 0}, };
@@ -172,7 +177,13 @@ void ICACHE_RAM_ATTR interrupt_handler(void*)
   ETS_GPIO_INTR_ENABLE();
 }
 
-extern void cleanupFunctional(void* arg);
+static void cleanupFunctional(void* arg)
+{
+  ArgStructure* localArg = (ArgStructure*)arg;
+  delete (FunctionInfo*)localArg->functionInfo;
+  delete (InterruptInfo*)localArg->interruptInfo;
+  delete localArg;
+}
 
 static void set_interrupt_handlers(uint8_t pin, voidFuncPtr userFunc, void* arg, uint8_t mode, bool functional)
 {
