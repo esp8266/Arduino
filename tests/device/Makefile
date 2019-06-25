@@ -34,12 +34,18 @@ all: count tests test_report
 
 $(TEST_LIST): | virtualenv $(TEST_CONFIG) $(BUILD_DIR) $(HARDWARE_DIR)
 
-tests: $(TEST_LIST)
+tests: showtestlist $(TEST_LIST)
+
+showtestlist:
+	@echo "-------------------------------- test list:"
+	@echo $(TEST_LIST)
+	@echo "--------------------------------"
 
 $(TEST_LIST): LOCAL_BUILD_DIR=$(BUILD_DIR)/$(notdir $@)
 
 $(TEST_LIST):
-	@echo Running $(words $(TEST_LIST)) tests
+	@echo "--------------------------------"
+	@echo "Running test '$@' of $(words $(TEST_LIST)) tests"
 	$(SILENT)mkdir -p $(LOCAL_BUILD_DIR)
 ifneq ("$(NO_BUILD)","1")
 	@test -n "$(ARDUINO_IDE_PATH)" || (echo "Please export ARDUINO_IDE_PATH" && exit 1)
@@ -85,7 +91,7 @@ ifneq ("$(NO_RUN)","1")
 		--port $(UPLOAD_PORT) \
 		--baud $(UPLOAD_BAUD) \
 		read_flash_status # reset
-	@source $(BS_DIR)/virtualenv/bin/activate && \
+	$(SILENT)source $(BS_DIR)/virtualenv/bin/activate && \
 		$(PYTHON) $(BS_DIR)/runner.py \
 			$(RUNNER_DEBUG_FLAG) \
 			-p $(UPLOAD_PORT) \

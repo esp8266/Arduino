@@ -29,6 +29,7 @@ except:
 import mock_decorators
 
 debug = False
+#debug = True
 
 sys.path.append(os.path.abspath(__file__))
 
@@ -126,7 +127,7 @@ class BSTestRunner(object):
                 debug_print('test output was:')
                 debug_print(test_output.getvalue())
                 if result == BSTestRunner.SUCCESS:
-                    test_case.stdout = test_output.getvalue()
+                    test_case.stdout = filter(lambda c: ord(c) < 128, test_output.getvalue())
                     print('test "{}" passed'.format(name))
                 else:
                     print('test "{}" failed'.format(name))
@@ -269,7 +270,7 @@ def main():
         ts = run_tests(sp, name, mocks, env_vars)
         if args.output:
             with open(args.output, "w") as f:
-                TestSuite.to_file(f, [ts])
+                TestSuite.to_file(f, [ts], encoding='raw_unicode_escape')
         return 0
 
 if __name__ == '__main__':
