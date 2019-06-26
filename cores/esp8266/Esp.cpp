@@ -200,7 +200,7 @@ void EspClass::restart(void)
 
 uint16_t EspClass::getVcc(void)
 {
-    InterruptLock lock;
+    esp8266::InterruptLock lock;
     (void)lock;
     return system_get_vdd33();
 }
