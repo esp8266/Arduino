@@ -45,6 +45,8 @@ static scheduled_fn_t* get_fn_unsafe ()
     // if no unused items, and count not too high, allocate a new one
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
     {
+        // calling malloc instead of new to avoid exception raising while in ISR
+        // construct complex members in place (never raises exceptions)
         result = (scheduled_fn_t*)malloc(sizeof(scheduled_fn_t));
         new (&result->mFunc) decltype(result->mFunc)();
         if (result)
