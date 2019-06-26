@@ -30,3 +30,4 @@ boards.local.txt
 [Rr]elease*/
 .vs/
 __vm/
+*.vcxproj*
