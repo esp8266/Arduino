@@ -41,14 +41,18 @@ static scheduled_fn_t* get_fn_unsafe ()
     {
         result = sUnused;
         sUnused = sUnused->mNext;
-        result->mNext = nullptr;
     }
     // if no unused items, and count not too high, allocate a new one
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
     {
+        // calling malloc instead of new to avoid exception raising while in ISR
+        // construct complex members in place (never raises exceptions)
         result = (scheduled_fn_t*)malloc(sizeof(scheduled_fn_t));
         if (result)
+        {
+            new (&result->mFunc) decltype(result->mFunc)();
             ++sCount;
+        }
     }
     return result;
 }
@@ -70,6 +74,7 @@ bool schedule_function (const std::function<void(void)>& fn)
         return false;
 
     item->mFunc = fn;
+    item->mNext = nullptr;
 
     if (sFirst)
         sLast->mNext = item;
