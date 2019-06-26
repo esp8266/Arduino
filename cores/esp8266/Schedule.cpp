@@ -41,12 +41,12 @@ static scheduled_fn_t* get_fn_unsafe ()
     {
         result = sUnused;
         sUnused = sUnused->mNext;
-        result->mNext = nullptr;
     }
     // if no unused items, and count not too high, allocate a new one
     else if (sCount < SCHEDULED_FN_MAX_COUNT)
     {
         result = (scheduled_fn_t*)malloc(sizeof(scheduled_fn_t));
+        new (&result->mFunc) decltype(result->mFunc)();
         if (result)
             ++sCount;
     }
@@ -70,6 +70,7 @@ bool schedule_function (const std::function<void(void)>& fn)
         return false;
 
     item->mFunc = fn;
+    item->mNext = nullptr;
 
     if (sFirst)
         sLast->mNext = item;
