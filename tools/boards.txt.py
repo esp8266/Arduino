@@ -1186,6 +1186,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         else:
             spiffs_blocksize = 8192
 
+    max_ota_size = min(max_upload_size, spiffs_start / 2) # =(max_upload_size+empty_size)/2
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
     strspiffs = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
     strspiffs_strip = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
@@ -1193,9 +1194,9 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
     menu = '.menu.eesz.' + strsize + strspiffs_strip
     menub = menu + '.build.'
-    desc = 'no' if (spiffs_kb == 0) else strspiffs
+    desc = 'no' if (spiffs_kb == 0) else strspiffs + 'B'
     d = collections.OrderedDict([
-        ( menu, strsize + ' (' + desc + ' SPIFFS)' ),
+        ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
         ( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
         ( menub + 'flash_ld', ld ),
