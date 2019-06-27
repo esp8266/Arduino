@@ -59,22 +59,22 @@ namespace MDNSImplementation {
     #ifdef DEBUG_ESP_MDNS_INFO
         #define DEBUG_EX_INFO(A)    A
     #else
-        #define DEBUG_EX_INFO(A)
+        #define DEBUG_EX_INFO(A)    do { (void)0; } while (0)
     #endif
     #ifdef DEBUG_ESP_MDNS_ERR
         #define DEBUG_EX_ERR(A) A
     #else
-        #define DEBUG_EX_ERR(A)
+        #define DEBUG_EX_ERR(A) do { (void)0; } while (0)
     #endif
     #ifdef DEBUG_ESP_MDNS_TX
         #define DEBUG_EX_TX(A)  A
     #else
-        #define DEBUG_EX_TX(A)
+        #define DEBUG_EX_TX(A)  do { (void)0; } while (0)
     #endif
     #ifdef DEBUG_ESP_MDNS_RX
         #define DEBUG_EX_RX(A)  A
     #else
-        #define DEBUG_EX_RX(A)
+        #define DEBUG_EX_RX(A)  do { (void)0; } while (0)
     #endif
 
     #ifdef DEBUG_ESP_PORT
@@ -83,10 +83,10 @@ namespace MDNSImplementation {
         #define DEBUG_OUTPUT Serial
     #endif
 #else
-    #define DEBUG_EX_INFO(A)
-    #define DEBUG_EX_ERR(A)
-    #define DEBUG_EX_TX(A)
-    #define DEBUG_EX_RX(A)
+    #define DEBUG_EX_INFO(A)    do { (void)0; } while (0)
+    #define DEBUG_EX_ERR(A)     do { (void)0; } while (0)
+    #define DEBUG_EX_TX(A)      do { (void)0; } while (0)
+    #define DEBUG_EX_RX(A)      do { (void)0; } while (0)
 #endif
 
 

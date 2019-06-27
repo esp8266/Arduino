@@ -1,12 +1,7 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 
-#include <stddef.h>
-#include <stdint.h>
-extern "C" {
-#include "c_types.h"
-#include "ets_sys.h"
-}
+#include <Arduino.h>
 
 // these auto classes wrap up xt_rsil so your code can be simplier, but can only be
 // used in an ino or cpp files. 
@@ -20,6 +15,9 @@ extern "C" {
 //    do work outside of interrupt lock here outside its scope
 //}
 //
+
+namespace esp8266
+{
 
 class InterruptLock {
 public:
@@ -58,5 +56,7 @@ private: \
     uint32_t _savedPS; \
     }; \
 _AutoDisableIntr _autoDisableIntr 
+
+} // esp8266
 
 #endif //INTERRUPTS_H
