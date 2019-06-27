@@ -98,12 +98,9 @@ bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32
     item->mFunc = fn;
 
     if (rFirst)
-    {
         item->mNext = rFirst;
-        rFirst = item;
-    }
-    else
-        rFirst = item;
+
+    rFirst = item;
 
     return true;
 }
