@@ -58,7 +58,8 @@ void run_scheduled_functions();
 //   functions.  However a user function returning false will cancel itself.
 // * Long running operations or yield() or delay() are not allowed in the
 //   recurrent function.
-// * A recurrent scheduled function can schedule recurrent functions (if ever needed).
+// * A recurrent function currently must not schedule another recurrent
+//   functions.
 
 bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us);
 
