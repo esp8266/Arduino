@@ -180,8 +180,8 @@ void ICACHE_RAM_ATTR interrupt_handler(void*)
 static void cleanupFunctional(void* arg)
 {
   ArgStructure* localArg = (ArgStructure*)arg;
-  delete (FunctionInfo*)localArg->functionInfo;
-  delete (InterruptInfo*)localArg->interruptInfo;
+  delete localArg->interruptInfo;
+  delete localArg->functionInfo;
   delete localArg;
 }
 
