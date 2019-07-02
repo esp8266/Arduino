@@ -1,5 +1,6 @@
 PYTHON_ENV_DIR=virtualenv
 TEST_EXECUTABLE=test/test
+PYTHON ?= python3
 
 all: test
 
@@ -10,7 +11,7 @@ clean:
 	rm -rf $(TEST_EXECUTABLE)
 
 $(PYTHON_ENV_DIR):
-	virtualenv --no-site-packages $(PYTHON_ENV_DIR)
+	virtualenv --python=$(PYTHON) --no-site-packages $(PYTHON_ENV_DIR)
 	. $(PYTHON_ENV_DIR)/bin/activate && pip install -r requirements.txt
 
 test: $(TEST_EXECUTABLE) $(PYTHON_ENV_DIR)

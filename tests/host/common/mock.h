@@ -157,12 +157,12 @@ void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize);
 class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
 
-class InterruptLock { };
-
 //
 
 void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
 void mock_stop_spiffs ();
+void mock_start_littlefs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_stop_littlefs ();
 
 //
 

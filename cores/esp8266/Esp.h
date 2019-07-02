@@ -201,8 +201,6 @@ class EspClass {
         bool eraseConfig();
 
 #ifdef CORE_MOCK
-        uint32_t getCycleCount();
-#else
         inline uint32_t getCycleCount() { return espGetCycleCount(); }
 #endif
 };

@@ -460,7 +460,7 @@ protected:
     size_t _write_from_source(DataSource* ds)
     {
         assert(_datasource == nullptr);
-        assert(_send_waiting == 0);
+        assert(!_send_waiting);
         _datasource = ds;
         _written = 0;
         _op_start_time = millis();
@@ -478,10 +478,11 @@ protected:
                 break;
             }
 
-            ++_send_waiting;
-            esp_yield();
+            _send_waiting = true;
+            // This delay will be interrupted by esp_schedule on next received ack
+            delay(_timeout_ms);
         } while(true);
-        _send_waiting = 0;
+        _send_waiting = false;
 
         if (_sync)
             wait_until_sent();
@@ -548,8 +549,8 @@ protected:
 
     void _write_some_from_cb()
     {
-        if (_send_waiting == 1) {
-            _send_waiting--;
+        if (_send_waiting) {
+            _send_waiting = false;
             esp_schedule();
         }
     }
@@ -673,7 +674,7 @@ private:
     size_t _written = 0;
     uint32_t _timeout_ms = 5000;
     uint32_t _op_start_time = 0;
-    uint8_t _send_waiting = 0;
+    bool _send_waiting = false;
     uint8_t _connect_pending = 0;
 
     int8_t _refcnt;

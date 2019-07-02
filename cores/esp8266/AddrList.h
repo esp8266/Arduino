@@ -127,6 +127,7 @@ struct netifWrapper
     const char* ifhostname () const { return _netif->hostname?: emptyString.c_str(); }
     const char* ifmac () const      { return (const char*)_netif->hwaddr; }
     int ifnumber () const           { return _netif->num; }
+    bool ifUp () const              { return !!(_netif->flags & NETIF_FLAG_UP); }
 
     const ip_addr_t* ipFromNetifNum () const
     {

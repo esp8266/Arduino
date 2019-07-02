@@ -73,3 +73,9 @@ extern "C" void delayMicroseconds(unsigned int us)
 }
 
 const char* overrideme PROGMEM = " should be overridden for better efficiency\r\n";
+
+#include "cont.h"
+cont_t* g_pcont = NULL;
+extern "C" void cont_yield(cont_t*)
+{
+}

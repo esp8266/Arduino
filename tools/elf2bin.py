@@ -25,7 +25,7 @@ import subprocess
 import sys
 import tempfile
 
-fmodeb = { 'dout': 3, 'dio': 2, 'quot': 1, 'qio': 0 }
+fmodeb = { 'dout': 3, 'dio': 2, 'qout': 1, 'qio': 0 }
 ffreqb = { '40': 0, '26': 1, '20': 2, '80': 15 }
 fsizeb = { '512K': 0, '256K': 1, '1M': 2, '2M': 3, '4M': 4, '8M': 8, '16M': 9 }
 

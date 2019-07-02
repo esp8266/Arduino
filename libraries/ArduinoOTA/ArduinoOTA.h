@@ -65,7 +65,7 @@ class ArduinoOTAClass
     //Call this in loop() to run the service. Also calls MDNS.update() when begin() or begin(true) is used.
     void handle();
 
-    //Gets update command type after OTA has started. Either U_FLASH or U_SPIFFS
+    //Gets update command type after OTA has started. Either U_FLASH or U_FS
     int getCommand();
 
   private:
