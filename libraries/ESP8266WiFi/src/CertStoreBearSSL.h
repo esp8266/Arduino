@@ -23,6 +23,7 @@
 #include <Arduino.h>
 #include <BearSSLHelpers.h>
 #include <bearssl/bearssl.h>
+#include <FS.h>
 
 // Base class for the certificate stores, which allow use
 // of a large set of certificates stored on SPIFFS of SD card to
@@ -30,43 +31,21 @@
 
 namespace BearSSL {
 
-// Subclass this and provide virtual functions appropriate for your storage.
-// Required because there are conflicting definitions for a "File" in the
-// Arduino setup, and there is no simple way to work around the minor
-// differences.
-// See the examples for implementations to use in your own code.
-//
-// NOTE: This virtual class may migrate to a templated model in a future
-// release.  Expect some changes to the interface, no matter what, as the
-// SD and SPIFFS filesystem get unified.
-class CertStoreFile {
-  public:
-    CertStoreFile() {};
-    virtual ~CertStoreFile() {};
-
-    // The main API
-    virtual bool open(bool write=false) = 0;
-    virtual bool seek(size_t absolute_pos) = 0;
-    virtual ssize_t read(void *dest, size_t bytes) = 0;
-    virtual ssize_t write(void *dest, size_t bytes) = 0;
-    virtual void close() = 0;
-};
-
-
 class CertStore {
   public:
     CertStore() { };
-    ~CertStore() { };
+    ~CertStore();
 
     // Set the file interface instances, do preprocessing
-    int initCertStore(CertStoreFile *index, CertStoreFile *data);
+    int initCertStore(FS &fs, const char *indexFileName, const char *dataFileName);
 
     // Installs the cert store into the X509 decoder (normally via static function callbacks)
     void installCertStore(br_x509_minimal_context *ctx);
 
   protected:
-    CertStoreFile *_index = nullptr;
-    CertStoreFile *_data = nullptr;
+    FS *_fs = nullptr;
+    char *_indexName = nullptr;
+    char *_dataName = nullptr;
     X509List *_x509 = nullptr;
 
     // These need to be static as they are callbacks from BearSSL C code

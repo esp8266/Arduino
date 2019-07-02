@@ -24,6 +24,8 @@
 #include <memory>
 #include <Arduino.h>
 
+class SDClass;
+
 namespace fs {
 
 class File;
@@ -60,7 +62,7 @@ public:
     int read() override;
     int peek() override;
     void flush() override;
-    size_t readBytes(char *buffer, size_t length)  override {
+    size_t readBytes(char *buffer, size_t length) override {
         return read((uint8_t*)buffer, length);
     }
     size_t read(uint8_t* buf, size_t size);
@@ -135,6 +137,7 @@ protected:
     FS       *_baseFS;
 };
 
+// Backwards compatible, <4GB filesystem usage
 struct FSInfo {
     size_t totalBytes;
     size_t usedBytes;
@@ -143,6 +146,17 @@ struct FSInfo {
     size_t maxOpenFiles;
     size_t maxPathLength;
 };
+
+// Support > 4GB filesystems (SD, etc.)
+struct FSInfo64 {
+    uint64_t totalBytes;
+    uint64_t usedBytes;
+    size_t blockSize;
+    size_t pageSize;
+    size_t maxOpenFiles;
+    size_t maxPathLength;
+};
+
 
 class FSConfig
 {
@@ -184,6 +198,7 @@ public:
 
     bool format();
     bool info(FSInfo& info);
+    bool info64(FSInfo64& info);
 
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
@@ -208,8 +223,10 @@ public:
 
     bool gc();
 
+    friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
     FSImplPtr _impl;
+    FSImplPtr getImpl() { return _impl; }
 };
 
 } // namespace fs
