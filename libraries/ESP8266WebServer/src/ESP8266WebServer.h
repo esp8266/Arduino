@@ -78,6 +78,7 @@ public:
 
   using ClientType = typename ServerType::ClientType;
   using RequestHandlerType = RequestHandler<ServerType>;
+  using WebServerType = ESP8266WebServerTemplate<ServerType>;
 
   void begin();
   void begin(uint16_t port);
@@ -206,6 +207,7 @@ protected:
   String           _srealm;  // Store the Auth realm between Calls
 
 };
+
 
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
