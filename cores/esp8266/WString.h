@@ -237,8 +237,7 @@ class String {
         void toLowerCase(void);
         void toUpperCase(void);
         void trim(void);
-
-        // parsing/conversion
+        
         long toInt(void) const;
         float toFloat(void) const;
 	double toDouble(void) const;

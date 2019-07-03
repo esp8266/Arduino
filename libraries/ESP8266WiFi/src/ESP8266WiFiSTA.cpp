@@ -443,12 +443,14 @@ bool ESP8266WiFiSTAClass::getAutoReconnect() {
  * returns the status reached or disconnect if STA is off
  * @return wl_status_t
  */
-uint8_t ESP8266WiFiSTAClass::waitForConnectResult() {
+uint8_t ESP8266WiFiSTAClass::waitForConnectResult(uint32_t wait_secs) {
     //1 and 3 have STA enabled
     if((wifi_get_opmode() & 1) == 0) {
         return WL_DISCONNECTED;
     }
-    while(status() == WL_DISCONNECTED) {
+    int i = 0; 
+    int try_times = wait_secs*10;
+    while((!status() || status() >= WL_DISCONNECTED) && ((wait_secs==0)? true : (i++ < try_times))) {
         delay(100);
     }
     return status();
