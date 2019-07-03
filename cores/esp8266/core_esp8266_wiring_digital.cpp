@@ -174,7 +174,7 @@ void ICACHE_RAM_ATTR interrupt_handler(void*)
 
 extern void cleanupFunctional(void* arg);
 
-void set_interrupt_handlers(uint8_t pin, voidFuncPtr userFunc, void* arg, uint8_t mode, bool functional)
+static void set_interrupt_handlers(uint8_t pin, voidFuncPtr userFunc, void* arg, uint8_t mode, bool functional)
 {
   interrupt_handler_t* handler = &interrupt_handlers[pin];
   handler->mode = mode;
@@ -235,7 +235,7 @@ extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode)
     __attachInterruptFunctionalArg(pin, (voidFuncPtrArg)userFunc, 0, mode, false);
 }
 
-void initPins() {
+extern void initPins() {
   //Disable UART interrupts
   system_set_os_print(0);
   U0IE = 0;
