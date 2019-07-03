@@ -174,6 +174,19 @@ void ICACHE_RAM_ATTR interrupt_handler(void*)
 
 extern void cleanupFunctional(void* arg);
 
+void set_interrupt_handlers(uint8_t pin, voidFuncPtr userFunc, void* arg, uint8_t mode, bool functional)
+{
+  interrupt_handler_t* handler = &interrupt_handlers[pin];
+  handler->mode = mode;
+  handler->fn = userFunc;
+  if (handler->functional && handler->arg)  // Clean when new attach without detach
+  {
+    cleanupFunctional(handler->arg);
+  }
+  handler->arg = arg;
+  handler->functional = functional;
+}
+
 extern void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtrArg userFunc, void* arg, int mode, bool functional)
 {
   // #5780
@@ -187,15 +200,7 @@ extern void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtrArg userFunc,
 
   if(pin < 16) {
     ETS_GPIO_INTR_DISABLE();
-    interrupt_handler_t* handler = &interrupt_handlers[pin];
-    handler->mode = mode;
-    handler->fn = (voidFuncPtr)userFunc;
-    if (handler->functional && handler->arg)  // Clean when new attach without detach
-    {
-        cleanupFunctional(handler->arg);
-    }
-    handler->arg = arg;
-    handler->functional = functional;
+    set_interrupt_handlers(pin, (voidFuncPtr)userFunc, arg, mode, functional);
     interrupt_reg |= (1 << pin);
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
@@ -217,15 +222,7 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
         GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
         GPIEC = (1 << pin); //Clear Interrupt for this pin
         interrupt_reg &= ~(1 << pin);
-        interrupt_handler_t* handler = &interrupt_handlers[pin];
-        handler->mode = 0;
-        handler->fn = 0;
-        if (handler->functional && handler->arg)
-        {
-            cleanupFunctional(handler->arg);
-        }
-        handler->arg = 0;
-        handler->functional = false;
+		set_interrupt_handlers(pin, nullptr, nullptr, 0, false);
         if (interrupt_reg)
         {
             ETS_GPIO_INTR_ENABLE();
