@@ -110,6 +110,7 @@ AVRISPState_t ESP8266AVRISP::serve() {
         case AVRISP_STATE_PENDING: {
             _state = AVRISP_STATE_ACTIVE;
         // fallthrough
+             __attribute__ ((fallthrough));
         }
         case AVRISP_STATE_ACTIVE: {
             while (_client.available()) {
