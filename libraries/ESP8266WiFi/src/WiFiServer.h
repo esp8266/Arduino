@@ -62,6 +62,7 @@ public:
   void stop();
 
   using Print::write;
+  using ClientType = WiFiClient;
 
 protected:
   long _accept(tcp_pcb* newpcb, long err);

@@ -109,7 +109,7 @@ recipe.objcopy.eep.pattern=
 
 ## Create hex
 recipe.objcopy.hex.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
-recipe.objcopy.hex.2.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
@@ -146,3 +146,7 @@ tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/to
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
 tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
+
+tools.mklittlefs.cmd=mklittlefs
+tools.mklittlefs.cmd.windows=mklittlefs.exe
+tools.mklittlefs.path={runtime.platform.path}/tools/mklittlefs

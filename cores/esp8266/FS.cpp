@@ -283,6 +283,13 @@ bool FS::info(FSInfo& info){
     return _impl->info(info);
 }
 
+bool FS::info64(FSInfo64& info){
+    if (!_impl) {
+        return false;
+    }
+    return _impl->info64(info);
+}
+
 File FS::open(const String& path, const char* mode) {
     return open(path.c_str(), mode);
 }

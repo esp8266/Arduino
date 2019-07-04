@@ -24,13 +24,10 @@ https://arduino.cc/en/Reference/HomePage
 
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py
 
-import os
-import subprocess
-
 from os.path import isdir, join
 
-from SCons import Builder, Util
-from SCons.Script import DefaultEnvironment
+from SCons import Util
+from SCons.Script import Builder, DefaultEnvironment
 
 
 def scons_patched_match_splitext(path, suffixes=None):
@@ -92,7 +89,12 @@ env.Append(
         "-Wl,-wrap,spi_flash_read",
         "-u", "app_entry",
         "-u", "_printf_float",
-        "-u", "_scanf_float"
+        "-u", "_scanf_float",
+        "-u", "_DebugExceptionVector",
+        "-u", "_DoubleExceptionVector",
+        "-u", "_KernelExceptionVector",
+        "-u", "_NMIExceptionVector",
+        "-u", "_UserExceptionVector"
     ],
 
     CPPDEFINES=[
@@ -127,7 +129,26 @@ env.Append(
 
     LIBSOURCE_DIRS=[
         join(FRAMEWORK_DIR, "libraries")
-    ]
+    ],
+
+    BUILDERS=dict(
+        ElfToBin=Builder(
+            action=env.VerboseAction(" ".join([
+                '"$PYTHONEXE"',
+                '"%s"' % join(FRAMEWORK_DIR, "tools", "elf2bin.py"),
+                "--eboot", '"%s"' % join(
+                    FRAMEWORK_DIR, "bootloaders", "eboot", "eboot.elf"),
+                "--app", "$SOURCE",
+                "--flash_mode", "$BOARD_FLASH_MODE",
+                "--flash_freq", "${__get_board_f_flash(__env__)}",
+                "--flash_size", "${__get_flash_size(__env__)}",
+                "--path", '"%s"' % join(
+                    platform.get_package_dir("toolchain-xtensa"), "bin"),
+                "--out", "$TARGET"
+            ]), "Building $TARGET"),
+            suffix=".bin"
+        )
+    )
 )
 
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
@@ -141,18 +162,18 @@ flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("NONOSDK3V0", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0"),]
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0")]
     )
 elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("NONOSDK22x", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x"),]
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x")]
     )
 # PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x (default)
 else:
     env.Append(
         CPPDEFINES=[("NONOSDK221", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221"),]
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221")]
     )
 
 #

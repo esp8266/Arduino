@@ -32,7 +32,8 @@ pins 9 and 11. These may be used as IO if flash chip works in DIO mode
 Pin interrupts are supported through ``attachInterrupt``,
 ``detachInterrupt`` functions. Interrupts may be attached to any GPIO
 pin, except GPIO16. Standard Arduino interrupt types are supported:
-``CHANGE``, ``RISING``, ``FALLING``.
+``CHANGE``, ``RISING``, ``FALLING``. ISRs need to have
+``ICACHE_RAM_ATTR`` before the function definition.
 
 Analog input
 ------------

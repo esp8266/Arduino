@@ -153,7 +153,7 @@ public:
     reset(userTimeout);
   }
 
-  ICACHE_RAM_ATTR
+  IRAM_ATTR // fast
   bool expired()
   {
     YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
@@ -162,7 +162,7 @@ public:
     return expiredOneShot();
   }
   
-  ICACHE_RAM_ATTR
+  IRAM_ATTR // fast
   operator bool()
   {
     return expired(); 
@@ -178,6 +178,7 @@ public:
     return _timeout != alwaysExpired;
   }
 
+  IRAM_ATTR // called from ISR
   void reset(const timeType newUserTimeout)
   {
     reset();
@@ -185,6 +186,7 @@ public:
     _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
   }
 
+  IRAM_ATTR // called from ISR
   void reset()
   {
     _start = TimePolicyT::time();
@@ -208,7 +210,7 @@ public:
 
 private:
 
-  ICACHE_RAM_ATTR
+  IRAM_ATTR // fast
   bool checkExpired(const timeType internalUnit) const
   {
     // canWait() is not checked here
@@ -218,7 +220,7 @@ private:
 
 protected:
 
-  ICACHE_RAM_ATTR
+  IRAM_ATTR // fast
   bool expiredRetrigger()
   {
     if (!canWait())
@@ -234,7 +236,7 @@ protected:
     return false;
   }
   
-  ICACHE_RAM_ATTR
+  IRAM_ATTR // fast
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
