@@ -23,7 +23,7 @@
 
 class SDFSMock {
 public:
-    SDFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString) { }
+    SDFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString) { (void)fs_size; (void)fs_block; (void)fs_page; (void)storage; }
     void reset() { }
     ~SDFSMock() { }
 };

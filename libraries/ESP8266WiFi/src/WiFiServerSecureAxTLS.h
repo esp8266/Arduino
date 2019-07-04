@@ -34,6 +34,8 @@ public:
   void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
   virtual ~WiFiServerSecure() {}
   WiFiClientSecure available(uint8_t* status = NULL);
+  using ClientType = WiFiClientSecure;
+
 private:
   bool usePMEM = false;
   const uint8_t *rsakey = nullptr;
