@@ -110,7 +110,7 @@ void setup() {
     ESP.restart();
   }
 
-  server.setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
+  server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
   server.on("/",showcredentialpage); //for this simple example, just show a simple page for changing credentials at the root
   server.on("/" + change_creds,handlecredentialchange); //handles submission of credentials from the client
   server.onNotFound(redirect);
