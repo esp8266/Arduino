@@ -40,6 +40,8 @@ static uint32_t    cntref = 0;             // Ref. comparision count
 // Callback for usec counter overflow timer interrupt
 void  us_overflow_tick ( void* arg )
 {
+  (void) arg;
+
   us_cnt = system_get_time();
 
   // Check for usec counter overflow
@@ -461,10 +463,16 @@ void setup ()
 {
   Serial.begin(115200);
   WiFi.mode( WIFI_OFF );
-  us_count_init();        // Start up timer overflow sampling  
   BS_RUN(Serial);
-
 } //setup
+
+
+//---------------------------------------------------------------------------
+bool pretest ()
+{
+  us_count_init();        // Start up timer overflow sampling  
+  return true;
+} //pretest
 
 //---------------------------------------------------------------------------
 void loop(void)

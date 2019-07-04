@@ -8,6 +8,11 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 TEST_CASE("Floating point formatting works", "[newlib]")
 {
     char buf[16];
