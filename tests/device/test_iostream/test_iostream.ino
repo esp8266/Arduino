@@ -11,6 +11,11 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 TEST_CASE("can print to std::cout", "[iostream]")
 {
     std::stringstream test_stream("");

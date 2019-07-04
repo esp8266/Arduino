@@ -136,7 +136,11 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 		p.events = POLLIN;
 	} while (poll(&p, 1, timeout_ms) == 1);
 	
-	memcpy(dst, ccinbuf, retsize);
+    if (dst)
+    {
+        memcpy(dst, ccinbuf, retsize);
+    }
+
 	return retsize;
 }
 
@@ -153,32 +157,36 @@ ssize_t mockRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbu
 	
 ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 {
-	struct pollfd p;
-	p.fd = sock;
-	p.events = POLLOUT;
-	int ret = poll(&p, 1, timeout_ms);
-	if (ret == -1)
+	size_t sent = 0;
+	while (sent < size)
 	{
-		fprintf(stderr, MOCK "ClientContext::write: poll(%d): %s\n", sock, strerror(errno));
-		return 0;
-	}
-	if (ret)
-	{
-#ifndef MSG_NOSIGNAL
-		ret = ::write(sock, data, size);
-#else
-		ret = ::send(sock, data, size, MSG_NOSIGNAL);
-#endif
+
+		struct pollfd p;
+		p.fd = sock;
+		p.events = POLLOUT;
+		int ret = poll(&p, 1, timeout_ms);
 		if (ret == -1)
 		{
 			fprintf(stderr, MOCK "ClientContext::write(%d): %s\n", sock, strerror(errno));
 			return -1;
 		}
-		if (ret != (int)size)
+		if (ret)
 		{
-			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %zd) (FIXME poll loop TODO)\n", ret, size);
-			exit(EXIT_FAILURE);
+#ifndef MSG_NOSIGNAL
+			ret = ::write(sock, data + sent, size - sent);
+#else
+			ret = ::send(sock, data + sent, size - sent, MSG_NOSIGNAL);
+#endif
+			if (ret == -1)
+			{
+				fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
+				return -1;
+			}
+			sent += ret;
+			if (sent < size)
+				fprintf(stderr, MOCK "ClientContext::write: sent %d bytes (%zd / %zd)\n", ret, sent, size);
 		}
 	}
-	return ret;
+	fprintf(stderr, MOCK "ClientContext::write: total sent %zd bytes\n", sent);
+	return sent;
 }
