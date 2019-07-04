@@ -18,7 +18,7 @@ Instructions
 
 -  Start Arduino and open Preferences window.
 -  Enter
-   ``http://arduino.esp8266.com/stable/package_esp8266com_index.json``
+   ``https://arduino.esp8266.com/stable/package_esp8266com_index.json``
    into *Additional Board Manager URLs* field. You can add multiple
    URLs, separating them with commas.
 -  Open Boards Manager from Tools > Board menu and find *esp8266*
@@ -27,11 +27,6 @@ Instructions
 -  Click *install* button.
 -  Don't forget to select your ESP8266 board from Tools > Board menu
    after installation.
-
-You may optionally use *staging* boards manager package link:
-``http://arduino.esp8266.com/staging/package_esp8266com_index.json``.
-This may contain some new features, but at the same time, some things
-might be broken.
 
 For more information on the Arduino Board Manager, see:
 
@@ -48,7 +43,7 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python 2.7 (http://python.org)
+-  Python 2.7 (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 
@@ -105,7 +100,7 @@ Instructions - Windows 10
 
    .. code:: bash
 
-       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       cd %USERPROFILE%\Documents\Arduino\hardware\esp8266com\esp8266
        git submodule update --init   
   
   If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
@@ -125,7 +120,7 @@ Instructions - Windows 10
 
    .. code:: bash
 
-       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       cd %USERPROFILE%\Documents\Arduino\hardware\esp8266com\esp8266
        git status
        git pull
 

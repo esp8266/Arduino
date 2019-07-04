@@ -52,7 +52,19 @@ int mockUDPSocket ()
 
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 {
-	int optval = 1;
+	int optval;
+	int mockport;
+
+	mockport = port;
+	if (mockport < 1024 && mock_port_shifter)
+	{
+		mockport += mock_port_shifter;
+		fprintf(stderr, MOCK "=====> UdpServer port: %d shifted to %d (use option -s) <=====\n", port, mockport);
+	}
+	else
+		fprintf(stderr, MOCK "=====> UdpServer port: %d <=====\n", mockport);
+
+	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
 		fprintf(stderr, MOCK "SO_REUSEPORT failed\n");
 	optval = 1;
@@ -65,17 +77,18 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
+	(void) dstaddr;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(port);
+	servaddr.sin_port = htons(mockport);
 
 	// Bind the socket with the server address
 	if (bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
-		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", port, strerror(errno));
+		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", mockport, strerror(errno));
 		return false;
 	}
 	else
-		fprintf(stderr, MOCK "UDP server on port %d (sock=%d)\n", (int)port, sock);
+		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
 	if (mcast)
 	{
@@ -141,6 +154,7 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
+	(void) sock;
 	if (usersize > CCBUFSIZE)
 		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
@@ -172,6 +186,7 @@ size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccin
 
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port)
 {
+	(void) timeout_ms;
 	// Filling server information
 	struct sockaddr_in peer;
 	peer.sin_family = AF_INET;

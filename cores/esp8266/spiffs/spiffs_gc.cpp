@@ -13,7 +13,7 @@ static s32_t spiffs_gc_erase_block(
     spiffs_block_ix bix) {
   s32_t res;
 
-  SPIFFS_GC_DBG("gc: erase block "_SPIPRIbl"\n", bix);
+  SPIFFS_GC_DBG("gc: erase block " _SPIPRIbl "\n", bix);
   res = spiffs_erase_block(fs, bix);
   SPIFFS_CHECK_RES(res);
 
@@ -124,16 +124,16 @@ s32_t spiffs_gc_check(
 
   u32_t needed_pages = (len + SPIFFS_DATA_PAGE_SIZE(fs) - 1) / SPIFFS_DATA_PAGE_SIZE(fs);
 //  if (fs->free_blocks <= 2 && (s32_t)needed_pages > free_pages) {
-//    SPIFFS_GC_DBG("gc: full freeblk:"_SPIPRIi" needed:"_SPIPRIi" free:"_SPIPRIi" dele:"_SPIPRIi"\n", fs->free_blocks, needed_pages, free_pages, fs->stats_p_deleted);
+//    SPIFFS_GC_DBG("gc: full freeblk:" _SPIPRIi " needed:" _SPIPRIi " free:" _SPIPRIi " dele:" _SPIPRIi "\n", fs->free_blocks, needed_pages, free_pages, fs->stats_p_deleted);
 //    return SPIFFS_ERR_FULL;
 //  }
   if ((s32_t)needed_pages > (s32_t)(free_pages + fs->stats_p_deleted)) {
-    SPIFFS_GC_DBG("gc_check: full freeblk:"_SPIPRIi" needed:"_SPIPRIi" free:"_SPIPRIi" dele:"_SPIPRIi"\n", fs->free_blocks, needed_pages, free_pages, fs->stats_p_deleted);
+    SPIFFS_GC_DBG("gc_check: full freeblk:" _SPIPRIi " needed:" _SPIPRIi " free:" _SPIPRIi " dele:" _SPIPRIi "\n", fs->free_blocks, needed_pages, free_pages, fs->stats_p_deleted);
     return SPIFFS_ERR_FULL;
   }
 
   do {
-    SPIFFS_GC_DBG("\ngc_check #"_SPIPRIi": run gc free_blocks:"_SPIPRIi" pfree:"_SPIPRIi" pallo:"_SPIPRIi" pdele:"_SPIPRIi" ["_SPIPRIi"] len:"_SPIPRIi" of "_SPIPRIi"\n",
+    SPIFFS_GC_DBG("\ngc_check #" _SPIPRIi": run gc free_blocks:" _SPIPRIi " pfree:" _SPIPRIi " pallo:" _SPIPRIi " pdele:" _SPIPRIi " [" _SPIPRIi"] len:" _SPIPRIi " of " _SPIPRIi "\n",
         tries,
         fs->free_blocks, free_pages, fs->stats_p_allocated, fs->stats_p_deleted, (free_pages+fs->stats_p_allocated+fs->stats_p_deleted),
         len, (u32_t)(free_pages*SPIFFS_DATA_PAGE_SIZE(fs)));
@@ -154,13 +154,13 @@ s32_t spiffs_gc_check(
 #endif
     cand = cands[0];
     fs->cleaning = 1;
-    //SPIFFS_GC_DBG("gcing: cleaning block "_SPIPRIi"\n", cand);
+    //SPIFFS_GC_DBG("gcing: cleaning block " _SPIPRIi "\n", cand);
     res = spiffs_gc_clean(fs, cand);
     fs->cleaning = 0;
     if (res < 0) {
-      SPIFFS_GC_DBG("gc_check: cleaning block "_SPIPRIi", result "_SPIPRIi"\n", cand, res);
+      SPIFFS_GC_DBG("gc_check: cleaning block " _SPIPRIi ", result " _SPIPRIi "\n", cand, res);
     } else {
-      SPIFFS_GC_DBG("gc_check: cleaning block "_SPIPRIi", result "_SPIPRIi"\n", cand, res);
+      SPIFFS_GC_DBG("gc_check: cleaning block " _SPIPRIi ", result " _SPIPRIi "\n", cand, res);
     }
     SPIFFS_CHECK_RES(res);
 
@@ -190,7 +190,7 @@ s32_t spiffs_gc_check(
     res = SPIFFS_ERR_FULL;
   }
 
-  SPIFFS_GC_DBG("gc_check: finished, "_SPIPRIi" dirty, blocks "_SPIPRIi" free, "_SPIPRIi" pages free, "_SPIPRIi" tries, res "_SPIPRIi"\n",
+  SPIFFS_GC_DBG("gc_check: finished, " _SPIPRIi " dirty, blocks " _SPIPRIi " free, " _SPIPRIi " pages free, " _SPIPRIi " tries, res " _SPIPRIi "\n",
       fs->stats_p_allocated + fs->stats_p_deleted,
       fs->free_blocks, free_pages, tries, res);
 
@@ -228,7 +228,7 @@ s32_t spiffs_gc_erase_page_stats(
     } // per entry
     obj_lookup_page++;
   } // per object lookup page
-  SPIFFS_GC_DBG("gc_check: wipe pallo:"_SPIPRIi" pdele:"_SPIPRIi"\n", allo, dele);
+  SPIFFS_GC_DBG("gc_check: wipe pallo:" _SPIPRIi " pdele:" _SPIPRIi "\n", allo, dele);
   fs->stats_p_allocated -= allo;
   fs->stats_p_deleted -= dele;
   return res;
@@ -316,7 +316,7 @@ s32_t spiffs_gc_find_candidate(
           used_pages_in_block * SPIFFS_GC_HEUR_W_USED +
           erase_age * (fs_crammed ? 0 : SPIFFS_GC_HEUR_W_ERASE_AGE);
       int cand_ix = 0;
-      SPIFFS_GC_DBG("gc_check: bix:"_SPIPRIbl" del:"_SPIPRIi" use:"_SPIPRIi" score:"_SPIPRIi"\n", cur_block, deleted_pages_in_block, used_pages_in_block, score);
+      SPIFFS_GC_DBG("gc_check: bix:" _SPIPRIbl" del:" _SPIPRIi " use:" _SPIPRIi " score:" _SPIPRIi "\n", cur_block, deleted_pages_in_block, used_pages_in_block, score);
       while (cand_ix < max_candidates) {
         if (cand_blocks[cand_ix] == (spiffs_block_ix)-1) {
           cand_blocks[cand_ix] = cur_block;
@@ -387,7 +387,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
   spiffs_page_object_ix_header *objix_hdr = (spiffs_page_object_ix_header *)fs->work;
   spiffs_page_object_ix *objix = (spiffs_page_object_ix *)fs->work;
 
-  SPIFFS_GC_DBG("gc_clean: cleaning block "_SPIPRIbl"\n", bix);
+  SPIFFS_GC_DBG("gc_clean: cleaning block " _SPIPRIbl "\n", bix);
 
   memset(&gc, 0, sizeof(spiffs_gc));
   gc.state = FIND_OBJ_DATA;
@@ -396,11 +396,11 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
     // move free cursor to next block, cannot use free pages from the block we want to clean
     fs->free_cursor_block_ix = (bix+1)%fs->block_count;
     fs->free_cursor_obj_lu_entry = 0;
-    SPIFFS_GC_DBG("gc_clean: move free cursor to block "_SPIPRIbl"\n", fs->free_cursor_block_ix);
+    SPIFFS_GC_DBG("gc_clean: move free cursor to block " _SPIPRIbl "\n", fs->free_cursor_block_ix);
   }
 
   while (res == SPIFFS_OK && gc.state != FINISHED) {
-    SPIFFS_GC_DBG("gc_clean: state = "_SPIPRIi" entry:"_SPIPRIi"\n", gc.state, cur_entry);
+    SPIFFS_GC_DBG("gc_clean: state = " _SPIPRIi " entry:" _SPIPRIi "\n", gc.state, cur_entry);
     gc.obj_id_found = 0; // reset (to no found data page)
 
     // scan through lookup pages
@@ -425,7 +425,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
           if (obj_id != SPIFFS_OBJ_ID_DELETED && obj_id != SPIFFS_OBJ_ID_FREE &&
               ((obj_id & SPIFFS_OBJ_ID_IX_FLAG) == 0)) {
             // found a data page, stop scanning and handle in switch case below
-            SPIFFS_GC_DBG("gc_clean: FIND_DATA state:"_SPIPRIi" - found obj id "_SPIPRIid"\n", gc.state, obj_id);
+            SPIFFS_GC_DBG("gc_clean: FIND_DATA state:" _SPIPRIi " - found obj id " _SPIPRIid"\n", gc.state, obj_id);
             gc.obj_id_found = 1;
             gc.cur_obj_id = obj_id;
             gc.cur_data_pix = cur_pix;
@@ -440,7 +440,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
             res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
                 0, SPIFFS_PAGE_TO_PADDR(fs, cur_pix), sizeof(spiffs_page_header), (u8_t*)&p_hdr);
             SPIFFS_CHECK_RES(res);
-            SPIFFS_GC_DBG("gc_clean: MOVE_DATA found data page "_SPIPRIid":"_SPIPRIsp" @ "_SPIPRIpg"\n", gc.cur_obj_id, p_hdr.span_ix, cur_pix);
+            SPIFFS_GC_DBG("gc_clean: MOVE_DATA found data page " _SPIPRIid":" _SPIPRIsp" @ " _SPIPRIpg"\n", gc.cur_obj_id, p_hdr.span_ix, cur_pix);
             if (SPIFFS_OBJ_IX_ENTRY_SPAN_IX(fs, p_hdr.span_ix) != gc.cur_objix_spix) {
               SPIFFS_GC_DBG("gc_clean: MOVE_DATA no objix spix match, take in another run\n");
             } else {
@@ -448,7 +448,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
               if (p_hdr.flags & SPIFFS_PH_FLAG_DELET) {
                 // move page
                 res = spiffs_page_move(fs, 0, 0, obj_id, &p_hdr, cur_pix, &new_data_pix);
-                SPIFFS_GC_DBG("gc_clean: MOVE_DATA move objix "_SPIPRIid":"_SPIPRIsp" page "_SPIPRIpg" to "_SPIPRIpg"\n", gc.cur_obj_id, p_hdr.span_ix, cur_pix, new_data_pix);
+                SPIFFS_GC_DBG("gc_clean: MOVE_DATA move objix " _SPIPRIid":" _SPIPRIsp" page " _SPIPRIpg" to " _SPIPRIpg"\n", gc.cur_obj_id, p_hdr.span_ix, cur_pix, new_data_pix);
                 SPIFFS_CHECK_RES(res);
                 // move wipes obj_lu, reload it
                 res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_READ,
@@ -459,7 +459,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
                 // page is deleted but not deleted in lookup, scrap it -
                 // might seem unnecessary as we will erase this block, but
                 // we might get aborted
-                SPIFFS_GC_DBG("gc_clean: MOVE_DATA wipe objix "_SPIPRIid":"_SPIPRIsp" page "_SPIPRIpg"\n", obj_id, p_hdr.span_ix, cur_pix);
+                SPIFFS_GC_DBG("gc_clean: MOVE_DATA wipe objix " _SPIPRIid":" _SPIPRIsp" page " _SPIPRIpg"\n", obj_id, p_hdr.span_ix, cur_pix);
                 res = spiffs_page_delete(fs, cur_pix);
                 SPIFFS_CHECK_RES(res);
                 new_data_pix = SPIFFS_OBJ_ID_FREE;
@@ -468,11 +468,11 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
               if (gc.cur_objix_spix == 0) {
                 // update object index header page
                 ((spiffs_page_ix*)((u8_t *)objix_hdr + sizeof(spiffs_page_object_ix_header)))[p_hdr.span_ix] = new_data_pix;
-                SPIFFS_GC_DBG("gc_clean: MOVE_DATA wrote page "_SPIPRIpg" to objix_hdr entry "_SPIPRIsp" in mem\n", new_data_pix, (spiffs_span_ix)SPIFFS_OBJ_IX_ENTRY(fs, p_hdr.span_ix));
+                SPIFFS_GC_DBG("gc_clean: MOVE_DATA wrote page " _SPIPRIpg" to objix_hdr entry " _SPIPRIsp" in mem\n", new_data_pix, (spiffs_span_ix)SPIFFS_OBJ_IX_ENTRY(fs, p_hdr.span_ix));
               } else {
                 // update object index page
                 ((spiffs_page_ix*)((u8_t *)objix + sizeof(spiffs_page_object_ix)))[SPIFFS_OBJ_IX_ENTRY(fs, p_hdr.span_ix)] = new_data_pix;
-                SPIFFS_GC_DBG("gc_clean: MOVE_DATA wrote page "_SPIPRIpg" to objix entry "_SPIPRIsp" in mem\n", new_data_pix, (spiffs_span_ix)SPIFFS_OBJ_IX_ENTRY(fs, p_hdr.span_ix));
+                SPIFFS_GC_DBG("gc_clean: MOVE_DATA wrote page " _SPIPRIpg" to objix entry " _SPIPRIsp" in mem\n", new_data_pix, (spiffs_span_ix)SPIFFS_OBJ_IX_ENTRY(fs, p_hdr.span_ix));
               }
             }
           }
@@ -491,7 +491,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
             if (p_hdr.flags & SPIFFS_PH_FLAG_DELET) {
               // move page
               res = spiffs_page_move(fs, 0, 0, obj_id, &p_hdr, cur_pix, &new_pix);
-              SPIFFS_GC_DBG("gc_clean: MOVE_OBJIX move objix "_SPIPRIid":"_SPIPRIsp" page "_SPIPRIpg" to "_SPIPRIpg"\n", obj_id, p_hdr.span_ix, cur_pix, new_pix);
+              SPIFFS_GC_DBG("gc_clean: MOVE_OBJIX move objix " _SPIPRIid":" _SPIPRIsp" page " _SPIPRIpg" to " _SPIPRIpg"\n", obj_id, p_hdr.span_ix, cur_pix, new_pix);
               SPIFFS_CHECK_RES(res);
               spiffs_cb_object_event(fs, (spiffs_page_object_ix *)&p_hdr,
                   SPIFFS_EV_IX_MOV, obj_id, p_hdr.span_ix, new_pix, 0);
@@ -504,7 +504,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
               // page is deleted but not deleted in lookup, scrap it -
               // might seem unnecessary as we will erase this block, but
               // we might get aborted
-              SPIFFS_GC_DBG("gc_clean: MOVE_OBJIX wipe objix "_SPIPRIid":"_SPIPRIsp" page "_SPIPRIpg"\n", obj_id, p_hdr.span_ix, cur_pix);
+              SPIFFS_GC_DBG("gc_clean: MOVE_OBJIX wipe objix " _SPIPRIid":" _SPIPRIsp" page " _SPIPRIpg"\n", obj_id, p_hdr.span_ix, cur_pix);
               res = spiffs_page_delete(fs, cur_pix);
               if (res == SPIFFS_OK) {
                 spiffs_cb_object_event(fs, (spiffs_page_object_ix *)0,
@@ -539,13 +539,13 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
             0, SPIFFS_PAGE_TO_PADDR(fs, cur_pix), sizeof(spiffs_page_header), (u8_t*)&p_hdr);
         SPIFFS_CHECK_RES(res);
         gc.cur_objix_spix = SPIFFS_OBJ_IX_ENTRY_SPAN_IX(fs, p_hdr.span_ix);
-        SPIFFS_GC_DBG("gc_clean: FIND_DATA find objix span_ix:"_SPIPRIsp"\n", gc.cur_objix_spix);
+        SPIFFS_GC_DBG("gc_clean: FIND_DATA find objix span_ix:" _SPIPRIsp"\n", gc.cur_objix_spix);
         res = spiffs_obj_lu_find_id_and_span(fs, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, gc.cur_objix_spix, 0, &objix_pix);
         if (res == SPIFFS_ERR_NOT_FOUND) {
           // on borked systems we might get an ERR_NOT_FOUND here -
           // this is handled by simply deleting the page as it is not referenced
           // from anywhere
-          SPIFFS_GC_DBG("gc_clean: FIND_OBJ_DATA objix not found! Wipe page "_SPIPRIpg"\n", gc.cur_data_pix);
+          SPIFFS_GC_DBG("gc_clean: FIND_OBJ_DATA objix not found! Wipe page " _SPIPRIpg"\n", gc.cur_data_pix);
           res = spiffs_page_delete(fs, gc.cur_data_pix);
           SPIFFS_CHECK_RES(res);
           // then we restore states and continue scanning for data pages
@@ -554,7 +554,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
           break; // done
         }
         SPIFFS_CHECK_RES(res);
-        SPIFFS_GC_DBG("gc_clean: FIND_DATA found object index at page "_SPIPRIpg"\n", objix_pix);
+        SPIFFS_GC_DBG("gc_clean: FIND_DATA found object index at page " _SPIPRIpg"\n", objix_pix);
         res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
             0, SPIFFS_PAGE_TO_PADDR(fs, objix_pix), SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->work);
         SPIFFS_CHECK_RES(res);
@@ -578,12 +578,12 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
       if (gc.cur_objix_spix == 0) {
         // store object index header page
         res = spiffs_object_update_index_hdr(fs, 0, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, gc.cur_objix_pix, fs->work, 0, 0, 0, &new_objix_pix);
-        SPIFFS_GC_DBG("gc_clean: MOVE_DATA store modified objix_hdr page, "_SPIPRIpg":"_SPIPRIsp"\n", new_objix_pix, 0);
+        SPIFFS_GC_DBG("gc_clean: MOVE_DATA store modified objix_hdr page, " _SPIPRIpg":" _SPIPRIsp"\n", new_objix_pix, 0);
         SPIFFS_CHECK_RES(res);
       } else {
         // store object index page
         res = spiffs_page_move(fs, 0, fs->work, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, 0, gc.cur_objix_pix, &new_objix_pix);
-        SPIFFS_GC_DBG("gc_clean: MOVE_DATA store modified objix page, "_SPIPRIpg":"_SPIPRIsp"\n", new_objix_pix, objix->p_hdr.span_ix);
+        SPIFFS_GC_DBG("gc_clean: MOVE_DATA store modified objix page, " _SPIPRIpg":" _SPIPRIsp"\n", new_objix_pix, objix->p_hdr.span_ix);
         SPIFFS_CHECK_RES(res);
         spiffs_cb_object_event(fs, (spiffs_page_object_ix *)fs->work,
             SPIFFS_EV_IX_UPD, gc.cur_obj_id, objix->p_hdr.span_ix, new_objix_pix, 0);
@@ -598,7 +598,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
       cur_entry = 0;
       break;
     } // switch gc.state
-    SPIFFS_GC_DBG("gc_clean: state-> "_SPIPRIi"\n", gc.state);
+    SPIFFS_GC_DBG("gc_clean: state-> " _SPIPRIi "\n", gc.state);
   } // while state != FINISHED
 
 

@@ -7,7 +7,7 @@ ESP8266 is all about Wi-Fi. If you are eager to connect your new ESP8266 module 
 Introduction
 ------------
 
-The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using naming convention and overall functionality philosophy of `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP9266 SDK to `esp8266 /
+The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using naming convention and overall functionality philosophy of `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP9266 SDK to `esp8266 /
 Arduino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we need to provide separate documentation on what is new and extra.
 
 This documentation will walk you through several classes, methods and properties of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
@@ -72,7 +72,7 @@ Connection process can take couple of seconds and we are checking for this to co
 
 The ``while()`` loop will keep looping while ``WiFi.status()`` is other than ``WL_CONNECTED``. The loop will exit only if the status changes to ``WL_CONNECTED``.
 
-The last line will then print out IP address assigned to ESP module by `DHCP <http://whatismyipaddress.com/dhcp>`__:
+The last line will then print out IP address assigned to ESP module by `DHCP <https://whatismyipaddress.com/dhcp>`__:
 
 .. code:: cpp
 
@@ -205,7 +205,7 @@ Check out separate section with `examples <udp-examples.rst>`__ / `list of funct
 Generic
 ~~~~~~~
 
-There are several functions offered by ESP8266's `SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ and not present in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. If such function does not fit into one of classes discussed above, it will likely be in Generic Class. Among them is handler to manage Wi-Fi events like connection, disconnection or obtaining an IP, Wi-Fi mode changes, functions to manage module sleep mode, hostname to an IP address resolution, etc.
+There are several functions offered by ESP8266's `SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ and not present in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. If such function does not fit into one of classes discussed above, it will likely be in Generic Class. Among them is handler to manage Wi-Fi events like connection, disconnection or obtaining an IP, Wi-Fi mode changes, functions to manage module sleep mode, hostname to an IP address resolution, etc.
 
 Check out separate section with `examples <generic-examples.rst>`__ / `list of functions <generic-class.rst>`__.
 
@@ -307,7 +307,7 @@ What's Inside?
 
 If you like to analyze in detail what is inside of the ESP8266WiFi library, go directly to the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi/src>`__ folder of esp8266 / Arduino repository on the GitHub.
 
-To make the analysis easier, rather than looking into individual header or source files, use one of free tools to automatically generate documentation. The class index in chapter `Class Description`_ above has been prepared in no time using great `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__, that is the de facto standard tool for generating documentation from annotated C++ sources.
+To make the analysis easier, rather than looking into individual header or source files, use one of free tools to automatically generate documentation. The class index in chapter `Class Description`_ above has been prepared in no time using great `Doxygen <https://www.doxygen.nl/>`__, that is the de facto standard tool for generating documentation from annotated C++ sources.
 
 .. figure:: pictures/doxygen-esp8266wifi-documentation.png
    :alt: Example of documentation prepared by Doxygen
@@ -325,4 +325,4 @@ If code is not annotated, you will still see the function prototype including ty
 .. figure:: pictures/doxygen-example-udp-begin.png
    :alt: Example of documentation for UDP begin method (not annotaed in code)by Doxygen
 
-Several classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ are not annotated. When preparing this document, `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__ has been tremendous help to quickly navigate through almost 30 files that make this library.
+Several classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ are not annotated. When preparing this document, `Doxygen <https://www.doxygen.nl/>`__ has been tremendous help to quickly navigate through almost 30 files that make this library.

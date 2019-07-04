@@ -175,17 +175,10 @@ public:
     // Start the MDNS responder by setting the default hostname
     // Later call MDNS::update() in every 'loop' to run the process loop
     // (probing, announcing, responding, ...)
-    bool begin(const char* p_pcHostname);
-    bool begin(const String& p_strHostname) {return begin(p_strHostname.c_str());}
-        // for compatibility
-        bool begin(const char* p_pcHostname,
-                   IPAddress p_IPAddress,       // ignored
-                   uint32_t p_u32TTL = 120);    // ignored
-        bool begin(const String& p_strHostname,
-                   IPAddress p_IPAddress,       // ignored
-                   uint32_t p_u32TTL = 120) {   // ignored
-            return begin(p_strHostname.c_str(), p_IPAddress, p_u32TTL);
-        }
+    // if interfaceAddress is not specified, default interface is STA, or AP when STA is not set
+    bool begin(const char* p_pcHostname, const IPAddress& p_IPAddress = INADDR_ANY, uint32_t p_u32TTL = 120 /*ignored*/);
+    bool begin(const String& p_strHostname, const IPAddress& p_IPAddress = INADDR_ANY, uint32_t p_u32TTL = 120 /*ignored*/) {return begin(p_strHostname.c_str(), p_IPAddress, p_u32TTL);}
+
     // Finish MDNS processing
     bool close(void);
     // for esp32 compatability
@@ -487,12 +480,12 @@ public:
                             const char* p_pcDivider = "-",
                             const char* p_pcDefaultDomain = 0);
     
-protected:
     /** STRUCTS **/
+
+public:
     /**
      * MDNSServiceInfo, used in application callbacks
      */
-public:
     struct MDNSServiceInfo
     {
     	MDNSServiceInfo(MDNSResponder& p_pM,MDNSResponder::hMDNSServiceQuery p_hS,uint32_t p_u32A)
@@ -905,12 +898,12 @@ protected:
      * stcProbeInformation
      */
     struct stcProbeInformation {
-        enuProbingStatus                m_ProbingStatus;
-        uint8_t                         m_u8SentCount;  // Used for probes and announcements
-        esp8266::polledTimeout::oneShot m_Timeout;      // Used for probes and announcements
-        //clsMDNSTimeFlag                 m_TimeFlag;     // Used for probes and announcements
-        bool                            m_bConflict;
-        bool                            m_bTiebreakNeeded;
+        enuProbingStatus                  m_ProbingStatus;
+        uint8_t                           m_u8SentCount;  // Used for probes and announcements
+        esp8266::polledTimeout::oneShotMs m_Timeout;      // Used for probes and announcements
+        //clsMDNSTimeFlag                   m_TimeFlag;     // Used for probes and announcements
+        bool                              m_bConflict;
+        bool                              m_bTiebreakNeeded;
         MDNSHostProbeFn   				m_fnHostProbeResultCallback;
         MDNSServiceProbeFn 				m_fnServiceProbeResultCallback;
 
@@ -974,14 +967,14 @@ protected:
                 const timeoutLevel_t    TIMEOUTLEVEL_INTERVAL   = 5;
                 const timeoutLevel_t    TIMEOUTLEVEL_FINAL      = 100;
 
-                uint32_t                        m_u32TTL;
-                esp8266::polledTimeout::oneShot m_TTLTimeout;
-                timeoutLevel_t                  m_timeoutLevel;
+                uint32_t                          m_u32TTL;
+                esp8266::polledTimeout::oneShotMs m_TTLTimeout;
+                timeoutLevel_t                    m_timeoutLevel;
 
                 stcTTL(void);
                 bool set(uint32_t p_u32TTL);
 
-                bool flagged(void) const;
+                bool flagged(void);
                 bool restart(void);
 
                 bool prepareDeletion(void);
@@ -1073,14 +1066,14 @@ protected:
 #endif
         };
 
-        stcMDNSServiceQuery*            m_pNext;
-        stcMDNS_RRDomain                m_ServiceTypeDomain;    // eg. _http._tcp.local
-        MDNSServiceQueryCallbackFunc    m_fnCallback;
-        bool                            m_bLegacyQuery;
-        uint8_t                         m_u8SentCount;
-        esp8266::polledTimeout::oneShot m_ResendTimeout;
-        bool                            m_bAwaitingAnswers;
-        stcAnswer*                      m_pAnswers;
+        stcMDNSServiceQuery*              m_pNext;
+        stcMDNS_RRDomain                  m_ServiceTypeDomain;    // eg. _http._tcp.local
+        MDNSServiceQueryCallbackFunc      m_fnCallback;
+        bool                              m_bLegacyQuery;
+        uint8_t                           m_u8SentCount;
+        esp8266::polledTimeout::oneShotMs m_ResendTimeout;
+        bool                              m_bAwaitingAnswers;
+        stcAnswer*                        m_pAnswers;
 
         stcMDNSServiceQuery(void);
         ~stcMDNSServiceQuery(void);
@@ -1155,6 +1148,7 @@ protected:
     MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
     bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
+    IPAddress                       m_IPAddress;
 
     /** CONTROL **/
     /* MAINTENANCE */
@@ -1201,8 +1195,7 @@ protected:
     /** TRANSFER **/
     /* SENDING */   
     bool _sendMDNSMessage(stcMDNSSendParameter& p_SendParameter);
-    bool _sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter,
-                                    int p_iWiFiOpMode);
+    bool _sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter);
     bool _prepareMDNSMessage(stcMDNSSendParameter& p_SendParameter,
                              IPAddress p_IPAddress);
     bool _sendMDNSServiceQuery(const stcMDNSServiceQuery& p_ServiceQuery);
@@ -1210,7 +1203,7 @@ protected:
                         uint16_t p_u16QueryType,
                         stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
                         
-    IPAddress _getResponseMulticastInterface(int p_iWiFiOpModes) const;
+    const IPAddress& _getResponseMulticastInterface() const { return m_IPAddress; }
 
     uint8_t _replyMaskForHost(const stcMDNS_RRHeader& p_RRHeader,
                               bool* p_pbFullNameMatch = 0) const;

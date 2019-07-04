@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+# return 1 if this test should not be built in CI (for other archs, not needed, etc.)
+function skip_ino()
+{
+    local ino=$1
+    local skiplist=""
+    # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
+    read -d '' skiplist << EOL || true
+/#attic/
+/AnalogBinLogger/
+/LowLatencyLogger/
+/LowLatencyLoggerADXL345/
+/LowLatencyLoggerMPU6050/
+/PrintBenchmark/
+/TeensySdioDemo/
+/SoftwareSpi/
+/STM32Test/
+/extras/
+EOL
+    echo $ino | grep -q -F "$skiplist"
+    echo $(( 1 - $? ))
+}
+
 function print_size_info()
 {
     elf_file=$1
@@ -79,6 +101,10 @@ function build_sketches()
             echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi
+        if [[ $(skip_ino $sketch) = 1 ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
         echo "$build_cmd $sketch"
@@ -109,7 +135,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v4.6.1.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip; } && unzip ArduinoJson-v4.6.1.zip
+    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip ArduinoJson-v6.11.0.zip
 
     popd
 }

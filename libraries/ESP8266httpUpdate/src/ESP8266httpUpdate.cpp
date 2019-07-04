@@ -26,16 +26,16 @@
 #include "ESP8266httpUpdate.h"
 #include <StreamString.h>
 
-extern "C" uint32_t _SPIFFS_start;
-extern "C" uint32_t _SPIFFS_end;
+extern "C" uint32_t _FS_start;
+extern "C" uint32_t _FS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000), _ledPin(-1)
+        : _httpClientTimeout(8000), _followRedirects(false), _ledPin(-1)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout), _ledPin(-1)
+        : _httpClientTimeout(httpClientTimeout), _followRedirects(false), _ledPin(-1)
 {
 }
 
@@ -261,6 +261,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
     http.setTimeout(_httpClientTimeout);
+    http.setFollowRedirects(_followRedirects);
     http.setUserAgent(F("ESP8266-http-Update"));
     http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
     http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
@@ -320,7 +321,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         if(len > 0) {
             bool startUpdate = true;
             if(spiffs) {
-                size_t spiffsSize = ((size_t) &_SPIFFS_end - (size_t) &_SPIFFS_start);
+                size_t spiffsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
                 if(len > (int) spiffsSize) {
                     DEBUG_HTTP_UPDATE("[httpUpdate] spiffsSize to low (%d) needed: %d\n", spiffsSize, len);
                     startUpdate = false;
@@ -347,8 +348,8 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                 int command;
 
                 if(spiffs) {
-                    command = U_SPIFFS;
-                    DEBUG_HTTP_UPDATE("[httpUpdate] runUpdate spiffs...\n");
+                    command = U_FS;
+                    DEBUG_HTTP_UPDATE("[httpUpdate] runUpdate filesystem...\n");
                 } else {
                     command = U_FLASH;
                     DEBUG_HTTP_UPDATE("[httpUpdate] runUpdate flash...\n");

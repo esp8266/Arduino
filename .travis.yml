@@ -93,6 +93,10 @@ jobs:
       script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
       install: tests/ci/install_astyle.sh
 
+    - name: "Mock trivial test"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/buildm.sh
+
     - name: "Boards"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/build_boards.sh
@@ -103,6 +107,7 @@ jobs:
       stage: deploy
       script: tests/ci/build_package.sh
       env: BUILD_TYPE=package
+      before_deploy: git submodule update --init
       deploy:
       # Create Github release, upload artifacts
       - provider: releases

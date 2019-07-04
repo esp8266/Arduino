@@ -2,6 +2,7 @@ BINDIR := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
+LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
@@ -25,6 +26,7 @@ $(warning Cannot compile in 32 bit mode, switching to native mode)
 else
 N32 = 32
 M32 = -m32
+E32 = .32
 endif
 endif
 
@@ -56,6 +58,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	MD5Builder.cpp \
+	../../libraries/LittleFS/src/LittleFS.cpp \
 	core_esp8266_noniso.cpp \
 	spiffs/spiffs_cache.cpp \
 	spiffs/spiffs_check.cpp \
@@ -63,17 +66,35 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_hydrogen.cpp \
 	spiffs/spiffs_nucleus.cpp \
 	libb64/cencode.cpp \
+	libb64/cdecode.cpp \
 	Schedule.cpp \
-)
+	HardwareSerial.cpp \
+	) \
+	$(addprefix $(LIBRARIES_PATH)/ESP8266SdFat/src/, \
+		FatLib/FatFile.cpp \
+		FatLib/FatFileLFN.cpp \
+		FatLib/FatFilePrint.cpp \
+		FatLib/FatFileSFN.cpp \
+		FatLib/FatVolume.cpp \
+		FatLib/FmtNumber.cpp \
+		FatLib/StdioStream.cpp \
+	) \
+	$(LIBRARIES_PATH)/SDFS/src/SDFS.cpp \
+	$(LIBRARIES_PATH)/SD/src/SD.cpp
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
+	../../libraries/LittleFS/src/lfs.c \
+	../../libraries/LittleFS/src/lfs_util.c \
 )
 
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
+	flash_hal_mock.cpp \
 	spiffs_mock.cpp \
+	littlefs_mock.cpp \
+	sdfs_mock.cpp \
 	WMath.cpp \
-	MockSerial.cpp \
+	MockUART.cpp \
 	MockTools.cpp \
 	MocklwIP.cpp \
 )
@@ -86,6 +107,7 @@ MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMain.cpp \
 	ArduinoMainUdp.cpp \
 	ArduinoMainSpiffs.cpp \
+	ArduinoMainLittlefs.cpp \
 	user_interface.cpp \
 )
 
@@ -93,7 +115,6 @@ MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
 	noniso.c \
 )
-
 
 INC_PATHS += $(addprefix -I, \
 	. \
@@ -113,7 +134,8 @@ TEST_CPP_FILES := \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp \
-	core/test_PolledTimeout.cpp
+	core/test_PolledTimeout.cpp \
+	core/test_Print.cpp
 
 PREINCLUDES := \
 	-include common/mock.h \
@@ -128,9 +150,11 @@ endif
 FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
+FLAGS += -DHOST_MOCK=1
+FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
-CXXFLAGS += -std=c++11 $(FLAGS)
-CFLAGS += -std=c99 $(FLAGS)
+CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
+CFLAGS += -std=c99 $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
@@ -140,10 +164,10 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 C_SOURCE_FILES = $(MOCK_C_FILES) $(CORE_C_FILES)
 CPP_SOURCE_FILES = $(MOCK_CPP_FILES) $(CORE_CPP_FILES) $(TEST_CPP_FILES)
-C_OBJECTS = $(C_SOURCE_FILES:.c=.c.o)
+C_OBJECTS = $(C_SOURCE_FILES:.c=.c$(E32).o)
 
-CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp.o) $(CORE_CPP_FILES:.cpp=.cpp.o)
-CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp.o)
+CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp$(E32).o) $(CORE_CPP_FILES:.cpp=.cpp$(E32).o)
+CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp$(E32).o)
 
 CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 
@@ -160,7 +184,10 @@ doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
-clean: clean-objects clean-coverage	# clean everything
+clean:
+	make FORCE32=0 cleanarch; make FORCE32=1 cleanarch
+
+cleanarch: clean-objects clean-coverage	# clean everything
 	rm -rf $(BINDIR)
 
 clean-objects:
@@ -192,11 +219,11 @@ build-info:				# show toolchain version
 -include $(BINDIR)/.*.d
 .SUFFIXES:
 
-%.c.o: %.c
+%.c$(E32).o: %.c
 	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
-.PRECIOUS: %.cpp.o
-%.cpp.o: %.cpp
+.PRECIOUS: %.cpp$(E32).o
+%.cpp$(E32).o: %.cpp
 	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
 $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
@@ -215,56 +242,58 @@ ARDUINO_LIBS := \
 		Updater.cpp \
 		base64.cpp \
 	) \
-	$(addprefix ../../libraries/,\
-		$(addprefix ESP8266WiFi/src/,\
-			ESP8266WiFi.cpp \
-			ESP8266WiFiAP.cpp \
-			ESP8266WiFiGeneric.cpp \
-			ESP8266WiFiMulti.cpp \
-			ESP8266WiFiSTA-WPS.cpp \
-			ESP8266WiFiSTA.cpp \
-			ESP8266WiFiScan.cpp \
-			WiFiClient.cpp \
-			WiFiUdp.cpp \
-			WiFiClientSecureBearSSL.cpp \
-			WiFiServerSecureBearSSL.cpp \
-			BearSSLHelpers.cpp \
-			CertStoreBearSSL.cpp \
-		) \
-		$(addprefix ESP8266WebServer/src/,\
-			ESP8266WebServer.cpp \
-			Parsing.cpp \
-			detail/mimetable.cpp \
-		) \
-		ESP8266mDNS/src/LEAmDNS.cpp \
-		ESP8266mDNS/src/LEAmDNS_Control.cpp \
-		ESP8266mDNS/src/LEAmDNS_Helpers.cpp \
-		ESP8266mDNS/src/LEAmDNS_Structs.cpp \
-		ESP8266mDNS/src/LEAmDNS_Transfer.cpp \
-		ESP8266mDNS/src/ESP8266mDNS.cpp \
-		ArduinoOTA/ArduinoOTA.cpp \
-		DNSServer/src/DNSServer.cpp \
-		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
-		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-	) \
+	$(addprefix ../../libraries/ESP8266WiFi/src/,\
+		ESP8266WiFi.cpp \
+		ESP8266WiFiAP.cpp \
+		ESP8266WiFiGeneric.cpp \
+		ESP8266WiFiMulti.cpp \
+		ESP8266WiFiSTA-WPS.cpp \
+		ESP8266WiFiSTA.cpp \
+		ESP8266WiFiScan.cpp \
+		WiFiClient.cpp \
+		WiFiUdp.cpp \
+		WiFiClientSecureBearSSL.cpp \
+		WiFiServerSecureBearSSL.cpp \
+		BearSSLHelpers.cpp \
+		CertStoreBearSSL.cpp \
+	)
 
-MOCK_ARDUINO_LIBS := \
-	common/ClientContextSocket.cpp \
-	common/ClientContextTools.cpp \
-	common/MockWiFiServerSocket.cpp \
-	common/MockWiFiServer.cpp \
-	common/UdpContextSocket.cpp \
-	common/HostWiring.cpp \
-	common/MockEsp.cpp \
-	common/MockEEPROM.cpp \
-	common/MockSPI.cpp \
+OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
+	$(addprefix ESP8266WebServer/src/,\
+		detail/mimetable.cpp \
+	) \
+	$(addprefix ESP8266mDNS/src/,\
+		LEAmDNS.cpp \
+		LEAmDNS_Control.cpp \
+		LEAmDNS_Helpers.cpp \
+		LEAmDNS_Structs.cpp \
+		LEAmDNS_Transfer.cpp \
+		ESP8266mDNS.cpp \
+	) \
+	ArduinoOTA/ArduinoOTA.cpp \
+	DNSServer/src/DNSServer.cpp \
+	ESP8266AVRISP/src/ESP8266AVRISP.cpp \
+	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+)
+
+MOCK_ARDUINO_LIBS := $(addprefix common/,\
+	ClientContextSocket.cpp \
+	ClientContextTools.cpp \
+	MockWiFiServerSocket.cpp \
+	MockWiFiServer.cpp \
+	UdpContextSocket.cpp \
+	HostWiring.cpp \
+	MockEsp.cpp \
+	MockEEPROM.cpp \
+	MockSPI.cpp \
+)
 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
 	$(CORE_CPP_FILES) \
 	$(MOCK_ARDUINO_LIBS) \
+	$(OPT_ARDUINO_LIBS) \
 	$(ARDUINO_LIBS) \
-
 
 LIBSSLFILE = ../../tools/sdk/ssl/bearssl/build$(N32)/libbearssl.a
 ifeq (,$(wildcard $(LIBSSLFILE)))
@@ -280,13 +309,13 @@ USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd
 USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp; do test -r $$ss && echo $$ss; done; done)
 INC_PATHS += $(USERLIBDIRS)
 INC_PATHS += -I$(INODIR)/..
-CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o)
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o)
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	$(VERBAR) ar -rcu $@ $^
 	$(VERBAR) ranlib -c $@
 
-%: %.ino.cpp.o bin/fullcore.a
+%: %.ino.cpp$(E32).o bin/fullcore.a
 	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
 	@echo "----> $@ <----"
 
@@ -339,3 +368,4 @@ help:
 	@echo ""
 	@sed -rne 's,([^: \t]*):[^=#]*#[\t ]*(.*),\1 - \2,p' $(MAKEFILE)
 	@echo ""
+	

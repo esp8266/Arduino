@@ -32,6 +32,8 @@
 #include <Esp.h>
 #include <eboot_command.h>
 
+#include <sys/time.h>
+
 #include <stdlib.h>
 
 unsigned long long operator"" _kHz(unsigned long long x) {
@@ -81,7 +83,7 @@ EspClass ESP;
 
 void EspClass::restart ()
 {
-	fprintf(stderr, MOCK "Esp.restart(): exiting\n");
+	mockverbose("Esp.restart(): exiting\n");
 	exit(EXIT_SUCCESS);
 }
 
@@ -92,6 +94,7 @@ uint32_t EspClass::getChipId()
 
 bool EspClass::checkFlashConfig(bool needsEquals)
 {
+	(void) needsEquals;
 	return true;
 }
 
@@ -105,8 +108,43 @@ uint32_t EspClass::getFreeHeap()
 	return 30000;
 }
 
+String EspClass::getResetReason()
+{
+  return "Power on";
+}
+
+uint32_t EspClass::getFreeSketchSpace()
+{
+  return 4 * 1024 * 1024;
+}
+
+uint8_t EspClass::getCpuFreqMHz()
+{
+  return 160;
+}
+
+const char *EspClass::getSdkVersion()
+{
+  return "2.5.0";
+}
+
+uint32_t EspClass::getFlashChipSpeed()
+{
+  return 40;
+}
+
+void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag) {
+  uint32_t hf = 10 * 1024;
+  float hm = 1 * 1024;
+
+  if (hfree) *hfree = hf;
+  if (hmax) *hmax = hm;
+  if (hfrag) *hfrag = 100 - (sqrt(hm) * 100) / hf;
+}
+
 bool EspClass::flashEraseSector(uint32_t sector)
 {
+	(void) sector;
 	return true;
 }
 
@@ -117,6 +155,7 @@ FlashMode_t EspClass::getFlashChipMode()
 
 FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 {
+	(void) byte;
 	return FM_DOUT;
 }
 
@@ -181,3 +220,9 @@ void EspClass::resetFreeContStack()
 {
 }
 
+uint32_t EspClass::getCycleCount()
+{
+    timeval t;
+    gettimeofday(&t, NULL);
+    return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
+}
