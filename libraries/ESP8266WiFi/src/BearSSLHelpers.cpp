@@ -848,6 +848,10 @@ const void *HashSHA256::hash() {
   return (const void*) _sha256;
 }
 
+const unsigned char *HashSHA256::oid() {
+    return BR_HASH_OID_SHA256;
+}
+
 // SHA256 verifier
 uint32_t SigningVerifier::length()
 {
@@ -869,7 +873,7 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
     bool ret;
     unsigned char vrf[hash->len()];
     br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
-    ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
+    ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), sizeof(vrf), _pubKey->getRSA(), vrf);
     if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
       return false;
     } else {
