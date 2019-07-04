@@ -375,7 +375,7 @@ int MDNSResponder::queryService(char *service, char *proto) {
 #ifdef DEBUG_ESP_MDNS_TX
   DEBUG_ESP_PORT.println("Waiting for answers..");
 #endif
-  interruptable_delay(1000);
+  delay(1000);
 
   _waitingForAnswers = false;
 
