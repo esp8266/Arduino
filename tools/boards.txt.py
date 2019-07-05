@@ -1186,6 +1186,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         else:
             spiffs_blocksize = 8192
 
+    max_ota_size = min(max_upload_size, spiffs_start / 2) # =(max_upload_size+empty_size)/2
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
     strspiffs = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
     strspiffs_strip = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
@@ -1193,9 +1194,9 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
     menu = '.menu.eesz.' + strsize + strspiffs_strip
     menub = menu + '.build.'
-    desc = 'no' if (spiffs_kb == 0) else strspiffs
+    desc = 'no' if (spiffs_kb == 0) else strspiffs + 'B'
     d = collections.OrderedDict([
-        ( menu, strsize + ' (' + desc + ' SPIFFS)' ),
+        ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
         ( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
         ( menub + 'flash_ld', ld ),
@@ -1252,10 +1253,10 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
-        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
-        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+        print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+        print("PROVIDE ( _FS_page = 0x%X );" % page)
+        print("PROVIDE ( _FS_block = 0x%X );" % block)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
@@ -1343,8 +1344,10 @@ def sdk ():
     return { 'sdk': collections.OrderedDict([
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                        ('.menu.sdk.nonosdk222', 'nonos-sdk 2.2.2-190313 (testing)'),
-                        ('.menu.sdk.nonosdk222.build.sdk', 'NONOSDK22x'),
+                        ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
+                        ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
+                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
+                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
                         ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])

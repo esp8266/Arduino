@@ -44,6 +44,7 @@
 bool user_exit = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
+size_t littlefs_kb = 1024;
 bool ignore_sigint = false;
 bool restore_tty = false;
 bool mockdebug = false;
@@ -127,9 +128,10 @@ void help (const char* argv0, int exitcode)
 		"	-f             - no throttle (possibly 100%%CPU)\n"
 		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
+		"	-L             - littlefs size in KBytes (default: %zd)\n"
 		"	-v             - mock verbose\n"
 		"                  (negative value will force mismatched size)\n"
-		, argv0, MOCK_PORT_SHIFTER, spiffs_kb);
+		, argv0, MOCK_PORT_SHIFTER, spiffs_kb, littlefs_kb);
 	exit(exitcode);
 }
 
@@ -143,12 +145,14 @@ static struct option options[] =
 	{ "verbose",		no_argument,		NULL, 'v' },
 	{ "interface",		required_argument,	NULL, 'i' },
 	{ "spiffskb",		required_argument,	NULL, 'S' },
+	{ "littlefskb",		required_argument,	NULL, 'L' },
 	{ "portshifter",	required_argument,	NULL, 's' },
 };
 
 void cleanup ()
 {
 	mock_stop_spiffs();
+//	mock_stop_littlefs();
 	mock_stop_uart();
 }
 
@@ -204,6 +208,9 @@ int main (int argc, char* const argv [])
 		case 'S':
 			spiffs_kb = atoi(optarg);
 			break;
+		case 'L':
+			littlefs_kb = atoi(optarg);
+			break;
 		case 'b':
 			blocking_uart = true;
 			break;
@@ -224,6 +231,15 @@ int main (int argc, char* const argv [])
 		name += String(spiffs_kb > 0? spiffs_kb: -spiffs_kb, DEC);
 		name += "KB";
 		mock_start_spiffs(name, spiffs_kb);
+	}
+
+	if (littlefs_kb)
+	{
+		String name = argv[0];
+		name += "-littlefs";
+		name += String(littlefs_kb > 0? littlefs_kb: -littlefs_kb, DEC);
+		name += "KB";
+//		mock_start_littlefs(name, littlefs_kb);
 	}
 
 	// setup global global_ipv4_netfmt

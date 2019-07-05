@@ -8,16 +8,21 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 
 TEST_CASE("If randomSeed is not called, random() uses hardware PRNG", "[random]")
 {
     int32_t data[32];
     srand(10);
-    for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
+    for (size_t i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
         data[i] = random(0x7fffffff);
     }
     srand(10);
-    for (int i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
+    for (size_t i = 0; i < sizeof(data)/sizeof(data[0]); ++i) {
         CHECK(random(0x7fffffff) != data[i]);
     }
 }
@@ -44,7 +49,7 @@ TEST_CASE("If randomSeed is called, we get same random sequence every time", "[r
         730240988, 786466794, 1411137128, 1680096093, 
     };
     randomSeed(42);
-    for (int i = 0; i < sizeof(reference_sequence)/sizeof(reference_sequence[0]); ++i) {
+    for (size_t i = 0; i < sizeof(reference_sequence)/sizeof(reference_sequence[0]); ++i) {
         CHECK(random(0x7fffffff) == reference_sequence[i]);
     }
 }

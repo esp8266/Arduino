@@ -63,3 +63,9 @@ extern "C" void delayMicroseconds(unsigned int us)
 {
     usleep(us);
 }
+
+#include "cont.h"
+cont_t* g_pcont = NULL;
+extern "C" void cont_yield(cont_t*)
+{
+}
