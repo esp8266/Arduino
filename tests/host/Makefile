@@ -260,8 +260,6 @@ ARDUINO_LIBS := \
 
 OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	$(addprefix ESP8266WebServer/src/,\
-		ESP8266WebServer.cpp \
-		Parsing.cpp \
 		detail/mimetable.cpp \
 	) \
 	$(addprefix ESP8266mDNS/src/,\
