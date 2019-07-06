@@ -24,7 +24,10 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED);
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    WiFi.begin(ssid, pass);
+    Serial.println("WiFi failed, retrying.");
+  }
 
   MDNS.begin(host);
   MDNS.addService("avrisp", "tcp", port);

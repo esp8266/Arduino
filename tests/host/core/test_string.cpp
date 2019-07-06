@@ -494,3 +494,21 @@ TEST_CASE("Strings with NULs", "[core][String]")
   const char *p = str3.c_str();
   REQUIRE(!memcmp(p, zeros, 64));
 }
+
+TEST_CASE("Replace and string expansion", "[core][String]")
+{
+  String s, l;
+  // Make these large enough to span SSO and non SSO
+  String whole = "#123456789012345678901234567890";
+  const char *res = "abcde123456789012345678901234567890";
+  for (size_t i=1; i < whole.length(); i++) {
+    s = whole.substring(0, i);
+    l = s;
+    l.replace("#", "abcde");
+    char buff[64];
+    strcpy(buff, res);
+    buff[5 + i-1] = 0;
+    REQUIRE(!strcmp(l.c_str(), buff));
+    REQUIRE(l.length() == strlen(buff));
+  }
+}

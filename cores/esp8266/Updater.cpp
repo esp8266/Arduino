@@ -1,7 +1,6 @@
 #include "Updater.h"
 #include "Arduino.h"
 #include "eboot_command.h"
-#include <interrupts.h>
 #include <esp8266_peri.h>
 
 //#define DEBUG_UPDATER Serial

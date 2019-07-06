@@ -258,6 +258,9 @@ public:
 
     void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
     {
+        (void) idle_sec;
+        (void) intv_sec;
+        (void) count;
         mockverbose("TODO ClientContext::keepAlive()\n");
     }
 

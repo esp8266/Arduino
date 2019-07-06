@@ -657,9 +657,7 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
             return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
         }
 
-        if(payload && size > 0) {
-            addHeader(F("Content-Length"), String(size));
-        }
+        addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
 
         // send Header
         if(!sendHeader(type)) {
@@ -764,7 +762,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
     if(buff) {
         // read all data from stream and send it to server
-        while(connected() && (stream->available() > -1) && (len > 0 || len == -1)) {
+        while(connected() && (stream->available() > 0) && (len > 0 || len == -1)) {
 
             // get available data size
             int sizeAvailable = stream->available();
