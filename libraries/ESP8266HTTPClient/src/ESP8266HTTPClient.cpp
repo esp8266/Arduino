@@ -1202,7 +1202,7 @@ bool HTTPClient::connect(void)
  * @return status
  */
 bool HTTPClient::sendHeader(const char * type)
-{ 
+{
     if(!connected()) {
         return false;
     }
