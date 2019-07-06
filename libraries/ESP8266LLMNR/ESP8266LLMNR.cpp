@@ -113,7 +113,7 @@ bool LLMNRResponder::_restart() {
 
     IPAddress llmnr(LLMNR_MULTICAST_ADDR);
 
-    if (igmp_joingroup(IP4_ADDR_ANY4, llmnr) != ERR_OK)
+    if (igmp_joingroup((ip_addr_t*)IP4_ADDR_ANY4, llmnr) != ERR_OK)
         return false;
 
     _conn = new UdpContext;
