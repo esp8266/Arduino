@@ -153,6 +153,7 @@ FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
+FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
 CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
 CFLAGS += -std=c99 $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
@@ -260,8 +261,6 @@ ARDUINO_LIBS := \
 
 OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	$(addprefix ESP8266WebServer/src/,\
-		ESP8266WebServer.cpp \
-		Parsing.cpp \
 		detail/mimetable.cpp \
 	) \
 	$(addprefix ESP8266mDNS/src/,\
