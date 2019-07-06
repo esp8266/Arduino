@@ -156,7 +156,7 @@ bool ESP8266NetBIOS::begin(const char *name)
     }
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
-    err_t err = udp_bind(_pcb, INADDR_ANY, NBNS_PORT);
+    err_t err = udp_bind(_pcb, (const ip_addr_t*)INADDR_ANY, NBNS_PORT);
     if(err != ERR_OK) {
         end();
         return false;
