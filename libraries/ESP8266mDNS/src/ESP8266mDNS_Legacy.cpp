@@ -198,7 +198,7 @@ bool MDNSResponder::_listen() {
 
     IPAddress mdns(MDNS_MULTICAST_ADDR);
 
-    if (igmp_joingroup(IP4_ADDR_ANY4, mdns)!= ERR_OK) {
+    if (igmp_joingroup((ip_addr_t *)IP4_ADDR_ANY4, mdns)!= ERR_OK) {
       return false;
     }
 
