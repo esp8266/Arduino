@@ -1051,7 +1051,9 @@ bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeFn p_
 
 bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn) {
     using namespace std::placeholders;
-    return setHostProbeResultCallback([resp=std::ref(*this), pfn](const char* p_pcDomainName, bool p_bProbeResult) { pfn(resp, p_pcDomainName, p_bProbeResult); });
+    return setHostProbeResultCallback(std::bind(pfn, std::ref(*this), _1, _2));
+// EFP3 - revert to std::bind to avoid C++14-ism
+//    return setHostProbeResultCallback([resp=std::ref(*this), pfn](const char* p_pcDomainName, bool p_bProbeResult) { pfn(resp, p_pcDomainName, p_bProbeResult); });
 }
 
 /*
@@ -1080,9 +1082,9 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
                                                   MDNSResponder::MDNSServiceProbeFn1 p_fnCallback) {
     using namespace std::placeholders;
-    return setServiceProbeResultCallback(p_hService, [resp=std::ref(*this), p_fnCallback](const char* p_pcServiceName, const hMDNSService p_hMDNSService, bool p_bProbeResult) {
-        p_fnCallback(resp, p_pcServiceName, p_hMDNSService, p_bProbeResult);
-    });
+    return setServiceProbeResultCallback(p_hService, std::bind(p_fnCallback, std::ref(*this), _1, _2, _3));
+// EFP3 - revert to std::bind to avoid C++14-ism
+//return setServiceProbeResultCallback(p_hService, [resp=std::ref(*this), p_fnCallback](const char* p_pcServiceName, const hMDNSService p_hMDNSService, bool p_bProbeResult) { p_fnCallback(resp, p_pcServiceName, p_hMDNSService, p_bProbeResult); });
 }
 
 
