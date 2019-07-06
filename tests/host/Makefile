@@ -26,6 +26,7 @@ $(warning Cannot compile in 32 bit mode, switching to native mode)
 else
 N32 = 32
 M32 = -m32
+E32 = .32
 endif
 endif
 
@@ -152,6 +153,7 @@ FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
+FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
 CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
 CFLAGS += -std=c99 $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
@@ -163,10 +165,10 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 C_SOURCE_FILES = $(MOCK_C_FILES) $(CORE_C_FILES)
 CPP_SOURCE_FILES = $(MOCK_CPP_FILES) $(CORE_CPP_FILES) $(TEST_CPP_FILES)
-C_OBJECTS = $(C_SOURCE_FILES:.c=.c.o)
+C_OBJECTS = $(C_SOURCE_FILES:.c=.c$(E32).o)
 
-CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp.o) $(CORE_CPP_FILES:.cpp=.cpp.o)
-CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp.o)
+CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp$(E32).o) $(CORE_CPP_FILES:.cpp=.cpp$(E32).o)
+CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp$(E32).o)
 
 CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 
@@ -183,7 +185,10 @@ doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
-clean: clean-objects clean-coverage	# clean everything
+clean:
+	make FORCE32=0 cleanarch; make FORCE32=1 cleanarch
+
+cleanarch: clean-objects clean-coverage	# clean everything
 	rm -rf $(BINDIR)
 
 clean-objects:
@@ -215,11 +220,11 @@ build-info:				# show toolchain version
 -include $(BINDIR)/.*.d
 .SUFFIXES:
 
-%.c.o: %.c
+%.c$(E32).o: %.c
 	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
-.PRECIOUS: %.cpp.o
-%.cpp.o: %.cpp
+.PRECIOUS: %.cpp$(E32).o
+%.cpp$(E32).o: %.cpp
 	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
 $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
@@ -256,8 +261,6 @@ ARDUINO_LIBS := \
 
 OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	$(addprefix ESP8266WebServer/src/,\
-		ESP8266WebServer.cpp \
-		Parsing.cpp \
 		detail/mimetable.cpp \
 	) \
 	$(addprefix ESP8266mDNS/src/,\
@@ -307,13 +310,13 @@ USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd
 USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp; do test -r $$ss && echo $$ss; done; done)
 INC_PATHS += $(USERLIBDIRS)
 INC_PATHS += -I$(INODIR)/..
-CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o)
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o)
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	$(VERBAR) ar -rcu $@ $^
 	$(VERBAR) ranlib -c $@
 
-%: %.ino.cpp.o bin/fullcore.a
+%: %.ino.cpp$(E32).o bin/fullcore.a
 	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
 	@echo "----> $@ <----"
 

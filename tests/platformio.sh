@@ -12,7 +12,7 @@ function install_platformio()
     ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
     # - esp8266/examples/ConfigFile
-    pio lib install "ArduinoJson@^5.13.4"
+    pio lib install "ArduinoJson@^6.11.0"
 }
 
 function build_sketches_with_platformio()
