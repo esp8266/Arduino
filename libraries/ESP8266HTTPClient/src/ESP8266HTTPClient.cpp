@@ -225,6 +225,11 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
         return false;
     }
     _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    if(!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create trainsport traits\n");
+        return false;
+    }
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
     return true;
 }
@@ -242,6 +247,11 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
         return false;
     }
     _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
+    if(!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create trainsport traits\n");
+        return false;
+    }
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] BearSSL-httpsFingerprint:");
     for (size_t i=0; i < 20; i++) {
         DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
@@ -1150,6 +1160,9 @@ bool HTTPClient::connect(void)
 #if HTTPCLIENT_1_1_COMPATIBLE
     if(!_client && _transportTraits) {
         _tcpDeprecated = _transportTraits->create();
+        if(!_tcpDeprecated) {
+            DEBUG_HTTPCLIENT("[HTTP-Client] connect: could not create tcp\n");
+        }
         _client = _tcpDeprecated.get();
     }
 #endif
@@ -1266,7 +1279,9 @@ int HTTPClient::handleHeaderResponse()
             DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
             if(headerLine.startsWith("HTTP/1.")) {
-                _canReuse = (headerLine[sizeof "HTTP/1."] != '0');
+                if(_canReuse) {
+                    _canReuse = (headerLine[sizeof "HTTP/1." - 1] != '0');
+                }
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
             } else if(headerLine.indexOf(':')) {
                 String headerName = headerLine.substring(0, headerLine.indexOf(':'));
