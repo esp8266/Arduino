@@ -111,12 +111,12 @@
                "toolsDependencies": [
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-0-99f8e128",
+                     "version": "3.0.0-0-0f7886a4",
                      "name": "xtensa-lx106-elf-gcc"
                   },
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-0-99f8e128",
+                     "version": "3.0.0-0-0f7886a4",
                      "name": "mkspiffs"
                   },
                   {
@@ -192,27 +192,27 @@
                ]
             },
             {
-               "version": "3.0.0-0-99f8e128",
+               "version": "3.0.0-0-0f7886a4",
                "name": "xtensa-lx106-elf-gcc",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-0/x86_64-linux-gnu.xtensa-lx106-elf-99f8e128.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-99f8e128.tar.gz",
-                     "checksum": "SHA-256:b890e7e4cef2c0fcf1480836d3abf1ace5c9751ccd52259e139dfe9f526a785b",
-                     "size": "56246051"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-0/x86_64-linux-gnu.xtensa-lx106-elf-0f7886a4.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-0f7886a4.tar.gz",
+                     "checksum": "SHA-256:1fef337793b16a0cade4665d3f1217952b4f44f844b1f7a4258334db91e2f0af",
+                     "size": "56244717"
                   }
                ]
             },
             {
-               "version": "3.0.0-0-99f8e128",
+               "version": "3.0.0-0-0f7886a4",
                "name": "mkspiffs",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-0/x86_64-linux-gnu.mkspiffs-7fefeac.tar.gz",
                      "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.tar.gz",
-                     "checksum": "SHA-256:467d15c09f54e105f8086800a3683d0726da72814ca571a7ac2cbe1828fb35c9",
+                     "checksum": "SHA-256:6156549b4e85f9c924dfdcd43248692dac8846ea3c5a627affac69cb3a5c8517",
                      "size": "52440"
                   }
                ]
