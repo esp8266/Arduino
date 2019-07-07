@@ -127,6 +127,8 @@ SECTIONS
     *(.init.literal)
     *(.init)
 
+    *(.text.app_entry*)  /* The main startup code */
+
     /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
     *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
   } >iram1_0_seg :iram1_0_phdr
