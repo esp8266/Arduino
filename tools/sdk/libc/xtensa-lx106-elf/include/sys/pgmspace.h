@@ -57,13 +57,13 @@ extern "C" {
 #define pgm_read_dword_with_offset(addr, res) \
   asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
       "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
-      "l32i     a13, %1, 0\n" \
-      "l32i     a14, %1, 4\n" \
+      "l32i     a15, %1, 0\n" \
+      "l32i     %1, %1, 4\n" \
       "ssa8l    %0\n" \
-      "src      %0, a14, a13\n" \
+      "src      %0, %1, a15\n" \
       :"=r"(res), "=r"(addr) \
       :"1"(addr) \
-      :"a13", "a14");
+      :"a15");
 
 static inline uint8_t pgm_read_byte_inlined(const void* addr) {
   register uint32_t res;
