@@ -110,8 +110,93 @@ extern char _heap_start;
  * called from within umm_malloc()
  */
 
-#define UMM_CRITICAL_ENTRY() ets_intr_lock()
-#define UMM_CRITICAL_EXIT()  ets_intr_unlock()
+/*
+  Per Devyte, the core currently doesn't support masking a specific interrupt
+  level. That doesn't mean it can't be implemented, only that at this time
+  locking is implemented as all or nothing.
+  https://github.com/esp8266/Arduino/issues/6246#issuecomment-508612609
+
+  So for now we default to all, 15.
+ */
+#ifndef DEFAULT_CRITICAL_SECTION_INTLEVEL
+#define DEFAULT_CRITICAL_SECTION_INTLEVEL 15
+#endif
+
+#define UMM_CRITICAL_PERIOD_ANALYZE
+
+#ifndef __STRINGIFY
+#define __STRINGIFY(a) #a
+#endif
+/*
+  Copy paste xt_rsil and xt_wsr_ps from Arduino.h
+ */
+#ifndef xt_rsil
+#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state)); state;}))
+#endif
+#ifndef xt_wsr_ps
+#define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
+#endif
+
+#if !defined(UMM_CRITICAL_PERIOD_ANALYZE)
+// This method preserves the intlevel on entry and restores the
+// original intlevel at exit.
+#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+#define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
+#define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
+
+#else
+// This option adds support for gathering time locked data
+typedef struct _TIME_STAT {
+  uint32_t min;
+  uint32_t max;
+  uint32_t start;
+  uint32_t intlevel;
+} time_stat_t;
+
+struct _UMM_TIME_STATS {
+  time_stat_t id_malloc;
+  time_stat_t id_realloc;
+  time_stat_t id_free;
+  time_stat_t id_info;
+};
+
+bool get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t size);
+
+static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
+  uint32_t ccount;
+  // Not sure esync is needed before "rsr %0,CCOUNT". I don't see it in
+  // Espressf SDK or Xtensa clock.S file.
+  //  __asm__ __volatile__("esync; rsr %0,ccount":"=a"(ccount)::"memory");
+  __asm__ __volatile__("rsr %0,ccount":"=a"(ccount)::"memory");
+  return ccount;
+}
+
+static inline void _critical_entry(time_stat_t *p, uint32_t *saved_ps) {
+    *saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
+    if (0U != (*saved_ps & 0x0FU)) {
+        p->intlevel += 1U;
+        // inflight_stack_trace(*saved_ps);
+    }
+
+    p->start = GetCycleCount();
+}
+
+static inline void _critical_exit(time_stat_t *p, uint32_t *saved_ps) {
+    uint32_t elapse = GetCycleCount() - p->start;
+    if (elapse < p->min)
+        p->min = elapse;
+
+    if (elapse > p->max)
+        p->max = elapse;
+
+    xt_wsr_ps(*saved_ps);
+}
+
+#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+#define UMM_CRITICAL_ENTRY(tag) _critical_entry(&time_stats.tag, &_saved_ps_##tag)
+#define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
+
+#endif
 
 /*
  * -D UMM_INTEGRITY_CHECK :
