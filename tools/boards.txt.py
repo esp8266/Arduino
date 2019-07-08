@@ -68,7 +68,7 @@ boards = collections.OrderedDict([
             'crystalfreq_menu',
             'flashfreq_menu',
             'flashmode_menu',
-            '512K', '1M', '2M', '4M', '8M', '16M',
+            '1M', '2M', '4M', '8M', '16M', '512K',
             'led',
             'sdk',
             ],
@@ -1277,12 +1277,6 @@ def all_flash_map ():
 
     #                      flash(KB) spiffs(KB)
 
-    f512.update(flash_map(     512))
-    f512.update(flash_map(     512,      32 ))
-    f512.update(flash_map(     512,      64 ))
-    f512.update(flash_map(     512,     128 ))
-
-    f1m.update( flash_map(    1024))
     f1m.update( flash_map(    1024,      64 ))
     f1m.update( flash_map(    1024,     128 ))
     f1m.update( flash_map(    1024,     144 ))
@@ -1290,23 +1284,29 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     192 ))
     f1m.update( flash_map(    1024,     256 ))
     f1m.update( flash_map(    1024,     512 ))
+    f1m.update( flash_map(    1024))
 
-    f2m.update( flash_map(  2*1024))
     f2m.update( flash_map(  2*1024,     128 ))
     f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
     f2m.update( flash_map(  2*1024,    1024 ))
+    f2m.update( flash_map(  2*1024))
 
-    f4m.update( flash_map(  4*1024))
-    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024,  2*1024 ))
+    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024,  3*1024 ))
+    f4m.update( flash_map(  4*1024))
 
     f8m.update( flash_map(  8*1024,  6*1024 ))
     f8m.update( flash_map(  8*1024,  7*1024 ))
 
     f16m.update(flash_map( 16*1024, 14*1024 ))
     f16m.update(flash_map( 16*1024, 15*1024 ))
+
+    f512.update(flash_map(     512,      32 ))
+    f512.update(flash_map(     512,      64 ))
+    f512.update(flash_map(     512,     128 ))
+    f512.update(flash_map(     512))
 
     if ldgen:
         print("generated: ldscripts (in %s)" % lddir)
