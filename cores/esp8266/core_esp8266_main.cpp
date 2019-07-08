@@ -236,8 +236,8 @@ void init_done() {
 
 */
 
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) __attribute__((weak));
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
+extern "C" void app_entry_redefinable(void) __attribute__((weak));
+extern "C" void app_entry_redefinable(void)
 {
     /* Allocate continuation context on this SYS stack,
        and save pointer to it. */
@@ -248,9 +248,9 @@ extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
     call_user_start();
 }
 
-static void ICACHE_RAM_ATTR app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
+static void app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
 
-extern "C" void ICACHE_RAM_ATTR app_entry (void)
+extern "C" void app_entry (void)
 {
     return app_entry_custom();
 }

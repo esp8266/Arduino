@@ -1500,7 +1500,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
 
   ret = probe.readBytes(extBytes, 2);
   handLen -= ret;
-  extLen = extBytes[1] || (extBytes[0]<<8);
+  extLen = extBytes[1] | (extBytes[0]<<8);
   if ((extLen == 0) || (ret != 2)) {
     return _SendAbort(probe, supportsLen);
   }

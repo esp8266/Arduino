@@ -31,8 +31,8 @@ const char* update_password = "admin";
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-BearSSL::ESP8266WebServerSecure httpServer(443);
-ESP8266HTTPUpdateServer httpUpdater;
+ESP8266WebServerSecure httpServer(443);
+ESP8266HTTPUpdateServerSecure httpUpdater;
 
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
@@ -106,7 +106,7 @@ void setup()
 
   MDNS.begin(host);
 
-  httpServer.setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
+  httpServer.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
   httpUpdater.setup(&httpServer, update_path, update_username, update_password);
   httpServer.begin();
 

@@ -165,7 +165,7 @@ void setup(void) {
     Serial.println("MDNS responder started");
   }
 
-  server.setServerKeyAndCert_P(rsakey, sizeof(rsakey), x509, sizeof(x509));
+  server.getServer().setServerKeyAndCert_P(rsakey, sizeof(rsakey), x509, sizeof(x509));
 
   server.on("/", handleRoot);
 

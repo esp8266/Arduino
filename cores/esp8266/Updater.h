@@ -38,6 +38,7 @@ class UpdaterHashClass {
     virtual void end() = 0;
     virtual int len() = 0;
     virtual const void *hash() = 0;
+    virtual const unsigned char *oid() = 0;
 };
 
 // Abstract class to implement a signature verifier
