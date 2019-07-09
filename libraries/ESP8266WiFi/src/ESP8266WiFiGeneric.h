@@ -104,6 +104,7 @@ class ESP8266WiFiGenericClass {
 
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
+        int hostByNameAsync(const char* aHostname, IPAddress& aResult);
         bool getPersistent();
     protected:
 
