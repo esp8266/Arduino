@@ -542,7 +542,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-      # 'serial': '57',
+        'serial': '57',
         'desc': [ '*TODO*' ],
     }),
     ( 'd1_mini', {
@@ -557,7 +557,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-      # 'serial': '921',
+        'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_pro', {
@@ -572,7 +572,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '16M',
             ],
-      # 'serial': '921',
+        'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_lite', {
@@ -587,7 +587,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '1M',
             ],
-      # 'serial': '921',
+        'serial': '921',
         'desc': [ 
             'Parameters in Arduino IDE:',
             '~~~~~~~~~~~~~~~~~~~~~~~~~~',
@@ -625,7 +625,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-      # 'serial': '921',
+        'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'espino', {
@@ -767,7 +767,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-      # 'serial': '921',
+        'serial': '921',
         'desc': [ 'The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.',
                   '',
                   'To make a serial connection, wire the adapter\'s **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.',
@@ -787,7 +787,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-      # 'serial': '921',
+        'serial': '921',
         'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
     }),
     ( 'wifi_slot', {
@@ -1573,7 +1573,7 @@ def usage (name,ret):
 # entry point
 
 lwip = 2
-default_speed = '921'
+default_speed = '115'
 led_default = 2
 led_max = 16
 nofloat = False
