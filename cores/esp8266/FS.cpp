@@ -251,9 +251,12 @@ bool FS::setConfig(const FSConfig &cfg) {
 
 bool FS::begin() {
     if (!_impl) {
+        DEBUGV("#error: FS: no implementation");
         return false;
     }
-    return _impl->begin();
+    bool ret = _impl->begin();
+    DEBUGV("%s\n", ret? "": "#error: FS could not start");
+    return ret;
 }
 
 void FS::end() {
