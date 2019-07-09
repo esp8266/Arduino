@@ -1,7 +1,7 @@
 /* Flash Split for 2M chips */
 /* sketch @0x40200000 (~1019KB) (1044464B) */
 /* empty  @0x402FEFF0 (~516KB) (528400B) */
-/* spiffs @0x40380000 (~492KB) (503808B) */
+/* spiffs @0x40380000 (~488KB) (499712B) */
 /* eeprom @0x403FB000 (4KB) */
 /* rfcal  @0x403FC000 (4KB) */
 /* wifi   @0x403FD000 (12KB) */
@@ -15,7 +15,7 @@ MEMORY
 }
 
 PROVIDE ( _FS_start = 0x40380000 );
-PROVIDE ( _FS_end = 0x403FB000 );
+PROVIDE ( _FS_end = 0x403FA000 );
 PROVIDE ( _FS_page = 0x100 );
 PROVIDE ( _FS_block = 0x2000 );
 
