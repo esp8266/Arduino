@@ -1161,7 +1161,7 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_map (flashsize_kb, spiffs_kb = 0):
+def flash_map (flashsize_kb, fs_kb = 0):
 
     # mapping:
     # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
@@ -1172,29 +1172,32 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     eeprom_size_kb = 4
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
-    spiffs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+    fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
-        max_upload_size = (flashsize_kb - (spiffs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
-        spiffs_start = spiffs_end - spiffs_kb * 1024
-        spiffs_blocksize = 4096
+        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
+        fs_start = fs_end - fs_kb * 1024
     else:
         max_upload_size = 1024 * 1024 - reserved
-        spiffs_start = (flashsize_kb - spiffs_kb) * 1024
-        if spiffs_kb < 512:
-            spiffs_blocksize = 4096
-        else:
-            spiffs_blocksize = 8192
+        fs_start = (flashsize_kb - fs_kb) * 1024
 
-    max_ota_size = min(max_upload_size, spiffs_start / 2) # =(max_upload_size+empty_size)/2
+    if fs_kb < 512:
+        fs_blocksize = 4096
+    else:
+        fs_blocksize = 8192
+
+    # Adjust SPIFFS_end to be a multiple of the block size
+    fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start;
+
+    max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
-    strspiffs = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
-    strspiffs_strip = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
+    strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
+    strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
 
-    ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
-    menu = '.menu.eesz.' + strsize + strspiffs_strip
+    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
+    menu = '.menu.eesz.' + strsize + strfs_strip
     menub = menu + '.build.'
-    desc = 'no' if (spiffs_kb == 0) else strspiffs + 'B'
+    desc = 'no' if (fs_kb == 0) else strfs + 'B'
     d = collections.OrderedDict([
         ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
@@ -1204,11 +1207,11 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    if spiffs_kb > 0:
+    if fs_kb > 0:
         d.update(collections.OrderedDict([
-            ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
-            ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
+            ( menub + 'spiffs_start', "0x%05X" % fs_start ),
+            ( menub + 'spiffs_end', "0x%05X" % fs_end ),
+            ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
             ]))
 
     if ldshow:
@@ -1224,23 +1227,19 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             realstdout = sys.stdout
             sys.stdout = open(lddir + ld, 'w')
 
-        if spiffs_kb == 0:
-            spiffs_start = spiffs_end
+        if fs_kb == 0:
+            fs_start = fs_end
             page = 0
-            block = 0
-        elif spiffs_kb < 0x80000 / 1024:
-            page = 0x100
-            block = 0x1000
+            fs_blocksize = 0
         else:
             page = 0x100
-            block = 0x2000
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-        empty_size = spiffs_start - max_upload_size
+        empty_size = fs_start - max_upload_size
         if empty_size > 0:
             print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
+        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
         print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
         print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
         print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
@@ -1253,10 +1252,10 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + spiffs_start))
-        print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
-        print("PROVIDE ( _FS_block = 0x%X );" % block)
+        print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
