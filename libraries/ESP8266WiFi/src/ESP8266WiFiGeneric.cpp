@@ -588,7 +588,7 @@ struct host_struct {
     const char* hostname;
     IPAddress addr;
     int status; // 0 failed, 1 ready, 2 in progress (callback not called)
-}
+};
 
 static struct host_struct host_var = { NULL, IPADDR_ANY, 2 };
 
@@ -615,7 +615,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
         }
         DEBUG_WIFI_GENERIC("[hostByNameAsync] An error occurred!");
     }
-    else if (host_var.hostname == aHostName) { // Better using strcmp ???
+    else if (host_var.hostname == aHostname) { // Better using strcmp ???
         if (host_var.status == 1) {
             aResult = host_var.addr;
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP found!");
@@ -624,7 +624,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP NOT found! Please retry");
         }
         if (host_var.status != 2) {
-            host_var.addr = IPADDR_ANY;
+            host_var.addr = (uint32_t) IPADDR_ANY;
             host_var.hostname = NULL;
             host_var.status = 2;
         }
@@ -637,7 +637,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
 }
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
-    if (ipaddr && *ipaddr != IPADDR_ANY) {
+    if (ipaddr && *ipaddr != (uint32_t) IPADDR_ANY) {
         reinterpret_cast<struct host_struct*>(callback_arg)->addr = IPAddress(ipaddr);
         reinterpret_cast<struct host_struct*>(callback_arg)->status = 1;
     } else {
