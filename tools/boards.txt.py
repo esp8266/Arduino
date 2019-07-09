@@ -68,7 +68,7 @@ boards = collections.OrderedDict([
             'crystalfreq_menu',
             'flashfreq_menu',
             'flashmode_menu',
-            '512K', '1M', '2M', '4M', '8M', '16M',
+            '1M', '2M', '4M', '8M', '16M', '512K',
             'led',
             'sdk',
             ],
@@ -328,7 +328,7 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
-	( 'inventone', {
+    ( 'inventone', {
         'name': 'Invent One',
         'opts': {
             '.build.board': 'ESP8266_GENERIC',
@@ -589,28 +589,28 @@ boards = collections.OrderedDict([
             ],
         'serial': '921',
         'desc': [ 
-			'Parameters in Arduino IDE:',
-			'~~~~~~~~~~~~~~~~~~~~~~~~~~',
-			'',
-			'- Card: "WEMOS D1 Mini Lite"',
-			'- Flash Size: "1M (512K SPIFFS)"',
-			'- CPU Frequency: "80 Mhz"',
-			'- Upload Speed: "230400"',
-			'',
-			'Power:',
-			'~~~~~~',
-			'',
-			'- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
-			'- 3V3 pin : 3.3V 500mA regulated output',
-			'- Digital pins : 3.3V 30mA.',
-			'',
-			'links:',
-			'~~~~~~',
-			'',
-			'- Product page: https://www.wemos.cc/',
-			'- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
-			'- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf',
-			'- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf',
+            'Parameters in Arduino IDE:',
+            '~~~~~~~~~~~~~~~~~~~~~~~~~~',
+            '',
+            '- Card: "WEMOS D1 Mini Lite"',
+            '- Flash Size: "1M (512K SPIFFS)"',
+            '- CPU Frequency: "80 Mhz"',
+          # '- Upload Speed: "230400"',
+            '',
+            'Power:',
+            '~~~~~~',
+            '',
+            '- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
+            '- 3V3 pin : 3.3V 500mA regulated output',
+            '- Digital pins : 3.3V 30mA.',
+            '',
+            'links:',
+            '~~~~~~',
+            '',
+            '- Product page: https://www.wemos.cc/',
+            '- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
+            '- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf',
+            '- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf',
         ],
     }),
     ( 'd1', {
@@ -1197,7 +1197,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
     menu = '.menu.eesz.' + strsize + strfs_strip
     menub = menu + '.build.'
-    desc = 'no' if (fs_kb == 0) else strfs + 'B'
+    desc = 'none' if (fs_kb == 0) else strfs + 'B'
     d = collections.OrderedDict([
         ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
@@ -1276,12 +1276,6 @@ def all_flash_map ():
 
     #                      flash(KB) spiffs(KB)
 
-    f512.update(flash_map(     512))
-    f512.update(flash_map(     512,      32 ))
-    f512.update(flash_map(     512,      64 ))
-    f512.update(flash_map(     512,     128 ))
-
-    f1m.update( flash_map(    1024))
     f1m.update( flash_map(    1024,      64 ))
     f1m.update( flash_map(    1024,     128 ))
     f1m.update( flash_map(    1024,     144 ))
@@ -1289,23 +1283,30 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     192 ))
     f1m.update( flash_map(    1024,     256 ))
     f1m.update( flash_map(    1024,     512 ))
+    f1m.update( flash_map(    1024))
 
-    f2m.update( flash_map(  2*1024))
+    f2m.update( flash_map(  2*1024,      64 ))
     f2m.update( flash_map(  2*1024,     128 ))
     f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
     f2m.update( flash_map(  2*1024,    1024 ))
+    f2m.update( flash_map(  2*1024))
 
-    f4m.update( flash_map(  4*1024))
-    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024,  2*1024 ))
     f4m.update( flash_map(  4*1024,  3*1024 ))
+    f4m.update( flash_map(  4*1024,    1024 ))
+    f4m.update( flash_map(  4*1024))
 
     f8m.update( flash_map(  8*1024,  6*1024 ))
     f8m.update( flash_map(  8*1024,  7*1024 ))
 
     f16m.update(flash_map( 16*1024, 14*1024 ))
     f16m.update(flash_map( 16*1024, 15*1024 ))
+
+    f512.update(flash_map(     512,      32 ))
+    f512.update(flash_map(     512,      64 ))
+    f512.update(flash_map(     512,     128 ))
+    f512.update(flash_map(     512))
 
     if ldgen:
         print("generated: ldscripts (in %s)" % lddir)
@@ -1341,12 +1342,12 @@ def led (default,max):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
-                        ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                        ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
-                        ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
                         ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
                         ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
+                        ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
+                        ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
+                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
+                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
                         ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])
