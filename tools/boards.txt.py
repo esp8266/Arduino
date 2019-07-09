@@ -1285,6 +1285,7 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     512 ))
     f1m.update( flash_map(    1024))
 
+    f2m.update( flash_map(  2*1024,      64 ))
     f2m.update( flash_map(  2*1024,     128 ))
     f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
@@ -1292,8 +1293,8 @@ def all_flash_map ():
     f2m.update( flash_map(  2*1024))
 
     f4m.update( flash_map(  4*1024,  2*1024 ))
-    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024,  3*1024 ))
+    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024))
 
     f8m.update( flash_map(  8*1024,  6*1024 ))
