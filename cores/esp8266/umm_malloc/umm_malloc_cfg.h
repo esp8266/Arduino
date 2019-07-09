@@ -162,7 +162,7 @@ struct _UMM_TIME_STATS {
 
 bool get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t size);
 
-static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
+static inline ICACHE_RAM_ATTR uint32_t _umm_get_cycle_count() {
   uint32_t ccount;
   // Not sure esync is needed before "rsr %0,CCOUNT". I don't see it in
   // Espressf SDK or Xtensa clock.S file.
@@ -178,11 +178,11 @@ static inline void _critical_entry(time_stat_t *p, uint32_t *saved_ps) {
         // inflight_stack_trace(*saved_ps);
     }
 
-    p->start = GetCycleCount();
+    p->start = _umm_get_cycle_count();
 }
 
 static inline void _critical_exit(time_stat_t *p, uint32_t *saved_ps) {
-    uint32_t elapse = GetCycleCount() - p->start;
+    uint32_t elapse = _umm_get_cycle_count() - p->start;
     if (elapse < p->min)
         p->min = elapse;
 
