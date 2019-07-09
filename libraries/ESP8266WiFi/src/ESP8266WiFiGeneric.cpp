@@ -627,8 +627,9 @@ struct host_struct {
     int status; // 0 failed, 1 ready, 2 in progress (callback not called)
 }
 
-static struct host_struct host_var
-    = { NULL, IPADDR_ANY, 2 };
+static struct host_struct host_var = { NULL, IPADDR_ANY, 2 };
+
+void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
 int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult)
 {
