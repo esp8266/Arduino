@@ -48,12 +48,22 @@ extern "C" {
   asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
       "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
       "l32i.n   %1, %1, 0x0\n"      /* Load word from aligned address */ \
-      "slli     %0, %0, 3\n"        /* Mulitiply offset by 8, yielding an offset in bits */ \
-      "ssr      %0\n"               /* Prepare to shift by offset (in bits) */ \
-      "srl      %0, %1\n"           /* Shift right; now the requested byte is the first one */ \
+      "ssa8l    %0\n"               /* Prepare to shift by offset (in bits) */ \
+      "src      %0, %1, %1\n"       /* Shift right; now the requested byte is the first one */ \
       :"=r"(res), "=r"(addr) \
       :"1"(addr) \
       :);
+
+#define pgm_read_dword_with_offset(addr, res) \
+  asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
+      "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
+      "l32i     a15, %1, 0\n" \
+      "l32i     %1, %1, 4\n" \
+      "ssa8l    %0\n" \
+      "src      %0, %1, a15\n" \
+      :"=r"(res), "=r"(addr) \
+      :"1"(addr) \
+      :"a15");
 
 static inline uint8_t pgm_read_byte_inlined(const void* addr) {
   register uint32_t res;
@@ -68,8 +78,6 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
   return (uint16_t) res;    /* This masks the lower half-word from the returned word */
 }
 
-
-
 #define pgm_read_byte(addr)                pgm_read_byte_inlined(addr)
 #define pgm_read_word_aligned(addr)        pgm_read_word_inlined(addr)
 #ifdef __cplusplus
@@ -82,26 +90,16 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
     #define pgm_read_ptr_aligned(addr)     (*(const void* const*)(addr))
 #endif
 
-__attribute__((optimize("-O3"), always_inline)) static inline uint32_t pgm_read_dword_unaligned(const void *addr) {
-    if (!(((int)addr)&3)) return *(const uint32_t *)addr;
-    int off = (((int)addr) & 3) << 3;
-    const uint32_t *p = (const uint32_t *)((int)addr & (~3));
-    uint32_t a = *p++;
-    uint32_t b = *p;
-    return (a>>off) | (b <<(32-off));
+static inline uint32_t pgm_read_dword_unaligned(const void *addr) {
+  uint32_t res;
+  pgm_read_dword_with_offset(addr, res);
+  return res;
 }
 
-__attribute__((optimize("-O3"), always_inline)) static inline float pgm_read_float_unaligned(const void *addr) {
-    return (float)pgm_read_dword_unaligned(addr);
-}
+#define pgm_read_float_unaligned(addr) ((float)pgm_read_dword_unaligned(addr))
+#define pgm_read_ptr_unaligned(addr)   ((void*)pgm_read_dword_unaligned(addr))
+#define pgm_read_word_unaligned(addr)  ((uint16_t)(pgm_read_dword_unaligned(addr) & 0xffff))
 
-__attribute__((optimize("-O3"), always_inline)) static inline void *pgm_read_ptr_unaligned(const void *addr) {
-    return (void *)pgm_read_dword_unaligned(addr);
-}
-
-__attribute__((optimize("-O3"), always_inline)) static inline uint16_t pgm_read_word_unaligned(const void *addr) {
-    return pgm_read_dword_unaligned(addr) & 0xffff;
-}
 
 // Allow selection of _aligned or _unaligned, but default to _unaligned for Arduino compatibility
 // Add -DPGM_READ_UNALIGNED=0 or "#define PGM_READ_UNALIGNED 0" to code to use aligned-only (faster) macros by default

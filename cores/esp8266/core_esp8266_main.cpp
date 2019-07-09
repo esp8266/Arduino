@@ -84,22 +84,27 @@ void preloop_update_frequency() {
 }
 
 
+static inline void esp_yield_within_cont() __attribute__((always_inline));
+static void esp_yield_within_cont() {
+        cont_yield(g_pcont);
+        run_scheduled_recurrent_functions();
+}
+
 extern "C" void esp_yield() {
     if (cont_can_yield(g_pcont)) {
-        cont_yield(g_pcont);
+        esp_yield_within_cont();
     }
 }
 
 extern "C" void esp_schedule() {
     // always on CONT stack here
-    run_scheduled_functions();
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
     if (cont_can_yield(g_pcont)) {
         esp_schedule();
-        cont_yield(g_pcont); //esp_yield();
+        esp_yield_within_cont();
     }
     else {
         panic();
@@ -124,6 +129,8 @@ static void loop_wrapper() {
         setup_done = true;
     }
     loop();
+    run_scheduled_functions();
+    run_scheduled_recurrent_functions();
     esp_schedule();
 }
 
@@ -229,8 +236,8 @@ void init_done() {
 
 */
 
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) __attribute__((weak));
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
+extern "C" void app_entry_redefinable(void) __attribute__((weak));
+extern "C" void app_entry_redefinable(void)
 {
     /* Allocate continuation context on this SYS stack,
        and save pointer to it. */
@@ -241,9 +248,9 @@ extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
     call_user_start();
 }
 
-static void ICACHE_RAM_ATTR app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
+static void app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
 
-extern "C" void ICACHE_RAM_ATTR app_entry (void)
+extern "C" void app_entry (void)
 {
     return app_entry_custom();
 }

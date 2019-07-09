@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 V ?= 0
 TEST_LIST ?= $(wildcard test_*/*.ino)
-ESP8266_CORE_PATH ?= ../..
+ESP8266_CORE_PATH ?= $(realpath ../..)
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
 #PYTHON ?= python3
@@ -23,6 +23,7 @@ TEST_REPORT_HTML := test_report.html
 
 ifneq ("$(V)","1")
 	SILENT = @
+	REDIR = >& /dev/null
 else
 	BUILDER_DEBUG_FLAG = -verbose
 	RUNNER_DEBUG_FLAG = -d
@@ -34,20 +35,27 @@ all: count tests test_report
 
 $(TEST_LIST): | virtualenv $(TEST_CONFIG) $(BUILD_DIR) $(HARDWARE_DIR)
 
-tests: $(TEST_LIST)
+tests: showtestlist $(TEST_LIST)
+
+showtestlist:
+	@echo "-------------------------------- test list:"
+	@echo $(TEST_LIST)
+	@echo "--------------------------------"
 
 $(TEST_LIST): LOCAL_BUILD_DIR=$(BUILD_DIR)/$(notdir $@)
 
 $(TEST_LIST):
-	@echo Running $(words $(TEST_LIST)) tests
+	@echo "--------------------------------"
+	@echo "Running test '$@' of $(words $(TEST_LIST)) tests"
 	$(SILENT)mkdir -p $(LOCAL_BUILD_DIR)
 ifneq ("$(NO_BUILD)","1")
 	@test -n "$(ARDUINO_IDE_PATH)" || (echo "Please export ARDUINO_IDE_PATH" && exit 1)
 	@echo Compiling $(notdir $@)
+	@rm -f $(LOCAL_BUILD_DIR)/build.options.json
 	$(SILENT)$(BUILD_TOOL) -compile -logger=human \
 		-libraries "$(PWD)/libraries" \
 		-core-api-version="10608" \
-		-warnings=none \
+		-warnings=all \
 		$(BUILDER_DEBUG_FLAG) \
 		-build-path $(LOCAL_BUILD_DIR) \
 		-tools $(ARDUINO_IDE_PATH)/tools-builder \
@@ -58,16 +66,17 @@ ifneq ("$(NO_BUILD)","1")
 endif
 ifneq ("$(NO_UPLOAD)","1")
 	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
-	@test -e $(dir $@)/make_spiffs.py && (echo "Generating and uploading SPIFFS" && \
-		(cd $(dir $@) && $(PYTHON) ./make_spiffs.py) && \
-		$(SILENT)$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
-			--block 8192 --page 256 $(LOCAL_BUILD_DIR)/spiffs.img && \
-		$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
+	@test -e $(dir $@)/make_spiffs.py && ( \
+		echo "Generating and uploading SPIFFS" && \
+		(cd $(dir $@) && $(PYTHON) ./make_spiffs.py $(REDIR) ) && \
+		$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
+			--block 8192 --page 256 $(LOCAL_BUILD_DIR)/spiffs.img $(REDIR) && \
+		$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
 			--chip esp8266 \
 			--port $(UPLOAD_PORT) \
 			--baud $(UPLOAD_BAUD) \
 			--after no_reset \
-			write_flash 0x300000 $(LOCAL_BUILD_DIR)/spiffs.img ) \
+			write_flash 0x300000 $(LOCAL_BUILD_DIR)/spiffs.img $(REDIR) ) \
 			|| (echo "No SPIFFS to upload")
 	@echo Uploading binary
 	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG)  \
@@ -75,7 +84,7 @@ ifneq ("$(NO_UPLOAD)","1")
 		--port $(UPLOAD_PORT) \
 		--baud $(UPLOAD_BAUD) \
 		--after no_reset \
-		write_flash 0x0 $(LOCAL_BUILD_DIR)/$(notdir $@).bin # no reset
+		write_flash 0x0 $(LOCAL_BUILD_DIR)/$(notdir $@).bin $(REDIR) # no reset
 endif
 ifneq ("$(NO_RUN)","1")
 	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
@@ -84,8 +93,8 @@ ifneq ("$(NO_RUN)","1")
 		--chip esp8266 \
 		--port $(UPLOAD_PORT) \
 		--baud $(UPLOAD_BAUD) \
-		read_flash_status # reset
-	@source $(BS_DIR)/virtualenv/bin/activate && \
+		read_flash_status $(REDIR) # reset
+	$(SILENT)source $(BS_DIR)/virtualenv/bin/activate && \
 		$(PYTHON) $(BS_DIR)/runner.py \
 			$(RUNNER_DEBUG_FLAG) \
 			-p $(UPLOAD_PORT) \

@@ -255,6 +255,7 @@ uart_tx_free(uart_t* uart)
 void
 uart_wait_tx_empty(uart_t* uart)
 {
+	(void) uart;
 }
 
 void
@@ -291,6 +292,8 @@ uart_get_baudrate(uart_t* uart)
 uart_t*
 uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
 {
+	(void) config;
+	(void) tx_pin;
 	uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
 	if(uart == NULL)
 		return NULL;
@@ -361,16 +364,23 @@ uart_uninit(uart_t* uart)
 void
 uart_swap(uart_t* uart, int tx_pin)
 {
+	(void) uart;
+	(void) tx_pin;
 }
 
 void
 uart_set_tx(uart_t* uart, int tx_pin)
 {
+	(void) uart;
+	(void) tx_pin;
 }
 
 void
 uart_set_pins(uart_t* uart, int tx, int rx)
 {
+	(void) uart;
+	(void) tx;
+	(void) rx;
 }
 
 bool
@@ -405,6 +415,7 @@ uart_has_overrun(uart_t* uart)
 bool
 uart_has_rx_error(uart_t* uart)
 {
+	(void) uart;
 	return false;
 }
 
@@ -423,11 +434,13 @@ uart_get_debug()
 void
 uart_start_detect_baudrate(int uart_nr)
 {
+	(void) uart_nr;
 }
 
 int
 uart_detect_baudrate(int uart_nr)
 {
+	(void) uart_nr;
 	return 115200;
 }
 
