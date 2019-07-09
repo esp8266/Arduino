@@ -1409,10 +1409,10 @@ static void _umm_free( void *ptr ) {
 
   c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
 
+  DBG_LOG_DEBUG( "Freeing block %6d\n", c );
+
   /* Protect the critical section... */
   UMM_CRITICAL_ENTRY(id_free);
-
-  DBG_LOG_DEBUG( "Freeing block %6d\n", c );
 
   /* Update dynamic Free Block count */
   ummHeapFreeBlocks += (UMM_NBLOCK(c) - c);
@@ -1591,12 +1591,12 @@ static void *_umm_malloc( size_t size ) {
     ummHeapFreeBlocks -= blocks;
 
   } else {
+    /* Release the critical section... */
+    UMM_CRITICAL_EXIT(id_malloc);
+
     /* Out of memory */
 
     DBG_LOG_DEBUG(  "Can't allocate %5d blocks\n", blocks );
-
-    /* Release the critical section... */
-    UMM_CRITICAL_EXIT(id_malloc);
 
     return( (void *)NULL );
   }
