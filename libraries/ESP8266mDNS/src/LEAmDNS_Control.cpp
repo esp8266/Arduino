@@ -79,10 +79,8 @@ bool MDNSResponder::_process(bool p_bUserContext) {
         }
     }
     else {
-        bResult = ((WiFi.isConnected() ||               // Either station is connected
-                    WiFi.softAPgetStationNum()>0) &&    // Or AP has stations connected
-                   (_updateProbeStatus()) &&            // Probing
-                   (_checkServiceQueryCache()));        // Service query cache check
+        bResult = _updateProbeStatus() &&           // Probing
+                  _checkServiceQueryCache();        // Service query cache check
     }
     return bResult;
 }
@@ -104,18 +102,18 @@ bool MDNSResponder::_restart(void) {
             return false;
         }
 
-        if (sta.isSet()) {
+        if (ap.isSet()) {
 
-            if (ap.isSet())
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected over AP (none was specified)\n")));
+            if (sta.isSet())
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected over STA (none was specified)\n")));
             else
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected\n")));
-            m_IPAddress = sta;
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected\n")));
+            m_IPAddress = ap;
 
         } else {
 
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected (none was specified)\n")));
-            m_IPAddress = ap;
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected (none was specified)\n")));
+            m_IPAddress = sta;
 
         }
 
