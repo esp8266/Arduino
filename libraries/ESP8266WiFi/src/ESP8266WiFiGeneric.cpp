@@ -590,7 +590,7 @@ struct host_struct {
     err_t status; // failed, ready, in progress (callback not called)
 };
 
-static struct host_struct host_var = { NULL, IPADDR_ANY, ERR_TIMEOUT };
+static struct host_struct host_var = { "", IPADDR_ANY, ERR_TIMEOUT };
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
@@ -602,7 +602,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
     static ip_addr_t addr;
     if (!host_var.hostname.length()) {
         host_var.hostname = aHostname;
-        err_t err = dns_gethostbyname(host_var.hostname, &addr, &wifi_dns_found_callback_async, &host_var);
+        err_t err = dns_gethostbyname(host_var.hostname.c_str(), &addr, &wifi_dns_found_callback_async, &host_var);
         if (err == ERR_OK) {
             aResult = IPAddress(addr);
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP found!");
@@ -624,7 +624,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
             DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS search still in progress!");
         } else {  // Generic error, reset
             host_var.addr = (uint32_t) IPADDR_ANY;
-            host_var.hostname = NULL;
+            host_var.hostname = "";
             host_var.status = ERR_TIMEOUT; // Generic error
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP NOT found! Please retry");
         }
