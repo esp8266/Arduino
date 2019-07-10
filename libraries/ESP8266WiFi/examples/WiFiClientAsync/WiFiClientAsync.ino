@@ -10,8 +10,6 @@
 #define STAPSK  "your-password"
 #endif
 
-#define ASYNC_MODE true
-
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
@@ -53,7 +51,7 @@ void loop() {
 
   // Use WiFiClient class to create TCP connections
   WiFiClient client;
-  if (!client.connectAsync(host, port, ASYNC_MODE)) { // 3rd argument to specify async mode
+  if (!client.connectAsync(host, port)) { // 3rd argument to specify async mode
     Serial.println("connection failed");
     delay(5000);
     return;
