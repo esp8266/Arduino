@@ -590,7 +590,7 @@ struct host_struct {
     err_t status; // failed, ready, in progress (callback not called)
 };
 
-static struct host_struct host_var = { NULL, IPADDR_ANY, 2 };
+static struct host_struct host_var = { NULL, IPADDR_ANY, ERR_TIMEOUT };
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
@@ -603,29 +603,30 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
     if (!host_var.hostname.length()) {
         host_var.hostname = aHostname;
         err_t err = dns_gethostbyname(host_var.hostname, &addr, &wifi_dns_found_callback_async, &host_var);
-        DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS query registred, waiting for response");
         if (err == ERR_OK) {
             aResult = IPAddress(addr);
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP found!");
-            return ERR_OK;
+            return 1;
         }
         if (err == ERR_INPROGRESS) {
-            return ERR_INPROGRESS;
+            DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS query registred, waiting for response");
+        } else {
+            DEBUG_WIFI_GENERIC("[hostByNameAsync] An error occurred!");
         }
-        DEBUG_WIFI_GENERIC("[hostByNameAsync] An error occurred!");
+        return 0;
     } else if (host_var.hostname.equals(aHostname)) {
         if (host_var.status == ERR_OK) { // IP found
             aResult = host_var.addr;
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP found!");
             return 1;
         }
-        if (host_var.status != ERR_INPROGRESS) {  // Generic error, reset
+        if (host_var.status == ERR_INPROGRESS) { // Search still in progress
+            DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS search still in progress!");
+        } else {  // Generic error, reset
             host_var.addr = (uint32_t) IPADDR_ANY;
             host_var.hostname = NULL;
-            host_var.status = ERR_TIMEOUT;
+            host_var.status = ERR_TIMEOUT; // Generic error
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP NOT found! Please retry");
-        } else { // Search still in progress
-            DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS search still in progress!");
         }
         return 0;
     } else {
