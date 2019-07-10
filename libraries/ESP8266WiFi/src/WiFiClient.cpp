@@ -137,9 +137,9 @@ int WiFiClient::connect(const char* host, uint16_t port, bool async)
     return 0;
 }
 
-int WiFiClient::connect(const String& host, uint16_t port)
+int WiFiClient::connect(const String& host, uint16_t port, bool async)
 {
-    return connect(host.c_str(), port);
+    return connect(host.c_str(), port, async);
 }
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
