@@ -57,6 +57,7 @@ public:
   virtual int connect(const char *host, uint16_t port) override;
   virtual int connect(const String& host, uint16_t port);
   virtual int connect(const char* host, uint16_t port, bool async);
+  virtual int connectAsync(const char* host, uint16_t port);
   virtual size_t write(uint8_t) override;
   virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);
