@@ -122,7 +122,16 @@ extern char _heap_start;
 #define DEFAULT_CRITICAL_SECTION_INTLEVEL 15
 #endif
 
-#define UMM_CRITICAL_PERIOD_ANALYZE
+/*
+ * -D UMM_CRITICAL_PERIOD_ANALYZE :
+ *
+ * Build option to collect timing usage data on critical section usage in
+ * functions: info, malloc, realloc. Collects MIN, MAX, and number of time
+ * IRQs were disabled at request time. Note, IRQs disabled value can be
+ * inflated by calls to realloc. realloc may call malloc and/or free.
+ * Examine code for specifics on what info is available and how to access.
+*/
+// #define UMM_CRITICAL_PERIOD_ANALYZE
 
 #ifndef __STRINGIFY
 #define __STRINGIFY(a) #a
@@ -175,7 +184,6 @@ static inline void _critical_entry(time_stat_t *p, uint32_t *saved_ps) {
     *saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
     if (0U != (*saved_ps & 0x0FU)) {
         p->intlevel += 1U;
-        // inflight_stack_trace(*saved_ps);
     }
 
     p->start = _umm_get_cycle_count();

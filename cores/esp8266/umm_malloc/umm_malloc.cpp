@@ -585,7 +585,7 @@ Changes:
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_ISR)
 #define DEBUG_IRAM_ATTR ICACHE_RAM_ATTR
 /*
-   Printing from the malloc routines is tricky. Since a lot of library calls
+  Printing from the malloc routines is tricky. Since a lot of library calls
   will want to do malloc.
 
   Objective:  To be able to print "last gasp" diagnostic messages
@@ -610,6 +610,13 @@ int DEBUG_IRAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
 #else
   uart_buff_switch(0U); // Side effect, clears RX FIFO
 #endif
+  /*
+    To use ets_strlen() and ets_memcpy() safely with PROGMEM, flash storage,
+    the PROGMEM address must be word (4 bytes) aligned. The destination
+    address for ets_memcpy must also be word-aligned. We also round the
+    buf_len up to the nearest word boundary. So that all transfers will be
+    whole words.
+  */
   size_t str_len = ets_strlen(fmt);
   size_t buf_len = (str_len + 1 + 3) & ~0x03U;
   char ram_buf[buf_len] __attribute__ ((aligned(4)));
