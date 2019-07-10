@@ -3,9 +3,9 @@ ESP8266 WiFi Mesh
 
 A library for turning your ESP8266 into a mesh network node.
 
-The library has been tested and works with Arduino core for ESP8266 version 2.3.0 (with default lwIP) and 2.4.2 or higher (with lwIP 1.4 and lwIP2).
+The library has been tested and works with Arduino core for ESP8266 version 2.6.0 (with lwIP2). It may work with earlier and later core releases, but this has not been tested during development.
 
-**Note:** This mesh library has been rewritten for core release 2.4.2. The old method signatures have been retained for compatibility purposes, but will be removed in core release 2.5.0. If you are still using these old method signatures please consider migrating to the new API shown in the `ESP8266WiFiMesh.h` source file.
+**Note:** This mesh library has been rewritten for core release 2.6.0. The old method signatures have been retained for compatibility purposes, but will be removed in core release 3.0.0. If you are still using these old method signatures please consider migrating to the new API shown in the `EspnowMeshBackend.h` or `TcpIpMeshBackend.h` source files.
 
 Usage
 -----
@@ -48,13 +48,17 @@ ESP8266WiFiMesh(requestHandlerType requestHandler, responseHandlerType responseH
 
 ### Note
 
-* This library can use static IP:s for the nodes to speed up connection times. To enable this, use the `setStaticIP` method after calling the `begin` method, as in the included example. Ensure that nodes connecting to the same AP have distinct static IP:s. Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default). It may also be worth noting that station gateway IP must match the IP for the server on the nodes, though this is the default setting for the library.
+* This library can use static IP:s for the nodes to speed up connection times. To enable this, use the `setStaticIP` method after calling the `begin` method, as in the included example. When using static IP, the following is good to keep in mind:
 
-  At the moment static IP is a global setting, meaning that all ESP8266WiFiMesh instances on the same ESP8266 share the same static IP settings.
+  Ensure that nodes connecting to the same AP have distinct static IP:s.
+
+  Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default).
+
+  Station gateway IP must match the IP for the server on the nodes. This is the default setting for the library.
+
+  Static IP is a global setting (for now), meaning that all ESP8266WiFiMesh instances on the same ESP8266 share the same static IP settings.
 
 * When Arduino core for ESP8266 version 2.4.2 or higher is used, there are optimizations available for WiFi scans and static IP use to reduce the time it takes for nodes to connect to each other. These optimizations are enabled by default. To take advantage of the static IP optimizations you also need to use lwIP2. The lwIP version can be changed in the Tools menu of Arduino IDE.
-
-  If you are using a core version prior to 2.4.2 it is possible to disable the WiFi scan and static IP optimizations by commenting out the `ENABLE_STATIC_IP_OPTIMIZATION` and `ENABLE_WIFI_SCAN_OPTIMIZATION` defines in ESP8266WiFiMesh.h. Press Ctrl+K in the Arduino IDE while an example from the mesh library is opened, to open the library folder (or click "Show Sketch Folder" in the Sketch menu). ESP8266WiFiMesh.h can then be found at ESP8266WiFiMesh/src. Edit the file with any text editor.
 
 * The WiFi scan optimization mentioned above works by making WiFi scans only search through the same WiFi channel as the ESP8266WiFiMesh instance is using. If you would like to scan all WiFi channels instead, set the `scanAllWiFiChannels` argument of the `attemptTransmission` method to `true`. Note that scanning all WiFi channels will slow down scans considerably and make it more likely that existing WiFi connections will break during scans. Also note that if the ESP8266 has an active AP, that AP will switch WiFi channel to match that of any other AP the ESP8266 connects to (compare next bullet point). This can make it impossible for other nodes to detect the AP if they are scanning the wrong WiFi channel. To remedy this, force the AP back on the original channel by using the `restartAP` method of the current AP controller once the ESP8266 has disconnected from the other AP. This would typically be done like so:
 

@@ -18,6 +18,28 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+
+
+
+
+
+
+/********************************************************************************************
+* NOTE!
+*
+* This class is deprecated and will be removed in core version 3.0.0.
+* If you are still using this class, please consider migrating to the new API shown in 
+* the EspnowMeshBackend.h or TcpIpMeshBackend.h source files.
+*
+* TODO: delete this file.
+********************************************************************************************/
+
+
+
+
+
+
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h> 
 #include <WiFiServer.h>
@@ -29,7 +51,6 @@
 #define SERVER_IP_ADDR      "192.168.4.1"
 
 const IPAddress ESP8266WiFiMesh::emptyIP = IPAddress();
-const uint32_t ESP8266WiFiMesh::lwipVersion203Signature[3] {2,0,3};
 
 String ESP8266WiFiMesh::lastSSID = "";
 bool ESP8266WiFiMesh::staticIPActivated = false;
@@ -51,10 +72,8 @@ ESP8266WiFiMesh::~ESP8266WiFiMesh()
 ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHandler, ESP8266WiFiMesh::responseHandlerType responseHandler, 
                                  ESP8266WiFiMesh::networkFilterType networkFilter, const String &meshPassword, const String &meshName, 
                                  const String &nodeID, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
-                                 : _server(serverPort), _lwipVersion{0, 0, 0}
-{
-  storeLwipVersion();
-  
+                                 : _server(serverPort)
+{  
   updateNetworkNames(meshName, (nodeID != "" ? nodeID : uint64ToString(ESP.getChipId())));
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
@@ -99,15 +118,10 @@ void ESP8266WiFiMesh::begin()
     if(!ESP8266WiFiMesh::getAPController()) // If there is no active AP controller
       WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
     
-    #ifdef ENABLE_STATIC_IP_OPTIMIZATION
-    if(atLeastLwipVersion(lwipVersion203Signature))
-    {
-      verboseModePrint(F("lwIP version is at least 2.0.3. Static ip optimizations enabled.\n"));
-    }
-    else
-    {
-      verboseModePrint(F("lwIP version is less than 2.0.3. Static ip optimizations DISABLED.\n"));
-    }
+    #if LWIP_VERSION_MAJOR >= 2
+    verboseModePrint(F("lwIP version is at least 2. Static ip optimizations enabled.\n"));
+    #else
+    verboseModePrint(F("lwIP version is less than 2. Static ip optimizations DISABLED.\n"));
     #endif
   }
 }
@@ -455,25 +469,18 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, i
 {
   if(staticIPActivated && lastSSID != "" && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
   {
-    #ifdef ENABLE_STATIC_IP_OPTIMIZATION
-    if(atLeastLwipVersion(lwipVersion203Signature))
-    {
-      // Can be used with Arduino core for ESP8266 version 2.4.2 or higher with lwIP2 enabled to keep static IP on even during network switches.
-      WiFiMode_t storedWiFiMode = WiFi.getMode();
-      WiFi.mode(WIFI_OFF);
-      WiFi.mode(storedWiFiMode);
-      yield();
-    }
-    else
-    {
-      // Disable static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
-      disableStaticIP();
-      verboseModePrint(F("\nConnecting to a different network. Static IP deactivated to make this possible."));
-    }
+    #if LWIP_VERSION_MAJOR >= 2
+    // Can be used with Arduino core for ESP8266 version 2.4.2 or higher with lwIP2 enabled to keep static IP on even during network switches.
+    WiFiMode_t storedWiFiMode = WiFi.getMode();
+    WiFi.mode(WIFI_OFF);
+    WiFi.mode(storedWiFiMode);
+    yield();
+    
     #else
     // Disable static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
     disableStaticIP();
     verboseModePrint(F("\nConnecting to a different network. Static IP deactivated to make this possible."));
+    
     #endif
   }
   lastSSID = targetSSID;
@@ -537,10 +544,9 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
       /* Scan for APs */
       connectionQueue.clear();
 
-      // If scanAllWiFiChannels is true or Arduino core for ESP8266 version < 2.4.2 scanning will cause the WiFi radio to cycle through all WiFi channels.
+      // If scanAllWiFiChannels is true scanning will cause the WiFi radio to cycle through all WiFi channels.
       // This means existing WiFi connections are likely to break or work poorly if done frequently.
       int n = 0;
-      #ifdef ENABLE_WIFI_SCAN_OPTIMIZATION
       if(scanAllWiFiChannels)
       {
         n = WiFi.scanNetworks(false, _scanHidden);
@@ -550,9 +556,6 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
         // Scan function argument overview: scanNetworks(bool async = false, bool show_hidden = false, uint8 channel = 0, uint8* ssid = NULL)
         n = WiFi.scanNetworks(false, _scanHidden, _meshWiFiChannel);
       }
-      #else
-      n = WiFi.scanNetworks(false, _scanHidden);
-      #endif
       
       _networkFilter(n, *this); // Update the connectionQueue.
     }
@@ -650,22 +653,34 @@ void ESP8266WiFiMesh::acceptRequest()
       if (!waitForClientTransmission(_client, _apModeTimeoutMs) || !_client.available()) {
         continue;
       }
-
+      
       /* Read in request and pass it to the supplied requestHandler */
       String request = _client.readStringUntil('\r');
       yield();
       _client.flush();
-
+      
       String response = _requestHandler(request, *this);
 
       /* Send the response back to the client */
       if (_client.connected())
       {
-        verboseModePrint("Responding"); // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
+        verboseModePrint("Responding");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
         _client.print(response + "\r");
         _client.flush();
         yield();
       }
     }
+  }
+}
+
+
+void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline)
+{
+  if(_verboseMode)
+  {
+    if(newline)
+      Serial.println(stringToPrint);
+    else
+      Serial.print(stringToPrint);
   }
 }

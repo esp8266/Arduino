@@ -24,6 +24,7 @@
  */
 
 #include "TypeConversionFunctions.h"
+#include "Crypto.h"
 
 String uint64ToString(uint64_t number, byte base)
 {
@@ -55,4 +56,90 @@ uint64_t stringToUint64(const String &string, byte base)
   }
   
   return result;
+}
+
+String uint8ArrayToHexString(const uint8_t *uint8Array, uint32_t arrayLength)
+{
+  char hexString[2*arrayLength + 1]; // Each uint8_t will become two characters (00 to FF) and we want a null terminated char array. 
+  hexString[arrayLength + 1] = { 0 };
+  for(uint32_t i = 0; i < arrayLength; i++)
+  {
+    sprintf(hexString + 2*i, "%02X", uint8Array[i]);
+  }
+
+  return String(hexString);
+}
+
+uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, uint32_t arrayLength)
+{
+  assert(hexString.length() >= arrayLength*2); // Each array element can hold two hexString characters
+  
+  for(uint32_t i = 0; i < arrayLength; i++)
+  {
+    uint8Array[i] = strtoul(hexString.substring(i*2, (i+1)*2).c_str(), nullptr, 16);
+  }
+  
+  return uint8Array;
+}
+
+String macToString(const uint8_t *mac)
+{
+  char macString[13] = { 0 };
+  sprintf(macString, "%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  return String(macString);
+}
+
+uint8_t *stringToMac(const String &macString, uint8_t *macArray)
+{
+  return hexStringToUint8Array(macString, macArray, 6);
+}
+
+uint64_t macToUint64(const uint8_t *macArray)
+{
+  uint64_t outcome = 0;
+  for(int shiftingFortune = 40; shiftingFortune >= 0; shiftingFortune -= 8)
+  {
+    outcome |= ((uint64_t)macArray[5 - shiftingFortune/8] << shiftingFortune);
+  }
+
+  return outcome;
+}
+
+uint8_t *uint64ToMac(uint64_t macValue, uint8_t *macArray)
+{
+  assert(macValue <= 0xFFFFFFFFFFFF); // Overflow will occur if value can't fit within 6 bytes
+  
+  for(int shiftingFortune = 40; shiftingFortune >= 0; shiftingFortune -= 8)
+  {
+    macArray[5 - shiftingFortune/8] = macValue >> shiftingFortune & 0xFF;
+  }
+  return macArray;
+} 
+
+/**
+ * Helper function for meshBackendCast.
+ */
+template <typename T>
+T attemptPointerCast(MeshBackendBase *meshBackendBaseInstance, mesh_backend_t resultClassType)
+{
+  if(meshBackendBaseInstance && meshBackendBaseInstance->getClassType() == resultClassType)
+  {
+    return static_cast<T>(meshBackendBaseInstance); 
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+template <> 
+EspnowMeshBackend *meshBackendCast<EspnowMeshBackend *>(MeshBackendBase *meshBackendBaseInstance)
+{
+  return attemptPointerCast<EspnowMeshBackend *>(meshBackendBaseInstance, MB_ESP_NOW);
+}
+
+template <> 
+TcpIpMeshBackend *meshBackendCast<TcpIpMeshBackend *>(MeshBackendBase *meshBackendBaseInstance)
+{
+  return attemptPointerCast<TcpIpMeshBackend *>(meshBackendBaseInstance, MB_TCP_IP);
 }

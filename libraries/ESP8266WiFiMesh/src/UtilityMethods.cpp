@@ -1,5 +1,5 @@
 /*
- * TransmissionResult
+ * UtilityMethods
  * Copyright (C) 2018 Anders Löfgren
  *
  * License (MIT license):
@@ -24,11 +24,15 @@
  */
 
 #include "TypeConversionFunctions.h"
-#include "ESP8266WiFiMesh.h"
+#include "MeshBackendBase.h"
+#include "EspnowMeshBackend.h"
 
-void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline)
+void MeshBackendBase::setVerboseModeState(bool enabled) {_verboseMode = enabled;}
+bool MeshBackendBase::verboseMode() {return _verboseMode;}
+
+void MeshBackendBase::verboseModePrint(const String &stringToPrint, bool newline)
 {
-  if(_verboseMode)
+  if(verboseMode())
   {
     if(newline)
       Serial.println(stringToPrint);
@@ -37,45 +41,43 @@ void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline
   }
 }
 
-/**
- * Calculate the current lwIP version number and store the numbers in the _lwipVersion array.
- * lwIP version can be changed in the "Tools" menu of Arduino IDE.
- */
-void ESP8266WiFiMesh::storeLwipVersion()
+void EspnowMeshBackend::setVerboseModeState(bool enabled) {MeshBackendBase::setVerboseModeState(enabled); _staticVerboseMode = enabled;}
+bool EspnowMeshBackend::verboseMode() {return staticVerboseMode();}
+
+void EspnowMeshBackend::verboseModePrint(const String &stringToPrint, bool newline)
 {
-  // ESP.getFullVersion() looks something like: 
-  // SDK:2.2.1(cfd48f3)/Core:win-2.5.0-dev/lwIP:2.0.3(STABLE-2_0_3_RELEASE/glue:arduino-2.4.1-10-g0c0d8c2)/BearSSL:94e9704
-  String fullVersion = ESP.getFullVersion();
-
-  int i = fullVersion.indexOf("lwIP:") + 5;
-  char currentChar = fullVersion.charAt(i);
-
-  for(int versionPart = 0; versionPart < 3; versionPart++)
+  if(verboseMode())
   {
-    while(!isdigit(currentChar))
-    {
-      currentChar = fullVersion.charAt(++i);
-    }
-    while(isdigit(currentChar))
-    {
-      _lwipVersion[versionPart] = 10 * _lwipVersion[versionPart] + (currentChar - '0'); // Left shift and add digit value, in base 10.
-      currentChar = fullVersion.charAt(++i);
-    }
+    if(newline)
+      Serial.println(stringToPrint);
+    else
+      Serial.print(stringToPrint);
   }
 }
 
-/**
- * Check if the code is running on a version of lwIP that is at least minLwipVersion.
- */
-bool ESP8266WiFiMesh::atLeastLwipVersion(const uint32_t minLwipVersion[3])
-{ 
-  for(int versionPart = 0; versionPart < 3; versionPart++)
-  {
-    if(_lwipVersion[versionPart] > minLwipVersion[versionPart])
-      return true;
-    else if(_lwipVersion[versionPart] < minLwipVersion[versionPart])
-      return false;
-  }
+bool EspnowMeshBackend::staticVerboseMode() {return _staticVerboseMode;}
 
-  return true;
+void EspnowMeshBackend::staticVerboseModePrint(const String &stringToPrint, bool newline)
+{
+  if(staticVerboseMode())
+  {
+    if(newline)
+      Serial.println(stringToPrint);
+    else
+      Serial.print(stringToPrint);
+  }
+}
+
+void MeshBackendBase::setPrintWarnings(bool printEnabled) {_printWarnings = printEnabled;}
+bool MeshBackendBase::printWarnings() {return _printWarnings;}
+
+void MeshBackendBase::warningPrint(const String &stringToPrint, bool newline)
+{
+  if(printWarnings())
+  {
+    if(newline)
+      Serial.println(stringToPrint);
+    else
+      Serial.print(stringToPrint);
+  }
 }
