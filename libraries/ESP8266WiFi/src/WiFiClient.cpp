@@ -139,6 +139,7 @@ int WiFiClient::connect(const char* host, uint16_t port, bool async)
       ret = WiFi.hostByNameAsync(host, remote_addr);
     } else {
       ret = WiFi.hostByName(host, remote_addr, _timeout);
+    }
     if (ret) {
         return connect(remote_addr, port);
     }
@@ -147,7 +148,6 @@ int WiFiClient::connect(const char* host, uint16_t port, bool async)
 
 int WiFiClient::connect(const String& host, uint16_t port)
 {
-    // TODO: async part
     return connect(host.c_str(), port);
 }
 
