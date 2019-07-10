@@ -53,7 +53,7 @@ void loop() {
 
   // Use WiFiClient class to create TCP connections
   WiFiClient client;
-  if (!client.connect(host, port, ASYNC_MODE)) { // 3rd argument to specify async mode
+  if (!client.connectAsync(host, port, ASYNC_MODE)) { // 3rd argument to specify async mode
     Serial.println("connection failed");
     delay(5000);
     return;
