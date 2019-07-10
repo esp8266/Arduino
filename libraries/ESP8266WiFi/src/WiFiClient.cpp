@@ -124,9 +124,22 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 
 int WiFiClient::connect(const char* host, uint16_t port)
 {
-    // TODO: async part
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr, _timeout)) {
+        return connect(remote_addr, port);
+    }
+    return 0;
+}
+
+int WiFiClient::connect(const char* host, uint16_t port, bool async)
+{
+    IPAddress remote_addr;
+    int ret;
+    if (async) {
+      ret = WiFi.hostByNameAsync(host, remote_addr);
+    } else {
+      ret = WiFi.hostByName(host, remote_addr, _timeout);
+    if (ret) {
         return connect(remote_addr, port);
     }
     return 0;
