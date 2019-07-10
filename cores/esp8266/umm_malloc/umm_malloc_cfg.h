@@ -127,8 +127,8 @@ extern char _heap_start;
  *
  * Build option to collect timing usage data on critical section usage in
  * functions: info, malloc, realloc. Collects MIN, MAX, and number of time
- * IRQs were disabled at request time. Note, IRQs disabled value can be
- * inflated by calls to realloc. realloc may call malloc and/or free.
+ * IRQs were disabled at request time. Note, for realloc MAX disabled time
+ * will not include the time from calling malloc and/or free.
  * Examine code for specifics on what info is available and how to access.
 */
 // #define UMM_CRITICAL_PERIOD_ANALYZE
@@ -140,7 +140,7 @@ extern char _heap_start;
   Copy paste xt_rsil and xt_wsr_ps from Arduino.h
  */
 #ifndef xt_rsil
-#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state)); state;}))
+#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #endif
 #ifndef xt_wsr_ps
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")

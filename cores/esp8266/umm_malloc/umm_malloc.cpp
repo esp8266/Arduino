@@ -541,13 +541,13 @@ extern int umm_last_fail_alloc_size;
 #endif
 
 /*
-Changes:
+Changes for July 2019:
 
   Correct critical section with interrupt level preserving and nest support
   alternative. Replace ets_intr_lock()/ets_intr_unlock() with uint32_t
   oldValue=xt_rsil(3)/xt_wrs(oldValue). Added UMM_CRITICAL_DECL macro to define
   storage for current state. Expanded UMM_CRITICAL_... to  use unique
-  identifiers. This helpt facilitate gather function specific  timing
+  identifiers. This helpt facilitate gather function specific timing
   information.
 
   Replace printf with something that is ROM or IRAM based so that a printf
@@ -560,10 +560,13 @@ Changes:
   80MHz CPU clock). It would be good practice for an ISR to avoid realloc.
   Note, while doing this might initially sound scary, this appears to be very
   stable. It ran on my troublesome sketch for over 3 weeks until I got back from
-  vacation and  flashed an update. Troublesome sketch - runs ESPAsyncTCP, with
+  vacation and flashed an update. Troublesome sketch - runs ESPAsyncTCP, with
   modified fauxmo emulation for 10 devices. It receives lost of Network traffic
   related to uPnP scans, which includes lots of TCP connects disconnects RSTs
   related to uPnP discovery.
+
+  Locking is no longer nested in realloc, due to refactoring for reduced IRQ
+  off time.
 
   I have clocked umm_info critical lock time taking as much as 180us. A common
   use for the umm_info call is to get the free heap result. It is common
@@ -574,10 +577,10 @@ Changes:
 
   I have added code that adjusts the running free heap number from _umm_malloc,
   _umm_realloc, and _umm_free. Removing the need to do a long interrupts
-  disabled calculation via _umm_info.
+  disabled calculation via umm_info.
 
   Build optional, min/max time measurements for locks held while in info,
-  malloc, realloc, and free. Also, maintain a count of how many times each is
+  malloc, realloc, and free. Also, maintains a count of how many times each is
   called with INTLEVEL set.
 
  */
