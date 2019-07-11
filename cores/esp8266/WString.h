@@ -189,6 +189,9 @@ class String {
         unsigned char operator !=(const char *cstr) const {
             return !equals(cstr);
         }
+	bool operator bool() {
+	    return length() > 0;
+	}
         unsigned char operator <(const String &rhs) const;
         unsigned char operator >(const String &rhs) const;
         unsigned char operator <=(const String &rhs) const;
