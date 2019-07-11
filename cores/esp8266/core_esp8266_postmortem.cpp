@@ -83,7 +83,7 @@ static void ets_printf_P(const char *str, ...) {
 }
 
 #define FAKE_REASON_NONE 255
-#define FAKE_REASON_USER  254
+#define FAKE_REASON_USER 254
 static int fake_rst_reason = FAKE_REASON_NONE;
 
 void __wrap_system_restart_local() {
@@ -232,7 +232,7 @@ static void uart1_write_char_d(char c) {
 
 static void raise_exception() {
     __asm__ __volatile__ ("syscall"); // no effect?
-    ets_printf_P("\nsoftware exception");
+    ets_printf_P(PSTR("\nsoftware exception"));
     fake_rst_reason = FAKE_REASON_USER;
     __wrap_system_restart_local();
     while (1); // never reached, needed to satisfy "noreturn" attribute
