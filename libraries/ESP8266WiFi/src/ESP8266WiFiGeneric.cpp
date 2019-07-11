@@ -272,20 +272,24 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
    wifi_set_listen_interval():
    Set listen interval of maximum sleep level for modem sleep and light sleep
    It only works when sleep level is set as MAX_SLEEP_T
-   It should be called following the order:
-     wifi_set_sleep_level(MAX_SLEEP_T)
-     wifi_set_listen_interval
-     wifi_set_sleep_type
    forum: https://github.com/espressif/ESP8266_NONOS_SDK/issues/165#issuecomment-416121920
    default value seems to be 3 (as recommended by https://routerguide.net/dtim-interval-period-best-setting/)
+
+   call order:
+     wifi_set_sleep_level(MAX_SLEEP_T) (SDK3)
+     wifi_set_listen_interval          (SDK3)
+     wifi_set_sleep_type               (all SDKs)
+
     */
+
+#ifdef NONOSDK3V0
 
 #ifdef DEBUG_ESP_WIFI
     if (listenInterval && type == WIFI_NONE_SLEEP)
         DEBUG_WIFI_GENERIC("listenInterval not usable with WIFI_NONE_SLEEP\n");
 #endif
 
-      if (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP) {
+    if (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP) {
         if (listenInterval) {
             if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
                 DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
@@ -309,6 +313,10 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
             }
         }
     }
+#else  // !defined(NONOSDK3V0)
+    (void)listenInterval;
+#endif // !defined(NONOSDK3V0)
+
     bool ret = wifi_set_sleep_type((sleep_type_t) type);
     if (!ret) {
         DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)type);
@@ -388,6 +396,11 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
     }
 
     bool ret = false;
+
+    if (m != WIFI_STA && m != WIFI_AP_STA)
+        // calls lwIP's dhcp_stop(),
+        // safe to call even if not started
+        wifi_station_dhcpc_stop();
 
     ETS_UART_INTR_DISABLE();
     if(_persistent) {
@@ -494,7 +507,11 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
  * @return interval
  */
 uint8_t ESP8266WiFiGenericClass::getListenInterval () {
+#ifndef NONOSDK3V0
+    return 0;
+#else
     return wifi_get_listen_interval();
+#endif
 }
 
 /**
@@ -502,7 +519,11 @@ uint8_t ESP8266WiFiGenericClass::getListenInterval () {
  * @return true if max level
  */
 bool ESP8266WiFiGenericClass::isSleepLevelMax () {
+#ifndef NONOSDK3V0
+    return false;
+#else
     return wifi_get_sleep_level() == MAX_SLEEP_T;
+#endif
 }
 
 
@@ -510,68 +531,55 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
 
-struct arg_callback {
-    IPAddress addr;
-    bool called = false;
-};
+static bool _dns_lookup_pending = false;
 
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
- * @return 1 if a String was successfully converted to an IP address,
- *          else error code
+ * @return 1 if aIPAddrString was successfully converted to an IP address,
+ *          else 0
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
     return hostByName(aHostname, aResult, 10000);
 }
 
+
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     ip_addr_t addr;
-    static struct arg_callback addr2;
-    static bool pending = false;  // If waiting for the callback function call
+    aResult = static_cast<uint32_t>(0);
 
     if(aResult.fromString(aHostname)) {
-        // Host name is a IP address, use it!
+        // Host name is a IP address use it!
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
         return 1;
     }
-    if(addr2.called) {  // If the callback function has been called
-        addr2.called = false;
-        pending = false;
-        if(addr2.addr != IPADDR_ANY) {  // If IP found
-            DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP found %s\n", aHostname, addr2.addr.toString().c_str());
-            aResult = addr2.addr;
-            addr2.addr = (uint32_t)IPADDR_ANY;
-            return 1;
-        } else {
-            DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP NOT found. Please re-try\n", aHostname);
-            return 0;
+
+    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
+    if(err == ERR_OK) {
+        aResult = IPAddress(&addr);
+    } else if(err == ERR_INPROGRESS) {
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        _dns_lookup_pending = false;
+        // will return here when dns_found_callback fires
+        if(aResult.isSet()) {
+            err = ERR_OK;
         }
     }
-    if(pending) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host %s: Waiting for callback call\n", aHostname);
-        return 0;
-    }
-    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &addr2);
-    DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP requested\n", aHostname);
-    if(err == ERR_OK) {
-        aResult = addr.addr;
-        pending = false;
-        addr2.called = false;
-        DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP found %s\n", aHostname, aResult.toString().c_str());
-        return 1;
-    }
-    if(err == ERR_INPROGRESS) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host %s: Query registered\n", aHostname);
-        pending = true;
+
+    if(err != 0) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
     } else {
-        DEBUG_WIFI_GENERIC("[hostByName] Host %s: Lookup error: %d!\n", aHostname, err);
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
     }
-    return 0;
+
+    return (err == ERR_OK) ? 1 : 0;
 }
 
 /**
@@ -580,13 +588,15 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
-    (reinterpret_cast<struct arg_callback*>(callback_arg))->called = true;
-    if(ipaddr) {
-        (reinterpret_cast<struct arg_callback*>(callback_arg))->addr = ipaddr->addr;
+    (void) name;
+    if (!_dns_lookup_pending) {
+        return;
     }
-    DEBUG_WIFI_GENERIC("[hostByName] Host %s: Callback function called", name);
+    if(ipaddr) {
+        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
+    }
     esp_schedule(); // resume the hostByName function
 }
 
