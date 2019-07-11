@@ -231,10 +231,13 @@ static void uart1_write_char_d(char c) {
 }
 
 static void raise_exception() {
+    //*((char*)0) = 0; // <- works but with a bad reason
     __asm__ __volatile__ ("syscall"); // no effect?
-    ets_printf_P(PSTR("\nsoftware exception"));
+
     fake_rst_reason = FAKE_REASON_USER;
+    ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
     __wrap_system_restart_local();
+
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
