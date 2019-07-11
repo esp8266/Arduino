@@ -82,7 +82,10 @@ static void ets_printf_P(const char *str, ...) {
     }
 }
 
-static int workaround = 0;
+#define FAKE_REASON_NONE 255
+#define FAKE_REASON_USER  254
+static int fake_rst_reason = FAKE_REASON_NONE;
+
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
@@ -98,19 +101,18 @@ void __wrap_system_restart_local() {
 
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
-    if (workaround == 0)
+    if (fake_rst_reason == FAKE_REASON_NONE)
     {
         system_rtc_mem_read(0, &rst_info, sizeof(rst_info));
         if (rst_info.reason != REASON_SOFT_WDT_RST &&
             rst_info.reason != REASON_EXCEPTION_RST &&
             rst_info.reason != REASON_WDT_RST)
         {
-ets_printf("beeeh %d\n", rst_info.reason);
             return;
         }
     }
     else
-        rst_info.reason = workaround;
+        rst_info.reason = fake_rst_reason;
 
     // TODO:  ets_install_putc1 definition is wrong in ets_sys.h, need cast
     ets_install_putc1((void *)&uart_write_char_d);
@@ -229,11 +231,10 @@ static void uart1_write_char_d(char c) {
 }
 
 static void raise_exception() {
-    __asm__ __volatile__ ("syscall");
-    ets_printf_P(PSTR("exception from IRQ\n"));
-workaround=7; // last REASON_EXT_SYS_RST      = 6
+    __asm__ __volatile__ ("syscall"); // no effect?
+    ets_printf_P("\nsoftware exception");
+    fake_rst_reason = FAKE_REASON_USER;
     __wrap_system_restart_local();
-    ets_printf_P(PSTR("beh\n"));
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
