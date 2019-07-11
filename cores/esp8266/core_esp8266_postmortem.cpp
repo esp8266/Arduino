@@ -230,6 +230,10 @@ static void uart1_write_char_d(char c) {
 
 static void raise_exception() {
     __asm__ __volatile__ ("syscall");
+    ets_printf_P(PSTR("exception from IRQ\n"));
+workaround=7; // last REASON_EXT_SYS_RST      = 6
+    __wrap_system_restart_local();
+    ets_printf_P(PSTR("beh\n"));
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
