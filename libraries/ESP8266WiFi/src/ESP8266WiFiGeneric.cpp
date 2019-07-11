@@ -656,11 +656,12 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
     (void) name;
-    if (ipaddr) {
+    err_t err = reinterpret_cast<struct host_struct*>(callback_arg)->status;
+    if (ipaddr && err == ERR_INPROGRESS) {
         reinterpret_cast<struct host_struct*>(callback_arg)->addr = IPAddress(ipaddr);
         reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_OK;
     } else {
-        reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_TIMEOUT;
+        reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_TIMEOUT; // Generic error
     }
 }
 
