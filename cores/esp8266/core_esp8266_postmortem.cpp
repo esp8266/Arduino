@@ -90,6 +90,7 @@ void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
 
+#if 0
     if (gdb_present()) {
         /* When GDBStub is present, exceptions are handled by GDBStub,
            but Soft WDT will still call this function.
@@ -98,6 +99,7 @@ void __wrap_system_restart_local() {
            break into GDB here. */
         raise_exception();
     }
+#endif
 
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
@@ -239,7 +241,9 @@ static void raise_exception() {
 
 #else
 
-    __asm__ __volatile__ ("syscall"); // no effect?
+    if (gdb_present())
+        //*((char*)0) = 0;
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
     fake_rst_reason = FAKE_REASON_USER;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
