@@ -419,6 +419,13 @@ StringSumHelper & operator +(const StringSumHelper &lhs, const char *cstr) {
     return a;
 }
 
+StringSumHelper & operator +(const StringSumHelper &lhs, const char cstr[]) {
+    StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+    if(!cstr || !a.concat((const char*) cstr, strlen(cstr)))
+        a.invalidate();
+    return a;
+}
+
 StringSumHelper & operator +(const StringSumHelper &lhs, char c) {
     StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
     if(!a.concat(c))
