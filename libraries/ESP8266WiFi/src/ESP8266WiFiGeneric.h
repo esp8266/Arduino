@@ -37,6 +37,12 @@
 #define DEBUG_WIFI_GENERIC(...) do { (void)0; } while (0)
 #endif
 
+enum enum_connect {
+    WIFI_CNT_OK,
+    WIFI_CNT_INPROGRESS,
+    WIFI_CNT_FAILED
+};
+
 struct WiFiEventHandlerOpaque;
 typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
