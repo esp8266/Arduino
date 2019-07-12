@@ -1158,13 +1158,12 @@ bool MDNSResponder::stcMDNS_RRAnswerGeneric::clear(void) {
  */
 MDNSResponder::stcProbeInformation::stcProbeInformation(void)
 :   m_ProbingStatus(ProbingStatus_WaitingForData),
-    m_u8ProbesSent(0),
-    //m_ulNextProbeTimeout(0),
-    m_NextProbeTimeFlag(),
+    m_u8SentCount(0),
+    m_Timeout(esp8266::polledTimeout::oneShotMs::neverExpires),
     m_bConflict(false),
     m_bTiebreakNeeded(false),
-    m_fnProbeResultCallback(0),
-    m_pProbeResultCallbackUserdata(0) {
+    m_fnHostProbeResultCallback(0),
+	m_fnServiceProbeResultCallback(0) {
 }
 
 /*
@@ -1173,14 +1172,13 @@ MDNSResponder::stcProbeInformation::stcProbeInformation(void)
 bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/) {
 
     m_ProbingStatus = ProbingStatus_WaitingForData;
-    m_u8ProbesSent = 0;
-    //m_ulNextProbeTimeout = 0;
-    m_NextProbeTimeFlag.reset();
+    m_u8SentCount = 0;
+    m_Timeout.resetToNeverExpires();
     m_bConflict = false;
     m_bTiebreakNeeded = false;
     if (p_bClearUserdata) {
-        m_fnProbeResultCallback = 0;
-        m_pProbeResultCallbackUserdata = 0;
+        m_fnHostProbeResultCallback = 0;
+        m_fnServiceProbeResultCallback = 0;
     }
     return true;
 }
@@ -1200,8 +1198,8 @@ bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/
  * MDNSResponder::stcMDNSService::stcMDNSService constructor
  */
 MDNSResponder::stcMDNSService::stcMDNSService(const char* p_pcName /*= 0*/,
-                                                const char* p_pcService /*= 0*/,
-                                                const char* p_pcProtocol /*= 0*/)
+                                              const char* p_pcService /*= 0*/,
+                                              const char* p_pcProtocol /*= 0*/)
 :   m_pNext(0),
     m_pcName(0),
     m_bAutoName(false),
@@ -1209,8 +1207,7 @@ MDNSResponder::stcMDNSService::stcMDNSService(const char* p_pcName /*= 0*/,
     m_pcProtocol(0),
     m_u16Port(0),
     m_u8ReplyMask(0),
-    m_fnTxtCallback(0),
-    m_pTxtCallbackUserdata(0) {
+    m_fnTxtCallback(0) {
     
     setName(p_pcName);
     setService(p_pcService);
@@ -1367,20 +1364,20 @@ bool MDNSResponder::stcMDNSService::releaseProtocol(void) {
  * and the 'set' time (also millis).
  * If the answer is scheduled for an update, the corresponding flag should be set.
  *
- */
+ * /
 
-/*
+/ *
  * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL constructor
- */
-MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(uint32_t p_u32TTL /*= 0*/)
+ * /
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(uint32_t p_u32TTL / *= 0* /)
 :   m_bUpdateScheduled(false) {
     
     set(p_u32TTL * 1000);
 }
 
-/*
+/ *
  * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set
- */
+ * /
 bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TTL) {
     
     m_TTLTimeFlag.restart(p_u32TTL * 1000);
@@ -1389,9 +1386,9 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TT
     return true;
 }
 
-/*
+/ *
  * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::has80Percent
- */
+ * /
 bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::has80Percent(void) const {
     
     return ((m_TTLTimeFlag.getTimeout()) &&
@@ -1399,13 +1396,119 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::has80Percent(void) c
             (m_TTLTimeFlag.hypotheticalTimeout((m_TTLTimeFlag.getTimeout() * 800) / 1000)));
 }
 
-/*
+/ *
  * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::isOutdated
- */
+ * /
 bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::isOutdated(void) const {
     
     return ((m_TTLTimeFlag.getTimeout()) &&
             (m_TTLTimeFlag.flagged()));
+}*/
+
+
+/**
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL
+ *
+ * The TTL (Time-To-Live) for an specific answer content.
+ * The 80% and outdated states are calculated based on the current time (millis)
+ * and the 'set' time (also millis).
+ * If the answer is scheduled for an update, the corresponding flag should be set.
+ *
+ */
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL constructor
+ */
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(void)
+:   m_u32TTL(0),
+    m_TTLTimeout(esp8266::polledTimeout::oneShotMs::neverExpires),
+    m_timeoutLevel(TIMEOUTLEVEL_UNSET) {
+
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TTL) {
+
+    m_u32TTL = p_u32TTL;
+    if (m_u32TTL) {
+        m_timeoutLevel = TIMEOUTLEVEL_BASE;             // Set to 80%
+        m_TTLTimeout.reset(timeout());
+    }
+    else {
+        m_timeoutLevel = TIMEOUTLEVEL_UNSET;            // undef
+        m_TTLTimeout.resetToNeverExpires();
+    }
+    return true;
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged(void) {
+
+    return ((m_u32TTL) &&
+            (TIMEOUTLEVEL_UNSET != m_timeoutLevel) &&
+            (m_TTLTimeout.expired()));
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::restart
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::restart(void) {
+
+    bool    bResult = true;
+
+    if ((TIMEOUTLEVEL_BASE <= m_timeoutLevel) &&    // >= 80% AND
+        (TIMEOUTLEVEL_FINAL > m_timeoutLevel)) {    // < 100%
+
+        m_timeoutLevel += TIMEOUTLEVEL_INTERVAL;    // increment by 5%
+        m_TTLTimeout.reset(timeout());
+    }
+    else {
+        bResult = false;
+        m_TTLTimeout.resetToNeverExpires();
+        m_timeoutLevel = TIMEOUTLEVEL_UNSET;
+    }
+    return bResult;
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::prepareDeletion
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::prepareDeletion(void) {
+
+    m_timeoutLevel = TIMEOUTLEVEL_FINAL;
+    m_TTLTimeout.reset(1 * 1000);   // See RFC 6762, 10.1
+
+    return true;
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel(void) const {
+
+    return (TIMEOUTLEVEL_FINAL == m_timeoutLevel);
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout
+ */
+unsigned long MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout(void) const {
+
+    uint32_t    u32Timeout = esp8266::polledTimeout::oneShotMs::neverExpires;
+
+    if (TIMEOUTLEVEL_BASE == m_timeoutLevel) {          // 80%
+        u32Timeout = (m_u32TTL * 800);                  // to milliseconds
+    }
+    else if ((TIMEOUTLEVEL_BASE < m_timeoutLevel) &&    // >80% AND
+             (TIMEOUTLEVEL_FINAL >= m_timeoutLevel)) {  // <= 100%
+
+        u32Timeout = (m_u32TTL * 50);
+    }   // else: invalid
+    return u32Timeout;
 }
 
 
@@ -1421,8 +1524,9 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::isOutdated(void) con
 MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address::stcIP4Address(IPAddress p_IPAddress,
                                                                                 uint32_t p_u32TTL /*= 0*/)
 :   m_pNext(0),
-    m_IPAddress(p_IPAddress),
-    m_TTL(p_u32TTL) {
+    m_IPAddress(p_IPAddress) {
+
+    m_TTL.set(p_u32TTL);
 }
 #endif
 
@@ -1816,8 +1920,9 @@ MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stc
 MDNSResponder::stcMDNSServiceQuery::stcMDNSServiceQuery(void)
 :   m_pNext(0),
     m_fnCallback(0),
-    m_pUserdata(0),
     m_bLegacyQuery(false),
+    m_u8SentCount(0),
+    m_ResendTimeout(esp8266::polledTimeout::oneShotMs::neverExpires),
     m_bAwaitingAnswers(true),
     m_pAnswers(0) {
 
@@ -1838,8 +1943,9 @@ MDNSResponder::stcMDNSServiceQuery::~stcMDNSServiceQuery(void) {
 bool MDNSResponder::stcMDNSServiceQuery::clear(void) {
     
     m_fnCallback = 0;
-    m_pUserdata = 0;
     m_bLegacyQuery = false;
+    m_u8SentCount = 0;
+    m_ResendTimeout.resetToNeverExpires();
     m_bAwaitingAnswers = true;
     while (m_pAnswers) {
         stcAnswer*  pNext = m_pAnswers->m_pNext;

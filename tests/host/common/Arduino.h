@@ -34,6 +34,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
     
 #include "binary.h"
 #include "twi.h"
@@ -142,26 +143,12 @@ extern "C" {
 #define __STRINGIFY(a) #a
 #endif
     
-    // these low level routines provide a replacement for SREG interrupt save that AVR uses
-    // but are esp8266 specific. A normal use pattern is like
-    //
-    //{
-    //    uint32_t savedPS = xt_rsil(1); // this routine will allow level 2 and above
-    //    // do work here
-    //    xt_wsr_ps(savedPS); // restore the state
-    //}
-    //
-    // level (0-15), interrupts of the given level and above will be active
-    // level 15 will disable ALL interrupts,
-    // level 0 will enable ALL interrupts,
-    //
-#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state)); state;}))
-#define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
-    
+#define xt_rsil(level) (level)
+#define xt_wsr_ps(state) do { (void)(state); } while (0)
+
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
-    
-    
+
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
@@ -189,8 +176,6 @@ extern "C" {
     
     void init(void);
     void initVariant(void);
-    
-    int atexit(void (*func)()) __attribute__((weak));
     
     void pinMode(uint8_t pin, uint8_t mode);
     void digitalWrite(uint8_t pin, uint8_t val);
@@ -249,10 +234,12 @@ extern "C" {
 #include "Updater.h"
 #include "debug.h"
 
+#if 0
 #ifndef _GLIBCXX_VECTOR
 // arduino is not compatible with std::vector
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
 #endif
 
 #define _min(a,b) ((a)<(b)?(a):(b))

@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+# return 1 if this test should not be built in CI (for other archs, not needed, etc.)
+function skip_ino()
+{
+    local ino=$1
+    local skiplist=""
+    # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
+    read -d '' skiplist << EOL || true
+/#attic/
+/AnalogBinLogger/
+/LowLatencyLogger/
+/LowLatencyLoggerADXL345/
+/LowLatencyLoggerMPU6050/
+/PrintBenchmark/
+/TeensySdioDemo/
+/SoftwareSpi/
+/STM32Test/
+/extras/
+EOL
+    echo $ino | grep -q -F "$skiplist"
+    echo $(( 1 - $? ))
+}
+
 function print_size_info()
 {
     elf_file=$1
@@ -79,6 +101,10 @@ function build_sketches()
             echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi
+        if [[ $(skip_ino $sketch) = 1 ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
         echo "$build_cmd $sketch"
@@ -109,7 +135,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v4.6.1.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip; } && unzip ArduinoJson-v4.6.1.zip
+    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip ArduinoJson-v6.11.0.zip
 
     popd
 }
@@ -139,59 +165,6 @@ function install_ide()
     cd esp8266/tools
     python get.py
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
-}
-
-function install_platformio()
-{
-    pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
-    platformio platform install "https://github.com/platformio/platform-espressif8266.git#feature/stage"
-    sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
-    ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
-    # Install dependencies:
-    # - esp8266/examples/ConfigFile
-    pio lib install ArduinoJson
-}
-
-function build_sketches_with_platformio()
-{
-    set +e
-    local srcpath=$1
-    local build_arg=$2
-    local build_mod=$3
-    local build_rem=$4
-    local sketches=$(find $srcpath -name *.ino | sort)
-    local testcnt=0
-    for sketch in $sketches; do
-        testcnt=$(( ($testcnt + 1) % $build_mod ))
-        if [ $testcnt -ne $build_rem ]; then
-            continue  # Not ours to do
-        fi
-        local sketchdir=$(dirname $sketch)
-        local sketchdirname=$(basename $sketchdir)
-        local sketchname=$(basename $sketch)
-        if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
-            echo "Skipping $sketch, beacause it is not the main sketch file";
-            continue
-        fi;
-        if [[ -f "$sketchdir/.test.skip" ]]; then
-            echo -e "\n ------------ Skipping $sketch ------------ \n";
-            continue
-        fi
-        local build_cmd="pio ci $sketchdir $build_arg"
-        echo -e "\n ------------ Building $sketch ------------ \n";
-        echo "$build_cmd"
-        time ($build_cmd >build.log)
-        local result=$?
-        if [ $result -ne 0 ]; then
-            echo "Build failed ($1)"
-            echo "Build log:"
-            cat build.log
-            set -e
-            return $result
-        fi
-        rm build.log
-    done
-    set -e
 }
 
 function install_arduino()
@@ -235,48 +208,3 @@ if [ -z "$TRAVIS_BUILD_DIR" ]; then
     echo "TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR"
 fi
 
-cache_dir=$(mktemp -d)
-
-if [ "$BUILD_TYPE" = "build" ]; then
-    install_arduino nodebug
-    build_sketches_with_arduino 1 0 lm2f
-elif [ "$BUILD_TYPE" = "build6" ]; then
-    install_arduino nodebug
-    build_sketches_with_arduino 1 0 lm6f
-elif [ "$BUILD_TYPE" = "build_even" ]; then
-    install_arduino nodebug
-    build_sketches_with_arduino 2 0 lm2f
-elif [ "$BUILD_TYPE" = "build_odd" ]; then
-    install_arduino nodebug
-    build_sketches_with_arduino 2 1 lm2f
-elif [ "$BUILD_TYPE" = "debug_even" ]; then
-    install_arduino debug
-    build_sketches_with_arduino 2 0 lm2f
-elif [ "$BUILD_TYPE" = "debug_odd" ]; then
-    install_arduino debug
-    build_sketches_with_arduino 2 1 lm2f
-elif [ "$BUILD_TYPE" = "build6_even" ]; then
-    install_arduino nodebug
-    build_sketches_with_arduino 2 0 lm6f
-elif [ "$BUILD_TYPE" = "build6_odd" ]; then
-    install_arduino nodebug
-    build_sketches_with_arduino 2 1 lm6f
-elif [ "$BUILD_TYPE" = "platformio" ]; then
-    # PlatformIO
-    install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 1 0
-elif [ "$BUILD_TYPE" = "platformio_even" ]; then
-    # PlatformIO
-    install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 0
-elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
-    # PlatformIO
-    install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 1
-else
-    echo "BUILD_TYPE not set or invalid"
-    rm -rf $cache_dir
-    exit 1
-fi
-
-rm -rf $cache_dir

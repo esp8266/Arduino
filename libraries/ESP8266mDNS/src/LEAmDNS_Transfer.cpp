@@ -76,25 +76,16 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
     
     bool    bResult = true;
     
-    if (p_rSendParameter.m_bResponse) {
-        if (p_rSendParameter.m_bUnicast) {  // Unicast response  -> Send to querier
-            DEBUG_EX_ERR(if (!m_pUDPContext->getRemoteAddress()) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage: MISSING remote address for response!\n")); });
-            IPAddress   ipRemote;
-            ipRemote = m_pUDPContext->getRemoteAddress();
-            bResult = ((_prepareMDNSMessage(p_rSendParameter, _getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE))) &&
-                       (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
-        }
-        else {                              // Multicast response -> Send via the same network interface, that received the query
-            bResult = _sendMDNSMessage_Multicast(p_rSendParameter, (SOFTAP_MODE | STATION_MODE));
-        }
+    if (p_rSendParameter.m_bResponse &&
+        p_rSendParameter.m_bUnicast) {  // Unicast response  -> Send to querier
+        DEBUG_EX_ERR(if (!m_pUDPContext->getRemoteAddress()) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage: MISSING remote address for response!\n")); });
+        IPAddress   ipRemote;
+        ipRemote = m_pUDPContext->getRemoteAddress();
+        bResult = ((_prepareMDNSMessage(p_rSendParameter, _getResponseMulticastInterface())) &&
+                   (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
     }
-    else {                                  // Multicast query -> Send by all available network interfaces
-        const int   caiWiFiOpModes[2] = { SOFTAP_MODE, STATION_MODE };
-        for (int iInterfaceId=0; ((bResult) && (iInterfaceId<=1)); ++iInterfaceId) {
-            if (wifi_get_opmode() & caiWiFiOpModes[iInterfaceId]) {
-                bResult = _sendMDNSMessage_Multicast(p_rSendParameter, caiWiFiOpModes[iInterfaceId]);
-            }
-        }
+    else {                              // Multicast response
+        bResult = _sendMDNSMessage_Multicast(p_rSendParameter);
     }
 
     // Finally clear service reply masks
@@ -112,12 +103,12 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
  * Fills the UDP output buffer (via _prepareMDNSMessage) and sends the buffer
  * via the selected WiFi interface (Station or AP)
  */
-bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter,
-                                               int p_iWiFiOpMode) {
+bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter) {
+
     bool    bResult = false;
 
     IPAddress   fromIPAddress;
-    fromIPAddress = _getResponseMulticastInterface(p_iWiFiOpMode);
+    fromIPAddress = _getResponseMulticastInterface();
     m_pUDPContext->setMulticastInterface(fromIPAddress);
 
 #ifdef MDNS_IP4_SUPPORT
@@ -343,7 +334,8 @@ bool MDNSResponder::_sendMDNSServiceQuery(const MDNSResponder::stcMDNSServiceQue
  *
  */
 bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_QueryDomain,
-                                   uint16_t p_u16QueryType) {
+                                   uint16_t p_u16QueryType,
+                                   stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers /*= 0*/) {
 
     bool                    bResult = false;
     
@@ -351,55 +343,18 @@ bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_Quer
     if (0 != ((sendParameter.m_pQuestions = new stcMDNS_RRQuestion))) {
         sendParameter.m_pQuestions->m_Header.m_Domain = p_QueryDomain;
 
-        sendParameter.m_pQuestions->m_bUnicast = true;
         sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = p_u16QueryType;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
+        // It seems, that some mDNS implementations don't support 'unicast response' questions...
+        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (/*0x8000 |*/ DNS_RRCLASS_IN);   // /*Unicast &*/ INternet
+
+        // TODO: Add knwon answer to the query
+        (void)p_pKnownAnswers;
 
         bResult = _sendMDNSMessage(sendParameter);
     }   // else: FAILED to alloc question
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSQuery: FAILED to alloc question!\n")););
     return bResult;
 }
-
-/*
- * MDNSResponder::_getResponseMulticastInterface
- *
- * Selects the appropriate interface for responses.
- * If AP mode is enabled and the remote contact is in the APs local net, then the
- * AP interface is used to send the response.
- * Otherwise the Station interface (if available) is used.
- *
- */
-IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) const {
-    
-    ip_info IPInfo_Local;
-    bool    bFoundMatch = false;
-    
-    if ((p_iWiFiOpModes & SOFTAP_MODE) &&
-        (wifi_get_opmode() & SOFTAP_MODE)) {
-        //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface: SOFTAP_MODE\n")););
-        // Get remote IP address
-        IPAddress IP_Remote;
-        IP_Remote = m_pUDPContext->getRemoteAddress();
-        // Get local (AP) IP address
-        wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local);
-        
-        if ((IPInfo_Local.ip.addr) &&                                                       // Has local AP IP address AND
-            (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)IP_Remote), &IPInfo_Local.ip, &IPInfo_Local.netmask))) { // Remote address is in the same subnet as the AP
-            bFoundMatch = true;
-        }
-    }
-    if ((!bFoundMatch) &&
-        (p_iWiFiOpModes & STATION_MODE) &&
-        (wifi_get_opmode() & STATION_MODE)) {
-        //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface: STATION_MODE\n")););
-        // Get local (STATION) IP address
-        wifi_get_ip_info(STATION_IF, &IPInfo_Local);
-    }
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface(%i): %s\n"), p_iWiFiOpModes, IPAddress(IPInfo_Local.ip).toString().c_str()););
-    return IPAddress(IPInfo_Local.ip);
-}
-
 
 /**
  * HELPERS
@@ -447,7 +402,7 @@ bool MDNSResponder::_readRRQuestion(MDNSResponder::stcMDNS_RRQuestion& p_rRRQues
  *
  */
 bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer) {
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
+    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
     
     bool    bResult = false;
     
@@ -458,11 +413,11 @@ bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer
         (_udpRead32(u32TTL)) &&
         (_udpRead16(u16RDLength))) {
 
-        DEBUG_EX_INFO(
+        /*DEBUG_EX_INFO(
                 DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer: Reading 0x%04X answer (class:0x%04X, TTL:%u, RDLength:%u) for "), header.m_Attributes.m_u16Type, header.m_Attributes.m_u16Class, u32TTL, u16RDLength);
                 _printRRDomain(header.m_Domain);
                 DEBUG_OUTPUT.printf_P(PSTR("\n"));
-                );
+                );*/
         
         switch (header.m_Attributes.m_u16Type & (~0x8000)) {    // Topmost bit might carry 'cache flush' flag
 #ifdef MDNS_IP4_SUPPORT
@@ -1435,8 +1390,7 @@ bool MDNSResponder::_writeMDNSAnswer_PTR_TYPE(MDNSResponder::stcMDNSService& p_r
     
     stcMDNS_RRDomain        dnssdDomain;
     stcMDNS_RRDomain        serviceDomain;
-    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR,
-                                       ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
+    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR, DNS_RRCLASS_IN);	// No cache flush! only INternet
     bool    bResult = ((_buildDomainForDNSSD(dnssdDomain)) &&                                   // _services._dns-sd._udp.local
                        (_writeMDNSRRDomain(dnssdDomain, p_rSendParameter)) &&
                        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                // TYPE & CLASS
@@ -1461,8 +1415,7 @@ bool MDNSResponder::_writeMDNSAnswer_PTR_NAME(MDNSResponder::stcMDNSService& p_r
                                               MDNSResponder::stcMDNSSendParameter& p_rSendParameter) {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSAnswer_PTR_NAME\n")););
 
-    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR,
-                                       ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
+    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR, DNS_RRCLASS_IN);	// No cache flush! only INternet
     bool    bResult = ((_writeMDNSServiceDomain(p_rService, false, false, p_rSendParameter)) && // _http._tcp.local
                        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                    // TYPE & CLASS
                        (_write32((p_rSendParameter.m_bUnannounce ? 0 : MDNS_SERVICE_TTL), p_rSendParameter)) && // TTL

@@ -52,7 +52,10 @@ public:
     err_t abort()
     {
         if (_sock >= 0)
+        {
             ::close(_sock);
+	    mockverbose("socket %d closed\n", _sock);
+        }
         _sock = -1;
         return ERR_ABRT;
     }
@@ -111,12 +114,12 @@ public:
 
     void setNoDelay(bool nodelay)
     {
-        fprintf(stderr, MOCK "TODO setNoDelay(%d)\n", (int)nodelay);
+        mockverbose("TODO setNoDelay(%d)\n", (int)nodelay);
     }
 
     bool getNoDelay() const
     {
-        fprintf(stderr, MOCK "TODO getNoDelay()\n");
+        mockverbose("TODO getNoDelay()\n");
         return false;
     }
 
@@ -132,42 +135,58 @@ public:
 
     uint32_t getRemoteAddress() const
     {
-        fprintf(stderr, MOCK "TODO getRemoteAddress()\n");
+        mockverbose("TODO getRemoteAddress()\n");
         return 0;
     }
 
     uint16_t getRemotePort() const
     {
-        fprintf(stderr, MOCK "TODO getRemotePort()\n");
+        mockverbose("TODO getRemotePort()\n");
         return 0;
     }
 
     uint32_t getLocalAddress() const
     {
-        fprintf(stderr, MOCK "TODO getLocalAddress()\n");
+        mockverbose("TODO getLocalAddress()\n");
         return 0;
     }
 
     uint16_t getLocalPort() const
     {
-        fprintf(stderr, MOCK "TODO getLocalPort()\n");
+        mockverbose("TODO getLocalPort()\n");
         return 0;
     }
 
     size_t getSize()
     {
-    	return _inbufsize?: mockFillInBuf(_sock, _inbuf, _inbufsize);
+        if (_sock < 0)
+            return 0;
+        if (_inbufsize)
+            return _inbufsize;
+        ssize_t ret = mockFillInBuf(_sock, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
     }
 
     int read()
     {
         char c;
-        return read(&c, 1)? c: -1;
+        return read(&c, 1)? (unsigned char)c: -1;
     }
 
     size_t read (char* dst, size_t size)
     {
-        return mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
+        ssize_t ret = mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
     }
 
     int peek()
@@ -178,27 +197,41 @@ public:
 
     size_t peekBytes(char *dst, size_t size)
     {
-        return mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        ssize_t ret = mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
     }
 
     void discard_received()
     {
-        fprintf(stderr, MOCK "TODO: ClientContext::discard_received()\n");
+        mockverbose("TODO: ClientContext::discard_received()\n");
     }
 
     bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
+        (void)max_wait_ms;
         return true;
     }
 
-    uint8_t state() const
+    uint8_t state()
     {
+	(void)getSize(); // read on socket to force detect closed peer
         return _sock >= 0? ESTABLISHED: CLOSED;
     }
 
     size_t write(const uint8_t* data, size_t size)
     {
-        return mockWrite(_sock, data, size, _timeout_ms);
+	ssize_t ret = mockWrite(_sock, data, size, _timeout_ms);
+	if (ret < 0)
+	{
+	    abort();
+	    return 0;
+	}
+	return ret;
     }
 
     size_t write(Stream& stream)
@@ -208,7 +241,7 @@ public:
         avail = stream.readBytes(buf, avail);
         size_t totwrote = 0;
         uint8_t* w = buf;
-        while (avail)
+        while (avail && _sock >= 0)
         {
             size_t wrote = write(w, avail);
             w += wrote;
@@ -225,42 +258,45 @@ public:
 
     void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
     {
-        fprintf(stderr, MOCK "TODO ClientContext::keepAlive()\n");
+        (void) idle_sec;
+        (void) intv_sec;
+        (void) count;
+        mockverbose("TODO ClientContext::keepAlive()\n");
     }
 
     bool isKeepAliveEnabled () const
     {
-        fprintf(stderr, MOCK "TODO ClientContext::isKeepAliveEnabled()\n");
+        mockverbose("TODO ClientContext::isKeepAliveEnabled()\n");
         return false;
     }
 
     uint16_t getKeepAliveIdle () const
     {
-        fprintf(stderr, MOCK "TODO ClientContext::getKeepAliveIdle()\n");
+        mockverbose("TODO ClientContext::getKeepAliveIdle()\n");
         return 0;
     }
 
     uint16_t getKeepAliveInterval () const
     {
-        fprintf(stderr, MOCK "TODO ClientContext::getKeepAliveInternal()\n");
+        mockverbose("TODO ClientContext::getKeepAliveInternal()\n");
         return 0;
     }
 
     uint8_t getKeepAliveCount () const
     {
-        fprintf(stderr, MOCK "TODO ClientContext::getKeepAliveCount()\n");
+        mockverbose("TODO ClientContext::getKeepAliveCount()\n");
         return 0;
     }
 
     bool getSync () const
     {
-        fprintf(stderr, MOCK "TODO ClientContext::getSync()\n");
+        mockverbose("TODO ClientContext::getSync()\n");
         return _sync;
     }
 
     void setSync (bool sync)
     {
-        fprintf(stderr, MOCK "TODO ClientContext::setSync()\n");
+        mockverbose("TODO ClientContext::setSync()\n");
         _sync = sync;
     }
 

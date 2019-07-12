@@ -57,7 +57,7 @@ class ESP8266WiFiSTAClass {
         bool setAutoReconnect(bool autoReconnect);
         bool getAutoReconnect();
 
-        uint8_t waitForConnectResult();
+        int8_t waitForConnectResult(unsigned long timeoutLength = 60000);
 
         // STA network info
         IPAddress localIP();
@@ -70,9 +70,8 @@ class ESP8266WiFiSTAClass {
         IPAddress dnsIP(uint8_t dns_no = 0);
 
         String hostname();
-        bool hostname(char* aHostname);
+        bool hostname(const String& aHostname) { return hostname(aHostname.c_str()); }
         bool hostname(const char* aHostname);
-        bool hostname(const String& aHostname);
 
         // STA WiFi info
         wl_status_t status();

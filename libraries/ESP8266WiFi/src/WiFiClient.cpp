@@ -137,7 +137,7 @@ int WiFiClient::connect(const String& host, uint16_t port)
     return connect(host.c_str(), port);
 }
 
-int WiFiClient::connect(CONST IPAddress& ip, uint16_t port)
+int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     if (_client) {
         stop();
@@ -351,10 +351,10 @@ WiFiClient::operator bool()
 
 IPAddress WiFiClient::remoteIP()
 {
-    if (!_client)
+    if (!_client || !_client->getRemoteAddress())
         return IPAddress(0U);
 
-    return IPAddress(_client->getRemoteAddress());
+    return _client->getRemoteAddress();
 }
 
 uint16_t WiFiClient::remotePort()

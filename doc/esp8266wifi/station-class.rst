@@ -135,8 +135,8 @@ The following IP configuration may be provided:
       Serial.println();
 
       Serial.printf("Connecting to %s\n", ssid);
-      WiFi.begin(ssid, password);
       WiFi.config(staticIP, gateway, subnet);
+      WiFi.begin(ssid, password);
       while (WiFi.status() != WL_CONNECTED)
       {
         delay(500);
@@ -254,6 +254,7 @@ Function returns one of the following connection statuses:
 - ``WL_CONNECT_FAILED`` if password is incorrect 
 - ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
 - ``WL_DISCONNECTED`` if module is not configured in station mode
+- ``-1`` on timeout
 
 Configuration
 ~~~~~~~~~~~~~
@@ -442,7 +443,6 @@ Return the status of Wi-Fi connection.
 .. code:: cpp
 
     WiFi.status()
-::
 
 Function returns one of the following connection statuses:
 
@@ -502,7 +502,7 @@ Basing on this example, when running above code, module is initially disconnecte
 SSID
 ^^^^
 
-Return the name of Wi-Fi network, formally called `Service Set Identification (SSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e34>`__.
+Return the name of Wi-Fi network, formally called `Service Set Identification (SSID) <https://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e34>`__.
 
 .. code:: cpp
 
@@ -536,7 +536,7 @@ Function returns value of the ``String`` type.
 BSSID
 ^^^^^
 
-Return the mac address the access point where ESP module is connected to. This address is formally called `Basic Service Set Identification (BSSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__.
+Return the mac address of the access point to which the ESP module was directed to connect to. This address is formally called `Basic Service Set Identification (BSSID) <https://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__. The returned pointer is what the user configured when calling begin() with a bssid argument. It does _not_ necessarily reflect the mac address of the access point to which the ESP module's station interface is currently connected to.
 
 .. code:: cpp
 
@@ -588,12 +588,12 @@ Signal strength value is provided in dBm. The type of returned value is ``int32_
 Connect Different
 ~~~~~~~~~~~~~~~~~
 
-`ESP8266 SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ provides alternate methods to connect ESP station to an access point. Out of them `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core implements `WPS <#wps>`__ and `Smart Config <#smart-config>`__ as described in more details below.
+`ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ provides alternate methods to connect ESP station to an access point. Out of them `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core implements `WPS <#wps>`__ and `Smart Config <#smart-config>`__ as described in more details below.
 
 WPS
 ^^^
 
-The following ``beginWPSConfig`` function allows connecting to a network using `Wi-Fi Protected Setup (WPS) <https://en.wikipedia.org/wiki/Wi-Fi_Protected_Setup>`__. Currently only `push-button configuration <http://www.wi-fi.org/knowledge-center/faq/how-does-wi-fi-protected-setup-work>`__ (``WPS_TYPE_PBC`` mode) is supported (SDK 1.5.4).
+The following ``beginWPSConfig`` function allows connecting to a network using `Wi-Fi Protected Setup (WPS) <https://en.wikipedia.org/wiki/Wi-Fi_Protected_Setup>`__. Currently only `push-button configuration <https://www.wi-fi.org/knowledge-center/faq/how-does-wi-fi-protected-setup-work>`__ (``WPS_TYPE_PBC`` mode) is supported (SDK 1.5.4).
 
 .. code:: cpp
 
@@ -662,4 +662,4 @@ Stop smart config, free the buffer taken by ``beginSmartConfig()``. Depending on
 
     stopSmartConfig()
 
-For additional details regarding Smart Config please refer to `ESP8266 API User Guide <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__.
+For additional details regarding Smart Config please refer to `ESP8266 API User Guide <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__.

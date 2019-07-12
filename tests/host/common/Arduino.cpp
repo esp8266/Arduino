@@ -37,12 +37,20 @@ extern "C" void yield()
 {
 }
 
+extern "C" void optimistic_yield (uint32_t interval_us)
+{
+    usleep(interval_us);
+}
+
 extern "C" void esp_yield()
 {
 }
 
 
 extern "C" void __panic_func(const char* file, int line, const char* func) {
+    (void)file;
+    (void)line;
+    (void)func;
     abort();
 }
 
@@ -54,4 +62,10 @@ extern "C" void delay(unsigned long ms)
 extern "C" void delayMicroseconds(unsigned int us)
 {
     usleep(us);
+}
+
+#include "cont.h"
+cont_t* g_pcont = NULL;
+extern "C" void cont_yield(cont_t*)
+{
 }

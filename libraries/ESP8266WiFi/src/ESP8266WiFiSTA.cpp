@@ -25,6 +25,7 @@
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
+#include "PolledTimeout.h"
 
 #include "c_types.h"
 #include "ets_sys.h"
@@ -37,6 +38,7 @@
 extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/dhcp.h"
 #include "lwip/init.h" // LWIP_VERSION_
 #if LWIP_IPV6
 #include "lwip/netif.h" // struct netif
@@ -62,6 +64,13 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
+
+#ifdef NONOSDK3V0
+    static_assert(sizeof(station_config) == 116, "struct station_config has changed, please update comparison function");
+#else
+    static_assert(sizeof(station_config) == 112, "struct station_config has changed, please update comparison function");
+#endif
+
     if(strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0) {
         return false;
     }
@@ -80,6 +89,20 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
+    
+    if(lhs.threshold.rssi != rhs.threshold.rssi) {
+        return false;
+    }
+
+    if(lhs.threshold.authmode != rhs.threshold.authmode) {
+        return false;
+    }
+
+#ifdef NONOSDK3V0
+    if (lhs.open_and_wep_mode_disable != rhs.open_and_wep_mode_disable) {
+        return false;
+    }
+#endif
 
     return true;
 }
@@ -137,7 +160,9 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
+#ifdef NONOSDK3V0
     conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
+#endif
 
     if(bssid) {
         conf.bssid_set = 1;
@@ -223,6 +248,27 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
  * @param dns1       Static DNS server 1
  * @param dns2       Static DNS server 2
  */
+
+#if LWIP_VERSION_MAJOR != 1
+/*
+  About the following call in the end of ESP8266WiFiSTAClass::config():
+      netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+
+  With lwip2, it is needed to trigger IP address change.
+      Recall: when lwip2 is enabled, lwip1 api is still used by espressif firmware
+          https://github.com/d-a-v/esp82xx-nonos-linklayer/tree/25d5e8186f710a230221021cba97727dbfdfd953#how-it-works
+
+  We need first to disable the lwIP API redirection for netif_set_addr() so lwip1's call will be linked:
+      https://github.com/d-a-v/esp82xx-nonos-linklayer/blob/25d5e8186f710a230221021cba97727dbfdfd953/glue-lwip/arch/cc.h#L122
+
+  We also need to declare its prototype using ip4_addr_t instead of ip_addr_t because lwIP-1.x never has IPv6.
+  No need to worry about this #undef, this call is only needed in lwip2, and never used in arduino core code.
+ */
+#undef netif_set_addr // need to call lwIP-v1.4 netif_set_addr()
+extern "C" struct netif* eagle_lwip_getif (int netif_index);
+extern "C" void netif_set_addr (struct netif* netif, ip4_addr_t* ip, ip4_addr_t* netmask, ip4_addr_t* gw);
+#endif
+
 bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress arg2, IPAddress arg3, IPAddress dns2) {
 
   if(!WiFi.enableSTA(true)) {
@@ -264,6 +310,13 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
     return false;
   }
 
+#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+  // get current->previous IP address
+  // (check below)
+  struct ip_info previp;
+  wifi_get_ip_info(STATION_IF, &previp);
+#endif
+
   struct ip_info info;
   info.ip.addr = local_ip.v4();
   info.gw.addr = gateway.v4();
@@ -285,6 +338,14 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       // Set DNS2-Server
       dns_setserver(1, dns2);
   }
+
+#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+  // trigger address change by calling lwIP-v1.4 api
+  // (see explanation above)
+  // only when ip is already set by other mean (generally dhcp)
+  if (previp.ip.addr != 0 && previp.ip.addr != info.ip.addr)
+      netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+#endif
 
   return true;
 }
@@ -381,17 +442,22 @@ bool ESP8266WiFiSTAClass::getAutoReconnect() {
 /**
  * Wait for WiFi connection to reach a result
  * returns the status reached or disconnect if STA is off
- * @return wl_status_t
+ * @return wl_status_t or -1 on timeout
  */
-uint8_t ESP8266WiFiSTAClass::waitForConnectResult() {
+int8_t ESP8266WiFiSTAClass::waitForConnectResult(unsigned long timeoutLength) {
     //1 and 3 have STA enabled
     if((wifi_get_opmode() & 1) == 0) {
         return WL_DISCONNECTED;
     }
-    while(status() == WL_DISCONNECTED) {
-        delay(100);
+    using esp8266::polledTimeout::oneShot;
+    oneShot timeout(timeoutLength); // number of milliseconds to wait before returning timeout error
+    while(!timeout) {
+        yield();
+        if(status() != WL_DISCONNECTED) {
+            return status();
+        }
     }
-    return status();
+    return -1; // -1 indicates timeout
 }
 
 /**
@@ -467,38 +533,90 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
  * @return hostname
  */
 String ESP8266WiFiSTAClass::hostname(void) {
-    return String(wifi_station_get_hostname());
-}
-
-
-/**
- * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
- * @return ok
- */
-bool ESP8266WiFiSTAClass::hostname(char* aHostname) {
-    if(strlen(aHostname) > 32) {
-        return false;
-    }
-    return wifi_station_set_hostname(aHostname);
+    return wifi_station_get_hostname();
 }
 
 /**
  * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
+ * @param aHostname max length:24
  * @return ok
  */
 bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
-    return hostname((char*) aHostname);
-}
+  /*
+  vvvv RFC952 vvvv
+  ASSUMPTIONS
+  1. A "name" (Net, Host, Gateway, or Domain name) is a text string up
+   to 24 characters drawn from the alphabet (A-Z), digits (0-9), minus
+   sign (-), and period (.).  Note that periods are only allowed when
+   they serve to delimit components of "domain style names". (See
+   RFC-921, "Domain Name System Implementation Schedule", for
+   background).  No blank or space characters are permitted as part of a
+   name. No distinction is made between upper and lower case.  The first
+   character must be an alpha character.  The last character must not be
+   a minus sign or period.  A host which serves as a GATEWAY should have
+   "-GATEWAY" or "-GW" as part of its name.  Hosts which do not serve as
+   Internet gateways should not use "-GATEWAY" and "-GW" as part of
+   their names. A host which is a TAC should have "-TAC" as the last
+   part of its host name, if it is a DoD host.  Single character names
+   or nicknames are not allowed.
+  ^^^^ RFC952 ^^^^
 
-/**
- * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
- * @return ok
- */
-bool ESP8266WiFiSTAClass::hostname(const String& aHostname) {
-    return hostname((char*) aHostname.c_str());
+  - 24 chars max
+  - only a..z A..Z 0..9 '-'
+  - no '-' as last char
+  */
+
+    size_t len = strlen(aHostname);
+
+    if (len == 0 || len > 32) {
+        // nonos-sdk limit is 32
+        // (dhcp hostname option minimum size is ~60)
+        DEBUG_WIFI_GENERIC("WiFi.(set)hostname(): empty or large(>32) name\n");
+        return false;
+    }
+
+    // check RFC compliance
+    bool compliant = (len <= 24);
+    for (size_t i = 0; compliant && i < len; i++)
+        if (!isalnum(aHostname[i]) && aHostname[i] != '-')
+            compliant = false;
+    if (aHostname[len - 1] == '-')
+        compliant = false;
+
+    if (!compliant) {
+        DEBUG_WIFI_GENERIC("hostname '%s' is not compliant with RFC952\n", aHostname);
+    }
+
+    bool ret = wifi_station_set_hostname(aHostname);
+    if (!ret) {
+        DEBUG_WIFI_GENERIC("WiFi.hostname(%s): wifi_station_set_hostname() failed\n", aHostname);
+        return false;
+    }
+
+    // now we should inform dhcp server for this change, using lwip_renew()
+    // looping through all existing interface
+    // harmless for AP, also compatible with ethernet adapters (to come)
+    for (netif* intf = netif_list; intf; intf = intf->next) {
+
+        // unconditionally update all known interfaces
+#if LWIP_VERSION_MAJOR == 1
+        intf->hostname = (char*)wifi_station_get_hostname();
+#else
+        intf->hostname = wifi_station_get_hostname();
+#endif
+
+        if (netif_dhcp_data(intf) != nullptr) {
+            // renew already started DHCP leases
+            err_t lwipret = dhcp_renew(intf);
+            if (lwipret != ERR_OK) {
+                DEBUG_WIFI_GENERIC("WiFi.hostname(%s): lwIP error %d on interface %c%c (index %d)\n",
+                                   intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
+                ret = false;
+            }
+        }
+    }
+
+    return ret && compliant;
 }
 
 /**

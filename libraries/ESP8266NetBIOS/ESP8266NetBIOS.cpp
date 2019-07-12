@@ -156,7 +156,7 @@ bool ESP8266NetBIOS::begin(const char *name)
     }
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
-    err_t err = udp_bind(_pcb, INADDR_ANY, NBNS_PORT);
+    err_t err = udp_bind(_pcb, (ip_addr_t*)INADDR_ANY, NBNS_PORT);
     if(err != ERR_OK) {
         end();
         return false;
@@ -182,7 +182,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
         size_t len = pb->len;
 #if LWIP_VERSION_MAJOR == 1
         // check UdpContext.h
-        const ip_addr_t* saddr = &current_iphdr_src;
+        ip_addr_t* saddr = &current_iphdr_src;
 #else
         // check UdpContext.h
         const ip_addr_t* saddr = &ip_data.current_iphdr_src;

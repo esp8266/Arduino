@@ -200,7 +200,7 @@ void EspClass::restart(void)
 
 uint16_t EspClass::getVcc(void)
 {
-    InterruptLock lock;
+    esp8266::InterruptLock lock;
     (void)lock;
     return system_get_vdd33();
 }
@@ -519,14 +519,14 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _FS_start;
 
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
@@ -572,9 +572,7 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
 static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
 
 bool EspClass::flashEraseSector(uint32_t sector) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = spi_flash_erase_sector(sector);
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 
@@ -622,7 +620,6 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
 #endif
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = 0;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
@@ -633,14 +630,11 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     {
         rc = spi_flash_write(offset, data, size);
     }
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = spi_flash_read(offset, (uint32_t*) data, size);
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 

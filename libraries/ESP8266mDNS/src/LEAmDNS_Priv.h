@@ -35,16 +35,21 @@ namespace MDNSImplementation {
 
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
-// #define DEBUG_ESP_MDNS_RESPONDER
+//#define DEBUG_ESP_MDNS_RESPONDER
 
 
 #ifndef LWIP_OPEN_SRC
     #define LWIP_OPEN_SRC
 #endif
 
+//
+// If ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE is defined, the mDNS responder ignores a successful probing
+// This allows to drive the responder in a environment, where 'update()' isn't called in the loop
+//#define ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
+
 // Enable/disable debug trace macros
 #ifdef DEBUG_ESP_MDNS_RESPONDER
-//#define DEBUG_ESP_MDNS_INFO
+#define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_ERR
 #define DEBUG_ESP_MDNS_TX
 #define DEBUG_ESP_MDNS_RX
@@ -54,22 +59,22 @@ namespace MDNSImplementation {
     #ifdef DEBUG_ESP_MDNS_INFO
         #define DEBUG_EX_INFO(A)    A
     #else
-        #define DEBUG_EX_INFO(A)
+        #define DEBUG_EX_INFO(A)    do { (void)0; } while (0)
     #endif
     #ifdef DEBUG_ESP_MDNS_ERR
         #define DEBUG_EX_ERR(A) A
     #else
-        #define DEBUG_EX_ERR(A)
+        #define DEBUG_EX_ERR(A) do { (void)0; } while (0)
     #endif
     #ifdef DEBUG_ESP_MDNS_TX
         #define DEBUG_EX_TX(A)  A
     #else
-        #define DEBUG_EX_TX(A)
+        #define DEBUG_EX_TX(A)  do { (void)0; } while (0)
     #endif
     #ifdef DEBUG_ESP_MDNS_RX
         #define DEBUG_EX_RX(A)  A
     #else
-        #define DEBUG_EX_RX(A)
+        #define DEBUG_EX_RX(A)  do { (void)0; } while (0)
     #endif
 
     #ifdef DEBUG_ESP_PORT
@@ -78,10 +83,10 @@ namespace MDNSImplementation {
         #define DEBUG_OUTPUT Serial
     #endif
 #else
-    #define DEBUG_EX_INFO(A)
-    #define DEBUG_EX_ERR(A)
-    #define DEBUG_EX_TX(A)
-    #define DEBUG_EX_RX(A)
+    #define DEBUG_EX_INFO(A)    do { (void)0; } while (0)
+    #define DEBUG_EX_ERR(A)     do { (void)0; } while (0)
+    #define DEBUG_EX_TX(A)      do { (void)0; } while (0)
+    #define DEBUG_EX_RX(A)      do { (void)0; } while (0)
 #endif
 
 
@@ -99,8 +104,10 @@ namespace MDNSImplementation {
  * subnet level distance MDNS records should travel.
  * 1 sets the subnet distance to 'local', which is default for MDNS.
  * (Btw.: 255 would set it to 'as far as possible' -> internet)
+ *
+ * However, RFC 3171 seems to force 255 instead
  */
-#define MDNS_MULTICAST_TTL              1
+#define MDNS_MULTICAST_TTL              255/*1*/
 
 /*
  * This is the MDNS record TTL
@@ -127,9 +134,15 @@ namespace MDNSImplementation {
 
 /*
  * Delay between and number of probes for host and service domains
+ * Delay between and number of announces for host and service domains
+ * Delay between and number of service queries; the delay is multiplied by the resent number in '_checkServiceQueryCache'
  */
 #define MDNS_PROBE_DELAY                250
 #define MDNS_PROBE_COUNT                3
+#define MDNS_ANNOUNCE_DELAY             1000
+#define MDNS_ANNOUNCE_COUNT             8
+#define MDNS_DYNAMIC_QUERY_RESEND_COUNT 5
+#define MDNS_DYNAMIC_QUERY_RESEND_DELAY 5000
 
 
 /*

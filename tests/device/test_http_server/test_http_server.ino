@@ -16,6 +16,11 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
@@ -24,7 +29,7 @@ void setup()
     MDNS.begin("etd");
     server.onNotFound([](){ server.send(404); });
     server.begin();
-    BS_RUN(Serial);
+    return true;
 }
 
 void handle_request()

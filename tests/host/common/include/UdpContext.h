@@ -79,15 +79,7 @@ public:
         _sock = -1;
     }
 
-#if 0
     void setMulticastInterface(const ip_addr_t& addr)
-    {
-        (void)addr;
-        // user multicast, and this is how it works with posix: send to multicast address:
-        _dst.addr = staticMCastAddr;
-    }
-#endif
-    void setMulticastInterface(const ip_addr_t* addr)
     {
         (void)addr;
         // user multicast, and this is how it works with posix: send to multicast address:
@@ -97,7 +89,7 @@ public:
     void setMulticastTTL(int ttl)
     {
         (void)ttl;
-        //fprintf(stderr, MOCK "TODO: UdpContext::setMulticastTTL\n");
+        //mockverbose("TODO: UdpContext::setMulticastTTL\n");
     }
 
     // warning: handler is called from tcp stack context
@@ -118,12 +110,12 @@ public:
 
     void seek(const size_t pos)
     {
-        fprintf(stderr, MOCK "TODO: implement UDP offset\n");
         if (!isValidOffset(pos))
         {
-            fprintf(stderr, MOCK "UDPContext::seek too far (%zd >= %zd)\n", pos, _inbufsize);
+            mockverbose("UDPContext::seek too far (%zd >= %zd)\n", pos, _inbufsize);
             exit(EXIT_FAILURE);
         }
+        mockUDPSwallow(pos, _inbuf, _inbufsize);
     }
 
     bool isValidOffset(const size_t pos) const {
@@ -142,13 +134,13 @@ public:
 
     uint32_t getDestAddress()
     {
-        fprintf(stderr, MOCK "TODO: implement UDP getDestAddress\n");
+        mockverbose("TODO: implement UDP getDestAddress\n");
         return 0; //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
     }
 
     uint16_t getLocalPort()
     {
-        fprintf(stderr, MOCK "TODO: implement UDP getLocalPort\n");
+        mockverbose("TODO: implement UDP getLocalPort\n");
         return 0; //
     }
 
@@ -183,7 +175,7 @@ public:
 
     void flush()
     {
-        //fprintf(stderr, MOCK "UdpContext::flush() does not follow arduino's flush concept\n");
+        //mockverbose("UdpContext::flush() does not follow arduino's flush concept\n");
         //exit(EXIT_FAILURE);
         // would be:
         _inbufsize = 0;
@@ -193,7 +185,7 @@ public:
     {
         if (size + _outbufsize > sizeof _outbuf)
         {
-            fprintf(stderr, MOCK "UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE, (size + _outbufsize));
+            mockverbose("UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE, (size + _outbufsize));
             exit(EXIT_FAILURE);
         }
 
@@ -233,7 +225,7 @@ private:
             //ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
         }
         else
-            fprintf(stderr, MOCK "TODO unhandled udp address of size %d\n", (int)addrsize);
+            mockverbose("TODO unhandled udp address of size %d\n", (int)addrsize);
     }
 
     int _sock = -1;

@@ -59,7 +59,7 @@ The format of a signed binary is compatible with the standard binary format, and
 
 As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash (i.e. if the signed hash was 64 bytes, then this uint32 will contain 64).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
 
-.. code::
+.. code:: bash
 
     NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
 
@@ -84,19 +84,19 @@ To enable this mode, just include `private.key` and `public.key` in the sketch `
 
 When the signing process starts, the message:
 
-.. code::
+.. code:: bash
 
     Enabling binary signing
 
 Will appear in the IDE window before a compile is launched, and at the completion of the build the signed binary file well be displayed in the IDE build window as:
 
-.. code::
+.. code:: bash
 
     Signed binary: /full/path/to/sketch.bin.signed
 
 If you receive either of the following messages in the IDE window, the signing was not completed and you will need to verify the `public.key` and `private.key`:
 
-.. code::
+.. code:: bash
 
     Not enabling binary signing
     ... or ...
@@ -124,6 +124,18 @@ Compile the sketch normally and, once a `.bin` file is available, sign it using 
 .. code:: bash
 
     <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
+
+Old And New Signature Formats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Up to version 2.5.2 of the core, the format of signatures was a little different. An additional signed binary with the extension legacy_sig is created. This file contains a signature in the old format and can be uploaded OTA to a device that checks for the old signature format.
+
+To create a legacy signature, call the signing script with --legacy:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
 
 Safety
 ~~~~~~
@@ -291,9 +303,9 @@ If OTA update fails, first step is to check for error messages that may be shown
 
 This window is for Arduino Yún and not yet implemented for esp8266/Arduino. It shows up because IDE is attempting to open Serial Monitor using network port you have selected for OTA upload.
 
-Instead you need an external serial monitor. If you are a Windows user check out `Termite <http://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
+Instead you need an external serial monitor. If you are a Windows user check out `Termite <https://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
 
-Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <http://www.compuphase.com/software_termite.htm>`__ below:
+Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <https://www.compuphase.com/software_termite.htm>`__ below:
 
 .. figure:: termite-configuration.png
    :alt: Termite settings
@@ -380,8 +392,8 @@ You can use another module if it meets previously described `requirements <#basi
       https://github.com/esp8266/Arduino#installing-with-boards-manager
    -  Host software depending on O/S you use:
 
-      1. Avahi http://avahi.org/ for Linux
-      2. Bonjour http://www.apple.com/support/bonjour/ for Windows
+      1. Avahi https://avahi.org/ for Linux
+      2. Bonjour https://www.apple.com/support/bonjour/ for Windows
       3. Mac OSX and iOS - support is already built in / no any extra
          s/w is required
 
@@ -451,7 +463,7 @@ You can use another module if it meets previously described `requirements <#basi
       :alt: Serial Monitor - after OTA update
 
    Just after reboot you should see exactly the same message
-   ``HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser``
+   ``HTTPUpdateServer ready! Open http://esp8266-webupdate.local/update in your browser``
    like in step 3. This is because module has been loaded again with the
    same code – first using serial port, and then using OTA.
 

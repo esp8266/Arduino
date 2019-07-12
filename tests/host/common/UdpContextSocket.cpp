@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <assert.h>
+#include <net/if.h>
 
 int mockUDPSocket ()
 {
@@ -51,7 +52,19 @@ int mockUDPSocket ()
 
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 {
-	int optval = 1;
+	int optval;
+	int mockport;
+
+	mockport = port;
+	if (mockport < 1024 && mock_port_shifter)
+	{
+		mockport += mock_port_shifter;
+		fprintf(stderr, MOCK "=====> UdpServer port: %d shifted to %d (use option -s) <=====\n", port, mockport);
+	}
+	else
+		fprintf(stderr, MOCK "=====> UdpServer port: %d <=====\n", mockport);
+
+	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
 		fprintf(stderr, MOCK "SO_REUSEPORT failed\n");
 	optval = 1;
@@ -64,17 +77,18 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
+	(void) dstaddr;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(port);
+	servaddr.sin_port = htons(mockport);
 
 	// Bind the socket with the server address
 	if (bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
-		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", port, strerror(errno));
+		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", mockport, strerror(errno));
 		return false;
 	}
 	else
-		fprintf(stderr, MOCK "UDP server on port %d (sock=%d)\n", (int)port, sock);
+		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
 	if (mcast)
 	{
@@ -87,7 +101,12 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 		if (global_ipv4_netfmt)
 		{
+#if __APPLE__
+			int idx = if_nametoindex(host_interface);
+			if (setsockopt(sock, IPPROTO_TCP, IP_BOUND_IF, &idx, sizeof(idx)) == -1)
+#else
 			if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, host_interface, strlen(host_interface)) == -1)
+#endif
 				fprintf(stderr, MOCK "UDP multicast: can't setup bind/output on interface %s: %s\n", host_interface, strerror(errno));
 			if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, &mreq.imr_interface, sizeof(struct in_addr)) == -1)
 				fprintf(stderr, MOCK "UDP multicast: can't setup bind/input on interface %s: %s\n", host_interface, strerror(errno));
@@ -135,6 +154,8 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
+	(void) sock;
+	(void) timeout_ms;  
 	if (usersize > CCBUFSIZE)
 		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
@@ -150,17 +171,23 @@ size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, c
 	return retsize;
 }
 
+void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize)
+{
+	// poor man buffer
+	memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
+	ccinbufsize -= copied;
+}
+
 size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	size_t copied = mockUDPPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
-	// swallow (XXX use a circular buffer?)
-	memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
-	ccinbufsize -= copied;
+	mockUDPSwallow(copied, ccinbuf, ccinbufsize);
 	return copied;
 }
 
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port)
 {
+	(void) timeout_ms;
 	// Filling server information
 	struct sockaddr_in peer;
 	peer.sin_family = AF_INET;
