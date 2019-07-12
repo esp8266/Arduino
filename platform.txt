@@ -83,8 +83,8 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs bash, git, and echo
-recipe.hooks.sketch.prebuild.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
-recipe.hooks.core.prebuild.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
+recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+recipe.hooks.core.prebuild.pattern="{runtime.tools.python.path}/python" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
 
 ## Build the app.ld linker file
 recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
