@@ -160,7 +160,7 @@ class String {
 
         friend StringSumHelper & operator +(const StringSumHelper &lhs, const String &rhs);
         friend StringSumHelper & operator +(const StringSumHelper &lhs, const char *cstr);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, const char cstr[]);
+        friend StringSumHelper & operator +(const StringSumHelper &lhs, char cstr[]);
         friend StringSumHelper & operator +(const StringSumHelper &lhs, char c);
         friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned char num);
         friend StringSumHelper & operator +(const StringSumHelper &lhs, int num);
