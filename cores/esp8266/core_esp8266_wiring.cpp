@@ -24,6 +24,7 @@
 #include "osapi.h"
 #include "user_interface.h"
 #include "cont.h"
+#include <PolledTimeout.h>
 
 extern "C" {
 
@@ -58,8 +59,9 @@ void interruptable_delay(unsigned long ms) {
 
 void delay(unsigned long ms) {
     if (ms) {
-        unsigned long delay_start = millis();
-        while(millis() - delay_start < ms) {
+        using esp8266::polledTimeout::oneShotMs;
+        oneShotMs waitDone(ms);
+        while(!waitDone) {
             os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
             os_timer_arm(&delay_timer, 1, ONCE);
             esp_yield();
