@@ -242,7 +242,7 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
       if (servicePtr->_txtLen + txtLen > 1300) 
         return false;  //max txt record size
       MDNSTxt *newtxt = new MDNSTxt;
-      newtxt->_txt = String(key) + String("=") + String(value);
+      newtxt->_txt = String(key) + "=" + String(value);
       newtxt->_next = 0;
       if(servicePtr->_txts == 0) { //no services have been added
         //Adding First TXT to service
