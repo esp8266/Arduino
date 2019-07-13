@@ -37,6 +37,8 @@ class WiFiClientSecure : public WiFiClient {
     WiFiClientSecure(const WiFiClientSecure &rhs);
     ~WiFiClientSecure() override;
 
+    WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
