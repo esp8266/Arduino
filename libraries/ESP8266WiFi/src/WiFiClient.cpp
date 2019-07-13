@@ -135,11 +135,11 @@ int WiFiClient::connect(const char* host, uint16_t port)
 int WiFiClient::connectAsync(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
-    if (WiFi.hostByNameAsync(host, remote_addr))
-    {
+    int ret = WiFi.hostByNameAsync(host, remote_addr);
+    if (ret == WIFI_CNT_OK) {
         return connect(remote_addr, port);
     }
-    return 0;
+    return ret;
 }
 
 int WiFiClient::connect(const char* host, uint16_t port, bool async)
