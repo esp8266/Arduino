@@ -82,28 +82,18 @@ static void ets_printf_P(const char *str, ...) {
     }
 }
 
-#define FAKE_REASON_NONE 255
-#define FAKE_REASON_USER 254
-static int fake_rst_reason = FAKE_REASON_NONE;
+#define USER_REASON_NONE 255
+#define USER_REASON_SWEXCEPTION 254
+// using numbers different from "REASON_" in user_interface.h 0..6
+static int user_reset_reason = USER_REASON_NONE;
 
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
 
-#if 0
-    if (gdb_present()) {
-        /* When GDBStub is present, exceptions are handled by GDBStub,
-           but Soft WDT will still call this function.
-           Trigger an exception to break into GDB.
-           TODO: check why gdb_do_break() or asm("break.n 0") do not
-           break into GDB here. */
-        raise_exception();
-    }
-#endif
-
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
-    if (fake_rst_reason == FAKE_REASON_NONE)
+    if (user_reset_reason == USER_REASON_NONE)
     {
         system_rtc_mem_read(0, &rst_info, sizeof(rst_info));
         if (rst_info.reason != REASON_SOFT_WDT_RST &&
@@ -114,7 +104,7 @@ void __wrap_system_restart_local() {
         }
     }
     else
-        rst_info.reason = fake_rst_reason;
+        rst_info.reason = user_reset_reason;
 
     // TODO:  ets_install_putc1 definition is wrong in ets_sys.h, need cast
     ets_install_putc1((void *)&uart_write_char_d);
@@ -233,23 +223,12 @@ static void uart1_write_char_d(char c) {
 }
 
 static void raise_exception() {
-#if 0
-
-    // works but also showing
-    // "Fatal exception 29(StoreProhibitedCause)"
-    *((char*)0) = 0;
-
-#else
-
     if (gdb_present())
-        //*((char*)0) = 0;
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
-    fake_rst_reason = FAKE_REASON_USER;
+    user_reset_reason = USER_REASON_SWEXCEPTION;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
     __wrap_system_restart_local();
-
-#endif
 
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
