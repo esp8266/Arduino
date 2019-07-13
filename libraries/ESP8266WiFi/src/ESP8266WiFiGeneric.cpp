@@ -608,7 +608,7 @@ struct host_struct {
     err_t status; // failed, ready, in progress (callback not called)
 };
 
-static struct host_struct host_var = { "", IPADDR_ANY, ERR_TIMEOUT };
+static struct host_struct host_var = { emptyString, IPADDR_ANY, ERR_TIMEOUT };
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
@@ -646,7 +646,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
             DEBUG_WIFI_GENERIC("[hostByNameAsync] IP NOT found! Please retry.");
         }
         // Reset
-        host_var.hostname = "";
+        host_var.hostname = emptyString;
         return (host_var.status == ERR_OK) ? WIFI_CNT_OK : WIFI_CNT_FAILED;
     } else { // When requesting a new DNS search, while the previous hasn't finished yet
         // TODO: implement multiple request at same time
@@ -657,12 +657,15 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
     (void) name;
-    err_t err = reinterpret_cast<struct host_struct*>(callback_arg)->status;
-    if (ipaddr && err == ERR_INPROGRESS) {
-        reinterpret_cast<struct host_struct*>(callback_arg)->addr = IPAddress(ipaddr);
-        reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_OK;
+    //err_t err = reinterpret_cast<struct host_struct*>(callback_arg)->status;
+    if (ipaddr && host_var.status == ERR_INPROGRESS) {
+        //reinterpret_cast<struct host_struct*>(callback_arg)->addr = IPAddress(ipaddr);
+        //reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_OK;
+        host_var.addr = IPAddress(ipaddr);
+        host_var.status = ERR_OK;
     } else {
-        reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_TIMEOUT; // Generic error
+        //reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_TIMEOUT; // Generic error
+        host_var.status = ERR_TIMEOUT; // Generic error
     }
 }
 
