@@ -900,7 +900,7 @@ void ATTR_GDBINIT gdbstub_set_uart_isr_callback(void (*func)(void*, uint8_t), vo
 
 
 //gdbstub initialization routine.
-void ATTR_GDBINIT gdbstub_init() {
+void gdbstub_init() {
 #if GDBSTUB_REDIRECT_CONSOLE_OUTPUT
 	os_install_putc1(gdbstub_semihost_putchar1);
 #endif
@@ -923,4 +923,4 @@ bool ATTR_GDBEXTERNFN gdb_present() {
 }
 
 void ATTR_GDBFN gdb_do_break() { gdbstub_do_break(); }
-void ATTR_GDBINIT gdb_init() __attribute__((alias("gdbstub_init")));
+void gdb_init() __attribute__(( alias("gdbstub_init") ));
