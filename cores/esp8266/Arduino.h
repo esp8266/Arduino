@@ -257,6 +257,7 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 #ifdef __cplusplus
 
 #include <algorithm>
+#include <cmath>
 #include <pgmspace.h>
 
 #include "WCharacter.h"

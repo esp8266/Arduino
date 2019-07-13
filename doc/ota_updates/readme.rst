@@ -125,6 +125,18 @@ Compile the sketch normally and, once a `.bin` file is available, sign it using 
 
     <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
 
+Old And New Signature Formats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Up to version 2.5.2 of the core, the format of signatures was a little different. An additional signed binary with the extension legacy_sig is created. This file contains a signature in the old format and can be uploaded OTA to a device that checks for the old signature format.
+
+To create a legacy signature, call the signing script with --legacy:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
+
 Safety
 ~~~~~~
 
