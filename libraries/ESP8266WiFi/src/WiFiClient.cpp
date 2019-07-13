@@ -137,7 +137,7 @@ int WiFiClient::connectAsync(const char* host, uint16_t port)
     IPAddress remote_addr;
     int ret = WiFi.hostByNameAsync(host, remote_addr);
     if (ret == WIFI_CNT_OK) {
-        return connect(remote_addr, port);
+        return connect(remote_addr, port) ? WIFI_CNT_OK : WIFI_CNT_FAILED;
     }
     return ret;
 }
