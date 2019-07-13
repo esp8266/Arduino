@@ -91,7 +91,7 @@ void* realloc_loc (void* p, size_t s, const char* file, int line);
  #define UMM_BEST_FIT
 
 /* Start addresses and the size of the heap */
-extern char _heap_start;
+extern char _heap_start[1024];
 #define UMM_MALLOC_CFG__HEAP_ADDR   ((uint32_t)&_heap_start)
 #define UMM_MALLOC_CFG__HEAP_SIZE   ((size_t)(0x3fffc000 - UMM_MALLOC_CFG__HEAP_ADDR))
 
