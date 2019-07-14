@@ -548,7 +548,6 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
-    time_t lastTime = 0;
     time_t timeInit = millis();
     err_t err;
     ip_addr_t addr;
@@ -558,15 +557,15 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, NULL);
         if (err == ERR_OK) {
             aResult = IPAddress(&addr);
-		    DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
+            DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
             return WIFI_CNT_OK;
      	} else if(err != ERR_INPROGRESS) {
-	        DEBUG_WIFI_GENERIC("[hostByName] DNS search failed.\n");
-			break;
-     	}
-     	DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress.\n");
-     	delay(100);
-   	}
+            DEBUG_WIFI_GENERIC("[hostByName] DNS search failed.\n");
+            break;
+        }
+        DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress.\n");
+        delay(100);
+    }
 
     return WIFI_CNT_FAILED;
 }
@@ -579,9 +578,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  */
 void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
-    name = NULL;
+    /*(void) name;
     ipaddr = NULL;
-    callback_arg = NULL;
+    callback_arg = NULL;*/
 }
 
 // Async part
@@ -591,17 +590,17 @@ void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, vo
 int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult) {
     ip_addr_t addr;
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback_async, NULL);
-	if (err == ERR_OK) {
+    if (err == ERR_OK) {
         aResult = IPAddress(addr);
-		DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
-		return WIFI_CNT_OK;
-	}
-	if (err == ERR_INPROGRESS) {
-		DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress. Host %s\n", aHostname);
-		return WIFI_CNT_INPROGRESS;
-	}
-	DEBUG_WIFI_GENERIC("[hostByName] DNS search failed. Host %s\n", aHostname);
-	return WIFI_CNT_FAILED;
+        DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
+        return WIFI_CNT_OK;
+    }
+    if (err == ERR_INPROGRESS) {
+        DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress. Host %s\n", aHostname);
+        return WIFI_CNT_INPROGRESS;
+    }
+    DEBUG_WIFI_GENERIC("[hostByName] DNS search failed. Host %s\n", aHostname);
+    return WIFI_CNT_FAILED;
 }
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
