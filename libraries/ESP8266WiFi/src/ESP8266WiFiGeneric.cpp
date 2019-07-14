@@ -548,13 +548,13 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
-    time_t lastTime = 0;
+	time_t lastTime = 0;
 	time_t timeInit = millis();
-    err_t err;
+	err_t err;
 
-   	while ((millis() - timeInit) < timeout_ms) {
+	while ((millis() - timeInit) < timeout_ms) {
 	    lastTime = millis();
-	    err = dns_gethostbyname(aHostname, (ip_addr_t) &aResult, &wifi_dns_found_callback, NULL);
+	    err = dns_gethostbyname(aHostname, (ip_addr_t*) &aResult, &wifi_dns_found_callback, NULL);
      	if (err == ERR_OK) {
          	aResult = IPAddress(&addr);
 		    DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
@@ -588,7 +588,7 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
 int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult) {
-    err_t err = dns_gethostbyname(aHostname, (ip_addr_t) &aResult, &wifi_dns_found_callback_async, NULL);
+    err_t err = dns_gethostbyname(aHostname, (ip_addr_t*) &aResult, &wifi_dns_found_callback_async, NULL);
 	if (err == ERR_OK) {
 		DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
 		return WIFI_CNT_OK;
