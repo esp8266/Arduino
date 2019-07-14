@@ -55,6 +55,8 @@ enableSTA	KEYWORD2
 enableAP	KEYWORD2
 forceSleepBegin	KEYWORD2
 forceSleepWake	KEYWORD2
+hostByName	KEYWORD2
+hostByNameAsync	KEYWORD2
 
 #ESP8266WiFi
 printDiag	KEYWORD2
@@ -119,6 +121,7 @@ smartConfigDone	KEYWORD2
 #WiFiClient
 status	KEYWORD2
 connect	KEYWORD2
+connectAsync	KEYWORD2
 write	KEYWORD2
 write_P	KEYWORD2
 available	KEYWORD2
