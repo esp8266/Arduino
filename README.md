@@ -114,7 +114,7 @@ Please provide as much context as possible, as well as the information requested
 
 ### Contributing
 
-For minor fixes of code and documentation, please go ahead and submit a pull request.
+For minor fixes of code and documentation, please go ahead and submit a pull request.  A gentle introduction to the process can be found [here](https://www.freecodecamp.org/news/a-simple-git-guide-and-cheat-sheet-for-open-source-contributors/).
 
 Check out the list of issues that are easy to fix — [easy issues pending](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
