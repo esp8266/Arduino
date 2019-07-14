@@ -217,9 +217,9 @@ int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
   return _connectSSL(nullptr);
 }
 
-int WiFiClientSecure::connect(const char* host, uint16_t port) {
+int WiFiClientSecure::connect(const char* name, uint16_t port) {
   IPAddress remote_addr;
-  if (!WiFi.hostByName(host, remote_addr)) {
+  if (!WiFi.hostByName(name, remote_addr)) {
     DEBUG_BSSL("connect: Name loopup failure\n");
     return 0;
   }
@@ -229,26 +229,6 @@ int WiFiClientSecure::connect(const char* host, uint16_t port) {
   }
   return _connectSSL(name);
 }
-
-int WiFiClientSecure::connectAsync(const char* host, uint16_t port)
-{
-    IPAddress remote_addr;
-    int ret = WiFi.hostByNameAsync(host, remote_addr);
-    if (ret == WIFI_CNT_OK) {
-        return connect(remote_addr, port) ? WIFI_CNT_OK : WIFI_CNT_FAILED;
-    }
-    return ret;
-}
-
-int WiFiClientSecure::connect(const char* host, uint16_t port, bool async)
-{
-    if (async) {
-        return connectAsync(host, port);
-    } else {
-        return connect(host, port);
-    }
-}
-
 
 int WiFiClientSecure::connect(const String& host, uint16_t port) {
   return connect(host.c_str(), port);
