@@ -690,14 +690,14 @@ extern "C" {
       for (size_t i=0; i<sizeof(res); i++) {
         char hex[4]; // XX_\0
         snprintf(hex, sizeof(hex), "%02x ", xc->match_fingerprint[i] & 0xff);
-        strncat(buff, hex, sizeof(buff));
+        strlcat(buff, hex, sizeof(buff));
       }
       DEBUG_BSSL("insecure_end_chain: expected %s\n", buff);
       buff[0] =0;
       for (size_t i=0; i<sizeof(res); i++) {
         char hex[4]; // XX_\0
         snprintf(hex, sizeof(hex), "%02x ", res[i] & 0xff);
-        strncat(buff, hex, sizeof(buff));
+        strlcat(buff, hex, sizeof(buff));
       }
       DEBUG_BSSL("insecure_end_chain: received %s\n", buff);
 #endif
