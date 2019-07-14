@@ -550,36 +550,26 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
-    ip_addr_t addr;
-    aResult = static_cast<uint32_t>(0);
+    time_t lastTime = 0;
+   	time_t timeInit = millis();
+    err_t err;
 
-    if(aResult.fromString(aHostname)) {
-        // Host name is a IP address use it!
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
-        return 1;
-    }
+   	while ((millis() - timeInit) < timeout_ms) {
+	      	lastTime = millis();
+	      	err = dns_gethostbyname(aHostname, &aResult, &wifi_dns_found_callback, NULL);
+     		if (err == ERR_OK) {
+         		aResult = IPAddress(&addr);
+		        	DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
+        			return WIFI_CNT_OK;
+     		} else if(err != ERR_INPROGRESS) {
+	        		DEBUG_WIFI_GENERIC("[hostByName] DNS search failed.\n");
+		        	break;
+     		}
+     		DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress.\n");
+     		delay(100);
+   	}
 
-    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
-    if(err == ERR_OK) {
-        aResult = IPAddress(&addr);
-    } else if(err == ERR_INPROGRESS) {
-        _dns_lookup_pending = true;
-        delay(timeout_ms);
-        _dns_lookup_pending = false;
-        // will return here when dns_found_callback fires
-        if(aResult.isSet()) {
-            err = ERR_OK;
-        }
-    }
-
-    if(err != 0) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
-    } else {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
-    }
-
-    return (err == ERR_OK) ? 1 : 0;
+    return WIFI_CNT_FAILED;
 }
 
 /**
@@ -591,82 +581,32 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
     (void) name;
-    if (!_dns_lookup_pending) {
-        return;
-    }
-    if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
-    }
-    esp_schedule(); // resume the hostByName function
+    (void*) ipaddr;
+    (void*) callback_arg;
 }
 
 // Async part
 
-struct host_struct {
-    String hostname;
-    IPAddress addr;
-    err_t status; // failed, ready, in progress (callback not called)
-};
-
-static struct host_struct host_var = { emptyString, IPADDR_ANY, ERR_TIMEOUT };
-
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
 int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult) {
-    if (aHostname == NULL) {
-        DEBUG_WIFI_GENERIC("[hostByNameAsync] Hostname is NULL!");
-        return WIFI_CNT_FAILED;
-    }
-
-    if (host_var.hostname == emptyString) { // No DNS search in progress
-        ip_addr_t addr;
-        host_var.status = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback_async, &host_var);
-        if (host_var.status == ERR_OK) {
-            aResult = IPAddress(addr);
-            DEBUG_WIFI_GENERIC("[hostByNameAsync] IP found! Host: %s -> IP %s .", aHostname, aResult.toString().c_str());
-            return WIFI_CNT_OK;
-        }
-        if (host_var.status == ERR_INPROGRESS) {
-            DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS query registred, waiting for response.");
-            // Save info for next call and callback call
-            host_var.hostname = aHostname;
-            return WIFI_CNT_INPROGRESS;
-        }
-        DEBUG_WIFI_GENERIC("[hostByNameAsync] An error occurred! Please retry!");
-        return WIFI_CNT_FAILED;
-    } else if (host_var.hostname == aHostname) { // DNS search already initialized
-        if (host_var.status == ERR_INPROGRESS) { // Search still in progress
-            DEBUG_WIFI_GENERIC("[hostByNameAsync] DNS search still in progress!");
-            return WIFI_CNT_INPROGRESS;
-        }
-        if (host_var.status == ERR_OK) { // IP found
-            aResult = host_var.addr;
-            DEBUG_WIFI_GENERIC("[hostByNameAsync] IP found! Host: %s -> IP %s .", aHostname, aResult.toString().c_str());
-        } else { // Generic error
-            DEBUG_WIFI_GENERIC("[hostByNameAsync] IP NOT found! Please retry.");
-        }
-        // Reset
-        host_var.hostname = emptyString;
-        return (host_var.status == ERR_OK) ? WIFI_CNT_OK : WIFI_CNT_FAILED;
-    } else { // When requesting a new DNS search, while the previous hasn't finished yet
-        // TODO: implement multiple request at same time
-        DEBUG_WIFI_GENERIC("[hostByNameAsync] Another DNS search is still in progress, please retry later!");
-        return WIFI_CNT_FAILED;
-    }
+    err_t err = dns_gethostbyname(aHostname, aResult, &wifi_dns_found_callback_async, NULL);
+	   if (err == ERR_OK) {
+		      DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
+		      return WIFI_CNT_OK;
+	   }
+	   if (err == ERR_INPROGRESS) {
+		      DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress. Host %s\n", aHostname);
+		      return WIFI_CNT_INPROGRESS;
+	   }
+	   DEBUG_WIFI_GENERIC("[hostByName] DNS search failed. Host %s\n", aHostname);
+	   return WIFI_CNT_FAILED;
 }
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
     (void) name;
-    //err_t err = reinterpret_cast<struct host_struct*>(callback_arg)->status;
-    if (ipaddr && host_var.status == ERR_INPROGRESS) {
-        //reinterpret_cast<struct host_struct*>(callback_arg)->addr = IPAddress(ipaddr);
-        //reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_OK;
-        host_var.addr = IPAddress(ipaddr);
-        host_var.status = ERR_OK;
-    } else {
-        //reinterpret_cast<struct host_struct*>(callback_arg)->status = ERR_TIMEOUT; // Generic error
-        host_var.status = ERR_TIMEOUT; // Generic error
-    }
+    (void*) ipaddr;
+    (void*) callback_arg;
 }
 
 //meant to be called from user-defined preinit()
