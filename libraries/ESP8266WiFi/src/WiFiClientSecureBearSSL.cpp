@@ -685,19 +685,19 @@ extern "C" {
     if (xc->match_fingerprint && memcmp(res, xc->match_fingerprint, sizeof(res))) {
 #ifdef DEBUG_ESP_SSL
       DEBUG_BSSL("insecure_end_chain: Received cert FP doesn't match\n");
-      char buff[3 * sizeof(res) + 5];
+      char buff[3 * sizeof(res) + 1]; // 3 chars per byte XX_, and null
       buff[0] = 0;
       for (size_t i=0; i<sizeof(res); i++) {
-        char hex[6];
-        sprintf(hex, "%02x ", xc->match_fingerprint[i] & 0xff);
-        strcat(buff, hex);
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", xc->match_fingerprint[i] & 0xff);
+        strncat(buff, hex, sizeof(buff));
       }
-      DEBUG_BSSL("insecure_end_chain: wanted   %s\n", buff);
+      DEBUG_BSSL("insecure_end_chain: expected %s\n", buff);
       buff[0] =0;
       for (size_t i=0; i<sizeof(res); i++) {
-        char hex[6];
-        sprintf(hex, "%02x ", res[i] & 0xff);
-        strcat(buff, hex);
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", res[i] & 0xff);
+        strncat(buff, hex, sizeof(buff));
       }
       DEBUG_BSSL("insecure_end_chain: received %s\n", buff);
 #endif
