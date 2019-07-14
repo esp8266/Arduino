@@ -64,14 +64,21 @@ public:
 		// C-cast serves two purposes:
 		// static_cast for smaller integer types,
 		// reinterpret_cast + const_cast for pointer types
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 		_attach_s(seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void *>(arg));
+#pragma GCC diagnostic push
 	}
 
 	template<typename TArg>
 	void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
+		// We know now that we can do a CB and pass back a uint32 for the receiver to interpret as they wish.  Disable GCC 9 warning about this
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void *>(arg));
+#pragma GCC diagnostic push
 	}
 
 	void once_scheduled(float seconds, callback_function_t callback)
