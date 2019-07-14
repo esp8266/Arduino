@@ -533,8 +533,6 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 
 void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
 
-static bool _dns_lookup_pending = false;
-
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
@@ -551,22 +549,22 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     time_t lastTime = 0;
-   	time_t timeInit = millis();
+	time_t timeInit = millis();
     err_t err;
 
    	while ((millis() - timeInit) < timeout_ms) {
-	      	lastTime = millis();
-	      	err = dns_gethostbyname(aHostname, &aResult, &wifi_dns_found_callback, NULL);
-     		if (err == ERR_OK) {
-         		aResult = IPAddress(&addr);
-		        	DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
-        			return WIFI_CNT_OK;
-     		} else if(err != ERR_INPROGRESS) {
-	        		DEBUG_WIFI_GENERIC("[hostByName] DNS search failed.\n");
-		        	break;
-     		}
-     		DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress.\n");
-     		delay(100);
+	    lastTime = millis();
+	    err = dns_gethostbyname(aHostname, (ip_addr_t) &aResult, &wifi_dns_found_callback, NULL);
+     	if (err == ERR_OK) {
+         	aResult = IPAddress(&addr);
+		    DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
+        	return WIFI_CNT_OK;
+     	} else if(err != ERR_INPROGRESS) {
+	        DEBUG_WIFI_GENERIC("[hostByName] DNS search failed.\n");
+			break;
+     	}
+     	DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress.\n");
+     	delay(100);
    	}
 
     return WIFI_CNT_FAILED;
@@ -580,9 +578,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  */
 void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
-    (void) name;
-    (void*) ipaddr;
-    (void*) callback_arg;
+    name = NULL;
+    ipaddr = NULL;
+    callback_arg = NULL;
 }
 
 // Async part
@@ -590,23 +588,23 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
 
 int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult) {
-    err_t err = dns_gethostbyname(aHostname, aResult, &wifi_dns_found_callback_async, NULL);
-	   if (err == ERR_OK) {
-		      DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
-		      return WIFI_CNT_OK;
-	   }
-	   if (err == ERR_INPROGRESS) {
-		      DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress. Host %s\n", aHostname);
-		      return WIFI_CNT_INPROGRESS;
-	   }
-	   DEBUG_WIFI_GENERIC("[hostByName] DNS search failed. Host %s\n", aHostname);
-	   return WIFI_CNT_FAILED;
+    err_t err = dns_gethostbyname(aHostname, (ip_addr_t) &aResult, &wifi_dns_found_callback_async, NULL);
+	if (err == ERR_OK) {
+		DEBUG_WIFI_GENERIC("[hostByName] DNS found! Host %s -> IP %s \n", aHostname, aResult.toString().c_str());
+		return WIFI_CNT_OK;
+	}
+	if (err == ERR_INPROGRESS) {
+		DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress. Host %s\n", aHostname);
+		return WIFI_CNT_INPROGRESS;
+	}
+	DEBUG_WIFI_GENERIC("[hostByName] DNS search failed. Host %s\n", aHostname);
+	return WIFI_CNT_FAILED;
 }
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
-    (void) name;
-    (void*) ipaddr;
-    (void*) callback_arg;
+    name = NULL;
+    ipaddr = NULL;
+    callback_arg = NULL;
 }
 
 //meant to be called from user-defined preinit()
