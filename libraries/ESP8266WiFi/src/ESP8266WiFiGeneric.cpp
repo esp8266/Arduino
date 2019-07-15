@@ -537,17 +537,15 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
- * @return 1 if aIPAddrString was successfully converted to an IP address,
+ * @return 1 if aHostname was successfully converted to an IP address,
  *          else 0
  */
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
-{
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
     return hostByName(aHostname, aResult, 10000);
 }
 
 
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
-{
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms) {
     time_t timeInit = millis();
     err_t err;
     ip_addr_t addr;
@@ -575,8 +573,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
-{
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg) {
     (void) name;
     (void) ipaddr;
     (void) callback_arg;
@@ -585,6 +582,15 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
 // Async part
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
+
+/**
+ * Resolves the given hostname to an IP address asynchronously.
+ * @param aHostname     Name to be resolved
+ * @param aResult       IPAddress structure to store the returned IP address
+ * @return WIFI_CNT_OK if aHostname was successfully converted to an IP address,
+ *         else WIFI_CNT_INPROGRESS if DNS search is still in progress
+ *         else WIFI_CNT_FAILED on failure
+ */
 
 int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult) {
     ip_addr_t addr;
@@ -603,9 +609,9 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
 }
 
 void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
-    name = NULL;
-    ipaddr = NULL;
-    callback_arg = NULL;
+    (void) name;
+    (void) ipaddr;
+    (void) callback_arg;
 }
 
 //meant to be called from user-defined preinit()
