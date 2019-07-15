@@ -84,11 +84,9 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                delete this;
-            }
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            delete this;
         }
     }
 
@@ -475,7 +473,7 @@ private:
             }
             // construct in place
             new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
-            pb->flags = PBUF_HELPER_FLAG; // mark helper pbuf
+            pb_helper->flags = PBUF_HELPER_FLAG; // mark helper pbuf
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
 

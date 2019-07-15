@@ -147,12 +147,13 @@ DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
 endif
 
-FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
+FLAGS += $(DEBUG) -Wall $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
+FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
 CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
 CFLAGS += -std=c99 $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
@@ -177,7 +178,7 @@ COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 all: help
 
 CI:					# run CI
-	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Werror FORCE32=0 OPTZ=-O0 doCI
+	$(MAKE) -f $(MAKEFILE) MKFLAGS="-Werror -coverage" FORCE32=0 OPTZ=-O0 doCI
 
 doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
