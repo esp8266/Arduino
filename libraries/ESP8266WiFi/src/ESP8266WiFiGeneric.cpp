@@ -553,7 +553,6 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     ip_addr_t addr;
 
     while ((millis() - timeInit) < timeout_ms) {
-        lastTime = millis();
         err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, NULL);
         if (err == ERR_OK) {
             aResult = IPAddress(&addr);
@@ -578,9 +577,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  */
 void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
-    /*(void) name;
-    ipaddr = NULL;
-    callback_arg = NULL;*/
+    (void) name;
+    (void) ipaddr;
+    (void) callback_arg;
 }
 
 // Async part
