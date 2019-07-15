@@ -159,7 +159,7 @@ void ets_intr_unlock();
 // level 15 will disable ALL interrupts,
 // level 0 will enable ALL interrupts,
 //
-#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state)); state;}))
+#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
 #define interrupts() xt_rsil(0)

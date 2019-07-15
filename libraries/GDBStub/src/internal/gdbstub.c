@@ -923,4 +923,4 @@ bool ATTR_GDBEXTERNFN gdb_present() {
 }
 
 void ATTR_GDBFN gdb_do_break() { gdbstub_do_break(); }
-void gdb_init() __attribute__(( alias("gdbstub_init") ));
+void gdb_init() __attribute__((alias("gdbstub_init")));
