@@ -82,7 +82,7 @@ class String {
                 return 0;
             }
         }
-        inline void empty(void) const {
+        inline void empty(void) {
             setLen(0);
         }
         inline bool isEmpty(void) const {
