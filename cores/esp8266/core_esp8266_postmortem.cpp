@@ -132,7 +132,7 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
     }
     else {
-        ets_printf_P(PSTR("\nGeneric Soft Reset\n"));
+        ets_printf_P(PSTR("\nGeneric Reset\n"));
     }
 
     uint32_t cont_stack_start = (uint32_t) &(g_pcont->stack);
