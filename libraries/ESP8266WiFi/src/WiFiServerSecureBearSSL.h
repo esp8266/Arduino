@@ -62,6 +62,8 @@ class WiFiServerSecure : public WiFiServer {
     void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
     void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
 
+    WiFiServerSecure& operator=(const WiFiServerSecure&) = default;
+
   using ClientType = WiFiClientSecure;
 
   private:
