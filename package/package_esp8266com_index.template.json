@@ -111,17 +111,17 @@
                "toolsDependencies": [
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-gnu1-4fa7857",
+                     "version": "3.0.0-gnu1-c396a1e",
                      "name": "xtensa-lx106-elf-gcc"
                   },
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-gnu1-4fa7857",
+                     "version": "3.0.0-gnu1-c396a1e",
                      "name": "mkspiffs"
                   },
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-gnu1-4fa7857",
+                     "version": "3.0.0-gnu1-c396a1e",
                      "name": "mklittlefs"
                   },
                   {
@@ -192,41 +192,41 @@
                ]
             },
             {
-               "version": "3.0.0-gnu1-4fa7857",
+               "version": "3.0.0-gnu1-c396a1e",
                "name": "xtensa-lx106-elf-gcc",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.xtensa-lx106-elf-e07da40.1563030100.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-e07da40.1563030100.tar.gz",
-                     "checksum": "SHA-256:5c91ce561a930ca0bf7018a3dc2c544540dd5fae8c051094ae1b546a78dcfeaa",
-                     "size": "65747170"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.xtensa-lx106-elf-c396a1e.1563217547.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-c396a1e.1563217547.tar.gz",
+                     "checksum": "SHA-256:5acd5764bd9ecae12a73508e167b5295d36e0f5046ba5a547b8723676efe3eb8",
+                     "size": "65765414"
                   }
                ]
             },
             {
-               "version": "3.0.0-gnu1-4fa7857",
+               "version": "3.0.0-gnu1-c396a1e",
                "name": "mkspiffs",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mkspiffs-7fefeac.1563030100.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563030100.tar.gz",
-                     "checksum": "SHA-256:d38ba9d2344635e64fbe20065c3c874f46911247d3648a470a4be86aff5b4648",
-                     "size": "52438"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mkspiffs-7fefeac.1563217547.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563217547.tar.gz",
+                     "checksum": "SHA-256:86b22f50b9d9863dceaeb04478b456116a8ab51828fa4eee00571f7dd416e0cf",
+                     "size": "52441"
                   }
                ]
             },
             {
-               "version": "3.0.0-gnu1-4fa7857",
+               "version": "3.0.0-gnu1-c396a1e",
                "name": "mklittlefs",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mklittlefs-7f77f2b.1563030100.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-7f77f2b.1563030100.tar.gz",
-                     "checksum": "SHA-256:990b3541ab4d0b5891afa97c3c6894d12a3b0a97b981a536582a93c160575ad8",
-                     "size": "46168"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mklittlefs-7f77f2b.1563217547.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-7f77f2b.1563217547.tar.gz",
+                     "checksum": "SHA-256:2a89741871e3dac67d84b264b07e5efd4a88bd864f95775a14ac77e175b99124",
+                     "size": "46167"
                   }
                ]
             }
