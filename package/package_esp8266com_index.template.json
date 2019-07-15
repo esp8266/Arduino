@@ -111,17 +111,17 @@
                "toolsDependencies": [
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-gnu1-c396a1e",
+                     "version": "3.0.0-gnu1-b45281e",
                      "name": "xtensa-lx106-elf-gcc"
                   },
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-gnu1-c396a1e",
+                     "version": "3.0.0-gnu1-b45281e",
                      "name": "mkspiffs"
                   },
                   {
                      "packager": "esp8266",
-                     "version": "3.0.0-gnu1-c396a1e",
+                     "version": "3.0.0-gnu1-b45281e",
                      "name": "mklittlefs"
                   },
                   {
@@ -192,40 +192,40 @@
                ]
             },
             {
-               "version": "3.0.0-gnu1-c396a1e",
+               "version": "3.0.0-gnu1-b45281e",
                "name": "xtensa-lx106-elf-gcc",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.xtensa-lx106-elf-c396a1e.1563217547.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-c396a1e.1563217547.tar.gz",
-                     "checksum": "SHA-256:5acd5764bd9ecae12a73508e167b5295d36e0f5046ba5a547b8723676efe3eb8",
-                     "size": "65765414"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.xtensa-lx106-elf-b45281e.1563234189.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-b45281e.1563234189.tar.gz",
+                     "checksum": "SHA-256:ae02b860e729e4556469f984f9d61d54a4b0bbaf14fdce3690b7f71b61dbb9e3",
+                     "size": "65764618"
                   }
                ]
             },
             {
-               "version": "3.0.0-gnu1-c396a1e",
+               "version": "3.0.0-gnu1-b45281e",
                "name": "mkspiffs",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mkspiffs-7fefeac.1563217547.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563217547.tar.gz",
-                     "checksum": "SHA-256:86b22f50b9d9863dceaeb04478b456116a8ab51828fa4eee00571f7dd416e0cf",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mkspiffs-7fefeac.1563234189.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563234189.tar.gz",
+                     "checksum": "SHA-256:152559329f7e662fa3c3bc506cf8798424be93c6dfc8b7634f136bf1a653ebc5",
                      "size": "52441"
                   }
                ]
             },
             {
-               "version": "3.0.0-gnu1-c396a1e",
+               "version": "3.0.0-gnu1-b45281e",
                "name": "mklittlefs",
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mklittlefs-7f77f2b.1563217547.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-7f77f2b.1563217547.tar.gz",
-                     "checksum": "SHA-256:2a89741871e3dac67d84b264b07e5efd4a88bd864f95775a14ac77e175b99124",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mklittlefs-7f77f2b.1563234189.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-7f77f2b.1563234189.tar.gz",
+                     "checksum": "SHA-256:322351c8a72b4444d4fe0aa2e8840b8a741ff8cc3c4056dc2ff74997f3d4e0ba",
                      "size": "46167"
                   }
                ]
