@@ -42,6 +42,8 @@ typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
 typedef void (*WiFiEventCb)(WiFiEvent_t);
 
+struct WiFiState;
+
 class ESP8266WiFiGenericClass {
         // ----------------------------------------------------------------------------------------------
         // -------------------------------------- Generic WiFi function ---------------------------------
@@ -62,7 +64,7 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
         WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
         WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
-        // WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
+        WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
         int32_t channel(void);
 
@@ -79,7 +81,7 @@ class ESP8266WiFiGenericClass {
 
         void persistent(bool persistent);
 
-        bool mode(WiFiMode_t);
+        bool mode(WiFiMode_t, WiFiState* state = nullptr);
         WiFiMode_t getMode();
 
         bool enableSTA(bool enable);
@@ -88,9 +90,16 @@ class ESP8266WiFiGenericClass {
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
 
+        void saveState (WiFiState* state, WiFiMode_t mode = WIFI_STA, bool persistent = false);
+        bool shutdown (uint32 sleepUs = 0, WiFiState* stateSave = nullptr);
+        bool resumeFromShutdown (WiFiState* savedState = nullptr);
+
+        static uint32_t shutdownCRC (const WiFiState* state);
+        static bool shutdownValidCRC (const WiFiState* state);
         static void preinitWiFiOff (); //meant to be called in user-defined preinit()
 
     protected:
+        static bool _shutdown;
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
 
