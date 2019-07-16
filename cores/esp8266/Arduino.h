@@ -209,6 +209,7 @@ unsigned long millis(void);
 unsigned long micros(void);
 uint64_t micros64(void);
 void delay(unsigned long);
+void interruptable_delay(unsigned long ms);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);

@@ -565,7 +565,11 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        delay(timeout_ms);
+        // Following delay will be interrupted by dns found callback
+        for (decltype(timeout_ms) i = 0; _dns_lookup_pending && i < timeout_ms; i++) {
+               // let a chance to recurrent scheduled functions (ethernet)
+               delay(1);
+       }
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult.isSet()) {
@@ -597,6 +601,7 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
+    _dns_lookup_pending = false;
     esp_schedule(); // resume the hostByName function
 }
 
