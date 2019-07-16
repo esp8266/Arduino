@@ -197,10 +197,10 @@
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.xtensa-lx106-elf-e44a7c6.1563246275.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-e44a7c6.1563246275.tar.gz",
-                     "checksum": "SHA-256:226872267365d9869857c03b6e5d9a5b6c04e98f24dc110c0bd79a0c1e719b21",
-                     "size": "65763764"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.xtensa-lx106-elf-e44a7c6.1563295110.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-e44a7c6.1563295110.tar.gz",
+                     "checksum": "SHA-256:1541165d58503fde6da6060fe1c6dccefe935aeeab2d768c143aa1e577229d55",
+                     "size": "65763586"
                   }
                ]
             },
@@ -210,10 +210,10 @@
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mkspiffs-7fefeac.1563246275.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563246275.tar.gz",
-                     "checksum": "SHA-256:019189d0197f18f8c43f1f167bc5de66a7acd78f29192d1179941c097bf6aec5",
-                     "size": "52441"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mkspiffs-7fefeac.1563295110.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563295110.tar.gz",
+                     "checksum": "SHA-256:a64a0517b2570d7d45065673b6772571bd0cae72384bf94bf18d84f074023301",
+                     "size": "52443"
                   }
                ]
             },
@@ -223,10 +223,10 @@
                "systems": [
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mklittlefs-7f77f2b.1563246275.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-7f77f2b.1563246275.tar.gz",
-                     "checksum": "SHA-256:b91bc568d2bb6ffa131ce0e5993e2511e12a84c8e6ecb90c5c1e2285b6d8b266",
-                     "size": "46169"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.0-gnu1/x86_64-linux-gnu.mklittlefs-7f77f2b.1563295110.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-7f77f2b.1563295110.tar.gz",
+                     "checksum": "SHA-256:25399dbdd47face700488eaf043bd9698933c551e330bcb743475c7ffb686a49",
+                     "size": "46167"
                   }
                ]
             }
