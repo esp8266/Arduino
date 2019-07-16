@@ -187,7 +187,8 @@ SECTIONS
     *(.rodata._ZZ*__func__)
 
     /* std::* exception strings, in their own section to allow string coalescing */
-    *(.irom.exceptiontext)
+    *(.irom.exceptiontext, .rodata.exceptiontext)
+    *(.rodata.*__exception_what__*) /* G++ seems to throw out templatized section attributes */
 
     /* c++ typeof IDs, etc. */
     *(.rodata._ZTIN* .rodata._ZTSN10* .rodata._ZTISt* .rodata._ZTSSt*)
