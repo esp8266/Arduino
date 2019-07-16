@@ -32,7 +32,7 @@ public:
 	Ticker();
 	~Ticker();
 
-	typedef void (*callback_with_arg_t)(void*);
+	typedef void (*callback_with_arg_t)(void *);
 	typedef std::function<void(void)> callback_function_t;
 
 	void attach_scheduled(float seconds, callback_function_t callback)
@@ -64,14 +64,14 @@ public:
 		// C-cast serves two purposes:
 		// static_cast for smaller integer types,
 		// reinterpret_cast + const_cast for pointer types
-		_attach_s(seconds, true, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_s(seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void *>(arg));
 	}
 
 	template<typename TArg>
 	void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void *>(arg));
 	}
 
 	void once_scheduled(float seconds, callback_function_t callback)
@@ -100,14 +100,14 @@ public:
 	void once(float seconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-		_attach_s(seconds, false, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_s(seconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void *>(arg));
 	}
 
 	template<typename TArg>
 	void once_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-		_attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+		_attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void *>(arg));
 	}
 
 	void detach();
@@ -122,7 +122,6 @@ protected:
 
 private:
 	void _attach_s(float seconds, bool repeat, callback_with_arg_t callback, void* arg);
-	//char _etsTimerMem[sizeof(ETSTimer)];
 	ETSTimer _etsTimer;
 };
 

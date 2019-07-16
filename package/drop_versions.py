@@ -4,12 +4,13 @@
 from __future__ import print_function
 import json
 import sys
+from collections import OrderedDict
 
 def load_package(filename):
     if filename == "-":
-        pkg = json.load(sys.stdin)['packages'][0]
+        pkg = json.load(sys.stdin, object_pairs_hook=OrderedDict)['packages'][0]
     else:
-        pkg = json.load(open(filename))['packages'][0]
+        pkg = json.load(open(filename), object_pairs_hook=OrderedDict)['packages'][0]
     print("Loaded package {0} from {1}".format(pkg['name'], filename), file=sys.stderr)
     print("{0} platform(s), {1} tools".format(len(pkg['platforms']), len(pkg['tools'])), file=sys.stderr)
     return pkg
