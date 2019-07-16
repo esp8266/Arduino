@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 
+#include <core_esp8266_features.h>
 #include <stdlib.h>
 #include <osapi.h>
 
@@ -133,19 +134,6 @@ extern char _heap_start[];
 */
 // #define UMM_CRITICAL_PERIOD_ANALYZE
 
-#ifndef __STRINGIFY
-#define __STRINGIFY(a) #a
-#endif
-/*
-  Copy paste xt_rsil and xt_wsr_ps from Arduino.h
- */
-#ifndef xt_rsil
-#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
-#endif
-#ifndef xt_wsr_ps
-#define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
-#endif
-
 #if !defined(UMM_CRITICAL_PERIOD_ANALYZE)
 // This method preserves the intlevel on entry and restores the
 // original intlevel at exit.
@@ -171,26 +159,17 @@ struct _UMM_TIME_STATS {
 
 bool get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t size);
 
-static inline ICACHE_RAM_ATTR uint32_t _umm_get_cycle_count() {
-  uint32_t ccount;
-  // Not sure esync is needed before "rsr %0,CCOUNT". I don't see it in
-  // Espressf SDK or Xtensa clock.S file.
-  //  __asm__ __volatile__("esync; rsr %0,ccount":"=a"(ccount)::"memory");
-  __asm__ __volatile__("rsr %0,ccount":"=a"(ccount)::"memory");
-  return ccount;
-}
-
 static inline void _critical_entry(time_stat_t *p, uint32_t *saved_ps) {
     *saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
     if (0U != (*saved_ps & 0x0FU)) {
         p->intlevel += 1U;
     }
 
-    p->start = _umm_get_cycle_count();
+    p->start = esp_get_cycle_count();
 }
 
 static inline void _critical_exit(time_stat_t *p, uint32_t *saved_ps) {
-    uint32_t elapse = _umm_get_cycle_count() - p->start;
+    uint32_t elapse = esp_get_cycle_count() - p->start;
     if (elapse < p->min)
         p->min = elapse;
 
