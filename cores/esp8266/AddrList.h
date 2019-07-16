@@ -167,8 +167,6 @@ public:
     bool operator== (AddressListIterator& o) { return netIf.equal(*o); }
     bool operator!= (AddressListIterator& o) { return !netIf.equal(*o); }
 
-    AddressListIterator& operator= (const AddressListIterator& o) { netIf = o.netIf; return *this; }
-
     AddressListIterator operator++ (int)
     {
         AddressListIterator ret = *this;
