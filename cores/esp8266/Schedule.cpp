@@ -27,7 +27,7 @@ struct recurrent_fn_t
     recurrent_fn_t (esp8266::polledTimeout::periodicFastUs interval): callNow(interval) { }
 };
 
-static recurrent_fn_t* rFirst = nullptr; // fifo not needed
+static recurrent_fn_t rFirst(0); // fifo not needed
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -92,10 +92,8 @@ bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32
 
     item->mFunc = fn;
 
-    if (rFirst)
-        item->mNext = rFirst;
-
-    rFirst = item;
+    item->mNext = rFirst.mNext;
+    rFirst.mNext = item;
 
     return true;
 }
@@ -136,7 +134,8 @@ void run_scheduled_recurrent_functions ()
     // its purpose is that it is never called from an interrupt
     // (always on cont stack).
 
-    if (!rFirst)
+    recurrent_fn_t* current = rFirst.mNext;
+    if (!current)
         return;
 
     static bool fence = false;
@@ -152,10 +151,9 @@ void run_scheduled_recurrent_functions ()
         fence = true;
     }
 
-    recurrent_fn_t* prev = nullptr;
-    recurrent_fn_t* current = rFirst;
+    recurrent_fn_t* prev = &rFirst;
 
-    while (current)
+    do
     {
         if (current->callNow && !current->mFunc())
         {
@@ -164,16 +162,11 @@ void run_scheduled_recurrent_functions ()
 
             auto to_ditch = current;
 
-            if (prev)
-            {
-                current = current->mNext;
-                prev->mNext = current;
-            }
-            else
-            {
-                rFirst = rFirst->mNext;
-                current = rFirst;
-            }
+	    // current function recursively scheduled something
+	    if (prev->mNext != current) prev = prev->mNext;
+
+            current = current->mNext;
+            prev->mNext = current;
 
             delete(to_ditch);
         }
@@ -183,6 +176,7 @@ void run_scheduled_recurrent_functions ()
             current = current->mNext;
         }
     }
+    while (current);
 
     fence = false;
 }
