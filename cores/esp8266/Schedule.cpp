@@ -62,6 +62,9 @@ static void recycle_fn_unsafe (scheduled_fn_t* fn)
 IRAM_ATTR // (not only) called from ISR
 bool schedule_function (const std::function<void(void)>& fn)
 {
+    if (!fn)
+        return false;
+
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     scheduled_fn_t* item = get_fn_unsafe();
@@ -83,6 +86,9 @@ bool schedule_function (const std::function<void(void)>& fn)
 bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
+
+    if (!fn)
+        return false;
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
