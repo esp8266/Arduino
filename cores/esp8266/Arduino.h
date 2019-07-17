@@ -33,6 +33,25 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 
+#if defined(__cplusplus) && !defined(__cpp_exceptions)
+// this is a hack working with gcc4.8
+// Overload operator new so it can return nullptr instead of throwing an
+// exception without (std::nothrow)`
+// Requirement (or the constructor is called even on nullptr)
+// - "noexcept" is needed
+// - "#include <new>" must not be done *before* these definitions
+#include <bits/c++config.h>
+extern "C++" inline void* operator new (std::size_t size) noexcept
+{
+    return malloc(size);
+}
+extern "C++" inline void* operator new [] (std::size_t size) noexcept
+{
+    return malloc(size);
+}
+#include <new>
+#endif // new nothrow nullptr hack
+
 #include "stdlib_noniso.h"
 #include "binary.h"
 #include "esp8266_peri.h"
