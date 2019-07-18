@@ -36,8 +36,8 @@
  */
 
 #include <debug.h>
-#include <functional>
 #include <ESP8266LLMNR.h>
+#include <functional>
 #include <WiFiUdp.h>
 
 extern "C" {
