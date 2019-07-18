@@ -1,6 +1,7 @@
 
 #include <assert.h>
 
+#include "Arduino.h"
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"

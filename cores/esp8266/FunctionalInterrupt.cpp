@@ -1,6 +1,6 @@
+#include <Arduino.h>
 #include <FunctionalInterrupt.h>
 #include <Schedule.h>
-#include "Arduino.h"
 
 // Duplicate typedefs from core_esp8266_wiring_digital_c
 typedef void (*voidFuncPtr)(void);

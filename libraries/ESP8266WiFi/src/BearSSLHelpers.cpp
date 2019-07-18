@@ -20,13 +20,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <Arduino.h>
+
 #include <memory>
 #include <vector>
 #include <bearssl/bearssl.h>
 #include <pgmspace.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Arduino.h>
 #include <StackThunk.h>
 #include "BearSSLHelpers.h"
 
