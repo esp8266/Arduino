@@ -44,7 +44,7 @@ extern "C" {
 // - "noexcept" is needed
 // - "#include <new>" must not be done *before* these definitions
 #define _NEWHACK
-#ifdef _NEW
+#if defined(_NEW) && !defined(_ARDUINO_HIDE_NEWHACK_WARNING)
 #warning Arduino.h must be included before other c++ include files
 #endif
 #include <bits/c++config.h>
