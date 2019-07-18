@@ -45,7 +45,7 @@ extern "C" {
 // - "#include <new>" must not be done *before* these definitions
 #define _NEWHACK
 #ifdef _NEW
-#error Arduino.h must be included before other c++ include files
+#warning Arduino.h must be included before other c++ include files
 #endif
 #include <bits/c++config.h>
 extern "C" void* _malloc4newabi (size_t size);
