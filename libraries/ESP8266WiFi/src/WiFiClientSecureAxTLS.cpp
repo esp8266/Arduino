@@ -22,6 +22,8 @@
 
 #define LWIP_INTERNAL
 
+#include <Arduino.h>
+
 #include "debug.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClientSecure.h"

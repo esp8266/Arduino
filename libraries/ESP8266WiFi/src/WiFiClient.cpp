@@ -22,6 +22,8 @@
 
 #define LWIP_INTERNAL
 
+#include <Arduino.h>
+
 extern "C"
 {
     #include "include/wl_definitions.h"

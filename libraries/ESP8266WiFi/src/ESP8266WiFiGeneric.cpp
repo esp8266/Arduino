@@ -22,6 +22,8 @@
 
  */
 
+#include <Arduino.h>
+
 #include <list>
 #include <string.h>
 #include "ESP8266WiFi.h"

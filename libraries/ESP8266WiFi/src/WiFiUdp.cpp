@@ -21,6 +21,8 @@
 */
 
 #define LWIP_INTERNAL
+
+#include <Arduino.h>
 #include <functional>
 
 extern "C"

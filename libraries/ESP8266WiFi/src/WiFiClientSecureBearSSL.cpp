@@ -22,6 +22,8 @@
 
 #define LWIP_INTERNAL
 
+#include <Arduino.h>
+
 #include <list>
 #include <errno.h>
 #include <algorithm>

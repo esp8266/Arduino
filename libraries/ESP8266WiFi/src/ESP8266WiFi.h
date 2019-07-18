@@ -22,6 +22,8 @@
 #ifndef WiFi_h
 #define WiFi_h
 
+#include <Arduino.h>
+
 #include <stdint.h>
 
 extern "C" {
