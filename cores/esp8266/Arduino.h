@@ -33,24 +33,32 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 
-#if defined(__cplusplus) && !defined(__cpp_exceptions)
+#if defined(__cplusplus) \
+ && !defined(__cpp_exceptions) \
+ && !defined(_NEWHACK) \
+ && !defined(CORE_MOCK)
 // this is a hack working with gcc4.8
 // Overload operator new so it can return nullptr instead of throwing an
 // exception without (std::nothrow)`
-// Requirement (or the constructor is called even on nullptr)
+// Requirements: (or the constructor is called even on nullptr)
 // - "noexcept" is needed
 // - "#include <new>" must not be done *before* these definitions
+#define _NEWHACK
+#ifdef _NEW
+#error Arduino.h must be included before other c++ include files
+#endif
 #include <bits/c++config.h>
+extern "C" void* _malloc4newabi (size_t size);
 extern "C++" inline void* operator new (std::size_t size) noexcept
 {
-    return malloc(size);
+    return _malloc4newabi(size);
 }
 extern "C++" inline void* operator new [] (std::size_t size) noexcept
 {
-    return malloc(size);
+    return _malloc4newabi(size);
 }
 #include <new>
-#endif // new nothrow nullptr hack
+#endif // _NEWHACK
 
 #include "stdlib_noniso.h"
 #include "binary.h"
