@@ -1,6 +1,7 @@
 #ifndef ESP_SCHEDULE_H
 #define ESP_SCHEDULE_H
 
+#include <Arduino.h>
 #include <functional>
 
 #define SCHEDULED_FN_MAX_COUNT 32
