@@ -110,12 +110,16 @@ public:
 
     String readString() override;
 
+    time_t getLastWrite();
+    void setTimeCallback(time_t (*cb)(void));
+
 protected:
     FileImplPtr _p;
 
     // Arduino SD class emulation
     std::shared_ptr<Dir> _fakeDir;
     FS                  *_baseFS;
+    time_t (*timeCallback)(void) = nullptr;
 };
 
 class Dir {
@@ -126,15 +130,21 @@ public:
 
     String fileName();
     size_t fileSize();
+    time_t fileTime();
     bool isFile() const;
     bool isDirectory() const;
 
     bool next();
     bool rewind();
 
+    time_t getLastWrite();
+    void setTimeCallback(time_t (*cb)(void));
+
 protected:
     DirImplPtr _impl;
     FS       *_baseFS;
+    time_t (*timeCallback)(void) = nullptr;
+
 };
 
 // Backwards compatible, <4GB filesystem usage
@@ -179,17 +189,26 @@ public:
 class SPIFFSConfig : public FSConfig
 {
 public:
-    SPIFFSConfig(bool autoFormat = true) {
+    SPIFFSConfig(bool autoFormat = true, bool enableTime = true) {
         _type = SPIFFSConfig::fsid::FSId;
 	_autoFormat = autoFormat;
+	_enableTime = enableTime;
     }
     enum fsid { FSId = 0x53504946 };
+
+    SPIFFSConfig setEnableTime(bool val = true) {
+        _enableTime = val;
+        return *this;
+    }
+
+    // Inherit _type and _autoFormat
+    bool _enableTime;
 };
 
 class FS
 {
 public:
-    FS(FSImplPtr impl) : _impl(impl) { }
+    FS(FSImplPtr impl) : _impl(impl) { timeCallback = _defaultTimeCB; }
 
     bool setConfig(const FSConfig &cfg);
 
@@ -223,10 +242,14 @@ public:
 
     bool gc();
 
+    void setTimeCallback(time_t (*cb)(void));
+
     friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
     FSImplPtr _impl;
     FSImplPtr getImpl() { return _impl; }
+    time_t (*timeCallback)(void);
+    static time_t _defaultTimeCB(void) { return time(NULL); }
 };
 
 } // namespace fs
@@ -241,6 +264,7 @@ using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
 using fs::FSConfig;
+using fs::SPIFFSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

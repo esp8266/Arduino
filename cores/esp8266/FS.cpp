@@ -180,6 +180,19 @@ String File::readString()
     return ret;
 }
 
+time_t File::getLastWrite() {
+    if (!_p)
+        return 0;
+
+    return _p->getLastWrite();
+}
+
+void File::setTimeCallback(time_t (*cb)(void)) {
+    if (!_p)
+        return;
+    _p->setTimeCallback(cb);
+}
+
 File Dir::openFile(const char* mode) {
     if (!_impl) {
         return File();
@@ -192,7 +205,9 @@ File Dir::openFile(const char* mode) {
         return File();
     }
 
-    return File(_impl->openFile(om, am), _baseFS);
+    auto f = File(_impl->openFile(om, am), _baseFS);
+    f.setTimeCallback(timeCallback);
+    return f;
 }
 
 String Dir::fileName() {
@@ -201,6 +216,12 @@ String Dir::fileName() {
     }
 
     return _impl->fileName();
+}
+
+time_t Dir::fileTime() {
+    if (!_impl)
+        return 0;
+    return _impl->fileTime();
 }
 
 size_t Dir::fileSize() {
@@ -240,6 +261,20 @@ bool Dir::rewind() {
 
     return _impl->rewind();
 }
+
+time_t Dir::getLastWrite() {
+    if (!_impl)
+        return 0;
+
+    return _impl->getLastWrite();
+}
+
+void Dir::setTimeCallback(time_t (*cb)(void)) {
+    if (!_impl)
+        return;
+    _impl->setTimeCallback(cb);
+}
+
 
 bool FS::setConfig(const FSConfig &cfg) {
     if (!_impl) {
@@ -308,7 +343,9 @@ File FS::open(const char* path, const char* mode) {
         DEBUGV("FS::open: invalid mode `%s`\r\n", mode);
         return File();
     }
-    return File(_impl->open(path, om, am), this);
+    auto f = File(_impl->open(path, om, am), this);
+    f.setTimeCallback(timeCallback);
+    return f;
 }
 
 bool FS::exists(const char* path) {
@@ -327,7 +364,9 @@ Dir FS::openDir(const char* path) {
         return Dir();
     }
     DirImplPtr p = _impl->openDir(path);
-    return Dir(p, this);
+    auto d = Dir(p, this);
+    d.setTimeCallback(timeCallback);
+    return d;
 }
 
 Dir FS::openDir(const String& path) {
@@ -378,6 +417,11 @@ bool FS::rename(const String& pathFrom, const String& pathTo) {
     return rename(pathFrom.c_str(), pathTo.c_str());
 }
 
+void FS::setTimeCallback(time_t (*cb)(void)) {
+    if (!_impl)
+        return;
+    _impl->setTimeCallback(cb);
+}
 
 
 static bool sflags(const char* mode, OpenMode& om, AccessMode& am) {

@@ -39,6 +39,7 @@ extern "C" {
 
 using namespace fs;
 
+extern int __SPIFFS_obj_meta_len;
 namespace spiffs_impl {
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
@@ -143,6 +144,7 @@ public:
     bool setConfig(const FSConfig &cfg) override
     {
         if ((cfg._type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
+            DEBUGV("SPIFFSImpl::setConfig error. Either wrong object used or SPIFFS mounted\n");
             return false;
         }
         _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
@@ -167,9 +169,7 @@ public:
             return true;
         }
         if (_cfg._autoFormat) {
-            auto rc = SPIFFS_format(&_fs);
-            if (rc != SPIFFS_OK) {
-                DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+            if (!_formatOldOrNew()) {
                 return false;
             }
             return _tryMount();
@@ -201,9 +201,8 @@ public:
         if (_tryMount()) {
             SPIFFS_unmount(&_fs);
         }
-        auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+
+        if (!_formatOldOrNew()) {
             return false;
         }
 
@@ -228,7 +227,7 @@ protected:
         return &_fs;
     }
 
-    bool _tryMount()
+    spiffs_config _setupSpiffsConfig(bool metadata)
     {
         spiffs_config config;
         memset(&config, 0, sizeof(config));
@@ -236,12 +235,11 @@ protected:
         config.hal_read_f       = &spiffs_hal_read;
         config.hal_write_f      = &spiffs_hal_write;
         config.hal_erase_f      = &spiffs_hal_erase;
-        config.phys_size        = _size;
-        config.phys_addr        = _start;
+        config.phys_size        = metadata ? _size - _blockSize : _size;
+        config.phys_addr        = metadata ? _start + _blockSize :_start;
         config.phys_erase_block = FLASH_SECTOR_SIZE;
         config.log_block_size   = _blockSize;
         config.log_page_size    = _pageSize;
-
 
         if (((uint32_t) std::numeric_limits<spiffs_block_ix>::max()) < (_size / _blockSize)) {
             DEBUGV("spiffs_block_ix type too small");
@@ -263,6 +261,49 @@ protected:
             abort();
         }
 
+        return config;
+    }
+
+    bool _formatOldOrNew() {
+        // Make sure we format with requested metadata len
+        if (_cfg._enableTime) {
+            if (!_mark_metadata_fs(_start, _blockSize, _pageSize)) {
+                DEBUGV("SPIFFSImpl::_formatOldOrNew error, can't mark as metadata filesystem\n");
+                return false;
+            }
+        }
+        // Make sure we format with requested metadata len
+        __SPIFFS_obj_meta_len = _cfg._enableTime ? 4 : 0;
+        DEBUGV("SPIFFSImpl::_formatOldOrNew formatting with metadata==%d\r\n", __SPIFFS_obj_meta_len);
+        spiffs_config config = _setupSpiffsConfig(_cfg._enableTime);
+
+        // We need to try a mount on SPIFFS, even though it will probably fail, to make the opaque
+        // SPIFFS _fs struct take the new sizes specified in the configuration.
+        size_t fdsBufSize = SPIFFS_buffer_bytes_for_filedescs(&_fs, _maxOpenFds);
+        size_t cacheBufSize = SPIFFS_buffer_bytes_for_cache(&_fs, _maxOpenFds);
+        auto err = SPIFFS_mount(&_fs, &config, _workBuf.get(),
+                            _fdsBuf.get(), fdsBufSize, _cacheBuf.get(), cacheBufSize,
+                            &SPIFFSImpl::_check_cb);
+        if (err == SPIFFS_OK) {
+           SPIFFS_unmount(&_fs);
+        }
+        auto rc = SPIFFS_format(&_fs);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+            return false;
+        }
+        if (_cfg._enableTime && !_is_metadata_fs(_start, _blockSize, _pageSize)) {
+            DEBUGV("SPIFFSImpl::_formatOldOrNew lost metadata flag somehow\n");
+            return false;
+        }
+	return true;
+    }
+
+
+    bool _tryMount()
+    {
+        spiffs_config config = _setupSpiffsConfig(false);
+
         // hack: even though fs is not initialized at this point,
         // SPIFFS_buffer_bytes_for_cache uses only fs->config.log_page_size
         // suggestion: change SPIFFS_buffer_bytes_for_cache to take
@@ -282,16 +323,74 @@ protected:
             _cacheBuf.reset(new uint8_t[cacheBufSize]);
         }
 
-        DEBUGV("SPIFFSImpl: mounting fs @%x, size=%x, block=%x, page=%x\r\n",
-               _start, _size, _blockSize, _pageSize);
-
-        auto err = SPIFFS_mount(&_fs, &config, _workBuf.get(),
+        // First, can we mount w/o metadata (preserve backwards)
+        int err;
+        if ( !_is_metadata_fs(_start, _blockSize, _pageSize) ) {
+            __SPIFFS_obj_meta_len = 0;
+            DEBUGV("SPIFFSImpl: trying fs @%x, size=%x, block=%x, page=%x, metadata=%d\r\n",
+                 _start, _size, _blockSize, _pageSize, __SPIFFS_obj_meta_len);
+            err = SPIFFS_mount(&_fs, &config, _workBuf.get(),
+                               _fdsBuf.get(), fdsBufSize, _cacheBuf.get(), cacheBufSize,
+                               &SPIFFSImpl::_check_cb);
+	} else {
+            // Flag matched, it's a metadata FS
+            __SPIFFS_obj_meta_len = 4;
+            config = _setupSpiffsConfig(true);
+            DEBUGV("SPIFFSImpl: doesn't look like old metadata==0, so trying fs @%x, size=%x, block=%x, page=%x, metadata=%d\r\n",
+                   _start, _size, _blockSize, _pageSize, __SPIFFS_obj_meta_len);
+            err = SPIFFS_mount(&_fs, &config, _workBuf.get(),
                                 _fdsBuf.get(), fdsBufSize, _cacheBuf.get(), cacheBufSize,
                                 &SPIFFSImpl::_check_cb);
+        }
 
         DEBUGV("SPIFFSImpl: mount rc=%d\r\n", err);
 
         return err == SPIFFS_OK;
+    }
+
+    // The value that's repeated through the entire first blockSize bytes of a timestamp FS
+    enum { __SPIFFS_MD_FS__ = 0xc0de0004 };
+
+    // Check the first blockSize bytes, and if they match the flag it's a timestamp FS
+    static bool _is_metadata_fs(uint32_t _start, uint32_t _blockSize, uint32_t _pageSize)
+    {
+        char buff[_pageSize];
+        for (uint32_t page = 0; page < _blockSize / _pageSize; page++) {
+            uint32_t addr = _start + page * _pageSize;
+            auto ret = spiffs_hal_read(addr, _pageSize, (uint8_t*)buff);
+            if (ret != SPIFFS_OK) {
+                return false;
+            }
+            for (uint32_t *ptr=reinterpret_cast<uint32_t*>(buff), cnt=0; cnt < sizeof(buff)/sizeof(uint32_t); cnt++, ptr++) {
+                if (*ptr != __SPIFFS_MD_FS__) {
+                    return false;
+                }
+            }
+        }
+	DEBUGV("SPIFFSImpl: metadata FS\n");
+        return true;
+    }
+
+    // Fills the first block with the timestamp flag
+    static bool _mark_metadata_fs(uint32_t _start, uint32_t _blockSize, uint32_t _pageSize)
+    {
+        char buff[_pageSize];
+        for (uint32_t *ptr=reinterpret_cast<uint32_t*>(buff), cnt=0; cnt < sizeof(buff)/sizeof(uint32_t); cnt++, ptr++) {
+            *ptr = __SPIFFS_MD_FS__;
+        }
+        auto ret = spiffs_hal_erase(_start, _blockSize);
+        if (ret != SPIFFS_OK) {
+            return false;
+	}
+        for (uint32_t page = 0; page < _blockSize / _pageSize; page++) {
+            uint32_t addr = _start + page * _pageSize;
+            ret = spiffs_hal_write(addr, _pageSize, (uint8_t *)buff);
+            if (ret != SPIFFS_OK) {
+                return false;
+            }
+        }
+	DEBUGV("SPIFFSImpl: set metadata FS flag\n");
+	return true;
     }
 
     static void _check_cb(spiffs_check_type type, spiffs_check_report report,
@@ -470,6 +569,18 @@ public:
         return name(); // No dirs, they're the same on SPIFFS
     }
 
+    time_t getLastWrite() override
+    {
+        CHECKFD();
+        time_t t = 0;
+        if (__SPIFFS_obj_meta_len) {
+            _getStat() ;
+            memcpy(&t, _stat.meta, sizeof(time_t));
+        }
+        return t;
+    }
+
+
 protected:
     void _getStat() const
     {
@@ -537,6 +648,14 @@ public:
         }
 
         return _dirent.size;
+    }
+
+    time_t fileTime() override {
+        if (!_valid) {
+            return 0;
+        }
+        // TODO - When SPIFFS supports time metadata, return it
+       return 0;
     }
 
     bool isFile() const override

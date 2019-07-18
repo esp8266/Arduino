@@ -467,7 +467,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
               // update memory representation of object index page with new data page
               if (gc.cur_objix_spix == 0) {
                 // update object index header page
-                ((spiffs_page_ix*)((u8_t *)objix_hdr + sizeof(spiffs_page_object_ix_header)))[p_hdr.span_ix] = new_data_pix;
+                ((spiffs_page_ix*)((u8_t *)objix_hdr + sizeof(spiffs_page_object_ix_header)+SPIFFS_OBJ_META_LEN))[p_hdr.span_ix] = new_data_pix;
                 SPIFFS_GC_DBG("gc_clean: MOVE_DATA wrote page " _SPIPRIpg" to objix_hdr entry " _SPIPRIsp" in mem\n", new_data_pix, (spiffs_span_ix)SPIFFS_OBJ_IX_ENTRY(fs, p_hdr.span_ix));
               } else {
                 // update object index page

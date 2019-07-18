@@ -25,7 +25,10 @@
 
 using namespace fs;
 
+int __SPIFFS_obj_meta_len = 0;
+
 namespace spiffs_impl {
+
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
@@ -50,6 +53,14 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
         DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
                fd, path, openMode, accessMode, _fs.err_code);
         return FileImplPtr();
+    }
+    if (!(mode & SPIFFS_O_RDONLY) && __SPIFFS_obj_meta_len==sizeof(4)) {
+        time_t t = time(NULL);
+        struct tm tmr;
+        localtime_r(&t, &tmr);
+        time_t meta = mktime(&tmr);
+	DEBUGV("SPIFFSImpl::open updating file write time to %ld\r\n", meta);
+        SPIFFS_fupdate_meta(&_fs, fd, &meta);
     }
     return std::make_shared<SPIFFSFileImpl>(this, fd);
 }

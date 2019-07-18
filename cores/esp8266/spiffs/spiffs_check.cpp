@@ -64,7 +64,7 @@ static s32_t spiffs_object_get_data_page_index_reference(
   u32_t addr = SPIFFS_PAGE_TO_PADDR(fs, *objix_pix);
   if (objix_spix == 0) {
     // get referenced page from object index header
-    addr += sizeof(spiffs_page_object_ix_header) + data_spix * sizeof(spiffs_page_ix);
+    addr += sizeof(spiffs_page_object_ix_header)+SPIFFS_OBJ_META_LEN + data_spix * sizeof(spiffs_page_ix);
   } else {
     // get referenced page from object index
     addr += sizeof(spiffs_page_object_ix) + SPIFFS_OBJ_IX_ENTRY(fs, data_spix) * sizeof(spiffs_page_ix);
@@ -136,7 +136,7 @@ static s32_t spiffs_rewrite_index(spiffs *fs, spiffs_obj_id obj_id, spiffs_span_
 
   // rewrite in mem
   if (objix_spix == 0) {
-    ((spiffs_page_ix*)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix_header)))[data_spix] = new_data_pix;
+    ((spiffs_page_ix*)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix_header)+SPIFFS_OBJ_META_LEN))[data_spix] = new_data_pix;
   } else {
     ((spiffs_page_ix*)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix)))[SPIFFS_OBJ_IX_ENTRY(fs, data_spix)] = new_data_pix;
   }
@@ -574,7 +574,7 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
             // object header page index
             entries = SPIFFS_OBJ_HDR_IX_LEN(fs);
             data_spix_offset = 0;
-            object_page_index = (spiffs_page_ix *)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix_header));
+            object_page_index = (spiffs_page_ix *)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix_header)+SPIFFS_OBJ_META_LEN);
           } else {
             // object page index
             entries = SPIFFS_OBJ_IX_LEN(fs);

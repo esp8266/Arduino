@@ -92,6 +92,27 @@ and ``SPIFFS.open()`` to ``LittleFS.open()`` with the rest of the
 code remaining untouched.
 
 
+SDFS and SD
+-----------
+FAT filesystems are supported on the ESP8266 using the old Arduino wrapper
+"SD.h" which wraps the "SDFS.h" filesystem transparently.
+
+Any commands discussed below pertaining to SPIFFS or LittleFS are
+applicable to SD/SDFS.
+
+For legacy applications, the classic SD filesystem may continue to be used,
+but for new applications, directly accessing the SDFS filesystem is
+recommended as it may expose additional functionality that the old Arduino
+SD filesystem didn't have.
+
+Note that in earlier releases of the core, using SD and SPIFFS in the same
+sketch was complicated and required the use of ``NO_FS_GLOBALS``.  The
+current design makes SD, SDFS, SPIFFS, and LittleFS fully source compatible
+and so please remove any ``NO_FS_GLOBALS`` definitions in your projects
+when updgrading core versions.
+
+
+
 SPIFFS file system limitations
 ------------------------------
 
@@ -160,6 +181,31 @@ in the specific subdirectory.  This mimics the POSIX behavior for
 directory traversal most C programmers are used to.
 
 
+SPIFFS on-flash versions
+------------------------
+
+There are two on-flash formats for SPIFFS.  The original one has no
+metadata support (SPIFFS_OBJ_META_LEN==0), while the current one supports
+a timestamp (SPIFFS_OBJ_META_LEN==4).
+
+Because the on-flash SPIFFS layout changes, depending on whether or not
+metadata is present, the two formats are incompatible.
+
+To ensure backwards compatibility, a unique layout on-flash is defined for
+the new version, with the first page of flash set to 0xc0de0004.
+
+When SPIFFS is attempted to be mounted the core first checks the first
+page of the flash filesystem.  If it is not 0xc0de0004 filled, then
+it immediately attempts to mount using the non-timestamped version.
+Only if the first page is all 0xc0de0004 will it attempt to mount with
+timestamps.
+
+When formatting a new filesystem, by default it builds a timestamp
+filesystem, but this can be overridden using
+``SPIFFS.setConfig(SPIFFSConfig().setEnableTime(true));`` before any
+``SPIFFS.begin()`` or ``SPIFFS.format()``.
+
+
 Uploading files to file system
 ------------------------------
 
@@ -196,8 +242,8 @@ use esptool.py.
 - To upload a LittleFS filesystem use Tools > ESP8266 LittleFS Data Upload
 
 
-File system object (SPIFFS/LittleFS)
-------------------------------------
+File system object (SPIFFS/LittleFS/SD/SDFS)
+--------------------------------------------
 
 setConfig
 ~~~~~~~~~
@@ -377,7 +423,7 @@ info
     or LittleFS.info(fs_info);
 
 Fills `FSInfo structure <#filesystem-information-structure>`__ with
-information about the file system. Returns ``true`` is successful,
+information about the file system. Returns ``true`` if successful,
 ``false`` otherwise.
 
 Filesystem information structure
@@ -401,6 +447,44 @@ block size - ``pageSize`` — filesystem logical page size - ``maxOpenFiles``
 — max number of files which may be open simultaneously -
 ``maxPathLength`` — max file name length (including one byte for zero
 termination)
+
+info64
+~~~~~~
+
+.. code:: cpp
+
+    FSInfo64 fsinfo;
+    SD.info(fsinfo);
+    or LittleFS(fsinfo);
+
+Performs the same operation as ``info`` but allows for reporting greater than
+4GB for filesystem size/used/etc.  Should be used with the SD and SDFS
+filesystems since most SD cards today are greater than 4GB in size.
+
+setTimeCallback(time_t (*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    time_t myTimeCallback() {
+        return 1455451200; // UNIX timestamp
+    }
+    void setup () {
+        LittleFS.setTimeCallback(myTimeCallback);
+        ...
+        // Any files will now be made with Pris' incept date
+    }
+
+
+The SD, SDFS, and LittleFS filesystems support a file timestamp, updated when the file is
+opened for writing.  By default, the ESP8266 will use the internal time returned from
+``time(NULL)``.  If your app sets the system time using NTP before file operations, then
+you should not need to use this function.  However, if you need to set a specific time
+for a file, or the system clock isn't correct and you need to read the time from an external
+RTC or use a fixed time, this call allows you do to so.
+
+In general use, with a functioning ``time()`` call, user applications should not need
+to use this function.
 
 Directory object (Dir)
 ----------------------
@@ -441,6 +525,12 @@ fileSize
 Returns the size of the current file pointed to
 by the internal iterator.
 
+fileTime
+~~~~~~~~
+
+Returns the time_t write time of the current file pointed
+to by the internal iterator.
+
 isFile
 ~~~~~~
 
@@ -463,6 +553,13 @@ rewind
 ~~~~~~
 
 Resets the internal pointer to the start of the directory.
+
+setTimeCallback(time_t (*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the time callback for any files accessed from this Dir object via openNextFile.
+Note that the SD and SDFS filesystems only support a filesystem-wide callback and
+calls to  ``Dir::setTimeCallback`` may produce unexpected behavior.
 
 File object
 -----------
@@ -535,6 +632,12 @@ fullName
 
 Returns the full path file name as a ``const char*``.
 
+getLastWrite
+~~~~~~~~~~~~
+
+Returns the file last write time, and only valid for files opened in read-only
+mode.  If a file is opened for writing, the returned time may be indeterminate.
+
 isFile
 ~~~~~~
 
@@ -589,3 +692,10 @@ rewindDirectory  (compatibiity method, not recommended for new code)
 
 Resets the ``openNextFile`` pointer to the top of the directory.  Only
 valid when ``File.isDirectory() == true``.
+
+setTimeCallback(time_t (*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the time callback for this specific file.  Note that the SD and
+SDFS filesystems only support a filesystem-wide callback and calls to
+``Dir::setTimeCallback`` may produce unexpected behavior.

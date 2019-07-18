@@ -248,7 +248,7 @@ extern "C" {
 
 // entries in an object header page index
 #define SPIFFS_OBJ_HDR_IX_LEN(fs) \
-  ((SPIFFS_CFG_LOG_PAGE_SZ(fs) - sizeof(spiffs_page_object_ix_header))/sizeof(spiffs_page_ix))
+  ((SPIFFS_CFG_LOG_PAGE_SZ(fs) - sizeof(spiffs_page_object_ix_header)-SPIFFS_OBJ_META_LEN)/sizeof(spiffs_page_ix))
 // entries in an object page index
 #define SPIFFS_OBJ_IX_LEN(fs) \
   ((SPIFFS_CFG_LOG_PAGE_SZ(fs) - sizeof(spiffs_page_object_ix))/sizeof(spiffs_page_ix))
@@ -509,10 +509,8 @@ typedef struct SPIFFS_PACKED
   spiffs_obj_type type;
   // name of object
   u8_t name[SPIFFS_OBJ_NAME_LEN];
-#if SPIFFS_OBJ_META_LEN
   // metadata. not interpreted by SPIFFS in any way.
-  u8_t meta[SPIFFS_OBJ_META_LEN];
-#endif
+  u8_t meta[]; // Leave array size undefined, since it is variable at runtime
 } spiffs_page_object_ix_header;
 
 // object index page header

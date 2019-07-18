@@ -729,10 +729,10 @@ s32_t SPIFFS_fremove(spiffs *fs, spiffs_file fh) {
 
 static s32_t spiffs_stat_pix(spiffs *fs, spiffs_page_ix pix, spiffs_file fh, spiffs_stat *s) {
   (void)fh;
-  spiffs_page_object_ix_header objix_hdr;
+  alloc_spiffs_page_object_ix_header(objix_hdr);
   spiffs_obj_id obj_id;
   s32_t res =_spiffs_rd(fs,  SPIFFS_OP_T_OBJ_IX | SPIFFS_OP_C_READ, fh,
-      SPIFFS_PAGE_TO_PADDR(fs, pix), sizeof(spiffs_page_object_ix_header), (u8_t *)&objix_hdr);
+      SPIFFS_PAGE_TO_PADDR(fs, pix), sizeof(spiffs_page_object_ix_header)+SPIFFS_OBJ_META_LEN, (u8_t *)&objix_hdr);
   SPIFFS_API_CHECK_RES(fs, res);
 
   u32_t obj_id_addr = SPIFFS_BLOCK_TO_PADDR(fs, SPIFFS_BLOCK_FOR_PAGE(fs , pix)) +
@@ -746,9 +746,8 @@ static s32_t spiffs_stat_pix(spiffs *fs, spiffs_page_ix pix, spiffs_file fh, spi
   s->size = objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
   s->pix = pix;
   strncpy((char *)s->name, (char *)objix_hdr.name, SPIFFS_OBJ_NAME_LEN);
-#if SPIFFS_OBJ_META_LEN
-  _SPIFFS_MEMCPY(s->meta, objix_hdr.meta, SPIFFS_OBJ_META_LEN);
-#endif
+  if (SPIFFS_OBJ_META_LEN)
+    _SPIFFS_MEMCPY(s->meta, objix_hdr.meta, SPIFFS_OBJ_META_LEN);
 
   return res;
 }
@@ -928,7 +927,7 @@ s32_t SPIFFS_rename(spiffs *fs, const char *old_path, const char *new_path) {
 #endif // SPIFFS_READ_ONLY
 }
 
-#if SPIFFS_OBJ_META_LEN
+
 s32_t SPIFFS_update_meta(spiffs *fs, const char *name, const void *meta) {
 #if SPIFFS_READ_ONLY
   (void)fs; (void)name; (void)meta;
@@ -953,8 +952,7 @@ s32_t SPIFFS_update_meta(spiffs *fs, const char *name, const void *meta) {
   }
   SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
 
-  res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id, fd->objix_hdr_pix, 0, 0, meta,
-      0, &pix_dummy);
+  res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id, fd->objix_hdr_pix, 0, 0, (const u8_t*)meta, 0, &pix_dummy);
 
   spiffs_fd_return(fs, fd->file_nbr);
 
@@ -988,8 +986,7 @@ s32_t SPIFFS_fupdate_meta(spiffs *fs, spiffs_file fh, const void *meta) {
     SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
   }
 
-  res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id, fd->objix_hdr_pix, 0, 0, meta,
-      0, &pix_dummy);
+  res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id, fd->objix_hdr_pix, 0, 0, (const u8_t*)meta, 0, &pix_dummy);
 
   SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
 
@@ -998,7 +995,7 @@ s32_t SPIFFS_fupdate_meta(spiffs *fs, spiffs_file fh, const void *meta) {
   return res;
 #endif // SPIFFS_READ_ONLY
 }
-#endif // SPIFFS_OBJ_META_LEN
+
 
 spiffs_DIR *SPIFFS_opendir(spiffs *fs, const char *name, spiffs_DIR *d) {
   SPIFFS_API_DBG("%s\n", __func__);
@@ -1029,7 +1026,7 @@ static s32_t spiffs_read_dir_v(
     void *user_var_p) {
   (void)user_const_p;
   s32_t res;
-  spiffs_page_object_ix_header objix_hdr;
+  alloc_spiffs_page_object_ix_header(objix_hdr);
   if (obj_id == SPIFFS_OBJ_ID_FREE || obj_id == SPIFFS_OBJ_ID_DELETED ||
       (obj_id & SPIFFS_OBJ_ID_IX_FLAG) == 0) {
     return SPIFFS_VIS_COUNTINUE;
@@ -1037,7 +1034,7 @@ static s32_t spiffs_read_dir_v(
 
   spiffs_page_ix pix = SPIFFS_OBJ_LOOKUP_ENTRY_TO_PIX(fs, bix, ix_entry);
   res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
-      0, SPIFFS_PAGE_TO_PADDR(fs, pix), sizeof(spiffs_page_object_ix_header), (u8_t *)&objix_hdr);
+      0, SPIFFS_PAGE_TO_PADDR(fs, pix), sizeof(spiffs_page_object_ix_header)+SPIFFS_OBJ_META_LEN, (u8_t *)&objix_hdr);
   if (res != SPIFFS_OK) return res;
   if ((obj_id & SPIFFS_OBJ_ID_IX_FLAG) &&
       objix_hdr.p_hdr.span_ix == 0 &&
@@ -1049,9 +1046,8 @@ static s32_t spiffs_read_dir_v(
     e->type = objix_hdr.type;
     e->size = objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
     e->pix = pix;
-#if SPIFFS_OBJ_META_LEN
-    _SPIFFS_MEMCPY(e->meta, objix_hdr.meta, SPIFFS_OBJ_META_LEN);
-#endif
+    if (SPIFFS_OBJ_META_LEN)
+      _SPIFFS_MEMCPY(e->meta, objix_hdr.meta, SPIFFS_OBJ_META_LEN);
     return SPIFFS_OK;
   }
   return SPIFFS_VIS_COUNTINUE;

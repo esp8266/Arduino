@@ -300,9 +300,7 @@ typedef struct {
   spiffs_obj_type type;
   spiffs_page_ix pix;
   u8_t name[SPIFFS_OBJ_NAME_LEN];
-#if SPIFFS_OBJ_META_LEN
-  u8_t meta[SPIFFS_OBJ_META_LEN];
-#endif
+  u8_t meta[4]; // Set to the largest supported metadata len
 } spiffs_stat;
 
 struct spiffs_dirent {
@@ -311,9 +309,7 @@ struct spiffs_dirent {
   spiffs_obj_type type;
   u32_t size;
   spiffs_page_ix pix;
-#if SPIFFS_OBJ_META_LEN
-  u8_t meta[SPIFFS_OBJ_META_LEN];
-#endif
+  u8_t meta[4]; // Set to the largest supported metadata len
 };
 
 typedef struct {
@@ -534,7 +530,7 @@ s32_t SPIFFS_close(spiffs *fs, spiffs_file fh);
  */
 s32_t SPIFFS_rename(spiffs *fs, const char *old, const char *newPath);
 
-#if SPIFFS_OBJ_META_LEN
+
 /**
  * Updates file's metadata
  * @param fs            the file system struct
@@ -550,7 +546,7 @@ s32_t SPIFFS_update_meta(spiffs *fs, const char *name, const void *meta);
  * @param meta          new metadata. must be SPIFFS_OBJ_META_LEN bytes long.
  */
 s32_t SPIFFS_fupdate_meta(spiffs *fs, spiffs_file fh, const void *meta);
-#endif
+
 
 /**
  * Returns last error of last file operation.

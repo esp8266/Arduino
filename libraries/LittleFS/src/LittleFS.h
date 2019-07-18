@@ -422,7 +422,25 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
+	    if (timeCallback) {
+                // Add metadata with last write time
+                time_t now = timeCallback();
+                int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
+                if (rc < 0) {
+                    DEBUGV("Unable to set time on '%s' to %d\n", _name.get(), now);
+               }
+            }
         }
+    }
+
+    time_t getLastWrite() override {
+        time_t ftime = 0;
+        if (_opened && _fd) {
+            int rc = lfs_getattr(_fs->getFS(), _name.get(), 't', (void *)&ftime, sizeof(ftime));
+            if (rc != sizeof(ftime))
+                ftime = 0; // Error, so clear read value
+        }
+        return ftime;
     }
 
     const char* name() const override {
@@ -519,6 +537,27 @@ public:
         }
         return _dirent.size;
     }
+
+    time_t fileTime() override {
+        if (!_valid) {
+            return 0;
+        }
+        int nameLen = 3; // Slashes, terminator
+        nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
+        nameLen += strlen(_dirent.name);
+        char *tmpName = (char*)malloc(nameLen);
+        if (!tmpName) {
+            return 0;
+        }
+        snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
+        time_t ftime = 0;
+        int rc = lfs_getattr(_fs->getFS(), tmpName, 't', (void *)&ftime, sizeof(ftime));
+        if (rc != sizeof(ftime))
+            ftime = 0; // Error, so clear read value
+        free(tmpName);
+        return ftime;
+    }
+
 
     bool isFile() const override {
         return _valid && (_dirent.type == LFS_TYPE_REG);

@@ -25,6 +25,22 @@ typedef uint16_t u16_t;
 typedef int8_t s8_t;
 typedef uint8_t u8_t;
 
+
+// Enable supporting both timestamped and non-timestamped FS images by making
+// the meta-len a global variable here and by changing the logic of SPIFFS.begin.
+extern int __SPIFFS_obj_meta_len;
+#define SPIFFS_OBJ_META_LEN (__SPIFFS_obj_meta_len)
+#define SPIFFS_MAX_META (4) // Maximum metadata size allowed at runtime
+// Because SPIFFS reads binary images of blocks, we need to be sure to actually ensure there is space to
+// keep the metadata (since 0 bytes are allocated in the struct itself).  Use an anonymous union to ensure
+// that there is at least MAX_META bytes after the end of the struct.
+#define alloc_spiffs_page_object_ix_header(name) \
+  union { \
+    spiffs_page_object_ix_header name; \
+    char xxx[sizeof(spiffs_page_object_ix_header) + SPIFFS_MAX_META]; \
+  };
+
+
 #ifndef SEEK_SET
 #define	SEEK_SET	0	/* set file offset to offset */
 #endif
