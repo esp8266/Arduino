@@ -22,8 +22,13 @@
 #ifndef WIFIUDP_H
 #define WIFIUDP_H
 
+#include <Arduino.h>
+
+#include <functional>
+
 #include <Udp.h>
 #include <include/slist.h>
+
 
 #define UDP_TX_PACKET_MAX_SIZE 8192
 

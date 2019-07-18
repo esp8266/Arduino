@@ -102,7 +102,6 @@
 #ifndef MDNS_H
 #define MDNS_H
 
-#include <functional>   // for UdpContext.h
 #include "WiFiUdp.h"
 #include "lwip/udp.h"
 #include "debug.h"
