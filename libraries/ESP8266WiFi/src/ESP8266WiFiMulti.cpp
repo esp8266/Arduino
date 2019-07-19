@@ -31,15 +31,7 @@ ESP8266WiFiMulti::ESP8266WiFiMulti() {
 }
 
 ESP8266WiFiMulti::~ESP8266WiFiMulti() {
-    APlistClean();
-}
-
-bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
-    return APlistAdd(ssid, passphrase);
-}
-
-bool ESP8266WiFiMulti::existsAP(const char* ssid, const char *passphrase) {
-    return APlistExists(ssid, passphrase);
+    cleanAPlist();
 }
 
 wl_status_t ESP8266WiFiMulti::run(void) {
@@ -183,32 +175,32 @@ wl_status_t ESP8266WiFiMulti::run(void) {
 
 // ##################################################################################
 
-bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
+bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
 
     WifiAPEntry newAP;
 
     if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] no ssid or ssid too long\n");
+        DEBUG_WIFI_MULTI("[WIFI][addAP] no ssid or ssid too long\n");
         return false;
     }
 
     //for passphrase, max is 63 ascii + null. For psk, 64hex + null.
     if(passphrase && strlen(passphrase) > 64) {
         // fail passphrase too long!
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] passphrase too long\n");
+        DEBUG_WIFI_MULTI("[WIFI][addAP] passphrase too long\n");
         return false;
     }
 
-    if(APlistExists(ssid, passphrase)) {
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] SSID: %s already exists\n", ssid);
+    if(existsAP(ssid, passphrase)) {
+        DEBUG_WIFI_MULTI("[WIFI][addAP] SSID: %s already exists\n", ssid);
         return true;
     }
 
     newAP.ssid = strdup(ssid);
 
     if(!newAP.ssid) {
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] fail newAP.ssid == 0\n");
+        DEBUG_WIFI_MULTI("[WIFI][addAP] fail newAP.ssid == 0\n");
         return false;
     }
 
@@ -219,39 +211,34 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
     }
 
     if(!newAP.passphrase) {
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] fail newAP.passphrase == 0\n");
+        DEBUG_WIFI_MULTI("[WIFI][addAP] fail newAP.passphrase == 0\n");
         free(newAP.ssid);
         return false;
     }
 
     APlist.push_back(newAP);
-    DEBUG_WIFI_MULTI("[WIFI][APlistAdd] add SSID: %s\n", newAP.ssid);
+    DEBUG_WIFI_MULTI("[WIFI][addAP] add SSID: %s\n", newAP.ssid);
     return true;
 }
 
-bool ESP8266WiFiMulti::APlistExists(const char* ssid, const char *passphrase) {
+bool ESP8266WiFiMulti::existsAP(const char* ssid, const char *passphrase) {
+
+    const char *pass = passphrase ? passphrase : "";
+
     if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
-        DEBUG_WIFI_MULTI("[WIFI][APlistExists] no ssid or ssid too long\n");
+        DEBUG_WIFI_MULTI("[WIFI][existsAP] no ssid or ssid too long\n");
         return false;
     }
     for(auto entry : APlist) {
-        if(!strcmp(entry.ssid, ssid)) {
-            if(!passphrase) {
-                if(!strcmp(entry.passphrase, "")) {
-                    return true;
-                }
-            } else {
-                if(!strcmp(entry.passphrase, passphrase)) {
-                    return true;
-                }
-            }
+        if(!strcmp(entry.ssid, ssid) && !strcmp(entry.passphrase, pass)) {
+	        return true;
         }
     }
     return false;
 }
 
-void ESP8266WiFiMulti::APlistClean(void) {
+void ESP8266WiFiMulti::cleanAPlist(void) {
     for(auto entry : APlist) {
         if(entry.ssid) {
             free(entry.ssid);
