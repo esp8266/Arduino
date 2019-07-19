@@ -1,5 +1,5 @@
-#include "Arduino.h"
-#include "Ticker.h"
+#include <Arduino.h>
+#include <Ticker.h>
 
 #define LED1  2
 #define LED2  4
