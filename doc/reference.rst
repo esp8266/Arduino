@@ -234,6 +234,7 @@ In this core after version 2.5.2, we will stick to C++ standards: `new` will cal
 However, a new optional global allocator is introduced with a different semantic. It is similar to `new` but will return `nullptr` without side effects, as expected in arduino world. Syntax is a bit different:
 
 .. code:: cpp
+
     SomeClass* sc = new SomeClass(arg1, arg2, ...);
     // sc is always valid and not nullptr, no check necessary
     // abort() may have been called (crash dump, reboot)
@@ -242,9 +243,10 @@ However, a new optional global allocator is introduced with a different semantic
 becomes:
 
 .. code:: cpp
+
     SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
     // abort() is never called, an exception is not thrown even if they are enabled
     if (sc == nullptr) // do something
     else // use sc
 
-History: #6269 <https://github.com/esp8266/Arduino/issues/6269>`__ #6309 <https://github.com/esp8266/Arduino/pull/6309>`__ #6312 <https://github.com/esp8266/Arduino/pull/6312>`__
+History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
