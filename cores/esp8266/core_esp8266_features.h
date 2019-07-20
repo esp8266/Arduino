@@ -33,7 +33,18 @@
 #define WIFI_HAS_EVENT_CALLBACK
 
 
+#ifdef __cplusplus
 
+extern "C++"
+template <typename T, typename ...TConstructorArgs>
+T* new0 (TConstructorArgs... TconstructorArgs)
+{
+    T* ptr = (T*)malloc(sizeof(T));
+    if (ptr)
+        new (ptr) T(TconstructorArgs...);
+    return ptr;
+}
 
-#endif
+#endif // __cplusplus
 
+#endif // CORE_ESP8266_FEATURES_H

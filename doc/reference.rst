@@ -215,3 +215,36 @@ using FPSTR would become...
         String response2;
         response2 += FPSTR(HTTP);
     }
+
+C++
+----
+
+About C++ `new` operator and return value
+
+On heap shortage (memory full), `new` operator in C++ standards:
+- is supposed to throw an exception
+- or call abort() when exceptions are disabled because `new` is supposed to never return `nullptr` (`NULL`).
+
+Usually, exceptions are by default disabled in Arduino worlds.
+Historically in Arduino environments, `new` is overloaded to simply return the equivalent `malloc()` which in turn can return `nullptr`, which is not standard for `new`. It is considered as acceptable.
+But it has a hidden and very bad side effect: the class and member constructors are always called, even when memory is full (`this`=`nullptr`). So any memory shortage, when using `new`, will lead to bad crashes sooner or later, sometimes unexplainable, generally due to memory corruption even when the returned value is checked and managed.
+
+In this core after version 2.5.2, we will stick to C++ standards: `new` will call `abort()` and will "cleanly" crash when exceptions are disabled and memory allocation cannot be honored.
+
+However, a new optional global allocator is introduced with a different semantic. It is similar to `new` but will return `nullptr` without side effects, as expected in arduino world. Syntax is a bit different:
+
+.. code:: cpp
+    SomeClass* sc = new SomeClass(arg1, arg2, ...);
+    // sc is always valid and not nullptr, no check necessary
+    // abort() may have been called (crash dump, reboot)
+    // or an exception thrown when available
+
+becomes:
+
+.. code:: cpp
+    SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
+    // abort() is never called, an exception is not thrown even if they are enabled
+    if (sc == nullptr) // do something
+    else // use sc
+
+History: #6269 <https://github.com/esp8266/Arduino/issues/6269>`__ #6309 <https://github.com/esp8266/Arduino/pull/6309>`__ #6312 <https://github.com/esp8266/Arduino/pull/6312>`__
