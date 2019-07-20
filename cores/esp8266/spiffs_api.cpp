@@ -52,7 +52,7 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
                fd, path, openMode, accessMode, _fs.err_code);
         return FileImplPtr();
     }
-    if (!(mode & SPIFFS_O_RDONLY) && _fs.obj_meta_len) {
+    if (!(mode & SPIFFS_O_RDONLY) && _fs.cfg.obj_meta_len) {
         time_t t = time(NULL);
         struct tm tmr;
         localtime_r(&t, &tmr);

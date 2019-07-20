@@ -220,12 +220,13 @@ typedef struct {
   // logical size of a page, must be at least
   // log_block_size / 8
   u32_t log_page_size;
-
 #endif
 #if SPIFFS_FILEHDL_OFFSET
   // an integer offset added to each file handle
   u16_t fh_ix_offset;
 #endif
+  // active metadata length
+  u32_t obj_meta_len;
 } spiffs_config;
 
 typedef struct spiffs_t {
@@ -291,8 +292,6 @@ typedef struct spiffs_t {
   void *user_data;
   // config magic
   u32_t config_magic;
-  // active metadata length
-  u32_t obj_meta_len;
 } spiffs;
 
 /* spiffs file status struct */
