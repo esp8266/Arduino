@@ -291,6 +291,8 @@ typedef struct spiffs_t {
   void *user_data;
   // config magic
   u32_t config_magic;
+  // active metadata length
+  u32_t obj_meta_len;
 } spiffs;
 
 /* spiffs file status struct */
@@ -300,7 +302,7 @@ typedef struct {
   spiffs_obj_type type;
   spiffs_page_ix pix;
   u8_t name[SPIFFS_OBJ_NAME_LEN];
-  u8_t meta[4]; // Set to the largest supported metadata len
+  u8_t meta[SPIFFS_MAX_META]; // Set to the largest supported metadata len
 } spiffs_stat;
 
 struct spiffs_dirent {
@@ -309,7 +311,7 @@ struct spiffs_dirent {
   spiffs_obj_type type;
   u32_t size;
   spiffs_page_ix pix;
-  u8_t meta[4]; // Set to the largest supported metadata len
+  u8_t meta[SPIFFS_MAX_META]; // Set to the largest supported metadata len
 };
 
 typedef struct {

@@ -25,8 +25,6 @@
 
 using namespace fs;
 
-int __SPIFFS_obj_meta_len = 0;
-
 namespace spiffs_impl {
 
 
@@ -54,7 +52,7 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
                fd, path, openMode, accessMode, _fs.err_code);
         return FileImplPtr();
     }
-    if (!(mode & SPIFFS_O_RDONLY) && __SPIFFS_obj_meta_len==sizeof(4)) {
+    if (!(mode & SPIFFS_O_RDONLY) && _fs.obj_meta_len) {
         time_t t = time(NULL);
         struct tm tmr;
         localtime_r(&t, &tmr);

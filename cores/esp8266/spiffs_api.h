@@ -39,7 +39,6 @@ extern "C" {
 
 using namespace fs;
 
-extern int __SPIFFS_obj_meta_len;
 namespace spiffs_impl {
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
@@ -273,8 +272,8 @@ protected:
             }
         }
         // Make sure we format with requested metadata len
-        __SPIFFS_obj_meta_len = _cfg._enableTime ? 4 : 0;
-        DEBUGV("SPIFFSImpl::_formatOldOrNew formatting with metadata==%d\r\n", __SPIFFS_obj_meta_len);
+        _fs.obj_meta_len = _cfg._enableTime ? 4 : 0;
+        DEBUGV("SPIFFSImpl::_formatOldOrNew formatting with metadata==%d\r\n", _fs.obj_meta_len);
         spiffs_config config = _setupSpiffsConfig(_cfg._enableTime);
 
         // We need to try a mount on SPIFFS, even though it will probably fail, to make the opaque
@@ -326,18 +325,18 @@ protected:
         // First, can we mount w/o metadata (preserve backwards)
         int err;
         if ( !_is_metadata_fs(_start, _blockSize, _pageSize) ) {
-            __SPIFFS_obj_meta_len = 0;
+            _fs.obj_meta_len = 0;
             DEBUGV("SPIFFSImpl: trying fs @%x, size=%x, block=%x, page=%x, metadata=%d\r\n",
-                 _start, _size, _blockSize, _pageSize, __SPIFFS_obj_meta_len);
+                 _start, _size, _blockSize, _pageSize, _fs.obj_meta_len);
             err = SPIFFS_mount(&_fs, &config, _workBuf.get(),
                                _fdsBuf.get(), fdsBufSize, _cacheBuf.get(), cacheBufSize,
                                &SPIFFSImpl::_check_cb);
 	} else {
             // Flag matched, it's a metadata FS
-            __SPIFFS_obj_meta_len = 4;
+            _fs.obj_meta_len = 4;
             config = _setupSpiffsConfig(true);
             DEBUGV("SPIFFSImpl: doesn't look like old metadata==0, so trying fs @%x, size=%x, block=%x, page=%x, metadata=%d\r\n",
-                   _start, _size, _blockSize, _pageSize, __SPIFFS_obj_meta_len);
+                   _start, _size, _blockSize, _pageSize, _fs.obj_meta_len);
             err = SPIFFS_mount(&_fs, &config, _workBuf.get(),
                                 _fdsBuf.get(), fdsBufSize, _cacheBuf.get(), cacheBufSize,
                                 &SPIFFSImpl::_check_cb);
@@ -573,7 +572,7 @@ public:
     {
         CHECKFD();
         time_t t = 0;
-        if (__SPIFFS_obj_meta_len) {
+        if (_fs->getFs()->obj_meta_len) {
             _getStat() ;
             memcpy(&t, _stat.meta, sizeof(time_t));
         }
