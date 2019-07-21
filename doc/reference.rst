@@ -221,6 +221,21 @@ C++
 
 - About C++ ``operator new`` and return value and its replacement ``new0<>()``
   
+  In short, it is preferred for stability to use new `new0` instead of `new`:
+  
+  .. code:: cpp
+  
+      SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
+      // abort() is never called, an exception is not thrown even if they are enabled
+      if (sc == nullptr)
+      {
+        // failed allocation, handle here
+      }
+      else
+      {
+        // use sc
+      }
+  
   The C++ standard says the following about the ``new`` operator behavior when encountering heap shortage (memory full):
 
   - has to throw a ``std::bad_alloc`` C++ exception
@@ -235,7 +250,7 @@ C++
 
   - guarantee that any subobjects partially constructed get destroyed, and in the correct order, if oom is encountered midway through construction
   
-  When C++ exceptions are disabled, or when using new(nothrow), the above guarantees can't be upheld, so the second point above is the only viable solution.
+  When C++ exceptions are disabled, or when using ``new(nothrow)``, the above guarantees can't be upheld, so the second point above is the only viable solution.
   
   Historically in Arduino environments, ``new`` is overloaded to simply return the equivalent ``malloc()`` which in turn can return ``nullptr``. In other cores, and up to our core version 2.5.2, that is considered as acceptable.
   
