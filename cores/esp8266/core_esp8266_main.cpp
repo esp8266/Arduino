@@ -121,6 +121,14 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
     }
 }
 
+extern "C" void __loop_end (void)
+{
+    run_scheduled_functions();
+    run_scheduled_recurrent_functions();
+}
+
+extern "C" void loop_end (void) __attribute__ ((weak, alias("__loop_end")));
+
 static void loop_wrapper() {
     static bool setup_done = false;
     preloop_update_frequency();
@@ -129,8 +137,7 @@ static void loop_wrapper() {
         setup_done = true;
     }
     loop();
-    run_scheduled_functions();
-    run_scheduled_recurrent_functions();
+    loop_end();
     esp_schedule();
 }
 
