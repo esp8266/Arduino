@@ -6,6 +6,14 @@ git:
   depth: 1
   submodules: false
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      - gcc-7
+
 before_install:
   - git submodule update --init  # no recursive update
 
@@ -80,6 +88,7 @@ jobs:
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
       install: sudo apt-get install valgrind lcov
+      env: CC=gcc-7 CXX=g++-7
 
     - name: "Docs"
       stage: build
@@ -92,6 +101,11 @@ jobs:
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
       install: tests/ci/install_astyle.sh
+
+    - name: "Mock trivial test"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/buildm.sh
+      env: CC=gcc-7 CXX=g++-7
 
     - name: "Boards"
       stage: build

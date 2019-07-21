@@ -36,7 +36,7 @@
 #define IP_SET_TYPE_VAL(x,y) do { (void)0; } while (0)
 #define IP_ANY_TYPE (&ip_addr_any)
 #define IP4_ADDR_ANY IPADDR_ANY
-#define IP4_ADDR_ANY4 IPADDR_ANY
+#define IP4_ADDR_ANY4 IP_ADDR_ANY
 #define IPADDR4_INIT(x) { x }
 #define CONST /* nothing: lwIP-v1 does not use const */
 #define ip4_addr_netcmp ip_addr_netcmp
@@ -136,6 +136,7 @@ class IPAddress: public Printable {
         // Overloaded copy operators to allow initialisation of IPAddress objects from other types
         IPAddress& operator=(const uint8_t *address);
         IPAddress& operator=(uint32_t address);
+        IPAddress& operator=(const IPAddress&) = default;
 
         virtual size_t printTo(Print& p) const;
         String toString() const;

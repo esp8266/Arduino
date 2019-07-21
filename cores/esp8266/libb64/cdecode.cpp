@@ -43,6 +43,7 @@ static int base64_decode_block_signed(const int8_t* code_in, const int length_in
           fragment = (int8_t)base64_decode_value_signed(*codechar++);
         } while (fragment < 0);
         *plainchar    = (fragment & 0x03f) << 2;
+        // falls through
       case step_b:
         do {
           if (codechar == code_in+length_in){
@@ -54,6 +55,7 @@ static int base64_decode_block_signed(const int8_t* code_in, const int length_in
         } while (fragment < 0);
         *plainchar++ |= (fragment & 0x030) >> 4;
         *plainchar    = (fragment & 0x00f) << 4;
+        // falls through
       case step_c:
         do {
           if (codechar == code_in+length_in){
@@ -65,6 +67,7 @@ static int base64_decode_block_signed(const int8_t* code_in, const int length_in
         } while (fragment < 0);
         *plainchar++ |= (fragment & 0x03c) >> 2;
         *plainchar    = (fragment & 0x003) << 6;
+        // falls through
       case step_d:
         do {
           if (codechar == code_in+length_in){

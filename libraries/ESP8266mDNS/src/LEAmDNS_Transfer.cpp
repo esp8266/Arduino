@@ -76,25 +76,16 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
     
     bool    bResult = true;
     
-    if (p_rSendParameter.m_bResponse) {
-        if (p_rSendParameter.m_bUnicast) {  // Unicast response  -> Send to querier
-            DEBUG_EX_ERR(if (!m_pUDPContext->getRemoteAddress()) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage: MISSING remote address for response!\n")); });
-            IPAddress   ipRemote;
-            ipRemote = m_pUDPContext->getRemoteAddress();
-            bResult = ((_prepareMDNSMessage(p_rSendParameter, _getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE))) &&
-                       (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
-        }
-        else {                              // Multicast response -> Send via the same network interface, that received the query
-            bResult = _sendMDNSMessage_Multicast(p_rSendParameter, (SOFTAP_MODE | STATION_MODE));
-        }
+    if (p_rSendParameter.m_bResponse &&
+        p_rSendParameter.m_bUnicast) {  // Unicast response  -> Send to querier
+        DEBUG_EX_ERR(if (!m_pUDPContext->getRemoteAddress()) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage: MISSING remote address for response!\n")); });
+        IPAddress   ipRemote;
+        ipRemote = m_pUDPContext->getRemoteAddress();
+        bResult = ((_prepareMDNSMessage(p_rSendParameter, _getResponseMulticastInterface())) &&
+                   (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
     }
-    else {                                  // Multicast query -> Send by all available network interfaces
-        const int   caiWiFiOpModes[2] = { SOFTAP_MODE, STATION_MODE };
-        for (int iInterfaceId=0; ((bResult) && (iInterfaceId<=1)); ++iInterfaceId) {
-            if (wifi_get_opmode() & caiWiFiOpModes[iInterfaceId]) {
-                bResult = _sendMDNSMessage_Multicast(p_rSendParameter, caiWiFiOpModes[iInterfaceId]);
-            }
-        }
+    else {                              // Multicast response
+        bResult = _sendMDNSMessage_Multicast(p_rSendParameter);
     }
 
     // Finally clear service reply masks
@@ -112,12 +103,12 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
  * Fills the UDP output buffer (via _prepareMDNSMessage) and sends the buffer
  * via the selected WiFi interface (Station or AP)
  */
-bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter,
-                                               int p_iWiFiOpMode) {
+bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter) {
+
     bool    bResult = false;
 
     IPAddress   fromIPAddress;
-    fromIPAddress = _getResponseMulticastInterface(p_iWiFiOpMode);
+    fromIPAddress = _getResponseMulticastInterface();
     m_pUDPContext->setMulticastInterface(fromIPAddress);
 
 #ifdef MDNS_IP4_SUPPORT
@@ -364,46 +355,6 @@ bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_Quer
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSQuery: FAILED to alloc question!\n")););
     return bResult;
 }
-
-/*
- * MDNSResponder::_getResponseMulticastInterface
- *
- * Selects the appropriate interface for responses.
- * If AP mode is enabled and the remote contact is in the APs local net, then the
- * AP interface is used to send the response.
- * Otherwise the Station interface (if available) is used.
- *
- */
-IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) const {
-    
-    ip_info IPInfo_Local;
-    bool    bFoundMatch = false;
-    
-    if ((p_iWiFiOpModes & SOFTAP_MODE) &&
-        (wifi_get_opmode() & SOFTAP_MODE)) {
-        //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface: SOFTAP_MODE\n")););
-        // Get remote IP address
-        IPAddress IP_Remote;
-        IP_Remote = m_pUDPContext->getRemoteAddress();
-        // Get local (AP) IP address
-        wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local);
-        
-        if ((IPInfo_Local.ip.addr) &&                                                       // Has local AP IP address AND
-            (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)IP_Remote), &IPInfo_Local.ip, &IPInfo_Local.netmask))) { // Remote address is in the same subnet as the AP
-            bFoundMatch = true;
-        }
-    }
-    if ((!bFoundMatch) &&
-        (p_iWiFiOpModes & STATION_MODE) &&
-        (wifi_get_opmode() & STATION_MODE)) {
-        //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface: STATION_MODE\n")););
-        // Get local (STATION) IP address
-        wifi_get_ip_info(STATION_IF, &IPInfo_Local);
-    }
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface(%i): %s\n"), p_iWiFiOpModes, IPAddress(IPInfo_Local.ip).toString().c_str()););
-    return IPAddress(IPInfo_Local.ip);
-}
-
 
 /**
  * HELPERS

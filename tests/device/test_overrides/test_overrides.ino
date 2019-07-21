@@ -15,9 +15,14 @@ static unsigned setup_micros;
 
 void setup()
 {
-	setup_micros = micros();
+    setup_micros = micros();
     Serial.begin(115200);
     BS_RUN(Serial);
+}
+
+bool pretest()
+{
+    return true;
 }
 
 TEST_CASE("ADC_MODE override works", "[core]")
