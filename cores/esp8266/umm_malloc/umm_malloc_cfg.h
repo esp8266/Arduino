@@ -15,6 +15,7 @@ extern "C" {
 #include <osapi.h>
 
 #include "c_types.h"
+#include "umm_performance.h"
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.
@@ -111,77 +112,20 @@ extern char _heap_start[];
  * called from within umm_malloc()
  */
 
-/*
-  Per Devyte, the core currently doesn't support masking a specific interrupt
-  level. That doesn't mean it can't be implemented, only that at this time
-  locking is implemented as all or nothing.
-  https://github.com/esp8266/Arduino/issues/6246#issuecomment-508612609
 
-  So for now we default to all, 15.
- */
-#ifndef DEFAULT_CRITICAL_SECTION_INTLEVEL
-#define DEFAULT_CRITICAL_SECTION_INTLEVEL 15
-#endif
+#if defined(UMM_CRITICAL_PERIOD_ANALYZE)
 
-/*
- * -D UMM_CRITICAL_PERIOD_ANALYZE :
- *
- * Build option to collect timing usage data on critical section usage in
- * functions: info, malloc, realloc. Collects MIN, MAX, and number of time
- * IRQs were disabled at request time. Note, for realloc MAX disabled time
- * will not include the time from calling malloc and/or free.
- * Examine code for specifics on what info is available and how to access.
-*/
-// #define UMM_CRITICAL_PERIOD_ANALYZE
+#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+#define UMM_CRITICAL_ENTRY(tag) _critical_entry(&time_stats.tag, &_saved_ps_##tag)
+#define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
 
-#if !defined(UMM_CRITICAL_PERIOD_ANALYZE)
+#else
+
 // This method preserves the intlevel on entry and restores the
 // original intlevel at exit.
 #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
 #define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
 #define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
-
-#else
-// This option adds support for gathering time locked data
-typedef struct _TIME_STAT {
-  uint32_t min;
-  uint32_t max;
-  uint32_t start;
-  uint32_t intlevel;
-} time_stat_t;
-
-struct _UMM_TIME_STATS {
-  time_stat_t id_malloc;
-  time_stat_t id_realloc;
-  time_stat_t id_free;
-  time_stat_t id_info;
-};
-
-bool get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t size);
-
-static inline void _critical_entry(time_stat_t *p, uint32_t *saved_ps) {
-    *saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
-    if (0U != (*saved_ps & 0x0FU)) {
-        p->intlevel += 1U;
-    }
-
-    p->start = esp_get_cycle_count();
-}
-
-static inline void _critical_exit(time_stat_t *p, uint32_t *saved_ps) {
-    uint32_t elapse = esp_get_cycle_count() - p->start;
-    if (elapse < p->min)
-        p->min = elapse;
-
-    if (elapse > p->max)
-        p->max = elapse;
-
-    xt_wsr_ps(*saved_ps);
-}
-
-#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
-#define UMM_CRITICAL_ENTRY(tag) _critical_entry(&time_stats.tag, &_saved_ps_##tag)
-#define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
 
 #endif
 
