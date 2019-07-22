@@ -350,7 +350,7 @@ void twi_attachSlaveTxEvent( void (*function)(void) )
   twi_onSlaveTransmit = function;
 }
 
-void ICACHE_RAM_ATTR twi_reply(uint8_t ack)
+inline void ICACHE_RAM_ATTR twi_reply(uint8_t ack)
 {
   // transmit master read ready signal, with or without ack
   if (ack) {
