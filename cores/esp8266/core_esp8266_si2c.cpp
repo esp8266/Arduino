@@ -524,8 +524,8 @@ static void eventTask(ETSEvent *e)
 
 void ICACHE_RAM_ATTR onSclChange(void)
 {
-	static uint8_t sda;
-	static uint8_t scl;
+	uint8_t sda;
+	uint8_t scl;
 
 	sda	= SDA_READ();
 	scl = SCL_READ();
@@ -682,8 +682,8 @@ void ICACHE_RAM_ATTR onSclChange(void)
 
 void ICACHE_RAM_ATTR onSdaChange(void)
 {
-	static uint8_t sda;
-	static uint8_t scl;
+	uint8_t sda;
+	uint8_t scl;
 	sda	= SDA_READ();
 	scl = SCL_READ();
 
