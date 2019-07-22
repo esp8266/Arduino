@@ -687,12 +687,10 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 	sda	= SDA_READ();
 	scl = SCL_READ();
 
-	switch (twip_state)
+	if (scl) /* !DATA */ switch (twip_state)
 	{
 		case TWIP_IDLE:
-			if (!scl) {
-				// DATA - ignore
-			} else if (sda) {
+			if (sda) {
 				// STOP - ignore
 			} else {
 				// START
@@ -711,72 +709,60 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 		case TWIP_READ_ACK:
 		case TWIP_RWAIT_ACK:
 		case TWIP_WRITE:
-			if (!scl) {
-				// DATA - ignore
-			} else {
-				// START or STOP
-				SDA_HIGH();	 // Should not be necessary
-				twip_status = TW_BUS_ERROR;
-				twi_onTwipEvent(twip_status);
-				twip_mode = TWIPM_WAIT;
-				twip_state = TWIP_BUS_ERR;
-			}
+			// START or STOP
+			SDA_HIGH();	 // Should not be necessary
+			twip_status = TW_BUS_ERROR;
+			twi_onTwipEvent(twip_status);
+			twip_mode = TWIPM_WAIT;
+			twip_state = TWIP_BUS_ERR;
 			break;
 
 		case TWIP_WAIT_STOP:
 		case TWIP_BUS_ERR:
-			if (!scl) {
-				// DATA - ignore
+			if (sda) {
+				// STOP
+				SCL_LOW();	// clock stretching
+				ets_timer_disarm(&timer);
+				twip_state = TWIP_IDLE;
+				twip_mode = TWIPM_IDLE;
+				SCL_HIGH();
 			} else {
-				if (sda) {
-					// STOP
-					SCL_LOW();	// clock stretching
-					ets_timer_disarm(&timer);
-					twip_state = TWIP_IDLE;
-					twip_mode = TWIPM_IDLE;
-					SCL_HIGH();
+				// START
+				if (twip_state == TWIP_BUS_ERR) {
+					// ignore
 				} else {
-					// START
-					if (twip_state == TWIP_BUS_ERR) {
-						// ignore
-					} else {
-						bitCount = 8;
-						twip_state = TWIP_REP_START;
-						ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
-					}
+					bitCount = 8;
+					twip_state = TWIP_REP_START;
+					ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
 				}
 			}
 			break;
 
 		case TWIP_SLA_W:
 		case TWIP_READ:
-			if (!scl) {
-				// DATA - ignore
+			// START or STOP
+			if (bitCount != 7) {
+				// inside byte transfer - error
+				twip_status = TW_BUS_ERROR;
+				twi_onTwipEvent(twip_status);
+				twip_mode = TWIPM_WAIT;
+				twip_state = TWIP_BUS_ERR;
 			} else {
-				// START or STOP
-				if (bitCount != 7) {
-					// inside byte transfer - error
-					twip_status = TW_BUS_ERROR;
-					twi_onTwipEvent(twip_status);
-					twip_mode = TWIPM_WAIT;
-					twip_state = TWIP_BUS_ERR;
+				// during first bit in byte transfer - ok
+				SCL_LOW();	// clock stretching
+				twip_status = TW_SR_STOP;
+				twi_onTwipEvent(twip_status);
+				if (sda) {
+					// STOP
+					ets_timer_disarm(&timer);
+					twip_state = TWIP_IDLE;
+					twip_mode = TWIPM_IDLE;
 				} else {
-					// during first bit in byte transfer - ok
-					SCL_LOW();	// clock stretching
-					twip_status = TW_SR_STOP;
-					twi_onTwipEvent(twip_status);
-					if (sda) {
-						// STOP
-						ets_timer_disarm(&timer);
-						twip_state = TWIP_IDLE;
-						twip_mode = TWIPM_IDLE;
-					} else {
-						// START
-						bitCount = 8;
-						ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
-						twip_state = TWIP_REP_START;
-						twip_mode = TWIPM_IDLE;
-					}
+					// START
+					bitCount = 8;
+					ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
+					twip_state = TWIP_REP_START;
+					twip_mode = TWIPM_IDLE;
 				}
 			}
 			break;
