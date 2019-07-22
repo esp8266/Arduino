@@ -364,7 +364,7 @@ inline void ICACHE_RAM_ATTR twi_reply(uint8_t ack)
   }
 }
 
-void ICACHE_RAM_ATTR twi_stop(void)
+inline void ICACHE_RAM_ATTR twi_stop(void)
 {
 	// send stop condition
 	//TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTO);
@@ -376,7 +376,7 @@ void ICACHE_RAM_ATTR twi_stop(void)
 	twi_state = TWI_READY;
 }
 
-void ICACHE_RAM_ATTR twi_releaseBus(void)
+inline void ICACHE_RAM_ATTR twi_releaseBus(void)
 {
 	// release bus
 	//TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
