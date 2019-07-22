@@ -59,15 +59,15 @@ static unsigned char twi_addr = 0;
 #define TWIP_WRITE		14
 #define TWIP_BUS_ERR 	15
 
-static volatile uint8_t twip_mode = TWIPM_IDLE;
-static volatile uint8_t twip_state = TWIP_IDLE;
-static volatile uint8_t twip_status = TW_NO_INFO;
-static volatile uint8_t bitCount = 0;
+static volatile int twip_mode = TWIPM_IDLE;
+static volatile int twip_state = TWIP_IDLE;
+static volatile int twip_status = TW_NO_INFO;
+static volatile int bitCount = 0;
 
 #define TWDR twi_data
 static volatile uint8_t twi_data = 0x00;
-static volatile uint8_t twi_ack = 0;
-static volatile uint8_t twi_ack_rec = 0;
+static volatile int twi_ack = 0;
+static volatile int twi_ack_rec = 0;
 static volatile int twi_timeout_ms = 10;
 
 #define TWI_READY 0
@@ -75,15 +75,15 @@ static volatile int twi_timeout_ms = 10;
 #define TWI_MTX   2
 #define TWI_SRX   3
 #define TWI_STX   4
-static volatile uint8_t twi_state = TWI_READY;
+static volatile int twi_state = TWI_READY;
 static volatile uint8_t twi_error = 0xFF;
 
 static uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_txBufferIndex;
-static volatile uint8_t twi_txBufferLength;
+static volatile int twi_txBufferIndex;
+static volatile int twi_txBufferLength;
 
 static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_rxBufferIndex;
+static volatile int twi_rxBufferIndex;
 
 static void (*twi_onSlaveTransmit)(void);
 static void (*twi_onSlaveReceive)(uint8_t*, size_t);
