@@ -522,6 +522,14 @@ static void eventTask(ETSEvent *e)
 	}
 }
 
+// The state machine is converted from a 0...15 state to a 1-hot encoded state, and then
+// compared to the logical-or of all states with the same branch.  This removes the need
+// for a large series of straight-line compares.  The biggest win is when multiple states
+// all have the same branch (onSdaChange), but for others there is some benefit, still.
+#define S2M(x) (1<<(x))
+// Shorthand for if the state is any of the or'd bitmask x
+#define IFSTATE(x) if (twip_state_mask & (x))
+
 void ICACHE_RAM_ATTR onSclChange(void)
 {
 	unsigned int sda;
@@ -532,151 +540,124 @@ void ICACHE_RAM_ATTR onSclChange(void)
 
 	twip_status = 0xF8;		// reset TWI status
 
-	switch (twip_state)
-	{
-		case TWIP_IDLE:
-		case TWIP_WAIT_STOP:
-		case TWIP_BUS_ERR:
+	int twip_state_mask = S2M(twip_state);
+	IFSTATE(S2M(TWIP_START)|S2M(TWIP_REP_START)|S2M(TWIP_SLA_W)|S2M(TWIP_READ)) {
+		if (!scl) {
 			// ignore
-			break;
+		} else {
+			bitCount--;
+			twi_data <<= 1;
+			twi_data |= sda;
 
-		case TWIP_START:
-		case TWIP_REP_START:
-		case TWIP_SLA_W:
-		case TWIP_READ:
-			if (!scl) {
-				// ignore
+			if (bitCount != 0) {
+				// continue
 			} else {
-				bitCount--;
-				twi_data <<= 1;
-				twi_data |= sda;
-
-				if (bitCount != 0) {
-					// continue
+				twip_state = TWIP_SEND_ACK;
+			}
+		}
+	} else IFSTATE(S2M(TWIP_SEND_ACK)) {
+		if (scl) {
+			// ignore
+		} else {
+			if (twip_mode == TWIPM_IDLE) {
+				if ((twi_data & 0xFE) != twi_addr) {
+					// ignore
 				} else {
-					twip_state = TWIP_SEND_ACK;
+					SDA_LOW();
+				}
+			} else {
+				if (!twi_ack) {
+					// ignore
+				} else {
+					SDA_LOW();
 				}
 			}
-			break;
-
-		case TWIP_SEND_ACK:
-			if (scl) {
-				// ignore
-			} else {
-				if (twip_mode == TWIPM_IDLE) {
-					if ((twi_data & 0xFE) != twi_addr) {
-						// ignore
-					} else {
-						SDA_LOW();
-					}
-				} else {
-					if (!twi_ack) {
-						// ignore
-					} else {
-						SDA_LOW();
-					}
-				}
-				twip_state = TWIP_WAIT_ACK;
-			}
-			break;
-
-		case TWIP_WAIT_ACK:
-			if (scl) {
-				// ignore
-			} else {
-				if (twip_mode == TWIPM_IDLE) {
-					if ((twi_data & 0xFE) != twi_addr) {
-						SDA_HIGH();
-						twip_state = TWIP_WAIT_STOP;
-					} else {
-						SCL_LOW();	// clock stretching
-						SDA_HIGH();
-						twip_mode = TWIPM_ADDRESSED;
-						if (!(twi_data & 0x01)) {
-							twip_status = TW_SR_SLA_ACK;
-							twi_onTwipEvent(twip_status);
-							bitCount = 8;
-							twip_state = TWIP_SLA_W;
-						} else {
-							twip_status = TW_ST_SLA_ACK;
-							twi_onTwipEvent(twip_status);
-							twip_state = TWIP_SLA_R;
-						}
-					}
+			twip_state = TWIP_WAIT_ACK;
+		}
+	} else IFSTATE(S2M(TWIP_WAIT_ACK)) {
+		if (scl) {
+			// ignore
+		} else {
+			if (twip_mode == TWIPM_IDLE) {
+				if ((twi_data & 0xFE) != twi_addr) {
+					SDA_HIGH();
+					twip_state = TWIP_WAIT_STOP;
 				} else {
 					SCL_LOW();	// clock stretching
 					SDA_HIGH();
-					if (!twi_ack) {
-						twip_status = TW_SR_DATA_NACK;
-						twi_onTwipEvent(twip_status);
-						twip_mode = TWIPM_WAIT;
-						twip_state = TWIP_WAIT_STOP;
-					} else {
-						twip_status = TW_SR_DATA_ACK;
+					twip_mode = TWIPM_ADDRESSED;
+					if (!(twi_data & 0x01)) {
+						twip_status = TW_SR_SLA_ACK;
 						twi_onTwipEvent(twip_status);
 						bitCount = 8;
-						twip_state = TWIP_READ;
+						twip_state = TWIP_SLA_W;
+					} else {
+						twip_status = TW_ST_SLA_ACK;
+						twi_onTwipEvent(twip_status);
+						twip_state = TWIP_SLA_R;
 					}
 				}
-			}
-			break;
-
-		case TWIP_SLA_R:
-		case TWIP_WRITE:
-			if (scl) {
-				// ignore
-			} else {
-				bitCount--;
-				(twi_data & 0x80) ? SDA_HIGH() : SDA_LOW();
-				twi_data <<= 1;
-
-				if (bitCount != 0) {
-					// continue
-				} else {
-					twip_state = TWIP_REC_ACK;
-				}
-			}
-			break;
-
-		case TWIP_REC_ACK:
-			if (scl) {
-				// ignore
-			} else {
-				SDA_HIGH();
-				twip_state = TWIP_READ_ACK;
-			}
-			break;
-
-		case TWIP_READ_ACK:
-			if (!scl) {
-				// ignore
-			} else {
-				twi_ack_rec = !sda;
-				twip_state = TWIP_RWAIT_ACK;
-			}
-			break;
-
-		case TWIP_RWAIT_ACK:
-			if (scl) {
-				// ignore
 			} else {
 				SCL_LOW();	// clock stretching
-				if (twi_ack && twi_ack_rec) {
-					twip_status = TW_ST_DATA_ACK;
-					twi_onTwipEvent(twip_status);
-					twip_state = TWIP_WRITE;
-				} else {
-					// we have no more data to send and/or the master doesn't want anymore
-					twip_status = twi_ack_rec ? TW_ST_LAST_DATA : TW_ST_DATA_NACK;
+				SDA_HIGH();
+				if (!twi_ack) {
+					twip_status = TW_SR_DATA_NACK;
 					twi_onTwipEvent(twip_status);
 					twip_mode = TWIPM_WAIT;
 					twip_state = TWIP_WAIT_STOP;
+				} else {
+					twip_status = TW_SR_DATA_ACK;
+					twi_onTwipEvent(twip_status);
+					bitCount = 8;
+					twip_state = TWIP_READ;
 				}
 			}
-			break;
+		}
+	} else IFSTATE(S2M(TWIP_SLA_R)|S2M(TWIP_WRITE)) {
+		if (scl) {
+			// ignore
+		} else {
+			bitCount--;
+			(twi_data & 0x80) ? SDA_HIGH() : SDA_LOW();
+			twi_data <<= 1;
 
-		default:
-			break;
+			if (bitCount != 0) {
+				// continue
+			} else {
+				twip_state = TWIP_REC_ACK;
+			}
+		}
+	} else IFSTATE(S2M(TWIP_REC_ACK)) {
+		if (scl) {
+			// ignore
+		} else {
+			SDA_HIGH();
+			twip_state = TWIP_READ_ACK;
+		}
+	} else IFSTATE(S2M(TWIP_READ_ACK)) {
+		if (!scl) {
+			// ignore
+		} else {
+			twi_ack_rec = !sda;
+			twip_state = TWIP_RWAIT_ACK;
+		}
+	} else IFSTATE(S2M(TWIP_RWAIT_ACK)) {
+		if (scl) {
+			// ignore
+		} else {
+			SCL_LOW();	// clock stretching
+			if (twi_ack && twi_ack_rec) {
+				twip_status = TW_ST_DATA_ACK;
+				twi_onTwipEvent(twip_status);
+				twip_state = TWIP_WRITE;
+			} else {
+				// we have no more data to send and/or the master doesn't want anymore
+				twip_status = twi_ack_rec ? TW_ST_LAST_DATA : TW_ST_DATA_NACK;
+				twi_onTwipEvent(twip_status);
+				twip_mode = TWIPM_WAIT;
+				twip_state = TWIP_WAIT_STOP;
+			}
+		}
 	}
 }
 
@@ -687,9 +668,9 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 	sda	= SDA_READ();
 	scl = SCL_READ();
 
-	if (scl) /* !DATA */ switch (twip_state)
-	{
-		case TWIP_IDLE:
+	int twip_state_mask = S2M(twip_state);
+	if (scl) { /* !DATA */
+		IFSTATE(S2M(TWIP_IDLE)) {
 			if (sda) {
 				// STOP - ignore
 			} else {
@@ -698,27 +679,14 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 				twip_state = TWIP_START;
 				ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
 			}
-			break;
-
-		case TWIP_START:
-		case TWIP_REP_START:
-		case TWIP_SEND_ACK:
-		case TWIP_WAIT_ACK:
-		case TWIP_SLA_R:
-		case TWIP_REC_ACK:
-		case TWIP_READ_ACK:
-		case TWIP_RWAIT_ACK:
-		case TWIP_WRITE:
+		} else IFSTATE(S2M(TWIP_START)|S2M(TWIP_REP_START)|S2M(TWIP_SEND_ACK)|S2M(TWIP_WAIT_ACK)|S2M(TWIP_SLA_R)|S2M(TWIP_REC_ACK)|S2M(TWIP_READ_ACK)|S2M(TWIP_RWAIT_ACK)|S2M(TWIP_WRITE)) {
 			// START or STOP
 			SDA_HIGH();	 // Should not be necessary
 			twip_status = TW_BUS_ERROR;
 			twi_onTwipEvent(twip_status);
 			twip_mode = TWIPM_WAIT;
 			twip_state = TWIP_BUS_ERR;
-			break;
-
-		case TWIP_WAIT_STOP:
-		case TWIP_BUS_ERR:
+		} else IFSTATE(S2M(TWIP_WAIT_STOP)|S2M(TWIP_BUS_ERR)) {
 			if (sda) {
 				// STOP
 				SCL_LOW();	// clock stretching
@@ -736,10 +704,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 					ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
 				}
 			}
-			break;
-
-		case TWIP_SLA_W:
-		case TWIP_READ:
+		} else IFSTATE(S2M(TWIP_SLA_W)|S2M(TWIP_READ)) {
 			// START or STOP
 			if (bitCount != 7) {
 				// inside byte transfer - error
@@ -765,10 +730,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 					twip_mode = TWIPM_IDLE;
 				}
 			}
-			break;
-
-		default:
-			break;
+		}
 	}
 }
 
