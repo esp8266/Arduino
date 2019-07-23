@@ -219,28 +219,13 @@ using FPSTR would become...
 C++
 ----
 
-- About C++ ``operator new`` and return value and its replacement ``new0<>()``
-  
-  In short, it is preferred for stability to use new `new0` instead of `new`:
-  
-  .. code:: cpp
-  
-      SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
-      // abort() is never called, an exception is not thrown even if they are enabled
-      if (sc == nullptr)
-      {
-        // failed allocation, handle here
-      }
-      else
-      {
-        // use sc
-      }
+- About C++ exceptions, ``operator new``, and Exceptions menu option
   
   The C++ standard says the following about the ``new`` operator behavior when encountering heap shortage (memory full):
 
-  - has to throw a ``std::bad_alloc`` C++ exception
+  - has to throw a ``std::bad_alloc`` C++ exception when they are enabled
 
-  - throw an unhandled exception, which means calling ``abort()``
+  - will ``abort()`` otherwise
   
   There are several reasons for the first point above, among which are:
 
@@ -250,59 +235,46 @@ C++
 
   - guarantee that any subobjects partially constructed get destroyed, and in the correct order, if oom is encountered midway through construction
   
-  When C++ exceptions are disabled, or when using ``new(nothrow)``, the above guarantees can't be upheld, so the second point above is the only viable solution.
+  When C++ exceptions are disabled, or when using ``new(nothrow)``, the above guarantees can't be upheld, so the second point (``abort()``) above is the only ``std::c++`` viable solution.
   
-  Historically in Arduino environments, ``new`` is overloaded to simply return the equivalent ``malloc()`` which in turn can return ``nullptr``. In other cores, and up to our core version 2.5.2, that is considered as acceptable.
+  Historically in Arduino environments, ``new`` is overloaded to simply return the equivalent ``malloc()`` which in turn can return ``nullptr``.
   
-  However, this behavior is not C++ standard, and there is good reason for that: there are hidden and very bad side effects. The *class and member constructors are always called, even when memory is full* (``this``=``nullptr``). In addition, the memory allocation for the top object could succeed, but allocation required for some member object could fail, leaving construction in an undefined state. So the historical behavior of Ardudino's ``new``, when faced with insufficient memory, will lead to bad crashes sooner or later, sometimes unexplainable, generally due to memory corruption even when the returned value is checked and managed.
+  This behavior is not C++ standard, and there is good reason for that: there are hidden and very bad side effects. The *class and member constructors are always called, even when memory is full* (``this``=``nullptr``).
+  In addition, the memory allocation for the top object could succeed, but allocation required for some member object could fail, leaving construction in an undefined state.
+  So the historical behavior of Ardudino's ``new``, when faced with insufficient memory, will lead to bad crashes sooner or later, sometimes unexplainable, generally due to memory corruption even when the returned value is checked and managed.
+  Luckily on esp8266, trying to update RAM near address 0 will immediately raise an hardware exception, unlike on other uC like avr on which that memory can be accessible.
   
-  As of core 2.6.0, we are sticking to the C++ standard. There are two clear cases when ``new`` encounters oom:
+  As of core 2.6.0, there are 3 options: legacy (default) and two clear cases when ``new`` encounters oom:
+  
+  - ``new`` returns ``nullptr``, with possible bad effects or immediate crash when constructors (called anyway) initialize members (exceptions are disabled in this case)
 
-  - C++ exceptions are disabled (default build): ``new`` causes an exception, which in turn calls ``abort()`` and will "cleanly" crash, because there is no way to honor memory allocation or to recover gracefully.
+  - C++ exceptions are disabled: ``new`` calls ``abort()`` and will "cleanly" crash, because there is no way to honor memory allocation or to recover gracefully.
 
-  - C++ exceptions are enabled (menu option): ``new`` throws a ``std::bad_alloc`` C++ exception, which can be caught and handled gracefully. This assures correct behavior, including handling of all subobjects, which guarantees stability.
-  
-  To allow previous behavior, a new optional global allocator is introduced with a different semantic. It is similar to ``new`` but will return ``nullptr`` without side effects (if ``std::new`` is not used in constructors), as expected in arduino world.
-  
-  Syntax is slightly different, the following shows the different usages:
-  
-  C++ standard behavior (as of 2.6.0):
-  
-  .. code:: cpp
-  
-      SomeClass* sc = new SomeClass(arg1, arg2, ...);
-      // sc is always valid and not nullptr, no check necessary
-      // abort() gets called (crash dump, reboot) if oom,
-      // or a C++ std::bad_alloc exception is thrown when available
-  
-  Old behavior (until 2.5.2):
-  
-  .. code:: cpp
-  
-      SomeClass* sc = new SomeClass(arg1, arg2, ...);
-      // abort() is never called, an exception is not thrown even if they are enabled
-      if (sc == nullptr)
-      {
-        // failed allocation, handle here, possible bad hidden effects
-      }
-      else
-      {
-        // use sc
-      }
-  
-  Alternate behavior (as of 2.6.0):
-  
-  .. code:: cpp
-  
-      SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
-      // abort() is never called, an exception is not thrown even if they are enabled
-      if (sc == nullptr)
-      {
-        // failed allocation, handle here
-      }
-      else
-      {
-        // use sc
-      }
-  
+  - C++ exceptions are enabled: ``new`` throws a ``std::bad_alloc`` C++ exception, which can be caught and handled gracefully.
+    This assures correct behavior, including handling of all subobjects, which guarantees stability.
+
   History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
+
+- New optional allocator ``new0``
+
+  A new optional global allocator is introduced with a different semantic:
+
+  - never throws exceptions on oom
+
+  - never calls constructors on oom
+
+  - returns nullptr (without side effects - excepted when parent constructors, or member constructors use ``new``)
+
+  It is similar to arduino ``new`` semantic without side effects.
+
+  Syntax is slightly different, the following shows the different usages:
+
+  C++ standard behavior (as of 2.6.0):
+
+  .. code:: cpp
+
+      // with new:
+      SomeClass* sc = new SomeClass(arg1, arg2, ...);
+
+      // with new0
+      SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
