@@ -32,7 +32,7 @@ extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
-#ifndef __cpp_exceptions
+#if !defined(__cpp_exceptions) && defined(NEW_RETURNS_NULLPTR)
 void *operator new(size_t size)
 {
     void *ret = malloc(size);
@@ -52,7 +52,7 @@ void *operator new[](size_t size)
     }
     return ret;
 }
-#endif
+#endif // arduino's std::new legacy
 
 void __cxa_pure_virtual(void)
 {
