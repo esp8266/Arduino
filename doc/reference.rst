@@ -239,7 +239,7 @@ C++
   
   Historically in Arduino environments, ``new`` is overloaded to simply return the equivalent ``malloc()`` which in turn can return ``nullptr``.
   
-  This behavior is not C++ standard, and there is good reason for that: there are hidden and very bad side effects. The *class and member constructors are always called, even when memory is full* (``this``=``nullptr``).
+  This behavior is not C++ standard, and there is good reason for that: there are hidden and very bad side effects. The *class and member constructors are always called, even when memory is full* (``this == nullptr``).
   In addition, the memory allocation for the top object could succeed, but allocation required for some member object could fail, leaving construction in an undefined state.
   So the historical behavior of Ardudino's ``new``, when faced with insufficient memory, will lead to bad crashes sooner or later, sometimes unexplainable, generally due to memory corruption even when the returned value is checked and managed.
   Luckily on esp8266, trying to update RAM near address 0 will immediately raise an hardware exception, unlike on other uC like avr on which that memory can be accessible.
@@ -263,9 +263,9 @@ C++
 
   - never calls constructors on oom
 
-  - returns nullptr (without side effects - excepted when parent constructors, or member constructors use ``new``)
+  - returns nullptr on oom
 
-  It is similar to arduino ``new`` semantic without side effects.
+  It is similar to arduino ``new`` semantic without side effects (excepted when parent constructors, or member constructors use ``new``)
 
   Syntax is slightly different, the following shows the different usages:
 
@@ -276,5 +276,5 @@ C++
       // with new:
       SomeClass* sc = new SomeClass(arg1, arg2, ...);
 
-      // with new0
+      // with new0:
       SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
