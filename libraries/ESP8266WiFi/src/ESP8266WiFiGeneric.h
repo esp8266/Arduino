@@ -37,12 +37,6 @@
 #define DEBUG_WIFI_GENERIC(...) do { (void)0; } while (0)
 #endif
 
-enum enum_connect {
-    WIFI_CNT_OK,
-    WIFI_CNT_INPROGRESS,
-    WIFI_CNT_FAILED
-};
-
 struct WiFiEventHandlerOpaque;
 typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
@@ -108,9 +102,11 @@ class ESP8266WiFiGenericClass {
 
     public:
 
-        int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
-        int hostByNameAsync(const char* aHostname, IPAddress& aResult);
+        inline int hostByName(const char* aHostname, IPAddress& aResult) {
+            return hostByName(aHostname, aResult, 10000);
+        }
+        int hostByNameAsync(const char* aHostname, IPAddress& aResult, uint8_t* waiting = NULL);
         bool getPersistent();
     protected:
 
