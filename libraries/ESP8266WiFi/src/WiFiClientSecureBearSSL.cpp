@@ -210,28 +210,35 @@ bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   return WiFiClient::flush(maxWaitMs);
 }
 
+int WiFiClientSecure::connect(const char* host, uint16_t port) {
+  if (!WiFiClient::connect(host, port)) {
+    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
+    return 0;
+  }
+  return _connectSSL(host);
+}
+
+int WiFiClientSecure::connectAsync(const char* host, uint16_t port, uint8_t* waiting) {
+  if (!WiFiClient::connectAsync(host, port, waiting)) {
+    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
+    return 0;
+  }
+  return _connectSSL(host);
+}
+
+int WiFiClientSecure::connect(const String& host, uint16_t port) {
+  return connect(host.c_str(), port);
+}
+
+int WiFiClientSecure::connectAsync(const String& host, uint16_t port, uint8_t* waiting) {
+  return connectAsync(host.c_str(), port, waiting);
+}
+
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }
   return _connectSSL(nullptr);
-}
-
-int WiFiClientSecure::connect(const char* name, uint16_t port) {
-  IPAddress remote_addr;
-  if (!WiFi.hostByName(name, remote_addr)) {
-    DEBUG_BSSL("connect: Name loopup failure\n");
-    return 0;
-  }
-  if (!WiFiClient::connect(remote_addr, port)) {
-    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
-    return 0;
-  }
-  return _connectSSL(name);
-}
-
-int WiFiClientSecure::connect(const String& host, uint16_t port) {
-  return connect(host.c_str(), port);
 }
 
 void WiFiClientSecure::_freeSSL() {
