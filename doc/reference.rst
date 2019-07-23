@@ -265,11 +265,10 @@ C++
 
   - returns nullptr on oom
 
-  It is similar to arduino ``new`` semantic without side effects (excepted when parent constructors, or member constructors use ``new``)
+  It is similar to arduino ``new`` semantic without side effects
+  (except when parent constructors, or member constructors use ``new``).
 
   Syntax is slightly different, the following shows the different usages:
-
-  C++ standard behavior (as of 2.6.0):
 
   .. code:: cpp
 
