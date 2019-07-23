@@ -241,6 +241,7 @@ using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
 using fs::FSConfig;
+using fs::SPIFFSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
