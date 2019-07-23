@@ -122,7 +122,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
     return *this;
 }
 
-int WiFiClient::connect(const char* host, uint16_t port)
+int WiFiClient::connect(const char* host, uint16_t port) // Blocking
 {
     if (connected()) return 1;
     IPAddress remote_addr;
@@ -133,29 +133,27 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
-int WiFiClient::connectAsync(const char* host, uint16_t port)
+int WiFiClient::connectAsync(const char* host, uint16_t port, uint8_t* waiting) // Non blocking
 {
-    if (connected()) return WIFI_CNT_OK;
+    if (waiting != NULL) *waiting = 0;
+    if (connected()) return 1;
+    
     IPAddress remote_addr;
-    int ret = WiFi.hostByNameAsync(host, remote_addr);
-    if (ret == WIFI_CNT_OK) {
-        return connect(remote_addr, port) ? WIFI_CNT_OK : WIFI_CNT_FAILED;
+    
+    if (WiFi.hostByNameAsync(host, remote_addr, waiting)) {
+        return connect(remote_addr, port);
     }
-    return ret;
+    return 0;
 }
 
-int WiFiClient::connect(const char* host, uint16_t port, bool async)
-{
-    if (async) {
-        return connectAsync(host, port);
-    } else {
-        return connect(host, port);
-    }
-}
-
-int WiFiClient::connect(const String& host, uint16_t port)
+int WiFiClient::connect(const String& host, uint16_t port) // Blocking
 {
     return connect(host.c_str(), port);
+}
+
+int WiFiClient::connectAsync(const String& host, uint16_t port, uint8_t* waiting) // Non blocking
+{
+    return connectAsync(host.c_str(), port, waiting);
 }
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
