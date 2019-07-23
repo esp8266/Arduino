@@ -205,7 +205,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
-      _reset();
       return false;
     }
 
@@ -231,7 +230,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     uint8_t *sig = (uint8_t*)malloc(sigLen);
     if (!sig) {
       _setError(UPDATE_ERROR_SIGN);
-      _reset();
       return false;
     }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
@@ -244,7 +242,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       _setError(UPDATE_ERROR_SIGN);
-      _reset();
       return false;
     }
 #ifdef DEBUG_UPDATER
@@ -254,7 +251,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _md5.calculate();
     if (strcasecmp(_target_md5.c_str(), _md5.toString().c_str())) {
       _setError(UPDATE_ERROR_MD5);
-      _reset();
       return false;
     }
 #ifdef DEBUG_UPDATER
@@ -467,7 +463,6 @@ size_t UpdaterClass::writeStream(Stream &data) {
             if(toRead == 0) { //Timeout
                 _currentAddress = (_startAddress + _size);
                 _setError(UPDATE_ERROR_STREAM);
-                _reset();
                 return written;
             }
         }
@@ -494,6 +489,7 @@ void UpdaterClass::_setError(int error){
 #ifdef DEBUG_UPDATER
   printError(DEBUG_UPDATER);
 #endif
+  _reset(); // Any error condition invalidates the entire update, so clear partial status
 }
 
 void UpdaterClass::printError(Print &out){
