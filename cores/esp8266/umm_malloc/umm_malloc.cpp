@@ -691,7 +691,7 @@ unsigned short int umm_numblocks = 0;
 
 /*
  * This does not look safe, no access locks. It currently is not being
- * built, so not an immediate issue. -  mjh 061019
+ * built, so not an immediate issue. -  06/10/19
  */
 /* integrity check (UMM_INTEGRITY_CHECK) {{{ */
 #if defined(UMM_INTEGRITY_CHECK)

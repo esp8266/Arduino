@@ -18,7 +18,7 @@ extern "C" {
  * will not include the time from calling malloc and/or free.
  * Examine code for specifics on what info is available and how to access.
 */
-#define UMM_CRITICAL_PERIOD_ANALYZE
+// #define UMM_CRITICAL_PERIOD_ANALYZE
 
 
 /*
