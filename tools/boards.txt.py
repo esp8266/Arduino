@@ -882,10 +882,10 @@ macros = {
 
     'exception_menu': collections.OrderedDict([
         ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
-        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions -DNEW_RETURNS_NULLPTR' ),
+        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
         ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),

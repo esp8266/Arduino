@@ -32,7 +32,7 @@ extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
-#if !defined(__cpp_exceptions) && defined(NEW_RETURNS_NULLPTR)
+#if !defined(__cpp_exceptions) && !defined(NEW_OOM_ABORT)
 void *operator new(size_t size)
 {
     void *ret = malloc(size);
