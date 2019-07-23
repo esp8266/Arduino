@@ -39,10 +39,12 @@ class WiFiClientSecure : public WiFiClient {
 
     WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
 
-    int connect(IPAddress ip, uint16_t port) override;
+    int connect(const char* host, uint16_t port) override;
+    int connectAsync(const char* host, uint16_t port, uint8_t* waiting = NULL) override;
     int connect(const String& host, uint16_t port) override;
-    int connect(const char* name, uint16_t port) override;
-
+    int connectAsync(const String& host, uint16_t port, uint8_t* waiting = NULL) override;
+    int connect(IPAddress ip, uint16_t port) override;
+    
     uint8_t connected() override;
     size_t write(const uint8_t *buf, size_t size) override;
     size_t write_P(PGM_P buf, size_t size) override;
