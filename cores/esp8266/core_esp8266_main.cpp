@@ -39,7 +39,6 @@ extern "C" {
 #define OPTIMISTIC_YIELD_TIME_US 16000
 
 extern "C" void call_user_start();
-extern void loop();
 extern void setup();
 extern void (*__init_array_start)(void);
 extern void (*__init_array_end)(void);
@@ -119,11 +118,10 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
     }
 }
 
-extern "C" void __loop_end (void)
-{
+extern "C" void esp_loop(void) __attribute__((weak));
+extern "C" void esp_loop(void) {
+    loop();
 }
-
-extern "C" void loop_end (void) __attribute__ ((weak, alias("__loop_end")));
 
 static void loop_wrapper() {
     static bool setup_done = false;
@@ -132,8 +130,7 @@ static void loop_wrapper() {
         setup();
         setup_done = true;
     }
-    loop();
-    loop_end();
+    esp_loop();
     esp_schedule();
 }
 
