@@ -6,8 +6,9 @@
 #include <interrupts.h>
 #include <coredecls.h>
 
-extern "C" void loop_end()
+extern "C" void esp_loop()
 {
+    loop();
     run_scheduled_functions();
     run_scheduled_recurrent_functions();}
 
