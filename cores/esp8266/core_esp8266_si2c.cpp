@@ -391,6 +391,7 @@ inline void ICACHE_RAM_ATTR twi_releaseBus(void)
 
 void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
 {
+  twip_status = status;
   switch(status) {
     // Slave Receiver
     case TW_SR_SLA_ACK:   // addressed, returned ack
@@ -485,8 +486,7 @@ void ICACHE_RAM_ATTR onTimer(void *unused)
 {
 	(void)unused;
 	twi_releaseBus();
-	twip_status = TW_BUS_ERROR;
-	twi_onTwipEvent(twip_status);
+	twi_onTwipEvent(TW_BUS_ERROR);
 	twip_mode = TWIPM_WAIT;
 	twip_state = TWIP_BUS_ERR;
 }
@@ -587,13 +587,11 @@ void ICACHE_RAM_ATTR onSclChange(void)
 					SDA_HIGH();
 					twip_mode = TWIPM_ADDRESSED;
 					if (!(twi_data & 0x01)) {
-						twip_status = TW_SR_SLA_ACK;
-						twi_onTwipEvent(twip_status);
+						twi_onTwipEvent(TW_SR_SLA_ACK);
 						bitCount = 8;
 						twip_state = TWIP_SLA_W;
 					} else {
-						twip_status = TW_ST_SLA_ACK;
-						twi_onTwipEvent(twip_status);
+						twi_onTwipEvent(TW_ST_SLA_ACK);
 						twip_state = TWIP_SLA_R;
 					}
 				}
@@ -601,13 +599,11 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				SCL_LOW();	// clock stretching
 				SDA_HIGH();
 				if (!twi_ack) {
-					twip_status = TW_SR_DATA_NACK;
-					twi_onTwipEvent(twip_status);
+					twi_onTwipEvent(TW_SR_DATA_NACK);
 					twip_mode = TWIPM_WAIT;
 					twip_state = TWIP_WAIT_STOP;
 				} else {
-					twip_status = TW_SR_DATA_ACK;
-					twi_onTwipEvent(twip_status);
+					twi_onTwipEvent(TW_SR_DATA_ACK);
 					bitCount = 8;
 					twip_state = TWIP_READ;
 				}
@@ -647,13 +643,11 @@ void ICACHE_RAM_ATTR onSclChange(void)
 		} else {
 			SCL_LOW();	// clock stretching
 			if (twi_ack && twi_ack_rec) {
-				twip_status = TW_ST_DATA_ACK;
-				twi_onTwipEvent(twip_status);
+				twi_onTwipEvent(TW_ST_DATA_ACK);
 				twip_state = TWIP_WRITE;
 			} else {
 				// we have no more data to send and/or the master doesn't want anymore
-				twip_status = twi_ack_rec ? TW_ST_LAST_DATA : TW_ST_DATA_NACK;
-				twi_onTwipEvent(twip_status);
+				twi_onTwipEvent(twi_ack_rec ? TW_ST_LAST_DATA : TW_ST_DATA_NACK);
 				twip_mode = TWIPM_WAIT;
 				twip_state = TWIP_WAIT_STOP;
 			}
@@ -682,8 +676,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 		} else IFSTATE(S2M(TWIP_START)|S2M(TWIP_REP_START)|S2M(TWIP_SEND_ACK)|S2M(TWIP_WAIT_ACK)|S2M(TWIP_SLA_R)|S2M(TWIP_REC_ACK)|S2M(TWIP_READ_ACK)|S2M(TWIP_RWAIT_ACK)|S2M(TWIP_WRITE)) {
 			// START or STOP
 			SDA_HIGH();	 // Should not be necessary
-			twip_status = TW_BUS_ERROR;
-			twi_onTwipEvent(twip_status);
+			twi_onTwipEvent(TW_BUS_ERROR);
 			twip_mode = TWIPM_WAIT;
 			twip_state = TWIP_BUS_ERR;
 		} else IFSTATE(S2M(TWIP_WAIT_STOP)|S2M(TWIP_BUS_ERR)) {
@@ -708,15 +701,13 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 			// START or STOP
 			if (bitCount != 7) {
 				// inside byte transfer - error
-				twip_status = TW_BUS_ERROR;
-				twi_onTwipEvent(twip_status);
+				twi_onTwipEvent(TW_BUS_ERROR);
 				twip_mode = TWIPM_WAIT;
 				twip_state = TWIP_BUS_ERR;
 			} else {
 				// during first bit in byte transfer - ok
 				SCL_LOW();	// clock stretching
-				twip_status = TW_SR_STOP;
-				twi_onTwipEvent(twip_status);
+				twi_onTwipEvent(TW_SR_STOP);
 				if (sda) {
 					// STOP
 					ets_timer_disarm(&timer);
