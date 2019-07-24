@@ -60,7 +60,7 @@ public:
     return connect(host.c_str(), port);
   }
   int connectAsync(const String& host, uint16_t port, uint8_t* waiting = NULL) {
-    return connecteAsync(host.c_str(), port, waiting);
+    return connectAsync(host.c_str(), port, waiting);
   }
   int connect(IPAddress ip, uint16_t port);
   
