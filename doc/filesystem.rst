@@ -402,6 +402,29 @@ block size - ``pageSize`` — filesystem logical page size - ``maxOpenFiles``
 ``maxPathLength`` — max file name length (including one byte for zero
 termination)
 
+gc
+~~
+
+.. code:: cpp
+
+    SPIFFS.gc()
+
+Only implemented in SPIFFS.  Performs a quick garbage collection operation on SPIFFS,
+possibly making writes perform faster in the future.  Not normally needed by applications
+as SPIFFS will take care of things itself on writes.
+
+check
+~~~~~
+
+.. code:: cpp
+
+    SPIFFS.begin();
+    SPIFFS.check();
+
+Only implemented in SPIFFS.  Performs an in-depth check of the filesystem metadata and
+correct what is repairable.  Not normally needed, and not guaranteed to actually fix
+anything should there be corruption.
+
 Directory object (Dir)
 ----------------------
 
