@@ -226,14 +226,6 @@ int WiFiClientSecure::connectAsync(const char* host, uint16_t port, uint8_t* wai
   return _connectSSL(host);
 }
 
-int WiFiClientSecure::connect(const String& host, uint16_t port) {
-  return connect(host.c_str(), port);
-}
-
-int WiFiClientSecure::connectAsync(const String& host, uint16_t port, uint8_t* waiting) {
-  return connectAsync(host.c_str(), port, waiting);
-}
-
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
