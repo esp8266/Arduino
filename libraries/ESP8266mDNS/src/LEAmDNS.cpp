@@ -59,11 +59,11 @@ MDNSResponder::MDNSResponder(void)
     m_pServiceQueries(0),
     m_fnServiceTxtCallback(0),
 #ifdef ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
-    m_bPassivModeEnabled(true) {
+    m_bPassivModeEnabled(true),
 #else
-    m_bPassivModeEnabled(false) {
+    m_bPassivModeEnabled(false),
 #endif
-    
+    m_netif(nullptr) {
 }
 
 /*

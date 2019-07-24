@@ -22,7 +22,6 @@
  *
  */
 
-#include <arch/cc.h>
 #include <sys/time.h>
 #include <IPAddress.h>
 #include <AddrList.h>
@@ -79,8 +78,10 @@ bool MDNSResponder::_process(bool p_bUserContext) {
         }
     }
     else {
-        bResult = _updateProbeStatus() &&           // Probing
-                  _checkServiceQueryCache();        // Service query cache check
+        bResult = (m_netif != nullptr) &&
+                  (m_netif->flags & NETIF_FLAG_UP) &&  // network interface is up and running
+                  _updateProbeStatus() &&              // Probing
+                  _checkServiceQueryCache();           // Service query cache check
     }
     return bResult;
 }
@@ -122,10 +123,12 @@ bool MDNSResponder::_restart(void) {
 
     // check existence of this IP address in the interface list
     bool found = false;
+    m_netif = nullptr;
     for (auto a: addrList)
         if (m_IPAddress == a.addr()) {
             if (a.ifUp()) {
                 found = true;
+                m_netif = a.interface();
                 break;
             }
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), m_IPAddress.toString().c_str()););
