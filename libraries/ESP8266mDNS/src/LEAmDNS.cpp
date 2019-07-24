@@ -95,19 +95,73 @@ bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress
     if (0 == m_pUDPContext) {
         if (_setHostname(p_pcHostname)) {
 
-            m_IPAddress = p_IPAddress;
+            //// select interface
             
-            m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
-                (void) pEvent;
-                // Ensure that _restart() runs in USER context
-                schedule_function([this]() { MDNSResponder::_restart(); });
-            });
+            m_netif = nullptr;
+            IPAddress ipAddress = p_IPAddress;
 
-            m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
-                (void) pEvent;
-                // Ensure that _restart() runs in USER context
-                schedule_function([this]() { MDNSResponder::_restart(); });
+            if (!ipAddress.isSet()) {
+
+                IPAddress sta = WiFi.localIP();
+                IPAddress ap = WiFi.softAPIP();
+
+                if (!sta.isSet() && !ap.isSet()) {
+
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] internal interfaces (STA, AP) are not set (none was specified)\n")));
+                    return false;
+                }
+
+                if (ap.isSet()) {
+
+                    if (sta.isSet())
+                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected over STA (none was specified)\n")));
+                    else
+                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected\n")));
+                    ipAddress = ap;
+
+                } else {
+
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected (none was specified)\n")));
+                    ipAddress = sta;
+
+                }
+
+                // continue to ensure interface is UP
+            }
+
+            // check existence of this IP address in the interface list
+            bool found = false;
+            m_netif = nullptr;
+            for (auto a: addrList)
+                if (ipAddress == a.addr()) {
+                    if (a.ifUp()) {
+                        found = true;
+                        m_netif = a.interface();
+                        break;
+                    }
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), ipAddress.toString().c_str()););
+                }
+            if (!found) {
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] interface defined by IP '%s' not found\n"), ipAddress.toString().c_str()););
+                return false;
+            }
+
+            //// done selecting the interface
+
+            if (m_netif->num == STATION_IF) {
+
+                m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
+                    (void) pEvent;
+                    // Ensure that _restart() runs in USER context
+                    schedule_function([this]() { MDNSResponder::_restart(); });
                 });
+
+                m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
+                    (void) pEvent;
+                    // Ensure that _restart() runs in USER context
+                    schedule_function([this]() { MDNSResponder::_restart(); });
+                    });
+            }
 
             bResult = _restart();
         }

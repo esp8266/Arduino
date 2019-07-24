@@ -91,55 +91,10 @@ bool MDNSResponder::_process(bool p_bUserContext) {
  */
 bool MDNSResponder::_restart(void) {
 
-    // check m_IPAddress
-    if (!m_IPAddress.isSet()) {
-
-        IPAddress sta = WiFi.localIP();
-        IPAddress ap = WiFi.softAPIP();
-
-        if (!sta.isSet() && !ap.isSet()) {
-
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] internal interfaces (STA, AP) are not set (none was specified)\n")));
-            return false;
-        }
-
-        if (ap.isSet()) {
-
-            if (sta.isSet())
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected over STA (none was specified)\n")));
-            else
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected\n")));
-            m_IPAddress = ap;
-
-        } else {
-
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected (none was specified)\n")));
-            m_IPAddress = sta;
-
-        }
-
-        // continue to ensure interface is UP
-    }
-
-    // check existence of this IP address in the interface list
-    bool found = false;
-    m_netif = nullptr;
-    for (auto a: addrList)
-        if (m_IPAddress == a.addr()) {
-            if (a.ifUp()) {
-                found = true;
-                m_netif = a.interface();
-                break;
-            }
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), m_IPAddress.toString().c_str()););
-        }
-    if (!found) {
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] interface defined by IP '%s' not found\n"), m_IPAddress.toString().c_str()););
-        return false;
-    }
-
-    return ((_resetProbeStatus(true)) &&    // Stop and restart probing
-            (_allocUDPContext()));          // Restart UDP
+    return ((m_netif != nullptr) &&
+            (m_netif->flags & NETIF_FLAG_UP) &&  // network interface is up and running
+            (_resetProbeStatus(true)) &&         // Stop and restart probing
+            (_allocUDPContext()));               // Restart UDP
 }
 
 
