@@ -89,6 +89,18 @@ static void ets_printf_P(const char *str, ...) {
     }
 }
 
+volatile static struct {
+    uint32_t pc;
+    uint32_t ps;
+    uint32_t sar;
+    uint32_t vpri;
+    uint32_t a[16]; //a0..a15
+    uint32_t litbase;
+    uint32_t sr176;
+    uint32_t sr208;
+    uint32_t valid;
+} core_regs;
+
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
@@ -187,6 +199,34 @@ void __wrap_system_restart_local() {
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
+    
+
+    ets_printf_P("\n---- begin regs ----\n");
+    if (!core_regs.valid) {
+    // At this point we have lost most registers.  Just update pc, sp
+     __asm__ __volatile__("\n\
+        .local core_regs\n\
+        movi    a2, core_regs\n\
+        movi    a0, 0x12345678\n\
+        s32i    a0, a2, 0x00\n" : /*no outputs */ : /* no inputs */ : "a0", "a2");
+     core_regs.a[1] = sp_dump;
+    }
+
+    for (volatile uint32_t *r = &core_regs.pc; r < &core_regs.valid; r++) {
+        ets_printf_P("%08x\n", *r);
+    }
+    ets_printf_P("---- end regs ----\n");
+
+    ets_printf_P("\n---- begin core ----\n");
+    uint8_t *ram = (uint8_t*)0x3FFE8000;
+    while (ram < (uint8_t*)0x40000000) {
+      for (size_t i=0; i<64; i++) { ets_printf_P("%02X", ram[i]); }
+      ets_printf_P("\n");
+      ram += 64;
+      system_soft_wdt_feed();
+    }
+    ets_printf_P("---- end core ----\n");
+
     ets_delay_us(10000);
     __real_system_restart_local();
 }
@@ -227,7 +267,41 @@ static void uart1_write_char_d(char c) {
     USF(1) = c;
 }
 
+
 static void raise_exception() {
+    core_regs.valid = true;
+    __asm__ __volatile__("\n\
+        .local core_regs\n\
+        movi    a2, core_regs\n\
+        s32i    a0, a2, 0x10\n\
+        s32i    a1, a2, 0x14\n\
+        rsr     a0, ps\n\
+        s32i    a0, a2, 0x04\n\
+        s32i    a2, a2, 0x18\n\
+        s32i    a3, a2, 0x1c\n\
+        s32i    a4, a2, 0x20\n\
+        s32i    a5, a2, 0x24\n\
+        s32i    a6, a2, 0x28\n\
+        s32i    a7, a2, 0x2c\n\
+        s32i    a8, a2, 0x30\n\
+        s32i    a9, a2, 0x34\n\
+        s32i    a10, a2, 0x38\n\
+        s32i    a11, a2, 0x3c\n\
+        s32i    a12, a2, 0x40\n\
+        s32i    a13, a2, 0x44\n\
+        s32i    a14, a2, 0x48\n\
+        s32i    a15, a2, 0x4c\n\
+        rsr     a0, SAR\n\
+        s32i    a0, a2, 0x08\n\
+        rsr     a0, LITBASE\n\
+        s32i    a0, a2, 0x50\n\
+        rsr     a0, 176\n\
+        s32i    a0, a2, 0x54\n\
+        rsr     a0, 208\n\
+        s32i    a0, a2, 0x58\n\
+        movi    a0, .\n\
+        s32i    a0, a2, 0x00\n" : : : "a0", "a2");
+
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
