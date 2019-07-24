@@ -1149,7 +1149,7 @@ protected:
     bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
     IPAddress                       m_IPAddress;
-    const netif*                    m_netif; // network interface associated to m_IPAddress
+    CONST netif*                    m_netif; // network interface associated to m_IPAddress
 
     /** CONTROL **/
     /* MAINTENANCE */
