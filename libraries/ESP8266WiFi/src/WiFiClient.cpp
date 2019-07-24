@@ -146,16 +146,6 @@ int WiFiClient::connectAsync(const char* host, uint16_t port, uint8_t* waiting) 
     return 0;
 }
 
-int WiFiClient::connect(const String& host, uint16_t port) // Blocking
-{
-    return connect(host.c_str(), port);
-}
-
-int WiFiClient::connectAsync(const String& host, uint16_t port, uint8_t* waiting) // Non blocking
-{
-    return connectAsync(host.c_str(), port, waiting);
-}
-
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     if (_client) {
