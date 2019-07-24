@@ -12,9 +12,11 @@ extern "C" void esp_loop()
     run_scheduled_functions();
     run_scheduled_recurrent_functions();}
 
-extern "C" void esp_yield_within_cont()
+extern "C" void esp_yield()
 {
-    cont_yield(g_pcont);
+    if (cont_can_yield(g_pcont)) {
+        cont_yield(g_pcont);
+    }
     run_scheduled_recurrent_functions();
 }
 

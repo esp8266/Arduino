@@ -88,15 +88,10 @@ void preloop_update_frequency() {
 #endif
 }
 
-extern "C" void __esp_yield_within_cont() {
-        cont_yield(g_pcont);
-}
-
-extern "C" void esp_yield_within_cont() __attribute__ ((weak, alias("__esp_yield_within_cont")));
-
+extern "C" void esp_yield() __attribute__((weak));
 extern "C" void esp_yield() {
     if (cont_can_yield(g_pcont)) {
-        esp_yield_within_cont();
+        cont_yield(g_pcont);
     }
 }
 
@@ -108,7 +103,7 @@ extern "C" void esp_schedule() {
 extern "C" void __yield() {
     if (cont_can_yield(g_pcont)) {
         esp_schedule();
-        esp_yield_within_cont();
+        esp_yield();
     }
     else {
         panic();
