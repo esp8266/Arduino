@@ -37,6 +37,7 @@
 #ifdef __cplusplus
 #include <vector>
 #endif
+#include <stddef.h>
 
 
 #ifdef __cplusplus
@@ -49,6 +50,8 @@ char* ltoa (long val, char *s, int radix);
 }
 #endif
 
+size_t strlcat(char *dst, const char *src, size_t size);
+size_t strlcpy(char *dst, const char *src, size_t size);
 
 // exotic typedefs used in the sdk
 
