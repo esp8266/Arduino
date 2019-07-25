@@ -44,9 +44,10 @@ typedef enum { TWI_READY=0, TWI_MRX, TWI_MTX, TWI_SRX, TWI_STX } twiStateType;
 static struct twi {
   unsigned int preferred_si2c_clock; // = 100000;
   unsigned char twi_dcount;// = 18;
-  unsigned char twi_sda, twi_scl;
-  uint32_t twi_clockStretchLimit;
+  unsigned char twi_sda;
+  unsigned char twi_scl;
   unsigned char twi_addr;// = 0;
+  uint32_t twi_clockStretchLimit;
 
 
   volatile twipModeType twip_mode;// = TWIPM_IDLE;
