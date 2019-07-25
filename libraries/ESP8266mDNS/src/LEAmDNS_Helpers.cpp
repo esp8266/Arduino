@@ -170,7 +170,7 @@ namespace MDNSImplementation {
  */
 
 bool MDNSResponder::_callProcess(void) {
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf("[MDNSResponder] _callProcess (%lu, triggered by: %s)\n", millis(), m_pUDPContext->getRemoteAddress().toString().c_str()););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf("[MDNSResponder] _callProcess (%lu, triggered by: %s)\n", millis(), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
 
     return _process(false);
 }

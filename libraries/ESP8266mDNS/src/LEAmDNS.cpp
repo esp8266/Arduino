@@ -23,6 +23,7 @@
  */
 
 #include <Schedule.h>
+#include <AddrList.h>
 
 #include "LEAmDNS_Priv.h"
 
@@ -696,7 +697,7 @@ uint32_t MDNSResponder::queryService(const char* p_pcService,
         }
     }
     else {
-        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryService: INVALID input data!\n"), p_pcService, p_pcProtocol););
+        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryService: INVALID input data!\n")););
     }
     return u32Result;
 }
