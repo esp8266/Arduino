@@ -23,48 +23,34 @@
 #include "pins_arduino.h"
 #include "wiring_private.h"
 
-extern "C" {
 
-unsigned int preferred_si2c_clock = 100000;
+
+extern "C" {
 #include "twi_util.h"
 
 #include "ets_sys.h"
 
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
+// modes (private)
+typedef enum { TWIPM_UNKNOWN = 0, TWIPM_IDLE, TWIPM_ADDRESSED, TWIPM_WAIT} twipModeType;
+
+// states (private)
+typedef enum { TWIP_UNKNOWN = 0, TWIP_IDLE, TWIP_START, TWIP_SEND_ACK, TWIP_WAIT_ACK, TWIP_WAIT_STOP, TWIP_SLA_W, TWIP_SLA_R, TWIP_REP_START, TWIP_READ, TWIP_STOP, TWIP_REC_ACK, TWIP_READ_ACK, TWIP_RWAIT_ACK, TWIP_WRITE, TWIP_BUS_ERR } twipStateType;
+typedef enum { TWI_READY=0, TWI_MRX, TWI_MTX, TWI_SRX, TWI_STX } twiStateType;
+
 static struct twi {
+  unsigned int preferred_si2c_clock; // = 100000;
   unsigned char twi_dcount;// = 18;
   unsigned char twi_sda, twi_scl;
   uint32_t twi_clockStretchLimit;
   unsigned char twi_addr;// = 0;
 
-// modes (private)
-#define TWIPM_UNKNOWN 	0
-#define TWIPM_IDLE 		1
-#define TWIPM_ADDRESSED	2
-#define TWIPM_WAIT		3
 
-// states (private)
-#define TWIP_UNKNOWN 	0
-#define TWIP_IDLE 		1
-#define TWIP_START 		2
-#define TWIP_SEND_ACK	3
-#define TWIP_WAIT_ACK	4
-#define TWIP_WAIT_STOP	5
-#define TWIP_SLA_W		6
-#define TWIP_SLA_R		7
-#define TWIP_REP_START	8
-#define TWIP_READ		9
-#define TWIP_STOP 		10
-#define TWIP_REC_ACK	11
-#define TWIP_READ_ACK	12
-#define TWIP_RWAIT_ACK	13
-#define TWIP_WRITE		14
-#define TWIP_BUS_ERR 	15
-
-  volatile int twip_mode;// = TWIPM_IDLE;
-  volatile int twip_state;// = TWIP_IDLE;
+  volatile twipModeType twip_mode;// = TWIPM_IDLE;
+  volatile twipStateType twip_state;// = TWIP_IDLE;
   volatile int twip_status;// = TW_NO_INFO;
   volatile int bitCount;// = 0;
 
@@ -74,12 +60,7 @@ static struct twi {
   volatile int twi_ack_rec;// = 0;
   volatile int twi_timeout_ms;// = 10;
 
-#define TWI_READY 0
-#define TWI_MRX   1
-#define TWI_MTX   2
-#define TWI_SRX   3
-#define TWI_STX   4
-  volatile int twi_state;// = TWI_READY;
+  volatile twiStateType twi_state;// = TWI_READY;
   volatile uint8_t twi_error;// = 0xFF;
 
   uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];
@@ -101,8 +82,8 @@ static struct twi {
 
   ETSEvent eventTaskQueue[EVENTTASK_QUEUE_SIZE];
   ETSTimer timer;
-} twi = { 18, 0, 0, 0, 0, TWIPM_IDLE, TWIP_IDLE, TW_NO_INFO, 0, 0, 0, 0, 10, TWI_READY, 0xff, {0}, 0, 0, {0}, 0, NULL, NULL, {{0}}, {0,0,0,0}};
-// = { twi_dcount: 18, twi_addr: 0, twip_mode: TWIPM_IDLE, twip_state: TWIP_IDLE, twip_status: TW_NO_INFO, bitCount: 0, twi_data: 0x00, twi_ack: 0, twi_ack_rec: 0, twi_timeout_ms: 10, twi_state: TWI_READY, twi_error: 0xFF };
+} twi = { 100000, 18, 0, 0, 0, 0, TWIPM_IDLE, TWIP_IDLE, TW_NO_INFO, 0, 0, 0, 0, 10, TWI_READY, 0xff, {0}, 0, 0, {0}, 0, NULL, NULL, {{0}}, {0,0,0,0}};
+// = { preferred_si2c_clock: 100000, twi_dcount: 18, twi_addr: 0, twip_mode: TWIPM_IDLE, twip_state: TWIP_IDLE, twip_status: TW_NO_INFO, bitCount: 0, twi_data: 0x00, twi_ack: 0, twi_ack_rec: 0, twi_timeout_ms: 10, twi_state: TWI_READY, twi_error: 0xFF };
 #pragma GCC diagnostic pop
 
 static void onSclChange(void);
@@ -128,7 +109,7 @@ static void onTimer(void *unused);
 #endif
 
 void twi_setClock(unsigned int freq){
-  preferred_si2c_clock = freq;
+  twi.preferred_si2c_clock = freq;
 #if F_CPU == FCPU80
   if(freq <= 50000) twi.twi_dcount = 38;//about 50KHz
   else if(freq <= 100000) twi.twi_dcount = 19;//about 100KHz
@@ -164,7 +145,7 @@ void twi_init(unsigned char sda, unsigned char scl)
   twi.twi_scl = scl;
   pinMode(twi.twi_sda, INPUT_PULLUP);
   pinMode(twi.twi_scl, INPUT_PULLUP);
-  twi_setClock(preferred_si2c_clock);
+  twi_setClock(twi.preferred_si2c_clock);
   twi_setClockStretchLimit(230); // default value is 230 uS
 
   if (twi.twi_addr != 0)
