@@ -365,6 +365,8 @@ generic.menu.led.14=14
 generic.menu.led.14.build.led=-DLED_BUILTIN=14
 generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
+generic.menu.led.16=16
+generic.menu.led.16.build.led=-DLED_BUILTIN=16
 generic.menu.sdk.nonosdk222_100=nonos-sdk 2.2.1+100 (testing)
 generic.menu.sdk.nonosdk222_100.build.sdk=NONOSDK22y
 generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
@@ -639,6 +641,8 @@ esp8285.menu.led.14=14
 esp8285.menu.led.14.build.led=-DLED_BUILTIN=14
 esp8285.menu.led.15=15
 esp8285.menu.led.15.build.led=-DLED_BUILTIN=15
+esp8285.menu.led.16=16
+esp8285.menu.led.16.build.led=-DLED_BUILTIN=16
 esp8285.menu.ip.lm2f=v2 Lower Memory
 esp8285.menu.ip.lm2f.build.lwip_include=lwip2/include
 esp8285.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
