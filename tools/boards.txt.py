@@ -1327,7 +1327,7 @@ def led (default,max):
                 ('.menu.led.' + str(default), str(default)),
                 ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
-    for i in range(0,max):
+    for i in range(0,max+1): # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not i == default:
             led.update(
                 collections.OrderedDict([
