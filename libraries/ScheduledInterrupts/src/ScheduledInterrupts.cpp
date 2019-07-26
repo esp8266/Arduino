@@ -1,5 +1,5 @@
 #include "ScheduledInterrupts.h"
-#include <Schedule.h>
+#include <FastScheduler.h>
 #include <Arduino.h>
 
 // Duplicate typedefs from core_esp8266_wiring_digital_c

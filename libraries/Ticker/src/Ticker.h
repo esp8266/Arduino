@@ -23,7 +23,7 @@
 #define TICKER_H
 
 #include <functional>
-#include <Schedule.h>
+#include <FastScheduler.h>
 #include <ets_sys.h>
 
 class Ticker

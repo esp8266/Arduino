@@ -1,5 +1,5 @@
 #include <BSTest.h>
-#include <Schedule.h>
+#include <FastScheduler.h>
 
 BS_ENV_DECLARE();
 

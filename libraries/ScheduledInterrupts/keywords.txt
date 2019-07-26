@@ -9,5 +9,4 @@ ArgStructure	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-attachInterrupt	KEYWORD2
 attachScheduledInterrupt	KEYWORD2

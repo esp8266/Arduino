@@ -22,7 +22,7 @@
  *
  */
 
-#include <Schedule.h>
+#include <FastScheduler.h>
 
 #include "LEAmDNS_Priv.h"
 
