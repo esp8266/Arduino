@@ -16,7 +16,7 @@ static const char serverIndex[] PROGMEM =
                </form>
          </body></html>)";
 static const char successResponse[] PROGMEM = 
-  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
+  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...";
 
 template <typename ServerType>
 ESP8266HTTPUpdateServerTemplate<ServerType>::ESP8266HTTPUpdateServerTemplate(bool serial_debug)
