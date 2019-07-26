@@ -6,18 +6,22 @@
 #include <interrupts.h>
 #include <coredecls.h>
 
-extern "C" void esp_loop()
+extern "C"
 {
-    loop();
-    run_scheduled_functions();
-    run_scheduled_recurrent_functions();}
-
-extern "C" void esp_yield()
-{
-    if (cont_can_yield(g_pcont)) {
-        cont_yield(g_pcont);
+    void esp_loop()
+    {
+        loop();
+        run_scheduled_functions();
+        run_scheduled_recurrent_functions();
     }
-    run_scheduled_recurrent_functions();
+
+    void __esp_yield();
+
+    extern "C" void esp_yield()
+    {
+        __esp_yield();
+        run_scheduled_recurrent_functions();
+    }
 }
 
 typedef std::function<void(void)> mSchedFuncT;

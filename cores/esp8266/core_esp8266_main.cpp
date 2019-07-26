@@ -81,12 +81,14 @@ void preloop_update_frequency() {
 #endif
 }
 
-extern "C" void esp_yield() __attribute__((weak));
-extern "C" void esp_yield() {
+extern "C" void __esp_yield() __attribute__((weak));
+extern "C" void __esp_yield() {
     if (cont_can_yield(g_pcont)) {
         cont_yield(g_pcont);
     }
 }
+
+extern "C" void esp_yield(void) __attribute__ ((weak, alias("__esp_yield")));
 
 extern "C" void esp_schedule() {
     // always on CONT stack here
