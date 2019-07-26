@@ -410,8 +410,10 @@ gc
     SPIFFS.gc()
 
 Only implemented in SPIFFS.  Performs a quick garbage collection operation on SPIFFS,
-possibly making writes perform faster in the future.  Not normally needed by applications
-as SPIFFS will take care of things itself on writes.
+possibly making writes perform faster/better in the future.  On very full or very fragmented
+filesystems, using this call can avoid or reduce issues where SPIFFS reports free space
+but is unable to write additional data to a file.  See `this discussion
+<https://github.com/esp8266/Arduino/pull/6340#discussion_r307042268>` for more info.
 
 check
 ~~~~~
