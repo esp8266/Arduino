@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define IRAM_ATTR
 #endif
 
+using std::min;
+
 /*!
     @brief	Instance class for a single-producer, single-consumer circular queue / ring buffer (FIFO).
             This implementation is lock-free between producer and consumer for the available(), peek(),
@@ -236,7 +238,7 @@ size_t circular_queue<T>::push_n(const T* buffer, size_t size)
     const auto outPos = m_outPos.load(std::memory_order_relaxed);
 
     size_t blockSize = (outPos > inPos) ? outPos - 1 - inPos : (outPos == 0) ? m_bufSize - 1 - inPos : m_bufSize - inPos;
-    blockSize = std::min(size, blockSize);
+    blockSize = min(size, blockSize);
     if (!blockSize) return 0;
     int next = (inPos + blockSize) % m_bufSize;
 
@@ -244,7 +246,7 @@ size_t circular_queue<T>::push_n(const T* buffer, size_t size)
 
     auto dest = m_buffer.get() + inPos;
     std::copy_n(std::make_move_iterator(buffer), blockSize, dest);
-    size = std::min(size - blockSize, outPos > 1 ? static_cast<size_t>(outPos - next - 1) : 0);
+    size = min(size - blockSize, outPos > 1 ? static_cast<size_t>(outPos - next - 1) : 0);
     next += size;
     dest = m_buffer.get();
     std::copy_n(std::make_move_iterator(buffer + blockSize), size, dest);
@@ -273,10 +275,10 @@ T circular_queue<T>::pop()
 
 template< typename T >
 size_t circular_queue<T>::pop_n(T* buffer, size_t size) {
-    size_t avail = size = std::min(size, available());
+    size_t avail = size = min(size, available());
     if (!avail) return 0;
     const auto outPos = m_outPos.load(std::memory_order_acquire);
-    size_t n = std::min(avail, static_cast<size_t>(m_bufSize - outPos));
+    size_t n = min(avail, static_cast<size_t>(m_bufSize - outPos));
 
     std::atomic_thread_fence(std::memory_order_acquire);
 
