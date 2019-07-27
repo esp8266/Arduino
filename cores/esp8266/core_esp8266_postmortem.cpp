@@ -46,7 +46,6 @@ static const char* s_panic_what = 0;
 static bool s_abort_called = false;
 static const char* s_unhandled_exception = NULL;
 
-void abort() __attribute__((noreturn));
 static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
@@ -63,7 +62,6 @@ static int s_user_reset_reason = REASON_DEFAULT_RST;
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
 
-static void raise_exception() __attribute__((noreturn));
 
 extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
     (void) rst_info;
@@ -89,7 +87,7 @@ static void ets_printf_P(const char *str, ...) {
     }
 }
 
-volatile static struct {
+volatile static struct core_regs {
     uint32_t pc;
     uint32_t ps;
     uint32_t sar;
@@ -266,47 +264,61 @@ static void uart1_write_char_d(char c) {
 }
 
 
-static void raise_exception() {
-    __asm__ __volatile__("\n\
-        s32i    a0, %0, 0x10\n\
-        s32i    a1, %0, 0x14\n\
-        rsr     a0, ps\n\
-        s32i    a0, %0, 0x04\n\
-        s32i    a2, %0, 0x18\n\
-        s32i    a3, %0, 0x1c\n\
-        s32i    a4, %0, 0x20\n\
-        s32i    a5, %0, 0x24\n\
-        s32i    a6, %0, 0x28\n\
-        s32i    a7, %0, 0x2c\n\
-        s32i    a8, %0, 0x30\n\
-        s32i    a9, %0, 0x34\n\
-        s32i    a10, %0, 0x38\n\
-        s32i    a11, %0, 0x3c\n\
-        s32i    a12, %0, 0x40\n\
-        s32i    a13, %0, 0x44\n\
-        s32i    a14, %0, 0x48\n\
-        s32i    a15, %0, 0x4c\n\
-        rsr     a0, SAR\n\
-        s32i    a0, %0, 0x08\n\
-        rsr     a0, LITBASE\n\
-        s32i    a0, %0, 0x50\n\
-        rsr     a0, 176\n\
-        s32i    a0, %0, 0x54\n\
-        rsr     a0, 208\n\
-        s32i    a0, %0, 0x58\n\
-        movi    a0, .\n\
-        s32i    a0, %0, 0x00\n" : : "r" (&core_regs) : "a0");
+void  __attribute__ ((noinline)) _preserve_regs(volatile struct core_regs *dest, int junk);
 
+asm ("	.align 4\n\
+	.global _preserve_regs\n\
+	.literal_position\n\
+_preserve_regs: \n\
+	addi    a1, a1, -32\n\
+	s32i    a15, a1, 28\n\
+	mov     a15, a1\n\
+	s32i    a2, a15, 0\n\
+	s32i    a3, a15, 4\n\
+	movi    a3, .\n\
+	s32i    a3, a2, 0    /* PC */\n\
+	rsr     a3, ps\n\
+	s32i    a3, a2, 0x04 /* PS */\n\
+        rsr     a3, SAR\n\
+        s32i    a3, a2, 0x08 /* SAR */\n\
+	s32i    a0, a2, 0x10 /* A0 */\n\
+	s32i    a1, a2, 0x14 /* A1 */\n\
+	s32i    a2, a2, 0x18 /* A2 */\n\
+	s32i    a3, a2, 0x1c /* A3 */\n\
+	s32i    a4, a2, 0x20 /* A4 */\n\
+	s32i    a5, a2, 0x24 /* A5 */\n\
+	s32i    a6, a2, 0x28 /* A6 */\n\
+	s32i    a7, a2, 0x2c /* A7 */\n\
+	s32i    a8, a2, 0x30 /* A8 */\n\
+	s32i    a9, a2, 0x34 /* A9 */\n\
+	s32i    a10, a2, 0x38 /* A10 */\n\
+	s32i    a11, a2, 0x3c /* A11 */\n\
+	s32i    a12, a2, 0x40 /* A12 */\n\
+	s32i    a13, a2, 0x44 /* A13 */\n\
+	s32i    a14, a2, 0x48 /* A14 */\n\
+	s32i    a15, a2, 0x4c /* A15 */\n\
+        rsr     a3, LITBASE\n\
+        s32i    a3, a2, 0x50 /*LITBASE */\n\
+        rsr     a3, 176\n\
+        s32i    a3, a2, 0x54\n\
+        rsr     a3, 208\n\
+        s32i    a3, a2, 0x58\n\
+	mov.n   a1, a15\n\
+	l32i.n  a15, sp, 28\n\
+	addi    sp, sp, 32\n\
+	ret.n\n");
+
+
+static void raise_exception() {
+    _preserve_regs(&core_regs, 0);
     core_regs.valid = 1;
 
-    if (gdb_present())
-        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+//    if (gdb_present())
+//        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
     s_user_reset_reason = REASON_USER_SWEXCEPTION_RST;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
     __wrap_system_restart_local();
-
-    while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
 void abort() {
@@ -324,7 +336,7 @@ void __assert_func(const char *file, int line, const char *func, const char *wha
     s_panic_line = line;
     s_panic_func = func;
     s_panic_what = what;
-    gdb_do_break();     /* if GDB is not present, this is a no-op */
+//    gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
 
@@ -333,7 +345,7 @@ void __panic_func(const char* file, int line, const char* func) {
     s_panic_line = line;
     s_panic_func = func;
     s_panic_what = 0;
-    gdb_do_break();     /* if GDB is not present, this is a no-op */
+//    gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
 

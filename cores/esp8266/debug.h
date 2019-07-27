@@ -22,7 +22,7 @@ void hexdump(const void *mem, uint32_t len, uint8_t cols);
 extern "C" {
 #endif
 
-void __panic_func(const char* file, int line, const char* func) __attribute__((noreturn));
+void __panic_func(const char* file, int line, const char* func);
 #define panic() __panic_func(PSTR(__FILE__), __LINE__, __func__)
 
 #ifdef __cplusplus
