@@ -1697,14 +1697,14 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     ptr    = (void *)&UMM_DATA(c);
   }
 
-  unsigned short int previousBlockSize = blockSize;
+  unsigned short int startingBlockSize = blockSize;
 
   /* Now calculate the block size again...and we'll have three cases */
 
   blockSize = (UMM_NBLOCK(c) - c);
 
   /* Update dynamic Free Block count */
-  ummHeapFreeBlocks -= (blockSize - previousBlockSize);
+  ummHeapFreeBlocks -= (blockSize - startingBlockSize);
 
   if( blockSize == blocks ) {
     /* This space intentionally left blank - return the original pointer! */
