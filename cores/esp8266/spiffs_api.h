@@ -219,6 +219,11 @@ public:
         return SPIFFS_gc_quick( &_fs, 0 ) == SPIFFS_OK;
     }
 
+    bool check() override
+    {
+        return SPIFFS_check(&_fs) == SPIFFS_OK;
+    }
+
 protected:
     friend class SPIFFSFileImpl;
     friend class SPIFFSDirImpl;
