@@ -1730,11 +1730,7 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     umm_make_new_block( c, blocks, 0, 0 );
 
-    UMM_CRITICAL_EXIT(id_realloc);
-
     _umm_free( (void *)&UMM_DATA(c+blocks) );
-
-    return( ptr );
 
   } else {
     /* New block is bigger than the old block... */
