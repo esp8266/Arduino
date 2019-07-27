@@ -204,12 +204,10 @@ void __wrap_system_restart_local() {
     ets_printf_P("\n---- begin regs ----\n");
     if (!core_regs.valid) {
     // At this point we have lost most registers.  Just update pc, sp
-     __asm__ __volatile__("\n\
-        .local core_regs\n\
-        movi    a2, core_regs\n\
-        movi    a0, 0x12345678\n\
-        s32i    a0, a2, 0x00\n" : /*no outputs */ : /* no inputs */ : "a0", "a2");
-     core_regs.a[1] = sp_dump;
+      __asm__ __volatile__("\n\
+        movi    a0, .\n\
+        s32i    a0, %0, 0x00\n" : : "r" (&core_regs) : "a0");
+      core_regs.a[1] = sp_dump;
     }
 
     for (volatile uint32_t *r = &core_regs.pc; r < &core_regs.valid; r++) {
@@ -269,38 +267,37 @@ static void uart1_write_char_d(char c) {
 
 
 static void raise_exception() {
-    core_regs.valid = true;
     __asm__ __volatile__("\n\
-        .local core_regs\n\
-        movi    a2, core_regs\n\
-        s32i    a0, a2, 0x10\n\
-        s32i    a1, a2, 0x14\n\
+        s32i    a0, %0, 0x10\n\
+        s32i    a1, %0, 0x14\n\
         rsr     a0, ps\n\
-        s32i    a0, a2, 0x04\n\
-        s32i    a2, a2, 0x18\n\
-        s32i    a3, a2, 0x1c\n\
-        s32i    a4, a2, 0x20\n\
-        s32i    a5, a2, 0x24\n\
-        s32i    a6, a2, 0x28\n\
-        s32i    a7, a2, 0x2c\n\
-        s32i    a8, a2, 0x30\n\
-        s32i    a9, a2, 0x34\n\
-        s32i    a10, a2, 0x38\n\
-        s32i    a11, a2, 0x3c\n\
-        s32i    a12, a2, 0x40\n\
-        s32i    a13, a2, 0x44\n\
-        s32i    a14, a2, 0x48\n\
-        s32i    a15, a2, 0x4c\n\
+        s32i    a0, %0, 0x04\n\
+        s32i    a2, %0, 0x18\n\
+        s32i    a3, %0, 0x1c\n\
+        s32i    a4, %0, 0x20\n\
+        s32i    a5, %0, 0x24\n\
+        s32i    a6, %0, 0x28\n\
+        s32i    a7, %0, 0x2c\n\
+        s32i    a8, %0, 0x30\n\
+        s32i    a9, %0, 0x34\n\
+        s32i    a10, %0, 0x38\n\
+        s32i    a11, %0, 0x3c\n\
+        s32i    a12, %0, 0x40\n\
+        s32i    a13, %0, 0x44\n\
+        s32i    a14, %0, 0x48\n\
+        s32i    a15, %0, 0x4c\n\
         rsr     a0, SAR\n\
-        s32i    a0, a2, 0x08\n\
+        s32i    a0, %0, 0x08\n\
         rsr     a0, LITBASE\n\
-        s32i    a0, a2, 0x50\n\
+        s32i    a0, %0, 0x50\n\
         rsr     a0, 176\n\
-        s32i    a0, a2, 0x54\n\
+        s32i    a0, %0, 0x54\n\
         rsr     a0, 208\n\
-        s32i    a0, a2, 0x58\n\
+        s32i    a0, %0, 0x58\n\
         movi    a0, .\n\
-        s32i    a0, a2, 0x00\n" : : : "a0", "a2");
+        s32i    a0, %0, 0x00\n" : : "r" (&core_regs) : "a0");
+
+    core_regs.valid = 1;
 
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
