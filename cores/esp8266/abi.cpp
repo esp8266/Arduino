@@ -28,6 +28,8 @@ using __cxxabiv1::__guard;
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
 
+extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
+extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
 #ifndef __cpp_exceptions

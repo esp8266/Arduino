@@ -46,6 +46,7 @@ static const char* s_panic_what = 0;
 static bool s_abort_called = false;
 static const char* s_unhandled_exception = NULL;
 
+void abort() __attribute__((noreturn));
 static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
@@ -62,6 +63,7 @@ static int s_user_reset_reason = REASON_DEFAULT_RST;
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
 
+static void raise_exception() __attribute__((noreturn));
 
 extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
     (void) rst_info;
@@ -197,11 +199,10 @@ void __wrap_system_restart_local() {
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
-    
-
     ets_printf_P("\n---- begin regs ----\n");
     if (!core_regs.valid) {
-      uint32_t *frame = (uint32_t*)(sp_dump + 0xa0); // Fixed depending on the OS and this function!!!  TODO - Any opdates to SDK or this function, verify 0xa0 offset!!!
+      // TODO - Any opdates to SDK or this function, verify 0xa0 offset!!! Maybe add intelligence to look nearby for expc1??
+      uint32_t *frame = (uint32_t*)(sp_dump + 0xa0); // Fixed depending on the OS and this function!!!
       core_regs.pc = frame[0];
       core_regs.ps = frame[1];
       core_regs.vpri = frame[2];
@@ -352,6 +353,8 @@ static void raise_exception() {
     s_user_reset_reason = REASON_USER_SWEXCEPTION_RST;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
     __wrap_system_restart_local();
+
+    while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
 void abort() {
