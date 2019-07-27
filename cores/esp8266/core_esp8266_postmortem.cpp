@@ -201,11 +201,28 @@ void __wrap_system_restart_local() {
 
     ets_printf_P("\n---- begin regs ----\n");
     if (!core_regs.valid) {
-    // At this point we have lost most registers.  Just update pc, sp
-      __asm__ __volatile__("\n\
-        movi    a0, .\n\
-        s32i    a0, %0, 0x00\n" : : "r" (&core_regs) : "a0");
-      core_regs.a[1] = sp_dump;
+      uint32_t *frame = (uint32_t*)(sp_dump + 0xa0); // Fixed depending on the OS and this function!!!  TODO - Any opdates to SDK or this function, verify 0xa0 offset!!!
+      core_regs.pc = frame[0];
+      core_regs.ps = frame[1];
+      core_regs.vpri = frame[2];
+      core_regs.sar = frame[3];
+      core_regs.a[0] = frame[4];
+      core_regs.a[1] = ((uint32_t)frame) + 80; // ??
+      core_regs.a[2] = frame[5];
+      core_regs.a[3] = frame[6];
+      core_regs.a[4] = frame[7];
+      core_regs.a[5] = frame[8];
+      core_regs.a[6] = frame[9];
+      core_regs.a[7] = frame[10];
+      core_regs.a[8] = frame[11];
+      core_regs.a[9] = frame[12];
+      core_regs.a[10] = frame[13];
+      core_regs.a[11] = frame[14];
+      core_regs.a[12] = frame[15];
+      core_regs.a[13] = frame[16];
+      core_regs.a[14] = frame[17];
+      core_regs.a[15] = frame[18];
+      core_regs.litbase = frame[19];
     }
 
     for (volatile uint32_t *r = &core_regs.pc; r < &core_regs.valid; r++) {
@@ -308,13 +325,29 @@ _preserve_regs: \n\
 	addi    sp, sp, 32\n\
 	ret.n\n");
 
+static uint32_t _pc;
+static uint32_t _a1;
+static uint32_t _a15;
+
+#define CATCH() \
+    register uint32_t a1 asm("a1"); \
+    register uint32_t a15 asm("a15"); \
+    uint32_t pc; \
+    __asm__ __volatile__ ("movi %0, ." : "=r" (pc)); \
+    _pc = pc;\
+    _a1 = a1;\
+    _a15 = a15;
 
 static void raise_exception() {
     _preserve_regs(&core_regs, 0);
     core_regs.valid = 1;
 
-//    if (gdb_present())
-//        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+    core_regs.pc    = _pc;
+    core_regs.a[1]  = _a1;
+    core_regs.a[15] = _a15;
+
+    if (gdb_present())
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
     s_user_reset_reason = REASON_USER_SWEXCEPTION_RST;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
@@ -322,30 +355,34 @@ static void raise_exception() {
 }
 
 void abort() {
+    CATCH();
     s_abort_called = true;
     raise_exception();
 }
 
 void __unhandled_exception(const char *str) {
+    CATCH();
     s_unhandled_exception = str;
     raise_exception();
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
+    CATCH();
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
     s_panic_what = what;
-//    gdb_do_break();     /* if GDB is not present, this is a no-op */
+    gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
 
 void __panic_func(const char* file, int line, const char* func) {
+    CATCH();
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
     s_panic_what = 0;
-//    gdb_do_break();     /* if GDB is not present, this is a no-op */
+    gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
 
