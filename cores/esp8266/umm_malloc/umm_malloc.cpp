@@ -1686,13 +1686,6 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     c = umm_assimilate_down(c, 0);
 
     /*
-     * For the ESP8266 interrupts should not be off for more than 10us.
-     * An unprotect/protect around memmove should be safe to do here.
-     * All variables used are on the stack.
-     */
-    UMM_CRITICAL_EXIT(id_realloc);
-
-    /*
      * Move the bytes down to the new block we just created, but be sure to move
      * only the original bytes.
      */
@@ -1702,8 +1695,6 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     /* And don't forget to adjust the pointer to the new block location! */
 
     ptr    = (void *)&UMM_DATA(c);
-
-    UMM_CRITICAL_ENTRY(id_realloc);
   }
 
   unsigned short int previousBlockSize = blockSize;
@@ -1729,9 +1720,7 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     DBG_LOG_DEBUG( "realloc %d to a smaller block %d, shrink and free the leftover bits\n", blockSize, blocks );
 
     umm_make_new_block( c, blocks, 0, 0 );
-
     _umm_free( (void *)&UMM_DATA(c+blocks) );
-
   } else {
     /* New block is bigger than the old block... */
 
