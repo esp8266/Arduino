@@ -147,7 +147,7 @@ DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
 endif
 
-FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
+FLAGS += $(DEBUG) -Wall $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
@@ -178,7 +178,7 @@ COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 all: help
 
 CI:					# run CI
-	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Werror FORCE32=0 OPTZ=-O0 doCI
+	$(MAKE) -f $(MAKEFILE) MKFLAGS="-Werror -coverage" FORCE32=0 OPTZ=-O0 doCI
 
 doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
@@ -287,6 +287,7 @@ MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	MockEsp.cpp \
 	MockEEPROM.cpp \
 	MockSPI.cpp \
+	strl.cpp \
 )
 
 CPP_SOURCES_CORE_EMU = \

@@ -272,6 +272,13 @@ bool FS::gc() {
     return _impl->gc();
 }
 
+bool FS::check() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->check();
+}
+
 bool FS::format() {
     if (!_impl) {
         return false;

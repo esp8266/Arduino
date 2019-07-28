@@ -85,6 +85,7 @@ public:
     virtual bool mkdir(const char* path) = 0;
     virtual bool rmdir(const char* path) = 0;
     virtual bool gc() { return true; } // May not be implemented in all file systems.
+    virtual bool check() { return true; } // May not be implemented in all file systems.
 };
 
 } // namespace fs
