@@ -30,7 +30,7 @@ extern "C" {
 #include "spi_flash.h"
 }
 
-extern "C" uint32_t _SPIFFS_end;
+extern "C" uint32_t _FS_end;
 
 EEPROMClass::EEPROMClass(uint32_t sector)
 : _sector(sector)
@@ -41,7 +41,7 @@ EEPROMClass::EEPROMClass(uint32_t sector)
 }
 
 EEPROMClass::EEPROMClass(void)
-: _sector((((uint32_t)&_SPIFFS_end - 0x40200000) / SPI_FLASH_SEC_SIZE))
+: _sector((((uint32_t)&_FS_end - 0x40200000) / SPI_FLASH_SEC_SIZE))
 , _data(0)
 , _size(0)
 , _dirty(false)

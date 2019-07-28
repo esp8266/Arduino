@@ -10,6 +10,11 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 TEST_CASE("stack in SYS ram", "[bs]")
 {
     bool sysstack = (((unsigned long)g_pcont) >> 16) == 0x3fff;

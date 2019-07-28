@@ -37,7 +37,9 @@ class WiFiClientSecure : public WiFiClient {
     WiFiClientSecure(const WiFiClientSecure &rhs);
     ~WiFiClientSecure() override;
 
-    int connect(CONST IPAddress& ip, uint16_t port) override;
+    WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+
+    int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
 
@@ -56,8 +58,10 @@ class WiFiClientSecure : public WiFiClient {
     int read() override;
     int peek() override;
     size_t peekBytes(uint8_t *buffer, size_t length) override;
-    bool flush(unsigned int maxWaitMs = 0) override;
-    bool stop(unsigned int maxWaitMs = 0) override;
+    bool flush(unsigned int maxWaitMs);
+    bool stop(unsigned int maxWaitMs);
+    void flush() override { (void)flush(0); }
+    void stop() override { (void)stop(0); }
 
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _session = session; }
@@ -103,6 +107,11 @@ class WiFiClientSecure : public WiFiClient {
     // Sets the requested buffer size for transmit and receive
     void setBufferSizes(int recv, int xmit);
 
+    // Returns whether MFLN negotiation for the above buffer sizes succeeded (after connection)
+    int getMFLNStatus() {
+      return connected() && br_ssl_engine_get_mfln_negotiated(_eng);
+    }
+
     // Return an error code and possibly a text string in a passed-in buffer with last SSL failure
     int getLastSSLError(char *dest = NULL, size_t len = 0);
 
@@ -117,7 +126,7 @@ class WiFiClientSecure : public WiFiClient {
     bool setCiphers(std::vector<uint16_t> list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
-    // Check for Maximum Fragment Length support for given len
+    // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);

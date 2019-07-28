@@ -32,7 +32,9 @@ void esp_schedule();
 
 #include <AddrList.h>
 
-#define GET_UDP_HDR(pb) (reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN))
+#define PBUF_ALIGNER_ADJUST 4
+#define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
+#define PBUF_HELPER_FLAG 0xff // lwIP pbuf flag: u8_t
 
 class UdpContext
 {
@@ -82,11 +84,9 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                delete this;
-            }
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            delete this;
         }
     }
 
@@ -207,21 +207,17 @@ public:
 
     CONST IPAddress& getRemoteAddress() CONST
     {
-        return _src_addr;
+        return _currentAddr.srcaddr;
     }
 
     uint16_t getRemotePort() const
     {
-        if (!_rx_buf)
-            return 0;
-
-        udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
-        return lwip_ntohs(udphdr->src);
+        return _currentAddr.srcport;
     }
 
     const IPAddress& getDestAddress() const
     {
-        return _dst_addr;
+        return _currentAddr.dstaddr;
     }
 
     uint16_t getLocalPort() const
@@ -235,23 +231,44 @@ public:
     {
         if (!_rx_buf)
             return false;
-
         if (!_first_buf_taken)
         {
             _first_buf_taken = true;
             return true;
         }
 
-        auto head = _rx_buf;
+        auto deleteme = _rx_buf;
         _rx_buf = _rx_buf->next;
-        _rx_buf_offset = 0;
 
         if (_rx_buf)
         {
+            if (_rx_buf->flags == PBUF_HELPER_FLAG)
+            {
+                // we have interleaved informations on addresses within reception pbuf chain:
+                // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
+                // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
+
+                // so the first rx_buf contains an address helper,
+                // copy it to "current address"
+                auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
+                _currentAddr = *helper;
+
+                // destroy the helper in the about-to-be-released pbuf
+                helper->~AddrHelper();
+
+                // forward in rx_buf list, next one is effective data
+                // current (not ref'ed) one will be pbuf_free'd with deleteme
+                _rx_buf = _rx_buf->next;
+            }
+
+            // this rx_buf is not nullptr by construction,
+            // ref'ing it to prevent release from the below pbuf_free(deleteme)
             pbuf_ref(_rx_buf);
         }
-        pbuf_free(head);
-        return _rx_buf != 0;
+        pbuf_free(deleteme);
+
+        _rx_buf_offset = 0;
+        return _rx_buf != nullptr;
     }
 
     int read()
@@ -420,54 +437,75 @@ private:
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-            const ip_addr_t *addr, u16_t port)
+            const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
-        (void) addr;
-        (void) port;
+
+#if LWIP_VERSION_MAJOR == 1
+    #define TEMPDSTADDR (&current_iphdr_dest)
+#else
+    #define TEMPDSTADDR (ip_current_dest_addr())
+#endif
+
+        // chain this helper pbuf first
         if (_rx_buf)
         {
             // there is some unread data
-            // chain the new pbuf to the existing one
+            // chain pbuf
+
+            // Addresses/ports are stored from this callback because lwIP's
+            // macro are valid only now.
+            //
+            // When peeking data from before payload start (like it was done
+            // before IPv6), there's no easy way to safely guess whether
+            // packet is from v4 or v6.
+            //
+            // Now storing data in an intermediate chained pbuf containing
+            // AddrHelper
+
+            // allocate new pbuf to store addresses/ports
+            pbuf* pb_helper = pbuf_alloc(PBUF_RAW, sizeof(AddrHelper) + PBUF_ALIGNER_ADJUST, PBUF_RAM);
+            if (!pb_helper)
+            {
+                // memory issue - discard received data
+                pbuf_free(pb);
+                return;
+            }
+            // construct in place
+            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+            pb_helper->flags = PBUF_HELPER_FLAG; // mark helper pbuf
+            // chain it
+            pbuf_cat(_rx_buf, pb_helper);
+
+            // now chain the new data pbuf
             DEBUGV(":urch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
             pbuf_cat(_rx_buf, pb);
         }
         else
         {
+            _currentAddr.srcaddr = srcaddr;
+            _currentAddr.dstaddr = TEMPDSTADDR;
+            _currentAddr.srcport = srcport;
+
             DEBUGV(":urn %d\r\n", pb->tot_len);
             _first_buf_taken = false;
             _rx_buf = pb;
             _rx_buf_offset = 0;
         }
 
-        // --> Arduino's UDP is a stream but UDP is not <--
-        // When IPv6 is enabled, we store addresses from here
-        // because lwIP's macro are valid only in this callback
-        // (there's no easy way to safely guess whether packet
-        //  is from v4 or v6 when we have only access to payload)
-        // Because of this stream-ed way this is inacurate when
-        // user does not swallow data quickly enough (the former
-        // IPv4-only way suffers from the exact same issue.
-
-#if LWIP_VERSION_MAJOR == 1
-        _src_addr = current_iphdr_src;
-        _dst_addr = current_iphdr_dest;
-#else
-        _src_addr = ip_data.current_iphdr_src;
-        _dst_addr = ip_data.current_iphdr_dest;
-#endif
-
         if (_on_rx) {
             _on_rx();
         }
-    }
 
+    #undef TEMPDSTADDR
+
+    }
 
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            CONST ip_addr_t *addr, u16_t port)
+            CONST ip_addr_t *srcaddr, u16_t srcport)
     {
-        reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
+        reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, srcaddr, srcport);
     }
 
 private:
@@ -483,7 +521,16 @@ private:
 #ifdef LWIP_MAYBE_XCC
     uint16_t _mcast_ttl;
 #endif
-    IPAddress _src_addr, _dst_addr;
+    struct AddrHelper
+    {
+        IPAddress srcaddr, dstaddr;
+        int16_t srcport;
+
+        AddrHelper() { }
+        AddrHelper(const ip_addr_t* src, const ip_addr_t* dst, uint16_t srcport):
+            srcaddr(src), dstaddr(dst), srcport(srcport) { }
+    };
+    AddrHelper _currentAddr;
 };
 
 

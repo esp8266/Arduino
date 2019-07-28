@@ -125,6 +125,18 @@ Compile the sketch normally and, once a `.bin` file is available, sign it using 
 
     <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
 
+Old And New Signature Formats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Up to version 2.5.2 of the core, the format of signatures was a little different. An additional signed binary with the extension legacy_sig is created. This file contains a signature in the old format and can be uploaded OTA to a device that checks for the old signature format.
+
+To create a legacy signature, call the signing script with --legacy:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
+
 Safety
 ~~~~~~
 
@@ -291,9 +303,9 @@ If OTA update fails, first step is to check for error messages that may be shown
 
 This window is for Arduino Yún and not yet implemented for esp8266/Arduino. It shows up because IDE is attempting to open Serial Monitor using network port you have selected for OTA upload.
 
-Instead you need an external serial monitor. If you are a Windows user check out `Termite <http://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
+Instead you need an external serial monitor. If you are a Windows user check out `Termite <https://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
 
-Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <http://www.compuphase.com/software_termite.htm>`__ below:
+Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <https://www.compuphase.com/software_termite.htm>`__ below:
 
 .. figure:: termite-configuration.png
    :alt: Termite settings
@@ -380,8 +392,8 @@ You can use another module if it meets previously described `requirements <#basi
       https://github.com/esp8266/Arduino#installing-with-boards-manager
    -  Host software depending on O/S you use:
 
-      1. Avahi http://avahi.org/ for Linux
-      2. Bonjour http://www.apple.com/support/bonjour/ for Windows
+      1. Avahi https://avahi.org/ for Linux
+      2. Bonjour https://www.apple.com/support/bonjour/ for Windows
       3. Mac OSX and iOS - support is already built in / no any extra
          s/w is required
 
@@ -451,7 +463,7 @@ You can use another module if it meets previously described `requirements <#basi
       :alt: Serial Monitor - after OTA update
 
    Just after reboot you should see exactly the same message
-   ``HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser``
+   ``HTTPUpdateServer ready! Open http://esp8266-webupdate.local/update in your browser``
    like in step 3. This is because module has been loaded again with the
    same code – first using serial port, and then using OTA.
 

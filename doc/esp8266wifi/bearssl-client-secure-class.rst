@@ -109,7 +109,7 @@ See the `BearSSL_CertStore` example for full details as the `BearSSL::CertStore`
 Supported Crypto
 ~~~~~~~~~~~~~~~~
 
-Please see the `BearSSL website <htps://bearssl.org>`__ for detailed cryptographic information.  In general, TLS 1.2, TLS 1.1, and TLS 1.0 are supported with RSA and Elliptic Curve keys and a very rich set of hashing and symmetric encryption codes.  Please note that Elliptic Curve (EC) key operations take a significant amount of time.
+Please see the `BearSSL website <https://bearssl.org>`__ for detailed cryptographic information.  In general, TLS 1.2, TLS 1.1, and TLS 1.0 are supported with RSA and Elliptic Curve keys and a very rich set of hashing and symmetric encryption codes.  Please note that Elliptic Curve (EC) key operations take a significant amount of time.
 
 
 BearSSL::WiFiClientSecure Class
@@ -138,6 +138,8 @@ setFingerprint(const uint8_t fp[20]) / setFingerprint(const char \*fpStr)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
+
+This fingerprint is calcuated on the raw X509 certificate served by the server.  In very rare cases, these certificates have certain encodings which should be normalized before taking a fingerprint (but in order to preserve memory BearSSL does not do this normalization since it would need RAM for an entire copy of the cert), and the fingerprint BearSSL calculates will not match the fingerprint OpenSSL calculates.  In this case, you can enable SSL debugging and get a dump of BearSSL's calculated fingerprint and use that one in your code, or use full certificate validation.  See the `original issue and debug here <https://github.com/esp8266/Arduino/issues/6209>`__.
 
 setTrustAnchors(BearSSL::X509List \*ta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -179,6 +181,11 @@ setBufferSizes(int recv, int xmit)
 Once you have verified (or know beforehand) that MFLN is supported you can use this call to set the size of memory buffers allocated by the connection object.  This must be called **before** `connect()` or it will be ignored.
 
 In certain applications where the TLS server does not support MFLN (not many do as of this writing as it is relatively new to OpenSSL), but you control both the ESP8266 and the server to which it is communicating, you may still be able to `setBufferSizes()` smaller if you guarantee no chunk of data will overflow those buffers.
+
+bool getMFLNStatus()
+^^^^^^^^^^^^^^^^^^^^
+
+After a successful connection, this method returns whether or not MFLN negotiation succeeded or not.  If it did not succeed, and you reduced the receive buffer with `setBufferSizes` then you may experience reception errors if the server attempts to send messages larger than your receive buffer.
 
 Sessions (Resuming connections fast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
