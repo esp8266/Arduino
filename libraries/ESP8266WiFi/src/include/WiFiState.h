@@ -10,13 +10,13 @@ struct WiFiState
     uint32_t crc;
     struct
     {
-        bool persistent;
-        WiFiMode_t mode;
-        uint8_t channel;
         station_config fwconfig;
         ip_info ip;
         ip_addr_t dns[2];
         ip_addr_t ntp[2];
+        WiFiMode_t mode;
+        uint8_t channel;
+        bool persistent;
     } state;
 };
 
