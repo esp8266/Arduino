@@ -235,7 +235,7 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
     for(auto it = std::begin(sCbEventList); it != std::end(sCbEventList); ) {
         WiFiEventHandler &handler = *it;
         if (handler->canExpire() && handler.unique()) {
-            it = sCbEventList.erase(it); 
+            it = sCbEventList.erase(it);
         }
         else {
             (*handler)(event);
