@@ -99,7 +99,6 @@ class ESP8266WiFiGenericClass {
         static void preinitWiFiOff (); //meant to be called in user-defined preinit()
 
     protected:
-        static bool _shutdown;
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
 
