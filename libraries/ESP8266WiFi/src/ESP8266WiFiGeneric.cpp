@@ -40,8 +40,12 @@ extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/dhcp.h"
-#include "lwip/apps/sntp.h"
 #include "lwip/init.h" // LWIP_VERSION_
+#if LWIP_VERSION_MAJOR == 1
+#include "lwip/sntp.h"
+#else
+#include "lwip/apps/sntp.h"
+#endif
 }
 
 #include "WiFiClient.h"
@@ -688,7 +692,13 @@ void ESP8266WiFiGenericClass::saveState (WiFiState* state, WiFiMode_t mode, bool
         state->state.mode = mode;
         uint8_t i = 0;
         for (auto& ntp: state->state.ntp)
+        {
+#if LWIP_VERSION_MAJOR == 1
+            ntp = sntp_getserver(i++);
+#else
             ntp = *sntp_getserver(i++);
+#endif
+        }
         i = 0;
         for (auto& dns: state->state.dns)
             dns = WiFi.dnsIP(i++);
@@ -726,7 +736,7 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
             DEBUG_WIFI("core: resume: static address '%s'\n", local.toString().c_str());
             WiFi.config(state->state.ip.ip, state->state.ip.gw, state->state.ip.netmask, state->state.dns[0], state->state.dns[1]);
             uint8_t i = 0;
-            for (const auto& ntp: state->state.ntp)
+            for (CONST auto& ntp: state->state.ntp)
             {
                 IPAddress ip(ntp);
                 if (ip.isSet())
