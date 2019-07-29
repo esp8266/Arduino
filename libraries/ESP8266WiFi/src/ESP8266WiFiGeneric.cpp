@@ -406,6 +406,10 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
         return false;
 
     // m is now WIFI_STA, WIFI_AP or WIFI_AP_STA
+    if (state)
+    {
+        DEBUG_WIFI("core: state is useless without SHUTDOWN or RESUME\n");
+    }
 
     if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
         // wifi may have been put asleep by ESP8266WiFiGenericClass::preinitWiFiOff
@@ -415,11 +419,9 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
 
     if(_persistent){
         if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
-            saveState(state, m, _persistent);
             return true;
         }
     } else if(wifi_get_opmode() == (uint8) m){
-        saveState(state, m, _persistent);
         return true;
     }
 
