@@ -1,6 +1,8 @@
 
 // NAPT example released to public domain
 
+#if LWIP_FEATURES && !LWIP_IPV6
+
 #define HAVE_NETDUMP 0
 
 #include <ESP8266WiFi.h>
@@ -76,5 +78,15 @@ void setup() {
   }
 }
 
+#else
+
+void setup() {
+  Serial.begin(115200);
+  Serial.printf("\n\nNAPT not supported in this configuration\n");
+}
+
+#endif
+
 void loop() {
 }
+
