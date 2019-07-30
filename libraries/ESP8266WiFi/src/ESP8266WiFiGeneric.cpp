@@ -682,16 +682,15 @@ bool ESP8266WiFiGenericClass::shutdown (uint32 sleepUs, WiFiState* state)
         WiFi.persistent(persistent);
         return false;
     }
-    saveState(state, before_off_mode, persistent);
-    return true;
-}
 
-void ESP8266WiFiGenericClass::saveState (WiFiState* state, WiFiMode_t mode, bool persistent)
-{
+    // WiFi is now in force-sleep mode
+
     if (state)
     {
+        // finish filling state and process crc
+
         state->state.persistent = persistent;
-        state->state.mode = mode;
+        state->state.mode = before_off_mode;
         uint8_t i = 0;
         for (auto& ntp: state->state.ntp)
         {
@@ -707,6 +706,7 @@ void ESP8266WiFiGenericClass::saveState (WiFiState* state, WiFiMode_t mode, bool
         state->crc = shutdownCRC(state);
         DEBUG_WIFI("core: state is saved\n");
     }
+    return true;
 }
 
 bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
