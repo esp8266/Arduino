@@ -766,6 +766,9 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
         return false;
     }
 
+    // success, invalidate saved state
+    state->crc++;
+
     return true;
 }
 
