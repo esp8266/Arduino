@@ -123,18 +123,34 @@ public:
     }
 
     /*!
-        @brief	Peek at the next element pop returns without removing it from the queue.
-        @return An rvalue copy of the next element that can be popped, or a default
-                value of type T if the queue is empty.
+        @brief	Peek at the next element pop will return without removing it from the queue.
+        @return An rvalue copy of the next element that can be popped. If the queue is empty,
+                return an rvalue copy of the element that is pending the next push.
     */
     T peek() const
     {
-        const auto outPos = m_outPos.load(std::memory_order_acquire);
+        const auto outPos = m_outPos.load(std::memory_order_relaxed);
+        std::atomic_thread_fence(std::memory_order_acquire);
+        return m_buffer[outPos];
+    }
+
+    /*!
+        @brief	Peek at the next pending input value.
+        @return A reference to the next element that can be pushed.
+    */
+    T& IRAM_ATTR pushpeek()
+    {
         const auto inPos = m_inPos.load(std::memory_order_relaxed);
         std::atomic_thread_fence(std::memory_order_acquire);
-        if (inPos == outPos) return defaultValue;
-        else return m_buffer[outPos];
+        return m_buffer[inPos];
     }
+
+    /*!
+        @brief	Release the next pending input value, accessible by pushpeek(), into the queue.
+        @return true if the queue accepted the value, false if the queue
+                was full.
+    */
+    bool IRAM_ATTR push();
 
     /*!
         @brief	Move the rvalue parameter into the queue.
@@ -209,6 +225,21 @@ bool circular_queue<T>::capacity(const size_t cap)
     std::atomic_thread_fence(std::memory_order_release);
     m_inPos.store(available, std::memory_order_relaxed);
     m_outPos.store(0, std::memory_order_release);
+    return true;
+}
+
+template< typename T >
+bool IRAM_ATTR circular_queue<T>::push()
+{
+    const auto inPos = m_inPos.load(std::memory_order_acquire);
+    const unsigned next = (inPos + 1) % m_bufSize;
+    if (next == m_outPos.load(std::memory_order_relaxed)) {
+        return false;
+    }
+
+    std::atomic_thread_fence(std::memory_order_acquire);
+
+    m_inPos.store(next, std::memory_order_release);
     return true;
 }
 

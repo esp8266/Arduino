@@ -71,6 +71,14 @@ public:
         return circular_queue<T>::capacity(cap);
     }
 
+    bool IRAM_ATTR push() = delete;
+
+    /*!
+        @brief	Move the rvalue parameter into the queue, guarded
+                for multiple concurrent producers.
+        @return true if the queue accepted the value, false if the queue
+                was full.
+    */
     bool IRAM_ATTR push(T&& val)
     {
 #ifdef ESP8266
@@ -82,7 +90,7 @@ public:
     }
 
     /*!
-        @brief	Move the rvalue parameter into the queue, guarded
+        @brief	Push a copy of the parameter into the queue, guarded
                 for multiple concurrent producers.
         @return true if the queue accepted the value, false if the queue
                 was full.
