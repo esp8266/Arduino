@@ -5,6 +5,11 @@
 
 #define HAVE_NETDUMP 0
 
+#ifndef STASSID
+#define STASSID "mynetwork"
+#define STAPSK  "mynetworkpassword"
+#endif
+
 #include <ESP8266WiFi.h>
 #include <lwip/napt.h>
 #include <lwip/dns.h>
