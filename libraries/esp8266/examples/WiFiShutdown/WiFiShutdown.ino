@@ -26,7 +26,8 @@ enum state_e {
   e_wait_connected,
   e_wait_ntp,
   e_shutdown,
-  e_wait_shutdown
+  e_wait_shutdown,
+  e_wait_off
 };
 
 static state_e step = e_initial; // step
@@ -136,6 +137,7 @@ void loop() {
   }
 
   switch (step) {
+
     case e_initial: {
         if (WiFi.shutdownValidCRC(&nv->wss)) {
           step = e_start_resume;
@@ -214,7 +216,8 @@ void loop() {
         switch (++deepsleep) {
           case 1: {
               Serial.println(SEP "WIFI_OFF for 5s");
-              TEST(WiFi.mode(WIFI_OFF, &nv->wss));
+              TEST(WiFi.mode(WIFI_OFF));
+              step = e_wait_off;
               break;
             }
           case 2: // several loop on shutdown
@@ -222,6 +225,7 @@ void loop() {
           case 4: { // reconnection duration
               Serial.println(SEP "WIFI_SHUTDOWN for 5s");
               TEST(WiFi.mode(WIFI_SHUTDOWN, &nv->wss));
+              step = e_wait_shutdown;
               break;
             }
           default: {
@@ -234,7 +238,6 @@ void loop() {
         }
 
         startup = millis();
-        step = e_wait_shutdown;
         break;
       }
 
@@ -242,6 +245,13 @@ void loop() {
     case e_wait_shutdown:
       if (millis() - startup > 5000) {
         step = e_start_resume;
+      }
+      break;
+
+
+    case e_wait_off:
+      if (millis() - startup > 5000) {
+        step = e_start_normal;
       }
       break;
   }
