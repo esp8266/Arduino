@@ -89,72 +89,71 @@ void loop() {
 }
 
 //////////////////////////////
-#if 0
+/*
 
-Result with:
-Exceptions: Legacy(new can return nullptr)
+  Result with:
+  Exceptions: Legacy(new can return nullptr)
 
-//////////////////////////////
+  //////////////////////////////
 
-arduino_new benefits
+  arduino_new benefits
 
----- - arduino_new:
-SomeClass@0x3fff1864()()
-~ SomeClass @0x3fff1864
+  ----- arduino_new:
+  SomeClass@0x3fff1864()()
+  ~ SomeClass @0x3fff1864
 
----- - arduino_new with oom:
-nullptr: 0
+  ----- arduino_new with oom:
+  nullptr: 0
 
----- - arduino_new with constructor parameters:
-SomeClass@0x3fff1864(param1)(param2)
-~ SomeClass @0x3fff1864
+  ----- arduino_new with constructor parameters:
+  SomeClass@0x3fff1864(param1)(param2)
+  ~ SomeClass @0x3fff1864
 
----- - arduino_newarray[2]
-SomeClass@0x3fff1868()()
-SomeClass@0x3fff1869()()
-@: 0x3fff1868 s = 1 s(2) = 2
-                           0: 0x3fff1868
-                           1: 0x3fff1869
-                           ~ SomeClass @0x3fff1869
-                           ~ SomeClass @0x3fff1868
+  ----- arduino_newarray[2]
+  SomeClass@0x3fff1868()()
+  SomeClass@0x3fff1869()()
+  @: 0x3fff1868 s = 1 s(2) = 2
+  0: 0x3fff1868
+  1: 0x3fff1869
+  ~ SomeClass @0x3fff1869
+  ~ SomeClass @0x3fff1868
 
-                           ---- - arduino_newarray[2](with constructor parameters)
-                           SomeClass@0x3fff1868(param1)()
-                           SomeClass@0x3fff1869(param1)()
-                           @: 0x3fff1868 s = 1 s(2) = 2
-                               0: 0x3fff1868
-                               1: 0x3fff1869
-                               ~ SomeClass @0x3fff1869
-                               ~ SomeClass @0x3fff1868
+  ----- arduino_newarray[2](with constructor parameters)
+  SomeClass@0x3fff1868(param1)()
+  SomeClass@0x3fff1869(param1)()
+  @: 0x3fff1868 s = 1 s(2) = 2
+  0: 0x3fff1868
+  1: 0x3fff1869
+  ~ SomeClass @0x3fff1869
+  ~ SomeClass @0x3fff1868
 
-                               ---- - arduino_newarray[100000]
-                               @: 0
+  ----- arduino_newarray[100000]
+  @: 0
 
-                               ---- - new
-                               SomeClass@0x3fff1864()()
-                               ~ SomeClass @0x3fff1864
+  ----- new
+  SomeClass@0x3fff1864()()
+  ~ SomeClass @0x3fff1864
 
-                               ----- new with oom: (abort() with option 'Exceptions: Disabled (new can abort)'
-                                   this constructor should not be called
-                                   nullptr: 0
+  ----- new with oom: (abort() with option 'Exceptions: Disabled (new can abort)'
+  this constructor should not be called
+  nullptr: 0
 
-                                   ---- - new[2]
-                                   SomeClass@0x3fff1868()()
-                                   SomeClass@0x3fff1869()()
-                                   @:0x3fff1868 s = 1 s(2) = 2
-                                       0: 0x3fff1868
-                                       1: 0x3fff1869
-                                       ~ SomeClass @0x3fff1869
-                                       ~ SomeClass @0x3fff1868
+  ----- new[2]
+  SomeClass@0x3fff1868()()
+  SomeClass@0x3fff1869()()
+  @:0x3fff1868 s = 1 s(2) = 2
+  0: 0x3fff1868
+  1: 0x3fff1869
+  ~ SomeClass @0x3fff1869
+  ~ SomeClass @0x3fff1868
 
-                                       ---- - new[10000](badly fails with 'Exceptions: Legacy' or '...Disabled'
+  ----- new[10000](badly fails with 'Exceptions: Legacy' or '...Disabled'
 
-                                           Exception(29):
-                                           epc1 = 0x402013de epc2 = 0x00000000 epc3 = 0x00000000 excvaddr = 0x00000000 depc = 0x00000000
+  Exception(29):
+  epc1 = 0x402013de epc2 = 0x00000000 epc3 = 0x00000000 excvaddr = 0x00000000 depc = 0x00000000
 
-                                               >>> stack >>>
+  >>> stack >>>
+  ...
 
-                                               ...
-                                               //////////////////////////////
-
-#endif
+*/
+/////////////////////////////
