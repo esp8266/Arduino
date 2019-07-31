@@ -35,15 +35,53 @@
 
 #ifdef __cplusplus
 
-extern "C++"
-template <typename T, typename ...TConstructorArgs>
-T* new0 (TConstructorArgs... TconstructorArgs)
+#include <stdlib.h> // malloc()
+#include <stddef.h> // size_t
+
+namespace arduino
 {
-    T* ptr = (T*)malloc(sizeof(T));
-    if (ptr)
-        new (ptr) T(TconstructorArgs...);
-    return ptr;
+    extern "C++"
+    template <typename T, typename ...TConstructorArgs>
+    T* new4arduino (size_t n, TConstructorArgs... TconstructorArgs)
+    {
+        if (n == 0)
+            return nullptr;
+        size_t offs = n == 1? 0: sizeof(size_t);
+        T* ptr = (T*)malloc(offs + (n * sizeof(T)));
+        if (ptr)
+        {
+            if (n > 1)
+                *(size_t*)(ptr) = n;
+            for (size_t i = 0; i < n; i++)
+                new (ptr + offs + i * sizeof(T)) T(TconstructorArgs...);
+            return ptr + offs;
+        }
+        return nullptr;
+    }
+
+    // new0<>() and new0array<>() below are necessary only
+    // because of variadic macro lack of feature, for example with:
+    //   #define arduino_new(Type, ...) arduino::new0array<Type>(1, __VA_ARGS__)
+    // this arduino_new ^^ macro cannot be used with no arguments after 'Type'
+    // hint: VA_OPT is c++20
+
+    extern "C++"
+    template <typename T, typename ...TConstructorArgs>
+    T* new0 (TConstructorArgs... TconstructorArgs)
+    {
+        return new4arduino<T>(1, TconstructorArgs...);
+    }
+
+    extern "C++"
+    template <typename T, size_t n, typename ...TConstructorArgs>
+    T* new0array (TConstructorArgs... TconstructorArgs)
+    {
+        return new4arduino<T>(n, TconstructorArgs...);
+    }
 }
+
+#define arduino_new(Type, ...) arduino::new0<Type>(__VA_ARGS__)
+#define arduino_newarray(Type, n, ...) arduino::new0array<Type, n>(__VA_ARGS__)
 
 #endif // __cplusplus
 

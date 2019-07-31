@@ -255,7 +255,7 @@ C++
 
   History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
 
-- New optional allocator ``new0``
+- New optional allocator ``arduino_new``
 
   A new optional global allocator is introduced with a different semantic:
 
@@ -273,7 +273,17 @@ C++
   .. code:: cpp
 
       // with new:
-      SomeClass* sc = new SomeClass(arg1, arg2, ...);
 
-      // with new0:
-      SomeClass* sc = new0<SomeClass>(arg1, arg2, ...);
+      SomeClass* sc = new SomeClass(arg1, arg2, ...);
+      delete sc;
+
+      SomeClass* scs = new SomeClass[42];
+      delete scs;
+
+      // with arduino_new:
+
+      SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
+      delete[] sc;
+
+      SomeClass* scs = arduino_newarray(SomeClass, 42);
+      delete[] scs;
