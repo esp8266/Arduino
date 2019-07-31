@@ -278,12 +278,12 @@ C++
       delete sc;
 
       SomeClass* scs = new SomeClass[42];
-      delete scs;
+      delete [] scs;
 
       // with arduino_new:
 
       SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
-      delete[] sc;
+      delete sc;
 
       SomeClass* scs = arduino_newarray(SomeClass, 42);
-      delete[] scs;
+      delete [] scs;
