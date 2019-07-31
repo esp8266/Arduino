@@ -186,6 +186,7 @@ public:
 
     /*!
         @brief	Pop multiple elements in ordered sequence from the queue to a buffer.
+                If buffer is nullptr, simply discards up to size elements from the queue.
         @return The number of elements actually popped from the queue to
                 buffer.
     */
@@ -313,9 +314,11 @@ size_t circular_queue<T>::pop_n(T* buffer, size_t size) {
 
     std::atomic_thread_fence(std::memory_order_acquire);
 
-    buffer = std::copy_n(std::make_move_iterator(m_buffer.get() + outPos), n, buffer);
-    avail -= n;
-    std::copy_n(std::make_move_iterator(m_buffer.get()), avail, buffer);
+    if (buffer) {
+        buffer = std::copy_n(std::make_move_iterator(m_buffer.get() + outPos), n, buffer);
+        avail -= n;
+        std::copy_n(std::make_move_iterator(m_buffer.get()), avail, buffer);
+    }
 
     std::atomic_thread_fence(std::memory_order_release);
 
