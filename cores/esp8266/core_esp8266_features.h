@@ -42,7 +42,7 @@ namespace arduino
 {
     extern "C++"
     template <typename T, typename ...TConstructorArgs>
-    T* new4arduino (size_t n, TConstructorArgs... TconstructorArgs)
+    T* new0 (size_t n, TConstructorArgs... TconstructorArgs)
     {
         // n==0: single allocation, otherwise it is an array
         size_t offset = n? sizeof(size_t): 0;
@@ -58,30 +58,10 @@ namespace arduino
         }
         return nullptr;
     }
-
-    // new0<>() and new0array<>() below are necessary only
-    // because of variadic macro lack of feature, for example with:
-    //   #define arduino_new(Type, ...) arduino::new0array<Type>(1, __VA_ARGS__)
-    // this arduino_new ^^ macro cannot be used with no arguments after 'Type'
-    // hint: VA_OPT is c++20
-
-    extern "C++"
-    template <typename T, typename ...TConstructorArgs>
-    T* new0 (TConstructorArgs... TconstructorArgs)
-    {
-        return new4arduino<T>(0, TconstructorArgs...);
-    }
-
-    extern "C++"
-    template <typename T, size_t n, typename ...TConstructorArgs>
-    T* new0array (TConstructorArgs... TconstructorArgs)
-    {
-        return n? new4arduino<T>(n, TconstructorArgs...): nullptr;
-    }
 }
 
-#define arduino_new(Type, ...) arduino::new0<Type>(__VA_ARGS__)
-#define arduino_newarray(Type, n, ...) arduino::new0array<Type, n>(__VA_ARGS__)
+#define arduino_new(Type, ...) arduino::new0<Type>(0, ##__VA_ARGS__)
+#define arduino_newarray(Type, n, ...) arduino::new0<Type>(n, ##__VA_ARGS__)
 
 #endif // __cplusplus
 
