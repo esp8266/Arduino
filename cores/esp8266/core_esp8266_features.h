@@ -44,17 +44,17 @@ namespace arduino
     template <typename T, typename ...TConstructorArgs>
     T* new4arduino (size_t n, TConstructorArgs... TconstructorArgs)
     {
-        if (n == 0)
-            return nullptr;
-        size_t offs = n == 1? 0: sizeof(size_t);
-        T* ptr = (T*)malloc(offs + (n * sizeof(T)));
+        // n==0: single allocation, otherwise it is an array
+        size_t offset = n? sizeof(size_t): 0;
+        size_t arraysize = n? n: 1;
+        T* ptr = (T*)malloc(offset + (arraysize * sizeof(T)));
         if (ptr)
         {
-            if (n > 1)
+            if (n)
                 *(size_t*)(ptr) = n;
-            for (size_t i = 0; i < n; i++)
-                new (ptr + offs + i * sizeof(T)) T(TconstructorArgs...);
-            return ptr + offs;
+            for (size_t i = 0; i < arraysize; i++)
+                new (ptr + offset + i * sizeof(T)) T(TconstructorArgs...);
+            return ptr + offset;
         }
         return nullptr;
     }
@@ -69,14 +69,14 @@ namespace arduino
     template <typename T, typename ...TConstructorArgs>
     T* new0 (TConstructorArgs... TconstructorArgs)
     {
-        return new4arduino<T>(1, TconstructorArgs...);
+        return new4arduino<T>(0, TconstructorArgs...);
     }
 
     extern "C++"
     template <typename T, size_t n, typename ...TConstructorArgs>
     T* new0array (TConstructorArgs... TconstructorArgs)
     {
-        return new4arduino<T>(n, TconstructorArgs...);
+        return n? new4arduino<T>(n, TconstructorArgs...): nullptr;
     }
 }
 
