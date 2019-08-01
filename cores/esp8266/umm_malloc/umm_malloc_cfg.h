@@ -16,6 +16,8 @@ extern "C" {
 
 #include "c_types.h"
 #include "umm_performance.h"
+#include "umm_stats.h"
+
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.

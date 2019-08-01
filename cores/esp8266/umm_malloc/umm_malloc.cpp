@@ -1027,7 +1027,6 @@ static void *get_unpoisoned( void *vptr ) {
  */
 
 UMM_HEAP_INFO ummHeapInfo;
-unsigned short int ummHeapFreeBlocks;
 
 void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
   UMM_CRITICAL_DECL(id_info);
@@ -1153,6 +1152,21 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
       ummHeapInfo.usedBlocks,
       ummHeapInfo.freeBlocks  );
 
+  if (ummHeapInfo.freeBlocks == ummStats.free_blocks) {
+      DBG_LOG_FORCE( force, "\nheap info Free blocks and heap statistics Free blocks match.\n");
+  } else {
+      DBG_LOG_FORCE( force, "\nheap info Free blocks  %5d != heap statistics Free Blocks  %5d\n\n",
+          ummHeapInfo.freeBlocks,
+          ummStats.free_blocks  );
+  }
+
+  DBG_LOG_FORCE( force, "\numm heap statistics:\n");
+  DBG_LOG_FORCE( force,   "  Free Space        %5u\n", ummStats.free_blocks * sizeof(umm_block));
+  DBG_LOG_FORCE( force,   "  Low Watermark     %5u\n", ummStats.free_blocks_min * sizeof(umm_block));
+  DBG_LOG_FORCE( force,   "  MAX Alloc Request %5u\n", ummStats.alloc_max_size);
+  DBG_LOG_FORCE( force,   "  OOM Count         %5u\n", ummStats.oom_count);
+  DBG_LOG_FORCE( force,   "  Size of umm_block %5u\n", sizeof(umm_block));
+
   /* Release the critical section... */
   UMM_CRITICAL_EXIT(id_info);
 
@@ -1272,8 +1286,8 @@ void ICACHE_FLASH_ATTR umm_init( void ) {
     /* index of the latest `umm_block` */
     const unsigned short int block_last = UMM_NUMBLOCKS - 1;
 
-    /* init heapFreeBlocks */
-    ummHeapFreeBlocks = block_last;
+    /* init ummStats */
+    ummStats.free_blocks = ummStats.free_blocks_min = block_last;
 
     /* setup the 0th `umm_block`, which just points to the 1st */
     UMM_NBLOCK(block_0th) = block_1th;
@@ -1348,8 +1362,8 @@ static void _umm_free( void *ptr ) {
   /* Protect the critical section... */
   UMM_CRITICAL_ENTRY(id_free);
 
-  /* Update dynamic Free Block count */
-  ummHeapFreeBlocks += (UMM_NBLOCK(c) - c);
+  /* Update heap statistics */
+  ummStats.free_blocks += (UMM_NBLOCK(c) - c);
 
   /* Now let's assimilate this block with the next one if possible. */
 
@@ -1434,6 +1448,9 @@ static void *_umm_malloc( size_t size ) {
 
     return( (void *)NULL );
   }
+
+  if ( size > ummStats.alloc_max_size )
+    ummStats.alloc_max_size = size;
 
   blocks = umm_blocks( size );
 
@@ -1521,10 +1538,14 @@ static void *_umm_malloc( size_t size ) {
       UMM_NFREE( cf + blocks ) = UMM_NFREE(cf);
     }
 
-    /* Update dynamic Free Block count */
-    ummHeapFreeBlocks -= blocks;
+    /* Update heap statistics */
+    ummStats.free_blocks -= blocks;
+    if (ummStats.free_blocks < ummStats.free_blocks_min)
+      ummStats.free_blocks_min = ummStats.free_blocks;
 
   } else {
+    ummStats.oom_count += 1;
+
     /* Release the critical section... */
     UMM_CRITICAL_EXIT(id_malloc);
 
@@ -1548,7 +1569,6 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
   unsigned short int blocks;
   unsigned short int blockSize;
-
   unsigned short int c;
 
   size_t curSize;
@@ -1584,6 +1604,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     return( (void *)NULL );
   }
+
+  if ( size > ummStats.alloc_max_size )
+    ummStats.alloc_max_size = size;
 
   /*
    * Defer starting critical section.
@@ -1658,7 +1681,13 @@ static void *_umm_realloc( void *ptr, size_t size ) {
    * assimilation step later in free :-)
    */
 
-  umm_assimilate_up( c );
+   if( UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_FREELIST_MASK ) {
+       // This will often be most of the free heap. The excess is
+       // restored when umm_free() is called before returning.
+       ummStats.free_blocks -=
+           (UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_BLOCKNO_MASK) - UMM_NBLOCK(c);
+       umm_assimilate_up( c );
+   }
 
   /*
    * Now check if it might help to assimilate down, but don't actually
@@ -1674,6 +1703,17 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     DBG_LOG_DEBUG( "realloc() could assimilate down %d blocks - fits!\n\r", c-UMM_PBLOCK(c) );
 
+    /*
+     * Calculate the number of blocks to keep while the information is
+     * still available.
+     */
+
+    unsigned short int prevBlockSize = c - UMM_PBLOCK(c);
+    ummStats.free_blocks -= prevBlockSize;
+    unsigned short int prelimBlockSize = blockSize + prevBlockSize;
+    if(prelimBlockSize < blocks)
+        prelimBlockSize = blocks;
+
     /* Disconnect the previous block from the FREE list */
 
     umm_disconnect_from_free_list( UMM_PBLOCK(c) );
@@ -1686,6 +1726,29 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     c = umm_assimilate_down(c, 0);
 
     /*
+     * Currently all or most of the heap has been grabbed. Do an early split of
+     * allocation down to the amount needed to do a successful move operation.
+     * This will allow an alloc/new from a ISR to succeed while a memmove is
+     * running.
+     */
+    if( (UMM_NBLOCK(c) - c) > prelimBlockSize ) {
+        umm_make_new_block( c, prelimBlockSize, 0, 0 );
+        _umm_free( (void *)&UMM_DATA(c+prelimBlockSize) );
+    }
+
+    // This is the lowest low that may be seen by an ISR doing an alloc/new
+    if( ummStats.free_blocks < ummStats.free_blocks_min )
+        ummStats.free_blocks_min = ummStats.free_blocks;
+
+    /*
+     * For the ESP8266 interrupts should not be off for more than 10us.
+     * An unprotect/protect around memmove should be safe to do here.
+     * All variables used are on the stack.
+     */
+
+    UMM_CRITICAL_EXIT(id_realloc);
+
+    /*
      * Move the bytes down to the new block we just created, but be sure to move
      * only the original bytes.
      */
@@ -1695,16 +1758,14 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     /* And don't forget to adjust the pointer to the new block location! */
 
     ptr    = (void *)&UMM_DATA(c);
+
+    /* Now resume critical section... */
+    UMM_CRITICAL_ENTRY(id_realloc);
   }
 
-  unsigned short int startingBlockSize = blockSize;
-
-  /* Now calculate the block size again...and we'll have three cases */
+  // Now calculate the block size again...and we'll have three cases /
 
   blockSize = (UMM_NBLOCK(c) - c);
-
-  /* Update dynamic Free Block count */
-  ummHeapFreeBlocks -= (blockSize - startingBlockSize);
 
   if( blockSize == blocks ) {
     /* This space intentionally left blank - return the original pointer! */
@@ -1724,6 +1785,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
   } else {
     /* New block is bigger than the old block... */
 
+    /* Finish up without critical section */
+    UMM_CRITICAL_EXIT(id_realloc);
+
     void *oldptr = ptr;
 
     DBG_LOG_DEBUG( "realloc %d to a bigger block %d, make new, copy, and free the old\n", blockSize, blocks );
@@ -1733,15 +1797,18 @@ static void *_umm_realloc( void *ptr, size_t size ) {
      * free up the old block, but only if the malloc was sucessful!
      */
 
-    UMM_CRITICAL_EXIT(id_realloc);
-
     if( (ptr = _umm_malloc( size )) ) {
       memcpy( ptr, oldptr, curSize );
       _umm_free( oldptr );
+    } else {
+      ummStats.oom_count += 1; // Needs atomic
     }
     return( ptr );
 
   }
+
+  if (ummStats.free_blocks < ummStats.free_blocks_min)
+      ummStats.free_blocks_min = ummStats.free_blocks;
 
   /* Release the critical section... */
   UMM_CRITICAL_EXIT(id_realloc);
@@ -1859,7 +1926,16 @@ void umm_free( void *ptr ) {
 /* ------------------------------------------------------------------------ */
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
-  return (size_t)ummHeapFreeBlocks * sizeof(umm_block);
+  return (size_t)ummStats.free_blocks * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_free_heap_size_min( void ) {
+  return (size_t)ummStats.free_blocks_min * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void ) {
+  ummStats.free_blocks_min = ummStats.free_blocks;
+  return (size_t)ummStats.free_blocks_min *  sizeof(umm_block);
 }
 
 size_t ICACHE_FLASH_ATTR umm_max_block_size( void ) {

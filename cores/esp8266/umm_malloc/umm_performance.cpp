@@ -7,8 +7,11 @@
 #include <pgmspace.h>
 #include <core_esp8266_features.h>
 #include "umm_performance.h"
+#include "umm_stats.h"
 
 extern "C" {
+
+UMM_STATS ummStats = {0, 0, 0, 0};
 
 #ifdef UMM_CRITICAL_PERIOD_ANALYZE
 struct _UMM_TIME_STATS time_stats = {
