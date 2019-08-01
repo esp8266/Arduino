@@ -296,7 +296,7 @@ long secureRandom(long);
 long secureRandom(long, long);
 long map(long, long, long, long, long);
 
-void configTime(long timezone, int daylightOffset_sec, const char* server1,
+void configTime(int timezone, int daylightOffset_sec, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
 void configTime(const char* tz, const char* server1,
