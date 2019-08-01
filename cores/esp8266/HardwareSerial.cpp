@@ -138,9 +138,9 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
 
     while (got < size)
     {
-        time_t startMillis = millis();
+        unsigned long startMillis = millis();
         size_t avail;
-        while ((avail = available()) == 0 && ((time_t) millis() - startMillis) < _timeout);
+        while ((avail = available()) == 0 && (millis() - startMillis) < _timeout);
         if (avail == 0)
             break;
         got += read(buffer + got, std::min(size - got, avail));
