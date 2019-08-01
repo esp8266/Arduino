@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-#include <PolledTimeout.h>
 #include "Arduino.h"
 #include "HardwareSerial.h"
 #include "Esp.h"
@@ -139,9 +138,9 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
 
     while (got < size)
     {
-        esp8266::polledTimeout::oneShotFastMs timeOut(_timeout);
+        time_t startMillis = millis();
         size_t avail;
-        while ((avail = available()) == 0 && !timeOut);
+        while ((avail = available()) == 0 && ((time_t) millis() - startMillis) < _timeout);
         if (avail == 0)
             break;
         got += read(buffer + got, std::min(size - got, avail));
