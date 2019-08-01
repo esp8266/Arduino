@@ -272,8 +272,8 @@ using std::max;
 using std::isinf;
 using std::isnan;
 
-#define _min(a,b) ((a)<(b)?(a):(b))
-#define _max(a,b) ((a)>(b)?(a):(b))
+#define _min(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a < _b? _a : _b; })
+#define _max(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a > _b? _a : _b; })
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
