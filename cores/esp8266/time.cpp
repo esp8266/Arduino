@@ -60,7 +60,7 @@ static void setServer(int id, const char* name_or_ip)
     }
 }
 
-
+extern "C++"
 void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
     sntp_stop();
@@ -71,6 +71,23 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
 
     sntp_set_timezone_in_seconds(timezone_sec);
     sntp_set_daylight(daylightOffset_sec);
+    sntp_init();
+}
+
+extern "C++"
+void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
+{
+    sntp_stop();
+
+    setServer(0, server1);
+    setServer(1, server2);
+    setServer(2, server3);
+
+    char tzram[strlen_P(tz) + 1];
+    memcpy_P(tzram, tz, sizeof(tzram));
+    setenv("TZ", tzram, 1/*overwrite*/);
+    tzset();
+
     sntp_init();
 }
 
