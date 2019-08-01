@@ -17,6 +17,7 @@ extern "C"
         run_scheduled_functions(SCHEDULE_FUNCTION_FROM_LOOP);
     }
 
+#ifdef ESP8266
     void __esp_yield();
 
     extern "C" void esp_yield()
@@ -24,6 +25,7 @@ extern "C"
         __esp_yield();
         run_scheduled_functions(SCHEDULE_FUNCTION_WITHOUT_YIELDELAYCALLS);
     }
+#endif
 }
 
 typedef std::function<bool(void)> mFuncT;
