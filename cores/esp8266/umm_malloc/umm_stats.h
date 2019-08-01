@@ -20,11 +20,11 @@ extern UMM_STATS ummStats;
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_min( void );
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void );
 
-size_t inline umm_get_max_alloc_size( void ) {
+inline size_t umm_get_max_alloc_size( void ) {
   return ummStats.alloc_max_size;
 }
 
-size_t inline umm_get_oom_count( void ) {
+inline size_t umm_get_oom_count( void ) {
   return ummStats.oom_count;
 }
 
