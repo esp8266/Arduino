@@ -142,17 +142,17 @@
                "systems": [
                   {
                      "host": "x86_64-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python-3.7.2.post1-embed-win32v2.zip",
-                     "archiveFileName": "python-3.7.2.post1-embed-win32v2.zip",
-                     "checksum": "SHA-256:26665d2925ee75118bb7d8620e9ee988adc2ca3e660a9f4c06a09a06c94c0c29",
-                     "size": "6431781"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python-3.7.2.post1-embed-win32v2a.zip",
+                     "archiveFileName": "python-3.7.2.post1-embed-win32v2a.zip",
+                     "checksum": "SHA-256:8eb71cd637c42abbeea9f31912bbaca22222405d8624ace8901c801519321d35",
+                     "size": "6481988"
                   },
                   {
                      "host": "i686-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python-3.7.2.post1-embed-win32v2.zip",
-                     "archiveFileName": "python-3.7.2.post1-embed-win32v2.zip",
-                     "checksum": "SHA-256:26665d2925ee75118bb7d8620e9ee988adc2ca3e660a9f4c06a09a06c94c0c29",
-                     "size": "6431781"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python-3.7.2.post1-embed-win32v2a.zip",
+                     "archiveFileName": "python-3.7.2.post1-embed-win32va2.zip",
+                     "checksum": "SHA-256:8eb71cd637c42abbeea9f31912bbaca22222405d8624ace8901c801519321d35",
+                     "size": "6481988"
                   },
                   {
                      "host": "aarch64-linux-gnu",
