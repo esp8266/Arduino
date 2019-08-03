@@ -78,19 +78,6 @@ static inline void _critical_exit(time_stat_t *p, uint32_t *saved_ps) {
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #endif
 
-// Use _UMM_MALLOC_CPP to limit access to umm_malloc.cpp module specific
-// definitions that are hardware and platform specific.
-#ifdef _UMM_MALLOC_CPP
-
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_ISR)
-#define printf(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
-#else
-// Macro to place constant strings into PROGMEM and print them properly
-#define printf(fmt, ...) printf(PSTR(fmt), ## __VA_ARGS__ )
-#endif
-
-#endif
-
 #ifdef __cplusplus
 }
 #endif

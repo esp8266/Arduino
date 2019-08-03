@@ -495,12 +495,18 @@
 #include <string.h>
 #include <pgmspace.h>
 
-#define _UMM_MALLOC_CPP
 #include "umm_malloc.h"
 
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
 extern "C" {
+
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_ISR)
+#define printf(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#else
+// Macro to place constant strings into PROGMEM and print them properly
+#define printf(fmt, ...) printf(PSTR(fmt), ## __VA_ARGS__ )
+#endif
 
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern void *umm_last_fail_alloc_addr;
