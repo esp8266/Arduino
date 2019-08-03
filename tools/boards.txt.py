@@ -1405,7 +1405,7 @@ def all_boards ():
 
         # standalone options
         if 'opts' in board:
-            for optname in board['opts']:
+            for optname in sorted(board['opts']):
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
