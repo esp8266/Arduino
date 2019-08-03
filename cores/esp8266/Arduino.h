@@ -282,6 +282,10 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 
 #include "pins_arduino.h"
 
+#ifndef PUYA_SUPPORT
+#define PUYA_SUPPORT 1
+#endif
+
 #endif
 
 #ifdef DEBUG_ESP_OOM

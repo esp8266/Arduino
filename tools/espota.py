@@ -81,6 +81,14 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     logging.error("Listen Failed")
     return 1
 
+  # Check whether Signed Update is used.
+  if ( os.path.isfile(filename + '.signed') ):
+    filename = filename + '.signed'
+    file_check_msg = 'Detected Signed Update. %s will be uploaded instead.' % (filename)
+    sys.stderr.write(file_check_msg + '\n')
+    sys.stderr.flush()
+    logging.info(file_check_msg)
+  
   content_size = os.path.getsize(filename)
   f = open(filename,'rb')
   file_md5 = hashlib.md5(f.read()).hexdigest()
