@@ -14,7 +14,7 @@ ESP8266_BASE      = $(ARDUINO_BASE)/hardware/esp8266com/esp8266
 ESP8266_TOOLS     = $(ESP8266_BASE)/tools
 XTENSA_TOOLS_ROOT = $(ESP8266_TOOLS)/xtensa-lx106-elf/bin
 
-PYTHON_BIN        = python
+PYTHON_BIN        = python3
 ESPTOOL_PY_BIN    = $(ESP8266_TOOLS)/esptool.py
 ESPOTA_PY_BIN     = $(ESP8266_TOOLS)/espota.py
 ESPTOOL_BIN       = $(ESP8266_TOOLS)/esptool/esptool.exe

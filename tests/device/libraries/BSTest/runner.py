@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-from __future__ import print_function
+#!/usr/bin/env python3
 import pexpect
 from pexpect import EOF, TIMEOUT, fdpexpect
 import sys

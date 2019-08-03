@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community

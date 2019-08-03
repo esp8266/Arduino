@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # This script will download and extract required tools into the current directory.
 # Tools list is obtained from package/package_esp8266com_index.template.json file.
 # Written by Ivan Grokhotkov, 2015.
 #
-from __future__ import print_function
 import os
 import shutil
 import errno
@@ -15,11 +14,7 @@ import sys
 import tarfile
 import zipfile
 import re
-if sys.version_info[0] == 3:
-    from urllib.request import urlretrieve
-else:
-    # Not Python 3 - today, it is most likely to be Python 2
-    from urllib import urlretrieve
+from urllib.request import urlretrieve
 
 dist_dir = 'dist/'
 
