@@ -1150,7 +1150,11 @@ bool HTTPClient::hasHeader(const char* name)
 bool HTTPClient::connect(void)
 {
     if(connected()) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
+        if(_reuse) {
+            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
+        } else {
+            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
+        }
         while(_client->available() > 0) {
             _client->read();
         }
@@ -1260,11 +1264,12 @@ int HTTPClient::handleHeaderResponse()
         return HTTPC_ERROR_NOT_CONNECTED;
     }
 
+    clear();
+
     _canReuse = !_useHTTP10;
 
     String transferEncoding;
-    _returnCode = -1;
-    _size = -1;
+
     _transferEncoding = HTTPC_TE_IDENTITY;
     unsigned long lastDataTime = millis();
 
