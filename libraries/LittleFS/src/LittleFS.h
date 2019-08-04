@@ -70,9 +70,9 @@ public:
         _lfs_cfg.read_size = 64;
         _lfs_cfg.prog_size = 64;
         _lfs_cfg.block_size =  _blockSize;
-        _lfs_cfg.block_count = _size / _blockSize;
-	_lfs_cfg.block_cycles = 16; // TODO - need better explanation
-	_lfs_cfg.cache_size = 64;
+        _lfs_cfg.block_count =_blockSize? _size / _blockSize: 0;
+        _lfs_cfg.block_cycles = 16; // TODO - need better explanation
+        _lfs_cfg.cache_size = 64;
         _lfs_cfg.lookahead_size = 64;
         _lfs_cfg.read_buffer = nullptr;
         _lfs_cfg.prog_buffer = nullptr;

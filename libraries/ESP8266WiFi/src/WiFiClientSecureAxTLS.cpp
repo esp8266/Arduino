@@ -473,7 +473,7 @@ extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
     }
     return cb;
 }
-extern "C" void ax_port_read() __attribute__ ((weak, alias("__ax_port_read")));
+extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) __attribute__ ((weak, alias("__ax_port_read")));
 
 extern "C" int __ax_port_write(int fd, uint8_t* buffer, size_t count)
 {
@@ -489,7 +489,7 @@ extern "C" int __ax_port_write(int fd, uint8_t* buffer, size_t count)
     }
     return cb;
 }
-extern "C" void ax_port_write() __attribute__ ((weak, alias("__ax_port_write")));
+extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) __attribute__ ((weak, alias("__ax_port_write")));
 
 extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
 {
@@ -497,7 +497,7 @@ extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
     *buf = 0;
     return 0;
 }
-extern "C" void ax_get_file() __attribute__ ((weak, alias("__ax_get_file")));
+extern "C" int ax_get_file(const char *filename, uint8_t **buf) __attribute__ ((weak, alias("__ax_get_file")));
 
 extern "C" void __ax_wdt_feed()
 {

@@ -654,6 +654,13 @@ extern "C" {
     if (!xc->done_cert) {
       br_sha1_update(&xc->sha1_cert, buf, len);
       br_x509_decoder_push(&xc->ctx, (const void*)buf, len);
+#ifdef DEBUG_ESP_SSL
+      DEBUG_BSSL("CERT: ");
+      for (size_t i=0; i<len; i++) {
+        DEBUG_ESP_PORT.printf_P(PSTR("%02x "), buf[i] & 0xff);
+      }
+      DEBUG_ESP_PORT.printf_P(PSTR("\n"));
+#endif
     }
   }
 
@@ -676,7 +683,24 @@ extern "C" {
     char res[20];
     br_sha1_out(&xc->sha1_cert, res);
     if (xc->match_fingerprint && memcmp(res, xc->match_fingerprint, sizeof(res))) {
+#ifdef DEBUG_ESP_SSL
       DEBUG_BSSL("insecure_end_chain: Received cert FP doesn't match\n");
+      char buff[3 * sizeof(res) + 1]; // 3 chars per byte XX_, and null
+      buff[0] = 0;
+      for (size_t i=0; i<sizeof(res); i++) {
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", xc->match_fingerprint[i] & 0xff);
+        strlcat(buff, hex, sizeof(buff));
+      }
+      DEBUG_BSSL("insecure_end_chain: expected %s\n", buff);
+      buff[0] =0;
+      for (size_t i=0; i<sizeof(res); i++) {
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", res[i] & 0xff);
+        strlcat(buff, hex, sizeof(buff));
+      }
+      DEBUG_BSSL("insecure_end_chain: received %s\n", buff);
+#endif
       return BR_ERR_X509_NOT_TRUSTED;
     }
 
