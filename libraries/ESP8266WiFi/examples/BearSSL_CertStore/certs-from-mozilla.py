@@ -7,12 +7,19 @@
 # and use them for your outgoing SSL connections.
 #
 # Script by Earle F. Philhower, III.  Released to the public domain.
-
+from __future__ import print_function
 import csv
 import os
+import sys
 from subprocess import Popen, PIPE, call
-from urllib.request import urlopen
-from io import StringIO
+try:
+    from urllib.request import urlopen
+except:
+    from urllib2 import urlopen
+try:
+    from StringIO import StringIO
+except:
+    from io import StringIO
 
 # Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
@@ -21,7 +28,9 @@ mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateRep
 names = []
 pems = []
 response = urlopen(mozurl)
-csvData = response.read().decode('utf-8')
+csvData = response.read()
+if sys.version_info[0] > 2:
+    csvData = csvData.decode('utf-8')
 csvFile = StringIO(csvData)
 csvReader = csv.reader(csvFile)
 for row in csvReader:

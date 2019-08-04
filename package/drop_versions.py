@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # This script drops one or multiple versions of a release
 #
+from __future__ import print_function
 import json
 import sys
 from collections import OrderedDict

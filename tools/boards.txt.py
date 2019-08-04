@@ -32,6 +32,7 @@
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
 #            lwip/lwip2                  menus for available lwip versions
 
+from __future__ import print_function
 import os
 import sys
 import collections
