@@ -135,6 +135,8 @@ public:
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
+  void sendContent(const char *content) { sendContent_P(content); }
+  void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
   static String credentialHash(const String& username, const String& realm, const String& password);
 
@@ -216,6 +218,7 @@ protected:
 
 
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
+using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
 
 
 #endif //ESP8266WEBSERVER_H

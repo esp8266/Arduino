@@ -1,7 +1,7 @@
 /* Flash Split for 16M chips */
 /* sketch @0x40200000 (~1019KB) (1044464B) */
 /* empty  @0x402FEFF0 (~4KB) (4112B) */
-/* spiffs @0x40300000 (~15340KB) (15708160B) */
+/* spiffs @0x40300000 (~15336KB) (15704064B) */
 /* eeprom @0x411FB000 (4KB) */
 /* rfcal  @0x411FC000 (4KB) */
 /* wifi   @0x411FD000 (12KB) */
@@ -15,7 +15,7 @@ MEMORY
 }
 
 PROVIDE ( _FS_start = 0x40300000 );
-PROVIDE ( _FS_end = 0x411FB000 );
+PROVIDE ( _FS_end = 0x411FA000 );
 PROVIDE ( _FS_page = 0x100 );
 PROVIDE ( _FS_block = 0x2000 );
 
