@@ -457,7 +457,9 @@ bool mount<FS>(FS& fs, const char* mountPoint) {
     entry->path = mountPoint;
     entry->next = s_mounted;
     s_mounted = entry;
+    printf("aaaaaaaaaaaaaaaaaaaaaaaa\n");
     return true;
+    
 }
 
 
