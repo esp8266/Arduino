@@ -48,9 +48,5 @@ String EspClass::getFullVersion()
              + F("/lwIP:")
 #if LWIP_IPV6
              + F("IPv6+")
-#endif // LWIP_IPV6
-             + F(LWIP_HASH_STR)
-#endif // LWIP_VERSION_MAJOR != 1
-             + FPSTR(bearssl_version)
-           ;
+
 }
