@@ -18,11 +18,6 @@ runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
 runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 
-compiler.warning_flags=-w
-compiler.warning_flags.none=-w
-compiler.warning_flags.default=
-compiler.warning_flags.more=-Wall
-compiler.warning_flags.all=-Wall -Wextra
 
 build.lwip_lib=-llwip_gcc
 build.lwip_include=lwip/include
