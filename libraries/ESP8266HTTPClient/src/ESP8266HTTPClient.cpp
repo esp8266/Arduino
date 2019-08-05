@@ -226,7 +226,7 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
     }
     _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
     if(!_transportTraits) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create trainsport traits\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
         return false;
     }
 
@@ -248,7 +248,7 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
     }
     _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
     if(!_transportTraits) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create trainsport traits\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
         return false;
     }
 
@@ -419,7 +419,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
  */
 void HTTPClient::end(void)
 {
-    disconnect();
+    disconnect(false);
     clear();
     _redirectCount = 0;
 }
@@ -991,7 +991,7 @@ int HTTPClient::writeToStream(Stream * stream)
         return returnError(HTTPC_ERROR_ENCODING);
     }
 
-    disconnect();
+    disconnect(true);
     return ret;
 }
 
@@ -1266,7 +1266,7 @@ int HTTPClient::handleHeaderResponse()
 
     clear();
 
-    _canReuse = !_useHTTP10;
+    _canReuse = _reuse;
 
     String transferEncoding;
 
@@ -1297,8 +1297,10 @@ int HTTPClient::handleHeaderResponse()
                     _size = headerValue.toInt();
                 }
 
-                if(headerName.equalsIgnoreCase("Connection")) {
-                    _canReuse = headerValue.equalsIgnoreCase("keep-alive");
+                if(_canReuse && headerName.equalsIgnoreCase("Connection")) {
+                    if(headerValue.indexOf("close") >= 0 && headerValue.indexOf("keep-alive") < 0) {
+                        _canReuse = false;
+                    }
                 }
 
                 if(headerName.equalsIgnoreCase("Transfer-Encoding")) {
