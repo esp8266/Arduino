@@ -217,7 +217,7 @@ protected:
     };
 
     bool beginInternal(String url, const char* expectedProtocol);
-    void disconnect(bool preserveClient); // Default value of 'false' removed, see discussion in https://github.com/esp8266/Arduino/pull/6176
+    void disconnect(bool preserveClient = false);
     void clear();
     int returnError(int error);
     bool connect(void);
