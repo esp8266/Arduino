@@ -1166,6 +1166,7 @@ bool HTTPClient::connect(void)
         _tcpDeprecated = _transportTraits->create();
         if(!_tcpDeprecated) {
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: could not create tcp\n");
+            return false;
         }
         _client = _tcpDeprecated.get();
     }
