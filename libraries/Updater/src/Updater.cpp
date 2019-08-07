@@ -1,6 +1,5 @@
 #include "Updater.h"
-#include "Arduino.h"
-#include "eboot_command.h"
+#include <eboot_command.h>
 #include <esp8266_peri.h>
 
 //#define DEBUG_UPDATER Serial
@@ -11,16 +10,16 @@
 #endif
 
 #if ARDUINO_SIGNING
-  #include "../../libraries/ESP8266WiFi/src/BearSSLHelpers.h"
+  #include "../../../libraries/ESP8266WiFi/src/BearSSLHelpers.h"
   static BearSSL::PublicKey signPubKey(signing_pubkey);
   static BearSSL::HashSHA256 hash;
   static BearSSL::SigningVerifier sign(&signPubKey);
 #endif
 
 extern "C" {
-    #include "c_types.h"
-    #include "spi_flash.h"
-    #include "user_interface.h"
+    #include <c_types.h>
+    #include <spi_flash.h>
+    #include <user_interface.h>
 }
 
 extern "C" uint32_t _FS_start;
