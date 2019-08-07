@@ -501,12 +501,12 @@
 
 extern "C" {
 
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_ISR)
-#define printf(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
-#else
-// Macro to place constant strings into PROGMEM and print them properly
-#define printf(fmt, ...) printf(PSTR(fmt), ## __VA_ARGS__ )
-#endif
+#undef memcpy
+#undef memmove
+#undef memset
+#define memcpy ets_memcpy
+#define memmove ets_memmove
+#define memset ets_memset
 
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern void *umm_last_fail_alloc_addr;
@@ -611,42 +611,42 @@ Changes for July 2019:
 /* ------------------------------------------------------------------------- */
 
 #if DBG_LOG_LEVEL >= 6
-#  define DBG_LOG_TRACE( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_TRACE( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_TRACE( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 5
-#  define DBG_LOG_DEBUG( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_DEBUG( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_DEBUG( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 4
-#  define DBG_LOG_CRITICAL( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_CRITICAL( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_CRITICAL( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 3
-#  define DBG_LOG_ERROR( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_ERROR( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_ERROR( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 2
-#  define DBG_LOG_WARNING( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_WARNING( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_WARNING( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 1
-#  define DBG_LOG_INFO( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_INFO( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_INFO( format, ... )
 #endif
 
-#define DBG_LOG_FORCE( force, format, ... ) {if(force) {printf( format, ## __VA_ARGS__  );}}
+#define DBG_LOG_FORCE( force, format, ... ) {if(force) {DBGLOG_FUNCTION( format, ## __VA_ARGS__  );}}
 
 /* }}} */
 
@@ -739,7 +739,7 @@ static int integrity_check(void) {
 
     /* Check that next free block number is valid */
     if (cur >= UMM_NUMBLOCKS) {
-      printf("heap integrity broken: too large next free num: %d "
+      DBGLOG_FUNCTION("heap integrity broken: too large next free num: %d "
           "(in block %d, addr 0x%lx)\n", cur, prev,
           (unsigned long)&UMM_NBLOCK(prev));
       ok = 0;
@@ -752,7 +752,7 @@ static int integrity_check(void) {
 
     /* Check if prev free block number matches */
     if (UMM_PFREE(cur) != prev) {
-      printf("heap integrity broken: free links don't match: "
+      DBGLOG_FUNCTION("heap integrity broken: free links don't match: "
           "%d -> %d, but %d -> %d\n",
           prev, cur, cur, UMM_PFREE(cur));
       ok = 0;
@@ -771,7 +771,7 @@ static int integrity_check(void) {
 
     /* Check that next block number is valid */
     if (cur >= UMM_NUMBLOCKS) {
-      printf("heap integrity broken: too large next block num: %d "
+      DBGLOG_FUNCTION("heap integrity broken: too large next block num: %d "
           "(in block %d, addr 0x%lx)\n", cur, prev,
           (unsigned long)&UMM_NBLOCK(prev));
       ok = 0;
@@ -786,7 +786,7 @@ static int integrity_check(void) {
     if ((UMM_NBLOCK(cur) & UMM_FREELIST_MASK)
         != (UMM_PBLOCK(cur) & UMM_FREELIST_MASK))
     {
-      printf("heap integrity broken: mask wrong at addr 0x%lx: n=0x%x, p=0x%x\n",
+      DBGLOG_FUNCTION("heap integrity broken: mask wrong at addr 0x%lx: n=0x%x, p=0x%x\n",
           (unsigned long)&UMM_NBLOCK(cur),
           (UMM_NBLOCK(cur) & UMM_FREELIST_MASK),
           (UMM_PBLOCK(cur) & UMM_FREELIST_MASK)
@@ -800,7 +800,7 @@ static int integrity_check(void) {
 
     /* Check if prev block number matches */
     if (UMM_PBLOCK(cur) != prev) {
-      printf("heap integrity broken: block links don't match: "
+      DBGLOG_FUNCTION("heap integrity broken: block links don't match: "
           "%d -> %d, but %d -> %d\n",
           prev, cur, cur, UMM_PBLOCK(cur));
       ok = 0;
@@ -846,7 +846,7 @@ clean:
  */
 static void dump_mem ( const unsigned char *ptr, size_t len ) {
   while (len--) {
-    printf(" 0x%.2x", (unsigned int)(*ptr++));
+    DBGLOG_FUNCTION(" 0x%.2x", (unsigned int)(*ptr++));
   }
 }
 
@@ -877,11 +877,11 @@ static int check_poison( const unsigned char *ptr, size_t poison_size,
   }
 
   if (!ok) {
-    printf("there is no poison %s the block. "
+    DBGLOG_FUNCTION("there is no poison %s the block. "
         "Expected poison address: 0x%lx, actual data:",
         where, (unsigned long)ptr);
     dump_mem(ptr, poison_size);
-    printf("\n");
+    DBGLOG_FUNCTION("\n");
   }
 
   return ok;
@@ -895,7 +895,7 @@ static int check_poison_block( umm_block *pblock ) {
   int ok = 1;
 
   if (pblock->header.used.next & UMM_FREELIST_MASK) {
-    printf("check_poison_block is called for free block 0x%lx\n",
+    DBGLOG_FUNCTION("check_poison_block is called for free block 0x%lx\n",
         (unsigned long)pblock);
   } else {
     /* the block is used; let's check poison */
@@ -904,7 +904,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE);
     if (!check_poison(pc_cur, UMM_POISON_SIZE_BEFORE, "before")) {
-      printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
+      DBGLOG_FUNCTION("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;
@@ -912,7 +912,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + *((UMM_POISONED_BLOCK_LEN_TYPE *)pc) - UMM_POISON_SIZE_AFTER;
     if (!check_poison(pc_cur, UMM_POISON_SIZE_AFTER, "after")) {
-	  printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
+      DBGLOG_FUNCTION("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;

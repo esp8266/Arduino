@@ -18,6 +18,17 @@ extern "C" {
 #include "umm_performance.h"
 #include "umm_stats.h"
 
+#undef DBGLOG_FUNCTION
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_ISR)
+int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+// Note, _isr_safe_printf_P will not handle additional string arguments in
+// PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
+#define DBGLOG_FUNCTION(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#else
+// Macro to place constant strings into PROGMEM and print them properly
+#define DBGLOG_FUNCTION(fmt, ...) printf(PSTR(fmt), ## __VA_ARGS__ )
+#endif
+
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.
