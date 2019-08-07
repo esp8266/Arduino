@@ -172,6 +172,8 @@ class UpdaterClass {
       return written;
     }
 
+    bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
+
   private:
     void _reset();
     bool _writeBuffer();

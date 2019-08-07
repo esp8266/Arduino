@@ -264,7 +264,6 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 
 #include "HardwareSerial.h"
 #include "Esp.h"
-#include "Updater.h"
 #include "debug.h"
 
 using std::min;

@@ -534,41 +534,6 @@ uint32_t EspClass::getFreeSketchSpace() {
     return freeSpaceEnd - freeSpaceStart;
 }
 
-bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool restartOnSuccess) {
-  if(!Update.begin(size)){
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print("Update ");
-    Update.printError(DEBUG_SERIAL);
-#endif
-    if(restartOnFail) ESP.restart();
-    return false;
-  }
-
-  if(Update.writeStream(in) != size){
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print("Update ");
-    Update.printError(DEBUG_SERIAL);
-#endif
-    if(restartOnFail) ESP.restart();
-    return false;
-  }
-
-  if(!Update.end()){
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print("Update ");
-    Update.printError(DEBUG_SERIAL);
-#endif
-    if(restartOnFail) ESP.restart();
-    return false;
-  }
-
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.println("Update SUCCESS");
-#endif
-    if(restartOnSuccess) ESP.restart();
-    return true;
-}
-
 static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
 
 bool EspClass::flashEraseSector(uint32_t sector) {

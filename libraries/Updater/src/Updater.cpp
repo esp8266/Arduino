@@ -525,4 +525,39 @@ void UpdaterClass::printError(Print &out){
   }
 }
 
+bool UpdaterClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool restartOnSuccess) {
+  if(!begin(size)){
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.print("Update ");
+    printError(DEBUG_SERIAL);
+#endif
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
+
+  if(writeStream(in) != size){
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.print("Update ");
+    printError(DEBUG_SERIAL);
+#endif
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
+
+  if(!end()){
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.print("Update ");
+    printError(DEBUG_SERIAL);
+#endif
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("Update SUCCESS");
+#endif
+    if(restartOnSuccess) ESP.restart();
+    return true;
+}
+
 UpdaterClass Update;

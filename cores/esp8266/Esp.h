@@ -192,7 +192,6 @@ class EspClass {
         uint32_t getSketchSize();
         String getSketchMD5();
         uint32_t getFreeSketchSpace();
-        bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
 
         String getResetReason();
         String getResetInfo();
