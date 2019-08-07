@@ -240,8 +240,10 @@ $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
 ARDUINO_LIBS := \
 	$(addprefix $(CORE_PATH)/,\
 		IPAddress.cpp \
-		Updater.cpp \
 		base64.cpp \
+	) \
+	$(addprefix ../../libraries/Updater/src/,\
+		Updater.cpp \
 	) \
 	$(addprefix ../../libraries/ESP8266WiFi/src/,\
 		ESP8266WiFi.cpp \
