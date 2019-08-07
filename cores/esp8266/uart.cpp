@@ -42,7 +42,7 @@
  */
 #include "Arduino.h"
 #include <pgmspace.h>
-#include "../../libraries/GDBStub/src/GDBStub.h"
+#include "gdb_hooks.h"
 #include "uart.h"
 #include "esp8266_peri.h"
 #include "user_interface.h"
