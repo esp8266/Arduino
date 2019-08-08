@@ -20,6 +20,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "BearSSLHelpers.h"
 #include <memory>
 #include <vector>
 #include <bearssl/bearssl.h>
@@ -28,7 +29,10 @@
 #include <string.h>
 #include <Arduino.h>
 #include <StackThunk.h>
-#include "BearSSLHelpers.h"
+#include <Updater_Signing.h>
+#ifndef ARDUINO_SIGNING
+  #define ARDUINO_SIGNING 0
+#endif
 
 namespace brssl {
   // Code here is pulled from brssl sources, with the copyright and license
@@ -901,13 +905,12 @@ make_stack_thunk(br_ssl_engine_sendrec_buf);
 #endif
 
 #if ARDUINO_SIGNING
-namespace {
-  static PublicKey signPubKey(signing_pubkey);
-  static HashSHA256 __hash;
-  static SigningVerifier __sign(&signPubKey);
-}
-extern UpdaterHashClass& hash = __hash;
-extern UpdaterVerifyClass& sign = __sign;
+static PublicKey signPubKey(signing_pubkey);
+static HashSHA256 __hash;
+static SigningVerifier __sign(&signPubKey);
+
+UpdaterHashClass& hash = __hash;
+UpdaterVerifyClass& sign = __sign;
 #endif
 
 };

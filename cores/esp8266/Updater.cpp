@@ -10,8 +10,10 @@
 #endif
 
 #if ARDUINO_SIGNING
+namespace BearSSL {
   extern UpdaterHashClass& hash;
   extern UpdaterVerifyClass& sign;
+}
 #endif
 
 extern "C" {
@@ -36,7 +38,7 @@ UpdaterClass::UpdaterClass()
 , _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
-  installSignature(&hash, &sign);
+  installSignature(&BearSSL::hash, &BearSSL::sign);
 #endif
 }
 
