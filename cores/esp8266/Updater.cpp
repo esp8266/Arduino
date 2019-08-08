@@ -10,7 +10,7 @@
 #endif
 
 #if ARDUINO_SIGNING
-namespace BearSSL {
+namespace esp8266 {
   extern UpdaterHashClass& hash;
   extern UpdaterVerifyClass& sign;
 }
@@ -38,7 +38,7 @@ UpdaterClass::UpdaterClass()
 , _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
-  installSignature(&BearSSL::hash, &BearSSL::sign);
+  installSignature(&esp8266::hash, &esp8266::sign);
 #endif
 }
 
