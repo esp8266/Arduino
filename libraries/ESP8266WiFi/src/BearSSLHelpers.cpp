@@ -900,4 +900,14 @@ make_stack_thunk(br_ssl_engine_sendrec_buf);
 
 #endif
 
+#if ARDUINO_SIGNING
+namespace {
+  static PublicKey signPubKey(signing_pubkey);
+  static HashSHA256 __hash;
+  static SigningVerifier __sign(&signPubKey);
+}
+extern UpdaterHashClass& hash = __hash;
+extern UpdaterVerifyClass& sign = __sign;
+#endif
+
 };

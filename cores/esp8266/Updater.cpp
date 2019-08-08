@@ -1,5 +1,4 @@
 #include "Updater.h"
-#include "Arduino.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
 
@@ -11,10 +10,8 @@
 #endif
 
 #if ARDUINO_SIGNING
-  #include "../../libraries/ESP8266WiFi/src/BearSSLHelpers.h"
-  static BearSSL::PublicKey signPubKey(signing_pubkey);
-  static BearSSL::HashSHA256 hash;
-  static BearSSL::SigningVerifier sign(&signPubKey);
+  extern UpdaterHashClass& hash;
+  extern UpdaterVerifyClass& sign;
 #endif
 
 extern "C" {
