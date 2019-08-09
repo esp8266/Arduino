@@ -558,7 +558,7 @@ void HTTPClient::setRedirectLimit(uint16_t limit)
 
 /**
  * use HTTP1.0
- * @param timeout
+ * @param useHTTP10 bool
  */
 void HTTPClient::useHTTP10(bool useHTTP10)
 {
