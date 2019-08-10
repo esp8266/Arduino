@@ -32,6 +32,7 @@ class MessageData : public TimeTracker {
 
 public:
 
+  MessageData(String &message, uint8_t transmissionsRemaining, uint32_t creationTimeMs = millis());
   MessageData(uint8_t *initialTransmission, uint8_t transmissionLength, uint32_t creationTimeMs = millis());
   /**
    * @transmission A string of characters, including initial protocol bytes.

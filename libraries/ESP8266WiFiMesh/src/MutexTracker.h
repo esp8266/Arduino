@@ -63,7 +63,7 @@ class MutexTracker
     /**
      * Attempt to capture the mutex.
      * 
-     * @returns True if mutex was caught (meaning no other instance is holding the mutex). False otherwise.
+     * @return True if mutex was caught (meaning no other instance is holding the mutex). False otherwise.
      */
     bool attemptMutexCapture(bool &mutexToCapture);
 };

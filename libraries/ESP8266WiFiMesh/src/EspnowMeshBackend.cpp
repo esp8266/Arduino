@@ -35,6 +35,8 @@ static const uint8_t maxEncryptedConnections = 6; // This is limited by the ESP-
 
 static const uint64_t uint64MSB = 0x8000000000000000;
 
+const uint8_t EspnowMeshBackend::broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 bool EspnowMeshBackend::_espnowTransmissionMutex = false;
 
 EspnowMeshBackend *EspnowMeshBackend::_espnowRequestManager = nullptr;
@@ -51,7 +53,7 @@ std::vector<EncryptedConnectionLog> EspnowMeshBackend::encryptedConnections = {}
 uint32_t EspnowMeshBackend::_espnowTransmissionTimeoutMs = 40;
 uint32_t EspnowMeshBackend::_espnowRetransmissionIntervalMs = 15; 
 
-uint32_t EspnowMeshBackend::_encryptionRequestTimeoutMs = 500;
+uint32_t EspnowMeshBackend::_encryptionRequestTimeoutMs = 300;
 
 bool EspnowMeshBackend::_espnowSendConfirmed = false;
 
@@ -69,7 +71,7 @@ uint32_t EspnowMeshBackend::_unencryptedMessageID = 0;
 // which takes 2000 ms + some margin to send. Also, we want to avoid old entries taking up memory if they cannot be sent, 
 // so storage duration should not be too long.
 uint32_t EspnowMeshBackend::_logEntryLifetimeMs = 2500;
-uint32_t EspnowMeshBackend::_responseTimeoutMs = 5000;
+uint32_t EspnowMeshBackend::_broadcastResponseTimeoutMs = 1000; // This is shorter than _logEntryLifetimeMs to preserve RAM since broadcasts are not deleted from sentRequests until they expire.
 uint32_t EspnowMeshBackend::_timeOfLastLogClear = 0;
 uint32_t EspnowMeshBackend::_criticalHeapLevel = 6000; // In bytes
 uint32_t EspnowMeshBackend::_criticalHeapLevelBuffer = 6000; // In bytes
@@ -95,15 +97,16 @@ void espnowDelay(uint32_t durationMs)
   }
 }
 
-EspnowMeshBackend::EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, 
-                                     networkFilterType networkFilter, const String &meshPassword, const uint8_t espnowEncryptionKey[espnowEncryptionKeyLength],
+EspnowMeshBackend::EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
+                                     broadcastFilterType broadcastFilter, const String &meshPassword, const uint8_t espnowEncryptionKey[espnowEncryptionKeyLength],
                                      const uint8_t espnowHashKey[espnowHashKeyLength], const String &ssidPrefix, const String &ssidSuffix, bool verboseMode,
                                      uint8 meshWiFiChannel) 
                                      : MeshBackendBase(requestHandler, responseHandler, networkFilter, MB_ESP_NOW)
 {
   // Reserve the maximum possible usage early on to prevent heap fragmentation later.
   encryptedConnections.reserve(maxEncryptedConnections);
-  
+
+  setBroadcastFilter(broadcastFilter);
   setSSID(ssidPrefix, "", ssidSuffix);
   setMeshPassword(meshPassword);
   setEspnowEncryptionKey(espnowEncryptionKey);
@@ -206,7 +209,7 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
     //Serial.print("Received from Mac: " + macToString(macaddr) + " ID: " + uint64ToString(receivedMessageID));
     //Serial.println(transmissionEncrypted ? " Encrypted" : " Unencrypted");
 
-    if(messageType == 'Q') // Question (request)
+    if(messageType == 'Q' || messageType == 'B') // Question (request) or Broadcast
     {
       if(ESP.getFreeHeap() <= criticalHeapLevel())
       {
@@ -215,7 +218,7 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
       }
 
       if(currentEspnowRequestManager)
-      {
+      {        
         if(!requestReceived(uint64StationMac, receivedMessageID)) // If the request has not already been received
         {
           if(transmissionEncrypted)
@@ -262,6 +265,12 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
           requestMac = uint64StationMac;
           requestSender = getOwnerOfSentRequest(requestMac, receivedMessageID);
         }
+
+        // Or if it was sent as a broadcast. (A broadcast can never be encrypted)
+        if(!requestSender)
+        {
+          requestSender = getOwnerOfSentRequest(uint64BroadcastMac, receivedMessageID);
+        }
       }
 
       // If this node sent the request and it has not already been answered.
@@ -286,7 +295,7 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
     }
     else
     {
-      assert(messageType == 'Q' || messageType == 'A' || messageType == 'S' || messageType == 'P' || messageType == 'C');
+      assert(messageType == 'Q' || messageType == 'A' || messageType == 'B' || messageType == 'S' || messageType == 'P' || messageType == 'C');
     }
 
     //Serial.println("espnowReceiveCallbackWrapper duration " + String(millis() - callbackStart));
@@ -497,8 +506,9 @@ bool EspnowMeshBackend::activateEspnow()
     
     esp_now_register_recv_cb(espnowReceiveCallbackWrapper);
     esp_now_register_send_cb([](uint8_t* mac, uint8_t sendStatus) {
-      (void)mac; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
-      if(!sendStatus) // sendStatus == 0 when send was OK.
+      if(_espnowSendConfirmed)
+        return;
+      else if(!sendStatus && macEqual(mac, _transmissionTargetBSSID)) // sendStatus == 0 when send was OK.
         _espnowSendConfirmed = true; // We do not want to reset this to false. That only happens before transmissions. Otherwise subsequent failed send attempts may obscure an initial successful one.
     });
 
@@ -546,9 +556,9 @@ uint32_t EspnowMeshBackend::logEntryLifetimeMs()
   return _logEntryLifetimeMs;
 }
 
-uint32_t EspnowMeshBackend::responseTimeoutMs()
+uint32_t EspnowMeshBackend::broadcastResponseTimeoutMs()
 {
-  return _responseTimeoutMs;
+  return _broadcastResponseTimeoutMs;
 }
 
 void EspnowMeshBackend::setCriticalHeapLevelBuffer(uint32_t bufferInBytes)
@@ -568,6 +578,24 @@ void EspnowMeshBackend::deleteExpiredLogEntries(std::map<std::pair<U, uint64_t>,
       entryIterator != logEntries.end(); )
   {
     if(entryIterator->second.timeSinceCreation() > maxEntryLifetimeMs)
+    {
+      entryIterator = logEntries.erase(entryIterator);
+    }
+    else
+      ++entryIterator;
+  }
+}
+
+void EspnowMeshBackend::deleteExpiredLogEntries(std::map<std::pair<peerMac_td, messageID_td>, RequestData> &logEntries, uint32_t requestLifetimeMs, uint32_t broadcastLifetimeMs)
+{
+  for(typename std::map<std::pair<peerMac_td, messageID_td>, RequestData>::iterator entryIterator = logEntries.begin(); 
+      entryIterator != logEntries.end(); )
+  {
+    bool broadcast = entryIterator->first.first == uint64BroadcastMac;
+    uint32_t timeSinceCreation = entryIterator->second.timeSinceCreation();
+    
+    if((!broadcast && timeSinceCreation > requestLifetimeMs) 
+        || (broadcast && timeSinceCreation > broadcastLifetimeMs))
     {
       entryIterator = logEntries.erase(entryIterator);
     }
@@ -633,7 +661,7 @@ void EspnowMeshBackend::clearOldLogEntries()
   
   deleteExpiredLogEntries(receivedEspnowTransmissions, logEntryLifetimeMs());
   deleteExpiredLogEntries(receivedRequests, logEntryLifetimeMs()); // Just needs to be long enough to not accept repeated transmissions by mistake.
-  deleteExpiredLogEntries(sentRequests, logEntryLifetimeMs());
+  deleteExpiredLogEntries(sentRequests, logEntryLifetimeMs(), broadcastResponseTimeoutMs());
   deleteExpiredLogEntries(responsesToSend, logEntryLifetimeMs());
   deleteExpiredLogEntries(peerRequestConfirmationsToSend, getEncryptionRequestTimeout());
 }
@@ -747,6 +775,9 @@ void EspnowMeshBackend::setAutoEncryptionDuration(uint32_t duration)
 }
 uint32_t EspnowMeshBackend::getAutoEncryptionDuration() {return _autoEncryptionDuration;}
 
+void EspnowMeshBackend::setBroadcastFilter(broadcastFilterType broadcastFilter) {_broadcastFilter = broadcastFilter;}
+EspnowMeshBackend::broadcastFilterType EspnowMeshBackend::getBroadcastFilter() {return _broadcastFilter;}
+
 bool EspnowMeshBackend::usesConstantSessionKey(char messageType)
 {
   return messageType == 'A' || messageType == 'C';
@@ -781,7 +812,6 @@ transmission_status_t EspnowMeshBackend::espnowSendToNode(const String &message,
   }
 }
 
-static const uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; // Saved for future use. TODO
 transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const String message, const uint8_t *targetBSSID, char messageType, uint64_t messageID, EspnowMeshBackend *espnowInstance)
 {
   using namespace EspnowProtocolInterpreter;
@@ -810,7 +840,7 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
   // We thus prefer to keep the code simple and performant instead.
   // Very large messages can always be split by the user as required. 
   assert(transmissionsRequired <= getMaxTransmissionsPerMessage());
-  assert(messageType == 'Q' || messageType == 'A' || messageType == 'S' || messageType == 'P' || messageType == 'C');
+  assert(messageType == 'Q' || messageType == 'A' || messageType == 'B' || messageType == 'S' || messageType == 'P' || messageType == 'C');
   if(messageType == 'P' || messageType == 'C')
   {
     assert(transmissionsRequired == 1); // These messages are assumed to be contained in one message by the receive callbacks.
@@ -824,9 +854,9 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
   {
     ////// Manage logs //////
     
-    if(transmissionsRemaining == 0 && messageType == 'Q')
+    if(transmissionsRemaining == 0 && (messageType == 'Q' || messageType == 'B'))
     {
-      assert(espnowInstance); // espnowInstance required when transmitting 'Q' type messages.
+      assert(espnowInstance); // espnowInstance required when transmitting 'Q' and 'B' type messages.
       // If we are sending the last transmission of a request we should store the sent request in the log no matter if we receive an ack for the final transmission or not.
       // That way we will always be ready to receive the response to the request when there is a chance the request message was transmitted successfully, 
       // even if the final ack for the request message was lost.
@@ -1000,8 +1030,27 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
 
   if(espnowIsMessageStart(dataArray))
   {
-    // Does nothing if key already in receivedEspnowTransmissions
-    receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(dataArray, len)));
+    if(messageType == 'B')
+    {
+      String message = espnowGetMessageContent(dataArray, len);
+      setSenderMac(macaddr);
+      setReceivedEncryptedMessage(usesEncryption(messageID));
+      bool acceptBroadcast = getBroadcastFilter()(message, *this);
+      if(acceptBroadcast)
+      {
+        // Does nothing if key already in receivedEspnowTransmissions
+        receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(message, espnowGetTransmissionsRemaining(dataArray))));
+      }
+      else
+      {
+        return;
+      }
+    }
+    else
+    {  
+      // Does nothing if key already in receivedEspnowTransmissions
+      receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(dataArray, len)));
+    }
   }
   else
   {
@@ -1038,7 +1087,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
 
   std::map<std::pair<macAndType_td, messageID_td>, MessageData>::iterator storedMessageIterator = receivedEspnowTransmissions.find(std::make_pair(macAndType, messageID));
   assert(storedMessageIterator != receivedEspnowTransmissions.end());
- 
+
   // Copy totalMessage in case user callbacks (request/responseHandler) do something odd with receivedEspnowTransmissions list.
   String totalMessage = storedMessageIterator->second.getTotalMessage(); // https://stackoverflow.com/questions/134731/returning-a-const-reference-to-an-object-instead-of-a-copy It is likely that most compilers will perform Named Value Return Value Optimisation in this case
   
@@ -1046,7 +1095,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
    
   //Serial.println("methodStart erase done " + String(millis() - methodStart));
   
-  if(messageType == 'Q') // Question (request)
+  if(messageType == 'Q' || messageType == 'B') // Question (request) or Broadcast
   {
     storeReceivedRequest(uint64Mac, messageID, TimeTracker(millis()));
     //Serial.println("methodStart request stored " + String(millis() - methodStart));
@@ -1082,7 +1131,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
   }
   else
   {
-    assert(messageType == 'Q' || messageType == 'A');
+    assert(messageType == 'Q' || messageType == 'A' || messageType == 'B');
   }
   
   ESP.wdtFeed(); // Prevents WDT reset in case we receive a lot of transmissions without break.
@@ -1286,7 +1335,7 @@ encrypted_connection_status_t EspnowMeshBackend::addEncryptedConnection(uint8_t 
     // No capacity for more encrypted connections.
     return ECS_MAX_CONNECTIONS_REACHED_SELF;
   }
-  // int esp_now_add_peer(u8 *mac_addr, u8 role, u8 channel, u8 *key, u8 key_len), returns 0 on success
+  // returns 0 on success: int esp_now_add_peer(u8 *mac_addr, u8 role, u8 channel, u8 *key, u8 key_len)
   // Only MAC, encryption key and key length (16) actually matter. The rest is not used by ESP-NOW.
   else if(0 == esp_now_add_peer(peerStaMac, ESP_NOW_ROLE_CONTROLLER, getWiFiChannel(), getEspnowEncryptionKey(encryptionKeyArray), espnowEncryptionKeyLength))
   {
@@ -1932,7 +1981,7 @@ void EspnowMeshBackend::attemptTransmission(const String &message, bool scan, bo
   }
 }
 
-void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, bool scan, bool scanAllWiFiChannels)
+void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool createPermanentConnections)
 {
   MutexTracker outerMutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
   if(!outerMutexTracker.mutexCaptured())
@@ -1990,7 +2039,10 @@ void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message,
 
     innerMutexTracker.releaseMutex();
 
-    connectionStatus = requestFlexibleTemporaryEncryptedConnection(currentBSSID, getAutoEncryptionDuration());
+    if(createPermanentConnections)
+      connectionStatus = requestEncryptedConnection(currentBSSID);
+    else
+      connectionStatus = requestFlexibleTemporaryEncryptedConnection(currentBSSID, getAutoEncryptionDuration());
 
     innerMutexTracker = MutexTracker(_espnowTransmissionMutex);
     if(!innerMutexTracker.mutexCaptured())
@@ -2023,7 +2075,7 @@ void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message,
       latestTransmissionOutcomes.push_back(TransmissionResult{.origin = currentNetwork, .transmissionStatus = TS_CONNECTION_FAILED});
     }
 
-    if(!encryptedConnection)
+    if(!encryptedConnection && !createPermanentConnections)
     {
       // Remove any connection that was added during the transmission attempt.
       removeEncryptedConnectionUnprotected(currentBSSID);
@@ -2039,6 +2091,18 @@ void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message,
   {
     verboseModePrint("No successful transmission.");
   }
+}
+
+void EspnowMeshBackend::broadcast(const String &message)
+{  
+  MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
+  if(!mutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! Transmission in progress. Don't call broadcast from callbacks as this may corrupt program state! Aborting."); 
+    return;
+  }
+
+  espnowSendToNode(message, broadcastMac, 'B', this);
 }
 
 void EspnowMeshBackend::sendEspnowResponses()

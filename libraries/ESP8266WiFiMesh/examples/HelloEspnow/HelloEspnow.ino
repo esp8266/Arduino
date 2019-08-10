@@ -14,7 +14,7 @@
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter function below.
+const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes during ESP-NOW broadcasts and in the example networkFilter function below.
 const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
@@ -35,16 +35,17 @@ unsigned int responseNumber = 0;
 String manageRequest(const String &request, MeshBackendBase &meshInstance);
 transmission_status_t manageResponse(const String &response, MeshBackendBase &meshInstance);
 void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
+bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
 
 /* Create the mesh node object */
-EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, FPSTR(exampleWiFiPassword), espnowEncryptionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, broadcastFilter, FPSTR(exampleWiFiPassword), espnowEncryptionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
 
 /**
    Callback for when other nodes send you a request
 
    @param request The request string received from another node in the mesh
    @param meshInstance The MeshBackendBase instance that called the function.
-   @returns The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
+   @return The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
 */
 String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // We do not store strings in flash (via F()) in this function.
@@ -78,7 +79,7 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
 
    @param response The response string received from another node in the mesh
    @param meshInstance The MeshBackendBase instance that called the function.
-   @returns The status code resulting from the response, as an int
+   @return The status code resulting from the response, as an int
 */
 transmission_status_t manageResponse(const String &response, MeshBackendBase &meshInstance) {
   transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
@@ -132,6 +133,42 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
   }
 }
 
+const char broadcastMetadataDelimiter = 23; // 23 = End-of-Transmission-Block (ETB) control character in ASCII
+
+/**
+   Callback used to decide which broadcast messages to accept. Only called for the first transmission in each broadcast.
+   If true is returned from this callback, the first broadcast transmission is saved until the entire broadcast message has been received.
+   The complete broadcast message will then be sent to the requestHandler (manageRequest in this example).
+   If false is returned from this callback, the broadcast message is discarded.
+
+   @param firstTransmission The first transmission of the broadcast.
+   @param meshInstance The EspnowMeshBackend instance that called the function.
+
+   @return True if the broadcast should be accepted. False otherwise.
+*/
+bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance) {
+  /**
+     This example broadcastFilter will accept a transmission if it contains the broadcastMetadataDelimiter
+     and as metaData either no targetMeshName or a targetMeshName that matches the MeshName of meshInstance.
+  */
+
+  int32_t metadataEndIndex = firstTransmission.indexOf(broadcastMetadataDelimiter);
+
+  if (metadataEndIndex == -1) {
+    return false;  // broadcastMetadataDelimiter not found
+  }
+
+  String targetMeshName = firstTransmission.substring(0, metadataEndIndex);
+
+  if (targetMeshName != "" && meshInstance.getMeshName() != targetMeshName) {
+    return false; // Broadcast is for another mesh network
+  } else {
+    // Remove metadata from message and mark as accepted broadcast.
+    firstTransmission = firstTransmission.substring(metadataEndIndex + 1);
+    return true;
+  }
+}
+
 void setup() {
   // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 .
   // This will however delay node WiFi start-up by about 700 ms. The delay is 900 ms if we otherwise would have stored the WiFi network we want to connect to.
@@ -173,6 +210,7 @@ void setup() {
 
   // Storing our message in the EspnowMeshBackend instance is not required, but can be useful for organizing code, especially when using many EspnowMeshBackend instances.
   // Note that calling espnowNode.attemptTransmission will replace the stored message with whatever message is transmitted.
+  // Also note that the maximum allowed number of ASCII characters in a ESP-NOW message is given by EspnowMeshBackend::getMaxMessageLength().
   espnowNode.setMessage(String(F("Hello world request #")) + String(requestNumber) + String(F(" from ")) + espnowNode.getMeshName() + espnowNode.getNodeID() + String(F(".")));
 }
 
@@ -188,17 +226,17 @@ void loop() {
   EspnowMeshBackend::performEspnowMaintainance();
 
   if (millis() - timeOfLastScan > 10000) { // Give other nodes some time to connect between data transfers.
-    uint32_t startTime = millis();
-
     Serial.println("\nPerforming unencrypted ESP-NOW transmissions.");
+
+    uint32_t startTime = millis();
     espnowNode.attemptTransmission(espnowNode.getMessage());
     Serial.println("Scan and " + String(MeshBackendBase::latestTransmissionOutcomes.size()) + " transmissions done in " + String(millis() - startTime) + " ms.");
+
+    timeOfLastScan = millis();
 
     // Wait for response. espnowDelay continuously calls performEspnowMaintainance() so we will respond to ESP-NOW request while waiting.
     // Should not be used inside responseHandler, requestHandler or networkFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
     espnowDelay(100);
-
-    timeOfLastScan = millis();
 
     // One way to check how attemptTransmission worked out
     if (MeshBackendBase::latestTransmissionSuccessful()) {
@@ -221,6 +259,20 @@ void loop() {
           assert(F("Invalid transmission status returned from responseHandler!") && false);
         }
       }
+
+      Serial.println("\nPerforming ESP-NOW broadcast.");
+
+      startTime = millis();
+
+      // Remove espnowNode.getMeshName() from the broadcastMetadata below to broadcast to all ESP-NOW nodes regardless of MeshName.
+      // Note that data that comes before broadcastMetadataDelimiter should not contain any broadcastMetadataDelimiter characters,
+      // otherwise the broadcastFilter function used in this example file will not work.
+      String broadcastMetadata = espnowNode.getMeshName() + String(broadcastMetadataDelimiter);
+      String broadcastMessage = String(F("Broadcast #")) + String(requestNumber) + String(F(" from ")) + espnowNode.getMeshName() + espnowNode.getNodeID() + String(F("."));
+      espnowNode.broadcast(broadcastMetadata + broadcastMessage);
+      Serial.println("Broadcast to all mesh nodes done in " + String(millis() - startTime) + " ms.");
+
+      espnowDelay(100); // Wait for responses (broadcasts can receive an unlimited number of responses, other transmissions can only receive one response).
 
       Serial.println("\nPerforming encrypted ESP-NOW transmissions.");
 
@@ -287,6 +339,7 @@ void loop() {
 
           // Or if we prefer we can just let the library automatically create brief encrypted connections which are long enough to transmit an encrypted message.
           // Note that encrypted responses will not be received, unless there already was an encrypted connection established with the peer before attemptAutoEncryptingTransmission was called.
+          // This can be remedied via the createPermanentConnections argument, though it must be noted that the maximum number of encrypted connections supported at a time is 6.
           espnowMessage = "This message is always encrypted, regardless of receiver.";
           Serial.println("\nTransmitting: " + espnowMessage);
           espnowNode.attemptAutoEncryptingTransmission(espnowMessage);

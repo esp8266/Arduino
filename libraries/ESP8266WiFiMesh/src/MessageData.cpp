@@ -27,7 +27,16 @@
 #include "EspnowMeshBackend.h"
 #include <assert.h>
 
-MessageData::MessageData(uint8_t *initialTransmission, uint8_t transmissionLength,uint32_t creationTimeMs) :
+MessageData::MessageData(String &message, uint8_t transmissionsRemaining, uint32_t creationTimeMs) :
+  TimeTracker(creationTimeMs)
+{
+  _transmissionsExpected = transmissionsRemaining + 1;
+  assert(message.length() <= EspnowMeshBackend::getMaxMessageBytesPerTransmission()); // Should catch some cases where transmission is not null terminated.
+  _totalMessage += message;
+  _transmissionsReceived++;
+}
+
+MessageData::MessageData(uint8_t *initialTransmission, uint8_t transmissionLength, uint32_t creationTimeMs) :
   TimeTracker(creationTimeMs)
 {
   _transmissionsExpected = EspnowProtocolInterpreter::espnowGetTransmissionsRemaining(initialTransmission) + 1;

@@ -110,7 +110,8 @@ public:
    * If multiple APs exist on a single ESP8266, each requires a separate server port. 
    * If two AP:s on the same ESP8266 are using the same server port, they will not be able to have both server instances active at the same time.                  
    * This is managed automatically by the activateAP method.
-   * Will also change the setting for the active AP if this TcpIpMeshBackend instance is the current AP controller.
+   * Will also change the setting for the active AP (via an AP restart)
+   * if this TcpIpMeshBackend instance is the current AP controller.
    *                    
    * @param serverPort The server port to use.
    *                    
@@ -123,7 +124,8 @@ public:
    * This number is 4 by default.
    * Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects.
    * The more stations that are connected, the more memory is required.
-   * Will also change the setting for the active AP if this TcpIpMeshBackend instance is the current AP controller.
+   * Will also change the setting for the active AP (via an AP restart)
+   * if this TcpIpMeshBackend instance is the current AP controller.
    *
    * @param maxAPStations The maximum number of simultaneous station connections allowed. Valid values are 0 to 8.
    */
@@ -153,7 +155,8 @@ public:
    * Set the timeout to use for transmissions when this TcpIpMeshBackend instance acts as an AP (i.e. when receiving connections from other stations).
    * This will affect the timeout of the acceptRequest method.
    * The timeout is 4 500 ms by default.
-   * Will also change the setting for the active AP if this TcpIpMeshBackend instance is the current AP controller.
+   * Will also change the setting for the active AP (without an AP restart)
+   * if this TcpIpMeshBackend instance is the current AP controller.
    *
    * @param apModeTimeoutMs The timeout to use, in milliseconds.
    */
@@ -182,7 +185,7 @@ protected:
   /**
    * Check if there is an ongoing TCP/IP transmission in the library. Used to avoid interrupting transmissions.
    * 
-   * @returns True if a transmission initiated by a public method is in progress.
+   * @return True if a transmission initiated by a public method is in progress.
    */
   static bool transmissionInProgress();
 

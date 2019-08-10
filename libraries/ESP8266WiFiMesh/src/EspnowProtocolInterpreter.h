@@ -52,7 +52,7 @@ namespace EspnowProtocolInterpreter
   const uint8_t espnowTransmissionsRemainingIndex = 1;
   const uint8_t espnowTransmissionMacIndex = 2;
   const uint8_t espnowMessageIDIndex = 8;
-  
+
   uint8_t espnowProtocolBytesSize();
 
   const uint8_t espnowEncryptionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.

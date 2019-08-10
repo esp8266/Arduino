@@ -134,6 +134,8 @@ void MeshBackendBase::setSSID(const String &newSSIDPrefix, const String &newSSID
 
   String newSSID = _SSIDPrefix + _SSIDRoot + _SSIDSuffix;
 
+  assert(newSSID.length() <= 31);
+
   if(getSSID() != newSSID)
   {
     _SSID = newSSID;

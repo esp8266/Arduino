@@ -62,7 +62,7 @@ namespace JsonTranslator
    * @param valueIdentifier The identifier to search for.
    * @param searchStartIndex Optional argument that makes it possible to decide at which index of jsonString the search starts. Search will begin at index 0 if not provided.
    *          
-   * @returns An int32_t containing the index within jsonString where the value of valueIdentifier starts, or a negative value if valueIdentifier was not found.
+   * @return An int32_t containing the index within jsonString where the value of valueIdentifier starts, or a negative value if valueIdentifier was not found.
    */
   int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, int32_t searchStartIndex = 0);
   
@@ -72,7 +72,7 @@ namespace JsonTranslator
    * @param jsonString The String to search within.
    * @param searchStartIndex The index of jsonString where the search will start.
    *          
-   * @returns An int32_t containing the index within jsonString where the next JSON termination character is found, or a negative value if no such character was found.
+   * @return An int32_t containing the index within jsonString where the next JSON termination character is found, or a negative value if no such character was found.
    */
   int32_t getEndIndex(const String &jsonString, int32_t searchStartIndex);
   
@@ -83,7 +83,7 @@ namespace JsonTranslator
    * @param jsonString The String to search within.
    * @param result The String where the value should be stored.
    * 
-   * @returns True if a value was found. False otherwise.
+   * @return True if a value was found. False otherwise.
    */
   bool getPassword(const String &jsonString, String &result);
   bool getOwnSessionKey(const String &jsonString, uint64_t &result);
@@ -96,7 +96,7 @@ namespace JsonTranslator
    * @param jsonString The String to search within.
    * @param resultArray The uint8_t array where the value should be stored. Must be at least 6 bytes.
    * 
-   * @returns True if a value was found. False otherwise.
+   * @return True if a value was found. False otherwise.
    */
   bool getPeerStaMac(const String &jsonString, uint8_t *resultArray);
   bool getPeerApMac(const String &jsonString, uint8_t *resultArray);

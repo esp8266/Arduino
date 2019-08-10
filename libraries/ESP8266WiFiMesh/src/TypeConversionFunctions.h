@@ -37,7 +37,7 @@
  * 
  * @param number The number to convert to a string with radix "base".
  * @param base The radix to convert "number" into. Must be between 2 and 36.
- * @returns A string of "number" encoded in radix "base".
+ * @return A string of "number" encoded in radix "base".
  */
 String uint64ToString(uint64_t number, byte base = 16);
 
@@ -46,7 +46,7 @@ String uint64ToString(uint64_t number, byte base = 16);
  * 
  * @param string The string to convert to uint64_t. String must use radix "base".
  * @param base The radix of "string". Must be between 2 and 36.
- * @returns A uint64_t of the string, using radix "base" during decoding.
+ * @return A uint64_t of the string, using radix "base" during decoding.
  */
 uint64_t stringToUint64(const String &string, byte base = 16);
 
@@ -60,7 +60,7 @@ uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, uin
  * Takes a uint8_t array and converts the first 6 bytes to a hexadecimal string.
  * 
  * @param mac A uint8_t array with the mac address to convert to a string. Should be 6 bytes in total.
- * @returns A hexadecimal string representation of the mac.
+ * @return A hexadecimal string representation of the mac.
  */
 String macToString(const uint8_t *mac);
 
@@ -69,7 +69,7 @@ String macToString(const uint8_t *mac);
  * 
  * @param macString A String which begins with the mac address to store in the array as a hexadecimal number.
  * @param macArray A uint8_t array that will hold the mac address once the function returns. Should have a size of at least 6 bytes.
- * @returns The macArray.
+ * @return The macArray.
  */
 uint8_t *stringToMac(const String &macString, uint8_t *macArray);
 
@@ -77,7 +77,7 @@ uint8_t *stringToMac(const String &macString, uint8_t *macArray);
  * Takes a uint8_t array and converts the first 6 bytes to a uint64_t. Assumes index 0 of the array contains MSB.
  * 
  * @param macArray A uint8_t array with the mac address to convert to a uint64_t. Should be 6 bytes in total.
- * @returns A uint64_t representation of the mac.
+ * @return A uint64_t representation of the mac.
  */
 uint64_t macToUint64(const uint8_t *macArray);
 
@@ -86,7 +86,7 @@ uint64_t macToUint64(const uint8_t *macArray);
  * 
  * @param macValue The uint64_t value to convert to a mac array. Value must fit within 6 bytes.
  * @param macArray A uint8_t array that will hold the mac address once the function returns. Should have a size of at least 6 bytes.
- * @returns The macArray.
+ * @return The macArray.
  */
 uint8_t *uint64ToMac(uint64_t macValue, uint8_t *macArray);
 
@@ -95,7 +95,7 @@ uint8_t *uint64ToMac(uint64_t macValue, uint8_t *macArray);
  * 
  * @param T The MeshBackend class pointer type to cast the meshBackendBaseInstance pointer into.
  * @param meshBackendBaseInstance The instance pointer to cast.
- * @returns A pointer of type T to meshBackendBaseInstance if meshBackendBaseInstance is of type T. nullptr otherwise.
+ * @return A pointer of type T to meshBackendBaseInstance if meshBackendBaseInstance is of type T. nullptr otherwise.
  */
 template <typename T>
 T meshBackendCast(MeshBackendBase *meshBackendBaseInstance)

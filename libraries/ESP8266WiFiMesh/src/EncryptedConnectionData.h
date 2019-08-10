@@ -48,7 +48,7 @@ public:
   /**
    * @param resultArray An uint8_t array with at least size 6.
    * 
-   * @returns The interface MAC used for communicating with the peer.
+   * @return The interface MAC used for communicating with the peer.
    */
   uint8_t *getEncryptedPeerMac(uint8_t *resultArray) const;
   uint8_t *getUnencryptedPeerMac(uint8_t *resultArray) const;

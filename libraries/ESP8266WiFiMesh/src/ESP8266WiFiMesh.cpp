@@ -337,7 +337,7 @@ void ESP8266WiFiMesh::fullStop(WiFiClient &currClient)
 /**
  * Wait for a WiFiClient to transmit
  *
- * @returns: True if the client is ready, false otherwise.
+ * @return: True if the client is ready, false otherwise.
  * 
  */
 bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait)
@@ -365,7 +365,7 @@ bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient &currClient, uint32_t
  * and pass that to the user-supplied responseHandler.
  *
  * @param currClient The client to which the message should be transmitted.
- * @returns: A status code based on the outcome of the exchange.
+ * @return: A status code based on the outcome of the exchange.
  * 
  */
 transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
@@ -398,7 +398,7 @@ transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
 /**
  * Handle data transfer process with a connected AP.
  *
- * @returns: A status code based on the outcome of the data transfer attempt.
+ * @return: A status code based on the outcome of the data transfer attempt.
  */
 transmission_status_t ESP8266WiFiMesh::attemptDataTransfer()
 {
@@ -418,7 +418,7 @@ transmission_status_t ESP8266WiFiMesh::attemptDataTransfer()
 /**
  * Helper function that contains the core functionality for the data transfer process with a connected AP.
  *
- * @returns: A status code based on the outcome of the data transfer attempt.
+ * @return: A status code based on the outcome of the data transfer attempt.
  */
 transmission_status_t ESP8266WiFiMesh::attemptDataTransferKernel()
 {
@@ -462,7 +462,7 @@ void ESP8266WiFiMesh::initiateConnectionToAP(const String &targetSSID, int targe
  * @param targetSSID The name of the AP the other node has set up.
  * @param targetChannel The WiFI channel of the AP the other node has set up.
  * @param targetBSSID The mac address of the AP the other node has set up.
- * @returns: A status code based on the outcome of the connection and data transfer process.
+ * @return: A status code based on the outcome of the connection and data transfer process.
  * 
  */
 transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)

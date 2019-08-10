@@ -194,7 +194,7 @@ public:
   static std::vector<TransmissionResult> latestTransmissionOutcomes;
 
   /**
-   * @returns True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
    */
   static bool latestTransmissionSuccessful();
 
@@ -217,7 +217,7 @@ public:
    * If another instance takes control over the AP after the pointer is created,
    * the created pointer will still point to the old AP instance.
    * 
-   * @returns A pointer to the ESP8266WiFiMesh instance currently in control of the ESP8266 AP,
+   * @return A pointer to the ESP8266WiFiMesh instance currently in control of the ESP8266 AP,
    *          or nullptr if there is no active AP controller.
    */
   static ESP8266WiFiMesh * getAPController();
@@ -225,7 +225,7 @@ public:
   /**
    * Check if this ESP8266WiFiMesh instance is in control of the ESP8266 AP.
    * 
-   * @returns True if this ESP8266WiFiMesh instance is in control of the ESP8266 AP. False otherwise.
+   * @return True if this ESP8266WiFiMesh instance is in control of the ESP8266 AP. False otherwise.
    */
   bool isAPController();
 

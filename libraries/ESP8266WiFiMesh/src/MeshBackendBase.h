@@ -61,7 +61,7 @@ public:
   static std::vector<TransmissionResult> latestTransmissionOutcomes;
 
   /**
-   * @returns True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
    */
   static bool latestTransmissionSuccessful();
 
@@ -84,7 +84,7 @@ public:
    * If another instance takes control over the AP after the pointer is created,
    * the created pointer will still point to the old AP instance.
    * 
-   * @returns A pointer to the MeshBackendBase instance currently in control of the ESP8266 AP,
+   * @return A pointer to the MeshBackendBase instance currently in control of the ESP8266 AP,
    *          or nullptr if there is no active AP controller.
    */
   static MeshBackendBase *getAPController();
@@ -92,13 +92,14 @@ public:
   /**
    * Check if this MeshBackendBase instance is in control of the ESP8266 AP.
    * 
-   * @returns True if this MeshBackendBase instance is in control of the ESP8266 AP. False otherwise.
+   * @return True if this MeshBackendBase instance is in control of the ESP8266 AP. False otherwise.
    */
   bool isAPController();
 
   /**
    * Change the WiFi channel used by this MeshBackendBase instance. 
-   * Will also change the WiFi channel for the active AP if this MeshBackendBase instance is the current AP controller and it is possible to change channel.
+   * Will also change the WiFi channel for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller and it is possible to change channel.
    * 
    * WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
    * This can cause problems if several MeshBackendBase instances exist on the same ESP8266 and use different WiFi channels. 
@@ -114,7 +115,9 @@ public:
 
   /**
    * Change the SSID used by this MeshBackendBase instance. 
-   * Will also change the SSID for the active AP if this MeshBackendBase instance is the current AP controller.
+   * The SSID can be at most 31 characters long.
+   * Will also change the SSID for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
    *
    * @param newSSIDPrefix The first part of the new SSID.
    * @param newSSIDRoot The middle part of the new SSID.
@@ -126,7 +129,8 @@ public:
 
   /**
    * Change the first part of the SSID used by this MeshBackendBase instance. 
-   * Will also change the first part of the SSID for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the first part of the SSID for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
    *
    * @param newSSIDPrefix The new first part of the SSID.
    */  
@@ -135,7 +139,8 @@ public:
 
   /**
    * Change the middle part of the SSID used by this MeshBackendBase instance. 
-   * Will also change the middle part of the SSID for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the middle part of the SSID for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
    *
    * @param newSSIDPrefix The new middle part of the SSID.
    */
@@ -144,7 +149,8 @@ public:
 
   /**
    * Change the last part of the SSID used by this MeshBackendBase instance. 
-   * Will also change the last part of the SSID for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the last part of the SSID for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
    *
    * @param newSSIDSuffix The new last part of the SSID.
    */  
@@ -153,7 +159,9 @@ public:
 
   /**
    * Change the mesh name used by this MeshBackendBase instance.
-   * Will also change the mesh name for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the mesh name for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
+   * 
    * Used as alias for setSSIDPrefix by default. Feel free to override this method in a subclass if your mesh name is not equal to SSIDPrefix.
    *
    * @param newMeshName The mesh name to change to.                        
@@ -163,7 +171,9 @@ public:
       
   /**
    * Change the node id used by this MeshBackendBase instance. 
-   * Will also change the node id for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the node id for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
+   * 
    * Used as alias for setSSIDSuffix by default. Feel free to override this method in a subclass if your node id is not equal to SSIDSuffix.
    *
    * @param newNodeID The node id to change to.                        
@@ -173,7 +183,8 @@ public:
 
   /**
    * Set the password used when connecting to other AP:s and when other nodes connect to the AP of this node.
-   * Will also change the setting for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the setting for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
    * 
    * @param newMeshPassword The password to use.
    */
@@ -213,7 +224,8 @@ public:
   /**
    * Set whether the AP controlled by this MeshBackendBase instance will have a WiFi network with hidden SSID.
    * This is false by default.
-   * Will also change the setting for the active AP if this MeshBackendBase instance is the current AP controller.
+   * Will also change the setting for the active AP (via an AP restart)
+   * if this MeshBackendBase instance is the current AP controller.
    *
    * @param apHidden If true, the WiFi network created will have a hidden SSID.
    */

@@ -166,7 +166,7 @@ void TcpIpMeshBackend::fullStop(WiFiClient &currClient)
 /**
  * Wait for a WiFiClient to transmit
  *
- * @returns: True if the client is ready, false otherwise.
+ * @return True if the client is ready, false otherwise.
  * 
  */
 bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait)
@@ -194,7 +194,7 @@ bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, uint32_
  * and pass that to the user-supplied responseHandler.
  *
  * @param currClient The client to which the message should be transmitted.
- * @returns: A status code based on the outcome of the exchange.
+ * @return A status code based on the outcome of the exchange.
  * 
  */
 transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
@@ -227,7 +227,7 @@ transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
 /**
  * Handle data transfer process with a connected AP.
  *
- * @returns: A status code based on the outcome of the data transfer attempt.
+ * @return A status code based on the outcome of the data transfer attempt.
  */
 transmission_status_t TcpIpMeshBackend::attemptDataTransfer()
 {
@@ -247,7 +247,7 @@ transmission_status_t TcpIpMeshBackend::attemptDataTransfer()
 /**
  * Helper function that contains the core functionality for the data transfer process with a connected AP.
  *
- * @returns: A status code based on the outcome of the data transfer attempt.
+ * @return A status code based on the outcome of the data transfer attempt.
  */
 transmission_status_t TcpIpMeshBackend::attemptDataTransferKernel()
 {
@@ -291,7 +291,7 @@ void TcpIpMeshBackend::initiateConnectionToAP(const String &targetSSID, int targ
  * @param targetSSID The name of the AP the other node has set up.
  * @param targetChannel The WiFI channel of the AP the other node has set up.
  * @param targetBSSID The MAC address of the AP the other node has set up.
- * @returns: A status code based on the outcome of the connection and data transfer process.
+ * @return A status code based on the outcome of the connection and data transfer process.
  * 
  */
 transmission_status_t TcpIpMeshBackend::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
