@@ -729,6 +729,7 @@ const String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const in
     case 415: return F("Unsupported Media Type");
     case 416: return F("Requested range not satisfiable");
     case 417: return F("Expectation Failed");
+    case 418: return F("I'm a teapot");
     case 500: return F("Internal Server Error");
     case 501: return F("Not Implemented");
     case 502: return F("Bad Gateway");
