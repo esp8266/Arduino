@@ -229,7 +229,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
 
     struct dhcps_lease dhcp_lease;
     IPAddress ip = local_ip;
-    ip[3] += 99;
+    ip[3] += 1;
     dhcp_lease.start_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP start: %s\n", ip.toString().c_str());
 
