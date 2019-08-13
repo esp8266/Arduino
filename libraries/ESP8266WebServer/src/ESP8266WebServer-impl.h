@@ -480,6 +480,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
+  if (_currentMethod == HTTP_HEAD) return;
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
