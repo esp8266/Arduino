@@ -194,8 +194,10 @@ bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& passphrase, in
  * @param local_ip      access point IP
  * @param gateway       gateway IP (0.0.0.0 to disable)
  * @param subnet        subnet mask
+ * @param dhcp_start    first IP assigned by DHCP
+ * @param dhcp_end      last IP assigned by DHCP
  */
-bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
+bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dhcp_start, IPAddress dhcp_end) {
     DEBUG_WIFI("[APConfig] local_ip: %s gateway: %s subnet: %s\n", local_ip.toString().c_str(), gateway.toString().c_str(), subnet.toString().c_str());
     if(!WiFi.enableAP(true)) {
         // enable AP failed
@@ -214,10 +216,24 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         return false;
     }
     struct ip_info info;
+	
     info.ip.addr = local_ip.v4();
     info.gw.addr = gateway.v4();
     info.netmask.addr = subnet.v4();
-
+	
+    uint32_t softap_ip = htonl(info.ip.addr);
+    uint32_t start_ip = htonl(dhcp_start.v4());
+    uint32_t end_ip = htonl(dhcp_end.v4());
+    softap_ip >>= 8;
+    if (( start_ip >> 8 != softap_ip ) || ( end_ip >> 8 != softap_ip )) {
+        DEBUG_WIFI("[APConfig] dhcp_start or dhcp_end isn't in range of local_ip Address!\n");
+        DEBUG_WIFI("[APConfig] set dfault vaule\n");
+        dhcp_start = local_ip;
+        dhcp_start[3] += 99;
+        dhcp_end = dhcp_start;
+        dhcp_end[3] += 100;
+    }
+	
     if(!wifi_softap_dhcps_stop()) {
         DEBUG_WIFI("[APConfig] wifi_softap_dhcps_stop failed!\n");
     }
@@ -228,14 +244,12 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     }
 
     struct dhcps_lease dhcp_lease;
-    IPAddress ip = local_ip;
-    ip[3] += 99;
-    dhcp_lease.start_ip.addr = ip.v4();
-    DEBUG_WIFI("[APConfig] DHCP IP start: %s\n", ip.toString().c_str());
+    dhcp_lease.enable = true;
+    dhcp_lease.start_ip.addr = dhcp_start.v4();
+    DEBUG_WIFI("[APConfig] DHCP IP start: %s\n", dhcp_start.toString().c_str());
 
-    ip[3] += 100;
-    dhcp_lease.end_ip.addr = ip.v4();
-    DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
+    dhcp_lease.end_ip.addr = dhcp_end.v4();
+    DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", dhcp_end.toString().c_str());
 
     if(!wifi_softap_set_dhcps_lease(&dhcp_lease)) {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
@@ -265,7 +279,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
             DEBUG_WIFI("[APConfig] IP config Invalid?!\n");
             ret = false;
         } else if(local_ip.v4() != info.ip.addr) {
-            ip = info.ip.addr;
+            IPAddress ip = info.ip.addr;
             DEBUG_WIFI("[APConfig] IP config not set correct?! new IP: %s\n", ip.toString().c_str());
             ret = false;
         }
@@ -277,7 +291,24 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     return ret;
 }
 
+/**
+ * Configure access point
+ * @param local_ip      access point IP
+ * @param gateway       gateway IP
+ * @param subnet        subnet mask
+ */
+bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
+    IPAddress dhcp_start;
+    IPAddress dhcp_end;
 
+    dhcp_start = local_ip;
+    dhcp_start[3] += 99;
+    dhcp_end = dhcp_start;
+    dhcp_end[3] += 100;
+
+    bool ret = softAPConfig(local_ip, gateway, subnet, dhcp_start, dhcp_end);
+    return ret;
+}
 
 /**
  * Disconnect from the network (close AP)
