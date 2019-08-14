@@ -25,7 +25,6 @@
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiAP.h"
-#include "utility/util.h"
 
 extern "C" {
 #include "c_types.h"
@@ -38,7 +37,12 @@ extern "C" {
 
 #include "debug.h"
 
-
+#ifndef htonl
+#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | \
+                   ((x)<< 8 & 0x00FF0000UL) | \
+                   ((x)>> 8 & 0x0000FF00UL) | \
+                   ((x)>>24 & 0x000000FFUL) )
+#endif
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
