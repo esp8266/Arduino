@@ -83,8 +83,8 @@ void setup() {
   WiFi.softAP(ssid, password);
 
   /* Setup your static leases.
-      As it depend from your first address, and need to be done BEFORE any request from client,
-     this need to be specified after WiFi.softAPConfig() and before WiFi.softAP().
+     As it depend from your first address, and need to be done BEFORE any request from client,
+     this need to be specified after WiFi.softAP().
      first call to wifi_softap_add_dhcps_lease() will setup first IP address of the range
      second call to wifi_softap_add_dhcps_lease() will setup second IP address of the range
      ...
