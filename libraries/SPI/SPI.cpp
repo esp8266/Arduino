@@ -307,26 +307,32 @@ uint8_t SPIClass::transfer(uint8_t data) {
 }
 
 uint16_t SPIClass::transfer16(uint16_t data) {
-    union {
-            uint16_t val;
-            struct {
-                    uint8_t lsb;
-                    uint8_t msb;
-            };
-    } in, out;
-    in.val = data;
+    while (SPI1CMD & SPIBUSY) {}
+    // Set to 16Bits transfer
+    setDataBits(16);
 
-    if((SPI1C & (SPICWBO | SPICRBO))) {
-        //LSBFIRST
-        out.lsb = transfer(in.lsb);
-        out.msb = transfer(in.msb);
-    } else {
-        //MSBFIRST
-        out.msb = transfer(in.msb);
-        out.lsb = transfer(in.lsb);
-    }
-    return out.val;
+    const bool isBigEndian = !(SPI1C & (SPICWBO | SPICRBO));
+
+    // Change byte order for MSBFIRST
+    if (isBigEndian)
+        SPI1W0 = (data >> 8) | (data << 8);
+    else
+        SPI1W0 = data;
+
+    // Start the transmission
+    SPI1CMD |= SPIBUSY;
+    // Wait for transmission to complete
+    while (SPI1CMD & SPIBUSY) {}
+    data = SPI1W0;
+
+    // Change byte order for MSBFIRST
+    if (isBigEndian)
+        return (data >> 8) | (data << 8);
+
+    // If !isBigEndian, return the normal data.
+    return data;
 }
+
 
 void SPIClass::transfer(void *buf, uint16_t count) {
     uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
