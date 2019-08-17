@@ -99,7 +99,9 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   _chunked = false;
 
   HTTPMethod method = HTTP_GET;
-  if (methodStr == F("POST")) {
+  if (methodStr == F("HEAD")) {
+    method = HTTP_HEAD;
+  } else if (methodStr == F("POST")) {
     method = HTTP_POST;
   } else if (methodStr == F("DELETE")) {
     method = HTTP_DELETE;
