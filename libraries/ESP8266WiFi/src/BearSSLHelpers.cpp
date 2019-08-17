@@ -908,14 +908,14 @@ make_stack_thunk(br_ssl_engine_sendrec_buf);
 
 #if ARDUINO_SIGNING
 namespace {
-  static BearSSL::PublicKey signPubKey(signing_pubkey);
-  static BearSSL::HashSHA256 __hash;
-  static BearSSL::SigningVerifier __sign(&signPubKey);
+  static BearSSL::PublicKey signingPubKey(signing_pubkey);
+  static BearSSL::HashSHA256 __signingHash;
+  static BearSSL::SigningVerifier __signingVerifier(&signingPubKey);
 };
 
 namespace esp8266 {
-  UpdaterHashClass& hash = __hash;
-  UpdaterVerifyClass& sign = __sign;
+  UpdaterHashClass& updaterSigningHash = __signingHash;
+  UpdaterVerifyClass& updaterSigningVerifier = __signingVerifier;
 };
 #endif
 

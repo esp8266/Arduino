@@ -11,8 +11,8 @@
 
 #if ARDUINO_SIGNING
 namespace esp8266 {
-  extern UpdaterHashClass& hash;
-  extern UpdaterVerifyClass& sign;
+  extern UpdaterHashClass& updaterSigningHash;
+  extern UpdaterVerifyClass& updaterSigningVerifier;
 }
 #endif
 
@@ -38,7 +38,7 @@ UpdaterClass::UpdaterClass()
 , _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
-  installSignature(&esp8266::hash, &esp8266::sign);
+  installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
 #endif
 }
 
