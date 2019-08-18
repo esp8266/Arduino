@@ -1769,7 +1769,7 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     UMM_CRITICAL_ENTRY(id_realloc);
   }
 
-  // Now calculate the block size again...and we'll have three cases /
+  /* Now calculate the block size again...and we'll have three cases */
 
   blockSize = (UMM_NBLOCK(c) - c);
 
