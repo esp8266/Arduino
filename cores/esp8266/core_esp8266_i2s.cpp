@@ -507,7 +507,6 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
   }
 
-  _i2s_sample_rate = 0;
   if (!i2s_slc_begin()) {
     // OOM in SLC memory allocations, tear it all down and abort!
     i2s_end();
@@ -530,7 +529,13 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
   // I2STXCMM, I2SRXCMM=0 => Dual channel mode
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); // Set RX/TX CHAN_MOD=0
 
-  i2s_set_rate(44100);
+  // Ensure a sane clock is set, but don't change any pre-existing ones.
+  // But we also need to make sure the other bits weren't reset by a previous
+  // reset.  So, store the present one, clear the flag, then set the same
+  // value (writing all needed config bits in the process
+  uint32_t save_rate = _i2s_sample_rate;
+  _i2s_sample_rate  = 0;
+   i2s_set_rate(save_rate ? save_rate : 44100);
 
   if (rx) {
     // Need to prime the # of samples to receive in the engine
