@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include <gdb_hooks.h>
 #include "internal/gdbstub-cfg.h"
 
 #ifdef __cplusplus

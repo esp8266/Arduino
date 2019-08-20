@@ -287,6 +287,7 @@ MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	MockEsp.cpp \
 	MockEEPROM.cpp \
 	MockSPI.cpp \
+	strl.cpp \
 )
 
 CPP_SOURCES_CORE_EMU = \

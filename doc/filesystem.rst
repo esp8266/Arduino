@@ -413,6 +413,31 @@ rename
 Renames file from ``pathFrom`` to ``pathTo``. Paths must be absolute.
 Returns *true* if file was renamed successfully.
 
+gc
+~~
+
+.. code:: cpp
+
+    SPIFFS.gc()
+
+Only implemented in SPIFFS.  Performs a quick garbage collection operation on SPIFFS,
+possibly making writes perform faster/better in the future.  On very full or very fragmented
+filesystems, using this call can avoid or reduce issues where SPIFFS reports free space
+but is unable to write additional data to a file.  See `this discussion
+<https://github.com/esp8266/Arduino/pull/6340#discussion_r307042268>` for more info.
+
+check
+~~~~~
+
+.. code:: cpp
+
+    SPIFFS.begin();
+    SPIFFS.check();
+
+Only implemented in SPIFFS.  Performs an in-depth check of the filesystem metadata and
+correct what is repairable.  Not normally needed, and not guaranteed to actually fix
+anything should there be corruption.
+
 info
 ~~~~
 

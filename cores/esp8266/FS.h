@@ -240,7 +240,9 @@ public:
     bool rmdir(const char* path);
     bool rmdir(const String& path);
 
+    // Low-level FS routines, not needed by most applications
     bool gc();
+    bool check();
 
     void setTimeCallback(time_t (*cb)(void));
 

@@ -30,7 +30,7 @@
 #include <FS.h>
 #include "detail/mimetable.h"
 
-enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
+enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
                         UPLOAD_FILE_ABORTED };
 enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
@@ -135,6 +135,8 @@ public:
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
+  void sendContent(const char *content) { sendContent_P(content); }
+  void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
   static String credentialHash(const String& username, const String& realm, const String& password);
 
@@ -192,10 +194,10 @@ protected:
   std::unique_ptr<HTTPUpload> _currentUpload;
   int              _postArgsLen;
   RequestArgument* _postArgs;
-    
+
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
- 
+
   size_t           _contentLength;
   String           _responseHeaders;
 
@@ -216,6 +218,7 @@ protected:
 
 
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
+using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
 
 
 #endif //ESP8266WEBSERVER_H
