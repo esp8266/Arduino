@@ -10,18 +10,18 @@ might get expensive.
 
 ## Acknowledgements
 
-Joerg Wunsch and the avr-libc provided the first malloc() implementation
+Joerg Wunsch and the avr-libc provided the first `malloc()` implementation
 that I examined in detail.
 
-http://www.nongnu.org/avr-libc
+`http://www.nongnu.org/avr-libc`
 
 Doug Lea's paper on malloc() was another excellent reference and provides
 a lot of detail on advanced memory management techniques such as binning.
 
-http://g.oswego.edu/dl/html/malloc.html
+`http://g.oswego.edu/dl/html/malloc.html`
 
 Bill Dittman provided excellent suggestions, including macros to support
-using these functions in critical sections, and for optimizing realloc()
+using these functions in critical sections, and for optimizing `realloc()`
 further by checking to see if the previous block was free and could be 
 used for the new block size. This can help to reduce heap fragmentation
 significantly. 
@@ -30,11 +30,73 @@ Yaniv Ankin suggested that a way to dump the current heap condition
 might be useful. I combined this with an idea from plarroy to also
 allow checking a free pointer to make sure it's valid.
 
+Dimitry Frank contributed many helpful additions to make things more
+robust including a user specified config file and a method of testing
+the integrity of the data structures.
+
+## Usage
+
+Copy the `umm_malloc_cfg_example.h` file to `umm_malloc_cfg.h` and
+make the changes required to support your application.
+
+The following `#define`s must be set to something useful for the
+library to work at all
+
+- `UMM_MALLOC_CFG_HEAP_ADDR` must be set to the symbol representing
+  the starting address of the heap. The heap must be
+  aligned on the natural boundary size of the processor.
+- `UMM_MALLOC_CFG_HEAP_SIZE` must be set to the size of the heap.
+  The heap size must be a multiple of the natural boundary size of
+  the processor.
+
+The fit algorithm is defined as either:
+
+- `UMM_BEST_FIT` which scans the entire free list and looks
+   for either an exact fit or the smallest block that will
+   satisfy the request. This is the default fit method.
+- `UMM_FIRST_FIT` which scans the entire free list and looks
+   for the first block that satisfies the request.
+
+The following `#define`s are disabled by default and should
+remain disabled for production use. They are helpful when 
+testing allocation errors (which are normally due to bugs in
+the application code) or for running the test suite when
+making changes to the code.
+
+You can define them in your compiler command line or uncomment
+the corresponding entries is `umm_malloc_cfg.h`:
+
+- `UMM_INFO` is used to include code that allows dumping
+  the entire heap structure (helpful when there's a problem).
+
+- `UMM_INTEGRITY_CHECK` is used to include code that
+  performs an integrity check on the heap structure. It's
+  up to you to call the `umm_integrity_check()` function.
+
+- `UMM_POISON_CHECK` is used to include code that
+  adds some bytes around the memory being allocated that
+  are filled with known data. If the data is not intact
+  when the block is checked, then somone has written outside
+  of the memory block they have been allocated. It is up
+  to you to call the `umm_poison_check()` function.
+
+## API
+
+The following functions are available for your application:
+
+- `void *umm_malloc( size_t size );`
+- `void *umm_calloc( size_t num, size_t size );`
+- `void *umm_realloc( void *ptr, size_t size );`
+- `void  umm_free( void *ptr );`
+
+They have exactly the same semantics as the corresponding standard library
+functions.
+ 
 ## Background
 
 The memory manager assumes the following things:
 
-1. The standard POSIX compliant malloc/realloc/free semantics are used
+1. The standard POSIX compliant malloc/calloc/realloc/free semantics are used
 1. All memory used by the manager is allocated at link time, it is aligned
 on a 32 bit boundary, it is contiguous, and its extent (start and end
 address) is filled in by the linker.
@@ -45,17 +107,17 @@ The fastest linked list implementations use doubly linked lists so that
 its possible to insert and delete blocks in constant time. This memory
 manager keeps track of both free and used blocks in a doubly linked list.
 
-Most memory managers use some kind of list structure made up of pointers
+Most memory managers use a list structure made up of pointers
 to keep track of used - and sometimes free - blocks of memory. In an
 embedded system, this can get pretty expensive as each pointer can use
 up to 32 bits.
 
-In most embedded systems there is no need for managing large blocks
-of memory dynamically, so a full 32 bit pointer based data structure
+In most embedded systems there is no need for managing a large quantity
+of memory block dynamically, so a full 32 bit pointer based data structure
 for the free and used block lists is wasteful. A block of memory on
 the free list would use 16 bytes just for the pointers!
 
-This memory management library sees the malloc heap as an array of blocks,
+This memory management library sees the heap as an array of blocks,
 and uses block numbers to keep track of locations. The block numbers are
 15 bits - which allows for up to 32767 blocks of memory. The high order
 bit marks a block as being either free or in use, which will be explained
@@ -75,7 +137,7 @@ can always add more data bytes to the body of the memory block
 at the expense of free block size overhead.
 
 There are a lot of little features and optimizations in this memory
-management system that makes it especially suited to small embedded, but
+management system that makes it especially suited to small systems, and
 the best way to appreciate them is to review the data structures and
 algorithms used, so let's get started.
 
@@ -124,10 +186,9 @@ Where:
 - n  is the index of the next block in the heap
 - p  is the index of the previous block in the heap
 
-Note that the free list information is gone, because it's now being used to
-store actual data for the application. It would have been nice to store
-the next and previous free list indexes as well, but that would be a waste
-of space. If we had even 500 items in use, that would be 2,000 bytes for
+Note that the free list information is gone because it's now
+being used to store actual data for the application. If we had
+even 500 items in use, that would be 2,000 bytes for
 free list information. We simply can't afford to waste that much.
 
 The address of the `...` area is what is returned to the application
@@ -143,7 +204,7 @@ described.
 `...` between memory blocks indicates zero or more additional blocks are
 allocated for use by the upper block.
 
-And while we're talking about "upper" and "lower" blocks, we should make
+While we're talking about "upper" and "lower" blocks, we should make
 a comment about adresses. In the diagrams, a block higher up in the
 picture is at a lower address. And the blocks grow downwards their
 block index increases as does their physical address.
@@ -166,24 +227,27 @@ we're at the end of the list!
 
 At this point, the malloc has a special test that checks if the current
 block index is 0, which it is. This special case initializes the free
-list to point at block index 1.
+list to point at block index 1 and then points block 1 to the
+last block (lf) on the heap.
 
 ```
    BEFORE                             AFTER
 
    +----+----+----+----+              +----+----+----+----+
-0  |  0 |  0 |  0 |  0 |           0  |  1 |  0 |  1 |  0 |
+0  |  0 |  0 |  0 |  0 |           0  |  1 |  0 |  1 |  1 |
    +----+----+----+----+              +----+----+----+----+
                                       +----+----+----+----+
-                                   1  |  0 |  0 |  0 |  0 |
+                                   1  |*lf |  0 |  0 |  0 |
+                                      +----+----+----+----+
+                                               ...
+                                      +----+----+----+----+
+                                   lf |  0 |  1 |  0 |  0 |
                                       +----+----+----+----+
 ```
 
 The heap is now ready to complete the first malloc operation.
 
-
-### Operation of malloc when we have reached the end of the free list and
-there is no block large enough to accommodate the request.
+### Operation of malloc when we have reached the end of the free list and there is no block large enough to accommodate the request.
 
 This happens at the very first malloc operation, or any time the free
 list is traversed and no free block large enough for the request is
@@ -306,8 +370,7 @@ else
 ```
 
 Step 1 of the free operation checks if the next block is free, and if it
-is then insert this block into the free list and assimilate the next block
-with this one.
+is assimilate the next block with this one.
 
 Note that c is the block we are freeing up, cf is the free block that
 follows it.

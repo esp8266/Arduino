@@ -39,11 +39,10 @@
  * ----------------------------------------------------------------------------
  */
 
-extern char test_umm_heap[];
 
 /* Start addresses and the size of the heap */
-#define UMM_MALLOC_CFG_HEAP_ADDR (test_umm_heap)
-#define UMM_MALLOC_CFG_HEAP_SIZE 0x10000
+#define UMM_MALLOC_CFG_HEAP_ADDR   /* TODO */
+#define UMM_MALLOC_CFG_HEAP_SIZE   /* TODO */
 
 /* A couple of macros to make packing structures less compiler dependent */
 
@@ -61,7 +60,9 @@ extern char test_umm_heap[];
  * unallocated block on the heap!
  */
 
+/*
 #define UMM_INFO
+*/
 
 #ifdef UMM_INFO
   typedef struct UMM_HEAP_INFO_t {
@@ -112,7 +113,9 @@ extern char test_umm_heap[];
  * for corruption.
  */
 
+/*
 #define UMM_INTEGRITY_CHECK
+*/
 
 #ifdef UMM_INTEGRITY_CHECK
    int umm_integrity_check( void );
@@ -151,7 +154,9 @@ extern char test_umm_heap[];
  * callback is called: `UMM_HEAP_CORRUPTION_CB()`
  */
 
+/*
 #define UMM_POISON_CHECK
+*/
 
 #define UMM_POISON_SIZE_BEFORE 4
 #define UMM_POISON_SIZE_AFTER 4
