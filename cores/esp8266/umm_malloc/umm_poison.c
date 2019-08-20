@@ -95,7 +95,9 @@ clean:
  *
  * `size_w_poison` is a size of the whole block, including a poison.
  */
-static void *get_poisoned( unsigned char *ptr, size_t size_w_poison ) {
+static void *get_poisoned( void *v_ptr, size_t size_w_poison ) {
+  unsigned char *ptr = (unsigned char *)v_ptr;
+
   if (size_w_poison != 0 && ptr != NULL) {
 
     /* Poison beginning and the end of the allocated chunk */
@@ -108,10 +110,10 @@ static void *get_poisoned( unsigned char *ptr, size_t size_w_poison ) {
     *(UMM_POISONED_BLOCK_LEN_TYPE *)ptr = (UMM_POISONED_BLOCK_LEN_TYPE)size_w_poison;
 
     /* Return pointer at the first non-poisoned byte */
-    return ptr + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
-  } else {
-    return ptr;
+    ptr += sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
   }
+
+  return (void *)ptr;
 }
 
 /*
@@ -120,7 +122,9 @@ static void *get_poisoned( unsigned char *ptr, size_t size_w_poison ) {
  *
  * Returns unpoisoned pointer, i.e. actual pointer to the allocated memory.
  */
-static void *get_unpoisoned( unsigned char *ptr ) {
+static void *get_unpoisoned( void *v_ptr ) {
+  unsigned char *ptr = (unsigned char *)v_ptr;
+
   if (ptr != NULL) {
     unsigned short int c;
 
@@ -129,10 +133,12 @@ static void *get_unpoisoned( unsigned char *ptr ) {
     /* Figure out which block we're in. Note the use of truncated division... */
     c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
 
-    check_poison_block(&UMM_BLOCK(c));
+    if (!check_poison_block(&UMM_BLOCK(c))) {
+      UMM_HEAP_POISON_CB();
+    }
   }
 
-  return ptr;
+  return (void *)ptr;
 }
 
 /* }}} */
@@ -160,7 +166,7 @@ void *umm_poison_calloc( size_t num, size_t item_size ) {
   size += poison_size(size);
 
   ret = umm_malloc(size);
-  
+
   if (NULL != ret)
       memset(ret, 0x00, size);
 
@@ -199,12 +205,15 @@ void umm_poison_free( void *ptr ) {
  */
 
 int umm_poison_check(void) {
+  UMM_CRITICAL_DECL(id_poison);
   int ok = 1;
   unsigned short int cur;
-    
+
   if (umm_heap == NULL) {
     umm_init();
   }
+
+  UMM_CRITICAL_ENTRY(id_poison);
 
   /* Now iterate through the blocks list */
   cur = UMM_NBLOCK(0) & UMM_BLOCKNO_MASK;
@@ -220,11 +229,11 @@ int umm_poison_check(void) {
 
     cur = UMM_NBLOCK(cur) & UMM_BLOCKNO_MASK;
   }
+  UMM_CRITICAL_EXIT(id_poison);
 
   return ok;
 }
- 
+
 /* ------------------------------------------------------------------------ */
 
 #endif
-
