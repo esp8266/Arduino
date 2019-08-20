@@ -1,25 +1,25 @@
 ESP8266WiFi library
 ===================
 
-ESP8266 is all about Wi-Fi. If you are eager to connect your new ESP8266 module to Wi-Fi network to start sending and receiving data, this is a good place to start. If you are looking for more in depth details of how to program specific Wi-Fi networking functionality, you are also in the right place.
+ESP8266 is all about Wi-Fi. If you are eager to connect your new ESP8266 module to a Wi-Fi network to start sending and receiving data, this is a good place to start. If you are looking for more in depth details of how to program specific Wi-Fi networking functionality, you are also in the right place.
 
 
 Introduction
 ------------
 
-The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using naming convention and overall functionality philosophy of `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP9266 SDK to `esp8266 /
-Arduino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we need to provide separate documentation on what is new and extra.
+The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP9266 SDK to `esp8266 /
+Arduino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we would need to provide separate documentation on what is new and extra.
 
-This documentation will walk you through several classes, methods and properties of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
+This documentation will walk you through several classes, methods and properties of the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
 
-The scope of functionality offered by `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library is quite extensive and therefore this description has been broken up into separate documents marked with :arrow\_right:.
+The scope of functionality offered by the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library is quite extensive and therefore this description has been broken up into separate documents marked with :arrow\_right:.
 
 Quick Start
 ~~~~~~~~~~~
 
-Hopefully you are already familiar how to load `Blink.ino <https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino>`__ sketch to ESP8266 module and get the LED blinking. If not, please check `this tutorial <https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout/using-arduino-ide>`__ by Adafruit or `another great tutorial <https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/introduction>`__ developed by Sparkfun.
+Hopefully, you are already familiar how to load the `Blink.ino <https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino>`__ sketch to an ESP8266 module and get the LED blinking. If not, please use `this tutorial <https://learn.adafruit.com/adafruit-huzzah-esp8266-breakout/using-arduino-ide>`__ by Adafruit or `another great tutorial <https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/introduction>`__ developed by Sparkfun.
 
-To hook up ESP module to Wi-Fi (like hooking up a mobile phone to a hot spot), you need just couple of lines of code:
+To hook up the ESP module to Wi-Fi (like hooking up a mobile phone to a hot spot), you need only a couple of lines of code:
 
 .. code:: cpp
 
@@ -46,21 +46,21 @@ To hook up ESP module to Wi-Fi (like hooking up a mobile phone to a hot spot), y
 
     void loop() {}
 
-In the line ``WiFi.begin("network-name", "pass-to-network")`` replace ``network-name`` and ``pass-to-network`` with name and password to the Wi-Fi network you like to connect. Then upload this sketch to ESP module and open serial monitor. You should see something like:
+In the line ``WiFi.begin("network-name", "pass-to-network")`` replace ``network-name`` and ``pass-to-network`` with the name and password of the Wi-Fi network you would like to connect to. Then, upload this sketch to ESP module and open the serial monitor. You should see something like:
 
 .. figure:: pictures/wifi-simple-connect-terminal.png
    :alt: Connection log on Arduino IDE's Serial Monitor
 
 
-How does it work? In the first line of sketch ``#include <ESP8266WiFi.h>`` we are including `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. This library provides ESP8266 specific Wi-Fi routines we are calling to connect to network.
+How does it work? In the first line of the sketch, ``#include <ESP8266WiFi.h>`` we are including the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. This library provides ESP8266 specific Wi-Fi routines that we are calling to connect to the network.
 
-Actual connection to Wi-Fi is initialized by calling:
+The actual connection to Wi-Fi is initialized by calling:
 
 .. code:: cpp
 
     WiFi.begin("network-name", "pass-to-network");
 
-Connection process can take couple of seconds and we are checking for this to complete in the following loop:
+The connection process can take couple of seconds and we are checking for whether this has completed in the following loop:
 
 .. code:: cpp
 
@@ -70,52 +70,52 @@ Connection process can take couple of seconds and we are checking for this to co
         Serial.print(".");
       }
 
-The ``while()`` loop will keep looping while ``WiFi.status()`` is other than ``WL_CONNECTED``. The loop will exit only if the status changes to ``WL_CONNECTED``.
+The ``while()`` loop will keep looping as long as ``WiFi.status()`` is other than ``WL_CONNECTED``. The loop will exit only if the status changes to ``WL_CONNECTED``.
 
-The last line will then print out IP address assigned to ESP module by `DHCP <https://whatismyipaddress.com/dhcp>`__:
+The last line will then print out the IP address assigned to the ESP module by `DHCP <https://whatismyipaddress.com/dhcp>`__:
 
 .. code:: cpp
 
     Serial.println(WiFi.localIP());
 
-If you don't see the last line but just more and more dots ``.........``, then likely name or password to the Wi-Fi network in sketch is entered incorrectly. Verify name and password by connecting from scratch to this Wi-Fi a PC or a mobile phone.
+If you don't see the last line but just more and more dots ``.........``, then likely name or password to the Wi-Fi network is entered incorrectl in the sketchy. Verify the name and password by connecting from scratch to this Wi-Fi network with a PC or a mobile phone.
 
-*Note:* if connection is established, and then lost for some reason, ESP will automatically reconnect to last used access point once it is again back on-line. This will be done automatically by Wi-Fi library, without any user intervention.
+*Note:* if connection is established, and then lost for some reason, ESP will automatically reconnect to the last used access point once it is again back on-line. This will be done automatically by Wi-Fi library, without any user intervention.
 
-That's all you need to connect ESP8266 to Wi-Fi. In the following chapters we will explain what cool things can be done by ESP once connected.
+That's all you need to connect ESP8266 to Wi-Fi. In the following chapters we will explain what cool things can be done by the ESP once it's connected.
 
 Who is Who
 ~~~~~~~~~~
 
-Devices that connect to Wi-Fi network are called stations (STA). Connection to Wi-Fi is provided by an access point (AP), that acts as a hub for one or more stations. The access point on the other end is connected to a wired network. An access point is usually integrated with a router to provide access from Wi-Fi network to the internet. Each access point is recognized by a SSID (**S**\ ervice **S**\ et **ID**\ entifier), that essentially is the name of network you select when connecting a device (station) to the Wi-Fi.
+Devices that connect to Wi-Fi networks are called stations (STA). Connection to Wi-Fi is provided by an access point (AP), that acts as a hub for one or more stations. The access point on the other end is connected to a wired network. An access point is usually integrated with a router to provide access from a Wi-Fi network to the internet. Each access point is recognized by a SSID (**S**\ ervice **S**\ et **ID**\ entifier), that essentially is the name of network you select when connecting a device (station) to the Wi-Fi.
 
-ESP8266 module can operate as a station, so we can connect it to the Wi-Fi network. It can also operate as a soft access point (soft-AP), to establish its own Wi-Fi network. Therefore we can connect other stations to such ESP module. ESP8266 is also able to operate both in station and soft access point mode. This provides possibility of building e.g. `mesh networks <https://en.wikipedia.org/wiki/Mesh_networking>`__.
+ESP8266 modules can operate as a station, so we can connect it to the Wi-Fi network. It can also operate as a soft access point (soft-AP), to establish its own Wi-Fi network. When the ESP8266 module is operating as a soft access point, we can connect other stations to the ESP module. ESP8266 is also able to operate as both a station and a soft access point mode. This provides the possibility of building e.g. `mesh networks <https://en.wikipedia.org/wiki/Mesh_networking>`__.
 
 .. figure:: pictures/esp8266-station-soft-access-point.png
    :alt: ESP8266 operating in the Station + Soft Access Point mode
 
-The `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library provides wide collection of C++
+The `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library provides a wide collection of C++
 `methods <https://en.wikipedia.org/wiki/Method_(computer_programming)>`__ (functions) and `properties <https://en.wikipedia.org/wiki/Property_(programming)>`__ to configure and operate an ESP8266 module in station and / or soft access point mode. They are described in the following chapters.
 
 Class Description
 -----------------
 
-The `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library is broken up into several classes. In most of cases, when writing the code, user is not concerned with this classification. We are using it to break up description of this library into more manageable pieces.
+The `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library is broken up into several classes. In most of cases, when writing the code, the user is not concerned with this classification. We are using it to break up description of this library into more manageable pieces.
 
 .. figure:: pictures/doxygen-class-index.png
    :alt: Index of classes of ESP8266WiFi library
 
-Chapters below describe all function calls (`methods <https://en.wikipedia.org/wiki/Method_(computer_programming)>`__ and `properties <https://en.wikipedia.org/wiki/Property_(programming)>`__ in C++ terms) listed in particular classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__. Description is illustrated with application examples and code snippets to show how to use functions in practice. Most of this information is broken up into separate documents. Please follow to access them.
+Chapters below describe all function calls (`methods <https://en.wikipedia.org/wiki/Method_(computer_programming)>`__ and `properties <https://en.wikipedia.org/wiki/Property_(programming)>`__ in C++ terms) listed in particular classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__. The description is illustrated with application examples and code snippets to show how to use functions in practice. This information is broken up into the following documents. 
 
 Station
 ~~~~~~~
 
-Station (STA) mode is used to get ESP module connected to a Wi-Fi network established by an access point.
+Station (STA) mode is used to get the ESP module connected to a Wi-Fi network established by an access point.
 
 .. figure:: pictures/esp8266-station.png
    :alt: ESP8266 operating in the Station mode
 
-Station class has several features to facilitate management of Wi-Fi connection. In case the connection is lost, ESP8266 will automatically reconnect to the last used access point, once it is again available. The same happens on module reboot. This is possible since ESP is saving credentials to last used access point in flash (non-volatile) memory. Using the saved data ESP will also reconnect if sketch has been changed but code does not alter the Wi-Fi mode or credentials.
+Station class has several features to facilitate the management of a Wi-Fi connection. In case the connection is lost, the ESP8266 will automatically reconnect to the last used access point, once it is available again. The same happens on module reboot. This is possible since ESP saves the credentials to the last used access point in flash (non-volatile) memory. Using the saved data ESP will also reconnect if sketch has been changed but code does not alter the Wi-Fi mode or credentials.
 
 `Station Class documentation <station-class.rst>`__
 
@@ -124,28 +124,27 @@ Check out separate section with `examples <station-examples.rst>`__.
 Soft Access Point
 ~~~~~~~~~~~~~~~~~
 
-An `access point (AP) <https://en.wikipedia.org/wiki/Wireless_access_point>`__ is a device that provides access to Wi-Fi network to other devices (stations)
-and connects them further to a wired network. ESP8266 can provide similar functionality except it does not have interface to a wired network. Such mode of operation is called soft access point (soft-AP). The maximum number of stations that can simultaneously be connected to the soft-AP can be set `from 0 to 8 <https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832>`__, but defaults to 4.
+An `access point (AP) <https://en.wikipedia.org/wiki/Wireless_access_point>`__ is a device that provides access to a Wi-Fi network to other devices (stations) and connects them to a wired network. The ESP8266 can provide similar functionality, except it does not have interface to a wired network. Such mode of operation is called soft access point (soft-AP). The maximum number of stations that can simultaneously be connected to the soft-AP can be set `from 0 to 8 <https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832>`__, but defaults to 4.
 
 .. figure:: pictures/esp8266-soft-access-point.png
    :alt: ESP8266 operating in the Soft Access Point mode
 
-The soft-AP mode is often used and an intermediate step before connecting ESP to a Wi-Fi in a station mode. This is when SSID and password to such network is not known upfront. ESP first boots in soft-AP mode, so we can connect to it using a laptop or a mobile phone. Then we are able to provide credentials to the target network. Once done ESP is switched to the station mode and can connect to the target Wi-Fi.
+The soft-AP mode is often used and an intermediate step before connecting ESP to a Wi-Fi in a station mode. This is when SSID and password to such network is not known upfront. ESP first boots in soft-AP mode, so we can connect to it using a laptop or a mobile phone. Then we are able to provide credentials to the target network. Then, the ESP is switched to the station mode and can connect to the target Wi-Fi.
 
-Another handy application of soft-AP mode is to set up `mesh networks <https://en.wikipedia.org/wiki/Mesh_networking>`__. ESP can operate in both soft-AP and Station mode so it can act as a node of a mesh network.
+Another handy application of soft-AP mode is to set up `mesh networks <https://en.wikipedia.org/wiki/Mesh_networking>`__. The ESP can operate in both soft-AP and Station mode so it can act as a node of a mesh network.
 
 `Soft Access Point Class documentation <soft-access-point-class.rst>`__
 
-Check out separate section with `examples <soft-access-point-examples.rst>`__.
+Check out the separate section with `examples <soft-access-point-examples.rst>`__.
 
 Scan
 ~~~~
 
-To connect a mobile phone to a hot spot, you typically open Wi-Fi settings app, list available networks and pick the hot spot you need. Then enter a password (or not) and you are in. You can do the same with ESP. Functionality of scanning for, and listing of available networks in range is implemented by the Scan Class.
+To connect a mobile phone to a hot spot, you typically open Wi-Fi settings app, list available networks and pick the hot spot you need. Then enter a password (or not) and you are in. You can do the same with the ESP. Functionality of scanning for, and listing of available networks in range is implemented by the Scan Class.
 
 `Scan Class documentation <scan-class.rst>`__
 
-Check out separate section with `examples <scan-examples.rst>`__.
+Check out the separate section with `examples <scan-examples.rst>`__.
 
 Client
 ~~~~~~
@@ -155,7 +154,7 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 .. figure:: pictures/esp8266-client.png
    :alt: ESP8266 operating as the Client
 
-Check out separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
+Check out the separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
 
 axTLS Client Secure - DEPRECATED
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,9 +163,9 @@ The following section details axTLS, the older TLS library used by the project. 
 
 The axTLS Client Secure is an extension of `Client Class <#client>`__ where connection and data exchange with servers is done using a `secure protocol <https://en.wikipedia.org/wiki/Transport_Layer_Security>`__. It supports `TLS 1.1 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.1>`__. The `TLS 1.2 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2>`__ is not supported.
 
-Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add, the flash memory size is usually not the issue. If you like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, access to what servers have been tested, and how memory limitations have been overcame, read fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
+Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add; the flash memory size is usually not the issue. If you would like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, what server access has been tested, and how memory limitations have been overcome, read this fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
 
-Check out separate section with `examples <client-secure-examples.rst>`__ / `list of functions <client-secure-class.rst>`__
+Check out the separate section with `examples <client-secure-examples.rst>`__ / `list of functions <client-secure-class.rst>`__
 
 
 BearSSL Client Secure and Server Secure
@@ -177,7 +176,7 @@ BearSSL Client Secure and Server Secure
 .. figure:: pictures/esp8266-client-secure.png
    :alt: ESP8266 operating as the Client Secure
 
-Secure clients and servers require siginificant amounts of additional memory and processing to enable their cryptographic algorithms.  In general only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
+Secure clients and servers require siginificant amounts of additional memory and processing to enable their cryptographic algorithms.  In general, only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
 
 `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ contains more information on using and configuring TLS connections.
 

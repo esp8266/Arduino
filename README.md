@@ -9,9 +9,9 @@ Arduino core for ESP8266 WiFi chip
 
 # Arduino on ESP8266
 
-This project brings support for ESP8266 chip to the Arduino environment. It lets you write sketches using familiar Arduino functions and libraries, and run them directly on ESP8266, no external microcontroller required.
+This project brings support for the ESP8266 chip to the Arduino environment. It lets you write sketches, using familiar Arduino functions and libraries, and run them directly on ESP8266, with no external microcontroller required.
 
-ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
+ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, and work with SD cards, servos, SPI and I2C peripherals.
 
 # Contents
 - Installing options:
@@ -71,9 +71,9 @@ python get.py
 ### Using PlatformIO
 
 [PlatformIO](https://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
-development with a cross-platform build system, library manager and full support
-for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
-Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
+development with a cross-platform build system, a library manager, and full support
+for Espressif (ESP8266) development. It works on the following popular host operating systems: macOS, Windows,
+Linux 32/64, and Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
 - [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
 - [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
@@ -95,7 +95,7 @@ Documentation for latest development version: https://arduino-esp8266.readthedoc
 
 ### Issues and support ###
 
-[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party lib not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
+[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party library not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
 
 If you find the forum useful, please consider supporting it with a donation. <br />
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
@@ -107,7 +107,7 @@ Please provide as much context as possible, as well as the information requested
 - ESP8266 Arduino core version which you are using (you can check it in Boards Manager)
 - your sketch code; please wrap it into a code block, see [Github markdown manual](https://help.github.com/articles/basic-writing-and-formatting-syntax/#quoting-code)
 - when encountering an issue that happens at run time, attach the serial output. Wrap it into a code block, just like the code.
-- for issues which happen at compile time, enable verbose compiler output in the IDE preferences, and attach that output (also inside a code block)
+- for issues that happen at compile time, enable verbose compiler output in the IDE preferences, and attach that output (also inside a code block)
 - ESP8266 development board model
 - IDE settings (board choice, flash size)
 - etc
