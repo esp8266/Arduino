@@ -42,7 +42,7 @@ bool ICACHE_FLASH_ATTR get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t s
 
 // ROM _putc1, ignores CRs and sends CR/LF for LF, newline.
 // Always returns character sent.
-int constexpr (*_rom_putc1)(int) = (int (*)(int))(void*)0x40001dcc;
+int (*_rom_putc1)(int) = (int (*)(int))0x40001dcc;
 void uart_buff_switch(uint8_t);
 
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
