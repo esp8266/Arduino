@@ -300,7 +300,7 @@ boards = collections.OrderedDict([
             ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
-            ( '.menu.UploadTool.esptool.upload.verbose', '-vv' ),
+            ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
             ( '.menu.UploadTool.espota', 'OTA' ),
             ( '.menu.UploadTool.espota.upload.tool', 'espota' ),
             ]),
