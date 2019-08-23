@@ -1,19 +1,15 @@
 /*
  ClientContext.h - TCP connection handling on top of lwIP
-
  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
-
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
-
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
-
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -130,11 +126,8 @@ public:
         }
         _connect_pending = 1;
         _op_start_time = millis();
-        // Following delay will be interrupted by connect callback
-        for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-       }
+        // This delay will be interrupted by esp_schedule in the connect callback
+        delay(_timeout_ms);
         _connect_pending = 0;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -459,11 +452,8 @@ protected:
             }
 
             _send_waiting = true;
-            // Following delay will be interrupted by on next received ack
-            for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-            }
+            // This delay will be interrupted by esp_schedule on next received ack
+            delay(_timeout_ms);
         } while(true);
         _send_waiting = false;
 
@@ -609,7 +599,6 @@ protected:
         (void) pcb;
         assert(pcb == _pcb);
         assert(_connect_pending);
-        _connect_pending = 0;
         esp_schedule();
         return ERR_OK;
     }
