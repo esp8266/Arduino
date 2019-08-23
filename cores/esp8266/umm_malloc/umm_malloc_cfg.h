@@ -552,19 +552,20 @@ void  free_loc (void* p, const char* file, int line);
 
 #endif /* _UMM_MALLOC_CFG_H */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef DEBUG_ESP_OOM
 // this must be outside from "#ifndef _UMM_MALLOC_CFG_H"
 // because Arduino.h's <cstdlib> does #undef *alloc
 // Arduino.h recall us to redefine them
 #include <pgmspace.h>
 // Reuse pvPort* calls, since they already support passing location information.
-extern "C" {
 void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line);
 void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
-};
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortCalloc(n, s, mem_debug_file, __LINE__); })
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
@@ -576,10 +577,10 @@ void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
 
 #elif defined(UMM_POISON_CHECK)
 #include <pgmspace.h>
-extern "C" {
+
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
 void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
-};
+
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
 #if 0
 //C
@@ -597,3 +598,7 @@ void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
 #endif
 
 #endif /* DEBUG_ESP_OOM */
+
+#ifdef __cplusplus
+}
+#endif
