@@ -132,12 +132,12 @@ void timer0_detachInterrupt(void);
 #undef abs
 #endif
 
-#define abs(x) ((x)>0?(x):-(x))
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#define abs(x) ({ __typeof__(x) _x = (x); _x >= 0? _x : -_x; })
+#define constrain(amt,low,high) ({ __typeof__(amt) _amt = (amt); __typeof__(low) _low = (low); __typeof__(high) _high = (high); _amt < _low? _low : (_amt > _high ? _high : _amt); })
+#define round(x) ({ __typeof__(x) _x = (x); (long)(_x >= 0 ? _x + 0.5 : _x - 0.5); })
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
-#define sq(x) ((x)*(x))
+#define sq(x) ({ __typeof__(x) _x = (x); _x * _x; })
 
 void ets_intr_lock();
 void ets_intr_unlock();
@@ -155,7 +155,7 @@ void ets_intr_unlock();
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
-#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
+#define bitWrite(value, bit, bitvalue) do { if (bitvalue) bitSet(value, bit); else bitClear(value, bit); } while (0)
 
 // avr-libc defines _NOP() since 1.6.2
 #ifndef _NOP
@@ -208,7 +208,7 @@ void optimistic_yield(uint32_t interval_us);
 
 #define _PORT_GPIO16    1
 #define digitalPinToPort(pin)       (((pin)==16)?(_PORT_GPIO16):(0))
-#define digitalPinToBitMask(pin)    (((pin)==16)?(1):(1UL << (pin)))
+#define digitalPinToBitMask(pin)    ({ __typeof__(pin) _pin = (pin); _pin == 16 ? 1 : (1UL << _pin); })
 #define digitalPinToTimer(pin)      (0)
 #define portOutputRegister(port)    (((port)==_PORT_GPIO16)?((volatile uint32_t*) &GP16O):((volatile uint32_t*) &GPO))
 #define portInputRegister(port)     (((port)==_PORT_GPIO16)?((volatile uint32_t*) &GP16I):((volatile uint32_t*) &GPI))
@@ -251,8 +251,8 @@ using std::max;
 using std::isinf;
 using std::isnan;
 
-#define _min(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a < _b? _a : _b; })
-#define _max(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a > _b? _a : _b; })
+#define _min(a,b) std::min(a,b)
+#define _max(a,b) std::max(a,b)
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
@@ -278,7 +278,12 @@ long map(long, long, long, long, long);
 extern "C" void configTime(long timezone, int daylightOffset_sec,
     const char* server1, const char* server2 = nullptr, const char* server3 = nullptr);
 
-#endif
+#else // !__cplusplus
+
+#define _min(a,b) ({ __typeof__(a) _a = (a); __typeof__(b) _b = (b); _a < _b? _a : _b; })
+#define _max(a,b) ({ __typeof__(a) _a = (a); __typeof__(b) _b = (b); _a > _b? _a : _b; })
+
+#endif // !__cplusplus
 
 #include "pins_arduino.h"
 
