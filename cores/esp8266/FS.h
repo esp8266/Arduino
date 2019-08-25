@@ -221,7 +221,9 @@ public:
     bool rmdir(const char* path);
     bool rmdir(const String& path);
 
+    // Low-level FS routines, not needed by most applications
     bool gc();
+    bool check();
 
     friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
@@ -241,6 +243,7 @@ using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
 using fs::FSConfig;
+using fs::SPIFFSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

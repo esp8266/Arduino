@@ -44,13 +44,14 @@ import json
 # or by user command line
 
 speeds = collections.OrderedDict([
-    (  '57', [ 's57',  's115', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '115', [ 's115', 's57', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '230', [ 's230', 's57', 's115', 's256', 's460', 's512', 's921' ]),
-    ( '256', [ 's256', 's57', 's115', 's230', 's460', 's512', 's921' ]),
-    ( '460', [ 's460', 's57', 's115', 's230', 's256', 's512', 's921' ]),
-    ( '512', [ 's512', 's57', 's115', 's230', 's256', 's460', 's921' ]),
-    ( '921', [ 's921', 's57', 's115', 's230', 's256', 's460', 's512' ]),
+    (  '57',  [ 's57',  's115', 's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '115',  [ 's115', 's57',  's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '230',  [ 's230', 's57',  's115', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '256',  [ 's256', 's57',  's115', 's230', 's460', 's512', 's921', 's3000' ]),
+    ( '460',  [ 's460', 's57',  's115', 's230', 's256', 's512', 's921', 's3000' ]),
+    ( '512',  [ 's512', 's57',  's115', 's230', 's256', 's460', 's921', 's3000' ]),
+    ( '921',  [ 's921', 's57',  's115', 's230', 's256', 's460', 's512', 's3000' ]),
+    ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
     ])
 
 # boards list
@@ -299,7 +300,7 @@ boards = collections.OrderedDict([
             ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
-            ( '.menu.UploadTool.esptool.upload.verbose', '-vv' ),
+            ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
             ( '.menu.UploadTool.espota', 'OTA' ),
             ( '.menu.UploadTool.espota.upload.tool', 'espota' ),
             ]),
@@ -1061,6 +1062,10 @@ macros = {
         ( '.menu.baud.921600', '921600' ),
         ( '.menu.baud.921600.upload.speed', '921600' ),
         ]),
+    's3000': collections.OrderedDict([
+        ( '.menu.baud.3000000', '3000000' ),
+        ( '.menu.baud.3000000.upload.speed', '3000000' ),
+        ]),
 
     ####################### flash erase
 
@@ -1327,7 +1332,7 @@ def led (default,max):
                 ('.menu.led.' + str(default), str(default)),
                 ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
-    for i in range(0,max):
+    for i in range(0,max+1): # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not i == default:
             led.update(
                 collections.OrderedDict([
