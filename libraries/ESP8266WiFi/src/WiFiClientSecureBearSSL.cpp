@@ -458,7 +458,7 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
       unsigned char *buf;
       size_t len;
       int wlen;
-      int availForWrite;
+      size_t availForWrite;
 
       buf = br_ssl_engine_sendrec_buf(_eng, &len);
       availForWrite = WiFiClient::availableForWrite();
