@@ -209,9 +209,7 @@ class EspClass {
 #ifndef CORE_MOCK
 uint32_t EspClass::getCycleCount()
 {
-    uint32_t ccount;
-    __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
-    return ccount;
+    return esp_get_cycle_count();
 }
 
 #endif // !defined(CORE_MOCK)
