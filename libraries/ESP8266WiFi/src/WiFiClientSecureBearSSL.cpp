@@ -437,12 +437,9 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
   }
-  for (int no_work = 0; blocking || no_work < 2;) {
-    if (blocking) {
-      // Only for blocking operations can we afford to yield()
-      optimistic_yield(100);
-    }
-
+  for (int no_work = 0; blocking || no_work < 2;) {    
+    optimistic_yield(100);
+    
     int state;
     state = br_ssl_engine_current_state(_eng);
     if (state & BR_SSL_CLOSED) {
@@ -461,8 +458,19 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
       unsigned char *buf;
       size_t len;
       int wlen;
+      int availForWrite;
 
       buf = br_ssl_engine_sendrec_buf(_eng, &len);
+      availForWrite = WiFiClient::availableForWrite();
+      
+      if (!blocking && len > availForWrite) {
+        /* 
+           writes on WiFiClient will block if len > availableForWrite()
+           this is needed to prevent available() calls from blocking
+           on dropped connections 
+        */
+        len = availForWrite;
+      }	  
       wlen = WiFiClient::write(buf, len);
       if (wlen <= 0) {
         /*
