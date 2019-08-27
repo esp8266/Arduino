@@ -1273,6 +1273,8 @@ int HTTPClient::handleHeaderResponse()
         return HTTPC_ERROR_NOT_CONNECTED;
     }
 
+    clear();
+
     _canReuse = _reuse;
 
     String transferEncoding;
