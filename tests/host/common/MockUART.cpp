@@ -289,6 +289,15 @@ uart_get_baudrate(uart_t* uart)
 	return uart->baud_rate;
 }
 
+uint8_t
+uart_get_bit_length(const int uart_nr)
+{
+	uint8_t width = ((uart_nr % 16) >> 2) + 5;
+	uint8_t parity = (uart_nr >> 5) + 1;
+	uint8_t stop = uart_nr % 4;
+	return (width + parity + stop + 1);
+}
+
 uart_t*
 uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
 {
