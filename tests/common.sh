@@ -145,6 +145,9 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
+    # Arduino-CLI
+    curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+    # Arduino IDE
     test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
     tar xf arduino.tar.xz
     mv arduino-nightly $ide_path
