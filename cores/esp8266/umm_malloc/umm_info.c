@@ -144,7 +144,7 @@ void *umm_info( void *ptr, int force ) {
 
   DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
-#ifdef UMM_STATS
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
   if (ummHeapInfo.freeBlocks == ummStats.free_blocks) {
       DBGLOG_FORCE( force, "heap info Free blocks and heap statistics Free blocks match.\n");
   } else {
@@ -158,14 +158,14 @@ void *umm_info( void *ptr, int force ) {
   DBGLOG_FORCE( force,   "  Free Space        %5u\n", ummStats.free_blocks * sizeof(umm_block));
 #if defined(UMM_STATS_FULL)
   DBGLOG_FORCE( force,   "  Low Watermark     %5u\n", ummStats.free_blocks_min * sizeof(umm_block));
-  DBGLOG_FORCE( force,   "  Low Watermark RSZ  %5u\n", ummStats.free_blocks_isr_min * sizeof(umm_block));
+  DBGLOG_FORCE( force,   "  Low Watermark ISR %5u\n", ummStats.free_blocks_isr_min * sizeof(umm_block));
   DBGLOG_FORCE( force,   "  MAX Alloc Request %5u\n", ummStats.alloc_max_size);
   DBGLOG_FORCE( force,   "  OOM Count         %5u\n", ummStats.oom_count);
 #endif
   DBGLOG_FORCE( force,   "  Size of umm_block %5u\n", sizeof(umm_block));
+  DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 #endif
 
-  DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
   /* Release the critical section... */
   UMM_CRITICAL_EXIT(id_info);
@@ -194,7 +194,7 @@ size_t umm_block_size( void ) {
 }
 #endif
 
-#ifdef UMM_STATS
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 
 UMM_STATISTICS ummStats;
 

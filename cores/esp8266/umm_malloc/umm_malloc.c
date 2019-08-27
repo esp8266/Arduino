@@ -216,8 +216,8 @@ void umm_init( void ) {
     /* index of the latest `umm_block` */
     const unsigned short int block_last = UMM_NUMBLOCKS - 1;
 
-#ifdef UMM_STATS
     /* init ummStats.free_blocks */
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 #if defined(UMM_STATS_FULL)
     ummStats.free_blocks_min =
     ummStats.free_blocks_isr_min  =

@@ -133,11 +133,14 @@ extern char _heap_start[];
  * most.
  */
 /*
-#define UMM_STATS_FULL
  */
  #define UMM_STATS
 
-#ifdef UMM_STATS
+#ifdef DEBUG_ESP_PORT
+#define UMM_STATS_FULL
+#endif
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 
 typedef struct UMM_STATISTICS_t {
   unsigned short int free_blocks;
@@ -157,10 +160,30 @@ size_t umm_free_heap_size_lw( void );
 
 #define STATS__FREE_BLOCKS_UPDATE(s) ummStats.free_blocks += (s)
 
+#else  // not UMM_STATS or UMM_STATS_FULL
+#define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
+#endif
+
 #ifdef UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN() \
     if (ummStats.free_blocks < ummStats.free_blocks_min) \
         ummStats.free_blocks_min = ummStats.free_blocks
+
+//C TODO: Needs a new name. ISR is too specific to our use. For upstream
+//C needs to indicate it is related to a temporary low, created during a
+//C realloc that includes memmove/copy.
+#define STATS__FREE_BLOCKS_ISR_MIN() \
+    if (ummStats.free_blocks < ummStats.free_blocks_isr_min) \
+        ummStats.free_blocks_isr_min = ummStats.free_blocks
+
+#define STATS__ALLOC_REQUEST(tag, s)  \
+{ \
+    ummStats.tag##_count += 1; \
+    if (ummStats.alloc_max_size < s) \
+        ummStats.alloc_max_size = s; \
+}
+
+#define STATS__OOM_UPDATE() ummStats.oom_count += 1
 
 static inline size_t ICACHE_FLASH_ATTR umm_free_heap_size_lw_min( void ) {
   return (size_t)ummStats.free_blocks_min * umm_block_size();
@@ -195,28 +218,7 @@ static inline size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
   return ummStats.oom_count;
 }
 
-//C TODO: Needs a new name. ISR is too specific to our use. For upstream
-//C needs to indicate it is related to a temporary low, created during a
-//C realloc that includes memmove/copy.
-#define STATS__FREE_BLOCKS_ISR_MIN() \
-    if (ummStats.free_blocks < ummStats.free_blocks_isr_min) \
-        ummStats.free_blocks_isr_min = ummStats.free_blocks
-
-#define STATS__ALLOC_REQUEST(tag, s)  \
-{ \
-    ummStats.tag##_count += 1; \
-    if (ummStats.alloc_max_size < s) \
-        ummStats.alloc_max_size = s; \
-}
-
-#define STATS__OOM_UPDATE() ummStats.oom_count += 1
-#endif
-
-#else  // ! UMM_STATS
-#define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
-#endif
-
-#if !defined(UMM_STATS_FULL)
+#else // Not UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN()     (void)0
 #define STATS__FREE_BLOCKS_ISR_MIN() (void)0
 #define STATS__ALLOC_REQUEST(tag, s) (void)(s)
