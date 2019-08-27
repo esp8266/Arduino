@@ -47,7 +47,7 @@ void setup() {
 }
 
 void loop() {
-  for(int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++) {
     Serial.printf("Reuse connection example, GET url for the %d time\n", i + 1);
     int httpCode = http.GET();
     if (httpCode > 0) {
@@ -72,5 +72,5 @@ void loop() {
   http.end();
 
   Serial.println("Done testing, now wait forever");
-  for(;;) delay(100); // Wait forever
+  for (;;) delay(100); // Wait forever
 }
