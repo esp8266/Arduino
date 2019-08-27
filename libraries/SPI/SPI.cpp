@@ -212,7 +212,7 @@ void SPIClass::setFrequency(uint32_t freq) {
         return;
     }
 
-    const spiClk_t minFreqReg = { 0x7FFFF000 };
+    const spiClk_t minFreqReg = { 0x7FFFF020 };
     uint32_t minFreq = ClkRegToFreq((spiClk_t*) &minFreqReg);
     if(freq < minFreq) {
         // use minimum possible clock
