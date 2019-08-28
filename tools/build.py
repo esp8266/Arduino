@@ -57,6 +57,7 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     if args.debug_port and args.debug_level:
         cmd += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
     cmd += ' '
+    cmd += '-built-in-libraries "' + ide_path + '/libraries" '
     cmd += '-ide-version=10607 '
     cmd += '-warnings={warnings} '.format(**vars(args))
     if args.verbose:
