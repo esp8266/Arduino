@@ -10,10 +10,25 @@
 extern "C" {
 #endif
 
+#include <core_esp8266_features.h>
 #include <stdlib.h>
 #include <osapi.h>
 
 #include "c_types.h"
+#include "umm_performance.h"
+#include "umm_stats.h"
+
+#undef DBGLOG_FUNCTION
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_ISR)
+int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+// Note, _isr_safe_printf_P will not handle additional string arguments in
+// PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
+#define DBGLOG_FUNCTION(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#else
+// Macro to place constant strings into PROGMEM and print them properly
+#define DBGLOG_FUNCTION(fmt, ...) printf(PSTR(fmt), ## __VA_ARGS__ )
+#endif
+
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.
@@ -110,8 +125,22 @@ extern char _heap_start[];
  * called from within umm_malloc()
  */
 
-#define UMM_CRITICAL_ENTRY() ets_intr_lock()
-#define UMM_CRITICAL_EXIT()  ets_intr_unlock()
+
+#if defined(UMM_CRITICAL_PERIOD_ANALYZE)
+
+#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+#define UMM_CRITICAL_ENTRY(tag) _critical_entry(&time_stats.tag, &_saved_ps_##tag)
+#define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
+
+#else
+
+// This method preserves the intlevel on entry and restores the
+// original intlevel at exit.
+#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+#define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
+#define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
+
+#endif
 
 /*
  * -D UMM_INTEGRITY_CHECK :
