@@ -65,7 +65,7 @@ function build_sketches()
     local build_rem=$5
     local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
+    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -163,7 +163,7 @@ function install_ide()
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
     cd esp8266/tools
-    python get.py
+    python3 get.py
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
 }
 

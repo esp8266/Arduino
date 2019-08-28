@@ -74,7 +74,7 @@ fi
 # handles tool paths differently when package is installed in hardware folder
 cat $srcdir/platform.txt | \
 $SED 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
-$SED 's/runtime.tools.python.path=.*//g' | \
+$SED 's/runtime.tools.python3.path=.*//g' | \
 $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' | \
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
 $SED 's/^tools.esptool.cmd=.*//g' | \
@@ -156,7 +156,7 @@ new_json=package_esp8266com_index.json
 
 set +e
 # Merge the old and new, then drop any obsolete package versions
-python ../../merge_packages.py $new_json $old_json | python ../../drop_versions.py - tools 1.20.0-26-gb404fb9 >tmp && mv tmp $new_json && rm $old_json
+python3 ../../merge_packages.py $new_json $old_json | python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 >tmp && mv tmp $new_json && rm $old_json
 
 # Verify the JSON file can be read, fail if it's not OK
 set -e
