@@ -495,7 +495,7 @@ uart_write(uart_t* uart, const char* buf, size_t size)
     size_t ret = size;
     const int uart_nr = uart->uart_nr;
     while (size--)
-        uart_do_write_char(uart_nr, *buf++);
+        uart_do_write_char(uart_nr, pgm_read_byte(buf++));
 
     return ret;
 }
