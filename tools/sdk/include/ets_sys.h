@@ -190,6 +190,7 @@ void *pvPortMalloc(size_t xWantedSize, const char* file, int line) __attribute__
 void *pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line) __attribute__((alloc_size(2)));
 void vPortFree(void *ptr, const char* file, int line);
 void *ets_memcpy(void *dest, const void *src, size_t n);
+void *ets_memmove(void *dest, const void *src, size_t n);
 void *ets_memset(void *s, int c, size_t n);
 void ets_timer_arm_new(ETSTimer *a, int b, int c, int isMstimer);
 void ets_timer_setfn(ETSTimer *t, ETSTimerFunc *fn, void *parg);

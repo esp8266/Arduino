@@ -485,6 +485,8 @@ generic.menu.baud.512000.windows=512000
 generic.menu.baud.512000.upload.speed=512000
 generic.menu.baud.921600=921600
 generic.menu.baud.921600.upload.speed=921600
+generic.menu.baud.3000000=3000000
+generic.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 esp8285.name=Generic ESP8285 Module
@@ -758,20 +760,22 @@ esp8285.menu.baud.512000.windows=512000
 esp8285.menu.baud.512000.upload.speed=512000
 esp8285.menu.baud.921600=921600
 esp8285.menu.baud.921600.upload.speed=921600
+esp8285.menu.baud.3000000=3000000
+esp8285.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espduino.name=ESPDuino (ESP-13 Module)
 espduino.build.board=ESP8266_ESP13
 espduino.build.variant=ESPDuino
-espduino.menu.ResetMethod.v2=ESPduino-V2
-espduino.menu.ResetMethod.v2.upload.resetmethod=nodemcu
 espduino.menu.ResetMethod.v1=ESPduino-V1
 espduino.menu.ResetMethod.v1.upload.resetmethod=ck
-espduino.menu.UploadTool.esptool=Serial
-espduino.menu.UploadTool.esptool.upload.tool=esptool
-espduino.menu.UploadTool.esptool.upload.verbose=-vv
+espduino.menu.ResetMethod.v2=ESPduino-V2
+espduino.menu.ResetMethod.v2.upload.resetmethod=nodemcu
 espduino.menu.UploadTool.espota=OTA
 espduino.menu.UploadTool.espota.upload.tool=espota
+espduino.menu.UploadTool.esptool=Serial
+espduino.menu.UploadTool.esptool.upload.tool=esptool
+espduino.menu.UploadTool.esptool.upload.verbose=--trace
 espduino.upload.tool=esptool
 espduino.upload.maximum_data_size=81920
 espduino.upload.wait_for_upload_port=true
@@ -955,6 +959,8 @@ espduino.menu.baud.512000.windows=512000
 espduino.menu.baud.512000.upload.speed=512000
 espduino.menu.baud.921600=921600
 espduino.menu.baud.921600.upload.speed=921600
+espduino.menu.baud.3000000=3000000
+espduino.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 huzzah.name=Adafruit Feather HUZZAH ESP8266
@@ -1144,6 +1150,8 @@ huzzah.menu.baud.512000.windows=512000
 huzzah.menu.baud.512000.upload.speed=512000
 huzzah.menu.baud.921600=921600
 huzzah.menu.baud.921600.upload.speed=921600
+huzzah.menu.baud.3000000=3000000
+huzzah.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 inventone.name=Invent One
@@ -1333,6 +1341,8 @@ inventone.menu.baud.512000.windows=512000
 inventone.menu.baud.512000.upload.speed=512000
 inventone.menu.baud.921600=921600
 inventone.menu.baud.921600.upload.speed=921600
+inventone.menu.baud.3000000=3000000
+inventone.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 cw01.name=XinaBox CW01
@@ -1525,6 +1535,8 @@ cw01.menu.baud.512000.windows=512000
 cw01.menu.baud.512000.upload.speed=512000
 cw01.menu.baud.921600=921600
 cw01.menu.baud.921600.upload.speed=921600
+cw01.menu.baud.3000000=3000000
+cw01.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espresso_lite_v1.name=ESPresso Lite 1.0
@@ -1717,6 +1729,8 @@ espresso_lite_v1.menu.baud.512000.windows=512000
 espresso_lite_v1.menu.baud.512000.upload.speed=512000
 espresso_lite_v1.menu.baud.921600=921600
 espresso_lite_v1.menu.baud.921600.upload.speed=921600
+espresso_lite_v1.menu.baud.3000000=3000000
+espresso_lite_v1.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espresso_lite_v2.name=ESPresso Lite 2.0
@@ -1909,6 +1923,8 @@ espresso_lite_v2.menu.baud.512000.windows=512000
 espresso_lite_v2.menu.baud.512000.upload.speed=512000
 espresso_lite_v2.menu.baud.921600=921600
 espresso_lite_v2.menu.baud.921600.upload.speed=921600
+espresso_lite_v2.menu.baud.3000000=3000000
+espresso_lite_v2.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 phoenix_v1.name=Phoenix 1.0
@@ -2101,6 +2117,8 @@ phoenix_v1.menu.baud.512000.windows=512000
 phoenix_v1.menu.baud.512000.upload.speed=512000
 phoenix_v1.menu.baud.921600=921600
 phoenix_v1.menu.baud.921600.upload.speed=921600
+phoenix_v1.menu.baud.3000000=3000000
+phoenix_v1.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 phoenix_v2.name=Phoenix 2.0
@@ -2293,6 +2311,8 @@ phoenix_v2.menu.baud.512000.windows=512000
 phoenix_v2.menu.baud.512000.upload.speed=512000
 phoenix_v2.menu.baud.921600=921600
 phoenix_v2.menu.baud.921600.upload.speed=921600
+phoenix_v2.menu.baud.3000000=3000000
+phoenix_v2.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
@@ -2482,6 +2502,8 @@ nodemcu.menu.baud.512000.windows=512000
 nodemcu.menu.baud.512000.upload.speed=512000
 nodemcu.menu.baud.921600=921600
 nodemcu.menu.baud.921600.upload.speed=921600
+nodemcu.menu.baud.3000000=3000000
+nodemcu.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
@@ -2671,6 +2693,8 @@ nodemcuv2.menu.baud.512000.windows=512000
 nodemcuv2.menu.baud.512000.upload.speed=512000
 nodemcuv2.menu.baud.921600=921600
 nodemcuv2.menu.baud.921600.upload.speed=921600
+nodemcuv2.menu.baud.3000000=3000000
+nodemcuv2.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -2880,6 +2904,8 @@ modwifi.menu.baud.512000.windows=512000
 modwifi.menu.baud.512000.upload.speed=512000
 modwifi.menu.baud.921600=921600
 modwifi.menu.baud.921600.upload.speed=921600
+modwifi.menu.baud.3000000=3000000
+modwifi.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 thing.name=SparkFun ESP8266 Thing
@@ -3069,6 +3095,8 @@ thing.menu.baud.512000.windows=512000
 thing.menu.baud.512000.upload.speed=512000
 thing.menu.baud.921600=921600
 thing.menu.baud.921600.upload.speed=921600
+thing.menu.baud.3000000=3000000
+thing.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 thingdev.name=SparkFun ESP8266 Thing Dev
@@ -3258,6 +3286,8 @@ thingdev.menu.baud.512000.windows=512000
 thingdev.menu.baud.512000.upload.speed=512000
 thingdev.menu.baud.921600=921600
 thingdev.menu.baud.921600.upload.speed=921600
+thingdev.menu.baud.3000000=3000000
+thingdev.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 esp210.name=SweetPea ESP-210
@@ -3447,6 +3477,8 @@ esp210.menu.baud.512000.windows=512000
 esp210.menu.baud.512000.upload.speed=512000
 esp210.menu.baud.921600=921600
 esp210.menu.baud.921600.upload.speed=921600
+esp210.menu.baud.3000000=3000000
+esp210.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 d1_mini.name=LOLIN(WEMOS) D1 R2 & mini
@@ -3636,6 +3668,8 @@ d1_mini.menu.baud.460800.macosx=460800
 d1_mini.menu.baud.460800.upload.speed=460800
 d1_mini.menu.baud.512000.windows=512000
 d1_mini.menu.baud.512000.upload.speed=512000
+d1_mini.menu.baud.3000000=3000000
+d1_mini.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 d1_mini_pro.name=LOLIN(WEMOS) D1 mini Pro
@@ -3808,6 +3842,8 @@ d1_mini_pro.menu.baud.460800.macosx=460800
 d1_mini_pro.menu.baud.460800.upload.speed=460800
 d1_mini_pro.menu.baud.512000.windows=512000
 d1_mini_pro.menu.baud.512000.upload.speed=512000
+d1_mini_pro.menu.baud.3000000=3000000
+d1_mini_pro.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 d1_mini_lite.name=LOLIN(WEMOS) D1 mini Lite
@@ -4037,6 +4073,8 @@ d1_mini_lite.menu.baud.460800.macosx=460800
 d1_mini_lite.menu.baud.460800.upload.speed=460800
 d1_mini_lite.menu.baud.512000.windows=512000
 d1_mini_lite.menu.baud.512000.upload.speed=512000
+d1_mini_lite.menu.baud.3000000=3000000
+d1_mini_lite.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 d1.name=WeMos D1 R1
@@ -4226,6 +4264,8 @@ d1.menu.baud.460800.macosx=460800
 d1.menu.baud.460800.upload.speed=460800
 d1.menu.baud.512000.windows=512000
 d1.menu.baud.512000.upload.speed=512000
+d1.menu.baud.3000000=3000000
+d1.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espino.name=ESPino (ESP-12 Module)
@@ -4418,6 +4458,8 @@ espino.menu.baud.512000.windows=512000
 espino.menu.baud.512000.upload.speed=512000
 espino.menu.baud.921600=921600
 espino.menu.baud.921600.upload.speed=921600
+espino.menu.baud.3000000=3000000
+espino.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
@@ -4607,6 +4649,8 @@ espinotee.menu.baud.512000.windows=512000
 espinotee.menu.baud.512000.upload.speed=512000
 espinotee.menu.baud.921600=921600
 espinotee.menu.baud.921600.upload.speed=921600
+espinotee.menu.baud.3000000=3000000
+espinotee.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 wifinfo.name=WifInfo
@@ -4614,20 +4658,20 @@ wifinfo.build.board=WIFINFO
 wifinfo.build.variant=wifinfo
 wifinfo.menu.ESPModule.ESP07192=ESP07 (1M/192K SPIFFS)
 wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
-wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
 wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
 wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
 wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
 wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
 wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
-wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
 wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
-wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
-wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
+wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
 wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
+wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
 wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
+wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
 wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
 wifinfo.upload.tool=esptool
 wifinfo.upload.maximum_data_size=81920
@@ -4856,22 +4900,24 @@ wifinfo.menu.baud.512000.windows=512000
 wifinfo.menu.baud.512000.upload.speed=512000
 wifinfo.menu.baud.921600=921600
 wifinfo.menu.baud.921600.upload.speed=921600
+wifinfo.menu.baud.3000000=3000000
+wifinfo.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 arduino-esp8266.name=Arduino
 arduino-esp8266.build.board=ESP8266_ARDUINO
 arduino-esp8266.menu.BoardModel.primo=Primo
 arduino-esp8266.menu.BoardModel.primo.build.board=ESP8266_ARDUINO_PRIMO
-arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
 arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
-arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
-arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
-arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
 arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
-arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
 arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
 arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
+arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
+arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
 arduino-esp8266.upload.tool=esptool
 arduino-esp8266.upload.maximum_data_size=81920
 arduino-esp8266.upload.wait_for_upload_port=true
@@ -5057,6 +5103,8 @@ arduino-esp8266.menu.baud.512000.windows=512000
 arduino-esp8266.menu.baud.512000.upload.speed=512000
 arduino-esp8266.menu.baud.921600=921600
 arduino-esp8266.menu.baud.921600.upload.speed=921600
+arduino-esp8266.menu.baud.3000000=3000000
+arduino-esp8266.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 gen4iod.name=4D Systems gen4 IoD Range
@@ -5247,6 +5295,8 @@ gen4iod.menu.baud.512000.windows=512000
 gen4iod.menu.baud.512000.upload.speed=512000
 gen4iod.menu.baud.921600=921600
 gen4iod.menu.baud.921600.upload.speed=921600
+gen4iod.menu.baud.3000000=3000000
+gen4iod.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 oak.name=Digistump Oak
@@ -5437,6 +5487,8 @@ oak.menu.baud.460800.macosx=460800
 oak.menu.baud.460800.upload.speed=460800
 oak.menu.baud.512000.windows=512000
 oak.menu.baud.512000.upload.speed=512000
+oak.menu.baud.3000000=3000000
+oak.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 wifiduino.name=WiFiduino
@@ -5626,6 +5678,8 @@ wifiduino.menu.baud.460800.macosx=460800
 wifiduino.menu.baud.460800.upload.speed=460800
 wifiduino.menu.baud.512000.windows=512000
 wifiduino.menu.baud.512000.upload.speed=512000
+wifiduino.menu.baud.3000000=3000000
+wifiduino.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 wifi_slot.name=Amperka WiFi Slot
@@ -5925,6 +5979,8 @@ wifi_slot.menu.baud.512000.windows=512000
 wifi_slot.menu.baud.512000.upload.speed=512000
 wifi_slot.menu.baud.921600=921600
 wifi_slot.menu.baud.921600.upload.speed=921600
+wifi_slot.menu.baud.3000000=3000000
+wifi_slot.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 wiolink.name=Seeed Wio Link
@@ -6114,6 +6170,8 @@ wiolink.menu.baud.512000.windows=512000
 wiolink.menu.baud.512000.upload.speed=512000
 wiolink.menu.baud.921600=921600
 wiolink.menu.baud.921600.upload.speed=921600
+wiolink.menu.baud.3000000=3000000
+wiolink.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espectro.name=ESPectro Core
@@ -6303,4 +6361,6 @@ espectro.menu.baud.512000.windows=512000
 espectro.menu.baud.512000.upload.speed=512000
 espectro.menu.baud.921600=921600
 espectro.menu.baud.921600.upload.speed=921600
+espectro.menu.baud.3000000=3000000
+espectro.menu.baud.3000000.upload.speed=3000000
 
