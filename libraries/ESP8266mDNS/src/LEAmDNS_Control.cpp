@@ -22,7 +22,6 @@
  *
  */
 
-#include <arch/cc.h>
 #include <sys/time.h>
 #include <IPAddress.h>
 #include <AddrList.h>
