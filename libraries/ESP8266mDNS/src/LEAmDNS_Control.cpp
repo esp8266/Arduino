@@ -22,9 +22,9 @@
  *
  */
 
-#include <arch/cc.h>
 #include <sys/time.h>
 #include <IPAddress.h>
+#include <AddrList.h>
 #include <lwip/ip_addr.h>
 #include <WString.h>
 #include <cstdint>
@@ -90,7 +90,52 @@ bool MDNSResponder::_process(bool p_bUserContext) {
  * MDNSResponder::_restart
  */
 bool MDNSResponder::_restart(void) {
-    
+
+    // check m_IPAddress
+    if (!m_IPAddress.isSet()) {
+
+        IPAddress sta = WiFi.localIP();
+        IPAddress ap = WiFi.softAPIP();
+
+        if (!sta.isSet() && !ap.isSet()) {
+
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] internal interfaces (STA, AP) are not set (none was specified)\n")));
+            return false;
+        }
+
+        if (sta.isSet()) {
+
+            if (ap.isSet())
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected over AP (none was specified)\n")));
+            else
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected\n")));
+            m_IPAddress = sta;
+
+        } else {
+
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected (none was specified)\n")));
+            m_IPAddress = ap;
+
+        }
+
+        // continue to ensure interface is UP
+    }
+
+    // check existence of this IP address in the interface list
+    bool found = false;
+    for (auto a: addrList)
+        if (m_IPAddress == a.addr()) {
+            if (a.ifUp()) {
+                found = true;
+                break;
+            }
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), m_IPAddress.toString().c_str()););
+        }
+    if (!found) {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] interface defined by IP '%s' not found\n"), m_IPAddress.toString().c_str()););
+        return false;
+    }
+
     return ((_resetProbeStatus(true)) &&    // Stop and restart probing
             (_allocUDPContext()));          // Restart UDP
 }
@@ -314,7 +359,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                         // IP4 address was asked for
 #ifdef MDNS_IP4_SUPPORT
                         if ((AnswerType_A == pKnownRRAnswer->answerType()) &&
-                            (((stcMDNS_RRAnswerA*)pKnownRRAnswer)->m_IPAddress == _getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE))) {
+                            (((stcMDNS_RRAnswerA*)pKnownRRAnswer)->m_IPAddress == _getResponseMulticastInterface())) {
 
                             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: IP4 address already known... skipping!\n")););
                             sendParameter.m_u8HostReplyMask &= ~ContentFlag_A;
@@ -325,7 +370,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                         // IP6 address was asked for
 #ifdef MDNS_IP6_SUPPORT
                         if ((AnswerType_AAAA == pAnswerRR->answerType()) &&
-                            (((stcMDNS_RRAnswerAAAA*)pAnswerRR)->m_IPAddress == _getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE))) {
+                            (((stcMDNS_RRAnswerAAAA*)pAnswerRR)->m_IPAddress == _getResponseMulticastInterface())) {
 
                             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: IP6 address already known... skipping!\n")););
                             sendParameter.m_u8HostReplyMask &= ~ContentFlag_AAAA;
@@ -343,7 +388,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                         // Host domain match
 #ifdef MDNS_IP4_SUPPORT
                         if (AnswerType_A == pKnownRRAnswer->answerType()) {
-                            IPAddress   localIPAddress(_getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE));
+                            IPAddress   localIPAddress(_getResponseMulticastInterface());
                             if (((stcMDNS_RRAnswerA*)pKnownRRAnswer)->m_IPAddress == localIPAddress) {
                                 // SAME IP address -> We've received an old message from ourselfs (same IP)
                                 DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Tiebreak (IP4) WON (was an old message)!\n")););
@@ -1039,7 +1084,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
     // Probe host domain
     if ((ProbingStatus_ReadyToStart == m_HostProbeInformation.m_ProbingStatus) &&                   // Ready to get started AND
         //TODO: Fix the following to allow Ethernet shield or other interfaces
-        (_getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE) != IPAddress())) {              // Has IP address
+        (_getResponseMulticastInterface() != IPAddress())) {              // Has IP address
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Starting host probing...\n")););
 
         // First probe delay SHOULD be random 0-250 ms
@@ -1721,7 +1766,7 @@ uint8_t MDNSResponder::_replyMaskForHost(const MDNSResponder::stcMDNS_RRHeader& 
             // PTR request
 #ifdef MDNS_IP4_SUPPORT
             stcMDNS_RRDomain    reverseIP4Domain;
-            if ((_buildDomainForReverseIP4(_getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE), reverseIP4Domain)) &&
+            if ((_buildDomainForReverseIP4(_getResponseMulticastInterface(), reverseIP4Domain)) &&
                 (p_RRHeader.m_Domain == reverseIP4Domain)) {
                 // Reverse domain match
                 u8ReplyMask |= ContentFlag_PTR_IP4;

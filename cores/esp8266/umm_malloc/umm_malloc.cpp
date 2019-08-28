@@ -501,6 +501,13 @@
 
 extern "C" {
 
+#undef memcpy
+#undef memmove
+#undef memset
+#define memcpy ets_memcpy
+#define memmove ets_memmove
+#define memset ets_memset
+
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
@@ -519,8 +526,50 @@ extern int umm_last_fail_alloc_size;
 #  define DBG_LOG_LEVEL DBG_LOG_LEVEL
 #endif
 
-// Macro to place constant strings into PROGMEM and print them properly
-#define printf(fmt, ...)  do { static const char fstr[] PROGMEM = fmt; char rstr[sizeof(fmt)]; for (size_t i=0; i<sizeof(rstr); i++) rstr[i] = fstr[i]; printf(rstr, ##__VA_ARGS__); } while (0)
+/*
+Changes for July 2019:
+
+  Correct critical section with interrupt level preserving and nest support
+  alternative. Replace ets_intr_lock()/ets_intr_unlock() with uint32_t
+  oldValue=xt_rsil(3)/xt_wrs(oldValue). Added UMM_CRITICAL_DECL macro to define
+  storage for current state. Expanded UMM_CRITICAL_... to  use unique
+  identifiers. This helpt facilitate gather function specific timing
+  information.
+
+  Replace printf with something that is ROM or IRAM based so that a printf
+  that occurs during an ISR malloc/new does not cause a crash. To avoid any
+  reentry issue it should also avoid doing malloc lib calls.
+
+  Refactor realloc to avoid memcpy/memmove while in critical section. This is
+  only effective when realloc is called with interrupts enabled. The copy
+  process alone can take over 10us (when copying more than ~498 bytes with a
+  80MHz CPU clock). It would be good practice for an ISR to avoid realloc.
+  Note, while doing this might initially sound scary, this appears to be very
+  stable. It ran on my troublesome sketch for over 3 weeks until I got back from
+  vacation and flashed an update. Troublesome sketch - runs ESPAsyncTCP, with
+  modified fauxmo emulation for 10 devices. It receives lost of Network traffic
+  related to uPnP scans, which includes lots of TCP connects disconnects RSTs
+  related to uPnP discovery.
+
+  Locking is no longer nested in realloc, due to refactoring for reduced IRQ
+  off time.
+
+  I have clocked umm_info critical lock time taking as much as 180us. A common
+  use for the umm_info call is to get the free heap result. It is common
+  to try and closely monitor free heap as a method to detect memory leaks.
+  This may result in frequent calls to umm_info. There has not been a clear
+  test case that shows an issue yet; however, I and others think they are or
+  have had crashes related to this.
+
+  I have added code that updates a current free heap value from _umm_malloc,
+  _umm_realloc, and _umm_free. Removing the need to do a long interrupts
+  disabled calculation via umm_info.
+
+  Build optional, min/max time measurements for locks held while in info,
+  malloc, realloc, and free. Also, maintains a count of how many times each is
+  called with INTLEVEL set.
+
+ */
 
 /* -- dbglog {{{ */
 
@@ -562,42 +611,42 @@ extern int umm_last_fail_alloc_size;
 /* ------------------------------------------------------------------------- */
 
 #if DBG_LOG_LEVEL >= 6
-#  define DBG_LOG_TRACE( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_TRACE( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_TRACE( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 5
-#  define DBG_LOG_DEBUG( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_DEBUG( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_DEBUG( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 4
-#  define DBG_LOG_CRITICAL( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_CRITICAL( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_CRITICAL( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 3
-#  define DBG_LOG_ERROR( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_ERROR( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_ERROR( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 2
-#  define DBG_LOG_WARNING( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_WARNING( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_WARNING( format, ... )
 #endif
 
 #if DBG_LOG_LEVEL >= 1
-#  define DBG_LOG_INFO( format, ... ) printf( format, ## __VA_ARGS__ )
+#  define DBG_LOG_INFO( format, ... ) DBGLOG_FUNCTION( format, ## __VA_ARGS__ )
 #else
 #  define DBG_LOG_INFO( format, ... )
 #endif
 
-#define DBG_LOG_FORCE( force, format, ... ) {if(force) {printf( format, ## __VA_ARGS__  );}}
+#define DBG_LOG_FORCE( force, format, ... ) {if(force) {DBGLOG_FUNCTION( format, ## __VA_ARGS__  );}}
 
 /* }}} */
 
@@ -646,6 +695,10 @@ unsigned short int umm_numblocks = 0;
 #define UMM_PFREE(b)  (UMM_BLOCK(b).body.free.prev)
 #define UMM_DATA(b)   (UMM_BLOCK(b).body.data)
 
+/*
+ * This does not look safe, no access locks. It currently is not being
+ * built, so not an immediate issue. -  06/10/19
+ */
 /* integrity check (UMM_INTEGRITY_CHECK) {{{ */
 #if defined(UMM_INTEGRITY_CHECK)
 /*
@@ -686,7 +739,7 @@ static int integrity_check(void) {
 
     /* Check that next free block number is valid */
     if (cur >= UMM_NUMBLOCKS) {
-      printf("heap integrity broken: too large next free num: %d "
+      DBGLOG_FUNCTION("heap integrity broken: too large next free num: %d "
           "(in block %d, addr 0x%lx)\n", cur, prev,
           (unsigned long)&UMM_NBLOCK(prev));
       ok = 0;
@@ -699,7 +752,7 @@ static int integrity_check(void) {
 
     /* Check if prev free block number matches */
     if (UMM_PFREE(cur) != prev) {
-      printf("heap integrity broken: free links don't match: "
+      DBGLOG_FUNCTION("heap integrity broken: free links don't match: "
           "%d -> %d, but %d -> %d\n",
           prev, cur, cur, UMM_PFREE(cur));
       ok = 0;
@@ -718,7 +771,7 @@ static int integrity_check(void) {
 
     /* Check that next block number is valid */
     if (cur >= UMM_NUMBLOCKS) {
-      printf("heap integrity broken: too large next block num: %d "
+      DBGLOG_FUNCTION("heap integrity broken: too large next block num: %d "
           "(in block %d, addr 0x%lx)\n", cur, prev,
           (unsigned long)&UMM_NBLOCK(prev));
       ok = 0;
@@ -733,7 +786,7 @@ static int integrity_check(void) {
     if ((UMM_NBLOCK(cur) & UMM_FREELIST_MASK)
         != (UMM_PBLOCK(cur) & UMM_FREELIST_MASK))
     {
-      printf("heap integrity broken: mask wrong at addr 0x%lx: n=0x%x, p=0x%x\n",
+      DBGLOG_FUNCTION("heap integrity broken: mask wrong at addr 0x%lx: n=0x%x, p=0x%x\n",
           (unsigned long)&UMM_NBLOCK(cur),
           (UMM_NBLOCK(cur) & UMM_FREELIST_MASK),
           (UMM_PBLOCK(cur) & UMM_FREELIST_MASK)
@@ -747,7 +800,7 @@ static int integrity_check(void) {
 
     /* Check if prev block number matches */
     if (UMM_PBLOCK(cur) != prev) {
-      printf("heap integrity broken: block links don't match: "
+      DBGLOG_FUNCTION("heap integrity broken: block links don't match: "
           "%d -> %d, but %d -> %d\n",
           prev, cur, cur, UMM_PBLOCK(cur));
       ok = 0;
@@ -793,7 +846,7 @@ clean:
  */
 static void dump_mem ( const unsigned char *ptr, size_t len ) {
   while (len--) {
-    printf(" 0x%.2x", (unsigned int)(*ptr++));
+    DBGLOG_FUNCTION(" 0x%.2x", (unsigned int)(*ptr++));
   }
 }
 
@@ -824,11 +877,11 @@ static int check_poison( const unsigned char *ptr, size_t poison_size,
   }
 
   if (!ok) {
-    printf("there is no poison %s the block. "
+    DBGLOG_FUNCTION("there is no poison %s the block. "
         "Expected poison address: 0x%lx, actual data:",
         where, (unsigned long)ptr);
     dump_mem(ptr, poison_size);
-    printf("\n");
+    DBGLOG_FUNCTION("\n");
   }
 
   return ok;
@@ -842,7 +895,7 @@ static int check_poison_block( umm_block *pblock ) {
   int ok = 1;
 
   if (pblock->header.used.next & UMM_FREELIST_MASK) {
-    printf("check_poison_block is called for free block 0x%lx\n",
+    DBGLOG_FUNCTION("check_poison_block is called for free block 0x%lx\n",
         (unsigned long)pblock);
   } else {
     /* the block is used; let's check poison */
@@ -851,7 +904,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE);
     if (!check_poison(pc_cur, UMM_POISON_SIZE_BEFORE, "before")) {
-      printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
+      DBGLOG_FUNCTION("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;
@@ -859,7 +912,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + *((UMM_POISONED_BLOCK_LEN_TYPE *)pc) - UMM_POISON_SIZE_AFTER;
     if (!check_poison(pc_cur, UMM_POISON_SIZE_AFTER, "after")) {
-	  printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
+      DBGLOG_FUNCTION("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;
@@ -982,6 +1035,7 @@ static void *get_unpoisoned( void *vptr ) {
 UMM_HEAP_INFO ummHeapInfo;
 
 void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
+  UMM_CRITICAL_DECL(id_info);
 
   unsigned short int blockNo = 0;
 
@@ -990,7 +1044,7 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
   }
 
   /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
+  UMM_CRITICAL_ENTRY(id_info);
 
   /*
    * Clear out all of the entries in the ummHeapInfo structure before doing
@@ -1051,7 +1105,7 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
       if( ptr == &UMM_BLOCK(blockNo) ) {
 
         /* Release the critical section... */
-        UMM_CRITICAL_EXIT();
+        UMM_CRITICAL_EXIT(id_info);
 
         return( ptr );
       }
@@ -1104,8 +1158,23 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
       ummHeapInfo.usedBlocks,
       ummHeapInfo.freeBlocks  );
 
+  if (ummHeapInfo.freeBlocks == ummStats.free_blocks) {
+      DBG_LOG_FORCE( force, "\nheap info Free blocks and heap statistics Free blocks match.\n");
+  } else {
+      DBG_LOG_FORCE( force, "\nheap info Free blocks  %5d != heap statistics Free Blocks  %5d\n\n",
+          ummHeapInfo.freeBlocks,
+          ummStats.free_blocks  );
+  }
+
+  DBG_LOG_FORCE( force, "\numm heap statistics:\n");
+  DBG_LOG_FORCE( force,   "  Free Space        %5u\n", ummStats.free_blocks * sizeof(umm_block));
+  DBG_LOG_FORCE( force,   "  Low Watermark     %5u\n", ummStats.free_blocks_min * sizeof(umm_block));
+  DBG_LOG_FORCE( force,   "  MAX Alloc Request %5u\n", ummStats.alloc_max_size);
+  DBG_LOG_FORCE( force,   "  OOM Count         %5u\n", ummStats.oom_count);
+  DBG_LOG_FORCE( force,   "  Size of umm_block %5u\n", sizeof(umm_block));
+
   /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
+  UMM_CRITICAL_EXIT(id_info);
 
   return( NULL );
 }
@@ -1223,6 +1292,9 @@ void ICACHE_FLASH_ATTR umm_init( void ) {
     /* index of the latest `umm_block` */
     const unsigned short int block_last = UMM_NUMBLOCKS - 1;
 
+    /* init ummStats */
+    ummStats.free_blocks = ummStats.free_blocks_min = block_last;
+
     /* setup the 0th `umm_block`, which just points to the 1st */
     UMM_NBLOCK(block_0th) = block_1th;
     UMM_NFREE(block_0th)  = block_1th;
@@ -1266,6 +1338,7 @@ void ICACHE_FLASH_ATTR umm_init( void ) {
 /* ------------------------------------------------------------------------ */
 
 static void _umm_free( void *ptr ) {
+  UMM_CRITICAL_DECL(id_free);
 
   unsigned short int c;
 
@@ -1286,14 +1359,17 @@ static void _umm_free( void *ptr ) {
    *        on the free list!
    */
 
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
-
   /* Figure out which block we're in. Note the use of truncated division... */
 
   c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
 
   DBG_LOG_DEBUG( "Freeing block %6d\n", c );
+
+  /* Protect the critical section... */
+  UMM_CRITICAL_ENTRY(id_free);
+
+  /* Update heap statistics */
+  ummStats.free_blocks += (UMM_NBLOCK(c) - c);
 
   /* Now let's assimilate this block with the next one if possible. */
 
@@ -1346,12 +1422,14 @@ static void _umm_free( void *ptr ) {
 #endif
 
   /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
+  UMM_CRITICAL_EXIT(id_free);
 }
 
 /* ------------------------------------------------------------------------ */
 
 static void *_umm_malloc( size_t size ) {
+  UMM_CRITICAL_DECL(id_malloc);
+
   unsigned short int blocks;
   unsigned short int blockSize = 0;
 
@@ -1377,8 +1455,8 @@ static void *_umm_malloc( size_t size ) {
     return( (void *)NULL );
   }
 
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
+  if ( size > ummStats.alloc_max_size )
+    ummStats.alloc_max_size = size;
 
   blocks = umm_blocks( size );
 
@@ -1389,6 +1467,9 @@ static void *_umm_malloc( size_t size ) {
    * This part may be customized to be a best-fit, worst-fit, or first-fit
    * algorithm
    */
+
+  /* Protect the critical section... */
+  UMM_CRITICAL_ENTRY(id_malloc);
 
   cf = UMM_NFREE(0);
 
@@ -1462,19 +1543,27 @@ static void *_umm_malloc( size_t size ) {
       UMM_PFREE( UMM_NFREE(cf) ) = cf + blocks;
       UMM_NFREE( cf + blocks ) = UMM_NFREE(cf);
     }
+
+    /* Update heap statistics */
+    ummStats.free_blocks -= blocks;
+    if (ummStats.free_blocks < ummStats.free_blocks_min)
+      ummStats.free_blocks_min = ummStats.free_blocks;
+
   } else {
+    ummStats.oom_count += 1;
+
+    /* Release the critical section... */
+    UMM_CRITICAL_EXIT(id_malloc);
+
     /* Out of memory */
 
     DBG_LOG_DEBUG(  "Can't allocate %5d blocks\n", blocks );
-
-    /* Release the critical section... */
-    UMM_CRITICAL_EXIT();
 
     return( (void *)NULL );
   }
 
   /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
+  UMM_CRITICAL_EXIT(id_malloc);
 
   return( (void *)&UMM_DATA(cf) );
 }
@@ -1482,10 +1571,10 @@ static void *_umm_malloc( size_t size ) {
 /* ------------------------------------------------------------------------ */
 
 static void *_umm_realloc( void *ptr, size_t size ) {
+  UMM_CRITICAL_DECL(id_realloc);
 
   unsigned short int blocks;
   unsigned short int blockSize;
-
   unsigned short int c;
 
   size_t curSize;
@@ -1522,8 +1611,33 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     return( (void *)NULL );
   }
 
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
+  if ( size > ummStats.alloc_max_size )
+    ummStats.alloc_max_size = size;
+
+  /*
+   * Defer starting critical section.
+   *
+   * Initially we should be safe without a critical section as long as we are
+   * referencing values that are within our allocation as constants.
+   * And only reference values that will not change, while the redefintions of
+   * the allocations around us change.
+   *
+   * Example UMM_PBLOCK() could be change by a call to malloc from an ISR.
+   * On the other hand UMM_NBLOCK() is safe returns an address of the next
+   * block. The calculation is all based on information within our allocation
+   * that remains constant, until we change it.
+   *
+   * As long as we don't try to modify the next block or walk the chain of
+   * blocks we are okay.
+   *
+   * When called by an "interrupts enabled" type caller, it bears the
+   * responsibility to not call again, with the allocate we are currently
+   * working on. I think this is a normal expectation. I could be wrong.
+   * Such a situation would involve a function that is called from foreground
+   * and ISR context. Such code would already have to be re-entrant. This
+   * change may expand the corner cases for such a function.
+   *
+   */
 
   /*
    * Otherwise we need to actually do a reallocation. A naiive approach
@@ -1559,11 +1673,11 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     DBG_LOG_DEBUG( "realloc the same size block - %d, do nothing\n", blocks );
 
-    /* Release the critical section... */
-    UMM_CRITICAL_EXIT();
-
     return( ptr );
   }
+
+  /* Now we need a critical section... */
+  UMM_CRITICAL_ENTRY(id_realloc);
 
   /*
    * Now we have a block size that could be bigger or smaller. Either
@@ -1573,7 +1687,13 @@ static void *_umm_realloc( void *ptr, size_t size ) {
    * assimilation step later in free :-)
    */
 
-  umm_assimilate_up( c );
+   if( UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_FREELIST_MASK ) {
+       // This will often be most of the free heap. The excess is
+       // restored when umm_free() is called before returning.
+       ummStats.free_blocks -=
+           (UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_BLOCKNO_MASK) - UMM_NBLOCK(c);
+       umm_assimilate_up( c );
+   }
 
   /*
    * Now check if it might help to assimilate down, but don't actually
@@ -1589,6 +1709,17 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     DBG_LOG_DEBUG( "realloc() could assimilate down %d blocks - fits!\n\r", c-UMM_PBLOCK(c) );
 
+    /*
+     * Calculate the number of blocks to keep while the information is
+     * still available.
+     */
+
+    unsigned short int prevBlockSize = c - UMM_PBLOCK(c);
+    ummStats.free_blocks -= prevBlockSize;
+    unsigned short int prelimBlockSize = blockSize + prevBlockSize;
+    if(prelimBlockSize < blocks)
+        prelimBlockSize = blocks;
+
     /* Disconnect the previous block from the FREE list */
 
     umm_disconnect_from_free_list( UMM_PBLOCK(c) );
@@ -1601,6 +1732,29 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     c = umm_assimilate_down(c, 0);
 
     /*
+     * Currently all or most of the heap has been grabbed. Do an early split of
+     * allocation down to the amount needed to do a successful move operation.
+     * This will allow an alloc/new from a ISR to succeed while a memmove is
+     * running.
+     */
+    if( (UMM_NBLOCK(c) - c) > prelimBlockSize ) {
+        umm_make_new_block( c, prelimBlockSize, 0, 0 );
+        _umm_free( (void *)&UMM_DATA(c+prelimBlockSize) );
+    }
+
+    // This is the lowest low that may be seen by an ISR doing an alloc/new
+    if( ummStats.free_blocks < ummStats.free_blocks_min )
+        ummStats.free_blocks_min = ummStats.free_blocks;
+
+    /*
+     * For the ESP8266 interrupts should not be off for more than 10us.
+     * An unprotect/protect around memmove should be safe to do here.
+     * All variables used are on the stack.
+     */
+
+    UMM_CRITICAL_EXIT(id_realloc);
+
+    /*
      * Move the bytes down to the new block we just created, but be sure to move
      * only the original bytes.
      */
@@ -1610,6 +1764,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     /* And don't forget to adjust the pointer to the new block location! */
 
     ptr    = (void *)&UMM_DATA(c);
+
+    /* Now resume critical section... */
+    UMM_CRITICAL_ENTRY(id_realloc);
   }
 
   /* Now calculate the block size again...and we'll have three cases */
@@ -1634,6 +1791,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
   } else {
     /* New block is bigger than the old block... */
 
+    /* Finish up without critical section */
+    UMM_CRITICAL_EXIT(id_realloc);
+
     void *oldptr = ptr;
 
     DBG_LOG_DEBUG( "realloc %d to a bigger block %d, make new, copy, and free the old\n", blockSize, blocks );
@@ -1646,12 +1806,18 @@ static void *_umm_realloc( void *ptr, size_t size ) {
     if( (ptr = _umm_malloc( size )) ) {
       memcpy( ptr, oldptr, curSize );
       _umm_free( oldptr );
+    } else {
+      ummStats.oom_count += 1; // Needs atomic
     }
+    return( ptr );
 
   }
 
+  if (ummStats.free_blocks < ummStats.free_blocks_min)
+      ummStats.free_blocks_min = ummStats.free_blocks;
+
   /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
+  UMM_CRITICAL_EXIT(id_realloc);
 
   return( ptr );
 }
@@ -1766,8 +1932,16 @@ void umm_free( void *ptr ) {
 /* ------------------------------------------------------------------------ */
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
-  umm_info(NULL, 0);
-  return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
+  return (size_t)ummStats.free_blocks * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_free_heap_size_min( void ) {
+  return (size_t)ummStats.free_blocks_min * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void ) {
+  ummStats.free_blocks_min = ummStats.free_blocks;
+  return (size_t)ummStats.free_blocks_min *  sizeof(umm_block);
 }
 
 size_t ICACHE_FLASH_ATTR umm_max_block_size( void ) {

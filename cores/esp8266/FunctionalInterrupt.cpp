@@ -1,14 +1,13 @@
 #include <FunctionalInterrupt.h>
 #include <Schedule.h>
 #include "Arduino.h"
-#include <ScheduledFunctions.h>
 
 // Duplicate typedefs from core_esp8266_wiring_digital_c
 typedef void (*voidFuncPtr)(void);
 typedef void (*voidFuncPtrArg)(void*);
 
 // Helper functions for Functional interrupt routines
-extern "C" void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void*fp , int mode);
+extern "C" void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtr userFunc, void*fp, int mode, bool functional);
 
 
 void ICACHE_RAM_ATTR interruptFunctional(void* arg)
@@ -17,7 +16,6 @@ void ICACHE_RAM_ATTR interruptFunctional(void* arg)
 	if (localArg->functionInfo->reqScheduledFunction)
 	{
 		schedule_function(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))));
-//      scheduledInterrupts->scheduleFunctionReg(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))), false, true);
 	}
 	if (localArg->functionInfo->reqFunction)
 	{
@@ -49,15 +47,11 @@ void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode
 	as->interruptInfo = ii;
 	as->functionInfo = fi;
 
-	__attachInterruptArg (pin, (voidFuncPtr)interruptFunctional, as, mode);
+	__attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
 }
 
 void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
 {
-	if (!scheduledInterrupts)
-	{
-		scheduledInterrupts = new ScheduledFunctions(32);
-	}
 	InterruptInfo* ii = new InterruptInfo;
 
 	FunctionInfo* fi = new FunctionInfo;
@@ -67,5 +61,5 @@ void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> sc
 	as->interruptInfo = ii;
 	as->functionInfo = fi;
 
-	__attachInterruptArg (pin, (voidFuncPtr)interruptFunctional, as, mode);
+	__attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
 }

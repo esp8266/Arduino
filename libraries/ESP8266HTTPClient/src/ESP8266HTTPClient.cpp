@@ -225,6 +225,11 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
         return false;
     }
     _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    if(!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
+        return false;
+    }
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
     return true;
 }
@@ -242,6 +247,11 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
         return false;
     }
     _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
+    if(!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
+        return false;
+    }
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] BearSSL-httpsFingerprint:");
     for (size_t i=0; i < 20; i++) {
         DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
@@ -409,7 +419,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
  */
 void HTTPClient::end(void)
 {
-    disconnect();
+    disconnect(false);
     clear();
     _redirectCount = 0;
 }
@@ -558,11 +568,12 @@ void HTTPClient::setRedirectLimit(uint16_t limit)
 
 /**
  * use HTTP1.0
- * @param timeout
+ * @param useHTTP10 bool
  */
 void HTTPClient::useHTTP10(bool useHTTP10)
 {
     _useHTTP10 = useHTTP10;
+    _reuse = !useHTTP10;
 }
 
 /**
@@ -656,9 +667,7 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
             return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
         }
 
-        if(payload && size > 0) {
-            addHeader(F("Content-Length"), String(size));
-        }
+        addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
 
         // send Header
         if(!sendHeader(type)) {
@@ -763,7 +772,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
     if(buff) {
         // read all data from stream and send it to server
-        while(connected() && (stream->available() > -1) && (len > 0 || len == -1)) {
+        while(connected() && (stream->available() > 0) && (len > 0 || len == -1)) {
 
             // get available data size
             int sizeAvailable = stream->available();
@@ -982,7 +991,7 @@ int HTTPClient::writeToStream(Stream * stream)
         return returnError(HTTPC_ERROR_ENCODING);
     }
 
-    disconnect();
+    disconnect(true);
     return ret;
 }
 
@@ -1141,7 +1150,11 @@ bool HTTPClient::hasHeader(const char* name)
 bool HTTPClient::connect(void)
 {
     if(connected()) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
+        if(_reuse) {
+            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
+        } else {
+            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
+        }
         while(_client->available() > 0) {
             _client->read();
         }
@@ -1151,6 +1164,10 @@ bool HTTPClient::connect(void)
 #if HTTPCLIENT_1_1_COMPATIBLE
     if(!_client && _transportTraits) {
         _tcpDeprecated = _transportTraits->create();
+        if(!_tcpDeprecated) {
+            DEBUG_HTTPCLIENT("[HTTP-Client] connect: could not create tcp\n");
+            return false;
+        }
         _client = _tcpDeprecated.get();
     }
 #endif
@@ -1248,9 +1265,12 @@ int HTTPClient::handleHeaderResponse()
         return HTTPC_ERROR_NOT_CONNECTED;
     }
 
+    clear();
+
+    _canReuse = _reuse;
+
     String transferEncoding;
-    _returnCode = -1;
-    _size = -1;
+
     _transferEncoding = HTTPC_TE_IDENTITY;
     unsigned long lastDataTime = millis();
 
@@ -1265,6 +1285,9 @@ int HTTPClient::handleHeaderResponse()
             DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
             if(headerLine.startsWith("HTTP/1.")) {
+                if(_canReuse) {
+                    _canReuse = (headerLine[sizeof "HTTP/1." - 1] != '0');
+                }
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
             } else if(headerLine.indexOf(':')) {
                 String headerName = headerLine.substring(0, headerLine.indexOf(':'));
@@ -1275,8 +1298,10 @@ int HTTPClient::handleHeaderResponse()
                     _size = headerValue.toInt();
                 }
 
-                if(headerName.equalsIgnoreCase("Connection")) {
-                    _canReuse = headerValue.equalsIgnoreCase("keep-alive");
+                if(_canReuse && headerName.equalsIgnoreCase("Connection")) {
+                    if(headerValue.indexOf("close") >= 0 && headerValue.indexOf("keep-alive") < 0) {
+                        _canReuse = false;
+                    }
                 }
 
                 if(headerName.equalsIgnoreCase("Transfer-Encoding")) {
