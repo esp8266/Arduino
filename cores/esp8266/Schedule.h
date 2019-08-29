@@ -2,6 +2,7 @@
 #define ESP_SCHEDULE_H
 
 #include <functional>
+#include <atomic>
 
 #define SCHEDULED_FN_MAX_COUNT 32
 
@@ -60,8 +61,10 @@ void run_scheduled_functions();
 //   recurrent function.
 // * A recurrent function currently must not schedule another recurrent
 //   functions.
-
-bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us);
+// * If a wakeupToken is used, if its value toggles, any remaining
+//   delay is disregarded, and the lambda runs on the next scheduler iteration.
+bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us,
+    const std::atomic<bool>* wakeupToken = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
