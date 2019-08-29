@@ -11,7 +11,7 @@ ESP8266WiFi library has been developed basing on ESP8266 SDK, using naming conve
 Ticker
 ------
 
-Library for calling functions repeatedly with a certain period. `Two examples <https://github.com/esp8266/Arduino/tree/master/libraries/Ticker/examples>`__ included.
+Library for calling functions repeatedly with a certain period. `Three examples <https://github.com/esp8266/Arduino/tree/master/libraries/Ticker/examples>`__ included.
 
 It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
 

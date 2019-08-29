@@ -80,10 +80,6 @@ class TwoWire : public Stream
     void onReceive( void (*)(size_t) ); // legacy esp8266 backward compatibility
     void onRequest( void (*)(void) );
 
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
     using Print::write;
 };
 

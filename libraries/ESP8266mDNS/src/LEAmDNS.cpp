@@ -87,24 +87,27 @@ MDNSResponder::~MDNSResponder(void) {
  * Finally the responder is (re)started
  *
  */
-bool MDNSResponder::begin(const char* p_pcHostname) {
+bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress, uint32_t p_u32TTL) {
     
+    (void)p_u32TTL; // ignored
     bool    bResult = false;
     
     if (0 == m_pUDPContext) {
         if (_setHostname(p_pcHostname)) {
+
+            m_IPAddress = p_IPAddress;
             
             m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
                 (void) pEvent;
                 // Ensure that _restart() runs in USER context
-                schedule_function(std::bind(&MDNSResponder::_restart, this));
+                schedule_function([this]() { MDNSResponder::_restart(); });
             });
 
             m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
                 (void) pEvent;
                 // Ensure that _restart() runs in USER context
-                schedule_function(std::bind(&MDNSResponder::_restart, this));
-            });
+                schedule_function([this]() { MDNSResponder::_restart(); });
+                });
 
             bResult = _restart();
         }
@@ -117,18 +120,6 @@ bool MDNSResponder::begin(const char* p_pcHostname) {
 }
 
 /*
- * MDNSResponder::begin (LEGACY)
- */
-bool MDNSResponder::begin(const char* p_pcHostname,
-                          IPAddress p_IPAddress,
-                          uint32_t p_u32TTL /*= 120*/) {
-    
-    (void) p_IPAddress;
-    (void) p_u32TTL;
-    return begin(p_pcHostname);
-}
-
-/*
  * MDNSResponder::close
  *
  * Ends the MDNS responder.
@@ -137,10 +128,10 @@ bool MDNSResponder::begin(const char* p_pcHostname,
  */
 bool MDNSResponder::close(void) {
     
-	m_GotIPHandler.reset();			// reset WiFi event callbacks.
-	m_DisconnectedHandler.reset();
+    m_GotIPHandler.reset();			// reset WiFi event callbacks.
+    m_DisconnectedHandler.reset();
 
-	_announce(false, true);
+    _announce(false, true);
     _resetProbeStatus(false);   // Stop probing
 
     _releaseServiceQueries();
@@ -159,7 +150,7 @@ bool MDNSResponder::close(void) {
  */
 
 bool MDNSResponder::end(void) {
-	return close();
+    return close();
 }
 
 /*
@@ -832,11 +823,11 @@ uint32_t MDNSResponder::answerCount(const MDNSResponder::hMDNSServiceQuery p_hSe
 
 std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo (const MDNSResponder::hMDNSServiceQuery p_hServiceQuery) {
     std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
-	for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
+    for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
     {
-		tempVector.emplace_back(*this,p_hServiceQuery,i);
+        tempVector.emplace_back(*this,p_hServiceQuery,i);
     }
-	return tempVector;
+    return tempVector;
 }
 
 /*
@@ -1053,14 +1044,14 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
  */
 bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeFn p_fnCallback) {
 
-	m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
+    m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
     
     return true;
 }
 
 bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn) {
-	using namespace std::placeholders;
-	return setHostProbeResultCallback(std::bind(pfn, std::ref(*this), _1, _2));
+    using namespace std::placeholders;
+    return setHostProbeResultCallback([this, pfn](const char* p_pcDomainName, bool p_bProbeResult) { pfn(*this, p_pcDomainName, p_bProbeResult); });
 }
 
 /*
@@ -1088,8 +1079,10 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
 
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
                                                   MDNSResponder::MDNSServiceProbeFn1 p_fnCallback) {
-	using namespace std::placeholders;
-	return setServiceProbeResultCallback(p_hService, std::bind(p_fnCallback, std::ref(*this), _1, _2, _3));
+    using namespace std::placeholders;
+    return setServiceProbeResultCallback(p_hService, [this, p_fnCallback](const char* p_pcServiceName, const hMDNSService p_hMDNSService, bool p_bProbeResult) {
+        p_fnCallback(*this, p_pcServiceName, p_hMDNSService, p_bProbeResult);
+    });
 }
 
 

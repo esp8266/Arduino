@@ -26,7 +26,6 @@
 #include <bearssl/bearssl.h>
 #include <Updater.h>
 
-
 // Internal opaque structures, not needed by user applications
 namespace brssl {
   class public_key;
@@ -146,6 +145,7 @@ class HashSHA256 : public UpdaterHashClass {
     virtual void end() override;
     virtual int len() override;
     virtual const void *hash() override;
+    virtual const unsigned char *oid() override;
   private:
     br_sha256_context _cc;
     unsigned char _sha256[32];

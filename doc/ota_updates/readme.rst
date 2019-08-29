@@ -125,6 +125,18 @@ Compile the sketch normally and, once a `.bin` file is available, sign it using 
 
     <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
 
+Old And New Signature Formats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Up to version 2.5.2 of the core, the format of signatures was a little different. An additional signed binary with the extension legacy_sig is created. This file contains a signature in the old format and can be uploaded OTA to a device that checks for the old signature format.
+
+To create a legacy signature, call the signing script with --legacy:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
+
 Safety
 ~~~~~~
 
@@ -181,7 +193,7 @@ Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) boa
    -  esp8266/Arduino platform package 2.0.0 or newer - for instructions
       follow
       https://github.com/esp8266/Arduino#installing-with-boards-manager
-   -  Python 2.7 - https://www.python.org/
+   -  Python 3.x - https://www.python.org/
 
       **Note:** Windows users should select “Add python.exe to Path”
       (see below – this option is not selected by default).
