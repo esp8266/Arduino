@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community
@@ -32,6 +32,7 @@
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
 #            lwip/lwip2                  menus for available lwip versions
 
+from __future__ import print_function
 import os
 import sys
 import collections
@@ -44,13 +45,14 @@ import json
 # or by user command line
 
 speeds = collections.OrderedDict([
-    (  '57', [ 's57',  's115', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '115', [ 's115', 's57', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '230', [ 's230', 's57', 's115', 's256', 's460', 's512', 's921' ]),
-    ( '256', [ 's256', 's57', 's115', 's230', 's460', 's512', 's921' ]),
-    ( '460', [ 's460', 's57', 's115', 's230', 's256', 's512', 's921' ]),
-    ( '512', [ 's512', 's57', 's115', 's230', 's256', 's460', 's921' ]),
-    ( '921', [ 's921', 's57', 's115', 's230', 's256', 's460', 's512' ]),
+    (  '57',  [ 's57',  's115', 's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '115',  [ 's115', 's57',  's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '230',  [ 's230', 's57',  's115', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '256',  [ 's256', 's57',  's115', 's230', 's460', 's512', 's921', 's3000' ]),
+    ( '460',  [ 's460', 's57',  's115', 's230', 's256', 's512', 's921', 's3000' ]),
+    ( '512',  [ 's512', 's57',  's115', 's230', 's256', 's460', 's921', 's3000' ]),
+    ( '921',  [ 's921', 's57',  's115', 's230', 's256', 's460', 's512', 's3000' ]),
+    ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
     ])
 
 # boards list
@@ -299,7 +301,7 @@ boards = collections.OrderedDict([
             ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
-            ( '.menu.UploadTool.esptool.upload.verbose', '-vv' ),
+            ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
             ( '.menu.UploadTool.espota', 'OTA' ),
             ( '.menu.UploadTool.espota.upload.tool', 'espota' ),
             ]),
@@ -881,8 +883,11 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.disabled', 'Disabled' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
+        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
@@ -1060,6 +1065,10 @@ macros = {
     's921': collections.OrderedDict([
         ( '.menu.baud.921600', '921600' ),
         ( '.menu.baud.921600.upload.speed', '921600' ),
+        ]),
+    's3000': collections.OrderedDict([
+        ( '.menu.baud.3000000', '3000000' ),
+        ( '.menu.baud.3000000.upload.speed', '3000000' ),
         ]),
 
     ####################### flash erase
@@ -1405,7 +1414,7 @@ def all_boards ():
 
         # standalone options
         if 'opts' in board:
-            for optname in board['opts']:
+            for optname in sorted(board['opts']):
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
