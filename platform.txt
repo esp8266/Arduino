@@ -83,7 +83,7 @@ compiler.objcopy.eep.extra_flags=
 compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
-## needs bash, git, and echo
+## needs git
 recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 recipe.hooks.core.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
 

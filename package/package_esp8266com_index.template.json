@@ -127,7 +127,7 @@
                   {
                      "packager": "esp8266",
                      "version": "3.7.2-post1",
-                     "name": "python"
+                     "name": "python3"
                   }
                ],
                "help": {
@@ -142,17 +142,17 @@
                "systems": [
                   {
                      "host": "x86_64-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python-3.7.2.post1-embed-win32v2a.zip",
-                     "archiveFileName": "python-3.7.2.post1-embed-win32v2a.zip",
-                     "checksum": "SHA-256:8eb71cd637c42abbeea9f31912bbaca22222405d8624ace8901c801519321d35",
-                     "size": "6481988"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip",
+                     "archiveFileName": "python3-3.7.2.post1-embed-win32v2a.zip",
+                     "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
+                     "size": "6428926"
                   },
                   {
                      "host": "i686-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python-3.7.2.post1-embed-win32v2a.zip",
-                     "archiveFileName": "python-3.7.2.post1-embed-win32va2.zip",
-                     "checksum": "SHA-256:8eb71cd637c42abbeea9f31912bbaca22222405d8624ace8901c801519321d35",
-                     "size": "6481988"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip",
+                     "archiveFileName": "python3-3.7.2.post1-embed-win32va2.zip",
+                     "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
+                     "size": "6428926"
                   },
                   {
                      "host": "aarch64-linux-gnu",
