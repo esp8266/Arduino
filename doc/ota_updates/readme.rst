@@ -193,7 +193,7 @@ Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) boa
    -  esp8266/Arduino platform package 2.0.0 or newer - for instructions
       follow
       https://github.com/esp8266/Arduino#installing-with-boards-manager
-   -  Python 2.7 - https://www.python.org/
+   -  Python 3.x - https://www.python.org/
 
       **Note:** Windows users should select “Add python.exe to Path”
       (see below – this option is not selected by default).

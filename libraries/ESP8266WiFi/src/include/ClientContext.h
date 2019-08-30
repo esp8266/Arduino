@@ -609,9 +609,10 @@ protected:
         (void) err;
         (void) pcb;
         assert(pcb == _pcb);
-        assert(_delaying);
-        _delaying = false;
-        esp_schedule(); // break current delay()
+        if (_delaying) {
+            _delaying = false;
+            esp_schedule(); // break current delay()
+        }
         return ERR_OK;
     }
 
