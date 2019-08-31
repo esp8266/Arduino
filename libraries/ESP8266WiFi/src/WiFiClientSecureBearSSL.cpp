@@ -437,8 +437,15 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
   }
+  
+  unsigned long startMillis = millis();
   for (int no_work = 0; blocking || no_work < 2;) {    
     optimistic_yield(100);
+    
+    if (millis() - startMillis > 30000) {
+      DEBUG_BSSL("_run_until: Timeout\n");
+      return -1;
+    }
     
     int state;
     state = br_ssl_engine_current_state(_eng);
