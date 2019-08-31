@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Generate an Arduino compatible BIN file from bootloader and sketch ELF
 # Replaces esptool-ck.exe and emulates its behavior.
@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 import argparse
 import re
 import os

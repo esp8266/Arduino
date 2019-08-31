@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # This script will download and extract required tools into the current directory.
 # Tools list is obtained from package/package_esp8266com_index.template.json file.
 # Written by Ivan Grokhotkov, 2015.
