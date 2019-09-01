@@ -60,6 +60,13 @@ static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 /* Used to implement optimistic_yield */
 static uint32_t s_micros_at_task_start;
 
+/* For ets_intr_lock_nest / ets_intr_unlock_nest
+ * Max nesting seen by SDK so far is 2.
+ */
+#define ETS_INTR_LOCK_NEST_MAX 7
+byte ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
+byte ets_intr_lock_stack_ptr=0;
+
 
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
@@ -120,6 +127,17 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
         yield();
     }
 }
+
+extern "C" void ets_intr_lock_nest() {
+  if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
+     ets_intr_lock_stack[ets_intr_lock_stack_ptr++] = xt_rsil(3);
+}
+
+extern "C" void ets_intr_unlock_nest() {
+  if (ets_intr_lock_stack_ptr > 0)
+     xt_wsr_ps(ets_intr_lock_stack[--ets_intr_lock_stack_ptr]);
+}
+
 
 extern "C" void __loop_end (void)
 {
