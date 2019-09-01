@@ -72,5 +72,7 @@ void loop() {
   http.end();
 
   Serial.println("Done testing, now wait forever");
-  for (;;) delay(100); // Wait forever
+  for (;;) {
+    delay(100); // Wait forever
+  }
 }
