@@ -764,6 +764,10 @@
 #define IP_FRAG                         0
 #endif /* !LWIP_IPV4 */
 
+#ifndef IP_NAPT
+#define IP_NAPT                         0
+#endif
+
 /**
  * IP_OPTIONS_ALLOWED: Defines the behavior for IP options.
  *      IP_OPTIONS_ALLOWED==0: All packets with IP options are dropped.
@@ -3484,6 +3488,14 @@
 #if !defined DHCP6_DEBUG || defined __DOXYGEN__
 #define DHCP6_DEBUG                     LWIP_DBG_OFF
 #endif
+
+/**
+ * NAPT_DEBUG: Enable debugging for NAPT.
+ */
+#ifndef NAPT_DEBUG
+#define NAPT_DEBUG                       LWIP_DBG_OFF
+#endif
+
 /**
  * @}
  */

@@ -819,7 +819,7 @@ extern "C" {
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
 #endif
   };
-#ifndef BEARSSL_BASIC
+#ifndef BEARSSL_SSL_BASIC
   // Server w/EC has one set, not possible with basic SSL config
   static const uint16_t suites_server_ec_P [] PROGMEM = {
     BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
@@ -852,7 +852,7 @@ extern "C" {
 #endif
 
   static const uint16_t suites_server_rsa_P[] PROGMEM = {
-#ifndef BEARSSL_BASIC
+#ifndef BEARSSL_SSL_BASIC
     BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
     BR_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
     BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
@@ -871,7 +871,7 @@ extern "C" {
     BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA,
-#ifndef BEARSSL_BASIC
+#ifndef BEARSSL_SSL_BASIC
     BR_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
 #endif

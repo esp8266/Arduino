@@ -43,7 +43,7 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python 2.7 (https://python.org)
+-  Python 3.x (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 
@@ -110,7 +110,7 @@ Instructions - Windows 10
    .. code:: bash
 
        cd esp8266/tools
-       python get.py
+       python3 get.py
 
 -  Restart Arduino
 
@@ -184,7 +184,7 @@ Instructions - Other OS
    .. code:: bash
 
        cd esp8266/tools
-       python get.py
+       python3 get.py
 
 -  Restart Arduino
 
