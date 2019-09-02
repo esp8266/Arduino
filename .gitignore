@@ -4,6 +4,7 @@ tools/xtensa-lx106-elf/
 tools/mkspiffs/
 tools/mklittlefs/
 tools/python/
+tools/python3/
 package/versions/
 exclude.txt
 tools/sdk/lib/liblwip_src.a

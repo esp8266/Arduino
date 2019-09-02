@@ -85,6 +85,7 @@ namespace arduino
 #define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
+inline uint32_t esp_get_cycle_count() __attribute__((always_inline));
 inline uint32_t esp_get_cycle_count() {
   uint32_t ccount;
   __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
