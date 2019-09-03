@@ -33,16 +33,11 @@ extern "C" {
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
+#include "lwip/def.h"
+#include "dhcpserver.h"
 }
 
 #include "debug.h"
-
-#ifndef htonl
-#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | \
-                   ((x)<< 8 & 0x00FF0000UL) | \
-                   ((x)>> 8 & 0x0000FF00UL) | \
-                   ((x)>>24 & 0x000000FFUL) )
-#endif
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -213,6 +208,8 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
 
     if (   !local_ip.isV4()
         || !subnet.isV4()
+        || !dhcp_start.isV4()
+        || !dhcp_end.isV4()
 #if LWIP_IPV6
         // uninitialized gateway is valid
         || gateway.isV6()
@@ -220,6 +217,12 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
        ) {
         return false;
     }
+	
+    if( subnet != IPAddress(255,255,255,0)) {
+	    DEBUG_WIFI("[APConfig] invalid netmask. only netmask \"255.255.255.0\" is valid!\n");
+	    return false;	
+	}	
+	
     struct ip_info info;
 	
     info.ip.addr = local_ip.v4();
@@ -229,16 +232,25 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     uint32_t softap_ip = htonl(info.ip.addr);
     uint32_t start_ip = htonl(dhcp_start.v4());
     uint32_t end_ip = htonl(dhcp_end.v4());
-    softap_ip >>= 8;
-    if (( start_ip >> 8 != softap_ip ) || ( end_ip >> 8 != softap_ip )) {
-        DEBUG_WIFI("[APConfig] dhcp_start or dhcp_end isn't in range of local_ip Address!\n");
-        DEBUG_WIFI("[APConfig] set dfault vaule\n");
-        dhcp_start = local_ip;
-        dhcp_start[3] += 99;
-        dhcp_end = dhcp_start;
-        dhcp_end[3] += 100;
+
+    if ((start_ip <= softap_ip)
+            || ( end_ip <= softap_ip)) {
+        DEBUG_WIFI("[APConfig] config ip information can't contain local ip!\n");
+        return false;
     }
 	
+    if ((end_ip - start_ip) > DHCPS_MAX_LEASE) {
+        DEBUG_WIFI("[APConfig] the value of dhcp lease is greater than \"DHCPS_MAX_LEASE\"!\n");
+        return false;
+    }
+	
+    softap_ip >>= 8;
+    if ((start_ip >> 8 != softap_ip)
+            || (end_ip >> 8 != softap_ip)) {
+        DEBUG_WIFI("[APConfig] config ip information must be in the same segment as the local ip!\n");
+        return false;
+    }
+
     if(!wifi_softap_dhcps_stop()) {
         DEBUG_WIFI("[APConfig] wifi_softap_dhcps_stop failed!\n");
     }
@@ -310,7 +322,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     IPAddress dhcp_end;
 
     dhcp_start = local_ip;
-    dhcp_start[3] += 99;
+    dhcp_start[3] += 1;
     dhcp_end = dhcp_start;
     dhcp_end[3] += 100;
 
