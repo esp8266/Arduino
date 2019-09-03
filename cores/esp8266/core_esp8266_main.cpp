@@ -64,8 +64,8 @@ static uint32_t s_micros_at_task_start;
  * Max nesting seen by SDK so far is 2.
  */
 #define ETS_INTR_LOCK_NEST_MAX 7
-byte ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
-byte ets_intr_lock_stack_ptr=0;
+uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
+byte     ets_intr_lock_stack_ptr=0;
 
 
 extern "C" {
@@ -131,11 +131,15 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 extern "C" void ets_intr_lock_nest() {
   if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
      ets_intr_lock_stack[ets_intr_lock_stack_ptr++] = xt_rsil(3);
+  else
+     xt_rsil(3);
 }
 
 extern "C" void ets_intr_unlock_nest() {
   if (ets_intr_lock_stack_ptr > 0)
      xt_wsr_ps(ets_intr_lock_stack[--ets_intr_lock_stack_ptr]);
+  else
+     xt_rsil(0);
 }
 
 
