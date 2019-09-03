@@ -128,14 +128,14 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
     }
 }
 
-extern "C" void ets_intr_lock_nest() {
+extern "C" void ets_intr_lock() {
   if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
      ets_intr_lock_stack[ets_intr_lock_stack_ptr++] = xt_rsil(3);
   else
      xt_rsil(3);
 }
 
-extern "C" void ets_intr_unlock_nest() {
+extern "C" void ets_intr_unlock() {
   if (ets_intr_lock_stack_ptr > 0)
      xt_wsr_ps(ets_intr_lock_stack[--ets_intr_lock_stack_ptr]);
   else
