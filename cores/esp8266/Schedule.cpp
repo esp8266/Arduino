@@ -169,8 +169,9 @@ void run_scheduled_recurrent_functions ()
         const bool wakeupToken = current->wakeupToken && current->wakeupToken->load();
         const bool wakeup = current->wakeupTokenCmp != wakeupToken;
         if (wakeup) current->wakeupTokenCmp = wakeupToken;
+        bool callNow = current->callNow;
 
-        if ((wakeup || current->callNow) && !current->mFunc())
+        if ((wakeup || callNow) && !current->mFunc())
         {
             // remove function from stack
             esp8266::InterruptLock lockAllInterruptsInThisScope;
