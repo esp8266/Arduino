@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Wrapper for Arduino core / others that can call esptool.py possibly multiple times
 # Adds pyserial to sys.path automatically based on the path of the current file
