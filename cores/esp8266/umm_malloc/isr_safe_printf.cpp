@@ -31,7 +31,7 @@
     code using the other port. Most of the ROM printf functions are not built
     to support this kind of usage. Things get especially dangerous when you
     try to use the ...external_printf stuff.
-  * ets_vprintf - by it self is safe.
+  * ets_vprintf - by itself is safe.
   * newlibc printf - not safe - lives in flash.
   * newlibc snprintf - not safe - lives in flash.
   * builtin putc1 print function - Is installed when you use
@@ -41,12 +41,16 @@
     * call uart_buff_switch at each printf call to reselect UART
     * use a stack buffer to hold a copy the PROGMEM string to print from.
     * use ets_vprintf for printing with putc1 function.
+  * os_printf_plus looks interesting. It is in IRAM. If no heap is available it
+    will use up to 64 bytes of stack space to copy a PROGMEM fmt for printing.
+    Issues:
+    * Printing is turned off by system_set_os_print
+    * putc1 needs to be in IRAM - this is a uart.cpp issue
+    * Need to force system_get_free_heap_size to return 0 during critical periods.
+    * won't work for umm_info it prints over 64 characters.
+    * along with umm_info there are other debug messages that exceed 64 characters.
 
   Research TODO, Unknowns:
-  * ets_printf_plus - is it safe?
-    * check if it uses alloc? the old versions used malloc for PROGMEM, if
-      that fails, they try to use the stack for PROGMEM.
-    * confirmed it is in IRAM in SDK!
   * Is there a problem with the ROM "serial print functions"?
     Rtos SDK does not use them. igrr also didn't use them in ...postmortem.
     See "ets_printf" above.
@@ -72,17 +76,15 @@ int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)
 //D int (*f)(int) ets_install_uart_printf(void);
 //D int (*_rom_putc1)(int) = (int (*)(int))0x40001dcc;
 
-// ROM _putc1, ignores CRs and sends CR/LF for LF, newline.
+// Boot ROM _putc1, ignores CRs and sends CR/LF for LF, newline.
 // Always returns character sent.
-typedef int (*fptr_t)(int);
-fptr_t ets_install_uart_printf(void);
+typedef int (*fp_putc_t)(int);
+#define _rom_putc1 ((fp_putc_t)0x40001dcc)
+
 void uart_buff_switch(uint8_t);
 
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
-    // This will replace, if any, the UART handler that was installed by uart.cpp
-    // calls ets_install_putc1.
-    fptr_t _rom_putc1 = ets_install_uart_printf();
 #ifdef DEBUG_ESP_PORT
 #define VALUE(x) __STRINGIFY(x)
     // Preprocessor and compiler together will optimize away the if.

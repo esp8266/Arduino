@@ -650,14 +650,15 @@ void *umm_realloc( void *ptr, size_t size ) {
    * out the best strategy for the new allocation. The following strategy is
    * focused on defragging the heap:
    *
-   * 1. If the new block is the same size or smaller than the current block do
-   *    nothing.
-   * 2. If the prev is free and adding it to the current and next block
-   *    gives us enough memory, proceed, note that next block may not be
-   *    available.
+   * 1. If the prev is free and adding it to the current, or current and next
+   *    block, gives us enough memory, proceed. Note, that next block may not
+   *    be available.
    *    a. Remove the previous block from the free list, assimilate it.
-   *    b. If new block gives enough memory, copy to the new block.
+   *    b. If this new block gives enough memory, copy to the new block.
+   *       Note, this includes the case of same size or smaller block.
    *    c. Else assimilate the next block, copy to the new block.
+   * 2. If the new block is the same size or smaller than the current block do
+   *    nothing.
    * 3. If the next block is free and adding it to the current block gives us
    *    enough memory, assimilate the next block.
    * 4. Otherwise try to allocate an entirely new block of memory. If the
@@ -668,10 +669,7 @@ void *umm_realloc( void *ptr, size_t size ) {
    * was not exact, then split the memory block so that we use only the
    * requested number of blocks and add what's left to the free list.
    */
-    if (blockSize >= blocks) { // 1
-        DBGLOG_DEBUG( "realloc the same or smaller size block - %d, do nothing\n", blocks );
-        /* This space intentionally left blank */
-    } else if (prevBlockSize && (prevBlockSize + blockSize + nextBlockSize) >= blocks) { // 2
+   if (prevBlockSize && (prevBlockSize + blockSize + nextBlockSize) >= blocks) { // 1
         umm_disconnect_from_free_list( UMM_PBLOCK(c) );
         c = umm_assimilate_down(c, 0);
         STATS__FREE_BLOCKS_UPDATE( - prevBlockSize );
@@ -697,6 +695,9 @@ void *umm_realloc( void *ptr, size_t size ) {
         memmove( (void *)&UMM_DATA(c), ptr, curSize );
         ptr = (void *)&UMM_DATA(c);
         UMM_CRITICAL_RESUME(id_realloc);
+    } else if (blockSize >= blocks) { // 2
+        DBGLOG_DEBUG( "realloc the same or smaller size block - %d, do nothing\n", blocks );
+        /* This space intentionally left blank */
     } else if ((blockSize + nextBlockSize) >= blocks) { // 3
         DBGLOG_DEBUG( "realloc using next block - %d\n", blocks );
         umm_assimilate_up( c );
