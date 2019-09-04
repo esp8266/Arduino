@@ -17,7 +17,7 @@ The Arduino IDE option is intended primarily for the software development phase.
 
 In any case, the first firmware upload has to be done over a serial port. If the OTA routines are correctly implemented in the sketch, then all subsequent uploads may be done over the air.
 
-By default, there is no imposed security for teh OTA process.  It is up to the developer to ensure that updates are allowed only from legitimate / trusted sources. Once the update is complete, the module restarts, and the new code is executed. The developer should ensure that the application running on the module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA updates.
+By default, there is no imposed security for the OTA process.  It is up to the developer to ensure that updates are allowed only from legitimate / trusted sources. Once the update is complete, the module restarts, and the new code is executed. The developer should ensure that the application running on the module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA updates.
 
 Security Disclaimer
 ~~~~~~~~~~~~~~~~~~~
@@ -50,7 +50,7 @@ Signed updates are updates whose compiled binaries are signed with a private key
 
 Cryptographic signing only protects against tampering with binaries delivered via OTA.  If someone has physical access, they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not protect code inside the device: if a user has physical access they can read out your program.
 
-**Securing your private key is paramount.  The same private/public keypair that was used with the original upload must also be used to sign ater binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
+**Securing your private key is paramount.  The same private/public keypair that was used with the original upload must also be used to sign later binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
 
 Signed Binary Format
 ^^^^^^^^^^^^^^^^^^^^
@@ -503,9 +503,9 @@ Simple updater downloads the file every time the function is called.
 Advanced updater
 ^^^^^^^^^^^^^^^^
 
-Its possible to point update function to a script at the server. If version string argument is given, it will be sent to the server. Server side script can use this to check if update should be performed.
+Its possible to point the update function to a script on the server. If a version string argument is given, it will be sent to the server. The server side script can use this string to check whether an update should be performed.
 
-Server side script can respond as follows: - response code 200, and send the firmware image, - or response code 304 to notify ESP that no update is required.
+The server-side script can respond as follows: - response code 200, and send the firmware image, - or response code 304 to notify ESP that no update is required.
 
 .. code:: cpp
 
@@ -533,7 +533,7 @@ For the simple updater the server only needs to deliver the binary file for upda
 Advanced updater
 ^^^^^^^^^^^^^^^^
 
-For advanced update management a script needs to run at the server side, for example a PHP script. At every update request the ESP sends some information in HTTP headers to the server.
+For advanced update management a script (such as a PHP script) needs to run on the server side. On every update request, the ESP sends some information in HTTP headers to the server.
 
 Example header data:
 
@@ -549,9 +549,7 @@ Example header data:
         [HTTP_X_ESP8266_SDK_VERSION] => 1.3.0
         [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
 
-With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address, for example.
-
-Script example:
+With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address, as in the following example:
 
 .. code:: php
 
@@ -646,7 +644,7 @@ Update process - memory view
 
 -  The new sketch will be stored in the space between the old sketch and
    the spiff.
--  on the next reboot the "eboot" bootloader check for commands.
+-  on the next reboot, the "eboot" bootloader checks for commands.
 -  the new sketch is now copied "over" the old one.
 -  the new sketch is started.
 
