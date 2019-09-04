@@ -25,6 +25,13 @@
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiAP.h"
+#include "lwip/def.h"
+
+#if LWIP_VERSION_MAJOR == 1
+#include "lwip/app/dhcpserver.h"
+#else
+#include "dhcpserver.h"
+#endif
 
 extern "C" {
 #include "c_types.h"
@@ -33,8 +40,6 @@ extern "C" {
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
-#include "lwip/def.h"
-#include "dhcpserver.h"
 }
 
 #include "debug.h"
@@ -219,8 +224,8 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     }
 	
     if( subnet != IPAddress(255,255,255,0)) {
-	    DEBUG_WIFI("[APConfig] invalid netmask. only netmask \"255.255.255.0\" is valid!\n");
-	    return false;	
+        DEBUG_WIFI("[APConfig] invalid netmask. only netmask \"255.255.255.0\" is valid!\n");
+        return false;	
 	}	
 	
     struct ip_info info;
