@@ -24,6 +24,7 @@
 
 #include <list>
 #include <string.h>
+#include <coredecls.h>
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 
@@ -38,12 +39,19 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/dhcp.h"
 #include "lwip/init.h" // LWIP_VERSION_
+#if LWIP_VERSION_MAJOR == 1
+#include "lwip/sntp.h"
+#else
+#include "lwip/apps/sntp.h"
+#endif
 }
 
 #include "WiFiClient.h"
 #include "WiFiUdp.h"
 #include "debug.h"
+#include "include/WiFiState.h"
 
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
@@ -200,15 +208,15 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::
     return handler;
 }
 
-// WiFiEventHandler ESP8266WiFiGenericClass::onWiFiModeChange(std::function<void(const WiFiEventModeChange&)> f)
-// {
-//     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_MODE_CHANGE, [f](System_Event_t* e){
-//         WiFiEventModeChange& dst = *reinterpret_cast<WiFiEventModeChange*>(&e->event_info);
-//         f(dst);
-//     });
-//     sCbEventList.push_back(handler);
-//     return handler;
-// }
+WiFiEventHandler ESP8266WiFiGenericClass::onWiFiModeChange(std::function<void(const WiFiEventModeChange&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_MODE_CHANGE, [f](System_Event_t* e){
+        WiFiEventModeChange& dst = *reinterpret_cast<WiFiEventModeChange*>(&e->event_info);
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
 
 /**
  * callback for WiFi events
@@ -386,7 +394,29 @@ bool ESP8266WiFiGenericClass::getPersistent(){
  * set new mode
  * @param m WiFiMode_t
  */
-bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
+bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
+    if (m == WIFI_SHUTDOWN) {
+        return shutdown(0, state);
+    }
+    else if (m == WIFI_RESUME) {
+        return resumeFromShutdown(state);
+    }
+    else if (m & ~(WIFI_STA | WIFI_AP))
+        // any other bits than legacy disallowed
+        return false;
+
+    // m is now WIFI_STA, WIFI_AP or WIFI_AP_STA
+    if (state)
+    {
+        DEBUG_WIFI("core: state is useless without SHUTDOWN or RESUME\n");
+    }
+
+    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        // wifi may have been put asleep by ESP8266WiFiGenericClass::preinitWiFiOff
+        wifi_fpm_do_wakeup();
+        wifi_fpm_close();
+    }
+
     if(_persistent){
         if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
             return true;
@@ -396,12 +426,6 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
     }
 
     bool ret = false;
-
-    if (m != WIFI_STA && m != WIFI_AP_STA)
-        // calls lwIP's dhcp_stop(),
-        // safe to call even if not started
-        wifi_station_dhcpc_stop();
-
     ETS_UART_INTR_DISABLE();
     if(_persistent) {
         ret = wifi_set_opmode(m);
@@ -431,15 +455,13 @@ bool ESP8266WiFiGenericClass::enableSTA(bool enable) {
     WiFiMode_t currentMode = getMode();
     bool isEnabled = ((currentMode & WIFI_STA) != 0);
 
-    if(isEnabled != enable) {
-        if(enable) {
-            return mode((WiFiMode_t)(currentMode | WIFI_STA));
-        } else {
-            return mode((WiFiMode_t)(currentMode & (~WIFI_STA)));
-        }
-    } else {
+    if (isEnabled == enable)
         return true;
-    }
+
+    if (enable)
+        return mode((WiFiMode_t)(currentMode | WIFI_STA));
+
+    return mode((WiFiMode_t)(currentMode & (~WIFI_STA)));
 }
 
 /**
@@ -472,16 +494,29 @@ bool ESP8266WiFiGenericClass::enableAP(bool enable){
 bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
     _forceSleepLastMode = getMode();
     if(!mode(WIFI_OFF)) {
+        DEBUG_WIFI("core: error with mode(WIFI_OFF)\n");
         return false;
     }
 
-    if(sleepUs == 0) {
+    if(sleepUs == 0 || sleepUs > 0xFFFFFFF) {
         sleepUs = 0xFFFFFFF;
     }
 
     wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+    delay(0);
     wifi_fpm_open();
-    return (wifi_fpm_do_sleep(sleepUs) == 0);
+    delay(0);
+    auto ret = wifi_fpm_do_sleep(sleepUs);
+    if (ret != 0)
+    {
+        DEBUG_WIFI("core: error %d with wifi_fpm_do_sleep: (-1=sleep status error, -2=force sleep not enabled)\n", ret);
+        return false;
+    }
+    // fpm_is_open() is always 1 here, with or without delay
+    // wifi_fpm_set_wakeup_cb(cb): callback is never called
+    // no power reduction without this delay
+    delay(10);
+    return true;
 }
 
 /**
@@ -489,8 +524,10 @@ bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
  * @return ok
  */
 bool ESP8266WiFiGenericClass::forceSleepWake() {
-    wifi_fpm_do_wakeup();
-    wifi_fpm_close();
+    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        wifi_fpm_do_wakeup();
+        wifi_fpm_close();
+    }
 
     // restore last mode
     if(mode(_forceSleepLastMode)) {
@@ -600,7 +637,142 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
     esp_schedule(); // resume the hostByName function
 }
 
-//meant to be called from user-defined preinit()
+uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState* state)
+{
+    return state? crc32(&state->state, sizeof(state->state)): 0;
+}
+
+bool ESP8266WiFiGenericClass::shutdownValidCRC (const WiFiState* state)
+{
+    return state && (crc32(&state->state, sizeof(state->state)) == state->crc);
+}
+
+bool ESP8266WiFiGenericClass::shutdown (uint32 sleepUs, WiFiState* state)
+{
+    bool persistent = _persistent;
+    WiFiMode_t before_off_mode = getMode();
+
+    if ((before_off_mode & WIFI_STA) && state)
+    {
+        bool ret = wifi_get_ip_info(STATION_IF, &state->state.ip);
+        if (!ret)
+        {
+            DEBUG_WIFI("core: error with wifi_get_ip_info(STATION_IF)\n");
+            return false;
+        }
+        memset(state->state.fwconfig.bssid, 0xff, 6);
+        ret = wifi_station_get_config(&state->state.fwconfig);
+        if (!ret)
+        {
+            DEBUG_WIFI("core: error with wifi_station_get_config\n");
+            return false;
+        }
+        state->state.channel = wifi_get_channel();
+    }
+
+    // disable persistence in FW so in case of power failure
+    // it doesn't wake up in off mode.
+    // persistence state will be restored on WiFi resume.
+    WiFi.persistent(false);
+    if (!WiFi.forceSleepBegin(sleepUs))
+    {
+        // WIFI_OFF mode set by forceSleepBegin()
+        DEBUG_WIFI("core: error with forceSleepBegin()\n");
+        WiFi.mode(before_off_mode);
+        WiFi.persistent(persistent);
+        return false;
+    }
+
+    // WiFi is now in force-sleep mode
+
+    if (state)
+    {
+        // finish filling state and process crc
+
+        state->state.persistent = persistent;
+        state->state.mode = before_off_mode;
+        uint8_t i = 0;
+        for (auto& ntp: state->state.ntp)
+        {
+#if LWIP_VERSION_MAJOR == 1
+            ntp = sntp_getserver(i++);
+#else
+            ntp = *sntp_getserver(i++);
+#endif
+        }
+        i = 0;
+        for (auto& dns: state->state.dns)
+            dns = WiFi.dnsIP(i++);
+        state->crc = shutdownCRC(state);
+        DEBUG_WIFI("core: state is saved\n");
+    }
+    return true;
+}
+
+bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
+{
+    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        wifi_fpm_do_wakeup();
+        wifi_fpm_close();
+    }
+
+    if (!state || shutdownCRC(state) != state->crc)
+    {
+        DEBUG_WIFI("core: resume: no state or bad crc\n");
+        return false;
+    }
+
+    persistent(state->state.persistent);
+
+    if (!mode(state->state.mode))
+    {
+        DEBUG_WIFI("core: resume: can't set wifi mode to %d\n", state->state.mode);
+        return false;
+    }
+
+    if (state->state.mode & WIFI_STA)
+    {
+        IPAddress local(state->state.ip.ip);
+        if (local)
+        {
+            DEBUG_WIFI("core: resume: static address '%s'\n", local.toString().c_str());
+            WiFi.config(state->state.ip.ip, state->state.ip.gw, state->state.ip.netmask, state->state.dns[0], state->state.dns[1]);
+            uint8_t i = 0;
+            for (CONST auto& ntp: state->state.ntp)
+            {
+                IPAddress ip(ntp);
+                if (ip.isSet())
+                {
+                    DEBUG_WIFI("core: resume: start SNTP, server='%s'\n", ip.toString().c_str());
+                    sntp_setserver(i++, &ntp);
+                }
+            }
+        }
+        // state->state.fwconfig.bssid is not real bssid (it's what user may have provided when bssid_set==1)
+        if (WiFi.begin((const char*)state->state.fwconfig.ssid,
+                       (const char*)state->state.fwconfig.password,
+                       state->state.channel,
+                       nullptr/*(const uint8_t*)state->state.fwconfig.bssid*/,  // <- try with gw's mac address?
+                       true) == WL_CONNECT_FAILED)
+        {
+            DEBUG_WIFI("core: resume: WiFi.begin failed\n");
+            return false;
+        }
+    }
+
+    if (state->state.mode & WIFI_AP)
+    {
+        DEBUG_WIFI("core: resume AP mode TODO\n");
+        return false;
+    }
+
+    // success, invalidate saved state
+    state->crc++;
+
+    return true;
+}
+
+//meant to be called from user-defined ::preinit()
 void ESP8266WiFiGenericClass::preinitWiFiOff () {
   // https://github.com/esp8266/Arduino/issues/2111#issuecomment-224251391
   // WiFi.persistent(false);
