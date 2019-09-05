@@ -58,6 +58,8 @@ extern "C" {
 /////////////////////////////////////////////////
 #undef DBGLOG_FUNCTION
 #undef DBGLOG_FUNCTION_P
+
+//C This #if 1 changes once the best print option from ISR is determined
 #if 1
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 // Note, _isr_safe_printf_P will not handle additional string arguments in
@@ -133,57 +135,86 @@ extern char _heap_start[];
  * most.
  */
 /*
- */
- #define UMM_STATS
-
-#ifdef DEBUG_ESP_PORT
+#define UMM_STATS
 #define UMM_STATS_FULL
+ */
+
+#if defined(DEBUG_ESP_PORT) && !defined(UMM_STATS) && !defined(UMM_STATS_FULL)
+#define UMM_STATS_FULL
+#elif !defined(UMM_STATS) && !defined(UMM_STATS_FULL)
+#define UMM_STATS
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 
 typedef struct UMM_STATISTICS_t {
   unsigned short int free_blocks;
+  size_t oom_count;
 #ifdef UMM_STATS_FULL
   unsigned short int free_blocks_min;
   unsigned short int free_blocks_isr_min;
   size_t alloc_max_size;
+  size_t last_alloc_size;
   size_t id_malloc_count;
+  size_t id_malloc_zero_count;
   size_t id_realloc_count;
-  size_t oom_count;
+  size_t id_realloc_zero_count;
+  size_t id_free_count;
+  size_t id_free_null_count;
 #endif
 }
 UMM_STATISTICS;
 extern UMM_STATISTICS ummStats;
 
+#define STATS__FREE_BLOCKS_UPDATE(s) ummStats.free_blocks += (s)
+#define STATS__OOM_UPDATE() ummStats.oom_count += 1
+
 size_t umm_free_heap_size_lw( void );
 
-#define STATS__FREE_BLOCKS_UPDATE(s) ummStats.free_blocks += (s)
+static inline size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
+  return ummStats.oom_count;
+}
 
 #else  // not UMM_STATS or UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
+#define STATS__OOM_UPDATE()          (void)0
 #endif
 
 #ifdef UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN() \
+do { \
     if (ummStats.free_blocks < ummStats.free_blocks_min) \
-        ummStats.free_blocks_min = ummStats.free_blocks
+        ummStats.free_blocks_min = ummStats.free_blocks; \
+} while(false)
 
-//C TODO: Needs a new name. ISR is too specific to our use. For upstream
-//C needs to indicate it is related to a temporary low, created during a
-//C realloc that includes memmove/copy.
 #define STATS__FREE_BLOCKS_ISR_MIN() \
+do { \
     if (ummStats.free_blocks < ummStats.free_blocks_isr_min) \
-        ummStats.free_blocks_isr_min = ummStats.free_blocks
+        ummStats.free_blocks_isr_min = ummStats.free_blocks; \
+} while(false)
 
 #define STATS__ALLOC_REQUEST(tag, s)  \
-{ \
+do { \
     ummStats.tag##_count += 1; \
+    ummStats.last_alloc_size = s; \
     if (ummStats.alloc_max_size < s) \
         ummStats.alloc_max_size = s; \
-}
+} while(false)
 
-#define STATS__OOM_UPDATE() ummStats.oom_count += 1
+#define STATS__ZERO_ALLOC_REQUEST(tag, s)  \
+do { \
+    ummStats.tag##_zero_count += 1; \
+} while(false)
+
+#define STATS__NULL_FREE_REQUEST(tag)  \
+do { \
+    ummStats.tag##_null_count += 1; \
+} while(false)
+
+#define STATS__FREE_REQUEST(tag)  \
+do { \
+    ummStats.tag##_count += 1; \
+} while(false)
 
 static inline size_t ICACHE_FLASH_ATTR umm_free_heap_size_lw_min( void ) {
   return (size_t)ummStats.free_blocks_min * umm_block_size();
@@ -206,23 +237,41 @@ static inline size_t ICACHE_FLASH_ATTR umm_get_max_alloc_size( void ) {
   return ummStats.alloc_max_size;
 }
 
+static inline size_t ICACHE_FLASH_ATTR umm_get_last_alloc_size( void ) {
+  return ummStats.last_alloc_size;
+}
+
 static inline size_t ICACHE_FLASH_ATTR umm_get_malloc_count( void ) {
   return ummStats.id_malloc_count;
+}
+
+static inline size_t ICACHE_FLASH_ATTR umm_get_malloc_zero_count( void ) {
+  return ummStats.id_malloc_zero_count;
 }
 
 static inline size_t ICACHE_FLASH_ATTR umm_get_realloc_count( void ) {
   return ummStats.id_realloc_count;
 }
 
-static inline size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
-  return ummStats.oom_count;
+static inline size_t ICACHE_FLASH_ATTR umm_get_realloc_zero_count( void ) {
+  return ummStats.id_realloc_zero_count;
+}
+
+static inline size_t ICACHE_FLASH_ATTR umm_get_free_count( void ) {
+  return ummStats.id_free_count;
+}
+
+static inline size_t ICACHE_FLASH_ATTR umm_get_free_null_count( void ) {
+  return ummStats.id_free_null_count;
 }
 
 #else // Not UMM_STATS_FULL
-#define STATS__FREE_BLOCKS_MIN()     (void)0
-#define STATS__FREE_BLOCKS_ISR_MIN() (void)0
-#define STATS__ALLOC_REQUEST(tag, s) (void)(s)
-#define STATS__OOM_UPDATE()          (void)0
+#define STATS__FREE_BLOCKS_MIN()          (void)0
+#define STATS__FREE_BLOCKS_ISR_MIN()      (void)0
+#define STATS__ALLOC_REQUEST(tag, s)      (void)(s)
+#define STATS__ZERO_ALLOC_REQUEST(tag, s) (void)(s)
+#define STATS__NULL_FREE_REQUEST(tag)     (void)0
+#define STATS__FREE_REQUEST(tag)          (void)0
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INFO)
@@ -356,8 +405,8 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  *
  * Pick one of these two stratagies. UMM_REALLOC_MINIMIZE_COPY grows upward or
  * shrinks an allocation, avoiding copy when possible. UMM_REALLOC_DEFRAG gives
- * priority with growing the revised allocation toward the beginning of the heap
- * when possible.
+ * priority with growing the revised allocation toward an adjacent hole in the
+ * direction of the beginning of the heap when possible.
  */
 /*
 #define UMM_REALLOC_MINIMIZE_COPY
@@ -394,44 +443,6 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #  define INTEGRITY_CHECK() 0
 #endif
 
-
-/////////////////////////////////////////////////
-
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_CORE)
-#define UMM_POISON_CHECK
-
-// less agressive checking, checks at realloc and free only.
-#define UMM_POISON_CHECK_LITE
-// Note, UMM_POISON is deprecated
-#define UMM_POISON
-#endif
-
-#if defined(UMM_POISON_CHECK) || defined(UMM_INTEGRITY_CHECK) || defined(UMM_POISON_CHECK_LITE)
-#if !defined(DBGLOG_LEVEL) || DBGLOG_LEVEL < 3
-// All debug prints in UMM_POISON_CHECK are level 3
-#undef DBGLOG_LEVEL
-#define DBGLOG_LEVEL 3
-#endif
-#endif
-
-
-#if defined(UMM_CRITICAL_METRICS)
-struct UMM_TIME_STATS_t {
-  UMM_TIME_STAT id_malloc;
-  UMM_TIME_STAT id_realloc;
-  UMM_TIME_STAT id_free;
-#ifdef UMM_INFO
-  UMM_TIME_STAT id_info;
-#endif
-#ifdef UMM_POISON_CHECK
-  UMM_TIME_STAT id_poison;
-#endif
-#ifdef UMM_INTEGRITY_CHECK
-  UMM_TIME_STAT id_integrity;
-#endif
-  UMM_TIME_STAT id_no_tag;
-};
-#endif
 /////////////////////////////////////////////////
 
 /*
@@ -466,9 +477,11 @@ struct UMM_TIME_STATS_t {
  * every alloc API call. May exceed 10us due to critical section with IRQs
  * disabled.
  *
- * UMM_POISON_CHECK_LITE - only checks the allocation presented at realloc()
- * and free().
- *
+ * UMM_POISON_CHECK_LITE - checks the allocation presented at realloc()
+ * and free(). Expands the poison check on the current allocation to
+ * include its nearest allocated neighbors in the heap.
+ * umm_malloc() will also checks the neighbors of the selected allocation
+ * before use.
  */
 
 /*
@@ -500,30 +513,55 @@ struct UMM_TIME_STATS_t {
    // Local Additions to better report location in code of the caller.
    void *umm_poison_realloc_fl( void *ptr, size_t size, const char* file, int line );
    void  umm_poison_free_fl( void *ptr, const char* file, int line );
-   extern int umm_poison_check_result;
-   // UMM_HEAP_CORRUPTION_CB was missing for umm_poison...
-   // TODO: recheck this assertion and find when.
-   // Introduced new CB specific for umm_poison
-#  define UMM_HEAP_POISON_CB() umm_poison_check_result = 0
    #if defined(UMM_POISON_CHECK_LITE)
    /*
     * We can safely do individual poison checks at free and realloc and stay
     * under 10us or close.
     */
    #  define POISON_CHECK() 1
+   #  define POISON_CHECK_NEIGHBORS(c) \
+     do {\
+       if(!check_poison_neighbors(c)) \
+         panic();\
+     } while(false)
    #else
    /* Not normally enabled. A full heap poison check may exceed 10us. */
    #  define POISON_CHECK() umm_poison_check()
+   #  define POISON_CHECK_NEIGHBORS(c) do{}while(false)
    #endif
 #else
 #  define POISON_CHECK() 1
-#  define UMM_HEAP_POISON_CB() do{}while(0)
+#  define POISON_CHECK_NEIGHBORS(c) do{}while(false)
 #endif
 
 
+/////////////////////////////////////////////////
 
-// #define UMM_HEAP_CORRUPTION_CB() panic()
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
+#if !defined(DBGLOG_LEVEL) || DBGLOG_LEVEL < 3
+// All debug prints in UMM_POISON_CHECK are level 3
+#undef DBGLOG_LEVEL
+#define DBGLOG_LEVEL 3
+#endif
+#endif
 
+#if defined(UMM_CRITICAL_METRICS)
+struct UMM_TIME_STATS_t {
+  UMM_TIME_STAT id_malloc;
+  UMM_TIME_STAT id_realloc;
+  UMM_TIME_STAT id_free;
+#ifdef UMM_INFO
+  UMM_TIME_STAT id_info;
+#endif
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+  UMM_TIME_STAT id_poison;
+#endif
+#ifdef UMM_INTEGRITY_CHECK
+  UMM_TIME_STAT id_integrity;
+#endif
+  UMM_TIME_STAT id_no_tag;
+};
+#endif
 /////////////////////////////////////////////////
 #ifdef DEBUG_ESP_OOM
 
@@ -571,13 +609,13 @@ void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortCalloc(n, s, mem_debug_file, __LINE__); })
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
-  #if defined(UMM_POISON_CHECK)
+  #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
     #if 0
     #define free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
     #endif
   #endif
 
-#elif defined(UMM_POISON_CHECK)
+#elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #include <pgmspace.h>
 
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);

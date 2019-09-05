@@ -149,7 +149,7 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 #define OOM_CHECK__PRINT_LOC(p, s, f, l)
 #endif
 
-#if defined(DEBUG_ESP_OOM) || defined(UMM_CHECK_POISON) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
+#if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
 
 void* ICACHE_RAM_ATTR malloc(size_t size)
 {

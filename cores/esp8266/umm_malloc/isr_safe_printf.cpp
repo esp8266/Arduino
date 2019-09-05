@@ -64,17 +64,14 @@
 
 extern "C" {
 
+//C This #if 1 changes once the best print option from ISR is determined.
 #if 1
-
 
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 // Note, _isr_safe_printf_P will not handle additional string arguments in
 // PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
 #define ISR_PRINTF(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
 #define ISR_PRINTF_P(fmt, ...) _isr_safe_printf_P(fmt, ##__VA_ARGS__)
-
-//D int (*f)(int) ets_install_uart_printf(void);
-//D int (*_rom_putc1)(int) = (int (*)(int))0x40001dcc;
 
 // Boot ROM _putc1, ignores CRs and sends CR/LF for LF, newline.
 // Always returns character sent.
@@ -85,6 +82,8 @@ void uart_buff_switch(uint8_t);
 
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
+
+//C This #ifdef block is obsolete if the PR for ets_putc UART selection is approved.
 #ifdef DEBUG_ESP_PORT
 #define VALUE(x) __STRINGIFY(x)
     // Preprocessor and compiler together will optimize away the if.
@@ -96,6 +95,8 @@ int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
 #else
   uart_buff_switch(0U); // Side effect, clears RX FIFO
 #endif
+//C - end
+
     /*
       To use ets_strlen() and ets_memcpy() safely with PROGMEM, flash storage,
       the PROGMEM address must be word (4 bytes) aligned. The destination
@@ -113,61 +114,6 @@ int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
     va_end(argPtr);
     return result;
 }
-#endif
-
-#if 0
-// Alternate print driver
-
-#ifdef DEBUG_ESP_PORT
-#define VALUE(x) __STRINGIFY(x)
-
-void ICACHE_RAM_ATTR uart_write_char_d(char c) {
-    // Preprocessor and compiler together will optimize away the if.
-    if (strcmp("Serial", VALUE(DEBUG_ESP_PORT)) == 0) {
-        // USS - get uart{0,1} status word
-        // USTXC - bit offset to TX FIFO count, 8 bit field
-        // USF - Uart FIFO
-        // Wait for space for two or more characters.
-        while (((USS(0) >> USTXC) & 0xff) >= 0x7e) { }
-
-        if (c == '\n') {
-            USF(0) = '\r';
-        }
-        USF(0) = c;
-    } else {
-        while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
-
-        if (c == '\n') {
-            USF(1) = '\r';
-        }
-        USF(1) = c;
-    }
-}
-#else // ! DEBUG_ESP_PORT
-void ICACHE_RAM_ATTR uart_write_char_d(char c) {
-    uart0_write_char_d(c);
-    uart1_write_char_d(c);
-}
-
-void ICACHE_RAM_ATTR uart0_write_char_d(char c) {
-    while (((USS(0) >> USTXC) & 0xff)) { }
-
-    if (c == '\n') {
-        USF(0) = '\r';
-    }
-    USF(0) = c;
-}
-
-void ICACHE_RAM_ATTR uart1_write_char_d(char c) {
-    while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
-
-    if (c == '\n') {
-        USF(1) = '\r';
-    }
-    USF(1) = c;
-}
-#endif
-
 #endif
 
 };

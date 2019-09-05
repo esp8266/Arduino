@@ -1,5 +1,5 @@
 /* poisoning (UMM_POISON_CHECK) {{{ */
-#if defined(UMM_POISON_CHECK)
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #define POISON_BYTE (0xa5)
 
 /*
@@ -133,9 +133,7 @@ static void *get_unpoisoned( void *v_ptr ) {
     /* Figure out which block we're in. Note the use of truncated division... */
     c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
 
-    if (!check_poison_block(&UMM_BLOCK(c))) {
-      UMM_HEAP_POISON_CB();
-    }
+    check_poison_block(&UMM_BLOCK(c));
   }
 
   return (void *)ptr;
