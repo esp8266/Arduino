@@ -44,6 +44,7 @@ extern "C"
 {
 
 #include <user_interface.h>
+#include <lwip/netif.h>
 
 uint8 wifi_get_opmode(void)
 {
@@ -115,6 +116,8 @@ void wifi_fpm_set_sleep_type (sleep_type_t type)
 
 uint32_t global_ipv4_netfmt = 0; // global binding
 
+netif netif0;
+
 bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 {
 	struct ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
@@ -165,6 +168,12 @@ bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 		info->ip.addr = ipv4;
 		info->netmask.addr = mask;
 		info->gw.addr = ipv4;
+
+		netif0.ip_addr.addr = ipv4;
+		netif0.netmask.addr = mask;
+		netif0.gw.addr = ipv4;
+		netif0.flags = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
+		netif0.next = nullptr;
 	}
 
 	return true;
@@ -461,7 +470,9 @@ bool smartconfig_stop (void)
 	return true;
 }
 
-
-
+sleep_type_t wifi_fpm_get_sleep_type(void)
+{
+    return NONE_SLEEP_T;
+}
 
 } // extern "C"
