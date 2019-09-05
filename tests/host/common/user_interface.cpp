@@ -461,7 +461,9 @@ bool smartconfig_stop (void)
 	return true;
 }
 
-
-
+sleep_type_t wifi_fpm_get_sleep_type(void)
+{
+    return NONE_SLEEP_T;
+}
 
 } // extern "C"
