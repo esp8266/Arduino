@@ -102,7 +102,13 @@ void setup() {
   settimeofday_cb(time_is_set_callback);
 
   // NTP servers may be overriden by your DHCP server for a more local one
+  // (see below)
   configTime(MYTZ, "pool.ntp.org");
+
+  // optional: change SNTP update delay (default: 1 hour = SNTP_UPDATE_DELAY_DEFAULT)
+  //sntp_update_delay_not_less_than_15000 = 600000; // 10mn / 600s / 600'000ms
+  // optional: disable obtaining SNTP servers from DHCP
+  //sntp_servermode_dhcp(0); // 0: disable (enabled by default)
 
   // start network
   WiFi.persistent(false);

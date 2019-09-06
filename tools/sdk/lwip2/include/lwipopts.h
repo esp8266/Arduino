@@ -3545,6 +3545,9 @@
 #error LWIP_FEATURES must be defined
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * TCP_RANDOM_PORT: randomize port instead of simply increasing
@@ -3566,6 +3569,11 @@
 #define SNTP_SERVER_DNS			1        // enable SNTP support DNS names through sntp_setservername / sntp_getservername
 
 #define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
+
+#define SNTP_UPDATE_DELAY_DEFAULT 3600000
+#define SNTP_SUPPRESS_DELAY_CHECK 1
+#define SNTP_UPDATE_DELAY sntp_update_delay_not_less_than_15000
+extern uint32_t SNTP_UPDATE_DELAY;
 
 #if LWIP_FEATURES
 // lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
@@ -3631,6 +3639,10 @@ void tcp_kill_timewait (void);
  */
 #ifndef MEMP_NUM_TCP_PCB_TIME_WAIT
 #define MEMP_NUM_TCP_PCB_TIME_WAIT       5
+#endif
+
+#ifdef __cplusplus
+} // extern "C"
 #endif
 
 #endif // MYLWIPOPTS_H
