@@ -3572,7 +3572,7 @@ extern "C" {
 
 #define SNTP_UPDATE_DELAY_DEFAULT 3600000
 #define SNTP_SUPPRESS_DELAY_CHECK 1
-#define SNTP_UPDATE_DELAY sntp_update_delay_not_less_than_15000
+#define SNTP_UPDATE_DELAY sntp_update_delay_MS_not_less_than_15000
 extern uint32_t SNTP_UPDATE_DELAY;
 
 #if LWIP_FEATURES
@@ -3580,16 +3580,18 @@ extern uint32_t SNTP_UPDATE_DELAY;
 #define SNTP_MAX_SERVERS                3
 #endif
 
-// turn off random delay before sntp request
-// when SNTP_STARTUP_DELAY is not defined,
-// LWIP_RAND is used to set a delay
+// no delay by default before sntp request
+// https://github.com/esp8266/Arduino/pull/5564
 // from sntp_opts.h:
 /** According to the RFC, this shall be a random delay
  * between 1 and 5 minutes (in milliseconds) to prevent load peaks.
  * This can be defined to a random generation function,
  * which must return the delay in milliseconds as u32_t.
  */
-#define SNTP_STARTUP_DELAY              0
+#define SNTP_STARTUP_DELAY 1                // enable startup delay
+#define SNTP_STARTUP_DELAY_FUNC_DEFAULT 0   // to 0 by default via a default weak function
+#define SNTP_STARTUP_DELAY_FUNC sntp_startup_delay_func_MS_not_less_than_60000()
+extern uint32_t SNTP_STARTUP_DELAY_FUNC;
 
 /*
    --------------------------------------------------

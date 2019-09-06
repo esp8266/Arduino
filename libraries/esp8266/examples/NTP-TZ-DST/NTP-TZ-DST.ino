@@ -49,6 +49,8 @@
 #include <time.h>                       // time() ctime()
 #include <sys/time.h>                   // struct timeval
 
+#include <lwip/apps/sntp.h>
+
 // for testing purpose:
 extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
 
@@ -86,6 +88,14 @@ void time_is_set_callback() {
   schedule_function(time_is_set_scheduled);
 }
 
+// optional: change SNTP startup delay (default: 0)
+// a weak function is already defined and returns 0 (violating RFcs)
+// user can redefine it:
+//uint32_t sntp_startup_delay_func_MS_not_less_than_60000 ()
+//{
+//    return 60000; // 10s (or (random() % 5000))
+//}
+
 void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting...\n");
@@ -106,7 +116,7 @@ void setup() {
   configTime(MYTZ, "pool.ntp.org");
 
   // optional: change SNTP update delay (default: 1 hour = SNTP_UPDATE_DELAY_DEFAULT)
-  //sntp_update_delay_not_less_than_15000 = 600000; // 10mn / 600s / 600'000ms
+  //sntp_update_delay_MS_not_less_than_15000 = 600000; // 10mn / 600s / 600'000ms
   // optional: disable obtaining SNTP servers from DHCP
   //sntp_servermode_dhcp(0); // 0: disable (enabled by default)
 
