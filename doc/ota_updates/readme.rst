@@ -103,7 +103,7 @@ If you receive either of the following messages in the IDE window, the signing w
     Not signing the generated binary
 
 Manual Signing of Binaries
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Users may also manually sign executables and require the OTA process to verify their signature.  In the main code, before enabling any update methods, add the following declarations and function call:
 
@@ -621,8 +621,6 @@ With this information the script now can check if an update is needed. It is als
 
 Stream Interface
 ----------------
-
-TODO describe Stream Interface
 
 The Stream Interface is the base for all other update modes like OTA, HTTP Server / client. Given a Stream-class variable `streamVar` providing `byteCount` bytes of firmware, it can store the firmware as follows:
 
