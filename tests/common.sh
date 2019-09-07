@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -x
 # return 1 if this test should not be built in CI (for other archs, not needed, etc.)
 function skip_ino()
 {
@@ -64,11 +64,18 @@ function build_sketches()
     local build_mod=$4
     local build_rem=$5
     local lwip=$6
+    export ARDUINO_IDE_PATH=$arduino
     mkdir -p $build_dir
     local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
+    if [ "$WINDOWS" = "1" ]; then
+        # Paths to the arduino builder need to be c:\ referenced, not our native ones
+	local pwd_win=$(realpath $PWD | sed 's/\/c/C:/')
+	local bar_win=$(echo $build_arg | sed 's/\/c\//C:\//g')
+        export ARDUINO_IDE_PATH=$(realpath $arduino | sed 's/\/c/C:/')
+        build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k -p $pwd_win/$build_dir -n $lwip $bar_win "
+    fi
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
-    export ARDUINO_IDE_PATH=$arduino
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
@@ -107,6 +114,9 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
+	if [ "$WINDOWS" == "1" ]; then
+            sketch=$(echo $sketch | sed 's/\/c/C:/')
+        fi
         echo "$build_cmd $sketch"
         time ($build_cmd $sketch >build.log)
         local result=$?
@@ -135,7 +145,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip ArduinoJson-v6.11.0.zip
+    { test -r ArduinoJson-v6.11.0.zip || wget -nv https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
 
     popd
 }
@@ -145,13 +155,28 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
-    test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-    tar xf arduino.tar.xz
+    if [ "$WINDOWS" = "1" ]; then
+        # Acquire needed packages from Windows package manager
+        choco install --no-progress python3
+        export PATH="/c/Python37:$PATH"  # Ensure it's live from now on...
+	cp /c/Python37/python.exe /c/Python37/python3.exe
+        choco install --no-progress unzip
+        choco install --no-progress sed
+        test -r arduino-nightly-windows.zip || wget -nv -O arduino-nightly-windows.zip https://www.arduino.cc/download.php?f=/arduino-nightly-windows.zip
+        unzip -q arduino-nightly-windows.zip
+    else
+        test -r arduino.tar.xz || wget -nv -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        tar xf arduino.tar.xz
+    fi
     mv arduino-nightly $ide_path
     cd $ide_path/hardware
     mkdir esp8266com
     cd esp8266com
-    ln -s $core_path esp8266
+    if [ "$WINDOWS" = "1" ]; then
+        cp -a $core_path esp8266
+    else
+        ln -s $core_path esp8266
+    fi
     local debug_flags=""
     if [ "$debug" = "debug" ]; then
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
@@ -163,7 +188,7 @@ function install_ide()
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
     cd esp8266/tools
-    python3 get.py
+    python3 get.py -q
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
 }
 

@@ -24,6 +24,7 @@ from __future__ import print_function
 import sys
 import os
 import argparse
+import platform
 import subprocess
 import tempfile
 import shutil
@@ -62,6 +63,10 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     if args.verbose:
         cmd += '-verbose '
     cmd += sketch
+
+    # Normalize slashes on Windows
+    if platform.system() == "Windows":
+        cmd = cmd.replace('/', '\\')
 
     if args.verbose:
         print('Building: ' + cmd, file=f)
@@ -127,6 +132,7 @@ def main():
     hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
 
     output_name = tmp_dir + '/' + os.path.basename(sketch_path) + '.bin'
+
     if args.verbose:
         print("Sketch: ", sketch_path)
         print("Build dir: ", tmp_dir)
