@@ -32,10 +32,6 @@
 #include "HardwareSerial.h"
 #include "Esp.h"
 
-// Boot ROM API for updating UART selection in Boot ROM structure UartDev.
-// Use 0 for UART0 and 1 for UART1. This controls the UART used by ets_putc.
-extern "C" void uart_buff_switch(uint8_t);
-
 HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr), _rx_size(256)
 {}
@@ -45,20 +41,11 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
     end();
     _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
-#define VALUE(x) __STRINGIFY(x)
     if (static_cast<void*>(this) == static_cast<void*>(&DEBUG_ESP_PORT))
     {
         setDebugOutput(true);
         println();
         println(ESP.getFullVersion());
-
-        // This selects the UART for Boot ROM ets_putc which is used by
-        // ::printf, ets_printf_P in core_esp_postmortem.cpp and others.
-        if (strcmp("Serial1", VALUE(DEBUG_ESP_PORT)) == 0) {
-            uart_buff_switch(1U);
-        } else {
-            uart_buff_switch(0U);
-        }
     }
 #endif
 }
@@ -142,7 +129,7 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
         }
         yield();
         delay(100);
-    }
+    }    
     return detectedBaudrate;
 }
 
