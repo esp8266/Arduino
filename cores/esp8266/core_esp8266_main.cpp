@@ -143,6 +143,16 @@ extern "C" void ets_intr_unlock() {
 }
 
 
+extern "C" bool ets_post_rom(uint8 prio, ETSSignal sig, ETSParam par);
+
+extern "C" bool ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
+  uint32_t saved;
+  asm volatile ("rsr %0,ps":"=a" (saved));
+  bool rc=ets_post_rom(prio, sig, par);
+  xt_wsr_ps(saved);
+  return rc;
+}
+
 extern "C" void __loop_end (void)
 {
     run_scheduled_functions();
