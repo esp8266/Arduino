@@ -49,7 +49,11 @@
 #include <time.h>                       // time() ctime()
 #include <sys/time.h>                   // struct timeval
 
-#include <lwip/apps/sntp.h>
+#if LWIP_VERSION_MAJOR == 1
+#include <lwip/sntp.h>                  // sntp_servermode_dhcp()
+#else
+#include <lwip/apps/sntp.h>             // sntp_servermode_dhcp()
+#endif
 
 // for testing purpose:
 extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
@@ -88,12 +92,22 @@ void time_is_set_callback() {
   schedule_function(time_is_set_scheduled);
 }
 
-// optional: change SNTP startup delay (default: 0)
-// a weak function is already defined and returns 0 (violating RFcs)
-// user can redefine it:
-//uint32_t sntp_startup_delay_func_MS_not_less_than_60000 ()
+// OPTIONAL: change SNTP startup delay
+// a weak function is already defined and returns 0 (RFC violation)
+// it can be redefined:
+//uint32_t sntp_startup_delay_MS_rfc_not_less_than_60000 ()
 //{
-//    return 60000; // 10s (or (random() % 5000))
+//    //::printf("(debug: sntp_startup_delay_MS_rfc_not_less_than_60000 is called)\n");a
+//    return 60000; // 60s (or lwIP's original default: (random() % 5000))
+//}
+
+// OPTIONAL: change SNTP update delay
+// a weak function is already defined and returns 1 hour
+// it can be redefined:
+//uint32_t sntp_update_delay_MS_rfc_not_less_than_15000 ()
+//{
+//    ::printf("(debug: sntp_update_delay_MS_rfc_not_less_than_15000 is called)\n");
+//    return 15000; // 15s
 //}
 
 void setup() {
@@ -115,10 +129,8 @@ void setup() {
   // (see below)
   configTime(MYTZ, "pool.ntp.org");
 
-  // optional: change SNTP update delay (default: 1 hour = SNTP_UPDATE_DELAY_DEFAULT)
-  //sntp_update_delay_MS_not_less_than_15000 = 600000; // 10mn / 600s / 600'000ms
-  // optional: disable obtaining SNTP servers from DHCP
-  //sntp_servermode_dhcp(0); // 0: disable (enabled by default)
+  // OPTIONAL: disable obtaining SNTP servers from DHCP
+  //sntp_servermode_dhcp(0); // 0: disable obtaining SNTP servers from DHCP (enabled by default)
 
   // start network
   WiFi.persistent(false);

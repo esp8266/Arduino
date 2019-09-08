@@ -3564,19 +3564,19 @@ extern "C" {
 // so we do not define it. sntp server can come from dhcp server, or by
 // user.
 //#define SNTP_SERVER_ADDRESS	"pool.ntp.org"   // default
-//#define SNTP_GET_SERVERS_FROM_DHCP	// implicitely enabled by LWIP_DHCP_GET_NTP_SRV
+//#define SNTP_GET_SERVERS_FROM_DHCP        // implicitely enabled by LWIP_DHCP_GET_NTP_SRV
 
-#define SNTP_SERVER_DNS			1        // enable SNTP support DNS names through sntp_setservername / sntp_getservername
+#define SNTP_SERVER_DNS 1                   // enable SNTP support DNS names through sntp_setservername / sntp_getservername
 
 #define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
 
-#define SNTP_UPDATE_DELAY_DEFAULT 3600000
 #define SNTP_SUPPRESS_DELAY_CHECK 1
-#define SNTP_UPDATE_DELAY sntp_update_delay_MS_not_less_than_15000
+#define SNTP_UPDATE_DELAY_DEFAULT 3600000   // update delay defined by a default weak function
+#define SNTP_UPDATE_DELAY sntp_update_delay_MS_rfc_not_less_than_15000()
 extern uint32_t SNTP_UPDATE_DELAY;
 
 #if LWIP_FEATURES
-// lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
+// esp8266/arduino/lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
 #define SNTP_MAX_SERVERS                3
 #endif
 
@@ -3590,7 +3590,7 @@ extern uint32_t SNTP_UPDATE_DELAY;
  */
 #define SNTP_STARTUP_DELAY 1                // enable startup delay
 #define SNTP_STARTUP_DELAY_FUNC_DEFAULT 0   // to 0 by default via a default weak function
-#define SNTP_STARTUP_DELAY_FUNC sntp_startup_delay_func_MS_not_less_than_60000()
+#define SNTP_STARTUP_DELAY_FUNC sntp_startup_delay_MS_rfc_not_less_than_60000()
 extern uint32_t SNTP_STARTUP_DELAY_FUNC;
 
 /*
