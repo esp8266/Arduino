@@ -66,7 +66,7 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
 
     # Normalize slashes on Windows
     if platform.system() == "Windows":
-        cmd = cmd.replace('/', '\\')
+        cmd = cmd.replace('/', '\\').replace('"', '')
 
     if args.verbose:
         print('Building: ' + cmd, file=f)

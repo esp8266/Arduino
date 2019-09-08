@@ -71,8 +71,10 @@ function build_sketches()
         # Paths to the arduino builder need to be c:\ referenced, not our native ones
 	local pwd_win=$(realpath $PWD | sed 's/\/c/C:/')
 	local bar_win=$(echo $build_arg | sed 's/\/c\//C:\//g')
-        export ARDUINO_IDE_PATH=$(realpath $arduino | sed 's/\/c/C:/')
+	# Make ARDUINO_IDE_PATH to Windows slashies
+        export ARDUINO_IDE_PATH=$(realpath $arduino | sed 's/\/c/C:/' | tr / '\\' )
         build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k -p $pwd_win/$build_dir -n $lwip $bar_win "
+        build_cmd=$(echo $build_cmd |  tr '"' ' ')  # Remove quotes to see if Win Go works better
     fi
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
@@ -159,13 +161,25 @@ function install_ide()
         # Acquire needed packages from Windows package manager
         choco install --no-progress python3
         export PATH="/c/Python37:$PATH"  # Ensure it's live from now on...
-	cp /c/Python37/python.exe /c/Python37/python3.exe
+        cp /c/Python37/python.exe /c/Python37/python3.exe
         choco install --no-progress unzip
         choco install --no-progress sed
+        #choco install --no-progress golang
         test -r arduino-nightly-windows.zip || wget -nv -O arduino-nightly-windows.zip https://www.arduino.cc/download.php?f=/arduino-nightly-windows.zip
         unzip -q arduino-nightly-windows.zip
+    elif [ "$MACOSX" = "1" ]; then
+        # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
+        wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
+        sudo installer -pkg python-3.7.4-macosx10.9.pkg -target /
+        # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
+        ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
+        # Hack to place arduino-builder in the same spot as sane OSes
+        test -r arduino.zip || wget -O arduino.zip https://downloads.arduino.cc/arduino-nightly-macosx.zip
+        unzip -q arduino.zip
+        mv Arduino.app arduino-nightly
+        mv arduino-nightly/Contents/Java/* arduino-nightly/.
     else
-        test -r arduino.tar.xz || wget -nv -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
         tar xf arduino.tar.xz
     fi
     mv arduino-nightly $ide_path
@@ -199,7 +213,6 @@ function install_arduino()
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
     install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR $debug
-    which arduino
     cd $TRAVIS_BUILD_DIR
     install_libraries
     echo -e "travis_fold:end:sketch_test_env_prepare"
