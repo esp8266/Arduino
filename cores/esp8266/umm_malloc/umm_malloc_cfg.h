@@ -55,11 +55,20 @@ extern "C" {
  * ----------------------------------------------------------------------------
  */
 
+#ifdef TEST_BUILD
+extern char test_umm_heap[];
+#endif
 
+#ifdef TEST_BUILD
+/* Start addresses and the size of the heap */
+#define UMM_MALLOC_CFG_HEAP_ADDR (test_umm_heap)
+#define UMM_MALLOC_CFG_HEAP_SIZE 0x10000
+#else
 /* Start addresses and the size of the heap */
 extern char _heap_start[];
 #define UMM_MALLOC_CFG_HEAP_ADDR   ((uint32_t)&_heap_start[0])
 #define UMM_MALLOC_CFG_HEAP_SIZE   ((size_t)(0x3fffc000 - UMM_MALLOC_CFG_HEAP_ADDR))
+#endif
 
 /* A couple of macros to make packing structures less compiler dependent */
 
@@ -336,17 +345,29 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  * called from within umm_malloc()
  */
 
-#if defined(UMM_CRITICAL_METRICS)
-#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
-#define UMM_CRITICAL_ENTRY(tag)_critical_entry(&time_stats.tag, &_saved_ps_##tag)
-#define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
+#ifdef TEST_BUILD
+    extern int umm_critical_depth;
+    extern int umm_max_critical_depth;
+    #define UMM_CRITICAL_ENTRY() {\
+          ++umm_critical_depth; \
+          if (umm_critical_depth > umm_max_critical_depth) { \
+              umm_max_critical_depth = umm_critical_depth; \
+          } \
+    }
+    #define UMM_CRITICAL_EXIT()  (umm_critical_depth--)
+#else
+    #if defined(UMM_CRITICAL_METRICS)
+        #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+        #define UMM_CRITICAL_ENTRY(tag)_critical_entry(&time_stats.tag, &_saved_ps_##tag)
+        #define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
 
-#else  // ! UMM_CRITICAL_METRICS
- // This method preserves the intlevel on entry and restores the
- // original intlevel at exit.
-#define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
-#define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
-#define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
+    #else  // ! UMM_CRITICAL_METRICS
+        // This method preserves the intlevel on entry and restores the
+        // original intlevel at exit.
+        #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
+        #define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
+        #define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
+    #endif
 #endif
 
  /*
@@ -376,11 +397,9 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #ifdef UMM_LIGHTWEIGHT_CPU
 #define UMM_CRITICAL_SUSPEND(tag) UMM_CRITICAL_EXIT(tag)
 #define UMM_CRITICAL_RESUME(tag) UMM_CRITICAL_ENTRY(tag)
-#define UMM_NEED_LOCK_LW_CPU true
 #else
 #define UMM_CRITICAL_SUSPEND(tag) do {} while(0)
 #define UMM_CRITICAL_RESUME(tag) do {} while(0)
-#define UMM_NEED_LOCK_LW_CPU true
 #endif
 
 /*

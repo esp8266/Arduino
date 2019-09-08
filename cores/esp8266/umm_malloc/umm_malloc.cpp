@@ -24,6 +24,10 @@
  *                     - Move integrity and poison checking to separate file
  * R.Hempel 2017-12-29 - Fix bug in realloc when requesting a new block that
  *                        results in OOM error - see Issue 11
+ * R.Hempel 2019-09-07 - Separate the malloc() and free() functionality into
+ *                        wrappers that use critical section protection macros
+ *                        and static core functions that assume they are
+ *                        running in a protected con text. Thanks @devyte
  * ----------------------------------------------------------------------------
  */
 
@@ -367,21 +371,14 @@ void umm_init( void ) {
   }
 }
 
-/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------
+ * Must be called only from within critical sections guarded by
+ * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ */
 
-void umm_free( void *ptr ) {
-  UMM_CRITICAL_DECL(id_free);
+static void umm_free_core( void *ptr ) {
 
   unsigned short int c;
-
-  /* If we're being asked to free a NULL pointer, well that's just silly! */
-
-  if( (void *)0 == ptr ) {
-    DBGLOG_DEBUG( "free a null pointer -> do nothing\n" );
-    STATS__NULL_FREE_REQUEST(id_free);
-
-    return;
-  }
 
   STATS__FREE_REQUEST(id_free);
   /*
@@ -398,9 +395,6 @@ void umm_free( void *ptr ) {
   c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
 
   DBGLOG_DEBUG( "Freeing block %6d\n", c );
-
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY(id_free);
 
   /* Update stats Free Block count */
   STATS__FREE_BLOCKS_UPDATE(UMM_NBLOCK(c) - c);
@@ -431,16 +425,41 @@ void umm_free( void *ptr ) {
 
     UMM_NBLOCK(c)          |= UMM_FREELIST_MASK;
   }
-
-  /* Release the critical section... */
-  UMM_CRITICAL_EXIT(id_free);
 }
 
 /* ------------------------------------------------------------------------ */
 
-void *umm_malloc( size_t size ) {
-  UMM_CRITICAL_DECL(id_malloc);
+void umm_free( void *ptr ) {
+  UMM_CRITICAL_DECL(id_free);
 
+  if (umm_heap == NULL) {
+    umm_init();
+  }
+
+  /* If we're being asked to free a NULL pointer, well that's just silly! */
+
+  if( (void *)0 == ptr ) {
+    DBGLOG_DEBUG( "free a null pointer -> do nothing\n" );
+    STATS__NULL_FREE_REQUEST(id_free);
+
+    return;
+  }
+
+  /* Free the memory withing a protected critical section */
+
+  UMM_CRITICAL_ENTRY(id_free);
+
+  umm_free_core( ptr );
+
+  UMM_CRITICAL_EXIT(id_free);
+}
+
+/* ------------------------------------------------------------------------
+ * Must be called only from within critical sections guarded by
+ * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ */
+
+static void *umm_malloc_core( size_t size ) {
   unsigned short int blocks;
   unsigned short int blockSize = 0;
 
@@ -449,31 +468,9 @@ void *umm_malloc( size_t size ) {
 
   unsigned short int cf;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
-
-  /*
-   * the very first thing we do is figure out if we're being asked to allocate
-   * a size of 0 - and if we are we'll simply return a null pointer. if not
-   * then reduce the size by 1 byte so that the subsequent calculations on
-   * the number of blocks to allocate are easier...
-   */
-
-
-  if( 0 == size ) {
-    DBGLOG_DEBUG( "malloc a block of 0 bytes -> do nothing\n" );
-    STATS__ZERO_ALLOC_REQUEST(id_malloc, size);
-
-    return( (void *)NULL );
-  }
-
   STATS__ALLOC_REQUEST(id_malloc, size);
 
   blocks = umm_blocks( size );
-
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY(id_malloc);
 
   /*
    * Now we can scan through the free list until we find a space that's big
@@ -566,16 +563,46 @@ void *umm_malloc( size_t size ) {
 
     DBGLOG_DEBUG(  "Can't allocate %5d blocks\n", blocks );
 
-    /* Release the critical section... */
-    UMM_CRITICAL_EXIT(id_malloc);
-
     return( (void *)NULL );
   }
 
-  /* Release the critical section... */
+  return( (void *)&UMM_DATA(cf) );
+}
+
+/* ------------------------------------------------------------------------ */
+
+void *umm_malloc( size_t size ) {
+  UMM_CRITICAL_DECL(id_malloc);
+
+  void *ptr = NULL;
+
+  if (umm_heap == NULL) {
+    umm_init();
+  }
+
+  /*
+   * the very first thing we do is figure out if we're being asked to allocate
+   * a size of 0 - and if we are we'll simply return a null pointer. if not
+   * then reduce the size by 1 byte so that the subsequent calculations on
+   * the number of blocks to allocate are easier...
+   */
+
+  if( 0 == size ) {
+    DBGLOG_DEBUG( "malloc a block of 0 bytes -> do nothing\n" );
+    STATS__ZERO_ALLOC_REQUEST(id_malloc, size);
+
+    return( ptr );
+  }
+
+  /* Allocate the memory withing a protected critical section */
+
+  UMM_CRITICAL_ENTRY(id_malloc);
+
+  ptr = umm_malloc_core( size );
+
   UMM_CRITICAL_EXIT(id_malloc);
 
-  return( (void *)&UMM_DATA(cf) );
+  return( ptr );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -724,7 +751,7 @@ void *umm_realloc( void *ptr, size_t size ) {
 #ifdef UMM_LIGHTWEIGHT_CPU
         if ((prevBlockSize + blockSize + nextBlockSize) > blocks) {
             umm_split_block( c, blocks, 0 );
-            umm_free( (void *)&UMM_DATA(c+blocks) );
+            umm_free_core( (void *)&UMM_DATA(c+blocks) );
         }
         STATS__FREE_BLOCKS_ISR_MIN();
         blockSize = blocks;
@@ -736,19 +763,18 @@ void *umm_realloc( void *ptr, size_t size ) {
         ptr = (void *)&UMM_DATA(c);
         UMM_CRITICAL_RESUME(id_realloc);
     } else {
-        UMM_CRITICAL_SUSPEND(id_realloc);
         DBGLOG_DEBUG( "realloc a completely new block %i\n", blocks );
         void *oldptr = ptr;
-        if( (ptr = umm_malloc( size )) ) {
+        if( (ptr = umm_malloc_core( size )) ) {
             DBGLOG_DEBUG( "realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks );
+            UMM_CRITICAL_SUSPEND(id_realloc);
             memcpy( ptr, oldptr, curSize );
-            umm_free( oldptr );
-            blockSize = blocks;
             UMM_CRITICAL_RESUME(id_realloc);
+            umm_free_core( oldptr );
+            blockSize = blocks;
         } else {
             DBGLOG_DEBUG( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            UMM_CRITICAL_RESUME(id_realloc);
             STATS__OOM_UPDATE();
         }
     }
@@ -794,7 +820,7 @@ void *umm_realloc( void *ptr, size_t size ) {
 #ifdef UMM_LIGHTWEIGHT_CPU
             if (blockSize > blocks) {
                 umm_split_block( c, blocks, 0 );
-                umm_free( (void *)&UMM_DATA(c+blocks) );
+                umm_free_core( (void *)&UMM_DATA(c+blocks) );
             }
             STATS__FREE_BLOCKS_ISR_MIN();
             blockSize = blocks;
@@ -813,19 +839,18 @@ void *umm_realloc( void *ptr, size_t size ) {
         STATS__FREE_BLOCKS_UPDATE(-nextBlockSize);
         blockSize += nextBlockSize;
     } else { // 4
-        UMM_CRITICAL_SUSPEND(id_realloc);
         DBGLOG_DEBUG( "realloc a completely new block %d\n", blocks );
         void *oldptr = ptr;
-        if( (ptr = umm_malloc( size )) ) {
+        if( (ptr = umm_malloc_core( size )) ) {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks );
+            UMM_CRITICAL_SUSPEND(id_realloc);
             memcpy( ptr, oldptr, curSize );
-            umm_free( oldptr);
-            blockSize = blocks;
             UMM_CRITICAL_RESUME(id_realloc);
+            umm_free_core( oldptr);
+            blockSize = blocks;
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            UMM_CRITICAL_RESUME(id_realloc);
             STATS__OOM_UPDATE();
         }
     }
@@ -836,15 +861,15 @@ void *umm_realloc( void *ptr, size_t size ) {
         DBGLOG_DEBUG( "realloc the same or smaller size block - %d, do nothing\n", blocks );
         /* This space intentionally left blank */
     } else {
-        UMM_CRITICAL_SUSPEND(id_realloc);
         DBGLOG_DEBUG( "realloc a completely new block %d\n", blocks );
         void *oldptr = ptr;
-        if( (ptr = umm_malloc( size )) ) {
+        if( (ptr = umm_malloc_core( size )) ) {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks );
+            UMM_CRITICAL_SUSPEND(id_realloc);
             memcpy( ptr, oldptr, curSize );
-            umm_free( oldptr );
-            blockSize = blocks;
             UMM_CRITICAL_RESUME(id_realloc);
+            umm_free_core( oldptr );
+            blockSize = blocks;
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
@@ -860,7 +885,7 @@ void *umm_realloc( void *ptr, size_t size ) {
     if (blockSize > blocks ) {
         DBGLOG_DEBUG( "split and free %d blocks from %d\n", blocks, blockSize );
         umm_split_block( c, blocks, 0 );
-        umm_free( (void *)&UMM_DATA(c+blocks) );
+        umm_free_core( (void *)&UMM_DATA(c+blocks) );
     }
 
     STATS__FREE_BLOCKS_MIN();

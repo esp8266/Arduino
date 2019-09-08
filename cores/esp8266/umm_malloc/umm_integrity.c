@@ -1,5 +1,6 @@
+#if defined(BUILD_UMM_MALLOC_C)
 /* integrity check (UMM_INTEGRITY_CHECK) {{{ */
-#if defined(UMM_INTEGRITY_CHECK) && defined(BUILD_UMM_MALLOC_C)
+#if defined(UMM_INTEGRITY_CHECK)
 /*
  * Perform integrity check of the whole heap data. Returns 1 in case of
  * success, 0 otherwise.
@@ -130,3 +131,4 @@ clean:
 
 #endif
 /* }}} */
+#endif  // defined(BUILD_UMM_MALLOC_C)

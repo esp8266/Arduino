@@ -1,5 +1,6 @@
-/* poisoning (UMM_POISON_CHECK) {{{ */
 #if defined(BUILD_UMM_MALLOC_C)
+
+/* poisoning (UMM_POISON_CHECK) {{{ */
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #define POISON_BYTE (0xa5)
 
@@ -236,4 +237,5 @@ int umm_poison_check(void) {
 /* ------------------------------------------------------------------------ */
 
 #endif
-#endif
+
+#endif  // defined(BUILD_UMM_MALLOC_C)

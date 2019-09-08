@@ -1,4 +1,5 @@
 #if defined(BUILD_UMM_MALLOC_C)
+
 #ifdef UMM_INFO
 
 /* ----------------------------------------------------------------------------
@@ -36,6 +37,7 @@ void *umm_info( void *ptr, int force ) {
    */
   memset( &ummHeapInfo, 0, sizeof( ummHeapInfo ) );
 
+  DBGLOG_FORCE( force, "\n" );
   DBGLOG_FORCE( force, "+----------+-------+--------+--------+-------+--------+--------+\n" );
   DBGLOG_FORCE( force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5d|NF %5d|PF %5d|\n",
       (unsigned long)(&UMM_BLOCK(blockNo)),
@@ -204,4 +206,5 @@ size_t umm_free_heap_size_lw( void ) {
   return (size_t)ummStats.free_blocks * sizeof(umm_block);
 }
 #endif
-#endif
+
+#endif  // defined(BUILD_UMM_MALLOC_C)
