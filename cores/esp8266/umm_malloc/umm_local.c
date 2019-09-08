@@ -2,6 +2,8 @@
  * Local Additions/Enhancements
  *
  */
+#if defined(BUILD_UMM_MALLOC_C)
+
 #if defined(UMM_CRITICAL_METRICS)
 /*
  * umm_malloc performance measurments for critical sections
@@ -153,4 +155,6 @@ size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_lw")
 #elif defined(UMM_INFO)
 size_t umm_free_heap_size( void ) __attribute__ ((alias("umm_free_heap_size_info")));
 size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_info")));
+#endif
+
 #endif

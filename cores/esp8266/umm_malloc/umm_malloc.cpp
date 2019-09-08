@@ -129,6 +129,9 @@
 /*
  * Added for using with Arduino ESP8266 and handling renameing to umm_malloc.cpp
  */
+
+#define BUILD_UMM_MALLOC_C
+
 extern "C" {
 
 #include <stdio.h>

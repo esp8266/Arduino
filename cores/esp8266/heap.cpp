@@ -128,12 +128,14 @@ static const char oom_fmt_2[] PROGMEM STORE_ATTR = ":%d\n";
 
 void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 {
+    if (system_get_os_print()) {
         DBGLOG_FUNCTION_P(oom_fmt_1, (int)size);
         DBGLOG_FUNCTION_P(file);
         DBGLOG_FUNCTION_P(oom_fmt_2, line);
+    }
 }
 
-#define OOM_CHECK__PRINT_OOM(p, f, s) if (!p) DBGLOG_FUNCTION_P(f, s)
+#define OOM_CHECK__PRINT_OOM(p, f, s) if (!p && system_get_os_print()) DBGLOG_FUNCTION_P(f, s)
 #define OOM_CHECK__PRINT_LOC(p, s, f, l) if (!p) print_loc(s, f, l)
 
 #else  // ! DEBUG_ESP_OOM

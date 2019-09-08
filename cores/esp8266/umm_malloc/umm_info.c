@@ -1,3 +1,4 @@
+#if defined(BUILD_UMM_MALLOC_C)
 #ifdef UMM_INFO
 
 /* ----------------------------------------------------------------------------
@@ -202,4 +203,5 @@ UMM_STATISTICS ummStats;
 size_t umm_free_heap_size_lw( void ) {
   return (size_t)ummStats.free_blocks * sizeof(umm_block);
 }
+#endif
 #endif

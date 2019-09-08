@@ -55,22 +55,6 @@ extern "C" {
  * ----------------------------------------------------------------------------
  */
 
-/////////////////////////////////////////////////
-#undef DBGLOG_FUNCTION
-#undef DBGLOG_FUNCTION_P
-
-//C This #if 1 changes once the best print option from ISR is determined
-#if 1
-int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-// Note, _isr_safe_printf_P will not handle additional string arguments in
-// PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
-#define DBGLOG_FUNCTION(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
-#define DBGLOG_FUNCTION_P(fmt, ...) _isr_safe_printf_P(fmt, ##__VA_ARGS__)
-#else
-#define DBGLOG_FUNCTION(fmt, ...) printf(PSTR(fmt), ##__VA_ARGS__)
-#define DBGLOG_FUNCTION_P(fmt, ...) printf_P(fmt, ##__VA_ARGS__)
-#endif
-/////////////////////////////////////////////////
 
 /* Start addresses and the size of the heap */
 extern char _heap_start[];
@@ -534,6 +518,22 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #  define POISON_CHECK_NEIGHBORS(c) do{}while(false)
 #endif
 
+/////////////////////////////////////////////////
+#undef DBGLOG_FUNCTION
+#undef DBGLOG_FUNCTION_P
+
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+// Note, _isr_safe_printf_P will not handle additional string arguments in
+// PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
+#define DBGLOG_FUNCTION(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#define DBGLOG_FUNCTION_P(fmt, ...) _isr_safe_printf_P(fmt, ##__VA_ARGS__)
+#else
+#define DBGLOG_FUNCTION(fmt, ...) printf(PSTR(fmt), ##__VA_ARGS__)
+#define DBGLOG_FUNCTION_P(fmt, ...) printf_P(fmt, ##__VA_ARGS__)
+#endif
+
+//C What about printing from umm_info - does it need to be ISR safe
 
 /////////////////////////////////////////////////
 
