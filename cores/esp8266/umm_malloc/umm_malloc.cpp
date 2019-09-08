@@ -836,7 +836,7 @@ void *umm_realloc( void *ptr, size_t size ) {
     } else if ((blockSize + nextBlockSize) >= blocks) { // 3
         DBGLOG_DEBUG( "realloc using next block - %d\n", blocks );
         umm_assimilate_up( c );
-        STATS__FREE_BLOCKS_UPDATE(-nextBlockSize);
+        STATS__FREE_BLOCKS_UPDATE( - nextBlockSize );
         blockSize += nextBlockSize;
     } else { // 4
         DBGLOG_DEBUG( "realloc a completely new block %d\n", blocks );

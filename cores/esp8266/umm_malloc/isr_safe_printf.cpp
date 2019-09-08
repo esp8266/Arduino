@@ -61,7 +61,7 @@
 #include <string.h>
 #include <pgmspace.h>
 #include <core_esp8266_features.h>
-
+#include "umm_malloc_cfg.h"
 extern "C" {
 
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)

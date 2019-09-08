@@ -551,7 +551,6 @@ int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)
 #define DBGLOG_FUNCTION(fmt, ...) printf(PSTR(fmt), ##__VA_ARGS__)
 #define DBGLOG_FUNCTION_P(fmt, ...) printf_P(fmt, ##__VA_ARGS__)
 #endif
-
 //C What about printing from umm_info - does it need to be ISR safe
 
 /////////////////////////////////////////////////

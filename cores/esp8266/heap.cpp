@@ -7,46 +7,53 @@
 #include "umm_malloc/umm_malloc.h"
 #include <c_types.h>
 #include <sys/reent.h>
-
+#include <user_interface.h>
 
 extern "C" {
 
-#if defined( UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #define __umm_malloc(s)           umm_poison_malloc(s)
 #define __umm_calloc(n,s)         umm_poison_calloc(n,s)
 #define __umm_realloc_fl(p,s,f,l) umm_poison_realloc_fl(p,s,f,l)
 #define __umm_free_fl(p,f,l)      umm_poison_free_fl(p,f,l)
 
-#ifdef UMM_POISON_CHECK_LITE
-#define POISON_CHECK__ABORT() do {} while(0)
-#define POISON_CHECK__PANIC_FL(file, line) do { (void)file; (void)line; } while(0)
+#undef realloc
+#undef free
 
-#else // Full heap poison check at every malloc libary call.
-#define POISON_CHECK__ABORT() \
-    do { \
-        if ( ! POISON_CHECK() ) \
-            abort(); \
-    } while(0)
-
-#define POISON_CHECK__PANIC_FL(file, line) \
-    do { \
-        if ( ! POISON_CHECK() ) \
-            __panic_func(file, line, ""); \
-    } while(0)
-#endif
+#elif defined(DEBUG_ESP_OOM)
+#define __umm_malloc(s)           umm_malloc(s)
+#define __umm_calloc(n,s)         umm_calloc(n,s)
+#define __umm_realloc_fl(p,s,f,l) umm_realloc(p,s)
+#define __umm_free_fl(p,f,l)      umm_free(p)
 
 #undef realloc
 #undef free
 
-#else  // ! UMM_POISON_CHECK
+#else  // ! UMM_POISON_CHECK && ! DEBUG_ESP_OOM
 #define __umm_malloc(s)           malloc(s)
 #define __umm_calloc(n,s)         calloc(n,s)
 #define __umm_realloc_fl(p,s,f,l) realloc(p,s)
 #define __umm_free_fl(p,f,l)      free(p)
+#endif
 
-#define POISON_CHECK__ABORT() do {} while(0)
-#define POISON_CHECK__PANIC_FL(file, line) do { (void)file; (void)line; } while(0)
-#endif  // UMM_POISON_CHECK
+
+#if defined(UMM_POISON_CHECK)
+  #define POISON_CHECK__ABORT() \
+      do { \
+          if ( ! POISON_CHECK() ) \
+              abort(); \
+      } while(0)
+
+  #define POISON_CHECK__PANIC_FL(file, line) \
+      do { \
+          if ( ! POISON_CHECK() ) \
+              __panic_func(file, line, ""); \
+      } while(0)
+
+#else // No full heap poison checking.
+  #define POISON_CHECK__ABORT() do {} while(0)
+  #define POISON_CHECK__PANIC_FL(file, line) do { (void)file; (void)line; } while(0)
+#endif
 
 // Debugging helper, last allocation which returned NULL
 void *umm_last_fail_alloc_addr = NULL;
@@ -109,14 +116,6 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
     return ret;
 }
 
-
-#define PTR_CHECK__LOG_LAST_FAIL(p, s, a) \
-    if(0 != (s) && 0 == p)\
-    {\
-      umm_last_fail_alloc_addr = a;\
-      umm_last_fail_alloc_size = s;\
-    }
-
 #ifdef DEBUG_ESP_OOM
 #undef malloc
 #undef calloc
@@ -128,6 +127,8 @@ static const char oom_fmt_2[] PROGMEM STORE_ATTR = ":%d\n";
 
 void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 {
+    (void)size;
+    (void)line;
     if (system_get_os_print()) {
         DBGLOG_FUNCTION_P(oom_fmt_1, (int)size);
         DBGLOG_FUNCTION_P(file);
