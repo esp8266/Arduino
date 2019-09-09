@@ -135,7 +135,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip ArduinoJson-v6.11.0.zip
+    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
 
     popd
 }
@@ -145,8 +145,21 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
-    test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-    tar xf arduino.tar.xz
+    if [ "$MACOSX" = "1" ]; then
+        # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
+        wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
+        sudo installer -pkg python-3.7.4-macosx10.9.pkg -target /
+        # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
+	( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
+        # Hack to place arduino-builder in the same spot as sane OSes
+        test -r arduino.zip || wget -O arduino.zip https://downloads.arduino.cc/arduino-nightly-macosx.zip
+        unzip -q arduino.zip
+	mv Arduino.app arduino-nightly
+	mv arduino-nightly/Contents/Java/* arduino-nightly/.
+    else
+        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        tar xf arduino.tar.xz
+    fi
     mv arduino-nightly $ide_path
     cd $ide_path/hardware
     mkdir esp8266com
@@ -174,7 +187,6 @@ function install_arduino()
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
     install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR $debug
-    which arduino
     cd $TRAVIS_BUILD_DIR
     install_libraries
     echo -e "travis_fold:end:sketch_test_env_prepare"
