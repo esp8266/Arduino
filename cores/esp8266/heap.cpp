@@ -142,8 +142,8 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 #else  // ! DEBUG_ESP_OOM
 
 #if 1
-//C Skip OOM check of pvPort... . It cost 64 more bytes of IRAM to turn on.
-//C Was not previously enabled.
+//C Skip OOM logging of last fail for malloc/... and pvPort... .
+//C It cost 64 more bytes of IRAM to turn on. And was not previously enabled.
 #undef PTR_CHECK__LOG_LAST_FAIL
 #define PTR_CHECK__LOG_LAST_FAIL(p, s, a)
 #endif

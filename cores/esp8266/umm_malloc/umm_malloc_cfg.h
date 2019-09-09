@@ -115,6 +115,23 @@ extern char _heap_start[];
 #endif
 
 /*
+ * -D UMM_INFO_PRINT
+ *
+ * umm_info(NULL, true) is used to print a debug view of heap information to the
+ * debug port. It has to walk the heap and print out information while in a
+ * critical section. This requires that the print function be able to print w/o
+ * doing malloc calls and from an IRQ disabled context. This requires extra IRAM
+ * based code for printing. Without this define `umm_info(NULL, true)` will
+ * not print.
+ *
+ * UMM_INFO_PRINT is enabled as part of selecting `Debug port: "Serial" or
+ * "Serial1"`. To make available all the time use '-D UMM_INFO_PRINT`.
+ */
+#if defined(DEBUG_ESP_PORT) && !defined(UMM_INFO_PRINT)
+#define UMM_INFO_PRINT
+#endif
+
+/*
  * -D UMM_STATS :
  *
  * This option provides a lightweight alternative to using `umm_info` just for
@@ -541,17 +558,23 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #undef DBGLOG_FUNCTION
 #undef DBGLOG_FUNCTION_P
 
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || \
+    defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || \
+    defined(UMM_INFO_PRINT) || defined(UMM_INTEGRITY_CHECK)
+
+#ifndef DEBUG_ESP_ISR
+#define DEBUG_ESP_ISR
+#endif
+
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 // Note, _isr_safe_printf_P will not handle additional string arguments in
 // PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
 #define DBGLOG_FUNCTION(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
 #define DBGLOG_FUNCTION_P(fmt, ...) _isr_safe_printf_P(fmt, ##__VA_ARGS__)
 #else
-#define DBGLOG_FUNCTION(fmt, ...) printf(PSTR(fmt), ##__VA_ARGS__)
-#define DBGLOG_FUNCTION_P(fmt, ...) printf_P(fmt, ##__VA_ARGS__)
+#define DBGLOG_FUNCTION(fmt, ...)   do { (void)fmt; } while(false)
+#define DBGLOG_FUNCTION_P(fmt, ...) do { (void)fmt; } while(false)
 #endif
-//C What about printing from umm_info - does it need to be ISR safe
 
 /////////////////////////////////////////////////
 

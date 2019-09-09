@@ -64,7 +64,7 @@
 #include "umm_malloc_cfg.h"
 extern "C" {
 
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#if defined(DEBUG_ESP_ISR)
 
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 // Note, _isr_safe_printf_P will not handle additional string arguments in

@@ -13,6 +13,14 @@
 #define memmove ets_memmove
 #define memset ets_memset
 
+#if !defined(UMM_INFO_PRINT)
+/* This will stop umm_info from printing.
+ * At this time DBGLOG_FORCE is only used by umm_info.
+ */
+#undef DBGLOG_FORCE
+#define DBGLOG_FORCE(force, format, ...) {(void)force; (void)format;}
+#endif
+
 #if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
 #else
 

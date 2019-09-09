@@ -771,12 +771,15 @@ void *umm_realloc( void *ptr, size_t size ) {
             memcpy( ptr, oldptr, curSize );
             UMM_CRITICAL_RESUME(id_realloc);
             umm_free_core( oldptr );
-            blockSize = blocks;
         } else {
             DBGLOG_DEBUG( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
             STATS__OOM_UPDATE();
         }
+        /* This is not accurate for OOM case; however, it will work for
+         * stopping a call to free before return.
+         */
+        blockSize = blocks;
     }
 #elif defined(UMM_REALLOC_DEFRAG)
   /*
@@ -847,12 +850,15 @@ void *umm_realloc( void *ptr, size_t size ) {
             memcpy( ptr, oldptr, curSize );
             UMM_CRITICAL_RESUME(id_realloc);
             umm_free_core( oldptr);
-            blockSize = blocks;
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
             STATS__OOM_UPDATE();
         }
+        /* This is not accurate for OOM case; however, it will work for
+         * stopping a call to free before return.
+         */
+        blockSize = blocks;
     }
 #else
 #warning "Neither UMM_REALLOC_DEFRAG nor UMM_REALLOC_MINIMIZE_COPY is defined - check umm_malloc_cfg.h"
@@ -869,13 +875,15 @@ void *umm_realloc( void *ptr, size_t size ) {
             memcpy( ptr, oldptr, curSize );
             UMM_CRITICAL_RESUME(id_realloc);
             umm_free_core( oldptr );
-            blockSize = blocks;
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            UMM_CRITICAL_RESUME(id_realloc);
             STATS__OOM_UPDATE();
         }
+        /* This is not accurate for OOM case; however, it will work for
+         * stopping a call to free before return.
+         */
+        blockSize = blocks;
     }
 #endif
     /* Now all we need to do is figure out if the block fit exactly or if we
