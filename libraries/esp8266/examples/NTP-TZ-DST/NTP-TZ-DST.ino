@@ -68,7 +68,7 @@ uint32_t now_ms, now_us;
 bool time_is_set = false;
 esp8266::polledTimeout::periodicMs showTime(3200);
 bool next_change_is_future = true;
-esp8266::polledTimeout::periodicMs add_6months_now(1 << 30);
+esp8266::polledTimeout::periodicMs add_6months_now(esp8266::polledTimeout::periodicMs::neverExpires);
 
 unsigned long testcbms;
 
