@@ -177,10 +177,10 @@
                   },
                   {
                      "host": "x86_64-apple-darwin",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-placeholder.tar.gz",
-                     "archiveFileName": "python3-placeholder.tar.gz",
-                     "checksum": "SHA-256:d8cf9d9d66423d7b90978ebe285a73a6e8611995cd0d5e6273e929a0cf2c9850",
-                     "size": "191"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-macosx-placeholder.tar.gz",
+                     "archiveFileName": "python3-macosx-placeholder.tar.gz",
+                     "checksum": "SHA-256:5bfa0d4c2dc3edeeaa913f4eac42ef3ff0bf8c8fe9f11be112a8ca7911de2dae",
+                     "size": "198"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
