@@ -14,7 +14,6 @@
 #include <Ticker.h>
 
 Ticker tickerSetHigh;
-Ticker tickerSetAnalog;
 Ticker tickerSetLow;
 
 void setPin(int state) {
@@ -27,7 +26,6 @@ void setPinChar(char state) {
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(1, LOW);
 
   // every 25 ms, call setPin(0)
   tickerSetLow.attach_ms(25, setPin, 0);
