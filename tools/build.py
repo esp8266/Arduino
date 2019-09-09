@@ -64,9 +64,9 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
         cmd += '-verbose '
     cmd += sketch
 
-    # Normalize slashes on Windows
+    # Try removing quotes to make arduino-cli sork
     if platform.system() == "Windows":
-        cmd = cmd.replace('/', '\\').replace('"', '')
+        cmd = cmd.replace('/', '\\')
 
     if args.verbose:
         print('Building: ' + cmd, file=f)

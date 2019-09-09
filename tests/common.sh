@@ -74,7 +74,6 @@ function build_sketches()
 	# Make ARDUINO_IDE_PATH to Windows slashies
         export ARDUINO_IDE_PATH=$(realpath $arduino | sed 's/\/c/C:/' | tr / '\\' )
         build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k -p $pwd_win/$build_dir -n $lwip $bar_win "
-        build_cmd=$(echo $build_cmd |  tr '"' ' ')  # Remove quotes to see if Win Go works better
     fi
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
@@ -161,17 +160,10 @@ function install_ide()
         # Acquire needed packages from Windows package manager
         choco install --no-progress python3
         export PATH="/c/Python37:$PATH"  # Ensure it's live from now on...
-<<<<<<< HEAD
         cp /c/Python37/python.exe /c/Python37/python3.exe
         choco install --no-progress unzip
         choco install --no-progress sed
         #choco install --no-progress golang
-=======
-	      cp /c/Python37/python.exe /c/Python37/python3.exe
-        choco install --no-progress unzip
-        choco install --no-progress sed
-        choco install --no-progress golang
->>>>>>> edfc77b0c247efe7afa70461ff9c32fda27c3274
         test -r arduino-nightly-windows.zip || wget -nv -O arduino-nightly-windows.zip https://www.arduino.cc/download.php?f=/arduino-nightly-windows.zip
         unzip -q arduino-nightly-windows.zip
     elif [ "$MACOSX" = "1" ]; then
