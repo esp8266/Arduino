@@ -32,8 +32,10 @@ function print_size_info()
     fi
 
     elf_name=$(basename $elf_file)
+    ls -l $elf_name
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
+    echo $PATH
     declare -A segments
     while read -a tokens; do
         seg=${tokens[0]}
@@ -43,7 +45,6 @@ function print_size_info()
         if [ "$addr" -eq "$addr" -a "$addr" -ne "0" ] 2>/dev/null; then
             segments[$seg]=$size
         fi
-
 
     done < <(xtensa-lx106-elf-size --format=sysv $elf_file)
 
@@ -203,7 +204,13 @@ function install_ide()
     echo -e "\n----\n"
     cd esp8266/tools
     python3 get.py -q
-    export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
+    if [ "$WINDOWS" = "1" ]; then
+        # Because the symlinks don't work well under Win32, we need to add the path to this copy, not the original...
+        relbin=$(realpath $PWD/xtensa-lx106-elf/bin)
+        export PATH="$ide_path:$relbin:$PATH"
+    else
+        export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
+    fi
 }
 
 function install_arduino()
