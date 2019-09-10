@@ -68,9 +68,9 @@ function build_sketches()
     mkdir -p $build_dir
     local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
-        # Paths to the arduino builder need to be c:\ referenced, not our native ones
-	local pwd_win=$(realpath $PWD | sed 's/\/c/C:/')
-	local bar_win=$(echo $build_arg | sed 's/\/c\//C:\//g')
+        # Paths to the arduino builder need to be / referenced, not our native ones
+	local pwd_win=$(realpath $PWD | sed 's/^\/c//')
+	local bar_win=$(echo $build_arg | sed 's/^\/c\//')
 	# Make ARDUINO_IDE_PATH to Windows slashies
         export ARDUINO_IDE_PATH=$(realpath $arduino | sed 's/\/c/C:/' | tr / '\\' )
         build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k -p $pwd_win/$build_dir -n $lwip $bar_win "

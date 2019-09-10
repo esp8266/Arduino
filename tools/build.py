@@ -32,19 +32,19 @@ import shutil
 def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     cmd = ide_path + '/arduino-builder '
     cmd += '-compile -logger=human '
-    cmd += '-build-path "' + tmp_dir + '" '
-    cmd += '-tools "' +  ide_path + '/tools-builder" '
+    cmd += '-build-path ' + tmp_dir + ' '
+    cmd += '-tools ' +  ide_path + '/tools-builder '
     if cache != "":
-        cmd += '-build-cache "' + cache + '" '
+        cmd += '-build-cache ' + cache + ' '
     if args.library_path:
         for lib_dir in args.library_path:
-            cmd += '-libraries "' + lib_dir + '" '
-    cmd += '-hardware "' + ide_path + '/hardware" '
+            cmd += '-libraries ' + lib_dir + ' '
+    cmd += '-hardware ' + ide_path + '/hardware '
     if args.hardware_dir:
         for hw_dir in args.hardware_dir:
-            cmd += '-hardware "' + hw_dir + '" '
+            cmd += '-hardware ' + hw_dir + ' '
     else:
-        cmd += '-hardware "' + hardware_dir + '" '
+        cmd += '-hardware ' + hardware_dir + ' '
     # Debug=Serial,DebugLevel=Core____
     cmd += '-fqbn=esp8266com:esp8266:{board_name}:' \
             'xtal={cpu_freq},' \
@@ -57,16 +57,16 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     if args.debug_port and args.debug_level:
         cmd += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
     cmd += ' '
-    cmd += '-built-in-libraries "' + ide_path + '/libraries" '
+    cmd += '-built-in-libraries ' + ide_path + '/libraries '
     cmd += '-ide-version=10607 '
     cmd += '-warnings={warnings} '.format(**vars(args))
     if args.verbose:
         cmd += '-verbose '
     cmd += sketch
 
-    # Try removing quotes to make arduino-cli sork
-    if platform.system() == "Windows":
-        cmd = cmd.replace('/', '\\')
+    # Try removing quotes to make arduino-cli work
+    #if platform.system() == "Windows":
+    #    cmd = cmd.replace('/', '\\')
 
     if args.verbose:
         print('Building: ' + cmd, file=f)
