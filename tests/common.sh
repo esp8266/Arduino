@@ -69,11 +69,7 @@ function build_sketches()
     local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
         # Paths to the arduino builder need to be / referenced, not our native ones
-	local pwd_win=$(realpath $PWD | sed 's/^\/c//')
-	local bar_win=$(echo $build_arg | sed 's/^\/c\//')
-	# Make ARDUINO_IDE_PATH to Windows slashies
-        export ARDUINO_IDE_PATH=$(realpath $arduino | sed 's/\/c/C:/' | tr / '\\' )
-        build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k -p $pwd_win/$build_dir -n $lwip $bar_win "
+        build_cmd=$(echo $build_cmd --ide_path $arduino | sed 's/ \/c\// \//g' ) # replace '/c/' with '/'
     fi
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
@@ -116,7 +112,12 @@ function build_sketches()
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
 	if [ "$WINDOWS" == "1" ]; then
-            sketch=$(echo $sketch | sed 's/\/c/C:/')
+            sketch=$(echo $sketch | sed 's/^\/c//')
+            # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
+            # http://www.mingw.org/wiki/Posix_path_conversion
+            # https://stackoverflow.com/questions/7250130/how-to-stop-mingw-and-msys-from-mangling-path-names-given-at-the-command-line#34386471
+            export MSYS2_ARG_CONV_EXC="*"
+            export MSYS_NO_PATHCONV=1
         fi
         echo "$build_cmd $sketch"
         time ($build_cmd $sketch >build.log)
