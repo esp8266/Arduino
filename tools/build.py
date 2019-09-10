@@ -30,7 +30,10 @@ import tempfile
 import shutil
 
 
+# Arduino-builder needs forward-slash paths for passed in params or it cannot
+# launch the needed toolset.
 def windowsize_paths(l):
+    """Convert forward-slash paths to backslash paths referenced from C:"""
     out = []
     for i in l:
         if i.startswith('/'):
@@ -135,13 +138,9 @@ def main():
         tmp_dir = tempfile.mkdtemp()
         created_tmp_dir = True
 
-    if platform.system() == "Windows":
-        tools_dir = os.path.dirname(os.path.realpath(__file__)) + '\\..\\tools'
-        hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '\\..\\cores'
-    else:
-        tools_dir = os.path.dirname(os.path.realpath(__file__)) + '/../tools'
-        # this is not the correct hardware folder to add.
-        hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
+    tools_dir = os.path.dirname(os.path.realpath(__file__)) + '/../tools'
+    # this is not the correct hardware folder to add.
+    hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
 
     output_name = tmp_dir + '/' + os.path.basename(sketch_path) + '.bin'
 

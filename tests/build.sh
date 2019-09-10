@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+
 cache_dir=$(mktemp -d)
 
 source "$TRAVIS_BUILD_DIR"/tests/common.sh

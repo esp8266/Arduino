@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+
 # return 1 if this test should not be built in CI (for other archs, not needed, etc.)
 function skip_ino()
 {
@@ -34,7 +34,6 @@ function print_size_info()
     elf_name=$(basename $elf_file)
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
-
     declare -A segments
     while read -a tokens; do
         seg=${tokens[0]}
@@ -64,7 +63,6 @@ function build_sketches()
     local build_mod=$4
     local build_rem=$5
     local lwip=$6
-    export ARDUINO_IDE_PATH=$arduino
     mkdir -p $build_dir
     local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
@@ -73,6 +71,7 @@ function build_sketches()
     fi
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
+    export ARDUINO_IDE_PATH=$arduino
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
