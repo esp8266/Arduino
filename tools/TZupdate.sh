@@ -8,7 +8,7 @@
 #   tools/TZupdate.sh
 #   ./TZupdate.sh
 
-dir=$(cd ${0%/*}; pwd)
+dir=$(cd ${0%/*} 2>/dev/null; pwd)
 base=${0##*/}
 
 csv=https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.csv
