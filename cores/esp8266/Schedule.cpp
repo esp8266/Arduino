@@ -26,7 +26,7 @@ struct recurrent_fn_t
     esp8266::polledTimeout::periodicFastUs callNow;
     const std::atomic<bool>* wakeupToken = nullptr;
     bool wakeupTokenCmp = false;
-    recurrent_fn_t (esp8266::polledTimeout::periodicFastUs interval): callNow(interval) { }
+    recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
 static recurrent_fn_t rFirst(0); // fifo not needed
@@ -35,7 +35,7 @@ static recurrent_fn_t rFirst(0); // fifo not needed
 // or if none are available allocates a new one,
 // or nullptr if limit is reached
 IRAM_ATTR // called from ISR
-static scheduled_fn_t* get_fn_unsafe ()
+static scheduled_fn_t* get_fn_unsafe()
 {
     scheduled_fn_t* result = nullptr;
     // try to get an item from unused items list
@@ -54,7 +54,7 @@ static scheduled_fn_t* get_fn_unsafe ()
     return result;
 }
 
-static void recycle_fn_unsafe (scheduled_fn_t* fn)
+static void recycle_fn_unsafe(scheduled_fn_t* fn)
 {
     fn->mFunc = nullptr; // special overload in c++ std lib
     fn->mNext = sUnused;
@@ -62,7 +62,7 @@ static void recycle_fn_unsafe (scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function (const std::function<void(void)>& fn)
+bool schedule_function(const std::function<void(void)>& fn)
 {
     if (!fn)
         return false;
@@ -85,15 +85,13 @@ bool schedule_function (const std::function<void(void)>& fn)
     return true;
 }
 
-bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us,
+bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us,
     const std::atomic<bool>* wakeupToken)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
     if (!fn)
         return false;
-
-    esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     recurrent_fn_t* item = new (std::nothrow) recurrent_fn_t(repeat_us);
     if (!item)
@@ -103,13 +101,15 @@ bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32
     item->wakeupToken = wakeupToken;
     item->wakeupTokenCmp = wakeupToken && wakeupToken->load();
 
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
+
     item->mNext = rFirst.mNext;
     rFirst.mNext = item;
 
     return true;
 }
 
-void run_scheduled_functions ()
+void run_scheduled_functions()
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
@@ -124,9 +124,9 @@ void run_scheduled_functions ()
             sFirst = sFirst->mNext;
             if (!sFirst)
                 sLast = nullptr;
-            recycle_fn_unsafe(to_recycle);
-        }
-
+			recycle_fn_unsafe(to_recycle);
+		}
+    	
         if (yieldNow)
         {
             // because scheduled function are allowed to last:
@@ -137,8 +137,10 @@ void run_scheduled_functions ()
     }
 }
 
-void run_scheduled_recurrent_functions ()
+void run_scheduled_recurrent_functions()
 {
+    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
+
     // Note to the reader:
     // There is no exposed API to remove a scheduled function:
     // Scheduled functions are removed only from this function, and
@@ -178,8 +180,8 @@ void run_scheduled_recurrent_functions ()
 
             auto to_ditch = current;
 
-        // current function recursively scheduled something
-        if (prev->mNext != current) prev = prev->mNext;
+            // current function recursively scheduled something
+            if (prev->mNext != current) prev = prev->mNext;
 
             current = current->mNext;
             prev->mNext = current;
@@ -191,8 +193,15 @@ void run_scheduled_recurrent_functions ()
             prev = current;
             current = current->mNext;
         }
-    }
-    while (current);
+
+        if (yieldNow)
+        {
+            // because scheduled function might last too long for watchdog etc,
+            // this is yield() in cont stack:
+            esp_schedule();
+            cont_yield(g_pcont);
+        }
+    } while (current);
 
     fence = false;
 }

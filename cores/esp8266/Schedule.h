@@ -11,7 +11,7 @@
 // in user stack (called CONT stack) without the common restrictions from
 // system context.  Details are below.
 
-// The purpose of recurrent scheduled function is to independantly execute
+// The purpose of recurrent scheduled function is to independently execute
 // user code in CONT stack on a regular basis.
 // It has been introduced with ethernet service in mind, it can also be used
 // for all libraries in the need of a regular `libdaemon_handlestuff()`.
@@ -37,7 +37,7 @@
 // * Run the lambda only once next time.
 // * A scheduled function can schedule a function.
 
-bool schedule_function (const std::function<void(void)>& fn);
+bool schedule_function(const std::function<void(void)> & fn);
 
 // Run all scheduled functions.
 // Use this function if your are not using `loop`,
@@ -59,16 +59,14 @@ void run_scheduled_functions();
 //   functions.  However a user function returning false will cancel itself.
 // * Long running operations or yield() or delay() are not allowed in the
 //   recurrent function.
-// * A recurrent function currently must not schedule another recurrent
-//   functions.
 // * If a wakeupToken is used, if its value toggles, any remaining
 //   delay is disregarded, and the lambda runs on the next scheduler iteration.
-bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us,
+bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us,
     const std::atomic<bool>* wakeupToken = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
 
-void run_scheduled_recurrent_functions ();
+void run_scheduled_recurrent_functions();
 
 #endif // ESP_SCHEDULE_H
