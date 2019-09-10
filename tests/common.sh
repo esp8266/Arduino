@@ -32,10 +32,9 @@ function print_size_info()
     fi
 
     elf_name=$(basename $elf_file)
-    ls -l $elf_name
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
-    echo $PATH
+
     declare -A segments
     while read -a tokens; do
         seg=${tokens[0]}
@@ -46,7 +45,7 @@ function print_size_info()
             segments[$seg]=$size
         fi
 
-    done < <(xtensa-lx106-elf-size --format=sysv $elf_file)
+    done < <(xtensa-lx106-elf-size --format=sysv $elf_file | sed 's/\r//g' )
 
     total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
     total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
