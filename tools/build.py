@@ -109,10 +109,6 @@ def main():
     args = parse_args()
 
     ide_path = args.ide_path
-    try:
-        print("IDE dir1: ", ide_path)
-    except:
-        pass
     if not ide_path:
         ide_path = os.environ.get('ARDUINO_IDE_PATH')
         if not ide_path:
@@ -120,7 +116,6 @@ def main():
                   "or ARDUINO_IDE_PATH environment variable.", file=sys.stderr)
             return 2
 
-        print("IDE dir2: ", ide_path)
     sketch_path = args.sketch_path
     tmp_dir = args.build_path
     created_tmp_dir = False
@@ -128,14 +123,17 @@ def main():
         tmp_dir = tempfile.mkdtemp()
         created_tmp_dir = True
 
-    tools_dir = os.path.dirname(os.path.realpath(__file__)) + '/../tools'
-    # this is not the correct hardware folder to add.
-    hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
+    if platform.system() == "Windows":
+        tools_dir = os.path.dirname(os.path.realpath(__file__)) + '\\..\\tools'
+        hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '\\..\\cores'
+    else:
+        tools_dir = os.path.dirname(os.path.realpath(__file__)) + '/../tools'
+        # this is not the correct hardware folder to add.
+        hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
 
     output_name = tmp_dir + '/' + os.path.basename(sketch_path) + '.bin'
 
     if args.verbose:
-        print("IDE dir: ", ide_path)
         print("Sketch: ", sketch_path)
         print("Build dir: ", tmp_dir)
         print("Cache dir: ", args.build_cache)
