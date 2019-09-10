@@ -29,6 +29,15 @@ import subprocess
 import tempfile
 import shutil
 
+
+def windowsize_paths(l):
+    out = []
+    for i in l:
+        if i.startswith('/'):
+            i = 'C:' + i
+        out += [i.replace('/', '\\')]
+    return out
+
 def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     cmd = []
     cmd += [ide_path + '/arduino-builder']
@@ -64,6 +73,9 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     if args.verbose:
         cmd += ['-verbose']
     cmd += [sketch]
+
+    if platform.system() == "Windows":
+        cmd = windowsize_paths(cmd)
 
     if args.verbose:
         print('Building: ' + " ".join(cmd), file=f)
