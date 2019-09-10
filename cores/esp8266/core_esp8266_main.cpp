@@ -64,8 +64,8 @@ static uint32_t s_micros_at_task_start;
  * Max nesting seen by SDK so far is 2.
  */
 #define ETS_INTR_LOCK_NEST_MAX 7
-uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
-byte     ets_intr_lock_stack_ptr=0;
+static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
+static byte     ets_intr_lock_stack_ptr=0;
 
 
 extern "C" {
@@ -128,6 +128,8 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
     }
 }
 
+
+// Replace ets_intr_(un)lock with nestable versions
 extern "C" void IRAM_ATTR ets_intr_lock() {
   if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
      ets_intr_lock_stack[ets_intr_lock_stack_ptr++] = xt_rsil(3);
@@ -143,6 +145,8 @@ extern "C" void IRAM_ATTR ets_intr_unlock() {
 }
 
 
+// Save / Restore the PS state across the rom ets_post call as the rom code
+// does not implement this correctly.
 extern "C" bool ets_post_rom(uint8 prio, ETSSignal sig, ETSParam par);
 
 extern "C" bool IRAM_ATTR ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
