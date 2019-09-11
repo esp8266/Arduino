@@ -44,8 +44,7 @@ function print_size_info()
             segments[$seg]=$size
         fi
 
-
-    done < <(xtensa-lx106-elf-size --format=sysv $elf_file)
+    done < <(xtensa-lx106-elf-size --format=sysv $elf_file | sed 's/\r//g' )
 
     total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
     total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
@@ -66,6 +65,10 @@ function build_sketches()
     local lwip=$6
     mkdir -p $build_dir
     local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
+    if [ "$WINDOWS" = "1" ]; then
+        # Paths to the arduino builder need to be / referenced, not our native ones
+        build_cmd=$(echo $build_cmd --ide_path $arduino | sed 's/ \/c\// \//g' ) # replace '/c/' with '/'
+    fi
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -107,6 +110,14 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
+	if [ "$WINDOWS" == "1" ]; then
+            sketch=$(echo $sketch | sed 's/^\/c//')
+            # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
+            # http://www.mingw.org/wiki/Posix_path_conversion
+            # https://stackoverflow.com/questions/7250130/how-to-stop-mingw-and-msys-from-mangling-path-names-given-at-the-command-line#34386471
+            export MSYS2_ARG_CONV_EXC="*"
+            export MSYS_NO_PATHCONV=1
+        fi
         echo "$build_cmd $sketch"
         time ($build_cmd $sketch >build.log)
         local result=$?
@@ -135,7 +146,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
+    { test -r ArduinoJson-v6.11.0.zip || wget -nv https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
 
     popd
 }
@@ -145,17 +156,27 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
-    if [ "$MACOSX" = "1" ]; then
+    if [ "$WINDOWS" = "1" ]; then
+        # Acquire needed packages from Windows package manager
+        choco install --no-progress python3
+        export PATH="/c/Python37:$PATH"  # Ensure it's live from now on...
+        cp /c/Python37/python.exe /c/Python37/python3.exe
+        choco install --no-progress unzip
+        choco install --no-progress sed
+        #choco install --no-progress golang
+        test -r arduino-nightly-windows.zip || wget -nv -O arduino-nightly-windows.zip https://www.arduino.cc/download.php?f=/arduino-nightly-windows.zip
+        unzip -q arduino-nightly-windows.zip
+    elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
         wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
         sudo installer -pkg python-3.7.4-macosx10.9.pkg -target /
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
-	( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
+        ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
         test -r arduino.zip || wget -O arduino.zip https://downloads.arduino.cc/arduino-nightly-macosx.zip
         unzip -q arduino.zip
-	mv Arduino.app arduino-nightly
-	mv arduino-nightly/Contents/Java/* arduino-nightly/.
+        mv Arduino.app arduino-nightly
+        mv arduino-nightly/Contents/Java/* arduino-nightly/.
     else
         test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
         tar xf arduino.tar.xz
@@ -164,7 +185,11 @@ function install_ide()
     cd $ide_path/hardware
     mkdir esp8266com
     cd esp8266com
-    ln -s $core_path esp8266
+    if [ "$WINDOWS" = "1" ]; then
+        cp -a $core_path esp8266
+    else
+        ln -s $core_path esp8266
+    fi
     local debug_flags=""
     if [ "$debug" = "debug" ]; then
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
@@ -176,8 +201,14 @@ function install_ide()
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
     cd esp8266/tools
-    python3 get.py
-    export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
+    python3 get.py -q
+    if [ "$WINDOWS" = "1" ]; then
+        # Because the symlinks don't work well under Win32, we need to add the path to this copy, not the original...
+        relbin=$(realpath $PWD/xtensa-lx106-elf/bin)
+        export PATH="$ide_path:$relbin:$PATH"
+    else
+        export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
+    fi
 }
 
 function install_arduino()
