@@ -37,7 +37,7 @@
 // * Run the lambda only once next time.
 // * A scheduled function can schedule a function.
 
-bool schedule_function(const std::function<void(void)> & fn);
+bool schedule_function (const std::function<void(void)>& fn);
 
 // Run all scheduled functions.
 // Use this function if your are not using `loop`,

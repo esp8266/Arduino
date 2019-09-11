@@ -36,7 +36,7 @@ static recurrent_fn_t* rLast = &rFirst;
 // or if none are available allocates a new one,
 // or nullptr if limit is reached
 IRAM_ATTR // called from ISR
-static scheduled_fn_t* get_fn_unsafe()
+static scheduled_fn_t* get_fn_unsafe ()
 {
     scheduled_fn_t* result = nullptr;
     // try to get an item from unused items list
@@ -55,7 +55,7 @@ static scheduled_fn_t* get_fn_unsafe()
     return result;
 }
 
-static void recycle_fn_unsafe(scheduled_fn_t* fn)
+static void recycle_fn_unsafe (scheduled_fn_t* fn)
 {
     fn->mFunc = nullptr; // special overload in c++ std lib
     fn->mNext = sUnused;
@@ -63,7 +63,7 @@ static void recycle_fn_unsafe(scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function(const std::function<void(void)>& fn)
+bool schedule_function (const std::function<void(void)>& fn)
 {
     if (!fn)
         return false;
@@ -111,7 +111,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_
     return true;
 }
 
-void run_scheduled_functions()
+void run_scheduled_functions ()
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
@@ -186,10 +186,11 @@ void run_scheduled_recurrent_functions()
 
             auto to_ditch = current;
 
+            // removing rLast
+            if (rLast == current) rLast = prev;
+
             current = current->mNext;
             prev->mNext = current;
-            // removing rLast
-            if (!current) rLast = prev;
 
             delete(to_ditch);
         }
