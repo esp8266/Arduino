@@ -21,36 +21,15 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include "coredecls.h"
 #include "eboot_command.h"
+
 
 extern "C" {
 
-static uint32_t crc_update(uint32_t crc, const uint8_t *data, size_t length)
-{
-    uint32_t i;
-    bool bit;
-    uint8_t c;
-    
-    while (length--) {
-        c = *data++;
-        for (i = 0x80; i > 0; i >>= 1) {
-            bit = crc & 0x80000000;
-            if (c & i) {
-                bit = !bit;
-            }
-            crc <<= 1;
-            if (bit) {
-                crc ^= 0x04c11db7;
-            }
-        }
-    }
-    return crc;
-}
-
 static uint32_t eboot_command_calculate_crc32(const struct eboot_command* cmd)
 {
-    return crc_update(0xffffffff, (const uint8_t*) cmd, 
-                      offsetof(struct eboot_command, crc32));
+    return crc32((const uint8_t*) cmd, offsetof(struct eboot_command, crc32));
 }
 
 int eboot_command_read(struct eboot_command* cmd)
