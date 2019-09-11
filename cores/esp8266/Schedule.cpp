@@ -29,7 +29,8 @@ struct recurrent_fn_t
     recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
-static recurrent_fn_t rFirst(0); // fifo not needed
+static recurrent_fn_t rFirst(0);
+static recurrent_fn_t* rLast = &rFirst;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -98,13 +99,14 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_
         return false;
 
     item->mFunc = fn;
+    item->mNext = nullptr;
     item->wakeupToken = wakeupToken;
     item->wakeupTokenCmp = wakeupToken && wakeupToken->load();
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
-    item->mNext = rFirst.mNext;
-    rFirst.mNext = item;
+    rLast->mNext = item;
+    rLast = item;
 
     return true;
 }
@@ -124,9 +126,9 @@ void run_scheduled_functions()
             sFirst = sFirst->mNext;
             if (!sFirst)
                 sLast = nullptr;
-			recycle_fn_unsafe(to_recycle);
-		}
-    	
+            recycle_fn_unsafe(to_recycle);
+        }
+
         if (yieldNow)
         {
             // because scheduled function are allowed to last:
@@ -147,7 +149,7 @@ void run_scheduled_recurrent_functions()
     // its purpose is that it is never called from an interrupt
     // (always on cont stack).
 
-    recurrent_fn_t* current = rFirst.mNext;
+    auto current = rFirst.mNext;
     if (!current)
         return;
 
@@ -164,10 +166,14 @@ void run_scheduled_recurrent_functions()
         fence = true;
     }
 
-    recurrent_fn_t* prev = &rFirst;
+    auto prev = &rFirst;
+    // prevent scheduling of new functions during this run
+    auto stop = rLast;
 
+    bool done;
     do
     {
+        done = current == stop;
         const bool wakeupToken = current->wakeupToken && current->wakeupToken->load();
         const bool wakeup = current->wakeupTokenCmp != wakeupToken;
         if (wakeup) current->wakeupTokenCmp = wakeupToken;
@@ -180,11 +186,10 @@ void run_scheduled_recurrent_functions()
 
             auto to_ditch = current;
 
-            // current function recursively scheduled something
-            if (prev->mNext != current) prev = prev->mNext;
-
             current = current->mNext;
             prev->mNext = current;
+            // removing rLast
+            if (!current) rLast = prev;
 
             delete(to_ditch);
         }
@@ -201,7 +206,7 @@ void run_scheduled_recurrent_functions()
             esp_schedule();
             cont_yield(g_pcont);
         }
-    } while (current);
+    } while (current && !done);
 
     fence = false;
 }
