@@ -54,7 +54,7 @@ public:
     void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
     {
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+        _attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
     }
 
     void once(float seconds, callback_function_t callback);
@@ -73,7 +73,7 @@ public:
     void once_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
     {
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), (void*)arg);
+        _attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
     }
 
     void detach();
