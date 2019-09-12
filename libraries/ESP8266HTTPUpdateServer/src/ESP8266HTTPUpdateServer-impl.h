@@ -7,8 +7,8 @@
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
-extern "C" uint32_t _SPIFFS_start;
-extern "C" uint32_t _SPIFFS_end;
+namespace esp8266httpupdateserver {
+using namespace esp8266webserver;
 
 static const char serverIndex[] PROGMEM =
   R"(<!DOCTYPE html>
@@ -31,9 +31,10 @@ static const char serverIndex[] PROGMEM =
      </body>
      </html>)";
 static const char successResponse[] PROGMEM = 
-  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
+  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...";
 
-ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
+template <typename ServerType>
+ESP8266HTTPUpdateServerTemplate<ServerType>::ESP8266HTTPUpdateServerTemplate(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
@@ -42,7 +43,8 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
   _authenticated = false;
 }
 
-void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path, const String& username, const String& password)
+template <typename ServerType>
+void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate<ServerType> *server, const String& path, const String& username, const String& password)
 {
     _server = server;
     _username = username;
@@ -120,10 +122,13 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path
     });
 }
 
-void ESP8266HTTPUpdateServer::_setUpdaterError()
+template <typename ServerType>
+void ESP8266HTTPUpdateServerTemplate<ServerType>::_setUpdaterError()
 {
   if (_serial_output) Update.printError(Serial);
   StreamString str;
   Update.printError(str);
   _updaterError = str.c_str();
 }
+
+};
