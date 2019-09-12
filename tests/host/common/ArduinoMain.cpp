@@ -50,8 +50,6 @@ bool restore_tty = false;
 bool mockdebug = false;
 int mock_port_shifter = MOCK_PORT_SHIFTER;
 
-bool serial_timestamp = false;
-
 #define STDIN STDIN_FILENO
 
 static struct termios initial_settings;

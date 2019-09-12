@@ -61,6 +61,8 @@ struct uart_
 	struct uart_rx_buffer_ * rx_buffer;
 };
 
+bool serial_timestamp = false;
+
 // write one byte to the emulated UART
 static void
 uart_do_write_char(const int uart_nr, char c)
