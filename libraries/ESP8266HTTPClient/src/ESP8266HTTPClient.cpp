@@ -1007,7 +1007,7 @@ const String& HTTPClient::getString(void)
 
     _payload.reset(new StreamString());
 
-    if(_size) {
+    if(_size > 0) {
         // try to reserve needed memmory
         if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
@@ -1456,10 +1456,10 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
     free(buff);
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] connection closed or file end (written: %d).\n", bytesWritten);
+    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] end of chunk or data (transferred: %d).\n", bytesWritten);
 
     if((size > 0) && (size != bytesWritten)) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] bytesWritten %d and size %d mismatch!.\n", bytesWritten, size);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] transferred size %d and request size %d mismatch!.\n", bytesWritten, size);
         return HTTPC_ERROR_STREAM_WRITE;
     }
 
