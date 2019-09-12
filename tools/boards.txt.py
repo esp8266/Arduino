@@ -319,7 +319,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'adafruit',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_qio',
             'flashfreq_40',
             '4M',
@@ -336,7 +336,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'inventone',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -353,7 +353,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'xinabox',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'crystalfreq_menu',
             'flashmode_dio',
             'flashfreq_40',
@@ -427,7 +427,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'nodemcu',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_qio',
             'flashfreq_40',
             '4M',
@@ -461,7 +461,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'nodemcu',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -486,7 +486,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'modwifi',
             },
         'macro': [
-            'resetmethod_cktmp',
+            'resetmethod_ck',
             'flashmode_qio',
             'flashfreq_40',
             '2M',
@@ -511,7 +511,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'thing',
             },
         'macro': [
-            'resetmethod_cktmp',
+            'resetmethod_ck',
             'flashmode_qio',
             'flashfreq_40',
             '512K',
@@ -525,7 +525,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'thing',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '512K',
@@ -538,7 +538,7 @@ boards = collections.OrderedDict([
             '.build.board': 'ESP8266_ESP210',
             },
         'macro': [
-            'resetmethod_cktmp',
+            'resetmethod_ck',
             'flashmode_qio',
             'flashfreq_40',
             '4M',
@@ -553,7 +553,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'd1_mini',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -568,7 +568,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'd1_mini',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '16M',
@@ -583,7 +583,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'd1_mini',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dout',
             'flashfreq_40',
             '1M',
@@ -621,7 +621,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'd1',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -655,7 +655,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'espinotee',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_qio',
             'flashfreq_40',
             '4M',
@@ -696,7 +696,7 @@ boards = collections.OrderedDict([
             ( '.menu.ESPModule.ESP12.upload.maximum_size', '1044464' ),
         ]),
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_qio',
             'flashfreq_menu',
             '1M',
@@ -724,7 +724,7 @@ boards = collections.OrderedDict([
             ( '.menu.BoardModel.starottodeved.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
         ]),
         'macro': [
-            'resetmethod_cktmp',
+            'resetmethod_ck',
             'flashmode_qio',
             'flashfreq_40',
             '4M',
@@ -739,7 +739,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'generic',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_80',
             '512K',
@@ -783,7 +783,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'wifiduino',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -798,7 +798,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'wifi_slot',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashfreq_menu',
             'flashmode_menu',
             '1M', '2M',
@@ -812,7 +812,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'wiolink',
             },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_qio',
             'flashfreq_40',
             '4M',
@@ -831,7 +831,7 @@ boards = collections.OrderedDict([
             '.build.variant': 'espectro',
         },
         'macro': [
-            'resetmethod_dtr',
+            'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -918,10 +918,10 @@ macros = {
     ####################### menu.resetmethod
 
     'resetmethod_menu': collections.OrderedDict([
-        ( '.menu.ResetMethod.dtr', 'dtr' ),
-        ( '.menu.ResetMethod.dtr.upload.resetmethod', '--before default_reset --after hard_reset' ),
-        ( '.menu.ResetMethod.nodtr', 'no dtr' ),
-        ( '.menu.ResetMethod.nodtr.upload.resetmethod', '--before no_reset --after soft_reset' ),
+        ( '.menu.ResetMethod.nodemcu', 'dtr (aka nodemcu)' ),
+        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', '--before default_reset --after hard_reset' ),
+        ( '.menu.ResetMethod.ck', 'no dtr (aka ck)' ),
+        ( '.menu.ResetMethod.ck.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_menu_extra': collections.OrderedDict([
@@ -929,42 +929,28 @@ macros = {
         ( '.menu.ResetMethod.nodtr_nosync.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
 
-    ####################### upload.resetmethod (unused, old esptool-ck)
+    ####################### upload.resetmethod (new esptool.py options)
 
     'resetmethod_ck': collections.OrderedDict([
-        ( '.upload.resetmethod', 'ck' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_nodemcu': collections.OrderedDict([
-        ( '.upload.resetmethod', 'nodemcu' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
     
     'resetmethod_none': collections.OrderedDict([
-        ( '.upload.resetmethod', 'none' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_dtrset': collections.OrderedDict([
-        ( '.upload.resetmethod', 'dtrset' ),
-        ]),
-
-    ####################### upload.resetmethod (new esptool.py)
-
-    'resetmethod_dtr': collections.OrderedDict([
         ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
-        ]),
-
-    'resetmethod_nodtr': collections.OrderedDict([
-        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_nodtr_nosync': collections.OrderedDict([
         ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
-
-    'resetmethod_cktmp': collections.OrderedDict([
-        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
-        ]),
-   
+  
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
