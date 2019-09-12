@@ -46,6 +46,7 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
         setDebugOutput(true);
         println();
         println(ESP.getFullVersion());
+        println(F("Before reporting an issue, retry with latest \"git\" development version: https://github.com/esp8266/Arduino#quick-links"));
     }
 #endif
 }
