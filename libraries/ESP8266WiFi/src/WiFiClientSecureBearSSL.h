@@ -37,6 +37,8 @@ class WiFiClientSecure : public WiFiClient {
     WiFiClientSecure(const WiFiClientSecure &rhs);
     ~WiFiClientSecure() override;
 
+    WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
@@ -206,6 +208,9 @@ class WiFiClientSecure : public WiFiClient {
     // AxTLS API deprecated section end
     /////////////////////////////////////
 
+  protected:
+    bool _connectSSL(const char *hostName); // Do initial SSL handshake
+
   private:
     void _clear();
     void _clearAuthenticationSettings();
@@ -256,7 +261,6 @@ class WiFiClientSecure : public WiFiClient {
     size_t _recvapp_len;
 
     bool _clientConnected(); // Is the underlying socket alive?
-    bool _connectSSL(const char *hostName); // Do initial SSL handshake
     void _freeSSL();
     int _run_until(unsigned target, bool blocking = true);
     size_t _write(const uint8_t *buf, size_t size, bool pmem);

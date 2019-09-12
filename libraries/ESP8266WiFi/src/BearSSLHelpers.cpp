@@ -20,6 +20,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "BearSSLHelpers.h"
 #include <memory>
 #include <vector>
 #include <bearssl/bearssl.h>
@@ -28,7 +29,10 @@
 #include <string.h>
 #include <Arduino.h>
 #include <StackThunk.h>
-#include "BearSSLHelpers.h"
+#include <Updater_Signing.h>
+#ifndef ARDUINO_SIGNING
+  #define ARDUINO_SIGNING 0
+#endif
 
 namespace brssl {
   // Code here is pulled from brssl sources, with the copyright and license
@@ -848,6 +852,10 @@ const void *HashSHA256::hash() {
   return (const void*) _sha256;
 }
 
+const unsigned char *HashSHA256::oid() {
+    return BR_HASH_OID_SHA256;
+}
+
 // SHA256 verifier
 uint32_t SigningVerifier::length()
 {
@@ -869,7 +877,7 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
     bool ret;
     unsigned char vrf[hash->len()];
     br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
-    ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
+    ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), sizeof(vrf), _pubKey->getRSA(), vrf);
     if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
       return false;
     } else {
@@ -897,3 +905,17 @@ make_stack_thunk(br_ssl_engine_sendrec_buf);
 #endif
 
 };
+
+#if ARDUINO_SIGNING
+namespace {
+  static BearSSL::PublicKey signingPubKey(signing_pubkey);
+  static BearSSL::HashSHA256 __signingHash;
+  static BearSSL::SigningVerifier __signingVerifier(&signingPubKey);
+};
+
+namespace esp8266 {
+  UpdaterHashClass& updaterSigningHash = __signingHash;
+  UpdaterVerifyClass& updaterSigningVerifier = __signingVerifier;
+};
+#endif
+

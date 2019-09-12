@@ -94,6 +94,7 @@ uint32_t EspClass::getChipId()
 
 bool EspClass::checkFlashConfig(bool needsEquals)
 {
+	(void) needsEquals;
 	return true;
 }
 
@@ -143,6 +144,7 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag) {
 
 bool EspClass::flashEraseSector(uint32_t sector)
 {
+	(void) sector;
 	return true;
 }
 
@@ -153,6 +155,7 @@ FlashMode_t EspClass::getFlashChipMode()
 
 FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 {
+	(void) byte;
 	return FM_DOUT;
 }
 

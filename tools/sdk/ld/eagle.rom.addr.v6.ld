@@ -41,13 +41,8 @@ PROVIDE ( UartRegReadProc = 0x4000381c );
 PROVIDE ( UartRegWriteProc = 0x400037ac );
 PROVIDE ( UartRxString = 0x40003c30 );
 PROVIDE ( Uart_Init = 0x40003a14 );
-PROVIDE ( _DebugExceptionVector = 0x40000010 );
-PROVIDE ( _DoubleExceptionVector = 0x40000070 );
-PROVIDE ( _KernelExceptionVector = 0x40000030 );
-PROVIDE ( _NMIExceptionVector = 0x40000020 );
 PROVIDE ( _ResetHandler = 0x400000a4 );
 PROVIDE ( _ResetVector = 0x40000080 );
-PROVIDE ( _UserExceptionVector = 0x40000050 );
 PROVIDE ( __adddf3 = 0x4000c538 );
 PROVIDE ( __addsf3 = 0x4000c180 );
 PROVIDE ( __divdf3 = 0x4000cb94 );
@@ -124,8 +119,10 @@ PROVIDE ( ets_install_external_printf = 0x40002450 );
 PROVIDE ( ets_install_putc1 = 0x4000242c );
 PROVIDE ( ets_install_putc2 = 0x4000248c );
 PROVIDE ( ets_install_uart_printf = 0x40002438 );
+/* permanently hide reimplemented ets_intr_*lock(), see #6484
 PROVIDE ( ets_intr_lock = 0x40000f74 );
 PROVIDE ( ets_intr_unlock = 0x40000f80 );
+*/
 PROVIDE ( ets_isr_attach = 0x40000f88 );
 PROVIDE ( ets_isr_mask = 0x40000f98 );
 PROVIDE ( ets_isr_unmask = 0x40000fa8 );
@@ -133,7 +130,10 @@ PROVIDE ( ets_memcmp = 0x400018d4 );
 PROVIDE ( ets_memcpy = 0x400018b4 );
 PROVIDE ( ets_memmove = 0x400018c4 );
 PROVIDE ( ets_memset = 0x400018a4 );
+/* renamed to ets_post_rom(), see #6484
 PROVIDE ( ets_post = 0x40000e24 );
+*/
+PROVIDE ( ets_post_rom = 0x40000e24 );
 PROVIDE ( ets_printf = 0x400024cc );
 PROVIDE ( ets_putc = 0x40002be8 );
 PROVIDE ( ets_rtc_int_register = 0x40002a40 );

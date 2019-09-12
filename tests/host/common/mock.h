@@ -60,6 +60,7 @@
 #ifdef __cplusplus
 #include <vector>
 #endif
+#include <stddef.h>
 
 
 #ifdef __cplusplus
@@ -72,6 +73,8 @@ char* ltoa (long val, char *s, int radix);
 }
 #endif
 
+size_t strlcat(char *dst, const char *src, size_t size);
+size_t strlcpy(char *dst, const char *src, size_t size);
 
 // exotic typedefs used in the sdk
 
@@ -108,7 +111,7 @@ int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern const char* host_interface; // cmdline parameter
-
+extern bool serial_timestamp;
 extern int mock_port_shifter;
 
 #define NO_GLOBAL_BINDING 0xffffffff
@@ -157,12 +160,12 @@ void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize);
 class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
 
-class InterruptLock { };
-
 //
 
 void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
 void mock_stop_spiffs ();
+void mock_start_littlefs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_stop_littlefs ();
 
 //
 

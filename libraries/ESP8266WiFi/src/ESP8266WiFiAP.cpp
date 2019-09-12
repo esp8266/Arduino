@@ -107,7 +107,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
 
     if(passphrase && strlen(passphrase) > 0 && (strlen(passphrase) > 63 || strlen(passphrase) < 8)) {
         // fail passphrase to long or short!
-        DEBUG_WIFI("[AP] fail passphrase to long or short!\n");
+        DEBUG_WIFI("[AP] fail passphrase too long or short!\n");
         return false;
     }
 
