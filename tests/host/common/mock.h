@@ -85,7 +85,6 @@ typedef uint32_t uint32;
 //
 
 #include <c_types.h>
-uint32_t espGetCycleCount();
 
 #include <Arduino.h>
 

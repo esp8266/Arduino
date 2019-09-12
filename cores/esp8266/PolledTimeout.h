@@ -70,12 +70,12 @@ struct TimeSourceMillis
 
 struct TimeSourceCycles
 {
-  // time policy based on espGetCycleCount()
+  // time policy based on ESP.getCycleCount()
   // this particular time measurement is intended to be called very often
   // (every loop, every yield)
 
-  using timeType = decltype(espGetCycleCount());
-  static timeType time() {return espGetCycleCount();}
+  using timeType = decltype(ESP.getCycleCount());
+  static timeType time() {return ESP.getCycleCount();}
   static constexpr timeType ticksPerSecond    = F_CPU;     // 80'000'000 or 160'000'000 Hz
   static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
