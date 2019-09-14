@@ -91,9 +91,9 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
         if (upload.name == "spiffs") {
-          size_t spiffsSize = ((size_t) &_SPIFFS_end - (size_t) &_SPIFFS_start);
+          size_t spiffsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
           SPIFFS.end();
-          if (!Update.begin(spiffsSize, U_SPIFFS)){//start with max available size
+          if (!Update.begin(spiffsSize, U_FS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
           }
         } else {
