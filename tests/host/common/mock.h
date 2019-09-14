@@ -85,7 +85,7 @@ int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern const char* host_interface; // cmdline parameter
-
+extern bool serial_timestamp;
 extern int mock_port_shifter;
 
 #define NO_GLOBAL_BINDING 0xffffffff
