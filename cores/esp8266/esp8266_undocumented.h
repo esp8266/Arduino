@@ -22,7 +22,7 @@ calls to ets_install_putc1().
    1 for UART1
  */
 extern void uart_buff_switch(uint8_t);
-typedef int (*fp_putc_t)(int);
+
 /*
  ROM function, ets_uart_printf(), prints on the UART selected by
  uart_buff_switch(). Supported format options are the same as vprintf(). Also
