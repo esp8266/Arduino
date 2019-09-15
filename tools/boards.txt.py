@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community
@@ -32,6 +32,7 @@
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
 #            lwip/lwip2                  menus for available lwip versions
 
+from __future__ import print_function
 import os
 import sys
 import collections
@@ -882,8 +883,11 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.disabled', 'Disabled' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
+        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
@@ -1120,7 +1124,7 @@ def comb1 (lst):
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
-    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM' ]
+    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
     options += comb1(listnocomb)
@@ -1410,7 +1414,7 @@ def all_boards ():
 
         # standalone options
         if 'opts' in board:
-            for optname in board['opts']:
+            for optname in sorted(board['opts']):
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
