@@ -202,7 +202,7 @@ void run_scheduled_recurrent_functions()
 
         if (yieldNow)
         {
-            // because scheduled function might last too long for watchdog etc,
+            // because scheduled functions might last too long for watchdog etc,
             // this is yield() in cont stack:
             esp_schedule();
             cont_yield(g_pcont);
