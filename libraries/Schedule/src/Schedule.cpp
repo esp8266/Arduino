@@ -138,7 +138,7 @@ void run_scheduled_functions ()
 
         if (yieldNow)
         {
-            // because scheduled function are allowed to last:
+            // because scheduled functions are allowed to last:
             // this is yield() in cont stack:
             esp_schedule();
             cont_yield(g_pcont);
