@@ -92,4 +92,4 @@ private:
 };
 
 
-#endif//TICKER_H
+#endif //TICKER_H
