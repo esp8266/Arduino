@@ -32,6 +32,7 @@ extern "C" {
 }
 #include "debug.h"
 #include "ESP8266WiFi.h"
+#include "PolledTimeout.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
 #include "StackThunk.h"
@@ -438,11 +439,12 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     return -1;
   }
   
-  unsigned long startMillis = millis();
+  esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
+  
   for (int no_work = 0; blocking || no_work < 2;) {    
     optimistic_yield(100);
     
-    if (millis() - startMillis > 30000) {
+    if (loopTimeout) {
       DEBUG_BSSL("_run_until: Timeout\n");
       return -1;
     }
