@@ -4,6 +4,7 @@
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
 #include <FS.h>
+#include <flash_hal.h>
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
@@ -24,7 +25,7 @@ static const char serverIndex[] PROGMEM =
          <input type='submit' value='Update Firmware'>
      </form>
      <form method='POST' action='' enctype='multipart/form-data'>
-         Spiffs:<br>
+         FileSystem:<br>
          <input type='file' accept='.bin' name='spiffs'>
          <input type='submit' value='Update SPIFFS'>
      </form>
@@ -93,6 +94,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         if (upload.name == "spiffs") {
           size_t spiffsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
           SPIFFS.end();
+          LittleFS.end();
           if (!Update.begin(spiffsSize, U_FS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
           }
