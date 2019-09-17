@@ -3,8 +3,9 @@
 #include <WiFiServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
-#include <FS.h>
 #include <flash_hal.h>
+#include <FS.h>
+#include <LittleFS.h>
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
