@@ -27,7 +27,7 @@ static const char serverIndex[] PROGMEM =
      <form method='POST' action='' enctype='multipart/form-data'>
          FileSystem:<br>
          <input type='file' accept='.bin' name='spiffs'>
-         <input type='submit' value='Update SPIFFS'>
+         <input type='submit' value='Update FileSystem'>
      </form>
      </body>
      </html>)";
