@@ -23,12 +23,34 @@
  * THE SOFTWARE.
  */
 
+
+
+
+
+
+
+/********************************************************************************************
+* NOTE!
+*
+* This class is deprecated and will be removed in core version 3.0.0.
+* If you are still using this class, please consider migrating to the new API shown in 
+* the EspnowNetworkInfo.h or TcpIpNetworkInfo.h source files.
+*
+* TODO: delete this file.
+********************************************************************************************/
+
+
+
+
+
+
+
+
 #ifndef __NETWORKINFO_H__
 #define __NETWORKINFO_H__
 
 #include <ESP8266WiFi.h>
-
-const int NETWORK_INFO_DEFAULT_INT = -1;
+#include "NetworkInfoBase.h"
 
 class NetworkInfo {
 

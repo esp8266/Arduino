@@ -14,7 +14,7 @@
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes during ESP-NOW broadcasts and in the example networkFilter function below.
+const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
 const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
@@ -31,6 +31,8 @@ uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // 
 
 unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
+
+const char broadcastMetadataDelimiter = 23; // 23 = End-of-Transmission-Block (ETB) control character in ASCII
 
 String manageRequest(const String &request, MeshBackendBase &meshInstance);
 transmission_status_t manageResponse(const String &response, MeshBackendBase &meshInstance);
@@ -96,7 +98,7 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
     // With ESP-NOW there is no guarantee when or if a response will show up, it can happen before or after the stored message is changed.
     // So for ESP-NOW, adding unique identifiers in the response and request is required to associate a response with a request.
     Serial.print(F("Request sent: "));
-    Serial.println(tcpIpInstance->getMessage().substring(0, 100));
+    Serial.println(tcpIpInstance->getCurrentMessage().substring(0, 100));
   } else {
     Serial.print("UNKNOWN!: ");
   }
@@ -127,13 +129,17 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
       uint64_t targetNodeID = stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
       if (targetNodeID < stringToUint64(meshInstance.getNodeID())) {
-        MeshBackendBase::connectionQueue.push_back(NetworkInfo(networkIndex));
+        if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+          espnowInstance->connectionQueue().push_back(networkIndex);
+        } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+          tcpIpInstance->connectionQueue().push_back(networkIndex);
+        } else {
+          Serial.println(String(F("Invalid mesh backend!")));
+        }
       }
     }
   }
 }
-
-const char broadcastMetadataDelimiter = 23; // 23 = End-of-Transmission-Block (ETB) control character in ASCII
 
 /**
    Callback used to decide which broadcast messages to accept. Only called for the first transmission in each broadcast.
@@ -147,10 +153,8 @@ const char broadcastMetadataDelimiter = 23; // 23 = End-of-Transmission-Block (E
    @return True if the broadcast should be accepted. False otherwise.
 */
 bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance) {
-  /**
-     This example broadcastFilter will accept a transmission if it contains the broadcastMetadataDelimiter
-     and as metaData either no targetMeshName or a targetMeshName that matches the MeshName of meshInstance.
-  */
+  // This example broadcastFilter will accept a transmission if it contains the broadcastMetadataDelimiter
+  // and as metaData either no targetMeshName or a targetMeshName that matches the MeshName of meshInstance.
 
   int32_t metadataEndIndex = firstTransmission.indexOf(broadcastMetadataDelimiter);
 
@@ -230,7 +234,7 @@ void loop() {
 
     uint32_t startTime = millis();
     espnowNode.attemptTransmission(espnowNode.getMessage());
-    Serial.println("Scan and " + String(MeshBackendBase::latestTransmissionOutcomes.size()) + " transmissions done in " + String(millis() - startTime) + " ms.");
+    Serial.println("Scan and " + String(espnowNode.latestTransmissionOutcomes().size()) + " transmissions done in " + String(millis() - startTime) + " ms.");
 
     timeOfLastScan = millis();
 
@@ -239,23 +243,23 @@ void loop() {
     espnowDelay(100);
 
     // One way to check how attemptTransmission worked out
-    if (MeshBackendBase::latestTransmissionSuccessful()) {
+    if (espnowNode.latestTransmissionSuccessful()) {
       Serial.println(F("Transmission successful."));
     }
 
     // Another way to check how attemptTransmission worked out
-    if (MeshBackendBase::latestTransmissionOutcomes.empty()) {
+    if (espnowNode.latestTransmissionOutcomes().empty()) {
       Serial.println(F("No mesh AP found."));
     } else {
-      for (TransmissionResult &transmissionResult : MeshBackendBase::latestTransmissionOutcomes) {
-        if (transmissionResult.transmissionStatus == TS_TRANSMISSION_FAILED) {
-          Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionResult.SSID);
-        } else if (transmissionResult.transmissionStatus == TS_CONNECTION_FAILED) {
-          Serial.println(String(F("Connection failed to mesh AP ")) + transmissionResult.SSID);
-        } else if (transmissionResult.transmissionStatus == TS_TRANSMISSION_COMPLETE) {
+      for (TransmissionOutcome &transmissionOutcome : espnowNode.latestTransmissionOutcomes()) {
+        if (transmissionOutcome.transmissionStatus() == TS_TRANSMISSION_FAILED) {
+          Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionOutcome.SSID());
+        } else if (transmissionOutcome.transmissionStatus() == TS_CONNECTION_FAILED) {
+          Serial.println(String(F("Connection failed to mesh AP ")) + transmissionOutcome.SSID());
+        } else if (transmissionOutcome.transmissionStatus() == TS_TRANSMISSION_COMPLETE) {
           // No need to do anything, transmission was successful.
         } else {
-          Serial.println(String(F("Invalid transmission status for ")) + transmissionResult.SSID + String(F("!")));
+          Serial.println(String(F("Invalid transmission status for ")) + transmissionOutcome.SSID() + String(F("!")));
           assert(F("Invalid transmission status returned from responseHandler!") && false);
         }
       }
@@ -276,14 +280,16 @@ void loop() {
 
       Serial.println("\nPerforming encrypted ESP-NOW transmissions.");
 
+      uint8_t targetBSSID[6] {0};
+
       // We can create encrypted connections to individual nodes so that all ESP-NOW communication with the node will be encrypted.
-      if (espnowNode.requestEncryptedConnection(MeshBackendBase::connectionQueue[0].BSSID) == ECS_CONNECTION_ESTABLISHED) {
+      if (espnowNode.connectionQueue()[0].getBSSID(targetBSSID) && espnowNode.requestEncryptedConnection(targetBSSID) == ECS_CONNECTION_ESTABLISHED) {
         // The WiFi scan will detect the AP MAC, but this will automatically be converted to the encrypted STA MAC by the framework.
-        String peerMac = macToString(MeshBackendBase::connectionQueue[0].BSSID);
+        String peerMac = macToString(targetBSSID);
 
         Serial.println("Encrypted ESP-NOW connection with " + peerMac + " established!");
 
-        // Making a transmission now will cause messages to MeshBackendBase::connectionQueue[0].BSSID to be encrypted.
+        // Making a transmission now will cause messages to targetBSSID to be encrypted.
         String espnowMessage = "This message is encrypted only when received by node " + peerMac;
         Serial.println("\nTransmitting: " + espnowMessage);
         espnowNode.attemptTransmission(espnowMessage, false);
@@ -291,11 +297,11 @@ void loop() {
 
         // A connection can be serialized and stored for later use.
         // Note that this saves the current state only, so if encrypted communication between the nodes happen after this, the stored state is invalid.
-        String serializedEncryptedConnection = EspnowMeshBackend::serializeEncryptedConnection(MeshBackendBase::connectionQueue[0].BSSID);
+        String serializedEncryptedConnection = EspnowMeshBackend::serializeEncryptedConnection(targetBSSID);
 
         Serial.println();
         // We can remove an encrypted connection like so.
-        espnowNode.removeEncryptedConnection(MeshBackendBase::connectionQueue[0].BSSID);
+        espnowNode.removeEncryptedConnection(targetBSSID);
 
         // Note that the peer will still be encrypted, so although we can send unencrypted messages to the peer, we cannot read the encrypted responses it sends back.
         espnowMessage = "This message is no longer encrypted when received by node " + peerMac;
@@ -304,7 +310,7 @@ void loop() {
         espnowDelay(100); // Wait for response.
         Serial.println("Cannot read the encrypted response...");
 
-        // Let's re-add our stored connection so we can communicate properly with MeshBackendBase::connectionQueue[0].BSSID again!
+        // Let's re-add our stored connection so we can communicate properly with targetBSSID again!
         espnowNode.addEncryptedConnection(serializedEncryptedConnection);
 
         espnowMessage = "This message is once again encrypted when received by node " + peerMac;
@@ -314,21 +320,28 @@ void loop() {
 
         Serial.println();
         // If we want to remove the encrypted connection on both nodes, we can do it like this.
-        encrypted_connection_removal_outcome_t removalOutcome = espnowNode.requestEncryptedConnectionRemoval(MeshBackendBase::connectionQueue[0].BSSID);
+        encrypted_connection_removal_outcome_t removalOutcome = espnowNode.requestEncryptedConnectionRemoval(targetBSSID);
         if (removalOutcome == ECRO_REMOVAL_SUCCEEDED) {
-          Serial.println(peerMac + " is no longer encrypted!\n");
+          Serial.println(peerMac + " is no longer encrypted!");
+
+          espnowMessage = "This message is only received by node " + peerMac + ". Transmitting in this way will not change the transmission state of the sender.";
+          Serial.println("Transmitting: " + espnowMessage);
+          espnowNode.attemptTransmission(espnowMessage, EspnowNetworkInfo(targetBSSID));
+          espnowDelay(100); // Wait for response.
+
+          Serial.println();
 
           // Of course, we can also just create a temporary encrypted connection that will remove itself once its duration has passed.
-          if (espnowNode.requestTemporaryEncryptedConnection(MeshBackendBase::connectionQueue[0].BSSID, 1000) == ECS_CONNECTION_ESTABLISHED) {
+          if (espnowNode.requestTemporaryEncryptedConnection(targetBSSID, 1000) == ECS_CONNECTION_ESTABLISHED) {
             espnowDelay(42);
             uint32_t remainingDuration = 0;
-            EspnowMeshBackend::getConnectionInfo(MeshBackendBase::connectionQueue[0].BSSID, &remainingDuration);
+            EspnowMeshBackend::getConnectionInfo(targetBSSID, &remainingDuration);
 
             espnowMessage = "Messages this node sends to " + peerMac + " will be encrypted for " + String(remainingDuration) + " ms more.";
             Serial.println("\nTransmitting: " + espnowMessage);
             espnowNode.attemptTransmission(espnowMessage, false);
 
-            EspnowMeshBackend::getConnectionInfo(MeshBackendBase::connectionQueue[0].BSSID, &remainingDuration);
+            EspnowMeshBackend::getConnectionInfo(targetBSSID, &remainingDuration);
             espnowDelay(remainingDuration + 100);
 
             espnowMessage = "Due to encrypted connection expiration, this message is no longer encrypted when received by node " + peerMac;

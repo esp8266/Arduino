@@ -17,13 +17,14 @@
 */
 
 #include "MeshBackendBase.h"
+#include "TypeConversionFunctions.h"
+#include "MutexTracker.h"
 
 #include <assert.h>
 
 MeshBackendBase *MeshBackendBase::apController = nullptr;
 
-std::vector<NetworkInfo> MeshBackendBase::connectionQueue = {};
-std::vector<TransmissionResult> MeshBackendBase::latestTransmissionOutcomes = {};
+bool MeshBackendBase::_scanMutex = false;
 
 bool MeshBackendBase::_printWarnings = true;
 
@@ -231,22 +232,28 @@ bool MeshBackendBase::getAPHidden() {return _apHidden;}
 
 bool MeshBackendBase::latestTransmissionSuccessful()
 {
-  if(MeshBackendBase::latestTransmissionOutcomes.empty())
+  if(latestTransmissionOutcomes().empty())
     return false;
   else
-    for(TransmissionResult &transmissionResult : MeshBackendBase::latestTransmissionOutcomes) 
-      if(transmissionResult.transmissionStatus != TS_TRANSMISSION_COMPLETE) 
+    for(TransmissionOutcome &transmissionOutcome : latestTransmissionOutcomes()) 
+      if(transmissionOutcome.transmissionStatus() != TS_TRANSMISSION_COMPLETE) 
         return false;
 
   return true;
 }
 
 void MeshBackendBase::scanForNetworks(bool scanAllWiFiChannels)
-{  
+{
+  MutexTracker mutexTracker(_scanMutex);
+  if(!mutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! Scan already in progress. Don't call scanForNetworks from callbacks as this may corrupt program state! Aborting."); 
+    return;
+  }
+  
   verboseModePrint(F("Scanning... "), false);
       
   /* Scan for APs */
-  connectionQueue.clear();
 
   // If scanAllWiFiChannels is true, scanning will cause the WiFi radio to cycle through all WiFi channels.
   // This means existing WiFi connections are likely to break or work poorly if done frequently.
@@ -264,14 +271,20 @@ void MeshBackendBase::scanForNetworks(bool scanAllWiFiChannels)
   getNetworkFilter()(n, *this); // Update the connectionQueue.
 }
 
-void MeshBackendBase::printAPInfo(const int apNetworkIndex, const String &apSSID, const int apWiFiChannel)
+void MeshBackendBase::printAPInfo(const NetworkInfoBase &apNetworkInfo)
 {
-   verboseModePrint(String(F("AP acquired: ")) + apSSID + String(F(", Ch:")) + String(apWiFiChannel) + " ", false);
-
-  if(apNetworkIndex != NETWORK_INFO_DEFAULT_INT)
+  String mainNetworkIdentifier = apNetworkInfo.SSID();
+  if(mainNetworkIdentifier == NetworkInfoBase::defaultSSID) // If SSID not provided, use BSSID instead
   {
-    verboseModePrint("(" + String(WiFi.RSSI(apNetworkIndex)) + String(F("dBm) ")) + 
-                     (WiFi.encryptionType(apNetworkIndex) == ENC_TYPE_NONE ? String(F("open")) : ""), false);
+    mainNetworkIdentifier = macToString(apNetworkInfo.BSSID());
+  }
+  
+  verboseModePrint(String(F("AP acquired: ")) + mainNetworkIdentifier + String(F(", Ch:")) + String(apNetworkInfo.wifiChannel()) + " ", false);
+
+  if(apNetworkInfo.RSSI() != NetworkInfoBase::defaultRSSI)
+  {
+    verboseModePrint("(" + String(apNetworkInfo.RSSI()) + String(F("dBm) ")) + 
+                     (apNetworkInfo.encryptionType() == ENC_TYPE_NONE ? String(F("open")) : ""), false);
   }
 
   verboseModePrint(F("... "), false);

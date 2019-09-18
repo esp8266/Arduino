@@ -50,6 +50,9 @@ std::list<PeerRequestLog> EspnowMeshBackend::peerRequestConfirmationsToSend = {}
 
 std::vector<EncryptedConnectionLog> EspnowMeshBackend::encryptedConnections = {};
 
+std::vector<EspnowNetworkInfo> EspnowMeshBackend::_connectionQueue = {};
+std::vector<TransmissionOutcome> EspnowMeshBackend::_latestTransmissionOutcomes = {};
+
 uint32_t EspnowMeshBackend::_espnowTransmissionTimeoutMs = 40;
 uint32_t EspnowMeshBackend::_espnowRetransmissionIntervalMs = 15; 
 
@@ -131,6 +134,16 @@ void EspnowMeshBackend::begin()
     WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
 
   activateEspnow();
+}
+
+std::vector<EspnowNetworkInfo> & EspnowMeshBackend::connectionQueue()
+{
+  return _connectionQueue;
+}
+
+std::vector<TransmissionOutcome> & EspnowMeshBackend::latestTransmissionOutcomes()
+{
+  return _latestTransmissionOutcomes;
 }
 
 void EspnowMeshBackend::performEspnowMaintainance()
@@ -1671,7 +1684,7 @@ encrypted_connection_removal_outcome_t EspnowMeshBackend::removeEncryptedConnect
   }
 }
 
-encrypted_connection_removal_outcome_t EspnowMeshBackend::removeEncryptedConnectionUnprotected(uint8_t *peerMac, std::vector<EncryptedConnectionLog>::iterator *resultingIterator)
+encrypted_connection_removal_outcome_t EspnowMeshBackend::removeEncryptedConnectionUnprotected(const uint8_t *peerMac, std::vector<EncryptedConnectionLog>::iterator *resultingIterator)
 {
   connectionLogIterator connectionIterator = getEncryptedConnectionIterator(peerMac, encryptedConnections);
   return removeEncryptedConnectionUnprotected(connectionIterator, resultingIterator);
@@ -1908,6 +1921,68 @@ uint8_t *EspnowMeshBackend::getEncryptedMac(const uint8_t *peerMac, uint8_t *res
   }
 }
 
+void EspnowMeshBackend::prepareForTransmission(const String &message, bool scan, bool scanAllWiFiChannels)
+{
+  setMessage(message);
+  
+  latestTransmissionOutcomes().clear();
+
+  if(scan)
+  {
+    connectionQueue().clear();
+    scanForNetworks(scanAllWiFiChannels);
+  }
+}
+
+transmission_status_t EspnowMeshBackend::initiateTransmission(const String &message, const EspnowNetworkInfo &recipientInfo)
+{
+  uint8_t targetBSSID[6] {0};
+
+  assert(recipientInfo.BSSID() != nullptr); // We need at least the BSSID to connect
+  recipientInfo.getBSSID(targetBSSID);
+
+  if(verboseMode()) // Avoid string generation if not required
+  {
+    printAPInfo(recipientInfo);
+    verboseModePrint(F(""));
+  }
+
+  return initiateTransmissionKernel(message, targetBSSID);
+}
+
+transmission_status_t EspnowMeshBackend::initiateTransmissionKernel(const String &message, const uint8_t *targetBSSID)
+{
+  uint32_t transmissionStartTime = millis();
+  transmission_status_t transmissionResult = sendRequest(message, targetBSSID);
+
+  uint32_t transmissionDuration = millis() - transmissionStartTime;
+  
+  if(verboseMode() && transmissionResult == TS_TRANSMISSION_COMPLETE) // Avoid calculations if not required
+  {
+    totalDurationWhenSuccessful_AT += transmissionDuration;
+    successfulTransmissions_AT++;
+    if(transmissionDuration > maxTransmissionDuration_AT)
+    {
+      maxTransmissionDuration_AT = transmissionDuration;
+    }
+  }
+
+  return transmissionResult;
+}
+
+void EspnowMeshBackend::printTransmissionStatistics()
+{
+  if(verboseMode() && successfulTransmissions_AT > 0) // Avoid calculations if not required
+  {
+    verboseModePrint("Average duration of successful transmissions: " + String(totalDurationWhenSuccessful_AT/successfulTransmissions_AT) + " ms.");
+    verboseModePrint("Maximum duration of successful transmissions: " + String(maxTransmissionDuration_AT) + " ms.");
+  }
+  else
+  {
+    verboseModePrint("No successful transmission.");
+  }
+}
+
 void EspnowMeshBackend::attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels)
 {
   MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
@@ -1917,67 +1992,70 @@ void EspnowMeshBackend::attemptTransmission(const String &message, bool scan, bo
     return;
   }
 
-  setMessage(message);
-  
-  latestTransmissionOutcomes.clear();
-
-  if(scan)
-  {
-    scanForNetworks(scanAllWiFiChannels);
-  }
-  
-  for(NetworkInfo &currentNetwork : connectionQueue)
-  {
-    String currentSSID = "";
-    int currentWiFiChannel = NETWORK_INFO_DEFAULT_INT;
-    uint8_t *currentBSSID = NULL;
-
-    // If a BSSID has been assigned, it is prioritized over an assigned networkIndex since the networkIndex is more likely to change.
-    if(currentNetwork.BSSID != NULL)
-    {
-      currentSSID = currentNetwork.SSID;
-      currentWiFiChannel = currentNetwork.wifiChannel;
-      currentBSSID = currentNetwork.BSSID;
-    }
-    else // Use only networkIndex
-    {
-      currentSSID = WiFi.SSID(currentNetwork.networkIndex);
-      currentWiFiChannel = WiFi.channel(currentNetwork.networkIndex);
-      currentBSSID = WiFi.BSSID(currentNetwork.networkIndex);
-    }
-
-    if(verboseMode()) // Avoid string generation if not required
-    {
-      printAPInfo(currentNetwork.networkIndex, currentSSID, currentWiFiChannel);
-      verboseModePrint(F(""));
-    }
+  prepareForTransmission(message, scan, scanAllWiFiChannels);
     
-    uint32_t transmissionStartTime = millis();
-    transmission_status_t transmissionResult = sendRequest(getMessage(), currentBSSID);
-
-    uint32_t transmissionDuration = millis() - transmissionStartTime;
-    
-    if(verboseMode() && transmissionResult == TS_TRANSMISSION_COMPLETE) // Avoid calculations if not required
-    {
-      totalDurationWhenSuccessful_AT += transmissionDuration;
-      successfulTransmissions_AT++;
-      if(transmissionDuration > maxTransmissionDuration_AT)
-      {
-        maxTransmissionDuration_AT = transmissionDuration;
-      }
-    }
-
-    latestTransmissionOutcomes.push_back(TransmissionResult{.origin = currentNetwork, .transmissionStatus = transmissionResult});
-  }
-
-  if(verboseMode() && successfulTransmissions_AT > 0) // Avoid calculations if not required
+  for(EspnowNetworkInfo &currentNetwork : connectionQueue())
   {
-    verboseModePrint("Average duration of successful transmissions: " + String(totalDurationWhenSuccessful_AT/successfulTransmissions_AT) + " ms.");
-    verboseModePrint("Maximum duration of successful transmissions: " + String(maxTransmissionDuration_AT) + " ms.");
+    transmission_status_t transmissionResult = initiateTransmission(getMessage(), currentNetwork);
+
+    latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
   }
+
+  printTransmissionStatistics();
+}
+
+transmission_status_t EspnowMeshBackend::attemptTransmission(const String &message, const EspnowNetworkInfo &recipientInfo)
+{
+  MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
+  if(!mutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! Transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    return TS_CONNECTION_FAILED;
+  }
+
+  return initiateTransmission(message, recipientInfo);
+}
+
+encrypted_connection_status_t EspnowMeshBackend::initiateAutoEncryptingConnection(const EspnowNetworkInfo &recipientInfo, bool createPermanentConnection, uint8_t *targetBSSID, EncryptedConnectionLog **encryptedConnection)
+{
+  assert(recipientInfo.BSSID() != nullptr); // We need at least the BSSID to connect
+  recipientInfo.getBSSID(targetBSSID);
+
+  if(verboseMode()) // Avoid string generation if not required
+  {
+    printAPInfo(recipientInfo);
+    verboseModePrint(F(""));
+  }
+
+  *encryptedConnection = getEncryptedConnection(targetBSSID);
+  encrypted_connection_status_t connectionStatus = ECS_MAX_CONNECTIONS_REACHED_SELF;
+
+  if(createPermanentConnection)
+    connectionStatus = requestEncryptedConnection(targetBSSID);
   else
+    connectionStatus = requestFlexibleTemporaryEncryptedConnection(targetBSSID, getAutoEncryptionDuration());
+
+  return connectionStatus;
+}
+
+transmission_status_t EspnowMeshBackend::initiateAutoEncryptingTransmission(const String &message, const uint8_t *targetBSSID, encrypted_connection_status_t connectionStatus)
+{
+  transmission_status_t transmissionResult = TS_CONNECTION_FAILED;
+  
+  if(connectionStatus == ECS_CONNECTION_ESTABLISHED)
   {
-    verboseModePrint("No successful transmission.");
+    transmissionResult = initiateTransmissionKernel(message, targetBSSID);
+  }
+  
+  return transmissionResult;
+}
+
+void EspnowMeshBackend::finalizeAutoEncryptingConnection(const uint8_t *targetBSSID, const EncryptedConnectionLog *encryptedConnection, bool createPermanentConnection)
+{
+  if(!encryptedConnection && !createPermanentConnection)
+  {
+    // Remove any connection that was added during the transmission attempt.
+    removeEncryptedConnectionUnprotected(targetBSSID);
   }
 }
 
@@ -1990,107 +2068,51 @@ void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message,
     return;
   }
 
-  setMessage(message);
-
-  latestTransmissionOutcomes.clear();
-
-  if(scan)
-  {
-    scanForNetworks(scanAllWiFiChannels);
-  }
+  prepareForTransmission(message, scan, scanAllWiFiChannels);
 
   outerMutexTracker.releaseMutex();
   
-  for(NetworkInfo &currentNetwork : connectionQueue)
-  {
+  for(EspnowNetworkInfo &currentNetwork : connectionQueue())
+  {    
+    uint8_t currentBSSID[6] {0};
+    EncryptedConnectionLog *encryptedConnection = nullptr;
+    encrypted_connection_status_t connectionStatus = initiateAutoEncryptingConnection(currentNetwork, createPermanentConnections, currentBSSID, &encryptedConnection);
+
     MutexTracker innerMutexTracker = MutexTracker(_espnowTransmissionMutex);
     if(!innerMutexTracker.mutexCaptured())
     {
       assert(false && "ERROR! Unable to recapture Mutex in attemptAutoEncryptingTransmission. Aborting."); 
       return;
     }
-    
-    String currentSSID = "";
-    int currentWiFiChannel = NETWORK_INFO_DEFAULT_INT;
-    uint8_t *currentBSSID = NULL;
 
-    // If a BSSID has been assigned, it is prioritized over an assigned networkIndex since the networkIndex is more likely to change.
-    if(currentNetwork.BSSID != NULL)
-    {
-      currentSSID = currentNetwork.SSID;
-      currentWiFiChannel = currentNetwork.wifiChannel;
-      currentBSSID = currentNetwork.BSSID;
-    }
-    else // Use only networkIndex
-    {
-      currentSSID = WiFi.SSID(currentNetwork.networkIndex);
-      currentWiFiChannel = WiFi.channel(currentNetwork.networkIndex);
-      currentBSSID = WiFi.BSSID(currentNetwork.networkIndex);
-    }
+    transmission_status_t transmissionResult = initiateAutoEncryptingTransmission(getMessage(), currentBSSID, connectionStatus);
 
-    if(verboseMode()) // Avoid string generation if not required
-    {
-      printAPInfo(currentNetwork.networkIndex, currentSSID, currentWiFiChannel);
-      verboseModePrint(F(""));
-    }
+    latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
 
-    EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(currentBSSID);
-    encrypted_connection_status_t connectionStatus = ECS_MAX_CONNECTIONS_REACHED_SELF;
-
-    innerMutexTracker.releaseMutex();
-
-    if(createPermanentConnections)
-      connectionStatus = requestEncryptedConnection(currentBSSID);
-    else
-      connectionStatus = requestFlexibleTemporaryEncryptedConnection(currentBSSID, getAutoEncryptionDuration());
-
-    innerMutexTracker = MutexTracker(_espnowTransmissionMutex);
-    if(!innerMutexTracker.mutexCaptured())
-    {
-      assert(false && "ERROR! Unable to recapture Mutex in attemptAutoEncryptingTransmission. Aborting."); 
-      return;
-    }
-
-    if(connectionStatus == ECS_CONNECTION_ESTABLISHED)
-    {
-      uint32_t transmissionStartTime = millis();
-      transmission_status_t transmissionResult = sendRequest(getMessage(), currentBSSID);
-  
-      uint32_t transmissionDuration = millis() - transmissionStartTime;
-
-      if(verboseMode() && transmissionResult == TS_TRANSMISSION_COMPLETE) // Avoid calculations if not required
-      {
-        totalDurationWhenSuccessful_AT += transmissionDuration;
-        successfulTransmissions_AT++;
-        if(transmissionDuration > maxTransmissionDuration_AT)
-        {
-          maxTransmissionDuration_AT = transmissionDuration;
-        }
-      }
-  
-      latestTransmissionOutcomes.push_back(TransmissionResult{.origin = currentNetwork, .transmissionStatus = transmissionResult});
-    }
-    else
-    {
-      latestTransmissionOutcomes.push_back(TransmissionResult{.origin = currentNetwork, .transmissionStatus = TS_CONNECTION_FAILED});
-    }
-
-    if(!encryptedConnection && !createPermanentConnections)
-    {
-      // Remove any connection that was added during the transmission attempt.
-      removeEncryptedConnectionUnprotected(currentBSSID);
-    }
+    finalizeAutoEncryptingConnection(currentBSSID, encryptedConnection, createPermanentConnections);
   }
 
-  if(verboseMode() && successfulTransmissions_AT > 0) // Avoid calculations if not required
+  printTransmissionStatistics();
+}
+
+transmission_status_t EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, const EspnowNetworkInfo &recipientInfo, bool createPermanentConnection)
+{
+  uint8_t targetBSSID[6] {0};
+  EncryptedConnectionLog *encryptedConnection = nullptr;
+  encrypted_connection_status_t connectionStatus = initiateAutoEncryptingConnection(recipientInfo, createPermanentConnection, targetBSSID, &encryptedConnection);
+
+  MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
+  if(!mutexTracker.mutexCaptured())
   {
-    verboseModePrint("Average duration of successful transmissions: " + String(totalDurationWhenSuccessful_AT/successfulTransmissions_AT) + " ms.");
-    verboseModePrint("Maximum duration of successful transmissions: " + String(maxTransmissionDuration_AT) + " ms.");
+    assert(false && "ERROR! Transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    return TS_CONNECTION_FAILED;
   }
-  else
-  {
-    verboseModePrint("No successful transmission.");
-  }
+
+  transmission_status_t transmissionResult = initiateAutoEncryptingTransmission(message, targetBSSID, connectionStatus);
+
+  finalizeAutoEncryptingConnection(targetBSSID, encryptedConnection, createPermanentConnection);
+
+  return transmissionResult;
 }
 
 void EspnowMeshBackend::broadcast(const String &message)

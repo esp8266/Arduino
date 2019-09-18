@@ -55,6 +55,7 @@
 #include <map>
 #include <list>
 #include "Crypto.h"
+#include "EspnowNetworkInfo.h"
 
 typedef enum 
 {
@@ -130,6 +131,24 @@ public:
 
   ~EspnowMeshBackend() override;
 
+  /** 
+  * Returns a vector that contains the NetworkInfo for each WiFi network to connect to.
+  * This vector is unique for each mesh backend.
+  * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
+  * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
+  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  */
+  std::vector<EspnowNetworkInfo> & connectionQueue();
+
+  /** 
+  * Returns a vector with the TransmissionOutcome for each AP to which a transmission was attempted during the latest attemptTransmission call.
+  * This vector is unique for each mesh backend.
+  * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
+  * Connection attempts are indexed in the same order they were attempted.
+  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  */
+  std::vector<TransmissionOutcome> & latestTransmissionOutcomes() override;
+
   /**
    * Initialises the node.
    */
@@ -177,6 +196,12 @@ public:
   static bool deactivateEspnow();
   
   void attemptTransmission(const String &message, bool scan = true, bool scanAllWiFiChannels = false) override;
+
+  /**
+   * Transmit message to a single recipient without changing the local transmission state. 
+   * Will not change connectionQueue, latestTransmissionOutcomes or stored message.
+   */
+  transmission_status_t attemptTransmission(const String &message, const EspnowNetworkInfo &recipientInfo);
   
   /* 
    * Will ensure that an encrypted connection exists to each target node before sending the message, 
@@ -200,6 +225,12 @@ public:
    *                                   Defaults to false.
    */
   void attemptAutoEncryptingTransmission(const String &message, bool scan = true, bool scanAllWiFiChannels = false, bool createPermanentConnections = false);
+
+  /**
+   * Transmit message to a single recipient without changing the local transmission state (apart from encrypted connections). 
+   * Will not change connectionQueue, latestTransmissionOutcomes or stored message.
+   */
+  transmission_status_t attemptAutoEncryptingTransmission(const String &message, const EspnowNetworkInfo &recipientInfo, bool createPermanentConnection = false);
 
   /**
    * Send a message simultaneously to all nearby nodes which have ESP-NOW activated.
@@ -535,6 +566,9 @@ public:
   
 protected:
 
+  static std::vector<EspnowNetworkInfo> _connectionQueue;
+  static std::vector<TransmissionOutcome> _latestTransmissionOutcomes;
+
   typedef std::vector<EncryptedConnectionLog>::iterator connectionLogIterator; 
   static connectionLogIterator connectionLogEndIterator();
 
@@ -564,7 +598,7 @@ protected:
   // Consider using getScheduledResponseRecipient and similar methods for this preparation.
   // Should only be used when there is no transmissions in progress. In practice when _espnowTransmissionMutex is free.
   // @param resultingIterator Will be set to the iterator position after the removed element, if an element to remove was found. Otherwise no change will occur.
-  static encrypted_connection_removal_outcome_t removeEncryptedConnectionUnprotected(uint8_t *peerMac, std::vector<EncryptedConnectionLog>::iterator *resultingIterator = nullptr);
+  static encrypted_connection_removal_outcome_t removeEncryptedConnectionUnprotected(const uint8_t *peerMac, std::vector<EncryptedConnectionLog>::iterator *resultingIterator = nullptr);
   static encrypted_connection_removal_outcome_t removeEncryptedConnectionUnprotected(connectionLogIterator &connectionIterator, std::vector<EncryptedConnectionLog>::iterator *resultingIterator);
 
   /**
@@ -790,6 +824,15 @@ private:
    * @return A uint64_t containing a new session key for an encrypted connection.
    */
   static uint64_t createSessionKey();
+
+  void prepareForTransmission(const String &message, bool scan, bool scanAllWiFiChannels);
+  transmission_status_t initiateTransmission(const String &message, const EspnowNetworkInfo &recipientInfo);
+  transmission_status_t initiateTransmissionKernel(const String &message, const uint8_t *targetBSSID);
+  void printTransmissionStatistics();
+  
+  encrypted_connection_status_t initiateAutoEncryptingConnection(const EspnowNetworkInfo &recipientInfo, bool createPermanentConnection, uint8_t *targetBSSID, EncryptedConnectionLog **encryptedConnection);
+  transmission_status_t initiateAutoEncryptingTransmission(const String &message, const uint8_t *targetBSSID, encrypted_connection_status_t connectionStatus);
+  void finalizeAutoEncryptingConnection(const uint8_t *targetBSSID, const EncryptedConnectionLog *encryptedConnection, bool createPermanentConnection);
 
   // Used for verboseMode printing in attemptTransmission, _AT suffix used to reduce namespace clutter
   uint32_t totalDurationWhenSuccessful_AT = 0;

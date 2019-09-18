@@ -23,18 +23,36 @@
  * THE SOFTWARE.
  */
 
+
+
+
+
+
+
+/********************************************************************************************
+* NOTE!
+*
+* This class is deprecated and will be removed in core version 3.0.0.
+* If you are still using this class, please consider migrating to the new API shown in 
+* the EspnowNetworkInfo.h or TcpIpNetworkInfo.h source files.
+*
+* TODO: delete this file.
+********************************************************************************************/
+
+
+
+
+
+
+
+
+
 #ifndef __TRANSMISSIONRESULT_H__
 #define __TRANSMISSIONRESULT_H__
 
 #include <ESP8266WiFi.h>
 #include "NetworkInfo.h"
-
-typedef enum 
-{
-    TS_CONNECTION_FAILED    = -1,
-    TS_TRANSMISSION_FAILED    = 0,
-    TS_TRANSMISSION_COMPLETE   = 1
-} transmission_status_t;
+#include "TransmissionOutcome.h"
 
 class TransmissionResult : public NetworkInfo {
 

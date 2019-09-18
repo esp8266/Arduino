@@ -31,7 +31,7 @@
 #include <functional>
 #include <vector>
 #include "MeshBackendBase.h"
-#include "NetworkInfo.h"
+#include "TcpIpNetworkInfo.h"
 
 class TcpIpMeshBackend : public MeshBackendBase {
 
@@ -65,6 +65,24 @@ public:
                   const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode = false, 
                   uint8 meshWiFiChannel = 1, uint16_t serverPort = 4011);
 
+  /** 
+  * Returns a vector that contains the NetworkInfo for each WiFi network to connect to.
+  * This vector is unique for each mesh backend.
+  * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
+  * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
+  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  */
+  std::vector<TcpIpNetworkInfo> & connectionQueue();
+
+  /** 
+  * Returns a vector with the TransmissionOutcome for each AP to which a transmission was attempted during the latest attemptTransmission call.
+  * This vector is unique for each mesh backend.
+  * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
+  * Connection attempts are indexed in the same order they were attempted.
+  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  */
+  std::vector<TransmissionOutcome> & latestTransmissionOutcomes() override;
+  
   /**
    * Initialises the node.
    */
@@ -86,11 +104,25 @@ public:
   void attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool concludingDisconnect, bool initialDisconnect = false);
 
   void attemptTransmission(const String &message, bool scan = true, bool scanAllWiFiChannels = false) override;
+
+  /**
+   * Transmit message to a single recipient without changing the local transmission state (apart from connecting to the recipient if required). 
+   * Will not change connectionQueue, latestTransmissionOutcomes or stored message.
+   * 
+   * Note that if wifiChannel and BSSID are missing from recipientInfo, connection time will be longer.
+   */
+  transmission_status_t attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect = true, bool initialDisconnect = false);
   
   /**
    * If any clients are connected, accept their requests and call the requestHandler function for each one.
    */
   void acceptRequest();
+
+  /**
+   * Get the TCP/IP message that is currently scheduled for transmission.
+   * Unlike the getMessage() method, this will be correct even when the single recipient attemptTransmission method is used.
+   */
+  String getCurrentMessage();
 
   /**
    * Set a static IP address for the ESP8266 and activate use of static IP.
@@ -165,6 +197,9 @@ public:
 
 protected:
 
+  static std::vector<TcpIpNetworkInfo> _connectionQueue;
+  static std::vector<TransmissionOutcome> _latestTransmissionOutcomes;
+
   /**
    * Called just before we activate the AP.
    * Put _server.stop() in deactivateAPHook() in case you use _server.begin() here.
@@ -189,6 +224,16 @@ protected:
    */
   static bool transmissionInProgress();
 
+  /**
+   * Set a message that will be sent to other nodes when calling attemptTransmission, instead of the regular getMessage(). 
+   * This message is used until clearTemporaryMessage() is called.
+   * 
+   * @param newMessage The message to send.
+   */
+  void setTemporaryMessage(const String &newMessage);
+  String getTemporaryMessage();
+  void clearTemporaryMessage();
+
 private:
 
   uint16_t _serverPort;
@@ -198,6 +243,7 @@ private:
   int _stationModeTimeoutMs = 5000; // int is the type used in the Arduino core for this particular API, not uint32_t, which is why we use int here.
   uint32_t _apModeTimeoutMs = 4500;
 
+  static String _temporaryMessage;
   static String lastSSID;
   static bool staticIPActivated;
   bool useStaticIP;
@@ -212,6 +258,8 @@ private:
   bool waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait);
   transmission_status_t attemptDataTransfer();
   transmission_status_t attemptDataTransferKernel();
+  transmission_status_t initiateTransmission(const TcpIpNetworkInfo &recipientInfo);
+  void enterPostTransmissionState(bool concludingDisconnect);
 };
 
 #endif

@@ -34,10 +34,15 @@ bool TcpIpMeshBackend::_tcpIpTransmissionMutex = false;
 String TcpIpMeshBackend::lastSSID = "";
 bool TcpIpMeshBackend::staticIPActivated = false;
 
+String TcpIpMeshBackend::_temporaryMessage = "";
+
 // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
 IPAddress TcpIpMeshBackend::staticIP = emptyIP;
 IPAddress TcpIpMeshBackend::gateway = IPAddress(192,168,4,1);
 IPAddress TcpIpMeshBackend::subnetMask = IPAddress(255,255,255,0);
+
+std::vector<TcpIpNetworkInfo> TcpIpMeshBackend::_connectionQueue = {};
+std::vector<TransmissionOutcome> TcpIpMeshBackend::_latestTransmissionOutcomes = {};
 
 TcpIpMeshBackend::TcpIpMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, 
                                    networkFilterType networkFilter, const String &meshPassword, const String &ssidPrefix, 
@@ -49,6 +54,16 @@ TcpIpMeshBackend::TcpIpMeshBackend(requestHandlerType requestHandler, responseHa
   setVerboseModeState(verboseMode);
   setWiFiChannel(meshWiFiChannel);
   setServerPort(serverPort);
+}
+
+std::vector<TcpIpNetworkInfo> & TcpIpMeshBackend::connectionQueue()
+{
+  return _connectionQueue;
+}
+
+std::vector<TransmissionOutcome> & TcpIpMeshBackend::latestTransmissionOutcomes()
+{
+  return _latestTransmissionOutcomes;
 }
 
 void TcpIpMeshBackend::begin()
@@ -77,6 +92,20 @@ void TcpIpMeshBackend::deactivateAPHook()
 }
 
 bool TcpIpMeshBackend::transmissionInProgress(){return _tcpIpTransmissionMutex;}
+
+void TcpIpMeshBackend::setTemporaryMessage(const String &newTemporaryMessage) {_temporaryMessage = newTemporaryMessage;}
+String TcpIpMeshBackend::getTemporaryMessage() {return _temporaryMessage;}
+void TcpIpMeshBackend::clearTemporaryMessage() {_temporaryMessage = "";}
+
+String TcpIpMeshBackend::getCurrentMessage()
+{
+  String message = getTemporaryMessage();
+  
+  if(message == "") // If no temporary message stored
+    message = getMessage();
+
+  return message;
+}
 
 void TcpIpMeshBackend::setStaticIP(const IPAddress &newIP)
 {
@@ -201,7 +230,7 @@ transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
 {
   verboseModePrint("Transmitting");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
     
-  currClient.print(getMessage() + "\r");
+  currClient.print(getCurrentMessage() + "\r");
   yield();
 
   if (!waitForClientTransmission(currClient, _stationModeTimeoutMs))
@@ -347,7 +376,42 @@ transmission_status_t TcpIpMeshBackend::connectToNode(const String &targetSSID, 
   return attemptDataTransfer();
 }
 
-void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool concludingDisconnect, bool initialDisconnect )
+transmission_status_t TcpIpMeshBackend::initiateTransmission(const TcpIpNetworkInfo &recipientInfo)
+{
+  WiFi.disconnect();
+  yield();
+
+  assert(recipientInfo.SSID() != ""); // We need at least SSID to connect
+  String targetSSID = recipientInfo.SSID();
+  int32_t targetWiFiChannel = recipientInfo.wifiChannel();
+  uint8_t targetBSSID[6] {0};
+  recipientInfo.getBSSID(targetBSSID);
+
+  if(verboseMode()) // Avoid string generation if not required
+  {
+    printAPInfo(recipientInfo);
+  }
+
+  return connectToNode(targetSSID, targetWiFiChannel, targetBSSID);
+}
+
+void TcpIpMeshBackend::enterPostTransmissionState(bool concludingDisconnect)
+{
+  if(WiFi.status() == WL_CONNECTED && staticIP != emptyIP && !staticIPActivated)
+  {
+    verboseModePrint(F("Reactivating static IP to allow for faster re-connects."));
+    setStaticIP(staticIP);
+  }
+
+  // If we do not want to be connected at end of transmission, disconnect here so we can re-enable static IP first (above).
+  if(concludingDisconnect)
+  {
+    WiFi.disconnect();
+    yield();
+  }
+}
+
+void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool concludingDisconnect, bool initialDisconnect)
 {  
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
@@ -364,71 +428,68 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
 
   setMessage(message);
 
-  latestTransmissionOutcomes.clear();
+  latestTransmissionOutcomes().clear();
   
   if(WiFi.status() == WL_CONNECTED)
   {
     transmission_status_t transmissionResult = attemptDataTransfer();
-    latestTransmissionOutcomes.push_back(TransmissionResult(connectionQueue.back(), transmissionResult));
+    latestTransmissionOutcomes().push_back(TransmissionOutcome(connectionQueue().back(), transmissionResult));
   }
   else
   {
     if(scan)
     {
+      connectionQueue().clear();
       scanForNetworks(scanAllWiFiChannels);
     }
 
-    for(NetworkInfo &currentNetwork : connectionQueue)
+    for(TcpIpNetworkInfo &currentNetwork : connectionQueue())
     {
-      WiFi.disconnect();
-      yield();
-
-      String currentSSID = "";
-      int currentWiFiChannel = NETWORK_INFO_DEFAULT_INT;
-      uint8_t *currentBSSID = NULL;
-
-      // If an SSID has been assigned, it is prioritized over an assigned networkIndex since the networkIndex is more likely to change.
-      if(currentNetwork.SSID != "")
-      {
-        currentSSID = currentNetwork.SSID;
-        currentWiFiChannel = currentNetwork.wifiChannel;
-        currentBSSID = currentNetwork.BSSID;
-      }
-      else // Use only networkIndex
-      {
-        currentSSID = WiFi.SSID(currentNetwork.networkIndex);
-        currentWiFiChannel = WiFi.channel(currentNetwork.networkIndex);
-        currentBSSID = WiFi.BSSID(currentNetwork.networkIndex);
-      }
-
-      if(verboseMode()) // Avoid string generation if not required
-      {
-        printAPInfo(currentNetwork.networkIndex, currentSSID, currentWiFiChannel);
-      }
-
-      transmission_status_t transmissionResult = connectToNode(currentSSID, currentWiFiChannel, currentBSSID);
+      transmission_status_t transmissionResult = initiateTransmission(currentNetwork);
             
-      latestTransmissionOutcomes.push_back(TransmissionResult{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+      latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
     }
   }
   
-  if(WiFi.status() == WL_CONNECTED && staticIP != emptyIP && !staticIPActivated)
-  {
-    verboseModePrint(F("Reactivating static IP to allow for faster re-connects."));
-    setStaticIP(staticIP);
-  }
-
-  // If we do not want to be connected at end of transmission, disconnect here so we can re-enable static IP first (above).
-  if(concludingDisconnect)
-  {
-    WiFi.disconnect();
-    yield();
-  }
+  enterPostTransmissionState(concludingDisconnect);
 }
 
 void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels)
 {
   attemptTransmission(message, scan, scanAllWiFiChannels, true, false);
+}
+
+transmission_status_t TcpIpMeshBackend::attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect, bool initialDisconnect)
+{  
+  MutexTracker mutexTracker(_tcpIpTransmissionMutex);
+  if(!mutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! TCP/IP transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    return TS_CONNECTION_FAILED;
+  }
+
+  transmission_status_t transmissionResult = TS_CONNECTION_FAILED;
+  setTemporaryMessage(message);
+  
+  if(initialDisconnect)
+  {
+    WiFi.disconnect();
+    yield();
+  }
+
+  if(WiFi.status() == WL_CONNECTED && WiFi.SSID() == recipientInfo.SSID())
+  {
+    transmissionResult = attemptDataTransfer();
+  }
+  else
+  {
+    transmissionResult = initiateTransmission(recipientInfo);
+  }
+  
+  enterPostTransmissionState(concludingDisconnect);
+  clearTemporaryMessage();
+  
+  return transmissionResult;
 }
 
 void TcpIpMeshBackend::acceptRequest()

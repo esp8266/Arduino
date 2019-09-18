@@ -20,7 +20,8 @@
 #define __MESHBACKENDBASE_H__
 
 #include <ESP8266WiFi.h>
-#include "TransmissionResult.h"
+#include "TransmissionOutcome.h"
+#include "NetworkInfoBase.h"
 
 const String ESP8266_MESH_EMPTY_STRING = "";
 
@@ -45,25 +46,18 @@ public:
   virtual ~MeshBackendBase();
 
   /** 
-  * A vector that contains the NetworkInfo for each WiFi network to connect to. 
-  * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
-  * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
-  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
-  */
-  static std::vector<NetworkInfo> connectionQueue;
-
-  /** 
-  * A vector with the TransmissionResult for each AP to which a transmission was attempted during the latest attemptTransmission call.
+  * Returns a vector with the TransmissionOutcome for each AP to which a transmission was attempted during the latest attemptTransmission call.
+  * This vector is unique for each mesh backend.
   * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
   * Connection attempts are indexed in the same order they were attempted.
   * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
   */
-  static std::vector<TransmissionResult> latestTransmissionOutcomes;
+  virtual std::vector<TransmissionOutcome> & latestTransmissionOutcomes() = 0;
 
   /**
    * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
    */
-  static bool latestTransmissionSuccessful();
+  bool latestTransmissionSuccessful();
 
   /**
    * Initialises the node.
@@ -271,7 +265,7 @@ public:
 protected:
 
   virtual void scanForNetworks(bool scanAllWiFiChannels);
-  virtual void printAPInfo(const int apNetworkIndex, const String &apSSID, const int apWiFiChannel);
+  virtual void printAPInfo(const NetworkInfoBase &apNetworkInfo);
 
   /**
    * Called just before we activate the AP.
@@ -286,6 +280,8 @@ protected:
   virtual void deactivateAPHook();
 
   void setClassType(mesh_backend_t classType);
+
+  static bool _scanMutex;
 
 private:
 
