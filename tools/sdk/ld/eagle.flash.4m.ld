@@ -14,9 +14,13 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xfeff0
 }
 
-PROVIDE ( _FS_start = 0x405FB000 );
+_BOOTLOADER_FS_OFFSET = DEFINED(eboot_get_flash_block_size) ? 0x2000 : 0;
+
+PROVIDE ( _FS_start = 0x40200000 + _BOOTLOADER_FS_OFFSET + _FS_start_offset );
 PROVIDE ( _FS_end = 0x405FB000 );
 PROVIDE ( _FS_page = 0x0 );
 PROVIDE ( _FS_block = 0x0 );
+PROVIDE ( _BOOTLOADER_DATA = DEFINED(eboot_get_flash_block_size) ? _FS_start - _BOOTLOADER_FS_OFFSET : 0 );
+PROVIDE ( _SKETCH_AREA_end = DEFINED(eboot_get_flash_block_size) ? _BOOTLOADER_DATA : _FS_start );
 
 INCLUDE "local.eagle.app.v6.common.ld"

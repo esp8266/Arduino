@@ -12,6 +12,7 @@
 #include <string.h>
 #include "flash.h"
 #include "eboot_command.h"
+#include "eboot.h"
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
@@ -21,10 +22,10 @@ extern void ets_wdt_disable(void);
 int print_version(const uint32_t flash_addr)
 {
     uint32_t ver;
-    if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
+    if (SPIRead(find_app_start(flash_addr) + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
         return 1;
     }
-    const char* __attribute__ ((aligned (4))) fmtt = "v%08x\n\0\0";
+    const char* __attribute__ ((aligned (4))) fmtt = "v%08x+\n\0";
     uint32_t fmt[2];
     fmt[0] = ((uint32_t*) fmtt)[0];
     fmt[1] = ((uint32_t*) fmtt)[1];
@@ -32,15 +33,70 @@ int print_version(const uint32_t flash_addr)
     return 0;
 }
 
+#ifdef EBOOT_ENABLE_FLASH_STORAGE
+
+int print_flags(const uint32_t flash_addr)
+{
+    const char* __attribute__ ((aligned (4))) fmtt = "#%08x\n\0\0";
+    uint32_t ver, i;
+    uint32_t fmt[2];
+    eboot_flash_command_t cmd;
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
+
+    ets_putc('<');
+    ets_printf((const char*) fmt, ver);
+    for (i = 0; i < EBOOT_COMMAND_SLOT_COUNT; i++) {
+        ets_putc('0' + i);
+        ets_putc(':');
+        readBootCommand(i, &cmd);
+        ets_printf((const char*) fmt, cmd.flags);
+    }
+    ets_putc('\n');
+    return 0;
+}
+
+#endif // EBOOT_ENABLE_FLASH_STORAGE
+
+int find_app_start(const uint32_t flash_addr)
+{
+    image_header_t image_header;
+    uint32_t pos = flash_addr;
+    uint8_t i;
+
+    for (i = 0; i < EBOOT_APP_OFFSET_PAGE_LIMIT; i++) {
+        pos += APP_START_OFFSET;
+        if (SPIRead(pos, &image_header, sizeof(image_header))) {
+            return 0;
+        }
+        if (image_header.magic == 0xe9) {
+            return pos;
+        }
+    }
+    return 0;
+}
+
 int load_app_from_flash_raw(const uint32_t flash_addr)
 {
     image_header_t image_header;
-    uint32_t pos = flash_addr + APP_START_OFFSET;
+    uint32_t pos = find_app_start(flash_addr);
+#ifdef EBOOT_VERBOSE_STARTUP
+    const char* __attribute__ ((aligned (4))) fmtt = "l:%08x\n\0";
+    uint32_t ver, i;
+    uint32_t fmt[2];
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
 
-    if (SPIRead(pos, &image_header, sizeof(image_header))) {
+    ets_printf((const char*) fmt, pos);
+#endif // EBOOT_VERBOSE_STARTUP
+   if (SPIRead(pos, &image_header, sizeof(image_header))) {
         return 1;
     }
     pos += sizeof(image_header);
+
+    #ifdef EBOOT_VERBOSE_STARTUP
+    ets_printf((const char*) fmt, pos);
+    #endif // EBOOT_VERBOSE_STARTUP
 
 
     for (uint32_t section_index = 0;
@@ -54,6 +110,15 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
         pos += sizeof(section_header);
 
         const uint32_t address = section_header.address;
+
+#ifdef EBOOT_VERBOSE_STARTUP
+        ets_putc('f');
+        ets_printf((const char*) fmt, pos);
+        ets_putc('t');
+        ets_printf((const char*) fmt, address);
+        ets_putc('s');
+        ets_printf((const char*) fmt, section_header.size);
+#endif // EBOOT_VERBOSE_STARTUP
 
         bool load = false;
 
@@ -74,8 +139,18 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
             continue;
         }
 
+#ifdef EBOOT_VERBOSE_STARTUP
+        ets_putc('l');
+        ets_putc('o');
+#endif // EBOOT_VERBOSE_STARTUP
+
         if (SPIRead(pos, (void*)address, section_header.size))
             return 3;
+#ifdef EBOOT_VERBOSE_STARTUP
+        ets_putc('a');
+        ets_putc('d');
+        ets_putc('\n');
+#endif // EBOOT_VERBOSE_STARTUP
 
         pos += section_header.size;
     }
@@ -93,6 +168,21 @@ int copy_raw(const uint32_t src_addr,
              const uint32_t dst_addr,
              const uint32_t size)
 {
+    uint32_t overwrite_eboot = 0;
+#ifdef EBOOT_VERBOSE_STARTUP
+    const char* __attribute__ ((aligned (4))) fmtt = ":%08x\n\0\0";
+    uint32_t fmt[2];
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
+
+    ets_putc('S');
+    ets_printf((const char*) fmt, src_addr);
+    ets_putc('D');
+    ets_printf((const char*) fmt, dst_addr);
+    ets_putc('B');
+    ets_printf((const char*) fmt, size);
+#endif // EBOOT_VERBOSE_STARTUP
+
     // require regions to be aligned
     if (src_addr & 0xfff != 0 ||
         dst_addr & 0xfff != 0) {
@@ -106,14 +196,16 @@ int copy_raw(const uint32_t src_addr,
     uint32_t daddr = dst_addr;
 
     while (left) {
-        if (SPIEraseSector(daddr/buffer_size)) {
-            return 2;
-        }
-        if (SPIRead(saddr, buffer, buffer_size)) {
-            return 3;
-        }
-        if (SPIWrite(daddr, buffer, buffer_size)) {
-            return 4;
+        if ((daddr >= FLASH_SECTOR_SIZE) || (overwrite_eboot == 1)) {
+            if (SPIEraseSector(daddr/buffer_size)) {
+                return 2;
+            }
+            if (SPIRead(saddr, buffer, buffer_size)) {
+                return 3;
+            }
+            if (SPIWrite(daddr, buffer, buffer_size)) {
+                return 4;
+            }
         }
         saddr += buffer_size;
         daddr += buffer_size;
@@ -131,10 +223,12 @@ void main()
     struct eboot_command cmd;
     
     print_version(0);
+#ifdef EBOOT_VERBOSE_STARTUP
+    print_flags(0);
+#endif // EBOOT_VERBOSE_STARTUP
 
     if (eboot_command_read(&cmd) == 0) {
         // valid command was passed via RTC_MEM
-        eboot_command_clear();
         ets_putc('@');
     } else {
         // no valid command found
@@ -150,6 +244,7 @@ void main()
         ets_wdt_enable();
         ets_putc('0'+res); ets_putc('\n');
         if (res == 0) {
+            eboot_command_clear();
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
         }
@@ -166,5 +261,9 @@ void main()
         SWRST;
     }
 
-    while(true){}
+    while(true) {
+#ifdef EBOOT_VERBOSE_STARTUP
+        ets_putc('.');
+#endif // EBOOT_VERBOSE_STARTUP
+    }
 }

@@ -138,7 +138,10 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
+    _ESP8266_AR_APP_START = ABSOLUTE(.);
     *(.ver_number)
+    LONG(0x31305241)
+    LONG(_BOOTLOADER_DATA)
     *.c.o(.literal*, .text*)
     *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal*, EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
     *.cc.o(.literal*, .text*)

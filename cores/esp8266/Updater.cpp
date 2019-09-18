@@ -23,6 +23,7 @@ extern "C" {
 }
 
 extern "C" uint32_t _FS_start;
+extern "C" uint32_t _SKETCH_AREA_end;
 
 UpdaterClass::UpdaterClass()
 : _async(false)
@@ -110,7 +111,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     //size of current sketch rounded to a sector
     size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+    uintptr_t updateEndAddress = (uintptr_t)&_SKETCH_AREA_end - 0x40200000;
     //size of the update rounded to a sector
     size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update

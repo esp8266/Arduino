@@ -21,6 +21,11 @@ int SPIRead(uint32_t addr, void *dest, size_t size);
 int SPIWrite(uint32_t addr, void *src, size_t size);
 int SPIEraseAreaEx(const uint32_t start, const uint32_t size);
 
+extern uint32_t _ESP8266_AR_APP_START;
+
+#define FLASH_SECTOR_SIZE 0x1000
+#define FLASH_BLOCK_SIZE 0x10000
+#define APP_START_OFFSET ((uint32_t) (&_ESP8266_AR_APP_START) - 0x40200000)
 
 typedef struct {
     unsigned char       magic;
