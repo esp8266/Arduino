@@ -1181,6 +1181,11 @@ def flash_map (flashsize_kb, fs_kb = 0):
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
     fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+
+    # For legacy reasons (#6531), the EEPROM sector needs to be at the old
+    # FS_end calculated without regards to block size
+    eeprom_start = fs_end
+
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
         max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
@@ -1264,6 +1269,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
