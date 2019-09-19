@@ -23,6 +23,15 @@ import os
 import subprocess
 import sys
 
+def get_segment_hints():
+    hints = {}
+    hints['IROM'] = '      code in flash (default or ICACHE_FLASH_ATTR)'
+    hints['IRAM'] = '/32KB code in IRAM (ICACHE_RAM_ATTR, ISRs...)'
+    hints['DATA'] = '/80KB initialized variables (global, static) in RAM/HEAP'
+    hints['RODATA'] = '/80KB constants (global, static) in RAM/HEAP'
+    hints['BSS'] = '/80KB uninitialized variables ("zeroed": global, static) in RAM/HEAP'
+    return hints
+
 def get_segment_sizes(elf, path):
     sizes = {}
     sizes['IROM'] = 0
@@ -53,10 +62,11 @@ def main():
 
     args = parser.parse_args()
     sizes = get_segment_sizes(args.elf, args.path)
+    hints = get_segment_hints()
 
     sys.stderr.write("Executable segment sizes:" + os.linesep)
     for k in sizes.keys():
-        sys.stderr.write("%-7s: %d%s" % (k, sizes[k], os.linesep))
+        sys.stderr.write("%-7s: %-10d %s %s" % (k, sizes[k], hints[k], os.linesep))
 
     return 0
 
