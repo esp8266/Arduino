@@ -25,11 +25,11 @@ import sys
 
 def get_segment_hints():
     hints = {}
-    hints['IROM'] = '      code in flash (default or ICACHE_FLASH_ATTR)'
-    hints['IRAM'] = '/32KB code in IRAM (ICACHE_RAM_ATTR, ISRs...)'
-    hints['DATA'] = '/80KB initialized variables (global, static) in RAM/HEAP'
-    hints['RODATA'] = '/80KB constants (global, static) in RAM/HEAP'
-    hints['BSS'] = '/80KB uninitialized variables ("zeroed": global, static) in RAM/HEAP'
+    hints['IROM'] = '         - code in flash         (default or ICACHE_FLASH_ATTR)'
+    hints['IRAM'] = '  / 32768 - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)'
+    hints['DATA'] = ')         - initialized variables (global, static) in RAM/HEAP'
+    hints['RODATA'] = ') / 81920 - constants             (global, static) in RAM/HEAP'
+    hints['BSS'] = ')         - zeroed variables      (global, static) in RAM/HEAP'
     return hints
 
 def get_segment_sizes(elf, path):
@@ -66,7 +66,7 @@ def main():
 
     sys.stderr.write("Executable segment sizes:" + os.linesep)
     for k in sizes.keys():
-        sys.stderr.write("%-7s: %-10d %s %s" % (k, sizes[k], hints[k], os.linesep))
+        sys.stderr.write("%-7s: %-5d %s %s" % (k, sizes[k], hints[k], os.linesep))
 
     return 0
 
