@@ -1,4 +1,0 @@
-strobeloader.name=StrobeLoader
-#strobeloader.protocol=tcp
-strobeloader.program.tool=sl
-strobeloader.program.extra_params=
