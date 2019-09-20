@@ -27,7 +27,7 @@ static const char serverIndex[] PROGMEM =
      </form>
      <form method='POST' action='' enctype='multipart/form-data'>
          FileSystem:<br>
-         <input type='file' accept='.bin' name='spiffs'>
+         <input type='file' accept='.bin' name='filesystem'>
          <input type='submit' value='Update FileSystem'>
      </form>
      </body>
@@ -92,11 +92,11 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         WiFiUDP::stopAll();
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
-        if (upload.name == "spiffs") {
-          size_t spiffsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+        if (upload.name == "filesystem") {
+          size_t fsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
           SPIFFS.end();
           LittleFS.end();
-          if (!Update.begin(spiffsSize, U_FS)){//start with max available size
+          if (!Update.begin(fsSize, U_FS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
           }
         } else {
