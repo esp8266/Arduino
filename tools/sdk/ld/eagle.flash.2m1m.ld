@@ -1,10 +1,10 @@
 /* Flash Split for 2M chips */
 /* sketch @0x40200000 (~1019KB) (1044464B) */
-/* empty  @0x402FEFF0 (~4KB) (4112B) */
-/* spiffs @0x40300000 (~1000KB) (1024000B) */
-/* eeprom @0x403FB000 (4KB) */
-/* rfcal  @0x403FC000 (4KB) */
-/* wifi   @0x403FD000 (12KB) */
+/* otacmds  @0x402FE000 (8KB) */
+/* spiffs   @0x40300000 (~1000KB) (1024000B) */
+/* eeprom   @0x403FB000 (4KB) */
+/* rfcal    @0x403FC000 (4KB) */
+/* wifi     @0x403FD000 (12KB) */
 
 MEMORY
 {
@@ -18,5 +18,7 @@ PROVIDE ( _FS_start = 0x40300000 );
 PROVIDE ( _FS_end = 0x403FA000 );
 PROVIDE ( _FS_page = 0x100 );
 PROVIDE ( _FS_block = 0x2000 );
+PROVIDE ( _BOOTLOADER_DATA = 0x000FE000 );
+PROVIDE ( _SKETCH_AREA_end = _FS_start );
 
 INCLUDE "local.eagle.app.v6.common.ld"
