@@ -95,8 +95,6 @@ SECTIONS
 
   /* IRAM is split into .text and .text1 to allow for moving specific */
   /* functions into IRAM that would be matched by the irom0.text matcher */
-  // Merged Conflict To Resolve
-  // iram layout inclding magic marker
   .text : ALIGN(4)
   {
     _stext = .;
@@ -141,6 +139,8 @@ SECTIONS
   {
     _irom0_text_start = ABSOLUTE(.);
     *(.ver_number)
+    LONG(0x31305241)
+    LONG(_BOOTLOADER_DATA)
     *.c.o(.literal*, .text*)
     *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal*, EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
     *.cc.o(.literal*, .text*)
