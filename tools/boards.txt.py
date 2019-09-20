@@ -1185,7 +1185,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     ota_commands_addr = fs_end
     if flashsize_kb <= 1024:
-        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb + ota_commands) * 1024 - reserved
+        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb + ota_commands)) * 1024 - reserved
         fs_start = fs_end - fs_kb * 1024
     else:
         max_upload_size = 1024 * 1024 - reserved
@@ -1267,13 +1267,12 @@ def flash_map (flashsize_kb, fs_kb = 0):
         # print("PROVIDE ( _FS_page = 0x%X );" % page)
         # print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
 
-        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start)
+        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start))
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
         print("PROVIDE ( _BOOTLOADER_DATA = 0x%08X );" % ota_commands_addr)
-        print("PROVIDE ( _SKETCH_AREA_end = _FS_start );" % 
-
+        print("PROVIDE ( _SKETCH_AREA_end = _FS_start );")
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
