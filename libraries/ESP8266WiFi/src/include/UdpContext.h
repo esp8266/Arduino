@@ -112,6 +112,12 @@ public:
     {
         _pcb->remote_ip = addr;
         _pcb->remote_port = port;
+#if LWIP_IPV6
+        // Set zone so that link local addresses use the default interface
+        if (IP_IS_V6(&_pcb->remote_ip) && ip6_addr_lacks_zone(ip_2_ip6(&_pcb->remote_ip), IP6_UNKNOWN)) {
+            ip6_addr_assign_zone(ip_2_ip6(&_pcb->remote_ip),IP6_UNKNOWN, netif_default);
+        }
+#endif
         return true;
     }
 
