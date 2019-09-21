@@ -33,6 +33,17 @@
 extern "C" {
 #endif
 
+/*
+ * This "print character function" prototype is modeled after the argument for
+ * ets_install_putc1() found in "ESP8266_NONOS_SDK/include/osapi.h". This
+ * deviates away from the familiar C library definition of putchar; however, it
+ * agrees with the code we are working with. Note, in the ROM some "character
+ * print functions" always return 0 (uart_tx_one_char and ets_putc), some return
+ * last character printed (buildin _putc1), and some return nothing
+ * (ets_write_char). Using a void return type safely represents them all.
+ */
+typedef void (*fp_putc_t)(char);
+
 typedef uint32_t ETSSignal;
 typedef uint32_t ETSParam;
 
@@ -205,15 +216,20 @@ char *ets_strstr(const char *haystack, const char *needle);
 int ets_sprintf(char *str, const char *format, ...)  __attribute__ ((format (printf, 2, 3)));
 int os_snprintf(char *str, size_t size, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 int ets_printf(const char *format, ...)  __attribute__ ((format (printf, 1, 2)));
-void ets_install_putc1(void* routine);
+void ets_install_putc1(fp_putc_t routine);
 void ets_isr_mask(int intr);
 void ets_isr_unmask(int intr);
 void ets_isr_attach(int intr, int_handler_t handler, void *arg);
 void ets_intr_lock();
 void ets_intr_unlock();
 int ets_vsnprintf(char * s, size_t n, const char * format, va_list arg)  __attribute__ ((format (printf, 3, 0)));
-int ets_vprintf(int (*print_function)(int), const char * format, va_list arg) __attribute__ ((format (printf, 2, 0)));
-int ets_putc(int);
+int ets_vprintf(fp_putc_t print_function, const char * format, va_list arg) __attribute__ ((format (printf, 2, 0)));
+/*
+ * ets_putc(), a "print character function" in ROM, prints a character to a
+ * UART. It always returns 0. The use of this function requires a prior setup
+ * call to uart_buff_switch() to select the UART.
+ */
+int ets_putc(char);
 bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
 bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
 void ets_update_cpu_frequency(uint32_t ticks_per_us);

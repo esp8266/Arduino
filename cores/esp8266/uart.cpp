@@ -899,7 +899,7 @@ void
 uart_set_debug(int uart_nr)
 {
     s_uart_debug_nr = uart_nr;
-    void (*func)(char) = NULL;
+    fp_putc_t func = NULL;
     switch(s_uart_debug_nr) 
     {
     case UART0:
@@ -921,7 +921,7 @@ uart_set_debug(int uart_nr)
         } else {
             system_set_os_print(0);
         }
-        ets_install_putc1((void *) func);
+        ets_install_putc1(func);
     }
 }
 
