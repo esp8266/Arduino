@@ -203,6 +203,20 @@ public:
         return (clusterSize() * totalClusters());
     }
 
+    // Helper function, takes FAT and makes standard time_t
+    static time_t FatToTimeT(uint16_t d, uint16_t t) {
+        struct tm tiempo;
+        memset(&tiempo, 0, sizeof(tiempo));
+        tiempo.tm_sec  = (((int)t) <<  1) & 0x3e;
+        tiempo.tm_min  = (((int)t) >>  5) & 0x3f;
+        tiempo.tm_hour = (((int)t) >> 11) & 0x1f;
+        tiempo.tm_mday = (int)(d & 0x1f);
+        tiempo.tm_mon  = ((int)(d >> 5) & 0x0f) - 1;
+        tiempo.tm_year = ((int)(d >> 9) & 0x7f) + 80;
+        tiempo.tm_isdst = -1;
+        return mktime(&tiempo);
+    }
+
 protected:
     friend class SDFileImpl;
     friend class SDFSDirImpl;
@@ -211,6 +225,7 @@ protected:
     {
         return &_fs;
     }
+
 
     static uint8_t _getFlags(OpenMode openMode, AccessMode accessMode) {
         uint8_t mode = 0;
@@ -350,6 +365,17 @@ public:
         return _opened ? _fd->isDirectory() : false;
     }
 
+    time_t getLastWrite() override {
+        time_t ftime = 0;
+        if (_opened && _fd) {
+            sdfat::dir_t tmp;
+            if (_fd.get()->dirEntry(&tmp)) {
+                ftime = SDFSImpl::FatToTimeT(tmp.lastWriteDate, tmp.lastWriteTime);
+            }
+        }
+        return ftime;
+    }
+
 
 protected:
     SDFSImpl*                     _fs;
@@ -425,6 +451,12 @@ public:
                 _size = file.fileSize();
                 _isFile = file.isFile();
                 _isDirectory = file.isDirectory();
+                sdfat::dir_t tmp;
+                if (file.dirEntry(&tmp)) {
+                    _time = SDFSImpl::FatToTimeT(tmp.lastWriteDate, tmp.lastWriteTime);
+		} else {
+                    _time = 0;
+               }
                 file.getName(_lfn, sizeof(_lfn));
                 file.close();
             } else {
@@ -447,6 +479,7 @@ protected:
     std::shared_ptr<sdfat::File> _dir;
     bool                         _valid;
     char                         _lfn[64];
+    time_t                       _time;
     std::shared_ptr<char>        _dirPath;
     uint32_t                     _size;
     bool                         _isFile;
