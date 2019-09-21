@@ -18,5 +18,6 @@ PROVIDE ( _FS_start = 0x403E0000 );
 PROVIDE ( _FS_end = 0x403FB000 );
 PROVIDE ( _FS_page = 0x100 );
 PROVIDE ( _FS_block = 0x1000 );
+PROVIDE ( _EEPROM_start = 0x403fb000 );
 
 INCLUDE "local.eagle.app.v6.common.ld"
