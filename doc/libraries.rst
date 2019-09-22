@@ -183,4 +183,5 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 -  `MFRC522 <https://github.com/miguelbalboa/rfid>`__ - A library for using the Mifare RC522 RFID-tag reader/writer.
 -  `Ping <https://github.com/dancol90/ESP8266Ping>`__ - lets the ESP8266 ping a remote machine.
 -  `AsyncPing <https://github.com/akaJes/AsyncPing>`__ - fully asynchronous Ping library (have full ping statistic and hardware MAC address).
--  `ESP_EEPROM <https://github.com/jwrw/ESP_EEPROM>`__ - This library writes a new copy of your data when you save (commit) it and keeps track of where in the sector the most recent copy is kept using a bitmap. The flash sector only needs to be erased when there is no more space for copies in the flash sector
+-  `ESP_EEPROM <https://github.com/jwrw/ESP_EEPROM>`__ - This library writes a new copy of your data when you save (commit) it and keeps track of where in the sector the most recent copy is kept using a bitmap. The flash sector only needs to be erased when there is no more space for copies in the flash sector.
+-  `EEPROM Rotate <https://github.com/xoseperez/eeprom_rotate>`__ - Instead of using a single sector to persist the data from the emulated EEPROM, this library uses a number of sectors to do so: a sector pool.
