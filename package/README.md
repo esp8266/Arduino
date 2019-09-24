@@ -109,9 +109,9 @@ The following points assume work in a direct clone of the repository, and not in
 
 2. Make a PR with the following, wait for Travis CI, and merge.
 
-   * an updated `version` to the release in platform.txt E.g. `3.0.0`,
+   * platform.txt: update `version` to the release in platform.txt E.g. `3.0.0`,
 
-   * `cores/esp8266/TZ.h` updated with `tools/TZupdate.sh`.
+   * `cores/esp8266/TZ.h`: import the latest database with the following shell command: `$ cd <rootdir>; sh tools/TZupdate.sh` .
 
 3. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `3.0.0`, or `X.Y.Z-betaN` for release candiate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
