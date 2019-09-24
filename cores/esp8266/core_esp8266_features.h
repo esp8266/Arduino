@@ -19,7 +19,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
  */
-
+#include <stdint.h>
 
 #ifndef CORE_ESP8266_FEATURES_H
 #define CORE_ESP8266_FEATURES_H
