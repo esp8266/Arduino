@@ -905,6 +905,10 @@ macros = {
         ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
         ( '.menu.FlashFreq.80', '80MHz' ),
         ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
+        ( '.menu.FlashFreq.20', '20MHz' ),
+        ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
+        ( '.menu.FlashFreq.26', '26MHz' ),
+        ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
