@@ -39,15 +39,6 @@ bool ICACHE_FLASH_ATTR get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t s
   Objective:  To be able to print "last gasp" diagnostic messages
   when interrupts are disabled and w/o availability of heap resources.
 */
-
-/*
- * ROM builtin "print character function" _putc1, ignores CRs and sends CR/LF
- * for LF, newline. This function is used internally by ets_uart_printf. It is
- * also the function that gets installed by ets_uart_install_printf through a
- * call to ets_install_putc1.
- */
-#define _rom_putc1 ((fp_putc_t)0x40001dcc)
-
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
   /*
@@ -63,7 +54,7 @@ int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
   ets_memcpy(ram_buf, fmt, buf_len);
   va_list argPtr;
   va_start(argPtr, fmt);
-  int result = ets_vprintf(_rom_putc1, ram_buf, argPtr);
+  int result = ets_vprintf(ets_uart_putc1, ram_buf, argPtr);
   va_end(argPtr);
   return result;
 }
