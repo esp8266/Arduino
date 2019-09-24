@@ -24,7 +24,12 @@
 #include "coredecls.h"
 #include <stdint.h>
 #include "eboot_command.h"
-
+#include "flash_utils.h"
+#include "c_types.h"
+#include "ets_sys.h"
+#include "os_type.h"
+#include "osapi.h"
+#include "spi_flash.h"
 
 extern "C" {
 
