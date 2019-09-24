@@ -109,7 +109,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 2. Make a PR with the following, wait for Travis CI, and merge.
 
-   * platform.txt: update `version` to the release in platform.txt E.g. `3.0.0`,
+   * platform.txt: update `version` to the release E.g. `3.0.0`,
 
    * `cores/esp8266/TZ.h`: import the latest database with the following shell command:\
      `$ cd tools; sh TZupdate.sh`.
