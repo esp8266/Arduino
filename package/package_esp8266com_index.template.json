@@ -106,6 +106,9 @@
                   },
                   {
                      "name": "ESPectro Core"
+                  },
+                  {
+                     "name": "Eduino WiFi"
                   }
                ],
                "toolsDependencies": [
