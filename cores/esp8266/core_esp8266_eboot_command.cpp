@@ -109,14 +109,14 @@ bool writeBootCommand(int cmd, eboot_flash_command_t *dst) {
 bool eraseBootCommandBlock(void) {
   eboot_flash_command_t *cmds = commandAddress();
   uint32_t addr = (uint32_t)cmds - 0x40200000;
-  ets_printf("Erasing command block at %p\n", (void 8) addr);
+  ets_printf("Erasing command block at %p\n", (void *) addr);
   if (spi_flash_erase_sector(addr / FLASH_SECTOR_SIZE)) {
     return 0;
   }
   return 1;
 }
 
-uint32_t eboot_command_read_from_flash(struct eboot_command *cmd)
+uint32_t eboot_command_read_from_flash(void)
 {
     eboot_index_t eboot_index;
     eboot_flash_command_t *flash_command;
