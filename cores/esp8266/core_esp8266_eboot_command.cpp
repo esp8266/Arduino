@@ -60,7 +60,7 @@ uint32_t eboot_read_flash_index(eboot_index_t *eboot_index)
 eboot_flash_command_t *commandAddress(void) {
   eboot_index_t eboot_index;
   const uint32_t addr = 0 + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t);
-  ets_printf("commandAddress: %p\n",  (void) addr);
+  ets_printf("commandAddress: %p\n",  (void *) addr);
   if (spi_flash_read(addr, (uint32_t *)&eboot_index, sizeof(eboot_index)) != 0) {
     ets_printf("failed to read SPI\n");
     return NULL;
@@ -78,13 +78,13 @@ bool readBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmds == 0) {
     return 0;
   }
-  ets_printf("Reading command %d from flash: %p\n", cmd, cmds);
+  ets_printf("Reading command %d from flash: %p\n", cmd, (void *) cmds);
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
   uint32_t addr = (uint32_t) cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
-  ets_printf("Reading command %d from flash @ %p\n", cmd, addr);
+  ets_printf("Reading command %d from flash @ %p\n", cmd, (void *) addr);
   if (spi_flash_read(addr, (uint32_t *)dst, sizeof(*dst))) {
     return 0;
   }
@@ -93,13 +93,13 @@ bool readBootCommand(int cmd, eboot_flash_command_t *dst) {
 
 bool writeBootCommand(int cmd, eboot_flash_command_t *dst) {
   eboot_flash_command_t *cmds = commandAddress();
-  ets_printf("!Writing command %d to flash: %p\n", cmd, cmds);
+  ets_printf("!Writing command %d to flash: %p\n", cmd, (void *) cmds);
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
   uint32_t addr = (uint32_t)cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
-  ets_printf("Writing command %d to flash @ %p\n", cmd, (void) addr);
+  ets_printf("Writing command %d to flash @ %p\n", cmd, (void *) addr);
   if (spi_flash_write(addr, (uint32_t *)dst, sizeof(*dst))) {
     return 0;
   }
@@ -109,7 +109,7 @@ bool writeBootCommand(int cmd, eboot_flash_command_t *dst) {
 bool eraseBootCommandBlock(void) {
   eboot_flash_command_t *cmds = commandAddress();
   uint32_t addr = (uint32_t)cmds - 0x40200000;
-  ets_printf("Erasing command block at %p\n", (void) addr);
+  ets_printf("Erasing command block at %p\n", (void 8) addr);
   if (spi_flash_erase_sector(addr / FLASH_SECTOR_SIZE)) {
     return 0;
   }
@@ -131,7 +131,7 @@ uint32_t eboot_command_read_from_flash(struct eboot_command *cmd)
             if (((flash_command->flags & EBOOT_CMD_FLAG_SLOT_FREE) == 0) &&
                 ((flash_command->flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
                 // This is a valid command waiting to be actioned, or should be. The CRC check will determine if it's actually valid
-                uint32_t* dst = (uint32_t *) cmd;
+                // uint32_t* dst = (uint32_t *) cmd;
                 // uint32_t* src = (uint32_t *) flash_command->cmd;
                 // for (uint32_t i = 0; i < dw_count; ++i) {
                 //     dst[i] = src[i];
@@ -149,7 +149,7 @@ uint32_t eboot_command_write_to_flash(struct eboot_command *cmd)
     uint32_t i, *dst, *src = (uint32_t *)cmd;
     int32_t target_command_slot = -1;
     const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
-    ets_printf("Writing command to flash: %p\n", cmd);
+    ets_printf("Writing command to flash: %p\n", (void *) cmd);
 
     for (i = 0; i < EBOOT_COMMAND_MAX_COUNT; i++) {
         ets_printf("Read bootCommand %d, flags: %x\n", i, flash_command.flags);
@@ -180,7 +180,7 @@ uint32_t eboot_command_write_to_flash(struct eboot_command *cmd)
         dst[j] = src[j];
     }
     flash_command.flags &= ~EBOOT_CMD_FLAG_SLOT_FREE;
-    ets_printf("Writing command %d to flash: %p\n", target_command_slot, cmd);
+    ets_printf("Writing command %d to flash: %p\n", target_command_slot, (void *) cmd);
     writeBootCommand(target_command_slot, &flash_command);
     return 1;
 }
@@ -237,7 +237,7 @@ void eboot_command_write(struct eboot_command* cmd)
     uint32_t saved = 0;
     cmd->magic = EBOOT_MAGIC;
     cmd->crc32 = eboot_command_calculate_crc32(cmd);
-    ets_printf("Writing command: %p\n", cmd);
+    ets_printf("Writing command: %p\n", (void *) cmd);
 #if defined (EBOOT_ENABLE_FLASH_STORAGE)
     saved = eboot_command_write_to_flash(cmd);
 #endif // EBOOT_ENABLE_FLASH_STORAGE
