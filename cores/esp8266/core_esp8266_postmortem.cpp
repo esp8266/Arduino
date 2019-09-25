@@ -108,7 +108,6 @@ void __wrap_system_restart_local() {
     else
         rst_info.reason = s_user_reset_reason;
 
-    // TODO:  ets_install_putc1 definition is wrong in ets_sys.h, need cast
     ets_install_putc1(&uart_write_char_d);
 
     if (s_panic_line) {
