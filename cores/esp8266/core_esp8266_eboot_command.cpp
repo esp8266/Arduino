@@ -60,7 +60,7 @@ uint32_t eboot_read_flash_index(eboot_index_t *eboot_index)
 eboot_flash_command_t *commandAddress(void) {
   eboot_index_t eboot_index;
   const uint32_t addr = 0 + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t);
-  ets_printf("commandAddress: %p\n", addr);
+  ets_printf("commandAddress: %p\n",  (void) addr);
   if (spi_flash_read(addr, (uint32_t *)&eboot_index, sizeof(eboot_index)) != 0) {
     ets_printf("failed to read SPI\n");
     return NULL;
@@ -82,8 +82,7 @@ bool readBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
-  uint32_t uint = (uint32_t) cmds;
-  uint32_t addr = (uint32_t)cmds - 0x40200000;
+  uint32_t addr = (uint32_t) cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
   ets_printf("Reading command %d from flash @ %p\n", cmd, addr);
   if (spi_flash_read(addr, (uint32_t *)dst, sizeof(*dst))) {
@@ -98,19 +97,19 @@ bool writeBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
-  uint32_t uint = (uint32_t) cmds;
   uint32_t addr = (uint32_t)cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
-  ets_printf("Writing command %d to flash @ %p\n", cmd, addr);
+  ets_printf("Writing command %d to flash @ %p\n", cmd, (void) addr);
   if (spi_flash_write(addr, (uint32_t *)dst, sizeof(*dst))) {
     return 0;
   }
+  return 1;
 }
 
 bool eraseBootCommandBlock(void) {
   eboot_flash_command_t *cmds = commandAddress();
   uint32_t addr = (uint32_t)cmds - 0x40200000;
-  ets_printf("Erasing command block at %p\n", addr);
+  ets_printf("Erasing command block at %p\n", (void) addr);
   if (spi_flash_erase_sector(addr / FLASH_SECTOR_SIZE)) {
     return 0;
   }
@@ -122,7 +121,7 @@ uint32_t eboot_command_read_from_flash(struct eboot_command *cmd)
     eboot_index_t eboot_index;
     eboot_flash_command_t *flash_command;
     uint32_t i;
-    const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
+//    const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
 
     if (!eboot_read_flash_index(&eboot_index)) {
         return 0;
@@ -199,7 +198,7 @@ int eboot_command_read_from_rtc(struct eboot_command *cmd)
     return 0;
 }
 
-int eboot_command_write_to_rtc(struct eboot_command *cmd)
+void eboot_command_write_to_rtc(struct eboot_command *cmd)
 {
     const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
     const uint32_t* src = (const uint32_t *) cmd;
@@ -225,7 +224,7 @@ int eboot_command_read(struct eboot_command* cmd)
     }
 
     uint32_t crc32 = eboot_command_calculate_crc32(cmd);
-    if (cmd->magic & EBOOT_MAGIC_MASK != EBOOT_MAGIC || 
+    if ((cmd->magic & EBOOT_MAGIC_MASK) != EBOOT_MAGIC || 
         cmd->crc32 != crc32) {
         return 1;
     }
