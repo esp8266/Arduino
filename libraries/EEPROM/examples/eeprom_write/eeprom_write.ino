@@ -35,9 +35,9 @@ void loop() {
   if (addr == 512) {
     addr = 0;
     if (EEPROM.commit()) {
-      Serial.println("EEPROM successfully written");
+      Serial.println("EEPROM successfully committed");
     } else {
-      Serial.println("ERROR!  EEPROM write failed");
+      Serial.println("ERROR! EEPROM commit failed");
     }
   }
 
