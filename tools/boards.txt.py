@@ -1293,6 +1293,12 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
         print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
+        # Re-add deprecated symbols pointing to the same address as the new standard ones
+        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
