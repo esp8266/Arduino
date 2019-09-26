@@ -13,6 +13,7 @@
 int addr = 0;
 
 void setup() {
+  Serial.begin(115200);
   EEPROM.begin(512);
 }
 
@@ -33,7 +34,11 @@ void loop() {
   addr = addr + 1;
   if (addr == 512) {
     addr = 0;
-    EEPROM.commit();
+    if (EEPROM.commit()) {
+      Serial.println("EEPROM successfully written");
+    } else {
+      Serial.println("ERROR!  EEPROM write failed");
+    }
   }
 
   delay(100);
