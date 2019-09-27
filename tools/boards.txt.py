@@ -905,6 +905,10 @@ macros = {
         ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
         ( '.menu.FlashFreq.80', '80MHz' ),
         ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
+        ( '.menu.FlashFreq.20', '20MHz' ),
+        ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
+        ( '.menu.FlashFreq.26', '26MHz' ),
+        ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
@@ -1183,6 +1187,11 @@ def flash_map (flashsize_kb, fs_kb = 0):
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
     fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+
+    # For legacy reasons (#6531), the EEPROM sector needs to be at the old
+    # FS_end calculated without regards to block size
+    eeprom_start = fs_end
+
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
         max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
@@ -1266,6 +1275,13 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
+        # Re-add deprecated symbols pointing to the same address as the new standard ones
+        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
