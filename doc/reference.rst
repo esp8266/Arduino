@@ -9,18 +9,33 @@ and have several limitations:
 
 * Interrupt callback functions must be in IRAM, because the flash may be
   in the middle of other operations when they occur.  Do this by adding
-  the ``ICACHE_RAM_ATTR`` attribute on the function definition.
- 
-* Interrupts should not perform delay() or any long-running (>1ms) task.
-  WiFi and other portiong of the code can become unstable if interrupts
+  the ``ICACHE_RAM_ATTR`` attribute on the function definition.  If this
+  attribute is not present, the sketch will crash when it attempts to
+  ``attachInterrupt`` with an error message.  
+
+.. code:: cpp
+
+    ICACHE_RAM_ATTR void gpio_change_handler(void *data) {...
+
+* Interrupts must not call ``delay()`` or ``yield()``, or call any routines
+  which internally use ``delay()`` or ``yield()`` either.
+  
+* Long-running (>1ms) tasks in interrupts will cause instabilty or crashes.
+  WiFi and other portions of the core can become unstable if interrupts
   are blocked by a long-running interrupt.  If you have much to do, you can
   set a volatile global flag that your main ``loop()`` can check each pass
-  or use a scheduled function (which will be called by the OS when it is
-  safe, and not at IRQ level) to do the work.
+  or use a scheduled function (which will be called outside of the interrupt
+  context when it is safe) to do long-running work.
 
-* Memory operations can be dangerous and avoided in interrupts.  Calls to
-  ``new`` or ``malloc`` should be minimized, and calls to ``realloc`` and
-  ``free`` must NEVER be used.
+* Memory operations can be dangerous and should be avoided in interrupts.
+  Calls to ``new`` or ``malloc`` should be minimized because they may require
+  a long running time if memory is fragmented.  Calls to ``realloc`` and
+  ``free`` must NEVER be called.  Using any routines or objects which call
+  ``free`` or ``realloc`` themselves is also forbidden for the same reason.
+  This means that ``String``, ``std::string``, ``std::vector`` and other
+  classes which use contiguous memory that may be resized must be used with
+  extreme care (ensuring strings aren't changed, vector elements aren't
+  added, etc.).
 
 Digital IO
 ----------
