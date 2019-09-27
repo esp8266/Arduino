@@ -1,6 +1,27 @@
 Reference
 =========
 
+Interrupts
+----------
+
+Interrupts can be used on the ESP8266, but they must be used with care
+and have several limitations:
+
+* Interrupt callback functions must be in IRAM, because the flash may be
+  in the middle of other operations when they occur.  Do this by adding
+  the ``ICACHE_RAM_ATTR`` attribute on the function definition.
+ 
+* Interrupts should not perform delay() or any long-running (>1ms) task.
+  WiFi and other portiong of the code can become unstable if interrupts
+  are blocked by a long-running interrupt.  If you have much to do, you can
+  set a volatile global flag that your main ``loop()`` can check each pass
+  or use a scheduled function (which will be called by the OS when it is
+  safe, and not at IRQ level) to do the work.
+
+* Memory operations can be dangerous and avoided in interrupts.  Calls to
+  ``new`` or ``malloc`` should be minimized, and calls to ``realloc`` and
+  ``free`` must NEVER be used.
+
 Digital IO
 ----------
 
