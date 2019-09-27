@@ -42,7 +42,7 @@
   *   Renamed to umm_malloc.cpp
   *
   *   Added `extern "C" { ...b};` around code.
-
+  *
   *   Surround DBGLOG_LEVEL with #ifndef... Now defined value in umm_malloc_cfg.h
   *
   *   umm_free() - moved critical section to start after safe calculations.
@@ -86,6 +86,11 @@
   *
   * Globally change across all files %i to %d: umm_info.c, umm_malloc.c,
   *
+  * Added a #ifdef BUILD_UMM_MALLOC_C fence to prevent Arduino IDE from building
+  * the various .c files that are #included into umm_malloc.cpp. They are
+  * normally enabled by #define <feature name>  in umm_malloc_cfg.h. In this
+  * case it builds fine; however, if the define is global, the IDE will try and
+  * build the .c by itself.
   *
   * Notes,
   *
@@ -128,7 +133,45 @@
   *   may have been an accident during code cleanup.
   *
   */
+/* This block will be used for the PR description:
 
+This updates the heap management library, umm_malloc, to the current upstream
+version at https://github.com/rhempel/umm_malloc. Some reorganizing and new code
+was needed to use the new version.
+
+This is a list of note worthy changes:
+
+UMM_POISON - now has a lite option as well as the previous intensive check
+option. The code for running the full poison test at the call of the various
+alloc functions was removed in the upstream version. In this port the missing
+code was added to heap.cpp and umm_local.cpp.
+* UMM_POISON - appears to have been partially changed to UMM_POISON_CHECK,
+  I treat it as depricated and used UMM_POISON_CHECK, when needed. 
+  However, the Arduino Core's references to UMM_POISON were replaced with 
+  UMM_POISON_CHECK_LITE.
+* UMM_POISON_CHECK_LITE - Less intense, it just checks poison on active
+  neighboring allocations.
+* UMM_POISON_CHECK - Full heap intensive check of poison
+
+UMM_INFO_PRINT - This new define makes building UMM_INFO with printing
+capability, optional. When umm_info(NULL, true) is used to print a debug view of
+heap information to the debug port, it has to walk the heap and print out
+information, while in a critical section. This requires that the print function
+be able to print w/o doing malloc calls and from an IRQ disabled context. It
+also requires more IRAM to handle printing. Without this define
+`umm_info(NULL, true)` will not print.
+* UMM_INFO_PRINT is enabled as part of selecting `Debug port: "Serial" or
+* "Serial1"`. To make available all the time use '-D UMM_INFO_PRINT`.
+
+A cautionary note, on the use of UMM_INTEGRITY_CHECK, UMM_POISON_CHECK, and
+UMM_INFO_PRINT. All of these run with IRQs disabled, for periods that can go
+into 100's of us. With umm_info(NULL, true) that may go into seconds, depending
+on the serial interface speed and the number of memory allocations present. Use
+UMM_INTEGRITY_CHECK, UMM_POISON_CHECK, and UMM_INFO_PRINT sparingly.
+If you want to see numbers for the disabled time, explore using 
+UMM_CRITICAL_METRICS in umm_malloc_cfg.h.
+
+ */
 
 /*
  * Added for using with Arduino ESP8266 and handling renameing to umm_malloc.cpp

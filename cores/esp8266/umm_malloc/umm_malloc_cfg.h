@@ -10,6 +10,7 @@
 
 #include <debug.h>
 #include <pgmspace.h>
+#include "isr_safe_printf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -566,11 +567,10 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #define DEBUG_ESP_ISR
 #endif
 
-int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-// Note, _isr_safe_printf_P will not handle additional string arguments in
+// Note, ISR_PRINTF_P will not handle additional string arguments in
 // PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
-#define DBGLOG_FUNCTION(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
-#define DBGLOG_FUNCTION_P(fmt, ...) _isr_safe_printf_P(fmt, ##__VA_ARGS__)
+#define DBGLOG_FUNCTION(fmt, ...) ISR_PRINTF(fmt, ##__VA_ARGS__)
+#define DBGLOG_FUNCTION_P(fmt, ...) ISR_PRINTF_P(fmt, ##__VA_ARGS__)
 #else
 #define DBGLOG_FUNCTION(fmt, ...)   do { (void)fmt; } while(false)
 #define DBGLOG_FUNCTION_P(fmt, ...) do { (void)fmt; } while(false)
@@ -668,7 +668,7 @@ void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
 /*
   Problem, I would like to report the file and line number with the umm poison
   event as close as possible to the event. The #define method works for malloc,
-  calloc, and realloc those names are not as generic as free. A #define free
+  calloc, and realloc those names are not as generic as "free". A #define free
   captures too much. Classes with methods called free are included :(
   Inline functions would report the address of the inline function in the .h
   not where they are called.
