@@ -478,7 +478,9 @@ setTimeCallback(time_t (*cb)(void))
 
 The SD, SDFS, and LittleFS filesystems support a file timestamp, updated when the file is
 opened for writing.  By default, the ESP8266 will use the internal time returned from
-``time(NULL)``.  If your app sets the system time using NTP before file operations, then
+``time(NULL)`` (i.e. local time, not UTC, to conform to the existing FAT filesystem), but this
+can be overridden to GMT or any other standard you'd like by using ``setTimeCallback()``.
+If your app sets the system time using NTP before file operations, then
 you should not need to use this function.  However, if you need to set a specific time
 for a file, or the system clock isn't correct and you need to read the time from an external
 RTC or use a fixed time, this call allows you do to so.
