@@ -38,7 +38,7 @@ extern "C" {
     // Adapted from AVR-specific code at https://forum.arduino.cc/index.php?topic=194603.0
     #define PSTR(str) (__extension__({ \
         PGM_P ptr; \
-        asm volatile ( ".pushsection " PROGMEM_PSTR ", \"SM\", @progbits, 1 \n .align 4 \n 0: .string " __STRINGIZE(str) "\n .popsection \n" ); \
+        asm volatile ( ".pushsection " PROGMEM_PSTR ", \"aSM\", @progbits, 1 \n .align 4 \n 0: .string " __STRINGIZE(str) "\n .popsection \n" ); \
         asm volatile ( "movi %0, 0b" : "=r" (ptr) ); \
         ptr; }))
 #endif
