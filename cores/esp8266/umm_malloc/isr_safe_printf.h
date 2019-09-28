@@ -4,7 +4,10 @@
 #include <string.h>
 #include <pgmspace.h>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 /*
   ISR Safe to call for debugging. Not really safe to use all the time. The
   problem is going over 10us with interrupts disabled. It takes 86.8us to send
@@ -15,6 +18,9 @@ int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)
 // PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
 #define ISR_PRINTF(fmt, ...) _isr_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
 #define ISR_PRINTF_P(fmt, ...) _isr_safe_printf_P(fmt, ##__VA_ARGS__)
+
+#ifdef __cplusplus
 }
+#endif
 
 #endif
