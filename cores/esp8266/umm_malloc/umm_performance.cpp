@@ -39,25 +39,8 @@ bool ICACHE_FLASH_ATTR get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t s
   Objective:  To be able to print "last gasp" diagnostic messages
   when interrupts are disabled and w/o availability of heap resources.
 */
-
-// ROM _putc1, ignores CRs and sends CR/LF for LF, newline.
-// Always returns character sent.
-int constexpr (*_rom_putc1)(int) = (int (*)(int))0x40001dcc;
-void uart_buff_switch(uint8_t);
-
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
-#ifdef DEBUG_ESP_PORT
-#define VALUE(x) __STRINGIFY(x)
-  // Preprocessor and compiler together will optimize away the if.
-  if (strcmp("Serial1", VALUE(DEBUG_ESP_PORT)) == 0) {
-    uart_buff_switch(1U);
-  } else {
-    uart_buff_switch(0U);
-  }
-#else
-  uart_buff_switch(0U); // Side effect, clears RX FIFO
-#endif
   /*
     To use ets_strlen() and ets_memcpy() safely with PROGMEM, flash storage,
     the PROGMEM address must be word (4 bytes) aligned. The destination
@@ -71,7 +54,7 @@ int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
   ets_memcpy(ram_buf, fmt, buf_len);
   va_list argPtr;
   va_start(argPtr, fmt);
-  int result = ets_vprintf(_rom_putc1, ram_buf, argPtr);
+  int result = ets_vprintf(ets_uart_putc1, ram_buf, argPtr);
   va_end(argPtr);
   return result;
 }

@@ -60,6 +60,15 @@ void HardwareSerial::end()
     _uart = NULL;
 }
 
+void HardwareSerial::updateBaudRate(unsigned long baud)
+{
+    if(!_uart) {
+        return;
+    }
+
+    uart_set_baudrate(_uart, baud);    
+}
+
 size_t HardwareSerial::setRxBufferSize(size_t size){
     if(_uart) {
         _rx_size = uart_resize_rx_buffer(_uart, size);
@@ -123,9 +132,9 @@ unsigned long HardwareSerial::testBaudrate()
 
 unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
-    time_t startMillis = millis();
+    esp8266::polledTimeout::oneShotFastMs timeOut(timeoutMillis);
     unsigned long detectedBaudrate;
-    while ((time_t) millis() - startMillis < timeoutMillis) {
+    while (!timeOut) {
         if ((detectedBaudrate = testBaudrate())) {
           break;
         }
