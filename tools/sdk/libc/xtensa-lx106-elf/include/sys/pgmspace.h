@@ -23,6 +23,7 @@ extern "C" {
   // Ref: https://gcc.gnu.org/onlinedocs/gcc-3.2/gcc/Variable-Attributes.html
   // Place each progmem object into its own named section, avoiding conflicts
   #define PROGMEM __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
+  #define PROGMEM_PSTR "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\""
 #endif
 #ifndef PGM_P
   #define PGM_P              const char *
@@ -37,7 +38,7 @@ extern "C" {
     // Adapted from AVR-specific code at https://forum.arduino.cc/index.php?topic=194603.0
     #define PSTR(str) (__extension__({ \
         PGM_P ptr; \
-        asm volatile ( ".pushsection .irom0.pstr, \"SM\", @progbits, 1 \n .align 4 \n 0: .string " __STRINGIZE(str) "\n .popsection \n" ); \
+        asm volatile ( ".pushsection " PROGMEM_PSTR ", \"SM\", @progbits, 1 \n .align 4 \n 0: .string " __STRINGIZE(str) "\n .popsection \n" ); \
         asm volatile ( "movi %0, 0b" : "=r" (ptr) ); \
         ptr; }))
 #endif

@@ -182,7 +182,7 @@ SECTIONS
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
 
     /* Constant strings in flash (PSTRs) */
-    *(.irom0.pstr)
+    *(.irom0.pstr.*)
 
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)
