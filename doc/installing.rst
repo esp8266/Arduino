@@ -12,6 +12,7 @@ Prerequisites
 -  Arduino 1.6.8, get it from `Arduino
    website <https://www.arduino.cc/en/Main/OldSoftwareReleases#previous>`__.
 -  Internet connection
+-  Python 3 interpreter (Mac/Linux only, Windows installation supplies its own)
 
 Instructions
 ~~~~~~~~~~~~
@@ -186,9 +187,33 @@ Instructions - Other OS
        cd esp8266/tools
        python3 get.py
 
+   If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as
+   part of the default install).  To install you will need to use ``sudo yum install python3``, ``sudo apt install python3``, or ``brew install python3``
+   as appropriate.  On the Mac you may get an error message like:
+
+   .. code:: bash
+
+       python3 get.py
+       Platform: x86_64-apple-darwin
+       Downloading python3-macosx-placeholder.tar.gz
+       Traceback (most recent call last):
+         File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/urllib/request.py", line 1317, in do_open
+           encode_chunked=req.has_header('Transfer-encoding'))
+         ...
+         File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/ssl.py", line 1117, in do_handshake
+           self._sslobj.do_handshake()
+       ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1056)
+
+    This is because Homebrew on the Mac does not always install the required SSL certificates by default.  Install them manually (adjust the Python 3.7 as needed) with:
+
+    .. code:: bash
+
+        cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command"
+
+
 -  Restart Arduino
 
-- When later updating your local library, goto the esp8266 directory and do a git pull
+-  When later updating your local library, goto the esp8266 directory and do a git pull
 
    .. code:: bash
 
