@@ -24,10 +24,13 @@
 .global gdbstub_exceptionStack
 #endif
 
-	.text
+	ASATTR_GDBFN
 .literal_position
 
-	.text
+	ASATTR_GDBINIT
+.literal_position
+
+	ASATTR_GDBFN
 	.align	4
 
 /*
@@ -51,6 +54,7 @@ This is the debugging exception routine; it's called by the debugging vector
 We arrive here with all regs intact except for a2. The old contents of A2 are saved
 into the DEBUG_EXCSAVE special function register. EPC is the original PC.
 */
+	.type gdbstub_debug_exception_entry, @function
 gdbstub_debug_exception_entry:
 /*
 	//Minimum no-op debug exception handler, for debug
@@ -64,32 +68,32 @@ gdbstub_debug_exception_entry:
 //Save all regs to structure
 	movi	a2, gdbstub_savedRegs
 	s32i	a0, a2, 0x10
-	s32i	a1, a2, 0x58
+	s32i	a1, a2, 0x14
 	rsr		a0, DEBUG_PS
 	s32i	a0, a2, 0x04
 	rsr		a0, DEBUG_EXCSAVE //was R2
-	s32i	a0, a2, 0x14
-	s32i	a3, a2, 0x18
-	s32i	a4, a2, 0x1c
-	s32i	a5, a2, 0x20
-	s32i	a6, a2, 0x24
-	s32i	a7, a2, 0x28
-	s32i	a8, a2, 0x2c
-	s32i	a9, a2, 0x30
-	s32i	a10, a2, 0x34
-	s32i	a11, a2, 0x38
-	s32i	a12, a2, 0x3c
-	s32i	a13, a2, 0x40
-	s32i	a14, a2, 0x44
-	s32i	a15, a2, 0x48
+	s32i	a0, a2, 0x18
+	s32i	a3, a2, 0x1c
+	s32i	a4, a2, 0x20
+	s32i	a5, a2, 0x24
+	s32i	a6, a2, 0x28
+	s32i	a7, a2, 0x2c
+	s32i	a8, a2, 0x30
+	s32i	a9, a2, 0x34
+	s32i	a10, a2, 0x38
+	s32i	a11, a2, 0x3c
+	s32i	a12, a2, 0x40
+	s32i	a13, a2, 0x44
+	s32i	a14, a2, 0x48
+	s32i	a15, a2, 0x4c
 	rsr		a0, SAR
 	s32i	a0, a2, 0x08
 	rsr		a0, LITBASE
-	s32i	a0, a2, 0x4C
-	rsr		a0, 176
 	s32i	a0, a2, 0x50
-	rsr		a0, 208
+	rsr		a0, 176
 	s32i	a0, a2, 0x54
+	rsr		a0, 208
+	s32i	a0, a2, 0x58
 	rsr		a0, DEBUGCAUSE
 	s32i	a0, a2, 0x5C
 	rsr		a4, DEBUG_PC
@@ -127,33 +131,33 @@ DebugExceptionExit:
 	movi	a2, gdbstub_savedRegs
 	l32i	a0, a2, 0x00
 	wsr		a0, DEBUG_PC
-//	l32i	a0, a2, 0x54
+//	l32i	a0, a2, 0x58
 //	wsr		a0, 208
-	l32i	a0, a2, 0x50
+	l32i	a0, a2, 0x54
 	//wsr		a0, 176		//Some versions of gcc do not understand this...
 	.byte  0x00, 176, 0x13	//so we hand-assemble the instruction.
-	l32i	a0, a2, 0x4C
+	l32i	a0, a2, 0x50
 	wsr		a0, LITBASE
 	l32i	a0, a2, 0x08
 	wsr		a0, SAR
-	l32i	a15, a2, 0x48
-	l32i	a14, a2, 0x44
-	l32i	a13, a2, 0x40
-	l32i	a12, a2, 0x3c
-	l32i	a11, a2, 0x38
-	l32i	a10, a2, 0x34
-	l32i	a9, a2, 0x30
-	l32i	a8, a2, 0x2c
-	l32i	a7, a2, 0x28
-	l32i	a6, a2, 0x24
-	l32i	a5, a2, 0x20
-	l32i	a4, a2, 0x1c
-	l32i	a3, a2, 0x18
-	l32i	a0, a2, 0x14
+	l32i	a15, a2, 0x4c
+	l32i	a14, a2, 0x48
+	l32i	a13, a2, 0x44
+	l32i	a12, a2, 0x40
+	l32i	a11, a2, 0x3c
+	l32i	a10, a2, 0x38
+	l32i	a9, a2, 0x34
+	l32i	a8, a2, 0x30
+	l32i	a7, a2, 0x2c
+	l32i	a6, a2, 0x28
+	l32i	a5, a2, 0x24
+	l32i	a4, a2, 0x20
+	l32i	a3, a2, 0x1c
+	l32i	a0, a2, 0x18
 	wsr		a0, DEBUG_EXCSAVE //was R2
 	l32i	a0, a2, 0x04
 	wsr		a0, DEBUG_PS
-	l32i	a1, a2, 0x58
+	l32i	a1, a2, 0x14
 	l32i	a0, a2, 0x10
 
 	//Read back vector-saved a2 value, put back address of this routine.
@@ -162,8 +166,10 @@ DebugExceptionExit:
 
 	//All done. Return to where we came from.
 	rfi	XCHAL_DEBUGLEVEL
+	.size gdbstub_debug_exception_entry, .-gdbstub_debug_exception_entry
 
 
+#if GDBSTUB_BREAK_ON_EXCEPTION
 
 #if GDBSTUB_FREERTOS
 /*
@@ -184,32 +190,34 @@ the user exception handler vector:
 */
 	.global gdbstub_handle_user_exception
 	.global gdbstub_user_exception_entry
+	.type gdbstub_user_exception_entry, @function
+	ASATTR_GDBFN
 	.align	4
 gdbstub_user_exception_entry:
 //Save all regs to structure
 	movi	a0, gdbstub_savedRegs
-	s32i	a1, a0, 0x14 //was a2
-	s32i	a3, a0, 0x18
-	s32i	a4, a0, 0x1c
-	s32i	a5, a0, 0x20
-	s32i	a6, a0, 0x24
-	s32i	a7, a0, 0x28
-	s32i	a8, a0, 0x2c
-	s32i	a9, a0, 0x30
-	s32i	a10, a0, 0x34
-	s32i	a11, a0, 0x38
-	s32i	a12, a0, 0x3c
-	s32i	a13, a0, 0x40
-	s32i	a14, a0, 0x44
-	s32i	a15, a0, 0x48
+	s32i	a1, a0, 0x18 //was a2
+	s32i	a3, a0, 0x1c
+	s32i	a4, a0, 0x20
+	s32i	a5, a0, 0x24
+	s32i	a6, a0, 0x28
+	s32i	a7, a0, 0x2c
+	s32i	a8, a0, 0x30
+	s32i	a9, a0, 0x34
+	s32i	a10, a0, 0x38
+	s32i	a11, a0, 0x3c
+	s32i	a12, a0, 0x40
+	s32i	a13, a0, 0x44
+	s32i	a14, a0, 0x48
+	s32i	a15, a0, 0x4c
 	rsr		a2, SAR
 	s32i	a2, a0, 0x08
 	rsr		a2, LITBASE
-	s32i	a2, a0, 0x4C
-	rsr		a2, 176
 	s32i	a2, a0, 0x50
-	rsr		a2, 208
+	rsr		a2, 176
 	s32i	a2, a0, 0x54
+	rsr		a2, 208
+	s32i	a2, a0, 0x58
 	rsr		a2, EXCCAUSE
 	s32i	a2, a0, 0x5C
 
@@ -243,10 +251,13 @@ is still something we need to implement later, if there's any demand for it, or 
 FreeRTOS to allow this in the future. (Which will then kill backwards compatibility... hmmm.)
 */
 	j UserExceptionExit
+	.size gdbstub_user_exception_entry, .-gdbstub_user_exception_entry
 
 
 	.global gdbstub_handle_uart_int
 	.global gdbstub_uart_entry
+	.type gdbstub_uart_entry, @function
+	ASATTR_GDBFN
 	.align	4
 gdbstub_uart_entry:
 	//On entry, the stack frame is at SP+16.
@@ -255,29 +266,37 @@ gdbstub_uart_entry:
 	add		a2, a2, a1
 	movi	a3, gdbstub_handle_uart_int
 	jx		a3
+	.size gdbstub_uart_entry, .-gdbstub_uart_entry
+
+#endif
 
 #endif
 
 
 
 	.global gdbstub_save_extra_sfrs_for_exception
+	.type gdbstub_save_extra_sfrs_for_exception, @function
+	ASATTR_GDBFN
 	.align 4
 //The Xtensa OS HAL does not save all the special function register things. This bit of assembly
 //fills the gdbstub_savedRegs struct with them.
 gdbstub_save_extra_sfrs_for_exception:
 	movi	a2, gdbstub_savedRegs
 	rsr		a3, LITBASE
-	s32i	a3, a2, 0x4C
-	rsr		a3, 176
 	s32i	a3, a2, 0x50
-	rsr		a3, 208
+	rsr		a3, 176
 	s32i	a3, a2, 0x54
+	rsr		a3, 208
+	s32i	a3, a2, 0x58
 	rsr		a3, EXCCAUSE
 	s32i	a3, a2, 0x5C
 	ret
+	.size gdbstub_save_extra_sfrs_for_exception, .-gdbstub_save_extra_sfrs_for_exception
 
 	.global gdbstub_init_debug_entry
 	.global _DebugExceptionVector
+	.type gdbstub_init_debug_entry, @function
+	ASATTR_GDBINIT
 	.align	4
 gdbstub_init_debug_entry:
 //This puts the following 2 instructions into the debug exception vector:
@@ -294,10 +313,13 @@ gdbstub_init_debug_entry:
 	wsr		a2, DEBUG_EXCSAVE
 
 	ret
+	.size gdbstub_init_debug_entry, .-gdbstub_init_debug_entry
 
 
 //Set up ICOUNT register to step one single instruction
 	.global gdbstub_icount_ena_single_step
+	.type gdbstub_icount_ena_single_step, @function
+	ASATTR_GDBFN
 	.align 4
 gdbstub_icount_ena_single_step:
 	movi	a3, XCHAL_DEBUGLEVEL //Only count steps in non-debug mode
@@ -306,6 +328,7 @@ gdbstub_icount_ena_single_step:
 	wsr		a2, ICOUNT
 	isync
 	ret
+	.size gdbstub_icount_ena_single_step, .-gdbstub_icount_ena_single_step
 
 
 //These routines all assume only one breakpoint and watchpoint is available, which
@@ -313,6 +336,8 @@ gdbstub_icount_ena_single_step:
 
 
 	.global gdbstub_set_hw_breakpoint
+	.type gdbstub_set_hw_breakpoint, @function
+	ASATTR_GDBFN
 gdbstub_set_hw_breakpoint:
 	//a2 - addr, a3 - len (unused here)
 	rsr		a4, IBREAKENABLE
@@ -323,8 +348,11 @@ gdbstub_set_hw_breakpoint:
 	isync
 	movi 	a2, 1
 	ret
+	.size gdbstub_set_hw_breakpoint, .-gdbstub_set_hw_breakpoint
 
 	.global gdbstub_del_hw_breakpoint
+	.type gdbstub_del_hw_breakpoint, @function
+	ASATTR_GDBFN
 gdbstub_del_hw_breakpoint:
 	//a2 - addr
 	rsr		a5, IBREAKENABLE
@@ -336,8 +364,11 @@ gdbstub_del_hw_breakpoint:
 	isync
 	movi	a2, 1
 	ret
+	.size gdbstub_del_hw_breakpoint, .-gdbstub_del_hw_breakpoint
 
 	.global gdbstub_set_hw_watchpoint
+	.type gdbstub_set_hw_watchpoint, @function
+	ASATTR_GDBFN
 	//a2 - addr, a3 - mask, a4 - type (1=read, 2=write, 3=access)
 gdbstub_set_hw_watchpoint:
 	//Check if any of the masked address bits are set. If so, that is an error.
@@ -362,9 +393,12 @@ gdbstub_set_hw_watchpoint:
 	mov		a2, a3
 	isync
 	ret
+	.size gdbstub_set_hw_watchpoint, .-gdbstub_set_hw_watchpoint
 
 
 	.global gdbstub_del_hw_watchpoint
+	.type gdbstub_del_hw_watchpoint, @function
+	ASATTR_GDBFN
 	//a2 - addr
 gdbstub_del_hw_watchpoint:
 	//See if the address matches
@@ -384,11 +418,14 @@ gdbstub_del_hw_watchpoint:
 return_w_error:
 	movi	a2, 0
 	ret
+	.size gdbstub_del_hw_watchpoint, .-gdbstub_del_hw_watchpoint
 
 
 //Breakpoint, with an attempt at a functional function prologue and epilogue...
 	.global gdbstub_do_break_breakpoint_addr
 	.global gdbstub_do_break
+	.type gdbstub_do_break, @function
+	ASATTR_GDBFN
 	.align	4
 gdbstub_do_break:
 	addi	a1, a1, -16
@@ -402,3 +439,4 @@ gdbstub_do_break_breakpoint_addr:
 	l32i	a15, a1, 12
 	addi	a1, a1, 16
 	ret
+	.size gdbstub_do_break, .-gdbstub_do_break

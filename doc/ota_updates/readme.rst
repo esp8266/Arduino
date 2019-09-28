@@ -5,7 +5,7 @@ OTA Updates
 Introduction
 ------------
 
-OTA (Over the Air) update is the process of loading the firmware to ESP module using Wi-Fi connection rather than a serial port. Such functionality became extremely useful in case of limited or no physical access to the module.
+OTA (Over the Air) update is the process of uploading firmware to an ESP module using a Wi-Fi connection rather than a serial port. Such functionality becomes extremely useful in case of limited or no physical access to the module.
 
 OTA may be done using:
 
@@ -13,18 +13,23 @@ OTA may be done using:
 -  `Web Browser <#web-browser>`__
 -  `HTTP Server <#http-server>`__
 
-Arduino IDE option is intended primarily for software development phase. The two other options would be more useful after deployment, to provide module with application updates manually with a web browser, or automatically using a http server.
+The Arduino IDE option is intended primarily for the software development phase. The other two options would be more useful after deployment, to provide the module with application updates either manually with a web browser, or automatically using an HTTP server.
 
-In any case, the first firmware upload has to be done over a serial port. If the OTA routines are correctly implemented in a sketch, then all subsequent uploads may be done over the air.
+In any case, the first firmware upload has to be done over a serial port. If the OTA routines are correctly implemented in the sketch, then all subsequent uploads may be done over the air.
 
-There is no imposed security on OTA process from being hacked. It is up to developer to ensure that updates are allowed only from legitimate / trusted sources. Once the update is complete, the module restarts, and the new code is executed. The developer should ensure that the application running on the module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA process.
+By default, there is no imposed security for the OTA process.  It is up to the developer to ensure that updates are allowed only from legitimate / trusted sources. Once the update is complete, the module restarts, and the new code is executed. The developer should ensure that the application running on the module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA updates.
 
-Security
-~~~~~~~~
+Security Disclaimer
+~~~~~~~~~~~~~~~~~~~
 
-Module has to be exposed wirelessly to get it updated with a new sketch. That poses chances of module being violently hacked and loaded with some other code. To reduce likelihood of being hacked consider protecting your uploads with a password, selecting certain OTA port, etc.
+No guarantees as to the level of security provided for your application by the following methods is implied.  Please refer to the GNU LGPL license associated for this project for full disclaimers.  If you do find security weaknesses, please don't hesitate to contact the maintainers or supply pull requests with fixes.  The MD5 verification and password protection schemes are already known to supply a very weak level of security.
 
-Check functionality provided with `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ library that may improve security:
+Basic Security
+~~~~~~~~~~~~~~
+
+The module has to be exposed wirelessly to get it updated with a new sketch. That poses a risk of the module being violently hacked and programmed with some other code. To reduce the likelihood of being hacked, consider protecting your uploads with a password, selecting certain OTA port, etc.
+
+Check functionality provided with the `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ library that may improve security:
 
 .. code:: cpp
 
@@ -32,18 +37,114 @@ Check functionality provided with `ArduinoOTA <https://github.com/esp8266/Arduin
     void setHostname(const char* hostname);
     void setPassword(const char* password);
 
-Certain protection functionality is already built in and do not require any additional coding by developer. `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ and espota.py use `Digest-MD5 <https://en.wikipedia.org/wiki/Digest_access_authentication>`__ to authenticate upload. Integrity of transferred data is verified on ESP side using `MD5 <https://en.wikipedia.org/wiki/MD5>`__ checksum.
+Certain basic protection is already built in and does not require any additional coding by the developer. `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ and espota.py use `Digest-MD5 <https://en.wikipedia.org/wiki/Digest_access_authentication>`__ to authenticate uploads. Integrity of transferred data is verified on the ESP side using `MD5 <https://en.wikipedia.org/wiki/MD5>`__ checksum.
 
-Make your own risk analysis and depending on application decide what library functions to implement. If required, consider implementation of other means of protection from being hacked, e.g. exposing module for uploads only according to specific schedule, trigger OTA only be user pressing dedicated “Update” button wired to ESP, etc.
+Make your own risk analysis and, depending on the application, decide what library functions to implement. If required, consider implementation of other means of protection from being hacked, like exposing modules for uploads only according to a specific schedule, triggering OTA only when the user presses a dedicated “Update” button wired to the ESP, etc.
+
+Advanced Security - Signed Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  This uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level encryption to guarantee that only the holder of a cryptographic private key can generate code accepted by the OTA update mechanisms.
+
+Signed updates are updates whose compiled binaries are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone except the holder of the developer's private key, the hash will not match and the ESP8266 will reject the upload.
+
+Cryptographic signing only protects against tampering with binaries delivered via OTA.  If someone has physical access, they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not protect code inside the device: if a user has physical access they can read out your program.
+
+**Securing your private key is paramount.  The same private/public keypair that was used with the original upload must also be used to sign later binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
+
+Signed Binary Format
+^^^^^^^^^^^^^^^^^^^^
+
+The format of a signed binary is compatible with the standard binary format, and can be uploaded to a non-signed ESP8266 via serial or OTA without any conditions.  Note, however, that once an unsigned OTA app is overwritten by this signed version, further updates will require signing.
+
+As shown below, the signed hash is appended to the unsigned binary, followed by the total length of the signed hash (i.e., if the signed hash was 64 bytes, then this uint32 data segment will contain 64).  This format allows for extensibility (such as adding a CA-based validation scheme allowing multiple signing keys all based on a trust anchor). Pull requests are always welcome.
+
+.. code:: bash
+
+    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
+
+Signed Binary Prerequisites
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+OpenSSL is required to run the standard signing steps, and should be available on any UNIX-like or Windows system.  As usual, the latest stable version of OpenSSL is recommended.
+
+Signing requires the generation of an RSA-2048 key (other bit lengths are supported as well, but 2048 is a good selection today) using any appropriate tool.  The following shell commands will generate a new public/private keypair.  Run them in the sketch directory:
+
+.. code:: bash
+
+    openssl genrsa -out private.key 2048
+    openssl rsa -in private.key -outform PEM -pubout -out public.key
+
+Automatic Signing -- Only available on Linux and Mac
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest way of implementing signing is to use the automatic mode, which presently is only possible on Linux and Mac due to some of the tools not being available for Windows.  This mode uses the IDE to configure the source code to enable sigining verification with a given public key, and signs binaries as part of the standard build process using a given public key.
+
+To enable this mode, just include `private.key` and `public.key` in the sketch `.ino` directory.  The IDE will call a helper script (`tools/signing.py`) before the build begins to create a header to enable key validation using the given public key, and to actually do the signing after the build process, generating a `sketch.bin.signed` file.  When OTA is enabled (ArduinoOTA, Web, or HTTP), the binary will automatically only accept signed updates.
+
+When the signing process starts, the message:
+
+.. code:: bash
+
+    Enabling binary signing
+
+will appear in the IDE window before a compile is launched. At the completion of the build, the signed binary file well be displayed in the IDE build window as:
+
+.. code:: bash
+
+    Signed binary: /full/path/to/sketch.bin.signed
+
+If you receive either of the following messages in the IDE window, the signing was not completed and you will need to verify the `public.key` and `private.key`:
+
+.. code:: bash
+
+    Not enabling binary signing
+    ... or ...
+    Not signing the generated binary
+
+Manual Signing of Binaries
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Users may also manually sign executables and require the OTA process to verify their signature.  In the main code, before enabling any update methods, add the following declarations and function call:
+
+.. code:: cpp
+
+    <in globals>
+    BearSSL::PublicKey signPubKey( ... key contents ... );
+    BearSSL::HashSHA256 hash;
+    BearSSL::SigningVerifier sign( &signPubKey );
+    ...
+    <in setup()>
+    Update.installSignature( &hash, &sign );
+
+The above snippet creates a BearSSL public key and a SHA256 hash verifier, and tells the Update object to use them to validate any updates it receives from any method.
+
+Compile the sketch normally and, once a `.bin` file is available, sign it using the signer script:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
+
+Old And New Signature Formats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Up to version 2.5.2 of the core, the format of signatures was a little different. An additional signed binary with the extension legacy_sig is created. This file contains a signature in the old format and can be uploaded OTA to a device that checks for the old signature format.
+
+To create a legacy signature, call the signing script with --legacy:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
 
 Safety
 ~~~~~~
 
-OTA process takes ESP’s resources and bandwidth during upload. Then module is restarted and a new sketch executed. Analyse and test how it affects functionality of existing and new sketch.
+The OTA process consumes some of the ESP’s resources and bandwidth during upload. Then, the module is restarted and a new sketch executed. Analyse and test how this affects the functionality of the existing and new sketches.
 
-If ESP is placed in remote location and controlling some equipment, you should put additional attention what happens if operation of this equipment is suddenly interrupted by update process. Therefore, decide how to put this equipment into safe state before starting the update. For instance, your module may be controlling a garden watering system in a sequence. If this sequence is not properly shut down and a water valve left open, your garden may be flooded.
+If the ESP is in a remote location and controlling some equipment, you should devote additional attention to what happens if operation of this equipment is suddenly interrupted by the update process. Therefore, decide how to put this equipment into a safe state before starting the update. For instance, your module may be controlling a garden watering system in a sequence. If this sequence is not properly shut down and a water valve is left open, the garden may be flooded.
 
-The following functions are provided with `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ library and intended to handle functionality of your application during specific stages of OTA, or on an OTA error:
+The following functions are provided with the `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ library and intended to handle functionality of your application during specific stages of OTA, or on an OTA error:
 
 .. code:: cpp
 
@@ -52,27 +153,33 @@ The following functions are provided with `ArduinoOTA <https://github.com/esp826
     void onProgress(OTA_CALLBACK_PROGRESS(fn));
     void onError(OTA_CALLBACK_ERROR (fn));
 
-Basic Requirements
-~~~~~~~~~~~~~~~~~~
+OTA Basic Requirements
+~~~~~~~~~~~~~~~~~~~~~~
 
-Flash chip size should be able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
+The flash chip size should be large enough to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
 
-Keep in mind that the File system and EEPROM for example needs space too (one time) see `flash layout <../filesystem.rst#flash-layout>`__.
+Keep in mind that the file system and EEPROM, for example, need space too; see `Flash layout <../filesystem.rst#flash-layout>`__.
 
 .. code:: cpp
 
     ESP.getFreeSketchSpace();
 
-can be used for checking the free space for the new sketch.
+can be used for checking the free space available for the new sketch.
 
-For overview of memory layout, where new sketch is stored and how it is copied during OTA process, see `Update process - memory view <#update-process---memory-view>`__.
+For an overview of memory layout, where the new sketch is stored and how it is copied during the OTA process, see `Update process - memory view <#update-process-memory-view>`__.
 
-The following chapters provide more details and specific methods of doing OTA.
+The following chapters provide more details and specific methods for OTA updates.
 
 Arduino IDE
 -----------
 
-Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios: - during firmware development as a quicker alternative to loading over a serial, - for updating small quantity of modules, - only if modules are available on the same network as the computer with Arduino IDE.
+Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios: 
+
+-  during firmware development as a quicker alternative to loading over a serial port, 
+
+-  for updating a small number of modules, 
+
+-  only if modules are accessible on the same network as the computer with the Arduino IDE.
 
 Requirements
 ~~~~~~~~~~~~
@@ -82,9 +189,9 @@ Requirements
 Application Example
 ~~~~~~~~~~~~~~~~~~~
 
-Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) board. You can use any other board assuming that it meets `requirements <#basic-requirements>`__ described above. This instruction is valid for all operating systems supported by Arduino IDE. Screen captures have been made on Windows 7 and you may see small differences (like name of serial port), if you are using Linux and MacOS.
+Instructions below show configuration of OTA on a NodeMCU 1.0 (ESP-12E Module) board. You can use any other board that meets the `requirements <#basic-requirements>`__ described above. This instruction is valid for all operating systems supported by the Arduino IDE. Screen captures have been made on Windows 7 and you may see small differences (like name of the serial port), if you are using Linux or MacOS.
 
-1. Before you begin, please make sure that you have the following s/w
+1. Before you begin, please make sure that you have the following software
    installed:
 
    -  Arduino IDE 1.6.7 or newer -
@@ -92,7 +199,7 @@ Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) boa
    -  esp8266/Arduino platform package 2.0.0 or newer - for instructions
       follow
       https://github.com/esp8266/Arduino#installing-with-boards-manager
-   -  Python 2.7 - https://www.python.org/
+   -  Python 3.x - https://www.python.org/
 
       **Note:** Windows users should select “Add python.exe to Path”
       (see below – this option is not selected by default).
@@ -100,13 +207,12 @@ Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) boa
       .. figure:: a-ota-python-configuration.png
          :alt: Python installation set up
 
-2. Now prepare the sketch and configuration for the upload over a serial
-   port.
+2. Now prepare the sketch and configuration for upload via a serial port.
 
-   -  Start Arduino IDE and load sketch BasicOTA.ino available under
+   -  Start Arduino IDE and upload the sketch BasicOTA.ino, available under
       File > Examples > ArduinoOTA |ota sketch selection|
 
-   -  Update SSID and password in the sketch, so the module can join
+   -  Update the SSID and password in the sketch, so that the module can join
       your Wi-Fi network |ota ssid pass entry|
 
    -  Configure upload parameters as below (you may need to adjust
@@ -124,20 +230,20 @@ Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) boa
    .. figure:: a-ota-upload-complete-and-joined-wifi.png
       :alt: Check if module joined network
 
-**Note:** ESP module should be reset after serial upload. Otherwise subsequent steps will not work. Reset may be done automatically for you after opening serial monitor as visible on the screenshot above. It depends on how you have DTR and RTS wired from USB-Serial converter to the ESP. If reset is not done automatically, then do it by pressing reset button or manually cycling the power. For more details why this should be done please refer to `FAQ <../faq#i-have-observed-a-case-when-esprestart-doesnt-work-what-is-the-reason-for-that>`__ regarding ``ESP.restart()``.
+**Note:** The ESP module should be reset after serial upload. Otherwise, subsequent steps will not work. Reset may be done for you automatically after opening serial monitor, as visible on the screenshot above. It depends on how you have DTR and RTS wired from the USB-Serial converter to the ESP. If reset is not done automatically, then trigger it by pressing reset button or manually cycling the power. For more details why this should be done please refer to `FAQ <../faq#i-have-observed-a-case-when-esprestart-doesnt-work-what-is-the-reason-for-that>`__ regarding ``ESP.restart()``.
 
-4. Only if module is connected to network, after a couple of seconds,
+4. Only if the module is connected to network, after a couple of seconds,
    the esp8266-ota port will show up in Arduino IDE. Select port with IP
    address shown in the Serial Monitor window in previous step:
 
    .. figure:: a-ota-ota-port-selection.png
       :alt: Selection of OTA port
 
-   **Note:** If OTA port does not show up, exit Arduino IDE, open it
-   again and check if port is there. If it does not help, check your
-   firewall and router settings. OTA port is advertised using mDNS
-   service. To check if port is visible by your PC, you can use
-   application like Bonjour Browser.
+   **Note:** If the OTA port does not show up, exit Arduino IDE, open it
+   again and check if the port is there. If it is not, check your
+   firewall and router settings. The OTA port is advertised using mDNS
+   service. To check if the port is visible by your PC, you can use
+   an application like Bonjour Browser.
 
 5. Now get ready for your first OTA upload by selecting the OTA port:
 
@@ -202,9 +308,9 @@ If OTA update fails, first step is to check for error messages that may be shown
 
 This window is for Arduino Yún and not yet implemented for esp8266/Arduino. It shows up because IDE is attempting to open Serial Monitor using network port you have selected for OTA upload.
 
-Instead you need an external serial monitor. If you are a Windows user check out `Termite <http://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
+Instead you need an external serial monitor. If you are a Windows user check out `Termite <https://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
 
-Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <http://www.compuphase.com/software_termite.htm>`__ below:
+Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <https://www.compuphase.com/software_termite.htm>`__ below:
 
 .. figure:: termite-configuration.png
    :alt: Termite settings
@@ -224,9 +330,14 @@ Instead of the log as on the above screen you may see the following:
 
 If this is the case, then most likely ESP module has not been reset after initial upload using serial port.
 
-The most common causes of OTA failure are as follows: \* not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA), \* too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process---memory-view>`__, \* too little memory declared in Arduino IDE for your selected board (i.e. less than physical size), \* not resetting the ESP module after initial upload using serial port.
+The most common causes of OTA failure are as follows:
 
-For more details regarding flash memory layout please check `File system <../filesystem.rst>`__. For overview where new sketch is stored, how it is copied and how memory is organized for the purpose of OTA see `Update process - memory view <#update-process---memory-view>`__.
+- not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA).
+- too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process-memory-view>`__.
+- too little memory declared in Arduino IDE for your selected board (i.e. less than physical size).
+- not resetting the ESP module after initial upload using serial port.
+
+For more details regarding flash memory layout please check `File system <../filesystem.rst>`__. For overview where new sketch is stored, how it is copied and how memory is organized for the purpose of OTA see `Update process - memory view <#update-process-memory-view>`__.
 
 Web Browser
 -----------
@@ -286,8 +397,8 @@ You can use another module if it meets previously described `requirements <#basi
       https://github.com/esp8266/Arduino#installing-with-boards-manager
    -  Host software depending on O/S you use:
 
-      1. Avahi http://avahi.org/ for Linux
-      2. Bonjour http://www.apple.com/support/bonjour/ for Windows
+      1. Avahi https://avahi.org/ for Linux
+      2. Bonjour https://www.apple.com/support/bonjour/ for Windows
       3. Mac OSX and iOS - support is already built in / no any extra
          s/w is required
 
@@ -357,7 +468,7 @@ You can use another module if it meets previously described `requirements <#basi
       :alt: Serial Monitor - after OTA update
 
    Just after reboot you should see exactly the same message
-   ``HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser``
+   ``HTTPUpdateServer ready! Open http://esp8266-webupdate.local/update in your browser``
    like in step 3. This is because module has been loaded again with the
    same code – first using serial port, and then using OTA.
 
@@ -392,9 +503,9 @@ Simple updater downloads the file every time the function is called.
 Advanced updater
 ^^^^^^^^^^^^^^^^
 
-Its possible to point update function to a script at the server. If version string argument is given, it will be sent to the server. Server side script can use this to check if update should be performed.
+Its possible to point the update function to a script on the server. If a version string argument is given, it will be sent to the server. The server side script can use this string to check whether an update should be performed.
 
-Server side script can respond as follows: - response code 200, and send the firmware image, - or response code 304 to notify ESP that no update is required.
+The server-side script can respond as follows: - response code 200, and send the firmware image, - or response code 304 to notify ESP that no update is required.
 
 .. code:: cpp
 
@@ -407,7 +518,7 @@ Server side script can respond as follows: - response code 200, and send the fir
             Serial.println("[update] Update no Update.");
             break;
         case HTTP_UPDATE_OK:
-            Serial.println("[update] Update ok."); // may not called we reboot the ESP
+            Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
             break;
     }
 
@@ -422,7 +533,7 @@ For the simple updater the server only needs to deliver the binary file for upda
 Advanced updater
 ^^^^^^^^^^^^^^^^
 
-For advanced update management a script needs to run at the server side, for example a PHP script. At every update request the ESP sends some information in HTTP headers to the server.
+For advanced update management a script (such as a PHP script) needs to run on the server side. On every update request, the ESP sends some information in HTTP headers to the server.
 
 Example header data:
 
@@ -438,9 +549,7 @@ Example header data:
         [HTTP_X_ESP8266_SDK_VERSION] => 1.3.0
         [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
 
-With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address for example.
-
-Script example:
+With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address, as in the following example:
 
 .. code:: php
 
@@ -513,21 +622,27 @@ Script example:
 Stream Interface
 ----------------
 
-TODO describe Stream Interface
+The Stream Interface is the base for all other update modes like OTA, HTTP Server / client. Given a Stream-class variable `streamVar` providing `byteCount` bytes of firmware, it can store the firmware as follows:
 
-The Stream Interface is the base for all other update modes like OTA, http Server / client.
+.. code:: cpp
+
+    Update.begin(firmwareLengthInBytes);
+    Update.writeStream(streamVar);
+    Update.end();
 
 Updater class
 -------------
 
-Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.
+Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader (eboot) to load the new firmware on the next boot.
+
+**Note:** The bootloader command will be stored into the first 128 bytes of user RTC memory, then it will be retrieved by eboot on boot. That means that user data present there will be lost `(per discussion in #5330) <https://github.com/esp8266/Arduino/pull/5330#issuecomment-437803456>`__.
 
 Update process - memory view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  The new sketch will be stored in the space between the old sketch and
    the spiff.
--  on the next reboot the "eboot" bootloader check for commands.
+-  on the next reboot, the "eboot" bootloader checks for commands.
 -  the new sketch is now copied "over" the old one.
 -  the new sketch is started.
 

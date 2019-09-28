@@ -1,5 +1,4 @@
 #include <BSTest.h>
-#include <test_config.h>
 
 BS_ENV_DECLARE();
 
@@ -7,6 +6,11 @@ void setup()
 {
     Serial.begin(115200);
     BS_RUN(Serial);
+}
+
+bool pretest()
+{
+    return true;
 }
 
 

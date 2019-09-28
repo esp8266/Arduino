@@ -1,37 +1,18 @@
 #ifndef REQUESTHANDLERSIMPL_H
 #define REQUESTHANDLERSIMPL_H
 
+#include <ESP8266WebServer.h>
 #include "RequestHandler.h"
+#include "mimetable.h"
+#include "WString.h"
 
-// Table of extension->MIME strings stored in PROGMEM, needs to be global due to GCC section typing rules
-static const struct {const char endsWith[16]; const char mimeType[32];} mimeTable[] ICACHE_RODATA_ATTR = {
-    { ".html", "text/html" },
-    { ".htm", "text/html" },
-    { ".css", "text/css" },
-    { ".txt", "text/plain" },
-    { ".js", "application/javascript" },
-    { ".json", "application/json" },
-    { ".png", "image/png" },
-    { ".gif", "image/gif" },
-    { ".jpg", "image/jpeg" },
-    { ".ico", "image/x-icon" },
-    { ".svg", "image/svg+xml" },
-    { ".ttf", "application/x-font-ttf" },
-    { ".otf", "application/x-font-opentype" },
-    { ".woff", "application/font-woff" },
-    { ".woff2", "application/font-woff2" },
-    { ".eot", "application/vnd.ms-fontobject" },
-    { ".sfnt", "application/font-sfnt" },
-    { ".xml", "text/xml" },
-    { ".pdf", "application/pdf" },
-    { ".zip", "application/zip" },
-    { ".gz", "application/x-gzip" },
-    { ".appcache", "text/cache-manifest" },
-    { "", "application/octet-stream" } };
+using namespace mime;
 
-class FunctionRequestHandler : public RequestHandler {
+template<typename ServerType>
+class FunctionRequestHandler : public RequestHandler<ServerType> {
+    using WebServerType = ESP8266WebServerTemplate<ServerType>;
 public:
-    FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn, const String &uri, HTTPMethod method)
+    FunctionRequestHandler(typename WebServerType::THandlerFunction fn, typename WebServerType::THandlerFunction ufn, const String &uri, HTTPMethod method)
     : _fn(fn)
     , _ufn(ufn)
     , _uri(uri)
@@ -56,7 +37,7 @@ public:
         return true;
     }
 
-    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(WebServerType& server, HTTPMethod requestMethod, String requestUri) override {
         (void) server;
         if (!canHandle(requestMethod, requestUri))
             return false;
@@ -65,7 +46,7 @@ public:
         return true;
     }
 
-    void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) override {
+    void upload(WebServerType& server, String requestUri, HTTPUpload& upload) override {
         (void) server;
         (void) upload;
         if (canUpload(requestUri))
@@ -73,13 +54,15 @@ public:
     }
 
 protected:
-    ESP8266WebServer::THandlerFunction _fn;
-    ESP8266WebServer::THandlerFunction _ufn;
+    typename WebServerType::THandlerFunction _fn;
+    typename WebServerType::THandlerFunction _ufn;
     String _uri;
     HTTPMethod _method;
 };
 
-class StaticRequestHandler : public RequestHandler {
+template<typename ServerType>
+class StaticRequestHandler : public RequestHandler<ServerType> {
+    using WebServerType = ESP8266WebServerTemplate<ServerType>;
 public:
     StaticRequestHandler(FS& fs, const char* path, const char* uri, const char* cache_header)
     : _fs(fs)
@@ -102,7 +85,7 @@ public:
         return true;
     }
 
-    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(WebServerType& server, HTTPMethod requestMethod, String requestUri) override {
         if (!canHandle(requestMethod, requestUri))
             return false;
 
@@ -113,7 +96,8 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) requestUri += "index.htm";
+            if (requestUri.endsWith("/")) 
+              requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
@@ -124,10 +108,10 @@ public:
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
-        if (!path.endsWith(".gz") && !_fs.exists(path))  {
-            String pathWithGz = path + ".gz";
+        if (!path.endsWith(FPSTR(mimeTable[gz].endsWith)) && !_fs.exists(path))  {
+            String pathWithGz = path + FPSTR(mimeTable[gz].endsWith);
             if(_fs.exists(pathWithGz))
-                path += ".gz";
+                path += FPSTR(mimeTable[gz].endsWith);
         }
 
         File f = _fs.open(path, "r");

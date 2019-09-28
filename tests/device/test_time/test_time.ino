@@ -2,27 +2,28 @@
 #include <time.h>
 #include <ESP8266HTTPClient.h>
 #include <BSTest.h>
-#include <test_config.h>
 
 BS_ENV_DECLARE();
 
 void setup()
 {
     Serial.begin(115200);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
-    BS_RUN(Serial);
+    return true;
 }
 
 
 TEST_CASE("Can sync time", "[time]")
 {
-    int timezone = 3;
-    int dst = 0;
-
     configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
     Serial.println("\nWaiting for time");
     unsigned timeout = 5000;
@@ -49,7 +50,7 @@ TEST_CASE("#1745 mktime and localtime", "[time]")
     const int years[] = {2012, 2013, 2014};
     const time_t timestamps[] = {1332640800, 1364176800, 1395712800};
 
-    for (int i = 0; i < sizeof(years)/sizeof(years[0]); ++i) {
+    for (size_t i = 0; i < sizeof(years)/sizeof(years[0]); ++i) {
         tm_in.tm_year = years[i] - 1900;
         tm_in.tm_mon = 2;
         tm_in.tm_mday = 25;

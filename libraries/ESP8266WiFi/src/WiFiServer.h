@@ -35,22 +35,24 @@ class ClientContext;
 class WiFiClient;
 
 class WiFiServer : public Server {
-private:
+  // Secure server needs access to all the private entries here
+protected:
   uint16_t _port;
   IPAddress _addr;
   tcp_pcb* _pcb;
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
-  bool _noDelay = false;
+  enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:
-  WiFiServer(IPAddress addr, uint16_t port);
+  WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();
+  void begin(uint16_t port);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
   virtual size_t write(uint8_t);
@@ -60,6 +62,7 @@ public:
   void stop();
 
   using Print::write;
+  using ClientType = WiFiClient;
 
 protected:
   long _accept(tcp_pcb* newpcb, long err);

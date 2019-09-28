@@ -14,6 +14,13 @@ Methods documented for the `Server Class <https://www.arduino.cc/en/Reference/Wi
 
 Methods and properties described further down are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
 
+write (write to all clients) not supported
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please note that the ``write`` method on the ``WiFiServer`` object is not implemented and returns failure always.  Use the returned
+``WiFiClient`` object from the ``WiFiServer::available()`` method to communicate with individual clients.  If you need to send
+the exact same packets to a series of clients, your application must maintain a list of connected clients and iterate over them manually.
+
 setNoDelay
 ~~~~~~~~~~
 
@@ -32,6 +39,10 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
     server.begin();
     server.setNoDelay(true);
 
+By default, ``nodelay`` value will depends on global ``WiFiClient::getDefaultNoDelay()`` (currently false by default).
+
+However, a call to ``wiFiServer.setNoDelay()`` will override ``NoDelay`` for all new ``WiFiClient`` provided by the calling instance (``wiFiServer``).
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +57,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with :doc:`examples <server-examples>` dedicated specifically to the Server Class.
+For code samples please refer to separate section with `examples <server-examples.rst>`__ dedicated specifically to the Server Class.

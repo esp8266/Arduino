@@ -29,7 +29,7 @@
 
 
 
-#define BUFFER_LENGTH 32
+#define BUFFER_LENGTH 128
 
 class TwoWire : public Stream
 {
@@ -45,12 +45,13 @@ class TwoWire : public Stream
 
     static uint8_t transmitting;
     static void (*user_onRequest)(void);
-    static void (*user_onReceive)(int);
+    static void (*user_onReceive)(size_t);
     static void onRequestService(void);
-    static void onReceiveService(uint8_t*, int);
+    static void onReceiveService(uint8_t*, size_t);
   public:
     TwoWire();
     void begin(int sda, int scl);
+    void begin(int sda, int scl, uint8_t address);    
     void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
     void begin();
     void begin(uint8_t);
@@ -75,13 +76,10 @@ class TwoWire : public Stream
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive( void (*)(int) );
+    void onReceive( void (*)(int) );    // arduino api
+    void onReceive( void (*)(size_t) ); // legacy esp8266 backward compatibility
     void onRequest( void (*)(void) );
 
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
     using Print::write;
 };
 

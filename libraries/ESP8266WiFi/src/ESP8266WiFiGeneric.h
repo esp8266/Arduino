@@ -29,18 +29,20 @@
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_WIFI_GENERIC(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_WIFI_GENERIC(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ##__VA_ARGS__ )
 #endif
 #endif
 
 #ifndef DEBUG_WIFI_GENERIC
-#define DEBUG_WIFI_GENERIC(...)
+#define DEBUG_WIFI_GENERIC(...) do { (void)0; } while (0)
 #endif
 
 struct WiFiEventHandlerOpaque;
 typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
 typedef void (*WiFiEventCb)(WiFiEvent_t);
+
+struct WiFiState;
 
 class ESP8266WiFiGenericClass {
         // ----------------------------------------------------------------------------------------------
@@ -62,12 +64,15 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
         WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
         WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
-        // WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
+        WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
         int32_t channel(void);
 
-        bool setSleepMode(WiFiSleepType_t type);
+        bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
+
         WiFiSleepType_t getSleepMode();
+        uint8_t getListenInterval ();
+        bool isSleepLevelMax ();
 
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
@@ -76,7 +81,7 @@ class ESP8266WiFiGenericClass {
 
         void persistent(bool persistent);
 
-        bool mode(WiFiMode_t);
+        bool mode(WiFiMode_t, WiFiState* state = nullptr);
         WiFiMode_t getMode();
 
         bool enableSTA(bool enable);
@@ -85,23 +90,32 @@ class ESP8266WiFiGenericClass {
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
 
+        static uint32_t shutdownCRC (const WiFiState* state);
+        static bool shutdownValidCRC (const WiFiState* state);
+        static void preinitWiFiOff (); //meant to be called in user-defined preinit()
+
     protected:
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
 
         static void _eventCallback(void *event);
 
+        // called by WiFi.mode(SHUTDOWN/RESTORE, state)
+        // - sleepUs is WiFi.forceSleepBegin() parameter, 0 = forever
+        // - saveState is the user's state to hold configuration on restore
+        bool shutdown (uint32 sleepUs = 0, WiFiState* stateSave = nullptr);
+        bool resumeFromShutdown (WiFiState* savedState = nullptr);
+
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------
         // ----------------------------------------------------------------------------------------------
 
     public:
-
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
         bool getPersistent();
-    protected:
 
+    protected:
         friend class ESP8266WiFiSTAClass;
         friend class ESP8266WiFiScanClass;
         friend class ESP8266WiFiAPClass;

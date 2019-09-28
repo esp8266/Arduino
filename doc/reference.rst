@@ -32,7 +32,8 @@ pins 9 and 11. These may be used as IO if flash chip works in DIO mode
 Pin interrupts are supported through ``attachInterrupt``,
 ``detachInterrupt`` functions. Interrupts may be attached to any GPIO
 pin, except GPIO16. Standard Arduino interrupt types are supported:
-``CHANGE``, ``RISING``, ``FALLING``.
+``CHANGE``, ``RISING``, ``FALLING``. ISRs need to have
+``ICACHE_RAM_ATTR`` before the function definition.
 
 Analog input
 ------------
@@ -42,7 +43,12 @@ either to read voltage at ADC pin, or to read module supply voltage
 (VCC).
 
 To read external voltage applied to ADC pin, use ``analogRead(A0)``.
-Input voltage range is 0 — 1.0V.
+Input voltage range of bare ESP8266 is 0 — 1.0V, however some many 
+boards may implement voltage dividers. To be on the safe side, <1.0V 
+can be tested. If e.g. 0.5V delivers values around ~512, then maximum 
+voltage is very likely to be 1.0V and 3.3V may harm the ESP8266. 
+However values around ~150 indicates that the maximum voltage is 
+likely to be 3.3V.
 
 To read VCC voltage, use ``ESP.getVcc()`` and ADC pin must be kept
 unconnected. Additionally, the following line has to be added to the
@@ -65,7 +71,13 @@ equal to 1023 by default. PWM range may be changed by calling
 ``analogWriteRange(new_range)``.
 
 PWM frequency is 1kHz by default. Call
-``analogWriteFreq(new_frequency)`` to change the frequency.
+``analogWriteFreq(new_frequency)`` to change the frequency. Valid values 
+are from 100Hz up to 40000Hz.
+
+The ESP doesn't have hardware PWM, so the implementation is by software. 
+With one PWM output at 40KHz, the CPU is already rather loaded. The more 
+PWM outputs used, and the higher their frequency, the closer you get to 
+the CPU limits, and the less CPU cycles are available for sketch execution. 
 
 Timing and delays
 -----------------
@@ -149,11 +161,22 @@ current speed. For example
 | ``Serial`` and ``Serial1`` objects are both instances of the
   ``HardwareSerial`` class.
 | I've done this also for official ESP8266 `Software
-  Serial <https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#softwareserial>`__
+  Serial <libraries.rst#softwareserial>`__
   library, see this `pull
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
 | Note that this implementation is **only for ESP8266 based boards**,
   and will not works with other Arduino boards.
+
+
+To detect an unknown baudrate of data coming into Serial use ``Serial.detectBaudrate(time_t timeoutMillis)``. This method tries to detect the baudrate for a maximum of timeoutMillis ms. It returns zero if no baudrate was detected, or the detected baudrate otherwise. The ``detectBaudrate()`` function may be called before ``Serial.begin()`` is called, because it does not need the receive buffer nor the SerialConfig parameters.
+
+The uart can not detect other parameters like number of start- or stopbits, number of data bits or parity.
+
+The detection itself does not change the baudrate, after detection it should be set as usual using ``Serial.begin(detectedBaudrate)``.
+
+Detection is very fast, it takes only a few incoming bytes.
+
+SerialDetectBaudrate.ino is a full example of usage.
 
 Progmem
 -------
@@ -192,3 +215,75 @@ using FPSTR would become...
         String response2;
         response2 += FPSTR(HTTP);
     }
+
+C++
+----
+
+- About C++ exceptions, ``operator new``, and Exceptions menu option
+  
+  The C++ standard says the following about the ``new`` operator behavior when encountering heap shortage (memory full):
+
+  - has to throw a ``std::bad_alloc`` C++ exception when they are enabled
+
+  - will ``abort()`` otherwise
+  
+  There are several reasons for the first point above, among which are:
+
+  - guarantee that the return of new is never a ``nullptr``
+
+  - guarantee full construction of the top level object plus all member subobjects
+
+  - guarantee that any subobjects partially constructed get destroyed, and in the correct order, if oom is encountered midway through construction
+  
+  When C++ exceptions are disabled, or when using ``new(nothrow)``, the above guarantees can't be upheld, so the second point (``abort()``) above is the only ``std::c++`` viable solution.
+  
+  Historically in Arduino environments, ``new`` is overloaded to simply return the equivalent ``malloc()`` which in turn can return ``nullptr``.
+  
+  This behavior is not C++ standard, and there is good reason for that: there are hidden and very bad side effects. The *class and member constructors are always called, even when memory is full* (``this == nullptr``).
+  In addition, the memory allocation for the top object could succeed, but allocation required for some member object could fail, leaving construction in an undefined state.
+  So the historical behavior of Ardudino's ``new``, when faced with insufficient memory, will lead to bad crashes sooner or later, sometimes unexplainable, generally due to memory corruption even when the returned value is checked and managed.
+  Luckily on esp8266, trying to update RAM near address 0 will immediately raise an hardware exception, unlike on other uC like avr on which that memory can be accessible.
+  
+  As of core 2.6.0, there are 3 options: legacy (default) and two clear cases when ``new`` encounters oom:
+  
+  - ``new`` returns ``nullptr``, with possible bad effects or immediate crash when constructors (called anyway) initialize members (exceptions are disabled in this case)
+
+  - C++ exceptions are disabled: ``new`` calls ``abort()`` and will "cleanly" crash, because there is no way to honor memory allocation or to recover gracefully.
+
+  - C++ exceptions are enabled: ``new`` throws a ``std::bad_alloc`` C++ exception, which can be caught and handled gracefully.
+    This assures correct behavior, including handling of all subobjects, which guarantees stability.
+
+  History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
+
+- New optional allocator ``arduino_new``
+
+  A new optional global allocator is introduced with a different semantic:
+
+  - never throws exceptions on oom
+
+  - never calls constructors on oom
+
+  - returns nullptr on oom
+
+  It is similar to arduino ``new`` semantic without side effects
+  (except when parent constructors, or member constructors use ``new``).
+
+  Syntax is slightly different, the following shows the different usages:
+
+  .. code:: cpp
+
+      // with new:
+
+      SomeClass* sc = new SomeClass(arg1, arg2, ...);
+      delete sc;
+
+      SomeClass* scs = new SomeClass[42];
+      delete [] scs;
+
+      // with arduino_new:
+
+      SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
+      delete sc;
+
+      SomeClass* scs = arduino_newarray(SomeClass, 42);
+      delete [] scs;

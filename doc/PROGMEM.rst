@@ -24,7 +24,7 @@ On the ESP8266 PROGMEM is a macro:
 
     #define ICACHE_RODATA_ATTR  __attribute__((section(".irom.text")))
 
-Which places the variable in the .irom.text section ie flash.  Placing strings in
+Which places the variable in the .irom.text section in flash.  Placing strings in
 flash requires using any of the methods above.  
 
 | ### Declare a global string to be stored in flash.
@@ -116,7 +116,7 @@ the ``F()`` macro and possibly the FPSTR() macro. These are defined in `WString.
     #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
     #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
-So ``FSPTR()`` takes a PROGMEM pointer to a string and casts it to this
+So ``FPSTR()`` takes a PROGMEM pointer to a string and casts it to this
 ``__FlashStringHelper`` class. Thus if you have defined a string as
 above ``xyz`` you can use ``FPSTR()`` to convert it to
 ``__FlashStringHelper`` for passing into functions that take it.

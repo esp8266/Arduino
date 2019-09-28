@@ -58,10 +58,13 @@ void sntp_set_system_time (uint32_t t);
 
 #include "mem.h" // useful for os_malloc used in esp-arduino's mDNS
 
-typedef uint32_t sys_prot_t;	// not really used
-#define SYS_ARCH_DECL_PROTECT(lev)
-#define SYS_ARCH_PROTECT(lev) os_intr_lock()
-#define SYS_ARCH_UNPROTECT(lev) os_intr_unlock()
+#include "glue.h" // include assembly locking macro used below
+typedef uint32_t sys_prot_t;
+#define SYS_ARCH_DECL_PROTECT(lev) sys_prot_t lev
+#define SYS_ARCH_PROTECT(lev) lev = lwip_xt_rsil(15)
+#define SYS_ARCH_UNPROTECT(lev) lwip_xt_wsr_ps(lev)
+
+#define LWIP_NO_CTYPE_H 1
 
 ///////////////////////////////
 //// DEBUG
@@ -89,15 +92,7 @@ typedef uint32_t sys_prot_t;	// not really used
     ip4_addr3_16(ipaddr), \
     ip4_addr4_16(ipaddr)
 
-// ip_addr / ip_info: do not exist in lwip2 (only in lwip1.4)
-struct ip_addr {
-  uint32_t addr;
-};
-struct ip_info {
-    struct ip_addr ip;
-    struct ip_addr netmask;
-    struct ip_addr gw;
-};
+#include <ipv4_addr.h>
 
 ///////////////////////////////
 //// PROVIDED TO USER

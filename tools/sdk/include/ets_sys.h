@@ -29,6 +29,21 @@
 #include "eagle_soc.h"
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * This "print character function" prototype is modeled after the argument for
+ * ets_install_putc1() found in "ESP8266_NONOS_SDK/include/osapi.h". This
+ * deviates away from the familiar C library definition of putchar; however, it
+ * agrees with the code we are working with. Note, in the ROM some "printf
+ * character functions" always return 0 (uart_tx_one_char and ets_putc), some
+ * return last character printed (buildin _putc1), and some return nothing
+ * (ets_write_char). Using a void return type safely represents them all.
+ */
+typedef void (*fp_putc_t)(char);
+
 typedef uint32_t ETSSignal;
 typedef uint32_t ETSParam;
 
@@ -186,6 +201,7 @@ void *pvPortMalloc(size_t xWantedSize, const char* file, int line) __attribute__
 void *pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line) __attribute__((alloc_size(2)));
 void vPortFree(void *ptr, const char* file, int line);
 void *ets_memcpy(void *dest, const void *src, size_t n);
+void *ets_memmove(void *dest, const void *src, size_t n);
 void *ets_memset(void *s, int c, size_t n);
 void ets_timer_arm_new(ETSTimer *a, int b, int c, int isMstimer);
 void ets_timer_setfn(ETSTimer *t, ETSTimerFunc *fn, void *parg);
@@ -200,17 +216,48 @@ char *ets_strstr(const char *haystack, const char *needle);
 int ets_sprintf(char *str, const char *format, ...)  __attribute__ ((format (printf, 2, 3)));
 int os_snprintf(char *str, size_t size, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 int ets_printf(const char *format, ...)  __attribute__ ((format (printf, 1, 2)));
-void ets_install_putc1(void* routine);
+void ets_install_putc1(fp_putc_t routine);
 void ets_isr_mask(int intr);
 void ets_isr_unmask(int intr);
 void ets_isr_attach(int intr, int_handler_t handler, void *arg);
 void ets_intr_lock();
 void ets_intr_unlock();
 int ets_vsnprintf(char * s, size_t n, const char * format, va_list arg)  __attribute__ ((format (printf, 3, 0)));
-int ets_vprintf(int (*print_function)(int), const char * format, va_list arg) __attribute__ ((format (printf, 2, 0)));
-int ets_putc(int);
+int ets_vprintf(fp_putc_t print_function, const char * format, va_list arg) __attribute__ ((format (printf, 2, 0)));
+
+/*
+ * ets_putc(), a "print character function" in ROM, prints a character to a
+ * UART. It always returns 0; however, the prototype here is defined with void
+ * return to make compatible with other usages of fp_putc_t. ets_putc() provides
+ * a "raw", print as is, interface. '\r' and '\n' are each printed exactly as is
+ * w/o addition. For a "cooked" interface use ets_uart_putc1().
+ * The use of this function requires a prior setup call to uart_buff_switch() to
+ * select the UART.
+ */
+void ets_putc(char);
+
+/*
+ * ets_uart_putc1(), a "print character function" in ROM, prints a character to
+ * a UART. It returns the character printed; however, the prototype here is
+ * defined with void return to make compatible with other usages of fp_putc_t.
+ * This function provides additional processing to characters '\r' and '\n'. It
+ * filters out '\r'.  When called with '\n', it prints characters '\r' and '\n'.
+ * This is sometimes refered to as a "cooked" interface. For a "raw", print as
+ * is, interface use ets_putc(). The use of this function requires a prior setup
+ * call to uart_buff_switch() to select the UART.
+ * ets_uart_putc1() is used internally by ets_uart_printf. It is also the
+ * function that gets installed by ets_uart_install_printf through a call to
+ * ets_install_putc1.
+ */
+void ets_uart_putc1(char);
+
 bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
 bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
+void ets_update_cpu_frequency(uint32_t ticks_per_us);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _ETS_SYS_H */
