@@ -76,6 +76,10 @@ generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
 generic.menu.FlashFreq.80=80MHz
 generic.menu.FlashFreq.80.build.flash_freq=80
+generic.menu.FlashFreq.20=20MHz
+generic.menu.FlashFreq.20.build.flash_freq=20
+generic.menu.FlashFreq.26=26MHz
+generic.menu.FlashFreq.26.build.flash_freq=26
 generic.menu.FlashMode.dout=DOUT (compatible)
 generic.menu.FlashMode.dout.build.flash_mode=dout
 generic.menu.FlashMode.dout.build.flash_flags=-DFLASHMODE_DOUT
@@ -4758,7 +4762,15 @@ wifinfo.menu.FlashFreq.40=40MHz
 wifinfo.menu.FlashFreq.40.build.flash_freq=40
 wifinfo.menu.FlashFreq.80=80MHz
 wifinfo.menu.FlashFreq.80.build.flash_freq=80
+<<<<<<< HEAD
 wifinfo.menu.eesz.1M64=1MB (FS:64KB OTA:~466KB)
+=======
+wifinfo.menu.FlashFreq.20=20MHz
+wifinfo.menu.FlashFreq.20.build.flash_freq=20
+wifinfo.menu.FlashFreq.26=26MHz
+wifinfo.menu.FlashFreq.26.build.flash_freq=26
+wifinfo.menu.eesz.1M64=1MB (FS:64KB OTA:~470KB)
+>>>>>>> upstream/master
 wifinfo.menu.eesz.1M64.build.flash_size=1M
 wifinfo.menu.eesz.1M64.build.flash_size_bytes=0x100000
 wifinfo.menu.eesz.1M64.build.flash_ld=eagle.flash.1m64.ld
@@ -5778,6 +5790,10 @@ wifi_slot.menu.FlashFreq.40=40MHz
 wifi_slot.menu.FlashFreq.40.build.flash_freq=40
 wifi_slot.menu.FlashFreq.80=80MHz
 wifi_slot.menu.FlashFreq.80.build.flash_freq=80
+wifi_slot.menu.FlashFreq.20=20MHz
+wifi_slot.menu.FlashFreq.20.build.flash_freq=20
+wifi_slot.menu.FlashFreq.26=26MHz
+wifi_slot.menu.FlashFreq.26.build.flash_freq=26
 wifi_slot.menu.FlashMode.dout=DOUT (compatible)
 wifi_slot.menu.FlashMode.dout.build.flash_mode=dout
 wifi_slot.menu.FlashMode.dout.build.flash_flags=-DFLASHMODE_DOUT
