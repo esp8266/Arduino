@@ -18,6 +18,7 @@ runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
 runtime.tools.sizes={runtime.platform.path}/tools/sizes.py
 runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
+runtime.tools.crc={runtime.platform.path}/tools/crc32bin.py
 
 compiler.warning_flags=-w
 compiler.warning_flags.none=-w
@@ -112,8 +113,9 @@ recipe.objcopy.eep.pattern=
 
 ## Create hex
 recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
-recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
-recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.crc}" --bin "{build.path}/{build.project_name}.bin" --size 4088 --crc 4092
+recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
+recipe.objcopy.hex.4.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin

@@ -26,6 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -438,6 +439,19 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     }
     return false;
 }
+
+bool EspClass::checkFlashCRC() {
+    uint32_t flashsize = *((uint32_t*)0x40200ff8);
+    uint32_t flashcrc = *((uint32_t*)0x40200ffc);
+    uint32_t z[2];
+    z[0] = z[1] = 0;
+
+    uint32_t crc = crc32_P((const void*)0x40200000, 4096-8, 0xffffffff);
+    crc = crc32_P(z, 8, crc);
+    crc = crc32_P((const void*)0x40201000, flashsize-4096, crc);
+    return crc == flashcrc;
+}
+
 
 String EspClass::getResetReason(void) {
     char buff[32];
