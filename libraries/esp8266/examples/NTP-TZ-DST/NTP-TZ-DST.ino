@@ -91,8 +91,7 @@ static esp8266::polledTimeout::periodicMs add_6months_now(esp8266::polledTimeout
 //}
 
 
-void showTime ()
-{
+void showTime() {
   gettimeofday(&tv, nullptr);
   clock_gettime(0, &tp);
   now = time(nullptr);
@@ -155,8 +154,7 @@ void time_is_set_scheduled() {
   // everything is allowed in this function
 
   // time machine demo
-  if (time_machine_running)
-  {
+  if (time_machine_running) {
     if (time_machine_days == 0)
       Serial.printf("---- settimeofday() has been called - possibly from SNTP\n"
                     "     (starting time machine demo to show libc's automatic DST handling)\n\n");
@@ -169,17 +167,16 @@ void time_is_set_scheduled() {
     gettimeofday(&tv, nullptr);
     constexpr int days = 30;
     time_machine_days += days;
-    if (time_machine_days > 360)
-    {
+    if (time_machine_days > 360) {
       tv.tv_sec -= (time_machine_days - days) * 60 * 60 * 24;
       time_machine_days = 0;
-    }
-    else
+    } else {
       tv.tv_sec += days * 60 * 60 * 24;
+    }
     settimeofday(&tv, nullptr);
-  }
-  else
+  } else {
     showTime();
+  }
 }
 
 void time_is_set_callback() {
@@ -190,8 +187,9 @@ void time_is_set_callback() {
 
   // This scheduled function is used for the demo, it is normaly unneeded
   schedule_function(time_is_set_scheduled);
-  if (time_machine_days == 0)
+  if (time_machine_days == 0) {
     time_machine_running = !time_machine_running;
+  }
 }
 
 void setup() {
