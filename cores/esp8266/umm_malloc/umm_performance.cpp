@@ -39,7 +39,6 @@ bool ICACHE_FLASH_ATTR get_umm_get_perf_data(struct _UMM_TIME_STATS *p, size_t s
   Objective:  To be able to print "last gasp" diagnostic messages
   when interrupts are disabled and w/o availability of heap resources.
 */
-
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
   /*
