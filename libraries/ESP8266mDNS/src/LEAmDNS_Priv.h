@@ -37,6 +37,9 @@ namespace MDNSImplementation {
 #define ESP_8266_MDNS_INCLUDE
 //#define DEBUG_ESP_MDNS_RESPONDER
 
+#if !defined(DEBUG_ESP_MDNS_RESPONDER) && defined(DEBUG_ESP_MDNS)
+#define DEBUG_ESP_MDNS_RESPONDER
+#endif
 
 #ifndef LWIP_OPEN_SRC
     #define LWIP_OPEN_SRC

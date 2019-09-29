@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # This script will download and extract required tools into the current directory.
 # Tools list is obtained from package/package_esp8266com_index.template.json file.
 # Written by Ivan Grokhotkov, 2015.
@@ -15,6 +15,9 @@ import sys
 import tarfile
 import zipfile
 import re
+
+verbose = True
+
 if sys.version_info[0] == 3:
     from urllib.request import urlretrieve
 else:
@@ -38,10 +41,12 @@ def mkdir_p(path):
             raise
 
 def report_progress(count, blockSize, totalSize):
-    percent = int(count*blockSize*100/totalSize)
-    percent = min(100, percent)
-    sys.stdout.write("\r%d%%" % percent)
-    sys.stdout.flush()
+    global verbose
+    if verbose:
+        percent = int(count*blockSize*100/totalSize)
+        percent = min(100, percent)
+        sys.stdout.write("\r%d%%" % percent)
+        sys.stdout.flush()
 
 def unpack(filename, destination):
     dirname = ''
@@ -111,6 +116,11 @@ def identify_platform():
     return arduino_platform_names[sys_name][bits]
 
 def main():
+    global verbose
+    # Support optional "-q" quiet mode simply
+    if len(sys.argv) == 2:
+        if sys.argv[1] == "-q":
+            verbose = False
     print('Platform: {0}'.format(identify_platform()))
     tools_to_download = load_tools_list('../package/package_esp8266com_index.template.json', identify_platform())
     mkdir_p(dist_dir)
