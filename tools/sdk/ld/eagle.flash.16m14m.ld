@@ -19,16 +19,13 @@ PROVIDE ( _FS_start = 0x40400000 );
 PROVIDE ( _FS_end = 0x411FA000 );
 PROVIDE ( _FS_page = 0x100 );
 PROVIDE ( _FS_block = 0x2000 );
-<<<<<<< HEAD
 PROVIDE ( _BOOTLOADER_DATA = 0x001FE000 );
 PROVIDE ( _SKETCH_AREA_end = _FS_start );
-=======
 PROVIDE ( _EEPROM_start = 0x411fb000 );
 /* The following symbols are DEPRECATED and will be REMOVED in a future release */
 PROVIDE ( _SPIFFS_start = 0x40400000 );
 PROVIDE ( _SPIFFS_end = 0x411FA000 );
 PROVIDE ( _SPIFFS_page = 0x100 );
 PROVIDE ( _SPIFFS_block = 0x2000 );
->>>>>>> upstream/master
 
 INCLUDE "local.eagle.app.v6.common.ld"
