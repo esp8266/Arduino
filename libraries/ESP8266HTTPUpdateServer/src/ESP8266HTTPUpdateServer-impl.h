@@ -3,20 +3,40 @@
 #include <WiFiServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
+#include <flash_hal.h>
+#include <FS.h>
+#include <LittleFS.h>
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
+namespace esp8266httpupdateserver {
+using namespace esp8266webserver;
 
 static const char serverIndex[] PROGMEM =
-  R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
-                  <input type='file' name='update'>
-                  <input type='submit' value='Update'>
-               </form>
-         </body></html>)";
+  R"(<!DOCTYPE html>
+     <html lang='en'>
+     <head>
+         <meta charset='utf-8'>
+         <meta name='viewport' content='width=device-width,initial-scale=1'/>
+     </head>
+     <body>
+     <form method='POST' action='' enctype='multipart/form-data'>
+         Firmware:<br>
+         <input type='file' accept='.bin' name='firmware'>
+         <input type='submit' value='Update Firmware'>
+     </form>
+     <form method='POST' action='' enctype='multipart/form-data'>
+         FileSystem:<br>
+         <input type='file' accept='.bin' name='filesystem'>
+         <input type='submit' value='Update FileSystem'>
+     </form>
+     </body>
+     </html>)";
 static const char successResponse[] PROGMEM = 
-  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
+  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...";
 
-ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
+template <typename ServerType>
+ESP8266HTTPUpdateServerTemplate<ServerType>::ESP8266HTTPUpdateServerTemplate(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
@@ -25,7 +45,8 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
   _authenticated = false;
 }
 
-void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path, const String& username, const String& password)
+template <typename ServerType>
+void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate<ServerType> *server, const String& path, const String& username, const String& password)
 {
     _server = server;
     _username = username;
@@ -71,9 +92,18 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path
         WiFiUDP::stopAll();
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
-        uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-        if(!Update.begin(maxSketchSpace)){//start with max available size
-          _setUpdaterError();
+        if (upload.name == "filesystem") {
+          size_t fsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+          SPIFFS.end();
+          LittleFS.end();
+          if (!Update.begin(fsSize, U_FS)){//start with max available size
+            if (_serial_output) Update.printError(Serial);
+          }
+        } else {
+          uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+          if (!Update.begin(maxSketchSpace, U_FLASH)){//start with max available size
+            _setUpdaterError();
+          }
         }
       } else if(_authenticated && upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()){
         if (_serial_output) Serial.printf(".");
@@ -95,10 +125,13 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path
     });
 }
 
-void ESP8266HTTPUpdateServer::_setUpdaterError()
+template <typename ServerType>
+void ESP8266HTTPUpdateServerTemplate<ServerType>::_setUpdaterError()
 {
   if (_serial_output) Update.printError(Serial);
   StreamString str;
   Update.printError(str);
   _updaterError = str.c_str();
 }
+
+};
