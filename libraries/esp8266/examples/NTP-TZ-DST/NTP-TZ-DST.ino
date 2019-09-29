@@ -6,6 +6,8 @@
   - how to read and set time
   - how to set timezone per country/city
   - how is local time automatically handled per official timezone definitions
+  - how to change internal sntp start and update delay
+  - how to use callbacks when time is updated
 
   This example code is in the public domain.
 */
@@ -28,16 +30,16 @@
 // "TZ_" macros follow DST change across seasons without source code change
 // check for your nearest city in TZ.h
 
-// select espressif headquarter TZ
-#define MYTZ TZ_Asia_Shanghai
+// espressif headquarter TZ
+//#define MYTZ TZ_Asia_Shanghai
 
 // example for "Not Only Whole Hours" timezones:
 // Kolkata/Calcutta is shifted by 30mn
 //#define MYTZ TZ_Asia_Kolkata
 
-// example to watch automatic local time time adjustment on Summer/Winter change
-// (exactly 182 days (~6 month) are regularly added or substracted in the example)
-//#define MYTZ TZ_Europe_Paris
+// example of a timezone with a variable Daylight-Saving-Time:
+// demo: watch automatic time adjustment on Summer/Winter change (DST)
+#define MYTZ TZ_Europe_London
 
 ////////////////////////////////////////////////////////
 
@@ -60,44 +62,22 @@ extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
 
 ////////////////////////////////////////////////////////
 
-timeval tv;
-timespec tp;
-time_t now;
-uint32_t now_ms, now_us;
+static timeval tv;
+static timespec tp;
+static time_t now;
+static uint32_t now_ms, now_us;
 
-bool time_is_set = false;
-esp8266::polledTimeout::periodicMs showTime(3200);
-bool next_change_is_future = true;
-esp8266::polledTimeout::periodicMs add_6months_now(esp8266::polledTimeout::periodicMs::neverExpires);
-
-unsigned long testcbms;
-
-void time_is_set_scheduled() {
-  // everything is allowed in this function
-  Serial.printf("\n----------> scheduled CB: settimeofday() has been called %ldms ago <----------\n"
-                "sleeping 2s\n\n",
-                millis() - testcbms);
-  delay(2000);
-}
-
-void time_is_set_callback() {
-  // like in an ISR
-  // it is not allowed to call "heavy" core API
-  // like yield()/delay()/print()/network/...
-
-  time_is_set = true;
-
-  testcbms = millis();
-  // call time_is_set_scheduled() at next loop():
-  schedule_function(time_is_set_scheduled);
-}
+static esp8266::polledTimeout::periodicMs showTimeNow(60000);
+static int time_machine_days = 0; // 0 = now
+static bool time_machine_running = false;
+static esp8266::polledTimeout::periodicMs add_6months_now(esp8266::polledTimeout::periodicMs::neverExpires);
 
 // OPTIONAL: change SNTP startup delay
 // a weak function is already defined and returns 0 (RFC violation)
 // it can be redefined:
 //uint32_t sntp_startup_delay_MS_rfc_not_less_than_60000 ()
 //{
-//    //::printf("(debug: sntp_startup_delay_MS_rfc_not_less_than_60000 is called)\n");a
+//    //info_sntp_startup_delay_MS_rfc_not_less_than_60000_has_been_called = true;
 //    return 60000; // 60s (or lwIP's original default: (random() % 5000))
 //}
 
@@ -106,9 +86,113 @@ void time_is_set_callback() {
 // it can be redefined:
 //uint32_t sntp_update_delay_MS_rfc_not_less_than_15000 ()
 //{
-//    ::printf("(debug: sntp_update_delay_MS_rfc_not_less_than_15000 is called)\n");
+//    //info_sntp_update_delay_MS_rfc_not_less_than_15000_has_been_called = true;
 //    return 15000; // 15s
 //}
+
+
+void showTime ()
+{
+  gettimeofday(&tv, nullptr);
+  clock_gettime(0, &tp);
+  now = time(nullptr);
+  now_ms = millis();
+  now_us = micros();
+
+  Serial.println();
+  printTm("localtime:", localtime(&now));
+  Serial.println();
+  printTm("gmtime:   ", gmtime(&now));
+  Serial.println();
+
+  // time from boot
+  Serial.print("clock:     ");
+  Serial.print((uint32_t)tp.tv_sec);
+  Serial.print("s / ");
+  Serial.print((uint32_t)tp.tv_nsec);
+  Serial.println("ns");
+
+  // time from boot
+  Serial.print("millis:    ");
+  Serial.println(now_ms);
+  Serial.print("micros:    ");
+  Serial.println(now_us);
+
+  // EPOCH+tz+dst
+  Serial.print("gtod:      ");
+  Serial.print((uint32_t)tv.tv_sec);
+  Serial.print("s / ");
+  Serial.print((uint32_t)tv.tv_usec);
+  Serial.println("us");
+
+  // EPOCH+tz+dst
+  Serial.print("time:      ");
+  Serial.println((uint32_t)now);
+
+  // timezone and demo in the future
+  Serial.printf("timezone:  %s\n", MYTZ);
+
+  // human readable
+  Serial.print("ctime:     ");
+  Serial.print(ctime(&now));
+
+  Serial.println();
+}
+
+
+#define PTM(w) \
+  Serial.print(" " #w "="); \
+  Serial.print(tm->tm_##w);
+
+void printTm(const char* what, const tm* tm) {
+  Serial.print(what);
+  PTM(isdst); PTM(yday); PTM(wday);
+  PTM(year);  PTM(mon);  PTM(mday);
+  PTM(hour);  PTM(min);  PTM(sec);
+}
+
+void time_is_set_scheduled() {
+  // everything is allowed in this function
+
+  // time machine demo
+  if (time_machine_running)
+  {
+    if (time_machine_days == 0)
+      Serial.printf("---- settimeofday() has been called - possibly from SNTP\n"
+                    "     (starting time machine demo to show libc's automatic DST handling)\n\n");
+    now = time(nullptr);
+    const tm* tm = localtime(&now);
+    Serial.printf("future=%3ddays: DST=%s - ",
+                  time_machine_days,
+                  tm->tm_isdst ? "true " : "false");
+    Serial.print(ctime(&now));
+    gettimeofday(&tv, nullptr);
+    constexpr int days = 30;
+    time_machine_days += days;
+    if (time_machine_days > 360)
+    {
+      tv.tv_sec -= (time_machine_days - days) * 60 * 60 * 24;
+      time_machine_days = 0;
+    }
+    else
+      tv.tv_sec += days * 60 * 60 * 24;
+    settimeofday(&tv, nullptr);
+  }
+  else
+    showTime();
+}
+
+void time_is_set_callback() {
+  // As in an ISR,
+  // it is not allowed to call "heavy" core API
+  // like yield()/delay()/print()/network/...
+  // If this is needed, use a scheduled function.
+
+  // This scheduled function is used for the demo, it is normaly unneeded
+  schedule_function(time_is_set_scheduled);
+  if (time_machine_days == 0)
+    time_machine_running = !time_machine_running;
+}
 
 void setup() {
   Serial.begin(115200);
@@ -139,85 +223,12 @@ void setup() {
 
   // don't wait for network, observe time changing
   // when NTP timestamp is received
-}
-
-#define PTM(w) \
-  Serial.print(" " #w "="); \
-  Serial.print(tm->tm_##w);
-
-void printTm(const char* what, const tm* tm) {
-  Serial.print(what);
-  PTM(isdst); PTM(yday); PTM(wday);
-  PTM(year);  PTM(mon);  PTM(mday);
-  PTM(hour);  PTM(min);  PTM(sec);
+  Serial.printf("Time is currently set by a constant:\n");
+  showTime();
 }
 
 void loop() {
-
-  if (time_is_set) {
-    Serial.printf("\n----------> loop: settimeofday() has been called %ldms ago ! <----------\n\n", millis() - testcbms);
-    time_is_set = false;
-    add_6months_now.reset(20000);
-  }
-
-  if (showTime) {
-    gettimeofday(&tv, nullptr);
-    clock_gettime(0, &tp);
-    now = time(nullptr);
-    now_ms = millis();
-    now_us = micros();
-
-    // for demo purpose, switch 6 months back and forth
-    if (add_6months_now) {
-      tv.tv_sec += (next_change_is_future ? -1 : 1) * (60 * 60 * 24 * 364 / 2);
-      settimeofday(&tv, nullptr);
-      Serial.printf("\n"
-                    "-- time machine: artificially moving 6 months %s\n"
-                    "-- observe local time change according to selected TZ's DST rules\n"
-                    "-- (and without assistance from sketch)\n"
-                    "\n",
-                    next_change_is_future ? "forward (future)" : "backward (to now)");
-      next_change_is_future = !next_change_is_future;
-      return;
-    }
-
-    printTm("localtime:", localtime(&now));
-    Serial.println();
-    printTm("gmtime:   ", gmtime(&now));
-    Serial.println();
-
-    // time from boot
-    Serial.print("clock:     ");
-    Serial.print((uint32_t)tp.tv_sec);
-    Serial.print("s / ");
-    Serial.print((uint32_t)tp.tv_nsec);
-    Serial.println("ns");
-
-    // time from boot
-    Serial.print("millis:    ");
-    Serial.println(now_ms);
-    Serial.print("micros:    ");
-    Serial.println(now_us);
-
-    // EPOCH+tz+dst
-    Serial.print("gtod:      ");
-    Serial.print((uint32_t)tv.tv_sec);
-    Serial.print("s / ");
-    Serial.print((uint32_t)tv.tv_usec);
-    Serial.println("us");
-
-    // EPOCH+tz+dst
-    Serial.print("time:      ");
-    Serial.println((uint32_t)now);
-
-    // timezone and demo in the future
-    Serial.printf("timezone:  %s\n", MYTZ);
-    Serial.printf("in future: %s\n", next_change_is_future ? "no" : "6 months");
-
-    // human readable
-    Serial.print("ctime:     ");
-    Serial.print(ctime(&now));
-
-    Serial.println();
+  if (showTimeNow) {
+    showTime();
   }
 }
