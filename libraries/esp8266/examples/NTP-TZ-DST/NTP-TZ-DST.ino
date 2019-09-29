@@ -70,7 +70,6 @@ static uint32_t now_ms, now_us;
 static esp8266::polledTimeout::periodicMs showTimeNow(60000);
 static int time_machine_days = 0; // 0 = now
 static bool time_machine_running = false;
-static esp8266::polledTimeout::periodicMs add_6months_now(esp8266::polledTimeout::periodicMs::neverExpires);
 
 // OPTIONAL: change SNTP startup delay
 // a weak function is already defined and returns 0 (RFC violation)
