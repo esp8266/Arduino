@@ -149,12 +149,51 @@ void umm_poison_free_fl(void *ptr, const char* file, int line) {
 }
 #endif
 
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-size_t umm_free_heap_size( void ) __attribute__ ((alias("umm_free_heap_size_lw")));
-size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_lw")));
-#elif defined(UMM_INFO)
-size_t umm_free_heap_size( void ) __attribute__ ((alias("umm_free_heap_size_info")));
-size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_info")));
+/* ------------------------------------------------------------------------ */
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INFO)
+size_t umm_block_size( void ) {
+  return sizeof(umm_block);
+}
 #endif
 
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+UMM_STATISTICS ummStats;
+
+// Keep complete call path in IRAM
+size_t umm_free_heap_size_lw( void ) {
+  return (size_t)ummStats.free_blocks * sizeof(umm_block);
+}
 #endif
+
+/*
+  I assume xPortGetFreeHeapSize needs to be in IRAM. Since
+  system_get_free_heap_size is in IRAM. Which would mean, umm_free_heap_size()
+  in flash, was not a safe alternative for returning the same information.
+*/
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_lw")));
+#elif defined(UMM_INFO)
+#warning "No ISR safe function available to implement xPortGetFreeHeapSize()"
+size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size")));
+#endif
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+void print_stats(int force) {
+  DBGLOG_FORCE( force, "umm heap statistics:\n");
+  DBGLOG_FORCE( force,   "  Free Space        %5u\n", ummStats.free_blocks * sizeof(umm_block));
+  DBGLOG_FORCE( force,   "  OOM Count         %5u\n", ummStats.oom_count);
+#if defined(UMM_STATS_FULL)
+  DBGLOG_FORCE( force,   "  Low Watermark     %5u\n", ummStats.free_blocks_min * sizeof(umm_block));
+  DBGLOG_FORCE( force,   "  Low Watermark ISR %5u\n", ummStats.free_blocks_isr_min * sizeof(umm_block));
+  DBGLOG_FORCE( force,   "  MAX Alloc Request %5u\n", ummStats.alloc_max_size);
+#endif
+  DBGLOG_FORCE( force,   "  Size of umm_block %5u\n", sizeof(umm_block));
+  DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
+}
+#endif
+
+
+#endif // BUILD_UMM_MALLOC_C
+
+

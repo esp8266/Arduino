@@ -157,18 +157,8 @@ void *umm_info( void *ptr, int force ) {
   }
   DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
-  DBGLOG_FORCE( force, "umm heap statistics:\n");
-  DBGLOG_FORCE( force,   "  Free Space        %5u\n", ummStats.free_blocks * sizeof(umm_block));
-#if defined(UMM_STATS_FULL)
-  DBGLOG_FORCE( force,   "  Low Watermark     %5u\n", ummStats.free_blocks_min * sizeof(umm_block));
-  DBGLOG_FORCE( force,   "  Low Watermark ISR %5u\n", ummStats.free_blocks_isr_min * sizeof(umm_block));
-  DBGLOG_FORCE( force,   "  MAX Alloc Request %5u\n", ummStats.alloc_max_size);
-  DBGLOG_FORCE( force,   "  OOM Count         %5u\n", ummStats.oom_count);
+  print_stats(force);
 #endif
-  DBGLOG_FORCE( force,   "  Size of umm_block %5u\n", sizeof(umm_block));
-  DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
-#endif
-
 
   /* Release the critical section... */
   UMM_CRITICAL_EXIT(id_info);
@@ -178,7 +168,7 @@ void *umm_info( void *ptr, int force ) {
 
 /* ------------------------------------------------------------------------ */
 
-size_t umm_free_heap_size_info( void ) {
+size_t umm_free_heap_size( void ) {
   umm_info(NULL, 0);
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
 }
@@ -189,22 +179,7 @@ size_t umm_max_block_size( void ) {
 }
 
 /* ------------------------------------------------------------------------ */
-#endif
 
-#if defined(UMM_STATS) || defined(UMM_INFO)
-size_t umm_block_size( void ) {
-  return sizeof(umm_block);
-}
-#endif
-
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-
-UMM_STATISTICS ummStats;
-
-// Complete call path in IRAM
-size_t umm_free_heap_size_lw( void ) {
-  return (size_t)ummStats.free_blocks * sizeof(umm_block);
-}
 #endif
 
 #endif  // defined(BUILD_UMM_MALLOC_C)

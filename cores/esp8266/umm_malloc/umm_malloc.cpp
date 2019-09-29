@@ -41,15 +41,10 @@
   * In umm_malloc.c
   *   Renamed to umm_malloc.cpp
   *
-  *   Added `extern "C" { ...b};` around code.
+  *   Added `extern "C" { ... };` around code.
   *
-  *   Surround DBGLOG_LEVEL with #ifndef... Now defined value in umm_malloc_cfg.h
-  *
-  *   umm_free() - moved critical section to start after safe calculations.
-  *
-  *   umm_malloc() - moved critical section to start after umm_blocks()
-  *   computations are based on constants that don't change, calling
-  *   argument excepted.
+  *   Surround DBGLOG_LEVEL with #ifndef... Define value of DBGLOG_LEVEL
+  *   from umm_malloc_cfg.h
   *
   *   umm_realloc() - Added UMM_CRITICAL_SUSPEND()/UMM_CRITICAL_RESUME() for
   *   when lightweight locks are available. eg. sti/cli. Single threaded
@@ -119,7 +114,7 @@
   *   add to list to report.
   */
  /*
-  * Current Deltas from the old umm_malloc
+  * New upstream umm_malloc feature delta's from the old umm_malloc we were using:
   *
   *   umm_posion check for a given *alloc - failure - no longer panics.
   *
@@ -132,8 +127,10 @@
   *   Defragmenting effect of realloc is gone. It now minimizes copy. This
   *   may have been an accident during code cleanup.
   *
+  * In one form or another these features have been restored in the
+  * reintegration of the upstream umm_malloc into the Arduino ESP8266 Core.
   */
-/* This block will be used for the PR description:
+/* This block will be used for the non-WIP PR description:
 
 This updates the heap management library, umm_malloc, to the current upstream
 version at https://github.com/rhempel/umm_malloc. Some reorganizing and new code

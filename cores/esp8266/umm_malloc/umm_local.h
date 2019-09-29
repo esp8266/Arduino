@@ -34,4 +34,8 @@
 static int check_poison_neighbors( unsigned short cur );
 #endif
 
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+void ICACHE_FLASH_ATTR print_stats(int force);
+#endif
+
 #endif

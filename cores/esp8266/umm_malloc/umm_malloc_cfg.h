@@ -108,10 +108,8 @@ extern char _heap_start[];
   extern UMM_HEAP_INFO ummHeapInfo;
 
   void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force );
-  size_t ICACHE_FLASH_ATTR umm_free_heap_size_info( void );
+  size_t ICACHE_FLASH_ATTR umm_free_heap_size( void );
   size_t ICACHE_FLASH_ATTR umm_max_block_size( void );
-  size_t ICACHE_FLASH_ATTR umm_block_size( void );
-
 #else
 #endif
 
@@ -127,13 +125,16 @@ extern char _heap_start[];
  *
  * UMM_INFO_PRINT is enabled as part of selecting `Debug port: "Serial" or
  * "Serial1"`. To make available all the time use '-D UMM_INFO_PRINT`.
+ *
+ * Status: Local Enhancement - addresses platform specific issue.
  */
-#if defined(DEBUG_ESP_PORT) && !defined(UMM_INFO_PRINT)
+#if defined(DEBUG_ESP_PORT) && !defined(UMM_INFO_PRINT) && defined(UMM_INFO)
 #define UMM_INFO_PRINT
 #endif
 
 /*
  * -D UMM_STATS :
+ * -D UMM_STATS_FULL
  *
  * This option provides a lightweight alternative to using `umm_info` just for
  * getting `umm_free_heap_size`.  With this option, a "free blocks" value is
@@ -144,16 +145,29 @@ extern char _heap_start[];
  * example is when an app closely monitors free heap to detect memory leaks. In
  * this case a single-core CPUs interrupt processing would have suffered the
  * most.
+ *
+ * UMM_STATS_FULL provides additional heap statistics. It can be used to gain
+ * additional insight into heap usage. This option would add an additional 132
+ * bytes of IRAM.
+ *
+ * Status: TODO: Needs to be proposed for upstream.
  */
 /*
 #define UMM_STATS
 #define UMM_STATS_FULL
  */
 
-#if defined(DEBUG_ESP_PORT) && !defined(UMM_STATS) && !defined(UMM_STATS_FULL)
-#define UMM_STATS_FULL
-#elif !defined(UMM_STATS) && !defined(UMM_STATS_FULL)
+/*
+ * For the ESP8266 we want at lest UMM_STATS built, so we have an ISR safe
+ * function to call for implementing xPortGetFreeHeapSize(), because umm_info()
+ * is in flash.
+ */
+#if !defined(UMM_STATS) && !defined(UMM_STATS_FULL)
 #define UMM_STATS
+#endif
+
+#if defined(UMM_STATS) && defined(UMM_STATS_FULL)
+#undef UMM_STATS
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
@@ -189,6 +203,10 @@ static inline size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
 #else  // not UMM_STATS or UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
 #define STATS__OOM_UPDATE()          (void)0
+#endif
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INFO)
+size_t ICACHE_FLASH_ATTR umm_block_size( void );
 #endif
 
 #ifdef UMM_STATS_FULL
@@ -285,10 +303,6 @@ static inline size_t ICACHE_FLASH_ATTR umm_get_free_null_count( void ) {
 #define STATS__FREE_REQUEST(tag)          (void)0
 #endif
 
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INFO)
-size_t umm_free_heap_size( void );
-#endif
-
 /*
   Per Devyte, the core currently doesn't support masking a specific interrupt
   level. That doesn't mean it can't be implemented, only that at this time
@@ -306,11 +320,12 @@ size_t umm_free_heap_size( void );
  *
  * Build option to collect timing usage data on critical section usage in
  * functions: info, malloc, realloc. Collects MIN, MAX, and number of time IRQs
- * were disabled at request time. Note, for realloc MAX disabled time will not
- * include the time from calling malloc and/or free when UMM_LIGHTWEIGHT_CPU is
- * defined. Examine code for specifics on what info is available and how to
- * access.
-*/
+ * were disabled at request time. Note, for realloc MAX disabled time will
+ * include the time spent in calling malloc and/or free. Examine code for
+ * specifics on what info is available and how to access.
+ *
+ * Status: TODO: Needs to be proposed for upstream.
+ */
 /*
 #define UMM_CRITICAL_METRICS
  */
@@ -402,11 +417,12 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
   * UMM_CRITICAL_SUSPEND and  UMM_CRITICAL_RESUME to the values of
   * UMM_CRITICAL_EXIT and UMM_CRITICAL_ENTRY.  These additional exit/entries
   * allow time to service interrupts during the reentrant sections of the code.
-  * Also, using these macros will relieve the nesting requirement.
   *
-  * These macros should probably not be used on multicore CPUs. Hardware locking
-  * methods sometimes carry higher overhead and may not be suitable for frequent
-  * calling.
+  * Performance may be impacked if used with multicore CPUs. The higher frquency
+  * of locking and unlocking may be an issue with locking methods that have a
+  * high overhead.
+  *
+  * Status: TODO: Needs to be proposed for upstream.
   */
 /*
  */
@@ -428,6 +444,10 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  * shrinks an allocation, avoiding copy when possible. UMM_REALLOC_DEFRAG gives
  * priority with growing the revised allocation toward an adjacent hole in the
  * direction of the beginning of the heap when possible.
+ *
+ * Status: TODO: These are new options introduced to optionally restore the
+ * previous defrag propery of realloc. The issue has been raised in the upstream
+ * repo. No response at this time. Based on response, may propose for upstream.
  */
 /*
 #define UMM_REALLOC_MINIMIZE_COPY
@@ -503,6 +523,11 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  * include its nearest allocated neighbors in the heap.
  * umm_malloc() will also checks the neighbors of the selected allocation
  * before use.
+ *
+ * Status: TODO?: UMM_POISON_CHECK_LITE is a new option. We could propose for
+ * upstream; however, the upstream version has much of the framework for calling
+ * poison check on each alloc call refactored out. Not sure how this will be
+ * received.
  */
 
 /*
@@ -571,6 +596,7 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 // PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
 #define DBGLOG_FUNCTION(fmt, ...) ISR_PRINTF(fmt, ##__VA_ARGS__)
 #define DBGLOG_FUNCTION_P(fmt, ...) ISR_PRINTF_P(fmt, ##__VA_ARGS__)
+
 #else
 #define DBGLOG_FUNCTION(fmt, ...)   do { (void)fmt; } while(false)
 #define DBGLOG_FUNCTION_P(fmt, ...) do { (void)fmt; } while(false)
@@ -646,38 +672,14 @@ void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line);
-void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortCalloc(n, s, mem_debug_file, __LINE__); })
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
-  #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-    #if 0
-    #define free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
-    #endif
-  #endif
 
 #elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #include <pgmspace.h>
-
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
-void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
-
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
-#if 0
-//C
-/*
-  Problem, I would like to report the file and line number with the umm poison
-  event as close as possible to the event. The #define method works for malloc,
-  calloc, and realloc those names are not as generic as "free". A #define free
-  captures too much. Classes with methods called free are included :(
-  Inline functions would report the address of the inline function in the .h
-  not where they are called.
-
-  Anybody know a trick to make this work?
-*/
-#define free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
-#endif
-
 #endif /* DEBUG_ESP_OOM */
 
 #ifdef __cplusplus
