@@ -187,7 +187,7 @@ function install_ide()
     else
         #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
         test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
-        tar xf arduino.tar.xz
+        tar xf arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi
     mv arduino-distrib $ide_path
