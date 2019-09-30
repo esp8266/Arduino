@@ -23,6 +23,7 @@ extern "C" {
   // Ref: https://gcc.gnu.org/onlinedocs/gcc-3.2/gcc/Variable-Attributes.html
   // Place each progmem object into its own named section, avoiding conflicts
   #define PROGMEM __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
+  #define PROGMEM_PSTR "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\""
 #endif
 #ifndef PGM_P
   #define PGM_P              const char *
@@ -34,7 +35,12 @@ extern "C" {
 // PSTR() macro modified to start on a 32-bit boundary.  This adds on average
 // 1.5 bytes/string, but in return memcpy_P and strcpy_P will work 4~8x faster
 #ifndef PSTR
-  #define PSTR(s)            (__extension__({static const char __c[] __attribute__((__aligned__(4))) PROGMEM = (s); &__c[0];}))
+    // Adapted from AVR-specific code at https://forum.arduino.cc/index.php?topic=194603.0
+    #define PSTR(str) (__extension__({ \
+        PGM_P ptr; \
+        asm volatile ( ".pushsection " PROGMEM_PSTR ", \"aSM\", @progbits, 1 \n .align 4 \n 0: .string " __STRINGIZE(str) "\n .popsection \n" ); \
+        asm volatile ( "movi %0, 0b" : "=r" (ptr) ); \
+        ptr; }))
 #endif
 
 // Flash memory must be read using 32 bit aligned addresses else a processor
