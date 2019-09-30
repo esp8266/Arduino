@@ -176,8 +176,6 @@ void run_scheduled_recurrent_functions()
         done = current == stop;
         const bool wakeupToken = current->wakeupToken && current->wakeupToken->load();
         const bool wakeup = current->wakeupTokenCmp != wakeupToken;
-        if (wakeup)
-            current->wakeupTokenCmp = wakeupToken;
         bool callNow = current->callNow;
 
         if ((wakeup || callNow) && !current->mFunc())

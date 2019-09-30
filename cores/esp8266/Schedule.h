@@ -59,8 +59,8 @@ void run_scheduled_functions();
 //   functions.  However a user function returning false will cancel itself.
 // * Long running operations or yield() or delay() are not allowed in the
 //   recurrent function.
-// * If a wakeupToken is used, if its value toggles, any remaining
-//   delay is disregarded, and the lambda runs on the next scheduler iteration.
+// * If a wakeupToken is used, anytime during scheduling when its value differs from that
+//   during this call, any remaining delay from repeat_us is disregarded, and fn is executed.
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us,
     const std::atomic<bool>* wakeupToken = nullptr);
 
