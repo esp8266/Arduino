@@ -19,8 +19,8 @@ PROVIDE ( _FS_start = 0x405FB000 );
 PROVIDE ( _FS_end = 0x405FB000 );
 PROVIDE ( _FS_page = 0x0 );
 PROVIDE ( _FS_block = 0x0 );
-PROVIDE ( _BOOTLOADER_DATA = 0x003FE000 );
-PROVIDE ( _SKETCH_AREA_end = _FS_start );
+PROVIDE ( _BOOTLOADER_DATA = 0x405FE000 );
+PROVIDE ( _SKETCH_AREA_end = _BOOTLOADER_DATA );
 PROVIDE ( _EEPROM_start = 0x405fb000 );
 /* The following symbols are DEPRECATED and will be REMOVED in a future release */
 PROVIDE ( _SPIFFS_start = 0x405FB000 );

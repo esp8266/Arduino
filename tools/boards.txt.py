@@ -1281,8 +1281,8 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
-        print("PROVIDE ( _BOOTLOADER_DATA = 0x%08X );" % ota_commands_addr)
-        print("PROVIDE ( _SKETCH_AREA_end = _FS_start );")
+        print("PROVIDE ( _BOOTLOADER_DATA = 0x%08X );" % (0x40200000 + ota_commands_addr))
+        print("PROVIDE ( _SKETCH_AREA_end = _BOOTLOADER_DATA );")
         print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
         # Re-add deprecated symbols pointing to the same address as the new standard ones
         print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")

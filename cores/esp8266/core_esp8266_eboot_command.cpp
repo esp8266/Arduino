@@ -116,12 +116,12 @@ bool eraseBootCommandBlock(void) {
   return 1;
 }
 
-uint32_t eboot_command_read_from_flash(void)
+uint32_t eboot_command_read_from_flash(eboot_flash_command_t *cmd)
 {
     eboot_index_t eboot_index;
     eboot_flash_command_t *flash_command;
     uint32_t i;
-//    const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
+   const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
 
     if (!eboot_read_flash_index(&eboot_index)) {
         return 0;
@@ -131,11 +131,11 @@ uint32_t eboot_command_read_from_flash(void)
             if (((flash_command->flags & EBOOT_CMD_FLAG_SLOT_FREE) == 0) &&
                 ((flash_command->flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
                 // This is a valid command waiting to be actioned, or should be. The CRC check will determine if it's actually valid
-                // uint32_t* dst = (uint32_t *) cmd;
-                // uint32_t* src = (uint32_t *) flash_command->cmd;
-                // for (uint32_t i = 0; i < dw_count; ++i) {
-                //     dst[i] = src[i];
-                // }
+                uint32_t* dst = (uint32_t *) cmd;
+                uint32_t* src = (uint32_t *) &(flash_command->cmd);
+                for (uint32_t i = 0; i < dw_count; ++i) {
+                    dst[i] = src[i];
+                }
                 return 1;
             }
         }
@@ -158,7 +158,9 @@ uint32_t eboot_command_write_to_flash(struct eboot_command *cmd)
         } else {
             ets_printf("Read bootCommand %d, flags: %x\n", i, flash_command.flags);
             if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == EBOOT_CMD_FLAG_SLOT_FREE) &&
-                ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
+                ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING) && 
+                (flash_command.cmd.magic == 0)
+                ) {
                 target_command_slot = i;
                 break;
             }
