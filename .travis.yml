@@ -7,12 +7,9 @@ git:
   submodules: false
 
 addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - gcc-7
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -q
+  - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
 
 before_install:
   - git submodule update --init  # no recursive update
