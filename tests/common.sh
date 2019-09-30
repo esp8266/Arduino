@@ -178,7 +178,10 @@ function install_ide()
         mv Arduino.app arduino-nightly
         mv arduino-nightly/Contents/Java/* arduino-nightly/.
     else
-        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        # nightlie
+        #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        # stable 1.8.10
+        test -r arduino.tar.xz || wget -O arduino.tar.xz https://downloads.arduino.cc/arduino-1.8.10-linux64.tar.xz
         tar xf arduino.tar.xz
     fi
     mv arduino-nightly $ide_path
