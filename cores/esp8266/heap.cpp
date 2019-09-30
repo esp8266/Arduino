@@ -247,6 +247,9 @@ size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
 
 void system_show_malloc(void)
 {
+#if !defined(UMM_INFO_PRINT)
+    ::printf(PSTR("\nTo use \"system_show_malloc()\", you need to build with the \"-DUMM_INFO_PRINT\" option.\n"));
+#endif
     umm_info(NULL, 1);
 }
 
