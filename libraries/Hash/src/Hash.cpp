@@ -33,8 +33,7 @@
  * @param size uint32_t
  * @param hash uint8_t[20]
  */
-void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
-
+void sha1(const uint8_t* data, uint32_t size, uint8_t hash[20]) {
     br_sha1_context ctx;
 
 #ifdef DEBUG_SHA1
@@ -63,23 +62,15 @@ void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
 #endif
 }
 
-void sha1(char * data, uint32_t size, uint8_t hash[20]) {
-    sha1((uint8_t *) data, size, hash);
-}
-
-void sha1(const uint8_t * data, uint32_t size, uint8_t hash[20]) {
-    sha1((uint8_t *) data, size, hash);
-}
-
-void sha1(const char * data, uint32_t size, uint8_t hash[20]) {
-    sha1((uint8_t *) data, size, hash);
+void sha1(const char* data, uint32_t size, uint8_t hash[20]) {
+    sha1((const uint8_t *) data, size, hash);
 }
 
 void sha1(const String& data, uint8_t hash[20]) {
     sha1(data.c_str(), data.length(), hash);
 }
 
-String sha1(uint8_t* data, uint32_t size) {
+String sha1(const uint8_t* data, uint32_t size) {
     uint8_t hash[20];
     String hashStr((const char*)nullptr);
     hashStr.reserve(20 * 2 + 1);
@@ -87,26 +78,16 @@ String sha1(uint8_t* data, uint32_t size) {
     sha1(&data[0], size, &hash[0]);
 
     for(uint16_t i = 0; i < 20; i++) {
-        String hex = String(hash[i], HEX);
-        if(hash[i] < 0x10) {
-            hashStr += '0';
-        }
+        char hex[3];
+        snprintf(hex, sizeof(hex), "%02x", hash[i]);
         hashStr += hex;
     }
 
     return hashStr;
 }
 
-String sha1(char* data, uint32_t size) {
-    return sha1((uint8_t*) data, size);
-}
-
-String sha1(const uint8_t* data, uint32_t size) {
-    return sha1((uint8_t*) data, size);
-}
-
 String sha1(const char* data, uint32_t size) {
-    return sha1((uint8_t*) data, size);
+    return sha1((const uint8_t*) data, size);
 }
 
 String sha1(const String& data) {
