@@ -6,11 +6,6 @@ git:
   depth: 1
   submodules: false
 
-addons:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -q
-  - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
-
 before_install:
   - git submodule update --init  # no recursive update
 
@@ -84,7 +79,11 @@ jobs:
     - name: "Host tests"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
-      install: sudo apt-get install valgrind lcov
+      install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -q
+        - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
+        - sudo apt-get install valgrind lcov
       env: CC=gcc-7 CXX=g++-7
 
     - name: "Docs"
@@ -102,6 +101,10 @@ jobs:
     - name: "Mock trivial test"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/buildm.sh
+      install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -q
+        - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
       env: CC=gcc-7 CXX=g++-7
 
     - name: "Mac OSX can build sketches"
