@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-#
+
+"""
 # Place a CRC32 checksum and length in a generated BIN file
 #
 # Copyright (C) 2019 - Earle F. Philhower, III
@@ -16,30 +17,33 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
 
 from __future__ import print_function
 import argparse
 import sys
 
 def crc8266(ldata):
+    "Return the CRC of ldata using same algorithm as eboot"
     crc = 0xffffffff
     idx = 0
     while idx < len(ldata):
-        c = int(ldata[idx]);
+        byte = int(ldata[idx])
         idx = idx + 1
         for i in [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01]:
-            bit = crc & 0x80000000;
-            if (c & i) != 0:
+            bit = crc & 0x80000000
+            if (byte & i) != 0:
                 if bit == 0:
                     bit = 1
                 else:
                     bit = 0
             crc = int(crc << 1) & 0xffffffff
             if bit != 0:
-                crc = int(crc ^ 0x04c11db7);
+                crc = int(crc ^ 0x04c11db7)
     return crc
 
 def store_word(raw, offset, val):
+    "Place a 4-byte word in 8266-dependent order in the raw image"
     raw[offset] = val & 255
     raw[offset + 1] = (val >> 8) & 255
     raw[offset + 2] = (val >> 16) & 255
@@ -47,10 +51,14 @@ def store_word(raw, offset, val):
     return raw
 
 def main():
-    parser = argparse.ArgumentParser(description='Add a CRC32 and length in a generated flash BIN image.')
-    parser.add_argument('-b', '--bin', action='store', required=True, help='Path to the Arduino sketch.bin')
-    parser.add_argument('-s', '--size', action='store', required=True, help='Byte offset in bin to store the size')
-    parser.add_argument('-c', '--crc', action='store', required=True, help='Byte offset in bin to store the crc32')
+    "Main CLI interface"
+    parser = argparse.ArgumentParser(description='Embed CRC32 and length in a generated BIN image')
+    parser.add_argument('-b', '--bin', action='store', required=True,
+                        help='Path to the Arduino sketch.bin')
+    parser.add_argument('-s', '--size', action='store', required=True,
+                        help='Byte offset in bin to store the size')
+    parser.add_argument('-c', '--crc', action='store', required=True,
+                        help='Byte offset in bin to store the crc32')
     args = parser.parse_args()
 
     with open(args.bin, "rb") as binfile:

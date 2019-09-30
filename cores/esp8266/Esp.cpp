@@ -441,13 +441,19 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
 }
 
 bool EspClass::checkFlashCRC() {
-    uint32_t flashsize = *((uint32_t*)0x40200ff8);
-    uint32_t flashcrc = *((uint32_t*)0x40200ffc);
+    // The CRC and total length are placed in extra space at the end of the 4K chunk
+    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
+    // we'll need to adjust this.
+    uint32_t flashsize = *((uint32_t*)i(0x40200000 + 4088); // Start of PROGMEM plus 4K-8
+    uint32_t flashcrc = *((uint32_t*)0x40200000 + 4095); // Start of PROGMEM plus 4K-4
     uint32_t z[2];
     z[0] = z[1] = 0;
 
+    // Start the checksum
     uint32_t crc = crc32_P((const void*)0x40200000, 4096-8, 0xffffffff);
+    // Pretend the 2 words of crc/len are zero to be idempotent
     crc = crc32_P(z, 8, crc);
+    // Finish the CRC calculation over the rest of flash
     crc = crc32_P((const void*)0x40201000, flashsize-4096, crc);
     return crc == flashcrc;
 }
