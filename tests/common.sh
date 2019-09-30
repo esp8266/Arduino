@@ -180,9 +180,11 @@ function install_ide()
     else
         # nightlie
         #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        #tar xf arduino.tar.xz
         # stable 1.8.10
         test -r arduino.tar.xz || wget -O arduino.tar.xz https://downloads.arduino.cc/arduino-1.8.10-linux64.tar.xz
         tar xf arduino.tar.xz
+        mv arduino-1.8.10 arduino-nightly
     fi
     mv arduino-nightly $ide_path
     cd $ide_path/hardware
