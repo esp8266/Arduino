@@ -72,7 +72,6 @@ void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
 
 void hspi_slave_begin(uint8_t status_len, void * arg)
 {
-    status_len &= 7;
     if(status_len > 4) {
         status_len = 4;    //max 32 bits
     }
