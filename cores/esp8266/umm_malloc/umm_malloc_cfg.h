@@ -324,7 +324,8 @@ static inline size_t ICACHE_FLASH_ATTR umm_get_free_null_count( void ) {
  * include the time spent in calling malloc and/or free. Examine code for
  * specifics on what info is available and how to access.
  *
- * Status: TODO: Needs to be proposed for upstream.
+ * Status: TODO: Needs to be proposed for upstream. Also should include updates
+ * to UMM_POISON_CHECK and UMM_INTEGRITY_CHECK to include a critical section.
  */
 /*
 #define UMM_CRITICAL_METRICS
