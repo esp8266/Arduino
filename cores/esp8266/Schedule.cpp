@@ -24,8 +24,7 @@ struct recurrent_fn_t
     recurrent_fn_t* mNext = nullptr;
     mRecFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
-    const std::atomic<bool>* wakeupToken = nullptr;
-    bool wakeupTokenCmp = false;
+    std::function<bool()> alarm = nullptr;
     recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
@@ -86,8 +85,8 @@ bool schedule_function (const std::function<void(void)>& fn)
     return true;
 }
 
-bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_t repeat_us,
-    const std::atomic<bool>* wakeupToken)
+bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
+    uint32_t repeat_us, std::function<bool()> alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -100,8 +99,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn, uint32_
 
     item->mFunc = fn;
     item->mNext = nullptr;
-    item->wakeupToken = wakeupToken;
-    item->wakeupTokenCmp = wakeupToken && wakeupToken->load();
+    item->alarm = std::move(alarm);
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
@@ -174,8 +172,7 @@ void run_scheduled_recurrent_functions()
     do
     {
         done = current == stop;
-        const bool wakeupToken = current->wakeupToken && current->wakeupToken->load();
-        const bool wakeup = current->wakeupTokenCmp != wakeupToken;
+        const bool wakeup = current->alarm && current->alarm();
         bool callNow = current->callNow;
 
         if ((wakeup || callNow) && !current->mFunc())
