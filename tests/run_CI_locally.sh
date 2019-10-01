@@ -84,6 +84,8 @@ done
 cp tests/platformio.sh tests/platformio-custom.sh
 sed -i 's,pip ,pip2 ,g' tests/platformio-custom.sh
 
+git submodule update --init
+
 export HOME="${TMPCI}"
 export TRAVIS_BUILD_DIR="${TMPCI}"
 export BUILD_TYPE="$BUILD_TYPE"
