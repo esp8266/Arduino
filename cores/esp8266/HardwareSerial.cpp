@@ -60,6 +60,15 @@ void HardwareSerial::end()
     _uart = NULL;
 }
 
+void HardwareSerial::updateBaudRate(unsigned long baud)
+{
+    if(!_uart) {
+        return;
+    }
+
+    uart_set_baudrate(_uart, baud);    
+}
+
 size_t HardwareSerial::setRxBufferSize(size_t size){
     if(_uart) {
         _rx_size = uart_resize_rx_buffer(_uart, size);

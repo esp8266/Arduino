@@ -175,16 +175,18 @@ use esptool.py.
 
 -  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.4.0/ESP8266FS-0.4.0.zip
 -  In your Arduino sketchbook directory, create ``tools`` directory if
-   it doesn't exist yet
+   it doesn't exist yet.
 -  Unpack the tool into ``tools`` directory (the path will look like
    ``<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar``)
    If upgrading, overwrite the existing JAR file with the newer version.
--  Restart Arduino IDE
--  Open a sketch (or create a new one and save it)
--  Go to sketch directory (choose Sketch > Show Sketch Folder)
+-  Restart Arduino IDE.
+-  Open a sketch (or create a new one and save it).
+-  Go to sketch directory (choose Sketch > Show Sketch Folder).
 -  Create a directory named ``data`` and any files you want in the file
-   system there
--  Make sure you have selected a board, port, and closed Serial Monitor
+   system there.
+-  Make sure you have selected a board, port, and closed Serial Monitor.
+-  If your board requires you to press a button (or other action) to enter
+   bootload mode for flashing a sketch, do that now.
 -  Select Tools > ESP8266 Sketch Data Upload. This should start
    uploading the files into ESP8266 flash file system. When done, IDE
    status bar will display ``SPIFFS Image Uploaded`` message.
