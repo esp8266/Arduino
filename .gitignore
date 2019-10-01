@@ -1,12 +1,34 @@
 .DS_Store
 tools/dist/
 tools/xtensa-lx106-elf/
-tools/esptool/
 tools/mkspiffs/
+tools/mklittlefs/
+tools/python/
+tools/python3/
 package/versions/
 exclude.txt
 tools/sdk/lib/liblwip_src.a
 tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
+tools/sdk/ld/backup
+tools/sdk/ld/eagle.app.v6.common.ld
+
+tests/hosts/lcov/
 
 *.pyc
+*.gch
+
+boards.local.txt
+
+*.gcov
+*.gcno
+*.gcda
+*.o
+*.a
+
+#Ignore files built by Visual Studio/Visual Micro
+[Dd]ebug*/
+[Rr]elease*/
+.vs/
+__vm/
+*.vcxproj*

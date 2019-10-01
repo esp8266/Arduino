@@ -1,11 +1,18 @@
 #ifndef REQUESTHANDLERSIMPL_H
 #define REQUESTHANDLERSIMPL_H
 
+#include <ESP8266WebServer.h>
 #include "RequestHandler.h"
+#include "mimetable.h"
+#include "WString.h"
 
-class FunctionRequestHandler : public RequestHandler {
+using namespace mime;
+
+template<typename ServerType>
+class FunctionRequestHandler : public RequestHandler<ServerType> {
+    using WebServerType = ESP8266WebServerTemplate<ServerType>;
 public:
-    FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn, const String &uri, HTTPMethod method)
+    FunctionRequestHandler(typename WebServerType::THandlerFunction fn, typename WebServerType::THandlerFunction ufn, const String &uri, HTTPMethod method)
     : _fn(fn)
     , _ufn(ufn)
     , _uri(uri)
@@ -30,7 +37,8 @@ public:
         return true;
     }
 
-    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(WebServerType& server, HTTPMethod requestMethod, String requestUri) override {
+        (void) server;
         if (!canHandle(requestMethod, requestUri))
             return false;
 
@@ -38,19 +46,23 @@ public:
         return true;
     }
 
-    void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) override {
+    void upload(WebServerType& server, String requestUri, HTTPUpload& upload) override {
+        (void) server;
+        (void) upload;
         if (canUpload(requestUri))
             _ufn();
     }
 
 protected:
-    ESP8266WebServer::THandlerFunction _fn;
-    ESP8266WebServer::THandlerFunction _ufn;
+    typename WebServerType::THandlerFunction _fn;
+    typename WebServerType::THandlerFunction _ufn;
     String _uri;
     HTTPMethod _method;
 };
 
-class StaticRequestHandler : public RequestHandler {
+template<typename ServerType>
+class StaticRequestHandler : public RequestHandler<ServerType> {
+    using WebServerType = ESP8266WebServerTemplate<ServerType>;
 public:
     StaticRequestHandler(FS& fs, const char* path, const char* uri, const char* cache_header)
     : _fs(fs)
@@ -73,7 +85,7 @@ public:
         return true;
     }
 
-    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(WebServerType& server, HTTPMethod requestMethod, String requestUri) override {
         if (!canHandle(requestMethod, requestUri))
             return false;
 
@@ -84,7 +96,8 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) requestUri += "index.htm";
+            if (requestUri.endsWith("/")) 
+              requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
@@ -95,10 +108,10 @@ public:
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
-        if (!path.endsWith(".gz") && !_fs.exists(path))  {
-            String pathWithGz = path + ".gz";
+        if (!path.endsWith(FPSTR(mimeTable[gz].endsWith)) && !_fs.exists(path))  {
+            String pathWithGz = path + FPSTR(mimeTable[gz].endsWith);
             if(_fs.exists(pathWithGz))
-                path += ".gz";
+                path += FPSTR(mimeTable[gz].endsWith);
         }
 
         File f = _fs.open(path, "r");
@@ -113,28 +126,18 @@ public:
     }
 
     static String getContentType(const String& path) {
-        if (path.endsWith(".html")) return "text/html";
-        else if (path.endsWith(".htm")) return "text/html";
-        else if (path.endsWith(".css")) return "text/css";
-        else if (path.endsWith(".txt")) return "text/plain";
-        else if (path.endsWith(".js")) return "application/javascript";
-        else if (path.endsWith(".png")) return "image/png";
-        else if (path.endsWith(".gif")) return "image/gif";
-        else if (path.endsWith(".jpg")) return "image/jpeg";
-        else if (path.endsWith(".ico")) return "image/x-icon";
-        else if (path.endsWith(".svg")) return "image/svg+xml";
-        else if (path.endsWith(".ttf")) return "application/x-font-ttf";
-        else if (path.endsWith(".otf")) return "application/x-font-opentype";
-        else if (path.endsWith(".woff")) return "application/font-woff";
-        else if (path.endsWith(".woff2")) return "application/font-woff2";
-        else if (path.endsWith(".eot")) return "application/vnd.ms-fontobject";
-        else if (path.endsWith(".sfnt")) return "application/font-sfnt";
-        else if (path.endsWith(".xml")) return "text/xml";
-        else if (path.endsWith(".pdf")) return "application/pdf";
-        else if (path.endsWith(".zip")) return "application/zip";
-        else if(path.endsWith(".gz")) return "application/x-gzip";
-        else if (path.endsWith(".appcache")) return "text/cache-manifest";
-        return "application/octet-stream";
+        char buff[sizeof(mimeTable[0].mimeType)];
+        // Check all entries but last one for match, return if found
+        for (size_t i=0; i < sizeof(mimeTable)/sizeof(mimeTable[0])-1; i++) {
+            strcpy_P(buff, mimeTable[i].endsWith);
+            if (path.endsWith(buff)) {
+                strcpy_P(buff, mimeTable[i].mimeType);
+                return String(buff);
+            }
+        }
+        // Fall-through and just return default type
+        strcpy_P(buff, mimeTable[sizeof(mimeTable)/sizeof(mimeTable[0])-1].mimeType);
+        return String(buff);
     }
 
 protected:

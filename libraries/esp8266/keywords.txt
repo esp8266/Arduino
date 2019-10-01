@@ -1,0 +1,113 @@
+#######################################
+# Syntax Coloring Map For ESP8266
+#######################################
+
+#######################################
+# Library (KEYWORD3)
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ESP	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+wdtEnable	KEYWORD2
+wdtDisable	KEYWORD2
+wdtFeed	KEYWORD2
+RF_MODE	KEYWORD2
+RF_PRE_INIT	KEYWORD2
+ADC_MODE	KEYWORD2
+deepSleep	KEYWORD2
+rtcUserMemoryRead	KEYWORD2
+rtcUserMemoryWrite	KEYWORD2
+reset	KEYWORD2
+restart	KEYWORD2
+getVcc	KEYWORD2
+getFreeHeap	KEYWORD2
+getHeapFragmentation	KEYWORD2
+getMaxFreeBlockSize	KEYWORD2
+getChipId	KEYWORD2
+getSdkVersion	KEYWORD2
+getCoreVersion	KEYWORD2
+getFullVersion	KEYWORD2
+getBootVersion	KEYWORD2
+getBootMode	KEYWORD2
+getCpuFreqMHz	KEYWORD2
+getFlashChipId	KEYWORD2
+getFlashChipRealSize	KEYWORD2
+getFlashChipSize	KEYWORD2
+getFlashChipSpeed	KEYWORD2
+getFlashChipMode	KEYWORD2
+getFlashChipSizeByChipId	KEYWORD2
+magicFlashChipSize	KEYWORD2
+magicFlashChipSpeed	KEYWORD2
+magicFlashChipMode	KEYWORD2
+checkFlashConfig	KEYWORD2
+flashEraseSector	KEYWORD2
+flashWrite	KEYWORD2
+flashRead	KEYWORD2
+getSketchSize	KEYWORD2
+getSketchMD5	KEYWORD2
+getFreeSketchSpace	KEYWORD2
+updateSketch	KEYWORD2
+getResetReason	KEYWORD2
+getResetInfo	KEYWORD2
+getResetInfoPtr	KEYWORD2
+eraseConfig	KEYWORD2
+getCycleCount	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+RFMode	LITERAL1
+WakeMode	LITERAL1
+FlashMode_t	LITERAL1
+
+RF_DEFAULT	LITERAL1
+RF_CAL	LITERAL1
+RF_NO_CAL	LITERAL1
+RF_DISABLED	LITERAL1
+WAKE_RF_DEFAULT	LITERAL1
+WAKE_RFCAL	LITERAL1
+WAKE_NO_RFCAL	LITERAL1
+WAKE_RF_DISABLED	LITERAL1
+ADC_VCC	LITERAL1
+ADC_TOUT	LITERAL1
+
+#######################################
+# namespace esp8266
+#######################################
+coreVersionMajor	LITERAL1
+coreVersionMinor	LITERAL1
+coreVersionRevision	LITERAL1
+coreVersionSubRevision	LITERAL1
+coreVersionNumeric	LITERAL1
+
+# Filesystem objects
+SPIFFS	KEYWORD1
+SDFS	KEYWORD1
+File	KEYWORD1
+Dir	KEYWORD1
+SPIFFSConfig	KEYWORD1
+
+# Seek enums
+SeekSet	LITERAL1
+SeekCur	LITERAL1
+SeekEnd	LITERAL1
+
+# Filesystem methods (not covered by Stream or Print)
+format	KEYWORD2
+info	KEYWORD2
+exists	KEYWORD2
+openDir	KEYWORD2
+remove	KEYWORD2
+rename	KEYWORD2
+mkdir	KEYWORD2
+rmdir	KEYWORD2
+isFile	KEYWORD2
+isDirectory	KEYWORD2

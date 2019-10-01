@@ -1,5 +1,24 @@
 /*
- *  Copyright (c) 2010 - 2011 Espressif System
+ * ESPRESSIF MIT License
+ *
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -65,14 +84,17 @@ typedef enum {
 #define SHMEM_ATTR
 
 #ifdef ICACHE_FLASH
-#define ICACHE_FLASH_ATTR   __attribute__((section(".irom0.text")))
-#define ICACHE_RAM_ATTR     __attribute__((section(".iram.text")))
-#define ICACHE_RODATA_ATTR  __attribute__((section(".irom.text")))
+#define __ICACHE_STRINGIZE_NX(A) #A
+#define __ICACHE_STRINGIZE(A) __ICACHE_STRINGIZE_NX(A)
+#define ICACHE_FLASH_ATTR   __attribute__((section("\".irom0.text." __FILE__ "." __ICACHE_STRINGIZE(__LINE__) "." __ICACHE_STRINGIZE(__COUNTER__) "\"")))
+#define ICACHE_RAM_ATTR     __attribute__((section("\".iram.text." __FILE__ "." __ICACHE_STRINGIZE(__LINE__) "." __ICACHE_STRINGIZE(__COUNTER__) "\"")))
 #else
 #define ICACHE_FLASH_ATTR
 #define ICACHE_RAM_ATTR
-#define ICACHE_RODATA_ATTR
 #endif /* ICACHE_FLASH */
+
+// counterpart https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp8266-compat.h
+#define IRAM_ATTR ICACHE_RAM_ATTR
 
 #define STORE_ATTR __attribute__((aligned(4)))
 

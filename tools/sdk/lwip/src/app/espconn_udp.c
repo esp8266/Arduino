@@ -94,8 +94,8 @@ espconn_udp_sent(void *arg, uint8 *psent, uint16 length)
         return ESPCONN_ARG;
     }
 
-    if (1470 < length) {
-        datalen = 1470;
+    if ((IP_FRAG_MAX_MTU - 20 - 8) < length) {
+        datalen = IP_FRAG_MAX_MTU - 20 - 8;
     } else {
         datalen = length;
     }
@@ -200,8 +200,8 @@ espconn_udp_sendto(void *arg, uint8 *psent, uint16 length)
         return ESPCONN_ARG;
     }
 
-    if (1470 < length) {
-        datalen = 1470;
+    if ((IP_FRAG_MAX_MTU - 20 - 8) < length) {
+        datalen = IP_FRAG_MAX_MTU - 20 - 8;
     } else {
         datalen = length;
     }

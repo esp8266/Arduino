@@ -11,6 +11,11 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 TEST_CASE("umm_info can be called", "[umm_malloc]")
 {
     umm_info(NULL, 1);

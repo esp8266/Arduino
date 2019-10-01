@@ -1,5 +1,4 @@
 #include <BSTest.h>
-#include <test_config.h>
 #include <Schedule.h>
 
 BS_ENV_DECLARE();
@@ -10,6 +9,10 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
 
 TEST_CASE("scheduled functions are executed", "[schedule]")
 {

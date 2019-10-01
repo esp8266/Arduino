@@ -75,7 +75,7 @@ uint8_t listen(SOCKET s)
  * 		
  * @return	1 for success else 0.
  */
-uint8_t connect(SOCKET s, uint8_t * addr, uint16_t port)
+uint8_t connect(SOCKET s, const uint8_t * addr, uint16_t port)
 {
   if 
     (
@@ -364,6 +364,7 @@ uint16_t recvfrom(SOCKET s, uint8_t *buf, uint16_t len, uint8_t *addr, uint16_t 
  */
 void flush(SOCKET s) {
   // TODO
+  (void) s;
 }
 
 uint16_t igmpsend(SOCKET s, const uint8_t * buf, uint16_t len)
@@ -419,7 +420,7 @@ uint16_t bufferData(SOCKET s, uint16_t offset, const uint8_t* buf, uint16_t len)
   return ret;
 }
 
-int startUDP(SOCKET s, uint8_t* addr, uint16_t port)
+int startUDP(SOCKET s, const uint8_t* addr, uint16_t port)
 {
   if
     (

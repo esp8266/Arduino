@@ -1,9 +1,9 @@
-/* 
+/*
   Ticker.cpp - esp8266 library that calls functions periodically
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -19,23 +19,20 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stddef.h>
-#include <stdint.h>
-
-extern "C" {
 #include "c_types.h"
 #include "eagle_soc.h"
-#include "ets_sys.h"
 #include "osapi.h"
-}
-
-const int ONCE   = 0;
-const int REPEAT = 1;
 
 #include "Ticker.h"
 
+namespace
+{
+	constexpr int ONCE = 0;
+	constexpr int REPEAT = 1;
+}
+
 Ticker::Ticker()
-: _timer(0)
+	: _timer(nullptr)
 {
 }
 
@@ -44,7 +41,12 @@ Ticker::~Ticker()
 	detach();
 }
 
-void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg)
+void Ticker::_attach_s(float seconds, bool repeat, callback_with_arg_t callback, void* arg)
+{
+	_attach_ms(1000 * seconds, repeat, callback, arg);
+}
+
+void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg)
 {
 	if (_timer)
 	{
@@ -52,11 +54,11 @@ void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t 
 	}
 	else
 	{
-		_timer = new ETSTimer;
+		_timer = &_etsTimer;
 	}
 
-	os_timer_setfn(_timer, reinterpret_cast<ETSTimerFunc*>(callback), reinterpret_cast<void*>(arg));
-	os_timer_arm(_timer, milliseconds, (repeat)?REPEAT:ONCE);
+	os_timer_setfn(_timer, callback, arg);
+	os_timer_arm(_timer, milliseconds, (repeat) ? REPEAT : ONCE);
 }
 
 void Ticker::detach()
@@ -65,6 +67,18 @@ void Ticker::detach()
 		return;
 
 	os_timer_disarm(_timer);
-	delete _timer;
-	_timer = 0;
+	_timer = nullptr;
+	_callback_function = nullptr;
+}
+
+bool Ticker::active() const
+{
+	return _timer;
+}
+
+void Ticker::_static_callback(void* arg)
+{
+	Ticker* _this = reinterpret_cast<Ticker*>(arg);
+	if (_this && _this->_callback_function)
+		_this->_callback_function();
 }

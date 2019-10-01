@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Original espota.py by Ivan Grokhotkov:
 # https://gist.github.com/igrr/d35ab8446922179dc58c
@@ -8,9 +8,9 @@
 # Modified since 2016-01-03 from Matthew O'Gorman (https://githumb.com/mogorman)
 #
 # This script will push an OTA update to the ESP
-# use it like: python espota.py -i <ESP_IP_address> -I <Host_IP_address> -p <ESP_port> -P <Host_port> [-a password] -f <sketch.bin>
+# use it like: python3 espota.py -i <ESP_IP_address> -I <Host_IP_address> -p <ESP_port> -P <Host_port> [-a password] -f <sketch.bin>
 # Or to upload SPIFFS image:
-# python espota.py -i <ESP_IP_address> -I <Host_IP_address> -p <ESP_port> -P <HOST_port> [-a password] -s -f <spiffs.bin>
+# python3 espota.py -i <ESP_IP_address> -I <Host_IP_address> -p <ESP_port> -P <HOST_port> [-a password] -s -f <spiffs.bin>
 #
 # Changes
 # 2015-09-18:
@@ -81,6 +81,14 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     logging.error("Listen Failed")
     return 1
 
+  # Check whether Signed Update is used.
+  if ( os.path.isfile(filename + '.signed') ):
+    filename = filename + '.signed'
+    file_check_msg = 'Detected Signed Update. %s will be uploaded instead.' % (filename)
+    sys.stderr.write(file_check_msg + '\n')
+    sys.stderr.flush()
+    logging.info(file_check_msg)
+  
   content_size = os.path.getsize(filename)
   f = open(filename,'rb')
   file_md5 = hashlib.md5(f.read()).hexdigest()
@@ -95,7 +103,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   sent = sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
-    data = sock2.recv(37).decode()
+    data = sock2.recv(128).decode()
   except:
     logging.error('No Answer')
     sock2.close()
@@ -144,6 +152,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     sock.close()
     return 1
 
+  received_ok = False
+
   try:
     f = open(filename, "rb")
     if (PROGRESS):
@@ -160,7 +170,9 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       connection.settimeout(10)
       try:
         connection.sendall(chunk)
-        res = connection.recv(4)
+        if connection.recv(32).decode().find('O') >= 0:
+          # connection will receive only digits or 'OK'
+          received_ok = True;
       except:
         sys.stderr.write('\n')
         logging.error('Error Uploading')
@@ -171,10 +183,16 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
 
     sys.stderr.write('\n')
     logging.info('Waiting for result...')
+    # libraries/ArduinoOTA/ArduinoOTA.cpp L311 L320
+    # only sends digits or 'OK'. We must not not close
+    # the connection before receiving the 'O' of 'OK'
     try:
       connection.settimeout(60)
-      data = connection.recv(32).decode()
-      logging.info('Result: %s' ,data)
+      while not received_ok:
+        if connection.recv(32).decode().find('O') >= 0:
+          # connection will receive only digits or 'OK'
+          received_ok = True;
+      logging.info('Result: OK')
       connection.close()
       f.close()
       sock.close()

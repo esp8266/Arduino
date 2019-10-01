@@ -34,7 +34,8 @@
 
 typedef enum WiFiMode 
 {
-    WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3
+    WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3,
+    /* these two pseudo modes are experimental: */ WIFI_SHUTDOWN = 4, WIFI_RESUME = 8
 } WiFiMode_t;
 
 typedef enum WiFiPhyMode
@@ -58,9 +59,10 @@ typedef enum WiFiEvent
     WIFI_EVENT_SOFTAPMODE_STACONNECTED,
     WIFI_EVENT_SOFTAPMODE_STADISCONNECTED,
     WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED,
+    WIFI_EVENT_MODE_CHANGE,
+    WIFI_EVENT_SOFTAPMODE_DISTRIBUTE_STA_IP,
     WIFI_EVENT_MAX,
     WIFI_EVENT_ANY = WIFI_EVENT_MAX,
-    WIFI_EVENT_MODE_CHANGE
 } WiFiEvent_t;
 
 enum WiFiDisconnectReason 
@@ -147,10 +149,5 @@ struct WiFiEventSoftAPModeProbeRequestReceived
     uint8 mac[6];
 };
 
-
-extern "C" {
-typedef STAILQ_HEAD(, bss_info)
-bss_info_head_t;
-}
 
 #endif /* ESP8266WIFITYPE_H_ */

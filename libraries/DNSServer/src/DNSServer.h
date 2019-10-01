@@ -6,6 +6,15 @@
 #define DNS_QR_RESPONSE 1
 #define DNS_OPCODE_QUERY 0
 
+#define DNS_QCLASS_IN 1
+#define DNS_QCLASS_ANY 255
+
+#define DNS_QTYPE_A 1
+#define DNS_QTYPE_ANY 255
+
+#define MAX_DNSNAME_LENGTH 253
+#define MAX_DNS_PACKETSIZE 512
+
 enum class DNSReplyCode
 {
   NoError = 0,
@@ -40,6 +49,9 @@ class DNSServer
 {
   public:
     DNSServer();
+    ~DNSServer() {
+        stop();
+    };
     void processNextRequest();
     void setErrorReplyCode(const DNSReplyCode &replyCode);
     void setTTL(const uint32_t &ttl);
@@ -56,16 +68,20 @@ class DNSServer
     uint16_t _port;
     String _domainName;
     unsigned char _resolvedIP[4];
-    int _currentPacketSize;
-    unsigned char* _buffer;
-    DNSHeader* _dnsHeader;
     uint32_t _ttl;
     DNSReplyCode _errorReplyCode;
 
     void downcaseAndRemoveWwwPrefix(String &domainName);
-    String getDomainNameWithoutWwwPrefix();
-    bool requestIncludesOnlyOneQuestion();
-    void replyWithIP();
-    void replyWithCustomCode();
+    void replyWithIP(DNSHeader *dnsHeader,
+		     unsigned char * query,
+		     size_t queryLength);
+    void replyWithError(DNSHeader *dnsHeader,
+			DNSReplyCode rcode,
+			unsigned char *query,
+			size_t queryLength);
+    void replyWithError(DNSHeader *dnsHeader,
+			DNSReplyCode rcode);
+    void respondToRequest(uint8_t *buffer, size_t length);
+    void writeNBOShort(uint16_t value);
 };
 #endif

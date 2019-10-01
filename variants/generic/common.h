@@ -30,19 +30,27 @@
 #define NUM_DIGITAL_PINS        17
 #define NUM_ANALOG_INPUTS       1
 
-// TODO: this should be <= 9 if flash is in DIO mode
 #define isFlashInterfacePin(p)      ((p) >= 6 && (p) <= 11)
 
 #define analogInputToDigitalPin(p)  ((p > 0) ? NOT_A_PIN : 0)
 #define digitalPinToInterrupt(p)    (((p) < EXTERNAL_NUM_INTERRUPTS)? (p) : NOT_AN_INTERRUPT)
 #define digitalPinHasPWM(p)         (((p) < NUM_DIGITAL_PINS && !isFlashInterfacePin(p))? 1 : 0)
 
-static const uint8_t SS    = 15;
-static const uint8_t MOSI  = 13;
-static const uint8_t MISO  = 12;
-static const uint8_t SCK   = 14;
+#define PIN_SPI_SS   (15)
+#define PIN_SPI_MOSI (13)
+#define PIN_SPI_MISO (12)
+#define PIN_SPI_SCK  (14)
 
-static const uint8_t A0 = 17;
+static const uint8_t SS    = PIN_SPI_SS;
+static const uint8_t MOSI  = PIN_SPI_MOSI;
+static const uint8_t MISO  = PIN_SPI_MISO;
+static const uint8_t SCK   = PIN_SPI_SCK;
+
+#ifndef PIN_A0
+#define PIN_A0 (17)
+#endif /* PIN_A0 */
+
+static const uint8_t A0 = PIN_A0;
 
 // These serial port names are intended to allow libraries and architecture-neutral
 // sketches to automatically default to the correct port name for a particular type
@@ -63,5 +71,12 @@ static const uint8_t A0 = 17;
 #define SERIAL_PORT_USBVIRTUAL     Serial
 #define SERIAL_PORT_HARDWARE       Serial
 #define SERIAL_PORT_HARDWARE_OPEN  Serial1
+
+#ifdef LED_BUILTIN
+#ifdef __cplusplus
+extern "C"
+#endif
+const int BUILTIN_LED __attribute__((deprecated("use LED_BUILTIN"), weak)) = LED_BUILTIN;
+#endif
 
 #endif /* GENERIC_COMMON_H */

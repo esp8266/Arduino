@@ -1,50 +1,159 @@
-sudo: false
 language: bash
-os:
-  - linux
+os: linux
+dist: trusty
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+git:
+  depth: 1
+  submodules: false
 
-script:
-  - set -e
-  - export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
-  - echo -e "travis_fold:start:host_tests"
-  - pushd $TRAVIS_BUILD_DIR/tests/host
-  - make
-  - make clean-objects
-  - echo -e "travis_fold:end:host_tests"
-  - echo -e "travis_fold:start:sketch_test_env_prepare"
-  - popd
-  - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-  - tar xf arduino.tar.xz
-  - mv arduino-nightly $HOME/arduino_ide
-  - cd $HOME/arduino_ide/hardware
-  - mkdir esp8266com
-  - cd esp8266com
-  - ln -s $TRAVIS_BUILD_DIR esp8266
-  - cd esp8266/tools
-  - python get.py
-  - export PATH="$HOME/arduino_ide:$TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf/bin:$PATH"
-  - which arduino
-  - cd $TRAVIS_BUILD_DIR
-  - source tests/common.sh
-  - install_libraries
-  - echo -e "travis_fold:end:sketch_test_env_prepare"
-  - echo -e "travis_fold:start:sketch_test"
-  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
-  - echo -e "travis_fold:end:sketch_test"
-  - echo -e "travis_fold:start:size_report"
-  - cat size.log
-  - echo -e "travis_fold:end:size_report"
+before_install:
+  - git submodule update --init  # no recursive update
 
-after_success:
-    - pushd $TRAVIS_BUILD_DIR/tests/host
-    - bash <(curl -s https://codecov.io/bash) -X gcov
+cache:
+  directories:
+    - $HOME/astyle
+
+stages:
+  - build
+  - deploy
+
+jobs:
+  include:
+    # Build stage. To save time, run all kinds of builds and tests in parallel.
+
+    - name: "Platformio (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Platformio (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Build (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Debug (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Debug (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Build IPv6 (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build IPv6 (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Build lwIP-v1.4 (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build1.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build lwIP-v1.4 (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build1.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Host tests"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
+      install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -q
+        - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
+        - sudo apt-get install valgrind lcov
+      env: CC=gcc-7 CXX=g++-7
+
+    - name: "Docs"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
+      install:
+          - sudo apt-get install python3-pip
+          - pip3 install --user -r doc/requirements.txt;
+
+    - name: "Style check"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
+      install: tests/ci/install_astyle.sh
+
+    - name: "Mock trivial test"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/buildm.sh
+      install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -q
+        - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
+      env: CC=gcc-7 CXX=g++-7
+
+    - name: "Mac OSX can build sketches"
+      os: osx
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env: MACOSX=1 BUILD_PARITY=custom mod=500 rem=1
+
+    - name: "Windows can build sketches"
+      os: windows
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env: WINDOWS=1 BUILD_PARITY=custom mod=500 rem=1
+
+    - name: "Boards"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_boards.sh
+
+    # Deploy stage.
+    # Here we build the package JSON (always) and do the deployments
+    - name: "Package / deploy"
+      stage: deploy
+      script: tests/ci/build_package.sh
+      env: BUILD_TYPE=package
+      before_deploy: git submodule update --init
+      deploy:
+      # Create Github release, upload artifacts
+      - provider: releases
+        draft: true
+        skip_cleanup: true
+        api_key:
+          secure: kYsxX/N21fwLSTLpbb0c96PnQHn1CIMqZstm02hfUhCX83FygWSh4vs3gzW28DMpjQMZ6vC4g+jtfosYU2tUhht/bynurDH4edpEyGeMyK+fzCI9pAr4JT0RbKQI84EC18ScpgP/UP0jTc1LJ+xl8UMwSiDE0mzHx7xJ4mMNQbA=
+        file_glob: true
+        tag_name: $TRAVIS_TAG
+        target_commitish: $TRAVIS_COMMIT
+        file:
+          - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
+          - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
+        on:
+          repo: esp8266/Arduino
+          tags: true
+
+      # Update the package index URL to point to the new version
+      - provider: script
+        skip_cleanup: true
+        script: bash package/deploy_package_index.sh
+        on:
+          repo: esp8266/Arduino
+          tags: true
 
 notifications:
   email:
