@@ -172,6 +172,7 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setRawAuthorization(const char * rawAuth);
     void setTimeout(uint16_t timeout);
     void setFollowRedirects(bool follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
@@ -243,7 +244,7 @@ protected:
     String _protocol;
     String _headers;
     String _userAgent = "ESP8266HTTPClient";
-    String _base64Authorization;
+    String _rawAuthorization;
 
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;

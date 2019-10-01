@@ -317,7 +317,8 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
         // auth info
         String auth = host.substring(0, index);
         host.remove(0, index + 1); // remove auth part including @
-        _base64Authorization = base64::encode(auth);
+        _rawAuthorization = "Basic ";
+        _rawAuthorization += base64::encode(auth);
     }
 
     // get port
@@ -492,7 +493,7 @@ void HTTPClient::setUserAgent(const String& userAgent)
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param user const char *
  * @param password const char *
  */
@@ -502,18 +503,31 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
         String auth = user;
         auth += ":";
         auth += password;
-        _base64Authorization = base64::encode(auth);
+        _rawAuthorization = "Basic ";
+        _rawAuthorization += base64::encode(auth);
     }
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param auth const char * base64
  */
 void HTTPClient::setAuthorization(const char * auth)
 {
     if(auth) {
-        _base64Authorization = auth;
+        _rawAuthorization = "Basic ";
+        _rawAuthorization += auth;
+    }
+}
+
+/**
+ * set the full raw Authorization header value for the http request
+ * @param rawAuth const char *
+ */
+void HTTPClient::setRawAuthorization(const char * rawAuth)
+{
+    if(rawAuth) {
+        _rawAuthorization = rawAuth;
     }
 }
 
@@ -1066,7 +1080,7 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
     if(!name.equalsIgnoreCase(F("Connection")) &&
        !name.equalsIgnoreCase(F("User-Agent")) &&
        !name.equalsIgnoreCase(F("Host")) &&
-       !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
+       !(name.equalsIgnoreCase(F("Authorization")) && _rawAuthorization.length())){
 
         String headerLine = name;
         headerLine += ": ";
@@ -1240,10 +1254,10 @@ bool HTTPClient::sendHeader(const char * type)
         header += F("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n");
     }
 
-    if(_base64Authorization.length()) {
-        _base64Authorization.replace("\n", "");
-        header += F("Authorization: Basic ");
-        header += _base64Authorization;
+    if (_rawAuthorization.length()) {
+        _rawAuthorization.replace("\n", "");
+        header += F("Authorization: ");
+        header += _rawAuthorization;
         header += "\r\n";
     }
 
