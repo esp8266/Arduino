@@ -444,8 +444,8 @@ bool EspClass::checkFlashCRC() {
     // The CRC and total length are placed in extra space at the end of the 4K chunk
     // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
     // we'll need to adjust this.
-    uint32_t flashsize = *((uint32_t*)i(0x40200000 + 4088); // Start of PROGMEM plus 4K-8
-    uint32_t flashcrc = *((uint32_t*)0x40200000 + 4095); // Start of PROGMEM plus 4K-4
+    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
+    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4095)); // Start of PROGMEM plus 4K-4
     uint32_t z[2];
     z[0] = z[1] = 0;
 
