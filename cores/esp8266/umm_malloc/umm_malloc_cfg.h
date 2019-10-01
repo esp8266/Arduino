@@ -10,7 +10,7 @@
 
 #include <debug.h>
 #include <pgmspace.h>
-#include "isr_safe_printf.h"
+#include <esp8266_undocumented.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,25 +111,6 @@ extern char _heap_start[];
   size_t ICACHE_FLASH_ATTR umm_free_heap_size( void );
   size_t ICACHE_FLASH_ATTR umm_max_block_size( void );
 #else
-#endif
-
-/*
- * -D UMM_INFO_PRINT
- *
- * umm_info(NULL, true) is used to print a debug view of heap information to the
- * debug port. It has to walk the heap and print out information while in a
- * critical section. This requires that the print function be able to print w/o
- * doing malloc calls and from an IRQ disabled context. This requires extra IRAM
- * based code for printing. Without this define `umm_info(NULL, true)` will
- * not print.
- *
- * UMM_INFO_PRINT is enabled as part of selecting `Debug port: "Serial" or
- * "Serial1"`. To make available all the time use '-D UMM_INFO_PRINT`.
- *
- * Status: Local Enhancement - addresses platform specific issue.
- */
-#if defined(DEBUG_ESP_PORT) && !defined(UMM_INFO_PRINT) && defined(UMM_INFO)
-#define UMM_INFO_PRINT
 #endif
 
 /*
@@ -587,20 +568,10 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || \
     defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || \
-    defined(UMM_INFO_PRINT) || defined(UMM_INTEGRITY_CHECK)
-
-#ifndef DEBUG_ESP_ISR
-#define DEBUG_ESP_ISR
-#endif
-
-// Note, ISR_PRINTF_P will not handle additional string arguments in
-// PROGMEM. Only the 1st parameter, fmt, is supported in PROGMEM.
-#define DBGLOG_FUNCTION(fmt, ...) ISR_PRINTF(fmt, ##__VA_ARGS__)
-#define DBGLOG_FUNCTION_P(fmt, ...) ISR_PRINTF_P(fmt, ##__VA_ARGS__)
-
+    defined(UMM_INTEGRITY_CHECK)
+#define DBGLOG_FUNCTION(fmt, ...) ets_uart_printf(fmt, ##__VA_ARGS__)
 #else
 #define DBGLOG_FUNCTION(fmt, ...)   do { (void)fmt; } while(false)
-#define DBGLOG_FUNCTION_P(fmt, ...) do { (void)fmt; } while(false)
 #endif
 
 /////////////////////////////////////////////////

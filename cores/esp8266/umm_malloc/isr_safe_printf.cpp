@@ -13,10 +13,14 @@
 #include "umm_malloc_cfg.h"
 extern "C" {
 
-#if defined(DEBUG_ESP_ISR)
+#if 0 //defined(DEBUG_ESP_ISR)
 
 int _isr_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 int ICACHE_RAM_ATTR _isr_safe_printf_P(const char *fmt, ...) {
+    if (ETS_INTR_WITHINISR() && (uint32_t)fmt >= 0x40200000) {
+        ets_uart_printf("\nCannot print flash string, %p, from ISR\n", fmt);
+        return 0;
+    }
     /*
       To use ets_strlen() and ets_memcpy() safely with PROGMEM, flash storage,
       the PROGMEM address must be word (4 bytes) aligned. The destination

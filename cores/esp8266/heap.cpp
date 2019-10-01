@@ -121,22 +121,39 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 #undef calloc
 #undef realloc
 
-static const char oom_fmt[]   PROGMEM STORE_ATTR = ":oom(%d)@?\n";
-static const char oom_fmt_1[] PROGMEM STORE_ATTR = ":oom(%d)@";
-static const char oom_fmt_2[] PROGMEM STORE_ATTR = ":%d\n";
+#define DEBUG_HEAP_PRINTF ets_uart_printf
 
 void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 {
     (void)size;
     (void)line;
     if (system_get_os_print()) {
-        DBGLOG_FUNCTION_P(oom_fmt_1, (int)size);
-        DBGLOG_FUNCTION_P(file);
-        DBGLOG_FUNCTION_P(oom_fmt_2, line);
+        DEBUG_HEAP_PRINTF(":oom(%d)@", (int)size);
+
+        bool inISR = ETS_INTR_WITHINISR();
+        if (inISR && (uint32_t)file >= 0x40200000) {
+            DEBUG_HEAP_PRINTF("%p", file);
+        } else if (!inISR && (uint32_t)file >= 0x40200000) {
+            char buf[ets_strlen(file)] __attribute__ ((aligned(4)));
+            ets_strcpy(buf, file);
+            DEBUG_HEAP_PRINTF(buf);
+        } else {
+            DEBUG_HEAP_PRINTF(file);
+        }
+        
+        DEBUG_HEAP_PRINTF(":%d\n", line);
     }
 }
 
-#define OOM_CHECK__PRINT_OOM(p, f, s) if (!p && system_get_os_print()) DBGLOG_FUNCTION_P(f, s)
+void ICACHE_RAM_ATTR print_oom_size(size_t size)
+{
+    (void)size;
+    if (system_get_os_print()) {
+        DEBUG_HEAP_PRINTF(":oom(%d)@?\n", (int)size);
+    }
+}
+
+#define OOM_CHECK__PRINT_OOM(p, s) if (!p) print_oom_size(s)
 #define OOM_CHECK__PRINT_LOC(p, s, f, l) if (!p) print_loc(s, f, l)
 
 #else  // ! DEBUG_ESP_OOM
@@ -148,7 +165,7 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 #define PTR_CHECK__LOG_LAST_FAIL(p, s, a)
 #endif
 
-#define OOM_CHECK__PRINT_OOM(p, f, s)
+#define OOM_CHECK__PRINT_OOM(p, s)
 #define OOM_CHECK__PRINT_LOC(p, s, f, l)
 #endif
 
@@ -160,7 +177,7 @@ void* ICACHE_RAM_ATTR malloc(size_t size)
     POISON_CHECK__ABORT();
     void* ret = __umm_malloc(size);
     PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
-    OOM_CHECK__PRINT_OOM(ret, oom_fmt, (int)size);
+    OOM_CHECK__PRINT_OOM(ret, size);
     return ret;
 }
 
@@ -170,7 +187,7 @@ void* ICACHE_RAM_ATTR calloc(size_t count, size_t size)
     POISON_CHECK__ABORT();
     void* ret = __umm_calloc(count, size);
     PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0));
-    OOM_CHECK__PRINT_OOM(ret, oom_fmt, (int)size);
+    OOM_CHECK__PRINT_OOM(ret, size);
     return ret;
 }
 
@@ -180,7 +197,7 @@ void* ICACHE_RAM_ATTR realloc(void* ptr, size_t size)
     void* ret = __umm_realloc_fl(ptr, size, NULL, 0);
     POISON_CHECK__ABORT();
     PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
-    OOM_CHECK__PRINT_OOM(ret, oom_fmt, (int)size);
+    OOM_CHECK__PRINT_OOM(ret, size);
     return ret;
 }
 
@@ -247,9 +264,6 @@ size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
 
 void system_show_malloc(void)
 {
-#if !defined(UMM_INFO_PRINT)
-    ::printf(PSTR("\nTo use \"system_show_malloc()\", you need to build with the \"-DUMM_INFO_PRINT\" option.\n"));
-#endif
     umm_info(NULL, 1);
 }
 
