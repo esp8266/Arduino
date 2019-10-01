@@ -197,13 +197,16 @@ static bool twi_write_start(void) {
   return true;
 }
 
+static void ICACHE_RAM_ATTR twi_wait_clockStretchLimit() {
+  uint32_t t=0; while(SCL_READ()==0 && (t++)<twi_clockStretchLimit); // twi_clockStretchLimit
+}
+
 static bool twi_write_stop(void){
-  uint32_t i = 0;
   SCL_LOW();
   SDA_LOW();
   twi_delay(twi_dcount);
   SCL_HIGH();
-  while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit); // Clock stretching
+  twi_wait_clockStretchLimit();
   twi_delay(twi_dcount);
   SDA_HIGH();
   twi_delay(twi_dcount);
@@ -211,24 +214,22 @@ static bool twi_write_stop(void){
 }
 
 static bool twi_write_bit(bool bit) {
-  uint32_t i = 0;
   SCL_LOW();
   if (bit) SDA_HIGH();
   else SDA_LOW();
   twi_delay(twi_dcount+1);
   SCL_HIGH();
-  while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit);// Clock stretching
+  twi_wait_clockStretchLimit();
   twi_delay(twi_dcount);
   return true;
 }
 
 static bool twi_read_bit(void) {
-  uint32_t i = 0;
   SCL_LOW();
   SDA_HIGH();
   twi_delay(twi_dcount+2);
   SCL_HIGH();
-  while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit);// Clock stretching
+  twi_wait_clockStretchLimit();
   bool bit = SDA_READ();
   twi_delay(twi_dcount);
   return bit;
@@ -251,6 +252,13 @@ static unsigned char twi_read_byte(bool nack) {
   return byte;
 }
 
+// Generate a clock "valey" (at the end of a segment, just before a repeated start)
+void twi_scl_valey( void ) {
+  SCL_LOW();
+  twi_delay(twi_dcount);
+  SCL_HIGH();
+}
+
 unsigned char twi_writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop){
   unsigned int i;
   if(!twi_write_start()) return 4;//line busy
@@ -265,12 +273,15 @@ unsigned char twi_writeTo(unsigned char address, unsigned char * buf, unsigned i
     }
   }
   if(sendStop) twi_write_stop();
+  else {
+    twi_scl_valey();
+    twi_wait_clockStretchLimit();
+		// TD-er: Also twi_delay here?
+		// twi_delay(twi_dcount);
+  }
   i = 0;
   while(SDA_READ() == 0 && (i++) < 10){
-    SCL_LOW();
-    twi_delay(twi_dcount);
-    SCL_HIGH();
-    unsigned int t=0; while(SCL_READ()==0 && (t++)<twi_clockStretchLimit); // twi_clockStretchLimit
+    twi_scl_valey();
     twi_delay(twi_dcount);
   }
   return 0;
@@ -286,12 +297,15 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
   for(i=0; i<(len-1); i++) buf[i] = twi_read_byte(false);
   buf[len-1] = twi_read_byte(true);
   if(sendStop) twi_write_stop();
+  else {
+    twi_scl_valey();
+    twi_wait_clockStretchLimit();
+		// TD-er: Also twi_delay here?
+		// twi_delay(twi_dcount);
+  }
   i = 0;
   while(SDA_READ() == 0 && (i++) < 10){
-    SCL_LOW();
-    twi_delay(twi_dcount);
-    SCL_HIGH();
-    unsigned int t=0; while(SCL_READ()==0 && (t++)<twi_clockStretchLimit); // twi_clockStretchLimit
+    twi_scl_valey();
     twi_delay(twi_dcount);
   }
   return 0;
