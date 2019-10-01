@@ -24,7 +24,7 @@ struct recurrent_fn_t
     recurrent_fn_t* mNext = nullptr;
     mRecFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
-    std::function<bool()> alarm = nullptr;
+    std::function<bool(void)> alarm = nullptr;
     recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
@@ -86,7 +86,7 @@ bool schedule_function (const std::function<void(void)>& fn)
 }
 
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, std::function<bool()> alarm)
+    uint32_t repeat_us, std::function<bool(void)> alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
