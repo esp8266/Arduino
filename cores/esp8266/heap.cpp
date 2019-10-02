@@ -58,7 +58,10 @@ extern "C" {
 // Debugging helper, last allocation which returned NULL
 void *umm_last_fail_alloc_addr = NULL;
 int umm_last_fail_alloc_size = 0;
-
+#if defined(DEBUG_ESP_OOM)
+const char *umm_last_fail_alloc_file = NULL;
+int umm_last_fail_alloc_line = 0;
+#endif
 
 #ifdef UMM_INTEGRITY_CHECK
 #define INTEGRITY_CHECK__ABORT() \
@@ -79,18 +82,31 @@ int umm_last_fail_alloc_size = 0;
 
 #endif //   UMM_INTEGRITY_CHECK
 
-#define PTR_CHECK__LOG_LAST_FAIL(p, s, a) \
+#if defined(DEBUG_ESP_OOM)
+#define PTR_CHECK__LOG_LAST_FAIL(p, s, a, f, l) \
+    if(0 != (s) && 0 == p)\
+    {\
+      umm_last_fail_alloc_addr = a;\
+      umm_last_fail_alloc_size = s;\
+      umm_last_fail_alloc_file = f;\
+      umm_last_fail_alloc_line = l;\
+    }
+#else
+#define PTR_CHECK__LOG_LAST_FAIL(p, s, a, f, l) \
+    (void)f;\
+    (void)l;\
     if(0 != (s) && 0 == p)\
     {\
       umm_last_fail_alloc_addr = a;\
       umm_last_fail_alloc_size = s;\
     }
+#endif
 
 void* _malloc_r(struct _reent* unused, size_t size)
 {
     (void) unused;
     void *ret = malloc(size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0))
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), NULL, 0);
     return ret;
 }
 
@@ -104,7 +120,7 @@ void* _realloc_r(struct _reent* unused, void* ptr, size_t size)
 {
     (void) unused;
     void *ret = realloc(ptr, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0))
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), NULL, 0);
     return ret;
 }
 
@@ -112,7 +128,7 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
     void *ret = calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0))
+    PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0), NULL, 0);
     return ret;
 }
 
@@ -132,7 +148,7 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
 
         bool inISR = ETS_INTR_WITHINISR();
         if (inISR && (uint32_t)file >= 0x40200000) {
-            DEBUG_HEAP_PRINTF("%p", file);
+            DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
             char buf[ets_strlen(file)] __attribute__ ((aligned(4)));
             ets_strcpy(buf, file);
@@ -176,7 +192,7 @@ void* ICACHE_RAM_ATTR malloc(size_t size)
     INTEGRITY_CHECK__ABORT();
     POISON_CHECK__ABORT();
     void* ret = __umm_malloc(size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), NULL, 0);
     OOM_CHECK__PRINT_OOM(ret, size);
     return ret;
 }
@@ -186,7 +202,7 @@ void* ICACHE_RAM_ATTR calloc(size_t count, size_t size)
     INTEGRITY_CHECK__ABORT();
     POISON_CHECK__ABORT();
     void* ret = __umm_calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0), NULL, 0);
     OOM_CHECK__PRINT_OOM(ret, size);
     return ret;
 }
@@ -196,7 +212,7 @@ void* ICACHE_RAM_ATTR realloc(void* ptr, size_t size)
     INTEGRITY_CHECK__ABORT();
     void* ret = __umm_realloc_fl(ptr, size, NULL, 0);
     POISON_CHECK__ABORT();
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), NULL, 0);
     OOM_CHECK__PRINT_OOM(ret, size);
     return ret;
 }
@@ -215,7 +231,7 @@ void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
     void* ret = __umm_malloc(size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), file, line);
     OOM_CHECK__PRINT_LOC(ret, size, file, line);
     return ret;
 }
@@ -225,7 +241,7 @@ void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, 
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
     void* ret = __umm_calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, count * size, __builtin_return_address(0), file, line);
     OOM_CHECK__PRINT_LOC(ret, size, file, line);
     return ret;
 }
@@ -235,7 +251,7 @@ void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, in
     INTEGRITY_CHECK__PANIC_FL(file, line);
     void* ret = __umm_realloc_fl(ptr, size, file, line);
     POISON_CHECK__PANIC_FL(file, line);
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), file, line);
     OOM_CHECK__PRINT_LOC(ret, size, file, line);
     return ret;
 }
@@ -245,7 +261,7 @@ void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
     void* ret = __umm_calloc(1, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0));
+    PTR_CHECK__LOG_LAST_FAIL(ret, size, __builtin_return_address(0), file, line);
     OOM_CHECK__PRINT_LOC(ret, size, file, line);
     return ret;
 }
