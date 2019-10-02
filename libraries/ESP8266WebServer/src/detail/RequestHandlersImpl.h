@@ -20,7 +20,7 @@ public:
     {
     }
 
-    bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
+    bool canHandle(HTTPMethod requestMethod, const String& requestUri) override  {
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
@@ -30,14 +30,14 @@ public:
         return true;
     }
 
-    bool canUpload(String requestUri) override  {
+    bool canUpload(const String& requestUri) override  {
         if (!_ufn || !canHandle(HTTP_POST, requestUri))
             return false;
 
         return true;
     }
 
-    bool handle(WebServerType& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
         (void) server;
         if (!canHandle(requestMethod, requestUri))
             return false;
@@ -46,7 +46,7 @@ public:
         return true;
     }
 
-    void upload(WebServerType& server, String requestUri, HTTPUpload& upload) override {
+    void upload(WebServerType& server, const String& requestUri, HTTPUpload& upload) override {
         (void) server;
         (void) upload;
         if (canUpload(requestUri))
@@ -75,7 +75,7 @@ public:
         _baseUriLength = _uri.length();
     }
 
-    bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
+    bool canHandle(HTTPMethod requestMethod, const String& requestUri) override  {
         if ((requestMethod != HTTP_GET) && (requestMethod != HTTP_HEAD))
             return false;
 
@@ -85,7 +85,9 @@ public:
         return true;
     }
 
-    bool handle(WebServerType& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(WebServerType& server, HTTPMethod requestMethod, const String& __requestUri) override {
+        String requestUri(__requestUri);
+
         if (!canHandle(requestMethod, requestUri))
             return false;
 
