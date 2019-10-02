@@ -110,16 +110,17 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
-	if [ "$WINDOWS" == "1" ]; then
-            sketch=$(echo $sketch | sed 's/^\/c//')
-            # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
-            # http://www.mingw.org/wiki/Posix_path_conversion
-            # https://stackoverflow.com/questions/7250130/how-to-stop-mingw-and-msys-from-mangling-path-names-given-at-the-command-line#34386471
-            export MSYS2_ARG_CONV_EXC="*"
-            export MSYS_NO_PATHCONV=1
+    	if [ "$WINDOWS" == "1" ]; then
+                sketch=$(echo $sketch | sed 's/^\/c//')
+                # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
+                # http://www.mingw.org/wiki/Posix_path_conversion
+                # https://stackoverflow.com/questions/7250130/how-to-stop-mingw-and-msys-from-mangling-path-names-given-at-the-command-line#34386471
+                export MSYS2_ARG_CONV_EXC="*"
+                export MSYS_NO_PATHCONV=1
         fi
         echo "$build_cmd $sketch"
         time ($build_cmd $sketch >build.log)
+        time ($build_cmd $sketch )
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"
@@ -178,10 +179,10 @@ function install_ide()
         mv Arduino.app arduino-nightly
         mv arduino-nightly/Contents/Java/* arduino-nightly/.
     else
-        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-1.8.10-linux64.tar.xz
         tar xf arduino.tar.xz
     fi
-    mv arduino-nightly $ide_path
+    mv arduino-1.8.10 $ide_path
     cd $ide_path/hardware
     mkdir esp8266com
     cd esp8266com
