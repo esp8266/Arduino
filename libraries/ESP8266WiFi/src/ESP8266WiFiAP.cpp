@@ -139,13 +139,13 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
 
     if(!softap_config_equal(conf, conf_compare)) {
 
-        ETS_UART_INTR_DISABLE();
+        ETS_INTR_LOCK();
         if(WiFi._persistent) {
             ret = wifi_softap_set_config(&conf);
         } else {
             ret = wifi_softap_set_config_current(&conf);
         }
-        ETS_UART_INTR_ENABLE();
+        ETS_INTR_UNLOCK();
 
         if(!ret) {
             DEBUG_WIFI("[AP] set_config failed!\n");
@@ -290,13 +290,13 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     *conf.ssid = 0;
     *conf.password = 0;
     conf.authmode = AUTH_OPEN;
-    ETS_UART_INTR_DISABLE();
+    ETS_INTR_LOCK();
     if(WiFi._persistent) {
         ret = wifi_softap_set_config(&conf);
     } else {
         ret = wifi_softap_set_config_current(&conf);
     }
-    ETS_UART_INTR_ENABLE();
+    ETS_INTR_UNLOCK();
 
     if(!ret) {
         DEBUG_WIFI("[APdisconnect] set_config failed!\n");
