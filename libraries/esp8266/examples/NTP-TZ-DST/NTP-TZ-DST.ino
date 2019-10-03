@@ -51,11 +51,7 @@
 #include <time.h>                       // time() ctime()
 #include <sys/time.h>                   // struct timeval
 
-#if LWIP_VERSION_MAJOR == 1
-#include <lwip/sntp.h>                  // sntp_servermode_dhcp()
-#else
-#include <lwip/apps/sntp.h>             // sntp_servermode_dhcp()
-#endif
+#include <sntp.h>                       // sntp_servermode_dhcp()
 
 // for testing purpose:
 extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
