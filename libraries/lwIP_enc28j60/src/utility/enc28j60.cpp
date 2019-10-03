@@ -144,7 +144,7 @@ void serial_printf(const char *fmt, ...) {
 // The ENC28J60 SPI Interface supports clock speeds up to 20 MHz
 static const SPISettings spiSettings(20000000, MSBFIRST, SPI_MODE0);
 
-ENC28J60::ENC28J60(SPIClass& spi, int8_t cs, int8_t intr):
+ENC28J60::ENC28J60(int8_t cs, SPIClass& spi, int8_t intr):
     _bank(ERXTX_BANK), _cs(cs), _spi(spi)
 {
     (void)intr;

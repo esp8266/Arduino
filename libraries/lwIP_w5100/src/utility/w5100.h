@@ -47,8 +47,7 @@ public:
      * Constructor that uses the default hardware SPI pins
      * @param cs the Arduino Chip Select / Slave Select pin (default 10)
      */
-    Wiznet5100(SPIClass& spi = SPI, int8_t cs = SS, int8_t intr = -1);
-
+    Wiznet5100(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1);
 
     /**
      * Initialise the Ethernet controller
@@ -82,6 +81,8 @@ public:
     uint16_t readFrame(uint8_t *buffer, uint16_t bufsize);
 
 protected:
+
+    static constexpr bool interruptIsPossible() { return false; }
 
     /**
      * Read an Ethernet frame size

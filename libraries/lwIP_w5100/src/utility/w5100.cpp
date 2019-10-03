@@ -206,7 +206,7 @@ void Wiznet5100::wizchip_sw_reset()
 }
 
 
-Wiznet5100::Wiznet5100(SPIClass& spi, int8_t cs, int8_t intr):
+Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr):
 	_spi(spi), _cs(cs)
 {
 	(void)intr;

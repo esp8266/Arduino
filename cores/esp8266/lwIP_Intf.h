@@ -1,6 +1,6 @@
 
-#ifndef _LWIPETH_H
-#define _LWIPETH_H
+#ifndef _LWIPINTF_H
+#define _LWIPINTF_H
 
 // TODO:
 // remove all Serial.print
@@ -12,25 +12,20 @@
 #include <lwip/etharp.h>
 #include <lwip/dhcp.h>
 
-#ifdef ESP8266
 #include <user_interface.h>	// wifi_get_macaddr()
 #include <Schedule.h>
-#endif
-#include <SPI.h>
-#include <IPAddress.h>
-#include <FunctionalInterrupt.h>
 
 #ifndef DEFAULT_MTU
 #define DEFAULT_MTU 1500
 #endif
 
 template <class RawEthernet>
-class LwipEthernet: public RawEthernet {
+class LwipInterface: public RawEthernet {
 
 public:
 
-    LwipEthernet (SPIClass& spi = SPI, int8_t cs = SS, int8_t intr = -1):
-        RawEthernet(spi, cs, intr),
+    LwipInterface (int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1):
+        RawEthernet(cs, spi, intr),
         _mtu(DEFAULT_MTU),
         _default(false),
         _intrPin(intr)
@@ -79,7 +74,7 @@ protected:
 };
 
 template <class RawEthernet>
-boolean LwipEthernet<RawEthernet>::begin (const uint8_t* macAddress, uint16_t mtu)
+boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t mtu)
 {
     if (macAddress)
         memcpy(_macAddress, macAddress, 6);
@@ -90,13 +85,12 @@ boolean LwipEthernet<RawEthernet>::begin (const uint8_t* macAddress, uint16_t mt
             if (n->num >= _netif.num)
                 _netif.num = n->num + 1;
 
-#ifdef ESP8266
-        // make a new mac-address from the esp's wifi sta one
+#if 1
+        // forge a new mac-address from the esp's wifi sta one
         // I understand this is cheating with an official mac-address
         wifi_get_macaddr(STATION_IF, (uint8*)_macAddress);
 #else
         // https://serverfault.com/questions/40712/what-range-of-mac-addresses-can-i-safely-use-for-my-virtual-machines
-        // TODO ESP32: get wifi mac address like with esp8266 above
         memset(_macAddress, 0, 6);
         _macAddress[0] = 0xEE;
 #endif
@@ -123,14 +117,18 @@ boolean LwipEthernet<RawEthernet>::begin (const uint8_t* macAddress, uint16_t mt
 
     if (_intrPin >= 0)
     {
-        ::printf((PGM_P)F("w500-lwIP: Interrupt not implemented yet, enabling transparent polling\r\n"));
-        // still need to enable interrupt in wiznet driver
-        _intrPin = -1;
+        if (RawEthernet::interruptIsPossible())
+        {
+            //attachInterrupt(_intrPin, [&]() { this->handlePackets(); }, FALLING);
+        }
+        else
+        {
+            ::printf((PGM_P)F("lwIP_Intf: Interrupt not implemented yet, enabling transparent polling\r\n"));
+            _intrPin = -1;
+        }
     }
 
-    if (_intrPin >= 0)
-        attachInterrupt(_intrPin, [&]() { this->handlePackets(); }, FALLING);
-    else if (!schedule_recurrent_function_us([&]() { this->handlePackets(); return true; }, 100))
+    if (_intrPin < 0 && !schedule_recurrent_function_us([&]() { this->handlePackets(); return true; }, 100))
     {
         netif_remove(&_netif);
         return false;
@@ -140,7 +138,7 @@ boolean LwipEthernet<RawEthernet>::begin (const uint8_t* macAddress, uint16_t mt
 }
 
 template <class RawEthernet>
-err_t LwipEthernet<RawEthernet>::start_with_dhclient ()
+err_t LwipInterface<RawEthernet>::start_with_dhclient ()
 {
     ip4_addr_t ip, mask, gw;
 
@@ -160,18 +158,16 @@ err_t LwipEthernet<RawEthernet>::start_with_dhclient ()
 }
 
 template <class RawEthernet>
-err_t LwipEthernet<RawEthernet>::linkoutput_s (netif *netif, struct pbuf *pbuf)
+err_t LwipInterface<RawEthernet>::linkoutput_s (netif *netif, struct pbuf *pbuf)
 {
-    LwipEthernet* ths = (LwipEthernet*)netif->state;
+    LwipInterface* ths = (LwipInterface*)netif->state;
 
-#ifdef ESP8266
     if (pbuf->len != pbuf->tot_len || pbuf->next)
         Serial.println("ERRTOT\r\n");
-#endif
 
     uint16_t len = ths->sendFrame((const uint8_t*)pbuf->payload, pbuf->len);
 
-#if defined(ESP8266) && PHY_HAS_CAPTURE
+#if PHY_HAS_CAPTURE
     if (phy_capture)
         phy_capture(ths->_netif.num, (const char*)pbuf->payload, pbuf->len, /*out*/1, /*success*/len == pbuf->len);
 #endif
@@ -180,19 +176,19 @@ err_t LwipEthernet<RawEthernet>::linkoutput_s (netif *netif, struct pbuf *pbuf)
 }
 
 template <class RawEthernet>
-err_t LwipEthernet<RawEthernet>::netif_init_s (struct netif* netif)
+err_t LwipInterface<RawEthernet>::netif_init_s (struct netif* netif)
 {
-    return ((LwipEthernet*)netif->state)->netif_init();
+    return ((LwipInterface*)netif->state)->netif_init();
 }
 
 template <class RawEthernet>
-void LwipEthernet<RawEthernet>::netif_status_callback_s (struct netif* netif)
+void LwipInterface<RawEthernet>::netif_status_callback_s (struct netif* netif)
 {
-    ((LwipEthernet*)netif->state)->netif_status_callback();
+    ((LwipInterface*)netif->state)->netif_status_callback();
 }
 
 template <class RawEthernet>
-err_t LwipEthernet<RawEthernet>::netif_init ()
+err_t LwipInterface<RawEthernet>::netif_init ()
 {
     _netif.name[0] = 'e';
     _netif.name[1] = '0' + _netif.num;
@@ -219,7 +215,7 @@ err_t LwipEthernet<RawEthernet>::netif_init ()
 }
 
 template <class RawEthernet>
-void LwipEthernet<RawEthernet>::netif_status_callback ()
+void LwipInterface<RawEthernet>::netif_status_callback ()
 {
     //XXX is it wise ?
     if (_default && connected())
@@ -229,7 +225,7 @@ void LwipEthernet<RawEthernet>::netif_status_callback ()
 }
 
 template <class RawEthernet>
-err_t LwipEthernet<RawEthernet>::handlePackets ()
+err_t LwipInterface<RawEthernet>::handlePackets ()
 {
     int pkt = 0;
     while(1)
@@ -272,7 +268,7 @@ err_t LwipEthernet<RawEthernet>::handlePackets ()
 
         err_t err = _netif.input(pbuf, &_netif);
 
-#if defined(ESP8266) && PHY_HAS_CAPTURE
+#if PHY_HAS_CAPTURE
         if (phy_capture)
             phy_capture(_netif.num, (const char*)pbuf->payload, tot_len, /*out*/0, /*success*/err == ERR_OK);
 #endif
@@ -288,11 +284,11 @@ err_t LwipEthernet<RawEthernet>::handlePackets ()
 }
 
 template <class RawEthernet>
-void LwipEthernet<RawEthernet>::setDefault ()
+void LwipInterface<RawEthernet>::setDefault ()
 {
     _default = true;
     if (connected())
         netif_set_default(&_netif);
 }
 
-#endif // _LWIPETH_H
+#endif // _LWIPINTF_H
