@@ -13,7 +13,7 @@
 #include "lwip/mem.h"
 #include "osapi.h"
 
-#include "DhcpServer.h"
+#include "lwIP_DhcpServer.h"
 
 #include "user_interface.h"
 #include "mem.h"
