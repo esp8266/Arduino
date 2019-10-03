@@ -159,7 +159,7 @@ uint32_t eboot_command_write_to_flash(struct eboot_command *cmd)
             ets_printf("Read bootCommand %d, flags: %x\n", i, flash_command.flags);
             if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == EBOOT_CMD_FLAG_SLOT_FREE) &&
                 ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING) && 
-                (flash_command.cmd.magic == 0)
+                (flash_command.cmd.magic == 0xffffffff)
                 ) {
                 target_command_slot = i;
                 break;

@@ -62,10 +62,12 @@ bool readBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
     ets_putc('r');
     ets_putc('b');
     ets_putc('0' + cmd);
     ets_putc('\n');
+#endif
   uint32_t uint = (uint32_t) cmds;
   uint32_t addr = (uint32_t)cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
@@ -79,10 +81,12 @@ bool writeBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
     ets_putc('w');
     ets_putc('b');
     ets_putc('0' + cmd);
     ets_putc('\n');
+#endif
   uint32_t uint = (uint32_t) cmds;
   uint32_t addr = (uint32_t)cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
@@ -106,10 +110,12 @@ uint32_t eboot_command_read_from_flash(struct eboot_command *cmd)
         if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == 0) &&
             ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
             // Not free (meaning there's some data) and pending (so it's yet to be completed)
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('r');
         ets_putc('c');
         ets_putc('0' + i);
         ets_putc('\n');
+#endif
             src = (uint32_t *)&flash_command.cmd;
             for (uint32_t j = 0; j < dw_count; ++j) {
                 dst[j] = src[j];
@@ -131,10 +137,12 @@ uint32_t eboot_command_write_to_flash(struct eboot_command *cmd)
         readBootCommand(i, &flash_command);
         if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == EBOOT_CMD_FLAG_SLOT_FREE) &&
             ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
-        ets_putc('w');
-        ets_putc('c');
-        ets_putc('0' + i);
-        ets_putc('\n');
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
+            ets_putc('w');
+            ets_putc('c');
+            ets_putc('0' + i);
+            ets_putc('\n');
+#endif
             dst = (uint32_t *)&flash_command.cmd;
             for (uint32_t j = 0; j < dw_count; ++j) {
                 dst[j] = src[j];
@@ -200,20 +208,28 @@ int eboot_command_read(struct eboot_command* cmd)
     uint32_t have_command = 0;
     uint32_t count = 0;
 #if defined (EBOOT_ENABLE_FLASH_STORAGE)
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
     ets_putc('F');
     ets_putc(':');
+#endif
     have_command = eboot_command_read_from_flash(cmd);
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
     ets_putc('0' + have_command);
     ets_putc('\n');
+#endif // EBOOT_ENABLE_SERIAL_DEBUG
 #endif // EBOOT_ENABLE_FLASH_STORAGE
     if (have_command == 0) {
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('R');
         ets_putc('-');
+#endif
         eboot_command_read_from_rtc(cmd);
         count = cmd->args[28];
         cmd->args[28] = 0;
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('0' + count);
         ets_putc('\n');
+#endif
     }
 
     uint32_t crc32 = eboot_command_calculate_crc32(cmd);
@@ -223,10 +239,12 @@ int eboot_command_read(struct eboot_command* cmd)
     }
 
     if (count >= 3) {
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('R');
         ets_putc('>');
         ets_putc('!');
         ets_putc('\n');
+#endif
         return 1;
     }
 

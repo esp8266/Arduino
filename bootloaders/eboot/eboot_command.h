@@ -33,7 +33,7 @@ typedef struct eboot_command {
 #if defined (EBOOT_ENABLE_FLASH_STORAGE)
 // Magic for version 1 corresponds to AR01
 #define EBOOT_INDEX_MAGIC_V1 0x31305241
-#define EBOOT_COMMAND_MAX_COUNT 8
+#define EBOOT_COMMAND_MAX_COUNT 32
 
 
 #define FLASH_SECTOR_SIZE 0x1000

@@ -32,6 +32,7 @@ int print_version(const uint32_t flash_addr)
     return 0;
 }
 
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
 int print_flags(const uint32_t flash_addr)
 {
     const char* __attribute__ ((aligned (4))) fmtt = "#%08x\n\0\0";
@@ -44,7 +45,7 @@ int print_flags(const uint32_t flash_addr)
     ets_putc('<');
     ets_printf((const char*) fmt, ver);
     ets_putc('\n');
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < EBOOT_COMMAND_MAX_COUNT; i++) {
         ets_putc('0' + i);
         ets_putc(':');
         readBootCommand(i, &cmd);
@@ -58,6 +59,9 @@ int print_flags(const uint32_t flash_addr)
     ets_putc('\n');
     return 0;
 }
+#else
+#define print_flags(X) {}
+#endif
 
 int find_app_start(const uint32_t flash_addr)
 {
@@ -105,12 +109,14 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
 
         const uint32_t address = section_header.address;
 
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('f');
         ets_printf((const char*) fmt, pos);
         ets_putc('t');
         ets_printf((const char*) fmt, address);
         ets_putc('s');
         ets_printf((const char*) fmt, section_header.size);
+#endif
 
         bool load = false;
 
@@ -131,14 +137,18 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
             continue;
         }
 
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('l');
         ets_putc('o');
+#endif
 
         if (SPIRead(pos, (void*)address, section_header.size))
             return 3;
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
         ets_putc('a');
         ets_putc('d');
         ets_putc('\n');
+#endif
 
         pos += section_header.size;
     }
@@ -161,12 +171,14 @@ int copy_raw(const uint32_t src_addr,
     fmt[0] = ((uint32_t*) fmtt)[0];
     fmt[1] = ((uint32_t*) fmtt)[1];
 
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
     ets_putc('S');
     ets_printf((const char*) fmt, src_addr);
     ets_putc('D');
     ets_printf((const char*) fmt, dst_addr);
     ets_putc('B');
     ets_printf((const char*) fmt, size);
+#endif
 
     // require regions to be aligned
     if (src_addr & 0xfff != 0 ||
