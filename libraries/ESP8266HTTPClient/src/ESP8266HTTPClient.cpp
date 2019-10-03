@@ -536,8 +536,8 @@ void HTTPClient::setTimeout(uint16_t timeout)
 bool HTTPClient::setURL(String url)
 {
     // if the new location is only a path then only update the URI
-    if (_location.startsWith("/")) {
-        _uri = _location;
+    if (url && url[0] == '/') {
+        _uri = url;
         clear();
         return true;
     }

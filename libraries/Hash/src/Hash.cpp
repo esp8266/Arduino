@@ -23,12 +23,9 @@
  */
 
 #include <Arduino.h>
+#include <bearssl/bearssl_hash.h>
 
 #include "Hash.h"
-
-extern "C" {
-#include "sha1/sha1.h"
-}
 
 /**
  * create a sha1 hash from data
@@ -36,9 +33,8 @@ extern "C" {
  * @param size uint32_t
  * @param hash uint8_t[20]
  */
-void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
-
-    SHA1_CTX ctx;
+void sha1(const uint8_t* data, uint32_t size, uint8_t hash[20]) {
+    br_sha1_context ctx;
 
 #ifdef DEBUG_SHA1
     os_printf("DATA:");
@@ -53,9 +49,9 @@ void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
     os_printf("\n");
 #endif
 
-    SHA1Init(&ctx);
-    SHA1Update(&ctx, data, size);
-    SHA1Final(hash, &ctx);
+    br_sha1_init(&ctx);
+    br_sha1_update(&ctx, data, size);
+    br_sha1_out(&ctx, hash);
 
 #ifdef DEBUG_SHA1
     os_printf("SHA1:");
@@ -66,52 +62,35 @@ void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
 #endif
 }
 
-void sha1(char * data, uint32_t size, uint8_t hash[20]) {
-    sha1((uint8_t *) data, size, hash);
+void sha1(const char* data, uint32_t size, uint8_t hash[20]) {
+    sha1((const uint8_t *) data, size, hash);
 }
 
-void sha1(const uint8_t * data, uint32_t size, uint8_t hash[20]) {
-    sha1((uint8_t *) data, size, hash);
-}
-
-void sha1(const char * data, uint32_t size, uint8_t hash[20]) {
-    sha1((uint8_t *) data, size, hash);
-}
-
-void sha1(String data, uint8_t hash[20]) {
+void sha1(const String& data, uint8_t hash[20]) {
     sha1(data.c_str(), data.length(), hash);
 }
 
-String sha1(uint8_t* data, uint32_t size) {
+String sha1(const uint8_t* data, uint32_t size) {
     uint8_t hash[20];
-    String hashStr = "";
+    String hashStr((const char*)nullptr);
+    hashStr.reserve(20 * 2 + 1);
 
     sha1(&data[0], size, &hash[0]);
 
     for(uint16_t i = 0; i < 20; i++) {
-        String hex = String(hash[i], HEX);
-        if(hex.length() < 2) {
-            hex = "0" + hex;
-        }
+        char hex[3];
+        snprintf(hex, sizeof(hex), "%02x", hash[i]);
         hashStr += hex;
     }
 
     return hashStr;
 }
 
-String sha1(char* data, uint32_t size) {
-    return sha1((uint8_t*) data, size);
-}
-
-String sha1(const uint8_t* data, uint32_t size) {
-    return sha1((uint8_t*) data, size);
-}
-
 String sha1(const char* data, uint32_t size) {
-    return sha1((uint8_t*) data, size);
+    return sha1((const uint8_t*) data, size);
 }
 
-String sha1(String data) {
+String sha1(const String& data) {
     return sha1(data.c_str(), data.length());
 }
 
