@@ -32,8 +32,12 @@
 
 //
 // Uncomment the define to allow static configuration of an SNTP server
+// We must use a static server config with LwIP v1.4
 //
-//#define SNTP_SERVER "0.pool.ntp.org"
+//#define STATIC_SNTP_SERVER
+#if defined(STATIC_SNTP_SERVER) || LWIP_VERSION_MAJOR == 1
+  #define SNTP_SERVER "0.pool.ntp.org"
+#endif
 
 #define STATUSDELAY_MS 10000
 
