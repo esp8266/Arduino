@@ -127,7 +127,8 @@ private:
         }
     }
 
-
+    // Generate a clock "valley" (at the end of a segment, just before a repeated start)
+    void twi_scl_valley(void);
 public:
     void setClock(unsigned int freq);
     void setClockStretchLimit(uint32_t limit);
@@ -383,14 +384,18 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
     if (sendStop)
     {
         write_stop();
+    } 
+    else
+    {
+        twi_scl_valley();
+        twi_wait_clockStretchLimit();
+        // TD-er: Also twi_delay here?
+        // delay(twi_dcount);
     }
     i = 0;
     while (!SDA_READ() && (i++) < 10)
     {
-        SCL_LOW();
-        busywait(twi_dcount);
-        SCL_HIGH();
-        WAIT_CLOCK_STRETCH();
+        twi_scl_valley();
         busywait(twi_dcount);
     }
     return 0;
@@ -420,13 +425,17 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     {
         write_stop();
     }
+    else
+    {
+        twi_scl_valley();
+        twi_wait_clockStretchLimit();
+        // TD-er: Also twi_delay here?
+        // delay(twi_dcount);
+    }
     i = 0;
     while (!SDA_READ() && (i++) < 10)
     {
-        SCL_LOW();
-        busywait(twi_dcount);
-        SCL_HIGH();
-        WAIT_CLOCK_STRETCH();
+        twi_scl_valley();
         busywait(twi_dcount);
     }
     return 0;
@@ -645,6 +654,19 @@ void ICACHE_RAM_ATTR Twi::onTwipEvent(uint8_t status)
         stop();
         break;
     }
+}
+
+void ICACHE_RAM_ATTR Twi::twi_wait_clockStretchLimit(void)
+{
+    uint32_t t=0; 
+    while(SCL_READ() == 0 && (t++) < twi_clockStretchLimit); // Clock stretching
+}
+
+void Twi::twi_scl_valley(void)
+{
+    SCL_LOW();
+    busywait(twi_dcount);
+    SCL_HIGH();
 }
 
 void ICACHE_RAM_ATTR Twi::onTimer(void *unused)
