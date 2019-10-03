@@ -3,25 +3,37 @@
 
 #set -x
 
-# Extract next version from platform.txt
-next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
+ver=`git describe --tag`
+visiblever=$ver
+if [ "$ver" = 0.0.1 ]; then
 
-# Figure out how will the package be called
-ver=`git describe --exact-match`
-if [ $? -ne 0 ]; then
-    # not tagged version; generate nightly package
-    date_str=`date +"%Y%m%d"`
-    is_nightly=1
-    plain_ver="${next}-nightly"
-    ver="${plain_ver}+${date_str}"
-else
+    git tag -d 0.0.1
+    ver=`git describe --tag HEAD`
     plain_ver=$ver
+
+else
+
+    # Extract next version from platform.txt
+    next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
+
+    # Figure out how will the package be called
+    ver=`git describe --exact-match`
+    if [ $? -ne 0 ]; then
+        # not tagged version; generate nightly package
+        date_str=`date +"%Y%m%d"`
+        is_nightly=1
+        plain_ver="${next}-nightly"
+        ver="${plain_ver}+${date_str}"
+    else
+        plain_ver=$ver
+    fi
+    visiblever=$ver
 fi
 
 set -e
 
-package_name=esp8266-$ver
-echo "Version: $ver"
+package_name=esp8266-$visiblever
+echo "Version: $visiblever ($ver)"
 echo "Package name: $package_name"
 
 # Set REMOTE_URL environment variable to the address where the package will be
@@ -34,7 +46,7 @@ echo "Remote: $REMOTE_URL"
 
 if [ -z "$PKG_URL" ]; then
     if [ -z "$PKG_URL_PREFIX" ]; then
-        PKG_URL_PREFIX="$REMOTE_URL/versions/$ver"
+        PKG_URL_PREFIX="$REMOTE_URL/versions/$visiblever"
     fi
     PKG_URL="$PKG_URL_PREFIX/$package_name.zip"
 fi
@@ -43,9 +55,9 @@ echo "Docs: $DOC_URL"
 
 pushd ..
 # Create directory for the package
-outdir=package/versions/$ver/$package_name
+outdir=package/versions/$visiblever/$package_name
 srcdir=$PWD
-rm -rf package/versions/$ver
+rm -rf package/versions/$visiblever
 mkdir -p $outdir
 
 # Some files should be excluded from the package
@@ -96,7 +108,7 @@ echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_v
 echo \#define ARDUINO_ESP8266_RELEASE \"$ver_define\" >>$outdir/cores/esp8266/core_version.h
 
 # Zip the package
-pushd package/versions/$ver
+pushd package/versions/$visiblever
 echo "Making $package_name.zip"
 zip -qr $package_name.zip $package_name
 rm -rf $package_name
@@ -109,7 +121,7 @@ echo SHA-256: $sha
 
 echo "Making package_esp8266com_index.json"
 
-jq_arg=".packages[0].platforms[0].version = \"$ver\" | \
+jq_arg=".packages[0].platforms[0].version = \"$visiblever\" | \
     .packages[0].platforms[0].url = \"$PKG_URL\" |\
     .packages[0].platforms[0].archiveFileName = \"$package_name.zip\""
 
