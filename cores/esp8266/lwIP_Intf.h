@@ -15,6 +15,9 @@
 #include <user_interface.h>	// wifi_get_macaddr()
 #include <Schedule.h>
 
+// import these definitions to the core ?
+#include <../../libraries/ESP8266WiFi/src/include/wl_definitions.h>
+
 #ifndef DEFAULT_MTU
 #define DEFAULT_MTU 1500
 #endif
@@ -53,6 +56,10 @@ public:
 
     bool connected () { return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr)); }
 
+    // ESP8266WiFi API compatibility
+
+    wl_status_t status ();
+
 protected:
 
     netif _netif;
@@ -60,6 +67,7 @@ protected:
     bool _default;
     int8_t _intrPin;
     uint8_t _macAddress[6];
+    bool _started = false;
 
     err_t start_with_dhclient ();
     err_t netif_init ();
@@ -100,6 +108,7 @@ boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t m
 
     if (!RawEthernet::begin(_macAddress))
         return false;
+    _started = true;
     _mtu = mtu;
 
     switch (start_with_dhclient())
@@ -135,6 +144,12 @@ boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t m
     }
 
     return true;
+}
+
+template <class RawEthernet>
+wl_status_t LwipInterface<RawEthernet>::status ()
+{
+    return _started? (connected()? WL_CONNECTED: WL_DISCONNECTED): WL_NO_SHIELD;
 }
 
 template <class RawEthernet>
