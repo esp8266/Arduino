@@ -8,3 +8,4 @@ typedef unsigned   long    u32_t;
 typedef signed     long    s32_t;
 typedef unsigned long   mem_ptr_t;
 #define LWIP_ERR_T s32_t
+typedef uint32_t sys_prot_t;
