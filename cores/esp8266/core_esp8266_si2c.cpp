@@ -42,6 +42,10 @@ private:
     unsigned char twi_addr = 0;
     uint32_t twi_clockStretchLimit = 0;
 
+    // These are int-wide, even though they could all fit in a byte, to reduce code size and avoid any potential
+    // issues about RmW on packed bytes.  The int-wide variations of asm instructions are smaller than the equivalent
+    // byte-wide ones, and since these emums are used everywhere, the difference adds up fast.  There is only a single
+    // instance of the class, though, so the extra 12 bytes of RAM used here saves a lot more IRAM.
     volatile enum { TWIPM_UNKNOWN = 0, TWIPM_IDLE, TWIPM_ADDRESSED, TWIPM_WAIT} twip_mode = TWIPM_IDLE;
     volatile enum { TWIP_UNKNOWN = 0, TWIP_IDLE, TWIP_START, TWIP_SEND_ACK, TWIP_WAIT_ACK, TWIP_WAIT_STOP, TWIP_SLA_W, TWIP_SLA_R, TWIP_REP_START, TWIP_READ, TWIP_STOP, TWIP_REC_ACK, TWIP_READ_ACK, TWIP_RWAIT_ACK, TWIP_WRITE, TWIP_BUS_ERR } twip_state = TWIP_IDLE;
     volatile int twip_status = TW_NO_INFO;
@@ -78,7 +82,7 @@ private:
     static void ICACHE_RAM_ATTR onTimer(void *unused);
 
     // Internal use functions
-    void ICACHE_RAM_ATTR delay(unsigned char v);
+    void ICACHE_RAM_ATTR busywait(unsigned char v);
     bool write_start(void);
     bool write_stop(void);
     bool write_bit(bool bit);
@@ -238,7 +242,7 @@ void Twi::setAddress(uint8_t address)
     twi_addr = address << 1;
 }
 
-void ICACHE_RAM_ATTR Twi::delay(unsigned char v)
+void ICACHE_RAM_ATTR Twi::busywait(unsigned char v)
 {
     unsigned int i;
 #pragma GCC diagnostic push
@@ -256,13 +260,13 @@ bool Twi::write_start(void)
 {
     SCL_HIGH();
     SDA_HIGH();
-    if (SDA_READ() == 0)
+    if (!SDA_READ())
     {
         return false;
     }
-    delay(twi_dcount);
+    busywait(twi_dcount);
     SDA_LOW();
-    delay(twi_dcount);
+    busywait(twi_dcount);
     return true;
 }
 
@@ -271,12 +275,12 @@ bool Twi::write_stop(void)
     uint32_t i = 0;
     SCL_LOW();
     SDA_LOW();
-    delay(twi_dcount);
+    busywait(twi_dcount);
     SCL_HIGH();
-    while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit); // Clock stretching
-    delay(twi_dcount);
+    while (!SCL_READ() && (i++) < twi_clockStretchLimit); // Clock stretching
+    busywait(twi_dcount);
     SDA_HIGH();
-    delay(twi_dcount);
+    busywait(twi_dcount);
     return true;
 }
 
@@ -292,10 +296,10 @@ bool Twi::write_bit(bool bit)
     {
         SDA_LOW();
     }
-    delay(twi_dcount + 1);
+    busywait(twi_dcount + 1);
     SCL_HIGH();
-    while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit);// Clock stretching
-    delay(twi_dcount);
+    while (!SCL_READ() && (i++) < twi_clockStretchLimit);// Clock stretching
+    busywait(twi_dcount);
     return true;
 }
 
@@ -304,11 +308,11 @@ bool Twi::read_bit(void)
     uint32_t i = 0;
     SCL_LOW();
     SDA_HIGH();
-    delay(twi_dcount + 2);
+    busywait(twi_dcount + 2);
     SCL_HIGH();
-    while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit);// Clock stretching
+    while (!SCL_READ() && (i++) < twi_clockStretchLimit);// Clock stretching
     bool bit = SDA_READ();
-    delay(twi_dcount);
+    busywait(twi_dcount);
     return bit;
 }
 
@@ -366,13 +370,13 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
         write_stop();
     }
     i = 0;
-    while (SDA_READ() == 0 && (i++) < 10)
+    while (!SDA_READ() && (i++) < 10)
     {
         SCL_LOW();
-        delay(twi_dcount);
+        busywait(twi_dcount);
         SCL_HIGH();
-        unsigned int t = 0; while (SCL_READ() == 0 && (t++) < twi_clockStretchLimit); // twi_clockStretchLimit
-        delay(twi_dcount);
+        unsigned int t = 0; while (!SCL_READ() && (t++) < twi_clockStretchLimit); // twi_clockStretchLimit
+        busywait(twi_dcount);
     }
     return 0;
 }
@@ -402,34 +406,34 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
         write_stop();
     }
     i = 0;
-    while (SDA_READ() == 0 && (i++) < 10)
+    while (!SDA_READ() && (i++) < 10)
     {
         SCL_LOW();
-        delay(twi_dcount);
+        busywait(twi_dcount);
         SCL_HIGH();
-        unsigned int t = 0; while (SCL_READ() == 0 && (t++) < twi_clockStretchLimit); // twi_clockStretchLimit
-        delay(twi_dcount);
+        unsigned int t = 0; while (!SCL_READ() && (t++) < twi_clockStretchLimit); // twi_clockStretchLimit
+        busywait(twi_dcount);
     }
     return 0;
 }
 
 uint8_t Twi::status()
 {
-    if (SCL_READ() == 0)
+    if (!SCL_READ())
     {
         return I2C_SCL_HELD_LOW;  // SCL held low by another device, no procedure available to recover
     }
 
     int clockCount = 20;
-    while (SDA_READ() == 0 && clockCount-- > 0)   // if SDA low, read the bits slaves have to sent to a max
+    while (!SDA_READ() && clockCount-- > 0)   // if SDA low, read the bits slaves have to sent to a max
     {
         read_bit();
-        if (SCL_READ() == 0)
+        if (!SCL_READ())
         {
             return I2C_SCL_HELD_LOW_AFTER_READ; // I2C bus error. SCL held low beyond slave clock stretch time
         }
     }
-    if (SDA_READ() == 0)
+    if (!SDA_READ())
     {
         return I2C_SDA_HELD_LOW;  // I2C bus error. SDA line held low by slave/another_master after n bits.
     }
@@ -501,7 +505,7 @@ inline void ICACHE_RAM_ATTR Twi::stop(void)
     //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTO);
     SCL_HIGH();		// _BV(TWINT)
     twi_ack = 1;	// _BV(TWEA)
-    delay(5);	// Maybe this should be here
+    busywait(5);	// Maybe this should be here
     SDA_HIGH();		// _BV(TWSTO)
     // update twi state
     twi_state = TWI_READY;
