@@ -113,8 +113,8 @@ protected:
  * constructor
  */
 HTTPClient::HTTPClient()
+    : _client(nullptr), _userAgent(F("ESP8266HTTPClient"))
 {
-    _client = nullptr;
 #if HTTPCLIENT_1_1_COMPATIBLE
     _tcpDeprecated.reset(nullptr);
 #endif
@@ -1294,21 +1294,21 @@ int HTTPClient::handleHeaderResponse()
                 String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
                 headerValue.trim();
 
-                if(headerName.equalsIgnoreCase("Content-Length")) {
+                if(headerName.equalsIgnoreCase(F("Content-Length"))) {
                     _size = headerValue.toInt();
                 }
 
-                if(_canReuse && headerName.equalsIgnoreCase("Connection")) {
+                if(_canReuse && headerName.equalsIgnoreCase(F("Connection"))) {
                     if(headerValue.indexOf("close") >= 0 && headerValue.indexOf("keep-alive") < 0) {
                         _canReuse = false;
                     }
                 }
 
-                if(headerName.equalsIgnoreCase("Transfer-Encoding")) {
+                if(headerName.equalsIgnoreCase(F("Transfer-Encoding"))) {
                     transferEncoding = headerValue;
                 }
 
-                if(headerName.equalsIgnoreCase("Location")) {
+                if(headerName.equalsIgnoreCase(F("Location"))) {
                     _location = headerValue;
                 }
 
@@ -1334,7 +1334,7 @@ int HTTPClient::handleHeaderResponse()
 
                 if(transferEncoding.length() > 0) {
                     DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Transfer-Encoding: %s\n", transferEncoding.c_str());
-                    if(transferEncoding.equalsIgnoreCase("chunked")) {
+                    if(transferEncoding.equalsIgnoreCase(F("chunked"))) {
                         _transferEncoding = HTTPC_TE_CHUNKED;
                     } else {
                         return HTTPC_ERROR_ENCODING;
