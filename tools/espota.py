@@ -69,6 +69,43 @@ def update_progress(progress):
     sys.stderr.write('.')
     sys.stderr.flush()
 
+def rle(data):
+    "RLE compress the input bitstream and return it as a list"
+    buf = [0] * 128
+    ret = []
+    src = 0
+    runlen = 0
+    repeat = False
+    while src < len(data):
+        buf[runlen] = data[src]
+        runlen = runlen + 1
+        src = src + 1
+        if runlen < 2:
+            continue
+        if repeat:
+            if buf[runlen - 1] != buf[runlen - 2]:
+                repeat = False
+            if (not repeat) or (runlen == 128):
+                ret += [runlen - 1] + [buf[0]]
+                buf[0] = buf[runlen - 1]
+                runlen = 1
+        else:
+            if buf[runlen - 1] == buf[runlen - 2]:
+                repeat = True
+                if runlen > 2:
+                    ret += [128 + runlen - 2] + buf[0:runlen - 2]
+                    buf[0] = buf[runlen - 1]
+                    buf[1] = buf[runlen - 1]
+                    runlen = 2
+                continue
+            if runlen == 128:
+                ret += [128 + runlen - 1] + buf[0:runlen]
+                runlen = 0
+    if runlen:
+        ret += [128 + runlen] + buf[0:runlen]
+    return ret
+
+
 def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, command = FLASH):
   # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,12 +126,18 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     sys.stderr.flush()
     logging.info(file_check_msg)
   
-  content_size = os.path.getsize(filename)
-  f = open(filename,'rb')
-  file_md5 = hashlib.md5(f.read()).hexdigest()
-  f.close()
+  with open(filename, "rb") as f:
+      content = f.read()
+  content_size = len(content)
+  content_rle = rle(content)
+  request_rle = len(content_rle) < content_size
+#  request_rle = True
+  file_md5 = hashlib.md5(content).hexdigest()
   logging.info('Upload size: %d', content_size)
   message = '%d %d %d %s\n' % (command, localPort, content_size, file_md5)
+  if request_rle:
+    # Add a request for compression, ignored on earlier ArduinoOTAs
+    message += 'COMPRESSRLE\n'
 
   # Wait for a connection
   logging.info('Sending invitation to: %s', remoteAddr)
@@ -103,42 +146,50 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   sent = sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
-    data = sock2.recv(128).decode()
+    data = sock2.recv(256).decode()
   except:
     logging.error('No Answer')
     sock2.close()
     return 1
-  if (data != "OK"):
-    if(data.startswith('AUTH')):
-      nonce = data.split()[1]
-      cnonce_text = '%s%u%s%s' % (filename, content_size, file_md5, remoteAddr)
-      cnonce = hashlib.md5(cnonce_text.encode()).hexdigest()
-      passmd5 = hashlib.md5(password.encode()).hexdigest()
-      result_text = '%s:%s:%s' % (passmd5 ,nonce, cnonce)
-      result = hashlib.md5(result_text.encode()).hexdigest()
-      sys.stderr.write('Authenticating...')
-      sys.stderr.flush()
-      message = '%d %s %s\n' % (AUTH, cnonce, result)
-      sock2.sendto(message.encode(), remote_address)
-      sock2.settimeout(10)
-      try:
-        data = sock2.recv(32).decode()
-      except:
-        sys.stderr.write('FAIL\n')
-        logging.error('No Answer to our Authentication')
-        sock2.close()
-        return 1
-      if (data != "OK"):
-        sys.stderr.write('FAIL\n')
-        logging.error('%s', data)
-        sock2.close()
-        sys.exit(1);
-        return 1
-      sys.stderr.write('OK\n')
-    else:
-      logging.error('Bad Answer: %s', data)
+
+  if data == "COMPOK":
+    compress = True
+  elif data == "OK":
+    compress = False
+  elif data.startswith('AUTH'):
+    nonce = data.split()[1]
+    cnonce_text = '%s%u%s%s' % (filename, content_size, file_md5, remoteAddr)
+    cnonce = hashlib.md5(cnonce_text.encode()).hexdigest()
+    passmd5 = hashlib.md5(password.encode()).hexdigest()
+    result_text = '%s:%s:%s' % (passmd5 ,nonce, cnonce)
+    result = hashlib.md5(result_text.encode()).hexdigest()
+    sys.stderr.write('Authenticating...')
+    sys.stderr.flush()
+    message = '%d %s %s\n' % (AUTH, cnonce, result)
+    sock2.sendto(message.encode(), remote_address)
+    sock2.settimeout(10)
+    try:
+      data = sock2.recv(32).decode()
+    except:
+      sys.stderr.write('FAIL\n')
+      logging.error('No Answer to our Authentication')
       sock2.close()
       return 1
+    if data == "OK":
+      compress = False
+    elif data == "COMPOK":
+      compress = True
+    else:
+      sys.stderr.write('FAIL\n')
+      logging.error('%s', data)
+      sock2.close()
+      sys.exit(1);
+      return 1
+    sys.stderr.write('OK\n')
+  else:
+    logging.error('Bad Answer: %s', data)
+    sock2.close()
+    return 1
   sock2.close()
 
   logging.info('Waiting for device...')
@@ -155,16 +206,17 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   received_ok = False
 
   try:
-    f = open(filename, "rb")
     if (PROGRESS):
       update_progress(0)
     else:
       sys.stderr.write('Uploading')
       sys.stderr.flush()
     offset = 0
+    chunk_size = 1460 # MTU-safe
     while True:
-      chunk = f.read(1460)
-      if not chunk: break
+      if offset >= content_size:
+        break
+      chunk = content[offset:min(content_size, offset + chunk_size)]
       offset += len(chunk)
       update_progress(offset/float(content_size))
       connection.settimeout(10)

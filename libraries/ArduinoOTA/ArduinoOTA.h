@@ -75,6 +75,7 @@ class ArduinoOTAClass
     String _nonce;
     UdpContext *_udp_ota;
     bool _initialized;
+    bool _useCompression;
     bool _rebootOnSuccess;
     bool _useMDNS;
     ota_state_t _state;

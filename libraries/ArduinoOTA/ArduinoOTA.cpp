@@ -30,10 +30,114 @@ extern "C" {
 #endif
 #endif
 
+
+/* This class is only used in OTA and implements a dumb, low-memory decompression engine */
+class RLEDecompressor : public Stream {
+public:
+  RLEDecompressor(WiFiClient client) {
+    _client = client;
+    _blockLen = 0;
+    _blockIdx = 0;
+    _block = new uint8_t[128];
+  }
+
+  virtual ~RLEDecompressor() {
+    delete[] _block;
+  }
+
+  virtual int read() {
+    int ret = -1;  // Default to EOF
+    if (_blockLen == _blockIdx) {
+        _refill();
+    }
+    if (_blockIdx < _blockLen) {
+        ret = _block[_blockIdx++];
+    }
+    return ret;
+  }
+
+  virtual int peek() {
+    return -1; // Not implemented, not needed for Updater
+  }
+
+  size_t read(uint8_t*a, size_t&b) { return readBytes((char*)a, b); }
+
+  virtual size_t readBytes(char *buffer, size_t length) {
+    if (_blockLen == _blockIdx) {
+      _refill();
+    }
+    int toRead = std::min((int)(_blockLen - _blockIdx), (int)length);
+    memcpy(buffer, _block + _blockIdx, toRead);
+    _blockIdx += toRead;
+    return toRead;
+  }
+    
+  virtual size_t write(uint8_t b) { return _client.write(b); }
+
+  virtual int available() {
+    if (_blockLen == _blockIdx) {
+      _refill();
+    }
+    return _blockLen - _blockIdx;
+  }
+
+
+private:
+  bool _refill() {
+    int c = -1;
+    while (_client.connected() && (c < 0)) {
+      c = _client.read();
+      yield();
+    }
+    if (c < 0) {
+       return false;
+    }
+    if (c < 128) {
+      int l = -1;
+      while (_client.connected() && (l < 0)) {
+        l = _client.read();
+        yield();
+      }
+      if (l < 0) {
+         return false;
+      }
+      memset(_block, l, c);
+      _blockLen = c;
+      _blockIdx = 0;
+      return true;
+    } else {
+      c = c - 128;
+      _blockLen = c;
+      _blockIdx = 0;
+      while (_client.connected() && c) {
+        int ret = _client.readBytes(_block + _blockIdx, c);
+        if (ret > 0) {
+          c -= ret;
+          _blockIdx += ret;
+        } else {
+          _blockIdx = _blockLen = 0;
+          return false;
+        }
+      }
+      _blockIdx = 0;
+      return true;
+    }
+  }
+
+private:
+  WiFiClient _client;
+  int        _blockLeft;
+  int        _blockIdx;
+  int        _blockLen;
+  uint8_t    *_block;
+};
+
+
 ArduinoOTAClass::ArduinoOTAClass()
 : _port(0)
 , _udp_ota(0)
 , _initialized(false)
+, _useCompression(false)
 , _rebootOnSuccess(true)
 , _useMDNS(true)
 , _state(OTA_IDLE)
@@ -199,6 +303,15 @@ void ArduinoOTAClass::_onRx(){
     if(_md5.length() != 32)
       return;
 
+    String compress = readStringUntil('\n');
+    compress.trim();
+    if (compress == "COMPRESSRLE") {
+        _useCompression = true;
+#ifdef OTA_DEBUG
+        OTA_DEBUG.println("Compressed upload requested");
+#endif
+    }
+
     ota_ip = _ota_ip;
 
     if (_password.length()){
@@ -273,7 +386,11 @@ void ArduinoOTAClass::_runUpdate() {
     _state = OTA_IDLE;
     return;
   }
-  _udp_ota->append("OK", 2);
+  if (_useCompression) {
+    _udp_ota->append("COMPOK", 6);
+  } else {
+    _udp_ota->append("OK", 2);
+  }
   _udp_ota->send(ota_ip, _ota_udp_port);
   delay(100);
 
@@ -317,7 +434,12 @@ void ArduinoOTAClass::_runUpdate() {
       }
       _state = OTA_IDLE;
     }
-    written = Update.write(client);
+    if (_useCompression) {
+      RLEDecompressor decomp(client);
+      written = Update.write(decomp);
+    } else {
+      written = Update.write(client);
+    }
     if (written > 0) {
       client.print(written, DEC);
       total += written;
