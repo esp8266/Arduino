@@ -152,6 +152,10 @@ void printTm(const char* what, const tm* tm) {
 void time_is_set_scheduled() {
   // everything is allowed in this function
 
+  if (time_machine_days == 0) {
+    time_machine_running = !time_machine_running;
+  }
+
   // time machine demo
   if (time_machine_running) {
     if (time_machine_days == 0)
@@ -178,19 +182,6 @@ void time_is_set_scheduled() {
   }
 }
 
-void time_is_set_callback() {
-  // As in an ISR,
-  // it is not allowed to call "heavy" core API
-  // like yield()/delay()/print()/network/...
-  // If this is needed, use a scheduled function.
-
-  // This scheduled function is used for the demo, it is normaly unneeded
-  schedule_function(time_is_set_scheduled);
-  if (time_machine_days == 0) {
-    time_machine_running = !time_machine_running;
-  }
-}
-
 void setup() {
   Serial.begin(115200);
   Serial.println("\nStarting...\n");
@@ -204,7 +195,7 @@ void setup() {
 
   // install callback - called when settimeofday is called (by SNTP or us)
   // once enabled (by DHCP), SNTP is updated every hour
-  settimeofday_cb(time_is_set_callback);
+  settimeofday_cb(time_is_set_scheduled);
 
   // NTP servers may be overriden by your DHCP server for a more local one
   // (see below)
