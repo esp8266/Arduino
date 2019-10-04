@@ -116,6 +116,13 @@ private:
     {
         return (GPI & (1 << twi_scl)) != 0;
     }
+    // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
+    inline void WAIT_CLOCK_STRETCH()
+    {
+        for (unsigned int t = 0; !SCL_READ() && (t < twi_clockStretchLimit); t++) {
+            /* noop */
+        }
+    }
 
 public:
     void setClock(unsigned int freq);
@@ -144,6 +151,7 @@ static Twi twi;
 #else
 #define TWI_CLOCK_STRETCH_MULTIPLIER 6
 #endif
+
 
 void Twi::setClock(unsigned int freq)
 {
@@ -272,12 +280,11 @@ bool Twi::write_start(void)
 
 bool Twi::write_stop(void)
 {
-    uint32_t i = 0;
     SCL_LOW();
     SDA_LOW();
     busywait(twi_dcount);
     SCL_HIGH();
-    while (!SCL_READ() && (i++) < twi_clockStretchLimit); // Clock stretching
+    WAIT_CLOCK_STRETCH();
     busywait(twi_dcount);
     SDA_HIGH();
     busywait(twi_dcount);
@@ -286,7 +293,6 @@ bool Twi::write_stop(void)
 
 bool Twi::write_bit(bool bit)
 {
-    uint32_t i = 0;
     SCL_LOW();
     if (bit)
     {
@@ -298,19 +304,18 @@ bool Twi::write_bit(bool bit)
     }
     busywait(twi_dcount + 1);
     SCL_HIGH();
-    while (!SCL_READ() && (i++) < twi_clockStretchLimit);// Clock stretching
+    WAIT_CLOCK_STRETCH();
     busywait(twi_dcount);
     return true;
 }
 
 bool Twi::read_bit(void)
 {
-    uint32_t i = 0;
     SCL_LOW();
     SDA_HIGH();
     busywait(twi_dcount + 2);
     SCL_HIGH();
-    while (!SCL_READ() && (i++) < twi_clockStretchLimit);// Clock stretching
+    WAIT_CLOCK_STRETCH();
     bool bit = SDA_READ();
     busywait(twi_dcount);
     return bit;
@@ -375,7 +380,7 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
         SCL_LOW();
         busywait(twi_dcount);
         SCL_HIGH();
-        unsigned int t = 0; while (!SCL_READ() && (t++) < twi_clockStretchLimit); // twi_clockStretchLimit
+        WAIT_CLOCK_STRETCH();
         busywait(twi_dcount);
     }
     return 0;
@@ -411,7 +416,7 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
         SCL_LOW();
         busywait(twi_dcount);
         SCL_HIGH();
-        unsigned int t = 0; while (!SCL_READ() && (t++) < twi_clockStretchLimit); // twi_clockStretchLimit
+        WAIT_CLOCK_STRETCH();
         busywait(twi_dcount);
     }
     return 0;
