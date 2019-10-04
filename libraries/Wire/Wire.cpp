@@ -274,10 +274,12 @@ void TwoWire::onReceive( void (*function)(int) ) {
 
 void TwoWire::onReceive( void (*function)(size_t) ) {
   user_onReceive = function;
+  twi_enableSlaveMode();
 }
 
 void TwoWire::onRequest( void (*function)(void) ){
   user_onRequest = function;
+  twi_enableSlaveMode();
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

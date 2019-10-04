@@ -81,6 +81,9 @@ private:
     static void eventTask(ETSEvent *e);
     static void ICACHE_RAM_ATTR onTimer(void *unused);
 
+    // Allow not linking in the slave code if there is no call to setAddress
+    bool _slaveEnabled = false;
+
     // Internal use functions
     void ICACHE_RAM_ATTR busywait(unsigned char v);
     bool write_start(void);
@@ -124,6 +127,7 @@ private:
         }
     }
 
+
 public:
     void setClock(unsigned int freq);
     void setClockStretchLimit(uint32_t limit);
@@ -138,6 +142,7 @@ public:
     inline void ICACHE_RAM_ATTR reply(uint8_t ack);
     inline void ICACHE_RAM_ATTR stop(void);
     inline void ICACHE_RAM_ATTR releaseBus(void);
+    void enableSlave();
 };
 
 static Twi twi;
@@ -222,6 +227,8 @@ void Twi::setClockStretchLimit(uint32_t limit)
     twi_clockStretchLimit = limit * TWI_CLOCK_STRETCH_MULTIPLIER;
 }
 
+
+
 void Twi::init(unsigned char sda, unsigned char scl)
 {
     // set timer function
@@ -236,18 +243,21 @@ void Twi::init(unsigned char sda, unsigned char scl)
     pinMode(twi_scl, INPUT_PULLUP);
     twi_setClock(preferred_si2c_clock);
     twi_setClockStretchLimit(230); // default value is 230 uS
-
-    if (twi_addr != 0)
-    {
-        attachInterrupt(scl, onSclChange, CHANGE);
-        attachInterrupt(sda, onSdaChange, CHANGE);
-    }
 }
 
 void Twi::setAddress(uint8_t address)
 {
     // set twi slave address (skip over R/W bit)
     twi_addr = address << 1;
+}
+
+void Twi::enableSlave()
+{
+    if (!_slaveEnabled) {
+        attachInterrupt(twi_scl, onSclChange, CHANGE);
+        attachInterrupt(twi_sda, onSdaChange, CHANGE);
+        _slaveEnabled = true;
+    }
 }
 
 void ICACHE_RAM_ATTR Twi::busywait(unsigned char v)
@@ -1042,6 +1052,11 @@ extern "C" {
     void twi_releaseBus(void)
     {
         twi.releaseBus();
+    }
+
+    void twi_enableSlaveMode(void)
+    {
+        twi.enableSlave();
     }
 
 };
