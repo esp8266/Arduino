@@ -71,9 +71,12 @@ void EEPROMClass::begin(size_t size) {
 
   _size = size;
 
-  noInterrupts();
-  auto ret = spi_flash_read(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size);
-  interrupts();
+  SpiFlashOpResult ret;
+  {
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
+    ret = spi_flash_read(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size);
+  }
+
   if (ret != SPI_FLASH_RESULT_OK) {
     DEBUGV("EEPROMClass::begin spi_flash_read failed,  %d\n", (int)ret);
   }
@@ -136,16 +139,19 @@ bool EEPROMClass::commit() {
   if(!_data)
     return false;
 
-  noInterrupts();
-  auto flashret = spi_flash_erase_sector(_sector);
-  if (flashret == SPI_FLASH_RESULT_OK) {
-    flashret = spi_flash_write(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size);
+  SpiFlashOpResult flashret;
+  {
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
+    flashret = spi_flash_erase_sector(_sector);
     if (flashret == SPI_FLASH_RESULT_OK) {
-      _dirty = false;
-      ret = true;
+      flashret = spi_flash_write(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size);
+      if (flashret == SPI_FLASH_RESULT_OK) {
+        _dirty = false;
+        ret = true;
+      }
     }
   }
-  interrupts();
+
 
   if (flashret != SPI_FLASH_RESULT_OK) {
     DEBUGV("EEPROMClass::commit failed,  %d\n", (int)flashret);
