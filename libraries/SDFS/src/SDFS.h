@@ -45,22 +45,9 @@ class SDFSDirImpl;
 class SDFSConfig : public FSConfig
 {
 public:
-    SDFSConfig() {
-        _type = SDFSConfig::fsid::FSId;
-        _autoFormat = false;
-        _csPin = 4;
-        _spiSettings = SD_SCK_MHZ(10);
-	_part = 0;
-    }
-    SDFSConfig(uint8_t csPin, SPISettings spi) {
-        _type = SDFSConfig::fsid::FSId;
-        _autoFormat = false;
-        _csPin = csPin;
-        _spiSettings = spi;
-	_part = 0;
-    }
+    static constexpr uint32_t FSId = 0x53444653;
 
-    enum fsid { FSId = 0x53444653 };
+    SDFSConfig(uint8_t csPin = 4, SPISettings spi = SD_SCK_MHZ(10)) : FSConfig(FSId, false), _csPin(csPin), _part(0), _spiSettings(spi)  { }
 
     SDFSConfig setAutoFormat(bool val = true) {
         _autoFormat = val;
@@ -152,7 +139,7 @@ public:
 
     bool setConfig(const FSConfig &cfg) override
     {
-        if ((cfg._type != SDFSConfig::fsid::FSId) || _mounted) {
+        if ((cfg._type != SDFSConfig::FSId) || _mounted) {
             DEBUGV("SDFS::setConfig: invalid config or already mounted\n");
             return false;
         }

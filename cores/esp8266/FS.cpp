@@ -205,7 +205,7 @@ File Dir::openFile(const char* mode) {
         return File();
     }
 
-    auto f = File(_impl->openFile(om, am), _baseFS);
+    File f(_impl->openFile(om, am), _baseFS);
     f.setTimeCallback(timeCallback);
     return f;
 }
@@ -350,7 +350,7 @@ File FS::open(const char* path, const char* mode) {
         DEBUGV("FS::open: invalid mode `%s`\r\n", mode);
         return File();
     }
-    auto f = File(_impl->open(path, om, am), this);
+    File f(_impl->open(path, om, am), this);
     f.setTimeCallback(timeCallback);
     return f;
 }
@@ -371,7 +371,7 @@ Dir FS::openDir(const char* path) {
         return Dir();
     }
     DirImplPtr p = _impl->openDir(path);
-    auto d = Dir(p, this);
+    Dir d(p, this);
     d.setTimeCallback(timeCallback);
     return d;
 }

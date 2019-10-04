@@ -171,12 +171,10 @@ struct FSInfo64 {
 class FSConfig
 {
 public:
-    FSConfig(bool autoFormat = true) {
-        _type = FSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
-    }
+    static constexpr uint32_t FSId = 0x00000000;
 
-    enum fsid { FSId = 0x00000000 };
+    FSConfig(uint32_t type = FSId, bool autoFormat = true) : _type(type), _autoFormat(autoFormat) { }
+
     FSConfig setAutoFormat(bool val = true) {
         _autoFormat = val;
         return *this;
@@ -189,20 +187,11 @@ public:
 class SPIFFSConfig : public FSConfig
 {
 public:
-    SPIFFSConfig(bool autoFormat = true, bool enableTime = true) {
-        _type = SPIFFSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
-	_enableTime = enableTime;
-    }
-    enum fsid { FSId = 0x53504946 };
-
-    SPIFFSConfig setEnableTime(bool val = true) {
-        _enableTime = val;
-        return *this;
-    }
+    static constexpr uint32_t FSId = 0x53504946;
+    SPIFFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
 
     // Inherit _type and _autoFormat
-    bool _enableTime;
+    // nothing yet, enableTime TBD when SPIFFS has metadate
 };
 
 class FS

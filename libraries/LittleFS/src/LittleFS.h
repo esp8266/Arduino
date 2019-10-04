@@ -47,11 +47,8 @@ class LittleFSDirImpl;
 class LittleFSConfig : public FSConfig
 {
 public:
-    LittleFSConfig(bool autoFormat = true) {
-        _type = LittleFSConfig::fsid::FSId;
-        _autoFormat = autoFormat;
-    }
-    enum fsid { FSId = 0x4c495454 };
+    static constexpr uint32_t FSId = 0x4c495454;
+    LittleFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
 };
 
 class LittleFSImpl : public FSImpl
@@ -176,7 +173,7 @@ public:
     }
 
     bool setConfig(const FSConfig &cfg) override {
-        if ((cfg._type != LittleFSConfig::fsid::FSId) || _mounted) {
+        if ((cfg._type != LittleFSConfig::FSId) || _mounted) {
             return false;
         }
         _cfg = *static_cast<const LittleFSConfig *>(&cfg);
