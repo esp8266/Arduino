@@ -134,7 +134,7 @@ bool EEPROMClass::commit() {
     return false;
 
   if (ESP.flashEraseSector(_sector)) {
-    if (ESP.flashWirite(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size)) {
+    if (ESP.flashWrite(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size)) {
       _dirty = false;
       return true;
     }
