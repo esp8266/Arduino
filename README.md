@@ -108,7 +108,7 @@ Please provide as much context as possible, as well as the information requested
 - your sketch code; please wrap it into a code block, see [Github markdown manual](https://help.github.com/articles/basic-writing-and-formatting-syntax/#quoting-code)
 - when encountering an issue that happens at run time, attach the serial output. Wrap it into a code block, just like the code.
 - for issues that happen at compile time, enable verbose compiler output in the IDE preferences, and attach that output (also inside a code block)
-- ESP8266 development board model
+- ESP8266 development board model.
 - IDE settings (board choice, flash size)
 - etc
 
