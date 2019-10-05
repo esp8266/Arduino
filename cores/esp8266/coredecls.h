@@ -26,8 +26,11 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc = 0xffffffff);
 }
 
 #include <functional>
-void settimeofday_cb (std::function<void()>&& cb);
-void settimeofday_cb (const std::function<void()>& cb);
+
+using functionalVoidVoid = std::function<void()>;
+
+void settimeofday_cb (functionalVoidVoid&& cb);
+void settimeofday_cb (const functionalVoidVoid& cb);
 
 #endif
 

@@ -44,14 +44,14 @@
 #include "coredecls.h"
 #include "Schedule.h"
 
-std::function<void()> _settimeofday_cb;
+static functionalVoidVoid _settimeofday_cb;
 
-void settimeofday_cb (std::function<void()>&& cb)
+void settimeofday_cb (functionalVoidVoid&& cb)
 {
     _settimeofday_cb = std::move(cb);
 }
 
-void settimeofday_cb (const std::function<void()>& cb)
+void settimeofday_cb (const functionalVoidVoid& cb)
 {
     _settimeofday_cb = cb;
 }
