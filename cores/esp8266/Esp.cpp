@@ -494,7 +494,7 @@ uint32_t EspClass::getSketchSize() {
 
     image_header_t image_header;
     uint32_t pos = APP_START_OFFSET;
-    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)) == SPI_FLASH_RESULT_OK) {
+    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)) != SPI_FLASH_RESULT_OK) {
         return 0;
     }
     pos += sizeof(image_header);
@@ -506,7 +506,7 @@ uint32_t EspClass::getSketchSize() {
         ++section_index)
     {
         section_header_t section_header = {0, 0};
-        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)) == SPI_FLASH_RESULT_OK) {
+        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)) != SPI_FLASH_RESULT_OK) {
             return 0;
         }
         pos += sizeof(section_header);
