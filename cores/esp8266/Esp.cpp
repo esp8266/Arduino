@@ -494,7 +494,7 @@ uint32_t EspClass::getSketchSize() {
 
     image_header_t image_header;
     uint32_t pos = APP_START_OFFSET;
-    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header))) {
+    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)) == SPI_FLASH_RESULT_OK) {
         return 0;
     }
     pos += sizeof(image_header);
@@ -506,7 +506,7 @@ uint32_t EspClass::getSketchSize() {
         ++section_index)
     {
         section_header_t section_header = {0, 0};
-        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
+        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)) == SPI_FLASH_RESULT_OK) {
             return 0;
         }
         pos += sizeof(section_header);
@@ -579,24 +579,25 @@ bool EspClass::flashEraseSector(uint32_t sector) {
 #if PUYA_SUPPORT
 static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
     if (data == nullptr) {
-      return 1; // SPI_FLASH_RESULT_ERR
+      return SPI_FLASH_RESULT_ERR; // SPI_FLASH_RESULT_ERR
     }
     // PUYA flash chips need to read existing data, update in memory and write modified data again.
     static uint32_t *flash_write_puya_buf = nullptr;
-    int rc = 0;
-    uint32_t* ptr = data;
 
     if (flash_write_puya_buf == nullptr) {
         flash_write_puya_buf = (uint32_t*) malloc(PUYA_BUFFER_SIZE);
         // No need to ever free this, since the flash chip will never change at runtime.
         if (flash_write_puya_buf == nullptr) {
             // Memory could not be allocated.
-            return 1; // SPI_FLASH_RESULT_ERR
+            return SPI_FLASH_RESULT_ERR; // SPI_FLASH_RESULT_ERR
         }
     }
+
+    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
+    uint32_t* ptr = data;
     size_t bytesLeft = size;
     uint32_t pos = offset;
-    while (bytesLeft > 0 && rc == 0) {
+    while (bytesLeft > 0 && rc == SPI_FLASH_RESULT_OK) {
         size_t bytesNow = bytesLeft;
         if (bytesNow > PUYA_BUFFER_SIZE) {
             bytesNow = PUYA_BUFFER_SIZE;
@@ -605,8 +606,8 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
             bytesLeft = 0;
         }
         rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
-        if (rc != 0) {
-            return rc;
+        if (rc != SPI_FLASH_RESULT_OK) {
+            return (int)rc;
         }
         for (size_t i = 0; i < bytesNow / 4; ++i) {
             flash_write_puya_buf[i] &= *ptr;
@@ -615,12 +616,12 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
         rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
         pos += bytesNow;
     }
-    return rc;
+    return (int)rc;
 }
 #endif
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-    int rc = 0;
+    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
         rc = spi_flash_write_puya(offset, data, size);
@@ -630,12 +631,12 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     {
         rc = spi_flash_write(offset, data, size);
     }
-    return rc == 0;
+    return rc == SPI_FLASH_RESULT_OK;
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
-    int rc = spi_flash_read(offset, (uint32_t*) data, size);
-    return rc == 0;
+    auto rc = spi_flash_read(offset, (uint32_t*) data, size);
+    return rc == SPI_FLASH_RESULT_OK;
 }
 
 String EspClass::getSketchMD5()
