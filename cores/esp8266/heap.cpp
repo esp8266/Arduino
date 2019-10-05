@@ -178,7 +178,7 @@ void ICACHE_RAM_ATTR print_oom_size(size_t size)
 //C Skip OOM logging of last fail for malloc/... and pvPort... .
 //C It cost 64 more bytes of IRAM to turn on. And was not previously enabled.
 #undef PTR_CHECK__LOG_LAST_FAIL
-#define PTR_CHECK__LOG_LAST_FAIL(p, s, a)
+#define PTR_CHECK__LOG_LAST_FAIL(p, s, a, f, l)
 #endif
 
 #define OOM_CHECK__PRINT_OOM(p, s)
