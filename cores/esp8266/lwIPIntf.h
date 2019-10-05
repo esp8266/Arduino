@@ -13,7 +13,9 @@
 #include <lwip/dhcp.h>
 
 #include <user_interface.h>	// wifi_get_macaddr()
+
 #include <Schedule.h>
+#include <lwIPTools.h>
 
 // import these definitions to the core ?
 #include <../../libraries/ESP8266WiFi/src/include/wl_definitions.h>
@@ -35,6 +37,25 @@ public:
     {
         memset(&_netif, 0, sizeof(_netif));
     }
+    
+    boolean config (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, const IPAddress& dns2);
+
+template <class RawEthernet>
+boolean LwipInterface::config (const IPAddress& localIP, const IPAddress& gateway, const IPAddress& netmask, const IPAddress& dns1, const IPAddress& dns2)
+{
+    if (_started)
+    {
+        DEBUGV("LwipInterface: use config() then begin()\n");
+        return false;
+    }
+    
+    IPAddress realGateway, realSubnet, realDns1;
+    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realSubnet, realDns1))
+        return false;
+    _netif.ip_addr = localIP.v4();
+    _netif.gw = gateway.v4();
+    _netif.netmask = netmask.v4();
+}
 
     // start with dhcp client
     // default mac-address is inferred from esp8266's STA interface
@@ -293,7 +314,7 @@ err_t LwipInterface<RawEthernet>::handlePackets ()
             pbuf_free(pbuf);
             return err;
         }
-        // (else) allocated pbuf is now on lwIP's responsibility
+        // (else) allocated pbuf is now lwIP's responsibility
 
     }
 }

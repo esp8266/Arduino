@@ -26,6 +26,7 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
 #include "PolledTimeout.h"
+#include "lwipTools.h"
 
 #include "c_types.h"
 #include "ets_sys.h"
@@ -287,28 +288,9 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       return true;
   }
 
-  //To allow compatibility, check first octet of 3rd arg. If 255, interpret as ESP order, otherwise Arduino order.
-  IPAddress gateway = arg1;
-  IPAddress subnet = arg2;
-  IPAddress dns1 = arg3;
-
-  if(subnet[0] != 255)
-  {
-    //octet is not 255 => interpret as Arduino order
-    gateway = arg2;
-    subnet = arg3[0] == 0 ? IPAddress(255,255,255,0) : arg3; //arg order is arduino and 4th arg not given => assign it arduino default
-    dns1 = arg1;
-  }
-
-  // check whether all is IPv4 (or gateway not set)
-  if (!(local_ip.isV4() && subnet.isV4() && (!gateway.isSet() || gateway.isV4()))) {
+  IPAddress gateway, subnet, dns1;
+  if (!ipAddressReorder(local_ip, arg1, arg2, arg3, gateway, subnet, dns1))
     return false;
-  }
-
-  //ip and gateway must be in the same subnet
-  if((local_ip.v4() & subnet.v4()) != (gateway.v4() & subnet.v4())) {
-    return false;
-  }
 
 #if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
   // get current->previous IP address
