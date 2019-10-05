@@ -1,6 +1,6 @@
 
-#ifndef _LWIPINTF_H
-#define _LWIPINTF_H
+#ifndef _LWIPINTFDEV_H
+#define _LWIPINTFDEV_H
 
 // TODO:
 // remove all Serial.print
@@ -14,23 +14,21 @@
 
 #include <user_interface.h>	// wifi_get_macaddr()
 
-#include <Schedule.h>
-#include <lwIPTools.h>
-
-// import these definitions to the core ?
-#include <../../libraries/ESP8266WiFi/src/include/wl_definitions.h>
+#include "Schedule.h"
+#include "lwIPIntf.h"
+#include "wl_definitions.h"
 
 #ifndef DEFAULT_MTU
 #define DEFAULT_MTU 1500
 #endif
 
-template <class RawEthernet>
-class LwipInterface: public RawEthernet {
+template <class RawDev>
+class LwipIntfDev: public LwipIntf, public RawDev {
 
 public:
 
-    LwipInterface (int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1):
-        RawEthernet(cs, spi, intr),
+    LwipIntfDev (int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1):
+        RawDev(cs, spi, intr),
         _mtu(DEFAULT_MTU),
         _default(false),
         _intrPin(intr)
@@ -39,23 +37,6 @@ public:
     }
     
     boolean config (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, const IPAddress& dns2);
-
-template <class RawEthernet>
-boolean LwipInterface::config (const IPAddress& localIP, const IPAddress& gateway, const IPAddress& netmask, const IPAddress& dns1, const IPAddress& dns2)
-{
-    if (_started)
-    {
-        DEBUGV("LwipInterface: use config() then begin()\n");
-        return false;
-    }
-    
-    IPAddress realGateway, realSubnet, realDns1;
-    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realSubnet, realDns1))
-        return false;
-    _netif.ip_addr = localIP.v4();
-    _netif.gw = gateway.v4();
-    _netif.netmask = netmask.v4();
-}
 
     // start with dhcp client
     // default mac-address is inferred from esp8266's STA interface
@@ -102,8 +83,25 @@ protected:
     err_t handlePackets ();
 };
 
-template <class RawEthernet>
-boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t mtu)
+template <class RawDev>
+boolean LwipIntfDev<RawDev>::config (const IPAddress& localIP, const IPAddress& gateway, const IPAddress& netmask, const IPAddress& dns1, const IPAddress& dns2)
+{
+    if (_started)
+    {
+        DEBUGV("LwipIntfDev: use config() then begin()\n");
+        return false;
+    }
+    
+    IPAddress realGateway, realSubnet, realDns1;
+    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realSubnet, realDns1))
+        return false;
+    _netif.ip_addr = localIP.v4();
+    _netif.gw = gateway.v4();
+    _netif.netmask = netmask.v4();
+}
+
+template <class RawDev>
+boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
 {
     if (macAddress)
         memcpy(_macAddress, macAddress, 6);
@@ -127,7 +125,7 @@ boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t m
         memcpy(_netif.hwaddr, _macAddress, 6);
     }
 
-    if (!RawEthernet::begin(_macAddress))
+    if (!RawDev::begin(_macAddress))
         return false;
     _started = true;
     _mtu = mtu;
@@ -147,7 +145,7 @@ boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t m
 
     if (_intrPin >= 0)
     {
-        if (RawEthernet::interruptIsPossible())
+        if (RawDev::interruptIsPossible())
         {
             //attachInterrupt(_intrPin, [&]() { this->handlePackets(); }, FALLING);
         }
@@ -167,14 +165,14 @@ boolean LwipInterface<RawEthernet>::begin (const uint8_t* macAddress, uint16_t m
     return true;
 }
 
-template <class RawEthernet>
-wl_status_t LwipInterface<RawEthernet>::status ()
+template <class RawDev>
+wl_status_t LwipIntfDev<RawDev>::status ()
 {
     return _started? (connected()? WL_CONNECTED: WL_DISCONNECTED): WL_NO_SHIELD;
 }
 
-template <class RawEthernet>
-err_t LwipInterface<RawEthernet>::start_with_dhclient ()
+template <class RawDev>
+err_t LwipIntfDev<RawDev>::start_with_dhclient ()
 {
     ip4_addr_t ip, mask, gw;
 
@@ -193,10 +191,10 @@ err_t LwipInterface<RawEthernet>::start_with_dhclient ()
     return dhcp_start(&_netif);
 }
 
-template <class RawEthernet>
-err_t LwipInterface<RawEthernet>::linkoutput_s (netif *netif, struct pbuf *pbuf)
+template <class RawDev>
+err_t LwipIntfDev<RawDev>::linkoutput_s (netif *netif, struct pbuf *pbuf)
 {
-    LwipInterface* ths = (LwipInterface*)netif->state;
+    LwipIntfDev* ths = (LwipIntfDev*)netif->state;
 
     if (pbuf->len != pbuf->tot_len || pbuf->next)
         Serial.println("ERRTOT\r\n");
@@ -211,20 +209,20 @@ err_t LwipInterface<RawEthernet>::linkoutput_s (netif *netif, struct pbuf *pbuf)
     return len == pbuf->len? ERR_OK: ERR_MEM;
 }
 
-template <class RawEthernet>
-err_t LwipInterface<RawEthernet>::netif_init_s (struct netif* netif)
+template <class RawDev>
+err_t LwipIntfDev<RawDev>::netif_init_s (struct netif* netif)
 {
-    return ((LwipInterface*)netif->state)->netif_init();
+    return ((LwipIntfDev*)netif->state)->netif_init();
 }
 
-template <class RawEthernet>
-void LwipInterface<RawEthernet>::netif_status_callback_s (struct netif* netif)
+template <class RawDev>
+void LwipIntfDev<RawDev>::netif_status_callback_s (struct netif* netif)
 {
-    ((LwipInterface*)netif->state)->netif_status_callback();
+    ((LwipIntfDev*)netif->state)->netif_status_callback();
 }
 
-template <class RawEthernet>
-err_t LwipInterface<RawEthernet>::netif_init ()
+template <class RawDev>
+err_t LwipIntfDev<RawDev>::netif_init ()
 {
     _netif.name[0] = 'e';
     _netif.name[1] = '0' + _netif.num;
@@ -250,8 +248,8 @@ err_t LwipInterface<RawEthernet>::netif_init ()
     return ERR_OK;
 }
 
-template <class RawEthernet>
-void LwipInterface<RawEthernet>::netif_status_callback ()
+template <class RawDev>
+void LwipIntfDev<RawDev>::netif_status_callback ()
 {
     //XXX is it wise ?
     if (_default && connected())
@@ -260,8 +258,8 @@ void LwipInterface<RawEthernet>::netif_status_callback ()
         netif_set_default(nullptr);
 }
 
-template <class RawEthernet>
-err_t LwipInterface<RawEthernet>::handlePackets ()
+template <class RawDev>
+err_t LwipIntfDev<RawDev>::handlePackets ()
 {
     int pkt = 0;
     while(1)
@@ -270,7 +268,7 @@ err_t LwipInterface<RawEthernet>::handlePackets ()
             // prevent starvation
             return ERR_OK;
 
-        uint16_t tot_len = RawEthernet::readFrameSize();
+        uint16_t tot_len = RawDev::readFrameSize();
         if (!tot_len)
             return ERR_OK;
 
@@ -287,11 +285,11 @@ err_t LwipInterface<RawEthernet>::handlePackets ()
         {
             if (pbuf)
                 pbuf_free(pbuf);
-            RawEthernet::discardFrame(tot_len);
+            RawDev::discardFrame(tot_len);
             return ERR_BUF;
         }
 
-        uint16_t len = RawEthernet::readFrameData((uint8_t*)pbuf->payload, tot_len);
+        uint16_t len = RawDev::readFrameData((uint8_t*)pbuf->payload, tot_len);
         if (len != tot_len)
         {
             // tot_len is given by readFrameSize()
@@ -319,12 +317,12 @@ err_t LwipInterface<RawEthernet>::handlePackets ()
     }
 }
 
-template <class RawEthernet>
-void LwipInterface<RawEthernet>::setDefault ()
+template <class RawDev>
+void LwipIntfDev<RawDev>::setDefault ()
 {
     _default = true;
     if (connected())
         netif_set_default(&_netif);
 }
 
-#endif // _LWIPINTF_H
+#endif // _LWIPINTFDEV_H

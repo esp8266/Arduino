@@ -26,7 +26,7 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
 #include "PolledTimeout.h"
-#include "lwipTools.h"
+#include "lwIPIntf.h"
 
 #include "c_types.h"
 #include "ets_sys.h"
