@@ -22,7 +22,6 @@
 #include "Arduino.h"
 #include "EEPROM.h"
 #include "debug.h"
-#include "interrupts.h"
 
 extern "C" {
 #include "c_types.h"
