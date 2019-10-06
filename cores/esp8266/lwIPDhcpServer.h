@@ -24,7 +24,7 @@ public:
     bool set_dhcps_lease_time(uint32 minute);
     bool reset_dhcps_lease_time(void);
     uint32 get_dhcps_lease_time(void);
-    
+
     bool started ();
 
 protected:
@@ -58,7 +58,7 @@ protected:
         const ip_addr_t *addr,
         uint16_t port);
     void kill_oldest_dhcps_pool(void);
-    void dhcps_coarse_tmr(void);
+    void dhcps_coarse_tmr(void); // CURRENTLY NOT CALLED
     void dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force);
     uint32 dhcps_client_update(u8 *bssid, struct ipv4_addr *ip);
 

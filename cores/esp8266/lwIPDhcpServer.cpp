@@ -918,7 +918,8 @@ void DhcpServer::handle_dhcp(
         os_printf("dhcps: handle_dhcp-> DHCPD_STATE_ACK\n");
 #endif
         send_ack(pmsg_dhcps);
-        wifi_softap_set_station_info(pmsg_dhcps->chaddr, &client_address);
+        if (_netif->num == SOFTAP_IF)
+            wifi_softap_set_station_info(pmsg_dhcps->chaddr, &client_address);
         break;
     case DHCPS_STATE_NAK://4
 #if DHCPS_DEBUG
@@ -1058,7 +1059,8 @@ void DhcpServer::stop ()
         node_remove_from_list(&plist, pback_node);
         dhcp_node = (struct dhcps_pool*)pback_node->pnode;
         //dhcps_client_leave(dhcp_node->mac,&dhcp_node->ip,true); // force to delete
-        wifi_softap_set_station_info(dhcp_node->mac, &ip_zero);
+        if (_netif->num == SOFTAP_IF)
+            wifi_softap_set_station_info(dhcp_node->mac, &ip_zero);
         free(pback_node->pnode);
         pback_node->pnode = nullptr;
         free(pback_node);
@@ -1359,7 +1361,8 @@ void DhcpServer::dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force)
 
                 struct ipv4_addr ip_zero;
                 memset(&ip_zero, 0x0, sizeof(ip_zero));
-                wifi_softap_set_station_info(bssid, &ip_zero);
+                if (_netif->num == SOFTAP_IF)
+                    wifi_softap_set_station_info(bssid, &ip_zero);
                 break;
             }
         }
