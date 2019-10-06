@@ -17,13 +17,15 @@ public:
     void start (struct ip_info *info);
     void stop  ();
 
-    void wifi_softap_init_dhcps_lease(uint32 ip);
-    bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
-    bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
-    bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
-    bool wifi_softap_set_dhcps_lease_time(uint32 minute);
-    bool wifi_softap_reset_dhcps_lease_time(void);
-    uint32 wifi_softap_get_dhcps_lease_time(void);
+    void init_dhcps_lease(uint32 ip);
+    bool set_dhcps_lease(struct dhcps_lease *please);
+    bool get_dhcps_lease(struct dhcps_lease *please);
+    bool set_dhcps_offer_option(uint8 level, void* optarg);
+    bool set_dhcps_lease_time(uint32 minute);
+    bool reset_dhcps_lease_time(void);
+    uint32 get_dhcps_lease_time(void);
+    
+    bool started ();
 
 protected:
 
@@ -35,7 +37,7 @@ protected:
     void dhcps_set_dns(int num, const ipv4_addr_t* dns);
     void node_insert_to_list(list_node **phead, list_node* pinsert);
     void node_remove_from_list(list_node **phead, list_node* pdelete);
-    bool wifi_softap_add_dhcps_lease(uint8 *macaddr);
+    bool add_dhcps_lease(uint8 *macaddr);
     uint8_t* add_msg_type(uint8_t *optptr, uint8_t type);
     uint8_t* add_offer_options(uint8_t *optptr);
     uint8_t* add_end(uint8_t *optptr);
@@ -57,8 +59,8 @@ protected:
         uint16_t port);
     void kill_oldest_dhcps_pool(void);
     void dhcps_coarse_tmr(void);
-    void wifi_softap_dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force);
-    uint32 wifi_softap_dhcps_client_update(u8 *bssid, struct ipv4_addr *ip);
+    void dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force);
+    uint32 dhcps_client_update(u8 *bssid, struct ipv4_addr *ip);
 
     netif* _netif;
 

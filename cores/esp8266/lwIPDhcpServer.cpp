@@ -156,9 +156,6 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
 // wifi_softap_set_station_info is missing in user_interface.h:
 extern "C" void wifi_softap_set_station_info (uint8_t* mac, struct ipv4_addr*);
 
-void wifi_softap_dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force);
-uint32 wifi_softap_dhcps_client_update(u8 *bssid, struct ipv4_addr *ip);
-
 void DhcpServer::dhcps_set_dns(int num, const ipv4_addr_t* dns)
 {
     (void)num;
@@ -255,12 +252,12 @@ void DhcpServer::node_remove_from_list(list_node **phead, list_node* pdelete)
 }
 
 /******************************************************************************
-    FunctionName : wifi_softap_add_dhcps_lease
+    FunctionName : add_dhcps_lease
     Description  : add static lease on the list, this will be the next available @
     Parameters   : mac address
     Returns      : true if ok and false if this mac already exist or if all ip are already reserved
 *******************************************************************************/
-bool DhcpServer::wifi_softap_add_dhcps_lease(uint8 *macaddr)
+bool DhcpServer::add_dhcps_lease(uint8 *macaddr)
 {
     struct dhcps_pool *pdhcps_pool = nullptr;
     list_node *pback_node = nullptr;
@@ -803,13 +800,13 @@ sint16_t DhcpServer::parse_msg(struct dhcps_msg *m, u16_t len)
     {
         struct ipv4_addr ip;
         memcpy(&ip.addr, m->ciaddr, sizeof(ip.addr));
-        client_address.addr = wifi_softap_dhcps_client_update(m->chaddr, &ip);
+        client_address.addr = dhcps_client_update(m->chaddr, &ip);
 
         sint16_t ret = parse_options(&m->options[4], len);
 
         if (ret == DHCPS_STATE_RELEASE)
         {
-            wifi_softap_dhcps_client_leave(m->chaddr, &ip, true); // force to delete
+            dhcps_client_leave(m->chaddr, &ip, true); // force to delete
             client_address.addr = ip.addr;
         }
 
@@ -940,7 +937,7 @@ void DhcpServer::handle_dhcp(
     pmsg_dhcps = nullptr;
 }
 ///////////////////////////////////////////////////////////////////////////////////
-void DhcpServer::wifi_softap_init_dhcps_lease(uint32 ip)
+void DhcpServer::init_dhcps_lease(uint32 ip)
 {
     uint32 softap_ip = 0, local_ip = 0;
     uint32 start_ip = 0;
@@ -1025,7 +1022,7 @@ void DhcpServer::start (struct ip_info *info)
     //XXXFIXMEIPV6 broadcast address?
 
     server_address = info->ip;
-    wifi_softap_init_dhcps_lease(server_address.addr);
+    init_dhcps_lease(server_address.addr);
 
     udp_bind(pcb_dhcps, IP_ADDR_ANY, DHCPS_SERVER_PORT);
     udp_recv(pcb_dhcps, S_handle_dhcp, this);
@@ -1060,7 +1057,7 @@ void DhcpServer::stop ()
         pnode = pback_node->pnext;
         node_remove_from_list(&plist, pback_node);
         dhcp_node = (struct dhcps_pool*)pback_node->pnode;
-        //wifi_softap_dhcps_client_leave(dhcp_node->mac,&dhcp_node->ip,true); // force to delete
+        //dhcps_client_leave(dhcp_node->mac,&dhcp_node->ip,true); // force to delete
         wifi_softap_set_station_info(dhcp_node->mac, &ip_zero);
         free(pback_node->pnode);
         pback_node->pnode = nullptr;
@@ -1069,14 +1066,20 @@ void DhcpServer::stop ()
     }
 }
 
+bool DhcpServer::started ()
+{
+    return !!_netif->state;
+}
+
+
 /******************************************************************************
-    FunctionName : wifi_softap_set_dhcps_lease
+    FunctionName : set_dhcps_lease
     Description  : set the lease information of DHCP server
     Parameters   : please -- Additional argument to set the lease information,
                             Little-Endian.
     Returns      : true or false
 *******************************************************************************/
-bool DhcpServer::wifi_softap_set_dhcps_lease(struct dhcps_lease *please)
+bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 {
     struct ip_info info;
     uint32 softap_ip = 0;
@@ -1090,7 +1093,7 @@ bool DhcpServer::wifi_softap_set_dhcps_lease(struct dhcps_lease *please)
         return false;
     }
 
-    if (please == nullptr || wifi_softap_dhcps_status() == DHCP_STARTED)
+    if (please == nullptr || started())
     {
         return false;
     }
@@ -1134,13 +1137,13 @@ bool DhcpServer::wifi_softap_set_dhcps_lease(struct dhcps_lease *please)
 }
 
 /******************************************************************************
-    FunctionName : wifi_softap_get_dhcps_lease
+    FunctionName : get_dhcps_lease
     Description  : get the lease information of DHCP server
     Parameters   : please -- Additional argument to get the lease information,
                             Little-Endian.
     Returns      : true or false
 *******************************************************************************/
-bool DhcpServer::wifi_softap_get_dhcps_lease(struct dhcps_lease *please)
+bool DhcpServer::get_dhcps_lease(struct dhcps_lease *please)
 {
     uint8 opmode = wifi_get_opmode();
 
@@ -1157,7 +1160,7 @@ bool DhcpServer::wifi_softap_get_dhcps_lease(struct dhcps_lease *please)
     //  if (dhcps_lease_flag){
     if (dhcps_lease.enable == false)
     {
-        if (wifi_softap_dhcps_status() == DHCP_STOPPED)
+        if (started())
         {
             return false;
         }
@@ -1165,13 +1168,13 @@ bool DhcpServer::wifi_softap_get_dhcps_lease(struct dhcps_lease *please)
     else
     {
         //      bzero(please, sizeof(dhcps_lease));
-        //      if (wifi_softap_dhcps_status() == DHCP_STOPPED){
+        //      if (!started()){
         //          please->start_ip.addr = htonl(dhcps_lease.start_ip.addr);
         //          please->end_ip.addr = htonl(dhcps_lease.end_ip.addr);
         //      }
     }
 
-    //  if (wifi_softap_dhcps_status() == DHCP_STARTED){
+    //  if (started()){
     //      bzero(please, sizeof(dhcps_lease));
     //      please->start_ip.addr = dhcps_lease.start_ip.addr;
     //      please->end_ip.addr = dhcps_lease.end_ip.addr;
@@ -1246,11 +1249,11 @@ void DhcpServer::dhcps_coarse_tmr(void)
     }
 }
 
-bool DhcpServer::wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
+bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
 {
     bool offer_flag = true;
     //uint8 option = 0;
-    if (optarg == nullptr && wifi_softap_dhcps_status() == false)
+    if (optarg == nullptr && !started())
     {
         return false;
     }
@@ -1273,7 +1276,7 @@ bool DhcpServer::wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
     return offer_flag;
 }
 
-bool DhcpServer::wifi_softap_set_dhcps_lease_time(uint32 minute)
+bool DhcpServer::set_dhcps_lease_time(uint32 minute)
 {
     uint8 opmode = wifi_get_opmode();
 
@@ -1282,7 +1285,7 @@ bool DhcpServer::wifi_softap_set_dhcps_lease_time(uint32 minute)
         return false;
     }
 
-    if (wifi_softap_dhcps_status() == DHCP_STARTED)
+    if (started())
     {
         return false;
     }
@@ -1295,7 +1298,7 @@ bool DhcpServer::wifi_softap_set_dhcps_lease_time(uint32 minute)
     return true;
 }
 
-bool DhcpServer::wifi_softap_reset_dhcps_lease_time(void)
+bool DhcpServer::reset_dhcps_lease_time(void)
 {
     uint8 opmode = wifi_get_opmode();
 
@@ -1304,7 +1307,7 @@ bool DhcpServer::wifi_softap_reset_dhcps_lease_time(void)
         return false;
     }
 
-    if (wifi_softap_dhcps_status() == DHCP_STARTED)
+    if (started())
     {
         return false;
     }
@@ -1312,12 +1315,12 @@ bool DhcpServer::wifi_softap_reset_dhcps_lease_time(void)
     return true;
 }
 
-uint32 DhcpServer::wifi_softap_get_dhcps_lease_time(void) // minute
+uint32 DhcpServer::get_dhcps_lease_time(void) // minute
 {
     return dhcps_lease_time;
 }
 
-void DhcpServer::wifi_softap_dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force)
+void DhcpServer::dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force)
 {
     struct dhcps_pool *pdhcps_pool = nullptr;
     list_node *pback_node = nullptr;
@@ -1363,7 +1366,7 @@ void DhcpServer::wifi_softap_dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip,
     }
 }
 
-uint32 DhcpServer::wifi_softap_dhcps_client_update(u8 *bssid, struct ipv4_addr *ip)
+uint32 DhcpServer::dhcps_client_update(u8 *bssid, struct ipv4_addr *ip)
 {
     struct dhcps_pool *pdhcps_pool = nullptr;
     list_node *pback_node = nullptr;
