@@ -14,11 +14,12 @@ DhcpServer dhcpSoftAP(&netif_git[SOFTAP_IF]);
 extern "C"
 {
 
-void dhcps_start(struct ip_info *info);
+void dhcps_start(struct ip_info *info, netif* apnetif);
 void dhcps_stop(void);
 
-void dhcps_start (struct ip_info *info)
+void dhcps_start (struct ip_info *info, netif* apnetif)
 {
+    (void)apnetif; // this is esp interface, replaced by lwip2 "netif_git" interface
     dhcpSoftAP.start(info);
 }
 
