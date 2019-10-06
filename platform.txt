@@ -137,7 +137,8 @@ tools.esptool.cmd={runtime.platform.path}/tools/python3/python3
 tools.esptool.network_cmd={runtime.platform.path}/tools/python3/python3
 
 tools.esptool.upload.protocol=esp
-tools.esptool.upload.params.verbose=--trace
+# esptool.py --trace option is a debug option, not a verbose option
+tools.esptool.upload.params.verbose=
 tools.esptool.upload.params.quiet=
 
 # First, potentially perform an erase or nothing
