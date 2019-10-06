@@ -27,10 +27,10 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc = 0xffffffff);
 
 #include <functional>
 
-using functionalVoidVoid = std::function<void()>;
+using TrivialCB = std::function<void()>;
 
-void settimeofday_cb (functionalVoidVoid&& cb);
-void settimeofday_cb (const functionalVoidVoid& cb);
+void settimeofday_cb (TrivialCB&& cb);
+void settimeofday_cb (const TrivialCB& cb);
 
 #endif
 
