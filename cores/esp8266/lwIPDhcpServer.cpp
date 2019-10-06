@@ -22,12 +22,6 @@
 #include "user_interface.h"
 #include "mem.h"
 
-// wifi_softap_set_station_info is missing in user_interface.h:
-extern "C" void wifi_softap_set_station_info (uint8_t* mac, struct ipv4_addr*);
-
-// lwip2 interfaces netif_git[STATION_IF] and netif_git[SOFTAP_IF]
-extern netif netif_git[2];
-
 typedef struct dhcps_state
 {
     sint16_t state;
@@ -86,7 +80,6 @@ struct dhcps_pool
 
 };
 
-extern uint32 dhcps_lease_time;
 #define DHCPS_LEASE_TIMER  dhcps_lease_time  //0x05A0
 #define DHCPS_MAX_LEASE 0x64
 #define BOOTP_BROADCAST 0x8000
@@ -144,14 +137,8 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #define LWIP_IS_OK(what,err) ((err) == ERR_OK)
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////
 
-// STARTS/STOPS DHCP SERVER ON WIFI AP INTERFACE
-// this symbol must exists as-is with "C" interface,
-// nonos-sdk calls it at boot
-
-extern "C" void dhcps_start(struct ip_info *info);
-extern "C" void dhcps_stop(void);
+const uint32 DhcpServer::magic_cookie = 0x63538263;
 
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,6 +152,9 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
     dhcps_lease_time = DHCPS_LEASE_TIME_DEF;  //minute
 };
 
+
+// wifi_softap_set_station_info is missing in user_interface.h:
+extern "C" void wifi_softap_set_station_info (uint8_t* mac, struct ipv4_addr*);
 
 void wifi_softap_dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force);
 uint32 wifi_softap_dhcps_client_update(u8 *bssid, struct ipv4_addr *ip);
@@ -1003,19 +993,6 @@ void DhcpServer::wifi_softap_init_dhcps_lease(uint32 ip)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
-static DhcpServer dhcpSoftAP(&netif_git[SOFTAP_IF]);
-
-void dhcps_start (struct ip_info *info)
-{
-    // This is called by nonos-sdk
-    // this function is supposed to start dhcp server on WiFi AP interface
-    // it can be called early (persistent mode, AP or AP_STA mode)
-    // (lwip2 is already initialized, and 'netif_git' too)
-    //dhcps_start_netif(info, &netif_git[SOFTAP_IF]);
-    dhcpSoftAP.start(info);
-}
-
-extern "C" void delay(int);
 void DhcpServer::start (struct ip_info *info)
 {
     // THIS FUNCTION IS ORIGINALLY DESIGNED FOR WIFI AP INTERFACE ONLY
@@ -1058,11 +1035,6 @@ void DhcpServer::start (struct ip_info *info)
 
     wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
     _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP; // added for lwip-git
-}
-
-void dhcps_stop (void)
-{
-    dhcpSoftAP.stop();
 }
 
 void DhcpServer::stop ()

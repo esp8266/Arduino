@@ -17,6 +17,14 @@ public:
     void start (struct ip_info *info);
     void stop  ();
 
+    void wifi_softap_init_dhcps_lease(uint32 ip);
+    bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
+    bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
+    bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
+    bool wifi_softap_set_dhcps_lease_time(uint32 minute);
+    bool wifi_softap_reset_dhcps_lease_time(void);
+    uint32 wifi_softap_get_dhcps_lease_time(void);
+
 protected:
 
     typedef struct _list_node {
@@ -47,32 +55,29 @@ protected:
         struct pbuf *p,
         const ip_addr_t *addr,
         uint16_t port);
-    void wifi_softap_init_dhcps_lease(uint32 ip);
-    bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
-    bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
     void kill_oldest_dhcps_pool(void);
     void dhcps_coarse_tmr(void);
-    bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
-    bool wifi_softap_set_dhcps_lease_time(uint32 minute);
-    bool wifi_softap_reset_dhcps_lease_time(void);
-    uint32 wifi_softap_get_dhcps_lease_time(void);
     void wifi_softap_dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force);
     uint32 wifi_softap_dhcps_client_update(u8 *bssid, struct ipv4_addr *ip);
 
     netif* _netif;
 
-    static constexpr uint32 magic_cookie = 0x63538263;
     struct udp_pcb *pcb_dhcps;
     ip_addr_t broadcast_dhcps;
     struct ipv4_addr server_address;
     struct ipv4_addr client_address;
     struct ipv4_addr dns_address;
+    uint32 dhcps_lease_time;
 
     struct dhcps_lease dhcps_lease;
     list_node *plist;
     uint8 offer;
     bool renew;
+
+    static const uint32 magic_cookie;
 };
+
+extern DhcpServer dhcpSoftAP;
 
 #endif // LWIP_VERSION_MAJOR != 1
 
