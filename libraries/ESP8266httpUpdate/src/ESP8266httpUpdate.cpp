@@ -43,7 +43,7 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
 {
 }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
         const String& httpsFingerprint, bool reboot)
 {
@@ -94,7 +94,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url
     return handleUpdate(http, currentVersion, false);
 }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
@@ -133,7 +133,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const Strin
     return handleUpdate(http, currentVersion, true);
 }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
         bool https, const String& httpsFingerprint, bool reboot)
 {
