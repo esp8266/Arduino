@@ -92,12 +92,14 @@ boolean LwipIntfDev<RawDev>::config (const IPAddress& localIP, const IPAddress& 
         return false;
     }
     
-    IPAddress realGateway, realSubnet, realDns1;
-    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realSubnet, realDns1))
+    IPAddress realGateway, realNetmask, realDns1;
+    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realGateway, realDns1))
         return false;
-    _netif.ip_addr = localIP.v4();
-    _netif.gw = gateway.v4();
-    _netif.netmask = netmask.v4();
+    ip4_addr_set_u32(ip_2_ip4(&_netif.ip_addr), localIP.v4());
+    ip4_addr_set_u32(ip_2_ip4(&_netif.gw), realGateway.v4());
+    ip4_addr_set_u32(ip_2_ip4(&_netif.netmask), realNetmask.v4());
+    
+    return true;
 }
 
 template <class RawDev>
@@ -130,18 +132,19 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
     _started = true;
     _mtu = mtu;
 
-    switch (start_with_dhclient())
-    {
-    case ERR_OK:
-        break;
+    if (localIP().v4() == 0)
+        switch (start_with_dhclient())
+        {
+        case ERR_OK:
+            break;
 
-    case ERR_IF:
-        return false;
+        case ERR_IF:
+            return false;
 
-    default:
-        netif_remove(&_netif);
-        return false;
-    }
+        default:
+            netif_remove(&_netif);
+            return false;
+        }
 
     if (_intrPin >= 0)
     {
