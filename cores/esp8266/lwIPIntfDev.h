@@ -38,7 +38,6 @@ public:
     
     boolean config (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, const IPAddress& dns2);
 
-    // start with dhcp client
     // default mac-address is inferred from esp8266's STA interface
     boolean begin (const uint8_t *macAddress = nullptr, uint16_t mtu = DEFAULT_MTU);
 
@@ -71,7 +70,6 @@ protected:
     uint8_t _macAddress[6];
     bool _started = false;
 
-    err_t start_with_dhclient ();
     err_t netif_init ();
     void  netif_status_callback ();
 
@@ -93,7 +91,7 @@ boolean LwipIntfDev<RawDev>::config (const IPAddress& localIP, const IPAddress& 
     }
     
     IPAddress realGateway, realNetmask, realDns1;
-    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realGateway, realDns1))
+    if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realNetmask, realDns1))
         return false;
     ip4_addr_set_u32(ip_2_ip4(&_netif.ip_addr), localIP.v4());
     ip4_addr_set_u32(ip_2_ip4(&_netif.gw), realGateway.v4());
@@ -124,16 +122,29 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
         _macAddress[0] = 0xEE;
 #endif
         _macAddress[3] += _netif.num;
-        memcpy(_netif.hwaddr, _macAddress, 6);
     }
 
     if (!RawDev::begin(_macAddress))
         return false;
-    _started = true;
-    _mtu = mtu;
+
+    // setup lwIP netif
+    
+    _netif.hwaddr_len = sizeof _macAddress;
+    memcpy(_netif.hwaddr, _macAddress, sizeof _macAddress);
+
+    // due to netif_add() api: ...
+    ip_addr_t ip_addr, netmask, gw;
+    ip_addr_copy(ip_addr, _netif.ip_addr);
+    ip_addr_copy(netmask, _netif.netmask);
+    ip_addr_copy(gw, _netif.gw);
+
+    if (!netif_add(&_netif, &ip_addr, &netmask, &gw, this, netif_init_s, ethernet_input))
+        return ERR_IF;
+
+    _netif.flags |= NETIF_FLAG_UP;
 
     if (localIP().v4() == 0)
-        switch (start_with_dhclient())
+        switch (dhcp_start(&_netif))
         {
         case ERR_OK:
             break;
@@ -145,6 +156,8 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
             netif_remove(&_netif);
             return false;
         }
+
+    _started = true;
 
     if (_intrPin >= 0)
     {
@@ -172,26 +185,6 @@ template <class RawDev>
 wl_status_t LwipIntfDev<RawDev>::status ()
 {
     return _started? (connected()? WL_CONNECTED: WL_DISCONNECTED): WL_NO_SHIELD;
-}
-
-template <class RawDev>
-err_t LwipIntfDev<RawDev>::start_with_dhclient ()
-{
-    ip4_addr_t ip, mask, gw;
-
-    ip4_addr_set_zero(&ip);
-    ip4_addr_set_zero(&mask);
-    ip4_addr_set_zero(&gw);
-
-    _netif.hwaddr_len = sizeof _macAddress;
-    memcpy(_netif.hwaddr, _macAddress, sizeof _macAddress);
-
-    if (!netif_add(&_netif, &ip, &mask, &gw, this, netif_init_s, ethernet_input))
-        return ERR_IF;
-
-    _netif.flags |= NETIF_FLAG_UP;
-
-    return dhcp_start(&_netif);
 }
 
 template <class RawDev>
