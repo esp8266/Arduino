@@ -48,6 +48,10 @@
 #include "user_interface.h"
 #include "uart_register.h"
 
+#define MODE2WIDTH(mode) (((mode%16)>>2)+5)
+#define MODE2STOP(mode) (((mode)>>5)+1)
+#define MODE2PARITY(mode) (mode%4)
+
 /*
   Some general architecture for GDB integration with the UART to enable
   serial debugging.
@@ -204,7 +208,14 @@ uart_read_char_unsafe(uart_t* uart)
     return -1;
 }
 
-size_t
+uint8_t
+uart_get_bit_length(const int uart_nr)
+{
+    // return bit length from uart mode, +1 for the start bit which is always there. 
+    return MODE2WIDTH(USC0(uart_nr)) + MODE2PARITY(USC0(uart_nr)) + MODE2STOP(USC0(uart_nr)) + 1;
+}
+
+size_t 
 uart_rx_available(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled)
