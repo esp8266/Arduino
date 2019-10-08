@@ -147,6 +147,7 @@ int uart_get_debug();
 void uart_start_detect_baudrate(int uart_nr);
 int uart_detect_baudrate(int uart_nr);
 
+uint8_t uart_get_bit_length(const int uart_nr);
 
 #if defined (__cplusplus)
 } // extern "C"

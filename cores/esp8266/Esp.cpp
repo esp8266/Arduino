@@ -18,7 +18,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Arduino.h"
+#include "Esp.h"
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
@@ -36,6 +36,14 @@ extern struct rst_info resetInfo;
 
 //#define DEBUG_SERIAL Serial
 
+#ifndef PUYA_SUPPORT
+  #define PUYA_SUPPORT 1
+#endif
+#ifndef PUYA_BUFFER_SIZE
+  // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE (= 4k)
+  // Always use a multiple of flash page size (256 bytes)
+  #define PUYA_BUFFER_SIZE 256
+#endif
 
 /**
  * User-defined Literals
@@ -577,7 +585,7 @@ bool EspClass::flashEraseSector(uint32_t sector) {
 }
 
 #if PUYA_SUPPORT
-static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
+static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
     if (data == nullptr) {
       return SPI_FLASH_RESULT_ERR;
     }
@@ -607,7 +615,7 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
         }
         rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
         if (rc != SPI_FLASH_RESULT_OK) {
-            return (int)rc;
+            return rc;
         }
         for (size_t i = 0; i < bytesNow / 4; ++i) {
             flash_write_puya_buf[i] &= *ptr;
@@ -616,7 +624,7 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
         rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
         pos += bytesNow;
     }
-    return (int)rc;
+    return rc;
 }
 #endif
 
