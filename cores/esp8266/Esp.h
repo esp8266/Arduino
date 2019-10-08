@@ -23,15 +23,6 @@
 
 #include <Arduino.h>
 
-#ifndef PUYA_SUPPORT
-  #define PUYA_SUPPORT 0
-#endif
-#ifndef PUYA_BUFFER_SIZE
-  // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE (= 4k)
-  // Always use a multiple of flash page size (256 bytes)
-  #define PUYA_BUFFER_SIZE 256
-#endif
-
 // Vendor IDs taken from Flashrom project
 // https://review.coreboot.org/cgit/flashrom.git/tree/flashchips.h?h=1.0.x
 typedef enum {
@@ -201,9 +192,10 @@ class EspClass {
         bool eraseConfig();
 
 #ifndef CORE_MOCK
-        inline
-#endif
+        inline uint32_t getCycleCount() __attribute__((always_inline));
+#else
         uint32_t getCycleCount();
+#endif
 };
 
 #ifndef CORE_MOCK

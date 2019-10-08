@@ -78,10 +78,10 @@ bool MDNSResponder::_process(bool p_bUserContext) {
         }
     }
     else {
-        bResult = ((WiFi.isConnected() ||               // Either station is connected
-                    WiFi.softAPgetStationNum()>0) &&    // Or AP has stations connected
-                   (_updateProbeStatus()) &&            // Probing
-                   (_checkServiceQueryCache()));        // Service query cache check
+        bResult = (m_netif != nullptr) &&
+                  (m_netif->flags & NETIF_FLAG_UP) &&  // network interface is up and running
+                  _updateProbeStatus() &&              // Probing
+                  _checkServiceQueryCache();           // Service query cache check
     }
     return bResult;
 }
@@ -91,53 +91,10 @@ bool MDNSResponder::_process(bool p_bUserContext) {
  */
 bool MDNSResponder::_restart(void) {
 
-    // check m_IPAddress
-    if (!m_IPAddress.isSet()) {
-
-        IPAddress sta = WiFi.localIP();
-        IPAddress ap = WiFi.softAPIP();
-
-        if (!sta.isSet() && !ap.isSet()) {
-
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] internal interfaces (STA, AP) are not set (none was specified)\n")));
-            return false;
-        }
-
-        if (sta.isSet()) {
-
-            if (ap.isSet())
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected over AP (none was specified)\n")));
-            else
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected\n")));
-            m_IPAddress = sta;
-
-        } else {
-
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected (none was specified)\n")));
-            m_IPAddress = ap;
-
-        }
-
-        // continue to ensure interface is UP
-    }
-
-    // check existence of this IP address in the interface list
-    bool found = false;
-    for (auto a: addrList)
-        if (m_IPAddress == a.addr()) {
-            if (a.ifUp()) {
-                found = true;
-                break;
-            }
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), m_IPAddress.toString().c_str()););
-        }
-    if (!found) {
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] interface defined by IP '%s' not found\n"), m_IPAddress.toString().c_str()););
-        return false;
-    }
-
-    return ((_resetProbeStatus(true)) &&    // Stop and restart probing
-            (_allocUDPContext()));          // Restart UDP
+    return ((m_netif != nullptr) &&
+            (m_netif->flags & NETIF_FLAG_UP) &&  // network interface is up and running
+            (_resetProbeStatus(true)) &&         // Stop and restart probing
+            (_allocUDPContext()));               // Restart UDP
 }
 
 
@@ -288,7 +245,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                          ((wifi_get_ip_info(STATION_IF, &IPInfo_Local)) &&
                           (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))))) { // Remote IP in STATION's subnet
 
-                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
+                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s, id %u!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), p_MsgHeader.m_u16ID););
 
                         sendParameter.m_u16ID = p_MsgHeader.m_u16ID;
                         sendParameter.m_bLegacyQuery = true;
@@ -797,7 +754,7 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                     if (p_pPTRAnswer->m_u32TTL) {   // Received update message
                         pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL);    // Update TTL tag
                         DEBUG_EX_INFO(
-                                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processPTRAnswer: Updated TTL(%lu) for "), p_pPTRAnswer->m_u32TTL);
+                                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processPTRAnswer: Updated TTL(%d) for "), (int)p_pPTRAnswer->m_u32TTL);
                                 _printRRDomain(pSQAnswer->m_ServiceDomain);
                                 DEBUG_OUTPUT.printf_P(PSTR("\n"));
                         );
@@ -851,7 +808,7 @@ bool MDNSResponder::_processSRVAnswer(const MDNSResponder::stcMDNS_RRAnswerSRV* 
                 if (p_pSRVAnswer->m_u32TTL) {   // First or update message (TTL != 0)
                     pSQAnswer->m_TTLHostDomainAndPort.set(p_pSRVAnswer->m_u32TTL);    // Update TTL tag
                     DEBUG_EX_INFO(
-                            DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processSRVAnswer: Updated TTL(%lu) for "), p_pSRVAnswer->m_u32TTL);
+                            DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processSRVAnswer: Updated TTL(%d) for "), (int)p_pSRVAnswer->m_u32TTL);
                             _printRRDomain(pSQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" host domain and port\n"));
                     );
@@ -904,7 +861,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                 if (p_pTXTAnswer->m_u32TTL) {   // First or update message
                     pSQAnswer->m_TTLTxts.set(p_pTXTAnswer->m_u32TTL); // Update TTL tag
                     DEBUG_EX_INFO(
-                            DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processTXTAnswer: Updated TTL(%lu) for "), p_pTXTAnswer->m_u32TTL);
+                            DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processTXTAnswer: Updated TTL(%d) for "), (int)p_pTXTAnswer->m_u32TTL);
                             _printRRDomain(pSQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" TXTs\n"));
                     );
@@ -956,7 +913,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                         if (p_pAAnswer->m_u32TTL) { // Valid TTL -> Update answers TTL
                             pIP4Address->m_TTL.set(p_pAAnswer->m_u32TTL);
                             DEBUG_EX_INFO(
-                                    DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAAnswer: Updated TTL(%lu) for "), p_pAAnswer->m_u32TTL);
+                                    DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAAnswer: Updated TTL(%d) for "), (int)p_pAAnswer->m_u32TTL);
                                     _printRRDomain(pSQAnswer->m_ServiceDomain);
                                     DEBUG_OUTPUT.printf_P(PSTR(" IP4Address (%s)\n"), pIP4Address->m_IPAddress.toString().c_str());
                             );
@@ -1123,7 +1080,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
 
             if (MDNS_ANNOUNCE_COUNT > m_HostProbeInformation.m_u8SentCount) {
                 m_HostProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing host (%lu).\n\n"), m_HostProbeInformation.m_u8SentCount););
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing host (%d).\n\n"), m_HostProbeInformation.m_u8SentCount););
             }
             else {
                 m_HostProbeInformation.m_Timeout.resetToNeverExpires();
@@ -1171,7 +1128,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
 
                 if (MDNS_ANNOUNCE_COUNT > pService->m_ProbeInformation.m_u8SentCount) {
                     pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing service %s.%s.%s (%lu)\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, pService->m_ProbeInformation.m_u8SentCount););
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing service %s.%s.%s (%d)\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, pService->m_ProbeInformation.m_u8SentCount););
                 }
                 else {
                     pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();

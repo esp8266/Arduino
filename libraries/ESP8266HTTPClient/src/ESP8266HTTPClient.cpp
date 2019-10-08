@@ -113,8 +113,8 @@ protected:
  * constructor
  */
 HTTPClient::HTTPClient()
+    : _client(nullptr), _userAgent(F("ESP8266HTTPClient"))
 {
-    _client = nullptr;
 #if HTTPCLIENT_1_1_COMPATIBLE
     _tcpDeprecated.reset(nullptr);
 #endif
@@ -536,8 +536,8 @@ void HTTPClient::setTimeout(uint16_t timeout)
 bool HTTPClient::setURL(String url)
 {
     // if the new location is only a path then only update the URI
-    if (_location.startsWith("/")) {
-        _uri = _location;
+    if (url && url[0] == '/') {
+        _uri = url;
         clear();
         return true;
     }
@@ -1007,7 +1007,7 @@ const String& HTTPClient::getString(void)
 
     _payload.reset(new StreamString());
 
-    if(_size) {
+    if(_size > 0) {
         // try to reserve needed memmory
         if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
@@ -1294,21 +1294,21 @@ int HTTPClient::handleHeaderResponse()
                 String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
                 headerValue.trim();
 
-                if(headerName.equalsIgnoreCase("Content-Length")) {
+                if(headerName.equalsIgnoreCase(F("Content-Length"))) {
                     _size = headerValue.toInt();
                 }
 
-                if(_canReuse && headerName.equalsIgnoreCase("Connection")) {
+                if(_canReuse && headerName.equalsIgnoreCase(F("Connection"))) {
                     if(headerValue.indexOf("close") >= 0 && headerValue.indexOf("keep-alive") < 0) {
                         _canReuse = false;
                     }
                 }
 
-                if(headerName.equalsIgnoreCase("Transfer-Encoding")) {
+                if(headerName.equalsIgnoreCase(F("Transfer-Encoding"))) {
                     transferEncoding = headerValue;
                 }
 
-                if(headerName.equalsIgnoreCase("Location")) {
+                if(headerName.equalsIgnoreCase(F("Location"))) {
                     _location = headerValue;
                 }
 
@@ -1334,7 +1334,7 @@ int HTTPClient::handleHeaderResponse()
 
                 if(transferEncoding.length() > 0) {
                     DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Transfer-Encoding: %s\n", transferEncoding.c_str());
-                    if(transferEncoding.equalsIgnoreCase("chunked")) {
+                    if(transferEncoding.equalsIgnoreCase(F("chunked"))) {
                         _transferEncoding = HTTPC_TE_CHUNKED;
                     } else {
                         return HTTPC_ERROR_ENCODING;
@@ -1456,10 +1456,10 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
     free(buff);
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] connection closed or file end (written: %d).\n", bytesWritten);
+    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] end of chunk or data (transferred: %d).\n", bytesWritten);
 
     if((size > 0) && (size != bytesWritten)) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] bytesWritten %d and size %d mismatch!.\n", bytesWritten, size);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] transferred size %d and request size %d mismatch!.\n", bytesWritten, size);
         return HTTPC_ERROR_STREAM_WRITE;
     }
 

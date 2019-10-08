@@ -29,6 +29,8 @@
  */
 
 #include <unistd.h> // write
+#include <sys/time.h> // gettimeofday
+#include <time.h> // localtime
 
 #include "Arduino.h"
 #include "uart.h"
@@ -59,13 +61,35 @@ struct uart_
 	struct uart_rx_buffer_ * rx_buffer;
 };
 
+bool serial_timestamp = false;
+
 // write one byte to the emulated UART
 static void
 uart_do_write_char(const int uart_nr, char c)
 {
+	static bool w = false;
+
 	if (uart_nr >= UART0 && uart_nr <= UART1)
-		if (1 != write(uart_nr + 1, &c, 1))
-			fprintf(stderr, "Unable to write character to emulated UART stream: %d\n", c);
+	{
+		if (serial_timestamp && (c == '\n' || c == '\r'))
+		{
+			if (w)
+			{
+				FILE* out = uart_nr == UART0? stdout: stderr;
+				timeval tv;
+				gettimeofday(&tv, nullptr);
+				const tm* tm = localtime(&tv.tv_sec);
+				fprintf(out, "\r\n%d:%02d:%02d.%06d: ", tm->tm_hour, tm->tm_min, tm->tm_sec, (int)tv.tv_usec);
+				fflush(out);
+				w = false;
+			}
+		}
+		else
+		{
+			write(uart_nr + 1, &c, 1);
+			w = true;
+		}
+	}
 }
 
 // write a new byte into the RX FIFO buffer
@@ -287,6 +311,15 @@ uart_get_baudrate(uart_t* uart)
 		return 0;
 
 	return uart->baud_rate;
+}
+
+uint8_t
+uart_get_bit_length(const int uart_nr)
+{
+	uint8_t width = ((uart_nr % 16) >> 2) + 5;
+	uint8_t parity = (uart_nr >> 5) + 1;
+	uint8_t stop = uart_nr % 4;
+	return (width + parity + stop + 1);
 }
 
 uart_t*
