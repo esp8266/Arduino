@@ -3,12 +3,17 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 
-const char* ssid = "........";
-const char* password = "........";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 
-const int led = 13;
+const int led = LED_BUILTIN;
 
 const String postForms = "<html>\
   <head>\
