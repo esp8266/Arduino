@@ -14,6 +14,12 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xfeff0
 }
 
+PROVIDE ( _FS_start = 0x403E0000 );
+PROVIDE ( _FS_end = 0x403FB000 );
+PROVIDE ( _FS_page = 0x100 );
+PROVIDE ( _FS_block = 0x1000 );
+PROVIDE ( _EEPROM_start = 0x403fb000 );
+/* The following symbols are DEPRECATED and will be REMOVED in a future release */
 PROVIDE ( _SPIFFS_start = 0x403E0000 );
 PROVIDE ( _SPIFFS_end = 0x403FB000 );
 PROVIDE ( _SPIFFS_page = 0x100 );

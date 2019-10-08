@@ -25,6 +25,7 @@ extern "C" {
 int 	 _EXFUN(memcmp_P,(const _PTR, const _PTR, size_t));
 _PTR	 _EXFUN(memmem_P, (const _PTR, size_t, const _PTR, size_t));
 _PTR 	 _EXFUN(memcpy_P,(_PTR __restrict, const _PTR __restrict, size_t));
+_PTR 	 _EXFUN(memmove_P,(_PTR __restrict, const _PTR __restrict, size_t));
 _PTR	 _EXFUN(memccpy_P,(_PTR __restrict, const _PTR __restrict, int, size_t));
 _PTR     _EXFUN(memchr_P,(const _PTR, int, size_t));
 

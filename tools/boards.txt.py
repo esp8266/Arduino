@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community
@@ -32,6 +32,7 @@
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
 #            lwip/lwip2                  menus for available lwip versions
 
+from __future__ import print_function
 import os
 import sys
 import collections
@@ -44,14 +45,14 @@ import json
 # or by user command line
 
 speeds = collections.OrderedDict([
-    (   '9', [ 's9', 's57', 's115', 's230', 's256', 's460', 's512', 's921' ]),
-    (  '57', [ 's57', 's9', 's115', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '115', [ 's115', 's9', 's57', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '230', [ 's230', 's9', 's57', 's115', 's256', 's460', 's512', 's921' ]),
-    ( '256', [ 's256', 's9', 's57', 's115', 's230', 's460', 's512', 's921' ]),
-    ( '460', [ 's460', 's9', 's57', 's115', 's230', 's256', 's512', 's921' ]),
-    ( '512', [ 's512', 's9', 's57', 's115', 's230', 's256', 's460', 's921' ]),
-    ( '921', [ 's921', 's9', 's57', 's115', 's230', 's256', 's460', 's512' ]),
+    (  '57',  [ 's57',  's115', 's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '115',  [ 's115', 's57',  's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '230',  [ 's230', 's57',  's115', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '256',  [ 's256', 's57',  's115', 's230', 's460', 's512', 's921', 's3000' ]),
+    ( '460',  [ 's460', 's57',  's115', 's230', 's256', 's512', 's921', 's3000' ]),
+    ( '512',  [ 's512', 's57',  's115', 's230', 's256', 's460', 's921', 's3000' ]),
+    ( '921',  [ 's921', 's57',  's115', 's230', 's256', 's460', 's512', 's3000' ]),
+    ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
     ])
 
 # boards list
@@ -68,7 +69,7 @@ boards = collections.OrderedDict([
             'crystalfreq_menu',
             'flashfreq_menu',
             'flashmode_menu',
-            '512K', '1M', '2M', '4M', '8M', '16M',
+            '1M', '2M', '4M', '8M', '16M', '512K',
             'led',
             'sdk',
             ],
@@ -300,7 +301,7 @@ boards = collections.OrderedDict([
             ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
-            ( '.menu.UploadTool.esptool.upload.verbose', '-vv' ),
+            ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
             ( '.menu.UploadTool.espota', 'OTA' ),
             ( '.menu.UploadTool.espota.upload.tool', 'espota' ),
             ]),
@@ -328,7 +329,7 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
-	( 'inventone', {
+    ( 'inventone', {
         'name': 'Invent One',
         'opts': {
             '.build.board': 'ESP8266_GENERIC',
@@ -589,28 +590,28 @@ boards = collections.OrderedDict([
             ],
         'serial': '921',
         'desc': [ 
-			'Parameters in Arduino IDE:',
-			'~~~~~~~~~~~~~~~~~~~~~~~~~~',
-			'',
-			'- Card: "WEMOS D1 Mini Lite"',
-			'- Flash Size: "1M (512K SPIFFS)"',
-			'- CPU Frequency: "80 Mhz"',
-			'- Upload Speed: "230400"',
-			'',
-			'Power:',
-			'~~~~~~',
-			'',
-			'- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
-			'- 3V3 pin : 3.3V 500mA regulated output',
-			'- Digital pins : 3.3V 30mA.',
-			'',
-			'links:',
-			'~~~~~~',
-			'',
-			'- Product page: https://www.wemos.cc/',
-			'- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
-			'- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf',
-			'- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf',
+            'Parameters in Arduino IDE:',
+            '~~~~~~~~~~~~~~~~~~~~~~~~~~',
+            '',
+            '- Card: "WEMOS D1 Mini Lite"',
+            '- Flash Size: "1M (512K SPIFFS)"',
+            '- CPU Frequency: "80 Mhz"',
+          # '- Upload Speed: "230400"',
+            '',
+            'Power:',
+            '~~~~~~',
+            '',
+            '- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
+            '- 3V3 pin : 3.3V 500mA regulated output',
+            '- Digital pins : 3.3V 30mA.',
+            '',
+            'links:',
+            '~~~~~~',
+            '',
+            '- Product page: https://www.wemos.cc/',
+            '- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
+            '- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf',
+            '- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf',
         ],
     }),
     ( 'd1', {
@@ -882,8 +883,11 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.disabled', 'Disabled' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
+        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
@@ -901,6 +905,10 @@ macros = {
         ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
         ( '.menu.FlashFreq.80', '80MHz' ),
         ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
+        ( '.menu.FlashFreq.20', '20MHz' ),
+        ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
+        ( '.menu.FlashFreq.26', '26MHz' ),
+        ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
@@ -1062,6 +1070,10 @@ macros = {
         ( '.menu.baud.921600', '921600' ),
         ( '.menu.baud.921600.upload.speed', '921600' ),
         ]),
+    's3000': collections.OrderedDict([
+        ( '.menu.baud.3000000', '3000000' ),
+        ( '.menu.baud.3000000.upload.speed', '3000000' ),
+        ]),
 
     ####################### flash erase
 
@@ -1116,7 +1128,7 @@ def comb1 (lst):
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
-    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM' ]
+    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
     options += comb1(listnocomb)
@@ -1161,7 +1173,7 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_map (flashsize_kb, spiffs_kb = 0):
+def flash_map (flashsize_kb, fs_kb = 0):
 
     # mapping:
     # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
@@ -1172,30 +1184,39 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     eeprom_size_kb = 4
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
-    spiffs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+    fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+
+    # For legacy reasons (#6531), the EEPROM sector needs to be at the old
+    # FS_end calculated without regards to block size
+    eeprom_start = fs_end
+
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
-        max_upload_size = (flashsize_kb - (spiffs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
-        spiffs_start = spiffs_end - spiffs_kb * 1024
-        spiffs_blocksize = 4096
+        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
+        fs_start = fs_end - fs_kb * 1024
     else:
         max_upload_size = 1024 * 1024 - reserved
-        spiffs_start = (flashsize_kb - spiffs_kb) * 1024
-        if spiffs_kb < 512:
-            spiffs_blocksize = 4096
-        else:
-            spiffs_blocksize = 8192
+        fs_start = (flashsize_kb - fs_kb) * 1024
 
+    if fs_kb < 512:
+        fs_blocksize = 4096
+    else:
+        fs_blocksize = 8192
+
+    # Adjust SPIFFS_end to be a multiple of the block size
+    fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start;
+
+    max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
-    strspiffs = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
-    strspiffs_strip = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
+    strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
+    strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
 
-    ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
-    menu = '.menu.eesz.' + strsize + strspiffs_strip
+    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
+    menu = '.menu.eesz.' + strsize + strfs_strip
     menub = menu + '.build.'
-    desc = 'no' if (spiffs_kb == 0) else strspiffs
+    desc = 'none' if (fs_kb == 0) else strfs + 'B'
     d = collections.OrderedDict([
-        ( menu, strsize + ' (' + desc + ' SPIFFS)' ),
+        ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
         ( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
         ( menub + 'flash_ld', ld ),
@@ -1203,11 +1224,11 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    if spiffs_kb > 0:
+    if fs_kb > 0:
         d.update(collections.OrderedDict([
-            ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
-            ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
+            ( menub + 'spiffs_start', "0x%05X" % fs_start ),
+            ( menub + 'spiffs_end', "0x%05X" % fs_end ),
+            ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
             ]))
 
     if ldshow:
@@ -1223,23 +1244,19 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             realstdout = sys.stdout
             sys.stdout = open(lddir + ld, 'w')
 
-        if spiffs_kb == 0:
-            spiffs_start = spiffs_end
+        if fs_kb == 0:
+            fs_start = fs_end
             page = 0
-            block = 0
-        elif spiffs_kb < 0x80000 / 1024:
-            page = 0x100
-            block = 0x1000
+            fs_blocksize = 0
         else:
             page = 0x100
-            block = 0x2000
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-        empty_size = spiffs_start - max_upload_size
+        empty_size = fs_start - max_upload_size
         if empty_size > 0:
             print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
+        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
         print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
         print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
         print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
@@ -1252,10 +1269,17 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
-        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _FS_page = 0x%X );" % page)
+        print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
+        # Re-add deprecated symbols pointing to the same address as the new standard ones
+        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
@@ -1276,12 +1300,6 @@ def all_flash_map ():
 
     #                      flash(KB) spiffs(KB)
 
-    f512.update(flash_map(     512))
-    f512.update(flash_map(     512,      32 ))
-    f512.update(flash_map(     512,      64 ))
-    f512.update(flash_map(     512,     128 ))
-
-    f1m.update( flash_map(    1024))
     f1m.update( flash_map(    1024,      64 ))
     f1m.update( flash_map(    1024,     128 ))
     f1m.update( flash_map(    1024,     144 ))
@@ -1289,23 +1307,30 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     192 ))
     f1m.update( flash_map(    1024,     256 ))
     f1m.update( flash_map(    1024,     512 ))
+    f1m.update( flash_map(    1024))
 
-    f2m.update( flash_map(  2*1024))
+    f2m.update( flash_map(  2*1024,      64 ))
     f2m.update( flash_map(  2*1024,     128 ))
     f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
     f2m.update( flash_map(  2*1024,    1024 ))
+    f2m.update( flash_map(  2*1024))
 
-    f4m.update( flash_map(  4*1024))
-    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024,  2*1024 ))
     f4m.update( flash_map(  4*1024,  3*1024 ))
+    f4m.update( flash_map(  4*1024,    1024 ))
+    f4m.update( flash_map(  4*1024))
 
     f8m.update( flash_map(  8*1024,  6*1024 ))
     f8m.update( flash_map(  8*1024,  7*1024 ))
 
     f16m.update(flash_map( 16*1024, 14*1024 ))
     f16m.update(flash_map( 16*1024, 15*1024 ))
+
+    f512.update(flash_map(     512,      32 ))
+    f512.update(flash_map(     512,      64 ))
+    f512.update(flash_map(     512,     128 ))
+    f512.update(flash_map(     512))
 
     if ldgen:
         print("generated: ldscripts (in %s)" % lddir)
@@ -1327,7 +1352,7 @@ def led (default,max):
                 ('.menu.led.' + str(default), str(default)),
                 ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
-    for i in range(0,max):
+    for i in range(0,max+1): # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not i == default:
             led.update(
                 collections.OrderedDict([
@@ -1341,10 +1366,12 @@ def led (default,max):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
+                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
+                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                        ('.menu.sdk.nonosdk222', 'nonos-sdk 2.2.2-190313 (testing)'),
-                        ('.menu.sdk.nonosdk222.build.sdk', 'NONOSDK22x'),
+                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
+                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
                         ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])
@@ -1403,7 +1430,7 @@ def all_boards ():
 
         # standalone options
         if 'opts' in board:
-            for optname in board['opts']:
+            for optname in sorted(board['opts']):
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros

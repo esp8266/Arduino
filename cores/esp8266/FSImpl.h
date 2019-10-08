@@ -22,6 +22,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <FS.h>
 
 namespace fs {
 
@@ -75,6 +76,7 @@ public:
     virtual void end() = 0;
     virtual bool format() = 0;
     virtual bool info(FSInfo& info) = 0;
+    virtual bool info64(FSInfo64& info) = 0;
     virtual FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) = 0;
     virtual bool exists(const char* path) = 0;
     virtual DirImplPtr openDir(const char* path) = 0;
@@ -83,6 +85,7 @@ public:
     virtual bool mkdir(const char* path) = 0;
     virtual bool rmdir(const char* path) = 0;
     virtual bool gc() { return true; } // May not be implemented in all file systems.
+    virtual bool check() { return true; } // May not be implemented in all file systems.
 };
 
 } // namespace fs

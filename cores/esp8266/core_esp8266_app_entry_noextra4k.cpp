@@ -27,7 +27,7 @@ extern "C" void call_user_start();
 /* this is the default NONOS-SDK user's heap location */
 static cont_t g_cont __attribute__ ((aligned (16)));
 
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
+extern "C" void app_entry_redefinable(void)
 {
     g_pcont = &g_cont;
 
