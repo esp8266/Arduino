@@ -51,7 +51,7 @@ Prerequisites
 
 Instructions - Windows 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- First, make sure you don't already have the ESP8266 library installed using the Board Manager (see above)
+- First, make sure you don't already have an ESP8266 core version installed using the Board Manager (see above). If you do, uninstall it from the Board Manager before proceeding.
 
 - Install git for Windows (if not already; see https://git-scm.com/download/win)
 
@@ -132,9 +132,14 @@ Note that you could, in theory install in ``C:\Program Files (x86)\Arduino\hardw
 Instructions - Other OS
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+-  First, make sure you don't already have an ESP8266 core version installed 
+   using the Board Manager (see above). If you do, uninstall it from the 
+   Board Manager before proceeding.
+
 -  Open the console and go to Arduino directory. This can be either your
    *sketchbook* directory (usually ``<Documents>/Arduino``), or the
    directory of Arduino application itself, the choice is up to you.
+
 -  Clone this repository into hardware/esp8266com/esp8266 directory.
    Alternatively, clone it elsewhere and create a symlink, if your OS
    supports them.
