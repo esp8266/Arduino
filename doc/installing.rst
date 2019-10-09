@@ -47,6 +47,7 @@ Prerequisites
 -  Python 3.x (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
+-  Uninstalling any core version installed via Board Manager
 
 Instructions - Windows 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
