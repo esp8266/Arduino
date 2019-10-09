@@ -51,7 +51,9 @@ Prerequisites
 
 Instructions - Windows 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- First, make sure you don't already have an ESP8266 core version installed using the Board Manager (see above). If you do, uninstall it from the Board Manager before proceeding.
+- First, make sure you don't already have an ESP8266 core version installed 
+  using the Board Manager (see above). If you do, uninstall it from the 
+  Board Manager before proceeding.
 
 - Install git for Windows (if not already; see https://git-scm.com/download/win)
 
