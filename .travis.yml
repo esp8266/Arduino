@@ -80,17 +80,13 @@ jobs:
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
       install:
-        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        - sudo apt-get update -q
-        - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
         - sudo apt-get install valgrind lcov
-      env: CC=gcc-7 CXX=g++-7
 
     - name: "Docs"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
       install:
-          - sudo apt-get install python3-pip
+          - sudo apt-get install python3-pip python3-setuptools
           - pip3 install --user -r doc/requirements.txt;
 
     - name: "Style check"
@@ -101,11 +97,6 @@ jobs:
     - name: "Mock trivial test"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/buildm.sh
-      install:
-        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        - sudo apt-get update -q
-        - sudo apt-get install -y --allow-unauthenticated g++-7 gcc-7
-      env: CC=gcc-7 CXX=g++-7
 
     - name: "Mac OSX can build sketches"
       os: osx
