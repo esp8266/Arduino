@@ -1,6 +1,6 @@
 language: bash
 os: linux
-dist: trusty #
+dist: trusty
 
 git:
   depth: 1
