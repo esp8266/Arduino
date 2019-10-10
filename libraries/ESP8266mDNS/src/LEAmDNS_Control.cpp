@@ -245,7 +245,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                          ((wifi_get_ip_info(STATION_IF, &IPInfo_Local)) &&
                           (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))))) { // Remote IP in STATION's subnet
 
-                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
+                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s, id %u!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), p_MsgHeader.m_u16ID););
 
                         sendParameter.m_u16ID = p_MsgHeader.m_u16ID;
                         sendParameter.m_bLegacyQuery = true;

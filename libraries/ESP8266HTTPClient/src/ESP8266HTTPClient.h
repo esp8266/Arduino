@@ -242,7 +242,7 @@ protected:
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent = "ESP8266HTTPClient";
+    String _userAgent;
     String _base64Authorization;
 
     /// Response handling
