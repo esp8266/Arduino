@@ -80,6 +80,14 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
   return (uint16_t) res;    /* This masks the lower half-word from the returned word */
 }
 
+/* Can't legally cast bits of uint32_t to a float w/o conversion or std::memcpy, which is inefficient. */
+/* The ASM block doesn't care the type, so just pass in what C thinks is a float and return in custom fcn. */
+static inline float pgm_read_float_unaligned(const void *addr) {
+  register float res;
+  pgm_read_with_offset(addr, res);
+  return res;
+}
+
 #define pgm_read_byte(addr)                pgm_read_byte_inlined(addr)
 #define pgm_read_word_aligned(addr)        pgm_read_word_inlined(addr)
 #ifdef __cplusplus
@@ -98,7 +106,6 @@ static inline uint32_t pgm_read_dword_unaligned(const void *addr) {
   return res;
 }
 
-#define pgm_read_float_unaligned(addr) ((float)pgm_read_dword_unaligned(addr))
 #define pgm_read_ptr_unaligned(addr)   ((void*)pgm_read_dword_unaligned(addr))
 #define pgm_read_word_unaligned(addr)  ((uint16_t)(pgm_read_dword_unaligned(addr) & 0xffff))
 

@@ -285,10 +285,6 @@ void configTime(const char* tz, const char* server1,
 
 #include "pins_arduino.h"
 
-#ifndef PUYA_SUPPORT
-#define PUYA_SUPPORT 1
-#endif
-
 #endif
 
 #ifdef DEBUG_ESP_OOM
