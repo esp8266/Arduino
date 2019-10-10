@@ -4,7 +4,7 @@
 
 set -ev
 
-sudo apt install python3-setuptools
+sudo apt -y install python3-setuptools
 
 cd $TRAVIS_BUILD_DIR/doc
 
