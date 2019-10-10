@@ -19,8 +19,12 @@ void dhcps_stop(void);
 
 void dhcps_start (struct ip_info *info, netif* apnetif)
 {
-    (void)apnetif; // this is esp interface, replaced by lwip2 "netif_git" interface
-    dhcpSoftAP.start(info);
+    // this is esp interface, replaced by lwip2's
+    // netif_git[SOFTAP_IF] interface in constructor
+    (void)apnetif;
+
+    fw_has_started_dhcps = 1; (void)info;
+    //dhcpSoftAP.start(info);
 }
 
 void dhcps_stop ()

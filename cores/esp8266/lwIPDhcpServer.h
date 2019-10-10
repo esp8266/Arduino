@@ -6,6 +6,8 @@
 
 #if LWIP_VERSION_MAJOR != 1
 
+extern "C" int fw_has_started_dhcps;
+
 class DhcpServer
 {
 public:

@@ -14,6 +14,7 @@
 
 #include <user_interface.h>	// wifi_get_macaddr()
 
+#include "SPI.h"
 #include "Schedule.h"
 #include "lwIPIntf.h"
 #include "wl_definitions.h"
@@ -61,9 +62,12 @@ public:
 
     wl_status_t status ();
 
-protected:
+//protected:
 
     netif _netif;
+
+protected:
+
     uint16_t _mtu;
     bool _default;
     int8_t _intrPin;

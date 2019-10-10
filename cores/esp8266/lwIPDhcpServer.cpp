@@ -140,6 +140,8 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 
 const uint32 DhcpServer::magic_cookie = 0x63538263;
 
+int fw_has_started_dhcps = 0;
+
 ////////////////////////////////////////////////////////////////////////////////////
 
 DhcpServer::DhcpServer (netif* netif): _netif(netif)
@@ -150,6 +152,13 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
     offer = 0xFF;
     renew = false;
     dhcps_lease_time = DHCPS_LEASE_TIME_DEF;  //minute
+    
+    if (netif->num == SOFTAP_IF && fw_has_started_dhcps == 1)
+    {
+        ip_info ip = { { 0x0104a8c0 }, { 0x00ffffff }, { 0 } };
+        start(&ip);
+        fw_has_started_dhcps = 2;
+    }
 };
 
 
@@ -332,13 +341,14 @@ uint8_t* DhcpServer::add_msg_type(uint8_t *optptr, uint8_t type)
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 {
-    struct ipv4_addr ipadd;
+    //struct ipv4_addr ipadd;
+    //ipadd.addr = server_address.addr;
+    #define ipadd (_netif->ip_addr)
 
-    ipadd.addr = server_address.addr;
-
-    struct ip_info if_ip;
-    bzero(&if_ip, sizeof(struct ip_info));
-    wifi_get_ip_info(SOFTAP_IF, &if_ip);
+    //struct ip_info if_ip;
+    //bzero(&if_ip, sizeof(struct ip_info));
+    //wifi_get_ip_info(SOFTAP_IF, &if_ip);
+    #define if_ip (*_netif)
 
     *optptr++ = DHCP_OPTION_SUBNET_MASK;
     *optptr++ = 4;
@@ -361,7 +371,7 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
     *optptr++ = ip4_addr3(&ipadd);
     *optptr++ = ip4_addr4(&ipadd);
 
-    if (dhcps_router_enabled(offer))
+    if (dhcps_router_enabled(offer) && ip_2_ip4(&if_ip.gw)->addr)
     {
         *optptr++ = DHCP_OPTION_ROUTER;
         *optptr++ = 4;
@@ -390,32 +400,18 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
     }
 #endif
 
-#ifdef CLASS_B_NET
-#error
     *optptr++ = DHCP_OPTION_BROADCAST_ADDRESS;
     *optptr++ = 4;
-    *optptr++ = ip4_addr1(&ipadd);
-    *optptr++ = 255;
-    *optptr++ = 255;
-    *optptr++ = 255;
-#else
-    *optptr++ = DHCP_OPTION_BROADCAST_ADDRESS;
-    *optptr++ = 4;
+    // XXXFIXME do better than that, we have netmask
     *optptr++ = ip4_addr1(&ipadd);
     *optptr++ = ip4_addr2(&ipadd);
     *optptr++ = ip4_addr3(&ipadd);
     *optptr++ = 255;
-#endif
 
     *optptr++ = DHCP_OPTION_INTERFACE_MTU;
     *optptr++ = 2;
-#ifdef CLASS_B_NET
     *optptr++ = 0x05;
-    *optptr++ = 0xdc;
-#else
-    *optptr++ = 0x02;
-    *optptr++ = 0x40;
-#endif
+    *optptr++ = 0xdc; // 1500
 
     *optptr++ = DHCP_OPTION_PERFORM_ROUTER_DISCOVERY;
     *optptr++ = 1;
@@ -437,6 +433,9 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 #endif
 
     return optptr;
+
+    #undef ipadd
+    #undef if_ip
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
@@ -993,17 +992,9 @@ void DhcpServer::init_dhcps_lease(uint32 ip)
 
 void DhcpServer::start (struct ip_info *info)
 {
-    // THIS FUNCTION IS ORIGINALLY DESIGNED FOR WIFI AP INTERFACE ONLY
-    // and calls specific firmware calls about it
-    //
-    // but
-    //
-    // THIS FUNCTION IS SUPPOSED TO BE WORKING FOR ANY INTERFACE
-    // and it has not been adapted yet 
-
-    if (_netif->state != nullptr)
+    if (pcb_dhcps != nullptr)
     {
-        udp_remove((struct udp_pcb*)_netif->state);
+        udp_remove(pcb_dhcps);
     }
 
     pcb_dhcps = udp_new();
@@ -1011,8 +1002,6 @@ void DhcpServer::start (struct ip_info *info)
     {
         os_printf("dhcps_start(): could not obtain pcb\n");
     }
-
-    _netif->state = pcb_dhcps;
 
     //  wrong: answer will go to sta  IP4_ADDR(&broadcast_dhcps, 255, 255, 255, 255);
     //  good: going to ap IP4_ADDR(&broadcast_dhcps, 192, 168, 4, 255);
@@ -1031,19 +1020,17 @@ void DhcpServer::start (struct ip_info *info)
     os_printf("dhcps:dhcps_start->udp_recv function Set a receive callback handle_dhcp for UDP_PCB pcb_dhcps\n");
 #endif
 
-    wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
+    if (_netif->num == SOFTAP_IF)
+        wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
     _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP; // added for lwip-git
 }
 
 void DhcpServer::stop ()
 {
     udp_disconnect(pcb_dhcps);
-    if (_netif->state != nullptr)
-    {
-        udp_remove((struct udp_pcb*)_netif->state);
-        _netif->state = nullptr;
-    }
-
+    udp_remove(pcb_dhcps);
+    pcb_dhcps = nullptr;
+    
     //udp_remove(pcb_dhcps);
     list_node *pnode = nullptr;
     list_node *pback_node = nullptr;
@@ -1088,11 +1075,13 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
     uint32 start_ip = 0;
     uint32 end_ip = 0;
 
-    uint8 opmode = wifi_get_opmode();
-
-    if (opmode == STATION_MODE || opmode == NULL_MODE)
+    if (_netif->num == SOFTAP_IF || _netif->num == STATION_IF)
     {
-        return false;
+        uint8 opmode = wifi_get_opmode();
+        if (opmode == STATION_MODE || opmode == NULL_MODE)
+        {
+            return false;
+        }
     }
 
     if (please == nullptr || started())
@@ -1102,12 +1091,15 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 
     if (please->enable)
     {
+#if 1
+        softap_ip = ip_2_ip4(&_netif->ip_addr)->addr;
+#else
         bzero(&info, sizeof(struct ip_info));
         wifi_get_ip_info(SOFTAP_IF, &info);
         softap_ip = htonl(info.ip.addr);
         start_ip = htonl(please->start_ip.addr);
         end_ip = htonl(please->end_ip.addr);
-
+#endif
         /*config ip information can't contain local ip*/
         if ((start_ip <= softap_ip) && (softap_ip <= end_ip))
         {
@@ -1147,11 +1139,13 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 *******************************************************************************/
 bool DhcpServer::get_dhcps_lease(struct dhcps_lease *please)
 {
-    uint8 opmode = wifi_get_opmode();
-
-    if (opmode == STATION_MODE || opmode == NULL_MODE)
+    if (_netif->num == SOFTAP_IF)
     {
-        return false;
+        uint8 opmode = wifi_get_opmode();
+        if (opmode == STATION_MODE || opmode == NULL_MODE)
+        {
+            return false;
+        }
     }
 
     if (nullptr == please)
@@ -1280,11 +1274,13 @@ bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
 
 bool DhcpServer::set_dhcps_lease_time(uint32 minute)
 {
-    uint8 opmode = wifi_get_opmode();
-
-    if (opmode == STATION_MODE || opmode == NULL_MODE)
+    if (_netif->num == SOFTAP_IF)
     {
-        return false;
+        uint8 opmode = wifi_get_opmode();
+        if (opmode == STATION_MODE || opmode == NULL_MODE)
+        {
+            return false;
+        }
     }
 
     if (started())
@@ -1302,11 +1298,13 @@ bool DhcpServer::set_dhcps_lease_time(uint32 minute)
 
 bool DhcpServer::reset_dhcps_lease_time(void)
 {
-    uint8 opmode = wifi_get_opmode();
-
-    if (opmode == STATION_MODE || opmode == NULL_MODE)
+    if (_netif->num == SOFTAP_IF)
     {
-        return false;
+        uint8 opmode = wifi_get_opmode();
+        if (opmode == STATION_MODE || opmode == NULL_MODE)
+        {
+            return false;
+        }
     }
 
     if (started())
