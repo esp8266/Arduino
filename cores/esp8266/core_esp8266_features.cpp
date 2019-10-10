@@ -20,6 +20,8 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <stdint.h>
+
 /* precache()
  *  pre-loads flash data into the flash cache
  *  if f==0, preloads instructions starting at the address we were called from.
