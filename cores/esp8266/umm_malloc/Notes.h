@@ -1,5 +1,11 @@
 #if 0
 /*
+ * This .h is nothing but comments about thoughts and observations made while
+ * updating the Arduino ESP8266 Core, with the new upstream umm_malloc. It is
+ * added as a .h so that it does not get lost and to avoid cluttering up the
+ * code with a huge block comment.
+
+
 PR text description:
 
 upstream version of `umm_malloc` customized for Arduino ESP8266 Core
@@ -52,7 +58,7 @@ UMM_CRITICAL_METRICS in umm_malloc_cfg.h.
 ===============================================================================
 
  A list of changes made for local adaptation of newer upstream umm_malloc.
- 
+
  In umm_malloc.c
      Renamed to umm_malloc.cpp
      Added `extern "C" { ... };` around code.
@@ -67,25 +73,25 @@ UMM_CRITICAL_METRICS in umm_malloc_cfg.h.
      had a defragging effect. This appears to have been replaced with an attempt
      to minimize copy when possible.
      Added heap stats tracking.
-     
+
  In umm_info.c
     umm_info() - Added UMM_CRITICAL_DECL(id_info), updated critical sections
     with tag.
     Carried forward: Added NULL ptr check at beginning (umm_malloc.c).
- 
+
  In umm_poison.c:
     Resolved C++ compiler error reported on get_poisoned(), and get_unpoisoned().
     They now take in void * arg instead of unsigned char *.
     Added  #if ... || defined(UMM_POISON_CHECK_LITE) to the conditional.
-  
+
  In umm_integrity.c:
     Replaced printf with DBGLOG_FUNCTION. This needs to be a malloc free
     function and ISR safe.
     Added critical sections.
-  
+
  In umm_malloc_cfg.h:
     Added macro UMM_CRITICAL_SUSPEND()/UMM_CRITICAL_RESUME()
-  
+
  Globally change across all files %i to %d: umm_info.c, umm_malloc.c,
  Added a #ifdef BUILD_UMM_MALLOC_C fence to prevent Arduino IDE from building
  the various .c files that are #included into umm_malloc.cpp. They are
@@ -97,24 +103,24 @@ UMM_CRITICAL_METRICS in umm_malloc_cfg.h.
    umm_integrity_check() is called by macro INTEGRITY_CHECK which returns 1
    on success. No corruption. Does a time consuming scan of the whole heap.
    It will call UMM_HEAP_CORRUPTION_CB if an error is found.
-   
+
    umm_poison_check(), formerly known as check_poison_all_blocks(),
    is called by macro POISON_CHECK which returns 1 on success for no
    corruption. Does a time consuming scan of all active allocations for
    modified poison. The new upstream version does *NOT* call
    UMM_HEAP_CORRUPTION_CB if an error is found. The option description says
    it does!
-   
+
    umm_poison_realloc() and umm_poison_free() no longer call the macro
    UMM_HEAP_CORRUPTION_CB on poison error. Just a printf message is
    generated. I have added alternative functions umm_poison_free_fl,
    umm_poison_realloc_fl, and get_unpoisoned_check_neighbors in
    umm_local.cpp. These expand the poison check on the current allocation to
    include its nearest allocated neighbors in the heap.
-   
+
    umm_malloc() has been extended to call check_poison_neighbors for the
    allocation it selects, conditionally for UMM_POISON_CHECK_LITE.
-   
+
    For upstream umm_malloc "#  define POISON_CHECK() 0" should have been 1
    add to list to report.
 
@@ -130,31 +136,41 @@ into another error and so on.
 Objective:  To be able to print "last gasp" diagnostic messages
 when interrupts are disabled and w/o availability of heap resources.
 
-It turns out things are more complicated than that. There are three cases for
-printing:
+It turns out things are more complicated than that. These are three cases for
+printing from the heap and the current solution.:
 
   1. Printing detailed heap info through `umm_info(NULL, 1);`. This function
   resides in flash and can only be called from non-ISR context. It can use
   PROGMEM strings. Because SPI bus will not be busy when called from foreground.
-  Because printing is done from IRQ_LEVEL 15, printf function must be in iRAM or
-  ROM.
-  > I don't think I full understand how this can work. If `umm_info` is called
-  > and not full cached and we raise IRQ_LEVEL 15, how is a cache-miss handled?
-  > Interrupts? Some hidden internal interrupt? If we can handle cache-miss then 
-  > other flash based functions can be used for printing here.
-  
+
+  At this time it is assumed that, while running from foreground, a cache-miss
+  at INTLEVEL 15 can be handled. The key factor being the SPI bus is not
+  busy at the time of the cache-miss. It is not clear what gets invoked to
+  process the cache-miss. A software vector call? A hardware assisted transfer?
+  In any case `umm_info_safe_printf_P()` is also in flash.
+
+  The focus here is to print w/o allocating memory and use strings
+  in flash to preserve DRAM.
+
   2. Printing diagnostic messages possibly from from ISR context.
-  
+
+  Use `ets_uart_printf()` in boot ROM.
+
   3. Printing diagnostic messages from `heap.cpp` these printf's need to check
   `system_get_os_print()` to confirm debug-output is enabled just as
   `os_printf()` did.
+
+  Do test calls to `system_get_os_print()` and call `ets_uart_printf()`
+  in boot ROM when debug print allowed.
 
 Considerations:
 * can be called from ISR
 * can be called from malloc code, cannot use malloc
 * can be called from malloc code that was called from an ISR
-* can be called from with in a critical section, eg. xt_rsil(15);
+* can be called from within a critical section, eg. xt_rsil(15);
   * this may be effectively the same as being called from an ISR?
+    Update: Current thinking is that from foreground we have more leeway
+    than an ISR.
 
 Knowns:
 * ets_printf - For RTOS SDK they replaced this function with one in the SDK.
