@@ -1,6 +1,6 @@
 language: bash
 os: linux
-dist: trusty
+dist: bionic
 
 git:
   depth: 1
