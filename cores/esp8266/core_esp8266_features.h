@@ -93,4 +93,17 @@ inline uint32_t esp_get_cycle_count() {
 }
 #endif // not CORE_MOCK
 
+
+// Tools for preloading code into the flash cache
+#define PRECACHE_ATTR __attribute__((optimize("no-reorder-blocks")))
+
+#define PRECACHE_START(tag) \
+    precache(NULL,(uint8_t *)&&_precache_end_##tag - (uint8_t*)&&_precache_start_##tag); \
+    _precache_start_##tag:
+
+#define PRECACHE_END(tag) \
+    _precache_end_##tag:
+
+void precache(void *f, uint32_t bytes);
+
 #endif // CORE_ESP8266_FEATURES_H
