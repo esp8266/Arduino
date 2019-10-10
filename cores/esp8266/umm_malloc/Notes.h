@@ -143,7 +143,7 @@ printing from the heap and the current solution.:
   resides in flash and can only be called from non-ISR context. It can use
   PROGMEM strings. Because SPI bus will not be busy when called from foreground.
 
-  At this time it is assumed that, while running from foreground, a cache-miss
+  At this time it is believed that, while running from foreground, a cache-miss
   at INTLEVEL 15 can be handled. The key factor being the SPI bus is not
   busy at the time of the cache-miss. It is not clear what gets invoked to
   process the cache-miss. A software vector call? A hardware assisted transfer?
@@ -201,6 +201,51 @@ Knowns:
   * along with umm_info there are other debug messages that exceed 64 characters.
 * ets_uart_printf - Appears safe. Just no PROGMEM support. Uses
   uart_buff_switch to select UART.
+
+===============================================================================
+
+heap.cpp is the entry point for most of the heap API calls.
+It is a merge point for abstracted heap API calls, such as _malloc_r,
+pvPortMalloc, and malloc. Thin wrappers are created here for these entry points
+and others. The wrappers call through to equivalent umm_malloc entry-point.
+These wrappers also provide the access points to do debug options, like OOM,
+Integrity Check, and Poison Check.
+
+-DEBUG_ESP_OOM or select `Debug Level: "OOM"` from the IDE.
+This option will add extra code to save information on the last OOM event. If
+your code is built with the `Debug port: "Serial"` option, debug messages will
+print on OOM events. You do not have to do `Debug port: "Serial"` to get OOM
+debug messages. From within your code, you can make a call to
+`Serial.debugOutput(true);` to enable OOM printing. Of course for this to work
+your code must be built with `Debug Level: "OOM"` or equal.
+
+-DUUM_POISON is now the same as -DUMM_POISON_CHECK_LITE
+This is new behavior with this updated. UMM_POISON_CHECK_LITE - checks the
+allocation presented at realloc() and free(). Expands the poison check on the
+current allocation to include its nearest allocated neighbors in the heap.
+umm_malloc() will also check the neighbors of the selected allocation before
+use.
+
+For more details and options search on UMM_POISON_CHECK in `umm_malloc_cfg.h`
+
+TODO: provide some interesting numbers on the time to perform:
+* UMM_POISON_CHECK
+* UMM_INTEGRITY_CHECK
+* umm_info(NUll, 0) built with and without print capability
+* umm_info(NUll, 1) printing a report to Serial device.
+
+===============================================================================
+
+Enhancement ideas:
+  1. Add tagging to heap allocations. Redefine UMM_POISONED_BLOCK_LEN_TYPE,
+  expand it to include an element for the calling address of allocating
+  requester. Expand  umm_info(NULL, 1) to print the respective address with each
+  active allocation.  The difficulty here will be the ever-growing complexity of
+  overlapping build options. I think it would be easiest to build this in with
+  and expand the UMM_POISON_CHECK_LITE option.
+
+  2. A build option to not have printing, from umm_info() compiled in. This can
+  save on the execution time spent with interrupts disabled.
 
 */
 #endif
