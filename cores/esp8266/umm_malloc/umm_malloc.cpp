@@ -31,106 +31,13 @@
  * ----------------------------------------------------------------------------
  */
 
- /*****************************************************************************
-  *
-  * A log listing changes made for local adaptation of newer upstream
-  * umm_malloc - started July 22, 2019.
-  *
-  * AUG 1, 2019 compiles with OOM, UMM_POISON_CHECK, and appears to be working.
-  *
-  * In umm_malloc.c
-  *   Renamed to umm_malloc.cpp
-  *
-  *   Added `extern "C" { ... };` around code.
-  *
-  *   Surround DBGLOG_LEVEL with #ifndef... Define value of DBGLOG_LEVEL
-  *   from umm_malloc_cfg.h
-  *
-  *   umm_realloc() - Added UMM_CRITICAL_SUSPEND()/UMM_CRITICAL_RESUME() for
-  *   when lightweight locks are available. eg. sti/cli. Single threaded
-  *   single CPU case.
-  *
-  *   umm_realloc() - appears to have been refactored to minimize memmove
-  *   and memcpy. The old version would always combine an adjacent block in the
-  *   direction of the start of the heap when available and do a memmove. This
-  *   had a defragging effect. This appears to have been replaced with an
-  *   attempt to minimize copy when possible.
-  *
-  *   Added heap stats tracking.
-  *
-  *
-  * In umm_info.c
-  *   umm_info() - Added UMM_CRITICAL_DECL(id_info), updated critical sections
-  *   with tag.
-  *   Carried forward: Added NULL ptr check at beginning (umm_malloc.c). - Mar 8, 2016
-  *
-  *
-  * In umm_poison.c:
-  *   Resolved C++ compiler error reported on get_poisoned(), and
-  *   get_unpoisoned(). They now take in void * arg instead of unsigned char *.
-  *   Added  #if ... || defined(UMM_POISON_CHECK_LITE) to the conditional.
-  *
-  * In umm_integrity.c:
-  *   Replaced printf with DBGLOG_FUNCTION. This needs to be a malloc free
-  *   function and ISR safe.
-  *   Added critical sections.
-  *
-  * In umm_malloc_cfg.h:
-  *   Added macro UMM_CRITICAL_SUSPEND()/UMM_CRITICAL_RESUME()
-  *
-  *
-  * Globally change across all files %i to %d: umm_info.c, umm_malloc.c,
-  *
-  * Added a #ifdef BUILD_UMM_MALLOC_C fence to prevent Arduino IDE from building
-  * the various .c files that are #included into umm_malloc.cpp. They are
-  * normally enabled by #define <feature name>  in umm_malloc_cfg.h. In this
-  * case it builds fine; however, if the define is global, the IDE will try and
-  * build the .c by itself.
-  *
-  * Notes,
-  *
-  *   umm_integrity_check() is called by macro INTEGRITY_CHECK which returns 1
-  *   on success. No corruption. Does a time consuming scan of the whole heap.
-  *   It will call UMM_HEAP_CORRUPTION_CB if an error is found.
-  *
-  *   umm_poison_check(), formerly known as check_poison_all_blocks(),
-  *   is called by macro POISON_CHECK which returns 1 on success for no
-  *   corruption. Does a time consuming scan of all active allocations for
-  *   modified poison. The new upstream version does *NOT* call
-  *   UMM_HEAP_CORRUPTION_CB if an  error is found. The option description says
-  *   it does!
-  *
-  *   umm_poison_realloc() and umm_poison_free() no longer call the macro
-  *   UMM_HEAP_CORRUPTION_CB on poison error. Just a printf message is
-  *   generated. I have added alternative functions umm_poison_free_fl,
-  *   umm_poison_realloc_fl, and get_unpoisoned_check_neighbors in
-  *   umm_local.cpp. These expand the poison check on the current allocation to
-  *   include its nearest allocated neighbors in the heap.
-  *
-  *   umm_malloc() has been extended to call check_poison_neighbors for the
-  *   allocation it selects, conditionally for UMM_POISON_CHECK_LITE.
-  *
-  *   For upstream umm_malloc "#  define POISON_CHECK() 0" should have been 1
-  *   add to list to report.
-  */
- /*
-  * New upstream umm_malloc feature delta's from the old umm_malloc we were using:
-  *
-  *   umm_posion check for a given *alloc - failure - no longer panics.
-  *
-  *   option to run full poison check at each *alloc call, not present
-  *
-  *   option to run full interity check at each *alloc call, not present
-  *
-  *   upstream code does not call panic from poison_check_block.
-  *
-  *   Defragmenting effect of realloc is gone. It now minimizes copy. This
-  *   may have been an accident during code cleanup.
-  *
-  * In one form or another these features have been restored in the
-  * reintegration of the upstream umm_malloc into the Arduino ESP8266 Core.
-  */
-
+/*
+ * This include is nothing but comments about thoughts and observations made
+ * while updating the Arduino ESP8266 Core, with the new upstream umm_malloc.
+ * It is added here as an include so that it does not get lost and to avoid
+ * cluttering up the code with a huge block comment.
+ */
+ #include "Notes.h"
 /*
  * Added for using with Arduino ESP8266 and handling renameing to umm_malloc.cpp
  */
