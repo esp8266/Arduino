@@ -35,7 +35,7 @@ build.sslflags=
 
 build.exception_flags=-fno-exceptions
 build.stdcpp_lib=-lstdc++
-build.stdcpp_level=-std=gnu++11
+build.stdcpp_level=-std=gnu++14
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
