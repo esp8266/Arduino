@@ -238,7 +238,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
       DEBUG_OUTPUT.println(headerValue);
 #endif
 
-      if (headerName.equalsIgnoreCase("Host")){
+      if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
       }
     }

@@ -129,10 +129,9 @@ String::~String() {
 // /*********************************************/
 
 inline void String::init(void) {
-    setSSO(false);
-    setCapacity(0);
+    setSSO(true);
     setLen(0);
-    setBuffer(nullptr);
+    wbuffer()[0] = 0;
 }
 
 void String::invalidate(void) {

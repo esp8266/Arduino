@@ -42,15 +42,21 @@
 #include <osapi.h>
 #include <os_type.h>
 #include "coredecls.h"
+#include "Schedule.h"
 
-extern "C" {
+static TrivialCB _settimeofday_cb;
 
-static void (*_settimeofday_cb)(void) = NULL;
+void settimeofday_cb (TrivialCB&& cb)
+{
+    _settimeofday_cb = std::move(cb);
+}
 
-void settimeofday_cb (void (*cb)(void))
+void settimeofday_cb (const TrivialCB& cb)
 {
     _settimeofday_cb = cb;
 }
+
+extern "C" {
 
 #if LWIP_VERSION_MAJOR == 1
 
@@ -478,7 +484,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         sntp_set_system_time(tv->tv_sec);
 
         if (_settimeofday_cb)
-            _settimeofday_cb();
+            schedule_function(_settimeofday_cb);
     }
     return 0;
 }
