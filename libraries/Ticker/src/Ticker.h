@@ -35,19 +35,25 @@ public:
     typedef void (*callback_with_arg_t)(void*);
     typedef std::function<void(void)> callback_function_t;
 
-    void attach(float seconds, callback_function_t callback);
-    void attach_ms(uint32_t milliseconds, callback_function_t callback);
-    void attach_scheduled(float seconds, callback_function_t callback);
-    void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback);
-
-    template<typename TArg>
-    void attach(float seconds, void (*callback)(TArg), TArg arg)
+    void attach_ms(uint32_t milliseconds, callback_function_t callback)
     {
-        static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        // C-cast serves two purposes:
-        // static_cast for smaller integer types,
-        // reinterpret_cast + const_cast for pointer types
-        _attach_s(seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+        _callback_function = std::move(callback);
+        _attach_ms(milliseconds, true, _static_callback, this);
+    }
+
+    void attach(float seconds, callback_function_t callback)
+    {
+        attach_ms(1000UL * seconds, callback);
+    }
+
+    void attach_scheduled(float seconds, callback_function_t callback)
+    {
+        attach(seconds, [callback]() { schedule_function(callback); });
+    }
+
+    void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
+    {
+        attach_ms(milliseconds, [callback]() { schedule_function(callback); });
     }
 
     template<typename TArg>
@@ -57,16 +63,32 @@ public:
         _attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
     }
 
-    void once(float seconds, callback_function_t callback);
-    void once_ms(uint32_t milliseconds, callback_function_t callback);
-    void once_scheduled(float seconds, callback_function_t callback);
-    void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback);
-
     template<typename TArg>
-    void once(float seconds, void (*callback)(TArg), TArg arg)
+    void attach(float seconds, void (*callback)(TArg), TArg arg)
     {
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_s(seconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+        attach_ms(1000UL * seconds, callback, arg);
+    }
+
+    void once_ms(uint32_t milliseconds, callback_function_t callback)
+    {
+        _callback_function = std::move(callback);
+        _attach_ms(milliseconds, false, _static_callback, this);
+    }
+
+    void once(float seconds, callback_function_t callback)
+    {
+        once_ms(1000UL * seconds, callback);
+    }
+
+    void once_scheduled(float seconds, callback_function_t callback)
+    {
+        once(seconds, [callback]() { schedule_function(callback); });
+    }
+
+    void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
+    {
+        once_ms(milliseconds, [callback]() { schedule_function(callback); });
     }
 
     template<typename TArg>
@@ -76,12 +98,18 @@ public:
         _attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
     }
 
+    template<typename TArg>
+    void once(float seconds, void (*callback)(TArg), TArg arg)
+    {
+        static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
+        once_ms(1000UL * seconds, callback, arg);
+    }
+
     void detach();
     bool active() const;
 
 protected:
     static void _static_callback(void* arg);
-    void _attach_s(float seconds, bool repeat, callback_with_arg_t callback, void* arg);
     void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg);
 
     ETSTimer* _timer;

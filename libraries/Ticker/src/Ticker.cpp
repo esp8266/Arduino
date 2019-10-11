@@ -33,55 +33,6 @@ Ticker::~Ticker()
     detach();
 }
 
-void Ticker::attach(float seconds, callback_function_t callback)
-{
-    _callback_function = std::move(callback);
-    _attach_ms(1000UL * seconds, true, _static_callback, this);
-}
-
-void Ticker::attach_ms(uint32_t milliseconds, callback_function_t callback)
-{
-    _callback_function = std::move(callback);
-    _attach_ms(milliseconds, true, _static_callback, this);
-}
-
-void Ticker::attach_scheduled(float seconds, callback_function_t callback)
-{
-    attach(seconds, [callback]() { schedule_function(callback); });
-}
-
-void Ticker::attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
-{
-    attach_ms(milliseconds, [callback]() { schedule_function(callback); });
-}
-
-void Ticker::once(float seconds, callback_function_t callback)
-{
-    _callback_function = std::move(callback);
-    _attach_ms(1000UL * seconds, false, _static_callback, this);
-}
-
-void Ticker::once_ms(uint32_t milliseconds, callback_function_t callback)
-{
-    _callback_function = std::move(callback);
-    _attach_ms(milliseconds, false, _static_callback, this);
-}
-
-void Ticker::once_scheduled(float seconds, callback_function_t callback)
-{
-    once(seconds, [callback]() { schedule_function(callback); });
-}
-
-void Ticker::once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
-{
-    once_ms(milliseconds, [callback]() { schedule_function(callback); });
-}
-
-void Ticker::_attach_s(float seconds, bool repeat, callback_with_arg_t callback, void* arg)
-{
-    _attach_ms(1000UL * seconds, repeat, callback, arg);
-}
-
 void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg)
 {
     if (_timer)
