@@ -28,14 +28,14 @@ struct recurrent_fn_t
     recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
-static recurrent_fn_t rFirst(0);
-static recurrent_fn_t* rLast = &rFirst;
+static recurrent_fn_t* rFirst = nullptr;
+static recurrent_fn_t* rLast = nullptr;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
 // or nullptr if limit is reached
 IRAM_ATTR // called from ISR
-static scheduled_fn_t* get_fn_unsafe ()
+static scheduled_fn_t* get_fn_unsafe()
 {
     scheduled_fn_t* result = nullptr;
     // try to get an item from unused items list
@@ -54,7 +54,7 @@ static scheduled_fn_t* get_fn_unsafe ()
     return result;
 }
 
-static void recycle_fn_unsafe (scheduled_fn_t* fn)
+static void recycle_fn_unsafe(scheduled_fn_t* fn)
 {
     fn->mFunc = nullptr; // special overload in c++ std lib
     fn->mNext = sUnused;
@@ -62,7 +62,7 @@ static void recycle_fn_unsafe (scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function (const std::function<void(void)>& fn)
+bool schedule_function(const std::function<void(void)>& fn)
 {
     if (!fn)
         return false;
@@ -98,18 +98,24 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
         return false;
 
     item->mFunc = fn;
-    item->mNext = nullptr;
     item->alarm = std::move(alarm);
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
-    rLast->mNext = item;
+    if (rLast)
+    {
+        rLast->mNext = item;
+    }
+    else
+    {
+        rFirst = item;
+    }
     rLast = item;
 
     return true;
 }
 
-void run_scheduled_functions ()
+void run_scheduled_functions()
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
@@ -147,7 +153,7 @@ void run_scheduled_recurrent_functions()
     // its purpose is that it is never called from an interrupt
     // (always on cont stack).
 
-    auto current = rFirst.mNext;
+    auto current = rFirst;
     if (!current)
         return;
 
@@ -164,7 +170,7 @@ void run_scheduled_recurrent_functions()
         fence = true;
     }
 
-    auto prev = &rFirst;
+    recurrent_fn_t* prev = nullptr;
     // prevent scheduling of new functions during this run
     auto stop = rLast;
 
@@ -187,7 +193,14 @@ void run_scheduled_recurrent_functions()
                 rLast = prev;
 
             current = current->mNext;
-            prev->mNext = current;
+            if (prev)
+            {
+                prev->mNext = current;
+            }
+            else
+            {
+                rFirst = current;
+            }
 
             delete(to_ditch);
         }
