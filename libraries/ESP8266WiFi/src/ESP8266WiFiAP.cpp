@@ -99,6 +99,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         return false;
     }
 
+
     if(!ssid || strlen(ssid) == 0 || strlen(ssid) > 31) {
         // fail SSID too long or missing!
         DEBUG_WIFI("[AP] SSID too long or missing!\n");
@@ -202,6 +203,10 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         DEBUG_WIFI("[APConfig] enableAP failed!\n");
         return false;
     }
+
+
+    delay(10); //FIXME this is needed or AP start can sometimes fail
+
     bool ret = true;
 
     if (   !local_ip.isV4()
