@@ -447,3 +447,16 @@ Initially designed for kids in mind, everybody should be able to use it. Yet it'
 
 More details at https://shop.makestro.com/product/espectrocore/
 
+ITEAD Sonoff
+------------
+
+ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, and Sonoff S20
+
+These are not development boards. The development process is inconvenient with these devices. When flashing firmware you will need a Serial Adapter to connect it to your computer.
+
+| Most of these devices, during normal operation, are connected to *wall power (AKA Mains Electricity)*. **NEVER** try to flash these devices when connected to *wall power*. **ALWAYS** have them disconnected from *wall power* when connecting them to your computer. Your life may depend on it!
+
+When flashing you will need to hold down the push button connected to the GPIO0 pin, while powering up with a safe 3.3 Volt source. USB Serial Adapters can often supply enough power to handle flashing; however, it many may not supply enough power to handle the activities when the device reboots.
+
+More product details at the bottom of https://www.itead.cc/wiki/Product/
+
