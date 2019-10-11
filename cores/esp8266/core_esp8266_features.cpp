@@ -28,7 +28,7 @@
  *  otherwise preloads flash at the given address.
  *  All preloads are word aligned.
  */
-void precache(void *f, uint32_t bytes) {
+extern "C" void precache(void *f, uint32_t bytes) {
   // Size of a cache page in words. We only need to read one word per
   // page (ie 1 word in 8) for this to work.
   #define CACHE_PAGE_SIZE (32/4)
