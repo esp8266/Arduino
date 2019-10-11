@@ -72,7 +72,7 @@ _SPI0Command(uint32_t spi0c,uint32_t spi0u,uint32_t spi0u1,uint32_t spi0u2,
   // wait for the command to complete
   uint32_t timeout = 1000;
   while ((SPI0CMD & SPICMDUSR) && timeout--) {}
-  
+
   if ((miso_bytes>0) && (timeout>0)) {
      // copy the response back to the buffer
      memcpy(data,(void *)&(SPI0W0),miso_bytes);
@@ -81,7 +81,7 @@ _SPI0Command(uint32_t spi0c,uint32_t spi0u,uint32_t spi0u1,uint32_t spi0u2,
   SPI0U = old_spi_usr;
   SPI0U2= old_spi_usr2;
   SPI0C = old_spi_c;
-  
+
   PRECACHE_END();
   return (timeout>0 ? SPI_RESULT_OK : SPI_RESULT_TIMEOUT);
 }
@@ -116,7 +116,7 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   spic |= (SPICRESANDRES | SPICSHARE | SPICWPR | SPIC2BSE);
 
   SpiOpResult rc =_SPI0Command(spic,spiu,spiu1,spiu2,data,mosi_words*4,miso_words*4);
-  
+
   if (rc==SPI_RESULT_OK) {
      // clear any bits we did not read in the last word.
      if (miso_bits % 32) {
