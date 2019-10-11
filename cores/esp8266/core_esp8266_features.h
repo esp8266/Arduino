@@ -104,6 +104,14 @@ inline uint32_t esp_get_cycle_count() {
 #define PRECACHE_END(tag) \
     _precache_end_##tag:
 
-extern "C" void precache(void *f, uint32_t bytes);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void precache(void *f, uint32_t bytes);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CORE_ESP8266_FEATURES_H
