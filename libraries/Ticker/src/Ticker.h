@@ -37,17 +37,20 @@ public:
 
     void attach_scheduled(float seconds, callback_function_t callback)
     {
-        attach(seconds, [callback]() { schedule_function(callback); });
+        _callback_function = [callback]() { schedule_function(callback); };
+        _attach_ms(1000UL * seconds, true, _static_callback, this);
     }
 
     void attach(float seconds, callback_function_t callback)
     {
-        attach_ms(1000UL * seconds, callback);
+        _callback_function = std::move(callback);
+        _attach_ms(1000UL * seconds, true, _static_callback, this);
     }
 
     void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
     {
-        attach_ms(milliseconds, [callback]() { schedule_function(callback); });
+        _callback_function = [callback]() { schedule_function(callback); };
+        _attach_ms(milliseconds, true, _static_callback, this);
     }
 
     void attach_ms(uint32_t milliseconds, callback_function_t callback)
@@ -60,7 +63,7 @@ public:
     void attach(float seconds, void (*callback)(TArg), TArg arg)
     {
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        attach_ms(1000UL * seconds, callback, arg);
+        _attach_ms(1000UL * seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
     }
 
     template<typename TArg>
@@ -72,17 +75,20 @@ public:
 
     void once_scheduled(float seconds, callback_function_t callback)
     {
-        once(seconds, [callback]() { schedule_function(callback); });
+        _callback_function = [callback]() { schedule_function(callback); };
+        _attach_ms(1000UL * seconds, false, _static_callback, this);
     }
 
     void once(float seconds, callback_function_t callback)
     {
-        once_ms(1000UL * seconds, callback);
+        _callback_function = std::move(callback);
+        _attach_ms(1000UL * seconds, false, _static_callback, this);
     }
 
     void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
     {
-        once_ms(milliseconds, [callback]() { schedule_function(callback); });
+        _callback_function = [callback]() { schedule_function(callback); };
+        _attach_ms(milliseconds, false, _static_callback, this);
     }
 
     void once_ms(uint32_t milliseconds, callback_function_t callback)
@@ -95,7 +101,7 @@ public:
     void once(float seconds, void (*callback)(TArg), TArg arg)
     {
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        once_ms(1000UL * seconds, callback, arg);
+        _attach_ms(1000UL * seconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
     }
 
     template<typename TArg>
