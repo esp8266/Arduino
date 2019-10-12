@@ -6,18 +6,26 @@
 
 #if LWIP_VERSION_MAJOR != 1
 
-extern "C" int fw_has_started_dhcps;
 
 class DhcpServer
 {
 public:
 
     DhcpServer (netif* netif);
+    ~DhcpServer ();
 
     void setDns (int num, const ipv4_addr_t* dns);
 
-    void start (struct ip_info *info);
-    void stop  ();
+    bool begin (ip_info* info);
+    void end ();
+    bool isRunning ();
+
+    // this is the C interface encapsulated in a class
+    // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
+    // (not changing everything at once)
+    // the API below is subject to change
+
+    // legacy public C structure and API to eventually turn into C++
 
     void init_dhcps_lease(uint32 ip);
     bool set_dhcps_lease(struct dhcps_lease *please);
@@ -27,10 +35,10 @@ public:
     bool reset_dhcps_lease_time(void);
     uint32 get_dhcps_lease_time(void);
 
-    bool started ();
-
 protected:
 
+    // legacy C structure and API to eventually turn into C++
+    
     typedef struct _list_node {
         void *pnode;
         struct _list_node *pnext;
@@ -81,7 +89,9 @@ protected:
     static const uint32 magic_cookie;
 };
 
+// SoftAP DHCP server always exists and is started on boot
 extern DhcpServer dhcpSoftAP;
+extern "C" int fw_has_started_softap_dhcps;
 
 #endif // LWIP_VERSION_MAJOR != 1
 

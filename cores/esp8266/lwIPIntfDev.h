@@ -107,6 +107,9 @@ boolean LwipIntfDev<RawDev>::config (const IPAddress& localIP, const IPAddress& 
 template <class RawDev>
 boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
 {
+    if (mtu)
+        _mtu = mtu;
+
     if (macAddress)
         memcpy(_macAddress, macAddress, 6);
     else

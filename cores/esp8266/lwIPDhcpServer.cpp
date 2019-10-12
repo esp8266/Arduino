@@ -137,10 +137,9 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #define LWIP_IS_OK(what,err) ((err) == ERR_OK)
 #endif
 
-
 const uint32 DhcpServer::magic_cookie = 0x63538263;
 
-int fw_has_started_dhcps = 0;
+int fw_has_started_softap_dhcps = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -153,11 +152,16 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
     renew = false;
     dhcps_lease_time = DHCPS_LEASE_TIME_DEF;  //minute
     
-    if (netif->num == SOFTAP_IF && fw_has_started_dhcps == 1)
+    if (netif->num == SOFTAP_IF && fw_has_started_softap_dhcps == 1)
     {
+        // nonos-sdk always starts DHCPS at boot
+        // now that dhcps is in a class, we must wait c++ constructors to be initialized
+        // when global variable `dhcpSoftAP` (netif number SOFTAP_IF) is initialized,
+        // this constructor is called and calls begin(legacy-values):
+        // 192.168.4.1 netmask 255.255.255.0 gateway 0.0.0.0
         ip_info ip = { { 0x0104a8c0 }, { 0x00ffffff }, { 0 } };
-        start(&ip);
-        fw_has_started_dhcps = 2;
+        begin(&ip);
+        fw_has_started_softap_dhcps = 2;
     }
 };
 
@@ -990,17 +994,16 @@ void DhcpServer::init_dhcps_lease(uint32 ip)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
-void DhcpServer::start (struct ip_info *info)
+bool DhcpServer::begin (struct ip_info *info)
 {
     if (pcb_dhcps != nullptr)
-    {
         udp_remove(pcb_dhcps);
-    }
 
     pcb_dhcps = udp_new();
     if (pcb_dhcps == nullptr || info == nullptr)
     {
         os_printf("dhcps_start(): could not obtain pcb\n");
+        return false;
     }
 
     //  wrong: answer will go to sta  IP4_ADDR(&broadcast_dhcps, 255, 255, 255, 255);
@@ -1023,10 +1026,20 @@ void DhcpServer::start (struct ip_info *info)
     if (_netif->num == SOFTAP_IF)
         wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
     _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP; // added for lwip-git
+    
+    return true;
 }
 
-void DhcpServer::stop ()
+DhcpServer::~DhcpServer ()
 {
+    end();
+}
+
+void DhcpServer::end ()
+{
+    if (!pcb_dhcps)
+        return;
+
     udp_disconnect(pcb_dhcps);
     udp_remove(pcb_dhcps);
     pcb_dhcps = nullptr;
@@ -1055,7 +1068,7 @@ void DhcpServer::stop ()
     }
 }
 
-bool DhcpServer::started ()
+bool DhcpServer::isRunning ()
 {
     return !!_netif->state;
 }
@@ -1070,7 +1083,6 @@ bool DhcpServer::started ()
 *******************************************************************************/
 bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 {
-    struct ip_info info;
     uint32 softap_ip = 0;
     uint32 start_ip = 0;
     uint32 end_ip = 0;
@@ -1084,7 +1096,7 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
         }
     }
 
-    if (please == nullptr || started())
+    if (please == nullptr || isRunning())
     {
         return false;
     }
@@ -1094,6 +1106,7 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 #if 1
         softap_ip = ip_2_ip4(&_netif->ip_addr)->addr;
 #else
+        struct ip_info info;
         bzero(&info, sizeof(struct ip_info));
         wifi_get_ip_info(SOFTAP_IF, &info);
         softap_ip = htonl(info.ip.addr);
@@ -1156,7 +1169,7 @@ bool DhcpServer::get_dhcps_lease(struct dhcps_lease *please)
     //  if (dhcps_lease_flag){
     if (dhcps_lease.enable == false)
     {
-        if (started())
+        if (isRunning())
         {
             return false;
         }
@@ -1164,13 +1177,13 @@ bool DhcpServer::get_dhcps_lease(struct dhcps_lease *please)
     else
     {
         //      bzero(please, sizeof(dhcps_lease));
-        //      if (!started()){
+        //      if (!isRunning()){
         //          please->start_ip.addr = htonl(dhcps_lease.start_ip.addr);
         //          please->end_ip.addr = htonl(dhcps_lease.end_ip.addr);
         //      }
     }
 
-    //  if (started()){
+    //  if (isRunning()){
     //      bzero(please, sizeof(dhcps_lease));
     //      please->start_ip.addr = dhcps_lease.start_ip.addr;
     //      please->end_ip.addr = dhcps_lease.end_ip.addr;
@@ -1249,7 +1262,7 @@ bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
 {
     bool offer_flag = true;
     //uint8 option = 0;
-    if (optarg == nullptr && !started())
+    if (optarg == nullptr && !isRunning())
     {
         return false;
     }
@@ -1283,7 +1296,7 @@ bool DhcpServer::set_dhcps_lease_time(uint32 minute)
         }
     }
 
-    if (started())
+    if (isRunning())
     {
         return false;
     }
@@ -1307,7 +1320,7 @@ bool DhcpServer::reset_dhcps_lease_time(void)
         }
     }
 
-    if (started())
+    if (isRunning())
     {
         return false;
     }
