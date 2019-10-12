@@ -138,7 +138,7 @@
          "tools": [
             {
                "version": "3.7.2-post1",
-               "name": "python",
+               "name": "python3",
                "systems": [
                   {
                      "host": "x86_64-mingw32",

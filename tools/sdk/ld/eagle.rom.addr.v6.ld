@@ -119,6 +119,8 @@ PROVIDE ( ets_install_external_printf = 0x40002450 );
 PROVIDE ( ets_install_putc1 = 0x4000242c );
 PROVIDE ( ets_install_putc2 = 0x4000248c );
 PROVIDE ( ets_install_uart_printf = 0x40002438 );
+/* Undocumented function to print character to UART */
+PROVIDE ( ets_uart_putc1 = 0x40001dcc );
 /* permanently hide reimplemented ets_intr_*lock(), see #6484
 PROVIDE ( ets_intr_lock = 0x40000f74 );
 PROVIDE ( ets_intr_unlock = 0x40000f80 );

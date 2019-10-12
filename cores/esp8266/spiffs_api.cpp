@@ -25,6 +25,21 @@
 
 using namespace fs;
 
+
+// Deprecated functions, to be deleted in next release
+int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
+    return flash_hal_write(addr, size, src);
+}
+int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
+    return flash_hal_erase(addr, size);
+}
+int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
+    return flash_hal_read(addr, size, dst);
+}
+
+
+
+
 namespace spiffs_impl {
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)

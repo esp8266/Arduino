@@ -43,7 +43,7 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
 {
 }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
         const String& httpsFingerprint, bool reboot)
 {
@@ -94,7 +94,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url
     return handleUpdate(http, currentVersion, false);
 }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
@@ -133,7 +133,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const Strin
     return handleUpdate(http, currentVersion, true);
 }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
         bool https, const String& httpsFingerprint, bool reboot)
 {
@@ -263,6 +263,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     http.setTimeout(_httpClientTimeout);
     http.setFollowRedirects(_followRedirects);
     http.setUserAgent(F("ESP8266-http-Update"));
+    http.addHeader(F("x-ESP8266-Chip-ID"), String(ESP.getChipId()));
     http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
     http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
     http.addHeader(F("x-ESP8266-free-space"), String(ESP.getFreeSketchSpace()));
