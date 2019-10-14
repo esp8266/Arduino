@@ -122,7 +122,8 @@ private:
     // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
     inline void WAIT_CLOCK_STRETCH()
     {
-        for (unsigned int t = 0; !SCL_READ() && (t < twi_clockStretchLimit); t++) {
+        for (unsigned int t = 0; !SCL_READ() && (t < twi_clockStretchLimit); t++)
+        {
             /* noop */
         }
     }
@@ -253,7 +254,8 @@ void Twi::setAddress(uint8_t address)
 
 void Twi::enableSlave()
 {
-    if (!_slaveEnabled) {
+    if (!_slaveEnabled)
+    {
         attachInterrupt(twi_scl, onSclChange, CHANGE);
         attachInterrupt(twi_sda, onSdaChange, CHANGE);
         _slaveEnabled = true;
