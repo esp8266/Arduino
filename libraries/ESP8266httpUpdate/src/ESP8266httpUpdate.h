@@ -26,13 +26,15 @@
 #ifndef ESP8266HTTPUPDATE_H_
 #define ESP8266HTTPUPDATE_H_
 
-#define HTTPUPDATE_1_2_COMPATIBLE
-
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiUdp.h>
 #include <ESP8266HTTPClient.h>
+
+#ifndef HTTPUPDATE_1_2_COMPATIBLE
+#define HTTPUPDATE_1_2_COMPATIBLE HTTPCLIENT_1_1_COMPATIBLE
+#endif
 
 #ifdef DEBUG_ESP_HTTP_UPDATE
 #ifdef DEBUG_ESP_PORT
@@ -85,7 +87,7 @@ public:
         _ledOn = ledOn;
     }
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use rebootOnUpdate and the next one instead
     t_httpUpdate_return update(const String& url, const String& currentVersion,
                                const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
@@ -97,7 +99,7 @@ public:
 #endif
     t_httpUpdate_return update(WiFiClient& client, const String& url, const String& currentVersion = "");
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use one of the overloads below along with rebootOnUpdate
     t_httpUpdate_return update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
                                bool https, const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
@@ -112,7 +114,7 @@ public:
     t_httpUpdate_return update(WiFiClient& client, const String& host, uint16_t port, const String& uri = "/",
                                const String& currentVersion = "");
 
-#ifdef HTTPUPDATE_1_2_COMPATIBLE
+#if HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use rebootOnUpdate and the next one instead
     t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion,
                                      const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
