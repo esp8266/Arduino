@@ -44,44 +44,62 @@ extern "C" uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
  * Note: if porting to ESP32 mosi/miso bits are set in 2 registers, not 1.
  */
 static SpiOpResult PRECACHE_ATTR
-_SPI0Command(uint32_t spi0c,uint32_t spi0u,uint32_t spi0u1,uint32_t spi0u2,
-             uint32_t *data,uint32_t mosi_bytes,uint32_t miso_bytes)
-{
-  PRECACHE_START();
-  //precache(NULL,200);
+_SPICommand(volatile uint32_t spiIfNum,
+             uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
+             uint32_t *data,uint32_t write_words,uint32_t read_words)
+{ 
+  if (spiIfNum>1) return SPI_RESULT_ERR;
 
-  Wait_SPI_Idle(flashchip);
-  uint32_t old_spi_usr = SPI0U;
-  uint32_t old_spi_usr2= SPI0U2;
-  uint32_t old_spi_c   = SPI0C;
+  // force SPI register access via base+offest. 
+  // Prevents loading individual address constants from flash.
+  uint32_t *spibase = (uint32_t*)(spiIfNum ? &(SPI1CMD) : &(SPI0CMD));
+  #define SPIREG(reg) *((volatile uint32_t *)(spibase+(&(reg) - &(SPI0CMD))))
+
+  // preload any constants and functions we need into variables
+  // Everything must be volatile or the optimizer can treat them as 
+  // constants, resulting in the flash reads we're trying to avoid
+  void    *(* volatile memcpyp)(void *,const void *, size_t) = memcpy;
+  uint32_t (* volatile Wait_SPI_Idlep)(SpiFlashChip *) = Wait_SPI_Idle;
+  volatile SpiFlashChip *fchip=flashchip;
+  volatile uint32_t spicmdusr=SPICMDUSR;
+
+  if (!spiIfNum) {
+     // Only need to precache when using SPI0
+     PRECACHE_START();
+     Wait_SPI_Idlep((SpiFlashChip *)fchip);
+  }
+  
+  uint32_t old_spi_usr = SPIREG(SPI0U);
+  uint32_t old_spi_usr2= SPIREG(SPI0U2);
+  uint32_t old_spi_c   = SPIREG(SPI0C);
 
   //SPI0S &= ~(SPISE|SPISBE|SPISSE|SPISCD);
-  SPI0C = spi0c;
-  SPI0U = spi0u;
-  SPI0U1= spi0u1;
-  SPI0U2= spi0u2;
+  SPIREG(SPI0C) = spic;
+  SPIREG(SPI0U) = spiu;
+  SPIREG(SPI0U1)= spiu1;
+  SPIREG(SPI0U2)= spiu2;
 
-  if (mosi_bytes>0) {
+  if (write_words>0) {
      // copy the outgoing data to the SPI hardware
-     memcpy((void*)&(SPI0W0),data,mosi_bytes);
+     memcpyp((void*)&(SPIREG(SPI0W0)),data,write_words*4);
   }
 
   // Start the transfer
-  SPI0CMD = SPICMDUSR;
+  SPIREG(SPI0CMD) = spicmdusr;
 
   // wait for the command to complete
   uint32_t timeout = 1000;
-  while ((SPI0CMD & SPICMDUSR) && timeout--) {}
+  while ((SPIREG(SPI0CMD) & spicmdusr) && timeout--) {}
 
-  if ((miso_bytes>0) && (timeout>0)) {
+  if ((read_words>0) && (timeout>0)) {
      // copy the response back to the buffer
-     memcpy(data,(void *)&(SPI0W0),miso_bytes);
+     memcpyp(data,(void *)&(SPIREG(SPI0W0)),read_words*4);
   }
 
-  SPI0U = old_spi_usr;
-  SPI0U2= old_spi_usr2;
-  SPI0C = old_spi_c;
-
+  SPIREG(SPI0U) = old_spi_usr;
+  SPIREG(SPI0U2)= old_spi_usr2;
+  SPIREG(SPI0C) = old_spi_c;
+  
   PRECACHE_END();
   return (timeout>0 ? SPI_RESULT_OK : SPI_RESULT_TIMEOUT);
 }
@@ -115,7 +133,7 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   spic &= ~(SPICQIO | SPICDIO | SPICQOUT | SPICDOUT | SPICAHB | SPICFASTRD);
   spic |= (SPICRESANDRES | SPICSHARE | SPICWPR | SPIC2BSE);
 
-  SpiOpResult rc =_SPI0Command(spic,spiu,spiu1,spiu2,data,mosi_words*4,miso_words*4);
+  SpiOpResult rc =_SPICommand(0,spic,spiu,spiu1,spiu2,data,mosi_words,miso_words);
 
   if (rc==SPI_RESULT_OK) {
      // clear any bits we did not read in the last word.
