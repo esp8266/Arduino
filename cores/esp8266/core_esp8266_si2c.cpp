@@ -656,12 +656,6 @@ void ICACHE_RAM_ATTR Twi::onTwipEvent(uint8_t status)
     }
 }
 
-void ICACHE_RAM_ATTR Twi::twi_wait_clockStretchLimit(void)
-{
-    uint32_t t=0; 
-    while(SCL_READ() == 0 && (t++) < twi_clockStretchLimit); // Clock stretching
-}
-
 void Twi::twi_scl_valley(void)
 {
     SCL_LOW();
