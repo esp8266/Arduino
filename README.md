@@ -16,7 +16,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version-basic-instructions)
+  - [Using git version](#using-git-version)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -38,35 +38,13 @@ Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_inde
 
 Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.2/](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
 
-### Using git version (basic instructions)
+### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
+Also known as latest git or master branch.
+
 - Install the current upstream Arduino IDE at the 1.8 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
-- Go to Arduino directory
-  - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
-    This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
-    ```bash
-    cd <application-directory>/Arduino.app/Contents/Java
-    ```
-  - For Linux, it is ~/Arduino by default.
-    ```bash
-    cd ~/Arduino
-    ```
-- Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
-```bash
-cd hardware
-mkdir esp8266com
-cd esp8266com
-git clone https://github.com/esp8266/Arduino.git esp8266
-cd esp8266
-git submodule update --init
-```
-- Download binary tools (you need Python 2.7)
-```bash
-cd esp8266/tools
-python get.py
-```
-- Restart Arduino
+- Follow the [instructions in the documentation](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
 
 ### Using PlatformIO
 
