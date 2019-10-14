@@ -704,6 +704,7 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
     unsigned int sda;
     unsigned int scl;
 
+    // Store bool return in int to reduce final code size.
     sda = twi.SDA_READ();
     scl = twi.SCL_READ();
 
@@ -899,6 +900,8 @@ void ICACHE_RAM_ATTR Twi::onSdaChange(void)
 {
     unsigned int sda;
     unsigned int scl;
+
+    // Store bool return in int to reduce final code size.
     sda = twi.SDA_READ();
     scl = twi.SCL_READ();
 
