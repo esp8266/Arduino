@@ -38,15 +38,14 @@ extern "C" uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
 /*
  * critical part of SPICommand.
  * Kept in a separate function to aid with precaching
- * and because this is the part that's really specific to SPI0.
  * PRECACHE_* saves having to make the function IRAM_ATTR.
  *
  * Note: if porting to ESP32 mosi/miso bits are set in 2 registers, not 1.
  */
 static SpiOpResult PRECACHE_ATTR
 _SPICommand(volatile uint32_t spiIfNum,
-             uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
-             uint32_t *data,uint32_t write_words,uint32_t read_words)
+            uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
+            uint32_t *data,uint32_t write_words,uint32_t read_words)
 { 
   if (spiIfNum>1) return SPI_RESULT_ERR;
 
