@@ -27,23 +27,26 @@
 #define Pins_Arduino_h
 
 #if defined(ARDUINO_SONOFF_SV)
-#define PIN_WIRE_SCL (5U)
+#define PIN_WIRE_SCL (5)
 static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 
 #if defined(ARDUINO_SONOFF_TH) || defined(ARDUINO_SONOFF_BASIC)
-#define PIN_WIRE_SCL (14U)
+#define PIN_WIRE_SCL (14)
 static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 
 #if defined(ARDUINO_SONOFF_TH) || defined(ARDUINO_SONOFF_SV)
-#define PIN_WIRE_SDA (4U)
+#define PIN_WIRE_SDA (4)
 static const uint8_t SDA = PIN_WIRE_SDA;
 #endif
 
 static const uint8_t BUILTIN_BUTTON = 0;
-static const uint8_t BUILTIN_LED = 13;
 static const uint8_t BUILTIN_RELAY = 12;
+
+#define BUTTON_BUILTIN (0)
+#define LED_BUILTIN    (13)
+#define RELAY_BUILTIN  (12)
 
 #include "../generic/common.h"
 
