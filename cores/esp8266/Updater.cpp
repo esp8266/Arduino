@@ -137,7 +137,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
       return false;
     }
 
-#ifdef UPDATE_IN_TWO_STEPS
+#ifdef ATOMIC_FS_UPDATE
     //address of the end of the space available for update
     uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
 
@@ -295,7 +295,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
   }
   else if (_command == U_FS) {
-#ifdef UPDATE_IN_TWO_STEPS
+#ifdef ATOMIC_FS_UPDATE
     eboot_command ebcmd;
     ebcmd.action = ACTION_COPY_RAW;
     ebcmd.args[0] = _startAddress;
