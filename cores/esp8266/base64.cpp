@@ -46,7 +46,7 @@ String base64::encode(const uint8_t * data, size_t length, bool doNewLines) {
         {
             base64_init_encodestate(&_state);
         }
-        else 
+        else
         {
             base64_init_encodestate_nonewlines(&_state);
         }
