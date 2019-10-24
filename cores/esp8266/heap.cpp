@@ -203,7 +203,24 @@ void ICACHE_RAM_ATTR print_oom_size(size_t size)
 #endif
 
 #if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
+/*
+  The thinking behind the ordering of Integrity Check, Full Poison Check, and
+  the specific *alloc function.
 
+  1. Integrity Check - verifies the heap management information is not corrupt.
+     This allows any other testing, that walks the heap, to run safely.
+
+  2. Place Full Poison Check before or after a specific *alloc function?
+     a. After, when the *alloc function operates on an existing allocation.
+     b. Before, when the *alloc function creates a new, not modified, allocation.
+
+     In a free() or realloc() call, the focus is on their allocation. It is
+     checked 1st and reported on 1ST if an error exists. Full Posion Check is
+     done after.
+
+     For malloc(), calloc(), and zalloc() Full Posion Check is done 1st since
+     these functions do not modify an existing allocation.
+*/
 void* ICACHE_RAM_ATTR malloc(size_t size)
 {
     INTEGRITY_CHECK__ABORT();
@@ -266,8 +283,8 @@ void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, 
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
-    POISON_CHECK__PANIC_FL(file, line);
     void* ret = UMM_REALLOC_FL(ptr, size, file, line);
+    POISON_CHECK__PANIC_FL(file, line);
     PTR_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line);
     OOM_CHECK__PRINT_LOC(ret, size, file, line);
     return ret;
@@ -286,8 +303,8 @@ void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
 void ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
-    POISON_CHECK__PANIC_FL(file, line);
     UMM_FREE_FL(ptr, file, line);
+    POISON_CHECK__PANIC_FL(file, line);
 }
 
 size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
