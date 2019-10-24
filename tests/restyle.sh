@@ -9,7 +9,11 @@ test -d cores/esp8266
 test -d libraries
 
 #all="cores/esp8266 libraries"
-all="libraries/ESP8266mDNS"
+all="
+libraries/ESP8266mDNS
+libraries/Wire
+cores/esp8266/core_esp8266_si2c.cpp
+"
 
 for d in $all; do
     for e in c cpp h; do
