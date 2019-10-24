@@ -28,14 +28,13 @@ code was added to heap.cpp and umm_local.cpp.
   neighboring allocations.
 * UMM_POISON_CHECK - Full heap intensive check of poison
 
-A cautionary note, on the use of UMM_INTEGRITY_CHECK, UMM_POISON_CHECK, and
-UMM_INFO_PRINT. All of these run with IRQs disabled, for periods that can go
-into 100's of us. With umm_info(NULL, true) that may go into seconds, depending
-on the serial interface speed and the number of memory allocations present. Use
-UMM_INTEGRITY_CHECK, UMM_POISON_CHECK, and UMM_INFO_PRINT sparingly.
-If you want to see numbers for the disabled time, explore using
-UMM_CRITICAL_METRICS in umm_malloc_cfg.h.
-
+A cautionary note, on the use of UMM_INTEGRITY_CHECK and UMM_POISON_CHECK, and
+umm_info(). All of these run with IRQs disabled, for periods that can go into
+100's of us. With umm_info(NULL, true) that may go into seconds, depending on
+the serial interface speed and the number of memory allocations present. Use
+UMM_INTEGRITY_CHECK, UMM_POISON_CHECK, and umm_info() sparingly. If you want to
+see numbers for the disabled time, explore using UMM_CRITICAL_METRICS in
+umm_malloc_cfg.h.
 
 ===============================================================================
 

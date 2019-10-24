@@ -644,14 +644,42 @@ void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
 void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line);
+void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
+
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortCalloc(n, s, mem_debug_file, __LINE__); })
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
+#else
+#define dbg_heap_free(p) free(p)
+#endif
 
 #elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #include <pgmspace.h>
 void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
+
+void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
+//C - to be discussed
+/*
+  Problem, I would like to report the file and line number with the umm poison
+  event as close as possible to the event. The #define method works for malloc,
+  calloc, and realloc those names are not as generic as free. A #define free
+  captures too much. Classes with methods called free are included :(
+  Inline functions would report the address of the inline function in the .h
+  not where they are called.
+
+  Anybody know a trick to make this work?
+
+  Create dbg_heap_free() as an alternative for free() when you need a little
+  more help in debugging the more challenging problems.
+*/
+#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
+
+#else
+#define dbg_heap_free(p) free(p)
 #endif /* DEBUG_ESP_OOM */
 
 #ifdef __cplusplus

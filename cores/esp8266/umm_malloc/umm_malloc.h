@@ -10,7 +10,7 @@
 
 /* ------------------------------------------------------------------------ */
 
-//C This include is not in upstream nether are the #ifdef __cplusplus
+//C This include is not in upstream neither are the #ifdef __cplusplus
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
 #ifdef __cplusplus
