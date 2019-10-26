@@ -399,6 +399,7 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
     while (!SDA_READ() && (i++) < 10)
     {
         twi_scl_valley();
+        WAIT_CLOCK_STRETCH();
         busywait(twi_dcount);
     }
     return 0;
@@ -439,6 +440,7 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     while (!SDA_READ() && (i++) < 10)
     {
         twi_scl_valley();
+        WAIT_CLOCK_STRETCH();
         busywait(twi_dcount);
     }
     return 0;
