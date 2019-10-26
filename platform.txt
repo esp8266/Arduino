@@ -39,7 +39,7 @@ build.stdcpp_level=-std=gnu++11
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
-build.sdk=NONOSDK22y
+build.sdk=NONOSDK22x_191024
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk

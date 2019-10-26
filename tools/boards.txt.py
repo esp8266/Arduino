@@ -1366,13 +1366,15 @@ def led (default,max):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
-                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
+                        ('.menu.sdk.nonosdk222_111', 'nonos-sdk 2.2.1+111 (191024 testing)'),
+                        ('.menu.sdk.nonosdk222_111.build.sdk', 'NONOSDK22x_191024'),
+                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (190703 testing, good)'),
+                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22x_190703'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
-                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
+                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (190313 testing)'),
+                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x_190313'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])
            }
