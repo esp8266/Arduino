@@ -13,7 +13,7 @@ UPLOAD_BOARD ?= nodemcu
 BS_DIR ?= libraries/BSTest
 DEBUG_LEVEL ?= DebugLevel=None____
 #FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,LwIPVariant=v2mss536,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
-FQBN ?= esp8266com:esp8266:generic:xtal=80,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=none,dbg=Serial,$(DEBUG_LEVEL)
+FQBN ?= esp8266com:esp8266:generic:xtal=160,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=none,dbg=Serial,$(DEBUG_LEVEL)
 BUILD_TOOL := $(ARDUINO_IDE_PATH)/arduino-builder
 TEST_CONFIG := test_env.cfg
 TEST_REPORT_XML := test_report.xml
