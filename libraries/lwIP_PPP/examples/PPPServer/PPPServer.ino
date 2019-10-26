@@ -34,12 +34,11 @@ SoftwareSerial ppplink;
 HardwareSerial& logger = Serial;
 PPPServer ppp(&ppplink);
 
-void PPPConnectedCallback (netif* nif)
-{
+void PPPConnectedCallback(netif* nif) {
   logger.printf("ppp: ip=%s/mask=%s/gw=%s\n",
-    IPAddress(&nif->ip_addr).toString().c_str(),
-    IPAddress(&nif->netmask).toString().c_str(),
-    IPAddress(&nif->gw).toString().c_str());
+                IPAddress(&nif->ip_addr).toString().c_str(),
+                IPAddress(&nif->netmask).toString().c_str(),
+                IPAddress(&nif->gw).toString().c_str());
 
   logger.printf("Heap before: %d\n", ESP.getFreeHeap());
   err_t ret = ip_napt_init(NAPT, NAPT_PORT);
@@ -50,7 +49,7 @@ void PPPConnectedCallback (netif* nif)
     if (ret == ERR_OK) {
       logger.printf("PPP client is NATed\n");
     }
-    
+
     // could not make this work yet,
     // but packets are arriving on ppp client (= linux host)
     logger.printf("redirect22=%d\n", ip_portmap_add(IP_PROTO_TCP, ip_2_ip4(&nif->ip_addr)->addr, 22, ip_2_ip4(&nif->gw)->addr, 22));
