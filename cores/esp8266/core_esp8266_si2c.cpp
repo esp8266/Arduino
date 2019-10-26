@@ -391,7 +391,6 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
     else
     {
         twi_scl_valley();
-        WAIT_CLOCK_STRETCH();
         // TD-er: Also busywait(twi_dcount) here?
         // busywait(twi_dcount);
     }
@@ -399,7 +398,6 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
     while (!SDA_READ() && (i++) < 10)
     {
         twi_scl_valley();
-        WAIT_CLOCK_STRETCH();
         busywait(twi_dcount);
     }
     return 0;
@@ -432,7 +430,6 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     else
     {
         twi_scl_valley();
-        WAIT_CLOCK_STRETCH();
         // TD-er: Also busywait(twi_dcount) here?
         // busywait(twi_dcount);
     }
@@ -440,7 +437,6 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     while (!SDA_READ() && (i++) < 10)
     {
         twi_scl_valley();
-        WAIT_CLOCK_STRETCH();
         busywait(twi_dcount);
     }
     return 0;
@@ -666,6 +662,7 @@ void Twi::twi_scl_valley(void)
     SCL_LOW();
     busywait(twi_dcount);
     SCL_HIGH();
+    WAIT_CLOCK_STRETCH();
 }
 
 void ICACHE_RAM_ATTR Twi::onTimer(void *unused)
