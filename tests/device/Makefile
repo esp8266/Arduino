@@ -104,7 +104,7 @@ ifneq ("$(NO_RUN)","1")
 endif
 
 $(TEST_REPORT_XML): $(HARDWARE_DIR) virtualenv
-	$(SILENT)$(BS_DIR)/virtualenv/bin/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
+	$(SILENT)$(BS_DIR)/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
 
 $(TEST_REPORT_HTML): $(TEST_REPORT_XML) | virtualenv
 	$(SILENT)$(BS_DIR)/virtualenv/bin/junit2html $< $@

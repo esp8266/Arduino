@@ -1,0 +1,26 @@
+#!/home/earle/Arduino/hardware/esp8266com/esp8266/tests/device/libraries/BSTest/virtualenv/bin/python3
+
+from __future__ import unicode_literals, print_function
+import argparse
+from xmerge import merge_xunit
+
+
+parser = argparse.ArgumentParser(
+    description='Utility for merging multiple XUnit xml reports '
+                'into a single xml report.',
+)
+parser.add_argument(
+    'report',
+    nargs='+',
+    type=argparse.FileType('r'),
+    help='Path of XUnit xml report. Multiple can be provided.',
+)
+parser.add_argument(
+    'output',
+    help='Path where merged of XUnit will be saved.',
+)
+
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    merge_xunit(args.report, args.output)
