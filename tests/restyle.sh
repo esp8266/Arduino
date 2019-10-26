@@ -12,6 +12,7 @@ test -d libraries
 all="
 libraries/ESP8266mDNS
 libraries/Wire
+libraries/lwIP*
 cores/esp8266/core_esp8266_si2c.cpp
 "
 
