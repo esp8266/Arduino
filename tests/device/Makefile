@@ -124,7 +124,7 @@ virtualenv:
 
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -rf $(HARDWARE_DIR)A
+	rm -rf $(HARDWARE_DIR)
 	rm -rf $(BS_DIR)/virtualenv
 	rm -f $(TEST_REPORT_HTML) $(TEST_REPORT_XML)
 
