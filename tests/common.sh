@@ -189,6 +189,11 @@ function install_ide()
         unzip -q arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
+    elif [ "$ARM64" = "1" ]; then
+        sudo apt-get install unzip
+        test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linuxaarch64.tar.xz"
+        tar xf arduino-linux.tar.xz
+        mv arduino-${idever} arduino-distrib
     else
         #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
         test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
