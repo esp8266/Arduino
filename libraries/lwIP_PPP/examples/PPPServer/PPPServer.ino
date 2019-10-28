@@ -2,7 +2,7 @@
 // This is still beta / a work in progress
 
 // To run this sketch an (other) USB-serial converter is needed connected to RX-TX ports (below)
-// hardware sewrial is used for logging
+// hardware serial is used for logging
 // software serial is used for the PPP link
 // this example is subject for changes once everything is stabilized
 
