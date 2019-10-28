@@ -35,6 +35,8 @@
 
 extern "C" uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
 
+namespace experimental {
+
 /*
  * critical part of SPICommand.
  * Kept in a separate function to aid with precaching
@@ -126,6 +128,10 @@ _SPICommand(volatile uint32_t spiIfNum,
  *	miso_bits
  *		Number of bits to read from the SPI bus after the outgoing
  *		data has been sent.
+ *
+ *  Note: This code has only been tested with SPI bus 0, but should work
+ *        equally well with other busses. The ESP8266 has bus 0 and 1,
+ *        newer chips may have more one day.
  */
 SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits) {
   if (mosi_bits>(64*8))
@@ -176,3 +182,5 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   }
   return rc;
 }
+
+} // namespace experimental
