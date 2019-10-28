@@ -63,7 +63,6 @@ void SPISlaveClass::_s_status_tx(void *arg)
 {
     reinterpret_cast<SPISlaveClass*>(arg)->_status_tx();
 }
-
 void SPISlaveClass::begin()
 {
     hspi_slave_onData(&_s_data_rx);
@@ -72,7 +71,6 @@ void SPISlaveClass::begin()
     hspi_slave_onStatusSent(&_s_status_tx);
     hspi_slave_begin(4, this);
 }
-  
 void SPISlaveClass::begin(uint8_t statusLength)
 {
     hspi_slave_onData(&_s_data_rx);
