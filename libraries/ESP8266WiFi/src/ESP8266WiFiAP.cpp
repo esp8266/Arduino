@@ -37,6 +37,7 @@ extern "C" {
 
 #include "debug.h"
 
+#include "lwIPDhcpServer.h"
 
 
 // -----------------------------------------------------------------------------------------------------------------------
@@ -237,19 +238,19 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    if(!wifi_softap_set_dhcps_lease(&dhcp_lease)) {
+    if(!dhcpSoftAP.set_dhcps_lease(&dhcp_lease)) {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
     }
 
     // set lease time to 720min --> 12h
-    if(!wifi_softap_set_dhcps_lease_time(720)) {
+    if(!dhcpSoftAP.set_dhcps_lease_time(720)) {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
         ret = false;
     }
 
     uint8 mode = info.gw.addr ? 1 : 0;
-    if(!wifi_softap_set_dhcps_offer_option(OFFER_ROUTER, &mode)) {
+    if(!dhcpSoftAP.set_dhcps_offer_option(OFFER_ROUTER, &mode)) {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
         ret = false;
     }
