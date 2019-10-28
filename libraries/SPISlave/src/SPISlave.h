@@ -51,6 +51,7 @@ public:
         , _status_sent_cb(NULL)
     {}
     ~SPISlaveClass() {}
+    void begin();
     void begin(uint8_t statusLength = 4);
     void end();
     void setData(uint8_t * data, size_t len);
