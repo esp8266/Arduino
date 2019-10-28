@@ -86,7 +86,7 @@ bool schedule_function(const std::function<void(void)>& fn)
 }
 
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, std::function<bool(void)> alarm)
+    uint32_t repeat_us, const std::function<bool(void)>& alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -98,7 +98,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
         return false;
 
     item->mFunc = fn;
-    item->alarm = std::move(alarm);
+    item->alarm = alarm;
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 

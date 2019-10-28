@@ -61,7 +61,7 @@ void run_scheduled_functions();
 // * If alarm is used, anytime during scheduling when it returns true,
 //   any remaining delay from repeat_us is disregarded, and fn is executed.
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, std::function<bool(void)> alarm = nullptr);
+    uint32_t repeat_us, const std::function<bool(void)>& alarm = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
