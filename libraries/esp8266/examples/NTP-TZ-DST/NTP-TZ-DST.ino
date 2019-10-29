@@ -130,6 +130,25 @@ void showTime() {
   Serial.print("ctime:     ");
   Serial.print(ctime(&now));
 
+#if LWIP_VERSION_MAJOR > 1
+  // LwIP v2 is able to list more details about the currently configured SNTP servers
+  for (int i = 0; i < SNTP_MAX_SERVERS; i++) {
+    IPAddress sntp = *sntp_getserver(i);
+    const char* name = sntp_getservername(i);
+    if (sntp.isSet()) {
+      Serial.printf("sntp%d:     ", i);
+      if (name) {
+        Serial.printf("%s (%s) ", name, sntp.toString().c_str());
+      } else {
+        Serial.printf("%s ", sntp.toString().c_str());
+      }
+      Serial.printf("IPv6: %s Reachability: %o\n",
+                    sntp.isV6() ? "Yes" : "No",
+                    sntp_getreachability(i));
+    }
+  }
+#endif
+
   Serial.println();
 }
 
