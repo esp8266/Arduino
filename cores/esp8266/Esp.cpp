@@ -533,14 +533,12 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _FS_start;
-
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
