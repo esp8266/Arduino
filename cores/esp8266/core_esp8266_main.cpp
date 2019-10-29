@@ -304,6 +304,16 @@ extern "C" void preinit (void)
     /* do nothing by default */
 }
 
+#if AUTOFLASHSIZE
+#include "flash_hal.h"
+extern "C" void flashinit (void);
+uintptr_t EEPROM_start;
+uintptr_t FS_start;
+uintptr_t FS_end;
+uint16_t FS_page;
+uint16_t FS_block;
+#endif
+
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
@@ -316,6 +326,9 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
+#if AUTOFLASHSIZE
+    flashinit();
+#endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,

@@ -363,7 +363,7 @@ boards = collections.OrderedDict([
                   '',
                   'Product page: https://xinabox.cc/products/CW01'
                   ],
-    }),  
+    }),
     ( 'espresso_lite_v1', {
         'name': 'ESPresso Lite 1.0',
         'opts': {
@@ -589,7 +589,7 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'serial': '921',
-        'desc': [ 
+        'desc': [
             'Parameters in Arduino IDE:',
             '~~~~~~~~~~~~~~~~~~~~~~~~~~',
             '',
@@ -944,7 +944,7 @@ macros = {
     'resetmethod_nodemcu': collections.OrderedDict([
         ( '.upload.resetmethod', 'nodemcu' ),
         ]),
-    
+
     'resetmethod_none': collections.OrderedDict([
         ( '.upload.resetmethod', 'none' ),
         ]),
@@ -952,7 +952,7 @@ macros = {
     'resetmethod_dtrset': collections.OrderedDict([
         ( '.upload.resetmethod', 'dtrset' ),
         ]),
-    
+
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1173,7 +1173,7 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_map (flashsize_kb, fs_kb = 0):
+def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
 
     # mapping:
     # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
@@ -1251,6 +1251,16 @@ def flash_map (flashsize_kb, fs_kb = 0):
         else:
             page = 0x100
 
+        if not conf_name == '':
+            if not conf_name in c_flash_map:
+                c_flash_map[conf_name] = collections.OrderedDict([])
+            c_flash_map[conf_name][flashsize_kb] = \
+                  hex(spi + eeprom_start) + ', ' \
+                + hex(spi + fs_start) + ', ' \
+                + hex(spi + fs_end) + ', ' \
+                + hex(fs_blocksize)+ ', ' \
+                + hex(page) + ', ' \
+
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
         empty_size = fs_start - max_upload_size
@@ -1269,15 +1279,15 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start))
-        print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _FS_start = 0x%08X );" % (spi + fs_start))
+        print("PROVIDE ( _FS_end = 0x%08X );" % (spi + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
-        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
+        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (spi + eeprom_start))
         # Re-add deprecated symbols pointing to the same address as the new standard ones
         print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
-        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + fs_start))
-        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (spi + fs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (spi + fs_end))
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
@@ -1298,44 +1308,92 @@ def all_flash_map ():
     f8m  = collections.OrderedDict([])
     f16m = collections.OrderedDict([])
 
-    #                      flash(KB) spiffs(KB)
+    global c_flash_map
+    c_flash_map = collections.OrderedDict([])
 
-    f1m.update( flash_map(    1024,      64 ))
+    #                      flash(KB) spiffs(KB) confname(C)
+
+    f1m.update( flash_map(    1024,      64, 'OTA_FS' ))
     f1m.update( flash_map(    1024,     128 ))
     f1m.update( flash_map(    1024,     144 ))
     f1m.update( flash_map(    1024,     160 ))
     f1m.update( flash_map(    1024,     192 ))
     f1m.update( flash_map(    1024,     256 ))
-    f1m.update( flash_map(    1024,     512 ))
-    f1m.update( flash_map(    1024))
+    f1m.update( flash_map(    1024,     512, 'MAX_FS' ))
+    f1m.update( flash_map(    1024,       0, 'NO_FS' ))
 
-    f2m.update( flash_map(  2*1024,      64 ))
+    f2m.update( flash_map(  2*1024,      64, 'OTA_FS' ))
     f2m.update( flash_map(  2*1024,     128 ))
     f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
-    f2m.update( flash_map(  2*1024,    1024 ))
-    f2m.update( flash_map(  2*1024))
+    f2m.update( flash_map(  2*1024,    1024, 'MAX_FS' ))
+    f2m.update( flash_map(  2*1024,       0, 'NO_FS' ))
 
-    f4m.update( flash_map(  4*1024,  2*1024 ))
+    f4m.update( flash_map(  4*1024,  2*1024, 'OTA_FS' ))
     f4m.update( flash_map(  4*1024,  3*1024 ))
-    f4m.update( flash_map(  4*1024,    1024 ))
-    f4m.update( flash_map(  4*1024))
+    f4m.update( flash_map(  4*1024,    1024, 'MAX_FS' ))
+    f4m.update( flash_map(  4*1024,       0, 'NO_FS' ))
 
-    f8m.update( flash_map(  8*1024,  6*1024 ))
-    f8m.update( flash_map(  8*1024,  7*1024 ))
+    f8m.update( flash_map(  8*1024,  6*1024, 'OTA_FS' ))
+    f8m.update( flash_map(  8*1024,  7*1024, 'MAX_FS' ))
+    f8m.update( flash_map(  8*1024,       0, 'NO_FS' ))
 
-    f16m.update(flash_map( 16*1024, 14*1024 ))
-    f16m.update(flash_map( 16*1024, 15*1024 ))
+    f16m.update(flash_map( 16*1024, 14*1024, 'OTA_FS' ))
+    f16m.update(flash_map( 16*1024, 15*1024, 'MAX_FS' ))
 
-    f512.update(flash_map(     512,      32 ))
+    f512.update(flash_map(     512,      32, 'OTA_FS' ))
     f512.update(flash_map(     512,      64 ))
-    f512.update(flash_map(     512,     128 ))
-    f512.update(flash_map(     512))
+    f512.update(flash_map(     512,     128, 'MAX_FS' ))
+    f512.update(flash_map(     512,       0, 'NO_FS' ))
 
     if ldgen:
         print("generated: ldscripts (in %s)" % lddir)
 
+    if ldshow:
+        if ldgen:
+            realstdout = sys.stdout
+            sys.stdout = open('cores/esp8266/FlashMap.h', 'w')
+
+        define = '\n'
+        define += '// - do not edit - autogenerated by boards.txt.py\n'
+        define += '\n'
+        define += '#ifndef __FLASH_MAP_H\n'
+        define += '#define __FLASH_MAP_H\n'
+        define += '\n'
+        define += '#include <stdint.h>\n';
+        define += '#include <stddef.h>\n';
+        define += '\n'
+        define += 'typedef struct\n';
+        define += '{\n';
+        define += '    uint32_t eeprom_start;\n';
+        define += '    uint32_t fs_start;\n';
+        define += '    uint32_t fs_end;\n';
+        define += '    uint16_t fs_block_size;\n';
+        define += '    uint16_t fs_page_size;\n';
+        define += '    uint16_t flash_size_kb;\n';
+        define += '} flash_map_s;\n';
+        for i in c_flash_map:
+            define += '\n#define FLASH_MAP_' + i + ' \\\n    { \\\n'
+            for d in c_flash_map[i]:
+                define += '        { ' + c_flash_map[i][d] + str(d) + ' }, \\\n'
+            define += '    }\n'
+        define += '\n#endif // __FLASH_MAP_H\n'
+
+        print(define)
+
+        if ldgen:
+            sys.stdout.close()
+            sys.stdout = realstdout
+            print("generated: flash map config file (in cores/esp8266/FlashMap.h)")
+
     return {
+        'autoflash': {
+            '.menu.eesz.autoflash': 'Mapping defined by Hardware and Sketch',
+            '.menu.eesz.autoflash.build.flash_size': '16M',
+            '.menu.eesz.autoflash.build.flash_ld': 'eagle.flash.auto.ld',
+            '.menu.eesz.autoflash.build.extra_flags': '-DAUTOFLASHSIZE=1',
+            '.menu.eesz.autoflash.upload.maximum_size': '1044464',
+        },
         '512K': f512,
           '1M':  f1m,
           '2M':  f2m,
@@ -1453,6 +1511,8 @@ def all_boards ():
         else:
             macrolist += speeds[default_speed]
 
+        macrolist += [ 'autoflash' ]
+
         for block in macrolist:
             for optname in macros[block]:
                 if not ('opts' in board) or not (optname in board['opts']):
@@ -1490,7 +1550,7 @@ def package ():
     substitution = '"boards": [\n'
     board_items = ['            {\n              "name": "%s"\n            }' % boards[id]['name']
                     for id in boards]
-    substitution += ',\n'.join(board_items)        
+    substitution += ',\n'.join(board_items)
     substitution += '\n          ],'
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
