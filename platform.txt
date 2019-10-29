@@ -10,11 +10,12 @@ version=2.6.0-dev
 
 # These will be removed by the packager script when doing a JSON release
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
-runtime.tools.python.path={runtime.platform.path}/tools/python
+runtime.tools.python3.path={runtime.platform.path}/tools/python3
 
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
 runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
+runtime.tools.sizes={runtime.platform.path}/tools/sizes.py
 runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 
@@ -34,10 +35,11 @@ build.sslflags=
 
 build.exception_flags=-fno-exceptions
 build.stdcpp_lib=-lstdc++
+build.stdcpp_level=-std=gnu++11
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
-build.sdk=NONOSDK221
+build.sdk=NONOSDK22x_190703
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
@@ -57,7 +59,7 @@ compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lhal -lphy -lpp -lnet80211 {build.lwip_lib} -lwpa -lcrypto -lmain -lwps -lbearssl -laxtls -lespnow -lsmartconfig -lairkiss -lwpa2 {build.stdcpp_lib} -lm -lc -lgcc
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c {compiler.warning_flags} -Os -g -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 -std=c++11 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags}
+compiler.cpp.flags=-c {compiler.warning_flags} -Os -g -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags}
 
 compiler.as.cmd=xtensa-lx106-elf-as
 
@@ -82,9 +84,10 @@ compiler.objcopy.eep.extra_flags=
 compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
-## needs bash, git, and echo
-recipe.hooks.core.prebuild.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
-recipe.hooks.core.prebuild.2.pattern="{runtime.tools.python.path}/python" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
+## needs git
+recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+# This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
+recipe.hooks.prebuild.10.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
 
 ## Build the app.ld linker file
 recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
@@ -108,8 +111,9 @@ recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-recipe.objcopy.hex.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
-recipe.objcopy.hex.2.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed"
+recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
+recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
@@ -125,15 +129,16 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 tools.esptool.path=
 # Because the variable expansion doesn't allow one tool to find another, the following lines
-# will point to "{runtime.platform.path}/tools/python/python" in GIT and
-# "{runtime.tools.python.path}/python" for JSON board manager releases.
-#tools.esptool.cmd={runtime.tools.python.path}/python
-#tools.esptool.network_cmd={runtime.tools.python.path}/python
-tools.esptool.cmd={runtime.platform.path}/tools/python/python
-tools.esptool.network_cmd={runtime.platform.path}/tools/python/python
+# will point to "{runtime.platform.path}/tools/python3/python3" in GIT and
+# "{runtime.tools.python3.path}/python3" for JSON board manager releases.
+#tools.esptool.cmd={runtime.tools.python3.path}/python3
+#tools.esptool.network_cmd={runtime.tools.python3.path}/python3
+tools.esptool.cmd={runtime.platform.path}/tools/python3/python3
+tools.esptool.network_cmd={runtime.platform.path}/tools/python3/python3
 
 tools.esptool.upload.protocol=esp
-tools.esptool.upload.params.verbose=--trace
+# esptool.py --trace option is a debug option, not a verbose option
+tools.esptool.upload.params.verbose=
 tools.esptool.upload.params.quiet=
 
 # First, potentially perform an erase or nothing
@@ -146,3 +151,7 @@ tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/to
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
 tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
+
+tools.mklittlefs.cmd=mklittlefs
+tools.mklittlefs.cmd.windows=mklittlefs.exe
+tools.mklittlefs.path={runtime.platform.path}/tools/mklittlefs

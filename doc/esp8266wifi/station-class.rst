@@ -254,6 +254,7 @@ Function returns one of the following connection statuses:
 - ``WL_CONNECT_FAILED`` if password is incorrect 
 - ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
 - ``WL_DISCONNECTED`` if module is not configured in station mode
+- ``-1`` on timeout
 
 Configuration
 ~~~~~~~~~~~~~

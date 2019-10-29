@@ -55,6 +55,11 @@ void setup()
   BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 void test_setup()
 {
   Serial.begin(BAUD);

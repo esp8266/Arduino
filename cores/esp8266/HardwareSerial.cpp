@@ -60,6 +60,15 @@ void HardwareSerial::end()
     _uart = NULL;
 }
 
+void HardwareSerial::updateBaudRate(unsigned long baud)
+{
+    if(!_uart) {
+        return;
+    }
+
+    uart_set_baudrate(_uart, baud);
+}
+
 size_t HardwareSerial::setRxBufferSize(size_t size){
     if(_uart) {
         _rx_size = uart_resize_rx_buffer(_uart, size);
@@ -99,14 +108,16 @@ int HardwareSerial::available(void)
 
 void HardwareSerial::flush()
 {
+    uint8_t bit_length = 0;
     if(!_uart || !uart_tx_enabled(_uart)) {
         return;
     }
 
+    bit_length = uart_get_bit_length(_uart_nr); // data width, parity and stop
     uart_wait_tx_empty(_uart);
     //Workaround for a bug in serial not actually being finished yet
     //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
-    delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
+    delayMicroseconds(bit_length * 1000000 / uart_get_baudrate(_uart) + 1);
 }
 
 void HardwareSerial::startDetectBaudrate()
@@ -121,15 +132,15 @@ unsigned long HardwareSerial::testBaudrate()
 
 unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
-    time_t startMillis = millis();
+    esp8266::polledTimeout::oneShotFastMs timeOut(timeoutMillis);
     unsigned long detectedBaudrate;
-    while ((time_t) millis() - startMillis < timeoutMillis) {
+    while (!timeOut) {
         if ((detectedBaudrate = testBaudrate())) {
           break;
         }
         yield();
         delay(100);
-    }    
+    }
     return detectedBaudrate;
 }
 
