@@ -293,6 +293,9 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
+#if 1
+    return getFlashChipRealSize();
+#else
     uint32_t data;
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
@@ -300,6 +303,7 @@ uint32_t EspClass::getFlashChipSize(void)
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
     }
     return 0;
+#endif
 }
 
 uint32_t EspClass::getFlashChipSpeed(void)
@@ -325,6 +329,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
+#if 0
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)
@@ -345,6 +350,7 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
             return 0;
     }
 }
+#endif
 
 uint32_t EspClass::magicFlashChipSpeed(uint8_t byte) {
     switch(byte & 0x0F) {
