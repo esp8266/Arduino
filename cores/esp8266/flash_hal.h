@@ -32,13 +32,14 @@ extern "C" {
 #if AUTOFLASHSIZE
 
 //#warning auto flash size
-extern uintptr_t EEPROM_start;
-extern uintptr_t FS_start;
-extern uintptr_t FS_end;
+extern uint32_t EEPROM_start;
+extern uint32_t FS_start;
+extern uint32_t FS_end;
 extern uint16_t FS_page;
 extern uint16_t FS_block;
 
 #include <FlashMap.h>
+extern void flashinit(void);
 extern uint32_t spi_flash_get_id (void); // <user_interface.h>
 #define FLASHMAPCONFIG(conf) \
   { \
@@ -47,9 +48,9 @@ extern uint32_t spi_flash_get_id (void); // <user_interface.h>
     for (size_t i = 0; i < sizeof(flashdesc) / sizeof(flashdesc[0]); i++) \
       if (pgm_read_word(&flashdesc[i].flash_size_kb) == flash_chip_size_kb) \
       { \
-        EEPROM_start = (uintptr_t)pgm_read_dword(&flashdesc[i].eeprom_start); \
-        FS_start = (uintptr_t)pgm_read_dword(&flashdesc[i].fs_start); \
-        FS_end = (uintptr_t)pgm_read_dword(&flashdesc[i].fs_end); \
+        EEPROM_start = (uint32_t)pgm_read_dword(&flashdesc[i].eeprom_start); \
+        FS_start = (uint32_t)pgm_read_dword(&flashdesc[i].fs_start); \
+        FS_end = (uint32_t)pgm_read_dword(&flashdesc[i].fs_end); \
         FS_block = pgm_read_word(&flashdesc[i].fs_block_size); \
         FS_page = pgm_read_word(&flashdesc[i].fs_page_size); \
       } \
@@ -58,23 +59,23 @@ extern uint32_t spi_flash_get_id (void); // <user_interface.h>
 #else // !AUTOFLASHSIZE
 
 //#warning no auto flash size
-extern "C" uint32_t _FS_start;
-extern "C" uint32_t _FS_end;
-extern "C" uint32_t _FS_page;
-extern "C" uint32_t _FS_block;
+extern uint32_t _FS_start;
+extern uint32_t _FS_end;
+extern uint32_t _FS_page;
+extern uint32_t _FS_block;
 extern uint32_t _EEPROM_start;
-#define EEPROM_start ((uintptr_t)&_EEPROM_start)
-#define FS_start ((uintptr_t)&_FS_start)
-#define FS_end ((uintptr_t)&_FS_end)
-#define FS_page ((uintptr_t)&_FS_page)
-#define FS_block ((uintptr_t)&_FS_block)
+#define EEPROM_start ((uint32_t)&_EEPROM_start)
+#define FS_start ((uint32_t)&_FS_start)
+#define FS_end ((uint32_t)&_FS_end)
+#define FS_page ((uint32_t)&_FS_page)
+#define FS_block ((uint32_t)&_FS_block)
 
 #endif // AUTOFLASHSIZE
 
-#define FS_PHYS_ADDR ((uint32_t) (FS_start) - 0x40200000)
-#define FS_PHYS_SIZE ((uint32_t) (FS_end) - (uint32_t) (FS_start))
-#define FS_PHYS_PAGE ((uint32_t) FS_page)
-#define FS_PHYS_BLOCK ((uint32_t) FS_block)
+#define FS_PHYS_ADDR ((uint32_t)FS_start - 0x40200000)
+#define FS_PHYS_SIZE ((uint32_t)(FS_end - FS_start))
+#define FS_PHYS_PAGE ((uint32_t)FS_page)
+#define FS_PHYS_BLOCK ((uint32_t)FS_block)
 
 // Return values of the following functions
 #define FLASH_HAL_OK          (0)

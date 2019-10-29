@@ -307,9 +307,9 @@ extern "C" void preinit (void)
 #if AUTOFLASHSIZE
 #include "flash_hal.h"
 extern "C" void flashinit (void);
-uintptr_t EEPROM_start;
-uintptr_t FS_start;
-uintptr_t FS_end;
+uint32_t EEPROM_start;
+uint32_t FS_start;
+uint32_t FS_end;
 uint16_t FS_page;
 uint16_t FS_block;
 #endif

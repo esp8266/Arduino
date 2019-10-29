@@ -199,7 +199,9 @@ void attachInterrupt(uint8_t pin, void (*)(void), int mode);
 void detachInterrupt(uint8_t pin);
 void attachInterruptArg(uint8_t pin, void (*)(void*), void* arg, int mode);
 
-void flashinit(void);
+#if AUTOFLASHSIZE
+#include <flash_hal.h>
+#endif
 void preinit(void);
 void setup(void);
 void loop(void);
