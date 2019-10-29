@@ -26,6 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
+#include "flash_hal.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -293,7 +294,7 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
-#if 1
+#if AUTOFLASHSIZE
     return getFlashChipRealSize();
 #else
     uint32_t data;
@@ -329,7 +330,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
-#if 0
+#if !AUTOFLASHSIZE
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)
