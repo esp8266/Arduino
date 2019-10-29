@@ -39,6 +39,26 @@ extern "C" {
 
 using namespace fs;
 
+// The following are deprecated symbols and functions, to be removed at the next major release.
+// They are provided only for backwards compatibility and to give libs a chance to update.
+
+extern "C" uint32_t _SPIFFS_start __attribute__((deprecated));
+extern "C" uint32_t _SPIFFS_end __attribute__((deprecated));
+extern "C" uint32_t _SPIFFS_page __attribute__((deprecated));
+extern "C" uint32_t _SPIFFS_block __attribute__((deprecated));
+
+#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
+#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
+#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
+#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+
+extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) __attribute__((deprecated));
+extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) __attribute__((deprecated));
+extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) __attribute__((deprecated));
+
+
+
+
 namespace spiffs_impl {
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
@@ -151,11 +171,6 @@ public:
 
     bool begin() override
     {
-#if defined(ARDUINO) && !defined(CORE_MOCK)
-        if (&_FS_end <= &_FS_start)
-            return false;
-#endif
-
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
