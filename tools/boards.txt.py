@@ -1320,31 +1320,32 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     192 ))
     f1m.update( flash_map(    1024,     256 ))
     f1m.update( flash_map(    1024,     512, 'MAX_FS' ))
-    f1m.update( flash_map(    1024,       0, 'NO_FS' ))
+    f1m.update( flash_map(    1024,       0, 'NO_FS'  ))
 
     f2m.update( flash_map(  2*1024,      64, 'OTA_FS' ))
     f2m.update( flash_map(  2*1024,     128 ))
     f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
     f2m.update( flash_map(  2*1024,    1024, 'MAX_FS' ))
-    f2m.update( flash_map(  2*1024,       0, 'NO_FS' ))
+    f2m.update( flash_map(  2*1024,       0, 'NO_FS'  ))
 
     f4m.update( flash_map(  4*1024,  2*1024, 'OTA_FS' ))
     f4m.update( flash_map(  4*1024,  3*1024 ))
     f4m.update( flash_map(  4*1024,    1024, 'MAX_FS' ))
-    f4m.update( flash_map(  4*1024,       0, 'NO_FS' ))
+    f4m.update( flash_map(  4*1024,       0, 'NO_FS'  ))
 
     f8m.update( flash_map(  8*1024,  6*1024, 'OTA_FS' ))
     f8m.update( flash_map(  8*1024,  7*1024, 'MAX_FS' ))
-    f8m.update( flash_map(  8*1024,       0, 'NO_FS' ))
+    f8m.update( flash_map(  8*1024,       0, 'NO_FS'  ))
 
     f16m.update(flash_map( 16*1024, 14*1024, 'OTA_FS' ))
     f16m.update(flash_map( 16*1024, 15*1024, 'MAX_FS' ))
+    f16m.update(flash_map( 16*1024,       0, 'NO_FS'  ))
 
     f512.update(flash_map(     512,      32, 'OTA_FS' ))
     f512.update(flash_map(     512,      64 ))
     f512.update(flash_map(     512,     128, 'MAX_FS' ))
-    f512.update(flash_map(     512,       0, 'NO_FS' ))
+    f512.update(flash_map(     512,       0, 'NO_FS'  ))
 
     if ldgen:
         print("generated: ldscripts (in %s)" % lddir)
