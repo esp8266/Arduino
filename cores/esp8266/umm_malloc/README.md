@@ -113,7 +113,7 @@ embedded system, this can get pretty expensive as each pointer can use
 up to 32 bits.
 
 In most embedded systems there is no need for managing a large quantity
-of memory block dynamically, so a full 32 bit pointer based data structure
+of memory blocks dynamically, so a full 32 bit pointer based data structure
 for the free and used block lists is wasteful. A block of memory on
 the free list would use 16 bytes just for the pointers!
 

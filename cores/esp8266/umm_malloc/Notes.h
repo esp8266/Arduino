@@ -129,7 +129,7 @@ umm_malloc_cfg.h.
 Notes from searching for the best print option
 
 Printing from the malloc routines is tricky. Since a print library
-might call *alloc. Then recusion may follow as each error call may fail
+might call *alloc. Then recursion may follow as each error call may fail
 into another error and so on.
 
 Objective:  To be able to print "last gasp" diagnostic messages
@@ -188,6 +188,7 @@ Knowns:
   is performed by calling uart_buff_switch with 0 for UART0 and 1 for UART1.
   This should work for our purpose here, if handled as follows:
   * call uart_buff_switch at each printf call to reselect UART
+    * Update: uart_buff_switch is now updated by uart_set_debug() in uart.cpp
   * use a stack buffer to hold a copy the PROGMEM string to print from.
   * use ets_vprintf for printing with putc1 function.
 * os_printf_plus looks interesting. It is in IRAM. If no heap is available it
@@ -196,7 +197,7 @@ Knowns:
   * Printing is turned off by system_set_os_print
   * putc1 needs to be in IRAM - this is a uart.cpp issue
   * Need to force system_get_free_heap_size to return 0 during critical periods.
-  * won't work for umm_info it prints over 64 characters.
+  * won't work for umm_info if it prints over 64 characters.
   * along with umm_info there are other debug messages that exceed 64 characters.
 * ets_uart_printf - Appears safe. Just no PROGMEM support. Uses
   uart_buff_switch to select UART.
