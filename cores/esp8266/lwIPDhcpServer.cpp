@@ -356,10 +356,10 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 
     *optptr++ = DHCP_OPTION_SUBNET_MASK;
     *optptr++ = 4;
-    *optptr++ = ip4_addr1(&if_ip.netmask);
-    *optptr++ = ip4_addr2(&if_ip.netmask);
-    *optptr++ = ip4_addr3(&if_ip.netmask);
-    *optptr++ = ip4_addr4(&if_ip.netmask);
+    *optptr++ = ip4_addr1(ip_2_ip4(&if_ip.netmask));
+    *optptr++ = ip4_addr2(ip_2_ip4(&if_ip.netmask));
+    *optptr++ = ip4_addr3(ip_2_ip4(&if_ip.netmask));
+    *optptr++ = ip4_addr4(ip_2_ip4(&if_ip.netmask));
 
     *optptr++ = DHCP_OPTION_LEASE_TIME;
     *optptr++ = 4;
@@ -370,19 +370,19 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 
     *optptr++ = DHCP_OPTION_SERVER_ID;
     *optptr++ = 4;
-    *optptr++ = ip4_addr1(&ipadd);
-    *optptr++ = ip4_addr2(&ipadd);
-    *optptr++ = ip4_addr3(&ipadd);
-    *optptr++ = ip4_addr4(&ipadd);
+    *optptr++ = ip4_addr1(ip_2_ip4(&ipadd));
+    *optptr++ = ip4_addr2(ip_2_ip4(&ipadd));
+    *optptr++ = ip4_addr3(ip_2_ip4(&ipadd));
+    *optptr++ = ip4_addr4(ip_2_ip4(&ipadd));
 
     if (dhcps_router_enabled(offer) && ip_2_ip4(&if_ip.gw)->addr)
     {
         *optptr++ = DHCP_OPTION_ROUTER;
         *optptr++ = 4;
-        *optptr++ = ip4_addr1(&if_ip.gw);
-        *optptr++ = ip4_addr2(&if_ip.gw);
-        *optptr++ = ip4_addr3(&if_ip.gw);
-        *optptr++ = ip4_addr4(&if_ip.gw);
+        *optptr++ = ip4_addr1(ip_2_ip4(&if_ip.gw));
+        *optptr++ = ip4_addr2(ip_2_ip4(&if_ip.gw));
+        *optptr++ = ip4_addr3(ip_2_ip4(&if_ip.gw));
+        *optptr++ = ip4_addr4(ip_2_ip4(&if_ip.gw));
     }
 
 #ifdef USE_DNS
@@ -390,26 +390,26 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
     *optptr++ = 4;
     if (dns_address.addr == 0)
     {
-        *optptr++ = ip4_addr1(&ipadd);
-        *optptr++ = ip4_addr2(&ipadd);
-        *optptr++ = ip4_addr3(&ipadd);
-        *optptr++ = ip4_addr4(&ipadd);
+        *optptr++ = ip4_addr1(ip_2_ip4(&ipadd));
+        *optptr++ = ip4_addr2(ip_2_ip4(&ipadd));
+        *optptr++ = ip4_addr3(ip_2_ip4(&ipadd));
+        *optptr++ = ip4_addr4(ip_2_ip4(&ipadd));
     }
     else
     {
         *optptr++ = ip4_addr1(&dns_address);
-        *optptr++ = ip4_addr2(&dns_address);;
-        *optptr++ = ip4_addr3(&dns_address);;
-        *optptr++ = ip4_addr4(&dns_address);;
+        *optptr++ = ip4_addr2(&dns_address);
+        *optptr++ = ip4_addr3(&dns_address);
+        *optptr++ = ip4_addr4(&dns_address);
     }
 #endif
 
     *optptr++ = DHCP_OPTION_BROADCAST_ADDRESS;
     *optptr++ = 4;
     // XXXFIXME do better than that, we have netmask
-    *optptr++ = ip4_addr1(&ipadd);
-    *optptr++ = ip4_addr2(&ipadd);
-    *optptr++ = ip4_addr3(&ipadd);
+    *optptr++ = ip4_addr1(ip_2_ip4(&ipadd));
+    *optptr++ = ip4_addr2(ip_2_ip4(&ipadd));
+    *optptr++ = ip4_addr3(ip_2_ip4(&ipadd));
     *optptr++ = 255;
 
     *optptr++ = DHCP_OPTION_INTERFACE_MTU;
