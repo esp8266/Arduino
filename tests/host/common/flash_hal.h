@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+#define FLASH_HAL_OK          (0)
+#define FLASH_HAL_READ_ERROR  (-1)
+#define FLASH_HAL_WRITE_ERROR (-2)
+#define FLASH_HAL_ERASE_ERROR (-3)
+
+#define FS_start 0
+#define FS_end 0
+
 extern "C"
 {
 
