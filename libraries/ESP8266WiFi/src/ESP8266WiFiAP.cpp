@@ -157,6 +157,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
+#if 0
     if(wifi_softap_dhcps_status() != DHCP_STARTED) {
         DEBUG_WIFI("[AP] DHCP not started, starting...\n");
         if(!wifi_softap_dhcps_start()) {
@@ -164,6 +165,9 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
             ret = false;
         }
     }
+#endif
+
+    dhcpSoftAP.end();
 
     // check IP config
     struct ip_info ip;
@@ -182,6 +186,8 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         DEBUG_WIFI("[AP] wifi_get_ip_info failed!\n");
         ret = false;
     }
+
+    dhcpSoftAP.begin(&ip);
 
     return ret;
 }

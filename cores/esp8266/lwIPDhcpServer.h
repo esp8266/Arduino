@@ -35,6 +35,8 @@ public:
     bool reset_dhcps_lease_time(void);
     uint32 get_dhcps_lease_time(void);
 
+    void dhcps_set_dns(int num, const ipv4_addr_t* dns);
+
 protected:
 
     // legacy C structure and API to eventually turn into C++
@@ -44,7 +46,6 @@ protected:
         struct _list_node *pnext;
     } list_node;
 
-    void dhcps_set_dns(int num, const ipv4_addr_t* dns);
     void node_insert_to_list(list_node **phead, list_node* pinsert);
     void node_remove_from_list(list_node **phead, list_node* pdelete);
     bool add_dhcps_lease(uint8 *macaddr);
