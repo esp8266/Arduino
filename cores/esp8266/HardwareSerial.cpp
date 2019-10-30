@@ -66,7 +66,7 @@ void HardwareSerial::updateBaudRate(unsigned long baud)
         return;
     }
 
-    uart_set_baudrate(_uart, baud);    
+    uart_set_baudrate(_uart, baud);
 }
 
 size_t HardwareSerial::setRxBufferSize(size_t size){
@@ -140,7 +140,7 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
         }
         yield();
         delay(100);
-    }    
+    }
     return detectedBaudrate;
 }
 
