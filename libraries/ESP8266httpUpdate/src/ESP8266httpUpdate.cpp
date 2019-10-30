@@ -25,6 +25,7 @@
 
 #include "ESP8266httpUpdate.h"
 #include <StreamString.h>
+#include <flash_hal.h>
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
         : _httpClientTimeout(8000), _followRedirects(false), _ledPin(-1)
