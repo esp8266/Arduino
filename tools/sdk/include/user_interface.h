@@ -382,6 +382,9 @@ void wifi_softap_free_station_info(void);
 bool wifi_softap_dhcps_start(void);
 bool wifi_softap_dhcps_stop(void);
 
+#if 0
+// these functions are open-source, in dhcp server,
+// which is now moved to lwIPDhcpServer.cpp
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
 bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
 uint32 wifi_softap_get_dhcps_lease_time(void);
@@ -389,6 +392,7 @@ bool wifi_softap_set_dhcps_lease_time(uint32 minute);
 bool wifi_softap_reset_dhcps_lease_time(void);
 
 bool wifi_softap_add_dhcps_lease(uint8 *macaddr);	// add static lease on the list, this will be the next available @
+#endif
 
 enum dhcp_status wifi_softap_dhcps_status(void);
 bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);

@@ -34,6 +34,7 @@ public:
     bool set_dhcps_lease_time(uint32 minute);
     bool reset_dhcps_lease_time(void);
     uint32 get_dhcps_lease_time(void);
+    bool add_dhcps_lease(uint8 *macaddr);
 
     void dhcps_set_dns(int num, const ipv4_addr_t* dns);
 
@@ -48,7 +49,6 @@ protected:
 
     void node_insert_to_list(list_node **phead, list_node* pinsert);
     void node_remove_from_list(list_node **phead, list_node* pdelete);
-    bool add_dhcps_lease(uint8 *macaddr);
     uint8_t* add_msg_type(uint8_t *optptr, uint8_t type);
     uint8_t* add_offer_options(uint8_t *optptr);
     uint8_t* add_end(uint8_t *optptr);
