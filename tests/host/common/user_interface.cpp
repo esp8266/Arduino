@@ -39,6 +39,49 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#include <lwIPDhcpServer.h>
+
+bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
+{
+    (void)please;
+    return false;
+}
+
+bool DhcpServer::set_dhcps_lease_time(uint32 minute)
+{
+    (void)minute;
+    return false;
+}
+
+bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
+{
+    (void)level;
+    (void)optarg;
+    return false;
+}
+
+void DhcpServer::end ()
+{
+}
+
+bool DhcpServer::begin (struct ip_info *info)
+{
+    (void)info;
+    return false;
+}
+
+DhcpServer::DhcpServer (netif* netif)
+{
+    (void)netif;
+}
+
+DhcpServer::~DhcpServer ()
+{
+    end();
+}
+
+DhcpServer dhcpSoftAP(nullptr);
+
 
 extern "C"
 {
