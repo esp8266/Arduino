@@ -38,7 +38,7 @@ extern "C" {
 
 #include "debug.h"
 
-#if LWIP_VESION_MAJOR > 1
+#if LWIP_VESION_MAJOR != 1
 #include "lwIPDhcpServer.h"
 #endif
 
