@@ -101,6 +101,10 @@ public:
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
+
+            if (!_fs.exists(path) && path.endsWith(".htm")) {
+                path += "l";
+            }
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
 
