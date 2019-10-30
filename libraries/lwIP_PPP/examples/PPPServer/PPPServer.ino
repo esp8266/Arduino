@@ -14,6 +14,8 @@
 // http://lwip.100.n7.nabble.com/PPP-proxy-arp-support-tp33286p33345.html
 // using NAT instead
 
+#if LWIP_FEATURES && !LWIP_IPV6
+
 #include <lwip/napt.h>
 #include <lwip/dns.h>
 #include <PPPServer.h>
@@ -89,6 +91,16 @@ void setup() {
   bool ret = ppp.begin(WiFi.localIP());
   logger.printf("ppp: %d\n", ret);
 }
+
+
+#else
+
+void setup() {
+  Serial.begin(115200);
+  Serial.printf("\n\nPPP/NAPT not supported in this configuration\n");
+}
+
+#endif
 
 void loop() {
 }
