@@ -22,7 +22,7 @@ PPPServer::PPPServer(Stream* sio): _sio(sio), _cb(netif_status_cb_s), _enabled(f
 
 bool PPPServer::handlePackets()
 {
-    int avail;
+    size_t avail;
     if ((avail = _sio->available()) > 0)
     {
         // XXX block peeking would be useful here
@@ -38,7 +38,8 @@ bool PPPServer::handlePackets()
 
 void PPPServer::link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx)
 {
-    //PPP* This = static_cast<PPP*>(ctx);
+    (void)ctx;
+
     netif* nif = ppp_netif(pcb);
 
     switch (err_code)
