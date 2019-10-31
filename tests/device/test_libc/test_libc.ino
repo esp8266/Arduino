@@ -9,6 +9,11 @@ void setup()
     BS_RUN(Serial);
 }
 
+bool pretest()
+{
+    return true;
+}
+
 extern "C" {
   extern void memmove_main(void);
   extern void memcpy_main(void);

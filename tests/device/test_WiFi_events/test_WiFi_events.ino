@@ -11,9 +11,14 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(false);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.mode(WIFI_OFF);
-    BS_RUN(Serial);
+    return true;
 }
 
 static std::map<WiFiEvent_t, int> sEventsReceived;
@@ -29,10 +34,13 @@ TEST_CASE("WiFi.onEvent is called for specific events", "[wifi][events]")
     sEventsReceived[WIFI_EVENT_STAMODE_DISCONNECTED] = 0;
     sEventsReceived[WIFI_EVENT_STAMODE_GOT_IP] = 0;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     WiFi.onEvent(onWiFiEvent, WIFI_EVENT_STAMODE_CONNECTED);
     WiFi.onEvent(onWiFiEvent, WIFI_EVENT_STAMODE_DISCONNECTED);
     WiFi.onEvent(onWiFiEvent, WIFI_EVENT_STAMODE_GOT_IP);
     WiFi.onEvent(onWiFiEvent, WIFI_EVENT_ANY);
+#pragma GCC diagnostic pop
 
     WiFi.mode(WIFI_STA);
     WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
@@ -44,9 +52,12 @@ TEST_CASE("WiFi.onEvent is called for specific events", "[wifi][events]")
     WiFi.disconnect();
     delay(100);
     WiFi.mode(WIFI_OFF);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     REQUIRE(sEventsReceived[WIFI_EVENT_STAMODE_CONNECTED] == 2);
     REQUIRE(sEventsReceived[WIFI_EVENT_STAMODE_DISCONNECTED] >= 2 && sEventsReceived[WIFI_EVENT_STAMODE_DISCONNECTED] % 2 == 0);
     REQUIRE(sEventsReceived[WIFI_EVENT_STAMODE_GOT_IP] == 2);
+#pragma GCC diagnostic pop
 }
 
 TEST_CASE("STA mode events are called both when using DHCP and static config", "[wifi][events]")
@@ -54,14 +65,17 @@ TEST_CASE("STA mode events are called both when using DHCP and static config", "
     String events;
     
     auto handler1 = WiFi.onStationModeConnected([&](const WiFiEventStationModeConnected& evt){
+        (void) evt;
         events += "connected,";
     });  
     auto handler2 = WiFi.onStationModeDisconnected([&](const WiFiEventStationModeDisconnected& evt){
+        (void) evt;
         if (events.length()) {
             events += "disconnected,";
         }
     });
     auto handler3 = WiFi.onStationModeGotIP([&](const WiFiEventStationModeGotIP& evt){
+        (void) evt;
         events += "got_ip,";
     });
 
@@ -104,12 +118,15 @@ TEST_CASE("Events are not called if handler is deleted", "[wifi][events]")
     String events;
     
     WiFi.onStationModeConnected([&](const WiFiEventStationModeConnected& evt){
+        (void) evt;
         events += "connected,";
     });  
     WiFi.onStationModeDisconnected([&](const WiFiEventStationModeDisconnected& evt){
+        (void) evt;
         events += "disconnected,";
     });
     WiFi.onStationModeGotIP([&](const WiFiEventStationModeGotIP& evt){
+        (void) evt;
         events += "got_ip,";
     });
 

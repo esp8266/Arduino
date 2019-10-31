@@ -48,7 +48,7 @@ void ICACHE_RAM_ATTR timer1_isr_init(){
     ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
 
-void timer1_attachInterrupt(timercallback userFunc) {
+void ICACHE_RAM_ATTR timer1_attachInterrupt(timercallback userFunc) {
     timer1_user_cb = userFunc;
     ETS_FRC1_INTR_ENABLE();
 }
@@ -59,7 +59,7 @@ void ICACHE_RAM_ATTR timer1_detachInterrupt() {
     ETS_FRC1_INTR_DISABLE();
 }
 
-void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
+void ICACHE_RAM_ATTR timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
     T1C = (1 << TCTE) | ((divider & 3) << TCPD) | ((int_type & 1) << TCIT) | ((reload & 1) << TCAR);
     T1I = 0;
 }
@@ -90,11 +90,11 @@ void ICACHE_RAM_ATTR timer0_isr_handler(void* para){
     }
 }
 
-void timer0_isr_init(){
+void ICACHE_RAM_ATTR timer0_isr_init(){
     ETS_CCOMPARE0_INTR_ATTACH(timer0_isr_handler, NULL);
 }
 
-void timer0_attachInterrupt(timercallback userFunc) {
+void ICACHE_RAM_ATTR timer0_attachInterrupt(timercallback userFunc) {
     timer0_user_cb = userFunc;
     ETS_CCOMPARE0_ENABLE();
 }

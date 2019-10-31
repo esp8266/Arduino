@@ -12,6 +12,7 @@ Prerequisites
 -  Arduino 1.6.8, get it from `Arduino
    website <https://www.arduino.cc/en/Main/OldSoftwareReleases#previous>`__.
 -  Internet connection
+-  Python 3 interpreter (Mac/Linux only, Windows installation supplies its own)
 
 Instructions
 ~~~~~~~~~~~~
@@ -43,13 +44,16 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python 2.7 (https://python.org)
+-  Python 3.x (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
+-  Uninstalling any core version installed via Board Manager
 
 Instructions - Windows 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- First, make sure you don't already have the ESP8266 library installed using the Board Manager (see above)
+- First, make sure you don't already have an ESP8266 core version installed 
+  using the Board Manager (see above). If you do, uninstall it from the 
+  Board Manager before proceeding.
 
 - Install git for Windows (if not already; see https://git-scm.com/download/win)
 
@@ -110,7 +114,7 @@ Instructions - Windows 10
    .. code:: bash
 
        cd esp8266/tools
-       python get.py
+       python3 get.py
 
 -  Restart Arduino
 
@@ -130,9 +134,14 @@ Note that you could, in theory install in ``C:\Program Files (x86)\Arduino\hardw
 Instructions - Other OS
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+-  First, make sure you don't already have an ESP8266 core version installed 
+   using the Board Manager (see above). If you do, uninstall it from the 
+   Board Manager before proceeding.
+
 -  Open the console and go to Arduino directory. This can be either your
    *sketchbook* directory (usually ``<Documents>/Arduino``), or the
    directory of Arduino application itself, the choice is up to you.
+
 -  Clone this repository into hardware/esp8266com/esp8266 directory.
    Alternatively, clone it elsewhere and create a symlink, if your OS
    supports them.
@@ -184,11 +193,35 @@ Instructions - Other OS
    .. code:: bash
 
        cd esp8266/tools
-       python get.py
+       python3 get.py
+
+   If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as
+   part of the default install).  To install you will need to use ``sudo yum install python3``, ``sudo apt install python3``, or ``brew install python3``
+   as appropriate.  On the Mac you may get an error message like:
+
+   .. code:: bash
+
+       python3 get.py
+       Platform: x86_64-apple-darwin
+       Downloading python3-macosx-placeholder.tar.gz
+       Traceback (most recent call last):
+         File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/urllib/request.py", line 1317, in do_open
+           encode_chunked=req.has_header('Transfer-encoding'))
+         ...
+         File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/ssl.py", line 1117, in do_handshake
+           self._sslobj.do_handshake()
+       ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1056)
+
+    This is because Homebrew on the Mac does not always install the required SSL certificates by default.  Install them manually (adjust the Python 3.7 as needed) with:
+
+    .. code:: bash
+
+        cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command"
+
 
 -  Restart Arduino
 
-- When later updating your local library, goto the esp8266 directory and do a git pull
+-  When later updating your local library, goto the esp8266 directory and do a git pull
 
    .. code:: bash
 

@@ -107,18 +107,23 @@ Here is an overview of the release process. See the section below for detailed i
 
 The following points assume work in a direct clone of the repository, and not in a personal fork.
 
-2. Update `version` to the release in platform.txt and commit. E.g. `2.5.0`. Make a PR, wait for Travis CI, and merge.
+2. Make a PR with the following, wait for Travis CI, and merge.
 
-3. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-betaN` for release candiate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
+   * platform.txt: update `version` to the release E.g. `3.0.0`,
+
+   * `cores/esp8266/TZ.h`: import the latest database with the following shell command:\
+     `$ cd tools; sh TZupdate.sh`.
+
+3. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `3.0.0`, or `X.Y.Z-betaN` for release candiate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
-   git tag -a -m "Release 2.5.0" 2.5.0
+   git tag -a -m "Release 3.0.0" 3.0.0
    ```
 
    then push the tag created in step 3 to esp8266/Arduino Github repository:
 
    ```
-   git push origin 2.5.0
+   git push origin 3.0.0
    ```
 
 4. In case something goes wrong, release can be canceled at any time:
@@ -141,7 +146,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 11. Create a commit to the master branch, updating:
 
-    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
+    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `3.1.0-dev`.
 
     * In main README.md:
 
