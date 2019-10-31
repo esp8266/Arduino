@@ -28,14 +28,14 @@ File root;
 
 void setup() {
   // Open serial communications and wait for port to open:
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(4)) {
+  if (!SD.begin(SS)) {
     Serial.println("initialization failed!");
     return;
   }
@@ -70,11 +70,13 @@ void printDirectory(File dir, int numTabs) {
     } else {
       // files have sizes, directories do not
       Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
+      Serial.print(entry.size(), DEC);
+      Serial.print("\t\t");
+      time_t ft = entry.getLastWrite();
+      struct tm *tm = localtime(&ft);
+      // US format.  Feel free to convert to your own locale...
+      Serial.printf("%02d-%02d-%02d %02d:%02d:%02d\n", tm->tm_mon + 1, tm->tm_mday, tm->tm_year % 100, tm->tm_hour, tm->tm_min, tm->tm_sec);
     }
     entry.close();
   }
 }
-
-
-
