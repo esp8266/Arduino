@@ -89,6 +89,11 @@ uint8_t *EncryptedConnectionData::getPeerApMac(uint8_t *resultArray) const
   return resultArray;
 }
 
+void EncryptedConnectionData::setPeerApMac(const uint8_t *peerApMac)
+{
+  std::copy_n(peerApMac, 6, _peerApMac);
+}
+
 bool EncryptedConnectionData::connectedTo(const uint8_t *peerMac) const
 {
   if(macEqual(peerMac, _peerStaMac) || macEqual(peerMac, _peerApMac))
@@ -146,10 +151,10 @@ bool EncryptedConnectionData::desync() const { return _desync; }
 
 String EncryptedConnectionData::serialize() const
 {
-  // Returns: {"connectionState":{"duration":"123","password":"abc","ownSessionKey":"1A2","peerSessionKey":"3B4","peerStaMac":"F2","peerApMac":"E3"}}
+  // Returns: {"connectionState":{"duration":"123","password":"abc","ownSK":"1A2","peerSK":"3B4","peerStaMac":"F2","peerApMac":"E3"}}
   
   return 
-  "{\"connectionState\":{"
+  JsonTranslator::jsonConnectionState
   + (temporary() ? JsonTranslator::jsonDuration + "\"" + String(temporary()->remainingDuration()) + "\"," : "")
   + JsonTranslator::jsonDesync + "\"" + String(desync()) + "\"," 
   + JsonTranslator::jsonOwnSessionKey + "\"" + uint64ToString(getOwnSessionKey()) + "\"," 

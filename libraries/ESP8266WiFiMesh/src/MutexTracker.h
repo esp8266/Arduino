@@ -34,6 +34,13 @@ class MutexTracker
 {
   public:
 
+    /*
+     * If captureBan is true, trying to capture a mutex will always fail. 
+     * Set to false by default.
+     * captureBan can be managed by MutexTracker like any other mutex.
+     */
+    static bool &captureBan();
+
     /**
     * Attempts to capture the mutex. Use the mutexCaptured() method to check success.
     */
@@ -56,6 +63,8 @@ class MutexTracker
     void releaseMutex();
 
   private:
+
+    static bool _captureBan;
 
     bool *_capturedMutex = nullptr;
     std::function<void()> _destructorHook = [](){ };

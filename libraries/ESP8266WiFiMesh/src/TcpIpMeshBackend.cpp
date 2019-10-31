@@ -30,6 +30,7 @@
 const IPAddress TcpIpMeshBackend::emptyIP = IPAddress();
 
 bool TcpIpMeshBackend::_tcpIpTransmissionMutex = false;
+bool TcpIpMeshBackend::_tcpIpConnectionQueueMutex = false;
 
 String TcpIpMeshBackend::lastSSID = "";
 bool TcpIpMeshBackend::staticIPActivated = false;
@@ -58,12 +59,28 @@ TcpIpMeshBackend::TcpIpMeshBackend(requestHandlerType requestHandler, responseHa
 
 std::vector<TcpIpNetworkInfo> & TcpIpMeshBackend::connectionQueue()
 {
+  MutexTracker connectionQueueMutexTracker(_tcpIpConnectionQueueMutex);
+  if(!connectionQueueMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! connectionQueue locked. Don't call connectionQueue() from callbacks other than NetworkFilter as this may corrupt program state!"); 
+  }
+  
+  return _connectionQueue;
+}
+
+const std::vector<TcpIpNetworkInfo> & TcpIpMeshBackend::constConnectionQueue()
+{  
   return _connectionQueue;
 }
 
 std::vector<TransmissionOutcome> & TcpIpMeshBackend::latestTransmissionOutcomes()
 {
   return _latestTransmissionOutcomes;
+}
+
+bool TcpIpMeshBackend::latestTransmissionSuccessful()
+{
+  return latestTransmissionSuccessfulBase(latestTransmissionOutcomes());
 }
 
 void TcpIpMeshBackend::begin()
@@ -433,7 +450,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
   if(WiFi.status() == WL_CONNECTED)
   {
     transmission_status_t transmissionResult = attemptDataTransfer();
-    latestTransmissionOutcomes().push_back(TransmissionOutcome(connectionQueue().back(), transmissionResult));
+    latestTransmissionOutcomes().push_back(TransmissionOutcome(constConnectionQueue().back(), transmissionResult));
   }
   else
   {
@@ -443,11 +460,22 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
       scanForNetworks(scanAllWiFiChannels);
     }
 
-    for(TcpIpNetworkInfo &currentNetwork : connectionQueue())
+    MutexTracker connectionQueueMutexTracker(_tcpIpConnectionQueueMutex);
+    if(!connectionQueueMutexTracker.mutexCaptured())
     {
-      transmission_status_t transmissionResult = initiateTransmission(currentNetwork);
-            
-      latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+      assert(false && "ERROR! connectionQueue locked. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    }
+    else
+    {
+      for(const TcpIpNetworkInfo &currentNetwork : constConnectionQueue())
+      {
+        transmission_status_t transmissionResult = initiateTransmission(currentNetwork);
+              
+        latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+
+        if(!getTransmissionOutcomesUpdateHook()(*this))
+          break;
+      }
     }
   }
   
@@ -492,12 +520,12 @@ transmission_status_t TcpIpMeshBackend::attemptTransmission(const String &messag
   return transmissionResult;
 }
 
-void TcpIpMeshBackend::acceptRequest()
+void TcpIpMeshBackend::acceptRequests()
 {
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! TCP/IP transmission in progress. Don't call acceptRequest from TCP/IP callbacks as this may corrupt program state! Aborting."); 
+    assert(false && "ERROR! TCP/IP transmission in progress. Don't call acceptRequests from callbacks as this may corrupt program state! Aborting."); 
     return;
   }
   

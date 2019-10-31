@@ -119,7 +119,7 @@ void MeshBackendBase::setWiFiChannel(uint8 newWiFiChannel)
   }
 }
 
-uint8 MeshBackendBase::getWiFiChannel()
+uint8 MeshBackendBase::getWiFiChannel() const
 {
   return _meshWiFiChannel;
 }
@@ -147,28 +147,28 @@ void MeshBackendBase::setSSID(const String &newSSIDPrefix, const String &newSSID
   }
 }
 
-String MeshBackendBase::getSSID() {return _SSID;}
+String MeshBackendBase::getSSID() const {return _SSID;}
 
 void MeshBackendBase::setSSIDPrefix(const String &newSSIDPrefix)
 {
   setSSID(newSSIDPrefix);
 }
 
-String MeshBackendBase::getSSIDPrefix() {return _SSIDPrefix;}
+String MeshBackendBase::getSSIDPrefix() const {return _SSIDPrefix;}
 
 void MeshBackendBase::setSSIDRoot(const String &newSSIDRoot)
 {
   setSSID("", newSSIDRoot);
 }
 
-String MeshBackendBase::getSSIDRoot() {return _SSIDRoot;}
+String MeshBackendBase::getSSIDRoot() const {return _SSIDRoot;}
 
 void MeshBackendBase::setSSIDSuffix(const String &newSSIDSuffix)
 {
   setSSID("", "", newSSIDSuffix);
 }
 
-String MeshBackendBase::getSSIDSuffix() {return _SSIDSuffix;}
+String MeshBackendBase::getSSIDSuffix() const {return _SSIDSuffix;}
 
 void MeshBackendBase::setMeshName(const String &newMeshName)
 {
@@ -195,10 +195,10 @@ void MeshBackendBase::setMeshPassword(const String &newMeshPassword)
     restartAP();
 }
 
-String MeshBackendBase::getMeshPassword() {return _meshPassword;}
+String MeshBackendBase::getMeshPassword() const {return _meshPassword;}
 
 void MeshBackendBase::setMessage(const String &newMessage) {_message = newMessage;}
-String MeshBackendBase::getMessage() {return _message;}
+String MeshBackendBase::getMessage() const {return _message;}
 
 void MeshBackendBase::setRequestHandler(MeshBackendBase::requestHandlerType requestHandler) {_requestHandler = requestHandler;}
 MeshBackendBase::requestHandlerType MeshBackendBase::getRequestHandler() {return _requestHandler;}
@@ -209,12 +209,15 @@ MeshBackendBase::responseHandlerType MeshBackendBase::getResponseHandler() {retu
 void MeshBackendBase::setNetworkFilter(MeshBackendBase::networkFilterType networkFilter) {_networkFilter = networkFilter;}
 MeshBackendBase::networkFilterType MeshBackendBase::getNetworkFilter() {return _networkFilter;}
 
+void MeshBackendBase::setTransmissionOutcomesUpdateHook(MeshBackendBase::transmissionOutcomesUpdateHookType transmissionOutcomesUpdateHook) {_transmissionOutcomesUpdateHook = transmissionOutcomesUpdateHook;}
+MeshBackendBase::transmissionOutcomesUpdateHookType MeshBackendBase::getTransmissionOutcomesUpdateHook() {return _transmissionOutcomesUpdateHook;}
+
 void MeshBackendBase::setScanHidden(bool scanHidden)
 {
   _scanHidden = scanHidden;
 }
 
-bool MeshBackendBase::getScanHidden() {return _scanHidden;}
+bool MeshBackendBase::getScanHidden() const {return _scanHidden;}
 
 void MeshBackendBase::setAPHidden(bool apHidden)
 {
@@ -228,14 +231,14 @@ void MeshBackendBase::setAPHidden(bool apHidden)
   }
 }
 
-bool MeshBackendBase::getAPHidden() {return _apHidden;}
+bool MeshBackendBase::getAPHidden() const {return _apHidden;}
 
-bool MeshBackendBase::latestTransmissionSuccessful()
+bool MeshBackendBase::latestTransmissionSuccessfulBase(const std::vector<TransmissionOutcome> &latestTransmissionOutcomes)
 {
-  if(latestTransmissionOutcomes().empty())
+  if(latestTransmissionOutcomes.empty())
     return false;
   else
-    for(TransmissionOutcome &transmissionOutcome : latestTransmissionOutcomes()) 
+    for(const TransmissionOutcome &transmissionOutcome : latestTransmissionOutcomes) 
       if(transmissionOutcome.transmissionStatus() != TS_TRANSMISSION_COMPLETE) 
         return false;
 

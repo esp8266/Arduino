@@ -36,6 +36,8 @@ public:
    */
   EspnowNetworkInfo(int networkIndex);
 
+  EspnowNetworkInfo(const NetworkInfoBase &originalNetworkInfo);
+
   EspnowNetworkInfo(const uint8_t BSSID[6], const String &SSID = defaultSSID, int32_t wifiChannel = defaultWifiChannel, uint8_t encryptionType = defaultEncryptionType, 
                     int32_t RSSI = defaultRSSI, bool isHidden = defaultIsHidden);
 };

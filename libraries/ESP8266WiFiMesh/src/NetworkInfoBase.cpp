@@ -24,6 +24,7 @@
 
 #include "NetworkInfoBase.h"
 
+uint8_t * const NetworkInfoBase::defaultBSSID = nullptr;
 const String NetworkInfoBase::defaultSSID = "";
 const int32_t NetworkInfoBase::defaultWifiChannel = NETWORK_INFO_DEFAULT_INT;
 const uint8_t NetworkInfoBase::defaultEncryptionType = 0;

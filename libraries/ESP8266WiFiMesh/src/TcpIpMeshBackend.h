@@ -67,12 +67,19 @@ public:
 
   /** 
   * Returns a vector that contains the NetworkInfo for each WiFi network to connect to.
-  * This vector is unique for each mesh backend.
+  * This vector is unique for each mesh backend, but NetworkInfo elements can be directly transferred between the vectors as long as both SSID and BSSID are present.
   * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
   * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
   * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  *
+  * Since the connectionQueue() is iterated over during transmissions, always use constConnectionQueue() from callbacks other than NetworkFilter.
   */
-  std::vector<TcpIpNetworkInfo> & connectionQueue();
+  static std::vector<TcpIpNetworkInfo> & connectionQueue();
+
+  /**
+   * Same as connectionQueue(), but can be called from all callbacks since the returned reference is const.
+   */
+  static const std::vector<TcpIpNetworkInfo> & constConnectionQueue();
 
   /** 
   * Returns a vector with the TransmissionOutcome for each AP to which a transmission was attempted during the latest attemptTransmission call.
@@ -81,7 +88,13 @@ public:
   * Connection attempts are indexed in the same order they were attempted.
   * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
   */
-  std::vector<TransmissionOutcome> & latestTransmissionOutcomes() override;
+  static std::vector<TransmissionOutcome> & latestTransmissionOutcomes();
+
+  /**
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   *         The result is unique for each mesh backend.
+   */
+  static bool latestTransmissionSuccessful();
   
   /**
    * Initialises the node.
@@ -116,7 +129,7 @@ public:
   /**
    * If any clients are connected, accept their requests and call the requestHandler function for each one.
    */
-  void acceptRequest();
+  void acceptRequests();
 
   /**
    * Get the TCP/IP message that is currently scheduled for transmission.
@@ -185,7 +198,7 @@ public:
 
   /**
    * Set the timeout to use for transmissions when this TcpIpMeshBackend instance acts as an AP (i.e. when receiving connections from other stations).
-   * This will affect the timeout of the acceptRequest method.
+   * This will affect the timeout of the acceptRequests method.
    * The timeout is 4 500 ms by default.
    * Will also change the setting for the active AP (without an AP restart)
    * if this TcpIpMeshBackend instance is the current AP controller.
@@ -216,6 +229,11 @@ protected:
    * Will be true if a transmission initiated by a public method is in progress.
    */
   static bool _tcpIpTransmissionMutex;
+
+  /** 
+   * Will be true when the connectionQueue should not be modified.
+   */
+  static bool _tcpIpConnectionQueueMutex;
 
   /**
    * Check if there is an ongoing TCP/IP transmission in the library. Used to avoid interrupting transmissions.

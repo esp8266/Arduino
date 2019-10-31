@@ -38,26 +38,13 @@ protected:
   typedef std::function<String(const String &, MeshBackendBase &)> requestHandlerType;
   typedef std::function<transmission_status_t(const String &, MeshBackendBase &)> responseHandlerType;
   typedef std::function<void(int, MeshBackendBase &)> networkFilterType;
+  typedef std::function<bool(MeshBackendBase &)> transmissionOutcomesUpdateHookType;
 
 public:
 
   MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, mesh_backend_t classType);
 
   virtual ~MeshBackendBase();
-
-  /** 
-  * Returns a vector with the TransmissionOutcome for each AP to which a transmission was attempted during the latest attemptTransmission call.
-  * This vector is unique for each mesh backend.
-  * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
-  * Connection attempts are indexed in the same order they were attempted.
-  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
-  */
-  virtual std::vector<TransmissionOutcome> & latestTransmissionOutcomes() = 0;
-
-  /**
-   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
-   */
-  bool latestTransmissionSuccessful();
 
   /**
    * Initialises the node.
@@ -105,7 +92,7 @@ public:
    *                          
    */
   void setWiFiChannel(uint8 newWiFiChannel);
-  uint8 getWiFiChannel();
+  uint8 getWiFiChannel() const;
 
   /**
    * Change the SSID used by this MeshBackendBase instance. 
@@ -119,7 +106,7 @@ public:
    */  
   void setSSID(const String &newSSIDPrefix = ESP8266_MESH_EMPTY_STRING, const String &newSSIDRoot = ESP8266_MESH_EMPTY_STRING, 
                const String &newSSIDSuffix = ESP8266_MESH_EMPTY_STRING);
-  String getSSID();
+  String getSSID() const;
 
   /**
    * Change the first part of the SSID used by this MeshBackendBase instance. 
@@ -129,7 +116,7 @@ public:
    * @param newSSIDPrefix The new first part of the SSID.
    */  
   void setSSIDPrefix(const String &newSSIDPrefix);
-  String getSSIDPrefix();
+  String getSSIDPrefix() const;
 
   /**
    * Change the middle part of the SSID used by this MeshBackendBase instance. 
@@ -139,7 +126,7 @@ public:
    * @param newSSIDPrefix The new middle part of the SSID.
    */
   void setSSIDRoot(const String &newSSIDRoot);
-  String getSSIDRoot();
+  String getSSIDRoot() const;
 
   /**
    * Change the last part of the SSID used by this MeshBackendBase instance. 
@@ -149,7 +136,7 @@ public:
    * @param newSSIDSuffix The new last part of the SSID.
    */  
   void setSSIDSuffix(const String &newSSIDSuffix);
-  String getSSIDSuffix();
+  String getSSIDSuffix() const;
 
   /**
    * Change the mesh name used by this MeshBackendBase instance.
@@ -183,7 +170,7 @@ public:
    * @param newMeshPassword The password to use.
    */
   void setMeshPassword(const String &newMeshPassword);
-  String getMeshPassword();
+  String getMeshPassword() const;
   
   /**
    * Set the message that will be sent to other nodes when calling attemptTransmission.
@@ -191,7 +178,7 @@ public:
    * @param newMessage The message to send.
    */
   void setMessage(const String &newMessage);
-  String getMessage();
+  String getMessage() const;
 
   virtual void attemptTransmission(const String &message, bool scan = true, bool scanAllWiFiChannels = false) = 0;
 
@@ -205,6 +192,16 @@ public:
   networkFilterType getNetworkFilter();
 
   /**
+   * Set a function that should be called after each update of the latestTransmissionOutcomes vector during attemptTransmission. (which happens after each individual transmission has finished)
+   * The function should return a bool. If this return value is true, attemptTransmission will continue with the next entry in the connectionQueue. If it is false, attemptTransmission will stop.
+   * The default transmissionOutcomesUpdateHook always returns true.
+   * 
+   * Example use cases is modifying getMessage() between transmissions, or aborting attemptTransmission before all nodes in the connectionQueue have been contacted.
+   */
+  void setTransmissionOutcomesUpdateHook(transmissionOutcomesUpdateHookType transmissionOutcomesUpdateHook);
+  transmissionOutcomesUpdateHookType getTransmissionOutcomesUpdateHook();
+
+  /**
    * Set whether scan results from this MeshBackendBase instance will include WiFi networks with hidden SSIDs.
    * This is false by default.
    * The SSID field of a found hidden network will be blank in the scan results.
@@ -213,7 +210,7 @@ public:
    * @param scanHidden If true, WiFi networks with hidden SSIDs will be included in scan results.
    */
   void setScanHidden(bool scanHidden);
-  bool getScanHidden();
+  bool getScanHidden() const;
 
   /**
    * Set whether the AP controlled by this MeshBackendBase instance will have a WiFi network with hidden SSID.
@@ -224,7 +221,7 @@ public:
    * @param apHidden If true, the WiFi network created will have a hidden SSID.
    */
   void setAPHidden(bool apHidden);
-  bool getAPHidden();
+  bool getAPHidden() const;
 
   /**
    * Set whether the normal events occurring in the library will be printed to Serial or not. Off by default.
@@ -263,6 +260,13 @@ public:
   mesh_backend_t getClassType();
 
 protected:
+
+  /**
+   * @param latestTransmissionOutcomes The transmission outcomes vector to check.
+   * 
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   */
+  static bool latestTransmissionSuccessfulBase(const std::vector<TransmissionOutcome> &latestTransmissionOutcomes);
 
   virtual void scanForNetworks(bool scanAllWiFiChannels);
   virtual void printAPInfo(const NetworkInfoBase &apNetworkInfo);
@@ -303,6 +307,7 @@ private:
   requestHandlerType _requestHandler;
   responseHandlerType _responseHandler;
   networkFilterType _networkFilter;
+  transmissionOutcomesUpdateHookType _transmissionOutcomesUpdateHook = [](MeshBackendBase &){return true;};
 
   static bool _printWarnings;
 };

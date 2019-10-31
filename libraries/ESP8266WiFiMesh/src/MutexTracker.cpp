@@ -24,6 +24,13 @@
 
 #include "MutexTracker.h"
 
+bool MutexTracker::_captureBan = false;
+
+bool &MutexTracker::captureBan()
+{
+  return _captureBan;
+}
+
 MutexTracker::MutexTracker(bool &mutexToCapture) 
 {
   attemptMutexCapture(mutexToCapture);
@@ -59,7 +66,7 @@ void MutexTracker::releaseMutex()
 
 bool MutexTracker::attemptMutexCapture(bool &mutexToCapture)
 {
-  if(!mutexToCapture)
+  if(!captureBan() && !mutexToCapture)
   {
     _capturedMutex = &mutexToCapture;
     *_capturedMutex = true;

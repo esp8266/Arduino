@@ -55,5 +55,5 @@ uint32_t ExpiringTimeTracker::remainingDuration() const
 
 bool ExpiringTimeTracker::expired() const
 {
-  return timeSinceCreation() > duration();
+  return timeSinceCreation() >= duration();
 }

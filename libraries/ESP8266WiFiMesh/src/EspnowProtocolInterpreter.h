@@ -44,6 +44,7 @@ namespace EspnowProtocolInterpreter
   const String temporaryEncryptionRequestHeader = "AddTEC:"; // Add temporary encrypted connection
   const String basicConnectionInfoHeader = "BasicCI:"; // Basic connection info
   const String encryptedConnectionInfoHeader = "EncryptedCI:"; // Encrypted connection info
+  const String softLimitEncryptedConnectionInfoHeader = "SLEncryptedCI:"; // Soft limit encrypted connection info
   const String maxConnectionsReachedHeader = "ECS_MAX_CONNECTIONS_REACHED_PEER:";
   const String encryptedConnectionVerificationHeader = "ECVerified:"; // Encrypted connection verified
   const String encryptedConnectionRemovalRequestHeader = "RemoveEC:"; // Remove encrypted connection

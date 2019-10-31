@@ -38,6 +38,7 @@ static const uint64_t uint64MSB = 0x8000000000000000;
 const uint8_t EspnowMeshBackend::broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 bool EspnowMeshBackend::_espnowTransmissionMutex = false;
+bool EspnowMeshBackend::_espnowConnectionQueueMutex = false;
 
 EspnowMeshBackend *EspnowMeshBackend::_espnowRequestManager = nullptr;
 
@@ -61,9 +62,11 @@ uint32_t EspnowMeshBackend::_encryptionRequestTimeoutMs = 300;
 bool EspnowMeshBackend::_espnowSendConfirmed = false;
 
 String EspnowMeshBackend::_ongoingPeerRequestNonce = "";
+uint8_t EspnowMeshBackend::_ongoingPeerRequestMac[6] = {0};
 EspnowMeshBackend *EspnowMeshBackend::_ongoingPeerRequester = nullptr;
 encrypted_connection_status_t EspnowMeshBackend::_ongoingPeerRequestResult = ECS_MAX_CONNECTIONS_REACHED_SELF;
 uint32_t EspnowMeshBackend::_ongoingPeerRequestEncryptionStart = 0;
+bool EspnowMeshBackend::_reciprocalPeerRequestConfirmation = false;
 
 uint8_t EspnowMeshBackend::_espnowEncryptionKok[espnowEncryptionKeyLength] = { 0 };
 bool EspnowMeshBackend::_espnowEncryptionKokSet = false;
@@ -136,8 +139,78 @@ void EspnowMeshBackend::begin()
   activateEspnow();
 }
 
+bool EspnowMeshBackend::activateEspnow()
+{
+  if (esp_now_init()==0) 
+  {    
+    if(_espnowEncryptionKokSet && esp_now_set_kok(_espnowEncryptionKok, espnowEncryptionKeyLength)) // esp_now_set_kok returns 0 on success.
+      warningPrint("Failed to set ESP-NOW KoK!");
+      
+    if(getEspnowRequestManager() == nullptr)
+    {
+      setEspnowRequestManager(this);
+    }
+    
+    esp_now_register_recv_cb(espnowReceiveCallbackWrapper);
+    esp_now_register_send_cb([](uint8_t* mac, uint8_t sendStatus) {
+      if(_espnowSendConfirmed)
+        return;
+      else if(!sendStatus && macEqual(mac, _transmissionTargetBSSID)) // sendStatus == 0 when send was OK.
+        _espnowSendConfirmed = true; // We do not want to reset this to false. That only happens before transmissions. Otherwise subsequent failed send attempts may obscure an initial successful one.
+    });
+
+    // Role must be set before adding peers. Cannot be changed while having peers.
+    // With ESP_NOW_ROLE_CONTROLLER, we always transmit from the station interface, which gives predictability.
+    if(esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER)) // esp_now_set_self_role returns 0 on success.
+      warningPrint("Failed to set ESP-NOW role! Maybe ESP-NOW peers are already added?");
+
+    verboseModePrint("ESP-NOW activated.");
+    verboseModePrint("My ESP-NOW STA MAC: " + WiFi.macAddress() + "\n"); // Get the station MAC address. The softAP MAC is different.
+    
+    return true;
+  } 
+  else 
+  {
+    warningPrint("ESP-NOW init failed!");
+    return false;
+  }
+}
+
+bool EspnowMeshBackend::deactivateEspnow()
+{
+  // esp_now_deinit() clears all ESP-NOW API settings, including receive callback, send callback, Kok and peers.
+  // The node will however continue to give acks to received ESP-NOW transmissions as long as the receiving interface (AP or STA) is active, even though the transmissions will not be processed.
+  if(esp_now_deinit() == 0)
+  {
+    responsesToSend.clear();
+    peerRequestConfirmationsToSend.clear();
+    receivedEspnowTransmissions.clear();
+    sentRequests.clear();
+    receivedRequests.clear();
+    encryptedConnections.clear();
+    EncryptedConnectionLog::setNewRemovalsScheduled(false);
+    
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 std::vector<EspnowNetworkInfo> & EspnowMeshBackend::connectionQueue()
 {
+  MutexTracker connectionQueueMutexTracker(_espnowConnectionQueueMutex);
+  if(!connectionQueueMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! connectionQueue locked. Don't call connectionQueue() from callbacks other than NetworkFilter as this may corrupt program state!"); 
+  }
+  
+  return _connectionQueue;
+}
+
+const std::vector<EspnowNetworkInfo> & EspnowMeshBackend::constConnectionQueue()
+{  
   return _connectionQueue;
 }
 
@@ -146,8 +219,15 @@ std::vector<TransmissionOutcome> & EspnowMeshBackend::latestTransmissionOutcomes
   return _latestTransmissionOutcomes;
 }
 
-void EspnowMeshBackend::performEspnowMaintainance()
+bool EspnowMeshBackend::latestTransmissionSuccessful()
 {
+  return latestTransmissionSuccessfulBase(latestTransmissionOutcomes());
+}
+
+void EspnowMeshBackend::performEspnowMaintainance(uint32_t estimatedMaxDuration)
+{
+  ExpiringTimeTracker estimatedMaxDurationTracker = ExpiringTimeTracker(estimatedMaxDuration);
+  
   // Doing this during an ESP-NOW transmission could invalidate iterators
   MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
   if(!mutexTracker.mutexCaptured())
@@ -165,7 +245,17 @@ void EspnowMeshBackend::performEspnowMaintainance()
     updateTemporaryEncryptedConnections();
   }
 
-  sendEspnowResponses();
+  if(estimatedMaxDuration > 0)
+  {
+    if(estimatedMaxDurationTracker.expired())
+      return;
+    else
+      sendStoredEspnowMessages(&estimatedMaxDurationTracker);
+  }
+  else
+  {
+    sendStoredEspnowMessages();
+  }
 }
 
 void EspnowMeshBackend::updateTemporaryEncryptedConnections(bool scheduledRemovalOnly)
@@ -195,9 +285,109 @@ void EspnowMeshBackend::updateTemporaryEncryptedConnections(bool scheduledRemova
   EncryptedConnectionLog::setNewRemovalsScheduled(false);
 }
 
+template <typename T, typename U>
+void EspnowMeshBackend::deleteExpiredLogEntries(std::map<std::pair<U, uint64_t>, T> &logEntries, uint32_t maxEntryLifetimeMs)
+{
+  for(typename std::map<std::pair<U, uint64_t>, T>::iterator entryIterator = logEntries.begin(); 
+      entryIterator != logEntries.end(); )
+  {
+    if(entryIterator->second.timeSinceCreation() > maxEntryLifetimeMs)
+    {
+      entryIterator = logEntries.erase(entryIterator);
+    }
+    else
+      ++entryIterator;
+  }
+}
+
+void EspnowMeshBackend::deleteExpiredLogEntries(std::map<std::pair<peerMac_td, messageID_td>, RequestData> &logEntries, uint32_t requestLifetimeMs, uint32_t broadcastLifetimeMs)
+{
+  for(typename std::map<std::pair<peerMac_td, messageID_td>, RequestData>::iterator entryIterator = logEntries.begin(); 
+      entryIterator != logEntries.end(); )
+  {
+    bool broadcast = entryIterator->first.first == uint64BroadcastMac;
+    uint32_t timeSinceCreation = entryIterator->second.timeSinceCreation();
+    
+    if((!broadcast && timeSinceCreation > requestLifetimeMs) 
+        || (broadcast && timeSinceCreation > broadcastLifetimeMs))
+    {
+      entryIterator = logEntries.erase(entryIterator);
+    }
+    else
+      ++entryIterator;
+  }
+}
+
+template <typename T>
+void EspnowMeshBackend::deleteExpiredLogEntries(std::list<T> &logEntries, uint32_t maxEntryLifetimeMs)
+{
+  for(typename std::list<T>::iterator entryIterator = logEntries.begin(); 
+      entryIterator != logEntries.end(); )
+  {
+    if(entryIterator->timeSinceCreation() > maxEntryLifetimeMs)
+    {
+      entryIterator = logEntries.erase(entryIterator);
+    }
+    else
+      ++entryIterator;
+  }
+}
+
+template <> 
+void EspnowMeshBackend::deleteExpiredLogEntries(std::list<EncryptedConnectionLog> &logEntries, uint32_t maxEntryLifetimeMs)
+{
+  for(typename std::list<EncryptedConnectionLog>::iterator entryIterator = logEntries.begin(); 
+    entryIterator != logEntries.end(); )
+  {
+    auto timeTrackerPointer = entryIterator->temporary();
+    if(timeTrackerPointer && timeTrackerPointer->timeSinceCreation() > maxEntryLifetimeMs)
+    {
+      entryIterator = logEntries.erase(entryIterator);
+    }
+    else
+      ++entryIterator;
+  }
+}
+
+template <> 
+void EspnowMeshBackend::deleteExpiredLogEntries(std::list<PeerRequestLog> &logEntries, uint32_t maxEntryLifetimeMs)
+{
+  for(typename std::list<PeerRequestLog>::iterator entryIterator = logEntries.begin(); 
+    entryIterator != logEntries.end(); )
+  {
+    auto timeTrackerPointer = entryIterator->temporary();
+    if(timeTrackerPointer && timeTrackerPointer->timeSinceCreation() > maxEntryLifetimeMs)
+    {
+      entryIterator = logEntries.erase(entryIterator);
+    }
+    else
+      ++entryIterator;
+  }
+}
+
+void EspnowMeshBackend::clearOldLogEntries()
+{
+  // Clearing all old log entries at the same time should help minimize heap fragmentation.
+  
+  // uint32_t startTime = millis();
+  
+  _timeOfLastLogClear = millis();
+  
+  deleteExpiredLogEntries(receivedEspnowTransmissions, logEntryLifetimeMs());
+  deleteExpiredLogEntries(receivedRequests, logEntryLifetimeMs()); // Just needs to be long enough to not accept repeated transmissions by mistake.
+  deleteExpiredLogEntries(sentRequests, logEntryLifetimeMs(), broadcastResponseTimeoutMs());
+  deleteExpiredLogEntries(responsesToSend, logEntryLifetimeMs());
+  deleteExpiredLogEntries(peerRequestConfirmationsToSend, getEncryptionRequestTimeout());
+}
+
 void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *dataArray, uint8_t len)
 {
   using namespace EspnowProtocolInterpreter;
+
+  // Since this callback can be called during any delay(), we should always consider all mutexes captured.
+  // This provides a consistent mutex environment, which facilitates development and debugging. 
+  // Otherwise we get issues such as _espnowTransmissionMutex will usually be free, but occasionally taken (when callback occurs in a delay() during attemptTransmission).
+  MutexTracker captureBanTracker(MutexTracker::captureBan());
   
   if(len >= EspnowProtocolInterpreter::espnowProtocolBytesSize()) // If we do not receive at least the protocol bytes, the transmission is invalid.
   {    
@@ -320,7 +510,7 @@ void EspnowMeshBackend::handlePeerRequest(uint8_t *macaddr, uint8_t *dataArray, 
   // Pairing process ends when encryptedConnectionVerificationHeader is received, maxConnectionsReachedHeader is sent or timeout is reached.
   // Pairing process stages for request receiver:
   // Receive: encryptionRequestHeader or temporaryEncryptionRequestHeader.
-  // Send: maxConnectionsReachedHeader / basicConnectionInfoHeader -> encryptedConnectionInfoHeader or maxConnectionsReachedHeader.
+  // Send: maxConnectionsReachedHeader / basicConnectionInfoHeader -> encryptedConnectionInfoHeader or softLimitEncryptedConnectionInfoHeader or maxConnectionsReachedHeader.
   // Receive: encryptedConnectionVerificationHeader.
   
   using namespace EspnowProtocolInterpreter;
@@ -340,6 +530,9 @@ void EspnowMeshBackend::handlePeerRequest(uint8_t *macaddr, uint8_t *dataArray, 
       {
         int32_t connectionRequestTypeEndIndex = message.indexOf(':', messageHeaderEndIndex + 1);
         String connectionRequestType = message.substring(messageHeaderEndIndex + 1, connectionRequestTypeEndIndex + 1);
+        connectionLogIterator encryptedConnection = connectionLogEndIterator();
+        if(!getEncryptedConnectionIterator(macaddr, encryptedConnection))
+          assert(false && "We must have an encrypted connection if we received an encryptedConnectionVerificationHeader which was encryptedCorrectly.");
         
         if(connectionRequestType == encryptionRequestHeader)
         {
@@ -347,10 +540,6 @@ void EspnowMeshBackend::handlePeerRequest(uint8_t *macaddr, uint8_t *dataArray, 
         }
         else if(connectionRequestType == temporaryEncryptionRequestHeader)
         {
-          connectionLogIterator encryptedConnection = connectionLogEndIterator();
-          if(!getEncryptedConnectionIterator(macaddr, encryptedConnection))
-            assert(false && "We must have an encrypted connection if we received an encryptedConnectionVerificationHeader which was encryptedCorrectly.");
-
           if(encryptedConnection->temporary()) // Should not change duration for existing permanent connections.
           {
             uint32_t connectionDuration = 0;
@@ -372,10 +561,35 @@ void EspnowMeshBackend::handlePeerRequest(uint8_t *macaddr, uint8_t *dataArray, 
       if(EspnowMeshBackend *currentEspnowRequestManager = getEspnowRequestManager())
       {
         String requestNonce = "";
-        if(JsonTranslator::getNonce(message, requestNonce))
+
+        if(JsonTranslator::getNonce(message, requestNonce) && requestNonce.length() >= 12) // The destination MAC address requires 12 characters.
         {
+          uint8_t destinationMac[6] = {0};
+          stringToMac(requestNonce, destinationMac);
+        
+          uint8_t apMac[6] {0};
+          WiFi.softAPmacAddress(apMac);
+
+          bool correctDestination = false;
+          if(macEqual(destinationMac, apMac))
+          {
+            correctDestination = true;
+          }
+          else
+          {
+            uint8_t staMac[6] {0};
+            WiFi.macAddress(staMac);
+            
+            if(macEqual(destinationMac, staMac))
+            {
+              correctDestination = true;
+            }
+          }
+
           uint8_t apMacArray[6] = { 0 };
-          peerRequestConfirmationsToSend.emplace_back(receivedMessageID, encryptedCorrectly, currentEspnowRequestManager->getMeshPassword(), requestNonce, macaddr, espnowGetTransmissionMac(dataArray, apMacArray), currentEspnowRequestManager->getEspnowHashKey());
+          if(correctDestination && JsonTranslator::verifyEncryptionRequestHmac(message, macaddr, espnowGetTransmissionMac(dataArray, apMacArray), currentEspnowRequestManager->getEspnowHashKey(), espnowHashKeyLength))
+            peerRequestConfirmationsToSend.emplace_back(receivedMessageID, encryptedCorrectly, currentEspnowRequestManager->getMeshPassword(), currentEspnowRequestManager->encryptedConnectionsSoftLimit(), 
+                                                        requestNonce, macaddr, apMacArray, currentEspnowRequestManager->getEspnowHashKey());
         }
       }
     }
@@ -396,7 +610,7 @@ void EspnowMeshBackend::handlePeerRequestConfirmation(uint8_t *macaddr, uint8_t 
   // Pairing process ends when _ongoingPeerRequestNonce == "" or timeout is reached.
   // Pairing process stages for request sender:
   // Send: encryptionRequestHeader or temporaryEncryptionRequestHeader.
-  // Receive: maxConnectionsReachedHeader / basicConnectionInfoHeader -> encryptedConnectionInfoHeader or maxConnectionsReachedHeader.
+  // Receive: maxConnectionsReachedHeader / basicConnectionInfoHeader -> encryptedConnectionInfoHeader or softLimitEncryptedConnectionInfoHeader or maxConnectionsReachedHeader.
   // Send: encryptedConnectionVerificationHeader.
   
   using namespace EspnowProtocolInterpreter;
@@ -405,18 +619,20 @@ void EspnowMeshBackend::handlePeerRequestConfirmation(uint8_t *macaddr, uint8_t 
   {
     String message = espnowGetMessageContent(dataArray, len);
     String requestNonce = "";
-    uint8_t macArray[6] = { 0 };
+
     if(JsonTranslator::getNonce(message, requestNonce) && requestNonce == _ongoingPeerRequestNonce)
     {      
       int32_t messageHeaderEndIndex = message.indexOf(':');
       String messageHeader = message.substring(0, messageHeaderEndIndex + 1);
       String messageBody = message.substring(messageHeaderEndIndex + 1);
+      uint8_t apMacArray[6] = { 0 };
+      espnowGetTransmissionMac(dataArray, apMacArray);
 
       if(messageHeader == basicConnectionInfoHeader)
       {
-        // _ongoingPeerRequestResult == ECS_CONNECTION_ESTABLISHED means we have already received a basicConnectionInfoHeader
-        if(_ongoingPeerRequestResult != ECS_CONNECTION_ESTABLISHED &&
-           JsonTranslator::verifyHmac(message, _ongoingPeerRequester->getEspnowHashKey(), espnowHashKeyLength))
+        // encryptedConnectionEstablished(_ongoingPeerRequestResult) means we have already received a basicConnectionInfoHeader
+        if(!encryptedConnectionEstablished(_ongoingPeerRequestResult) &&
+           JsonTranslator::verifyEncryptionRequestHmac(message, macaddr, apMacArray, _ongoingPeerRequester->getEspnowHashKey(), espnowHashKeyLength))
         {
            _ongoingPeerRequestEncryptionStart = millis();
   
@@ -425,8 +641,7 @@ void EspnowMeshBackend::handlePeerRequestConfirmation(uint8_t *macaddr, uint8_t 
           if(!getEncryptedConnectionIterator(macaddr, existingEncryptedConnection))
           {
             // Although the newly created session keys are normally never used (they are replaced with synchronized ones later), the session keys must still be randomized to prevent attacks until replaced.
-            _ongoingPeerRequestResult = _ongoingPeerRequester->addTemporaryEncryptedConnection(macaddr, espnowGetTransmissionMac(dataArray, macArray), 
-                                                                                               createSessionKey(), createSessionKey(), getEncryptionRequestTimeout());
+            _ongoingPeerRequestResult = _ongoingPeerRequester->addTemporaryEncryptedConnection(macaddr, apMacArray, createSessionKey(), createSessionKey(), getEncryptionRequestTimeout());
           }
           else 
           {
@@ -442,55 +657,207 @@ void EspnowMeshBackend::handlePeerRequestConfirmation(uint8_t *macaddr, uint8_t 
             }
           }
   
-          if(_ongoingPeerRequestResult != ECS_CONNECTION_ESTABLISHED)
+          if(!encryptedConnectionEstablished(_ongoingPeerRequestResult))
           {
             // Adding connection failed, abort ongoing peer request.
             _ongoingPeerRequestNonce = "";
           }
         }
       }
-      else 
+      else if(messageHeader == encryptedConnectionInfoHeader || messageHeader == softLimitEncryptedConnectionInfoHeader)
       {
-        if(messageHeader == encryptedConnectionInfoHeader)
+        String messagePassword = "";
+        
+        if(JsonTranslator::getPassword(messageBody, messagePassword) && messagePassword == _ongoingPeerRequester->getMeshPassword())
         {
-          String messagePassword = "";
+          // The mesh password is only shared via encrypted messages, so now we know this message is valid since it was encrypted and contained the correct nonce.
           
-          if(JsonTranslator::getPassword(messageBody, messagePassword) && messagePassword == _ongoingPeerRequester->getMeshPassword())
+          EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(macaddr);
+          uint64_t peerSessionKey = 0;
+          uint64_t ownSessionKey = 0;
+          if(encryptedConnection && JsonTranslator::getPeerSessionKey(messageBody, peerSessionKey) && JsonTranslator::getOwnSessionKey(messageBody, ownSessionKey))
           {
-            // The mesh password is only shared via encrypted messages, so now we know this message is valid since it was encrypted and contained the correct nonce.
-            
-            EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(macaddr);
-            uint64_t peerSessionKey = 0;
-            uint64_t ownSessionKey = 0;
-            if(encryptedConnection && JsonTranslator::getPeerSessionKey(messageBody, peerSessionKey) && JsonTranslator::getOwnSessionKey(messageBody, ownSessionKey))
-            {
-              encryptedConnection->setPeerSessionKey(peerSessionKey);
-              encryptedConnection->setOwnSessionKey(ownSessionKey);
-              _ongoingPeerRequestResult = ECS_CONNECTION_ESTABLISHED;
-            }
-            else
-            {
-              _ongoingPeerRequestResult = ECS_REQUEST_TRANSMISSION_FAILED;
-            }
+            encryptedConnection->setPeerSessionKey(peerSessionKey);
+            encryptedConnection->setOwnSessionKey(ownSessionKey);
 
-            _ongoingPeerRequestNonce = "";
+            if(messageHeader == encryptedConnectionInfoHeader)
+              _ongoingPeerRequestResult = ECS_CONNECTION_ESTABLISHED;
+            else if(messageHeader == softLimitEncryptedConnectionInfoHeader)
+              _ongoingPeerRequestResult = ECS_SOFT_LIMIT_CONNECTION_ESTABLISHED;
+            else
+              assert(false && "Unknown _ongoingPeerRequestResult!");
           }
-        }
-        else if(messageHeader == maxConnectionsReachedHeader)
-        {
-          if(JsonTranslator::verifyHmac(message, _ongoingPeerRequester->getEspnowHashKey(), espnowHashKeyLength))
+          else
           {
-            _ongoingPeerRequestResult = ECS_MAX_CONNECTIONS_REACHED_PEER;
-            _ongoingPeerRequestNonce = "";
+            _ongoingPeerRequestResult = ECS_REQUEST_TRANSMISSION_FAILED;
           }
+
+          _ongoingPeerRequestNonce = "";
         }
-        else
+      }
+      else if(messageHeader == maxConnectionsReachedHeader)
+      {
+        if(JsonTranslator::verifyEncryptionRequestHmac(message, macaddr, apMacArray, _ongoingPeerRequester->getEspnowHashKey(), espnowHashKeyLength))
         {
-          assert(messageHeader == basicConnectionInfoHeader || messageHeader == encryptedConnectionInfoHeader || messageHeader == maxConnectionsReachedHeader);
+          _ongoingPeerRequestResult = ECS_MAX_CONNECTIONS_REACHED_PEER;
+          _ongoingPeerRequestNonce = "";
         }
+      }
+      else
+      {
+        assert(messageHeader == basicConnectionInfoHeader || messageHeader == encryptedConnectionInfoHeader || 
+               messageHeader == softLimitEncryptedConnectionInfoHeader || messageHeader == maxConnectionsReachedHeader);
       }
     }
   }
+}
+
+void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArray, uint8_t len)
+{  
+  using namespace EspnowProtocolInterpreter;
+  
+  ////// <Method overview> //////
+  /*
+  if(messageStart)
+  {
+    storeTransmission
+  }
+  else
+  {
+    if(messageFound)
+      storeTransmission or (erase and return)
+    else
+      return
+  }
+  
+  if(transmissionsRemaining != 0)
+    return
+    
+  processMessage
+  */
+  ////// </Method overview> //////
+
+  char messageType = espnowGetMessageType(dataArray);
+  uint8_t transmissionsRemaining = espnowGetTransmissionsRemaining(dataArray);
+  uint64_t uint64Mac = macToUint64(macaddr);
+  
+  // The MAC is 6 bytes so two bytes of uint64Mac are free. We must include the messageType there since it is possible that we will
+  // receive both a request and a response that shares the same messageID from the same uint64Mac, being distinguished only by the messageType.
+  // This would otherwise potentially cause the request and response to be mixed into one message when they are multi-part transmissions sent roughly at the same time.
+  macAndType_td macAndType = createMacAndTypeValue(uint64Mac, messageType); 
+  uint64_t messageID = espnowGetMessageID(dataArray);
+  
+  //uint32_t methodStart = millis();
+
+  if(espnowIsMessageStart(dataArray))
+  {
+    if(messageType == 'B')
+    {
+      String message = espnowGetMessageContent(dataArray, len);
+      setSenderMac(macaddr);
+      setReceivedEncryptedMessage(usesEncryption(messageID));
+      bool acceptBroadcast = getBroadcastFilter()(message, *this);
+      if(acceptBroadcast)
+      {
+        // Does nothing if key already in receivedEspnowTransmissions
+        receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(message, espnowGetTransmissionsRemaining(dataArray))));
+      }
+      else
+      {
+        return;
+      }
+    }
+    else
+    {  
+      // Does nothing if key already in receivedEspnowTransmissions
+      receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(dataArray, len)));
+    }
+  }
+  else
+  {
+    std::map<std::pair<macAndType_td, messageID_td>, MessageData>::iterator storedMessageIterator = receivedEspnowTransmissions.find(std::make_pair(macAndType, messageID));
+    
+    if(storedMessageIterator != receivedEspnowTransmissions.end()) // If we have not stored the key already, we missed the first message part.
+    {
+      if(!storedMessageIterator->second.addToMessage(dataArray, len))
+      {
+        // If we received the wrong message part, remove the whole message if we have missed a part.
+        // Otherwise just ignore the received part since it has already been stored.
+        
+        uint8_t transmissionsRemainingExpected = storedMessageIterator->second.getTransmissionsRemaining() - 1;
+        
+        if(transmissionsRemaining < transmissionsRemainingExpected)
+        {
+          receivedEspnowTransmissions.erase(storedMessageIterator);
+          return;
+        }
+      }
+    }
+    else
+    {
+      return;
+    }
+  }
+  
+  //Serial.println("methodStart storage done " + String(millis() - methodStart));
+  
+  if(transmissionsRemaining != 0)
+  {
+    return;
+  }
+
+  std::map<std::pair<macAndType_td, messageID_td>, MessageData>::iterator storedMessageIterator = receivedEspnowTransmissions.find(std::make_pair(macAndType, messageID));
+  assert(storedMessageIterator != receivedEspnowTransmissions.end());
+
+  // Copy totalMessage in case user callbacks (request/responseHandler) do something odd with receivedEspnowTransmissions list.
+  String totalMessage = storedMessageIterator->second.getTotalMessage(); // https://stackoverflow.com/questions/134731/returning-a-const-reference-to-an-object-instead-of-a-copy It is likely that most compilers will perform Named Value Return Value Optimisation in this case
+  
+  receivedEspnowTransmissions.erase(storedMessageIterator); // Erase the extra copy of the totalMessage, to save RAM. 
+   
+  //Serial.println("methodStart erase done " + String(millis() - methodStart));
+  
+  if(messageType == 'Q' || messageType == 'B') // Question (request) or Broadcast
+  {
+    storeReceivedRequest(uint64Mac, messageID, TimeTracker(millis()));
+    //Serial.println("methodStart request stored " + String(millis() - methodStart));
+      
+    setSenderMac(macaddr);
+    setReceivedEncryptedMessage(usesEncryption(messageID));
+    String response = getRequestHandler()(totalMessage, *this);
+    //Serial.println("methodStart response acquired " + String(millis() - methodStart));
+     
+    if(response.length() > 0)
+    {
+      responsesToSend.push_back(ResponseData(response, macaddr, messageID));
+      
+      //Serial.println("methodStart Q done " + String(millis() - methodStart));
+    }
+  }
+  else if(messageType == 'A') // Answer (response)
+  {
+    deleteSentRequest(uint64Mac, messageID); // Request has been answered, so stop accepting new answers about it.
+
+    if(EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(macaddr))
+    {
+      if(encryptedConnection->getOwnSessionKey() == messageID)
+      {
+        encryptedConnection->setDesync(false); // We just received an answer to the latest request we sent to the node, so the node sending the answer must now be in sync.
+        encryptedConnection->incrementOwnSessionKey();
+      }
+    } 
+    
+    setSenderMac(macaddr);
+    setReceivedEncryptedMessage(usesEncryption(messageID));
+    getResponseHandler()(totalMessage, *this);
+  }
+  else
+  {
+    assert(messageType == 'Q' || messageType == 'A' || messageType == 'B');
+  }
+  
+  ESP.wdtFeed(); // Prevents WDT reset in case we receive a lot of transmissions without break.
+
+  //Serial.println("methodStart wdtFeed done " + String(millis() - methodStart));
 }
 
 void EspnowMeshBackend::setEspnowRequestManager(EspnowMeshBackend *espnowMeshInstance)
@@ -505,63 +872,9 @@ bool EspnowMeshBackend::isEspnowRequestManager()
   return (this == getEspnowRequestManager());
 }
 
-bool EspnowMeshBackend::activateEspnow()
+bool EspnowMeshBackend::encryptedConnectionEstablished(encrypted_connection_status_t connectionStatus)
 {
-  if (esp_now_init()==0) 
-  {    
-    if(_espnowEncryptionKokSet && esp_now_set_kok(_espnowEncryptionKok, espnowEncryptionKeyLength)) // esp_now_set_kok returns 0 on success.
-      warningPrint("Failed to set ESP-NOW KoK!");
-      
-    if(getEspnowRequestManager() == nullptr)
-    {
-      setEspnowRequestManager(this);
-    }
-    
-    esp_now_register_recv_cb(espnowReceiveCallbackWrapper);
-    esp_now_register_send_cb([](uint8_t* mac, uint8_t sendStatus) {
-      if(_espnowSendConfirmed)
-        return;
-      else if(!sendStatus && macEqual(mac, _transmissionTargetBSSID)) // sendStatus == 0 when send was OK.
-        _espnowSendConfirmed = true; // We do not want to reset this to false. That only happens before transmissions. Otherwise subsequent failed send attempts may obscure an initial successful one.
-    });
-
-    // Role must be set before adding peers. Cannot be changed while having peers.
-    // With ESP_NOW_ROLE_CONTROLLER, we always transmit from the station interface, which gives predictability.
-    if(esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER)) // esp_now_set_self_role returns 0 on success.
-      warningPrint("Failed to set ESP-NOW role! Maybe ESP-NOW peers are already added?");
-
-    verboseModePrint("ESP-NOW activated.");
-    verboseModePrint("My ESP-NOW STA MAC: " + WiFi.macAddress() + "\n"); // Get the station MAC address. The softAP MAC is different.
-    
-    return true;
-  } 
-  else 
-  {
-    warningPrint("ESP-NOW init failed!");
-    return false;
-  }
-}
-
-bool EspnowMeshBackend::deactivateEspnow()
-{
-  // esp_now_deinit() clears all ESP-NOW API settings, including receive callback, send callback, Kok and peers.
-  // The node will however continue to give acks to received ESP-NOW transmissions as long as the receiving interface (AP or STA) is active, even though the transmissions will not be processed.
-  if(esp_now_deinit() == 0)
-  {
-    responsesToSend.clear();
-    peerRequestConfirmationsToSend.clear();
-    receivedEspnowTransmissions.clear();
-    sentRequests.clear();
-    receivedRequests.clear();
-    encryptedConnections.clear();
-    EncryptedConnectionLog::setNewRemovalsScheduled(false);
-    
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return connectionStatus > 0;
 }
 
 uint32_t EspnowMeshBackend::logEntryLifetimeMs()
@@ -582,101 +895,6 @@ void EspnowMeshBackend::setCriticalHeapLevelBuffer(uint32_t bufferInBytes)
 uint32_t EspnowMeshBackend::criticalHeapLevelBuffer()
 {
   return _criticalHeapLevelBuffer;
-}
-
-template <typename T, typename U>
-void EspnowMeshBackend::deleteExpiredLogEntries(std::map<std::pair<U, uint64_t>, T> &logEntries, uint32_t maxEntryLifetimeMs)
-{
-  for(typename std::map<std::pair<U, uint64_t>, T>::iterator entryIterator = logEntries.begin(); 
-      entryIterator != logEntries.end(); )
-  {
-    if(entryIterator->second.timeSinceCreation() > maxEntryLifetimeMs)
-    {
-      entryIterator = logEntries.erase(entryIterator);
-    }
-    else
-      ++entryIterator;
-  }
-}
-
-void EspnowMeshBackend::deleteExpiredLogEntries(std::map<std::pair<peerMac_td, messageID_td>, RequestData> &logEntries, uint32_t requestLifetimeMs, uint32_t broadcastLifetimeMs)
-{
-  for(typename std::map<std::pair<peerMac_td, messageID_td>, RequestData>::iterator entryIterator = logEntries.begin(); 
-      entryIterator != logEntries.end(); )
-  {
-    bool broadcast = entryIterator->first.first == uint64BroadcastMac;
-    uint32_t timeSinceCreation = entryIterator->second.timeSinceCreation();
-    
-    if((!broadcast && timeSinceCreation > requestLifetimeMs) 
-        || (broadcast && timeSinceCreation > broadcastLifetimeMs))
-    {
-      entryIterator = logEntries.erase(entryIterator);
-    }
-    else
-      ++entryIterator;
-  }
-}
-
-template <typename T>
-void EspnowMeshBackend::deleteExpiredLogEntries(std::list<T> &logEntries, uint32_t maxEntryLifetimeMs)
-{
-  for(typename std::list<T>::iterator entryIterator = logEntries.begin(); 
-      entryIterator != logEntries.end(); )
-  {
-    if(entryIterator->timeSinceCreation() > maxEntryLifetimeMs)
-    {
-      entryIterator = logEntries.erase(entryIterator);
-    }
-    else
-      ++entryIterator;
-  }
-}
-
-template <> 
-void EspnowMeshBackend::deleteExpiredLogEntries(std::list<EncryptedConnectionLog> &logEntries, uint32_t maxEntryLifetimeMs)
-{
-  for(typename std::list<EncryptedConnectionLog>::iterator entryIterator = logEntries.begin(); 
-    entryIterator != logEntries.end(); )
-  {
-    auto timeTrackerPointer = entryIterator->temporary();
-    if(timeTrackerPointer && timeTrackerPointer->timeSinceCreation() > maxEntryLifetimeMs)
-    {
-      entryIterator = logEntries.erase(entryIterator);
-    }
-    else
-      ++entryIterator;
-  }
-}
-
-template <> 
-void EspnowMeshBackend::deleteExpiredLogEntries(std::list<PeerRequestLog> &logEntries, uint32_t maxEntryLifetimeMs)
-{
-  for(typename std::list<PeerRequestLog>::iterator entryIterator = logEntries.begin(); 
-    entryIterator != logEntries.end(); )
-  {
-    auto timeTrackerPointer = entryIterator->temporary();
-    if(timeTrackerPointer && timeTrackerPointer->timeSinceCreation() > maxEntryLifetimeMs)
-    {
-      entryIterator = logEntries.erase(entryIterator);
-    }
-    else
-      ++entryIterator;
-  }
-}
-
-void EspnowMeshBackend::clearOldLogEntries()
-{
-  // Clearing all old log entries at the same time should help minimize heap fragmentation.
-  
-  // uint32_t startTime = millis();
-  
-  _timeOfLastLogClear = millis();
-  
-  deleteExpiredLogEntries(receivedEspnowTransmissions, logEntryLifetimeMs());
-  deleteExpiredLogEntries(receivedRequests, logEntryLifetimeMs()); // Just needs to be long enough to not accept repeated transmissions by mistake.
-  deleteExpiredLogEntries(sentRequests, logEntryLifetimeMs(), broadcastResponseTimeoutMs());
-  deleteExpiredLogEntries(responsesToSend, logEntryLifetimeMs());
-  deleteExpiredLogEntries(peerRequestConfirmationsToSend, getEncryptionRequestTimeout());
 }
 
 template <typename T>
@@ -806,6 +1024,8 @@ transmission_status_t EspnowMeshBackend::espnowSendToNode(const String &message,
   {
     uint8_t encryptedMac[6] {0};
     encryptedConnection->getEncryptedPeerMac(encryptedMac);
+    
+    assert(esp_now_is_peer_exist(encryptedMac) > 0 && "ERROR! Attempting to send content marked as encrypted via unencrypted connection!");
     
     if(encryptedConnection->desync())
     {
@@ -987,6 +1207,7 @@ transmission_status_t EspnowMeshBackend::sendResponse(const String &message, uin
   if(encryptedConnection)
   {
     encryptedConnection->getEncryptedPeerMac(encryptedMac);
+    assert(esp_now_is_peer_exist(encryptedMac) > 0 && "ERROR! Attempting to send content marked as encrypted via unencrypted connection!");
   }
   
   return espnowSendToNodeUnsynchronized(message, encryptedConnection ? encryptedMac : targetBSSID, 'A', requestID, this);
@@ -1002,154 +1223,6 @@ EspnowMeshBackend::macAndType_td EspnowMeshBackend::createMacAndTypeValue(uint64
 uint64_t EspnowMeshBackend::macAndTypeToUint64Mac(const macAndType_td &macAndTypeValue)
 {
   return static_cast<uint64_t>(macAndTypeValue) >> 8;
-}
-
-void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArray, uint8_t len)
-{  
-  using namespace EspnowProtocolInterpreter;
-  
-  ////// <Method overview> //////
-  /*
-  if(messageStart)
-  {
-    storeTransmission
-  }
-  else
-  {
-    if(messageFound)
-      storeTransmission or (erase and return)
-    else
-      return
-  }
-  
-  if(transmissionsRemaining != 0)
-    return
-    
-  processMessage
-  */
-  ////// </Method overview> //////
-
-  char messageType = espnowGetMessageType(dataArray);
-  uint8_t transmissionsRemaining = espnowGetTransmissionsRemaining(dataArray);
-  uint64_t uint64Mac = macToUint64(macaddr);
-  
-  // The MAC is 6 bytes so two bytes of uint64Mac are free. We must include the messageType there since it is possible that we will
-  // receive both a request and a response that shares the same messageID from the same uint64Mac, being distinguished only by the messageType.
-  // This would otherwise potentially cause the request and response to be mixed into one message when they are multi-part transmissions sent roughly at the same time.
-  macAndType_td macAndType = createMacAndTypeValue(uint64Mac, messageType); 
-  uint64_t messageID = espnowGetMessageID(dataArray);
-  
-  //uint32_t methodStart = millis();
-
-  if(espnowIsMessageStart(dataArray))
-  {
-    if(messageType == 'B')
-    {
-      String message = espnowGetMessageContent(dataArray, len);
-      setSenderMac(macaddr);
-      setReceivedEncryptedMessage(usesEncryption(messageID));
-      bool acceptBroadcast = getBroadcastFilter()(message, *this);
-      if(acceptBroadcast)
-      {
-        // Does nothing if key already in receivedEspnowTransmissions
-        receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(message, espnowGetTransmissionsRemaining(dataArray))));
-      }
-      else
-      {
-        return;
-      }
-    }
-    else
-    {  
-      // Does nothing if key already in receivedEspnowTransmissions
-      receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(dataArray, len)));
-    }
-  }
-  else
-  {
-    std::map<std::pair<macAndType_td, messageID_td>, MessageData>::iterator storedMessageIterator = receivedEspnowTransmissions.find(std::make_pair(macAndType, messageID));
-    
-    if(storedMessageIterator != receivedEspnowTransmissions.end()) // If we have not stored the key already, we missed the first message part.
-    {
-      if(!storedMessageIterator->second.addToMessage(dataArray, len))
-      {
-        // If we received the wrong message part, remove the whole message if we have missed a part.
-        // Otherwise just ignore the received part since it has already been stored.
-        
-        uint8_t transmissionsRemainingExpected = storedMessageIterator->second.getTransmissionsRemaining() - 1;
-        
-        if(transmissionsRemaining < transmissionsRemainingExpected)
-        {
-          receivedEspnowTransmissions.erase(storedMessageIterator);
-          return;
-        }
-      }
-    }
-    else
-    {
-      return;
-    }
-  }
-  
-  //Serial.println("methodStart storage done " + String(millis() - methodStart));
-  
-  if(transmissionsRemaining != 0)
-  {
-    return;
-  }
-
-  std::map<std::pair<macAndType_td, messageID_td>, MessageData>::iterator storedMessageIterator = receivedEspnowTransmissions.find(std::make_pair(macAndType, messageID));
-  assert(storedMessageIterator != receivedEspnowTransmissions.end());
-
-  // Copy totalMessage in case user callbacks (request/responseHandler) do something odd with receivedEspnowTransmissions list.
-  String totalMessage = storedMessageIterator->second.getTotalMessage(); // https://stackoverflow.com/questions/134731/returning-a-const-reference-to-an-object-instead-of-a-copy It is likely that most compilers will perform Named Value Return Value Optimisation in this case
-  
-  receivedEspnowTransmissions.erase(storedMessageIterator); // Erase the extra copy of the totalMessage, to save RAM. 
-   
-  //Serial.println("methodStart erase done " + String(millis() - methodStart));
-  
-  if(messageType == 'Q' || messageType == 'B') // Question (request) or Broadcast
-  {
-    storeReceivedRequest(uint64Mac, messageID, TimeTracker(millis()));
-    //Serial.println("methodStart request stored " + String(millis() - methodStart));
-      
-    setSenderMac(macaddr);
-    setReceivedEncryptedMessage(usesEncryption(messageID));
-    String response = getRequestHandler()(totalMessage, *this);
-    //Serial.println("methodStart response acquired " + String(millis() - methodStart));
-     
-    if(response.length() > 0)
-    {
-      responsesToSend.push_back(ResponseData(response, macaddr, messageID));
-      
-      //Serial.println("methodStart Q done " + String(millis() - methodStart));
-    }
-  }
-  else if(messageType == 'A') // Answer (response)
-  {
-    deleteSentRequest(uint64Mac, messageID); // Request has been answered, so stop accepting new answers about it.
-
-    if(EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(macaddr))
-    {
-      if(encryptedConnection->getOwnSessionKey() == messageID)
-      {
-        encryptedConnection->setDesync(false); // We just received an answer to the latest request we sent to the node, so the node sending the answer must now be in sync.
-        encryptedConnection->incrementOwnSessionKey();
-      }
-    } 
-    
-    setSenderMac(macaddr);
-    setReceivedEncryptedMessage(usesEncryption(messageID));
-    getResponseHandler()(totalMessage, *this);
-  }
-  else
-  {
-    assert(messageType == 'Q' || messageType == 'A' || messageType == 'B');
-  }
-  
-  ESP.wdtFeed(); // Prevents WDT reset in case we receive a lot of transmissions without break.
-
-  //Serial.println("methodStart wdtFeed done " + String(millis() - methodStart));
 }
 
 void EspnowMeshBackend::setEspnowEncryptionKey(const uint8_t espnowEncryptionKey[espnowEncryptionKeyLength])
@@ -1324,6 +1397,11 @@ uint8_t *EspnowMeshBackend::getSenderMac(uint8_t *macArray)
 
 void EspnowMeshBackend::setReceivedEncryptedMessage(bool receivedEncryptedMessage) { _receivedEncryptedMessage = receivedEncryptedMessage; }
 bool EspnowMeshBackend::receivedEncryptedMessage() {return _receivedEncryptedMessage;}
+
+bool EspnowMeshBackend::addUnencryptedConnection(const String &serializedConnectionState)
+{
+  return JsonTranslator::getUnencryptedMessageID(serializedConnectionState, _unencryptedMessageID);
+}
 
 encrypted_connection_status_t EspnowMeshBackend::addEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey)
 {
@@ -1508,6 +1586,8 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
   _ongoingPeerRequestResult = ECS_REQUEST_TRANSMISSION_FAILED;
   _ongoingPeerRequestNonce = requestNonce;
   _ongoingPeerRequester = this;
+  _reciprocalPeerRequestConfirmation = false;
+  std::copy_n(peerMac, 6, _ongoingPeerRequestMac);
   String requestMessage = encryptionRequestBuilder(requestNonce, existingTimeTracker);
 
   verboseModePrint("Sending encrypted connection request to: " + macToString(peerMac));
@@ -1519,6 +1599,9 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
     // _ongoingPeerRequestNonce is set to "" when a peer confirmation response from the mac is received
     while(millis() - startTime < getEncryptionRequestTimeout() && _ongoingPeerRequestNonce != "")
     {
+      // For obvious reasons dividing by exactly 10 is a good choice.
+      ExpiringTimeTracker maxDurationTracker = ExpiringTimeTracker(getEncryptionRequestTimeout()/10);
+      sendPeerRequestConfirmations(&maxDurationTracker); // Must be called before delay() to ensure _ongoingPeerRequestNonce != "" is still true, so reciprocal peer request order is preserved.
       delay(1);
     }
   }
@@ -1529,9 +1612,17 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
     _ongoingPeerRequestResult = ECS_REQUEST_TRANSMISSION_FAILED;
     _ongoingPeerRequestNonce = "";
   }
-  else if(_ongoingPeerRequestResult == ECS_CONNECTION_ESTABLISHED)
+  else if(encryptedConnectionEstablished(_ongoingPeerRequestResult))
   {
-    requestMessage = encryptionRequestBuilder(requestNonce, existingTimeTracker); // Give the builder a chance to update the message
+    if(_ongoingPeerRequestResult == ECS_CONNECTION_ESTABLISHED)
+      // Give the builder a chance to update the message
+      requestMessage = encryptionRequestBuilder(requestNonce, existingTimeTracker);
+    else if(_ongoingPeerRequestResult == ECS_SOFT_LIMIT_CONNECTION_ESTABLISHED)
+      // We will only get a soft limit connection. Adjust future actions based on this.
+      requestMessage = JsonTranslator::createEncryptionRequestHmacMessage(temporaryEncryptionRequestHeader, requestNonce, getEspnowHashKey(), 
+                                                                          espnowHashKeyLength, getAutoEncryptionDuration());
+    else
+      assert(false && "Unknown _ongoingPeerRequestResult during encrypted connection finalization!");
     
     int32_t messageHeaderEndIndex = requestMessage.indexOf(':');
     String messageHeader = requestMessage.substring(0, messageHeaderEndIndex + 1);
@@ -1542,10 +1633,15 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
        && millis() - _ongoingPeerRequestEncryptionStart < getEncryptionRequestTimeout())
     {
       EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(peerMac);
-      if(!encryptedConnection || encryptedConnection->removalScheduled())
+      if(!encryptedConnection)
       {
         assert(encryptedConnection && "requestEncryptedConnectionKernel cannot find an encrypted connection!");
         // requestEncryptedConnectionRemoval received.
+        _ongoingPeerRequestResult = ECS_REQUEST_TRANSMISSION_FAILED;
+      }
+      else if(encryptedConnection->removalScheduled() || (encryptedConnection->temporary() && encryptedConnection->temporary()->expired()))
+      {
+        // Could possibly be caused by a simultaneous temporary peer request from the peer.
         _ongoingPeerRequestResult = ECS_REQUEST_TRANSMISSION_FAILED;
       }
       else
@@ -1557,7 +1653,7 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
         }
         else if(messageHeader == temporaryEncryptionRequestHeader)
         {
-          if(!existingEncryptedConnection || existingEncryptedConnection->temporary())
+          if(encryptedConnection->temporary())
           {
             // Should not change duration of existing permanent connections.
             uint32_t connectionDuration = 0;
@@ -1579,11 +1675,11 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
     }
   }
 
-  if(_ongoingPeerRequestResult != ECS_CONNECTION_ESTABLISHED)
+  if(!encryptedConnectionEstablished(_ongoingPeerRequestResult))
   {
-    if(!existingEncryptedConnection)
+    if(!existingEncryptedConnection && !_reciprocalPeerRequestConfirmation)
     {
-      // Remove any connection that was added during the request attempt.
+      // Remove any connection that was added during the request attempt and is no longer in use.
       removeEncryptedConnectionUnprotected(peerMac);
     }
   }
@@ -1593,31 +1689,16 @@ encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnectionKerne
   return _ongoingPeerRequestResult;
 }
 
-String EspnowMeshBackend::defaultEncryptionRequestBuilder(const String &requestHeader, const uint32_t durationMs,
+String EspnowMeshBackend::defaultEncryptionRequestBuilder(const String &requestHeader, const uint32_t durationMs, const uint8_t *hashKey,
                                                          const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker)
 {
-  using namespace JsonTranslator;
-  using EspnowProtocolInterpreter::temporaryEncryptionRequestHeader;
-
   (void)existingTimeTracker; // This removes a "unused parameter" compiler warning. Does nothing else.
-
-  String requestMessage = "";
   
-  if(requestHeader == temporaryEncryptionRequestHeader)
-  {
-    requestMessage += createEncryptionRequestIntro(requestHeader, durationMs);
-  }
-  else
-  {
-    requestMessage += createEncryptionRequestIntro(requestHeader);
-  }
-
-  requestMessage += createEncryptionRequestEnding(requestNonce);
-  
-  return requestMessage;
+  return JsonTranslator::createEncryptionRequestHmacMessage(requestHeader, requestNonce, hashKey, espnowHashKeyLength, durationMs);
 }
     
-String EspnowMeshBackend::flexibleEncryptionRequestBuilder(const uint32_t minDurationMs, const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker)
+String EspnowMeshBackend::flexibleEncryptionRequestBuilder(const uint32_t minDurationMs, const uint8_t *hashKey, 
+                                                           const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker)
 {
   using namespace JsonTranslator;
   using EspnowProtocolInterpreter::temporaryEncryptionRequestHeader;
@@ -1625,25 +1706,26 @@ String EspnowMeshBackend::flexibleEncryptionRequestBuilder(const uint32_t minDur
   uint32_t connectionDuration = minDurationMs >= existingTimeTracker.remainingDuration() ? 
                                 minDurationMs : existingTimeTracker.remainingDuration();
 
-  return createEncryptionRequestIntro(temporaryEncryptionRequestHeader, connectionDuration) + createEncryptionRequestEnding(requestNonce);
+  return createEncryptionRequestHmacMessage(temporaryEncryptionRequestHeader, requestNonce, hashKey, espnowHashKeyLength, connectionDuration);
 }
 
 encrypted_connection_status_t EspnowMeshBackend::requestEncryptedConnection(uint8_t *peerMac)
 {
   using namespace std::placeholders;
-  return requestEncryptedConnectionKernel(peerMac, std::bind(defaultEncryptionRequestBuilder, EspnowProtocolInterpreter::encryptionRequestHeader, 0, _1, _2));
+  return requestEncryptedConnectionKernel(peerMac, std::bind(defaultEncryptionRequestBuilder, EspnowProtocolInterpreter::encryptionRequestHeader, 0, getEspnowHashKey(), _1, _2));
 }
 
 encrypted_connection_status_t EspnowMeshBackend::requestTemporaryEncryptedConnection(uint8_t *peerMac, uint32_t durationMs)
 {
   using namespace std::placeholders;
-  return requestEncryptedConnectionKernel(peerMac, std::bind(defaultEncryptionRequestBuilder, EspnowProtocolInterpreter::temporaryEncryptionRequestHeader, durationMs, _1, _2));
+  return requestEncryptedConnectionKernel(peerMac, std::bind(defaultEncryptionRequestBuilder, EspnowProtocolInterpreter::temporaryEncryptionRequestHeader, 
+                                                             durationMs, getEspnowHashKey(), _1, _2));
 }
 
 encrypted_connection_status_t EspnowMeshBackend::requestFlexibleTemporaryEncryptedConnection(uint8_t *peerMac, uint32_t minDurationMs)
 {
   using namespace std::placeholders;
-  return requestEncryptedConnectionKernel(peerMac, std::bind(flexibleEncryptionRequestBuilder, minDurationMs, _1, _2));
+  return requestEncryptedConnectionKernel(peerMac, std::bind(flexibleEncryptionRequestBuilder, minDurationMs, getEspnowHashKey(), _1, _2));
 }
 
 bool EspnowMeshBackend::temporaryEncryptedConnectionToPermanent(uint8_t *peerMac)
@@ -1831,6 +1913,14 @@ encrypted_connection_removal_outcome_t EspnowMeshBackend::requestEncryptedConnec
 void EspnowMeshBackend::setAcceptsUnencryptedRequests(bool acceptsUnencryptedRequests)  { _acceptsUnencryptedRequests = acceptsUnencryptedRequests; }
 bool EspnowMeshBackend::acceptsUnencryptedRequests() { return _acceptsUnencryptedRequests; }
 
+void EspnowMeshBackend::setEncryptedConnectionsSoftLimit(uint8_t softLimit) 
+{ 
+  assert(softLimit <= 6); // Valid values are 0 to 6, but uint8_t is always at least 0.
+  _encryptedConnectionsSoftLimit = softLimit; 
+}
+
+uint8_t EspnowMeshBackend::encryptedConnectionsSoftLimit() { return _encryptedConnectionsSoftLimit; }
+
 template <typename T>
 typename std::vector<T>::iterator EspnowMeshBackend::getEncryptedConnectionIterator(const uint8_t *peerMac, typename std::vector<T> &connectionVector)
 {
@@ -1993,12 +2083,23 @@ void EspnowMeshBackend::attemptTransmission(const String &message, bool scan, bo
   }
 
   prepareForTransmission(message, scan, scanAllWiFiChannels);
-    
-  for(EspnowNetworkInfo &currentNetwork : connectionQueue())
-  {
-    transmission_status_t transmissionResult = initiateTransmission(getMessage(), currentNetwork);
 
-    latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+  MutexTracker connectionQueueMutexTracker(_espnowConnectionQueueMutex);
+  if(!connectionQueueMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! connectionQueue locked. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+  }
+  else
+  { 
+    for(const EspnowNetworkInfo &currentNetwork : constConnectionQueue())
+    {
+      transmission_status_t transmissionResult = initiateTransmission(getMessage(), currentNetwork);
+  
+      latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+  
+      if(!getTransmissionOutcomesUpdateHook()(*this))
+        break;
+    }
   }
 
   printTransmissionStatistics();
@@ -2016,7 +2117,7 @@ transmission_status_t EspnowMeshBackend::attemptTransmission(const String &messa
   return initiateTransmission(message, recipientInfo);
 }
 
-encrypted_connection_status_t EspnowMeshBackend::initiateAutoEncryptingConnection(const EspnowNetworkInfo &recipientInfo, bool createPermanentConnection, uint8_t *targetBSSID, EncryptedConnectionLog **encryptedConnection)
+encrypted_connection_status_t EspnowMeshBackend::initiateAutoEncryptingConnection(const EspnowNetworkInfo &recipientInfo, bool requestPermanentConnection, uint8_t *targetBSSID, EncryptedConnectionLog **existingEncryptedConnection)
 {
   assert(recipientInfo.BSSID() != nullptr); // We need at least the BSSID to connect
   recipientInfo.getBSSID(targetBSSID);
@@ -2027,10 +2128,10 @@ encrypted_connection_status_t EspnowMeshBackend::initiateAutoEncryptingConnectio
     verboseModePrint(F(""));
   }
 
-  *encryptedConnection = getEncryptedConnection(targetBSSID);
+  *existingEncryptedConnection = getEncryptedConnection(targetBSSID);
   encrypted_connection_status_t connectionStatus = ECS_MAX_CONNECTIONS_REACHED_SELF;
 
-  if(createPermanentConnection)
+  if(requestPermanentConnection)
     connectionStatus = requestEncryptedConnection(targetBSSID);
   else
     connectionStatus = requestFlexibleTemporaryEncryptedConnection(targetBSSID, getAutoEncryptionDuration());
@@ -2042,64 +2143,77 @@ transmission_status_t EspnowMeshBackend::initiateAutoEncryptingTransmission(cons
 {
   transmission_status_t transmissionResult = TS_CONNECTION_FAILED;
   
-  if(connectionStatus == ECS_CONNECTION_ESTABLISHED)
+  if(encryptedConnectionEstablished(connectionStatus))
   {
+    uint8_t encryptedMac[6] {0};
+    assert(getEncryptedMac(targetBSSID, encryptedMac) && esp_now_is_peer_exist(encryptedMac) > 0 && "ERROR! Attempting to send content marked as encrypted via unencrypted connection!");
     transmissionResult = initiateTransmissionKernel(message, targetBSSID);
   }
   
   return transmissionResult;
 }
 
-void EspnowMeshBackend::finalizeAutoEncryptingConnection(const uint8_t *targetBSSID, const EncryptedConnectionLog *encryptedConnection, bool createPermanentConnection)
+void EspnowMeshBackend::finalizeAutoEncryptingConnection(const uint8_t *targetBSSID, const EncryptedConnectionLog *existingEncryptedConnection, bool requestPermanentConnection)
 {
-  if(!encryptedConnection && !createPermanentConnection)
+  if(!existingEncryptedConnection && !requestPermanentConnection && !_reciprocalPeerRequestConfirmation)
   {
-    // Remove any connection that was added during the transmission attempt.
+    // Remove any connection that was added during the transmission attempt and is no longer in use.
     removeEncryptedConnectionUnprotected(targetBSSID);
   }
 }
 
-void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool createPermanentConnections)
+void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, bool requestPermanentConnections, bool scan, bool scanAllWiFiChannels)
 {
   MutexTracker outerMutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
   if(!outerMutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! Transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    assert(false && "ERROR! Transmission in progress. Don't call attemptAutoEncryptingTransmission from callbacks as this may corrupt program state! Aborting."); 
     return;
   }
 
   prepareForTransmission(message, scan, scanAllWiFiChannels);
 
   outerMutexTracker.releaseMutex();
+
+  MutexTracker connectionQueueMutexTracker(_espnowConnectionQueueMutex);
+  if(!connectionQueueMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! connectionQueue locked. Don't call attemptAutoEncryptingTransmission from callbacks as this may corrupt program state! Aborting."); 
+  }
+  else
+  {
+    for(const EspnowNetworkInfo &currentNetwork : constConnectionQueue())
+    {    
+      uint8_t currentBSSID[6] {0};
+      EncryptedConnectionLog *existingEncryptedConnection = nullptr;
+      encrypted_connection_status_t connectionStatus = initiateAutoEncryptingConnection(currentNetwork, requestPermanentConnections, currentBSSID, &existingEncryptedConnection);
   
-  for(EspnowNetworkInfo &currentNetwork : connectionQueue())
-  {    
-    uint8_t currentBSSID[6] {0};
-    EncryptedConnectionLog *encryptedConnection = nullptr;
-    encrypted_connection_status_t connectionStatus = initiateAutoEncryptingConnection(currentNetwork, createPermanentConnections, currentBSSID, &encryptedConnection);
-
-    MutexTracker innerMutexTracker = MutexTracker(_espnowTransmissionMutex);
-    if(!innerMutexTracker.mutexCaptured())
-    {
-      assert(false && "ERROR! Unable to recapture Mutex in attemptAutoEncryptingTransmission. Aborting."); 
-      return;
+      MutexTracker innerMutexTracker = MutexTracker(_espnowTransmissionMutex);
+      if(!innerMutexTracker.mutexCaptured())
+      {
+        assert(false && "ERROR! Unable to recapture Mutex in attemptAutoEncryptingTransmission. Aborting."); 
+        return;
+      }
+  
+      transmission_status_t transmissionResult = initiateAutoEncryptingTransmission(getMessage(), currentBSSID, connectionStatus);
+  
+      latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+  
+      finalizeAutoEncryptingConnection(currentBSSID, existingEncryptedConnection, requestPermanentConnections);
+  
+      if(!getTransmissionOutcomesUpdateHook()(*this))
+        break;
     }
-
-    transmission_status_t transmissionResult = initiateAutoEncryptingTransmission(getMessage(), currentBSSID, connectionStatus);
-
-    latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
-
-    finalizeAutoEncryptingConnection(currentBSSID, encryptedConnection, createPermanentConnections);
   }
 
   printTransmissionStatistics();
 }
 
-transmission_status_t EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, const EspnowNetworkInfo &recipientInfo, bool createPermanentConnection)
+transmission_status_t EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message, const EspnowNetworkInfo &recipientInfo, bool requestPermanentConnection)
 {
   uint8_t targetBSSID[6] {0};
-  EncryptedConnectionLog *encryptedConnection = nullptr;
-  encrypted_connection_status_t connectionStatus = initiateAutoEncryptingConnection(recipientInfo, createPermanentConnection, targetBSSID, &encryptedConnection);
+  EncryptedConnectionLog *existingEncryptedConnection = nullptr;
+  encrypted_connection_status_t connectionStatus = initiateAutoEncryptingConnection(recipientInfo, requestPermanentConnection, targetBSSID, &existingEncryptedConnection);
 
   MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
   if(!mutexTracker.mutexCaptured())
@@ -2110,7 +2224,7 @@ transmission_status_t EspnowMeshBackend::attemptAutoEncryptingTransmission(const
 
   transmission_status_t transmissionResult = initiateAutoEncryptingTransmission(message, targetBSSID, connectionStatus);
 
-  finalizeAutoEncryptingConnection(targetBSSID, encryptedConnection, createPermanentConnection);
+  finalizeAutoEncryptingConnection(targetBSSID, existingEncryptedConnection, requestPermanentConnection);
 
   return transmissionResult;
 }
@@ -2127,20 +2241,36 @@ void EspnowMeshBackend::broadcast(const String &message)
   espnowSendToNode(message, broadcastMac, 'B', this);
 }
 
-void EspnowMeshBackend::sendEspnowResponses()
+void EspnowMeshBackend::sendStoredEspnowMessages(const ExpiringTimeTracker *estimatedMaxDurationTracker)
 {
-  //uint32_t startTime = millis();
+  sendPeerRequestConfirmations(estimatedMaxDurationTracker);
 
+  if(estimatedMaxDurationTracker && estimatedMaxDurationTracker->expired())
+    return;
+
+  sendEspnowResponses(estimatedMaxDurationTracker);
+}
+
+void EspnowMeshBackend::sendPeerRequestConfirmations(const ExpiringTimeTracker *estimatedMaxDurationTracker)
+{
   uint32_t bufferedCriticalHeapLevel = criticalHeapLevel() + criticalHeapLevelBuffer(); // We preferably want to start clearing the logs a bit before things get critical.
-
+  // _ongoingPeerRequestNonce can change during every delay(), but we need to remember the initial value to know from where sendPeerRequestConfirmations was called.
+  String initialOngoingPeerRequestNonce = _ongoingPeerRequestNonce;
+  
   for(std::list<PeerRequestLog>::iterator confirmationsIterator = peerRequestConfirmationsToSend.begin(); confirmationsIterator != peerRequestConfirmationsToSend.end(); )
   {     
     using namespace EspnowProtocolInterpreter;
+
+    // True if confirmationsIterator contains a peer request received from the same node we are currently sending a peer request to.
+    bool reciprocalPeerRequest = initialOngoingPeerRequestNonce != "" && confirmationsIterator->connectedTo(_ongoingPeerRequestMac);
          
     auto timeTrackerPointer = confirmationsIterator->temporary();
     assert(timeTrackerPointer); // peerRequestConfirmations should always expire and so should always have a timeTracker
-    if(timeTrackerPointer->timeSinceCreation() > getEncryptionRequestTimeout())
+    if(timeTrackerPointer->timeSinceCreation() > getEncryptionRequestTimeout() 
+       || (reciprocalPeerRequest && confirmationsIterator->getPeerRequestNonce() <= initialOngoingPeerRequestNonce))
     {
+      // The peer request has expired, 
+      // or the peer request comes from the node we are currently making a peer request to ourselves and we are supposed to wait in this event to avoid simultaneous session key transfer.
       ++confirmationsIterator;
       continue;
     }
@@ -2164,7 +2294,8 @@ void EspnowMeshBackend::sendEspnowResponses()
 
     staticVerboseModePrint("Responding to encrypted connection request from MAC " + macToString(defaultBSSID));
 
-    if(!existingEncryptedConnection && encryptedConnections.size() >= maxEncryptedConnections)
+    if(!existingEncryptedConnection && 
+       ((reciprocalPeerRequest && encryptedConnections.size() >= maxEncryptedConnections) || (!reciprocalPeerRequest && reservedEncryptedConnections() >= maxEncryptedConnections)))
     {
       espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptionRequestHmacMessage(maxConnectionsReachedHeader, 
                                                         confirmationsIterator->getPeerRequestNonce(), hashKey, espnowHashKeyLength),
@@ -2200,7 +2331,7 @@ void EspnowMeshBackend::sendEspnowResponses()
       {
         warningPrint("WARNING! Ignoring received encrypted connection request since no EspnowRequestManager is assigned.");
       }
-
+      
       if(!existingEncryptedConnection)
       {
         // Send "node full" message
@@ -2210,11 +2341,29 @@ void EspnowMeshBackend::sendEspnowResponses()
       }
       else
       {
-        delay(1); // Give some time for the peer to add an encrypted connection
+        if(reciprocalPeerRequest)
+          _reciprocalPeerRequestConfirmation = true;
+        
+        delay(5); // Give some time for the peer to add an encrypted connection
+        
+        assert(esp_now_is_peer_exist(defaultBSSID) > 0 && "ERROR! Attempting to send content marked as encrypted via unencrypted connection!");
+
+        String messageHeader = "";
+
+        if(existingEncryptedConnection->temporary() && // Should never change permanent connections
+          ((reciprocalPeerRequest && encryptedConnections.size() > confirmationsIterator->getEncryptedConnectionsSoftLimit()) 
+            || (!reciprocalPeerRequest && reservedEncryptedConnections() > confirmationsIterator->getEncryptedConnectionsSoftLimit())))
+        {
+          messageHeader = softLimitEncryptedConnectionInfoHeader;
+        }
+        else
+        {
+          messageHeader = encryptedConnectionInfoHeader;
+        }
         
         // Send password and keys.
         // Probably no need to know which connection type to use, that is stored in request node and will be sent over for finalization.
-        espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptedConnectionInfo(
+        espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptedConnectionInfo(messageHeader,
                                                           confirmationsIterator->getPeerRequestNonce(), confirmationsIterator->getAuthenticationPassword(), 
                                                           existingEncryptedConnection->getOwnSessionKey(), existingEncryptedConnection->getPeerSessionKey()),
                                                           defaultBSSID, 'C', generateMessageID(nullptr));  // Generates a new message ID to avoid sending encrypted sessionKeys over unencrypted connections.
@@ -2235,7 +2384,15 @@ void EspnowMeshBackend::sendEspnowResponses()
       clearOldLogEntries();
       return; // confirmationsIterator may be invalid now. Also, we should give the main loop a chance to respond to the situation.
     }
+
+    if(estimatedMaxDurationTracker && estimatedMaxDurationTracker->expired())
+      return;
   }
+}
+
+void EspnowMeshBackend::sendEspnowResponses(const ExpiringTimeTracker *estimatedMaxDurationTracker)
+{
+  uint32_t bufferedCriticalHeapLevel = criticalHeapLevel() + criticalHeapLevelBuffer(); // We preferably want to start clearing the logs a bit before things get critical.
   
   for(std::list<ResponseData>::iterator responseIterator = responsesToSend.begin(); responseIterator != responsesToSend.end(); )
   {
@@ -2268,6 +2425,9 @@ void EspnowMeshBackend::sendEspnowResponses()
       clearOldLogEntries();
       return; // responseIterator may be invalid now. Also, we should give the main loop a chance to respond to the situation.
     }
+
+    if(estimatedMaxDurationTracker && estimatedMaxDurationTracker->expired())
+      return;
   }
 }
 
@@ -2297,6 +2457,15 @@ uint32_t EspnowMeshBackend::getMaxMessageLength()
 
 uint8_t EspnowMeshBackend::numberOfEncryptedConnections()
 {
+  return encryptedConnections.size();
+}
+
+uint8_t EspnowMeshBackend::reservedEncryptedConnections()
+{
+  if(_ongoingPeerRequestNonce != "")
+    if(!getEncryptedConnection(_ongoingPeerRequestMac))
+      return encryptedConnections.size() + 1; // Reserve one connection spot if we are currently making a peer request to a new node.
+
   return encryptedConnections.size();
 }
 
@@ -2357,6 +2526,15 @@ void EspnowMeshBackend::resetTransmissionFailRate()
 {
   _transmissionsFailed = 0;
   _transmissionsTotal = 0;
+}
+
+String EspnowMeshBackend::serializeUnencryptedConnection()
+{
+  using namespace JsonTranslator;
+  
+  // Returns: {"connectionState":{"uMessageID":"123"}}
+  
+  return jsonConnectionState + createJsonEndPair(jsonUnencryptedMessageID, String(_unencryptedMessageID));
 }
 
 String EspnowMeshBackend::serializeEncryptedConnection(const uint8_t *peerMac)

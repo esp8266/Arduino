@@ -30,6 +30,7 @@
 
 namespace JsonTranslator 
 {
+  const String jsonConnectionState = "{\"connectionState\":{";
   const String jsonPassword = "\"password\":";
   const String jsonOwnSessionKey = "\"ownSK\":";
   const String jsonPeerSessionKey = "\"peerSK\":";
@@ -39,6 +40,8 @@ namespace JsonTranslator
   const String jsonNonce = "\"nonce\":";
   const String jsonHmac = "\"hmac\":";
   const String jsonDesync = "\"desync\":";
+  const String jsonUnencryptedMessageID = "\"uMessageID\":";
+  const String jsonMeshMessageCount = "\"mMessageCount\":";
   
   String createJsonPair(const String &valueIdentifier, const String &value);
   String createJsonEndPair(const String &valueIdentifier, const String &value);
@@ -47,12 +50,11 @@ namespace JsonTranslator
   String createHmac(const String &message, const uint8_t *hashKey, uint8_t hashKeyLength);
 
   bool verifyHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, uint8_t hashKeyLength);
-  bool verifyHmac(const String &encryptionRequestHmacMessage, const uint8_t *hashKey, uint8_t hashKeyLength);
+  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, uint8_t hashKeyLength);
   
-  String createEncryptedConnectionInfo(const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey);
+  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey);
   String createEncryptionRequestIntro(const String &requestHeader, uint32_t duration = 0);
   String createEncryptionRequestEnding(const String &requestNonce);
-  String createEncryptionRequestMessage(const String &requestHeader, const String &requestNonce, uint32_t duration = 0);
   String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, uint8_t hashKeyLength, uint32_t duration = 0);
 
   /**
@@ -76,6 +78,7 @@ namespace JsonTranslator
    */
   int32_t getEndIndex(const String &jsonString, int32_t searchStartIndex);
   
+  bool getConnectionState(const String &jsonString, String &result);
   /**
    * Stores the value of the password field within jsonString into the result variable. 
    * No changes to the result variable are made if jsonString does not contain a password.
@@ -104,6 +107,8 @@ namespace JsonTranslator
   bool getNonce(const String &jsonString, String &result);
   bool getHmac(const String &jsonString, String &result);
   bool getDesync(const String &jsonString, bool &result);
+  bool getUnencryptedMessageID(const String &jsonString, uint32_t &result);
+  bool getMeshMessageCount(const String &jsonString, uint16_t &result);
 }
 
 #endif

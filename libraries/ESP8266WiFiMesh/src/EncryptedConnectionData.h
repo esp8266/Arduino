@@ -55,7 +55,9 @@ public:
 
   // @param resultArray At least size 6.
   uint8_t *getPeerStaMac(uint8_t *resultArray) const;
+  void setPeerStaMac(const uint8_t *peerStaMac) = delete; // A method for setPeerStaMac would sometimes require interacting with the ESP-NOW API to change encrypted connections, so it is not implemented.
   uint8_t *getPeerApMac(uint8_t *resultArray) const;
+  void setPeerApMac(const uint8_t *peerApMac);
 
   bool connectedTo(const uint8_t *peerMac) const;
 

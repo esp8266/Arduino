@@ -32,10 +32,11 @@ class PeerRequestLog : public EncryptedConnectionData {
   
 public:
 
-  PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, const String &peerRequestNonce, const uint8_t peerStaMac[6],
-                 const uint8_t peerApMac[6], const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
-  PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, const String &peerRequestNonce, const uint8_t peerStaMac[6], 
-                 const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+  PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
+                 const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+  PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce,
+                 const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, 
+                 const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
 
   void setRequestID(uint64_t requestID);
   uint64_t getRequestID();
@@ -45,6 +46,9 @@ public:
 
   void setAuthenticationPassword(const String &password);
   String getAuthenticationPassword();
+
+  void setEncryptedConnectionsSoftLimit(uint8_t softLimit);
+  uint8_t getEncryptedConnectionsSoftLimit();
   
   void setPeerRequestNonce(const String &nonce);
   String getPeerRequestNonce();
@@ -54,6 +58,7 @@ private:
   uint64_t _requestID;
   bool _requestEncrypted;
   String _authenticationPassword = "";
+  uint8_t _encryptedConnectionsSoftLimit;
   String _peerRequestNonce = "";
 };
 

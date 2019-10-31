@@ -73,7 +73,8 @@ namespace JsonTranslator
       return false;
   }
 
-  bool verifyHmac(const String &encryptionRequestHmacMessage, const uint8_t *hashKey, uint8_t hashKeyLength)
+  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, 
+                                   const uint8_t *hashKey, uint8_t hashKeyLength)
   {
     String hmac = "";
     if(getHmac(encryptionRequestHmacMessage, hmac))
@@ -82,7 +83,7 @@ namespace JsonTranslator
       if(hmacStartIndex < 0)
         return false;
      
-      if(verifyHmac(encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
+      if(verifyHmac(macToString(requesterStaMac) + macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
       {
         return true;
       }
@@ -91,13 +92,12 @@ namespace JsonTranslator
     return false;
   }
   
-  String createEncryptedConnectionInfo(const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey)
+  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey)
   {
-    // Returns: Encrypted connection info:{"arguments":{"nonce":"1F2","password":"abc","ownSessionKey":"3B4","peerSessionKey":"1A2"}}
-
+    // Returns: Encrypted connection info:{"arguments":{"nonce":"1F2","password":"abc","ownSK":"3B4","peerSK":"1A2"}}
 
     return
-    EspnowProtocolInterpreter::encryptedConnectionInfoHeader + "{\"arguments\":{" 
+    infoHeader + "{\"arguments\":{" 
     + createJsonPair(jsonNonce, requestNonce)
     + createJsonPair(jsonPassword, authenticationPassword)
     + createJsonPair(jsonOwnSessionKey, uint64ToString(peerSessionKey))   // Exchanges session keys since it should be valid for the receiver.
@@ -116,15 +116,13 @@ namespace JsonTranslator
     return createJsonEndPair(jsonNonce, requestNonce);
   }
   
-  String createEncryptionRequestMessage(const String &requestHeader, const String &requestNonce, uint32_t duration)
-  {
-    return createEncryptionRequestIntro(requestHeader, duration) + createEncryptionRequestEnding(requestNonce);
-  }
-
   String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, uint8_t hashKeyLength, uint32_t duration)
   {
     String mainMessage = createEncryptionRequestIntro(requestHeader, duration) + createJsonPair(jsonNonce, requestNonce);
-    String hmac = createHmac(mainMessage, hashKey, hashKeyLength);
+    uint8_t staMac[6] {0};
+    uint8_t apMac[6] {0};
+    String requesterStaApMac = macToString(WiFi.macAddress(staMac)) + macToString(WiFi.softAPmacAddress(apMac));
+    String hmac = createHmac(requesterStaApMac + mainMessage, hashKey, hashKeyLength);
     return mainMessage + createJsonEndPair(jsonHmac, hmac);
   }
   
@@ -147,6 +145,20 @@ namespace JsonTranslator
     endIndex -= 1; // End index will be at the character after the closing quotation mark, so need to subtract 1.
   
     return endIndex;
+  }
+
+  bool getConnectionState(const String &jsonString, String &result)
+  {
+    int32_t startIndex = jsonString.indexOf(jsonConnectionState);
+    if(startIndex < 0)
+      return false;
+    
+    int32_t endIndex = jsonString.indexOf("}");
+    if(endIndex < 0)
+      return false;
+      
+    result = jsonString.substring(startIndex, endIndex + 1);
+    return true;
   }
   
   bool getPassword(const String &jsonString, String &result)
@@ -264,6 +276,29 @@ namespace JsonTranslator
       return false;
     
     result = bool(strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0)); // strtoul stops reading input when an invalid character is discovered.
+    return true;
+  }
+
+  bool getUnencryptedMessageID(const String &jsonString, uint32_t &result)
+  {
+    int32_t startIndex = getStartIndex(jsonString, jsonUnencryptedMessageID);
+    if(startIndex < 0)
+      return false;
+    
+    result = strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
+    return true;
+  }
+
+  bool getMeshMessageCount(const String &jsonString, uint16_t &result)
+  {  
+    int32_t startIndex = getStartIndex(jsonString, jsonMeshMessageCount);
+    if(startIndex < 0)
+      return false;
+
+    uint32_t longResult = strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
+    assert(longResult <= 65535); // Must fit within uint16_t
+    
+    result = longResult;
     return true;
   }
 }

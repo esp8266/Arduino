@@ -36,10 +36,13 @@ public:
    */
   TcpIpNetworkInfo(int networkIndex);
 
+  
+  TcpIpNetworkInfo(const NetworkInfoBase &originalNetworkInfo);
+
   /**
    * Without giving wifiChannel and BSSID, connection time is longer.
    */
-  TcpIpNetworkInfo(const String &SSID, int32_t wifiChannel = defaultWifiChannel, const uint8_t BSSID[6] = nullptr, uint8_t encryptionType = defaultEncryptionType, 
+  TcpIpNetworkInfo(const String &SSID, int32_t wifiChannel = defaultWifiChannel, const uint8_t BSSID[6] = defaultBSSID, uint8_t encryptionType = defaultEncryptionType, 
                     int32_t RSSI = defaultRSSI, bool isHidden = defaultIsHidden);
 };
 
