@@ -130,7 +130,7 @@ public:
 
 protected:
     t_httpUpdate_return handleUpdate(HTTPClient& http, const String& currentVersion, bool spiffs = false);
-    bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
+    bool runUpdate(Stream& in, uint32_t size, const String& md5, int command = U_FLASH);
 
     int _lastError;
     bool _rebootOnUpdate = true;
