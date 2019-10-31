@@ -52,6 +52,7 @@ public:
     {}
     ~SPISlaveClass() {}
     void begin();
+    void begin(uint8_t statusLength);
     void end();
     void setData(uint8_t * data, size_t len);
     void setData(const char * data)
