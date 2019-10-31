@@ -3,7 +3,7 @@
 BearSSL Secure Server Class
 ---------------------------
 
-Implements a TLS encrypted server with optional client certificate validation.  See `Server Class <server-class.rst>`__ for general information and `BearSSL Secure Client Class <bearssl-secure-client-class.rst>`__ for basic server and BearSSL concepts.
+Implements a TLS encrypted server with optional client certificate validation.  See `Server Class <server-class.rst>`__ for general information and `BearSSL Secure Client Class <bearssl-client-secure-class.rst>`__ for basic server and BearSSL concepts.
 
 setBufferSizes(int recv, int xmit)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
