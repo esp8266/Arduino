@@ -171,11 +171,6 @@ public:
 
     bool begin() override
     {
-#if defined(ARDUINO) && !defined(CORE_MOCK)
-        if (&_FS_end <= &_FS_start)
-            return false;
-#endif
-
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }

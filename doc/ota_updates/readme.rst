@@ -646,6 +646,8 @@ Update process - memory view
 -  the new sketch is now copied "over" the old one.
 -  the new sketch is started.
 
+By default, filesystem updates are overriding the target flash directly. In order to use the same two step process set the `ATOMIC_FS_UPDATE` flag.
+
 .. figure:: update_memory_copy.png
    :alt: Memory layout for OTA updates
 
