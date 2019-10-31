@@ -319,7 +319,7 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
         // auth info
         String auth = host.substring(0, index);
         host.remove(0, index + 1); // remove auth part including @
-        _base64Authorization = base64::encode(auth);
+        _base64Authorization = base64::encode(auth, false /* doNewLines */);
     }
 
     // get port
@@ -504,7 +504,7 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
         String auth = user;
         auth += ':';
         auth += password;
-        _base64Authorization = base64::encode(auth);
+        _base64Authorization = base64::encode(auth, false /* doNewLines */);
     }
 }
 
@@ -516,6 +516,7 @@ void HTTPClient::setAuthorization(const char * auth)
 {
     if(auth) {
         _base64Authorization = auth;
+        _base64Authorization.replace(String('\n'), emptyString);
     }
 }
 
@@ -1243,7 +1244,6 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     if(_base64Authorization.length()) {
-        _base64Authorization.replace("\n", "");
         header += F("Authorization: Basic ");
         header += _base64Authorization;
         header += "\r\n";
