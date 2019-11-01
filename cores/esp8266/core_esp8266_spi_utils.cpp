@@ -106,7 +106,7 @@ _SPICommand(volatile uint32_t spiIfNum,
      // copy the response back to the buffer
      uint32_t *dst=data;
      volatile uint32_t *src=&SPIREG(SPI0W0);
-     for (uint32_t i=0; i<writeWords; i++)
+     for (uint32_t i=0; i<readWords; i++)
          *dst++ = *src++;
   }
 
