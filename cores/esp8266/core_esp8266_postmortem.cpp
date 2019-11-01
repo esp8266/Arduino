@@ -62,6 +62,10 @@ static int s_user_reset_reason = REASON_DEFAULT_RST;
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
+#if defined(DEBUG_ESP_OOM)
+extern const char *umm_last_fail_alloc_file;
+extern int umm_last_fail_alloc_line;
+#endif
 
 static void raise_exception() __attribute__((noreturn));
 
@@ -181,7 +185,13 @@ void __wrap_system_restart_local() {
 
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (umm_last_fail_alloc_addr) {
-      ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+#if defined(DEBUG_ESP_OOM)
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)@%S:%d\n"),
+            (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size,
+            umm_last_fail_alloc_file, umm_last_fail_alloc_line);
+#else
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+#endif
     }
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );

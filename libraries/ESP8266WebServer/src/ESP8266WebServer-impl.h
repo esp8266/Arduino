@@ -252,11 +252,11 @@ void ESP8266WebServerTemplate<ServerType>::requestAuthentication(HTTPAuthMethod 
     _srealm = String(realm);
   }
   if(mode == BASIC_AUTH) {
-    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String(F("\"")));
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String('\"'));
   } else {
     _snonce=_getRandomHexString();
     _sopaque=_getRandomHexString();
-    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String(F("\"")));
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String('\"'));
   }
   using namespace mime;
   send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
@@ -524,13 +524,13 @@ String ESP8266WebServerTemplate<ServerType>::credentialHash(const String& userna
 {
   MD5Builder md5;
   md5.begin();
-  md5.add(username + ":" + realm + ":" + password);  // md5 of the user:realm:password
+  md5.add(username + ':' + realm + ':' + password);  // md5 of the user:realm:password
   md5.calculate();
   return md5.toString();
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)
+void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize, const String &fileName, const String &contentType)
 {
   using namespace mime;
   setContentLength(fileSize);
@@ -544,7 +544,7 @@ void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize
 
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::arg(String name) const {
+const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) const {
   for (int j = 0; j < _postArgsLen; ++j) {
     if ( _postArgs[j].key == name )
       return _postArgs[j].value;
@@ -590,7 +590,7 @@ bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
 
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::header(String name) const {
+const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
@@ -630,7 +630,7 @@ int ESP8266WebServerTemplate<ServerType>::headers() const {
 }
 
 template <typename ServerType>
-bool ESP8266WebServerTemplate<ServerType>::hasHeader(String name) const {
+bool ESP8266WebServerTemplate<ServerType>::hasHeader(const String& name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
       return true;

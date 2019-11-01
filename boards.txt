@@ -374,11 +374,13 @@ generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
 generic.menu.led.16=16
 generic.menu.led.16.build.led=-DLED_BUILTIN=16
-generic.menu.sdk.nonosdk222_100=nonos-sdk 2.2.1+100 (testing)
-generic.menu.sdk.nonosdk222_100.build.sdk=NONOSDK22y
+generic.menu.sdk.nonosdk222_100=nonos-sdk 2.2.1+100 (190703 approved)
+generic.menu.sdk.nonosdk222_100.build.sdk=NONOSDK22x_190703
+generic.menu.sdk.nonosdk222_111=nonos-sdk 2.2.1+111 (191024 testing)
+generic.menu.sdk.nonosdk222_111.build.sdk=NONOSDK22x_191024
 generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
 generic.menu.sdk.nonosdk221.build.sdk=NONOSDK221
-generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (known issues)
+generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (180626 known issues)
 generic.menu.sdk.nonosdk3v0.build.sdk=NONOSDK3V0
 generic.menu.ip.lm2f=v2 Lower Memory
 generic.menu.ip.lm2f.build.lwip_include=lwip2/include
