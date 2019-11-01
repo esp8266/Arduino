@@ -589,7 +589,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
 
         if(currentNetwork.networkIndex != NETWORK_INFO_DEFAULT_INT)
         {
-          verboseModePrint('(' + String(WiFi.RSSI(currentNetwork.networkIndex)) + String(F("dBm) ")) + 
+          verboseModePrint(String('(') + String(WiFi.RSSI(currentNetwork.networkIndex)) + String(F("dBm) ")) +
                            (WiFi.encryptionType(currentNetwork.networkIndex) == ENC_TYPE_NONE ? String(F("open")) : ""), false);
         }
 

@@ -286,7 +286,7 @@ void MeshBackendBase::printAPInfo(const NetworkInfoBase &apNetworkInfo)
 
   if(apNetworkInfo.RSSI() != NetworkInfoBase::defaultRSSI)
   {
-    verboseModePrint('(' + String(apNetworkInfo.RSSI()) + String(F("dBm) ")) + 
+    verboseModePrint(String('(') + String(apNetworkInfo.RSSI()) + String(F("dBm) ")) + 
                      (apNetworkInfo.encryptionType() == ENC_TYPE_NONE ? String(F("open")) : ""), false);
   }
 
