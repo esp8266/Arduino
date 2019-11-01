@@ -58,6 +58,7 @@ extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) __att
 
 
 
+extern void enable_real_spiffs_weak_end();
 
 namespace spiffs_impl {
 
@@ -171,6 +172,8 @@ public:
 
     bool begin() override
     {
+        enable_real_spiffs_weak_end(); // Ensure spiffs_weak_end actually calls SPIFFS.end();
+
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }

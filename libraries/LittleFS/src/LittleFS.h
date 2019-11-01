@@ -39,6 +39,9 @@
 
 using namespace fs;
 
+extern void enable_real_littlefs_weak_end();
+extern void littlefs_weak_end();
+
 namespace littlefs_impl {
 
 class LittleFSFileImpl;
@@ -181,6 +184,8 @@ public:
     }
 
     bool begin() override {
+        enable_real_littlefs_weak_end(); // Ensure littlefs_weak_end actually calls LittleFS.end();
+
         if (_size <= 0) {
             DEBUGV("LittleFS size is <= zero");
             return false;

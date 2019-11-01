@@ -245,6 +245,8 @@ protected:
 
 } // namespace fs
 
+extern void spiffs_weak_end();
+
 #ifndef FS_NO_GLOBALS
 using fs::FS;
 using fs::File;

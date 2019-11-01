@@ -38,9 +38,8 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
 }
 
 
-
-
 namespace spiffs_impl {
+
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
