@@ -2,11 +2,10 @@
 #define REQUESTHANDLERSIMPL_H
 
 #include <ESP8266WebServer.h>
-#include <string>
-#include <regex>
 #include "RequestHandler.h"
 #include "mimetable.h"
 #include "WString.h"
+#include "Uri.h"
 
 using namespace mime;
 
@@ -14,47 +13,20 @@ template<typename ServerType>
 class FunctionRequestHandler : public RequestHandler<ServerType> {
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
 public:
-    FunctionRequestHandler(typename WebServerType::THandlerFunction fn, typename WebServerType::THandlerFunction ufn, const String &uri, HTTPMethod method)
+    FunctionRequestHandler(typename WebServerType::THandlerFunction fn, typename WebServerType::THandlerFunction ufn, const Uri &uri, HTTPMethod method)
     : _fn(fn)
     , _ufn(ufn)
-    , _uri(uri)
+    , _uri(uri.clone())
     , _method(method)
-    , _isRegex(false)
     {
-        _isRegex = uri.startsWith("^") && uri.endsWith("$");
-        if (_isRegex) {
-            std::regex rgx((_uri + "|").c_str());
-            std::smatch matches;
-            std::string s{""};
-            std::regex_search(s, matches, rgx);
-            RequestHandler<ServerType>::pathArgs.resize(matches.size() - 1);
-        } else {
-             RequestHandler<ServerType>::pathArgs.resize(0);
-        }
+        _uri->initPathArgs(RequestHandler<ServerType>::pathArgs);
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
-        if (_uri == requestUri)
-            return true;
-
-        if (_isRegex) {
-            unsigned int pathArgIndex = 0;
-            std::regex rgx(_uri.c_str());
-            std::smatch matches;
-            std::string s(requestUri.c_str());
-            if (std::regex_search(s, matches, rgx)) {
-                for (size_t i = 1; i < matches.size(); ++i) {  // skip first
-                    RequestHandler<ServerType>::pathArgs[pathArgIndex] = String(matches[i].str().c_str());
-                    pathArgIndex++;
-                }
-                return true;
-            }
-        }
-
-        return false;
+        return _uri->canHandle(requestUri, RequestHandler<ServerType>::pathArgs);
     }
 
     bool canUpload(String requestUri) override  {
@@ -83,9 +55,8 @@ public:
 protected:
     typename WebServerType::THandlerFunction _fn;
     typename WebServerType::THandlerFunction _ufn;
-    String _uri;
+    Uri *_uri;
     HTTPMethod _method;
-    bool _isRegex;
 };
 
 template<typename ServerType>
