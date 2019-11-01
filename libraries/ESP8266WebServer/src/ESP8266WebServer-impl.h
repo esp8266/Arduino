@@ -542,7 +542,8 @@ void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize
   send(200, contentType, emptyString);
 }
 
-const String& ESP8266WebServer::pathArg(unsigned int i) { 
+template <typename ServerType>
+const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) const { 
   if (_currentHandler != nullptr)
     return _currentHandler->pathArg(i);
   return emptyString;

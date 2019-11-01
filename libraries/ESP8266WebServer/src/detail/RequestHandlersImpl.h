@@ -19,6 +19,7 @@ public:
     , _ufn(ufn)
     , _uri(uri)
     , _method(method)
+    , _isRegex(false)
     {
         _isRegex = uri.startsWith("^") && uri.endsWith("$");
         if (_isRegex) {
@@ -26,9 +27,9 @@ public:
             std::smatch matches;
             std::string s{""};
             std::regex_search(s, matches, rgx);
-            pathArgs.resize(matches.size() - 1);
+            RequestHandler<ServerType>::pathArgs.resize(matches.size() - 1);
         } else {
-            pathArgs.resize(0);
+             RequestHandler<ServerType>::pathArgs.resize(0);
         }
     }
 
@@ -46,7 +47,7 @@ public:
             std::string s(requestUri.c_str());
             if (std::regex_search(s, matches, rgx)) {
                 for (size_t i = 1; i < matches.size(); ++i) {  // skip first
-                    pathArgs[pathArgIndex] = String(matches[i].str().c_str());
+                    RequestHandler<ServerType>::pathArgs[pathArgIndex] = String(matches[i].str().c_str());
                     pathArgIndex++;
                 }
                 return true;
@@ -84,6 +85,7 @@ protected:
     typename WebServerType::THandlerFunction _ufn;
     String _uri;
     HTTPMethod _method;
+    bool _isRegex;
 };
 
 template<typename ServerType>

@@ -107,7 +107,7 @@ public:
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
-  String pathArg(unsigned int i); // get request path argument by number
+  const String& pathArg(unsigned int i) const; // get request path argument by number
   const String& arg(const String& name) const;    // get request argument value by name
   const String& arg(int i) const;          // get request argument value by number
   const String& argName(int i) const;      // get request argument name by number
