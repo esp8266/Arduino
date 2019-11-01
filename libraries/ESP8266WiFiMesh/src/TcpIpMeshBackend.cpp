@@ -247,7 +247,7 @@ transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
 {
   verboseModePrint("Transmitting");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
     
-  currClient.print(getCurrentMessage() + "\r");
+  currClient.print(getCurrentMessage() + '\r');
   yield();
 
   if (!waitForClientTransmission(currClient, _stationModeTimeoutMs))
@@ -550,7 +550,7 @@ void TcpIpMeshBackend::acceptRequests()
     if (_client.connected())
     {
       verboseModePrint("Responding");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
-      _client.print(response + "\r");
+      _client.print(response + '\r');
       _client.flush();
       yield();
     }

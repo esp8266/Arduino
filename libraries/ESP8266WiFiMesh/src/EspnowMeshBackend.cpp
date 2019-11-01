@@ -165,7 +165,7 @@ bool EspnowMeshBackend::activateEspnow()
       warningPrint("Failed to set ESP-NOW role! Maybe ESP-NOW peers are already added?");
 
     verboseModePrint("ESP-NOW activated.");
-    verboseModePrint("My ESP-NOW STA MAC: " + WiFi.macAddress() + "\n"); // Get the station MAC address. The softAP MAC is different.
+    verboseModePrint("My ESP-NOW STA MAC: " + WiFi.macAddress() + '\n'); // Get the station MAC address. The softAP MAC is different.
     
     return true;
   } 

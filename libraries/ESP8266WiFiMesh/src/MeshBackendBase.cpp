@@ -282,11 +282,11 @@ void MeshBackendBase::printAPInfo(const NetworkInfoBase &apNetworkInfo)
     mainNetworkIdentifier = macToString(apNetworkInfo.BSSID());
   }
   
-  verboseModePrint(String(F("AP acquired: ")) + mainNetworkIdentifier + String(F(", Ch:")) + String(apNetworkInfo.wifiChannel()) + " ", false);
+  verboseModePrint(String(F("AP acquired: ")) + mainNetworkIdentifier + String(F(", Ch:")) + String(apNetworkInfo.wifiChannel()) + ' ', false);
 
   if(apNetworkInfo.RSSI() != NetworkInfoBase::defaultRSSI)
   {
-    verboseModePrint("(" + String(apNetworkInfo.RSSI()) + String(F("dBm) ")) + 
+    verboseModePrint('(' + String(apNetworkInfo.RSSI()) + String(F("dBm) ")) + 
                      (apNetworkInfo.encryptionType() == ENC_TYPE_NONE ? String(F("open")) : ""), false);
   }
 
