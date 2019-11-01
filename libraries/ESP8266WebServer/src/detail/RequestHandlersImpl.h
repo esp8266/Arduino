@@ -22,6 +22,10 @@ public:
         _uri->initPathArgs(RequestHandler<ServerType>::pathArgs);
     }
 
+    ~FunctionRequestHandler() {
+        delete _uri;
+    }
+
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
