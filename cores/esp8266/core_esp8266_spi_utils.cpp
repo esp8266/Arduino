@@ -65,7 +65,6 @@ _SPICommand(volatile uint32_t spiIfNum,
   // Everything defined here must be volatile or the optimizer can
   // treat them as constants, resulting in the flash reads we're
   // trying to avoid
-  void    *(* volatile memcpyp)(void *,const void *, size_t) = memcpy;
   uint32_t (* volatile Wait_SPI_Idlep)(SpiFlashChip *) = Wait_SPI_Idle;
   volatile SpiFlashChip *fchip=flashchip;
   volatile uint32_t spicmdusr=SPICMDUSR;
@@ -90,7 +89,10 @@ _SPICommand(volatile uint32_t spiIfNum,
 
   if (writeWords>0) {
      // copy the outgoing data to the SPI hardware
-     memcpyp((void*)&(SPIREG(SPI0W0)),data,writeWords*4);
+     uint32_t *src=data;
+     volatile uint32_t *dst=&SPIREG(SPI0W0);
+     for (uint32_t i=0; i<writeWords; i++)
+         *dst++ = *src++;
   }
 
   // Start the transfer
@@ -102,7 +104,10 @@ _SPICommand(volatile uint32_t spiIfNum,
 
   if ((readWords>0) && (timeout>0)) {
      // copy the response back to the buffer
-     memcpyp(data,(void *)&(SPIREG(SPI0W0)),readWords*4);
+     uint32_t *dst=data;
+     volatile uint32_t *src=&SPIREG(SPI0W0);
+     for (uint32_t i=0; i<writeWords; i++)
+         *dst++ = *src++;
   }
 
   // Restore saved registers
