@@ -331,7 +331,7 @@ bool WiFiClient::stop(unsigned int maxWaitMs)
 
 uint8_t WiFiClient::connected()
 {
-    if (!_client || _client->state() == CLOSED)
+    if (!_client)
         return 0;
 
     return _client->state() == ESTABLISHED || available();
