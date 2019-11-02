@@ -93,8 +93,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
           Serial.printf("Update: %s\n", upload.filename.c_str());
         if (upload.name == "filesystem") {
           size_t fsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
-          spiffs_weak_end();
-          littlefs_weak_end();
+          close_all_fs();
           if (!Update.begin(fsSize, U_FS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
           }

@@ -8,6 +8,12 @@
 extern "C"
 {
 
+void close_all_fs(void)
+{
+    littlefs_weak_end();
+    spiffs_weak_end();
+}
+
 void littlefs_weak_end(void) __attribute__((weak));
 void littlefs_weak_end(void)
 {
