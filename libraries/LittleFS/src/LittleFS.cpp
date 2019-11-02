@@ -181,6 +181,12 @@ int LittleFSImpl::lfs_flash_sync(const struct lfs_config *c) {
 
 }; // namespace
 
+extern "C" void littlefs_weak_end(void)
+{
+    //ets_printf("debug: not weak littlefs end\n");
+    LittleFS.end();
+}
+
 // these symbols should be defined in the linker script for each flash layout
 #ifndef CORE_MOCK
 #ifdef ARDUINO

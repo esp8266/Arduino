@@ -245,6 +245,12 @@ protected:
 
 } // namespace fs
 
+extern "C"
+{
+void littlefs_weak_end(void);
+void spiffs_weak_end(void);
+}
+
 #ifndef FS_NO_GLOBALS
 using fs::FS;
 using fs::File;
