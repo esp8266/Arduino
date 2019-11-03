@@ -132,7 +132,7 @@ protected:
 public:
   
   /**
-   * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
+   * ESP-NOW constructor method. Creates an ESP-NOW node, ready to be initialised.
    *
    * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
    *          is the request string received from another node and returns the string to send back.
@@ -141,6 +141,8 @@ public:
    * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
    * @param broadcastFilter The callback handler for deciding which ESP-NOW broadcasts to accept.
    * @param meshPassword The WiFi password for the mesh network.
+   * @param espnowEncryptionKey An uint8_t array containing the key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
+   * @param espnowHashKey An uint8_t array containing the secret key used by this EspnowMeshBackend to generate HMACs for encrypted ESP-NOW connections.
    * @param ssidPrefix The prefix (first part) of the node SSID.
    * @param ssidSuffix The suffix (last part) of the node SSID.
    * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
@@ -293,6 +295,15 @@ public:
    */
   void broadcast(const String &message);
 
+  /**
+   * Set the number of redundant transmissions that will be made for every broadcast. 
+   * A greater number increases the likelihood that the broadcast is received, but also means it takes longer time to send.
+   * 
+   * @param redundancy The number of extra transmissions to make of each broadcast. Defaults to 1.
+   */
+  void setBroadcastTransmissionRedundancy(uint8_t redundancy);
+  uint8_t getBroadcastTransmissionRedundancy();
+  
   /**
    * Set the EspnowMeshBackend instance responsible for handling incoming requests. The requestHandler of the instance will be called upon receiving ESP-NOW requests.
    * 
@@ -519,6 +530,23 @@ public:
   uint8_t *getSenderMac(uint8_t *macArray);
 
   /**
+   * Get the AP MAC address of the sender of the most recently received ESP-NOW request, response or broadcast to this EspnowMeshBackend instance. 
+   * Returns a String.
+   * 
+   * @return A String filled with a hexadecimal representation of the AP MAC, without delimiters.
+   */
+  String getSenderAPMac();
+
+  /**
+   * Get the AP MAC address of the sender of the most recently received ESP-NOW request, response or broadcast to this EspnowMeshBackend instance. 
+   * Returns a uint8_t array.
+   * 
+   * @param macArray The array that should store the MAC address. Must be at least 6 bytes.
+   * @return macArray filled with the sender AP MAC.
+   */
+  uint8_t *getSenderAPMac(uint8_t *macArray);
+
+  /**
    * Get whether the ESP-NOW request, response or broadcast which was most recently received by this EspnowMeshBackend instance was encrypted or not. 
    * 
    * @return If true, the request, response or broadcast was encrypted. If false, it was unencrypted.
@@ -715,6 +743,13 @@ protected:
   void setSenderMac(uint8_t *macArray);
 
   /**
+   * Set the MAC address considered to be the AP MAC of the sender of the most recently received ESP-NOW request, response or broadcast.
+   * 
+   * @param macArray An uint8_t array which contains the MAC address to store. The method will store the first 6 bytes of the array.
+   */
+  void setSenderAPMac(uint8_t *macArray);
+
+  /**
    * Set whether the most recently received ESP-NOW request, response or broadcast is presented as having been encrypted or not.
    * 
    * @param receivedEncryptedMessage If true, the request, response or broadcast is presented as having been encrypted.
@@ -875,6 +910,8 @@ private:
 
   broadcastFilterType _broadcastFilter;
 
+  uint8_t _broadcastTransmissionRedundancy = 1;
+
   static String _ongoingPeerRequestNonce;
   static uint8_t _ongoingPeerRequestMac[6];
   static EspnowMeshBackend *_ongoingPeerRequester;
@@ -896,6 +933,7 @@ private:
   static uint32_t _unencryptedMessageID;
 
   uint8_t _senderMac[6] = {0};
+  uint8_t _senderAPMac[6] = {0};
   bool _receivedEncryptedMessage = false;
 
   static bool _espnowSendToNodeMutex;

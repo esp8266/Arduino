@@ -82,7 +82,7 @@ uint8_t *stringToMac(const String &macString, uint8_t *macArray);
 uint64_t macToUint64(const uint8_t *macArray);
 
 /**
- * Takes a uint64_t value and stores the bits of the first 6 bytes in a uint8_t array. Assumes index 0 of the array should contain MSB. 
+ * Takes a uint64_t value and stores the bits of the first 6 bytes (LSB) in a uint8_t array. Assumes index 0 of the array should contain MSB. 
  * 
  * @param macValue The uint64_t value to convert to a mac array. Value must fit within 6 bytes.
  * @param macArray A uint8_t array that will hold the mac address once the function returns. Should have a size of at least 6 bytes.

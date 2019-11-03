@@ -40,8 +40,8 @@ namespace JsonTranslator
   const String jsonNonce = "\"nonce\":";
   const String jsonHmac = "\"hmac\":";
   const String jsonDesync = "\"desync\":";
-  const String jsonUnencryptedMessageID = "\"uMessageID\":";
-  const String jsonMeshMessageCount = "\"mMessageCount\":";
+  const String jsonUnencryptedMessageID = "\"unencMsgID\":";
+  const String jsonMeshMessageCount = "\"meshMsgCount\":";
   
   String createJsonPair(const String &valueIdentifier, const String &value);
   String createJsonEndPair(const String &valueIdentifier, const String &value);

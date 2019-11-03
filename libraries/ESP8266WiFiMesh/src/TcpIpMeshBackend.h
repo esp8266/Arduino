@@ -38,7 +38,7 @@ class TcpIpMeshBackend : public MeshBackendBase {
 public:
 
   /**
-   * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
+   * TCP/IP constructor method. Creates a TCP/IP node, ready to be initialised.
    *
    * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
    *          is the request string received from another node and returns the string to send back.

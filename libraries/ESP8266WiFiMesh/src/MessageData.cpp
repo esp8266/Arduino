@@ -31,7 +31,6 @@ MessageData::MessageData(String &message, uint8_t transmissionsRemaining, uint32
   TimeTracker(creationTimeMs)
 {
   _transmissionsExpected = transmissionsRemaining + 1;
-  assert(message.length() <= EspnowMeshBackend::getMaxMessageBytesPerTransmission()); // Should catch some cases where transmission is not null terminated.
   _totalMessage += message;
   _transmissionsReceived++;
 }

@@ -753,14 +753,19 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
   {
     if(messageType == 'B')
     {
+      auto key = std::make_pair(macAndType, messageID);
+      if(receivedEspnowTransmissions.find(key) != receivedEspnowTransmissions.end())
+        return; // Should not call BroadcastFilter more than once for an accepted message
+      
       String message = espnowGetMessageContent(dataArray, len);
       setSenderMac(macaddr);
+      espnowGetTransmissionMac(dataArray, _senderAPMac);
       setReceivedEncryptedMessage(usesEncryption(messageID));
       bool acceptBroadcast = getBroadcastFilter()(message, *this);
       if(acceptBroadcast)
       {
         // Does nothing if key already in receivedEspnowTransmissions
-        receivedEspnowTransmissions.insert(std::make_pair(std::make_pair(macAndType, messageID), MessageData(message, espnowGetTransmissionsRemaining(dataArray))));
+        receivedEspnowTransmissions.insert(std::make_pair(key, MessageData(message, espnowGetTransmissionsRemaining(dataArray))));
       }
       else
       {
@@ -822,6 +827,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
     //Serial.println("methodStart request stored " + String(millis() - methodStart));
       
     setSenderMac(macaddr);
+    espnowGetTransmissionMac(dataArray, _senderAPMac);
     setReceivedEncryptedMessage(usesEncryption(messageID));
     String response = getRequestHandler()(totalMessage, *this);
     //Serial.println("methodStart response acquired " + String(millis() - methodStart));
@@ -847,6 +853,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
     } 
     
     setSenderMac(macaddr);
+    espnowGetTransmissionMac(dataArray, _senderAPMac);
     setReceivedEncryptedMessage(usesEncryption(messageID));
     getResponseHandler()(totalMessage, *this);
   }
@@ -1135,39 +1142,46 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
 
     ////// Transmit //////
 
-    _espnowSendConfirmed = false;
-    uint32_t transmissionStartTime = millis();
-    
-    while(!_espnowSendConfirmed && millis() - transmissionStartTime < getEspnowTransmissionTimeout())
+    uint32_t retransmissions = 0;
+    if(messageType == 'B')
+      retransmissions = espnowInstance->getBroadcastTransmissionRedundancy();
+      
+    for(uint32_t i = 0; i <= retransmissions; i++)
     {
-      if(esp_now_send(_transmissionTargetBSSID, transmission, transmissionSize) == 0) // == 0 => Success
+      _espnowSendConfirmed = false;
+      uint32_t transmissionStartTime = millis();
+      
+      while(!_espnowSendConfirmed && millis() - transmissionStartTime < getEspnowTransmissionTimeout())
       {
-        uint32_t transmissionAttemptStart = millis();
-        while(!_espnowSendConfirmed 
-              && (millis() - transmissionAttemptStart < getEspnowRetransmissionInterval())
-              && (millis() - transmissionStartTime < getEspnowTransmissionTimeout()))
-        {        
-          delay(1); // Note that callbacks can be called during delay time, so it is possible to receive a transmission during this delay.
+        if(esp_now_send(_transmissionTargetBSSID, transmission, transmissionSize) == 0) // == 0 => Success
+        {
+          uint32_t transmissionAttemptStart = millis();
+          while(!_espnowSendConfirmed 
+                && (millis() - transmissionAttemptStart < getEspnowRetransmissionInterval())
+                && (millis() - transmissionStartTime < getEspnowTransmissionTimeout()))
+          {        
+            delay(1); // Note that callbacks can be called during delay time, so it is possible to receive a transmission during this delay.
+          }
+        }
+  
+        if(_espnowSendConfirmed)
+        {
+          if(messageStart)
+          {        
+            if(encryptedConnection && !usesConstantSessionKey(messageType) && encryptedConnection->getOwnSessionKey() == messageID)
+            {
+              encryptedConnection->setDesync(false);
+              encryptedConnection->incrementOwnSessionKey();
+            }
+            
+            messageStart = false;
+          }  
+          
+          break;
         }
       }
-
-      if(_espnowSendConfirmed)
-      {
-        if(messageStart)
-        {        
-          if(encryptedConnection && !usesConstantSessionKey(messageType) && encryptedConnection->getOwnSessionKey() == messageID)
-          {
-            encryptedConnection->setDesync(false);
-            encryptedConnection->incrementOwnSessionKey();
-          }
-          
-          messageStart = false;
-        }  
-        
-        break;
-      }
     }
-
+    
     if(!_espnowSendConfirmed)
     {
       _transmissionsFailed++;
@@ -1392,6 +1406,18 @@ String EspnowMeshBackend::getSenderMac() {return macToString(_senderMac);}
 uint8_t *EspnowMeshBackend::getSenderMac(uint8_t *macArray)
 {
   std::copy_n(_senderMac, 6, macArray);
+  return macArray;
+}
+
+void EspnowMeshBackend::setSenderAPMac(uint8_t *macArray)
+{
+  std::copy_n(macArray, 6, _senderAPMac);
+}
+
+String EspnowMeshBackend::getSenderAPMac() {return macToString(_senderAPMac);}
+uint8_t *EspnowMeshBackend::getSenderAPMac(uint8_t *macArray)
+{
+  std::copy_n(_senderAPMac, 6, macArray);
   return macArray;
 }
 
@@ -2241,6 +2267,9 @@ void EspnowMeshBackend::broadcast(const String &message)
   espnowSendToNode(message, broadcastMac, 'B', this);
 }
 
+void EspnowMeshBackend::setBroadcastTransmissionRedundancy(uint8_t redundancy) { _broadcastTransmissionRedundancy = redundancy; }
+uint8_t EspnowMeshBackend::getBroadcastTransmissionRedundancy() { return _broadcastTransmissionRedundancy; }
+
 void EspnowMeshBackend::sendStoredEspnowMessages(const ExpiringTimeTracker *estimatedMaxDurationTracker)
 {
   sendPeerRequestConfirmations(estimatedMaxDurationTracker);
@@ -2532,7 +2561,7 @@ String EspnowMeshBackend::serializeUnencryptedConnection()
 {
   using namespace JsonTranslator;
   
-  // Returns: {"connectionState":{"uMessageID":"123"}}
+  // Returns: {"connectionState":{"unencMsgID":"123"}}
   
   return jsonConnectionState + createJsonEndPair(jsonUnencryptedMessageID, String(_unencryptedMessageID));
 }

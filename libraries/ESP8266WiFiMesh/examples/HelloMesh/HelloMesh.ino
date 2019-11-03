@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266WiFiMesh.h>
 #include <TypeConversionFunctions.h>
 #include <assert.h>
+#include <FloodingMesh.h>
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -14,84 +14,94 @@
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-const char exampleMeshName[] PROGMEM = "MeshNode_";
-const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";
+const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
+const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
-unsigned int requestNumber = 0;
-unsigned int responseNumber = 0;
+// A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
+// All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
+uint8_t espnowEncryptionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions.
+                                   0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
+                                  };
+uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
+                             0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD
+                            };
 
-String manageRequest(const String &request, ESP8266WiFiMesh &meshInstance);
-transmission_status_t manageResponse(const String &response, ESP8266WiFiMesh &meshInstance);
-void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance);
+bool meshMessageHandler(String &message, FloodingMesh &meshInstance);
 
 /* Create the mesh node object */
-ESP8266WiFiMesh meshNode = ESP8266WiFiMesh(manageRequest, manageResponse, networkFilter, FPSTR(exampleWiFiPassword), FPSTR(exampleMeshName), "", true);
+FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+
+bool theOne = true;
+String theOneMac = "";
+
+bool useLED = false; // Change this to true if you wish the onboard LED to mark The One.
 
 /**
-   Callback for when other nodes send you a request
+   Callback for when a message is received from the mesh network.
 
-   @param request The request string received from another node in the mesh
-   @param meshInstance The ESP8266WiFiMesh instance that called the function.
-   @returns The string to send back to the other node
+   @param message The message String received from the mesh.
+                  Modifications to this String are passed on when the message is forwarded from this node to other nodes.
+                  However, the forwarded message will still use the same messageID.
+                  Thus it will not be sent to nodes that have already received this messageID.
+                  If you want to send a new message to the whole network, use a new broadcast from within the loop() instead.
+   @param meshInstance The FloodingMesh instance that received the message.
+   @return True if this node should forward the received message to other nodes. False otherwise.
 */
-String manageRequest(const String &request, ESP8266WiFiMesh &meshInstance) {
-  // We do not store strings in flash (via F()) in this function.
-  // The reason is that the other node will be waiting for our response,
-  // so keeping the strings in RAM will give a (small) improvement in response time.
-  // Of course, it is advised to adjust this approach based on RAM requirements.
+bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
+  int32_t delimiterIndex = message.indexOf(meshInstance.broadcastMetadataDelimiter());
+  if (delimiterIndex == 0) {
+    Serial.print("Message received from STA " + meshInstance.getEspnowMeshBackend().getSenderMac() + ": ");
+    Serial.println(message.substring(1, 101));
 
-  /* Print out received message */
-  Serial.print("Request received: ");
-  Serial.println(request);
+    String potentialMac = message.substring(1, 13);
 
-  /* return a string to send back */
-  return ("Hello world response #" + String(responseNumber++) + " from " + meshInstance.getMeshName() + meshInstance.getNodeID() + ".");
-}
+    if (potentialMac > theOneMac) {
+      if (theOne) {
+        if (useLED) {
+          digitalWrite(LED_BUILTIN, HIGH); // Turn LED off (LED is active low)
+        }
 
-/**
-   Callback for when you get a response from other nodes
+        theOne = false;
+      }
 
-   @param response The response string received from another node in the mesh
-   @param meshInstance The ESP8266WiFiMesh instance that called the function.
-   @returns The status code resulting from the response, as an int
-*/
-transmission_status_t manageResponse(const String &response, ESP8266WiFiMesh &meshInstance) {
-  transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
+      theOneMac = potentialMac;
 
-  /* Print out received message */
-  Serial.print(F("Request sent: "));
-  Serial.println(meshInstance.getMessage());
-  Serial.print(F("Response received: "));
-  Serial.println(response);
+      return true;
+    } else {
+      return false;
+    }
+  } else if (delimiterIndex > 0) {
+    if (meshInstance.getOriginMac() == theOneMac) {
+      uint32_t totalBroadcasts = strtoul(message.c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
 
-  // Our last request got a response, so time to create a new request.
-  meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + String(F(" from "))
-                          + meshInstance.getMeshName() + meshInstance.getNodeID() + String(F(".")));
+      // Static variables are only initialized once.
+      static uint32_t firstBroadcast = totalBroadcasts;
 
-  // (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
-  return statusCode;
-}
+      if (totalBroadcasts - firstBroadcast >= 100) { // Wait a little to avoid start-up glitches
+        static uint32_t missedBroadcasts = 1; // Starting at one to compensate for initial -1 below.
+        static uint32_t previousTotalBroadcasts = totalBroadcasts;
+        static uint32_t totalReceivedBroadcasts = 0;
+        totalReceivedBroadcasts++;
 
-/**
-   Callback used to decide which networks to connect to once a WiFi scan has been completed.
+        missedBroadcasts += totalBroadcasts - previousTotalBroadcasts - 1; // We expect an increment by 1.
+        previousTotalBroadcasts = totalBroadcasts;
 
-   @param numberOfNetworks The number of networks found in the WiFi scan.
-   @param meshInstance The ESP8266WiFiMesh instance that called the function.
-*/
-void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
-  for (int networkIndex = 0; networkIndex < numberOfNetworks; ++networkIndex) {
-    String currentSSID = WiFi.SSID(networkIndex);
-    int meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
-
-    /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
-    if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
-
-      if (targetNodeID < stringToUint64(meshInstance.getNodeID())) {
-        ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(networkIndex));
+        if (totalReceivedBroadcasts % 50 == 0) {
+          Serial.println("missed/total: " + String(missedBroadcasts) + '/' + String(totalReceivedBroadcasts));
+        }
+        if (totalReceivedBroadcasts % 500 == 0) {
+          Serial.println("Benchmark message: " + message.substring(0, 100));
+        }
       }
     }
+  } else {
+    // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
+    // If you need to print the whole String it is better to store it and print it in the loop() later.
+    Serial.print("Message with origin " + meshInstance.getOriginMac() + " received: ");
+    Serial.println(message.substring(0, 100));
   }
+
+  return true;
 }
 
 void setup() {
@@ -102,7 +112,7 @@ void setup() {
   Serial.begin(115200);
   delay(50); // Wait for Serial.
 
-  //yield(); // Use this if you don't want to wait for Serial.
+  //yield(); // Use this if you don't want to wait for Serial, but not with the ESP-NOW backend (yield() causes crashes with ESP-NOW).
 
   // The WiFi.disconnect() ensures that the WiFi is working correctly. If this is not done before receiving WiFi connections,
   // those WiFi connections will take a long time to make or sometimes will not work at all.
@@ -111,52 +121,52 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  Serial.println(F("Note that this library can use static IP:s for the nodes to speed up connection times.\n"
-                   "Use the setStaticIP method as shown in this example to enable this.\n"
-                   "Ensure that nodes connecting to the same AP have distinct static IP:s.\n"
-                   "Also, remember to change the default mesh network password!\n\n"));
+  Serial.println(F("If you have an onboard LED on your ESP8266 it is recommended that you change the useLED variable to true.\n"
+                   "That way you will get instant confirmation of the mesh communication.\n"
+                   "Also, remember to change the default mesh network password and ESP-NOW keys!\n"));
 
   Serial.println(F("Setting up mesh node..."));
 
-  /* Initialise the mesh node */
-  meshNode.begin();
-  meshNode.activateAP(); // Each AP requires a separate server port.
-  meshNode.setStaticIP(IPAddress(192, 168, 4, 22)); // Activate static IP mode to speed up connection times.
+  floodingMesh.begin();
+
+  uint8_t apMacArray[6] {0};
+  theOneMac = macToString(WiFi.softAPmacAddress(apMacArray));
+
+  if (useLED) {
+    pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
+    digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LED is active low)
+  }
+
+  floodingMeshDelay(5000); // Give some time for user to start the nodes
 }
 
-int32_t timeOfLastScan = -10000;
+int32_t timeOfLastProclamation = -10000;
 void loop() {
-  if (millis() - timeOfLastScan > 3000 // Give other nodes some time to connect between data transfers.
-      || (WiFi.status() != WL_CONNECTED && millis() - timeOfLastScan > 2000)) { // Scan for networks with two second intervals when not already connected.
-    String request = String(F("Hello world request #")) + String(requestNumber) + String(F(" from ")) + meshNode.getMeshName() + meshNode.getNodeID() + String(F("."));
-    meshNode.attemptTransmission(request, false);
-    timeOfLastScan = millis();
+  static uint32_t benchmarkCount = 0;
+  static uint32_t loopStart = millis();
 
-    // One way to check how attemptTransmission worked out
-    if (ESP8266WiFiMesh::latestTransmissionSuccessful()) {
-      Serial.println(F("Transmission successful."));
+  // The floodingMeshDelay() method performs all the background operations for the FloodingMesh (via FloodingMesh::performMeshMaintainance()).
+  // It is recommended to place one of these methods in the beginning of the loop(), unless there is a need to put them elsewhere.
+  // Among other things, the method cleans up old ESP-NOW log entries (freeing up RAM) and forwards received mesh messages.
+  // Note that depending on the amount of messages to forward and their length, this method can take tens or even hundreds of milliseconds to complete.
+  // More intense transmission activity and less frequent calls to performMeshMaintainance will likely cause the method to take longer to complete, so plan accordingly.
+  floodingMeshDelay(1);
+
+  if (theOne) {
+    if (millis() - timeOfLastProclamation > 10000) {
+      uint32_t startTime = millis();
+      floodingMesh.broadcast(String(floodingMesh.broadcastMetadataDelimiter()) + theOneMac + " is The One.");
+      Serial.println("Proclamation broadcast done in " + String(millis() - startTime) + " ms.");
+
+      timeOfLastProclamation = millis();
+      floodingMeshDelay(20);
     }
 
-    // Another way to check how attemptTransmission worked out
-    if (ESP8266WiFiMesh::latestTransmissionOutcomes.empty()) {
-      Serial.println(F("No mesh AP found."));
-    } else {
-      for (TransmissionResult &transmissionResult : ESP8266WiFiMesh::latestTransmissionOutcomes) {
-        if (transmissionResult.transmissionStatus == TS_TRANSMISSION_FAILED) {
-          Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionResult.SSID);
-        } else if (transmissionResult.transmissionStatus == TS_CONNECTION_FAILED) {
-          Serial.println(String(F("Connection failed to mesh AP ")) + transmissionResult.SSID);
-        } else if (transmissionResult.transmissionStatus == TS_TRANSMISSION_COMPLETE) {
-          // No need to do anything, transmission was successful.
-        } else {
-          Serial.println(String(F("Invalid transmission status for ")) + transmissionResult.SSID + String(F("!")));
-          assert(F("Invalid transmission status returned from responseHandler!") && false);
-        }
-      }
+    if (millis() - loopStart > 23000) { // Start benchmarking the mesh once three proclamations have been made
+      uint32_t startTime = millis();
+      floodingMesh.broadcast(String(benchmarkCount++) + String(floodingMesh.broadcastMetadataDelimiter()) + ": Not a spoon in sight.");
+      Serial.println("Benchmark broadcast done in " + String(millis() - startTime) + " ms.");
+      floodingMeshDelay(20);
     }
-    Serial.println();
-  } else {
-    /* Accept any incoming connections */
-    meshNode.acceptRequest();
   }
 }
