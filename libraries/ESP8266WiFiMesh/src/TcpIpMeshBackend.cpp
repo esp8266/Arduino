@@ -451,6 +451,8 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
   {
     transmission_status_t transmissionResult = attemptDataTransfer();
     latestTransmissionOutcomes().push_back(TransmissionOutcome(constConnectionQueue().back(), transmissionResult));
+
+    getTransmissionOutcomesUpdateHook()(*this);
   }
   else
   {

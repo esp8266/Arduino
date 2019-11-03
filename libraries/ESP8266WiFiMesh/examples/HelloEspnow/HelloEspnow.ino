@@ -146,8 +146,9 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
    If true is returned from this callback, the first broadcast transmission is saved until the entire broadcast message has been received.
    The complete broadcast message will then be sent to the requestHandler (manageRequest in this example).
    If false is returned from this callback, the broadcast message is discarded.
+   Note that the BroadcastFilter may be called multiple times for messages that are discarded in this way, but is only called once for accepted messages.
 
-   @param firstTransmission The first transmission of the broadcast.
+   @param firstTransmission The first transmission of the broadcast. Modifications to this String are passed on to the broadcast message.
    @param meshInstance The EspnowMeshBackend instance that called the function.
 
    @return True if the broadcast should be accepted. False otherwise.
@@ -171,6 +172,25 @@ bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance)
     firstTransmission = firstTransmission.substring(metadataEndIndex + 1);
     return true;
   }
+}
+
+/**
+   Once passed to the setTransmissionOutcomesUpdateHook method of the ESP-NOW backend,
+   this function will be called after each update of the latestTransmissionOutcomes vector during attemptTransmission.
+   (which happens after each individual transmission has finished)
+
+   Example use cases is modifying getMessage() between transmissions, or aborting attemptTransmission before all nodes in the connectionQueue have been contacted.
+
+   @param meshInstance The MeshBackendBase instance that called the function.
+
+   @return True if attemptTransmission should continue with the next entry in the connectionQueue. False if attemptTransmission should stop.
+*/
+bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
+  // Currently this is exactly the same as the default hook, but you can modify it to alter the behaviour of attemptTransmission.
+
+  (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+
+  return true;
 }
 
 void setup() {
@@ -213,9 +233,11 @@ void setup() {
   espnowNode.activateAP();
 
   // Storing our message in the EspnowMeshBackend instance is not required, but can be useful for organizing code, especially when using many EspnowMeshBackend instances.
-  // Note that calling espnowNode.attemptTransmission will replace the stored message with whatever message is transmitted.
+  // Note that calling the multi-recipient versions of espnowNode.attemptTransmission and espnowNode.attemptAutoEncryptingTransmission will replace the stored message with whatever message is transmitted.
   // Also note that the maximum allowed number of ASCII characters in a ESP-NOW message is given by EspnowMeshBackend::getMaxMessageLength().
   espnowNode.setMessage(String(F("Hello world request #")) + String(requestNumber) + String(F(" from ")) + espnowNode.getMeshName() + espnowNode.getNodeID() + String(F(".")));
+
+  espnowNode.setTransmissionOutcomesUpdateHook(exampleTransmissionOutcomesUpdateHook);
 }
 
 int32_t timeOfLastScan = -10000;
@@ -226,7 +248,7 @@ void loop() {
   // Note that depending on the amount of responses to send and their length, this method can take tens or even hundreds of milliseconds to complete.
   // More intense transmission activity and less frequent calls to performEspnowMaintainance will likely cause the method to take longer to complete, so plan accordingly.
 
-  //Should not be used inside responseHandler, requestHandler or networkFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
+  //Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
   EspnowMeshBackend::performEspnowMaintainance();
 
   if (millis() - timeOfLastScan > 10000) { // Give other nodes some time to connect between data transfers.
@@ -239,7 +261,7 @@ void loop() {
     timeOfLastScan = millis();
 
     // Wait for response. espnowDelay continuously calls performEspnowMaintainance() so we will respond to ESP-NOW request while waiting.
-    // Should not be used inside responseHandler, requestHandler or networkFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
+    // Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
     espnowDelay(100);
 
     // One way to check how attemptTransmission worked out
@@ -283,7 +305,7 @@ void loop() {
       uint8_t targetBSSID[6] {0};
 
       // We can create encrypted connections to individual nodes so that all ESP-NOW communication with the node will be encrypted.
-      if (espnowNode.connectionQueue()[0].getBSSID(targetBSSID) && espnowNode.requestEncryptedConnection(targetBSSID) == ECS_CONNECTION_ESTABLISHED) {
+      if (espnowNode.constConnectionQueue()[0].getBSSID(targetBSSID) && espnowNode.requestEncryptedConnection(targetBSSID) == ECS_CONNECTION_ESTABLISHED) {
         // The WiFi scan will detect the AP MAC, but this will automatically be converted to the encrypted STA MAC by the framework.
         String peerMac = macToString(targetBSSID);
 
@@ -352,7 +374,7 @@ void loop() {
 
           // Or if we prefer we can just let the library automatically create brief encrypted connections which are long enough to transmit an encrypted message.
           // Note that encrypted responses will not be received, unless there already was an encrypted connection established with the peer before attemptAutoEncryptingTransmission was called.
-          // This can be remedied via the createPermanentConnections argument, though it must be noted that the maximum number of encrypted connections supported at a time is 6.
+          // This can be remedied via the requestPermanentConnections argument, though it must be noted that the maximum number of encrypted connections supported at a time is 6.
           espnowMessage = "This message is always encrypted, regardless of receiver.";
           Serial.println("\nTransmitting: " + espnowMessage);
           espnowNode.attemptAutoEncryptingTransmission(espnowMessage);

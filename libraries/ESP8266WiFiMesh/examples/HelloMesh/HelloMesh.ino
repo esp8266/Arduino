@@ -150,7 +150,12 @@ void loop() {
   // Among other things, the method cleans up old ESP-NOW log entries (freeing up RAM) and forwards received mesh messages.
   // Note that depending on the amount of messages to forward and their length, this method can take tens or even hundreds of milliseconds to complete.
   // More intense transmission activity and less frequent calls to performMeshMaintainance will likely cause the method to take longer to complete, so plan accordingly.
+  // The maintainance methods should not be used inside the meshMessageHandler callback, since they can alter the mesh node state. The framework will alert you during runtime if you make this mistake.
   floodingMeshDelay(1);
+
+  // If you wish to transmit only to a single node, try using one of the following methods (requires the node to be within range and know the MAC of the recipient):
+  // Unencrypted: transmission_status_t floodingMesh.getEspnowMeshBackend().attemptTransmission(message, EspnowNetworkInfo(recipientMac));
+  // Encrypted (slow): floodingMesh.getEspnowMeshBackend().attemptAutoEncryptingTransmission(message, EspnowNetworkInfo(recipientMac));
 
   if (theOne) {
     if (millis() - timeOfLastProclamation > 10000) {
