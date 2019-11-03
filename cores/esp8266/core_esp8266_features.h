@@ -95,7 +95,8 @@ inline uint32_t esp_get_cycle_count() {
 
 
 // Tools for preloading code into the flash cache
-#define PRECACHE_ATTR __attribute__((optimize("no-reorder-blocks")))
+#define PRECACHE_ATTR __attribute__((optimize("no-reorder-blocks"))) \
+                      __attribute__((noinline))
 
 #define PRECACHE_START(tag) \
     precache(NULL,(uint8_t *)&&_precache_end_##tag - (uint8_t*)&&_precache_start_##tag); \
