@@ -50,21 +50,21 @@ bool useLED = false; // Change this to true if you wish the onboard LED to mark 
 bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
   int32_t delimiterIndex = message.indexOf(meshInstance.broadcastMetadataDelimiter());
   if (delimiterIndex == 0) {
-    Serial.print("Message received from STA " + meshInstance.getEspnowMeshBackend().getSenderMac() + ": ");
-    Serial.println(message.substring(1, 101));
+    Serial.print("Message received from STA MAC " + meshInstance.getEspnowMeshBackend().getSenderMac() + ": ");
+    Serial.println(message.substring(2, 102));
 
-    String potentialMac = message.substring(1, 13);
+    String potentialMac = message.substring(2, 14);
 
-    if (potentialMac > theOneMac) {
-      if (theOne) {
-        if (useLED) {
-          digitalWrite(LED_BUILTIN, HIGH); // Turn LED off (LED is active low)
-        }
-
+    if (potentialMac >= theOneMac) {
+      if (potentialMac > theOneMac) {
         theOne = false;
+        theOneMac = potentialMac;
       }
 
-      theOneMac = potentialMac;
+      if (useLED && !theOne) {
+        bool ledState = message.charAt(1) == '1';
+        digitalWrite(LED_BUILTIN, ledState); // Turn LED on/off (LED is active low)
+      }
 
       return true;
     } else {
@@ -142,6 +142,7 @@ void setup() {
 
 int32_t timeOfLastProclamation = -10000;
 void loop() {
+  static bool ledState = 1;
   static uint32_t benchmarkCount = 0;
   static uint32_t loopStart = millis();
 
@@ -160,7 +161,10 @@ void loop() {
   if (theOne) {
     if (millis() - timeOfLastProclamation > 10000) {
       uint32_t startTime = millis();
-      floodingMesh.broadcast(String(floodingMesh.broadcastMetadataDelimiter()) + theOneMac + " is The One.");
+      ledState = ledState ^ bool(benchmarkCount); // Make other nodes' LEDs alternate between on and off once benchmarking begins.
+
+      // Note: The maximum length of an unencrypted broadcast message is given by floodingMesh.maxUnencryptedMessageSize(). It is around 670 bytes by default.
+      floodingMesh.broadcast(String(floodingMesh.broadcastMetadataDelimiter()) + String(ledState) + theOneMac + " is The One.");
       Serial.println("Proclamation broadcast done in " + String(millis() - startTime) + " ms.");
 
       timeOfLastProclamation = millis();
