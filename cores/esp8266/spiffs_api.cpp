@@ -127,12 +127,6 @@ bool isSpiffsFilenameValid(const char* name)
 
 }; // namespace
 
-extern "C" void spiffs_weak_end(void)
-{
-    //ets_printf("debug: not weak spiffs end\n");
-    SPIFFS.end();
-}
-
 // these symbols should be defined in the linker script for each flash layout
 #ifndef CORE_MOCK
 #ifdef ARDUINO
@@ -147,6 +141,14 @@ FS SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(
                              FS_PHYS_PAGE,
                              FS_PHYS_BLOCK,
                              SPIFFS_MAX_OPEN_FILES)));
+
+extern "C" void spiffs_request_end(void)
+{
+    // override default weak function
+    //ets_printf("debug: not weak spiffs end\n");
+    SPIFFS.end();
+}
+
 #endif // ARDUINO
 #endif // !CORE_MOCK
 

@@ -1,6 +1,6 @@
 /*
  *  no-op implementations
- *  used/linked when no not-weak implementation already exists elsewhere
+ *  used/linked when no strong implementation already exists elsewhere
  */
 
 #include <FS.h>
@@ -10,20 +10,24 @@ extern "C"
 
 void close_all_fs(void)
 {
-    littlefs_weak_end();
-    spiffs_weak_end();
+    littlefs_request_end();
+    spiffs_request_end();
 }
 
-void littlefs_weak_end(void) __attribute__((weak));
-void littlefs_weak_end(void)
+// default weak definitions
+// they are overriden in their respective real implementation
+// hint: https://github.com/esp8266/Arduino/pull/6699#issuecomment-549085382
+
+void littlefs_request_end(void) __attribute__((weak));
+void littlefs_request_end(void)
 {
-    //ets_printf("debug: noop: littlefs_weak_end\n");
+    //ets_printf("debug: noop: littlefs_request_end\n");
 }
 
-void spiffs_weak_end(void) __attribute__((weak));
-void spiffs_weak_end(void)
+void spiffs_request_end(void) __attribute__((weak));
+void spiffs_request_end(void)
 {
-    //ets_printf("debug: noop: spiffs_weak_end\n");
+    //ets_printf("debug: noop: spiffs_request_end\n");
 }
 
 }

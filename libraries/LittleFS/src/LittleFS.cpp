@@ -181,12 +181,6 @@ int LittleFSImpl::lfs_flash_sync(const struct lfs_config *c) {
 
 }; // namespace
 
-extern "C" void littlefs_weak_end(void)
-{
-    //ets_printf("debug: not weak littlefs end\n");
-    LittleFS.end();
-}
-
 // these symbols should be defined in the linker script for each flash layout
 #ifndef CORE_MOCK
 #ifdef ARDUINO
@@ -196,6 +190,14 @@ extern "C" void littlefs_weak_end(void)
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LITTLEFS)
 FS LittleFS = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(FS_PHYS_ADDR, FS_PHYS_SIZE, FS_PHYS_PAGE, FS_PHYS_BLOCK, FS_MAX_OPEN_FILES)));
+
+extern "C" void littlefs_request_end(void)
+{
+    // override default weak function
+    //ets_printf("debug: not weak littlefs end\n");
+    LittleFS.end();
+}
+
 #endif
 
 #endif // !CORE_MOCK
