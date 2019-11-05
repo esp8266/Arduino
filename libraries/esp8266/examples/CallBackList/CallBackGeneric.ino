@@ -2,7 +2,7 @@
 #include <Ticker.h>
 #include "CallBackList.h"
 
-using namespace esp8266::CBListImplentation;
+using namespace experimental::CBListImplentation;
 
 class exampleClass {
   public:
