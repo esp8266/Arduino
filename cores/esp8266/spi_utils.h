@@ -28,13 +28,13 @@ extern "C" {
 
 #include <stdint.h>
 
+namespace experimental {
 typedef enum {
     SPI_RESULT_OK,
     SPI_RESULT_ERR,
     SPI_RESULT_TIMEOUT
 } SpiOpResult;
 
-namespace experimental {
 SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits);
 }
 
