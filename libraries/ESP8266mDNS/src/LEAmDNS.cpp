@@ -280,7 +280,7 @@ bool MDNSResponder::setHostname(const char* p_pcHostname)
 /*
     MDNSResponder::setHostname (LEGACY)
 */
-bool MDNSResponder::setHostname(String p_strHostname)
+bool MDNSResponder::setHostname(const String& p_strHostname)
 {
 
     return setHostname(p_strHostname.c_str());
@@ -369,8 +369,8 @@ bool MDNSResponder::removeService(const char* p_pcName,
 /*
     MDNSResponder::addService (LEGACY)
 */
-bool MDNSResponder::addService(String p_strService,
-                               String p_strProtocol,
+bool MDNSResponder::addService(const String& p_strService,
+                               const String& p_strProtocol,
                                uint16_t p_u16Port)
 {
 
@@ -595,10 +595,10 @@ bool MDNSResponder::addServiceTxt(const char* p_pcService,
 /*
     MDNSResponder::addServiceTxt (LEGACY)
 */
-bool MDNSResponder::addServiceTxt(String p_strService,
-                                  String p_strProtocol,
-                                  String p_strKey,
-                                  String p_strValue)
+bool MDNSResponder::addServiceTxt(const String& p_strService,
+                                  const String& p_strProtocol,
+                                  const String& p_strKey,
+                                  const String& p_strValue)
 {
 
     return (0 != _addServiceTxt(_findService(m_pcHostname, p_strService.c_str(), p_strProtocol.c_str()), p_strKey.c_str(), p_strValue.c_str(), false));
@@ -826,8 +826,8 @@ bool MDNSResponder::removeQuery(void)
 /*
     MDNSResponder::queryService (LEGACY)
 */
-uint32_t MDNSResponder::queryService(String p_strService,
-                                     String p_strProtocol)
+uint32_t MDNSResponder::queryService(const String& p_strService,
+                                     const String& p_strProtocol)
 {
 
     return queryService(p_strService.c_str(), p_strProtocol.c_str());

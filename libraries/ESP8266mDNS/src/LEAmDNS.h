@@ -192,7 +192,7 @@ public:
     // Change hostname (probing is restarted)
     bool setHostname(const char* p_pcHostname);
     // for compatibility...
-    bool setHostname(String p_strHostname);
+    bool setHostname(const String& p_strHostname);
 
     /**
         hMDNSService (opaque handle to access the service)
@@ -213,8 +213,8 @@ public:
                        const char* p_pcServiceName,
                        const char* p_pcProtocol);
     // for compatibility...
-    bool addService(String p_strServiceName,
-                    String p_strProtocol,
+    bool addService(const String& p_strServiceName,
+                    const String& p_strProtocol,
                     uint16_t p_u16Port);
 
 
@@ -276,10 +276,10 @@ public:
                        const char* p_pcProtocol,
                        const char* p_pcKey,
                        const char* p_pcValue);
-    bool addServiceTxt(String p_strService,
-                       String p_strProtocol,
-                       String p_strKey,
-                       String p_strValue);
+    bool addServiceTxt(const String& p_strService,
+                       const String& p_strProtocol,
+                       const String& p_strKey,
+                       const String& p_strValue);
 
     /**
         MDNSDynamicServiceTxtCallbackFn
@@ -331,8 +331,8 @@ public:
                           const uint16_t p_u16Timeout = MDNS_QUERYSERVICES_WAIT_TIME);
     bool removeQuery(void);
     // for compatibility...
-    uint32_t queryService(String p_strService,
-                          String p_strProtocol);
+    uint32_t queryService(const String& p_strService,
+                          const String& p_strProtocol);
 
     const char* answerHostname(const uint32_t p_u32AnswerIndex);
     IPAddress answerIP(const uint32_t p_u32AnswerIndex);
