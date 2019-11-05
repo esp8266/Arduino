@@ -534,6 +534,20 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'Product page: https://www.sparkfun.com/products/13711' ],
     }),
+    ( 'blynk', {
+        'name': 'SparkFun Blynk Board',
+        'opts': {
+            '.build.board': 'ESP8266_THING',
+            '.build.variant': 'thing',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Product page: https://www.sparkfun.com/products/13794' ],
+    }),
     ( 'esp210', {
         'name': 'SweetPea ESP-210',
         'opts': {
