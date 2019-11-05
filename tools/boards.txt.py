@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community
@@ -32,6 +32,7 @@
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
 #            lwip/lwip2                  menus for available lwip versions
 
+from __future__ import print_function
 import os
 import sys
 import collections
@@ -44,13 +45,14 @@ import json
 # or by user command line
 
 speeds = collections.OrderedDict([
-    (  '57', [ 's57',  's115', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '115', [ 's115', 's57', 's230', 's256', 's460', 's512', 's921' ]),
-    ( '230', [ 's230', 's57', 's115', 's256', 's460', 's512', 's921' ]),
-    ( '256', [ 's256', 's57', 's115', 's230', 's460', 's512', 's921' ]),
-    ( '460', [ 's460', 's57', 's115', 's230', 's256', 's512', 's921' ]),
-    ( '512', [ 's512', 's57', 's115', 's230', 's256', 's460', 's921' ]),
-    ( '921', [ 's921', 's57', 's115', 's230', 's256', 's460', 's512' ]),
+    (  '57',  [ 's57',  's115', 's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '115',  [ 's115', 's57',  's230', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '230',  [ 's230', 's57',  's115', 's256', 's460', 's512', 's921', 's3000' ]),
+    ( '256',  [ 's256', 's57',  's115', 's230', 's460', 's512', 's921', 's3000' ]),
+    ( '460',  [ 's460', 's57',  's115', 's230', 's256', 's512', 's921', 's3000' ]),
+    ( '512',  [ 's512', 's57',  's115', 's230', 's256', 's460', 's921', 's3000' ]),
+    ( '921',  [ 's921', 's57',  's115', 's230', 's256', 's460', 's512', 's3000' ]),
+    ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
     ])
 
 # boards list
@@ -299,7 +301,7 @@ boards = collections.OrderedDict([
             ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
-            ( '.menu.UploadTool.esptool.upload.verbose', '-vv' ),
+            ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
             ( '.menu.UploadTool.espota', 'OTA' ),
             ( '.menu.UploadTool.espota.upload.tool', 'espota' ),
             ]),
@@ -529,6 +531,20 @@ boards = collections.OrderedDict([
             '512K',
             ],
         'desc': [ 'Product page: https://www.sparkfun.com/products/13711' ],
+    }),
+    ( 'blynk', {
+        'name': 'SparkFun Blynk Board',
+        'opts': {
+            '.build.board': 'ESP8266_THING',
+            '.build.variant': 'thing',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Product page: https://www.sparkfun.com/products/13794' ],
     }),
     ( 'esp210', {
         'name': 'SweetPea ESP-210',
@@ -881,8 +897,11 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.disabled', 'Disabled' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
+        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
@@ -900,6 +919,10 @@ macros = {
         ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
         ( '.menu.FlashFreq.80', '80MHz' ),
         ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
+        ( '.menu.FlashFreq.20', '20MHz' ),
+        ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
+        ( '.menu.FlashFreq.26', '26MHz' ),
+        ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
@@ -1061,6 +1084,10 @@ macros = {
         ( '.menu.baud.921600', '921600' ),
         ( '.menu.baud.921600.upload.speed', '921600' ),
         ]),
+    's3000': collections.OrderedDict([
+        ( '.menu.baud.3000000', '3000000' ),
+        ( '.menu.baud.3000000.upload.speed', '3000000' ),
+        ]),
 
     ####################### flash erase
 
@@ -1115,7 +1142,7 @@ def comb1 (lst):
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
-    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM' ]
+    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
     options += comb1(listnocomb)
@@ -1172,6 +1199,11 @@ def flash_map (flashsize_kb, fs_kb = 0):
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
     fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+
+    # For legacy reasons (#6531), the EEPROM sector needs to be at the old
+    # FS_end calculated without regards to block size
+    eeprom_start = fs_end
+
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
         max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
@@ -1255,6 +1287,13 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
+        # Re-add deprecated symbols pointing to the same address as the new standard ones
+        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
@@ -1341,13 +1380,15 @@ def led (default,max):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
-                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
+                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (190703 approved)'),
+                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22x_190703'),
+                        ('.menu.sdk.nonosdk222_111', 'nonos-sdk 2.2.1+111 (191024 testing)'),
+                        ('.menu.sdk.nonosdk222_111.build.sdk', 'NONOSDK22x_191024'),
+                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (190313 testing)'),
+                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
-                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])
            }
@@ -1405,7 +1446,7 @@ def all_boards ():
 
         # standalone options
         if 'opts' in board:
-            for optname in board['opts']:
+            for optname in sorted(board['opts']):
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros

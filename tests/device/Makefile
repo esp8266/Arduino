@@ -4,17 +4,16 @@ TEST_LIST ?= $(wildcard test_*/*.ino)
 ESP8266_CORE_PATH ?= $(realpath ../..)
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
-#PYTHON ?= python3
-PYTHON ?= python
+PYTHON ?= python3
 ESPTOOL ?= $(PYTHON) $(ESP8266_CORE_PATH)/tools/esptool/esptool.py
 MKSPIFFS ?= $(ESP8266_CORE_PATH)/tools/mkspiffs/mkspiffs
 UPLOAD_PORT ?= $(shell ls /dev/tty* | grep -m 1 -i USB)
 UPLOAD_BAUD ?= 460800
 UPLOAD_BOARD ?= nodemcu
 BS_DIR ?= libraries/BSTest
-DEBUG_LEVEL ?= DebugLevel=None____
+DEBUG_LEVEL ?= lvl=None____
 #FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,LwIPVariant=v2mss536,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
-FQBN ?= esp8266com:esp8266:generic:xtal=80,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=none,dbg=Serial,$(DEBUG_LEVEL)
+FQBN ?= esp8266com:esp8266:generic:xtal=160,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=none,dbg=Serial,$(DEBUG_LEVEL)
 BUILD_TOOL := $(ARDUINO_IDE_PATH)/arduino-builder
 TEST_CONFIG := test_env.cfg
 TEST_REPORT_XML := test_report.xml
@@ -105,7 +104,7 @@ ifneq ("$(NO_RUN)","1")
 endif
 
 $(TEST_REPORT_XML): $(HARDWARE_DIR) virtualenv
-	$(SILENT)$(BS_DIR)/virtualenv/bin/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
+	$(SILENT)$(BS_DIR)/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
 
 $(TEST_REPORT_HTML): $(TEST_REPORT_XML) | virtualenv
 	$(SILENT)$(BS_DIR)/virtualenv/bin/junit2html $< $@
@@ -126,6 +125,7 @@ virtualenv:
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(HARDWARE_DIR)
+	rm -rf $(BS_DIR)/virtualenv
 	rm -f $(TEST_REPORT_HTML) $(TEST_REPORT_XML)
 
 distclean: clean

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __future__ import print_function
 import pexpect
 from pexpect import EOF, TIMEOUT, fdpexpect
@@ -236,10 +236,10 @@ ser = None
 def spawn_port(port_name, baudrate=115200):
     global ser
     ser = serial.serial_for_url(port_name, baudrate=baudrate)
-    return fdpexpect.fdspawn(ser, 'wb', timeout=0)
+    return fdpexpect.fdspawn(ser, 'wb', timeout=0, encoding='cp437')
 
 def spawn_exec(name):
-    return pexpect.spawn(name, timeout=0)
+    return pexpect.spawn(name, timeout=0, encoding='cp437')
 
 def run_tests(spawn, name, mocks, env_vars):
     tw = BSTestRunner(spawn, name, mocks, env_vars)

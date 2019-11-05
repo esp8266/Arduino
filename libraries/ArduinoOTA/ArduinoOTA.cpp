@@ -231,7 +231,7 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    String challenge = _password + ":" + String(_nonce) + ":" + cnonce;
+    String challenge = _password + ':' + String(_nonce) + ':' + cnonce;
     MD5Builder _challengemd5;
     _challengemd5.begin();
     _challengemd5.add(challenge);
@@ -330,7 +330,7 @@ void ArduinoOTAClass::_runUpdate() {
   if (Update.end()) {
     client.print("OK");
     client.stop();
-    delay(10);
+    delay(1000);
 #ifdef OTA_DEBUG
     OTA_DEBUG.printf("Update Success\n");
 #endif

@@ -15,7 +15,7 @@ $(PYTHON_ENV_DIR):
 	. $(PYTHON_ENV_DIR)/bin/activate && pip install -r requirements.txt
 
 test: $(TEST_EXECUTABLE) $(PYTHON_ENV_DIR)
-	. $(PYTHON_ENV_DIR)/bin/activate && python runner.py -e $(TEST_EXECUTABLE) -m test/test.py
+	. $(PYTHON_ENV_DIR)/bin/activate && $(PYTHON) runner.py -e $(TEST_EXECUTABLE) -m test/test.py
 
 $(TEST_EXECUTABLE): test/test.cpp
 	g++ -std=c++11 -Isrc -o $@ test/test.cpp
