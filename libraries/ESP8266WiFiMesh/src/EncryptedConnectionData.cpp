@@ -26,6 +26,7 @@
 #include "UtilityFunctions.h"
 #include "TypeConversionFunctions.h"
 #include "JsonTranslator.h"
+#include "CryptoInterface.h"
 
 using EspnowProtocolInterpreter::espnowHashKeyLength;
 
@@ -127,7 +128,7 @@ uint64_t EncryptedConnectionData::getOwnSessionKey() const { return _ownSessionK
 
 uint64_t EncryptedConnectionData::incrementSessionKey(uint64_t sessionKey, const uint8_t *hashKey, uint8_t hashKeyLength)
 {
-  String hmac = JsonTranslator::createHmac(uint64ToString(sessionKey), hashKey, hashKeyLength);
+  String hmac = CryptoInterface::createBearsslHmac(uint64ToString(sessionKey), hashKey, hashKeyLength);
   
   /* HMAC truncation should be OK since hmac sha256 is a PRF and we are truncating to the leftmost (MSB) bits.
   PRF: https://crypto.stackexchange.com/questions/26410/whats-the-gcm-sha-256-of-a-tls-protocol/26434#26434

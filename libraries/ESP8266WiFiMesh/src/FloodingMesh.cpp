@@ -37,7 +37,7 @@ void floodingMeshDelay(uint32_t durationMs)
   while(millis() - startingTime < durationMs)
   {
     delay(1);
-    FloodingMesh::performMeshMaintainance();
+    FloodingMesh::performMeshMaintenance();
   }
 }
 
@@ -74,25 +74,25 @@ void FloodingMesh::begin()
   // Initialise the mesh node  
   getEspnowMeshBackend().begin();
   
-  // Makes it possible to find the node through scans, and also makes it possible to recover from an encrypted ESP-NOW connection where only the other node is encrypted. 
-  // Note that only one AP can be active at a time in total, and this will always be the one which was last activated.
-  // Thus the AP is shared by all backends.
-  getEspnowMeshBackend().activateAP();
-  
   availableFloodingMeshes.insert(this); // Returns std::pair<iterator,bool>
 }
 
-void FloodingMesh::performMeshMaintainance()
+void FloodingMesh::activateAP()
+{
+  getEspnowMeshBackend().activateAP();
+}
+
+void FloodingMesh::performMeshMaintenance()
 {
   for(FloodingMesh *meshInstance : availableFloodingMeshes)
   {
-    meshInstance->performMeshInstanceMaintainance();
+    meshInstance->performMeshInstanceMaintenance();
   }
 }
 
-void FloodingMesh::performMeshInstanceMaintainance()
+void FloodingMesh::performMeshInstanceMaintenance()
 {
-  EspnowMeshBackend::performEspnowMaintainance(); 
+  EspnowMeshBackend::performEspnowMaintenance(); 
   
   for(std::list<std::pair<String, bool>>::iterator backlogIterator = _forwardingBacklog.begin();  backlogIterator != _forwardingBacklog.end(); )
   {
@@ -110,7 +110,7 @@ void FloodingMesh::performMeshInstanceMaintainance()
 
     backlogIterator = _forwardingBacklog.erase(backlogIterator);
     
-    EspnowMeshBackend::performEspnowMaintainance(); // It is best to performEspnowMaintainance frequently to keep the Espnow backend responsive. Especially if each encryptedBroadcast takes a lot of time.
+    EspnowMeshBackend::performEspnowMaintenance(); // It is best to performEspnowMaintenance frequently to keep the Espnow backend responsive. Especially if each encryptedBroadcast takes a lot of time.
   }
 }
 

@@ -1,3 +1,10 @@
+/**
+   This example makes every node broadcast their AP MAC to the rest of the network during the first 28 seconds, as long as the node thinks it has the highest AP MAC in the network.
+   Once 28 seconds have passed, the node that has the highest AP MAC will start broadcasting benchmark messages, which will allow you to see how many messages are lost at the other nodes.
+   If you have an onboard LED on your ESP8266 it is recommended that you change the useLED variable below to true.
+   That way you will get instant confirmation of the mesh communication without checking the Serial Monitor.
+*/
+
 #include <ESP8266WiFi.h>
 #include <TypeConversionFunctions.h>
 #include <assert.h>
@@ -63,7 +70,7 @@ bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
 
       if (useLED && !theOne) {
         bool ledState = message.charAt(1) == '1';
-        digitalWrite(LED_BUILTIN, ledState); // Turn LED on/off (LED is active low)
+        digitalWrite(LED_BUILTIN, ledState); // Turn LED on/off (LED_BUILTIN is active low)
       }
 
       return true;
@@ -128,13 +135,14 @@ void setup() {
   Serial.println(F("Setting up mesh node..."));
 
   floodingMesh.begin();
+  floodingMesh.activateAP();
 
   uint8_t apMacArray[6] {0};
   theOneMac = macToString(WiFi.softAPmacAddress(apMacArray));
 
   if (useLED) {
     pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
-    digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LED is active low)
+    digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LED_BUILTIN is active low)
   }
 
   floodingMeshDelay(5000); // Give some time for user to start the nodes
@@ -146,12 +154,12 @@ void loop() {
   static uint32_t benchmarkCount = 0;
   static uint32_t loopStart = millis();
 
-  // The floodingMeshDelay() method performs all the background operations for the FloodingMesh (via FloodingMesh::performMeshMaintainance()).
+  // The floodingMeshDelay() method performs all the background operations for the FloodingMesh (via FloodingMesh::performMeshMaintenance()).
   // It is recommended to place one of these methods in the beginning of the loop(), unless there is a need to put them elsewhere.
   // Among other things, the method cleans up old ESP-NOW log entries (freeing up RAM) and forwards received mesh messages.
   // Note that depending on the amount of messages to forward and their length, this method can take tens or even hundreds of milliseconds to complete.
-  // More intense transmission activity and less frequent calls to performMeshMaintainance will likely cause the method to take longer to complete, so plan accordingly.
-  // The maintainance methods should not be used inside the meshMessageHandler callback, since they can alter the mesh node state. The framework will alert you during runtime if you make this mistake.
+  // More intense transmission activity and less frequent calls to performMeshMaintenance will likely cause the method to take longer to complete, so plan accordingly.
+  // The maintenance methods should not be used inside the meshMessageHandler callback, since they can alter the mesh node state. The framework will alert you during runtime if you make this mistake.
   floodingMeshDelay(1);
 
   // If you wish to transmit only to a single node, try using one of the following methods (requires the node to be within range and know the MAC of the recipient):

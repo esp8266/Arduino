@@ -242,14 +242,14 @@ void setup() {
 
 int32_t timeOfLastScan = -10000;
 void loop() {
-  // The performEspnowMaintainance() method performs all the background operations for the EspnowMeshBackend.
+  // The performEspnowMaintenance() method performs all the background operations for the EspnowMeshBackend.
   // It is recommended to place it in the beginning of the loop(), unless there is a need to put it elsewhere.
   // Among other things, the method cleans up old Espnow log entries (freeing up RAM) and sends the responses you provide to Espnow requests.
   // Note that depending on the amount of responses to send and their length, this method can take tens or even hundreds of milliseconds to complete.
-  // More intense transmission activity and less frequent calls to performEspnowMaintainance will likely cause the method to take longer to complete, so plan accordingly.
+  // More intense transmission activity and less frequent calls to performEspnowMaintenance will likely cause the method to take longer to complete, so plan accordingly.
 
-  //Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
-  EspnowMeshBackend::performEspnowMaintainance();
+  //Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintenance() can alter the ESP-NOW state.
+  EspnowMeshBackend::performEspnowMaintenance();
 
   if (millis() - timeOfLastScan > 10000) { // Give other nodes some time to connect between data transfers.
     Serial.println("\nPerforming unencrypted ESP-NOW transmissions.");
@@ -260,8 +260,8 @@ void loop() {
 
     timeOfLastScan = millis();
 
-    // Wait for response. espnowDelay continuously calls performEspnowMaintainance() so we will respond to ESP-NOW request while waiting.
-    // Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
+    // Wait for response. espnowDelay continuously calls performEspnowMaintenance() so we will respond to ESP-NOW request while waiting.
+    // Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintenance() can alter the ESP-NOW state.
     espnowDelay(100);
 
     // One way to check how attemptTransmission worked out

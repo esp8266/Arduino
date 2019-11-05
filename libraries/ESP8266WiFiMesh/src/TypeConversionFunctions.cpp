@@ -24,7 +24,6 @@
  */
 
 #include "TypeConversionFunctions.h"
-#include "Crypto.h"
 
 String uint64ToString(uint64_t number, byte base)
 {

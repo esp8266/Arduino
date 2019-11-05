@@ -26,7 +26,6 @@ extern "C" {
 #include "UtilityFunctions.h"
 #include "MutexTracker.h"
 #include "JsonTranslator.h"
-#include "Crypto.h"
 
 using EspnowProtocolInterpreter::espnowEncryptionKeyLength;
 using EspnowProtocolInterpreter::espnowHashKeyLength;
@@ -99,7 +98,7 @@ void espnowDelay(uint32_t durationMs)
   while(millis() - startingTime < durationMs)
   {
     delay(1);
-    EspnowMeshBackend::performEspnowMaintainance();
+    EspnowMeshBackend::performEspnowMaintenance();
   }
 }
 
@@ -224,7 +223,7 @@ bool EspnowMeshBackend::latestTransmissionSuccessful()
   return latestTransmissionSuccessfulBase(latestTransmissionOutcomes());
 }
 
-void EspnowMeshBackend::performEspnowMaintainance(uint32_t estimatedMaxDuration)
+void EspnowMeshBackend::performEspnowMaintenance(uint32_t estimatedMaxDuration)
 {
   ExpiringTimeTracker estimatedMaxDurationTracker = ExpiringTimeTracker(estimatedMaxDuration);
   
@@ -232,7 +231,7 @@ void EspnowMeshBackend::performEspnowMaintainance(uint32_t estimatedMaxDuration)
   MutexTracker mutexTracker(_espnowTransmissionMutex, handlePostponedRemovals);
   if(!mutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! Transmission in progress. Don't call performEspnowMaintainance from callbacks as this may corrupt program state! Aborting."); 
+    assert(false && "ERROR! Transmission in progress. Don't call performEspnowMaintenance from callbacks as this may corrupt program state! Aborting."); 
     return;
   }
   

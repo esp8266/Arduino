@@ -26,7 +26,6 @@
 #define __ESPNOWJSONTRANSLATOR_H__
 
 #include <WString.h>
-#include "Crypto.h"
 
 namespace JsonTranslator 
 {
@@ -45,17 +44,13 @@ namespace JsonTranslator
   
   String createJsonPair(const String &valueIdentifier, const String &value);
   String createJsonEndPair(const String &valueIdentifier, const String &value);
-
-  uint8_t *createHmac(const String &message, const uint8_t *hashKey, uint8_t hashKeyLength, uint8_t resultArray[SHA256HMAC_SIZE]);
-  String createHmac(const String &message, const uint8_t *hashKey, uint8_t hashKeyLength);
-
-  bool verifyHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, uint8_t hashKeyLength);
-  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, uint8_t hashKeyLength);
   
   String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey);
   String createEncryptionRequestIntro(const String &requestHeader, uint32_t duration = 0);
   String createEncryptionRequestEnding(const String &requestNonce);
   String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, uint8_t hashKeyLength, uint32_t duration = 0);
+
+  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, uint8_t hashKeyLength);
 
   /**
    * Provides the index within jsonString where the value of valueIdentifier starts.

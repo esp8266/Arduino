@@ -31,11 +31,11 @@
 #include <queue>
 
 /**
- * An alternative to standard delay(). Will continuously call performMeshMaintainance() during the waiting time, so that the FloodingMesh node remains responsive.
+ * An alternative to standard delay(). Will continuously call performMeshMaintenance() during the waiting time, so that the FloodingMesh node remains responsive.
  * Note that if there is a lot of FloodingMesh transmission activity to the node during the floodingMeshDelay, the desired duration may be overshot by several ms. 
  * Thus, if precise timing is required, use standard delay() instead.
  *  
- * Should not be used inside callbacks since performMeshMaintainance() can alter the ESP-NOW state.
+ * Should not be used inside callbacks since performMeshMaintenance() can alter the ESP-NOW state.
  *  
  * @param durationMs The shortest allowed delay duration, in milliseconds.
  */
@@ -92,16 +92,25 @@ public:
    * All FloodingMesh instances can still broadcast messages though, even if their AP is not visible.
    */
   void begin();
+
+  /** 
+   * Makes it possible to find the node through scans, and also makes it possible to recover from an encrypted ESP-NOW connection where only the other node is encrypted.
+   * Required for encryptedBroadcast() usage, but also slows down the start-up of the node.
+   * 
+   * Note that only one AP can be active at a time in total, and this will always be the one which was last activated.
+   * Thus the AP is shared by all backends.
+   */
+  void activateAP();
   
   /**
-   * Performs maintainance for all available Flooding Mesh instances
+   * Performs maintenance for all available Flooding Mesh instances
    */
-  static void performMeshMaintainance();
+  static void performMeshMaintenance();
   
   /** 
-   * Performs maintainance for this particular Flooding Mesh instance
+   * Performs maintenance for this particular Flooding Mesh instance
    */
-  void performMeshInstanceMaintainance();
+  void performMeshInstanceMaintenance();
 
   /**
    * Serialize the current mesh node state. Useful to save a state before the node goes to sleep.

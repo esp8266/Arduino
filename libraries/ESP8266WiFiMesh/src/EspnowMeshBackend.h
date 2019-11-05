@@ -80,7 +80,6 @@
 #include "MessageData.h"
 #include <map>
 #include <list>
-#include "Crypto.h"
 #include "EspnowNetworkInfo.h"
 
 typedef enum 
@@ -111,11 +110,11 @@ typedef enum
 
 
 /**
- * An alternative to standard delay(). Will continuously call performEspnowMaintainance() during the waiting time, so that the ESP-NOW node remains responsive.
+ * An alternative to standard delay(). Will continuously call performEspnowMaintenance() during the waiting time, so that the ESP-NOW node remains responsive.
  * Note that if there is a lot of ESP-NOW transmission activity to the node during the espnowDelay, the desired duration may be overshot by several ms. 
  * Thus, if precise timing is required, use standard delay() instead.
  *  
- * Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
+ * Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintenance() can alter the ESP-NOW state.
  *  
  * @param durationMs The shortest allowed delay duration, in milliseconds.
  */
@@ -202,15 +201,15 @@ public:
    * It is recommended to place it in the beginning of the loop(), unless there is a need to put it elsewhere.
    * Among other things, the method cleans up old Espnow log entries (freeing up RAM) and sends the responses you provide to Espnow requests.
    * Note that depending on the amount of responses to send and their length, this method can take tens or even hundreds of milliseconds to complete.
-   * More intense transmission activity and less frequent calls to performEspnowMaintainance will likely cause the method to take longer to complete, so plan accordingly.
+   * More intense transmission activity and less frequent calls to performEspnowMaintenance will likely cause the method to take longer to complete, so plan accordingly.
    * 
-   * Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintainance() can alter the ESP-NOW state.
+   * Should not be used inside responseHandler, requestHandler, networkFilter or broadcastFilter callbacks since performEspnowMaintenance() can alter the ESP-NOW state.
    * 
    * @param estimatedMaxDuration The desired max duration for the method. If set to 0 there is no duration limit. 
-   *                             Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintainance.
+   *                             Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintenance.
    *                             Also note that although the method will try to respect the max duration limit, there is no guarantee. Overshoots by tens of milliseconds are possible.
    */
-  static void performEspnowMaintainance(uint32_t estimatedMaxDuration = 0);
+  static void performEspnowMaintenance(uint32_t estimatedMaxDuration = 0);
 
   /**
    * At critical heap level no more incoming requests are accepted.
@@ -703,19 +702,19 @@ protected:
    * For example, response order will be mixed up if some responses fail to transmit while others transmit successfully.
    * 
    * @param estimatedMaxDurationTracker A pointer to an ExpiringTimeTracker initialized with the desired max duration for the method. If set to nullptr there is no duration limit. 
-   *                                    Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintainance.
+   *                                    Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintenance.
    *                                    Also note that although the method will try to respect the max duration limit, there is no guarantee. Overshoots by tens of milliseconds are possible.
    */
   static void sendStoredEspnowMessages(const ExpiringTimeTracker *estimatedMaxDurationTracker = nullptr);
   /*
    * @param estimatedMaxDurationTracker A pointer to an ExpiringTimeTracker initialized with the desired max duration for the method. If set to nullptr there is no duration limit. 
-   *                                    Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintainance.
+   *                                    Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintenance.
    *                                    Also note that although the method will try to respect the max duration limit, there is no guarantee. Overshoots by tens of milliseconds are possible.                            
    */
   static void sendPeerRequestConfirmations(const ExpiringTimeTracker *estimatedMaxDurationTracker = nullptr);
   /*
    * @param estimatedMaxDurationTracker A pointer to an ExpiringTimeTracker initialized with the desired max duration for the method. If set to nullptr there is no duration limit. 
-   *                                    Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintainance.
+   *                                    Note that setting the estimatedMaxDuration too low may result in missed ESP-NOW transmissions because of too little time for maintenance.
    *                                    Also note that although the method will try to respect the max duration limit, there is no guarantee. Overshoots by tens of milliseconds are possible.                            
    */
   static void sendEspnowResponses(const ExpiringTimeTracker *estimatedMaxDurationTracker = nullptr);

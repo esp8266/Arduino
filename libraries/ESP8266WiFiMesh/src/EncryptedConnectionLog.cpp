@@ -55,7 +55,7 @@ void EncryptedConnectionLog::removeDuration()
 
 void EncryptedConnectionLog::scheduleForRemoval()
 {
-  // When we give the connection 0 remaining duration it will be removed during the next performEspnowMaintainance() call.
+  // When we give the connection 0 remaining duration it will be removed during the next performEspnowMaintenance() call.
   // Duration must be changed before setting the scheduledForRemoval flag to true, since the flag is otherwise cleared.
   setRemainingDuration(0);
   setScheduledForRemoval(true);
