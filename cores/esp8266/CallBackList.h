@@ -28,7 +28,7 @@
 #include <list>
 #include <utility>
 
-namespace esp8266
+namespace experimental
 {
 namespace CBListImplentation
 {
@@ -79,6 +79,6 @@ public:
 };
 
 } //CBListImplementation
-}//esp8266
+}//experimental
 
 #endif // __CALLBACKLIST_H__
