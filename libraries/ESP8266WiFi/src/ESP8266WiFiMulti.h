@@ -57,6 +57,8 @@ class ESP8266WiFiMulti {
 
         wl_status_t run(void);
 
+        void cleanAPlist(void);
+
     private:
         WifiAPlist APlist;
         bool APlistAdd(const char* ssid, const char *passphrase = NULL);
