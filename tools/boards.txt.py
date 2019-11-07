@@ -298,9 +298,9 @@ boards = collections.OrderedDict([
             ( '.build.board', 'ESP8266_ESP13' ),
             ( '.build.variant', 'ESPDuino' ),
             ( '.menu.ResetMethod.v2', 'ESPduino-V2' ),
-            ( '.menu.ResetMethod.v2.upload.resetmethod', 'nodemcu' ),
+            ( '.menu.ResetMethod.v2.upload.resetmethod', '--before default_reset --after hard_reset' ),
             ( '.menu.ResetMethod.v1', 'ESPduino-V1' ),
-            ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
+            ( '.menu.ResetMethod.v1.upload.resetmethod', '--before no_reset --after soft_reset' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
             ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
@@ -915,7 +915,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', 'version'),
+        ( '.upload.erase_cmd', 'flash_id'),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -984,37 +984,39 @@ macros = {
     ####################### menu.resetmethod
 
     'resetmethod_menu': collections.OrderedDict([
-        ( '.menu.ResetMethod.ck', 'ck' ),
-        ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
-        ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
-        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
+        ( '.menu.ResetMethod.nodemcu', 'dtr (aka nodemcu)' ),
+        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', '--before default_reset --after hard_reset' ),
+        ( '.menu.ResetMethod.ck', 'no dtr (aka ck)' ),
+        ( '.menu.ResetMethod.ck.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_menu_extra': collections.OrderedDict([
-        ( '.menu.ResetMethod.none', 'none' ),
-        ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
-        ( '.menu.ResetMethod.dtrset', 'dtrset' ),
-        ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
+        ( '.menu.ResetMethod.nodtr_nosync', 'no dtr, no_sync' ),
+        ( '.menu.ResetMethod.nodtr_nosync.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
 
-    ####################### upload.resetmethod
+    ####################### upload.resetmethod (new esptool.py options)
 
     'resetmethod_ck': collections.OrderedDict([
-        ( '.upload.resetmethod', 'ck' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_nodemcu': collections.OrderedDict([
-        ( '.upload.resetmethod', 'nodemcu' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
 
     'resetmethod_none': collections.OrderedDict([
-        ( '.upload.resetmethod', 'none' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_dtrset': collections.OrderedDict([
-        ( '.upload.resetmethod', 'dtrset' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
 
+    'resetmethod_nodtr_nosync': collections.OrderedDict([
+        ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
+        ]),
+  
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1141,7 +1143,7 @@ macros = {
 
     'flash_erase_menu': collections.OrderedDict([
         ( '.menu.wipe.none', 'Only Sketch' ),
-        ( '.menu.wipe.none.upload.erase_cmd', 'version' ),
+        ( '.menu.wipe.none.upload.erase_cmd', 'flash_id' ),
         ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
         ( '.menu.wipe.sdk.upload.erase_cmd', 'erase_region "{build.rfcal_addr}" 0x4000' ),
         ( '.menu.wipe.all', 'All Flash Contents' ),
