@@ -80,6 +80,11 @@ public:
         memset(&_fs, 0, sizeof(_fs));
     }
 
+    ~SPIFFSImpl()
+    {
+        end();
+    }
+
     FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) override;
     bool exists(const char* path) override;
     DirImplPtr openDir(const char* path) override;
