@@ -39,7 +39,12 @@ build.stdcpp_level=-std=gnu++11
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
-build.sdk=NONOSDK22x_191024
+
+# default SDK for all boards
+# (generic board overrides this variable)
+#build.sdk=NONOSDK22x_190703
+#build.sdk=NONOSDK22x_191024
+build.sdk=NONOSDK22x_191105
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
