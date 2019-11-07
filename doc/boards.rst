@@ -317,6 +317,11 @@ SparkFun ESP8266 Thing Dev
 
 Product page: https://www.sparkfun.com/products/13711
 
+SparkFun Blynk Board
+--------------------
+
+Product page: https://www.sparkfun.com/products/13794
+
 SweetPea ESP-210
 ----------------
 
