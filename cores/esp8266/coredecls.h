@@ -14,6 +14,7 @@ extern "C" {
 
 extern bool timeshift64_is_set;
 
+bool can_yield();
 void esp_yield();
 void esp_schedule();
 void tune_timeshift64 (uint64_t now_us);
