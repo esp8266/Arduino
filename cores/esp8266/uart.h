@@ -157,6 +157,8 @@ const char* uart_peek_buffer (uart_t* uart);
 // consume bytes after use (see peekBuffer)
 void uart_peek_consume (uart_t* uart, size_t consume);
 
+uint8_t uart_get_bit_length(const int uart_nr);
+
 #if defined (__cplusplus)
 } // extern "C"
 #endif

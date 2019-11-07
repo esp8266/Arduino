@@ -88,6 +88,8 @@ public:
 
     void end();
 
+    void updateBaudRate(unsigned long baud);
+
     size_t setRxBufferSize(size_t size);
     size_t getRxBufferSize()
     {

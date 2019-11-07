@@ -296,9 +296,9 @@ boards = collections.OrderedDict([
             ( '.build.board', 'ESP8266_ESP13' ),
             ( '.build.variant', 'ESPDuino' ),
             ( '.menu.ResetMethod.v2', 'ESPduino-V2' ),
-            ( '.menu.ResetMethod.v2.upload.resetmethod', 'nodemcu' ),
+            ( '.menu.ResetMethod.v2.upload.resetmethod', '--before default_reset --after hard_reset' ),
             ( '.menu.ResetMethod.v1', 'ESPduino-V1' ),
-            ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
+            ( '.menu.ResetMethod.v1.upload.resetmethod', '--before no_reset --after soft_reset' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
             ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
@@ -531,6 +531,20 @@ boards = collections.OrderedDict([
             '512K',
             ],
         'desc': [ 'Product page: https://www.sparkfun.com/products/13711' ],
+    }),
+    ( 'blynk', {
+        'name': 'SparkFun Blynk Board',
+        'opts': {
+            '.build.board': 'ESP8266_THING',
+            '.build.variant': 'thing',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Product page: https://www.sparkfun.com/products/13794' ],
     }),
     ( 'esp210', {
         'name': 'SweetPea ESP-210',
@@ -853,7 +867,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', 'version'),
+        ( '.upload.erase_cmd', 'flash_id'),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -905,6 +919,10 @@ macros = {
         ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
         ( '.menu.FlashFreq.80', '80MHz' ),
         ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
+        ( '.menu.FlashFreq.20', '20MHz' ),
+        ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
+        ( '.menu.FlashFreq.26', '26MHz' ),
+        ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
@@ -918,37 +936,39 @@ macros = {
     ####################### menu.resetmethod
 
     'resetmethod_menu': collections.OrderedDict([
-        ( '.menu.ResetMethod.ck', 'ck' ),
-        ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
-        ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
-        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
+        ( '.menu.ResetMethod.nodemcu', 'dtr (aka nodemcu)' ),
+        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', '--before default_reset --after hard_reset' ),
+        ( '.menu.ResetMethod.ck', 'no dtr (aka ck)' ),
+        ( '.menu.ResetMethod.ck.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_menu_extra': collections.OrderedDict([
-        ( '.menu.ResetMethod.none', 'none' ),
-        ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
-        ( '.menu.ResetMethod.dtrset', 'dtrset' ),
-        ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
+        ( '.menu.ResetMethod.nodtr_nosync', 'no dtr, no_sync' ),
+        ( '.menu.ResetMethod.nodtr_nosync.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
 
-    ####################### upload.resetmethod
+    ####################### upload.resetmethod (new esptool.py options)
 
     'resetmethod_ck': collections.OrderedDict([
-        ( '.upload.resetmethod', 'ck' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_nodemcu': collections.OrderedDict([
-        ( '.upload.resetmethod', 'nodemcu' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
     
     'resetmethod_none': collections.OrderedDict([
-        ( '.upload.resetmethod', 'none' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_dtrset': collections.OrderedDict([
-        ( '.upload.resetmethod', 'dtrset' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
-    
+
+    'resetmethod_nodtr_nosync': collections.OrderedDict([
+        ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
+        ]),
+  
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1075,7 +1095,7 @@ macros = {
 
     'flash_erase_menu': collections.OrderedDict([
         ( '.menu.wipe.none', 'Only Sketch' ),
-        ( '.menu.wipe.none.upload.erase_cmd', 'version' ),
+        ( '.menu.wipe.none.upload.erase_cmd', 'flash_id' ),
         ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
         ( '.menu.wipe.sdk.upload.erase_cmd', 'erase_region "{build.rfcal_addr}" 0x4000' ),
         ( '.menu.wipe.all', 'All Flash Contents' ),
@@ -1181,6 +1201,11 @@ def flash_map (flashsize_kb, fs_kb = 0):
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
     fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+
+    # For legacy reasons (#6531), the EEPROM sector needs to be at the old
+    # FS_end calculated without regards to block size
+    eeprom_start = fs_end
+
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
         max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
@@ -1264,6 +1289,13 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
+        # Re-add deprecated symbols pointing to the same address as the new standard ones
+        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + fs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + fs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
@@ -1350,13 +1382,15 @@ def led (default,max):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
-                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
+                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (190703 approved)'),
+                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22x_190703'),
+                        ('.menu.sdk.nonosdk222_111', 'nonos-sdk 2.2.1+111 (191024 testing)'),
+                        ('.menu.sdk.nonosdk222_111.build.sdk', 'NONOSDK22x_191024'),
+                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (190313 testing)'),
+                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
-                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])
            }
