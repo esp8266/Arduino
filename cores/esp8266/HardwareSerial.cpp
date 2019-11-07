@@ -66,7 +66,7 @@ void HardwareSerial::updateBaudRate(unsigned long baud)
         return;
     }
 
-    uart_set_baudrate(_uart, baud);    
+    uart_set_baudrate(_uart, baud);
 }
 
 size_t HardwareSerial::setRxBufferSize(size_t size){
@@ -108,14 +108,16 @@ int HardwareSerial::available(void)
 
 void HardwareSerial::flush()
 {
+    uint8_t bit_length = 0;
     if(!_uart || !uart_tx_enabled(_uart)) {
         return;
     }
 
+    bit_length = uart_get_bit_length(_uart_nr); // data width, parity and stop
     uart_wait_tx_empty(_uart);
     //Workaround for a bug in serial not actually being finished yet
     //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
-    delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
+    delayMicroseconds(bit_length * 1000000 / uart_get_baudrate(_uart) + 1);
 }
 
 void HardwareSerial::startDetectBaudrate()
@@ -138,7 +140,7 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
         }
         yield();
         delay(100);
-    }    
+    }
     return detectedBaudrate;
 }
 

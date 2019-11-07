@@ -25,14 +25,18 @@
 #ifndef CORE_BASE64_H_
 #define CORE_BASE64_H_
 
-class base64 {
-    public:
-        // NOTE: The default behaviour of backend (lib64)
-        // is to add a newline every 72 (encoded) characters output.
-        // This may 'break' longer uris and json variables
-        static String encode(const uint8_t * data, size_t length, bool doNewLines = true);
-        static String encode(const String& text, bool doNewLines = true);
-    private:
+class base64
+{
+public:
+    // NOTE: The default behaviour of backend (lib64)
+    // is to add a newline every 72 (encoded) characters output.
+    // This may 'break' longer uris and json variables
+    static String encode(const uint8_t * data, size_t length, bool doNewLines = true);
+    static String inline encode(const String& text, bool doNewLines = true)
+    {
+        return encode( (const uint8_t *) text.c_str(), text.length(), doNewLines );
+    }
+private:
 };
 
 
