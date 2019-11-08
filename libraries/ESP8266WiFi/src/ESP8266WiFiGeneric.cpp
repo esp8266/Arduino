@@ -25,6 +25,7 @@
 #include <list>
 #include <string.h>
 #include <coredecls.h>
+#include <PolledTimeout.h>
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 
@@ -433,6 +434,25 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
         ret = wifi_set_opmode_current(m);
     }
     ETS_UART_INTR_ENABLE();
+
+    if(!ret)
+      return false; //calling wifi_set_opmode failed
+
+    //Wait for mode change, which is asynchronous.
+    //Only wait if in CONT context. If this were called from SYS, it's up to the user to serialize
+    //tasks to wait correctly.
+    constexpr unsigned int timeoutValue = 1000; //1 second
+    if(can_yield()) {
+        using oneShot = esp8266::polledTimeout::oneShotFastUs;
+        oneShot timeout(timeoutValue);
+        while(wifi_get_opmode() != (uint8) m && !timeout)
+            delay(5);
+
+        //if at this point mode still hasn't been reached, give up
+        if(wifi_get_opmode() != (uint8) m) {
+            return false; //timeout
+        }
+    }
 
     return ret;
 }
