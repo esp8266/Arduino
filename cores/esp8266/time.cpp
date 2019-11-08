@@ -17,7 +17,7 @@
  */
 
 #include <stdlib.h>
-#include <time.h>
+#include <../include/time.h>
 #include <sys/time.h>
 #include <sys/reent.h>
 #include "sntp.h"
