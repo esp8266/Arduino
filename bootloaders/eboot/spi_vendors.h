@@ -18,8 +18,8 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SPI_VENDORS_H
-#define SPI_VENDORS_H
+#ifndef __SPI_VENDORS_H__
+#define __SPI_VENDORS_H__
 
 // Vendor IDs taken from Flashrom project
 // https://review.coreboot.org/cgit/flashrom.git/tree/flashchips.h?h=1.0.x
