@@ -245,6 +245,13 @@ protected:
 
 } // namespace fs
 
+extern "C"
+{
+void close_all_fs(void);
+void littlefs_request_end(void);
+void spiffs_request_end(void);
+}
+
 #ifndef FS_NO_GLOBALS
 using fs::FS;
 using fs::File;
