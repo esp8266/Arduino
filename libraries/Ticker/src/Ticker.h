@@ -38,25 +38,25 @@ public:
     void attach_scheduled(float seconds, callback_function_t callback)
     {
         _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(1000UL * seconds, true, _static_callback, this);
+        _attach_ms(1000UL * seconds, true);
     }
 
     void attach(float seconds, callback_function_t callback)
     {
         _callback_function = std::move(callback);
-        _attach_ms(1000UL * seconds, true, _static_callback, this);
+        _attach_ms(1000UL * seconds, true);
     }
 
     void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
     {
         _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(milliseconds, true, _static_callback, this);
+        _attach_ms(milliseconds, true);
     }
 
     void attach_ms(uint32_t milliseconds, callback_function_t callback)
     {
         _callback_function = std::move(callback);
-        _attach_ms(milliseconds, true, _static_callback, this);
+        _attach_ms(milliseconds, true);
     }
 
     template<typename TArg>
@@ -76,25 +76,25 @@ public:
     void once_scheduled(float seconds, callback_function_t callback)
     {
         _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(1000UL * seconds, false, _static_callback, this);
+        _attach_ms(1000UL * seconds, false);
     }
 
     void once(float seconds, callback_function_t callback)
     {
         _callback_function = std::move(callback);
-        _attach_ms(1000UL * seconds, false, _static_callback, this);
+        _attach_ms(1000UL * seconds, false);
     }
 
     void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
     {
         _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(milliseconds, false, _static_callback, this);
+        _attach_ms(milliseconds, false);
     }
 
     void once_ms(uint32_t milliseconds, callback_function_t callback)
     {
         _callback_function = std::move(callback);
-        _attach_ms(milliseconds, false, _static_callback, this);
+        _attach_ms(milliseconds, false);
     }
 
     template<typename TArg>
@@ -117,6 +117,10 @@ public:
 protected:
     static void _static_callback(void* arg);
     void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg);
+    void _attach_ms(uint32_t milliseconds, bool repeat)
+    {
+        _attach_ms(milliseconds, repeat, _static_callback, this);
+    }
 
     ETSTimer* _timer;
     callback_function_t _callback_function = nullptr;
