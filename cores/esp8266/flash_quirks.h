@@ -28,7 +28,11 @@ extern "C" {
 #include "spi_vendors.h"
 #include "spi_flash_defs.h"
 
+namespace experimental {
+
 void initFlashQuirks();
+
+} // namespace experimental
 
 #ifdef __cplusplus
 }

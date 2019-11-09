@@ -318,7 +318,7 @@ extern "C" void user_init(void) {
 
     initVariant();
 
-    initFlashQuirks(); // Chip specific flash init.
+    experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
 

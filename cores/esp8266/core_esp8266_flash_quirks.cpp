@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+namespace experimental {
+
 static int get_flash_mhz() {
     // FIXME: copied from Esp.cpp - we really should define the magic values
     uint32_t data;
@@ -75,6 +77,8 @@ void initFlashQuirks() {
          }
   }
 }
+
+} // namespace experimental
 
 #ifdef __cplusplus
 }
