@@ -42,6 +42,7 @@ import json
 
 requiredboards = [ 'generic', 'esp8285' ]
 
+################################################################
 # serial upload speed order in menu
 # default is 115 for every board unless specified with 'serial' in board
 # or by user command line
@@ -57,6 +58,7 @@ speeds = collections.OrderedDict([
     ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
     ])
 
+################################################################
 # boards list
 
 boards = collections.OrderedDict([
@@ -467,6 +469,7 @@ boards = collections.OrderedDict([
             'flashmode_dio',
             'flashfreq_40',
             '4M',
+            'led216',
             ],
         'desc': [ 'This module is sold under many names for around $6.50 on AliExpress and it\'s one of the cheapest, fully integrated ESP8266 solutions.',
                   '',
@@ -1435,19 +1438,19 @@ def all_flash_map ():
 ################################################################
 # builtin led
 
-def led (default,max):
+def led (name, default, ledList):
     led = collections.OrderedDict([
                 ('.menu.led.' + str(default), str(default)),
                 ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
-    for i in range(0,max+1): # Make range incluside of max (16), since there are really 16 GPIOS not 15
+    for i in ledList: # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not i == default:
             led.update(
                 collections.OrderedDict([
                     ('.menu.led.' + str(i), str(i)),
                     ('.menu.led.' + str(i) + '.build.led', '-DLED_BUILTIN=' + str(i)),
                 ]))
-    return { 'led': led }
+    return { name: led }
 
 ################################################################
 # sdk selection
@@ -1495,7 +1498,8 @@ def all_boards ():
 
     macros.update(all_flash_map())
     macros.update(all_debug())
-    macros.update(led(led_default, led_max))
+    macros.update(led('led',    led_default, range(0,led_max+1)))
+    macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
 
     if boardfilteropt or excludeboards:
