@@ -123,3 +123,13 @@ ESP8266 core files are licensed under LGPL.
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 
 [LittleFS](https://github.com/ARMmbed/littlefs) library written by ARM Limited and released under the [BSD 3-clause license](https://github.com/ARMmbed/littlefs/blob/master/LICENSE.md).
+
+### Other useful links ###
+
+[Toolchain repo](https://github.com/earlephilhower/esp-quick-toolchain)
+
+[Lwip link layer repo](https://github.com/d-a-v/esp82xx-nonos-linklayer)
+
+[SoftwareSerial repo](https://github.com/plerup/espsoftwareserial)
+
+[Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).
