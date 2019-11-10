@@ -55,7 +55,7 @@ bool useLED = false; // Change this to true if you wish the onboard LED to mark 
    @return True if this node should forward the received message to other nodes. False otherwise.
 */
 bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
-  int32_t delimiterIndex = message.indexOf(meshInstance.broadcastMetadataDelimiter());
+  int32_t delimiterIndex = message.indexOf(meshInstance.metadataDelimiter());
   if (delimiterIndex == 0) {
     Serial.print("Message received from STA MAC " + meshInstance.getEspnowMeshBackend().getSenderMac() + ": ");
     Serial.println(message.substring(2, 102));
@@ -172,7 +172,7 @@ void loop() {
       ledState = ledState ^ bool(benchmarkCount); // Make other nodes' LEDs alternate between on and off once benchmarking begins.
 
       // Note: The maximum length of an unencrypted broadcast message is given by floodingMesh.maxUnencryptedMessageSize(). It is around 670 bytes by default.
-      floodingMesh.broadcast(String(floodingMesh.broadcastMetadataDelimiter()) + String(ledState) + theOneMac + " is The One.");
+      floodingMesh.broadcast(String(floodingMesh.metadataDelimiter()) + String(ledState) + theOneMac + " is The One.");
       Serial.println("Proclamation broadcast done in " + String(millis() - startTime) + " ms.");
 
       timeOfLastProclamation = millis();
@@ -181,7 +181,7 @@ void loop() {
 
     if (millis() - loopStart > 23000) { // Start benchmarking the mesh once three proclamations have been made
       uint32_t startTime = millis();
-      floodingMesh.broadcast(String(benchmarkCount++) + String(floodingMesh.broadcastMetadataDelimiter()) + ": Not a spoon in sight.");
+      floodingMesh.broadcast(String(benchmarkCount++) + String(floodingMesh.metadataDelimiter()) + ": Not a spoon in sight.");
       Serial.println("Benchmark broadcast done in " + String(millis() - startTime) + " ms.");
       floodingMeshDelay(20);
     }

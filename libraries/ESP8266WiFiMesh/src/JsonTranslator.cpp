@@ -25,7 +25,7 @@
 #include "JsonTranslator.h"
 #include "EspnowProtocolInterpreter.h"
 #include "TypeConversionFunctions.h"
-#include "CryptoInterface.h"
+#include "MeshCryptoInterface.h"
 
 namespace JsonTranslator
 {
@@ -69,14 +69,14 @@ namespace JsonTranslator
     uint8_t staMac[6] {0};
     uint8_t apMac[6] {0};
     String requesterStaApMac = macToString(WiFi.macAddress(staMac)) + macToString(WiFi.softAPmacAddress(apMac));
-    String hmac = CryptoInterface::createBearsslHmac(requesterStaApMac + mainMessage, hashKey, hashKeyLength);
+    String hmac = MeshCryptoInterface::createMeshHmac(requesterStaApMac + mainMessage, hashKey, hashKeyLength);
     return mainMessage + createJsonEndPair(jsonHmac, hmac);
   }
 
   bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, 
                                    const uint8_t *hashKey, uint8_t hashKeyLength)
   {
-    using namespace CryptoInterface;
+    using MeshCryptoInterface::verifyMeshHmac;
     
     String hmac = "";
     if(getHmac(encryptionRequestHmacMessage, hmac))
@@ -85,8 +85,8 @@ namespace JsonTranslator
       if(hmacStartIndex < 0)
         return false;
      
-      if(hmac.length() == 2*SHA256HMAC_NATURAL_LENGTH // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
-         && verifyBearsslHmac(macToString(requesterStaMac) + macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
+      if(hmac.length() == 2*CryptoInterface::SHA256_NATURAL_LENGTH // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
+         && verifyMeshHmac(macToString(requesterStaMac) + macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
       {
         return true;
       }

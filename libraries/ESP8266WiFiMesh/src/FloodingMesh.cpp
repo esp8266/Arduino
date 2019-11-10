@@ -28,7 +28,7 @@
 
 std::set<FloodingMesh *> FloodingMesh::availableFloodingMeshes = {};
 
-char FloodingMesh::_broadcastMetadataDelimiter = 23;
+char FloodingMesh::_metadataDelimiter = 23;
 
 void floodingMeshDelay(uint32_t durationMs)
 {
@@ -156,10 +156,10 @@ void FloodingMesh::broadcast(const String &message)
   
   String messageID = generateMessageID();
 
-  // Remove getEspnowMeshBackend().getMeshName() from the broadcastMetadata below to broadcast to all ESP-NOW nodes regardless of MeshName.
+  // Remove getEspnowMeshBackend().getMeshName() from the metadata below to broadcast to all ESP-NOW nodes regardless of MeshName.
   String targetMeshName = getEspnowMeshBackend().getMeshName();
 
-  broadcastKernel(targetMeshName + String(broadcastMetadataDelimiter()) + messageID + String(broadcastMetadataDelimiter()) + message);
+  broadcastKernel(targetMeshName + String(metadataDelimiter()) + messageID + String(metadataDelimiter()) + message);
 }
 
 void FloodingMesh::broadcastKernel(const String &message)
@@ -180,7 +180,7 @@ void FloodingMesh::encryptedBroadcast(const String &message)
 
   String messageID = generateMessageID();
   
-  encryptedBroadcastKernel(messageID + String(broadcastMetadataDelimiter()) + message);  
+  encryptedBroadcastKernel(messageID + String(metadataDelimiter()) + message);  
 }
 
 void FloodingMesh::encryptedBroadcastKernel(const String &message)
@@ -232,15 +232,15 @@ void FloodingMesh::setMessageLogSize(uint16_t messageLogSize)
 }
 uint16_t FloodingMesh::messageLogSize() { return _messageLogSize; }
 
-void FloodingMesh::setBroadcastMetadataDelimiter(char broadcastMetadataDelimiter) 
+void FloodingMesh::setMetadataDelimiter(char metadataDelimiter) 
 { 
   // Using HEX number characters as a delimiter is a bad idea regardless of broadcast type, since they are always in the broadcast metadata
-  assert(broadcastMetadataDelimiter < 48 || 57 < broadcastMetadataDelimiter);
-  assert(broadcastMetadataDelimiter < 65 || 70 < broadcastMetadataDelimiter);
+  assert(metadataDelimiter < 48 || 57 < metadataDelimiter);
+  assert(metadataDelimiter < 65 || 70 < metadataDelimiter);
   
-  _broadcastMetadataDelimiter = broadcastMetadataDelimiter; 
+  _metadataDelimiter = metadataDelimiter; 
 }
-char FloodingMesh::broadcastMetadataDelimiter() { return _broadcastMetadataDelimiter; }
+char FloodingMesh::metadataDelimiter() { return _metadataDelimiter; }
   
 EspnowMeshBackend &FloodingMesh::getEspnowMeshBackend()
 {
@@ -342,12 +342,12 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
   String broadcastTarget = "";
   String remainingRequest = "";
   
-  if(request.charAt(0) == broadcastMetadataDelimiter())
+  if(request.charAt(0) == metadataDelimiter())
   {
-    int32_t broadcastTargetEndIndex = request.indexOf(broadcastMetadataDelimiter(), 1);
+    int32_t broadcastTargetEndIndex = request.indexOf(metadataDelimiter(), 1);
 
     if(broadcastTargetEndIndex == -1)
-      return ""; // broadcastMetadataDelimiter not found
+      return ""; // metadataDelimiter not found
     
     broadcastTarget = request.substring(1, broadcastTargetEndIndex + 1); // Include delimiter
     remainingRequest = request.substring(broadcastTargetEndIndex + 1);
@@ -357,10 +357,10 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
     remainingRequest = request;
   }
   
-  int32_t messageIDEndIndex = remainingRequest.indexOf(broadcastMetadataDelimiter());
+  int32_t messageIDEndIndex = remainingRequest.indexOf(metadataDelimiter());
 
   if(messageIDEndIndex == -1)
-    return ""; // broadcastMetadataDelimiter not found
+    return ""; // metadataDelimiter not found
 
   uint64_t messageID = stringToUint64(remainingRequest.substring(0, messageIDEndIndex));
 
@@ -447,16 +447,16 @@ void FloodingMesh::_defaultNetworkFilter(int numberOfNetworks, MeshBackendBase &
  */
 bool FloodingMesh::_defaultBroadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance)
 {
-  // This broadcastFilter will accept a transmission if it contains the broadcastMetadataDelimiter
+  // This broadcastFilter will accept a transmission if it contains the metadataDelimiter
   // and as metaData either no targetMeshName or a targetMeshName that matches the MeshName of meshInstance
   // and insertPreliminaryMessageID(messageID) returns true.
 
   // Broadcast firstTransmission String structure: targetMeshName+messageID+message.
    
-  int32_t metadataEndIndex = firstTransmission.indexOf(broadcastMetadataDelimiter());
+  int32_t metadataEndIndex = firstTransmission.indexOf(metadataDelimiter());
 
   if(metadataEndIndex == -1)
-    return false; // broadcastMetadataDelimiter not found
+    return false; // metadataDelimiter not found
 
   String targetMeshName = firstTransmission.substring(0, metadataEndIndex);
   
@@ -466,17 +466,17 @@ bool FloodingMesh::_defaultBroadcastFilter(String &firstTransmission, EspnowMesh
   }
   else 
   {
-    int32_t messageIDEndIndex = firstTransmission.indexOf(broadcastMetadataDelimiter(), metadataEndIndex + 1);
+    int32_t messageIDEndIndex = firstTransmission.indexOf(metadataDelimiter(), metadataEndIndex + 1);
 
     if(messageIDEndIndex == -1)
-      return false; // broadcastMetadataDelimiter not found
+      return false; // metadataDelimiter not found
   
     uint64_t messageID = stringToUint64(firstTransmission.substring(metadataEndIndex + 1, messageIDEndIndex));
 
     if(insertPreliminaryMessageID(messageID))
     {
       // Add broadcast identifier to stored message and mark as accepted broadcast.
-      firstTransmission = String(broadcastMetadataDelimiter()) + firstTransmission;
+      firstTransmission = String(metadataDelimiter()) + firstTransmission;
       return true;
     }
     else

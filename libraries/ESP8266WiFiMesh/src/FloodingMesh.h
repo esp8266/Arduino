@@ -217,11 +217,11 @@ public:
    * Set the delimiter character used for metadata by every FloodingMesh instance. 
    * Using characters found in the mesh name or in HEX numbers is unwise, as is using ','.
    * 
-   * @param broadcastMetadataDelimiter The metadata delimiter character to use.
+   * @param metadataDelimiter The metadata delimiter character to use.
    *                                   Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
    */
-  static void setBroadcastMetadataDelimiter(char broadcastMetadataDelimiter);
-  static char broadcastMetadataDelimiter();
+  static void setMetadataDelimiter(char metadataDelimiter);
+  static char metadataDelimiter();
 
   /*
    * Gives you access to the EspnowMeshBackend used by the mesh node.
@@ -274,7 +274,7 @@ private:
 
   uint8_t _broadcastReceptionRedundancy = 2;
 
-  static char _broadcastMetadataDelimiter; // Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
+  static char _metadataDelimiter; // Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
 
   uint8_t _originMac[6] = {0};
 
