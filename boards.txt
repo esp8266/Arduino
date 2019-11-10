@@ -2610,6 +2610,10 @@ nodemcuv2.menu.eesz.4M.build.flash_ld=eagle.flash.4m.ld
 nodemcuv2.menu.eesz.4M.build.spiffs_pagesize=256
 nodemcuv2.menu.eesz.4M.upload.maximum_size=1044464
 nodemcuv2.menu.eesz.4M.build.rfcal_addr=0x3FC000
+nodemcuv2.menu.led.2=2
+nodemcuv2.menu.led.2.build.led=-DLED_BUILTIN=2
+nodemcuv2.menu.led.16=16
+nodemcuv2.menu.led.16.build.led=-DLED_BUILTIN=16
 nodemcuv2.menu.ip.lm2f=v2 Lower Memory
 nodemcuv2.menu.ip.lm2f.build.lwip_include=lwip2/include
 nodemcuv2.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
