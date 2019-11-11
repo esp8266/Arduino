@@ -331,6 +331,7 @@ unsigned char String::concat(const char *cstr, unsigned int length) {
         return 0;
     memmove_P(wbuffer() + len(), cstr, length + 1);
     setLen(newlen);
+    wbuffer()[newlen] = 0;
     return 1;
 }
 
