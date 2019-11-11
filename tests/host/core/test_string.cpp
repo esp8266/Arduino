@@ -135,13 +135,15 @@ TEST_CASE("String concantenation", "[core][String]")
     const char buff[] = "abcdefg";
     String n;
     n = "1234567890"; // Make it a SSO string, fill with non-0 data
-    n = "1"; // Overwrite [1] with 0, but leave old jump in SSO space still
+    n = "1"; // Overwrite [1] with 0, but leave old junk in SSO space still
     n.concat(buff, 3);
     REQUIRE(n == "1abc"); // Ensure the trailing 0 is always present even w/this funky concat
-    for (int i=0; i<20; i++) n.concat(buff, 1); // Add 20 'a's to go from SSO to normal string
+    for (int i=0; i<20; i++)
+        n.concat(buff, 1); // Add 20 'a's to go from SSO to normal string
     REQUIRE(n == "1abcaaaaaaaaaaaaaaaaaaaa");
     n = "";
-    for (int i=0; i<=5; i++) n.concat(buff, i);
+    for (int i=0; i<=5; i++)
+        n.concat(buff, i);
     REQUIRE(n == "aababcabcdabcde");
     n.concat(buff, 0); // And check no add'n
     REQUIRE(n == "aababcabcdabcde");
