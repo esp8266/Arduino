@@ -18,11 +18,11 @@ Ticker tickerSetHigh;
 Ticker tickerSetChar;
 
 void setPinLow() {
-	digitalWrite(LED_BUILTIN, 0);
+  digitalWrite(LED_BUILTIN, 0);
 }
 
 void setPinHigh() {
-	digitalWrite(LED_BUILTIN, 1);
+  digitalWrite(LED_BUILTIN, 1);
 }
 
 void setPin(int state) {
