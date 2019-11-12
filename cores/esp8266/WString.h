@@ -203,18 +203,18 @@ class String {
         unsigned char equalsConstantTime(const String &s) const;
         unsigned char startsWith(const String &prefix) const;
         unsigned char startsWith(const char * prefix) {
-            this->startsWith(String(prefix));
+            return this->startsWith(String(prefix));
         }
         unsigned char startsWith(const __FlashStringHelper * prefix) {
-            this->startsWith(String(prefix));
+            return this->startsWith(String(prefix));
         }
         unsigned char startsWith(const String &prefix, unsigned int offset) const;
         unsigned char endsWith(const String &suffix) const;
         unsigned char endsWith(const char * suffix) {
-            this->endsWith(String(suffix));
+            return this->endsWith(String(suffix));
         }
         unsigned char endsWith(const __FlashStringHelper * suffix) {
-            this->endsWith(String(suffix));
+            return this->endsWith(String(suffix));
         }
 
         // character access
