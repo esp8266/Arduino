@@ -202,18 +202,18 @@ class String {
         unsigned char equalsIgnoreCase(const String &s) const;
         unsigned char equalsConstantTime(const String &s) const;
         unsigned char startsWith(const String &prefix) const;
-        unsigned char startsWith(const char * prefix) {
+        unsigned char startsWith(const char * prefix) const {
             return this->startsWith(String(prefix));
         }
-        unsigned char startsWith(const __FlashStringHelper * prefix) {
+        unsigned char startsWith(const __FlashStringHelper * prefix) const {
             return this->startsWith(String(prefix));
         }
         unsigned char startsWith(const String &prefix, unsigned int offset) const;
         unsigned char endsWith(const String &suffix) const;
-        unsigned char endsWith(const char * suffix) {
+        unsigned char endsWith(const char * suffix) const {
             return this->endsWith(String(suffix));
         }
-        unsigned char endsWith(const __FlashStringHelper * suffix) {
+        unsigned char endsWith(const __FlashStringHelper * suffix) const {
             return this->endsWith(String(suffix));
         }
 
