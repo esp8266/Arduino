@@ -97,9 +97,9 @@ void setup(void) {
   webServer.serveStatic("/", *filesystem, "/");
   webServer.begin();
 
-  //startSerial(3);
+  startSerial(1);
   // startTcpDump();
-   startTracefile();
+  // startTracefile();
 
 }
 
