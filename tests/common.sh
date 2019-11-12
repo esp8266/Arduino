@@ -153,6 +153,14 @@ function install_libraries()
 
 function install_ide()
 {
+    #local idever='nightly'
+    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
+
+    local idever='1.8.10'
+    local ideurl="https://downloads.arduino.cc/arduino-$idever"
+
+    echo "using Arduino IDE distribution ${idever}"
+
     local ide_path=$1
     local core_path=$2
     local debug=$3
@@ -164,8 +172,9 @@ function install_ide()
         choco install --no-progress unzip
         choco install --no-progress sed
         #choco install --no-progress golang
-        test -r arduino-nightly-windows.zip || wget -nv -O arduino-nightly-windows.zip https://www.arduino.cc/download.php?f=/arduino-nightly-windows.zip
-        unzip -q arduino-nightly-windows.zip
+        test -r arduino-windows.zip || wget -nv -O arduino-windows.zip "${ideurl}-windows.zip"
+        unzip -q arduino-windows.zip
+        mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
         wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
@@ -173,15 +182,17 @@ function install_ide()
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino.zip || wget -O arduino.zip https://downloads.arduino.cc/arduino-nightly-macosx.zip
-        unzip -q arduino.zip
-        mv Arduino.app arduino-nightly
-        mv arduino-nightly/Contents/Java/* arduino-nightly/.
+        test -r arduino-macos.zip || wget -O arduino-macos.zip "${ideurl}-macosx.zip"
+        unzip -q arduino-macos.zip
+        mv Arduino.app arduino-distrib
+        mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-        tar xf arduino.tar.xz
+        #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        tar xf arduino-linux.tar.xz
+        mv arduino-${idever} arduino-distrib
     fi
-    mv arduino-nightly $ide_path
+    mv arduino-distrib $ide_path
     cd $ide_path/hardware
     mkdir esp8266com
     cd esp8266com
