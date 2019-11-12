@@ -152,8 +152,12 @@ void setup() {
   getLocalTime(&tmstruct, 5000);
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
-
-  Serial.printf("Formatting LittleFS filesystem\n");
+  Serial.println("Mount LittleFS");
+  if (!LittleFS.begin()) {
+    Serial.println("LittleFS mount failed");
+    return;
+  }
+  Serial.println("Formatting LittleFS filesystem");
   LittleFS.format();
   listDir("/");
   deleteFile("/hello.txt");
@@ -161,12 +165,12 @@ void setup() {
   appendFile("/hello.txt", "World!\n");
   listDir("/");
 
-  Serial.printf("The timestamp should be valid above\n");
+  Serial.println("The timestamp should be valid above");
 
-  Serial.printf("Now unmount and remount and perform the same operation.\n");
-  Serial.printf("Timestamp should be valid, data should be good.\n");
+  Serial.println("Now unmount and remount and perform the same operation.");
+  Serial.println("Timestamp should be valid, data should be good.");
   LittleFS.end();
-  Serial.printf("Now mount it\n");
+  Serial.println("Now mount it");
   if (!LittleFS.begin()) {
     Serial.println("LittleFS mount failed");
     return;
