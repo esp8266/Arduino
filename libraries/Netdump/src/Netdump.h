@@ -1,7 +1,7 @@
 /*
     NetDump library - tcpdump-like packet logger facility
 
-    Copyright (c) 2018 David Gauchard. All rights reserved.
+    Copyright (c) 2019 Herman Reintke. All rights reserved.
     This file is part of the esp8266 core for Arduino environment.
 
     This library is free software; you can redistribute it and/or
@@ -26,8 +26,6 @@
 #include <functional>
 #include <lwipopts.h>
 #include <FS.h>
-//#include <IPAddress.h>
-//#include <StreamString.h>
 #include "NetdumpPacket.h"
 #include <ESP8266WiFi.h>
 
@@ -64,9 +62,9 @@ private:
     static Netdump* self;
 
     static void capture(int netif_idx, const char* data, size_t len, int out, int success);
-    void printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, NetdumpPacket np);
-    void fileDumpProcess(File outfile, NetdumpPacket np);
-    void tcpDumpProcess(NetdumpPacket np);
+    void printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, const NetdumpPacket& np);
+    void fileDumpProcess(File outfile, const NetdumpPacket& np);
+    void tcpDumpProcess(const NetdumpPacket& np);
     void tcpDumpLoop(WiFiServer &tcpDumpServer);
 
     WiFiClient tcpDumpClient;

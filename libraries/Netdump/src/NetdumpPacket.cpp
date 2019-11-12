@@ -22,7 +22,7 @@
 #include "Netdump.h"
 #include <lwip/init.h>
 
-void NetdumpPacket::printDetail(Print& out, String indent, const char* data, size_t size, PacketDetail pd)
+void NetdumpPacket::printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const
 {
     if (pd == PacketDetail::NONE)
     {
@@ -62,7 +62,7 @@ void NetdumpPacket::printDetail(Print& out, String indent, const char* data, siz
 }
 
 
-String NetdumpPacket::toString(PacketDetail netdumpDetail)
+String NetdumpPacket::toString(PacketDetail netdumpDetail) const
 {
     StreamString sstr;
     sstr.reserve(128);

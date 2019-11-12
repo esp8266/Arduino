@@ -1,8 +1,22 @@
 /*
-    NetdumpIP.cpp
+    NetDump library - tcpdump-like packet logger facility
 
-    Created on: 18 mei 2019
-        Author: Herman
+    Copyright (c) 2019 Herman Reintke. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+
 */
 #include <Arduino.h>
 #include <NetdumpIP.h>
@@ -43,7 +57,7 @@ NetdumpIP::NetdumpIP(const uint8_t *address, bool v4)
     }
 }
 
-NetdumpIP::NetdumpIP(IPAddress ip)
+NetdumpIP::NetdumpIP(const IPAddress& ip)
 {
     if (!ip.isSet())
     {
@@ -67,7 +81,7 @@ NetdumpIP::NetdumpIP(IPAddress ip)
     }
 }
 
-NetdumpIP::NetdumpIP(String ip)
+NetdumpIP::NetdumpIP(const String& ip)
 {
     if (!fromString(ip.c_str()))
     {
@@ -267,7 +281,7 @@ size_t NetdumpIP::printTo(Print& p)
     return n;
 }
 
-bool NetdumpIP::compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b)
+bool NetdumpIP::compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b) const
 {
     for (int i = 0; i < (v == IPversion::IPV4 ? 4 : 16); i++)
     {
@@ -279,7 +293,7 @@ bool NetdumpIP::compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b)
     return true;
 }
 
-bool NetdumpIP::compareIP(IPAddress ip)
+bool NetdumpIP::compareIP(const IPAddress& ip) const
 {
     switch (ipv)
     {
@@ -300,7 +314,7 @@ bool NetdumpIP::compareIP(IPAddress ip)
         }
         else
         {
-            return compareRaw(IPversion::IPV4, rawip, &ip[0]);
+            return compareRaw(IPversion::IPV4, rawip, reinterpret_cast<const uint8_t*>(&ip.v4()));
         }
         break;
     case IPversion::IPV6 :
@@ -310,7 +324,7 @@ bool NetdumpIP::compareIP(IPAddress ip)
         }
         else
         {
-            return compareRaw(IPversion::IPV6, rawip, &ip[0]);
+            return compareRaw(IPversion::IPV6, rawip, reinterpret_cast<const uint8_t*>(ip.raw6()));
         }
         break;
     default :
@@ -319,7 +333,7 @@ bool NetdumpIP::compareIP(IPAddress ip)
     }
 }
 
-bool NetdumpIP::compareIP(NetdumpIP nip)
+bool NetdumpIP::compareIP(const NetdumpIP& nip) const
 {
     switch (ipv)
     {

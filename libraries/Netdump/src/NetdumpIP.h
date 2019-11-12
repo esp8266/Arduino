@@ -21,8 +21,8 @@ public:
 
     NetdumpIP(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
     NetdumpIP(const uint8_t *address, bool V4 = true);
-    NetdumpIP(IPAddress ip);
-    NetdumpIP(String ip);
+    NetdumpIP(const IPAddress& ip);
+    NetdumpIP(const String& ip);
 
     uint8_t& operator[](int index)
     {
@@ -51,33 +51,33 @@ private:
     {
         ipv = IPversion::UNSET;
     };
-    bool isV4()
+    bool isV4() const
     {
         return (ipv == IPversion::IPV4);
     };
-    bool isV6()
+    bool isV6() const
     {
         return (ipv == IPversion::IPV6);
     };
-    bool isUnset()
+    bool isUnset() const
     {
         return (ipv == IPversion::UNSET);
     };
-    bool isSet()
+    bool isSet() const
     {
         return (ipv != IPversion::UNSET);
     };
 
-    bool compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b);
-    bool compareIP(IPAddress ip);
-    bool compareIP(NetdumpIP nip) ;
+    bool compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b) const;
+    bool compareIP(const IPAddress& ip) const;
+    bool compareIP(const NetdumpIP& nip) const;
 
     bool fromString4(const char *address);
     bool fromString6(const char *address);
 
-    size_t printTo(Print& p) ;
+    size_t printTo(Print& p);
 public:
-    bool operator==(const IPAddress& addr)
+    bool operator==(const IPAddress& addr) const
     {
         return compareIP(addr);
     };

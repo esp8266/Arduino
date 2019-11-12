@@ -1,7 +1,7 @@
 /*
     NetDump library - tcpdump-like packet logger facility
 
-    Copyright (c) 2018 David Gauchard. All rights reserved.
+    Copyright (c) 2019 Herman Reintke. All rights reserved.
     This file is part of the esp8266 core for Arduino environment.
 
     This library is free software; you can redistribute it and/or
@@ -51,158 +51,158 @@ public:
     int out;
     int success;
 
-    uint16_t ntoh16(uint16_t idx)
+    uint16_t ntoh16(uint16_t idx) const
     {
         return data[idx + 1] | (((uint16_t)data[idx]) << 8);
     };
-    uint32_t ntoh32(uint16_t idx)
+    uint32_t ntoh32(uint16_t idx) const
     {
         return ntoh16(idx + 2) | (((uint32_t)ntoh16(idx)) << 16);
     };
-    uint8_t  byteData(uint16_t idx)
+    uint8_t  byteData(uint16_t idx) const
     {
         return data[idx];
     }
-    const char* byteIdx(uint16_t idx)
+    const char* byteIdx(uint16_t idx) const
     {
         return &data[idx];
     };
-    uint16_t ethType()
+    uint16_t ethType() const
     {
         return ntoh16(12);
     };
-    uint8_t  ipType()
+    uint8_t  ipType() const
     {
         return isIPv4() ? data[ETH_HDR_LEN + 9] : data[ETH_HDR_LEN + 6];
     };
 
-    uint16_t getIpHdrLen()
+    uint16_t getIpHdrLen() const
     {
         return isIPv4() ? (((unsigned char)data[ETH_HDR_LEN]) & 0x0f) << 2 : 40 ;   // IPv6 is fixed length
     }
-    uint16_t getIpTotLen()
+    uint16_t getIpTotLen() const
     {
         return ntoh16(ETH_HDR_LEN + 2);
     }
     //	uint16_t getIpOptLen()        { return getIpHdrLen() - 20; }
     //	uint16_t getIpUsrLen()        { return getIpTotLen() - getIpHdrLen(); }
 
-    uint32_t getTcpSeq()
+    uint32_t getTcpSeq() const
     {
         return ntoh32(ETH_HDR_LEN + getIpHdrLen() + 4);
     }
-    uint32_t getTcpAck()
+    uint32_t getTcpAck() const
     {
         return ntoh32(ETH_HDR_LEN + getIpHdrLen() + 8);
     }
-    uint16_t getTcpFlags()
+    uint16_t getTcpFlags() const
     {
         return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 12);
     }
-    uint16_t getTcpWindow()
+    uint16_t getTcpWindow() const
     {
         return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 14);
     }
-    uint8_t  getTcpHdrLen()
+    uint8_t  getTcpHdrLen() const
     {
         return (data[ETH_HDR_LEN + getIpHdrLen() + 12] >> 4) * 4;
     };//Header len is in multiple of 4 bytes
-    uint16_t getTcpLen()
+    uint16_t getTcpLen() const
     {
         return getIpTotLen() - getIpHdrLen() - getTcpHdrLen() ;
     };
 
-    uint8_t  getIcmpType()
+    uint8_t  getIcmpType() const
     {
         return data[ETH_HDR_LEN + getIpHdrLen() + 0];
     }
-    uint8_t  getIgmpType()
+    uint8_t  getIgmpType() const
     {
         return data[ETH_HDR_LEN + getIpHdrLen() + 0];
     }
 
-    uint8_t getARPType()
+    uint8_t getARPType() const
     {
         return data[ETH_HDR_LEN + 7];
     }
-    bool    is_ARP_who()
+    bool    is_ARP_who() const
     {
         return getARPType() == 1;
     }
-    bool    is_ARP_is()
+    bool    is_ARP_is() const
     {
         return getARPType() == 2;
     }
 
-    uint8_t getUdpHdrLen()
+    uint8_t getUdpHdrLen() const
     {
         return 8;
     };
-    uint16_t getUdpLen()
+    uint16_t getUdpLen() const
     {
         return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 4);
     };
 
 
-    bool isARP()
+    bool isARP() const
     {
         return (ethType() == 0x0806);
     };
-    bool isIPv4()
+    bool isIPv4() const
     {
         return (ethType() == 0x0800);
     };
-    bool isIPv6()
+    bool isIPv6() const
     {
         return (ethType() == 0x86dd);
     };
-    bool isIP()
+    bool isIP() const
     {
         return (isIPv4() || isIPv6());
     };
-    bool isICMP()
+    bool isICMP() const
     {
         return ((ipType() == 1) || ipType() == 58);
     };
-    bool isIGMP()
+    bool isIGMP() const
     {
         return ipType() == 2;
     };
-    bool isTCP()
+    bool isTCP() const
     {
         return ipType() == 6;
     };
-    bool isUDP()
+    bool isUDP() const
     {
         return ipType() == 17;
     };
-    bool isMDNS()
+    bool isMDNS() const
     {
         return hasPort(5353);
     };
-    bool isDNS()
+    bool isDNS() const
     {
         return hasPort(53);
     };
-    bool isSSDP()
+    bool isSSDP() const
     {
         return hasPort(1900);
     };
-    bool isDHCP()
+    bool isDHCP() const
     {
         return (hasPort(546) || hasPort(547) || hasPort(67) || hasPort(68));
     };
-    bool isWSDD()
+    bool isWSDD() const
     {
         return (hasPort(3702));
     };
-    bool isHTTP()
+    bool isHTTP() const
     {
         return (hasPort(80));
     };
 
 
-    NetdumpIP getIP(uint16_t idx)
+    NetdumpIP getIP(uint16_t idx) const
     {
         return NetdumpIP(data[idx],
                          data[idx + 1],
@@ -210,13 +210,13 @@ public:
                          data[idx + 3]);
     };
 
-    NetdumpIP getIP6(uint16_t idx)
+    NetdumpIP getIP6(uint16_t idx) const
     {
         return NetdumpIP((const uint8_t*)&data[idx], false);
     };
 
 
-    NetdumpIP sourceIP()
+    NetdumpIP sourceIP() const
     {
         NetdumpIP ip;
         if (isIPv4())
@@ -230,7 +230,7 @@ public:
         return ip;
     };
 
-    NetdumpIP destIP()
+    NetdumpIP destIP() const
     {
         NetdumpIP ip;
         if (isIPv4())
@@ -243,21 +243,21 @@ public:
         }
         return ip;
     };
-    uint16_t getSrcPort()
+    uint16_t getSrcPort() const
     {
         return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 0);
     }
-    uint16_t getDstPort()
+    uint16_t getDstPort() const
     {
         return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 2);
     }
-    bool     hasPort(uint16_t p)
+    bool     hasPort(uint16_t p) const
     {
         return ((getSrcPort() == p) || (getDstPort() == p));
     }
 
-    String toString(PacketDetail netdumpDetail = PacketDetail::NONE);
-    void printDetail(Print& out, String indent, const char* data, size_t size, PacketDetail pd);
+    String toString(PacketDetail netdumpDetail = PacketDetail::NONE) const;
+    void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
 };
 

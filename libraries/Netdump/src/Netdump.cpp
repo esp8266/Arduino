@@ -1,7 +1,7 @@
 /*
     NetDump library - tcpdump-like packet logger facility
 
-    Copyright (c) 2018 David Gauchard. All rights reserved.
+    Copyright (c) 2019 Herman Reintke. All rights reserved.
     This file is part of the esp8266 core for Arduino environment.
 
     This library is free software; you can redistribute it and/or
@@ -56,16 +56,25 @@ void Netdump::printDump(Print& out, NetdumpPacket::PacketDetail ndd, NetdumpFilt
 void Netdump::fileDump(File outfile, NetdumpFilter nf)
 {
 
-    char buf[24];
+    //char buf[24];
 
+    uint32_t buf[6];
+/*
     *(uint32_t*)&buf[0] = 0xa1b2c3d4;
     *(uint32_t*)&buf[4] = 0x00040002;
     *(uint32_t*)&buf[8] = 0;
     *(uint32_t*)&buf[12] = 0;
     *(uint32_t*)&buf[16] = 1024;
     *(uint32_t*)&buf[20] = 1;
+*/
+    buf[0] = 0xa1b2c3d4;
+    buf[1] = 0x00040002;
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 1024;
+    buf[5] = 1;
 
-    outfile.write(buf, 24);
+    outfile.write((uint8_t*)buf, 24);
     //	setCallback( std::bind(&Netdump::fileDumpProcess, this, outfile, std::placeholders::_1));
     setCallback([outfile, this](NetdumpPacket & ndp)
     {
@@ -103,11 +112,12 @@ void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int 
     }
 }
 
-void Netdump::printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, NetdumpPacket np)
+void Netdump::printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, const NetdumpPacket& np)
 {
     out.printf("%8d %s", millis(), np.toString(ndd).c_str());
 }
-void Netdump::fileDumpProcess(File outfile, NetdumpPacket np)
+
+void Netdump::fileDumpProcess(File outfile, const NetdumpPacket& np)
 {
     size_t incl_len = np.len > 1024 ? 1024 : np.len;
     char buf[16];
@@ -122,7 +132,7 @@ void Netdump::fileDumpProcess(File outfile, NetdumpPacket np)
 
     outfile.write(np.data, incl_len);
 }
-void Netdump::tcpDumpProcess(NetdumpPacket np)
+void Netdump::tcpDumpProcess(const NetdumpPacket& np)
 {
     // Get capture code from netdumpout.cpp
     if (np.isIPv4() && np.isTCP()
@@ -155,7 +165,6 @@ void Netdump::tcpDumpProcess(NetdumpPacket np)
 }
 void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
 {
-
     if (tcpDumpServer.hasClient())
     {
         tcpDumpClient = tcpDumpServer.available();
@@ -191,8 +200,11 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
         bufferIndex = 0;
     }
     //  schedule_function(std::bind(&Netdump::tcpDumpLoop,this,std::ref(tcpDumpServer)));
-    schedule_function([&tcpDumpServer, this]()
+    if (tcpDumpServer.status() != CLOSED)
     {
-        tcpDumpLoop(tcpDumpServer);
-    });
+        schedule_function([&tcpDumpServer, this]()
+        {
+            tcpDumpLoop(tcpDumpServer);
+        });
+    }
 }
