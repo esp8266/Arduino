@@ -83,7 +83,6 @@ void Netdump::fileDump(File outfile, NetdumpFilter nf)
 }
 void Netdump::tcpDump(WiFiServer &tcpDumpServer, NetdumpFilter nf)
 {
-    // Get initialize code from netdumpout.cpp
     if (packetBuffer)
     {
         delete packetBuffer;
@@ -91,7 +90,6 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, NetdumpFilter nf)
     packetBuffer = new char[2048];
     bufferIndex = 0;
 
-    //	schedule_function(std::bind(&Netdump::tcpDumpLoop,this,std::ref(tcpDumpServer)));
     schedule_function([&tcpDumpServer, this]()
     {
         tcpDumpLoop(tcpDumpServer);
@@ -168,9 +166,8 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
     if (tcpDumpServer.hasClient())
     {
         tcpDumpClient = tcpDumpServer.available();
-        //if (fastsend)
-        tcpDumpClient.setNoDelay(true);
 
+        tcpDumpClient.setNoDelay(true);
 
         // pcap-savefile(5) capture preamble
         *(uint32_t*)&packetBuffer[0] = 0xa1b2c3d4;
@@ -181,7 +178,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
         *(uint32_t*)&packetBuffer[20] = 1;
         tcpDumpClient.write(packetBuffer, 24);
         bufferIndex = 0;
-        //      setCallback(std::bind(&Netdump::tcpDumpProcess,this,std::placeholders::_1));
+
         setCallback([this](NetdumpPacket & ndp)
         {
             tcpDumpProcess(ndp);
@@ -199,7 +196,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;
     }
-    //  schedule_function(std::bind(&Netdump::tcpDumpLoop,this,std::ref(tcpDumpServer)));
+
     if (tcpDumpServer.status() != CLOSED)
     {
         schedule_function([&tcpDumpServer, this]()

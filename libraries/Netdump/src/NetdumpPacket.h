@@ -230,6 +230,11 @@ public:
         return ip;
     };
 
+    bool      hasIP(NetdumpIP ip) const
+    {
+    	return ((ip == sourceIP()) || (ip == destIP()));
+    }
+
     NetdumpIP destIP() const
     {
         NetdumpIP ip;

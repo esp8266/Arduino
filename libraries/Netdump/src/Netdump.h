@@ -68,8 +68,8 @@ private:
     void tcpDumpLoop(WiFiServer &tcpDumpServer);
 
     WiFiClient tcpDumpClient;
-    char* packetBuffer;
-    size_t bufferIndex;
+    char* packetBuffer = nullptr;
+    size_t bufferIndex = 0;
 };
 
-#endif /* LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_H_ */
+#endif /* __NETDUMP_H */
