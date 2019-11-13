@@ -8,6 +8,7 @@
 
 import sys
 import os
+import tempfile
 
 sys.argv.pop(0) # Remove executable name
 toolspath = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/') # CWD in UNIX format
@@ -16,20 +17,67 @@ try:
     sys.path.insert(0, toolspath + "/esptool") # Add esptool dir to search path
     import esptool # If this fails, we can't continue and will bomb below
 except:
-    sys.stderr.write("Error in command line, need pyserial path as 1st arg and esptool path as 2nd.\n")
+    sys.stderr.write("pyserial or esptool directories not found next to this upload.py tool.\n")
     sys.exit(1)
 
-fakeargs = [];
+cmdline = []
+write_option = ''
+erase_addr = ''
+erase_len = ''
+
 while len(sys.argv):
-    if sys.argv[0] == '--end':
-        esptool.main(fakeargs)
-        sys.argv.pop(0) # Remove --end
-        fakeargs = []
-    else:
-        # We silently replace the 921kbaud setting with 460k to enable backward
-        # compatibility with the old esptool-ck.exe.  Esptool.py doesn't seem
-        # work reliably at 921k, but is still significantly faster at 460kbaud.
-        thisarg = sys.argv.pop(0)
-        if thisarg == "921600":
-            thisarg = "460800"
-        fakeargs = fakeargs + [thisarg]
+    thisarg = sys.argv.pop(0)
+
+    # We silently replace the 921kbaud setting with 460k to enable backward
+    # compatibility with the old esptool-ck.exe.  Esptool.py doesn't seem
+    # work reliably at 921k, but is still significantly faster at 460kbaud.
+    if thisarg == "921600":
+        thisarg = "460800"
+
+    # 'erase_flash' command is translated to the write_flash --erase-all option
+    # https://github.com/esp8266/Arduino/issues/6755#issuecomment-553208688
+    if thisarg == "erase_flash":
+        write_option = '--erase-all'
+        thisarg = ''
+
+    if thisarg == 'erase_region':
+        erase_addr = sys.argv.pop(0)
+        erase_len = sys.argv.pop(0)
+        thisarg = ''
+
+    if thisarg == 'ignore_this_arg':
+        thisarg = ''
+
+    if os.path.isfile(thisarg):
+        binary = thisarg
+        thisarg = ''
+
+    if len(thisarg):
+        cmdline = cmdline + [thisarg]
+
+
+cmdline = cmdline + ['write_flash']
+if len(write_option):
+    cmdline = cmdline + [write_option]
+cmdline = cmdline + ['0x0', binary]
+
+erase_file = ''
+if len(erase_addr):
+    # generate temporary empty (0xff) file
+    eraser = tempfile.mkstemp()
+    erase_file = eraser[1]
+    print(eraser)
+    # fill it
+    data = bytearray(512)
+    for i in range(512):
+        data[i] = 0xff
+    for i in range(int((int(erase_len, 0) + 511)/512)):
+        os.write(eraser[0], data)
+    os.close(eraser[0])
+    cmdline = cmdline + [ erase_addr, erase_file ]
+
+print('esptool.py cmdline:', cmdline)
+esptool.main(cmdline)
+
+if len(erase_file):
+    os.remove(erase_file)
