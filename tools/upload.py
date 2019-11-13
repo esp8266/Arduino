@@ -45,16 +45,12 @@ while len(sys.argv):
         erase_len = sys.argv.pop(0)
         thisarg = ''
 
-    if thisarg == 'ignore_this_arg':
-        thisarg = ''
-
     if os.path.isfile(thisarg):
         binary = thisarg
         thisarg = ''
 
     if len(thisarg):
         cmdline = cmdline + [thisarg]
-
 
 cmdline = cmdline + ['write_flash']
 if len(write_option):
@@ -66,17 +62,10 @@ if len(erase_addr):
     # generate temporary empty (0xff) file
     eraser = tempfile.mkstemp()
     erase_file = eraser[1]
-    print(eraser)
-    # fill it
-    data = bytearray(512)
-    for i in range(512):
-        data[i] = 0xff
-    for i in range(int((int(erase_len, 0) + 511)/512)):
-        os.write(eraser[0], data)
+    os.write(eraser[0], bytearray([255] * int(erase_len, 0)))
     os.close(eraser[0])
     cmdline = cmdline + [ erase_addr, erase_file ]
 
-print('esptool.py cmdline:', cmdline)
 esptool.main(cmdline)
 
 if len(erase_file):
