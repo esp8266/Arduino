@@ -29,53 +29,43 @@ void Netdump::setCallback(NetdumpCallback nc)
 {
     netDumpCallback = nc;
 }
+
 void Netdump::setCallback(NetdumpCallback nc, NetdumpFilter nf)
 {
     netDumpFilter   = nf;
     netDumpCallback = nc;
 }
+
 void Netdump::setFilter(NetdumpFilter nf)
 {
     netDumpFilter = nf;
 }
+
 void Netdump::reset()
 {
     setCallback(nullptr, nullptr);
 }
+
 void Netdump::printDump(Print& out, NetdumpPacket::PacketDetail ndd, NetdumpFilter nf)
 {
     out.printf("netDump starting\r\n");
-//    setCallback(std::bind(&Netdump::printDumpProcess, this, std::ref(out), ndd, std::placeholders::_1), nf);
     setCallback([&out, ndd, this](NetdumpPacket & ndp)
     {
         printDumpProcess(out, ndd, ndp);
     }, nf);
-
-
 }
+
 void Netdump::fileDump(File outfile, NetdumpFilter nf)
 {
-
-    //char buf[24];
-
     uint32_t buf[6];
-/*
-    *(uint32_t*)&buf[0] = 0xa1b2c3d4;
-    *(uint32_t*)&buf[4] = 0x00040002;
-    *(uint32_t*)&buf[8] = 0;
-    *(uint32_t*)&buf[12] = 0;
-    *(uint32_t*)&buf[16] = 1024;
-    *(uint32_t*)&buf[20] = 1;
-*/
     buf[0] = 0xa1b2c3d4;
     buf[1] = 0x00040002;
     buf[2] = 0;
     buf[3] = 0;
-    buf[4] = 1024;
+    buf[4] = maxPcapLength;
     buf[5] = 1;
 
     outfile.write((uint8_t*)buf, 24);
-    //	setCallback( std::bind(&Netdump::fileDumpProcess, this, outfile, std::placeholders::_1));
     setCallback([outfile, this](NetdumpPacket & ndp)
     {
         fileDumpProcess(outfile, ndp);
@@ -87,19 +77,18 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, NetdumpFilter nf)
     {
         delete packetBuffer;
     }
-    packetBuffer = new char[2048];
+    packetBuffer = new char[tcpBuffersize];
     bufferIndex = 0;
 
-    schedule_function([&tcpDumpServer, this]()
+    schedule_function([&tcpDumpServer, this, nf]()
     {
-        tcpDumpLoop(tcpDumpServer);
+        tcpDumpLoop(tcpDumpServer, nf);
     });
-    Serial.printf("scheduled\r\n");
 }
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
 {
-    NetdumpPacket np(netif_idx, data, len, out, success);
+    NetdumpPacket np(millis(), netif_idx, data, len, out, success);
     if (self->netDumpCallback)
     {
         if (self->netDumpFilter  && !self->netDumpFilter(np))
@@ -112,12 +101,12 @@ void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int 
 
 void Netdump::printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, const NetdumpPacket& np)
 {
-    out.printf("%8d %s", millis(), np.toString(ndd).c_str());
+    out.printf("%8d %s", np.getTime(), np.toString(ndd).c_str());
 }
 
 void Netdump::fileDumpProcess(File outfile, const NetdumpPacket& np)
 {
-    size_t incl_len = np.len > 1024 ? 1024 : np.len;
+    size_t incl_len = np.getSize() > maxPcapLength ? maxPcapLength : np.getSize();
     char buf[16];
 
     struct timeval tv;
@@ -125,43 +114,46 @@ void Netdump::fileDumpProcess(File outfile, const NetdumpPacket& np)
     *(uint32_t*)&buf[0] = tv.tv_sec;
     *(uint32_t*)&buf[4] = tv.tv_usec;
     *(uint32_t*)&buf[8] = incl_len;
-    *(uint32_t*)&buf[12] = np.len;
+    *(uint32_t*)&buf[12] = np.getSize();
     outfile.write(buf, 16);
 
-    outfile.write(np.data, incl_len);
+    outfile.write(np.rawData(), incl_len);
 }
+
 void Netdump::tcpDumpProcess(const NetdumpPacket& np)
 {
-    // Get capture code from netdumpout.cpp
     if (np.isIPv4() && np.isTCP()
-            && ((np.out && np.getSrcPort() == tcpDumpClient.localPort())
-                || (!np.out && np.getDstPort() == tcpDumpClient.localPort())
+            && ((np.getInOut() && np.getSrcPort() == tcpDumpClient.localPort())
+                || (!np.getInOut() && np.getDstPort() == tcpDumpClient.localPort())
                )
        )
     {
         // skip myself
         return;
     }
-    size_t incl_len = np.len > 1024 ? 1024 : np.len;
+    size_t incl_len = np.getSize() > maxPcapLength ? maxPcapLength : np.getSize();
 
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    *(uint32_t*)&packetBuffer[bufferIndex] = tv.tv_sec;
-    *(uint32_t*)&packetBuffer[bufferIndex + 4] = tv.tv_usec;
-    *(uint32_t*)&packetBuffer[bufferIndex + 8] = incl_len;
-    *(uint32_t*)&packetBuffer[bufferIndex + 12] = np.len;
-    bufferIndex += 16;
-    memcpy(&packetBuffer[bufferIndex], np.data, incl_len);
-    bufferIndex += incl_len;
+    if (bufferIndex+16+incl_len < tcpBuffersize) // only add if enough space available
+    {
+        struct timeval tv;
+        gettimeofday(&tv, nullptr);
+        *(uint32_t*)&packetBuffer[bufferIndex] = tv.tv_sec;
+        *(uint32_t*)&packetBuffer[bufferIndex + 4] = tv.tv_usec;
+        *(uint32_t*)&packetBuffer[bufferIndex + 8] = incl_len;
+        *(uint32_t*)&packetBuffer[bufferIndex + 12] = np.getSize();
+        bufferIndex += 16;
+        memcpy(&packetBuffer[bufferIndex], np.rawData(), incl_len);
+        bufferIndex += incl_len;
+    }
+
     if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= bufferIndex)
     {
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;
     }
-
-
 }
-void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
+
+void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, NetdumpFilter nf)
 {
     if (tcpDumpServer.hasClient())
     {
@@ -174,7 +166,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
         *(uint32_t*)&packetBuffer[4] = 0x00040002;
         *(uint32_t*)&packetBuffer[8] = 0;
         *(uint32_t*)&packetBuffer[12] = 0;
-        *(uint32_t*)&packetBuffer[16] = 1024;
+        *(uint32_t*)&packetBuffer[16] = maxPcapLength;
         *(uint32_t*)&packetBuffer[20] = 1;
         tcpDumpClient.write(packetBuffer, 24);
         bufferIndex = 0;
@@ -182,7 +174,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
         setCallback([this](NetdumpPacket & ndp)
         {
             tcpDumpProcess(ndp);
-        });
+        }, nf);
 
         Serial.printf("client started\r\n");
     }
@@ -199,9 +191,9 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer)
 
     if (tcpDumpServer.status() != CLOSED)
     {
-        schedule_function([&tcpDumpServer, this]()
+        schedule_function([&tcpDumpServer, this, nf]()
         {
-            tcpDumpLoop(tcpDumpServer);
+            tcpDumpLoop(tcpDumpServer, nf);
         });
     }
 }

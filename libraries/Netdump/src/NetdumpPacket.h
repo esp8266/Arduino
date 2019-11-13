@@ -32,8 +32,8 @@
 class NetdumpPacket
 {
 public:
-    NetdumpPacket(int n, const char* d, size_t l, int o, int s)
-        : netif_idx(n), data(d), len(l), out(o), success(s)
+    NetdumpPacket(unsigned long msec, int n, const char* d, size_t l, int o, int s)
+        : packetTime(msec), netif_idx(n), data(d), len(l), out(o), success(s)
     {};
 
     virtual ~NetdumpPacket() {};
@@ -45,12 +45,22 @@ public:
         CHARS
     };
 
-    int netif_idx;
-    const char* data;
-    size_t len;
-    int out;
-    int success;
-
+    const char* rawData() const
+    {
+    	return data;
+    }
+    int getInOut() const
+    {
+    	return out;
+    }
+    unsigned long getTime() const
+    {
+    	return packetTime;
+    }
+    uint32_t getSize() const
+    {
+    	return len;
+    }
     uint16_t ntoh16(uint16_t idx) const
     {
         return data[idx + 1] | (((uint16_t)data[idx]) << 8);
@@ -200,6 +210,10 @@ public:
     {
         return (hasPort(80));
     };
+    bool isOTA() const
+    {
+    	return (hasPort(8266));
+    }
 
 
     NetdumpIP getIP(uint16_t idx) const
@@ -232,7 +246,7 @@ public:
 
     bool      hasIP(NetdumpIP ip) const
     {
-    	return ((ip == sourceIP()) || (ip == destIP()));
+        return ((ip == sourceIP()) || (ip == destIP()));
     }
 
     NetdumpIP destIP() const
@@ -264,7 +278,14 @@ public:
     String toString(PacketDetail netdumpDetail = PacketDetail::NONE) const;
     void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
+private:
+    unsigned long packetTime;
+    int netif_idx;
+    const char* data;
+    size_t len;
+    int out;
+    int success;
 };
 
 
-#endif /* LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_PACKET_H_ */
+#endif /* __NETDUMP_PACKET_H */

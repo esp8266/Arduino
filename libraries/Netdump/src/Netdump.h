@@ -65,11 +65,14 @@ private:
     void printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, const NetdumpPacket& np);
     void fileDumpProcess(File outfile, const NetdumpPacket& np);
     void tcpDumpProcess(const NetdumpPacket& np);
-    void tcpDumpLoop(WiFiServer &tcpDumpServer);
+    void tcpDumpLoop(WiFiServer &tcpDumpServer, NetdumpFilter nf);
 
     WiFiClient tcpDumpClient;
     char* packetBuffer = nullptr;
     size_t bufferIndex = 0;
+
+    static constexpr int tcpBuffersize = 2048;
+    static constexpr int maxPcapLength = 1024;
 };
 
 #endif /* __NETDUMP_H */

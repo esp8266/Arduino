@@ -134,6 +134,10 @@ String NetdumpPacket::toString(PacketDetail netdumpDetail) const
                 {
                     udpType = "WSDD";
                 }
+                else if (isOTA())
+                {
+                	udpType = "OTA";
+                }
                 else
                 {
                     udpType = "UDP ";
