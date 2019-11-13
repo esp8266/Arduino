@@ -55,7 +55,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
-, _currentArgsHavePlain(0),
+, _currentArgsHavePlain(0)
 , _postArgsLen(0)
 , _postArgs(nullptr)
 , _headerKeysCount(0)
@@ -77,7 +77,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
-, _currentArgsHavePlain(0),
+, _currentArgsHavePlain(0)
 , _postArgsLen(0)
 , _postArgs(nullptr)
 , _headerKeysCount(0)
