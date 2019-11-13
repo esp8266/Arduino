@@ -117,10 +117,18 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
 void run_scheduled_functions()
 {
+    if (!sFirst)
+        return;
+
     esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
-    while (sFirst)
+    // prevent scheduling of new functions during this run
+    auto stop = sLast;
+
+    bool done;
+    do
     {
+        done = sFirst == stop;
         sFirst->mFunc();
 
         {
@@ -140,7 +148,7 @@ void run_scheduled_functions()
             esp_schedule();
             cont_yield(g_pcont);
         }
-    }
+    } while (!done);
 }
 
 void run_scheduled_recurrent_functions()
