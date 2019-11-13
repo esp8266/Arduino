@@ -95,8 +95,9 @@ void handleNotFound() {
 }
 
 void drawGraph() {
-  String out = "";
-  char temp[100];
+  String out;
+  out.reserve(2600);
+  char temp[70];
   out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"400\" height=\"150\">\n";
   out += "<rect width=\"400\" height=\"150\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
   out += "<g stroke=\"black\">\n";
