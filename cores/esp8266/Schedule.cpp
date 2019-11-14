@@ -119,23 +119,33 @@ void run_scheduled_functions()
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
-    while (sFirst)
+    // prevent scheduling of new functions during this run
+    auto stop = sLast;
+    bool done = false;
+    while (sFirst && !done)
     {
+        done = sFirst == stop;
+
         sFirst->mFunc();
 
         {
+            // remove function from stack
             esp8266::InterruptLock lockAllInterruptsInThisScope;
 
             auto to_recycle = sFirst;
-            sFirst = sFirst->mNext;
-            if (!sFirst)
+
+            // removing rLast
+            if (sLast == sFirst)
                 sLast = nullptr;
+
+            sFirst = sFirst->mNext;
+
             recycle_fn_unsafe(to_recycle);
         }
 
         if (yieldNow)
         {
-            // because scheduled function are allowed to last:
+            // because scheduled functions might last too long for watchdog etc,
             // this is yield() in cont stack:
             esp_schedule();
             cont_yield(g_pcont);

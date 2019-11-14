@@ -32,6 +32,7 @@
 #define LWIP_IPV6_NUM_ADDRESSES 0
 #define ip_2_ip4(x) (x)
 #define ipv4_addr ip_addr
+#define ipv4_addr_t ip_addr_t
 #define IP_IS_V4_VAL(x) (1)
 #define IP_SET_TYPE_VAL(x,y) do { (void)0; } while (0)
 #define IP_ANY_TYPE (&ip_addr_any)
