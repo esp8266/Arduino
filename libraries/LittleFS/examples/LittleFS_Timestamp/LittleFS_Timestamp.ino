@@ -152,13 +152,13 @@ void setup() {
   getLocalTime(&tmstruct, 5000);
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
+  Serial.println("Formatting LittleFS filesystem");
+  LittleFS.format();
   Serial.println("Mount LittleFS");
   if (!LittleFS.begin()) {
     Serial.println("LittleFS mount failed");
     return;
   }
-  Serial.println("Formatting LittleFS filesystem");
-  LittleFS.format();
   listDir("/");
   deleteFile("/hello.txt");
   writeFile("/hello.txt", "Hello ");
