@@ -29,10 +29,10 @@ void __panic_func(const char* file, int line, const char* func) __attribute__((n
 extern const char* overrideme PROGMEM;
 #define IAMSLOW() \
     do { \
-        static bool once = false;\
+        static bool once = false; \
         if (!once) { \
             once = true; \
-            DEBUGV((PGM_P)PSTR(__FUNCTION__ "%s", overrideme)); \
+            DEBUGV(overrideme, (PGM_P)PSTR(__FUNCTION__)); \
         } \
     } while (0)
 #else

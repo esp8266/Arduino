@@ -759,9 +759,14 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 #if 1
 
     size_t transferred = 0;
+
     while (connected() && transferred < size)
+        transferred += streamMove(*stream, *_client, stream->getTimeout(), size - transferred);
+
+    if (transferred < size)
     {
-        transferred += stream->streamTo(*_client, size - transferred);
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
+        return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
     }
 
 #else

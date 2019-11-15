@@ -66,7 +66,7 @@ public:
     size_t readBytes(char *buffer, size_t length) override {
         return read((uint8_t*)buffer, length);
     }
-    int read(uint8_t* buf, size_t size);
+    size_t read(uint8_t* buf, size_t size);
     bool seek(uint32_t pos, SeekMode mode);
     bool seek(uint32_t pos) {
         return seek(pos, SeekSet);

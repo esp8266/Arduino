@@ -89,13 +89,13 @@ class Stream: public Print {
 
         float parseFloat();               // float version of parseInt
 
-        // both arduino's "size_t Stream::readBytes(char*/uint8_t*, size_t):
         virtual size_t readBytes(char *buffer, size_t length); // read chars from stream into buffer
         virtual size_t readBytes(uint8_t *buffer, size_t length) {
             return readBytes((char *) buffer, length);
         }
         // terminates if length characters have been read or timeout (see setTimeout)
         // returns the number of characters placed in the buffer (0 means no valid data found)
+        // return data type: size_t
 
         size_t readBytesUntil(char terminator, char *buffer, size_t length); // as readBytes with terminator character
         size_t readBytesUntil(char terminator, uint8_t *buffer, size_t length) {
@@ -108,41 +108,34 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
-        // additions: Client:: read() definitions moved here, because HardwareSerial have them too
-
+        // (Client::read() definitions moved here - HardwareSerial have them too)
         // read at most maxLen bytes:
         // returns effectively transfered bytes (can be less than maxLen)
         // immediate return when no more data are available (no timeout)
-        virtual int read(char* buffer, size_t maxLen);
-        // arduino's "int Client::read(uint8_t*,size_t)":
-        virtual int read(uint8_t* buffer, size_t maxLen) { return read((char*)buffer, maxLen); }
+        virtual size_t read(char* buffer, size_t maxLen);
+        virtual size_t read(uint8_t* buffer, size_t maxLen) { return read((char*)buffer, maxLen); }
+        // return data type: int
 
-        //////////////////// extensions:
+        //////////////////// extensions: direct access to input buffer
 
-        // addition: directly access to read buffer
-        // (primarily implemented in HardwareSerial:: and WiFiClient::)
-
-        // return number of byte accessible by peekBuffer()
-        virtual size_t availableForPeek () { IAMSLOW(); int test = peek(); oneChar = test; return test == -1? 0: 1; }
+        // return number of byte accessible by peekBuffer(), can be 0
+        virtual size_t availableForPeek () { IAMSLOW(); int test = peek(); oneChar = (char)test; return test == -1? 0: 1; }
 
         // return a pointer to available data buffer (size = availableForPeek())
         // semantic forbids any kind of read() after calling peekBuffer() and before calling peekConsume()
         virtual const char* peekBuffer () { return &oneChar; }
 
         // consume bytes after peekBuffer use
-        virtual void peekConsume (size_t consume) { (void)read(); }
+        virtual void peekConsume (size_t consume) { if (consume) read(); }
 
-        // additions: streamTo
-
-        // transfer at most maxlen bytes
-        // return number of transfered bytes
-        // generic implementation using arduino virtual API
+        // streamTo():
+        // transfer from Stream:: to Print:: at most maxlen bytes and return number of transfered bytes
+        // this is the generic implementation using arduino virtual API
         // (also available: virtual-less template streamMove(from,to))
-        // - maxLen==0 will transfer until read starvation or destination temporarily full
-        // - readUntilChar: using anything in 0..255 will stop transfer when this char is read
-        // - timeout_ms==0: means immediate exit if nothing more can be read even if maxLen is not reached
-        
-        virtual size_t streamTo (Print& to, size_t maxLen = 0, int readUntilChar = -1, unsigned long timeout_ms = 0);
+        // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
+        // - maxLen==0 will transfer until input starvation or saturated output
+        // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read (not included)
+        virtual size_t streamTo (Print& to, unsigned long timeout_ms = getTimeout(), size_t maxLen = 0, int readUntilChar = -1);
 
         //////////////////// end of extensions
 
@@ -154,24 +147,27 @@ class Stream: public Print {
         float parseFloat(char skipChar);  // as above but the given skipChar is ignored
 };
 
-#define STREAM_MOVE(from,to,...) (streamMove<decltype(from),decltype(to)>(from, to, ## __VA_ARGS__))
-
 #include <PolledTimeout.h>
 
+#if 0
 template <typename streamT, typename printT,
           typename PeriodicMs = esp8266::polledTimeout::periodicFastMs,
           typename TimeoutMs  = esp8266::polledTimeout::oneShotFastMs>
-size_t streamMove (streamT& from, printT& to, size_t maxLen = 0, int readUntilChar = -1, TimeoutMs::timeType timeout = TimeoutMs::alwaysExpired)
+size_t streamMove (streamT& from, printT& to, TimeoutMs::timeType timeout = TimeoutMs::neverExpires, size_t maxLen = 0, int readUntilChar = -1)
+#else
+template <>
+size_t streamMove <streamT, printT,
+                   typename PeriodicMs = esp8266::polledTimeout::periodicFastMs,
+                   typename TimeoutMs  = esp8266::polledTimeout::oneShotFastMs>
+                //(streamT& from, printT& to, TimeoutMs::timeType timeout = from.getTimeout()/*TimeoutMs::neverExpires*/, size_t maxLen = 0, int readUntilChar = -1)
+                  (streamT& from, printT& to, TimeoutMs::timeType timeout = from.getTimeout(), size_t maxLen = 0, int readUntilChar = -1)
+#endif
 {
     PeriodicMs yieldNow(100);
-    TimeoutMS timedOut(timeout);
+    //TimeoutMs timedOut(timeout == TimeoutMs::neverExpires? from.getTimeout(): timeout);
+    TimeoutMs timedOut(timeout);
     size_t written = 0;
     size_t w;
-
-    if (timeout == TimeoutMs::neverExpires)
-        timedOut.reset(from.getTimeout());
-    else
-        timedOut.reset();
 
     while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
     {
@@ -189,10 +185,10 @@ size_t streamMove (streamT& from, printT& to, size_t maxLen = 0, int readUntilCh
                     size_t remain = last - directbuf + 1;
                     if (w > remain)
                         w = remain;
-                    if (maxlen && written + w > maxlen)
-                        w = maxlen - written;
                 }
             }
+            if (maxlen && written + w > maxlen)
+                w = maxlen - written;
             if (w && ((w = to.write(directbuf, w)))
             {
                 from.peekConsume(w);

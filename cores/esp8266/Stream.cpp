@@ -22,7 +22,6 @@
 
 #include <Arduino.h>
 #include <Stream.h>
-#include <assert.h>
 #include <PolledTimeout.h>
 
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
@@ -262,7 +261,7 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
-int Stream::read (char* buffer, size_t maxLen)
+size_t Stream::read (char* buffer, size_t maxLen)
 {
     IAMSLOW("Stream::read(buffer,len)");
 
@@ -272,7 +271,8 @@ int Stream::read (char* buffer, size_t maxLen)
     return nbread;
 }
 
-size_t Stream::streamTo (Print& to, size_t maxLen = 0, int readUntilChar = -1, unsigned long timeout_ms = 0)
+size_t Stream::streamTo (Print& to, unsigned long timeout_ms, size_t maxLen, int readUntilChar)
 {
-    return streamMove<Stream,Print>(*this, to, maxLen, readUntilChar, timeout_ms);
+    //return streamMove<Stream,Print>(*this, to, timeout_ms, maxLen, readUntilChar);
+    return streamMove(*this, to, timeout_ms, maxLen, readUntilChar);
 }
