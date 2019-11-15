@@ -45,6 +45,36 @@ public:
         CHARS
     };
 
+    enum class PacketType
+	{
+    	ARP,
+		IP,
+		UDP,
+		MDNS,
+		DNS,
+		SSDP,
+		DHCP,
+		WSDD,
+		NETBIOS,
+		SMB,
+		OTA,
+		TCP,
+		HTTP,
+		ICMP,
+		IGMP,
+		UKNW,
+	};
+
+    static constexpr char* packetTypeArray[] = {"ARP ","IP  ","UDP ","MDNS","DNS ",
+                                                "SSDP","DHCP","WSDD","NBIO", "SMB ","OTA ","TCP ",
+                                                "HTTP","ICMP","IGMP","UKNW"};
+
+    const char* packetTypeString (PacketType pt) const
+    {
+    	return packetTypeArray[static_cast<int>(pt)];
+    }
+    PacketType packetType() const;
+
     const char* rawData() const
     {
     	return data;
@@ -152,8 +182,6 @@ public:
     {
         return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 4);
     };
-
-
     bool isARP() const
     {
         return (ethType() == 0x0806);
@@ -214,8 +242,14 @@ public:
     {
     	return (hasPort(8266));
     }
-
-
+    bool isNETBIOS() const
+    {
+    	return (hasPort(137) || hasPort(138) || hasPort(139));
+    }
+    bool isSMB() const
+    {
+    	return (hasPort(445));
+    }
     NetdumpIP getIP(uint16_t idx) const
     {
         return NetdumpIP(data[idx],
