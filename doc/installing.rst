@@ -53,7 +53,8 @@ Instructions - Windows 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 - First, make sure you don't already have an ESP8266 core version installed 
   using the Board Manager (see above). If you do, uninstall it from the 
-  Board Manager before proceeding.
+  Board Manager before proceeding. It is also advisable to erase the Arduino15 
+  contents.
 
 - Install git for Windows (if not already; see https://git-scm.com/download/win)
 
@@ -136,7 +137,8 @@ Instructions - Other OS
 
 -  First, make sure you don't already have an ESP8266 core version installed 
    using the Board Manager (see above). If you do, uninstall it from the 
-   Board Manager before proceeding.
+   Board Manager before proceeding. It is also advisable to erase the .arduino15 (Linux)
+   or Arduino15 (MacOS) contents.
 
 -  Open the console and go to Arduino directory. This can be either your
    *sketchbook* directory (usually ``<Documents>/Arduino``), or the

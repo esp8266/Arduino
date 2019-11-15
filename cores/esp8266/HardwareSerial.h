@@ -28,7 +28,7 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
-#include <time.h>
+#include <../include/time.h> // See issue #6714
 #include "Stream.h"
 #include "uart.h"
 

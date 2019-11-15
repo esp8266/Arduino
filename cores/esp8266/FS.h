@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <Arduino.h>
+#include <../include/time.h> // See issue #6714
 
 class SDClass;
 
