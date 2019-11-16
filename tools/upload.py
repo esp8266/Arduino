@@ -22,6 +22,7 @@ except:
 
 cmdline = []
 write_option = ''
+write_addr = '0x0'
 erase_addr = ''
 erase_len = ''
 
@@ -45,6 +46,16 @@ while len(sys.argv):
         erase_len = sys.argv.pop(0)
         thisarg = ''
 
+    # Backwards compatibility with fs upload tools, eat --end
+    if thisarg == '--end':
+        thisarg = ''
+
+    # Backwards compatibility with fs upload tools, parse write_flash for later use
+    if thisarg == 'write_flash':
+        write_addr = sys.argv.pop(0)
+        binary = sys.argv.pop(0)
+        thisarg = ''
+
     if os.path.isfile(thisarg):
         binary = thisarg
         thisarg = ''
@@ -55,7 +66,7 @@ while len(sys.argv):
 cmdline = cmdline + ['write_flash']
 if len(write_option):
     cmdline = cmdline + [write_option]
-cmdline = cmdline + ['0x0', binary]
+cmdline = cmdline + [write_addr, binary]
 
 erase_file = ''
 if len(erase_addr):
