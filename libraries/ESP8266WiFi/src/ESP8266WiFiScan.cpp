@@ -37,6 +37,8 @@ extern "C" {
 
 #include "debug.h"
 
+extern "C" void esp_schedule();
+
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -91,7 +93,7 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
         ESP8266WiFiScanClass::_scanStarted = true;
 
         if(ESP8266WiFiScanClass::_scanAsync) {
-            yield(); // time for the OS to trigger the scan
+            delay(0); // time for the OS to trigger the scan
             return WIFI_SCAN_RUNNING;
         }
 
@@ -321,11 +323,13 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
 
     }
 
-    // resume scanNetworks
     ESP8266WiFiScanClass::_scanStarted = false;
     ESP8266WiFiScanClass::_scanComplete = true;
 
-    if(ESP8266WiFiScanClass::_scanAsync && ESP8266WiFiScanClass::_onComplete) {
+    if (!ESP8266WiFiScanClass::_scanAsync) {
+        // resume scanNetworks
+        esp_schedule();
+    } else if (ESP8266WiFiScanClass::_onComplete) {
         ESP8266WiFiScanClass::_onComplete(ESP8266WiFiScanClass::_scanCount);
         ESP8266WiFiScanClass::_onComplete = nullptr;
     }

@@ -49,6 +49,8 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
+extern "C" void esp_schedule();
+
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -706,6 +708,7 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
         (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
     _dns_lookup_pending = false; // resume hostByName
+    esp_schedule();
 }
 
 uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState& state)

@@ -26,8 +26,11 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
+extern "C" void esp_schedule();
+
 #include <assert.h>
 #include <esp_priv.h>
+
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -458,6 +461,7 @@ protected:
             // resume connect or _write_from_source
             _send_waiting = false;
             _connect_pending = false;
+            esp_schedule();
         }
     }
 
@@ -560,6 +564,7 @@ protected:
         if (_send_waiting) {
             // resume _write_from_source
             _send_waiting = false;
+            esp_schedule();
         }
     }
 
@@ -648,6 +653,7 @@ protected:
         if (_connect_pending) {
             // resume connect
             _connect_pending = false;
+            esp_schedule();
         }
         return ERR_OK;
     }
