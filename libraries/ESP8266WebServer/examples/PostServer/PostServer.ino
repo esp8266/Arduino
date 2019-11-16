@@ -38,7 +38,7 @@ const String postForms = "<html>\
 
 void handleRoot() {
   digitalWrite(led, 1);
-  server.send(200, "text/plain", postForms);
+  server.send(200, "text/html", postForms);
   digitalWrite(led, 0);
 }
 
