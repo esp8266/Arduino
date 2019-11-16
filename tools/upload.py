@@ -39,28 +39,16 @@ while len(sys.argv):
     # https://github.com/esp8266/Arduino/issues/6755#issuecomment-553208688
     if thisarg == "erase_flash":
         write_option = '--erase-all'
-        thisarg = ''
-
-    if thisarg == 'erase_region':
+    elif thisarg == 'erase_region':
         erase_addr = sys.argv.pop(0)
         erase_len = sys.argv.pop(0)
-        thisarg = ''
-
-    # Backwards compatibility with fs upload tools, eat --end
-    if thisarg == '--end':
-        thisarg = ''
-
-    # Backwards compatibility with fs upload tools, parse write_flash for later use
-    if thisarg == 'write_flash':
+    elif thisarg == '--end':
+        # Backwards compatibility with fs upload tools, eat --end
+        pass
+    elif thisarg == 'write_flash':
         write_addr = sys.argv.pop(0)
         binary = sys.argv.pop(0)
-        thisarg = ''
-
-    if os.path.isfile(thisarg):
-        binary = thisarg
-        thisarg = ''
-
-    if len(thisarg):
+    elif len(thisarg):
         cmdline = cmdline + [thisarg]
 
 cmdline = cmdline + ['write_flash']
@@ -70,7 +58,7 @@ cmdline = cmdline + [write_addr, binary]
 
 erase_file = ''
 if len(erase_addr):
-    # generate temporary empty (0xff) file
+    # Generate temporary empty (0xff) file
     eraser = tempfile.mkstemp()
     erase_file = eraser[1]
     os.write(eraser[0], bytearray([255] * int(erase_len, 0)))
