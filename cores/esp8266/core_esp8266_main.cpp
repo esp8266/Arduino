@@ -138,7 +138,7 @@ extern "C" void __yield() {
     }
 }
 
-extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
+extern "C" void yield() __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
     const uint32_t intvl_cycles = interval_us *

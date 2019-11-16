@@ -75,8 +75,7 @@ bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
     _wps_config_pending = true;
     // will continue when wifi_wps_status_cb fires
     while (_wps_config_pending) {
-        // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-        yield();
+        esp_yield();
     }
     _wps_config_pending = false;
 
