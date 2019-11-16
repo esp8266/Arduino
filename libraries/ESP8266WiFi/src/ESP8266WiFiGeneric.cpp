@@ -49,6 +49,7 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
+extern "C" void esp_delay(unsigned long ms);
 extern "C" void esp_schedule();
 
 // -----------------------------------------------------------------------------------------------------------------------
@@ -672,8 +673,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         auto op_start_time = millis();
         // will continue on timeout or when wifi_dns_found_callback fires
         while (millis() - op_start_time < timeout_ms && _dns_lookup_pending) {
-            // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-            yield();
+            esp_delay(timeout_ms);
         }
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires

@@ -26,6 +26,7 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
+extern "C" void esp_delay(unsigned long ms);
 extern "C" void esp_schedule();
 
 #include <assert.h>
@@ -148,7 +149,7 @@ public:
         // will continue on timeout or when _connected or _notify_error fires
         while (!_is_timeout() && _connect_pending) {
             // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-            yield();
+            esp_delay(1);
         }
         _connect_pending = false;
         if (!_pcb) {
@@ -491,7 +492,7 @@ protected:
             // will continue on timeout or when _write_some_from_cb or _notify_error fires
             while (!_is_timeout() && _send_waiting) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-                yield();
+                esp_delay(1);
             }
             _send_waiting = false;
         } while(true);

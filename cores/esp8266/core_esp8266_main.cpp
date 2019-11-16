@@ -71,7 +71,6 @@ static uint32_t s_cycles_at_yield_start;
 static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
 static byte     ets_intr_lock_stack_ptr=0;
 
-
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
 const char* core_release =
@@ -80,6 +79,10 @@ const char* core_release =
 #else
     NULL;
 #endif
+
+static os_timer_t delay_timer;
+#define ONCE 0
+#define REPEAT 1
 } // extern "C"
 
 void initVariant() __attribute__((weak));
@@ -128,6 +131,27 @@ extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
+void delay_end(void* arg) {
+    (void)arg;
+    esp_schedule();
+}
+
+extern "C" void __esp_delay(unsigned long ms) {
+    if (ms) {
+        os_timer_setfn(&delay_timer, (os_timer_func_t*)&delay_end, 0);
+        os_timer_arm(&delay_timer, ms, ONCE);
+    }
+    else {
+        esp_schedule();
+    }
+    esp_yield();
+    if (ms) {
+        os_timer_disarm(&delay_timer);
+    }
+}
+
+extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
+
 extern "C" void __yield() {
     if (can_yield()) {
         esp_schedule();
@@ -168,7 +192,6 @@ extern "C" void IRAM_ATTR ets_intr_unlock() {
   else
      xt_rsil(0);
 }
-
 
 // Save / Restore the PS state across the rom ets_post call as the rom code
 // does not implement this correctly.
@@ -215,8 +238,8 @@ static void loop_task(os_event_t *events) {
         panic();
     }
 }
-extern "C" {
 
+extern "C" {
 struct object { long placeholder[ 10 ]; };
 void __register_frame_info (const void *begin, struct object *ob);
 extern char __eh_frame[];
@@ -253,7 +276,6 @@ static void  __unhandled_exception_cpp()
     }
 #endif
 }
-
 }
 
 void init_done() {
