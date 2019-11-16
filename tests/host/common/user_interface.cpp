@@ -502,6 +502,10 @@ extern "C"
     {
     }
 
+void esp_delay (unsigned long ms)
+{
+}
+
     void dns_setserver(u8_t numdns, ip_addr_t *dnsserver)
     {
         (void)numdns;
