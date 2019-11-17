@@ -22,9 +22,12 @@
 #include "Netdump.h"
 #include <lwip/init.h>
 
-constexpr char* NetdumpPacket::packetTypeArray[];
+namespace NetCapture
+{
 
-void NetdumpPacket::printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const
+constexpr char* Packet::packetTypeArray[];
+
+void Packet::printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const
 {
     if (pd == PacketDetail::NONE)
     {
@@ -63,7 +66,7 @@ void NetdumpPacket::printDetail(Print& out, const String& indent, const char* da
     }
 }
 
-NetdumpPacket::PacketType NetdumpPacket::packetType() const
+Packet::PacketType Packet::packetType() const
 {
 	if (isARP()) return PacketType::ARP;
 	if (isIP())
@@ -92,13 +95,12 @@ NetdumpPacket::PacketType NetdumpPacket::packetType() const
 	return PacketType::UKNW;
 }
 
-
-String NetdumpPacket::toString(PacketDetail netdumpDetail) const
+String Packet::toString(PacketDetail netdumpDetail) const
 {
     StreamString sstr;
     sstr.reserve(128);
 
-    sstr.printf("%d %3s %s ", netif_idx, out ? "out" : "in ", packetTypeString(packetType()));
+    sstr.printf_P(PSTR("%d %3s %s "), netif_idx, out ? "out" : "in ", packetTypeString(packetType()));
 
     switch (packetType())
     {
@@ -106,12 +108,12 @@ String NetdumpPacket::toString(PacketDetail netdumpDetail) const
     {
         switch (getARPType())
         {
-        case 1 : sstr.printf("who has %s tell %s", getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
+        case 1 : sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
             break;
-        case 2 : sstr.printf("%s is at ", getIP(ETH_HDR_LEN + 14).toString().c_str());
+        case 2 : sstr.printf_P(PSTR("%s is at "), getIP(ETH_HDR_LEN + 14).toString().c_str());
             for (int i = 0; i < 6; i++)
             {
-                sstr.printf("%02x", (unsigned char)data[ETH_HDR_LEN + 8 + i]);
+                sstr.printf_P(PSTR("%02x"), (unsigned char)data[ETH_HDR_LEN + 8 + i]);
                 if (i < 5)
                 {
                     sstr.print(':');
@@ -125,28 +127,28 @@ String NetdumpPacket::toString(PacketDetail netdumpDetail) const
     case PacketType::MDNS :
     case PacketType::DNS :
     {
-        sstr.printf("%s>%s ", sourceIP().toString().c_str(), destIP().toString().c_str());
-        sstr.printf("ID=0x%04x ", ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8));
-        sstr.printf("F=0x%04x ", ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8 + 2));
+        sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
+        sstr.printf_P(PSTR("ID=0x%04x "), ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8));
+        sstr.printf_P(PSTR("F=0x%04x "), ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8 + 2));
         if (uint16_t t = ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8 + 4))
         {
-            sstr.printf("Q=%d ", t);
+            sstr.printf_P(PSTR("Q=%d "), t);
         }
         if (uint16_t t = ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8 + 6))
         {
-            sstr.printf("R=%d ", t);
+            sstr.printf_P(PSTR("R=%d "), t);
         }
         if (uint16_t t = ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8 + 8))
         {
-            sstr.printf("TR=%d ", t);
+            sstr.printf_P(PSTR("TR=%d "), t);
         }
         if (uint16_t t = ntoh16(ETH_HDR_LEN + getIpHdrLen() + 8 + 10))
         {
-            sstr.printf("DR=%d ", t);
+            sstr.printf_P(PSTR("DR=%d "), t);
         }
-        sstr.printf("\r\n");
-        printDetail(sstr, "           H ", &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(), netdumpDetail);
-        printDetail(sstr, "           D ", &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()], getUdpLen(), netdumpDetail);
+        sstr.printf_P(PSTR("\r\n"));
+        printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(), netdumpDetail);
+        printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()], getUdpLen(), netdumpDetail);
         return sstr;
     }
     case PacketType::SSDP :
@@ -157,18 +159,18 @@ String NetdumpPacket::toString(PacketDetail netdumpDetail) const
     case PacketType::OTA :
     case PacketType::UDP :
     {
-        sstr.printf("%s>%s ", sourceIP().toString().c_str(), destIP().toString().c_str());
-        sstr.printf("%d:%d", getSrcPort(), getDstPort());
-        sstr.printf("\r\n");
-        printDetail(sstr, "           H ", &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(), netdumpDetail);
-        printDetail(sstr, "           D ", &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()], getUdpLen(), netdumpDetail);
+        sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
+        sstr.printf_P(PSTR("%d:%d"), getSrcPort(), getDstPort());
+        sstr.printf_P(PSTR("\r\n"));
+        printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(), netdumpDetail);
+        printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()], getUdpLen(), netdumpDetail);
         return sstr;
     }
     case PacketType::TCP :
     case PacketType::HTTP :
     {
-        sstr.printf("%s>%s ", sourceIP().toString().c_str(), destIP().toString().c_str());
-        sstr.printf("%d:%d ", getSrcPort(), getDstPort());
+        sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
+        sstr.printf_P(PSTR("%d:%d "), getSrcPort(), getDstPort());
         uint16_t flags = getTcpFlags();
         sstr.print('[');
         const char chars [] = "FSRPAUECN";
@@ -178,33 +180,33 @@ String NetdumpPacket::toString(PacketDetail netdumpDetail) const
                 sstr.print(chars[i]);
             }
         sstr.print(']');
-        sstr.printf(" len: %u seq: %u, ack: %u, wnd: %u ", getTcpLen(), getTcpSeq(), getTcpAck(), getTcpWindow());
-        sstr.printf("\r\n");
-        printDetail(sstr, "           H ", &data[ETH_HDR_LEN + getIpHdrLen()], getTcpHdrLen(), netdumpDetail);
-        printDetail(sstr, "           D ", &data[ETH_HDR_LEN + getIpHdrLen() + getTcpHdrLen()], getTcpLen(), netdumpDetail);
+        sstr.printf_P(PSTR(" len: %u seq: %u, ack: %u, wnd: %u "), getTcpLen(), getTcpSeq(), getTcpAck(), getTcpWindow());
+        sstr.printf_P(PSTR("\r\n"));
+        printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getTcpHdrLen(), netdumpDetail);
+        printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getTcpHdrLen()], getTcpLen(), netdumpDetail);
         return sstr;
     }
     case PacketType::ICMP :
     {
-        sstr.printf("%s>%s ", sourceIP().toString().c_str(), destIP().toString().c_str());
+        sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
         if (isIPv4())
         {
             switch (getIcmpType())
             {
-            case 0 : sstr.printf("ping reply"); break;
-            case 8 : sstr.printf("ping request"); break;
-            default: sstr.printf("type(0x%02x)", getIcmpType()); break;
+            case 0 : sstr.printf_P(PSTR("ping reply")); break;
+            case 8 : sstr.printf_P(PSTR("ping request")); break;
+            default: sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType()); break;
             }
         }
         if (isIPv6())
         {
             switch (getIcmpType())
             {
-            case 129 : sstr.printf("ping reply"); break;
-            case 128 : sstr.printf("ping request"); break;
-            case 135 : sstr.printf("Neighbour solicitation"); break;
-            case 136 : sstr.printf("Neighbour advertisement"); break;
-            default: sstr.printf("type(0x%02x)", getIcmpType()); break;
+            case 129 : sstr.printf_P(PSTR("ping reply")); break;
+            case 128 : sstr.printf_P(PSTR("ping request")); break;
+            case 135 : sstr.printf_P(PSTR("Neighbour solicitation")); break;
+            case 136 : sstr.printf_P(PSTR("Neighbour advertisement")); break;
+            default: sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType()); break;
             }
         }
         sstr.printf("\r\n");
@@ -214,38 +216,39 @@ String NetdumpPacket::toString(PacketDetail netdumpDetail) const
     {
     	switch (getIgmpType())
         {
-        case 1 : sstr.printf("Create Group Request"); break;
-        case 2 : sstr.printf("Create Group Reply"); break;
-        case 3 : sstr.printf("Join Group Request"); break;
-        case 4 : sstr.printf("Join Group Reply"); break;
-        case 5 : sstr.printf("Leave Group Request"); break;
-        case 6 : sstr.printf("Leave Group Reply"); break;
-        case 7 : sstr.printf("Confirm Group Request"); break;
-        case 8 : sstr.printf("Confirm Group Reply"); break;
-        case 0x11 : sstr.printf("Group Membership Query"); break;
-        case 0x12 : sstr.printf("IGMPv1 Membership Report"); break;
-        case 0x22 : sstr.printf("IGMPv3 Membership Report"); break;
-        default: sstr.printf("type(0x%02x)", getIgmpType()); break;
+        case 1 : sstr.printf_P(PSTR("Create Group Request")); break;
+        case 2 : sstr.printf_P(PSTR("Create Group Reply")); break;
+        case 3 : sstr.printf_P(PSTR("Join Group Request")); break;
+        case 4 : sstr.printf_P(PSTR("Join Group Reply")); break;
+        case 5 : sstr.printf_P(PSTR("Leave Group Request")); break;
+        case 6 : sstr.printf_P(PSTR("Leave Group Reply")); break;
+        case 7 : sstr.printf_P(PSTR("Confirm Group Request")); break;
+        case 8 : sstr.printf_P(PSTR("Confirm Group Reply")); break;
+        case 0x11 : sstr.printf_P(PSTR("Group Membership Query")); break;
+        case 0x12 : sstr.printf_P(PSTR("IGMPv1 Membership Report")); break;
+        case 0x22 : sstr.printf_P(PSTR("IGMPv3 Membership Report")); break;
+        default: sstr.printf_P(PSTR("type(0x%02x)"), getIgmpType()); break;
         }
-        sstr.printf("\r\n");
+        sstr.printf_P(PSTR("\r\n"));
         return sstr;
     }
     case PacketType::IP :
     {
-        sstr.printf("Unknown IP type : %d\r\n", ipType());
+        sstr.printf_P(PSTR("Unknown IP type : %d\r\n"), ipType());
         return sstr;
     }
     case PacketType::UKNW :
     {
-        sstr.printf("Unknown packet, type = 0x%04x\r\n", ethType());
+        sstr.printf_P(("Unknown packet, type = 0x%04x\r\n"), ethType());
         return sstr;
     }
     default :
     {
-    	sstr.printf("Non identified packet\r\n");
+    	sstr.printf_P(PSTR("Non identified packet\r\n"));
     	return sstr;
     }
     }
 
 }
 
+} // namespace NetCapture

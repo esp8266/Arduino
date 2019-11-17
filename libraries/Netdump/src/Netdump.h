@@ -29,43 +29,47 @@
 #include "NetdumpPacket.h"
 #include <ESP8266WiFi.h>
 
-using NetdumpFilter    = std::function<bool(NetdumpPacket&)>;
-using NetdumpCallback  = std::function<void(NetdumpPacket&)>;
+namespace NetCapture
+{
 
 class Netdump
 {
 public:
+
+    using Filter = std::function<bool(Packet&)>;
+    using Callback = std::function<void(Packet&)>;
+
     Netdump()
     {
         phy_capture = capture;
         self = this;
     };
-    virtual ~Netdump()
+    ~Netdump()
     {
         phy_capture = nullptr;
     };
 
-    void setCallback(NetdumpCallback nc);
-    void setCallback(NetdumpCallback nc, NetdumpFilter nf);
-    void setFilter(NetdumpFilter nf);
+    void setCallback(const Callback nc);
+    void setCallback(const Callback nc, const Filter nf);
+    void setFilter(const Filter nf);
     void reset();
 
-    void printDump(Print& out, NetdumpPacket::PacketDetail ndd, NetdumpFilter nf = nullptr);
-    void fileDump(File outfile, NetdumpFilter nf = nullptr);
-    void tcpDump(WiFiServer &tcpDumpServer, NetdumpFilter nf = nullptr);
+    void printDump(Print& out, Packet::PacketDetail ndd, Filter nf = nullptr);
+    void fileDump(File& outfile, Filter nf = nullptr);
+    void tcpDump(WiFiServer &tcpDumpServer, Filter nf = nullptr);
 
 
 private:
-    NetdumpCallback netDumpCallback = nullptr;
-    NetdumpFilter   netDumpFilter   = nullptr;
+    Callback netDumpCallback = nullptr;
+    Filter   netDumpFilter   = nullptr;
 
     static Netdump* self;
 
     static void capture(int netif_idx, const char* data, size_t len, int out, int success);
-    void printDumpProcess(Print& out, NetdumpPacket::PacketDetail ndd, const NetdumpPacket& np);
-    void fileDumpProcess(File outfile, const NetdumpPacket& np);
-    void tcpDumpProcess(const NetdumpPacket& np);
-    void tcpDumpLoop(WiFiServer &tcpDumpServer, NetdumpFilter nf);
+    void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np);
+    void fileDumpProcess(File& outfile, const Packet& np);
+    void tcpDumpProcess(const Packet& np);
+    void tcpDumpLoop(WiFiServer &tcpDumpServer, Filter nf);
 
     WiFiClient tcpDumpClient;
     char* packetBuffer = nullptr;
@@ -74,5 +78,7 @@ private:
     static constexpr int tcpBuffersize = 2048;
     static constexpr int maxPcapLength = 1024;
 };
+
+} // namespace NetCapture
 
 #endif /* __NETDUMP_H */

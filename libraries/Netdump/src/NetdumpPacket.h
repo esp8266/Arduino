@@ -27,16 +27,19 @@
 #include <StreamString.h>
 #include "NetdumpIP.h"
 
-#define ETH_HDR_LEN 14
+namespace NetCapture
+{
 
-class NetdumpPacket
+int constexpr ETH_HDR_LEN = 14;
+
+class Packet
 {
 public:
-    NetdumpPacket(unsigned long msec, int n, const char* d, size_t l, int o, int s)
+    Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
         : packetTime(msec), netif_idx(n), data(d), len(l), out(o), success(s)
     {};
 
-    virtual ~NetdumpPacket() {};
+    ~Packet() {};
 
     enum class PacketDetail
     {
@@ -87,7 +90,7 @@ public:
     {
     	return packetTime;
     }
-    uint32_t getSize() const
+    uint32_t getPacketSize() const
     {
     	return len;
     }
@@ -120,7 +123,7 @@ public:
     {
         return isIPv4() ? (((unsigned char)data[ETH_HDR_LEN]) & 0x0f) << 2 : 40 ;   // IPv6 is fixed length
     }
-    uint16_t getIpTotLen() const
+    uint16_t getIpTotalLen() const
     {
         return ntoh16(ETH_HDR_LEN + 2);
     }
@@ -149,7 +152,7 @@ public:
     };//Header len is in multiple of 4 bytes
     uint16_t getTcpLen() const
     {
-        return getIpTotLen() - getIpHdrLen() - getTcpHdrLen() ;
+        return getIpTotalLen() - getIpHdrLen() - getTcpHdrLen() ;
     };
 
     uint8_t  getIcmpType() const
@@ -321,5 +324,6 @@ private:
     int success;
 };
 
+} // namespace NetCapture
 
 #endif /* __NETDUMP_PACKET_H */

@@ -21,6 +21,9 @@
 #include <Arduino.h>
 #include <NetdumpIP.h>
 
+namespace NetCapture
+{
+
 NetdumpIP::NetdumpIP()
 {
 }
@@ -372,3 +375,5 @@ bool NetdumpIP::compareIP(const NetdumpIP& nip) const
         break;
     }
 }
+
+} // namespace NetCapture
