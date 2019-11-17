@@ -85,6 +85,16 @@ static bool time_machine_running = false;
 //    return 15000; // 15s
 //}
 
+#define PTM(w) \
+  Serial.print(" " #w "="); \
+  Serial.print(tm->tm_##w);
+
+void printTm(const char* what, const tm* tm) {
+  Serial.print(what);
+  PTM(isdst); PTM(yday); PTM(wday);
+  PTM(year);  PTM(mon);  PTM(mday);
+  PTM(hour);  PTM(min);  PTM(sec);
+}
 
 void showTime() {
   gettimeofday(&tv, nullptr);
@@ -150,18 +160,6 @@ void showTime() {
 #endif
 
   Serial.println();
-}
-
-
-#define PTM(w) \
-  Serial.print(" " #w "="); \
-  Serial.print(tm->tm_##w);
-
-void printTm(const char* what, const tm* tm) {
-  Serial.print(what);
-  PTM(isdst); PTM(yday); PTM(wday);
-  PTM(year);  PTM(mon);  PTM(mday);
-  PTM(hour);  PTM(min);  PTM(sec);
 }
 
 void time_is_set_scheduled() {

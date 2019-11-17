@@ -72,8 +72,8 @@ void setup() {
 
   // using HardwareSerial0 pins,
   // so we can still log to the regular usbserial chips
-  SoftwareSerial* ss = new SoftwareSerial;
-  ss->begin(SSBAUD, 3, 1);
+  SoftwareSerial* ss = new SoftwareSerial(3, 1);
+  ss->begin(SSBAUD);
   ss->enableIntTx(false);
   logger = ss;
   logger->println();

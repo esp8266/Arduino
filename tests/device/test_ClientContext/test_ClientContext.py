@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from mock_decorators import setup, teardown
 from flask import Flask, request
 from threading import Thread
@@ -21,7 +23,7 @@ def setup_tcpsrv(e):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         for port in range(8266, 8285 + 1):
             try:
-                print >>sys.stderr, 'trying port', port
+                print ('trying port %d' %port, file=sys.stderr)
                 server_address = ("0.0.0.0", port)
                 sock.bind(server_address)
                 sock.listen(1)
@@ -31,17 +33,17 @@ def setup_tcpsrv(e):
                 print >>sys.stderr, 'busy'
         if not running:
             return
-        print >>sys.stderr, 'starting up on %s port %s' % server_address
-        print >>sys.stderr, 'waiting for connections'
+        print ('starting up on %s port %s' % server_address, file=sys.stderr)
+        print ( 'waiting for connections', file=sys.stderr)
         while running:
-            print >>sys.stderr, 'loop'
+            print ('loop', file=sys.stderr)
             readable, writable, errored = select.select([sock], [], [], 1.0)
             if readable:
                 connection, client_address = sock.accept()
                 try:
-                    print >>sys.stderr, 'client connected:', client_address
+                    print('client connected: %s' % str(client_address), file=sys.stderr)
                 finally:
-                    print >>sys.stderr, 'close'
+                    print ('close', file=sys.stderr)
                     connection.shutdown(socket.SHUT_RDWR)
                     connection.close()
 
@@ -54,7 +56,7 @@ def teardown_tcpsrv(e):
     global thread
     global running
     
-    print >>sys.stderr, 'closing'
+    print ('closing', file=sys.stderr)
     running = False
     thread.join()
     return 0

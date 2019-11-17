@@ -358,7 +358,7 @@ transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
 {
   verboseModePrint("Transmitting");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
     
-  currClient.print(getMessage() + "\r");
+  currClient.print(getMessage() + '\r');
   yield();
 
   if (!waitForClientTransmission(currClient, _stationModeTimeoutMs))
@@ -582,11 +582,11 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
 
       if(_verboseMode) // Avoid string generation if not required
       {
-        verboseModePrint(String(F("AP acquired: ")) + currentSSID + String(F(", Ch:")) + String(currentWiFiChannel) + " ", false);
+        verboseModePrint(String(F("AP acquired: ")) + currentSSID + String(F(", Ch:")) + String(currentWiFiChannel) + ' ', false);
 
         if(currentNetwork.networkIndex != NETWORK_INFO_DEFAULT_INT)
         {
-          verboseModePrint("(" + String(WiFi.RSSI(currentNetwork.networkIndex)) + String(F("dBm) ")) + 
+          verboseModePrint(String('(') + String(WiFi.RSSI(currentNetwork.networkIndex)) + String(F("dBm) ")) +
                            (WiFi.encryptionType(currentNetwork.networkIndex) == ENC_TYPE_NONE ? String(F("open")) : ""), false);
         }
 
@@ -662,7 +662,7 @@ void ESP8266WiFiMesh::acceptRequest()
       if (_client.connected())
       {
         verboseModePrint("Responding"); // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
-        _client.print(response + "\r");
+        _client.print(response + '\r');
         _client.flush();
         yield();
       }

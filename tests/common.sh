@@ -167,9 +167,12 @@ function install_ide()
     local debug=$3
     if [ "$WINDOWS" = "1" ]; then
         # Acquire needed packages from Windows package manager
-        choco install --no-progress python3
-        export PATH="/c/Python37:$PATH"  # Ensure it's live from now on...
-        cp /c/Python37/python.exe /c/Python37/python3.exe
+        choco install --no-progress python3 >& pylog.txt
+	# Parse the python instrall dir from the output log.  Sorry, can't set it via choco on the free version
+	PYDIR=$(cat pylog.txt | grep "^Installed to:"  | cut -f2 -d"'" | sed 's/C:\\/\/c\//')
+	echo "Detected python3 install dir: $PYDIR"
+        export PATH="$PYDIR:$PATH"  # Ensure it's live from now on...
+        cp "$PYDIR/python.exe" "$PYDIR/python3.exe"
         choco install --no-progress unzip
         choco install --no-progress sed
         #choco install --no-progress golang

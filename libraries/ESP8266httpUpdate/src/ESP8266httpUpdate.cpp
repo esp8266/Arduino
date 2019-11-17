@@ -389,7 +389,11 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
                     http.end();
 
+#ifdef ATOMIC_FS_UPDATE
+                    if(_rebootOnUpdate) {
+#else
                     if(_rebootOnUpdate && !spiffs) {
+#endif
                         ESP.restart();
                     }
 
@@ -435,7 +439,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
  * @param md5 String
  * @return true if Update ok
  */
-bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int command)
+bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, const String& md5, int command)
 {
 
     StreamString error;
