@@ -73,7 +73,7 @@ static const char _ssdp_packet_template[] PROGMEM =
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
   "USN: %s\r\n" // _uuid
   "%s: %s\r\n"  // "NT" or "ST", _deviceType
-  "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
+  "LOCATION: http://%s:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
 static const char _ssdp_schema_template[] PROGMEM =
@@ -88,7 +88,7 @@ static const char _ssdp_schema_template[] PROGMEM =
   "<major>1</major>"
   "<minor>0</minor>"
   "</specVersion>"
-  "<URLBase>http://%u.%u.%u.%u:%u/</URLBase>" // WiFi.localIP(), _port
+  "<URLBase>http://%s:%u/</URLBase>" // WiFi.localIP(), _port
   "<device>"
   "<deviceType>%s</deviceType>"
   "<friendlyName>%s</friendlyName>"
@@ -247,7 +247,7 @@ void SSDPClass::_send(ssdp_method_t method) {
                        _uuid,
                        (method == NONE) ? "ST" : "NT",
                        (_st_is_uuid) ? _uuid : _deviceType,
-                       ip[0], ip[1], ip[2], ip[3], _port, _schemaURL
+                       ip.toString(), _port, _schemaURL
                       );
 
   _server->append(buffer, len);
@@ -276,12 +276,12 @@ void SSDPClass::_send(ssdp_method_t method) {
   _server->send(remoteAddr, remotePort);
 }
 
-void SSDPClass::schema(WiFiClient &client) const {
+void SSDPClass::schema(Print &client) const {
   IPAddress ip = WiFi.localIP();
   char buffer[strlen_P(_ssdp_schema_template) + 1];
   strcpy_P(buffer, _ssdp_schema_template);
   client.printf(buffer,
-                ip[0], ip[1], ip[2], ip[3], _port,
+                ip.toString(), _port,
                 _deviceType,
                 _friendlyName,
                 _presentationURL,
@@ -295,22 +295,6 @@ void SSDPClass::schema(WiFiClient &client) const {
                );
 }
 
-void SSDPClass::schema(Print &print) const {
-  uint32_t ip = WiFi.localIP();
-  print.printf(_ssdp_schema_template,
-    IP2STR(&ip), _port,
-    _deviceType,
-    _friendlyName,
-    _presentationURL,
-    _serialNumber,
-    _modelName,
-    _modelNumber,
-    _modelURL,
-    _manufacturer,
-    _manufacturerURL,
-    _uuid
-  );
-}
 void SSDPClass::_update() {
   if (!_pending && _server->next()) {
     ssdp_method_t method = NONE;
