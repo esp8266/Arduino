@@ -118,7 +118,7 @@ class Stream: public Print {
 
         //////////////////// extensions: direct access to input buffer
 
-        // return number of byte accessible by peekBuffer(), can be 0
+        // return number of byte accessible by peekBuffer()
         virtual size_t availableForPeek () { IAMSLOW(); int test = peek(); oneChar = (char)test; return test == -1? 0: 1; }
 
         // return a pointer to available data buffer (size = availableForPeek())
