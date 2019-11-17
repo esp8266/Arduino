@@ -276,7 +276,7 @@ void SSDPClass::_send(ssdp_method_t method) {
   _server->send(remoteAddr, remotePort);
 }
 
-void SSDPClass::schema(WiFiClient client) {
+void SSDPClass::schema(WiFiClient &client) const {
   IPAddress ip = WiFi.localIP();
   char buffer[strlen_P(_ssdp_schema_template) + 1];
   strcpy_P(buffer, _ssdp_schema_template);
@@ -295,6 +295,22 @@ void SSDPClass::schema(WiFiClient client) {
                );
 }
 
+void SSDPClass::schema(Print &print) const {
+  uint32_t ip = WiFi.localIP();
+  print.printf(_ssdp_schema_template,
+    IP2STR(&ip), _port,
+    _deviceType,
+    _friendlyName,
+    _presentationURL,
+    _serialNumber,
+    _modelName,
+    _modelNumber,
+    _modelURL,
+    _manufacturer,
+    _manufacturerURL,
+    _uuid
+  );
+}
 void SSDPClass::_update() {
   if (!_pending && _server->next()) {
     ssdp_method_t method = NONE;
