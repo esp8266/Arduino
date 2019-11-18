@@ -36,7 +36,7 @@ class Packet
 {
 public:
     Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
-        : packetTime(msec), netif_idx(n), data(d), len(l), out(o), success(s)
+        : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {};
 
     ~Packet() {};
@@ -92,7 +92,7 @@ public:
     }
     uint32_t getPacketSize() const
     {
-    	return len;
+    	return packetLength;
     }
     uint16_t ntoh16(uint16_t idx) const
     {
@@ -116,74 +116,69 @@ public:
     };
     uint8_t  ipType() const
     {
-        return isIPv4() ? data[ETH_HDR_LEN + 9] : data[ETH_HDR_LEN + 6];
+        return isIP() ? isIPv4() ? data[ETH_HDR_LEN + 9] : data[ETH_HDR_LEN + 6] : 0;
     };
-
     uint16_t getIpHdrLen() const
     {
         return isIPv4() ? (((unsigned char)data[ETH_HDR_LEN]) & 0x0f) << 2 : 40 ;   // IPv6 is fixed length
     }
     uint16_t getIpTotalLen() const
     {
-        return ntoh16(ETH_HDR_LEN + 2);
+        return isIP() ? ntoh16(ETH_HDR_LEN + 2) : 0;
     }
-    //	uint16_t getIpOptLen()        { return getIpHdrLen() - 20; }
-    //	uint16_t getIpUsrLen()        { return getIpTotLen() - getIpHdrLen(); }
-
     uint32_t getTcpSeq() const
     {
-        return ntoh32(ETH_HDR_LEN + getIpHdrLen() + 4);
+        return isTCP() ? ntoh32(ETH_HDR_LEN + getIpHdrLen() + 4) : 0;
     }
     uint32_t getTcpAck() const
     {
-        return ntoh32(ETH_HDR_LEN + getIpHdrLen() + 8);
+        return isTCP() ? ntoh32(ETH_HDR_LEN + getIpHdrLen() + 8) : 0;
     }
     uint16_t getTcpFlags() const
     {
-        return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 12);
+        return isTCP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 12) : 0;
     }
     uint16_t getTcpWindow() const
     {
-        return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 14);
+        return isTCP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 14) : 0;
     }
     uint8_t  getTcpHdrLen() const
     {
-        return (data[ETH_HDR_LEN + getIpHdrLen() + 12] >> 4) * 4;
+        return isTCP() ? (data[ETH_HDR_LEN + getIpHdrLen() + 12] >> 4) * 4 : 0;
     };//Header len is in multiple of 4 bytes
     uint16_t getTcpLen() const
     {
-        return getIpTotalLen() - getIpHdrLen() - getTcpHdrLen() ;
+        return isTCP() ? getIpTotalLen() - getIpHdrLen() - getTcpHdrLen() : 0 ;
     };
 
     uint8_t  getIcmpType() const
     {
-        return data[ETH_HDR_LEN + getIpHdrLen() + 0];
+        return isICMP() ? data[ETH_HDR_LEN + getIpHdrLen() + 0] : 0;
     }
     uint8_t  getIgmpType() const
     {
-        return data[ETH_HDR_LEN + getIpHdrLen() + 0];
+        return isIGMP() ? data[ETH_HDR_LEN + getIpHdrLen() + 0] : 0;
     }
-
     uint8_t getARPType() const
     {
-        return data[ETH_HDR_LEN + 7];
+        return isARP() ? data[ETH_HDR_LEN + 7] : 0;
     }
     bool    is_ARP_who() const
     {
-        return getARPType() == 1;
+        return (getARPType() == 1);
     }
     bool    is_ARP_is() const
     {
-        return getARPType() == 2;
+        return (getARPType() == 2);
     }
 
     uint8_t getUdpHdrLen() const
     {
-        return 8;
+        return isUDP() ? 8 : 0;
     };
     uint16_t getUdpLen() const
     {
-        return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 4);
+        return isUDP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 4) : 0;
     };
     bool isARP() const
     {
@@ -203,70 +198,65 @@ public:
     };
     bool isICMP() const
     {
-        return ((ipType() == 1) || ipType() == 58);
+        return (isIP() && ((ipType() == 1) || (ipType() == 58)));
     };
     bool isIGMP() const
     {
-        return ipType() == 2;
+        return (isIP() && (ipType() == 2));
     };
     bool isTCP() const
     {
-        return ipType() == 6;
+        return (isIP() && (ipType() == 6));
     };
     bool isUDP() const
     {
-        return ipType() == 17;
+        return (isIP() && ipType() == 17);
     };
     bool isMDNS() const
     {
-        return hasPort(5353);
+        return (isUDP() && hasPort(5353));
     };
     bool isDNS() const
     {
-        return hasPort(53);
+        return (isUDP() && hasPort(53));
     };
     bool isSSDP() const
     {
-        return hasPort(1900);
+        return (isUDP() && hasPort(1900));
     };
     bool isDHCP() const
     {
-        return (hasPort(546) || hasPort(547) || hasPort(67) || hasPort(68));
+        return (isUDP() && ((hasPort(546) || hasPort(547) || hasPort(67) || hasPort(68))));
     };
     bool isWSDD() const
     {
-        return (hasPort(3702));
+        return (isUDP() && hasPort(3702));
     };
     bool isHTTP() const
     {
-        return (hasPort(80));
+        return (isTCP() && hasPort(80));
     };
     bool isOTA() const
     {
-    	return (hasPort(8266));
+    	return (isUDP() && hasPort(8266));
     }
     bool isNETBIOS() const
     {
-    	return (hasPort(137) || hasPort(138) || hasPort(139));
+    	return (isUDP() && (hasPort(137) || hasPort(138) || hasPort(139)));
     }
     bool isSMB() const
     {
-    	return (hasPort(445));
+    	return (isUDP() && hasPort(445));
     }
     NetdumpIP getIP(uint16_t idx) const
     {
-        return NetdumpIP(data[idx],
-                         data[idx + 1],
-                         data[idx + 2],
-                         data[idx + 3]);
+        return isIPv4() ? NetdumpIP(data[idx], data[idx + 1], data[idx + 2], data[idx + 3]) : NetdumpIP();
     };
 
     NetdumpIP getIP6(uint16_t idx) const
     {
-        return NetdumpIP((const uint8_t*)&data[idx], false);
+        return isIPv6() ? NetdumpIP((const uint8_t*)&data[idx], false) : NetdumpIP();
     };
-
-
     NetdumpIP sourceIP() const
     {
         NetdumpIP ip;
@@ -283,7 +273,7 @@ public:
 
     bool      hasIP(NetdumpIP ip) const
     {
-        return ((ip == sourceIP()) || (ip == destIP()));
+        return (isIP() && ((ip == sourceIP()) || (ip == destIP())));
     }
 
     NetdumpIP destIP() const
@@ -301,15 +291,15 @@ public:
     };
     uint16_t getSrcPort() const
     {
-        return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 0);
+        return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 0) : 0;
     }
     uint16_t getDstPort() const
     {
-        return ntoh16(ETH_HDR_LEN + getIpHdrLen() + 2);
+        return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 2) : 0;
     }
     bool     hasPort(uint16_t p) const
     {
-        return ((getSrcPort() == p) || (getDstPort() == p));
+        return (isIP() && ((getSrcPort() == p) || (getDstPort() == p)));
     }
 
     String toString(PacketDetail netdumpDetail = PacketDetail::NONE) const;
@@ -319,7 +309,7 @@ private:
     unsigned long packetTime;
     int netif_idx;
     const char* data;
-    size_t len;
+    size_t packetLength;
     int out;
     int success;
 };

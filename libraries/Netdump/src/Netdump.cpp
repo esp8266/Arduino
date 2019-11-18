@@ -107,8 +107,6 @@ void Netdump::writePcapHeader(Stream& s)
     s.write(reinterpret_cast<char*>(pcapHeader), 24);
 }
 
-
-
 void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np)
 {
     out.printf("%8d %s", np.getTime(), np.toString(ndd).c_str());
@@ -132,11 +130,7 @@ void Netdump::fileDumpProcess(File& outfile, const Packet& np)
 
 void Netdump::tcpDumpProcess(const Packet& np)
 {
-    if (np.isIPv4() && np.isTCP()
-            && ((np.getInOut() && np.getSrcPort() == tcpDumpClient.localPort())
-                || (!np.getInOut() && np.getDstPort() == tcpDumpClient.localPort())
-               )
-       )
+    if (np.isTCP() && np.hasPort(tcpDumpClient.localPort()))
     {
         // skip myself
         return;
