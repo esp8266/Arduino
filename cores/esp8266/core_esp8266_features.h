@@ -32,10 +32,11 @@
 
 #define WIFI_HAS_EVENT_CALLBACK
 
-#ifdef __cplusplus
-
 #include <stdlib.h> // malloc()
 #include <stddef.h> // size_t
+#include <stdint.h>
+
+#ifdef __cplusplus
 
 namespace arduino
 {
