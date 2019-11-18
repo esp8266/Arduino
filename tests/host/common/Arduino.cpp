@@ -57,6 +57,23 @@ extern "C" void esp_yield()
 {
 }
 
+extern "C" void esp_delay (unsigned long ms)
+{
+    usleep(ms * 1000);
+}
+
+inline void esp_yield(const std::function<bool()>& blocked) {
+}
+
+void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, const uint32_t intvl_ms)
+{
+    usleep(ms * 1000);
+}
+
+inline void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked)
+{
+    usleep(ms * 1000);
+}
 
 extern "C" void __panic_func(const char* file, int line, const char* func) {
     (void)file;
@@ -67,7 +84,7 @@ extern "C" void __panic_func(const char* file, int line, const char* func) {
 
 extern "C" void delay(unsigned long ms)
 {
-    usleep(ms * 1000);
+    esp_delay(ms);
 }
 
 extern "C" void delayMicroseconds(unsigned int us)
