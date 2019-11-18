@@ -58,7 +58,7 @@ cont_t* g_pcont __attribute__((section(".noinit")));
 static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 
 /* Used to implement optimistic_yield */
-static uint32_t s_micros_at_task_start;
+static uint32_t s_micros_since_yield_start;
 
 /* For ets_intr_lock_nest / ets_intr_unlock_nest
  * Max nesting seen by SDK so far is 2.
@@ -116,6 +116,7 @@ extern "C" void __yield() {
     if (can_yield()) {
         esp_schedule();
         esp_yield_within_cont();
+        s_micros_since_yield_start = system_get_time();
     }
     else {
         panic();
@@ -126,7 +127,7 @@ extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
     if (can_yield() &&
-        (system_get_time() - s_micros_at_task_start) > interval_us)
+        (system_get_time() - s_micros_since_yield_start) > interval_us)
     {
         yield();
     }
@@ -183,7 +184,7 @@ static void loop_wrapper() {
 
 static void loop_task(os_event_t *events) {
     (void) events;
-    s_micros_at_task_start = system_get_time();
+    s_micros_since_yield_start = system_get_time();
     cont_run(g_pcont, &loop_wrapper);
     if (cont_check(g_pcont) != 0) {
         panic();
