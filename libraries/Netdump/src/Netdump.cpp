@@ -28,6 +28,22 @@ namespace NetCapture
 
 Netdump* Netdump::self;
 
+Netdump::Netdump()
+{
+    phy_capture = capture;
+    self = this;
+};
+
+Netdump::~Netdump()
+{
+	reset();
+    phy_capture = nullptr;
+    if (packetBuffer)
+    {
+    	delete[] packetBuffer;
+    }
+};
+
 void Netdump::setCallback(const Callback nc)
 {
     netDumpCallback = nc;
@@ -69,11 +85,11 @@ void Netdump::fileDump(File& outfile, const Filter nf)
 }
 void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 {
-    if (packetBuffer)
+
+    if (!packetBuffer)
     {
-        delete packetBuffer;
+    	packetBuffer = new char[tcpBuffersize];
     }
-    packetBuffer = new char[tcpBuffersize];
     bufferIndex = 0;
 
     schedule_function([&tcpDumpServer, this, nf]()
@@ -95,7 +111,7 @@ void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int 
     }
 }
 
-void Netdump::writePcapHeader(Stream& s)
+void Netdump::writePcapHeader(Stream& s) const
 {
     uint32_t pcapHeader[6];
     pcapHeader[0] = 0xa1b2c3d4;     // pcap magic number
@@ -107,12 +123,12 @@ void Netdump::writePcapHeader(Stream& s)
     s.write(reinterpret_cast<char*>(pcapHeader), 24);
 }
 
-void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np)
+void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const
 {
-    out.printf("%8d %s", np.getTime(), np.toString(ndd).c_str());
+    out.printf_P(PSTR("%8d %s"), np.getTime(), np.toString(ndd).c_str());
 }
 
-void Netdump::fileDumpProcess(File& outfile, const Packet& np)
+void Netdump::fileDumpProcess(File& outfile, const Packet& np) const
 {
     size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
     uint32_t pcapHeader[4];

@@ -39,7 +39,7 @@ public:
         : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {};
 
-    ~Packet() {};
+    Packet() {};
 
     enum class PacketDetail
     {

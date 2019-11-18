@@ -39,15 +39,8 @@ public:
     using Filter = std::function<bool(Packet&)>;
     using Callback = std::function<void(Packet&)>;
 
-    Netdump()
-    {
-        phy_capture = capture;
-        self = this;
-    };
-    ~Netdump()
-    {
-        phy_capture = nullptr;
-    };
+    Netdump();
+    ~Netdump();
 
     void setCallback(const Callback nc);
     void setCallback(const Callback nc, const Filter nf);
@@ -66,12 +59,12 @@ private:
     static Netdump* self;
 
     static void capture(int netif_idx, const char* data, size_t len, int out, int success);
-    void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np);
-    void fileDumpProcess(File& outfile, const Packet& np);
+    void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const;
+    void fileDumpProcess(File& outfile, const Packet& np) const;
     void tcpDumpProcess(const Packet& np);
     void tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf);
 
-    void writePcapHeader(Stream& s);
+    void writePcapHeader(Stream& s) const;
 
     WiFiClient tcpDumpClient;
     char* packetBuffer = nullptr;
