@@ -133,13 +133,13 @@ protected:
     bool runUpdate(Stream& in, uint32_t size, const String& md5, int command = U_FLASH);
 
     int _lastError;
-    bool _rebootOnUpdate = true;
 private:
     int _httpClientTimeout;
-    bool _followRedirects;
-
     int _ledPin;
     uint8_t _ledOn;
+    bool _followRedirects = false;
+protected:
+    bool _rebootOnUpdate = true;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)

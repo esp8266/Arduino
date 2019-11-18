@@ -69,31 +69,31 @@ class ArduinoOTAClass
     int getCommand();
 
   private:
-    int _port;
+    void _runUpdate(void);
+    void _onRx(void);
+    int parseInt(void);
+    String readStringUntil(char end);
+
     String _password;
     String _hostname;
     String _nonce;
+    String _md5;
     UdpContext *_udp_ota;
-    bool _initialized;
-    bool _rebootOnSuccess;
-    bool _useMDNS;
     ota_state_t _state;
     int _size;
     int _cmd;
+    IPAddress _ota_ip;
+    uint16_t _port;
     uint16_t _ota_port;
     uint16_t _ota_udp_port;
-    IPAddress _ota_ip;
-    String _md5;
+    bool _initialized;
+    bool _rebootOnSuccess;
+    bool _useMDNS;
 
     THandlerFunction _start_callback;
     THandlerFunction _end_callback;
     THandlerFunction_Error _error_callback;
     THandlerFunction_Progress _progress_callback;
-
-    void _runUpdate(void);
-    void _onRx(void);
-    int parseInt(void);
-    String readStringUntil(char end);
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)

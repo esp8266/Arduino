@@ -233,15 +233,20 @@ protected:
     WiFiClient* _client;
 
     /// request handling
-    String _host;
     uint16_t _port = 0;
-    bool _reuse = true;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
+    uint16_t _redirectCount = 0;
+    uint16_t _redirectLimit = 10;
+    bool _canReuse = false;
+    bool _followRedirects = false;
+    bool _reuse = true;
     bool _useHTTP10 = false;
 
+    String _host;
     String _uri;
     String _protocol;
     String _headers;
+    String _location;
     String _userAgent;
     String _base64Authorization;
 
@@ -251,11 +256,6 @@ protected:
 
     int _returnCode = 0;
     int _size = -1;
-    bool _canReuse = false;
-    bool _followRedirects = false;
-    uint16_t _redirectCount = 0;
-    uint16_t _redirectLimit = 10;
-    String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
     std::unique_ptr<StreamString> _payload;
 };

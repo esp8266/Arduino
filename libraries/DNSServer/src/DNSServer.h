@@ -64,13 +64,6 @@ class DNSServer
     void stop();
 
   private:
-    WiFiUDP _udp;
-    uint16_t _port;
-    String _domainName;
-    unsigned char _resolvedIP[4];
-    uint32_t _ttl;
-    DNSReplyCode _errorReplyCode;
-
     void downcaseAndRemoveWwwPrefix(String &domainName);
     void replyWithIP(DNSHeader *dnsHeader,
 		     unsigned char * query,
@@ -83,5 +76,12 @@ class DNSServer
 			DNSReplyCode rcode);
     void respondToRequest(uint8_t *buffer, size_t length);
     void writeNBOShort(uint16_t value);
+
+    String _domainName;
+    WiFiUDP _udp;
+    DNSReplyCode _errorReplyCode;
+    uint32_t _ttl;
+    uint16_t _port;
+    unsigned char _resolvedIP[4];
 };
 #endif
