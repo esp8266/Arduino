@@ -506,6 +506,10 @@ void esp_delay (unsigned long ms)
 {
 }
 
+void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked)
+{
+}
+
     void dns_setserver(u8_t numdns, ip_addr_t *dnsserver)
     {
         (void)numdns;

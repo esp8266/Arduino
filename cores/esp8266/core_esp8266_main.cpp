@@ -152,12 +152,6 @@ extern "C" void __esp_delay(unsigned long ms) {
 
 extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
 
-void esp_yield(const std::function<bool()>& blocked) {
-    do {
-        esp_yield();
-    } while (blocked());
-}
-
 void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, const uint32_t intvl_ms) {
     const auto start = millis();
     decltype(millis()) expired;
@@ -165,10 +159,6 @@ void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, 
         auto remaining = timeout_ms - expired;
         esp_delay(remaining <= intvl_ms ? remaining : intvl_ms);
     }
-}
-
-void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked) {
-    esp_delay(timeout_ms, blocked, timeout_ms);
 }
 
 extern "C" void __yield() {

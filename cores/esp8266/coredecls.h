@@ -36,9 +36,17 @@ using TrivialCB = std::function<void()>;
 void settimeofday_cb (const BoolCB& cb);
 void settimeofday_cb (const TrivialCB& cb);
 
-void esp_yield(const std::function<bool()>& blocked);
-void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked);
+inline void esp_yield(const std::function<bool()>& blocked) {
+    do {
+        esp_yield();
+    } while (blocked());
+}
+
 void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, const uint32_t intvl_ms);
+
+inline void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked) {
+    esp_delay(timeout_ms, blocked, timeout_ms);
+}
 
 #endif // __cplusplus
 
