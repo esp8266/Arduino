@@ -44,6 +44,7 @@ extern "C" bool can_yield()
 
 extern "C" void optimistic_yield (uint32_t interval_us)
 {
+    (void)interval_us;
 }
 
 extern "C" void esp_yield()
