@@ -247,7 +247,7 @@ void SSDPClass::_send(ssdp_method_t method) {
                        _uuid,
                        (method == NONE) ? "ST" : "NT",
                        (_st_is_uuid) ? _uuid : _deviceType,
-                       ip.toString(), _port, _schemaURL
+                       ip.toString().c_str(), _port, _schemaURL
                       );
 
   _server->append(buffer, len);
@@ -281,7 +281,7 @@ void SSDPClass::schema(Print &client) const {
   char buffer[strlen_P(_ssdp_schema_template) + 1];
   strcpy_P(buffer, _ssdp_schema_template);
   client.printf(buffer,
-                ip.toString(), _port,
+                ip.toString().c_str(), _port,
                 _deviceType,
                 _friendlyName,
                 _presentationURL,
