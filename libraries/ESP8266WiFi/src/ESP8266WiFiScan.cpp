@@ -36,9 +36,7 @@ extern "C" {
 }
 
 #include "debug.h"
-
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
+#include <coredecls.h>
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -98,11 +96,8 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
             return WIFI_SCAN_RUNNING;
         }
 
-        // will continue when _scanDone fires
-        while (!ESP8266WiFiScanClass::_scanComplete && ESP8266WiFiScanClass::_scanStarted)
-        {
-            esp_yield();
-        }
+        // will resume when _scanDone fires
+        esp_yield([]() { return !ESP8266WiFiScanClass::_scanComplete && ESP8266WiFiScanClass::_scanStarted; });
 
         return ESP8266WiFiScanClass::_scanCount;
     } else {

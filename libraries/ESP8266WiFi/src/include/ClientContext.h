@@ -26,12 +26,9 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
-extern "C" void esp_delay(unsigned long ms);
-extern "C" void esp_schedule();
-
 #include <assert.h>
 #include <esp_priv.h>
-
+#include <coredecls.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -146,11 +143,9 @@ public:
         }
         _connect_pending = true;
         _op_start_time = millis();
-        // will continue on timeout or when _connected or _notify_error fires
-        while (!_is_timeout() && _connect_pending) {
-            // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-            esp_delay(1);
-        }
+        // will resume on timeout or when _connected or _notify_error fires
+        // give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
+        esp_delay(_timeout_ms, [this]() { return _connect_pending; }, 1);
         _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -489,11 +484,9 @@ protected:
             }
 
             _send_waiting = true;
-            // will continue on timeout or when _write_some_from_cb or _notify_error fires
-            while (!_is_timeout() && _send_waiting) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-                esp_delay(1);
-            }
+            // will resume on timeout or when _write_some_from_cb or _notify_error fires
+            // give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
+            esp_delay(_timeout_ms, [this]() { return _send_waiting; }, 1);
             _send_waiting = false;
         } while(true);
 

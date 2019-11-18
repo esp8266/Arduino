@@ -49,9 +49,6 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
-extern "C" void esp_delay(unsigned long ms);
-extern "C" void esp_schedule();
-
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -620,7 +617,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        delay(timeout_ms);
+        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
         // will resume on timeout or when wifi_dns_found_callback fires
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
@@ -670,11 +667,8 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        auto op_start_time = millis();
-        // will continue on timeout or when wifi_dns_found_callback fires
-        while (millis() - op_start_time < timeout_ms && _dns_lookup_pending) {
-            esp_delay(timeout_ms);
-        }
+        // will resume on timeout or when wifi_dns_found_callback fires
+        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult.isSet()) {

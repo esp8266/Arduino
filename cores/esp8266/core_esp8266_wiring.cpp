@@ -23,13 +23,11 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #include "user_interface.h"
-#include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 
 extern void ets_delay_us(uint32_t us);
-extern void esp_yield();
-extern void esp_delay(unsigned long ms);
 
 static os_timer_t micros_overflow_timer;
 static uint32_t micros_at_last_overflow_tick = 0;

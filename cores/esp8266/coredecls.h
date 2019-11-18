@@ -14,6 +14,7 @@ extern "C" {
 
 bool can_yield();
 void esp_yield();
+void esp_delay(unsigned long ms);
 void esp_schedule();
 void tune_timeshift64 (uint64_t now_us);
 void disable_extra4k_at_link_time (void) __attribute__((noinline));
@@ -34,6 +35,10 @@ using TrivialCB = std::function<void()>;
 
 void settimeofday_cb (const BoolCB& cb);
 void settimeofday_cb (const TrivialCB& cb);
+
+void esp_yield(const std::function<bool()>& blocked);
+void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked);
+void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, const uint32_t intvl_ms);
 
 #endif // __cplusplus
 
