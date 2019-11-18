@@ -49,7 +49,7 @@ void Netdump::reset()
     setCallback(nullptr, nullptr);
 }
 
-void Netdump::printDump(Print& out, Packet::PacketDetail ndd, Filter nf)
+void Netdump::printDump(Print& out, Packet::PacketDetail ndd, const Filter nf)
 {
     out.printf("netDump starting\r\n");
     setCallback([&out, ndd, this](Packet & ndp)
@@ -58,23 +58,16 @@ void Netdump::printDump(Print& out, Packet::PacketDetail ndd, Filter nf)
     }, nf);
 }
 
-void Netdump::fileDump(File& outfile, Filter nf)
+void Netdump::fileDump(File& outfile, const Filter nf)
 {
-    uint32_t buf[6];
-    buf[0] = 0xa1b2c3d4;
-    buf[1] = 0x00040002;
-    buf[2] = 0;
-    buf[3] = 0;
-    buf[4] = maxPcapLength;
-    buf[5] = 1;
 
-    outfile.write((uint8_t*)buf, 24);
+    writePcapHeader(outfile);
     setCallback([&outfile, this](Packet & ndp)
     {
         fileDumpProcess(outfile, ndp);
     }, nf);
 }
-void Netdump::tcpDump(WiFiServer &tcpDumpServer, Filter nf)
+void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 {
     if (packetBuffer)
     {
@@ -102,6 +95,20 @@ void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int 
     }
 }
 
+void Netdump::writePcapHeader(Stream& s)
+{
+    uint32_t pcapHeader[6];
+    pcapHeader[0] = 0xa1b2c3d4;     // pcap magic number
+    pcapHeader[1] = 0x00040002;     // pcap major/minor version
+    pcapHeader[2] = 0;			     // pcap UTC correction in seconds
+    pcapHeader[3] = 0;			     // pcap time stamp accuracy
+    pcapHeader[4] = maxPcapLength;  // pcap max packet length per record
+    pcapHeader[5] = 1;              // pacp data linkt type = ethernet
+    s.write(reinterpret_cast<char*>(pcapHeader), 24);
+}
+
+
+
 void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np)
 {
     out.printf("%8d %s", np.getTime(), np.toString(ndd).c_str());
@@ -110,15 +117,15 @@ void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packe
 void Netdump::fileDumpProcess(File& outfile, const Packet& np)
 {
     size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
-    char buf[16];
+    uint32_t pcapHeader[4];
 
     struct timeval tv;
     gettimeofday(&tv, nullptr);
-    *(uint32_t*)&buf[0] = tv.tv_sec;
-    *(uint32_t*)&buf[4] = tv.tv_usec;
-    *(uint32_t*)&buf[8] = incl_len;
-    *(uint32_t*)&buf[12] = np.getPacketSize();
-    outfile.write(buf, 16);
+    pcapHeader[0] = tv.tv_sec;
+    pcapHeader[1] = tv.tv_usec;
+    pcapHeader[2] = incl_len;
+    pcapHeader[3] = np.getPacketSize();
+    outfile.write(reinterpret_cast<char*>(pcapHeader), 16); // pcap record header
 
     outfile.write(np.rawData(), incl_len);
 }
@@ -140,11 +147,12 @@ void Netdump::tcpDumpProcess(const Packet& np)
     {
         struct timeval tv;
         gettimeofday(&tv, nullptr);
-        *(uint32_t*)&packetBuffer[bufferIndex] = tv.tv_sec;
-        *(uint32_t*)&packetBuffer[bufferIndex + 4] = tv.tv_usec;
-        *(uint32_t*)&packetBuffer[bufferIndex + 8] = incl_len;
-        *(uint32_t*)&packetBuffer[bufferIndex + 12] = np.getPacketSize();
-        bufferIndex += 16;
+        uint32_t* pcapHeader = reinterpret_cast<uint32_t*>(&packetBuffer[bufferIndex]);
+        pcapHeader[0] = tv.tv_sec;      // add pcap record header
+        pcapHeader[1] = tv.tv_usec;
+        pcapHeader[2] = incl_len;
+        pcapHeader[3] = np.getPacketSize();
+        bufferIndex += 16; // pcap header size
         memcpy(&packetBuffer[bufferIndex], np.rawData(), incl_len);
         bufferIndex += incl_len;
     }
@@ -156,23 +164,15 @@ void Netdump::tcpDumpProcess(const Packet& np)
     }
 }
 
-void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, Filter nf)
+void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
 {
     if (tcpDumpServer.hasClient())
     {
         tcpDumpClient = tcpDumpServer.available();
-
         tcpDumpClient.setNoDelay(true);
 
-        // pcap-savefile(5) capture preamble
-        *(uint32_t*)&packetBuffer[0] = 0xa1b2c3d4;
-        *(uint32_t*)&packetBuffer[4] = 0x00040002;
-        *(uint32_t*)&packetBuffer[8] = 0;
-        *(uint32_t*)&packetBuffer[12] = 0;
-        *(uint32_t*)&packetBuffer[16] = maxPcapLength;
-        *(uint32_t*)&packetBuffer[20] = 1;
-        tcpDumpClient.write(packetBuffer, 24);
         bufferIndex = 0;
+        writePcapHeader(tcpDumpClient);
 
         setCallback([this](Packet & ndp)
         {

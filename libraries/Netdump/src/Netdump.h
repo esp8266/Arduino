@@ -54,9 +54,9 @@ public:
     void setFilter(const Filter nf);
     void reset();
 
-    void printDump(Print& out, Packet::PacketDetail ndd, Filter nf = nullptr);
-    void fileDump(File& outfile, Filter nf = nullptr);
-    void tcpDump(WiFiServer &tcpDumpServer, Filter nf = nullptr);
+    void printDump(Print& out, Packet::PacketDetail ndd, const Filter nf = nullptr);
+    void fileDump(File& outfile, const Filter nf = nullptr);
+    void tcpDump(WiFiServer &tcpDumpServer, const Filter nf = nullptr);
 
 
 private:
@@ -69,7 +69,9 @@ private:
     void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np);
     void fileDumpProcess(File& outfile, const Packet& np);
     void tcpDumpProcess(const Packet& np);
-    void tcpDumpLoop(WiFiServer &tcpDumpServer, Filter nf);
+    void tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf);
+
+    void writePcapHeader(Stream& s);
 
     WiFiClient tcpDumpClient;
     char* packetBuffer = nullptr;
@@ -77,6 +79,8 @@ private:
 
     static constexpr int tcpBuffersize = 2048;
     static constexpr int maxPcapLength = 1024;
+    static constexpr uint32_t pcapMagic = 0xa1b2c3d4;
+
 };
 
 } // namespace NetCapture
