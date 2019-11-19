@@ -46,6 +46,12 @@ build.led=
 build.sdk=NONOSDK22x_191024
 #build.sdk=NONOSDK22x_191105
 
+# These are not overriden when FS is not configured
+build.eeprom_start=
+build.spiffs_start=
+build.spiffs_end=
+build.spiffs_blocksize=
+
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
