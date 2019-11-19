@@ -97,6 +97,7 @@ extern "C" bool can_yield() {
 static inline void esp_yield_within_cont() __attribute__((always_inline));
 static void esp_yield_within_cont() {
         cont_yield(g_pcont);
+        s_cycles_since_yield_start = ESP.getCycleCount();
         run_scheduled_recurrent_functions();
 }
 
@@ -116,7 +117,6 @@ extern "C" void __yield() {
     if (can_yield()) {
         esp_schedule();
         esp_yield_within_cont();
-        s_cycles_since_yield_start = ESP.getCycleCount();
     }
     else {
         panic();
@@ -133,7 +133,6 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
         yield();
     }
 }
-
 
 // Replace ets_intr_(un)lock with nestable versions
 extern "C" void IRAM_ATTR ets_intr_lock() {
