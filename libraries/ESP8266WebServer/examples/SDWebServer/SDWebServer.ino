@@ -241,6 +241,7 @@ void printDirectory() {
     entry.close();
   }
   server.sendContent("]");
+  server.sendContent(""); // Terminate the HTTP chunked transmission with a 0-length chunk
   dir.close();
 }
 
