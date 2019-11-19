@@ -40,6 +40,9 @@ import getopt
 import re
 import json
 
+requiredboards = [ 'generic', 'esp8285' ]
+
+################################################################
 # serial upload speed order in menu
 # default is 115 for every board unless specified with 'serial' in board
 # or by user command line
@@ -55,6 +58,7 @@ speeds = collections.OrderedDict([
     ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
     ])
 
+################################################################
 # boards list
 
 boards = collections.OrderedDict([
@@ -296,9 +300,9 @@ boards = collections.OrderedDict([
             ( '.build.board', 'ESP8266_ESP13' ),
             ( '.build.variant', 'ESPDuino' ),
             ( '.menu.ResetMethod.v2', 'ESPduino-V2' ),
-            ( '.menu.ResetMethod.v2.upload.resetmethod', 'nodemcu' ),
+            ( '.menu.ResetMethod.v2.upload.resetmethod', '--before default_reset --after hard_reset' ),
             ( '.menu.ResetMethod.v1', 'ESPduino-V1' ),
-            ( '.menu.ResetMethod.v1.upload.resetmethod', 'ck' ),
+            ( '.menu.ResetMethod.v1.upload.resetmethod', '--before no_reset --after soft_reset' ),
             ( '.menu.UploadTool.esptool', 'Serial' ),
             ( '.menu.UploadTool.esptool.upload.tool', 'esptool' ),
             ( '.menu.UploadTool.esptool.upload.verbose', '--trace' ),
@@ -363,7 +367,7 @@ boards = collections.OrderedDict([
                   '',
                   'Product page: https://xinabox.cc/products/CW01'
                   ],
-    }),  
+    }),
     ( 'espresso_lite_v1', {
         'name': 'ESPresso Lite 1.0',
         'opts': {
@@ -465,6 +469,7 @@ boards = collections.OrderedDict([
             'flashmode_dio',
             'flashfreq_40',
             '4M',
+            'led216',
             ],
         'desc': [ 'This module is sold under many names for around $6.50 on AliExpress and it\'s one of the cheapest, fully integrated ESP8266 solutions.',
                   '',
@@ -532,6 +537,20 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'Product page: https://www.sparkfun.com/products/13711' ],
     }),
+    ( 'blynk', {
+        'name': 'SparkFun Blynk Board',
+        'opts': {
+            '.build.board': 'ESP8266_THING',
+            '.build.variant': 'thing',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Product page: https://www.sparkfun.com/products/13794' ],
+    }),
     ( 'esp210', {
         'name': 'SweetPea ESP-210',
         'opts': {
@@ -589,7 +608,7 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'serial': '921',
-        'desc': [ 
+        'desc': [
             'Parameters in Arduino IDE:',
             '~~~~~~~~~~~~~~~~~~~~~~~~~~',
             '',
@@ -843,6 +862,76 @@ boards = collections.OrderedDict([
             '',
             'More details at https://shop.makestro.com/product/espectrocore/',
         ],
+    }),
+    ( 'sonoff', {
+        'name': 'ITEAD Sonoff',
+        'opts': {
+            '.build.board': 'SONOFF_SV',
+            '.build.variant': 'itead',
+            '.build.extra_flags': '-DESP8266',
+            '.build.flash_size': '1M',
+            '.menu.BoardModel.sonoffSV': 'ITEAD Sonoff SV',
+            '.menu.BoardModel.sonoffSV.build.board': 'SONOFF_SV',
+            '.menu.BoardModel.sonoffTH': 'ITEAD Sonoff TH',
+            '.menu.BoardModel.sonoffTH.build.board': 'SONOFF_TH',
+            '.menu.BoardModel.sonoffBasic': 'ITEAD Sonoff Basic',
+            '.menu.BoardModel.sonoffBasic.build.board': 'SONOFF_BASIC',
+            '.menu.BoardModel.sonoffS20': 'ITEAD Sonoff S20',
+            '.menu.BoardModel.sonoffS20.build.board': 'SONOFF_S20',
+             },
+        'macro': [
+            'resetmethod_none',
+            'flashmode_dout',
+            'flashfreq_40',
+            '1M',
+            ],
+        'desc': [
+            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, '
+            'and Sonoff S20',
+            '',
+            'These are not development boards. The development process is '
+            'inconvenient with these devices. When flashing firmware you will '
+            'need a Serial Adapter to connect it to your computer.',
+            '',
+            ' | Most of these devices, during normal operation, are connected to '
+            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these '
+            'devices when connected to *wall power*. **ALWAYS** have them '
+            'disconnected from *wall power* when connecting them to your '
+            'computer. Your life may depend on it!',
+            '',
+            'When flashing you will need to hold down the push button connected '
+            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB '
+            'Serial Adapters may supply enough power to handle flashing; '
+            'however, it many may not supply enough power to handle the '
+            'activities when the device reboots.',
+            '',
+            'More product details at the bottom of https://www.itead.cc/wiki/Product/'
+        ],
+    }),
+    ( 'espmxdevkit', {
+        'name': 'DOIT ESP-Mx DevKit (ESP8285)',
+        'opts': {
+            '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285',
+            '.build.led': '-DLED_BUILTIN=16',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dout',
+            'flashfreq_40',
+            '1M',
+            ],
+        'desc': [
+            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module '
+            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) '
+            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. '
+            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 '
+            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. '
+            '',
+            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) '
+            'is a multi-chip package which contains ESP8266 and 1MB flash. ',
+            '',
+        ],
     })
     ])
 
@@ -853,7 +942,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', 'version'),
+        ( '.upload.erase_cmd', ''),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -922,37 +1011,39 @@ macros = {
     ####################### menu.resetmethod
 
     'resetmethod_menu': collections.OrderedDict([
-        ( '.menu.ResetMethod.ck', 'ck' ),
-        ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
-        ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
-        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
+        ( '.menu.ResetMethod.nodemcu', 'dtr (aka nodemcu)' ),
+        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', '--before default_reset --after hard_reset' ),
+        ( '.menu.ResetMethod.ck', 'no dtr (aka ck)' ),
+        ( '.menu.ResetMethod.ck.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_menu_extra': collections.OrderedDict([
-        ( '.menu.ResetMethod.none', 'none' ),
-        ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
-        ( '.menu.ResetMethod.dtrset', 'dtrset' ),
-        ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
+        ( '.menu.ResetMethod.nodtr_nosync', 'no dtr, no_sync' ),
+        ( '.menu.ResetMethod.nodtr_nosync.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
 
-    ####################### upload.resetmethod
+    ####################### upload.resetmethod (new esptool.py options)
 
     'resetmethod_ck': collections.OrderedDict([
-        ( '.upload.resetmethod', 'ck' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_nodemcu': collections.OrderedDict([
-        ( '.upload.resetmethod', 'nodemcu' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
-    
+
     'resetmethod_none': collections.OrderedDict([
-        ( '.upload.resetmethod', 'none' ),
+        ( '.upload.resetmethod', '--before no_reset --after soft_reset' ),
         ]),
 
     'resetmethod_dtrset': collections.OrderedDict([
-        ( '.upload.resetmethod', 'dtrset' ),
+        ( '.upload.resetmethod', '--before default_reset --after hard_reset' ),
         ]),
-    
+
+    'resetmethod_nodtr_nosync': collections.OrderedDict([
+        ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
+        ]),
+  
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1079,7 +1170,7 @@ macros = {
 
     'flash_erase_menu': collections.OrderedDict([
         ( '.menu.wipe.none', 'Only Sketch' ),
-        ( '.menu.wipe.none.upload.erase_cmd', 'version' ),
+        ( '.menu.wipe.none.upload.erase_cmd', '' ),
         ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
         ( '.menu.wipe.sdk.upload.erase_cmd', 'erase_region "{build.rfcal_addr}" 0x4000' ),
         ( '.menu.wipe.all', 'All Flash Contents' ),
@@ -1347,32 +1438,36 @@ def all_flash_map ():
 ################################################################
 # builtin led
 
-def led (default,max):
+def led (name, default, ledList):
     led = collections.OrderedDict([
                 ('.menu.led.' + str(default), str(default)),
                 ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
-    for i in range(0,max+1): # Make range incluside of max (16), since there are really 16 GPIOS not 15
+    for i in ledList: # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not i == default:
             led.update(
                 collections.OrderedDict([
                     ('.menu.led.' + str(i), str(i)),
                     ('.menu.led.' + str(i) + '.build.led', '-DLED_BUILTIN=' + str(i)),
                 ]))
-    return { 'led': led }
+    return { name: led }
 
 ################################################################
 # sdk selection
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk222_100', 'nonos-sdk 2.2.1+100 (testing)'),
-                        ('.menu.sdk.nonosdk222_100.build.sdk', 'NONOSDK22y'),
+                        ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
+                        ('.menu.sdk.nonosdk_191024.build.sdk', 'NONOSDK22x_191024'),
+                        ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
+                        ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
+                        ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
+                        ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
+                     #  ('.menu.sdk.nonosdk_190313', 'nonos-sdk 2.2.1+61 (190313 testing)'),
+                     #  ('.menu.sdk.nonosdk_190313.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                     #  ('.menu.sdk.nonosdk222_61', 'nonos-sdk 2.2.1+61 (testing)'),
-                     #  ('.menu.sdk.nonosdk222_61.build.sdk', 'NONOSDK22x'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
                     ])
            }
@@ -1381,21 +1476,48 @@ def sdk ():
 
 def all_boards ():
 
-    if boardsgen:
+    if boardsgen or boardslocalgen:
 
         checkdir()
 
-        # check if backup already exists
-        if not os.path.isfile("boards.txt.orig"):
-            os.rename("boards.txt", "boards.txt.orig")
+        if boardsgen:
+            # check if backup already exists
+            if not os.path.isfile("boards.txt.orig"):
+                os.rename("boards.txt", "boards.txt.orig")
 
-        realstdout = sys.stdout
-        sys.stdout = open("boards.txt", 'w')
+            realstdout = sys.stdout
+            sys.stdout = open("boards.txt", 'w')
+        else:
+            # make backup of boards.local.txt
+            if os.path.isfile("boards.local.txt"):
+                if not os.path.isfile("boards.local.txt.orig"):
+                    os.rename("boards.local.txt", "boards.local.txt.orig")
+
+            realstdout = sys.stdout
+            sys.stdout = open("boards.local.txt", 'w')
 
     macros.update(all_flash_map())
     macros.update(all_debug())
-    macros.update(led(led_default, led_max))
+    macros.update(led('led',    led_default, range(0,led_max+1)))
+    macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
+
+    if boardfilteropt or excludeboards:
+        print('#')
+        print('# Do not create pull-requests with this abridged file!')
+        print('# Do as instructed further down.')
+        print('#')
+
+        out = ""
+        for a in sys.argv:
+            out += " " + a
+        print('# Abridged boards.txt or boards.local.txt created by:' + out)
+        out = ""
+        for a in boardlist:
+            out += " " + a
+        print('# The following boards were included: ' + out)
+        print('#')
+
 
     print('#')
     print('# Do not create pull-requests for this file only, CI will not accept them.')
@@ -1403,7 +1525,10 @@ def all_boards ():
     print('# All modified files after running with option "--allgen" must be included in the pull-request.')
     print('#')
     print('')
+    # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
     print('menu.BoardModel=Model')
+    print('menu.ESPModule=Module')
+    print('menu.led=Builtin Led')
     print('menu.baud=Upload Speed')
     print('menu.xtal=CPU Frequency')
     print('menu.CrystalFreq=Crystal Frequency')
@@ -1411,19 +1536,22 @@ def all_boards ():
     print('menu.FlashMode=Flash Mode')
     print('menu.FlashFreq=Flash Frequency')
     print('menu.ResetMethod=Reset Method')
-    print('menu.ESPModule=Module')
     print('menu.dbg=Debug port')
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=Exceptions')
-    print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
     print('')
 
-    for id in boards:
+    missingboards = []
+    for id in boardlist:
+        if id not in boards:
+            missingboards += [ id ];
+            continue
+
         print('##############################################################')
         board = boards[id]
         print(id + '.name=' + board['name'])
@@ -1461,10 +1589,19 @@ def all_boards ():
 
         print('')
 
-    if boardsgen:
+    if boardsgen or boardslocalgen:
         sys.stdout.close()
         sys.stdout = realstdout
+
+    if missingboards:
+        print("No board definitions were found for the following boards:")
+        print(missingboards)
+        print("")
+
+    if boardsgen:
         print("generated: boards.txt")
+    else:
+        print("generated: boards.local.txt")
 
 ################################################################
 
@@ -1488,7 +1625,7 @@ def package ():
     substitution = '"boards": [\n'
     board_items = ['            {\n              "name": "%s"\n            }' % boards[id]['name']
                     for id in boards]
-    substitution += ',\n'.join(board_items)        
+    substitution += ',\n'.join(board_items)
     substitution += '\n          ],'
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
@@ -1543,6 +1680,16 @@ def doc ():
         print("generated: doc/boards.rst")
 
 ################################################################
+
+def boardnames ():
+    print('# Available board names. Delete or comment out the boards you do not need:')
+
+    for id in boards:
+        print('{: <20s} # {}'.format(id, boards[id]['name']))
+
+    sys.exit(0)
+
+################################################################
 # help / usage
 
 def usage (name,ret):
@@ -1555,22 +1702,27 @@ def usage (name,ret):
     print(" --lwip            - preferred default lwIP version (default %d)" % lwip)
     print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
     print(" --board <b>       - board to modify:")
+    print(" --filter <file>   - create a short boards.txt based on the boards listed in <file>")
+    print(" --xfilter <file>  - create a short boards.txt excluding the boards listed in <file>")
+    print("                     (For --filter or --xfilter use only one)")
     print(" --speed <s>       - change default serial speed")
     print(" --customspeed <s> - new serial speed for all boards")
     print(" --nofloat         - disable float support in printf/scanf")
     print("")
     print(" mandatory option (at least one):")
     print("")
-    print(" --boards        - show boards.txt")
-    print(" --boardsgen     - replace boards.txt")
-    print(" --ld            - show ldscripts")
-    print(" --ldgen         - replace ldscripts")
-    print(" --package       - show package")
-    print(" --packagegen    - replace board:[] in package")
-    print(" --doc           - shows doc/boards.rst")
-    print(" --docgen        - replace doc/boards.rst")
-    print(" --allgen        - generate and replace everything")
-    print("                   (useful for pushing on github)")
+    print(" --boards          - show boards.txt")
+    print(" --boardsgen       - replace boards.txt")
+    print(" --boardslocalgen  - replace boards.local.txt instead of boards.txt")
+    print(" --boardnames      - prints a list of board names, one per line")
+    print(" --ld              - show ldscripts")
+    print(" --ldgen           - replace ldscripts")
+    print(" --package         - show package")
+    print(" --packagegen      - replace board:[] in package")
+    print(" --doc             - shows doc/boards.rst")
+    print(" --docgen          - replace doc/boards.rst")
+    print(" --allgen          - generate and replace everything")
+    print("                     (useful for pushing on github)")
     print("")
 
     out = ""
@@ -1605,6 +1757,14 @@ ldgen = False
 ldshow = False
 boardsgen = False
 boardsshow = False
+
+boardlist = []
+boardfilterfile = ""
+boardfilteropt = False
+excludeboardlist = []
+excludeboards = False
+boardslocalgen = False
+
 packageshow = False
 packagegen = False
 docshow = False
@@ -1618,6 +1778,7 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
           "noextra4kheap", "allowWPS",
+          "boardslocalgen", "filter=", "xfilter=", "boardnames",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
@@ -1631,6 +1792,9 @@ for o, a in opts:
 
     if o in ("-h", "--help"):
         usage(sys.argv[0], 0)
+
+    elif o in ("--boardnames"):
+       boardnames()
 
     elif o in ("--lwip"):
         lwip = a
@@ -1648,6 +1812,14 @@ for o, a in opts:
             print("board %s not available" % a)
             usage(sys.argv[0], 1)
         board = a
+
+    elif o in ("--filter"):
+        boardfilteropt = True
+        boardfilterfile = a
+
+    elif o in ("--xfilter"):
+        excludeboards = True
+        boardfilterfile = a
 
     elif o in ("--speed"):
         if board == no:
@@ -1678,6 +1850,10 @@ for o, a in opts:
         boardsshow = True
         boardsgen = True
 
+    elif o in ("--boardslocalgen"):
+        boardsshow = True
+        boardslocalgen = True
+
     elif o in ("--package"):
         packageshow = True
 
@@ -1707,6 +1883,45 @@ for o, a in opts:
 
 #### ^^^^ cmdline parsing ends
 
+#### vvvv Filter file processing if we have one
+
+if boardfilteropt and excludeboards:
+    print('Specify either --filter or --xfilter, not both.')
+    usage(sys.argv[0], 1)
+
+if boardfilteropt or excludeboards:
+    if not os.path.isfile(boardfilterfile):
+        print('Filter file missing: ', boardfilterfile)
+        usage(sys.argv[0], 1)
+
+    f = open(boardfilterfile, 'r')
+    for line in f:
+        a = line.split('#', 1)[0].strip()
+        if a != '':
+            boardlist += [ a ]
+    f.close()
+
+    if not boardslocalgen:
+        if boardfilteropt:
+            for name in requiredboards:
+                if name not in boardlist:
+                    boardlist.append(name)
+        else:
+            # excludeboards:
+            for name in requiredboards:
+                if name in boardlist:
+                    boardlist.remove(name)
+
+    if boardfilteropt:
+        print('Applying keep filter list:')
+    else:
+        print('Applying exclude filter list:')
+
+    print(boardlist)
+    print('')
+
+#### ^^^^ Filter file processing finished
+
 did = False
 
 if ldshow:
@@ -1716,6 +1931,13 @@ if ldshow:
 if boardsshow:
     ldshow = False
     ldgen = False
+    if not boardfilteropt:
+        if excludeboards:
+            excludeboardlist = boardlist
+        boardlist = []
+        for b in boards:
+            if b not in excludeboardlist:
+                boardlist += [ b ]
     all_boards()
     did = True
 

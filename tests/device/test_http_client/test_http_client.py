@@ -1,7 +1,7 @@
 from mock_decorators import setup, teardown
 from flask import Flask, request, redirect
 from threading import Thread
-import urllib2
+import urllib
 import os
 import ssl
 import time
@@ -20,7 +20,7 @@ def setup_http_get(e):
         return 'Server shutting down...'
     @app.route("/", methods = ['GET', 'POST'])
     def root():
-        print('Got data: ' + request.data);
+        print('Got data: ' + request.data.decode());
         return 'hello!!!'
     @app.route("/data")
     def get_data():
@@ -48,7 +48,7 @@ def setup_http_get(e):
 
 @teardown('HTTP GET & POST requests')
 def teardown_http_get(e):
-    response = urllib2.urlopen('http://localhost:8088/shutdown')
+    response = urllib.request.urlopen('http://localhost:8088/shutdown')
     html = response.read()
     time.sleep(1) # avoid address in use error on macOS
 
@@ -86,6 +86,6 @@ def teardown_http_get(e):
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
     p = os.path.dirname(os.path.abspath(__file__))
-    response = urllib2.urlopen('https://localhost:8088/shutdown', context=ctx)
+    response = urllib.request.urlopen('https://localhost:8088/shutdown', context=ctx)
     html = response.read()
 

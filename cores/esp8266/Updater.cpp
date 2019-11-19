@@ -23,6 +23,7 @@ extern "C" {
 }
 
 extern "C" uint32_t _FS_start;
+extern "C" uint32_t _FS_end;
 
 UpdaterClass::UpdaterClass()
 : _async(false)
@@ -105,15 +106,17 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   wifi_set_sleep_type(NONE_SLEEP_T);
 
+  //address where we will start writing the update
   uintptr_t updateStartAddress = 0;
+  //size of current sketch rounded to a sector
+  size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+  //size of the update rounded to a sector
+  size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+
   if (command == U_FLASH) {
-    //size of current sketch rounded to a sector
-    size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
     uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
-    //size of the update rounded to a sector
-    size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    //address where we will start writing the update
+
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
@@ -129,7 +132,24 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     }
   }
   else if (command == U_FS) {
-     updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
+    if((uintptr_t)&_FS_start + roundedSize > (uintptr_t)&_FS_end) {
+      _setError(UPDATE_ERROR_SPACE);
+      return false;
+    }
+
+#ifdef ATOMIC_FS_UPDATE
+    //address of the end of the space available for update
+    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+
+    updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
+
+    if(updateStartAddress < currentSketchSize) {
+      _setError(UPDATE_ERROR_SPACE);
+      return false;
+    }
+#else
+    updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
+#endif
   }
   else {
     // unknown command
@@ -272,8 +292,19 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("Staged: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
+#endif
   }
   else if (_command == U_FS) {
+#ifdef ATOMIC_FS_UPDATE
+    eboot_command ebcmd;
+    ebcmd.action = ACTION_COPY_RAW;
+    ebcmd.args[0] = _startAddress;
+    ebcmd.args[1] = (uintptr_t)&_FS_start - 0x40200000;
+    ebcmd.args[2] = _size;
+    eboot_command_write(&ebcmd);
+#endif
+
+#ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("Filesystem: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
 #endif
   }
@@ -387,7 +418,7 @@ bool UpdaterClass::_verifyHeader(uint8_t data) {
         }
         return true;
     } else if(_command == U_FS) {
-        // no check of SPIFFS possible with first byte.
+        // no check of FS possible with first byte.
         return true;
     }
     return false;
@@ -421,7 +452,7 @@ bool UpdaterClass::_verifyEnd() {
 
         return true;
     } else if(_command == U_FS) {
-        // SPIFFS is already over written checks make no sense any more.
+        // FS is already over written checks make no sense any more.
         return true;
     }
     return false;
