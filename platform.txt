@@ -149,7 +149,7 @@ tools.esptool.upload.params.quiet=
 # First, potentially perform an erase or nothing
 # Next, do the binary upload
 # Combined in one rule because Arduino doesn't suport upload.1.pattern/upload.3.pattern
-tools.esptool.upload.pattern="{cmd}" "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} "{build.path}/{build.project_name}.bin"
+tools.esptool.upload.pattern="{cmd}" "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
 
 tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
 
