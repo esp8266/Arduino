@@ -58,7 +58,7 @@ cont_t* g_pcont __attribute__((section(".noinit")));
 static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 
 /* Used to implement optimistic_yield */
-static uint32_t s_micros_since_yield_start;
+static uint32_t s_cycles_since_yield_start;
 
 /* For ets_intr_lock_nest / ets_intr_unlock_nest
  * Max nesting seen by SDK so far is 2.
@@ -116,7 +116,7 @@ extern "C" void __yield() {
     if (can_yield()) {
         esp_schedule();
         esp_yield_within_cont();
-        s_micros_since_yield_start = system_get_time();
+        s_cycles_since_yield_start = ESP.getCycleCount();
     }
     else {
         panic();
@@ -126,8 +126,9 @@ extern "C" void __yield() {
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
+    const uint32_t interval_cycles = interval_us * ESP.getCpuFreqMHz();
     if (can_yield() &&
-        (system_get_time() - s_micros_since_yield_start) > interval_us)
+        (ESP.getCycleCount() - s_cycles_since_yield_start) > interval_cycles)
     {
         yield();
     }
@@ -184,7 +185,7 @@ static void loop_wrapper() {
 
 static void loop_task(os_event_t *events) {
     (void) events;
-    s_micros_since_yield_start = system_get_time();
+    s_cycles_since_yield_start = ESP.getCycleCount();
     cont_run(g_pcont, &loop_wrapper);
     if (cont_check(g_pcont) != 0) {
         panic();
@@ -212,7 +213,7 @@ extern void __unhandled_exception(const char *str);
 static void  __unhandled_exception_cpp()
 {
 #ifndef __EXCEPTIONS
-	abort();
+    abort();
 #else
     static bool terminating;
     if (terminating)
