@@ -1322,6 +1322,10 @@ def flash_map (flashsize_kb, fs_kb = 0):
             ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
             ]))
 
+    d.update(collections.OrderedDict([
+        ( menub + 'eeprom_start', "0x%05X" % eeprom_start ),
+        ]))
+
     if ldshow:
         if ldgen:
 

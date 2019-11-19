@@ -50,7 +50,7 @@ compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core" -DEEPROMSTART={build.eeprom_start} -DFSSTART={build.spiffs_start} -DFSEND={build.spiffs_end} -DFSBLOCKSIZE={build.spiffs_blocksize}
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c {compiler.warning_flags} -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags}
