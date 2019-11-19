@@ -62,15 +62,21 @@ public:
     template<typename TArg>
     void attach(float seconds, void (*callback)(TArg), TArg arg)
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
         _attach_ms(1000UL * seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+#pragma GCC diagnostic pop
     }
 
     template<typename TArg>
     void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
         _attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+#pragma GCC diagnostic pop
     }
 
     void once_scheduled(float seconds, callback_function_t callback)
