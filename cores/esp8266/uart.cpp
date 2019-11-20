@@ -657,6 +657,10 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
     }
 
     uart_set_baudrate(uart, baudrate);
+    if(invert)
+    {
+        config |= BIT(UCDTRI) | BIT(UCRTSI) | BIT(UCTXI) | BIT(UCDSRI) | BIT(UCCTSI) | BIT(UCRXI);
+    }
     USC0(uart->uart_nr) = config;
 
     if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
@@ -668,10 +672,6 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
     if(uart->uart_nr == UART0) {
         if(uart->rx_enabled) {
             uart_start_isr(uart);
-        }
-        if(invert)
-        {
-            U0C0 |= BIT(UCDTRI) | BIT(UCRTSI) | BIT(UCTXI) | BIT(UCDSRI) | BIT(UCCTSI) | BIT(UCRXI);
         }
         if(gdbstub_has_uart_isr_control()) {
             ETS_UART_INTR_ENABLE(); // Undo the disable in the switch() above
