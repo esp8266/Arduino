@@ -84,7 +84,7 @@ public:
         begin(baud, config, mode, 1);
     }
 
-    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin, bool invert=false);
 
     void end();
 
