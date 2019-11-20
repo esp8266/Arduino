@@ -25,6 +25,7 @@
 #include <debug.h>
 #include <inttypes.h>
 #include "Print.h"
+#include <PolledTimeout.h>
 
 // compatibility macros for testing
 /*
@@ -107,6 +108,11 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
+#if 0
+// conflicting returned type: it is `int` in arduino's `Client::`
+// and `size_t` in esp8266 API (serial, FS), so holding this back for now because
+// changing every read()/write() `size_t` return type to `int` will be a breaking change
+
         // (Client::read() definitions moved here - HardwareSerial have them too)
         // read at most maxLen bytes:
         // returns effectively transfered bytes (can be less than maxLen)
@@ -114,11 +120,12 @@ class Stream: public Print {
         virtual size_t read(char* buffer, size_t maxLen);
         virtual size_t read(uint8_t* buffer, size_t maxLen) { return read((char*)buffer, maxLen); }
         // return data type: int
+#endif
 
         //////////////////// extensions: direct access to input buffer
         
-        // inform user or ::to() on effective implementation
-        virtual bool peekBufferAPI () { return false; }
+        // inform user or ::to() on effective buffered peek API implementation
+        virtual bool peekBufferAPI () const { return false; }
 
         // return number of byte accessible by peekBuffer()
         virtual size_t availableForPeek () { return 0; }
@@ -139,7 +146,7 @@ class Stream: public Print {
         // - maxLen==0 will transfer until input starvation or saturated output
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read (swallowed, not copied)
         size_t to (Print& to,
-                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = from.getTimeout(),
+                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires, /* ->getTimeout() */
                    size_t maxLen = 0,
                    int readUntilChar = -1);
 

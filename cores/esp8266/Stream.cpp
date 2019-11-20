@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 #include <Stream.h>
-#include <PolledTimeout.h>
+#include <assert.h>
 
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
@@ -261,25 +261,30 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
+#if 0
 size_t Stream::read (char* buffer, size_t maxLen)
 {
-    IAMSLOW("Stream::read(buffer,len)");
+    IAMSLOW();
 
     size_t nbread = 0;
     while (nbread < maxLen && available())
         buffer[nbread++] = read();
     return nbread;
 }
+#endif
 
 size_t Stream::to (Print& to,
-                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = from.getTimeout(),
-                   size_t maxLen = 0,
-                   int readUntilChar = -1)
+                   esp8266::polledTimeout::oneShotFastMs::timeType timeout,
+                   size_t maxLen,
+                   int readUntilChar)
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100);
     esp8266::polledTimeout::oneShotFastMs timedOut(timeout);
     size_t written = 0;
     size_t w;
+    
+    if (timeout == esp8266::polledTimeout::oneShotFastMs::neverExpires)
+        timeout = getTimeout();
 
     if (peekBufferAPI())
 
@@ -287,31 +292,30 @@ size_t Stream::to (Print& to,
 
         while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
         {
-            size_t r = availableForPeek();
-            if (w > r)
-                w = r;
+            if (maxLen)
+                w = std::min(w, maxLen - written);
+            w = std::min(w, availableForPeek());
             if (w)
             {
                 const char* directbuf = peekBuffer();
+                bool ignore = false;
                 if (readUntilChar >= 0)
                 {
-                    const char* last = memchr(directbuf, readUntilChar, w);
+                    const char* last = (const char*)memchr(directbuf, readUntilChar, w);
                     if (last)
                     {
-                        size_t remain = last - directbuf + 1;
-                        w = std::min(remain, w);
+                        w = std::min((size_t)(last - directbuf + 1), w);
+                        ignore = true;
                     }
                 }
-                if (maxlen && written + w > maxlen)
-                    w = maxlen - written;
-                if (w && ((w = to.write(directbuf, w)))
+                if (w && ((w = to.write(directbuf, w))))
                 {
-                    from.peekConsume(w);
+                    peekConsume(w + ignore);
                     written += w;
                     timedOut.reset();
                 }
             }
-            if (w == 0 && timedOut)
+            else if (timedOut)
                 break;
             if (yieldNow)
                 yield();
@@ -324,19 +328,20 @@ size_t Stream::to (Print& to,
 
         while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
         {
-            char c;
-            size_t r = read(&c, 1);
-            if (r)
+            int c = read();
+            if (c != -1)
             {
                 if (c == readUntilChar)
                     break;
-                w = to.write(&c, 1);
+                w = to.write(c);
                 assert(w);
                 written += 1;
                 timedOut.reset();
             }
             else if (timedOut)
                 break;
+            if (yieldNow)
+                yield();
         }
 
     else
@@ -346,8 +351,8 @@ size_t Stream::to (Print& to,
 
         while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
         {
-            w = std::min(w, available());
-            w = std::min(w, 64);
+            w = std::min(w, (size_t)available());
+            w = std::min(w, 64U);
             char temp[w];
             size_t r = read(temp, w);
             w = to.write(temp, r);
@@ -357,6 +362,8 @@ size_t Stream::to (Print& to,
                 timedOut.reset();
             else if (timedOut)
                 break;
+            if (yieldNow)
+                yield();
         }
 
     return written;

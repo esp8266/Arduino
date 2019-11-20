@@ -131,8 +131,8 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
-    // disallow optimization for streamMove/STREAM_MOVE
-    virtual const char* peekBuffer () { return nullptr; }
+    // disallow buffered peek API (for now)
+    virtual bool peekBufferAPI () const override { return false; }
 
     ////////////////////////////////////////////////////
     // AxTLS API deprecated warnings to help upgrading

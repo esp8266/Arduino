@@ -83,8 +83,8 @@ public:
     return loadCACert(file, file.size());
   }
 
-  // disallow optimization for streamMove/STREAM_MOVE
-  virtual const char* peekBuffer () { return nullptr; }
+  // disallow buffered peek API
+  virtual bool peekBufferAPI () const override { return false; }
 
 friend class WiFiServerSecure; // Needs access to custom constructor below
 protected:

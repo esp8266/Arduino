@@ -111,6 +111,11 @@ extern "C" {
 #endif
 
 void precache(void *f, uint32_t bytes);
+unsigned long millis(void);
+unsigned long micros(void);
+uint64_t micros64(void);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
 
 #ifdef __cplusplus
 }

@@ -424,6 +424,10 @@ uint8_t WiFiClient::getKeepAliveCount () const
     return _client->getKeepAliveCount();
 }
 
+bool WiFiClient::peekBufferAPI () const
+{
+    return true;
+}
 
 // return a pointer to available data buffer (size = availableForPeek())
 // semantic forbids any kind of read() before calling peekConsume()

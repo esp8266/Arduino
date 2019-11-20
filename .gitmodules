@@ -19,3 +19,9 @@
 [submodule "tools/esptool"]
 	path = tools/esptool
 	url = https://github.com/espressif/esptool.git
+[submodule "libraries/Ethernet"]
+	path = libraries/Ethernet
+	url = https://github.com/d-a-v/Ethernet.git
+[submodule "Ethernet"]
+	path = libraries/Ethernet
+	url = https://github.com/d-a-v/Ethernet.git

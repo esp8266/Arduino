@@ -131,7 +131,7 @@ public:
         return uart_peek_char(_uart);
     }
 
-    bool peekBufferAPI () override
+    virtual bool peekBufferAPI () const override
     {
         return true;
     }
@@ -161,11 +161,11 @@ public:
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
-    size_t read(char* buffer, size_t size) override
+    size_t read(char* buffer, size_t size) // should override, see Stream.h
     {
         return uart_read(_uart, buffer, size);
     }
-    size_t read(uint8_t* buffer, size_t size) override
+    size_t read(uint8_t* buffer, size_t size) // should override, see Stream.h
     {
         return uart_read(_uart, (char*)buffer, size);
     }

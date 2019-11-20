@@ -243,6 +243,11 @@ uart_peek_char(uart_t* uart)
 // return number of byte accessible by uart_peek_buffer()
 size_t uart_peek_available (uart_t* uart)
 {
+    // path for further optimization:
+    // - return already copied buffer pointer (= older data)
+    // - or return fifo when buffer is empty but then any move from fifo to
+    //   buffer should be blocked until peek_consume is called
+
     ETS_UART_INTR_DISABLE();
     uart_rx_copy_fifo_to_buffer_unsafe(uart);
     ETS_UART_INTR_ENABLE();
