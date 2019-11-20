@@ -23,6 +23,7 @@ extern "C" {
 }
 
 extern "C" uint32_t _FS_start;
+extern "C" uint32_t _FS_end;
 extern "C" uint32_t _SKETCH_AREA_end;
 
 
