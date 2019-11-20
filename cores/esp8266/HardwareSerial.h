@@ -131,6 +131,11 @@ public:
         return uart_peek_char(_uart);
     }
 
+    bool peekBufferAPI () override
+    {
+        return true;
+    }
+
     // return a pointer to available data buffer (size = available())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer () override

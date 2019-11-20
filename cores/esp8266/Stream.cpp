@@ -271,8 +271,93 @@ size_t Stream::read (char* buffer, size_t maxLen)
     return nbread;
 }
 
-size_t Stream::streamTo (Print& to, unsigned long timeout_ms, size_t maxLen, int readUntilChar)
+size_t Stream::to (Print& to,
+                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = from.getTimeout(),
+                   size_t maxLen = 0,
+                   int readUntilChar = -1)
 {
-    //return streamMove<Stream,Print>(*this, to, timeout_ms, maxLen, readUntilChar);
-    return streamMove(*this, to, timeout_ms, maxLen, readUntilChar);
+    esp8266::polledTimeout::periodicFastMs yieldNow(100);
+    esp8266::polledTimeout::oneShotFastMs timedOut(timeout);
+    size_t written = 0;
+    size_t w;
+
+    if (peekBufferAPI())
+
+        // peek-buffer API
+
+        while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
+        {
+            size_t r = availableForPeek();
+            if (w > r)
+                w = r;
+            if (w)
+            {
+                const char* directbuf = peekBuffer();
+                if (readUntilChar >= 0)
+                {
+                    const char* last = memchr(directbuf, readUntilChar, w);
+                    if (last)
+                    {
+                        size_t remain = last - directbuf + 1;
+                        w = std::min(remain, w);
+                    }
+                }
+                if (maxlen && written + w > maxlen)
+                    w = maxlen - written;
+                if (w && ((w = to.write(directbuf, w)))
+                {
+                    from.peekConsume(w);
+                    written += w;
+                    timedOut.reset();
+                }
+            }
+            if (w == 0 && timedOut)
+                break;
+            if (yieldNow)
+                yield();
+        }
+
+    else if (readUntilChar >= 0)
+
+        // regular Stream API
+        // no other choice than reading byte by byte
+
+        while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
+        {
+            char c;
+            size_t r = read(&c, 1);
+            if (r)
+            {
+                if (c == readUntilChar)
+                    break;
+                w = to.write(&c, 1);
+                assert(w);
+                written += 1;
+                timedOut.reset();
+            }
+            else if (timedOut)
+                break;
+        }
+
+    else
+    
+        // regular Stream API
+        // use an intermediary buffer
+
+        while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
+        {
+            w = std::min(w, available());
+            w = std::min(w, 64);
+            char temp[w];
+            size_t r = read(temp, w);
+            w = to.write(temp, r);
+            assert(r == w);
+            written += w;
+            if (w)
+                timedOut.reset();
+            else if (timedOut)
+                break;
+        }
+
+    return written;
 }
