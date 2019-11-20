@@ -100,14 +100,15 @@ static void esp_yield_within_cont() {
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void esp_yield() {
+extern "C" void __esp_yield() {
     if (can_yield()) {
         esp_yield_within_cont();
     }
 }
 
-extern "C" void esp_schedule() {
-    // always on CONT stack here
+extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
+
+extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
