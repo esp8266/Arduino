@@ -12,6 +12,7 @@
 #include <string.h>
 #include "flash.h"
 #include "eboot_command.h"
+#include "spi_vendors.h"
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
@@ -145,9 +146,49 @@ void main()
 
     if (cmd.action == ACTION_COPY_RAW) {
         ets_putc('c'); ets_putc('p'); ets_putc(':');
+
+#define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
+#define SPI0CLK ESP8266_REG(0x218)
+#define SPI0C   ESP8266_REG(0x208)
+
+        // save the flash access speed registers
+        uint32_t spi0clk = SPI0CLK;
+        uint32_t spi0c   = SPI0C;
+        
+        uint32_t vendor  = 0;//spi_flash_get_id() & 0x000000ff;
+        if (vendor == SPI_FLASH_VENDOR_XMC) {
+           uint32_t flashinfo=0;
+           if (SPIRead(0, &flashinfo, 4)) {
+              // failed to read the configured flash speed.
+              // Do not change anything,
+           } else {
+              // select an appropriate flash speed
+              // Register values are those used by ROM
+              switch ((flashinfo >> 24) & 0x0f) {
+                 case 0x0: // 40MHz, slow to 20
+                 case 0x1: // 26MHz, slow to 20
+                      SPI0CLK = 0x00003043;
+                      SPI0C   = 0x00EAA313;
+                      break;
+                 case 0x2: // 20MHz, no change
+                      break;
+                 case 0xf: // 80MHz, slow to 26
+                      SPI0CLK = 0x00002002;
+                      SPI0C   = 0x00EAA202;
+                      break;
+                 default:
+                      break;
+              }
+           }
+        }
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
         ets_wdt_enable();
+        
+        // restore the saved flash access speed registers
+        SPI0CLK = spi0clk;
+        SPI0C   = spi0c;
+        
         ets_putc('0'+res); ets_putc('\n');
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
