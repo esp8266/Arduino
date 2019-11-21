@@ -125,6 +125,10 @@ public:
   bool getSync() const;
   void setSync(bool sync);
 
+  // substitute for virtual int ::read(buf, len)
+  virtual int readNow (char* buffer, size_t len) override;
+
+  // peek buffer API is present
   virtual bool peekBufferAPI () const override;
 
   // return number of byte accessible by peekBuffer()

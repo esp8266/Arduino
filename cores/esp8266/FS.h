@@ -114,6 +114,11 @@ public:
     time_t getLastWrite();
     void setTimeCallback(time_t (*cb)(void));
 
+    // substitute for `virtual int ::read(buf, len)` in `Stream::`
+    virtual int readNow (char* buffer, size_t len) override {
+        return read((uint8_t*)buffer, len);
+    }
+
 protected:
     FileImplPtr _p;
 

@@ -136,6 +136,12 @@ public:
         return true;
     }
 
+    // substitute for virtual int ::read(buf, len)
+    virtual int readNow (char* buffer, size_t len) override
+    {
+        return HardwareSerial::read(buffer, len);
+    }
+
     // return a pointer to available data buffer (size = available())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer () override

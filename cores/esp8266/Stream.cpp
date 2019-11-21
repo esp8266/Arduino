@@ -262,7 +262,7 @@ String Stream::readStringUntil(char terminator) {
 }
 
 // read what can be read, immediate exit on unavailable data
-// prototype should be int `int Stream::read(char* buffer, size_t maxLen)` like Arduino `int Client::read(buf, len)`
+// prototype should be `int Stream::read(char* buffer, size_t maxLen)` like Arduino `int Client::read(buf, len)`
 int Stream::readNow (char* buffer, size_t maxLen)
 {
     IAMSLOW();
@@ -359,7 +359,7 @@ size_t Stream::to (Print& to,
             w = std::min(w, (size_t)available());
             w = std::min(w, 64U);
             char temp[w];
-            size_t r = read(temp, w);
+            size_t r = readNow(temp, w);
             w = to.write(temp, r);
             assert(r == w);
             written += w;

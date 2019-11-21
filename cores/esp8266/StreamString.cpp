@@ -66,3 +66,9 @@ int StreamString::peek() {
 void StreamString::flush() {
 }
 
+int StreamString::read (char* buffer, size_t len) /*should override*/ {
+    size_t l = std::min(len, length());
+    memcpy(buffer, String::buffer(), l);
+    remove(0, l);
+    return l;
+}

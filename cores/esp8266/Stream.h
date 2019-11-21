@@ -108,21 +108,21 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
-        // ::read(buf, len): conflicting returned type: it is `int` in arduino's `Client::`
-        // and `size_t` in esp8266 API (serial, FS), so holding this back for now because
+        // ::read(buf, len): conflicting returned type:
+        // - `int` in arduino's `Client::`
+        // - `size_t` in esp8266 API (serial, FS)
         // changing every read()/write() `size_t` return type to `int` will be a breaking change
-        // adding int ::readNow(buf, len) for now (following Client::read(buf, len))
+        // => adding int ::readNow(buf, len) for now (following official Client::read(buf, len))
         //
-        // (::read() definitions from Client:: moved here - HardwareSerial have them too)
-        // read at most maxLen bytes, returns effectively transfered bytes (can be less than maxLen)
+        // ::readNow(buf, len)
+        // read at most len bytes, returns effectively transfered bytes (can be less than len)
         // immediate return when no more data are available (no timeout)
-        virtual int readNow(char*    buffer, size_t maxLen);
-        virtual int readNow(uint8_t* buffer, size_t maxLen) { return read((char*)buffer, maxLen); }
-        // return data type: int
+        virtual int readNow(char* buffer, size_t len);
+        int readNow(uint8_t* buffer, size_t len) { return readNow((char*)buffer, len); }
 
         //////////////////// extensions: direct access to input buffer
         
-        // inform user or ::to() on effective buffered peek API implementation
+        // inform user and ::to() on effective buffered peek API implementation
         virtual bool peekBufferAPI () const { return false; }
 
         // return number of byte accessible by peekBuffer()
@@ -138,13 +138,13 @@ class Stream: public Print {
         //////////////////// extensions: Stream streams
 
         // Stream::to()
-        // transfer from Stream:: to Print:: at most maxlen bytes and return number of transfered bytes
-        // (uses 1-copy peekBuffer API when available, or transfer through a 2-copy local stack space)
+        // transfer from `Stream::` to `Print::` at most maxlen bytes and return number of transfered bytes
+        // (uses 1-copy peekBuffer API when available, or transfer through a 2-copies local stack space)
         // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - maxLen==0 will transfer until input starvation or saturated output
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read (swallowed, not copied)
         size_t to (Print& to,
-                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires, /* ->getTimeout() */
+                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires, /* =>getTimeout() */
                    size_t maxLen = 0,
                    int readUntilChar = -1);
 
