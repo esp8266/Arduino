@@ -31,7 +31,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
-#include <time.h>
+#include <../include/time.h> // See issue #6714
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>

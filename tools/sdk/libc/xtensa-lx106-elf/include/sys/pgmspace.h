@@ -23,7 +23,6 @@ extern "C" {
   // Ref: https://gcc.gnu.org/onlinedocs/gcc-3.2/gcc/Variable-Attributes.html
   // Place each progmem object into its own named section, avoiding conflicts
   #define PROGMEM __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
-  #define PROGMEM_PSTR "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\""
 #endif
 #ifndef PGM_P
   #define PGM_P              const char *
@@ -36,11 +35,8 @@ extern "C" {
 // 1.5 bytes/string, but in return memcpy_P and strcpy_P will work 4~8x faster
 #ifndef PSTR
     // Adapted from AVR-specific code at https://forum.arduino.cc/index.php?topic=194603.0
-    #define PSTR(str) (__extension__({ \
-        PGM_P ptr; \
-        asm volatile ( ".pushsection " PROGMEM_PSTR ", \"aSM\", @progbits, 1 \n .align 4 \n 0: .string " __STRINGIZE(str) "\n .popsection \n" ); \
-        asm volatile ( "movi %0, 0b" : "=r" (ptr) ); \
-        ptr; }))
+    // Uses C attribute section instead of ASM block to allow for C language string concatenation ("x" "y" === "xy")
+    #define PSTR(s) (__extension__({static const char __c[] __attribute__((__aligned__(4))) __attribute__((section( "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\", \"aSM\", @progbits, 1 #"))) = (s); &__c[0];}))
 #endif
 
 // Flash memory must be read using 32 bit aligned addresses else a processor
@@ -84,6 +80,14 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
   return (uint16_t) res;    /* This masks the lower half-word from the returned word */
 }
 
+/* Can't legally cast bits of uint32_t to a float w/o conversion or std::memcpy, which is inefficient. */
+/* The ASM block doesn't care the type, so just pass in what C thinks is a float and return in custom fcn. */
+static inline float pgm_read_float_unaligned(const void *addr) {
+  register float res;
+  pgm_read_with_offset(addr, res);
+  return res;
+}
+
 #define pgm_read_byte(addr)                pgm_read_byte_inlined(addr)
 #define pgm_read_word_aligned(addr)        pgm_read_word_inlined(addr)
 #ifdef __cplusplus
@@ -102,7 +106,6 @@ static inline uint32_t pgm_read_dword_unaligned(const void *addr) {
   return res;
 }
 
-#define pgm_read_float_unaligned(addr) ((float)pgm_read_dword_unaligned(addr))
 #define pgm_read_ptr_unaligned(addr)   ((void*)pgm_read_dword_unaligned(addr))
 #define pgm_read_word_unaligned(addr)  ((uint16_t)(pgm_read_dword_unaligned(addr) & 0xffff))
 

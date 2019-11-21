@@ -129,10 +129,9 @@ String::~String() {
 // /*********************************************/
 
 inline void String::init(void) {
-    setSSO(false);
-    setCapacity(0);
+    setSSO(true);
     setLen(0);
-    setBuffer(nullptr);
+    wbuffer()[0] = 0;
 }
 
 void String::invalidate(void) {
@@ -332,6 +331,7 @@ unsigned char String::concat(const char *cstr, unsigned int length) {
         return 0;
     memmove_P(wbuffer() + len(), cstr, length + 1);
     setLen(newlen);
+    wbuffer()[newlen] = 0;
     return 1;
 }
 

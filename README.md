@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.6.1/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -16,7 +16,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version-basic-instructions)
+  - [Using git version](#using-git-version)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -36,37 +36,15 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.2/](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.6.1/](https://arduino-esp8266.readthedocs.io/en/2.6.1/)
 
-### Using git version (basic instructions)
+### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
+Also known as latest git or master branch.
+
 - Install the current upstream Arduino IDE at the 1.8 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
-- Go to Arduino directory
-  - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
-    This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
-    ```bash
-    cd <application-directory>/Arduino.app/Contents/Java
-    ```
-  - For Linux, it is ~/Arduino by default.
-    ```bash
-    cd ~/Arduino
-    ```
-- Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
-```bash
-cd hardware
-mkdir esp8266com
-cd esp8266com
-git clone https://github.com/esp8266/Arduino.git esp8266
-cd esp8266
-git submodule update --init
-```
-- Download binary tools (you need Python 2.7)
-```bash
-cd esp8266/tools
-python get.py
-```
-- Restart Arduino
+- Follow the [instructions in the documentation](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
 
 ### Using PlatformIO
 
@@ -145,3 +123,13 @@ ESP8266 core files are licensed under LGPL.
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 
 [LittleFS](https://github.com/ARMmbed/littlefs) library written by ARM Limited and released under the [BSD 3-clause license](https://github.com/ARMmbed/littlefs/blob/master/LICENSE.md).
+
+### Other useful links ###
+
+[Toolchain repo](https://github.com/earlephilhower/esp-quick-toolchain)
+
+[Lwip link layer repo](https://github.com/d-a-v/esp82xx-nonos-linklayer)
+
+[SoftwareSerial repo](https://github.com/plerup/espsoftwareserial)
+
+[Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).

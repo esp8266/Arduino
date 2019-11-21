@@ -147,8 +147,8 @@ public:
  * Since both begin() functions take a reference to client as a parameter, you need to 
  * ensure the client object lives the entire time of the HTTPClient
  */
-    bool begin(WiFiClient &client, String url);
-    bool begin(WiFiClient &client, String host, uint16_t port, String uri = "/", bool https = false);
+    bool begin(WiFiClient &client, const String& url);
+    bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
 #if HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
@@ -175,20 +175,20 @@ public:
     void setTimeout(uint16_t timeout);
     void setFollowRedirects(bool follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
-    bool setURL(String url); // handy for handling redirects
+    bool setURL(const String& url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
     /// request handling
     int GET();
-    int POST(uint8_t * payload, size_t size);
-    int POST(String payload);
-    int PUT(uint8_t * payload, size_t size);
-    int PUT(String payload);
-    int PATCH(uint8_t * payload, size_t size);
-    int PATCH(String payload);
-    int sendRequest(const char * type, String payload);
-    int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-    int sendRequest(const char * type, Stream * stream, size_t size = 0);
+    int POST(const uint8_t* payload, size_t size);
+    int POST(const String& payload);
+    int PUT(const uint8_t* payload, size_t size);
+    int PUT(const String& payload);
+    int PATCH(const uint8_t* payload, size_t size);
+    int PATCH(const String& payload);
+    int sendRequest(const char* type, const String& payload);
+    int sendRequest(const char* type, const uint8_t* payload = NULL, size_t size = 0);
+    int sendRequest(const char* type, Stream * stream, size_t size = 0);
 
     void addHeader(const String& name, const String& value, bool first = false, bool replace = true);
 
@@ -216,7 +216,7 @@ protected:
         String value;
     };
 
-    bool beginInternal(String url, const char* expectedProtocol);
+    bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
     int returnError(int error);
@@ -242,7 +242,7 @@ protected:
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent = "ESP8266HTTPClient";
+    String _userAgent;
     String _base64Authorization;
 
     /// Response handling

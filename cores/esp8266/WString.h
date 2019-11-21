@@ -53,7 +53,7 @@ class String {
         // if the initial value is null or invalid, or if memory allocation
         // fails, the string will be marked as invalid (i.e. "if (s)" will
         // be false).
-        String(const char *cstr = "");
+        String(const char *cstr = nullptr);
         String(const String &str);
         String(const __FlashStringHelper *str);
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -116,6 +116,7 @@ class String {
         unsigned char concat(float num);
         unsigned char concat(double num);
         unsigned char concat(const __FlashStringHelper * str);
+        unsigned char concat(const char *cstr, unsigned int length);
 
         // if there's not enough memory for the concatenated value, the string
         // will be left unchanged (but this isn't signalled in any way)
@@ -202,8 +203,20 @@ class String {
         unsigned char equalsIgnoreCase(const String &s) const;
         unsigned char equalsConstantTime(const String &s) const;
         unsigned char startsWith(const String &prefix) const;
+        unsigned char startsWith(const char * prefix) const {
+            return this->startsWith(String(prefix));
+        }
+        unsigned char startsWith(const __FlashStringHelper * prefix) const {
+            return this->startsWith(String(prefix));
+        }
         unsigned char startsWith(const String &prefix, unsigned int offset) const;
         unsigned char endsWith(const String &suffix) const;
+        unsigned char endsWith(const char * suffix) const {
+            return this->endsWith(String(suffix));
+        }
+        unsigned char endsWith(const __FlashStringHelper * suffix) const {
+            return this->endsWith(String(suffix));
+        }
 
         // character access
         char charAt(unsigned int index) const;
@@ -238,6 +251,21 @@ class String {
         // modification
         void replace(char find, char replace);
         void replace(const String& find, const String& replace);
+        void replace(const char * find, const String& replace) {
+            this->replace(String(find), replace);
+        }
+        void replace(const __FlashStringHelper * find, const String& replace) {
+            this->replace(String(find), replace);
+        }
+        void replace(const char * find, const char * replace) {
+            this->replace(String(find), String(replace));
+        }
+        void replace(const __FlashStringHelper * find, const char * replace) {
+            this->replace(String(find), String(replace));
+        }
+        void replace(const __FlashStringHelper * find, const __FlashStringHelper * replace) {
+            this->replace(String(find), String(replace));
+        }
         void remove(unsigned int index);
         void remove(unsigned int index, unsigned int count);
         void toLowerCase(void);
@@ -284,7 +312,6 @@ class String {
         void init(void);
         void invalidate(void);
         unsigned char changeBuffer(unsigned int maxStrLen);
-        unsigned char concat(const char *cstr, unsigned int length);
 
         // copy and move
         String & copy(const char *cstr, unsigned int length);

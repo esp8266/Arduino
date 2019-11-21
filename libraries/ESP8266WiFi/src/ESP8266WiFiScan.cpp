@@ -98,7 +98,7 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
             return WIFI_SCAN_RUNNING;
         }
 
-        esp_yield();
+        esp_yield(); // will resume when _scanDone fires
         return ESP8266WiFiScanClass::_scanCount;
     } else {
         return WIFI_SCAN_FAILED;
@@ -323,7 +323,7 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
     ESP8266WiFiScanClass::_scanComplete = true;
 
     if(!ESP8266WiFiScanClass::_scanAsync) {
-        esp_schedule();
+        esp_schedule(); // resume scanNetworks
     } else if (ESP8266WiFiScanClass::_onComplete) {
         ESP8266WiFiScanClass::_onComplete(ESP8266WiFiScanClass::_scanCount);
         ESP8266WiFiScanClass::_onComplete = nullptr;
