@@ -50,7 +50,7 @@ class Client: public Stream {
 
         // substitute for `virtual int ::read(buf, len)` in `Stream::`
         virtual int readNow (char* buffer, size_t len) override {
-            return read(buf, len);
+            return read((uint8_t*)buffer, len);
         }
 };
 

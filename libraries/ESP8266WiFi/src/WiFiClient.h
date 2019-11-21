@@ -126,7 +126,9 @@ public:
   void setSync(bool sync);
 
   // substitute for virtual int ::read(buf, len)
-  virtual int readNow (char* buffer, size_t len) override;
+  virtual int readNow (char* buffer, size_t len) override {
+    return WiFiClient::read(buffer, len);
+  }
 
   // peek buffer API is present
   virtual bool peekBufferAPI () const override;

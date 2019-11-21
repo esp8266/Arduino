@@ -437,7 +437,7 @@ public:
     {
         if (!_rx_buf)
             return 0;
-        return _rx_buf->tot_len - _rx_buf_offset;
+        return _rx_buf->len - _rx_buf_offset;
     }
 
     // consume bytes after use (see peekBuffer)
@@ -575,8 +575,6 @@ protected:
 
     void _consume(size_t size)
     {
-        if(_pcb)
-            tcp_recved(_pcb, size);
         ptrdiff_t left = _rx_buf->len - _rx_buf_offset - size;
         if(left > 0) {
             _rx_buf_offset += size;
@@ -593,6 +591,8 @@ protected:
             pbuf_ref(_rx_buf);
             pbuf_free(head);
         }
+        if(_pcb)
+            tcp_recved(_pcb, size);
     }
 
     err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
