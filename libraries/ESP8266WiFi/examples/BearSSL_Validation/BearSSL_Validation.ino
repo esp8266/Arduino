@@ -82,8 +82,8 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
   }
   client->stop();
   uint32_t freeStackEnd = ESP.getFreeContStack();
-  Serial.printf("\nCONT stack used: %d\n-------\n\n", freeStackStart - freeStackEnd);
-  Serial.printf("\nBSSL stack used: %d\n-------\n\n", stack_thunk_get_max_usage());
+  Serial.printf("\nCONT stack used: %d\n", freeStackStart - freeStackEnd);
+  Serial.printf("BSSL stack used: %d\n-------\n\n", stack_thunk_get_max_usage());
 }
 
 void fetchNoConfig() {
