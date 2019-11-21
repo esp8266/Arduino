@@ -551,7 +551,6 @@ bool HTTPClient::setURL(const String& url)
     }
     // disconnect but preserve _client
     disconnect(true);
-    clear();
     return beginInternal(url, nullptr);
 }
 

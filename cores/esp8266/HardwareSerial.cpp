@@ -36,10 +36,10 @@ HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr), _rx_size(256)
 {}
 
-void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
+void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin, bool invert)
 {
     end();
-    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
+    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size, invert);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
     if (static_cast<void*>(this) == static_cast<void*>(&DEBUG_ESP_PORT))
     {
