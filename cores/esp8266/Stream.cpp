@@ -261,17 +261,22 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
-#if 0
-size_t Stream::read (char* buffer, size_t maxLen)
+// read what can be read, immediate exit on unavailable data
+// prototype should be int `int Stream::read(char* buffer, size_t maxLen)` like Arduino `int Client::read(buf, len)`
+int Stream::readNow (char* buffer, size_t maxLen)
 {
     IAMSLOW();
 
     size_t nbread = 0;
     while (nbread < maxLen && available())
+    {
+        int c = read();
+        if (c == -1)
+            break;
         buffer[nbread++] = read();
+    }
     return nbread;
 }
-#endif
 
 size_t Stream::to (Print& to,
                    esp8266::polledTimeout::oneShotFastMs::timeType timeout,
