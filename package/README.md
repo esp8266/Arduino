@@ -120,7 +120,9 @@ The following points assume work in a direct clone of the repository, and not in
    git tag -a -m "Release 3.0.0" 3.0.0
    ```
 
-   then push the tag created in step 3 to esp8266/Arduino Github repository:
+   navigate to [Travis CI options](https://travis-ci.org/esp8266/Arduino/settings), enable `Build pushed branches`,
+
+   then push the tag created above to esp8266/Arduino Github repository:
 
    ```
    git push origin 3.0.0
@@ -132,7 +134,9 @@ The following points assume work in a direct clone of the repository, and not in
 
     * Release must be deleted: github > releases > edit x.y.z > remove all files > delete button appears
 
-5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds. 
+5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds,
+
+   return to the Travis CI options and disable `Build pushed branches`.
 
 6. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
