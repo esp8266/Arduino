@@ -124,7 +124,28 @@ int copy_raw(const uint32_t src_addr,
     return 0;
 }
 
+#define XMC_SUPPORT
+#ifdef XMC_SUPPORT
+// Define a few SPI0 registers we need access to
+#define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
+#define SPI0CMD ESP8266_REG(0x200)
+#define SPI0CLK ESP8266_REG(0x218)
+#define SPI0C   ESP8266_REG(0x208)
+#define SPI0W0  ESP8266_REG(0x240)
 
+#define SPICMDRDID (1 << 28)
+
+/* spi_flash_get_id()
+   Returns the flash chip ID - same as the SDK function.
+   We need our own version as the SDK isn't available here.
+ */
+uint32_t __attribute__((noinline)) spi_flash_get_id() {
+  SPI0W0=0;
+  SPI0CMD=SPICMDRDID;
+  while (SPI0CMD) {}
+  return SPI0W0;
+}
+#endif // XMC_SUPPORT
 
 void main()
 {
@@ -148,15 +169,12 @@ void main()
     if (cmd.action == ACTION_COPY_RAW) {
         ets_putc('c'); ets_putc('p'); ets_putc(':');
 
-#define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
-#define SPI0CLK ESP8266_REG(0x218)
-#define SPI0C   ESP8266_REG(0x208)
-
+#ifdef XMC_SUPPORT
         // save the flash access speed registers
         uint32_t spi0clk = SPI0CLK;
         uint32_t spi0c   = SPI0C;
         
-        uint32_t vendor  = 0;//spi_flash_get_id() & 0x000000ff;
+        uint32_t vendor  = spi_flash_get_id() & 0x000000ff;
         if (vendor == SPI_FLASH_VENDOR_XMC) {
            uint32_t flashinfo=0;
            if (SPIRead(0, &flashinfo, 4)) {
@@ -182,14 +200,16 @@ void main()
               }
            }
         }
+#endif // XMC_SUPPORT
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
         ets_wdt_enable();
         
+#ifdef XMC_SUPPORT
         // restore the saved flash access speed registers
         SPI0CLK = spi0clk;
         SPI0C   = spi0c;
-        
+#endif        
         ets_putc('0'+res); ets_putc('\n');
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
