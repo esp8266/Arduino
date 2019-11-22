@@ -610,7 +610,7 @@ uart_get_baudrate(uart_t* uart)
 }
 
 uart_t*
-uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
 {
     uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
     if(uart == NULL)
@@ -690,6 +690,10 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
     }
 
     uart_set_baudrate(uart, baudrate);
+    if(uart->uart_nr == UART0 && invert)
+    {
+        config |= BIT(UCDTRI) | BIT(UCRTSI) | BIT(UCTXI) | BIT(UCDSRI) | BIT(UCCTSI) | BIT(UCRXI);
+    }
     USC0(uart->uart_nr) = config;
 
     if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
