@@ -3,7 +3,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <FS.h>
+#include <LittleFS.h>
 
 #define FILE "/randfile"
 #define URL "http://127.0.0.1:9080/edit"
@@ -24,10 +24,10 @@ void setup() {
         delay(250);
     }
 
-    if (!SPIFFS.begin())
-        Serial.println("CLIENT: failed to start SPIFFS!");
+    if (!LittleFS.begin())
+        Serial.println("CLIENT: failed to start LittleFS!");
 
-    auto f = SPIFFS.open(FILE, "r");
+    auto f = LittleFS.open(FILE, "r");
     const auto f_size = f.size();
     Serial.printf("CLIENT: size to upload: %d\n", (int)f_size);
 
