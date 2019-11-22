@@ -48,27 +48,18 @@ void setup() {
     client.println("Content-Type: application/octet-stream");
     client.println("");
 
-
-    Serial.printf("\r\n\r\n");
-    Serial.printf("\r\n\r\n##########################\r\n");
-
-
-#define TESTSTREAM 0
-
-printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\r\n");
+#define TESTSTREAM 1
 
     auto A = millis();
     Serial.printf("\r\n\r\nCLIENT: ----> upload duration: %lums  sent: %d\r\n\r\n",
         millis() - A,
 #if TESTSTREAM
-        (int)f.streamTo(client, 0)
+        (int)f.to(client, 0)
 #else
         (int)client.write(f)
 #endif
         );
     A = millis() - A;
-
-printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\r\n");
 
     Serial.println("CLIENT waiting for server ack...");
     client.println("\r\n--glark--");
@@ -78,7 +69,7 @@ printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\
     Serial.println("@@@@@@@@@@@@@ CLIENT: server response:");
 #if TESTSTREAM
     client.setTimeout(10000);
-    client.streamTo(Serial, 0);
+    client.to(Serial, 0);
 #else
     while (client.available())
         Serial.write(client.read());
