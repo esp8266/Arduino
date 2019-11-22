@@ -208,7 +208,7 @@ uint32_t EspClass::getFlashChipSize(void)
 
 String EspClass::getFullVersion ()
 {
-	return "host-emulation";
+	return "emulation-on-host";
 }
 
 uint32_t EspClass::getFreeContStack()
