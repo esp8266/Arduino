@@ -129,13 +129,14 @@ int copy_raw(const uint32_t src_addr,
 void main()
 {
     int res = 9;
+    bool clear_cmd = false;
     struct eboot_command cmd;
     
     print_version(0);
 
     if (eboot_command_read(&cmd) == 0) {
         // valid command was passed via RTC_MEM
-        eboot_command_clear();
+        clear_cmd = true;
         ets_putc('@');
     } else {
         // no valid command found
@@ -194,6 +195,10 @@ void main()
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
         }
+    }
+
+    if (clear_cmd) {
+        eboot_command_clear();
     }
 
     if (cmd.action == ACTION_LOAD_APP) {
