@@ -23,7 +23,7 @@ static const char serverIndex[] PROGMEM =
          Firmware:<br>
          <input type='file' accept='.bin' name='firmware'>
          <input type='submit' value='Update Firmware'>
-     </form>     
+     </form>
      <form method='POST' action='' enctype='multipart/form-data'>
          FileSystem:<br>
          <input type='file' accept='.bin' name='filesystem'>
@@ -70,7 +70,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
           Serial.printf("Unauthenticated Update\n");
         return;
       }
-	  });
+    });
 	
     // handler for the /update form POST (once file upload finishes)
     _server->on(path.c_str(), HTTP_POST, [&](){
