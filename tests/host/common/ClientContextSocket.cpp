@@ -179,7 +179,7 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 #endif
 			if (ret == -1)
 			{
-				fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
+				fprintf(stderr, MOCK "ClientContext::write/send(%d): %s\n", sock, strerror(errno));
 				return -1;
 			}
 			sent += ret;
@@ -187,6 +187,8 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 				fprintf(stderr, MOCK "ClientContext::write: sent %d bytes (%zd / %zd)\n", ret, sent, size);
 		}
 	}
+#ifdef DEBUG_ESP_WIFI
 	fprintf(stderr, MOCK "ClientContext::write: total sent %zd bytes\n", sent);
+#endif
 	return sent;
 }

@@ -361,8 +361,8 @@ size_t Stream::to (Print& to,
             char temp[w];
             size_t r = readNow(temp, w);
             w = to.write(temp, r);
-            assert(r == w);
             written += w;
+            assert(r == w);
             if (w)
                 timedOut.reset();
             else if (timedOut)

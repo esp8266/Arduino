@@ -323,10 +323,7 @@ public:
     void peekConsume (size_t consume)
     {
         assert(consume <= _inbufsize);
-        size_t move = consume;
-        if (consume + move > sizeof _inbuf)
-            move = sizeof _inbuf - consume;
-        memmove(_inbuf, _inbuf + consume, move);
+        memmove(_inbuf, _inbuf + consume, _inbufsize - consume);
         _inbufsize -= consume;
     }
 

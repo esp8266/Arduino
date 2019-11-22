@@ -85,6 +85,9 @@ typedef uint32_t uint32;
 //
 
 #include <c_types.h>
+#include <core_esp8266_features.h>
+
+inline uint32_t esp_get_cycle_count() { return millis(); }
 
 #include <Arduino.h>
 
@@ -105,7 +108,7 @@ typedef uint32_t uint32;
 extern "C" {
 #endif
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
-#define os_printf_plus printf
+#define os_printf_plus ets_printf
 
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 

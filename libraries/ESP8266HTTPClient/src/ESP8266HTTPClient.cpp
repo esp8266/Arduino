@@ -760,7 +760,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     size_t transferred = 0;
 
     while (connected() && transferred < size)
-        transferred += streamMove(*stream, *_client, stream->getTimeout(), size - transferred);
+        transferred += stream->to(*_client, stream->getTimeout(), size - transferred);
 
     if (transferred < size)
     {
