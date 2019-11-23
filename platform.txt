@@ -46,11 +46,17 @@ build.led=
 build.sdk=NONOSDK22x_191024
 #build.sdk=NONOSDK22x_191105
 
+# These are not overriden when FS is not configured
+build.eeprom_start=
+build.spiffs_start=
+build.spiffs_end=
+build.spiffs_blocksize=
+
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core" -D_EEPROM_START={build.eeprom_start} -D_FS_START={build.spiffs_start} -D_FS_END={build.spiffs_end} -D_FS_BLOCKSIZE={build.spiffs_blocksize} -D_FS_PAGE=0x100
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c {compiler.warning_flags} -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags}
