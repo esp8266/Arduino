@@ -11,6 +11,7 @@
 #include <lwip/netif.h>
 #include <lwip/etharp.h>
 #include <lwip/dhcp.h>
+#include <lwip/apps/sntp.h>
 
 #include <user_interface.h>	// wifi_get_macaddr()
 
@@ -254,10 +255,14 @@ err_t LwipIntfDev<RawDev>::netif_init ()
 template <class RawDev>
 void LwipIntfDev<RawDev>::netif_status_callback ()
 {
-    //XXX is it wise ?
-    if (_default && connected())
-        netif_set_default(&_netif);
-    else if (netif_default == &_netif && !connected())
+    if (connected())
+    {
+        if (_default)
+            netif_set_default(&_netif);
+        sntp_stop();
+        sntp_init();
+    }
+    else if (netif_default == &_netif)
         netif_set_default(nullptr);
 }
 

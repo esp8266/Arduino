@@ -70,10 +70,6 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         IPAddress gatewayIP();
         IPAddress dnsIP(uint8_t dns_no = 0);
 
-        String hostname();
-        bool hostname(const String& aHostname) { return hostname(aHostname.c_str()); }
-        bool hostname(const char* aHostname);
-
         // STA WiFi info
         wl_status_t status();
         String SSID() const;

@@ -23,6 +23,10 @@ public:
     bool ipAddressReorder (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
                            IPAddress& gateway, IPAddress& netmask, IPAddress& dns1);
 
+    String hostname();
+    bool hostname(const String& aHostname) { return hostname(aHostname.c_str()); }
+    bool hostname(const char* aHostname);
+
 };
 
 #endif // _LWIPINTF_H
