@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 extern "C" {
-#include "include/wl_definitions.h"
+#include <wl_definitions.h>
 }
 
 #include "IPAddress.h"
