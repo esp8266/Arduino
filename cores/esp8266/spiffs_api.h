@@ -35,7 +35,7 @@ extern "C" {
 };
 #include "debug.h"
 #include "flash_utils.h"
-#include "flash_hal.h"
+#include <flash_hal.h>
 
 using namespace fs;
 

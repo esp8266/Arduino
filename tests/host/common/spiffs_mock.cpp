@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "flash_hal_mock.h"
+#include <flash_hal.h>
 
 #define SPIFFS_FILE_NAME "spiffs.bin"
 
