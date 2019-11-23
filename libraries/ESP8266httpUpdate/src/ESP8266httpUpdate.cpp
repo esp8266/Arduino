@@ -292,7 +292,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
     if(code <= 0) {
         DEBUG_HTTP_UPDATE("[httpUpdate] HTTP error: %s\n", http.errorToString(code).c_str());
-        _lastError = code;
+        _setLastError(code);
         http.end();
         return HTTP_UPDATE_FAILED;
     }
@@ -332,10 +332,14 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                 }
             }
 
-            if(!startUpdate) {
-                _lastError = HTTP_UE_TOO_LESS_SPACE;
+            if (!startUpdate) {
+                _setLastError(HTTP_UE_TOO_LESS_SPACE);
                 ret = HTTP_UPDATE_FAILED;
             } else {
+                // Warn main app we're starting up...
+                if (_cbStart) {
+                    _cbStart();
+                }
 
                 WiFiClient * tcp = http.getStreamPtr();
 
@@ -358,7 +362,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     uint8_t buf[4];
                     if(tcp->peekBytes(&buf[0], 4) != 4) {
                         DEBUG_HTTP_UPDATE("[httpUpdate] peekBytes magic header failed\n");
-                        _lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
+                        _setLastError(HTTP_UE_BIN_VERIFY_HEADER_FAILED);
                         http.end();
                         return HTTP_UPDATE_FAILED;
                     }
@@ -366,7 +370,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     // check for valid first magic byte
                     if(buf[0] != 0xE9) {
                         DEBUG_HTTP_UPDATE("[httpUpdate] Magic header does not start with 0xE9\n");
-                        _lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
+                        _setLastError(HTTP_UE_BIN_VERIFY_HEADER_FAILED);
                         http.end();
                         return HTTP_UPDATE_FAILED;
 
@@ -380,7 +384,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     // check if new bin fits to SPI flash
                     if(bin_flash_size > ESP.getFlashChipRealSize()) {
                         DEBUG_HTTP_UPDATE("[httpUpdate] New binary does not fit SPI Flash size\n");
-                        _lastError = HTTP_UE_BIN_FOR_WRONG_FLASH;
+                        _setLastError(HTTP_UE_BIN_FOR_WRONG_FLASH);
                         http.end();
                         return HTTP_UPDATE_FAILED;
                     }
@@ -390,6 +394,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     ret = HTTP_UPDATE_OK;
                     DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
                     http.end();
+                    // Warn main app we're all done
+                    if (_cbEnd) {
+                        _cbEnd();
+                    }
 
 #ifdef ATOMIC_FS_UPDATE
                     if(_rebootOnUpdate) {
@@ -405,7 +413,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                 }
             }
         } else {
-            _lastError = HTTP_UE_SERVER_NOT_REPORT_SIZE;
+            _setLastError(HTTP_UE_SERVER_NOT_REPORT_SIZE);
             ret = HTTP_UPDATE_FAILED;
             DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length was 0 or wasn't set by Server?!\n");
         }
@@ -415,15 +423,15 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         ret = HTTP_UPDATE_NO_UPDATES;
         break;
     case HTTP_CODE_NOT_FOUND:
-        _lastError = HTTP_UE_SERVER_FILE_NOT_FOUND;
+        _setLastError(HTTP_UE_SERVER_FILE_NOT_FOUND);
         ret = HTTP_UPDATE_FAILED;
         break;
     case HTTP_CODE_FORBIDDEN:
-        _lastError = HTTP_UE_SERVER_FORBIDDEN;
+        _setLastError(HTTP_UE_SERVER_FORBIDDEN);
         ret = HTTP_UPDATE_FAILED;
         break;
     default:
-        _lastError = HTTP_UE_SERVER_WRONG_HTTP_CODE;
+        _setLastError(HTTP_UE_SERVER_WRONG_HTTP_CODE);
         ret = HTTP_UPDATE_FAILED;
         DEBUG_HTTP_UPDATE("[httpUpdate] HTTP Code is (%d)\n", code);
         //http.writeToStream(&Serial1);
@@ -441,37 +449,49 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
  * @param md5 String
  * @return true if Update ok
  */
-bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int command)
+bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, const String& md5, int command)
 {
 
     StreamString error;
 
+    if (_cbProgress) {
+        Update.onProgress(_cbProgress);
+    }
+
     if(!Update.begin(size, command, _ledPin, _ledOn)) {
-        _lastError = Update.getError();
+        _setLastError(Update.getError());
         Update.printError(error);
         error.trim(); // remove line ending
         DEBUG_HTTP_UPDATE("[httpUpdate] Update.begin failed! (%s)\n", error.c_str());
         return false;
     }
 
+    if (_cbProgress) {
+        _cbProgress(0, size);
+    }
+
     if(md5.length()) {
         if(!Update.setMD5(md5.c_str())) {
-            _lastError = HTTP_UE_SERVER_FAULTY_MD5;
+            _setLastError(HTTP_UE_SERVER_FAULTY_MD5);
             DEBUG_HTTP_UPDATE("[httpUpdate] Update.setMD5 failed! (%s)\n", md5.c_str());
             return false;
         }
     }
 
     if(Update.writeStream(in) != size) {
-        _lastError = Update.getError();
+        _setLastError(Update.getError());
         Update.printError(error);
         error.trim(); // remove line ending
         DEBUG_HTTP_UPDATE("[httpUpdate] Update.writeStream failed! (%s)\n", error.c_str());
         return false;
     }
 
+    if (_cbProgress) {
+        _cbProgress(size, size);
+    }
+
     if(!Update.end()) {
-        _lastError = Update.getError();
+        _setLastError(Update.getError());
         Update.printError(error);
         error.trim(); // remove line ending
         DEBUG_HTTP_UPDATE("[httpUpdate] Update.end failed! (%s)\n", error.c_str());
