@@ -264,11 +264,6 @@ uint8_t EspClass::getBootMode(void)
     return system_get_boot_mode();
 }
 
-uint8_t EspClass::getCpuFreqMHz(void)
-{
-    return system_get_cpu_freq();
-}
-
 
 uint32_t EspClass::getFlashChipId(void)
 {
