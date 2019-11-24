@@ -372,12 +372,12 @@ generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
 generic.menu.led.16=16
 generic.menu.led.16.build.led=-DLED_BUILTIN=16
-generic.menu.sdk.nonosdk_191024=nonos-sdk 2.2.1+111 (191024)
-generic.menu.sdk.nonosdk_191024.build.sdk=NONOSDK22x_191024
-generic.menu.sdk.nonosdk_191105=nonos-sdk 2.2.1+113 (191105)
-generic.menu.sdk.nonosdk_191105.build.sdk=NONOSDK22x_191105
 generic.menu.sdk.nonosdk_190703=nonos-sdk 2.2.1+100 (190703)
 generic.menu.sdk.nonosdk_190703.build.sdk=NONOSDK22x_190703
+generic.menu.sdk.nonosdk_191105=nonos-sdk 2.2.1+113 (191105)
+generic.menu.sdk.nonosdk_191105.build.sdk=NONOSDK22x_191105
+generic.menu.sdk.nonosdk_191024=nonos-sdk 2.2.1+111 (191024)
+generic.menu.sdk.nonosdk_191024.build.sdk=NONOSDK22x_191024
 generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
 generic.menu.sdk.nonosdk221.build.sdk=NONOSDK221
 generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (180626 known issues)
