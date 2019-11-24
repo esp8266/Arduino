@@ -26,6 +26,8 @@
 #include <IPAddress.h>
 #include <StreamString.h>
 #include "NetdumpIP.h"
+#include "PacketType.h"
+#include <vector>
 
 namespace NetCapture
 {
@@ -37,7 +39,9 @@ class Packet
 public:
     Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
         : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
-    {};
+    {
+    	setPacketTypes();
+    };
 
     Packet() {};
 
@@ -48,37 +52,7 @@ public:
         CHARS
     };
 
-    enum class PacketType
-	{
-    	ARP,
-		IP,
-		UDP,
-		MDNS,
-		DNS,
-		SSDP,
-		DHCP,
-		WSDD,
-		NETBIOS,
-		SMB,
-		OTA,
-		TCP,
-		HTTP,
-		ICMP,
-		IGMP,
-		UKNW,
-	};
-
-    static constexpr char* packetTypeArray[] = {"ARP ","IP  ","UDP ","MDNS","DNS ",
-                                                "SSDP","DHCP","WSDD","NBIO", "SMB ","OTA ","TCP ",
-                                                "HTTP","ICMP","IGMP","UKNW"};
-
-    const char* packetTypeString (PacketType pt) const
-    {
-    	return packetTypeArray[static_cast<int>(pt)];
-    }
-    PacketType packetType() const;
-
-    const char* rawData() const
+     const char* rawData() const
     {
     	return data;
     }
@@ -250,12 +224,12 @@ public:
     }
     NetdumpIP getIP(uint16_t idx) const
     {
-        return isIPv4() ? NetdumpIP(data[idx], data[idx + 1], data[idx + 2], data[idx + 3]) : NetdumpIP();
+        return NetdumpIP(data[idx], data[idx + 1], data[idx + 2], data[idx + 3]);
     };
 
     NetdumpIP getIP6(uint16_t idx) const
     {
-        return isIPv6() ? NetdumpIP((const uint8_t*)&data[idx], false) : NetdumpIP();
+        return NetdumpIP((const uint8_t*)&data[idx], false);
     };
     NetdumpIP sourceIP() const
     {
@@ -302,16 +276,25 @@ public:
         return (isIP() && ((getSrcPort() == p) || (getDstPort() == p)));
     }
 
-    String toString(PacketDetail netdumpDetail = PacketDetail::NONE) const;
+    const String toString(PacketDetail netdumpDetail = PacketDetail::NONE) const;
     void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
+    const PacketType packetType() const;
+    const std::vector<PacketType> allPacketTypes() const;
+
+
 private:
+
+    void setPacketType(PacketType);
+    void setPacketTypes();
     unsigned long packetTime;
     int netif_idx;
     const char* data;
     size_t packetLength;
     int out;
     int success;
+    PacketType thisPacketType;
+    std::vector<PacketType> thisAllPacketTypes;
 };
 
 } // namespace NetCapture

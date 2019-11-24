@@ -25,8 +25,6 @@
 namespace NetCapture
 {
 
-constexpr char* Packet::packetTypeArray[];
-
 void Packet::printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const
 {
     if (pd == PacketDetail::NONE)
@@ -34,7 +32,7 @@ void Packet::printDetail(Print& out, const String& indent, const char* data, siz
         return;
     }
 
-    uint16_t charCount = pd == PacketDetail::FULL ? 24 : 80;
+    uint16_t charCount = (pd == PacketDetail::FULL) ? 24 : 80;
 
     size_t start = 0;
     while (start < size)
@@ -66,43 +64,64 @@ void Packet::printDetail(Print& out, const String& indent, const char* data, siz
     }
 }
 
-Packet::PacketType Packet::packetType() const
+void Packet::setPacketType(PacketType pt)
 {
-	if (isARP()) return PacketType::ARP;
+	thisPacketType = pt;
+	thisAllPacketTypes.emplace_back(pt);
+}
+
+void Packet::setPacketTypes()
+{
+	if (isARP())
+	{
+	   setPacketType(PacketType::ARP);
+	} else
 	if (isIP())
 	{
+		setPacketType(PacketType::IP);
 		if (isUDP())
 		{
-			if (isMDNS()) return PacketType::MDNS;
-			if (isDNS())  return PacketType::DNS;
-			if (isSSDP()) return PacketType::SSDP;
-			if (isDHCP()) return PacketType::DHCP;
-			if (isWSDD()) return PacketType::WSDD;
-			if (isNETBIOS()) return PacketType::NETBIOS;
-			if (isSMB())  return PacketType::SMB;
-			if (isOTA())  return PacketType::OTA;
-			return PacketType::UDP;
+			setPacketType(PacketType::UDP);
+			if (isMDNS()) setPacketType(PacketType::MDNS);
+			if (isDNS())  setPacketType(PacketType::DNS);
+			if (isSSDP()) setPacketType(PacketType::SSDP);
+			if (isDHCP()) setPacketType(PacketType::DHCP);
+			if (isWSDD()) setPacketType(PacketType::WSDD);
+			if (isNETBIOS()) setPacketType(PacketType::NETBIOS);
+			if (isSMB())  setPacketType(PacketType::SMB);
+			if (isOTA())  setPacketType(PacketType::OTA);
 		}
 		if (isTCP())
 		{
-			if (isHTTP()) return PacketType::HTTP;
-			return PacketType::TCP;
+			setPacketType(PacketType::TCP);
+			if (isHTTP()) setPacketType(PacketType::HTTP);
 		}
-		if (isICMP()) return PacketType::ICMP;
-		if (isIGMP()) return PacketType::IGMP;
-		return PacketType::IP;
+		if (isICMP()) setPacketType(PacketType::ICMP);
+		if (isIGMP()) setPacketType(PacketType::IGMP);
+	} else
+	{
+		setPacketType(PacketType::UKNW);
 	}
-	return PacketType::UKNW;
 }
 
-String Packet::toString(PacketDetail netdumpDetail) const
+const PacketType Packet::packetType() const
+{
+	return thisPacketType;
+}
+
+const std::vector<PacketType> Packet::allPacketTypes() const
+{
+	return thisAllPacketTypes;
+}
+
+const String Packet::toString(PacketDetail netdumpDetail) const
 {
     StreamString sstr;
     sstr.reserve(128);
 
-    sstr.printf_P(PSTR("%d %3s %s "), netif_idx, out ? "out" : "in ", packetTypeString(packetType()));
+    sstr.printf_P(PSTR("%d %3s %-4s "), netif_idx, out ? "out" : "in ", packetType().toString().c_str());
 
-    switch (packetType())
+    switch (thisPacketType)
     {
     case PacketType::ARP :
     {
