@@ -319,7 +319,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool keepCurrentClient = false;
   bool callYield = false;
 
-  if (_currentClient.connected()) {
+  if (_currentClient.connected() || _currentClient.available()) {
     switch (_currentStatus) {
     case HC_NONE:
       // No-op to avoid C++ compiler warning
