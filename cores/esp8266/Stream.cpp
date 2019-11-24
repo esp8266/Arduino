@@ -303,21 +303,23 @@ size_t Stream::to (Print& to,
             if (w)
             {
                 const char* directbuf = peekBuffer();
-                bool ignore = false;
+                bool foundChar = false;
                 if (readUntilChar >= 0)
                 {
                     const char* last = (const char*)memchr(directbuf, readUntilChar, w);
                     if (last)
                     {
                         w = std::min((size_t)(last - directbuf + 1), w);
-                        ignore = true;
+                        foundChar = true;
                     }
                 }
                 if (w && ((w = to.write(directbuf, w))))
                 {
-                    peekConsume(w + ignore);
+                    peekConsume(w + foundChar);
                     written += w;
                     timedOut.reset();
+                    if (foundChar)
+                        break;
                 }
             }
             else if (timedOut)
