@@ -49,7 +49,8 @@ public:
     {
         NONE,
         FULL,
-        CHARS
+        CHAR,
+		RAW
     };
 
      const char* rawData() const
@@ -98,7 +99,7 @@ public:
     }
     uint16_t getIpTotalLen() const
     {
-        return isIP() ? ntoh16(ETH_HDR_LEN + 2) : 0;
+        return isIP() ? isIPv4() ? ntoh16(ETH_HDR_LEN + 2) :  (packetLength - ETH_HDR_LEN)   :  0;
     }
     uint32_t getTcpSeq() const
     {
@@ -287,6 +288,16 @@ private:
 
     void setPacketType(PacketType);
     void setPacketTypes();
+
+    const String ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    const String DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    const String UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    const String TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    const String ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    const String IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    const String IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+
+
     unsigned long packetTime;
     int netif_idx;
     const char* data;

@@ -33,6 +33,8 @@ public:
 		HTTP,
 		ICMP,
 		IGMP,
+		IPv4,
+		IPv6,
 		UKNW,
 	};
 

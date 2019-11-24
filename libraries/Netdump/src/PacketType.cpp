@@ -37,6 +37,8 @@ String PacketType::toString() const
 	case PType::HTTP :   return PSTR("HTTP");
 	case PType::ICMP :   return PSTR("ICMP");
 	case PType::IGMP :   return PSTR("IGMP");
+	case PType::IPv4:    return PSTR("IPv4");
+	case PType::IPv6:    return PSTR("IPv6");
 	case PType::UKNW :   return PSTR("UKNW");
 	default :            return PSTR("ERR");
 	};

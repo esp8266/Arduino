@@ -195,7 +195,6 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
     }
     if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= bufferIndex)
     {
-        Serial.printf("tcp write %d\r\n", bufferIndex);
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;
     }
