@@ -303,7 +303,7 @@ void ArduinoOTAClass::_runUpdate() {
   client.setNoDelay(true);
 
   uint32_t written, total = 0;
-  while (!Update.isFinished() && client.connected()) {
+  while (!Update.isFinished() && (client.connected() || client.available())) {
     int waited = 1000;
     while (!client.available() && waited--)
       delay(1);

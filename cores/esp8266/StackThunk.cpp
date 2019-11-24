@@ -36,7 +36,8 @@ uint32_t *stack_thunk_top = NULL;
 uint32_t *stack_thunk_save = NULL;  /* Saved A1 while in BearSSL */
 uint32_t stack_thunk_refcnt = 0;
 
-#define _stackSize (5748/4)
+/* Largest stack usage seen in the wild at scripts.google.com at 5828 */
+#define _stackSize (5900/4)
 #define _stackPaint 0xdeadbeef
 
 /* Add a reference, and allocate the stack if necessary */
