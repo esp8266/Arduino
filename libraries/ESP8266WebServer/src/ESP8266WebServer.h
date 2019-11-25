@@ -151,10 +151,15 @@ public:
 
   static String urlDecode(const String& text);
 
+  // send file based header and stream body when not "HTTP_HEAD" 
   template<typename T>
-  size_t streamFile(T &file, const String& contentType) {
+  size_t streamFile(T &file, const String& contentType, HTTPMethod requestMethod = HTTP_GET) {
     _streamFileCore(file.size(), file.name(), contentType);
-    return _currentClient.write(file);
+    if (requestMethod != HTTP_HEAD) {
+      return _currentClient.write(file);
+    } else {
+      return 0;
+    }
   }
 
   static const String responseCodeToString(const int code);
