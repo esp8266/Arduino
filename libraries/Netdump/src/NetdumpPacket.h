@@ -61,7 +61,7 @@ public:
     {
     	return out;
     }
-    unsigned long getTime() const
+    time_t getTime() const
     {
     	return packetTime;
     }
@@ -289,16 +289,18 @@ private:
     void setPacketType(PacketType);
     void setPacketTypes();
 
-    const String ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    const String DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    const String UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    const String TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    const String ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    const String IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    const String IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void MACtoString(int dataIdx, StreamString& sstr) const;
+    void ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
 
 
-    unsigned long packetTime;
+    time_t packetTime;
     int netif_idx;
     const char* data;
     size_t packetLength;
