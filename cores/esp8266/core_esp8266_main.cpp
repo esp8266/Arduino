@@ -81,13 +81,16 @@ void initVariant() __attribute__((weak));
 void initVariant() {
 }
 
-void preloop_update_frequency() __attribute__((weak));
-void preloop_update_frequency() {
+extern "C" void __preloop_update_frequency() {
 #if defined(F_CPU) && (F_CPU == 160000000L)
-    REG_SET_BIT(0x3ff00014, BIT(0));
     ets_update_cpu_frequency(160);
+    REG_SET_BIT(0x3ff00014, BIT(0));
+#elif !defined(F_CPU)
+    if (system_get_cpu_freq() == 160) REG_SET_BIT(0x3ff00014, BIT(0));
 #endif
 }
+
+extern "C" void preloop_update_frequency() __attribute__((weak, alias("__preloop_update_frequency")));
 
 extern "C" bool can_yield() {
   return cont_can_yield(g_pcont);

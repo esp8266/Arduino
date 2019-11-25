@@ -209,7 +209,11 @@ class EspClass {
 
 uint8_t EspClass::getCpuFreqMHz()
 {
+#if defined(F_CPU)
     return clockCyclesPerMicrosecond();
+#elif !defined(F_CPU)
+    return system_get_cpu_freq();
+#endif
 }
 
 uint32_t EspClass::getCycleCount()
