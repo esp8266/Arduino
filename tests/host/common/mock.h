@@ -61,10 +61,6 @@ typedef uint32_t uint32;
 
 //
 
-#include <Arduino.h>
-
-//
-
 #include <stdlib.h>
 #define RANDOM_REG32 ((uint32_t)random())
 
@@ -163,6 +159,10 @@ void mock_stop_littlefs ();
 #define D6 6
 #define D7 7
 #define D8 8
+
+//
+
+#include <Arduino.h>
 
 //
 
