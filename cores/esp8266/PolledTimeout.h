@@ -223,6 +223,14 @@ public:
     return TimePolicyT::toUserUnit(_timeout);
   }
 
+  IRAM_ATTR // fast
+  timeType expiresIn()
+  {
+    if (_neverExpires) return timeMax();
+    if (expired()) return TimePolicyT::toUserUnit(0);
+    return TimePolicyT::toUserUnit(_timeout - (_current - _start));
+  }
+  
   static constexpr timeType timeMax()
   {
     return TimePolicyT::timeMax;
@@ -231,11 +239,11 @@ public:
 private:
 
   IRAM_ATTR // fast
-  bool checkExpired(const timeType internalUnit) const
+  bool checkExpired() const
   {
     // canWait() is not checked here
     // returns "can expire" and "time expired"
-    return (!_neverExpires) && ((internalUnit - _start) >= _timeout);
+    return (!_neverExpires) && ((_current - _start) >= _timeout);
   }
 
 protected:
@@ -246,10 +254,10 @@ protected:
     if (!canWait())
       return true;
 
-    timeType current = TimePolicyT::time();
-    if(checkExpired(current))
+    _current = TimePolicyT::time();
+    if(checkExpired())
     {
-      unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
+      unsigned long n = (_current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (_current - _start >= _timeout)
       _start += n  * _timeout;
       return true;
     }
@@ -257,14 +265,16 @@ protected:
   }
 
   IRAM_ATTR // fast
-  bool expiredOneShot() const
+  bool expiredOneShot()
   {
+    _current = TimePolicyT::time();
     // returns "always expired" or "has expired"
-    return !canWait() || checkExpired(TimePolicyT::time());
+    return !canWait() || checkExpired();
   }
 
   timeType _timeout;
   timeType _start;
+  timeType _current;
   bool _neverExpires;
 };
 
