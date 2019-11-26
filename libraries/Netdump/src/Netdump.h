@@ -28,9 +28,12 @@
 #include <FS.h>
 #include "NetdumpPacket.h"
 #include <ESP8266WiFi.h>
+#include "CallBackList.h"
 
 namespace NetCapture
 {
+
+using namespace experimental::CBListImplentation;
 
 class Netdump
 {
@@ -38,6 +41,7 @@ public:
 
     using Filter = std::function<bool(Packet&)>;
     using Callback = std::function<void(Packet&)>;
+    using LwipCallback = std::function<void(int, const char*, int, int, int)>;
 
     Netdump();
     ~Netdump();
@@ -56,9 +60,11 @@ private:
     Callback netDumpCallback = nullptr;
     Filter   netDumpFilter   = nullptr;
 
-    static Netdump* self;
-
     static void capture(int netif_idx, const char* data, size_t len, int out, int success);
+    static CallBackList<LwipCallback> lwipCallback;
+
+    void netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success);
+
     void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const;
     void fileDumpProcess(File& outfile, const Packet& np) const;
     void tcpDumpProcess(const Packet& np);
@@ -73,6 +79,8 @@ private:
     static constexpr int tcpBuffersize = 2048;
     static constexpr int maxPcapLength = 1024;
     static constexpr uint32_t pcapMagic = 0xa1b2c3d4;
+
+    CallBackList<LwipCallback>::CallBackHandler lwipHandler;
 
 };
 

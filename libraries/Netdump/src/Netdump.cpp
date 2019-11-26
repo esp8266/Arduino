@@ -23,15 +23,17 @@
 #include <lwip/init.h>
 #include "Schedule.h"
 
+
 namespace NetCapture
 {
 
-Netdump* Netdump::self;
+CallBackList<Netdump::LwipCallback> Netdump::lwipCallback;
 
 Netdump::Netdump()
 {
+	using namespace std::placeholders;
     phy_capture = capture;
-    self = this;
+    lwipHandler = lwipCallback.add(std::bind(&Netdump::netdumpCapture,this,_1,_2,_3,_4,_5));
 };
 
 Netdump::~Netdump()
@@ -100,14 +102,19 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
 {
+	lwipCallback.execute(netif_idx,data,len,out,success);
+}
+
+void Netdump::netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success)
+{
     Packet np(millis(), netif_idx, data, len, out, success);
-    if (self->netDumpCallback)
+    if (netDumpCallback)
     {
-        if (self->netDumpFilter  && !self->netDumpFilter(np))
+        if (netDumpFilter  && !netDumpFilter(np))
         {
             return;
         }
-        self->netDumpCallback(np);
+        netDumpCallback(np);
     }
 }
 
