@@ -131,6 +131,22 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "-100");
     str = String((long)-100, 10);
     REQUIRE(str == "-100");
+    // Non-zero-terminated array concatenation
+    const char buff[] = "abcdefg";
+    String n;
+    n = "1234567890"; // Make it a SSO string, fill with non-0 data
+    n = "1"; // Overwrite [1] with 0, but leave old junk in SSO space still
+    n.concat(buff, 3);
+    REQUIRE(n == "1abc"); // Ensure the trailing 0 is always present even w/this funky concat
+    for (int i=0; i<20; i++)
+        n.concat(buff, 1); // Add 20 'a's to go from SSO to normal string
+    REQUIRE(n == "1abcaaaaaaaaaaaaaaaaaaaa");
+    n = "";
+    for (int i=0; i<=5; i++)
+        n.concat(buff, i);
+    REQUIRE(n == "aababcabcdabcde");
+    n.concat(buff, 0); // And check no add'n
+    REQUIRE(n == "aababcabcdabcde");
 }
 
 TEST_CASE("String comparison", "[core][String]")
@@ -320,11 +336,11 @@ TEST_CASE("String SSO works", "[core][String]")
   REQUIRE(s.c_str() == savesso);
   REQUIRE(s == "0123456789");
   REQUIRE(s.length() == 10);
-  s += "a";
-  REQUIRE(s.c_str() == savesso);
-  REQUIRE(s == "0123456789a");
-  REQUIRE(s.length() == 11);
   if (sizeof(savesso) == 4) {
+    s += "a";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "b";
     REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789ab");
@@ -334,12 +350,16 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s == "0123456789abc");
     REQUIRE(s.length() == 13);
   } else {
+  s += "a";
+    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "bcde";
     REQUIRE(s.c_str() == savesso);
     REQUIRE(s == "0123456789abcde");
     REQUIRE(s.length() == 15);
     s += "fghi";
-    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789abcdefghi");
     REQUIRE(s.length() == 19);
     s += "j";
@@ -360,7 +380,7 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s.length() == 23);
     s += "nopq";
     REQUIRE(s.c_str() != savesso);
-      REQUIRE(s == "0123456789abcdefghijklmnopq");
+    REQUIRE(s == "0123456789abcdefghijklmnopq");
     REQUIRE(s.length() == 27);
     s += "rstu";
     REQUIRE(s.c_str() != savesso);
@@ -451,4 +471,60 @@ TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
     s.print(String("message"));
     s.print('\"');
     REQUIRE(s == "{\"message\"");
+}
+
+TEST_CASE("Strings with NULs", "[core][String]")
+{
+  // The following should never be done in a real app! This is only to inject 0s in the middle of a string.
+  // Fits in SSO...
+  String str("01234567");
+  REQUIRE(str.length() == 8);
+  char *ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  String str2;
+  str2 = str;
+  REQUIRE(str2.length() == 8);
+  // Needs a buffer pointer
+  str = "0123456789012345678901234567890123456789";
+  ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  str2 = str;
+  REQUIRE(str2.length() == 40);
+  String str3("a");
+  ptr = (char *)str3.c_str();
+  *ptr = 0;
+  REQUIRE(str3.length() == 1);
+  str3 += str3;
+  REQUIRE(str3.length() == 2);
+  str3 += str3;
+  REQUIRE(str3.length() == 4);
+  str3 += str3;
+  REQUIRE(str3.length() == 8);
+  str3 += str3;
+  REQUIRE(str3.length() == 16);
+  str3 += str3;
+  REQUIRE(str3.length() == 32);
+  str3 += str3;
+  REQUIRE(str3.length() == 64);
+  static char zeros[64] = {0};
+  const char *p = str3.c_str();
+  REQUIRE(!memcmp(p, zeros, 64));
+}
+
+TEST_CASE("Replace and string expansion", "[core][String]")
+{
+  String s, l;
+  // Make these large enough to span SSO and non SSO
+  String whole = "#123456789012345678901234567890";
+  const char *res = "abcde123456789012345678901234567890";
+  for (size_t i=1; i < whole.length(); i++) {
+    s = whole.substring(0, i);
+    l = s;
+    l.replace("#", "abcde");
+    char buff[64];
+    strcpy(buff, res);
+    buff[5 + i-1] = 0;
+    REQUIRE(!strcmp(l.c_str(), buff));
+    REQUIRE(l.length() == strlen(buff));
+  }
 }

@@ -31,6 +31,29 @@ extern int umm_last_fail_alloc_size;
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
+
+#if !defined(__cpp_exceptions) && !defined(NEW_OOM_ABORT)
+void *operator new(size_t size)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+   return ret;
+}
+
+void *operator new[](size_t size)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
+}
+#endif // arduino's std::new legacy
+
 void __cxa_pure_virtual(void)
 {
     panic();

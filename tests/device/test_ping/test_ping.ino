@@ -10,13 +10,18 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.mode(WIFI_STA);
     WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
-    BS_RUN(Serial);
+    return true;
 }
 
 static struct ping_option po;

@@ -37,6 +37,11 @@ extern "C" void yield()
 {
 }
 
+extern "C" bool can_yield()
+{
+    return true;
+}
+
 extern "C" void optimistic_yield (uint32_t interval_us)
 {
     usleep(interval_us);
@@ -63,3 +68,10 @@ extern "C" void delayMicroseconds(unsigned int us)
 {
     usleep(us);
 }
+
+#include "cont.h"
+cont_t* g_pcont = NULL;
+extern "C" void cont_yield(cont_t*)
+{
+}
+

@@ -41,7 +41,7 @@ DNSServer dnsServer;
 ESP8266WebServer server(80);
 
 /* Soft AP network parameters */
-IPAddress apIP(192, 168, 4, 1);
+IPAddress apIP(172, 217, 28, 1);
 IPAddress netMsk(255, 255, 255, 0);
 
 

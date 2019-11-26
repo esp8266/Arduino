@@ -186,7 +186,7 @@ void ArduinoOTAClass::_onRx(){
 
   if (_state == OTA_IDLE) {
     int cmd = parseInt();
-    if (cmd != U_FLASH && cmd != U_SPIFFS)
+    if (cmd != U_FLASH && cmd != U_FS)
       return;
     _ota_ip = _udp_ota->getRemoteAddress();
     _cmd  = cmd;
@@ -231,7 +231,7 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    String challenge = _password + ":" + String(_nonce) + ":" + cnonce;
+    String challenge = _password + ':' + String(_nonce) + ':' + cnonce;
     MD5Builder _challengemd5;
     _challengemd5.begin();
     _challengemd5.add(challenge);
@@ -303,7 +303,7 @@ void ArduinoOTAClass::_runUpdate() {
   client.setNoDelay(true);
 
   uint32_t written, total = 0;
-  while (!Update.isFinished() && client.connected()) {
+  while (!Update.isFinished() && (client.connected() || client.available())) {
     int waited = 1000;
     while (!client.available() && waited--)
       delay(1);
@@ -330,7 +330,7 @@ void ArduinoOTAClass::_runUpdate() {
   if (Update.end()) {
     client.print("OK");
     client.stop();
-    delay(10);
+    delay(1000);
 #ifdef OTA_DEBUG
     OTA_DEBUG.printf("Update Success\n");
 #endif

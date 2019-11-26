@@ -36,7 +36,8 @@ uint32_t *stack_thunk_top = NULL;
 uint32_t *stack_thunk_save = NULL;  /* Saved A1 while in BearSSL */
 uint32_t stack_thunk_refcnt = 0;
 
-#define _stackSize (5600/4)
+/* Largest stack usage seen in the wild at scripts.google.com at 5828 */
+#define _stackSize (5900/4)
 #define _stackPaint 0xdeadbeef
 
 /* Add a reference, and allocate the stack if necessary */
@@ -122,6 +123,13 @@ void stack_thunk_dump_stack()
     pos += 4;
   }
   ets_printf("<<<stack<<<\n");
+}
+
+/* Called when the stack overflow is detected by a thunk.  Main memory is corrupted at this point.  Do not return. */
+void stack_thunk_fatal_overflow()
+{
+    ets_printf("FATAL ERROR: BSSL stack overflow\n");
+    abort();
 }
 
 };
