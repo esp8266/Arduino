@@ -157,7 +157,7 @@ class EspClass {
         uint8_t getBootVersion();
         uint8_t getBootMode();
 
-#if !defined(CORE_MOCK) && defined(F_CPU)
+#if defined(F_CPU)
         constexpr uint8_t getCpuFreqMHz() const
         {
             return clockCyclesPerMicrosecond();
@@ -165,7 +165,6 @@ class EspClass {
 #else
         uint8_t getCpuFreqMHz();
 #endif
-
 
         uint32_t getFlashChipId();
         uint8_t getFlashChipVendorId();
