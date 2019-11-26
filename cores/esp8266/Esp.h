@@ -157,8 +157,11 @@ class EspClass {
         uint8_t getBootVersion();
         uint8_t getBootMode();
 
-#ifndef CORE_MOCK
-        inline uint8_t getCpuFreqMHz() __attribute__((always_inline));
+#if !defined(CORE_MOCK) && defined(F_CPU)
+        constexpr uint8_t getCpuFreqMHz() const
+        {
+            return clockCyclesPerMicrosecond();
+        }
 #else
         uint8_t getCpuFreqMHz();
 #endif
@@ -206,15 +209,6 @@ class EspClass {
 };
 
 #ifndef CORE_MOCK
-
-uint8_t EspClass::getCpuFreqMHz()
-{
-#if defined(F_CPU)
-    return clockCyclesPerMicrosecond();
-#elif !defined(F_CPU)
-    return system_get_cpu_freq();
-#endif
-}
 
 uint32_t EspClass::getCycleCount()
 {
