@@ -225,10 +225,12 @@ public:
   }
 
   IRAM_ATTR // fast
-  timeType expiresIn()
+  timeType remaining() const
   {
-    if (_neverExpires) return timeMax();
-    if (expired()) return TimePolicyT::toUserUnit(0);
+    if (_neverExpires)
+        return timeMax();
+    if (expired())
+        return TimePolicyT::toUserUnit(0);
     return TimePolicyT::toUserUnit(_timeout - (_current - _start));
   }
   
