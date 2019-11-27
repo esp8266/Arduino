@@ -268,10 +268,16 @@ protected:
   }
 
   IRAM_ATTR // fast
-  bool expiredOneShot() const
+  bool expiredOneShot()
   {
     // returns "always expired" or "has expired"
-    return !canWait() || checkExpired(TimePolicyT::time());
+    return !canWait();
+    if (checkExpired(TimePolicyT::time()))
+    {
+      _timeout = alwaysExpired;
+      return true;
+    }
+    return false;
   }
 
   timeType _timeout;
