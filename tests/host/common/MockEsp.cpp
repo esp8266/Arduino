@@ -120,7 +120,7 @@ uint32_t EspClass::getFreeSketchSpace()
 
 uint8_t EspClass::getCpuFreqMHz()
 {
-  return 160;
+  return F_CPU / 1000000;
 }
 
 const char *EspClass::getSdkVersion()

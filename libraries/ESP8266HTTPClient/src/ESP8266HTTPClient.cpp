@@ -677,9 +677,20 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         }
 
         // send Payload if needed
-        if(payload && size > 0) {
-            if(_client->write(&payload[0], size) != size) {
-                return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+        if (payload && size > 0) {
+            size_t bytesWritten = 0;
+            const uint8_t *p = payload;
+            while (bytesWritten < size) {
+                int written;
+                int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
+                written = _client->write(p + bytesWritten, towrite);
+                if (written < 0) {
+                     return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+                } else if (written == 0) {
+                     return returnError(HTTPC_ERROR_CONNECTION_LOST);
+                }
+                bytesWritten += written;
+                size -= written;
             }
         }
 
