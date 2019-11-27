@@ -271,7 +271,7 @@ protected:
   bool expiredOneShot()
   {
     // returns "always expired" or "has expired"
-    return !canWait();
+    if (!canWait()) return true;
     if (checkExpired(TimePolicyT::time()))
     {
       _timeout = alwaysExpired;
