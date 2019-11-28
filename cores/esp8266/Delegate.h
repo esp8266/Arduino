@@ -102,14 +102,14 @@ namespace detail
             DelegateImpl::obj = std::move(obj);
         }
 
-        DelegateImpl(const FunctionType& functional)
+        template<typename F> DelegateImpl(const F& functional)
         {
             type = FUNC;
             new (&this->functional) FunctionType();
             DelegateImpl::functional = functional;
         }
 
-        DelegateImpl(FunctionType&& functional)
+        template<typename F> DelegateImpl(F&& functional)
         {
             type = FUNC;
             new (&this->functional) FunctionType();
@@ -164,7 +164,7 @@ namespace detail
             return *this;
         }
 
-        DelegateImpl& operator=(const FunctionType& functional)
+        template<typename F> DelegateImpl& operator=(const F& functional)
         {
             if (FUNC != type)
             {
@@ -175,7 +175,7 @@ namespace detail
             return *this;
         }
 
-        DelegateImpl& operator=(FunctionType&& functional)
+        template<typename F> DelegateImpl& operator=(F&& functional)
         {
             if (FUNC != type)
             {
@@ -284,14 +284,14 @@ namespace detail
             DelegateImpl::fn = fn;
         }
 
-        DelegateImpl(const FunctionType& functional)
+        template<typename F> DelegateImpl(const F& functional)
         {
             type = FUNC;
             new (&this->functional) FunctionType();
             DelegateImpl::functional = functional;
         }
 
-        DelegateImpl(FunctionType&& functional)
+        template<typename F> DelegateImpl(F&& functional)
         {
             type = FUNC;
             new (&this->functional) FunctionType();
@@ -344,7 +344,7 @@ namespace detail
             return *this;
         }
 
-        DelegateImpl& operator=(const FunctionType& functional)
+        template<typename F> DelegateImpl& operator=(const F& functional)
         {
             if (FUNC != type)
             {
@@ -355,7 +355,7 @@ namespace detail
             return *this;
         }
 
-        DelegateImpl& operator=(FunctionType&& functional)
+        template<typename F> DelegateImpl& operator=(F&& functional)
         {
             if (FUNC != type)
             {
