@@ -23,7 +23,7 @@
 #include "interrupts.h"
 #include "coredecls.h"
 
-typedef std::function<void(void)> mSchedFuncT;
+typedef Delegate<> mSchedFuncT;
 struct scheduled_fn_t
 {
     scheduled_fn_t* mNext = nullptr;
@@ -35,13 +35,13 @@ static scheduled_fn_t* sLast = nullptr;
 static scheduled_fn_t* sUnused = nullptr;
 static int sCount = 0;
 
-typedef std::function<bool(void)> mRecFuncT;
+typedef Delegate<bool> mRecFuncT;
 struct recurrent_fn_t
 {
     recurrent_fn_t* mNext = nullptr;
     mRecFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
-    std::function<bool(void)> alarm = nullptr;
+    Delegate<bool> alarm = nullptr;
     recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
@@ -73,13 +73,13 @@ static scheduled_fn_t* get_fn_unsafe()
 
 static void recycle_fn_unsafe(scheduled_fn_t* fn)
 {
-    fn->mFunc = nullptr; // special overload in c++ std lib
+    fn->mFunc = nullptr; // special overload in Delegate
     fn->mNext = sUnused;
     sUnused = fn;
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function(const std::function<void(void)>& fn)
+bool schedule_function(const Delegate<>& fn)
 {
     if (!fn)
         return false;
@@ -103,8 +103,8 @@ bool schedule_function(const std::function<void(void)>& fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm)
+bool schedule_recurrent_function_us(const Delegate<bool>& fn,
+    uint32_t repeat_us, const Delegate<bool>& alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
