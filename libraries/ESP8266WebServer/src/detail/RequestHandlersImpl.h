@@ -105,7 +105,7 @@ public:
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
 
-            if (!_fs.exists(path) && path.endsWith(".htm")) {
+            if (!_fs.exists(path) && path.endsWith(".htm") && _fs.exists(path + "l")) {
                 path += "l";
             }
         }

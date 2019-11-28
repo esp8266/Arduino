@@ -17,7 +17,7 @@
  */
 
 #include <stdlib.h>
-#include <time.h>
+#include <../include/time.h> // See issue #6714
 #include <sys/time.h>
 #include <sys/reent.h>
 #include "sntp.h"
@@ -122,6 +122,7 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     char tzram[strlen_P(tz) + 1];
     memcpy_P(tzram, tz, sizeof(tzram));
     setenv("TZ", tzram, 1/*overwrite*/);
+    sntp_set_timezone_in_seconds(0);
     tzset();
 
     sntp_init();
