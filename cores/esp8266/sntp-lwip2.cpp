@@ -38,7 +38,7 @@
  */
 
 #include <lwip/init.h>
-#include <sys/time.h>
+#include <time.h>
 #include <osapi.h>
 #include <os_type.h>
 #include "coredecls.h"
@@ -133,30 +133,8 @@ static const int year_lengths[2] = {
   365,
   366
 } ;
-struct tm
-{
-  int	tm_sec;
-  int	tm_min;
-  int	tm_hour;
-  int	tm_mday;
-  int	tm_mon;
-  int	tm_year;
-  int	tm_wday;
-  int	tm_yday;
-  int	tm_isdst;
-};
 
 struct tm res_buf;
-typedef struct __tzrule_struct
-{
-  char ch;
-  int m;
-  int n;
-  int d;
-  int s;
-  time_t change;
-  int offset;
-} __tzrule_type;
 
 __tzrule_type sntp__tzrule[2];
 struct tm *
