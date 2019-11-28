@@ -54,7 +54,7 @@ void setup() {
     Serial.printf("\r\n\r\nCLIENT: ----> upload duration: %lums  sent: %d\r\n\r\n",
         millis() - A,
 #if TESTSTREAM
-        (int)f.to(client, 0)
+        (int)f.to(client, 0, 0)
 #else
         (int)client.write(f)
 #endif

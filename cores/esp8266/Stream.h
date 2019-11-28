@@ -142,10 +142,10 @@ class Stream: public Print {
         // (uses 1-copy peekBuffer API when available, or transfer through a 2-copies local stack space)
         // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - maxLen==0 will transfer until input starvation or saturated output
-        // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read (swallowed, not copied)
+        // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
         size_t to (Print& to,
-                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires, /* =>getTimeout() */
                    size_t maxLen = 0,
+                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
                    int readUntilChar = -1);
 
         //////////////////// end of extensions

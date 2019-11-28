@@ -279,8 +279,8 @@ int Stream::readNow (char* buffer, size_t maxLen)
 }
 
 size_t Stream::to (Print& to,
-                   esp8266::polledTimeout::oneShotFastMs::timeType timeout,
                    size_t maxLen,
+                   esp8266::polledTimeout::oneShotFastMs::timeType timeout,
                    int readUntilChar)
 {
     esp8266::polledTimeout::periodicFastMs yieldNow(100);
@@ -315,7 +315,7 @@ size_t Stream::to (Print& to,
                 }
                 if (w && ((w = to.write(directbuf, w))))
                 {
-                    peekConsume(w + foundChar);
+                    peekConsume(w);
                     written += w;
                     timedOut.reset();
                     if (foundChar)
@@ -338,9 +338,9 @@ size_t Stream::to (Print& to,
             int c = read();
             if (c != -1)
             {
+                w = to.write(c);
                 if (c == readUntilChar)
                     break;
-                w = to.write(c);
                 assert(w);
                 written += 1;
                 timedOut.reset();
