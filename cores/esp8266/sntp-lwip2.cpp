@@ -39,6 +39,7 @@
 
 #include <lwip/init.h>
 #include <time.h>
+#include <sys/time.h>
 #include <osapi.h>
 #include <os_type.h>
 #include "coredecls.h"
