@@ -617,7 +617,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     }
 
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
+    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, LWIP_DNS_ADDRTYPE_DEFAULT);
     if(err == ERR_OK) {
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
