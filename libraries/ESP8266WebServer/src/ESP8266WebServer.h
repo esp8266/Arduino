@@ -107,17 +107,17 @@ public:
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
-  const String& arg(String name) const;    // get request argument value by name
+  const String& arg(const String& name) const;    // get request argument value by name
   const String& arg(int i) const;          // get request argument value by number
   const String& argName(int i) const;      // get request argument name by number
   int args() const;                        // get arguments count
   bool hasArg(const String& name) const;   // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
-  const String& header(String name) const; // get request header value by name
+  const String& header(const String& name) const; // get request header value by name
   const String& header(int i) const;       // get request header value by number
   const String& headerName(int i) const;   // get request header name by number
   int headers() const;                     // get header count
-  bool hasHeader(String name) const;       // check if header exists
+  bool hasHeader(const String& name) const;       // check if header exists
   const String& hostHeader() const;        // get request host header if available or empty String if not
 
   // send response to the client
@@ -127,6 +127,15 @@ public:
   void send(int code, const char* content_type = NULL, const String& content = String(""));
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
+  void send(int code, const char *content_type, const char *content, size_t content_length = 0) {
+    if (content_length == 0) {
+      content_length = strlen_P(content);
+    }
+    send_P(code, content_type, content, content_length);
+  }
+  void send(int code, const char *content_type, const uint8_t *content, size_t content_length) {
+    send_P(code, content_type, (const char *)content, content_length);
+  }
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 

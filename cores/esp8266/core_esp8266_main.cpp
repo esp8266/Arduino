@@ -90,6 +90,9 @@ void preloop_update_frequency() {
 #endif
 }
 
+extern "C" bool can_yield() {
+  return cont_can_yield(g_pcont);
+}
 
 static inline void esp_yield_within_cont() __attribute__((always_inline));
 static void esp_yield_within_cont() {
@@ -97,19 +100,20 @@ static void esp_yield_within_cont() {
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void esp_yield() {
-    if (cont_can_yield(g_pcont)) {
+extern "C" void __esp_yield() {
+    if (can_yield()) {
         esp_yield_within_cont();
     }
 }
 
-extern "C" void esp_schedule() {
-    // always on CONT stack here
+extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
+
+extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
-    if (cont_can_yield(g_pcont)) {
+    if (can_yield()) {
         esp_schedule();
         esp_yield_within_cont();
     }
@@ -121,7 +125,7 @@ extern "C" void __yield() {
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
-    if (cont_can_yield(g_pcont) &&
+    if (can_yield() &&
         (system_get_time() - s_micros_at_task_start) > interval_us)
     {
         yield();

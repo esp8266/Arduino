@@ -231,7 +231,7 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    String challenge = _password + ":" + String(_nonce) + ":" + cnonce;
+    String challenge = _password + ':' + String(_nonce) + ':' + cnonce;
     MD5Builder _challengemd5;
     _challengemd5.begin();
     _challengemd5.add(challenge);
@@ -303,7 +303,7 @@ void ArduinoOTAClass::_runUpdate() {
   client.setNoDelay(true);
 
   uint32_t written, total = 0;
-  while (!Update.isFinished() && client.connected()) {
+  while (!Update.isFinished() && (client.connected() || client.available())) {
     int waited = 1000;
     while (!client.available() && waited--)
       delay(1);

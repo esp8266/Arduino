@@ -323,10 +323,11 @@ uart_get_bit_length(const int uart_nr)
 }
 
 uart_t*
-uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
 {
 	(void) config;
 	(void) tx_pin;
+	(void) invert;
 	uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
 	if(uart == NULL)
 		return NULL;
