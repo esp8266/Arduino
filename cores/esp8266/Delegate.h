@@ -785,18 +785,28 @@ namespace detail
         };
     };
 
+    template<typename R = void, typename A = void, typename... P>
+    class Delegate : public detail::DelegatePImpl<A, R, P...>
+    {
+        using detail::DelegatePImpl<A, R, P...>::DelegatePImpl;
+    };
+
+    template<typename R, typename A>
+    class Delegate<R, A> : public detail::DelegateImpl<A, R>
+    {
+        using detail::DelegateImpl<A, R>::DelegateImpl;
+    };
+
 }
 
-template<typename R = void, typename A = void, typename... P>
-class Delegate : public detail::DelegatePImpl<A, R, P...>
+template<typename R, typename A = void, typename... P> class Delegate;
+template<typename R, typename A, typename... P> class Delegate<R(A, P...), A> : public detail::Delegate<R, A, P...>
 {
-    using detail::DelegatePImpl<A, R, P...>::DelegatePImpl;
+    using detail::Delegate<R, A, P...>::Delegate;
 };
-
-template<typename R, typename A>
-class Delegate<R, A> : public detail::DelegateImpl<A, R>
+template<typename R, typename... P> class Delegate<R(P...)> : public detail::Delegate<R, void, P...>
 {
-    using detail::DelegateImpl<A, R>::DelegateImpl;
+    using detail::Delegate<R, void, P...>::Delegate;
 };
 
 #endif // __Delegate_h
