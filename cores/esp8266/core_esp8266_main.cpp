@@ -153,7 +153,7 @@ extern "C" void __esp_delay(unsigned long ms) {
 
 extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
 
-using IsBlockedCB = Delegate<bool, void*>;
+using IsBlockedCB = Delegate<bool(void*), void*>;
 
 void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms) {
     const auto start = millis();
