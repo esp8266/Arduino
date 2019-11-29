@@ -800,7 +800,7 @@ namespace detail
 }
 
 template<typename R, typename A = void, typename... P> class Delegate;
-template<typename R, typename A, typename... P> class Delegate<R(A, P...), A> : public detail::Delegate<R, A, P...>
+template<typename R, typename A, typename... P> class Delegate<R(P...), A> : public detail::Delegate<R, A, P...>
 {
     using detail::Delegate<R, A, P...>::Delegate;
 };
