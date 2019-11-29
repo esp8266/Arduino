@@ -443,7 +443,7 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
     //tasks to wait correctly.
     constexpr unsigned int timeoutValue = 1000; //1 second
     if(can_yield()) {
-        using oneShot = esp8266::polledTimeout::oneShotFastUs;
+        using oneShot = esp8266::polledTimeout::oneShotFastMs;
         oneShot timeout(timeoutValue);
         while(wifi_get_opmode() != (uint8) m && !timeout)
             delay(5);
@@ -604,6 +604,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     return hostByName(aHostname, aResult, 10000);
 }
 
+
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     ip_addr_t addr;
@@ -626,6 +627,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
         delay(timeout_ms);
+	// will resume on timeout or when wifi_dns_found_callback fires
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult.isSet()) {
@@ -695,7 +697,7 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
-    esp_schedule(); // resume the hostByName function
+    esp_schedule(); // break delay in hostByName
 }
 
 uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState* state)
