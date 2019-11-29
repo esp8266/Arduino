@@ -23,7 +23,7 @@
 #include "interrupts.h"
 #include "coredecls.h"
 
-typedef Delegate<void()> mSchedFuncT;
+typedef Delegate<void(), void*> mSchedFuncT;
 struct scheduled_fn_t
 {
     scheduled_fn_t* mNext = nullptr;
@@ -35,13 +35,13 @@ static scheduled_fn_t* sLast = nullptr;
 static scheduled_fn_t* sUnused = nullptr;
 static int sCount = 0;
 
-typedef Delegate<bool()> mRecFuncT;
+typedef Delegate<bool(), void*> mRecFuncT;
 struct recurrent_fn_t
 {
     recurrent_fn_t* mNext = nullptr;
     mRecFuncT mFunc;
     esp8266::polledTimeout::periodicFastUs callNow;
-    Delegate<bool()> alarm = nullptr;
+    Delegate<bool(), void*> alarm = nullptr;
     recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
@@ -79,7 +79,7 @@ static void recycle_fn_unsafe(scheduled_fn_t* fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function(const Delegate<void()>& fn)
+bool schedule_function(const Delegate<void(), void*>& fn)
 {
     if (!fn)
         return false;
@@ -103,8 +103,8 @@ bool schedule_function(const Delegate<void()>& fn)
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_recurrent_function_us(const Delegate<bool()>& fn,
-    uint32_t repeat_us, const Delegate<bool()>& alarm)
+bool schedule_recurrent_function_us(const Delegate<bool(), void*>& fn,
+    uint32_t repeat_us, const Delegate<bool(), void*>& alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
