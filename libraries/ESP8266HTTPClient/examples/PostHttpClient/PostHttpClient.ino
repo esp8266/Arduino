@@ -39,11 +39,12 @@ void loop() {
     // wait for WiFi connection
     if((WiFiMulti.run() == WL_CONNECTED)) {
 
+        WiFiClient client;
         HTTPClient http;
 
         USE_SERIAL.print("[HTTP] begin...\n");
         // configure traged server and url
-        http.begin("http://192.168.1.12/post/"); //HTTP
+        http.begin(client, "http://192.168.1.12/post/"); //HTTP
         http.addHeader("Content-Type", "application/json");
 
         USE_SERIAL.print("[HTTP] POST...\n");
