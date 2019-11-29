@@ -30,14 +30,14 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc = 0xffffffff);
 
 #include <Delegate.h>
 
-using BoolCB = Delegate<void(bool)>;
-using TrivialCB = Delegate<void()>;
+using BoolCB = Delegate<void(bool), void*>;
+using TrivialCB = Delegate<void(), void*>;
 
 void settimeofday_cb (BoolCB&& cb);
 void settimeofday_cb (const BoolCB& cb);
 void settimeofday_cb (const TrivialCB& cb);
 
-using IsBlockedCB = Delegate<bool(void*), void*>;
+using IsBlockedCB = Delegate<bool(), void*>;
 
 inline void esp_yield(const IsBlockedCB& blocked) {
     do {
