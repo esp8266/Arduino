@@ -35,6 +35,7 @@ bool pretest()
 void handle_request()
 {
     for (uint8_t i=0; i<server.args(); i++){
+        Serial.printf("######## arg%d: argName='%s' arg='%s'\n", i, server.argName(i).c_str(), server.arg(i).c_str());
         // skip "plain" which is automatically added during arg parsing for post's
         if (server.argName(i) == "plain")
             continue;
@@ -42,6 +43,7 @@ void handle_request()
             siteData += "\n";
         siteData += server.argName(i) + " = " + server.arg(i);
     }
+    Serial.printf("########=> siteDate='%s'\n", siteData.c_str());
     siteHits++;
     server.send(200, "text/plain", siteData);
 }
@@ -55,7 +57,10 @@ TEST_CASE("HTTP GET Parameters", "[HTTPServer]")
         server.on("/get", HTTP_GET, &handle_request);
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("var1 = val with spaces\nva=r+ = so&me%"));
     }
 }
@@ -65,10 +70,15 @@ TEST_CASE("HTTP POST Parameters", "[HTTPServer]")
     {
         siteHits = 0;
         siteData = "";
+        Serial.printf("################ siteHits=%d siteData='%s'\n", siteHits, siteData.c_str());
         server.on("/post", HTTP_POST, &handle_request);
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
+        Serial.printf("################ siteHits=%d siteData='%s'\n", siteHits, siteData.c_str());
         REQUIRE(siteHits > 0 && siteData.equals("var2 = val with spaces"));
     }
 }
@@ -81,7 +91,10 @@ TEST_CASE("HTTP GET+POST Parameters", "[HTTPServer]")
         server.on("/get_and_post", HTTP_POST, &handle_request);
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("var3 = val with spaces\nva&r+ = so=me%"));
     }
 }
@@ -103,7 +116,10 @@ TEST_CASE("HTTP Upload", "[HTTPServer]")
         });
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("test.txt:16\nvar4 = val with spaces"));
     }
 }

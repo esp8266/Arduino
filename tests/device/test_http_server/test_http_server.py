@@ -4,18 +4,27 @@ from threading import Thread
 from poster3.encode import MultipartParam
 from poster3.encode import multipart_encode
 from poster3.streaminghttp import register_openers
+import sys
 import urllib
 
 def http_test(res, url, get=None, post=None):
-    response = ''
     try:
+        print('a', file=sys.stderr)
         if get:
-            url += '?' + urllib.urlencode(get)
+            url += '?' + urllib.parse.urlencode(get)
+        print('b', file=sys.stderr)
         if post:
-            post = urllib.parse.quote(post)
+            print('post1=', post, file=sys.stderr)
+            post = bytes(urllib.parse.quote(bytes(str(post).encode('utf-8'))).encode('utf-8'))
+            print('post2=', post, file=sys.stderr)
+        print('c url=', url, '  post=', post, file=sys.stderr)
         request = urllib.request.urlopen(url, post, 2)
+        print('d', file=sys.stderr)
         response = request.read()
-    except:
+        print('e', file=sys.stderr)
+        print('response=', response, ' ?res=', res, file=sys.stderr)
+    except Exception as e:
+        print('http_test: Exception: ', e, file=sys.stderr)
         return 1
     if response != res:
         return 1
@@ -56,12 +65,19 @@ def setup_http_upload(e):
     def testRun():
         response = ''
         try:
+            print('f', file=sys.stderr)
             register_openers()
+            print('g', file=sys.stderr)
             p = MultipartParam("file", "0123456789abcdef", "test.txt", "text/plain; charset=utf8")
+            print('h', file=sys.stderr)
             datagen, headers = multipart_encode( [("var4", "val with spaces"), p] )
+            print('i', file=sys.stderr)
             request = urllib.request('http://etd.local/upload', datagen, headers)
+            print('j', file=sys.stderr)
             response = urllib.request.urlopen(request, None, 2).read()
-        except:
+            print('k', file=sys.stderr)
+        except Exception as e:
+            print('testRun: Exception: ', e, file=sys.stderr)
             return 1
         if response != 'test.txt:16\nvar4 = val with spaces':
             return 1
