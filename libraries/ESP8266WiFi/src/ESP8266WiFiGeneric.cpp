@@ -666,6 +666,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
         delay(timeout_ms);
+	// will resume on timeout or when wifi_dns_found_callback fires
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult.isSet()) {
