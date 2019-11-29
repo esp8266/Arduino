@@ -20,10 +20,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __Delegate_h
 #define __Delegate_h
 
-#if defined(ARDUINO)
-#include <Arduino.h>
-#endif
-#if !defined(ESP32) && !defined(ESP8266)
+#if defined(ESP8266)
+#include <c_types.h>
+#elif defined(ESP32)
+#include <esp_attr.h>
+#else
 #define ICACHE_RAM_ATTR
 #define IRAM_ATTR
 #endif
