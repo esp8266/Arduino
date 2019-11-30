@@ -114,7 +114,6 @@ class ESP8266WiFiGenericClass {
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
  #if LWIP_VERSION_MAJOR > 1
- #pragma message("header lwip 2.x")
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, uint8_t resolveType);
  #endif
         bool getPersistent();
