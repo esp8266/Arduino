@@ -618,10 +618,8 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
 #if LWIP_IPV4 && LWIP_IPV6
-#pragma message("Dualstack")
     err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,LWIP_DNS_ADDRTYPE_DEFAULT);
 #else
-#pragma message("Singlestack")
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
 #endif
     if(err == ERR_OK) {
@@ -647,7 +645,6 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
-#pragma message("Dualstack API extension")
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, uint8_t resolveType)
 {
     ip_addr_t addr;
