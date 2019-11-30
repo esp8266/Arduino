@@ -99,6 +99,7 @@ TEST_CASE("HTTP GET+POST Parameters", "[HTTPServer]")
     }
 }
 
+#if 0
 TEST_CASE("HTTP Upload", "[HTTPServer]")
 {
     {
@@ -123,6 +124,7 @@ TEST_CASE("HTTP Upload", "[HTTPServer]")
         REQUIRE(siteHits > 0 && siteData.equals("test.txt:16\nvar4 = val with spaces"));
     }
 }
+#endif
 
 void loop()
 {
