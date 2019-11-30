@@ -8,6 +8,7 @@ import sys
 import urllib
 
 def http_test(res, url, get=None, post=None):
+    response = ''
     try:
         if get:
             url += '?' + urllib.parse.urlencode(get)
@@ -15,7 +16,6 @@ def http_test(res, url, get=None, post=None):
             post = bytes(urllib.parse.urlencode(post).encode('utf-8'))
         request = urllib.request.urlopen(url, post, 2)
         response = request.read()
-        print('response=', response, ' ?res=', res, file=sys.stderr)
     except Exception as e:
         print('http_test: Exception: ', e, file=sys.stderr)
         return 1
