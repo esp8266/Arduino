@@ -113,9 +113,9 @@ class ESP8266WiFiGenericClass {
     public:
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
- #if LWIP_VERSION_MAJOR > 1
+#if LWIP_IPV4 && LWIP_IPV6
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, uint8_t resolveType);
- #endif
+#endif
         bool getPersistent();
 
     protected:
