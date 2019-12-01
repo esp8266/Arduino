@@ -22,6 +22,7 @@
 #include "twi.h"
 #include "pins_arduino.h"
 #include "wiring_private.h"
+#include "PolledTimeout.h"
 
 
 
@@ -122,9 +123,12 @@ private:
     // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
     inline void WAIT_CLOCK_STRETCH()
     {
-        for (unsigned int t = 0; !SCL_READ() && (t < twi_clockStretchLimit); t++)
-        {
-            /* noop */
+        esp8266::polledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
+        esp8266::polledTimeout::periodicFastUs yieldTimeout(5000);
+        while(!timeout && !SCL_READ())  // outer loop is stretch duration up to stretch limit
+        { 
+            if (yieldTimeout)   // inner loop yields every 5ms
+                yield();
         }
     }
 
@@ -245,7 +249,7 @@ void Twi::init(unsigned char sda, unsigned char scl)
     pinMode(twi_sda, INPUT_PULLUP);
     pinMode(twi_scl, INPUT_PULLUP);
     twi_setClock(preferred_si2c_clock);
-    twi_setClockStretchLimit(230); // default value is 230 uS
+    twi_setClockStretchLimit(150000L); // default value is 150 mS
 }
 
 void Twi::setAddress(uint8_t address)
@@ -444,6 +448,7 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
 
 uint8_t Twi::status()
 {
+    WAIT_CLOCK_STRETCH();  // wait for a slow slave to finish
     if (!SCL_READ())
     {
         return I2C_SCL_HELD_LOW;  // SCL held low by another device, no procedure available to recover
@@ -461,11 +466,6 @@ uint8_t Twi::status()
     if (!SDA_READ())
     {
         return I2C_SDA_HELD_LOW;  // I2C bus error. SDA line held low by slave/another_master after n bits.
-    }
-
-    if (!write_start())
-    {
-        return I2C_SDA_HELD_LOW_AFTER_INIT;  // line busy. SDA again held low by another device. 2nd master?
     }
 
     return I2C_OK;
