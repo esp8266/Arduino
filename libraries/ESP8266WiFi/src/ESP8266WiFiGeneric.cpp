@@ -617,7 +617,11 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     }
 
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+#if LWIP_IPV4 && LWIP_IPV6
+    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,LWIP_DNS_ADDRTYPE_DEFAULT);
+#else
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
+#endif
     if(err == ERR_OK) {
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
@@ -639,6 +643,43 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 
     return (err == ERR_OK) ? 1 : 0;
 }
+
+#if LWIP_IPV4 && LWIP_IPV6
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, uint8_t resolveType)
+{
+    ip_addr_t addr;
+    aResult = static_cast<uint32_t>(0);
+
+    if(aResult.fromString(aHostname)) {
+        // Host name is a IP address use it!
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
+        return 1;
+    }
+
+    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,resolveType & 3); // limit to defined types 0 -3
+    if(err == ERR_OK) {
+        aResult = IPAddress(&addr);
+    } else if(err == ERR_INPROGRESS) {
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        // will resume on timeout or when wifi_dns_found_callback fires
+        _dns_lookup_pending = false;
+        // will return here when dns_found_callback fires
+        if(aResult.isSet()) {
+            err = ERR_OK;
+        }
+    }
+
+    if(err != 0) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
+    } else {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+    }
+
+    return (err == ERR_OK) ? 1 : 0;
+}
+#endif
 
 /**
  * DNS callback
