@@ -158,10 +158,9 @@ public:
   IRAM_ATTR // fast
   bool expired()
   {
-    YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
-    if(PeriodicT)           //in case of false: gets optimized away
-      return expiredRetrigger();
-    return expiredOneShot();
+    bool hasExpired = PeriodicT ? expiredRetrigger() : expiredOneShot();
+    if (!hasExpired) YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
+    return hasExpired;
   }
 
   IRAM_ATTR // fast
