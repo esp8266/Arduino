@@ -212,16 +212,11 @@ extern "C" uint8 system_get_cpu_freq(void);
 
 void __optimistic_yield(uint32_t intvl_cycles);
 
-void inline optimistic_yield(uint32_t interval_us) __attribute__((always_inline));
-void inline optimistic_yield(uint32_t interval_us) {
-    __optimistic_yield(interval_us *
 #if defined(F_CPU)
-        clockCyclesPerMicrosecond()
+#define optimistic_yield(interval_us) (__optimistic_yield(interval_us * clockCyclesPerMicrosecond()))
 #else
-        getCpuFreqMHz()
+#define optimistic_yield(interval_us) (__optimistic_yield(interval_us * getCpuFreqMHz()))
 #endif
-    );
-}
 
 #define _PORT_GPIO16    1
 #define digitalPinToPort(pin)       (((pin)==16)?(_PORT_GPIO16):(0))

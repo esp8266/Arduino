@@ -133,6 +133,17 @@ extern "C" void __optimistic_yield(uint32_t intvl_cycles) {
     }
 }
 
+#undef optimistic_yield
+extern "C" void optimistic_yield(uint32_t interval_us) {
+    __optimistic_yield(interval_us *
+#if defined(F_CPU)
+        clockCyclesPerMicrosecond()
+#else
+        getCpuFreqMHz()
+#endif
+    );
+}
+
 // Replace ets_intr_(un)lock with nestable versions
 extern "C" void IRAM_ATTR ets_intr_lock() {
   if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
