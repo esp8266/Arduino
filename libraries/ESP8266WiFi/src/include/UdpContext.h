@@ -167,6 +167,22 @@ public:
 
 #endif // !LWIP_IPV6
 
+    /*
+     * Add a netif (by its index) as the multicast interface
+     */
+    void setMulticastInterface(netif* p_pNetIf)
+    {
+        udp_set_multicast_netif_index(_pcb, netif_get_index(p_pNetIf));
+    }
+
+    /*
+     * Allow access to pcb to change eg. options
+     */
+    udp_pcb* pcb(void)
+    {
+        return _pcb;
+    }
+
     void setMulticastTTL(int ttl)
     {
 #ifdef LWIP_MAYBE_XCC

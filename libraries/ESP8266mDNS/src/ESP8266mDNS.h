@@ -44,12 +44,14 @@
 
 #include "ESP8266mDNS_Legacy.h"
 #include "LEAmDNS.h"
+#include "LEAmDNS2.h"
 
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 // Maps the implementation to use to the global namespace type
 //using MDNSResponder = Legacy_MDNSResponder::MDNSResponder; //legacy
 using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder; //new
+//using MDNSResponder = esp8266::experimental::MDNSResponder; //new^2 not compatible
 
 extern MDNSResponder MDNS;
 #endif
