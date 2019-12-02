@@ -126,10 +126,10 @@ private:
     {
         esp8266::polledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
         esp8266::polledTimeout::periodicFastUs yieldTimeout(5000);
-        while(!timeout && !SCL_READ(twi_scl))  // outer loop is stretch duration up to stretch limit
+        while(!timeout && !SCL_READ(twi_scl))  // busy wait for stretch duration up to stretch limit
         { 
-            if (yieldTimeout)   // inner loop yields every 5ms
-                yield();
+            if (yieldTimeout)   // device response timeout exceeded
+                optimistic_yield(10000); // actually yield once every 10ms since last yield
         }
     }
 
