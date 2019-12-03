@@ -130,6 +130,9 @@ public:
   void send(int code, const char *content_type, const char *content) {
     send_P(code, content_type, content);
   }
+  void send(int code, const char *content_type, const char *content, size_t content_length) {
+    send_P(code, content_type, content, content_length);
+  }
   void send(int code, const char *content_type, const uint8_t *content, size_t content_length) {
     send_P(code, content_type, (const char *)content, content_length);
   }
