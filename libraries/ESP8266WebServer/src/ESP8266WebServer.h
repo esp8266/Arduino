@@ -127,11 +127,8 @@ public:
   void send(int code, const char* content_type = NULL, const String& content = String(""));
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
-  void send(int code, const char *content_type, const char *content, size_t content_length = 0) {
-    if (content_length == 0) {
-      content_length = strlen_P(content);
-    }
-    send_P(code, content_type, content, content_length);
+  void send(int code, const char *content_type, const char *content) {
+    send_P(code, content_type, content);
   }
   void send(int code, const char *content_type, const uint8_t *content, size_t content_length) {
     send_P(code, content_type, (const char *)content, content_length);
