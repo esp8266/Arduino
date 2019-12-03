@@ -158,7 +158,8 @@ public:
   bool expired()
   {
     bool hasExpired = PeriodicT ? expiredRetrigger() : expiredOneShot();
-    if (!hasExpired) YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
+    if (!hasExpired) //in case of DoNothing: gets optimized away
+      YieldPolicyT::execute();
     return hasExpired;
   }
 
