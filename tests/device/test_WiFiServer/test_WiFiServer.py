@@ -18,11 +18,11 @@ def setup_echo_server(e):
             sock.connect((server_address, 5000))
             sock.settimeout(1.0)
             buf = 'a' * 1023 + '\n'
-            sock.sendall(buf)
+            sock.sendall(bytes(buf.encode('utf-8')))
             data = ''
             retries = 0
             while len(data) < 1024 and retries < 3:
-                data += sock.recv(1024)
+                data += sock.recv(1024).decode('utf-8')
                 retries += 1
             print('Received {} bytes'.format(len(data)))
             if len(data) != 1024:
