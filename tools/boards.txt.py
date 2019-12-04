@@ -1459,6 +1459,8 @@ def sdk ():
     return { 'sdk': collections.OrderedDict([
                         ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
                         ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
+                        ('.menu.sdk.nonosdk_191122', 'nonos-sdk 2.2.1+119 (191122)'),
+                        ('.menu.sdk.nonosdk_191122.build.sdk', 'NONOSDK22x_191122'),
                         ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
                         ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
                         ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
