@@ -246,8 +246,8 @@ private:
   bool checkExpired(const timeType internalUnit) const
   {
     // canWait() is not checked here
-    // returns "can expire" and "oneshot not expired" and "time expired"
-    return (_oneShotExpired) || ((!_neverExpires) && ((internalUnit - _start) >= _timeout));
+    // returns "oneshot has expired", otherwise returns "can expire" and "time has expired"
+    return _oneShotExpired || (!_neverExpires && ((internalUnit - _start) >= _timeout));
   }
 
 protected:
