@@ -56,7 +56,7 @@ void fqdn_rt(Print& out, const String& fqdn, uint8_t resolveType) {
   out.print(fqdn);
   out.print(F(": "));
   IPAddress result;
-  if (WiFi.hostByName(fqdn.c_str(), result, 10000, resolveType) {
+  if (WiFi.hostByName(fqdn.c_str(), result, 10000, resolveType)) {
     result.printTo(out);
     out.println();
   } else {
