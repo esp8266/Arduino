@@ -51,6 +51,7 @@ void fqdn(Print& out, const String& fqdn) {
   }
 }
 
+#if LWIP_IPV4 && LWIP_IPV6
 void fqdn_rt(Print& out, const String& fqdn, uint8_t resolveType) {
   out.print(F("resolving "));
   out.print(fqdn);
@@ -63,6 +64,7 @@ void fqdn_rt(Print& out, const String& fqdn, uint8_t resolveType) {
     out.println(F("timeout or not found"));
   }
 }
+#endif
 
 void status(Print& out) {
   out.println(F("------------------------------"));
@@ -99,8 +101,10 @@ void status(Print& out) {
   // an example is provided with a fqdn which does not resolve with IPv4
   fqdn(out, FQDN);
   fqdn(out, FQDN6);
+#if LWIP_IPV4 && LWIP_IPV6
   fqdn_rt(out, FQDN, LWIP_DNS_ADDRTYPE_IPV4_IPV6);  // IPv4 before IPv6
-  fqdn_rt(out, FQDN2, LWIP_DNS_ADDRTYPE_IPV6_IPV4); // IPv6 before IPv4 
+  fqdn_rt(out, FQDN2, LWIP_DNS_ADDRTYPE_IPV6_IPV4); // IPv6 before IPv4
+#endif
   out.println(F("------------------------------"));
 }
 
