@@ -158,13 +158,6 @@ static Twi twi;
 #define FCPU80 80000000L
 #endif
 
-#if F_CPU == FCPU80
-#define TWI_CLOCK_STRETCH_MULTIPLIER 3
-#else
-#define TWI_CLOCK_STRETCH_MULTIPLIER 6
-#endif
-
-
 void Twi::setClock(unsigned int freq)
 {
     preferred_si2c_clock = freq;
@@ -231,7 +224,7 @@ void Twi::setClock(unsigned int freq)
 
 void Twi::setClockStretchLimit(uint32_t limit)
 {
-    twi_clockStretchLimit = limit * TWI_CLOCK_STRETCH_MULTIPLIER;
+    twi_clockStretchLimit = limit;
 }
 
 
