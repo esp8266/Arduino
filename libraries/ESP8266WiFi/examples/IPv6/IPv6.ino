@@ -51,7 +51,7 @@ void fqdn(Print& out, const String& fqdn) {
   }
 }
 
-void fqdn_rt(Print& out, const String& fqdn, resolveType) {
+void fqdn_rt(Print& out, const String& fqdn, uint8_t resolveType) {
   out.print(F("resolving "));
   out.print(fqdn);
   out.print(F(": "));
