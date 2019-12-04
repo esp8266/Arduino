@@ -42,8 +42,8 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
   if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-    String messageEncrypted = espnowInstance->receivedEncryptedMessage() ? ", Encrypted" : ", Unencrypted";
-    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + messageEncrypted + "): ");
+    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
+    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
   } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
     Serial.print("TCP/IP: ");
@@ -54,6 +54,7 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   /* Print out received message */
   // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
   // If you need to print the whole String it is better to store it and print it in the loop() later.
+  // Note that request.substring will not work as expected if the String contains null values as data.
   Serial.print("Request received: ");
   Serial.println(request.substring(0, 100));
 
@@ -73,8 +74,8 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
   if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-    String messageEncrypted = espnowInstance->receivedEncryptedMessage() ? ", Encrypted" : ", Unencrypted";
-    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + messageEncrypted + "): ");
+    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
+    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
   } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     Serial.print("TCP/IP: ");
 
@@ -84,7 +85,6 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
     // So for ESP-NOW, adding unique identifiers in the response and request is required to associate a response with a request.
     Serial.print(F("Request sent: "));
     Serial.println(tcpIpInstance->getCurrentMessage().substring(0, 100));
-
   } else {
     Serial.print("UNKNOWN!: ");
   }
@@ -92,6 +92,7 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
   /* Print out received message */
   // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
   // If you need to print the whole String it is better to store it and print it in the loop() later.
+  // Note that response.substring will not work as expected if the String contains null values as data.
   Serial.print(F("Response received: "));
   Serial.println(response.substring(0, 100));
 

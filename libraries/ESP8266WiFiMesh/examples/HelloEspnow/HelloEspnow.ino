@@ -19,10 +19,11 @@ const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
-uint8_t espnowEncryptionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions.
-                                   0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
-                                  };
-uint8_t espnowEncryptionKok[16] = {0x22, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting the encryption key.
+// Note that it is also possible to use Strings as key seeds instead of arrays.
+uint8_t espnowEncryptedConnectionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions of encrypted connections.
+                                            0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
+                                           };
+uint8_t espnowEncryptionKok[16] = {0x22, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting the encrypted connection key.
                                    0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x33
                                   };
 uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
@@ -40,7 +41,7 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
 bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
 
 /* Create the mesh node object */
-EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, broadcastFilter, FPSTR(exampleWiFiPassword), espnowEncryptionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, broadcastFilter, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
 
 /**
    Callback for when other nodes send you a request
@@ -57,8 +58,8 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
   if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-    String messageEncrypted = espnowInstance->receivedEncryptedMessage() ? ", Encrypted" : ", Unencrypted";
-    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + messageEncrypted + "): ");
+    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
+    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
   } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
     Serial.print("TCP/IP: ");
@@ -69,6 +70,7 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   /* Print out received message */
   // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
   // If you need to print the whole String it is better to store it and print it in the loop() later.
+  // Note that request.substring will not work as expected if the String contains null values as data.
   Serial.print("Request received: ");
   Serial.println(request.substring(0, 100));
 
@@ -88,8 +90,8 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
   if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-    String messageEncrypted = espnowInstance->receivedEncryptedMessage() ? ", Encrypted" : ", Unencrypted";
-    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + messageEncrypted + "): ");
+    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
+    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
   } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     Serial.print("TCP/IP: ");
 
@@ -106,6 +108,7 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
   /* Print out received message */
   // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
   // If you need to print the whole String it is better to store it and print it in the loop() later.
+  // Note that response.substring will not work as expected if the String contains null values as data.
   Serial.print(F("Response received: "));
   Serial.println(response.substring(0, 100));
 
@@ -169,7 +172,9 @@ bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance)
     return false; // Broadcast is for another mesh network
   } else {
     // Remove metadata from message and mark as accepted broadcast.
-    firstTransmission = firstTransmission.substring(metadataEndIndex + 1);
+    // Note that when you modify firstTransmission it is best to avoid using substring or other String methods that rely on null values for String length determination.
+    // Otherwise your broadcasts cannot include null values in the message bytes.
+    firstTransmission.remove(0, metadataEndIndex + 1);
     return true;
   }
 }
@@ -189,6 +194,31 @@ bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
   // Currently this is exactly the same as the default hook, but you can modify it to alter the behaviour of attemptTransmission.
 
   (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+
+  return true;
+}
+
+/**
+   Once passed to the setResponseTransmittedHook method of the ESP-NOW backend,
+   this function will be called after each successful ESP-NOW response transmission, just before the response is removed from the waiting list.
+   If a particular response is not sent, there will be no function call for it.
+   Only the hook of the EspnowMeshBackend instance that is getEspnowRequestManager() will be called.
+
+   @param response The sent response.
+   @param recipientMac The MAC address the response was sent to.
+   @param responseIndex The index of the response in the waiting list.
+   @param meshInstance The EspnowMeshBackend instance that called the function.
+
+   @return True if the response transmission process should continue with the next response in the waiting list.
+           False if the response transmission process should stop after removing the just sent response from the waiting list.
+*/
+bool exampleResponseTransmittedHook(const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance) {
+  // Currently this is exactly the same as the default hook, but you can modify it to alter the behaviour of sendEspnowResponses.
+
+  (void)response; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  (void)recipientMac;
+  (void)responseIndex;
+  (void)meshInstance;
 
   return true;
 }
@@ -222,10 +252,10 @@ void setup() {
 
   // Note: This changes the Kok for all EspnowMeshBackend instances on this ESP8266.
   // Encrypted connections added before the Kok change will retain their old Kok.
-  // Both Kok and encryption key must match in an encrypted connection pair for encrypted communication to be possible.
+  // Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible.
   // Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
   EspnowMeshBackend::setEspnowEncryptionKok(espnowEncryptionKok);
-  espnowNode.setEspnowEncryptionKey(espnowEncryptionKey);
+  espnowNode.setEspnowEncryptedConnectionKey(espnowEncryptedConnectionKey);
 
   // Makes it possible to find the node through scans, and also makes it possible to recover from an encrypted connection where only the other node is encrypted.
   // Note that only one AP can be active at a time in total, and this will always be the one which was last activated.
@@ -238,6 +268,21 @@ void setup() {
   espnowNode.setMessage(String(F("Hello world request #")) + String(requestNumber) + String(F(" from ")) + espnowNode.getMeshName() + espnowNode.getNodeID() + String(F(".")));
 
   espnowNode.setTransmissionOutcomesUpdateHook(exampleTransmissionOutcomesUpdateHook);
+  espnowNode.setResponseTransmittedHook(exampleResponseTransmittedHook);
+
+  // In addition to using encrypted ESP-NOW connections the framework can also send automatically encrypted messages (AEAD) over both encrypted and unencrypted connections.
+  // Using AEAD will only encrypt the message content, not the transmission metadata.
+  // The AEAD encryption does not require any pairing, and is thus faster for single messages than establishing a new encrypted connection before transfer.
+  // AEAD encryption also works with ESP-NOW broadcasts and supports an unlimited number of nodes, which is not true for encrypted connections.
+  // Encrypted ESP-NOW connections do however come with built in replay attack protection, which is not provided by the framework when using AEAD encryption,
+  // and allow EspnowProtocolInterpreter::aeadMetadataSize extra message bytes per transmission.
+  // Transmissions via encrypted connections are also slightly faster than via AEAD once a connection has been established.
+  //
+  // Uncomment the lines below to use automatic AEAD encryption/decryption of messages sent/received.
+  // All nodes this node wishes to communicate with must then also use encrypted messages with the same getEspnowMessageEncryptionKey(), or messages will not be accepted.
+  // Note that using AEAD encrypted messages will reduce the number of message bytes that can be transmitted.
+  //espnowNode.setEspnowMessageEncryptionKey("ChangeThisKeySeed_TODO"); // The message encryption key should always be set manually. Otherwise a default key (all zeroes) is used.
+  //espnowNode.setUseEncryptedMessages(true);
 }
 
 int32_t timeOfLastScan = -10000;

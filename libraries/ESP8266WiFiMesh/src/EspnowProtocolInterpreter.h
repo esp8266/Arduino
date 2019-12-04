@@ -54,12 +54,16 @@ namespace EspnowProtocolInterpreter
   const uint8_t espnowTransmissionMacIndex = 2;
   const uint8_t espnowMessageIDIndex = 8;
 
-  uint8_t espnowProtocolBytesSize();
+  constexpr uint8_t espnowProtocolBytesSize = 16;
+  constexpr uint8_t aeadMetadataSize = 28;
+  uint8_t espnowMetadataSize();
 
-  const uint8_t espnowEncryptionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
+  const uint8_t espnowEncryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
   const uint8_t espnowHashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
 
-  String espnowGetMessageContent(uint8_t *transmission, uint8_t transmissionLength);
+  constexpr uint64_t uint64LeftmostBits = 0xFFFFFFFF00000000;
+
+  String espnowGetMessageContent(uint8_t *transmissionDataArray, uint8_t transmissionLength);
   char espnowGetMessageType(const uint8_t *transmissionDataArray);
   uint8_t espnowGetTransmissionsRemaining(const uint8_t *transmissionDataArray);
   bool espnowIsMessageStart(const uint8_t *transmissionDataArray);

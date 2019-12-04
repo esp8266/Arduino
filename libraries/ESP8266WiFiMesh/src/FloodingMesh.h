@@ -55,7 +55,7 @@ public:
    *
    * @param messageHandler The callback handler responsible for dealing with messages received from the mesh.
    * @param meshPassword The WiFi password for the mesh network.
-   * @param espnowEncryptionKey An uint8_t array containing the key used by the EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
+   * @param espnowEncryptedConnectionKey An uint8_t array containing the secret key used by the EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
    * @param espnowHashKey An uint8_t array containing the secret key used by the EspnowMeshBackend instance to generate HMACs for encrypted ESP-NOW connections.
    * @param ssidPrefix The prefix (first part) of the node SSID.
    * @param ssidSuffix The suffix (last part) of the node SSID.
@@ -68,7 +68,39 @@ public:
    *                        make it impossible for other stations to detect the APs whose WiFi channels have changed.
    * 
    */
-  FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength], 
+  FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
+               const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+               const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+
+  /**
+   * FloodingMesh constructor method. Creates a FloodingMesh node, ready to be initialised.
+   *
+   * @param messageHandler The callback handler responsible for dealing with messages received from the mesh.
+   * @param meshPassword The WiFi password for the mesh network.
+   * @param espnowEncryptedConnectionKeySeed A string containing the seed that will generate the secret key used by the EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
+   * @param espnowHashKeySeed A string containing the seed that will generate the secret key used by the EspnowMeshBackend to generate HMACs for encrypted ESP-NOW connections.
+   * @param ssidPrefix The prefix (first part) of the node SSID.
+   * @param ssidSuffix The suffix (last part) of the node SSID.
+   * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
+   * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
+   *                        WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                        This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
+   *                        In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
+   *                        WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
+   *                        make it impossible for other stations to detect the APs whose WiFi channels have changed.
+   * 
+   */
+  FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed, 
+               const String &ssidPrefix, const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+
+  /**
+   * This constructor should be used in combination with serializeMeshState() when the node has gone to sleep while other nodes stayed awake.
+   * Otherwise the message ID will be reset after sleep, which means that the nodes that stayed awake may ignore new broadcasts for a while.
+   * 
+   * @param serializedMeshState A String with a serialized mesh node state that the node should use.
+   */
+  FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
+               const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
                const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
 
@@ -78,18 +110,13 @@ public:
    * 
    * @param serializedMeshState A String with a serialized mesh node state that the node should use.
    */
-  FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
-               const uint8_t espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength], 
-               const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
-               const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+  FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, 
+               const String &espnowHashKeySeed, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
 
   virtual ~FloodingMesh();
 
   /**
    * The method responsible for initialising this FloodingMesh instance.
-   * 
-   * Since there is only one WiFi radio on the ESP8266, only the FloodingMesh instance that was the last to begin() will be visible to surrounding nodes.
-   * All FloodingMesh instances can still broadcast messages though, even if their AP is not visible.
    */
   void begin();
 
@@ -97,8 +124,9 @@ public:
    * Makes it possible to find the node through scans, and also makes it possible to recover from an encrypted ESP-NOW connection where only the other node is encrypted.
    * Required for encryptedBroadcast() usage, but also slows down the start-up of the node.
    * 
-   * Note that only one AP can be active at a time in total, and this will always be the one which was last activated.
+   * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
    * Thus the AP is shared by all backends.
+   * All FloodingMesh instances can still broadcast messages though, even if their AP is not visible.
    */
   void activateAP();
   
@@ -123,10 +151,10 @@ public:
   /**
    * Make an unencrypted broadcast to the entire mesh network.
    * 
-   * It is recommended that there is at most one new message transmitted in the mesh every 10, 20, 30 ms for messages of length maxUnencryptedMessageSize()*n, 
+   * It is recommended that there is at most one new message transmitted in the mesh every 10, 20, 30 ms for messages up to length maxUnencryptedMessageLength()*n, 
    * where n is (roughly, depending on mesh name length) 1/4, 3/5 and 1 respectively. If transmissions are more frequent than this, message loss will increase.
    * 
-   * @param message The message to broadcast. Maximum message length is given by maxUnencryptedMessageSize(). The longer the message, the longer the transmission time. 
+   * @param message The message to broadcast. Maximum message length is given by maxUnencryptedMessageLength(). The longer the message, the longer the transmission time. 
    */
   void broadcast(const String &message);
 
@@ -143,17 +171,24 @@ public:
    * Make an encrypted broadcast to the entire mesh network.
    * 
    * ########## WARNING! This an experimental feature. API may change at any time. Only use if you like it when things break. ##########
-   * Will be very slow compared to unencrypted broadcasts. Probably works OK in a small mesh with a maximum of one new message transmitted in the mesh every second.
+   * Will be very slow compared to unencrypted broadcasts. Probably works OK in a small mesh with a maximum of 2-3 new messages transmitted in the mesh every second.
    * Because of the throughput difference, mixing encypted and unencrypted broadcasts is not recommended if there are frequent mesh broadcasts (multiple per second), 
    * since a lot of unencrypted broadcasts can build up while a single encrypted broadcast is sent.
    * 
    * It is recommended that verboseMode is turned off if using this, to avoid slowdowns due to excessive Serial printing.
    * 
-   * @param message The message to broadcast. Maximum message length is given by maxEncryptedMessageSize(). The longer the message, the longer the transmission time. 
+   * @param message The message to broadcast. Maximum message length is given by maxEncryptedMessageLength(). The longer the message, the longer the transmission time. 
    */
   void encryptedBroadcast(const String &message);
-    
-  void clearMessageLogs(); 
+
+  /**
+   * Clear the logs used for remembering which messages this node has received from the mesh network.
+   */
+  void clearMessageLogs();
+  
+  /**
+   * Remove all messages received from the mesh network which are stored waiting to be forwarded by this node.
+   */
   void clearForwardingBacklog();
 
   /**
@@ -203,7 +238,7 @@ public:
    *         Note that non-ASCII characters usually require at least two bytes each.
    *         Also note that for unencrypted messages the maximum size will depend on getEspnowMeshBackend().getMeshName().length()
    */
-  uint32_t maxUnencryptedMessageSize();
+  uint32_t maxUnencryptedMessageLength();
   
   /**
    * Hint: Use String.length() to get the ASCII length of a String.
@@ -211,14 +246,14 @@ public:
    * @return The maximum length in bytes an encrypted ASCII message is allowed to be when broadcasted by this node. 
    *         Note that non-ASCII characters usually require at least two bytes each.
    */
-  uint32_t maxEncryptedMessageSize();
+  uint32_t maxEncryptedMessageLength();
 
   /**
    * Set the delimiter character used for metadata by every FloodingMesh instance. 
    * Using characters found in the mesh name or in HEX numbers is unwise, as is using ','.
    * 
    * @param metadataDelimiter The metadata delimiter character to use.
-   *                                   Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
+   *                          Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
    */
   static void setMetadataDelimiter(char metadataDelimiter);
   static char metadataDelimiter();
@@ -236,6 +271,7 @@ public:
   void restoreDefaultNetworkFilter();
   void restoreDefaultBroadcastFilter();
   void restoreDefaultTransmissionOutcomesUpdateHook();
+  void restoreDefaultResponseTransmittedHook();
 
 protected:
 
@@ -289,6 +325,7 @@ private:
   void _defaultNetworkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
   bool _defaultBroadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
   bool _defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance);
+  bool _defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance);
 };
 
 #endif

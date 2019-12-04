@@ -193,7 +193,7 @@ public:
 
   /**
    * Set a function that should be called after each update of the latestTransmissionOutcomes vector during attemptTransmission. (which happens after each individual transmission has finished)
-   * The function should return a bool. If this return value is true, attemptTransmission will continue with the next entry in the connectionQueue. If it is false, attemptTransmission will stop.
+   * The hook should return a bool. If this return value is true, attemptTransmission will continue with the next entry in the connectionQueue. If it is false, attemptTransmission will stop.
    * The default transmissionOutcomesUpdateHook always returns true.
    * 
    * Example use cases is modifying getMessage() between transmissions, or aborting attemptTransmission before all nodes in the connectionQueue have been contacted.

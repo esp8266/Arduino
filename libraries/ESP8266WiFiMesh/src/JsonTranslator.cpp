@@ -248,9 +248,9 @@ namespace JsonTranslator
     return true;
   }
 
-  bool getUnencryptedMessageID(const String &jsonString, uint32_t &result)
+  bool getUnsynchronizedMessageID(const String &jsonString, uint32_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonUnencryptedMessageID);
+    int32_t startIndex = getStartIndex(jsonString, jsonUnsynchronizedMessageID);
     if(startIndex < 0)
       return false;
     

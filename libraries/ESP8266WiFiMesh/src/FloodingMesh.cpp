@@ -41,7 +41,7 @@ void floodingMeshDelay(uint32_t durationMs)
   }
 }
 
-FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength], 
+FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                            const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
                            const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel) 
                            : _espnowBackend(
@@ -49,17 +49,35 @@ FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &mesh
                             [this](const String &response, MeshBackendBase &meshInstance){ return _defaultResponseHandler(response, meshInstance); }, 
                             [this](int numberOfNetworks, MeshBackendBase &meshInstance){ return _defaultNetworkFilter(numberOfNetworks, meshInstance); }, 
                             [this](String &firstTransmission, EspnowMeshBackend &meshInstance){ return _defaultBroadcastFilter(firstTransmission, meshInstance); },
-                            meshPassword, espnowEncryptionKey, espnowHashKey, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
+                            meshPassword, espnowEncryptedConnectionKey, espnowHashKey, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
 {
   setMessageHandler(messageHandler);
   restoreDefaultTransmissionOutcomesUpdateHook();
+  restoreDefaultResponseTransmittedHook();
+}
+
+FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed,
+                           const String &ssidPrefix, const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel) 
+                           : FloodingMesh(messageHandler, meshPassword, (const uint8_t[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]){0}, 
+                                          (const uint8_t[EspnowProtocolInterpreter::espnowHashKeyLength]){0}, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
+{
+  getEspnowMeshBackend().setEspnowEncryptedConnectionKey(espnowEncryptedConnectionKeySeed);
+  getEspnowMeshBackend().setEspnowHashKey(espnowHashKeySeed);
 }
 
 FloodingMesh::FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
-                           const uint8_t espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength], 
+                           const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                            const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
                            const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel)
-                           : FloodingMesh(messageHandler, meshPassword, espnowEncryptionKey, espnowHashKey, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel) 
+                           : FloodingMesh(messageHandler, meshPassword, espnowEncryptedConnectionKey, espnowHashKey, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel) 
+{
+  loadMeshState(serializedMeshState);
+}
+
+FloodingMesh::FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
+                           const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed, const String &ssidPrefix, 
+                           const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel)
+                           : FloodingMesh(messageHandler, meshPassword, espnowEncryptedConnectionKeySeed, espnowHashKeySeed, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel) 
 {
   loadMeshState(serializedMeshState);
 }
@@ -73,6 +91,9 @@ void FloodingMesh::begin()
 {
   // Initialise the mesh node  
   getEspnowMeshBackend().begin();
+
+  // Used for encrypted broadcasts
+  getEspnowMeshBackend().setEncryptedConnectionsSoftLimit(3);
   
   availableFloodingMeshes.insert(this); // Returns std::pair<iterator,bool>
 }
@@ -118,7 +139,7 @@ String FloodingMesh::serializeMeshState()
 {
   using namespace JsonTranslator;
   
-  // Returns: {"meshState":{"connectionState":{"unencMsgID":"123"},"meshMsgCount":"123"}}
+  // Returns: {"meshState":{"connectionState":{"unsyncMsgID":"123"},"meshMsgCount":"123"}}
 
   String connectionState = getEspnowMeshBackend().serializeUnencryptedConnection();
   
@@ -138,21 +159,21 @@ void FloodingMesh::loadMeshState(const String &serializedMeshState)
   String connectionState = "";
   if(!getConnectionState(serializedMeshState, connectionState) || !getEspnowMeshBackend().addUnencryptedConnection(connectionState))
   {
-    getEspnowMeshBackend().warningPrint("WARNING! serializedMeshState did not contain unencryptedMessageID. Using default instead.");
+    getEspnowMeshBackend().warningPrint("WARNING! serializedMeshState did not contain unsynchronizedMessageID. Using default instead.");
   }
 }
 
 String FloodingMesh::generateMessageID()
 {
-  char messageCountArray[2] = { 0 };
-  sprintf(messageCountArray, "%04X", _messageCount++);
+  char messageCountArray[5] = { 0 };
+  snprintf(messageCountArray, 5, "%04X", _messageCount++);
   uint8_t apMac[6] {0};
   return macToString(WiFi.softAPmacAddress(apMac)) + String(messageCountArray); // We use the AP MAC address as ID since it is what shows up during WiFi scans
 }
 
 void FloodingMesh::broadcast(const String &message)
 {
-  assert(message.length() <= maxUnencryptedMessageSize());
+  assert(message.length() <= maxUnencryptedMessageLength());
   
   String messageID = generateMessageID();
 
@@ -176,7 +197,7 @@ uint8_t FloodingMesh::getBroadcastReceptionRedundancy() { return _broadcastRecep
 
 void FloodingMesh::encryptedBroadcast(const String &message)
 {
-  assert(message.length() <= maxEncryptedMessageSize());
+  assert(message.length() <= maxEncryptedMessageLength());
 
   String messageID = generateMessageID();
   
@@ -185,7 +206,7 @@ void FloodingMesh::encryptedBroadcast(const String &message)
 
 void FloodingMesh::encryptedBroadcastKernel(const String &message)
 {
-  getEspnowMeshBackend().attemptAutoEncryptingTransmission(message);
+  getEspnowMeshBackend().attemptAutoEncryptingTransmission(message, true);
 }
 
 void FloodingMesh::clearMessageLogs()
@@ -214,12 +235,12 @@ uint8_t *FloodingMesh::getOriginMac(uint8_t *macArray)
   return macArray;
 }
 
-uint32_t FloodingMesh::maxUnencryptedMessageSize()
+uint32_t FloodingMesh::maxUnencryptedMessageLength()
 {
   return getEspnowMeshBackend().getMaxMessageLength() - MESSAGE_ID_LENGTH - (getEspnowMeshBackend().getMeshName().length() + 1); // Need room for mesh name + delimiter
 }
 
-uint32_t FloodingMesh::maxEncryptedMessageSize()
+uint32_t FloodingMesh::maxEncryptedMessageLength()
 {
   // Need 1 extra delimiter character for maximum metadata efficiency (makes it possible to store exactly 18 MACs in metadata by adding an extra transmission)
   return getEspnowMeshBackend().getMaxMessageLength() - MESSAGE_ID_LENGTH - 1;
@@ -234,9 +255,11 @@ uint16_t FloodingMesh::messageLogSize() { return _messageLogSize; }
 
 void FloodingMesh::setMetadataDelimiter(char metadataDelimiter) 
 { 
-  // Using HEX number characters as a delimiter is a bad idea regardless of broadcast type, since they are always in the broadcast metadata
-  assert(metadataDelimiter < 48 || 57 < metadataDelimiter);
-  assert(metadataDelimiter < 65 || 70 < metadataDelimiter);
+  // Using HEX number characters as a delimiter is a bad idea regardless of broadcast type, since they are always in the broadcast metadata.
+  // We therefore check for those characters below.
+  assert(metadataDelimiter < '0' || '9' < metadataDelimiter);
+  assert(metadataDelimiter < 'A' || 'F' < metadataDelimiter);
+  assert(metadataDelimiter < 'a' || 'f' < metadataDelimiter);
   
   _metadataDelimiter = metadataDelimiter; 
 }
@@ -328,6 +351,12 @@ void FloodingMesh::restoreDefaultTransmissionOutcomesUpdateHook()
   getEspnowMeshBackend().setTransmissionOutcomesUpdateHook([this](MeshBackendBase &meshInstance){ return _defaultTransmissionOutcomesUpdateHook(meshInstance); });
 }
 
+void FloodingMesh::restoreDefaultResponseTransmittedHook()
+{  
+  getEspnowMeshBackend().setResponseTransmittedHook([this](const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance)
+                                                    { return _defaultResponseTransmittedHook(response, recipientMac, responseIndex, meshInstance); });
+}
+
 /**
  * Callback for when other nodes send you a request
  *
@@ -340,7 +369,7 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
   (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
   
   String broadcastTarget = "";
-  String remainingRequest = "";
+  String remainingRequest = request;
   
   if(request.charAt(0) == metadataDelimiter())
   {
@@ -350,11 +379,7 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
       return ""; // metadataDelimiter not found
     
     broadcastTarget = request.substring(1, broadcastTargetEndIndex + 1); // Include delimiter
-    remainingRequest = request.substring(broadcastTargetEndIndex + 1);
-  }
-  else
-  {
-    remainingRequest = request;
+    remainingRequest.remove(0, broadcastTargetEndIndex + 1);
   }
   
   int32_t messageIDEndIndex = remainingRequest.indexOf(metadataDelimiter());
@@ -367,15 +392,16 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
   if(insertCompletedMessageID(messageID))
   {
     uint8_t originMacArray[6] = { 0 };
-    setOriginMac(uint64ToMac(messageID >> 16, originMacArray));
+    setOriginMac(uint64ToMac(messageID >> 16, originMacArray)); // messageID consists of MAC + 16 bit counter
   
-    String message = remainingRequest.substring(messageIDEndIndex + 1);
+    String message = remainingRequest;
+    message.remove(0, messageIDEndIndex + 1); // This approach avoids the null value removal of substring()
     
     if(getMessageHandler()(message, *this))
     {
       message = broadcastTarget + remainingRequest.substring(0, messageIDEndIndex + 1) + message;
       assert(message.length() <= _espnowBackend.getMaxMessageLength());
-      _forwardingBacklog.emplace_back(message, getEspnowMeshBackend().receivedEncryptedMessage());
+      _forwardingBacklog.emplace_back(message, getEspnowMeshBackend().receivedEncryptedTransmission());
     }
   }
   
@@ -498,6 +524,30 @@ bool FloodingMesh::_defaultBroadcastFilter(String &firstTransmission, EspnowMesh
 bool FloodingMesh::_defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance)
 {
   (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+
+  return true;
+}
+
+/**
+ * Once passed to the setResponseTransmittedHook method of the ESP-NOW backend, 
+ * this function will be called after each successful ESP-NOW response transmission, just before the response is removed from the waiting list.
+ * If a particular response is not sent, there will be no function call for it.
+ * Only the hook of the EspnowMeshBackend instance that is getEspnowRequestManager() will be called.
+ * 
+ * @param response The sent response.
+ * @param recipientMac The MAC address the response was sent to.
+ * @param responseIndex The index of the response in the waiting list.
+ * @param meshInstance The EspnowMeshBackend instance that called the function.
+ * 
+ * @return True if the response transmission process should continue with the next response in the waiting list.
+ *         False if the response transmission process should stop after removing the just sent response from the waiting list.
+ */
+bool FloodingMesh::_defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance)
+{
+  (void)response; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  (void)recipientMac;
+  (void)responseIndex;
+  (void)meshInstance;
 
   return true;
 }

@@ -23,6 +23,7 @@
  */
 
 #include "MeshCryptoInterface.h"
+#include <assert.h>
 
 namespace MeshCryptoInterface 
 {
@@ -38,5 +39,14 @@ namespace MeshCryptoInterface
       return true;
     else
       return false;
+  }
+
+  uint8_t *initializeKey(uint8_t *key, uint8_t keyLength, const String &keySeed)
+  {
+    assert(keyLength <= CryptoInterface::SHA256_NATURAL_LENGTH);
+    uint8_t hashArray[CryptoInterface::SHA256_NATURAL_LENGTH] {};
+    CryptoInterface::sha256Hash(keySeed.c_str(), keySeed.length(), hashArray);
+    memcpy(key, hashArray, keyLength);
+    return key;
   }
 }

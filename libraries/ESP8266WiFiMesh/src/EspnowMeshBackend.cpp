@@ -26,8 +26,9 @@ extern "C" {
 #include "UtilityFunctions.h"
 #include "MutexTracker.h"
 #include "JsonTranslator.h"
+#include "MeshCryptoInterface.h"
 
-using EspnowProtocolInterpreter::espnowEncryptionKeyLength;
+using EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength;
 using EspnowProtocolInterpreter::espnowHashKeyLength;
 
 static const uint8_t maxEncryptedConnections = 6; // This is limited by the ESP-NOW API. Max 6 in AP or AP+STA mode. Max 10 in STA mode. See "ESP-NOW User Guide" for more info. 
@@ -38,6 +39,7 @@ const uint8_t EspnowMeshBackend::broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 
 bool EspnowMeshBackend::_espnowTransmissionMutex = false;
 bool EspnowMeshBackend::_espnowConnectionQueueMutex = false;
+bool EspnowMeshBackend::_responsesToSendMutex = false;
 
 EspnowMeshBackend *EspnowMeshBackend::_espnowRequestManager = nullptr;
 
@@ -67,10 +69,13 @@ encrypted_connection_status_t EspnowMeshBackend::_ongoingPeerRequestResult = ECS
 uint32_t EspnowMeshBackend::_ongoingPeerRequestEncryptionStart = 0;
 bool EspnowMeshBackend::_reciprocalPeerRequestConfirmation = false;
 
-uint8_t EspnowMeshBackend::_espnowEncryptionKok[espnowEncryptionKeyLength] = { 0 };
+uint8_t EspnowMeshBackend::_espnowEncryptionKok[espnowEncryptedConnectionKeyLength] = { 0 };
 bool EspnowMeshBackend::_espnowEncryptionKokSet = false;
 
-uint32_t EspnowMeshBackend::_unencryptedMessageID = 0;
+uint8_t EspnowMeshBackend::_espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH] = { 0 };
+bool EspnowMeshBackend::_useEncryptedMessages = false;
+
+uint32_t EspnowMeshBackend::_unsynchronizedMessageID = 0;
 
 // _logEntryLifetimeMs is based on someone storing 40 responses of 750 bytes each = 30 000 bytes (roughly full memory), 
 // which takes 2000 ms + some margin to send. Also, we want to avoid old entries taking up memory if they cannot be sent, 
@@ -103,8 +108,7 @@ void espnowDelay(uint32_t durationMs)
 }
 
 EspnowMeshBackend::EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
-                                     broadcastFilterType broadcastFilter, const String &meshPassword, const uint8_t espnowEncryptionKey[espnowEncryptionKeyLength],
-                                     const uint8_t espnowHashKey[espnowHashKeyLength], const String &ssidPrefix, const String &ssidSuffix, bool verboseMode,
+                                     broadcastFilterType broadcastFilter, const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode,
                                      uint8 meshWiFiChannel) 
                                      : MeshBackendBase(requestHandler, responseHandler, networkFilter, MB_ESP_NOW)
 {
@@ -114,10 +118,28 @@ EspnowMeshBackend::EspnowMeshBackend(requestHandlerType requestHandler, response
   setBroadcastFilter(broadcastFilter);
   setSSID(ssidPrefix, "", ssidSuffix);
   setMeshPassword(meshPassword);
-  setEspnowEncryptionKey(espnowEncryptionKey);
-  setEspnowHashKey(espnowHashKey);
   setVerboseModeState(verboseMode);
   setWiFiChannel(meshWiFiChannel);
+}
+
+EspnowMeshBackend::EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
+                                     broadcastFilterType broadcastFilter, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[espnowEncryptedConnectionKeyLength],
+                                     const uint8_t espnowHashKey[espnowHashKeyLength], const String &ssidPrefix, const String &ssidSuffix, bool verboseMode,
+                                     uint8 meshWiFiChannel) 
+                                     : EspnowMeshBackend(requestHandler, responseHandler, networkFilter, broadcastFilter, meshPassword, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
+{
+  setEspnowEncryptedConnectionKey(espnowEncryptedConnectionKey);
+  setEspnowHashKey(espnowHashKey);
+}
+
+EspnowMeshBackend::EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
+                                     broadcastFilterType broadcastFilter, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed,
+                                     const String &espnowHashKeySeed, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode,
+                                     uint8 meshWiFiChannel) 
+                                     : EspnowMeshBackend(requestHandler, responseHandler, networkFilter, broadcastFilter, meshPassword, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
+{
+  setEspnowEncryptedConnectionKey(espnowEncryptedConnectionKeySeed);
+  setEspnowHashKey(espnowHashKeySeed);
 }
 
 EspnowMeshBackend::~EspnowMeshBackend()
@@ -142,7 +164,7 @@ bool EspnowMeshBackend::activateEspnow()
 {
   if (esp_now_init()==0) 
   {    
-    if(_espnowEncryptionKokSet && esp_now_set_kok(_espnowEncryptionKok, espnowEncryptionKeyLength)) // esp_now_set_kok returns 0 on success.
+    if(_espnowEncryptionKokSet && esp_now_set_kok(_espnowEncryptionKok, espnowEncryptedConnectionKeyLength)) // esp_now_set_kok returns 0 on success.
       warningPrint("Failed to set ESP-NOW KoK!");
       
     if(getEspnowRequestManager() == nullptr)
@@ -388,7 +410,7 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
   // Otherwise we get issues such as _espnowTransmissionMutex will usually be free, but occasionally taken (when callback occurs in a delay() during attemptTransmission).
   MutexTracker captureBanTracker(MutexTracker::captureBan());
   
-  if(len >= EspnowProtocolInterpreter::espnowProtocolBytesSize()) // If we do not receive at least the protocol bytes, the transmission is invalid.
+  if(len >= espnowMetadataSize()) // If we do not receive at least the metadata bytes, the transmission is invalid.
   {    
     //uint32_t callbackStart = millis();
 
@@ -398,10 +420,20 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
     char messageType = espnowGetMessageType(dataArray);
     uint64_t receivedMessageID = espnowGetMessageID(dataArray);
 
-    if(currentEspnowRequestManager && !currentEspnowRequestManager->acceptsUnencryptedRequests() 
+    if(currentEspnowRequestManager && !currentEspnowRequestManager->acceptsUnverifiedRequests() 
        && !usesConstantSessionKey(messageType) && !verifyPeerSessionKey(receivedMessageID, macaddr, messageType))
     {
       return;
+    }
+
+    if(useEncryptedMessages())
+    {
+      // chacha20Poly1305Decrypt decrypts dataArray in place.
+      if(!CryptoInterface::chacha20Poly1305Decrypt(dataArray + espnowMetadataSize(), len - espnowMetadataSize(), getEspnowMessageEncryptionKey(), dataArray, 
+                                                   espnowProtocolBytesSize, dataArray + espnowProtocolBytesSize, dataArray + espnowProtocolBytesSize + 12))
+      {
+        return; // Decryption of message failed.
+      }
     }
     
     uint64_t uint64StationMac = macToUint64(macaddr);
@@ -759,7 +791,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
       String message = espnowGetMessageContent(dataArray, len);
       setSenderMac(macaddr);
       espnowGetTransmissionMac(dataArray, _senderAPMac);
-      setReceivedEncryptedMessage(usesEncryption(messageID));
+      setReceivedEncryptedTransmission(usesEncryption(messageID));
       bool acceptBroadcast = getBroadcastFilter()(message, *this);
       if(acceptBroadcast)
       {
@@ -815,7 +847,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
 
   // Copy totalMessage in case user callbacks (request/responseHandler) do something odd with receivedEspnowTransmissions list.
   String totalMessage = storedMessageIterator->second.getTotalMessage(); // https://stackoverflow.com/questions/134731/returning-a-const-reference-to-an-object-instead-of-a-copy It is likely that most compilers will perform Named Value Return Value Optimisation in this case
-  
+
   receivedEspnowTransmissions.erase(storedMessageIterator); // Erase the extra copy of the totalMessage, to save RAM. 
    
   //Serial.println("methodStart erase done " + String(millis() - methodStart));
@@ -827,7 +859,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
       
     setSenderMac(macaddr);
     espnowGetTransmissionMac(dataArray, _senderAPMac);
-    setReceivedEncryptedMessage(usesEncryption(messageID));
+    setReceivedEncryptedTransmission(usesEncryption(messageID));
     String response = getRequestHandler()(totalMessage, *this);
     //Serial.println("methodStart response acquired " + String(millis() - methodStart));
      
@@ -853,7 +885,7 @@ void EspnowMeshBackend::espnowReceiveCallback(uint8_t *macaddr, uint8_t *dataArr
     
     setSenderMac(macaddr);
     espnowGetTransmissionMac(dataArray, _senderAPMac);
-    setReceivedEncryptedMessage(usesEncryption(messageID));
+    setReceivedEncryptedTransmission(usesEncryption(messageID));
     getResponseHandler()(totalMessage, *this);
   }
   else
@@ -979,7 +1011,7 @@ uint64_t EspnowMeshBackend::generateMessageID(EncryptedConnectionLog *encryptedC
     return encryptedConnection->getOwnSessionKey();
   }
 
-  return _unencryptedMessageID++;
+  return _unsynchronizedMessageID++;
 }
 
 uint64_t EspnowMeshBackend::createSessionKey()
@@ -1073,7 +1105,7 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
   int32_t transmissionsRemaining = transmissionsRequired > 1 ? transmissionsRequired - 1 : 0;
 
   _transmissionsTotal++;
-  
+
   // Though it is possible to handle messages requiring more than 3 transmissions with the current design, transmission fail rates would increase dramatically. 
   // Messages composed of up to 128 transmissions can be handled without modification, but RAM limitations on the ESP8266 would make this hard in practice. 
   // We thus prefer to keep the code simple and performant instead.
@@ -1087,7 +1119,7 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
   
   uint8_t transmissionSize = 0;
   bool messageStart = true;
-  uint8_t sizeOfProtocolBytes = espnowProtocolBytesSize();
+  uint8_t metadataSize = espnowMetadataSize();
 
   do
   {
@@ -1105,12 +1137,19 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
     ////// Create transmission array //////
     
     if(transmissionsRemaining > 0)
+    {
       transmissionSize = getMaxBytesPerTransmission();
-    else if(message.length() == 0)
-      transmissionSize = sizeOfProtocolBytes;
+    }
     else
-      transmissionSize = sizeOfProtocolBytes + (message.length() % getMaxMessageBytesPerTransmission() == 0 ? 
-                                                    getMaxMessageBytesPerTransmission() : message.length() % getMaxMessageBytesPerTransmission());
+    {
+      transmissionSize = metadataSize;
+      
+      if(message.length() > 0)
+      {
+        uint32_t remainingLength = message.length() % getMaxMessageBytesPerTransmission();
+        transmissionSize += (remainingLength == 0 ? getMaxMessageBytesPerTransmission() : remainingLength);
+      }
+    }
     
     uint8_t transmission[transmissionSize];
 
@@ -1136,9 +1175,17 @@ transmission_status_t EspnowMeshBackend::espnowSendToNodeUnsynchronized(const St
     ////// Fill message bytes //////
     
     int32_t transmissionStartIndex = (transmissionsRequired - transmissionsRemaining - 1) * getMaxMessageBytesPerTransmission();
-    std::copy_n(message.substring(transmissionStartIndex, transmissionStartIndex + transmissionSize - sizeOfProtocolBytes).c_str(), 
-                transmissionSize - sizeOfProtocolBytes, transmission + sizeOfProtocolBytes);
+    
+    std::copy_n(message.begin() + transmissionStartIndex, transmissionSize - metadataSize, transmission + metadataSize);
 
+    if(useEncryptedMessages())
+    {      
+      // chacha20Poly1305Encrypt encrypts transmission in place.
+      // We are using the protocol bytes as a key salt.
+      CryptoInterface::chacha20Poly1305Encrypt(transmission + metadataSize, transmissionSize - metadataSize, getEspnowMessageEncryptionKey(), transmission, 
+                                               espnowProtocolBytesSize, transmission + espnowProtocolBytesSize, transmission + espnowProtocolBytesSize + 12);
+    }
+    
     ////// Transmit //////
 
     uint32_t retransmissions = 0;
@@ -1238,33 +1285,38 @@ uint64_t EspnowMeshBackend::macAndTypeToUint64Mac(const macAndType_td &macAndTyp
   return static_cast<uint64_t>(macAndTypeValue) >> 8;
 }
 
-void EspnowMeshBackend::setEspnowEncryptionKey(const uint8_t espnowEncryptionKey[espnowEncryptionKeyLength])
+void EspnowMeshBackend::setEspnowEncryptedConnectionKey(const uint8_t espnowEncryptedConnectionKey[espnowEncryptedConnectionKeyLength])
 {
-  assert(espnowEncryptionKey != nullptr);
+  assert(espnowEncryptedConnectionKey != nullptr);
    
-  for(int i = 0; i < espnowEncryptionKeyLength; i++)
+  for(int i = 0; i < espnowEncryptedConnectionKeyLength; i++)
   {
-    _espnowEncryptionKey[i] = espnowEncryptionKey[i];
+    _espnowEncryptedConnectionKey[i] = espnowEncryptedConnectionKey[i];
   }
 }
 
-const uint8_t *EspnowMeshBackend::getEspnowEncryptionKey()
+void EspnowMeshBackend::setEspnowEncryptedConnectionKey(const String &espnowEncryptedConnectionKeySeed)
 {
-  return _espnowEncryptionKey;
+  MeshCryptoInterface::initializeKey(_espnowEncryptedConnectionKey, espnowEncryptedConnectionKeyLength, espnowEncryptedConnectionKeySeed);
 }
 
-uint8_t *EspnowMeshBackend::getEspnowEncryptionKey(uint8_t resultArray[espnowEncryptionKeyLength])
+const uint8_t *EspnowMeshBackend::getEspnowEncryptedConnectionKey()
 {
-  std::copy_n(_espnowEncryptionKey, espnowEncryptionKeyLength, resultArray);
+  return _espnowEncryptedConnectionKey;
+}
+
+uint8_t *EspnowMeshBackend::getEspnowEncryptedConnectionKey(uint8_t resultArray[espnowEncryptedConnectionKeyLength])
+{
+  std::copy_n(_espnowEncryptedConnectionKey, espnowEncryptedConnectionKeyLength, resultArray);
   return resultArray;
 }
 
-bool EspnowMeshBackend::setEspnowEncryptionKok(uint8_t espnowEncryptionKok[espnowEncryptionKeyLength])
+bool EspnowMeshBackend::setEspnowEncryptionKok(uint8_t espnowEncryptionKok[espnowEncryptedConnectionKeyLength])
 {
-  if(espnowEncryptionKok == nullptr || esp_now_set_kok(espnowEncryptionKok, espnowEncryptionKeyLength)) // esp_now_set_kok failed if not == 0
+  if(espnowEncryptionKok == nullptr || esp_now_set_kok(espnowEncryptionKok, espnowEncryptedConnectionKeyLength)) // esp_now_set_kok failed if not == 0
     return false;
   
-  for(int i = 0; i < espnowEncryptionKeyLength; i++)
+  for(int i = 0; i < espnowEncryptedConnectionKeyLength; i++)
   {
     _espnowEncryptionKok[i] = espnowEncryptionKok[i];
   }
@@ -1272,6 +1324,14 @@ bool EspnowMeshBackend::setEspnowEncryptionKok(uint8_t espnowEncryptionKok[espno
   _espnowEncryptionKokSet = true;
   
   return true;
+}
+
+bool EspnowMeshBackend::setEspnowEncryptionKok(const String &espnowEncryptionKokSeed)
+{
+  uint8_t espnowEncryptionKok[espnowEncryptedConnectionKeyLength] {};
+  MeshCryptoInterface::initializeKey(espnowEncryptionKok, espnowEncryptedConnectionKeyLength, espnowEncryptionKokSeed);
+
+  return setEspnowEncryptionKok(espnowEncryptionKok);
 }
 
 const uint8_t *EspnowMeshBackend::getEspnowEncryptionKok()
@@ -1292,10 +1352,47 @@ void EspnowMeshBackend::setEspnowHashKey(const uint8_t espnowHashKey[espnowHashK
   }
 }
 
+void EspnowMeshBackend::setEspnowHashKey(const String &espnowHashKeySeed)
+{
+  MeshCryptoInterface::initializeKey(_espnowHashKey, espnowHashKeyLength, espnowHashKeySeed);
+}
+
 const uint8_t *EspnowMeshBackend::getEspnowHashKey()
 {
   return _espnowHashKey;
 }
+
+void EspnowMeshBackend::setEspnowMessageEncryptionKey(uint8_t espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH])
+{
+  assert(espnowMessageEncryptionKey != nullptr);
+   
+  for(int i = 0; i < CryptoInterface::ENCRYPTION_KEY_LENGTH; i++)
+  {
+    _espnowMessageEncryptionKey[i] = espnowMessageEncryptionKey[i];
+  }
+}
+
+void EspnowMeshBackend::setEspnowMessageEncryptionKey(const String &espnowMessageEncryptionKeySeed)
+{
+  MeshCryptoInterface::initializeKey(_espnowMessageEncryptionKey, CryptoInterface::ENCRYPTION_KEY_LENGTH, espnowMessageEncryptionKeySeed);
+}
+
+const uint8_t *EspnowMeshBackend::getEspnowMessageEncryptionKey()
+{
+  return _espnowMessageEncryptionKey;
+}
+
+void EspnowMeshBackend::setUseEncryptedMessages(bool useEncryptedMessages) 
+{
+  MutexTracker mutexTracker(_espnowSendToNodeMutex);
+  if(!mutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! espnowSendToNode in progress. Don't call setUseEncryptedMessages from non-hook callbacks since this may modify the ESP-NOW transmission parameters during ongoing transmissions! Aborting.");
+  }
+  
+  _useEncryptedMessages = useEncryptedMessages; 
+}
+bool EspnowMeshBackend::useEncryptedMessages() { return _useEncryptedMessages; }
 
 bool EspnowMeshBackend::verifyPeerSessionKey(uint64_t sessionKey, const uint8_t *peerMac, char messageType)
 {
@@ -1375,16 +1472,27 @@ const uint8_t *EspnowMeshBackend::getScheduledResponseRecipient(uint32_t respons
   return getScheduledResponse(responseIndex)->getRecipientMac();
 }
 
+uint32_t EspnowMeshBackend::numberOfScheduledResponses() {return responsesToSend.size();}
+
 void EspnowMeshBackend::clearAllScheduledResponses()
 {
+  MutexTracker responsesToSendMutexTracker(_responsesToSendMutex);
+  if(!responsesToSendMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! responsesToSend locked. Don't call clearAllScheduledResponses from callbacks as this may corrupt program state! Aborting."); 
+  }
+  
   responsesToSend.clear();
 }
 
-uint32_t EspnowMeshBackend::numberOfScheduledResponses() {return responsesToSend.size();}
-
-
 void EspnowMeshBackend::deleteScheduledResponsesByRecipient(const uint8_t *recipientMac, bool encryptedOnly)
 {
+  MutexTracker responsesToSendMutexTracker(_responsesToSendMutex);
+  if(!responsesToSendMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! responsesToSend locked. Don't call deleteScheduledResponsesByRecipient from callbacks as this may corrupt program state! Aborting."); 
+  }
+  
   for(auto responseIterator = responsesToSend.begin(); responseIterator != responsesToSend.end(); )
   {
     if(macEqual(responseIterator->getRecipientMac(), recipientMac) && (!encryptedOnly || EspnowProtocolInterpreter::usesEncryption(responseIterator->getRequestID())))
@@ -1420,19 +1528,19 @@ uint8_t *EspnowMeshBackend::getSenderAPMac(uint8_t *macArray)
   return macArray;
 }
 
-void EspnowMeshBackend::setReceivedEncryptedMessage(bool receivedEncryptedMessage) { _receivedEncryptedMessage = receivedEncryptedMessage; }
-bool EspnowMeshBackend::receivedEncryptedMessage() {return _receivedEncryptedMessage;}
+void EspnowMeshBackend::setReceivedEncryptedTransmission(bool receivedEncryptedTransmission) { _receivedEncryptedTransmission = receivedEncryptedTransmission; }
+bool EspnowMeshBackend::receivedEncryptedTransmission() {return _receivedEncryptedTransmission;}
 
 bool EspnowMeshBackend::addUnencryptedConnection(const String &serializedConnectionState)
 {
-  return JsonTranslator::getUnencryptedMessageID(serializedConnectionState, _unencryptedMessageID);
+  return JsonTranslator::getUnsynchronizedMessageID(serializedConnectionState, _unsynchronizedMessageID);
 }
 
 encrypted_connection_status_t EspnowMeshBackend::addEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey)
 {
   assert(encryptedConnections.size() <= maxEncryptedConnections); // If this is not the case, ESP-NOW is no longer in sync with the library
 
-  uint8_t encryptionKeyArray[espnowEncryptionKeyLength] = { 0 };
+  uint8_t encryptionKeyArray[espnowEncryptedConnectionKeyLength] = { 0 };
   
   if(EncryptedConnectionLog *encryptedConnection = getEncryptedConnection(peerStaMac))
   {
@@ -1440,7 +1548,7 @@ encrypted_connection_status_t EspnowMeshBackend::addEncryptedConnection(uint8_t 
     temporaryEncryptedConnectionToPermanent(peerStaMac);
     encryptedConnection->setPeerSessionKey(peerSessionKey);
     encryptedConnection->setOwnSessionKey(ownSessionKey);
-    esp_now_set_peer_key(peerStaMac, getEspnowEncryptionKey(encryptionKeyArray), espnowEncryptionKeyLength);
+    esp_now_set_peer_key(peerStaMac, getEspnowEncryptedConnectionKey(encryptionKeyArray), espnowEncryptedConnectionKeyLength);
     encryptedConnection->setHashKey(getEspnowHashKey());
     
     return ECS_CONNECTION_ESTABLISHED;
@@ -1453,7 +1561,7 @@ encrypted_connection_status_t EspnowMeshBackend::addEncryptedConnection(uint8_t 
   }
   // returns 0 on success: int esp_now_add_peer(u8 *mac_addr, u8 role, u8 channel, u8 *key, u8 key_len)
   // Only MAC, encryption key and key length (16) actually matter. The rest is not used by ESP-NOW.
-  else if(0 == esp_now_add_peer(peerStaMac, ESP_NOW_ROLE_CONTROLLER, getWiFiChannel(), getEspnowEncryptionKey(encryptionKeyArray), espnowEncryptionKeyLength))
+  else if(0 == esp_now_add_peer(peerStaMac, ESP_NOW_ROLE_CONTROLLER, getWiFiChannel(), getEspnowEncryptedConnectionKey(encryptionKeyArray), espnowEncryptedConnectionKeyLength))
   {
     encryptedConnections.emplace_back(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, getEspnowHashKey());
     return ECS_CONNECTION_ESTABLISHED;
@@ -1506,7 +1614,7 @@ encrypted_connection_status_t EspnowMeshBackend::addTemporaryEncryptedConnection
 {  
   assert(encryptedConnections.size() <= maxEncryptedConnections); // If this is not the case, ESP-NOW is no longer in sync with the library
 
-  uint8_t encryptionKeyArray[espnowEncryptionKeyLength] = { 0 };
+  uint8_t encryptionKeyArray[espnowEncryptedConnectionKeyLength] = { 0 };
 
   connectionLogIterator encryptedConnection = connectionLogEndIterator();
     
@@ -1515,7 +1623,7 @@ encrypted_connection_status_t EspnowMeshBackend::addTemporaryEncryptedConnection
     // There is already an encrypted connection to this mac, so no need to replace it, just updating is enough.
     encryptedConnection->setPeerSessionKey(peerSessionKey);
     encryptedConnection->setOwnSessionKey(ownSessionKey);
-    esp_now_set_peer_key(peerStaMac, getEspnowEncryptionKey(encryptionKeyArray), espnowEncryptionKeyLength);
+    esp_now_set_peer_key(peerStaMac, getEspnowEncryptedConnectionKey(encryptionKeyArray), espnowEncryptedConnectionKeyLength);
     encryptedConnection->setHashKey(getEspnowHashKey());
 
     if(encryptedConnection->temporary())
@@ -1935,8 +2043,8 @@ encrypted_connection_removal_outcome_t EspnowMeshBackend::requestEncryptedConnec
   }
 }
 
-void EspnowMeshBackend::setAcceptsUnencryptedRequests(bool acceptsUnencryptedRequests)  { _acceptsUnencryptedRequests = acceptsUnencryptedRequests; }
-bool EspnowMeshBackend::acceptsUnencryptedRequests() { return _acceptsUnencryptedRequests; }
+void EspnowMeshBackend::setAcceptsUnverifiedRequests(bool acceptsUnverifiedRequests)  { _acceptsUnverifiedRequests = acceptsUnverifiedRequests; }
+bool EspnowMeshBackend::acceptsUnverifiedRequests() { return _acceptsUnverifiedRequests; }
 
 void EspnowMeshBackend::setEncryptedConnectionsSoftLimit(uint8_t softLimit) 
 { 
@@ -2269,6 +2377,9 @@ void EspnowMeshBackend::broadcast(const String &message)
 void EspnowMeshBackend::setBroadcastTransmissionRedundancy(uint8_t redundancy) { _broadcastTransmissionRedundancy = redundancy; }
 uint8_t EspnowMeshBackend::getBroadcastTransmissionRedundancy() { return _broadcastTransmissionRedundancy; }
 
+void EspnowMeshBackend::setResponseTransmittedHook(responseTransmittedHookType responseTransmittedHook) { _responseTransmittedHook = responseTransmittedHook; }
+EspnowMeshBackend::responseTransmittedHookType EspnowMeshBackend::getResponseTransmittedHook() { return _responseTransmittedHook; }
+
 void EspnowMeshBackend::sendStoredEspnowMessages(const ExpiringTimeTracker *estimatedMaxDurationTracker)
 {
   sendPeerRequestConfirmations(estimatedMaxDurationTracker);
@@ -2319,8 +2430,6 @@ void EspnowMeshBackend::sendPeerRequestConfirmations(const ExpiringTimeTracker *
     
     // Note that callbacks can be called during delay time, so it is possible to receive a transmission during espnowSendToNode
     // (which may add an element to the peerRequestConfirmationsToSend list).
-
-    staticVerboseModePrint("Responding to encrypted connection request from MAC " + macToString(defaultBSSID));
 
     if(!existingEncryptedConnection && 
        ((reciprocalPeerRequest && encryptedConnections.size() >= maxEncryptedConnections) || (!reciprocalPeerRequest && reservedEncryptedConnections() >= maxEncryptedConnections)))
@@ -2421,8 +2530,15 @@ void EspnowMeshBackend::sendPeerRequestConfirmations(const ExpiringTimeTracker *
 void EspnowMeshBackend::sendEspnowResponses(const ExpiringTimeTracker *estimatedMaxDurationTracker)
 {
   uint32_t bufferedCriticalHeapLevel = criticalHeapLevel() + criticalHeapLevelBuffer(); // We preferably want to start clearing the logs a bit before things get critical.
-  
-  for(std::list<ResponseData>::iterator responseIterator = responsesToSend.begin(); responseIterator != responsesToSend.end(); )
+
+  MutexTracker responsesToSendMutexTracker(_responsesToSendMutex);
+  if(!responsesToSendMutexTracker.mutexCaptured())
+  {
+    assert(false && "ERROR! responsesToSend locked. Don't call sendEspnowResponses from callbacks as this may corrupt program state! Aborting."); 
+  }
+
+  uint32_t responseIndex = 0;
+  for(std::list<ResponseData>::iterator responseIterator = responsesToSend.begin(); responseIterator != responsesToSend.end(); ++responseIndex)
   {
     if(responseIterator->timeSinceCreation() > logEntryLifetimeMs())
     {
@@ -2433,12 +2549,17 @@ void EspnowMeshBackend::sendEspnowResponses(const ExpiringTimeTracker *estimated
       continue;
     }
 
+    bool hookOutcome = true;
     // Note that callbacks can be called during delay time, so it is possible to receive a transmission during espnowSendToNode
     // (which may add an element to the responsesToSend list).
     if(espnowSendToNodeUnsynchronized(responseIterator->getMessage(), responseIterator->getRecipientMac(), 'A', responseIterator->getRequestID())
        == TS_TRANSMISSION_COMPLETE)
-    {            
+    {
+      if(EspnowMeshBackend *currentEspnowRequestManager = getEspnowRequestManager())
+        hookOutcome = currentEspnowRequestManager->getResponseTransmittedHook()(responseIterator->getMessage(), responseIterator->getRecipientMac(), responseIndex, *currentEspnowRequestManager);
+      
       responseIterator = responsesToSend.erase(responseIterator);
+      --responseIndex;
     }
     else
     {
@@ -2454,7 +2575,7 @@ void EspnowMeshBackend::sendEspnowResponses(const ExpiringTimeTracker *estimated
       return; // responseIterator may be invalid now. Also, we should give the main loop a chance to respond to the situation.
     }
 
-    if(estimatedMaxDurationTracker && estimatedMaxDurationTracker->expired())
+    if(!hookOutcome || (estimatedMaxDurationTracker && estimatedMaxDurationTracker->expired()))
       return;
   }
 }
@@ -2466,7 +2587,8 @@ uint32_t EspnowMeshBackend::getMaxBytesPerTransmission()
 
 uint32_t EspnowMeshBackend::getMaxMessageBytesPerTransmission()
 {
-  return getMaxBytesPerTransmission() - EspnowProtocolInterpreter::espnowProtocolBytesSize();
+  using namespace EspnowProtocolInterpreter;
+  return getMaxBytesPerTransmission() - espnowMetadataSize();
 }
 
 void EspnowMeshBackend::setMaxTransmissionsPerMessage(uint8_t maxTransmissionsPerMessage)
@@ -2560,9 +2682,9 @@ String EspnowMeshBackend::serializeUnencryptedConnection()
 {
   using namespace JsonTranslator;
   
-  // Returns: {"connectionState":{"unencMsgID":"123"}}
+  // Returns: {"connectionState":{"unsyncMsgID":"123"}}
   
-  return jsonConnectionState + createJsonEndPair(jsonUnencryptedMessageID, String(_unencryptedMessageID));
+  return jsonConnectionState + createJsonEndPair(jsonUnsynchronizedMessageID, String(_unsynchronizedMessageID));
 }
 
 String EspnowMeshBackend::serializeEncryptedConnection(const uint8_t *peerMac)

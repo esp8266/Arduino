@@ -34,11 +34,64 @@ namespace
   size_t _ctMaxDataLength = 1024;
 
   bool _warningsEnabled = true;
+  
+  br_hkdf_context _storedHkdfContext;
+  bool _hkdfContextStored = false;
 
-  void *createBearsslHmac(const br_hash_class *hashType, const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  uint8_t *defaultNonceGenerator(uint8_t *nonceArray, const size_t nonceLength)
   {
-    assert(1 <= resultArrayLength);
+    /**
+     * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
+     * 
+     * "When used correctly, every 32-bit value the system reads from the RNG_DATA_REG register of the random number generator is a true random number.
+     * These true random numbers are generated based on the noise in the Wi-Fi/BT RF system.
+     * When Wi-Fi and BT are disabled, the random number generator will give out pseudo-random numbers.
+     * 
+     * When Wi-Fi or BT is enabled, the random number generator is fed two bits of entropy every APB clock cycle (normally 80 MHz).
+     * Thus, for the maximum amount of entropy, it is advisable to read the random register at a maximum rate of 5 MHz.
+     * A data sample of 2 GB, read from the random number generator with Wi-Fi enabled and the random register read at 5 MHz,
+     * has been tested using the Dieharder Random Number Testsuite (version 3.31.1).
+     * The sample passed all tests."
+     * 
+     * Since ESP32 is the sequal to ESP8266 it is unlikely that the ESP8266 is able to generate random numbers more quickly than 5 MHz when run at a 80 MHz frequency.
+     * A maximum random number frequency of 0.5 MHz is used here to leave some margin for possibly inferior components in the ESP8266.
+     * It should be noted that the ESP8266 has no Bluetooth functionality, so turning the WiFi off is likely to cause RANDOM_REG32 to use pseudo-random numbers.
+     * 
+     * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available. 
+     * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during nonce generation.
+     * Thus only delayMicroseconds() is used below.
+     */ 
+
+    constexpr uint8_t cooldownMicros = 2;
+    static uint32_t lastCalledMicros = micros() - cooldownMicros;
+
+    uint32_t randomNumber = 0;
     
+    for(size_t byteIndex = 0; byteIndex < nonceLength; ++byteIndex)
+    {
+      if(byteIndex % 4 == 0)
+      {
+        // Old random number has been used up (random number could be exactly 0, so we can't check for that)
+                
+        uint32_t timeSinceLastCall = micros() - lastCalledMicros;
+        if(timeSinceLastCall < cooldownMicros)
+          delayMicroseconds(cooldownMicros - timeSinceLastCall);
+        
+        randomNumber = RANDOM_REG32;
+        lastCalledMicros = micros();
+      }
+      
+      nonceArray[byteIndex] = randomNumber;
+      randomNumber >>= 8;
+    }
+
+    return nonceArray;
+  }
+  
+  CryptoInterface::nonceGeneratorType _nonceGenerator = defaultNonceGenerator;
+
+  void *createBearsslHmac(const br_hash_class *hashType, const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+  {
     // Comments mainly from https://www.bearssl.org/apidoc/bearssl__hmac_8h.html
     
     // HMAC is initialized with a key and an underlying hash function; it then fills a "key context". That context contains the processed key.
@@ -54,8 +107,8 @@ namespace
     // Initialise a HMAC context with a key context. The key context is unmodified. 
     // Relevant data from the key context is immediately copied; the key context can thus be independently reused, modified or released without impacting this HMAC computation.
     // An explicit output length can be specified; the actual output length will be the minimum of that value and the natural HMAC output length. 
-    // If resultArrayLength is 0, then the natural HMAC output length is selected. The "natural output length" is the output length of the underlying hash function.
-    br_hmac_init(&hmacContext, &keyContext, resultArrayLength);
+    // If outputLength is 0, then the natural HMAC output length is selected. The "natural output length" is the output length of the underlying hash function.
+    br_hmac_init(&hmacContext, &keyContext, outputLength);
   
     // Provide the HMAC context with the data to create a HMAC from.
     // The provided dataLength bytes are injected as extra input in the HMAC computation incarnated by the hmacContext. 
@@ -80,9 +133,8 @@ namespace
     return uint8ArrayToHexString(hmac, hmacLength);
   }
   
-  void *createBearsslHmacCT(const br_hash_class *hashType, const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *createBearsslHmacCT(const br_hash_class *hashType, const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    assert(1 <= resultArrayLength);
     assert(_ctMinDataLength <= dataLength && dataLength <= _ctMaxDataLength);
     
     // Comments mainly from https://www.bearssl.org/apidoc/bearssl__hmac_8h.html
@@ -100,8 +152,8 @@ namespace
     // Initialise a HMAC context with a key context. The key context is unmodified. 
     // Relevant data from the key context is immediately copied; the key context can thus be independently reused, modified or released without impacting this HMAC computation.
     // An explicit output length can be specified; the actual output length will be the minimum of that value and the natural HMAC output length. 
-    // If resultArrayLength is 0, then the natural HMAC output length is selected. The "natural output length" is the output length of the underlying hash function.
-    br_hmac_init(&hmacContext, &keyContext, resultArrayLength);
+    // If outputLength is 0, then the natural HMAC output length is selected. The "natural output length" is the output length of the underlying hash function.
+    br_hmac_init(&hmacContext, &keyContext, outputLength);
   
     // Provide the HMAC context with the data to create a HMAC from.
     // The provided dataLength bytes are injected as extra input in the HMAC computation incarnated by the hmacContext. 
@@ -153,6 +205,9 @@ namespace CryptoInterface
   void setWarningsEnabled(bool warningsEnabled) { _warningsEnabled = warningsEnabled; }
   bool warningsEnabled() { return _warningsEnabled; }
 
+  void setNonceGenerator(nonceGeneratorType nonceGenerator) { _nonceGenerator = nonceGenerator; }
+  nonceGeneratorType getNonceGenerator() { return _nonceGenerator; }
+
 
   // #################### MD5 ####################
     
@@ -178,9 +233,9 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, MD5_NATURAL_LENGTH);
   }
 
-  void *md5Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *md5Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {  
-    return createBearsslHmac(&br_md5_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmac(&br_md5_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String md5Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -188,9 +243,9 @@ namespace CryptoInterface
     return createBearsslHmac(&br_md5_vtable, MD5_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
   }
 
-  void *md5HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *md5HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    return createBearsslHmacCT(&br_md5_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmacCT(&br_md5_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String md5HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -223,9 +278,9 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, SHA1_NATURAL_LENGTH);
   }
 
-  void *sha1Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha1Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {  
-    return createBearsslHmac(&br_sha1_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmac(&br_sha1_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha1Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -233,9 +288,9 @@ namespace CryptoInterface
     return createBearsslHmac(&br_sha1_vtable, SHA1_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
   }
 
-  void *sha1HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha1HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    return createBearsslHmacCT(&br_sha1_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmacCT(&br_sha1_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha1HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -263,9 +318,9 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, SHA224_NATURAL_LENGTH);
   }
 
-  void *sha224Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha224Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {  
-    return createBearsslHmac(&br_sha224_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmac(&br_sha224_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha224Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -273,9 +328,9 @@ namespace CryptoInterface
     return createBearsslHmac(&br_sha224_vtable, SHA224_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
   }
 
-  void *sha224HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha224HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    return createBearsslHmacCT(&br_sha224_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmacCT(&br_sha224_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha224HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -303,9 +358,9 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, SHA256_NATURAL_LENGTH);
   }
 
-  void *sha256Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha256Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {  
-    return createBearsslHmac(&br_sha256_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmac(&br_sha256_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha256Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -313,9 +368,9 @@ namespace CryptoInterface
     return createBearsslHmac(&br_sha256_vtable, SHA256_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
   }
 
-  void *sha256HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha256HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    return createBearsslHmacCT(&br_sha256_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmacCT(&br_sha256_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha256HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -343,9 +398,9 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, SHA384_NATURAL_LENGTH);
   }
 
-  void *sha384Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha384Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {  
-    return createBearsslHmac(&br_sha384_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmac(&br_sha384_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha384Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -353,9 +408,9 @@ namespace CryptoInterface
     return createBearsslHmac(&br_sha384_vtable, SHA384_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
   }
 
-  void *sha384HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha384HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    return createBearsslHmacCT(&br_sha384_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmacCT(&br_sha384_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha384HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -383,9 +438,9 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, SHA512_NATURAL_LENGTH);
   }
 
-  void *sha512Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha512Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {  
-    return createBearsslHmac(&br_sha512_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmac(&br_sha512_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha512Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -393,9 +448,9 @@ namespace CryptoInterface
     return createBearsslHmac(&br_sha512_vtable, SHA512_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
   }
 
-  void *sha512HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t resultArrayLength)
+  void *sha512HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
   {
-    return createBearsslHmacCT(&br_sha512_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, resultArrayLength);
+    return createBearsslHmacCT(&br_sha512_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
   }
   
   String sha512HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
@@ -423,4 +478,86 @@ namespace CryptoInterface
     return uint8ArrayToHexString(hash, MD5SHA1_NATURAL_LENGTH);
   }
 
+
+  // #################### HKDF ####################
+
+  void hkdfInit(const void *keyMaterial, const size_t keyMaterialLength, const void *salt, const size_t saltLength)
+  {
+    // Comments mainly from https://www.bearssl.org/apidoc/bearssl__kdf_8h.html
+    
+    br_hkdf_context context;
+
+    // Initialize an HKDF context, with a hash function, and the salt. This starts the HKDF-Extract process.
+    br_hkdf_init(&context, &br_sha256_vtable, salt, saltLength);
+
+    // Inject more input bytes. This function may be called repeatedly if the input data is provided by chunks, after br_hkdf_init() but before br_hkdf_flip().
+    br_hkdf_inject(&context, keyMaterial, keyMaterialLength);
+
+    // End the HKDF-Extract process, and start the HKDF-Expand process.
+    br_hkdf_flip(&context);
+
+    _storedHkdfContext = context;
+    _hkdfContextStored = true;
+  }
+  
+  size_t hkdfProduce(void *resultArray, const size_t outputLength, const void *info, const size_t infoLength)
+  {
+    // Comments mainly from https://www.bearssl.org/apidoc/bearssl__kdf_8h.html
+    
+    if(!_hkdfContextStored) // hkdfInit has not yet been executed
+      return 0;
+    
+    // HKDF output production (HKDF-Expand).
+    // Produces more output bytes from the current state. This function may be called several times, but only after br_hkdf_flip().
+    // Returned value is the number of actually produced bytes. The total output length is limited to 255 times the output length of the underlying hash function.
+    return br_hkdf_produce(&_storedHkdfContext, info, infoLength, resultArray, outputLength);
+  }
+
+
+  // #################### Authenticated Encryption with Associated Data (AEAD) ####################
+
+  
+  // #################### ChaCha20+Poly1305 AEAD ####################
+
+  void chacha20Poly1305Kernel(const int encrypt, void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
+                              const void *nonce, void *tag, const void *aad, const size_t aadLength)
+  {
+    if(keySalt == nullptr)
+    {
+      br_poly1305_ctmul32_run(key, nonce, data, dataLength, aad, aadLength, tag, br_chacha20_ct_run, encrypt);
+    }
+    else
+    {
+      hkdfInit(key, ENCRYPTION_KEY_LENGTH, keySalt, keySaltLength);
+      uint8_t derivedEncryptionKey[ENCRYPTION_KEY_LENGTH] {0};
+      hkdfProduce(derivedEncryptionKey, ENCRYPTION_KEY_LENGTH);
+      br_poly1305_ctmul32_run(derivedEncryptionKey, nonce, data, dataLength, aad, aadLength, tag, br_chacha20_ct_run, encrypt);
+    }  
+  }
+
+  void chacha20Poly1305Encrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
+                               void *resultingNonce, void *resultingTag, const void *aad, const size_t aadLength)
+  {
+    uint8_t *nonce = (uint8_t *)resultingNonce;
+    getNonceGenerator()(nonce, 12);
+    
+    chacha20Poly1305Kernel(1, data, dataLength, key, keySalt, keySaltLength, nonce, resultingTag, aad, aadLength);            
+  }
+  
+  bool chacha20Poly1305Decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
+                               const void *encryptionNonce, const void *encryptionTag, const void *aad, const size_t aadLength)
+  {
+    const uint8_t *oldTag = (const uint8_t *)encryptionTag;
+    uint8_t newTag[16] {0};
+
+    chacha20Poly1305Kernel(0, data, dataLength, key, keySalt, keySaltLength, encryptionNonce, newTag, aad, aadLength);
+
+    for(uint32_t i = 0; i < sizeof newTag; ++i)
+    {
+      if(newTag[i] != oldTag[i])
+        return false;
+    }
+
+    return true;
+  }
 }

@@ -67,6 +67,17 @@ namespace MeshCryptoInterface
    * @return True if the HMAC is correct. False otherwise.
    */
   bool verifyMeshHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, uint8_t hashKeyLength);
+  
+  /**
+   * Initialize key with a SHA-256 hash of keySeed.
+   * 
+   * @param key A uint8_t array containing the key to be initialized.
+   * @param keyLength The length of the key array in bytes. Maximum value is CryptoInterface::SHA256_NATURAL_LENGTH.
+   * @param keySeed The key seed.
+   * 
+   * @return A pointer to the initialized key array.
+   */
+  uint8_t *initializeKey(uint8_t *key, uint8_t keyLength, const String &keySeed);
 }
 
 #endif

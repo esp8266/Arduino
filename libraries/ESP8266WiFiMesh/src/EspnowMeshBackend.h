@@ -42,7 +42,7 @@
  * This enables flexible easy-to-use encrypted ESP-NOW communication. 'P' and 'C' messages can be encrypted. 
  * The encryption pairing process works as follows (from top to bottom):
  * 
- *  Encryption pairing process, schematic overview: 
+ * Encrypted connection pairing process, schematic overview: 
  * 
  *     Connection   |         Peer sends ('C'):           |    Peer requester sends ('P'):   |    Connection
  *     encrypted:   |                                     |                                  |    encrypted:
@@ -66,6 +66,13 @@
  * Messages of type 'A' and 'C' are response types, and thus use the same session key as the corresponding 'R' and 'P' message they are responding to.
  * This means they can never cause a desynchronization to occur, and therefore they do not trigger 'S' messages.
  * 
+ * In addition to using encrypted ESP-NOW connections the framework can also send automatically encrypted messages (AEAD) over both encrypted and unencrypted connections. 
+ * Using AEAD will only encrypt the message content, not the transmission metadata. 
+ * The AEAD encryption does not require any pairing, and is thus faster for single messages than establishing a new encrypted connection before transfer.
+ * AEAD encryption also works with ESP-NOW broadcasts and supports an unlimited number of nodes, which is not true for encrypted connections.
+ * Encrypted ESP-NOW connections do however come with built in replay attack protection, which is not provided by the framework when using AEAD encryption, 
+ * and allow EspnowProtocolInterpreter::aeadMetadataSize extra message bytes per transmission.
+ * Transmissions via encrypted connections are also slightly faster than via AEAD once a connection has been established.
  */
 
 #ifndef __ESPNOWMESHBACKEND_H__
@@ -81,6 +88,7 @@
 #include <map>
 #include <list>
 #include "EspnowNetworkInfo.h"
+#include "CryptoInterface.h"
 
 typedef enum 
 {
@@ -127,6 +135,7 @@ class EspnowMeshBackend : public MeshBackendBase {
 protected: 
 
   typedef std::function<bool(String &, EspnowMeshBackend &)> broadcastFilterType;
+  typedef std::function<bool(const String &, const uint8_t *, uint32_t, EspnowMeshBackend &)> responseTransmittedHookType;
 
 public:
   
@@ -140,7 +149,7 @@ public:
    * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
    * @param broadcastFilter The callback handler for deciding which ESP-NOW broadcasts to accept.
    * @param meshPassword The WiFi password for the mesh network.
-   * @param espnowEncryptionKey An uint8_t array containing the key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
+   * @param espnowEncryptedConnectionKey An uint8_t array containing the secret key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
    * @param espnowHashKey An uint8_t array containing the secret key used by this EspnowMeshBackend to generate HMACs for encrypted ESP-NOW connections.
    * @param ssidPrefix The prefix (first part) of the node SSID.
    * @param ssidSuffix The suffix (last part) of the node SSID.
@@ -154,8 +163,35 @@ public:
    * 
    */
   EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, broadcastFilterType broadcastFilter,
-                    const String &meshPassword, const uint8_t espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength], 
+                    const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                     const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+                    const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+
+  /**
+   * ESP-NOW constructor method. Creates an ESP-NOW node, ready to be initialised.
+   *
+   * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
+   *          is the request string received from another node and returns the string to send back.
+   * @param responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
+   *          is the response string received from another node. Returns a transmission status code as a transmission_status_t.
+   * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
+   * @param broadcastFilter The callback handler for deciding which ESP-NOW broadcasts to accept.
+   * @param meshPassword The WiFi password for the mesh network.
+   * @param espnowEncryptedConnectionKeySeed A string containing the seed that will generate the secret key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
+   * @param espnowHashKeySeed A string containing the seed that will generate the secret key used by this EspnowMeshBackend to generate HMACs for encrypted ESP-NOW connections.
+   * @param ssidPrefix The prefix (first part) of the node SSID.
+   * @param ssidSuffix The suffix (last part) of the node SSID.
+   * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
+   * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
+   *                    WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                    This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
+   *                    In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
+   *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
+   *                    make it impossible for other stations to detect the APs whose WiFi channels have changed.
+   * 
+   */
+  EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, broadcastFilterType broadcastFilter,
+                    const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed, const String &ssidPrefix, 
                     const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
 
   ~EspnowMeshBackend() override;
@@ -327,20 +363,50 @@ public:
    * 
    * NOTE: Encrypted connections added before the encryption key change will retain their old encryption key. 
    * Only changes the encryption key used by this EspnowMeshBackend instance, so each instance can use a separate key.
-   * Both Kok and encryption key must match in an encrypted connection pair for encrypted communication to be possible. 
+   * Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible. 
    * Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
    * 
-   * @param espnowEncryptionKey An array containing the espnowEncryptionKeyLength bytes that will be used as the encryption key.
+   * @param espnowEncryptedConnectionKey An array containing the espnowEncryptedConnectionKeyLength bytes that will be used as the encryption key.
    */
-  void setEspnowEncryptionKey(const uint8_t espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength]);
+  void setEspnowEncryptedConnectionKey(const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]);
+
+  /** 
+   * Change the key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
+   * Will apply to any new received requests for encrypted connection if this EspnowMeshBackend instance is the current request manager. 
+   * Will apply to any new encrypted connections requested or added by this EspnowMeshBackend instance.
+   * 
+   * NOTE: Encrypted connections added before the encryption key change will retain their old encryption key. 
+   * Only changes the encryption key used by this EspnowMeshBackend instance, so each instance can use a separate key.
+   * Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible. 
+   * Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
+   * 
+   * @param espnowHashKeySeed A string that will be used to generate the encryption key. The same string will always generate the same key. 
+   *                          A minimum of 8 random characters are recommended to ensure sufficient key variation.
+   */
+  void setEspnowEncryptedConnectionKey(const String &espnowEncryptedConnectionKeySeed);
 
   /**
    * Get the encryption key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
    * 
-   * @return The current espnowEncryptionKey for this EspnowMeshBackend instance.
+   * @return The current espnowEncryptedConnectionKey for this EspnowMeshBackend instance.
    */
-  const uint8_t *getEspnowEncryptionKey();
-  uint8_t *getEspnowEncryptionKey(uint8_t resultArray[EspnowProtocolInterpreter::espnowEncryptionKeyLength]); 
+  const uint8_t *getEspnowEncryptedConnectionKey();
+  uint8_t *getEspnowEncryptedConnectionKey(uint8_t resultArray[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]); 
+
+  /** 
+   * Change the key used to encrypt/decrypt the encrypted connection key when creating encrypted ESP-NOW connections. (Kok = key of keys, perhaps) If no Kok is provided by the user, a default Kok is used.
+   * Will apply to any new encrypted connections.
+   * Must be called after begin() to take effect.
+   * 
+   * NOTE: Encrypted connections added before the Kok change will retain their old Kok. 
+   * This changes the Kok for all EspnowMeshBackend instances on this ESP8266.
+   * Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible. 
+   * Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
+   * 
+   * @param espnowEncryptionKok An array containing the espnowEncryptedConnectionKeyLength bytes that will be used as the Kok.
+   * @return True if Kok was changed successfully. False if Kok was not changed.
+   */
+  static bool setEspnowEncryptionKok(uint8_t espnowEncryptionKok[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]);
 
   /** 
    * Change the key used to encrypt/decrypt the encryption key when creating encrypted ESP-NOW connections. (Kok = key of keys, perhaps) If no Kok is provided by the user, a default Kok is used.
@@ -349,13 +415,14 @@ public:
    * 
    * NOTE: Encrypted connections added before the Kok change will retain their old Kok. 
    * This changes the Kok for all EspnowMeshBackend instances on this ESP8266.
-   * Both Kok and encryption key must match in an encrypted connection pair for encrypted communication to be possible. 
+   * Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible. 
    * Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
    * 
-   * @param espnowEncryptionKok An array containing the espnowEncryptionKeyLength bytes that will be used as the Kok.
+   * @param espnowEncryptionKokSeed A string that will be used to generate the KoK. The same string will always generate the same KoK. 
+   *                                A minimum of 8 random characters are recommended to ensure sufficient KoK variation.
    * @return True if Kok was changed successfully. False if Kok was not changed.
    */
-  static bool setEspnowEncryptionKok(uint8_t espnowEncryptionKok[EspnowProtocolInterpreter::espnowEncryptionKeyLength]);
+  static bool setEspnowEncryptionKok(const String &espnowEncryptionKokSeed);
   
   /**
    * Get the key used to encrypt the encryption keys when creating encrypted ESP-NOW connections. (Kok = key of keys, perhaps) Returns nullptr if no Kok has been provided by the user.
@@ -364,7 +431,7 @@ public:
    */
   static const uint8_t *getEspnowEncryptionKok();
 
-  /** 
+ /** 
   * Change the secret key used to generate HMACs for encrypted ESP-NOW connections.
   * Will apply to any new received requests for encrypted connection if this EspnowMeshBackend instance is the current request manager. 
   * Will apply to any new encrypted connections requested or added by this EspnowMeshBackend instance.
@@ -375,12 +442,75 @@ public:
   * @param espnowHashKey An array containing the espnowHashKeyLength bytes that will be used as the HMAC key.
   */
   void setEspnowHashKey(const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+  
+ /** 
+  * Change the secret key used to generate HMACs for encrypted ESP-NOW connections.
+  * Will apply to any new received requests for encrypted connection if this EspnowMeshBackend instance is the current request manager. 
+  * Will apply to any new encrypted connections requested or added by this EspnowMeshBackend instance.
+  * 
+  * NOTE: Encrypted connections added before the key change will retain their old key.
+  * Only changes the secret hash key used by this EspnowMeshBackend instance, so each instance can use a separate secret key.
+  * 
+  * @param espnowHashKeySeed A string that will be used to generate the HMAC key. The same string will always generate the same key. 
+  *                          A minimum of 8 random characters are recommended to ensure sufficient key variation.
+  */
+  void setEspnowHashKey(const String &espnowHashKeySeed);
+  
   const uint8_t *getEspnowHashKey();
+
+  /** 
+   * Change the key used to encrypt/decrypt messages when using AEAD encryption.
+   * If no message encryption key is provided by the user, a default key consisting of all zeroes is used.
+   * 
+   * This changes the message encryption key for all EspnowMeshBackend instances on this ESP8266.
+   * 
+   * @param espnowMessageEncryptionKey An array containing the CryptoInterface::ENCRYPTION_KEY_LENGTH bytes that will be used as the message encryption key.
+   */
+  static void setEspnowMessageEncryptionKey(uint8_t espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH]);
+
+  /** 
+   * Change the key used to encrypt/decrypt messages when using AEAD encryption.
+   * If no message encryption key is provided by the user, a default key consisting of all zeroes is used.
+   * 
+   * This changes the message encryption key for all EspnowMeshBackend instances on this ESP8266.
+   * 
+   * @param espnowMessageEncryptionKeySeed A string that will be used to generate the message encryption key. The same string will always generate the same key. 
+   *                                       A minimum of 8 random characters are recommended to ensure sufficient key variation.
+   */
+  static void setEspnowMessageEncryptionKey(const String &espnowMessageEncryptionKeySeed);
+  
+  /**
+   * Get the key used to encrypt/decrypt messages when using AEAD encryption.
+   * 
+   * @return An uint8_t array with size CryptoInterface::ENCRYPTION_KEY_LENGTH containing the currently used message encryption key.
+   */
+  static const uint8_t *getEspnowMessageEncryptionKey();
+
+  /**
+   * If true, AEAD will be used to encrypt/decrypt all messages sent/received by this node via ESP-NOW, regardless of whether the connection is encrypted or not.
+   * All nodes this node wishes to communicate with must then also use encrypted messages with the same getEspnowMessageEncryptionKey(), or messages will not be accepted.
+   * Note that using encrypted messages will reduce the number of message bytes that can be transmitted.
+   *
+   * Using AEAD will only encrypt the message content, not the transmission metadata. 
+   * The AEAD encryption does not require any pairing, and is thus faster for single messages than establishing a new encrypted connection before transfer.
+   * AEAD encryption also works with ESP-NOW broadcasts and supports an unlimited number of nodes, which is not true for encrypted connections.
+   * Encrypted ESP-NOW connections do however come with built in replay attack protection, which is not provided by the framework when using AEAD encryption, 
+   * and allow EspnowProtocolInterpreter::aeadMetadataSize extra message bytes per transmission.
+   * Transmissions via encrypted connections are also slightly faster than via AEAD once a connection has been established.
+   * 
+   * useEncryptedMessages() is false by default.
+   * 
+   * @param useEncryptedMessages If true, AEAD encryption/decryption is enabled. If false, AEAD encryption/decryption is disabled.
+   */
+  static void setUseEncryptedMessages(bool useEncryptedMessages);
+  static bool useEncryptedMessages();
   
   /**
    * Hint: Use String.length() to get the ASCII length of a String.
    * 
-   * @return The maximum number of bytes (or ASCII characters) a transmission can contain. Note that non-ASCII characters usually require the space of at least two ASCII characters each.
+   * @return The maximum number of bytes (or ASCII characters) a transmission can contain. 
+   *         Note that non-ASCII characters usually require the space of at least two ASCII characters each.
+   *         Also note that this value will be reduced by EspnowProtocolInterpreter::aeadMetadataSize if useEncryptedMessages() is true.
    */
   static uint32_t getMaxMessageBytesPerTransmission();
 
@@ -402,7 +532,9 @@ public:
   /**
    * Hint: Use String.length() to get the ASCII length of a String.
    * 
-   * @return The maximum length in bytes an ASCII message is allowed to be when transmitted/broadcasted by this node. Note that non-ASCII characters usually require at least two bytes each.
+   * @return The maximum length in bytes an ASCII message is allowed to be when transmitted/broadcasted by this node. 
+   *         Note that non-ASCII characters usually require at least two bytes each.
+   *         Also note that this value will be reduced if useEncryptedMessages() is true.
    */
   static uint32_t getMaxMessageLength();
 
@@ -506,6 +638,19 @@ public:
 
   void setBroadcastFilter(broadcastFilterType broadcastFilter);
   broadcastFilterType getBroadcastFilter();
+
+  /**
+   * Set a function that should be called after each successful ESP-NOW response transmission, just before the response is removed from the waiting list. 
+   * If a particular response is not sent, there will be no function call for it.
+   * Only the hook of the EspnowMeshBackend instance that is getEspnowRequestManager() will be called.
+   * 
+   * The hook should return a bool. 
+   * If this return value is true, the response transmission process will continue with the next response in the waiting list. 
+   * If it is false, the response transmission process will stop after removing the just sent response from the waiting list.
+   * The default responseTransmittedHook always returns true.
+   */
+  void setResponseTransmittedHook(responseTransmittedHookType responseTransmittedHook);
+  responseTransmittedHookType getResponseTransmittedHook();
   
   /**
    * Get the MAC address of the sender of the most recently received ESP-NOW request, response or broadcast to this EspnowMeshBackend instance. 
@@ -546,11 +691,11 @@ public:
   uint8_t *getSenderAPMac(uint8_t *macArray);
 
   /**
-   * Get whether the ESP-NOW request, response or broadcast which was most recently received by this EspnowMeshBackend instance was encrypted or not. 
+   * Get whether the ESP-NOW request, response or broadcast which was most recently received by this EspnowMeshBackend instance was sent over an encrypted connection or not. 
    * 
-   * @return If true, the request, response or broadcast was encrypted. If false, it was unencrypted.
+   * @return If true, the request, response or broadcast was sent over an encrypted connection. If false, the connection was unencrypted.
    */
-  bool receivedEncryptedMessage();
+  bool receivedEncryptedTransmission();
 
   /**
    * Should be used together with serializeUnencryptedConnection() if the node sends unencrypted transmissions
@@ -563,10 +708,10 @@ public:
    */
   static bool addUnencryptedConnection(const String &serializedConnectionState);
   
-  // Updates connection with current stored encryption key.
+  // Updates connection with current stored encrypted connection key.
   // At least one of the leftmost 32 bits in each of the session keys should be 1, since the key otherwise indicates the connection is unencrypted.
   encrypted_connection_status_t addEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey);
-  // Note that the espnowEncryptionKey, espnowEncryptionKok and espnowHashKey are not serialized.
+  // Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized.
   // These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
   // @param ignoreDuration Ignores any stored duration serializedConnectionState, guaranteeing that the created connection will be permanent. Returns: ECS_REQUEST_TRANSMISSION_FAILED indicates malformed serializedConnectionState.
   encrypted_connection_status_t addEncryptedConnection(const String &serializedConnectionState, bool ignoreDuration = false);
@@ -575,7 +720,7 @@ public:
   // As with all these methods, changes will only take effect once the requester proves it has the ability to decrypt the session key.
   // At least one of the leftmost 32 bits in each of the session keys should be 1, since the key otherwise indicates the connection is unencrypted.
   encrypted_connection_status_t addTemporaryEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey, uint32_t duration);
-  // Note that the espnowEncryptionKey, espnowEncryptionKok and espnowHashKey are not serialized.
+  // Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized.
   // These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
   // Uses duration argument instead of any stored duration in serializedConnectionState. Returns: ECS_REQUEST_TRANSMISSION_FAILED indicates malformed serializedConnectionState.
   encrypted_connection_status_t addTemporaryEncryptedConnection(const String &serializedConnectionState, uint32_t duration);
@@ -593,15 +738,17 @@ public:
   encrypted_connection_removal_outcome_t requestEncryptedConnectionRemoval(uint8_t *peerMac);
 
   /**
-   * Set whether this EspnowMeshBackend instance will accept unencrypted ESP-NOW requests or not, when acting as EspnowRequestManager. 
+   * Set whether this EspnowMeshBackend instance will accept ESP-NOW requests from unencrypted connections or not, when acting as EspnowRequestManager. 
    * When set to false and combined with already existing encrypted connections, this can be used to ensure only encrypted transmissions are processed.
-   * When set to false it will also make it impossible to send unencrypted requests for encrypted connection to the node, 
+   * When set to false it will also make it impossible to send requests for encrypted connection to the node over an unencrypted connection, 
    * which can be useful if too many such requests could otherwise be expected.
    * 
-   * @param acceptsUnencryptedRequests If and only if true, unencrypted requests will be processed when this EspnowMeshBackend instance is acting as EspnowRequestManager. True by default.
+   * True by default.
+   * 
+   * @param acceptsUnverifiedRequests If and only if true, requests from unencrypted connections will be processed when this EspnowMeshBackend instance is acting as EspnowRequestManager.
    */
-  void setAcceptsUnencryptedRequests(bool acceptsUnencryptedRequests);
-  bool acceptsUnencryptedRequests();
+  void setAcceptsUnverifiedRequests(bool acceptsUnverifiedRequests);
+  bool acceptsUnverifiedRequests();
 
   /**
    * Set a soft upper limit on the number of encrypted connections this node can have when receiving encrypted connection requests.
@@ -609,12 +756,14 @@ public:
    * Each EspnowMeshBackend instance can have a separate value. The value used is that of the current EspnowRequestManager.
    * The hard upper limit is 6 encrypted connections, mandated by the ESP-NOW API.
    * 
+   * Default is 6.
+   * 
    * When a request for encrypted connection is received from a node to which there is no existing permanent encrypted connection,
    * and the number of encrypted connections exceeds the soft limit,
    * this request will automatically be converted to an autoEncryptionRequest.
    * This means it will be a temporary connection with very short duration (with default framework settings).
    * 
-   * @param softLimit The new soft limit. Valid values are 0 to 6. Default is 6.
+   * @param softLimit The new soft limit. Valid values are 0 to 6.
    */
   void setEncryptedConnectionsSoftLimit(uint8_t softLimit);
   uint8_t encryptedConnectionsSoftLimit();
@@ -749,11 +898,11 @@ protected:
   void setSenderAPMac(uint8_t *macArray);
 
   /**
-   * Set whether the most recently received ESP-NOW request, response or broadcast is presented as having been encrypted or not.
+   * Set whether the most recently received ESP-NOW request, response or broadcast is presented as having been sent over an encrypted connection or not
    * 
-   * @param receivedEncryptedMessage If true, the request, response or broadcast is presented as having been encrypted.
+   * @param receivedEncryptedTransmission If true, the request, response or broadcast is presented as having been sent over an encrypted connection.
    */
-  void setReceivedEncryptedMessage(bool receivedEncryptedMessage);
+  void setReceivedEncryptedTransmission(bool receivedEncryptedTransmission);
 
   static bool temporaryEncryptedConnectionToPermanent(uint8_t *peerMac);
 
@@ -766,6 +915,11 @@ protected:
    * Will be true when the connectionQueue should not be modified.
    */
   static bool _espnowConnectionQueueMutex;
+
+  /** 
+   * Will be true when no responsesToSend element should be removed.
+   */
+  static bool _responsesToSendMutex;
 
   /**
    * Check if there is an ongoing ESP-NOW transmission in the library. Used to avoid interrupting transmissions.
@@ -813,6 +967,9 @@ protected:
   transmission_status_t sendResponse(const String &message, uint64_t requestID, const uint8_t *targetBSSID);
 
 private:
+
+  EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, broadcastFilterType broadcastFilter,
+                    const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel);
 
   typedef std::function<String(const String &, const ExpiringTimeTracker &)> encryptionRequestBuilderType;
   static String defaultEncryptionRequestBuilder(const String &requestHeader, const uint32_t durationMs, const uint8_t *hashKey, const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker);
@@ -908,6 +1065,7 @@ private:
   static bool _espnowSendConfirmed;
 
   broadcastFilterType _broadcastFilter;
+  responseTransmittedHookType _responseTransmittedHook = [](const String &, const uint8_t *, uint32_t, EspnowMeshBackend &){ return true; };
 
   uint8_t _broadcastTransmissionRedundancy = 1;
 
@@ -923,17 +1081,19 @@ private:
 
   static bool usesConstantSessionKey(char messageType);
 
-  bool _acceptsUnencryptedRequests = true;
+  bool _acceptsUnverifiedRequests = true;
 
-  uint8_t _espnowEncryptionKey[EspnowProtocolInterpreter::espnowEncryptionKeyLength] {0};
+  uint8_t _espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength] {0};
   uint8_t _espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength] {0};
-  static uint8_t _espnowEncryptionKok[EspnowProtocolInterpreter::espnowEncryptionKeyLength];
+  static uint8_t _espnowEncryptionKok[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength];
   static bool _espnowEncryptionKokSet;
-  static uint32_t _unencryptedMessageID;
+  static uint8_t _espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH];
+  static bool _useEncryptedMessages;
+  static uint32_t _unsynchronizedMessageID;
 
   uint8_t _senderMac[6] = {0};
   uint8_t _senderAPMac[6] = {0};
-  bool _receivedEncryptedMessage = false;
+  bool _receivedEncryptedTransmission = false;
 
   static bool _espnowSendToNodeMutex;
   static uint8_t _transmissionTargetBSSID[6];

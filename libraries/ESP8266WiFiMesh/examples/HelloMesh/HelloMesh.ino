@@ -26,9 +26,10 @@ const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
-uint8_t espnowEncryptionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions.
-                                   0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
-                                  };
+// Note that it is also possible to use Strings as key seeds instead of arrays.
+uint8_t espnowEncryptedConnectionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions of encrypted connections.
+                                            0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
+                                           };
 uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
                              0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD
                             };
@@ -36,7 +37,7 @@ uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // 
 bool meshMessageHandler(String &message, FloodingMesh &meshInstance);
 
 /* Create the mesh node object */
-FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
 
 bool theOne = true;
 String theOneMac = "";
@@ -145,6 +146,13 @@ void setup() {
     digitalWrite(LED_BUILTIN, LOW); // Turn LED on (LED_BUILTIN is active low)
   }
 
+  // Uncomment the lines below to use automatic AEAD encryption/decryption of messages sent/received via broadcast() and encryptedBroadcast().
+  // The main benefit of AEAD encryption is that it can be used with normal broadcasts (which are substantially faster than encryptedBroadcasts).
+  // The main drawbacks are that AEAD only encrypts the message data (not transmission metadata), transfers less data per message and lacks replay attack protection.
+  // When using AEAD, potential replay attacks must thus be handled manually.
+  //floodingMesh.getEspnowMeshBackend().setEspnowMessageEncryptionKey("ChangeThisKeySeed_TODO"); // The message encryption key should always be set manually. Otherwise a default key (all zeroes) is used.
+  //floodingMesh.getEspnowMeshBackend().setUseEncryptedMessages(true);
+
   floodingMeshDelay(5000); // Give some time for user to start the nodes
 }
 
@@ -171,7 +179,7 @@ void loop() {
       uint32_t startTime = millis();
       ledState = ledState ^ bool(benchmarkCount); // Make other nodes' LEDs alternate between on and off once benchmarking begins.
 
-      // Note: The maximum length of an unencrypted broadcast message is given by floodingMesh.maxUnencryptedMessageSize(). It is around 670 bytes by default.
+      // Note: The maximum length of an unencrypted broadcast message is given by floodingMesh.maxUnencryptedMessageLength(). It is around 670 bytes by default.
       floodingMesh.broadcast(String(floodingMesh.metadataDelimiter()) + String(ledState) + theOneMac + " is The One.");
       Serial.println("Proclamation broadcast done in " + String(millis() - startTime) + " ms.");
 

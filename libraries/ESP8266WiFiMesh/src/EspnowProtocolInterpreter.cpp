@@ -25,30 +25,27 @@
 #include "EspnowProtocolInterpreter.h"
 #include "TypeConversionFunctions.h"
 #include <algorithm>
+#include "EspnowMeshBackend.h"
 
 namespace EspnowProtocolInterpreter
-{ 
-  const uint64_t uint64LeftmostBits = 0xFFFFFFFF00000000;
-  
-  uint8_t espnowProtocolBytesSize()
+{   
+  uint8_t espnowMetadataSize()
   {
-    return 16;
+    return espnowProtocolBytesSize + (EspnowMeshBackend::useEncryptedMessages() ? aeadMetadataSize : 0);
   }
   
-  String espnowGetMessageContent(uint8_t *transmission, uint8_t transmissionLength)
+  String espnowGetMessageContent(uint8_t *transmissionDataArray, uint8_t transmissionLength)
   {
-    if(transmissionLength < espnowProtocolBytesSize())
+    String messageContent = emptyString;
+    
+    if(transmissionLength >= espnowMetadataSize())
     {
-      return "";
+      uint8_t messageSize = transmissionLength - espnowMetadataSize();
+      
+      messageContent = uint8ArrayToMultiString(transmissionDataArray + espnowMetadataSize(), messageSize);
     }
-    else
-    {
-      // Ensure we have a NULL terminated character array so the String() constructor knows where to stop.
-      uint8_t bufferedTransmission[transmissionLength + 1];
-      std::copy_n(transmission, transmissionLength, bufferedTransmission);
-      bufferedTransmission[transmissionLength] = 0;
-      return String((char *)(bufferedTransmission + espnowProtocolBytesSize()));
-    }
+
+    return messageContent;
   }
   
   char espnowGetMessageType(const uint8_t *transmissionDataArray)
@@ -79,22 +76,12 @@ namespace EspnowProtocolInterpreter
 
   uint64_t espnowGetMessageID(const uint8_t *transmissionDataArray)
   {
-    uint64_t outcome = 0;
-    for(int shiftingFortune = 56; shiftingFortune >= 0; shiftingFortune -= 8)
-    {
-      outcome |= ((uint64_t)transmissionDataArray[espnowMessageIDIndex + 7 - shiftingFortune/8] << shiftingFortune);
-    }
-
-    return outcome;
+    return uint8ArrayToUint64(transmissionDataArray + espnowMessageIDIndex);
   }
 
   uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, uint64_t messageID)
   {
-    for(int shiftingFortune = 56; shiftingFortune >= 0; shiftingFortune -= 8)
-    {
-      transmissionDataArray[espnowMessageIDIndex + 7 - shiftingFortune/8] = messageID >> shiftingFortune & 0xFF;
-    }
-    return transmissionDataArray;
+    return uint64ToUint8Array(messageID, transmissionDataArray + espnowMessageIDIndex);
   }
 
   bool usesEncryption(uint64_t messageID)

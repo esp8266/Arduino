@@ -1,6 +1,6 @@
 /*
  * TypeConversionFunctions
- * Copyright (C) 2018 Anders Löfgren
+ * Copyright (C) 2018-2019 Anders Löfgren
  *
  * License (MIT license):
  *
@@ -25,19 +25,39 @@
 
 #include "TypeConversionFunctions.h"
 
+namespace
+{
+  constexpr char chars[36] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+  constexpr uint8_t charValues[75] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, // 0 to 10
+                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0, 0, 0, 0, 0, 0, // Upper case letters
+                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}; // Lower case letters
+}
+
+
 String uint64ToString(uint64_t number, byte base)
 {
   assert(2 <= base && base <= 36);
   
-  String result = "";
-
-  while(number > 0)
+  String result;
+  
+  if(base == 16)
   {
-    result = String((uint32_t)(number % base), base) + result;
-    number /= base;
+    do {
+      result += chars[ number % base ];
+      number >>= 4; // We could write number /= 16; and the compiler would optimize it to a shift, but the explicit shift notation makes it clearer where the speed-up comes from.
+    } while ( number );
+  }
+  else
+  {
+    do {
+      result += chars[ number % base ];
+      number /= base;
+    } while ( number );
   }
   
-  return (result == "" ? "0" : result);
+  std::reverse( result.begin(), result.end() );
+  
+  return result;
 }
 
 uint64_t stringToUint64(const String &string, byte base)
@@ -46,12 +66,21 @@ uint64_t stringToUint64(const String &string, byte base)
   
   uint64_t result = 0;
 
-  char currentCharacter[1];
-  for(uint32_t i = 0; i < string.length(); i++)
+  if(base == 16)
   {
-    result *= base;
-    currentCharacter[0] = string.charAt(i);
-    result += strtoul(currentCharacter, NULL, base);
+    for(uint32_t i = 0; i < string.length(); ++i)
+    {
+      result <<= 4; // We could write result *= 16; and the compiler would optimize it to a shift, but the explicit shift notation makes it clearer where the speed-up comes from.
+      result += charValues[string.charAt(i) - '0'];
+    }
+  }
+  else
+  {
+    for(uint32_t i = 0; i < string.length(); ++i)
+    {
+      result *= base;
+      result += charValues[string.charAt(i) - '0'];
+    }
   }
   
   return result;
@@ -59,33 +88,78 @@ uint64_t stringToUint64(const String &string, byte base)
 
 String uint8ArrayToHexString(const uint8_t *uint8Array, uint32_t arrayLength)
 {
-  char hexString[2*arrayLength + 1]; // Each uint8_t will become two characters (00 to FF) and we want a null terminated char array. 
-  hexString[arrayLength + 1] = { 0 };
-  for(uint32_t i = 0; i < arrayLength; i++)
+  String hexString;
+  if(!hexString.reserve(2*arrayLength))  // Each uint8_t will become two characters (00 to FF)
+    return emptyString;
+  
+  for(uint32_t i = 0; i < arrayLength; ++i)
   {
-    sprintf(hexString + 2*i, "%02X", uint8Array[i]);
+    hexString += chars[ uint8Array[i] >> 4 ];
+    hexString += chars[ uint8Array[i] % 16 ];
   }
-
-  return String(hexString);
+  
+  return hexString;  
 }
 
 uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, uint32_t arrayLength)
 {
   assert(hexString.length() >= arrayLength*2); // Each array element can hold two hexString characters
   
-  for(uint32_t i = 0; i < arrayLength; i++)
+  for(uint32_t i = 0; i < arrayLength; ++i)
   {
-    uint8Array[i] = strtoul(hexString.substring(i*2, (i+1)*2).c_str(), nullptr, 16);
+    uint8Array[i] = (charValues[hexString.charAt(i*2) - '0'] << 4) + charValues[hexString.charAt(i*2 + 1) - '0']; 
   }
   
   return uint8Array;
 }
 
+String uint8ArrayToMultiString(uint8_t *uint8Array, uint32_t arrayLength)
+{
+  String multiString;
+  if(!multiString.reserve(arrayLength))
+    return emptyString;
+
+  // Ensure we have a NULL terminated character array so the String() constructor knows where to stop.
+  char finalChar = uint8Array[arrayLength - 1];
+  uint8Array[arrayLength - 1] = 0;
+
+  multiString += (char *)(uint8Array);
+  while(multiString.length() < arrayLength - 1)
+  {
+    multiString += (char)0; // String construction only stops for null values, so we need to add those manually.
+    multiString += (char *)(uint8Array + multiString.length());
+  }
+
+  multiString += finalChar;
+  uint8Array[arrayLength - 1] = finalChar;
+
+  return multiString;
+}
+
+String bufferedUint8ArrayToMultiString(const uint8_t *uint8Array, uint32_t arrayLength)
+{
+  String multiString;
+  if(!multiString.reserve(arrayLength))
+    return emptyString;
+  
+  // Ensure we have a NULL terminated character array so the String() constructor knows where to stop.
+  uint8_t bufferedData[arrayLength + 1];
+  std::copy_n(uint8Array, arrayLength, bufferedData);
+  bufferedData[arrayLength] = 0;
+  
+  multiString += (char *)(bufferedData);
+  while(multiString.length() < arrayLength)
+  {
+    multiString += (char)0; // String construction only stops for null values, so we need to add those manually.
+    multiString += (char *)(bufferedData + multiString.length());
+  }
+
+  return multiString;
+}
+
 String macToString(const uint8_t *mac)
 {
-  char macString[13] = { 0 };
-  sprintf(macString, "%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-  return String(macString);
+  return uint8ArrayToHexString(mac, 6);
 }
 
 uint8_t *stringToMac(const String &macString, uint8_t *macArray)
@@ -95,25 +169,45 @@ uint8_t *stringToMac(const String &macString, uint8_t *macArray)
 
 uint64_t macToUint64(const uint8_t *macArray)
 {
-  uint64_t outcome = 0;
-  for(int shiftingFortune = 40; shiftingFortune >= 0; shiftingFortune -= 8)
-  {
-    outcome |= ((uint64_t)macArray[5 - shiftingFortune/8] << shiftingFortune);
-  }
-
-  return outcome;
+  uint64_t result = (uint64_t)macArray[0] << 40 | (uint64_t)macArray[1] << 32 | (uint64_t)macArray[2] << 24 | (uint64_t)macArray[3] << 16 | (uint64_t)macArray[4] << 8 | (uint64_t)macArray[5];
+  return result;
 }
 
 uint8_t *uint64ToMac(uint64_t macValue, uint8_t *macArray)
 {
   assert(macValue <= 0xFFFFFFFFFFFF); // Overflow will occur if value can't fit within 6 bytes
   
-  for(int shiftingFortune = 40; shiftingFortune >= 0; shiftingFortune -= 8)
-  {
-    macArray[5 - shiftingFortune/8] = macValue >> shiftingFortune & 0xFF;
-  }
+  macArray[5] = macValue;
+  macArray[4] = macValue >> 8;
+  macArray[3] = macValue >> 16;
+  macArray[2] = macValue >> 24;
+  macArray[1] = macValue >> 32;
+  macArray[0] = macValue >> 40;
+  
   return macArray;
-} 
+}
+
+uint8_t *uint64ToUint8Array(uint64_t value, uint8_t *resultArray)
+{
+  resultArray[7] = value;
+  resultArray[6] = value >> 8;
+  resultArray[5] = value >> 16;
+  resultArray[4] = value >> 24;
+  resultArray[3] = value >> 32;
+  resultArray[2] = value >> 40;
+  resultArray[1] = value >> 48;
+  resultArray[0] = value >> 56;
+
+  return resultArray;
+}
+
+uint64_t uint8ArrayToUint64(const uint8_t *inputArray)
+{
+  uint64_t result = (uint64_t)inputArray[0] << 56 | (uint64_t)inputArray[1] << 48 | (uint64_t)inputArray[2] << 40 | (uint64_t)inputArray[3] << 32 
+                    | (uint64_t)inputArray[4] << 24 | (uint64_t)inputArray[5] << 16 | (uint64_t)inputArray[6] << 8 | (uint64_t)inputArray[7];
+                     
+  return result;
+}
 
 /**
  * Helper function for meshBackendCast.

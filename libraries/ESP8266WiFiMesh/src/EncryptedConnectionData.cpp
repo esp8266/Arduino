@@ -128,18 +128,21 @@ uint64_t EncryptedConnectionData::getOwnSessionKey() const { return _ownSessionK
 
 uint64_t EncryptedConnectionData::incrementSessionKey(uint64_t sessionKey, const uint8_t *hashKey, uint8_t hashKeyLength)
 {
-  String hmac = MeshCryptoInterface::createMeshHmac(uint64ToString(sessionKey), hashKey, hashKeyLength);
-  
+  uint8_t inputArray[8] {0};
+  uint8_t hmacArray[CryptoInterface::SHA256_NATURAL_LENGTH] {0};
+  CryptoInterface::sha256Hmac(uint64ToUint8Array(sessionKey, inputArray), 8, hashKey, hashKeyLength, hmacArray, CryptoInterface::SHA256_NATURAL_LENGTH);
+
   /* HMAC truncation should be OK since hmac sha256 is a PRF and we are truncating to the leftmost (MSB) bits.
   PRF: https://crypto.stackexchange.com/questions/26410/whats-the-gcm-sha-256-of-a-tls-protocol/26434#26434
   Truncate to leftmost bits: https://tools.ietf.org/html/rfc2104#section-5 */
-  uint64_t newLeftmostBits = strtoul(hmac.substring(0, 8).c_str(), nullptr, HEX); // strtoul stops reading input when an invalid character is discovered.
+  uint64_t newLeftmostBits = uint8ArrayToUint64(hmacArray) & EspnowProtocolInterpreter::uint64LeftmostBits;
+  
   if(newLeftmostBits == 0)
-    newLeftmostBits = RANDOM_REG32 | (1 << 31); // We never want newLeftmostBits == 0 since that would indicate an unencrypted transmission.
+    newLeftmostBits = ((uint64_t)RANDOM_REG32 | (1 << 31)) << 32; // We never want newLeftmostBits == 0 since that would indicate an unencrypted transmission.
   
   uint64_t newRightmostBits = (uint32_t)(sessionKey + 1);
 
-  return (newLeftmostBits << 32) | newRightmostBits;
+  return newLeftmostBits | newRightmostBits;
 }
 
 void EncryptedConnectionData::incrementOwnSessionKey()

@@ -76,7 +76,7 @@ public:
   void setDesync(bool desync);
   bool desync() const;
 
-  // Note that the espnowEncryptionKey, espnowEncryptionKok and espnowHashKey are not serialized. 
+  // Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized. 
   // These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
   String serialize() const;
 

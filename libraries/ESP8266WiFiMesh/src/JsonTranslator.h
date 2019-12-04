@@ -39,7 +39,7 @@ namespace JsonTranslator
   const String jsonNonce = "\"nonce\":";
   const String jsonHmac = "\"hmac\":";
   const String jsonDesync = "\"desync\":";
-  const String jsonUnencryptedMessageID = "\"unencMsgID\":";
+  const String jsonUnsynchronizedMessageID = "\"unsyncMsgID\":";
   const String jsonMeshMessageCount = "\"meshMsgCount\":";
   
   String createJsonPair(const String &valueIdentifier, const String &value);
@@ -102,7 +102,7 @@ namespace JsonTranslator
   bool getNonce(const String &jsonString, String &result);
   bool getHmac(const String &jsonString, String &result);
   bool getDesync(const String &jsonString, bool &result);
-  bool getUnencryptedMessageID(const String &jsonString, uint32_t &result);
+  bool getUnsynchronizedMessageID(const String &jsonString, uint32_t &result);
   bool getMeshMessageCount(const String &jsonString, uint16_t &result);
 }
 
