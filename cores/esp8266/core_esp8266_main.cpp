@@ -108,8 +108,7 @@ extern "C" void __esp_yield() {
 
 extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
 
-extern "C" void esp_schedule() {
-    // always on CONT stack here
+extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
