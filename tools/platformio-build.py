@@ -185,6 +185,11 @@ elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191105" in flatten_cppdefines:
         CPPDEFINES=[("NONOSDK22x_191105", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191105")]
     )
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191122" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x_191122", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191122")]
+    )
 else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("NONOSDK22x_190703", 1)],
