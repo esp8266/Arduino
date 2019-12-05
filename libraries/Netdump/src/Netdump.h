@@ -62,6 +62,7 @@ private:
 
     static void capture(int netif_idx, const char* data, size_t len, int out, int success);
     static CallBackList<LwipCallback> lwipCallback;
+    CallBackList<LwipCallback>::CallBackHandler lwipHandler;
 
     void netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success);
 
@@ -79,9 +80,6 @@ private:
     static constexpr int tcpBuffersize = 2048;
     static constexpr int maxPcapLength = 1024;
     static constexpr uint32_t pcapMagic = 0xa1b2c3d4;
-
-    CallBackList<LwipCallback>::CallBackHandler lwipHandler;
-
 };
 
 } // namespace NetCapture

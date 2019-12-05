@@ -277,7 +277,8 @@ public:
         return (isIP() && ((getSrcPort() == p) || (getDstPort() == p)));
     }
 
-    const String toString(PacketDetail netdumpDetail = PacketDetail::NONE) const;
+    const String toString() const;
+    const String toString(PacketDetail netdumpDetail) const;
     void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
     const PacketType packetType() const;

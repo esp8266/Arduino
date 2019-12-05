@@ -39,7 +39,6 @@ Netdump::Netdump()
 Netdump::~Netdump()
 {
 	reset();
-    phy_capture = nullptr;
     if (packetBuffer)
     {
     	delete[] packetBuffer;
@@ -102,7 +101,10 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
 {
-	lwipCallback.execute(netif_idx,data,len,out,success);
+	if (lwipCallback.execute(netif_idx,data,len,out,success) == 0)
+	{
+		phy_capture = nullptr; // No active callback/netdump instances, will be set again by new object.
+	}
 }
 
 void Netdump::netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success)

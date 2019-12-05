@@ -259,6 +259,10 @@ void Packet::UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 	sstr.printf_P(PSTR("\r\n"));
 }
 
+const String Packet::toString() const
+{
+	return toString(PacketDetail::NONE);
+}
 
 
 const String Packet::toString(PacketDetail netdumpDetail) const
