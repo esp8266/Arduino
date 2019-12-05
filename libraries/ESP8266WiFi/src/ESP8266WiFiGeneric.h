@@ -43,12 +43,13 @@ typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 typedef void (*WiFiEventCb)(WiFiEvent_t);
 
 #if LWIP_IPV4 && LWIP_IPV6
-enum class DNSResolveType : uint8_t
+
+enum class DNSResolveType: uint8_t
 {
-    DNS_ADDRTYPE_IPV4, 		// LWIP_DNS_ADDRTYPE_IPV4 = 0
-    DNS_ADDRTYPE_IPV6,		// LWIP_DNS_ADDRTYPE_IPV6 = 1
-    DNS_ADDRTYPE_IPV4_IPV6,	// LWIP_DNS_ADDRTYPE_IPV4_IPV6 = 2
-    DNS_ADDRTYPE_IPV6_IPV4	// LWIP_DNS_ADDRTYPE_IPV6_IPV4 = 3
+    DNS_AddrType_IPv4 = 0,	// LWIP_DNS_ADDRTYPE_IPV4 = 0
+    DNS_AddrType_IPv6,		// LWIP_DNS_ADDRTYPE_IPV6 = 1
+    DNS_AddrType_IPv4_IPv6,	// LWIP_DNS_ADDRTYPE_IPV4_IPV6 = 2
+    DNS_AddrType_IPv6_IPv4	// LWIP_DNS_ADDRTYPE_IPV6_IPV4 = 3
 };
 #endif
 

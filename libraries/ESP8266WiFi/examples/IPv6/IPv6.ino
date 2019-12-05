@@ -101,8 +101,8 @@ void status(Print& out) {
   fqdn(out, FQDN);
   fqdn(out, FQDN6);
 #if LWIP_IPV4 && LWIP_IPV6
-  fqdn_rt(out, FQDN,  DNSResolveType::DNS_ADDRTYPE_IPV4_IPV6); // IPv4 before IPv6
-  fqdn_rt(out, FQDN2, DNSResolveType::DNS_ADDRTYPE_IPV6_IPV4); // IPv6 before IPv4
+  fqdn_rt(out, FQDN,  DNSResolveType::DNS_AddrType_IPv4_IPv6); // IPv4 before IPv6
+  fqdn_rt(out, FQDN2, DNSResolveType::DNS_AddrType_IPv6_IPv4); // IPv6 before IPv4
 #endif
   out.println(F("------------------------------"));
 }
