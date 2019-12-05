@@ -51,7 +51,7 @@ void fqdn(Print& out, const String& fqdn) {
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
-void fqdn_rt(Print& out, const String& fqdn, uint8_t resolveType) {
+void fqdn_rt(Print& out, const String& fqdn, DNSResolveType resolveType) {
   out.print(F("resolving "));
   out.print(fqdn);
   out.print(F(": "));
