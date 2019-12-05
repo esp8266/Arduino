@@ -1,0 +1,60 @@
+commit a0b131126ba803d0069014698a07e9f2fd3decd6
+Merge: a8d1fcb 1e61d28
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Nov 22 15:13:18 2019 +0800
+
+    Merge branch 'feature/add_broadcast_support_for_smartconfig' into 'release/v2.2.x'
+    
+    feat(sc): add broadcast support for smartconfig
+    
+    See merge request sdk/ESP8266_NONOS_SDK!246
+
+commit 1e61d284b621527193303828612c3058be137230
+Author: Chen Wen <chenwen@espressif.com>
+Date:   Thu Nov 21 16:54:46 2019 +0800
+
+    feat(sc): add broadcast support for smartconfig
+
+commit a8d1fcbebda3055a89d7378c3fc3591df4420966
+Merge: 173440a 089fe93
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Nov 19 16:55:11 2019 +0800
+
+    Merge branch 'cherry-pick-4bfd0469-2' into 'release/v2.2.x'
+    
+    feat: Update phy to 1155
+    
+    See merge request sdk/ESP8266_NONOS_SDK!243
+
+commit 173440a5c3ab3763230748010d753e4508db15e9
+Merge: 1848ef1 3c337a0
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Nov 19 16:53:34 2019 +0800
+
+    Merge branch 'feature/update_core' into 'release/v2.2.x'
+    
+    feat: Update at core to fix bugs
+    
+    See merge request sdk/ESP8266_NONOS_SDK!240
+
+commit 089fe93b5059588bf0da598644f0a16a5f7b3058
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Nov 19 08:48:39 2019 +0000
+
+    Merge branch 'feature/update_phy' into 'master'
+    
+    feat: Update phy to 1155
+    
+    See merge request sdk/ESP8266_NONOS_SDK!241
+    
+    (cherry picked from commit 4bfd046942c7162678f9545bb4aa0d6f46f47ea5)
+    
+    56dc26ed feat: Update phy to 1155
+
+commit 3c337a008b1e881d0945464dce2b6efdbddf097c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Nov 19 16:39:00 2019 +0800
+
+    feat: Update at core to fix bugs
+    
+    - fix: TCP data lost when link is disconnect
