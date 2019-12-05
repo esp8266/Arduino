@@ -42,6 +42,16 @@ typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
 typedef void (*WiFiEventCb)(WiFiEvent_t);
 
+#if LWIP_IPV4 && LWIP_IPV6
+enum class DNSResolveType : uint8_t
+{
+    DNS_ADDRTYPE_IPV4 = LWIP_DNS_ADDRTYPE_IPV4, 
+    DNS_ADDRTYPE_IPV6 = LWIP_DNS_ADDRTYPE_IPV6,
+    DNS_ADDRTYPE_IPV4_IPV6 = LWIP_DNS_ADDRTYPE_IPV4_IPV6,
+    DNS_ADDRTYPE_IPV6_IPV4 = LWIP_DNS_ADDRTYPE_IPV6_IPV4
+};
+#endif
+
 struct WiFiState;
 
 class ESP8266WiFiGenericClass {
@@ -114,7 +124,7 @@ class ESP8266WiFiGenericClass {
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
 #if LWIP_IPV4 && LWIP_IPV6
-        int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, uint8_t resolveType);
+        int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType_t resolveType);
 #endif
         bool getPersistent();
 

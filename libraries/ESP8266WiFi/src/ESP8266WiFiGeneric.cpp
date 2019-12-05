@@ -608,7 +608,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     ip_addr_t addr;
-    aResult = static_cast<uint32_t>(0);
+    aResult = static_cast<uint32_t>(INADDR_NONE);
 
     if(aResult.fromString(aHostname)) {
         // Host name is a IP address use it!
@@ -645,10 +645,10 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, uint8_t resolveType)
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType)
 {
     ip_addr_t addr;
-    aResult = static_cast<uint32_t>(0);
+    aResult = static_cast<uint32_t>(INADDR_NONE);
 
     if(aResult.fromString(aHostname)) {
         // Host name is a IP address use it!
@@ -657,7 +657,20 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     }
 
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,resolveType & 3); // limit to defined types 0 -3
+    switch(resolveType)
+    {
+      // Use selected addrtype
+      case DNSResolveType::DNS_ADDRTYPE_IPV4:
+      case DNSResolveType::DNS_ADDRTYPE_IPV6:
+      case DNSResolveType::DNS_ADDRTYPE_IPV4_IPV6:
+      case DNSResolveType::DNS_ADDRTYPE_IPV6_IPV4:
+        err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, resolveType);
+	 break;
+      default:
+        err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, LWIP_DNS_ADDRTYPE_DEFAULT); // If illegal type, use default.
+	 break;
+    }
+
     if(err == ERR_OK) {
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
