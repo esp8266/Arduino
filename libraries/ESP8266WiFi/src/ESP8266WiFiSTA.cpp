@@ -45,6 +45,7 @@ extern "C" {
 #include "lwip/netif.h" // struct netif
 #endif
 #if LWIP_VERSION_MAJOR == 1
+#include "netif/wlan_lwip_if.h" // eagle_lwip_getif()
 #include "netif/etharp.h" // gratuitous arp
 #else
 #include "lwip/etharp.h" // gratuitous arp
@@ -730,11 +731,11 @@ bool ESP8266WiFiSTAClass::stationKeepAliveSetupMs (int ms)
     schedule_recurrent_function_us([&]()
     {
         for (netif* interface = netif_list; interface != nullptr; interface = interface->next)
-
              if (
                    (interface->flags & NETIF_FLAG_LINK_UP)
                 && (interface->flags & NETIF_FLAG_UP)
 #if LWIP_VERSION_MAJOR == 1
+                && interface == eagle_lwip_getif(STATION_IF)
                 && (!ip_addr_isany(&interface->ip_addr))
 #else
                 && interface->num == STATION_IF /* lwip1 does not set num properly */
