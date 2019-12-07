@@ -26,8 +26,8 @@
 #define STAPSK  "your-password"
 #endif
 
-#define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
-#define FQDN2 F("www.yahoo.com")  // with both IPv4 & IPv6 addresses
+#define FQDN  F("www.google.com")  // with both IPv4 & IPv6 addresses
+#define FQDN2 F("www.yahoo.com")   // with both IPv4 & IPv6 addresses
 #define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
 #define STATUSDELAY_MS 10000
 #define TCP_PORT 23
