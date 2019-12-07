@@ -184,6 +184,9 @@ SECTIONS
     /* Constant strings in flash (PSTRs) */
     *(.irom0.pstr.*)
 
+    /* Inline flash strings PSTR() within templated code */
+    *(.rodata._ZZ*__pstr__*)
+
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)
     *(.rodata._ZZ*__PRETTY_FUNCTION__)

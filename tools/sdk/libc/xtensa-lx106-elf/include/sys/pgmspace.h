@@ -36,7 +36,7 @@ extern "C" {
 #ifndef PSTR
     // Adapted from AVR-specific code at https://forum.arduino.cc/index.php?topic=194603.0
     // Uses C attribute section instead of ASM block to allow for C language string concatenation ("x" "y" === "xy")
-    #define PSTR(s) (__extension__({static const char __c[] __attribute__((__aligned__(4))) __attribute__((section( "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\", \"aSM\", @progbits, 1 #"))) = (s); &__c[0];}))
+    #define PSTR(s) (__extension__({static const char __pstr__[] __attribute__((__aligned__(4))) __attribute__((section( "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\", \"aSM\", @progbits, 1 #"))) = (s); &__pstr__[0];}))
 #endif
 
 // Flash memory must be read using 32 bit aligned addresses else a processor
@@ -59,13 +59,13 @@ extern "C" {
 #define pgm_read_dword_with_offset(addr, res) \
   asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
       "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
-      "l32i     a15, %1, 0\n" \
+      "l32i     a14, %1, 0\n" \
       "l32i     %1, %1, 4\n" \
       "ssa8l    %0\n" \
-      "src      %0, %1, a15\n" \
+      "src      %0, %1, a14\n" \
       :"=r"(res), "=r"(addr) \
       :"1"(addr) \
-      :"a15");
+      :"a14");
 
 static inline uint8_t pgm_read_byte_inlined(const void* addr) {
   register uint32_t res;
