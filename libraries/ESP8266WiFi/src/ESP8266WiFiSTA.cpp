@@ -735,10 +735,10 @@ bool ESP8266WiFiSTAClass::stationKeepAliveSetupMs (int ms)
                    (interface->flags & NETIF_FLAG_LINK_UP)
                 && (interface->flags & NETIF_FLAG_UP)
 #if LWIP_VERSION_MAJOR == 1
-                && interface == eagle_lwip_getif(STATION_IF)
+                && interface == eagle_lwip_getif(STATION_IF) /* lwip1 does not set num properly */
                 && (!ip_addr_isany(&interface->ip_addr))
 #else
-                && interface->num == STATION_IF /* lwip1 does not set num properly */
+                && interface->num == STATION_IF
                 && (!ip4_addr_isany_val(*netif_ip4_addr(interface)))
 #endif
             )
