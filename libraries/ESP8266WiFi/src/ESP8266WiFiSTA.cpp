@@ -34,6 +34,7 @@
 #include "mem.h"
 #include "user_interface.h"
 #include "smartconfig.h"
+#include "Schedule.h"
 
 extern "C" {
 #include "lwip/err.h"
@@ -42,6 +43,11 @@ extern "C" {
 #include "lwip/init.h" // LWIP_VERSION_
 #if LWIP_IPV6
 #include "lwip/netif.h" // struct netif
+#endif
+#if LWIP_VERSION_MAJOR == 1
+#include "netif/etharp.h" // gratuitous arp
+#else
+#include "lwip/etharp.h" // gratuitous arp
 #endif
 }
 
@@ -89,7 +95,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
-    
+
     if(lhs.threshold.rssi != rhs.threshold.rssi) {
         return false;
     }
@@ -704,7 +710,55 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
     return wifi_station_get_rssi();
 }
 
+bool ESP8266WiFiSTAClass::stationKeepAliveEnabled ()
+{
+    return _keepStationAliveUs != 0;
+}
 
+void ESP8266WiFiSTAClass::stationKeepAliveStop ()
+{
+    _keepStationAliveUs = -1;
+    // will be set to 0 at recurrent call
+}
+
+bool ESP8266WiFiSTAClass::stationKeepAliveSetupMs (int ms)
+{
+    if (_keepStationAliveUs != 0 || ms <= 0)
+        return false;
+    _keepStationAliveUs = ms * 1000;
+
+    schedule_recurrent_function_us([&]()
+    {
+        for (netif* interface = netif_list; interface != nullptr; interface = interface->next)
+
+             if (
+                   (interface->flags & NETIF_FLAG_LINK_UP)
+                && (interface->flags & NETIF_FLAG_UP)
+#if LWIP_VERSION_MAJOR == 1
+                && (!ip_addr_isany(&interface->ip_addr))
+#else
+                && interface->num == STATION_IF /* lwip1 does not set num properly */
+                && (!ip4_addr_isany_val(*netif_ip4_addr(interface)))
+#endif
+            )
+            {
+                etharp_gratuitous(interface);
+                break;
+            }
+
+        if (_keepStationAliveUs > 0)
+            // continue
+            return true;
+
+        // stop on user request (value < 0)
+        _keepStationAliveUs = 0; // stop acknowledged
+        // stop recurrent function
+        return false;
+
+    }, _keepStationAliveUs);
+
+    return true;
+}
 
 // -----------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------- STA remote configure -----------------------------------------------
