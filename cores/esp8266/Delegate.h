@@ -38,98 +38,99 @@ namespace detail
     template<typename A, typename R, typename... P>
     class DelegatePImpl {
     public:
+        using target_type = R(P...);
         using FunPtr = R(*)(A, P...);
-        using FunctionType = std::function<R(P...)>;
+        using FunctionType = std::function<target_type>;
 
         DelegatePImpl()
         {
             fn = nullptr;
-            obj = {};
+            new (&obj) A;
         }
 
         DelegatePImpl(std::nullptr_t)
         {
             fn = nullptr;
-            obj = {};
+            new (&obj) A;
         }
 
         ~DelegatePImpl()
         {
-            if (FUNC == type)
+            if (FUNC == kind)
                 functional.~FunctionType();
+            else
+                obj.~A();
         }
 
         DelegatePImpl(const DelegatePImpl& del)
         {
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
-                new (&functional) FunctionType();
-                functional = del.functional;
+                new (&functional) FunctionType(del.functional);
             }
             else
             {
                 fn = del.fn;
-                obj = del.obj;
+                new (&obj) A(del.obj);
             }
         }
 
         DelegatePImpl(DelegatePImpl&& del)
         {
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
-                new (&functional) FunctionType();
-                functional = std::move(del.functional);
+                new (&functional) FunctionType(std::move(del.functional));
             }
             else
             {
                 fn = del.fn;
-                obj = del.obj;
+                new (&obj) A(std::move(del.obj));
             }
         }
 
         DelegatePImpl(FunPtr fn, const A& obj)
         {
-            type = FP;
+            kind = FP;
             DelegatePImpl::fn = fn;
-            DelegatePImpl::obj = obj;
+            new (&this->obj) A(obj);
         }
 
         DelegatePImpl(FunPtr fn, A&& obj)
         {
-            type = FP;
+            kind = FP;
             DelegatePImpl::fn = fn;
-            DelegatePImpl::obj = std::move(obj);
+            new (&this->obj) A(std::move(obj));
         }
 
         template<typename F> DelegatePImpl(const F& functional)
         {
-            type = FUNC;
-            new (&this->functional) FunctionType();
-            DelegatePImpl::functional = functional;
+            kind = FUNC;
+            new (&this->functional) FunctionType(functional);
         }
 
         template<typename F> DelegatePImpl(F&& functional)
         {
-            type = FUNC;
-            new (&this->functional) FunctionType();
-            DelegatePImpl::functional = std::move(functional);
+            kind = FUNC;
+            new (&this->functional) FunctionType(std::move(functional));
         }
 
         DelegatePImpl& operator=(const DelegatePImpl& del)
         {
             if (this == &del) return *this;
-            if (FUNC == type && FUNC != del.type)
+            if (FUNC == kind && FUNC != del.kind)
             {
                 functional.~FunctionType();
+                new (&obj) A;
             }
-            else if (FUNC != type && FUNC == del.type)
+            else if (FUNC != kind && FUNC == del.kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
             }
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
                 functional = del.functional;
             }
@@ -144,33 +145,36 @@ namespace detail
         DelegatePImpl& operator=(DelegatePImpl&& del)
         {
             if (this == &del) return *this;
-            if (FUNC == type && FUNC != del.type)
+            if (FUNC == kind && FUNC != del.kind)
             {
                 functional.~FunctionType();
+                new (&obj) A;
             }
-            else if (FUNC != type && FUNC == del.type)
+            else if (FUNC != kind && FUNC == del.kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
             }
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
                 functional = std::move(del.functional);
             }
             else
             {
                 fn = del.fn;
-                obj = del.obj;
+                obj = std::move(del.obj);
             }
             return *this;
         }
 
         template<typename F> DelegatePImpl& operator=(const F& functional)
         {
-            if (FUNC != type)
+            if (FUNC != kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
-                type = FUNC;
+                kind = FUNC;
             }
             this->functional = functional;
             return *this;
@@ -178,10 +182,11 @@ namespace detail
 
         template<typename F> DelegatePImpl& operator=(F&& functional)
         {
-            if (FUNC != type)
+            if (FUNC != kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
-                type = FUNC;
+                kind = FUNC;
             }
             this->functional = std::move(functional);
             return *this;
@@ -189,11 +194,12 @@ namespace detail
 
         DelegatePImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 functional.~FunctionType();
+                new (&obj) A;
             }
-            type = FP;
+            kind = FP;
             fn = nullptr;
             obj = {};
             return *this;
@@ -201,7 +207,7 @@ namespace detail
 
         operator bool() const
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 return functional ? true : false;
             }
@@ -213,7 +219,7 @@ namespace detail
 
         R IRAM_ATTR operator()(P... args) const
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 return functional(std::forward<P...>(args...));
             }
@@ -224,7 +230,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP } type = FP;
+        enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
             struct {
@@ -244,98 +250,99 @@ namespace detail
     template<typename A, typename R>
     class DelegateImpl {
     public:
+        using target_type = R();
         using FunPtr = R(*)(A);
-        using FunctionType = std::function<R()>;
+        using FunctionType = std::function<target_type>;
 
         DelegateImpl()
         {
             fn = nullptr;
-            obj = {};
+            new (&obj) A;
         }
 
         DelegateImpl(std::nullptr_t)
         {
             fn = nullptr;
-            obj = {};
+            new (&obj) A;
         }
 
         ~DelegateImpl()
         {
-            if (FUNC == type)
+            if (FUNC == kind)
                 functional.~FunctionType();
+            else
+                obj.~A();
         }
 
         DelegateImpl(const DelegateImpl& del)
         {
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
-                new (&functional) FunctionType();
-                functional = del.functional;
+                new (&functional) FunctionType(del.functional);
             }
             else
             {
                 fn = del.fn;
-                obj = del.obj;
+                new (&obj) A(del.obj);
             }
         }
 
         DelegateImpl(DelegateImpl&& del)
         {
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
-                new (&functional) FunctionType();
-                functional = std::move(del.functional);
+                new (&functional) FunctionType(std::move(del.functional));
             }
             else
             {
                 fn = del.fn;
-                obj = del.obj;
+                new (&obj) A(std::move(del.obj));
             }
         }
 
         DelegateImpl(FunPtr fn, const A& obj)
         {
-            type = FP;
+            kind = FP;
             DelegateImpl::fn = fn;
-            DelegateImpl::obj = obj;
+            new (&this->obj) A(obj);
         }
 
         DelegateImpl(FunPtr fn, A&& obj)
         {
-            type = FP;
+            kind = FP;
             DelegateImpl::fn = fn;
-            DelegateImpl::obj = std::move(obj);
+            new (&this->obj) A(std::move(obj));
         }
 
         template<typename F> DelegateImpl(const F& functional)
         {
-            type = FUNC;
-            new (&this->functional) FunctionType();
-            DelegateImpl::functional = functional;
+            kind = FUNC;
+            new (&this->functional) FunctionType(functional);
         }
 
         template<typename F> DelegateImpl(F&& functional)
         {
-            type = FUNC;
-            new (&this->functional) FunctionType();
-            DelegateImpl::functional = std::move(functional);
+            kind = FUNC;
+            new (&this->functional) FunctionType(std::move(functional));
         }
 
         DelegateImpl& operator=(const DelegateImpl& del)
         {
             if (this == &del) return *this;
-            if (FUNC == type && FUNC != del.type)
+            if (FUNC == kind && FUNC != del.kind)
             {
                 functional.~FunctionType();
+                new (&obj) A;
             }
-            else if (FUNC != type && FUNC == del.type)
+            else if (FUNC != kind && FUNC == del.kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
             }
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
                 functional = del.functional;
             }
@@ -350,33 +357,36 @@ namespace detail
         DelegateImpl& operator=(DelegateImpl&& del)
         {
             if (this == &del) return *this;
-            if (FUNC == type && FUNC != del.type)
+            if (FUNC == kind && FUNC != del.kind)
             {
                 functional.~FunctionType();
+                new (&obj) A;
             }
-            else if (FUNC != type && FUNC == del.type)
+            else if (FUNC != kind && FUNC == del.kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
             }
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
                 functional = std::move(del.functional);
             }
             else
             {
                 fn = del.fn;
-                obj = del.obj;
+                obj = std::move(del.obj);
             }
             return *this;
         }
 
         template<typename F> DelegateImpl& operator=(const F& functional)
         {
-            if (FUNC != type)
+            if (FUNC != kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
-                type = FUNC;
+                kind = FUNC;
             }
             this->functional = functional;
             return *this;
@@ -384,10 +394,11 @@ namespace detail
 
         template<typename F> DelegateImpl& operator=(F&& functional)
         {
-            if (FUNC != type)
+            if (FUNC != kind)
             {
+                obj.~A();
                 new (&this->functional) FunctionType();
-                type = FUNC;
+                kind = FUNC;
             }
             this->functional = std::move(functional);
             return *this;
@@ -395,11 +406,12 @@ namespace detail
 
         DelegateImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 functional.~FunctionType();
+                new (&obj) A;
             }
-            type = FP;
+            kind = FP;
             fn = nullptr;
             obj = {};
             return *this;
@@ -407,7 +419,7 @@ namespace detail
 
         operator bool() const
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 return functional ? true : false;
             }
@@ -419,7 +431,7 @@ namespace detail
 
         R IRAM_ATTR operator()() const
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 return functional();
             }
@@ -430,7 +442,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP } type = FP;
+        enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
             struct {
@@ -443,8 +455,9 @@ namespace detail
     template<typename R>
     class DelegateImpl<void, R> {
     public:
+        using target_type = R();
         using FunPtr = R(*)();
-        using FunctionType = std::function<R()>;
+        using FunctionType = std::function<target_type>;
 
         DelegateImpl()
         {
@@ -453,17 +466,16 @@ namespace detail
 
         ~DelegateImpl()
         {
-            if (FUNC == type)
+            if (FUNC == kind)
                 functional.~FunctionType();
         }
 
         DelegateImpl(const DelegateImpl& del)
         {
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
-                new (&functional) FunctionType();
-                functional = del.functional;
+                new (&functional) FunctionType(del.functional);
             }
             else
             {
@@ -473,11 +485,10 @@ namespace detail
 
         DelegateImpl(DelegateImpl&& del)
         {
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
-                new (&functional) FunctionType();
-                functional = std::move(del.functional);
+                new (&functional) FunctionType(std::move(del.functional));
             }
             else
             {
@@ -487,37 +498,35 @@ namespace detail
 
         DelegateImpl(FunPtr fn)
         {
-            type = FP;
+            kind = FP;
             DelegateImpl::fn = fn;
         }
 
         template<typename F> DelegateImpl(const F& functional)
         {
-            type = FUNC;
-            new (&this->functional) FunctionType();
-            DelegateImpl::functional = functional;
+            kind = FUNC;
+            new (&this->functional) FunctionType(functional);
         }
 
         template<typename F> DelegateImpl(F&& functional)
         {
-            type = FUNC;
-            new (&this->functional) FunctionType();
-            DelegateImpl::functional = std::move(functional);
+            kind = FUNC;
+            new (&this->functional) FunctionType(std::move(functional));
         }
 
         DelegateImpl& operator=(const DelegateImpl& del)
         {
             if (this == &del) return *this;
-            if (FUNC == type && FUNC != del.type)
+            if (FUNC == kind && FUNC != del.kind)
             {
                 functional.~FunctionType();
             }
-            else if (FUNC != type && FUNC == del.type)
+            else if (FUNC != kind && FUNC == del.kind)
             {
                 new (&this->functional) FunctionType();
             }
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
                 functional = del.functional;
             }
@@ -531,16 +540,16 @@ namespace detail
         DelegateImpl& operator=(DelegateImpl&& del)
         {
             if (this == &del) return *this;
-            if (FUNC == type && FUNC != del.type)
+            if (FUNC == kind && FUNC != del.kind)
             {
                 functional.~FunctionType();
             }
-            else if (FUNC != type && FUNC == del.type)
+            else if (FUNC != kind && FUNC == del.kind)
             {
                 new (&this->functional) FunctionType();
             }
-            type = del.type;
-            if (FUNC == del.type)
+            kind = del.kind;
+            if (FUNC == del.kind)
             {
                 functional = std::move(del.functional);
             }
@@ -553,10 +562,10 @@ namespace detail
 
         template<typename F> DelegateImpl& operator=(const F& functional)
         {
-            if (FUNC != type)
+            if (FUNC != kind)
             {
                 new (&this->functional) FunctionType();
-                type = FUNC;
+                kind = FUNC;
             }
             this->functional = functional;
             return *this;
@@ -564,10 +573,10 @@ namespace detail
 
         template<typename F> DelegateImpl& operator=(F&& functional)
         {
-            if (FUNC != type)
+            if (FUNC != kind)
             {
                 new (&this->functional) FunctionType();
-                type = FUNC;
+                kind = FUNC;
             }
             this->functional = std::move(functional);
             return *this;
@@ -575,18 +584,18 @@ namespace detail
 
         DelegateImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 functional.~FunctionType();
             }
-            type = FP;
+            kind = FP;
             fn = nullptr;
             return *this;
         }
 
         operator bool() const
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 return functional ? true : false;
             }
@@ -598,7 +607,7 @@ namespace detail
 
         R IRAM_ATTR operator()() const
         {
-            if (FUNC == type)
+            if (FUNC == kind)
             {
                 return functional();
             }
@@ -609,7 +618,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP } type = FP;
+        enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
             FunPtr fn;
