@@ -36,7 +36,7 @@ TEST_CASE("Simple echo server", "[WiFiServer]")
     
     int replyCount = 0;
     while (millis() - start < timeout) {
-        delay(50);
+        MDNS.update();
         WiFiClient client = server.available();
         if (!client) {
             continue;

@@ -190,11 +190,11 @@ directory into ESP8266 flash file system.
 
 **Warning**: Due to the move from the obsolete esptool-ck.exe to the
 supported esptool.py upload tool, upgraders from pre 2.5.1 will need to
-update the ESP8266FS tool referenced below to 0.4.0 or later.  Prior versions
+update the ESP8266FS tool referenced below to 0.5.0 or later.  Prior versions
 will fail with a "esptool not found" error because they don't know how to
 use esptool.py.
 
--  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.4.0/ESP8266FS-0.4.0.zip
+-  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.5.0/ESP8266FS-0.5.0.zip
 -  In your Arduino sketchbook directory, create ``tools`` directory if
    it doesn't exist yet.
 -  Unpack the tool into ``tools`` directory (the path will look like
@@ -214,7 +214,7 @@ use esptool.py.
 
 *ESP8266LittleFS* is the equivalent tool for LittleFS.
 
-- Download the tool: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
+- Download the 2.6.0 or later version of the tool: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
 - Install as above
 - To upload a LittleFS filesystem use Tools > ESP8266 LittleFS Data Upload
 
