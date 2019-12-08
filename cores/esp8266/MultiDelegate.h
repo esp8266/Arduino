@@ -1,7 +1,21 @@
 #ifndef __MULTIDELEGATE_H
 #define __MULTIDELEGATE_H
 
+#include <atomic>
+#ifdef ESP8266
 #include <interrupts.h>
+using esp8266::InterruptLock;
+#else
+class InterruptLock {
+public:
+    InterruptLock() {
+        noInterrupts();
+    }
+    ~InterruptLock() {
+        interrupts();
+    }
+};
+#endif
 
 namespace detail
 {
@@ -177,7 +191,7 @@ namespace detail
             if (!del)
                 return nullptr;
 
-            esp8266::InterruptLock lockAllInterruptsInThisScope;
+            InterruptLock lockAllInterruptsInThisScope;
 
             Node_t* item = get_node_unsafe();
             if (!item)
@@ -207,7 +221,7 @@ namespace detail
                 if (del == &current->mDelegate)
                 {
                     // remove callback from stack
-                    esp8266::InterruptLock lockAllInterruptsInThisScope;
+                    InterruptLock lockAllInterruptsInThisScope;
 
                     auto to_recycle = current;
 
@@ -243,15 +257,14 @@ namespace detail
             if (!current)
                 return;
 
-            static bool fence = false;
-            {
-                esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-                // prevent recursive calls
-                if (fence)
-                    return;
-                fence = true;
-            }
+            static std::atomic<bool> fence(false);
+            // prevent recursive calls
+#ifdef ESP8266
+            if (fence.load()) return;
+            fence.store(true);
+#else
+            if (fence.exchange(true)) return;
+#endif
 
             Node_t* prev = nullptr;
             // prevent execution of new callbacks during this run
@@ -264,7 +277,7 @@ namespace detail
                 if (!CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, args...))
                 {
                     // remove callback from stack
-                    esp8266::InterruptLock lockAllInterruptsInThisScope;
+                    InterruptLock lockAllInterruptsInThisScope;
 
                     auto to_recycle = current;
 
@@ -294,7 +307,7 @@ namespace detail
                 optimistic_yield(10000);
             } while (current && !done);
 
-            fence = false;
+            fence.store(false);
         }
     };
 
@@ -318,15 +331,14 @@ namespace detail
             if (!current)
                 return;
 
-            static bool fence = false;
-            {
-                esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-                // prevent recursive calls
-                if (fence)
-                    return;
-                fence = true;
-            }
+            static std::atomic<bool> fence(false);
+            // prevent recursive calls
+#ifdef ESP8266
+            if (fence.load()) return;
+            fence.store(true);
+#else
+            if (fence.exchange(true)) return;
+#endif
 
             Node_t* prev = nullptr;
             // prevent execution of new callbacks during this run
@@ -339,7 +351,7 @@ namespace detail
                 if (!Call<Delegate, R, ISQUEUE>::execute(current->mDelegate))
                 {
                     // remove callback from stack
-                    esp8266::InterruptLock lockAllInterruptsInThisScope;
+                    InterruptLock lockAllInterruptsInThisScope;
 
                     auto to_recycle = current;
 
@@ -369,7 +381,7 @@ namespace detail
                 optimistic_yield(10000);
             } while (current && !done);
 
-            fence = false;
+            fence.store(false);
         }
     };
 
