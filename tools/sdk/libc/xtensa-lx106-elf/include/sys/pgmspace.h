@@ -47,7 +47,7 @@ extern "C" {
 //     w1,     w0
 
 #define pgm_read_with_offset(addr, res) \
-  asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
+  __asm__("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
       "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
       "l32i.n   %1, %1, 0x0\n"      /* Load word from aligned address */ \
       "ssa8l    %0\n"               /* Prepare to shift by offset (in bits) */ \
@@ -57,7 +57,7 @@ extern "C" {
       :);
 
 #define pgm_read_dword_with_offset(addr, res) \
-  asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
+  __asm__("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
       "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
       "l32i     a14, %1, 0\n" \
       "l32i     %1, %1, 4\n" \
@@ -68,14 +68,14 @@ extern "C" {
       :"a14");
 
 static inline uint8_t pgm_read_byte_inlined(const void* addr) {
-  register uint32_t res;
+  uint32_t res;
   pgm_read_with_offset(addr, res);
   return (uint8_t) res;     /* This masks the lower byte from the returned word */
 }
 
 /* Although this says "word", it's actually 16 bit, i.e. half word on Xtensa */
 static inline uint16_t pgm_read_word_inlined(const void* addr) {
-  register uint32_t res;
+  uint32_t res;
   pgm_read_with_offset(addr, res);
   return (uint16_t) res;    /* This masks the lower half-word from the returned word */
 }
@@ -83,7 +83,7 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 /* Can't legally cast bits of uint32_t to a float w/o conversion or std::memcpy, which is inefficient. */
 /* The ASM block doesn't care the type, so just pass in what C thinks is a float and return in custom fcn. */
 static inline float pgm_read_float_unaligned(const void *addr) {
-  register float res;
+  float res;
   pgm_read_with_offset(addr, res);
   return res;
 }
