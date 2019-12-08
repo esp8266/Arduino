@@ -24,19 +24,8 @@
 #include "interrupts.h"
 #include "coredecls.h"
 
-class mSchedFuncT : public Delegate<void(), void*>
-{
-public:
-    using target_type = bool();
-    using base_type = Delegate<void(), void*>;
-    using base_type::Delegate;
-    bool IRAM_ATTR operator()() const
-    {
-        base_type::operator()();
-        return false;
-    }
-};
-MultiDelegate<mSchedFuncT> schedFuncs;
+using mSchedFuncT = Delegate<void(), void*>;
+MultiDelegate<mSchedFuncT, true> schedFuncs;
 
 class mRecFuncT : public Delegate<bool(), void*>
 {
