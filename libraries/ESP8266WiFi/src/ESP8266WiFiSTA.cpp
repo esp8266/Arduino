@@ -752,14 +752,12 @@ void ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (int ms)
         int checkState = _keepStationState;
         schedule_recurrent_function_us([&, checkState]()
         {
-Serial.printf("--- %d %d\n", checkState, this->_keepStationState);
             // this recurring scheduled function will be cancelled
             // when this->_keepStationState != checkState
             if (checkState != this->_keepStationState)
                 // cancel this recurring event
                 return false;
 
-Serial.printf("--- SEND\n");
             // send gratuitous ARP
             this->stationKeepAliveNow();
 
