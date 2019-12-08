@@ -83,16 +83,16 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
-        // enable automatic sending of Gratuitous ARP packets
+        // enable or update automatic sending of Gratuitous ARP packets
         // based on a time interval in milliseconds
-        // returns true on success
-        bool stationKeepAliveSetupMs (int ms = 1000);
+        void stationKeepAliveSetIntervalMs (int ms = 1000);
 
         // request for stopping arp gratuitous packets
-        void stationKeepAliveStop ();
+        void stationKeepAliveStop () { stationKeepAliveSetIntervalMs(0); }
 
         // allows to check whether the gratuitous ARP service is still running
-        bool stationKeepAliveEnabled ();
+        bool stationKeepAliveEnabled () const { return _keepStationAliveUs != 0; }
+
 
         static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
 
@@ -101,6 +101,8 @@ class ESP8266WiFiSTAClass {
         int _keepStationAliveUs = 0;
         static bool _useStaticIp;
         static bool _useInsecureWEP;
+
+        void stationKeepAliveNow ();
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------

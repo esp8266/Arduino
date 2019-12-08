@@ -711,24 +711,9 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
     return wifi_station_get_rssi();
 }
 
-bool ESP8266WiFiSTAClass::stationKeepAliveEnabled ()
+void ESP8266WiFiSTAClass::stationKeepAliveNow ()
 {
-    return _keepStationAliveUs != 0;
-}
-
-void ESP8266WiFiSTAClass::stationKeepAliveStop ()
-{
-    _keepStationAliveUs = -1;
-    // will be set to 0 at recurrent call
-}
-
-bool ESP8266WiFiSTAClass::stationKeepAliveSetupMs (int ms)
-{
-    if (_keepStationAliveUs != 0 || ms <= 0)
-        return false;
-    _keepStationAliveUs = ms * 1000;
-
-    schedule_recurrent_function_us([&]()
+    if (_keepStationAliveUs > 0)
     {
         for (netif* interface = netif_list; interface != nullptr; interface = interface->next)
              if (
@@ -747,18 +732,30 @@ bool ESP8266WiFiSTAClass::stationKeepAliveSetupMs (int ms)
                 break;
             }
 
-        if (_keepStationAliveUs > 0)
-            // continue
-            return true;
+            // re/schedule with a possibly updated interval
+            schedule_recurrent_function_us([&]()
+            {
+                stationKeepAliveNow();
+                return false;
+            }, _keepStationAliveUs);
+    }
+    else
+        // mark disabled (0) if user cancelled it (<0)
+        _keepStationAliveUs = 0;
+}
 
-        // stop on user request (value < 0)
-        _keepStationAliveUs = 0; // stop acknowledged
-        // stop recurrent function
-        return false;
-
-    }, _keepStationAliveUs);
-
-    return true;
+void ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (int ms)
+{
+    bool wasEnabled = (_keepStationAliveUs > 0);
+    int us = ms * 1000;
+    if (wasEnabled)
+        _keepStationAliveUs = ms <= 0? /*disable*/-1: /*update*/us;
+    else if (ms > 0)
+    {
+        _keepStationAliveUs = us;
+        // start
+        stationKeepAliveNow();
+    }
 }
 
 // -----------------------------------------------------------------------------------------------------------------------
