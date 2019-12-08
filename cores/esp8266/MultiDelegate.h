@@ -261,7 +261,7 @@ namespace detail
             do
             {
                 done = current == stop;
-                if (!CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, std::forward<P...>(args...)))
+                if (!CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, args...))
                 {
                     // remove callback from stack
                     esp8266::InterruptLock lockAllInterruptsInThisScope;
