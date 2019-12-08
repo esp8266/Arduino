@@ -713,48 +713,59 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
 
 void ESP8266WiFiSTAClass::stationKeepAliveNow ()
 {
-    if (_keepStationAliveUs > 0)
-    {
-        for (netif* interface = netif_list; interface != nullptr; interface = interface->next)
-             if (
-                   (interface->flags & NETIF_FLAG_LINK_UP)
-                && (interface->flags & NETIF_FLAG_UP)
+    for (netif* interface = netif_list; interface != nullptr; interface = interface->next)
+         if (
+               (interface->flags & NETIF_FLAG_LINK_UP)
+            && (interface->flags & NETIF_FLAG_UP)
 #if LWIP_VERSION_MAJOR == 1
-                && interface == eagle_lwip_getif(STATION_IF) /* lwip1 does not set num properly */
-                && (!ip_addr_isany(&interface->ip_addr))
+            && interface == eagle_lwip_getif(STATION_IF) /* lwip1 does not set if->num properly */
+            && (!ip_addr_isany(&interface->ip_addr))
 #else
-                && interface->num == STATION_IF
-                && (!ip4_addr_isany_val(*netif_ip4_addr(interface)))
+            && interface->num == STATION_IF
+            && (!ip4_addr_isany_val(*netif_ip4_addr(interface)))
 #endif
-            )
-            {
-                etharp_gratuitous(interface);
-                break;
-            }
-
-            // re/schedule with a possibly updated interval
-            schedule_recurrent_function_us([&]()
-            {
-                stationKeepAliveNow();
-                return false;
-            }, _keepStationAliveUs);
-    }
-    else
-        // mark disabled (0) if user cancelled it (<0)
-        _keepStationAliveUs = 0;
+        )
+        {
+            etharp_gratuitous(interface);
+            break;
+        }
 }
 
 void ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (int ms)
 {
-    bool wasEnabled = (_keepStationAliveUs > 0);
-    int us = ms * 1000;
-    if (wasEnabled)
-        _keepStationAliveUs = ms <= 0? /*disable*/-1: /*update*/us;
-    else if (ms > 0)
+    int us;
+    if (ms > std::numeric_limits<int>::max() / 1000)
+        // for sanity only, 24 days is not really meaningful
+        us = std::numeric_limits<int>::max();
+    else
+        us = ms * 1000;
+
+    // cancel possibly already scheduled future events
+    _keepStationState++;
+
+    if (us)
     {
-        _keepStationAliveUs = us;
-        // start
+        // send one now
         stationKeepAliveNow();
+
+        // schedule next ones
+        int checkState = _keepStationState;
+        schedule_recurrent_function_us([&, checkState]()
+        {
+Serial.printf("--- %d %d\n", checkState, this->_keepStationState);
+            // this recurring scheduled function will be cancelled
+            // when this->_keepStationState != checkState
+            if (checkState != this->_keepStationState)
+                // cancel this recurring event
+                return false;
+
+Serial.printf("--- SEND\n");
+            // send gratuitous ARP
+            this->stationKeepAliveNow();
+
+            // keep on with next event
+            return true;
+        }, us);
     }
 }
 

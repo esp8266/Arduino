@@ -41,8 +41,8 @@ class ESP8266WiFiSTAClass {
         wl_status_t begin(const String& ssid, const String& passphrase = emptyString, int32_t channel = 0, const uint8_t* bssid = NULL, bool connect = true);
         wl_status_t begin();
 
-        //The argument order for ESP is not the same as for Arduino. However, there is compatibility code under the hood 
-        //to detect Arduino arg order, and handle it correctly. Be aware that the Arduino default value handling doesn't 
+        //The argument order for ESP is not the same as for Arduino. However, there is compatibility code under the hood
+        //to detect Arduino arg order, and handle it correctly. Be aware that the Arduino default value handling doesn't
         //work here (see Arduino docs for gway/subnet defaults). In other words: at least 3 args must always be given.
         bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
 
@@ -83,26 +83,25 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
-        // enable or update automatic sending of Gratuitous ARP packets
-        // based on a time interval in milliseconds
+        // disable(0) or enable/update automatic sending of Gratuitous ARP packets
+        // a gratuitous ARP packet is sent at start, then
+        // based on a time interval in milliseconds, default 1s
         void stationKeepAliveSetIntervalMs (int ms = 1000);
 
         // request for stopping arp gratuitous packets
         void stationKeepAliveStop () { stationKeepAliveSetIntervalMs(0); }
 
-        // allows to check whether the gratuitous ARP service is still running
-        bool stationKeepAliveEnabled () const { return _keepStationAliveUs != 0; }
-
+        // immediately send one gratuitous ARP from STA
+        static void stationKeepAliveNow ();
 
         static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
 
     protected:
 
-        int _keepStationAliveUs = 0;
         static bool _useStaticIp;
         static bool _useInsecureWEP;
 
-        void stationKeepAliveNow ();
+        int _keepStationState = 0;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------
