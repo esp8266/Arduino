@@ -47,7 +47,7 @@ void setup() {
 
 void loop() {
   // wait for WiFi connection
-  if ((WiFiMulti.run() == WL_CONNECTED)) {
+  if ((WiFi.status() == WL_CONNECTED)) {
 
     WiFiClient client;
     HTTPClient http;
