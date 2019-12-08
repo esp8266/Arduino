@@ -7,46 +7,46 @@ namespace detail
 {
     namespace
     {
-        template< typename Delegate, typename R, typename... P>
+        template< typename Delegate, typename R, bool ISQUEUE = false, typename... P>
         struct CallP
         {
             static R execute(Delegate& del, P... args)
             {
-                return del(std::forward<P...>(args...));
+                return del(std::forward<P...>(args...)) ? !ISQUEUE : ISQUEUE;
             }
         };
 
-        template< typename Delegate, typename... P>
-        struct CallP<Delegate, void, P...>
+        template< typename Delegate, bool ISQUEUE, typename... P>
+        struct CallP<Delegate, void, ISQUEUE, P...>
         {
             static bool execute(Delegate& del, P... args)
             {
                 del(std::forward<P...>(args...));
-                return true;
+                return !ISQUEUE;
             }
         };
 
-        template< typename Delegate, typename R>
+        template< typename Delegate, typename R, bool ISQUEUE = false>
         struct Call
         {
             static R execute(Delegate& del)
             {
-                return del();
+                return del() ? !ISQUEUE : ISQUEUE;
             }
         };
 
-        template< typename Delegate>
-        struct Call<Delegate, void>
+        template< typename Delegate, bool ISQUEUE>
+        struct Call<Delegate, void, ISQUEUE>
         {
             static bool execute(Delegate& del)
             {
                 del();
-                return true;
+                return !ISQUEUE;
             }
         };
     };
 
-    template< typename Delegate, typename R = void, uint32_t MULTICALLBACK_MAX_COUNT = 32, typename... P>
+    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_COUNT = 32, typename... P>
     class MultiDelegatePImpl
     {
     public:
@@ -261,7 +261,7 @@ namespace detail
             do
             {
                 done = current == stop;
-                if (!CallP<Delegate, R, P...>::execute(current->mDelegate, std::forward<P...>(args...)))
+                if (!CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, std::forward<P...>(args...)))
                 {
                     // remove callback from stack
                     esp8266::InterruptLock lockAllInterruptsInThisScope;
@@ -298,19 +298,19 @@ namespace detail
         }
     };
 
-    template< typename Delegate, typename R = void, uint32_t MULTICALLBACK_MAX_COUNT = 32>
-    class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>
+    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_COUNT = 32>
+    class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>
     {
     protected:
-        using typename MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::Node_t;
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::first;
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::last;
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::unused;
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::nodeCount;
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::recycle_node_unsafe;
+        using typename MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::Node_t;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::first;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::last;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::unused;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::nodeCount;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::recycle_node_unsafe;
 
     public:
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
 
         void operator()()
         {
@@ -336,7 +336,7 @@ namespace detail
             do
             {
                 done = current == stop;
-                if (!Call<Delegate, R>::execute(current->mDelegate))
+                if (!Call<Delegate, R, ISQUEUE>::execute(current->mDelegate))
                 {
                     // remove callback from stack
                     esp8266::InterruptLock lockAllInterruptsInThisScope;
@@ -373,28 +373,28 @@ namespace detail
         }
     };
 
-    template< typename Delegate, typename R, uint32_t MULTICALLBACK_MAX_COUNT, typename... P> class MultiDelegate;
+    template< typename Delegate, typename R, bool ISQUEUE, uint32_t MULTICALLBACK_MAX_COUNT, typename... P> class MultiDelegate;
 
-    template< typename Delegate, typename R, uint32_t MULTICALLBACK_MAX_COUNT, typename... P>
-    class MultiDelegate<Delegate, R(P...), MULTICALLBACK_MAX_COUNT> : public MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT, P...>
+    template< typename Delegate, typename R, bool ISQUEUE, uint32_t MULTICALLBACK_MAX_COUNT, typename... P>
+    class MultiDelegate<Delegate, R(P...), ISQUEUE, MULTICALLBACK_MAX_COUNT> : public MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT, P...>
     {
     public:
-        using MultiDelegatePImpl<Delegate, R, MULTICALLBACK_MAX_COUNT, P...>::MultiDelegatePImpl;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT, P...>::MultiDelegatePImpl;
     };
 
-    template< typename Delegate, typename R, uint32_t MULTICALLBACK_MAX_COUNT>
-    class MultiDelegate<Delegate, R(), MULTICALLBACK_MAX_COUNT> : public MultiDelegateImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>
+    template< typename Delegate, typename R, bool ISQUEUE, uint32_t MULTICALLBACK_MAX_COUNT>
+    class MultiDelegate<Delegate, R(), ISQUEUE, MULTICALLBACK_MAX_COUNT> : public MultiDelegateImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>
     {
     public:
-        using MultiDelegateImpl<Delegate, R, MULTICALLBACK_MAX_COUNT>::MultiDelegateImpl;
+        using MultiDelegateImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegateImpl;
     };
 };
 
-template< typename Delegate, uint32_t MULTICALLBACK_MAX_COUNT = 32>
-class MultiDelegate : public detail::MultiDelegate<Delegate, typename Delegate::target_type, MULTICALLBACK_MAX_COUNT>
+template< typename Delegate, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_COUNT = 32>
+class MultiDelegate : public detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>
 {
 public:
-    using detail::MultiDelegate<Delegate, typename Delegate::target_type, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
+    using detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
 };
 
 #endif // __MULTIDELEGATE_H
