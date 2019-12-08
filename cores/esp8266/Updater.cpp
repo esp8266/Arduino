@@ -329,7 +329,7 @@ bool UpdaterClass::_writeBuffer(){
   bool modifyFlashMode = false;
   FlashMode_t flashMode = FM_QIO;
   FlashMode_t bufferFlashMode = FM_QIO;
-  if (_currentAddress == _startAddress + FLASH_MODE_PAGE) {
+  if ((_currentAddress == _startAddress + FLASH_MODE_PAGE) && (_command == U_FLASH)) {
     flashMode = ESP.getFlashChipMode();
     #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf_P(PSTR("Header: 0x%1X %1X %1X %1X\n"), _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
