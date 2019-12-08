@@ -127,14 +127,8 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's abs if encountered
-#ifdef abs
-#undef abs
-#endif
-
-#define abs(x) ((x)>0?(x):-(x))
+// Use stdlib abs() and round() to avoid issues with the C++ libraries
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
