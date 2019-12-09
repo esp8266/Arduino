@@ -330,7 +330,7 @@ bool UpdaterClass::_writeBuffer(){
   FlashMode_t flashMode = FM_QIO;
   FlashMode_t bufferFlashMode = FM_QIO;
   //TODO - GZIP can't do this
-  if ((_currentAddress == _startAddress + FLASH_MODE_PAGE) && (_buffer[0] != 0x1f)) {
+  if ((_currentAddress == _startAddress + FLASH_MODE_PAGE) && (_buffer[0] != 0x1f) && (_command == U_FLASH)) {
     flashMode = ESP.getFlashChipMode();
     #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf_P(PSTR("Header: 0x%1X %1X %1X %1X\n"), _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
