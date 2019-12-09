@@ -731,12 +731,12 @@ void ESP8266WiFiSTAClass::stationKeepAliveNow ()
         }
 }
 
-void ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (int ms)
+void ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (uint32_t ms)
 {
-    int us;
-    if (ms > std::numeric_limits<int>::max() / 1000)
-        // for sanity only, 24 days is not really meaningful
-        us = std::numeric_limits<int>::max();
+    uint32_t us;
+    if (ms > std::numeric_limits<uint32_t>::max() / 1000)
+        // for sanity only, 49 days is not really meaningful
+        us = std::numeric_limits<uint32_t>::max();
     else
         us = ms * 1000;
 

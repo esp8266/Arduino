@@ -86,7 +86,7 @@ class ESP8266WiFiSTAClass {
         // disable(0) or enable/update automatic sending of Gratuitous ARP packets
         // a gratuitous ARP packet is sent at start, then
         // based on a time interval in milliseconds, default 1s
-        void stationKeepAliveSetIntervalMs (int ms = 1000);
+        void stationKeepAliveSetIntervalMs (uint32_t ms = 1000);
 
         // request for stopping arp gratuitous packets
         void stationKeepAliveStop () { stationKeepAliveSetIntervalMs(0); }
