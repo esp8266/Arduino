@@ -38,19 +38,26 @@
  */
 
 #include <lwip/init.h>
+#include <time.h>
 #include <sys/time.h>
 #include <osapi.h>
 #include <os_type.h>
 #include "coredecls.h"
+#include "Schedule.h"
 
-extern "C" {
+static TrivialCB _settimeofday_cb;
 
-static void (*_settimeofday_cb)(void) = NULL;
+void settimeofday_cb (TrivialCB&& cb)
+{
+    _settimeofday_cb = std::move(cb);
+}
 
-void settimeofday_cb (void (*cb)(void))
+void settimeofday_cb (const TrivialCB& cb)
 {
     _settimeofday_cb = cb;
 }
+
+extern "C" {
 
 #if LWIP_VERSION_MAJOR == 1
 
@@ -127,30 +134,8 @@ static const int year_lengths[2] = {
   365,
   366
 } ;
-struct tm
-{
-  int	tm_sec;
-  int	tm_min;
-  int	tm_hour;
-  int	tm_mday;
-  int	tm_mon;
-  int	tm_year;
-  int	tm_wday;
-  int	tm_yday;
-  int	tm_isdst;
-};
 
 struct tm res_buf;
-typedef struct __tzrule_struct
-{
-  char ch;
-  int m;
-  int n;
-  int d;
-  int s;
-  time_t change;
-  int offset;
-} __tzrule_type;
 
 __tzrule_type sntp__tzrule[2];
 struct tm *
@@ -478,7 +463,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         sntp_set_system_time(tv->tv_sec);
 
         if (_settimeofday_cb)
-            _settimeofday_cb();
+            schedule_function(_settimeofday_cb);
     }
     return 0;
 }

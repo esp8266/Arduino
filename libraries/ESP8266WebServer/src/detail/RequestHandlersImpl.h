@@ -76,7 +76,7 @@ public:
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
-        if (requestMethod != HTTP_GET)
+        if ((requestMethod != HTTP_GET) && (requestMethod != HTTP_HEAD))
             return false;
 
         if ((_isFile && requestUri != _uri) || !requestUri.startsWith(_uri))
@@ -101,6 +101,10 @@ public:
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
+
+            if (!_fs.exists(path) && path.endsWith(".htm") && _fs.exists(path + "l")) {
+                path += "l";
+            }
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
 
@@ -121,7 +125,7 @@ public:
         if (_cache_header.length() != 0)
             server.sendHeader("Cache-Control", _cache_header);
 
-        server.streamFile(f, contentType);
+        server.streamFile(f, contentType, requestMethod);
         return true;
     }
 
