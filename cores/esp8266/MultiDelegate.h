@@ -1,11 +1,16 @@
 #ifndef __MULTIDELEGATE_H
 #define __MULTIDELEGATE_H
 
+#if defined(ESP8266) || defined(ESP32) || !defined(ARDUINO)
 #include <atomic>
-#ifdef ESP8266
+#else
+#include "circular_queue/ghostl.h"
+#endif
+
+#if defined(ESP8266)
 #include <interrupts.h>
 using esp8266::InterruptLock;
-#else
+#elif defined(ARDUINO)
 class InterruptLock {
 public:
     InterruptLock() {
@@ -15,6 +20,8 @@ public:
         interrupts();
     }
 };
+#else
+#include <mutex>
 #endif
 
 namespace detail
@@ -166,7 +173,11 @@ namespace detail
             // if no unused items, and count not too high, allocate a new one
             else if (nodeCount < MULTICALLBACK_MAX_COUNT)
             {
+#if defined(ESP8266) || defined(ESP32)            	
                 result = new (std::nothrow) Node_t;
+#else
+                result = new Node_t;
+#endif
                 if (result)
                     ++nodeCount;
             }
@@ -180,6 +191,9 @@ namespace detail
             unused = node;
         }
 
+#ifndef ARDUINO
+        std::mutex mutex_unused;
+#endif
     public:
         const Delegate* IRAM_ATTR add(const Delegate& del)
         {
@@ -191,7 +205,11 @@ namespace detail
             if (!del)
                 return nullptr;
 
+#ifdef ARDUINO
             InterruptLock lockAllInterruptsInThisScope;
+#else
+            std::lock_guard<std::mutex> lock(mutex_unused);
+#endif
 
             Node_t* item = get_node_unsafe();
             if (!item)
@@ -221,7 +239,11 @@ namespace detail
                 if (del == &current->mDelegate)
                 {
                     // remove callback from stack
+#ifdef ARDUINO
                     InterruptLock lockAllInterruptsInThisScope;
+#else
+                    std::lock_guard<std::mutex> lock(mutex_unused);
+#endif
 
                     auto to_recycle = current;
 
@@ -259,7 +281,7 @@ namespace detail
 
             static std::atomic<bool> fence(false);
             // prevent recursive calls
-#ifdef ESP8266
+#if defined(ARDUINO) && !defined(ESP32)
             if (fence.load()) return;
             fence.store(true);
 #else
@@ -277,7 +299,11 @@ namespace detail
                 if (!CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, args...))
                 {
                     // remove callback from stack
+#ifdef ARDUINO
                     InterruptLock lockAllInterruptsInThisScope;
+#else
+                    std::lock_guard<std::mutex> lock(mutex_unused);
+#endif
 
                     auto to_recycle = current;
 
@@ -303,8 +329,10 @@ namespace detail
                     current = current->mNext;
                 }
 
+#if defined(ESP8266) || defined(ESP32)
                 // running callbacks might last too long for watchdog etc.
                 optimistic_yield(10000);
+#endif
             } while (current && !done);
 
             fence.store(false);
@@ -321,6 +349,9 @@ namespace detail
         using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::unused;
         using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::nodeCount;
         using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::recycle_node_unsafe;
+#ifndef ARDUINO
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::mutex_unused;
+#endif
 
     public:
         using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
@@ -333,7 +364,7 @@ namespace detail
 
             static std::atomic<bool> fence(false);
             // prevent recursive calls
-#ifdef ESP8266
+#if defined(ARDUINO) && !defined(ESP32)
             if (fence.load()) return;
             fence.store(true);
 #else
@@ -351,7 +382,11 @@ namespace detail
                 if (!Call<Delegate, R, ISQUEUE>::execute(current->mDelegate))
                 {
                     // remove callback from stack
+#ifdef ARDUINO
                     InterruptLock lockAllInterruptsInThisScope;
+#else
+                    std::lock_guard<std::mutex> lock(mutex_unused);
+#endif
 
                     auto to_recycle = current;
 
@@ -377,8 +412,10 @@ namespace detail
                     current = current->mNext;
                 }
 
+#if defined(ESP8266) || defined(ESP32)
                 // running callbacks might last too long for watchdog etc.
                 optimistic_yield(10000);
+#endif
             } while (current && !done);
 
             fence.store(false);
@@ -406,7 +443,7 @@ template< typename Delegate, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_CO
 class MultiDelegate : public detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>
 {
 public:
-    using detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
+    using detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegate;
 };
 
 #endif // __MULTIDELEGATE_H
