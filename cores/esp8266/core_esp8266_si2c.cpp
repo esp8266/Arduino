@@ -95,31 +95,32 @@ private:
     unsigned char read_byte(bool nack);
     void ICACHE_RAM_ATTR onTwipEvent(uint8_t status);
 
-    // Inline helpers
-    inline void SDA_LOW()
+    // !Inline helpers (linker doesn't bring them inline)
+    ICACHE_RAM_ATTR void SDA_LOW()
     {
         GPES = (1 << twi_sda);
     }
-    inline void SDA_HIGH()
+    ICACHE_RAM_ATTR void SDA_HIGH()
     {
         GPEC = (1 << twi_sda);
     }
-    inline bool SDA_READ()
+    ICACHE_RAM_ATTR bool SDA_READ()
     {
         return (GPI & (1 << twi_sda)) != 0;
     }
-    inline void SCL_LOW()
+    ICACHE_RAM_ATTR void SCL_LOW()
     {
         GPES = (1 << twi_scl);
     }
-    inline void SCL_HIGH()
+    ICACHE_RAM_ATTR void SCL_HIGH()
     {
         GPEC = (1 << twi_scl);
     }
-    inline bool SCL_READ()
+    ICACHE_RAM_ATTR bool SCL_READ()
     {
         return (GPI & (1 << twi_scl)) != 0;
     }
+	
     // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
     inline void WAIT_CLOCK_STRETCH()
     {
@@ -439,6 +440,14 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     return 0;
 }
 
+void Twi::twi_scl_valley(void)
+{
+    SCL_LOW();
+    busywait(twi_dcount);
+    SCL_HIGH();
+    WAIT_CLOCK_STRETCH();
+}
+
 uint8_t Twi::status()
 {
     WAIT_CLOCK_STRETCH();  // wait for a slow slave to finish
@@ -650,14 +659,6 @@ void ICACHE_RAM_ATTR Twi::onTwipEvent(uint8_t status)
     }
 }
 
-void Twi::twi_scl_valley(void)
-{
-    SCL_LOW();
-    busywait(twi_dcount);
-    SCL_HIGH();
-    WAIT_CLOCK_STRETCH();
-}
-
 void ICACHE_RAM_ATTR Twi::onTimer(void *unused)
 {
     (void)unused;
@@ -714,8 +715,8 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
     unsigned int scl;
 
     // Store bool return in int to reduce final code size.
-    sda = twi.SDA_READ();
-    scl = twi.SCL_READ();
+    sda = (GPI & (1 << twi.twi_sda)) != 0; // SDA_READ() fast, no time for a call
+    scl = (GPI & (1 << twi.twi_scl)) != 0; // SCL_READ()
 
     twi.twip_status = 0xF8;		// reset TWI status
 
@@ -911,8 +912,8 @@ void ICACHE_RAM_ATTR Twi::onSdaChange(void)
     unsigned int scl;
 
     // Store bool return in int to reduce final code size.
-    sda = twi.SDA_READ();
-    scl = twi.SCL_READ();
+    sda = (GPI & (1 << twi.twi_sda)) != 0; // SDA_READ()
+    scl = (GPI & (1 << twi.twi_scl)) != 0; // SCL_READ()
 
     int twip_state_mask = S2M(twi.twip_state);
     if (scl)   /* !DATA */
