@@ -124,7 +124,7 @@ struct netifWrapper
 
     // common to all addresses of this interface
     String ifname () const          { return String(_netif->name[0]) + _netif->name[1]; }
-    const char* ifhostname () const { return _netif->hostname?: emptyString.c_str(); }
+    const char* ifhostname () const { return _netif->hostname? _netif->hostname : emptyString.c_str(); }
     const char* ifmac () const      { return (const char*)_netif->hwaddr; }
     int ifnumber () const           { return _netif->num; }
     bool ifUp () const              { return !!(_netif->flags & NETIF_FLAG_UP); }
