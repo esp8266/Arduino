@@ -464,8 +464,10 @@ void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, 
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
-    sendContent(header);
-    sendContent_P(content, contentLength);
+    _currentClient.write((const uint8_t *)header.c_str(), header.length());
+    if (contentLength) {
+      sendContent_P(content, contentLength);
+    }
 }
 
 template <typename ServerType>
