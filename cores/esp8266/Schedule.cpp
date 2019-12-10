@@ -48,8 +48,7 @@ MultiDelegate<mRecFuncT> recFuncs;
 IRAM_ATTR // (not only) called from ISR
 bool schedule_function(const Delegate<void(), void*>& fn)
 {
-    mSchedFuncT func(fn);
-    return schedFuncs.add(std::move(func));
+    return schedFuncs.add(fn);
 }
 
 IRAM_ATTR // (not only) called from ISR
