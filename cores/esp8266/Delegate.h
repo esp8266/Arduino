@@ -426,6 +426,7 @@ namespace detail
     template<typename R, typename... P>
     class DelegatePImpl<void, R, P...> : public std::function<R(P...)> {
     public:
+        using target_type = R(P...);
         using std::function<R(P...)>::function;
         using std::function<R(P...)>::operator=;
     };
@@ -889,187 +890,11 @@ namespace detail
 
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
     template<typename R>
-    class DelegateImpl<void, R> {
+    class DelegateImpl<void, R> : public std::function<R()> {
     public:
         using target_type = R();
-        using FunPtr = R(*)();
-        using FunctionType = std::function<target_type>;
-
-        DelegateImpl()
-        {
-            fn = nullptr;
-        }
-
-        ~DelegateImpl()
-        {
-            if (FUNC == kind)
-                functional.~FunctionType();
-        }
-
-        DelegateImpl(const DelegateImpl& del)
-        {
-            kind = del.kind;
-            if (FUNC == del.kind)
-            {
-                new (&functional) FunctionType(del.functional);
-            }
-            else
-            {
-                fn = del.fn;
-            }
-        }
-
-        DelegateImpl(DelegateImpl&& del)
-        {
-            kind = del.kind;
-            if (FUNC == del.kind)
-            {
-                new (&functional) FunctionType(std::move(del.functional));
-            }
-            else
-            {
-                fn = del.fn;
-            }
-        }
-
-        DelegateImpl(FunPtr fn)
-        {
-            kind = FP;
-            DelegateImpl::fn = fn;
-        }
-
-        template<typename F> DelegateImpl(const F& functional)
-        {
-            kind = FUNC;
-            new (&this->functional) FunctionType(functional);
-        }
-
-        template<typename F> DelegateImpl(F&& functional)
-        {
-            kind = FUNC;
-            new (&this->functional) FunctionType(std::move(functional));
-        }
-
-        DelegateImpl& operator=(const DelegateImpl& del)
-        {
-            if (this == &del) return *this;
-            if (FUNC == kind && FUNC != del.kind)
-            {
-                functional.~FunctionType();
-            }
-            else if (FUNC != kind && FUNC == del.kind)
-            {
-                new (&this->functional) FunctionType();
-            }
-            kind = del.kind;
-            if (FUNC == del.kind)
-            {
-                functional = del.functional;
-            }
-            else
-            {
-                fn = del.fn;
-            }
-            return *this;
-        }
-
-        DelegateImpl& operator=(DelegateImpl&& del)
-        {
-            if (this == &del) return *this;
-            if (FUNC == kind && FUNC != del.kind)
-            {
-                functional.~FunctionType();
-            }
-            else if (FUNC != kind && FUNC == del.kind)
-            {
-                new (&this->functional) FunctionType();
-            }
-            kind = del.kind;
-            if (FUNC == del.kind)
-            {
-                functional = std::move(del.functional);
-            }
-            else
-            {
-                fn = del.fn;
-            }
-            return *this;
-        }
-
-        DelegateImpl& operator=(FunPtr fn)
-        {
-            if (FUNC == kind)
-            {
-                functional.~FunctionType();
-            }
-            kind = FP;
-            DelegateImpl::fn = fn;
-            return *this;
-        }
-
-        template<typename F> DelegateImpl& operator=(const F& functional)
-        {
-            if (FUNC != kind)
-            {
-                new (&this->functional) FunctionType();
-                kind = FUNC;
-            }
-            this->functional = functional;
-            return *this;
-        }
-
-        template<typename F> DelegateImpl& operator=(F&& functional)
-        {
-            if (FUNC != kind)
-            {
-                new (&this->functional) FunctionType();
-                kind = FUNC;
-            }
-            this->functional = std::move(functional);
-            return *this;
-        }
-
-        DelegateImpl& IRAM_ATTR operator=(std::nullptr_t)
-        {
-            if (FUNC == kind)
-            {
-                functional.~FunctionType();
-            }
-            kind = FP;
-            fn = nullptr;
-            return *this;
-        }
-
-        operator bool() const
-        {
-            if (FUNC == kind)
-            {
-                return functional ? true : false;
-            }
-            else
-            {
-                return fn;
-            }
-        }
-
-        R IRAM_ATTR operator()() const
-        {
-            if (FUNC == kind)
-            {
-                return functional();
-            }
-            else
-            {
-                return fn();
-            }
-        }
-
-    protected:
-        enum { FUNC, FP } kind = FP;
-        union {
-            FunctionType functional;
-            FunPtr fn;
-        };
+        using std::function<R()>::function;
+        using std::function<R()>::operator=;
     };
 #else
     template<typename R>
@@ -1093,6 +918,11 @@ namespace detail
             fn = del.fn;
         }
 
+        DelegateImpl(DelegateImpl&& del)
+        {
+            fn = std::move(del.fn);
+        }
+
         DelegateImpl(FunPtr fn)
         {
             DelegateImpl::fn = fn;
@@ -1100,7 +930,15 @@ namespace detail
 
         DelegateImpl& operator=(const DelegateImpl& del)
         {
+            if (this == &del) return *this;
             fn = del.fn;
+            return *this;
+        }
+
+        DelegateImpl& operator=(DelegateImpl&& del)
+        {
+            if (this == &del) return *this;
+            fn = std::move(del.fn);
             return *this;
         }
 
