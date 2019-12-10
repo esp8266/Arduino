@@ -46,7 +46,7 @@ void run_scheduled_functions();
 
 // recurrent scheduled function:
 //
-// * Internal queue may not be a FIFO.
+// * Internal queue is a FIFO.
 // * Run the lambda periodically about every <repeat_us> microseconds until
 //   it returns false.
 // * Note that it may be more than <repeat_us> microseconds between calls if
@@ -60,6 +60,7 @@ void run_scheduled_functions();
 //   recurrent function.
 // * If alarm is used, anytime during scheduling when it returns true,
 //   any remaining delay from repeat_us is disregarded, and fn is executed.
+
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     uint32_t repeat_us, const std::function<bool(void)>& alarm = nullptr);
 
