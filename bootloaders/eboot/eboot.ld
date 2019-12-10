@@ -156,9 +156,9 @@ SECTIONS
     /* CRC stored in last 8 bytes */
     ASSERT((. < 4096 - 8), "Error: No space for CRC in bootloader sector.");
     . = _stext + 4096 - 8;
-    _crc_val = .;
+    _crc_size = .;
     . = . + 4;
-    _crc_len = .;
+    _crc_val = .;
   } >iram1_0_seg :iram1_0_phdr
 
   .lit4 : ALIGN(4)
