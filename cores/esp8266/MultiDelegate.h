@@ -87,7 +87,7 @@ namespace detail
         };
     };
 
-    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_COUNT = 32, typename... P>
+    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t QUEUE_CAPACITY = 32, typename... P>
     class MultiDelegatePImpl
     {
     public:
@@ -191,7 +191,7 @@ namespace detail
                 unused = unused->mNext;
             }
             // if no unused items, and count not too high, allocate a new one
-            else if (nodeCount < MULTICALLBACK_MAX_COUNT)
+            else if (nodeCount < QUEUE_CAPACITY)
             {
 #if defined(ESP8266) || defined(ESP32)            	
                 result = new (std::nothrow) Node_t;
@@ -231,7 +231,12 @@ namespace detail
             std::lock_guard<std::mutex> lock(mutex_unused);
 #endif
 
-            Node_t* item = get_node_unsafe();
+            Node_t* item = ISQUEUE ? get_node_unsafe() :
+#if defined(ESP8266) || defined(ESP32)            	
+                new (std::nothrow) Node_t;
+#else
+                new Node_t;
+#endif
             if (!item)
                 return nullptr;
 
@@ -281,7 +286,10 @@ namespace detail
                         first = current;
                     }
 
-                    recycle_node_unsafe(to_recycle);
+                    if (ISQUEUE)
+                        recycle_node_unsafe(to_recycle);
+                    else
+                        delete to_recycle;
                     return true;
                 }
                 else
@@ -341,7 +349,10 @@ namespace detail
                         first = current;
                     }
 
-                    recycle_node_unsafe(to_recycle);
+                    if (ISQUEUE)
+                        recycle_node_unsafe(to_recycle);
+                    else
+                        delete to_recycle;
                 }
                 else
                 {
@@ -359,22 +370,22 @@ namespace detail
         }
     };
 
-    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_COUNT = 32>
-    class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>
+    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t QUEUE_CAPACITY = 32>
+    class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
     {
     protected:
-        using typename MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::Node_t;
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::first;
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::last;
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::unused;
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::nodeCount;
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::recycle_node_unsafe;
+        using typename MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::Node_t;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::first;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::last;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::unused;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::nodeCount;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::recycle_node_unsafe;
 #ifndef ARDUINO
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::mutex_unused;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::mutex_unused;
 #endif
 
     public:
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegatePImpl;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::MultiDelegatePImpl;
 
         void operator()()
         {
@@ -424,7 +435,10 @@ namespace detail
                         first = current;
                     }
 
-                    recycle_node_unsafe(to_recycle);
+                    if (ISQUEUE)
+                        recycle_node_unsafe(to_recycle);
+                    else
+                        delete to_recycle;
                 }
                 else
                 {
@@ -442,28 +456,48 @@ namespace detail
         }
     };
 
-    template< typename Delegate, typename R, bool ISQUEUE, uint32_t MULTICALLBACK_MAX_COUNT, typename... P> class MultiDelegate;
+    template< typename Delegate, typename R, bool ISQUEUE, uint32_t QUEUE_CAPACITY, typename... P> class MultiDelegate;
 
-    template< typename Delegate, typename R, bool ISQUEUE, uint32_t MULTICALLBACK_MAX_COUNT, typename... P>
-    class MultiDelegate<Delegate, R(P...), ISQUEUE, MULTICALLBACK_MAX_COUNT> : public MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT, P...>
+    template< typename Delegate, typename R, bool ISQUEUE, uint32_t QUEUE_CAPACITY, typename... P>
+    class MultiDelegate<Delegate, R(P...), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>
     {
     public:
-        using MultiDelegatePImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT, P...>::MultiDelegatePImpl;
+        using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>::MultiDelegatePImpl;
     };
 
-    template< typename Delegate, typename R, bool ISQUEUE, uint32_t MULTICALLBACK_MAX_COUNT>
-    class MultiDelegate<Delegate, R(), ISQUEUE, MULTICALLBACK_MAX_COUNT> : public MultiDelegateImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>
+    template< typename Delegate, typename R, bool ISQUEUE, uint32_t QUEUE_CAPACITY>
+    class MultiDelegate<Delegate, R(), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
     {
     public:
-        using MultiDelegateImpl<Delegate, R, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegateImpl;
+        using MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::MultiDelegateImpl;
     };
 };
 
-template< typename Delegate, bool ISQUEUE = false, uint32_t MULTICALLBACK_MAX_COUNT = 32>
-class MultiDelegate : public detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>
+/**
+The MultiDelegate class template can be specialized to either a queue or an event multiplexer.
+It is designed to be used with Delegate, the efficient runtime wrapper for C function ptr and C++ std::function.
+@tparam Delegate specifies the concrete type that MultiDelegate bases the queue or event multiplexer on.
+@tparam ISQUEUE modifies the generated MultiDelegate class in subtle ways. In queue mode (ISQUEUE == true),
+               the value of QUEUE_CAPACITY enforces the maximum number of simultaneous items the queue can contain.
+               This is exploited to minimize the use of new and delete by reusing already allocated items, thus
+               reducing heap fragmentation. In event multiplexer mode (ISQUEUE = false), new and delete are
+               used for allocation of the event handler items.
+               If the result type of the function call operator of Delegate is void, calling a MultiDelegate queue
+               removes each item after calling it; a Multidelegate event multiplexer keeps event handlers until
+               explicitly removed.
+               If the result type of the function call operator of Delegate is non-void, the type-conversion to bool
+               of that result determines if the item is immediately removed or kept after each call: a Multidelegate
+               queue removes an item only if true is returned, but a Multidelegate event multiplexer removes event
+               handlers that return false.
+@tparam QUEUE_CAPACITY is only used if ISQUEUE == true. Then, it sets the maximum capacity that the queue dynamically
+               allocates from the heap. Unused items are not returned to the heap, but are managed by the MultiDelegate
+               instance during its own lifetime for efficiency.
+*/
+template< typename Delegate, bool ISQUEUE = false, uint32_t QUEUE_CAPACITY = 32>
+class MultiDelegate : public detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, QUEUE_CAPACITY>
 {
 public:
-    using detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, MULTICALLBACK_MAX_COUNT>::MultiDelegate;
+    using detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, QUEUE_CAPACITY>::MultiDelegate;
 };
 
 #endif // __MULTIDELEGATE_H
