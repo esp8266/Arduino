@@ -83,7 +83,9 @@ typedef void (*int_handler_t)(void*);
 #define ETS_WDT_INUM        8
 #define ETS_FRC_TIMER1_INUM 9  /* use edge*/
 
-typedef void (* ets_isr_t)(void *);
+// The xtos_1int handler calls with param1 as the arg, param2 as a pointer
+// to an exception frame in memory.
+typedef void (* ets_isr_t)(void *, void *);
 
 void ets_intr_lock(void);
 void ets_intr_unlock(void);
