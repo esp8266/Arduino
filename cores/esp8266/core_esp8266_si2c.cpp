@@ -148,8 +148,8 @@ public:
     void attachSlaveRxEvent(void (*function)(uint8_t*, size_t));
     void attachSlaveTxEvent(void (*function)(void));
     void ICACHE_RAM_ATTR reply(uint8_t ack);
-    inline void ICACHE_RAM_ATTR stop(void);
-    inline void ICACHE_RAM_ATTR releaseBus(void);
+    void ICACHE_RAM_ATTR stop(void);
+    void ICACHE_RAM_ATTR releaseBus(void);
     void enableSlave();
 };
 
