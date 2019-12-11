@@ -265,6 +265,7 @@ public:
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
             pbuf_ref(_rx_buf);
         }
+        // remove the already-consumed head of the chain
         pbuf_free(deleteme);
 
         _rx_buf_offset = 0;
@@ -440,6 +441,19 @@ private:
             const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
+        // check receive pbuf chain depth
+        {
+            pbuf* p;
+            int count = 0;
+            for (p = _rx_buf; p && ++count < rxBufMaxDepth*2; p = p->next);
+            if (p)
+            {
+                // pbuf chain too deep, dropping
+                pbuf_free(pb);
+                DEBUGV(":udr\r\n");
+                return;
+            }
+        }
 
 #if LWIP_VERSION_MAJOR == 1
     #define TEMPDSTADDR (&current_iphdr_dest)
@@ -531,6 +545,10 @@ private:
             srcaddr(src), dstaddr(dst), srcport(srcport) { }
     };
     AddrHelper _currentAddr;
+
+    // rx pbuf depth barrier (counter of buffered UDP received packets)
+    // keep it small
+    static constexpr int rxBufMaxDepth = 4;
 };
 
 
