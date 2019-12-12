@@ -51,7 +51,6 @@ endif
 $(shell mkdir -p $(BINDIR))
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
-	StreamString.cpp \
 	Stream.cpp \
 	WString.cpp \
 	Print.cpp \
