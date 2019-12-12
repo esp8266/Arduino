@@ -176,7 +176,7 @@ namespace detail
         Node_t* first = nullptr;
         Node_t* last = nullptr;
         Node_t* unused = nullptr;
-        int nodeCount = 0;
+        uint32_t nodeCount = 0;
 
         // Returns a pointer to an unused Node_t,
         // or if none are available allocates a new one,
