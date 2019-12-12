@@ -440,6 +440,14 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     return 0;
 }
 
+void Twi::twi_scl_valley(void)
+{
+    SCL_LOW(twi_scl);
+    busywait(twi_dcount);
+    SCL_HIGH(twi_scl);
+    WAIT_CLOCK_STRETCH();
+}
+
 uint8_t Twi::status()
 {
     WAIT_CLOCK_STRETCH();  // wait for a slow slave to finish
@@ -501,6 +509,9 @@ void Twi::attachSlaveTxEvent(void (*function)(void))
     twi_onSlaveTransmit = function;
 }
 
+// DO NOT INLINE, inlining reply() in combination with compiler optimizations causes function breakup into 
+// parts and the ICACHE_RAM_ATTR isn't propagated correctly to all parts, which of course causes crashes.
+// TODO: test with gcc 9.x and if it still fails, disable optimization with -fdisable-ipa-fnsplit
 void ICACHE_RAM_ATTR Twi::reply(uint8_t ack)
 {
     // transmit master read ready signal, with or without ack
@@ -518,7 +529,7 @@ void ICACHE_RAM_ATTR Twi::reply(uint8_t ack)
     }
 }
 
-inline void ICACHE_RAM_ATTR Twi::stop(void)
+void ICACHE_RAM_ATTR Twi::stop(void)
 {
     // send stop condition
     //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTO);
@@ -530,7 +541,7 @@ inline void ICACHE_RAM_ATTR Twi::stop(void)
     twi_state = TWI_READY;
 }
 
-inline void ICACHE_RAM_ATTR Twi::releaseBus(void)
+void ICACHE_RAM_ATTR Twi::releaseBus(void)
 {
     // release bus
     //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
@@ -649,14 +660,6 @@ void ICACHE_RAM_ATTR Twi::onTwipEvent(uint8_t status)
         stop();
         break;
     }
-}
-
-void Twi::twi_scl_valley(void)
-{
-    SCL_LOW(twi_scl);
-    busywait(twi_dcount);
-    SCL_HIGH(twi_scl);
-    WAIT_CLOCK_STRETCH();
 }
 
 void ICACHE_RAM_ATTR Twi::onTimer(void *unused)
