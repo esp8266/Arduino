@@ -23,28 +23,10 @@
 #ifndef STREAMSTRING_H_
 #define STREAMSTRING_H_
 
+#include "WString.h"
 
-class StreamString: public Stream, public String {
-public:
-    size_t write(const uint8_t *buffer, size_t size) override;
-    size_t write(uint8_t data) override;
+// StreamString has been integrated insite String
 
-    int available() override;
-    int read() override;
-    int peek() override;
-    void flush() override;
-
-    virtual bool peekBufferAPI () const override { return true; }
-    virtual size_t availableForPeek () override { return String::length(); }
-    virtual const char* peekBuffer () override { return String::buffer(); }
-    virtual void peekConsume (size_t consume) override { String::remove(0, consume); }
-    virtual int read (char* buffer, size_t len) /*should override*/;
-
-    // substitute for `virtual int ::read(buf, len)` in `Stream::`
-    virtual int readNow (char* buffer, size_t len) override {
-        return read(buffer, len);
-    }
-};
-
+using StreamString = String;
 
 #endif /* STREAMSTRING_H_ */

@@ -28,6 +28,8 @@
 #include <ctype.h>
 #include <pgmspace.h>
 
+#include <Stream.h>
+
 // An inherited class for holding the result of a concatenation.  These
 // result objects are assumed to be writable by subsequent concatenations.
 class StringSumHelper;
@@ -39,7 +41,7 @@ class __FlashStringHelper;
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
 // The string class
-class String {
+class String: public Stream {
         // use a function pointer to allow for "if (s)" without the
         // complications of an operator bool(). for more information, see:
         // http://www.artima.com/cppsource/safebool.html
@@ -279,7 +281,7 @@ class String {
 
     protected:
         // Contains the string info when we're not in SSO mode
-        struct _ptr { 
+        struct _ptr {
             char *   buff;
             uint16_t cap;
             uint16_t len;
@@ -319,6 +321,47 @@ class String {
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
         void move(String &rhs);
 #endif
+
+    /////////////////////////////////////////////
+    // Stream API:
+
+protected:
+
+    // peekPointer is used with peekBufferAPI,
+    // on peekConsume(), string can either:
+    // - be really consumed -- case when peekPointer==-1
+    // - marked as read     -- peekPointer is increased
+    //   (marked to not be consumed by default)
+    int peekPointer = 0;
+
+public:
+
+    //// imported from former StreamString class:
+
+    size_t write(const uint8_t *buffer, size_t size) override;
+    size_t write(uint8_t data) override;
+
+    int available() override;
+    int read() override;
+    int peek() override;
+    void flush() override;
+
+    //// peekBuffer API:
+
+    virtual bool peekBufferAPI () const override { return true; }
+    virtual size_t availableForPeek () override { return String::length(); }
+    virtual const char* peekBuffer () override { return String::buffer(); }
+    //ditchme virtual void peekConsume (size_t consume) override { String::remove(0, consume); }
+    virtual void peekConsume (size_t consume) override;
+    virtual int read (char* buffer, size_t len) /*should override*/;
+
+    void peekPointerSetConsume () { peekPointer = -1; }
+    void peekPointerReset (int pointer = 0) { peekPointer = pointer; }
+
+    // substitute for `virtual int ::read(buf, len)` in `Stream::`
+    virtual int readNow (char* buffer, size_t len) override {
+        return read(buffer, len);
+    }
 };
 
 class StringSumHelper: public String {

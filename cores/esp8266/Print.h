@@ -23,8 +23,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "WString.h"
 #include "Printable.h"
+
+class String;
+class __FlashStringHelper;
 
 #define DEC 10
 #define HEX 16
