@@ -455,7 +455,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         // apparently tz->tz_dsttime is a bitfield and should not be further used (cf man)
         sntp_set_daylight(0);
     }
-    if (tv) /* after*/
+    if (tv) /*after*/
     {
         // reset time subsystem
         tune_timeshift64(tv->tv_sec * 1000000ULL + tv->tv_usec);
@@ -463,7 +463,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         sntp_set_system_time(tv->tv_sec);
 
         if (_settimeofday_cb)
-            schedule_function(_settimeofday_cb);
+            schedule_recurrent_function_us([](){ _settimeofday_cb(); return false; }, 0);
     }
     return 0;
 }
