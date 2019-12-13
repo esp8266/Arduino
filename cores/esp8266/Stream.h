@@ -140,8 +140,8 @@ class Stream: public Print {
         // Stream::to()
         // transfer from `Stream::` to `Print::` at most maxlen bytes and return number of transfered bytes
         // (uses 1-copy peekBuffer API when available, or transfer through a 2-copies local stack space)
-        // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - maxLen==0 will transfer until input starvation or saturated output
+        // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
         size_t to (Print& to,
                    size_t maxLen = 0,

@@ -30,7 +30,7 @@
 #include <WiFiClientSecureAxTLS.h>
 #endif
 
-#include <StreamString.h>
+#include <StreamDev.h>
 #include <base64.h>
 
 #if HTTPCLIENT_1_1_COMPATIBLE
@@ -676,6 +676,13 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
             return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
         }
 
+#if 1
+
+        size_t sent = StreamPtr(payload, size).to(*_client); // all of it, with timeout
+        if (sent < size)
+            return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+
+#else
         // send Payload if needed
         if (payload && size > 0) {
             size_t bytesWritten = 0;
@@ -693,6 +700,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
                 size -= written;
             }
         }
+#endif
 
         // handle Server Response (Header)
         code = handleHeaderResponse();
