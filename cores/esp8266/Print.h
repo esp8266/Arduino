@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
+#include <sys/pgmspace.h>
 
 #include "Printable.h"
 
