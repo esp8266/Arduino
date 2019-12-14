@@ -969,7 +969,7 @@ int HTTPClient::writeToStream(Stream * stream)
 #if 1
         // len < 0: all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->to(stream, (size_t)(len < 0? 0: len));
+        ret = _client->to(*stream, (size_t)(len < 0? 0: len));
 #else
         ret = writeToStreamDataBlock(stream, len);
 #endif
@@ -1000,7 +1000,7 @@ int HTTPClient::writeToStream(Stream * stream)
             if(len > 0) {
 #if 1
                 // read len bytes with timeout
-                int r = _client->to(stream, len);
+                int r = _client->to(*stream, len);
                 if (r < len)
                     // not all data transferred
                     return returnError(HTTPC_ERROR_READ_TIMEOUT);
@@ -1203,7 +1203,8 @@ bool HTTPClient::connect(void)
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
         }
 #if 1
-        _client->to(StreamNull(), 0, 0); // clear _client's output
+        StreamNull devnull;
+        _client->to(devnull, 0, 0); // clear _client's output
 #else
         while(_client->available() > 0) {
             _client->read();
@@ -1273,10 +1274,10 @@ bool HTTPClient::sendHeader(const char * type)
     else
         header += '/';
     header += F(" HTTP/1.");
-    header += '0' + !_useHTTP10;
+    header += (char)('0' + !_useHTTP10);
 
     header += F("\r\nHost: ");
-    jeader += _host;
+    header += _host;
     if (_port != 80 && _port != 443)
     {
         header += ':';
