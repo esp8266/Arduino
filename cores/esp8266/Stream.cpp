@@ -212,6 +212,8 @@ float Stream::parseFloat(char skipChar) {
 // the buffer is NOT null terminated.
 //
 size_t Stream::readBytes(char *buffer, size_t length) {
+    IAMSLOW();
+
     size_t count = 0;
     while(count < length) {
         int c = timedRead();

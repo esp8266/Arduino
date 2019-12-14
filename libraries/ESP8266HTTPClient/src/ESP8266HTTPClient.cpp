@@ -678,8 +678,8 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
 
 #if 1
 
-        size_t sent = StreamPtr(payload, size).to(*_client); // all of it, with timeout
-        if (sent < size)
+        // all of it, with timeout
+        if (StreamPtr(payload, size).to(*_client) < size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
 
 #else
@@ -776,12 +776,8 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
 #if 1
 
-    size_t transferred = 0;
-
-    while (connected() && transferred < size)
-        transferred += stream->to(*_client, size - transferred); // default timeout from *stream
-
-    if (transferred < size)
+    // all of it, with timeout
+    if (stream->to(*_client, size) < size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
@@ -970,8 +966,13 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
+#if 1
+        // len < 0: all of it, with timeout
+        // len >= 0: max:len, with timeout
+        ret = _client->to(stream, (size_t)(len < 0? 0: len));
+#else
         ret = writeToStreamDataBlock(stream, len);
-
+#endif
         // have we an error?
         if(ret < 0) {
             return returnError(ret);
@@ -997,11 +998,18 @@ int HTTPClient::writeToStream(Stream * stream)
 
             // data left?
             if(len > 0) {
+#if 1
+                // read len bytes with timeout
+                int r = _client->to(stream, len);
+                if (r < len)
+                    // not all data transferred
+                    return returnError(HTTPC_ERROR_READ_TIMEOUT);
+#else
                 int r = writeToStreamDataBlock(stream, len);
-                if(r < 0) {
+                if(r < 0)
                     // error in writeToStreamDataBlock
                     return returnError(r);
-                }
+#endif
                 ret += r;
             } else {
 
@@ -1194,9 +1202,13 @@ bool HTTPClient::connect(void)
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
         }
+#if 1
+        _client->to(StreamNull(), 0, 0); // clear _client's output
+#else
         while(_client->available() > 0) {
             _client->read();
         }
+#endif
         return true;
     }
 
@@ -1251,22 +1263,28 @@ bool HTTPClient::sendHeader(const char * type)
         return false;
     }
 
-    String header = String(type) + ' ' + (_uri.length() ? _uri : F("/")) + F(" HTTP/1.");
+    String header;
+    header.reserve(128);
 
-    if(_useHTTP10) {
-        header += '0';
-    } else {
-        header += '1';
-    }
+    header += type;
+    header += ' ';
+    if (_uri.length())
+        header += _uri;
+    else
+        header += '/';
+    header += F(" HTTP/1.");
+    header += '0' + !_useHTTP10;
 
-    header += String(F("\r\nHost: ")) + _host;
+    header += F("\r\nHost: ");
+    jeader += _host;
     if (_port != 80 && _port != 443)
     {
         header += ':';
         header += String(_port);
     }
-    header += String(F("\r\nUser-Agent: ")) + _userAgent +
-              F("\r\nConnection: ");
+    header += F("\r\nUser-Agent: ");
+    header += _userAgent;
+    header += F("\r\nConnection: ");
 
     if(_reuse) {
         header += F("keep-alive");
@@ -1285,11 +1303,17 @@ bool HTTPClient::sendHeader(const char * type)
         header += "\r\n";
     }
 
-    header += _headers + "\r\n";
+    header += _headers;
+    header += F("\r\n");
 
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
+#if 1
+    // all of it, with timeout
+    return header.to(*_client) == header.length();
+#else
     return (_client->write((const uint8_t *) header.c_str(), header.length()) == header.length());
+#endif
 }
 
 /**
@@ -1401,6 +1425,7 @@ int HTTPClient::handleHeaderResponse()
     return HTTPC_ERROR_CONNECTION_LOST;
 }
 
+#if 0
 /**
  * write one Data Block to Stream
  * @param stream Stream *
@@ -1504,6 +1529,7 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
     return bytesWritten;
 }
+#endif
 
 /**
  * called to handle error return, may disconnect the connection if still exists
