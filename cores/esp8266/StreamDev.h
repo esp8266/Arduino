@@ -74,7 +74,10 @@ public:
         if (_peekPointer < _size)
         {
             size_t cpylen = std::min(_size - _peekPointer, len);
-            memcpy_P(buffer, _buffer + _peekPointer, cpylen);
+            if (_in_flash)
+                memcpy_P(buffer, _buffer + _peekPointer, cpylen);
+            else
+                memcpy(buffer, _buffer + _peekPointer, cpylen);
             _peekPointer += cpylen;
             return cpylen;
         }
