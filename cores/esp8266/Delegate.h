@@ -44,10 +44,11 @@ namespace detail
     class DelegatePImpl {
     public:
         using target_type = R(P...);
-        using FunPtr = R(*)(P...);
+    private:
+        using FunPtr = target_type*;
         using FunAPtr = R(*)(A, P...);
         using FunctionType = std::function<target_type>;
-
+    public:
         DelegatePImpl()
         {
             fn = nullptr;
@@ -304,7 +305,7 @@ namespace detail
             }
         }
 
-    protected:
+    private:
         enum { FUNC, FP, FPA } kind = FP;
         union {
             FunctionType functional;
@@ -320,9 +321,10 @@ namespace detail
     class DelegatePImpl {
     public:
         using target_type = R(P...);
-        using FunPtr = R(*)(P...);
+    private:
+        using FunPtr = target_type*;
         using FunAPtr = R(*)(A, P...);
-
+    public:
         DelegatePImpl()
         {
             fn = nullptr;
@@ -473,7 +475,7 @@ namespace detail
             }
         }
 
-    protected:
+    private:
         enum { FP, FPA } kind = FP;
         union {
             FunPtr fn;
@@ -488,9 +490,10 @@ namespace detail
     class DelegatePImpl<void, R, P...> {
     public:
         using target_type = R(P...);
-        using FunPtr = R(*)(P...);
+    private:
+        using FunPtr = target_type*;
         using FunctionType = std::function<target_type>;
-
+    public:
         DelegatePImpl()
         {
             fn = nullptr;
@@ -665,7 +668,7 @@ namespace detail
             }
         }
 
-    protected:
+    private:
         enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
@@ -677,8 +680,9 @@ namespace detail
     class DelegatePImpl<void, R, P...> {
     public:
         using target_type = R(P...);
-        using FunPtr = R(*)(P...);
-
+    private:
+        using FunPtr = target_type*;
+    public:
         DelegatePImpl()
         {
             fn = nullptr;
@@ -740,7 +744,7 @@ namespace detail
             return fn(std::forward<P...>(args...));
         }
 
-    protected:
+    private:
         FunPtr fn;
     };
 #endif
@@ -750,10 +754,11 @@ namespace detail
     class DelegateImpl {
     public:
         using target_type = R();
-        using FunPtr = R(*)();
+    private:
+        using FunPtr = target_type*;
         using FunAPtr = R(*)(A);
         using FunctionType = std::function<target_type>;
-
+    public:
         DelegateImpl()
         {
             fn = nullptr;
@@ -1010,7 +1015,7 @@ namespace detail
             }
         }
 
-    protected:
+    private:
         enum { FUNC, FP, FPA } kind = FP;
         union {
             FunctionType functional;
@@ -1026,9 +1031,10 @@ namespace detail
     class DelegateImpl {
     public:
         using target_type = R();
-        using FunPtr = R(*)();
+    private:
+        using FunPtr = target_type*;
         using FunAPtr = R(*)(A);
-
+    public:
         DelegateImpl()
         {
             fn = nullptr;
@@ -1179,7 +1185,7 @@ namespace detail
             }
         }
 
-    protected:
+    private:
         enum { FP, FPA } kind = FP;
         union {
             FunPtr fn;
@@ -1194,9 +1200,10 @@ namespace detail
     class DelegateImpl<void, R> {
     public:
         using target_type = R();
-        using FunPtr = R(*)();
+    private:
+        using FunPtr = target_type*;
         using FunctionType = std::function<target_type>;
-
+    public:
         DelegateImpl()
         {
             fn = nullptr;
@@ -1371,7 +1378,7 @@ namespace detail
             }
         }
 
-    protected:
+    private:
         enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
@@ -1383,8 +1390,9 @@ namespace detail
     class DelegateImpl<void, R> {
     public:
         using target_type = R();
-        using FunPtr = R(*)();
-
+    private:
+        using FunPtr = target_type*;
+    public:
         DelegateImpl()
         {
             fn = nullptr;
@@ -1446,7 +1454,7 @@ namespace detail
             return fn();
         }
 
-    protected:
+    private:
         FunPtr fn;
     };
 #endif
@@ -1454,12 +1462,14 @@ namespace detail
     template<typename R = void, typename A = void, typename... P>
     class Delegate : public detail::DelegatePImpl<A, R, P...>
     {
+    public:
         using detail::DelegatePImpl<A, R, P...>::DelegatePImpl;
     };
 
     template<typename R, typename A>
     class Delegate<R, A> : public detail::DelegateImpl<A, R>
     {
+    public:
         using detail::DelegateImpl<A, R>::DelegateImpl;
     };
 
@@ -1468,10 +1478,12 @@ namespace detail
 template<typename R, typename A = void, typename... P> class Delegate;
 template<typename R, typename A, typename... P> class Delegate<R(P...), A> : public detail::Delegate<R, A, P...>
 {
+public:
     using detail::Delegate<R, A, P...>::Delegate;
 };
 template<typename R, typename... P> class Delegate<R(P...)> : public detail::Delegate<R, void, P...>
 {
+public:
     using detail::Delegate<R, void, P...>::Delegate;
 };
 
