@@ -679,7 +679,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
 #if 1
 
         // all of it, with timeout
-        if (size && StreamPtr(payload, size).to(*_client) != size)
+        if (size && StreamPtr(payload, size).to(_client) != size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
 
 #else
@@ -777,7 +777,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 #if 1
 
     // all of it, with timeout
-    if (stream->to(*_client, size) != size)
+    if (stream->to(_client, size) != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
@@ -1209,7 +1209,7 @@ bool HTTPClient::connect(void)
         }
 #if 1
         StreamNull devnull;
-        _client->to(devnull, -1, 0); // clear _client's output (all of it, no timeout)
+        _client->to(&devnull, -1, 0); // clear _client's output (all of it, no timeout)
 #else
         while(_client->available() > 0) {
             _client->read();
@@ -1316,7 +1316,7 @@ bool HTTPClient::sendHeader(const char * type)
 
 #if 1
     // all of it, with timeout
-    return header.to(*_client) == header.length();
+    return header.to(_client) == header.length();
 #else
     return (_client->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 #endif

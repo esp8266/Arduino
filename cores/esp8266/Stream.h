@@ -147,7 +147,7 @@ class Stream: public Print {
         // - maxLen<0 will transfer until input starvation or saturated output
         // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
-        size_t to (Print& to,
+        size_t to (Print* to,
                    ssize_t len = -1,
                    esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
                    int readUntilChar = -1);

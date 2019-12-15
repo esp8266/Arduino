@@ -133,6 +133,7 @@ class WiFiClientSecure : public WiFiClient {
 
     // disallow buffered peek API (for now)
     virtual bool peekBufferAPI () const override { return false; }
+    //virtual int readNow (char* buffer, size_t len) override { return read((uint8_t*)buffer, len); }
 
     ////////////////////////////////////////////////////
     // AxTLS API deprecated warnings to help upgrading
