@@ -24,8 +24,9 @@
 
 #include <debug.h>
 #include <inttypes.h>
-#include "Print.h"
+#include <Print.h>
 #include <PolledTimeout.h>
+#include <sys/types.h> // ssize_t
 
 // compatibility macros for testing
 /*
@@ -135,16 +136,19 @@ class Stream: public Print {
         // consume bytes after peekBuffer use
         virtual void peekConsume (size_t consume) { (void)consume; }
 
+        // by default timeout is enabled (incoming network,serial.. data)
+        virtual bool inputTimeoutPossible () const { return true; }
+
         //////////////////// extensions: Stream streams
 
         // Stream::to()
         // transfer from `Stream::` to `Print::` at most maxlen bytes and return number of transfered bytes
         // (uses 1-copy peekBuffer API when available, or transfer through a 2-copies local stack space)
-        // - maxLen==0 will transfer until input starvation or saturated output
+        // - maxLen<0 will transfer until input starvation or saturated output
         // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
         size_t to (Print& to,
-                   size_t maxLen = 0,
+                   ssize_t len = -1,
                    esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
                    int readUntilChar = -1);
 

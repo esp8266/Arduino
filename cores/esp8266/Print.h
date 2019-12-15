@@ -108,6 +108,10 @@ class Print {
 
         virtual int availableForWrite();
         // return type: int
+
+        // by default timeout is enabled (outgoing network,serial.. data)
+        // (children can override to false)
+        virtual bool outputTimeoutPossible () const { return true; }
 };
 
 #endif
