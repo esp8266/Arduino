@@ -49,6 +49,7 @@ bool ignore_sigint = false;
 bool restore_tty = false;
 bool mockdebug = false;
 int mock_port_shifter = MOCK_PORT_SHIFTER;
+bool blocking_uart = false;
 
 #define STDIN STDIN_FILENO
 
@@ -174,7 +175,7 @@ void control_c (int sig)
 int main (int argc, char* const argv [])
 {
 	bool fast = false;
-	bool blocking_uart = false;
+	blocking_uart = false; // global
 
 	signal(SIGINT, control_c);
 	if (geteuid() == 0)

@@ -190,6 +190,13 @@ uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 	if(uart == NULL || !uart->rx_enabled)
 		return 0;
 
+    if (!blocking_uart)
+    {
+        char c;
+        if (read(0, &c, 1) == 1)
+            uart_new_data(0, c);
+    }
+
 	size_t ret = 0;
 	while (ret < usersize && uart_rx_available_unsafe(uart->rx_buffer))
 	{
