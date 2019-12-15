@@ -39,6 +39,8 @@
 
 extern "C" {
 
+bool blocking_uart = true; // system default
+
 static int s_uart_debug_nr = UART1;
 
 static uart_t *UART[2] = { NULL, NULL };

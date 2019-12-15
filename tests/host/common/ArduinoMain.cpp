@@ -49,7 +49,6 @@ bool ignore_sigint = false;
 bool restore_tty = false;
 bool mockdebug = false;
 int mock_port_shifter = MOCK_PORT_SHIFTER;
-bool blocking_uart = false;
 
 #define STDIN STDIN_FILENO
 

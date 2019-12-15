@@ -18,6 +18,7 @@ TEST_REPORT_XML := test_report.xml
 TEST_REPORT_HTML := test_report.html
 
 ifeq ("$(MOCK)", "1")
+# To enable a test for mock testing, just rename dir+files to '*_sw_*'
 TEST_LIST ?= $(wildcard test_sw_*/*.ino)
 else
 TEST_LIST ?= $(wildcard test_*/*.ino)
@@ -33,10 +34,14 @@ else
 endif
 
 help:
-	@echo 'make list                           - show list of tests'
-	@echo 'make [V=1] sometest/sometest.ino    - run one test'
-	@echo 'make [V=1] all                      - run all tests'
-	@echo 'variables needed: $$ARDUINO_IDE_PATH'
+	@echo
+	@echo 'make list                    - show list of tests'
+	@echo 'make sometest/sometest.ino   - run one test'
+	@echo 'make all                     - run all tests'
+	@echo 'make MOCK=1 all              - run all emulation-on-host compatible tests'
+	@echo 'variables needed: $$ARDUINO_IDE_PATH $$ESP8266_CORE_PATH'
+	@echo 'make options: V=1 NO_BUILD=1 NO_UPLOAD=1 NO_RUN=1 MOCK=1'
+	@echo
 
 list: showtestlist
 
