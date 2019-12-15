@@ -952,7 +952,6 @@ WiFiClient* HTTPClient::getStreamPtr(void)
  */
 int HTTPClient::writeToStream(Stream * stream)
 {
-
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
     }
@@ -966,15 +965,15 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-Serial.printf("##### 1 %d %d\n", (int)len, (int)millis());
-#if 0 // test ok
+Serial.printf("##### 1 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
+#if 1 // testok
         // len < 0: all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->to(*stream, len, 1000);
+        ret = _client->to(stream, len, 1000);
 #else
         ret = writeToStreamDataBlock(stream, len);
 #endif
-Serial.printf("##### 2 %d %d\n", (int)ret, (int)millis());
+Serial.printf("##### 2 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)ret);
         // have we an error?
         if(ret < 0) {
             return returnError(ret);
@@ -1000,17 +999,17 @@ Serial.printf("##### 2 %d %d\n", (int)ret, (int)millis());
 
             // data left?
             if(len > 0) {
-Serial.printf("##### 3 %d %d\n", (int)len, (int)millis());
-#if 0 // testok
+Serial.printf("##### 3 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
+#if 1 // testok
                 // read len bytes with timeout
-                int r = _client->to(*stream, len, 100);
-Serial.printf("##### 4 %d %d\n", (int)r, (int)millis());
+                int r = _client->to(stream, len, 100);
+Serial.printf("##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
                 if (r != len)
                     // not all data transferred
                     return returnError(HTTPC_ERROR_READ_TIMEOUT);
 #else
                 int r = writeToStreamDataBlock(stream, len);
-Serial.printf("##### 4 %d %d\n", (int)r, (int)millis());
+Serial.printf("##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
                 if(r < 0)
                     // error in writeToStreamDataBlock
                     return returnError(r);
@@ -1067,7 +1066,9 @@ const String& HTTPClient::getString(void)
         }
     }
 
+Serial.printf("blob1 c=%p\n", _client);
     writeToStream(_payload.get());
+Serial.printf("blob2\n");
     return *_payload;
 }
 
