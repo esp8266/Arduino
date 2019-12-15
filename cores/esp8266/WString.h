@@ -336,8 +336,6 @@ protected:
 
 public:
 
-    //// imported from former StreamString class:
-
     size_t write(const uint8_t *buffer, size_t size) override;
     size_t write(uint8_t data) override;
 
@@ -349,10 +347,11 @@ public:
     //// peekBuffer API:
 
     virtual bool peekBufferAPI () const override { return true; }
-    virtual size_t availableForPeek () override { return String::length(); }
-    virtual const char* peekBuffer () override { return String::buffer(); }
-    //ditchme virtual void peekConsume (size_t consume) override { String::remove(0, consume); }
+    virtual size_t availableForPeek () override { return available(); }
+    virtual const char* peekBuffer () override;
     virtual void peekConsume (size_t consume) override;
+    virtual bool outputTimeoutPossible () const override { return false; }
+    virtual bool inputTimeoutPossible () const override { return false; }
     virtual int read (char* buffer, size_t len) /*should override*/;
 
     void peekPointerSetConsume () { peekPointer = -1; }

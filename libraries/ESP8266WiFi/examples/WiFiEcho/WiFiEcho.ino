@@ -63,19 +63,18 @@ void loop() {
     }
 
   if (t == 1)
-
+  {
     // byte by byte
-
     while (client.available() && client.availableForWrite())
-      // working char by char is not very efficient
     {
+      // working char by char is not efficient
       client.write(client.read());
     }
+  }
 
   else if (t == 2)
-
+  {
     // block by block through a local buffer (2 copies)
-
     while (client.available() && client.availableForWrite()) {
       size_t maxTo = std::min(client.available(), client.availableForWrite());
       maxTo = std::min(maxTo, (size_t)STACK_PROTECTOR);
@@ -86,13 +85,12 @@ void loop() {
         Serial.printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxTo, tcp_got, tcp_sent);
       }
     }
+  }
 
   else if (t == 3)
-
-    // stream to print, possibly with only one copy
-
   {
-    client.to(client, 0, 0);  // immediate return (no timeout)
+    // stream to print, possibly with only one copy
+    client.to(client, -1, 0);  // all of it, immediate return (no timeout)
   }
 
 }

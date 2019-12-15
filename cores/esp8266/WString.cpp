@@ -887,30 +887,36 @@ size_t String::write(uint8_t data)
 
 int String::available()
 {
-    return length();
+    return peekPointer < 0? length(): length() - peekPointer;
 }
 
 int String::read()
 {
-    if(length())
+    if (peekPointer < 0)
     {
-        char c = charAt(0);
-        if (peekPointer < 0)
+        if (length())
+        {
+            char c = charAt(0);
             remove(0, 1);
-        else
-            peekPointer++;
-        return c;
+            return c;
+        }
     }
+    else if (peekPointer < (int)length())
+        return charAt(peekPointer++);
+
     return -1;
 }
 
 int String::peek()
 {
-    if(length())
+    if (peekPointer < 0)
     {
-        char c = charAt(0);
-        return c;
+        if (length())
+            return charAt(0);
     }
+    else if (peekPointer < (int)length())
+        return charAt(peekPointer);
+
     return -1;
 }
 
@@ -919,6 +925,15 @@ void String::flush()
 }
 
 //// Stream's peekBufferAPI
+
+const char* String::peekBuffer ()
+{
+    if (peekPointer < 0)
+        return buffer();
+    if (peekPointer < (int)length())
+        return buffer() + peekPointer;
+    return nullptr;
+}
 
 void String::peekConsume (size_t consume)
 {
@@ -934,7 +949,7 @@ int String::read (char* buffer, size_t len)
 {
     if (peekPointer < 0)
     {
-        // string is really consumed
+        // string will be consumed
         size_t l = std::min(len, length());
         memcpy(buffer, String::buffer(), l);
         remove(0, l);

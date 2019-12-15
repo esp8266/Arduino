@@ -679,7 +679,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
 #if 1
 
         // all of it, with timeout
-        if (StreamPtr(payload, size).to(*_client) < size)
+        if (size && StreamPtr(payload, size).to(*_client) != size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
 
 #else
@@ -777,7 +777,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 #if 1
 
     // all of it, with timeout
-    if (stream->to(*_client, size) < size)
+    if (stream->to(*_client, size) != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
@@ -966,13 +966,15 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-#if 1
+Serial.printf("##### 1 %d %d\n", (int)len, (int)millis());
+#if 0 // test ok
         // len < 0: all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->to(*stream, (size_t)(len < 0? 0: len));
+        ret = _client->to(*stream, len, 1000);
 #else
         ret = writeToStreamDataBlock(stream, len);
 #endif
+Serial.printf("##### 2 %d %d\n", (int)ret, (int)millis());
         // have we an error?
         if(ret < 0) {
             return returnError(ret);
@@ -998,14 +1000,17 @@ int HTTPClient::writeToStream(Stream * stream)
 
             // data left?
             if(len > 0) {
-#if 1
+Serial.printf("##### 3 %d %d\n", (int)len, (int)millis());
+#if 0 // testok
                 // read len bytes with timeout
-                int r = _client->to(*stream, len);
-                if (r < len)
+                int r = _client->to(*stream, len, 100);
+Serial.printf("##### 4 %d %d\n", (int)r, (int)millis());
+                if (r != len)
                     // not all data transferred
                     return returnError(HTTPC_ERROR_READ_TIMEOUT);
 #else
                 int r = writeToStreamDataBlock(stream, len);
+Serial.printf("##### 4 %d %d\n", (int)r, (int)millis());
                 if(r < 0)
                     // error in writeToStreamDataBlock
                     return returnError(r);
@@ -1204,7 +1209,7 @@ bool HTTPClient::connect(void)
         }
 #if 1
         StreamNull devnull;
-        _client->to(devnull, 0, 0); // clear _client's output
+        _client->to(devnull, -1, 0); // clear _client's output (all of it, no timeout)
 #else
         while(_client->available() > 0) {
             _client->read();
@@ -1426,7 +1431,7 @@ int HTTPClient::handleHeaderResponse()
     return HTTPC_ERROR_CONNECTION_LOST;
 }
 
-#if 0
+#if 1
 /**
  * write one Data Block to Stream
  * @param stream Stream *
