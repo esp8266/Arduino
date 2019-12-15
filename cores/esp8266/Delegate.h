@@ -44,9 +44,10 @@ namespace detail
     class DelegatePImpl {
     public:
         using target_type = R(P...);
-    private:
+    protected:
         using FunPtr = target_type*;
         using FunAPtr = R(*)(A, P...);
+        using FunVPPtr = R(*)(void*, P...);
         using FunctionType = std::function<target_type>;
     public:
         DelegatePImpl()
@@ -289,6 +290,54 @@ namespace detail
             }
         }
 
+        operator FunVPPtr() const
+        {
+            if (FP == kind)
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
+                };
+            }
+            else if (FPA == kind)
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->fnA(
+                        static_cast<DelegatePImpl*>(self)->obj,
+                        std::forward<P...>(args...));
+                };
+            }
+            else
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->functional(std::forward<P...>(args...));
+                };
+            }
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegatePImpl*>(this);
+        }
+
+        operator FunctionType() const
+        {
+            if (FP == kind)
+            {
+                return fn;
+            }
+            else if (FPA == kind)
+            {
+                return std::bind(fnA, obj);
+            }
+            else
+            {
+                return functional;
+            }
+        }
+
         R IRAM_ATTR operator()(P... args) const
         {
             if (FP == kind)
@@ -305,7 +354,7 @@ namespace detail
             }
         }
 
-    private:
+    protected:
         enum { FUNC, FP, FPA } kind = FP;
         union {
             FunctionType functional;
@@ -321,9 +370,10 @@ namespace detail
     class DelegatePImpl {
     public:
         using target_type = R(P...);
-    private:
+    protected:
         using FunPtr = target_type*;
         using FunAPtr = R(*)(A, P...);
+        using FunVPPtr = R(*)(void*, P...);
     public:
         DelegatePImpl()
         {
@@ -463,6 +513,31 @@ namespace detail
             }
         }
 
+        operator FunVPPtr() const
+        {
+            if (FP == kind)
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
+                };
+            }
+            else
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->fnA(
+                        static_cast<DelegatePImpl*>(self)->obj,
+                        std::forward<P...>(args...));
+                };
+            }
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegatePImpl*>(this);
+        }
+
         R IRAM_ATTR operator()(P... args) const
         {
             if (FP == kind)
@@ -475,7 +550,7 @@ namespace detail
             }
         }
 
-    private:
+    protected:
         enum { FP, FPA } kind = FP;
         union {
             FunPtr fn;
@@ -490,9 +565,10 @@ namespace detail
     class DelegatePImpl<void, R, P...> {
     public:
         using target_type = R(P...);
-    private:
+    protected:
         using FunPtr = target_type*;
         using FunctionType = std::function<target_type>;
+        using FunVPPtr = R(*)(void*, P...);
     public:
         DelegatePImpl()
         {
@@ -656,6 +732,41 @@ namespace detail
             }
         }
 
+        operator FunVPPtr() const
+        {
+            if (FP == kind)
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
+                };
+            }
+            else
+            {
+                return [](void* self, P... args) -> R
+                {
+                    return static_cast<DelegatePImpl*>(self)->functional(std::forward<P...>(args...));
+                };
+            }
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegatePImpl*>(this);
+        }
+
+        operator FunctionType() const
+        {
+            if (FP == kind)
+            {
+                return fn;
+            }
+            else
+            {
+                return functional;
+            }
+        }
+
         R IRAM_ATTR operator()(P... args) const
         {
             if (FP == kind)
@@ -668,7 +779,7 @@ namespace detail
             }
         }
 
-    private:
+    protected:
         enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
@@ -680,8 +791,9 @@ namespace detail
     class DelegatePImpl<void, R, P...> {
     public:
         using target_type = R(P...);
-    private:
+    protected:
         using FunPtr = target_type*;
+        using FunVPPtr = R(*)(void*, P...);
     public:
         DelegatePImpl()
         {
@@ -739,12 +851,25 @@ namespace detail
             return fn;
         }
 
+        operator FunVPPtr() const
+        {
+            return [](void* self, P... args) -> R
+            {
+                return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
+            };
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegatePImpl*>(this);
+        }
+
         R IRAM_ATTR operator()(P... args) const
         {
             return fn(std::forward<P...>(args...));
         }
 
-    private:
+    protected:
         FunPtr fn;
     };
 #endif
@@ -754,10 +879,11 @@ namespace detail
     class DelegateImpl {
     public:
         using target_type = R();
-    private:
+    protected:
         using FunPtr = target_type*;
         using FunAPtr = R(*)(A);
         using FunctionType = std::function<target_type>;
+        using FunVPPtr = R(*)(void*);
     public:
         DelegateImpl()
         {
@@ -999,6 +1125,53 @@ namespace detail
             }
         }
 
+        operator FunVPPtr() const
+        {
+            if (FP == kind)
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->fn();
+                };
+            }
+            else if (FPA == kind)
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->fnA(
+                        static_cast<DelegateImpl*>(self)->obj);
+                };
+            }
+            else
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->functional();
+                };
+            }
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegateImpl*>(this);
+        }
+
+        operator FunctionType() const
+        {
+            if (FP == kind)
+            {
+                return fn;
+            }
+            else if (FPA == kind)
+            {
+                return std::bind(fnA, obj);
+            }
+            else
+            {
+                return functional;
+            }
+        }
+
         R IRAM_ATTR operator()() const
         {
             if (FP == kind)
@@ -1015,7 +1188,7 @@ namespace detail
             }
         }
 
-    private:
+    protected:
         enum { FUNC, FP, FPA } kind = FP;
         union {
             FunctionType functional;
@@ -1031,9 +1204,10 @@ namespace detail
     class DelegateImpl {
     public:
         using target_type = R();
-    private:
+    protected:
         using FunPtr = target_type*;
         using FunAPtr = R(*)(A);
+        using FunVPPtr = R(*)(void*);
     public:
         DelegateImpl()
         {
@@ -1173,6 +1347,30 @@ namespace detail
             }
         }
 
+        operator FunVPPtr() const
+        {
+            if (FP == kind)
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->fn();
+                };
+            }
+            else
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->fnA(
+                        static_cast<DelegateImpl*>(self)->obj);
+                };
+            }
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegateImpl*>(this);
+        }
+
         R IRAM_ATTR operator()() const
         {
             if (FP == kind)
@@ -1185,7 +1383,7 @@ namespace detail
             }
         }
 
-    private:
+    protected:
         enum { FP, FPA } kind = FP;
         union {
             FunPtr fn;
@@ -1200,9 +1398,10 @@ namespace detail
     class DelegateImpl<void, R> {
     public:
         using target_type = R();
-    private:
+    protected:
         using FunPtr = target_type*;
         using FunctionType = std::function<target_type>;
+        using FunVPPtr = R(*)(void*);
     public:
         DelegateImpl()
         {
@@ -1366,6 +1565,41 @@ namespace detail
             }
         }
 
+        operator FunVPPtr() const
+        {
+            if (FP == kind)
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->fn();
+                };
+            }
+            else
+            {
+                return [](void* self) -> R
+                {
+                    return static_cast<DelegateImpl*>(self)->functional();
+                };
+            }
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegateImpl*>(this);
+        }
+
+        operator FunctionType() const
+        {
+            if (FP == kind)
+            {
+                return fn;
+            }
+            else
+            {
+                return functional;
+            }
+        }
+
         R IRAM_ATTR operator()() const
         {
             if (FP == kind)
@@ -1378,7 +1612,7 @@ namespace detail
             }
         }
 
-    private:
+    protected:
         enum { FUNC, FP } kind = FP;
         union {
             FunctionType functional;
@@ -1390,8 +1624,9 @@ namespace detail
     class DelegateImpl<void, R> {
     public:
         using target_type = R();
-    private:
+    protected:
         using FunPtr = target_type*;
+        using FunVPPtr = R(*)(void*);
     public:
         DelegateImpl()
         {
@@ -1449,28 +1684,151 @@ namespace detail
             return fn;
         }
 
+        operator FunVPPtr() const
+        {
+            return [](void* self) -> R
+            {
+                return static_cast<DelegateImpl*>(self)->fn();
+            };
+        }
+
+        void* arg() const
+        {
+            return const_cast<DelegateImpl*>(this);
+        }
+
         R IRAM_ATTR operator()() const
         {
             return fn();
         }
 
-    private:
+    protected:
         FunPtr fn;
     };
 #endif
 
     template<typename R = void, typename A = void, typename... P>
-    class Delegate : public detail::DelegatePImpl<A, R, P...>
+    class Delegate : private detail::DelegatePImpl<A, R, P...>
     {
+    private:
+        using typename detail::DelegatePImpl<A, R, P...>::FunVPPtr;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using typename detail::DelegatePImpl<A, R, P...>::FunctionType;
+#endif
     public:
+        using detail::DelegatePImpl<A, R, P...>::target_type;
         using detail::DelegatePImpl<A, R, P...>::DelegatePImpl;
+        using detail::DelegatePImpl<A, R, P...>::operator=;
+        using detail::DelegatePImpl<A, R, P...>::operator bool;
+        using detail::DelegatePImpl<A, R, P...>::operator FunVPPtr;
+        using detail::DelegatePImpl<A, R, P...>::arg;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using detail::DelegatePImpl<A, R, P...>::operator FunctionType;
+#endif
+        using detail::DelegatePImpl<A, R, P...>::operator();
+    };
+
+    template<typename R, typename A, typename... P>
+    class Delegate<R, A*, P...> : private detail::DelegatePImpl<A*, R, P...>
+    {
+    private:
+        using typename detail::DelegatePImpl<A*, R, P...>::FunVPPtr;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using typename detail::DelegatePImpl<A*, R, P...>::FunctionType;
+#endif
+    public:
+        using detail::DelegatePImpl<A*, R, P...>::target_type;
+        using detail::DelegatePImpl<A*, R, P...>::DelegatePImpl;
+        using detail::DelegatePImpl<A*, R, P...>::operator=;
+        using detail::DelegatePImpl<A*, R, P...>::operator bool;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using detail::DelegatePImpl<A*, R, P...>::operator FunctionType;
+#endif
+        using detail::DelegatePImpl<A*, R, P...>::operator();
+        operator FunVPPtr() const
+        {
+            if (detail::DelegatePImpl<A*, R, P...>::FPA == detail::DelegatePImpl<A*, R, P...>::kind)
+            {
+                return reinterpret_cast<R(*)(void*, P...)>(detail::DelegatePImpl<A*, R, P...>::fnA);
+            }
+            else
+            {
+                return detail::DelegatePImpl<A*, R, P...>::operator FunVPPtr();
+            }
+        }
+        void* arg() const
+        {
+            if (detail::DelegatePImpl<A*, R, P...>::FPA == detail::DelegatePImpl<A*, R, P...>::kind)
+            {
+                return detail::DelegatePImpl<A*, R, P...>::obj;
+            }
+            else
+            {
+                return detail::DelegatePImpl<A*, R, P...>::arg();
+            }
+        }
     };
 
     template<typename R, typename A>
-    class Delegate<R, A> : public detail::DelegateImpl<A, R>
+    class Delegate<R, A> : private detail::DelegateImpl<A, R>
     {
+    private:
+        using typename detail::DelegateImpl<A, R>::FunVPPtr;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using typename detail::DelegateImpl<A, R>::FunctionType;
+#endif
     public:
+        using detail::DelegateImpl<A, R>::target_type;
         using detail::DelegateImpl<A, R>::DelegateImpl;
+        using detail::DelegateImpl<A, R>::operator=;
+        using detail::DelegateImpl<A, R>::operator bool;
+        using detail::DelegateImpl<A, R>::operator FunVPPtr;
+        using detail::DelegateImpl<A, R>::arg;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using detail::DelegateImpl<A, R>::operator FunctionType;
+#endif
+        using detail::DelegateImpl<A, R>::operator();
+    };
+
+    template<typename R, typename A>
+    class Delegate<R, A*> : private detail::DelegateImpl<A*, R>
+    {
+    private:
+        using typename detail::DelegateImpl<A*, R>::FunVPPtr;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using typename detail::DelegateImpl<A*, R>::FunctionType;
+#endif
+    public:
+        using detail::DelegateImpl<A*, R>::target_type;
+        using detail::DelegateImpl<A*, R>::DelegateImpl;
+        using detail::DelegateImpl<A*, R>::operator=;
+        using detail::DelegateImpl<A*, R>::operator bool;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+        using detail::DelegateImpl<A*, R>::operator FunctionType;
+#endif
+        using detail::DelegateImpl<A*, R>::operator();
+        operator FunVPPtr() const
+        {
+            if (detail::DelegateImpl<A*, R>::FPA == detail::DelegateImpl<A*, R>::kind)
+            {
+                return reinterpret_cast<R(*)(void*)>(detail::DelegateImpl<A*, R>::fnA);
+            }
+            else
+            {
+                return detail::DelegateImpl<A*, R>::operator FunVPPtr();
+            }
+        }
+        void* arg() const
+        {
+            if (detail::DelegateImpl<A*, R>::FPA == detail::DelegateImpl<A*, R>::kind)
+            {
+                return detail::DelegateImpl<A*, R>::obj;
+            }
+            else
+            {
+                return detail::DelegateImpl<A*, R>::arg();
+            }
+        }
     };
 
 }
