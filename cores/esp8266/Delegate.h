@@ -38,6 +38,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 namespace detail
 {
+    template<typename R, typename... P>
+    static R vPtrToFunPtrExec(void* fn, P... args)
+    {
+        using target_type = R(P...);
+        return reinterpret_cast<target_type*>(fn)(std::forward<P...>(args...));
+    }
 
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
     template<typename A, typename R, typename... P>
@@ -290,23 +296,22 @@ namespace detail
             }
         }
 
+        static R vPtrToFunAPtrExec(void* self, P... args)
+        {
+            return static_cast<DelegatePImpl*>(self)->fnA(
+                static_cast<DelegatePImpl*>(self)->obj,
+                std::forward<P...>(args...));
+        };
+
         operator FunVPPtr() const
         {
             if (FP == kind)
             {
-                return [](void* self, P... args) -> R
-                {
-                    return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
-                };
+                return vPtrToFunPtrExec<R, P...>;
             }
             else if (FPA == kind)
             {
-                return [](void* self, P... args) -> R
-                {
-                    return static_cast<DelegatePImpl*>(self)->fnA(
-                        static_cast<DelegatePImpl*>(self)->obj,
-                        std::forward<P...>(args...));
-                };
+                return vPtrToFunAPtrExec;
             }
             else
             {
@@ -319,7 +324,14 @@ namespace detail
 
         void* arg() const
         {
-            return const_cast<DelegatePImpl*>(this);
+            if (FP == kind)
+            {
+                return reinterpret_cast<void*>(fn);
+            }
+            else
+            {
+                return const_cast<DelegatePImpl*>(this);
+            }
         }
 
         operator FunctionType() const
@@ -513,29 +525,35 @@ namespace detail
             }
         }
 
+        static R vPtrToFunAPtrExec(void* self, P... args)
+        {
+            return static_cast<DelegatePImpl*>(self)->fnA(
+                static_cast<DelegatePImpl*>(self)->obj,
+                std::forward<P...>(args...));
+        };
+
         operator FunVPPtr() const
         {
             if (FP == kind)
             {
-                return [](void* self, P... args) -> R
-                {
-                    return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
-                };
+                return vPtrToFunPtrExec<R, P...>;
             }
             else
             {
-                return [](void* self, P... args) -> R
-                {
-                    return static_cast<DelegatePImpl*>(self)->fnA(
-                        static_cast<DelegatePImpl*>(self)->obj,
-                        std::forward<P...>(args...));
-                };
+                return vPtrToFunAPtrExec;
             }
         }
 
         void* arg() const
         {
-            return const_cast<DelegatePImpl*>(this);
+            if (FP == kind)
+            {
+                return reinterpret_cast<void*>(fn);
+            }
+            else
+            {
+                return const_cast<DelegatePImpl*>(this);
+            }
         }
 
         R IRAM_ATTR operator()(P... args) const
@@ -736,10 +754,7 @@ namespace detail
         {
             if (FP == kind)
             {
-                return [](void* self, P... args) -> R
-                {
-                    return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
-                };
+                return vPtrToFunPtrExec<R, P...>;
             }
             else
             {
@@ -752,7 +767,14 @@ namespace detail
 
         void* arg() const
         {
-            return const_cast<DelegatePImpl*>(this);
+            if (FP == kind)
+            {
+                return reinterpret_cast<void*>(fn);
+            }
+            else
+            {
+                return const_cast<DelegatePImpl*>(this);
+            }
         }
 
         operator FunctionType() const
@@ -853,15 +875,12 @@ namespace detail
 
         operator FunVPPtr() const
         {
-            return [](void* self, P... args) -> R
-            {
-                return static_cast<DelegatePImpl*>(self)->fn(std::forward<P...>(args...));
-            };
+            return vPtrToFunPtrExec<R, P...>;
         }
 
         void* arg() const
         {
-            return const_cast<DelegatePImpl*>(this);
+            return reinterpret_cast<void*>(fn);
         }
 
         R IRAM_ATTR operator()(P... args) const
@@ -1125,22 +1144,21 @@ namespace detail
             }
         }
 
+        static R vPtrToFunAPtrExec(void* self)
+        {
+            return static_cast<DelegateImpl*>(self)->fnA(
+                static_cast<DelegateImpl*>(self)->obj);
+        };
+
         operator FunVPPtr() const
         {
             if (FP == kind)
             {
-                return [](void* self) -> R
-                {
-                    return static_cast<DelegateImpl*>(self)->fn();
-                };
+                return fn;
             }
             else if (FPA == kind)
             {
-                return [](void* self) -> R
-                {
-                    return static_cast<DelegateImpl*>(self)->fnA(
-                        static_cast<DelegateImpl*>(self)->obj);
-                };
+                return vPtrToFunAPtrExec;
             }
             else
             {
@@ -1153,7 +1171,14 @@ namespace detail
 
         void* arg() const
         {
-            return const_cast<DelegateImpl*>(this);
+            if (FP == kind)
+            {
+                return nullptr;
+            }
+            else
+            {
+                return const_cast<DelegateImpl*>(this);
+            }
         }
 
         operator FunctionType() const
@@ -1347,28 +1372,34 @@ namespace detail
             }
         }
 
+        static R vPtrToFunAPtrExec(void* self)
+        {
+            return static_cast<DelegateImpl*>(self)->fnA(
+                static_cast<DelegateImpl*>(self)->obj);
+        };
+
         operator FunVPPtr() const
         {
             if (FP == kind)
             {
-                return [](void* self) -> R
-                {
-                    return static_cast<DelegateImpl*>(self)->fn();
-                };
+                return fn;
             }
             else
             {
-                return [](void* self) -> R
-                {
-                    return static_cast<DelegateImpl*>(self)->fnA(
-                        static_cast<DelegateImpl*>(self)->obj);
-                };
+                return vPtrToFunAPtrExec;
             }
         }
 
         void* arg() const
         {
-            return const_cast<DelegateImpl*>(this);
+            if (FP == kind)
+            {
+                return nullptr;
+            }
+            else
+            {
+                return const_cast<DelegateImpl*>(this);
+            }
         }
 
         R IRAM_ATTR operator()() const
@@ -1569,10 +1600,7 @@ namespace detail
         {
             if (FP == kind)
             {
-                return [](void* self) -> R
-                {
-                    return static_cast<DelegateImpl*>(self)->fn();
-                };
+                return fn;
             }
             else
             {
@@ -1585,7 +1613,14 @@ namespace detail
 
         void* arg() const
         {
-            return const_cast<DelegateImpl*>(this);
+            if (FP == kind)
+            {
+                return nullptr;
+            }
+            else
+            {
+                return const_cast<DelegateImpl*>(this);
+            }
         }
 
         operator FunctionType() const
@@ -1686,15 +1721,12 @@ namespace detail
 
         operator FunVPPtr() const
         {
-            return [](void* self) -> R
-            {
-                return static_cast<DelegateImpl*>(self)->fn();
-            };
+            return fn;
         }
 
         void* arg() const
         {
-            return const_cast<DelegateImpl*>(this);
+            return nullptr;
         }
 
         R IRAM_ATTR operator()() const
