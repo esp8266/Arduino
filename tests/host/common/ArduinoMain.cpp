@@ -174,7 +174,7 @@ void control_c (int sig)
 int main (int argc, char* const argv [])
 {
 	bool fast = false;
-	bool blocking_uart = false;
+	blocking_uart = false; // global
 
 	signal(SIGINT, control_c);
 	if (geteuid() == 0)
