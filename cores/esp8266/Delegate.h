@@ -1154,7 +1154,7 @@ namespace detail
         {
             if (FP == kind)
             {
-                return fn;
+                return reinterpret_cast<FunVPPtr>(fn);
             }
             else if (FPA == kind)
             {
@@ -1382,7 +1382,7 @@ namespace detail
         {
             if (FP == kind)
             {
-                return fn;
+                return reinterpret_cast<FunVPPtr>(fn);
             }
             else
             {
@@ -1600,7 +1600,7 @@ namespace detail
         {
             if (FP == kind)
             {
-                return fn;
+                return reinterpret_cast<FunVPPtr>(fn);
             }
             else
             {
@@ -1721,7 +1721,7 @@ namespace detail
 
         operator FunVPPtr() const
         {
-            return fn;
+            return reinterpret_cast<FunVPPtr>(fn);
         }
 
         void* arg() const
