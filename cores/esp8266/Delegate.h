@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 namespace detail
 {
     template<typename R, typename... P>
-    static R vPtrToFunPtrExec(void* fn, P... args)
+    static R IRAM_ATTR vPtrToFunPtrExec(void* fn, P... args)
     {
         using target_type = R(P...);
         return reinterpret_cast<target_type*>(fn)(std::forward<P...>(args...));
@@ -296,7 +296,7 @@ namespace detail
             }
         }
 
-        static R vPtrToFunAPtrExec(void* self, P... args)
+        static R IRAM_ATTR vPtrToFunAPtrExec(void* self, P... args)
         {
             return static_cast<DelegatePImpl*>(self)->fnA(
                 static_cast<DelegatePImpl*>(self)->obj,
@@ -525,7 +525,7 @@ namespace detail
             }
         }
 
-        static R vPtrToFunAPtrExec(void* self, P... args)
+        static R IRAM_ATTR vPtrToFunAPtrExec(void* self, P... args)
         {
             return static_cast<DelegatePImpl*>(self)->fnA(
                 static_cast<DelegatePImpl*>(self)->obj,
@@ -1144,7 +1144,7 @@ namespace detail
             }
         }
 
-        static R vPtrToFunAPtrExec(void* self)
+        static R IRAM_ATTR vPtrToFunAPtrExec(void* self)
         {
             return static_cast<DelegateImpl*>(self)->fnA(
                 static_cast<DelegateImpl*>(self)->obj);
@@ -1372,7 +1372,7 @@ namespace detail
             }
         }
 
-        static R vPtrToFunAPtrExec(void* self)
+        static R IRAM_ATTR vPtrToFunAPtrExec(void* self)
         {
             return static_cast<DelegateImpl*>(self)->fnA(
                 static_cast<DelegateImpl*>(self)->obj);
