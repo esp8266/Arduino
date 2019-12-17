@@ -89,7 +89,8 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 	if (ret == 0)
 	{
 		// connection closed
-		return -1;
+		// nothing is read
+		return 0;
 	}
 
 	if (ret == -1)
@@ -97,16 +98,21 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 		if (errno != EAGAIN)
 		{
 			fprintf(stderr, MOCK "ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n", sock, maxread, strerror(errno));
+assert(0);
+            // error
 			return -1;
 		}
 		ret = 0;
 	}
+
 	ccinbufsize += ret;
 	return ret;
 }
 
 ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
+    // usersize==0: availableForPeek()
+
 	if (usersize > CCBUFSIZE)
 		mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
@@ -114,7 +120,7 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 	size_t retsize = 0;
 	do
 	{
-		if (usersize <= ccinbufsize)
+		if (usersize && usersize <= ccinbufsize)
 		{
 			// data already buffered
 			retsize = usersize;
@@ -123,7 +129,14 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 		
 		// check incoming data data
 		if (mockFillInBuf(sock, ccinbuf, ccinbufsize) < 0)
+		{
 			return -1;
+	    }
+
+        if (usersize == 0 && ccinbufsize)
+            // availableForPeek
+            return ccinbufsize;
+
 		if (usersize <= ccinbufsize)
 		{
 			// data just received

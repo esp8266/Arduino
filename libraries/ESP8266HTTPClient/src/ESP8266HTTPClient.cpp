@@ -676,7 +676,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
             return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
         }
 
-#if 1
+#if 1 // mock64ok
 
         // all of it, with timeout
         if (size && StreamPtr(payload, size).to(_client) != size)
@@ -774,10 +774,11 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
         return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
     }
 
-#if 1
+#if 1 // mock64ok
 
     // all of it, with timeout
-    if (stream->to(_client, size) != size)
+    size_t transferred = stream->to(_client, size);
+    if (transferred != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
@@ -965,7 +966,12 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-Serial.printf("##### 1 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
+fprintf(stderr, "##### 1 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
+//fprintf(stderr, "_client:avr=%d avp=%d  %p %s\n", (int)_client->available(), _client->availableForPeek(), _client, typeid(*_client).name());
+fprintf(stderr, "_client:avr=%d\n", (int)_client->available());
+fprintf(stderr, "_client:avp=%d\n", _client->availableForPeek());
+fprintf(stderr, "_client:%p\n", _client);
+fprintf(stderr, "_client:%s\n", typeid(*_client).name());
 #if 1 // testok
         // len < 0: all of it, with timeout
         // len >= 0: max:len, with timeout
@@ -973,7 +979,7 @@ Serial.printf("##### 1 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBu
 #else
         ret = writeToStreamDataBlock(stream, len);
 #endif
-Serial.printf("##### 2 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)ret);
+fprintf(stderr, "##### 2 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)ret);
         // have we an error?
         if(ret < 0) {
             return returnError(ret);
@@ -999,17 +1005,17 @@ Serial.printf("##### 2 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBu
 
             // data left?
             if(len > 0) {
-Serial.printf("##### 3 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
-#if 1 // testok
+fprintf(stderr, "##### 3 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
+#if 0 // testok
                 // read len bytes with timeout
                 int r = _client->to(stream, len, 100);
-Serial.printf("##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
+fprintf(stderr, "##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
                 if (r != len)
                     // not all data transferred
                     return returnError(HTTPC_ERROR_READ_TIMEOUT);
 #else
                 int r = writeToStreamDataBlock(stream, len);
-Serial.printf("##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
+fprintf(stderr, "##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
                 if(r < 0)
                     // error in writeToStreamDataBlock
                     return returnError(r);
@@ -1066,9 +1072,9 @@ const String& HTTPClient::getString(void)
         }
     }
 
-Serial.printf("blob1 c=%p\n", _client);
+fprintf(stderr, "blob1 c=%p\n", _client);
     writeToStream(_payload.get());
-Serial.printf("blob2\n");
+fprintf(stderr, "blob2\n");
     return *_payload;
 }
 
@@ -1208,7 +1214,7 @@ bool HTTPClient::connect(void)
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
         }
-#if 1
+#if 1 // mock64ok
         StreamNull devnull;
         _client->to(&devnull, -1, 0); // clear _client's output (all of it, no timeout)
 #else
@@ -1315,7 +1321,7 @@ bool HTTPClient::sendHeader(const char * type)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
-#if 1
+#if 1 // mock64ok
     // all of it, with timeout
     return header.to(_client) == header.length();
 #else

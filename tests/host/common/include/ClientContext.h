@@ -310,7 +310,7 @@ public:
     // return number of byte accessible by peekBuffer()
     size_t availableForPeek ()
     {
-        ssize_t ret = mockPeekBytes(_sock, nullptr, sizeof _inbuf, 0, _inbuf, _inbufsize);
+        ssize_t ret = mockPeekBytes(_sock, nullptr, 0, 0, _inbuf, _inbufsize);
         if (ret < 0)
         {
             abort();

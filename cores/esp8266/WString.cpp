@@ -942,7 +942,7 @@ void String::peekConsume (size_t consume)
         remove(0, consume);
     else
         // only the pointer is moved
-        peekPointer = std::min(length(), peekPointer + consume);
+        peekPointer = std::min((size_t)length(), peekPointer + consume);
 }
 
 int String::read (char* buffer, size_t len)
@@ -950,7 +950,7 @@ int String::read (char* buffer, size_t len)
     if (peekPointer < 0)
     {
         // string will be consumed
-        size_t l = std::min(len, length());
+        size_t l = std::min(len, (size_t)length());
         memcpy(buffer, String::buffer(), l);
         remove(0, l);
         return l;
@@ -960,7 +960,7 @@ int String::read (char* buffer, size_t len)
         return 0;
 
     // only the pointer is moved
-    size_t l = std::min(len, length() - peekPointer);
+    size_t l = std::min(len, (size_t)(length() - peekPointer));
     memcpy(buffer, String::buffer() + peekPointer, l);
     peekPointer += l;
     return l;
