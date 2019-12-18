@@ -7,12 +7,14 @@
 */
 
 
-#include <Arduino.h>
-
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
-
 #include <ESP8266HTTPClient.h>
+
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -29,7 +31,7 @@ void setup() {
   Serial.println("Connecting to WiFi...");
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("SSID", "PASSWORD");
+  WiFiMulti.addAP(STASSID, STAPSK);
 
   // wait for WiFi connection
   while ((WiFiMulti.run() != WL_CONNECTED)) {
