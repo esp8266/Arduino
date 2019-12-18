@@ -37,7 +37,6 @@ extern "C" {
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
-#define OPTIMISTIC_YIELD_TIME_US 16000
 
 extern "C" void call_user_start();
 extern void loop();
