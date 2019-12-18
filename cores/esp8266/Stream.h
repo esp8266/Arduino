@@ -122,7 +122,7 @@ class Stream: public Print {
         int readNow(uint8_t* buffer, size_t len) { return readNow((char*)buffer, len); }
 
         //////////////////// extensions: direct access to input buffer
-        
+
         // inform user and ::to() on effective buffered peek API implementation
         virtual bool peekBufferAPI () const { return false; }
 

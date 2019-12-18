@@ -59,7 +59,7 @@ protected:
     size_t _size;
     bool _in_flash;
     size_t _peekPointer = 0;
-    
+
 public:
     StreamPtr (const char* buffer, size_t size, bool in_flash = false): _buffer(buffer), _size(size), _in_flash(in_flash) { }
     StreamPtr (const uint8_t* buffer, size_t size, bool in_flash = false): _buffer((const char*)buffer), _size(size), _in_flash(in_flash) { }

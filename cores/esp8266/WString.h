@@ -361,6 +361,10 @@ public:
     virtual int readNow (char* buffer, size_t len) override {
         return read(buffer, len);
     }
+
+    //// Print
+    virtual int availableForWrite() override { return 256; }
+    // or biggestChunk()/4 or reserved-length?
 };
 
 class StringSumHelper: public String {

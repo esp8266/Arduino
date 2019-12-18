@@ -676,12 +676,10 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
             return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
         }
 
-#if 1 // mock64ok
-
+#if 1
         // all of it, with timeout
         if (size && StreamPtr(payload, size).to(_client) != size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
-
 #else
         // send Payload if needed
         if (payload && size > 0) {
@@ -774,7 +772,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
         return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
     }
 
-#if 1 // mock64ok
+#if 1
 
     // all of it, with timeout
     size_t transferred = stream->to(_client, size);
@@ -785,7 +783,6 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     }
 
 #else
-
 
     int buff_size = HTTP_TCP_BUFFER_SIZE;
 
@@ -951,6 +948,7 @@ WiFiClient* HTTPClient::getStreamPtr(void)
  * @param stream Stream *
  * @return bytes written ( negative values are error codes )
  */
+
 int HTTPClient::writeToStream(Stream * stream)
 {
     if(!stream) {
@@ -966,12 +964,6 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-fprintf(stderr, "##### 1 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
-//fprintf(stderr, "_client:avr=%d avp=%d  %p %s\n", (int)_client->available(), _client->availableForPeek(), _client, typeid(*_client).name());
-fprintf(stderr, "_client:avr=%d\n", (int)_client->available());
-fprintf(stderr, "_client:avp=%d\n", _client->availableForPeek());
-fprintf(stderr, "_client:%p\n", _client);
-fprintf(stderr, "_client:%s\n", typeid(*_client).name());
 #if 1 // testok
         // len < 0: all of it, with timeout
         // len >= 0: max:len, with timeout
@@ -979,7 +971,6 @@ fprintf(stderr, "_client:%s\n", typeid(*_client).name());
 #else
         ret = writeToStreamDataBlock(stream, len);
 #endif
-fprintf(stderr, "##### 2 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)ret);
         // have we an error?
         if(ret < 0) {
             return returnError(ret);
@@ -1005,20 +996,18 @@ fprintf(stderr, "##### 2 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peek
 
             // data left?
             if(len > 0) {
-fprintf(stderr, "##### 3 %dms pb=%i len=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)len);
-#if 0 // testok
+#if 1
                 // read len bytes with timeout
                 int r = _client->to(stream, len, 100);
-fprintf(stderr, "##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
                 if (r != len)
                     // not all data transferred
                     return returnError(HTTPC_ERROR_READ_TIMEOUT);
 #else
                 int r = writeToStreamDataBlock(stream, len);
-fprintf(stderr, "##### 4 %dms pb=%i ret=%d\n", (int)millis(), (int)_client->peekBufferAPI(), (int)r);
-                if(r < 0)
+                if(r < 0) {
                     // error in writeToStreamDataBlock
                     return returnError(r);
+                }
 #endif
                 ret += r;
             } else {
@@ -1072,9 +1061,7 @@ const String& HTTPClient::getString(void)
         }
     }
 
-fprintf(stderr, "blob1 c=%p\n", _client);
     writeToStream(_payload.get());
-fprintf(stderr, "blob2\n");
     return *_payload;
 }
 
@@ -1214,7 +1201,7 @@ bool HTTPClient::connect(void)
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
         }
-#if 1 // mock64ok
+#if 1
         StreamNull devnull;
         _client->to(&devnull, -1, 0); // clear _client's output (all of it, no timeout)
 #else
@@ -1321,7 +1308,7 @@ bool HTTPClient::sendHeader(const char * type)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
-#if 1 // mock64ok
+#if 1
     // all of it, with timeout
     return header.to(_client) == header.length();
 #else
@@ -1438,7 +1425,7 @@ int HTTPClient::handleHeaderResponse()
     return HTTPC_ERROR_CONNECTION_LOST;
 }
 
-#if 1
+#if 0
 /**
  * write one Data Block to Stream
  * @param stream Stream *

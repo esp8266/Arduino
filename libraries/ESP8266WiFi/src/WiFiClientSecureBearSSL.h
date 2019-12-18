@@ -54,6 +54,7 @@ class WiFiClientSecure : public WiFiClient {
     }
     size_t write(Stream& stream); // Note this is not virtual
     int read(uint8_t *buf, size_t size) override;
+    int read(char *buf, size_t size) override { return read((uint8_t*)buf, size); }
     int available() override;
     int read() override;
     int peek() override;
@@ -133,7 +134,7 @@ class WiFiClientSecure : public WiFiClient {
 
     // disallow buffered peek API (for now)
     virtual bool peekBufferAPI () const override { return false; }
-    //virtual int readNow (char* buffer, size_t len) override { return read((uint8_t*)buffer, len); }
+    virtual int readNow (char* buffer, size_t len) override { return read((uint8_t*)buffer, len); }
 
     ////////////////////////////////////////////////////
     // AxTLS API deprecated warnings to help upgrading

@@ -69,9 +69,9 @@ public:
   virtual int read(char *buf, size_t size); // should override, see Stream.h
   virtual int read(uint8_t *buf, size_t size) // should override, see Stream.h
   {
-    return read((char*)buf, size);
+    return WiFiClient::read((char*)buf, size);
   }
-  
+
   virtual int peek() override;
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
   size_t peekBytes(char *buffer, size_t length) {
