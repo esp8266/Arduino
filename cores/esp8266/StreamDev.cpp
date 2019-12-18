@@ -4,8 +4,7 @@
 
 using esp8266::polledTimeout::oneShotFastMs;
 using esp8266::polledTimeout::periodicFastMs;
-#include <iostream>
-using namespace std;
+
 size_t Stream::to (Print* to,
                    ssize_t len,
                    oneShotFastMs::timeType timeout,
