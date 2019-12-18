@@ -109,7 +109,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 2. Make a PR with the following, wait for Travis CI, and merge.
 
-   * platform.txt: update `version` to the release E.g. `3.0.0`,
+   * platform.txt and package.json: update `version` to the release E.g. `3.0.0`,
 
    * `cores/esp8266/TZ.h`: import the latest database with the following shell command:\
      `$ cd tools; sh TZupdate.sh`.
@@ -150,7 +150,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 11. Create a commit to the master branch, updating:
 
-    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `3.1.0-dev`.
+    * The version in platform.txt and package.json files. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `3.1.0-dev`.
 
     * In main README.md:
 
