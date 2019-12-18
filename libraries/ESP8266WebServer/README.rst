@@ -96,7 +96,7 @@ Getting information about request arguments
   int args();
   bool hasArg();
 
-``arg`` - get request argument value
+``arg`` - get request argument value, use ``arg("plain")`` to get POST body
 	
 ``argName`` - get request argument name
 	

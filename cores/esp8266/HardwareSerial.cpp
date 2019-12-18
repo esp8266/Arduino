@@ -36,10 +36,10 @@ HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr), _rx_size(256)
 {}
 
-void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
+void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin, bool invert)
 {
     end();
-    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
+    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size, invert);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
     if (static_cast<void*>(this) == static_cast<void*>(&DEBUG_ESP_PORT))
     {
@@ -58,6 +58,15 @@ void HardwareSerial::end()
 
     uart_uninit(_uart);
     _uart = NULL;
+}
+
+void HardwareSerial::updateBaudRate(unsigned long baud)
+{
+    if(!_uart) {
+        return;
+    }
+
+    uart_set_baudrate(_uart, baud);
 }
 
 size_t HardwareSerial::setRxBufferSize(size_t size){
@@ -99,14 +108,16 @@ int HardwareSerial::available(void)
 
 void HardwareSerial::flush()
 {
+    uint8_t bit_length = 0;
     if(!_uart || !uart_tx_enabled(_uart)) {
         return;
     }
 
+    bit_length = uart_get_bit_length(_uart_nr); // data width, parity and stop
     uart_wait_tx_empty(_uart);
     //Workaround for a bug in serial not actually being finished yet
     //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
-    delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
+    delayMicroseconds(bit_length * 1000000 / uart_get_baudrate(_uart) + 1);
 }
 
 void HardwareSerial::startDetectBaudrate()
@@ -122,14 +133,14 @@ unsigned long HardwareSerial::testBaudrate()
 unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
     esp8266::polledTimeout::oneShotFastMs timeOut(timeoutMillis);
-    unsigned long detectedBaudrate;
+    unsigned long detectedBaudrate = 0;
     while (!timeOut) {
         if ((detectedBaudrate = testBaudrate())) {
           break;
         }
         yield();
         delay(100);
-    }    
+    }
     return detectedBaudrate;
 }
 

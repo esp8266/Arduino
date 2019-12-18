@@ -128,14 +128,14 @@ public:
         if (err != ERR_OK) {
             return 0;
         }
-        _delaying = true;
+        _connect_pending = true;
         _op_start_time = millis();
-        // Following delay will be interrupted by connect callback
-        for (decltype(_timeout_ms) i = 0; _delaying && i < _timeout_ms; i++) {
+        for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _connected or _notify_error fires
         }
-        _delaying = false;
+        _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
             return 0;
@@ -432,16 +432,17 @@ protected:
 
     void _notify_error()
     {
-        if (_delaying) {
-            _delaying = false;
-            esp_schedule(); // break current delay()
+        if (_connect_pending || _send_waiting) {
+            _send_waiting = false;
+            _connect_pending = false;
+            esp_schedule(); // break delay in connect or _write_from_source
         }
     }
 
     size_t _write_from_source(DataSource* ds)
     {
         assert(_datasource == nullptr);
-        assert(!_delaying);
+        assert(!_send_waiting);
         _datasource = ds;
         _written = 0;
         _op_start_time = millis();
@@ -459,13 +460,14 @@ protected:
                 break;
             }
 
-            _delaying = true;
-            // Following delay will be interrupted by on next received ack
-            for (decltype(_timeout_ms) i = 0; _delaying && i < _timeout_ms; i++) {
+            _send_waiting = true;
+            for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _write_some_from_cb or _notify_error fires
+
             }
-            _delaying = false;
+            _send_waiting = false;
         } while(true);
 
         if (_sync)
@@ -533,9 +535,9 @@ protected:
 
     void _write_some_from_cb()
     {
-        if (_delaying) {
-            _delaying = false;
-            esp_schedule(); // break current delay()
+        if (_send_waiting) {
+            _send_waiting = false;
+            esp_schedule(); // break delay in _write_from_source
         }
     }
 
@@ -609,9 +611,9 @@ protected:
         (void) err;
         (void) pcb;
         assert(pcb == _pcb);
-        if (_delaying) {
-            _delaying = false;
-            esp_schedule(); // break current delay()
+        if (_connect_pending) {
+            _connect_pending = false;
+            esp_schedule(); // break delay in connect
         }
         return ERR_OK;
     }
@@ -660,7 +662,8 @@ private:
     size_t _written = 0;
     uint32_t _timeout_ms = 5000;
     uint32_t _op_start_time = 0;
-    bool _delaying = false;
+    bool _send_waiting = false;
+    bool _connect_pending = false;
 
     int8_t _refcnt;
     ClientContext* _next;

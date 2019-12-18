@@ -5,7 +5,6 @@ This is part of the libb64 project, and has been placed in the public domain.
 For details, see http://sourceforge.net/projects/libb64
 */
 
-#include <pgmspace.h>
 #include "cencode.h"
 
 extern "C" {
@@ -23,10 +22,20 @@ void base64_init_encodestate_nonewlines(base64_encodestate* state_in){
   state_in->stepsnewline = -1;
 }
 
-char base64_encode_value(char value_in){
-  static const char encoding[] PROGMEM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  if (value_in > 63) return '=';
-  return pgm_read_byte( &encoding[(int)value_in] );
+char base64_encode_value(const char n) {
+  char r;
+
+  if (n < 26)
+    r = n + 'A';
+  else if (n < 26 + 26)
+    r = n - 26 + 'a';
+  else if (n < 26 + 26 + 10 )
+    r = n - 26 - 26 + '0';
+  else if (n == 62 )
+    r = '+';
+  else
+    r = '/';
+  return r;
 }
 
 int base64_encode_block(const char* plaintext_in, int length_in, char* code_out, base64_encodestate* state_in){

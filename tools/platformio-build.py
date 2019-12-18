@@ -164,21 +164,36 @@ if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
         CPPDEFINES=[("NONOSDK3V0", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0")]
     )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK22x", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x")]
-    )
 elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK221" in flatten_cppdefines:
     #(previous default)
     env.Append(
         CPPDEFINES=[("NONOSDK221", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221")]
     )
-else: #(default) elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22y" in flatten_cppdefines:
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190313" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("NONOSDK22y", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22y")]
+        CPPDEFINES=[("NONOSDK22x_190313", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190313")]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191024" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x_191024", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191024")]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191105" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x_191105", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191105")]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191122" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x_191122", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191122")]
+    )
+else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x_190703", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190703")]
     )
 
 #
