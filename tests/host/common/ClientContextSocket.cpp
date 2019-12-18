@@ -98,7 +98,6 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 		if (errno != EAGAIN)
 		{
 			fprintf(stderr, MOCK "ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n", sock, maxread, strerror(errno));
-assert(0);
             // error
 			return -1;
 		}

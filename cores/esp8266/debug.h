@@ -32,7 +32,7 @@ extern void iamslow (const char* what);
         static bool once = false; \
         if (!once) { \
             once = true; \
-            if (__GXX_RTTI) DEBUGV(typeid(*this).name()); \
+            /*if (__GXX_RTTI) DEBUGV(typeid(*this).name());*/ \
             iamslow((PGM_P)FPSTR(__FUNCTION__)); \
         } \
     } while (0)
