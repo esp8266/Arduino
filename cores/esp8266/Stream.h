@@ -110,16 +110,17 @@ class Stream: public Print {
         String readStringUntil(char terminator);
 
         // ::read(buf, len): conflicting returned type:
-        // - `int` in arduino's `Client::`
-        // - `size_t` in esp8266 API (serial, FS)
+        // - `int` in arduino's Client::
+        // - `size_t` in esp8266 API (HardwareSerial::, FS::)
+        // - not existent in arduino's Stream::
         // changing every read()/write() `size_t` return type to `int` will be a breaking change
-        // => adding int ::readNow(buf, len) for now (following official Client::read(buf, len))
+        // => adding int ::readNow(buf, len) for now (following official `int Client::read(buf, len))`
         //
-        // ::readNow(buf, len)
+        // int ::readNow(buf, len)
         // read at most len bytes, returns effectively transfered bytes (can be less than len)
         // immediate return when no more data are available (no timeout)
         virtual int readNow(char* buffer, size_t len);
-        int readNow(uint8_t* buffer, size_t len) { return readNow((char*)buffer, len); }
+        virtual int readNow(uint8_t* buffer, size_t len) final { return readNow((char*)buffer, len); }
 
         //////////////////// extensions: direct access to input buffer
 
