@@ -27,7 +27,7 @@ size_t Stream::to (Print* to,
     size_t written = 0;
     size_t maxLen = std::max((decltype(len))0, len);
 
-#define D 1
+#define D 0
 #if D
     Serial.printf("#### %dms: pb=%d ruc=%d ml=%d to=%d otp=%d itp=%d avr=%d avp=%d avw=%d\n",
         (int)millis(),
@@ -57,7 +57,7 @@ size_t Stream::to (Print* to,
             if (w == 0 && !outputTimeoutPossible())
                 // no more data can be written, ever
                 break;
-            
+
             w = std::min(w, avpk);
             if (maxLen)
                 w = std::min(w, maxLen - written);
@@ -105,7 +105,7 @@ size_t Stream::to (Print* to,
             if (w == 0 && !outputTimeoutPossible())
                 // no more data can be written, ever
                 break;
-            
+
             int c = read();
             if (c != -1)
             {
@@ -123,7 +123,7 @@ size_t Stream::to (Print* to,
         }
 
     else
-    
+
         // regular Stream API
         // use an intermediary buffer
 

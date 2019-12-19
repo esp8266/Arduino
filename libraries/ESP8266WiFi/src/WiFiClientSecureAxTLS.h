@@ -85,6 +85,7 @@ public:
 
   // disallow buffered peek API
   virtual bool peekBufferAPI () const override { return false; }
+  virtual int readNow (char* buffer, size_t len) override { return WiFiClientSecure::read((uint8_t*)buffer, len); }
 
 friend class WiFiServerSecure; // Needs access to custom constructor below
 protected:

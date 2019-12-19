@@ -131,10 +131,12 @@ class Stream: public Print {
         virtual size_t availableForPeek () { return 0; }
 
         // return a pointer to available data buffer (size = availableForPeek())
-        // semantic forbids any kind of read() after calling peekBuffer() and before calling peekConsume()
+        // semantic forbids any kind of read()
+        //     after calling peekBuffer()
+        //     and before calling peekConsume()
         virtual const char* peekBuffer () { return nullptr; }
 
-        // consume bytes after peekBuffer use
+        // consume bytes after peekBuffer() use
         virtual void peekConsume (size_t consume) { (void)consume; }
 
         // by default timeout is enabled (incoming network,serial.. data)
@@ -148,10 +150,10 @@ class Stream: public Print {
         // - maxLen<0 will transfer until input starvation or saturated output
         // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
-        size_t to (Print* to,
-                   ssize_t len = -1,
-                   esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
-                   int readUntilChar = -1);
+        virtual size_t to (Print* to,
+                           ssize_t len = -1,
+                           esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
+                           int readUntilChar = -1) final;
 
         //////////////////// end of extensions
 
