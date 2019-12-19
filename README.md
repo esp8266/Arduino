@@ -124,7 +124,11 @@ ESP8266 core files are licensed under LGPL.
 
 [LittleFS](https://github.com/ARMmbed/littlefs) library written by ARM Limited and released under the [BSD 3-clause license](https://github.com/ARMmbed/littlefs/blob/master/LICENSE.md).
 
-[uzlib](https://github.com/pfalcon/uzlib) library written and (c) 2014-2018 Paul Sokolovsky, licensed under the ZLib license (https://www.zlib.net/zlib_license.html).
+[uzlib](https://github.com/pfalcon/uzlib) library written and (c) 2014-2018 Paul Sokolovsky, licensed under the ZLib license (https://www.zlib.net/zlib_license.html).  uzlib is based on:
+* tinf library by Joergen Ibsen (Deflate decompression)
+* Deflate Static Huffman tree routines by Simon Tatham
+* LZ77 compressor by Paul Sokolovsky
+* Library integrated and maintained by Paul Sokolovsky.
 
 ### Other useful links ###
 
