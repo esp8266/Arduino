@@ -132,9 +132,19 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
-    // disallow buffered peek API (for now)
-    virtual bool peekBufferAPI () const override { return false; }
+    // peek buffer API is present
+    virtual bool peekBufferAPI () const override { return true; }
     virtual int readNow (char* buffer, size_t len) override { return WiFiClientSecure::read((uint8_t*)buffer, len); }
+
+    // return number of byte accessible by peekBuffer()
+    virtual size_t availableForPeek () override { return WiFiClientSecure::available(); }
+
+    // return a pointer to available data buffer (size = availableForPeek())
+    // semantic forbids any kind of read() before calling peekConsume()
+    virtual const char* peekBuffer () override;
+
+    // consume bytes after use (see peekBuffer)
+    virtual void peekConsume (size_t consume) override;
 
     ////////////////////////////////////////////////////
     // AxTLS API deprecated warnings to help upgrading

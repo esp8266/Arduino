@@ -368,6 +368,19 @@ int WiFiClientSecure::read(uint8_t *buf, size_t size) {
   return 0; // If we're connected, no error but no read.
 }
 
+// return a pointer to available data buffer (size = availableForPeek())
+// semantic forbids any kind of read() before calling peekConsume()
+const char* WiFiClientSecure::peekBuffer ()
+{
+    return (const char*)_recvapp_buf;
+}
+
+// consume bytes after use (see peekBuffer)
+void WiFiClientSecure::peekConsume (size_t consume)
+{
+    br_ssl_engine_recvapp_ack(_eng, consume);
+}
+
 int WiFiClientSecure::read() {
   uint8_t c;
   if (1 == read(&c, 1)) {
