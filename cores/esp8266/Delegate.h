@@ -445,6 +445,12 @@ namespace detail
             DelegatePImpl::fn = fn;
         }
 
+        template<typename F> DelegatePImpl(const F& fn)
+        {
+            kind = FP;
+            DelegatePImpl::fn = fn;
+        }
+
         DelegatePImpl& operator=(const DelegatePImpl& del)
         {
             if (this == &del) return *this;
@@ -492,6 +498,17 @@ namespace detail
         }
 
         DelegatePImpl& operator=(FunPtr fn)
+        {
+            if (FPA == kind)
+            {
+                obj = {};
+            }
+            kind = FP;
+            this->fn = fn;
+            return *this;
+        }
+
+        template<typename F> DelegatePImpl& operator=(const F& fn)
         {
             if (FPA == kind)
             {
@@ -694,6 +711,17 @@ namespace detail
             return *this;
         }
 
+        DelegatePImpl& operator=(FunPtr fn)
+        {
+            if (FUNC == kind)
+            {
+                functional.~FunctionType();
+                kind = FP;
+            }
+            DelegatePImpl::fn = fn;
+            return *this;
+        }
+
         template<typename F> DelegatePImpl& operator=(const F& functional)
         {
             if (FUNC != kind)
@@ -713,17 +741,6 @@ namespace detail
                 kind = FUNC;
             }
             this->functional = std::move(functional);
-            return *this;
-        }
-
-        DelegatePImpl& operator=(FunPtr fn)
-        {
-            if (FUNC == kind)
-            {
-                functional.~FunctionType();
-                kind = FP;
-            }
-            DelegatePImpl::fn = fn;
             return *this;
         }
 
@@ -842,6 +859,11 @@ namespace detail
             DelegatePImpl::fn = fn;
         }
 
+        template<typename F> DelegatePImpl(const F& fn)
+        {
+            DelegatePImpl::fn = fn;
+        }
+
         DelegatePImpl& operator=(const DelegatePImpl& del)
         {
             if (this == &del) return *this;
@@ -857,6 +879,12 @@ namespace detail
         }
 
         DelegatePImpl& operator=(FunPtr fn)
+        {
+            DelegatePImpl::fn = fn;
+            return *this;
+        }
+
+        template<typename F> DelegatePImpl& operator=(const F& fn)
         {
             DelegatePImpl::fn = fn;
             return *this;
@@ -1292,6 +1320,12 @@ namespace detail
             DelegateImpl::fn = fn;
         }
 
+        template<typename F> DelegateImpl(const F& fn)
+        {
+            kind = FP;
+            DelegateImpl::fn = fn;
+        }
+
         DelegateImpl& operator=(const DelegateImpl& del)
         {
             if (this == &del) return *this;
@@ -1339,6 +1373,17 @@ namespace detail
         }
 
         DelegateImpl& operator=(FunPtr fn)
+        {
+            if (FPA == kind)
+            {
+                obj = {};
+            }
+            kind = FP;
+            this->fn = fn;
+            return *this;
+        }
+
+        template<typename F> DelegateImpl& operator=(const F& fn)
         {
             if (FPA == kind)
             {
@@ -1540,6 +1585,17 @@ namespace detail
             return *this;
         }
 
+        DelegateImpl& operator=(FunPtr fn)
+        {
+            if (FUNC == kind)
+            {
+                functional.~FunctionType();
+                kind = FP;
+            }
+            DelegateImpl::fn = fn;
+            return *this;
+        }
+
         template<typename F> DelegateImpl& operator=(const F& functional)
         {
             if (FUNC != kind)
@@ -1559,17 +1615,6 @@ namespace detail
                 kind = FUNC;
             }
             this->functional = std::move(functional);
-            return *this;
-        }
-
-        DelegateImpl& operator=(FunPtr fn)
-        {
-            if (FUNC == kind)
-            {
-                functional.~FunctionType();
-                kind = FP;
-            }
-            DelegateImpl::fn = fn;
             return *this;
         }
 
@@ -1688,6 +1733,11 @@ namespace detail
             DelegateImpl::fn = fn;
         }
 
+        template<typename F> DelegateImpl(const F& fn)
+        {
+            DelegateImpl::fn = fn;
+        }
+
         DelegateImpl& operator=(const DelegateImpl& del)
         {
             if (this == &del) return *this;
@@ -1703,6 +1753,12 @@ namespace detail
         }
 
         DelegateImpl& operator=(FunPtr fn)
+        {
+            DelegateImpl::fn = fn;
+            return *this;
+        }
+
+        template<typename F> DelegateImpl& operator=(const F& fn)
         {
             DelegateImpl::fn = fn;
             return *this;
