@@ -154,6 +154,12 @@ SECTIONS
     *(.gnu.linkonce.b.*)
     . = ALIGN (8);
     _bss_end = ABSOLUTE(.);
+    /* CRC stored in last 8 bytes */
+    ASSERT((. < 4096 - 8), "Error: No space for CRC in bootloader sector.");
+    . = _stext + 4096 - 8;
+    _crc_size = .;
+    . = . + 4;
+    _crc_val = .;
   } >iram1_0_seg :iram1_0_phdr
 
   .lit4 : ALIGN(4)
