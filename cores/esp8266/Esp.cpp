@@ -458,11 +458,11 @@ bool EspClass::checkFlashCRC() {
     z[0] = z[1] = 0;
 
     // Start the checksum
-    uint32_t crc = crc32_P((const void*)0x40200000, 4096-8, 0xffffffff);
+    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
     // Pretend the 2 words of crc/len are zero to be idempotent
-    crc = crc32_P(z, 8, crc);
+    crc = crc32(z, 8, crc);
     // Finish the CRC calculation over the rest of flash
-    crc = crc32_P((const void*)0x40201000, flashsize-4096, crc);
+    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
     return crc == flashcrc;
 }
 
