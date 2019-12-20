@@ -28,26 +28,6 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc /*= 0xffffffff*/)
     const uint8_t* ldata = (const uint8_t*)data;
     while (length--)
     {
-        uint8_t c = *ldata++;
-        for (uint32_t i = 0x80; i > 0; i >>= 1)
-        {
-            bool bit = crc & 0x80000000;
-            if (c & i)
-                bit = !bit;
-            crc <<= 1;
-            if (bit)
-                crc ^= 0x04c11db7;
-        }
-    }
-    return crc;
-}
-
-
-uint32_t crc32_P (const void* data, size_t length, uint32_t crc /*= 0xffffffff*/)
-{
-    const uint8_t* ldata = (const uint8_t*)data;
-    while (length--)
-    {
         uint8_t c = pgm_read_byte(ldata++);
         for (uint32_t i = 0x80; i > 0; i >>= 1)
         {
