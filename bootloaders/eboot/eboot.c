@@ -27,14 +27,14 @@ int print_version(const uint32_t flash_addr)
     if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
         return 1;
     }
-    char fmt[16];
+    char fmt[7];
     fmt[0] = 'v';
     fmt[1] = '%';
     fmt[2] = '0';
     fmt[3] = '8';
     fmt[4] = 'x';
     fmt[5] = '\n';
-    fmt[6] = '0';
+    fmt[6] = 0;
     ets_printf((const char*) fmt, ver);
     return 0;
 }
