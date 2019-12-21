@@ -22,3 +22,6 @@
 [submodule "libraries/Ethernet"]
 	path = libraries/Ethernet
 	url = https://github.com/arduino-libraries/Ethernet.git
+[submodule "tools/sdk/uzlib"]
+	path = tools/sdk/uzlib
+	url = https://github.com/earlephilhower/uzlib.git
