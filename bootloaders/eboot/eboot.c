@@ -14,8 +14,6 @@
 #include "eboot_command.h"
 #include <uzlib.h>
 
-extern unsigned char _gzip_dict;
-
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
 extern void ets_wdt_enable(void);

@@ -18,6 +18,7 @@ CXX := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-g++
 AR := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-ar
 LD := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
 OBJDUMP := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-objdump
+SIZE := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-size
 
 INC += -I../../tools/sdk/include -I../../tools/sdk/uzlib/src
 
@@ -51,6 +52,7 @@ $(APP_AR): $(TARGET_OBJ_PATHS) tinflate.o tinfgzip.o
 
 $(APP_OUT): $(APP_AR)
 	$(LD) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group -Wl,--whole-archive $(APP_AR) -Wl,--end-group -o $@
+	$(SIZE) -d $@
 
 clean:
 	rm -f *.o
