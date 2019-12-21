@@ -5,10 +5,14 @@
    That way you will get instant confirmation of the mesh communication without checking the Serial Monitor.
 */
 
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+
 #include <ESP8266WiFi.h>
 #include <TypeConversionFunctions.h>
 #include <assert.h>
 #include <FloodingMesh.h>
+
+namespace TypeCast = MeshTypeConversionFunctions;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -21,8 +25,8 @@
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
-const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
+constexpr char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
@@ -37,10 +41,10 @@ uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // 
 bool meshMessageHandler(String &message, FloodingMesh &meshInstance);
 
 /* Create the mesh node object */
-FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
 
 bool theOne = true;
-String theOneMac = "";
+String theOneMac;
 
 bool useLED = false; // Change this to true if you wish the onboard LED to mark The One.
 
@@ -58,7 +62,7 @@ bool useLED = false; // Change this to true if you wish the onboard LED to mark 
 bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
   int32_t delimiterIndex = message.indexOf(meshInstance.metadataDelimiter());
   if (delimiterIndex == 0) {
-    Serial.print("Message received from STA MAC " + meshInstance.getEspnowMeshBackend().getSenderMac() + ": ");
+    Serial.print(String(F("Message received from STA MAC ")) + meshInstance.getEspnowMeshBackend().getSenderMac() + F(": "));
     Serial.println(message.substring(2, 102));
 
     String potentialMac = message.substring(2, 14);
@@ -95,17 +99,17 @@ bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
         previousTotalBroadcasts = totalBroadcasts;
 
         if (totalReceivedBroadcasts % 50 == 0) {
-          Serial.println("missed/total: " + String(missedBroadcasts) + '/' + String(totalReceivedBroadcasts));
+          Serial.println(String(F("missed/total: ")) + String(missedBroadcasts) + '/' + String(totalReceivedBroadcasts));
         }
         if (totalReceivedBroadcasts % 500 == 0) {
-          Serial.println("Benchmark message: " + message.substring(0, 100));
+          Serial.println(String(F("Benchmark message: ")) + message.substring(0, 100));
         }
       }
     }
   } else {
     // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
     // If you need to print the whole String it is better to store it and print it in the loop() later.
-    Serial.print("Message with origin " + meshInstance.getOriginMac() + " received: ");
+    Serial.print(String(F("Message with origin ")) + meshInstance.getOriginMac() + F(" received: "));
     Serial.println(message.substring(0, 100));
   }
 
@@ -139,7 +143,7 @@ void setup() {
   floodingMesh.activateAP();
 
   uint8_t apMacArray[6] {0};
-  theOneMac = macToString(WiFi.softAPmacAddress(apMacArray));
+  theOneMac = TypeCast::macToString(WiFi.softAPmacAddress(apMacArray));
 
   if (useLED) {
     pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
@@ -150,7 +154,7 @@ void setup() {
   // The main benefit of AEAD encryption is that it can be used with normal broadcasts (which are substantially faster than encryptedBroadcasts).
   // The main drawbacks are that AEAD only encrypts the message data (not transmission metadata), transfers less data per message and lacks replay attack protection.
   // When using AEAD, potential replay attacks must thus be handled manually.
-  //floodingMesh.getEspnowMeshBackend().setEspnowMessageEncryptionKey("ChangeThisKeySeed_TODO"); // The message encryption key should always be set manually. Otherwise a default key (all zeroes) is used.
+  //floodingMesh.getEspnowMeshBackend().setEspnowMessageEncryptionKey(F("ChangeThisKeySeed_TODO")); // The message encryption key should always be set manually. Otherwise a default key (all zeroes) is used.
   //floodingMesh.getEspnowMeshBackend().setUseEncryptedMessages(true);
 
   floodingMeshDelay(5000); // Give some time for user to start the nodes
@@ -180,8 +184,8 @@ void loop() {
       ledState = ledState ^ bool(benchmarkCount); // Make other nodes' LEDs alternate between on and off once benchmarking begins.
 
       // Note: The maximum length of an unencrypted broadcast message is given by floodingMesh.maxUnencryptedMessageLength(). It is around 670 bytes by default.
-      floodingMesh.broadcast(String(floodingMesh.metadataDelimiter()) + String(ledState) + theOneMac + " is The One.");
-      Serial.println("Proclamation broadcast done in " + String(millis() - startTime) + " ms.");
+      floodingMesh.broadcast(String(floodingMesh.metadataDelimiter()) + String(ledState) + theOneMac + F(" is The One."));
+      Serial.println(String(F("Proclamation broadcast done in ")) + String(millis() - startTime) + F(" ms."));
 
       timeOfLastProclamation = millis();
       floodingMeshDelay(20);
@@ -189,8 +193,8 @@ void loop() {
 
     if (millis() - loopStart > 23000) { // Start benchmarking the mesh once three proclamations have been made
       uint32_t startTime = millis();
-      floodingMesh.broadcast(String(benchmarkCount++) + String(floodingMesh.metadataDelimiter()) + ": Not a spoon in sight.");
-      Serial.println("Benchmark broadcast done in " + String(millis() - startTime) + " ms.");
+      floodingMesh.broadcast(String(benchmarkCount++) + String(floodingMesh.metadataDelimiter()) + F(": Not a spoon in sight."));
+      Serial.println(String(F("Benchmark broadcast done in ")) + String(millis() - startTime) + F(" ms."));
       floodingMeshDelay(20);
     }
   }

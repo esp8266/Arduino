@@ -29,6 +29,7 @@
 #include "MeshCryptoInterface.h"
 
 using EspnowProtocolInterpreter::espnowHashKeyLength;
+namespace TypeCast = MeshTypeConversionFunctions;
 
 EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
   : _peerSessionKey(peerSessionKey), _ownSessionKey(ownSessionKey)
@@ -97,7 +98,7 @@ void EncryptedConnectionData::setPeerApMac(const uint8_t *peerApMac)
 
 bool EncryptedConnectionData::connectedTo(const uint8_t *peerMac) const
 {
-  if(macEqual(peerMac, _peerStaMac) || macEqual(peerMac, _peerApMac))
+  if(MeshUtilityFunctions::macEqual(peerMac, _peerStaMac) || MeshUtilityFunctions::macEqual(peerMac, _peerApMac))
   {
     return true;
   }
@@ -130,12 +131,12 @@ uint64_t EncryptedConnectionData::incrementSessionKey(uint64_t sessionKey, const
 {
   uint8_t inputArray[8] {0};
   uint8_t hmacArray[CryptoInterface::SHA256_NATURAL_LENGTH] {0};
-  CryptoInterface::sha256Hmac(uint64ToUint8Array(sessionKey, inputArray), 8, hashKey, hashKeyLength, hmacArray, CryptoInterface::SHA256_NATURAL_LENGTH);
+  CryptoInterface::sha256Hmac(TypeCast::uint64ToUint8Array(sessionKey, inputArray), 8, hashKey, hashKeyLength, hmacArray, CryptoInterface::SHA256_NATURAL_LENGTH);
 
   /* HMAC truncation should be OK since hmac sha256 is a PRF and we are truncating to the leftmost (MSB) bits.
   PRF: https://crypto.stackexchange.com/questions/26410/whats-the-gcm-sha-256-of-a-tls-protocol/26434#26434
   Truncate to leftmost bits: https://tools.ietf.org/html/rfc2104#section-5 */
-  uint64_t newLeftmostBits = uint8ArrayToUint64(hmacArray) & EspnowProtocolInterpreter::uint64LeftmostBits;
+  uint64_t newLeftmostBits = TypeCast::uint8ArrayToUint64(hmacArray) & EspnowProtocolInterpreter::uint64LeftmostBits;
   
   if(newLeftmostBits == 0)
     newLeftmostBits = ((uint64_t)RANDOM_REG32 | (1 << 31)) << 32; // We never want newLeftmostBits == 0 since that would indicate an unencrypted transmission.
@@ -158,13 +159,13 @@ String EncryptedConnectionData::serialize() const
   // Returns: {"connectionState":{"duration":"123","password":"abc","ownSK":"1A2","peerSK":"3B4","peerStaMac":"F2","peerApMac":"E3"}}
   
   return 
-  JsonTranslator::jsonConnectionState
-  + (temporary() ? JsonTranslator::jsonDuration + "\"" + String(temporary()->remainingDuration()) + "\"," : "")
-  + JsonTranslator::jsonDesync + "\"" + String(desync()) + "\"," 
-  + JsonTranslator::jsonOwnSessionKey + "\"" + uint64ToString(getOwnSessionKey()) + "\"," 
-  + JsonTranslator::jsonPeerSessionKey + "\"" + uint64ToString(getPeerSessionKey()) + "\"," 
-  + JsonTranslator::jsonPeerStaMac + "\"" + macToString(_peerStaMac) + "\"," 
-  + JsonTranslator::jsonPeerApMac + "\"" + macToString(_peerApMac) +  "\"}}";
+  String(FPSTR(JsonTranslator::jsonConnectionState))
+  + (temporary() ? String(FPSTR(JsonTranslator::jsonDuration)) + '\"' + String(temporary()->remainingDuration()) + F("\",") : emptyString)
+  + FPSTR(JsonTranslator::jsonDesync) + '\"' + String(desync()) + F("\",") 
+  + FPSTR(JsonTranslator::jsonOwnSessionKey) + '\"' + TypeCast::uint64ToString(getOwnSessionKey()) + F("\",") 
+  + FPSTR(JsonTranslator::jsonPeerSessionKey) + '\"' + TypeCast::uint64ToString(getPeerSessionKey()) + F("\",") 
+  + FPSTR(JsonTranslator::jsonPeerStaMac) + '\"' + TypeCast::macToString(_peerStaMac) + F("\",") 
+  + FPSTR(JsonTranslator::jsonPeerApMac) + '\"' + TypeCast::macToString(_peerApMac) +  F("\"}}");
 }
 
 const ExpiringTimeTracker *EncryptedConnectionData::temporary() const

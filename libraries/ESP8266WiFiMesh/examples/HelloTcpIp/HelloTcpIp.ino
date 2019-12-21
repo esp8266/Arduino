@@ -1,7 +1,11 @@
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+
 #include <ESP8266WiFi.h>
 #include <TcpIpMeshBackend.h>
 #include <TypeConversionFunctions.h>
 #include <assert.h>
+
+namespace TypeCast = MeshTypeConversionFunctions;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -14,8 +18,8 @@
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-const char exampleMeshName[] PROGMEM = "MeshNode_";
-const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";
+constexpr char exampleMeshName[] PROGMEM = "MeshNode_";
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";
 
 unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
@@ -25,7 +29,7 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
 void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
 
 /* Create the mesh node object */
-TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, networkFilter, FPSTR(exampleWiFiPassword), FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, networkFilter, FPSTR(exampleWiFiPassword), FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
 
 /**
    Callback for when other nodes send you a request
@@ -35,31 +39,26 @@ TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, net
    @return The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
 */
 String manageRequest(const String &request, MeshBackendBase &meshInstance) {
-  // We do not store strings in flash (via F()) in this function.
-  // The reason is that the other node will be waiting for our response,
-  // so keeping the strings in RAM will give a (small) improvement in response time.
-  // Of course, it is advised to adjust this approach based on RAM requirements.
-
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
-    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
-  } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
+    Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
+  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
-    Serial.print("TCP/IP: ");
+    Serial.print(F("TCP/IP: "));
   } else {
-    Serial.print("UNKNOWN!: ");
+    Serial.print(F("UNKNOWN!: "));
   }
 
   /* Print out received message */
   // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
   // If you need to print the whole String it is better to store it and print it in the loop() later.
   // Note that request.substring will not work as expected if the String contains null values as data.
-  Serial.print("Request received: ");
+  Serial.print(F("Request received: "));
   Serial.println(request.substring(0, 100));
 
   /* return a string to send back */
-  return ("Hello world response #" + String(responseNumber++) + " from " + meshInstance.getMeshName() + meshInstance.getNodeID() + " with AP MAC " + WiFi.softAPmacAddress() + ".");
+  return (String(F("Hello world response #")) + String(responseNumber++) + F(" from ") + meshInstance.getMeshName() + meshInstance.getNodeID() + F(" with AP MAC ") + WiFi.softAPmacAddress() + String('.'));
 }
 
 /**
@@ -73,11 +72,11 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
   transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
-    Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
-  } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
-    Serial.print("TCP/IP: ");
+  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+    String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
+    Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
+  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+    Serial.print(F("TCP/IP: "));
 
     // Getting the sent message like this will work as long as ONLY(!) TCP/IP is used.
     // With TCP/IP the response will follow immediately after the request, so the stored message will not have changed.
@@ -86,7 +85,7 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
     Serial.print(F("Request sent: "));
     Serial.println(tcpIpInstance->getCurrentMessage().substring(0, 100));
   } else {
-    Serial.print("UNKNOWN!: ");
+    Serial.print(F("UNKNOWN!: "));
   }
 
   /* Print out received message */
@@ -113,15 +112,15 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
 
     /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
     if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
+      uint64_t targetNodeID = TypeCast::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
-      if (targetNodeID < stringToUint64(meshInstance.getNodeID())) {
-        if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+      if (targetNodeID < TypeCast::stringToUint64(meshInstance.getNodeID())) {
+        if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
           espnowInstance->connectionQueue().push_back(networkIndex);
-        } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+        } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
           tcpIpInstance->connectionQueue().push_back(networkIndex);
         } else {
-          Serial.println(String(F("Invalid mesh backend!")));
+          Serial.println(F("Invalid mesh backend!"));
         }
       }
     }
@@ -142,14 +141,14 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
 bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
   // The default hook only returns true and does nothing else.
 
-  if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+  if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     if (tcpIpInstance->latestTransmissionOutcomes().back().transmissionStatus() == TS_TRANSMISSION_COMPLETE) {
       // Our last request got a response, so time to create a new request.
-      meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + String(F(" from "))
-                              + meshInstance.getMeshName() + meshInstance.getNodeID() + String(F(".")));
+      meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + F(" from ")
+                              + meshInstance.getMeshName() + meshInstance.getNodeID() + String('.'));
     }
   } else {
-    Serial.println(String(F("Invalid mesh backend!")));
+    Serial.println(F("Invalid mesh backend!"));
   }
 
   return true;
@@ -186,7 +185,7 @@ void setup() {
 
   // Storing our message in the TcpIpMeshBackend instance is not required, but can be useful for organizing code, especially when using many TcpIpMeshBackend instances.
   // Note that calling the multi-recipient tcpIpNode.attemptTransmission will replace the stored message with whatever message is transmitted.
-  tcpIpNode.setMessage(String(F("Hello world request #")) + String(requestNumber) + String(F(" from ")) + tcpIpNode.getMeshName() + tcpIpNode.getNodeID() + String(F(".")));
+  tcpIpNode.setMessage(String(F("Hello world request #")) + String(requestNumber) + F(" from ") + tcpIpNode.getMeshName() + tcpIpNode.getNodeID() + String('.'));
 
   tcpIpNode.setTransmissionOutcomesUpdateHook(exampleTransmissionOutcomesUpdateHook);
 }
@@ -217,7 +216,7 @@ void loop() {
         } else if (transmissionOutcome.transmissionStatus() == TS_TRANSMISSION_COMPLETE) {
           // No need to do anything, transmission was successful.
         } else {
-          Serial.println(String(F("Invalid transmission status for ")) + transmissionOutcome.SSID() + String(F("!")));
+          Serial.println(String(F("Invalid transmission status for ")) + transmissionOutcome.SSID() + String('!'));
           assert(F("Invalid transmission status returned from responseHandler!") && false);
         }
       }

@@ -22,6 +22,8 @@
 
 #include <assert.h>
 
+namespace TypeCast = MeshTypeConversionFunctions;
+
 MeshBackendBase *MeshBackendBase::apController = nullptr;
 
 bool MeshBackendBase::_scanMutex = false;
@@ -38,7 +40,7 @@ MeshBackendBase::MeshBackendBase(requestHandlerType requestHandler, responseHand
 
 MeshBackendBase::~MeshBackendBase()
 {
-  deactivateAP();
+  deactivateControlledAP();
 }
 
 void MeshBackendBase::setClassType(mesh_backend_t classType)
@@ -51,8 +53,7 @@ mesh_backend_t MeshBackendBase::getClassType() {return _classType;}
 void MeshBackendBase::activateAP()
 {
   // Deactivate active AP to avoid two servers using the same port, which can lead to crashes.
-  if(MeshBackendBase *currentAPController = MeshBackendBase::getAPController())
-    currentAPController->deactivateAP();
+  deactivateAP();
 
   activateAPHook();
   
@@ -68,6 +69,12 @@ void MeshBackendBase::activateAPHook()
 
 void MeshBackendBase::deactivateAP()
 {
+  if(MeshBackendBase *currentAPController = MeshBackendBase::getAPController())
+    currentAPController->deactivateControlledAP();
+}
+
+bool MeshBackendBase::deactivateControlledAP()
+{
   if(isAPController())
   {
     deactivateAPHook();
@@ -77,7 +84,11 @@ void MeshBackendBase::deactivateAP()
 
     // Since there is no active AP controller now, make the apController variable point to nothing. 
     apController = nullptr;
+
+    return true;
   }
+
+  return false;
 }
 
 void MeshBackendBase::deactivateAPHook()
@@ -126,11 +137,11 @@ uint8 MeshBackendBase::getWiFiChannel() const
 
 void MeshBackendBase::setSSID(const String &newSSIDPrefix, const String &newSSIDRoot, const String &newSSIDSuffix)
 {
-  if(newSSIDPrefix != "")
+  if(!newSSIDPrefix.isEmpty())
     _SSIDPrefix = newSSIDPrefix;
-  if(newSSIDRoot != "")
+  if(!newSSIDRoot.isEmpty())
     _SSIDRoot = newSSIDRoot;
-  if(newSSIDSuffix != "")
+  if(!newSSIDSuffix.isEmpty())
     _SSIDSuffix = newSSIDSuffix;
 
   String newSSID = _SSIDPrefix + _SSIDRoot + _SSIDSuffix;
@@ -158,14 +169,14 @@ String MeshBackendBase::getSSIDPrefix() const {return _SSIDPrefix;}
 
 void MeshBackendBase::setSSIDRoot(const String &newSSIDRoot)
 {
-  setSSID("", newSSIDRoot);
+  setSSID(emptyString, newSSIDRoot);
 }
 
 String MeshBackendBase::getSSIDRoot() const {return _SSIDRoot;}
 
 void MeshBackendBase::setSSIDSuffix(const String &newSSIDSuffix)
 {
-  setSSID("", "", newSSIDSuffix);
+  setSSID(emptyString, emptyString, newSSIDSuffix);
 }
 
 String MeshBackendBase::getSSIDSuffix() const {return _SSIDSuffix;}
@@ -250,7 +261,7 @@ void MeshBackendBase::scanForNetworks(bool scanAllWiFiChannels)
   MutexTracker mutexTracker(_scanMutex);
   if(!mutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! Scan already in progress. Don't call scanForNetworks from callbacks as this may corrupt program state! Aborting."); 
+    assert(false && String(F("ERROR! Scan already in progress. Don't call scanForNetworks from callbacks as this may corrupt program state! Aborting."))); 
     return;
   }
   
@@ -279,7 +290,7 @@ void MeshBackendBase::printAPInfo(const NetworkInfoBase &apNetworkInfo)
   String mainNetworkIdentifier = apNetworkInfo.SSID();
   if(mainNetworkIdentifier == NetworkInfoBase::defaultSSID) // If SSID not provided, use BSSID instead
   {
-    mainNetworkIdentifier = macToString(apNetworkInfo.BSSID());
+    mainNetworkIdentifier = TypeCast::macToString(apNetworkInfo.BSSID());
   }
   
   verboseModePrint(String(F("AP acquired: ")) + mainNetworkIdentifier + String(F(", Ch:")) + String(apNetworkInfo.wifiChannel()) + ' ', false);
@@ -287,7 +298,7 @@ void MeshBackendBase::printAPInfo(const NetworkInfoBase &apNetworkInfo)
   if(apNetworkInfo.RSSI() != NetworkInfoBase::defaultRSSI)
   {
     verboseModePrint(String('(') + String(apNetworkInfo.RSSI()) + String(F("dBm) ")) + 
-                     (apNetworkInfo.encryptionType() == ENC_TYPE_NONE ? String(F("open")) : ""), false);
+                     (apNetworkInfo.encryptionType() == ENC_TYPE_NONE ? String(F("open")) : emptyString), false);
   }
 
   verboseModePrint(F("... "), false);

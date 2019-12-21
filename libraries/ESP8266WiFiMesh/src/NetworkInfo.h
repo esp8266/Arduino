@@ -60,7 +60,7 @@ private:
 
 public:
 
-  String SSID = "";
+  String SSID;
   int wifiChannel = NETWORK_INFO_DEFAULT_INT;
   uint8_t *BSSID = NULL;
   int networkIndex = NETWORK_INFO_DEFAULT_INT;

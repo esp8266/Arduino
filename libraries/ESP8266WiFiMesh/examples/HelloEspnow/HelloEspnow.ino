@@ -1,7 +1,11 @@
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+
 #include <ESP8266WiFi.h>
 #include <EspnowMeshBackend.h>
 #include <TypeConversionFunctions.h>
 #include <assert.h>
+
+namespace TypeCast = MeshTypeConversionFunctions;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -14,8 +18,8 @@
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-const char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
-const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
+constexpr char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
@@ -41,7 +45,7 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
 bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
 
 /* Create the mesh node object */
-EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, broadcastFilter, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), uint64ToString(ESP.getChipId()), true);
+EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, broadcastFilter, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
 
 /**
    Callback for when other nodes send you a request
@@ -57,10 +61,10 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // Of course, it is advised to adjust this approach based on RAM requirements.
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
     Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
-  } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
     Serial.print("TCP/IP: ");
   } else {
@@ -72,7 +76,12 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // If you need to print the whole String it is better to store it and print it in the loop() later.
   // Note that request.substring will not work as expected if the String contains null values as data.
   Serial.print("Request received: ");
-  Serial.println(request.substring(0, 100));
+
+  if (request.charAt(0) == 0) {
+    Serial.println(request);  // substring will not work for multiStrings.
+  } else {
+    Serial.println(request.substring(0, 100));
+  }
 
   /* return a string to send back */
   return ("Hello world response #" + String(responseNumber++) + " from " + meshInstance.getMeshName() + meshInstance.getNodeID() + " with AP MAC " + WiFi.softAPmacAddress() + ".");
@@ -89,10 +98,10 @@ transmission_status_t manageResponse(const String &response, MeshBackendBase &me
   transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? ", Encrypted transmission" : ", Unencrypted transmission";
     Serial.print("ESP-NOW (" + espnowInstance->getSenderMac() + transmissionEncrypted + "): ");
-  } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     Serial.print("TCP/IP: ");
 
     // Getting the sent message like this will work as long as ONLY(!) TCP/IP is used.
@@ -129,12 +138,12 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
 
     /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
     if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
+      uint64_t targetNodeID = TypeCast::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
-      if (targetNodeID < stringToUint64(meshInstance.getNodeID())) {
-        if (EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+      if (targetNodeID < TypeCast::stringToUint64(meshInstance.getNodeID())) {
+        if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
           espnowInstance->connectionQueue().push_back(networkIndex);
-        } else if (TcpIpMeshBackend *tcpIpInstance = meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+        } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
           tcpIpInstance->connectionQueue().push_back(networkIndex);
         } else {
           Serial.println(String(F("Invalid mesh backend!")));
@@ -345,6 +354,15 @@ void loop() {
 
       espnowDelay(100); // Wait for responses (broadcasts can receive an unlimited number of responses, other transmissions can only receive one response).
 
+      // If you have a data array containing null values it is possible to transmit the raw data by making the array into a multiString as shown below.
+      // You can use String::c_str() or String::begin() to retreive the data array later.
+      // Note that certain String methods such as String::substring use null values to determine String length, which means they will not work as normal with multiStrings.
+      uint8_t dataArray[] = {0, '\'', 0, '\'', ' ', '(', 'n', 'u', 'l', 'l', ')', ' ', 'v', 'a', 'l', 'u', 'e'};
+      String espnowMessage = TypeCast::uint8ArrayToMultiString(dataArray, sizeof dataArray) + String(F(" from ")) + espnowNode.getMeshName() + espnowNode.getNodeID() + String(F("."));
+      Serial.println("\nTransmitting: " + espnowMessage);
+      espnowNode.attemptTransmission(espnowMessage, false);
+      espnowDelay(100); // Wait for response.
+
       Serial.println("\nPerforming encrypted ESP-NOW transmissions.");
 
       uint8_t targetBSSID[6] {0};
@@ -352,7 +370,7 @@ void loop() {
       // We can create encrypted connections to individual nodes so that all ESP-NOW communication with the node will be encrypted.
       if (espnowNode.constConnectionQueue()[0].getBSSID(targetBSSID) && espnowNode.requestEncryptedConnection(targetBSSID) == ECS_CONNECTION_ESTABLISHED) {
         // The WiFi scan will detect the AP MAC, but this will automatically be converted to the encrypted STA MAC by the framework.
-        String peerMac = macToString(targetBSSID);
+        String peerMac = TypeCast::macToString(targetBSSID);
 
         Serial.println("Encrypted ESP-NOW connection with " + peerMac + " established!");
 

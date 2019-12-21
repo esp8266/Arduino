@@ -27,9 +27,12 @@
 #define __UTILITYFUNCTIONS_H__
 
 #include <inttypes.h>
-  
-bool macEqual(const uint8_t *macOne, const uint8_t *macTwo);
 
-uint64_t randomUint64();
+namespace MeshUtilityFunctions
+{
+  bool macEqual(const uint8_t *macOne, const uint8_t *macTwo);
+  
+  uint64_t randomUint64();
+}
 
 #endif

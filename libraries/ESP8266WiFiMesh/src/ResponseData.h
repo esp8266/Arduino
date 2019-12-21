@@ -52,7 +52,7 @@ private:
   
   uint8_t _recipientMacArray[6] {0};
   uint8_t *_recipientMac = nullptr;
-  String _message = "";
+  String _message;
   uint64_t _requestID = 0;
 };
 

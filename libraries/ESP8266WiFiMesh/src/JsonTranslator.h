@@ -29,18 +29,18 @@
 
 namespace JsonTranslator 
 {
-  const String jsonConnectionState = "{\"connectionState\":{";
-  const String jsonPassword = "\"password\":";
-  const String jsonOwnSessionKey = "\"ownSK\":";
-  const String jsonPeerSessionKey = "\"peerSK\":";
-  const String jsonPeerStaMac = "\"peerStaMac\":";
-  const String jsonPeerApMac = "\"peerApMac\":";
-  const String jsonDuration = "\"duration\":";
-  const String jsonNonce = "\"nonce\":";
-  const String jsonHmac = "\"hmac\":";
-  const String jsonDesync = "\"desync\":";
-  const String jsonUnsynchronizedMessageID = "\"unsyncMsgID\":";
-  const String jsonMeshMessageCount = "\"meshMsgCount\":";
+  constexpr char jsonConnectionState[] PROGMEM = "{\"connectionState\":{";
+  constexpr char jsonPassword[] PROGMEM = "\"password\":";
+  constexpr char jsonOwnSessionKey[] PROGMEM = "\"ownSK\":";
+  constexpr char jsonPeerSessionKey[] PROGMEM = "\"peerSK\":";
+  constexpr char jsonPeerStaMac[] PROGMEM = "\"peerStaMac\":";
+  constexpr char jsonPeerApMac[] PROGMEM = "\"peerApMac\":";
+  constexpr char jsonDuration[] PROGMEM = "\"duration\":";
+  constexpr char jsonNonce[] PROGMEM = "\"nonce\":";
+  constexpr char jsonHmac[] PROGMEM = "\"hmac\":";
+  constexpr char jsonDesync[] PROGMEM = "\"desync\":";
+  constexpr char jsonUnsynchronizedMessageID[] PROGMEM = "\"unsyncMsgID\":";
+  constexpr char jsonMeshMessageCount[] PROGMEM = "\"meshMsgCount\":";
   
   String createJsonPair(const String &valueIdentifier, const String &value);
   String createJsonEndPair(const String &valueIdentifier, const String &value);

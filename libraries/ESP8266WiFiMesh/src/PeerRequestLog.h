@@ -57,9 +57,9 @@ private:
 
   uint64_t _requestID;
   bool _requestEncrypted;
-  String _authenticationPassword = "";
+  String _authenticationPassword;
   uint8_t _encryptedConnectionsSoftLimit;
-  String _peerRequestNonce = "";
+  String _peerRequestNonce;
 };
 
 #endif

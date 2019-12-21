@@ -26,6 +26,14 @@
 #include "TypeConversionFunctions.h"
 #include "JsonTranslator.h"
 
+namespace TypeCast = MeshTypeConversionFunctions;
+
+namespace
+{
+  constexpr uint8_t MESSAGE_ID_LENGTH = 17; // 16 characters and one delimiter
+  constexpr uint8_t MESSAGE_COMPLETE = 255;
+}
+
 std::set<FloodingMesh *> FloodingMesh::availableFloodingMeshes = {};
 
 char FloodingMesh::_metadataDelimiter = 23;
@@ -103,6 +111,11 @@ void FloodingMesh::activateAP()
   getEspnowMeshBackend().activateAP();
 }
 
+void FloodingMesh::deactivateAP()
+{
+  MeshBackendBase::deactivateAP();
+}
+
 void FloodingMesh::performMeshMaintenance()
 {
   for(FloodingMesh *meshInstance : availableFloodingMeshes)
@@ -122,7 +135,7 @@ void FloodingMesh::performMeshInstanceMaintenance()
     {
       _macIgnoreList = messageData.first.substring(0, 12) + ','; // The message should contain the messageID first
       encryptedBroadcastKernel(messageData.first); 
-      _macIgnoreList = "";
+      _macIgnoreList = emptyString;
     }
     else
     {
@@ -144,9 +157,9 @@ String FloodingMesh::serializeMeshState()
   String connectionState = getEspnowMeshBackend().serializeUnencryptedConnection();
   
   return 
-  "{\"meshState\":{"
-  + connectionState.substring(1, connectionState.length() - 1) + ","
-  + createJsonEndPair(jsonMeshMessageCount, String(_messageCount));
+  String(F("{\"meshState\":{"))
+  + connectionState.substring(1, connectionState.length() - 1) + String(',')
+  + createJsonEndPair(FPSTR(jsonMeshMessageCount), String(_messageCount));
 }
 
 void FloodingMesh::loadMeshState(const String &serializedMeshState)
@@ -154,12 +167,12 @@ void FloodingMesh::loadMeshState(const String &serializedMeshState)
   using namespace JsonTranslator;
   
   if(!getMeshMessageCount(serializedMeshState, _messageCount))
-    getEspnowMeshBackend().warningPrint("WARNING! serializedMeshState did not contain MeshMessageCount. Using default instead.");
+    getEspnowMeshBackend().warningPrint(String(F("WARNING! serializedMeshState did not contain MeshMessageCount. Using default instead.")));
 
-  String connectionState = "";
+  String connectionState;
   if(!getConnectionState(serializedMeshState, connectionState) || !getEspnowMeshBackend().addUnencryptedConnection(connectionState))
   {
-    getEspnowMeshBackend().warningPrint("WARNING! serializedMeshState did not contain unsynchronizedMessageID. Using default instead.");
+    getEspnowMeshBackend().warningPrint(String(F("WARNING! serializedMeshState did not contain unsynchronizedMessageID. Using default instead.")));
   }
 }
 
@@ -168,7 +181,7 @@ String FloodingMesh::generateMessageID()
   char messageCountArray[5] = { 0 };
   snprintf(messageCountArray, 5, "%04X", _messageCount++);
   uint8_t apMac[6] {0};
-  return macToString(WiFi.softAPmacAddress(apMac)) + String(messageCountArray); // We use the AP MAC address as ID since it is what shows up during WiFi scans
+  return TypeCast::macToString(WiFi.softAPmacAddress(apMac)) + String(messageCountArray); // We use the AP MAC address as ID since it is what shows up during WiFi scans
 }
 
 void FloodingMesh::broadcast(const String &message)
@@ -228,7 +241,7 @@ void FloodingMesh::setOriginMac(uint8_t *macArray)
   std::copy_n(macArray, 6, _originMac);
 }
 
-String FloodingMesh::getOriginMac() { return macToString(_originMac); }
+String FloodingMesh::getOriginMac() { return TypeCast::macToString(_originMac); }
 uint8_t *FloodingMesh::getOriginMac(uint8_t *macArray)
 {
   std::copy_n(_originMac, 6, macArray);
@@ -273,7 +286,7 @@ EspnowMeshBackend &FloodingMesh::getEspnowMeshBackend()
 bool FloodingMesh::insertPreliminaryMessageID(uint64_t messageID)
 {
   uint8_t apMacArray[6] = { 0 };
-  if(messageID >> 16 == macToUint64(WiFi.softAPmacAddress(apMacArray)))
+  if(messageID >> 16 == TypeCast::macToUint64(WiFi.softAPmacAddress(apMacArray)))
     return false; // The node should not receive its own messages.
   
   auto insertionResult = _messageIDs.emplace(messageID, 0); // Returns std::pair<iterator,bool>
@@ -291,7 +304,7 @@ bool FloodingMesh::insertPreliminaryMessageID(uint64_t messageID)
 bool FloodingMesh::insertCompletedMessageID(uint64_t messageID)
 {
   uint8_t apMacArray[6] = { 0 };
-  if(messageID >> 16 == macToUint64(WiFi.softAPmacAddress(apMacArray)))
+  if(messageID >> 16 == TypeCast::macToUint64(WiFi.softAPmacAddress(apMacArray)))
     return false; // The node should not receive its own messages.
   
   auto insertionResult = _messageIDs.emplace(messageID, MESSAGE_COMPLETE); // Returns std::pair<iterator,bool>
@@ -368,7 +381,7 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
 {
   (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
   
-  String broadcastTarget = "";
+  String broadcastTarget;
   String remainingRequest = request;
   
   if(request.charAt(0) == metadataDelimiter())
@@ -376,7 +389,7 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
     int32_t broadcastTargetEndIndex = request.indexOf(metadataDelimiter(), 1);
 
     if(broadcastTargetEndIndex == -1)
-      return ""; // metadataDelimiter not found
+      return emptyString; // metadataDelimiter not found
     
     broadcastTarget = request.substring(1, broadcastTargetEndIndex + 1); // Include delimiter
     remainingRequest.remove(0, broadcastTargetEndIndex + 1);
@@ -385,14 +398,14 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
   int32_t messageIDEndIndex = remainingRequest.indexOf(metadataDelimiter());
 
   if(messageIDEndIndex == -1)
-    return ""; // metadataDelimiter not found
+    return emptyString; // metadataDelimiter not found
 
-  uint64_t messageID = stringToUint64(remainingRequest.substring(0, messageIDEndIndex));
+  uint64_t messageID = TypeCast::stringToUint64(remainingRequest.substring(0, messageIDEndIndex));
 
   if(insertCompletedMessageID(messageID))
   {
     uint8_t originMacArray[6] = { 0 };
-    setOriginMac(uint64ToMac(messageID >> 16, originMacArray)); // messageID consists of MAC + 16 bit counter
+    setOriginMac(TypeCast::uint64ToMac(messageID >> 16, originMacArray)); // messageID consists of MAC + 16 bit counter
   
     String message = remainingRequest;
     message.remove(0, messageIDEndIndex + 1); // This approach avoids the null value removal of substring()
@@ -405,7 +418,7 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
     }
   }
   
-  return "";
+  return emptyString;
 }
 
 /**
@@ -419,7 +432,7 @@ transmission_status_t FloodingMesh::_defaultResponseHandler(const String &respon
 {
   transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
 
-  getEspnowMeshBackend().warningPrint("WARNING! Response to FloodingMesh broadcast received, but none is expected!");
+  getEspnowMeshBackend().warningPrint(String(F("WARNING! Response to FloodingMesh broadcast received, but none is expected!")));
 
   (void)response; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
   (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
@@ -444,9 +457,9 @@ void FloodingMesh::_defaultNetworkFilter(int numberOfNetworks, MeshBackendBase &
     // Connect to any APs which contain meshInstance.getMeshName()
     if(meshNameIndex >= 0)
     {      
-      if(_macIgnoreList.indexOf(macToString(WiFi.BSSID(networkIndex))) == -1) // If the BSSID is not in the ignore list
+      if(_macIgnoreList.indexOf(TypeCast::macToString(WiFi.BSSID(networkIndex))) == -1) // If the BSSID is not in the ignore list
       {
-        if(EspnowMeshBackend *espnowInstance = meshBackendCast<EspnowMeshBackend *>(&meshInstance))
+        if(EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance))
         {
           espnowInstance->connectionQueue().push_back(networkIndex);
         }
@@ -486,7 +499,7 @@ bool FloodingMesh::_defaultBroadcastFilter(String &firstTransmission, EspnowMesh
 
   String targetMeshName = firstTransmission.substring(0, metadataEndIndex);
   
-  if(targetMeshName != "" && meshInstance.getMeshName() != targetMeshName)
+  if(!targetMeshName.isEmpty() && meshInstance.getMeshName() != targetMeshName)
   {
     return false; // Broadcast is for another mesh network
   }
@@ -497,7 +510,7 @@ bool FloodingMesh::_defaultBroadcastFilter(String &firstTransmission, EspnowMesh
     if(messageIDEndIndex == -1)
       return false; // metadataDelimiter not found
   
-    uint64_t messageID = stringToUint64(firstTransmission.substring(metadataEndIndex + 1, messageIDEndIndex));
+    uint64_t messageID = TypeCast::stringToUint64(firstTransmission.substring(metadataEndIndex + 1, messageIDEndIndex));
 
     if(insertPreliminaryMessageID(messageID))
     {

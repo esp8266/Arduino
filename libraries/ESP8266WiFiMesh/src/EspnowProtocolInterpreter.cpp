@@ -27,6 +27,8 @@
 #include <algorithm>
 #include "EspnowMeshBackend.h"
 
+namespace TypeCast = MeshTypeConversionFunctions;
+
 namespace EspnowProtocolInterpreter
 {   
   uint8_t espnowMetadataSize()
@@ -42,7 +44,7 @@ namespace EspnowProtocolInterpreter
     {
       uint8_t messageSize = transmissionLength - espnowMetadataSize();
       
-      messageContent = uint8ArrayToMultiString(transmissionDataArray + espnowMetadataSize(), messageSize);
+      messageContent = TypeCast::uint8ArrayToMultiString(transmissionDataArray + espnowMetadataSize(), messageSize);
     }
 
     return messageContent;
@@ -65,7 +67,7 @@ namespace EspnowProtocolInterpreter
 
   uint64_t espnowGetTransmissionMac(const uint8_t *transmissionDataArray)
   {
-    return macToUint64(transmissionDataArray + espnowTransmissionMacIndex);
+    return TypeCast::macToUint64(transmissionDataArray + espnowTransmissionMacIndex);
   }
 
   uint8_t *espnowGetTransmissionMac(const uint8_t *transmissionDataArray, uint8_t *resultArray)
@@ -76,12 +78,12 @@ namespace EspnowProtocolInterpreter
 
   uint64_t espnowGetMessageID(const uint8_t *transmissionDataArray)
   {
-    return uint8ArrayToUint64(transmissionDataArray + espnowMessageIDIndex);
+    return TypeCast::uint8ArrayToUint64(transmissionDataArray + espnowMessageIDIndex);
   }
 
   uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, uint64_t messageID)
   {
-    return uint64ToUint8Array(messageID, transmissionDataArray + espnowMessageIDIndex);
+    return TypeCast::uint64ToUint8Array(messageID, transmissionDataArray + espnowMessageIDIndex);
   }
 
   bool usesEncryption(uint64_t messageID)

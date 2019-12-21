@@ -25,22 +25,25 @@
 #include "TypeConversionFunctions.h"
 #include "MutexTracker.h"
 
-#define SERVER_IP_ADDR      "192.168.4.1"
+namespace
+{
+  constexpr char SERVER_IP_ADDR[] PROGMEM = "192.168.4.1";
+}
 
-const IPAddress TcpIpMeshBackend::emptyIP = IPAddress();
+const IPAddress TcpIpMeshBackend::emptyIP;
 
 bool TcpIpMeshBackend::_tcpIpTransmissionMutex = false;
 bool TcpIpMeshBackend::_tcpIpConnectionQueueMutex = false;
 
-String TcpIpMeshBackend::lastSSID = "";
+String TcpIpMeshBackend::lastSSID;
 bool TcpIpMeshBackend::staticIPActivated = false;
 
-String TcpIpMeshBackend::_temporaryMessage = "";
+String TcpIpMeshBackend::_temporaryMessage;
 
 // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
-IPAddress TcpIpMeshBackend::staticIP = emptyIP;
-IPAddress TcpIpMeshBackend::gateway = IPAddress(192,168,4,1);
-IPAddress TcpIpMeshBackend::subnetMask = IPAddress(255,255,255,0);
+IPAddress TcpIpMeshBackend::staticIP;
+IPAddress TcpIpMeshBackend::gateway(192,168,4,1);
+IPAddress TcpIpMeshBackend::subnetMask(255,255,255,0);
 
 std::vector<TcpIpNetworkInfo> TcpIpMeshBackend::_connectionQueue = {};
 std::vector<TransmissionOutcome> TcpIpMeshBackend::_latestTransmissionOutcomes = {};
@@ -50,7 +53,7 @@ TcpIpMeshBackend::TcpIpMeshBackend(requestHandlerType requestHandler, responseHa
                                    const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
                                    : MeshBackendBase(requestHandler, responseHandler, networkFilter, MB_TCP_IP), _server(serverPort)
 {
-  setSSID(ssidPrefix, "", ssidSuffix);
+  setSSID(ssidPrefix, emptyString, ssidSuffix);
   setMeshPassword(meshPassword);
   setVerboseModeState(verboseMode);
   setWiFiChannel(meshWiFiChannel);
@@ -62,7 +65,7 @@ std::vector<TcpIpNetworkInfo> & TcpIpMeshBackend::connectionQueue()
   MutexTracker connectionQueueMutexTracker(_tcpIpConnectionQueueMutex);
   if(!connectionQueueMutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! connectionQueue locked. Don't call connectionQueue() from callbacks other than NetworkFilter as this may corrupt program state!"); 
+    assert(false && String(F("ERROR! connectionQueue locked. Don't call connectionQueue() from callbacks other than NetworkFilter as this may corrupt program state!"))); 
   }
   
   return _connectionQueue;
@@ -112,13 +115,13 @@ bool TcpIpMeshBackend::transmissionInProgress(){return _tcpIpTransmissionMutex;}
 
 void TcpIpMeshBackend::setTemporaryMessage(const String &newTemporaryMessage) {_temporaryMessage = newTemporaryMessage;}
 String TcpIpMeshBackend::getTemporaryMessage() {return _temporaryMessage;}
-void TcpIpMeshBackend::clearTemporaryMessage() {_temporaryMessage = "";}
+void TcpIpMeshBackend::clearTemporaryMessage() {_temporaryMessage.clear();}
 
 String TcpIpMeshBackend::getCurrentMessage()
 {
   String message = getTemporaryMessage();
   
-  if(message == "") // If no temporary message stored
+  if(message.isEmpty()) // If no temporary message stored
     message = getMessage();
 
   return message;
@@ -245,7 +248,7 @@ bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, uint32_
  */
 transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
 {
-  verboseModePrint("Transmitting");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
+  verboseModePrint(String(F("Transmitting")));
     
   currClient.print(getCurrentMessage() + '\r');
   yield();
@@ -301,7 +304,7 @@ transmission_status_t TcpIpMeshBackend::attemptDataTransferKernel()
   currClient.setTimeout(_stationModeTimeoutMs);
 
   /* Connect to the node's server */
-  if (!currClient.connect(SERVER_IP_ADDR, getServerPort())) 
+  if (!currClient.connect(FPSTR(SERVER_IP_ADDR), getServerPort())) 
   {
     fullStop(currClient);
     verboseModePrint(F("Server unavailable"));
@@ -342,7 +345,7 @@ void TcpIpMeshBackend::initiateConnectionToAP(const String &targetSSID, int targ
  */
 transmission_status_t TcpIpMeshBackend::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
 {  
-  if(staticIPActivated && lastSSID != "" && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
+  if(staticIPActivated && !lastSSID.isEmpty() && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
   {
     #if LWIP_VERSION_MAJOR >= 2
     // Can be used with Arduino core for ESP8266 version 2.4.2 or higher with lwIP2 enabled to keep static IP on even during network switches.
@@ -398,7 +401,7 @@ transmission_status_t TcpIpMeshBackend::initiateTransmission(const TcpIpNetworkI
   WiFi.disconnect();
   yield();
 
-  assert(recipientInfo.SSID() != ""); // We need at least SSID to connect
+  assert(!recipientInfo.SSID().isEmpty()); // We need at least SSID to connect
   String targetSSID = recipientInfo.SSID();
   int32_t targetWiFiChannel = recipientInfo.wifiChannel();
   uint8_t targetBSSID[6] {0};
@@ -433,7 +436,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! TCP/IP transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    assert(false && String(F("ERROR! TCP/IP transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."))); 
     return;
   }
   
@@ -465,7 +468,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
     MutexTracker connectionQueueMutexTracker(_tcpIpConnectionQueueMutex);
     if(!connectionQueueMutexTracker.mutexCaptured())
     {
-      assert(false && "ERROR! connectionQueue locked. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+      assert(false && String(F("ERROR! connectionQueue locked. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."))); 
     }
     else
     {
@@ -494,7 +497,7 @@ transmission_status_t TcpIpMeshBackend::attemptTransmission(const String &messag
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! TCP/IP transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."); 
+    assert(false && String(F("ERROR! TCP/IP transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."))); 
     return TS_CONNECTION_FAILED;
   }
 
@@ -527,7 +530,7 @@ void TcpIpMeshBackend::acceptRequests()
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
   {
-    assert(false && "ERROR! TCP/IP transmission in progress. Don't call acceptRequests from callbacks as this may corrupt program state! Aborting."); 
+    assert(false && String(F("ERROR! TCP/IP transmission in progress. Don't call acceptRequests from callbacks as this may corrupt program state! Aborting."))); 
     return;
   }
   
@@ -551,7 +554,7 @@ void TcpIpMeshBackend::acceptRequests()
     /* Send the response back to the client */
     if (_client.connected())
     {
-      verboseModePrint("Responding");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
+      verboseModePrint(String(F("Responding")));
       _client.print(response + '\r');
       _client.flush();
       yield();

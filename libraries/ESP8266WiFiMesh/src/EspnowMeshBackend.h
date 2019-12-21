@@ -356,6 +356,32 @@ public:
    */
   bool isEspnowRequestManager();
 
+  /**
+   * Set the duration of most ESP-NOW log entries. Used for all ESP-NOW communication except for broadcasts and encrypted connection requests.
+   * Setting the duration too long may cause the node to run out of RAM, especially if there is intense transmission activity.
+   * Setting the duration too short may cause ESP-NOW transmissions to stop working, or make the node receive the same transmission multiple times.
+   * 
+   * Set to 2500 ms by default.
+   * 
+   * @param logEntryLifetimeMs The duration to use for most ESP-NOW log entries, in milliseconds.
+   */
+  static void setLogEntryLifetimeMs(uint32_t logEntryLifetimeMs);
+  static uint32_t logEntryLifetimeMs();
+
+  /**
+   * Set the duration during which sent ESP-NOW broadcast are stored in the log and can receive responses.
+   * This is shorter by default than logEntryLifetimeMs() in order to preserve RAM since broadcasts are always kept in the log until they expire,
+   * whereas normal transmissions are only kept till they receive a response.
+   * Setting the duration too long may cause the node to run out of RAM, especially if there is intense broadcast activity.
+   * Setting the duration too short may cause ESP-NOW broadcasts to stop working, or make the node never receive responses to broadcasts.
+   * 
+   * Set to 1000 ms by default.
+   * 
+   * @param broadcastResponseTimeoutMs The duration sent ESP-NOW broadcasts will be stored in the log, in milliseconds.
+   */
+  static void setBroadcastResponseTimeoutMs(uint32_t broadcastResponseTimeoutMs);
+  static uint32_t broadcastResponseTimeoutMs();
+
   /** 
    * Change the key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
    * Will apply to any new received requests for encrypted connection if this EspnowMeshBackend instance is the current request manager. 
@@ -1052,9 +1078,7 @@ private:
   static void deleteExpiredLogEntries(std::list<T> &logEntries, uint32_t maxEntryLifetimeMs);
 
   static uint32_t _logEntryLifetimeMs;
-  static uint32_t logEntryLifetimeMs();
   static uint32_t _broadcastResponseTimeoutMs;
-  static uint32_t broadcastResponseTimeoutMs();
 
   static uint32_t _encryptionRequestTimeoutMs;
 

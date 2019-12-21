@@ -23,8 +23,6 @@
 #include "TransmissionOutcome.h"
 #include "NetworkInfoBase.h"
 
-const String ESP8266_MESH_EMPTY_STRING = "";
-
 typedef enum
 {
   MB_TCP_IP = 0,
@@ -52,11 +50,40 @@ public:
   virtual void begin() = 0;
 
   /**
-   * Each AP requires a separate server port. If two AP:s are using the same server port, they will not be able to have both server instances active at the same time.
+   * Activate the WiFi access point of this ESP8266.
+   * 
+   * For TCP/IP, each AP requires a separate server port. If two AP:s are using the same server port, they will not be able to have both server instances active at the same time.
    * This is managed automatically by the activateAP method.
+   * 
+   * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
+   * Thus the AP is shared by all backends.
    */
   void activateAP();
-  void deactivateAP();
+
+  /** 
+   * Deactivate the WiFi access point of this ESP8266, regardless of which MeshBackendBase instance is in control of the AP.
+   * 
+   * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
+   * Thus the AP is shared by all backends.
+   */
+  static void deactivateAP();
+  
+  /** 
+   * Deactivate the WiFi access point of this ESP8266, provided that this MeshBackendBase instance is in control of the AP (which normally is the case for the MeshBackendBase instance that did the last activateAP() call).
+   * 
+   * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
+   * Thus the AP is shared by all backends.
+   * 
+   * @return True if the AP was deactivated. False otherwise.
+   */
+  bool deactivateControlledAP();
+
+  /**
+   * Restart the WiFi access point of this ESP8266.
+   * 
+   * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
+   * Thus the AP is shared by all backends.
+   */
   void restartAP();
 
   /**
@@ -104,8 +131,8 @@ public:
    * @param newSSIDRoot The middle part of the new SSID.
    * @param newSSIDSuffix The last part of the new SSID.
    */  
-  void setSSID(const String &newSSIDPrefix = ESP8266_MESH_EMPTY_STRING, const String &newSSIDRoot = ESP8266_MESH_EMPTY_STRING, 
-               const String &newSSIDSuffix = ESP8266_MESH_EMPTY_STRING);
+  void setSSID(const String &newSSIDPrefix = emptyString, const String &newSSIDRoot = emptyString, 
+               const String &newSSIDSuffix = emptyString);
   String getSSID() const;
 
   /**
@@ -300,7 +327,7 @@ private:
   String _meshPassword;
   uint8 _meshWiFiChannel;
   bool _verboseMode;
-  String _message = ESP8266_MESH_EMPTY_STRING;
+  String _message;
   bool _scanHidden = false;
   bool _apHidden = false;
 

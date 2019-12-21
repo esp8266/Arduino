@@ -48,6 +48,8 @@
 #include "ESP8266WiFiMesh.h"
 #include "TypeConversionFunctions.h"
 
+namespace TypeCast = MeshTypeConversionFunctions;
+
 #define SERVER_IP_ADDR      "192.168.4.1"
 
 const IPAddress ESP8266WiFiMesh::emptyIP = IPAddress();
@@ -74,7 +76,7 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHand
                                  const String &nodeID, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
                                  : _server(serverPort)
 {  
-  updateNetworkNames(meshName, (nodeID != "" ? nodeID : uint64ToString(ESP.getChipId())));
+  updateNetworkNames(meshName, (nodeID != "" ? nodeID : TypeCast::uint64ToString(ESP.getChipId())));
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
   setWiFiChannel(meshWiFiChannel);

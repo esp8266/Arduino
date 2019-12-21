@@ -39,27 +39,27 @@
 
 namespace EspnowProtocolInterpreter
 { 
-  const String synchronizationRequestHeader = "Synchronization request.";
-  const String encryptionRequestHeader = "AddEC:"; // Add encrypted connection
-  const String temporaryEncryptionRequestHeader = "AddTEC:"; // Add temporary encrypted connection
-  const String basicConnectionInfoHeader = "BasicCI:"; // Basic connection info
-  const String encryptedConnectionInfoHeader = "EncryptedCI:"; // Encrypted connection info
-  const String softLimitEncryptedConnectionInfoHeader = "SLEncryptedCI:"; // Soft limit encrypted connection info
-  const String maxConnectionsReachedHeader = "ECS_MAX_CONNECTIONS_REACHED_PEER:";
-  const String encryptedConnectionVerificationHeader = "ECVerified:"; // Encrypted connection verified
-  const String encryptedConnectionRemovalRequestHeader = "RemoveEC:"; // Remove encrypted connection
+  constexpr char synchronizationRequestHeader[] PROGMEM = "Synchronization request.";
+  constexpr char encryptionRequestHeader[] PROGMEM = "AddEC:"; // Add encrypted connection
+  constexpr char temporaryEncryptionRequestHeader[] PROGMEM = "AddTEC:"; // Add temporary encrypted connection
+  constexpr char basicConnectionInfoHeader[] PROGMEM = "BasicCI:"; // Basic connection info
+  constexpr char encryptedConnectionInfoHeader[] PROGMEM = "EncryptedCI:"; // Encrypted connection info
+  constexpr char softLimitEncryptedConnectionInfoHeader[] PROGMEM = "SLEncryptedCI:"; // Soft limit encrypted connection info
+  constexpr char maxConnectionsReachedHeader[] PROGMEM = "ECS_MAX_CONNECTIONS_REACHED_PEER:";
+  constexpr char encryptedConnectionVerificationHeader[] PROGMEM = "ECVerified:"; // Encrypted connection verified
+  constexpr char encryptedConnectionRemovalRequestHeader[] PROGMEM = "RemoveEC:"; // Remove encrypted connection
 
-  const uint8_t espnowMessageTypeIndex = 0;
-  const uint8_t espnowTransmissionsRemainingIndex = 1;
-  const uint8_t espnowTransmissionMacIndex = 2;
-  const uint8_t espnowMessageIDIndex = 8;
+  constexpr uint8_t espnowMessageTypeIndex = 0;
+  constexpr uint8_t espnowTransmissionsRemainingIndex = 1;
+  constexpr uint8_t espnowTransmissionMacIndex = 2;
+  constexpr uint8_t espnowMessageIDIndex = 8;
 
   constexpr uint8_t espnowProtocolBytesSize = 16;
   constexpr uint8_t aeadMetadataSize = 28;
   uint8_t espnowMetadataSize();
 
-  const uint8_t espnowEncryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
-  const uint8_t espnowHashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
+  constexpr uint8_t espnowEncryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
+  constexpr uint8_t espnowHashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
 
   constexpr uint64_t uint64LeftmostBits = 0xFFFFFFFF00000000;
 

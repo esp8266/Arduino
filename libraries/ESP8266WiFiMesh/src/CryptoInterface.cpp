@@ -28,6 +28,8 @@
 
 #include <bearssl/bearssl.h>
 
+namespace TypeCast = MeshTypeConversionFunctions;
+
 namespace
 {
   size_t _ctMinDataLength = 0;
@@ -130,7 +132,7 @@ namespace
     
     uint8_t hmac[hmacLength];
     createBearsslHmac(hashType, message.c_str(), message.length(), hashKey, hashKeyLength, hmac, hmacLength);
-    return uint8ArrayToHexString(hmac, hmacLength);
+    return TypeCast::uint8ArrayToHexString(hmac, hmacLength);
   }
   
   void *createBearsslHmacCT(const br_hash_class *hashType, const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -182,7 +184,7 @@ namespace
     
     uint8_t hmac[hmacLength];
     createBearsslHmacCT(hashType, message.c_str(), message.length(), hashKey, hashKeyLength, hmac, hmacLength);
-    return uint8ArrayToHexString(hmac, hmacLength);
+    return TypeCast::uint8ArrayToHexString(hmac, hmacLength);
   }
 }
 
@@ -190,14 +192,14 @@ namespace CryptoInterface
 {
   void setCtMinDataLength(const size_t ctMinDataLength) 
   {
-    assert(ctMaxDataLength() - ctMinDataLength <= ctMaxDiff);
+    assert(ctMaxDataLength() - ctMinDataLength <= CT_MAX_DIFF);
     _ctMinDataLength = ctMinDataLength; 
   }
   size_t ctMinDataLength() {return _ctMinDataLength;}
 
   void setCtMaxDataLength(const size_t ctMaxDataLength) 
   { 
-    assert(ctMaxDataLength - ctMinDataLength() <= ctMaxDiff);
+    assert(ctMaxDataLength - ctMinDataLength() <= CT_MAX_DIFF);
     _ctMaxDataLength = ctMaxDataLength; 
   }
   size_t ctMaxDataLength() {return _ctMaxDataLength;}
@@ -230,7 +232,7 @@ namespace CryptoInterface
   {
     uint8_t hash[MD5_NATURAL_LENGTH];
     md5Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, MD5_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, MD5_NATURAL_LENGTH);
   }
 
   void *md5Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -275,7 +277,7 @@ namespace CryptoInterface
   {
     uint8_t hash[SHA1_NATURAL_LENGTH];
     sha1Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, SHA1_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, SHA1_NATURAL_LENGTH);
   }
 
   void *sha1Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -315,7 +317,7 @@ namespace CryptoInterface
   {
     uint8_t hash[SHA224_NATURAL_LENGTH];
     sha224Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, SHA224_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, SHA224_NATURAL_LENGTH);
   }
 
   void *sha224Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -355,7 +357,7 @@ namespace CryptoInterface
   {
     uint8_t hash[SHA256_NATURAL_LENGTH];
     sha256Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, SHA256_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, SHA256_NATURAL_LENGTH);
   }
 
   void *sha256Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -395,7 +397,7 @@ namespace CryptoInterface
   {
     uint8_t hash[SHA384_NATURAL_LENGTH];
     sha384Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, SHA384_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, SHA384_NATURAL_LENGTH);
   }
 
   void *sha384Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -435,7 +437,7 @@ namespace CryptoInterface
   {
     uint8_t hash[SHA512_NATURAL_LENGTH];
     sha512Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, SHA512_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, SHA512_NATURAL_LENGTH);
   }
 
   void *sha512Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
@@ -475,7 +477,7 @@ namespace CryptoInterface
   {
     uint8_t hash[MD5SHA1_NATURAL_LENGTH];
     md5sha1Hash(message.c_str(), message.length(), hash);
-    return uint8ArrayToHexString(hash, MD5SHA1_NATURAL_LENGTH);
+    return TypeCast::uint8ArrayToHexString(hash, MD5SHA1_NATURAL_LENGTH);
   }
 
 

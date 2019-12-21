@@ -121,7 +121,8 @@ public:
   void begin();
 
   /** 
-   * Makes it possible to find the node through scans, and also makes it possible to recover from an encrypted ESP-NOW connection where only the other node is encrypted.
+   * Activate the WiFi access point of this ESP8266.
+   * This makes it possible to find the node through scans, and also makes it possible to recover from an encrypted ESP-NOW connection where only the other node is encrypted.
    * Required for encryptedBroadcast() usage, but also slows down the start-up of the node.
    * 
    * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
@@ -129,6 +130,15 @@ public:
    * All FloodingMesh instances can still broadcast messages though, even if their AP is not visible.
    */
   void activateAP();
+
+  /** 
+   * Deactivate the WiFi access point of this ESP8266.
+   * 
+   * Note that only one AP can be active at a time in total (there is only one WiFi radio on the ESP8266), and this will always be the one which was last activated.
+   * Thus the AP is shared by all backends.
+   * All FloodingMesh instances can still broadcast messages though, even if their AP is not visible.
+   */
+  static void deactivateAP();
   
   /**
    * Performs maintenance for all available Flooding Mesh instances
@@ -298,9 +308,6 @@ protected:
   
 private:
 
-  static const uint8_t MESSAGE_ID_LENGTH = 17; // 16 characters and one delimiter
-  static const uint8_t MESSAGE_COMPLETE = 255;
-
   EspnowMeshBackend _espnowBackend;
 
   messageHandlerType _messageHandler;
@@ -318,7 +325,7 @@ private:
   std::queue<messageQueueElementType> _messageIdOrder = {};
   std::list<std::pair<String, bool>> _forwardingBacklog = {};
 
-  String _macIgnoreList = "";
+  String _macIgnoreList;
   
   String _defaultRequestHandler(const String &request, MeshBackendBase &meshInstance);
   transmission_status_t _defaultResponseHandler(const String &response, MeshBackendBase &meshInstance);

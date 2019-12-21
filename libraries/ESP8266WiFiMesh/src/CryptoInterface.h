@@ -71,7 +71,7 @@ namespace CryptoInterface
 
   constexpr uint8_t ENCRYPTION_KEY_LENGTH = 32;
 
-  constexpr uint32_t ctMaxDiff = 1073741823; // 2^30 - 1
+  constexpr uint32_t CT_MAX_DIFF = 1073741823; // 2^30 - 1
 
   /**
    * This function allows for fine-tuning of the specifications for the constant time calculations. 
@@ -672,7 +672,7 @@ namespace CryptoInterface
   // #################### HKDF ####################
 
   /**
-   * KDF are functions that takes a variable length input, and provide a variable length output, meant to be used to derive subkeys from a master key.
+   * KDFs (key derivation functions) are functions that takes a variable length input, and provide a variable length output, meant to be used to derive subkeys from a master key.
    * HKDF is a KDF defined by RFC 5869. It is based on HMAC. The provided implementation uses SHA-256 as the underlying hash function.
    * 
    * This function initializes the HKDF implementation with the input data to use for HKDF processing.
@@ -755,7 +755,7 @@ namespace CryptoInterface
    * 
    * @param data An array containing the data to encrypt. The encrypted data is generated in place, so when the function returns the data array will contain the encrypted data.
    * @param dataLength The length of the data array in bytes.
-   * @param key The secret encryption key to use.
+   * @param key The secret encryption key to use. Must be 32 bytes (ENCRYPTION_KEY_LENGTH) long.
    * @param keySalt The salt to use when generating a subkey from key. Note that the same salt must be used during decryption as during encryption. Set to nullptr to prevent subkey generation.
    * @param keySaltLength The length of keySalt in bytes.
    * @param resultingNonce The array that will store the nonce generated during encryption. Must be able to contain at least 12 bytes. The nonce is not secret and must be passed to the decryption function.
@@ -780,7 +780,7 @@ namespace CryptoInterface
    * 
    * @param data An array containing the data to decrypt. The decrypted data is generated in place, so when the function returns the data array will contain the decrypted data.
    * @param dataLength The length of the data array in bytes.
-   * @param key The secret encryption key to use.
+   * @param key The secret encryption key to use. Must be 32 bytes (ENCRYPTION_KEY_LENGTH) long.
    * @param keySalt The salt to use when generating a subkey from key. Note that the same salt must be used during decryption as during encryption. Set to nullptr to prevent subkey generation.
    * @param keySaltLength The length of keySalt in bytes.
    * @param encryptionNonce An array containing the nonce that was generated during encryption. The nonce should be 12 bytes.

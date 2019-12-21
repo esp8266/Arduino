@@ -48,7 +48,7 @@ private:
 
   uint8_t _transmissionsReceived = 0;
   uint8_t _transmissionsExpected;
-  String _totalMessage = "";
+  String _totalMessage;
 
 };
 

@@ -26,20 +26,23 @@
 #include "UtilityFunctions.h"
 #include <esp8266_peri.h>
 
-bool macEqual(const uint8_t *macOne, const uint8_t *macTwo)
+namespace MeshUtilityFunctions
 {
-  for(int i = 0; i <= 5; i++)
+  bool macEqual(const uint8_t *macOne, const uint8_t *macTwo)
   {
-    if(macOne[i] != macTwo[i])
+    for(int i = 0; i <= 5; i++)
     {
-      return false;
+      if(macOne[i] != macTwo[i])
+      {
+        return false;
+      }
     }
+  
+    return true;
   }
-
-  return true;
-}
-
-uint64_t randomUint64()
-{
-  return (((uint64_t)RANDOM_REG32 << 32) | (uint64_t)RANDOM_REG32);
+  
+  uint64_t randomUint64()
+  {
+    return (((uint64_t)RANDOM_REG32 << 32) | (uint64_t)RANDOM_REG32);
+  }
 }

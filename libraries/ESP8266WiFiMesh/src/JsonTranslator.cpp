@@ -27,16 +27,18 @@
 #include "TypeConversionFunctions.h"
 #include "MeshCryptoInterface.h"
 
+namespace TypeCast = MeshTypeConversionFunctions;
+
 namespace JsonTranslator
 {
   String createJsonPair(const String &valueIdentifier, const String &value)
   {
-    return valueIdentifier + "\"" + value + "\",";
+    return valueIdentifier + '\"' + value + F("\",");
   }
 
   String createJsonEndPair(const String &valueIdentifier, const String &value)
   {
-    return valueIdentifier + "\"" + value + "\"}}";
+    return valueIdentifier + '\"' + value + F("\"}}");
   }
   
   String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey)
@@ -44,33 +46,33 @@ namespace JsonTranslator
     // Returns: Encrypted connection info:{"arguments":{"nonce":"1F2","password":"abc","ownSK":"3B4","peerSK":"1A2"}}
 
     return
-    infoHeader + "{\"arguments\":{" 
-    + createJsonPair(jsonNonce, requestNonce)
-    + createJsonPair(jsonPassword, authenticationPassword)
-    + createJsonPair(jsonOwnSessionKey, uint64ToString(peerSessionKey))   // Exchanges session keys since it should be valid for the receiver.
-    + createJsonEndPair(jsonPeerSessionKey, uint64ToString(ownSessionKey));
+    infoHeader + String(F("{\"arguments\":{")) 
+    + createJsonPair(FPSTR(jsonNonce), requestNonce)
+    + createJsonPair(FPSTR(jsonPassword), authenticationPassword)
+    + createJsonPair(FPSTR(jsonOwnSessionKey), TypeCast::uint64ToString(peerSessionKey))   // Exchanges session keys since it should be valid for the receiver.
+    + createJsonEndPair(FPSTR(jsonPeerSessionKey), TypeCast::uint64ToString(ownSessionKey));
   }
   
   String createEncryptionRequestIntro(const String &requestHeader, uint32_t duration)
   {
     return 
-    requestHeader + "{\"arguments\":{" 
-    + (requestHeader == EspnowProtocolInterpreter::temporaryEncryptionRequestHeader ? createJsonPair(jsonDuration, String(duration)) : "");
+    requestHeader + String(F("{\"arguments\":{")) 
+    + (requestHeader == FPSTR(EspnowProtocolInterpreter::temporaryEncryptionRequestHeader) ? createJsonPair(FPSTR(jsonDuration), String(duration)) : emptyString);
   }
   
   String createEncryptionRequestEnding(const String &requestNonce)
   {
-    return createJsonEndPair(jsonNonce, requestNonce);
+    return createJsonEndPair(FPSTR(jsonNonce), requestNonce);
   }
   
   String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, uint8_t hashKeyLength, uint32_t duration)
   {
-    String mainMessage = createEncryptionRequestIntro(requestHeader, duration) + createJsonPair(jsonNonce, requestNonce);
+    String mainMessage = createEncryptionRequestIntro(requestHeader, duration) + createJsonPair(FPSTR(jsonNonce), requestNonce);
     uint8_t staMac[6] {0};
     uint8_t apMac[6] {0};
-    String requesterStaApMac = macToString(WiFi.macAddress(staMac)) + macToString(WiFi.softAPmacAddress(apMac));
+    String requesterStaApMac = TypeCast::macToString(WiFi.macAddress(staMac)) + TypeCast::macToString(WiFi.softAPmacAddress(apMac));
     String hmac = MeshCryptoInterface::createMeshHmac(requesterStaApMac + mainMessage, hashKey, hashKeyLength);
-    return mainMessage + createJsonEndPair(jsonHmac, hmac);
+    return mainMessage + createJsonEndPair(FPSTR(jsonHmac), hmac);
   }
 
   bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, 
@@ -78,15 +80,15 @@ namespace JsonTranslator
   {
     using MeshCryptoInterface::verifyMeshHmac;
     
-    String hmac = "";
+    String hmac;
     if(getHmac(encryptionRequestHmacMessage, hmac))
     {
-      int32_t hmacStartIndex = encryptionRequestHmacMessage.indexOf(jsonHmac);
+      int32_t hmacStartIndex = encryptionRequestHmacMessage.indexOf(FPSTR(jsonHmac));
       if(hmacStartIndex < 0)
         return false;
      
       if(hmac.length() == 2*CryptoInterface::SHA256_NATURAL_LENGTH // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
-         && verifyMeshHmac(macToString(requesterStaMac) + macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
+         && verifyMeshHmac(TypeCast::macToString(requesterStaMac) + TypeCast::macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
       {
         return true;
       }
@@ -118,11 +120,11 @@ namespace JsonTranslator
 
   bool getConnectionState(const String &jsonString, String &result)
   {
-    int32_t startIndex = jsonString.indexOf(jsonConnectionState);
+    int32_t startIndex = jsonString.indexOf(FPSTR(jsonConnectionState));
     if(startIndex < 0)
       return false;
     
-    int32_t endIndex = jsonString.indexOf("}");
+    int32_t endIndex = jsonString.indexOf('}');
     if(endIndex < 0)
       return false;
       
@@ -132,7 +134,7 @@ namespace JsonTranslator
   
   bool getPassword(const String &jsonString, String &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonPassword);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPassword));
     if(startIndex < 0)
       return false;
     
@@ -146,7 +148,7 @@ namespace JsonTranslator
   
   bool getOwnSessionKey(const String &jsonString, uint64_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonOwnSessionKey);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonOwnSessionKey));
     if(startIndex < 0)
       return false;
     
@@ -154,13 +156,13 @@ namespace JsonTranslator
     if(endIndex < 0)
       return false;
   
-    result = stringToUint64(jsonString.substring(startIndex, endIndex));
+    result = TypeCast::stringToUint64(jsonString.substring(startIndex, endIndex));
     return true;
   }
   
   bool getPeerSessionKey(const String &jsonString, uint64_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonPeerSessionKey);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPeerSessionKey));
     if(startIndex < 0)
       return false;
     
@@ -168,13 +170,13 @@ namespace JsonTranslator
     if(endIndex < 0)
       return false;
     
-    result = stringToUint64(jsonString.substring(startIndex, endIndex));
+    result = TypeCast::stringToUint64(jsonString.substring(startIndex, endIndex));
     return true;
   }
   
   bool getPeerStaMac(const String &jsonString, uint8_t *resultArray)
   {  
-    int32_t startIndex = getStartIndex(jsonString, jsonPeerStaMac);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPeerStaMac));
     if(startIndex < 0)
       return false;
   
@@ -182,13 +184,13 @@ namespace JsonTranslator
     if(endIndex < 0 || endIndex - startIndex != 12) // Mac String is always 12 characters long
       return false;
     
-    stringToMac(jsonString.substring(startIndex, endIndex), resultArray);
+    TypeCast::stringToMac(jsonString.substring(startIndex, endIndex), resultArray);
     return true;
   }
   
   bool getPeerApMac(const String &jsonString, uint8_t *resultArray)
   {  
-    int32_t startIndex = getStartIndex(jsonString, jsonPeerApMac);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPeerApMac));
     if(startIndex < 0)
       return false;
       
@@ -196,13 +198,13 @@ namespace JsonTranslator
     if(endIndex < 0 || endIndex - startIndex != 12) // Mac String is always 12 characters long
       return false;
     
-    stringToMac(jsonString.substring(startIndex, endIndex), resultArray);
+    TypeCast::stringToMac(jsonString.substring(startIndex, endIndex), resultArray);
     return true;
   }
   
   bool getDuration(const String &jsonString, uint32_t &result)
   {  
-    int32_t startIndex = getStartIndex(jsonString, jsonDuration);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonDuration));
     if(startIndex < 0)
       return false;
     
@@ -212,7 +214,7 @@ namespace JsonTranslator
   
   bool getNonce(const String &jsonString, String &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonNonce);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonNonce));
     if(startIndex < 0)
       return false;
     
@@ -226,7 +228,7 @@ namespace JsonTranslator
 
   bool getHmac(const String &jsonString, String &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonHmac);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonHmac));
     if(startIndex < 0)
       return false;
     
@@ -240,7 +242,7 @@ namespace JsonTranslator
 
   bool getDesync(const String &jsonString, bool &result)
   {  
-    int32_t startIndex = getStartIndex(jsonString, jsonDesync);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonDesync));
     if(startIndex < 0)
       return false;
     
@@ -250,7 +252,7 @@ namespace JsonTranslator
 
   bool getUnsynchronizedMessageID(const String &jsonString, uint32_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, jsonUnsynchronizedMessageID);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonUnsynchronizedMessageID));
     if(startIndex < 0)
       return false;
     
@@ -260,7 +262,7 @@ namespace JsonTranslator
 
   bool getMeshMessageCount(const String &jsonString, uint16_t &result)
   {  
-    int32_t startIndex = getStartIndex(jsonString, jsonMeshMessageCount);
+    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonMeshMessageCount));
     if(startIndex < 0)
       return false;
 
