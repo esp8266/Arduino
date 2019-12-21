@@ -18,5 +18,3 @@ if [ $fail -ne 0 ]; then
 else
     exit 0
 fi
-
-
