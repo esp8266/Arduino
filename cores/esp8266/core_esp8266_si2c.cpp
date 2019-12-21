@@ -265,7 +265,7 @@ bool Twi::write_bit(bool bit)
     {
         SDA_LOW(twi_sda);
     }
-    busywait(twi_dcount + 1);
+    busywait(twi_dcount);
     SCL_HIGH(twi_scl);
     WAIT_CLOCK_STRETCH();
     busywait(twi_dcount);
@@ -276,7 +276,7 @@ bool Twi::read_bit(void)
 {
     SCL_LOW(twi_scl);
     SDA_HIGH(twi_sda);
-    busywait(twi_dcount + 2);
+    busywait(twi_dcount);
     SCL_HIGH(twi_scl);
     WAIT_CLOCK_STRETCH();
     bool bit = SDA_READ(twi_sda);
