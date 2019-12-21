@@ -123,7 +123,7 @@ Compile the sketch normally and, once a `.bin` file is available, sign it using 
 
 .. code:: bash
 
-    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
+    <ESP8266ArduinoPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
 
 Old And New Signature Formats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -134,7 +134,34 @@ To create a legacy signature, call the signing script with --legacy:
 
 .. code:: bash
 
-    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+    <ESP8266ArduinoPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
+
+Compression
+-----------
+
+The eboot bootloader incorporates a GZIP decompressor, built for very low code requirements.  For applications, this optional decompression is completely transparent.  For uploading compressed filesystems, the application must be built with `ATOMIC_FS_UPDATE` defined because, otherwise, eboot will not be involved in writing the filesystem.
+
+No changes to the application are required.  The `Updater` class and `eboot` bootloader (which performs actual application overwriting on update) automatically search for the `gzip` header in the uploaded binary, and if found, handle it.
+
+Compress an application `.bin` file or filesystem package using any `gzip` available, at any desired compression level (`gzip -9` is recommended because it provides the maximum compression and uncompresses as fast as any other compressino level).  For example:
+
+.. code:: bash
+
+    gzip -9 sketch.bin  # Maximum compression, output sketch.bin.gz
+    <Upload the resultant sketch.bin.gz>
+
+If signing is desired, sign the gzip compressed file *after* compression.
+
+.. code:: bash
+
+    gzip -9 sketch.bin
+    <ESP8266ArduinoPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin sketch.bin.gz --out sketch.bin.gz.signed
+
+Updating apps in the field to support compression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have applications deployed in the field and wish to update them to support compressed OTA uploads, you will need to first recompile the application, then _upload the uncompressed `.bin` file once_.  Attempting to upload a `gzip` compressed binary to a legacy app will result in the Updater rejecting the upload as it does not understand the `gzip` format.  After this initial upload, which will include the new bootloader and `Updater` class with compression support, compressed updates can then be used.
 
 
 Safety
