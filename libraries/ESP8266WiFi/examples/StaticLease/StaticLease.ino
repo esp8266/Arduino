@@ -1,5 +1,6 @@
 
-#include <lwip/init.h>
+#include <lwip/init.h>      // LWIP_VERSION_*
+#include <lwIPDhcpServer.h> // dhcpSoftAP
 
 #if LWIP_VERSION_MAJOR == 1
 
@@ -89,8 +90,8 @@ void setup() {
      ...
      any client not listed will use next IP address available from the range (here 192.168.0.102 and more)
   */
-  wifi_softap_add_dhcps_lease(mac_CAM);  // always 192.168.0.100
-  wifi_softap_add_dhcps_lease(mac_PC);   // always 192.168.0.101
+  dhcpSoftAP.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
+  dhcpSoftAP.add_dhcps_lease(mac_PC);   // always 192.168.0.101
   /* Start Access Point. You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");

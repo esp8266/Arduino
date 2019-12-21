@@ -357,7 +357,7 @@ extern struct tcp_pcb ** const tcp_pcb_lists[NUM_TCP_PCB_LISTS];
 #if TCP_DEBUG_PCB_LISTS
 #define TCP_REG(pcbs, npcb) do {\
                             struct tcp_pcb *tcp_tmp_pcb; \
-                            LWIP_DEBUGF(TCP_DEBUG, ("TCP_REG %p local port %"U16_F"\n", (void *)(npcb), (npcb)->local_port)); \
+                            LWIP_DEBUGF(TCP_DEBUG, ("TCP_REG %p local port %" U16_F "\n", (void *)(npcb), (npcb)->local_port)); \
                             for (tcp_tmp_pcb = *(pcbs); \
           tcp_tmp_pcb != NULL; \
         tcp_tmp_pcb = tcp_tmp_pcb->next) { \
