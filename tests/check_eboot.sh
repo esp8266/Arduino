@@ -3,7 +3,7 @@
 # Check that no file in the bootloader directory is newer than the eboot.elf
 # (indicating that eboot.elf needs to be rebuilt)
 
-cd ../bootloaders/eboot
+cd "$TRAVIS_BUILD_DIR"/bootloaders/eboot
 fail=0
 eboot=$(git log -1 --date=unix --format=%at eboot.elf)
 for i in $(git ls-files | grep -v ^eboot.elf); do
