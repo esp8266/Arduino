@@ -151,10 +151,22 @@ public:
 
   static String urlDecode(const String& text);
 
+  // Handle a GET request by sending a response header and stream file content to response body 
   template<typename T>
   size_t streamFile(T &file, const String& contentType) {
+    return streamFile(file, contentType, HTTP_GET);
+  }
+
+  // Implement GET and HEAD requests for files.
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests. 
+  template<typename T>
+  size_t streamFile(T &file, const String& contentType, HTTPMethod requestMethod) {
+    size_t contentLength = 0;
     _streamFileCore(file.size(), file.name(), contentType);
-    return _currentClient.write(file);
+    if (requestMethod == HTTP_GET) {
+      contentLength = _currentClient.write(file);
+    }
+    return contentLength;
   }
 
   static const String responseCodeToString(const int code);
