@@ -146,11 +146,6 @@ size_t Stream::to (Print* to,
                     _last_to = TOSTREAM_READ_ERROR;
                     break;
                 }
-                if ((size_t)r < w)
-                {
-                    Serial.printf(":to read(=%zd)<available(=%zd) stream=%p\n", r, w, this);
-                    break;
-                }
                 w = to->write(temp, r);
                 written += w;
                 if ((size_t)r != w)
@@ -171,7 +166,7 @@ size_t Stream::to (Print* to,
     {
         if (timedOut)
             _last_to = TOSTREAM_TIMED_OUT;
-        else if (len > 0 && written != len)
+        else if (len > 0 && (ssize_t)written != len)
             _last_to = TOSTREAM_SHORT;
     }
     return written;
