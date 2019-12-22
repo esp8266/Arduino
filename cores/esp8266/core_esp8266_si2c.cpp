@@ -160,6 +160,9 @@ static Twi twi;
 
 void Twi::setClock(unsigned int freq)
 {
+	if (freq < 250)  // minimum freq 250Hz to prevent overflow @ 232Hz
+		freq = 250;
+	
 	preferred_si2c_clock = freq;
 
 #if F_CPU == FCPU80
@@ -225,11 +228,6 @@ void Twi::enableSlave()
     {
 		asm("nop"); // minimum element to keep GCC from optimizing this function out.
     }
-
-//    {
-//        esp8266::polledTimeout::oneShotFastNs timeout(v);
-//        while(!timeout) { // 
-//    }
 }
 
 bool Twi::write_start(void)
