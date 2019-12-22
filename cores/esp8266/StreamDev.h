@@ -5,8 +5,9 @@
 #include <Stream.h>
 
 ///////////////////////////////////////////////
-// - black hole in, swallow everything, availableForWrite = infinite
-// - black hole out, nothing to read, available = 0
+// /dev/null
+// - black hole as output, swallow everything, availableForWrite = infinite
+// - black hole as input, nothing to read, available = 0
 
 class StreamNull: public Stream
 {
@@ -29,8 +30,8 @@ public:
 
 ///////////////////////////////////////////////
 // /dev/zero
-// - black hole in, swallow everything, availableForWrite = infinite
-// - white hole out, gives infinity to read, available = infinite
+// - black hole as output, swallow everything, availableForWrite = infinite
+// - big bang as input, gives infinity to read, available = infinite
 
 class StreamZero: public StreamNull
 {
@@ -49,8 +50,8 @@ public:
 
 ///////////////////////////////////////////////
 // static buffer (in flash or ram)
-// - black hole in, swallow everything, availableForWrite = infinite
-// - Stream buffer out
+// - black hole as output, swallow everything, availableForWrite = infinite
+// - Stream buffer out, resettable
 
 class StreamPtr: public StreamNull
 {
@@ -73,17 +74,15 @@ public:
     virtual int peek() override { return _peekPointer < _size? _buffer[_peekPointer]: -1; }
     virtual size_t readBytes(char* buffer, size_t len) override
     {
-        if (_peekPointer < _size)
-        {
-            size_t cpylen = std::min(_size - _peekPointer, len);
-            if (_in_flash)
-                memcpy_P(buffer, _buffer + _peekPointer, cpylen);
-            else
-                memcpy(buffer, _buffer + _peekPointer, cpylen);
-            _peekPointer += cpylen;
-            return cpylen;
-        }
-        return 0;
+        if (_peekPointer >= _size)
+            return 0;
+        size_t cpylen = std::min(_size - _peekPointer, len);
+        if (_in_flash)
+            memcpy_P(buffer, _buffer + _peekPointer, cpylen);
+        else
+            memcpy(buffer, _buffer + _peekPointer, cpylen);
+        _peekPointer += cpylen;
+        return cpylen;
     }
     virtual int readNow(char* buffer, size_t len) override { return readBytes(buffer, len); }
 
