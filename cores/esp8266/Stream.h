@@ -151,9 +151,19 @@ class Stream: public Print {
         // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
         // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
         virtual size_t to (Print* to,
-                           ssize_t len = -1,
+                           const ssize_t len = -1,
                            esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
                            int readUntilChar = -1) final;
+        enum
+        {
+            TOSTREAM_SUCCESS = 0,
+            TOSTREAM_TIMED_OUT,
+            TOSTREAM_READ_ERROR,
+            TOSTREAM_WRITE_ERROR,
+            TOSTREAM_SHORT,
+        } _last_to = TOSTREAM_SUCCESS;
+
+        decltype(_last_to) getLastTo () const { return _last_to; }
 
         //////////////////// end of extensions
 

@@ -6,14 +6,16 @@ using esp8266::polledTimeout::oneShotFastMs;
 using esp8266::polledTimeout::periodicFastMs;
 
 size_t Stream::to (Print* to,
-                   ssize_t len,
+                   const ssize_t len,
                    oneShotFastMs::timeType timeout,
                    int readUntilChar)
 {
+    _last_to = TOSTREAM_SUCCESS;
+
     if (len == 0)
         return 0;   // avoid timeout for no requested data
 
-    // There are two useful timeout:
+    // There are two timeouts:
     // - read (network, serial, ...)
     // - write (network, serial, ...)
     // However
@@ -22,25 +24,16 @@ size_t Stream::to (Print* to,
     // So we use getTimeout() for both,
     // (also when inputTimeoutPossible() is false)
 
+    // "neverExpires (default, impossible)" is translated to default timeout
     oneShotFastMs timedOut(timeout == oneShotFastMs::neverExpires? getTimeout(): timeout);
-    periodicFastMs yieldNow(5); // yield about every 5ms
-    size_t written = 0;
-    size_t maxLen = std::max((decltype(len))0, len);
 
-#define D 0
-#if D
-    Serial.printf("#### %dms: pb=%d ruc=%d ml=%d to=%d otp=%d itp=%d avr=%d avp=%d avw=%d\n",
-        (int)millis(),
-        (int)peekBufferAPI(),
-        (int)readUntilChar,
-        (int)maxLen,
-        (int)timedOut.getTimeout(),
-        (int)inputTimeoutPossible(),
-        (int)outputTimeoutPossible(),
-        (int)available(),
-        (int)availableForPeek(),
-        (int)to->availableForWrite());
-#endif
+    // yield about every 5ms (XXX SHOULD BE A SYSTEM-WIDE CONSTANT?)
+    periodicFastMs yieldNow(5);
+
+    size_t written = 0;
+
+    // len==-1 => maxLen=0 <=> until starvation
+    size_t maxLen = std::max((decltype(len))0, len);
 
     if (peekBufferAPI())
 
@@ -110,11 +103,15 @@ size_t Stream::to (Print* to,
             if (c != -1)
             {
                 w = to->write(c);
-                if (c == readUntilChar)
+                if (w != 1)
+                {
+                    _last_to = TOSTREAM_WRITE_ERROR;
                     break;
-                assert(w);
+                }
                 written += 1;
                 timedOut.reset();
+                if (c == readUntilChar)
+                    break;
             }
             else if (timedOut)
                 break;
@@ -139,14 +136,14 @@ size_t Stream::to (Print* to,
                 // no more data can be written, ever
                 break;
             w = std::min(w, avr);
-            w = std::min(w, (decltype(w))64);
+            w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
             if (w)
             {
                 char temp[w];
                 ssize_t r = readNow(temp, w);
                 if (r < 0)
                 {
-                    // do something?
+                    _last_to = TOSTREAM_READ_ERROR;
                     break;
                 }
                 if ((size_t)r < w)
@@ -156,7 +153,11 @@ size_t Stream::to (Print* to,
                 }
                 w = to->write(temp, r);
                 written += w;
-                assert((size_t)r == w);
+                if ((size_t)r != w)
+                {
+                    _last_to = TOSTREAM_WRITE_ERROR;
+                    break;
+                }
                 if (w)
                     timedOut.reset();
             }
@@ -166,11 +167,12 @@ size_t Stream::to (Print* to,
                 yield();
         }
 
-#if D
-    Serial.printf("#### %dms: transf=%d\n", (int)millis(), (int)written);
-    if (timedOut)
-        Serial.printf("#### Timeout!\n");
-#endif
-
+    if (_last_to == TOSTREAM_SUCCESS)
+    {
+        if (timedOut)
+            _last_to = TOSTREAM_TIMED_OUT;
+        else if (len > 0 && written != len)
+            _last_to = TOSTREAM_SHORT;
+    }
     return written;
 }
