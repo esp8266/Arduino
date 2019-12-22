@@ -342,7 +342,7 @@ namespace detail
             }
             else if (FPA == kind)
             {
-                return std::bind(fnA, obj);
+                return [this](P... args) { return fnA(obj, std::forward<P...>(args...)); };
             }
             else
             {
@@ -1217,7 +1217,7 @@ namespace detail
             }
             else if (FPA == kind)
             {
-                return std::bind(fnA, obj);
+                return [this]() { return fnA(obj); };
             }
             else
             {
