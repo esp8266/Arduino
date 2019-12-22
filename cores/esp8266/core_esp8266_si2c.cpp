@@ -225,6 +225,11 @@ void Twi::enableSlave()
     {
 		asm("nop"); // minimum element to keep GCC from optimizing this function out.
     }
+
+//    {
+//        esp8266::polledTimeout::oneShotFastNs timeout(v);
+//        while(!timeout) { // 
+//    }
 }
 
 bool Twi::write_start(void)
@@ -265,7 +270,7 @@ bool Twi::write_bit(bool bit)
     {
         SDA_LOW(twi_sda);
     }
-    busywait(twi_dcount);
+    busywait(twi_dcount + 1);
     SCL_HIGH(twi_scl);
     WAIT_CLOCK_STRETCH();
     busywait(twi_dcount);
@@ -276,7 +281,7 @@ bool Twi::read_bit(void)
 {
     SCL_LOW(twi_scl);
     SDA_HIGH(twi_sda);
-    busywait(twi_dcount);
+    busywait(twi_dcount + 2);
     SCL_HIGH(twi_scl);
     WAIT_CLOCK_STRETCH();
     bool bit = SDA_READ(twi_sda);
