@@ -90,7 +90,7 @@ void loop() {
   else if (t == 3)
   {
     // stream to print, possibly with only one copy
-    client.to(client, -1, 0);  // all of it, immediate return (no timeout)
+    client.to(&client, -1, 0);  // transfer everything possible, immediate return (no timeout)
   }
 
 }
