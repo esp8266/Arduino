@@ -323,18 +323,21 @@ class String: public Stream {
 #endif
 
     /////////////////////////////////////////////
-    // Stream API:
+    // Print/Stream/peekBuffer API:
 
 protected:
 
     // peekPointer is used with peekBufferAPI,
-    // on peekConsume(), string can either:
-    // - be really consumed -- case when peekPointer==-1
-    // - marked as read     -- peekPointer is increased
-    //   (marked to not be consumed by default)
+    // on peekConsume(), chars can either:
+    // - be really consumed = disappeared
+    //   (case when peekPointer==-1)
+    // - marked as read
+    //   (peekPointer >=0 is increased)
     int peekPointer = 0;
 
 public:
+
+    //// Stream:
 
     size_t write(const uint8_t *buffer, size_t size) override;
     size_t write(uint8_t data) override;
@@ -350,7 +353,6 @@ public:
     virtual size_t availableForPeek () override { return available(); }
     virtual const char* peekBuffer () override;
     virtual void peekConsume (size_t consume) override;
-    virtual bool outputTimeoutPossible () const override { return false; }
     virtual bool inputTimeoutPossible () const override { return false; }
     virtual int read (char* buffer, size_t len) /*should override*/;
 
@@ -362,9 +364,10 @@ public:
         return read(buffer, len);
     }
 
-    //// Print
-    virtual int availableForWrite() override { return 256; }
-    // or biggestChunk()/4 or reserved-length?
+    //// Print:
+
+    virtual bool outputTimeoutPossible () const override { return false; }
+    virtual int availableForWrite() override { return 64; } // or biggestChunk()/4 or max(1,reserved-length)?
 };
 
 class StringSumHelper: public String {

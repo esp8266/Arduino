@@ -139,7 +139,8 @@ class Stream: public Print {
         // consume bytes after peekBuffer() use
         virtual void peekConsume (size_t consume) { (void)consume; }
 
-        // by default timeout is enabled (incoming network,serial.. data)
+        // by default read timeout is possible (incoming data from network,serial..)
+        // (children can override to false (like String))
         virtual bool inputTimeoutPossible () const { return true; }
 
         //////////////////// extensions: Stream streams
