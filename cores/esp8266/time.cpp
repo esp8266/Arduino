@@ -38,6 +38,7 @@ struct timeval {
 extern char* sntp_asctime(const struct tm *t);
 extern struct tm* sntp_localtime(const time_t *clock);
 extern uint64_t micros64();
+extern int sntp_get_daylight();
 extern void sntp_set_daylight(int daylight);
 
 // time gap in seconds from 01.01.1900 (NTP time) to 01.01.1970 (UNIX time)
@@ -126,4 +127,16 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     tzset();
 
     sntp_init();
+}
+
+void setDST(int daylightOffset_sec)
+{
+    sntp_stop();
+    sntp_set_daylight(daylightOffset_sec);
+    sntp_init();
+}
+
+int getDST()
+{
+    return sntp_get_daylight();
 }

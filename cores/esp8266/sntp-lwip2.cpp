@@ -70,6 +70,7 @@ bool sntp_set_timezone_in_seconds(sint32 timezone)
     return sntp_set_timezone((sint8)(timezone/(60*60))); //TODO: move this to the same file as sntp_set_timezone() in lwip1.4, and implement correctly over there.	
 }
 	
+int sntp_get_daylight(void);
 void sntp_set_daylight(int daylight);
 
 int settimeofday(const struct timeval* tv, const struct timezone* tz)
@@ -429,6 +430,11 @@ bool sntp_set_timezone(sint8 timezone)
 }
 
 		   
+int sntp_get_daylight(void)
+{
+    return dst;
+}
+
 void sntp_set_daylight(int daylight)
 {
     dst = daylight;
@@ -455,7 +461,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         // apparently tz->tz_dsttime is a bitfield and should not be further used (cf man)
         sntp_set_daylight(0);
     }
-    if (tv) /* after*/
+    if (tv) /*after*/
     {
         // reset time subsystem
         tune_timeshift64(tv->tv_sec * 1000000ULL + tv->tv_usec);
@@ -463,7 +469,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         sntp_set_system_time(tv->tv_sec);
 
         if (_settimeofday_cb)
-            schedule_function(_settimeofday_cb);
+            schedule_recurrent_function_us([](){ _settimeofday_cb(); return false; }, 0);
     }
     return 0;
 }
