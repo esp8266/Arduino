@@ -436,7 +436,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
     //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
     //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
-    size_t sent = StreamPtr(header.c_str(), header.length()).to(_currentClient); // transfer all of it, with timeout
+    size_t sent = StreamPtr(header.c_str(), header.length()).to(&_currentClient); // transfer all of it, with timeout
     (void)sent;
 #ifdef DEBUG_ESP_HTTP_SERVER
     if (sent != header.length())
