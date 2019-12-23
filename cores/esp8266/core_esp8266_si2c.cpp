@@ -40,8 +40,8 @@ extern "C" {
     {
         GPEC = (1 << twi_sda);
     }
-	static inline __attribute__((always_inline)) bool SDA_READ(const int twi_sda)
-	{
+    static inline __attribute__((always_inline)) bool SDA_READ(const int twi_sda)
+    {
         return (GPI & (1 << twi_sda)) != 0;
     }
     static inline __attribute__((always_inline)) void SCL_LOW(const int twi_scl)
@@ -52,8 +52,8 @@ extern "C" {
     {
         GPEC = (1 << twi_scl);
     }
-	static inline __attribute__((always_inline)) bool SCL_READ(const int twi_scl)
-	{
+    static inline __attribute__((always_inline)) bool SCL_READ(const int twi_scl)
+    {
         return (GPI & (1 << twi_scl)) != 0;
     }
 
@@ -160,22 +160,22 @@ static Twi twi;
 
 void Twi::setClock(unsigned int freq)
 {
-	if (freq < 250)  // minimum freq 250Hz to prevent overflow @ 232Hz
-		freq = 250;
-	
-	preferred_si2c_clock = freq;
+    if (freq < 250)  // minimum freq 250Hz to prevent overflow @ 232Hz
+        freq = 250;
+    
+    preferred_si2c_clock = freq;
 
 #if F_CPU == FCPU80
 
     if (freq > 400000)
-	    freq = 400000;
+        freq = 400000;
     twi_dcount = (500000000 / freq);  // half-cycle period in ns
     twi_dcount = (1000*(twi_dcount - 1120)) / 62500;  // (half cycle - overhead) / busywait loop time 
-	
+    
 #else
 
-	if (freq > 800000)
-	    freq = 800000;
+    if (freq > 800000)
+        freq = 800000;
     twi_dcount = (500000000 / freq);  // half-cycle period in ns
     twi_dcount = (1000*(twi_dcount - 560)) / 31250;  // (half cycle - overhead) / busywait loop time
 
@@ -226,7 +226,7 @@ void Twi::enableSlave()
     unsigned int i;
     for (i = 0; i < v; i++)  // loop time is 5 machine cycles: 31.25ns @ 160MHz, 62.5ns @ 80MHz
     {
-		asm("nop"); // minimum element to keep GCC from optimizing this function out.
+        asm("nop"); // minimum element to keep GCC from optimizing this function out.
     }
 }
 
@@ -472,14 +472,14 @@ void ICACHE_RAM_ATTR Twi::reply(uint8_t ack)
     if (ack)
     {
         //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT) | _BV(TWEA);
-        SCL_HIGH(twi.twi_scl);		// _BV(TWINT)
-        twi_ack = 1; 	// _BV(TWEA)
+        SCL_HIGH(twi.twi_scl);      // _BV(TWINT)
+        twi_ack = 1;    // _BV(TWEA)
     }
     else
     {
         //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT);
-        SCL_HIGH(twi.twi_scl);		// _BV(TWINT)
-        twi_ack = 0;	// ~_BV(TWEA)
+        SCL_HIGH(twi.twi_scl);      // _BV(TWINT)
+        twi_ack = 0;    // ~_BV(TWEA)
     }
 }
 
@@ -488,8 +488,8 @@ void ICACHE_RAM_ATTR Twi::releaseBus(void)
 {
     // release bus
     //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
-    SCL_HIGH(twi.twi_scl);		// _BV(TWINT)
-    twi_ack = 1; 	// _BV(TWEA)
+    SCL_HIGH(twi.twi_scl);      // _BV(TWINT)
+    twi_ack = 1;    // _BV(TWEA)
     SDA_HIGH(twi.twi_sda);
 
     // update twi state
@@ -660,11 +660,11 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
     unsigned int scl;
 
     // Store bool return in int to reduce final code size.
-	
+    
     sda = SDA_READ(twi.twi_sda);
     scl = SCL_READ(twi.twi_scl);
 
-    twi.twip_status = 0xF8;		// reset TWI status
+    twi.twip_status = 0xF8;     // reset TWI status
 
     int twip_state_mask = S2M(twi.twip_state);
     IFSTATE(S2M(TWIP_START) | S2M(TWIP_REP_START) | S2M(TWIP_SLA_W) | S2M(TWIP_READ))
@@ -739,7 +739,7 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
                 }
                 else
                 {
-                    SCL_LOW(twi.twi_scl);	// clock stretching
+                    SCL_LOW(twi.twi_scl);   // clock stretching
                     SDA_HIGH(twi.twi_sda);
                     twi.twip_mode = TWIPM_ADDRESSED;
                     if (!(twi.twi_data & 0x01))
@@ -757,7 +757,7 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
             }
             else
             {
-                SCL_LOW(twi.twi_scl);	// clock stretching
+                SCL_LOW(twi.twi_scl);   // clock stretching
                 SDA_HIGH(twi.twi_sda);
                 if (!twi.twi_ack)
                 {
@@ -835,7 +835,7 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
         }
         else
         {
-            SCL_LOW(twi.twi_scl);	// clock stretching
+            SCL_LOW(twi.twi_scl);   // clock stretching
             if (twi.twi_ack && twi.twi_ack_rec)
             {
                 twi.onTwipEvent(TW_ST_DATA_ACK);
@@ -881,7 +881,7 @@ void ICACHE_RAM_ATTR Twi::onSdaChange(void)
         else IFSTATE(S2M(TWIP_START) | S2M(TWIP_REP_START) | S2M(TWIP_SEND_ACK) | S2M(TWIP_WAIT_ACK) | S2M(TWIP_SLA_R) | S2M(TWIP_REC_ACK) | S2M(TWIP_READ_ACK) | S2M(TWIP_RWAIT_ACK) | S2M(TWIP_WRITE))
         {
             // START or STOP
-            SDA_HIGH(twi.twi_sda);	 // Should not be necessary
+            SDA_HIGH(twi.twi_sda);   // Should not be necessary
             twi.onTwipEvent(TW_BUS_ERROR);
             twi.twip_mode = TWIPM_WAIT;
             twi.twip_state = TWIP_BUS_ERR;
@@ -891,7 +891,7 @@ void ICACHE_RAM_ATTR Twi::onSdaChange(void)
             if (sda)
             {
                 // STOP
-                SCL_LOW(twi.twi_scl);	// clock stretching
+                SCL_LOW(twi.twi_scl);   // generates a low SCL pulse after STOP
                 ets_timer_disarm(&twi.timer);
                 twi.twip_state = TWIP_IDLE;
                 twi.twip_mode = TWIPM_IDLE;
@@ -925,7 +925,7 @@ void ICACHE_RAM_ATTR Twi::onSdaChange(void)
             else
             {
                 // during first bit in byte transfer - ok
-                SCL_LOW(twi.twi_scl);	// clock stretching
+                SCL_LOW(twi.twi_scl);   // clock stretching
                 twi.onTwipEvent(TW_SR_STOP);
                 if (sda)
                 {
