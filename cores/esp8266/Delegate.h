@@ -58,11 +58,13 @@ namespace detail
     public:
         DelegatePImpl()
         {
+            kind = FP;
             fn = nullptr;
         }
 
         DelegatePImpl(std::nullptr_t)
         {
+            kind = FP;
             fn = nullptr;
         }
 
@@ -367,7 +369,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP, FPA } kind = FP;
+        enum { FUNC, FP, FPA } kind;
         union {
             FunctionType functional;
             FunPtr fn;
@@ -389,11 +391,13 @@ namespace detail
     public:
         DelegatePImpl()
         {
+            kind = FP;
             fn = nullptr;
         }
 
         DelegatePImpl(std::nullptr_t)
         {
+            kind = FP;
             fn = nullptr;
         }
 
@@ -586,7 +590,7 @@ namespace detail
         }
 
     protected:
-        enum { FP, FPA } kind = FP;
+        enum { FP, FPA } kind;
         union {
             FunPtr fn;
             FunAPtr fnA;
@@ -607,11 +611,13 @@ namespace detail
     public:
         DelegatePImpl()
         {
+            kind = FP;
             fn = nullptr;
         }
 
         DelegatePImpl(std::nullptr_t)
         {
+            kind = FP;
             fn = nullptr;
         }
 
@@ -819,7 +825,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP } kind = FP;
+        enum { FUNC, FP } kind;
         union {
             FunctionType functional;
             FunPtr fn;
@@ -934,11 +940,13 @@ namespace detail
     public:
         DelegateImpl()
         {
+            kind = FP;
             fn = nullptr;
         }
 
         DelegateImpl(std::nullptr_t)
         {
+            kind = FP;
             fn = nullptr;
         }
 
@@ -1242,7 +1250,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP, FPA } kind = FP;
+        enum { FUNC, FP, FPA } kind;
         union {
             FunctionType functional;
             FunPtr fn;
@@ -1264,11 +1272,13 @@ namespace detail
     public:
         DelegateImpl()
         {
+            kind = FP;
             fn = nullptr;
         }
 
         DelegateImpl(std::nullptr_t)
         {
+            kind = FP;
             fn = nullptr;
         }
 
@@ -1460,7 +1470,7 @@ namespace detail
         }
 
     protected:
-        enum { FP, FPA } kind = FP;
+        enum { FP, FPA } kind;
         union {
             FunPtr fn;
             FunAPtr fnA;
@@ -1481,11 +1491,13 @@ namespace detail
     public:
         DelegateImpl()
         {
+            kind = FP;
             fn = nullptr;
         }
 
         DelegateImpl(std::nullptr_t)
         {
+            kind = FP;
             fn = nullptr;
         }
 
@@ -1693,7 +1705,7 @@ namespace detail
         }
 
     protected:
-        enum { FUNC, FP } kind = FP;
+        enum { FUNC, FP } kind;
         union {
             FunctionType functional;
             FunPtr fn;
