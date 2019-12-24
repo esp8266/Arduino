@@ -205,18 +205,7 @@ void loop(void);
 
 void yield(void);
 
-#ifndef F_CPU
-// single function needed from SDK user_interface.h
-extern "C" uint8 system_get_cpu_freq(void);
-#endif
-
-void __optimistic_yield(uint32_t intvl_cycles);
-
-#if defined(F_CPU)
-#define optimistic_yield(interval_us) (__optimistic_yield(interval_us * clockCyclesPerMicrosecond()))
-#else
-#define optimistic_yield(interval_us) (__optimistic_yield(interval_us * getCpuFreqMHz()))
-#endif
+void optimistic_yield(uint32_t interval_us);
 
 #define _PORT_GPIO16    1
 #define digitalPinToPort(pin)       (((pin)==16)?(_PORT_GPIO16):(0))

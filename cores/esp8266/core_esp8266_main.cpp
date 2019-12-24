@@ -124,23 +124,18 @@ extern "C" void __yield() {
 
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
-extern "C" void __optimistic_yield(uint32_t intvl_cycles) {
+extern "C" void optimistic_yield(uint32_t interval_us) {
+    const uint32_t intvl_cycles = interval_us *
+#if defined(F_CPU)
+        clockCyclesPerMicrosecond();
+#else
+        getCpuFreqMHz();
+#endif
     if ((ESP.getCycleCount() - s_cycles_since_yield_start) > intvl_cycles &&
         can_yield())
     {
         yield();
     }
-}
-
-#undef optimistic_yield
-extern "C" void optimistic_yield(uint32_t interval_us) {
-    __optimistic_yield(interval_us *
-#if defined(F_CPU)
-        clockCyclesPerMicrosecond()
-#else
-        getCpuFreqMHz()
-#endif
-    );
 }
 
 // Replace ets_intr_(un)lock with nestable versions
