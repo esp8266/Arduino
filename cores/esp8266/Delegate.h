@@ -231,21 +231,6 @@ namespace detail
             return *this;
         }
 
-        template<typename F> DelegatePImpl& operator=(F functional)
-        {
-            if (FUNC != kind)
-            {
-                if (FPA == kind)
-                {
-                    obj.~A();
-                }
-                new (&this->functional) FunctionType();
-                kind = FUNC;
-            }
-            this->functional = std::forward<F>(functional);
-            return *this;
-        }
-
         DelegatePImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
             if (FUNC == kind)
@@ -491,17 +476,6 @@ namespace detail
             return *this;
         }
 
-        template<typename F> DelegatePImpl& operator=(F fn)
-        {
-            if (FPA == kind)
-            {
-                obj = {};
-            }
-            kind = FP;
-            this->fn = std::forward<F>(fn);
-            return *this;
-        }
-
         DelegatePImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
             if (FPA == kind)
@@ -701,17 +675,6 @@ namespace detail
             return *this;
         }
 
-        template<typename F> DelegatePImpl& operator=(F functional)
-        {
-            if (FUNC != kind)
-            {
-                new (&this->functional) FunctionType();
-                kind = FUNC;
-            }
-            this->functional = std::forward<F>(functional);
-            return *this;
-        }
-
         DelegatePImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
             if (FUNC == kind)
@@ -849,12 +812,6 @@ namespace detail
         DelegatePImpl& operator=(FunPtr fn)
         {
             DelegatePImpl::fn = fn;
-            return *this;
-        }
-
-        template<typename F> DelegatePImpl& operator=(F fn)
-        {
-            DelegatePImpl::fn = std::forward<F>(fn);
             return *this;
         }
 
@@ -1072,21 +1029,6 @@ namespace detail
             }
             kind = FP;
             this->fn = fn;
-            return *this;
-        }
-
-        template<typename F> DelegateImpl& operator=(F functional)
-        {
-            if (FUNC != kind)
-            {
-                if (FPA == kind)
-                {
-                    obj.~A();
-                }
-                new (&this->functional) FunctionType();
-                kind = FUNC;
-            }
-            this->functional = std::forward<F>(functional);
             return *this;
         }
 
@@ -1334,17 +1276,6 @@ namespace detail
             return *this;
         }
 
-        template<typename F> DelegateImpl& operator=(F fn)
-        {
-            if (FPA == kind)
-            {
-                obj = {};
-            }
-            kind = FP;
-            this->fn = std::forward<F>(fn);
-            return *this;
-        }
-
         DelegateImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
             if (FPA == kind)
@@ -1543,17 +1474,6 @@ namespace detail
             return *this;
         }
 
-        template<typename F> DelegateImpl& operator=(F functional)
-        {
-            if (FUNC != kind)
-            {
-                new (&this->functional) FunctionType();
-                kind = FUNC;
-            }
-            this->functional = std::forward<F>(functional);
-            return *this;
-        }
-
         DelegateImpl& IRAM_ATTR operator=(std::nullptr_t)
         {
             if (FUNC == kind)
@@ -1691,12 +1611,6 @@ namespace detail
         DelegateImpl& operator=(FunPtr fn)
         {
             DelegateImpl::fn = fn;
-            return *this;
-        }
-
-        template<typename F> DelegateImpl& operator=(F fn)
-        {
-            DelegateImpl::fn = std::forward<F>(fn);
             return *this;
         }
 
