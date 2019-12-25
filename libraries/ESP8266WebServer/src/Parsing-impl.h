@@ -60,7 +60,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
   DBGWS("request: %s\n", req.c_str());
   client.readStringUntil('\n');
   //reset header value
-  for (int i = 0; i < _headerKeysCount; ++i) {
+  for (size_t i = 0; i < _headerKeysCount; ++i) {
     _currentHeaders[i].value.clear();
    }
 
@@ -236,7 +236,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
 #ifdef DEBUG_ESP_HTTP_SERVER
   DBGWS("Request: %s\nArguments: %s\nfinal list of key/value pairs:\n",
     url.c_str(), searchStr.c_str());
-  for (int i = 0; i < _currentArgCount; i++)
+  for (size_t i = 0; i < _currentArgCount; i++)
     DBGWS("  key:'%s' value:'%s'\r\n",
       _currentArgs[i].key.c_str(),
       _currentArgs[i].value.c_str());
@@ -247,13 +247,13 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_collectHeader(const char* headerName, const char* headerValue) {
-  for (int i = 0; i < _headerKeysCount; i++) {
-    if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
-            _currentHeaders[i].value=headerValue;
+    for (size_t i = 0; i < _headerKeysCount; i++) {
+        if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
+            _currentHeaders[i].value = headerValue;
             return true;
         }
-  }
-  return false;
+    }
+    return false;
 }
 
 template <typename ServerType>
@@ -513,21 +513,20 @@ readfile:
       }
     }
 
-    int iarg;
-    int totalArgs = ((WEBSERVER_MAX_POST_ARGS - _postArgsLen) < _currentArgCount)?(WEBSERVER_MAX_POST_ARGS - _postArgsLen):_currentArgCount;
-    for (iarg = 0; iarg < totalArgs; iarg++){
+    size_t totalArgs = ((WEBSERVER_MAX_POST_ARGS - _postArgsLen) < _currentArgCount)?(WEBSERVER_MAX_POST_ARGS - _postArgsLen):_currentArgCount;
+    for (size_t iarg = 0; iarg < totalArgs; iarg++) {
       RequestArgument& arg = _postArgs[_postArgsLen++];
       arg.key = _currentArgs[iarg].key;
       arg.value = _currentArgs[iarg].value;
     }
     if (_currentArgs) delete[] _currentArgs;
     _currentArgs = new RequestArgument[_postArgsLen];
-    for (iarg = 0; iarg < _postArgsLen; iarg++){
-      RequestArgument& arg = _currentArgs[iarg];
-      arg.key = _postArgs[iarg].key;
-      arg.value = _postArgs[iarg].value;
+    for (size_t i = 0; i < _postArgsLen; i++) {
+      RequestArgument& arg = _currentArgs[i];
+      arg.key = _postArgs[i].key;
+      arg.value = _postArgs[i].value;
     }
-    _currentArgCount = iarg;
+    _currentArgCount = _postArgsLen;
     if (_postArgs) {
       delete[] _postArgs;
       _postArgs = nullptr;

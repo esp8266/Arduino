@@ -127,19 +127,32 @@ public:
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
-  const String& pathArg(unsigned int i) const; // get request path argument by number
-  const String& arg(const String& name) const;    // get request argument value by name
-  const String& arg(int i) const;          // get request argument value by number
-  const String& argName(int i) const;      // get request argument name by number
-  int args() const;                        // get arguments count
-  bool hasArg(const String& name) const;   // check if argument exists
-  void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
-  const String& header(const String& name) const; // get request header value by name
-  const String& header(int i) const;       // get request header value by number
-  const String& headerName(int i) const;   // get request header name by number
-  int headers() const;                     // get header count
-  bool hasHeader(const String& name) const;       // check if header exists
-  const String& hostHeader() const;        // get request host header if available or empty String if not
+  // get request path argument by number
+  const String& pathArg(unsigned int i) const;
+  // get request argument value by name
+  const String& arg(const String& name) const;
+  // get request argument value by number
+  const String& arg(int i) const;
+  // get request argument name by number
+  const String& argName(int i) const;
+  // get arguments count
+  int args() const;
+  // check if argument exists
+  bool hasArg(const String& name) const;
+  // set the request headers to collect
+  void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
+  // get request header value by name
+  const String& header(const String& name) const;
+  // get request header value by number
+  const String& header(int i) const;
+  // get request header name by number
+  const String& headerName(int i) const;
+  // get header count
+  int headers() const;
+  // check if header exists
+  bool hasHeader(const String& name) const;
+  // get request host header if available or empty String if not
+  const String& hostHeader() const;
 
   // send response to the client
   // code - HTTP response code, can be 200 or 404
@@ -192,7 +205,7 @@ public:
   // Defaults to true when the client's HTTP version is 1.1 or above, otherwise it defaults to false.
   // If the client sends the "Connection" header, the value given by the header is used.
   void keepAlive(bool keepAlive) { _keepAlive = keepAlive; }
-  bool keepAlive() { return _keepAlive; }
+  bool keepAlive() const { return _keepAlive; }
 
   static String credentialHash(const String& username, const String& realm, const String& password);
 
@@ -261,34 +274,33 @@ protected:
   ClientType  _currentClient;
   HTTPMethod  _currentMethod;
   String      _currentUri;
-  uint8_t     _currentVersion;
-  HTTPClientStatus _currentStatus;
-  unsigned long _statusChange;
-  bool _keepAlive;
+  uint8_t     _currentVersion = 0;
+  HTTPClientStatus _currentStatus = HC_NONE;
+  unsigned long _statusChange = 0;
 
-  RequestHandlerType*  _currentHandler;
-  RequestHandlerType*  _firstHandler;
-  RequestHandlerType*  _lastHandler;
+  bool _keepAlive = false;
+  bool _chunked = false;
+  bool _corsEnabled = false;
+
+  RequestHandlerType*  _currentHandler = nullptr;
+  RequestHandlerType*  _firstHandler = nullptr;
+  RequestHandlerType*  _lastHandler = nullptr;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
 
-  int              _currentArgCount;
-  RequestArgument* _currentArgs;
-  int              _currentArgsHavePlain;
+  size_t           _currentArgCount = 0;
+  RequestArgument* _currentArgs = nullptr;
+  size_t           _currentArgsHavePlain = 0;
   std::unique_ptr<HTTPUpload> _currentUpload;
-  int              _postArgsLen;
-  RequestArgument* _postArgs;
+  size_t           _postArgsLen = 0;
+  RequestArgument* _postArgs = nullptr;
 
-  int              _headerKeysCount;
-  RequestArgument* _currentHeaders;
+  size_t           _headerKeysCount = 0;
+  RequestArgument* _currentHeaders = nullptr;
 
-  size_t           _contentLength;
+  size_t           _contentLength = 0;
   String           _responseHeaders;
-
   String           _hostHeader;
-  bool             _chunked;
-  bool             _corsEnabled;
-
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
