@@ -121,41 +121,29 @@ String ESP8266WebServerTemplate<ServerType>::_extractParam(String& authReq,const
 }
 
 template <typename ServerType>
-bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, const char * password){
-  if(hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
-    String authReq = header(FPSTR(AUTHORIZATION_HEADER));
-    if(authReq.startsWith(F("Basic"))){
-      authReq = authReq.substring(6);
-      authReq.trim();
-      char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new (std::nothrow) char[toencodeLen + 1];
-      if(toencode == NULL){
-        authReq = "";
-        return false;
-      }
-      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
-        authReq = "";
-        delete[] toencode;
-        return false;
-      }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
-        authReq = "";
-        delete[] toencode;
-        delete[] encoded;
-        return true;
-      }
-      delete[] toencode;
-      delete[] encoded;
-    } else if(authReq.startsWith(F("Digest"))) {
-      String _realm    = _extractParam(authReq, F("realm=\""));
-      String _H1 = credentialHash((String)username,_realm,(String)password);
-      return authenticateDigest((String)username,_H1);
+bool ESP8266WebServerTemplate<ServerType>::authenticate(const char* name, const char* pass) {
+    if (hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
+        String authReq = header(FPSTR(AUTHORIZATION_HEADER));
+        String username(name);
+        String password(pass);
+
+        if (authReq.startsWith(F("Basic"))) {
+            authReq = authReq.substring(6);
+            authReq.trim();
+            String toencode;
+            toencode.reserve(username.length() + 1 + password.length());
+
+            toencode += username;
+            toencode += ':';
+            toencode += password;
+            return authReq.equalsConstantTime(::base64::encode(toencode, false /* doNewLines */));
+        } else if (authReq.startsWith(F("Digest"))) {
+            return authenticateDigest(
+                username, credentialHash(
+                    username, _extractParam(authReq, F("realm=\"")), password));
+        }
     }
-    authReq = "";
-  }
-  return false;
+    return false;
 }
 
 template <typename ServerType>
