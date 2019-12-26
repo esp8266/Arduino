@@ -37,7 +37,6 @@
 #endif
 
 static const char Content_Type[] PROGMEM = "Content-Type";
-static const char filename[] PROGMEM = "filename";
 
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
@@ -62,216 +61,183 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
-  // Read the first line of HTTP request
-  String req = client.readStringUntil('\r');
+    // Read the first line of HTTP request
+    String req = client.readStringUntil('\r');
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("request: ");
     DEBUG_OUTPUT.println(req);
 #endif
-  client.readStringUntil('\n');
-  //reset header value
-  for (int i = 0; i < _headerKeysCount; ++i) {
-    _currentHeaders[i].value =String();
-   }
+    client.readStringUntil('\n');
+    //reset header value
+    for (size_t i = 0; i < _headerKeysCount; ++i) {
+        _currentHeaders[i].value.clear();
+    }
 
-  // First line of HTTP request looks like "GET /path HTTP/1.1"
-  // Retrieve the "/path" part by finding the spaces
-  int addr_start = req.indexOf(' ');
-  int addr_end = req.indexOf(' ', addr_start + 1);
-  if (addr_start == -1 || addr_end == -1) {
+    // First line of HTTP request looks like "GET /path HTTP/1.1"
+    // Retrieve the "/path" part by finding the spaces
+    int addr_start = req.indexOf(' ');
+    int addr_end = req.indexOf(' ', addr_start + 1);
+    if (addr_start == -1 || addr_end == -1) {
 #ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("Invalid request");
+        DEBUG_OUTPUT.println("Invalid request");
 #endif
-    return false;
-  }
+        return false;
+    }
 
-  String methodStr = req.substring(0, addr_start);
-  String url = req.substring(addr_start + 1, addr_end);
-  String versionEnd = req.substring(addr_end + 8);
-  _currentVersion = atoi(versionEnd.c_str());
-  String searchStr;
-  int hasSearch = url.indexOf('?');
-  if (hasSearch != -1){
-    searchStr = url.substring(hasSearch + 1);
-    url = url.substring(0, hasSearch);
-  }
-  _currentUri = url;
-  _chunked = false;
+    String methodStr = req.substring(0, addr_start);
+    String url = req.substring(addr_start + 1, addr_end);
+    _currentVersion = req.substring(addr_end + 8).toInt();
+    String searchStr;
+    int hasSearch = url.indexOf('?');
+    if (hasSearch != -1) {
+        searchStr = url.substring(hasSearch + 1);
+        url = url.substring(0, hasSearch);
+    }
+    _currentUri = url;
+    _chunked = false;
 
-  HTTPMethod method = HTTP_GET;
-  if (methodStr == F("HEAD")) {
-    method = HTTP_HEAD;
-  } else if (methodStr == F("POST")) {
-    method = HTTP_POST;
-  } else if (methodStr == F("DELETE")) {
-    method = HTTP_DELETE;
-  } else if (methodStr == F("OPTIONS")) {
-    method = HTTP_OPTIONS;
-  } else if (methodStr == F("PUT")) {
-    method = HTTP_PUT;
-  } else if (methodStr == F("PATCH")) {
-    method = HTTP_PATCH;
-  }
-  _currentMethod = method;
+    HTTPMethod method = HTTP_GET;
+    if (methodStr == F("HEAD")) {
+        method = HTTP_HEAD;
+    } else if (methodStr == F("POST")) {
+        method = HTTP_POST;
+    } else if (methodStr == F("DELETE")) {
+        method = HTTP_DELETE;
+    } else if (methodStr == F("OPTIONS")) {
+        method = HTTP_OPTIONS;
+    } else if (methodStr == F("PUT")) {
+        method = HTTP_PUT;
+    } else if (methodStr == F("PATCH")) {
+        method = HTTP_PATCH;
+    }
+    _currentMethod = method;
 
 #ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("method: ");
-  DEBUG_OUTPUT.print(methodStr);
-  DEBUG_OUTPUT.print(" url: ");
-  DEBUG_OUTPUT.print(url);
-  DEBUG_OUTPUT.print(" search: ");
-  DEBUG_OUTPUT.println(searchStr);
+    DEBUG_OUTPUT.print("method: ");
+    DEBUG_OUTPUT.print(methodStr);
+    DEBUG_OUTPUT.print(" url: ");
+    DEBUG_OUTPUT.print(url);
+    DEBUG_OUTPUT.print(" search: ");
+    DEBUG_OUTPUT.println(searchStr);
 #endif
 
-  //attach handler
-  RequestHandlerType* handler;
-  for (handler = _firstHandler; handler; handler = handler->next()) {
-    if (handler->canHandle(_currentMethod, _currentUri))
-      break;
-  }
-  _currentHandler = handler;
+    //attach handler
+    RequestHandlerType* handler;
+    for (handler = _firstHandler; handler; handler = handler->next()) {
+        if (handler->canHandle(_currentMethod, _currentUri))
+            break;
+    }
+    _currentHandler = handler;
 
-  String formData;
-  // below is needed only when POST type request
-  if (method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
-    String boundaryStr;
     String headerName;
     String headerValue;
+    String boundaryStr;
     bool isForm = false;
     bool isEncoded = false;
     uint32_t contentLength = 0;
-    //parse headers
-    while(1){
-      req = client.readStringUntil('\r');
-      client.readStringUntil('\n');
-      if (req.isEmpty()) break;//no moar headers
-      int headerDiv = req.indexOf(':');
-      if (headerDiv == -1){
-        break;
-      }
-      headerName = req.substring(0, headerDiv);
-      headerValue = req.substring(headerDiv + 1);
-      headerValue.trim();
-       _collectHeader(headerName.c_str(),headerValue.c_str());
+    // parse headers
+    while (true) {
+        req = client.readStringUntil('\r');
+        client.readStringUntil('\n');
 
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print("headerName: ");
-      DEBUG_OUTPUT.println(headerName);
-      DEBUG_OUTPUT.print("headerValue: ");
-      DEBUG_OUTPUT.println(headerValue);
-      #endif
-
-      if (headerName.equalsIgnoreCase(FPSTR(Content_Type))){
-        using namespace mime;
-        if (headerValue.startsWith(FPSTR(mimeTable[txt].mimeType))){
-          isForm = false;
-        } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
-          isForm = false;
-          isEncoded = true;
-        } else if (headerValue.startsWith(F("multipart/"))){
-          boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
-          boundaryStr.replace("\"","");
-          isForm = true;
+        int headerDiv = req.indexOf(':');
+        if (headerDiv < 0) {
+            break;
         }
-      } else if (headerName.equalsIgnoreCase(F("Content-Length"))){
-        contentLength = headerValue.toInt();
-      } else if (headerName.equalsIgnoreCase(F("Host"))){
-        _hostHeader = headerValue;
-      }
-    }
-
-    String plainBuf;
-    if (   !isForm
-        && // read content into plainBuf
-           (   !readBytesWithTimeout<ServerType>(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
-            || (plainBuf.length() < contentLength)
-           )
-       )
-    {
-        return false;
-    }
-
-    if (isEncoded) {
-        // isEncoded => !isForm => plainBuf is not empty
-        // add plainBuf in search str
-        if (searchStr.length())
-          searchStr += '&';
-        searchStr += plainBuf;
-    }
-
-    // parse searchStr for key/value pairs
-    _parseArguments(searchStr);
-
-    if (!isForm) {
-      if (contentLength) {
-        // add key=value: plain={body} (post json or other data)
-        RequestArgument& arg = _currentArgs[_currentArgCount++];
-        arg.key = F("plain");
-        arg.value = plainBuf;
-        _currentArgsHavePlain = 1;
-      }
-    } else { // isForm is true
-      // here: content is not yet read (plainBuf is still empty)
-      if (!_parseForm(client, boundaryStr, contentLength)) {
-        return false;
-      }
-    }
-  } else {
-    String headerName;
-    String headerValue;
-    //parse headers
-    while(1){
-      req = client.readStringUntil('\r');
-      client.readStringUntil('\n');
-      if (req.isEmpty()) break;//no moar headers
-      int headerDiv = req.indexOf(':');
-      if (headerDiv == -1){
-        break;
-      }
-      headerName = req.substring(0, headerDiv);
-      headerValue = req.substring(headerDiv + 2);
-      _collectHeader(headerName.c_str(),headerValue.c_str());
+        headerName = req.substring(0, headerDiv);
+        headerValue = req.substring(headerDiv + 1);
+        headerValue.trim();
+        _collectHeader(headerName, headerValue);
 
 #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print(F("headerName: "));
-      DEBUG_OUTPUT.println(headerName);
-      DEBUG_OUTPUT.print(F("headerValue: "));
-      DEBUG_OUTPUT.println(headerValue);
+        DEBUG_OUTPUT.print(F("headerName: "));
+        DEBUG_OUTPUT.println(headerName);
+        DEBUG_OUTPUT.print(F("headerValue: "));
+        DEBUG_OUTPUT.println(headerValue);
 #endif
-
-      if (headerName.equalsIgnoreCase(F("Host"))){
-        _hostHeader = headerValue;
-      }
+        if (headerName.equalsIgnoreCase(FPSTR(Content_Type))) {
+            if (headerValue.startsWith(FPSTR(::mime::mimeTable[::mime::txt].mimeType))) {
+                isForm = false;
+            } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))) {
+                isForm = false;
+                isEncoded = true;
+            } else if (headerValue.startsWith(F("multipart/"))) {
+                boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
+                boundaryStr.replace("\"", "");
+                isForm = true;
+            }
+        } else if (headerName.equalsIgnoreCase(F("Content-Length"))) {
+            contentLength = headerValue.toInt();
+        } else if (headerName.equalsIgnoreCase(F("Host"))) {
+            _hostHeader = headerValue;
+        }
     }
     _parseArguments(searchStr);
-  }
-  client.flush();
+
+    // below is needed only when POST type request
+    if (method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE) {
+        String plainBuf;
+        if (!isForm &&
+                // read content into plainBuf
+                (!readBytesWithTimeout<ServerType>(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
+                 || (plainBuf.length() < contentLength)))
+        {
+            return false;
+        }
+
+        if (isEncoded) {
+            // isEncoded => !isForm => plainBuf is not empty
+            // add plainBuf in search str
+            if (searchStr.length())
+                searchStr += '&';
+            searchStr += plainBuf;
+        }
+
+        // parse searchStr for key/value pairs
+        _parseArguments(searchStr);
+
+        if (!isForm) {
+            if (contentLength) {
+                // add key=value: plain={body} (post json or other data)
+                RequestArgument& arg = _currentArgs[_currentArgCount++];
+                arg.key = F("plain");
+                arg.value = plainBuf;
+                _currentArgsHavePlain = 1;
+            }
+        } else { // isForm is true
+            // here: content is not yet read (plainBuf is still empty)
+            if (!_parseForm(client, boundaryStr, contentLength)) {
+                return false;
+            }
+        }
+    }
+    client.flush();
 
 #ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print(F("Request: "));
-  DEBUG_OUTPUT.println(url);
-  DEBUG_OUTPUT.print(F("Arguments: "));
-  DEBUG_OUTPUT.println(searchStr);
+    DEBUG_OUTPUT.print(F("Request: "));
+    DEBUG_OUTPUT.println(url);
+    DEBUG_OUTPUT.print(F("Arguments: "));
+    DEBUG_OUTPUT.println(searchStr);
 
-  DEBUG_OUTPUT.println(F("final list of key/value pairs:"));
-  for (int i = 0; i < _currentArgCount; i++)
-    DEBUG_OUTPUT.printf("  key:'%s' value:'%s'\r\n",
-      _currentArgs[i].key.c_str(),
-      _currentArgs[i].value.c_str());
+    DEBUG_OUTPUT.println(F("final list of key/value pairs:"));
+    for (int i = 0; i < _currentArgCount; i++)
+        DEBUG_OUTPUT.printf("  key:'%s' value:'%s'\r\n",
+                _currentArgs[i].key.c_str(),
+                _currentArgs[i].value.c_str());
 #endif
 
-  return true;
+    return true;
 }
 
 template <typename ServerType>
-bool ESP8266WebServerTemplate<ServerType>::_collectHeader(const char* headerName, const char* headerValue) {
-  for (int i = 0; i < _headerKeysCount; i++) {
-    if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
-            _currentHeaders[i].value=headerValue;
+bool ESP8266WebServerTemplate<ServerType>::_collectHeader(const String& headerName, const String& headerValue) {
+    for (int i = 0; i < _headerKeysCount; i++) {
+        if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
+            _currentHeaders[i].value = headerValue;
             return true;
         }
-  }
-  return false;
+    }
+    return false;
 }
 
 template <typename ServerType>
@@ -359,9 +325,9 @@ int ESP8266WebServerTemplate<ServerType>::_parseArgumentsPrivate(const String& d
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
-  if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
-    if(_currentHandler && _currentHandler->canUpload(_currentUri))
+void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b) {
+  if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN) {
+    if (_currentHandler && _currentHandler->canUpload(_currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
     _currentUpload->totalSize += _currentUpload->currentSize;
     _currentUpload->currentSize = 0;
@@ -427,8 +393,9 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             DEBUG_OUTPUT.println(argFilename);
 #endif
             //use GET to set the filename if uploading using blob
-            if (argFilename == F("blob") && hasArg(FPSTR(filename)))
-              argFilename = arg(FPSTR(filename));
+            String filenameArg = arg(F("filename"));
+            if (argFilename == F("blob") && !filenameArg.isEmpty())
+              argFilename = filenameArg;
           }
 #ifdef DEBUG_ESP_HTTP_SERVER
           DEBUG_OUTPUT.print("PostArg Name: ");
