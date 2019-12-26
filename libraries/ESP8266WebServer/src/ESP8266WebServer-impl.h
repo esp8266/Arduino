@@ -801,9 +801,6 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
     case 417:
         r = F("Expectation Failed");
         break;
-    case 418:
-        r = F("I'm a teapot");
-        break;
     case 500:
         r = F("Internal Server Error");
         break;
