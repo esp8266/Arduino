@@ -190,7 +190,7 @@ class SPIFFSConfig : public FSConfig
 public:
     static constexpr uint32_t FSId = 0x53504946;
     SPIFFSConfig(bool autoFormat = true, bool enableTime = true) {
-        _type = SPIFFSConfig::fsid::FSId;
+        _type = SPIFFSConfig::FSId;
         _autoFormat = autoFormat;
         _enableTime = enableTime;
     }
