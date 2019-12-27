@@ -696,6 +696,9 @@ void ESP8266WebServerTemplate<ServerType>::_finalizeResponse() {
 
 template <typename ServerType>
 String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code) {
+    // By first determining the pointer to the flash stored string in the switch
+    // statement and then doing String(FlashStringHelper) return reduces the total code
+    // size of this function by over 50%.
     const __FlashStringHelper *r;
     switch (code)
     {
