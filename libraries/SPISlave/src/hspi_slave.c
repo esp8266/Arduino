@@ -72,11 +72,10 @@ void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
 
 void hspi_slave_begin(uint8_t status_len, void * arg)
 {
-    status_len &= 7;
     if(status_len > 4) {
         status_len = 4;    //max 32 bits
     }
-    if(status_len == 0) {
+    else if(status_len == 0) {
         status_len = 1;    //min 8 bits
     }
 
@@ -85,7 +84,13 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
     pinMode(MISO, SPECIAL);
     pinMode(MOSI, SPECIAL);
 
-    SPI1S = SPISE | SPISBE | 0x3E0; // SPI_SLAVE_REG
+    SPI1S = SPISE | SPISBE | SPISTRIE | SPISWBIE | SPISRSIE | SPISWSIE | SPISRBIE;	//(0x63E0)
+    //setting config bits in SPI_SLAVE_REG, defined in "esp8266_peri.h" :
+    //SPISE - spi slave enable
+    //SPISBE - allows work (read/write) with buffer, without this only? status available
+    //SPISTRIE - enables TRANS?? interrupt
+    //other SPISxxIE - enables corresponding interrupts (read(R)/write(W) status(S) and buffer(B))
+  
     SPI1U = SPIUMISOH | SPIUCOMMAND | SPIUSSE; // SPI_USER_REG
     SPI1CLK = 0;
     SPI1U2 = (7 << SPILCOMMAND); // SPI_USER2_REG

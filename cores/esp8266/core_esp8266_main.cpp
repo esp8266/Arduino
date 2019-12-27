@@ -60,6 +60,13 @@ static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 /* Used to implement optimistic_yield */
 static uint32_t s_micros_at_task_start;
 
+/* For ets_intr_lock_nest / ets_intr_unlock_nest
+ * Max nesting seen by SDK so far is 2.
+ */
+#define ETS_INTR_LOCK_NEST_MAX 7
+static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
+static byte     ets_intr_lock_stack_ptr=0;
+
 
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
@@ -83,6 +90,9 @@ void preloop_update_frequency() {
 #endif
 }
 
+extern "C" bool can_yield() {
+  return cont_can_yield(g_pcont);
+}
 
 static inline void esp_yield_within_cont() __attribute__((always_inline));
 static void esp_yield_within_cont() {
@@ -90,19 +100,20 @@ static void esp_yield_within_cont() {
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void esp_yield() {
-    if (cont_can_yield(g_pcont)) {
+extern "C" void __esp_yield() {
+    if (can_yield()) {
         esp_yield_within_cont();
     }
 }
 
-extern "C" void esp_schedule() {
-    // always on CONT stack here
+extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
+
+extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
-    if (cont_can_yield(g_pcont)) {
+    if (can_yield()) {
         esp_schedule();
         esp_yield_within_cont();
     }
@@ -114,11 +125,40 @@ extern "C" void __yield() {
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
-    if (cont_can_yield(g_pcont) &&
+    if (can_yield() &&
         (system_get_time() - s_micros_at_task_start) > interval_us)
     {
         yield();
     }
+}
+
+
+// Replace ets_intr_(un)lock with nestable versions
+extern "C" void IRAM_ATTR ets_intr_lock() {
+  if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
+     ets_intr_lock_stack[ets_intr_lock_stack_ptr++] = xt_rsil(3);
+  else
+     xt_rsil(3);
+}
+
+extern "C" void IRAM_ATTR ets_intr_unlock() {
+  if (ets_intr_lock_stack_ptr > 0)
+     xt_wsr_ps(ets_intr_lock_stack[--ets_intr_lock_stack_ptr]);
+  else
+     xt_rsil(0);
+}
+
+
+// Save / Restore the PS state across the rom ets_post call as the rom code
+// does not implement this correctly.
+extern "C" bool ets_post_rom(uint8 prio, ETSSignal sig, ETSParam par);
+
+extern "C" bool IRAM_ATTR ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
+  uint32_t saved;
+  asm volatile ("rsr %0,ps":"=a" (saved));
+  bool rc=ets_post_rom(prio, sig, par);
+  xt_wsr_ps(saved);
+  return rc;
 }
 
 extern "C" void __loop_end (void)

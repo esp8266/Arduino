@@ -129,24 +129,26 @@ void help (const char* argv0, int exitcode)
 		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
 		"	-L             - littlefs size in KBytes (default: %zd)\n"
-		"	-v             - mock verbose\n"
-		"                  (negative value will force mismatched size)\n"
+		"\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
+		"	-T             - show timestamp on output\n"
+		"	-v             - verbose\n"
 		, argv0, MOCK_PORT_SHIFTER, spiffs_kb, littlefs_kb);
 	exit(exitcode);
 }
 
 static struct option options[] =
 {
-	{ "help",		no_argument,		NULL, 'h' },
-	{ "fast",		no_argument,		NULL, 'f' },
-	{ "local",		no_argument,		NULL, 'l' },
-	{ "sigint",		no_argument,		NULL, 'c' },
-	{ "blockinguart",	no_argument,		NULL, 'b' },
-	{ "verbose",		no_argument,		NULL, 'v' },
-	{ "interface",		required_argument,	NULL, 'i' },
-	{ "spiffskb",		required_argument,	NULL, 'S' },
-	{ "littlefskb",		required_argument,	NULL, 'L' },
-	{ "portshifter",	required_argument,	NULL, 's' },
+	{ "help",           no_argument,        NULL, 'h' },
+	{ "fast",           no_argument,        NULL, 'f' },
+	{ "local",          no_argument,        NULL, 'l' },
+	{ "sigint",         no_argument,        NULL, 'c' },
+	{ "blockinguart",   no_argument,        NULL, 'b' },
+	{ "verbose",        no_argument,        NULL, 'v' },
+	{ "timestamp",      no_argument,        NULL, 'T' },
+	{ "interface",      required_argument,  NULL, 'i' },
+	{ "spiffskb",       required_argument,  NULL, 'S' },
+	{ "littlefskb",     required_argument,  NULL, 'L' },
+	{ "portshifter",    required_argument,  NULL, 's' },
 };
 
 void cleanup ()
@@ -172,7 +174,7 @@ void control_c (int sig)
 int main (int argc, char* const argv [])
 {
 	bool fast = false;
-	bool blocking_uart = false;
+	blocking_uart = false; // global
 
 	signal(SIGINT, control_c);
 	if (geteuid() == 0)
@@ -182,7 +184,7 @@ int main (int argc, char* const argv [])
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfbvi:S:s:L:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -216,6 +218,9 @@ int main (int argc, char* const argv [])
 			break;
 		case 'v':
 			mockdebug = true;
+			break;
+		case 'T':
+			serial_timestamp = true;
 			break;
 		default:
 			help(argv[0], EXIT_FAILURE);

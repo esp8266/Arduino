@@ -215,29 +215,31 @@ directory into ESP8266 flash file system.
 
 **Warning**: Due to the move from the obsolete esptool-ck.exe to the
 supported esptool.py upload tool, upgraders from pre 2.5.1 will need to
-update the ESP8266FS tool referenced below to 0.4.0 or later.  Prior versions
+update the ESP8266FS tool referenced below to 0.5.0 or later.  Prior versions
 will fail with a "esptool not found" error because they don't know how to
 use esptool.py.
 
--  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.4.0/ESP8266FS-0.4.0.zip
+-  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.5.0/ESP8266FS-0.5.0.zip
 -  In your Arduino sketchbook directory, create ``tools`` directory if
-   it doesn't exist yet
+   it doesn't exist yet.
 -  Unpack the tool into ``tools`` directory (the path will look like
    ``<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar``)
    If upgrading, overwrite the existing JAR file with the newer version.
--  Restart Arduino IDE
--  Open a sketch (or create a new one and save it)
--  Go to sketch directory (choose Sketch > Show Sketch Folder)
+-  Restart Arduino IDE.
+-  Open a sketch (or create a new one and save it).
+-  Go to sketch directory (choose Sketch > Show Sketch Folder).
 -  Create a directory named ``data`` and any files you want in the file
-   system there
--  Make sure you have selected a board, port, and closed Serial Monitor
+   system there.
+-  Make sure you have selected a board, port, and closed Serial Monitor.
+-  If your board requires you to press a button (or other action) to enter
+   bootload mode for flashing a sketch, do that now.
 -  Select Tools > ESP8266 Sketch Data Upload. This should start
    uploading the files into ESP8266 flash file system. When done, IDE
    status bar will display ``SPIFFS Image Uploaded`` message.
 
 *ESP8266LittleFS* is the equivalent tool for LittleFS.
 
-- Download the tool: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
+- Download the 2.6.0 or later version of the tool: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
 - Install as above
 - To upload a LittleFS filesystem use Tools > ESP8266 LittleFS Data Upload
 
@@ -501,9 +503,11 @@ setTimeCallback(time_t (*cb)(void))
     }
 
 
-The SD, SDFS, and LittleFS filesystems support a file timestamp, updated when the file is
-opened for writing.  By default, the ESP8266 will use the internal time returned from
-``time(NULL)``.  If your app sets the system time using NTP before file operations, then
+The SD, SDFS, SPIFFS, and LittleFS filesystems support a file timestamp, updated when the
+file is opened for writing.  By default, the ESP8266 will use the internal time returned from
+``time(NULL)`` (i.e. local time, not UTC, to conform to the existing FAT filesystem), but this
+can be overridden to GMT or any other standard you'd like by using ``setTimeCallback()``.
+If your app sets the system time using NTP before file operations, then
 you should not need to use this function.  However, if you need to set a specific time
 for a file, or the system clock isn't correct and you need to read the time from an external
 RTC or use a fixed time, this call allows you do to so.

@@ -12,6 +12,9 @@
 #include <string.h>
 #include "flash.h"
 #include "eboot_command.h"
+#include <uzlib.h>
+
+extern unsigned char _gzip_dict;
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
@@ -24,10 +27,14 @@ int print_version(const uint32_t flash_addr)
     if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
         return 1;
     }
-    const char* __attribute__ ((aligned (4))) fmtt = "v%08x\n\0\0";
-    uint32_t fmt[2];
-    fmt[0] = ((uint32_t*) fmtt)[0];
-    fmt[1] = ((uint32_t*) fmtt)[1];
+    char fmt[7];
+    fmt[0] = 'v';
+    fmt[1] = '%';
+    fmt[2] = '0';
+    fmt[3] = '8';
+    fmt[4] = 'x';
+    fmt[5] = '\n';
+    fmt[6] = 0;
     ets_printf((const char*) fmt, ver);
     return 0;
 }
@@ -80,37 +87,96 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
         pos += section_header.size;
     }
 
-    register uint32_t sp asm("a1") = 0x3ffffff0;
-    register uint32_t pc asm("a3") = image_header.entry;
-    __asm__  __volatile__ ("jx a3");
+    asm volatile("" ::: "memory");
+    asm volatile ("mov.n a1, %0\n"
+        "mov.n a3, %1\n"
+        "jx a3\n" : : "r" (0x3ffffff0), "r" (image_header.entry) );
 
+    __builtin_unreachable(); // Save a few bytes by letting GCC know no need to pop regs/return
     return 0;
 }
 
+uint8_t read_flash_byte(const uint32_t addr)
+{
+    uint8_t __attribute__((aligned(4))) buff[4];
+    SPIRead(addr & ~3, buff, 4);
+    return buff[addr & 3];
+}
+unsigned char __attribute__((aligned(4))) uzlib_flash_read_cb_buff[4096];
+uint32_t uzlib_flash_read_cb_addr;
+int uzlib_flash_read_cb(struct uzlib_uncomp *m)
+{
+    m->source = uzlib_flash_read_cb_buff;
+    m->source_limit = uzlib_flash_read_cb_buff + sizeof(uzlib_flash_read_cb_buff);
+    SPIRead(uzlib_flash_read_cb_addr, uzlib_flash_read_cb_buff, sizeof(uzlib_flash_read_cb_buff));
+    uzlib_flash_read_cb_addr += sizeof(uzlib_flash_read_cb_buff);
+    return *(m->source++);
+}
 
+unsigned char gzip_dict[32768];
 
 int copy_raw(const uint32_t src_addr,
              const uint32_t dst_addr,
              const uint32_t size)
 {
     // require regions to be aligned
-    if (src_addr & 0xfff != 0 ||
-        dst_addr & 0xfff != 0) {
+    if ((src_addr & 0xfff) != 0 ||
+        (dst_addr & 0xfff) != 0) {
         return 1;
     }
 
     const uint32_t buffer_size = FLASH_SECTOR_SIZE;
     uint8_t buffer[buffer_size];
-    uint32_t left = ((size+buffer_size-1) & ~(buffer_size-1));
+    int32_t left = ((size+buffer_size-1) & ~(buffer_size-1));
     uint32_t saddr = src_addr;
     uint32_t daddr = dst_addr;
+    struct uzlib_uncomp m_uncomp;
+    bool gzip = false;
 
-    while (left) {
+    // Check if we are uncompressing a GZIP upload or not
+    if ((read_flash_byte(saddr) == 0x1f) && (read_flash_byte(saddr + 1) == 0x8b)) {
+        // GZIP signature matched.  Find real size as encoded at the end
+        left = read_flash_byte(saddr + size - 4);
+        left += read_flash_byte(saddr + size - 3)<<8;
+        left += read_flash_byte(saddr + size - 2)<<16;
+        left += read_flash_byte(saddr + size - 1)<<24;
+
+        uzlib_init();
+
+        /* all 3 fields below must be initialized by user */
+        m_uncomp.source = NULL;
+        m_uncomp.source_limit = NULL;
+        uzlib_flash_read_cb_addr = src_addr;
+        m_uncomp.source_read_cb = uzlib_flash_read_cb;
+        uzlib_uncompress_init(&m_uncomp, gzip_dict, sizeof(gzip_dict));
+
+        int res = uzlib_gzip_parse_header(&m_uncomp);
+        if (res != TINF_OK) {
+            return 5; // Error uncompress header read
+        }
+	gzip = true;
+    }
+    while (left > 0) {
         if (SPIEraseSector(daddr/buffer_size)) {
             return 2;
         }
-        if (SPIRead(saddr, buffer, buffer_size)) {
-            return 3;
+        if (!gzip) {
+            if (SPIRead(saddr, buffer, buffer_size)) {
+                return 3;
+            }
+        } else {
+            m_uncomp.dest_start = buffer;
+            m_uncomp.dest = buffer;
+            int to_read = (left > buffer_size) ? buffer_size : left;
+            m_uncomp.dest_limit = buffer + to_read;
+            int res = uzlib_uncompress(&m_uncomp);
+            if ((res != TINF_DONE) && (res != TINF_OK)) {
+                return 6;
+            }
+            // Fill any remaining with 0xff
+            for (int i = to_read; i < buffer_size; i++) {
+                buffer[i] = 0xff;
+            }
         }
         if (SPIWrite(daddr, buffer, buffer_size)) {
             return 4;
@@ -124,17 +190,17 @@ int copy_raw(const uint32_t src_addr,
 }
 
 
-
-void main()
+int main()
 {
     int res = 9;
+    bool clear_cmd = false;
     struct eboot_command cmd;
-    
+
     print_version(0);
 
     if (eboot_command_read(&cmd) == 0) {
         // valid command was passed via RTC_MEM
-        eboot_command_clear();
+        clear_cmd = true;
         ets_putc('@');
     } else {
         // no valid command found
@@ -155,6 +221,10 @@ void main()
         }
     }
 
+    if (clear_cmd) {
+        eboot_command_clear();
+    }
+
     if (cmd.action == ACTION_LOAD_APP) {
         ets_putc('l'); ets_putc('d'); ets_putc('\n');
         res = load_app_from_flash_raw(cmd.args[0]);
@@ -167,4 +237,7 @@ void main()
     }
 
     while(true){}
+
+    __builtin_unreachable();
+    return 0;
 }

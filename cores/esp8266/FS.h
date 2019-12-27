@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <Arduino.h>
+#include <../include/time.h> // See issue #6714
 
 class SDClass;
 
@@ -171,12 +172,10 @@ struct FSInfo64 {
 class FSConfig
 {
 public:
-    FSConfig(bool autoFormat = true) {
-        _type = FSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
-    }
+    static constexpr uint32_t FSId = 0x00000000;
 
-    enum fsid { FSId = 0x00000000 };
+    FSConfig(uint32_t type = FSId, bool autoFormat = true) : _type(type), _autoFormat(autoFormat) { }
+
     FSConfig setAutoFormat(bool val = true) {
         _autoFormat = val;
         return *this;
@@ -189,12 +188,12 @@ public:
 class SPIFFSConfig : public FSConfig
 {
 public:
+    static constexpr uint32_t FSId = 0x53504946;
     SPIFFSConfig(bool autoFormat = true, bool enableTime = true) {
         _type = SPIFFSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
-	_enableTime = enableTime;
+        _autoFormat = autoFormat;
+        _enableTime = enableTime;
     }
-    enum fsid { FSId = 0x53504946 };
 
     SPIFFSConfig setEnableTime(bool val = true) {
         _enableTime = val;
@@ -255,6 +254,13 @@ protected:
 };
 
 } // namespace fs
+
+extern "C"
+{
+void close_all_fs(void);
+void littlefs_request_end(void);
+void spiffs_request_end(void);
+}
 
 #ifndef FS_NO_GLOBALS
 using fs::FS;

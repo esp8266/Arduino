@@ -32,6 +32,7 @@ size_t StreamString::write(const uint8_t *data, size_t size) {
             *(wbuffer() + newlen) = 0x00; // add null for string end
             return size;
         }
+        DEBUGV(":stream2string: OOM (%d->%d)\n", length(), newlen+1);
     }
     return 0;
 }

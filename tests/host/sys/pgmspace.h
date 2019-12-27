@@ -60,6 +60,7 @@ inline size_t strlen_P(const char *s) { return strlen(s); }
 inline int vsnprintf_P(char *str, size_t size, const char *format, va_list ap) { return vsnprintf(str, size, format, ap); }
 
 #define memcpy_P memcpy
+#define memmove_P memmove
 #define strncpy_P strncpy
 #define strcmp_P strcmp
 #define memccpy_P memccpy

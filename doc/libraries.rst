@@ -29,6 +29,8 @@ EEPROM library uses one sector of flash located just after the SPIFFS.
 
 `Three examples <https://github.com/esp8266/Arduino/tree/master/libraries/EEPROM>`__  included.
 
+Note that the sector needs to be re-flashed every time the changed EEPROM data needs to be saved, thus will wear out the flash memory very quickly even if small amounts of data are written. Consider using one of the EEPROM libraries mentioned down below.
+
 I2C (Wire library)
 ------------------
 
@@ -111,6 +113,8 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getCycleCount()`` returns the cpu instruction cycle count since start as an unsigned 32-bit. This is useful for accurate timing of very short actions like bit banging.
 
+``ESP.checkFlashCRC()`` calculates the CRC of the program memory (not including any filesystems) and compares it to the one embedded in the image.  If this call returns ``false`` then the flash has been corrupted.  At that point, you may want to consider trying to send a MQTT message, to start a re-download of the application, blink a LED in an `SOS` pattern, etc.  However, since the flash is known corrupted at this point there is no guarantee the app will be able to perform any of these operations, so in safety critical deployments an immediate shutdown to a fail-safe mode may be indicated.
+
 ``ESP.getVcc()`` may be used to measure supply voltage. ESP needs to reconfigure the ADC at startup in order for this feature to be available. Add the following line to the top of your sketch to use ``getVcc``:
 
 .. code:: cpp
@@ -140,14 +144,6 @@ Servo
 -----
 
 This library exposes the ability to control RC (hobby) servo motors. It will support up to 24 servos on any available output pin. By default the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be affected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
-
-Improved EEPROM library for ESP (ESP_EEPROM)
---------------------------------------------
-
-An improved EEPROM library for ESPxxxx.  Uses flash memory as per the standard ESP EEPROM library but reduces reflash - so reducing wear and improving commit() performance.  
-
-As actions on the flash need to stop the interrupts, an EEPROM reflash could noticably affect anything using PWM, etc.
-
 
 Other libraries (not included with the IDE)
 -------------------------------------------
@@ -189,3 +185,5 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 -  `MFRC522 <https://github.com/miguelbalboa/rfid>`__ - A library for using the Mifare RC522 RFID-tag reader/writer.
 -  `Ping <https://github.com/dancol90/ESP8266Ping>`__ - lets the ESP8266 ping a remote machine.
 -  `AsyncPing <https://github.com/akaJes/AsyncPing>`__ - fully asynchronous Ping library (have full ping statistic and hardware MAC address).
+-  `ESP_EEPROM <https://github.com/jwrw/ESP_EEPROM>`__ - This library writes a new copy of your data when you save (commit) it and keeps track of where in the sector the most recent copy is kept using a bitmap. The flash sector only needs to be erased when there is no more space for copies in the flash sector.
+-  `EEPROM Rotate <https://github.com/xoseperez/eeprom_rotate>`__ - Instead of using a single sector to persist the data from the emulated EEPROM, this library uses a number of sectors to do so: a sector pool.
