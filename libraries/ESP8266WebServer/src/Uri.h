@@ -18,8 +18,6 @@ class Uri {
             return new Uri(_uri);
         };
 
-        virtual void initPathArgs(__attribute__((unused)) std::vector<String> &pathArgs) {}
-
         virtual bool canHandle(const String &requestUri, __attribute__((unused)) std::vector<String> &pathArgs) {
             return _uri == requestUri;
         }

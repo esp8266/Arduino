@@ -19,7 +19,6 @@ public:
     , _uri(uri.clone())
     , _method(method)
     {
-        _uri->initPathArgs(RequestHandler<ServerType>::pathArgs);
     }
 
     ~FunctionRequestHandler() {
