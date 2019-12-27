@@ -1227,8 +1227,9 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     String header;
-    // 168: Arbitrarily chosen to have enough buffer space for avoiding internal reallocations
-    header.reserve(_headers.length() + _base64Authorization.length() + _host.length() + 168);
+    // 128: Arbitrarily chosen to have enough buffer space for avoiding internal reallocations
+    header.reserve(_headers.length() + _uri.length() +
+            _base64Authorization.length() + _host.length() + _userAgent.length() + 128);
     header += type;
     header += ' ';
     if (_uri.length()) {
