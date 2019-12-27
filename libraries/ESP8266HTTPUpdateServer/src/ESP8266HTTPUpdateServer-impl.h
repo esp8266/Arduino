@@ -77,7 +77,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
       HTTPUpload& upload = _server->upload();
 
       if(upload.status == UPLOAD_FILE_START){
-        _updaterError = String();
+        _updaterError.clear();
         if (_serial_output)
           Serial.setDebugOutput(true);
 

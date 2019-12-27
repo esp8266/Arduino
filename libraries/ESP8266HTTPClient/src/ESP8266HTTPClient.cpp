@@ -137,9 +137,9 @@ void HTTPClient::clear()
 {
     _returnCode = 0;
     _size = -1;
-    _headers = "";
+    _headers.clear();
+    _location.clear();
     _payload.reset();
-    _location = "";
 }
 
 
@@ -657,7 +657,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         // wipe out any existing headers from previous request
         for(size_t i = 0; i < _headerKeysCount; i++) {
             if (_currentHeaders[i].value.length() > 0) {
-                _currentHeaders[i].value = "";
+                _currentHeaders[i].value.clear();
             }
         }
 
