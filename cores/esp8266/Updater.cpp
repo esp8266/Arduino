@@ -117,11 +117,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   if (command == U_FLASH) {
     //address of the end of the space available for sketch and update
-#ifdef HOST_MOCK
-    uintptr_t updateEndAddress = (uintptr_t) -1;
-#else
     uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
-#endif
 
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
@@ -138,12 +134,10 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     }
   }
   else if (command == U_FS) {
-#ifndef HOST_MOCK
     if((uintptr_t)&_FS_start + roundedSize > (uintptr_t)&_FS_end) {
       _setError(UPDATE_ERROR_SPACE);
       return false;
     }
-#endif
 
 #ifdef ATOMIC_FS_UPDATE
     //address of the end of the space available for update
@@ -156,11 +150,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
       return false;
     }
 #else
-  #ifdef HOST_MOCK
-    updateStartAddress = 0;
-  #else
     updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
-  #endif
 #endif
   }
   else {

@@ -22,6 +22,7 @@ TEST_CASE("Updater fails when writes overflow requested size", "[core][Updater]"
 {
     UpdaterClass *u;
     uint8_t buff[6000];
+    memset(buff, 0, sizeof(buff));
     u = new UpdaterClass();
     REQUIRE(u->begin(6000));
     REQUIRE(u->write(buff, 1000));

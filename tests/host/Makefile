@@ -6,6 +6,7 @@ LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
+DEFSYM_FS ?= -Wl,--defsym,_FS_start=0x40300000 -Wl,--defsym,_FS_end=0x411FA000 -Wl,--defsym,_FS_page=0x100 -Wl,--defsym,_FS_block=0x2000 -Wl,--defsym,_EEPROM_start=0x411fb000
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
@@ -236,7 +237,7 @@ $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ranlib -c $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
-	$(VERBLD) $(CXX) $(LDFLAGS) $^ -o $@
+	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@
 
 #################################################
 # building ino sources
