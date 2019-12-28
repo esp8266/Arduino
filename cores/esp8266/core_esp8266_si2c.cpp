@@ -160,8 +160,8 @@ static Twi twi;
 
 void Twi::setClock(unsigned int freq)
 {
-    if (freq < 250)  // minimum freq 250Hz to prevent overflow @ 232Hz
-        freq = 250;
+    if (freq < 1000)  // minimum freq 1000Hz to minimize slave timeouts and WDT resets
+        freq = 1000;
     
     preferred_si2c_clock = freq;
 
