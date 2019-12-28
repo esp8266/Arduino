@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
+#include <erase_config.h>
 
 //#define DEBUG_UPDATER Serial
 
@@ -34,6 +35,9 @@ UpdaterClass::UpdaterClass()
 , _startAddress(0)
 , _currentAddress(0)
 , _command(U_FLASH)
+#ifdef ERASE_CONFIG_H
+, _eraseConfigOption(ERASE_CONFIG_BLANK_BIN)
+#endif
 , _hash(nullptr)
 , _verify(nullptr)
 , _progress_callback(nullptr)
@@ -84,7 +88,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     _setError(UPDATE_ERROR_BOOTSTRAP);
     return false;
   }
-  
+
 #ifdef DEBUG_UPDATER
   if (command == U_FS) {
     DEBUG_UPDATER.println(F("[begin] Update Filesystem."));
@@ -127,7 +131,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
     if(updateStartAddress < currentSketchSize) {
-      _setError(UPDATE_ERROR_SPACE);    
+      _setError(UPDATE_ERROR_SPACE);
       return false;
     }
   }
@@ -284,10 +288,17 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   if (_command == U_FLASH) {
     eboot_command ebcmd;
+    memset(&ebcmd, 0, sizeof(ebcmd));
     ebcmd.action = ACTION_COPY_RAW;
     ebcmd.args[0] = _startAddress;
     ebcmd.args[1] = 0x00000;
     ebcmd.args[2] = _size;
+#ifdef ERASE_CONFIG_H
+    ebcmd.args[4] =  _eraseConfigOption;
+    ebcmd.args[5] = ~_eraseConfigOption;
+    ebcmd.args[6] =  _eraseConfigOption;
+    ebcmd.args[7] = ~_eraseConfigOption;
+#endif
     eboot_command_write(&ebcmd);
 
 #ifdef DEBUG_UPDATER
@@ -297,6 +308,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
   else if (_command == U_FS) {
 #ifdef ATOMIC_FS_UPDATE
     eboot_command ebcmd;
+    memset(&ebcmd, 0, sizeof(ebcmd));
     ebcmd.action = ACTION_COPY_RAW;
     ebcmd.args[0] = _startAddress;
     ebcmd.args[1] = (uintptr_t)&_FS_start - 0x40200000;
@@ -345,7 +357,7 @@ bool UpdaterClass::_writeBuffer(){
       modifyFlashMode = true;
     }
   }
-  
+
   if (eraseResult) {
     if(!_async) yield();
     writeResult = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
@@ -431,7 +443,7 @@ bool UpdaterClass::_verifyEnd() {
         uint8_t buf[4];
         if(!ESP.flashRead(_startAddress, (uint32_t *) &buf[0], 4)) {
             _currentAddress = (_startAddress);
-            _setError(UPDATE_ERROR_READ);            
+            _setError(UPDATE_ERROR_READ);
             return false;
         }
 
@@ -443,7 +455,7 @@ bool UpdaterClass::_verifyEnd() {
             return true;
         } else if (buf[0] != 0xE9) {
             _currentAddress = (_startAddress);
-            _setError(UPDATE_ERROR_MAGIC_BYTE);            
+            _setError(UPDATE_ERROR_MAGIC_BYTE);
             return false;
         }
 
@@ -452,7 +464,7 @@ bool UpdaterClass::_verifyEnd() {
         // check if new bin fits to SPI flash
         if(bin_flash_size > ESP.getFlashChipRealSize()) {
             _currentAddress = (_startAddress);
-            _setError(UPDATE_ERROR_NEW_FLASH_CONFIG);            
+            _setError(UPDATE_ERROR_NEW_FLASH_CONFIG);
             return false;
         }
 

@@ -191,7 +191,11 @@ class EspClass {
         String getResetInfo();
         struct rst_info * getResetInfoPtr();
 
+#ifdef ERASE_CONFIG_H
+        bool eraseConfig(const uint32_t flash_erase_mask = ERASE_CONFIG_SDK_DATA);
+#else
         bool eraseConfig();
+#endif
 
 #ifndef CORE_MOCK
         inline uint32_t getCycleCount() __attribute__((always_inline));

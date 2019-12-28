@@ -51,7 +51,7 @@ class UpdaterVerifyClass {
 class UpdaterClass {
   public:
     typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
-  
+
     UpdaterClass();
 
     /* Optionally add a cryptographic signature verification hash and method */
@@ -63,6 +63,13 @@ class UpdaterClass {
     */
     bool begin(size_t size, int command = U_FLASH, int ledPin = -1, uint8_t ledOn = LOW);
 
+#ifdef ERASE_CONFIG_H
+    /*
+    */
+    inline void setEraseConfigOption(ERASE_CONFIG_MASK_t eraseOption) {
+      _eraseConfigOption = eraseOption;
+    }
+#endif
     /*
       Run Updater from asynchronous callbacs
     */
@@ -179,7 +186,7 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
-    void _setError(int error);    
+    void _setError(int error);
 
     bool _async;
     uint8_t _error;
@@ -196,6 +203,8 @@ class UpdaterClass {
 
     int _ledPin;
     uint8_t _ledOn;
+
+    uint32_t _eraseConfigOption;
 
     // Optional signed binary verification
     UpdaterHashClass *_hash;
