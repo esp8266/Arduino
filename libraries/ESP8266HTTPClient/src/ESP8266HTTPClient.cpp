@@ -150,9 +150,9 @@ void HTTPClient::clear()
 {
     _returnCode = 0;
     _size = -1;
-    _headers = "";
+    _headers.clear();
+    _location.clear();
     _payload.reset();
-    _location = "";
 }
 
 
@@ -670,7 +670,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         // wipe out any existing headers from previous request
         for(size_t i = 0; i < _headerKeysCount; i++) {
             if (_currentHeaders[i].value.length() > 0) {
-                _currentHeaders[i].value = "";
+                _currentHeaders[i].value.clear();
             }
         }
 
@@ -978,12 +978,14 @@ String HTTPClient::errorToString(int error)
 void HTTPClient::addHeader(const String& name, const String& value, bool first, bool replace)
 {
     // not allow set of Header handled by code
-    if(!name.equalsIgnoreCase(F("Connection")) &&
-       !name.equalsIgnoreCase(F("User-Agent")) &&
-       !name.equalsIgnoreCase(F("Host")) &&
-       !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
+    if (!name.equalsIgnoreCase(F("Connection")) &&
+        !name.equalsIgnoreCase(F("User-Agent")) &&
+        !name.equalsIgnoreCase(F("Host")) &&
+        !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())) {
 
-        String headerLine = name;
+        String headerLine;
+        headerLine.reserve(name.length() + value.length() + 4);
+        headerLine += name;
         headerLine += ": ";
 
         if (replace) {
@@ -996,13 +998,12 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
 
         headerLine += value;
         headerLine += "\r\n";
-        if(first) {
+        if (first) {
             _headers = headerLine + _headers;
         } else {
             _headers += headerLine;
         }
     }
-
 }
 
 void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount)
@@ -1127,7 +1128,17 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     String header;
-    header.reserve(128);
+    // 128: Arbitrarily chosen to have enough buffer space for avoiding internal reallocations
+    header.reserve(_headers.length() + _uri.length() +
+            _base64Authorization.length() + _host.length() + _userAgent.length() + 128);
+    header += type;
+    header += ' ';
+    if (_uri.length()) {
+        header += _uri;
+    } else {
+        header += '/';
+    }
+    header += F(" HTTP/1.");
 
     header += type;
     header += ' ';
@@ -1147,27 +1158,22 @@ bool HTTPClient::sendHeader(const char * type)
     }
     header += F("\r\nUser-Agent: ");
     header += _userAgent;
-    header += F("\r\nConnection: ");
 
-    if(_reuse) {
-        header += F("keep-alive");
-    } else {
-        header += F("close");
+    if (!_useHTTP10) {
+        header += F("\r\nAccept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
     }
+
+    if (_base64Authorization.length()) {
+        header += F("\r\nAuthorization: Basic ");
+        header += _base64Authorization;
+    }
+
+    header += F("\r\nConnection: ");
+    header += _reuse ? F("keep-alive") : F("close");
     header += "\r\n";
 
-    if(!_useHTTP10) {
-        header += F("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n");
-    }
-
-    if(_base64Authorization.length()) {
-        header += F("Authorization: Basic ");
-        header += _base64Authorization;
-        header += "\r\n";
-    }
-
     header += _headers;
-    header += F("\r\n");
+    header += "\r\n";
 
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
@@ -1199,20 +1205,23 @@ int HTTPClient::handleHeaderResponse()
         size_t len = _client->available();
         if(len > 0) {
             String headerLine = _client->readStringUntil('\n');
-            headerLine.trim(); // remove \r
 
             lastDataTime = millis();
 
             DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
-            if(headerLine.startsWith("HTTP/1.")) {
-                if(_canReuse) {
+            if (headerLine.startsWith(F("HTTP/1."))) {
+                if (_canReuse) {
                     _canReuse = (headerLine[sizeof "HTTP/1." - 1] != '0');
                 }
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
-            } else if(headerLine.indexOf(':')) {
-                String headerName = headerLine.substring(0, headerLine.indexOf(':'));
-                String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
+                continue;
+            }
+
+            int headerSeparator = headerLine.indexOf(':');
+            if (headerSeparator > 0) {
+                String headerName = headerLine.substring(0, headerSeparator);
+                String headerValue = headerLine.substring(headerSeparator + 1);
                 headerValue.trim();
 
                 if(headerName.equalsIgnoreCase(F("Content-Length"))) {
@@ -1233,9 +1242,9 @@ int HTTPClient::handleHeaderResponse()
                     _location = headerValue;
                 }
 
-                for(size_t i = 0; i < _headerKeysCount; i++) {
-                    if(_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
-                        if (_currentHeaders[i].value != "") {
+                for (size_t i = 0; i < _headerKeysCount; i++) {
+                    if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
+                        if (!_currentHeaders[i].value.isEmpty()) {
                             // Existing value, append this one with a comma
                             _currentHeaders[i].value += ',';
                             _currentHeaders[i].value += headerValue;
@@ -1245,9 +1254,12 @@ int HTTPClient::handleHeaderResponse()
                         break; // We found a match, stop looking
                     }
                 }
+                continue;
             }
 
-            if(headerLine == "") {
+            headerLine.trim(); // remove \r
+
+            if (headerLine.isEmpty()) {
                 DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] code: %d\n", _returnCode);
 
                 if(_size > 0) {
