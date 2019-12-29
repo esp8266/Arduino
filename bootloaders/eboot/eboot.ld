@@ -68,6 +68,8 @@ SECTIONS
 
   .data : ALIGN(4)
   {
+    *(COMMON)  /* Global vars */
+    . = ALIGN(4);
     _heap_start = ABSOLUTE(.);
 /*    _stack_sentry = ALIGN(0x8); */
   } >dram0_0_seg :dram0_0_bss_phdr
@@ -150,9 +152,14 @@ SECTIONS
     *(.bss)
     *(.bss.*)
     *(.gnu.linkonce.b.*)
-    *(COMMON)
     . = ALIGN (8);
     _bss_end = ABSOLUTE(.);
+    /* CRC stored in last 8 bytes */
+    ASSERT((. < 4096 - 8), "Error: No space for CRC in bootloader sector.");
+    . = _stext + 4096 - 8;
+    _crc_size = .;
+    . = . + 4;
+    _crc_val = .;
   } >iram1_0_seg :iram1_0_phdr
 
   .lit4 : ALIGN(4)

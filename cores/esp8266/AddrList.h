@@ -128,6 +128,7 @@ struct netifWrapper
     const char* ifmac () const      { return (const char*)_netif->hwaddr; }
     int ifnumber () const           { return _netif->num; }
     bool ifUp () const              { return !!(_netif->flags & NETIF_FLAG_UP); }
+    CONST netif* interface () const { return _netif; }
 
     const ip_addr_t* ipFromNetifNum () const
     {
@@ -166,8 +167,6 @@ public:
 
     bool operator== (AddressListIterator& o) { return netIf.equal(*o); }
     bool operator!= (AddressListIterator& o) { return !netIf.equal(*o); }
-
-    AddressListIterator& operator= (const AddressListIterator& o) { netIf = o.netIf; return *this; }
 
     AddressListIterator operator++ (int)
     {

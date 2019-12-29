@@ -32,6 +32,7 @@ extern "C" {
 }
 #include "debug.h"
 #include "ESP8266WiFi.h"
+#include "PolledTimeout.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
 #include "StackThunk.h"
@@ -437,12 +438,17 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
   }
-  for (int no_work = 0; blocking || no_work < 2;) {
-    if (blocking) {
-      // Only for blocking operations can we afford to yield()
-      optimistic_yield(100);
+  
+  esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
+  
+  for (int no_work = 0; blocking || no_work < 2;) {    
+    optimistic_yield(100);
+    
+    if (loopTimeout) {
+      DEBUG_BSSL("_run_until: Timeout\n");
+      return -1;
     }
-
+    
     int state;
     state = br_ssl_engine_current_state(_eng);
     if (state & BR_SSL_CLOSED) {
@@ -461,8 +467,19 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
       unsigned char *buf;
       size_t len;
       int wlen;
+      size_t availForWrite;
 
       buf = br_ssl_engine_sendrec_buf(_eng, &len);
+      availForWrite = WiFiClient::availableForWrite();
+      
+      if (!blocking && len > availForWrite) {
+        /* 
+           writes on WiFiClient will block if len > availableForWrite()
+           this is needed to prevent available() calls from blocking
+           on dropped connections 
+        */
+        len = availForWrite;
+      }	  
       wlen = WiFiClient::write(buf, len);
       if (wlen <= 0) {
         /*
@@ -654,6 +671,13 @@ extern "C" {
     if (!xc->done_cert) {
       br_sha1_update(&xc->sha1_cert, buf, len);
       br_x509_decoder_push(&xc->ctx, (const void*)buf, len);
+#ifdef DEBUG_ESP_SSL
+      DEBUG_BSSL("CERT: ");
+      for (size_t i=0; i<len; i++) {
+        DEBUG_ESP_PORT.printf_P(PSTR("%02x "), buf[i] & 0xff);
+      }
+      DEBUG_ESP_PORT.printf_P(PSTR("\n"));
+#endif
     }
   }
 
@@ -676,7 +700,24 @@ extern "C" {
     char res[20];
     br_sha1_out(&xc->sha1_cert, res);
     if (xc->match_fingerprint && memcmp(res, xc->match_fingerprint, sizeof(res))) {
+#ifdef DEBUG_ESP_SSL
       DEBUG_BSSL("insecure_end_chain: Received cert FP doesn't match\n");
+      char buff[3 * sizeof(res) + 1]; // 3 chars per byte XX_, and null
+      buff[0] = 0;
+      for (size_t i=0; i<sizeof(res); i++) {
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", xc->match_fingerprint[i] & 0xff);
+        strlcat(buff, hex, sizeof(buff));
+      }
+      DEBUG_BSSL("insecure_end_chain: expected %s\n", buff);
+      buff[0] =0;
+      for (size_t i=0; i<sizeof(res); i++) {
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", res[i] & 0xff);
+        strlcat(buff, hex, sizeof(buff));
+      }
+      DEBUG_BSSL("insecure_end_chain: received %s\n", buff);
+#endif
       return BR_ERR_X509_NOT_TRUSTED;
     }
 
@@ -795,7 +836,7 @@ extern "C" {
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
 #endif
   };
-#ifndef BEARSSL_BASIC
+#ifndef BEARSSL_SSL_BASIC
   // Server w/EC has one set, not possible with basic SSL config
   static const uint16_t suites_server_ec_P [] PROGMEM = {
     BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
@@ -828,7 +869,7 @@ extern "C" {
 #endif
 
   static const uint16_t suites_server_rsa_P[] PROGMEM = {
-#ifndef BEARSSL_BASIC
+#ifndef BEARSSL_SSL_BASIC
     BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
     BR_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
     BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
@@ -847,7 +888,7 @@ extern "C" {
     BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA,
-#ifndef BEARSSL_BASIC
+#ifndef BEARSSL_SSL_BASIC
     BR_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
 #endif

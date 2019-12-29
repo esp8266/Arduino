@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <Arduino.h>
+#include <../include/time.h> // See issue #6714
 
 class SDClass;
 
@@ -110,12 +111,16 @@ public:
 
     String readString() override;
 
+    time_t getLastWrite();
+    void setTimeCallback(time_t (*cb)(void));
+
 protected:
     FileImplPtr _p;
 
     // Arduino SD class emulation
     std::shared_ptr<Dir> _fakeDir;
     FS                  *_baseFS;
+    time_t (*timeCallback)(void) = nullptr;
 };
 
 class Dir {
@@ -126,15 +131,21 @@ public:
 
     String fileName();
     size_t fileSize();
+    time_t fileTime();
     bool isFile() const;
     bool isDirectory() const;
 
     bool next();
     bool rewind();
 
+    time_t getLastWrite();
+    void setTimeCallback(time_t (*cb)(void));
+
 protected:
     DirImplPtr _impl;
     FS       *_baseFS;
+    time_t (*timeCallback)(void) = nullptr;
+
 };
 
 // Backwards compatible, <4GB filesystem usage
@@ -161,12 +172,10 @@ struct FSInfo64 {
 class FSConfig
 {
 public:
-    FSConfig(bool autoFormat = true) {
-        _type = FSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
-    }
+    static constexpr uint32_t FSId = 0x00000000;
 
-    enum fsid { FSId = 0x00000000 };
+    FSConfig(uint32_t type = FSId, bool autoFormat = true) : _type(type), _autoFormat(autoFormat) { }
+
     FSConfig setAutoFormat(bool val = true) {
         _autoFormat = val;
         return *this;
@@ -179,17 +188,17 @@ public:
 class SPIFFSConfig : public FSConfig
 {
 public:
-    SPIFFSConfig(bool autoFormat = true) {
-        _type = SPIFFSConfig::fsid::FSId;
-	_autoFormat = autoFormat;
-    }
-    enum fsid { FSId = 0x53504946 };
+    static constexpr uint32_t FSId = 0x53504946;
+    SPIFFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
+
+    // Inherit _type and _autoFormat
+    // nothing yet, enableTime TBD when SPIFFS has metadate
 };
 
 class FS
 {
 public:
-    FS(FSImplPtr impl) : _impl(impl) { }
+    FS(FSImplPtr impl) : _impl(impl) { timeCallback = _defaultTimeCB; }
 
     bool setConfig(const FSConfig &cfg);
 
@@ -221,15 +230,28 @@ public:
     bool rmdir(const char* path);
     bool rmdir(const String& path);
 
+    // Low-level FS routines, not needed by most applications
     bool gc();
+    bool check();
+
+    void setTimeCallback(time_t (*cb)(void));
 
     friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
     FSImplPtr _impl;
     FSImplPtr getImpl() { return _impl; }
+    time_t (*timeCallback)(void);
+    static time_t _defaultTimeCB(void) { return time(NULL); }
 };
 
 } // namespace fs
+
+extern "C"
+{
+void close_all_fs(void);
+void littlefs_request_end(void);
+void spiffs_request_end(void);
+}
 
 #ifndef FS_NO_GLOBALS
 using fs::FS;
@@ -241,6 +263,7 @@ using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
 using fs::FSConfig;
+using fs::SPIFFSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

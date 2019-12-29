@@ -252,11 +252,11 @@ void ESP8266WebServerTemplate<ServerType>::requestAuthentication(HTTPAuthMethod 
     _srealm = String(realm);
   }
   if(mode == BASIC_AUTH) {
-    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String(F("\"")));
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String('\"'));
   } else {
     _snonce=_getRandomHexString();
     _sopaque=_getRandomHexString();
-    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String(F("\"")));
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String('\"'));
   }
   using namespace mime;
   send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
@@ -319,7 +319,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool keepCurrentClient = false;
   bool callYield = false;
 
-  if (_currentClient.connected()) {
+  if (_currentClient.connected() || _currentClient.available()) {
     switch (_currentStatus) {
     case HC_NONE:
       // No-op to avoid C++ compiler warning
@@ -464,8 +464,10 @@ void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, 
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
-    sendContent(header);
-    sendContent_P(content, contentLength);
+    _currentClient.write((const uint8_t *)header.c_str(), header.length());
+    if (contentLength) {
+      sendContent_P(content, contentLength);
+    }
 }
 
 template <typename ServerType>
@@ -480,6 +482,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
+  if (_currentMethod == HTTP_HEAD) return;
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
@@ -523,13 +526,13 @@ String ESP8266WebServerTemplate<ServerType>::credentialHash(const String& userna
 {
   MD5Builder md5;
   md5.begin();
-  md5.add(username + ":" + realm + ":" + password);  // md5 of the user:realm:password
+  md5.add(username + ':' + realm + ':' + password);  // md5 of the user:realm:password
   md5.calculate();
   return md5.toString();
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)
+void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize, const String &fileName, const String &contentType)
 {
   using namespace mime;
   setContentLength(fileSize);
@@ -543,7 +546,7 @@ void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize
 
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::arg(String name) const {
+const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) const {
   for (int j = 0; j < _postArgsLen; ++j) {
     if ( _postArgs[j].key == name )
       return _postArgs[j].value;
@@ -589,7 +592,7 @@ bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
 
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::header(String name) const {
+const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
@@ -629,7 +632,7 @@ int ESP8266WebServerTemplate<ServerType>::headers() const {
 }
 
 template <typename ServerType>
-bool ESP8266WebServerTemplate<ServerType>::hasHeader(String name) const {
+bool ESP8266WebServerTemplate<ServerType>::hasHeader(const String& name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
       return true;
@@ -692,48 +695,136 @@ void ESP8266WebServerTemplate<ServerType>::_finalizeResponse() {
 }
 
 template <typename ServerType>
-const String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code) {
-  switch (code) {
-    case 100: return F("Continue");
-    case 101: return F("Switching Protocols");
-    case 200: return F("OK");
-    case 201: return F("Created");
-    case 202: return F("Accepted");
-    case 203: return F("Non-Authoritative Information");
-    case 204: return F("No Content");
-    case 205: return F("Reset Content");
-    case 206: return F("Partial Content");
-    case 300: return F("Multiple Choices");
-    case 301: return F("Moved Permanently");
-    case 302: return F("Found");
-    case 303: return F("See Other");
-    case 304: return F("Not Modified");
-    case 305: return F("Use Proxy");
-    case 307: return F("Temporary Redirect");
-    case 400: return F("Bad Request");
-    case 401: return F("Unauthorized");
-    case 402: return F("Payment Required");
-    case 403: return F("Forbidden");
-    case 404: return F("Not Found");
-    case 405: return F("Method Not Allowed");
-    case 406: return F("Not Acceptable");
-    case 407: return F("Proxy Authentication Required");
-    case 408: return F("Request Time-out");
-    case 409: return F("Conflict");
-    case 410: return F("Gone");
-    case 411: return F("Length Required");
-    case 412: return F("Precondition Failed");
-    case 413: return F("Request Entity Too Large");
-    case 414: return F("Request-URI Too Large");
-    case 415: return F("Unsupported Media Type");
-    case 416: return F("Requested range not satisfiable");
-    case 417: return F("Expectation Failed");
-    case 500: return F("Internal Server Error");
-    case 501: return F("Not Implemented");
-    case 502: return F("Bad Gateway");
-    case 503: return F("Service Unavailable");
-    case 504: return F("Gateway Time-out");
-    case 505: return F("HTTP Version not supported");
-    default:  return F("");
-  }
+String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code) {
+    // By first determining the pointer to the flash stored string in the switch
+    // statement and then doing String(FlashStringHelper) return reduces the total code
+    // size of this function by over 50%.
+    const __FlashStringHelper *r;
+    switch (code)
+    {
+    case 100:
+        r = F("Continue");
+        break;
+    case 101:
+        r = F("Switching Protocols");
+        break;
+    case 200:
+        r = F("OK");
+        break;
+    case 201:
+        r = F("Created");
+        break;
+    case 202:
+        r = F("Accepted");
+        break;
+    case 203:
+        r = F("Non-Authoritative Information");
+        break;
+    case 204:
+        r = F("No Content");
+        break;
+    case 205:
+        r = F("Reset Content");
+        break;
+    case 206:
+        r = F("Partial Content");
+        break;
+    case 300:
+        r = F("Multiple Choices");
+        break;
+    case 301:
+        r = F("Moved Permanently");
+        break;
+    case 302:
+        r = F("Found");
+        break;
+    case 303:
+        r = F("See Other");
+        break;
+    case 304:
+        r = F("Not Modified");
+        break;
+    case 305:
+        r = F("Use Proxy");
+        break;
+    case 307:
+        r = F("Temporary Redirect");
+        break;
+    case 400:
+        r = F("Bad Request");
+        break;
+    case 401:
+        r = F("Unauthorized");
+        break;
+    case 402:
+        r = F("Payment Required");
+        break;
+    case 403:
+        r = F("Forbidden");
+        break;
+    case 404:
+        r = F("Not Found");
+        break;
+    case 405:
+        r = F("Method Not Allowed");
+        break;
+    case 406:
+        r = F("Not Acceptable");
+        break;
+    case 407:
+        r = F("Proxy Authentication Required");
+        break;
+    case 408:
+        r = F("Request Timeout");
+        break;
+    case 409:
+        r = F("Conflict");
+        break;
+    case 410:
+        r = F("Gone");
+        break;
+    case 411:
+        r = F("Length Required");
+        break;
+    case 412:
+        r = F("Precondition Failed");
+        break;
+    case 413:
+        r = F("Request Entity Too Large");
+        break;
+    case 414:
+        r = F("URI Too Long");
+        break;
+    case 415:
+        r = F("Unsupported Media Type");
+        break;
+    case 416:
+        r = F("Range not satisfiable");
+        break;
+    case 417:
+        r = F("Expectation Failed");
+        break;
+    case 500:
+        r = F("Internal Server Error");
+        break;
+    case 501:
+        r = F("Not Implemented");
+        break;
+    case 502:
+        r = F("Bad Gateway");
+        break;
+    case 503:
+        r = F("Service Unavailable");
+        break;
+    case 504:
+        r = F("Gateway Timeout");
+        break;
+    case 505:
+        r = F("HTTP Version not supported");
+        break;
+    default:
+        r = F("");
+        break;
+    }
+    return String(r);
 }

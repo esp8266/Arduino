@@ -16,7 +16,8 @@
  *
  */
 
-#include <time.h>
+#include <stdlib.h>
+#include <../include/time.h> // See issue #6714
 #include <sys/time.h>
 #include <sys/reent.h>
 #include "sntp.h"
@@ -55,23 +56,10 @@ static void setServer(int id, const char* name_or_ip)
 {
     if (name_or_ip)
     {
-        //TODO: check whether server is given by name or IP
+        // per current configuration,
+        // lwIP can receive an IP address or a fqdn
         sntp_setservername(id, (char*) name_or_ip);
     }
-}
-
-
-void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
-{
-    sntp_stop();
-
-    setServer(0, server1);
-    setServer(1, server2);
-    setServer(2, server3);
-
-    sntp_set_timezone_in_seconds(timezone_sec);
-    sntp_set_daylight(daylightOffset_sec);
-    sntp_init();
 }
 
 int clock_gettime(clockid_t unused, struct timespec *tp)
@@ -108,4 +96,34 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     return 0;
 }
 
-};
+}; // extern "C"
+
+void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
+{
+    sntp_stop();
+
+    setServer(0, server1);
+    setServer(1, server2);
+    setServer(2, server3);
+
+    sntp_set_timezone_in_seconds(timezone_sec);
+    sntp_set_daylight(daylightOffset_sec);
+    sntp_init();
+}
+
+void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
+{
+    sntp_stop();
+
+    setServer(0, server1);
+    setServer(1, server2);
+    setServer(2, server3);
+
+    char tzram[strlen_P(tz) + 1];
+    memcpy_P(tzram, tz, sizeof(tzram));
+    setenv("TZ", tzram, 1/*overwrite*/);
+    sntp_set_timezone_in_seconds(0);
+    tzset();
+
+    sntp_init();
+}

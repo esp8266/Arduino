@@ -26,7 +26,6 @@
 #include <bearssl/bearssl.h>
 #include <Updater.h>
 
-
 // Internal opaque structures, not needed by user applications
 namespace brssl {
   class public_key;

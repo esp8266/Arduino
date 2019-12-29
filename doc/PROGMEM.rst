@@ -116,7 +116,7 @@ the ``F()`` macro and possibly the FPSTR() macro. These are defined in `WString.
     #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
     #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
-So ``FSPTR()`` takes a PROGMEM pointer to a string and casts it to this
+So ``FPSTR()`` takes a PROGMEM pointer to a string and casts it to this
 ``__FlashStringHelper`` class. Thus if you have defined a string as
 above ``xyz`` you can use ``FPSTR()`` to convert it to
 ``__FlashStringHelper`` for passing into functions that take it.
@@ -145,7 +145,7 @@ constructor:
 
 .. code:: cpp
 
-    String(const char *cstr = ""); // constructor from const char * 
+    String(const char *cstr = nullptr); // constructor from const char *
     String(const String &str); // copy constructor
     String(const __FlashStringHelper *str); // constructor for flash strings 
 
@@ -236,6 +236,42 @@ the value back.
         Serial.write(byteval); // output the buffer.
       }
     }
+
+How do I declare Arrays of strings in PROGMEM and retrieve an element from it.
+------------------------------------------------------------------------------
+
+It is often convenient when working with large amounts of text, such as a project with an LCD display, to setup an array of strings. Because strings themselves are arrays, this is actually an example of a two-dimensional array.
+
+These tend to be large structures so putting them into program memory is often desirable. The code below illustrates the idea.
+
+.. code:: cpp
+
+    // Define Strings
+    const char string_0[] PROGMEM = "String 0";
+    const char string_1[] PROGMEM = "String 1";
+    const char string_2[] PROGMEM = "String 2";
+    const char string_3[] PROGMEM = "String 3";
+    const char string_4[] PROGMEM = "String 4";
+    const char string_5[] PROGMEM = "String 5";
+
+    // Initialize Table of Strings
+    const char* const string_table[] PROGMEM = { string_0, string_1, string_2, string_3, string_4, string_5 };
+
+    char buffer[30]; // buffer for reading the string to (needs to be large enough to take the longest string
+
+    void setup() {
+      Serial.begin(9600);
+      Serial.println("OK");
+    }
+
+    void loop() {
+      for (int i = 0; i < 6; i++) {
+        strcpy_P(buffer, (char*)pgm_read_dword(&(string_table[i])));
+        Serial.println(buffer);
+        delay(500);
+      }
+    }
+
 
 In summary
 ----------

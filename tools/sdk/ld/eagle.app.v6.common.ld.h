@@ -129,6 +129,8 @@ SECTIONS
 
     *(.text.app_entry*)  /* The main startup code */
 
+    *(.text.gdbstub*, .text.gdb_init)    /* Any GDB hooks */
+
     /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
     *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
   } >iram1_0_seg :iram1_0_phdr
@@ -178,6 +180,9 @@ SECTIONS
     *libwpa2.a:(.literal.* .text.*)
     *libwps.a:(.literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
+
+    /* Constant strings in flash (PSTRs) */
+    *(.irom0.pstr.*)
 
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)

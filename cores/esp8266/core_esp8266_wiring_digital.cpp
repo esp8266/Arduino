@@ -30,7 +30,7 @@
 
 extern "C" {
 
-uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x04, 0x08, 0x0C, 0x10};
+volatile uint32_t* const esp8266_gpioToFn[16] PROGMEM = { &GPF0, &GPF1, &GPF2, &GPF3, &GPF4, &GPF5, &GPF6, &GPF7, &GPF8, &GPF9, &GPF10, &GPF11, &GPF12, &GPF13, &GPF14, &GPF15 };
 
 extern void __pinMode(uint8_t pin, uint8_t mode) {
   if(pin < 16){
@@ -252,7 +252,7 @@ extern void initPins() {
 
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));
 extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
-extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead")));
+extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead"), nothrow));
 extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
 extern void attachInterruptArg(uint8_t pin, voidFuncPtrArg handler, void* arg, int mode) __attribute__((weak, alias("__attachInterruptArg")));
 extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));

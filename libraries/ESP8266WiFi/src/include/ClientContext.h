@@ -128,14 +128,14 @@ public:
         if (err != ERR_OK) {
             return 0;
         }
-        _connect_pending = 1;
+        _connect_pending = true;
         _op_start_time = millis();
-        // Following delay will be interrupted by connect callback
         for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
-       }
-        _connect_pending = 0;
+               // will resume on timeout or when _connected or _notify_error fires
+        }
+        _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
             return 0;
@@ -433,7 +433,9 @@ protected:
     void _notify_error()
     {
         if (_connect_pending || _send_waiting) {
-            esp_schedule();
+            _send_waiting = false;
+            _connect_pending = false;
+            esp_schedule(); // break delay in connect or _write_from_source
         }
     }
 
@@ -459,13 +461,14 @@ protected:
             }
 
             _send_waiting = true;
-            // Following delay will be interrupted by on next received ack
             for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _write_some_from_cb or _notify_error fires
+
             }
+            _send_waiting = false;
         } while(true);
-        _send_waiting = false;
 
         if (_sync)
             wait_until_sent();
@@ -534,7 +537,7 @@ protected:
     {
         if (_send_waiting) {
             _send_waiting = false;
-            esp_schedule();
+            esp_schedule(); // break delay in _write_from_source
         }
     }
 
@@ -608,9 +611,10 @@ protected:
         (void) err;
         (void) pcb;
         assert(pcb == _pcb);
-        assert(_connect_pending);
-        _connect_pending = 0;
-        esp_schedule();
+        if (_connect_pending) {
+            _connect_pending = false;
+            esp_schedule(); // break delay in connect
+        }
         return ERR_OK;
     }
 
@@ -659,7 +663,7 @@ private:
     uint32_t _timeout_ms = 5000;
     uint32_t _op_start_time = 0;
     bool _send_waiting = false;
-    uint8_t _connect_pending = 0;
+    bool _connect_pending = false;
 
     int8_t _refcnt;
     ClientContext* _next;

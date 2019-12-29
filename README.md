@@ -3,20 +3,20 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.6.3/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
 # Arduino on ESP8266
 
-This project brings support for ESP8266 chip to the Arduino environment. It lets you write sketches using familiar Arduino functions and libraries, and run them directly on ESP8266, no external microcontroller required.
+This project brings support for the ESP8266 chip to the Arduino environment. It lets you write sketches, using familiar Arduino functions and libraries, and run them directly on ESP8266, with no external microcontroller required.
 
-ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
+ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, and work with SD cards, servos, SPI and I2C peripherals.
 
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version-basic-instructions)
+  - [Using git version](#using-git-version)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -36,44 +36,22 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.2/](https://arduino-esp8266.readthedocs.io/en/2.5.2/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.6.3/](https://arduino-esp8266.readthedocs.io/en/2.6.3/)
 
-### Using git version (basic instructions)
+### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
+Also known as latest git or master branch.
+
 - Install the current upstream Arduino IDE at the 1.8 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
-- Go to Arduino directory
-  - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
-    This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
-    ```bash
-    cd <application-directory>/Arduino.app/Contents/Java
-    ```
-  - For Linux, it is ~/Arduino by default.
-    ```bash
-    cd ~/Arduino
-    ```
-- Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
-```bash
-cd hardware
-mkdir esp8266com
-cd esp8266com
-git clone https://github.com/esp8266/Arduino.git esp8266
-cd esp8266
-git submodule update --init
-```
-- Download binary tools (you need Python 2.7)
-```bash
-cd esp8266/tools
-python get.py
-```
-- Restart Arduino
+- Follow the [instructions in the documentation](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
 
 ### Using PlatformIO
 
 [PlatformIO](https://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
-development with a cross-platform build system, library manager and full support
-for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
-Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
+development with a cross-platform build system, a library manager, and full support
+for Espressif (ESP8266) development. It works on the following popular host operating systems: macOS, Windows,
+Linux 32/64, and Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
 - [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
 - [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
@@ -95,7 +73,7 @@ Documentation for latest development version: https://arduino-esp8266.readthedoc
 
 ### Issues and support ###
 
-[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party lib not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
+[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party library not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
 
 If you find the forum useful, please consider supporting it with a donation. <br />
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
@@ -107,14 +85,14 @@ Please provide as much context as possible, as well as the information requested
 - ESP8266 Arduino core version which you are using (you can check it in Boards Manager)
 - your sketch code; please wrap it into a code block, see [Github markdown manual](https://help.github.com/articles/basic-writing-and-formatting-syntax/#quoting-code)
 - when encountering an issue that happens at run time, attach the serial output. Wrap it into a code block, just like the code.
-- for issues which happen at compile time, enable verbose compiler output in the IDE preferences, and attach that output (also inside a code block)
+- for issues that happen at compile time, enable verbose compiler output in the IDE preferences, and attach that output (also inside a code block)
 - ESP8266 development board model
 - IDE settings (board choice, flash size)
 - etc
 
 ### Contributing
 
-For minor fixes of code and documentation, please go ahead and submit a pull request.
+For minor fixes of code and documentation, please go ahead and submit a pull request.  A gentle introduction to the process can be found [here](https://www.freecodecamp.org/news/a-simple-git-guide-and-cheat-sheet-for-open-source-contributors/).
 
 Check out the list of issues that are easy to fix — [easy issues pending](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
@@ -128,7 +106,7 @@ Arduino IDE is developed and maintained by the Arduino team. The IDE is licensed
 
 ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
-Esptool written by Christian Klippel is licensed under GPLv2, currently maintained by Ivan Grokhotkov: https://github.com/igrr/esptool-ck.
+Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), and is currently maintained by Angus Gratton (@projectgus) under GPL 2.0 license.
 
 Espressif SDK included in this build is under Espressif MIT License.
 
@@ -145,3 +123,15 @@ ESP8266 core files are licensed under LGPL.
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 
 [LittleFS](https://github.com/ARMmbed/littlefs) library written by ARM Limited and released under the [BSD 3-clause license](https://github.com/ARMmbed/littlefs/blob/master/LICENSE.md).
+
+[uzlib](https://github.com/pfalcon/uzlib) library written and (c) 2014-2018 Paul Sokolovsky, licensed under the ZLib license (https://www.zlib.net/zlib_license.html). uzlib is based on: tinf library by Joergen Ibsen (Deflate decompression); Deflate Static Huffman tree routines by Simon Tatham; LZ77 compressor by Paul Sokolovsky; with library integrated and maintained by Paul Sokolovsky.
+
+### Other useful links ###
+
+[Toolchain repo](https://github.com/earlephilhower/esp-quick-toolchain)
+
+[Lwip link layer repo](https://github.com/d-a-v/esp82xx-nonos-linklayer)
+
+[SoftwareSerial repo](https://github.com/plerup/espsoftwareserial)
+
+[Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).

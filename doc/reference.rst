@@ -1,6 +1,42 @@
 Reference
 =========
 
+Interrupts
+----------
+
+Interrupts can be used on the ESP8266, but they must be used with care
+and have several limitations:
+
+* Interrupt callback functions must be in IRAM, because the flash may be
+  in the middle of other operations when they occur.  Do this by adding
+  the ``ICACHE_RAM_ATTR`` attribute on the function definition.  If this
+  attribute is not present, the sketch will crash when it attempts to
+  ``attachInterrupt`` with an error message.  
+
+.. code:: cpp
+
+    ICACHE_RAM_ATTR void gpio_change_handler(void *data) {...
+
+* Interrupts must not call ``delay()`` or ``yield()``, or call any routines
+  which internally use ``delay()`` or ``yield()`` either.
+  
+* Long-running (>1ms) tasks in interrupts will cause instabilty or crashes.
+  WiFi and other portions of the core can become unstable if interrupts
+  are blocked by a long-running interrupt.  If you have much to do, you can
+  set a volatile global flag that your main ``loop()`` can check each pass
+  or use a scheduled function (which will be called outside of the interrupt
+  context when it is safe) to do long-running work.
+
+* Memory operations can be dangerous and should be avoided in interrupts.
+  Calls to ``new`` or ``malloc`` should be minimized because they may require
+  a long running time if memory is fragmented.  Calls to ``realloc`` and
+  ``free`` must NEVER be called.  Using any routines or objects which call
+  ``free`` or ``realloc`` themselves is also forbidden for the same reason.
+  This means that ``String``, ``std::string``, ``std::vector`` and other
+  classes which use contiguous memory that may be resized must be used with
+  extreme care (ensuring strings aren't changed, vector elements aren't
+  added, etc.).
+
 Digital IO
 ----------
 
@@ -215,3 +251,75 @@ using FPSTR would become...
         String response2;
         response2 += FPSTR(HTTP);
     }
+
+C++
+----
+
+- About C++ exceptions, ``operator new``, and Exceptions menu option
+  
+  The C++ standard says the following about the ``new`` operator behavior when encountering heap shortage (memory full):
+
+  - has to throw a ``std::bad_alloc`` C++ exception when they are enabled
+
+  - will ``abort()`` otherwise
+  
+  There are several reasons for the first point above, among which are:
+
+  - guarantee that the return of new is never a ``nullptr``
+
+  - guarantee full construction of the top level object plus all member subobjects
+
+  - guarantee that any subobjects partially constructed get destroyed, and in the correct order, if oom is encountered midway through construction
+  
+  When C++ exceptions are disabled, or when using ``new(nothrow)``, the above guarantees can't be upheld, so the second point (``abort()``) above is the only ``std::c++`` viable solution.
+  
+  Historically in Arduino environments, ``new`` is overloaded to simply return the equivalent ``malloc()`` which in turn can return ``nullptr``.
+  
+  This behavior is not C++ standard, and there is good reason for that: there are hidden and very bad side effects. The *class and member constructors are always called, even when memory is full* (``this == nullptr``).
+  In addition, the memory allocation for the top object could succeed, but allocation required for some member object could fail, leaving construction in an undefined state.
+  So the historical behavior of Ardudino's ``new``, when faced with insufficient memory, will lead to bad crashes sooner or later, sometimes unexplainable, generally due to memory corruption even when the returned value is checked and managed.
+  Luckily on esp8266, trying to update RAM near address 0 will immediately raise an hardware exception, unlike on other uC like avr on which that memory can be accessible.
+  
+  As of core 2.6.0, there are 3 options: legacy (default) and two clear cases when ``new`` encounters oom:
+  
+  - ``new`` returns ``nullptr``, with possible bad effects or immediate crash when constructors (called anyway) initialize members (exceptions are disabled in this case)
+
+  - C++ exceptions are disabled: ``new`` calls ``abort()`` and will "cleanly" crash, because there is no way to honor memory allocation or to recover gracefully.
+
+  - C++ exceptions are enabled: ``new`` throws a ``std::bad_alloc`` C++ exception, which can be caught and handled gracefully.
+    This assures correct behavior, including handling of all subobjects, which guarantees stability.
+
+  History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
+
+- New optional allocator ``arduino_new``
+
+  A new optional global allocator is introduced with a different semantic:
+
+  - never throws exceptions on oom
+
+  - never calls constructors on oom
+
+  - returns nullptr on oom
+
+  It is similar to arduino ``new`` semantic without side effects
+  (except when parent constructors, or member constructors use ``new``).
+
+  Syntax is slightly different, the following shows the different usages:
+
+  .. code:: cpp
+
+      // with new:
+
+      SomeClass* sc = new SomeClass(arg1, arg2, ...);
+      delete sc;
+
+      SomeClass* scs = new SomeClass[42];
+      delete [] scs;
+
+      // with arduino_new:
+
+      SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
+      delete sc;
+
+      SomeClass* scs = arduino_newarray(SomeClass, 42);
+      delete [] scs;

@@ -41,6 +41,19 @@ public:
     virtual const char* fullName() const = 0;
     virtual bool isFile() const = 0;
     virtual bool isDirectory() const = 0;
+
+    // Filesystems *may* support a timestamp per-file, so allow the user to override with
+    // their own callback for *this specific* file (as opposed to the FSImpl call of the
+    // same name.  The default implementation simply returns time(&null)
+    virtual void setTimeCallback(time_t (*cb)(void)) { timeCallback = cb; }
+
+    // Return the last written time for a file.  Undefined when called on a writable file
+    // as the FS is allowed to return either the time of the last write() operation or the
+    // time present in the filesystem metadata (often the last time the file was closed)
+    virtual time_t getLastWrite() { return 0; } // Default is to not support timestamps
+
+protected:
+    time_t (*timeCallback)(void) = nullptr;
 };
 
 enum OpenMode {
@@ -62,10 +75,24 @@ public:
     virtual FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) = 0;
     virtual const char* fileName() = 0;
     virtual size_t fileSize() = 0;
+    virtual time_t fileTime() { return 0; } // By default, FS doesn't report file times
     virtual bool isFile() const = 0;
     virtual bool isDirectory() const = 0;
     virtual bool next() = 0;
     virtual bool rewind() = 0;
+
+    // Filesystems *may* support a timestamp per-file, so allow the user to override with
+    // their own callback for *this specific* file (as opposed to the FSImpl call of the
+    // same name.  The default implementation simply returns time(&null)
+    virtual void setTimeCallback(time_t (*cb)(void)) { timeCallback = cb; }
+
+    // Return the last written time for a file.  Undefined when called on a writable file
+    // as the FS is allowed to return either the time of the last write() operation or the
+    // time present in the filesystem metadata (often the last time the file was closed)
+    virtual time_t getLastWrite() { return 0; } // Default is to not support timestamps
+
+protected:
+    time_t (*timeCallback)(void) = nullptr;
 };
 
 class FSImpl {
@@ -85,6 +112,15 @@ public:
     virtual bool mkdir(const char* path) = 0;
     virtual bool rmdir(const char* path) = 0;
     virtual bool gc() { return true; } // May not be implemented in all file systems.
+    virtual bool check() { return true; } // May not be implemented in all file systems.
+
+    // Filesystems *may* support a timestamp per-file, so allow the user to override with
+    // their own callback for all files on this FS.  The default implementation simply
+    // returns the present time as reported by time(&null)
+    virtual void setTimeCallback(time_t (*cb)(void)) { timeCallback = cb; }
+
+protected:
+    time_t (*timeCallback)(void) = nullptr;
 };
 
 } // namespace fs
