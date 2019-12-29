@@ -39,8 +39,7 @@ void setup() {
   Serial.println();
 }
 
-void loop() 
-{
+void loop() {
   // This serves only to demonstrate the library use. See the header file for a full list of functions.
 
   String exampleData = F("Hello Crypto World!");
@@ -79,23 +78,24 @@ void loop()
   uint8_t resultingTag[16] { 0 }; // The tag is always 16 bytes
 
   Serial.println(String(F("\nThis is the data to encrypt: ")) + dataToEncrypt);
-  
+
   // Note that the key must be ENCRYPTION_KEY_LENGTH long.
   CryptoInterface::chacha20Poly1305Encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   Serial.println(String(F("Encrypted data: ")) + dataToEncrypt);
-  
+
   bool decryptionSucceeded = CryptoInterface::chacha20Poly1305Decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   encryptionCounter++;
-  
-  if(decryptionSucceeded)
+
+  if (decryptionSucceeded) {
     Serial.print(F("Decryption succeeded. Result: "));
-  else
+  } else {
     Serial.print(F("Decryption failed. Result: "));
+  }
 
   Serial.println(dataToEncrypt);
 
 
   Serial.println(F("\n##########################################################################################################\n"));
-  
+
   delay(10000);
 }

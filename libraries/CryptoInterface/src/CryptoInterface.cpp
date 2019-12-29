@@ -27,6 +27,7 @@
 #include <TypeConversion.h>
 
 #include <bearssl/bearssl.h>
+#include <assert.h>
 
 namespace TypeCast = esp8266::TypeConversion;
 
