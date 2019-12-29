@@ -169,7 +169,7 @@ public:
     return contentLength;
   }
 
-  static const String responseCodeToString(const int code);
+  static String responseCodeToString(const int code);
 
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
