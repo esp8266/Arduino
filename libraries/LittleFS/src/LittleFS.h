@@ -567,6 +567,10 @@ public:
     bool rewind() override {
         _valid = false;
         int rc = lfs_dir_rewind(_fs->getFS(), _getDir());
+        // Skip the . and .. entries
+        lfs_info dirent;
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
         return (rc == 0);
     }
 
