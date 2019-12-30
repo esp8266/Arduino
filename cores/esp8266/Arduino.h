@@ -39,6 +39,8 @@ extern "C" {
 #include "twi.h"
 #include "core_esp8266_features.h"
 #include "core_esp8266_version.h"
+
+#define ERASE_CONFIG_METHOD 2
 #include "erase_config.h"
 
 #define HIGH 0x1
