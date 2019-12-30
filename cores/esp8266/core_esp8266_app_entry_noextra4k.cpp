@@ -27,9 +27,17 @@ extern "C" void call_user_start();
 /* this is the default NONOS-SDK user's heap location */
 static cont_t g_cont __attribute__ ((aligned (16)));
 
+#if (ERASE_CONFIG_METHOD == 2)
+extern int eboot_two_shots;
+#endif
+
 extern "C" void app_entry_redefinable(void)
 {
     g_pcont = &g_cont;
+
+#if (ERASE_CONFIG_METHOD == 2)
+    eboot_two_shots = 2;
+#endif
 
     /* Call the entry point of the SDK code. */
     call_user_start();

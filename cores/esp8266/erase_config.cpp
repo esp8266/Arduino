@@ -107,10 +107,9 @@ int ICACHE_RAM_ATTR SPIRead(uint32_t addr, void *dest, size_t size) {
   // verification read is performed. Before this read is passed on we erase
   // config sectors.
   if (eboot_two_shots) {
-    if (eboot_two_shots == 1)
-      check_and_erase_config();
-
     eboot_two_shots--;
+    if (0 == eboot_two_shots)
+      check_and_erase_config();
   }
 
   int err = real_SPIRead(addr, dest, size);
