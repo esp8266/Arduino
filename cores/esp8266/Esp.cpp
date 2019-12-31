@@ -502,11 +502,6 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
     return &resetInfo;
 }
 
-#ifdef ERASE_CONFIG_H
-bool EspClass::eraseConfig(const uint32_t flash_erase_mask) {
-    return erase_config(flash_erase_mask);
-}
-#else
 bool EspClass::eraseConfig(void) {
     const size_t cfgSize = 0x4000;
     size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
@@ -519,7 +514,6 @@ bool EspClass::eraseConfig(void) {
 
     return true;
 }
-#endif
 
 uint32_t EspClass::getSketchSize() {
     static uint32_t result = 0;

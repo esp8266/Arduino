@@ -283,10 +283,6 @@ void init_done() {
 
 */
 
-#if (ERASE_CONFIG_METHOD == 2)
-int eboot_two_shots __attribute__((section(".noinit")));
-#endif
-
 extern "C" void app_entry_redefinable(void) __attribute__((weak));
 extern "C" void app_entry_redefinable(void)
 {
@@ -294,10 +290,6 @@ extern "C" void app_entry_redefinable(void)
        and save pointer to it. */
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
-
-#if (ERASE_CONFIG_METHOD == 2)
-    eboot_two_shots = 2;
-#endif
 
     /* Call the entry point of the SDK code. */
     call_user_start();
@@ -316,27 +308,11 @@ extern "C" void preinit (void)
     /* do nothing by default */
 }
 
-#if (ERASE_CONFIG_METHOD == 1)
-extern "C" void __pinMode(uint8_t pin, uint8_t mode);
-#endif
-
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
-
-#if (ERASE_CONFIG_METHOD == 1)
-    if (0 != resetInfo.reason) {  // Not Power On
-        // 1st 3 lines are trying to silence or reduce the unreadable serial
-        // prints. Not sure of the effectivness. Need to reverify.
-        system_set_os_print(0);
-        U0IE = 0;
-        U1IE = 0;
-        __pinMode(1, INPUT_PULLUP); // Silence U0TXD
-        check_and_erase_config();
-    }
-#endif
 
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
