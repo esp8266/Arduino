@@ -14,7 +14,8 @@ typedef enum ERASE_CONFIG {
 // to store only 128 bytes.
 //
 // Mapping of Sectors at end of Flash, adapted for the Arduino ESP8266.
-// Defaults to using the IDE configured flash size for placement
+// The IDE configured flash size defines where the actual last sector used by
+// the SDK is located.
 //_______________________________________________________________________________________
 //_Bit_number_for_Mask______|_____4_____|_____3_____|_____2_____|_____1_____|_____0_____|
 //                          |           |  RF_CAL   |        SDK Parameter Area         |

@@ -3,6 +3,48 @@
 #include <eboot_command.h>
 #include <spi_flash.h>
 
+/*
+
+Issue: Sometimes when an ESP8266 is reflashed/upgraded the WiFi does not work.
+Then a  serial flash with Erase Flash with WiFi setting is recommended. I have
+seen this more often when changing SDK by OTA. We don't have an erase WiFi for
+OTA.
+
+The PR tries to present a proof of concept solution. Actually it describes two
+different methods.
+
+There are 3 cases to consider when the firmware is updated by OTA. The new
+firmware:
+1. has the same Flash Configuration as the old.
+2. has a larger Flash Configuration than the old.
+3. has a smaller Flash Configuration then the old.
+
+In theory after an OTA and before a restart, the flash could be erased for
+_case 1_. _Case 2_ is a problem because the size exceeds what the SPIEraseSector
+expects and fails. We have to wait for a restart, after which the SDK will have
+updated the values in `flashchip`. _Case 3_ is potentially unsafe because we
+could be erasing the code that is running.
+
+At app_entry() `flashchip` properties appear to be reset to a default 4MByte
+flash. Even an ESP8285 reported 4MByte. The value of `flashchip->chip_size` was
+changed at the 2nd SPIRead. The 1st read was to address 0, 4 bytes.
+
+To erase the flash WiFi area, I choose to wait until the SDK has finished its
+adjustments to the `flashchip` structure. Then to begin erasing WiFi sectors.
+
+I implemented two methods:
+1. The first runs after the SDK calls `user_init()` and flash code execution is
+available (No IRAM needed), but restarts to be sure the SDK  does not get
+confused about its sectors being erased.
+2. The 2nd method runs as early as possible required IRAM. The sectors are
+erased before that 2nd read is processed. The SDK allowing the SDK to start off
+thinking the sectors were blank at boot.
+
+I also added an example/test sketch for exercising the feature. It is
+OTAEraseConfig.
+
+
+*/
 
 #define ERASE_CONFIG_METHOD 1
 
