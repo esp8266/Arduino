@@ -7,8 +7,9 @@ bool WifiUp = false;
 
 bool printLocalTime(Print& oPrint, time_t timeIn, const char *fmt) {
   time_t gtime = timeIn;
-  if (0 == gtime)
+  if (0 == gtime) {
     time(&gtime);
+  }
 
   char ephemeralBuffer[64];
   if (strftime(ephemeralBuffer, sizeof(ephemeralBuffer), fmt, localtime(&gtime)) > 0) {
@@ -20,16 +21,18 @@ bool printLocalTime(Print& oPrint, time_t timeIn, const char *fmt) {
 
 bool printUpTime(Print& oPrint, time_t timeIn) {
   time_t gtime;
-  if (timeIn)
+  if (timeIn) {
     gtime = timeIn;
-  else
+  } else {
     gtime = (time_t)(micros64() / 1000000);
+  }
 
   char ephemeralBuffer[64];
   struct tm *tv = gmtime(&gtime);
   if (strftime(ephemeralBuffer, sizeof(ephemeralBuffer), "%T", tv) > 0) {
-    if (tv->tm_yday)
+    if (tv->tm_yday) {
       oPrint.print(String((tv->tm_yday)) + " day" + ((tv->tm_yday == 1) ? " " : "s ") );
+    }
 
     oPrint.print(ephemeralBuffer);
     return true;
@@ -185,45 +188,45 @@ void updateWiFiStats(void) {
 }
 
 void onWiFiConnected(WiFiEventStationModeConnected data) {
-    (void) data;
-    wifiHealth.channel = data.channel;
-    memcpy(wifiHealth.bssid, data.bssid, sizeof(wifiHealth.bssid));
-    wifiHealth.connected_count++;
-    wifiHealth.connected_time = (time_t)(micros64() / 1000000);
-    wifiHealth.rssi = WiFi.RSSI();
-    WifiUp = true;
-//    wifiLed.strobe(0);
-//    wifiLed.on();
+  (void) data;
+  wifiHealth.channel = data.channel;
+  memcpy(wifiHealth.bssid, data.bssid, sizeof(wifiHealth.bssid));
+  wifiHealth.connected_count++;
+  wifiHealth.connected_time = (time_t)(micros64() / 1000000);
+  wifiHealth.rssi = WiFi.RSSI();
+  WifiUp = true;
 
-//    last_garp = millis(); // init for doGarp(NULL);
+  // wifiLed.strobe(0);
+  // wifiLed.on();
+  // last_garp = millis(); // init for doGarp(NULL);
 }
 
 void onWiFiDisconnected(WiFiEventStationModeDisconnected data) {
-    (void) data;
-    WifiUp = false;
-//    wifiLed.strobe(0);
-//    wifiLed.off();
-    time_t gtime;
-    time(&gtime);
-    time_t stime = (time_t)(micros64() / 1000000);
-    wifiHealth.disconnected_time = stime;
-    wifiHealth.gtime_adjust = gtime - stime;
+  (void) data;
+  WifiUp = false;
+  // wifiLed.strobe(0);
+  // wifiLed.off();
+  time_t gtime;
+  time(&gtime);
+  time_t stime = (time_t)(micros64() / 1000000);
+  wifiHealth.disconnected_time = stime;
+  wifiHealth.gtime_adjust = gtime - stime;
 
-    if (wifiHealth.connected_time) {
-      size_t last = wifiHealth.connected_count % MAX_CONNECTION_LOST_TIME_LOG;
-      wifi_disconnect_log[last].time    = stime; // Note, 1st entry is at [1].
-      wifi_disconnect_log[last].reason  = data.reason;
-      wifi_disconnect_log[last].channel = wifiHealth.channel;
-      wifi_disconnect_log[last].rssi = wifiHealth.rssi;
-      time_t uptime = stime - wifiHealth.connected_time;
-      wifiHealth.uptime_sum += uptime;
-      wifiHealth.uptime_max = max(wifiHealth.uptime_max, uptime);
-      if (~(time_t)0 != wifiHealth.uptime_min) {
-        wifiHealth.uptime_min = min(wifiHealth.uptime_min, uptime);
-      } else {
-        wifiHealth.uptime_min = uptime;
-      }
+  if (wifiHealth.connected_time) {
+    size_t last = wifiHealth.connected_count % MAX_CONNECTION_LOST_TIME_LOG;
+    wifi_disconnect_log[last].time    = stime; // Note, 1st entry is at [1].
+    wifi_disconnect_log[last].reason  = data.reason;
+    wifi_disconnect_log[last].channel = wifiHealth.channel;
+    wifi_disconnect_log[last].rssi = wifiHealth.rssi;
+    time_t uptime = stime - wifiHealth.connected_time;
+    wifiHealth.uptime_sum += uptime;
+    wifiHealth.uptime_max = max(wifiHealth.uptime_max, uptime);
+    if (~(time_t)0 != wifiHealth.uptime_min) {
+      wifiHealth.uptime_min = min(wifiHealth.uptime_min, uptime);
+    } else {
+      wifiHealth.uptime_min = uptime;
     }
+  }
 }
 
 
@@ -232,19 +235,19 @@ bool printWiFiStats(Print& oStream) {
 
   if (WiFi.status() == WL_CONNECTED) {
     oStream.println(String_F("\nWiFi connected:   '") + WiFi.SSID() + "'");
-    oStream.println(String_F("  SDK Version:       ") + String(ESP.getSdkVersion()) );
-    oStream.printf_P(   PSTR("  BSSID:             %02X:%02X:%02X:%02X:%02X:%02X\r\n"),
-        wifiHealth.bssid[0], wifiHealth.bssid[1], wifiHealth.bssid[2],
-        wifiHealth.bssid[3], wifiHealth.bssid[4], wifiHealth.bssid[5] );
-    oStream.println(String_F("  PHY Mode:          802.11") + (getPhyModeChar(WiFi.getPhyMode())) );
-    oStream.println(String_F("  Channel:           ") + (WiFi.channel()) );
-    oStream.println(String_F("  RSSI:              ") + (WiFi.RSSI()) );
+    oStream.println(String_F("  SDK Version:       ") + String(ESP.getSdkVersion()));
+    oStream.printf_P(PSTR("  BSSID:             %02X:%02X:%02X:%02X:%02X:%02X\r\n"),
+                     wifiHealth.bssid[0], wifiHealth.bssid[1], wifiHealth.bssid[2],
+                     wifiHealth.bssid[3], wifiHealth.bssid[4], wifiHealth.bssid[5]);
+    oStream.println(String_F("  PHY Mode:          802.11") + (getPhyModeChar(WiFi.getPhyMode())));
+    oStream.println(String_F("  Channel:           ") + (WiFi.channel()));
+    oStream.println(String_F("  RSSI:              ") + (WiFi.RSSI()));
     oStream.println(String_F("    MAX:             ") + (wifiHealth.rssi_max) );
     oStream.println(String_F("    MIN:             ") + (wifiHealth.rssi_min) );
     if (wifiHealth.rssi_count)
-      oStream.println(String_F("    AVG:             ") + (wifiHealth.rssi_sum/(int32_t)wifiHealth.rssi_count) );
+      oStream.println(String_F("    AVG:             ") + (wifiHealth.rssi_sum/(int32_t)wifiHealth.rssi_count));
 
-    oStream.println(String_F("    sample count:    ") + (wifiHealth.rssi_count) );
+    oStream.println(String_F("    sample count:    ") + (wifiHealth.rssi_count));
     if (0 != wifiHealth.connected_time) {
       oStream.print(String_F("  Connection Uptime: "));
       time_t uptime = (time_t)(micros64() / 1000000);
@@ -267,12 +270,12 @@ bool printWiFiStats(Print& oStream) {
       uptime /= (decltype(uptime))wifiHealth.connected_count;
       printUpTime(oStream, uptime);
       oStream.println();
-      oStream.println(String_F("  Reconnects:        ") + (wifiHealth.connected_count - 1) );
+      oStream.println(String_F("  Reconnects:        ") + (wifiHealth.connected_count - 1));
 
       if (wifiHealth.connected_count > 1) {
         oStream.println(String_F("  Recent Disconnect times:"));
         ssize_t back_count = wifiHealth.connected_count;
-        for (ssize_t i=1; i <= MAX_CONNECTION_LOST_TIME_LOG; i++) {
+        for (ssize_t i = 1; i <= MAX_CONNECTION_LOST_TIME_LOG; i++) {
           back_count -= 1;
           if (back_count < 1)
             break;
@@ -282,17 +285,17 @@ bool printWiFiStats(Print& oStream) {
           printLocalTime(oStream, wifi_disconnect_log[iLog].time + wifiHealth.gtime_adjust);
           oStream.println();
           oStream.println(String_F("      Reason:  ") + getWiFiDisconnectReasonString(wifi_disconnect_log[iLog].reason));
-          oStream.println(String_F("      Channel: ") + (wifi_disconnect_log[iLog].channel) );
-          oStream.println(String_F("      RSSI:    ") + (wifi_disconnect_log[iLog].rssi) );
+          oStream.println(String_F("      Channel: ") + (wifi_disconnect_log[iLog].channel));
+          oStream.println(String_F("      RSSI:    ") + (wifi_disconnect_log[iLog].rssi));
         }
       }
     }
 
-    oStream.println(String_F("  IP Address:        ") + (WiFi.localIP().toString()) );
-    oStream.println(String_F("  Network Mask:      ") + (WiFi.subnetMask().toString()) );
-    oStream.println(String_F("  Gateway:           ") + (WiFi.gatewayIP().toString()) );
-    oStream.println(String_F("  DNS1:              ") + (WiFi.dnsIP(0).toString()) );
-    oStream.println(String_F("  DNS2:              ") + (WiFi.dnsIP(1).toString()) );
+    oStream.println(String_F("  IP Address:        ") + (WiFi.localIP().toString()));
+    oStream.println(String_F("  Network Mask:      ") + (WiFi.subnetMask().toString()));
+    oStream.println(String_F("  Gateway:           ") + (WiFi.gatewayIP().toString()));
+    oStream.println(String_F("  DNS1:              ") + (WiFi.dnsIP(0).toString()));
+    oStream.println(String_F("  DNS2:              ") + (WiFi.dnsIP(1).toString()));
 
 
     bSuccess = true;

@@ -18,7 +18,7 @@ void telnetAgentSetup(void) {
 void handleTelnetAgent(void) {
   //check if there are any new clients
   if (server.hasClient()) {
-    
+
     //find free/disconnected spot
     int i;
     for (i = 0; i < MAX_SRV_CLIENTS; i++)
@@ -28,7 +28,7 @@ void handleTelnetAgent(void) {
         Serial.print(i);
         break;
       }
-      
+
     //no free/disconnected spot so reject
     if (i == MAX_SRV_CLIENTS) {
       server.available().println("busy");
@@ -45,11 +45,12 @@ void handleTelnetAgent(void) {
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     while (serverClients[i].available()) {
       int hotKey = serverClients[i].read();
-      
-      if ((hotKey > 0 && hotKey >' ') || hotKey == '\r')
+
+      if ((hotKey > 0 && hotKey >' ') || hotKey == '\r') {
         cmdLoop(telnetOut, hotKey);
+      }
     }
-    
+
 #else
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     while (serverClients[i].available()) {

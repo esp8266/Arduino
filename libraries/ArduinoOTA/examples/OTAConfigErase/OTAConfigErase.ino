@@ -55,7 +55,7 @@ void setTimeTZ(const char *tz) {
 }
 
 void setTimeTZ(String& tz) {
-  setTimeTZ(tz.c_str() );
+  setTimeTZ(tz.c_str());
 }
 
 void setup() {
@@ -115,7 +115,7 @@ void setup() {
       type = "sketch";
 
       Update.setEraseConfigOption(eraseConfigOption);
-      
+
     } else { // U_FS
       type = "filesystem";
     }
@@ -255,7 +255,7 @@ int cmdLoop(Print& oStream, char inChar) {
       printFlashStatsReport(oStream);
       oStream.println();
       break;
-#endif      
+#endif
     case 'w':
       printWiFiStats(oStream);
       oStream.println();
