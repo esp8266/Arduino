@@ -46,7 +46,7 @@ void handleTelnetAgent(void) {
     while (serverClients[i].available()) {
       int hotKey = serverClients[i].read();
 
-      if ((hotKey > 0 && hotKey >' ') || hotKey == '\r') {
+      if ((hotKey > 0 && hotKey > ' ') || hotKey == '\r') {
         cmdLoop(telnetOut, hotKey);
       }
     }

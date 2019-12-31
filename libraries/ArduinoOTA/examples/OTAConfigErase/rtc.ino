@@ -4,26 +4,26 @@
 #ifdef ERASE_CONFIG_H
 void printFlashEraseMap(Print& out) {
   out.printf_P(PSTR(
-               "_________________________________________________________________________________________\r\n"
-               "|  Address of sectors       |           |           |           |           |           |\r\n"
-               "|  at the end of the Flash  | ...FB000  | ...FC000  | ...FD000  | ...FE000  | ...FF000  |\r\n"
-               "|___________________________|___________|___________|___________|___________|___________|\r\n"
-               "|__Bit_number_for_Mask______|_____4_____|_____3_____|_____2_____|_____1_____|_____0_____|\r\n"
-               "|                           |           |  RF_CAL   |        SDK Parameter Area         |\r\n"
-               "|  Overlay at RF init       |           | PHY INIT  |           |           |           |\r\n"
-               "|  Persistant data          |           |           |           |  SSID/PW  |           |\r\n"
-               "|  User storage             |   EEPROM  |           |           |           |           |\r\n"
-               "|  Often shown downloaded   |           | BLANK.BIN |           | BLANK.BIN |           |\r\n"
-               "|___________________________|___________|___________|___________|___________|___________|\r\n"
-               "| 0 ERASE_CONFIG_NONE       |           |           |           |           |           |\r\n"
-               "| 1 ERASE_CONFIG_EEPROM     |   BIT(4)  |           |           |           |           |\r\n"
-               "| 2 ERASE_CONFIG_RF_CAL     |           |  BIT(3)   |           |           |           |\r\n"
-               "| 3 ERASE_CONFIG_PERSISTANT |           |           |           |   BIT(1)  |           |\r\n"
-               "| 4 ERASE_CONFIG_BLANK_BIN  |           |  BIT(3)   |           |   BIT(1)  |           |\r\n"
-               "| 5 ERASE_CONFIG_SDK_DATA   |           |  BIT(3)   |   BIT(2)  |   BIT(1)  |   BIT(0)  |\r\n"
-               "| 6 ERASE_CONFIG_ALL_DATA   |   BIT(4)  |  BIT(3)   |   BIT(2)  |   BIT(1)  |   BIT(0)  |\r\n"
-               "|___________________________|___________|___________|___________|___________|___________|\r\n"
-             ));
+                 "_________________________________________________________________________________________\r\n"
+                 "|  Address of sectors       |           |           |           |           |           |\r\n"
+                 "|  at the end of the Flash  | ...FB000  | ...FC000  | ...FD000  | ...FE000  | ...FF000  |\r\n"
+                 "|___________________________|___________|___________|___________|___________|___________|\r\n"
+                 "|__Bit_number_for_Mask______|_____4_____|_____3_____|_____2_____|_____1_____|_____0_____|\r\n"
+                 "|                           |           |  RF_CAL   |        SDK Parameter Area         |\r\n"
+                 "|  Overlay at RF init       |           | PHY INIT  |           |           |           |\r\n"
+                 "|  Persistant data          |           |           |           |  SSID/PW  |           |\r\n"
+                 "|  User storage             |   EEPROM  |           |           |           |           |\r\n"
+                 "|  Often shown downloaded   |           | BLANK.BIN |           | BLANK.BIN |           |\r\n"
+                 "|___________________________|___________|___________|___________|___________|___________|\r\n"
+                 "| 0 ERASE_CONFIG_NONE       |           |           |           |           |           |\r\n"
+                 "| 1 ERASE_CONFIG_EEPROM     |   BIT(4)  |           |           |           |           |\r\n"
+                 "| 2 ERASE_CONFIG_RF_CAL     |           |  BIT(3)   |           |           |           |\r\n"
+                 "| 3 ERASE_CONFIG_PERSISTANT |           |           |           |   BIT(1)  |           |\r\n"
+                 "| 4 ERASE_CONFIG_BLANK_BIN  |           |  BIT(3)   |           |   BIT(1)  |           |\r\n"
+                 "| 5 ERASE_CONFIG_SDK_DATA   |           |  BIT(3)   |   BIT(2)  |   BIT(1)  |   BIT(0)  |\r\n"
+                 "| 6 ERASE_CONFIG_ALL_DATA   |   BIT(4)  |  BIT(3)   |   BIT(2)  |   BIT(1)  |   BIT(0)  |\r\n"
+                 "|___________________________|___________|___________|___________|___________|___________|\r\n"
+               ));
 }
 
 bool queueEraseConfig(int hotKey) {

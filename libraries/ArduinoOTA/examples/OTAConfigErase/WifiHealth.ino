@@ -31,7 +31,7 @@ bool printUpTime(Print& oPrint, time_t timeIn) {
   struct tm *tv = gmtime(&gtime);
   if (strftime(ephemeralBuffer, sizeof(ephemeralBuffer), "%T", tv) > 0) {
     if (tv->tm_yday) {
-      oPrint.print(String((tv->tm_yday)) + " day" + ((tv->tm_yday == 1) ? " " : "s ") );
+      oPrint.print(String((tv->tm_yday)) + " day" + ((tv->tm_yday == 1) ? " " : "s "));
     }
 
     oPrint.print(ephemeralBuffer);
@@ -242,10 +242,11 @@ bool printWiFiStats(Print& oStream) {
     oStream.println(String_F("  PHY Mode:          802.11") + (getPhyModeChar(WiFi.getPhyMode())));
     oStream.println(String_F("  Channel:           ") + (WiFi.channel()));
     oStream.println(String_F("  RSSI:              ") + (WiFi.RSSI()));
-    oStream.println(String_F("    MAX:             ") + (wifiHealth.rssi_max) );
-    oStream.println(String_F("    MIN:             ") + (wifiHealth.rssi_min) );
-    if (wifiHealth.rssi_count)
-      oStream.println(String_F("    AVG:             ") + (wifiHealth.rssi_sum/(int32_t)wifiHealth.rssi_count));
+    oStream.println(String_F("    MAX:             ") + (wifiHealth.rssi_max));
+    oStream.println(String_F("    MIN:             ") + (wifiHealth.rssi_min));
+    if (wifiHealth.rssi_count) {
+      oStream.println(String_F("    AVG:             ") + (wifiHealth.rssi_sum / (int32_t)wifiHealth.rssi_count));
+    }
 
     oStream.println(String_F("    sample count:    ") + (wifiHealth.rssi_count));
     if (0 != wifiHealth.connected_time) {
@@ -277,8 +278,9 @@ bool printWiFiStats(Print& oStream) {
         ssize_t back_count = wifiHealth.connected_count;
         for (ssize_t i = 1; i <= MAX_CONNECTION_LOST_TIME_LOG; i++) {
           back_count -= 1;
-          if (back_count < 1)
+          if (back_count < 1) {
             break;
+          }
 
           ssize_t iLog = back_count % MAX_CONNECTION_LOST_TIME_LOG;
           oStream.print(String_F("    "));
