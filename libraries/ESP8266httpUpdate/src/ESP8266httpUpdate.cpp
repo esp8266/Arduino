@@ -345,8 +345,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                 WiFiClient * tcp = http.getStreamPtr();
 
-                WiFiUDP::stopAll();
-                WiFiClient::stopAllExcept(tcp);
+                if (_severConnectionsOnUpdate) {
+                    WiFiUDP::stopAll();
+                    WiFiClient::stopAllExcept(tcp);
+                }
 
                 delay(100);
 
