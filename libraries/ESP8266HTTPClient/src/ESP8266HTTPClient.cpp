@@ -1140,14 +1140,11 @@ bool HTTPClient::sendHeader(const char * type)
     }
     header += F(" HTTP/1.");
 
-    header += type;
-    header += ' ';
-    if (_uri.length())
-        header += _uri;
-    else
-        header += '/';
-    header += F(" HTTP/1.");
-    header += (char)('0' + !_useHTTP10);
+    if(_useHTTP10) {
+        header += '0';
+    } else {
+        header += '1';
+    }
 
     header += F("\r\nHost: ");
     header += _host;
