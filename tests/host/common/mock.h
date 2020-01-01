@@ -87,7 +87,7 @@ typedef uint32_t uint32;
 #include <c_types.h>
 #include <core_esp8266_features.h>
 
-inline uint32_t esp_get_cycle_count() { return millis() * (F_CPU / 1000); }
+uint32_t esp_get_cycle_count();
 
 #include <Arduino.h>
 
