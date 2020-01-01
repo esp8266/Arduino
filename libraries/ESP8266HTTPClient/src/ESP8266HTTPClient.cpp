@@ -828,9 +828,9 @@ WiFiClient* HTTPClient::getStreamPtr(void)
  * @param stream Stream *
  * @return bytes written ( negative values are error codes )
  */
-
 int HTTPClient::writeToStream(Stream * stream)
 {
+
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
     }

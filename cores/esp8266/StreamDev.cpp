@@ -135,6 +135,7 @@ size_t Stream::to (Print* to,
             if (w == 0 && !to->outputTimeoutPossible())
                 // no more data can be written, ever
                 break;
+
             w = std::min(w, avr);
             w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
             if (w)
@@ -164,9 +165,9 @@ size_t Stream::to (Print* to,
 
     if (getWriteError() == STREAMTO_SUCCESS)
     {
-        if (timedOut)
+        if (timeout && timedOut)
             setWriteError(STREAMTO_TIMED_OUT);
-        else if ((ssize_t)written != len)
+        else if (len > 0 && (ssize_t)written != len)
             // This is happening when source cannot timeout (ex: a String)
             // but has not enough data, or a dest has closed or cannot
             // timeout but is too small (String, buffer...)

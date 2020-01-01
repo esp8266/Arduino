@@ -24,8 +24,8 @@ public:
     virtual int peek() override { return -1; }
     virtual size_t readBytes(char* buffer, size_t len) override { (void)buffer; (void)len; return 0; }
     virtual int readNow(char* buffer, size_t len) override { (void)buffer; (void)len; return 0; }
-    virtual bool outputTimeoutPossible () const override { return false; }
-    virtual bool inputTimeoutPossible () const override { return false; }
+    virtual bool outputTimeoutPossible () override { return false; }
+    virtual bool inputTimeoutPossible () override { return false; }
 };
 
 ///////////////////////////////////////////////
