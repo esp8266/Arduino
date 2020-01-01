@@ -143,6 +143,9 @@ public:
   // consume bytes after use (see peekBuffer)
   virtual void peekConsume (size_t consume) override;
 
+  virtual bool outputTimeoutPossible () override { return connected(); }
+  virtual bool inputTimeoutPossible () override { return connected(); }
+
 protected:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);

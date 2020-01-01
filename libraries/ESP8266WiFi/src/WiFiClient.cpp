@@ -208,7 +208,7 @@ bool WiFiClient::getSync() const
 
 int WiFiClient::availableForWrite ()
 {
-    return _client? (int)_client->availableForWrite(): 0;
+    return connected()? (int)_client->availableForWrite(): 0;
 }
 
 size_t WiFiClient::write(uint8_t b)
@@ -255,7 +255,7 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
 int WiFiClient::available()
 {
     if (!_client)
-        return false;
+        return 0;
 
     int result = _client->getSize();
 
@@ -433,17 +433,18 @@ bool WiFiClient::peekBufferAPI () const
 // semantic forbids any kind of read() before calling peekConsume()
 const char* WiFiClient::peekBuffer ()
 {
-    return _client->peekBuffer();
+    return _client? _client->peekBuffer(): nullptr;
 }
 
 // return number of byte accessible by peekBuffer()
 size_t WiFiClient::availableForPeek ()
 {
-    return _client->availableForPeek();
+    return _client? _client->availableForPeek(): 0;
 }
 
 // consume bytes after use (see peekBuffer)
 void WiFiClient::peekConsume (size_t consume)
 {
-    return _client->peekConsume(consume);
+    if (_client)
+        _client->peekConsume(consume);
 }

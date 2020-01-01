@@ -353,7 +353,7 @@ public:
     virtual size_t availableForPeek () override { return available(); }
     virtual const char* peekBuffer () override;
     virtual void peekConsume (size_t consume) override;
-    virtual bool inputTimeoutPossible () const override { return false; }
+    virtual bool inputTimeoutPossible () override { return false; }
     virtual int read (char* buffer, size_t len) /*should override*/;
 
     void peekPointerSetConsume () { peekPointer = -1; }
@@ -366,7 +366,7 @@ public:
 
     //// Print:
 
-    virtual bool outputTimeoutPossible () const override { return false; }
+    virtual bool outputTimeoutPossible () override { return false; }
     virtual int availableForWrite() override { return 64; } // or biggestChunk()/4 or max(1,reserved-length)?
 };
 

@@ -148,7 +148,7 @@ class Stream: public Print {
         // by default read timeout is possible (incoming data from network,serial..)
         // children can override to false (like String::)
         // (outputTimeoutPossible() is defined in Print::)
-        virtual bool inputTimeoutPossible () const { return true; }
+        virtual bool inputTimeoutPossible () { return true; }
 
         //////////////////// extensions: Stream streams
         // Stream::to()

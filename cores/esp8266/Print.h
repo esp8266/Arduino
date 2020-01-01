@@ -111,7 +111,7 @@ class Print {
 
         // by default write timeout is possible (outgoing data from network,serial..)
         // (children can override to false (like String))
-        virtual bool outputTimeoutPossible () const { return true; }
+        virtual bool outputTimeoutPossible () { return true; }
 };
 
 #endif
