@@ -850,7 +850,7 @@ int HTTPClient::writeToStream(Stream * stream)
 
         // have we an error?
         if(_client->getLastTo() != Stream::STREAMTO_SUCCESS) {
-            return returnError(TO2HTTPC(ret));
+            return returnError(TO2HTTPC(_client->getLastTo()));
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
@@ -877,7 +877,7 @@ int HTTPClient::writeToStream(Stream * stream)
                 int r = _client->to(stream, len);
                 if (_client->getLastTo() != Stream::STREAMTO_SUCCESS)
                     // not all data transferred
-                    return returnError(TO2HTTPC(ret));
+                    return returnError(TO2HTTPC(_client->getLastTo()));
                 ret += r;
             } else {
 
