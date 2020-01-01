@@ -37,12 +37,12 @@ int TO2HTTPC (int streamToError)
 {
     switch (streamToError)
     {
-    case Stream::TOSTREAM_TIMED_OUT: return HTTPC_ERROR_READ_TIMEOUT;
-    case Stream::TOSTREAM_READ_ERROR: return HTTPC_ERROR_NO_STREAM;
-    case Stream::TOSTREAM_WRITE_ERROR: return HTTPC_ERROR_STREAM_WRITE;
-    case Stream::TOSTREAM_SHORT: return HTTPC_ERROR_STREAM_WRITE;
+    case Stream::STREAMTO_TIMED_OUT: return HTTPC_ERROR_READ_TIMEOUT;
+    case Stream::STREAMTO_READ_ERROR: return HTTPC_ERROR_NO_STREAM;
+    case Stream::STREAMTO_WRITE_ERROR: return HTTPC_ERROR_STREAM_WRITE;
+    case Stream::STREAMTO_SHORT: return HTTPC_ERROR_STREAM_WRITE;
     default:
-    case Stream::TOSTREAM_SUCCESS: return 0;
+    case Stream::STREAMTO_SUCCESS: return 0;
     }
 }
 
@@ -849,7 +849,7 @@ int HTTPClient::writeToStream(Stream * stream)
         ret = _client->to(stream, len);
 
         // have we an error?
-        if(_client->getLastTo() != Stream::TOSTREAM_SUCCESS) {
+        if(_client->getLastTo() != Stream::STREAMTO_SUCCESS) {
             return returnError(TO2HTTPC(ret));
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
@@ -875,7 +875,7 @@ int HTTPClient::writeToStream(Stream * stream)
             if(len > 0) {
                 // read len bytes with timeout
                 int r = _client->to(stream, len);
-                if (_client->getLastTo() != Stream::TOSTREAM_SUCCESS)
+                if (_client->getLastTo() != Stream::STREAMTO_SUCCESS)
                     // not all data transferred
                     return returnError(TO2HTTPC(ret));
                 ret += r;

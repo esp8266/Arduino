@@ -10,10 +10,10 @@ size_t Stream::to (Print* to,
                    oneShotFastMs::timeType timeout,
                    int readUntilChar)
 {
-    _last_to = TOSTREAM_SUCCESS;
+    setWriteError(STREAMTO_SUCCESS);
 
     if (len == 0)
-        return 0;   // avoid timeout for no requested data
+        return 0;   // conveniently avoids timeout for no requested data
 
     // There are two timeouts:
     // - read (network, serial, ...)
@@ -33,7 +33,7 @@ size_t Stream::to (Print* to,
     size_t written = 0;
 
     // len==-1 => maxLen=0 <=> until starvation
-    size_t maxLen = std::max((decltype(len))0, len);
+    size_t maxLen = std::max((ssize_t)0, len);
 
     if (peekBufferAPI())
 
@@ -105,7 +105,7 @@ size_t Stream::to (Print* to,
                 w = to->write(c);
                 if (w != 1)
                 {
-                    _last_to = TOSTREAM_WRITE_ERROR;
+                    setWriteError(STREAMTO_WRITE_ERROR);
                     break;
                 }
                 written += 1;
@@ -143,14 +143,14 @@ size_t Stream::to (Print* to,
                 ssize_t r = readNow(temp, w);
                 if (r < 0)
                 {
-                    _last_to = TOSTREAM_READ_ERROR;
+                    setWriteError(STREAMTO_READ_ERROR);
                     break;
                 }
                 w = to->write(temp, r);
                 written += w;
                 if ((size_t)r != w)
                 {
-                    _last_to = TOSTREAM_WRITE_ERROR;
+                    setWriteError(STREAMTO_WRITE_ERROR);
                     break;
                 }
                 if (w)
@@ -162,12 +162,18 @@ size_t Stream::to (Print* to,
                 yield();
         }
 
-    if (_last_to == TOSTREAM_SUCCESS)
+    if (getWriteError() == STREAMTO_SUCCESS)
     {
         if (timedOut)
-            _last_to = TOSTREAM_TIMED_OUT;
-        else if (len > 0 && (ssize_t)written != len)
-            _last_to = TOSTREAM_SHORT;
+            setWriteError(STREAMTO_TIMED_OUT);
+        else if ((ssize_t)written != len)
+            // This is happening when source cannot timeout (ex: a String)
+            // but has not enough data, or a dest has closed or cannot
+            // timeout but is too small (String, buffer...)
+            //
+            // Mark it as an error because user usually wants to get what is
+            // asked for.
+            setWriteError(STREAMTO_SHORT);
     }
     return written;
 }

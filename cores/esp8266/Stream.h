@@ -109,7 +109,10 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
-        // ::read(buf, len): conflicting returned type:
+        //////////////////// extension: readNow (is ::read() with unified signature)
+        // (supposed to be internally used, and ephemeral)
+        //
+        // about ::read(buf, len): conflicting returned type:
         // - `int` in arduino's Client::
         // - `size_t` in esp8266 API (HardwareSerial::, FS::)
         // - not existent in arduino's Stream::
@@ -117,54 +120,83 @@ class Stream: public Print {
         // => adding int ::readNow(buf, len) for now (following official `int Client::read(buf, len))`
         //
         // int ::readNow(buf, len)
-        // read at most len bytes, returns effectively transfered bytes (can be less than len)
-        // immediate return when no more data are available (no timeout)
-        virtual int readNow(char* buffer, size_t len);
-        virtual int readNow(uint8_t* buffer, size_t len) final { return readNow((char*)buffer, len); }
+        // read at most len bytes, returns effectively transfered bytes (can be less than 'len')
+        // with no timeout: immediate return when no more data are available
+        virtual int readNow (char* buffer, size_t len);
+        virtual int readNow (uint8_t* buffer, size_t len) final { return readNow((char*)buffer, len); }
 
-        //////////////////// extensions: direct access to input buffer
+        //////////////////// extension: direct access to input buffer
+        // for providing, when possible, a pointer to available data for read
 
-        // inform user and ::to() on effective buffered peek API implementation
+        // informs user and ::to() on effective buffered peek API implementation
+        // by default: not available
         virtual bool peekBufferAPI () const { return false; }
 
-        // return number of byte accessible by peekBuffer()
+        // returns number of byte accessible by peekBuffer()
         virtual size_t availableForPeek () { return 0; }
 
-        // return a pointer to available data buffer (size = availableForPeek())
-        // semantic forbids any kind of read()
-        //     after calling peekBuffer()
-        //     and before calling peekConsume()
+        // returns a pointer to available data buffer (size = availableForPeek())
+        // semantic forbids any kind of ::read()
+        //     - after calling peekBuffer()
+        //     - and before calling peekConsume()
         virtual const char* peekBuffer () { return nullptr; }
 
-        // consume bytes after peekBuffer() use
+        // consumes bytes after peekBuffer() use
+        // (then ::read() is allowed)
         virtual void peekConsume (size_t consume) { (void)consume; }
 
         // by default read timeout is possible (incoming data from network,serial..)
-        // (children can override to false (like String))
+        // children can override to false (like String::)
+        // (outputTimeoutPossible() is defined in Print::)
         virtual bool inputTimeoutPossible () const { return true; }
 
         //////////////////// extensions: Stream streams
-
         // Stream::to()
-        // transfer from `Stream::` to `Print::` at most maxlen bytes and return number of transfered bytes
-        // (uses 1-copy peekBuffer API when available, or transfer through a 2-copies local stack space)
-        // - maxLen<0 will transfer until input starvation or saturated output
-        // - timeout_ms==TimeoutMs::neverExpires: use getTimeout() (when 0: take what's available and immediate return)
-        // - readUntilChar: setting anything in 0..255 will stop transfer when this char is read *and copied too*.
-        virtual size_t to (Print* to,
-                           const ssize_t len = -1,
-                           esp8266::polledTimeout::oneShotFastMs::timeType timeout = esp8266::polledTimeout::oneShotFastMs::neverExpires /* =>getTimeout() */,
-                           int readUntilChar = -1) final;
-        enum
-        {
-            TOSTREAM_SUCCESS = 0,
-            TOSTREAM_TIMED_OUT,
-            TOSTREAM_READ_ERROR,
-            TOSTREAM_WRITE_ERROR,
-            TOSTREAM_SHORT,
-        } _last_to = TOSTREAM_SUCCESS;
+        //
+        // Stream::to() uses 1-copy transfers when peekBuffer API is
+        // available, or makes a regular transfer through a local temporary
+        // stack buffer.
+        //
+        // By default "source->to(&dest)" transfers everything until
+        // available (read or write) gets to 0 and a timeout occurs.
+        //
+        // "source->to(&dest, maxLen)" is like above but also returns when
+        // maxLen bytes are transferred.
+        //
+        // More generally ::to() will transfer as much as possible until:
+        //      - maxLen (>=0) bytes are transferred           (without timeout),
+        //      - or readUntilChar (>=0) is reached            (without timeout),
+        //      - or available for read or write gets to zero  (after timeout).
+        //
+        // Timeout value is by default thisStream->getTimeout() but it can
+        // be set to "alwaysExpired" (=0) or any value within oneShotMs
+        // allowed range.
+        //
+        // Return value:
+        //      >0: the number of transfered bytes
+        //      0:  nothing has been transfered, getLastTo() may contain an error reason
+        //
+        // Notes:
+        // - readUntilChar is copied and counted
+        // - for efficiency: Stream classes should implement peekAPI when possible
+        // - for efficiency: Stream classes should implement {input,output}TimeoutPossible()
 
-        decltype(_last_to) getLastTo () const { return _last_to; }
+        using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
+
+        virtual size_t to (Print* to,
+                           const ssize_t maxLen = -1,
+                           oneShotMs::timeType timeout = oneShotMs::neverExpires /* =>getTimeout() */,
+                           int readUntilChar = -1) final;
+        typedef enum
+        {
+            STREAMTO_SUCCESS = 0,
+            STREAMTO_TIMED_OUT,
+            STREAMTO_READ_ERROR,
+            STREAMTO_WRITE_ERROR,
+            STREAMTO_SHORT,
+        } toReport_e;
+
+        toReport_e getLastTo () /*const*/ { return (toReport_e)getWriteError(); }
 
         //////////////////// end of extensions
 
