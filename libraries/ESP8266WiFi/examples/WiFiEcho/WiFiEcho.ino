@@ -18,7 +18,7 @@ constexpr int port = 23;
 WiFiServer server(port);
 WiFiClient client;
 
-constexpr uint32_t stackProtector = 128;
+constexpr size_t stackProtector = 128;
 constexpr uint32_t breathMs = 200;
 esp8266::polledTimeout::oneShotFastMs enoughMs(breathMs);
 int t = 1; // test (1, 2 or 3, see below)
