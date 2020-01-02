@@ -92,22 +92,8 @@ void loop() {
 
   else if (t == 3) {
     // stream to print, possibly with only one copy
+    client.to(&client);
 
-#if CORE_MOCK
-
-    // (without limit, with a bandwitdh tester, this call would endlessly transfer data)
-    client.to(&client, 10000000, 0);  // transfer large chunks, no timeout
-    if (client.getLastTo() == Stream::STREAMTO_SHORT)
-      // don't really care about really transfered bytes
-    {
-      client.clearWriteError();
-    }
-
-#else
-
-    client.to(&client, -1, 0);  // on esp: no size limit, no timeout
-
-#endif
     switch (client.getLastTo()) {
       case Stream::STREAMTO_SUCCESS: break;
       case Stream::STREAMTO_TIMED_OUT: Serial.println("Stream::to: timeout"); break;

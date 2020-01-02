@@ -7,8 +7,8 @@ using esp8266::polledTimeout::periodicFastMs;
 
 size_t Stream::to (Print* to,
                    const ssize_t len,
-                   oneShotFastMs::timeType timeout,
-                   int readUntilChar)
+                   int readUntilChar,
+                   oneShotFastMs::timeType timeout)
 {
     setWriteError(STREAMTO_SUCCESS);
 
@@ -71,13 +71,22 @@ size_t Stream::to (Print* to,
                 {
                     peekConsume(w);
                     written += w;
-                    timedOut.reset();
+                    if (maxLen)
+                        timedOut.reset();
                     if (foundChar)
                         break;
                 }
             }
-            else if (timedOut)
+
+            if (!maxLen && !w)
+                // nothing has been transfered and no specific size requested
                 break;
+
+            if (timedOut)
+                // either (maxLen>0) nothing has been transfered for too long
+                // or (maxLen=0) too much time has been spent here
+                break;
+
             if (yieldNow)
                 yield();
         }
@@ -109,12 +118,21 @@ size_t Stream::to (Print* to,
                     break;
                 }
                 written += 1;
-                timedOut.reset();
+                if (maxLen)
+                    timedOut.reset();
                 if (c == readUntilChar)
                     break;
             }
-            else if (timedOut)
+
+            if (!maxLen && !w)
+                // nothing has been transfered and no specific size requested
                 break;
+
+            if (timedOut)
+                // either (maxLen>0) nothing has been transfered for too long
+                // or (maxLen=0) too much time has been spent here
+                break;
+
             if (yieldNow)
                 yield();
         }
@@ -154,20 +172,28 @@ size_t Stream::to (Print* to,
                     setWriteError(STREAMTO_WRITE_ERROR);
                     break;
                 }
-                if (w)
+                if (maxLen && w)
                     timedOut.reset();
             }
-            if (timedOut)
+
+            if (!maxLen && !w)
+                // nothing has been transfered and no specific size requested
                 break;
+
+            if (timedOut)
+                // either (maxLen>0) nothing has been transfered for too long
+                // or (maxLen=0) too much time has been spent here
+                break;
+
             if (yieldNow)
                 yield();
         }
 
-    if (getWriteError() == STREAMTO_SUCCESS)
+    if (getWriteError() == STREAMTO_SUCCESS && maxLen > 0)
     {
         if (timeout && timedOut)
             setWriteError(STREAMTO_TIMED_OUT);
-        else if (len > 0 && (ssize_t)written != len)
+        else if ((ssize_t)written != len)
             // This is happening when source cannot timeout (ex: a String)
             // but has not enough data, or a dest has closed or cannot
             // timeout but is too small (String, buffer...)

@@ -1072,7 +1072,7 @@ bool HTTPClient::connect(void)
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
         }
         StreamNull devnull;
-        _client->to(&devnull, -1, 0); // clear _client's output (all of it, no timeout)
+        _client->to(&devnull, -1, -1, 0); // clear _client's output (all of it, no timeout)
         return true;
     }
 

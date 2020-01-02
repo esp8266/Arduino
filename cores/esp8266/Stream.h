@@ -185,8 +185,8 @@ class Stream: public Print {
 
         virtual size_t to (Print* to,
                            const ssize_t maxLen = -1,
-                           oneShotMs::timeType timeout = oneShotMs::neverExpires /* =>getTimeout() */,
-                           int readUntilChar = -1) final;
+                           int readUntilChar = -1,
+                           oneShotMs::timeType timeout = oneShotMs::neverExpires /* =>getTimeout() */) final;
         typedef enum
         {
             STREAMTO_SUCCESS = 0,
