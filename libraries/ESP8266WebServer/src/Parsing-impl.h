@@ -230,6 +230,11 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
 }
 
 template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_collectHeader(const char* headerName, const char* headerValue) {
+    return _collectHeader(String(headerName), String(headerValue));
+}
+
+template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_collectHeader(const String& headerName, const String& headerValue) {
     for (int i = 0; i < _headerKeysCount; i++) {
         if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
