@@ -13,16 +13,15 @@
 #define STAPSK  "your-password"
 #endif
 
-#define STACK_PROTECTOR 128
-
-const int port = 23;
-int t = 1; // test (1, 2 or 3, see below)
+constexpr int port = 23;
 
 WiFiServer server(port);
 WiFiClient client;
 
-constexpr uint32_t breathMs = 100;
+constexpr uint32_t stackProtector = 128;
+constexpr uint32_t breathMs = 200;
 esp8266::polledTimeout::oneShotFastMs enoughMs(breathMs);
+int t = 1; // test (1, 2 or 3, see below)
 
 void setup() {
 
@@ -80,7 +79,7 @@ void loop() {
     // block by block through a local buffer (2 copies)
     while (client.available() && client.availableForWrite() && !enoughMs) {
       size_t maxTo = std::min(client.available(), client.availableForWrite());
-      maxTo = std::min(maxTo, (size_t)STACK_PROTECTOR);
+      maxTo = std::min(maxTo, stackProtector);
       uint8_t buf[maxTo];
       size_t tcp_got = client.read(buf, maxTo);
       size_t tcp_sent = client.write(buf, tcp_got);
@@ -92,7 +91,8 @@ void loop() {
 
   else if (t == 3) {
     // stream to print, possibly with only one copy
-    client.to(&client);
+    //client.to(&client); // <=> client.to(&client, -1, -1, client->getTimeout())
+    client.to(&client, -1, -1, breathMs);
 
     switch (client.getLastTo()) {
       case Stream::STREAMTO_SUCCESS: break;
