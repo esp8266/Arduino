@@ -139,6 +139,8 @@ void HTTPClient::clear()
     _size = -1;
     _headers.clear();
     _location.clear();
+    _chunkHeader.clear();
+    _chunkLen = 0;
     _payload.reset();
 }
 
@@ -956,22 +958,15 @@ int HTTPClient::writeToStream(Stream * stream)
             if(!connected()) {
                 return returnError(HTTPC_ERROR_CONNECTION_LOST);
             }
-            String chunkHeader = _client->readStringUntil('\n');
-
-            if(chunkHeader.length() <= 0) {
+            if(!readChunkHeader()) {
                 return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
-
-            chunkHeader.trim(); // remove \r
-
-            // read size of chunk
-            len = (uint32_t) strtol((const char *) chunkHeader.c_str(), NULL, 16);
-            size += len;
-            DEBUG_HTTPCLIENT("[HTTP-Client] read chunk len: %d\n", len);
+            size += _chunkLen;
+            DEBUG_HTTPCLIENT("[HTTP-Client] read chunk len: %d\n", _chunkLen);
 
             // data left?
-            if(len > 0) {
-                int r = writeToStreamDataBlock(stream, len);
+            if(_chunkLen > 0) {
+                int r = writeToStreamDataBlock(stream, _chunkLen);
                 if(r < 0) {
                     // error in writeToStreamDataBlock
                     return returnError(r);
@@ -992,9 +987,7 @@ int HTTPClient::writeToStream(Stream * stream)
             }
 
             // read trailing \r\n at the end of the chunk
-            char buf[2];
-            auto trailing_seq_len = _client->readBytes((uint8_t*)buf, 2);
-            if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+            if (!readChunkTrailer()) {
                 return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
 
@@ -1494,6 +1487,61 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
     }
 
     return bytesWritten;
+}
+
+/**
+ * Read header of next chunk in HTTP response using chunked encoding
+ * @param blocking bool  whether this method is allowed to block
+ * @return boolean value indicating whether a complete header could be read
+ */
+bool HTTPClient::readChunkHeader(bool blocking)
+{
+    if (blocking) {
+        _chunkHeader += _client->readStringUntil('\n');
+        if (_chunkHeader.length() == 0) {
+            return false;
+        }
+    } else {
+        while (_client->available() && !_chunkHeader.endsWith("\n")) {
+            _chunkHeader += (char) _client->read();
+        }
+        if (!_chunkHeader.endsWith("\n")) {
+            return false;
+        }
+    }
+
+    // read size of chunk
+    _chunkLen = (uint32_t) strtol((const char *) _chunkHeader.c_str(), NULL,
+            16);
+
+    return true;
+}
+
+/**
+ * Read trailer of current chunk in HTTP response using chunked encoding
+ * @param blocking bool  whether this method is allowed to block
+ * @return boolean value indicating whether the complete trailer could be read
+ */
+bool HTTPClient::readChunkTrailer(bool blocking)
+{
+    uint8_t buf[2];
+
+    if (blocking || (_client->available() >= 2)) {
+        auto trailing_seq_len = _client->readBytes((uint8_t *) buf, 2);
+
+        if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+            return false;
+        } else {
+            /* Clear _chunkHeader to indicate that the current chunk has been
+             * completely read, and reset _chunkLen to indicate that the next
+             * chunk header has not been read yet. */
+            _chunkHeader.clear();
+            _chunkLen = 0;
+            return true;
+        }
+    } else {
+        return false;
+    }
 }
 
 /**

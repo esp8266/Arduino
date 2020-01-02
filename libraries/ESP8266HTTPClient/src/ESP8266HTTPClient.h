@@ -225,6 +225,8 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
+    bool readChunkHeader(bool blocking = true);
+    bool readChunkTrailer(bool blocking = true);
 
 #if HTTPCLIENT_1_1_COMPATIBLE
     TransportTraitsPtr _transportTraits;
@@ -257,6 +259,8 @@ protected:
     uint16_t _redirectLimit = 10;
     String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    String _chunkHeader;
+    uint32_t _chunkLen = 0;
     std::unique_ptr<StreamString> _payload;
 };
 
