@@ -70,7 +70,7 @@ class String: public Stream {
         explicit String(unsigned long, unsigned char base = 10);
         explicit String(float, unsigned char decimalPlaces = 2);
         explicit String(double, unsigned char decimalPlaces = 2);
-        ~String(void);
+        virtual ~String(void);
 
         // memory management
         // return true on success, false on failure (in which case, the string
