@@ -208,7 +208,7 @@ bool WiFiClient::getSync() const
 
 int WiFiClient::availableForWrite ()
 {
-    return connected()? (int)_client->availableForWrite(): 0;
+    return _client? (int)_client->availableForWrite(): 0;
 }
 
 size_t WiFiClient::write(uint8_t b)
