@@ -6,6 +6,7 @@ LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
+R ?= noexec
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
@@ -330,6 +331,7 @@ ifeq ($(INO),)
 %: %.ino
 	@# recursive 'make' with paths
 	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Wextra INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@)
+	test "$(R)" = noexec || $(BINDIR)/$(notdir $@)/$(notdir $@) $(R)
 	@# see below the new build rule with fixed output path outside from core location
 
 #####################

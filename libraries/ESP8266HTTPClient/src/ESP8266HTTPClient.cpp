@@ -33,7 +33,7 @@
 #include <StreamDev.h>
 #include <base64.h>
 
-int TO2HTTPC (int streamToError)
+static int TO2HTTPC (Stream::toReport_e streamToError)
 {
     switch (streamToError)
     {
@@ -41,9 +41,9 @@ int TO2HTTPC (int streamToError)
     case Stream::STREAMTO_READ_ERROR: return HTTPC_ERROR_NO_STREAM;
     case Stream::STREAMTO_WRITE_ERROR: return HTTPC_ERROR_STREAM_WRITE;
     case Stream::STREAMTO_SHORT: return HTTPC_ERROR_STREAM_WRITE;
-    default:
     case Stream::STREAMTO_SUCCESS: return 0;
     }
+    return 0; // never reached, keep gcc quiet
 }
 
 #if HTTPCLIENT_1_1_COMPATIBLE
@@ -1071,8 +1071,8 @@ bool HTTPClient::connect(void)
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
         }
-        StreamNull devnull;
-        _client->to(&devnull, -1, -1, 0); // clear _client's output (all of it, no timeout)
+        StreamNull devNull; // should we have a global one?
+        _client->to(devNull); // clear _client's output (all of it, no timeout)
         return true;
     }
 

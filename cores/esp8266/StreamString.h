@@ -25,7 +25,7 @@
 
 #include "WString.h"
 
-// StreamString has been integrated insite String
+// StreamString has been integrated into String
 
 using StreamString = String;
 
