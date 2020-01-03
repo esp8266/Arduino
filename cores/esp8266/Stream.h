@@ -120,7 +120,7 @@ class Stream: public Print {
         // => adding int ::readNow(buf, len) for now (following official `int Client::read(buf, len))`
         //
         // int ::readNow(buf, len)
-        // read at most len bytes, returns effectively transfered bytes (can be less than 'len')
+        // read at most len bytes, returns effectively transferred bytes (can be less than 'len')
         // with no timeout: immediate return when no more data are available
         virtual int readNow (char* buffer, size_t len);
         virtual int readNow (uint8_t* buffer, size_t len) final { return readNow((char*)buffer, len); }
@@ -155,38 +155,51 @@ class Stream: public Print {
         //
         // Stream::to() uses 1-copy transfers when peekBuffer API is
         // available, or makes a regular transfer through a local temporary
-        // stack buffer.
+        // stack 2-copies buffer.
         //
         // By default "source->to(&dest)" transfers everything until
-        // available (read or write) gets to 0 and a timeout occurs.
+        // available (read or write) gets to 0, then immediately returns.
         //
         // "source->to(&dest, maxLen)" is like above but also returns when
-        // maxLen bytes are transferred.
+        // maxLen bytes are transferred, using the default Stream timeout.
         //
-        // More generally ::to() will transfer as much as possible until:
-        //      - maxLen (>=0) bytes are transferred           (without timeout),
-        //      - or readUntilChar (>=0) is reached            (without timeout),
-        //      - or available for read or write gets to zero  (after timeout).
+        // "source->to(&string, -1, '\n')" transfers source to string until
+        // and including a specific character, with the default Stream
+        // timeout.
         //
-        // Timeout value is by default thisStream->getTimeout() but it can
-        // be set to "alwaysExpired" (=0) or any value within oneShotMs
+        // More generally ::to() will transfer as much as possible with the
+        // following constraints:
+        //      - at most maxLen bytes (-1 by default is no length
+        //        constraint)
+        //      - readUntilChar as last transferred byte (-1 by default is
+        //        no last char contraint)
+        //      - timeoutMs as maximum wait time (only if maxLen>=0 or
+        //        readUntilChar>=0, immediate otherwise)
+        //
+        // timeoutMs value is by default "oneShotMs::neverExpires" which is
+        // internally converted to this->getTimeout() but it can be set to
+        // "oneShotMs::alwaysExpired" (=0) or any value within oneShotMs
         // allowed range.
         //
         // Return value:
-        //      >0: the number of transfered bytes
-        //      0:  nothing has been transfered, getLastTo() may contain an error reason
+        //      >0: the number of transferred bytes
+        //      0:  nothing has been transferred
+        // When result is 0 or less than requested maxLen, this->getLastTo()
+        // may contain an error reason.
         //
         // Notes:
         // - readUntilChar is copied and counted
-        // - for efficiency: Stream classes should implement peekAPI when possible
-        // - for efficiency: Stream classes should implement {input,output}TimeoutPossible()
+        // - for efficiency, Stream classes should implement peekAPI when
+        //   possible
+        // - for an efficient timeout management, Print/Stream classes
+        //   should implement {output,input}TimeoutPossible()
 
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
 
         virtual size_t to (Print* to,
                            const ssize_t maxLen = -1,
                            int readUntilChar = -1,
-                           oneShotMs::timeType timeout = oneShotMs::neverExpires /* =>getTimeout() */) final;
+                           oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */) final;
         typedef enum
         {
             STREAMTO_SUCCESS = 0,

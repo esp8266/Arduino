@@ -8,7 +8,7 @@ using esp8266::polledTimeout::periodicFastMs;
 size_t Stream::to (Print* to,
                    const ssize_t len,
                    int readUntilChar,
-                   oneShotFastMs::timeType timeout)
+                   oneShotFastMs::timeType timeoutMs)
 {
     setWriteError(STREAMTO_SUCCESS);
 
@@ -25,7 +25,7 @@ size_t Stream::to (Print* to,
     // (also when inputTimeoutPossible() is false)
 
     // "neverExpires (default, impossible)" is translated to default timeout
-    oneShotFastMs timedOut(timeout == oneShotFastMs::neverExpires? getTimeout(): timeout);
+    oneShotFastMs timedOut(timeoutMs >= oneShotFastMs::neverExpires? getTimeout(): timeoutMs);
 
     // yield about every 5ms (XXX SHOULD BE A SYSTEM-WIDE CONSTANT?)
     periodicFastMs yieldNow(5);
@@ -78,12 +78,13 @@ size_t Stream::to (Print* to,
                 }
             }
 
-            if (!maxLen && !w)
-                // nothing has been transfered and no specific size requested
+            if (!w && !maxLen && readUntilChar < 0)
+                // nothing has been transferred and no specific condition is requested
                 break;
 
             if (timedOut)
-                // either (maxLen>0) nothing has been transfered for too long
+                // either (maxLen>0) nothing has been transferred for too long
+                // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
                 break;
 
@@ -124,12 +125,13 @@ size_t Stream::to (Print* to,
                     break;
             }
 
-            if (!maxLen && !w)
-                // nothing has been transfered and no specific size requested
+            if (!w && !maxLen && readUntilChar < 0)
+                // nothing has been transferred and no specific condition is requested
                 break;
 
             if (timedOut)
-                // either (maxLen>0) nothing has been transfered for too long
+                // either (maxLen>0) nothing has been transferred for too long
+                // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
                 break;
 
@@ -176,12 +178,13 @@ size_t Stream::to (Print* to,
                     timedOut.reset();
             }
 
-            if (!maxLen && !w)
-                // nothing has been transfered and no specific size requested
+            if (!w && !maxLen && readUntilChar < 0)
+                // nothing has been transferred and no specific condition is requested
                 break;
 
             if (timedOut)
-                // either (maxLen>0) nothing has been transfered for too long
+                // either (maxLen>0) nothing has been transferred for too long
+                // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
                 break;
 
@@ -191,7 +194,7 @@ size_t Stream::to (Print* to,
 
     if (getWriteError() == STREAMTO_SUCCESS && maxLen > 0)
     {
-        if (timeout && timedOut)
+        if (timeoutMs && timedOut)
             setWriteError(STREAMTO_TIMED_OUT);
         else if ((ssize_t)written != len)
             // This is happening when source cannot timeout (ex: a String)
