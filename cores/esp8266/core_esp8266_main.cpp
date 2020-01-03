@@ -34,6 +34,8 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include <core_esp8266_unaligned.h>
+
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -319,6 +321,8 @@ extern "C" void user_init(void) {
     initVariant();
 
     cont_init(g_pcont);
+
+    install_unaligned_exception_handler();
 
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
