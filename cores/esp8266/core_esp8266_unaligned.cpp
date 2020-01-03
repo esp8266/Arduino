@@ -9,6 +9,7 @@
 
 #include <Arduino.h>
 #include <core_esp8266_unaligned.h>
+#include <esp8266_undocumented.h>
 
 extern "C" {
 
@@ -17,50 +18,14 @@ extern "C" {
 #define L16UI_MATCH 0x001002u
 #define L16SI_MATCH 0x009002u
 
-#define EXCCAUSE_LOAD_STORE_ERROR 3 // Unaligned or NULL error
+#define EXCCAUSE_LOAD_STORE_ERROR 3 // Unaligned read/write error
 
-struct exception_frame
+static ICACHE_RAM_ATTR void read_align_exception_handler(struct __exception_frame *ef, uint32_t cause)
 {
-  uint32_t epc;
-  uint32_t ps;
-  uint32_t sar;
-  uint32_t unused;
-  union {
-    struct {
-      uint32_t a0;
-      // note: no a1 here!
-      uint32_t a2;
-      uint32_t a3;
-      uint32_t a4;
-      uint32_t a5;
-      uint32_t a6;
-      uint32_t a7;
-      uint32_t a8;
-      uint32_t a9;
-      uint32_t a10;
-      uint32_t a11;
-      uint32_t a12;
-      uint32_t a13;
-      uint32_t a14;
-      uint32_t a15;
-    };
-    uint32_t a_reg[15];
-  };
-  uint32_t cause;
-};
-
-extern void _xtos_set_exception_handler(uint32_t reason, void (*fn)(struct exception_frame *ef, uint32_t cause));
-extern void _xtos_unhandled_exception(struct exception_frame *ef, uint32_t cause);
-
-static ICACHE_RAM_ATTR void read_align_exception_handler(struct exception_frame *ef, uint32_t cause)
-{
-  /* If this is not EXCCAUSE_LOAD_STORE_ERROR you're doing it wrong! */
-  (void)cause;
-
   uint32_t epc1 = ef->epc;
   uint32_t excvaddr;
   uint32_t insn;
-  asm (
+  __asm (
     "rsr   %0, EXCVADDR;"    /* read out the faulting address */
     "movi  a4, ~3;"          /* prepare a mask for the EPC */
     "and   a4, a4, %2;"      /* apply mask for 32bit aligned base */
@@ -83,12 +48,8 @@ static ICACHE_RAM_ATTR void read_align_exception_handler(struct exception_frame 
   else
   {
 die:
-    /* Turns out we couldn't fix this, trigger a system break instead
-     * and hang if the break doesn't get handled. This is effectively
-     * what would happen if the default handler was installed. */
+    /* Go to the default handler, we can't help here */
     _xtos_unhandled_exception(ef, cause);
-    asm ("break 1, 1");
-    while (1) {}
   }
 
   /* Load, shift and mask down to correct size */
@@ -109,7 +70,6 @@ die:
   ef->a_reg[regno] = val;  /* carry out the load */
   ef->epc += 3;            /* resume at following instruction */
 }
-
 
 
 void install_unaligned_exception_handler()
