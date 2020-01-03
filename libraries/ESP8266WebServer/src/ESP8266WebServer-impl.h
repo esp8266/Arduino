@@ -440,7 +440,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
     (void)sent;
 #ifdef DEBUG_ESP_HTTP_SERVER
     if (sent != header.length())
-        DEBUG_OUTPUT.println("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
+        DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
 #endif
 
     if(content.length())
