@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include "StackThunk.h"
 #include <ets_sys.h>
+#include <Esp.h>
 
 extern "C" {
 
@@ -45,7 +46,9 @@ void stack_thunk_add_ref()
 {
   stack_thunk_refcnt++;
   if (stack_thunk_refcnt == 1) {
+    ESP.setInternalHeap();
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
+    ESP.resetHeap();
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
     stack_thunk_repaint();

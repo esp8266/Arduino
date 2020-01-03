@@ -25,6 +25,7 @@
 #include <list>
 #include <errno.h>
 #include <algorithm>
+#include <Esp.h>
 
 extern "C" {
 #include "osapi.h"
@@ -1067,8 +1068,10 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
+  ESP.setExternalHeap();
   _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
   _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  ESP.resetHeap();
 
   if (!_sc || !_iobuf_in || !_iobuf_out) {
     _freeSSL(); // Frees _sc, _iobuf*
@@ -1183,8 +1186,10 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
+  ESP.setExternalHeap();
   _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
   _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  ESP.resetHeap();
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
@@ -1220,8 +1225,10 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
+  ESP.setExternalHeap();
   _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
   _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  ESP.resetHeap();
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();

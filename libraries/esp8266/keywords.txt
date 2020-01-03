@@ -60,6 +60,10 @@ getResetInfo	KEYWORD2
 getResetInfoPtr	KEYWORD2
 eraseConfig	KEYWORD2
 getCycleCount	KEYWORD2
+enableVM	KEYWORD2
+setExternalHeap	KEYWORD2
+setInternalHeap	KEYWORD2
+resetHeap	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

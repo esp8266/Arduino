@@ -86,8 +86,111 @@ UMM_H_ATTPACKPRE typedef struct umm_block_t {
 
 /* ------------------------------------------------------------------------- */
 
+/* Points to the currently active heap */
 umm_block *umm_heap = NULL;
 unsigned short int umm_numblocks = 0;
+
+/* Copies of the globals from both heaps */
+static umm_block *umm_heap_internal = NULL;
+static unsigned short int umm_numblocks_internal = 0;
+
+static umm_block *umm_heap_external = NULL;
+static unsigned short int umm_numblocks_external = 0;
+
+#ifdef UMM_INFO
+extern UMM_HEAP_INFO ummHeapInfo;
+static UMM_HEAP_INFO ummHeapInfo_internal;
+static UMM_HEAP_INFO ummHeapInfo_external;
+#endif
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+extern UMM_STATISTICS ummStats;
+static UMM_STATISTICS ummStats_internal;
+static UMM_STATISTICS ummStats_external;
+#endif
+
+/* A stack allowing push/popping of heaps for library use */
+static int umm_heap_cur = UMM_HEAP_INTERNAL;
+#define UMM_HEAP_STACK_DEPTH 32
+static int umm_heap_stack_ptr = 0;
+static char umm_heap_stack[UMM_HEAP_STACK_DEPTH];
+
+/* ------------------------------------------------------------------------ */
+/*
+ * Swap globals to a specific heap.  No-op if we're already in that heap.
+ *
+ * Uses memcpy() instead of pointer assignment to minimize code changes
+ * elsewhere in this and other files.
+ */
+
+void umm_set_heap( int which ) {
+  if (which != umm_heap_cur) {
+    if (umm_heap_cur == UMM_HEAP_INTERNAL) { /* Moving to external */
+      umm_heap = umm_heap_external;
+      umm_numblocks = umm_numblocks_external;
+
+#ifdef UMM_INFO
+      memcpy(&ummHeapInfo_internal, &ummHeapInfo, sizeof(ummHeapInfo));
+      memcpy(&ummHeapInfo, &ummHeapInfo_external, sizeof(ummHeapInfo));
+#endif
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+      memcpy(&ummStats_internal, &ummStats, sizeof(ummStats));
+      memcpy(&ummStats, &ummStats_external, sizeof(ummStats));
+#endif
+    } else { /* Moving to internal */
+      umm_heap = umm_heap_internal;
+      umm_numblocks = umm_numblocks_internal;
+
+#ifdef UMM_INFO
+      memcpy(&ummHeapInfo_external, &ummHeapInfo, sizeof(ummHeapInfo));
+      memcpy(&ummHeapInfo, &ummHeapInfo_internal, sizeof(ummHeapInfo));
+#endif
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+      memcpy(&ummStats_external, &ummStats, sizeof(ummStats));
+      memcpy(&ummStats, &ummStats_internal, sizeof(ummStats));
+#endif
+    }
+    umm_heap_cur = which;
+  }
+
+}
+
+/* ------------------------------------------------------------------------ */
+
+void umm_push_heap( int which ) {
+  if (umm_heap_stack_ptr < UMM_HEAP_STACK_DEPTH) {
+    umm_heap_stack[umm_heap_stack_ptr++] = umm_heap_cur;
+    umm_set_heap( which );
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+
+void umm_pop_heap( void ) {
+  if (umm_heap_stack_ptr > 0 ) {
+    umm_set_heap(umm_heap_stack[--umm_heap_stack_ptr]);
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ * Pushes a heap change to the right heap for a given pointer.  Useful for
+ * realloc or free since you may not be in the right heap to handle it.
+ *
+ * After doing the required work, be sure to call umm_pop_heap() to return
+ * back to the original heap in use.
+ */
+void umm_push_heap_to_ptr( void *ptr ) {
+  if ( umm_heap_external && ( ptr >= (void *)umm_heap_external ) &&
+       ( (umm_block *)ptr <= umm_heap_external + umm_numblocks_external ) ) {
+    umm_push_heap( UMM_HEAP_EXTERNAL );
+  } else {
+    umm_push_heap( UMM_HEAP_INTERNAL );
+  }
+}
+
 
 #define UMM_NUMBLOCKS (umm_numblocks)
 
@@ -214,12 +317,43 @@ static unsigned short int umm_assimilate_down( unsigned short int c, unsigned sh
 
 /* ------------------------------------------------------------------------- */
 
+static void umm_init_stage_2( void );
+
 void umm_init( void ) {
   /* init heap pointer and size, and memset it to 0 */
   umm_heap = (umm_block *)UMM_MALLOC_CFG_HEAP_ADDR;
   umm_numblocks = (UMM_MALLOC_CFG_HEAP_SIZE / sizeof(umm_block));
   memset(umm_heap, 0x00, UMM_MALLOC_CFG_HEAP_SIZE);
+  /* Save the current internal heap */
+  umm_heap_internal = umm_heap;
+  umm_numblocks_internal = umm_numblocks;
+  /* Set up internal data structures */
+  umm_init_stage_2();
+}
 
+void umm_init_vm( void *vmaddr, unsigned int vmsize ) {
+  /* We need the main, internal heap set up first */
+  if (!umm_heap)
+    umm_init();
+
+  /* Preserve internal setup */
+  umm_set_heap(UMM_HEAP_EXTERNAL);
+
+  /* Init the external SRAM as heap */
+  umm_heap = (umm_block *)vmaddr;
+  umm_numblocks = (vmsize / sizeof(umm_block));
+  memset(umm_heap, 0x00, vmsize);
+
+  umm_init_stage_2();
+  /* Save the newly generated external heap */
+  umm_heap_external = umm_heap;
+  umm_numblocks_external = umm_numblocks;
+
+  /* Return to the main heap until further notice */
+  umm_set_heap(UMM_HEAP_INTERNAL);
+}
+
+static void umm_init_stage_2( void ) {
   /* setup initial blank heap structure */
   {
     /* index of the 0th `umm_block` */
@@ -357,7 +491,13 @@ void umm_free( void *ptr ) {
 
   UMM_CRITICAL_ENTRY(id_free);
 
+  /* Need to be in the heap in which this block lives */
+  umm_push_heap_to_ptr( ptr);
+
   umm_free_core( ptr );
+
+  /* Restore to the old heap */
+  umm_pop_heap();
 
   UMM_CRITICAL_EXIT(id_free);
 }
@@ -562,6 +702,8 @@ void *umm_realloc( void *ptr, size_t size ) {
   }
 
   STATS__ALLOC_REQUEST(id_realloc, size);
+
+  umm_push_heap_to_ptr( ptr );
 
   /*
    * Otherwise we need to actually do a reallocation. A naiive approach
@@ -805,6 +947,8 @@ void *umm_realloc( void *ptr, size_t size ) {
     }
 
     STATS__FREE_BLOCKS_MIN();
+
+    umm_pop_heap();
 
     /* Release the critical section... */
     UMM_CRITICAL_EXIT(id_realloc);

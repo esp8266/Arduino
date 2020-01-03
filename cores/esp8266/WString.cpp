@@ -179,7 +179,9 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         return false;
     }
     uint16_t oldLen = len();
+    ESP.setExternalHeap();
     char *newbuffer = (char *) realloc(isSSO() ? nullptr : wbuffer(), newSize);
+    ESP.resetHeap();
     if (newbuffer) {
         size_t oldSize = capacity() + 1; // include NULL.
         if (isSSO()) {

@@ -27,6 +27,8 @@
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
 #include "coredecls.h"
+#include "umm_malloc/umm_malloc.h"
+#include "core_esp8266_vm.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -694,4 +696,29 @@ String EspClass::getSketchMD5()
     md5.calculate();
     result = md5.toString();
     return result;
+}
+
+void EspClass::enableVM()
+{
+    if (!vmEnabled)
+        install_vm_exception_handler();
+    vmEnabled = true;
+}
+
+void EspClass::setExternalHeap()
+{
+    if (vmEnabled)
+        umm_push_heap(UMM_HEAP_EXTERNAL);
+}
+
+void EspClass::setInternalHeap()
+{
+    if (vmEnabled)
+        umm_push_heap(UMM_HEAP_INTERNAL);
+}
+
+void EspClass::resetHeap()
+{
+    if (vmEnabled)
+        umm_pop_heap();
 }
