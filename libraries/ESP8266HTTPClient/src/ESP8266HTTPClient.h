@@ -137,7 +137,7 @@ typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
 class StreamString;
 
-class HTTPClient
+class HTTPClient : public Stream
 {
 public:
     HTTPClient();
@@ -210,6 +210,12 @@ public:
     const String& getString(void);
     static String errorToString(int error);
 
+    size_t write(uint8_t b);
+    size_t write(const uint8_t *buffer, size_t size);
+    int available();
+    int read();
+    int peek();
+
 protected:
     struct RequestArgument {
         String key;
@@ -222,6 +228,7 @@ protected:
     int returnError(int error);
     bool connect(void);
     bool sendHeader(const char * type);
+    bool endRequest(void);
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
@@ -261,6 +268,7 @@ protected:
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
     String _chunkHeader;
     uint32_t _chunkLen = 0;
+    uint32_t _chunkOffset = 0;
     std::unique_ptr<StreamString> _payload;
 };
 

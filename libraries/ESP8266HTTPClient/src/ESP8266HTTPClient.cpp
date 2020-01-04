@@ -141,6 +141,7 @@ void HTTPClient::clear()
     _location.clear();
     _chunkHeader.clear();
     _chunkLen = 0;
+    _transferEncoding = HTTPC_TE_IDENTITY;
     _payload.reset();
 }
 
@@ -1061,6 +1062,142 @@ String HTTPClient::errorToString(int error)
 }
 
 /**
+ * write a byte to HTTP connection stream
+ * @param b uint8_t  byte to be written
+ * @return number of bytes written
+ */
+size_t HTTPClient::write(uint8_t b)
+{
+    return write(&b, sizeof(b));
+}
+
+/**
+ * write a byte array to HTTP connection stream
+ * @param buffer uint8_t *  byte array to be written
+ * @param size size_t  byte array size
+ * @return number of bytes written
+ */
+size_t HTTPClient::write(const uint8_t *buffer, size_t size)
+{
+    if (!connected()) {
+        return 0;
+    }
+    if (_transferEncoding == HTTPC_TE_CHUNKED) {
+        int written;
+
+        if (size == 0) {
+            return size;
+        }
+        if ((_chunkLen != 0) && (_chunkOffset == _chunkLen)) {
+            if (_client->write("\r\n") == 2) {
+                _chunkLen = 0;
+            } else {
+                return 0;
+            }
+        }
+        if (_chunkLen == 0) {
+            String header = String(size, 16) + "\r\n";
+
+            if (_client->write(header.c_str()) != header.length()) {
+                return 0;
+            }
+            _chunkLen = size;
+            _chunkOffset = 0;
+        }
+        if (size > _chunkLen - _chunkOffset) {
+            size = _chunkLen - _chunkOffset;
+        }
+        written = _client->write(buffer, size);
+        _chunkOffset += written;
+        return written;
+    }
+    else {
+        return _client->write(buffer, size);
+    }
+}
+
+/**
+ * retrieve number of bytes available to be read from HTTP connection stream
+ * @return number of available bytes
+ */
+int HTTPClient::available()
+{
+    if (!connected()) {
+        return 0;
+    }
+    if (_transferEncoding == HTTPC_TE_IDENTITY) {
+        return _client->available();
+    } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
+        if ((_chunkLen == 0) && !readChunkHeader(false)) {
+            return 0;
+        }
+        if (_chunkLen > 0) {
+            if (_chunkOffset < _chunkLen) {
+                unsigned int available = (unsigned int) _client->available();
+                if (available < _chunkLen - _chunkOffset) {
+                    return available;
+                } else {
+                    return (_chunkLen - _chunkOffset);
+                }
+            } else {
+                readChunkTrailer(false);
+            }
+        }
+        return 0;
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * read a byte from HTTP connection stream
+ * @return byte read, or -1 if no bytes could be read
+ */
+int HTTPClient::read()
+{
+    if (!connected()) {
+        return -1;
+    }
+    if (_transferEncoding == HTTPC_TE_IDENTITY) {
+        return _client->read();
+    } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
+        while (true) {
+            if ((_chunkLen == 0) && !readChunkHeader()) {
+                return -1;
+            }
+            if (_chunkLen > 0) {
+                if (_chunkOffset < _chunkLen) {
+                    int c = _client->read();
+
+                    if (c >= 0) {
+                        _chunkOffset++;
+                    }
+                    return c;
+                } else if (!readChunkTrailer()) {
+                    return -1;
+                }
+            } else {
+                return -1;
+            }
+        }
+    } else {
+        return -1;
+    }
+}
+
+/**
+ * retrieve next byte available to be read from HTTP connection stream
+ * @return byte available to be read, or -1 if no bytes can be read
+ */
+int HTTPClient::peek()
+{
+    if (!available()) {
+        return -1;
+    }
+    return _client->peek();
+}
+
+/**
  * adds Header to the request
  * @param name
  * @param value
@@ -1091,8 +1228,13 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
         headerLine += "\r\n";
         if (first) {
             _headers = headerLine + _headers;
+            _transferEncoding = HTTPC_TE_IDENTITY;
         } else {
             _headers += headerLine;
+        }
+        if (name.equalsIgnoreCase(F("Transfer-Encoding")) &&
+            value.equalsIgnoreCase(F("chunked"))) {
+            _transferEncoding = HTTPC_TE_CHUNKED;
         }
     }
 }
@@ -1270,6 +1412,27 @@ bool HTTPClient::sendHeader(const char * type)
 }
 
 /**
+ * sends HTTP request header
+ * @param type (GET, POST, ...)
+ * @return status
+ */
+bool HTTPClient::endRequest(void)
+{
+    if (!connected()) {
+        return false;
+    }
+    if (_transferEncoding == HTTPC_TE_CHUNKED) {
+        if ((_chunkLen != 0) && (_client->write("\r\n") != 2)) {
+            return false;
+        }
+        return (_client->write("0\r\n\r\n") == 5);
+    }
+    else {
+        return true;
+    }
+}
+
+/**
  * reads the response from the server
  * @return int http code
  */
@@ -1286,7 +1449,6 @@ int HTTPClient::handleHeaderResponse()
 
     String transferEncoding;
 
-    _transferEncoding = HTTPC_TE_IDENTITY;
     unsigned long lastDataTime = millis();
 
     while(connected()) {
@@ -1514,6 +1676,7 @@ bool HTTPClient::readChunkHeader(bool blocking)
     _chunkLen = (uint32_t) strtol((const char *) _chunkHeader.c_str(), NULL,
             16);
 
+    _chunkOffset = 0;
     return true;
 }
 
