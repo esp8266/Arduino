@@ -70,7 +70,15 @@ public:
     , _path(path)
     , _cache_header(cache_header)
     {
-        _isFile = fs.exists(path);
+        if (fs.exists(path)) {
+            File file = fs.open(path, "r");
+            _isFile = file && file.isFile();
+            file.close();
+        }
+        else {
+            _isFile = false;
+        }
+        
         DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
         _baseUriLength = _uri.length();
     }
