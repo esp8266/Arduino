@@ -7,6 +7,7 @@
 #include <CryptoInterface.h>
 
 namespace TypeCast = esp8266::TypeConversion;
+using namespace experimental;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
