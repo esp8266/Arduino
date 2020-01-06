@@ -39,11 +39,11 @@
 #define DEBUG_PRINT(x)
 #endif
 
-#define WAKE_UP_PIN D3  // GPIO0, can also force a serial flash upload with RESET
+#define WAKE_UP_PIN 0  // D3/GPIO0, can also force a serial flash upload with RESET
 
 // un-comment one of the two lines below for your LED connection
-#define LED D1  // external LED for modules with built-in LEDs so it doesn't add to the current
-//#define LED D4  // GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
+#define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add to the current
+//#define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
 
 ADC_MODE(ADC_VCC);  // allows us to monitor the internal VCC level; it varies with WiFi load
 // don't connect anything to the analog input pin(s)!
@@ -69,7 +69,7 @@ struct {
   byte data[4];  // the last byte stores the reset count
 } rtcData;
 
-byte resetLoop = 0;  // keeps track of the number of Deep Sleep tests / resets
+byte resetCount = 0;  // keeps track of the number of Deep Sleep tests / resets
 String resetCause = "";
 
 const unsigned int blinkDelay = 100; // fast blink rate for the LED when waiting for the user
@@ -91,7 +91,7 @@ void setup() {
   Serial.println(resetCause);
   if (resetCause == "External System") {
     Serial.println(F("I'm awake and starting the low power tests"));
-    resetLoop = 5;
+    resetCount = 5;
     updateRTC();  // if external reset, wipe the RTC memory and start all over
   }
 
@@ -99,15 +99,15 @@ void setup() {
   if (ESP.rtcUserMemoryRead(64, (uint32_t*) &rtcData, sizeof(rtcData))) {
     uint32_t crcOfData = calculateCRC32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
     if (crcOfData != rtcData.crc32) {  // if the CRC is invalid
-      resetLoop = 0;  // set first test loop since power on or external reset
+      resetCount = 0;  // set first test loop since power on or external reset
     } else {
-      resetLoop = rtcData.data[3];  // read the previous reset count
+      resetCount = rtcData.data[3];  // read the previous reset count
     }
   }
 }  // end of Setup()
 
 void loop() {
-  if (resetLoop == 0) {
+  if (resetCount == 0) {
     // 1st test - running with WiFi unconfigured, reads ~67 mA minimum
     Serial.println(F("\n1st test - running with WiFi unconfigured"));
     float volts = ESP.getVcc();
@@ -171,7 +171,7 @@ void loop() {
     Serial.println(F("\n6th test - Deep Sleep for 10 seconds, wake with RF_DEFAULT"));
     init_WiFi();  // initialize WiFi since we turned it off in the last test
     init_OTA();
-    resetLoop = 1;  // advance to the next Deep Sleep test after the reset
+    resetCount = 1;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
@@ -192,12 +192,12 @@ void loop() {
   }
 
   // 7th test - Deep Sleep for 10 seconds, wake with RFCAL
-  if (resetLoop < 4) {
+  if (resetCount < 4) {
     init_WiFi();  // need to reinitialize WiFi & OTA due to Deep Sleep resets
     init_OTA();   // since we didn't do it in setup() because of the first test
   }
-  if (resetLoop == 1) {  // second reset loop since power on
-    resetLoop = 2;  // advance to the next Deep Sleep test after the reset
+  if (resetCount == 1) {  // second reset loop since power on
+    resetCount = 2;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, wake with RFCAL"));
     float volts = ESP.getVcc();
@@ -212,8 +212,8 @@ void loop() {
   }
 
   // 8th test - Deep Sleep Instant for 10 seconds, wake with NO_RFCAL
-  if (resetLoop == 2) {  // third reset loop since power on
-    resetLoop = 3;  // advance to the next Deep Sleep test after the reset
+  if (resetCount == 2) {  // third reset loop since power on
+    resetCount = 3;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, wake with NO_RFCAL"));
     float volts = ESP.getVcc();
@@ -228,8 +228,8 @@ void loop() {
   }
 
   // 9th test - Deep Sleep Instant for 10 seconds, wake with RF_DISABLED
-  if (resetLoop == 3) {  // fourth reset loop since power on
-    resetLoop = 4;  // advance to the next Deep Sleep test after the reset
+  if (resetCount == 3) {  // fourth reset loop since power on
+    resetCount = 4;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, wake with RF_DISABLED"));
     float volts = ESP.getVcc();
@@ -243,8 +243,8 @@ void loop() {
     Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
   }
 
-  if (resetLoop == 4) {
-    resetLoop = 5;  // start all over
+  if (resetCount == 4) {
+    resetCount = 5;  // start all over
     updateRTC();  // save the current test state in RTC memory
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
@@ -299,10 +299,10 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length) {
 }
 
 void updateRTC() {
-  rtcData.data[3] = resetLoop;  // save the loop count for the next reset
+  rtcData.data[3] = resetCount;  // save the loop count for the next reset
   // Update CRC32 of data
   rtcData.crc32 = calculateCRC32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
-  if (resetLoop == 5)  // wipe the CRC in RTC memory when we're done with all tests
+  if (resetCount == 5)  // wipe the CRC in RTC memory when we're done with all tests
     rtcData.crc32 = 0;
   // Write struct to RTC memory
   ESP.rtcUserMemoryWrite(64, (uint32_t*) &rtcData, sizeof(rtcData));
