@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For ESP8266WiFiMesh
+# Syntax Coloring Map For CryptoInterface
 #######################################
 
 #######################################
@@ -19,11 +19,9 @@ nonceGeneratorType	KEYWORD1
 #######################################
 
 setCtMinDataLength	KEYWORD2
-ctMinDataLength	KEYWORD2
+getCtMinDataLength	KEYWORD2
 setCtMaxDataLength	KEYWORD2
-ctMaxDataLength	KEYWORD2
-setWarningsEnabled	KEYWORD2
-warningsEnabled	KEYWORD2
+getCtMaxDataLength	KEYWORD2
 setNonceGenerator	KEYWORD2
 getNonceGenerator	KEYWORD2
 md5Hash	KEYWORD2
