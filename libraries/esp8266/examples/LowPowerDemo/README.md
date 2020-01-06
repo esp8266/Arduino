@@ -48,11 +48,11 @@ This is typical for programs that don't use WiFi, and is a high current drain of
 
 ### Test 2 - Automatic Modem Sleep
 
-This is the default power saving mode when you have an active WiFi connection.  You don't need to add anything to your code to get it.  However, it's not as wonderful as it may seem, as the only time the modem sleeps is when you spend a long time in delay(), with delay times over 50mS.  The LED blinks more slowly during this test as I'm doing delay(350) to get the modem to sleep.  While in delay() your sketch isn't doing anything interesting.  Average current during long delay()s is 15 mA minimum.  Without the delay() the average current is 67 mA with short spikes above 250 mA as transmissions occur.  When the WiFi has traffic (even couple of pings), the modem can turn on for over 2 seconds continuous at 67 mA, and it may stay on for a second after the traffic.  In a high traffic environment you won't get any power savings with either of the 2 Automatic modes.  Automatic Modem Sleep turns on 7-8 seconds after an active connection is established.
+This is the default power saving mode when you have an active WiFi connection.  You don't need to add anything to your code to get it.  However, it's not as wonderful as it may seem, as the only time the modem sleeps is when you spend a long time in delay(), with delay times over 50mS.  The LED blinks more slowly during this test as I'm doing delay(350) to get the modem to sleep.  While in delay() your sketch isn't doing anything interesting.  Average current during long delay()s is 15 mA minimum.  Without the delay() the average current is 67 mA with short spikes above 250 mA as transmissions occur.  When the WiFi has traffic (even a couple of pings), the modem can turn on for over 2 seconds continuous at 67 mA, and it may stay on for a second after the traffic.  In a high traffic environment you won't get any power savings with either of the 2 Automatic modes.  Automatic Modem Sleep turns on 7-8 seconds after an active connection is established.
 
 ### Test 3 - Forced Modem Sleep
 
-Turns off the modem (losing the connection), and dropping the current by 50 mA.  This uses the WiFi library function.  It's good if there is a long interval with no expected traffic, as you can do other things while only drawing 15 mA.
+Turns off the modem (losing the connection), and dropping the current by 50 mA.  This uses the WiFi library function.  It's good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 mA.
 
 ### Test 4 - Automatic Light Sleep
 
@@ -68,7 +68,7 @@ In Deep Sleep almost everything is turned off, and the chip draws ~20 uA.  If yo
 
 ### Test 7 - Deep Sleep, wake with RFCAL
 
-Identical to the test above, but the modem does a power calibration when booting.  In normal use, I'd likely do WAKE_RF_DEFAULT instead to save the extra RFCAL power burst if it's not needed.
+Identical to the test above, but the modem does a power calibration when booting.  In normal use, I'd likely do WAKE_RF_DEFAULT instead to minimize the extra RFCAL power burst if it's not needed.
 
 ### Test 8 - Deep Sleep Instant, wake with NO_RFCAL
 
