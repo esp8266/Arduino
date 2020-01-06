@@ -70,7 +70,15 @@ public:
     , _path(path)
     , _cache_header(cache_header)
     {
-        _isFile = fs.exists(path);
+        if (fs.exists(path)) {
+            File file = fs.open(path, "r");
+            _isFile = file && file.isFile();
+            file.close();
+        }
+        else {
+            _isFile = false;
+        }
+        
         DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
         _baseUriLength = _uri.length();
     }
@@ -96,7 +104,7 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) 
+            if (requestUri.endsWith("/"))
               requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
