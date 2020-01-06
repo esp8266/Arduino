@@ -134,13 +134,14 @@ void showTime() {
   Serial.println((uint32_t)now);
 
   // timezone and demo in the future
-  Serial.printf("timezone:  %s\n", MYTZ);
+  Serial.printf("timezone:  %s\n", getenv("TZ"));
 
   // human readable
   Serial.print("ctime:     ");
   Serial.print(ctime(&now));
 
 #if LWIP_VERSION_MAJOR > 1
+
   // LwIP v2 is able to list more details about the currently configured SNTP servers
   for (int i = 0; i < SNTP_MAX_SERVERS; i++) {
     IPAddress sntp = *sntp_getserver(i);
@@ -212,7 +213,17 @@ void setup() {
 
   // NTP servers may be overriden by your DHCP server for a more local one
   // (see below)
+
+  // ----> Here is the ONLY ONE LINE needed in your sketch
+
   configTime(MYTZ, "pool.ntp.org");
+
+  //       Here is the ONLY ONE LINE needed in your sketch <----
+  // pick a value from TZ.h (search for this file in your filesystem) for MYTZ
+
+  // former configTime is still valid, here is the call for 7 to the west
+  // with an enabled 30mn DST
+  //configTime(7*3600, 3600 / 2, "pool.ntp.org");
 
   // OPTIONAL: disable obtaining SNTP servers from DHCP
   //sntp_servermode_dhcp(0); // 0: disable obtaining SNTP servers from DHCP (enabled by default)

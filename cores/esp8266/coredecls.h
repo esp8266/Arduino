@@ -13,6 +13,7 @@ extern "C" {
 #include <cont.h> // g_pcont declaration
 
 extern bool timeshift64_is_set;
+extern uint32_t sntp_real_timestamp;
 
 bool can_yield();
 void esp_yield();
