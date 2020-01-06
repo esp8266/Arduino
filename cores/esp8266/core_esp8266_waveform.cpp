@@ -129,7 +129,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
 
-  uint32_t mask = 1<<pin;
+  uint32_t mask = 1UL<<pin;
   if (!(waveformEnabled & mask)) {
     // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
@@ -164,7 +164,7 @@ static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
 }
 
 static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
-  if (a < b) {
+  if (a <= b) {
     return a;
   }
   return b;
@@ -231,7 +231,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     do {
       nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
       for (int i = startPin; i <= endPin; i++) {
-        uint32_t mask = 1<<i;
+        uint32_t mask = 1UL<<i;
 
         // If it's not on, ignore!
         if (!(waveformEnabled & mask)) {
@@ -241,45 +241,49 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         Waveform *wave = &waveform[i];
         uint32_t now = GetCycleCountIRQ();
 
+        // Check for toggles
+        const int32_t cyclesToGo = wave->nextServiceCycle - now;
+        if (cyclesToGo <= 0) {
+          if (waveformState & mask ? !wave->nextTimeLowCycles : !wave->nextTimeHighCycles) {
+            // for 100% duty or idle, don't toggle and set service cycle to maximum 
+            wave->nextServiceCycle = now + nextEventCycles;
+          }
+          else {
+            waveformState ^= mask;
+            if (waveformState & mask) {
+              if (i == 16) {
+                GP16O |= 1; // GPIO16 write slow as it's RMW
+              }
+              else {
+                SetGPIO(mask);
+              }
+              wave->nextServiceCycle = now + wave->nextTimeHighCycles;
+              nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
+            }
+            else {
+              if (i == 16) {
+                GP16O &= ~1; // GPIO16 write slow as it's RMW
+              }
+              else {
+                ClearGPIO(mask);
+              }
+              wave->nextServiceCycle = now + wave->nextTimeLowCycles;
+              nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
+            }
+          }
+        }
+        else {
+          uint32_t deltaCycles = wave->nextServiceCycle - now;
+          nextEventCycles = min_u32(nextEventCycles, deltaCycles);
+        }
+
         // Disable any waveforms that are done
         if (wave->expiryCycle) {
           int32_t expiryToGo = wave->expiryCycle - now;
-          if (expiryToGo < 0) {
-              // Done, remove!
-              waveformEnabled &= ~mask;
-              if (i == 16) {
-                GP16O &= ~1;
-              } else {
-                ClearGPIO(mask);
-              }
-              continue;
-            }
-        }
-
-        // Check for toggles
-        int32_t cyclesToGo = wave->nextServiceCycle - now;
-        if (cyclesToGo < 0) {
-          waveformState ^= mask;
-          if (waveformState & mask) {
-            if (i == 16) {
-              GP16O |= 1; // GPIO16 write slow as it's RMW
-            } else {
-              SetGPIO(mask);
-            }
-            wave->nextServiceCycle = now + wave->nextTimeHighCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
-          } else {
-            if (i == 16) {
-              GP16O &= ~1; // GPIO16 write slow as it's RMW
-            } else {
-              ClearGPIO(mask);
-            }
-            wave->nextServiceCycle = now + wave->nextTimeLowCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
+          if (expiryToGo <= 0) {
+            // Done, remove!
+            waveformEnabled &= ~mask;
           }
-        } else {
-          uint32_t deltaCycles = wave->nextServiceCycle - now;
-          nextEventCycles = min_u32(nextEventCycles, deltaCycles);
         }
       }
 
@@ -287,7 +291,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       uint32_t now = GetCycleCountIRQ();
       int32_t cycleDeltaNextEvent = timeoutCycle - (now + nextEventCycles);
       int32_t cyclesLeftTimeout = timeoutCycle - now;
-      done = (cycleDeltaNextEvent < 0) || (cyclesLeftTimeout < 0);
+      done = (cycleDeltaNextEvent <= 0) || (cyclesLeftTimeout <= 0);
     } while (!done);
   } // if (waveformEnabled)
 
