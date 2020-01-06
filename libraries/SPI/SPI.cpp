@@ -147,6 +147,7 @@ void SPIClass::beginTransaction(SPISettings settings) {
 }
 
 void SPIClass::endTransaction() {
+    while(SPI1CMD & SPIBUSY) {}
 }
 
 void SPIClass::setDataMode(uint8_t dataMode) {
@@ -347,20 +348,28 @@ void SPIClass::transfer(void *buf, uint16_t count) {
         *cbuf = transfer(*cbuf);
 }
 
-void SPIClass::write(uint8_t data) {
+void SPIClass::write_(uint8_t data) {
     while(SPI1CMD & SPIBUSY) {}
     // reset to 8Bit mode
     setDataBits(8);
     SPI1W0 = data;
     SPI1CMD |= SPIBUSY;
+}
+
+void SPIClass::write(uint8_t data) {
+    write_(data);
     while(SPI1CMD & SPIBUSY) {}
+}
+
+void SPIClass::write16_(uint16_t data) {
+    write16_(data, !(SPI1C & (SPICWBO | SPICRBO)));
 }
 
 void SPIClass::write16(uint16_t data) {
     write16(data, !(SPI1C & (SPICWBO | SPICRBO)));
 }
 
-void SPIClass::write16(uint16_t data, bool msb) {
+void SPIClass::write16_(uint16_t data, bool msb) {
     while(SPI1CMD & SPIBUSY) {}
     // Set to 16Bits transfer
     setDataBits(16);
@@ -372,6 +381,10 @@ void SPIClass::write16(uint16_t data, bool msb) {
         SPI1W0 = data;
     }
     SPI1CMD |= SPIBUSY;
+}
+
+void SPIClass::write16(uint16_t data, bool msb) {
+    write16_(data,msb);
     while(SPI1CMD & SPIBUSY) {}
 }
 
@@ -379,7 +392,11 @@ void SPIClass::write32(uint32_t data) {
     write32(data, !(SPI1C & (SPICWBO | SPICRBO)));
 }
 
-void SPIClass::write32(uint32_t data, bool msb) {
+void SPIClass::write32_(uint32_t data) {
+    write32_(data, !(SPI1C & (SPICWBO | SPICRBO)));
+}
+
+void SPIClass::write32_(uint32_t data, bool msb) {
     while(SPI1CMD & SPIBUSY) {}
     // Set to 32Bits transfer
     setDataBits(32);
@@ -394,6 +411,10 @@ void SPIClass::write32(uint32_t data, bool msb) {
     }
     SPI1W0 = data;
     SPI1CMD |= SPIBUSY;
+}
+
+void SPIClass::write32(uint32_t data, bool msb) {
+    write32_(data, msb);
     while(SPI1CMD & SPIBUSY) {}
 }
 
@@ -404,20 +425,32 @@ void SPIClass::write32(uint32_t data, bool msb) {
  * @param data uint8_t *
  * @param size uint32_t
  */
-void SPIClass::writeBytes(const uint8_t * data, uint32_t size) {
+void SPIClass::writeBytes_(const uint8_t * data, uint32_t size) {
     while(size) {
         if(size > 64) {
-            writeBytes_(data, 64);
+            writeBytesFifo_(data, 64);
             size -= 64;
             data += 64;
         } else {
-            writeBytes_(data, size);
+            writeBytesFifo_(data, size);
             size = 0;
         }
     }
 }
 
-void SPIClass::writeBytes_(const uint8_t * data, uint8_t size) {
+/**
+ * Note:
+ *  data need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param data uint8_t *
+ * @param size uint32_t
+ */
+void SPIClass::writeBytes(const uint8_t * data, uint32_t size) {
+    writeBytes_( data, size );
+    while(SPI1CMD & SPIBUSY) {}
+}
+
+void SPIClass::writeBytesFifo_(const uint8_t * data, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
     // Set Bits to transfer
     setDataBits(size * 8);
@@ -434,7 +467,6 @@ void SPIClass::writeBytes_(const uint8_t * data, uint8_t size) {
 
     __sync_synchronize();
     SPI1CMD |= SPIBUSY;
-    while(SPI1CMD & SPIBUSY) {}
 }
 
 /**
@@ -511,6 +543,11 @@ void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat)
     while(SPI1CMD & SPIBUSY) {}
 
     SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
+}
+
+void SPIClass::waitNotBusy()
+{
+    while(SPI1CMD & SPIBUSY) {}
 }
 
 /**

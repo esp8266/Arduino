@@ -65,19 +65,31 @@ public:
   uint8_t transfer(uint8_t data);
   uint16_t transfer16(uint16_t data);
   void transfer(void *buf, uint16_t count);
+  //Of the write* family of functions, underscore denotes
+  //a function that may return before the data is written.
+  //You must use waitNotBusy() to block if you want to ensure
+  //the data is written. The functions without underscore block
+  //until the data is written.
   void write(uint8_t data);
+  void write_(uint8_t data);
   void write16(uint16_t data);
+  void write16_(uint16_t data);
   void write16(uint16_t data, bool msb);
+  void write16_(uint16_t data, bool msb);
   void write32(uint32_t data);
+  void write32_(uint32_t data);
   void write32(uint32_t data, bool msb);
+  void write32_(uint32_t data, bool msb);
   void writeBytes(const uint8_t * data, uint32_t size);
+  void writeBytes_(const uint8_t * data, uint32_t size);
   void writePattern(const uint8_t * data, uint8_t size, uint32_t repeat);
+  void waitNotBusy();
   void transferBytes(const uint8_t * out, uint8_t * in, uint32_t size);
   void endTransaction(void);
 private:
   bool useHwCs;
   uint8_t pinSet;
-  void writeBytes_(const uint8_t * data, uint8_t size);
+  void writeBytesFifo_(const uint8_t * data, uint8_t size);
   void transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size);
   void transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t size);
   inline void setDataBits(uint16_t bits);
