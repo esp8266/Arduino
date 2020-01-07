@@ -5,13 +5,13 @@
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
-  set to 1-shot mode and is always loaded with the time until the next edge
-  of any live waveforms.
+  high and low period (defined in microseconds).  TIMER1 is set to 1-shot
+  mode and is always loaded with the time until the next edge of any live
+  waveforms.
 
   Up to one waveform generator per pin supported.
 
-  Each waveform generator is synchronized to the ESP clock cycle counter, not the
+  Each waveform generator is synchronized to the ESP cycle counter, not the
   timer.  This allows for removing interrupt jitter and delay as the counter
   always increments once per 80MHz clock.  Changes to a waveform are
   contiguous and only take effect on the next waveform transition,
@@ -19,9 +19,8 @@
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
-  Everywhere in the code where "cycles" is used, it means ESP.getCycleCount()
-  clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
-  cycles (which may be 2 CPU clock cycles @ 160MHz).
+  Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
+  cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -69,16 +68,6 @@ static volatile uint32_t waveformToDisable = 0; // Message to the NMI handler to
 
 static uint32_t (*timer1CB)() = NULL;
 
-
-// Non-speed critical bits
-#pragma GCC optimize ("Os")
-
-static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
-  uint32_t ccount;
-  __asm__ __volatile__("esync; rsr %0,ccount":"=a"(ccount));
-  return ccount;
-}
-
 // Interrupt on/off control
 static ICACHE_RAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
@@ -113,26 +102,22 @@ void setTimer1Callback(uint32_t (*fn)()) {
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
-  return startWaveformClockCycles(pin, microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
-}
-
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
-   if ((pin > 16) || isFlashInterfacePin(pin)) {
+  if ((pin > 16) || isFlashInterfacePin(pin)) {
     return false;
   }
   Waveform *wave = &waveform[pin];
   // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = timeHighCycles;
-  wave->nextTimeLowCycles = timeLowCycles;
-  wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
-  if (runTimeCycles && !wave->expiryCycle) {
+  wave->nextTimeHighCycles = microsecondsToClockCycles(timeHighUS);
+  wave->nextTimeLowCycles = microsecondsToClockCycles(timeLowUS);
+  wave->expiryCycle = runTimeUS ? ESP.getCycleCount() + microsecondsToClockCycles(runTimeUS) : 0;
+  if (runTimeUS && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
 
   uint32_t mask = 1UL<<pin;
   if (!(waveformEnabled & mask)) {
     // Actually set the pin high or low in the IRQ service to guarantee times
-    wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(10);
+    wave->nextServiceCycle = ESP.getCycleCount() + microsecondsToClockCycles(10);
     waveformToEnable |= mask;
     if (!timerRunning) {
       initTimer();
@@ -149,18 +134,6 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
   }
 
   return true;
-}
-
-// Speed critical bits
-#pragma GCC optimize ("O2")
-// Normally would not want two copies like this, but due to different
-// optimization levels the inline attribute gets lost if we try the
-// other version.
-
-static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
-  uint32_t ccount;
-  __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
-  return ccount;
 }
 
 // Stops a waveform on a pin
@@ -195,7 +168,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int endPin = 0;
 
   constexpr uint32_t isrTimeoutCycles = microsecondsToClockCycles(14);
-  const uint32_t isrStart = GetCycleCountIRQ();
+  const uint32_t isrStart = ESP.getCycleCount();
   uint32_t nextEventCycle = isrStart + microsecondsToClockCycles(MAXIRQUS);
 
   if (waveformToEnable || waveformToDisable) {
@@ -212,7 +185,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   bool done = false;
   if (waveformEnabled) {
-    uint32_t now = GetCycleCountIRQ();
+    uint32_t now = ESP.getCycleCount();
     do {
       nextEventCycle = now + microsecondsToClockCycles(MAXIRQUS);
       for (int i = startPin; i <= endPin; i++) {
@@ -271,7 +244,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             waveformEnabled &= ~mask;
           }
         }
-        now = GetCycleCountIRQ();
+        now = ESP.getCycleCount();
       }
 
       // Exit the loop if we've hit the fixed runtime limit or the next event is known to be after that timeout would occur
@@ -281,11 +254,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   int32_t nextEventCycles;
   if (!timer1CB) {
-    nextEventCycles = nextEventCycle - GetCycleCountIRQ();
+    nextEventCycles = nextEventCycle - ESP.getCycleCount();
   }
   else {
     int32_t callbackCycles = microsecondsToClockCycles(timer1CB());
-    nextEventCycles = nextEventCycle - GetCycleCountIRQ();
+    nextEventCycles = nextEventCycle - ESP.getCycleCount();
     if (nextEventCycles > callbackCycles)
       nextEventCycles = callbackCycles;
   }
