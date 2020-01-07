@@ -112,6 +112,7 @@ public:
     String readString() override;
 
     time_t getLastWrite();
+    time_t getCreation();
     void setTimeCallback(time_t (*cb)(void));
 
 protected:
@@ -120,7 +121,6 @@ protected:
     // Arduino SD class emulation
     std::shared_ptr<Dir> _fakeDir;
     FS                  *_baseFS;
-    time_t (*timeCallback)(void) = nullptr;
 };
 
 class Dir {
@@ -132,20 +132,19 @@ public:
     String fileName();
     size_t fileSize();
     time_t fileTime();
+    time_t fileCreation();
     bool isFile() const;
     bool isDirectory() const;
 
     bool next();
     bool rewind();
 
-    time_t getLastWrite();
     void setTimeCallback(time_t (*cb)(void));
 
 protected:
     DirImplPtr _impl;
     FS       *_baseFS;
     time_t (*timeCallback)(void) = nullptr;
-
 };
 
 // Backwards compatible, <4GB filesystem usage

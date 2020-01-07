@@ -187,6 +187,13 @@ time_t File::getLastWrite() {
     return _p->getLastWrite();
 }
 
+time_t File::getCreation() {
+    if (!_p)
+        return 0;
+
+    return _p->getCreation();
+}
+
 void File::setTimeCallback(time_t (*cb)(void)) {
     if (!_p)
         return;
@@ -222,6 +229,12 @@ time_t Dir::fileTime() {
     if (!_impl)
         return 0;
     return _impl->fileTime();
+}
+
+time_t Dir::fileCreation() {
+    if (!_impl)
+        return 0;
+    return _impl->fileCreation();
 }
 
 size_t Dir::fileSize() {
@@ -262,17 +275,11 @@ bool Dir::rewind() {
     return _impl->rewind();
 }
 
-time_t Dir::getLastWrite() {
-    if (!_impl)
-        return 0;
-
-    return _impl->getLastWrite();
-}
-
 void Dir::setTimeCallback(time_t (*cb)(void)) {
     if (!_impl)
         return;
     _impl->setTimeCallback(cb);
+    timeCallback = cb;
 }
 
 
@@ -289,6 +296,7 @@ bool FS::begin() {
         DEBUGV("#error: FS: no implementation");
         return false;
     }
+    _impl->setTimeCallback(timeCallback);
     bool ret = _impl->begin();
     DEBUGV("%s\n", ret? "": "#error: FS could not start");
     return ret;

@@ -363,6 +363,18 @@ public:
         return ftime;
     }
 
+    time_t getCreation() override {
+        time_t ftime = 0;
+        if (_opened && _fd) {
+            sdfat::dir_t tmp;
+            if (_fd.get()->dirEntry(&tmp)) {
+                ftime = SDFSImpl::FatToTimeT(tmp.creationDate, tmp.creationTime);
+            }
+        }
+        return ftime;
+    }
+
+
 
 protected:
     SDFSImpl*                     _fs;
@@ -426,6 +438,14 @@ public:
         return _time;
     }
 
+    time_t fileCreation() override
+    {
+        if (!_valid) {
+            return 0;
+        }
+
+        return _creation;
+    }
 
     bool isFile() const override
     {
@@ -451,8 +471,10 @@ public:
                 sdfat::dir_t tmp;
                 if (file.dirEntry(&tmp)) {
                     _time = SDFSImpl::FatToTimeT(tmp.lastWriteDate, tmp.lastWriteTime);
+                    _creation = SDFSImpl::FatToTimeT(tmp.creationDate, tmp.creationTime);
 		} else {
                     _time = 0;
+                    _creation = 0;
                }
                 file.getName(_lfn, sizeof(_lfn));
                 file.close();
@@ -477,6 +499,7 @@ protected:
     bool                         _valid;
     char                         _lfn[64];
     time_t                       _time;
+    time_t                       _creation;
     std::shared_ptr<char>        _dirPath;
     uint32_t                     _size;
     bool                         _isFile;
