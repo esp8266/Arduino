@@ -1186,6 +1186,14 @@ macros = {
         ( '.menu.ssl.basic.build.sslflags', '-DBEARSSL_SSL_BASIC'),
         ]),
 
+    ######################## Unaligned exception handler
+
+    'unaligned_menu': collections.OrderedDict([
+        ('.menu.unaligned.safe', 'Allow byte and word access to PROGMEM' ),
+        ('.menu.unaligned.safe.build.unalignedflags', '-DUNALIGNED_HANDLER'),
+        ('.menu.unaligned.fast', 'Require pgm_read macros for PROGMEM' ),
+        ('.menu.unaligned.fast.build.unalignedflags', ''),
+        ])
     }
 
 ################################################################
@@ -1546,6 +1554,7 @@ def all_boards ():
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
+    print('menu.unaligned=Unaligned Accesses')
     print('')
 
     missingboards = []
@@ -1564,7 +1573,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu', 'unaligned_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:

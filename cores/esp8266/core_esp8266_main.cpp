@@ -322,7 +322,9 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
+#ifdef UNALIGNED_HANDLER
     install_unaligned_exception_handler();
+#endif
 
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 

@@ -10,8 +10,9 @@
 #include <Arduino.h>
 #include <core_esp8266_unaligned.h>
 #include <esp8266_undocumented.h>
+#include <Schedule.h>
+#include <debug.h>
 
-extern "C" {
 
 #define LOAD_MASK   0x00f00fu
 #define L8UI_MATCH  0x000002u
@@ -19,6 +20,12 @@ extern "C" {
 #define L16SI_MATCH 0x009002u
 
 #define EXCCAUSE_LOAD_STORE_ERROR 3 // Unaligned read/write error
+
+static bool fired = false;
+static void warning(void)
+{
+    DEBUGV("WARNING: The unaligned hander has been invoked and performance may suffer.\n");
+}
 
 static ICACHE_RAM_ATTR void read_align_exception_handler(struct __exception_frame *ef, uint32_t cause)
 {
@@ -52,6 +59,11 @@ die:
     _xtos_unhandled_exception(ef, cause);
   }
 
+  if (!fired) {
+    fired = true;
+    schedule_function(warning);
+  }
+
   /* Load, shift and mask down to correct size */
   uint32_t val = (*(uint32_t *)(excvaddr & ~0x3));
   val >>= (excvaddr & 0x3) * 8;
@@ -76,6 +88,3 @@ void install_unaligned_exception_handler()
 {
   _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR, read_align_exception_handler);
 }
-
-
-};
