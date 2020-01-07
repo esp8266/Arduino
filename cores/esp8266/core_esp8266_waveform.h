@@ -5,13 +5,13 @@
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
+  high and low period (defined in microseconds or CPU cycles).  TIMER1 is
   set to 1-shot mode and is always loaded with the time until the next edge
   of any live waveforms.
 
   Up to one waveform generator per pin supported.
 
-  Each waveform generator is synchronized to the ESP clock cycle counter, not the
+  Each waveform generator is synchronized to the ESP cycle counter, not the
   timer.  This allows for removing interrupt jitter and delay as the counter
   always increments once per 80MHz clock.  Changes to a waveform are
   contiguous and only take effect on the next waveform transition,
@@ -19,9 +19,8 @@
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
-  Everywhere in the code where "cycles" is used, it means ESP.getCycleCount()
-  clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
-  cycles (which may be 2 CPU clock cycles @ 160MHz).
+  Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
+  cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -51,10 +50,10 @@ extern "C" {
 // If runtimeUS > 0 then automatically stop it after that many usecs.
 // Returns true or false on success or failure.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
-// Start or change a waveform of the specified high and low CPU clock cycles on specific pin.
-// If runtimeCycles > 0 then automatically stop it after that many CPU clock cycles.
+// Start or change a waveform of the specified high and low CPU cycles on specific pin.
+// If runtimeCycles > 0 then automatically stop it after that many usecs.
 // Returns true or false on success or failure.
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles);
+int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles);
 // Stop a waveform, if any, on the specified pin.
 // Returns true or false on success or failure.
 int stopWaveform(uint8_t pin);

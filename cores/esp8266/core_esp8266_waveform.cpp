@@ -5,9 +5,9 @@
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds).  TIMER1 is set to 1-shot
-  mode and is always loaded with the time until the next edge of any live
-  waveforms.
+  high and low period (defined in microseconds or CPU cycles).  TIMER1 is
+  set to 1-shot mode and is always loaded with the time until the next edge
+  of any live waveforms.
 
   Up to one waveform generator per pin supported.
 
@@ -92,42 +92,42 @@ void setTimer1Callback(uint32_t (*fn)()) {
   timer1CB = fn;
   if (!timerRunning && fn) {
     initTimer();
-    timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
+    timer1_write(microsecondsToClockCycles(2)); // Cause an interrupt post-haste
   } else if (timerRunning && !fn && !waveformEnabled) {
     deinitTimer();
   }
 }
 
+int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
+  return startWaveformCycles(pin,
+    microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
+}
+
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
+int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
   if ((pin > 16) || isFlashInterfacePin(pin)) {
     return false;
   }
-  Waveform *wave = &waveform[pin];
+  Waveform* wave = &waveform[pin];
   // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = microsecondsToClockCycles(timeHighUS);
-  wave->nextTimeLowCycles = microsecondsToClockCycles(timeLowUS);
-  wave->expiryCycle = runTimeUS ? ESP.getCycleCount() + microsecondsToClockCycles(runTimeUS) : 0;
-  if (runTimeUS && !wave->expiryCycle) {
-    wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
+  wave->nextTimeHighCycles = timeHighCycles;
+  wave->nextTimeLowCycles = timeLowCycles;
+  wave->expiryCycle = runTimeCycles ? ESP.getCycleCount() + runTimeCycles : 0;
+  if (runTimeCycles && !wave->expiryCycle) {
+    wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so prevent setting it
   }
 
-  uint32_t mask = 1UL<<pin;
+  uint32_t mask = 1UL << pin;
   if (!(waveformEnabled & mask)) {
     // Actually set the pin high or low in the IRQ service to guarantee times
-    wave->nextServiceCycle = ESP.getCycleCount() + microsecondsToClockCycles(10);
+    wave->nextServiceCycle = ESP.getCycleCount() + microsecondsToClockCycles(2);
     waveformToEnable |= mask;
     if (!timerRunning) {
       initTimer();
-      timer1_write(microsecondsToClockCycles(10));
-    } else {
-      // Ensure timely service....
-      if (T1L > microsecondsToClockCycles(10)) {
-        timer1_write(microsecondsToClockCycles(10));
-      }
     }
+    timer1_write(microsecondsToClockCycles(2));
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
     }
@@ -146,10 +146,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // If they send >=32, then the shift will result in 0 and it will also return false
   if (waveformEnabled & (1UL << pin)) {
     waveformToDisable = 1UL << pin;
-    // Must not interfere if Timer is due shortly
-    if (T1L > microsecondsToClockCycles(10)) {
-      timer1_write(microsecondsToClockCycles(10));
-    }
+    timer1_write(microsecondsToClockCycles(2));
     while (waveformToDisable) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
     }
@@ -266,13 +263,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   if (nextEventCycles < microsecondsToClockCycles(2))
     nextEventCycles = microsecondsToClockCycles(2);
 
-  // Do it here instead of global function to save time and because we know it's edge-IRQ
-#if F_CPU == 160000000
-  T1L = nextEventCycles >> 1; // Already know we're in range by MAXIRQUS
-#else
-  T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
-#endif
-  TEIE |= TEIE1; // Edge int enable
+  if (clockCyclesPerMicrosecond() == 160)
+    timer1_write(nextEventCycles / 2);
+  else
+    timer1_write(nextEventCycles);
 }
 
 };
