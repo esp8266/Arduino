@@ -55,8 +55,8 @@ extern "C" {
 typedef struct {
   uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
   uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
-  uint32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
-  uint32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
+  int32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
+  int32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
 } Waveform;
 
 static Waveform waveform[17];        // State of all possible pins
@@ -132,7 +132,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
   uint32_t mask = 1UL<<pin;
   if (!(waveformEnabled & mask)) {
     // Actually set the pin high or low in the IRQ service to guarantee times
-    wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
+    wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(10);
     waveformToEnable |= mask;
     if (!timerRunning) {
       initTimer();
@@ -163,13 +163,6 @@ static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
   return ccount;
 }
 
-static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
-  if (a <= b) {
-    return a;
-  }
-  return b;
-}
-
 // Stops a waveform on a pin
 int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
@@ -194,16 +187,6 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   return true;
 }
 
-// The SDK and hardware take some time to actually get to our NMI code, so
-// decrement the next IRQ's timer value by a bit so we can actually catch the
-// real CPU cycle counter we want for the waveforms.
-#if F_CPU == 80000000
-  #define DELTAIRQ (microsecondsToClockCycles(3))
-#else
-  #define DELTAIRQ (microsecondsToClockCycles(2))
-#endif
-
-
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Optimize the NMI inner loop by keeping track of the min and max GPIO that we
   // are generating.  In the common case (1 PWM) these may be the same pin and
@@ -211,8 +194,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
-  uint32_t nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
-  uint32_t timeoutCycle = GetCycleCountIRQ() + microsecondsToClockCycles(14);
+  constexpr uint32_t isrTimeoutCycles = microsecondsToClockCycles(14);
+  const uint32_t isrStart = GetCycleCountIRQ();
+  uint32_t nextEventCycle = isrStart + microsecondsToClockCycles(MAXIRQUS);
 
   if (waveformToEnable || waveformToDisable) {
     // Handle enable/disable requests from main app.
@@ -228,25 +212,29 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   bool done = false;
   if (waveformEnabled) {
+    uint32_t now = GetCycleCountIRQ();
     do {
-      nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
+      nextEventCycle = now + microsecondsToClockCycles(MAXIRQUS);
       for (int i = startPin; i <= endPin; i++) {
         uint32_t mask = 1UL<<i;
 
         // If it's not on, ignore!
-        if (!(waveformEnabled & mask)) {
+        if (!(waveformEnabled & mask))
           continue;
-        }
 
         Waveform *wave = &waveform[i];
-        uint32_t now = GetCycleCountIRQ();
 
         // Check for toggles
         const int32_t cyclesToGo = wave->nextServiceCycle - now;
-        if (cyclesToGo <= 0) {
+        const int32_t nextEventCycles = nextEventCycle - now;
+        if (cyclesToGo > 0) {
+          if (nextEventCycles > cyclesToGo)
+            nextEventCycle = wave->nextServiceCycle;
+        }
+        else {
           if (waveformState & mask ? !wave->nextTimeLowCycles : !wave->nextTimeHighCycles) {
             // for 100% duty or idle, don't toggle and set service cycle to maximum 
-            wave->nextServiceCycle = now + nextEventCycles;
+            wave->nextServiceCycle += microsecondsToClockCycles(MAXIRQUS);
           }
           else {
             waveformState ^= mask;
@@ -257,8 +245,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               else {
                 SetGPIO(mask);
               }
-              wave->nextServiceCycle = now + wave->nextTimeHighCycles;
-              nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
+              wave->nextServiceCycle += wave->nextTimeHighCycles;
+              if (nextEventCycles > wave->nextTimeHighCycles)
+                nextEventCycle = wave->nextServiceCycle;
             }
             else {
               if (i == 16) {
@@ -267,14 +256,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               else {
                 ClearGPIO(mask);
               }
-              wave->nextServiceCycle = now + wave->nextTimeLowCycles;
-              nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
+              wave->nextServiceCycle += wave->nextTimeLowCycles;
+              if (nextEventCycles > wave->nextTimeLowCycles)
+                nextEventCycle = wave->nextServiceCycle;
             }
           }
-        }
-        else {
-          uint32_t deltaCycles = wave->nextServiceCycle - now;
-          nextEventCycles = min_u32(nextEventCycles, deltaCycles);
         }
 
         // Disable any waveforms that are done
@@ -285,24 +271,27 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             waveformEnabled &= ~mask;
           }
         }
+        now = GetCycleCountIRQ();
       }
 
       // Exit the loop if we've hit the fixed runtime limit or the next event is known to be after that timeout would occur
-      uint32_t now = GetCycleCountIRQ();
-      int32_t cycleDeltaNextEvent = timeoutCycle - (now + nextEventCycles);
-      int32_t cyclesLeftTimeout = timeoutCycle - now;
-      done = (cycleDeltaNextEvent <= 0) || (cyclesLeftTimeout <= 0);
+      done = (now - isrStart >= isrTimeoutCycles) || (nextEventCycle - isrStart  >= isrTimeoutCycles);
     } while (!done);
   } // if (waveformEnabled)
 
-  if (timer1CB) {
-    nextEventCycles = min_u32(nextEventCycles, timer1CB());
+  int32_t nextEventCycles;
+  if (!timer1CB) {
+    nextEventCycles = nextEventCycle - GetCycleCountIRQ();
+  }
+  else {
+    int32_t callbackCycles = microsecondsToClockCycles(timer1CB());
+    nextEventCycles = nextEventCycle - GetCycleCountIRQ();
+    if (nextEventCycles > callbackCycles)
+      nextEventCycles = callbackCycles;
   }
 
-  if (nextEventCycles < microsecondsToClockCycles(10)) {
-    nextEventCycles = microsecondsToClockCycles(10);
-  }
-  nextEventCycles -= DELTAIRQ;
+  if (nextEventCycles < microsecondsToClockCycles(2))
+    nextEventCycles = microsecondsToClockCycles(2);
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
 #if F_CPU == 160000000
