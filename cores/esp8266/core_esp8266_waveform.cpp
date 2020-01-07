@@ -107,7 +107,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
 int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
-  if ((pin > 16) || isFlashInterfacePin(pin)) {
+  if ((pin > 16) || isFlashInterfacePin(pin) || !(timeHighCycles + timeLowCycles)) {
     return false;
   }
   Waveform* wave = &waveform[pin];
@@ -202,34 +202,32 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             nextEventCycle = wave->nextServiceCycle;
         }
         else {
-          if (waveformState & mask ? !wave->nextTimeLowCycles : !wave->nextTimeHighCycles) {
-            // for 100% duty or idle, don't toggle and set service cycle to maximum 
-            wave->nextServiceCycle += microsecondsToClockCycles(MAXIRQUS);
-          }
-          else {
-            waveformState ^= mask;
-            if (waveformState & mask) {
+          waveformState ^= mask;
+          if (waveformState & mask) {
+            if (wave->nextTimeHighCycles) {
               if (i == 16) {
                 GP16O |= 1; // GPIO16 write slow as it's RMW
               }
               else {
                 SetGPIO(mask);
               }
-              wave->nextServiceCycle += wave->nextTimeHighCycles;
-              if (nextEventCycles > wave->nextTimeHighCycles)
-                nextEventCycle = wave->nextServiceCycle;
             }
-            else {
+            wave->nextServiceCycle += wave->nextTimeHighCycles;
+            if (nextEventCycles > wave->nextTimeHighCycles)
+              nextEventCycle = wave->nextServiceCycle;
+          }
+          else {
+            if (wave->nextTimeLowCycles) {
               if (i == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
               }
               else {
                 ClearGPIO(mask);
               }
-              wave->nextServiceCycle += wave->nextTimeLowCycles;
-              if (nextEventCycles > wave->nextTimeLowCycles)
-                nextEventCycle = wave->nextServiceCycle;
             }
+            wave->nextServiceCycle += wave->nextTimeLowCycles;
+            if (nextEventCycles > wave->nextTimeLowCycles)
+              nextEventCycle = wave->nextServiceCycle;
           }
         }
 
