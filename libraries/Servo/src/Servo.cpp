@@ -46,9 +46,9 @@ int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 Servo::Servo()
 {
   _attached = false;
-  _valueUs = DEFAULT_PULSE_WIDTH;
-  _minUs = MIN_PULSE_WIDTH;
-  _maxUs = MAX_PULSE_WIDTH;
+  _valueUs = DEFAULT_NEUTRAL_PULSE_WIDTH;
+  _minUs = DEFAULT_MIN_PULSE_WIDTH;
+  _maxUs = DEFAULT_MAX_PULSE_WIDTH;
 }
 
 Servo::~Servo() {
@@ -58,7 +58,7 @@ Servo::~Servo() {
 
 uint8_t Servo::attach(int pin)
 {
-  return attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  return attach(pin, DEFAULT_MIN_PULSE_WIDTH, DEFAULT_MAX_PULSE_WIDTH);
 }
 
 uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
@@ -70,11 +70,11 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
     _attached = true;
   }
 
-  // keep the min and max within 200-3000 us, these are extreme
+  // keep the min and max within 500-2500 us, these are extreme
   // ranges and should support extreme servos while maintaining
   // reasonable ranges
-  _maxUs = max((uint16_t)250, min((uint16_t)3000, maxUs));
-  _minUs = max((uint16_t)200, min(_maxUs, minUs));
+  _maxUs = max((uint16_t)550, min((uint16_t)2500, maxUs));
+  _minUs = max((uint16_t)500, min(_maxUs, minUs));
 
   write(_valueUs);
 
@@ -97,9 +97,11 @@ void Servo::write(int value)
   if (value < _minUs) {
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
-    // writeMicroseconds will contrain the calculated value for us
+    // writeMicroseconds will contain the calculated value for us
     // for any user defined min and max, but we must use default min max
     value = improved_map(value, 0, 180, _minUs, _maxUs);
+  } else if (value > _maxUs) {
+    value = constrain(value, _minUs, _maxUs);
   }
   writeMicroseconds(value);
 }
