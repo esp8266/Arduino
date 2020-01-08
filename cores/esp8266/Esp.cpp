@@ -18,12 +18,15 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Arduino.h"
+#include "Esp.h"
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
 #include "interrupts.h"
 #include "MD5Builder.h"
+#include "umm_malloc/umm_malloc.h"
+#include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -34,6 +37,14 @@ extern struct rst_info resetInfo;
 
 //#define DEBUG_SERIAL Serial
 
+#ifndef PUYA_SUPPORT
+  #define PUYA_SUPPORT 1
+#endif
+#ifndef PUYA_BUFFER_SIZE
+  // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE (= 4k)
+  // Always use a multiple of flash page size (256 bytes)
+  #define PUYA_BUFFER_SIZE 256
+#endif
 
 /**
  * User-defined Literals
@@ -83,6 +94,7 @@ EspClass ESP;
 
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
+    (void) timeout_ms;
     /// This API can only be called if software watchdog is stopped
     system_soft_wdt_restart();
 }
@@ -106,16 +118,66 @@ void EspClass::wdtFeed(void)
 
 extern "C" void esp_yield();
 
-void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
+void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
     esp_yield();
 }
 
+void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
+{
+    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep_instant(time_us);
+    esp_yield();
+}
+
+//this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
+//Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
+uint64_t EspClass::deepSleepMax()
+{
+  //cali*(2^31-1)/(2^12)
+  return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
+
+}
+
+/*
+Layout of RTC Memory is as follows:
+Ref: Espressif doc 2C-ESP8266_Non_OS_SDK_API_Reference, section 3.3.23 (system_rtc_mem_write)
+
+|<------system data (256 bytes)------->|<-----------------user data (512 bytes)--------------->|
+
+SDK function signature:
+bool	system_rtc_mem_read	(
+				uint32	des_addr,
+				void	*	src_addr,
+				uint32	save_size
+)
+
+The system data section can't be used by the user, so:
+des_addr must be >=64 (i.e.: 256/4) and <192 (i.e.: 768/4)
+src_addr is a pointer to data
+save_size is the number of bytes to write
+
+For the method interface:
+offset is the user block number (block size is 4 bytes) must be >= 0 and <128
+data is a pointer to data, 4-byte aligned
+size is number of bytes in the block pointed to by data
+
+Same for write
+
+Note: If the Updater class is in play, e.g.: the application uses OTA, the eboot
+command will be stored into the first 128 bytes of user data, then it will be
+retrieved by eboot on boot. That means that user data present there will be lost.
+Ref:
+- discussion in PR #5330.
+- https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map#memmory-mapped-io-registers
+- Arduino/bootloaders/eboot/eboot_command.h RTC_MEM definition
+*/
+
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 {
-    if (size + offset > 512) {
+    if (offset * 4 + size > 512 || size == 0) {
         return false;
     } else {
         return system_rtc_mem_read(64 + offset, data, size);
@@ -124,12 +186,14 @@ bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 
 bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
 {
-    if (size + offset > 512) {
+    if (offset * 4 + size > 512 || size == 0) {
         return false;
     } else {
         return system_rtc_mem_write(64 + offset, data, size);
     }
 }
+
+
 
 extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
@@ -145,13 +209,29 @@ void EspClass::restart(void)
 
 uint16_t EspClass::getVcc(void)
 {
-    InterruptLock lock;
+    esp8266::InterruptLock lock;
+    (void)lock;
     return system_get_vdd33();
 }
 
 uint32_t EspClass::getFreeHeap(void)
 {
     return system_get_free_heap_size();
+}
+
+uint16_t EspClass::getMaxFreeBlockSize(void)
+{
+    return umm_max_block_size();
+}
+
+uint32_t EspClass::getFreeContStack()
+{
+    return cont_get_free_stack(g_pcont);
+}
+
+void EspClass::resetFreeContStack()
+{
+    cont_repaint_stack(g_pcont);
 }
 
 uint32_t EspClass::getChipId(void)
@@ -195,7 +275,16 @@ uint8_t EspClass::getCpuFreqMHz(void)
 
 uint32_t EspClass::getFlashChipId(void)
 {
-    return spi_flash_get_id();
+    static uint32_t flash_chip_id = 0;
+    if (flash_chip_id == 0) {
+        flash_chip_id = spi_flash_get_id();
+    }
+    return flash_chip_id;
+}
+
+uint8_t EspClass::getFlashChipVendorId(void)
+{
+    return (getFlashChipId() & 0x000000ff);
 }
 
 uint32_t EspClass::getFlashChipRealSize(void)
@@ -359,6 +448,25 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     return false;
 }
 
+bool EspClass::checkFlashCRC() {
+    // The CRC and total length are placed in extra space at the end of the 4K chunk
+    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
+    // we'll need to adjust this.
+    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
+    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4092)); // Start of PROGMEM plus 4K-4
+    uint32_t z[2];
+    z[0] = z[1] = 0;
+
+    // Start the checksum
+    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
+    // Pretend the 2 words of crc/len are zero to be idempotent
+    crc = crc32(z, 8, crc);
+    // Finish the CRC calculation over the rest of flash
+    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
+    return crc == flashcrc;
+}
+
+
 String EspClass::getResetReason(void) {
     char buff[32];
     if (resetInfo.reason == REASON_DEFAULT_RST) { // normal startup by power on
@@ -395,23 +503,16 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
 }
 
 bool EspClass::eraseConfig(void) {
-    bool ret = true;
-    size_t cfgAddr = (ESP.getFlashChipSize() - 0x4000);
-    size_t cfgSize = (8*1024);
+    const size_t cfgSize = 0x4000;
+    size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
 
-    noInterrupts();
-    while(cfgSize) {
-
-        if(spi_flash_erase_sector((cfgAddr / SPI_FLASH_SEC_SIZE)) != SPI_FLASH_RESULT_OK) {
-            ret = false;
+    for (size_t offset = 0; offset < cfgSize; offset += SPI_FLASH_SEC_SIZE) {
+        if (!flashEraseSector((cfgAddr + offset) / SPI_FLASH_SEC_SIZE)) {
+            return false;
         }
-
-        cfgSize -= SPI_FLASH_SEC_SIZE;
-        cfgAddr += SPI_FLASH_SEC_SIZE;
     }
-    interrupts();
 
-    return ret;
+    return true;
 }
 
 uint32_t EspClass::getSketchSize() {
@@ -421,7 +522,7 @@ uint32_t EspClass::getSketchSize() {
 
     image_header_t image_header;
     uint32_t pos = APP_START_OFFSET;
-    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header))) {
+    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)) != SPI_FLASH_RESULT_OK) {
         return 0;
     }
     pos += sizeof(image_header);
@@ -432,8 +533,8 @@ uint32_t EspClass::getSketchSize() {
         section_index < image_header.num_segments;
         ++section_index)
     {
-        section_header_t section_header = {0};
-        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
+        section_header_t section_header = {0, 0};
+        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)) != SPI_FLASH_RESULT_OK) {
             return 0;
         }
         pos += sizeof(section_header);
@@ -446,14 +547,14 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _FS_start;
 
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
@@ -499,24 +600,71 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
 static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
 
 bool EspClass::flashEraseSector(uint32_t sector) {
-    ets_isr_mask(FLASH_INT_MASK);
     int rc = spi_flash_erase_sector(sector);
-    ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
 
+#if PUYA_SUPPORT
+static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
+    if (data == nullptr) {
+      return SPI_FLASH_RESULT_ERR;
+    }
+    // PUYA flash chips need to read existing data, update in memory and write modified data again.
+    static uint32_t *flash_write_puya_buf = nullptr;
+
+    if (flash_write_puya_buf == nullptr) {
+        flash_write_puya_buf = (uint32_t*) malloc(PUYA_BUFFER_SIZE);
+        // No need to ever free this, since the flash chip will never change at runtime.
+        if (flash_write_puya_buf == nullptr) {
+            // Memory could not be allocated.
+            return SPI_FLASH_RESULT_ERR;
+        }
+    }
+
+    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
+    uint32_t* ptr = data;
+    size_t bytesLeft = size;
+    uint32_t pos = offset;
+    while (bytesLeft > 0 && rc == SPI_FLASH_RESULT_OK) {
+        size_t bytesNow = bytesLeft;
+        if (bytesNow > PUYA_BUFFER_SIZE) {
+            bytesNow = PUYA_BUFFER_SIZE;
+            bytesLeft -= PUYA_BUFFER_SIZE;
+        } else {
+            bytesLeft = 0;
+        }
+        rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
+        if (rc != SPI_FLASH_RESULT_OK) {
+            return rc;
+        }
+        for (size_t i = 0; i < bytesNow / 4; ++i) {
+            flash_write_puya_buf[i] &= *ptr;
+            ++ptr;
+        }
+        rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
+        pos += bytesNow;
+    }
+    return rc;
+}
+#endif
+
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-    ets_isr_mask(FLASH_INT_MASK);
-    int rc = spi_flash_write(offset, (uint32_t*) data, size);
-    ets_isr_unmask(FLASH_INT_MASK);
-    return rc == 0;
+    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
+#if PUYA_SUPPORT
+    if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
+        rc = spi_flash_write_puya(offset, data, size);
+    }
+    else
+#endif
+    {
+        rc = spi_flash_write(offset, data, size);
+    }
+    return rc == SPI_FLASH_RESULT_OK;
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
-    ets_isr_mask(FLASH_INT_MASK);
-    int rc = spi_flash_read(offset, (uint32_t*) data, size);
-    ets_isr_unmask(FLASH_INT_MASK);
-    return rc == 0;
+    auto rc = spi_flash_read(offset, (uint32_t*) data, size);
+    return rc == SPI_FLASH_RESULT_OK;
 }
 
 String EspClass::getSketchMD5()

@@ -26,8 +26,6 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#include "../generic/common.h"
-
 #define ESPRESSO_LITE_VERSION   2
 
 #define PIN_WIRE_SDA (4)
@@ -36,7 +34,8 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-static const uint8_t LED_BUILTIN = 2;
-static const uint8_t BUILTIN_LED = 2;
+#define LED_BUILTIN 2
+
+#include "../generic/common.h"
 
 #endif /* Pins_Arduino_h */

@@ -23,11 +23,15 @@
 
 #include <memory>
 #include <Arduino.h>
+#include <../include/time.h> // See issue #6714
+
+class SDClass;
 
 namespace fs {
 
 class File;
 class Dir;
+class FS;
 
 class FileImpl;
 typedef std::shared_ptr<FileImpl> FileImplPtr;
@@ -48,7 +52,7 @@ enum SeekMode {
 class File : public Stream
 {
 public:
-    File(FileImplPtr p = FileImplPtr()) : _p(p) {}
+    File(FileImplPtr p = FileImplPtr(), FS *baseFS = nullptr) : _p(p), _fakeDir(nullptr), _baseFS(baseFS) { }
 
     // Print methods:
     size_t write(uint8_t) override;
@@ -59,7 +63,7 @@ public:
     int read() override;
     int peek() override;
     void flush() override;
-    size_t readBytes(char *buffer, size_t length)  override {
+    size_t readBytes(char *buffer, size_t length) override {
         return read((uint8_t*)buffer, length);
     }
     size_t read(uint8_t* buf, size_t size);
@@ -72,24 +76,79 @@ public:
     void close();
     operator bool() const;
     const char* name() const;
+    const char* fullName() const; // Includes path
+    bool truncate(uint32_t size);
+
+    bool isFile() const;
+    bool isDirectory() const;
+
+    // Arduino "class SD" methods for compatibility
+    template<typename T> size_t write(T &src){
+      uint8_t obuf[256];
+      size_t doneLen = 0;
+      size_t sentLen;
+      int i;
+
+      while (src.available() > sizeof(obuf)){
+        src.read(obuf, sizeof(obuf));
+        sentLen = write(obuf, sizeof(obuf));
+        doneLen = doneLen + sentLen;
+        if(sentLen != sizeof(obuf)){
+          return doneLen;
+        }
+      }
+
+      size_t leftLen = src.available();
+      src.read(obuf, leftLen);
+      sentLen = write(obuf, leftLen);
+      doneLen = doneLen + sentLen;
+      return doneLen;
+    }
+    using Print::write;
+
+    void rewindDirectory();
+    File openNextFile();
+
+    String readString() override;
+
+    time_t getLastWrite();
+    void setTimeCallback(time_t (*cb)(void));
 
 protected:
     FileImplPtr _p;
+
+    // Arduino SD class emulation
+    std::shared_ptr<Dir> _fakeDir;
+    FS                  *_baseFS;
+    time_t (*timeCallback)(void) = nullptr;
 };
 
 class Dir {
 public:
-    Dir(DirImplPtr impl = DirImplPtr()): _impl(impl) { }
+    Dir(DirImplPtr impl = DirImplPtr(), FS *baseFS = nullptr): _impl(impl), _baseFS(baseFS) { }
 
     File openFile(const char* mode);
+
     String fileName();
     size_t fileSize();
+    time_t fileTime();
+    bool isFile() const;
+    bool isDirectory() const;
+
     bool next();
+    bool rewind();
+
+    time_t getLastWrite();
+    void setTimeCallback(time_t (*cb)(void));
 
 protected:
     DirImplPtr _impl;
+    FS       *_baseFS;
+    time_t (*timeCallback)(void) = nullptr;
+
 };
 
+// Backwards compatible, <4GB filesystem usage
 struct FSInfo {
     size_t totalBytes;
     size_t usedBytes;
@@ -99,16 +158,56 @@ struct FSInfo {
     size_t maxPathLength;
 };
 
+// Support > 4GB filesystems (SD, etc.)
+struct FSInfo64 {
+    uint64_t totalBytes;
+    uint64_t usedBytes;
+    size_t blockSize;
+    size_t pageSize;
+    size_t maxOpenFiles;
+    size_t maxPathLength;
+};
+
+
+class FSConfig
+{
+public:
+    static constexpr uint32_t FSId = 0x00000000;
+
+    FSConfig(uint32_t type = FSId, bool autoFormat = true) : _type(type), _autoFormat(autoFormat) { }
+
+    FSConfig setAutoFormat(bool val = true) {
+        _autoFormat = val;
+        return *this;
+    }
+
+    uint32_t _type;
+    bool     _autoFormat;
+};
+
+class SPIFFSConfig : public FSConfig
+{
+public:
+    static constexpr uint32_t FSId = 0x53504946;
+    SPIFFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
+
+    // Inherit _type and _autoFormat
+    // nothing yet, enableTime TBD when SPIFFS has metadate
+};
+
 class FS
 {
 public:
-    FS(FSImplPtr impl) : _impl(impl) { }
+    FS(FSImplPtr impl) : _impl(impl) { timeCallback = _defaultTimeCB; }
+
+    bool setConfig(const FSConfig &cfg);
 
     bool begin();
     void end();
-    
+
     bool format();
     bool info(FSInfo& info);
+    bool info64(FSInfo64& info);
 
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
@@ -125,11 +224,34 @@ public:
     bool rename(const char* pathFrom, const char* pathTo);
     bool rename(const String& pathFrom, const String& pathTo);
 
+    bool mkdir(const char* path);
+    bool mkdir(const String& path);
+
+    bool rmdir(const char* path);
+    bool rmdir(const String& path);
+
+    // Low-level FS routines, not needed by most applications
+    bool gc();
+    bool check();
+
+    void setTimeCallback(time_t (*cb)(void));
+
+    friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
     FSImplPtr _impl;
+    FSImplPtr getImpl() { return _impl; }
+    time_t (*timeCallback)(void);
+    static time_t _defaultTimeCB(void) { return time(NULL); }
 };
 
 } // namespace fs
+
+extern "C"
+{
+void close_all_fs(void);
+void littlefs_request_end(void);
+void spiffs_request_end(void);
+}
 
 #ifndef FS_NO_GLOBALS
 using fs::FS;
@@ -140,6 +262,8 @@ using fs::SeekSet;
 using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
+using fs::FSConfig;
+using fs::SPIFFSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

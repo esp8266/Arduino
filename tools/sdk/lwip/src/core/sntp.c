@@ -51,7 +51,7 @@
 #include "lwip/dns.h"
 #include "lwip/ip_addr.h"
 #include "lwip/pbuf.h"
-
+#include "lwip/app/time.h"
 //#include <string.h>
 #if LWIP_UDP
 
@@ -148,14 +148,18 @@
 #endif
 
 /** SNTP macro to change system time including microseconds */
-#ifdef SNTP_SET_SYSTEM_TIME_US
-#define SNTP_CALC_TIME_US           1
-#define SNTP_RECEIVE_TIME_SIZE      2
-#else
-#define SNTP_SET_SYSTEM_TIME_US(sec, us)
-#define SNTP_CALC_TIME_US           0
-#define SNTP_RECEIVE_TIME_SIZE      1
-#endif
+uint8 sntp_receive_time_size = 1;
+#define SNTP_RECEIVE_TIME_SIZE      sntp_receive_time_size
+#define SNTP_SET_SYSTEM_TIME_US(sec, us)	sntp_update_rtc(sec, us)
+//#ifdef SNTP_SET_SYSTEM_TIME_US
+//#define SNTP_SET_SYSTEM_TIME_US(sec, us)	sntp_update_rtc(sec, us)
+//#define SNTP_CALC_TIME_US           1
+//#define SNTP_RECEIVE_TIME_SIZE      2
+//#else
+//#define SNTP_SET_SYSTEM_TIME_US(sec, us)
+//#define SNTP_CALC_TIME_US           0
+//#define SNTP_RECEIVE_TIME_SIZE      sntp_receive_time_size
+//#endif
 
 /** SNTP macro to get system time, used with SNTP_CHECK_RESPONSE >= 2
  * to send in request and compare in response.
@@ -295,10 +299,12 @@ static ip_addr_t sntp_last_server_address;
  * to compare against in response */
 static u32_t sntp_last_timestamp_sent[2];
 #endif /* SNTP_CHECK_RESPONSE >= 2 */
-typedef long     time_t;
+
 //uint32 current_stamp_1 = 0;
 //uint32 current_stamp_2 = 0;
-uint32 realtime_stamp = 0;
+static bool sntp_time_flag = false;
+static uint32 sntp_update_delay = SNTP_UPDATE_DELAY;
+static uint32 realtime_stamp = 0;
 LOCAL os_timer_t sntp_timer;
 /*****************************************/
 #define SECSPERMIN	60L
@@ -643,13 +649,24 @@ bool ICACHE_FLASH_ATTR
 sntp_set_timezone(sint8 timezone)
 {
 	if(timezone >= -11 || timezone <= 13) {
-		time_zone = timezone;
+		if (sntp_get_timetype()){
+			RTC_TZ_SET(time_zone);
+		} else
+			time_zone = timezone;
 		return true;
 	} else {
 		return false;
 	}
 
 }
+
+void ICACHE_FLASH_ATTR sntp_set_daylight(int daylight)
+{
+	if (sntp_get_timetype()){
+		RTC_DST_SET(daylight);
+	}
+}
+
 void ICACHE_FLASH_ATTR
 sntp_time_inc(void)
 {
@@ -665,7 +682,22 @@ sntp_process(u32_t *receive_timestamp)
    * @todo: if MSB is 1, SNTP time is 2036-based!
    */
   time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
-
+  if (sntp_get_timetype()){
+	  u32_t us = ntohl(receive_timestamp[1]) / 4295;
+	    SNTP_SET_SYSTEM_TIME_US(t, us);
+	    /* display local time from GMT time */
+	    LWIP_DEBUGF(SNTP_DEBUG_TRACE, ("sntp_process: %s, %"U32_F" us", ctime(&t), us));
+  } else{
+	  /* change system time and/or the update the RTC clock */
+	    SNTP_SET_SYSTEM_TIME(t);
+	    /* display local time from GMT time */
+	    t += time_zone * 60 * 60;// format GMT + time_zone TIME ZONE
+	    realtime_stamp = t;
+	    os_timer_disarm(&sntp_timer);
+	    os_timer_setfn(&sntp_timer, (os_timer_func_t *)sntp_time_inc, NULL);
+	    os_timer_arm(&sntp_timer, 1000, 1);
+  }
+#if 0
 #if SNTP_CALC_TIME_US
   u32_t us = ntohl(receive_timestamp[1]) / 4295;
   SNTP_SET_SYSTEM_TIME_US(t, us);
@@ -682,10 +714,8 @@ sntp_process(u32_t *receive_timestamp)
   os_timer_disarm(&sntp_timer);
   os_timer_setfn(&sntp_timer, (os_timer_func_t *)sntp_time_inc, NULL);
   os_timer_arm(&sntp_timer, 1000, 1);
-  os_printf("%s\n",sntp_asctime(sntp_localtime (&t)));
-//  os_printf("%s\n",ctime(&t));
-//  LWIP_DEBUGF(SNTP_DEBUG_TRACE, ("sntp_process: %s", ctime(&t)));
 #endif /* SNTP_CALC_TIME_US */
+#endif
 }
 
 /**
@@ -856,9 +886,9 @@ sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t *addr, u16_t
     sntp_process(receive_timestamp);
 
     /* Set up timeout for next request */
-    sys_timeout((u32_t)SNTP_UPDATE_DELAY, sntp_request, NULL);
+    sys_timeout((u32_t)sntp_update_delay, sntp_request, NULL);
     LWIP_DEBUGF(SNTP_DEBUG_STATE, ("sntp_recv: Scheduled next time request: %"U32_F" ms\n",
-      (u32_t)SNTP_UPDATE_DELAY));
+      (u32_t)sntp_update_delay));
   } else if (err == SNTP_ERR_KOD) {
     /* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
     sntp_try_next_server(NULL);
@@ -1124,5 +1154,32 @@ sntp_getservername(u8_t idx)
   return NULL;
 }
 #endif /* SNTP_SERVER_DNS */
+
+void ICACHE_FLASH_ATTR
+sntp_set_update_delay(uint32 ms)
+{
+	sntp_update_delay = ms > 15000?ms:15000;
+}
+
+void ICACHE_FLASH_ATTR
+sntp_set_timetype(bool type)
+{
+	// sntp_time_flag = type;
+}
+
+bool sntp_get_timetype(void)
+{
+	return sntp_time_flag;
+}
+
+void ICACHE_FLASH_ATTR
+sntp_set_receive_time_size(void)
+{
+	if (sntp_get_timetype()){
+		sntp_receive_time_size = 2;
+	} else{
+		sntp_receive_time_size = 1;
+	}
+}
 
 #endif /* LWIP_UDP */

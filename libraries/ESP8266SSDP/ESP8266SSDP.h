@@ -35,11 +35,11 @@ License (MIT license):
 
 class UdpContext;
 
-#define SSDP_UUID_SIZE              37
+#define SSDP_UUID_SIZE              42
 #define SSDP_SCHEMA_URL_SIZE        64
 #define SSDP_DEVICE_TYPE_SIZE       64
 #define SSDP_FRIENDLY_NAME_SIZE     64
-#define SSDP_SERIAL_NUMBER_SIZE     32
+#define SSDP_SERIAL_NUMBER_SIZE     37
 #define SSDP_PRESENTATION_URL_SIZE  128
 #define SSDP_MODEL_NAME_SIZE        64
 #define SSDP_MODEL_URL_SIZE         128
@@ -60,20 +60,24 @@ class SSDPClass{
   public:
     SSDPClass();
     ~SSDPClass();
-
     bool begin();
-
-    void schema(WiFiClient client);
-
+    void end();
+    void schema(WiFiClient client) const { schema((Print&)std::ref(client)); }
+    void schema(Print &print) const;
     void setDeviceType(const String& deviceType) { setDeviceType(deviceType.c_str()); }
     void setDeviceType(const char *deviceType);
-    void setName(const String& name) { setName(name.c_str()); }
+	
+    /*To define a custom UUID, you must call the method before begin(). Otherwise an automatic UUID based on CHIPID will be generated.*/
+    void setUUID(const String& uuid)	{ setUUID(uuid.c_str()); }
+    void setUUID(const char *uuid);
+	
+	  void setName(const String& name) { setName(name.c_str()); }
     void setName(const char *name);
     void setURL(const String& url) { setURL(url.c_str()); }
     void setURL(const char *url);
     void setSchemaURL(const String& url) { setSchemaURL(url.c_str()); }
     void setSchemaURL(const char *url);
-    void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
+	  void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
     void setSerialNumber(const char *serialNumber);
     void setSerialNumber(const uint32_t serialNumber);
     void setModelName(const String& name) { setModelName(name.c_str()); }
@@ -93,6 +97,7 @@ class SSDPClass{
     void _send(ssdp_method_t method);
     void _update();
     void _startTimer();
+    void _stopTimer();
     static void _onTimerStatic(SSDPClass* self);
 
     UdpContext* _server;
@@ -104,6 +109,7 @@ class SSDPClass{
     uint16_t  _respondToPort;
 
     bool _pending;
+    bool _st_is_uuid;
     unsigned short _delay;
     unsigned long _process_time;
     unsigned long _notify_time;

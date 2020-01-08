@@ -23,7 +23,13 @@ extern "C" {
     #include "mem.h"
 }
 
+#ifdef malloc
+  #undef malloc
+#endif
 #define malloc      os_malloc
+#ifdef free
+  #undef free
+#endif
 #define free        os_free
 
 // #define AVRISP_DEBUG(fmt, ...)     os_printf("[AVRP] " fmt "\r\n", ##__VA_ARGS__ )
@@ -39,8 +45,8 @@ extern "C" {
 #define beget16(addr) (*addr * 256 + *(addr+1))
 
 ESP8266AVRISP::ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq, bool reset_state, bool reset_activehigh):
-    _reset_pin(reset_pin), _reset_state(reset_state), _spi_freq(spi_freq), _reset_activehigh(reset_activehigh),
-    _server(WiFiServer(port)), _state(AVRISP_STATE_IDLE)
+    _spi_freq(spi_freq), _server(WiFiServer(port)), _state(AVRISP_STATE_IDLE),
+    _reset_pin(reset_pin), _reset_state(reset_state), _reset_activehigh(reset_activehigh)
 {
     pinMode(_reset_pin, OUTPUT);
     setReset(_reset_state);
@@ -68,9 +74,7 @@ AVRISPState_t ESP8266AVRISP::update() {
             if (_server.hasClient()) {
                 _client = _server.available();
                 _client.setNoDelay(true);
-                ip_addr_t lip;
-                lip.addr = _client.remoteIP();
-                AVRISP_DEBUG("client connect %d.%d.%d.%d:%d", IP2STR(&lip), _client.remotePort());
+                AVRISP_DEBUG("client connect %s:%d", _client.remoteIP().toString().c_str(), _client.remotePort());
                 _client.setTimeout(100); // for getch()
                 _state = AVRISP_STATE_PENDING;
                 _reject_incoming();
@@ -103,10 +107,9 @@ AVRISPState_t ESP8266AVRISP::serve() {
         case AVRISP_STATE_IDLE:
             // should not be called when idle, error?
             break;
-        case AVRISP_STATE_PENDING: {
+        case AVRISP_STATE_PENDING:
             _state = AVRISP_STATE_ACTIVE;
-        // fallthrough
-        }
+            // falls through
         case AVRISP_STATE_ACTIVE: {
             while (_client.available()) {
                 avrisp();
@@ -136,10 +139,9 @@ void ESP8266AVRISP::fill(int n) {
 }
 
 uint8_t ESP8266AVRISP::spi_transaction(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
-    uint8_t n;
     SPI.transfer(a);
-    n = SPI.transfer(b);
-    n = SPI.transfer(c);
+    SPI.transfer(b);
+    SPI.transfer(c);
     return SPI.transfer(d);
 }
 
@@ -233,7 +235,6 @@ void ESP8266AVRISP::end_pmode() {
 }
 
 void ESP8266AVRISP::universal() {
-    int w;
     uint8_t ch;
 
     fill(4);
@@ -265,8 +266,6 @@ int ESP8266AVRISP::addr_page(int addr) {
 
 
 void ESP8266AVRISP::write_flash(int length) {
-    uint32_t started = millis();
-
     fill(length);
 
     if (Sync_CRC_EOP == getch()) {
@@ -331,7 +330,6 @@ void ESP8266AVRISP::program_page() {
     int length = 256 * getch();
     length += getch();
     char memtype = getch();
-    char buf[100];
     // flash memory @here, (length) bytes
     if (memtype == 'F') {
         write_flash(length);
@@ -390,7 +388,6 @@ void ESP8266AVRISP::eeprom_read_page(int length) {
 }
 
 void ESP8266AVRISP::read_page() {
-    char result = (char)Resp_STK_FAILED;
     int length = 256 * getch();
     length += getch();
     char memtype = getch();
@@ -424,9 +421,13 @@ void ESP8266AVRISP::read_signature() {
 
 // It seems ArduinoISP is based on the original STK500 (not v2)
 // but implements only a subset of the commands.
-int ESP8266AVRISP::avrisp() {
+void ESP8266AVRISP::avrisp() {
     uint8_t data, low, high;
     uint8_t ch = getch();
+    // Avoid set but not used warning.  Leaving them in as it helps document the code
+    (void) data;
+    (void) low;
+    (void) high;
     // AVRISP_DEBUG("CMD 0x%02x", ch);
     switch (ch) {
     case Cmnd_STK_GET_SYNC:
@@ -517,7 +518,7 @@ int ESP8266AVRISP::avrisp() {
 
       // anything else we will return STK_UNKNOWN
     default:
-        AVRISP_DEBUG("??!?");
+        AVRISP_DEBUG("?!?");
         error++;
         if (Sync_CRC_EOP == getch()) {
             _client.print((char)Resp_STK_UNKNOWN);

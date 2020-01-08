@@ -3,6 +3,7 @@
 
 #include "lwip/dns.h"
 #include "os_type.h"
+#include "lwip/app/espconn_buf.h"
 
 #if 0
 #define espconn_printf(fmt, args...) os_printf(fmt,## args)
@@ -32,6 +33,8 @@ typedef void (* espconn_reconnect_callback)(void *arg, sint8 err);
 #define ESPCONN_ARG        -12   /* Illegal argument.        */
 #define ESPCONN_IF		   -14	 /* Low_level error			 */
 #define ESPCONN_ISCONN     -15   /* Already connected.       */
+#define ESPCONN_TIME	   -16	 /* Sync Time error			 */
+#define ESPCONN_NODATA	   -17	 /* No data can be read	     */
 
 #define ESPCONN_HANDSHAKE  -28   /* ssl handshake failed	 */
 #define ESPCONN_RESP_TIMEOUT -29 /* ssl handshake no response*/
@@ -186,6 +189,8 @@ typedef struct _espconn_msg{
 //***********Code for WIFI_BLOCK from upper**************
 	uint8 recv_hold_flag;
 	uint16 recv_holded_buf_Len;
+//*******************************************************
+	ringbuf *readbuf;
 }espconn_msg;
 
 #ifndef _MDNS_INFO
@@ -568,7 +573,7 @@ extern sint8 espconn_get_keepalive(struct espconn *espconn, uint8 level, void *o
  *                - ESPCONN_ARG: dns client not initialized or invalid hostname
 *******************************************************************************/
 
-extern sint8 espconn_gethostbyname(struct espconn *pespconn, const char *name, ip_addr_t *addr, dns_found_callback found);
+extern err_t espconn_gethostbyname(struct espconn *pespconn, const char *name, ip_addr_t *addr, dns_found_callback found);
 
 /******************************************************************************
  * FunctionName : espconn_igmp_join
@@ -669,5 +674,13 @@ extern void espconn_mdns_enable(void);
  *  Returns     : none
 *******************************************************************************/
 extern void espconn_dns_setserver(u8_t numdns, ip_addr_t *dnsserver);
+/******************************************************************************
+ * FunctionName : espconn_dns_getserver
+ * Description  : get dns server.
+ * Parameters   : numdns -- the index of the DNS server ,must
+ * 				  be < DNS_MAX_SERVERS = 2
+ *  Returns     : dnsserver -- struct ip_addr_t
+*******************************************************************************/
+extern ip_addr_t espconn_dns_getserver(u8_t numdns);
 #endif
 

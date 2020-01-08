@@ -33,9 +33,24 @@
 
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size) {
+
+#ifdef DEBUG_ESP_CORE
+    static char not_the_best_way [] PROGMEM STORE_ATTR = "Print::write(data,len) should be overridden for better efficiency\r\n";
+    static bool once = false;
+    if (!once) {
+        once = true;
+        os_printf_plus(not_the_best_way);
+    }
+#endif
+
     size_t n = 0;
-    while(size--) {
-        n += write(*buffer++);
+    while (size--) {
+        size_t ret = write(pgm_read_byte(buffer++));
+        if (ret == 0) {
+            // Write of last byte didn't complete, abort additional processing
+            break;
+        }
+        n += ret;
     }
     return n;
 }
@@ -89,11 +104,19 @@ size_t Print::printf_P(PGM_P format, ...) {
 size_t Print::print(const __FlashStringHelper *ifsh) {
     PGM_P p = reinterpret_cast<PGM_P>(ifsh);
 
+    char buff[128] __attribute__ ((aligned(4)));
+    auto len = strlen_P(p);
     size_t n = 0;
-    while (1) {
-        uint8_t c = pgm_read_byte(p++);
-        if (c == 0) break;
-        n += write(c);
+    while (n < len) {
+        int to_write = std::min(sizeof(buff), len - n);
+        memcpy_P(buff, p, to_write);
+        auto written = write(buff, to_write);
+        n += written;
+        p += written;
+        if (!written) {
+            // Some error, write() should write at least 1 byte before returning
+            break;
+        }
     }
     return n;
 }

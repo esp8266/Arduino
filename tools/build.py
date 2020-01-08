@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # build.py — build a sketch using arduino-builder
@@ -20,51 +20,70 @@
 #
 #
 
-
 from __future__ import print_function
 import sys
 import os
 import argparse
+import platform
 import subprocess
 import tempfile
 import shutil
 
-def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
-    cmd = ide_path + '/arduino-builder '
-    cmd += '-compile -logger=human '
-    cmd += '-build-path "' + tmp_dir + '" '
-    cmd += '-tools "' +  ide_path + '/tools-builder" '
+
+# Arduino-builder needs forward-slash paths for passed in params or it cannot
+# launch the needed toolset.
+def windowsize_paths(l):
+    """Convert forward-slash paths to backslash paths referenced from C:"""
+    out = []
+    for i in l:
+        if i.startswith('/'):
+            i = 'C:' + i
+        out += [i.replace('/', '\\')]
+    return out
+
+def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
+    cmd = []
+    cmd += [ide_path + '/arduino-builder']
+    cmd += ['-compile', '-logger=human']
+    cmd += ['-build-path', tmp_dir]
+    cmd += ['-tools', ide_path + '/tools-builder']
+    if cache != "":
+        cmd += ['-build-cache', cache ]
     if args.library_path:
         for lib_dir in args.library_path:
-            cmd += '-libraries "' + lib_dir + '" '
-    cmd += '-hardware "' + ide_path + '/hardware" '
+            cmd += ['-libraries', lib_dir]
+    cmd += ['-hardware', ide_path + '/hardware']
     if args.hardware_dir:
         for hw_dir in args.hardware_dir:
-            cmd += '-hardware "' + hw_dir + '" '
+            cmd += ['-hardware', hw_dir]
     else:
-        cmd += '-hardware "' + hardware_dir + '" '
+        cmd += ['-hardware', hardware_dir]
     # Debug=Serial,DebugLevel=Core____
-    cmd += '-fqbn=esp8266com:esp8266:{board_name}:' \
-            'CpuFrequency={cpu_freq},' \
+    fqbn = '-fqbn=esp8266com:esp8266:{board_name}:' \
+            'xtal={cpu_freq},' \
             'FlashFreq={flash_freq},' \
             'FlashMode={flash_mode},' \
-            'UploadSpeed=921600,' \
-            'FlashSize={flash_size},' \
+            'baud=921600,' \
+            'eesz={flash_size},' \
+            'ip={lwIP},' \
             'ResetMethod=nodemcu'.format(**vars(args))
     if args.debug_port and args.debug_level:
-        cmd += 'Debug={debug_port},DebugLevel={debug_level}'.format(**vars(args))
-    cmd += ' '
-    cmd += '-ide-version=10607 '
-    cmd += '-warnings={warnings} '.format(**vars(args))
+        fqbn += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
+    cmd += [fqbn]
+    cmd += ['-built-in-libraries', ide_path + '/libraries']
+    cmd += ['-ide-version=10607']
+    cmd += ['-warnings={warnings}'.format(**vars(args))]
     if args.verbose:
-        cmd += '-verbose '
-    cmd += sketch
+        cmd += ['-verbose']
+    cmd += [sketch]
+
+    if platform.system() == "Windows":
+        cmd = windowsize_paths(cmd)
 
     if args.verbose:
-        print('Building: ' + cmd, file=f)
+        print('Building: ' + " ".join(cmd), file=f)
 
-    cmds = cmd.split(' ')
-    p = subprocess.Popen(cmds, stdout=f, stderr=subprocess.STDOUT)
+    p = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT)
     p.wait()
     return p.returncode
 
@@ -85,6 +104,8 @@ def parse_args():
                         choices=[80, 160], type=int)
     parser.add_argument('-m', '--flash_mode', help='Flash mode', default='qio',
                         choices=['dio', 'qio'])
+    parser.add_argument('-n', '--lwIP', help='lwIP version', default='lm2f',
+                        choices=['lm2f', 'hb2f', 'lm6f', 'hb6f', 'hb1'])
     parser.add_argument('-w', '--warnings', help='Compilation warnings level',
                         default='none', choices=['none', 'all', 'more'])
     parser.add_argument('-o', '--output_binary', help='File name for output binary')
@@ -95,6 +116,7 @@ def parse_args():
     parser.add_argument('--debug_port', help='Debug port',
                         choices=['Serial', 'Serial1'])
     parser.add_argument('--debug_level', help='Debug level')
+    parser.add_argument('--build_cache', help='Build directory to cache core.a', default='')
     parser.add_argument('sketch_path', help='Sketch file path')
     return parser.parse_args()
 
@@ -121,9 +143,11 @@ def main():
     hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
 
     output_name = tmp_dir + '/' + os.path.basename(sketch_path) + '.bin'
+
     if args.verbose:
         print("Sketch: ", sketch_path)
         print("Build dir: ", tmp_dir)
+        print("Cache dir: ", args.build_cache)
         print("Output: ", output_name)
 
     if args.verbose:
@@ -131,7 +155,7 @@ def main():
     else:
         f = open(tmp_dir + '/build.log', 'w')
 
-    res = compile(tmp_dir, sketch_path, tools_dir, hardware_dir, ide_path, f, args)
+    res = compile(tmp_dir, sketch_path, args.build_cache, tools_dir, hardware_dir, ide_path, f, args)
     if res != 0:
         return res
 

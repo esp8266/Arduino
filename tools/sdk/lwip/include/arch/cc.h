@@ -39,6 +39,8 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #define EFAULT 14
+#include <sys/pgmspace.h>
+#include <../../../cores/esp8266/core_esp8266_features.h>
 
 //#define LWIP_PROVIDE_ERRNO
 
@@ -65,7 +67,7 @@ typedef unsigned long   mem_ptr_t;
 #define U32_F "d"
 #define X32_F "x"
 
-
+#define LWIP_ERR_T s32_t
 
 //#define PACK_STRUCT_FIELD(x) x __attribute__((packed))
 #define PACK_STRUCT_FIELD(x) x
@@ -83,9 +85,10 @@ typedef unsigned long   mem_ptr_t;
 #define LWIP_PLATFORM_ASSERT(x)
 #endif
 
-#define SYS_ARCH_DECL_PROTECT(x)
-#define SYS_ARCH_PROTECT(x)
-#define SYS_ARCH_UNPROTECT(x)
+typedef uint32_t sys_prot_t;
+#define SYS_ARCH_DECL_PROTECT(lev) sys_prot_t lev
+#define SYS_ARCH_PROTECT(lev) lev = xt_rsil(15)
+#define SYS_ARCH_UNPROTECT(lev) xt_wsr_ps(lev)
 
 #define LWIP_PLATFORM_BYTESWAP 1
 #define LWIP_PLATFORM_HTONS(_n)  ((u16_t)((((_n) & 0xff) << 8) | (((_n) >> 8) & 0xff)))
