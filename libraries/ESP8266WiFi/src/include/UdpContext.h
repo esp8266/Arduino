@@ -478,7 +478,7 @@ private:
 
 #if LWIP_VERSION_MAJOR == 1
     #define TEMPDSTADDR (&current_iphdr_dest)
-    #define TEMPINPUTNETIF (ip_current_input_netif())
+    #define TEMPINPUTNETIF (current_netif)
 #else
     #define TEMPDSTADDR (ip_current_dest_addr())
     #define TEMPINPUTNETIF (ip_current_input_netif())
