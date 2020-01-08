@@ -66,19 +66,27 @@ public:
         return ERR_ABRT;
     }
 
-    err_t close()
+    err_t close(bool force_abort = false)
     {
         err_t err = ERR_OK;
         if(_pcb) {
-            DEBUGV(":close\r\n");
+            if (force_abort)
+                DEBUGV(":closeabort\r\n");
+            else
+                DEBUGV(":close\r\n");
             tcp_arg(_pcb, NULL);
             tcp_sent(_pcb, NULL);
             tcp_recv(_pcb, NULL);
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
             err = tcp_close(_pcb);
-            if(err != ERR_OK) {
-                DEBUGV(":tc err %d\r\n", (int) err);
+            if(err != ERR_OK || force_abort) {
+                if (force_abort)
+                    /* Without delay some clients fail to receive the response and 
+                     * report a 'cannot connect' error message */
+                    delay(10);
+		else
+                    DEBUGV(":tc err %d\r\n", (int) err);
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
             }
@@ -86,27 +94,6 @@ public:
         }
         return err;
     }
-    
-    err_t close_abort()
-    {
-          /* ERR_ABRT must be sent back on abortion as specified in the comments
-           * of tools/sdk/lwip/src/core/tcp.c at the footnote of tcp_abort() */
-          err_t err = ERR_ABRT;
-          if(_pcb) {
-              DEBUGV(":close\r\n");
-              tcp_arg(_pcb, NULL);
-              tcp_sent(_pcb, NULL);
-              tcp_recv(_pcb, NULL);
-              tcp_err(_pcb, NULL);
-              tcp_close(_pcb);
-              /* Without delay some clients fail to receive the response and 
-               * report a 'cannot connect' error message */
-              delay(10);
-              tcp_abort(_pcb);
-              _pcb = 0;
-          }
-          return err;
-	}
 
     ~ClientContext()
     {
