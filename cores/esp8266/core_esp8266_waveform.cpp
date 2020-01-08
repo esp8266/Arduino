@@ -52,10 +52,11 @@ extern "C" {
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
-  uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
-  uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
+  uint32_t nextServiceCycle;  // ESP cycle timer when a transition required
   int32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
   int32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
+  uint32_t expiryCycle;       // For time-limited waveform, the cycle when this waveform must stop
+  bool hasExpiry;             // if false, expiryCycle is not set and must be ignored
 } Waveform;
 
 static Waveform waveform[17];        // State of all possible pins
@@ -114,10 +115,8 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
   // Adjust to shave off some of the IRQ time, approximately
   wave->nextTimeHighCycles = timeHighCycles;
   wave->nextTimeLowCycles = timeLowCycles;
-  wave->expiryCycle = runTimeCycles ? ESP.getCycleCount() + runTimeCycles : 0;
-  if (runTimeCycles && !wave->expiryCycle) {
-    wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so prevent setting it
-  }
+  wave->expiryCycle = runTimeCycles;
+  wave->hasExpiry = static_cast<bool>(runTimeCycles);
 
   uint32_t mask = 1UL << pin;
   if (!(waveformEnabled & mask)) {
@@ -232,7 +231,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
 
         // Disable any waveforms that are done
-        if (wave->expiryCycle) {
+        if (wave->hasExpiry) {
           int32_t expiryToGo = wave->expiryCycle - now;
           if (expiryToGo <= 0) {
             // Done, remove!
