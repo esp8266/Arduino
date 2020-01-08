@@ -109,12 +109,12 @@ public:
         DEBUGV(":ref %d\r\n", _refcnt);
     }
 
-    void unref()
+    void unref(bool force_abort = false)
     {
         DEBUGV(":ur %d\r\n", _refcnt);
         if(--_refcnt == 0) {
             discard_received();
-            close();
+            close(true, force_abort);
             if(_discard_cb) {
                 _discard_cb(_discard_cb_arg, this);
             }
@@ -125,18 +125,8 @@ public:
     
     void unref_abort()
     {
-		if(this != 0) {
-		    DEBUGV(":ur_abrt %d\r\n", _refcnt);
-		    if(--_refcnt == 0) {
-		        flush();
-		        close_abort();
-		        if(_discard_cb)
-		            _discard_cb(_discard_cb_arg, this);
-		        DEBUGV(":del\r\n");
-		        delete this;
-		    }
-		}
-	}
+        unref(true);
+    }
 
     int connect(CONST ip_addr_t* addr, uint16_t port)
     {
