@@ -51,41 +51,24 @@ public:
         //keepAlive();
     }
 
-    err_t abort()
+    err_t close(bool force_close = true, bool force_abort = false)
     {
+        err_t err = force_close? ERR_OK: ERR_ABRT;
         if(_pcb) {
-            DEBUGV(":abort\r\n");
+            DEBUGV(":close:%d abort:%d\r\n", force_close, force_abort);
             tcp_arg(_pcb, NULL);
             tcp_sent(_pcb, NULL);
             tcp_recv(_pcb, NULL);
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
-            tcp_abort(_pcb);
-            _pcb = nullptr;
-        }
-        return ERR_ABRT;
-    }
-
-    err_t close(bool force_abort = false)
-    {
-        err_t err = ERR_OK;
-        if(_pcb) {
-            if (force_abort)
-                DEBUGV(":closeabort\r\n");
-            else
-                DEBUGV(":close\r\n");
-            tcp_arg(_pcb, NULL);
-            tcp_sent(_pcb, NULL);
-            tcp_recv(_pcb, NULL);
-            tcp_err(_pcb, NULL);
-            tcp_poll(_pcb, NULL, 0);
-            err = tcp_close(_pcb);
+            if (force_close)
+                err = tcp_close(_pcb);
             if(err != ERR_OK || force_abort) {
                 if (force_abort)
                     /* Without delay some clients fail to receive the response and 
                      * report a 'cannot connect' error message */
                     delay(10);
-		else
+                else
                     DEBUGV(":tc err %d\r\n", (int) err);
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
@@ -93,6 +76,16 @@ public:
             _pcb = nullptr;
         }
         return err;
+    }
+
+    err_t abort()
+    {
+        return close(false, true);
+    }
+
+    err_t close_abort(bool force_abort = false)
+    {
+        return close(true, true);
     }
 
     ~ClientContext()
