@@ -9,17 +9,10 @@
 #include "WifiHealth.h"
 
 #include <umm_malloc/umm_malloc_cfg.h>
-#if HEAP_STATIC_RESERVE_SIZE
-#include <evlog/src/event_logger.h>
-#else
-#define EVLOG1(a) do{ (void)a; } while(false)
-#endif
-#if ENABLE_FLASH_STATS
-#include <evlog/src/flash_stats.h>
-#endif
+#include "AddOns.h"
 
 #ifndef STASSID
-#pragma message("Using default SSID: your-ssid")
+#pragma message("Using default SSID: your-ssid, this is probably not what you want.")
 #define STASSID "your-ssid"
 #define STAPSK  "your-password"
 #endif
@@ -90,11 +83,9 @@ void setup() {
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     Serial.println("Connection Failed! Rebooting...");
-    EVLOG1("Connection Failed! Rebooting...");
     delay(5000);
     ESP.restart();
   }
-  EVLOG1("WiFi Up!");
 
   // Port defaults to 8266
   // ArduinoOTA.setPort(8266);
@@ -173,20 +164,13 @@ void printHelp(Print& oStream) {
   oStream.println(F("  u - umm_info"));
   oStream.println(F("  w - WiFi Stats"));
   oStream.println(F("  R - Restart"));
-#if ENABLE_FLASH_STATS
-  oStream.println(F("  f - flash Stats"));
-#endif
-#if HEAP_STATIC_RESERVE_SIZE
-  oStream.println(F("  m - static reserve memory information"));
-  oStream.println(F("  e - EvLog Report"));
-  oStream.println(F("  E - EvLog Clear"));
-#endif
+  oStream.println(F("  f - flash info"));
+  printHelpAddOn(oStream);
   oStream.println(F("  ? - This help message"));
   oStream.println();
 }
 
 void printTimes(Print& out) {
-  //  #if (EVLOG_TIMESTAMP == EVLOG_TIMESTAMP_CLOCKCYCLES)
   {
     uint32_t fraction = esp_get_cycle_count();
     fraction /= clockCyclesPerMicrosecond();
@@ -199,7 +183,6 @@ void printTimes(Print& out) {
     out.printf_P(ts_fmt, buf, fraction, clockCyclesPerMicrosecond());
     out.println();
   }
-  //  #elif (EVLOG_TIMESTAMP == EVLOG_TIMESTAMP_MICROS)
   {
     uint32_t fraction = micros();
     time_t gtime = (time_t)(fraction / 1000000U);
@@ -211,7 +194,6 @@ void printTimes(Print& out) {
     out.printf_P(ts_fmt, buf, fraction);
     out.println();
   }
-  //  #elif (EVLOG_TIMESTAMP == EVLOG_TIMESTAMP_MILLIS)
   {
     uint32_t fraction = millis();
     time_t gtime = (time_t)(fraction / 1000U);
@@ -223,39 +205,26 @@ void printTimes(Print& out) {
     out.printf_P(ts_fmt, buf, fraction);
     out.println();
   }
-  //  #endif
 }
 
-int cmdLoop(Print& oStream, char inChar) {
-  switch (inChar) {
+int cmdLoop(Print& oStream, char hotKey) {
+  switch (hotKey) {
     case 't':
       printLocalTime(oStream);
       oStream.println();
       printTimes(oStream);
       oStream.println();
       break;
-#if HEAP_STATIC_RESERVE_SIZE
-    case 'm':
-      oStream.printf_P(PSTR("umm_get_static_reserve_size %u"), umm_get_static_reserve_size());
-      oStream.println();
-      oStream.printf_P(PSTR("umm_get_static_reserve_addr %p"), umm_get_static_reserve_addr());
-      oStream.println();
-      oStream.println();
-      break;
-#endif
     case '?':
       printHelp(oStream);
       break;
     case 'u':
       umm_info(NULL, true);
       break;
-
-#if ENABLE_FLASH_STATS
     case 'f':
-      printFlashStatsReport(oStream);
+      printFlashInfo(oStream);
       oStream.println();
       break;
-#endif
     case 'w':
       printWiFiStats(oStream);
       oStream.println();
@@ -266,17 +235,6 @@ int cmdLoop(Print& oStream, char inChar) {
       WiFi.mode(WIFI_OFF);
       ESP.restart();
       break;
-
-#if HEAP_STATIC_RESERVE_SIZE
-    case 'E':
-      evlog_restart(1);
-      oStream.println(F("EvLog restarted."));
-      break;
-    case 'e':
-      evlogPrintReport(oStream);
-      oStream.println();
-      break;
-#endif
     case '0':
     case '1':
     case '2':
@@ -284,7 +242,7 @@ int cmdLoop(Print& oStream, char inChar) {
     case '4':
     case '5':
     case '6':
-      if (queueEraseConfig(inChar)) {
+      if (queueEraseConfig(hotKey)) {
         oStream.println(F("Erase config request queued. Press 'R' to process or start OTA Update."));
       }
       oStream.println();
@@ -294,16 +252,17 @@ int cmdLoop(Print& oStream, char inChar) {
       oStream.println();
       break;
     default:
-      oStream.println();
+      return hotKeyHandlerAddOn(oStream, hotKey);
       break;
   }
-  return 0;
+  oStream.println();
+  return 1;
 }
 
 void serialClientLoop(void) {
   if (Serial.available() > 0) {
-    char inChar = Serial.read();
-    cmdLoop(Serial, inChar);
+    char hotKey = Serial.read();
+    cmdLoop(Serial, hotKey);
   }
 }
 
