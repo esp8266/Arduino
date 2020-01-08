@@ -167,6 +167,23 @@ public:
 
 #endif // !LWIP_IPV6
 
+    /*
+     * Add a netif (by its index) as the multicast interface
+     */
+    void setMulticastInterface(netif* p_pNetIf)
+    {
+        uint8_t mcast_ifindex = (p_pNetIf ? netif_get_index(p_pNetIf) : 0);
+        udp_set_multicast_netif_index(_pcb, mcast_ifindex);
+    }
+
+    /*
+     * Allow access to pcb to change eg. options
+     */
+    udp_pcb* pcb(void)
+    {
+        return _pcb;
+    }
+
     void setMulticastTTL(int ttl)
     {
 #ifdef LWIP_MAYBE_XCC
@@ -203,6 +220,11 @@ public:
 
     bool isValidOffset(const size_t pos) const {
         return (pos <= _rx_buf->len);
+    }
+
+    netif* getInputNetif() const
+    {
+        return _currentAddr.input_netif;
     }
 
     CONST IPAddress& getRemoteAddress() CONST
@@ -265,7 +287,6 @@ public:
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
             pbuf_ref(_rx_buf);
         }
-        // remove the already-consumed head of the chain
         pbuf_free(deleteme);
 
         _rx_buf_offset = 0;
@@ -441,24 +462,13 @@ private:
             const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
-        // check receive pbuf chain depth
-        {
-            pbuf* p;
-            int count = 0;
-            for (p = _rx_buf; p && ++count < rxBufMaxDepth*2; p = p->next);
-            if (p)
-            {
-                // pbuf chain too deep, dropping
-                pbuf_free(pb);
-                DEBUGV(":udr\r\n");
-                return;
-            }
-        }
 
 #if LWIP_VERSION_MAJOR == 1
     #define TEMPDSTADDR (&current_iphdr_dest)
+    #define TEMPINPUTNETIF todo
 #else
     #define TEMPDSTADDR (ip_current_dest_addr())
+    #define TEMPINPUTNETIF (ip_current_input_netif())
 #endif
 
         // chain this helper pbuf first
@@ -486,7 +496,7 @@ private:
                 return;
             }
             // construct in place
-            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport, TEMPINPUTNETIF);
             pb_helper->flags = PBUF_HELPER_FLAG; // mark helper pbuf
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
@@ -500,6 +510,7 @@ private:
             _currentAddr.srcaddr = srcaddr;
             _currentAddr.dstaddr = TEMPDSTADDR;
             _currentAddr.srcport = srcport;
+            _currentAddr.input_netif = TEMPINPUTNETIF;
 
             DEBUGV(":urn %d\r\n", pb->tot_len);
             _first_buf_taken = false;
@@ -512,6 +523,7 @@ private:
         }
 
     #undef TEMPDSTADDR
+    #undef TEMPINPUTNETIF
 
     }
 
@@ -539,16 +551,13 @@ private:
     {
         IPAddress srcaddr, dstaddr;
         int16_t srcport;
+        netif* input_netif;
 
         AddrHelper() { }
-        AddrHelper(const ip_addr_t* src, const ip_addr_t* dst, uint16_t srcport):
-            srcaddr(src), dstaddr(dst), srcport(srcport) { }
+        AddrHelper(const ip_addr_t* src, const ip_addr_t* dst, uint16_t srcport, netif* input_netif):
+            srcaddr(src), dstaddr(dst), srcport(srcport), input_netif(input_netif) { }
     };
     AddrHelper _currentAddr;
-
-    // rx pbuf depth barrier (counter of buffered UDP received packets)
-    // keep it small
-    static constexpr int rxBufMaxDepth = 4;
 };
 
 
