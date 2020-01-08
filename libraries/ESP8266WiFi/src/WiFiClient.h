@@ -72,7 +72,6 @@ public:
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
- 
   virtual void flush() override { (void)flush(0); }
   virtual void stop() override { (void)stop(0); }
   bool flush(unsigned int maxWaitMs);
