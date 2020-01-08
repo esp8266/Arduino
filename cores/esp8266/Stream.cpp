@@ -22,6 +22,7 @@
 
 #include <Arduino.h>
 #include <Stream.h>
+
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
 
@@ -210,6 +211,8 @@ float Stream::parseFloat(char skipChar) {
 // the buffer is NOT null terminated.
 //
 size_t Stream::readBytes(char *buffer, size_t length) {
+    IAMSLOW();
+
     size_t count = 0;
     while(count < length) {
         int c = timedRead();
@@ -257,4 +260,21 @@ String Stream::readStringUntil(char terminator) {
         c = timedRead();
     }
     return ret;
+}
+
+// read what can be read, immediate exit on unavailable data
+// prototype should be `int Stream::read(char* buffer, size_t maxLen)` like Arduino `int Client::read(buf, len)`
+int Stream::readNow (char* buffer, size_t maxLen)
+{
+    IAMSLOW();
+
+    size_t nbread = 0;
+    while (nbread < maxLen && available())
+    {
+        int c = read();
+        if (c == -1)
+            break;
+        buffer[nbread++] = read();
+    }
+    return nbread;
 }

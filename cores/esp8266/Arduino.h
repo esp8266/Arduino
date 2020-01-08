@@ -184,11 +184,6 @@ void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(uint32_t freq);
 void analogWriteRange(uint32_t range);
 
-unsigned long millis(void);
-unsigned long micros(void);
-uint64_t micros64(void);
-void delay(unsigned long);
-void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
 

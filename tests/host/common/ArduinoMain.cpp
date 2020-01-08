@@ -249,6 +249,7 @@ int main (int argc, char* const argv [])
 
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
+	init_milliscros();
 
 	if (!blocking_uart)
 	{

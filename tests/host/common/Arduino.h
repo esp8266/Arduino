@@ -186,6 +186,7 @@ extern "C" {
     void analogWriteFreq(uint32_t freq);
     void analogWriteRange(uint32_t range);
     
+    void init_milliscros ();
     unsigned long millis(void);
     unsigned long micros(void);
     void delay(unsigned long);

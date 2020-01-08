@@ -423,6 +423,29 @@ public:
         _sync = sync;
     }
 
+    // return a pointer to available data buffer (size = availableForPeek())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer ()
+    {
+        if (!_rx_buf)
+            return nullptr;
+        return (const char*)_rx_buf->payload + _rx_buf_offset;
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t availableForPeek ()
+    {
+        if (!_rx_buf)
+            return 0;
+        return _rx_buf->len - _rx_buf_offset;
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume)
+    {
+        _consume(consume);
+    }
+
 protected:
 
     bool _is_timeout()
@@ -552,8 +575,6 @@ protected:
 
     void _consume(size_t size)
     {
-        if(_pcb)
-            tcp_recved(_pcb, size);
         ptrdiff_t left = _rx_buf->len - _rx_buf_offset - size;
         if(left > 0) {
             _rx_buf_offset += size;
@@ -570,6 +591,8 @@ protected:
             pbuf_ref(_rx_buf);
             pbuf_free(head);
         }
+        if(_pcb)
+            tcp_recved(_pcb, size);
     }
 
     err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)

@@ -28,6 +28,7 @@
 #include "ESP8266WebServer.h"
 #include "FS.h"
 #include "detail/RequestHandlersImpl.h"
+#include <StreamDev.h>
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -435,7 +436,13 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
     //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
     //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
-    _currentClient.write((const uint8_t *)header.c_str(), header.length());
+    size_t sent = StreamPtr(header.c_str(), header.length()).to(&_currentClient); // transfer all of it, with timeout
+    (void)sent;
+#ifdef DEBUG_ESP_HTTP_SERVER
+    if (sent != header.length())
+        DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
+#endif
+
     if(content.length())
       sendContent(content);
 }

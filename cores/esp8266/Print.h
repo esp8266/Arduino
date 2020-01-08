@@ -22,9 +22,13 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
+#include <sys/pgmspace.h>
 
-#include "WString.h"
 #include "Printable.h"
+
+class String;
+class __FlashStringHelper;
 
 #define DEC 10
 #define HEX 16
@@ -101,6 +105,13 @@ class Print {
         size_t println(void);
 
         virtual void flush() { /* Empty implementation for backward compatibility */ }
+
+        virtual int availableForWrite();
+        // return type: int
+
+        // by default write timeout is possible (outgoing data from network,serial..)
+        // (children can override to false (like String))
+        virtual bool outputTimeoutPossible () { return true; }
 };
 
 #endif

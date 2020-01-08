@@ -6,6 +6,7 @@ LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
+R ?= noexec
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
@@ -22,7 +23,7 @@ GENHTML ?= genhtml
 ifeq ($(FORCE32),1)
 SIZEOFLONG = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
 ifneq ($(SIZEOFLONG),4)
-$(warning Cannot compile in 32 bit mode, switching to native mode)
+$(warning Cannot compile in 32 bit mode (g++-multilib is missing?), switching to native mode)
 else
 N32 = 32
 M32 = -m32
@@ -51,7 +52,7 @@ endif
 $(shell mkdir -p $(BINDIR))
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
-	StreamString.cpp \
+	StreamDev.cpp \
 	Stream.cpp \
 	WString.cpp \
 	Print.cpp \
@@ -243,6 +244,7 @@ ARDUINO_LIBS := \
 		IPAddress.cpp \
 		Updater.cpp \
 		base64.cpp \
+		debug.cpp \
 	) \
 	$(addprefix ../../libraries/ESP8266WiFi/src/,\
 		ESP8266WiFi.cpp \
@@ -329,6 +331,7 @@ ifeq ($(INO),)
 %: %.ino
 	@# recursive 'make' with paths
 	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Wextra INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@)
+	test "$(R)" = noexec || $(BINDIR)/$(notdir $@)/$(notdir $@) $(R)
 	@# see below the new build rule with fixed output path outside from core location
 
 #####################

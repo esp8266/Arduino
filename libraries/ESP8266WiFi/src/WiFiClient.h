@@ -66,7 +66,12 @@ public:
 
   virtual int available() override;
   virtual int read() override;
-  virtual int read(uint8_t *buf, size_t size) override;
+  virtual int read(char *buf, size_t size); // should override, see Stream.h
+  virtual int read(uint8_t *buf, size_t size) // should override, see Stream.h
+  {
+    return WiFiClient::read((char*)buf, size);
+  }
+
   virtual int peek() override;
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
   size_t peekBytes(char *buffer, size_t length) {
@@ -86,7 +91,7 @@ public:
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
-  size_t availableForWrite();
+  int availableForWrite() override;
 
   friend class WiFiServer;
 
@@ -119,6 +124,27 @@ public:
   static bool getDefaultSync ();
   bool getSync() const;
   void setSync(bool sync);
+
+  // substitute for virtual int ::read(buf, len)
+  virtual int readNow (char* buffer, size_t len) override {
+    return WiFiClient::read(buffer, len);
+  }
+
+  // peek buffer API is present
+  virtual bool peekBufferAPI () const override;
+
+  // return number of byte accessible by peekBuffer()
+  virtual size_t availableForPeek () override;
+
+  // return a pointer to available data buffer (size = availableForPeek())
+  // semantic forbids any kind of read() before calling peekConsume()
+  virtual const char* peekBuffer () override;
+
+  // consume bytes after use (see peekBuffer)
+  virtual void peekConsume (size_t consume) override;
+
+  virtual bool outputTimeoutPossible () override { return connected(); }
+  virtual bool inputTimeoutPossible () override { return connected(); }
 
 protected:
 

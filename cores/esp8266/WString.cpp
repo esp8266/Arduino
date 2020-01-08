@@ -6,6 +6,9 @@
  Modified by Ivan Grokhotkov, 2014 - esp8266 support
  Modified by Michael C. Miller, 2015 - esp8266 progmem support
 
+ imported:
+ StringStream Copyright (c) 2015 Markus Sattler. All rights reserved.
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -854,3 +857,111 @@ double String::toDouble(void) const
 // global empty string to allow returning const String& with nothing
 
 const String emptyString;
+
+/////////////////////////////////////////////
+// Stream API:
+
+//// imported from former StreamString.cpp
+
+size_t String::write(const uint8_t *data, size_t size)
+{
+    if(size && data)
+    {
+        const unsigned int newlen = length() + size;
+        if(reserve(newlen + 1))
+        {
+            memcpy((void *) (wbuffer() + len()), (const void *) data, size);
+            setLen(newlen);
+            *(wbuffer() + newlen) = 0x00; // add null for string end
+            return size;
+        }
+        DEBUGV(":stream2string: OOM (%d->%d)\n", length(), newlen+1);
+    }
+    return 0;
+}
+
+size_t String::write(uint8_t data)
+{
+    return concat((char) data);
+}
+
+int String::available()
+{
+    return peekPointer < 0? length(): length() - peekPointer;
+}
+
+int String::read()
+{
+    if (peekPointer < 0)
+    {
+        if (length())
+        {
+            char c = charAt(0);
+            remove(0, 1);
+            return c;
+        }
+    }
+    else if (peekPointer < (int)length())
+        return charAt(peekPointer++);
+
+    return -1;
+}
+
+int String::peek()
+{
+    if (peekPointer < 0)
+    {
+        if (length())
+            return charAt(0);
+    }
+    else if (peekPointer < (int)length())
+        return charAt(peekPointer);
+
+    return -1;
+}
+
+void String::flush()
+{
+}
+
+//// Stream's peekBufferAPI
+
+const char* String::peekBuffer ()
+{
+    if (peekPointer < 0)
+        return buffer();
+    if (peekPointer < (int)length())
+        return buffer() + peekPointer;
+    return nullptr;
+}
+
+void String::peekConsume (size_t consume)
+{
+    if (peekPointer < 0)
+        // string is really consumed
+        remove(0, consume);
+    else
+        // only the pointer is moved
+        peekPointer = std::min((size_t)length(), peekPointer + consume);
+}
+
+int String::read (char* buffer, size_t len)
+{
+    if (peekPointer < 0)
+    {
+        // string will be consumed
+        size_t l = std::min(len, (size_t)length());
+        memcpy(buffer, String::buffer(), l);
+        remove(0, l);
+        return l;
+    }
+
+    if (peekPointer >= (int)length())
+        return 0;
+
+    // only the pointer is moved
+    size_t l = std::min(len, (size_t)(length() - peekPointer));
+    memcpy(buffer, String::buffer() + peekPointer, l);
+    peekPointer += l;
+    return l;
+}

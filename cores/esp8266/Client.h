@@ -47,6 +47,11 @@ class Client: public Stream {
             return addr.raw_address();
         }
 #endif
+
+        // substitute for `virtual int ::read(buf, len)` in `Stream::`
+        virtual int readNow (char* buffer, size_t len) override {
+            return read((uint8_t*)buffer, len);
+        }
 };
 
 #endif
