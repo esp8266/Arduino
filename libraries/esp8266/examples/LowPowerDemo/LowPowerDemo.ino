@@ -1,33 +1,29 @@
 /* This example demonstrates the different low-power modes of the ESP8266
 
-   My initial setup was a WeMos D1 Mini with 3.3V connected to the 3V3 pin through a meter
+   The initial setup was a WeMos D1 Mini with 3.3V connected to the 3V3 pin through a meter
    so that it bypassed the on-board voltage regulator and USB chip.  There's still about
-   0.3 mA worth of leakage current due to the unpowered chips, so an ESP-01 will show lower
-   current readings than what I could achieve.  These tests should work with any module.
-   While the modem is on the current is 67 mA or jumping around with a listed minimum.
-   To verify the 20 uA Deep Sleep current I removed the voltage regulator and USB chip.
+   0.3 mA worth of leakage current due to the unpowered chips.  These tests should work with
+   any module, although on-board components will affect the actual current measurement.
+   While the modem is turned on the current is > 67 mA or jumping around with a minimum value.
+   To verify the 20 uA Deep Sleep current the voltage regulator and USB chip were removed.
 
-   Since I'm now missing the USB chip, I've included OTA upload.  You'll need to upload
-   from USB or a USB-to-TTL converter the first time, then you can disconnect and use OTA
-   afterwards during any test if the WiFi is connected.  Some tests disconnect or sleep WiFi
-   so OTA won't go through.  If you want OTA upload, hit RESET & press the test button once.
-
-   This test assumes you have a pushbutton switch connected between D3 and GND to advance
-   the tests.  You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.
-   If you forget to connect D0 to RST it will hang after the first Deep Sleep test.
-   Connect an LED from any free pin through a 330 ohm resistor to the 3.3V supply, NOT the 3V3
-   pin on the module or it adds to the measured current.  When it blinks you can proceed.
-   When the LED is lit continuously it's connecting WiFi, when it's off the CPU is asleep.
-   The LED blinks slowly when the tests are complete.
+   This test series requires an active WiFi connection to illustrate two tests.  If you
+   have problems with WiFi, uncomment the #ifdef DEBUG for additional WiFi error messages.
+   The test requires a pushbutton switch connected between D3 and GND to advance the tests.
+   You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.  If you forget to
+   connect D0 to RST it will hang after the first Deep Sleep test.  Additionally, you can
+   connect an LED from any free pin through a 330 ohm resistor to the 3.3V supply, though
+   preferably not the 3V3 pin on the module or it adds to the measured current.  When the
+   LED blinks you can proceed to the next test.  When the LED is lit continuously it's
+   connecting WiFi, and when it's off the CPU is asleep.  The LED blinks slowly when the
+   tests are complete.  Test progress is also shown on the serial monitor.
 
    WiFi connections will be made over twice as fast if you can use a static IP address.
 
    This example code is in the public domain, and was inspired by code from numerous sources */
 
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#include <WiFiUdp.h>
-#include <ArduinoOTA.h>
+#include <coredecls.h>         // crc32()
 #include <PolledTimeout.h>
 
 //#define DEBUG  // prints WiFi connection info to serial, uncomment if you want WiFi messages
@@ -41,11 +37,12 @@
 
 #define WAKE_UP_PIN 0  // D3/GPIO0, can also force a serial flash upload with RESET
 
-// un-comment one of the two lines below for your LED connection
+// uncomment one of the two lines below for your LED connection, if used
 #define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add to the current
 //#define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
+// you can use LED_BUILTIN, but it adds to the measured current by 0.3mA to 6mA.
 
-ADC_MODE(ADC_VCC);  // allows us to monitor the internal VCC level; it varies with WiFi load
+ADC_MODE(ADC_VCC);  // allows you to monitor the internal VCC level; it varies with WiFi load
 // don't connect anything to the analog input pin(s)!
 
 // enter your WiFi configuration below
@@ -56,12 +53,13 @@ IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
-
+uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
+bool wifiOK;  // used to skip tests if WiFi never connected
 
 // CRC function used to ensure data validity of RTC User Memory
 uint32_t calculateCRC32(const uint8_t *data, size_t length);
 
-// This structure will be stored in RTC memory to remember the reset loop count.
+// This structure will be stored in RTC memory to remember the reset count (number of Deep Sleeps).
 // First field is CRC32, which is calculated based on the rest of the structure contents.
 // Any fields can go after the CRC32.  The structure must be 4-byte aligned.
 struct {
@@ -72,8 +70,8 @@ struct {
 byte resetCount = 0;  // keeps track of the number of Deep Sleep tests / resets
 String resetCause = "";
 
-const unsigned int blinkDelay = 100; // fast blink rate for the LED when waiting for the user
-const unsigned int longDelay = 350;  // longer delay() for the two AUTOMATIC modes
+const uint32_t blinkDelay = 100; // fast blink rate for the LED when waiting for the user
+const uint32_t longDelay = 350;  // longer delay() for the two AUTOMATIC modes
 esp8266::polledTimeout::periodicFastMs blinkLED(blinkDelay);
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
@@ -119,12 +117,15 @@ void loop() {
     Serial.println(F("\n2nd test - Automatic Modem Sleep"));
     Serial.println(F("connecting WiFi, please wait until the LED blinks"));
     init_WiFi();
-    init_OTA();
-    Serial.println(F("The current will drop in 7 seconds."));
-    volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
-    Serial.println(F("press the button to continue"));
-    waitPushbutton(true, longDelay);
+    if (WiFi.localIP()) {
+      Serial.println(F("The current will drop in 7 seconds."));
+      volts = ESP.getVcc();
+      Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+      Serial.println(F("press the button to continue"));
+      waitPushbutton(true, longDelay);
+    } else {
+      Serial.println(F("test skipped"));
+    }
 
     // 3rd test - Forced Modem Sleep
     Serial.println(F("\n3rd test - Forced Modem Sleep"));
@@ -137,17 +138,21 @@ void loop() {
 
     // 4th test - Automatic Light Sleep
     Serial.println(F("\n4th test - Automatic Light Sleep"));
+if (WiFi.localIP()) {
     Serial.println(F("reconnecting WiFi"));
     Serial.println(F("it will be in Automatic Light Sleep once WiFi connects (LED blinks)"));
     digitalWrite(LED, LOW);  // visual cue that we're reconnecting
     WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 5);  // Automatic Light Sleep
     WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
     while (!WiFi.localIP())
-      delay(50);
+    delay(50);
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
     Serial.println(F("press the button to continue"));
     waitPushbutton(true, longDelay);
+    } else {
+      Serial.println(F("test skipped"));
+    }
 
     // 5th test - Forced Light Sleep using Non-OS SDK calls
     Serial.println(F("\n5th test - Forced Light Sleep using Non-OS SDK calls"));
@@ -168,9 +173,8 @@ void loop() {
     Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
 
     // 6th test - Deep Sleep for 10 seconds, wake with RF_DEFAULT
-    Serial.println(F("\n6th test - Deep Sleep for 10 seconds, wake with RF_DEFAULT"));
+    Serial.println(F("\n6th test - Deep Sleep for 10 seconds, reset and wake with RF_DEFAULT"));
     init_WiFi();  // initialize WiFi since we turned it off in the last test
-    init_OTA();
     resetCount = 1;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     volts = ESP.getVcc();
@@ -187,19 +191,19 @@ void loop() {
     delay(10);
     // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is off)
     // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
-    // the 2 uA GPIO current during Deep Sleep can't drive the LED so it's off now
+    // the 2 uA GPIO current during Deep Sleep can't drive the LED so it's not lit now, although
+    // depending on the LED used, you might see it very dimly lit in a dark room during this test
     Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
   }
 
   // 7th test - Deep Sleep for 10 seconds, wake with RFCAL
   if (resetCount < 4) {
-    init_WiFi();  // need to reinitialize WiFi & OTA due to Deep Sleep resets
-    init_OTA();   // since we didn't do it in setup() because of the first test
+    init_WiFi();  // need to reinitialize WiFi due to Deep Sleep resets
   }
   if (resetCount == 1) {  // second reset loop since power on
     resetCount = 2;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
-    Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, wake with RFCAL"));
+    Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, reset and wake with RFCAL"));
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
     Serial.println(F("press the button to continue"));
@@ -215,7 +219,7 @@ void loop() {
   if (resetCount == 2) {  // third reset loop since power on
     resetCount = 3;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
-    Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, wake with NO_RFCAL"));
+    Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with NO_RFCAL"));
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
     Serial.println(F("press the button to continue"));
@@ -231,7 +235,7 @@ void loop() {
   if (resetCount == 3) {  // fourth reset loop since power on
     resetCount = 4;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
-    Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, wake with RF_DISABLED"));
+    Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with RF_DISABLED"));
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
     Serial.println(F("press the button to continue"));
@@ -261,16 +265,12 @@ void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until the
     while (digitalRead(WAKE_UP_PIN)) {  // wait for a button press
       if (blinkLED) {
         digitalWrite(LED, !digitalRead(LED));  // toggle the activity LED
-        if (WiFi.localIP())  // don't check OTA if WiFi isn't connected
-          ArduinoOTA.handle();  //see if we need to reflash
       }
       yield();
     }
   } else {  // long delay() for the 2 AUTOMATIC modes, but it misses quick button presses
     while (digitalRead(WAKE_UP_PIN)) {  // wait for a button press
       digitalWrite(LED, !digitalRead(LED));  // toggle the activity LED
-      if (WiFi.localIP())  // don't check OTA if WiFi isn't connected
-        ArduinoOTA.handle();  //see if we need to reflash
       delay(delayTime);
     }
   }
@@ -312,7 +312,7 @@ void init_WiFi() {
   /* Explicitly set the ESP8266 as a WiFi-client (STAtion mode), otherwise by default it
     would try to act as both a client and an access-point and could cause network issues
     with other WiFi devices on your network. */
-  digitalWrite(LED, LOW);  // give a visual indication that we're alive but busy
+  digitalWrite(LED, LOW);  // give a visual indication that we're alive but busy with WiFi
   WiFi.persistent(false);  // don't store the connection each time to save wear on the flash
   WiFi.mode(WIFI_STA);
   WiFi.config(staticIP, gateway, subnet);  // if using static IP, enter parameters at the top
@@ -321,45 +321,21 @@ void init_WiFi() {
   Serial.println(AP_SSID);
   DEBUG_PRINT(F("my MAC: "));
   DEBUG_PRINTLN(WiFi.macAddress());
-  while (WiFi.status() != WL_CONNECTED)
+  uint32_t wifiStart = millis();
+  while (( WiFi.status() != WL_CONNECTED ) && ( millis() - wifiStart < wifiTimeout )) {
     delay(50);
-  DEBUG_PRINTLN(F("WiFi connected"));
-  while (!WiFi.localIP())
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    DEBUG_PRINTLN(F("WiFi connected"));
+  } else {
+    Serial.println(F("WiFi timed out and didn't connect"));
+  }
+  while (!WiFi.localIP() && (WiFi.status() == WL_CONNECTED)) {
     delay(50);
+  }
   WiFi.setAutoReconnect(true);
   DEBUG_PRINT(F("WiFi Gateway IP: "));
   DEBUG_PRINTLN(WiFi.gatewayIP());
   DEBUG_PRINT(F("my IP address: "));
   DEBUG_PRINTLN(WiFi.localIP());
-}
-
-void init_OTA() {
-  // Port defaults to 8266
-  // ArduinoOTA.setPort(8266);
-
-  // Hostname defaults to esp8266-[ChipID]
-  // ArduinoOTA.setHostname("myesp8266"));
-
-  // No authentication by default
-  // ArduinoOTA.setPassword((const char *)"123"));
-
-  ArduinoOTA.onStart([]() {
-    Serial.println(F("Start"));
-  });
-  ArduinoOTA.onEnd([]() {
-    Serial.println(F("\nEnd"));
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println(F("Auth Failed"));
-    else if (error == OTA_BEGIN_ERROR) Serial.println(F("Begin Failed"));
-    else if (error == OTA_CONNECT_ERROR) Serial.println(F("Connect Failed"));
-    else if (error == OTA_RECEIVE_ERROR) Serial.println(F("Receive Failed"));
-    else if (error == OTA_END_ERROR) Serial.println(F("End Failed"));
-  });
-  ArduinoOTA.begin();
-  yield();
 }
