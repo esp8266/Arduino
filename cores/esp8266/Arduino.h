@@ -281,6 +281,13 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1,
 void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
+// esp32 api compatibility
+void configTzTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr)
+{
+    configTime(tz, server1, server2, server3);
+}
+
 #endif // __cplusplus
 
 #include "pins_arduino.h"
