@@ -108,7 +108,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   _reset();
   clearError(); //  _error = 0
 
+#ifndef HOST_MOCK
   wifi_set_sleep_type(NONE_SLEEP_T);
+#endif
 
   //address where we will start writing the update
   uintptr_t updateStartAddress = 0;
@@ -390,9 +392,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
   if(hasError() || !isRunning())
     return 0;
 
-  if(len > remaining()){
-    //len = remaining();
-    //fail instead
+  if(progress() + _bufferLen + len > _size) {
     _setError(UPDATE_ERROR_SPACE);
     return 0;
   }
