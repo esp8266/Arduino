@@ -1,7 +1,7 @@
 
 #ifdef ADDON_DEMO
 void printHelpAddOn(Print& oStream) {
-    oStream.println(F("  x - use this space to add on extra hot key options"));
+  oStream.println(F("  x - use this space to add on extra hot key options"));
 }
 
 int hotKeyHandlerAddOn(Print& oStream, char hotKey) {
