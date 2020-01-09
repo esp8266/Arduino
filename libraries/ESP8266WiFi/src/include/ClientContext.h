@@ -83,7 +83,7 @@ public:
         return close(false, true);
     }
 
-    err_t close_abort(bool force_abort = false)
+    err_t close_abort()
     {
         return close(true, true);
     }
