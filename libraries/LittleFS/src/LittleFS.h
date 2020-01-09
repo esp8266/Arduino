@@ -323,7 +323,7 @@ protected:
 class LittleFSFileImpl : public FileImpl
 {
 public:
-    LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd) : _fs(fs), _fd(fd), _opened(true) {
+    LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd, int flags) : _fs(fs), _fd(fd), _opened(true), _flags(flags) {
         _name = std::shared_ptr<char>(new char[strlen(name) + 1], std::default_delete<char[]>());
         strcpy(_name.get(), name);
     }
@@ -419,7 +419,7 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
-	    if (timeCallback) {
+	    if (timeCallback && (_flags & LFS_O_WRONLY)) {
                 // Add metadata with last write time
                 time_t now = timeCallback();
                 int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
@@ -483,6 +483,7 @@ protected:
     std::shared_ptr<lfs_file_t>  _fd;
     std::shared_ptr<char>        _name;
     bool                         _opened;
+    int                          _flags;
 };
 
 class LittleFSDirImpl : public DirImpl
@@ -567,6 +568,10 @@ public:
     bool rewind() override {
         _valid = false;
         int rc = lfs_dir_rewind(_fs->getFS(), _getDir());
+        // Skip the . and .. entries
+        lfs_info dirent;
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
         return (rc == 0);
     }
 
