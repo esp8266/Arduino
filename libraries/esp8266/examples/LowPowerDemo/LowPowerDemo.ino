@@ -152,7 +152,7 @@ void loop() {
     WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 5);  // Automatic Light Sleep
     WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
     uint32_t wifiStart = millis();
-    while ((!WiFi.localIP() ) && ( millis() - wifiStart < wifiTimeout )) {
+    while ((!WiFi.localIP()) && (millis() - wifiStart < wifiTimeout)) {
       delay(50);
     }
     if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
