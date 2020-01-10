@@ -20,7 +20,19 @@
 
    WiFi connections will be made over twice as fast if you can use a static IP address.
 
-   This example code is in the public domain, and was inspired by code from numerous sources */
+   This example is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   This example is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this example; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA  */
 
 #include <ESP8266WiFi.h>
 #include <coredecls.h>         // crc32()
@@ -54,10 +66,6 @@ IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
 uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
-bool wifiOK;  // used to skip tests if WiFi never connected
-
-// CRC function used to ensure data validity of RTC User Memory
-uint32_t calculateCRC32(const uint8_t *data, size_t length);
 
 // This structure will be stored in RTC memory to remember the reset count (number of Deep Sleeps).
 // First field is CRC32, which is calculated based on the rest of the structure contents.
@@ -95,7 +103,7 @@ void setup() {
 
   // Read struct from RTC memory
   if (ESP.rtcUserMemoryRead(64, (uint32_t*) &rtcData, sizeof(rtcData))) {
-    uint32_t crcOfData = calculateCRC32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
+    uint32_t crcOfData = crc32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
     if (crcOfData != rtcData.crc32) {  // if the CRC is invalid
       resetCount = 0;  // set first test loop since power on or external reset
     } else {
@@ -109,7 +117,7 @@ void loop() {
     // 1st test - running with WiFi unconfigured, reads ~67 mA minimum
     Serial.println(F("\n1st test - running with WiFi unconfigured"));
     float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);
 
@@ -117,14 +125,14 @@ void loop() {
     Serial.println(F("\n2nd test - Automatic Modem Sleep"));
     Serial.println(F("connecting WiFi, please wait until the LED blinks"));
     init_WiFi();
-    if (WiFi.localIP()) {
+    if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
       Serial.println(F("The current will drop in 7 seconds."));
       volts = ESP.getVcc();
-      Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+      Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
       Serial.println(F("press the button to continue"));
       waitPushbutton(true, longDelay);
     } else {
-      Serial.println(F("test skipped"));
+      Serial.println(F("no WiFi connection, test skipped"));
     }
 
     // 3rd test - Forced Modem Sleep
@@ -132,26 +140,28 @@ void loop() {
     WiFi.forceSleepBegin();
     delay(10);  // it doesn't always go to sleep unless you delay(10)
     volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);
 
     // 4th test - Automatic Light Sleep
     Serial.println(F("\n4th test - Automatic Light Sleep"));
-if (WiFi.localIP()) {
     Serial.println(F("reconnecting WiFi"));
     Serial.println(F("it will be in Automatic Light Sleep once WiFi connects (LED blinks)"));
     digitalWrite(LED, LOW);  // visual cue that we're reconnecting
     WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 5);  // Automatic Light Sleep
     WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
-    while (!WiFi.localIP())
-    delay(50);
-    volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
-    Serial.println(F("press the button to continue"));
-    waitPushbutton(true, longDelay);
+    uint32_t wifiStart = millis();
+    while ((!WiFi.localIP() ) && ( millis() - wifiStart < wifiTimeout )) {
+      delay(50);
+    }
+    if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
+      volts = ESP.getVcc();
+      Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+      Serial.println(F("press the button to continue"));
+      waitPushbutton(true, longDelay);
     } else {
-      Serial.println(F("test skipped"));
+      Serial.println(F("no WiFi connection, test skipped"));
     }
 
     // 5th test - Forced Light Sleep using Non-OS SDK calls
@@ -160,7 +170,7 @@ if (WiFi.localIP()) {
     yield();
     digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
     volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the button)"));
     delay(100);  // needs a brief delay after the print or it may print the whole message
     wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
@@ -178,10 +188,11 @@ if (WiFi.localIP()) {
     resetCount = 1;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
-    while (!digitalRead(WAKE_UP_PIN))  // wait for them to release the button from the last test
+    while (!digitalRead(WAKE_UP_PIN)) {  // wait for them to release the button from the last test
       delay(10);
+    }
     delay(50);  // debounce time for the switch, button released
     waitPushbutton(false, blinkDelay);
     digitalWrite(LED, LOW);  // turn the LED on, at least briefly
@@ -205,7 +216,7 @@ if (WiFi.localIP()) {
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, reset and wake with RFCAL"));
     float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);
     Serial.println(F("going into Deep Sleep now..."));
@@ -221,7 +232,7 @@ if (WiFi.localIP()) {
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with NO_RFCAL"));
     float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);
     Serial.println(F("going into Deep Sleep now..."));
@@ -237,7 +248,7 @@ if (WiFi.localIP()) {
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with RF_DISABLED"));
     float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);
     Serial.println(F("going into Deep Sleep now..."));
@@ -248,10 +259,10 @@ if (WiFi.localIP()) {
   }
 
   if (resetCount == 4) {
-    resetCount = 5;  // start all over
+    resetCount = 5;  // start all over, do an ESP.restart to insure it's a clean state
     updateRTC();  // save the current test state in RTC memory
     float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000 );
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("\nTests completed, in RF_DISABLED, press the button to do an ESP.restart()"));
     waitPushbutton(false, 1000);
     ESP.restart();
@@ -260,7 +271,7 @@ if (WiFi.localIP()) {
 
 void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until they press the button
   // note: 2 different modes, as both of the AUTOMATIC power saving modes need a long delay()
-  if (!usesDelay) {  // quick interception of button press, no delay()
+  if (!usesDelay) {  // quick interception of button press, no delay() used
     blinkLED.reset(delayTime);
     while (digitalRead(WAKE_UP_PIN)) {  // wait for a button press
       if (blinkLED) {
@@ -275,35 +286,19 @@ void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until the
     }
   }
   delay(50);  // debounce time for the switch, button pressed
-  while (!digitalRead(WAKE_UP_PIN))  // now wait for them to release the button
+  while (!digitalRead(WAKE_UP_PIN)) {  // now wait for them to release the button
     delay(10);
-  delay(50);  // debounce time for the switch, button released
-}
-
-uint32_t calculateCRC32(const uint8_t *data, size_t length) {
-  uint32_t crc = 0xffffffff;
-  while (length--) {
-    uint8_t c = *data++;
-    for (uint32_t i = 0x80; i > 0; i >>= 1) {
-      bool bit = crc & 0x80000000;
-      if (c & i) {
-        bit = !bit;
-      }
-      crc <<= 1;
-      if (bit) {
-        crc ^= 0x04c11db7;
-      }
-    }
   }
-  return crc;
+  delay(50);  // debounce time for the switch, button released
 }
 
 void updateRTC() {
   rtcData.data[3] = resetCount;  // save the loop count for the next reset
   // Update CRC32 of data
-  rtcData.crc32 = calculateCRC32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
-  if (resetCount == 5)  // wipe the CRC in RTC memory when we're done with all tests
+  rtcData.crc32 = crc32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
+  if (resetCount == 5) {  // wipe the CRC in RTC memory when we're done with all tests
     rtcData.crc32 = 0;
+  }
   // Write struct to RTC memory
   ESP.rtcUserMemoryWrite(64, (uint32_t*) &rtcData, sizeof(rtcData));
 }
@@ -322,7 +317,7 @@ void init_WiFi() {
   DEBUG_PRINT(F("my MAC: "));
   DEBUG_PRINTLN(WiFi.macAddress());
   uint32_t wifiStart = millis();
-  while (( WiFi.status() != WL_CONNECTED ) && ( millis() - wifiStart < wifiTimeout )) {
+  while ((WiFi.status() != WL_CONNECTED) && (millis() - wifiStart < wifiTimeout)) {
     delay(50);
   }
   if (WiFi.status() == WL_CONNECTED) {
