@@ -12,7 +12,7 @@
    The test requires a pushbutton switch connected between D3 and GND to advance the tests.
    You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.  If you forget to
    connect D0 to RST it will hang after the first Deep Sleep test.  Additionally, you can
-   connect an LED from any free pin through a 330 ohm resistor to the 3.3V supply, though
+   connect an LED from any free pin through a 1K ohm resistor to the 3.3V supply, though
    preferably not the 3V3 pin on the module or it adds to the measured current.  When the
    LED blinks you can proceed to the next test.  When the LED is lit continuously it's
    connecting WiFi, and when it's off the CPU is asleep.  The LED blinks slowly when the
@@ -48,6 +48,7 @@
 #endif
 
 #define WAKE_UP_PIN 0  // D3/GPIO0, can also force a serial flash upload with RESET
+// you can use any pin for WAKE_UP_PIN except for D0/GPIO16 as it doesn't support interrupts
 
 // uncomment one of the two lines below for your LED connection, if used
 #define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add to the current
