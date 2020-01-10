@@ -83,6 +83,7 @@ void WiFiServer::begin(uint16_t port) {
         return;
     }
     _pcb = listen_pcb;
+    _port = _pcb->local_port;
     tcp_accept(listen_pcb, &WiFiServer::_s_accept);
     tcp_arg(listen_pcb, (void*) this);
 }
@@ -124,6 +125,10 @@ uint8_t WiFiServer::status()  {
     if (!_pcb)
         return CLOSED;
     return _pcb->state;
+}
+
+uint16_t WiFiServer::port() const {
+    return _port;
 }
 
 void WiFiServer::close() {
