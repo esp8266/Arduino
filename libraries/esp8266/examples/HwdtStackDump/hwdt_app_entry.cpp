@@ -89,17 +89,19 @@ extern uint32_t rtc_get_reset_reason(void);
  * Normally there are 4 sections of code that share/overlap the same stack space
  * starting at near 0x40000000.
  *   1) The Boot ROM (uses around 640 bytes)
- *   2) The Bootloader, eboot.elf (last seen using 720 bytes.)
+ *   2) The Bootloader, eboot.elf (using around 720 bytes.)
  *   3) `app_entry_redefinable()` just before it starts the SDK.
- *   4) The NONOS SDK, optionally the Core when extra 4K option is selected.
+ *   4) The NONOS SDK, optionally the Core when the extra 4K option is selected.
  *
- * To preserve the sketch stack data for a stack dump, I define a stack for used
- * by the ROM and bootloader that is separate from that used by the sketch. By
- * sketch, I refer to ESP8266 Core, NONOS SDK, and sketch as one. By not
- * overlapping, we lose some stack space by leaving idle space behind; however,
- * we improve the likelihood that we can generate a stack dump after an HWDT
- * crash. I leave this value at 1024; however, with current measurements, it
- * looks like it could go down. Leaving it for now in case eboot gets bigger.
+ * To preserve the sketch stack data for a stack dump, I define three separate
+ * stacks:
+ *   1) Boot ROM and eboot
+ *   2) this stack dump code
+ *   3) SDK, Core, and Sketch
+ *
+ * With this, we can recover a complete stack trace of our sketch. I am leaving
+ * this for now at 1024; however, I think there is room to lower it without loss
+ * of information.
  */
 #ifndef ROM_STACK_SIZE
 #define ROM_STACK_SIZE (1024)
