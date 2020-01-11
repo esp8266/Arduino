@@ -65,6 +65,7 @@ extern "C" {
 #include <user_interface.h>
 #include <uart_register.h>
 extern void call_user_start();
+extern uint32_t rtc_get_reset_reason(void);
 }
 
 /*
@@ -405,7 +406,8 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
     *  detection.
     *
     *  The following indirect method of testing of vital pointers for validity
-    *  has been worked best so far.
+    *  works for determining power on. Then need to reference both ROM API
+    *  and SDK RTC value to detect a real HWDT.
     */
     bool power_on = false;
     if (g_rom_stack != rom_stack ||
@@ -423,9 +425,10 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 
     ets_memset(&hwdt_info, 0, sizeof(hwdt_info));
     uint32_t rtc_sys_reason = hwdt_info.rtc_sys_reason = RTC_SYS[0];
+    uint32_t rom_api_reason = rtc_get_reset_reason();
     bool hwdt_reset = false;
 
-    if (!power_on && REASON_WDT_RST == rtc_sys_reason) {
+    if (!power_on && REASON_WDT_RST == rtc_sys_reason && 4 == rom_api_reason) {
         hwdt_reset = true;
     }
 

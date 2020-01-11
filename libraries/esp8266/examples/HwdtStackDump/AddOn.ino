@@ -3,10 +3,10 @@ extern struct rst_info resetInfo;
 
 void printHwdtDebugInfo(Print& out) {
   extern struct rst_info resetInfo;
-  out.println(String(F("RTC_SYS[0] = ")) +  (hwdt_info.rtc_sys_reason) + F(", resetInfo.reason = ") + (resetInfo.reason) + F(", ") + ESP.getResetReason());
+  out.println(String(F("RTC_SYS[0] = ")) + (hwdt_info.rtc_sys_reason) + F(", resetInfo.reason = ") + (resetInfo.reason) + F(", ") + ESP.getResetReason());
   out.println();
   if (hwdt_info.sys) {
-  out.println(String(F("Stack Usages:")));
+    out.println(String(F("Stack Usages:")));
     out.printf_P(PSTR("  ctx: sys  %6u\r\n"), hwdt_info.sys);
     uint32 cont_flags = hwdt_info.cont_integrity;
     out.printf_P(PSTR("  ctx: cont %6u, Integrity Flags: %04X - %s\r\n"), hwdt_info.cont, cont_flags, (cont_flags) ? "fail" : "pass");
@@ -21,7 +21,7 @@ void printHwdtDebugInfo(Print& out) {
 
 
 void printHelpAddOn(Print& out) {
-  out.println(F("  d    - Print some HWDT Debug info.);"));
+  out.println(F("  d    - Print some HWDT Debug info.;"));
 }
 
 

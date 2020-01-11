@@ -9,13 +9,12 @@ void processKey(Print& out, int hotKey) {
       ESP.reset();
       break;
     case 't':
-      out.printf_P(PSTR("Restart, ESP.restart(); (%ld ms) ...\r\n"));
+      out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
       ESP.restart();
       break;
-    case 's':
-      {
+    case 's': {
         uint32_t startTime = millis();
-        out.printf_P(PSTR("Now crashing with Software WDT. This will take about 3 seconds\r\n"));
+        out.printf_P(PSTR("Now crashing with Software WDT. This will take about 3 seconds.\r\n"));
         ets_install_putc1(ets_putc);
         while (true) {
           ets_printf("%9lu\r", (millis() - startTime));
@@ -25,15 +24,15 @@ void processKey(Print& out, int hotKey) {
       }
       break;
     case 'h':
-      out.printf_P(PSTR("Now crashing with Hardware WDT. This will take about 6 seconds\r\n"));
+      out.printf_P(PSTR("Now crashing with Hardware WDT. This will take about 6 seconds.\r\n"));
       // ESP.wdtDisable();
       asm volatile("" ::: "memory");
-      asm volatile ("mov.n a2, %0\n"
-                    "mov.n a3, %1\n"
-                    "mov.n a4, %1\n"
-                    "mov.n a5, %1\n"
-                    "mov.n a6, %1\n"
-                    : : "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa) );
+      asm volatile("mov.n a2, %0\n"
+                   "mov.n a3, %1\n"
+                   "mov.n a4, %1\n"
+                   "mov.n a5, %1\n"
+                   "mov.n a6, %1\n"
+                   : : "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa) );
       // Could not find these in the stack dump, unless interrupts were enabled.
       {
         uint32_t startTime = millis();
