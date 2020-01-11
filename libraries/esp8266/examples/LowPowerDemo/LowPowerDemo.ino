@@ -139,7 +139,7 @@ void loop() {
     // 3rd test - Forced Modem Sleep
     Serial.println(F("\n3rd test - Forced Modem Sleep"));
     WiFi.forceSleepBegin();
-    delay(10);  // it doesn't always go to sleep unless you delay(10)
+    delay(10);  // it doesn't always go to sleep unless you delay(10), yield() may also work
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
@@ -173,13 +173,13 @@ void loop() {
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the button)"));
-    delay(100);  // needs a brief delay after the print or it may print the whole message
+    delay(100);  // needs a delay() after the print or it may not print the whole message
     wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
     gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);
     // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
     wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
     wifi_fpm_open();
-    wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF allowed; any other value and it won't sleep
+    wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF works; any other value and it won't sleep
     delay(10);  // it goes to sleep some time during this delay() and waits for an interrupt
     Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
 
@@ -210,7 +210,7 @@ void loop() {
 
   // 7th test - Deep Sleep for 10 seconds, wake with RFCAL
   if (resetCount < 4) {
-    init_WiFi();  // need to reinitialize WiFi due to Deep Sleep resets
+    init_WiFi();  // need to reinitialize WiFi due to Deep Sleep reset
   }
   if (resetCount == 1) {  // second reset loop since power on
     resetCount = 2;  // advance to the next Deep Sleep test after the reset
@@ -278,12 +278,12 @@ void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until the
       if (blinkLED) {
         digitalWrite(LED, !digitalRead(LED));  // toggle the activity LED
       }
-      yield();
+      yield();  // this would be a good spot for ArduinoOTA.handle();
     }
   } else {  // long delay() for the 2 AUTOMATIC modes, but it misses quick button presses
     while (digitalRead(WAKE_UP_PIN)) {  // wait for a button press
       digitalWrite(LED, !digitalRead(LED));  // toggle the activity LED
-      delay(delayTime);
+      delay(delayTime);  // another good spot for ArduinoOTA.handle();
     }
   }
   delay(50);  // debounce time for the switch, button pressed
@@ -294,7 +294,7 @@ void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until the
 }
 
 void updateRTC() {
-  rtcData.data[3] = resetCount;  // save the loop count for the next reset
+  rtcData.data[3] = resetCount;  // save the reset count for the next test run
   // Update CRC32 of data
   rtcData.crc32 = crc32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
   if (resetCount == 5) {  // wipe the CRC in RTC memory when we're done with all tests
