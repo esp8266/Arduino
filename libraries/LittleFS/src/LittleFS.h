@@ -89,7 +89,7 @@ public:
     DirImplPtr openDir(const char *path) override;
 
     bool exists(const char* path) override {
-	if ( !_mounted || !path || !path[0] ) {
+        if (!_mounted || !path || !path[0]) {
             return false;
         }
         lfs_info info;
@@ -98,7 +98,7 @@ public:
     }
 
     bool rename(const char* pathFrom, const char* pathTo) override {
-	if (!_mounted || !pathFrom || !pathFrom[0] || !pathTo || !pathTo[0]) {
+        if (!_mounted || !pathFrom || !pathFrom[0] || !pathTo || !pathTo[0]) {
             return false;
         }
         int rc = lfs_rename(&_lfs, pathFrom, pathTo);
@@ -419,7 +419,7 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
-	    if (timeCallback && (_flags & LFS_O_WRONLY)) {
+            if (timeCallback && (_flags & LFS_O_WRONLY)) {
                 // If the file opened with O_CREAT, write the creation time attribute
                 if (_creation) {
                     int rc = lfs_setattr(_fs->getFS(), _name.get(), 'c', (const void *)&_creation, sizeof(_creation));
@@ -530,13 +530,9 @@ public:
         int nameLen = 3; // Slashes, terminator
         nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
         nameLen += strlen(_dirent.name);
-        char *tmpName = (char*)malloc(nameLen);
-        if (!tmpName) {
-            return FileImplPtr();
-        }
-	snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
+        char tmpName[nameLen];
+        snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
         auto ret = _fs->open((const char *)tmpName, openMode, accessMode);
-        free(tmpName);
         return ret;
     }
 
@@ -605,16 +601,12 @@ protected:
         int nameLen = 3; // Slashes, terminator
         nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
         nameLen += strlen(_dirent.name);
-        char *tmpName = (char*)malloc(nameLen);
-        if (!tmpName) {
-            return 0;
-        }
+        char tmpName[nameLen];
         snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
         time_t ftime = 0;
         int rc = lfs_getattr(_fs->getFS(), tmpName, attr, (void *)&ftime, sizeof(ftime));
         if (rc != sizeof(ftime))
             ftime = 0; // Error, so clear read value
-        free(tmpName);
         return ftime;
     }
 
