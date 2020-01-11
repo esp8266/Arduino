@@ -29,10 +29,10 @@ void processKey(Print& out, int hotKey) {
       asm volatile("" ::: "memory");
       asm volatile("mov.n a2, %0\n"
                    "mov.n a3, %1\n"
-                   "mov.n a4, %1\n"
-                   "mov.n a5, %1\n"
-                   "mov.n a6, %1\n"
-                   : : "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa), "r" (0xaaaaaaaa) );
+                   "mov.n a4, %2\n"
+                   "mov.n a5, %3\n"
+                   "mov.n a6, %4\n"
+                   : : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa));
       // Could not find these in the stack dump, unless interrupts were enabled.
       {
         uint32_t startTime = millis();
