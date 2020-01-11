@@ -66,7 +66,7 @@ IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
-uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
+uint32_t wifiTimeout = 10E3;  // 10 second timeout on the WiFi connection
 
 // This structure will be stored in RTC memory to remember the reset count (number of Deep Sleeps).
 // First field is CRC32, which is calculated based on the rest of the structure contents.
@@ -139,11 +139,13 @@ void loop() {
     // 3rd test - Forced Modem Sleep
     Serial.println(F("\n3rd test - Forced Modem Sleep"));
     WiFi.forceSleepBegin();
-    delay(10);  // it doesn't always go to sleep unless you delay(10), yield() may also work
+    delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
+    Serial.println(F("Doing a 10 second delay() to show the lowest possible current"));
+	delay(10E3);
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);
+    waitPushbutton(true, longDelay);
 
     // 4th test - Automatic Light Sleep
     Serial.println(F("\n4th test - Automatic Light Sleep"));
