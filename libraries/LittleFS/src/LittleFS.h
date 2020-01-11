@@ -447,7 +447,7 @@ public:
         return ftime;
     }
 
-    time_t getCreation() override {
+    time_t getCreationTime() override {
         time_t ftime = 0;
         if (_opened && _fd) {
             int rc = lfs_getattr(_fs->getFS(), _name.get(), 'c', (void *)&ftime, sizeof(ftime));
@@ -554,7 +554,7 @@ public:
         return (time_t)_getAttr4('t');
     }
 
-    time_t fileCreation() override {
+    time_t fileCreationTime() override {
         return (time_t)_getAttr4('c');
     }
 

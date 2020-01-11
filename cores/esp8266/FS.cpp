@@ -187,11 +187,11 @@ time_t File::getLastWrite() {
     return _p->getLastWrite();
 }
 
-time_t File::getCreation() {
+time_t File::getCreationTime() {
     if (!_p)
         return 0;
 
-    return _p->getCreation();
+    return _p->getCreationTime();
 }
 
 void File::setTimeCallback(time_t (*cb)(void)) {
@@ -231,10 +231,10 @@ time_t Dir::fileTime() {
     return _impl->fileTime();
 }
 
-time_t Dir::fileCreation() {
+time_t Dir::fileCreationTime() {
     if (!_impl)
         return 0;
-    return _impl->fileCreation();
+    return _impl->fileCreationTime();
 }
 
 size_t Dir::fileSize() {

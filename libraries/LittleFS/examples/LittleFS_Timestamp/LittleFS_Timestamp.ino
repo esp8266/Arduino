@@ -53,7 +53,7 @@ void listDir(const char * dirname) {
     Serial.print(root.fileName());
     Serial.print("  SIZE: ");
     Serial.print(file.size());
-    time_t cr = file.getCreation();
+    time_t cr = file.getCreationTime();
     time_t lw = file.getLastWrite();
     file.close();
     struct tm * tmstruct = localtime(&cr);

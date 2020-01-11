@@ -52,7 +52,7 @@ public:
     // time present in the filesystem metadata (often the last time the file was closed)
     virtual time_t getLastWrite() { return 0; } // Default is to not support timestamps
     // Same for creation time.
-    virtual time_t getCreation() { return 0; } // Default is to not support timestamps
+    virtual time_t getCreationTime() { return 0; } // Default is to not support timestamps
 
 protected:
     time_t (*timeCallback)(void) = nullptr;
@@ -81,7 +81,7 @@ public:
     // as the FS is allowed to return either the time of the last write() operation or the
     // time present in the filesystem metadata (often the last time the file was closed)
     virtual time_t fileTime() { return 0; } // By default, FS doesn't report file times
-    virtual time_t fileCreation() { return 0; } // By default, FS doesn't report file times
+    virtual time_t fileCreationTime() { return 0; } // By default, FS doesn't report file times
     virtual bool isFile() const = 0;
     virtual bool isDirectory() const = 0;
     virtual bool next() = 0;

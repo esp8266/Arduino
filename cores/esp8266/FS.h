@@ -112,7 +112,7 @@ public:
     String readString() override;
 
     time_t getLastWrite();
-    time_t getCreation();
+    time_t getCreationTime();
     void setTimeCallback(time_t (*cb)(void));
 
 protected:
@@ -132,7 +132,7 @@ public:
     String fileName();
     size_t fileSize();
     time_t fileTime();
-    time_t fileCreation();
+    time_t fileCreationTime();
     bool isFile() const;
     bool isDirectory() const;
 

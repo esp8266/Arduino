@@ -363,7 +363,7 @@ public:
         return ftime;
     }
 
-    time_t getCreation() override {
+    time_t getCreationTime() override {
         time_t ftime = 0;
         if (_opened && _fd) {
             sdfat::dir_t tmp;
@@ -438,7 +438,7 @@ public:
         return _time;
     }
 
-    time_t fileCreation() override
+    time_t fileCreationTime() override
     {
         if (!_valid) {
             return 0;
