@@ -5,28 +5,28 @@ There is a lot of confusion, out-of-date information, and poor or non-working ex
 The two relevant reference manuals from Espressif are the [Low-Power Solutions](https://www.espressif.com/sites/default/files/documentation/9b-esp8266-low_power_solutions__en.pdf) and the [Non-OS SDK API Reference](https://www.espressif.com/sites/default/files/documentation/2c-esp8266_non_os_sdk_api_reference_en.pdf).  There is more information in the two PDFs than is presented here, so you'll want both of them for your reference.
 
 
-The table below is an expanded version of Table 1.1 from the Low-Power Solutions PDF.  The currents listed are absolute minimums, and most people will not get that low with typical hardware and programs.
+The table below is an expanded version of Table 1.1 from the Low-Power Solutions PDF.  The amperages listed are absolute minimums, and most people will not get that low with typical hardware and programs.
 
 |          item         | Automatic Modem Sleep | Forced Modem Sleep | Automatic Light Sleep | Forced Light Sleep |  Forced Deep Sleep |
 |:---------------------:|:---------------------:|:------------------:|:---------------------:|:------------------:|:------------------:|
 |   WiFi connectivity   |       Connected       |    Disconnected    |       Connected       |    Disconnected    |    Disconnected    |
-|       GPIO state      |       Unchanged       |      Unchanged     |       Unchanged       |      Unchanged     | Low current (2 uA) |
+|       GPIO state      |       Unchanged       |      Unchanged     |       Unchanged       |      Unchanged     | Low amperage (2 uA) |
 |          WiFi         |           ON          |         OFF        |           ON          |         OFF        |         OFF        |
 |      System Clock     |           ON          |         ON         |        CYCLING        |         OFF        |         OFF        |
 |          RTC          |           ON          |         ON         |           ON          |         ON         |         ON (1)     |
 |          CPU          |           ON          |         ON         |           ON          |         ON         |         OFF        |
-|   Substrate Current   |         15 mA         |        15 mA       |        2-15 mA (2)    |       0.4 mA       |        20 uA       |
-|  Avg Current DTIM = 1 |        16.2 mA        |                    |        (1.8 mA)       |                    |                    |
-|  Avg Current DTIM = 3 |        15.4 mA        |                    |        (0.9 mA)       |                    |                    |
-| Avg Current DTIM = 10 |        15.2 mA        |                    |       (0.55 mA)       |                    |                    |
+|   Substrate Amperage   |         15 mA         |        15 mA       |        2-15 mA (2)    |       0.4 mA       |        20 uA       |
+|  Avg Amperage DTIM = 1 |        16.2 mA        |                    |        (1.8 mA)       |                    |                    |
+|  Avg Amperage DTIM = 3 |        15.4 mA        |                    |        (0.9 mA)       |                    |                    |
+| Avg Amperage DTIM = 10 |        15.2 mA        |                    |       (0.55 mA)       |                    |                    |
 
 Notes: 
 
 (1) setting a sleep time of 0 for Deep Sleep turns off or disconnects the RTC, requiring an external RESET to wake it
 
-(2) due to a bug in SDK 2, the minimum current will never be less than ~ 2 mA and is frequently 15 mA between DTIM beacons
+(2) due to a bug in SDK 2, the minimum amperage will never be less than ~ 2 mA and is frequently 15 mA between DTIM beacons
 
-The Average Current with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the currents listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more current.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional current.
+The Average Amperage with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the amperages listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more amperage.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional amperage.
 
 ---
 
@@ -46,23 +46,23 @@ The Average Current with different DTIM settings is unverified, and will likely 
 
 ### Test 1 - Unconfigured modem
 
-This is typical for programs that don't use WiFi, and is a high current continuous drain of at least 67 mA.  This isn't a test as much as setting a baseline or reference point for comparing the power savings.  You can stop during any test while the CPU is halted or the LED is blinking to measure the current.
+This is typical for programs that don't use WiFi, and is a high continuous drain of at least 67 mA.  This isn't a test as much as setting a baseline or reference point for comparing the power savings.  You can stop during any test while the CPU is halted or the LED is blinking to measure the amperage.
 
 ### Test 2 - Automatic Modem Sleep
 
-This is the default power saving mode when you have an active WiFi connection.  You don't need to add anything to your code to get this mode.  The only time the modem sleeps is when your program spends time in delay() frequently.  Any delay() time works as long as it happens frequently.  The LED blinks more slowly during this test as it's doing **delay(350)** to get the modem to sleep.  While in delay() your sketch isn't doing anything worthwhile.  Average current during Automatic Modem Sleep is 15 mA minimum.  Without a delay() the average current is > 67 mA with brief spikes > 250-350 mA as transmissions occur.  When the WiFi has traffic (even a couple of pings), the modem can turn on for over 2 seconds continuous at 67 mA, and it may stay on for a second after the traffic.  In a high traffic environment you won't get any power savings with either of the 2 Automatic modes.  Automatic Modem Sleep turns on 7-8 seconds after an active connection is established.
+This is the default power saving mode when you have an active WiFi connection.  You don't need to add anything to your code to get this mode.  The only time the modem sleeps is when your program spends time in delay() frequently.  Any delay() time works as long as it happens frequently.  The LED blinks more slowly during this test as it's doing **delay(350)** to get the modem to sleep.  While in delay() your sketch isn't doing anything worthwhile.  Amperage during Automatic Modem Sleep is 15 mA minimum.  Without a delay() the amperage is > 67 mA with brief spikes > 250-350 mA as transmissions occur.  When the WiFi has traffic (even a couple of pings), the modem can turn on for over 2 seconds continuous at 67 mA, and it may stay on for a second after the traffic.  In a high traffic environment you won't get any power savings with either of the 2 Automatic modes.  Automatic Modem Sleep turns on 7-8 seconds after an active connection is established.
 
 ### Test 3 - Forced Modem Sleep
 
-Turns off the modem (losing the connection), and reducing the current by > 50 mA.  This test uses the WiFi library function.  It's good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 to 20 mA.  The longer you spend in delay(), the closer the current approaches 15 mA.  The test loops on delay(350) until you press the button.  The CPU will be drawing 15 to 16 mA during the looped delay(), and 19-20 mA without a delay().
+Turns off the modem (losing the connection), reducing the amperage by > 50 mA.  This test uses the WiFi library function.  It's good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 to 20 mA.  The longer you spend in delay(), the closer the amperage approaches 15 mA.  The test loops on delay(350) until you press the button.  The CPU will be drawing 15 to 16 mA during the looped delay(), and 19-20 mA without a delay().
 
 ### Test 4 - Automatic Light Sleep
 
-Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the average current can drop to ~ 2 mA average.  In a network with sparse traffic you might get something near 2-5 mA average current.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go into Automatic Light Sleep.
+Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the amperage can drop to ~ 3 mA average.  In a network with sparse traffic you might get something near 2-5 mA amperage.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go into Automatic Light Sleep.
 
 ### Test 5 - Forced Light Sleep
 
-Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA current until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 5.1 mS, but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.
+Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 5.1 mS, but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.
 
 ### Test 6 - Deep Sleep, wake with RF_DEFAULT
 
@@ -74,11 +74,11 @@ Identical to the test above, but the modem does an RF power calibration when boo
 
 ### Test 8 - Deep Sleep Instant, wake with NO_RFCAL
 
-This variation doesn't do an automatic RF calibration on return, so power requirements will be slightly less.  Additionally, *most* of the time it immediately goes into Deep Sleep without turning off the modem (that's the INSTANT part).  There's another bug in SDK 2, and the SDK functions the WiFi-class calls occasionally do a modem shut-down before Deep Sleep; it's not always Instant.  When it doesn't do the modem shut-down it saves an extra 270 mS of power.  With the modem turned off (Forced Modem Sleep) you **always** get an instant Deep Sleep; doing WiFi.mode(WIFI_OFF) doesn't help, as the SDK still spends 270 mS of time shutting the modem down before going into Deep Sleep.
+This variation doesn't do an RF calibration on return, so power requirements will be slightly less.  Additionally, *most* of the time it immediately goes into Deep Sleep without turning off the modem (that's the INSTANT part).  There's another bug in SDK 2, and the SDK functions the WiFi-class calls occasionally do a modem shut-down before Deep Sleep; it's not always Instant.  When it doesn't do the modem shut-down it saves an extra 270 mS of power.  With the modem turned off (Forced Modem Sleep) you **always** get an instant Deep Sleep; doing WiFi.mode(WIFI_OFF) doesn't help, as the SDK still spends 270 mS of time shutting the modem down before going into Deep Sleep.
 
 ### Test 9 - Deep Sleep Instant, wake with RF_DISABLED
 
-This last variation also uses Deep Sleep Instant, but it wakes up with the modem disabled so current after Deep Sleep is only 15 mA.  Each of the 4 WAKE modes has their own use, depending on what you need.
+This last variation also uses Deep Sleep Instant, but it wakes up with the modem disabled so amperage after Deep Sleep is only 15 mA.  Each of the 4 WAKE modes has their own use, depending on what you need.
 
 ---
 
@@ -97,13 +97,13 @@ If all you want to do is reduce power for a sketch that doesn't need WiFi, add t
 ```c
   wifi_station_disconnect();   // disconnects Wi-Fi Station from AP
   delay(10);  // without at least delay(8) you might get soft WDT resets after this
-  wifi_set_opmode_current(NULL_MODE);  // set Wi-Fi working mode to unconfigured, don't save to flash
+  wifi_set_opmode_amperage(NULL_MODE);  // set Wi-Fi working mode to unconfigured, don't save to flash
   wifi_fpm_set_sleep_type(MODEM_SLEEP_T);  // set the sleep type to modem sleep
   wifi_fpm_open();  // enable Forced Modem Sleep
   wifi_fpm_do_sleep(0xFFFFFFF);  // force CPU to enter sleep mode
   delay(10);  // without a delay() here it doesn't reliably enter sleep
 ```
-This code allows you to shut down the modem *without* loading the WiFi library, dropping your average current by 50 mA, or ~ 1/4th of the initial power.  You have to add it as shown, preferably in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
+This code allows you to shut down the modem *without* loading the WiFi library, dropping your amperage by 50 mA, or ~ 1/4th of the initial power.  You have to add it as shown, preferably in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
 
-You can also use the Deep Sleep modes without loading the WiFi library, as Deep Sleep use ESP API functions.  The Deep Sleep tests above turn the WiFi on to show you the differences after the 4 reset modes.
+You can also use the Deep Sleep modes without loading the WiFi library, as Deep Sleep use ESP API functions.  The Deep Sleep tests above turn the WiFi on to show you the differences after the 4 reset modes. but WiFi is not required for Deep Sleep.
 

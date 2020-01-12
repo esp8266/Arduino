@@ -2,10 +2,10 @@
 
    The initial setup was a WeMos D1 Mini with 3.3V connected to the 3V3 pin through a meter
    so that it bypassed the on-board voltage regulator and USB chip.  There's still about
-   0.3 mA worth of leakage current due to the unpowered chips.  These tests should work with
+   0.3 mA worth of leakage amperage due to the unpowered chips.  These tests should work with
    any module, although on-board components will affect the actual current measurement.
-   While the modem is turned on the current is > 67 mA or jumping around with a minimum value.
-   To verify the 20 uA Deep Sleep current the voltage regulator and USB chip were removed.
+   While the modem is turned on the amperage is > 67 mA or jumping around with a minimum value.
+   To verify the 20 uA Deep Sleep amperage the voltage regulator and USB chip were removed.
 
    This test series requires an active WiFi connection to illustrate two tests.  If you
    have problems with WiFi, uncomment the #ifdef DEBUG for additional WiFi error messages.
@@ -13,7 +13,7 @@
    You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.  If you forget to
    connect D0 to RST it will hang after the first Deep Sleep test.  Additionally, you can
    connect an LED from any free pin through a 1K ohm resistor to the 3.3V supply, though
-   preferably not the 3V3 pin on the module or it adds to the measured current.  When the
+   preferably not the 3V3 pin on the module or it adds to the measured amperage.  When the
    LED blinks you can proceed to the next test.  When the LED is lit continuously it's
    connecting WiFi, and when it's off the CPU is asleep.  The LED blinks slowly when the
    tests are complete.  Test progress is also shown on the serial monitor.
@@ -51,9 +51,9 @@
 // you can use any pin for WAKE_UP_PIN except for D0/GPIO16 as it doesn't support interrupts
 
 // uncomment one of the two lines below for your LED connection, if used
-#define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add to the current
+#define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add to the amperage
 //#define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
-// you can use LED_BUILTIN, but it adds to the measured current by 0.3mA to 6mA.
+// you can use LED_BUILTIN, but it adds to the measured amperage by 0.3mA to 6mA.
 
 ADC_MODE(ADC_VCC);  // allows you to monitor the internal VCC level; it varies with WiFi load
 // don't connect anything to the analog input pin(s)!
@@ -127,7 +127,7 @@ void loop() {
     Serial.println(F("connecting WiFi, please wait until the LED blinks"));
     init_WiFi();
     if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
-      Serial.println(F("The current will drop in 7 seconds."));
+      Serial.println(F("The amperage will drop in 7 seconds."));
       volts = ESP.getVcc();
       Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
       Serial.println(F("press the button to continue"));
@@ -203,7 +203,7 @@ void loop() {
     delay(10);
     // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is off)
     // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
-    // the 2 uA GPIO current during Deep Sleep can't drive the LED so it's not lit now, although
+    // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
     // depending on the LED used, you might see it very dimly lit in a dark room during this test
     Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
   }
