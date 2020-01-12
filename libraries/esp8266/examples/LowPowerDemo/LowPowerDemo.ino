@@ -4,11 +4,11 @@
    so that it bypassed the on-board voltage regulator and USB chip.  There's still about
    0.3 mA worth of leakage amperage due to the unpowered chips.  These tests should work with
    any module, although on-board components will affect the actual current measurement.
-   While the modem is turned on the amperage is > 67 mA or jumping around with a minimum value.
+   While the modem is turned on the amperage is > 67 mA or changing with a minimum value.
    To verify the 20 uA Deep Sleep amperage the voltage regulator and USB chip were removed.
 
    This test series requires an active WiFi connection to illustrate two tests.  If you
-   have problems with WiFi, uncomment the #ifdef DEBUG for additional WiFi error messages.
+   have problems with WiFi, uncomment the #define DEBUG for additional WiFi error messages.
    The test requires a pushbutton switch connected between D3 and GND to advance the tests.
    You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.  If you forget to
    connect D0 to RST it will hang after the first Deep Sleep test.  Additionally, you can
@@ -16,7 +16,7 @@
    preferably not the 3V3 pin on the module or it adds to the measured amperage.  When the
    LED blinks you can proceed to the next test.  When the LED is lit continuously it's
    connecting WiFi, and when it's off the CPU is asleep.  The LED blinks slowly when the
-   tests are complete.  Test progress is also shown on the serial monitor.
+   tests are complete.  Test progress can also be shown on the serial monitor.
 
    WiFi connections will be made over twice as fast if you can use a static IP address.
 
