@@ -111,7 +111,7 @@ void setup() {
       resetCount = rtcData.data[3];  // read the previous reset count
     }
   }
-}  // end of Setup()
+}  // end of setup()
 
 void loop() {
   if (resetCount == 0) {
@@ -140,8 +140,6 @@ void loop() {
     Serial.println(F("\n3rd test - Forced Modem Sleep"));
     WiFi.forceSleepBegin();
     delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
-    Serial.println(F("Doing a 10 second delay() to show the lowest possible current"));
-	delay(10E3);
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));

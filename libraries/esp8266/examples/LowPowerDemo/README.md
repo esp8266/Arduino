@@ -46,19 +46,19 @@ The Average Current with different DTIM settings is unverified, and will likely 
 
 ### Test 1 - Unconfigured modem
 
-This is typical for programs that don't use WiFi, and is a high current drain of at least 67 mA continuous.  This isn't a test as much as it sets a baseline or reference point for comparing the power savings.  You can stop any time the CPU is halted or the LED is blinking during the tests to measure the current.
+This is typical for programs that don't use WiFi, and is a high current continuous drain of at least 67 mA.  This isn't a test as much as setting a baseline or reference point for comparing the power savings.  You can stop during any test while the CPU is halted or the LED is blinking to measure the current.
 
 ### Test 2 - Automatic Modem Sleep
 
-This is the default power saving mode when you have an active WiFi connection.  You don't need to add anything to your code to get it.  The only time the modem sleeps is when your program spends time in delay() frequently.  Any delay() time works as long as it happens frequently.  The LED blinks more slowly during this test as it's doing **delay(350)** to get the modem to sleep.  While in delay() your sketch isn't doing anything worthwhile.  Average current during Automatic Modem Sleep is 15 mA minimum.  Without a delay() the average current is 67 mA with short spikes above 250 mA as transmissions occur.  When the WiFi has traffic (even a couple of pings), the modem can turn on for over 2 seconds continuous at 67 mA, and it may stay on for a second after the traffic.  In a high traffic environment you won't get any power savings with either of the 2 Automatic modes.  Automatic Modem Sleep turns on 7-8 seconds after an active connection is established.
+This is the default power saving mode when you have an active WiFi connection.  You don't need to add anything to your code to get this mode.  The only time the modem sleeps is when your program spends time in delay() frequently.  Any delay() time works as long as it happens frequently.  The LED blinks more slowly during this test as it's doing **delay(350)** to get the modem to sleep.  While in delay() your sketch isn't doing anything worthwhile.  Average current during Automatic Modem Sleep is 15 mA minimum.  Without a delay() the average current > 67 mA with short spikes > 250-350 mA as transmissions occur.  When the WiFi has traffic (even a couple of pings), the modem can turn on for over 2 seconds continuous at 67 mA, and it may stay on for a second after the traffic.  In a high traffic environment you won't get any power savings with either of the 2 Automatic modes.  Automatic Modem Sleep turns on 7-8 seconds after an active connection is established.
 
 ### Test 3 - Forced Modem Sleep
 
-Turns off the modem (losing the connection), and reducing the current by > 47 mA.  This test uses the WiFi library function.  It's good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 to 20 mA.  The longer you spend in delay(), the closer the current approaches 15 mA.  The test loops on delay(350) until you press the button.  The CPU will be drawing 15 to 16 mA during the looped delay().
+Turns off the modem (losing the connection), and reducing the current by 50 mA.  This test uses the WiFi library function.  It's good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 to 20 mA.  The longer you spend in delay(), the closer the current approaches 15 mA.  The test loops on delay(350) until you press the button.  The CPU will be drawing 15 to 16 mA during the looped delay().
 
 ### Test 4 - Automatic Light Sleep
 
-Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the average current can drop to ~ 2 mA.  In a network with sparse traffic you might get something near 2-5 mA average current.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go into Automatic Light Sleep.
+Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the average current can drop to ~ 2 mA average.  In a network with sparse traffic you might get something near 2-5 mA average current.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go into Automatic Light Sleep.
 
 ### Test 5 - Forced Light Sleep
 
@@ -74,7 +74,7 @@ Identical to the test above, but the modem does an RF power calibration when boo
 
 ### Test 8 - Deep Sleep Instant, wake with NO_RFCAL
 
-This variation doesn't do an automatic RF calibration on return, so power requirements will be slightly less.  Additionally, *most* of the time it immediately goes into Deep Sleep without turning off the modem (that's the INSTANT part).  There's another bug in SDK 2, and the SDK functions the WiFi-class calls occasionally do a modem shut-down before Deep Sleep; it's not always Instant.  When it doesn't do the modem shut-down it saves an extra 270 mS of power.
+This variation doesn't do an automatic RF calibration on return, so power requirements will be slightly less.  Additionally, *most* of the time it immediately goes into Deep Sleep without turning off the modem (that's the INSTANT part).  There's another bug in SDK 2, and the SDK functions the WiFi-class calls occasionally do a modem shut-down before Deep Sleep; it's not always Instant.  When it doesn't do the modem shut-down it saves an extra 270 mS of power.  With the modem turned off (Forced Modem Sleep) you **always** get an instant Deep Sleep; doing WiFi.mode(WIFI_OFF) doesn't help, as the SDK still spends 270 mS of time shutting the modem down before going into Deep Sleep.
 
 ### Test 9 - Deep Sleep Instant, wake with RF_DISABLED
 
@@ -86,7 +86,7 @@ All of the Deep Sleep modes end with a RESET, so you must re-initialize everythi
 
 The maximum Deep Sleep interval is 71.58 minutes (2^32 -1 microseconds), although the actual interval may be slightly less than that.
 
-If you need a longer sleep time than 72 minutes, you can pass zero as the time variable to Deep Sleep and it turns off the RTC.  The only way to wake it at that point is an external RESET; D0 can't do it.  Both Forced Light Sleep and Deep Sleep(0) are woken by an external signal, so short delays are more efficient with Forced Light Sleep, and longer delays are more energy efficient with Deep Sleep.
+If you need a longer sleep time than 72 minutes, you can pass zero as the time variable to Deep Sleep and it turns off or disconnects the RTC.  The only way to wake it at that point is an external RESET; D0 can't do it.  Both Forced Light Sleep and Deep Sleep(0) are woken by an external signal, so short delays are more efficient with Forced Light Sleep, and longer delays are more energy efficient with Deep Sleep.
 
 
 ---
@@ -103,7 +103,7 @@ If all you want to do is reduce power for a sketch that doesn't need WiFi, add t
   wifi_fpm_do_sleep(0xFFFFFFF);  // force CPU to enter sleep mode
   delay(10);  // without a delay() here it doesn't reliably enter sleep
 ```
-This code allows you to shut down the modem *without* loading the WiFi library, dropping your average current by > 47 mA, or ~ 1/3rd of the initial power.  You have to add it as shown, preferably in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
+This code allows you to shut down the modem *without* loading the WiFi library, dropping your average current by 50 mA, or ~ 1/4th of the initial power.  You have to add it as shown, preferably in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
 
-You can also use the Deep Sleep modes without loading the WiFi library, as they use ESP API functions.  The Deep Sleep tests above bring the WiFi up to show you the differences after the 4 reset modes.  With the modem turned off (Forced Modem Sleep) you **always** get an instant Deep Sleep; doing WiFi.mode(WIFI_OFF) doesn't help, as the SDK still spends 270 mS of time shutting the modem down before going into Deep Sleep.
+You can also use the Deep Sleep modes without loading the WiFi library, as Deep Sleep use ESP API functions.  The Deep Sleep tests above turn the WiFi on to show you the differences after the 4 reset modes.
 
