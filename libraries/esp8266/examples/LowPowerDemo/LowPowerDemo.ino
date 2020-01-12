@@ -89,7 +89,7 @@ void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback fu
 }
 
 void setup() {
-  pinMode(LED, OUTPUT);  // Activity and Status indicator
+  pinMode(LED, OUTPUT);  // activity and status indicator
   digitalWrite(LED, LOW);  // turn on the LED
   pinMode(WAKE_UP_PIN, INPUT_PULLUP);  // polled to advance tests, interrupt for Forced Light Sleep
   Serial.begin(115200);
@@ -106,7 +106,7 @@ void setup() {
   if (ESP.rtcUserMemoryRead(64, (uint32_t*) &rtcData, sizeof(rtcData))) {
     uint32_t crcOfData = crc32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
     if (crcOfData != rtcData.crc32) {  // if the CRC is invalid
-      resetCount = 0;  // set first test loop since power on or external reset
+      resetCount = 0;  // set first test run since power on or external reset
     } else {
       resetCount = rtcData.data[3];  // read the previous reset count
     }
@@ -114,7 +114,7 @@ void setup() {
 }  // end of setup()
 
 void loop() {
-  if (resetCount == 0) {
+  if (resetCount == 0) {  // first reset, else skip down to the next Deep Sleep test
     // 1st test - running with WiFi unconfigured, reads ~67 mA minimum
     Serial.println(F("\n1st test - running with WiFi unconfigured"));
     float volts = ESP.getVcc();
@@ -140,6 +140,7 @@ void loop() {
     Serial.println(F("\n3rd test - Forced Modem Sleep"));
     WiFi.forceSleepBegin();
     delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
+    // WiFi.mode(WIFI_SHUTDOWN);  // alternate method of Forced Modem Sleep
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
@@ -173,7 +174,7 @@ void loop() {
     volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the button)"));
-    delay(100);  // needs a delay() after the print or it may not print the whole message
+    Serial.flush();  // needs a delay(100) or Serial.flush() else it doesn't print the whole message
     wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
     gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);
     // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
@@ -198,7 +199,7 @@ void loop() {
     waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     digitalWrite(LED, LOW);  // turn the LED on, at least briefly
     Serial.println(F("going into Deep Sleep now..."));
-    delay(10);  // sometimes the \n isn't printed without a short delay
+    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
     ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
     delay(10);
     // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is off)
@@ -212,7 +213,7 @@ void loop() {
   if (resetCount < 4) {
     init_WiFi();  // need to reinitialize WiFi due to Deep Sleep reset
   }
-  if (resetCount == 1) {  // second reset loop since power on
+  if (resetCount == 1) {  // second reset since power on
     resetCount = 2;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, reset and wake with RFCAL"));
@@ -221,14 +222,14 @@ void loop() {
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     Serial.println(F("going into Deep Sleep now..."));
-    delay(10);  // sometimes the \n isn't printed without a short delay
+    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
     ESP.deepSleep(10E6, WAKE_RFCAL); // good night!  D0 fires a reset in 10 seconds...
     delay(10);
     Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
   }
 
   // 8th test - Deep Sleep Instant for 10 seconds, wake with NO_RFCAL
-  if (resetCount == 2) {  // third reset loop since power on
+  if (resetCount == 2) {  // third reset since power on
     resetCount = 3;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with NO_RFCAL"));
@@ -237,14 +238,14 @@ void loop() {
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     Serial.println(F("going into Deep Sleep now..."));
-    delay(10);  // sometimes the \n isn't printed without a short delay
+    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
     ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL); // good night!  D0 fires a reset in 10 seconds...
     delay(10);
     Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
   }
 
   // 9th test - Deep Sleep Instant for 10 seconds, wake with RF_DISABLED
-  if (resetCount == 3) {  // fourth reset loop since power on
+  if (resetCount == 3) {  // fourth reset since power on
     resetCount = 4;  // advance to the next Deep Sleep test after the reset
     updateRTC();  // save the current test state in RTC memory
     Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with RF_DISABLED"));
@@ -253,7 +254,7 @@ void loop() {
     Serial.println(F("press the button to continue"));
     waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     Serial.println(F("going into Deep Sleep now..."));
-    delay(10);  // sometimes the \n isn't printed without a short delay
+    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
     ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED); // good night!  D0 fires a reset in 10 seconds...
     delay(10);
     Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
@@ -278,12 +279,12 @@ void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until the
       if (blinkLED) {
         digitalWrite(LED, !digitalRead(LED));  // toggle the activity LED
       }
-      yield();  // this would be a good spot for ArduinoOTA.handle();
+      yield();  // this would be a good place for ArduinoOTA.handle();
     }
   } else {  // long delay() for the 2 AUTOMATIC modes, but it misses quick button presses
     while (digitalRead(WAKE_UP_PIN)) {  // wait for a button press
       digitalWrite(LED, !digitalRead(LED));  // toggle the activity LED
-      delay(delayTime);  // another good spot for ArduinoOTA.handle();
+      delay(delayTime);  // another good place for ArduinoOTA.handle();
     }
   }
   delay(50);  // debounce time for the switch, button pressed
