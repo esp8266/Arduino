@@ -26,7 +26,7 @@ Notes:
 
 (2) due to a bug in SDK 2, the minimum amperage will never be less than ~ 2 mA and is frequently 15 mA between DTIM beacons
 
-The Average Amperage with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the amperages listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more amperage.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional amperage.
+The Average Amperage with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the amperages listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more power.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional amperage.
 
 ---
 
@@ -97,7 +97,7 @@ If all you want to do is reduce power for a sketch that doesn't need WiFi, add t
 ```c
   wifi_station_disconnect();   // disconnects Wi-Fi Station from AP
   delay(10);  // without at least delay(8) you might get soft WDT resets after this
-  wifi_set_opmode_amperage(NULL_MODE);  // set Wi-Fi working mode to unconfigured, don't save to flash
+  wifi_set_opmode_current(NULL_MODE);  // set Wi-Fi working mode to unconfigured, don't save to flash
   wifi_fpm_set_sleep_type(MODEM_SLEEP_T);  // set the sleep type to modem sleep
   wifi_fpm_open();  // enable Forced Modem Sleep
   wifi_fpm_do_sleep(0xFFFFFFF);  // force CPU to enter sleep mode
