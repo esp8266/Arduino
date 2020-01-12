@@ -26,7 +26,7 @@ Notes:
 
 (2) due to a bug in SDK 2, the minimum current will never be less than ~ 2 mA and is frequently 15 mA between DTIM beacons
 
-The Average Current with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the currents listed in this README are for the ESP8266 chip only.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional current.
+The Average Current with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the currents listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more current.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional current.
 
 ---
 
@@ -66,7 +66,7 @@ Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA current
 
 ### Test 6 - Deep Sleep, wake with RF_DEFAULT
 
-In Deep Sleep almost everything is turned off, and the chip draws ~ 20 uA.  If you have D0/GPIO16 connected to RST, you can use the RTC timer to wake the chip up at a timed interval.  You can also wake it with an external RESET.  Waking with RF_DEFAULT means it will do an RFCAL if it needs to.  Doing **ESP.deepSleep(time)** without the mode variable uses this wake mode.  These first two Deep Sleep tests use the standard Deep Sleep function, so the WiFi connection is closed and the modem turned off, which takes about 270 mS before the Deep Sleep begins.  Deep Sleep ends with a RESET, and the boot time after that is ~ 120 mS.  Any Deep Sleep less than ~ 2 seconds is wasting energy due to the modem shut-off and boot times, and Forced Light Sleep will be a better choice as it recovers in 5.1 mS from the previous state.
+In Deep Sleep almost everything is turned off, and the chip draws ~ 20 uA.  If you have D0/GPIO16 connected to RST, you can use the RTC timer to wake the chip up at a timed interval.  You can also wake it with an external RESET.  Waking with RF_DEFAULT means it will do an RFCAL if it needs to.  Doing **ESP.deepSleep(time)** without the mode variable uses this wake mode.  These first two Deep Sleep tests use the standard Deep Sleep function, so the WiFi connection is closed and the modem turned off, which takes about 270 mS before the Deep Sleep begins.  Deep Sleep ends with a RESET, and the boot time after that is ~ 120 mS.  Any Deep Sleep less than ~ 2 seconds is wasting energy due to the modem shut-off and boot times, and Forced Light Sleep will be a better choice as it recovers in 5.1 mS from the previous state.  The Deep Sleep tests will not go into Automatic Modem Sleep because delay() is not used.
 
 ### Test 7 - Deep Sleep, wake with RFCAL
 

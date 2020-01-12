@@ -66,7 +66,7 @@ IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
-uint32_t wifiTimeout = 10E3;  // 10 second timeout on the WiFi connection
+uint32_t wifiTimeout = 25E3;  // 25 second timeout on the WiFi connection
 
 // This structure will be stored in RTC memory to remember the reset count (number of Deep Sleeps).
 // First field is CRC32, which is calculated based on the rest of the structure contents.
@@ -91,13 +91,13 @@ void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback fu
 void setup() {
   pinMode(LED, OUTPUT);  // Activity and Status indicator
   digitalWrite(LED, LOW);  // turn on the LED
-  pinMode(WAKE_UP_PIN, INPUT_PULLUP);  // polled to advance tests, INTR for Forced Light Sleep
+  pinMode(WAKE_UP_PIN, INPUT_PULLUP);  // polled to advance tests, interrupt for Forced Light Sleep
   Serial.begin(115200);
   Serial.print(F("\nReset reason = "));
   String resetCause = ESP.getResetReason();
   Serial.println(resetCause);
-  if (resetCause == "External System") {
-    Serial.println(F("I'm awake and starting the low power tests"));
+  if ((resetCause == "External System") || (resetCause == "Power on")) {
+    Serial.println(F("I'm awake and starting the Low Power tests"));
     resetCount = 5;
     updateRTC();  // if external reset, wipe the RTC memory and start all over
   }
@@ -195,7 +195,7 @@ void loop() {
       delay(10);
     }
     delay(50);  // debounce time for the switch, button released
-    waitPushbutton(false, blinkDelay);
+    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     digitalWrite(LED, LOW);  // turn the LED on, at least briefly
     Serial.println(F("going into Deep Sleep now..."));
     delay(10);  // sometimes the \n isn't printed without a short delay
@@ -219,7 +219,7 @@ void loop() {
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);
+    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     Serial.println(F("going into Deep Sleep now..."));
     delay(10);  // sometimes the \n isn't printed without a short delay
     ESP.deepSleep(10E6, WAKE_RFCAL); // good night!  D0 fires a reset in 10 seconds...
@@ -235,7 +235,7 @@ void loop() {
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);
+    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     Serial.println(F("going into Deep Sleep now..."));
     delay(10);  // sometimes the \n isn't printed without a short delay
     ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL); // good night!  D0 fires a reset in 10 seconds...
@@ -251,7 +251,7 @@ void loop() {
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);
+    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
     Serial.println(F("going into Deep Sleep now..."));
     delay(10);  // sometimes the \n isn't printed without a short delay
     ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED); // good night!  D0 fires a reset in 10 seconds...
