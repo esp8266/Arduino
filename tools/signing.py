@@ -22,7 +22,7 @@ def sign_and_write(data, priv_key, out_file):
     """Save the signed firmware to out_file (file path)."""
 
     signcmd = [ 'openssl', 'dgst', '-sha256', '-sign', priv_key ]
-    proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     signout, signerr = proc.communicate(input=data)
     if proc.returncode:
         sys.stderr.write("OpenSSL returned an error signing the binary: " + str(proc.returncode) + "\nSTDERR: " + str(signerr))
