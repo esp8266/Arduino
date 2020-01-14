@@ -1,4 +1,4 @@
-#ifdef DEBUG_HWDT
+#ifdef HWDT_STACK_DUMP_H
 
 extern struct rst_info resetInfo;
 

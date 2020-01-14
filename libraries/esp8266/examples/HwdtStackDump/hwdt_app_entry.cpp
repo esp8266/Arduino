@@ -150,27 +150,12 @@
 /*
  * HWDT_INFO
  *
- * Gather some useful information on ROM and bootloader combined, sys, and cont
- * stack usage. If you are missing the include file for this structure, you can
- * copy-paste from an embeded version of the .h below.
+ * Gather some interesting information on ROM and bootloader combined, sys, and
+ * cont stack usage. If you are missing the include file for this structure, you
+ * can copy-paste from an embeded version of the .h below.
  *
  */
  #define HWDT_INFO
-
-
-/*
- * HWDT_OPTION_THE_OPTIMIST
- *
- * The optimist's choice. It can be used to reduce the IRAM footprint. It
- * assumes the strings in memory before the crash are still valid and can be
- * used for printing the report.
- *
- * EDIT: It appears I am mistaken. String constants appear to be loaded
- * at boot time and are available from the start before crt0 runs. I'll wait
- * for a reviewer confirmation before making this option a permanent selection.
- *
- */
- #define HWDT_OPTION_THE_OPTIMIST
 
 
 /*
@@ -182,6 +167,7 @@
  #define ROM_STACK_DUMP
  */
 
+
 /*
  * HWDT_IF_METHOD_RESET_REASON
  *
@@ -190,6 +176,10 @@
  *
  * Checks are being performed when DEBUG_HWDT_DEBUG_RESET_REASON has been
  * defined.
+ *
+ * EDIT: I should settle on one or the other; however, new issues continue to
+ * popup on determining reset reason. I'll wait till later and pick the
+ * smaller. At this time the "if" approach is 4 bytes smaller.
  *
  #define DEBUG_HWDT_DEBUG_RESET_REASON
  */
@@ -240,6 +230,7 @@ extern uint32_t rtc_get_reset_reason(void);
 #ifdef HWDT_STACK_DUMP_H
 #define HWDT_INFO_t LOCAL_HWDT_INFO_t
 #define hwdt_info LOCAL_hwdt_info
+#define HWDT_VERIFY_HWDT_INFO
 #endif
 
 /*
@@ -251,17 +242,17 @@ extern uint32_t rtc_get_reset_reason(void);
 /*                                                                            */
 /*        Start of copy-paste block to create "hwdt_app_entry.h"              */
 /*____________________________________________________________________________*/
-#if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_INFO_t)
+#if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_VERIFY_HWDT_INFO)
 #define HWDT_STACK_DUMP_H
 
 typedef struct HWDT_INFO {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
-    uint32_t rtc_sys_reason;
     uint32_t rom_api_reason;
-    uint32_t cont_integrity;
+    uint32_t rtc_sys_reason;
     uint32_t reset_reason;
+    uint32_t cont_integrity;
     bool g_pcont_valid;
 } HWDT_INFO_t;
 
@@ -277,9 +268,10 @@ extern HWDT_INFO_t hwdt_info;
 /*____________________________________________________________________________*/
 
 
-#ifdef HWDT_INFO_t
+#ifdef HWDT_VERIFY_HWDT_INFO
 #undef HWDT_INFO_t
 #undef hwdt_info
+#undef HWDT_VERIFY_HWDT_INFO
 static_assert(sizeof(HWDT_INFO_t) == sizeof(LOCAL_HWDT_INFO_t), "Local and include verison of HWDT_INFO_t do not match.");
 #endif
 
@@ -348,17 +340,6 @@ void enable_debug_hwdt_at_link_time(void)
 /* the following code is linked only if a call to the above function is made somewhere */
 
 extern "C" {
-#if 0 // Handy debug print during development
-static void ICACHE_RAM_ATTR print_size(uintptr_t val) {
-    uint32_t fmt_sz[4];
-    fmt_sz[0]  = ('0' ) | ('x' <<8) | ('%' <<16) | ('0' <<24);
-    fmt_sz[1]  = ('8' ) | ('X' <<8) | (',' <<16) | (' ' <<24);
-    fmt_sz[2]  = (' ' ) | ('%' <<8) | ('5' <<16) | ('u' <<24);
-    fmt_sz[3]  = ('\n') | ('\0'<<8) | ('\0'<<16) | ('\0'<<24);
-    ets_printf((const char *)fmt_sz, val, val);
-}
-#endif
-
 
 enum PRINT_STACK {
     CONT = 1,
@@ -366,7 +347,7 @@ enum PRINT_STACK {
     ROM = 4
 };
 
-#if defined(HWDT_OPTION_THE_OPTIMIST)
+
 static void ICACHE_RAM_ATTR print_stack(uintptr_t start, uintptr_t end, uint32_t chunk) {
     ets_printf("\n>>>stack>>>\n\nctx: ");
 
@@ -398,84 +379,6 @@ static void ICACHE_RAM_ATTR print_stack(uintptr_t start, uintptr_t end, uint32_t
     ets_printf("<<<stack<<<\n");
 }
 
-#else
-static void ICACHE_RAM_ATTR print_stack(uintptr_t start, uintptr_t end, uint32_t chunk) {
-
-    uint32_t fmt_stk[6];
-    fmt_stk[0] = ('\n') | ('>' <<8) | ('>' <<16) | ('>' <<24);
-    fmt_stk[1] = ('s' ) | ('t' <<8) | ('a' <<16) | ('c' <<24);
-    fmt_stk[2] = ('k' ) | ('>' <<8) | ('>' <<16) | ('>' <<24);
-    fmt_stk[3] = ('\n') | ('\n'<<8) | ('c' <<16) | ('t' <<24);
-    fmt_stk[4] = ('x' ) | (':' <<8) | (' ' <<16) | ('%' <<24);
-    fmt_stk[5] = ('s' ) | ('\n'<<8) | ('\0'<<16) | ('\0'<<24);
-
-    uint32_t fmt_sp[9];
-    fmt_sp[0]  = ('s' ) | ('p' <<8) | (':' <<16) | (' ' <<24);
-    fmt_sp[1]  = ('%' ) | ('0' <<8) | ('8' <<16) | ('x' <<24);
-    fmt_sp[2]  = (' ' ) | ('e' <<8) | ('n' <<16) | ('d' <<24);
-    fmt_sp[3]  = (':' ) | (' ' <<8) | ('%' <<16) | ('0' <<24);
-    fmt_sp[4]  = ('8' ) | ('x' <<8) | (' ' <<16) | ('o' <<24);
-    fmt_sp[5]  = ('f' ) | ('f' <<8) | ('s' <<16) | ('e' <<24);
-    fmt_sp[6]  = ('t' ) | (':' <<8) | (' ' <<16) | ('%' <<24);
-    fmt_sp[7]  = ('0' ) | ('4' <<8) | ('x' <<16) | ('\n'<<24);
-    fmt_sp[8]  = ('\0') | ('\0'<<8) | ('\0'<<16) | ('\0'<<24);
-
-    uint32_t fmt_rom[1];
-    fmt_rom[0]  = ('R' ) | ('O' <<8) | ('M' <<16) | ('\0'<<24);
-
-    uint32_t fmt_sys[1];
-    fmt_sys[0]  = ('s' ) | ('y' <<8) | ('s' <<16) | ('\0'<<24);
-
-    uint32_t fmt_cont[2];
-    fmt_cont[0] = ('c' ) | ('o' <<8) | ('n' <<16) | ('t' <<24);
-    fmt_cont[1] = ('\0') | ('\0'<<8) | ('\0'<<16) | ('\0'<<24);
-
-    if (chunk & PRINT_STACK::CONT) {
-        ets_printf((const char *)fmt_stk, (const char *)fmt_cont);
-    } else
-    if (chunk & PRINT_STACK::SYS) {
-        ets_printf((const char *)fmt_stk, (const char *)fmt_sys);
-    } else
-    if (chunk & PRINT_STACK::ROM) {
-        ets_printf((const char *)fmt_stk, (const char *)fmt_rom);
-    }
-
-    ets_printf((const char *)fmt_sp, start, end, 0);
-
-    {
-        uint32_t fmt_stk_dmp[8];
-        fmt_stk_dmp[0] = ('%') | ('0' <<8) | ('8' <<16) | ('x' <<24);
-        fmt_stk_dmp[1] = (':') | (' ' <<8) | (' ' <<16) | ('%' <<24);
-        fmt_stk_dmp[2] = ('0') | ('8' <<8) | ('x' <<16) | (' ' <<24);
-        fmt_stk_dmp[3] = ('%') | ('0' <<8) | ('8' <<16) | ('x' <<24);
-        fmt_stk_dmp[4] = (' ') | ('%' <<8) | ('0' <<16) | ('8' <<24);
-        fmt_stk_dmp[5] = ('x') | (' ' <<8) | ('%' <<16) | ('0' <<24);
-        fmt_stk_dmp[6] = ('8') | ('x' <<8) | (' ' <<16) | ('%' <<24);
-        fmt_stk_dmp[7] = ('c') | ('\n'<<8) | ('\0'<<16) | ('\0'<<24);
-
-        size_t this_mutch = end - start;
-        if (this_mutch >= 0x10) {
-            for (size_t pos = 0; pos < this_mutch; pos += 0x10) {
-                uint32_t *value = (uint32_t *)(start + pos);
-
-                // rough indicator: stack frames usually have SP saved as the second word
-                bool looksLikeStackFrame = (value[2] == (start + pos + 0x10));
-                ets_printf((const char*)fmt_stk_dmp, (uint32_t)&value[0],
-                           value[0], value[1], value[2], value[3],
-                           (looksLikeStackFrame)?'<':' ');
-            }
-        }
-    }
-    {
-        uint32_t fmt_stk_end[4];
-        fmt_stk_end[0] = ('<' ) | ('<' <<8) | ('<' <<16) | ('s' <<24);
-        fmt_stk_end[1] = ('t' ) | ('a' <<8) | ('c' <<16) | ('k' <<24);
-        fmt_stk_end[2] = ('<' ) | ('<' <<8) | ('<' <<16) | ('\n'<<24);
-        fmt_stk_end[3] = ('\n') | ('\0'<<8) | ('\0'<<16) | ('\0'<<24);
-        ets_printf((const char *)fmt_stk_end);
-    }
-}
-#endif
 
 static const uint32_t * ICACHE_RAM_ATTR skip_stackguard(const uint32_t *start, const uint32_t *end, const uint32_t pattern) {
     // Find the end of SYS stack activity
@@ -585,17 +488,8 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      * estimate and expands on it.
      */
     hwdt_info.reset_reason = rtc_sys_reason;
-    if (REASON_WDT_RST == rtc_sys_reason) {
-        if (OWDT_RESET == rom_api_reason) {
-            *hwdt_reset = true;
-        } else {
-            hwdt_info.reset_reason = REASON_EXT_SYS_RST;
-            if (!debug__confirm_rom_reason(EXT_RESET)) {
-                hwdt_info.reset_reason = ~0;
-            }
-        }
-
-    } else if (REASON_DEFAULT_RST == rtc_sys_reason) {
+    if (REASON_DEFAULT_RST == rtc_sys_reason ||
+        REASON_WDT_RST     == rtc_sys_reason) {
         /*
          * 1) The 0 value (REASON_DEFAULT_RST) shows up with multiple EXT_RSTs
          *    quickly. The 1 value (REASON_WDT_RST), previous if, shows up if
@@ -609,7 +503,7 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
         } else {
              hwdt_info.reset_reason = REASON_EXT_SYS_RST;
              if (!debug__confirm_rom_reason(EXT_RESET)) {
-               hwdt_info.reset_reason = ~0;
+                hwdt_info.reset_reason = ~0;
              }
         }
 
@@ -624,6 +518,16 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
         if (!debug__confirm_rom_reason(POWERON_RESET)) {
             hwdt_info.reset_reason = ~0;
             *power_on = false;
+        }
+    } else {
+        /*
+         * REASON_EXT_SYS_RST is not expected at reboot, let it fall through to
+         * for confirmation in debug option.
+         */
+        if (REASON_EXT_SYS_RST == rtc_sys_reason) {
+            if (!debug__confirm_rom_reason(EXT_RESET)) {
+                hwdt_info.reset_reason = ~0;
+            }
         }
     }
 #else
@@ -645,10 +549,11 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
           if (OWDT_RESET == rom_api_reason) {
               hwdt_info.reset_reason = REASON_WDT_RST;
               *hwdt_reset = true;
-          } else if (!debug__confirm_rom_reason(EXT_RESET)) {
-              hwdt_info.reset_reason = ~0;
           } else {
               hwdt_info.reset_reason = REASON_EXT_SYS_RST;
+              if (!debug__confirm_rom_reason(EXT_RESET)) {
+                  hwdt_info.reset_reason = ~0;
+              }
           }
           break;
         /* These should be correct as is */
@@ -659,7 +564,7 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
             hwdt_info.reset_reason = rtc_sys_reason;
             break;
         /*
-         * REASON_EXT_SYS_RST is not expected at reboot, let it fall though to
+         * REASON_EXT_SYS_RST is not expected at reboot, let it fall through to
          * default for confirmation.
          */
         case REASON_EXT_SYS_RST:
@@ -671,10 +576,11 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
             if (POWERON_RESET == rom_api_reason) {
                 hwdt_info.reset_reason = REASON_DEFAULT_RST;
                 *power_on = true;
-            } else if (!debug__confirm_rom_reason(EXT_RESET)) {
-                hwdt_info.reset_reason = ~0;
             } else {
                 hwdt_info.reset_reason = REASON_EXT_SYS_RST;
+                if (!debug__confirm_rom_reason(EXT_RESET)) {
+                    hwdt_info.reset_reason = ~0;
+                }
             }
             break;
     }
@@ -806,20 +712,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 
         /* Print context SYS */
         if (hwdt_reset) {
-            {
-#if defined(HWDT_OPTION_THE_OPTIMIST)
-              ets_printf("\nHardware WDT reset\n");
-#else
-              uint32_t fmt_hwdt[6];
-              fmt_hwdt[0] = ('\n') | ('H' <<8) | ('a' <<16) | ('r' <<24);
-              fmt_hwdt[1] = ('d' ) | ('w' <<8) | ('a' <<16) | ('r' <<24);
-              fmt_hwdt[2] = ('e' ) | (' ' <<8) | ('W' <<16) | ('D' <<24);
-              fmt_hwdt[3] = ('T' ) | (' ' <<8) | ('r' <<16) | ('e' <<24);
-              fmt_hwdt[4] = ('s' ) | ('e' <<8) | ('t' <<16) | ('\n'<<24);
-              fmt_hwdt[5] = 0;
-              ets_printf((const char*)fmt_hwdt);
-#endif
-            }
+            ets_printf("\nHardware WDT reset\n");
             print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)rom_stack, PRINT_STACK::SYS);
 
 #ifdef DEBUG_HWDT_NO4KEXTRA

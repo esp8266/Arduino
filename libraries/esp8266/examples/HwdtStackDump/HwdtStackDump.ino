@@ -7,7 +7,7 @@
    The module hwdt_app_entry.cpp writes a stack dump to the serial interface
    after a Hardware Watchdog Timer has struck and a new boot cycle has begun.
    Note, at restart the UART speed is set by the ROM to 115200 bps. This is the
-   speed your serial device needs to be set to for displaying the dump.
+   speed your serial device needs set for displaying the dump.
    See hwdt_app_entry.cpp for more details.
 
 */
