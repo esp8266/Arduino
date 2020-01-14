@@ -198,7 +198,7 @@ extern uint32_t rtc_get_reset_reason(void);
  * include block below into its respective filename.
  *
  */
-#include "hwdt_app_entry.h"
+// #include "hwdt_app_entry.h"
 
 
 /*
@@ -226,7 +226,7 @@ typedef struct HWDT_INFO {
     bool g_pcont_valid;
 } HWDT_INFO_t;
 
-void enable_debug_hwdt_at_link_time (void);
+void enable_debug_hwdt_at_link_time(void);
 
 extern uint32_t *g_rom_stack;
 extern HWDT_INFO_t hwdt_info;
@@ -485,6 +485,17 @@ static void ICACHE_RAM_ATTR check_g_pcont_validity(void) {
 #define debug__confirm_rom_reason(a) (true)
 #endif
 
+typedef enum ROM_RST_REASON { /* Comments on the right are from RTOS SDK */
+  NO_MEAN                =  0,    /* Undefined */
+  POWERON_RESET          =  1,    /* Power on boot      *//**<1, Vbat power on reset */
+  EXT_RESET              =  2,    /* External reset or wake-up from Deep-sleep */
+                                                          /**<2, external system reset */
+  SW_RESET               =  3,    /*                    *//**<3, Software reset digital core */
+  OWDT_RESET             =  4,    /* Hardware WDT reset *//**<4, Legacy watch dog reset digital core */
+  DEEPSLEEP_RESET        =  5,    /*                    *//**<5, Deep Sleep reset digital core */
+  SDIO_RESET             =  6,    /*                    *//**<6, Reset by SLC module, reset digital core*/
+} ROM_RST_REASON_t;
+
 static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_reset) {
     /*
      * Detecting a Hardware WDT (HWDT) reset is a little complicated at boot
@@ -514,7 +525,8 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      */
 
     uint32_t rtc_sys_reason = hwdt_info.rtc_sys_reason = RTC_SYS[0];
-    uint32_t rom_api_reason = hwdt_info.rom_api_reason = rtc_get_reset_reason();
+    hwdt_info.rom_api_reason = rtc_get_reset_reason();
+    ROM_RST_REASON_t rom_api_reason = (ROM_RST_REASON_t)hwdt_info.rom_api_reason;
 
 #ifdef HWDT_IF_METHOD_RESET_REASON
     *hwdt_reset = false;
@@ -525,24 +537,31 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      */
     hwdt_info.reset_reason = rtc_sys_reason;
     if (REASON_WDT_RST == rtc_sys_reason) {
-        if (4 == rom_api_reason) {
+        if (OWDT_RESET == rom_api_reason) {
             *hwdt_reset = true;
         } else {
             hwdt_info.reset_reason = REASON_EXT_SYS_RST;
-            if (!debug__confirm_rom_reason(2)) {  // EXT_RST
+            if (!debug__confirm_rom_reason(EXT_RESET)) {
                 hwdt_info.reset_reason = ~0;
             }
         }
 
     } else if (0 == rtc_sys_reason) {
         /*
-         * The 0 values shows up with multiple EXT_RSTs quickly.
-         * The 1 value, previous if, shows up if you wait a while before
-         * the EXT_RST.
+         * 1) The 0 values shows up with multiple EXT_RSTs quickly.
+         *    The 1 value, previous if, shows up if you wait a while before
+         *    the EXT_RST.
+         * 2) The 0 value also shows up if a HWDT reset occurs too quickly after
+         *    the system starts. Note even the SDK gets this one right.
          */
-        hwdt_info.reset_reason = REASON_EXT_SYS_RST;
-        if (!debug__confirm_rom_reason(2)) {  // EXT_RST
-            hwdt_info.reset_reason = ~0;
+        if (OWDT_RESET == rom_api_reason) {
+             *hwdt_reset = true;
+             hwdt_info.reset_reason = REASON_WDT_RST;
+        } else {
+             hwdt_info.reset_reason = REASON_EXT_SYS_RST;
+             if (!debug__confirm_rom_reason(EXT_RESET)) {
+               hwdt_info.reset_reason = ~0;
+             }
         }
 
     } else if (REASON_EXT_SYS_RST < rtc_sys_reason) {
@@ -553,7 +572,7 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
          */
         *power_on = true;
         hwdt_info.reset_reason = REASON_DEFAULT_RST;
-        if (!debug__confirm_rom_reason(1)) {  // Power-on
+        if (!debug__confirm_rom_reason(POWERON_RESET)) {
             hwdt_info.reset_reason = ~0;
             *power_on = false;
         }
@@ -574,10 +593,10 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
            * This may be present for REASON_EXT_SYS_RST or REASON_WDT_RST,
            * use rom_api_reason to confirm.
            */
-          if (4 == rom_api_reason) {  // HWDT
+          if (OWDT_RESET == rom_api_reason) {
               hwdt_info.reset_reason = REASON_WDT_RST;
               *hwdt_reset = true;
-          } else if (!debug__confirm_rom_reason(2)) {
+          } else if (!debug__confirm_rom_reason(EXT_RESET)) {
               hwdt_info.reset_reason = ~0;
           } else {
               hwdt_info.reset_reason = REASON_EXT_SYS_RST;
@@ -600,10 +619,10 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
              * Out of range value, this could be a REASON_DEFAULT_RST,
              * use rom_api_reason to confirm.
              */
-            if (1 == rom_api_reason) {  // Power-on
+            if (POWERON_RESET == rom_api_reason) {
                 hwdt_info.reset_reason = REASON_DEFAULT_RST;
                 *power_on = true;
-            } else if (!debug__confirm_rom_reason(2)) {
+            } else if (!debug__confirm_rom_reason(EXT_RESET)) {
                 hwdt_info.reset_reason = ~0;
             } else {
                 hwdt_info.reset_reason = REASON_EXT_SYS_RST;
@@ -883,6 +902,6 @@ void preinit(void) {
 };
 
 #else
-extern "C" void enable_debug_hwdt_at_link_time (void){
+void enable_debug_hwdt_at_link_time (void){
 }
 #endif // end of #ifdef DEBUG_HWDT

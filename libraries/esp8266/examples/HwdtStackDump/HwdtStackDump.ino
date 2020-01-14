@@ -16,7 +16,7 @@
 #include <ESP8266WiFi.h>
 #include <Esp.h>
 #include <user_interface.h>
-// extern "C" void enable_debug_hwdt_at_link_time(void);
+// void enable_debug_hwdt_at_link_time(void);
 
 #include "AddOn.h"
 /*
