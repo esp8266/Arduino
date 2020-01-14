@@ -1,22 +1,22 @@
 /*
-   A Hardware WDT Stack Dump by Michael Hightower
+   A Hardware WDT Reset stack dump tool by Michael Hightower
 
-   This Sketch demonstrates the use of a tool to print a stack dump
-   at reboot after a Hardware WDT event.
+   This Sketch demonstrates the use of a tool that prints a stack dump after
+   a Hardware WDT reset. After a Hardware Watchdog Timer reset, the module
+   hwdt_app_entry.cpp writes a stack dump to the serial interface.
 
-   The module hwdt_app_entry.cpp writes a stack dump to the serial interface
-   after a Hardware Watchdog Timer has struck and a new boot cycle has begun.
-   Note, at restart the UART speed is set by the ROM to 115200 bps. This is the
-   speed your serial device needs set for displaying the dump.
-   See hwdt_app_entry.cpp for more details.
+   The goal was to have a file (hwdt_app_entry.cpp) that could be dropped into
+   a sketch directory, then open the sketch project, build, upload, and debug.
 
+   Note, at the restart, the UART speed is set by the ROM to 115200 bps. This
+   is the speed your serial device needs to be for displaying the dump.
+   See hwdt_app_entry.cpp for more options and details.
 */
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <Esp.h>
 #include <user_interface.h>
-// void enable_debug_hwdt_at_link_time(void);
 
 #include "AddOn.h"
 /*

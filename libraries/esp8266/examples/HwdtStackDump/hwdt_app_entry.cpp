@@ -69,7 +69,7 @@
 /*
  * DEBUG_HWDT
  *
- * Enables this debug tool for printing a Hardware WDT stack dump on reboot.
+ * Enables this debug tool for printing a Hardware WDT stack dump at restart.
  *
  */
  #define DEBUG_HWDT
@@ -118,6 +118,10 @@
  * at any other time. After the SDK has run a 2nd EXT_RST will show the greeting
  * message.
  *
+ * EDIT2: Seems to work better now. Placed delays around calls to
+ * uart_div_modify(). Leave these comments until I have more experience with
+ * this change.
+ *
  */
  // #define HWDT_PRINT_GREETING
 
@@ -164,8 +168,9 @@
  * Dump the stack contents of the ROM Stack area. Good for getting a visual
  * on stack usage. Probably not of value beyond developing this tool.
  *
- #define ROM_STACK_DUMP
+ * To see printing you may need to use this with option: HWDT_UART_SPEED.
  */
+ // #define ROM_STACK_DUMP
 
 
 /*
@@ -297,7 +302,7 @@ constexpr uint32_t *sys_stack       = (uint32_t *)0x3fffeb30;
  * because the ROM BSS gets zeroed as part of ROM init on reboot. Any part of
  * the "sys" stack residing there is lost. On the other hand, it becomes a prime
  * candidate for DRAM address space to handle the needs of this stack dump
- * utility.
+ * tool.
  */
 constexpr uint32_t *sys_stack_e000  = (uint32_t *)0x3fffe000;
 
@@ -633,25 +638,26 @@ static uint32_t ICACHE_RAM_ATTR set_uart_speed(uint32_t uart_no, uint32_t new_sp
     }
     uint32_t new_uart_divisor = master_freq / new_speed;
 
-#if defined(DEBUG_HWDT_DEBUG)
     int rc = 1;
     if (new_uart_divisor != uart_divisor) {
+        /*
+         * These delays appear to resolve the lost data problem that occurs when
+         * printing after a flash upload using esptool.
+         */
+        ets_delay_us(18000);
         rc = real_uart_div_modify(0, new_uart_divisor);
-        ets_delay_us(50); // Allow one 20K BPS character time to pass
+        ets_delay_us(1000);
     }
+#if defined(DEBUG_HWDT_DEBUG)
     ets_printf("\n\n%d = real_uart_div_modify(0, %u / %u);\n", rc, master_freq, new_speed);
     ets_printf("F_CRYSTAL = %u\n", crystal_freq);
     ets_printf("old uart_divisor = %u\n", uart_divisor);
     ets_printf("master_freq = %u\n", master_freq);
-    return (rc) ? 0 : uart_divisor;
-#else
-    if (new_uart_divisor != uart_divisor) {
-        return (real_uart_div_modify(0, new_uart_divisor)) ? 0 : uart_divisor;
-    }
-    return 0;
 #endif
+    return (rc) ? 0 : uart_divisor;
 }
 #endif
+
 /*
  *
  *
@@ -750,12 +756,15 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 
 #if defined(HWDT_PRINT_GREETING)
     ets_printf("\n\nHardware WDT Stack Dump - enabled\n\n");
+#else
+    ets_printf("\n\n");
 #endif
 
-ets_delay_us(12000); /* Let UART FIFO clear. */
 #ifdef HWDT_UART_SPEED
     if (uart_divisor) {
+        ets_delay_us(18000);
         real_uart_div_modify(0, uart_divisor); // Put it back the way we found it!
+        ets_delay_us(1000);
     }
 #endif
 }
