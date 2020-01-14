@@ -320,6 +320,13 @@
                      "size": "36871"
                   },
                   {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-linux-gnu.mklittlefs-7f77f2b.1563313032.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.mklittlefs-7f77f2b.1563313032.tar.gz",
+                     "checksum": "SHA-256:022c96df4d110f957d43f6d23e9c5e8b699a66d8ab041056dd5da7411a8ade42",
+                     "size": "47544"
+                  },
+                  {
                      "host": "i686-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-w64-mingw32-mklittlefs-69bd9e6.zip",
                      "archiveFileName": "i686-w64-mingw32-mklittlefs-69bd9e6.zip",
