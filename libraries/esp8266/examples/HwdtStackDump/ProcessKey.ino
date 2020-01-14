@@ -60,12 +60,12 @@ void processKey(Print& out, int hotKey) {
       out.println(F("Press a key + <enter>"));
       out.println(F("  r    - Reset, ESP.reset();"));
       out.println(F("  t    - Restart, ESP.restart();"));
-      printHelpAddOn(out);
       out.println(F("  ?    - Print Help"));
       out.println();
       out.println(F("Crash with:"));
       out.println(F("  s    - Software WDT"));
       out.println(F("  h    - Hardware WDT"));
+      printHelpAddOn(out);
       out.println();
       break;
     default:

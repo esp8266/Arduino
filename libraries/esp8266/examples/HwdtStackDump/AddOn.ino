@@ -1,9 +1,16 @@
-extern struct rst_info resetInfo;
+#ifdef DEBUG_HWDT
 
+extern struct rst_info resetInfo;
 
 void printHwdtDebugInfo(Print& out) {
   extern struct rst_info resetInfo;
   out.println(String(F("RTC_SYS[0] = ")) + (hwdt_info.rtc_sys_reason) + F(", resetInfo.reason = ") + (resetInfo.reason) + F(", ") + ESP.getResetReason());
+  out.println(String(F("ROM API reset reason = ")) + (hwdt_info.rom_api_reason));
+  out.println(String(F("HWDT reset reason = ")) + (hwdt_info.reset_reason));
+  if (REASON_EXT_SYS_RST < hwdt_info.reset_reason) {
+      out.println(String(F("Reset reason confirmation failed!\n")));
+  }
+
   out.println();
   if (hwdt_info.sys) {
     out.println(String(F("Stack Usages:")));
@@ -21,8 +28,13 @@ void printHwdtDebugInfo(Print& out) {
 
 
 void printHelpAddOn(Print& out) {
-  out.println(F("  d    - Print some HWDT Debug info.;"));
+  out.println(F("  0    - Divide by zero, exception(0);"));
+  out.println(F("  p    - panic();"));
+  out.println();
+  out.println(F("Additional options:"));
+  out.println(F("  d    - Print some HWDT Debug info."));
 }
+
 
 
 int hotKeyHandlerAddOn(Print& out, int hotKey) {
@@ -30,8 +42,36 @@ int hotKeyHandlerAddOn(Print& out, int hotKey) {
     case 'd':
       printHwdtDebugInfo(out);
       break;
+    case 'p':
+      out.println(F("Time to panic()!"));
+      panic();
+      break;
+    case '0':
+      out.println(F("Crashing by dividing by zero."));
+      out.printf_P(PSTR("This should not print %d\n"), divideA_B(1, 0));
+      break;
     default:
       return 0;
   }
   return 1;
 }
+
+int divideA_B(int a, int b) {
+  return (a / b);
+}
+
+#else
+void printHwdtDebugInfo(Print& out) {
+  (void)out;
+}
+
+int hotKeyHandlerAddOn(Print& out, int hotKey) {
+  (void)out;
+  (void)hotKey;
+  return 0;
+}
+
+void printHelpAddOn(Print& out) {
+  (void)out;
+}
+#endif

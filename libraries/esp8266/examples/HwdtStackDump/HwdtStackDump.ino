@@ -6,7 +6,8 @@
 
    The module hwdt_app_entry.cpp writes a stack dump to the serial interface
    after a Hardware Watchdog Timer has struck and a new boot cycle has begun.
-   Be sure your sketch has properly initialized the Serial port before the crash.
+   Note, at restart the UART speed is set by the ROM to 115200 bps. This is the
+   speed your serial device needs to be set to for displaying the dump.
    See hwdt_app_entry.cpp for more details.
 
 */
@@ -15,15 +16,20 @@
 #include <ESP8266WiFi.h>
 #include <Esp.h>
 #include <user_interface.h>
-// #include <coredecls.h> // for disable_extra4k_at_link_time();
-void enable_debug_hwdt_at_link_time(void);
+// extern "C" void enable_debug_hwdt_at_link_time(void);
 
 #include "AddOn.h"
+/*
+  To see the difference with and without this tool. Comment out the #include
+  below. And comment out the "#define DEBUG_HWDT" line in hwdt_app_entry.cpp.
+*/
 #include "hwdt_app_entry.h"
 
 
 void setup(void) {
+#ifdef DEBUG_HWDT
   enable_debug_hwdt_at_link_time();
+#endif
   WiFi.persistent(false); // w/o this a flash write occurs at every boot
   WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
