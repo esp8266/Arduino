@@ -20,9 +20,9 @@
  * trapped. Debugging an HWDT can be quite challenging.
  *
  * This module writes a stack dump to the serial port after a Hardware Watchdog
- * Timer has struck and a new boot cycle has begun. Since we have a late start,
- * some information may be lost due to DRAM usage by the Boot ROM and the
- * bootloader.
+ * Timer has struck and a new boot cycle has begun. By making adjustments to the
+ * stack, we can avoid crash stack data being overwritten by this tool,
+ * the Boot ROM and the bootloader.
  *
  * We are using the method defined for `core_esp8266_app_entry_noextra4k.cpp` to
  * load an alternate `app_entry_redefinable()`. For details on this method, see
@@ -33,15 +33,15 @@
  *
  * By making some adjustments to start of the stack pointer, at the entry to
  * `app_entry_redefinable()`, and also to the stack pointer passed to the SDK,
- * we can preserve the stack during an HWDT event. At least thats the idea.
+ * we can preserve the stack during an HWDT event.
  *
- * To use, just place this file in the sketch directory and rebuild and upload
- * your sketch. That should be enough to get it included in your sketch. If
- * that does not work, then add a call to:
+ * To use, just place this file in the sketch directory before opening the
+ * project and build and upload your sketch. That should be enough to get it
+ * included in your sketch. If that does not work, then add a call to:
  *    `void enable_debug_hwdt_at_link_time (void);`
- * in `setup()`. Also, be sure to initialize the Serial interface for printing.
- * This tool relies on the Serial interface already being setup from the
- * previous boot cycle.
+ * in `setup()`. This tool prints to the serial port at the default serial port
+ * speed set by the boot ROM. On a Hardware WDT reset that port speed is
+ * 115200 bps. If your needs differ, see the HWDT_UART_SPEED option below.
  *
  * When you get a stack dump, copy-paste it into the "ESP Exception Decoder".
  * Since we don't have a SP, we see a lot more stuff in the report. Start at the
@@ -60,25 +60,20 @@
  *
  */
 
-#define DEBUG_HWDT
+/*____________________________________________________________________________*/
+/*                                                                            */
+/*                          Configuration Options                             */
+/*____________________________________________________________________________*/
 
-#ifdef DEBUG_HWDT
 
-#include <c_types.h>
-#include "cont.h"
-#include "coredecls.h"
-#include <core_esp8266_features.h>
-#include <esp8266_undocumented.h>
-#include <esp8266_peri.h>
-#include <uart.h>
+/*
+ * DEBUG_HWDT
+ *
+ * Enables this debug tool for printing a Hardware WDT stack dump on reboot.
+ *
+ */
+ #define DEBUG_HWDT
 
-extern "C" {
-#include <user_interface.h>
-#include <uart_register.h>
-extern void call_user_start();
-extern uint32_t rtc_get_reset_reason(void);
-}
-// #define DEBUG_HWDT_DEBUG
 
 /*
  * DEBUG_HWDT_NO4KEXTRA
@@ -90,16 +85,48 @@ extern uint32_t rtc_get_reset_reason(void);
  * Using this option has the effect of taking 4K of DRAM away from the heap
  * which gets used for the "cont" stack. Leaving an extra 4K on the "sys" stack,
  * that is clear of the ROM's BSS area. This allows for a more complete "sys"
- * stack dump.
+ * stack dump. The choice here can depend on where you are crashing.
+ *
+ * Because we don't know where the crash occurs, this option prints two stack
+ * dumps. One for "cont" (user stack) and one for "sys" (NONOS SDK).
  *
  */
 #define DEBUG_HWDT_NO4KEXTRA
 
+
+/*
+ * HWDT_UART_SPEED
+ *
+ * UART serial speed to be used for stack dump. On reboot the ESP8266 ROM
+ * sets a speed of 115200 BPS. If you are using this default speed you can skip
+ * this option and save the IRAM space.
+ *
+ */
+ // #define HWDT_UART_SPEED (115200)
+
+
+/*
+ * HWDT_PRINT_GREETING
+ *
+ * Prints a simple introduction to let you know this tool is active and in the
+ * build. At power-on this may not be viewable on some devices. The crystal
+ * has to be 40Mhz for this to work w/o using the HWDT_UART_SPEED option above.
+ * May not be worth the cost in IRAM.
+ *
+ * EDIT: There is something different in the UART setup after a flash upload. I
+ * am unable to print using the same code that works for Power-on and an EXT_RST
+ * at any other time. After the SDK has run a 2nd EXT_RST will show the greeting
+ * message.
+ *
+ */
+ // #define HWDT_PRINT_GREETING
+
+
 /*
  * ROM_STACK_SIZE
  *
- * There are 4 sections of code that share the same stack space that starts at
- * around 0x40000000.
+ * There are four sections of code that would normally share the same stack
+ * space starting just before 0x40000000.
  *   1) The Boot ROM (uses around 640 bytes)
  *   2) The Bootloader, eboot.elf (uses around 720 bytes.)
  *   3) `app_entry_redefinable()` just before it starts the SDK.
@@ -119,11 +146,13 @@ extern uint32_t rtc_get_reset_reason(void);
 #define ROM_STACK_SIZE (1024)
 #endif
 
+
 /*
  * HWDT_INFO
  *
  * Gather some useful information on ROM and bootloader combined, sys, and cont
- * stack usage as well as other stuff that comes up.
+ * stack usage. If you are missing the include file for this structure, you can
+ * copy-paste from an embeded version of the .h below.
  *
  */
  #define HWDT_INFO
@@ -166,52 +195,62 @@ extern uint32_t rtc_get_reset_reason(void);
  */
  #define HWDT_IF_METHOD_RESET_REASON
 
+/*____________________________________________________________________________*/
+/*                                                                            */
+/*                     End of Configuration Options                           */
+/*____________________________________________________________________________*/
+
+
+#ifdef DEBUG_HWDT
+
+#include <c_types.h>
+#include "cont.h"
+#include "coredecls.h"
+#include <core_esp8266_features.h>
+#include <esp8266_undocumented.h>
+#include <esp8266_peri.h>
+#include <uart.h>
+
+extern "C" {
+#include <user_interface.h>
+#include <uart_register.h>
+extern void call_user_start();
+extern uint32_t rtc_get_reset_reason(void);
+}
+
+// #define DEBUG_HWDT_DEBUG
+
+#ifdef DEBUG_HWDT_DEBUG
 /*
- * HWDT_PRINT_GREETING
+ * We have two copies of HWDT_INFO_t. Verify internal and external structures match.
  *
- * Prints a simple introduction to let you know this tool is active and in the
- * build. At power-on this may not be viewable on some devices. The crystal
- * has to be 40Mhz for this to work w/o using the HWDT_UART_SPEED option below.
- * May not be worth the cost in IRAM.
+ * This duplication is done so that in most cases, a simple/quick add one file
+ * to a sketch folder is enough to debug.
  *
- * EDIT: There is something different in the UART setup after a EXT_RST after
- * flash upload. I am unable to print using the same code that works for
- * Power-on and an EXT_RST at any other time. After the SDK has run a 2nd
- * EXT_RST will show the greeting message.
- *
+ * Only if additional internal information is needed, would this include be
+ * added. Since we have two copies, a static_assert is used to verify that at
+ * least the the size of the two structures are the same.
  */
- #define HWDT_PRINT_GREETING
+#include "hwdt_app_entry.h"
+#endif
 
 /*
- * HWDT_UART_SPEED
- *
- * UART serial speed to be used for stack dump. At boot/reboot the ESP8266 ROM
- * sets a speed of 115200 BPS. If you are using this default speed you can skip
- * this option and save the IRAM space.
- *
- */
- #define HWDT_UART_SPEED (115200)
-
-/*
- * If you do not need the information in provided by HWDT info, you do not need
- * this include. If you do, uncomment the include line and copy-paste the
- * include block below into its respective filename.
- *
- */
-// #include "hwdt_app_entry.h"
-
-
-/*
- * This is only used to verify that the internal and external structure
- * definitions match.
+ * Verify that the internal and external structure definitions match.
  */
 #ifdef HWDT_STACK_DUMP_H
 #define HWDT_INFO_t LOCAL_HWDT_INFO_t
 #define hwdt_info LOCAL_hwdt_info
 #endif
 
+/*
+ * If you are using the HWDT_INFO_t structure, and are missing the include file.
+ * Copy-paste the include block below into its respective filename.
+ */
 
-/******** Start of copy-paste block to create "hwdt_app_entry.h" **************/
+/*____________________________________________________________________________*/
+/*                                                                            */
+/*        Start of copy-paste block to create "hwdt_app_entry.h"              */
+/*____________________________________________________________________________*/
 #if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_INFO_t)
 #define HWDT_STACK_DUMP_H
 
@@ -232,7 +271,10 @@ extern uint32_t *g_rom_stack;
 extern HWDT_INFO_t hwdt_info;
 
 #endif
-/******** End of copy-paste this block for creating "hwdt_app_entry.h" ********/
+/*____________________________________________________________________________*/
+/*                                                                            */
+/*        End of copy-paste block for creating "hwdt_app_entry.h"             */
+/*____________________________________________________________________________*/
 
 
 #ifdef HWDT_INFO_t
@@ -296,8 +338,9 @@ void enable_debug_hwdt_at_link_time(void)
      * `app_entry()` with the one below. This will create a stack dump on
      * Hardware WDT resets.
      *
-     * It appears just including this module in the sketch directory is enough.
-     * However, just play it safe, call this function from setup.
+     * It appears just including this module in the sketch directory before
+     * opening the project is enough. However, just play it safe, call this
+     * function from setup.
      */
 }
 
@@ -505,10 +548,14 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      * after a software restart. And the SDK has not been started so its API is
      * not available.
      *
-     * There is a value in System RTC memory that appears to store, at boot,
-     * the reset reason for the SDK. It appears to be set before the SDK
-     * performs its restart. Of course, this value is invalid at power on
-     * before the SDK runs.
+     * There is a value in System RTC memory that appears to store, at restart,
+     * the reset reason for the SDK. I assume it is set by SDK before the
+     * restart. Of course, this value is invalid at power on before the SDK
+     * runs. It is set to 0 by the SDK after init and later is changed to a 1
+     * and remains 1 during the operation of the sketch. So during normal
+     * execution the reason is preset to indicate a Hardware WDT reset.
+     *
+     * This case list for example and not comprehensive.
      *
      * Case 1: At power-on boot the ROM API result is valid; however, the SDK
      * value in RTC Memory has not been set at this time.
@@ -517,7 +564,9 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      * restart by the SDK. At boot, the ROM API result still reports the HWDT
      * reason.
      *
-     *
+     * Case 3: It is pssible to see a value of 0 or 1 (power-on or HWDT) for the
+     * SDK reset reason for both EXT_RST and Hardware WDT resets. For either of
+     * these values, the ROM API does hold the valid reset reason.
      *
      * I need to know if this is the 1st boot at power on. Combining these
      * indicators has been tricky, I think I now have it.
@@ -546,11 +595,11 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
             }
         }
 
-    } else if (0 == rtc_sys_reason) {
+    } else if (REASON_DEFAULT_RST == rtc_sys_reason) {
         /*
-         * 1) The 0 values shows up with multiple EXT_RSTs quickly.
-         *    The 1 value, previous if, shows up if you wait a while before
-         *    the EXT_RST.
+         * 1) The 0 value (REASON_DEFAULT_RST) shows up with multiple EXT_RSTs
+         *    quickly. The 1 value (REASON_WDT_RST), previous if, shows up if
+         *    you wait a while before the EXT_RST.
          * 2) The 0 value also shows up if a HWDT reset occurs too quickly after
          *    the system starts. Note even the SDK gets this one right.
          */
