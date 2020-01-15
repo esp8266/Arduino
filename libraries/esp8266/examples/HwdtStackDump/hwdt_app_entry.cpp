@@ -217,7 +217,8 @@ extern uint32_t rtc_get_reset_reason(void);
 
 #ifdef DEBUG_HWDT_DEBUG
 /*
- * We have two copies of HWDT_INFO_t. Verify internal and external structures match.
+ * We have two copies of HWDT_INFO_t. Verify internal and external structures
+ * match.
  *
  * This duplication is done so that in most cases, a simple/quick add one file
  * to a sketch folder is enough to debug.
@@ -298,11 +299,10 @@ constexpr uint32_t *rom_stack_first = (uint32_t *)0x40000000;
 constexpr uint32_t *sys_stack       = (uint32_t *)0x3fffeb30;
 /*
  * The space between 0x3fffe000 up to 0x3fffeb30 is a ROM BSS area that is later
- * claimed by the SDK for stack space. This is a problem area for stack dump,
+ * claimed by the SDK for stack space. This is a problem area for this tool,
  * because the ROM BSS gets zeroed as part of ROM init on reboot. Any part of
  * the "sys" stack residing there is lost. On the other hand, it becomes a prime
- * candidate for DRAM address space to handle the needs of this stack dump
- * tool.
+ * candidate for DRAM address space to handle the needs of this tool.
  */
 constexpr uint32_t *sys_stack_e000  = (uint32_t *)0x3fffe000;
 
@@ -327,8 +327,7 @@ uint32_t *g_rom_stack  __attribute__((section(".noinit")));
 size_t g_rom_stack_A16_sz  __attribute__((section(".noinit")));
 HWDT_INFO_t hwdt_info __attribute__((section(".noinit")));
 
-void enable_debug_hwdt_at_link_time(void)
-{
+void enable_debug_hwdt_at_link_time(void) {
     /*
      * This function does nothing; however, including a call to it in setup,
      * allows this module to override, at link time, the core_esp8266_main.cpp's
@@ -353,7 +352,7 @@ enum PRINT_STACK {
 };
 
 
-static void ICACHE_RAM_ATTR print_stack(uintptr_t start, uintptr_t end, uint32_t chunk) {
+static void ICACHE_RAM_ATTR print_stack(const uintptr_t start, const uintptr_t end, const uint32_t chunk) {
     ets_printf("\n>>>stack>>>\n\nctx: ");
 
     if (chunk & PRINT_STACK::CONT) {
@@ -368,12 +367,12 @@ static void ICACHE_RAM_ATTR print_stack(uintptr_t start, uintptr_t end, uint32_t
 
     ets_printf("\nsp: %08x end: %08x offset: %04x\n", start, end, 0);
 
-    size_t this_mutch = end - start;
+    const size_t this_mutch = end - start;
     if (this_mutch >= 0x10) {
         for (size_t pos = 0; pos < this_mutch; pos += 0x10) {
-            uint32_t *value = (uint32_t *)(start + pos);
+            const uint32_t *value = (uint32_t *)(start + pos);
 
-            // rough indicator: stack frames usually have SP saved as the second word
+            /* rough indicator: stack frames usually have SP saved as the second word */
             bool looksLikeStackFrame = (value[2] == (start + pos + 0x10));
             ets_printf("%08x:  %08x %08x %08x %08x %c\n", (uint32_t)&value[0],
                        value[0], value[1], value[2], value[3],
@@ -481,9 +480,10 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      *
      */
 
-    uint32_t rtc_sys_reason = hwdt_info.rtc_sys_reason = RTC_SYS[0];
+    hwdt_info.rtc_sys_reason = RTC_SYS[0];
+    const uint32_t rtc_sys_reason = hwdt_info.rtc_sys_reason;
     hwdt_info.rom_api_reason = rtc_get_reset_reason();
-    ROM_RST_REASON_t rom_api_reason = (ROM_RST_REASON_t)hwdt_info.rom_api_reason;
+    const ROM_RST_REASON_t rom_api_reason = (ROM_RST_REASON_t)hwdt_info.rom_api_reason;
 
 #ifdef HWDT_IF_METHOD_RESET_REASON
     *hwdt_reset = false;
@@ -605,18 +605,15 @@ typedef int (*fp_uart_div_modify_t)(uint32_t uart_no, uint32 DivLatchValue);
 constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_uart_div_modify;
 
 
-static uint32_t ICACHE_RAM_ATTR set_uart_speed(uint32_t uart_no, uint32_t new_speed) {
-    (void)uart_no;
+static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uint32_t new_speed) {
 
-    // #if F_CRYSTAL == 40000000
 #ifdef F_CRYSTAL
     constexpr uint32_t crystal_freq = F_CRYSTAL;
 #else
     constexpr uint32_t crystal_freq = 26000000;
 #endif
-    constexpr uint32_t UART_CLK_DIVISOR_M = (0x000FFFFF);
     constexpr uint32_t rom_uart_speed = 115200;
-    uint32_t uart_divisor = ESP8266_REG(0x14) & UART_CLK_DIVISOR_M;
+    const uint32_t uart_divisor = UART_CLKDIV(uart_no) & UART_CLKDIV_CNT;
     uint32_t master_freq = crystal_freq * 2;
 
     if (REASON_DEFAULT_RST       == hwdt_info.reset_reason ||
@@ -674,7 +671,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
     get_reset_reason(&power_on, &hwdt_reset);
 
 #ifdef HWDT_UART_SPEED
-    uint32_t uart_divisor = set_uart_speed(0, HWDT_UART_SPEED);
+    const uint32_t uart_divisor = set_uart_speed(0, HWDT_UART_SPEED);
 #endif
 #if defined(DEBUG_HWDT_DEBUG)
     ets_printf("Basic boot reason: %s\n", (power_on) ? "Power-on" : "Reboot");
@@ -770,6 +767,9 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 }
 
 void ICACHE_RAM_ATTR app_entry_start(void) {
+
+    handle_hwdt();
+
 #ifdef DEBUG_HWDT_NO4KEXTRA
     /*
      *  Continuation context is in BSS.
@@ -790,16 +790,8 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     asm volatile("" ::: "memory");
     asm volatile("mov.n a1, %0\n"
                  "mov.n a3, %1\n"
-                 "mov.n a0, %2\n"     // Should never return; however, set return to Boot ROM Breakpoint
+                 "mov.n a0, %2\n"     /* Should never return; however, set return to Boot ROM Breakpoint */
                  "jx a3\n" : : "r" (sys_stack_first), "r" (call_user_start), "r" (0x4000044c) );
-
-    __builtin_unreachable();
-}
-
-
-void ICACHE_RAM_ATTR app_entry_redefinable2(void) {
-    handle_hwdt();
-    app_entry_start();
 
     __builtin_unreachable();
 }
@@ -814,22 +806,18 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
      *   4) The NONOS SDK, optionally the Core when the extra 4K option is
      *      selected.
      *
-     * Make the ROM BSS zeroed out memory the home for our temporary stack. That
-     * way no additional information will be lost. That will remove this tool
-     * from the list of possible concerns for stack overwrite. For now, At this
-     * time it is set to 1024.
+     * Use the ROM BSS zeroed out memory as the home for our temporary stack.
+     * This way no additional information will be lost. That will remove this
+     * tool from the list of possible concerns for stack overwrite.
      *
      */
     asm volatile ("mov.n a1, %0\n"
                   "mov.n a3, %1\n"
                   "mov.n a0, %2\n"
-                  "jx a3\n" : : "r" (0x3fffeb30), "r" (app_entry_redefinable2), "r" (0x4000044c) );
+                  "jx a3\n" : : "r" (0x3fffeb30), "r" (app_entry_start), "r" (0x4000044c) );
     /*
-     * TODO: Look at the assembly, I had to split app_entry_redefinable like
-     * this to stop some back indexing on the stack. Looks like some temporary
-     * storage was set up and was being referenced and I moved it away by
-     * changing the stack pointer. Splitting the `app_entry_redefinable()`
-     * function into two parts seems to have taken care of that issue.
+     * Keep this function with just asm seems to help avoid a stack frame being
+     * created for this function and things getting really confused.
      */
 
     __builtin_unreachable();
