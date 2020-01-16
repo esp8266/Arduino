@@ -28,8 +28,9 @@
  * load an alternate `app_entry_redefinable()`. For details on this method, see
  * comments in `core_esp8266_main.cpp's app_entry()`.
  *
- * Using this alternate we can gain control before the SDK is started.
- * And dump what is left of the "sys" and "cont" stacks.
+ * Using this tools alternate `app_entry_redefinable()` we can gain control
+ * before the SDK is started. And dump what is left of the "sys" and "cont"
+ * stacks.
  *
  * By making some adjustments to start of the stack pointer, at the entry to
  * `app_entry_redefinable()`, and also to the stack pointer passed to the SDK,
@@ -40,8 +41,25 @@
  * included in your sketch. If that does not work, then add a call to:
  *    `void enable_debug_hwdt_at_link_time (void);`
  * in `setup()`. This tool prints to the serial port at the default serial port
- * speed set by the boot ROM. On a Hardware WDT reset that port speed is
+ * speed set by the Boot ROM. On a Hardware WDT reset that port speed is
  * 115200 bps. If your needs differ, see the HWDT_UART_SPEED option below.
+ *
+ * More on crystal differences and data rates:
+ *     When the ESP8266 restarts because of a Hardware WDT reset, the port speed
+ *     defaults to 115200. This will be the speed, even if you have a 26MHz or
+ *     40MHz Crystal. If you would like to use a different data rate, use the
+ *     option HWDT_UART_SPEED described below.
+ *
+ *     The Boot ROM initially sets the UART clock divisor to support a data rate
+ *     of 115200 bps with the assumption that it has a 40MHz crystal. When a
+ *     26MHz crystal is used instead, the resulting error gives us a real rate
+ *     of 74880 bps and printing is garbled at first, until the CPU clock's PLL
+ *     is adjusted by the NONOS SDK. While CH_PD and EST_RST bring the CPU back
+ *     to this state of underclocking with a 26MHz crystal, the Hardware WDT
+ *     reset does not appear to do the same. The UART continues to be clocked at
+ *     a rate to support a device at 115200 bps. Thus, allowing us to see the
+ *     old cryptic WDT message along with our new stack dump.
+ *
  *
  * When you get a stack dump, copy-paste it into the "ESP Exception Decoder".
  * Since we don't have a SP, we see a lot more stuff in the report. Start at the
@@ -79,16 +97,20 @@
  * DEBUG_HWDT_NO4KEXTRA
  *
  * This option will leave more of the system stack available for the stack dump.
- * The problem with the "4K extra" option is that it pushes the system stack up
- * into the ROM's BSS area which gets zeroed at reboot by the Boot ROM.
+ * A problem we have with the "4K extra" option, is it pushes the system stack
+ * up into the ROM's BSS area which gets zeroed at reboot by the Boot ROM.
  *
- * Using this option has the effect of taking 4K of DRAM away from the heap
+ * Using this option has the effect of taking 4K of DRAM away from the heap,
  * which gets used for the "cont" stack. Leaving an extra 4K on the "sys" stack,
  * that is clear of the ROM's BSS area. This allows for a more complete "sys"
  * stack dump. The choice here can depend on where you are crashing.
  *
  * Because we don't know where the crash occurs, this option prints two stack
- * dumps. One for "cont" (user stack) and one for "sys" (NONOS SDK).
+ * dumps, one for "cont" (user stack) and one for "sys" (NONOS SDK).
+ *
+ * In contrast, if the hang is happening on the "cont" stack, you don't need a
+ * complete stack dump of the "sys" stack. You can omit this define and have an
+ * extra 4K in the heap.
  *
  */
 #define DEBUG_HWDT_NO4KEXTRA
@@ -97,19 +119,26 @@
 /*
  * HWDT_UART_SPEED
  *
- * UART serial speed to be used for stack dump. On reboot the ESP8266 ROM
- * sets a speed of 115200 BPS. If you are using this default speed you can skip
- * this option and save the IRAM space.
+ * This option alters the UART serial speed used for printing the Hardware WDT
+ * reset stack dump. Without this option on an HWDT reset, the existing default
+ * speed of 115200 bps will be used. If you are using this default speed, you
+ * can skip this option and save on the IRAM space. Note this option only
+ * changes the speed while this module is printing.
+ *
+ * For more confusion on the serial port speed, see "More on crystal differences
+ * and data rates" in the comments at the top.
  *
  */
+ // #define HWDT_UART_SPEED (74880)
  // #define HWDT_UART_SPEED (115200)
+ // #define HWDT_UART_SPEED (230400)
 
 
 /*
  * HWDT_PRINT_GREETING
  *
  * Prints a simple introduction to let you know this tool is active and in the
- * build. At power-on this may not be viewable on some devices. The crystal
+ * build. At power-on, this may not be viewable on some devices. The crystal
  * has to be 40Mhz for this to work w/o using the HWDT_UART_SPEED option above.
  * May not be worth the cost in IRAM.
  *
@@ -129,12 +158,12 @@
 /*
  * ROM_STACK_SIZE
  *
- * There are four sections of code that would normally share the same stack
- * space starting just before 0x40000000.
+ * There are four sections of code starting just before 0x40000000, that share
+ * the same stack space.
  *   1) The Boot ROM (uses around 640 bytes)
  *   2) The Bootloader, eboot.elf (uses around 720 bytes.)
  *   3) `app_entry_redefinable()` just before it starts the SDK.
- *   4) The NONOS SDK, optionally the Core when the extra 4K option is selected.
+ *   4) The NONOS SDK and optionally the Core when the extra 4K option is selected.
  *
  * To preserve the sketch stack data for a stack dump, I define three separate
  * stacks:
@@ -154,9 +183,9 @@
 /*
  * HWDT_INFO
  *
- * Gather some interesting information on ROM and bootloader combined, sys, and
- * cont stack usage. If you are missing the include file for this structure, you
- * can copy-paste from an embeded version of the .h below.
+ * Gather some information on ROM and bootloader combined, sys, and cont stack
+ * usage. If you are missing the include file for this structure, you can
+ * copy-paste from the embedded version of the .h below.
  *
  */
  #define HWDT_INFO
@@ -165,10 +194,10 @@
 /*
  * ROM_STACK_DUMP
  *
- * Dump the stack contents of the ROM Stack area. Good for getting a visual
- * on stack usage. Probably not of value beyond developing this tool.
+ * Dump the stack contents of the ROM Stack area. This gives us a visual of the
+ * stack usage. Probably not of value, beyond developing this tool.
  *
- * To see printing you may need to use this with option: HWDT_UART_SPEED.
+ * To see printing, you may need to use this option with HWDT_UART_SPEED.
  */
  // #define ROM_STACK_DUMP
 
@@ -176,15 +205,13 @@
 /*
  * HWDT_IF_METHOD_RESET_REASON
  *
- * If statement vs switch method to implement the logic. Both can be made
- * smaller by removing confirmation checks.
+ * "If" statement or "switch" method to implement, the reset reason logic. Both
+ * can be made smaller by removing confirmation checks.
  *
- * Checks are being performed when DEBUG_HWDT_DEBUG_RESET_REASON has been
- * defined.
+ * Checks are performed when DEBUG_HWDT_DEBUG_RESET_REASON has been defined.
  *
  * EDIT: I should settle on one or the other; however, new issues continue to
- * popup on determining reset reason. I'll wait till later and pick the
- * smaller. At this time the "if" approach is 4 bytes smaller.
+ * pop up on determining reset reason. I'll wait until later and pick one.
  *
  #define DEBUG_HWDT_DEBUG_RESET_REASON
  */
@@ -353,7 +380,7 @@ enum PRINT_STACK {
 
 
 static void ICACHE_RAM_ATTR print_stack(const uintptr_t start, const uintptr_t end, const uint32_t chunk) {
-    ets_printf("\n>>>stack>>>\n\nctx: ");
+    ets_printf("\n\n>>>stack>>>\n\nctx: ");
 
     if (chunk & PRINT_STACK::CONT) {
         ets_printf("cont");
@@ -462,7 +489,8 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
      * and remains 1 during the operation of the sketch. So during normal
      * execution the reason is preset to indicate a Hardware WDT reset.
      *
-     * This case list for example and not comprehensive.
+     * These cases represent some examples. The list is not meant to be
+     * comprehensive.
      *
      * Case 1: At power-on boot the ROM API result is valid; however, the SDK
      * value in RTC Memory has not been set at this time.
@@ -595,8 +623,8 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
 
 #ifdef HWDT_UART_SPEED
 /*
- * We need this because the SDK has an override on this already. If we call it
- * at this time we will crash in the unintialized SDK.
+ * We need this because the SDK overrides the ROMs entry-point. When we call the
+ * uninitialized SDK's version of uart_div_modify, we crash.
  */
 #ifndef ROM_uart_div_modify
 #define ROM_uart_div_modify         0x400039d8
@@ -643,7 +671,7 @@ static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uin
          */
         ets_delay_us(18000);
         rc = real_uart_div_modify(0, new_uart_divisor);
-        ets_delay_us(1000);
+        ets_delay_us(150);
     }
 #if defined(DEBUG_HWDT_DEBUG)
     ets_printf("\n\n%d = real_uart_div_modify(0, %u / %u);\n", rc, master_freq, new_speed);
@@ -715,7 +743,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 
         /* Print context SYS */
         if (hwdt_reset) {
-            ets_printf("\nHardware WDT reset\n");
+            ets_printf("\n\nHardware WDT reset\n");
             print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)rom_stack, PRINT_STACK::SYS);
 
 #ifdef DEBUG_HWDT_NO4KEXTRA
@@ -761,7 +789,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
     if (uart_divisor) {
         ets_delay_us(18000);
         real_uart_div_modify(0, uart_divisor); // Put it back the way we found it!
-        ets_delay_us(1000);
+        ets_delay_us(150);
     }
 #endif
 }

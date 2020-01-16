@@ -8,9 +8,10 @@
    The goal was to have a file (hwdt_app_entry.cpp) that could be dropped into
    a sketch directory, then open the sketch project, build, upload, and debug.
 
-   Note, at the restart, the UART speed is set by the ROM to 115200 bps. This
-   is the speed your serial device needs to be for displaying the dump.
-   See hwdt_app_entry.cpp for more options and details.
+   When the ESP8266 restarts because of a Hardware WDT reset, the serial port
+   speed defaults to 115200 bps. For support of other speeds, review the
+   comments on option HWDT_UART_SPEED in wdt_app_entry.cpp.
+
 */
 
 #include <Arduino.h>
@@ -20,8 +21,9 @@
 
 #include "AddOn.h"
 /*
-  To see the difference with and without this tool. Comment out the #include
-  below. And comment out the "#define DEBUG_HWDT" line in hwdt_app_entry.cpp.
+  If you need to run your sketch w/o this tool or you want to  see the
+  difference with and without this tool. Comment out the #include below. And
+  comment out the "#define DEBUG_HWDT" line in hwdt_app_entry.cpp.
 */
 #include "hwdt_app_entry.h"
 
