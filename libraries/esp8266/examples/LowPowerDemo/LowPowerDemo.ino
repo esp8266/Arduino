@@ -123,195 +123,224 @@ void setup() {
 }  // end of setup()
 
 void loop() {
-  if (resetCount == 0) {  // first reset, else skip down to the next Deep Sleep test
-    // 1st test - running with WiFi unconfigured, reads ~67 mA minimum
-    Serial.println(F("\n1st test - running with WiFi unconfigured"));
+  if (resetCount == 0) {
+    runTest1();
+    runTest2();
+    runTest3();
+    runTest4();
+    runTest5();
+    runTest6();
+  }
+  if (resetCount < 4) {
+    initWiFi();
+  }
+  if (resetCount == 1) {
+    runTest7();
+  } else if (resetCount == 2) {
+    runTest8();
+  } else if (resetCount == 3) {
+  runTest9();
+  } else if (resetCount == 4) {
+  resetTests();
+  }
+} //end loop
+
+// 1st test - running with WiFi unconfigured, reads ~67 mA minimum
+void runTest1() {
+  Serial.println(F("\n1st test - running with WiFi unconfigured"));
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("press the button to continue"));
+  waitPushbutton(false, blinkDelay);
+}
+
+// 2nd test - Automatic Modem Sleep 7 seconds after WiFi is connected (LED flashes)
+void runTest2() {
+  Serial.println(F("\n2nd test - Automatic Modem Sleep"));
+  Serial.println(F("connecting WiFi, please wait until the LED blinks"));
+  initWiFi();
+  if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
+    Serial.println(F("The amperage will drop in 7 seconds."));
     float volts = ESP.getVcc();
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);
-
-    // 2nd test - Automatic Modem Sleep 7 seconds after WiFi is connected (LED flashes)
-    Serial.println(F("\n2nd test - Automatic Modem Sleep"));
-    Serial.println(F("connecting WiFi, please wait until the LED blinks"));
-    init_WiFi();
-    if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
-      Serial.println(F("The amperage will drop in 7 seconds."));
-      volts = ESP.getVcc();
-      Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-      Serial.println(F("press the button to continue"));
-      waitPushbutton(true, 90);  /* This is using a special feature: below 100 mS blink delay,
+    waitPushbutton(true, 90);  /* This is using a special feature: below 100 mS blink delay,
          the LED blink delay is padding the time with 'program cycles' to fill the 100 mS. At 90 mS
          delay, 90% of the blink time is delay(), and 10% is 'your program running'. Below 90% you
          will see a difference in the average amperage, less delay() = more amperage.  At 100 mS
          and above it's essentially all delay() time.  On an oscilloscope you'll see the time
          between beacons at > 67 mA more often with less delay() percentage. You can change the
          '90' mS to other values to see the effect it has on Automatic Modem Sleep. */
-    } else {
-      Serial.println(F("no WiFi connection, test skipped"));
-    }
+  } else {
+    Serial.println(F("no WiFi connection, test skipped"));
+  }
+}
 
-    // 3rd test - Forced Modem Sleep
-    Serial.println(F("\n3rd test - Forced Modem Sleep"));
-    WiFi.forceSleepBegin();
-    delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
-    // WiFi.mode(WIFI_SHUTDOWN);  // alternate method of Forced Modem Sleep
-    volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("press the button to continue"));
-    waitPushbutton(true, 99);  /* Using the same < 100 mS feature. If you drop the delay below 100, you
+// 3rd test - Forced Modem Sleep
+void runTest3() {
+  Serial.println(F("\n3rd test - Forced Modem Sleep"));
+  WiFi.forceSleepBegin();
+  delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
+  // WiFi.mode(WIFI_SHUTDOWN);  // alternate method of Forced Modem Sleep
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("press the button to continue"));
+  waitPushbutton(true, 99);  /* Using the same < 100 mS feature. If you drop the delay below 100, you
       will see the effect of program time vs. delay() time on minimum amperage.  Above ~ 97 (97% of the
       time in delay) there is little change in amperage, so you need to spend maximum time in delay()
       to get minimum amperage. At a high percentage of delay() you will see minimum amperage. */
+}
 
-    // 4th test - Automatic Light Sleep
-    Serial.println(F("\n4th test - Automatic Light Sleep"));
-    Serial.println(F("reconnecting WiFi"));
-    Serial.println(F("it will be in Automatic Light Sleep once WiFi connects (LED blinks)"));
-    digitalWrite(LED, LOW);  // visual cue that we're reconnecting
-    WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 5);  // Automatic Light Sleep
-    WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
-    uint32_t wifiStart = millis();
-    while ((!WiFi.localIP()) && (millis() - wifiStart < wifiTimeout)) {
-      delay(50);
-    }
-    if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
-      volts = ESP.getVcc();
-      Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-      Serial.println(F("press the button to continue"));
-      waitPushbutton(true, 350);  /* Below 100 mS delay it only goes into 'Automatic Modem Sleep',
+// 4th test - Automatic Light Sleep
+void runTest4() {
+  Serial.println(F("\n4th test - Automatic Light Sleep"));
+  Serial.println(F("reconnecting WiFi"));
+  Serial.println(F("it will be in Automatic Light Sleep once WiFi connects (LED blinks)"));
+  digitalWrite(LED, LOW);  // visual cue that we're reconnecting
+  WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 5);  // Automatic Light Sleep
+  WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
+  uint32_t wifiStart = millis();
+  while ((!WiFi.localIP()) && (millis() - wifiStart < wifiTimeout)) {
+    delay(50);
+  }
+  if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
+    float volts = ESP.getVcc();
+    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+    Serial.println(F("press the button to continue"));
+    waitPushbutton(true, 350);  /* Below 100 mS delay it only goes into 'Automatic Modem Sleep',
         and below ~ 350 mS delay() the 'Automatic Light Sleep' is less frequent.  Above 350 mS
         delay() doesn't make much improvement in power savings. */
-    } else {
-      Serial.println(F("no WiFi connection, test skipped"));
-    }
-
-    // 5th test - Forced Light Sleep using Non-OS SDK calls
-    Serial.println(F("\n5th test - Forced Light Sleep using Non-OS SDK calls"));
-    WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-    yield();
-    digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
-#ifdef testPoint
-    digitalWrite(testPoint, HIGH);  // testPoint LOW in callback tracks latency from WAKE_UP_PIN LOW to testPoint LOW
-#endif
-    volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the button)"));
-    Serial.flush();  // needs a delay(100) or Serial.flush() else it doesn't print the whole message
-    wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
-    gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);
-    // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
-    wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
-    wifi_fpm_open();
-    wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF works; any other value and it won't sleep
-    delay(10);  // it goes to sleep some time during this delay() and waits for an interrupt
-    Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
-
-    // 6th test - Deep Sleep for 10 seconds, wake with RF_DEFAULT
-    Serial.println(F("\n6th test - Deep Sleep for 10 seconds, reset and wake with RF_DEFAULT"));
-    init_WiFi();  // initialize WiFi since we turned it off in the last test
-    resetCount = 1;  // advance to the next Deep Sleep test after the reset
-    updateRTC();  // save the current test state in RTC memory
-    volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("press the button to continue"));
-    while (!digitalRead(WAKE_UP_PIN)) {  // wait for them to release the button from the last test
-      delay(10);
-    }
-    delay(50);  // debounce time for the switch, button released
-    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-    digitalWrite(LED, LOW);  // turn the LED on, at least briefly
-    //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no long
-    // RFCAL as it goes into Deep Sleep
-    Serial.println(F("going into Deep Sleep now..."));
-    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-    digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
-    ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
-    delay(10);
-    // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is off)
-    // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
-    // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
-    // depending on the LED used, you might see it very dimly lit in a dark room during this test
-    Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
-  }
-
-  // 7th test - Deep Sleep for 10 seconds, wake with RFCAL
-  if (resetCount < 4) {
-    init_WiFi();  // need to reinitialize WiFi due to Deep Sleep reset
-  }
-  if (resetCount == 1) {  // second reset since power on
-    resetCount = 2;  // advance to the next Deep Sleep test after the reset
-    updateRTC();  // save the current test state in RTC memory
-    Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, reset and wake with RFCAL"));
-    float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-    //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no RFCAL
-    // as it goes into Deep Sleep
-    Serial.println(F("going into Deep Sleep now..."));
-    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-    digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
-    ESP.deepSleep(10E6, WAKE_RFCAL); // good night!  D0 fires a reset in 10 seconds...
-    delay(10);
-    Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
-  }
-
-  // 8th test - Deep Sleep Instant for 10 seconds, wake with NO_RFCAL
-  if (resetCount == 2) {  // third reset since power on
-    resetCount = 3;  // advance to the next Deep Sleep test after the reset
-    updateRTC();  // save the current test state in RTC memory
-    Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with NO_RFCAL"));
-    float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-    //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no RFCAL
-    // as it goes into Deep Sleep
-    Serial.println(F("going into Deep Sleep now..."));
-    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-    digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
-    ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL); // good night!  D0 fires a reset in 10 seconds...
-    delay(10);
-    Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
-  }
-
-  // 9th test - Deep Sleep Instant for 10 seconds, wake with RF_DISABLED
-  if (resetCount == 3) {  // fourth reset since power on
-    resetCount = 4;  // advance to the next Deep Sleep test after the reset
-    updateRTC();  // save the current test state in RTC memory
-    Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with RF_DISABLED"));
-    float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("press the button to continue"));
-    waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-    // WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep
-    Serial.println(F("going into Deep Sleep now..."));
-    Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-    digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
-    ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED); // good night!  D0 fires a reset in 10 seconds...
-    delay(10);
-    Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
-  }
-
-  if (resetCount == 4) {
-    resetCount = 5;  // start all over, do an ESP.restart to insure it's a clean state
-    updateRTC();  // save the current test state in RTC memory
-    float volts = ESP.getVcc();
-    Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
-    Serial.println(F("\nTests completed, in RF_DISABLED, press the button to do an ESP.restart()"));
-    waitPushbutton(false, 1000);
-    ESP.restart();
+  } else {
+    Serial.println(F("no WiFi connection, test skipped"));
   }
 }
+
+// 5th test - Forced Light Sleep using Non-OS SDK calls
+void runTest5() {
+  Serial.println(F("\n5th test - Forced Light Sleep using Non-OS SDK calls"));
+  WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
+  yield();
+  digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
+#ifdef testPoint
+  digitalWrite(testPoint, HIGH);  // testPoint LOW in callback tracks latency from WAKE_UP_PIN LOW to testPoint LOW
+#endif
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the button)"));
+  Serial.flush();  // needs a delay(100) or Serial.flush() else it doesn't print the whole message
+  wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+  gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);
+  // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
+  wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
+  wifi_fpm_open();
+  wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF works; any other value and it won't sleep
+  delay(10);  // it goes to sleep some time during this delay() and waits for an interrupt
+  Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
+}
+
+// 6th test - Deep Sleep for 10 seconds, wake with RF_DEFAULT
+void runTest6() {
+  Serial.println(F("\n6th test - Deep Sleep for 10 seconds, reset and wake with RF_DEFAULT"));
+  initWiFi();  // initialize WiFi since we turned it off in the last test
+  resetCount = 1;  // advance to the next Deep Sleep test after the reset
+  updateRTC();  // save the current test state in RTC memory
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("press the button to continue"));
+  while (!digitalRead(WAKE_UP_PIN)) {  // wait for them to release the button from the last test
+    delay(10);
+  }
+  delay(50);  // debounce time for the switch, button released
+  waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
+  digitalWrite(LED, LOW);  // turn the LED on, at least briefly
+  //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no long
+  // RFCAL as it goes into Deep Sleep
+  Serial.println(F("going into Deep Sleep now..."));
+  Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
+#ifdef testPoint
+  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
+#endif
+  ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
+  delay(10);
+  // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is off)
+  // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
+  // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
+  // depending on the LED used, you might see it very dimly lit in a dark room during this test
+  Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
+}
+
+// 7th test - Deep Sleep for 10 seconds, wake with RFCAL
+void runTest7() {
+  resetCount = 2;  // advance to the next Deep Sleep test after the reset
+  updateRTC();  // save the current test state in RTC memory
+  Serial.println(F("\n7th test - in RF_DEFAULT, Deep Sleep for 10 seconds, reset and wake with RFCAL"));
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("press the button to continue"));
+  waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
+  //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no RFCAL
+  // as it goes into Deep Sleep
+  Serial.println(F("going into Deep Sleep now..."));
+  Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
+#ifdef testPoint
+  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
+#endif
+  ESP.deepSleep(10E6, WAKE_RFCAL); // good night!  D0 fires a reset in 10 seconds...
+  delay(10);
+  Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
+}
+
+// 8th test - Deep Sleep Instant for 10 seconds, wake with NO_RFCAL
+void runTest8() {
+  resetCount = 3;  // advance to the next Deep Sleep test after the reset
+  updateRTC();  // save the current test state in RTC memory
+  Serial.println(F("\n8th test - in RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with NO_RFCAL"));
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("press the button to continue"));
+  waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
+  //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no RFCAL
+  // as it goes into Deep Sleep
+  Serial.println(F("going into Deep Sleep now..."));
+  Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
+#ifdef testPoint
+  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
+#endif
+  ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL); // good night!  D0 fires a reset in 10 seconds...
+  delay(10);
+  Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
+}
+
+// 9th test - Deep Sleep Instant for 10 seconds, wake with RF_DISABLED
+void runTest9() {
+  resetCount = 4;  // advance to the next Deep Sleep test after the reset
+  updateRTC();  // save the current test state in RTC memory
+  Serial.println(F("\n9th test - in NO_RFCAL, Deep Sleep Instant for 10 seconds, reset and wake with RF_DISABLED"));
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("press the button to continue"));
+  waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
+  // WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep
+  Serial.println(F("going into Deep Sleep now..."));
+  Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
+#ifdef testPoint
+  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
+#endif
+  ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED); // good night!  D0 fires a reset in 10 seconds...
+  delay(10);
+  Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
+}
+
+void resetTests() {
+  resetCount = 5;  // start all over: do ESP.restart to insure a clean state since Deep Sleep doesn't clear everything
+  updateRTC();  // save the current test state in RTC memory
+  float volts = ESP.getVcc();
+  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.println(F("\nTests completed, in RF_DISABLED, press the button to do an ESP.restart()"));
+  waitPushbutton(false, 1000);
+  ESP.restart();
+}
+
 
 void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until they press the button
   // note: 2 different modes, as 3 of the power saving modes need a delay() to activate fully
@@ -352,7 +381,7 @@ void updateRTC() {
   ESP.rtcUserMemoryWrite(64, (uint32_t*) &rtcData, sizeof(rtcData));
 }
 
-void init_WiFi() {
+void initWiFi() {
   /* Explicitly set the ESP8266 as a WiFi-client (STAtion mode), otherwise by default it
     would try to act as both a client and an access-point and could cause network issues
     with other WiFi devices on your network. */
