@@ -87,7 +87,7 @@ namespace detail
         };
     };
 
-    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t QUEUE_CAPACITY = 32, typename... P>
+    template< typename Delegate, typename R = void, bool ISQUEUE = false, unsigned QUEUE_CAPACITY = 32, typename... P>
     class MultiDelegatePImpl
     {
     public:
@@ -176,7 +176,7 @@ namespace detail
         Node_t* first = nullptr;
         Node_t* last = nullptr;
         Node_t* unused = nullptr;
-        uint32_t nodeCount = 0;
+        unsigned nodeCount = 0;
 
         // Returns a pointer to an unused Node_t,
         // or if none are available allocates a new one,
@@ -370,7 +370,7 @@ namespace detail
         }
     };
 
-    template< typename Delegate, typename R = void, bool ISQUEUE = false, uint32_t QUEUE_CAPACITY = 32>
+    template< typename Delegate, typename R = void, bool ISQUEUE = false, unsigned QUEUE_CAPACITY = 32>
     class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
     {
     protected:
@@ -456,16 +456,16 @@ namespace detail
         }
     };
 
-    template< typename Delegate, typename R, bool ISQUEUE, uint32_t QUEUE_CAPACITY, typename... P> class MultiDelegate;
+    template< typename Delegate, typename R, bool ISQUEUE, unsigned QUEUE_CAPACITY, typename... P> class MultiDelegate;
 
-    template< typename Delegate, typename R, bool ISQUEUE, uint32_t QUEUE_CAPACITY, typename... P>
+    template< typename Delegate, typename R, bool ISQUEUE, unsigned QUEUE_CAPACITY, typename... P>
     class MultiDelegate<Delegate, R(P...), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>
     {
     public:
         using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>::MultiDelegatePImpl;
     };
 
-    template< typename Delegate, typename R, bool ISQUEUE, uint32_t QUEUE_CAPACITY>
+    template< typename Delegate, typename R, bool ISQUEUE, unsigned QUEUE_CAPACITY>
     class MultiDelegate<Delegate, R(), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
     {
     public:
@@ -493,7 +493,7 @@ It is designed to be used with Delegate, the efficient runtime wrapper for C fun
                allocates from the heap. Unused items are not returned to the heap, but are managed by the MultiDelegate
                instance during its own lifetime for efficiency.
 */
-template< typename Delegate, bool ISQUEUE = false, uint32_t QUEUE_CAPACITY = 32>
+template< typename Delegate, bool ISQUEUE = false, unsigned QUEUE_CAPACITY = 32>
 class MultiDelegate : public detail::MultiDelegate<Delegate, typename Delegate::target_type, ISQUEUE, QUEUE_CAPACITY>
 {
 public:
