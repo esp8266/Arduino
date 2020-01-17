@@ -83,7 +83,7 @@ byte resetCount = 0;  // keeps track of the number of Deep Sleep tests / resets
 const uint32_t blinkDelay = 100; // fast blink rate for the LED when waiting for the user
 const uint32_t longDelay = 350;  // longer delay() for the two AUTOMATIC modes
 esp8266::polledTimeout::periodicMs blinkLED(blinkDelay);
-esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);
+esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight spin to simulate user code
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback function
@@ -139,9 +139,9 @@ void loop() {
   } else if (resetCount == 2) {
     runTest8();
   } else if (resetCount == 3) {
-  runTest9();
+    runTest9();
   } else if (resetCount == 4) {
-  resetTests();
+    resetTests();
   }
 } //end loop
 
