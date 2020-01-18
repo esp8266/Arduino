@@ -59,18 +59,18 @@ ADC_MODE(ADC_VCC);  // allows you to monitor the internal VCC level; it varies w
 // don't connect anything to the analog input pin(s)!
 
 // enter your WiFi configuration below
-const char* AP_SSID = "tryagain";  // your router's SSID here
-const char* AP_PASS = "093774c242ccb21a3485";  // your router's password here
+const char* AP_SSID = "your_SSID";  // your router's SSID here
+const char* AP_PASS = "your_password";  // your router's password here
 IPAddress staticIP(0, 0, 0, 0); // parameters below are for your static IP address, if used
 IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
-uint32_t wifiTimeout = 25E3;  // 25 second timeout on the WiFi connection
+uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
 
-#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles, entirely optional
+//#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles, optional
 
-// This structure will be stored in RTC memory to remember the reset count (number of Deep Sleeps).
+// This structure is stored in RTC memory to remember the reset count (number of Deep Sleeps).
 // First field is CRC32, which is calculated based on the rest of the structure contents.
 // Any fields can go after the CRC32.  The structure must be 4-byte aligned.
 struct {
@@ -89,6 +89,8 @@ void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback fu
 #ifdef testPoint
   digitalWrite(testPoint, LOW);  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW
 #endif
+  Serial.print(F("millis() = ")); // show that RTC / millis() is slowed in Forced Light Sleep
+  Serial.println(millis());
   Serial.println(F("Woke from Forced Light Sleep - this is the callback"));
 }
 
@@ -119,6 +121,10 @@ void setup() {
       resetCount = rtcData.data[3];  // read the previous reset count
     }
   }
+  if  (resetCount == 1) {  // show that millis() is cleared across Deep Sleep reset
+    Serial.print(F("millis() = "));
+    Serial.println(millis());
+  }
 }  // end of setup()
 
 void loop() {
@@ -128,7 +134,7 @@ void loop() {
     runTest3();
     runTest4();
     runTest5();
-    runTest6();  // first Deep Sleep test, all these end with a RESET
+    runTest6();  // first Deep Sleep test, all of these end with a RESET
   }
   if (resetCount < 4) {
     initWiFi();
@@ -200,7 +206,7 @@ void runTest4() {
   WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
   uint32_t wifiStart = millis();
   while ((!WiFi.localIP()) && (millis() - wifiStart < wifiTimeout)) {
-    delay(50);
+    yield();
   }
   if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
     float volts = ESP.getVcc();
@@ -221,12 +227,14 @@ void runTest5() {
   yield();
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
 #ifdef testPoint
-  digitalWrite(testPoint, HIGH);  
+  digitalWrite(testPoint, HIGH);
   // testPoint LOW in callback tracks latency from WAKE_UP_PIN LOW to testPoint LOW
 #endif
   float volts = ESP.getVcc();
   Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
   Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the button)"));
+  Serial.print(F("millis() = "));
+  Serial.println(millis());
   Serial.flush();  // needs a delay(100) or Serial.flush() else it doesn't print the whole message
   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
   gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);
@@ -256,6 +264,8 @@ void runTest6() {
   //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep, and no long
   // RFCAL as it goes into Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
+  Serial.print(F("millis() = "));
+  Serial.println(millis());
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
 #ifdef testPoint
   digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
@@ -329,7 +339,7 @@ void runTest9() {
 
 void resetTests() {
   resetCount = 5;  // start all over: do ESP.restart to insure a clean starting state
-    // 
+  //
   updateRTC();  // save the current test state in RTC memory
   float volts = ESP.getVcc();
   Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
@@ -337,7 +347,6 @@ void resetTests() {
   waitPushbutton(false, 1000);
   ESP.restart();
 }
-
 
 void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until they press the button
   // note: 2 different modes, as 3 of the power saving modes need a delay() to activate fully
@@ -393,19 +402,24 @@ void initWiFi() {
   DEBUG_PRINTLN(WiFi.macAddress());
   uint32_t wifiStart = millis();
   while ((WiFi.status() != WL_CONNECTED) && (millis() - wifiStart < wifiTimeout)) {
-    delay(50);
+    yield();
   }
   if (WiFi.status() == WL_CONNECTED) {
     DEBUG_PRINTLN(F("WiFi connected"));
   } else {
     Serial.println(F("WiFi timed out and didn't connect"));
   }
-  while (!WiFi.localIP() && (WiFi.status() == WL_CONNECTED)) {
-    delay(50);
+  wifiStart = millis();
+  while ((!WiFi.localIP() && (WiFi.status() == WL_CONNECTED)) && (millis() - wifiStart < wifiTimeout)) {
+    yield();
   }
   WiFi.setAutoReconnect(true);
-  DEBUG_PRINT(F("WiFi Gateway IP: "));
-  DEBUG_PRINTLN(WiFi.gatewayIP());
-  DEBUG_PRINT(F("my IP address: "));
-  DEBUG_PRINTLN(WiFi.localIP());
+  if (WiFi.localIP()) {
+    DEBUG_PRINT(F("WiFi Gateway IP: "));
+    DEBUG_PRINTLN(WiFi.gatewayIP());
+    DEBUG_PRINT(F("my IP address: "));
+    DEBUG_PRINTLN(WiFi.localIP());
+  } else {
+    DEBUG_PRINTLN(F("IP addresses not acquired"));
+  }
 }
