@@ -51,7 +51,7 @@
 // you can use any pin for WAKE_UP_PIN except for D0/GPIO16 as it doesn't support interrupts
 
 // uncomment one of the two lines below for your LED connection, if used
-#define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add to the amperage
+#define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add amperage
 //#define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
 // you can use LED_BUILTIN, but it adds to the measured amperage by 0.3mA to 6mA.
 
@@ -59,8 +59,8 @@ ADC_MODE(ADC_VCC);  // allows you to monitor the internal VCC level; it varies w
 // don't connect anything to the analog input pin(s)!
 
 // enter your WiFi configuration below
-const char* AP_SSID = "SSID";  // your router's SSID here
-const char* AP_PASS = "password";  // your router's password here
+const char* AP_SSID = "tryagain";  // your router's SSID here
+const char* AP_PASS = "093774c242ccb21a3485";  // your router's password here
 IPAddress staticIP(0, 0, 0, 0); // parameters below are for your static IP address, if used
 IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
@@ -68,7 +68,7 @@ IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
 uint32_t wifiTimeout = 25E3;  // 25 second timeout on the WiFi connection
 
-//#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles, entirely optional
+#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles, entirely optional
 
 // This structure will be stored in RTC memory to remember the reset count (number of Deep Sleeps).
 // First field is CRC32, which is calculated based on the rest of the structure contents.
@@ -81,7 +81,6 @@ struct {
 byte resetCount = 0;  // keeps track of the number of Deep Sleep tests / resets
 
 const uint32_t blinkDelay = 100; // fast blink rate for the LED when waiting for the user
-const uint32_t longDelay = 350;  // longer delay() for the two AUTOMATIC modes
 esp8266::polledTimeout::periodicMs blinkLED(blinkDelay);
 esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight spin to simulate user code
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
@@ -96,7 +95,7 @@ void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback fu
 void setup() {
 #ifdef testPoint
   pinMode(testPoint, OUTPUT);  // test point for Forced Light Sleep and Deep Sleep tests
-  digitalWrite(testPoint, LOW);  // Deep Sleep reset doesn't clear GPIOs, testPoint falling shows boot time
+  digitalWrite(testPoint, LOW);  // Deep Sleep reset doesn't clear GPIOs, testPoint LOW shows boot time
 #endif
   pinMode(LED, OUTPUT);  // activity and status indicator
   digitalWrite(LED, LOW);  // turn on the LED
@@ -123,13 +122,13 @@ void setup() {
 }  // end of setup()
 
 void loop() {
-  if (resetCount == 0) {
+  if (resetCount == 0) {  // if first loop() since power on or external reset
     runTest1();
     runTest2();
     runTest3();
     runTest4();
     runTest5();
-    runTest6();
+    runTest6();  // first Deep Sleep test, all these end with a RESET
   }
   if (resetCount < 4) {
     initWiFi();
@@ -143,7 +142,7 @@ void loop() {
   } else if (resetCount == 4) {
     resetTests();
   }
-} //end loop
+} //end of loop()
 
 // 1st test - running with WiFi unconfigured, reads ~67 mA minimum
 void runTest1() {
@@ -165,12 +164,12 @@ void runTest2() {
     Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
     Serial.println(F("press the button to continue"));
     waitPushbutton(true, 90);  /* This is using a special feature: below 100 mS blink delay,
-         the LED blink delay is padding the time with 'program cycles' to fill the 100 mS. At 90 mS
-         delay, 90% of the blink time is delay(), and 10% is 'your program running'. Below 90% you
-         will see a difference in the average amperage, less delay() = more amperage.  At 100 mS
-         and above it's essentially all delay() time.  On an oscilloscope you'll see the time
-         between beacons at > 67 mA more often with less delay() percentage. You can change the
-         '90' mS to other values to see the effect it has on Automatic Modem Sleep. */
+         the LED blink delay is padding 100 mS time with 'program cycles' to fill the 100 mS.
+         At 90 mS delay, 90% of the blink time is delay(), and 10% is 'your program running'.
+         Below 90% you'll see a difference in the average amperage: less delay() = more amperage.
+         At 100 mS and above it's essentially all delay() time.  On an oscilloscope you'll see the
+         time between beacons at > 67 mA more often with less delay() percentage. You can change
+         the '90' mS to other values to see the effect it has on Automatic Modem Sleep. */
   } else {
     Serial.println(F("no WiFi connection, test skipped"));
   }
@@ -195,7 +194,7 @@ void runTest3() {
 void runTest4() {
   Serial.println(F("\n4th test - Automatic Light Sleep"));
   Serial.println(F("reconnecting WiFi"));
-  Serial.println(F("it will be in Automatic Light Sleep once WiFi connects (LED blinks)"));
+  Serial.println(F("it will be in Automatic Light Sleep when WiFi connects (LED blinks)"));
   digitalWrite(LED, LOW);  // visual cue that we're reconnecting
   WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 5);  // Automatic Light Sleep
   WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
@@ -222,7 +221,8 @@ void runTest5() {
   yield();
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
 #ifdef testPoint
-  digitalWrite(testPoint, HIGH);  // testPoint LOW in callback tracks latency from WAKE_UP_PIN LOW to testPoint LOW
+  digitalWrite(testPoint, HIGH);  
+  // testPoint LOW in callback tracks latency from WAKE_UP_PIN LOW to testPoint LOW
 #endif
   float volts = ESP.getVcc();
   Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
@@ -261,7 +261,6 @@ void runTest6() {
   digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
 #endif
   ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
-  delay(10);
   // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is off)
   // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
   // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
@@ -286,7 +285,6 @@ void runTest7() {
   digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
 #endif
   ESP.deepSleep(10E6, WAKE_RFCAL); // good night!  D0 fires a reset in 10 seconds...
-  delay(10);
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
 
@@ -307,7 +305,6 @@ void runTest8() {
   digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
 #endif
   ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL); // good night!  D0 fires a reset in 10 seconds...
-  delay(10);
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
 
@@ -327,12 +324,12 @@ void runTest9() {
   digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
 #endif
   ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED); // good night!  D0 fires a reset in 10 seconds...
-  delay(10);
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
 
 void resetTests() {
-  resetCount = 5;  // start all over: do ESP.restart to insure a clean state since Deep Sleep doesn't clear everything
+  resetCount = 5;  // start all over: do ESP.restart to insure a clean starting state
+    // 
   updateRTC();  // save the current test state in RTC memory
   float volts = ESP.getVcc();
   Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);

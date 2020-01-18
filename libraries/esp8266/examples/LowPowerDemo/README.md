@@ -66,13 +66,13 @@ Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperag
 
 ### Test 6 - Deep Sleep, wake with RF_DEFAULT
 
-In Deep Sleep almost everything is turned off, and the chip draws ~ 20 uA.  If you have D0/GPIO16 connected to RST, you can use the RTC timer to wake the chip up at a timed interval.  You can also wake it with an external RESET.  Waking with RF_DEFAULT means it will do an RFCAL if it needs to.  Doing **ESP.deepSleep(time)** without the mode variable uses this wake mode.  These first two Deep Sleep tests use the standard Deep Sleep function, so the WiFi connection is closed and the modem turned off, which takes up to 270 mS before Deep Sleep begins.  Deep Sleep ends with a RESET, and the boot time after that is ~ 130 mS.  Any Deep Sleep less than ~ 2 seconds is wasting energy due to the modem shut-off and boot times, and Forced Light Sleep will be a better choice as it recovers in ~ 5 mS from the previous state.  The Deep Sleep tests will not go into Automatic Modem Sleep because delay() is not used.
+In Deep Sleep almost everything is turned off, and the chip draws ~ 20 uA.  If you have D0/GPIO16 connected to RST, you can use the RTC timer to wake the chip up at a timed interval.  You can also wake it with an external RESET.  Waking with RF_DEFAULT means it will do an RFCAL if it needs to.  Doing **ESP.deepSleep(time)** without the mode variable uses this wake mode.  These first two Deep Sleep tests use the standard Deep Sleep function, so the WiFi connection is closed and the modem turned off, which takes up to 270 mS before Deep Sleep begins.  Deep Sleep ends with a RESET, and the boot time after that is ~ 130 mS.  Any Deep Sleep less than ~ 2 seconds is wasting energy due to the modem shut-off and boot times, and Forced Light Sleep will be a better choice as it recovers in ~ 5 mS from the previous program state.  The Deep Sleep tests will not go into Automatic Modem Sleep because delay() is not used.
 
 Note that a RESET during Deep Sleep (either external or from D0/GPIO16) does not clear the GPIO pins; they hold their previous state.  It's unknown how much else survives a Deep Sleep reset, as it's not documented.
 
 ### Test 7 - Deep Sleep, wake with RFCAL
 
-Identical to the test above, but the modem does an RF power calibration when booting.  In normal use, most people would do WAKE_RF_DEFAULT instead to avoid the extra RFCAL power burst if it's not needed.
+Identical to the test above, but the modem always does an RF power calibration when booting.  In normal use, most people would do WAKE_RF_DEFAULT instead to avoid the extra RFCAL power burst coming out of Deep Sleep if it's not needed.  Note that most of the time both of these modes (WAKE_RF_DEFAULT and WAKE_RFCAL) do a 100 mS long RFCAL *before* going into Deep Sleep (the RFCAL after Deep Sleep is much shorter).  If the modem is shut down, this long RFCAL doesn't happen.
 
 ### Test 8 - Deep Sleep Instant, wake with NO_RFCAL
 
