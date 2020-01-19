@@ -156,6 +156,7 @@ public:
             format();
             _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         }
+	sdfat::SdFile::dateTimeCallback(dateTimeCB);
         return _mounted;
     }
 
@@ -202,6 +203,17 @@ public:
         tiempo.tm_year = ((int)(d >> 9) & 0x7f) + 80;
         tiempo.tm_isdst = -1;
         return mktime(&tiempo);
+    }
+
+    // Because SdFat has a single, global setting for this we can only use a
+    // static member of our class to return the time/date.  However, since
+    // this is static, we can't see the time callback variable.  Punt for now,
+    // using time(NULL) as the best we can do.
+    static void dateTimeCB(uint16_t *dosYear, uint16_t *dosTime) {
+        time_t now = time(nullptr);
+        struct tm *tiempo = localtime(&now);
+        *dosYear = ((tiempo->tm_year - 1980) << 9) | (tiempo->tm_mon << 5) | tiempo->tm_mday;
+        *dosTime = (tiempo->tm_hour << 11) | (tiempo->tm_min << 5) | tiempo->tm_sec;
     }
 
 protected:
