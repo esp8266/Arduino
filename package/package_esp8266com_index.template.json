@@ -63,6 +63,9 @@
                      "name": "SparkFun ESP8266 Thing Dev"
                   },
                   {
+                     "name": "SparkFun Blynk Board"
+                  },
+                  {
                      "name": "SweetPea ESP-210"
                   },
                   {
@@ -106,6 +109,12 @@
                   },
                   {
                      "name": "ESPectro Core"
+                  },
+                  {
+                     "name": "ITEAD Sonoff"
+                  },
+                  {
+                     "name": "DOIT ESP-Mx DevKit (ESP8285)"
                   }
                ],
                "toolsDependencies": [
