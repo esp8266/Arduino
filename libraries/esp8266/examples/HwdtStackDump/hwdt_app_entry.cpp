@@ -62,9 +62,10 @@
  *
  *
  * When you get a stack dump, copy-paste it into the "ESP Exception Decoder".
- * Since we don't have a SP, we see a lot more stuff in the report. Start at the
- * bottom and work your way up. At this time I have not had a lot of practice
- * using this tool.  TODO: Update description with more details when available.
+ * Since we don't have an SP, we see a lot more stuff in the report, compared to
+ * what you would see with a postmortem report. Start at the bottom and work
+ * your way up. At this time, I have not had a lot of practice using this tool.
+ * TODO: Update description with more details when available.
  *
  *
  *
@@ -74,7 +75,12 @@
  * 0x3fffeb30. This would allow for a value near 640 for ROM_STACK_SIZE.
  *
  * If a problem should arise with some data elements being corrupted during
- * reboot, would it be possible to move their DRAM location higher in memory.
+ * reboot, would it be possible to move their DRAM location higher in memory?
+ *
+ * Also, DRAM being valid across reset events other than power-on and deep
+ * sleep, suggest that a variable in the .noinit section could be used instead
+ * of the more limited RTC Memory for sketches that don't do deep sleep.
+ * However, DRAM should be considered invalid after an upload serial or OTA.
  *
  */
 
@@ -434,6 +440,9 @@ static const uint32_t * ICACHE_RAM_ATTR skip_stackguard(const uint32_t *start, c
 
 static void ICACHE_RAM_ATTR check_g_pcont_validity(void) {
     /*
+     * DRAM appears to remain valid after most resets. There is more on this in
+     * handle_hwdt().
+     *
      * Testing of vital pointers for validity could also aid as a partial
      * indicator of power-on. Not needed for that purpose at this time.
      */
@@ -593,7 +602,7 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
         case REASON_EXCEPTION_RST:
         case REASON_SOFT_WDT_RST:
         case REASON_SOFT_RESTART:
-        case REASON_DEEP_SLEEP_AWAKE:    // TODO: Untested.
+        case REASON_DEEP_SLEEP_AWAKE:
             hwdt_info.reset_reason = rtc_sys_reason;
             break;
         /*
@@ -714,7 +723,21 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
         ets_printf("  ROM API Reset Reason = %u\n", hwdt_info.rom_api_reason);
     }
 #endif
-    // After a flash upload memory cannot be trusted.
+    /*
+     * With a few exceptions, DRAM data remains valid after a reset.
+     *
+     * Check for "cont" stack consistency.
+     * The contents of DRAM are not expected to be valid after a:
+     *   1) flash update (OTA or serial)
+     *   2) power-on
+     *   3) deep sleep
+     * Additionally, g_pcont is expected to be invalid after these events.
+     *
+     * When g_pcont is valid, we expect these checks to be valid. I am not sure
+     * what to do when they are not. An error that could lead to a crash is
+     * corrected. We currently continue and print the stack dump. This assumes
+     * something is better than nothing.
+     */
     if (!power_on && hwdt_info.g_pcont_valid) {
         uint32_t cont_integrity = 0;
         if (g_pcont->stack_guard1 != CONT_STACKGUARD) {
@@ -750,6 +773,9 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
             /* Print separate ctx: cont stack */
             print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
 #endif
+            if (hwdt_info.cont_integrity) {
+                ets_printf("\nCaution, the stack is possibly corrupt integrity checks did not pass.\n\n")
+            }
         }
     }
 
