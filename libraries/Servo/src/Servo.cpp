@@ -27,15 +27,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 uint32_t Servo::_servoMap = 0;
 
 // similiar to map but will have increased accuracy that provides a more
-// symetric api (call it and use result to reverse will provide the original value)
+// symmetrical api (call it and use result to reverse will provide the original value)
 int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 {
     const int rangeIn = maxIn - minIn;
     const int rangeOut = maxOut - minOut;
     const int deltaIn = value - minIn;
     // fixed point math constants to improve accurancy of divide and rounding
-    const int fixedHalfDecimal = 1;
-    const int fixedDecimal = fixedHalfDecimal * 2;
+    constexpr int fixedHalfDecimal = 1;
+    constexpr int fixedDecimal = fixedHalfDecimal * 2;
 
     return ((deltaIn * rangeOut * fixedDecimal) / (rangeIn) + fixedHalfDecimal) / fixedDecimal + minOut;
 }
@@ -70,11 +70,11 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
     _attached = true;
   }
 
-  // keep the min and max within 500-2500 us, these are extreme
+  // keep the min and max within 200-3000 us, these are extreme
   // ranges and should support extreme servos while maintaining
   // reasonable ranges
-  _maxUs = max((uint16_t)550, min((uint16_t)2500, maxUs));
-  _minUs = max((uint16_t)500, min(_maxUs, minUs));
+  _maxUs = max((uint16_t)250, min((uint16_t)3000, maxUs));
+  _minUs = max((uint16_t)200, min(_maxUs, minUs));
 
   write(_valueUs);
 
@@ -87,21 +87,20 @@ void Servo::detach()
     _servoMap &= ~(1 << _pin);
     stopWaveform(_pin);
     _attached = false;
+    _valueUs = DEFAULT_NEUTRAL_PULSE_WIDTH;
     digitalWrite(_pin, LOW);
   }
 }
 
 void Servo::write(int value)
 {
-  // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
+  // treat values less than _minUs as angles in degrees (values equal or larger are handled as microseconds)
   if (value < _minUs) {
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
-    // writeMicroseconds will contain the calculated value for us
-    // for any user defined min and max, but we must use default min max
     value = improved_map(value, 0, 180, _minUs, _maxUs);
   } else if (value > _maxUs) {
-    value = constrain(value, _minUs, _maxUs);
+    value = _maxUs;
   }
   writeMicroseconds(value);
 }
@@ -119,8 +118,7 @@ void Servo::writeMicroseconds(int value)
 
 int Servo::read() // return the value as degrees
 {
-  // read returns the angle for an assumed 0-180, so we calculate using 
-  // the normal min/max constants and not user defined ones
+  // read returns the angle for an assumed 0-180
   return improved_map(readMicroseconds(), _minUs, _maxUs, 0, 180);
 }
 
