@@ -41,10 +41,8 @@ extern "C" {
 #include <Ticker.h>
 
 #ifndef STASSID
-//#define STASSID "your-ssid"
-//#define STAPSK  "your-password"
-#define STASSID "EThomeZX"
-#define STAPSK  "superd0me;0rca"
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
 #endif
 
 const char* ssid = STASSID;
