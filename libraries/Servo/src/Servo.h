@@ -50,7 +50,7 @@
 #define DEFAULT_MAX_PULSE_WIDTH      2190 // the longest duty cycle sent to a servo 
 #define DEFAULT_NEUTRAL_PULSE_WIDTH  1500 // default duty cycle when servo is attached
 #define REFRESH_INTERVAL            20000 // classic default period to refresh servos in microseconds 
-#define MAX_SERVOS             12
+#define MAX_SERVOS                      9 // D0-D8
 
 #if !defined(ESP8266)
 
