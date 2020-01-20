@@ -1043,7 +1043,7 @@ macros = {
     'resetmethod_nodtr_nosync': collections.OrderedDict([
         ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
-  
+
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1459,6 +1459,8 @@ def sdk ():
     return { 'sdk': collections.OrderedDict([
                         ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
                         ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
+                        ('.menu.sdk.nonosdk_191122', 'nonos-sdk 2.2.1+119 (191122)'),
+                        ('.menu.sdk.nonosdk_191122.build.sdk', 'NONOSDK22x_191122'),
                         ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
                         ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
                         ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
@@ -1633,7 +1635,7 @@ def package ():
     # To get consistent indent/formatting read the JSON and write it out programattically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
-            filejson = json.loads(filestr, object_pairs_hook=collections.OrderedDict)
+            filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)
             package_file.write(json.dumps(filejson, indent=3, separators=(',',': ')))
         print("updated:   %s" % pkgfname)
     else:
