@@ -632,15 +632,18 @@ static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_rese
 
 #ifdef HWDT_UART_SPEED
 /*
- * We need this because the SDK overrides the ROMs entry-point. When we call the
- * uninitialized SDK's version of uart_div_modify, we crash.
+ * Here we use uart_div_modify in the Boot ROM. Note the Boot ROM version does
+ * not do any input validation.
+ *
+ * We cannot use the SDKs replacement. It is not in IRAM.
  */
 #ifndef ROM_uart_div_modify
 #define ROM_uart_div_modify         0x400039d8
 #endif
-typedef int (*fp_uart_div_modify_t)(uint32_t uart_no, uint32 DivLatchValue);
+typedef void (*fp_uart_div_modify_t)(uint32_t uart_no, uint32 DivLatchValue);
 constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_uart_div_modify;
 
+#define UART_CLKDIV_MASK 0x000FFFFFUL
 
 static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uint32_t new_speed) {
 
@@ -650,45 +653,57 @@ static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uin
     constexpr uint32_t crystal_freq = 26000000;
 #endif
     constexpr uint32_t rom_uart_speed = 115200;
-    const uint32_t uart_divisor = UART_CLKDIV(uart_no) & UART_CLKDIV_CNT;
+    uint32_t uart_divisor = USD(uart_no) & UART_CLKDIV_MASK;
     uint32_t master_freq = crystal_freq * 2;
 
     if (REASON_DEFAULT_RST       == hwdt_info.reset_reason ||
         REASON_EXT_SYS_RST       == hwdt_info.reset_reason ||
         REASON_DEEP_SLEEP_AWAKE  == hwdt_info.reset_reason) {
         /*
-         * At this time, with a power on boot or EXT_RSTs the CPU Frequency
-         * calibration has not happended. Thus for a 26MHz Xtal, the CPU clock
-         * is running at 52MHz. Tweak uart speed here, so printing works.
-         * To avoid confusion at exit, put the divisor back as we found it.
+         * At this time, with power on boot or EXT_RST, the CPU Frequency
+         * calibration has not happened. Thus for a 26MHz Xtal, the CPU clock is
+         * running at 52MHz. Tweak UART speed here, so printing works. To avoid
+         * confusion on exit, we later restore the divisor.
          */
         master_freq = crystal_freq * 2;
+
     } else {
         /*
-         * No adjustments needed on reboots, etc.
-         * Avoid accumulating divide errors.
+         * No adjustments are needed on reboots, etc.
+         *
+         * The UART clock is independent of the CPU Speed. (ie. 80MHz, 160MHz)
+         * UART_CLK_FREQ is used in user_init, and ESP8266_CLOCK is used in
+         * uart.h. Both are defined to be 80000000.
          */
-        master_freq = ((uart_divisor * rom_uart_speed) < 100000000) ? 80000000 : 160000000;
+        master_freq = UART_CLK_FREQ;
     }
+
     uint32_t new_uart_divisor = master_freq / new_speed;
 
-    int rc = 1;
-    if (new_uart_divisor != uart_divisor) {
+    if (UART_CLKDIV_MASK < new_uart_divisor ||
+        2 > new_uart_divisor ||
+        new_uart_divisor == uart_divisor) {
+        uart_divisor = 0;
+
+    } else {
         /*
-         * These delays appear to resolve the lost data problem that occurs when
-         * printing after a flash upload using esptool.
+         * These delays appear to resolve the lost data problem that occurs
+         * when printing after a flash upload using esptool.
          */
         ets_delay_us(18000);
-        rc = real_uart_div_modify(0, new_uart_divisor);
+        real_uart_div_modify(0, new_uart_divisor);
         ets_delay_us(150);
     }
+
 #if defined(DEBUG_HWDT_DEBUG)
-    ets_printf("\n\n%d = real_uart_div_modify(0, %u / %u);\n", rc, master_freq, new_speed);
+    ets_printf("\n\nreal_uart_div_modify(0, %u / %u);\n", master_freq, new_speed);
     ets_printf("F_CRYSTAL = %u\n", crystal_freq);
     ets_printf("old uart_divisor = %u\n", uart_divisor);
+    ets_printf("new uart_divisor = %u\n", new_uart_divisor);
     ets_printf("master_freq = %u\n", master_freq);
 #endif
-    return (rc) ? 0 : uart_divisor;
+
+    return uart_divisor;
 }
 #endif
 
@@ -774,7 +789,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
             print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
 #endif
             if (hwdt_info.cont_integrity) {
-                ets_printf("\nCaution, the stack is possibly corrupt integrity checks did not pass.\n\n")
+                ets_printf("\nCaution, the stack is possibly corrupt integrity checks did not pass.\n\n");
             }
         }
     }
