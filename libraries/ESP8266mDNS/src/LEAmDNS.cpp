@@ -219,24 +219,22 @@ bool MDNSResponder::close(void)
 
     if (0 != m_pUDPContext)
     {
+        m_GotIPHandler.reset();			// reset WiFi event callbacks.
+        m_DisconnectedHandler.reset();
 
-	  	  m_GotIPHandler.reset();			// reset WiFi event callbacks.
-  	  	m_DisconnectedHandler.reset();
+        _announce(false, true);
+        _resetProbeStatus(false);   // Stop probing
+        _releaseServiceQueries();
+        _releaseUDPContext();
+        _releaseHostname();
 
-    		_announce(false, true);
-    		_resetProbeStatus(false);   // Stop probing
-
-    		_releaseServiceQueries();
-    		_releaseUDPContext();
-    		_releaseHostname();
-
-    		bResult = true;
+        bResult = true;
     }
     else
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] close: Ignoring call to close!\n")););
     }
-	return bResult;
+    return bResult;
 }
 
 /*
