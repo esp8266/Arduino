@@ -20,16 +20,16 @@
  * trapped. Debugging an HWDT can be quite challenging.
  *
  * This module writes a stack dump to the serial port after a Hardware Watchdog
- * Timer has struck and a new boot cycle has begun. By making adjustments to the
+ * Timer has struck, and a new boot cycle has begun. By making adjustments to the
  * stack, we can avoid crash stack data being overwritten by this tool,
- * the Boot ROM and the bootloader.
+ * the Boot ROM, and the bootloader.
  *
  * We are using the method defined for `core_esp8266_app_entry_noextra4k.cpp` to
  * load an alternate `app_entry_redefinable()`. For details on this method, see
  * comments in `core_esp8266_main.cpp's app_entry()`.
  *
- * Using this tools alternate `app_entry_redefinable()` we can gain control
- * before the SDK is started. And dump what is left of the "sys" and "cont"
+ * Using this tool's alternate `app_entry_redefinable()`, we can gain control
+ * before the SDK is started. And dump the contents of the "sys" and "cont"
  * stacks.
  *
  * By making some adjustments to start of the stack pointer, at the entry to
@@ -82,6 +82,28 @@
  * of the more limited RTC Memory for sketches that don't do deep sleep.
  * However, DRAM should be considered invalid after an upload serial or OTA.
  *
+ * With this module active, postmortem stack dumps will be a little longer than
+ * they need to be. The sys stack now ends at 0x3FFFFC00 instead of 0x3FFFFB0.
+ *
+ * Uh, there is a third stack ?? ctx: bearssl - I have not coded for this.
+ * I'll leave this for later, as a possible future enhancement.
+ * There are three possible stacks to hang in!?
+ * Notes for later:
+ *   * Stack is allocted with malloc - must be recovered before SDK init
+ *     (umm_init() called on 1ST heap free call early in SDK init)
+ *   * Function calls for addresses are pageable. Need to access pointers
+ *     directly.
+ *   * stackpaint is 0xdeadbeef
+ *   * stack_thunk_save has reg a1.
+ *   * stack_thunk_ptr malloc-ed address
+ *   * use stack_thunk_refcnt to determine if present
+ *   * malloc addresses are aligned 8 not 16
+ *   * stack_thunk_top beginning of stack. Defined as stack_thunk_ptr + size -1
+ *   * uhhh, either my dyslexic brain is playing tricks on me or
+ *     `void stack_thunk_dump_stack()` in `StackThunk.cpp` has top and bottom
+ *     (which is higher?) confused.
+ *
+ * Maybe an in/out ref count would be nice for bearssl and cont stacks.
  */
 
 /*____________________________________________________________________________*/
@@ -136,7 +158,7 @@
  *
  */
  // #define HWDT_UART_SPEED (74880)
- // #define HWDT_UART_SPEED (115200)
+ #define HWDT_UART_SPEED (115200)
  // #define HWDT_UART_SPEED (230400)
 
 
@@ -241,7 +263,6 @@
 
 extern "C" {
 #include <user_interface.h>
-#include <uart_register.h>
 extern void call_user_start();
 extern uint32_t rtc_get_reset_reason(void);
 }
@@ -647,15 +668,15 @@ constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_
 
 static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uint32_t new_speed) {
 
-#ifdef F_CRYSTAL
-    constexpr uint32_t crystal_freq = F_CRYSTAL;
-#else
-    constexpr uint32_t crystal_freq = 26000000;
-#endif
-    constexpr uint32_t rom_uart_speed = 115200;
     uint32_t uart_divisor = USD(uart_no) & UART_CLKDIV_MASK;
-    uint32_t master_freq = crystal_freq * 2;
-
+    /*
+     * No adjustments are needed on most reboots, etc.
+     *
+     * The UART clock is independent of the CPU Speed. (ie. 80MHz, 160MHz)
+     * UART_CLK_FREQ is used in user_init, and ESP8266_CLOCK is used in
+     * uart.h. Both are defined to be 80000000.
+     */
+    uint32_t master_freq = UART_CLK_FREQ;
     if (REASON_DEFAULT_RST       == hwdt_info.reset_reason ||
         REASON_EXT_SYS_RST       == hwdt_info.reset_reason ||
         REASON_DEEP_SLEEP_AWAKE  == hwdt_info.reset_reason) {
@@ -665,17 +686,12 @@ static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uin
          * running at 52MHz. Tweak UART speed here, so printing works. To avoid
          * confusion on exit, we later restore the divisor.
          */
+#if (1 < F_CRYSTAL)
+        constexpr uint32_t crystal_freq = F_CRYSTAL;
+#else
+        constexpr uint32_t crystal_freq = 26000000;
+#endif
         master_freq = crystal_freq * 2;
-
-    } else {
-        /*
-         * No adjustments are needed on reboots, etc.
-         *
-         * The UART clock is independent of the CPU Speed. (ie. 80MHz, 160MHz)
-         * UART_CLK_FREQ is used in user_init, and ESP8266_CLOCK is used in
-         * uart.h. Both are defined to be 80000000.
-         */
-        master_freq = UART_CLK_FREQ;
     }
 
     uint32_t new_uart_divisor = master_freq / new_speed;
