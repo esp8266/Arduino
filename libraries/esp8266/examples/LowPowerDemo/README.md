@@ -15,16 +15,16 @@ The table below is an expanded version of Table 1.1 from the Low-Power Solutions
 |      System Clock     |           ON          |         ON         |        CYCLING        |         OFF        |         OFF        |
 |          RTC          |           ON          |         ON         |           ON          |         ON         |         ON (1)     |
 |          CPU          |           ON          |         ON         |           ON          |         ON         |         OFF        |
-|   Substrate Amperage   |         15 mA         |        15 mA       |        2-15 mA (2)    |       0.4 mA       |        20 uA       |
+|   Substrate Amperage   |         15 mA         |        15 mA       |        1-15 mA (2)    |       0.4 mA       |        20 uA       |
 |  Avg Amperage DTIM = 1 |        16.2 mA        |                    |        (1.8 mA)       |                    |                    |
 |  Avg Amperage DTIM = 3 |        15.4 mA        |                    |        (0.9 mA)       |                    |                    |
 | Avg Amperage DTIM = 10 |        15.2 mA        |                    |       (0.55 mA)       |                    |                    |
 
 Notes: 
 
-(1) setting a sleep time of 0 for Deep Sleep turns off or disconnects the RTC, requiring an external RESET to wake it
+(1) setting a sleep time of 0 for Deep Sleep disconnects the RTC, requiring an external RESET to wake the CPU
 
-(2) due to a bug in SDK 2, the minimum amperage will never be less than ~ 2 mA and is frequently 15 mA between DTIM beacons
+(2) minimum amperage was never measured less than ~ 1 mA and is frequently 15 mA between DTIM beacons
 
 The Average Amperage with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the amperages listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more power.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional amperage.
 
@@ -58,11 +58,11 @@ Turns off the modem (losing the connection), and reducing the amperage by > 50 m
 
 ### Test 4 - Automatic Light Sleep
 
-Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the amperage can drop to ~ 3 mA average.  In a network with sparse traffic you might get something near 2-5 mA amperage.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go more fully into Automatic Light Sleep.  Although the CPU clock is cycling on and off to achieve low power, the RTC is still running so millis() and micros() are correct.
+Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the amperage can drop to ~ 2 mA average.  In a network with sparse traffic you might get something near 2-5 mA amperage.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go more fully into Automatic Light Sleep.  Although the CPU clock is cycling on and off to achieve low power, millis() and micros() are correct.
 
 ### Test 5 - Forced Light Sleep
 
-Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 5 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.  The RTC is slowed so millis() and micros() are also slowed during Forced Light Sleep.
+Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.  Timers will keep the chip from going fully into Forced Light Sleep, and amperage will be ~ 2 mA with timers enabled.
 
 ### Test 6 - Deep Sleep, wake with RF_DEFAULT
 
