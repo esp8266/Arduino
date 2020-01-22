@@ -36,17 +36,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "circular_queue/ghostl.h"
 #endif
 
+namespace
+{
+
+    template<typename R, typename... P>
+    R IRAM_ATTR vPtrToFunPtrExec(void* fn, P... args)
+    {
+        using target_type = R(P...);
+        return reinterpret_cast<target_type*>(fn)(std::forward<P...>(args...));
+    }
+
+}
+
 namespace delegate
 {
     namespace detail
     {
-
-        template<typename R, typename... P>
-        R IRAM_ATTR vPtrToFunPtrExec(void* fn, P... args)
-        {
-            using target_type = R(P...);
-            return reinterpret_cast<target_type*>(fn)(std::forward<P...>(args...));
-        }
 
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
         template<typename A, typename R, typename... P>
