@@ -38,7 +38,7 @@ public:
     // callback will be called at following loop() after ticker fires
     void attach_scheduled(float seconds, callback_t callback)
     {
-        _callback = [callback]() { schedule_function(callback); };
+        _callback = std::bind(schedule_function, callback);
         _attach_ms(1000UL * seconds, true, _callback, _callback.arg());
     }
 
@@ -52,14 +52,14 @@ public:
     // callback will be called at following loop() after ticker fires
     void attach_ms_scheduled(uint32_t milliseconds, callback_t callback)
     {
-        _callback = [callback]() { schedule_function(callback); };
+        _callback = std::bind(schedule_function, callback);
         _attach_ms(milliseconds, true, _callback, _callback.arg());
     }
 
     // callback will be called at following yield() after ticker fires
     void attach_ms_scheduled_accurate(uint32_t milliseconds, callback_t callback)
     {
-        _callback = [callback]() { schedule_recurrent_function_us([callback]() { callback(); return false; }, 0); };
+        _callback = std::bind(schedule_recurrent_function_us, [callback]() { callback(); return false; }, 0, nullptr);
         _attach_ms(milliseconds, true, _callback, _callback.arg());
     }
 
@@ -95,7 +95,7 @@ public:
     // callback will be called at following loop() after ticker fires
     void once_scheduled(float seconds, callback_t callback)
     {
-        _callback = [callback]() { schedule_function(callback); };
+        _callback = std::bind(schedule_function, callback);
         _attach_ms(1000UL * seconds, false, _callback, _callback.arg());
     }
 
@@ -109,7 +109,7 @@ public:
     // callback will be called at following loop() after ticker fires
     void once_ms_scheduled(uint32_t milliseconds, callback_t callback)
     {
-        _callback = [callback]() { schedule_function(callback); };
+        _callback = std::bind(schedule_function, callback);
         _attach_ms(milliseconds, false, _callback, _callback.arg());
     }
 
