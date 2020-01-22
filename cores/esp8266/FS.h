@@ -72,7 +72,7 @@ public:
         return seek(pos, SeekSet);
     }
     size_t position() const;
-    size_t size() const;
+    virtual ssize_t size() override;
     void close();
     operator bool() const;
     const char* name() const;

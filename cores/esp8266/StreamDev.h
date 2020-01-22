@@ -35,7 +35,7 @@ public:
 
     // Print
     virtual size_t write(uint8_t) override { return 1; }
-    virtual size_t write(const uint8_t* buffer, size_t size) override { (void)buffer; return size; }
+    virtual size_t write(const uint8_t* buffer, size_t size) override { (void)buffer; (void)size; return size; }
     virtual int availableForWrite() override { return 32767; }
 
     // Stream
@@ -46,6 +46,8 @@ public:
     virtual int readNow(char* buffer, size_t len) override { (void)buffer; (void)len; return 0; }
     virtual bool outputTimeoutPossible () override { return false; }
     virtual bool inputTimeoutPossible () override { return false; }
+
+    virtual ssize_t size () override { return 0; }
 };
 
 ///////////////////////////////////////////////
@@ -66,6 +68,8 @@ public:
     virtual int peek() override { return _x; }
     virtual size_t readBytes(char* buffer, size_t len) override { memset(buffer, _x, len); return len; }
     virtual int readNow(char* buffer, size_t len) override { memset(buffer, _x, len); return len; }
+
+    virtual ssize_t size () override { return 32767; }
 };
 
 ///////////////////////////////////////////////
@@ -85,6 +89,7 @@ public:
     StreamPtr (const char* buffer, size_t size, bool in_flash = false): _buffer(buffer), _size(size), _in_flash(in_flash) { }
     StreamPtr (const uint8_t* buffer, size_t size, bool in_flash = false): _buffer((const char*)buffer), _size(size), _in_flash(in_flash) { }
     StreamPtr (const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _in_flash(true) { }
+    StreamPtr (const __FlashStringHelper* buffer): _buffer(reinterpret_cast<const char*>(buffer)), _size(strlen_P(_buffer)), _in_flash(true) { }
 
     void peekPointerReset (int pointer = 0) { _peekPointer = pointer; }
 
@@ -106,11 +111,150 @@ public:
     }
     virtual int readNow(char* buffer, size_t len) override { return readBytes(buffer, len); }
 
+    virtual ssize_t size () override { return _size; }
+
     // peekBuffer
     virtual bool peekBufferAPI () const override { return !_in_flash; }
     virtual size_t availableForPeek () override { return _peekPointer < _size? _size - _peekPointer: 0; }
     virtual const char* peekBuffer () { return _peekPointer < _size? _buffer + _peekPointer: nullptr; }
     virtual void peekConsume (size_t consume) { _peekPointer += consume; }
+};
+
+///////////////////////////////////////////////
+// serialization:
+// combine multiple input Stream into one
+// useful when sending HTML content (strings, files. ...)
+
+template <int MaxSegments = 10>
+class SerialStreamArray: public Stream
+{
+protected:
+
+    Stream* m_segments [MaxSegments];
+    int m_size = 0;
+    int m_current = 0;
+
+public:
+
+    // not writable
+    virtual size_t write(uint8_t) override { return 0; }
+    virtual size_t write(const uint8_t* buffer, size_t size) override { (void)buffer; (void)size; return 0; }
+    virtual int availableForWrite() override { return 0; }
+    virtual bool outputTimeoutPossible () override { return false; }
+
+    // not offering peekBuffer because one streamed element can be not compatible
+    // (Stream:: is by default not peekBuffer-enabled)
+    // input timeout may be possible:
+    virtual bool inputTimeoutPossible () override { return true; }
+
+    SerialStreamArray () {}
+
+    bool add (Stream* s)
+    {
+        if (m_size >= MaxSegments)
+            return false;
+
+        m_segments[m_size++] = s;
+        return true;
+    }
+
+    // Stream
+    virtual int available() override
+    {
+        while (true)
+        {
+            if (m_current >= m_size)
+                // end of all
+                return 0;
+
+            int ret = m_segments[m_current]->available();
+            if (ret > 0)
+                return ret;
+
+            m_current++;
+        }
+    }
+
+    virtual int read() override
+    {
+        while (true)
+        {
+            if (m_current >= m_size)
+                // end of all
+                return 0;
+
+            int ret = m_segments[m_current]->read();
+            if (ret > 0)
+                return ret;
+
+            m_current++;
+        }
+    }
+
+    virtual int peek() override
+    {
+        while (true)
+        {
+            if (m_current >= m_size)
+                // end of all
+                return 0;
+
+            int ret = m_segments[m_current]->peek();
+            if (ret > 0)
+                return ret;
+
+            m_current++;
+        }
+    }
+
+    virtual size_t readBytes(char* buffer, size_t len) override
+    {
+        while (true)
+        {
+            if (m_current >= m_size)
+                // end of all
+                return 0;
+
+            size_t ret = m_segments[m_current]->readBytes(buffer, len);
+            if (ret > 0)
+                return ret;
+
+            m_current++;
+        }
+    }
+
+    virtual int readNow(char* buffer, size_t len) override
+    {
+        while (true)
+        {
+            if (m_current >= m_size)
+                // end of all
+                return 0;
+
+            int ret = m_segments[m_current]->readNow(buffer, len);
+            if (ret > 0)
+                return ret;
+
+            m_current++;
+        }
+    }
+
+    virtual ssize_t size () override
+    {
+        ssize_t ret = 0;
+        for (int i = 0; i < m_size; i++)
+        {
+            ssize_t s = m_segments[i]->size();
+            if (s == -1)
+                return -1;
+            ret += s;
+        }
+        return ret;
+    }
+};
+
+class SerialStream: public SerialStreamArray<>
+{
 };
 
 ///////////////////////////////////////////////

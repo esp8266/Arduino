@@ -364,6 +364,8 @@ public:
         return read(buffer, len);
     }
 
+    virtual ssize_t size () override { return length(); }
+
     //// Print:
 
     virtual bool outputTimeoutPossible () override { return false; }

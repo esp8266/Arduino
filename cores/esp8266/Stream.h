@@ -220,6 +220,13 @@ class Stream: public Print {
 
         toReport_e getLastTo () /*const*/ { return (toReport_e)getWriteError(); }
 
+        ////////////////////
+        // size of input
+        // -1 by default is unknown
+        // may be used by http streamer (using a SerialStream as a file)
+
+        virtual ssize_t size () { return -1; }
+
         //////////////////// end of extensions
 
     protected:

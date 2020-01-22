@@ -169,6 +169,30 @@ public:
     return contentLength;
   }
 
+  // Implement GET and HEAD requests for stream
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t stream(T &aStream, const String& contentType, HTTPMethod requestMethod, ssize_t size) {
+    setContentLength(size);
+    send(200, contentType, emptyString);
+    if (requestMethod == HTTP_GET)
+        size = aStream.to(_currentClient, size);
+    return size;
+  }
+
+  // Implement GET and HEAD requests for stream
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t stream(T& aStream, const String& contentType, HTTPMethod requestMethod = HTTP_GET) {
+    ssize_t size = aStream.size();
+    if (size < 0)
+    {
+        send(500, F("text/html"), F("input stream: undetermined size"));
+        return 0;
+    }
+    return stream(aStream, contentType, requestMethod, size);
+  }
+
   static String responseCodeToString(const int code);
 
 protected:

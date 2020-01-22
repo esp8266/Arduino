@@ -96,7 +96,7 @@ size_t File::position() const {
     return _p->position();
 }
 
-size_t File::size() const {
+ssize_t File::size() {
     if (!_p)
         return 0;
 
