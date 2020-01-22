@@ -204,8 +204,7 @@ void setup() {
   // it will be used until NTP server will send us real current time
   time_t rtc = RTC_UTC_TEST;
   timeval tv = { rtc, 0 };
-  timezone tz = { 0, 0 };
-  settimeofday(&tv, &tz);
+  settimeofday(&tv, nullptr);
 
   // install callback - called when settimeofday is called (by SNTP or us)
   // once enabled (by DHCP), SNTP is updated every hour
@@ -221,9 +220,9 @@ void setup() {
   //       Here is the ONLY ONE LINE needed in your sketch <----
   // pick a value from TZ.h (search for this file in your filesystem) for MYTZ
 
-  // former configTime is still valid, here is the call for 7 to the west
+  // former configTime is still valid, here is the call for 7 hours to the west
   // with an enabled 30mn DST
-  //configTime(7*3600, 3600 / 2, "pool.ntp.org");
+  //configTime(7 * 3600, 3600 / 2, "pool.ntp.org");
 
   // OPTIONAL: disable obtaining SNTP servers from DHCP
   //sntp_servermode_dhcp(0); // 0: disable obtaining SNTP servers from DHCP (enabled by default)
