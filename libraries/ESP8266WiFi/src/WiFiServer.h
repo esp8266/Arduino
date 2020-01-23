@@ -31,6 +31,17 @@ extern "C" {
 #include "Server.h"
 #include "IPAddress.h"
 
+// lwIP-v2 backlog facility allows to keep memory safe by limiting the
+// maximum number of simultaneously accepted clients.
+// Generally in Arduino scenarios, only one client is used at a time.
+// Default number of possibly simultaneously acepted client is defined
+// below, user can overide it at runtime from sketch:
+//      WiFiServer::begin(port, max-simultaneous-clients-per-port);
+// New incoming clients to this server will be delayed until an already
+// connected one leaves.  SYNACK is anyway answered to waiting clients, so
+// the connection appears as open anyway.
+#define MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT 3
+
 class ClientContext;
 class WiFiClient;
 
@@ -39,7 +50,7 @@ class WiFiServer : public Server {
 protected:
   uint16_t _port;
   IPAddress _addr;
-  tcp_pcb* _pcb;
+  tcp_pcb* _listen_pcb;
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
@@ -52,7 +63,8 @@ public:
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();
-  void begin(uint16_t port);
+  void begin(uint16_t port) { begin(port, MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT); }
+  void begin(uint16_t port, int backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
   virtual size_t write(uint8_t);

@@ -35,12 +35,13 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
+#include "lwip/init.h" // LWIP_VERSION_
 #include <include/ClientContext.h>
 
 WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 : _port(port)
 , _addr(addr)
-, _pcb(nullptr)
+, _listen_pcb(nullptr)
 , _unclaimed(nullptr)
 , _discarded(nullptr)
 {
@@ -49,7 +50,7 @@ WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 WiFiServer::WiFiServer(uint16_t port)
 : _port(port)
 , _addr(IP_ANY_TYPE)
-, _pcb(nullptr)
+, _listen_pcb(nullptr)
 , _unclaimed(nullptr)
 , _discarded(nullptr)
 {
@@ -59,7 +60,7 @@ void WiFiServer::begin() {
 	begin(_port);
 }
 
-void WiFiServer::begin(uint16_t port) {
+void WiFiServer::begin(uint16_t port, int backlog) {
     close();
     _port = port;
     err_t err;
@@ -77,13 +78,19 @@ void WiFiServer::begin(uint16_t port) {
         return;
     }
 
+#if LWIP_VERSION_MAJOR == 1
+    (void)backlog;
     tcp_pcb* listen_pcb = tcp_listen(pcb);
+#else
+    tcp_pcb* listen_pcb = tcp_listen_with_backlog(pcb, backlog);
+#endif
+
     if (!listen_pcb) {
         tcp_close(pcb);
         return;
     }
-    _pcb = listen_pcb;
-    _port = _pcb->local_port;
+    _listen_pcb = listen_pcb;
+    _port = _listen_pcb->local_port;
     tcp_accept(listen_pcb, &WiFiServer::_s_accept);
     tcp_arg(listen_pcb, (void*) this);
 }
@@ -122,9 +129,9 @@ WiFiClient WiFiServer::available(byte* status) {
 }
 
 uint8_t WiFiServer::status()  {
-    if (!_pcb)
+    if (!_listen_pcb)
         return CLOSED;
-    return _pcb->state;
+    return _listen_pcb->state;
 }
 
 uint16_t WiFiServer::port() const {
@@ -132,11 +139,11 @@ uint16_t WiFiServer::port() const {
 }
 
 void WiFiServer::close() {
-    if (!_pcb) {
+    if (!_listen_pcb) {
       return;
     }
-    tcp_close(_pcb);
-    _pcb = nullptr;
+    tcp_close(_listen_pcb);
+    _listen_pcb = nullptr;
 }
 
 void WiFiServer::stop() {
@@ -171,7 +178,13 @@ long WiFiServer::_accept(tcp_pcb* apcb, long err) {
     DEBUGV("WS:ac\r\n");
     ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
     _unclaimed = slist_append_tail(_unclaimed, client);
-    tcp_accepted(_pcb);
+#if LWIP_VERSION_MAJOR == 1
+    tcp_accepted(_listen_pcb);
+#else
+    tcp_backlog_accepted(_listen_pcb);
+    // http://lwip.100.n7.nabble.com/Problem-re-opening-listening-pbc-tt32484.html#a32494
+    // https://www.nongnu.org/lwip/2_1_x/group__tcp__raw.html#gaeff14f321d1eecd0431611f382fcd338
+#endif
     return ERR_OK;
 }
 
