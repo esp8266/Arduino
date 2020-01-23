@@ -52,7 +52,7 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
     int flags = _getFlags(openMode, accessMode);
     auto fd = std::make_shared<lfs_file_t>();
 
-    if ((openMode && OM_CREATE) && strchr(path, '/')) {
+    if ((openMode & OM_CREATE) && strchr(path, '/')) {
         // For file creation, silently make subdirs as needed.  If any fail,
         // it will be caught by the real file open later on
         char *pathStr = strdup(path);
@@ -72,9 +72,9 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
     if (rc == LFS_ERR_ISDIR) {
         // To support the SD.openNextFile, a null FD indicates to the LittleFSFile this is just
         // a directory whose name we are carrying around but which cannot be read or written
-        return std::make_shared<LittleFSFileImpl>(this, path, nullptr);
+        return std::make_shared<LittleFSFileImpl>(this, path, nullptr, flags);
     } else if (rc == 0) {
-        return std::make_shared<LittleFSFileImpl>(this, path, fd);
+        return std::make_shared<LittleFSFileImpl>(this, path, fd, flags);
     } else {
         DEBUGV("LittleFSDirImpl::openFile: rc=%d fd=%p path=`%s` openMode=%d accessMode=%d err=%d\n",
                rc, fd.get(), path, openMode, accessMode, rc);

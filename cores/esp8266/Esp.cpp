@@ -26,6 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -447,6 +448,25 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     return false;
 }
 
+bool EspClass::checkFlashCRC() {
+    // The CRC and total length are placed in extra space at the end of the 4K chunk
+    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
+    // we'll need to adjust this.
+    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
+    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4092)); // Start of PROGMEM plus 4K-4
+    uint32_t z[2];
+    z[0] = z[1] = 0;
+
+    // Start the checksum
+    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
+    // Pretend the 2 words of crc/len are zero to be idempotent
+    crc = crc32(z, 8, crc);
+    // Finish the CRC calculation over the rest of flash
+    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
+    return crc == flashcrc;
+}
+
+
 String EspClass::getResetReason(void) {
     char buff[32];
     if (resetInfo.reason == REASON_DEFAULT_RST) { // normal startup by power on
@@ -470,12 +490,14 @@ String EspClass::getResetReason(void) {
 }
 
 String EspClass::getResetInfo(void) {
-    if(resetInfo.reason != 0) {
+    if (resetInfo.reason >= REASON_WDT_RST && resetInfo.reason <= REASON_SOFT_WDT_RST) {
         char buff[200];
-        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : resetInfo.reason == 6 ? "EXT_SYS_RST" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        sprintf_P(buff, PSTR("Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x"),
+            resetInfo.exccause, resetInfo.reason, getResetReason().c_str(),
+            resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
         return String(buff);
     }
-    return String("flag: 0");
+    return getResetReason();
 }
 
 struct rst_info * EspClass::getResetInfoPtr(void) {
