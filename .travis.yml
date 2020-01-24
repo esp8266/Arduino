@@ -24,11 +24,15 @@ jobs:
     - name: "Platformio (1)"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      install:
+          - sudo apt-get install python3-pip
       env:
         - BUILD_PARITY=even
     - name: "Platformio (2)"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      install:
+          - sudo apt-get install python3-pip
       env:
         - BUILD_PARITY=odd
 
