@@ -149,10 +149,18 @@ public:
 
     SerialStreamArray () {}
 
-    bool add (Stream* s)
+    bool addref (Stream& s)
+    {
+        return addref(&s);
+    }
+
+    bool addref (Stream* s)
     {
         if (m_size >= MaxSegments)
+        {
+            //XXXDEBUG: print exhausted message
             return false;
+        }
 
         m_segments[m_size++] = s;
         return true;
