@@ -82,7 +82,7 @@ done
 
 # use pip2 for python2 with python3 is around, platformio doesn't like it
 cp tests/platformio.sh tests/platformio-custom.sh
-sed -i 's,pip ,pip2 ,g' tests/platformio-custom.sh
+sed -i 's,pip ,pip3 ,g' tests/platformio-custom.sh
 
 git submodule update --init
 
