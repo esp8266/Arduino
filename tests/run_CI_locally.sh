@@ -114,14 +114,11 @@ elif [ "$BUILD_TYPE" = "build1_odd" ]; then
     BUILD_PARITY=odd tests/build1.sh
 
 elif [ "$BUILD_TYPE" = "platformio" ]; then
-    cp tests/platformio.sh tests/platformio-custom.sh
-    sed -i 's,pip ,pip3 ,g' tests/platformio-custom.sh
-    platformio lib --storage-dir ${TMPCI}/.platformio/lib install
-    tests/platformio-custom.sh
+    tests/platformio.sh
 elif [ "$BUILD_TYPE" = "platformio_even" ]; then
-    BUILD_PARITY=even tests/platformio-custom.sh
+    BUILD_PARITY=even tests/platformio.sh
 elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
-    BUILD_PARITY=odd tests/platformio-custom.sh
+    BUILD_PARITY=odd tests/platformio.sh
 
 elif [ "$BUILD_TYPE" = host ]; then
     tests/ci/host_test.sh

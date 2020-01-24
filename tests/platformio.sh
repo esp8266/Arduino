@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 
 cache_dir=$(mktemp -d)
 
