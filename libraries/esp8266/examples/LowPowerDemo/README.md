@@ -54,7 +54,7 @@ This is the default power saving mode when you have an active WiFi connection.  
 
 ### Test 3 - Forced Modem Sleep
 
-Turns off the modem (losing the connection), and reducing the amperage by > 50 mA.  This test uses the WiFi library function.  It's good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 to 20 mA.  The longer you spend in delay(), the closer the amperage approaches 15 mA.  The test loops on delay(100) until you press the button.  The CPU will be drawing 15 to 16 mA during the looped delay(), and 19-20 mA without a delay().
+Turns off the modem (losing the connection), and reducing the amperage by > 50 mA.  This test uses a WiFi library function and saves the WiFi connection state for faster reconnection later in the tests.  Forced Modem Sleep is good if there is a long interval with no expected WiFi traffic, as you can do other things while only drawing 15 to 20 mA.  The longer you spend in delay(), the closer the amperage approaches 15 mA.  The test loops on delay(100) until you press the button.  The CPU will be drawing 15 to 16 mA during the looped delay(), and 19-20 mA without a delay().
 
 ### Test 4 - Automatic Light Sleep
 
@@ -68,7 +68,7 @@ Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperag
 
 In Deep Sleep almost everything is turned off, and the chip draws ~ 20 uA.  If you have D0/GPIO16 connected to RST, you can use the RTC timer to wake the chip up at a timed interval.  You can also wake it with an external RESET.  Waking with RF_DEFAULT means it will do an RFCAL if it needs to.  Doing **ESP.deepSleep(time)** without the mode variable uses this wake mode.  These first two Deep Sleep tests use the standard Deep Sleep function, so the WiFi connection is closed and the modem turned off, which takes up to 270 mS before Deep Sleep begins.  Deep Sleep ends with a RESET, and the boot time after that is ~ 130 mS.  Any Deep Sleep less than ~ 2 seconds is wasting energy due to the modem shut-off and boot times, and Forced Light Sleep will be a better choice as it recovers in ~ 5 mS from the previous program state.  The Deep Sleep tests will not go into Automatic Modem Sleep because delay() is not used.
 
-Note that a RESET during Deep Sleep (either external or from D0/GPIO16) does not clear the GPIO pins; they hold their previous state.  It's unknown how much else survives a Deep Sleep reset, as it's not documented.
+Note that a RESET during Deep Sleep (either external or from D0/GPIO16) does not clear the GPIO pins; some of them hold their previous state.  It's unknown how much else survives a reset, as it's not documented.
 
 ### Test 7 - Deep Sleep, wake with RFCAL
 
@@ -97,15 +97,13 @@ If you need a longer sleep time than 71 minutes, you can pass zero as the time v
 
 If all you want to do is reduce power for a sketch that doesn't need WiFi, add these SDK 2 functions to your code:
 ```c
-  wifi_station_disconnect();   // disconnects Wi-Fi Station from AP
-  delay(10);  // without at least delay(8) you might get soft WDT resets after this
   wifi_set_opmode_current(NULL_MODE);  // set Wi-Fi working mode to unconfigured, don't save to flash
   wifi_fpm_set_sleep_type(MODEM_SLEEP_T);  // set the sleep type to modem sleep
   wifi_fpm_open();  // enable Forced Modem Sleep
-  wifi_fpm_do_sleep(0xFFFFFFF);  // force CPU to enter sleep mode
-  delay(10);  // without a delay() here it doesn't reliably enter sleep
+  wifi_fpm_do_sleep(0xFFFFFFF);  // force modem to enter sleep mode
+  delay(10);  // without a minimum of delay(1) here it doesn't reliably enter sleep
 ```
-This code allows you to shut down the modem *without* loading the WiFi library, dropping your amperage by 50 mA, or ~ 1/4th of the initial power.  You have to add it as shown, preferably in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
+This code allows you to shut down the modem *without* loading the WiFi library, dropping your amperage by 50 mA, or ~ 1/4th of the initial power.  You have to add it as shown, preferably early in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  If you put a delay value smaller than 0xFFFFFFF it will end Modem Sleep at the number of uS you have entered: 10E6 would be 10 seconds of Modem Sleep.  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
 
 You can also use the Deep Sleep modes without loading the WiFi library, as Deep Sleep use ESP API functions.  The Deep Sleep tests above turn the WiFi on to show you the differences after the 4 reset modes. but WiFi is not required for Deep Sleep.
 
