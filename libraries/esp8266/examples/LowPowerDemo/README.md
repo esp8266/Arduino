@@ -105,5 +105,7 @@ If all you want to do is reduce power for a sketch that doesn't need WiFi, add t
 ```
 This code allows you to shut down the modem *without* loading the WiFi library, dropping your amperage by 50 mA, or ~ 1/4th of the initial power.  You have to add it as shown, preferably early in **setup()**.  It doesn't time out at 71 minutes, as you might think from the (0xFFFFFFF).  If you put a delay value smaller than 0xFFFFFFF it will end Modem Sleep at the number of uS you have entered: 10E6 would be 10 seconds of Modem Sleep.  The Forced Modem Sleep test does the same thing with a WiFi library call that encapsulates something similar to the code above.
 
+If you want to reduce the start-up power even more, see https://github.com/esp8266/Arduino/issues/6642#issuecomment-578462867
+
 You can also use the Deep Sleep modes without loading the WiFi library, as Deep Sleep use ESP API functions.  The Deep Sleep tests above turn the WiFi on to show you the differences after the 4 reset modes. but WiFi is not required for Deep Sleep.
 
