@@ -187,7 +187,7 @@ public:
         if (!_rx_buf)
             return 0;
 
-        return _rx_buf->len - _rx_buf_offset;
+        return _rx_buf->tot_len - _rx_buf_offset;
     }
 
     size_t tell() const
@@ -202,7 +202,7 @@ public:
     }
 
     bool isValidOffset(const size_t pos) const {
-        return (pos <= _rx_buf->len);
+        return (pos <= _rx_buf->tot_len);
     }
 
     CONST IPAddress& getRemoteAddress() CONST
@@ -238,6 +238,8 @@ public:
         }
 
         auto deleteme = _rx_buf;
+
+        while(_rx_buf->len != _rx_buf->tot_len) _rx_buf = _rx_buf->next;
         _rx_buf = _rx_buf->next;
 
         if (_rx_buf)
@@ -274,10 +276,10 @@ public:
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf->tot_len)
             return -1;
 
-        char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        char c = pbuf_get_at(_rx_buf, _rx_buf_offset);
         _consume(1);
         return c;
     }
@@ -287,11 +289,15 @@ public:
         if (!_rx_buf)
             return 0;
 
-        size_t max_size = _rx_buf->len - _rx_buf_offset;
+        size_t max_size = _rx_buf->tot_len - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
-        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->len, _rx_buf_offset);
+        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
 
-        memcpy(dst, reinterpret_cast<char*>(_rx_buf->payload) + _rx_buf_offset, size);
+        void* buf = pbuf_get_contiguous(_rx_buf, dst, size, size, _rx_buf_offset);
+        if(!buf) return 0;
+
+        if(buf != dst) memcpy(dst, buf, size);
+
         _consume(size);
 
         return size;
@@ -299,10 +305,10 @@ public:
 
     int peek() const
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset == _rx_buf->tot_len)
             return -1;
 
-        return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        return pbuf_get_at(_rx_buf, _rx_buf_offset);
     }
 
     void flush()
@@ -311,7 +317,7 @@ public:
         if (!_rx_buf)
             return;
 
-        _consume(_rx_buf->len - _rx_buf_offset);
+        _consume(_rx_buf->tot_len - _rx_buf_offset);
     }
 
     size_t append(const char* data, size_t size)
@@ -432,8 +438,8 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
-        if (_rx_buf_offset > _rx_buf->len) {
-            _rx_buf_offset = _rx_buf->len;
+        if (_rx_buf_offset > _rx_buf->tot_len) {
+            _rx_buf_offset = _rx_buf->tot_len;
         }
     }
 
