@@ -141,6 +141,8 @@ public:
 
   void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
+  void sendContent(Stream& content);
+  void sendContent(Stream* content);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);

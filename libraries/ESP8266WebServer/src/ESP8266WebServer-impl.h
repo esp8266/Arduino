@@ -488,6 +488,31 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_
 }
 
 template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent(Stream& content) {
+    sendContent(&content);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
+  if (_currentMethod == HTTP_HEAD) return;
+  const char * footer = "\r\n";
+  size_t len = content->size();
+  if(_chunked) {
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", len);
+    _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
+  }
+  size_t sent = content->to(_currentClient);
+  (void)sent; /// if (sent != len) print-error-on-console-and-return-false
+  if(_chunked){
+    _currentClient.write((const uint8_t *)footer, 2);
+    if (len == 0) {
+      _chunked = false;
+    }
+  }
+}
+
+template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
   if (_currentMethod == HTTP_HEAD) return;
   const char * footer = "\r\n";
