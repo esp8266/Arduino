@@ -52,7 +52,7 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
     int flags = _getFlags(openMode, accessMode);
     auto fd = std::make_shared<lfs_file_t>();
 
-    if ((openMode && OM_CREATE) && strchr(path, '/')) {
+    if ((openMode & OM_CREATE) && strchr(path, '/')) {
         // For file creation, silently make subdirs as needed.  If any fail,
         // it will be caught by the real file open later on
         char *pathStr = strdup(path);

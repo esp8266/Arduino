@@ -758,7 +758,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     }
 
     if(size > 0) {
-        addHeader("Content-Length", String(size));
+        addHeader(F("Content-Length"), String(size));
     }
 
     // send Header
@@ -1324,7 +1324,8 @@ int HTTPClient::handleHeaderResponse()
                 }
 
                 if(_canReuse && headerName.equalsIgnoreCase(F("Connection"))) {
-                    if(headerValue.indexOf("close") >= 0 && headerValue.indexOf("keep-alive") < 0) {
+                    if (headerValue.indexOf(F("close")) >= 0 &&
+                            headerValue.indexOf(F("keep-alive")) < 0) {
                         _canReuse = false;
                     }
                 }
