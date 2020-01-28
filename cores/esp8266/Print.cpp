@@ -280,8 +280,9 @@ size_t Print::printNumber(unsigned long n, uint8_t base) {
         base = 10;
 
     do {
-        char c = n % base;
+        unsigned long m = n;
         n /= base;
+        char c = m - base * n;
 
         *--str = c < 10 ? c + '0' : c + 'A' - 10;
     } while(n);
@@ -300,8 +301,9 @@ size_t Print::printNumber(unsigned long long n, uint8_t base) {
         base = 10;
 
     do {
-        char c = n % base;
+        unsigned long m = n;
         n /= base;
+        char c = m - base * n;
 
         *--str = c < 10 ? c + '0' : c + 'A' - 10;
     } while(n);
