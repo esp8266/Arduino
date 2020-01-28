@@ -24,7 +24,7 @@ Notes:
 
 (1) setting a sleep time of 0 for Deep Sleep disconnects the RTC, requiring an external RESET to wake the CPU
 
-(2) minimum amperage was never measured less than ~ 1 mA and is frequently 15 mA between DTIM beacons
+(2) minimum amperage was never measured less than ~ 1 mA and is frequently 15 mA between TIM beacons
 
 The Average Amperage with different DTIM settings is unverified, and will likely be higher in a real-world environment.  All of the amperages listed in this README are for the ESP8266 chip only, compiled for 80 MHz CPU Frequency as 160 MHz uses even more power.  Modules that have voltage regulators, USB chips, LEDs or other hardware will draw additional amperage.
 
@@ -36,11 +36,12 @@ The Average Amperage with different DTIM settings is unverified, and will likely
 2. Automatic Modem Sleep
 3. Forced Modem Sleep
 4. Automatic Light Sleep
-5. Forced Light Sleep (stop the clock, and wait for an interrupt)
-6. Deep Sleep for 10 seconds, wake with default modem power settings
-7. Deep Sleep for 10 seconds, wake with RFCAL
-8. Deep Sleep Instant for 10 seconds, wake with NO_RFCAL
-9. Deep Sleep Instant for 10 seconds, wake with RF_DISABLED
+5. Timed Light Sleep - stop the CPU for (x microseconds)
+6. Forced Light Sleep, wake with GPIO interrupt
+7. Deep Sleep for 10 seconds, wake with default modem power settings
+8. Deep Sleep for 10 seconds, wake with RFCAL
+9. Deep Sleep Instant for 10 seconds, wake with NO_RFCAL
+10. Deep Sleep Instant for 10 seconds, wake with RF_DISABLED
 
 ---
 
@@ -58,27 +59,31 @@ Turns off the modem (losing the connection), and reducing the amperage by > 50 m
 
 ### Test 4 - Automatic Light Sleep
 
-Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the amperage can drop to ~ 2 mA average.  In a network with sparse traffic you might get something near 2-5 mA amperage.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the DTIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go more fully into Automatic Light Sleep.  Although the CPU clock is cycling on and off to achieve low power, millis() and micros() are correct.
+Like Automatic Modem Sleep, with similar restrictions.  Once configured it's immediately active when a connection is established.  During periods of long delay() the amperage can drop to ~ 2 mA average.  In a network with sparse traffic you might get something near 2-5 mA amperage.  The LED blinks more slowly during this test as it's doing delay(350) to get the modem to sleep.  With delay() times shorter than the TIM beacon interval (100 mS beacons for these tests) the modem only goes into Automatic Modem Sleep, and with a longer delay() it will go more fully into Automatic Light Sleep.  Although the CPU clock is cycling on and off to achieve low power, millis() and micros() are correct.  You can't stop OS_timers to get the low amperage recorded by Espressif as WiFi needs system timers running.
 
-### Test 5 - Forced Light Sleep
+### Test 5 - Timed Light Sleep
 
-Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.  Timers will keep the chip from going fully into Forced Light Sleep, and amperage will be ~ 2 mA with timers enabled.
+Similar to Deep Sleep, but it wakes with an interrupt at the next line in your code and continues.  The chip sleeps at 0.4 mA amperage until it is woken by the RTC timer.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using timed Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter timed Light Sleep so you will need to re-initialize it if you are using WiFi.  Any timers (including OS_timers and PWM) will keep the chip from going fully into timed Light Sleep, and it will fall through to the next line in your code if timers are enabled.
 
-### Test 6 - Deep Sleep, wake with RF_DEFAULT
+### Test 6 - Forced Light Sleep, wake with GPIO interrupt
+
+Similar to Deep Sleep, but without the timer.  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.  Any standard timers (including PWM) will keep the chip from going fully into Forced Light Sleep, and amperage will be ~ 2 mA with timers enabled.
+
+### Test 7 - Deep Sleep, wake with RF_DEFAULT
 
 In Deep Sleep almost everything is turned off, and the chip draws ~ 20 uA.  If you have D0/GPIO16 connected to RST, you can use the RTC timer to wake the chip up at a timed interval.  You can also wake it with an external RESET.  Waking with RF_DEFAULT means it will do an RFCAL if it needs to.  Doing **ESP.deepSleep(time)** without the mode variable uses this wake mode.  These first two Deep Sleep tests use the standard Deep Sleep function, so the WiFi connection is closed and the modem turned off, which takes up to 270 mS before Deep Sleep begins.  Deep Sleep ends with a RESET, and the boot time after that is ~ 130 mS.  Any Deep Sleep less than ~ 2 seconds is wasting energy due to the modem shut-off and boot times, and Forced Light Sleep will be a better choice as it recovers in ~ 5 mS from the previous program state.  The Deep Sleep tests will not go into Automatic Modem Sleep because delay() is not used.
 
 Note that a RESET during Deep Sleep (either external or from D0/GPIO16) does not clear the GPIO pins; some of them hold their previous state.  It's unknown how much else survives a reset, as it's not documented.
 
-### Test 7 - Deep Sleep, wake with RFCAL
+### Test 8 - Deep Sleep, wake with RFCAL
 
 Identical to the test above, but the modem always does an RF power calibration when booting.  In normal use, most people would do WAKE_RF_DEFAULT instead to avoid the extra RFCAL power burst coming out of Deep Sleep if it's not needed.  Note that most of the time both of these modes (WAKE_RF_DEFAULT and WAKE_RFCAL) do a 100 mS long RFCAL *before* going into Deep Sleep (the RFCAL after Deep Sleep is much shorter).  If the modem is shut down, this long RFCAL doesn't happen.
 
-### Test 8 - Deep Sleep Instant, wake with NO_RFCAL
+### Test 9 - Deep Sleep Instant, wake with NO_RFCAL
 
 This variation doesn't do an RF calibration on return, so power requirements will be slightly less.  Additionally, frequently it immediately goes into Deep Sleep without turning off the modem (that's the INSTANT part).  There's another bug in SDK 2, and the SDK functions the WiFi-class calls occasionally do a modem shut-down before Deep Sleep; it's not always Instant.  When it doesn't do the modem shut-down it saves an extra 270 mS of power.  With the modem turned off (Forced Modem Sleep) you **always** get an instant Deep Sleep; doing WiFi.mode(WIFI_OFF) doesn't help, as the SDK still spends 270 mS of time shutting the modem down before going into Deep Sleep.
 
-### Test 9 - Deep Sleep Instant, wake with RF_DISABLED
+### Test 10 - Deep Sleep Instant, wake with RF_DISABLED
 
 This last variation also uses Deep Sleep Instant, but it wakes up with the modem disabled so amperage after Deep Sleep is only 15 mA.  Each of the 4 WAKE modes has their own use, depending on what you need.
 
