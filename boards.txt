@@ -6637,18 +6637,18 @@ espectro.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 sonoff.name=ITEAD Sonoff
-sonoff.build.board=SONOFF_SV
+sonoff.build.board=ESP8266_SONOFF_SV
 sonoff.build.extra_flags=-DESP8266
 sonoff.build.flash_size=1M
 sonoff.build.variant=itead
 sonoff.menu.BoardModel.sonoffBasic=ITEAD Sonoff Basic
-sonoff.menu.BoardModel.sonoffBasic.build.board=SONOFF_BASIC
+sonoff.menu.BoardModel.sonoffBasic.build.board=ESP8266_SONOFF_BASIC
 sonoff.menu.BoardModel.sonoffS20=ITEAD Sonoff S20
-sonoff.menu.BoardModel.sonoffS20.build.board=SONOFF_S20
+sonoff.menu.BoardModel.sonoffS20.build.board=ESP8266_SONOFF_S20
 sonoff.menu.BoardModel.sonoffSV=ITEAD Sonoff SV
-sonoff.menu.BoardModel.sonoffSV.build.board=SONOFF_SV
+sonoff.menu.BoardModel.sonoffSV.build.board=ESP8266_SONOFF_SV
 sonoff.menu.BoardModel.sonoffTH=ITEAD Sonoff TH
-sonoff.menu.BoardModel.sonoffTH.build.board=SONOFF_TH
+sonoff.menu.BoardModel.sonoffTH.build.board=ESP8266_SONOFF_TH
 sonoff.upload.tool=esptool
 sonoff.upload.maximum_data_size=81920
 sonoff.upload.wait_for_upload_port=true
