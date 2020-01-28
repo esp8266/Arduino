@@ -562,7 +562,8 @@ bool HTTPClient::setURL(const String& url)
         DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
         return false;
     }
-    // disconnect but preserve _client
+    // disconnect but preserve _client (clear _canReuse so disconnect will close the connection)
+    _canReuse = false;
     disconnect(true);
     return beginInternal(url, nullptr);
 }
