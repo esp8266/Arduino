@@ -215,18 +215,26 @@ bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress
 */
 bool MDNSResponder::close(void)
 {
+    bool    bResult = false;
 
-    m_GotIPHandler.reset();			// reset WiFi event callbacks.
-    m_DisconnectedHandler.reset();
+    if (0 != m_pUDPContext)
+    {
+        m_GotIPHandler.reset();			// reset WiFi event callbacks.
+        m_DisconnectedHandler.reset();
 
-    _announce(false, true);
-    _resetProbeStatus(false);   // Stop probing
+        _announce(false, true);
+        _resetProbeStatus(false);   // Stop probing
+        _releaseServiceQueries();
+        _releaseUDPContext();
+        _releaseHostname();
 
-    _releaseServiceQueries();
-    _releaseUDPContext();
-    _releaseHostname();
-
-    return true;
+        bResult = true;
+    }
+    else
+    {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] close: Ignoring call to close!\n")););
+    }
+    return bResult;
 }
 
 /*
