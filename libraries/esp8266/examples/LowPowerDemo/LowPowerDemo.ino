@@ -239,7 +239,6 @@ void runTest5() {
   Serial.println(F("Press the button when you are ready to proceed"));
   waitPushbutton(true, blinkDelay);
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-  //  delay(10);
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
   readVoltage();  // read internal VCC
   printMillis();  // show time difference across sleep, including Serial.flush();
@@ -293,7 +292,7 @@ void runTest7() {
   testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
   ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
   // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is disconnected)
-  // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
+  // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF but actually less than that
   // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
   // depending on the LED used, you might see it very dimly lit in a dark room during this test
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
