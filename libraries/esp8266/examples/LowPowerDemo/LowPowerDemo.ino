@@ -69,7 +69,15 @@ IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
 uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
 
-//#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles (optional)
+//#define TESTPOINT  //  used to track the timing of several test cycles (optional)
+#ifdef TESTPOINT
+#define testPointPin 4  // D2/GPIO4, you can use any pin that supports interrupts
+#define testPoint_HIGH digitalWrite(testPointPin, HIGH)
+#define testPoint_LOW digitalWrite(testPointPin, LOW)
+#else
+#define testPoint_HIGH
+#define testPoint_LOW
+#endif
 
 // This structure is stored in RTC memory to save the WiFi state and reset count (number of Deep Sleeps),
 // and it reconnects twice as fast as the first connection; it's used extensively in this demo
@@ -94,10 +102,8 @@ esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight loop to si
 
 void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback function
   wifi_fpm_close();  // disable Light Sleep
-#ifdef testPoint
-  digitalWrite(testPoint, LOW);  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW
-#endif
-  printMillis();  // show time difference across sleep
+  testPoint_LOW;  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW
+  printMillis();  // show time difference across sleep; millis is wrong as the CPU eventually stops
   Serial.println(F("Woke from Light Sleep - this is the callback"));
 }
 
@@ -106,9 +112,9 @@ void preinit() {
 }
 
 void setup() {
-#ifdef testPoint
-  pinMode(testPoint, OUTPUT);  // test point for Light Sleep and Deep Sleep tests
-  digitalWrite(testPoint, LOW);  // Deep Sleep reset doesn't clear GPIOs, testPoint LOW shows boot time
+#ifdef TESTPOINT
+  pinMode(testPointPin, OUTPUT);  // test point for Light Sleep and Deep Sleep tests
+  testPoint_LOW;  // Deep Sleep reset doesn't clear GPIOs, testPoint LOW shows boot time
 #endif
   pinMode(LED, OUTPUT);  // activity and status indicator
   digitalWrite(LED, LOW);  // turn on the LED
@@ -233,14 +239,11 @@ void runTest5() {
   Serial.println(F("Press the button when you are ready to proceed"));
   waitPushbutton(true, blinkDelay);
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-//  delay(10);
+  //  delay(10);
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
   readVoltage();  // read internal VCC
   printMillis();  // show time difference across sleep, including Serial.flush();
-#ifdef testPoint
-  digitalWrite(testPoint, HIGH);
-  // testPoint LOW in callback tracks delay from testPoint HIGH to testPoint LOW
-#endif
+  testPoint_HIGH;  // testPoint LOW in callback tracks delay from testPoint HIGH to LOW
   extern os_timer_t *timer_list;
   timer_list = nullptr;  // stop (but don't disable) the 4 OS timers
   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
@@ -248,7 +251,7 @@ void runTest5() {
   // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
   wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
   wifi_fpm_open();
-  wifi_fpm_do_sleep(10E6);  // Sleep Range 10000 ~ 268,435,454 uS (0xFFFFFFE, 2^28-1)
+  wifi_fpm_do_sleep(10E6);  // Sleep Range = 10000 ~ 268,435,454 uS (0xFFFFFFE, 2^28-1)
   delay(10e3 + 1); // delay needs to be 1 mS longer than sleep or it only goes into Modem Sleep
   Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
 }
@@ -257,12 +260,8 @@ void runTest6() {
   Serial.println(F("\n6th test - Forced Light Sleep, wake with GPIO interrupt"));
   Serial.flush();
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-//  delay(10);  // testPoint is only low for 18 mS without this delay()
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
-#ifdef testPoint
-  digitalWrite(testPoint, HIGH);
-  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW in callback
-#endif
+  testPoint_HIGH;  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW in callback
   readVoltage();  // read internal VCC
   Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the switch)"));
   printMillis();  // show time difference across sleep
@@ -291,9 +290,7 @@ void runTest7() {
   // and no extended RFCAL as it goes into Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   printMillis();  // show time difference across sleep
-#ifdef testPoint
-  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
+  testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
   ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
   // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is disconnected)
   // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
@@ -311,9 +308,7 @@ void runTest8() {
   // and no extended RFCAL as it goes into Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
+  testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
   ESP.deepSleep(10E6, WAKE_RFCAL); // good night!  D0 fires a reset in 10 seconds...
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
@@ -326,9 +321,7 @@ void runTest9() {
   WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
+  testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
   ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL); // good night!  D0 fires a reset in 10 seconds...
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
@@ -341,9 +334,7 @@ void runTest10() {
   //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
-#ifdef testPoint
-  digitalWrite(testPoint, HIGH);  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-#endif
+  testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
   ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED); // good night!  D0 fires a reset in 10 seconds...
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
