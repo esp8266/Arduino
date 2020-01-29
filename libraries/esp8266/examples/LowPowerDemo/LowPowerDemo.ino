@@ -51,7 +51,7 @@
 #define WAKE_UP_PIN 0  // D3/GPIO0, can also force a serial flash upload with RESET
 // you can use any GPIO for WAKE_UP_PIN except for D0/GPIO16 as it doesn't support interrupts
 
-// uncomment one of the two lines below for your LED connection, if used
+// uncomment one of the two lines below for your LED connection (optional)
 #define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add amperage
 //#define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
 // you can use LED_BUILTIN, but it adds to the measured amperage by 0.3mA to 6mA.
@@ -69,7 +69,7 @@ IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
 uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
 
-//#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles, optional
+//#define testPoint 4  // D2/GPIO4 used to track the timing of several test cycles (optional)
 
 // This structure is stored in RTC memory to save the WiFi state and reset count (number of Deep Sleeps),
 // and it reconnects twice as fast as the first connection; it's used extensively in this demo
@@ -93,11 +93,12 @@ esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight loop to si
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback function
+  wifi_fpm_close();  // disable Light Sleep
 #ifdef testPoint
   digitalWrite(testPoint, LOW);  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW
 #endif
   printMillis();  // show time difference across sleep
-  Serial.println(F("Woke from Forced Light Sleep - this is the callback"));
+  Serial.println(F("Woke from Light Sleep - this is the callback"));
 }
 
 void preinit() {
@@ -106,7 +107,7 @@ void preinit() {
 
 void setup() {
 #ifdef testPoint
-  pinMode(testPoint, OUTPUT);  // test point for Forced Light Sleep and Deep Sleep tests
+  pinMode(testPoint, OUTPUT);  // test point for Light Sleep and Deep Sleep tests
   digitalWrite(testPoint, LOW);  // Deep Sleep reset doesn't clear GPIOs, testPoint LOW shows boot time
 #endif
   pinMode(LED, OUTPUT);  // activity and status indicator
@@ -190,7 +191,7 @@ void runTest2() {
 void runTest3() {
   Serial.println(F("\n3rd test - Forced Modem Sleep"));
   WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // shut the modem down and save the WiFi state for faster reconnection
-  //  WiFi.forceSleepBegin(delay_in_uS);  // alternate method of Forced Modem Sleep if you want a timed shutdown
+  //  WiFi.forceSleepBegin(delay_in_uS);  // alternate method of Forced Modem Sleep for an optional timed shutdown
   //  delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
   readVoltage();  // read internal VCC
   Serial.println(F("press the switch to continue"));
@@ -203,7 +204,8 @@ void runTest3() {
 void runTest4() {
   Serial.println(F("\n4th test - Automatic Light Sleep"));
   Serial.println(F("reconnecting WiFi with forceSleepWake"));
-  Serial.println(F("Automatic Light Sleep begins 7 seconds after WiFi connects (LED blinks)"));
+  Serial.println(F("Automatic Light Sleep begins after WiFi connects (LED blinks)"));
+  // on successive loops after power-on, WiFi shows 'connected' several seconds before Sleep happens
   digitalWrite(LED, LOW);  // visual cue that we're reconnecting
   WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 3);  // Automatic Light Sleep, DTIM listen interval = 3
   // at higher DTIM intervals you'll have a hard time establishing and maintaining a connection
@@ -220,7 +222,7 @@ void runTest4() {
     Serial.println(F("long press of the switch to continue"));
     waitPushbutton(true, 350);  /* Below 100 mS delay it only goes into 'Automatic Modem Sleep',
         and below ~ 350 mS delay() the 'Automatic Light Sleep' is less frequent.  Above 500 mS
-        delay() doesn't make much improvement in power savings. */
+        delay() doesn't make significant improvement in power savings. */
   } else {
     Serial.println(F("no WiFi connection, test skipped"));
   }
@@ -231,7 +233,7 @@ void runTest5() {
   Serial.println(F("Press the button when you are ready to proceed"));
   waitPushbutton(true, blinkDelay);
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-  delay(10);
+//  delay(10);
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
   readVoltage();  // read internal VCC
   printMillis();  // show time difference across sleep, including Serial.flush();
@@ -242,9 +244,11 @@ void runTest5() {
   extern os_timer_t *timer_list;
   timer_list = nullptr;  // stop (but don't disable) the 4 OS timers
   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+  gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);  // GPIO wakeup (optional)
+  // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
   wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
   wifi_fpm_open();
-  wifi_fpm_do_sleep(10E6);  // only 0xFFFFFFF works; any other value and it won't sleep
+  wifi_fpm_do_sleep(10E6);  // Sleep Range 10000 ~ 268,435,454 uS (0xFFFFFFE, 2^28-1)
   delay(10e3 + 1); // delay needs to be 1 mS longer than sleep or it only goes into Modem Sleep
   Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
 }
@@ -253,11 +257,11 @@ void runTest6() {
   Serial.println(F("\n6th test - Forced Light Sleep, wake with GPIO interrupt"));
   Serial.flush();
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-  delay(10);
+//  delay(10);  // testPoint is only low for 18 mS without this delay()
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
 #ifdef testPoint
   digitalWrite(testPoint, HIGH);
-  // testPoint LOW in callback tracks latency from WAKE_UP_PIN LOW to testPoint LOW
+  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW in callback
 #endif
   readVoltage();  // read internal VCC
   Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the switch)"));
@@ -267,7 +271,7 @@ void runTest6() {
   // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
   wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
   wifi_fpm_open();
-  wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF works; any other value and it won't sleep
+  wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF, any other value and it won't disconnect the RTC timer
   delay(10);  // it goes to sleep some time during this delay() and waits for an interrupt
   Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed*/
 }
@@ -347,7 +351,7 @@ void runTest10() {
 void resetTests() {
   readVoltage();  // read internal VCC
   Serial.println(F("\nTests completed, in RF_DISABLED, press the switch to do an ESP.restart()"));
-  //memset(&nv->wss, 0, sizeof(nv->wss) * 2);  // uncomment if you erase to wipe the saved WiFi states
+  memset(&nv->wss, 0, sizeof(nv->wss) * 2);  // comment this if you want to keep the saved WiFi states
   waitPushbutton(false, 1000);
   ESP.restart();
 }

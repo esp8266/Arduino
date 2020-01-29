@@ -7,22 +7,24 @@ The two relevant reference manuals from Espressif are the [Low-Power Solutions](
 
 The table below is an expanded version of Table 1.1 from the Low-Power Solutions PDF.  The amperages listed are absolute minimums, and most people will not get that low with typical hardware and programs.
 
-|          item         | Automatic Modem Sleep | Forced Modem Sleep | Automatic Light Sleep | Forced Light Sleep |  Forced Deep Sleep |
+|          item         | Automatic Modem Sleep | Forced Modem Sleep | Automatic Light Sleep | Timed or Forced Light Sleep |  Forced Deep Sleep |
 |:---------------------:|:---------------------:|:------------------:|:---------------------:|:------------------:|:------------------:|
 |   WiFi connectivity   |       Connected       |    Disconnected    |       Connected       |    Disconnected    |    Disconnected    |
 |       GPIO state      |       Unchanged       |      Unchanged     |       Unchanged       |      Unchanged     | Low amperage (2 uA) |
 |          WiFi         |           ON          |         OFF        |           ON          |         OFF        |         OFF        |
 |      System Clock     |           ON          |         ON         |        CYCLING        |         OFF        |         OFF        |
-|          RTC          |           ON          |         ON         |           ON          |         ON         |         ON (1)     |
+|          RTC          |           ON          |         ON         |           ON          |         ON (1)        |         ON (2)     |
 |          CPU          |           ON          |         ON         |           ON          |         ON         |         OFF        |
-|   Substrate Amperage   |         15 mA         |        15 mA       |        1-15 mA (2)    |       0.4 mA       |        20 uA       |
+|   Substrate Amperage   |         15 mA         |        15 mA       |        1-15 mA (3)    |       0.4 mA       |        20 uA       |
 |  Avg Amperage DTIM = 1 |        16.2 mA        |                    |        (1.8 mA)       |                    |                    |
 |  Avg Amperage DTIM = 3 |        15.4 mA        |                    |        (0.9 mA)       |                    |                    |
 | Avg Amperage DTIM = 10 |        15.2 mA        |                    |       (0.55 mA)       |                    |                    |
 
 Notes: 
 
-(1) setting a sleep time of 0 for Deep Sleep disconnects the RTC, requiring an external RESET to wake the CPU
+(1) setting a sleep time of 0xFFFFFFF for Light Sleep disconnects the RTC, requiring a GPIO interrupt to wake the CPU
+
+(2) setting a sleep time of 0 for Deep Sleep disconnects the RTC, requiring an external RESET to wake the CPU
 
 (2) minimum amperage was never measured less than ~ 1 mA and is frequently 15 mA between TIM beacons
 
@@ -63,11 +65,11 @@ Like Automatic Modem Sleep, with similar restrictions.  Once configured it's imm
 
 ### Test 5 - Timed Light Sleep
 
-Similar to Deep Sleep, but it wakes with an interrupt at the next line in your code and continues.  The chip sleeps at 0.4 mA amperage until it is woken by the RTC timer.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using timed Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter timed Light Sleep so you will need to re-initialize it if you are using WiFi.  Any timers (including OS_timers and PWM) will keep the chip from going into timed Light Sleep, and it will fall through to the next line in your code if timers are enabled.
+Similar to Deep Sleep, but it wakes with an interrupt at the next line in your code and continues.  The chip sleeps at 0.4 mA amperage until it is woken by the RTC timer.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using timed Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter timed Light Sleep so you will need to re-initialize it if you are using WiFi.  Any timers (including OS_timers and PWM) will keep the chip from going into timed Light Sleep, and it will fall through to the next line in your code if any timers are running.  You can set an optional interrupt callback, and you can set a GPIO interrupt to wake the CPU as well as the RTC timer.
 
 ### Test 6 - Forced Light Sleep, wake with GPIO interrupt
 
-Similar to ESP.deepSleep(0).  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.  Any standard timers (including PWM) will keep the chip from going fully into Forced Light Sleep, and amperage will be ~ 2 mA with timers enabled.
+Similar to ESP.deepSleep(0).  The chip sleeps at 0.4 mA amperage until it is woken by an external interrupt.  The only allowed interrupts are high level and low level; edge interrupts won't work.  If you have a design that needs to be woken frequently (more often than every 2 seconds) then you should consider using Forced Light Sleep.  For sleep periods longer than 2 seconds, Deep Sleep will be more energy efficient.  The chip wakes after an interrupt in about 3 to 5.5 mS (regardless of CPU speed), but WiFi was turned off to enter Forced Light Sleep so you will need to re-initialize it if you are using WiFi.  Any user timers (including PWM) will keep the chip from going fully into Forced Light Sleep, and amperage will be ~ 2 mA with timers enabled.
 
 ### Test 7 - Deep Sleep, wake with RF_DEFAULT
 
