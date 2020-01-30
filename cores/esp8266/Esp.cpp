@@ -485,7 +485,7 @@ String EspClass::getResetReason(void) {
         case REASON_DEEP_SLEEP_AWAKE: buff = F("Deep-Sleep Wake"); break;
         // // external system reset
         case REASON_EXT_SYS_RST:      buff = F("External System"); break;
-        default:                      buff = F("Unknown");
+        default:                      buff = F("Unknown"); break;
     }
     return String(buff);
 }
