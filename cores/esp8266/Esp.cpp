@@ -190,11 +190,12 @@ that is 6(2^2 + 2^1) + 0.615234375(2^-1 +2^-4 + 2^-5 + 2^-6 + 2^-8 + 2^-9), so (
 as nanoseconds(6615), in result (((system_rtc_clock_cali_proc() * 1000) >> 12) * system_get_rtc_time()) / 1000 
 is equal to (system_rtc_clock_cali_proc() * system_get_rtc_time()) >> 12 based on microseconds
 Refs:
-- https://github.com/espressif/ESP8266_NONOS_SDK/issues/204
-- https://github.com/esp8266/Arduino/pull/5485
-- ESP8266 Non-OS SDK API Reference v3.0
+	- https://github.com/espressif/ESP8266_NONOS_SDK/issues/204
+	- https://github.com/esp8266/Arduino/pull/5485
+	- https://github.com/esp8266/Arduino/pull/5590
+	- ESP8266 Non-OS SDK API Reference v3.0
 */
-uint64_t EspClass::getRtcTime() {
+uint32_t EspClass::getRtcTime() {
 	uint32_t cali = system_rtc_clock_cali_proc();
 	uint32_t cycles = system_get_rtc_time();
 	

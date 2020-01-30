@@ -144,7 +144,7 @@ class EspClass {
 
         bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
-	uint64_t getRtcTime(); // as microseconds
+	    uint32_t getRtcTime(); // as microseconds
 
         void reset();
         void restart();
