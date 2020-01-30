@@ -1,7 +1,5 @@
 #include "Updater.h"
-#include "Arduino.h"
 #include "eboot_command.h"
-#include <interrupts.h>
 #include <esp8266_peri.h>
 
 //#define DEBUG_UPDATER Serial
@@ -12,10 +10,10 @@
 #endif
 
 #if ARDUINO_SIGNING
-  #include "../../libraries/ESP8266WiFi/src/BearSSLHelpers.h"
-  static BearSSL::PublicKey signPubKey(signing_pubkey);
-  static BearSSL::HashSHA256 hash;
-  static BearSSL::SigningVerifier sign(&signPubKey);
+namespace esp8266 {
+  extern UpdaterHashClass& updaterSigningHash;
+  extern UpdaterVerifyClass& updaterSigningVerifier;
+}
 #endif
 
 extern "C" {
@@ -24,7 +22,8 @@ extern "C" {
     #include "user_interface.h"
 }
 
-extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _FS_start;
+extern "C" uint32_t _FS_end;
 
 UpdaterClass::UpdaterClass()
 : _async(false)
@@ -40,7 +39,7 @@ UpdaterClass::UpdaterClass()
 , _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
-  installSignature(&hash, &sign);
+  installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
 #endif
 }
 
@@ -87,8 +86,8 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   }
   
 #ifdef DEBUG_UPDATER
-  if (command == U_SPIFFS) {
-    DEBUG_UPDATER.println(F("[begin] Update SPIFFS."));
+  if (command == U_FS) {
+    DEBUG_UPDATER.println(F("[begin] Update Filesystem."));
   }
 #endif
 
@@ -105,17 +104,21 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   _reset();
   clearError(); //  _error = 0
 
+#ifndef HOST_MOCK
   wifi_set_sleep_type(NONE_SLEEP_T);
+#endif
 
+  //address where we will start writing the update
   uintptr_t updateStartAddress = 0;
+  //size of current sketch rounded to a sector
+  size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+  //size of the update rounded to a sector
+  size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+
   if (command == U_FLASH) {
-    //size of current sketch rounded to a sector
-    size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uintptr_t updateEndAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
-    //size of the update rounded to a sector
-    size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    //address where we will start writing the update
+    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
@@ -130,8 +133,25 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
       return false;
     }
   }
-  else if (command == U_SPIFFS) {
-     updateStartAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
+  else if (command == U_FS) {
+    if((uintptr_t)&_FS_start + roundedSize > (uintptr_t)&_FS_end) {
+      _setError(UPDATE_ERROR_SPACE);
+      return false;
+    }
+
+#ifdef ATOMIC_FS_UPDATE
+    //address of the end of the space available for update
+    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+
+    updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
+
+    if(updateStartAddress < currentSketchSize) {
+      _setError(UPDATE_ERROR_SPACE);
+      return false;
+    }
+#else
+    updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
+#endif
   }
   else {
     // unknown command
@@ -206,7 +226,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
-      _reset();
       return false;
     }
 
@@ -232,7 +251,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     uint8_t *sig = (uint8_t*)malloc(sigLen);
     if (!sig) {
       _setError(UPDATE_ERROR_SIGN);
-      _reset();
       return false;
     }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
@@ -245,7 +263,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       _setError(UPDATE_ERROR_SIGN);
-      _reset();
       return false;
     }
 #ifdef DEBUG_UPDATER
@@ -255,7 +272,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _md5.calculate();
     if (strcasecmp(_target_md5.c_str(), _md5.toString().c_str())) {
       _setError(UPDATE_ERROR_MD5);
-      _reset();
       return false;
     }
 #ifdef DEBUG_UPDATER
@@ -278,9 +294,20 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("Staged: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
+#endif
   }
-  else if (_command == U_SPIFFS) {
-    DEBUG_UPDATER.printf_P(PSTR("SPIFFS: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
+  else if (_command == U_FS) {
+#ifdef ATOMIC_FS_UPDATE
+    eboot_command ebcmd;
+    ebcmd.action = ACTION_COPY_RAW;
+    ebcmd.args[0] = _startAddress;
+    ebcmd.args[1] = (uintptr_t)&_FS_start - 0x40200000;
+    ebcmd.args[2] = _size;
+    eboot_command_write(&ebcmd);
+#endif
+
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf_P(PSTR("Filesystem: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
 #endif
   }
 
@@ -304,7 +331,8 @@ bool UpdaterClass::_writeBuffer(){
   bool modifyFlashMode = false;
   FlashMode_t flashMode = FM_QIO;
   FlashMode_t bufferFlashMode = FM_QIO;
-  if (_currentAddress == _startAddress + FLASH_MODE_PAGE) {
+  //TODO - GZIP can't do this
+  if ((_currentAddress == _startAddress + FLASH_MODE_PAGE) && (_buffer[0] != 0x1f) && (_command == U_FLASH)) {
     flashMode = ESP.getFlashChipMode();
     #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf_P(PSTR("Header: 0x%1X %1X %1X %1X\n"), _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
@@ -352,9 +380,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
   if(hasError() || !isRunning())
     return 0;
 
-  if(len > remaining()){
-    //len = remaining();
-    //fail instead
+  if(progress() + _bufferLen + len > _size) {
     _setError(UPDATE_ERROR_SPACE);
     return 0;
   }
@@ -386,14 +412,14 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
 bool UpdaterClass::_verifyHeader(uint8_t data) {
     if(_command == U_FLASH) {
         // check for valid first magic byte (is always 0xE9)
-        if(data != 0xE9) {
+        if ((data != 0xE9) && (data != 0x1f)) {
             _currentAddress = (_startAddress + _size);
             _setError(UPDATE_ERROR_MAGIC_BYTE);
             return false;
         }
         return true;
-    } else if(_command == U_SPIFFS) {
-        // no check of SPIFFS possible with first byte.
+    } else if(_command == U_FS) {
+        // no check of FS possible with first byte.
         return true;
     }
     return false;
@@ -410,7 +436,12 @@ bool UpdaterClass::_verifyEnd() {
         }
 
         // check for valid first magic byte
-        if(buf[0] != 0xE9) {
+	//
+	// TODO: GZIP compresses the chipsize flags, so can't do check here
+	if ((buf[0] == 0x1f) && (buf[1] == 0x8b)) {
+            // GZIP, just assume OK
+            return true;
+        } else if (buf[0] != 0xE9) {
             _currentAddress = (_startAddress);
             _setError(UPDATE_ERROR_MAGIC_BYTE);            
             return false;
@@ -426,8 +457,8 @@ bool UpdaterClass::_verifyEnd() {
         }
 
         return true;
-    } else if(_command == U_SPIFFS) {
-        // SPIFFS is already over written checks make no sense any more.
+    } else if(_command == U_FS) {
+        // FS is already over written checks make no sense any more.
         return true;
     }
     return false;
@@ -468,7 +499,6 @@ size_t UpdaterClass::writeStream(Stream &data) {
             if(toRead == 0) { //Timeout
                 _currentAddress = (_startAddress + _size);
                 _setError(UPDATE_ERROR_STREAM);
-                _reset();
                 return written;
             }
         }
@@ -495,6 +525,7 @@ void UpdaterClass::_setError(int error){
 #ifdef DEBUG_UPDATER
   printError(DEBUG_UPDATER);
 #endif
+  _reset(); // Any error condition invalidates the entire update, so clear partial status
 }
 
 void UpdaterClass::printError(Print &out){

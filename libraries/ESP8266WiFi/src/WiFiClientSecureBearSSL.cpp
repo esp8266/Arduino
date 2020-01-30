@@ -32,6 +32,7 @@ extern "C" {
 }
 #include "debug.h"
 #include "ESP8266WiFi.h"
+#include "PolledTimeout.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
 #include "StackThunk.h"
@@ -437,12 +438,17 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
   }
-  for (int no_work = 0; blocking || no_work < 2;) {
-    if (blocking) {
-      // Only for blocking operations can we afford to yield()
-      optimistic_yield(100);
+  
+  esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
+  
+  for (int no_work = 0; blocking || no_work < 2;) {    
+    optimistic_yield(100);
+    
+    if (loopTimeout) {
+      DEBUG_BSSL("_run_until: Timeout\n");
+      return -1;
     }
-
+    
     int state;
     state = br_ssl_engine_current_state(_eng);
     if (state & BR_SSL_CLOSED) {
@@ -461,8 +467,19 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
       unsigned char *buf;
       size_t len;
       int wlen;
+      size_t availForWrite;
 
       buf = br_ssl_engine_sendrec_buf(_eng, &len);
+      availForWrite = WiFiClient::availableForWrite();
+      
+      if (!blocking && len > availForWrite) {
+        /* 
+           writes on WiFiClient will block if len > availableForWrite()
+           this is needed to prevent available() calls from blocking
+           on dropped connections 
+        */
+        len = availForWrite;
+      }	  
       wlen = WiFiClient::write(buf, len);
       if (wlen <= 0) {
         /*
@@ -654,6 +671,13 @@ extern "C" {
     if (!xc->done_cert) {
       br_sha1_update(&xc->sha1_cert, buf, len);
       br_x509_decoder_push(&xc->ctx, (const void*)buf, len);
+#ifdef DEBUG_ESP_SSL
+      DEBUG_BSSL("CERT: ");
+      for (size_t i=0; i<len; i++) {
+        DEBUG_ESP_PORT.printf_P(PSTR("%02x "), buf[i] & 0xff);
+      }
+      DEBUG_ESP_PORT.printf_P(PSTR("\n"));
+#endif
     }
   }
 
@@ -676,7 +700,24 @@ extern "C" {
     char res[20];
     br_sha1_out(&xc->sha1_cert, res);
     if (xc->match_fingerprint && memcmp(res, xc->match_fingerprint, sizeof(res))) {
+#ifdef DEBUG_ESP_SSL
       DEBUG_BSSL("insecure_end_chain: Received cert FP doesn't match\n");
+      char buff[3 * sizeof(res) + 1]; // 3 chars per byte XX_, and null
+      buff[0] = 0;
+      for (size_t i=0; i<sizeof(res); i++) {
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", xc->match_fingerprint[i] & 0xff);
+        strlcat(buff, hex, sizeof(buff));
+      }
+      DEBUG_BSSL("insecure_end_chain: expected %s\n", buff);
+      buff[0] =0;
+      for (size_t i=0; i<sizeof(res); i++) {
+        char hex[4]; // XX_\0
+        snprintf(hex, sizeof(hex), "%02x ", res[i] & 0xff);
+        strlcat(buff, hex, sizeof(buff));
+      }
+      DEBUG_BSSL("insecure_end_chain: received %s\n", buff);
+#endif
       return BR_ERR_X509_NOT_TRUSTED;
     }
 
@@ -795,6 +836,64 @@ extern "C" {
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
 #endif
   };
+#ifndef BEARSSL_SSL_BASIC
+  // Server w/EC has one set, not possible with basic SSL config
+  static const uint16_t suites_server_ec_P [] PROGMEM = {
+    BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA,
+    BR_TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA,
+    BR_TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA
+  };
+#endif
+
+  static const uint16_t suites_server_rsa_P[] PROGMEM = {
+#ifndef BEARSSL_SSL_BASIC
+    BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+    BR_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,
+    BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_RSA_WITH_AES_128_GCM_SHA256,
+    BR_TLS_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_RSA_WITH_AES_128_CCM,
+    BR_TLS_RSA_WITH_AES_256_CCM,
+    BR_TLS_RSA_WITH_AES_128_CCM_8,
+    BR_TLS_RSA_WITH_AES_256_CCM_8,
+#endif
+    BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
+    BR_TLS_RSA_WITH_AES_128_CBC_SHA,
+    BR_TLS_RSA_WITH_AES_256_CBC_SHA,
+#ifndef BEARSSL_SSL_BASIC
+    BR_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+    BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
+#endif
+  };
+
 
   // For apps which want to use less secure but faster ciphers, only
   static const uint16_t faster_suites_P[] PROGMEM = {
@@ -827,6 +926,7 @@ extern "C" {
     uint16_t suites[cipher_cnt];
     memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
     br_ssl_client_zero(cc);
+    br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegociation, as we free the Private Key after handshake
     br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
     br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
     br_ssl_client_set_default_rsapub(cc);
@@ -842,6 +942,31 @@ extern "C" {
 #ifndef BEARSSL_SSL_BASIC
     br_ssl_engine_set_default_aes_gcm(&cc->eng);
     br_ssl_engine_set_default_aes_ccm(&cc->eng);
+    br_ssl_engine_set_default_des_cbc(&cc->eng);
+    br_ssl_engine_set_default_chapol(&cc->eng);
+#endif
+  }
+
+  // Default initializion for our SSL clients
+  static void br_ssl_server_base_init(br_ssl_server_context *cc, const uint16_t *cipher_list, int cipher_cnt) {
+    uint16_t suites[cipher_cnt];
+    memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
+    br_ssl_server_zero(cc);
+    br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegociation, as we free the Private Key after handshake
+    br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
+    br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
+#ifndef BEARSSL_SSL_BASIC
+    br_ssl_engine_set_default_ec(&cc->eng);
+#endif
+
+    br_ssl_client_install_hashes(&cc->eng);
+    br_ssl_engine_set_prf10(&cc->eng, &br_tls10_prf);
+    br_ssl_engine_set_prf_sha256(&cc->eng, &br_tls12_sha256_prf);
+    br_ssl_engine_set_prf_sha384(&cc->eng, &br_tls12_sha384_prf);
+    br_ssl_engine_set_default_aes_cbc(&cc->eng);
+#ifndef BEARSSL_SSL_BASIC
+    br_ssl_engine_set_default_aes_ccm(&cc->eng);
+    br_ssl_engine_set_default_aes_gcm(&cc->eng);
     br_ssl_engine_set_default_des_cbc(&cc->eng);
     br_ssl_engine_set_default_chapol(&cc->eng);
 #endif
@@ -1049,6 +1174,7 @@ bool WiFiClientSecure::_installServerX509Validator(const X509List *client_CA_ta)
   return true;
 }
 
+
 // Called by WiFiServerBearSSL when an RSA cert/key is specified.
 bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
     const PrivateKey *sk,
@@ -1067,7 +1193,10 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
     return false;
   }
 
-  br_ssl_server_init_full_rsa(_sc_svr.get(), chain ? chain->getX509Certs() : nullptr, chain ? chain->getCount() : 0, sk ? sk->getRSA() : nullptr);
+  br_ssl_server_base_init(_sc_svr.get(), suites_server_rsa_P, sizeof(suites_server_rsa_P) / sizeof(suites_server_rsa_P[0]));
+  br_ssl_server_set_single_rsa(_sc_svr.get(), chain ? chain->getX509Certs() : nullptr, chain ? chain->getCount() : 0,
+                               sk ? sk->getRSA() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
+		               br_rsa_private_get_default(), br_rsa_pkcs1_sign_get_default());
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
     DEBUG_BSSL("_connectSSLServerRSA: Can't install serverX509check\n");
@@ -1101,8 +1230,10 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
     return false;
   }
 
-  br_ssl_server_init_full_ec(_sc_svr.get(), chain ? chain->getX509Certs() : nullptr, chain ? chain->getCount() : 0,
-                             cert_issuer_key_type, sk ? sk->getEC() : nullptr);
+  br_ssl_server_base_init(_sc_svr.get(), suites_server_ec_P, sizeof(suites_server_ec_P) / sizeof(suites_server_ec_P[0]));
+  br_ssl_server_set_single_ec(_sc_svr.get(), chain ? chain->getX509Certs() : nullptr, chain ? chain->getCount() : 0,
+                               sk ? sk->getEC() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
+                               cert_issuer_key_type, br_ssl_engine_get_ec(_eng), br_ecdsa_i15_sign_asn1);
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
     DEBUG_BSSL("_connectSSLServerEC: Can't install serverX509check\n");
@@ -1410,7 +1541,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
 
   ret = probe.readBytes(extBytes, 2);
   handLen -= ret;
-  extLen = extBytes[1] || (extBytes[0]<<8);
+  extLen = extBytes[1] | (extBytes[0]<<8);
   if ((extLen == 0) || (ret != 2)) {
     return _SendAbort(probe, supportsLen);
   }

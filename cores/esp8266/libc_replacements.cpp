@@ -31,7 +31,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
-#include <time.h>
+#include <../include/time.h> // See issue #6714
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -100,7 +100,8 @@ int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) __attribute__((
 int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
     (void) r;
     if (file->_file == STDOUT_FILENO) {
-        return ets_putc(c);
+      ets_putc(c);
+      return c;
     }
     return EOF;
 }

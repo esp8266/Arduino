@@ -29,6 +29,7 @@
 #undef FILE_WRITE
 #define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT | sdfat::O_APPEND)
 
+
 class SDClass {
 public:
     boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
@@ -47,7 +48,15 @@ public:
         return SDFS.open(filename, getMode(mode));
     }
 
+    File open(const char *filename, const char *mode) {
+        return SDFS.open(filename, mode);
+    }
+
     File open(const String &filename, uint8_t mode = FILE_READ) {
+        return open(filename.c_str(), mode);
+    }
+
+    File open(const String &filename, const char *mode) {
         return open(filename.c_str(), mode);
     }
 
@@ -129,6 +138,17 @@ public:
         return ((uint64_t)clusterSize() * (uint64_t)totalClusters());
     }
 
+    void setTimeCallback(time_t (*cb)(void)) {
+        SDFS.setTimeCallback(cb);
+    }
+
+    // Wrapper to allow obsolete datetimecallback use, silently convert to time_t in wrappertimecb
+    void dateTimeCallback(void (*cb)(uint16_t*, uint16_t*)) {
+        extern void (*__SD__userDateTimeCB)(uint16_t*, uint16_t*);
+        __SD__userDateTimeCB = cb;
+	SDFS.setTimeCallback(wrapperTimeCB);
+    }
+
 private:
     const char *getMode(uint8_t mode) {
         bool read = (mode & sdfat::O_READ) ? true : false;
@@ -142,7 +162,45 @@ private:
         else                                 { return "r";  }
     }
 
+    static time_t wrapperTimeCB(void) {
+        extern void (*__SD__userDateTimeCB)(uint16_t*, uint16_t*);
+        if (__SD__userDateTimeCB) {
+            uint16_t d, t;
+            __SD__userDateTimeCB(&d, &t);
+            return sdfs::SDFSImpl::FatToTimeT(d, t);
+        }
+        return time(nullptr);
+    }
+
 };
+
+
+// Expose FatStructs.h helpers for MSDOS date/time for use with dateTimeCallback
+static inline uint16_t FAT_DATE(uint16_t year, uint8_t month, uint8_t day) {
+  return (year - 1980) << 9 | month << 5 | day;
+}
+static inline uint16_t FAT_YEAR(uint16_t fatDate) {
+  return 1980 + (fatDate >> 9);
+}
+static inline uint8_t FAT_MONTH(uint16_t fatDate) {
+  return (fatDate >> 5) & 0XF;
+}
+static inline uint8_t FAT_DAY(uint16_t fatDate) {
+  return fatDate & 0X1F;
+}
+static inline uint16_t FAT_TIME(uint8_t hour, uint8_t minute, uint8_t second) {
+  return hour << 11 | minute << 5 | second >> 1;
+}
+static inline uint8_t FAT_HOUR(uint16_t fatTime) {
+  return fatTime >> 11;
+}
+static inline uint8_t FAT_MINUTE(uint16_t fatTime) {
+  return (fatTime >> 5) & 0X3F;
+}
+static inline uint8_t FAT_SECOND(uint16_t fatTime) {
+  return 2*(fatTime & 0X1F);
+}
+
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)
 extern SDClass SD;

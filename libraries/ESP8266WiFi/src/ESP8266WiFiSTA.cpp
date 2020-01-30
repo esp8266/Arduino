@@ -25,6 +25,7 @@
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
+#include "PolledTimeout.h"
 
 #include "c_types.h"
 #include "ets_sys.h"
@@ -309,6 +310,13 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
     return false;
   }
 
+#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+  // get current->previous IP address
+  // (check below)
+  struct ip_info previp;
+  wifi_get_ip_info(STATION_IF, &previp);
+#endif
+
   struct ip_info info;
   info.ip.addr = local_ip.v4();
   info.gw.addr = gateway.v4();
@@ -334,7 +342,9 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 #if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
   // trigger address change by calling lwIP-v1.4 api
   // (see explanation above)
-  netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+  // only when ip is already set by other mean (generally dhcp)
+  if (previp.ip.addr != 0 && previp.ip.addr != info.ip.addr)
+      netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
 #endif
 
   return true;
@@ -359,10 +369,16 @@ bool ESP8266WiFiSTAClass::reconnect() {
  * @return  one value of wl_status_t enum
  */
 bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
-    bool ret;
+    bool ret = false;
     struct station_config conf;
     *conf.ssid = 0;
     *conf.password = 0;
+
+    // API Reference: wifi_station_disconnect() need to be called after system initializes and the ESP8266 Station mode is enabled.
+    if (WiFi.getMode() & WIFI_STA)
+        ret = wifi_station_disconnect();
+    else
+        ret = true;
 
     ETS_UART_INTR_DISABLE();
     if(WiFi._persistent) {
@@ -370,7 +386,7 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
     } else {
         wifi_station_set_config_current(&conf);
     }
-    ret = wifi_station_disconnect();
+
     ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
@@ -432,17 +448,22 @@ bool ESP8266WiFiSTAClass::getAutoReconnect() {
 /**
  * Wait for WiFi connection to reach a result
  * returns the status reached or disconnect if STA is off
- * @return wl_status_t
+ * @return wl_status_t or -1 on timeout
  */
-uint8_t ESP8266WiFiSTAClass::waitForConnectResult() {
+int8_t ESP8266WiFiSTAClass::waitForConnectResult(unsigned long timeoutLength) {
     //1 and 3 have STA enabled
     if((wifi_get_opmode() & 1) == 0) {
         return WL_DISCONNECTED;
     }
-    while(status() == WL_DISCONNECTED) {
-        delay(100);
+    using esp8266::polledTimeout::oneShot;
+    oneShot timeout(timeoutLength); // number of milliseconds to wait before returning timeout error
+    while(!timeout) {
+        yield();
+        if(status() != WL_DISCONNECTED) {
+            return status();
+        }
     }
-    return status();
+    return -1; // -1 indicates timeout
 }
 
 /**

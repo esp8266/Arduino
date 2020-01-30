@@ -107,10 +107,9 @@ AVRISPState_t ESP8266AVRISP::serve() {
         case AVRISP_STATE_IDLE:
             // should not be called when idle, error?
             break;
-        case AVRISP_STATE_PENDING: {
+        case AVRISP_STATE_PENDING:
             _state = AVRISP_STATE_ACTIVE;
-        // fallthrough
-        }
+            // falls through
         case AVRISP_STATE_ACTIVE: {
             while (_client.available()) {
                 avrisp();

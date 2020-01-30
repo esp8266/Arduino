@@ -34,6 +34,7 @@ void esp_schedule();
 
 #define PBUF_ALIGNER_ADJUST 4
 #define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
+#define PBUF_HELPER_FLAG 0xff // lwIP pbuf flag: u8_t
 
 class UdpContext
 {
@@ -83,11 +84,9 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                delete this;
-            }
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            delete this;
         }
     }
 
@@ -243,26 +242,30 @@ public:
 
         if (_rx_buf)
         {
-            // we have interleaved informations on addresses within reception pbuf chain:
-            // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
-            // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
+            if (_rx_buf->flags == PBUF_HELPER_FLAG)
+            {
+                // we have interleaved informations on addresses within reception pbuf chain:
+                // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
+                // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
 
-            // so the first rx_buf contains an address helper,
-            // copy it to "current address"
-            auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
-            _currentAddr = *helper;
+                // so the first rx_buf contains an address helper,
+                // copy it to "current address"
+                auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
+                _currentAddr = *helper;
 
-            // destroy the helper in the about-to-be-released pbuf
-            helper->~AddrHelper();
+                // destroy the helper in the about-to-be-released pbuf
+                helper->~AddrHelper();
 
-            // forward in rx_buf list, next one is effective data
-            // current (not ref'ed) one will be pbuf_free'd with deleteme
-            _rx_buf = _rx_buf->next;
+                // forward in rx_buf list, next one is effective data
+                // current (not ref'ed) one will be pbuf_free'd with deleteme
+                _rx_buf = _rx_buf->next;
+            }
 
             // this rx_buf is not nullptr by construction,
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
             pbuf_ref(_rx_buf);
         }
+        // remove the already-consumed head of the chain
         pbuf_free(deleteme);
 
         _rx_buf_offset = 0;
@@ -438,6 +441,19 @@ private:
             const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
+        // check receive pbuf chain depth
+        {
+            pbuf* p;
+            int count = 0;
+            for (p = _rx_buf; p && ++count < rxBufMaxDepth*2; p = p->next);
+            if (p)
+            {
+                // pbuf chain too deep, dropping
+                pbuf_free(pb);
+                DEBUGV(":udr\r\n");
+                return;
+            }
+        }
 
 #if LWIP_VERSION_MAJOR == 1
     #define TEMPDSTADDR (&current_iphdr_dest)
@@ -471,6 +487,7 @@ private:
             }
             // construct in place
             new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+            pb_helper->flags = PBUF_HELPER_FLAG; // mark helper pbuf
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
 
@@ -528,6 +545,10 @@ private:
             srcaddr(src), dstaddr(dst), srcport(srcport) { }
     };
     AddrHelper _currentAddr;
+
+    // rx pbuf depth barrier (counter of buffered UDP received packets)
+    // keep it small
+    static constexpr int rxBufMaxDepth = 4;
 };
 
 

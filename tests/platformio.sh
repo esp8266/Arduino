@@ -6,13 +6,13 @@ source "$TRAVIS_BUILD_DIR"/tests/common.sh
 
 function install_platformio()
 {
-    pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    pip3 install --user -U https://github.com/platformio/platformio/archive/develop.zip
     platformio platform install "https://github.com/platformio/platform-espressif8266.git#feature/stage"
     sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
-    ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
+    ln -sf $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
     # - esp8266/examples/ConfigFile
-    pio lib install "ArduinoJson@^5.13.4"
+    pio lib --global install "ArduinoJson@^6.11.0"
 }
 
 function build_sketches_with_platformio()

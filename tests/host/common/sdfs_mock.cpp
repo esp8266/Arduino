@@ -17,5 +17,5 @@
 #include "../../../libraries/SDFS/src/SDFS.h"
 
 #define SDSIZE 16LL
-uint64_t _sdCardSizeB = SDSIZE * 1024LL * 1024LL;
-uint8_t _sdCard[SDSIZE * 1024LL * 1024LL];
+uint64_t _sdCardSizeB = 0;
+uint8_t *_sdCard = nullptr;
