@@ -101,14 +101,9 @@ esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight loop to si
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback function
-  wifi_fpm_close();  // disable Light Sleep
   testPoint_LOW;  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW
   printMillis();  // show time difference across sleep; millis is wrong as the CPU eventually stops
   Serial.println(F("Woke from Light Sleep - this is the callback"));
-}
-
-void preinit() {
-  ESP8266WiFiClass::preinitWiFiOff();  // currently not working
 }
 
 void setup() {
@@ -139,7 +134,7 @@ void setup() {
   updateRTCcrc();
 
   if (resetCount == 1) {  // show that millis() is cleared across the Deep Sleep reset
-    printMillis();  // show time difference across sleep
+    printMillis();
   }
 }  // end of setup()
 
@@ -212,6 +207,7 @@ void runTest4() {
   Serial.println(F("reconnecting WiFi with forceSleepWake"));
   Serial.println(F("Automatic Light Sleep begins after WiFi connects (LED blinks)"));
   // on successive loops after power-on, WiFi shows 'connected' several seconds before Sleep happens
+  // and WiFi reconnects after the forceSleepWake more quickly
   digitalWrite(LED, LOW);  // visual cue that we're reconnecting
   WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 3);  // Automatic Light Sleep, DTIM listen interval = 3
   // at higher DTIM intervals you'll have a hard time establishing and maintaining a connection
@@ -236,21 +232,23 @@ void runTest4() {
 
 void runTest5() {
   Serial.println(F("\n5th test - Timed Light Sleep, wake in 10 seconds"));
-  Serial.println(F("Press the button when you are ready to proceed"));
+  Serial.println(F("Press the button when you're ready to proceed"));
   waitPushbutton(true, blinkDelay);
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
-  digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
   readVoltage();  // read internal VCC
-  printMillis();  // show time difference across sleep, including Serial.flush();
+  printMillis();  // show millis() across sleep, including Serial.flush()
+  digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
   testPoint_HIGH;  // testPoint LOW in callback tracks delay from testPoint HIGH to LOW
   extern os_timer_t *timer_list;
   timer_list = nullptr;  // stop (but don't disable) the 4 OS timers
   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
   gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);  // GPIO wakeup (optional)
   // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
-  wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
+  wifi_fpm_set_wakeup_cb(wakeupCallback); // set wakeup callback
+  // the callback is optional, but without it the modem will wake in 10 seconds then delay(10 seconds)
+  // with the callback the sleep time is only 10 seconds total, no extra delay() afterward
   wifi_fpm_open();
-  wifi_fpm_do_sleep(10E6);  // Sleep Range = 10000 ~ 268,435,454 uS (0xFFFFFFE, 2^28-1)
+  wifi_fpm_do_sleep(10E6);  // Sleep range = 10000 ~ 268,435,454 uS (0xFFFFFFE, 2^28-1)
   delay(10e3 + 1); // delay needs to be 1 mS longer than sleep or it only goes into Modem Sleep
   Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
 }
@@ -260,17 +258,17 @@ void runTest6() {
   Serial.flush();
   WiFi.mode(WIFI_OFF);  // you must turn the modem off; using disconnect won't work
   digitalWrite(LED, HIGH);  // turn the LED off so they know the CPU isn't running
-  testPoint_HIGH;  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW in callback
   readVoltage();  // read internal VCC
   Serial.println(F("CPU going to sleep, pull WAKE_UP_PIN low to wake it (press the switch)"));
-  printMillis();  // show time difference across sleep
+  printMillis();  // show millis() across sleep, including Serial.flush()
+  testPoint_HIGH;  // testPoint tracks latency from WAKE_UP_PIN LOW to testPoint LOW in callback
   wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
   gpio_pin_wakeup_enable(GPIO_ID_PIN(WAKE_UP_PIN), GPIO_PIN_INTR_LOLEVEL);
   // only LOLEVEL or HILEVEL interrupts work, no edge, that's an SDK or CPU limitation
   wifi_fpm_set_wakeup_cb(wakeupCallback); // Set wakeup callback (optional)
   wifi_fpm_open();
   wifi_fpm_do_sleep(0xFFFFFFF);  // only 0xFFFFFFF, any other value and it won't disconnect the RTC timer
-  delay(10);  // it goes to sleep some time during this delay() and waits for an interrupt
+  delay(10);  // it goes to sleep during this delay() and waits for an interrupt
   Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed*/
 }
 
@@ -292,7 +290,7 @@ void runTest7() {
   testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
   ESP.deepSleep(10E6, WAKE_RF_DEFAULT); // good night!  D0 fires a reset in 10 seconds...
   // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is disconnected)
-  // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF but actually less than that
+  // maximum timed Deep Sleep interval = 71.58 minutes with 0xFFFFFFFF
   // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
   // depending on the LED used, you might see it very dimly lit in a dark room during this test
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
@@ -341,7 +339,7 @@ void runTest10() {
 void resetTests() {
   readVoltage();  // read internal VCC
   Serial.println(F("\nTests completed, in RF_DISABLED, press the switch to do an ESP.restart()"));
-  memset(&nv->wss, 0, sizeof(nv->wss) * 2);  // comment this if you want to keep the saved WiFi states
+  memset(&nv->wss, 0, sizeof(nv->wss) * 2);  // wipe saved WiFi states, comment this if you want to keep them
   waitPushbutton(false, 1000);
   ESP.restart();
 }
@@ -380,7 +378,7 @@ void readVoltage() { // read internal VCC
 }
 
 void printMillis() {
-  Serial.print(F("millis() = "));
+  Serial.print(F("millis() = "));  // show that millis() isn't correct across most Sleep modes
   Serial.println(millis());
   Serial.flush();  // needs a Serial.flush() else it may not print the whole message before sleeping
 }
