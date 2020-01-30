@@ -225,7 +225,7 @@ class Stream: public Print {
         // -1 by default is unknown
         // may be used by http streamer (using a SerialStream as a file)
 
-        virtual ssize_t size () { return -1; }
+        virtual ssize_t streamSize () { return -1; }
 
         //////////////////// end of extensions
 

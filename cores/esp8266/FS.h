@@ -72,7 +72,8 @@ public:
         return seek(pos, SeekSet);
     }
     size_t position() const;
-    virtual ssize_t size() override;
+    size_t size() const;
+    virtual ssize_t streamSize() override { return size(); }
     void close();
     operator bool() const;
     const char* name() const;

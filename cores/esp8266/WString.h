@@ -364,7 +364,7 @@ public:
         return read(buffer, len);
     }
 
-    virtual ssize_t size () override { return length(); }
+    virtual ssize_t streamSize () override { return length(); }
 
     //// Print:
 

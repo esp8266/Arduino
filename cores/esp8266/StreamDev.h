@@ -47,7 +47,7 @@ public:
     virtual bool outputTimeoutPossible () override { return false; }
     virtual bool inputTimeoutPossible () override { return false; }
 
-    virtual ssize_t size () override { return 0; }
+    virtual ssize_t streamSize () override { return 0; }
 };
 
 ///////////////////////////////////////////////
@@ -69,7 +69,7 @@ public:
     virtual size_t readBytes(char* buffer, size_t len) override { memset(buffer, _x, len); return len; }
     virtual int readNow(char* buffer, size_t len) override { memset(buffer, _x, len); return len; }
 
-    virtual ssize_t size () override { return 32767; }
+    virtual ssize_t streamSize () override { return 32767; }
 };
 
 ///////////////////////////////////////////////
@@ -111,7 +111,7 @@ public:
     }
     virtual int readNow(char* buffer, size_t len) override { return readBytes(buffer, len); }
 
-    virtual ssize_t size () override { return _size; }
+    virtual ssize_t streamSize () override { return _size; }
 
     // peekBuffer
     virtual bool peekBufferAPI () const override { return !_in_flash; }
@@ -247,7 +247,7 @@ public:
         }
     }
 
-    virtual ssize_t size () override
+    virtual ssize_t streamSize () override
     {
         ssize_t ret = 0;
         for (int i = 0; i < m_size; i++)
