@@ -173,7 +173,7 @@ public:
     void setMulticastInterface(netif* p_pNetIf)
     {
 #if LWIP_VERSION_MAJOR == 1
-        udp_set_multicast_netif_addr(_pcb, (p_pNetIf ? ip_2_ip4(p_pNetIf->ip_addr) : ip_addr_any));
+        udp_set_multicast_netif_addr(_pcb, (p_pNetIf ? p_pNetIf->ip_addr : ip_addr_any));
 #else
         udp_set_multicast_netif_index(_pcb, (p_pNetIf ? netif_get_index(p_pNetIf) : 0));
 #endif
