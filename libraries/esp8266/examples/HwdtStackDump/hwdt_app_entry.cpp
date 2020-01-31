@@ -81,6 +81,7 @@
  * sleep, suggest that a variable in the .noinit section could be used instead
  * of the more limited RTC Memory for sketches that don't do deep sleep.
  * However, DRAM should be considered invalid after an upload serial or OTA.
+ * These operations use a lot of DRAM.
  *
  * With this module active, postmortem stack dumps will be a little longer than
  * they need to be. The sys stack now ends at 0x3FFFFC00 instead of 0x3FFFFB0.
@@ -260,6 +261,7 @@
 #include <esp8266_undocumented.h>
 #include <esp8266_peri.h>
 #include <uart.h>
+#include <pgmspace.h>
 
 extern "C" {
 #include <user_interface.h>
@@ -268,6 +270,20 @@ extern uint32_t rtc_get_reset_reason(void);
 }
 
 // #define DEBUG_HWDT_DEBUG
+// #define USE_IRAM
+
+#ifdef USE_IRAM
+#undef USE_IRAM
+#define USE_IRAM 1
+#define IRAM_MAYBE ICACHE_RAM_ATTR
+
+#else
+#undef USE_IRAM
+#define IRAM_MAYBE
+#endif
+
+#define STATIC static __attribute__((noinline))
+// #define STATIC
 
 #ifdef DEBUG_HWDT_DEBUG
 /*
@@ -399,6 +415,33 @@ void enable_debug_hwdt_at_link_time(void) {
 
 extern "C" {
 
+#if USE_IRAM
+#define ETS_PRINTF ets_uart_printf
+
+#else
+/*
+ This function is already in umm_malloc for some debug options.
+ Define here in case they are not enabled.
+*/
+int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((weak));
+int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
+    /*
+      To use ets_strlen() and ets_strcpy() safely with PROGMEM, flash storage,
+      the PROGMEM address must be word (4 bytes) aligned. The destination
+      address for ets_memcpy must also be word-aligned.
+    */
+    char ram_buf[ets_strlen(fmt)] __attribute__ ((aligned(4)));
+    ets_strcpy(ram_buf, fmt);
+    va_list argPtr;
+    va_start(argPtr, fmt);
+    int result = ets_vprintf(ets_uart_putc1, ram_buf, argPtr);
+    va_end(argPtr);
+    return result;
+}
+
+#define ETS_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#endif
+
 enum PRINT_STACK {
     CONT = 1,
     SYS = 2,
@@ -406,20 +449,20 @@ enum PRINT_STACK {
 };
 
 
-static void ICACHE_RAM_ATTR print_stack(const uintptr_t start, const uintptr_t end, const uint32_t chunk) {
-    ets_printf("\n\n>>>stack>>>\n\nctx: ");
+STATIC void IRAM_MAYBE print_stack(const uintptr_t start, const uintptr_t end, const uint32_t chunk) {
+    ETS_PRINTF("\n\n>>>stack>>>\n\nctx: ");
 
     if (chunk & PRINT_STACK::CONT) {
-        ets_printf("cont");
+        ETS_PRINTF("cont");
     } else
     if (chunk & PRINT_STACK::SYS) {
-        ets_printf("sys");
+        ETS_PRINTF("sys");
     } else
     if (chunk & PRINT_STACK::ROM) {
-        ets_printf("ROM");
+        ETS_PRINTF("ROM");
     }
 
-    ets_printf("\nsp: %08x end: %08x offset: %04x\n", start, end, 0);
+    ETS_PRINTF("\nsp: %08x end: %08x offset: %04x\n", start, end, 0);
 
     const size_t this_mutch = end - start;
     if (this_mutch >= 0x10) {
@@ -428,17 +471,17 @@ static void ICACHE_RAM_ATTR print_stack(const uintptr_t start, const uintptr_t e
 
             /* rough indicator: stack frames usually have SP saved as the second word */
             bool looksLikeStackFrame = (value[2] == (start + pos + 0x10));
-            ets_printf("%08x:  %08x %08x %08x %08x %c\n", (uint32_t)&value[0],
+            ETS_PRINTF("%08x:  %08x %08x %08x %08x %c\n", (uint32_t)&value[0],
                        value[0], value[1], value[2], value[3],
                        (looksLikeStackFrame)?'<':' ');
         }
     }
 
-    ets_printf("<<<stack<<<\n");
+    ETS_PRINTF("<<<stack<<<\n");
 }
 
 
-static const uint32_t * ICACHE_RAM_ATTR skip_stackguard(const uint32_t *start, const uint32_t *end, const uint32_t pattern) {
+STATIC const uint32_t * IRAM_MAYBE skip_stackguard(const uint32_t *start, const uint32_t *end, const uint32_t pattern) {
     // Find the end of SYS stack activity
     const uint32_t *uptr = start;
 
@@ -459,7 +502,7 @@ static const uint32_t * ICACHE_RAM_ATTR skip_stackguard(const uint32_t *start, c
     return uptr;
 }
 
-static void ICACHE_RAM_ATTR check_g_pcont_validity(void) {
+STATIC void IRAM_MAYBE check_g_pcont_validity(void) {
     /*
      * DRAM appears to remain valid after most resets. There is more on this in
      * handle_hwdt().
@@ -503,7 +546,7 @@ typedef enum ROM_RST_REASON { /* Comments on the right are from RTOS SDK */
   SDIO_RESET             =  6,    /*                    *//**<6, Reset by SLC module, reset digital core*/
 } ROM_RST_REASON_t;
 
-static uint32_t ICACHE_RAM_ATTR get_reset_reason(bool* power_on, bool* hwdt_reset) {
+STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
     /*
      * Detecting a Hardware WDT (HWDT) reset is a little complicated at boot
      * before the SDK is started.
@@ -666,7 +709,7 @@ constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_
 
 #define UART_CLKDIV_MASK 0x000FFFFFUL
 
-static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uint32_t new_speed) {
+STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t new_speed) {
 
     uint32_t uart_divisor = USD(uart_no) & UART_CLKDIV_MASK;
     /*
@@ -712,11 +755,11 @@ static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uin
     }
 
 #if defined(DEBUG_HWDT_DEBUG)
-    ets_printf("\n\nreal_uart_div_modify(0, %u / %u);\n", master_freq, new_speed);
-    ets_printf("F_CRYSTAL = %u\n", crystal_freq);
-    ets_printf("old uart_divisor = %u\n", uart_divisor);
-    ets_printf("new uart_divisor = %u\n", new_uart_divisor);
-    ets_printf("master_freq = %u\n", master_freq);
+    ETS_PRINTF("\n\nreal_uart_div_modify(0, %u / %u);\n", master_freq, new_speed);
+    ETS_PRINTF("F_CRYSTAL = %u\n", crystal_freq);
+    ETS_PRINTF("old uart_divisor = %u\n", uart_divisor);
+    ETS_PRINTF("new uart_divisor = %u\n", new_uart_divisor);
+    ETS_PRINTF("master_freq = %u\n", master_freq);
 #endif
 
     return uart_divisor;
@@ -729,7 +772,7 @@ static uint32_t ICACHE_RAM_ATTR set_uart_speed(const uint32_t uart_no, const uin
  *
  *
  */
-static void ICACHE_RAM_ATTR handle_hwdt(void) {
+STATIC void IRAM_MAYBE handle_hwdt(void) {
 
     ets_memset(&hwdt_info, 0, sizeof(hwdt_info));
     check_g_pcont_validity();
@@ -742,16 +785,16 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
     const uint32_t uart_divisor = set_uart_speed(0, HWDT_UART_SPEED);
 #endif
 #if defined(DEBUG_HWDT_DEBUG)
-    ets_printf("Basic boot reason: %s\n", (power_on) ? "Power-on" : "Reboot");
-    ets_printf("RTC_SYS Reset Reason = %u\n", hwdt_info.rtc_sys_reason);
-    ets_printf("ROM API Reset Reason = %u\n", hwdt_info.rom_api_reason);
-    ets_printf("HWDT Reset Reason = %u\n\n", hwdt_info.reset_reason);
+    ETS_PRINTF("Basic boot reason: %s\n", (power_on) ? "Power-on" : "Reboot");
+    ETS_PRINTF("RTC_SYS Reset Reason = %u\n", hwdt_info.rtc_sys_reason);
+    ETS_PRINTF("ROM API Reset Reason = %u\n", hwdt_info.rom_api_reason);
+    ETS_PRINTF("HWDT Reset Reason = %u\n\n", hwdt_info.reset_reason);
 #endif
 #if defined(DEBUG_HWDT_DEBUG_RESET_REASON)
     if (REASON_EXT_SYS_RST < hwdt_info.reset_reason) {
-        ets_printf("Reset reason confirmation failed!\n");
-        ets_printf("  RTC_SYS Reset Reason = %u\n", hwdt_info.rtc_sys_reason);
-        ets_printf("  ROM API Reset Reason = %u\n", hwdt_info.rom_api_reason);
+        ETS_PRINTF("Reset reason confirmation failed!\n");
+        ETS_PRINTF("  RTC_SYS Reset Reason = %u\n", hwdt_info.rtc_sys_reason);
+        ETS_PRINTF("  ROM API Reset Reason = %u\n", hwdt_info.rom_api_reason);
     }
 #endif
     /*
@@ -797,7 +840,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 
         /* Print context SYS */
         if (hwdt_reset) {
-            ets_printf("\n\nHardware WDT reset\n");
+            ETS_PRINTF("\n\nHardware WDT reset\n");
             print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)rom_stack, PRINT_STACK::SYS);
 
 #ifdef DEBUG_HWDT_NO4KEXTRA
@@ -805,7 +848,7 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
             print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
 #endif
             if (hwdt_info.cont_integrity) {
-                ets_printf("\nCaution, the stack is possibly corrupt integrity checks did not pass.\n\n");
+                ETS_PRINTF("\nCaution, the stack is possibly corrupt integrity checks did not pass.\n\n");
             }
         }
     }
@@ -837,9 +880,9 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
 #endif
 
 #if defined(HWDT_PRINT_GREETING)
-    ets_printf("\n\nHardware WDT Stack Dump - enabled\n\n");
+    ETS_PRINTF("\n\nHardware WDT Stack Dump - enabled\n\n");
 #else
-    ets_printf("\n\n");
+    ETS_PRINTF("\n\n");
 #endif
 
 #ifdef HWDT_UART_SPEED
@@ -850,6 +893,25 @@ static void ICACHE_RAM_ATTR handle_hwdt(void) {
     }
 #endif
 }
+
+/*
+ * Using Cache_Read_Enable/Cache_Read_Disable to reduce IRAM usage. Moved
+ * strings and most functions to flash. At this phase of the startup, "C++" has
+ * not initialized. So, we needed a local "C" function to handle printing from
+ * flash. For this, I grabbed a copy of umm_info_safe_printf_P.
+ *
+ * This reduced IRAM usage by ~1K and DRAM ~200 bytes.
+ *
+ * Inspiration for using Cache_Read_Enable came from reviewing rboot, zboot, and
+ * https://richard.burtons.org/2015/06/12/esp8266-cache_read_enable/.
+ * Additional insight can be gleemed from reviewing the ESP8266_RTOS_SDK.
+ * (eg. ../components/bootloader_support/src/bootloader_utility.c)
+ */
+#define ICACHE_SIZE_32 1
+#define ICACHE_SIZE_16 0
+
+extern "C" void Cache_Read_Disable(void);
+extern "C" void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 
 void ICACHE_RAM_ATTR app_entry_start(void) {
 
@@ -873,10 +935,13 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
      *  Call the entry point of the SDK code.
      */
     asm volatile("" ::: "memory");
-    asm volatile("mov.n a1, %0\n"
-                 "mov.n a3, %1\n"
-                 "mov.n a0, %2\n"     /* Should never return; however, set return to Boot ROM Breakpoint */
-                 "jx a3\n" : : "r" (sys_stack_first), "r" (call_user_start), "r" (0x4000044c) );
+    asm volatile ("mov.n a1, %0\n" :: "r" (sys_stack_first));
+
+#ifndef USE_IRAM
+    asm volatile ("call0 Cache_Read_Disable\n" ::);
+#endif
+    asm volatile("movi a0, 0x4000044c\n"     /* Should never return; however, set return to Boot ROM Breakpoint */
+                 "j call_user_start\n" ::);
 
     __builtin_unreachable();
 }
@@ -896,10 +961,18 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
      * tool from the list of possible concerns for stack overwrite.
      *
      */
-    asm volatile ("mov.n a1, %0\n"
-                  "mov.n a3, %1\n"
-                  "mov.n a0, %2\n"
-                  "jx a3\n" : : "r" (0x3fffeb30), "r" (app_entry_start), "r" (0x4000044c) );
+    asm volatile ("movi a1, 0x3fffeb30\n" ::);
+
+#ifndef USE_IRAM
+    // Enable cache over flash
+    asm volatile ("movi.n a2, 0\n"
+                  "mov.n  a3, a2\n"
+                  "movi.n a4, 1\n"    // ICACHE_SIZE_32
+                  "call0 Cache_Read_Enable\n" ::);
+#endif
+
+    asm volatile ("j app_entry_start" ::);
+
     /*
      * Keep this function with just asm seems to help avoid a stack frame being
      * created for this function and things getting really confused.
