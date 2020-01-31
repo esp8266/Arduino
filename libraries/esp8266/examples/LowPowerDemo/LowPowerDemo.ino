@@ -192,14 +192,15 @@ void runTest2() {
 void runTest3() {
   Serial.println(F("\n3rd test - Forced Modem Sleep"));
   WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // shut the modem down and save the WiFi state for faster reconnection
-  //  WiFi.forceSleepBegin(delay_in_uS);  // alternate method of Forced Modem Sleep for an optional timed shutdown
+  //  WiFi.forceSleepBegin(delay_in_uS);  // alternate method of Forced Modem Sleep for an optional timed shutdown,
+  // with WiFi.forceSleepBegin(0xFFFFFFF); the modem sleeps until you wake it, with values <= 0xFFFFFFE it's timed
   //  delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
   readVoltage();  // read internal VCC
   Serial.println(F("press the switch to continue"));
   waitPushbutton(true, 99);  /* Using the same < 100 mS feature. If you drop the delay below 100, you
       will see the effect of program time vs. delay() time on minimum amperage.  Above ~ 97 (97% of the
       time in delay) there is little change in amperage, so you need to spend maximum time in delay()
-      to get minimum amperage. At a high percentage of delay() you will see minimum amperage. */
+      to get minimum amperage.*/
 }
 
 void runTest4() {
