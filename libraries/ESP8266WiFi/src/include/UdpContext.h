@@ -21,8 +21,6 @@
 #ifndef UDPCONTEXT_H
 #define UDPCONTEXT_H
 
-#include <Arduino.h>    // TEMP for Serial
-
 class UdpContext;
 
 extern "C" {
@@ -477,7 +475,6 @@ private:
                 // pbuf chain too deep, dropping
                 pbuf_free(pb);
                 DEBUGV(":udr\r\n");
-                Serial.println("WARNING!!!  DELETED UDP DATAGRAM  !!!");
                 return;
             }
         }
