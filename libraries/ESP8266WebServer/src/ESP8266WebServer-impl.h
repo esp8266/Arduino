@@ -496,7 +496,7 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
   if (_currentMethod == HTTP_HEAD) return;
   const char * footer = "\r\n";
-  size_t len = content->size();
+  size_t len = content->streamSize();
   if(_chunked) {
     char chunkSize[11];
     sprintf(chunkSize, "%zx\r\n", len);
