@@ -9,7 +9,7 @@
 
   This test series requires an active WiFi connection to illustrate two tests.  If you
   have problems with WiFi, uncomment the #define DEBUG for additional WiFi error messages.
-  The test requires a pushbutton switch connected between D3 and GND to advance the tests.
+  The test needs a pushbutton switch connected between D3/GPIO0 and GND to advance the tests.
   You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.  If you forget to
   connect D0 to RST it will hang after the first Deep Sleep test. D0 is driven high during
   Deep Sleep, so you should use a Schottky diode between D0 and RST if you want to use a 
@@ -21,7 +21,7 @@
   continuously it's connecting WiFi, and when it's off the CPU is asleep.  The LED blinks 
   slowly when the tests are complete.  Test progress can also be shown on the serial monitor.
 
-  WiFi connections will be made over twice as fast if you can use a static IP address.
+  WiFi connections will be made over twice as fast if you use a static IP address.
 
   This example is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -38,9 +38,9 @@
   51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA  */
 
 #include <ESP8266WiFi.h>
-#include <coredecls.h>         // crc32()
+#include <coredecls.h>   // crc32()
 #include <PolledTimeout.h>
-#include <include/WiFiState.h> // WiFiState structure details
+#include <include/WiFiState.h>  // WiFiState structure details
 
 //#define DEBUG  // prints WiFi connection info to serial, uncomment if you want WiFi messages
 #ifdef DEBUG
@@ -65,14 +65,14 @@ ADC_MODE(ADC_VCC);  // allows you to monitor the internal VCC level; it varies w
 // enter your WiFi configuration below
 const char* AP_SSID = "SSID";  // your router's SSID here
 const char* AP_PASS = "password";  // your router's password here
-IPAddress staticIP(0, 0, 0, 0); // parameters below are for your static IP address, if used
+IPAddress staticIP(0, 0, 0, 0);  // parameters below are for your static IP address, if used
 IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
 uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
 
-//#define TESTPOINT  //  used to track the timing of several test cycles (optional)
+//#define TESTPOINT  // used to track the timing of several test cycles (optional)
 #ifdef TESTPOINT
 #define testPointPin 4  // D2/GPIO4, you can use any pin that supports interrupts
 #define testPoint_HIGH digitalWrite(testPointPin, HIGH)
@@ -85,7 +85,7 @@ uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
 // This structure is stored in RTC memory to save the WiFi state and reset count (number of Deep Sleeps),
 // and it reconnects twice as fast as the first connection; it's used extensively in this demo
 struct nv_s {
-  WiFiState wss; // core's WiFi save state
+  WiFiState wss;  // core's WiFi save state
 
   struct {
     uint32_t crc32;
@@ -94,11 +94,11 @@ struct nv_s {
   } rtcData;
 };
 
-static nv_s* nv = (nv_s*)RTC_USER_MEM; // user RTC RAM area
+static nv_s* nv = (nv_s*)RTC_USER_MEM;  // user RTC RAM area
 
 uint32_t resetCount = 0;  // keeps track of the number of Deep Sleep tests / resets
 
-const uint32_t blinkDelay = 100; // fast blink rate for the LED when waiting for the user
+const uint32_t blinkDelay = 100;  // fast blink rate for the LED when waiting for the user
 esp8266::polledTimeout::periodicMs blinkLED(blinkDelay);  // LED blink delay without delay()
 esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight loop to simulate user code
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
@@ -133,7 +133,7 @@ void setup() {
     resetCount = nv->rtcData.rstCount;  // read the previous reset count
     resetCount++;
   }
-  nv->rtcData.rstCount = resetCount; // update the reset count & CRC
+  nv->rtcData.rstCount = resetCount;  // update the reset count & CRC
   updateRTCcrc();
 
   if (resetCount == 1) {  // show that millis() is cleared across the Deep Sleep reset
@@ -163,7 +163,7 @@ void loop() {
   } else if (resetCount == 4) {
     resetTests();
   }
-} //end of loop()
+}  //end of loop()
 
 void runTest1() {
   Serial.println(F("\n1st test - running with WiFi unconfigured"));
@@ -253,7 +253,7 @@ void runTest5() {
   // with the callback the sleep time is only 10 seconds total, no extra delay() afterward
   wifi_fpm_open();
   wifi_fpm_do_sleep(10E6);  // Sleep range = 10000 ~ 268,435,454 uS (0xFFFFFFE, 2^28-1)
-  delay(10e3 + 1); // delay needs to be 1 mS longer than sleep or it only goes into Modem Sleep
+  delay(10e3 + 1);  // delay needs to be 1 mS longer than sleep or it only goes into Modem Sleep
   Serial.println(F("Woke up!"));  // the interrupt callback hits before this is executed
 }
 
