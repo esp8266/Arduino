@@ -7,7 +7,7 @@ The two relevant reference manuals from Espressif are the [Low-Power Solutions](
 
 The table below is an expanded version of Table 1.1 from the Low-Power Solutions PDF.  The amperages listed are absolute minimums, and most people will not get that low with typical hardware and programs.
 
-|          item         | Automatic Modem Sleep | Forced Modem Sleep | Automatic Light Sleep | Timed or Forced Light Sleep |  Forced Deep Sleep |
+|          item         | Automatic Modem Sleep | Forced Modem Sleep | Automatic Light Sleep | Timed / Forced Light Sleep |  Forced Deep Sleep |
 |:---------------------:|:---------------------:|:------------------:|:---------------------:|:------------------:|:------------------:|
 |   WiFi connectivity   |       Connected       |    Disconnected    |       Connected       |    Disconnected    |    Disconnected    |
 |       GPIO state      |       Unchanged       |      Unchanged     |       Unchanged       |      Unchanged     | Low amperage (2 uA) |
