@@ -95,7 +95,7 @@ All of the Deep Sleep modes end with a RESET, so you must re-initialize nearly e
 
 Since SDK 2.1 the maximum Deep Sleep time has changed.  The old maximum was based on uint32_t(micros) or ~71.58 minutes (2^32-1 microseconds).  The new maximum is calculated from the RTC clock, which drifts with temperature from 5 to 7 timer ticks per microsecond, and will return a different number each time you read **system_rtc_clock_cali_proc()**.  Depending on CPU and temperature, you will get between 3 and 4 hours maximum Deep Sleep.  You can read the current theoretical maximum with **uint64_t deepSleepMax = ESP.deepSleepMax();** although you should set your time a little less than that due to the RTC drift.  If you go over the maximum time when you finally enter Deep Sleep, it disconnects the timer and won't wake without an external RESET. 
 
-If you need a longer sleep time than 3 hours, you can pass zero as the time variable to Deep Sleep and it turns disconnects the RTC.  The only way to wake it at that point is an external RESET; D0 can't do it.  Both Forced Light Sleep and Deep Sleep(0) are woken by an external signal, so short delays are more efficient with Forced Light Sleep, and longer delays are more energy efficient with Deep Sleep.
+If you need a longer sleep time than 3 hours, you can pass zero as the time variable to Deep Sleep and it disconnects the RTC.  The only way to wake it at that point is an external RESET; D0 can't do it.  Both Forced Light Sleep and Deep Sleep(0) are woken by an external signal, so short delays are more efficient with Forced Light Sleep, and longer delays are more energy efficient with Deep Sleep.
 
 
 ---
