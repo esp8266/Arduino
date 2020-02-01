@@ -70,7 +70,7 @@ IPAddress gateway(0, 0, 0, 0);
 IPAddress subnet(0, 0, 0, 0);
 IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
-uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
+uint32_t timeout = 30E3;  // 30 second timeout on the WiFi connection
 
 //#define TESTPOINT  //  used to track the timing of several test cycles (optional)
 #ifdef TESTPOINT
@@ -83,14 +83,14 @@ uint32_t wifiTimeout = 30E3;  // 30 second timeout on the WiFi connection
 #endif
 
 // This structure is stored in RTC memory to save the WiFi state and reset count (number of Deep Sleeps),
-// and it reconnects twice as fast as the first connection; it's used extensively in this demo
+// and it reconnects twice as fast as the first connection; it's used several places in this demo
 struct nv_s {
   WiFiState wss; // core's WiFi save state
 
   struct {
     uint32_t crc32;
     uint32_t rstCount;  // stores the Deep Sleep reset count
-    // you can add anything else here that you want to save
+    // you can add anything else here that you want to save, must be 4-byte aligned
   } rtcData;
 };
 
@@ -100,7 +100,8 @@ uint32_t resetCount = 0;  // keeps track of the number of Deep Sleep tests / res
 
 const uint32_t blinkDelay = 100; // fast blink rate for the LED when waiting for the user
 esp8266::polledTimeout::periodicMs blinkLED(blinkDelay);  // LED blink delay without delay()
-esp8266::polledTimeout::oneShotFastMs altDelay(blinkDelay);  // tight loop to simulate user code
+esp8266::polledTimeout::oneShotMs altDelay(blinkDelay);  // tight loop to simulate user code
+esp8266::polledTimeout::oneShotMs wifiTimeout(timeout);  // 30 second timeout on WiFi connection
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback function
@@ -212,18 +213,19 @@ void runTest4() {
   Serial.println(F("Automatic Light Sleep begins after WiFi connects (LED blinks)"));
   // on successive loops after power-on, WiFi shows 'connected' several seconds before Sleep happens
   // and WiFi reconnects after the forceSleepWake more quickly
-  digitalWrite(LED, LOW);  // visual cue that we're reconnecting
+  digitalWrite(LED, LOW);  // visual cue that we're reconnecting WiFi
+  uint32_t wifiBegin = millis();
+  WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
   WiFi.setSleepMode(WIFI_LIGHT_SLEEP, 3);  // Automatic Light Sleep, DTIM listen interval = 3
   // at higher DTIM intervals you'll have a hard time establishing and maintaining a connection
-  WiFi.forceSleepWake();  // reconnect with previous STA mode and connection settings
-  uint32_t wifiStart = millis();
-  while (((!WiFi.localIP()) || (WiFi.status() != WL_CONNECTED)) && (millis() - wifiStart < wifiTimeout)) {
+  wifiTimeout.reset(timeout);
+  while (((!WiFi.localIP()) || (WiFi.status() != WL_CONNECTED)) && (!wifiTimeout)) {
     yield();
   }
   if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
-    float reConn = (millis() - wifiStart);
+    float reConn = (millis() - wifiBegin);
     Serial.print(F("WiFi connect time = "));
-    Serial.printf("%1.3f seconds\n", reConn / 1000);
+    Serial.printf("%1.2f seconds\n", reConn / 1000);
     readVoltage();  // read internal VCC
     Serial.println(F("long press of the switch to continue"));
     waitPushbutton(true, 350);  /* Below 100 mS delay it only goes into 'Automatic Modem Sleep',
@@ -416,29 +418,21 @@ void initWiFi() {
     DEBUG_PRINT(F("my MAC: "));
     DEBUG_PRINTLN(WiFi.macAddress());
   }
-  uint32_t wifiStart = millis();
-  while ((WiFi.status() != WL_CONNECTED) && (millis() - wifiStart < wifiTimeout)) {
+  wifiTimeout.reset(timeout);
+  while (((!WiFi.localIP()) || (WiFi.status() != WL_CONNECTED)) && (!wifiTimeout)) {
     yield();
   }
-  if (WiFi.status() == WL_CONNECTED) {
-    DEBUG_PRINTLN(F("WiFi connected"));
-  } else {
-    Serial.println(F("WiFi timed out and didn't connect"));
-  }
-  uint32_t wifiFinish = millis();  // timeout if we don't get the IP addresses from DHCP
-  while ((!WiFi.localIP() && (WiFi.status() == WL_CONNECTED)) && (millis() - wifiFinish < wifiTimeout)) {
-    yield();
-  }
-  WiFi.setAutoReconnect(true);
   if (WiFi.localIP()) {
+    DEBUG_PRINTLN(F("WiFi connected"));
     Serial.print(F("WiFi connect time = "));
     float reConn = (millis() - wifiBegin);
-    Serial.printf("%1.3f seconds\n", reConn / 1000);
+    Serial.printf("%1.2f seconds\n", reConn / 1000);
     DEBUG_PRINT(F("WiFi Gateway IP: "));
     DEBUG_PRINTLN(WiFi.gatewayIP());
     DEBUG_PRINT(F("my IP address: "));
     DEBUG_PRINTLN(WiFi.localIP());
   } else {
-    DEBUG_PRINTLN(F("IP addresses not acquired from DHCP"));
+    Serial.println(F("WiFi timed out and didn't connect"));
   }
+  WiFi.setAutoReconnect(true);
 }
