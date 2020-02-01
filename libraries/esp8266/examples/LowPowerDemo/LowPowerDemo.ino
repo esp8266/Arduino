@@ -222,7 +222,8 @@ void runTest4() {
   while (((!WiFi.localIP()) || (WiFi.status() != WL_CONNECTED)) && (!wifiTimeout)) {
     yield();
   }
-  if (WiFi.localIP()) {  // won't go into Automatic Sleep without an active WiFi connection
+  if ((WiFi.status() == WL_CONNECTED) && WiFi.localIP()) {
+  // won't go into Automatic Sleep without an active WiFi connection
     float reConn = (millis() - wifiBegin);
     Serial.print(F("WiFi connect time = "));
     Serial.printf("%1.2f seconds\n", reConn / 1000);
@@ -380,7 +381,7 @@ void waitPushbutton(bool usesDelay, unsigned int delayTime) {  // loop until the
 
 void readVoltage() { // read internal VCC
   float volts = ESP.getVcc();
-  Serial.printf("The internal VCC reads %1.3f volts\n", volts / 1000);
+  Serial.printf("The internal VCC reads %1.2f volts\n", volts / 1000);
 }
 
 void printMillis() {
@@ -422,7 +423,7 @@ void initWiFi() {
   while (((!WiFi.localIP()) || (WiFi.status() != WL_CONNECTED)) && (!wifiTimeout)) {
     yield();
   }
-  if (WiFi.localIP()) {
+  if ((WiFi.status() == WL_CONNECTED) && WiFi.localIP()) {
     DEBUG_PRINTLN(F("WiFi connected"));
     Serial.print(F("WiFi connect time = "));
     float reConn = (millis() - wifiBegin);
