@@ -223,7 +223,7 @@ void runTest4() {
     yield();
   }
   if ((WiFi.status() == WL_CONNECTED) && WiFi.localIP()) {
-  // won't go into Automatic Sleep without an active WiFi connection
+    // won't go into Automatic Sleep without an active WiFi connection
     float reConn = (millis() - wifiBegin);
     Serial.print(F("WiFi connect time = "));
     Serial.printf("%1.2f seconds\n", reConn / 1000);
