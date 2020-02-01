@@ -12,13 +12,13 @@
   The test requires a pushbutton switch connected between D3 and GND to advance the tests.
   You'll also need to connect D0/GPIO16 to RST for the Deep Sleep tests.  If you forget to
   connect D0 to RST it will hang after the first Deep Sleep test. D0 is driven high during
-  Deep Sleep, so you should use a Schottky diode between D0 and RST if you want to use a 
+  Deep Sleep, so you should use a Schottky diode between D0 and RST if you want to use a
   reset switch; connect the anode of the diode to RST, and the cathode to D0.
 
   Additionally, you can connect an LED from any free pin through a 1K ohm resistor to the
   3.3V supply, though preferably not the 3V3 pin on the module or it adds to the measured
   amperage.  When the LED blinks you can proceed to the next test.  When the LED is lit
-  continuously it's connecting WiFi, and when it's off the CPU is asleep.  The LED blinks  
+  continuously it's connecting WiFi, and when it's off the CPU is asleep.  The LED blinks
   slowly when the tests are complete.  Test progress can also be shown on the serial monitor.
 
   WiFi connections will be made over twice as fast if you can use a static IP address.
