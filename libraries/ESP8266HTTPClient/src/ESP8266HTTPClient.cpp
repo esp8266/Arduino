@@ -681,7 +681,8 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         if (payload && size > 0) {
             size_t bytesWritten = 0;
             const uint8_t *p = payload;
-            while (bytesWritten < size) {
+            size_t originalSize = size;
+            while (bytesWritten < originalSize) {
                 int written;
                 int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
                 written = _client->write(p + bytesWritten, towrite);
