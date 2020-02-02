@@ -256,6 +256,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         // Check for toggles
         int32_t cyclesToGo = wave->nextServiceCycle - now;
         if (cyclesToGo < 0) {
+          cyclesToGo = -((-cyclesToGo) % (wave->nextTimeHighCycles + wave->nextTimeLowCycles));
           waveformState ^= mask;
           if (waveformState & mask) {
             if (i == 16) {
@@ -263,16 +264,16 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeHighCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
+            wave->nextServiceCycle = now + wave->nextTimeHighCycles + cyclesToGo;
+            nextEventCycles = min_u32(nextEventCycles, min_u32(wave->nextTimeHighCycles + cyclesToGo, 1));
           } else {
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
             } else {
               ClearGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeLowCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
+            wave->nextServiceCycle = now + wave->nextTimeLowCycles + cyclesToGo;
+            nextEventCycles = min_u32(nextEventCycles, min_u32(wave->nextTimeLowCycles + cyclesToGo, 1));
           }
         } else {
           uint32_t deltaCycles = wave->nextServiceCycle - now;
