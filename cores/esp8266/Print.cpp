@@ -270,43 +270,45 @@ size_t Print::println(const Printable& x) {
 // Private Methods /////////////////////////////////////////////////////////////
 
 size_t Print::printNumber(unsigned long n, uint8_t base) {
-    char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+    char buf[8 * sizeof(n) + 1]; // Assumes 8-bit chars plus zero byte.
     char *str = &buf[sizeof(buf) - 1];
 
     *str = '\0';
 
     // prevent crash if called with base == 1
-    if(base < 2)
+    if(base < 2) {
         base = 10;
+    }
 
     do {
-        unsigned long m = n;
+        auto m = n;
         n /= base;
         char c = m - base * n;
 
         *--str = c < 10 ? c + '0' : c + 'A' - 10;
-    } while(n);
+    } while (n);
 
     return write(str);
 }
 
 size_t Print::printNumber(unsigned long long n, uint8_t base) {
-    char buf[8 * sizeof(long long) + 1]; // Assumes 8-bit chars plus zero byte.
+    char buf[8 * sizeof(n) + 1]; // Assumes 8-bit chars plus zero byte.
     char* str = &buf[sizeof(buf) - 1];
 
     *str = '\0';
 
     // prevent crash if called with base == 1
-    if (base < 2)
+    if (base < 2) {
         base = 10;
+    }
 
     do {
-        unsigned long m = n;
+        auto m = n;
         n /= base;
         char c = m - base * n;
 
         *--str = c < 10 ? c + '0' : c + 'A' - 10;
-    } while(n);
+    } while (n);
 
     return write(str);
 }
