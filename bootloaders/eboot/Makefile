@@ -29,13 +29,13 @@ CFLAGS += $(INC)
 
 CFLAGS += $(UZLIB_FLAGS)
 
-LDFLAGS	+= -nostdlib -Wl,--no-check-sections -Wl,--gc-sections -umain
+LDFLAGS	+= -nostdlib -Wl,--no-check-sections -Wl,--gc-sections -umain -Wl,-Map,$(@:.elf=.map)
 
 LD_SCRIPT := -Teboot.ld
 
-APP_OUT:= eboot.elf
-APP_AR := eboot.a
-APP_FW := eboot.bin
+APP_OUT := eboot.elf
+APP_AR  := eboot.a
+APP_FW  := eboot.bin
 
 
 all: $(APP_OUT)
@@ -49,13 +49,14 @@ tinfgzip.o: $(UZLIB_PATH)/tinfgzip.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_c
 $(APP_AR): $(TARGET_OBJ_PATHS) tinflate.o tinfgzip.o
 	$(AR) cru $@ $^
 
-$(APP_OUT): $(APP_AR)
+$(APP_OUT): $(APP_AR) eboot.ld | Makefile
 	$(LD) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group -Wl,--whole-archive $(APP_AR) -Wl,--end-group -o $@
 
 clean:
 	rm -f *.o
 	rm -f $(APP_AR)
 	rm -f $(APP_OUT)
+	rm -f *.map
 
 
 .PHONY: all clean default
