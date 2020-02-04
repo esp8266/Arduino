@@ -165,7 +165,7 @@ function install_ide()
             wget -nv https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-win32.zip
             unzip -q python-3.8.1-embed-win32.zip
             cp "python.exe" "python3.exe"
-            wget -nv -O sed.exe https://github.com/mbuilov/sed-windows/raw/master/sed-4.7-x64.exe
+            wget -nv -O sed.exe https://github.com/mbuilov/sed-windows/raw/master/sed-4.8-x64.exe
             #wget -nv https://fossies.org/windows/misc/unz600xn.exe
             #unzip -q ./unz600xn.exe
         popd
