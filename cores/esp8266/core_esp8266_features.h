@@ -112,6 +112,9 @@ extern "C" {
 
 void precache(void *f, uint32_t bytes);
 
+void Cache_Read_Enable(uint32_t map, uint32_t p, uint32_t v);
+extern int Cache_Read_Enable_status;
+
 #ifdef __cplusplus
 }
 #endif

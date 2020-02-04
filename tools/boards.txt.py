@@ -1186,6 +1186,17 @@ macros = {
         ( '.menu.ssl.basic.build.sslflags', '-DBEARSSL_SSL_BASIC'),
         ]),
 
+    ####################### mmu
+
+    'mmu_menu': collections.OrderedDict([
+        ( '.menu.mmu.3232', '32KB cache + 32KB IRAM (balanced)' ),
+        ( '.menu.mmu.3232.build.mmuflags', '-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000'),
+        ( '.menu.mmu.4816', '16KB cache + 48KB IRAM (IRAM)' ),
+        ( '.menu.mmu.4816.build.mmuflags', '-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000' ),
+        ( '.menu.mmu.3216', '16KB cache + 32KB IRAM + 16KB sec heap (Heap)' ),
+        ( '.menu.mmu.3216.build.mmuflags', '-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000' ),
+        ]),
+
     }
 
 ################################################################
@@ -1302,7 +1313,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
     strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
 
-    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
+    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld.h'
     menu = '.menu.eesz.' + strsize + strfs_strip
     menub = menu + '.build.'
     desc = 'none' if (fs_kb == 0) else strfs + 'B'
@@ -1356,7 +1367,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("{")
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        print("  iram1_0_seg :                         org = 0x40100000, len = 0x8000")
+        print("  iram1_0_seg :                         org = 0x40100000, len = IRAM_SIZE")
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
@@ -1546,6 +1557,7 @@ def all_boards ():
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
+    print('menu.mmu=MMU')
     print('')
 
     missingboards = []
@@ -1564,7 +1576,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu', 'mmu_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:

@@ -68,7 +68,7 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
             load = true;
         }
 
-        if (address >= 0x40100000 && address < 0x40108000) {
+        if (address >= 0x40100000 && address < 0x4010C000) {
             load = true;
         }
 
