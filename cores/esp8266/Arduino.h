@@ -246,6 +246,10 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 #include "Updater.h"
 #include "debug.h"
 
+
+#include "mmu_iram.h"
+
+
 using std::min;
 using std::max;
 using std::isinf;

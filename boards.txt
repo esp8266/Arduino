@@ -63,11 +63,11 @@ generic.menu.ssl.all.build.sslflags=
 generic.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 generic.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 generic.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-generic.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+generic.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 generic.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-generic.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+generic.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 generic.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-generic.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+generic.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 generic.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 generic.menu.ResetMethod.ck=no dtr (aka ck)
@@ -544,11 +544,11 @@ esp8285.menu.ssl.all.build.sslflags=
 esp8285.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 esp8285.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 esp8285.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-esp8285.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+esp8285.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp8285.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-esp8285.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+esp8285.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 esp8285.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-esp8285.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+esp8285.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 esp8285.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 esp8285.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 esp8285.menu.ResetMethod.ck=no dtr (aka ck)
@@ -834,11 +834,11 @@ espduino.menu.ssl.all.build.sslflags=
 espduino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espduino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espduino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espduino.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espduino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espduino.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espduino.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espduino.build.flash_mode=dio
 espduino.build.flash_flags=-DFLASHMODE_DIO
 espduino.build.flash_freq=40
@@ -1032,11 +1032,11 @@ huzzah.menu.ssl.all.build.sslflags=
 huzzah.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 huzzah.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 huzzah.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-huzzah.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+huzzah.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 huzzah.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-huzzah.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+huzzah.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 huzzah.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-huzzah.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+huzzah.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 huzzah.upload.resetmethod=--before default_reset --after hard_reset
 huzzah.build.flash_mode=qio
 huzzah.build.flash_flags=-DFLASHMODE_QIO
@@ -1231,11 +1231,11 @@ inventone.menu.ssl.all.build.sslflags=
 inventone.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 inventone.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 inventone.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-inventone.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+inventone.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 inventone.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-inventone.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+inventone.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 inventone.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-inventone.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+inventone.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 inventone.upload.resetmethod=--before default_reset --after hard_reset
 inventone.build.flash_mode=dio
 inventone.build.flash_flags=-DFLASHMODE_DIO
@@ -1430,11 +1430,11 @@ cw01.menu.ssl.all.build.sslflags=
 cw01.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 cw01.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 cw01.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-cw01.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+cw01.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 cw01.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-cw01.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+cw01.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 cw01.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-cw01.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+cw01.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 cw01.upload.resetmethod=--before default_reset --after hard_reset
 cw01.menu.CrystalFreq.26=26 MHz
 cw01.menu.CrystalFreq.40=40 MHz
@@ -1632,11 +1632,11 @@ espresso_lite_v1.menu.ssl.all.build.sslflags=
 espresso_lite_v1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espresso_lite_v1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espresso_lite_v1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espresso_lite_v1.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espresso_lite_v1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espresso_lite_v1.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espresso_lite_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espresso_lite_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espresso_lite_v1.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espresso_lite_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espresso_lite_v1.build.flash_mode=dio
 espresso_lite_v1.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v1.build.flash_freq=40
@@ -1834,11 +1834,11 @@ espresso_lite_v2.menu.ssl.all.build.sslflags=
 espresso_lite_v2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espresso_lite_v2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espresso_lite_v2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espresso_lite_v2.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espresso_lite_v2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espresso_lite_v2.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espresso_lite_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espresso_lite_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espresso_lite_v2.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espresso_lite_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espresso_lite_v2.build.flash_mode=dio
 espresso_lite_v2.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v2.build.flash_freq=40
@@ -2036,11 +2036,11 @@ phoenix_v1.menu.ssl.all.build.sslflags=
 phoenix_v1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 phoenix_v1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 phoenix_v1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-phoenix_v1.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+phoenix_v1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-phoenix_v1.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+phoenix_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 phoenix_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-phoenix_v1.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+phoenix_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 phoenix_v1.build.flash_mode=dio
 phoenix_v1.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v1.build.flash_freq=40
@@ -2238,11 +2238,11 @@ phoenix_v2.menu.ssl.all.build.sslflags=
 phoenix_v2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 phoenix_v2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 phoenix_v2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-phoenix_v2.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+phoenix_v2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-phoenix_v2.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+phoenix_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 phoenix_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-phoenix_v2.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+phoenix_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 phoenix_v2.build.flash_mode=dio
 phoenix_v2.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v2.build.flash_freq=40
@@ -2440,11 +2440,11 @@ nodemcu.menu.ssl.all.build.sslflags=
 nodemcu.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 nodemcu.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 nodemcu.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-nodemcu.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+nodemcu.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcu.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-nodemcu.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+nodemcu.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 nodemcu.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-nodemcu.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+nodemcu.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_flags=-DFLASHMODE_QIO
@@ -2639,11 +2639,11 @@ nodemcuv2.menu.ssl.all.build.sslflags=
 nodemcuv2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 nodemcuv2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 nodemcuv2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-nodemcuv2.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+nodemcuv2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcuv2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-nodemcuv2.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+nodemcuv2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 nodemcuv2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-nodemcuv2.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+nodemcuv2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 nodemcuv2.upload.resetmethod=--before default_reset --after hard_reset
 nodemcuv2.build.flash_mode=dio
 nodemcuv2.build.flash_flags=-DFLASHMODE_DIO
@@ -2842,11 +2842,11 @@ modwifi.menu.ssl.all.build.sslflags=
 modwifi.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 modwifi.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 modwifi.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-modwifi.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+modwifi.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 modwifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-modwifi.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+modwifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 modwifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-modwifi.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+modwifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 modwifi.upload.resetmethod=--before no_reset --after soft_reset
 modwifi.build.flash_mode=qio
 modwifi.build.flash_flags=-DFLASHMODE_QIO
@@ -3061,11 +3061,11 @@ thing.menu.ssl.all.build.sslflags=
 thing.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 thing.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 thing.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-thing.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+thing.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thing.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-thing.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+thing.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 thing.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-thing.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+thing.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 thing.upload.resetmethod=--before no_reset --after soft_reset
 thing.build.flash_mode=qio
 thing.build.flash_flags=-DFLASHMODE_QIO
@@ -3260,11 +3260,11 @@ thingdev.menu.ssl.all.build.sslflags=
 thingdev.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 thingdev.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 thingdev.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-thingdev.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+thingdev.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thingdev.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-thingdev.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+thingdev.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 thingdev.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-thingdev.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+thingdev.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 thingdev.upload.resetmethod=--before default_reset --after hard_reset
 thingdev.build.flash_mode=dio
 thingdev.build.flash_flags=-DFLASHMODE_DIO
@@ -3459,11 +3459,11 @@ blynk.menu.ssl.all.build.sslflags=
 blynk.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 blynk.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 blynk.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-blynk.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+blynk.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 blynk.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-blynk.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+blynk.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 blynk.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-blynk.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+blynk.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 blynk.upload.resetmethod=--before default_reset --after hard_reset
 blynk.build.flash_mode=qio
 blynk.build.flash_flags=-DFLASHMODE_QIO
@@ -3658,11 +3658,11 @@ esp210.menu.ssl.all.build.sslflags=
 esp210.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 esp210.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 esp210.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-esp210.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+esp210.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp210.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-esp210.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+esp210.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 esp210.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-esp210.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+esp210.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 esp210.upload.resetmethod=--before no_reset --after soft_reset
 esp210.build.flash_mode=qio
 esp210.build.flash_flags=-DFLASHMODE_QIO
@@ -3857,11 +3857,11 @@ d1_mini.menu.ssl.all.build.sslflags=
 d1_mini.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1_mini.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1_mini.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-d1_mini.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+d1_mini.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-d1_mini.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+d1_mini.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1_mini.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-d1_mini.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+d1_mini.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini.build.flash_mode=dio
 d1_mini.build.flash_flags=-DFLASHMODE_DIO
@@ -4056,11 +4056,11 @@ d1_mini_pro.menu.ssl.all.build.sslflags=
 d1_mini_pro.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1_mini_pro.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1_mini_pro.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-d1_mini_pro.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+d1_mini_pro.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_pro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-d1_mini_pro.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+d1_mini_pro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1_mini_pro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-d1_mini_pro.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+d1_mini_pro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini_pro.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini_pro.build.flash_mode=dio
 d1_mini_pro.build.flash_flags=-DFLASHMODE_DIO
@@ -4238,11 +4238,11 @@ d1_mini_lite.menu.ssl.all.build.sslflags=
 d1_mini_lite.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1_mini_lite.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1_mini_lite.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-d1_mini_lite.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+d1_mini_lite.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_lite.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-d1_mini_lite.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+d1_mini_lite.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1_mini_lite.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-d1_mini_lite.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+d1_mini_lite.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini_lite.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini_lite.build.flash_mode=dout
 d1_mini_lite.build.flash_flags=-DFLASHMODE_DOUT
@@ -4477,11 +4477,11 @@ d1.menu.ssl.all.build.sslflags=
 d1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-d1.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+d1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-d1.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+d1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-d1.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+d1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1.upload.resetmethod=--before default_reset --after hard_reset
 d1.build.flash_mode=dio
 d1.build.flash_flags=-DFLASHMODE_DIO
@@ -4676,11 +4676,11 @@ espino.menu.ssl.all.build.sslflags=
 espino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espino.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espino.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espino.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espino.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 espino.menu.ResetMethod.ck=no dtr (aka ck)
@@ -4878,11 +4878,11 @@ espinotee.menu.ssl.all.build.sslflags=
 espinotee.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espinotee.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espinotee.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espinotee.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espinotee.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espinotee.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espinotee.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espinotee.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espinotee.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espinotee.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espinotee.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espinotee.upload.resetmethod=--before default_reset --after hard_reset
 espinotee.build.flash_mode=qio
 espinotee.build.flash_flags=-DFLASHMODE_QIO
@@ -5094,11 +5094,11 @@ wifinfo.menu.ssl.all.build.sslflags=
 wifinfo.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wifinfo.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wifinfo.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-wifinfo.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+wifinfo.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifinfo.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-wifinfo.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+wifinfo.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wifinfo.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-wifinfo.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+wifinfo.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifinfo.upload.resetmethod=--before default_reset --after hard_reset
 wifinfo.build.flash_mode=qio
 wifinfo.build.flash_flags=-DFLASHMODE_QIO
@@ -5352,11 +5352,11 @@ arduino-esp8266.menu.ssl.all.build.sslflags=
 arduino-esp8266.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 arduino-esp8266.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 arduino-esp8266.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-arduino-esp8266.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+arduino-esp8266.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 arduino-esp8266.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-arduino-esp8266.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+arduino-esp8266.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 arduino-esp8266.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-arduino-esp8266.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+arduino-esp8266.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 arduino-esp8266.upload.resetmethod=--before no_reset --after soft_reset
 arduino-esp8266.build.flash_mode=qio
 arduino-esp8266.build.flash_flags=-DFLASHMODE_QIO
@@ -5552,11 +5552,11 @@ gen4iod.menu.ssl.all.build.sslflags=
 gen4iod.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 gen4iod.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 gen4iod.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-gen4iod.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+gen4iod.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 gen4iod.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-gen4iod.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+gen4iod.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 gen4iod.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-gen4iod.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+gen4iod.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 gen4iod.upload.resetmethod=--before default_reset --after hard_reset
 gen4iod.build.flash_mode=dio
 gen4iod.build.flash_flags=-DFLASHMODE_DIO
@@ -5752,11 +5752,11 @@ oak.menu.ssl.all.build.sslflags=
 oak.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 oak.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 oak.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-oak.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+oak.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 oak.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-oak.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+oak.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 oak.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-oak.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+oak.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 oak.upload.resetmethod=--before no_reset --after soft_reset
 oak.build.flash_mode=dio
 oak.build.flash_flags=-DFLASHMODE_DIO
@@ -5951,11 +5951,11 @@ wifiduino.menu.ssl.all.build.sslflags=
 wifiduino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wifiduino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wifiduino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-wifiduino.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+wifiduino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifiduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-wifiduino.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+wifiduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wifiduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-wifiduino.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+wifiduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifiduino.upload.resetmethod=--before default_reset --after hard_reset
 wifiduino.build.flash_mode=dio
 wifiduino.build.flash_flags=-DFLASHMODE_DIO
@@ -6150,11 +6150,11 @@ wifi_slot.menu.ssl.all.build.sslflags=
 wifi_slot.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wifi_slot.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wifi_slot.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-wifi_slot.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+wifi_slot.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifi_slot.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-wifi_slot.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+wifi_slot.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wifi_slot.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-wifi_slot.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+wifi_slot.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifi_slot.upload.resetmethod=--before default_reset --after hard_reset
 wifi_slot.menu.FlashFreq.40=40MHz
 wifi_slot.menu.FlashFreq.40.build.flash_freq=40
@@ -6463,11 +6463,11 @@ wiolink.menu.ssl.all.build.sslflags=
 wiolink.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wiolink.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wiolink.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-wiolink.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+wiolink.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wiolink.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-wiolink.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+wiolink.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wiolink.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-wiolink.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+wiolink.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wiolink.upload.resetmethod=--before default_reset --after hard_reset
 wiolink.build.flash_mode=qio
 wiolink.build.flash_flags=-DFLASHMODE_QIO
@@ -6662,11 +6662,11 @@ espectro.menu.ssl.all.build.sslflags=
 espectro.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espectro.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espectro.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espectro.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espectro.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espectro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espectro.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espectro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espectro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espectro.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espectro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espectro.upload.resetmethod=--before default_reset --after hard_reset
 espectro.build.flash_mode=dio
 espectro.build.flash_flags=-DFLASHMODE_DIO
@@ -6871,11 +6871,11 @@ sonoff.menu.ssl.all.build.sslflags=
 sonoff.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 sonoff.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 sonoff.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-sonoff.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+sonoff.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 sonoff.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-sonoff.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+sonoff.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 sonoff.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-sonoff.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+sonoff.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 sonoff.upload.resetmethod=--before no_reset --after soft_reset
 sonoff.build.flash_mode=dout
 sonoff.build.flash_flags=-DFLASHMODE_DOUT
@@ -7111,11 +7111,11 @@ espmxdevkit.menu.ssl.all.build.sslflags=
 espmxdevkit.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espmxdevkit.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espmxdevkit.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
-espmxdevkit.menu.mmu.3232.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x8000
+espmxdevkit.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espmxdevkit.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
-espmxdevkit.menu.mmu.4816.build.mmuflags=-DIRAM_SIZE=0xC000 -DICACHE_SIZE=0x4000
+espmxdevkit.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espmxdevkit.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
-espmxdevkit.menu.mmu.3216.build.mmuflags=-DIRAM_SIZE=0x8000 -DICACHE_SIZE=0x4000 -DSEC_HEAP=0x40108000 -DSEC_HEAP_SIZE=0x4000
+espmxdevkit.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espmxdevkit.upload.resetmethod=--before default_reset --after hard_reset
 espmxdevkit.build.flash_mode=dout
 espmxdevkit.build.flash_flags=-DFLASHMODE_DOUT
