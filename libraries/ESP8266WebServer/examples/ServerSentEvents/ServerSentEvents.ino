@@ -83,14 +83,15 @@ void SSEKeepAlive() {
     if (!(subscription[i].clientIP)) continue;
     WiFiClient client = subscription[i].client;  
     if (client.connected()) {
-      Serial.printf_P(PSTR("SSEKeepAlive - client is still listening on channel %d\n"));
+      Serial.printf_P(PSTR("SSEKeepAlive - client is still listening on channel %d\n"), i);
       client.println(F("event: event\ndata: { \"TYPE\":\"KEEP-ALIVE\" }\n"));   // Extra newline required by SSE standard
     } else { 
-      Serial.printf_P(PSTR("SSEKeepAlive - client not listening on channel %d, remove subscription\n"));
+      Serial.printf_P(PSTR("SSEKeepAlive - client not listening on channel %d, remove subscription\n"), i);
       subscription[i].keepAliveTimer.detach();
       client.flush();
       client.stop();
       subscription[i].clientIP = 0;
+      subscriptionCount--;
     }
   }
 }
@@ -143,7 +144,7 @@ void updateSensor(const char* name, unsigned short *value) {
   unsigned short newVal = (unsigned short)RANDOM_REG32; // (not so good) random value for the sensor
   unsigned short val = *value;
  	Serial.printf_P(PSTR("update sensor %s - previous state: %d, new state: %d\n"), name, val, newVal);
-  if (val != newVal) SSEBroadcastState(name, newVal, val); // only broadcast if state is different
+  if (val != newVal) SSEBroadcastState(name, val, newVal); // only broadcast if state is different
   *value = newVal;
   update.once(rand() % 20 + 10, std::bind(updateSensor, name, value));  // randomly update sensor A 
 }
