@@ -114,33 +114,20 @@ bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress
                 IPAddress sta = WiFi.localIP();
                 IPAddress ap = WiFi.softAPIP();
 
-                if (!sta.isSet() && !ap.isSet())
+                if (sta.isSet())
                 {
-
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] internal interfaces (STA, AP) are not set (none was specified)\n")));
-                    return false;
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] STA interface selected\n")));
+                    ipAddress = sta;
                 }
-
-                if (ap.isSet())
+                else if (ap.isSet())
                 {
-
-                    if (sta.isSet())
-                    {
-                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected over STA (none was specified)\n")));
-                    }
-                    else
-                    {
-                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected\n")));
-                    }
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] AP interface selected\n")));
                     ipAddress = ap;
-
                 }
                 else
                 {
-
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected (none was specified)\n")));
-                    ipAddress = sta;
-
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] standard interfaces are not up, please specify one in ::begin()\n")));
+                    return false;
                 }
 
                 // continue to ensure interface is UP
