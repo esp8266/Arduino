@@ -63,7 +63,7 @@ extern "C" {
 //   if it has not given up waiting (72 seconds on windows for the connect
 //   timeout).
 //
-// Note that ESPAsync clients may serve more than one client at a time so
+// Note that ESPAsync servers may serve more than one client at a time so
 // the default setting is not 1 or 2.  It was 0xff by default.  It can be
 // overriden at runtime in WiFiServer::begin().
 //
