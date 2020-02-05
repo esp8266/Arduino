@@ -60,7 +60,7 @@ void WiFiServer::begin() {
 	begin(_port);
 }
 
-void WiFiServer::begin(uint16_t port, int backlog) {
+void WiFiServer::begin(uint16_t port, uint8_t backlog) {
     close();
     _port = port;
     err_t err;
@@ -82,6 +82,8 @@ void WiFiServer::begin(uint16_t port, int backlog) {
     (void)backlog;
     tcp_pcb* listen_pcb = tcp_listen(pcb);
 #else
+    if (backlog == 0)
+        backlog = MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT;
     tcp_pcb* listen_pcb = tcp_listen_with_backlog(pcb, backlog);
 #endif
 
@@ -181,9 +183,12 @@ long WiFiServer::_accept(tcp_pcb* apcb, long err) {
 #if LWIP_VERSION_MAJOR == 1
     tcp_accepted(_listen_pcb);
 #else
-    tcp_backlog_accepted(_listen_pcb);
+    tcp_backlog_delayed(apcb);
+    // tcp_backlog_accepted() has to be called on this ClientContext's pcb (here = acpb)
+    // just before tcp_close() (but not needed before tcp_abort()).
     // http://lwip.100.n7.nabble.com/Problem-re-opening-listening-pbc-tt32484.html#a32494
     // https://www.nongnu.org/lwip/2_1_x/group__tcp__raw.html#gaeff14f321d1eecd0431611f382fcd338
+    client->write((const uint8_t*)"gotit",5);
 #endif
     return ERR_OK;
 }

@@ -76,6 +76,11 @@ public:
             tcp_recv(_pcb, NULL);
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
+#if LWIP_VERSION_MAJOR != 1
+            // needed for clients from WiFiServer
+            // harmless for other clients
+            tcp_backlog_accepted(_pcb);
+#endif
             err = tcp_close(_pcb);
             if(err != ERR_OK) {
                 DEBUGV(":tc err %d\r\n", (int) err);

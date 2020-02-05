@@ -32,15 +32,44 @@ extern "C" {
 #include "IPAddress.h"
 
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
-// maximum number of simultaneously accepted clients.
-// Generally in Arduino scenarios, only one client is used at a time.
-// Default number of possibly simultaneously acepted client is defined
-// below, user can overide it at runtime from sketch:
+// maximum number of simultaneously accepted clients.  Default number of
+// possibly simultaneously accepted client is defined below, user can
+// overide it at runtime from sketch:
 //      WiFiServer::begin(port, max-simultaneous-clients-per-port);
 // New incoming clients to this server will be delayed until an already
-// connected one leaves.  SYNACK is anyway answered to waiting clients, so
-// the connection appears as open anyway.
-#define MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT 3
+// connected one leaves.
+// By "delayed", it is meant that WiFiServer will not answer to the SYN
+// packet until there is room for a new one: The server (tcp on that port)
+// will be invisible.  When a connected client leaves, the server will
+// accept a newcomer at the moment when one of them retries to connect by
+// sending another SYN (which will not immediately happen), and before it
+// times-out trying to connect.
+//
+// Back to Arduino scenario:
+//
+// Usually only one client is used at a time: The client (like a http
+// browser) is accepted, served then closed.  The ESP8266WebServer cannot
+// answer to another client during that time even if it is tcp-accepted
+// (syn-acked), until the current one has been served.
+//
+// Now that backlog is enabled, at most
+// MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT clients will be tcp-accepted by
+// a WiFiServer even if it is currently busy serving one client (ie: busy
+// and not checking WiFiServer::available()/hasClient()).  But next clients
+// will be kept out and will have to tcp-retry (as if they were trying to
+// connect through a mute firewall):
+// - Then eventually one of the connected clients leaves
+// - Then a while *after* that moment a waiting/potential client say hello
+//   if it has not given up waiting (72 seconds on windows for the connect
+//   timeout).
+//
+// Note that ESPAsync clients may serve more than one client at a time so
+// the default setting is not 1 or 2.  It was 0xff by default.  It can be
+// overriden at runtime in WiFiServer::begin().
+//
+#ifndef MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT
+#define MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT 5
+#endif
 
 class ClientContext;
 class WiFiClient;
@@ -63,8 +92,8 @@ public:
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();
-  void begin(uint16_t port) { begin(port, MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT); }
-  void begin(uint16_t port, int backlog);
+  void begin(uint16_t port) { begin(port, 0); }
+  void begin(uint16_t port, uint8_t backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
   virtual size_t write(uint8_t);
