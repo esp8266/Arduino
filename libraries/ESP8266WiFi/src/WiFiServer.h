@@ -33,8 +33,8 @@ extern "C" {
 
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
 // maximum number of simultaneously accepted clients.  Default number of
-// possibly simultaneously accepted client is defined below, user can
-// overide it at runtime from sketch:
+// possibly simultaneously accepted client is defined in WiFiServer.cpp,
+// user can overide it at runtime from sketch:
 //      WiFiServer::begin(port, max-simultaneous-clients-per-port);
 // New incoming clients to this server will be delayed until an already
 // connected one leaves.
@@ -66,10 +66,6 @@ extern "C" {
 // Note that ESPAsync servers may serve more than one client at a time so
 // the default setting is not 1 or 2.  It was 0xff by default.  It can be
 // overriden at runtime in WiFiServer::begin().
-//
-#ifndef MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT
-#define MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT 5
-#endif
 
 class ClientContext;
 class WiFiClient;

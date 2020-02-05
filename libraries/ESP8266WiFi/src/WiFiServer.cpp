@@ -38,6 +38,10 @@ extern "C" {
 #include "lwip/init.h" // LWIP_VERSION_
 #include <include/ClientContext.h>
 
+#ifndef MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT
+#define MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT 5
+#endif
+
 WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 : _port(port)
 , _addr(addr)
