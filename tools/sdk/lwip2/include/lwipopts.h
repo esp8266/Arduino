@@ -3579,7 +3579,7 @@ extern "C" {
 #define SNTP_SUPPRESS_DELAY_CHECK 1
 #define SNTP_UPDATE_DELAY_DEFAULT 3600000   // update delay defined by a default weak function
 #define SNTP_UPDATE_DELAY sntp_update_delay_MS_rfc_not_less_than_15000()
-extern uint32_t SNTP_UPDATE_DELAY;
+uint32_t SNTP_UPDATE_DELAY;
 
 #if LWIP_FEATURES
 // esp8266/arduino/lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
@@ -3597,7 +3597,7 @@ extern uint32_t SNTP_UPDATE_DELAY;
 #define SNTP_STARTUP_DELAY 1                // enable startup delay
 #define SNTP_STARTUP_DELAY_FUNC_DEFAULT 0   // to 0 by default via a default weak function
 #define SNTP_STARTUP_DELAY_FUNC sntp_startup_delay_MS_rfc_not_less_than_60000()
-extern uint32_t SNTP_STARTUP_DELAY_FUNC;
+uint32_t SNTP_STARTUP_DELAY_FUNC;
 
 /*
    --------------------------------------------------
@@ -3617,7 +3617,7 @@ struct netif;
 #error LWIP_ERR_T definition should come from lwip1.4 from espressif
 #endif
 //#define LWIP_ERR_T s8
-LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif) __attribute__((weak));
+LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif);
 
 /*
    --------------------------------------------------
