@@ -68,6 +68,9 @@ void UpdaterClass::_reset() {
 }
 
 bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
+  // Empty call so erase_config.cpp module to ensure it is built and linked in.
+  enable_erase_config_at_link_time();
+
   if(_size > 0){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("[begin] already running"));

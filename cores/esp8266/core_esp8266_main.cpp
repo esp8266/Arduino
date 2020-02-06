@@ -282,6 +282,17 @@ void init_done() {
    https://github.com/esp8266/Arduino/pull/4889
 
 */
+#if defined(ERASE_CONFIG_H)
+extern "C" void fix_divider(void);
+#define FIX_DIVIDER fix_divider
+#define ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
+#define ETS_DELAY_US(a) ets_delay_us(a)
+#else
+#define FIX_DIVIDER() do {} while(0)
+#define ETS_PRINTF(...) do {} while(0)
+#define ETS_DELAY_US(a) do {} while(0)
+#endif
+
 
 extern "C" void app_entry_redefinable(void) __attribute__((weak));
 extern "C" void app_entry_redefinable(void)
@@ -291,6 +302,8 @@ extern "C" void app_entry_redefinable(void)
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
+    FIX_DIVIDER();
+    ETS_PRINTF("\n\ncall_user_start()\n");
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
@@ -312,7 +325,13 @@ extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
+#if defined(ERASE_CONFIG_H)
+    uart_div_modify(0, UART_CLK_FREQ / (74880));
+    ETS_DELAY_US(150);
+    ETS_PRINTF("\nuser_init()\n");
+#else
     uart_div_modify(0, UART_CLK_FREQ / (115200));
+#endif
 
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 

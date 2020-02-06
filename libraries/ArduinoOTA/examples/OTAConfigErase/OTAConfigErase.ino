@@ -29,7 +29,7 @@ const char* password = STAPSK;
   ERASE_CONFIG_SDK_DATA
   ERASE_CONFIG_ALL_DATA
 */
-ERASE_CONFIG_MASK_t eraseConfigOption = ERASE_CONFIG_BLANK_BIN;
+ERASE_CONFIG_MASK_t eraseConfigOption = ERASE_CONFIG_RF_CAL; //ERASE_CONFIG_BLANK_BIN;
 
 #define String_F(a) String(F(a))
 
@@ -52,10 +52,11 @@ void setTimeTZ(String& tz) {
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(74880);
+  // Serial.begin(115200);
   delay(20);
   Serial.println();
-  Serial.println("Booting");
+  Serial.println("setup ...");
 
   WiFi.persistent(false); // w/o this a flash write occurs at every boot
   WiFi.mode(WIFI_OFF);
@@ -135,7 +136,7 @@ void setup() {
     }
   });
   ArduinoOTA.begin();
-  Serial.println("Ready");
+  Serial.println("setup complete");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
   Serial.println();

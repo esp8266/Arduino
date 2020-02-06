@@ -36,6 +36,7 @@ ERASE_CONFIG_ALL_DATA     = (   BIT(4)  |  BIT(3)   |   BIT(2)  |   BIT(1)  |   
 
 bool check_and_erase_config(void);
 bool erase_config(const uint32_t flash_erase_mask);
+void enable_erase_config_at_link_time(void);
 
 #ifdef __cplusplus
 };
