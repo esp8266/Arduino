@@ -57,7 +57,7 @@ typedef struct {
   uint32_t nextServiceCycle;           // ESP cycle timer when a transition required
   volatile int32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
   volatile int32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
-  volatile uint32_t expiryCycle;       // For time-limited waveform, the cycle when this waveform must stop
+  volatile uint32_t expiryCycle;       // For time-limited waveform, the cycle when this waveform must stop. In ExpiryState::UPDATE, temporarily holds relative cycle count
   volatile ExpiryState hasExpiry;      // OFF: expiryCycle (temporarily) ignored. UPDATE: expiryCycle is zero-based, NMI will recompute 
 } Waveform;
 
@@ -136,7 +136,7 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
   }
   else {
     wave->hasExpiry = ExpiryState::OFF; // turn off to make update atomic from NMI
-    wave->expiryCycle = runTimeCycles;
+    wave->expiryCycle = runTimeCycles; // in ExpiryState::UPDATE, temporarily hold relative cycle count
     if (runTimeCycles)
       wave->hasExpiry = ExpiryState::UPDATE;
   }
@@ -203,7 +203,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
         // Check for toggles etc.
         if (ExpiryState::UPDATE == wave->hasExpiry) {
-          wave->expiryCycle += wave->nextServiceCycle;
+          wave->expiryCycle += wave->nextServiceCycle; // in ExpiryState::UPDATE, expiryCycle temporarily holds relative cycle count
           if (waveformState & mask)
             wave->expiryCycle += wave->nextTimeLowCycles; // update expiry time to next full period
           wave->hasExpiry = ExpiryState::ON;
