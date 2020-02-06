@@ -229,8 +229,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               else {
                 SetGPIO(mask);
               }
+              wave->nextServiceCycle += wave->nextTimeHighCycles;
             }
-            wave->nextServiceCycle += wave->nextTimeHighCycles;
             if (nextEventCycles > wave->nextTimeHighCycles)
               nextEventCycle = wave->nextServiceCycle;
           }
@@ -242,8 +242,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               else {
                 ClearGPIO(mask);
               }
+              wave->nextServiceCycle += wave->nextTimeLowCycles;
             }
-            wave->nextServiceCycle += wave->nextTimeLowCycles;
             if (nextEventCycles > wave->nextTimeLowCycles)
               nextEventCycle = wave->nextServiceCycle;
           }
