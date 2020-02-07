@@ -46,7 +46,7 @@ OTAEraseConfig.
 
 */
 
-#define ERASE_CONFIG_METHOD 1
+#define ERASE_CONFIG_METHOD 2
 
 
 #ifndef VAR_NAME_VALUE
@@ -213,8 +213,7 @@ void ICACHE_RAM_ATTR fix_divider(void) {
 #if (ERASE_CONFIG_METHOD == 1)
 extern struct rst_info resetInfo;
 
-extern "C" void preinit (void)
-{
+extern "C" void preinit (void) {
     /* do nothing On power up */
     if (0 != resetInfo.reason) {
         check_and_erase_config();
