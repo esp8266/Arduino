@@ -123,7 +123,7 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
     // Actually set the pin high or low in the IRQ service to guarantee times
     uint32_t now = ESP.getCycleCount();
     wave->nextServiceCycle = now + microsecondsToClockCycles(2);
-    wave->expiryCycle = now + microsecondsToClockCycles(2) + runTimeCycles;
+    wave->expiryCycle = wave->nextServiceCycle + runTimeCycles;
     wave->hasExpiry = static_cast<bool>(runTimeCycles) ? ExpiryState::ON : ExpiryState::OFF;
     waveformsToEnable |= mask;
     if (!timerRunning) {
