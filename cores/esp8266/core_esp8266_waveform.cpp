@@ -220,30 +220,26 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             nextEventCycle = wave->nextServiceCycle;
         }
         else {
-          waveformsState ^= mask;
-          if (waveformsState & mask) {
-            if (wave->nextTimeHighCycles) {
-              if (i == 16) {
-                GP16O |= 1; // GPIO16 write slow as it's RMW
-              }
-              else {
-                SetGPIO(mask);
-              }
-              wave->nextServiceCycle += wave->nextTimeHighCycles;
+          if (wave->nextTimeHighCycles && (!(waveformsState & mask) || !wave->nextTimeLowCycles)) {
+            waveformsState |= mask;
+            if (i == 16) {
+              GP16O |= 1; // GPIO16 write slow as it's RMW
             }
+            else {
+              SetGPIO(mask);
+            }
+            wave->nextServiceCycle += wave->nextTimeHighCycles;
             if (nextEventCycles > wave->nextTimeHighCycles)
               nextEventCycle = wave->nextServiceCycle;
-          }
-          else {
-            if (wave->nextTimeLowCycles) {
-              if (i == 16) {
-                GP16O &= ~1; // GPIO16 write slow as it's RMW
-              }
-              else {
-                ClearGPIO(mask);
-              }
-              wave->nextServiceCycle += wave->nextTimeLowCycles;
+          } else if ((waveformsState & mask) || !wave->nextTimeHighCycles) {
+            waveformsState &= ~mask;
+            if (i == 16) {
+              GP16O &= ~1; // GPIO16 write slow as it's RMW
             }
+            else {
+              ClearGPIO(mask);
+            }
+            wave->nextServiceCycle += wave->nextTimeLowCycles;
             if (nextEventCycles > wave->nextTimeLowCycles)
               nextEventCycle = wave->nextServiceCycle;
           }
