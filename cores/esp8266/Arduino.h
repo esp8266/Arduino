@@ -281,6 +281,10 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1,
 void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
+void setDST(int daylightOffset_sec);
+
+int getDST();
+
 #endif // __cplusplus
 
 #include "pins_arduino.h"
