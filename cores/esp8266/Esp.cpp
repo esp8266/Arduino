@@ -468,34 +468,37 @@ bool EspClass::checkFlashCRC() {
 
 
 String EspClass::getResetReason(void) {
-    char buff[32];
-    if (resetInfo.reason == REASON_DEFAULT_RST) { // normal startup by power on
-      strcpy_P(buff, PSTR("Power on"));
-    } else if (resetInfo.reason == REASON_WDT_RST) { // hardware watch dog reset
-      strcpy_P(buff, PSTR("Hardware Watchdog"));
-    } else if (resetInfo.reason == REASON_EXCEPTION_RST) { // exception reset, GPIO status won’t change
-      strcpy_P(buff, PSTR("Exception"));
-    } else if (resetInfo.reason == REASON_SOFT_WDT_RST) { // software watch dog reset, GPIO status won’t change
-      strcpy_P(buff, PSTR("Software Watchdog"));
-    } else if (resetInfo.reason == REASON_SOFT_RESTART) { // software restart ,system_restart , GPIO status won’t change
-      strcpy_P(buff, PSTR("Software/System restart"));
-    } else if (resetInfo.reason == REASON_DEEP_SLEEP_AWAKE) { // wake up from deep-sleep
-      strcpy_P(buff, PSTR("Deep-Sleep Wake"));
-    } else if (resetInfo.reason == REASON_EXT_SYS_RST) { // external system reset
-      strcpy_P(buff, PSTR("External System"));
-    } else {
-      strcpy_P(buff, PSTR("Unknown"));
+    const __FlashStringHelper* buff;
+
+    switch(resetInfo.reason) {
+        // normal startup by power on
+        case REASON_DEFAULT_RST:      buff = F("Power On"); break;
+        // hardware watch dog reset
+        case REASON_WDT_RST:          buff = F("Hardware Watchdog"); break;
+        // exception reset, GPIO status won’t change
+        case REASON_EXCEPTION_RST:    buff = F("Exception"); break;
+        // software watch dog reset, GPIO status won’t change
+        case REASON_SOFT_WDT_RST:     buff = F("Software Watchdog"); break;
+        // software restart ,system_restart , GPIO status won’t change
+        case REASON_SOFT_RESTART:     buff = F("Software/System restart"); break;
+        // wake up from deep-sleep
+        case REASON_DEEP_SLEEP_AWAKE: buff = F("Deep-Sleep Wake"); break;
+        // // external system reset
+        case REASON_EXT_SYS_RST:      buff = F("External System"); break;
+        default:                      buff = F("Unknown"); break;
     }
     return String(buff);
 }
 
 String EspClass::getResetInfo(void) {
-    if(resetInfo.reason != 0) {
+    if (resetInfo.reason >= REASON_WDT_RST && resetInfo.reason <= REASON_SOFT_WDT_RST) {
         char buff[200];
-        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : resetInfo.reason == 6 ? "EXT_SYS_RST" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        sprintf_P(buff, PSTR("Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x"),
+            resetInfo.exccause, resetInfo.reason, getResetReason().c_str(),
+            resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
         return String(buff);
     }
-    return String("flag: 0");
+    return getResetReason();
 }
 
 struct rst_info * EspClass::getResetInfoPtr(void) {

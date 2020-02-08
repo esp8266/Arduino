@@ -549,7 +549,8 @@ bool HTTPClient::setURL(const String& url)
         DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
         return false;
     }
-    // disconnect but preserve _client
+    // disconnect but preserve _client (clear _canReuse so disconnect will close the connection)
+    _canReuse = false;
     disconnect(true);
     return beginInternal(url, nullptr);
 }
@@ -680,7 +681,8 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         if (payload && size > 0) {
             size_t bytesWritten = 0;
             const uint8_t *p = payload;
-            while (bytesWritten < size) {
+            size_t originalSize = size;
+            while (bytesWritten < originalSize) {
                 int written;
                 int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
                 written = _client->write(p + bytesWritten, towrite);
