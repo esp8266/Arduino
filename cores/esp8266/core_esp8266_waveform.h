@@ -52,7 +52,7 @@ extern "C" {
 // Returns true or false on success or failure.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
 // Start or change a waveform of the specified high and low CPU cycles on specific pin.
-// If runtimeCycles > 0 then automatically stop it after that many usecs, relative to the next
+// If runtimeCycles > 0 then automatically stop it after that many CPU cycles, relative to the next
 // full period.
 // Returns true or false on success or failure.
 int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles);
