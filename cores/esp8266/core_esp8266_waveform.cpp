@@ -5,13 +5,13 @@
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds or CPU cycles).  TIMER1 is
+  high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
   set to 1-shot mode and is always loaded with the time until the next edge
   of any live waveforms.
 
   Up to one waveform generator per pin supported.
 
-  Each waveform generator is synchronized to the ESP cycle counter, not the
+  Each waveform generator is synchronized to the ESP clock cycle counter, not the
   timer.  This allows for removing interrupt jitter and delay as the counter
   always increments once per 80MHz clock.  Changes to a waveform are
   contiguous and only take effect on the next waveform transition,
@@ -19,8 +19,9 @@
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
-  Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
-  cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
+  Everywhere in the code where "ccy" or "ccys" is used, it means ESP.getCycleTime()
+  clock cycle time, or an interval measured in clock cycles, but not TIMER1
+  cycles (which may be 2 CPU clock cycles @ 160MHz).
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -50,15 +51,15 @@ extern "C" {
 #define SetGPIO(a) do { GPOS = a; } while (0)
 #define ClearGPIO(a) do { GPOC = a; } while (0)
 
-enum class ExpiryState : uint32_t {OFF = 0, ON = 1, UPDATE = 2}; // for UPDATE, the NMI computes the exact expiry cycle and transitions to ON
+enum class ExpiryState : uint32_t {OFF = 0, ON = 1, UPDATE = 2}; // for UPDATE, the NMI computes the exact expiry ccy and transitions to ON
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
-  uint32_t nextServiceCycle;           // ESP cycle timer when a transition required
-  volatile int32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
-  volatile int32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
-  volatile uint32_t expiryCycle;       // For time-limited waveform, the cycle when this waveform must stop. In ExpiryState::UPDATE, temporarily holds relative cycle count
-  volatile ExpiryState hasExpiry;      // OFF: expiryCycle (temporarily) ignored. UPDATE: expiryCycle is zero-based, NMI will recompute 
+  uint32_t nextPhaseCcy;               // ESP clock cycle when a period begins
+  volatile int32_t nextTimeDutyCcys;   // Add at low->high to keep smooth waveform
+  volatile int32_t nextTimePeriodCcys; // Set next phase cycle at low->high to maintain phase
+  volatile uint32_t expiryCcy;         // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
+  volatile ExpiryState hasExpiry;        // OFF: expiryCycle (temporarily) ignored. UPDATE: expiryCcy is zero-based, NMI will recompute
 } Waveform;
 
 static Waveform waveforms[17];        // State of all possible pins
@@ -102,29 +103,29 @@ void setTimer1Callback(uint32_t (*fn)()) {
 }
 
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
-  return startWaveformCycles(pin,
+  return startWaveformClockCycles(pin,
     microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
-  if ((pin > 16) || isFlashInterfacePin(pin) || !(timeHighCycles + timeLowCycles)) {
+int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys, uint32_t runTimeCcys) {
+  const auto periodCcys = timeHighCcys + timeLowCcys;
+  if ((pin > 16) || isFlashInterfacePin(pin) || !periodCcys) {
     return false;
   }
   Waveform* wave = &waveforms[pin];
-  // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = timeHighCycles;
-  wave->nextTimeLowCycles = timeLowCycles;
+  wave->nextTimeDutyCcys = timeHighCcys;
+  wave->nextTimePeriodCcys = periodCcys;
 
   uint32_t mask = 1UL << pin;
   if (!(waveformsEnabled & mask)) {
     // Actually set the pin high or low in the IRQ service to guarantee times
     uint32_t now = ESP.getCycleCount();
-    wave->nextServiceCycle = now + microsecondsToClockCycles(2);
-    wave->expiryCycle = wave->nextServiceCycle + runTimeCycles;
-    wave->hasExpiry = static_cast<bool>(runTimeCycles) ? ExpiryState::ON : ExpiryState::OFF;
+    wave->nextPhaseCcy = now + microsecondsToClockCycles(2);
+    wave->expiryCcy = wave->nextPhaseCcy + runTimeCcys;
+    wave->hasExpiry = static_cast<bool>(runTimeCcys) ? ExpiryState::ON : ExpiryState::OFF;
     waveformToEnable |= mask;
     if (!timerRunning) {
       initTimer();
@@ -136,8 +137,8 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
   }
   else {
     wave->hasExpiry = ExpiryState::OFF; // turn off to make update atomic from NMI
-    wave->expiryCycle = runTimeCycles; // in ExpiryState::UPDATE, temporarily hold relative cycle count
-    if (runTimeCycles)
+    wave->expiryCcy = runTimeCcys; // in ExpiryState::UPDATE, temporarily hold relative cycle count
+    if (runTimeCcys)
       wave->hasExpiry = ExpiryState::UPDATE;
   }
   return true;
@@ -171,9 +172,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
-  constexpr uint32_t isrTimeoutCycles = microsecondsToClockCycles(14);
-  const uint32_t isrStart = ESP.getCycleCount();
-  uint32_t nextEventCycle = isrStart + microsecondsToClockCycles(MAXIRQUS);
+  constexpr uint32_t isrTimeoutCcys = microsecondsToClockCycles(14);
+  const uint32_t isrStartCcy = ESP.getCycleCount();
+  uint32_t nextTimerCcy = isrStartCcy + microsecondsToClockCycles(MAXIRQUS);
 
   if (waveformToEnable || waveformToDisable) {
     // Handle enable/disable requests from main app.
@@ -189,9 +190,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   bool done = false;
   if (waveformsEnabled) {
-    uint32_t now = ESP.getCycleCount();
     do {
-      nextEventCycle = now + microsecondsToClockCycles(MAXIRQUS);
+      uint32_t now = ESP.getCycleCount();
+      nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
       for (int i = startPin; i <= endPin; i++) {
         uint32_t mask = 1UL<<i;
 
@@ -203,24 +204,16 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
         // Check for toggles etc.
         if (ExpiryState::UPDATE == wave->hasExpiry) {
-          wave->expiryCycle += wave->nextServiceCycle; // in ExpiryState::UPDATE, expiryCycle temporarily holds relative cycle count
-          if (waveformsState & mask)
-            wave->expiryCycle += wave->nextTimeLowCycles; // update expiry time to next full period
+          wave->expiryCcy += wave->nextPhaseCcy; // in ExpiryState::UPDATE, expiryCcy temporarily holds relative CPU cycle count
           wave->hasExpiry = ExpiryState::ON;
         }
-        const int32_t cyclesToGo = wave->nextServiceCycle - now;
-        int32_t expiryToGo = (ExpiryState:: ON == wave->hasExpiry) ? wave->expiryCycle - now : (cyclesToGo + 1);
-        const int32_t nextEventCycles = nextEventCycle - now;
-        if (cyclesToGo >= expiryToGo) {
-          // don't update waveform on or after expiring
-          expiryToGo = 0;
-        }
-        else if (cyclesToGo > 0) {
-          if (nextEventCycles > cyclesToGo)
-            nextEventCycle = wave->nextServiceCycle;
-        }
-        else {
-          if (wave->nextTimeHighCycles && (!(waveformsState & mask) || !wave->nextTimeLowCycles)) {
+        const bool noIdle = wave->nextTimePeriodCcys == wave->nextTimeDutyCcys;
+        const int32_t nextTimerCcys = nextTimerCcy - now;
+        const int32_t nextEventCcys = wave->nextPhaseCcy +
+          ((!noIdle && waveformsState & mask) ? wave->nextTimeDutyCcys : 0) - now;
+        const int32_t expiryCcys = (ExpiryState:: ON == wave->hasExpiry) ? wave->expiryCcy - now : (nextEventCcys + 1);
+        if (nextEventCcys <= 0 && expiryCcys > nextEventCcys) {
+          if (wave->nextTimeDutyCcys && (!(waveformsState & mask) || noIdle)) {
             waveformsState |= mask;
             if (i == 16) {
               GP16O |= 1; // GPIO16 write slow as it's RMW
@@ -228,10 +221,17 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             else {
               SetGPIO(mask);
             }
-            wave->nextServiceCycle += wave->nextTimeHighCycles;
-            if (nextEventCycles > wave->nextTimeHighCycles)
-              nextEventCycle = wave->nextServiceCycle;
-          } else if ((waveformsState & mask) || !wave->nextTimeHighCycles) {
+            if (noIdle) {
+              wave->nextPhaseCcy += wave->nextTimePeriodCcys;
+              if (nextTimerCcys > static_cast<int32_t>(wave->nextPhaseCcy - now))
+                nextTimerCcy = wave->nextPhaseCcy;
+            }
+            else {
+              if (nextTimerCcys > wave->nextTimeDutyCcys)
+                nextTimerCcy = wave->nextPhaseCcy + wave->nextTimeDutyCcys;
+            }
+          }
+          else if ((waveformsState & mask) || !wave->nextTimeDutyCcys) {
             waveformsState &= ~mask;
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
@@ -239,14 +239,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             else {
               ClearGPIO(mask);
             }
-            wave->nextServiceCycle += wave->nextTimeLowCycles;
-            if (nextEventCycles > wave->nextTimeLowCycles)
-              nextEventCycle = wave->nextServiceCycle;
+            wave->nextPhaseCcy += wave->nextTimePeriodCcys;
+            if (nextTimerCcys > static_cast<int32_t>(wave->nextPhaseCcy - now))
+              nextTimerCcy = wave->nextPhaseCcy;
           }
         }
 
         // Disable any waveforms that are done
-        if ((ExpiryState::ON == wave->hasExpiry) && expiryToGo <= 0) {
+        if ((ExpiryState::ON == wave->hasExpiry) && expiryCcys <= 0) {
           // Done, remove!
           waveformsEnabled &= ~mask;
         }
@@ -254,28 +254,28 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
 
       // Exit the loop if we've hit the fixed runtime limit or the next event is known to be after that timeout would occur
-      done = (now - isrStart >= isrTimeoutCycles) || (nextEventCycle - isrStart  >= isrTimeoutCycles);
+      done = !waveformsEnabled || (now - isrStartCcy >= isrTimeoutCcys) || (nextTimerCcy - isrStartCcy >= isrTimeoutCcys);
     } while (!done);
   } // if (waveformsEnabled)
 
-  int32_t nextEventCycles;
+  int32_t nextTimerCcys;
   if (!timer1CB) {
-    nextEventCycles = nextEventCycle - ESP.getCycleCount();
+    nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
   }
   else {
-    int32_t callbackCycles = microsecondsToClockCycles(timer1CB());
-    nextEventCycles = nextEventCycle - ESP.getCycleCount();
-    if (nextEventCycles > callbackCycles)
-      nextEventCycles = callbackCycles;
+    int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
+    nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
+    if (nextTimerCcys > callbackCcys)
+      nextTimerCcys = callbackCcys;
   }
 
-  if (nextEventCycles < microsecondsToClockCycles(2))
-    nextEventCycles = microsecondsToClockCycles(2);
+  if (nextTimerCcys < microsecondsToClockCycles(2))
+    nextTimerCcys = microsecondsToClockCycles(2);
 
   if (clockCyclesPerMicrosecond() == 160)
-    timer1_write(nextEventCycles / 2);
+    timer1_write(nextTimerCcys / 2);
   else
-    timer1_write(nextEventCycles);
+    timer1_write(nextTimerCcys);
 }
 
 };
