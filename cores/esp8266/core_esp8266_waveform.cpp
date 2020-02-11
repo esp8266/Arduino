@@ -3,6 +3,7 @@
                      supporting outputs on all pins in parallel.
 
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
+  Copyright (c) 2020 Dirk O. Kaar.
 
   The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
@@ -45,7 +46,7 @@
 extern "C" {
 
 // Maximum delay between IRQs, 1Hz
-#define MAXIRQUS (1000000)
+constexpr uint32_t MAXIRQUS = 1000000;
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
@@ -56,8 +57,8 @@ enum class ExpiryState : uint32_t {OFF = 0, ON = 1, UPDATE = 2}; // for UPDATE, 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
   uint32_t nextPhaseCcy;               // ESP clock cycle when a period begins
-  volatile int32_t nextTimeDutyCcys;   // Add at low->high to keep smooth waveform
-  volatile int32_t nextTimePeriodCcys; // Set next phase cycle at low->high to maintain phase
+  volatile uint32_t nextTimeDutyCcys;   // Add at low->high to keep smooth waveform
+  volatile uint32_t nextTimePeriodCcys; // Set next phase cycle at low->high to maintain phase
   volatile uint32_t expiryCcy;         // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
   volatile ExpiryState hasExpiry;        // OFF: expiryCycle (temporarily) ignored. UPDATE: expiryCcy is zero-based, NMI will recompute
 } Waveform;
@@ -172,7 +173,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
-  constexpr uint32_t isrTimeoutCcys = microsecondsToClockCycles(8);
+  constexpr uint32_t isrTimeoutCcys = microsecondsToClockCycles(14);
   const uint32_t isrStartCcy = ESP.getCycleCount();
   uint32_t nextTimerCcy = isrStartCcy + microsecondsToClockCycles(MAXIRQUS);
 
@@ -208,45 +209,55 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           wave->hasExpiry = ExpiryState::ON;
         }
         const int32_t nextTimerCcys = nextTimerCcy - now;
-        const int32_t nextEventCcys = wave->nextPhaseCcy +
-          ((waveformsState & mask) ? wave->nextTimeDutyCcys : 0) - now;
+        uint32_t nextEventCcy = wave->nextPhaseCcy + ((waveformsState & mask) ? wave->nextTimeDutyCcys : 0);
+        int32_t nextEventCcys =  nextEventCcy - now;
         const int32_t expiryCcys = (ExpiryState:: ON == wave->hasExpiry) ? wave->expiryCcy - now : (nextEventCcys + 1);
         if (nextEventCcys <= 0 && expiryCcys > nextEventCcys) {
-          if (wave->nextTimeDutyCcys && !(waveformsState & mask)) {
-            waveformsState |= mask;
-            if (i == 16) {
-              GP16O |= 1; // GPIO16 write slow as it's RMW
-            }
-            else {
-              SetGPIO(mask);
-            }
-            if (nextTimerCcys > wave->nextTimeDutyCcys)
-              nextTimerCcy = wave->nextPhaseCcy + wave->nextTimeDutyCcys;
+          waveformsState ^= mask;
+          if (waveformsState & mask) {
+          	if (wave->nextTimeDutyCcys) {
+              if (i == 16) {
+                GP16O |= 1; // GPIO16 write slow as it's RMW
+              }
+              else {
+                SetGPIO(mask);
+              }
+          	}
+            nextEventCcy = (wave->nextPhaseCcy + wave->nextTimeDutyCcys);
           }
-          else if ((waveformsState & mask) || !wave->nextTimeDutyCcys) {
-            waveformsState &= ~mask;
-            if (i == 16) {
-              GP16O &= ~1; // GPIO16 write slow as it's RMW
-            }
-            else {
-              ClearGPIO(mask);
+          else {
+            if (wave->nextTimeDutyCcys != wave->nextTimePeriodCcys) {
+              if (i == 16) {
+                GP16O &= ~1; // GPIO16 write slow as it's RMW
+              }
+              else {
+                ClearGPIO(mask);
+              }
             }
             wave->nextPhaseCcy += wave->nextTimePeriodCcys;
-            if (nextTimerCcys > wave->nextTimePeriodCcys)
-              nextTimerCcy = wave->nextPhaseCcy;
+            nextEventCcy = wave->nextPhaseCcy;
           }
         }
+        nextEventCcys = nextEventCcy - now;
+        if (nextTimerCcys > nextEventCcys)
+          nextTimerCcy = wave->nextPhaseCcy;
 
         // Disable any waveforms that are done
-        if ((ExpiryState::ON == wave->hasExpiry) && expiryCcys <= 0) {
-          // Done, remove!
-          waveformsEnabled &= ~mask;
+        if ((ExpiryState::ON == wave->hasExpiry)) {
+          if (expiryCcys <= 0) {
+            // Done, remove!
+            waveformsEnabled &= ~mask;
+          }
+          else if (static_cast<int32_t>(nextTimerCcy - now) > expiryCcys)
+          {
+            nextTimerCcy = wave->expiryCcy;
+          }
         }
         now = ESP.getCycleCount();
       }
 
       // Exit the loop if we've hit the fixed runtime limit or the next event is known to be after that timeout would occur
-      done = !waveformsEnabled || (now - isrStartCcy >= isrTimeoutCcys) || (nextTimerCcy - isrStartCcy >= isrTimeoutCcys);
+      done = !waveformsEnabled || (now - isrStartCcy > isrTimeoutCcys) || (nextTimerCcy - isrStartCcy > isrTimeoutCcys);
     } while (!done);
   } // if (waveformsEnabled)
 

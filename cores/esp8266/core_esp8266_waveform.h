@@ -3,6 +3,7 @@
                      supporting outputs on all pins in parallel.
 
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
+  Copyright (c) 2020 Dirk O. Kaar.
 
   The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
