@@ -23,6 +23,7 @@ menu.wipe=Erase Flash
 menu.sdk=Espressif FW
 menu.ssl=SSL Support
 menu.mmu=MMU
+menu.non32xfer=Non-32-Bit Access
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -68,6 +69,10 @@ generic.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 generic.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 generic.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 generic.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+generic.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+generic.menu.non32xfer.fast.build.non32xferflags=
+generic.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+generic.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 generic.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 generic.menu.ResetMethod.ck=no dtr (aka ck)
@@ -549,6 +554,10 @@ esp8285.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 esp8285.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 esp8285.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 esp8285.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+esp8285.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+esp8285.menu.non32xfer.fast.build.non32xferflags=
+esp8285.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+esp8285.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 esp8285.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 esp8285.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 esp8285.menu.ResetMethod.ck=no dtr (aka ck)
@@ -839,6 +848,10 @@ espduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espduino.menu.non32xfer.fast.build.non32xferflags=
+espduino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espduino.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espduino.build.flash_mode=dio
 espduino.build.flash_flags=-DFLASHMODE_DIO
 espduino.build.flash_freq=40
@@ -1037,6 +1050,10 @@ huzzah.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 huzzah.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 huzzah.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 huzzah.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+huzzah.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+huzzah.menu.non32xfer.fast.build.non32xferflags=
+huzzah.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+huzzah.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 huzzah.upload.resetmethod=--before default_reset --after hard_reset
 huzzah.build.flash_mode=qio
 huzzah.build.flash_flags=-DFLASHMODE_QIO
@@ -1236,6 +1253,10 @@ inventone.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 inventone.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 inventone.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 inventone.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+inventone.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+inventone.menu.non32xfer.fast.build.non32xferflags=
+inventone.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+inventone.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 inventone.upload.resetmethod=--before default_reset --after hard_reset
 inventone.build.flash_mode=dio
 inventone.build.flash_flags=-DFLASHMODE_DIO
@@ -1435,6 +1456,10 @@ cw01.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 cw01.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 cw01.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 cw01.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+cw01.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+cw01.menu.non32xfer.fast.build.non32xferflags=
+cw01.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+cw01.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 cw01.upload.resetmethod=--before default_reset --after hard_reset
 cw01.menu.CrystalFreq.26=26 MHz
 cw01.menu.CrystalFreq.40=40 MHz
@@ -1637,6 +1662,10 @@ espresso_lite_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espresso_lite_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espresso_lite_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espresso_lite_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espresso_lite_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espresso_lite_v1.menu.non32xfer.fast.build.non32xferflags=
+espresso_lite_v1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espresso_lite_v1.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espresso_lite_v1.build.flash_mode=dio
 espresso_lite_v1.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v1.build.flash_freq=40
@@ -1839,6 +1868,10 @@ espresso_lite_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espresso_lite_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espresso_lite_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espresso_lite_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espresso_lite_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espresso_lite_v2.menu.non32xfer.fast.build.non32xferflags=
+espresso_lite_v2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espresso_lite_v2.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espresso_lite_v2.build.flash_mode=dio
 espresso_lite_v2.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v2.build.flash_freq=40
@@ -2041,6 +2074,10 @@ phoenix_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 phoenix_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 phoenix_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 phoenix_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+phoenix_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+phoenix_v1.menu.non32xfer.fast.build.non32xferflags=
+phoenix_v1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+phoenix_v1.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 phoenix_v1.build.flash_mode=dio
 phoenix_v1.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v1.build.flash_freq=40
@@ -2243,6 +2280,10 @@ phoenix_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 phoenix_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 phoenix_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 phoenix_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+phoenix_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+phoenix_v2.menu.non32xfer.fast.build.non32xferflags=
+phoenix_v2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+phoenix_v2.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 phoenix_v2.build.flash_mode=dio
 phoenix_v2.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v2.build.flash_freq=40
@@ -2445,6 +2486,10 @@ nodemcu.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 nodemcu.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 nodemcu.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 nodemcu.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+nodemcu.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+nodemcu.menu.non32xfer.fast.build.non32xferflags=
+nodemcu.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+nodemcu.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_flags=-DFLASHMODE_QIO
@@ -2644,6 +2689,10 @@ nodemcuv2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 nodemcuv2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 nodemcuv2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 nodemcuv2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+nodemcuv2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+nodemcuv2.menu.non32xfer.fast.build.non32xferflags=
+nodemcuv2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+nodemcuv2.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 nodemcuv2.upload.resetmethod=--before default_reset --after hard_reset
 nodemcuv2.build.flash_mode=dio
 nodemcuv2.build.flash_flags=-DFLASHMODE_DIO
@@ -2847,6 +2896,10 @@ modwifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 modwifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 modwifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 modwifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+modwifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+modwifi.menu.non32xfer.fast.build.non32xferflags=
+modwifi.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+modwifi.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 modwifi.upload.resetmethod=--before no_reset --after soft_reset
 modwifi.build.flash_mode=qio
 modwifi.build.flash_flags=-DFLASHMODE_QIO
@@ -3066,6 +3119,10 @@ thing.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 thing.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 thing.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 thing.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+thing.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+thing.menu.non32xfer.fast.build.non32xferflags=
+thing.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+thing.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 thing.upload.resetmethod=--before no_reset --after soft_reset
 thing.build.flash_mode=qio
 thing.build.flash_flags=-DFLASHMODE_QIO
@@ -3265,6 +3322,10 @@ thingdev.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 thingdev.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 thingdev.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 thingdev.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+thingdev.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+thingdev.menu.non32xfer.fast.build.non32xferflags=
+thingdev.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+thingdev.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 thingdev.upload.resetmethod=--before default_reset --after hard_reset
 thingdev.build.flash_mode=dio
 thingdev.build.flash_flags=-DFLASHMODE_DIO
@@ -3464,6 +3525,10 @@ blynk.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 blynk.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 blynk.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 blynk.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+blynk.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+blynk.menu.non32xfer.fast.build.non32xferflags=
+blynk.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+blynk.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 blynk.upload.resetmethod=--before default_reset --after hard_reset
 blynk.build.flash_mode=qio
 blynk.build.flash_flags=-DFLASHMODE_QIO
@@ -3663,6 +3728,10 @@ esp210.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 esp210.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 esp210.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 esp210.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+esp210.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+esp210.menu.non32xfer.fast.build.non32xferflags=
+esp210.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+esp210.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 esp210.upload.resetmethod=--before no_reset --after soft_reset
 esp210.build.flash_mode=qio
 esp210.build.flash_flags=-DFLASHMODE_QIO
@@ -3862,6 +3931,10 @@ d1_mini.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1_mini.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1_mini.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 d1_mini.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1_mini.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1_mini.menu.non32xfer.fast.build.non32xferflags=
+d1_mini.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1_mini.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1_mini.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini.build.flash_mode=dio
 d1_mini.build.flash_flags=-DFLASHMODE_DIO
@@ -4061,6 +4134,10 @@ d1_mini_pro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1_mini_pro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1_mini_pro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 d1_mini_pro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1_mini_pro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1_mini_pro.menu.non32xfer.fast.build.non32xferflags=
+d1_mini_pro.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1_mini_pro.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1_mini_pro.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini_pro.build.flash_mode=dio
 d1_mini_pro.build.flash_flags=-DFLASHMODE_DIO
@@ -4243,6 +4320,10 @@ d1_mini_lite.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1_mini_lite.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1_mini_lite.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 d1_mini_lite.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1_mini_lite.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1_mini_lite.menu.non32xfer.fast.build.non32xferflags=
+d1_mini_lite.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1_mini_lite.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1_mini_lite.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini_lite.build.flash_mode=dout
 d1_mini_lite.build.flash_flags=-DFLASHMODE_DOUT
@@ -4482,6 +4563,10 @@ d1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 d1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1.menu.non32xfer.fast.build.non32xferflags=
+d1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1.upload.resetmethod=--before default_reset --after hard_reset
 d1.build.flash_mode=dio
 d1.build.flash_flags=-DFLASHMODE_DIO
@@ -4681,6 +4766,10 @@ espino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espino.menu.non32xfer.fast.build.non32xferflags=
+espino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espino.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espino.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 espino.menu.ResetMethod.ck=no dtr (aka ck)
@@ -4883,6 +4972,10 @@ espinotee.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espinotee.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espinotee.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espinotee.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espinotee.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espinotee.menu.non32xfer.fast.build.non32xferflags=
+espinotee.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espinotee.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espinotee.upload.resetmethod=--before default_reset --after hard_reset
 espinotee.build.flash_mode=qio
 espinotee.build.flash_flags=-DFLASHMODE_QIO
@@ -5099,6 +5192,10 @@ wifinfo.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wifinfo.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wifinfo.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 wifinfo.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wifinfo.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wifinfo.menu.non32xfer.fast.build.non32xferflags=
+wifinfo.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wifinfo.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wifinfo.upload.resetmethod=--before default_reset --after hard_reset
 wifinfo.build.flash_mode=qio
 wifinfo.build.flash_flags=-DFLASHMODE_QIO
@@ -5357,6 +5454,10 @@ arduino-esp8266.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 arduino-esp8266.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 arduino-esp8266.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 arduino-esp8266.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+arduino-esp8266.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+arduino-esp8266.menu.non32xfer.fast.build.non32xferflags=
+arduino-esp8266.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+arduino-esp8266.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 arduino-esp8266.upload.resetmethod=--before no_reset --after soft_reset
 arduino-esp8266.build.flash_mode=qio
 arduino-esp8266.build.flash_flags=-DFLASHMODE_QIO
@@ -5557,6 +5658,10 @@ gen4iod.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 gen4iod.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 gen4iod.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 gen4iod.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+gen4iod.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+gen4iod.menu.non32xfer.fast.build.non32xferflags=
+gen4iod.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+gen4iod.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 gen4iod.upload.resetmethod=--before default_reset --after hard_reset
 gen4iod.build.flash_mode=dio
 gen4iod.build.flash_flags=-DFLASHMODE_DIO
@@ -5757,6 +5862,10 @@ oak.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 oak.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 oak.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 oak.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+oak.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+oak.menu.non32xfer.fast.build.non32xferflags=
+oak.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+oak.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 oak.upload.resetmethod=--before no_reset --after soft_reset
 oak.build.flash_mode=dio
 oak.build.flash_flags=-DFLASHMODE_DIO
@@ -5956,6 +6065,10 @@ wifiduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wifiduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wifiduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 wifiduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wifiduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wifiduino.menu.non32xfer.fast.build.non32xferflags=
+wifiduino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wifiduino.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wifiduino.upload.resetmethod=--before default_reset --after hard_reset
 wifiduino.build.flash_mode=dio
 wifiduino.build.flash_flags=-DFLASHMODE_DIO
@@ -6155,6 +6268,10 @@ wifi_slot.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wifi_slot.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wifi_slot.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 wifi_slot.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wifi_slot.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wifi_slot.menu.non32xfer.fast.build.non32xferflags=
+wifi_slot.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wifi_slot.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wifi_slot.upload.resetmethod=--before default_reset --after hard_reset
 wifi_slot.menu.FlashFreq.40=40MHz
 wifi_slot.menu.FlashFreq.40.build.flash_freq=40
@@ -6468,6 +6585,10 @@ wiolink.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wiolink.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 wiolink.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 wiolink.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wiolink.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wiolink.menu.non32xfer.fast.build.non32xferflags=
+wiolink.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wiolink.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wiolink.upload.resetmethod=--before default_reset --after hard_reset
 wiolink.build.flash_mode=qio
 wiolink.build.flash_flags=-DFLASHMODE_QIO
@@ -6667,6 +6788,10 @@ espectro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espectro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espectro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espectro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espectro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espectro.menu.non32xfer.fast.build.non32xferflags=
+espectro.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espectro.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espectro.upload.resetmethod=--before default_reset --after hard_reset
 espectro.build.flash_mode=dio
 espectro.build.flash_flags=-DFLASHMODE_DIO
@@ -6876,6 +7001,10 @@ sonoff.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 sonoff.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 sonoff.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 sonoff.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+sonoff.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+sonoff.menu.non32xfer.fast.build.non32xferflags=
+sonoff.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+sonoff.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 sonoff.upload.resetmethod=--before no_reset --after soft_reset
 sonoff.build.flash_mode=dout
 sonoff.build.flash_flags=-DFLASHMODE_DOUT
@@ -7116,6 +7245,10 @@ espmxdevkit.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espmxdevkit.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 espmxdevkit.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
 espmxdevkit.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espmxdevkit.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espmxdevkit.menu.non32xfer.fast.build.non32xferflags=
+espmxdevkit.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espmxdevkit.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espmxdevkit.upload.resetmethod=--before default_reset --after hard_reset
 espmxdevkit.build.flash_mode=dout
 espmxdevkit.build.flash_flags=-DFLASHMODE_DOUT
