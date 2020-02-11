@@ -44,8 +44,8 @@
 
 extern "C" {
 
-// Maximum delay between IRQs
-#define MAXIRQUS (10000)
+// Maximum delay between IRQs, 1Hz
+#define MAXIRQUS (1000000)
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
@@ -172,7 +172,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
-  constexpr uint32_t isrTimeoutCcys = microsecondsToClockCycles(14);
+  constexpr uint32_t isrTimeoutCcys = microsecondsToClockCycles(8);
   const uint32_t isrStartCcy = ESP.getCycleCount();
   uint32_t nextTimerCcy = isrStartCcy + microsecondsToClockCycles(MAXIRQUS);
 
@@ -261,8 +261,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       nextTimerCcys = callbackCcys;
   }
 
-  if (nextTimerCcys < microsecondsToClockCycles(2))
+  // Firing timer too soon, the NMI occurs before ISR has returned.
+  // But, must fire timer early to reach deadlines for waveforms.
+  if (nextTimerCcys < microsecondsToClockCycles(4))
     nextTimerCcys = microsecondsToClockCycles(2);
+  else
+    nextTimerCcys -= microsecondsToClockCycles(2);
 
   if (clockCyclesPerMicrosecond() == 160)
     timer1_write(nextTimerCcys / 2);
