@@ -207,13 +207,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           wave->expiryCcy += wave->nextPhaseCcy; // in ExpiryState::UPDATE, expiryCcy temporarily holds relative CPU cycle count
           wave->hasExpiry = ExpiryState::ON;
         }
-        const bool noIdle = wave->nextTimePeriodCcys == wave->nextTimeDutyCcys;
         const int32_t nextTimerCcys = nextTimerCcy - now;
         const int32_t nextEventCcys = wave->nextPhaseCcy +
-          ((!noIdle && waveformsState & mask) ? wave->nextTimeDutyCcys : 0) - now;
+          ((waveformsState & mask) ? wave->nextTimeDutyCcys : 0) - now;
         const int32_t expiryCcys = (ExpiryState:: ON == wave->hasExpiry) ? wave->expiryCcy - now : (nextEventCcys + 1);
         if (nextEventCcys <= 0 && expiryCcys > nextEventCcys) {
-          if (wave->nextTimeDutyCcys && (!(waveformsState & mask) || noIdle)) {
+          if (wave->nextTimeDutyCcys && !(waveformsState & mask)) {
             waveformsState |= mask;
             if (i == 16) {
               GP16O |= 1; // GPIO16 write slow as it's RMW
@@ -221,15 +220,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             else {
               SetGPIO(mask);
             }
-            if (noIdle) {
-              wave->nextPhaseCcy += wave->nextTimePeriodCcys;
-              if (nextTimerCcys > static_cast<int32_t>(wave->nextPhaseCcy - now))
-                nextTimerCcy = wave->nextPhaseCcy;
-            }
-            else {
-              if (nextTimerCcys > wave->nextTimeDutyCcys)
-                nextTimerCcy = wave->nextPhaseCcy + wave->nextTimeDutyCcys;
-            }
+            if (nextTimerCcys > wave->nextTimeDutyCcys)
+              nextTimerCcy = wave->nextPhaseCcy + wave->nextTimeDutyCcys;
           }
           else if ((waveformsState & mask) || !wave->nextTimeDutyCcys) {
             waveformsState &= ~mask;
@@ -240,7 +232,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               ClearGPIO(mask);
             }
             wave->nextPhaseCcy += wave->nextTimePeriodCcys;
-            if (nextTimerCcys > static_cast<int32_t>(wave->nextPhaseCcy - now))
+            if (nextTimerCcys > wave->nextTimePeriodCcys)
               nextTimerCcy = wave->nextPhaseCcy;
           }
         }
