@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __MULTIDELEGATE_H
 #define __MULTIDELEGATE_H
 
+#include <iterator>
 #if defined(ESP8266) || defined(ESP32) || !defined(ARDUINO)
 #include <atomic>
 #else
@@ -216,6 +217,10 @@ namespace delegate
                 unused = node;
             }
 
+            void traverse(Node_t*& current) const
+            {
+                current = current->mNext;
+            }
             void traverse(Node_t*& prev, Node_t*& current, bool remove = true)
             {
                 if (remove && ISQUEUE)
@@ -248,7 +253,7 @@ namespace delegate
                 else
                 {
                     prev = current;
-                    current = current->mNext;
+                    traverse(current);
                 }
             }
 
@@ -256,6 +261,56 @@ namespace delegate
             std::mutex mutex_unused;
 #endif
         public:
+            class iterator : public std::iterator<std::forward_iterator_tag, Delegate>
+            {
+            protected:
+                MultiDelegatePImpl& multiDel;
+                Node_t* current = nullptr;
+                Node_t* const stop = nullptr;
+            public:
+                iterator(MultiDelegatePImpl& md) : multiDel(md), current(md.first), stop(md.last) {}
+                iterator(MultiDelegatePImpl& md, nullptr_t) : multiDel(md) {}
+                iterator() = default;
+                iterator(const iterator&) = default;
+                iterator& operator=(const iterator&) = default;
+                bool operator==(const iterator& rhs) const
+                {
+                    return &multiDel == &rhs.multiDel && current == rhs.current;
+                }
+                bool operator!=(const iterator& rhs) const {
+                    return !operator==(rhs);
+                }
+                const Delegate& operator*() const
+                {
+                    return current->mDelegate;
+                }
+                const Delegate* const operator->() const
+                {
+                    return &current->mDelegate;
+                }
+                iterator& operator++() // prefix
+                {
+                    if (current && stop != current)
+                        multiDel.traverse(current);
+                    else
+                        current = nullptr; // end
+                    return *this;
+                }
+                iterator& operator++(int) // postfix
+                {
+                    iterator tmp(*this);
+                    operator++();
+                    return tmp;
+                }
+            };
+
+            iterator begin() const {
+                return iterator(*this);
+            }
+            iterator end() const {
+                return iterator(*this, nullptr);
+            }
+
             const Delegate* IRAM_ATTR add(const Delegate& del)
             {
                 return add(Delegate(del));
@@ -372,7 +427,10 @@ namespace delegate
                 {
                     done = current == stop;
                     result = CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, args...);
-                    traverse(prev, current, result);
+                    if (ISQUEUE)
+                        traverse(prev, current, result);
+                    else
+                        traverse(current);
 #if defined(ESP8266) || defined(ESP32)
                     // running callbacks might last too long for watchdog etc.
                     optimistic_yield(10000);
@@ -426,7 +484,10 @@ namespace delegate
                 {
                     done = current == stop;
                     result = Call<Delegate, R, ISQUEUE>::execute(current->mDelegate);
-                    this->traverse(prev, current, result);
+                    if (ISQUEUE)
+                        this->traverse(prev, current, result);
+                    else
+                        this->traverse(current);
 #if defined(ESP8266) || defined(ESP32)
                     // running callbacks might last too long for watchdog etc.
                     optimistic_yield(10000);
@@ -487,7 +548,10 @@ namespace delegate
                 {
                     done = current == stop;
                     CallP<Delegate, void, ISQUEUE, P...>::execute(current->mDelegate, args...);
-                    this->traverse(prev, current);
+                    if (ISQUEUE)
+                        this->traverse(prev, current);
+                    else
+                        traverse(current);
 #if defined(ESP8266) || defined(ESP32)
                     // running callbacks might last too long for watchdog etc.
                     optimistic_yield(10000);
@@ -531,7 +595,10 @@ namespace delegate
                 {
                     done = current == stop;
                     Call<Delegate, void, ISQUEUE>::execute(current->mDelegate);
-                    this->traverse(prev, current);
+                    if (ISQUEUE)
+                        this->traverse(prev, current);
+                    else
+                        this->traverse(current);
 #if defined(ESP8266) || defined(ESP32)
                     // running callbacks might last too long for watchdog etc.
                     optimistic_yield(10000);
