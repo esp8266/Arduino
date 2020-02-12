@@ -1,7 +1,7 @@
 /*
 MultiDelegate.h - A queue or event multiplexer based on the efficient Delegate
 class
-Copyright (c) 2019 Dirk O. Kaar. All rights reserved.
+Copyright (c) 2019-2020 Dirk O. Kaar. All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ namespace
     {
         static R execute(Delegate& del, P... args)
         {
-            return del(std::forward<P...>(args...)) ? !ISQUEUE : ISQUEUE;
+            return del(std::forward<P...>(args...));
         }
     };
 
@@ -62,7 +62,7 @@ namespace
         static bool execute(Delegate& del, P... args)
         {
             del(std::forward<P...>(args...));
-            return !ISQUEUE;
+            return true;
         }
     };
 
@@ -71,7 +71,7 @@ namespace
     {
         static R execute(Delegate& del)
         {
-            return del() ? !ISQUEUE : ISQUEUE;
+            return del();
         }
     };
 
@@ -81,7 +81,7 @@ namespace
         static bool execute(Delegate& del)
         {
             del();
-            return !ISQUEUE;
+            return true;
         }
     };
 
@@ -92,7 +92,7 @@ namespace delegate
     namespace detail
     {
 
-        template< typename Delegate, typename R = void, bool ISQUEUE = false, size_t QUEUE_CAPACITY = 32, typename... P>
+        template< typename Delegate, typename R, bool ISQUEUE = false, size_t QUEUE_CAPACITY = 32, typename... P>
         class MultiDelegatePImpl
         {
         public:
@@ -216,6 +216,42 @@ namespace delegate
                 unused = node;
             }
 
+            void traverse(Node_t*& prev, Node_t*& current, bool remove = true)
+            {
+                if (remove && ISQUEUE)
+                {
+                    // remove callback from stack
+#ifdef ARDUINO
+                    InterruptLock lockAllInterruptsInThisScope;
+#else
+                    std::lock_guard<std::mutex> lock(mutex_unused);
+#endif
+
+                    auto to_recycle = current;
+
+                    // removing last
+                    if (last == current)
+                        last = prev;
+
+                    current = current->mNext;
+                    if (prev)
+                    {
+                        prev->mNext = current;
+                    }
+                    else
+                    {
+                        first = current;
+                    }
+
+                    recycle_node_unsafe(to_recycle);
+                }
+                else
+                {
+                    prev = current;
+                    current = current->mNext;
+                }
+            }
+
 #ifndef ARDUINO
             std::mutex mutex_unused;
 #endif
@@ -277,7 +313,7 @@ namespace delegate
 
                         auto to_recycle = current;
 
-                        // removing rLast
+                        // removing last
                         if (last == current)
                             last = prev;
 
@@ -306,6 +342,127 @@ namespace delegate
                 return false;
             }
 
+            operator bool() const
+            {
+                return first;
+            }
+
+            R operator()(P... args)
+            {
+                auto current = first;
+                if (!current)
+                    return {};
+
+                static std::atomic<bool> fence(false);
+                // prevent recursive calls
+#if defined(ARDUINO) && !defined(ESP32)
+                if (fence.load()) return {};
+                fence.store(true);
+#else
+                if (fence.exchange(true)) return {};
+#endif
+
+                Node_t* prev = nullptr;
+                // prevent execution of new callbacks during this run
+                auto stop = last;
+
+                R result;
+                bool done;
+                do
+                {
+                    done = current == stop;
+                    result = CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, args...);
+                    traverse(prev, current, result);
+#if defined(ESP8266) || defined(ESP32)
+                    // running callbacks might last too long for watchdog etc.
+                    optimistic_yield(10000);
+#endif
+                } while (current && !done);
+
+                fence.store(false);
+                return result;
+            }
+        };
+
+        template< typename Delegate, typename R = void, bool ISQUEUE = false, size_t QUEUE_CAPACITY = 32>
+        class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
+        {
+        protected:
+            using typename MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::Node_t;
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::first;
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::last;
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::unused;
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::nodeCount;
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::recycle_node_unsafe;
+#ifndef ARDUINO
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::mutex_unused;
+#endif
+
+        public:
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::MultiDelegatePImpl;
+
+            R operator()()
+            {
+                auto current = first;
+                if (!current)
+                    return {};
+
+                static std::atomic<bool> fence(false);
+                // prevent recursive calls
+#if defined(ARDUINO) && !defined(ESP32)
+                if (fence.load()) return {};
+                fence.store(true);
+#else
+                if (fence.exchange(true)) return {};
+#endif
+
+                Node_t* prev = nullptr;
+                // prevent execution of new callbacks during this run
+                auto stop = last;
+
+                R result;
+                bool done;
+                do
+                {
+                    done = current == stop;
+                    result = Call<Delegate, R, ISQUEUE>::execute(current->mDelegate);
+                    this->traverse(prev, current, result);
+#if defined(ESP8266) || defined(ESP32)
+                    // running callbacks might last too long for watchdog etc.
+                    optimistic_yield(10000);
+#endif
+                } while (current && !done);
+
+                fence.store(false);
+                return result;
+            }
+        };
+
+        template< typename Delegate, typename R, bool ISQUEUE, size_t QUEUE_CAPACITY, typename... P> class MultiDelegate;
+
+        template< typename Delegate, typename R, bool ISQUEUE, size_t QUEUE_CAPACITY, typename... P>
+        class MultiDelegate<Delegate, R(P...), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>
+        {
+        public:
+            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>::MultiDelegatePImpl;
+        };
+
+        template< typename Delegate, typename R, bool ISQUEUE, size_t QUEUE_CAPACITY>
+        class MultiDelegate<Delegate, R(), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
+        {
+        public:
+            using MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::MultiDelegateImpl;
+        };
+
+        template< typename Delegate, bool ISQUEUE, size_t QUEUE_CAPACITY, typename... P>
+        class MultiDelegate<Delegate, void(P...), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegatePImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY, P...>
+        {
+        public:
+            using MultiDelegatePImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY, P...>::MultiDelegatePImpl;
+            using typename MultiDelegatePImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY, P...>::Node_t;
+            using MultiDelegatePImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY, P...>::first;
+            using MultiDelegatePImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY, P...>::last;
+
             void operator()(P... args)
             {
                 auto current = first;
@@ -329,42 +486,8 @@ namespace delegate
                 do
                 {
                     done = current == stop;
-                    if (!CallP<Delegate, R, ISQUEUE, P...>::execute(current->mDelegate, args...))
-                    {
-                        // remove callback from stack
-#ifdef ARDUINO
-                        InterruptLock lockAllInterruptsInThisScope;
-#else
-                        std::lock_guard<std::mutex> lock(mutex_unused);
-#endif
-
-                        auto to_recycle = current;
-
-                        // removing rLast
-                        if (last == current)
-                            last = prev;
-
-                        current = current->mNext;
-                        if (prev)
-                        {
-                            prev->mNext = current;
-                        }
-                        else
-                        {
-                            first = current;
-                        }
-
-                        if (ISQUEUE)
-                            recycle_node_unsafe(to_recycle);
-                        else
-                            delete to_recycle;
-                    }
-                    else
-                    {
-                        prev = current;
-                        current = current->mNext;
-                    }
-
+                    CallP<Delegate, void, ISQUEUE, P...>::execute(current->mDelegate, args...);
+                    this->traverse(prev, current);
 #if defined(ESP8266) || defined(ESP32)
                     // running callbacks might last too long for watchdog etc.
                     optimistic_yield(10000);
@@ -375,22 +498,14 @@ namespace delegate
             }
         };
 
-        template< typename Delegate, typename R = void, bool ISQUEUE = false, size_t QUEUE_CAPACITY = 32>
-        class MultiDelegateImpl : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
+        template< typename Delegate, bool ISQUEUE, size_t QUEUE_CAPACITY>
+        class MultiDelegate<Delegate, void(), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegateImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY>
         {
-        protected:
-            using typename MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::Node_t;
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::first;
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::last;
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::unused;
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::nodeCount;
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::recycle_node_unsafe;
-#ifndef ARDUINO
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::mutex_unused;
-#endif
-
         public:
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::MultiDelegatePImpl;
+            using MultiDelegateImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY>::MultiDelegateImpl;
+            using typename MultiDelegateImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY>::Node_t;
+            using MultiDelegateImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY>::first;
+            using MultiDelegateImpl<Delegate, void, ISQUEUE, QUEUE_CAPACITY>::last;
 
             void operator()()
             {
@@ -415,42 +530,8 @@ namespace delegate
                 do
                 {
                     done = current == stop;
-                    if (!Call<Delegate, R, ISQUEUE>::execute(current->mDelegate))
-                    {
-                        // remove callback from stack
-#ifdef ARDUINO
-                        InterruptLock lockAllInterruptsInThisScope;
-#else
-                        std::lock_guard<std::mutex> lock(mutex_unused);
-#endif
-
-                        auto to_recycle = current;
-
-                        // removing rLast
-                        if (last == current)
-                            last = prev;
-
-                        current = current->mNext;
-                        if (prev)
-                        {
-                            prev->mNext = current;
-                        }
-                        else
-                        {
-                            first = current;
-                        }
-
-                        if (ISQUEUE)
-                            recycle_node_unsafe(to_recycle);
-                        else
-                            delete to_recycle;
-                    }
-                    else
-                    {
-                        prev = current;
-                        current = current->mNext;
-                    }
-
+                    Call<Delegate, void, ISQUEUE>::execute(current->mDelegate);
+                    this->traverse(prev, current);
 #if defined(ESP8266) || defined(ESP32)
                     // running callbacks might last too long for watchdog etc.
                     optimistic_yield(10000);
@@ -461,23 +542,8 @@ namespace delegate
             }
         };
 
-        template< typename Delegate, typename R, bool ISQUEUE, size_t QUEUE_CAPACITY, typename... P> class MultiDelegate;
-
-        template< typename Delegate, typename R, bool ISQUEUE, size_t QUEUE_CAPACITY, typename... P>
-        class MultiDelegate<Delegate, R(P...), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>
-        {
-        public:
-            using MultiDelegatePImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY, P...>::MultiDelegatePImpl;
-        };
-
-        template< typename Delegate, typename R, bool ISQUEUE, size_t QUEUE_CAPACITY>
-        class MultiDelegate<Delegate, R(), ISQUEUE, QUEUE_CAPACITY> : public MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>
-        {
-        public:
-            using MultiDelegateImpl<Delegate, R, ISQUEUE, QUEUE_CAPACITY>::MultiDelegateImpl;
-        };
-
     }
+
 }
 
 /**
@@ -492,10 +558,10 @@ It is designed to be used with Delegate, the efficient runtime wrapper for C fun
                If the result type of the function call operator of Delegate is void, calling a MultiDelegate queue
                removes each item after calling it; a Multidelegate event multiplexer keeps event handlers until
                explicitly removed.
-               If the result type of the function call operator of Delegate is non-void, the type-conversion to bool
-               of that result determines if the item is immediately removed or kept after each call: a Multidelegate
-               queue removes an item only if true is returned, but a Multidelegate event multiplexer removes event
-               handlers that return false.
+               If the result type of the function call operator of Delegate is non-void, in a MultiDelegate queue
+               the type-conversion to bool of that result determines if the item is immediately removed or kept
+               after each call: if true is returned, the item is removed. A Multidelegate event multiplexer keeps event
+               handlers until they are explicitly removed.
 @tparam QUEUE_CAPACITY is only used if ISQUEUE == true. Then, it sets the maximum capacity that the queue dynamically
                allocates from the heap. Unused items are not returned to the heap, but are managed by the MultiDelegate
                instance during its own lifetime for efficiency.
