@@ -63,11 +63,11 @@ void print_mmu_status(Print& oStream) {
   oStream.printf_P(PSTR("MMU Configuration"));
   oStream.println();
   oStream.printf_P(PSTR("  mmu_status = {"
-                  "v_cfg = %u, state = %d, enable/disable count = %u/%u, "
-                  "map = 0x%02X, p = 0x%02X, v = 0x%02X}"),
-                  mmu_status.v_cfg, mmu_status.state,
-                  mmu_status.enable_count, mmu_status.disable_count,
-                  mmu_status.map, mmu_status.p, mmu_status.v);
+                        "v_cfg = %u, state = %d, enable/disable count = %u/%u, "
+                        "map = 0x%02X, p = 0x%02X, v = 0x%02X}"),
+                   mmu_status.v_cfg, mmu_status.state,
+                   mmu_status.enable_count, mmu_status.disable_count,
+                   mmu_status.map, mmu_status.p, mmu_status.v);
   oStream.println();
   uint32_t iram_bank_reg = ESP8266_DREG(0x24);
   if (0 == (iram_bank_reg & 0x10)) {  // if bit clear, is enabled
@@ -161,19 +161,18 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read Byte from iRAM, 0x%02X at %p"), probe_b[0], probe_b);
       out.println();
       break;
-    case 'B':
-    {
-      out.printf_P(PSTR("Load/Store exception by writing byte to iRAM"));
-      out.println();
-      char val = 0x55;
-      out.printf_P(PSTR("Write byte, 0x%02X, to iRAM at %p"), val, probe_b);
-      out.println();
-      out.flush();
-      probe_b[0] = val;
-      out.printf_P(PSTR("Read Byte back from iRAM, 0x%02X at %p"), probe_b[0], probe_b);
-      out.println();
-      break;
-    }
+    case 'B': {
+        out.printf_P(PSTR("Load/Store exception by writing byte to iRAM"));
+        out.println();
+        char val = 0x55;
+        out.printf_P(PSTR("Write byte, 0x%02X, to iRAM at %p"), val, probe_b);
+        out.println();
+        out.flush();
+        probe_b[0] = val;
+        out.printf_P(PSTR("Read Byte back from iRAM, 0x%02X at %p"), probe_b[0], probe_b);
+        out.println();
+        break;
+      }
     case 's':
       out.printf_P(PSTR("Load/Store exception by reading short from iRAM"));
       out.println();
@@ -181,19 +180,18 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read short from iRAM, 0x%04X at %p"), probe_s[0], probe_s);
       out.println();
       break;
-    case 'S':
-    {
-      out.printf_P(PSTR("Load/Store exception by writing short to iRAM"));
-      out.println();
-      short int val = 0x0AA0;
-      out.printf_P(PSTR("Write short, 0x%04X, to iRAM at %p"), val, probe_s);
-      out.println();
-      out.flush();
-      probe_s[0] = val;
-      out.printf_P(PSTR("Read short back from iRAM, 0x%04X at %p"), probe_s[0], probe_s);
-      out.println();
-      break;
-    }
+    case 'S': {
+        out.printf_P(PSTR("Load/Store exception by writing short to iRAM"));
+        out.println();
+        short int val = 0x0AA0;
+        out.printf_P(PSTR("Write short, 0x%04X, to iRAM at %p"), val, probe_s);
+        out.println();
+        out.flush();
+        probe_s[0] = val;
+        out.printf_P(PSTR("Read short back from iRAM, 0x%04X at %p"), probe_s[0], probe_s);
+        out.println();
+        break;
+      }
     case 'R':
       out.printf_P(PSTR("Restart, ESP.restart(); ..."));
       out.println();
@@ -253,4 +251,4 @@ void loop() {
 
 int divideA_B(int a, int b) {
   return (a / b);
- }
+}

@@ -43,7 +43,11 @@ extern mmu_cre_status_t mmu_status;
 #ifdef DEBUG_MMU
 bool inline is_iram(uint32_t addr) {
   constexpr uint32_t iram_start = 0x40100000u;
+#ifdef MMU_SEC_HEAP_SIZE
   constexpr uint32_t iram_end = iram_start + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE;
+#else
+  constexpr uint32_t iram_end = iram_start + MMU_IRAM_SIZE;
+#endif
   return (iram_start <= addr && iram_end > addr);
 }
 
