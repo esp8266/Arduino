@@ -244,11 +244,11 @@ namespace delegate
                 bool operator!=(const iterator& rhs) const {
                     return !operator==(rhs);
                 }
-                const Delegate& operator*() const
+                Delegate& operator*() const
                 {
                     return current->mDelegate;
                 }
-                const Delegate* const operator->() const
+                Delegate* const operator->() const
                 {
                     return &current->mDelegate;
                 }
@@ -349,7 +349,7 @@ namespace delegate
                 auto it = begin();
                 while (it)
                 {
-                    if (del == &it.current->mDelegate)
+                    if (del == &(*it))
                     {
                         erase(it);
                         return true;
@@ -382,7 +382,7 @@ namespace delegate
                 R result;
                 do
                 {
-                    result = CallP<Delegate, R, ISQUEUE, P...>::execute(it.current->mDelegate, args...);
+                    result = CallP<Delegate, R, ISQUEUE, P...>::execute(*it, args...);
                     if (result && ISQUEUE)
                         it = erase(it);
                     else
@@ -422,7 +422,7 @@ namespace delegate
                 R result;
                 do
                 {
-                    result = Call<Delegate, R, ISQUEUE>::execute(it.current->mDelegate);
+                    result = Call<Delegate, R, ISQUEUE>::execute(*it);
                     if (result && ISQUEUE)
                         it = this->erase(it);
                     else
@@ -477,7 +477,7 @@ namespace delegate
 
                 do
                 {
-                    CallP<Delegate, void, ISQUEUE, P...>::execute(it.current->mDelegate, args...);
+                    CallP<Delegate, void, ISQUEUE, P...>::execute(*it, args...);
                     if (ISQUEUE)
                         it = this->erase(it);
                     else
@@ -515,7 +515,7 @@ namespace delegate
 
                 do
                 {
-                    Call<Delegate, void, ISQUEUE>::execute(it.current->mDelegate);
+                    Call<Delegate, void, ISQUEUE>::execute(*it);
                     if (ISQUEUE)
                         it = this->erase(it);
                     else
