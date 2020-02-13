@@ -110,7 +110,9 @@ public:
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
 
-            if (!_fs.exists(path) && path.endsWith(".htm") && _fs.exists(path + "l")) {
+            // If neither <blah> nor <blah>.gz exist, and <blah> is a file.htm, try it with file.html instead
+            // For the normal case this will give a search order of index.htm, index.htm.gz, index.html, index.html.gz
+            if (!_fs.exists(path) && !_fs.exists(path + ".gz") && path.endsWith(".htm")) {
                 path += "l";
             }
         }
