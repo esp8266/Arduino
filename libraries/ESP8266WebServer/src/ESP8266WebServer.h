@@ -101,7 +101,7 @@ public:
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
-  ClientType client() { return _currentClient; }
+  ClientType& client() { return _currentClient; }
   HTTPUpload& upload() { return *_currentUpload; }
 
   // Allows setting server options (i.e. SSL keys) by the instantiator
