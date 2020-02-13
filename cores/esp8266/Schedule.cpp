@@ -25,6 +25,7 @@
 #include "coredecls.h"
 
 using mSchedFuncT = Delegate<void(), void*>;
+// queue specialization: cache erased nodes, call each once next round. 
 MultiDelegate<mSchedFuncT, true> schedFuncs;
 
 class mRecFuncT : public Delegate<bool(), void*>
@@ -36,6 +37,7 @@ public:
     using base_type::operator=;
     esp8266::polledTimeout::periodicFastUs callNow;
     Delegate<bool(), void*> alarm = nullptr;
+    // return true to keep, false to erase.
     bool IRAM_ATTR operator()()
     {
         const bool wakeup = alarm && alarm();
@@ -43,6 +45,7 @@ public:
         return !(wakeup || callNow) || base_type::operator()();
     }
 };
+// non-queue specialization: heap new/delete, use explicit erase. 
 MultiDelegate<mRecFuncT> recFuncs;
 
 IRAM_ATTR // (not only) called from ISR
@@ -74,5 +77,25 @@ void run_scheduled_functions()
 
 void run_scheduled_recurrent_functions()
 {
-    recFuncs();
+    auto it = recFuncs.begin();
+    if (!it)
+        return;
+
+    static std::atomic<bool> fence(false);
+    // prevent recursive calls
+    if (fence.load()) return;
+    fence.store(true);
+
+    auto end = recFuncs.end();
+    do
+    {
+        if ((*it)())
+            ++it;
+        else
+            it = recFuncs.erase(it);
+        // running callbacks might last too long for watchdog etc.
+        optimistic_yield(10000);
+    } while (it != end);
+
+    fence.store(false);
 }
