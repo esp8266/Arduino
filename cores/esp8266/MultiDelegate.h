@@ -241,14 +241,15 @@ namespace delegate
                 {
                     return current == rhs.current;
                 }
-                bool operator!=(const iterator& rhs) const {
+                bool operator!=(const iterator& rhs) const
+                {
                     return !operator==(rhs);
                 }
                 Delegate& operator*() const
                 {
                     return current->mDelegate;
                 }
-                Delegate* const operator->() const
+                Delegate* operator->() const
                 {
                     return &current->mDelegate;
                 }
@@ -271,10 +272,12 @@ namespace delegate
                 }
             };
 
-            iterator begin() {
+            iterator begin()
+            {
                 return iterator(*this);
             }
-            iterator end() const {
+            iterator end() const
+            {
                 return iterator();
             }
 
