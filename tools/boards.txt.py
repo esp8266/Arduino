@@ -1321,7 +1321,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
     strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
 
-    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld.h'
+    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
     menu = '.menu.eesz.' + strsize + strfs_strip
     menub = menu + '.build.'
     desc = 'none' if (fs_kb == 0) else strfs + 'B'

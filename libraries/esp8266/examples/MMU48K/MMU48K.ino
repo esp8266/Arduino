@@ -1,6 +1,15 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 
+uint32_t timed_byte_read(char *pc, uint32_t * o);
+uint32_t timed_byte_read2(char *pc, uint32_t * o);
+
+#define GET_BYTE_FN(name,wo,bo) \
+static inline char get ## name(void *o) { \
+  char res;  /* extract named field */ \
+  asm ("l32i  %0, %1, " #wo "; extui %0, %0, " #bo ", 8;" : "=r"(res) : "r"(o) : );\
+  return res; }
+
 /*
   Notes,
   When accessing IRAM as data storage all access must be word aligned and
@@ -134,8 +143,43 @@ constexpr short *probe_s = (short *)0x40108000;
 constexpr char *probe_c = (char *)0x40110000;
 constexpr short *unaligned_probe_s = (short *)0x3FFF8001;
 
+uint32_t read_var = 0x11223344;
+
+extern uint32_t mmu_non32xfer_count;
+
 void processKey(Print& out, int hotKey) {
   switch (hotKey) {
+    case 't': {
+        uint32_t tmp;
+        out.printf_P(PSTR("Test how much time is added by exception handling"));
+        out.println();
+        out.printf_P(PSTR("mmu_non32xfer_count %u"), mmu_non32xfer_count);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read((char *)0x40200003, &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read((char *)0x40200003, &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."), timed_byte_read((char *)0x40108000, &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."), timed_byte_read((char *)((uintptr_t)&read_var + 1), &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("mmu_non32xfer_count %u"), mmu_non32xfer_count);
+        out.println();
+        out.printf_P(PSTR("Test how much time is used by the inline function method"));
+        out.println();
+        out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read2((char *)0x40200003, &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read2((char *)0x40200003, &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."), timed_byte_read2((char *)0x40108000, &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."), timed_byte_read2((char *)((uintptr_t)&read_var + 1), &tmp), tmp);
+        out.println();
+        out.printf_P(PSTR("mmu_non32xfer_count %u"), mmu_non32xfer_count);
+        out.println();
+        out.println();
+        break;
+      }
     case '9':
       out.printf_P(PSTR("Unaligned exception by reading short"));
       out.println();
@@ -214,6 +258,7 @@ void processKey(Print& out, int hotKey) {
       out.println();
       out.println(F("Press a key + <enter>"));
       out.println(F("  R    - Restart, ESP.restart();"));
+      out.println(F("  t    - exception vs inline method timing info."));
       out.println(F("  ?    - Print Help"));
       out.println();
       out.println(F("Crash with:"));

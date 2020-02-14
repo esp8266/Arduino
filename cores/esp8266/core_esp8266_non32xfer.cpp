@@ -72,7 +72,7 @@ static void warning(void)
 }
 static fn_exception_handler_t old_handler = NULL;
 
-static ICACHE_RAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, uint32_t cause)
+static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, uint32_t cause)
 {
   do {
     /*
@@ -83,20 +83,21 @@ static ICACHE_RAM_ATTR void non32xfer_exception_handler(struct __exception_frame
        Register a15 was used for epc1, then clobbered for rsr. Maybe an
        __asm("":::"memory") before starting the asm would help for these cases.
        For this instance moved setting epc1 closer to where it was used.
+       Edit. "&"" on output register would have resolved the problem.
+       Refactored to reduce and consolidate register usage.
      */
     uint32_t insn;
     __asm(
-      "movi  a4, ~3;"          /* prepare a mask for the EPC */
-      "and   a4, a4, %1;"      /* apply mask for 32bit aligned base */
-      "l32i  a5, a4, 0;"       /* load part 1 */
-      "l32i  a6, a4, 4;"       /* load part 2 */
+      "movi  %0, ~3;"          /* prepare a mask for the EPC */
+      "and   %0, %0, %1;"      /* apply mask for 32bit aligned base */
       "ssa8l %1;"              /* set up shift register for src op */
-      "src   %0, a6, a5;"      /* right shift to get faulting instruction */
-      :"=r"(insn)
+      "l32i  %1, %0, 0;"       /* load part 1 */
+      "l32i  %0, %0, 4;"       /* load part 2 */
+      "src   %0, %0, %1;"      /* right shift to get faulting instruction */
+      :"=&r"(insn)
       :"r"(ef->epc)
-      :"a4", "a5", "a6"
+      :
     );
-
     /*
       This is a concern area - exception handlers are called with interrupts
       turned back on by _xtos_c_wrapper_handler. Is there something about an
@@ -148,7 +149,7 @@ static ICACHE_RAM_ATTR void non32xfer_exception_handler(struct __exception_frame
     __asm("rsr %0, EXCVADDR;" :"=r"(excvaddr)::);
 
     /* debug option, validate address so we don't hide memory access bugs in APP */
-    if ((is_read && is_icache(excvaddr)) || is_iram(excvaddr)) {
+    if (is_iram(excvaddr) || (is_read && is_icache(excvaddr))) {
       /* all is good  */
     } else {
       continue;  /* fail */
@@ -201,7 +202,7 @@ static ICACHE_RAM_ATTR void non32xfer_exception_handler(struct __exception_frame
     Calling _xtos_unhandled_exception(ef, cause) in the Boot ROM, gets us a
     hardware wdt.
 
-    Use panic instead as a fall back. It will at least give us a stack trace.
+    Use panic instead as a fall back. It will produce a stack trace.
    */
   panic();
 }
