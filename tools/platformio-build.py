@@ -264,6 +264,9 @@ app_ld = env.Command(
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
 
+if not env.BoardConfig().get("build.ldscript", ""):
+    env.Replace(LDSCRIPT_PATH=env.BoardConfig().get("build.arduino.ldscript", "")) 
+
 #
 # Dynamic core_version.h for staging builds
 #
