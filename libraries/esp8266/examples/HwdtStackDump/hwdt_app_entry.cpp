@@ -71,8 +71,9 @@
  *
  * Possible Issues/Thoughts/Improvements:
  *
- * I wonder if the eboot could be changed to use at stack pointer beginning at
- * 0x3fffeb30. This would allow for a value near 640 for ROM_STACK_SIZE.
+ * On reboot after an OTA download, eboot has a large demand for stack and DRAM
+ * space. For routine loads from flash, its stack and DRAM usage is light and
+ * should leave us a good stack to dump for a HWDT.
  *
  * If a problem should arise with some data elements being corrupted during
  * reboot, would it be possible to move their DRAM location higher in memory?
@@ -100,9 +101,6 @@
  *   * use stack_thunk_refcnt to determine if present
  *   * malloc addresses are aligned 8 not 16
  *   * stack_thunk_top beginning of stack. Defined as stack_thunk_ptr + size -1
- *   * uhhh, either my dyslexic brain is playing tricks on me or
- *     `void stack_thunk_dump_stack()` in `StackThunk.cpp` has top and bottom
- *     (which is higher?) confused.
  *
  * Maybe an in/out ref count would be nice for bearssl and cont stacks.
  */
@@ -158,8 +156,9 @@
  * and data rates" in the comments at the top.
  *
  */
+ // #define HWDT_UART_SPEED (19200)
  // #define HWDT_UART_SPEED (74880)
- #define HWDT_UART_SPEED (115200)
+ // #define HWDT_UART_SPEED (115200)
  // #define HWDT_UART_SPEED (230400)
 
 
@@ -442,6 +441,8 @@ int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
 #define ETS_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
 #endif
 
+#define ETS_FLUSH(uart_no) while((USS(uart_no) >> USTXC) & 0xff) {}
+
 enum PRINT_STACK {
     CONT = 1,
     SYS = 2,
@@ -709,6 +710,31 @@ constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_
 
 #define UART_CLKDIV_MASK 0x000FFFFFUL
 
+void adjust_uart_speed(uint32_t uart_divisor) {
+    /*
+     * Take care to let serial data in the FIFO finish before changing UART
+     * speed. Then after changing speeds, let the uart clock generator
+     * stablilize, and let the remote receiver come to an idle state before
+     * continuing.
+     *
+     * Load a Rubout character for the final charcter shifting out to stop
+     * the last charcter from getting crunched during the speed change.
+     *
+     * The thinking is if the speed changes while shifting out, as long as the
+     * start bit gets out before the change. The change will not be noticed
+     * since all ones will look like the serial line idle state. And for text
+     * displaying, received rubout characters should be discarded. At least that
+     * was true 40 years ago.
+     *
+     * These adjustments appear to resolve the lost data problem that occurs
+     * when printing after a flash upload using esptool.
+     */
+    ets_putc('\xFF');
+    ETS_FLUSH(0);
+    real_uart_div_modify(0, uart_divisor);
+    ets_delay_us(150);
+}
+
 STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t new_speed) {
 
     uint32_t uart_divisor = USD(uart_no) & UART_CLKDIV_MASK;
@@ -745,13 +771,7 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
         uart_divisor = 0;
 
     } else {
-        /*
-         * These delays appear to resolve the lost data problem that occurs
-         * when printing after a flash upload using esptool.
-         */
-        ets_delay_us(18000);
-        real_uart_div_modify(0, new_uart_divisor);
-        ets_delay_us(150);
+        adjust_uart_speed(new_uart_divisor);
     }
 
 #if defined(DEBUG_HWDT_DEBUG)
@@ -887,9 +907,7 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
 
 #ifdef HWDT_UART_SPEED
     if (uart_divisor) {
-        ets_delay_us(18000);
-        real_uart_div_modify(0, uart_divisor); // Put it back the way we found it!
-        ets_delay_us(150);
+        adjust_uart_speed(uart_divisor);
     }
 #endif
 }
@@ -967,7 +985,7 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
     // Enable cache over flash
     asm volatile ("movi.n a2, 0\n"
                   "mov.n  a3, a2\n"
-                  "movi.n a4, 1\n"    // ICACHE_SIZE_32
+                  "movi.n a4, 0\n"    // ICACHE_SIZE_16
                   "call0 Cache_Read_Enable\n" ::);
 #endif
 
