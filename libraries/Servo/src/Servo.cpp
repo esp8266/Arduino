@@ -82,9 +82,9 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
 void Servo::detach()
 {
   if (_attached) {
+    pinMode(_pin, INPUT);
     stopWaveform(_pin);
     _attached = false;
-    digitalWrite(_pin, LOW);
   }
 }
 
