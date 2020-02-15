@@ -5,6 +5,7 @@ typedef struct HWDT_INFO {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
+    uint32_t bearssl;
     uint32_t rom_api_reason;
     uint32_t rtc_sys_reason;
     uint32_t reset_reason;

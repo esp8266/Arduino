@@ -71,9 +71,9 @@
  *
  * Possible Issues/Thoughts/Improvements:
  *
- * On reboot after an OTA download, eboot has a large demand for stack and DRAM
- * space. For routine loads from flash, its stack and DRAM usage is light and
- * should leave us a good stack to dump for a HWDT.
+ * On reboot after an OTA download, eboot requires a lot of stack and DRAM
+ * space. For routine loads from flash, the stack and DRAM usage are small,
+ * leaving us valid data to print a stack dump.
  *
  * If a problem should arise with some data elements being corrupted during
  * reboot, would it be possible to move their DRAM location higher in memory?
@@ -179,6 +179,11 @@
  * uart_div_modify(). Leave these comments until I have more experience with
  * this change.
  *
+ * EDIT3: The delay before the uart_div_modify() has been replaced with a wait
+ * till FIFO empty loop. I now believe the lost greeting message after an
+ * esptool firmware update, has to do with the transition period between the
+ * tool performing hardware reset and exiting, then the serial monitor
+ * re-ngaging. This is not an issue that needs to be addressed here.
  */
  // #define HWDT_PRINT_GREETING
 
@@ -266,6 +271,15 @@ extern "C" {
 #include <user_interface.h>
 extern void call_user_start();
 extern uint32_t rtc_get_reset_reason(void);
+
+uint32_t __zero_return() {
+  return 0;
+}
+// extern void stack_thunk_dump_stack();
+extern uint32_t stack_thunk_get_refcnt() __attribute__((weak, alias("__zero_return")));
+extern uint32_t stack_thunk_get_stack_top() __attribute__((weak, alias("__zero_return")));
+extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_return")));
+
 }
 
 // #define DEBUG_HWDT_DEBUG
@@ -324,6 +338,7 @@ typedef struct HWDT_INFO {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
+    uint32_t bearssl;
     uint32_t rom_api_reason;
     uint32_t rtc_sys_reason;
     uint32_t reset_reason;
@@ -446,7 +461,8 @@ int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
 enum PRINT_STACK {
     CONT = 1,
     SYS = 2,
-    ROM = 4
+    ROM = 4,
+    BEARSSL = 8
 };
 
 
@@ -461,6 +477,9 @@ STATIC void IRAM_MAYBE print_stack(const uintptr_t start, const uintptr_t end, c
     } else
     if (chunk & PRINT_STACK::ROM) {
         ETS_PRINTF("ROM");
+    } else
+    if (chunk & PRINT_STACK::BEARSSL) {
+        ETS_PRINTF("bearssl");
     }
 
     ETS_PRINTF("\nsp: %08x end: %08x offset: %04x\n", start, end, 0);
@@ -858,9 +877,25 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
         const uint32_t *ctx_sys_ptr = skip_stackguard(sys_stack, rom_stack, CONT_STACKGUARD);
         hwdt_info.sys = (uintptr_t)rom_stack - (uintptr_t)ctx_sys_ptr;
 
-        /* Print context SYS */
+#ifndef USE_IRAM
+        const uint32_t *bearssl_stack_top = NULL;
+        const uint32_t *ctx_bearssl_ptr = NULL;
+        if (stack_thunk_get_refcnt()) {
+            bearssl_stack_top = (const uint32_t *)stack_thunk_get_stack_top();
+            ctx_bearssl_ptr = skip_stackguard((const uint32_t *)stack_thunk_get_stack_bot(), bearssl_stack_top, 0xdeadbeef);
+            hwdt_info.bearssl = (uintptr_t)bearssl_stack_top - (uintptr_t)ctx_bearssl_ptr;
+        }
+#endif
+
         if (hwdt_reset) {
             ETS_PRINTF("\n\nHardware WDT reset\n");
+#ifndef USE_IRAM
+            if (bearssl_stack_top) {
+                /* Print context bearssl */
+                print_stack((uintptr_t)ctx_bearssl_ptr, (uintptr_t)bearssl_stack_top, PRINT_STACK::BEARSSL);
+            }
+#endif
+            /* Print context SYS */
             print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)rom_stack, PRINT_STACK::SYS);
 
 #ifdef DEBUG_HWDT_NO4KEXTRA
@@ -952,14 +987,18 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
      *  Use new calculated SYS stack from top.
      *  Call the entry point of the SDK code.
      */
-    asm volatile("" ::: "memory");
-    asm volatile ("mov.n a1, %0\n" :: "r" (sys_stack_first));
+    asm volatile ("" ::: "memory");
 
 #ifndef USE_IRAM
-    asm volatile ("call0 Cache_Read_Disable\n" ::);
+    asm volatile ("callx0 %0\n\t" ::
+                  "r" (Cache_Read_Disable) : "memory");
 #endif
-    asm volatile("movi a0, 0x4000044c\n"     /* Should never return; however, set return to Boot ROM Breakpoint */
-                 "j call_user_start\n" ::);
+
+    asm volatile ("mov.n a1, %0\n\t"
+                  "movi a0, 0x4000044c\n\t"     /* Should never return; however, set return to Boot ROM Breakpoint */
+                  "jx %1\n\t" ::
+                  "r" (sys_stack_first), "r" (call_user_start):
+                  "a0", "a1");
 
     __builtin_unreachable();
 }
@@ -979,14 +1018,16 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
      * tool from the list of possible concerns for stack overwrite.
      *
      */
-    asm volatile ("movi a1, 0x3fffeb30\n" ::);
+    asm volatile ("movi a1, 0x3fffeb30\n\t" ::: "a1");
 
 #ifndef USE_IRAM
     // Enable cache over flash
-    asm volatile ("movi.n a2, 0\n"
-                  "mov.n  a3, a2\n"
-                  "movi.n a4, 0\n"    // ICACHE_SIZE_16
-                  "call0 Cache_Read_Enable\n" ::);
+    asm volatile ("movi.n a2, 0\n\t"
+                  "movi.n a3, 0\n\t"
+                  "movi.n a4, 0\n\t"    // 0 == ICACHE_SIZE_16
+                  "callx0 %0\n\t" ::
+                  "r" (Cache_Read_Enable):
+                  "a2", "a3", "a4", "memory");
 #endif
 
     asm volatile ("j app_entry_start" ::);
@@ -1017,6 +1058,6 @@ void preinit(void) {
 };
 
 #else
-void enable_debug_hwdt_at_link_time (void){
+void enable_debug_hwdt_at_link_time(void) {
 }
 #endif // end of #ifdef DEBUG_HWDT
