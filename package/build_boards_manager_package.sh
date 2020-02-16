@@ -5,9 +5,10 @@
 
 ver=`git describe --tag`
 visiblever=$ver
-if [ "$ver" = 0.0.1 ]; then
+# match 0.0.*
+if [ "${ver%.*}" = 0.0 ]; then
 
-    git tag -d 0.0.1
+    git tag -d ${ver}
     ver=`git describe --tag HEAD`
     plain_ver=$ver
 
