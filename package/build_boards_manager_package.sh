@@ -171,8 +171,10 @@ set +e
 python3 ../../merge_packages.py $new_json $old_json > tmp
 
 # additional json to merge (for experimental releases)
+echo "Additional json package files: ${MOREJSONPACKAGES}"
 for json in ${MOREJSONPACKAGES}; do
     if [ ! -z "$json" -a -r "$json" ]; then
+        echo "- merging $json"
         python3 ../../merge_packages.py tmp $json > tmp2
         mv tmp2 tmp
     fi
