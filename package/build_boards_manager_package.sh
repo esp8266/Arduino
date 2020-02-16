@@ -1,5 +1,4 @@
 #!/bin/bash
-#
 
 #set -x
 
@@ -168,8 +167,19 @@ curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${bas
 new_json=package_esp8266com_index.json
 
 set +e
-# Merge the old and new, then drop any obsolete package versions
-python3 ../../merge_packages.py $new_json $old_json | python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 >tmp && mv tmp $new_json && rm $old_json
+# Merge the old and new
+python3 ../../merge_packages.py $new_json $old_json > tmp
+
+# additional json to merge (for experimental releases)
+for json in ${MOREJSONPACKAGES}; do
+    if [ ! -z "$json" -a -r "$json" ]; then
+        python3 ../../merge_packages.py tmp $json > tmp2
+        mv tmp2 tmp
+    fi
+done
+
+# drop any obsolete package versions
+python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 < tmp > tmp2 && mv tmp2 $new_json && rm $old_json tmp
 
 # Verify the JSON file can be read, fail if it's not OK
 set -e
