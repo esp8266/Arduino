@@ -28,6 +28,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+#include <limits>
 #include "stdlib_noniso.h"
 
 extern "C" {
