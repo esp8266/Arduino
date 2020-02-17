@@ -58,9 +58,15 @@ int serverAccept (int srvsock)
 	return mockSockSetup(clisock);
 }
 
+void WiFiServer::begin (uint16_t port)
+{
+    return begin(port, !0);
+}
+
 void WiFiServer::begin (uint16_t port, uint8_t backlog)
 {
-	(void)backlog;
+    if (!backlog)
+        return;
 	_port = port;
 	return begin();
 }

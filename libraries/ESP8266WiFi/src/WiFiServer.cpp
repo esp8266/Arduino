@@ -38,8 +38,8 @@ extern "C" {
 #include "lwip/init.h" // LWIP_VERSION_
 #include <include/ClientContext.h>
 
-#ifndef MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT
-#define MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT 5
+#ifndef MAX_PENDING_CLIENTS_PER_PORT
+#define MAX_PENDING_CLIENTS_PER_PORT 5
 #endif
 
 WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
@@ -64,10 +64,15 @@ void WiFiServer::begin() {
 	begin(_port);
 }
 
+void WiFiServer::begin(uint16_t port) {
+    return begin(port, MAX_PENDING_CLIENTS_PER_PORT);
+}
+
 void WiFiServer::begin(uint16_t port, uint8_t backlog) {
     close();
+    if (!backlog)
+        return;
     _port = port;
-    err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return;
@@ -75,19 +80,14 @@ void WiFiServer::begin(uint16_t port, uint8_t backlog) {
     pcb->so_options |= SOF_REUSEADDR;
 
     // (IPAddress _addr) operator-converted to (const ip_addr_t*)
-    err = tcp_bind(pcb, _addr, _port);
-
-    if (err != ERR_OK) {
+    if (tcp_bind(pcb, _addr, _port) != ERR_OK) {
         tcp_close(pcb);
         return;
     }
 
 #if LWIP_VERSION_MAJOR == 1
-    (void)backlog;
     tcp_pcb* listen_pcb = tcp_listen(pcb);
 #else
-    if (backlog == 0)
-        backlog = MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT;
     tcp_pcb* listen_pcb = tcp_listen_with_backlog(pcb, backlog);
 #endif
 
@@ -124,6 +124,10 @@ WiFiClient WiFiServer::available(byte* status) {
     (void) status;
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
+#if LWIP_VERSION_MAJOR != 1
+        _unclaimed->acceptPCB();
+        tcp_backlog_accepted(_unclaimed->getPCB());
+#endif
         _unclaimed = _unclaimed->next();
         result.setNoDelay(getNoDelay());
         DEBUGV("WS:av\r\n");
@@ -182,18 +186,36 @@ T* slist_append_tail(T* head, T* item) {
 long WiFiServer::_accept(tcp_pcb* apcb, long err) {
     (void) err;
     DEBUGV("WS:ac\r\n");
-    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
-    _unclaimed = slist_append_tail(_unclaimed, client);
+
 #if LWIP_VERSION_MAJOR == 1
+
+    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
     tcp_accepted(_listen_pcb);
+
 #else
-    tcp_backlog_delayed(apcb);
-    // tcp_backlog_accepted() has to be called on this ClientContext's pcb (here = acpb)
-    // just before tcp_close() (but not needed before tcp_abort()).
+
+    // backlog doc:
     // http://lwip.100.n7.nabble.com/Problem-re-opening-listening-pbc-tt32484.html#a32494
     // https://www.nongnu.org/lwip/2_1_x/group__tcp__raw.html#gaeff14f321d1eecd0431611f382fcd338
-    client->write((const uint8_t*)"gotit",5);
+
+    // lwip-v2: Tell ClientContext to not accept yet the connection (final 'false' below)
+    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this, false);
+    // increase lwIP's backlog
+    tcp_backlog_delayed(apcb);
+
+    // Optimization Path:
+    // when lwip-v1.4 is not allowed anymore,
+    // - _accept() should not create ClientContext anymore
+    // - apcb should be stored into some sort of linked list (->_unclaimed)
+    //   (the linked list would store tcp_pcb* instead of ClientContext*)
+    //   (TCP_PCB_EXTARGS might be used for that (lwIP's struct tcp_pcb))
+    // - on available(), get the pcb back and create the ClientContext
+    // (this is not done today for better source readability with lwip-1.4 around)
+
 #endif
+
+    _unclaimed = slist_append_tail(_unclaimed, client);
+
     return ERR_OK;
 }
 

@@ -32,40 +32,35 @@ extern "C" {
 #include "IPAddress.h"
 
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
-// maximum number of simultaneously accepted clients.  Default number of
-// possibly simultaneously accepted client is defined in WiFiServer.cpp,
-// user can overide it at runtime from sketch:
-//      WiFiServer::begin(port, max-simultaneous-clients-per-port);
-// New incoming clients to this server will be delayed until an already
-// connected one leaves.
-// By "delayed", it is meant that WiFiServer will not answer to the SYN
-// packet until there is room for a new one: The server (tcp on that port)
-// will be invisible.  When a connected client leaves, the server will
-// accept a newcomer at the moment when one of them retries to connect by
-// sending another SYN (which will not immediately happen), and before it
-// times-out trying to connect.
+// maximum number of incoming *pending clients*.  Default number of possibly
+// simultaneously pending clients is defined in WiFiServer.cpp
+// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can overide it at runtime from
+// sketch:
+//      WiFiServer::begin(port, max-simultaneous-pending-clients);
 //
-// Back to Arduino scenario:
+// An "incoming pending" client is a new incoming TCP connection trying to
+// reach the TCP server.  It is "pending" until lwIP acknowledges it and
+// "accepted / no more pending" when user calls WiFiServer::available().
 //
-// Usually only one client is used at a time: The client (like a http
-// browser) is accepted, served then closed.  The ESP8266WebServer cannot
-// answer to another client during that time even if it is tcp-accepted
-// (syn-acked), until the current one has been served.
+// Before the backlog feature or with lwIP-v1.4, there was no pending
+// connections: They were immediately accepted and filling RAM.
 //
-// Now that backlog is enabled, at most
-// MAX_DEFAULT_SIMULTANEOUS_CLIENTS_PER_PORT clients will be tcp-accepted by
-// a WiFiServer even if it is currently busy serving one client (ie: busy
-// and not checking WiFiServer::available()/hasClient()).  But next clients
-// will be kept out and will have to tcp-retry (as if they were trying to
-// connect through a mute firewall):
-// - Then eventually one of the connected clients leaves
-// - Then a while *after* that moment a waiting/potential client say hello
-//   if it has not given up waiting (72 seconds on windows for the connect
-//   timeout).
+// Several pending clients can appear during the time when one client is
+// served by a long not-async service like ESP8266WebServer.  During that
+// time WiFiServer::available() cannot be called.
 //
-// Note that ESPAsync servers may serve more than one client at a time so
-// the default setting is not 1 or 2.  It was 0xff by default.  It can be
-// overriden at runtime in WiFiServer::begin().
+// Note: This *does not limit* the number of *simultaneously accepted
+//       clients*.  Such limit management is left to the user.
+//
+// Thus, when the maximum number of pending connections is reached, new
+// connections are delayed.
+// By "delayed", it is meant that WiFiServer(lwIP) will not answer to the
+// SYN packet until there is room for a new one: The TCP server on that port
+// will be mute.  The TCP client will regularly try to connect until success
+// or a timeout occurs (72s on windows).
+//
+// When user calls WiFiServer::available(), the tcp server stops muting and
+// answers to newcomers (until the "backlog" pending list is full again).
 
 class ClientContext;
 class WiFiClient;
@@ -88,7 +83,7 @@ public:
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();
-  void begin(uint16_t port) { begin(port, 0); }
+  void begin(uint16_t port);
   void begin(uint16_t port, uint8_t backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();

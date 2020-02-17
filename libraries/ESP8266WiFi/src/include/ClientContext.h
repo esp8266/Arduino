@@ -36,16 +36,27 @@ bool getDefaultPrivateGlobalSyncValue ();
 class ClientContext
 {
 public:
-    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
+    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg, bool acceptNow = true) :
         _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
         _sync(::getDefaultPrivateGlobalSyncValue())
     {
-        tcp_setprio(pcb, TCP_PRIO_MIN);
-        tcp_arg(pcb, this);
-        tcp_recv(pcb, &_s_recv);
-        tcp_sent(pcb, &_s_acked);
-        tcp_err(pcb, &_s_error);
-        tcp_poll(pcb, &_s_poll, 1);
+        if (acceptNow)
+            acceptPCB();
+    }
+
+    tcp_pcb* getPCB ()
+    {
+        return _pcb;
+    }
+
+    void acceptPCB()
+    {
+        tcp_setprio(_pcb, TCP_PRIO_MIN);
+        tcp_arg(_pcb, this);
+        tcp_recv(_pcb, &_s_recv);
+        tcp_sent(_pcb, &_s_acked);
+        tcp_err(_pcb, &_s_error);
+        tcp_poll(_pcb, &_s_poll, 1);
 
         // keep-alive not enabled by default
         //keepAlive();
@@ -76,11 +87,6 @@ public:
             tcp_recv(_pcb, NULL);
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
-#if LWIP_VERSION_MAJOR != 1
-            // needed for clients from WiFiServer
-            // harmless for other clients
-            tcp_backlog_accepted(_pcb);
-#endif
             err = tcp_close(_pcb);
             if(err != ERR_OK) {
                 DEBUGV(":tc err %d\r\n", (int) err);
