@@ -29,6 +29,7 @@
 
 class String;
 class __FlashStringHelper;
+#include "stdlib_noniso.h"
 
 #define DEC 10
 #define HEX 16
