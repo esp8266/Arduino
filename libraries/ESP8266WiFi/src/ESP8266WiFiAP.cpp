@@ -33,11 +33,14 @@ extern "C" {
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
+#include <lwip/init.h> // LWIP_VERSION_*
 }
 
 #include "debug.h"
 
-
+#if LWIP_VESION_MAJOR != 1
+#include "lwIPDhcpServer.h"
+#endif
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -156,6 +159,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
+#if LWIP_VERSION_MAJOR == 1
     if(wifi_softap_dhcps_status() != DHCP_STARTED) {
         DEBUG_WIFI("[AP] DHCP not started, starting...\n");
         if(!wifi_softap_dhcps_start()) {
@@ -163,6 +167,9 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
             ret = false;
         }
     }
+#else
+    dhcpSoftAP.end();
+#endif
 
     // check IP config
     struct ip_info ip;
@@ -181,6 +188,10 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         DEBUG_WIFI("[AP] wifi_get_ip_info failed!\n");
         ret = false;
     }
+
+#if LWIP_VERSION_MAJOR > 1
+    dhcpSoftAP.begin(&ip);
+#endif
 
     return ret;
 }
@@ -237,19 +248,34 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    if(!wifi_softap_set_dhcps_lease(&dhcp_lease)) {
+#if LWIP_VERSION_MAJOR == 1
+    if(!wifi_softap_set_dhcps_lease(&dhcp_lease))
+#else
+    if(!dhcpSoftAP.set_dhcps_lease(&dhcp_lease))
+#endif
+    {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
     }
 
     // set lease time to 720min --> 12h
-    if(!wifi_softap_set_dhcps_lease_time(720)) {
+#if LWIP_VERSION_MAJOR == 1
+    if(!wifi_softap_set_dhcps_lease_time(720))
+#else
+    if(!dhcpSoftAP.set_dhcps_lease_time(720))
+#endif
+    {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
         ret = false;
     }
 
     uint8 mode = info.gw.addr ? 1 : 0;
-    if(!wifi_softap_set_dhcps_offer_option(OFFER_ROUTER, &mode)) {
+#if LWIP_VERSION_MAJOR == 1
+    if(!wifi_softap_set_dhcps_offer_option(OFFER_ROUTER, &mode))
+#else
+    if(!dhcpSoftAP.set_dhcps_offer_option(OFFER_ROUTER, &mode))
+#endif
+    {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
         ret = false;
     }

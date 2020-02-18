@@ -68,7 +68,7 @@ enum wl_enc_type {  /* Values map to 802.11 encryption suites... */
         ENC_TYPE_AUTO = 8
 };
 
-#if !defined(LWIP_INTERNAL) && !defined(__LWIP_TCP_H__)
+#if !defined(LWIP_INTERNAL) && !defined(__LWIP_TCP_H__) && !defined(LWIP_HDR_TCPBASE_H)
 enum wl_tcp_state {
   CLOSED      = 0,
   LISTEN      = 1,

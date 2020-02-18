@@ -23,7 +23,7 @@
 #define wifiserver_h
 
 extern "C" {
-  #include "include/wl_definitions.h"
+  #include "wl_definitions.h"
 
   struct tcp_pcb;
 }
