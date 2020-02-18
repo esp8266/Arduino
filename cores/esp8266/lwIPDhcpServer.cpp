@@ -151,7 +151,7 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
     offer = 0xFF;
     renew = false;
     dhcps_lease_time = DHCPS_LEASE_TIME_DEF;  //minute
-    
+
     if (netif->num == SOFTAP_IF && fw_has_started_softap_dhcps == 1)
     {
         // nonos-sdk always starts DHCPS at boot
@@ -1026,7 +1026,7 @@ bool DhcpServer::begin (struct ip_info *info)
     if (_netif->num == SOFTAP_IF)
         wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
     _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP; // added for lwip-git
-    
+
     return true;
 }
 
@@ -1043,7 +1043,7 @@ void DhcpServer::end ()
     udp_disconnect(pcb_dhcps);
     udp_remove(pcb_dhcps);
     pcb_dhcps = nullptr;
-    
+
     //udp_remove(pcb_dhcps);
     list_node *pnode = nullptr;
     list_node *pback_node = nullptr;

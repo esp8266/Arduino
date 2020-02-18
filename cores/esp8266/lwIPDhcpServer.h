@@ -41,7 +41,7 @@ public:
 protected:
 
     // legacy C structure and API to eventually turn into C++
-    
+
     typedef struct _list_node {
         void *pnode;
         struct _list_node *pnext;
