@@ -38,6 +38,10 @@ bool check_and_erase_config(void);
 bool erase_config(const uint32_t flash_erase_mask);
 void enable_erase_config_at_link_time(void);
 
+// Enable debug printing for verification at a near consistant 74880 bps across
+// various reset causes. Also, reduces garbled printing.
+// #define DEBUG_ERASE_CONFIG
+
 #ifdef __cplusplus
 };
 #endif

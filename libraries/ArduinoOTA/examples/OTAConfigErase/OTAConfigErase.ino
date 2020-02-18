@@ -1,4 +1,17 @@
+/*
+  This config_erase example used BasicOTA as a start point.
 
+  Build customization for this PoC:
+    * To select one of three erase config methods:
+      Update `#define ERASE_CONFIG_METHOD` in `cores/esp8266/erase_config.cpp`
+      A description of the different method is also there.
+    * To turn on debug printing:
+      Uncomment `#define DEBUG_ERASE_CONFIG` in `cores/esp8266/erase_config.h`
+      This requires Serial speed 74880 bps.
+    * To build w/o erase config option:
+      Comment out `#include "erase_config.h"` in both `cores/esp8266/Update.cpp`
+      and `Arduino.h`
+ */
 #include <time.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -20,6 +33,7 @@
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
+#ifdef ERASE_CONFIG_H
 /*  Erase Config Options
   ERASE_CONFIG_NONE
   ERASE_CONFIG_EEPROM
@@ -30,6 +44,7 @@ const char* password = STAPSK;
   ERASE_CONFIG_ALL_DATA
 */
 ERASE_CONFIG_MASK_t eraseConfigOption = ERASE_CONFIG_RF_CAL; //ERASE_CONFIG_BLANK_BIN;
+#endif
 
 #define String_F(a) String(F(a))
 
@@ -52,8 +67,12 @@ void setTimeTZ(String& tz) {
 }
 
 void setup() {
+#ifdef DEBUG_ERASE_CONFIG
+  Serial.begin(74880);
+#else
   Serial.begin(74880);
   // Serial.begin(115200);
+#endif
   delay(20);
   Serial.println();
   Serial.println("setup ...");
@@ -105,9 +124,9 @@ void setup() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH) {
       type = "sketch";
-
+#ifdef ERASE_CONFIG_H
       Update.setEraseConfigOption(eraseConfigOption);
-
+#endif
     } else { // U_FS
       type = "filesystem";
     }
@@ -150,6 +169,7 @@ void printHelp(Print& oStream) {
   oStream.println();
   oStream.println(F("Hot key help:"));
   oStream.println();
+#ifdef ERASE_CONFIG_H
   oStream.println(F("    Erase Config Options"));
   oStream.println(F("  0 - ERASE_CONFIG_NONE"));
   oStream.println(F("  1 - ERASE_CONFIG_EEPROM"));
@@ -160,6 +180,7 @@ void printHelp(Print& oStream) {
   oStream.println(F("  6 - ERASE_CONFIG_ALL_DATA"));
   oStream.println(F("  9 - print detailed sector map"));
   oStream.println();
+#endif
   oStream.println(F("    Other Options"));
   oStream.println(F("  t - time information"));
   oStream.println(F("  u - umm_info"));
@@ -236,6 +257,7 @@ int cmdLoop(Print& oStream, char hotKey) {
       WiFi.mode(WIFI_OFF);
       ESP.restart();
       break;
+#ifdef ERASE_CONFIG_H
     case '0':
     case '1':
     case '2':
@@ -252,6 +274,7 @@ int cmdLoop(Print& oStream, char hotKey) {
       printFlashEraseMap(oStream);
       oStream.println();
       break;
+#endif
     default:
       return hotKeyHandlerAddOn(oStream, hotKey);
       break;

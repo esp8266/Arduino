@@ -282,7 +282,7 @@ void init_done() {
    https://github.com/esp8266/Arduino/pull/4889
 
 */
-#if defined(ERASE_CONFIG_H)
+#if defined(DEBUG_ERASE_CONFIG)
 extern "C" void fix_divider(void);
 #define FIX_DIVIDER fix_divider
 #define ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
@@ -325,7 +325,7 @@ extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
-#if defined(ERASE_CONFIG_H)
+#if defined(DEBUG_ERASE_CONFIG)
     uart_div_modify(0, UART_CLK_FREQ / (74880));
     ETS_DELAY_US(150);
     ETS_PRINTF("\nuser_init()\n");
