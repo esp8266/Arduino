@@ -41,9 +41,18 @@ char* ultoa(unsigned long value, char* result, int base) {
     return utoa((unsigned int)value, result, base);
 }
 
-#ifdef NOPRINTFLOAT
-
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
+    if (!_printf_float) {
+        return __dtostrf(number, width, prec, s);
+    } else {
+        char fmt[32];
+        sprintf(fmt, "%%%d.%df", width, prec);
+        sprintf(s, fmt, number);
+        return s;
+    }
+}
+
+static char * __dtostrf(double number, signed char width, unsigned char prec, char *s) {
     bool negative = false;
 
     if (isnan(number)) {
@@ -87,7 +96,7 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
         digitcount++;
     }
 
-    // minimal compensation for possible lack of precision
+    // minimal compensation for possible lack of precision (#7087 addition)
     number *= 1 + std::numeric_limits<decltype(number)>::epsilon();
 
     number /= tenpow;
@@ -119,16 +128,5 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     *out = 0;
     return s;
 }
-
-#else // !NOPRINTFLOAT
-
-char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
-    char fmt[32];
-    sprintf(fmt, "%%%d.%df", width, prec);
-    sprintf(s, fmt, number);
-    return s;
-}
-
-#endif // !NOPRINTFLOAT
 
 };
