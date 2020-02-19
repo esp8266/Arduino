@@ -89,7 +89,7 @@ static void ets_printf_P(const char *str, ...) {
     vsnprintf(destStr, sizeof(destStr), str, argPtr);
     va_end(argPtr);
     while (*c) {
-      ets_uart_putc1(*(c++));   // This will send "\r\n" for each '\n'
+        ets_uart_putc1(*(c++));
     }
 }
 
