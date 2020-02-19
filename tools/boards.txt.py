@@ -1588,6 +1588,7 @@ def all_boards ():
 
         if nofloat:
             print(id + '.build.float=')
+            print(id + '.build.floatflags=-DNOPRINTFLOAT')
 
         print('')
 
