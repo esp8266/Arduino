@@ -147,10 +147,10 @@ void __wrap_system_restart_local() {
     // (determined empirically, might break)
     uint32_t offset = 0;
     if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        offset = 0x190;
+        offset = 0x1a0;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        offset = 0x180;
+        offset = 0x190;
     }
     else if (rst_info.reason == REASON_WDT_RST) {
         offset = 0x10;

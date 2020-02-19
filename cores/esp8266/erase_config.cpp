@@ -403,6 +403,7 @@ void print_flashchip() {
 #define PRINT_FLASHCHIP() do{}while(false)
 #endif
 
+#if 0
 void set_flashchip_and_check_erase_config(uint8_t byte) {
     /*
        We patch and restore chip_size here. It should be noted that the ROM APIs
@@ -432,6 +433,37 @@ void ICACHE_RAM_ATTR erase_config_method3(void) {
     }
 }
 
+#else
+void set_flashchip_and_check_erase_config(void) {
+    /*
+       We patch and restore chip_size here. It should be noted that the ROM APIs
+       use both the chip_size and sector_size to validate calling parameters.
+       From what I see at least with esptool.py and core, there is a general
+       assumption that sector_size is always 4K.
+
+       I don't see a need to set and restore sector_size at this time.
+     */
+    PRINT_FLASHCHIP();
+    /* Since Flash code has been mapped for execution, we can just address the
+       flash image header located at the beginning of flash as iCACHE like memory. */
+    uint32_t word32 = *((uint32_t *)0x40200000);
+    uint8_t *bytes = (uint8_t *)&word32;
+    ETS_PRINTF("\n*((uint32_t *)0x40200000) == 0x%08X\n", word32);
+    uint32_t old_flash_size = flashchip->chip_size;
+    flashchip->chip_size = esp_c_magic_flash_chip_size((bytes[3] >> 4) & 0x0F);
+    PRINT_FLASHCHIP();
+    if (flashchip->chip_size) {
+        check_and_erase_config();
+    }
+    flashchip->chip_size = old_flash_size;
+}
+
+void ICACHE_RAM_ATTR erase_config_method3(void) {
+    Cache_Read_Enable(0, 0, 0);
+    set_flashchip_and_check_erase_config();
+    Cache_Read_Disable();
+}
+#endif
 
 #include "cont.h"
 
