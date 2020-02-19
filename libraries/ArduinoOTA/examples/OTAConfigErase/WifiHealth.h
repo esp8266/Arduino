@@ -5,18 +5,19 @@ bool printLocalTime(Print& oPrint, time_t timeIn = 0, const char *fmt = "%I:%M:%
 bool printLocalTime(Print& oPrint, time_t timeIn, const char *fmt);
 extern bool WifiUp;
 
-//static unsigned long last_garp = 0;
-
 typedef struct _WIFI_HEALTH {
   int32_t connected_count;
   int32_t rssi_sum;
   uint32_t rssi_count;
   time_t gtime_adjust;
   time_t connected_time;
-  time_t disconnected_time;
   time_t uptime_sum;
   time_t uptime_max;
   time_t uptime_min;
+  time_t disconnected_time;
+  time_t downtime_sum;
+  time_t downtime_max;
+  time_t downtime_min;
   uint8  bssid[6];
   uint8_t channel;
   int8_t rssi_max;

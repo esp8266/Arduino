@@ -2,25 +2,28 @@
   This config_erase example used BasicOTA as a start point.
 
   Build customization for this PoC:
+
     * To select one of three erase config methods:
       Update `#define ERASE_CONFIG_METHOD` in `cores/esp8266/erase_config.cpp`
       A description of the different method is also there.
+
     * To turn on debug printing:
       Uncomment `#define DEBUG_ERASE_CONFIG` in `cores/esp8266/erase_config.h`
       This requires Serial speed 74880 bps.
+
     * To build w/o erase config option:
       Comment out `#include "erase_config.h"` in both `cores/esp8266/Update.cpp`
       and `Arduino.h`
- */
+*/
 #include <time.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <Ticker.h>
+#include <TZ.h>
 
 #include "WifiHealth.h"
-
 #include <umm_malloc/umm_malloc_cfg.h>
 #include "AddOns.h"
 
@@ -28,6 +31,10 @@
 #pragma message("Using default SSID: your-ssid, this is probably not what you want.")
 #define STASSID "your-ssid"
 #define STAPSK  "your-password"
+#endif
+
+#ifndef LOCALTZ
+#define LOCALTZ TZ_America_Los_Angeles
 #endif
 
 const char* ssid = STASSID;
@@ -53,17 +60,12 @@ ERASE_CONFIG_MASK_t eraseConfigOption = ERASE_CONFIG_RF_CAL; //ERASE_CONFIG_BLAN
 WiFiEventHandler handler1;
 WiFiEventHandler handler2;
 
-extern char **environ;
-void setTimeTZ(const char *tz) {
-  char **old_environ = environ;
-  char * tzEnv[2] = { (char *)tz, NULL };
-  environ = &tzEnv[0];
-  tzset();
-  environ = old_environ;
+#define LED_BUILTIN_ON (0)
+void wifiLedOn(void) {
+  digitalWrite(LED_BUILTIN, (LED_BUILTIN_ON) ? 1 : 0);
 }
-
-void setTimeTZ(String& tz) {
-  setTimeTZ(tz.c_str());
+void wifiLedOff(void) {
+  digitalWrite(LED_BUILTIN, (LED_BUILTIN_ON) ? 0 : 1);
 }
 
 void setup() {
@@ -76,13 +78,12 @@ void setup() {
   delay(20);
   Serial.println();
   Serial.println("setup ...");
+  pinMode(LED_BUILTIN, OUTPUT);
+  wifiLedOff();
 
   WiFi.persistent(false); // w/o this a flash write occurs at every boot
   WiFi.mode(WIFI_OFF);
-
-  String tz = F("TZ=PST+8PDT+7,M3.2.0M11.1.0");
-  setTimeTZ(tz);
-  configTime(0, 0, "pool.ntp.org");
+  configTime(LOCALTZ, "pool.ntp.org");
 
   // Register wifi Event to control connection LED
   handler1 = WiFi.onStationModeConnected([](WiFiEventStationModeConnected data) {

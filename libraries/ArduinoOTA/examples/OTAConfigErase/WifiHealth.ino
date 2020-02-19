@@ -1,5 +1,9 @@
 
-wifi_health_t wifiHealth = {0, 0, 0, 0, 0, 0, 0, 0, ~(time_t)0, "", 0, INT8_MIN, INT8_MAX, 0};
+wifi_health_t wifiHealth = {
+  0, 0, 0, 0,
+  0, 0, 0, (time_t)LONG_MAX,
+  0, 0, 0, (time_t)LONG_MAX,
+  "", 0, INT8_MIN, INT8_MAX, 0};
 WiFiDisconnectLog_t wifi_disconnect_log[MAX_CONNECTION_LOST_TIME_LOG] = {0, 0, 0, 0};
 Ticker scheduleCheck;
 bool WifiUp = false;
@@ -188,44 +192,46 @@ void updateWiFiStats(void) {
 }
 
 void onWiFiConnected(WiFiEventStationModeConnected data) {
-  (void) data;
   wifiHealth.channel = data.channel;
   memcpy(wifiHealth.bssid, data.bssid, sizeof(wifiHealth.bssid));
   wifiHealth.connected_count++;
-  wifiHealth.connected_time = (time_t)(micros64() / 1000000);
+  time_t stime = (time_t)(micros64() / 1000000);
+  wifiHealth.connected_time = stime;
   wifiHealth.rssi = WiFi.RSSI();
   WifiUp = true;
+  wifiLedOn();
 
-  // wifiLed.strobe(0);
-  // wifiLed.on();
-  // last_garp = millis(); // init for doGarp(NULL);
+  if (wifiHealth.disconnected_time) {
+    time_t downtime = stime - wifiHealth.disconnected_time;
+    wifiHealth.downtime_sum += downtime;
+    wifiHealth.downtime_max = max(wifiHealth.downtime_max, downtime);
+    wifiHealth.downtime_min = min(wifiHealth.downtime_min, downtime);
+    wifiHealth.disconnected_time = (time_t)0;
+  }
 }
 
 void onWiFiDisconnected(WiFiEventStationModeDisconnected data) {
-  (void) data;
+  /* After a disconnect, an attempt is made about every 3 secs to reconnect.
+     On each failed attempt, this function is called. */
   WifiUp = false;
-  // wifiLed.strobe(0);
-  // wifiLed.off();
   time_t gtime;
   time(&gtime);
   time_t stime = (time_t)(micros64() / 1000000);
-  wifiHealth.disconnected_time = stime;
   wifiHealth.gtime_adjust = gtime - stime;
 
   if (wifiHealth.connected_time) {
+    wifiLedOff();
+    wifiHealth.disconnected_time = stime;
     size_t last = wifiHealth.connected_count % MAX_CONNECTION_LOST_TIME_LOG;
     wifi_disconnect_log[last].time    = stime; // Note, 1st entry is at [1].
     wifi_disconnect_log[last].reason  = data.reason;
     wifi_disconnect_log[last].channel = wifiHealth.channel;
-    wifi_disconnect_log[last].rssi = wifiHealth.rssi;
+    wifi_disconnect_log[last].rssi    = wifiHealth.rssi;
     time_t uptime = stime - wifiHealth.connected_time;
     wifiHealth.uptime_sum += uptime;
     wifiHealth.uptime_max = max(wifiHealth.uptime_max, uptime);
-    if (~(time_t)0 != wifiHealth.uptime_min) {
-      wifiHealth.uptime_min = min(wifiHealth.uptime_min, uptime);
-    } else {
-      wifiHealth.uptime_min = uptime;
-    }
+    wifiHealth.uptime_min = min(wifiHealth.uptime_min, uptime);
+    wifiHealth.connected_time = (time_t)0;
   }
 }
 
@@ -256,21 +262,53 @@ bool printWiFiStats(Print& oStream) {
       printUpTime(oStream, uptime);
       oStream.println();
 
-      if (wifiHealth.uptime_max) {
-        oStream.print(String_F("    MAX:             "));
-        printUpTime(oStream, wifiHealth.uptime_max);
+      uptime = wifiHealth.uptime_sum;
+      if (uptime) {
+        oStream.print(String_F("  Total Uptime:      "));
+        printUpTime(oStream, uptime);
         oStream.println();
+
+        if (2 < wifiHealth.connected_count) {
+          if (wifiHealth.uptime_max) {
+            oStream.print(String_F("    MAX:             "));
+            printUpTime(oStream, wifiHealth.uptime_max);
+            oStream.println();
+          }
+          if ((time_t)LONG_MAX != wifiHealth.uptime_min) {
+            oStream.print(String_F("    MIN:             "));
+            printUpTime(oStream, wifiHealth.uptime_min);
+            oStream.println();
+          }
+          oStream.print(String_F("    AVG:             "));
+          uptime /= (decltype(uptime))(wifiHealth.connected_count - 1);
+          printUpTime(oStream, uptime);
+          oStream.println();
+        }
       }
-      if (~(time_t)0 != wifiHealth.uptime_min) {
-        oStream.print(String_F("    MIN:             "));
-        printUpTime(oStream, wifiHealth.uptime_min);
+
+      time_t downtime = wifiHealth.downtime_sum;
+      if (downtime) {
+        oStream.print(String_F("  Total Downtime:    "));
+        printUpTime(oStream, downtime);
         oStream.println();
+
+        if (2 < wifiHealth.connected_count) {
+          if (wifiHealth.downtime_max) {
+            oStream.print(String_F("    MAX:             "));
+            printUpTime(oStream, wifiHealth.downtime_max);
+            oStream.println();
+          }
+          if ((time_t)LONG_MAX != wifiHealth.downtime_min) {
+            oStream.print(String_F("    MIN:             "));
+            printUpTime(oStream, wifiHealth.downtime_min);
+            oStream.println();
+          }
+          oStream.print(String_F("    AVG:             "));
+          downtime /= (decltype(uptime))(wifiHealth.connected_count - 1);
+          printUpTime(oStream, downtime);
+          oStream.println();
+        }
       }
-      oStream.print(String_F("    AVG:             "));
-      uptime += wifiHealth.uptime_sum;
-      uptime /= (decltype(uptime))wifiHealth.connected_count;
-      printUpTime(oStream, uptime);
-      oStream.println();
       oStream.println(String_F("  Reconnects:        ") + (wifiHealth.connected_count - 1));
 
       if (wifiHealth.connected_count > 1) {
