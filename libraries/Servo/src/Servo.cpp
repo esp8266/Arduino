@@ -63,6 +63,11 @@ uint8_t Servo::attach(int pin)
 
 uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
 {
+  return attach(pin, minUs, maxUs, _valueUs);
+}
+
+uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs, int value)
+{
   if (!_attached) {
     digitalWrite(pin, LOW);
     pinMode(pin, OUTPUT);
@@ -76,7 +81,7 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
   _maxUs = max((uint16_t)250, min((uint16_t)3000, maxUs));
   _minUs = max((uint16_t)200, min(_maxUs, minUs));
 
-  write(_valueUs);
+  write(value);
 
   return pin;
 }
