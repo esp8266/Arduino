@@ -26,4 +26,3 @@ PROVIDE ( _SPIFFS_page = 0x100 );
 PROVIDE ( _SPIFFS_block = 0x1000 );
 
 INCLUDE "local.eagle.app.v6.common.ld"
-

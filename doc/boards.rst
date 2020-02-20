@@ -452,14 +452,13 @@ Initially designed for kids in mind, everybody should be able to use it. Yet it'
 
 More details at https://shop.makestro.com/product/espectrocore/
 
-
 Schirmilabs Eduino WiFi
 -----------------------
 
 Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module
 
 Product page: https://schirmilabs.de/?page_id=165
-=======
+
 ITEAD Sonoff
 ------------
 
@@ -478,6 +477,5 @@ DOIT ESP-Mx DevKit (ESP8285)
 
 DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module (`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 and is active low to turn on. It uses a CH340C, USB to Serial converter chip. 
 ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. 
-
 
 

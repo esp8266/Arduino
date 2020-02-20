@@ -6636,14 +6636,13 @@ espectro.menu.baud.3000000=3000000
 espectro.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
-<<<<<<< HEAD
 eduinowifi.name=Schirmilabs Eduino WiFi
 eduinowifi.build.board=ESP8266_SCHIRMILABS_EDUINO_WIFI
 eduinowifi.build.variant=eduinowifi
 eduinowifi.upload.tool=esptool
 eduinowifi.upload.maximum_data_size=81920
 eduinowifi.upload.wait_for_upload_port=true
-eduinowifi.upload.erase_cmd=version
+eduinowifi.upload.erase_cmd=
 eduinowifi.serial.disableDTR=true
 eduinowifi.serial.disableRTS=true
 eduinowifi.build.mcu=esp8266
@@ -6674,7 +6673,7 @@ eduinowifi.menu.ssl.all=All SSL ciphers (most compatible)
 eduinowifi.menu.ssl.all.build.sslflags=
 eduinowifi.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 eduinowifi.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
-eduinowifi.upload.resetmethod=nodemcu
+eduinowifi.upload.resetmethod=--before default_reset --after hard_reset
 eduinowifi.build.flash_mode=dio
 eduinowifi.build.flash_flags=-DFLASHMODE_DIO
 eduinowifi.build.flash_freq=40
@@ -6805,7 +6804,7 @@ eduinowifi.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROT
 eduinowifi.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 eduinowifi.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 eduinowifi.menu.wipe.none=Only Sketch
-eduinowifi.menu.wipe.none.upload.erase_cmd=version
+eduinowifi.menu.wipe.none.upload.erase_cmd=
 eduinowifi.menu.wipe.sdk=Sketch + WiFi Settings
 eduinowifi.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 eduinowifi.menu.wipe.all=All Flash Contents
@@ -6828,7 +6827,8 @@ eduinowifi.menu.baud.921600=921600
 eduinowifi.menu.baud.921600.upload.speed=921600
 eduinowifi.menu.baud.3000000=3000000
 eduinowifi.menu.baud.3000000.upload.speed=3000000
-=======
+
+##############################################################
 sonoff.name=ITEAD Sonoff
 sonoff.build.board=ESP8266_SONOFF_SV
 sonoff.build.extra_flags=-DESP8266
@@ -7304,5 +7304,4 @@ espmxdevkit.menu.baud.921600=921600
 espmxdevkit.menu.baud.921600.upload.speed=921600
 espmxdevkit.menu.baud.3000000=3000000
 espmxdevkit.menu.baud.3000000.upload.speed=3000000
->>>>>>> f066ed2495c8d6f04841243d90f6deaef21a0119
 
