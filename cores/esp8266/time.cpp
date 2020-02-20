@@ -16,11 +16,14 @@
  *
  */
 
-#include <time.h>
+#include <stdlib.h>
+#include <../include/time.h> // See issue #6714
 #include <sys/time.h>
 #include <sys/reent.h>
 #include "sntp.h"
 #include "coredecls.h"
+
+#include <Arduino.h> // configTime()
 
 #include "sntp-lwip2.h"
 
@@ -55,23 +58,10 @@ static void setServer(int id, const char* name_or_ip)
 {
     if (name_or_ip)
     {
-        //TODO: check whether server is given by name or IP
+        // per current configuration,
+        // lwIP can receive an IP address or a fqdn
         sntp_setservername(id, (char*) name_or_ip);
     }
-}
-
-
-void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
-{
-    sntp_stop();
-
-    setServer(0, server1);
-    setServer(1, server2);
-    setServer(2, server3);
-
-    sntp_set_timezone_in_seconds(timezone_sec);
-    sntp_set_daylight(daylightOffset_sec);
-    sntp_init();
 }
 
 int clock_gettime(clockid_t unused, struct timespec *tp)
@@ -83,14 +73,27 @@ int clock_gettime(clockid_t unused, struct timespec *tp)
     return 0;
 }
 
+#if LWIP_VERSION_MAJOR == 1
+// hack for espressif time management included in patched lwIP-1.4
+#define sntp_real_timestamp sntp_get_current_timestamp()
+#endif
+
+#if LWIP_VERSION_MAJOR == 2
+// backport api
+bool sntp_set_timezone_in_seconds (int32_t timezone_sec)
+{
+    configTime(timezone_sec, 0, sntp_getservername(0), sntp_getservername(1), sntp_getservername(2));
+    return true;
+}
+#endif
+
 time_t time(time_t * t)
 {
-    time_t seconds = sntp_get_current_timestamp();
     if (t)
     {
-        *t = seconds;
+        *t = sntp_real_timestamp;
     }
-    return seconds;
+    return sntp_real_timestamp;
 }
 
 int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
@@ -100,7 +103,7 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     if (tp)
     {
         if (!timeshift64_is_set)
-            tune_timeshift64(sntp_get_current_timestamp() * 1000000ULL);
+            tune_timeshift64(sntp_real_timestamp * 1000000ULL);
         uint64_t currentTime_us = timeshift64 + micros64();
         tp->tv_sec = currentTime_us / 1000000ULL;
         tp->tv_usec = currentTime_us % 1000000ULL;
@@ -108,4 +111,38 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     return 0;
 }
 
-};
+}; // extern "C"
+
+void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
+{
+    char tzstr [64];
+
+    // There is no way to tell when DST starts or stop with this API
+    // So DST is always integrated in TZ
+    // The other API should be preferred
+
+    int tzs = daylightOffset_sec + timezone_sec;
+    int tzh = tzs / 3600;
+    tzs -= tzh * 3600;
+    int tzm = tzs / 60;
+    tzs -= tzm * 60;
+
+    // man tzset:
+    snprintf(tzstr, sizeof tzstr, "ESPUSER<%+d:%02d:%02d>", tzh, tzm, tzs);
+    return configTime(tzstr, server1, server2, server3);
+}
+
+void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
+{
+    sntp_stop();
+
+    setServer(0, server1);
+    setServer(1, server2);
+    setServer(2, server3);
+    char tzram[strlen_P(tz) + 1];
+    memcpy_P(tzram, tz, sizeof(tzram));
+    setenv("TZ", tzram, 1/*overwrite*/);
+    tzset();
+
+    sntp_init();
+}

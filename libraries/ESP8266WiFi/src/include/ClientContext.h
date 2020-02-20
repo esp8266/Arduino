@@ -36,16 +36,27 @@ bool getDefaultPrivateGlobalSyncValue ();
 class ClientContext
 {
 public:
-    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
+    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg, bool acceptNow = true) :
         _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
         _sync(::getDefaultPrivateGlobalSyncValue())
     {
-        tcp_setprio(pcb, TCP_PRIO_MIN);
-        tcp_arg(pcb, this);
-        tcp_recv(pcb, &_s_recv);
-        tcp_sent(pcb, &_s_acked);
-        tcp_err(pcb, &_s_error);
-        tcp_poll(pcb, &_s_poll, 1);
+        if (acceptNow)
+            acceptPCB();
+    }
+
+    tcp_pcb* getPCB ()
+    {
+        return _pcb;
+    }
+
+    void acceptPCB()
+    {
+        tcp_setprio(_pcb, TCP_PRIO_MIN);
+        tcp_arg(_pcb, this);
+        tcp_recv(_pcb, &_s_recv);
+        tcp_sent(_pcb, &_s_acked);
+        tcp_err(_pcb, &_s_error);
+        tcp_poll(_pcb, &_s_poll, 1);
 
         // keep-alive not enabled by default
         //keepAlive();
@@ -130,10 +141,10 @@ public:
         }
         _connect_pending = true;
         _op_start_time = millis();
-        // Following delay will be interrupted by connect callback
         for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _connected or _notify_error fires
         }
         _connect_pending = false;
         if (!_pcb) {
@@ -435,7 +446,7 @@ protected:
         if (_connect_pending || _send_waiting) {
             _send_waiting = false;
             _connect_pending = false;
-            esp_schedule(); // break current delay()
+            esp_schedule(); // break delay in connect or _write_from_source
         }
     }
 
@@ -461,10 +472,11 @@ protected:
             }
 
             _send_waiting = true;
-            // Following delay will be interrupted by on next received ack
             for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _write_some_from_cb or _notify_error fires
+
             }
             _send_waiting = false;
         } while(true);
@@ -536,7 +548,7 @@ protected:
     {
         if (_send_waiting) {
             _send_waiting = false;
-            esp_schedule(); // break current delay()
+            esp_schedule(); // break delay in _write_from_source
         }
     }
 
@@ -612,7 +624,7 @@ protected:
         assert(pcb == _pcb);
         if (_connect_pending) {
             _connect_pending = false;
-            esp_schedule(); // break current delay()
+            esp_schedule(); // break delay in connect
         }
         return ERR_OK;
     }

@@ -89,7 +89,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   String url = req.substring(addr_start + 1, addr_end);
   String versionEnd = req.substring(addr_end + 8);
   _currentVersion = atoi(versionEnd.c_str());
-  String searchStr = "";
+  String searchStr;
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
     searchStr = url.substring(hasSearch + 1);
@@ -144,7 +144,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req == "") break;//no moar headers
+      if (req.isEmpty()) break;//no moar headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -222,7 +222,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req == "") break;//no moar headers
+      if (req.isEmpty()) break;//no moar headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -238,7 +238,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
       DEBUG_OUTPUT.println(headerValue);
 #endif
 
-      if (headerName.equalsIgnoreCase("Host")){
+      if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
       }
     }
@@ -452,7 +452,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
               line = client.readStringUntil('\r');
               client.readStringUntil('\n');
               if (line.startsWith("--"+boundary)) break;
-              if (argValue.length() > 0) argValue += "\n";
+              if (argValue.length() > 0) argValue += '\n';
               argValue += line;
             }
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -600,7 +600,7 @@ readfile:
 template <typename ServerType>
 String ESP8266WebServerTemplate<ServerType>::urlDecode(const String& text)
 {
-  String decoded = "";
+  String decoded;
   char temp[] = "0x00";
   unsigned int len = text.length();
   unsigned int i = 0;

@@ -34,17 +34,11 @@ function print_size_info()
     elf_name=$(basename $elf_file)
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
+    xtensa-lx106-elf-size --format=sysv $elf_file | sed s/irom0.text/irom0text/g > size.txt
     declare -A segments
-    while read -a tokens; do
-        seg=${tokens[0]}
-        seg=${seg//./}
-        size=${tokens[1]}
-        addr=${tokens[2]}
-        if [ "$addr" -eq "$addr" -a "$addr" -ne "0" ] 2>/dev/null; then
-            segments[$seg]=$size
-        fi
-
-    done < <(xtensa-lx106-elf-size --format=sysv $elf_file | sed 's/\r//g' )
+    for seg in data rodata bss text irom0text; do
+        segments[$seg]=$(grep ^.$seg size.txt | awk '{sum += $2} END {print sum}')
+    done
 
     total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
     total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
@@ -153,19 +147,35 @@ function install_libraries()
 
 function install_ide()
 {
+    #local idever='nightly'
+    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
+
+    local idever='1.8.10'
+    local ideurl="https://downloads.arduino.cc/arduino-$idever"
+
+    echo "using Arduino IDE distribution ${idever}"
+
     local ide_path=$1
     local core_path=$2
     local debug=$3
     if [ "$WINDOWS" = "1" ]; then
-        # Acquire needed packages from Windows package manager
-        choco install --no-progress python3
-        export PATH="/c/Python37:$PATH"  # Ensure it's live from now on...
-        cp /c/Python37/python.exe /c/Python37/python3.exe
-        choco install --no-progress unzip
-        choco install --no-progress sed
-        #choco install --no-progress golang
-        test -r arduino-nightly-windows.zip || wget -nv -O arduino-nightly-windows.zip https://www.arduino.cc/download.php?f=/arduino-nightly-windows.zip
-        unzip -q arduino-nightly-windows.zip
+        mkdir /c/mybin
+        pushd /c/mybin
+            # Use Python.org to install python3 and make sure it is in path
+            wget -nv https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-win32.zip
+            unzip -q python-3.8.1-embed-win32.zip
+            cp "python.exe" "python3.exe"
+            wget -nv -O sed.exe https://github.com/mbuilov/sed-windows/raw/master/sed-4.8-x64.exe
+            #wget -nv https://fossies.org/windows/misc/unz600xn.exe
+            #unzip -q ./unz600xn.exe
+        popd
+        export PATH="c:\\mybin:$PATH"  # Ensure it's live from now on...
+        python3 --version
+        sed --version
+        awk --version
+        test -r arduino-windows.zip || wget -nv -O arduino-windows.zip "${ideurl}-windows.zip"
+        unzip -q arduino-windows.zip
+        mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
         wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
@@ -173,15 +183,17 @@ function install_ide()
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino.zip || wget -O arduino.zip https://downloads.arduino.cc/arduino-nightly-macosx.zip
-        unzip -q arduino.zip
-        mv Arduino.app arduino-nightly
-        mv arduino-nightly/Contents/Java/* arduino-nightly/.
+        test -r arduino-macos.zip || wget -O arduino-macos.zip "${ideurl}-macosx.zip"
+        unzip -q arduino-macos.zip
+        mv Arduino.app arduino-distrib
+        mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-        tar xf arduino.tar.xz
+        #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+        test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        tar xf arduino-linux.tar.xz
+        mv arduino-${idever} arduino-distrib
     fi
-    mv arduino-nightly $ide_path
+    mv arduino-distrib $ide_path
     cd $ide_path/hardware
     mkdir esp8266com
     cd esp8266com

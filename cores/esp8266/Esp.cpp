@@ -18,7 +18,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Arduino.h"
+#include "Esp.h"
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
@@ -26,6 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -36,6 +37,14 @@ extern struct rst_info resetInfo;
 
 //#define DEBUG_SERIAL Serial
 
+#ifndef PUYA_SUPPORT
+  #define PUYA_SUPPORT 1
+#endif
+#ifndef PUYA_BUFFER_SIZE
+  // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE (= 4k)
+  // Always use a multiple of flash page size (256 bytes)
+  #define PUYA_BUFFER_SIZE 256
+#endif
 
 /**
  * User-defined Literals
@@ -439,35 +448,57 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     return false;
 }
 
+bool EspClass::checkFlashCRC() {
+    // The CRC and total length are placed in extra space at the end of the 4K chunk
+    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
+    // we'll need to adjust this.
+    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
+    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4092)); // Start of PROGMEM plus 4K-4
+    uint32_t z[2];
+    z[0] = z[1] = 0;
+
+    // Start the checksum
+    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
+    // Pretend the 2 words of crc/len are zero to be idempotent
+    crc = crc32(z, 8, crc);
+    // Finish the CRC calculation over the rest of flash
+    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
+    return crc == flashcrc;
+}
+
+
 String EspClass::getResetReason(void) {
-    char buff[32];
-    if (resetInfo.reason == REASON_DEFAULT_RST) { // normal startup by power on
-      strcpy_P(buff, PSTR("Power on"));
-    } else if (resetInfo.reason == REASON_WDT_RST) { // hardware watch dog reset
-      strcpy_P(buff, PSTR("Hardware Watchdog"));
-    } else if (resetInfo.reason == REASON_EXCEPTION_RST) { // exception reset, GPIO status won’t change
-      strcpy_P(buff, PSTR("Exception"));
-    } else if (resetInfo.reason == REASON_SOFT_WDT_RST) { // software watch dog reset, GPIO status won’t change
-      strcpy_P(buff, PSTR("Software Watchdog"));
-    } else if (resetInfo.reason == REASON_SOFT_RESTART) { // software restart ,system_restart , GPIO status won’t change
-      strcpy_P(buff, PSTR("Software/System restart"));
-    } else if (resetInfo.reason == REASON_DEEP_SLEEP_AWAKE) { // wake up from deep-sleep
-      strcpy_P(buff, PSTR("Deep-Sleep Wake"));
-    } else if (resetInfo.reason == REASON_EXT_SYS_RST) { // external system reset
-      strcpy_P(buff, PSTR("External System"));
-    } else {
-      strcpy_P(buff, PSTR("Unknown"));
+    const __FlashStringHelper* buff;
+
+    switch(resetInfo.reason) {
+        // normal startup by power on
+        case REASON_DEFAULT_RST:      buff = F("Power On"); break;
+        // hardware watch dog reset
+        case REASON_WDT_RST:          buff = F("Hardware Watchdog"); break;
+        // exception reset, GPIO status won’t change
+        case REASON_EXCEPTION_RST:    buff = F("Exception"); break;
+        // software watch dog reset, GPIO status won’t change
+        case REASON_SOFT_WDT_RST:     buff = F("Software Watchdog"); break;
+        // software restart ,system_restart , GPIO status won’t change
+        case REASON_SOFT_RESTART:     buff = F("Software/System restart"); break;
+        // wake up from deep-sleep
+        case REASON_DEEP_SLEEP_AWAKE: buff = F("Deep-Sleep Wake"); break;
+        // // external system reset
+        case REASON_EXT_SYS_RST:      buff = F("External System"); break;
+        default:                      buff = F("Unknown"); break;
     }
     return String(buff);
 }
 
 String EspClass::getResetInfo(void) {
-    if(resetInfo.reason != 0) {
+    if (resetInfo.reason >= REASON_WDT_RST && resetInfo.reason <= REASON_SOFT_WDT_RST) {
         char buff[200];
-        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : resetInfo.reason == 6 ? "EXT_SYS_RST" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        sprintf_P(buff, PSTR("Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x"),
+            resetInfo.exccause, resetInfo.reason, getResetReason().c_str(),
+            resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
         return String(buff);
     }
-    return String("flag: 0");
+    return getResetReason();
 }
 
 struct rst_info * EspClass::getResetInfoPtr(void) {
@@ -494,7 +525,7 @@ uint32_t EspClass::getSketchSize() {
 
     image_header_t image_header;
     uint32_t pos = APP_START_OFFSET;
-    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header))) {
+    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)) != SPI_FLASH_RESULT_OK) {
         return 0;
     }
     pos += sizeof(image_header);
@@ -506,7 +537,7 @@ uint32_t EspClass::getSketchSize() {
         ++section_index)
     {
         section_header_t section_header = {0, 0};
-        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
+        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)) != SPI_FLASH_RESULT_OK) {
             return 0;
         }
         pos += sizeof(section_header);
@@ -577,26 +608,27 @@ bool EspClass::flashEraseSector(uint32_t sector) {
 }
 
 #if PUYA_SUPPORT
-static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
+static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
     if (data == nullptr) {
-      return 1; // SPI_FLASH_RESULT_ERR
+      return SPI_FLASH_RESULT_ERR;
     }
     // PUYA flash chips need to read existing data, update in memory and write modified data again.
     static uint32_t *flash_write_puya_buf = nullptr;
-    int rc = 0;
-    uint32_t* ptr = data;
 
     if (flash_write_puya_buf == nullptr) {
         flash_write_puya_buf = (uint32_t*) malloc(PUYA_BUFFER_SIZE);
         // No need to ever free this, since the flash chip will never change at runtime.
         if (flash_write_puya_buf == nullptr) {
             // Memory could not be allocated.
-            return 1; // SPI_FLASH_RESULT_ERR
+            return SPI_FLASH_RESULT_ERR;
         }
     }
+
+    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
+    uint32_t* ptr = data;
     size_t bytesLeft = size;
     uint32_t pos = offset;
-    while (bytesLeft > 0 && rc == 0) {
+    while (bytesLeft > 0 && rc == SPI_FLASH_RESULT_OK) {
         size_t bytesNow = bytesLeft;
         if (bytesNow > PUYA_BUFFER_SIZE) {
             bytesNow = PUYA_BUFFER_SIZE;
@@ -605,7 +637,7 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
             bytesLeft = 0;
         }
         rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
-        if (rc != 0) {
+        if (rc != SPI_FLASH_RESULT_OK) {
             return rc;
         }
         for (size_t i = 0; i < bytesNow / 4; ++i) {
@@ -620,7 +652,7 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
 #endif
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-    int rc = 0;
+    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
         rc = spi_flash_write_puya(offset, data, size);
@@ -630,12 +662,12 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     {
         rc = spi_flash_write(offset, data, size);
     }
-    return rc == 0;
+    return rc == SPI_FLASH_RESULT_OK;
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
-    int rc = spi_flash_read(offset, (uint32_t*) data, size);
-    return rc == 0;
+    auto rc = spi_flash_read(offset, (uint32_t*) data, size);
+    return rc == SPI_FLASH_RESULT_OK;
 }
 
 String EspClass::getSketchMD5()

@@ -317,6 +317,11 @@ SparkFun ESP8266 Thing Dev
 
 Product page: https://www.sparkfun.com/products/13711
 
+SparkFun Blynk Board
+--------------------
+
+Product page: https://www.sparkfun.com/products/13794
+
 SweetPea ESP-210
 ----------------
 
@@ -447,10 +452,32 @@ Initially designed for kids in mind, everybody should be able to use it. Yet it'
 
 More details at https://shop.makestro.com/product/espectrocore/
 
+
 Schirmilabs Eduino WiFi
 -----------------------
 
 Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module
 
 Product page: https://schirmilabs.de/?page_id=165
+=======
+ITEAD Sonoff
+------------
+
+ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, and Sonoff S20
+
+These are not development boards. The development process is inconvenient with these devices. When flashing firmware you will need a Serial Adapter to connect it to your computer.
+
+ | Most of these devices, during normal operation, are connected to *wall power (AKA Mains Electricity)*. **NEVER** try to flash these devices when connected to *wall power*. **ALWAYS** have them disconnected from *wall power* when connecting them to your computer. Your life may depend on it!
+
+When flashing you will need to hold down the push button connected to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB Serial Adapters may supply enough power to handle flashing; however, it many may not supply enough power to handle the activities when the device reboots.
+
+More product details at the bottom of https://www.itead.cc/wiki/Product/
+
+DOIT ESP-Mx DevKit (ESP8285)
+----------------------------
+
+DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module (`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 and is active low to turn on. It uses a CH340C, USB to Serial converter chip. 
+ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. 
+
+
 

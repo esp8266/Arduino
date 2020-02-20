@@ -48,6 +48,10 @@
 #include "user_interface.h"
 #include "uart_register.h"
 
+#define MODE2WIDTH(mode) (((mode%16)>>2)+5)
+#define MODE2STOP(mode) (((mode)>>5)+1)
+#define MODE2PARITY(mode) (mode%4)
+
 /*
   Some general architecture for GDB integration with the UART to enable
   serial debugging.
@@ -204,7 +208,14 @@ uart_read_char_unsafe(uart_t* uart)
     return -1;
 }
 
-size_t
+uint8_t
+uart_get_bit_length(const int uart_nr)
+{
+    // return bit length from uart mode, +1 for the start bit which is always there. 
+    return MODE2WIDTH(USC0(uart_nr)) + MODE2PARITY(USC0(uart_nr)) + MODE2STOP(USC0(uart_nr)) + 1;
+}
+
+size_t 
 uart_rx_available(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled)
@@ -566,7 +577,7 @@ uart_get_baudrate(uart_t* uart)
 }
 
 uart_t*
-uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
 {
     uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
     if(uart == NULL)
@@ -646,6 +657,10 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
     }
 
     uart_set_baudrate(uart, baudrate);
+    if(uart->uart_nr == UART0 && invert)
+    {
+        config |= BIT(UCDTRI) | BIT(UCRTSI) | BIT(UCTXI) | BIT(UCDSRI) | BIT(UCCTSI) | BIT(UCRXI);
+    }
     USC0(uart->uart_nr) = config;
 
     if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
@@ -899,8 +914,8 @@ void
 uart_set_debug(int uart_nr)
 {
     s_uart_debug_nr = uart_nr;
-    void (*func)(char) = NULL;
-    switch(s_uart_debug_nr)
+    fp_putc_t func = NULL;
+    switch(s_uart_debug_nr) 
     {
     case UART0:
         func = &uart0_write_char;
@@ -929,7 +944,7 @@ uart_set_debug(int uart_nr)
         } else {
             system_set_os_print(0);
         }
-        ets_install_putc1((void *) func);
+        ets_install_putc1(func);
     }
 }
 

@@ -113,7 +113,7 @@ extern "C" {
 struct uart_;
 typedef struct uart_ uart_t;
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size);
+uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert);
 void uart_uninit(uart_t* uart);
 
 void uart_swap(uart_t* uart, int tx_pin);
@@ -147,6 +147,7 @@ int uart_get_debug();
 void uart_start_detect_baudrate(int uart_nr);
 int uart_detect_baudrate(int uart_nr);
 
+uint8_t uart_get_bit_length(const int uart_nr);
 
 #if defined (__cplusplus)
 } // extern "C"

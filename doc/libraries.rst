@@ -113,6 +113,8 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getCycleCount()`` returns the cpu instruction cycle count since start as an unsigned 32-bit. This is useful for accurate timing of very short actions like bit banging.
 
+``ESP.checkFlashCRC()`` calculates the CRC of the program memory (not including any filesystems) and compares it to the one embedded in the image.  If this call returns ``false`` then the flash has been corrupted.  At that point, you may want to consider trying to send a MQTT message, to start a re-download of the application, blink a LED in an `SOS` pattern, etc.  However, since the flash is known corrupted at this point there is no guarantee the app will be able to perform any of these operations, so in safety critical deployments an immediate shutdown to a fail-safe mode may be indicated.
+
 ``ESP.getVcc()`` may be used to measure supply voltage. ESP needs to reconfigure the ADC at startup in order for this feature to be available. Add the following line to the top of your sketch to use ``getVcc``:
 
 .. code:: cpp

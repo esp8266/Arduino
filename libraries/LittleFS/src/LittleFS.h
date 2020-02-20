@@ -47,11 +47,8 @@ class LittleFSDirImpl;
 class LittleFSConfig : public FSConfig
 {
 public:
-    LittleFSConfig(bool autoFormat = true) {
-        _type = LittleFSConfig::fsid::FSId;
-        _autoFormat = autoFormat;
-    }
-    enum fsid { FSId = 0x4c495454 };
+    static constexpr uint32_t FSId = 0x4c495454;
+    LittleFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
 };
 
 class LittleFSImpl : public FSImpl
@@ -176,7 +173,7 @@ public:
     }
 
     bool setConfig(const FSConfig &cfg) override {
-        if ((cfg._type != LittleFSConfig::fsid::FSId) || _mounted) {
+        if ((cfg._type != LittleFSConfig::FSId) || _mounted) {
             return false;
         }
         _cfg = *static_cast<const LittleFSConfig *>(&cfg);
@@ -326,7 +323,7 @@ protected:
 class LittleFSFileImpl : public FileImpl
 {
 public:
-    LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd) : _fs(fs), _fd(fd), _opened(true) {
+    LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd, int flags) : _fs(fs), _fd(fd), _opened(true), _flags(flags) {
         _name = std::shared_ptr<char>(new char[strlen(name) + 1], std::default_delete<char[]>());
         strcpy(_name.get(), name);
     }
@@ -422,7 +419,25 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
+	    if (timeCallback && (_flags & LFS_O_WRONLY)) {
+                // Add metadata with last write time
+                time_t now = timeCallback();
+                int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
+                if (rc < 0) {
+                    DEBUGV("Unable to set time on '%s' to %d\n", _name.get(), now);
+               }
+            }
         }
+    }
+
+    time_t getLastWrite() override {
+        time_t ftime = 0;
+        if (_opened && _fd) {
+            int rc = lfs_getattr(_fs->getFS(), _name.get(), 't', (void *)&ftime, sizeof(ftime));
+            if (rc != sizeof(ftime))
+                ftime = 0; // Error, so clear read value
+        }
+        return ftime;
     }
 
     const char* name() const override {
@@ -468,6 +483,7 @@ protected:
     std::shared_ptr<lfs_file_t>  _fd;
     std::shared_ptr<char>        _name;
     bool                         _opened;
+    int                          _flags;
 };
 
 class LittleFSDirImpl : public DirImpl
@@ -520,6 +536,27 @@ public:
         return _dirent.size;
     }
 
+    time_t fileTime() override {
+        if (!_valid) {
+            return 0;
+        }
+        int nameLen = 3; // Slashes, terminator
+        nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
+        nameLen += strlen(_dirent.name);
+        char *tmpName = (char*)malloc(nameLen);
+        if (!tmpName) {
+            return 0;
+        }
+        snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
+        time_t ftime = 0;
+        int rc = lfs_getattr(_fs->getFS(), tmpName, 't', (void *)&ftime, sizeof(ftime));
+        if (rc != sizeof(ftime))
+            ftime = 0; // Error, so clear read value
+        free(tmpName);
+        return ftime;
+    }
+
+
     bool isFile() const override {
         return _valid && (_dirent.type == LFS_TYPE_REG);
     }
@@ -531,6 +568,10 @@ public:
     bool rewind() override {
         _valid = false;
         int rc = lfs_dir_rewind(_fs->getFS(), _getDir());
+        // Skip the . and .. entries
+        lfs_info dirent;
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
         return (rc == 0);
     }
 

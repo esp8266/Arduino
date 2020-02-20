@@ -62,6 +62,10 @@ static int s_user_reset_reason = REASON_DEFAULT_RST;
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
+#if defined(DEBUG_ESP_OOM)
+extern const char *umm_last_fail_alloc_file;
+extern int umm_last_fail_alloc_line;
+#endif
 
 static void raise_exception() __attribute__((noreturn));
 
@@ -85,7 +89,7 @@ static void ets_printf_P(const char *str, ...) {
     vsnprintf(destStr, sizeof(destStr), str, argPtr);
     va_end(argPtr);
     while (*c) {
-        ets_putc(*(c++));
+        ets_uart_putc1(*(c++));
     }
 }
 
@@ -108,8 +112,7 @@ void __wrap_system_restart_local() {
     else
         rst_info.reason = s_user_reset_reason;
 
-    // TODO:  ets_install_putc1 definition is wrong in ets_sys.h, need cast
-    ets_install_putc1((void *)&uart_write_char_d);
+    ets_install_putc1(&uart_write_char_d);
 
     if (s_panic_line) {
         ets_printf_P(PSTR("\nPanic %S:%d %S"), s_panic_file, s_panic_line, s_panic_func);
@@ -144,10 +147,10 @@ void __wrap_system_restart_local() {
     // (determined empirically, might break)
     uint32_t offset = 0;
     if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        offset = 0x1b0;
+        offset = 0x1a0;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        offset = 0x1a0;
+        offset = 0x190;
     }
     else if (rst_info.reason == REASON_WDT_RST) {
         offset = 0x10;
@@ -182,7 +185,13 @@ void __wrap_system_restart_local() {
 
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (umm_last_fail_alloc_addr) {
-      ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+#if defined(DEBUG_ESP_OOM)
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)@%S:%d\n"),
+            (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size,
+            umm_last_fail_alloc_file, umm_last_fail_alloc_line);
+#else
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+#endif
     }
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
