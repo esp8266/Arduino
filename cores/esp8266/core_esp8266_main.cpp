@@ -56,8 +56,8 @@ cont_t* g_pcont __attribute__((section(".noinit")));
 /* Event queue used by the main (arduino) task */
 static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 
-/* Used to implement __optimistic_yield */
-static uint32_t s_cycles_since_yield_start;
+/* Used to implement optimistic_yield */
+static uint32_t s_cycles_at_yield_start;
 
 /* For ets_intr_lock_nest / ets_intr_unlock_nest
  * Max nesting seen by SDK so far is 2.
@@ -96,7 +96,7 @@ extern "C" bool can_yield() {
 static inline void esp_yield_within_cont() __attribute__((always_inline));
 static void esp_yield_within_cont() {
         cont_yield(g_pcont);
-        s_cycles_since_yield_start = ESP.getCycleCount();
+        s_cycles_at_yield_start = ESP.getCycleCount();
         run_scheduled_recurrent_functions();
 }
 
@@ -129,9 +129,9 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 #if defined(F_CPU)
         clockCyclesPerMicrosecond();
 #else
-        getCpuFreqMHz();
+        ESP.getCpuFreqMHz();
 #endif
-    if ((ESP.getCycleCount() - s_cycles_since_yield_start) > intvl_cycles &&
+    if ((ESP.getCycleCount() - s_cycles_at_yield_start) > intvl_cycles &&
         can_yield())
     {
         yield();
@@ -188,7 +188,7 @@ static void loop_wrapper() {
 
 static void loop_task(os_event_t *events) {
     (void) events;
-    s_cycles_since_yield_start = ESP.getCycleCount();
+    s_cycles_at_yield_start = ESP.getCycleCount();
     cont_run(g_pcont, &loop_wrapper);
     if (cont_check(g_pcont) != 0) {
         panic();
