@@ -85,10 +85,11 @@ void Servo::detach()
 {
   if (_attached) {
     _servoMap &= ~(1 << _pin);
+    startWaveform(_pin, 0, REFRESH_INTERVAL, 1);
+    delay(REFRESH_INTERVAL / 1000); // long enough to complete active period under all circumstances.
     stopWaveform(_pin);
     _attached = false;
     _valueUs = DEFAULT_NEUTRAL_PULSE_WIDTH;
-    digitalWrite(_pin, LOW);
   }
 }
 
