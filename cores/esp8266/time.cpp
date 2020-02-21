@@ -78,7 +78,7 @@ int clock_gettime(clockid_t unused, struct timespec *tp)
 #define sntp_real_timestamp sntp_get_current_timestamp()
 #endif
 
-#if LWIP_VERSION_MAJOR == 2
+#if LWIP_VERSION_MAJOR != 1
 
 // backport Espressif api
 
@@ -90,7 +90,7 @@ bool sntp_set_timezone_in_seconds (int32_t timezone_sec)
 
 bool sntp_set_timezone(sint8 timezone_in_hours)
 {
-    return sntp_set_timezone_in_seconds(3600 * ((int)timezone));
+    return sntp_set_timezone_in_seconds(3600 * ((int)timezone_in_hours));
 }
 
 char* sntp_get_real_time(time_t t)
