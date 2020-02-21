@@ -22,7 +22,6 @@
 
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -41,7 +40,7 @@ char* ultoa(unsigned long value, char* result, int base) {
     return utoa((unsigned int)value, result, base);
 }
 
-static char * __dtostrf(double number, signed char width, unsigned char prec, char *s) {
+char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     bool negative = false;
 
     if (isnan(number)) {
@@ -116,20 +115,6 @@ static char * __dtostrf(double number, signed char width, unsigned char prec, ch
     // make sure the string is terminated
     *out = 0;
     return s;
-}
-
-// extern weak declaration (= function pointer) to check whether _printf_float is defined
-extern int _printf_float () __attribute__((__weak__));
-
-char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
-    if (!_printf_float) {
-        return __dtostrf(number, width, prec, s);
-    } else {
-        char fmt[32];
-        sprintf(fmt, "%%%d.%df", width, prec);
-        sprintf(s, fmt, number);
-        return s;
-    }
 }
 
 };
