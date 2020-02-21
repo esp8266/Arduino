@@ -111,14 +111,14 @@ uint32_t stack_thunk_get_max_usage()
 /* Print the stack from the first used 16-byte chunk to the top, decodable by the exception decoder */
 void stack_thunk_dump_stack()
 {
-  uint32_t *pos = stack_thunk_top;
-  while (pos < stack_thunk_ptr) {
+  uint32_t *pos = stack_thunk_ptr;
+  while (pos < stack_thunk_top) {
     if ((pos[0] != _stackPaint) || (pos[1] != _stackPaint) || (pos[2] != _stackPaint) || (pos[3] != _stackPaint))
       break;
     pos += 4;
   }
   ets_printf(">>>stack>>>\n");
-  while (pos < stack_thunk_ptr) {
+  while (pos < stack_thunk_top) {
     ets_printf("%08x:  %08x %08x %08x %08x\n", (int32_t)pos, pos[0], pos[1], pos[2], pos[3]);
     pos += 4;
   }
