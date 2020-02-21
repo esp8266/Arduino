@@ -296,6 +296,7 @@ public:
 
     void discard_received()
     {
+        DEBUGV(":dsrcv %d\n", _rx_buf? _rx_buf->tot_len: 0);
         if(!_rx_buf) {
             return;
         }
@@ -586,7 +587,7 @@ protected:
             // connection closed by peer
             DEBUGV(":rcl pb=%p sz=%d\r\n", _rx_buf, _rx_buf? _rx_buf->tot_len: -1);
             _notify_error();
-            if (_rx_buf)
+            if (_rx_buf && _rx_buf->tot_len)
             {
                 // there is still something to read
                 return ERR_OK;
