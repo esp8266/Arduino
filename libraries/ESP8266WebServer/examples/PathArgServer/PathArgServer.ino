@@ -17,7 +17,7 @@ const char *password = STAPSK;
 ESP8266WebServer server(80);
 
 void setup(void) {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
