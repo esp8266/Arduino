@@ -68,7 +68,7 @@ void UpdaterClass::_reset() {
 }
 
 bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
-#ifdef ERASE_CONFIG_H
+#if defined(ERASE_CONFIG_H) && !defined(HOST_MOCK)
   // Empty call so erase_config.cpp module to ensure it is built and linked in.
   enable_erase_config_at_link_time();
 #endif

@@ -52,12 +52,12 @@ size element in `flashchip` structure in ROM data, dRAM. This allows the flash
 erase to succeed.
 
 The original flash size is restored before starting the SDK. With the assumption
-that the  SDK will handle the size change properly. It should be noted that
-only changing the size value in the flashchip table, is equivalent to what the
-esptool.py is doing.
+that the SDK will handle the size change properly. Note that only changing the
+size value in the `flashchip` structure, is equivalent to what the esptool.py is
+doing.
 
 I also added an example/test sketch for exercising the feature. It is
-OTAEraseConfig.
+OTAEraseConfig. It also gathers some WiFi signal/connection statistics.
 
 */
 
@@ -110,7 +110,9 @@ void enable_erase_config_at_link_time(void) {
 extern "C" void Cache_Read_Enable_2(void);
 extern "C" void Cache_Read_Disable_2(void);
 
-int ICACHE_RAM_ATTR erase_sector(const uint32_t sector) {
+/* Cannot be made static. The compiler will inline into erase_config and lose
+   ICACHE_RAM_ATTR. Make name longer to be more unique */
+int ICACHE_RAM_ATTR erase_config__erase_sector(const uint32_t sector) {
     /*
        Toggle Flash execution off and on, around ROM flash function calls.
        The SDK APIs would have normally handled this operation; however,
@@ -137,7 +139,7 @@ bool IRAM_MAYBE erase_config(const uint32_t flash_erase_mask) {
 #elif (ERASE_CONFIG_METHOD == 2)
             if (0 != SPIEraseSector(sector)) {
 #elif (ERASE_CONFIG_METHOD == 3)
-            if (0 != erase_sector(sector)) {
+            if (0 != erase_config__erase_sector(sector)) {
 #endif
                 ETS_PRINTF("Erase sector 0x%04X failed!\n", sector);
                 return false;
@@ -403,6 +405,8 @@ void print_flashchip() {
 #define PRINT_FLASHCHIP() do{}while(false)
 #endif
 
+/* Cannot be made static, compiler will inline into erase_config_method3 and use
+   more IRAM. */
 void set_flashchip_and_check_erase_config(void) {
     /*
        We patch and restore chip_size here. It should be noted that the ROM APIs
