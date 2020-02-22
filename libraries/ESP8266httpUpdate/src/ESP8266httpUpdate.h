@@ -87,9 +87,9 @@ public:
         _followRedirects = follow;
     }
 
-    void severConnectionsOnUpdate(bool sever)
+    void closeConnectionsOnUpdate(bool sever)
     {
-        _severConnectionsOnUpdate = sever;
+        _closeConnectionsOnUpdate = sever;
     }
 
     void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
@@ -157,7 +157,7 @@ protected:
     }
     int _lastError;
     bool _rebootOnUpdate = true;
-    bool _severConnectionsOnUpdate = true;
+    bool _closeConnectionsOnUpdate = true;
 private:
     int _httpClientTimeout;
     bool _followRedirects;
