@@ -1,6 +1,5 @@
 SHELL := /bin/bash
 V ?= 0
-TEST_LIST ?= $(wildcard test_*/*.ino)
 ESP8266_CORE_PATH ?= $(realpath ../..)
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
@@ -12,13 +11,18 @@ UPLOAD_BAUD ?= 460800
 UPLOAD_BOARD ?= nodemcu
 BS_DIR ?= libraries/BSTest
 DEBUG_LEVEL ?= lvl=None____
-#FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,LwIPVariant=v2mss536,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
-FQBN ?= esp8266com:esp8266:generic:xtal=160,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=none,dbg=Serial,$(DEBUG_LEVEL)
+FQBN ?= esp8266com:esp8266:generic:xtal=160,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=nodemcu,dbg=Serial,$(DEBUG_LEVEL)
 BUILD_TOOL := $(ARDUINO_IDE_PATH)/arduino-builder
 TEST_CONFIG := test_env.cfg
 TEST_REPORT_XML := test_report.xml
 TEST_REPORT_HTML := test_report.html
 
+ifeq ("$(MOCK)", "1")
+# To enable a test for mock testing, just rename dir+files to '*_sw_*'
+TEST_LIST ?= $(wildcard test_sw_*/*.ino)
+else
+TEST_LIST ?= $(wildcard test_*/*.ino)
+endif
 
 ifneq ("$(V)","1")
 	SILENT = @
@@ -29,6 +33,17 @@ else
 	#UPLOAD_VERBOSE_FLAG = -v
 endif
 
+help:
+	@echo
+	@echo 'make list                    - show list of tests'
+	@echo 'make sometest/sometest.ino   - run one test'
+	@echo 'make all                     - run all tests'
+	@echo 'make MOCK=1 all              - run all emulation-on-host compatible tests'
+	@echo 'variables needed: $$ARDUINO_IDE_PATH $$ESP8266_CORE_PATH'
+	@echo 'make options: V=1 NO_BUILD=1 NO_UPLOAD=1 NO_RUN=1 MOCK=1'
+	@echo
+
+list: showtestlist
 
 all: count tests test_report
 
@@ -47,6 +62,18 @@ $(TEST_LIST):
 	@echo "--------------------------------"
 	@echo "Running test '$@' of $(words $(TEST_LIST)) tests"
 	$(SILENT)mkdir -p $(LOCAL_BUILD_DIR)
+ifeq ("$(MOCK)", "1")
+	@echo Compiling $(notdir $@)
+	(cd ../host; make ULIBDIRS=../device/libraries/BSTest ../device/$(@:%.ino=%))
+	$(SILENT)source $(BS_DIR)/virtualenv/bin/activate && \
+		$(PYTHON) $(BS_DIR)/runner.py \
+			$(RUNNER_DEBUG_FLAG) \
+			-e "$(ESP8266_CORE_PATH)/tests/host/bin/$(@:%.ino=%)" \
+			-n $(basename $(notdir $@)) \
+			-o $(LOCAL_BUILD_DIR)/test_result.xml \
+			--env-file $(TEST_CONFIG) \
+			`test -f $(addsuffix .py, $(basename $@)) && echo "-m $(addsuffix .py, $(basename $@))" || echo ""`
+else
 ifneq ("$(NO_BUILD)","1")
 	@test -n "$(ARDUINO_IDE_PATH)" || (echo "Please export ARDUINO_IDE_PATH" && exit 1)
 	@echo Compiling $(notdir $@)
@@ -101,6 +128,7 @@ ifneq ("$(NO_RUN)","1")
 			-o $(LOCAL_BUILD_DIR)/test_result.xml \
 			--env-file $(TEST_CONFIG) \
 			`test -f $(addsuffix .py, $(basename $@)) && echo "-m $(addsuffix .py, $(basename $@))" || echo ""`
+endif
 endif
 
 $(TEST_REPORT_XML): $(HARDWARE_DIR) virtualenv

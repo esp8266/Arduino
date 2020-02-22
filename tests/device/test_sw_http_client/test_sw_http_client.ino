@@ -210,6 +210,7 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
     //
     // Same tests with axTLS
     //
+#if !CORE_MOCK
     {
         // small request
 #pragma GCC diagnostic push
@@ -242,6 +243,7 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
             }
         }
     }
+#endif
 }
 
 void loop()

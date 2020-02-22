@@ -162,6 +162,10 @@ UMM_STATISTICS ummStats;
 
 // Keep complete call path in IRAM
 size_t umm_free_heap_size_lw( void ) {
+  if (umm_heap == NULL) {
+    umm_init();
+  }
+
   return (size_t)ummStats.free_blocks * sizeof(umm_block);
 }
 #endif
@@ -211,5 +215,3 @@ int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
 }
 
 #endif // BUILD_UMM_MALLOC_C
-
-

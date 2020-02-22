@@ -72,13 +72,21 @@ public:
     , _path(path)
     , _cache_header(cache_header)
     {
-        _isFile = fs.exists(path);
+        if (fs.exists(path)) {
+            File file = fs.open(path, "r");
+            _isFile = file && file.isFile();
+            file.close();
+        }
+        else {
+            _isFile = false;
+        }
+        
         DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
         _baseUriLength = _uri.length();
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
-        if (requestMethod != HTTP_GET)
+        if ((requestMethod != HTTP_GET) && (requestMethod != HTTP_HEAD))
             return false;
 
         if ((_isFile && requestUri != _uri) || !requestUri.startsWith(_uri))
@@ -98,13 +106,15 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) 
+            if (requestUri.endsWith("/"))
               requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
 
-            if (!_fs.exists(path) && path.endsWith(".htm") && _fs.exists(path + "l")) {
+            // If neither <blah> nor <blah>.gz exist, and <blah> is a file.htm, try it with file.html instead
+            // For the normal case this will give a search order of index.htm, index.htm.gz, index.html, index.html.gz
+            if (!_fs.exists(path) && !_fs.exists(path + ".gz") && path.endsWith(".htm")) {
                 path += "l";
             }
         }
@@ -127,7 +137,7 @@ public:
         if (_cache_header.length() != 0)
             server.sendHeader("Cache-Control", _cache_header);
 
-        server.streamFile(f, contentType);
+        server.streamFile(f, contentType, requestMethod);
         return true;
     }
 

@@ -417,6 +417,16 @@ public:
         return _size;
     }
 
+    time_t fileTime() override
+    {
+        if (!_valid) {
+            return 0;
+        }
+
+        return _time;
+    }
+
+
     bool isFile() const override
     {
         return _valid ? _isFile : false;
