@@ -5,6 +5,7 @@
 #include "RequestHandler.h"
 #include "mimetable.h"
 #include "WString.h"
+#include "Uri.h"
 
 using namespace mime;
 
@@ -12,22 +13,23 @@ template<typename ServerType>
 class FunctionRequestHandler : public RequestHandler<ServerType> {
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
 public:
-    FunctionRequestHandler(typename WebServerType::THandlerFunction fn, typename WebServerType::THandlerFunction ufn, const String &uri, HTTPMethod method)
+    FunctionRequestHandler(typename WebServerType::THandlerFunction fn, typename WebServerType::THandlerFunction ufn, const Uri &uri, HTTPMethod method)
     : _fn(fn)
     , _ufn(ufn)
-    , _uri(uri)
+    , _uri(uri.clone())
     , _method(method)
     {
+    }
+
+    ~FunctionRequestHandler() {
+        delete _uri;
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
-        if (requestUri != _uri)
-            return false;
-
-        return true;
+        return _uri->canHandle(requestUri, RequestHandler<ServerType>::pathArgs);
     }
 
     bool canUpload(String requestUri) override  {
@@ -56,7 +58,7 @@ public:
 protected:
     typename WebServerType::THandlerFunction _fn;
     typename WebServerType::THandlerFunction _ufn;
-    String _uri;
+    Uri *_uri;
     HTTPMethod _method;
 };
 
