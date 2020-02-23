@@ -80,7 +80,7 @@ public:
         else {
             _isFile = false;
         }
-        
+
         DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
         _baseUriLength = _uri.length();
     }
@@ -133,6 +133,11 @@ public:
         File f = _fs.open(path, "r");
         if (!f)
             return false;
+
+        if (!f.isFile()) {
+            f.close();
+            return false;
+        }
 
         if (_cache_header.length() != 0)
             server.sendHeader("Cache-Control", _cache_header);
