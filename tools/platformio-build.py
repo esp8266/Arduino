@@ -175,20 +175,25 @@ elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190313" in flatten_cppdefines:
         CPPDEFINES=[("NONOSDK22x_190313", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190313")]
     )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_cppdefines:
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191024" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("NONOSDK22x_190703", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190703")]
+        CPPDEFINES=[("NONOSDK22x_191024", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191024")]
     )
 elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191105" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("NONOSDK22x_191105", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191105")]
     )
-else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191024" in flatten_cppdefines:
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191122" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("NONOSDK22x_191024", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191024")]
+        CPPDEFINES=[("NONOSDK22x_191122", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191122")]
+    )
+else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x_190703", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190703")]
     )
 
 #
@@ -258,6 +263,9 @@ app_ld = env.Command(
         "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
+
+if not env.BoardConfig().get("build.ldscript", ""):
+    env.Replace(LDSCRIPT_PATH=env.BoardConfig().get("build.arduino.ldscript", "")) 
 
 #
 # Dynamic core_version.h for staging builds

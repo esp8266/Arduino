@@ -3,8 +3,8 @@
 # Wrapper for Arduino core / others that can call esptool.py possibly multiple times
 # Adds pyserial to sys.path automatically based on the path of the current file
 
-# First parameter is pyserial path, second is esptool path, then a series of command arguments separated with --end
-# i.e. upload.py tools/pyserial tools/esptool erase_flash --end write_flash file 0x0 --end
+# First parameter is pyserial path, second is esptool path, then a series of command arguments
+# i.e. upload.py tools/pyserial tools/esptool write_flash file 0x0
 
 import sys
 import os
@@ -22,6 +22,7 @@ except:
 
 cmdline = []
 write_option = ''
+write_addr = '0x0'
 erase_addr = ''
 erase_len = ''
 
@@ -38,28 +39,23 @@ while len(sys.argv):
     # https://github.com/esp8266/Arduino/issues/6755#issuecomment-553208688
     if thisarg == "erase_flash":
         write_option = '--erase-all'
-        thisarg = ''
-
-    if thisarg == 'erase_region':
+    elif thisarg == 'erase_region':
         erase_addr = sys.argv.pop(0)
         erase_len = sys.argv.pop(0)
-        thisarg = ''
-
-    if os.path.isfile(thisarg):
-        binary = thisarg
-        thisarg = ''
-
-    if len(thisarg):
+    elif thisarg == 'write_flash':
+        write_addr = sys.argv.pop(0)
+        binary = sys.argv.pop(0)
+    elif len(thisarg):
         cmdline = cmdline + [thisarg]
 
 cmdline = cmdline + ['write_flash']
 if len(write_option):
     cmdline = cmdline + [write_option]
-cmdline = cmdline + ['0x0', binary]
+cmdline = cmdline + [write_addr, binary]
 
 erase_file = ''
 if len(erase_addr):
-    # generate temporary empty (0xff) file
+    # Generate temporary empty (0xff) file
     eraser = tempfile.mkstemp()
     erase_file = eraser[1]
     os.write(eraser[0], bytearray([255] * int(erase_len, 0)))

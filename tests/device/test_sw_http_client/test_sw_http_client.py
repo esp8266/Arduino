@@ -37,7 +37,7 @@ def setup_http_get(e):
         return redirect("http://{}:8088/target".format(request.args['host']), code=302)
     @app.route("/redirect303", methods = ['POST'])
     def redirect303():
-        return redirect("http://{}:8088/target".format(request.data), code=303)
+        return redirect("http://{}:8088/target".format(request.data.decode()), code=303)
     @app.route("/redirect307")
     def redirect307():
         return redirect("http://{}:8088/target".format(request.args['host']), code=307)

@@ -47,14 +47,15 @@
 #endif
 
 /// note we use HTTP client errors too so we start at 100
-#define HTTP_UE_TOO_LESS_SPACE              (-100)
-#define HTTP_UE_SERVER_NOT_REPORT_SIZE      (-101)
-#define HTTP_UE_SERVER_FILE_NOT_FOUND       (-102)
-#define HTTP_UE_SERVER_FORBIDDEN            (-103)
-#define HTTP_UE_SERVER_WRONG_HTTP_CODE      (-104)
-#define HTTP_UE_SERVER_FAULTY_MD5           (-105)
-#define HTTP_UE_BIN_VERIFY_HEADER_FAILED    (-106)
-#define HTTP_UE_BIN_FOR_WRONG_FLASH         (-107)
+//TODO - in v3.0.0 make this an enum
+constexpr int HTTP_UE_TOO_LESS_SPACE            = (-100);
+constexpr int HTTP_UE_SERVER_NOT_REPORT_SIZE    = (-101);
+constexpr int HTTP_UE_SERVER_FILE_NOT_FOUND     = (-102);
+constexpr int HTTP_UE_SERVER_FORBIDDEN          = (-103);
+constexpr int HTTP_UE_SERVER_WRONG_HTTP_CODE    = (-104);
+constexpr int HTTP_UE_SERVER_FAULTY_MD5         = (-105);
+constexpr int HTTP_UE_BIN_VERIFY_HEADER_FAILED  = (-106);
+constexpr int HTTP_UE_BIN_FOR_WRONG_FLASH       = (-107);
 
 enum HTTPUpdateResult {
     HTTP_UPDATE_FAILED,
@@ -63,6 +64,11 @@ enum HTTPUpdateResult {
 };
 
 typedef HTTPUpdateResult t_httpUpdate_return; // backward compatibility
+
+using HTTPUpdateStartCB = std::function<void()>;
+using HTTPUpdateEndCB = std::function<void()>;
+using HTTPUpdateErrorCB = std::function<void(int)>;
+using HTTPUpdateProgressCB = std::function<void(int, int)>;
 
 class ESP8266HTTPUpdate
 {
@@ -79,6 +85,11 @@ public:
     void followRedirects(bool follow)
     {
         _followRedirects = follow;
+    }
+
+    void closeConnectionsOnUpdate(bool sever)
+    {
+        _closeConnectionsOnUpdate = sever;
     }
 
     void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
@@ -124,6 +135,11 @@ public:
 #endif
     t_httpUpdate_return updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion = "");
 
+    // Notification callbacks
+    void onStart(HTTPUpdateStartCB cbOnStart)          { _cbStart = cbOnStart; }
+    void onEnd(HTTPUpdateEndCB cbOnEnd)                { _cbEnd = cbOnEnd; }
+    void onError(HTTPUpdateErrorCB cbOnError)          { _cbError = cbOnError; }
+    void onProgress(HTTPUpdateProgressCB cbOnProgress) { _cbProgress = cbOnProgress; }
 
     int getLastError(void);
     String getLastErrorString(void);
@@ -132,11 +148,25 @@ protected:
     t_httpUpdate_return handleUpdate(HTTPClient& http, const String& currentVersion, bool spiffs = false);
     bool runUpdate(Stream& in, uint32_t size, const String& md5, int command = U_FLASH);
 
+    // Set the error and potentially use a CB to notify the application
+    void _setLastError(int err) {
+        _lastError = err;
+        if (_cbError) {
+            _cbError(err);
+        }
+    }
     int _lastError;
     bool _rebootOnUpdate = true;
+    bool _closeConnectionsOnUpdate = true;
 private:
     int _httpClientTimeout;
     bool _followRedirects;
+
+    // Callbacks
+    HTTPUpdateStartCB    _cbStart;
+    HTTPUpdateEndCB      _cbEnd;
+    HTTPUpdateErrorCB    _cbError;
+    HTTPUpdateProgressCB _cbProgress;
 
     int _ledPin;
     uint8_t _ledOn;

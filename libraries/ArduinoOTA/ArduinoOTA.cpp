@@ -168,7 +168,7 @@ int ArduinoOTAClass::parseInt(){
 }
 
 String ArduinoOTAClass::readStringUntil(char end){
-  String res = "";
+  String res;
   int value;
   while(true){
     value = _udp_ota->read();
@@ -303,7 +303,7 @@ void ArduinoOTAClass::_runUpdate() {
   client.setNoDelay(true);
 
   uint32_t written, total = 0;
-  while (!Update.isFinished() && client.connected()) {
+  while (!Update.isFinished() && (client.connected() || client.available())) {
     int waited = 1000;
     while (!client.available() && waited--)
       delay(1);

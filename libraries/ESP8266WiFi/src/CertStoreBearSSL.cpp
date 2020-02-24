@@ -82,6 +82,10 @@ int CertStore::initCertStore(FS &fs, const char *indexFileName, const char *data
 
   _fs = &fs;
 
+  // In case initCertStore called multiple times, don't leak old filenames
+  free(_indexName);
+  free(_dataName);
+
   // No strdup_P, so manually do it
   _indexName = (char *)malloc(strlen_P(indexFileName) + 1);
   _dataName = (char *)malloc(strlen_P(dataFileName) + 1);

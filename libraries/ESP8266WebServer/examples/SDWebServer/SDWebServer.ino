@@ -209,7 +209,7 @@ void printDirectory() {
     return returnFail("BAD PATH");
   }
   File dir = SD.open((char *)path.c_str());
-  path = String();
+  path.clear();
   if (!dir.isDirectory()) {
     dir.close();
     return returnFail("NOT DIR");
@@ -241,6 +241,7 @@ void printDirectory() {
     entry.close();
   }
   server.sendContent("]");
+  server.sendContent(""); // Terminate the HTTP chunked transmission with a 0-length chunk
   dir.close();
 }
 

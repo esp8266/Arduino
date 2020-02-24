@@ -53,9 +53,12 @@ void listDir(const char * dirname) {
     Serial.print(root.fileName());
     Serial.print("  SIZE: ");
     Serial.print(file.size());
-    time_t t = file.getLastWrite();
-    struct tm * tmstruct = localtime(&t);
+    time_t cr = file.getCreationTime();
+    time_t lw = file.getLastWrite();
     file.close();
+    struct tm * tmstruct = localtime(&cr);
+    Serial.printf("    CREATION: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
+    tmstruct = localtime(&lw);
     Serial.printf("  LAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
   }
 }
@@ -90,6 +93,7 @@ void writeFile(const char * path, const char * message) {
   } else {
     Serial.println("Write failed");
   }
+  delay(2000); // Make sure the CREATE and LASTWRITE times are different
   file.close();
 }
 
@@ -152,21 +156,25 @@ void setup() {
   getLocalTime(&tmstruct, 5000);
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
-
-  Serial.printf("Formatting LittleFS filesystem\n");
+  Serial.println("Formatting LittleFS filesystem");
   LittleFS.format();
+  Serial.println("Mount LittleFS");
+  if (!LittleFS.begin()) {
+    Serial.println("LittleFS mount failed");
+    return;
+  }
   listDir("/");
   deleteFile("/hello.txt");
   writeFile("/hello.txt", "Hello ");
   appendFile("/hello.txt", "World!\n");
   listDir("/");
 
-  Serial.printf("The timestamp should be valid above\n");
+  Serial.println("The timestamp should be valid above");
 
-  Serial.printf("Now unmount and remount and perform the same operation.\n");
-  Serial.printf("Timestamp should be valid, data should be good.\n");
+  Serial.println("Now unmount and remount and perform the same operation.");
+  Serial.println("Timestamp should be valid, data should be good.");
   LittleFS.end();
-  Serial.printf("Now mount it\n");
+  Serial.println("Now mount it");
   if (!LittleFS.begin()) {
     Serial.println("LittleFS mount failed");
     return;
