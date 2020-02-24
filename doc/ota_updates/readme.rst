@@ -61,7 +61,7 @@ As shown below, the signed hash is appended to the unsigned binary, followed by 
 
 .. code:: bash
 
-    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
+    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS>
 
 Signed Binary Prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -123,7 +123,7 @@ Compile the sketch normally and, once a `.bin` file is available, sign it using 
 
 .. code:: bash
 
-    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
+    <ESP8266ArduinoPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
 
 Old And New Signature Formats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -134,7 +134,34 @@ To create a legacy signature, call the signing script with --legacy:
 
 .. code:: bash
 
-    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+    <ESP8266ArduinoPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary> --legacy <path-to-legacy-file>
+
+
+Compression
+-----------
+
+The eboot bootloader incorporates a GZIP decompressor, built for very low code requirements.  For applications, this optional decompression is completely transparent.  For uploading compressed filesystems, the application must be built with `ATOMIC_FS_UPDATE` defined because, otherwise, eboot will not be involved in writing the filesystem.
+
+No changes to the application are required.  The `Updater` class and `eboot` bootloader (which performs actual application overwriting on update) automatically search for the `gzip` header in the uploaded binary, and if found, handle it.
+
+Compress an application `.bin` file or filesystem package using any `gzip` available, at any desired compression level (`gzip -9` is recommended because it provides the maximum compression and uncompresses as fast as any other compressino level).  For example:
+
+.. code:: bash
+
+    gzip -9 sketch.bin  # Maximum compression, output sketch.bin.gz
+    <Upload the resultant sketch.bin.gz>
+
+If signing is desired, sign the gzip compressed file *after* compression.
+
+.. code:: bash
+
+    gzip -9 sketch.bin
+    <ESP8266ArduinoPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin sketch.bin.gz --out sketch.bin.gz.signed
+
+Updating apps in the field to support compression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have applications deployed in the field and wish to update them to support compressed OTA uploads, you will need to first recompile the application, then _upload the uncompressed `.bin` file once_.  Attempting to upload a `gzip` compressed binary to a legacy app will result in the Updater rejecting the upload as it does not understand the `gzip` format.  After this initial upload, which will include the new bootloader and `Updater` class with compression support, compressed updates can then be used.
 
 
 Safety
@@ -173,11 +200,11 @@ The following chapters provide more details and specific methods for OTA updates
 Arduino IDE
 -----------
 
-Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios: 
+Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios:
 
--  during firmware development as a quicker alternative to loading over a serial port, 
+-  during firmware development as a quicker alternative to loading over a serial port,
 
--  for updating a small number of modules, 
+-  for updating a small number of modules,
 
 -  only if modules are accessible on the same network as the computer with the Arduino IDE.
 
@@ -482,6 +509,11 @@ HTTP Server
 -----------
 
 ``ESPhttpUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
+
+Note that by default this class closes all other connections except the one used by the update, this is because the update method blocks. This means that if there's another application receiving data then TCP packets will build up in the buffer leading to out of memory errors causing the OTA update to fail. There's also a limited number of receive buffers available and all may be used up by other applications.
+
+There are some cases where you know that you won't be receiving any data but would still like to send progress updates.
+It's possible to disable the default behaviour (and keep connections open) by calling closeConnectionsOnUpdate(false).
 
 Requirements
 ~~~~~~~~~~~~

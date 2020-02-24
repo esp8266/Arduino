@@ -104,12 +104,14 @@ extern "C" {
 #endif
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
+#define ets_vsnprintf vsnprintf
 
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern const char* host_interface; // cmdline parameter
 extern bool serial_timestamp;
 extern int mock_port_shifter;
+extern bool blocking_uart;
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to

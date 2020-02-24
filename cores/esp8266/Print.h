@@ -26,6 +26,8 @@
 #include "WString.h"
 #include "Printable.h"
 
+#include "stdlib_noniso.h"
+
 #define DEC 10
 #define HEX 16
 #define OCT 8

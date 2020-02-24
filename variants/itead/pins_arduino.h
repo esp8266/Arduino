@@ -26,17 +26,17 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#if defined(ARDUINO_SONOFF_SV)
+#if defined(ARDUINO_ESP8266_SONOFF_SV)
 #define PIN_WIRE_SCL (5)
 static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 
-#if defined(ARDUINO_SONOFF_TH) || defined(ARDUINO_SONOFF_BASIC)
+#if defined(ARDUINO_ESP8266_SONOFF_TH) || defined(ARDUINO_ESP8266_SONOFF_BASIC)
 #define PIN_WIRE_SCL (14)
 static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 
-#if defined(ARDUINO_SONOFF_TH) || defined(ARDUINO_SONOFF_SV)
+#if defined(ARDUINO_ESP8266_SONOFF_TH) || defined(ARDUINO_ESP8266_SONOFF_SV)
 #define PIN_WIRE_SDA (4)
 static const uint8_t SDA = PIN_WIRE_SDA;
 #endif
