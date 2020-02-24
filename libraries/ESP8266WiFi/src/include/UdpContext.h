@@ -239,7 +239,9 @@ public:
 
         auto deleteme = _rx_buf;
 
-        while(_rx_buf->len != _rx_buf->tot_len) _rx_buf = _rx_buf->next;
+        while(_rx_buf->len != _rx_buf->tot_len)
+            _rx_buf = _rx_buf->next;
+
         _rx_buf = _rx_buf->next;
 
         if (_rx_buf)
@@ -294,9 +296,11 @@ public:
         DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
 
         void* buf = pbuf_get_contiguous(_rx_buf, dst, size, size, _rx_buf_offset);
-        if(!buf) return 0;
+        if(!buf)
+            return 0;
 
-        if(buf != dst) memcpy(dst, buf, size);
+        if(buf != dst)
+            memcpy(dst, buf, size);
 
         _consume(size);
 
@@ -538,17 +542,17 @@ private:
     pbuf_skip_const(const struct pbuf *in, u16_t in_offset, u16_t *out_offset)
     {
       u16_t offset_left = in_offset;
-      const struct pbuf *q = in;
+      const struct pbuf *pbuf_it = in;
 
       /* get the correct pbuf */
-      while ((q != NULL) && (q->len <= offset_left)) {
-        offset_left = (u16_t)(offset_left - q->len);
-        q = q->next;
+      while ((pbuf_it != NULL) && (pbuf_it->len <= offset_left)) {
+        offset_left = (u16_t)(offset_left - pbuf_it->len);
+        pbuf_it = pbuf_it->next;
       }
       if (out_offset != NULL) {
         *out_offset = offset_left;
       }
-      return q;
+      return pbuf_it;
     }
 
     u16_t

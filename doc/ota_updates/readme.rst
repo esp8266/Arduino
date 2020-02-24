@@ -61,7 +61,7 @@ As shown below, the signed hash is appended to the unsigned binary, followed by 
 
 .. code:: bash
 
-    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
+    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS>
 
 Signed Binary Prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -200,11 +200,11 @@ The following chapters provide more details and specific methods for OTA updates
 Arduino IDE
 -----------
 
-Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios: 
+Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios:
 
--  during firmware development as a quicker alternative to loading over a serial port, 
+-  during firmware development as a quicker alternative to loading over a serial port,
 
--  for updating a small number of modules, 
+-  for updating a small number of modules,
 
 -  only if modules are accessible on the same network as the computer with the Arduino IDE.
 
@@ -509,6 +509,11 @@ HTTP Server
 -----------
 
 ``ESPhttpUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
+
+Note that by default this class closes all other connections except the one used by the update, this is because the update method blocks. This means that if there's another application receiving data then TCP packets will build up in the buffer leading to out of memory errors causing the OTA update to fail. There's also a limited number of receive buffers available and all may be used up by other applications.
+
+There are some cases where you know that you won't be receiving any data but would still like to send progress updates.
+It's possible to disable the default behaviour (and keep connections open) by calling closeConnectionsOnUpdate(false).
 
 Requirements
 ~~~~~~~~~~~~

@@ -264,17 +264,17 @@ void ESP8266WebServerTemplate<ServerType>::requestAuthentication(HTTPAuthMethod 
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::on(const String &uri, ESP8266WebServerTemplate<ServerType>::THandlerFunction handler) {
+void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, ESP8266WebServerTemplate<ServerType>::THandlerFunction handler) {
   on(uri, HTTP_ANY, handler);
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::on(const String &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn) {
+void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn) {
   on(uri, method, fn, _fileUploadHandler);
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::on(const String &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn, ESP8266WebServerTemplate<ServerType>::THandlerFunction ufn) {
+void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn, ESP8266WebServerTemplate<ServerType>::THandlerFunction ufn) {
   _addRequestHandler(new FunctionRequestHandler<ServerType>(fn, ufn, uri, method));
 }
 
@@ -576,6 +576,12 @@ void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize
   send(200, contentType, emptyString);
 }
 
+template <typename ServerType>
+const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) const { 
+  if (_currentHandler != nullptr)
+    return _currentHandler->pathArg(i);
+  return emptyString;
+}
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) const {
