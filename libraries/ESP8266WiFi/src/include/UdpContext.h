@@ -207,7 +207,7 @@ public:
         if (!_rx_buf)
             return 0;
 
-        return _rx_buf->len - _rx_buf_offset;
+        return _rx_buf->tot_len - _rx_buf_offset;
     }
 
     size_t tell() const
@@ -222,7 +222,7 @@ public:
     }
 
     bool isValidOffset(const size_t pos) const {
-        return (pos <= _rx_buf->len);
+        return (pos <= _rx_buf->tot_len);
     }
 
     netif* getInputNetif() const
@@ -263,6 +263,10 @@ public:
         }
 
         auto deleteme = _rx_buf;
+
+        while(_rx_buf->len != _rx_buf->tot_len)
+            _rx_buf = _rx_buf->next;
+
         _rx_buf = _rx_buf->next;
 
         if (_rx_buf)
@@ -298,10 +302,10 @@ public:
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf->tot_len)
             return -1;
 
-        char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        char c = pbuf_get_at(_rx_buf, _rx_buf_offset);
         _consume(1);
         return c;
     }
@@ -311,11 +315,17 @@ public:
         if (!_rx_buf)
             return 0;
 
-        size_t max_size = _rx_buf->len - _rx_buf_offset;
+        size_t max_size = _rx_buf->tot_len - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
-        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->len, _rx_buf_offset);
+        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
 
-        memcpy(dst, reinterpret_cast<char*>(_rx_buf->payload) + _rx_buf_offset, size);
+        void* buf = pbuf_get_contiguous(_rx_buf, dst, size, size, _rx_buf_offset);
+        if(!buf)
+            return 0;
+
+        if(buf != dst)
+            memcpy(dst, buf, size);
+
         _consume(size);
 
         return size;
@@ -323,10 +333,10 @@ public:
 
     int peek() const
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset == _rx_buf->tot_len)
             return -1;
 
-        return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        return pbuf_get_at(_rx_buf, _rx_buf_offset);
     }
 
     void flush()
@@ -335,7 +345,7 @@ public:
         if (!_rx_buf)
             return;
 
-        _consume(_rx_buf->len - _rx_buf_offset);
+        _consume(_rx_buf->tot_len - _rx_buf_offset);
     }
 
     size_t append(const char* data, size_t size)
@@ -456,8 +466,8 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
-        if (_rx_buf_offset > _rx_buf->len) {
-            _rx_buf_offset = _rx_buf->len;
+        if (_rx_buf_offset > _rx_buf->tot_len) {
+            _rx_buf_offset = _rx_buf->tot_len;
         }
     }
 
@@ -548,6 +558,90 @@ private:
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, srcaddr, srcport);
     }
+
+#if LWIP_VERSION_MAJOR == 1
+    /*
+     * Code in this conditional block is copied/backported verbatim from
+     * LwIP 2.1.2 to provide pbuf_get_contiguous.
+     */
+
+    static const struct pbuf *
+    pbuf_skip_const(const struct pbuf *in, u16_t in_offset, u16_t *out_offset)
+    {
+      u16_t offset_left = in_offset;
+      const struct pbuf *pbuf_it = in;
+
+      /* get the correct pbuf */
+      while ((pbuf_it != NULL) && (pbuf_it->len <= offset_left)) {
+        offset_left = (u16_t)(offset_left - pbuf_it->len);
+        pbuf_it = pbuf_it->next;
+      }
+      if (out_offset != NULL) {
+        *out_offset = offset_left;
+      }
+      return pbuf_it;
+    }
+
+    u16_t
+    pbuf_copy_partial(const struct pbuf *buf, void *dataptr, u16_t len, u16_t offset)
+    {
+      const struct pbuf *p;
+      u16_t left = 0;
+      u16_t buf_copy_len;
+      u16_t copied_total = 0;
+
+      LWIP_ERROR("pbuf_copy_partial: invalid buf", (buf != NULL), return 0;);
+      LWIP_ERROR("pbuf_copy_partial: invalid dataptr", (dataptr != NULL), return 0;);
+
+      /* Note some systems use byte copy if dataptr or one of the pbuf payload pointers are unaligned. */
+      for (p = buf; len != 0 && p != NULL; p = p->next) {
+        if ((offset != 0) && (offset >= p->len)) {
+          /* don't copy from this buffer -> on to the next */
+          offset = (u16_t)(offset - p->len);
+        } else {
+          /* copy from this buffer. maybe only partially. */
+          buf_copy_len = (u16_t)(p->len - offset);
+          if (buf_copy_len > len) {
+            buf_copy_len = len;
+          }
+          /* copy the necessary parts of the buffer */
+          MEMCPY(&((char *)dataptr)[left], &((char *)p->payload)[offset], buf_copy_len);
+          copied_total = (u16_t)(copied_total + buf_copy_len);
+          left = (u16_t)(left + buf_copy_len);
+          len = (u16_t)(len - buf_copy_len);
+          offset = 0;
+        }
+      }
+      return copied_total;
+    }
+
+    void *
+    pbuf_get_contiguous(const struct pbuf *p, void *buffer, size_t bufsize, u16_t len, u16_t offset)
+    {
+      const struct pbuf *q;
+      u16_t out_offset;
+
+      LWIP_ERROR("pbuf_get_contiguous: invalid buf", (p != NULL), return NULL;);
+      LWIP_ERROR("pbuf_get_contiguous: invalid dataptr", (buffer != NULL), return NULL;);
+      LWIP_ERROR("pbuf_get_contiguous: invalid dataptr", (bufsize >= len), return NULL;);
+
+      q = pbuf_skip_const(p, offset, &out_offset);
+      if (q != NULL) {
+        if (q->len >= (out_offset + len)) {
+          /* all data in this pbuf, return zero-copy */
+          return (u8_t *)q->payload + out_offset;
+        }
+        /* need to copy */
+        if (pbuf_copy_partial(q, buffer, len, out_offset) != len) {
+          /* copying failed: pbuf is too short */
+          return NULL;
+        }
+        return buffer;
+      }
+      /* pbuf is too short (offset does not fit in) */
+      return NULL;
+    }
+#endif
 
 private:
     udp_pcb* _pcb;

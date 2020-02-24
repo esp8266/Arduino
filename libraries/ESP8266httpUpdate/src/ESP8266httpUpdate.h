@@ -87,6 +87,11 @@ public:
         _followRedirects = follow;
     }
 
+    void closeConnectionsOnUpdate(bool sever)
+    {
+        _closeConnectionsOnUpdate = sever;
+    }
+
     void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
     {
         _ledPin = ledPin;
@@ -146,12 +151,13 @@ protected:
     // Set the error and potentially use a CB to notify the application
     void _setLastError(int err) {
         _lastError = err;
-	if (_cbError) {
+        if (_cbError) {
             _cbError(err);
         }
     }
     int _lastError;
     bool _rebootOnUpdate = true;
+    bool _closeConnectionsOnUpdate = true;
 private:
     int _httpClientTimeout;
     bool _followRedirects;
