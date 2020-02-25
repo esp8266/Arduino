@@ -1666,12 +1666,13 @@ namespace delegate
             using detail::DelegatePImpl<A, R, P...>::DelegatePImpl;
             using detail::DelegatePImpl<A, R, P...>::operator=;
             using detail::DelegatePImpl<A, R, P...>::operator bool;
-            using detail::DelegatePImpl<A, R, P...>::operator FunVPPtr;
             using detail::DelegatePImpl<A, R, P...>::arg;
-#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using detail::DelegatePImpl<A, R, P...>::operator FunctionType;
-#endif
             using detail::DelegatePImpl<A, R, P...>::operator();
+
+            operator FunVPPtr() { return detail::DelegatePImpl<A, R, P...>::operator FunVPPtr(); }
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            operator FunctionType() { return detail::DelegatePImpl<A, R, P...>::operator FunctionType(); }
+#endif
         };
 
         template<typename R, typename A, typename... P>
@@ -1687,10 +1688,8 @@ namespace delegate
             using detail::DelegatePImpl<A*, R, P...>::DelegatePImpl;
             using detail::DelegatePImpl<A*, R, P...>::operator=;
             using detail::DelegatePImpl<A*, R, P...>::operator bool;
-#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using detail::DelegatePImpl<A*, R, P...>::operator FunctionType;
-#endif
             using detail::DelegatePImpl<A*, R, P...>::operator();
+
             operator FunVPPtr() const
             {
                 if (detail::DelegatePImpl<A*, R, P...>::FPA == detail::DelegatePImpl<A*, R, P...>::kind)
@@ -1702,6 +1701,9 @@ namespace delegate
                     return detail::DelegatePImpl<A*, R, P...>::operator FunVPPtr();
                 }
             }
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            operator FunctionType() { return detail::DelegatePImpl<A*, R, P...>::operator FunctionType(); }
+#endif
             void* arg() const
             {
                 if (detail::DelegatePImpl<A*, R, P...>::FPA == detail::DelegatePImpl<A*, R, P...>::kind)
@@ -1728,12 +1730,13 @@ namespace delegate
             using detail::DelegateImpl<A, R>::DelegateImpl;
             using detail::DelegateImpl<A, R>::operator=;
             using detail::DelegateImpl<A, R>::operator bool;
-            using detail::DelegateImpl<A, R>::operator FunVPPtr;
             using detail::DelegateImpl<A, R>::arg;
-#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using detail::DelegateImpl<A, R>::operator FunctionType;
-#endif
             using detail::DelegateImpl<A, R>::operator();
+
+            operator FunVPPtr() { return detail::DelegateImpl<A, R>::operator FunVPPtr(); }
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            operator FunctionType() { return detail::DelegateImpl<A, R>::operator FunctionType(); }
+#endif
         };
 
         template<typename R, typename A>
@@ -1749,10 +1752,8 @@ namespace delegate
             using detail::DelegateImpl<A*, R>::DelegateImpl;
             using detail::DelegateImpl<A*, R>::operator=;
             using detail::DelegateImpl<A*, R>::operator bool;
-#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using detail::DelegateImpl<A*, R>::operator FunctionType;
-#endif
             using detail::DelegateImpl<A*, R>::operator();
+
             operator FunVPPtr() const
             {
                 if (detail::DelegateImpl<A*, R>::FPA == detail::DelegateImpl<A*, R>::kind)
@@ -1764,6 +1765,9 @@ namespace delegate
                     return detail::DelegateImpl<A*, R>::operator FunVPPtr();
                 }
             }
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            operator FunctionType() { return detail::DelegateImpl<A*, R>::operator FunctionType(); }
+#endif
             void* arg() const
             {
                 if (detail::DelegateImpl<A*, R>::FPA == detail::DelegateImpl<A*, R>::kind)
