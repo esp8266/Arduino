@@ -137,9 +137,8 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     // So DST is always integrated in TZ
     // The other API should be preferred
 
-#if 0
-
-    // using posix API (calls sprintf here, sscanf internally)
+    /*** portable version using posix API
+         (calls sprintf here, then sscanf internally)
 
     int tzs = daylightOffset_sec + timezone_sec;
     int tzh = tzs / 3600;
@@ -152,14 +151,14 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     snprintf(tzstr, sizeof tzstr, "ESPUSER<%+d:%02d:%02d>", tzh, tzm, tzs);
     return configTime(tzstr, server1, server2, server3);
 
-#else
+    Replaced by light code found from
+    newlib inspection and internal structure hacking
+    (no sprintf, no sscanf, -7584 flash bytes):
 
-    // newlib inspection and internal structure hacking
-    // no sprintf, no sscanf, -7584 flash bytes
+    ***/
 
     static char gmt[] = "GMT";
 
-    // newlib inspection and hack
     _timezone = timezone_sec + daylightOffset_sec;
     _daylight = 0;
     _tzname[0] = gmt;
@@ -184,7 +183,7 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     setServer(1, server2);
     setServer(2, server3);
 
-#endif
+    /*** end of posix replacement ***/
 }
 
 void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
