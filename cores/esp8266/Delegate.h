@@ -1789,11 +1789,13 @@ template<typename R, typename A, typename... P> class Delegate<R(P...), A> : pub
 {
 public:
     using delegate::detail::Delegate<R, A, P...>::Delegate;
+    using delegate::detail::Delegate<R, A, P...>::operator=;
 };
 template<typename R, typename... P> class Delegate<R(P...)> : public delegate::detail::Delegate<R, void, P...>
 {
 public:
     using delegate::detail::Delegate<R, void, P...>::Delegate;
+    using delegate::detail::Delegate<R, void, P...>::operator=;
 };
 
 #endif // __Delegate_h
