@@ -168,7 +168,7 @@ int ArduinoOTAClass::parseInt(){
 }
 
 String ArduinoOTAClass::readStringUntil(char end){
-  String res = "";
+  String res;
   int value;
   while(true){
     value = _udp_ota->read();

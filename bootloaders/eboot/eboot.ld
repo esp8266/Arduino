@@ -154,12 +154,24 @@ SECTIONS
     *(.gnu.linkonce.b.*)
     . = ALIGN (8);
     _bss_end = ABSOLUTE(.);
-    /* CRC stored in last 8 bytes */
-    ASSERT((. < 4096 - 8), "Error: No space for CRC in bootloader sector.");
-    . = _stext + 4096 - 8;
-    _crc_size = .;
-    . = . + 4;
-    _crc_val = .;
+    _free_space = 4096 - 17 - (. - _stext);
+/*
+The boot loader checksum must be before the CRC, which is written by elf2bin.py.
+This leaves 16 bytes after the checksum for the CRC placed at the end of the
+4096-byte sector. */
+    _cs_here = (ALIGN((. + 1), 16) == ALIGN(16)) ? (ALIGN(16) - 1) : (. + 0x0F);
+
+/*
+The filling (padding) and values for _crc_size and _crc_val are handled by
+elf2bin.py. With this, we give values to the symbols without explicitly
+assigning space. This avoids the linkers back *fill* operation that causes
+trouble.
+
+The CRC info is stored in last 8 bytes.    */
+    _crc_size = _stext + 4096 - 8;
+    _crc_val = _stext + 4096 - 4;
+    ASSERT((4096 > (17 + (. - _stext))), "Error: No space for CS and CRC in bootloader sector.");
+    ASSERT((_crc_size > _cs_here), "Error: CRC must be located after CS.");
   } >iram1_0_seg :iram1_0_phdr
 
   .lit4 : ALIGN(4)

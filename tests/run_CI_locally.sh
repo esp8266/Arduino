@@ -80,9 +80,6 @@ EOF
 	test -z "$BUILD_TYPE" || break
 done
 
-# use pip2 for python2 with python3 is around, platformio doesn't like it
-cp tests/platformio.sh tests/platformio-custom.sh
-sed -i 's,pip ,pip2 ,g' tests/platformio-custom.sh
 
 git submodule update --init
 
@@ -117,11 +114,11 @@ elif [ "$BUILD_TYPE" = "build1_odd" ]; then
     BUILD_PARITY=odd tests/build1.sh
 
 elif [ "$BUILD_TYPE" = "platformio" ]; then
-    tests/platformio-custom.sh
+    tests/platformio.sh
 elif [ "$BUILD_TYPE" = "platformio_even" ]; then
-    BUILD_PARITY=even tests/platformio-custom.sh
+    BUILD_PARITY=even tests/platformio.sh
 elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
-    BUILD_PARITY=odd tests/platformio-custom.sh
+    BUILD_PARITY=odd tests/platformio.sh
 
 elif [ "$BUILD_TYPE" = host ]; then
     tests/ci/host_test.sh
