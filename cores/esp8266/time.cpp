@@ -133,11 +133,12 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
 
 void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
-    char tzstr [64];
-
     // There is no way to tell when DST starts or stop with this API
     // So DST is always integrated in TZ
     // The other API should be preferred
+
+    /*** portable version using posix API
+         (calls sprintf here, then sscanf internally)
 
     int tzs = daylightOffset_sec + timezone_sec;
     int tzh = tzs / 3600;
@@ -146,8 +147,43 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     tzs -= tzm * 60;
 
     // man tzset:
+    char tzstr [64];
     snprintf(tzstr, sizeof tzstr, "ESPUSER<%+d:%02d:%02d>", tzh, tzm, tzs);
     return configTime(tzstr, server1, server2, server3);
+
+    Replaced by light code found from
+    newlib inspection and internal structure hacking
+    (no sprintf, no sscanf, -7584 flash bytes):
+
+    ***/
+
+    static char gmt[] = "GMT";
+
+    _timezone = timezone_sec + daylightOffset_sec;
+    _daylight = 0;
+    _tzname[0] = gmt;
+    _tzname[1] = gmt;
+    auto tz = __gettzinfo();
+    tz->__tznorth = 1;
+    tz->__tzyear = 0;
+    for (int i = 0; i < 2; i++)
+    {
+        auto tzr = &tz->__tzrule[i];
+        tzr->ch = 74;
+        tzr->m = 0;
+        tzr->n = 0;
+        tzr->d = 0;
+        tzr->s = 0;
+        tzr->change = 0;
+        tzr->offset = _timezone;
+    }
+
+    // sntp servers
+    setServer(0, server1);
+    setServer(1, server2);
+    setServer(2, server3);
+
+    /*** end of posix replacement ***/
 }
 
 void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
