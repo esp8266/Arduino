@@ -40,15 +40,20 @@ public:
         _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
         _sync(::getDefaultPrivateGlobalSyncValue())
     {
-        tcp_setprio(pcb, TCP_PRIO_MIN);
-        tcp_arg(pcb, this);
-        tcp_recv(pcb, &_s_recv);
-        tcp_sent(pcb, &_s_acked);
-        tcp_err(pcb, &_s_error);
-        tcp_poll(pcb, &_s_poll, 1);
+        tcp_setprio(_pcb, TCP_PRIO_MIN);
+        tcp_arg(_pcb, this);
+        tcp_recv(_pcb, &_s_recv);
+        tcp_sent(_pcb, &_s_acked);
+        tcp_err(_pcb, &_s_error);
+        tcp_poll(_pcb, &_s_poll, 1);
 
         // keep-alive not enabled by default
         //keepAlive();
+    }
+
+    tcp_pcb* getPCB ()
+    {
+        return _pcb;
     }
 
     err_t abort()
@@ -291,6 +296,7 @@ public:
 
     void discard_received()
     {
+        DEBUGV(":dsrcv %d\n", _rx_buf? _rx_buf->tot_len: 0);
         if(!_rx_buf) {
             return;
         }
@@ -349,7 +355,8 @@ public:
 
     uint8_t state() const
     {
-        if(!_pcb) {
+        if(!_pcb || _pcb->state == CLOSE_WAIT || _pcb->state == CLOSING) {
+            // CLOSED for WiFIClient::status() means nothing more can be written
             return CLOSED;
         }
 
@@ -576,11 +583,23 @@ protected:
     {
         (void) pcb;
         (void) err;
-        if(pb == 0) { // connection closed
-            DEBUGV(":rcl\r\n");
+        if(pb == 0) {
+            // connection closed by peer
+            DEBUGV(":rcl pb=%p sz=%d\r\n", _rx_buf, _rx_buf? _rx_buf->tot_len: -1);
             _notify_error();
-            abort();
-            return ERR_ABRT;
+            if (_rx_buf && _rx_buf->tot_len)
+            {
+                // there is still something to read
+                return ERR_OK;
+            }
+            else
+            {
+                // nothing in receive buffer,
+                // peer closed = nothing can be written:
+                // closing in the legacy way
+                abort();
+                return ERR_ABRT;
+            }
         }
 
         if(_rx_buf) {

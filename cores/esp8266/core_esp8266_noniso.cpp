@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+#include <limits>
 #include "stdlib_noniso.h"
 
 extern "C" {
@@ -77,10 +78,14 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     // Figure out how big our number really is
     double tenpow = 1.0;
     int digitcount = 1;
-    while (number >= 10.0 * tenpow) {
-        tenpow *= 10.0;
+    double nextpow;
+    while (number >= (nextpow = (10.0 * tenpow))) {
+        tenpow = nextpow;
         digitcount++;
     }
+
+    // minimal compensation for possible lack of precision (#7087 addition)
+    number *= 1 + std::numeric_limits<decltype(number)>::epsilon();
 
     number /= tenpow;
     fillme -= digitcount;

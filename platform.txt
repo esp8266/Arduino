@@ -42,8 +42,8 @@ build.led=
 
 # default SDK for all boards
 # (generic board overrides this variable)
-#build.sdk=NONOSDK22x_190703
-build.sdk=NONOSDK22x_191024
+build.sdk=NONOSDK22x_190703
+#build.sdk=NONOSDK22x_191024
 #build.sdk=NONOSDK22x_191105
 
 # These are not overriden when FS is not configured
