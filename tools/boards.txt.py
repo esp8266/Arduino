@@ -863,6 +863,26 @@ boards = collections.OrderedDict([
             'More details at https://shop.makestro.com/product/espectrocore/',
         ],
     }),
+
+	( 'eduinowifi', {
+        'name': 'Schirmilabs Eduino WiFi',
+        'opts': {
+            '.build.board': 'ESP8266_SCHIRMILABS_EDUINO_WIFI',
+            '.build.variant': 'eduinowifi',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'serial': '512',
+        'desc': [ 'Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module',
+		          '',
+				  'Product page: https://schirmilabs.de/?page_id=165',
+				  ]
+
+    }),
     ( 'sonoff', {
         'name': 'ITEAD Sonoff',
         'opts': {
@@ -932,8 +952,10 @@ boards = collections.OrderedDict([
             'is a multi-chip package which contains ESP8266 and 1MB flash. ',
             '',
         ],
+
     })
-    ])
+	])
+    
 
 ################################################################
 
