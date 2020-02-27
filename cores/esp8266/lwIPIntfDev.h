@@ -37,7 +37,7 @@ public:
     {
         memset(&_netif, 0, sizeof(_netif));
     }
-    
+
     boolean config (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, const IPAddress& dns2);
 
     // default mac-address is inferred from esp8266's STA interface
@@ -94,14 +94,14 @@ boolean LwipIntfDev<RawDev>::config (const IPAddress& localIP, const IPAddress& 
         DEBUGV("LwipIntfDev: use config() then begin()\n");
         return false;
     }
-    
+
     IPAddress realGateway, realNetmask, realDns1;
     if (!ipAddressReorder(localIP, gateway, netmask, dns1, realGateway, realNetmask, realDns1))
         return false;
     ip4_addr_set_u32(ip_2_ip4(&_netif.ip_addr), localIP.v4());
     ip4_addr_set_u32(ip_2_ip4(&_netif.gw), realGateway.v4());
     ip4_addr_set_u32(ip_2_ip4(&_netif.netmask), realNetmask.v4());
-    
+
     return true;
 }
 
@@ -136,7 +136,7 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
         return false;
 
     // setup lwIP netif
-    
+
     _netif.hwaddr_len = sizeof _macAddress;
     memcpy(_netif.hwaddr, _macAddress, sizeof _macAddress);
 
