@@ -8,6 +8,8 @@ extern "C" {
 #if LWIP_IPV6
 #include "lwip/netif.h" // struct netif
 #endif
+
+#include <user_interface.h>
 }
 
 #include "debug.h"
