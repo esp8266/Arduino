@@ -452,6 +452,13 @@ Initially designed for kids in mind, everybody should be able to use it. Yet it'
 
 More details at https://shop.makestro.com/product/espectrocore/
 
+Schirmilabs Eduino WiFi
+-----------------------
+
+Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module
+
+Product page: https://schirmilabs.de/?page_id=165
+
 ITEAD Sonoff
 ------------
 
