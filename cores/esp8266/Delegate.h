@@ -1653,18 +1653,19 @@ namespace delegate
         };
 #endif
 
-        template<typename R = void, typename A = void, typename... P>
+        template<typename A = void, typename R = void, typename... P>
         class Delegate : private detail::DelegatePImpl<A, R, P...>
         {
-        private:
-            using typename detail::DelegatePImpl<A, R, P...>::FunVPPtr;
+        public:
+            using target_type = R(P...);
+        protected:
+            using FunPtr = target_type*;
+            using FunAPtr = R(*)(A, P...);
+            using FunVPPtr = R(*)(void*, P...);
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using typename detail::DelegatePImpl<A, R, P...>::FunctionType;
+            using FunctionType = std::function<target_type>;
 #endif
         public:
-            using detail::DelegatePImpl<A, R, P...>::target_type;
-            using detail::DelegatePImpl<A, R, P...>::DelegatePImpl;
-            using detail::DelegatePImpl<A, R, P...>::operator=;
             using detail::DelegatePImpl<A, R, P...>::operator bool;
             using detail::DelegatePImpl<A, R, P...>::arg;
             using detail::DelegatePImpl<A, R, P...>::operator();
@@ -1673,20 +1674,57 @@ namespace delegate
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
             operator FunctionType() { return detail::DelegatePImpl<A, R, P...>::operator FunctionType(); }
 #endif
+
+            Delegate() : detail::DelegatePImpl<A, R, P...>::DelegatePImpl() {}
+
+            Delegate(std::nullptr_t) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(nullptr) {}
+
+            Delegate(const detail::DelegatePImpl<A, R, P...>& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(del) {}
+
+            Delegate(detail::DelegatePImpl<A, R, P...>&& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(std::move(del)) {}
+
+            Delegate(FunAPtr fnA, const A& obj) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(fnA, obj) {}
+
+            Delegate(FunAPtr fnA, A&& obj) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(fnA, std::move(obj)) {}
+
+            Delegate(FunPtr fn) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(fn) {}
+
+            template<typename F> Delegate(F functional) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(functional) {}
+
+            Delegate& operator=(const detail::DelegatePImpl<A, R, P...>& del) {
+                detail::DelegatePImpl<A, R, P...>::operator=(del);
+                return *this;
+            }
+
+            Delegate& operator=(detail::DelegatePImpl<A, R, P...>&& del) {
+                detail::DelegatePImpl<A, R, P...>::operator=(std::move(del));
+                return *this;
+            }
+
+            Delegate& operator=(FunPtr fn) {
+                detail::DelegatePImpl<A, R, P...>::operator=(fn);
+                return *this;
+            }
+
+            Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+                detail::DelegatePImpl<A, R, P...>::operator=(nullptr);
+                return *this;
+            }
         };
 
-        template<typename R, typename A, typename... P>
-        class Delegate<R, A*, P...> : private detail::DelegatePImpl<A*, R, P...>
+        template<typename A, typename R, typename... P>
+        class Delegate<A*, R, P...> : private detail::DelegatePImpl<A*, R, P...>
         {
-        private:
-            using typename detail::DelegatePImpl<A*, R, P...>::FunVPPtr;
+        public:
+            using target_type = R(P...);
+        protected:
+            using FunPtr = target_type*;
+            using FunAPtr = R(*)(A*, P...);
+            using FunVPPtr = R(*)(void*, P...);
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using typename detail::DelegatePImpl<A*, R, P...>::FunctionType;
+            using FunctionType = std::function<target_type>;
 #endif
         public:
-            using detail::DelegatePImpl<A*, R, P...>::target_type;
-            using detail::DelegatePImpl<A*, R, P...>::DelegatePImpl;
-            using detail::DelegatePImpl<A*, R, P...>::operator=;
             using detail::DelegatePImpl<A*, R, P...>::operator bool;
             using detail::DelegatePImpl<A*, R, P...>::operator();
 
@@ -1694,7 +1732,7 @@ namespace delegate
             {
                 if (detail::DelegatePImpl<A*, R, P...>::FPA == detail::DelegatePImpl<A*, R, P...>::kind)
                 {
-                    return reinterpret_cast<R(*)(void*, P...)>(detail::DelegatePImpl<A*, R, P...>::fnA);
+                    return reinterpret_cast<FunVPPtr>(detail::DelegatePImpl<A*, R, P...>::fnA);
                 }
                 else
                 {
@@ -1715,20 +1753,109 @@ namespace delegate
                     return detail::DelegatePImpl<A*, R, P...>::arg();
                 }
             }
+
+            Delegate() : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl() {}
+
+            Delegate(std::nullptr_t) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(nullptr) {}
+
+            Delegate(const detail::DelegatePImpl<A*, R, P...>& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(del) {}
+
+            Delegate(detail::DelegatePImpl<A*, R, P...>&& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(std::move(del)) {}
+
+            Delegate(FunAPtr fnA, A* obj) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(fnA, obj) {}
+
+            Delegate(FunPtr fn) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(fn) {}
+
+            template<typename F> Delegate(F functional) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(functional) {}
+
+            Delegate& operator=(const detail::DelegatePImpl<A*, R, P...>& del) {
+                detail::DelegatePImpl<A*, R, P...>::operator=(del);
+                return *this;
+            }
+
+            Delegate& operator=(detail::DelegatePImpl<A*, R, P...>&& del) {
+                detail::DelegatePImpl<A*, R, P...>::operator=(std::move(del));
+                return *this;
+            }
+
+            Delegate& operator=(FunPtr fn) {
+                detail::DelegatePImpl<A*, R, P...>::operator=(fn);
+                return *this;
+            }
+
+            Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+                detail::DelegatePImpl<A*, R, P...>::operator=(nullptr);
+                return *this;
+            }
         };
 
-        template<typename R, typename A>
-        class Delegate<R, A> : private detail::DelegateImpl<A, R>
+        template<typename R, typename... P>
+        class Delegate<void, R, P...> : private detail::DelegatePImpl<void, R, P...>
         {
-        private:
-            using typename detail::DelegateImpl<A, R>::FunVPPtr;
+        public:
+            using target_type = R(P...);
+        protected:
+            using FunPtr = target_type*;
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using typename detail::DelegateImpl<A, R>::FunctionType;
+            using FunctionType = std::function<target_type>;
+#endif
+            using FunVPPtr = R(*)(void*, P...);
+        public:
+            using detail::DelegatePImpl<void, R, P...>::operator bool;
+            using detail::DelegatePImpl<void, R, P...>::arg;
+            using detail::DelegatePImpl<void, R, P...>::operator();
+
+            operator FunVPPtr() const { return detail::DelegatePImpl<void, R, P...>::operator FunVPPtr(); }
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            operator FunctionType() { return detail::DelegatePImpl<void, R, P...>::operator FunctionType(); }
+#endif
+
+            Delegate() : detail::DelegatePImpl<void, R, P...>::DelegatePImpl() {}
+
+            Delegate(std::nullptr_t) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(nullptr) {}
+
+            Delegate(detail::DelegatePImpl<void, R, P...>& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(del) {}
+
+            Delegate(detail::DelegatePImpl<void, R, P...>&& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(std::move(del)) {}
+
+            Delegate(FunPtr fn) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(fn) {}
+
+            template<typename F> Delegate(F functional) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(functional) {}
+
+            Delegate& operator=(const detail::DelegatePImpl<void, R, P...>& del) {
+                detail::DelegatePImpl<void, R, P...>::operator=(del);
+                return *this;
+            }
+
+            Delegate& operator=(detail::DelegatePImpl<void, R, P...>&& del) {
+                detail::DelegatePImpl<void, R, P...>::operator=(std::move(del));
+                return *this;
+            }
+
+            Delegate& operator=(FunPtr fn) {
+                detail::DelegatePImpl<void, R, P...>::operator=(fn);
+                return *this;
+            }
+
+            Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+                detail::DelegatePImpl<void, R, P...>::operator=(nullptr);
+                return *this;
+            }
+        };
+
+        template<typename A, typename R>
+        class Delegate<A, R> : private detail::DelegateImpl<A, R>
+        {
+        public:
+            using target_type = R();
+        protected:
+            using FunPtr = target_type*;
+            using FunAPtr = R(*)(A);
+            using FunVPPtr = R(*)(void*);
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            using FunctionType = std::function<target_type>;
 #endif
         public:
-            using detail::DelegateImpl<A, R>::target_type;
-            using detail::DelegateImpl<A, R>::DelegateImpl;
-            using detail::DelegateImpl<A, R>::operator=;
             using detail::DelegateImpl<A, R>::operator bool;
             using detail::DelegateImpl<A, R>::arg;
             using detail::DelegateImpl<A, R>::operator();
@@ -1737,20 +1864,57 @@ namespace delegate
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
             operator FunctionType() { return detail::DelegateImpl<A, R>::operator FunctionType(); }
 #endif
+
+            Delegate() : detail::DelegateImpl<A, R>::DelegateImpl() {}
+
+            Delegate(std::nullptr_t) : detail::DelegateImpl<A, R>::DelegateImpl(nullptr) {}
+
+            Delegate(const detail::DelegateImpl<A, R>& del) : detail::DelegateImpl<A, R>::DelegateImpl(del) {}
+
+            Delegate(detail::DelegateImpl<A, R>&& del) : detail::DelegateImpl<A, R>::DelegateImpl(std::move(del)) {}
+
+            Delegate(FunAPtr fnA, const A& obj) : detail::DelegateImpl<A, R>::DelegateImpl(fnA, obj) {}
+
+            Delegate(FunAPtr fnA, A&& obj) : detail::DelegateImpl<A, R>::DelegateImpl(fnA, std::move(obj)) {}
+
+            Delegate(FunPtr fn) : detail::DelegateImpl<A, R>::DelegateImpl(fn) {}
+
+            template<typename F> Delegate(F functional) : detail::DelegateImpl<A, R>::DelegateImpl(functional) {}
+
+            Delegate& operator=(const detail::DelegateImpl<A, R>& del) {
+                detail::DelegateImpl<A, R>::operator=(del);
+                return *this;
+            }
+
+            Delegate& operator=(detail::DelegateImpl<A, R>&& del) {
+                detail::DelegateImpl<A, R>::operator=(std::move(del));
+                return *this;
+            }
+
+            Delegate& operator=(FunPtr fn) {
+                detail::DelegateImpl<A, R>::operator=(fn);
+                return *this;
+            }
+
+            Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+                detail::DelegateImpl<A, R>::operator=(nullptr);
+                return *this;
+            }
         };
 
-        template<typename R, typename A>
-        class Delegate<R, A*> : private detail::DelegateImpl<A*, R>
+        template<typename A, typename R>
+        class Delegate<A*, R> : private detail::DelegateImpl<A*, R>
         {
-        private:
-            using typename detail::DelegateImpl<A*, R>::FunVPPtr;
+        public:
+            using target_type = R();
+        protected:
+            using FunPtr = target_type*;
+            using FunAPtr = R(*)(A*);
+            using FunVPPtr = R(*)(void*);
 #if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
-            using typename detail::DelegateImpl<A*, R>::FunctionType;
+            using FunctionType = std::function<target_type>;
 #endif
         public:
-            using detail::DelegateImpl<A*, R>::target_type;
-            using detail::DelegateImpl<A*, R>::DelegateImpl;
-            using detail::DelegateImpl<A*, R>::operator=;
             using detail::DelegateImpl<A*, R>::operator bool;
             using detail::DelegateImpl<A*, R>::operator();
 
@@ -1758,7 +1922,7 @@ namespace delegate
             {
                 if (detail::DelegateImpl<A*, R>::FPA == detail::DelegateImpl<A*, R>::kind)
                 {
-                    return reinterpret_cast<R(*)(void*)>(detail::DelegateImpl<A*, R>::fnA);
+                    return reinterpret_cast<FunVPPtr>(detail::DelegateImpl<A*, R>::fnA);
                 }
                 else
                 {
@@ -1779,23 +1943,172 @@ namespace delegate
                     return detail::DelegateImpl<A*, R>::arg();
                 }
             }
+
+            Delegate() : detail::DelegateImpl<A*, R>::DelegateImpl() {}
+
+            Delegate(std::nullptr_t) : detail::DelegateImpl<A*, R>::DelegateImpl(nullptr) {}
+
+            Delegate(const detail::DelegateImpl<A*, R>& del) : detail::DelegateImpl<A*, R>::DelegateImpl(del) {}
+
+            Delegate(detail::DelegateImpl<A*, R>&& del) : detail::DelegateImpl<A*, R>::DelegateImpl(std::move(del)) {}
+
+            Delegate(FunAPtr fnA, A* obj) : detail::DelegateImpl<A*, R>::DelegateImpl(fnA, obj) {}
+
+            Delegate(FunPtr fn) : detail::DelegateImpl<A*, R>::DelegateImpl(fn) {}
+
+            template<typename F> Delegate(F functional) : detail::DelegateImpl<A*, R>::DelegateImpl(functional) {}
+
+            Delegate& operator=(const detail::DelegateImpl<A*, R>& del) {
+                detail::DelegateImpl<A*, R>::operator=(del);
+                return *this;
+            }
+
+            Delegate& operator=(detail::DelegateImpl<A*, R>&& del) {
+                detail::DelegateImpl<A*, R>::operator=(std::move(del));
+                return *this;
+            }
+
+            Delegate& operator=(FunPtr fn) {
+                detail::DelegateImpl<A*, R>::operator=(fn);
+                return *this;
+            }
+
+            Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+                detail::DelegateImpl<A*, R>::operator=(nullptr);
+                return *this;
+            }
         };
 
+        template<typename R>
+        class Delegate<void, R> : private detail::DelegateImpl<void, R>
+        {
+        public:
+            using target_type = R();
+        protected:
+            using FunPtr = target_type*;
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            using FunctionType = std::function<target_type>;
+#endif
+            using FunVPPtr = R(*)(void*);
+        public:
+            using detail::DelegateImpl<void, R>::operator bool;
+            using detail::DelegateImpl<void, R>::arg;
+            using detail::DelegateImpl<void, R>::operator();
+
+            operator FunVPPtr() const { return detail::DelegateImpl<void, R>::operator FunVPPtr(); }
+#if !defined(ARDUINO) || defined(ESP8266) || defined(ESP32)
+            operator FunctionType() { return detail::DelegateImpl<void, R>::operator FunctionType(); }
+#endif
+
+            Delegate() : detail::DelegateImpl<void, R>::DelegateImpl() {}
+
+            Delegate(std::nullptr_t) : detail::DelegateImpl<void, R>::DelegateImpl(nullptr) {}
+
+            Delegate(const detail::DelegateImpl<void, R>& del) : detail::DelegateImpl<void, R>::DelegateImpl(del) {}
+
+            Delegate(detail::DelegateImpl<void, R>&& del) : detail::DelegateImpl<void, R>::DelegateImpl(std::move(del)) {}
+
+            Delegate(FunPtr fn) : detail::DelegateImpl<void, R>::DelegateImpl(fn) {}
+
+            template<typename F> Delegate(F functional) : detail::DelegateImpl<void, R>::DelegateImpl(functional) {}
+
+            Delegate& operator=(const detail::DelegateImpl<void, R>& del) {
+                detail::DelegateImpl<void, R>::operator=(del);
+                return *this;
+            }
+
+            Delegate& operator=(detail::DelegateImpl<void, R>&& del) {
+                detail::DelegateImpl<void, R>::operator=(std::move(del));
+                return *this;
+            }
+
+            Delegate& operator=(FunPtr fn) {
+                detail::DelegateImpl<void, R>::operator=(fn);
+                return *this;
+            }
+
+            Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+                detail::DelegateImpl<void, R>::operator=(nullptr);
+                return *this;
+            }
+        };
     }
 }
 
-template<typename R, typename A = void, typename... P> class Delegate;
-template<typename R, typename A, typename... P> class Delegate<R(P...), A> : public delegate::detail::Delegate<R, A, P...>
+template<typename A = void, typename R = void, typename... P> class Delegate;
+template<typename A, typename R, typename... P> class Delegate<R(P...), A> : public delegate::detail::Delegate<A, R, P...>
 {
 public:
-    using delegate::detail::Delegate<R, A, P...>::Delegate;
-    using delegate::detail::Delegate<R, A, P...>::operator=;
+    Delegate() : delegate::detail::Delegate<A, R, P...>::Delegate() {}
+
+    Delegate(std::nullptr_t) : delegate::detail::Delegate<A, R, P...>::Delegate(nullptr) {}
+
+    Delegate(const delegate::detail::Delegate<A, R, P...>& del) : delegate::detail::Delegate<A, R, P...>::Delegate(del) {}
+
+    Delegate(delegate::detail::Delegate<A, R, P...>&& del) : delegate::detail::Delegate<A, R, P...>::Delegate(std::move(del)) {}
+
+    Delegate(typename delegate::detail::Delegate<A, R, P...>::FunAPtr fnA, const A& obj) : delegate::detail::Delegate<A, R, P...>::Delegate(fnA, obj) {}
+
+    Delegate(typename delegate::detail::Delegate<A, R, P...>::FunAPtr fnA, A&& obj) : delegate::detail::Delegate<A, R, P...>::Delegate(fnA, std::move(obj)) {}
+
+    Delegate(typename delegate::detail::Delegate<A, R, P...>::FunPtr fn) : delegate::detail::Delegate<A, R, P...>::Delegate(fn) {}
+
+    template<typename F> Delegate(F functional) : delegate::detail::Delegate<A, R, P...>::Delegate(functional) {}
+
+    Delegate& operator=(const delegate::detail::Delegate<A, R, P...>& del) {
+        delegate::detail::Delegate<A, R, P...>::operator=(del);
+        return *this;
+    }
+
+    Delegate& operator=(delegate::detail::Delegate<A, R, P...>&& del) {
+        delegate::detail::Delegate<A, R, P...>::operator=(std::move(del));
+        return *this;
+    }
+
+    Delegate& operator=(typename delegate::detail::Delegate<A, R, P...>::FunPtr fn) {
+        delegate::detail::Delegate<A, R, P...>::operator=(fn);
+        return *this;
+    }
+
+    Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+        delegate::detail::Delegate<A, R, P...>::operator=(nullptr);
+        return *this;
+    }
 };
-template<typename R, typename... P> class Delegate<R(P...)> : public delegate::detail::Delegate<R, void, P...>
+template<typename R, typename... P> class Delegate<R(P...)> : public delegate::detail::Delegate<void, R, P...>
 {
 public:
-    using delegate::detail::Delegate<R, void, P...>::Delegate;
-    using delegate::detail::Delegate<R, void, P...>::operator=;
+    Delegate() : delegate::detail::Delegate<void, R, P...>::Delegate() {}
+
+    Delegate(std::nullptr_t) : delegate::detail::Delegate<void, R, P...>::Delegate(nullptr) {}
+
+    Delegate(const delegate::detail::Delegate<void, R, P...>& del) : delegate::detail::Delegate<void, R, P...>::Delegate(del) {}
+
+    Delegate(delegate::detail::Delegate<void, R, P...>&& del) : delegate::detail::Delegate<void, R, P...>::Delegate(std::move(del)) {}
+
+    Delegate(typename delegate::detail::Delegate<void, R, P...>::FunPtr fn) : delegate::detail::Delegate<void, R, P...>::Delegate(fn) {}
+
+    template<typename F> Delegate(F functional) : delegate::detail::Delegate<void, R, P...>::Delegate(functional) {}
+
+    Delegate& operator=(const delegate::detail::Delegate<void, R, P...>& del) {
+        delegate::detail::Delegate<void, R, P...>::operator=(del);
+        return *this;
+    }
+
+    Delegate& operator=(delegate::detail::Delegate<void, R, P...>&& del) {
+        delegate::detail::Delegate<void, R, P...>::operator=(std::move(del));
+        return *this;
+    }
+
+    Delegate& operator=(typename delegate::detail::Delegate<void, R, P...>::FunPtr fn) {
+        delegate::detail::Delegate<void, R, P...>::operator=(fn);
+        return *this;
+    }
+
+    Delegate& IRAM_ATTR operator=(std::nullptr_t) {
+        delegate::detail::Delegate<void, R, P...>::operator=(nullptr);
+        return *this;
+    }
 };
 
 #endif // __Delegate_h
