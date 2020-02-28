@@ -6985,6 +6985,16 @@ eduinowifi.menu.ssl.all=All SSL ciphers (most compatible)
 eduinowifi.menu.ssl.all.build.sslflags=
 eduinowifi.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 eduinowifi.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+eduinowifi.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+eduinowifi.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+eduinowifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+eduinowifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+eduinowifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+eduinowifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+eduinowifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+eduinowifi.menu.non32xfer.fast.build.non32xferflags=
+eduinowifi.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+eduinowifi.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 eduinowifi.upload.resetmethod=--before default_reset --after hard_reset
 eduinowifi.build.flash_mode=dio
 eduinowifi.build.flash_flags=-DFLASHMODE_DIO
