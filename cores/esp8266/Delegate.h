@@ -84,7 +84,7 @@ namespace delegate
                     obj.~A();
             }
 
-            DelegatePImpl(const DelegatePImpl<A, R, P...>& del)
+            DelegatePImpl(const DelegatePImpl& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -102,7 +102,7 @@ namespace delegate
                 }
             }
 
-            DelegatePImpl(DelegatePImpl<A, R, P...>&& del)
+            DelegatePImpl(DelegatePImpl&& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -146,7 +146,7 @@ namespace delegate
                 new (&this->functional) FunctionType(std::forward<F>(functional));
             }
 
-            DelegatePImpl& operator=(const DelegatePImpl<A, R, P...>& del)
+            DelegatePImpl& operator=(const DelegatePImpl& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -185,7 +185,7 @@ namespace delegate
                 return *this;
             }
 
-            DelegatePImpl& operator=(DelegatePImpl<A, R, P...>&& del)
+            DelegatePImpl& operator=(DelegatePImpl&& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -373,7 +373,7 @@ namespace delegate
                 fn = nullptr;
             }
 
-            DelegatePImpl(const DelegatePImpl<A, R, P...>& del)
+            DelegatePImpl(const DelegatePImpl& del)
             {
                 kind = del.kind;
                 if (FPA == del.kind)
@@ -387,7 +387,7 @@ namespace delegate
                 }
             }
 
-            DelegatePImpl(DelegatePImpl<A, R, P...>&& del)
+            DelegatePImpl(DelegatePImpl&& del)
             {
                 kind = del.kind;
                 if (FPA == del.kind)
@@ -427,7 +427,7 @@ namespace delegate
                 DelegatePImpl::fn = std::forward<F>(fn);
             }
 
-            DelegatePImpl& operator=(const DelegatePImpl<A, R, P...>& del)
+            DelegatePImpl& operator=(const DelegatePImpl& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -450,7 +450,7 @@ namespace delegate
                 return *this;
             }
 
-            DelegatePImpl& operator=(DelegatePImpl<A, R, P...>&& del)
+            DelegatePImpl& operator=(DelegatePImpl&& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -588,7 +588,7 @@ namespace delegate
                     functional.~FunctionType();
             }
 
-            DelegatePImpl(const DelegatePImpl<void, R, P...>& del)
+            DelegatePImpl(const DelegatePImpl& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -601,7 +601,7 @@ namespace delegate
                 }
             }
 
-            DelegatePImpl(DelegatePImpl<void, R, P...>&& del)
+            DelegatePImpl(DelegatePImpl&& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -626,7 +626,7 @@ namespace delegate
                 new (&this->functional) FunctionType(std::forward<F>(functional));
             }
 
-            DelegatePImpl& operator=(const DelegatePImpl<void, R, P...>& del)
+            DelegatePImpl& operator=(const DelegatePImpl& del)
             {
                 if (this == &del) return *this;
                 if (FUNC == kind && FUNC != del.kind)
@@ -649,7 +649,7 @@ namespace delegate
                 return *this;
             }
 
-            DelegatePImpl& operator=(DelegatePImpl<void, R, P...>&& del)
+            DelegatePImpl& operator=(DelegatePImpl&& del)
             {
                 if (this == &del) return *this;
                 if (FUNC == kind && FUNC != del.kind)
@@ -783,12 +783,12 @@ namespace delegate
                 fn = nullptr;
             }
 
-            DelegatePImpl(const DelegatePImpl<void, R, P...>& del)
+            DelegatePImpl(const DelegatePImpl& del)
             {
                 fn = del.fn;
             }
 
-            DelegatePImpl(DelegatePImpl<void, R, P...>&& del)
+            DelegatePImpl(DelegatePImpl&& del)
             {
                 fn = std::move(del.fn);
             }
@@ -803,14 +803,14 @@ namespace delegate
                 DelegatePImpl::fn = std::forward<F>(fn);
             }
 
-            DelegatePImpl& operator=(const DelegatePImpl<void, R, P...>& del)
+            DelegatePImpl& operator=(const DelegatePImpl& del)
             {
                 if (this == &del) return *this;
                 fn = del.fn;
                 return *this;
             }
 
-            DelegatePImpl& operator=(DelegatePImpl<void, R, P...>&& del)
+            DelegatePImpl& operator=(DelegatePImpl&& del)
             {
                 if (this == &del) return *this;
                 fn = std::move(del.fn);
@@ -885,7 +885,7 @@ namespace delegate
                     obj.~A();
             }
 
-            DelegateImpl(const DelegateImpl<A, R>& del)
+            DelegateImpl(const DelegateImpl& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -903,7 +903,7 @@ namespace delegate
                 }
             }
 
-            DelegateImpl(DelegateImpl<A, R>&& del)
+            DelegateImpl(DelegateImpl&& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -947,7 +947,7 @@ namespace delegate
                 new (&this->functional) FunctionType(std::forward<F>(functional));
             }
 
-            DelegateImpl& operator=(const DelegateImpl<A, R>& del)
+            DelegateImpl& operator=(const DelegateImpl& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -986,7 +986,7 @@ namespace delegate
                 return *this;
             }
 
-            DelegateImpl& operator=(DelegateImpl<A, R>&& del)
+            DelegateImpl& operator=(DelegateImpl&& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -1173,7 +1173,7 @@ namespace delegate
                 fn = nullptr;
             }
 
-            DelegateImpl(const DelegateImpl<A, R>& del)
+            DelegateImpl(const DelegateImpl& del)
             {
                 kind = del.kind;
                 if (FPA == del.kind)
@@ -1187,7 +1187,7 @@ namespace delegate
                 }
             }
 
-            DelegateImpl(DelegateImpl<A, R>&& del)
+            DelegateImpl(DelegateImpl&& del)
             {
                 kind = del.kind;
                 if (FPA == del.kind)
@@ -1227,7 +1227,7 @@ namespace delegate
                 DelegateImpl::fn = std::forward<F>(fn);
             }
 
-            DelegateImpl& operator=(const DelegateImpl<A, R>& del)
+            DelegateImpl& operator=(const DelegateImpl& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -1250,7 +1250,7 @@ namespace delegate
                 return *this;
             }
 
-            DelegateImpl& operator=(DelegateImpl<A, R>&& del)
+            DelegateImpl& operator=(DelegateImpl&& del)
             {
                 if (this == &del) return *this;
                 if (kind != del.kind)
@@ -1387,7 +1387,7 @@ namespace delegate
                     functional.~FunctionType();
             }
 
-            DelegateImpl(const DelegateImpl<void, R>& del)
+            DelegateImpl(const DelegateImpl& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -1400,7 +1400,7 @@ namespace delegate
                 }
             }
 
-            DelegateImpl(DelegateImpl<void, R>&& del)
+            DelegateImpl(DelegateImpl&& del)
             {
                 kind = del.kind;
                 if (FUNC == del.kind)
@@ -1425,7 +1425,7 @@ namespace delegate
                 new (&this->functional) FunctionType(std::forward<F>(functional));
             }
 
-            DelegateImpl& operator=(const DelegateImpl<void, R>& del)
+            DelegateImpl& operator=(const DelegateImpl& del)
             {
                 if (this == &del) return *this;
                 if (FUNC == kind && FUNC != del.kind)
@@ -1448,7 +1448,7 @@ namespace delegate
                 return *this;
             }
 
-            DelegateImpl& operator=(DelegateImpl<void, R>&& del)
+            DelegateImpl& operator=(DelegateImpl&& del)
             {
                 if (this == &del) return *this;
                 if (FUNC == kind && FUNC != del.kind)
@@ -1582,12 +1582,12 @@ namespace delegate
                 fn = nullptr;
             }
 
-            DelegateImpl(const DelegateImpl<void, R>& del)
+            DelegateImpl(const DelegateImpl& del)
             {
                 fn = del.fn;
             }
 
-            DelegateImpl(DelegateImpl<void, R>&& del)
+            DelegateImpl(DelegateImpl&& del)
             {
                 fn = std::move(del.fn);
             }
@@ -1602,14 +1602,14 @@ namespace delegate
                 DelegateImpl::fn = std::forward<F>(fn);
             }
 
-            DelegateImpl& operator=(const DelegateImpl<void, R>& del)
+            DelegateImpl& operator=(const DelegateImpl& del)
             {
                 if (this == &del) return *this;
                 fn = del.fn;
                 return *this;
             }
 
-            DelegateImpl& operator=(DelegateImpl<void, R>&& del)
+            DelegateImpl& operator=(DelegateImpl&& del)
             {
                 if (this == &del) return *this;
                 fn = std::move(del.fn);
@@ -1679,9 +1679,11 @@ namespace delegate
 
             Delegate(std::nullptr_t) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(nullptr) {}
 
-            Delegate(const detail::DelegatePImpl<A, R, P...>& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(del) {}
+            Delegate(const Delegate& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(
+                static_cast<const detail::DelegatePImpl<A, R, P...>&>(del)) {}
 
-            Delegate(detail::DelegatePImpl<A, R, P...>&& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(std::move(del)) {}
+            Delegate(Delegate&& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(
+                std::move(static_cast<detail::DelegatePImpl<A, R, P...>&&>(del))) {}
 
             Delegate(FunAPtr fnA, const A& obj) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(fnA, obj) {}
 
@@ -1691,12 +1693,12 @@ namespace delegate
 
             template<typename F> Delegate(F functional) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(functional) {}
 
-            Delegate& operator=(const detail::DelegatePImpl<A, R, P...>& del) {
+            Delegate& operator=(const Delegate& del) {
                 detail::DelegatePImpl<A, R, P...>::operator=(del);
                 return *this;
             }
 
-            Delegate& operator=(detail::DelegatePImpl<A, R, P...>&& del) {
+            Delegate& operator=(Delegate&& del) {
                 detail::DelegatePImpl<A, R, P...>::operator=(std::move(del));
                 return *this;
             }
@@ -1758,9 +1760,11 @@ namespace delegate
 
             Delegate(std::nullptr_t) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(nullptr) {}
 
-            Delegate(const detail::DelegatePImpl<A*, R, P...>& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(del) {}
+            Delegate(const Delegate& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(
+                static_cast<const detail::DelegatePImpl<A*, R, P...>&>(del)) {}
 
-            Delegate(detail::DelegatePImpl<A*, R, P...>&& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(std::move(del)) {}
+            Delegate(Delegate&& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(
+                std::move(static_cast<detail::DelegatePImpl<A*, R, P...>&&>(del))) {}
 
             Delegate(FunAPtr fnA, A* obj) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(fnA, obj) {}
 
@@ -1768,12 +1772,12 @@ namespace delegate
 
             template<typename F> Delegate(F functional) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(functional) {}
 
-            Delegate& operator=(const detail::DelegatePImpl<A*, R, P...>& del) {
+            Delegate& operator=(const Delegate& del) {
                 detail::DelegatePImpl<A*, R, P...>::operator=(del);
                 return *this;
             }
 
-            Delegate& operator=(detail::DelegatePImpl<A*, R, P...>&& del) {
+            Delegate& operator=(Delegate&& del) {
                 detail::DelegatePImpl<A*, R, P...>::operator=(std::move(del));
                 return *this;
             }
@@ -1814,20 +1818,22 @@ namespace delegate
 
             Delegate(std::nullptr_t) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(nullptr) {}
 
-            Delegate(detail::DelegatePImpl<void, R, P...>& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(del) {}
+            Delegate(const Delegate& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(
+                static_cast<const detail::DelegatePImpl<void, R, P...>&>(del)) {}
 
-            Delegate(detail::DelegatePImpl<void, R, P...>&& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(std::move(del)) {}
+            Delegate(Delegate&& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(
+                std::move(static_cast<detail::DelegatePImpl<void, R, P...>&&>(del))) {}
 
             Delegate(FunPtr fn) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(fn) {}
 
             template<typename F> Delegate(F functional) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(functional) {}
 
-            Delegate& operator=(const detail::DelegatePImpl<void, R, P...>& del) {
+            Delegate& operator=(const Delegate& del) {
                 detail::DelegatePImpl<void, R, P...>::operator=(del);
                 return *this;
             }
 
-            Delegate& operator=(detail::DelegatePImpl<void, R, P...>&& del) {
+            Delegate& operator=(Delegate&& del) {
                 detail::DelegatePImpl<void, R, P...>::operator=(std::move(del));
                 return *this;
             }
@@ -1869,9 +1875,11 @@ namespace delegate
 
             Delegate(std::nullptr_t) : detail::DelegateImpl<A, R>::DelegateImpl(nullptr) {}
 
-            Delegate(const detail::DelegateImpl<A, R>& del) : detail::DelegateImpl<A, R>::DelegateImpl(del) {}
+            Delegate(const Delegate& del) : detail::DelegateImpl<A, R>::DelegateImpl(
+                static_cast<const detail::DelegateImpl<A, R>&>(del)) {}
 
-            Delegate(detail::DelegateImpl<A, R>&& del) : detail::DelegateImpl<A, R>::DelegateImpl(std::move(del)) {}
+            Delegate(Delegate&& del) : detail::DelegateImpl<A, R>::DelegateImpl(
+                std::move(static_cast<detail::DelegateImpl<A, R>&&>(del))) {}
 
             Delegate(FunAPtr fnA, const A& obj) : detail::DelegateImpl<A, R>::DelegateImpl(fnA, obj) {}
 
@@ -1881,12 +1889,12 @@ namespace delegate
 
             template<typename F> Delegate(F functional) : detail::DelegateImpl<A, R>::DelegateImpl(functional) {}
 
-            Delegate& operator=(const detail::DelegateImpl<A, R>& del) {
+            Delegate& operator=(const Delegate& del) {
                 detail::DelegateImpl<A, R>::operator=(del);
                 return *this;
             }
 
-            Delegate& operator=(detail::DelegateImpl<A, R>&& del) {
+            Delegate& operator=(Delegate&& del) {
                 detail::DelegateImpl<A, R>::operator=(std::move(del));
                 return *this;
             }
@@ -1948,9 +1956,11 @@ namespace delegate
 
             Delegate(std::nullptr_t) : detail::DelegateImpl<A*, R>::DelegateImpl(nullptr) {}
 
-            Delegate(const detail::DelegateImpl<A*, R>& del) : detail::DelegateImpl<A*, R>::DelegateImpl(del) {}
+            Delegate(const Delegate& del) : detail::DelegateImpl<A*, R>::DelegateImpl(
+                static_cast<const detail::DelegateImpl<A*, R>&>(del)) {}
 
-            Delegate(detail::DelegateImpl<A*, R>&& del) : detail::DelegateImpl<A*, R>::DelegateImpl(std::move(del)) {}
+            Delegate(Delegate&& del) : detail::DelegateImpl<A*, R>::DelegateImpl(
+                std::move(static_cast<detail::DelegateImpl<A*, R>&&>(del))) {}
 
             Delegate(FunAPtr fnA, A* obj) : detail::DelegateImpl<A*, R>::DelegateImpl(fnA, obj) {}
 
@@ -1958,12 +1968,12 @@ namespace delegate
 
             template<typename F> Delegate(F functional) : detail::DelegateImpl<A*, R>::DelegateImpl(functional) {}
 
-            Delegate& operator=(const detail::DelegateImpl<A*, R>& del) {
+            Delegate& operator=(const Delegate& del) {
                 detail::DelegateImpl<A*, R>::operator=(del);
                 return *this;
             }
 
-            Delegate& operator=(detail::DelegateImpl<A*, R>&& del) {
+            Delegate& operator=(Delegate&& del) {
                 detail::DelegateImpl<A*, R>::operator=(std::move(del));
                 return *this;
             }
@@ -2004,20 +2014,22 @@ namespace delegate
 
             Delegate(std::nullptr_t) : detail::DelegateImpl<void, R>::DelegateImpl(nullptr) {}
 
-            Delegate(const detail::DelegateImpl<void, R>& del) : detail::DelegateImpl<void, R>::DelegateImpl(del) {}
+            Delegate(const Delegate& del) : detail::DelegateImpl<void, R>::DelegateImpl(
+                static_cast<const detail::DelegateImpl<void, R>&>(del)) {}
 
-            Delegate(detail::DelegateImpl<void, R>&& del) : detail::DelegateImpl<void, R>::DelegateImpl(std::move(del)) {}
+            Delegate(Delegate&& del) : detail::DelegateImpl<void, R>::DelegateImpl(
+                std::move(static_cast<detail::DelegateImpl<void, R>&&>(del))) {}
 
             Delegate(FunPtr fn) : detail::DelegateImpl<void, R>::DelegateImpl(fn) {}
 
             template<typename F> Delegate(F functional) : detail::DelegateImpl<void, R>::DelegateImpl(functional) {}
 
-            Delegate& operator=(const detail::DelegateImpl<void, R>& del) {
+            Delegate& operator=(const Delegate& del) {
                 detail::DelegateImpl<void, R>::operator=(del);
                 return *this;
             }
 
-            Delegate& operator=(detail::DelegateImpl<void, R>&& del) {
+            Delegate& operator=(Delegate&& del) {
                 detail::DelegateImpl<void, R>::operator=(std::move(del));
                 return *this;
             }
@@ -2043,9 +2055,11 @@ public:
 
     Delegate(std::nullptr_t) : delegate::detail::Delegate<A, R, P...>::Delegate(nullptr) {}
 
-    Delegate(const delegate::detail::Delegate<A, R, P...>& del) : delegate::detail::Delegate<A, R, P...>::Delegate(del) {}
+    Delegate(const Delegate& del) : delegate::detail::Delegate<A, R, P...>::Delegate(
+        static_cast<const delegate::detail::Delegate<A, R, P...>&>(del)) {}
 
-    Delegate(delegate::detail::Delegate<A, R, P...>&& del) : delegate::detail::Delegate<A, R, P...>::Delegate(std::move(del)) {}
+    Delegate(Delegate&& del) : delegate::detail::Delegate<A, R, P...>::Delegate(
+        std::move(static_cast<delegate::detail::Delegate<A, R, P...>&&>(del))) {}
 
     Delegate(typename delegate::detail::Delegate<A, R, P...>::FunAPtr fnA, const A& obj) : delegate::detail::Delegate<A, R, P...>::Delegate(fnA, obj) {}
 
@@ -2055,12 +2069,12 @@ public:
 
     template<typename F> Delegate(F functional) : delegate::detail::Delegate<A, R, P...>::Delegate(functional) {}
 
-    Delegate& operator=(const delegate::detail::Delegate<A, R, P...>& del) {
+    Delegate& operator=(const Delegate& del) {
         delegate::detail::Delegate<A, R, P...>::operator=(del);
         return *this;
     }
 
-    Delegate& operator=(delegate::detail::Delegate<A, R, P...>&& del) {
+    Delegate& operator=(Delegate&& del) {
         delegate::detail::Delegate<A, R, P...>::operator=(std::move(del));
         return *this;
     }
@@ -2082,20 +2096,22 @@ public:
 
     Delegate(std::nullptr_t) : delegate::detail::Delegate<void, R, P...>::Delegate(nullptr) {}
 
-    Delegate(const delegate::detail::Delegate<void, R, P...>& del) : delegate::detail::Delegate<void, R, P...>::Delegate(del) {}
+    Delegate(const Delegate& del) : delegate::detail::Delegate<void, R, P...>::Delegate(
+        static_cast<const delegate::detail::Delegate<void, R, P...>&>(del)) {}
 
-    Delegate(delegate::detail::Delegate<void, R, P...>&& del) : delegate::detail::Delegate<void, R, P...>::Delegate(std::move(del)) {}
+    Delegate(Delegate&& del) : delegate::detail::Delegate<void, R, P...>::Delegate(
+        std::move(static_cast<delegate::detail::Delegate<void, R, P...>&&>(del))) {}
 
     Delegate(typename delegate::detail::Delegate<void, R, P...>::FunPtr fn) : delegate::detail::Delegate<void, R, P...>::Delegate(fn) {}
 
     template<typename F> Delegate(F functional) : delegate::detail::Delegate<void, R, P...>::Delegate(functional) {}
 
-    Delegate& operator=(const delegate::detail::Delegate<void, R, P...>& del) {
+    Delegate& operator=(const Delegate& del) {
         delegate::detail::Delegate<void, R, P...>::operator=(del);
         return *this;
     }
 
-    Delegate& operator=(delegate::detail::Delegate<void, R, P...>&& del) {
+    Delegate& operator=(Delegate&& del) {
         delegate::detail::Delegate<void, R, P...>::operator=(std::move(del));
         return *this;
     }
