@@ -251,7 +251,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
         nextEventCcys = nextEventCcy - now;
         if (nextTimerCcys > nextEventCcys)
-          nextTimerCcy = wave->nextPhaseCcy;
+          nextTimerCcy = nextEventCcy;
 
         // Disable any waveforms that are done
         if ((WaveformMode::EXPIRES == wave->mode)) {
