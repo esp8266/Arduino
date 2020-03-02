@@ -92,7 +92,7 @@ class SSDPClass{
     void setManufacturerURL(const char *url);
     void setHTTPPort(uint16_t port);
     void setTTL(uint8_t ttl);
-    void setInterval(uint8_t interval);
+    void setInterval(uint32_t interval);
 
   protected:
     void _send(ssdp_method_t method);
@@ -105,7 +105,7 @@ class SSDPClass{
     SSDPTimer* _timer;
     uint16_t _port;
     uint8_t _ttl;
-    uint8_t _interval;
+    uint32_t _interval;
 
     IPAddress _respondToAddr;
     uint16_t  _respondToPort;

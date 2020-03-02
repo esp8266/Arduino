@@ -498,7 +498,7 @@ void SSDPClass::setTTL(const uint8_t ttl) {
   _ttl = ttl;
 }
 
-void SSDPClass::setInterval(uint8_t interval) {
+void SSDPClass::setInterval(uint32_t interval) {
   _interval = interval;
 }
 
