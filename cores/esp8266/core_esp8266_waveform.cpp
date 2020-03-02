@@ -292,10 +292,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
   // But, must fire timer early to reach deadlines for waveforms.
-  if (nextTimerCcys <= microsecondsToClockCycles(4))
+  if (nextTimerCcys <= microsecondsToClockCycles(6))
     nextTimerCcys = microsecondsToClockCycles(2);
   else
-    nextTimerCcys -= microsecondsToClockCycles(2);
+    nextTimerCcys -= microsecondsToClockCycles(4);
 
   if (clockCyclesPerMicrosecond() == 160)
     timer1_write(nextTimerCcys / 2);
