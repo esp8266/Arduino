@@ -222,7 +222,7 @@ public:
     }
 
     bool isValidOffset(const size_t pos) const {
-        return (pos <= _rx_buf->tot_len);
+        return (_rx_buf && pos <= _rx_buf->tot_len);
     }
 
     netif* getInputNetif() const
@@ -264,7 +264,7 @@ public:
 
         auto deleteme = _rx_buf;
 
-        while(_rx_buf->len != _rx_buf->tot_len)
+        while(_rx_buf->len != _rx_buf->tot_len && _rx_buf->next)
             _rx_buf = _rx_buf->next;
 
         _rx_buf = _rx_buf->next;
@@ -292,7 +292,7 @@ public:
 
             // this rx_buf is not nullptr by construction,
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
-            pbuf_ref(_rx_buf);
+            if (_rx_buf) pbuf_ref(_rx_buf);
         }
         pbuf_free(deleteme);
 
@@ -466,7 +466,7 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
-        if (_rx_buf_offset > _rx_buf->tot_len) {
+        if (_rx_buf && _rx_buf_offset > _rx_buf->tot_len) {
             _rx_buf_offset = _rx_buf->tot_len;
         }
     }
