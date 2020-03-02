@@ -271,12 +271,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             nextTimerCcy = wave->expiryCcy;
           }
         }
-        now = ESP.getCycleCount();
       }
 
-      // Exit the loop if the next event, if any, is known to be after the fixed ISR runtime limit,
+      // Exit the loop if the next event, if any, is sufficiently distant,
       // and guard against insanely short waveform periods that the ISR cannot maintain
-      done = !waveformsEnabled || (nextTimerCcy - isrStartCcy > isrTimeoutCcys) || (now - isrStartCcy > isrTimeoutCcys);
+      done = !waveformsEnabled || (nextTimerCcy - now > microsecondsToClockCycles(4)) || (now - isrStartCcy > isrTimeoutCcys);
     } while (!done);
   } // if (waveformsEnabled)
 
