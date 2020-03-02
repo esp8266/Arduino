@@ -182,9 +182,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
-  constexpr uint32_t isrTimeoutCcys = microsecondsToClockCycles(14);
+  constexpr int32_t isrTimeoutCcys = microsecondsToClockCycles(14);
   const uint32_t isrStartCcy = ESP.getCycleCount();
-  uint32_t nextTimerCcy = isrStartCcy + microsecondsToClockCycles(MAXIRQUS);
 
   if (waveformToEnable || waveformToDisable) {
     // Handle enable/disable requests from main app.
@@ -198,11 +197,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     endPin = 32 - __builtin_clz(waveformsEnabled);
   }
 
-  bool done = false;
+  uint32_t now = ESP.getCycleCount();
+  int32_t nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
+  uint32_t nextTimerCcy = now + nextTimerCcys;
   if (waveformsEnabled) {
-    do {
-      uint32_t now = ESP.getCycleCount();
-      nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
+      bool done = false;
+      do {
+      nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
       for (int i = startPin; i <= endPin; i++) {
         uint32_t mask = 1UL<<i;
 
@@ -226,7 +227,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         default:
           break;
         }
-        const int32_t nextTimerCcys = nextTimerCcy - now;
         uint32_t nextEventCcy = wave->nextPhaseCcy + ((waveformsState & mask) ? wave->nextTimeDutyCcys : 0);
         int32_t nextEventCcys =  nextEventCcy - now;
         const int32_t expiryCcys = (WaveformMode::EXPIRES == wave->mode) ? wave->expiryCcy - now : (nextEventCcys + 1);
@@ -258,7 +258,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
         nextEventCcys = nextEventCcy - now;
         if (nextTimerCcys > nextEventCcys)
-          nextTimerCcy = nextEventCcy;
+          nextTimerCcys = nextEventCcys;
 
         // Disable any waveforms that are done
         if ((WaveformMode::EXPIRES == wave->mode)) {
@@ -266,25 +266,26 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             // Done, remove!
             waveformsEnabled &= ~mask;
           }
-          else if (static_cast<int32_t>(nextTimerCcy - now) > expiryCcys)
+          else if (nextTimerCcys > expiryCcys)
           {
-            nextTimerCcy = wave->expiryCcy;
+            nextTimerCcys = expiryCcys;
           }
         }
       }
 
+      nextTimerCcy = now + nextTimerCcys;
+      now = ESP.getCycleCount();
+      nextTimerCcys = nextTimerCcy - now;
       // Exit the loop if the next event, if any, is sufficiently distant,
       // and guard against insanely short waveform periods that the ISR cannot maintain
-      done = !waveformsEnabled || (nextTimerCcy - now > microsecondsToClockCycles(4)) || (now - isrStartCcy > isrTimeoutCcys);
+      const int32_t isrRemainingCcys = isrTimeoutCcys - (now - isrStartCcy);
+      done = !waveformsEnabled || (nextTimerCcys >= isrRemainingCcys) || (isrRemainingCcys <= 0);
     } while (!done);
   } // if (waveformsEnabled)
 
-  int32_t nextTimerCcys;
-  if (!timer1CB) {
-    nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
-  }
-  else {
+  if (timer1CB) {
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
+    // Account for unknown duration of timer1CB().
     nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
     if (nextTimerCcys > callbackCcys)
       nextTimerCcys = callbackCcys;
