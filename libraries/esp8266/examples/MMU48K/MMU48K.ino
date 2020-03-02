@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <umm_malloc/umm_malloc.h>
 
 uint32_t timed_byte_read(char *pc, uint32_t * o);
 uint32_t timed_byte_read2(char *pc, uint32_t * o);
@@ -23,12 +24,17 @@ constexpr size_t gobble_sz = sizeof(gobble);
 #endif
 
 #ifdef MMU_SEC_HEAP
-constexpr uint32_t *gobble = (uint32_t *)MMU_SEC_HEAP;
-constexpr size_t gobble_sz = MMU_SEC_HEAP_SIZE;
+uint32_t *gobble;
+size_t gobble_sz;
 #endif
 
 bool  isValid(uint32_t *probe) {
   bool rc = true;
+  if (NULL == probe) {
+  	ets_uart_printf("\nNULL memory pointer %p ...\n", probe);
+    return false;
+  }
+
   ets_uart_printf("\nTesting for valid memory at %p ...\n", probe);
   uint32_t savePS = xt_rsil(15);
   uint32_t saveData = *probe;
@@ -119,18 +125,30 @@ void setup() {
 
   print_mmu_status(Serial);
 
+#ifdef MMU_SEC_HEAP
+  {
+    HeapSelectIram ephemeral;
+    // Serial.printf_P(PSTR("ESP.getFreeHeap(): %u\n"), ESP.getFreeHeap());
+    gobble_sz = ESP.getFreeHeap(); // - 4096;
+    gobble = (uint32_t *)malloc(gobble_sz);
+  }
+  Serial.printf_P(PSTR("gobble_sz: %u\n"), gobble_sz);
+  Serial.printf_P(PSTR("gobble:    %p\n"), gobble);
+
+#endif
+
 #if (MMU_IRAM_SIZE > 0x8000) || defined(MMU_SEC_HEAP)
   if (isValid(gobble)) {
     // Put something in our new memory
     for (size_t i = 0; i < (gobble_sz / 4); i++) {
       gobble[i] = (uint32_t)&gobble[i];
     }
-  }
 
-  // Now is it there?
-  dump_mem32(gobble, 32);
-  // dump_mem32(&gobble[gobble_sz / 4 / 2], 32);
-  dump_mem32(&gobble[gobble_sz / 4 - 32], 32);
+    // Now is it there?
+    dump_mem32(gobble, 32);
+    // dump_mem32(&gobble[gobble_sz / 4 / 2], 32);
+    dump_mem32(&gobble[gobble_sz / 4 - 32], 32);
+  }
 #endif
 
   // Lets peak over the edge
@@ -138,10 +156,10 @@ void setup() {
 }
 
 int* nullPointer = NULL;
-constexpr char *probe_b = (char *)0x40108000;
-constexpr short *probe_s = (short *)0x40108000;
-constexpr char *probe_c = (char *)0x40110000;
-constexpr short *unaligned_probe_s = (short *)0x3FFF8001;
+char *probe_b = (char *)gobble;
+short *probe_s = (short *)((uintptr_t)gobble);
+char *probe_c = (char *)0x40110000;
+short *unaligned_probe_s = (short *)((uintptr_t)gobble + 1);
 
 uint32_t read_var = 0x11223344;
 
@@ -297,3 +315,23 @@ void loop() {
 int divideA_B(int a, int b) {
   return (a / b);
 }
+
+#if 0
+#ifdef MMU_SEC_HEAP
+extern "C" void _text_end(void);
+
+extern "C" void umm_init_iram(void) {
+  // Merge free IRAM into Second Heap
+  uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - 0x40100000UL);
+  uint32_t sec_heap = MMU_SEC_HEAP;
+  size_t   sec_heap_sz = MMU_SEC_HEAP_SIZE;
+  iram_free &= ~7;
+  if (iram_free > 40) {
+    iram_free -= 32;
+    sec_heap -= iram_free;
+    sec_heap_sz += iram_free;
+  }
+  umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
+}
+#endif
+#endif

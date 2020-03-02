@@ -34,6 +34,7 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include <umm_malloc/umm_malloc.h>
 #include <core_esp8266_non32xfer.h>
 
 
@@ -298,18 +299,20 @@ extern "C" void app_entry_redefinable(void)
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
-    DBG_MM_PRINT_STATUS();
+    DBG_MMU_PRINT_STATUS();
 
-    DBG_MMU_PRINT_IRAM_BANK_REG(0);
+    DBG_MMU_PRINT_IRAM_BANK_REG(0, "");
+
+    DBG_MMU_PRINTF("\nCall call_user_start()\n");
 
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
-
 static void app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
 
 extern "C" void app_entry (void)
 {
+    umm_init();
     return app_entry_custom();
 }
 
@@ -331,10 +334,12 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
-#ifdef NON32XFER_HANDLER
+#if defined(NON32XFER_HANDLER) || defined(MMU_SEC_HEAP)
     install_non32xfer_exception_handler();
 #endif
-
+#if defined(MMU_SEC_HEAP)
+    umm_init_iram();
+#endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,

@@ -81,7 +81,7 @@ struct __exception_frame
 typedef void (*fn_exception_handler_t)(struct __exception_frame *ef, uint32_t cause);
 extern fn_exception_handler_t _xtos_set_exception_handler(uint32_t reason, fn_exception_handler_t fn);
 
-//D extern void _xtos_unhandled_exception(struct __exception_frame *ef, uint32_t cause);
+extern void _xtos_unhandled_exception(struct __exception_frame *ef, uint32_t cause);
 
 #ifdef __cplusplus
 };

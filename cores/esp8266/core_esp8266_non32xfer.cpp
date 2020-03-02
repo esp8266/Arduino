@@ -38,24 +38,6 @@
 
 extern "C" {
 
-#if 1
-#define ETS_PRINTF ets_uart_printf
-#else
-#define ETS_PRINTF(...) do {} while(false)
-#endif
-
-#ifndef __MMU_IRAM_H
-bool inline is_iram(uint32_t addr) {
-  (void)addr;
-  return true;
-}
-
-bool inline is_icache(uint32_t addr) {
-  (void)addr;
-  return true;
-}
-#endif
-
 #define LOAD_MASK   0x00f00fu
 #define L8UI_MATCH  0x000002u
 #define L16UI_MATCH 0x001002u
@@ -66,10 +48,16 @@ bool inline is_icache(uint32_t addr) {
 #define EXCCAUSE_LOAD_STORE_ERROR 3 /* Non 32-bit read/write error */
 
 uint32_t mmu_non32xfer_count = 0;
+uint32_t mmu_non32xfer_withinisr_count = 0;
+
+#define DEBUG_WARNING
+#ifdef DEBUG_WARNING
 static void warning(void)
 {
-    DEBUGV("WARNING: The Non-32-bit transfer hander has been invoked, and performance may suffer.\n");
+    ETS_PRINTF("WARNING: The Non-32-bit transfer hander has been invoked, and performance may suffer.\n");
 }
+#endif
+
 static fn_exception_handler_t old_handler = NULL;
 
 static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, uint32_t cause)
@@ -88,12 +76,13 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
      */
     uint32_t insn;
     __asm(
-      "movi  %0, ~3;"          /* prepare a mask for the EPC */
-      "and   %0, %0, %1;"      /* apply mask for 32bit aligned base */
-      "ssa8l %1;"              /* set up shift register for src op */
-      "l32i  %1, %0, 0;"       /* load part 1 */
-      "l32i  %0, %0, 4;"       /* load part 2 */
-      "src   %0, %0, %1;"      /* right shift to get faulting instruction */
+      "rsil  %0, 15\n\t"         /* Turn IRQs back off, let exit wrapper restore PS */
+      "movi  %0, ~3\n\t"         /* prepare a mask for the EPC */
+      "and   %0, %0, %1\n\t"     /* apply mask for 32bit aligned base */
+      "ssa8l %1\n\t"             /* set up shift register for src op */
+      "l32i  %1, %0, 0\n\t"      /* load part 1 */
+      "l32i  %0, %0, 4\n\t"      /* load part 2 */
+      "src   %0, %0, %1\n\t"     /* right shift to get faulting instruction */
       :"=&r"(insn)
       :"r"(ef->epc)
       :
@@ -105,10 +94,15 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       an exception handler?
      */
     if (ef->ps & 0x0F) {
-      ETS_PRINTF("\nload/store exception with INTLEVEL 0x%02X\n", ef->ps & 0x0F);
-#if 0
-      continue;     /* fail, not safe for IRQ disabled ?? */
-#endif
+      if (0 == mmu_non32xfer_withinisr_count) {
+        ETS_PRINTF("\nload/store exception with INTLEVEL 0x%02X\n", ef->ps & 0x0F);
+        #if 0
+        continue;     /* fail, not safe for IRQ disabled ?? */
+        #endif
+      }
+      if (0 == ++mmu_non32xfer_withinisr_count) {
+        --mmu_non32xfer_withinisr_count;  // saturated
+      }
     }
 
     uint32_t what = insn & LOAD_MASK;
@@ -129,9 +123,13 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       continue; /* fail */
     }
 
+#ifdef DEBUG_WARNING
     if (0 == mmu_non32xfer_count) {
+      // This may be causing some issues TODO retest with umm_malloc within
+      // interrupt context.
       schedule_function(warning);
     }
+#endif
     // Some accounting information so we know this is happending.
     if (0 == ++mmu_non32xfer_count) {
       --mmu_non32xfer_count;  // saturated
@@ -208,10 +206,13 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
 }
 
 
-void install_non32xfer_exception_handler(void)
+void IRAM_ATTR install_non32xfer_exception_handler(void)
 {
-  old_handler =
-  _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR, non32xfer_exception_handler);
+  if (NULL == old_handler) {
+    old_handler =
+    _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR,
+      non32xfer_exception_handler);
+  }
 }
 
 };

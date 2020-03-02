@@ -27,6 +27,8 @@
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
 #include "coredecls.h"
+#include "umm_malloc/umm_malloc.h"
+// #include "core_esp8266_vm.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -697,4 +699,48 @@ String EspClass::getSketchMD5()
     md5.calculate();
     result = md5.toString();
     return result;
+}
+
+void EspClass::enableVM()
+{
+#ifdef UMM_HEAP_EXTERNAL
+    if (!vmEnabled)
+        install_vm_exception_handler();
+    vmEnabled = true;
+#endif
+}
+
+void EspClass::setExternalHeap()
+{
+#ifdef UMM_HEAP_EXTERNAL
+    if (vmEnabled)
+        umm_push_heap(UMM_HEAP_EXTERNAL);
+#endif
+}
+
+void EspClass::setIramHeap()
+{
+#ifdef UMM_HEAP_IRAM
+    umm_push_heap(UMM_HEAP_IRAM);
+#endif
+}
+
+void EspClass::setDramHeap()
+{
+#if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
+    if (vmEnabled)
+        umm_push_heap(UMM_HEAP_DRAM);
+#elif defined(UMM_HEAP_IRAM)
+    umm_push_heap(UMM_HEAP_DRAM);
+#endif
+}
+
+void EspClass::resetHeap()
+{
+#if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
+    if (vmEnabled)
+        umm_pop_heap();
+#elif defined(UMM_HEAP_IRAM)
+    umm_pop_heap();
+#endif
 }

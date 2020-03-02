@@ -25,6 +25,7 @@
 #include <list>
 #include <errno.h>
 #include <algorithm>
+#include <Esp.h>
 
 extern "C" {
 #include "osapi.h"
@@ -44,6 +45,8 @@ extern "C" {
 #include <include/ClientContext.h>
 #include "c_types.h"
 #include "coredecls.h"
+#include <mmu_iram.h>
+#include <umm_malloc/umm_malloc.h>
 
 #if !CORE_MOCK
 
@@ -438,17 +441,17 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
   }
-  
+
   esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
-  
-  for (int no_work = 0; blocking || no_work < 2;) {    
+
+  for (int no_work = 0; blocking || no_work < 2;) {
     optimistic_yield(100);
-    
+
     if (loopTimeout) {
       DEBUG_BSSL("_run_until: Timeout\n");
       return -1;
     }
-    
+
     int state;
     state = br_ssl_engine_current_state(_eng);
     if (state & BR_SSL_CLOSED) {
@@ -471,15 +474,15 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
 
       buf = br_ssl_engine_sendrec_buf(_eng, &len);
       availForWrite = WiFiClient::availableForWrite();
-      
+
       if (!blocking && len > availForWrite) {
-        /* 
+        /*
            writes on WiFiClient will block if len > availableForWrite()
            this is needed to prevent available() calls from blocking
-           on dropped connections 
+           on dropped connections
         */
         len = availForWrite;
-      }	  
+      }
       wlen = WiFiClient::write(buf, len);
       if (wlen <= 0) {
         /*
@@ -1067,8 +1070,15 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-  _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  { // ESP.setIramHeap();
+    HeapSelectIram ephemeral;
+    _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+    _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+    ETS_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+    ETS_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+    ETS_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+    ETS_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
+  } // ESP.resetHeap();
 
   if (!_sc || !_iobuf_in || !_iobuf_out) {
     _freeSSL(); // Frees _sc, _iobuf*
@@ -1183,8 +1193,15 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-  _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  { // ESP.setIramHeap();
+    HeapSelectIram ephemeral;
+    _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+    _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+    ETS_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+    ETS_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+    ETS_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+    ETS_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
+  }	// ESP.resetHeap();
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
@@ -1196,7 +1213,7 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
   br_ssl_server_base_init(_sc_svr.get(), suites_server_rsa_P, sizeof(suites_server_rsa_P) / sizeof(suites_server_rsa_P[0]));
   br_ssl_server_set_single_rsa(_sc_svr.get(), chain ? chain->getX509Certs() : nullptr, chain ? chain->getCount() : 0,
                                sk ? sk->getRSA() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
-		               br_rsa_private_get_default(), br_rsa_pkcs1_sign_get_default());
+                               br_rsa_private_get_default(), br_rsa_pkcs1_sign_get_default());
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
     DEBUG_BSSL("_connectSSLServerRSA: Can't install serverX509check\n");
@@ -1220,8 +1237,15 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-  _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  { // ESP.setIramHeap();
+    HeapSelectIram ephemeral;
+    _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+    _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+    ETS_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+    ETS_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+    ETS_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+    ETS_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
+  }	// ESP.resetHeap();
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
@@ -1402,7 +1426,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
     0x00, 26 + 14 + 6 +  5, // Extension length
     0x00, 0x0d, 0x00, 0x16, 0x00, 0x14, 0x04, 0x03, 0x03, 0x03, 0x05, 0x03,
           0x06, 0x03, 0x02, 0x03, 0x04, 0x01, 0x03, 0x01, 0x05, 0x01, 0x06,
-	  0x01, 0x02, 0x01, // Supported signature algorithms
+    0x01, 0x02, 0x01, // Supported signature algorithms
     0x00, 0x0a, 0x00, 0x0a, 0x00, 0x08, 0x00, 0x17, 0x00, 0x18, 0x00, 0x19,
           0x00, 0x1d, // Supported groups
     0x00, 0x0b, 0x00, 0x02, 0x01, 0x00, // Supported EC formats

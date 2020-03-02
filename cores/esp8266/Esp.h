@@ -198,6 +198,17 @@ class EspClass {
 #else
         uint32_t getCycleCount();
 #endif
+
+        void enableVM();
+        void setDramHeap();
+        void setIramHeap();
+        void setExternalHeap();
+        void setInternalHeap() {setDramHeap();}; // depricated
+        void resetHeap();
+private:
+#ifdef UMM_HEAP_EXTERNAL
+        bool vmEnabled = false;
+#endif
 };
 
 #ifndef CORE_MOCK

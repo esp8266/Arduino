@@ -17,6 +17,7 @@
 
 #include "Arduino.h"
 #include "mmu_iram.h"
+#include <user_interface.h>
 
 extern "C" {
 
@@ -110,12 +111,12 @@ void IRAM_ATTR Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v) {
   if (0 == mmu_status.enable_count) {
     mmu_status.enable_count--;   // keep saturated value
   }
-  DBG_MMU_PRINT_IRAM_BANK_REG("before");
+  DBG_MMU_PRINT_IRAM_BANK_REG("before", "Enable");
 
   real_Cache_Read_Enable(map, p, SOC_CACHE_SIZE);
 
-  DBG_MMU_PRINT_IRAM_BANK_REG("after");
-  DBG_MM_PRINT_STATUS();
+  DBG_MMU_PRINT_IRAM_BANK_REG("after", "Enable");
+  DBG_MMU_PRINT_STATUS();
 }
 
 #ifndef ROM_Cache_Read_Disable
@@ -129,19 +130,85 @@ constexpr fp_Cache_Read_Disable_t real_Cache_Read_Disable =
  *
  */
 void IRAM_ATTR Cache_Read_Disable(void) {
-
   mmu_status.disable_count++;
   mmu_status.state = 0;
   if (0 == mmu_status.disable_count) {
     mmu_status.disable_count--;   // keep saturated value
   }
-  DBG_MMU_PRINT_IRAM_BANK_REG("before");
+  DBG_MMU_PRINT_IRAM_BANK_REG("before", "Disable");
 
   real_Cache_Read_Disable();
 
-  DBG_MMU_PRINT_IRAM_BANK_REG("after");
-  DBG_MM_PRINT_STATUS();
+  DBG_MMU_PRINT_IRAM_BANK_REG("after", "Disable");
+  DBG_MMU_PRINT_STATUS();
 }
+
+#ifdef DEV_DEBUG_PRINT
+/*
+ * Early adjustment for CPU crystal frequency, so debug printing will work.
+ * This should not be left enabled all the time in Crash_Read..., I am concerned
+ * that there may be unknown interference with the NONOS SDK startup.
+ *
+ * Inspired by:
+ * https://github.com/pvvx/esp8266web/blob/2e25559bc489487747205db2ef171d48326b32d4/app/sdklib/system/app_main.c#L581-L591
+ */
+extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
+extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
+
+extern "C" void IRAM_ATTR set_pll(void)
+{
+#if !defined(F_CRYSTAL)
+#define F_CRYSTAL 26000000
+#endif
+  if (F_CRYSTAL != 40000000) {
+    // At Boot ROM(-BIOS) start, it assumes a 40MHz crystal.
+    // If it is not, we assume a 26MHz crystal.
+    // There is no support for 24MHz crustal at this time.
+    if(rom_i2c_readReg(103,4,1) != 136) { // 8: 40MHz, 136: 26MHz
+      // Assume 26MHz crystal
+      // soc_param0: 0: 40MHz, 1: 26MHz, 2: 24MHz
+      // set 80MHz PLL CPU
+      rom_i2c_writeReg(103,4,1,136);
+      rom_i2c_writeReg(103,4,2,145);
+    }
+  }
+}
+
+extern "C" void IRAM_ATTR dbg_set_pll(void)
+{
+  char r103_4_1 = rom_i2c_readReg(103,4,1);
+  char r103_4_2 = rom_i2c_readReg(103,4,2);
+  set_pll();
+  ets_uart_printf("\nrom_i2c_readReg(103,4,1) == %u\n", r103_4_1);
+  ets_uart_printf(  "rom_i2c_readReg(103,4,2) == %u\n", r103_4_2);
+}
+
+/*
+  This helps keep the UART enabled at user_init() so we can get a few more
+  messages printed.
+*/
+extern struct rst_info resetInfo;
+extern "C" void __pinMode( uint8_t pin, uint8_t mode );
+
+inline bool is_gpio_persistent(void) {
+    return REASON_EXCEPTION_RST <= resetInfo.reason &&
+           REASON_SOFT_RESTART  >= resetInfo.reason;
+}
+
+extern "C" void pinMode( uint8_t pin, uint8_t mode ) {
+    static bool in_initPins = true;
+    if (in_initPins && (1 == pin)) {
+        if (!is_gpio_persistent()) {
+            /* Restore pin to TX after Power-on and EXT_RST */
+            __pinMode(pin, FUNCTION_0);
+        }
+        in_initPins = false;
+        return;
+    }
+
+    __pinMode( pin, mode );
+}
+#endif
 
 #endif
 

@@ -19,14 +19,77 @@
 
 #include <stdint.h>
 #include <c_types.h>
+#include <assert.h>
+
+/*
+ * DEV_DEBUG_MMU_IRAM:
+ *   Debug printing for developing mmu_iram. I don't think it would be usful for
+ *   general debugging.
+ *
+ * DEV_DEBUG_PRINT:
+ *   Debug printing macros for printing before before, during, and after
+ *   NONOS SDK initializes. May or maynot be safe during NONOS SDK
+ *   initialization. As in printing from functions called on by the SDK
+ *   during the SDK initialization.
+ *
+ #define DEV_DEBUG_MMU_IRAM
+ #define DEV_DEBUG_PRINT
+ */
 
 #ifdef DEBUG_ESP_CORE
-#endif
 #define DEBUG_MMU
-
-#ifndef assert
-#define assert(...) do{}while(false)
 #endif
+
+
+
+#if defined( DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_MMU)
+#include <esp8266_peri.h>
+
+#if defined( DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM)
+extern "C" void set_pll(void);
+extern "C" void dbg_set_pll(void);
+#define SET_PLL() set_pll()
+
+#else
+#define SET_PLL() do {} while(false)
+#endif
+
+#define ETS_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
+
+#define ETS_PRINTF(fmt, ...) \
+  SET_PLL(); \
+  uart_buff_switch(0); \
+  ets_uart_printf(fmt, ##__VA_ARGS__); \
+  ETS_FLUSH(0)
+
+#else     // ! DEV_DEBUG_PRINT
+#define ETS_FLUSH(...) do {} while(false)
+#define ETS_PRINTF(...) do {} while(false)
+#endif    // DEV_DEBUG_PRINT
+
+#define DBG_MMU_PRINTF ETS_PRINTF
+
+#ifdef DEV_DEBUG_MMU_IRAM
+#define DBG_MMU_PRINT_STATUS() { \
+    DBG_MMU_PRINTF("\nmmu_status = {" \
+                   "v_cfg = %u, state = %d, enable/disable count = %u/%u, " \
+                   "map = 0x%02X, p = 0x%02X, v = 0x%02X}\n", \
+                   mmu_status.v_cfg, mmu_status.state, \
+                   mmu_status.enable_count, mmu_status.disable_count, \
+                   mmu_status.map, mmu_status.p, mmu_status.v); \
+    ETS_FLUSH(0); \
+}
+
+#define DBG_MMU_PRINT_IRAM_BANK_REG(a, b) { \
+    uint32_t iram_bank_reg = ESP8266_DREG(0x24); \
+    DBG_MMU_PRINTF("\niram_bank_reg %s%s 0x%08X\n", (0 == a) ? "" : a, (0 == a) ? "" : " Cache_Read_" b, iram_bank_reg); \
+}
+
+#else     // ! DEV_DEBUG_MMU_IRAM
+#define DBG_MMU_PRINT_STATUS(...) do {} while(false)
+#define DBG_MMU_PRINT_IRAM_BANK_REG(...) do {} while(false)
+#endif    // #if DEV_DEBUG_MMU_IRAM
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,30 +109,44 @@ extern mmu_cre_status_t mmu_status;
 
 
 #ifdef DEBUG_MMU
+
 static inline bool is_iram(uint32_t addr) {
-constexpr uint32_t iram_start = 0x40100000u;
+constexpr uint32_t _start = 0x40100000UL;
+#define IRAM_START 0x40100000UL
 
 #ifndef MMU_IRAM_SIZE
 #define MMU_IRAM_SIZE 0x8000
 #endif
 
 #ifdef MMU_SEC_HEAP_SIZE
-  constexpr uint32_t iram_end = iram_start + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE;
+  constexpr uint32_t _end = _start + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE;
+  #define IRAM_END (IRAM_START + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE)
 #else
-  constexpr uint32_t iram_end = iram_start + MMU_IRAM_SIZE;
+  constexpr uint32_t _end = _start + MMU_IRAM_SIZE;
 #endif
 
-  return (iram_start <= addr && iram_end > addr);
+  return (_start <= addr && _end > addr);
+}
+
+static inline bool is_dram(uint32_t addr) {
+  constexpr uint32_t _start = 0x3FF80000UL;
+  constexpr uint32_t _end = 0x40000000;
+  return (_start <= addr && _end > addr);
 }
 
 static inline bool is_icache(uint32_t addr) {
-  constexpr uint32_t icache_start = 0x40200000u;
-  constexpr uint32_t icache_end = icache_start + 0x100000;
-  return (icache_start <= addr && icache_end > addr);
+  constexpr uint32_t _start = 0x40200000UL;
+  constexpr uint32_t _end = _start + 0x100000;
+  return (_start <= addr && _end > addr);
 }
 
 #else
 static inline bool is_iram(uint32_t addr) {
+  (void)addr;
+  return true;
+}
+
+static inline bool is_dram(uint32_t addr) {
   (void)addr;
   return true;
 }
@@ -80,6 +157,25 @@ static inline bool is_icache(uint32_t addr) {
 }
 #endif  // #ifdef DEBUG_MMU
 
+#ifdef DEBUG_MMU
+#define ASSERT_RANGE_TEST_WRITE(a) \
+  if (is_iram((uint32_t)a) || is_dram((uint32_t)a)) { \
+  } else { \
+    DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
+    assert(("Outside of Range Write", false)); \
+  }
+
+#define ASSERT_RANGE_TEST_READ(a) \
+  if (is_iram((uint32_t)a) || is_icache((uint32_t)a) || is_dram((uint32_t)a)) { \
+  } else { \
+    DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
+    assert(("Outside of Range Read", false)); \
+  }
+
+#else
+#define ASSERT_RANGE_TEST_WRITE(a) do {} while(false)
+#define ASSERT_RANGE_TEST_READ(a) do {} while(false)
+#endif
 
 /*
  * Some inlines to allow faster random access to non32bit access of iRAM or
@@ -87,23 +183,23 @@ static inline bool is_icache(uint32_t addr) {
  * have occured by relying on exception processing.
  */
 static inline uint8_t get_uint8_iram(const void *p8) {
-  assert((is_iram((uint32_t)p8) || is_icache((uint32_t)p8)));
+  ASSERT_RANGE_TEST_READ(p8);
   uint32_t val = (*(uint32_t *)((uintptr_t)p8 & ~0x3));
   uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
   val >>= pos;
   return (uint8_t)val;
 }
 
-static inline uint16_t get_uint16_iram(const void *p16) {
-  assert((is_iram((uint32_t)p16) || is_icache((uint32_t)p16)));
+static inline uint16_t get_uint16_iram(const unsigned short *p16) {
+  ASSERT_RANGE_TEST_READ(p16);
   uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
   val >>= pos;
   return (uint16_t)val;
 }
 
-static inline int16_t get_int16_iram(const void *p16) {
-  assert((is_iram((uint32_t)p16) || is_icache((uint32_t)p16)));
+static inline int16_t get_int16_iram(const short *p16) {
+  ASSERT_RANGE_TEST_READ(p16);
   uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
   val >>= pos;
@@ -113,7 +209,7 @@ static inline int16_t get_int16_iram(const void *p16) {
 
 
 static inline uint8_t set_uint8_iram(void *p8, const uint8_t val) {
-  assert((is_iram((uint32_t)p8)));
+  ASSERT_RANGE_TEST_WRITE(p8);
   uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
   uint32_t sval = val << pos;
   uint32_t valmask =  0x0FF << pos;
@@ -126,8 +222,8 @@ static inline uint8_t set_uint8_iram(void *p8, const uint8_t val) {
   return val;
 }
 
-static inline uint16_t set_uint16_iram(void *p16, const uint16_t val) {
-  assert((is_iram((uint32_t)p16)));
+static inline uint16_t set_uint16_iram(unsigned short *p16, const uint16_t val) {
+  ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
   uint32_t sval = val << pos;
   uint32_t valmask =  0x0FFFF << pos;
@@ -140,8 +236,8 @@ static inline uint16_t set_uint16_iram(void *p16, const uint16_t val) {
   return val;
 }
 
-static inline int16_t set_int16_iram(void *p16, const int16_t val) {
-  assert((is_iram((uint32_t)p16)));
+static inline int16_t set_int16_iram(short *p16, const int16_t val) {
+  ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t sval = (uint16_t)val;
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
   sval <<= pos;
@@ -154,36 +250,6 @@ static inline int16_t set_int16_iram(void *p16, const int16_t val) {
   *p32 = ival;
   return val;
 }
-
-
-
-#if DEV_DEBUG
-#define DBG_MMU_PRINTF ets_uart_printf
-
-#define ETS_FLUSH(a) while((USS(a) >> USTXC) & 0xff){}
-
-#define DBG_MM_PRINT_STATUS() { \
-    DBG_MMU_PRINTF("\nmmu_status = {" \
-                   "v_cfg = %u, state = %d, enable/disable count = %u/%u, " \
-                   "map = 0x%02X, p = 0x%02X, v = 0x%02X}\n", \
-                   mmu_status.v_cfg, mmu_status.state, \
-                   mmu_status.enable_count, mmu_status.disable_count, \
-                   mmu_status.map, mmu_status.p, mmu_status.v); \
-    ETS_FLUSH(0); \
-}
-
-#define DBG_MMU_PRINT_IRAM_BANK_REG(a) { \
-    uint32_t iram_bank_reg = ESP8266_DREG(0x24); \
-    DBG_MMU_PRINTF("\niram_bank_reg %s%s0x%08X\n", (0 == a) ? "" : a, (0 == a) ? "" : " Cache_Read_Enable ", iram_bank_reg); \
-}
-
-#else
-#define ETS_FLUSH(...) do {} while(false)
-#define DBG_MMU_PRINTF(...) do {} while(false)
-#define DBG_MM_PRINT_STATUS(...) do {} while(false)
-#define DBG_MMU_PRINT_IRAM_BANK_REG(...) do {} while(false)
-#endif    // #if DEV_DEBUG
-
 
 #ifdef __cplusplus
 }

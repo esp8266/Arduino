@@ -132,8 +132,13 @@ static void *get_unpoisoned( void *v_ptr ) {
 
     ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
 
+    umm_heap_context_t *_context = umm_get_ptr_context( v_ptr );
+    if (NULL == _context) {
+      panic();
+      return NULL:
+    }
     /* Figure out which block we're in. Note the use of truncated division... */
-    c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
+    c = (((char *)ptr)-(char *)(&(_context->heap[0])))/sizeof(umm_block);
 
     check_poison_block(&UMM_BLOCK(c));
   }
@@ -209,11 +214,10 @@ int umm_poison_check(void) {
   int ok = 1;
   unsigned short int cur;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  UMM_INIT_HEAP;
 
   UMM_CRITICAL_ENTRY(id_poison);
+  umm_heap_context_t *_context = umm_get_current_heap();
 
   /* Now iterate through the blocks list */
   cur = UMM_NBLOCK(0) & UMM_BLOCKNO_MASK;

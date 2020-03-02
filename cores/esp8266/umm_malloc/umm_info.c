@@ -24,12 +24,12 @@ void *umm_info( void *ptr, int force ) {
 
   unsigned short int blockNo = 0;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  UMM_INIT_HEAP;
 
   /* Protect the critical section... */
   UMM_CRITICAL_ENTRY(id_info);
+
+  umm_heap_context_t *_context = umm_get_current_heap();
 
   /*
    * Clear out all of the entries in the ummHeapInfo structure before doing
@@ -148,16 +148,16 @@ void *umm_info( void *ptr, int force ) {
   DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-  if (ummHeapInfo.freeBlocks == ummStats.free_blocks) {
+  if (ummHeapInfo.freeBlocks == _context->stats.free_blocks) {
       DBGLOG_FORCE( force, "heap info Free blocks and heap statistics Free blocks match.\n");
   } else {
       DBGLOG_FORCE( force, "\nheap info Free blocks  %5d != heap statistics Free Blocks  %5d\n\n",
           ummHeapInfo.freeBlocks,
-          ummStats.free_blocks  );
+          _context->stats.free_blocks  );
   }
   DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
-  print_stats(force);
+  umm_print_stats(force);
 #endif
 
   /* Release the critical section... */

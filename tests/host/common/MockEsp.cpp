@@ -226,3 +226,15 @@ uint32_t EspClass::getCycleCount()
     gettimeofday(&t, NULL);
     return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
 }
+
+void EspClass::setInternalHeap()
+{
+}
+
+void EspClass::setExternalHeap()
+{
+}
+
+void EspClass::resetHeap()
+{
+}
