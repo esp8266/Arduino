@@ -132,8 +132,12 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     waveformToEnable |= mask;
     if (!timerRunning) {
       initTimer();
+      timer1_write(microsecondsToClockCycles(2));
     }
-    timer1_write(microsecondsToClockCycles(2));
+    else if (T1L > microsecondsToClockCycles(2)) {
+      // Must not interfere if Timer is due shortly
+      timer1_write(microsecondsToClockCycles(2));
+    }
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
     }
@@ -157,7 +161,10 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // If they send >=32, then the shift will result in 0 and it will also return false
   if (waveformsEnabled & (1UL << pin)) {
     waveformToDisable = 1UL << pin;
+  // Must not interfere if Timer is due shortly
+  if (T1L > microsecondsToClockCycles(2)) {
     timer1_write(microsecondsToClockCycles(2));
+  }
     while (waveformToDisable) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
     }
@@ -286,7 +293,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
   // But, must fire timer early to reach deadlines for waveforms.
-  if (nextTimerCcys < microsecondsToClockCycles(4))
+  if (nextTimerCcys <= microsecondsToClockCycles(4))
     nextTimerCcys = microsecondsToClockCycles(2);
   else
     nextTimerCcys -= microsecondsToClockCycles(2);
