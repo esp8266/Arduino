@@ -162,14 +162,27 @@ size_t umm_block_size( void ) {
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-// UMM_STATISTICS ummStats;
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+
+// Adjustment needed for free_blocks to express the number of bytes that can
+// actually be allocated.
+#define UMM_OVERHEAD_ADJUST \
+  (umm_block_size() + \
+  umm_block_size()/2 + \
+  UMM_POISON_SIZE_BEFORE + \
+  UMM_POISON_SIZE_AFTER + \
+  sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
+#else
+#define UMM_OVERHEAD_ADJUST  (umm_block_size() + umm_block_size()/2)
+#endif
 
 // Keep complete call path in IRAM
 size_t umm_free_heap_size_lw( void ) {
   UMM_INIT_HEAP;
 
   umm_heap_context_t *_context = umm_get_current_heap();
-  return (size_t)_context->stats.free_blocks * sizeof(umm_block) - umm_block_size() - umm_block_size()/2;
+  return (size_t)_context->stats.free_blocks * sizeof(umm_block) - UMM_OVERHEAD_ADJUST;
 }
 #endif
 
@@ -231,7 +244,7 @@ size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_lw_min( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
-  return (size_t)_context->stats.free_blocks_min * umm_block_size() - umm_block_size() - umm_block_size()/2;
+  return (size_t)_context->stats.free_blocks_min * umm_block_size() - UMM_OVERHEAD_ADJUST;
 }
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void ) {
@@ -242,12 +255,12 @@ size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void ) {
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_min( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
-  return _context->stats.free_blocks_min * umm_block_size() - umm_block_size() - umm_block_size()/2;
+  return _context->stats.free_blocks_min * umm_block_size() - UMM_OVERHEAD_ADJUST;
 }
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_isr_min( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
-  return _context->stats.free_blocks_isr_min * umm_block_size() - umm_block_size() - umm_block_size()/2;
+  return _context->stats.free_blocks_isr_min * umm_block_size() - UMM_OVERHEAD_ADJUST;
 }
 
 size_t ICACHE_FLASH_ATTR umm_get_max_alloc_size( void ) {

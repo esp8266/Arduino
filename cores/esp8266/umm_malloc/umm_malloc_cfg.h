@@ -558,7 +558,7 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
    #  define POISON_CHECK() 1
    #  define POISON_CHECK_NEIGHBORS(c) \
      do {\
-       if(!check_poison_neighbors(c)) \
+       if(!check_poison_neighbors(_context, c)) \
          panic();\
      } while(false)
    #else

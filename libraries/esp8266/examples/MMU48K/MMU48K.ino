@@ -21,17 +21,18 @@ static inline char get ## name(void *o) { \
 #if (MMU_IRAM_SIZE > 32*1024)
 uint32_t gobble[4 * 1024] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
-#endif
-
-#ifdef MMU_SEC_HEAP
+#elif defined(MMU_SEC_HEAP)
 uint32_t *gobble;
 size_t gobble_sz;
+#else
+uint32_t gobble[256] IRAM_ATTR;
+constexpr size_t gobble_sz = sizeof(gobble);
 #endif
 
 bool  isValid(uint32_t *probe) {
   bool rc = true;
   if (NULL == probe) {
-  	ets_uart_printf("\nNULL memory pointer %p ...\n", probe);
+    ets_uart_printf("\nNULL memory pointer %p ...\n", probe);
     return false;
   }
 
@@ -156,6 +157,7 @@ void setup() {
 }
 
 int* nullPointer = NULL;
+
 char *probe_b = (char *)gobble;
 short *probe_s = (short *)((uintptr_t)gobble);
 char *probe_c = (char *)0x40110000;

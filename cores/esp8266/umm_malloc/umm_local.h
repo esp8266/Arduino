@@ -37,7 +37,7 @@
 
 
 #if defined(UMM_POISON_CHECK_LITE)
-static int check_poison_neighbors( unsigned short cur );
+static int check_poison_neighbors( umm_heap_context_t *_context, unsigned short cur );
 #endif
 
 

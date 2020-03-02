@@ -135,7 +135,7 @@ static void *get_unpoisoned( void *v_ptr ) {
     umm_heap_context_t *_context = umm_get_ptr_context( v_ptr );
     if (NULL == _context) {
       panic();
-      return NULL:
+      return NULL;
     }
     /* Figure out which block we're in. Note the use of truncated division... */
     c = (((char *)ptr)-(char *)(&(_context->heap[0])))/sizeof(umm_block);
