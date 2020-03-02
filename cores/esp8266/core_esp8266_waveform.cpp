@@ -81,6 +81,10 @@ static uint32_t (*timer1CB)() = NULL;
 static ICACHE_RAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
 
+
+// Non-speed critical bits
+#pragma GCC optimize ("Os")
+
 static void initTimer() {
   timer1_disable();
   ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
@@ -174,6 +178,9 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   }
   return true;
 }
+
+// Speed critical bits
+#pragma GCC optimize ("O2")
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Optimize the NMI inner loop by keeping track of the min and max GPIO that we
