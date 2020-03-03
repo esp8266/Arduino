@@ -458,23 +458,12 @@ void _text_end(void);
 void umm_init_iram(void) __attribute__((weak));
 
 void umm_init_iram(void) {
-  uint32_t sec_heap = MMU_SEC_HEAP;
-  size_t   sec_heap_sz = MMU_SEC_HEAP_SIZE;
-
-#ifdef UUM_MERGE_FREE_IRAM_W_SEC_HEAP
-  // Combine free IRAM from 1st 32K with 16K of Second Heap
-  uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - 0x40100000UL);
-  iram_free &= ~7;
-  if (iram_free > 40) {
-    iram_free -= 32;
-    sec_heap -= iram_free;
-    sec_heap_sz += iram_free;
-  }
-#endif
+  uint32_t sec_heap = (uint32_t)_text_end + 32;
+  sec_heap &= ~7;
+  size_t   sec_heap_sz = 0xC000UL - (sec_heap - 0x40100000UL);
 
   umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
 }
-
 #endif	// #ifdef UMM_HEAP_IRAM
 
 #ifdef UMM_HEAP_EXTERNAL

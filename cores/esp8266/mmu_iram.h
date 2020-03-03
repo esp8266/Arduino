@@ -111,33 +111,36 @@ extern mmu_cre_status_t mmu_status;
 #ifdef DEBUG_MMU
 
 static inline bool is_iram(uint32_t addr) {
-constexpr uint32_t _start = 0x40100000UL;
+// constexpr uint32_t _start = 0x40100000UL;
 #define IRAM_START 0x40100000UL
 
 #ifndef MMU_IRAM_SIZE
-#define MMU_IRAM_SIZE 0x8000
+#define MMU_IRAM_SIZE 0xC000UL
 #endif
 
 #ifdef MMU_SEC_HEAP_SIZE
-  constexpr uint32_t _end = _start + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE;
+  // constexpr uint32_t _end = _start + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE;
   #define IRAM_END (IRAM_START + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE)
 #else
-  constexpr uint32_t _end = _start + MMU_IRAM_SIZE;
+  // constexpr uint32_t _end = _start + MMU_IRAM_SIZE;
+  #define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
 #endif
 
-  return (_start <= addr && _end > addr);
+  return (IRAM_START <= addr && IRAM_END > addr);
 }
 
 static inline bool is_dram(uint32_t addr) {
-  constexpr uint32_t _start = 0x3FF80000UL;
-  constexpr uint32_t _end = 0x40000000;
-  return (_start <= addr && _end > addr);
+  // constexpr uint32_t _start = 0x3FF80000UL;
+  // constexpr uint32_t _end = 0x40000000UL;
+  return (0x3FF80000UL <= addr && 0x40000000UL > addr);
 }
 
 static inline bool is_icache(uint32_t addr) {
-  constexpr uint32_t _start = 0x40200000UL;
-  constexpr uint32_t _end = _start + 0x100000;
-  return (_start <= addr && _end > addr);
+  // constexpr uint32_t _start = 0x40200000UL;
+  // constexpr uint32_t _end = _start + 0x100000UL;
+  #define ICACHE_START 0x40200000UL
+  #define ICACHE_END (ICACHE_START + 0x100000UL)
+  return (ICACHE_START <= addr && ICACHE_END > addr);
 }
 
 #else
@@ -162,14 +165,14 @@ static inline bool is_icache(uint32_t addr) {
   if (is_iram((uint32_t)a) || is_dram((uint32_t)a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
-    assert(("Outside of Range Write", false)); \
+    assert(("Outside of Range Write" && false)); \
   }
 
 #define ASSERT_RANGE_TEST_READ(a) \
   if (is_iram((uint32_t)a) || is_icache((uint32_t)a) || is_dram((uint32_t)a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
-    assert(("Outside of Range Read", false)); \
+    assert(("Outside of Range Read" && false)); \
   }
 
 #else

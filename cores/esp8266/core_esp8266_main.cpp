@@ -337,7 +337,7 @@ extern "C" void user_init(void) {
 #if defined(NON32XFER_HANDLER) || defined(MMU_SEC_HEAP)
     install_non32xfer_exception_handler();
 #endif
-#if defined(MMU_SEC_HEAP)
+#if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.

@@ -23,13 +23,10 @@ extern "C" {
 
 #include "c_types.h"
 
-// Combine free IRAM from 1st 32K with 16K of Second Heap
-#define UUM_MERGE_FREE_IRAM_W_SEC_HEAP
-
 /*
  * Define active Heaps
  */
-#ifdef MMU_SEC_HEAP
+#if defined(MMU_IRAM_HEAP)
 #define UMM_HEAP_IRAM
 #else
 #undef UMM_HEAP_IRAM

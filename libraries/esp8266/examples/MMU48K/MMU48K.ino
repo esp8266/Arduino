@@ -18,12 +18,15 @@ static inline char get ## name(void *o) { \
 
 */
 
-#if (MMU_IRAM_SIZE > 32*1024)
+#if defined(MMU_IRAM_HEAP)
+uint32_t *gobble;
+size_t gobble_sz;
+#elif (MMU_IRAM_SIZE > 32*1024)
 uint32_t gobble[4 * 1024] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
 #elif defined(MMU_SEC_HEAP)
-uint32_t *gobble;
-size_t gobble_sz;
+uint32_t *gobble = (uint32_t *)MMU_SEC_HEAP;
+size_t gobble_sz = MMU_SEC_HEAP_SIZE;
 #else
 uint32_t gobble[256] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
@@ -126,7 +129,7 @@ void setup() {
 
   print_mmu_status(Serial);
 
-#ifdef MMU_SEC_HEAP
+#if defined(MMU_IRAM_HEAP)
   {
     HeapSelectIram ephemeral;
     // Serial.printf_P(PSTR("ESP.getFreeHeap(): %u\n"), ESP.getFreeHeap());
@@ -138,7 +141,7 @@ void setup() {
 
 #endif
 
-#if (MMU_IRAM_SIZE > 0x8000) || defined(MMU_SEC_HEAP)
+#if (MMU_IRAM_SIZE > 0x8000) || defined(MMU_IRAM_HEAP) || defined(MMU_SEC_HEAP)
   if (isValid(gobble)) {
     // Put something in our new memory
     for (size_t i = 0; i < (gobble_sz / 4); i++) {
@@ -323,16 +326,12 @@ int divideA_B(int a, int b) {
 extern "C" void _text_end(void);
 
 extern "C" void umm_init_iram(void) {
-  // Merge free IRAM into Second Heap
-  uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - 0x40100000UL);
-  uint32_t sec_heap = MMU_SEC_HEAP;
-  size_t   sec_heap_sz = MMU_SEC_HEAP_SIZE;
-  iram_free &= ~7;
-  if (iram_free > 40) {
-    iram_free -= 32;
-    sec_heap -= iram_free;
-    sec_heap_sz += iram_free;
-  }
+
+void umm_init_iram(void) {
+  uint32_t sec_heap = (uint32_t)_text_end + 32;
+  sec_heap &= ~7;
+  size_t   sec_heap_sz = 0xC000UL - (sec_heap - 0x40100000UL);
+
   umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
 }
 #endif
