@@ -202,6 +202,30 @@ public:
         _on_rx = handler;
     }
 
+#ifdef DEBUG_ESP_CORE
+    // this helper is ready to be used when debugging UDP
+    void printChain (const pbuf* pb, const char* msg) const
+    {
+        // printf the pb pbuf chain, bufferred and all at once
+        char buf[128];
+        int l = snprintf(buf, sizeof(buf), "UDP: %s: ", msg);
+        while (pb)
+        {
+            l += snprintf(&buf[l], sizeof(buf) -l, "%p(H=%d,%d<=%d)-",
+                pb, pb->flags == PBUF_HELPER_FLAG, pb->len, pb->tot_len);
+            pb = pb->next;
+        }
+        l += snprintf(&buf[l], sizeof(buf) - l, "(end)");
+        DEBUGV("%s\n", buf);
+    }
+#else
+    void printChain (const pbuf* pb, const char* msg) const
+    {
+        (void)pb;
+        (void)msg;
+    }
+#endif
+
     size_t getSize() const
     {
         if (!_rx_buf)
@@ -262,38 +286,44 @@ public:
             return true;
         }
 
+        // We have interleaved informations on addresses within received pbuf chain:
+        // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
+        // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
+        //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...
+        // _rx_buf is currently adressing a data pbuf,
+        // in this function it is going to be discarded.
+
         auto deleteme = _rx_buf;
 
-        while(_rx_buf->len != _rx_buf->tot_len)
+        // forward in the chain until next address-info pbuf or end of chain
+        while(_rx_buf && _rx_buf->flags != PBUF_HELPER_FLAG)
             _rx_buf = _rx_buf->next;
-
-        _rx_buf = _rx_buf->next;
 
         if (_rx_buf)
         {
-            if (_rx_buf->flags == PBUF_HELPER_FLAG)
-            {
-                // we have interleaved informations on addresses within reception pbuf chain:
-                // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
-                // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
+            assert(_rx_buf->flags == PBUF_HELPER_FLAG);
 
-                // so the first rx_buf contains an address helper,
-                // copy it to "current address"
-                auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
-                _currentAddr = *helper;
+            // copy address helper to "current address"
+            auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
+            _currentAddr = *helper;
 
-                // destroy the helper in the about-to-be-released pbuf
-                helper->~AddrHelper();
+            // destroy the helper in the about-to-be-released pbuf
+            helper->~AddrHelper();
 
-                // forward in rx_buf list, next one is effective data
-                // current (not ref'ed) one will be pbuf_free'd with deleteme
-                _rx_buf = _rx_buf->next;
-            }
+            // forward in rx_buf list, next one is effective data
+            // current (not ref'ed) one will be pbuf_free'd
+            // with the 'deleteme' pointer above
+            _rx_buf = _rx_buf->next;
 
             // this rx_buf is not nullptr by construction,
+            assert(_rx_buf);
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
+            // (ref counter prevents release and will be decreased by pbuf_free)
             pbuf_ref(_rx_buf);
         }
+
+        // release in chain previous data, and if any:
+        // current helper, but not start of current data
         pbuf_free(deleteme);
 
         _rx_buf_offset = 0;
@@ -488,6 +518,7 @@ private:
                 return;
             }
         }
+
 #if LWIP_VERSION_MAJOR == 1
     #define TEMPDSTADDR (&current_iphdr_dest)
     #define TEMPINPUTNETIF (current_netif)
