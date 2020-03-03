@@ -1399,7 +1399,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("{")
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        print("  iram1_0_seg :                         org = 0x40100000, len = 0xC000 /* Actual len: IRAM_SIZE */")
+        print("  iram1_0_seg :                         org = 0x40100000, len = 0xC000 /* Actual len: MMU_IRAM_SIZE */")
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")

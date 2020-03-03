@@ -326,8 +326,6 @@ int divideA_B(int a, int b) {
 extern "C" void _text_end(void);
 
 extern "C" void umm_init_iram(void) {
-
-void umm_init_iram(void) {
   uint32_t sec_heap = (uint32_t)_text_end + 32;
   sec_heap &= ~7;
   size_t   sec_heap_sz = 0xC000UL - (sec_heap - 0x40100000UL);
