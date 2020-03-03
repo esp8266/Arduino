@@ -165,6 +165,13 @@ static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
   return b;
 }
 
+static inline ICACHE_RAM_ATTR int32_t max_32(int32_t a, int32_t b) {
+    if (a < b) {
+        return b;
+    }
+    return a;
+}
+
 // Stops a waveform on a pin
 int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
@@ -270,16 +277,16 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeHighCycles + cyclesToGo;
-            nextEventCycles = min_u32(nextEventCycles, min_u32(wave->nextTimeHighCycles + cyclesToGo, 1));
+            wave->nextServiceCycle += wave->nextTimeHighCycles;
+            nextEventCycles = min_u32(nextEventCycles, max_32(wave->nextTimeHighCycles + cyclesToGo, microsecondsToClockCycles(1)));
           } else {
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
             } else {
               ClearGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeLowCycles + cyclesToGo;
-            nextEventCycles = min_u32(nextEventCycles, min_u32(wave->nextTimeLowCycles + cyclesToGo, 1));
+            wave->nextServiceCycle += wave->nextTimeLowCycles;
+            nextEventCycles = min_u32(nextEventCycles, max_32(wave->nextTimeLowCycles + cyclesToGo, microsecondsToClockCycles(1)));
           }
         } else {
           uint32_t deltaCycles = wave->nextServiceCycle - now;
