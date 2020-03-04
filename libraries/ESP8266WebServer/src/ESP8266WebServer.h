@@ -149,17 +149,19 @@ public:
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
-  bool chunkedResponseModeStart (int code, const char* content_type) {
+  bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
+    if (_currentVersion == 0)
+        // no chunk mode in HTTP/1.0
+        return false;
     setContentLength(CONTENT_LENGTH_UNKNOWN);
-    send(code, content_type, emptyString);
+    send_P(code, content_type, "");
+    return true;
+  }
+  bool chunkedResponseModeStart (int code, const char* content_type) {
+    return chunkedResponseModeStart_P(code, content_type);
   }
   bool chunkedResponseModeStart (int code, const String& content_type) {
-    setContentLength(CONTENT_LENGTH_UNKNOWN);
-    send(code, content_type, emptyString);
-  }
-  bool chunkedResponseModeStart (int code, PGM_P content_type) {
-    setContentLength(CONTENT_LENGTH_UNKNOWN);
-    send(code, content_type, emptyString);
+    return chunkedResponseModeStart_P(code, content_type.c_str());
   }
   void chunkedResponseFinalize () {
     sendContent(emptyString);

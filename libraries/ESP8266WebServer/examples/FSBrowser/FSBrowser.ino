@@ -186,8 +186,12 @@ void handleFileList() {
   Dir dir = filesystem->openDir(path);
   path.clear();
 
-  // use chunked response to avoid building a huge temporary string
-  server.chunkedResponseModeStart(200, "text/json");
+  // use HTTP/1.1 Chunked response to avoid building a huge temporary string
+  if (!server.chunkedResponseModeStart(200, "text/json")) {
+    server.send(505, FPSTR("text/html"), FPSTR("HTTP1.1 required"));
+    return;
+  }
+
   bool first = true;
   // use the same string for every line
   String output;
