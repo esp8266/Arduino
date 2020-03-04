@@ -47,6 +47,7 @@ public:
     , _rx_buf(0)
     , _first_buf_taken(false)
     , _rx_buf_offset(0)
+    , _rx_buf_size(0)
     , _refcnt(0)
     , _tx_buf_head(0)
     , _tx_buf_cur(0)
@@ -74,6 +75,7 @@ public:
             pbuf_free(_rx_buf);
             _rx_buf = 0;
             _rx_buf_offset = 0;
+            _rx_buf_size = 0;
         }
     }
 
@@ -202,12 +204,36 @@ public:
         _on_rx = handler;
     }
 
+#ifdef DEBUG_ESP_CORE
+    // this helper is ready to be used when debugging UDP
+    void printChain (const pbuf* pb, const char* msg, size_t n) const
+    {
+        // printf the pb pbuf chain, bufferred and all at once
+        char buf[128];
+        int l = snprintf(buf, sizeof(buf), "UDP: %s %u: ", msg, n);
+        while (pb)
+        {
+            l += snprintf(&buf[l], sizeof(buf) -l, "%p(H=%d,%d<=%d)-",
+                pb, pb->flags == PBUF_HELPER_FLAG, pb->len, pb->tot_len);
+            pb = pb->next;
+        }
+        l += snprintf(&buf[l], sizeof(buf) - l, "(end)");
+        DEBUGV("%s\n", buf);
+    }
+#else
+    void printChain (const pbuf* pb, const char* msg) const
+    {
+        (void)pb;
+        (void)msg;
+    }
+#endif
+
     size_t getSize() const
     {
         if (!_rx_buf)
             return 0;
 
-        return _rx_buf->tot_len - _rx_buf_offset;
+        return _rx_buf_size - _rx_buf_offset;
     }
 
     size_t tell() const
@@ -222,7 +248,7 @@ public:
     }
 
     bool isValidOffset(const size_t pos) const {
-        return (pos <= _rx_buf->tot_len);
+        return (pos <= _rx_buf_size);
     }
 
     netif* getInputNetif() const
@@ -262,47 +288,54 @@ public:
             return true;
         }
 
+        // We have interleaved informations on addresses within received pbuf chain:
+        // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
+        // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
+        //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...
+        // _rx_buf is currently adressing a data pbuf,
+        // in this function it is going to be discarded.
+
         auto deleteme = _rx_buf;
 
-        while(_rx_buf->len != _rx_buf->tot_len)
+        // forward in the chain until next address-info pbuf or end of chain
+        while(_rx_buf && _rx_buf->flags != PBUF_HELPER_FLAG)
             _rx_buf = _rx_buf->next;
-
-        _rx_buf = _rx_buf->next;
 
         if (_rx_buf)
         {
-            if (_rx_buf->flags == PBUF_HELPER_FLAG)
-            {
-                // we have interleaved informations on addresses within reception pbuf chain:
-                // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
-                // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
+            assert(_rx_buf->flags == PBUF_HELPER_FLAG);
 
-                // so the first rx_buf contains an address helper,
-                // copy it to "current address"
-                auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
-                _currentAddr = *helper;
+            // copy address helper to "current address"
+            auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
+            _currentAddr = *helper;
 
-                // destroy the helper in the about-to-be-released pbuf
-                helper->~AddrHelper();
+            // destroy the helper in the about-to-be-released pbuf
+            helper->~AddrHelper();
 
-                // forward in rx_buf list, next one is effective data
-                // current (not ref'ed) one will be pbuf_free'd with deleteme
-                _rx_buf = _rx_buf->next;
-            }
+            // forward in rx_buf list, next one is effective data
+            // current (not ref'ed) one will be pbuf_free'd
+            // with the 'deleteme' pointer above
+            _rx_buf = _rx_buf->next;
 
             // this rx_buf is not nullptr by construction,
+            assert(_rx_buf);
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
+            // (ref counter prevents release and will be decreased by pbuf_free)
             pbuf_ref(_rx_buf);
         }
+
+        // release in chain previous data, and if any:
+        // current helper, but not start of current data
         pbuf_free(deleteme);
 
         _rx_buf_offset = 0;
+        _rx_buf_size = _processSize(_rx_buf);
         return _rx_buf != nullptr;
     }
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset >= _rx_buf->tot_len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf_size)
             return -1;
 
         char c = pbuf_get_at(_rx_buf, _rx_buf_offset);
@@ -315,9 +348,9 @@ public:
         if (!_rx_buf)
             return 0;
 
-        size_t max_size = _rx_buf->tot_len - _rx_buf_offset;
+        size_t max_size = _rx_buf_size - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
-        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
+        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf_size, _rx_buf_offset);
 
         void* buf = pbuf_get_contiguous(_rx_buf, dst, size, size, _rx_buf_offset);
         if(!buf)
@@ -333,7 +366,7 @@ public:
 
     int peek() const
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->tot_len)
+        if (!_rx_buf || _rx_buf_offset == _rx_buf_size)
             return -1;
 
         return pbuf_get_at(_rx_buf, _rx_buf_offset);
@@ -345,7 +378,7 @@ public:
         if (!_rx_buf)
             return;
 
-        _consume(_rx_buf->tot_len - _rx_buf_offset);
+        _consume(_rx_buf_size - _rx_buf_offset);
     }
 
     size_t append(const char* data, size_t size)
@@ -429,6 +462,14 @@ public:
 
 private:
 
+    size_t _processSize (const pbuf* pb)
+    {
+        size_t ret = 0;
+        for (; pb && pb->flags != PBUF_HELPER_FLAG; pb = pb->next)
+            ret += pb->len;
+        return ret;
+    }
+
     void _reserve(size_t size)
     {
         const size_t pbuf_unit_size = 128;
@@ -466,8 +507,8 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
-        if (_rx_buf_offset > _rx_buf->tot_len) {
-            _rx_buf_offset = _rx_buf->tot_len;
+        if (_rx_buf_offset > _rx_buf_size) {
+            _rx_buf_offset = _rx_buf_size;
         }
     }
 
@@ -476,6 +517,7 @@ private:
     {
         (void) upcb;
         // check receive pbuf chain depth
+        // optimization path: cache the pbuf chain length
         {
             pbuf* p;
             int count = 0;
@@ -488,6 +530,7 @@ private:
                 return;
             }
         }
+
 #if LWIP_VERSION_MAJOR == 1
     #define TEMPDSTADDR (&current_iphdr_dest)
     #define TEMPINPUTNETIF (current_netif)
@@ -541,6 +584,7 @@ private:
             _first_buf_taken = false;
             _rx_buf = pb;
             _rx_buf_offset = 0;
+            _rx_buf_size = pb->tot_len;
         }
 
         if (_on_rx) {
@@ -648,6 +692,7 @@ private:
     pbuf* _rx_buf;
     bool _first_buf_taken;
     size_t _rx_buf_offset;
+    size_t _rx_buf_size;
     int _refcnt;
     pbuf* _tx_buf_head;
     pbuf* _tx_buf_cur;
