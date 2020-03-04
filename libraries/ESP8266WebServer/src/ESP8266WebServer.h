@@ -149,18 +149,34 @@ public:
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
+  bool chunkedResponseModeStart (int code, const char* content_type) {
+    setContentLength(CONTENT_LENGTH_UNKNOWN);
+    send(code, content_type, emptyString);
+  }
+  bool chunkedResponseModeStart (int code, const String& content_type) {
+    setContentLength(CONTENT_LENGTH_UNKNOWN);
+    send(code, content_type, emptyString);
+  }
+  bool chunkedResponseModeStart (int code, PGM_P content_type) {
+    setContentLength(CONTENT_LENGTH_UNKNOWN);
+    send(code, content_type, emptyString);
+  }
+  void chunkedResponseFinalize () {
+    sendContent(emptyString);
+  }
+
   static String credentialHash(const String& username, const String& realm, const String& password);
 
   static String urlDecode(const String& text);
 
-  // Handle a GET request by sending a response header and stream file content to response body 
+  // Handle a GET request by sending a response header and stream file content to response body
   template<typename T>
   size_t streamFile(T &file, const String& contentType) {
     return streamFile(file, contentType, HTTP_GET);
   }
 
   // Implement GET and HEAD requests for files.
-  // Stream body on HTTP_GET but not on HTTP_HEAD requests. 
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
   template<typename T>
   size_t streamFile(T &file, const String& contentType, HTTPMethod requestMethod) {
     size_t contentLength = 0;
