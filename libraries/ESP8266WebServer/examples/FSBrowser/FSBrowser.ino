@@ -192,20 +192,21 @@ void handleFileList() {
     return;
   }
 
-  bool first = true;
   // use the same string for every line
   String output;
   output.reserve(64);
   while (dir.next()) {
 
-    if (output.length())
-        // send string from previous iteration
-        // as an HTTP chunk
-        server.sendContent(output);
+    if (output.length()) {
+      // send string from previous iteration
+      // as an HTTP chunk
+      server.sendContent(output);
+      output = ',';
+    } else {
+      output = '[';
+    }
 
     File entry = dir.openFile("r");
-    output = first? '[': ',';
-    first = false;
     bool isDir = false;
     output += "{\"type\":\"";
     output += (isDir) ? "dir" : "file";
