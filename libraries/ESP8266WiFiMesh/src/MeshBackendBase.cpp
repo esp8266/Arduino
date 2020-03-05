@@ -26,11 +26,11 @@ namespace TypeCast = MeshTypeConversionFunctions;
 
 MeshBackendBase *MeshBackendBase::apController = nullptr;
 
-bool MeshBackendBase::_scanMutex = false;
+std::shared_ptr<bool> MeshBackendBase::_scanMutex = std::make_shared<bool>(false);
 
 bool MeshBackendBase::_printWarnings = true;
 
-MeshBackendBase::MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, mesh_backend_t classType)
+MeshBackendBase::MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, MeshBackendType classType)
 {
   setRequestHandler(requestHandler);
   setResponseHandler(responseHandler);
@@ -43,12 +43,12 @@ MeshBackendBase::~MeshBackendBase()
   deactivateControlledAP();
 }
 
-void MeshBackendBase::setClassType(mesh_backend_t classType)
+void MeshBackendBase::setClassType(MeshBackendType classType)
 {
   _classType = classType;
 }
 
-mesh_backend_t MeshBackendBase::getClassType() {return _classType;}
+MeshBackendType MeshBackendBase::getClassType() {return _classType;}
 
 void MeshBackendBase::activateAP()
 {
@@ -115,7 +115,9 @@ bool MeshBackendBase::isAPController()
 
 void MeshBackendBase::setWiFiChannel(uint8 newWiFiChannel)
 {
-  assert(1 <= newWiFiChannel && newWiFiChannel <= 13);
+  wifi_country_t wifiCountry;
+  wifi_get_country(&wifiCountry); // Note: Should return 0 on success and -1 on failure, but always seems to return 1. Possibly broken API. Channels 1 to 13 are the default limits.
+  assert(wifiCountry.schan <= newWiFiChannel && newWiFiChannel <= wifiCountry.schan + wifiCountry.nchan - 1);
   
   _meshWiFiChannel = newWiFiChannel;
 
@@ -248,10 +250,10 @@ bool MeshBackendBase::latestTransmissionSuccessfulBase(const std::vector<Transmi
 {
   if(latestTransmissionOutcomes.empty())
     return false;
-  else
-    for(const TransmissionOutcome &transmissionOutcome : latestTransmissionOutcomes) 
-      if(transmissionOutcome.transmissionStatus() != TS_TRANSMISSION_COMPLETE) 
-        return false;
+
+  for(const TransmissionOutcome &transmissionOutcome : latestTransmissionOutcomes) 
+    if(transmissionOutcome.transmissionStatus() != TransmissionStatusType::TRANSMISSION_COMPLETE) 
+      return false;
 
   return true;
 }

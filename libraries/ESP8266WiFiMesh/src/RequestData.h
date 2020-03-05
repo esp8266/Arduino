@@ -30,17 +30,19 @@
 
 class EspnowMeshBackend;
 
-class RequestData : public TimeTracker {
+class RequestData {
 
 public:
 
   RequestData(EspnowMeshBackend &meshInstance, uint32_t creationTimeMs = millis());
   
-  void setMeshInstance(EspnowMeshBackend &meshInstance);
-  EspnowMeshBackend &getMeshInstance();
+  void setMeshInstance(const EspnowMeshBackend &meshInstance);
+  EspnowMeshBackend &getMeshInstance() const;
+  const TimeTracker &getTimeTracker() const;
 
 private:
 
+  TimeTracker _timeTracker;
   EspnowMeshBackend &_meshInstance;
 };
 

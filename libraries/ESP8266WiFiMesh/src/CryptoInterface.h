@@ -41,8 +41,8 @@ namespace CryptoInterface
    * naturally yielding constant-time operations. HMAC is naturally as constant-time as the underlying hash function. The size of the MACed data, and the size of the key, 
    * may leak, though; only the contents are protected."
    *  
-   * For messages much smaller than ctMaxDataLength(), constant-time processing takes substantially longer time to complete than a normal HMAC,
-   * determined by the size of (ctMaxDataLength() - ctMinDataLength()). 
+   * For messages much smaller than getCtMaxDataLength(), constant-time processing takes substantially longer time to complete than a normal HMAC,
+   * determined by the size of (getCtMaxDataLength() - getCtMinDataLength()). 
    * Constant-time processing also sets limits on the data length.
    * 
    * Making the fixed data length limits variable will generally defeat the purpose of using constant-time.
@@ -78,34 +78,26 @@ namespace CryptoInterface
    * It should not be changed once a constant time function has been used at least once. 
    * Otherwise the constant time will not be constant for the used functions.
    * 
-   * The difference ctMaxDataLength() - ctMinDataLength() MUST be less than 2^30 (i.e. about one gigabyte).
+   * The difference getCtMaxDataLength() - getCtMinDataLength() MUST be less than 2^30 (i.e. about one gigabyte).
    */
   void setCtMinDataLength(const size_t ctMinDataLength);
   /**
    * 0 by default.
    */
-  size_t ctMinDataLength();
+  size_t getCtMinDataLength();
 
   /**
    * This function allows for fine-tuning of the specifications for the constant time calculations. 
    * It should not be changed once a constant time function has been used at least once. 
    * Otherwise the constant time will not be constant for the used functions.
    * 
-   * The difference ctMaxDataLength() - ctMinDataLength() MUST be less than 2^30 (i.e. about one gigabyte).
+   * The difference getCtMaxDataLength() - getCtMinDataLength() MUST be less than 2^30 (i.e. about one gigabyte).
    */
   void setCtMaxDataLength(const size_t ctMaxDataLength);
   /**
    * 1024 by default.
    */
-  size_t ctMaxDataLength();
-
-  /**
-   * Turn on or off warning Serial prints from the CryptoInterface functions.
-   * 
-   * @param warningsEnabled If true, warnings will be printed to Serial.
-   */
-  void setWarningsEnabled(bool warningsEnabled);
-  bool warningsEnabled();
+  size_t getCtMaxDataLength();
 
   /**
    * Set the nonce generator used by the CryptoInterface functions.
@@ -119,6 +111,9 @@ namespace CryptoInterface
   // #################### MD5 ####################
 
   /**
+   * WARNING! The MD5 hash is broken in terms of attacker resistance.
+   * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+   * 
    * Create a MD5 hash of the data. The result will be MD5_NATURAL_LENGTH bytes long and stored in resultArray.
    * Uses the BearSSL cryptographic library.
    * 
@@ -128,9 +123,12 @@ namespace CryptoInterface
    * 
    * @return A pointer to resultArray.
    */
-  void *md5Hash(const void *data, const size_t dataLength, void *resultArray);
+  void *md5Hash(const void *data, const size_t dataLength, void *resultArray) __attribute__((deprecated));
   
   /**
+   * WARNING! The MD5 hash is broken in terms of attacker resistance.
+   * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+   * 
    * Create a MD5 hash of the data. The result will be MD5_NATURAL_LENGTH bytes long and returned as a String in HEX format.
    * Uses the BearSSL cryptographic library.
    * 
@@ -138,7 +136,7 @@ namespace CryptoInterface
    * 
    * @return A String with the generated hash in HEX format.
    */
-  String md5Hash(const String &message);
+  String md5Hash(const String &message) __attribute__((deprecated));
 
   /**
    * Create a MD5 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
@@ -176,7 +174,7 @@ namespace CryptoInterface
    * Uses the BearSSL cryptographic library.
    * 
    * @param data The data array from which to create the HMAC.
-   * @param dataLength The length of the data array in bytes. Valid values are in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param resultArray The array wherein to store the resulting HMAC.
@@ -193,7 +191,7 @@ namespace CryptoInterface
    * Constant-time version.
    * Uses the BearSSL cryptographic library.
    * 
-   * @param message The string from which to create the HMAC. Must have a length in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to MD5_NATURAL_LENGTH.
@@ -206,6 +204,9 @@ namespace CryptoInterface
   // #################### SHA-1 ####################
 
   /**
+   * WARNING! The SHA-1 hash is broken in terms of attacker resistance.
+   * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+   * 
    * Create a SHA1 hash of the data. The result will be SHA1_NATURAL_LENGTH bytes long and stored in resultArray.
    * Uses the BearSSL cryptographic library.
    * 
@@ -215,9 +216,12 @@ namespace CryptoInterface
    * 
    * @return A pointer to resultArray.
    */
-  void *sha1Hash(const void *data, const size_t dataLength, void *resultArray);
+  void *sha1Hash(const void *data, const size_t dataLength, void *resultArray) __attribute__((deprecated));
   
   /**
+   * WARNING! The SHA-1 hash is broken in terms of attacker resistance.
+   * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+   * 
    * Create a SHA1 hash of the data. The result will be SHA1_NATURAL_LENGTH bytes long and returned as a String in HEX format.
    * Uses the BearSSL cryptographic library.
    * 
@@ -225,7 +229,7 @@ namespace CryptoInterface
    * 
    * @return A String with the generated hash in HEX format.
    */
-  String sha1Hash(const String &message);
+  String sha1Hash(const String &message) __attribute__((deprecated));
 
   /**
    * Create a SHA1 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
@@ -263,7 +267,7 @@ namespace CryptoInterface
    * Uses the BearSSL cryptographic library.
    * 
    * @param data The data array from which to create the HMAC.
-   * @param dataLength The length of the data array in bytes. Valid values are in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param resultArray The array wherein to store the resulting HMAC.
@@ -280,7 +284,7 @@ namespace CryptoInterface
    * Constant-time version.
    * Uses the BearSSL cryptographic library.
    * 
-   * @param message The string from which to create the HMAC. Must have a length in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA1_NATURAL_LENGTH.
@@ -350,7 +354,7 @@ namespace CryptoInterface
    * Uses the BearSSL cryptographic library.
    * 
    * @param data The data array from which to create the HMAC.
-   * @param dataLength The length of the data array in bytes. Valid values are in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param resultArray The array wherein to store the resulting HMAC.
@@ -367,7 +371,7 @@ namespace CryptoInterface
    * Constant-time version.
    * Uses the BearSSL cryptographic library.
    * 
-   * @param message The string from which to create the HMAC. Must have a length in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA224_NATURAL_LENGTH.
@@ -437,7 +441,7 @@ namespace CryptoInterface
    * Uses the BearSSL cryptographic library.
    * 
    * @param data The data array from which to create the HMAC.
-   * @param dataLength The length of the data array in bytes. Valid values are in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param resultArray The array wherein to store the resulting HMAC.
@@ -454,7 +458,7 @@ namespace CryptoInterface
    * Constant-time version.
    * Uses the BearSSL cryptographic library.
    * 
-   * @param message The string from which to create the HMAC. Must have a length in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA256_NATURAL_LENGTH.
@@ -524,7 +528,7 @@ namespace CryptoInterface
    * Uses the BearSSL cryptographic library.
    * 
    * @param data The data array from which to create the HMAC.
-   * @param dataLength The length of the data array in bytes. Valid values are in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param resultArray The array wherein to store the resulting HMAC.
@@ -541,7 +545,7 @@ namespace CryptoInterface
    * Constant-time version.
    * Uses the BearSSL cryptographic library.
    * 
-   * @param message The string from which to create the HMAC. Must have a length in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA384_NATURAL_LENGTH.
@@ -611,7 +615,7 @@ namespace CryptoInterface
    * Uses the BearSSL cryptographic library.
    * 
    * @param data The data array from which to create the HMAC.
-   * @param dataLength The length of the data array in bytes. Valid values are in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param resultArray The array wherein to store the resulting HMAC.
@@ -628,7 +632,7 @@ namespace CryptoInterface
    * Constant-time version.
    * Uses the BearSSL cryptographic library.
    * 
-   * @param message The string from which to create the HMAC. Must have a length in the range [ctMinDataLength(), ctMaxDataLength()].
+   * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
    * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA512_NATURAL_LENGTH.

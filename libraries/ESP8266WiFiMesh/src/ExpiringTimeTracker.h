@@ -25,24 +25,54 @@
 #ifndef __EXPIRINGTIMETRACKER_H__
 #define __EXPIRINGTIMETRACKER_H__
 
-#include "TimeTracker.h"
 #include <Arduino.h>
+#include <PolledTimeout.h>
 
-class ExpiringTimeTracker  : public TimeTracker {
+class ExpiringTimeTracker : private esp8266::polledTimeout::oneShotMs {
   
 public:
 
-  ~ExpiringTimeTracker() override = default; 
+  using calculatorType = std::function<uint32_t()>;
 
-  ExpiringTimeTracker(uint32_t duration, uint32_t creationTimeMs = millis());
+  virtual ~ExpiringTimeTracker() = default; 
+
+  ExpiringTimeTracker(const uint32_t duration, const uint32_t creationTimeMs = millis());
+  ExpiringTimeTracker(const calculatorType durationCalculator, const uint32_t creationTimeMs = millis());
+  
   uint32_t duration() const;
-  void setRemainingDuration(uint32_t remainingDuration);
+  void setDuration(const uint32_t duration);
+  void setDuration(const calculatorType durationCalculator);
+
   uint32_t remainingDuration() const;
+  
+  /**
+   * Sets a new duration which includes the current elapsedTime(). This means elapsedTime() is not reset.
+   * Note that reset() will use this new duration, including the saved elapsedTime().
+   */
+  void setRemainingDuration(const uint32_t remainingDuration);
+  
+  /**
+   * Sets a new duration which includes the current elapsedTime(). This means elapsedTime() is not reset.
+   * Note that reset() will use this new duration, including the saved elapsedTime().
+   */
+  void setRemainingDuration(const calculatorType remainingDurationCalculator);
+  
+  /**
+   * Get the time since the ExpiringTimeTracker instance creation or the last reset(), whichever is more recent.
+   */
+  uint32_t elapsedTime() const;
   bool expired() const;
+  void reset();
+  void reset(const uint32_t newDuration);
+  void reset(const calculatorType newDurationCalculator);
+  explicit operator bool() const;
   
 private:
 
-  uint32_t _duration;
+  bool useCalculator = false;
+  calculatorType _durationCalculator;
+
+  void setTimeout(const uint32_t newUserTimeout);
 };
 
 #endif

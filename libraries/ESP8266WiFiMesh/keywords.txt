@@ -12,7 +12,7 @@ ESP8266WiFiMesh	KEYWORD3
 # Datatypes (KEYWORD1)
 #######################################
 
-transmission_status_t	KEYWORD1
+TransmissionStatusType	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

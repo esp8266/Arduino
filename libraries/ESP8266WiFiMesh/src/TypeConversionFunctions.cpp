@@ -27,15 +27,15 @@
 
 namespace
 {
-  constexpr char chars[36] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-  constexpr uint8_t charValues[75] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, // 0 to 10
+  constexpr char chars[36] PROGMEM = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+  constexpr uint8_t charValues[75] PROGMEM {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, // 0 to 9
                                     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0, 0, 0, 0, 0, 0, // Upper case letters
                                     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}; // Lower case letters
 }
 
 namespace MeshTypeConversionFunctions 
 {
-  String uint64ToString(uint64_t number, byte base)
+  String uint64ToString(uint64_t number, const byte base)
   {
     assert(2 <= base && base <= 36);
     
@@ -44,14 +44,14 @@ namespace MeshTypeConversionFunctions
     if(base == 16)
     {
       do {
-        result += chars[ number % base ];
+        result += (char)pgm_read_byte(chars + number % base);
         number >>= 4; // We could write number /= 16; and the compiler would optimize it to a shift, but the explicit shift notation makes it clearer where the speed-up comes from.
       } while ( number );
     }
     else
     {
       do {
-        result += chars[ number % base ];
+        result += (char)pgm_read_byte(chars + number % base);
         number /= base;
       } while ( number );
     }
@@ -61,7 +61,7 @@ namespace MeshTypeConversionFunctions
     return result;
   }
   
-  uint64_t stringToUint64(const String &string, byte base)
+  uint64_t stringToUint64(const String &string, const byte base)
   {
     assert(2 <= base && base <= 36);
     
@@ -72,7 +72,7 @@ namespace MeshTypeConversionFunctions
       for(uint32_t i = 0; i < string.length(); ++i)
       {
         result <<= 4; // We could write result *= 16; and the compiler would optimize it to a shift, but the explicit shift notation makes it clearer where the speed-up comes from.
-        result += charValues[string.charAt(i) - '0'];
+        result += pgm_read_byte(charValues + string.charAt(i) - '0');
       }
     }
     else
@@ -80,14 +80,14 @@ namespace MeshTypeConversionFunctions
       for(uint32_t i = 0; i < string.length(); ++i)
       {
         result *= base;
-        result += charValues[string.charAt(i) - '0'];
+        result += pgm_read_byte(charValues + string.charAt(i) - '0');
       }
     }
     
     return result;
   }
   
-  String uint8ArrayToHexString(const uint8_t *uint8Array, uint32_t arrayLength)
+  String uint8ArrayToHexString(const uint8_t *uint8Array, const uint32_t arrayLength)
   {
     String hexString;
     if(!hexString.reserve(2*arrayLength))  // Each uint8_t will become two characters (00 to FF)
@@ -95,26 +95,26 @@ namespace MeshTypeConversionFunctions
     
     for(uint32_t i = 0; i < arrayLength; ++i)
     {
-      hexString += chars[ uint8Array[i] >> 4 ];
-      hexString += chars[ uint8Array[i] % 16 ];
+      hexString += (char)pgm_read_byte(chars + (uint8Array[i] >> 4));
+      hexString += (char)pgm_read_byte(chars + uint8Array[i] % 16 );
     }
     
     return hexString;  
   }
   
-  uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, uint32_t arrayLength)
+  uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength)
   {
     assert(hexString.length() >= arrayLength*2); // Each array element can hold two hexString characters
     
     for(uint32_t i = 0; i < arrayLength; ++i)
     {
-      uint8Array[i] = (charValues[hexString.charAt(i*2) - '0'] << 4) + charValues[hexString.charAt(i*2 + 1) - '0']; 
+      uint8Array[i] = (pgm_read_byte(charValues + hexString.charAt(i*2) - '0') << 4) + pgm_read_byte(charValues + hexString.charAt(i*2 + 1) - '0'); 
     }
     
     return uint8Array;
   }
   
-  String uint8ArrayToMultiString(uint8_t *uint8Array, uint32_t arrayLength)
+  String uint8ArrayToMultiString(uint8_t *uint8Array, const uint32_t arrayLength)
   {
     String multiString;
     if(!multiString.reserve(arrayLength))
@@ -137,7 +137,7 @@ namespace MeshTypeConversionFunctions
     return multiString;
   }
   
-  String bufferedUint8ArrayToMultiString(const uint8_t *uint8Array, uint32_t arrayLength)
+  String bufferedUint8ArrayToMultiString(const uint8_t *uint8Array, const uint32_t arrayLength)
   {
     String multiString;
     if(!multiString.reserve(arrayLength))
@@ -174,7 +174,7 @@ namespace MeshTypeConversionFunctions
     return result;
   }
   
-  uint8_t *uint64ToMac(uint64_t macValue, uint8_t *macArray)
+  uint8_t *uint64ToMac(const uint64_t macValue, uint8_t *macArray)
   {
     assert(macValue <= 0xFFFFFFFFFFFF); // Overflow will occur if value can't fit within 6 bytes
     
@@ -188,7 +188,7 @@ namespace MeshTypeConversionFunctions
     return macArray;
   }
   
-  uint8_t *uint64ToUint8Array(uint64_t value, uint8_t *resultArray)
+  uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray)
   {
     resultArray[7] = value;
     resultArray[6] = value >> 8;
@@ -214,27 +214,25 @@ namespace MeshTypeConversionFunctions
    * Helper function for meshBackendCast.
    */
   template <typename T>
-  T attemptPointerCast(MeshBackendBase *meshBackendBaseInstance, mesh_backend_t resultClassType)
+  T attemptPointerCast(MeshBackendBase *meshBackendBaseInstance, MeshBackendType resultClassType)
   {
     if(meshBackendBaseInstance && meshBackendBaseInstance->getClassType() == resultClassType)
     {
       return static_cast<T>(meshBackendBaseInstance); 
     }
-    else
-    {
-      return nullptr;
-    }
+    
+    return nullptr;
   }
   
   template <> 
   EspnowMeshBackend *meshBackendCast<EspnowMeshBackend *>(MeshBackendBase *meshBackendBaseInstance)
   {
-    return attemptPointerCast<EspnowMeshBackend *>(meshBackendBaseInstance, MB_ESP_NOW);
+    return attemptPointerCast<EspnowMeshBackend *>(meshBackendBaseInstance, MeshBackendType::ESP_NOW);
   }
   
   template <> 
   TcpIpMeshBackend *meshBackendCast<TcpIpMeshBackend *>(MeshBackendBase *meshBackendBaseInstance)
   {
-    return attemptPointerCast<TcpIpMeshBackend *>(meshBackendBaseInstance, MB_TCP_IP);
+    return attemptPointerCast<TcpIpMeshBackend *>(meshBackendBaseInstance, MeshBackendType::TCP_IP);
   }
 }

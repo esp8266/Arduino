@@ -47,8 +47,9 @@
 #include <WiFiServer.h>
 #include <functional>
 #include <vector>
-#include "NetworkInfo.h"
 #include "TransmissionResult.h"
+#include "NetworkInfo.h"
+
 
 const String WIFI_MESH_EMPTY_STRING = "";
 
@@ -175,7 +176,7 @@ public:
    */
   ESP8266WiFiMesh(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
                   const String &meshPassword, const String &meshName = "MeshNode_", const String &nodeID = WIFI_MESH_EMPTY_STRING, bool verboseMode = false, 
-                  uint8 meshWiFiChannel = 1, uint16_t serverPort = 4011);
+                  uint8 meshWiFiChannel = 1, uint16_t serverPort = 4011) __attribute__((deprecated));
   
   /** 
   * A vector that contains the NetworkInfo for each WiFi network to connect to. 

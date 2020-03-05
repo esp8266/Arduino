@@ -25,13 +25,13 @@
 #include "ResponseData.h"
 
 ResponseData::ResponseData(const String &message, const uint8_t recipientMac[6], uint64_t requestID, uint32_t creationTimeMs) : 
-  TimeTracker(creationTimeMs), _message(message), _requestID(requestID)
+  _timeTracker(creationTimeMs), _message(message), _requestID(requestID)
 {      
   storeRecipientMac(recipientMac);
 }
 
 ResponseData::ResponseData(const ResponseData &other) 
-  : TimeTracker(other), _message(other.getMessage()), _requestID(other.getRequestID())
+  : _timeTracker(other.getTimeTracker()), _message(other.getMessage()), _requestID(other.getRequestID())
 {
   storeRecipientMac(other.getRecipientMac());
 }
@@ -40,7 +40,7 @@ ResponseData & ResponseData::operator=(const ResponseData &other)
 {
   if(this != &other)
   {
-    TimeTracker::operator=(other);
+    _timeTracker = other.getTimeTracker();
     _message = other.getMessage();
     _requestID = other.getRequestID();
     storeRecipientMac(other.getRecipientMac());
@@ -51,21 +51,20 @@ ResponseData & ResponseData::operator=(const ResponseData &other)
 
 void ResponseData::storeRecipientMac(const uint8_t newRecipientMac[6])
 {
-  if(newRecipientMac != nullptr)
-  {
-    if(_recipientMac == nullptr)
-    {
-      _recipientMac = _recipientMacArray;
-    }
-    
-    for(int i = 0; i < 6; i++)
-    {
-      _recipientMac[i] = newRecipientMac[i];
-    }
-  }
-  else
+  if(newRecipientMac == nullptr)
   {
     _recipientMac = nullptr;
+    return;
+  }
+  
+  if(_recipientMac == nullptr)
+  {
+    _recipientMac = _recipientMacArray;
+  }
+  
+  for(int i = 0; i < 6; ++i)
+  {
+    _recipientMac[i] = newRecipientMac[i];
   }
 }
 
@@ -77,3 +76,5 @@ String ResponseData::getMessage() const { return _message; }
 
 void ResponseData::setRequestID(uint64_t requestID) { _requestID = requestID; }
 uint64_t ResponseData::getRequestID() const { return _requestID; }
+
+const TimeTracker &ResponseData::getTimeTracker() const { return _timeTracker; }

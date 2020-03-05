@@ -27,7 +27,6 @@
 
 #include "EspnowMeshBackend.h"
 #include <set>
-#include <unordered_map>
 #include <queue>
 
 /**
@@ -45,8 +44,8 @@ class FloodingMesh {
 
 protected:
 
-  typedef std::function<bool(String &, FloodingMesh &)> messageHandlerType;
-  typedef std::unordered_map<uint64_t, uint8_t>::iterator messageQueueElementType;
+  using messageHandlerType = std::function<bool(String &, FloodingMesh &)>;
+  using messageQueueElementType = std::map<uint64_t, uint8_t>::iterator;
   
 public:
 
@@ -61,7 +60,7 @@ public:
    * @param ssidSuffix The suffix (last part) of the node SSID.
    * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
    * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
-   *                        WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                        WARNING: The ESP8266 has only one WiFi channel, and the station/client mode is always prioritized for channel selection.
    *                        This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                        In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
    *                        WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
@@ -83,7 +82,7 @@ public:
    * @param ssidSuffix The suffix (last part) of the node SSID.
    * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
    * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
-   *                        WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                        WARNING: The ESP8266 has only one WiFi channel, and the station/client mode is always prioritized for channel selection.
    *                        This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                        In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
    *                        WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
@@ -321,14 +320,14 @@ private:
 
   uint8_t _originMac[6] = {0};
 
-  std::unordered_map<uint64_t, uint8_t> _messageIDs = {};
+  std::map<uint64_t, uint8_t> _messageIDs = {};
   std::queue<messageQueueElementType> _messageIdOrder = {};
   std::list<std::pair<String, bool>> _forwardingBacklog = {};
 
   String _macIgnoreList;
   
   String _defaultRequestHandler(const String &request, MeshBackendBase &meshInstance);
-  transmission_status_t _defaultResponseHandler(const String &response, MeshBackendBase &meshInstance);
+  TransmissionStatusType _defaultResponseHandler(const String &response, MeshBackendBase &meshInstance);
   void _defaultNetworkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
   bool _defaultBroadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
   bool _defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance);

@@ -5,7 +5,7 @@
    That way you will get instant confirmation of the mesh communication without checking the Serial Monitor.
 */
 
-#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
 
 #include <ESP8266WiFi.h>
 #include <TypeConversionFunctions.h>
@@ -175,7 +175,7 @@ void loop() {
   floodingMeshDelay(1);
 
   // If you wish to transmit only to a single node, try using one of the following methods (requires the node to be within range and know the MAC of the recipient):
-  // Unencrypted: transmission_status_t floodingMesh.getEspnowMeshBackend().attemptTransmission(message, EspnowNetworkInfo(recipientMac));
+  // Unencrypted: TransmissionStatusType floodingMesh.getEspnowMeshBackend().attemptTransmission(message, EspnowNetworkInfo(recipientMac));
   // Encrypted (slow): floodingMesh.getEspnowMeshBackend().attemptAutoEncryptingTransmission(message, EspnowNetworkInfo(recipientMac));
 
   if (theOne) {

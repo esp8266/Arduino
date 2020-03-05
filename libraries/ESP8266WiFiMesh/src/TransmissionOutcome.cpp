@@ -24,13 +24,13 @@
 
 #include "TransmissionOutcome.h"
 
-TransmissionOutcome::TransmissionOutcome(const NetworkInfoBase &origin, transmission_status_t transmissionStatus) 
+TransmissionOutcome::TransmissionOutcome(const NetworkInfoBase &origin, TransmissionStatusType transmissionStatus) 
                                        : NetworkInfoBase(origin), _transmissionStatus(transmissionStatus)
 { }
 
-TransmissionOutcome::TransmissionOutcome(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden, transmission_status_t transmissionStatus) 
+TransmissionOutcome::TransmissionOutcome(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden, TransmissionStatusType transmissionStatus) 
                                        : NetworkInfoBase(SSID, wifiChannel, BSSID, encryptionType, RSSI, isHidden), _transmissionStatus(transmissionStatus)
 { }
 
-void TransmissionOutcome::setTransmissionStatus(transmission_status_t transmissionStatus) { _transmissionStatus = transmissionStatus; }
-transmission_status_t TransmissionOutcome::transmissionStatus() const { return _transmissionStatus; }
+void TransmissionOutcome::setTransmissionStatus(TransmissionStatusType transmissionStatus) { _transmissionStatus = transmissionStatus; }
+TransmissionStatusType TransmissionOutcome::transmissionStatus() const { return _transmissionStatus; }

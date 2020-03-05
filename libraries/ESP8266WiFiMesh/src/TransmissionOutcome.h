@@ -28,27 +28,27 @@
 #include <ESP8266WiFi.h>
 #include "NetworkInfoBase.h"
 
-typedef enum 
+enum class TransmissionStatusType
 {
-    TS_CONNECTION_FAILED    = -1,
-    TS_TRANSMISSION_FAILED    = 0,
-    TS_TRANSMISSION_COMPLETE   = 1
-} transmission_status_t;
+  CONNECTION_FAILED      = -1,
+  TRANSMISSION_FAILED    = 0,
+  TRANSMISSION_COMPLETE  = 1
+};
 
 class TransmissionOutcome : public NetworkInfoBase {
 
 public:
 
-  TransmissionOutcome(const NetworkInfoBase &origin, transmission_status_t transmissionStatus);
+  TransmissionOutcome(const NetworkInfoBase &origin, TransmissionStatusType transmissionStatus);
 
-  TransmissionOutcome(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden, transmission_status_t transmissionStatus);
+  TransmissionOutcome(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden, TransmissionStatusType transmissionStatus);
 
-  void setTransmissionStatus(transmission_status_t transmissionStatus);
-  transmission_status_t transmissionStatus() const;
+  void setTransmissionStatus(TransmissionStatusType transmissionStatus);
+  TransmissionStatusType transmissionStatus() const;
 
 private:
 
-  transmission_status_t _transmissionStatus;
+  TransmissionStatusType _transmissionStatus;
 };
 
 #endif

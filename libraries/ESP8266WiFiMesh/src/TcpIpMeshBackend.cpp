@@ -32,8 +32,8 @@ namespace
 
 const IPAddress TcpIpMeshBackend::emptyIP;
 
-bool TcpIpMeshBackend::_tcpIpTransmissionMutex = false;
-bool TcpIpMeshBackend::_tcpIpConnectionQueueMutex = false;
+std::shared_ptr<bool> TcpIpMeshBackend::_tcpIpTransmissionMutex = std::make_shared<bool>(false);
+std::shared_ptr<bool> TcpIpMeshBackend::_tcpIpConnectionQueueMutex = std::make_shared<bool>(false);
 
 String TcpIpMeshBackend::lastSSID;
 bool TcpIpMeshBackend::staticIPActivated = false;
@@ -51,7 +51,7 @@ std::vector<TransmissionOutcome> TcpIpMeshBackend::_latestTransmissionOutcomes =
 TcpIpMeshBackend::TcpIpMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, 
                                    networkFilterType networkFilter, const String &meshPassword, const String &ssidPrefix, 
                                    const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
-                                   : MeshBackendBase(requestHandler, responseHandler, networkFilter, MB_TCP_IP), _server(serverPort)
+                                   : MeshBackendBase(requestHandler, responseHandler, networkFilter, MeshBackendType::TCP_IP), _server(serverPort)
 {
   setSSID(ssidPrefix, emptyString, ssidSuffix);
   setMeshPassword(meshPassword);
@@ -111,7 +111,7 @@ void TcpIpMeshBackend::deactivateAPHook()
   _server.stop();
 }
 
-bool TcpIpMeshBackend::transmissionInProgress(){return _tcpIpTransmissionMutex;}
+bool TcpIpMeshBackend::transmissionInProgress(){return *_tcpIpTransmissionMutex;}
 
 void TcpIpMeshBackend::setTemporaryMessage(const String &newTemporaryMessage) {_temporaryMessage = newTemporaryMessage;}
 String TcpIpMeshBackend::getTemporaryMessage() {return _temporaryMessage;}
@@ -180,12 +180,12 @@ void TcpIpMeshBackend::setMaxAPStations(uint8_t maxAPStations)
 
 bool TcpIpMeshBackend::getMaxAPStations() {return _maxAPStations;}
 
-void TcpIpMeshBackend::setConnectionAttemptTimeout(int32_t connectionAttemptTimeoutMs)
+void TcpIpMeshBackend::setConnectionAttemptTimeout(uint32_t connectionAttemptTimeoutMs)
 {
   _connectionAttemptTimeoutMs = connectionAttemptTimeoutMs;
 }
 
-int32_t TcpIpMeshBackend::getConnectionAttemptTimeout() {return _connectionAttemptTimeoutMs;}
+uint32_t TcpIpMeshBackend::getConnectionAttemptTimeout() {return _connectionAttemptTimeoutMs;}
 
 void TcpIpMeshBackend::setStationModeTimeout(int stationModeTimeoutMs)
 {
@@ -220,12 +220,11 @@ void TcpIpMeshBackend::fullStop(WiFiClient &currClient)
  */
 bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait)
 {
-  uint32_t connectionStartTime = millis();
-  uint32_t waitingTime = millis() - connectionStartTime;
-  while(currClient.connected() && !currClient.available() && waitingTime < maxWait)
+  ExpiringTimeTracker timeout(maxWait);
+  
+  while(currClient.connected() && !currClient.available() && !timeout)
   {
     delay(1);
-    waitingTime = millis() - connectionStartTime;
   }
 
   /* Return false if the client isn't ready to communicate */
@@ -246,7 +245,7 @@ bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, uint32_
  * @return A status code based on the outcome of the exchange.
  * 
  */
-transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
+TransmissionStatusType TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
 {
   verboseModePrint(String(F("Transmitting")));
     
@@ -256,13 +255,13 @@ transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
   if (!waitForClientTransmission(currClient, _stationModeTimeoutMs))
   {
     fullStop(currClient);
-    return TS_CONNECTION_FAILED;
+    return TransmissionStatusType::CONNECTION_FAILED;
   }
 
   if (!currClient.available()) 
   {
     verboseModePrint(F("No response!"));
-    return TS_TRANSMISSION_FAILED; // WiFi.status() != WL_DISCONNECTED so we do not want to use fullStop(currClient) here since that would force the node to scan for WiFi networks.
+    return TransmissionStatusType::TRANSMISSION_FAILED; // WiFi.status() != WL_DISCONNECTED so we do not want to use fullStop(currClient) here since that would force the node to scan for WiFi networks.
   }
 
   String response = currClient.readStringUntil('\r');
@@ -278,7 +277,7 @@ transmission_status_t TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
  *
  * @return A status code based on the outcome of the data transfer attempt.
  */
-transmission_status_t TcpIpMeshBackend::attemptDataTransfer()
+TransmissionStatusType TcpIpMeshBackend::attemptDataTransfer()
 {
   // Unlike WiFi.mode(WIFI_AP);, WiFi.mode(WIFI_AP_STA); allows us to stay connected to the AP we connected to in STA mode, at the same time as we can receive connections from other stations. 
   // We cannot send data to the AP in STA_AP mode though, that requires STA mode. 
@@ -286,7 +285,7 @@ transmission_status_t TcpIpMeshBackend::attemptDataTransfer()
   WiFiMode_t storedWiFiMode = WiFi.getMode();
   WiFi.mode(WIFI_STA);
   delay(1);
-  transmission_status_t transmissionOutcome = attemptDataTransferKernel();
+  TransmissionStatusType transmissionOutcome = attemptDataTransferKernel();
   WiFi.mode(storedWiFiMode);
   delay(1);
   
@@ -298,7 +297,7 @@ transmission_status_t TcpIpMeshBackend::attemptDataTransfer()
  *
  * @return A status code based on the outcome of the data transfer attempt.
  */
-transmission_status_t TcpIpMeshBackend::attemptDataTransferKernel()
+TransmissionStatusType TcpIpMeshBackend::attemptDataTransferKernel()
 {
   WiFiClient currClient;
   currClient.setTimeout(_stationModeTimeoutMs);
@@ -308,11 +307,11 @@ transmission_status_t TcpIpMeshBackend::attemptDataTransferKernel()
   {
     fullStop(currClient);
     verboseModePrint(F("Server unavailable"));
-    return TS_CONNECTION_FAILED;
+    return TransmissionStatusType::CONNECTION_FAILED;
   }  
 
-  transmission_status_t transmissionOutcome = exchangeInfo(currClient);
-  if (transmissionOutcome <= 0)
+  TransmissionStatusType transmissionOutcome = exchangeInfo(currClient);
+  if (static_cast<int>(transmissionOutcome) <= 0)
   {
     verboseModePrint(F("Transmission failed during exchangeInfo."));
     return transmissionOutcome;
@@ -343,7 +342,7 @@ void TcpIpMeshBackend::initiateConnectionToAP(const String &targetSSID, int targ
  * @return A status code based on the outcome of the connection and data transfer process.
  * 
  */
-transmission_status_t TcpIpMeshBackend::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
+TransmissionStatusType TcpIpMeshBackend::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
 {  
   if(staticIPActivated && !lastSSID.isEmpty() && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
   {
@@ -366,37 +365,36 @@ transmission_status_t TcpIpMeshBackend::connectToNode(const String &targetSSID, 
   verboseModePrint(F("Connecting... "), false);
   initiateConnectionToAP(targetSSID, targetChannel, targetBSSID);
 
-  int connectionStartTime = millis();
   int attemptNumber = 1;
+  ExpiringTimeTracker connectionAttemptTimeout([this](){ return _connectionAttemptTimeoutMs; });
 
-  int waitingTime = millis() - connectionStartTime;
-  while((WiFi.status() == WL_DISCONNECTED) && waitingTime <= _connectionAttemptTimeoutMs)
+  while((WiFi.status() == WL_DISCONNECTED) && !connectionAttemptTimeout)
   {
-    if(waitingTime > attemptNumber * _connectionAttemptTimeoutMs) // _connectionAttemptTimeoutMs can be replaced (lowered) if you want to limit the time allowed for each connection attempt.
+    if(connectionAttemptTimeout.elapsedTime() > attemptNumber * _connectionAttemptTimeoutMs) // _connectionAttemptTimeoutMs can be replaced (lowered) if you want to limit the time allowed for each connection attempt.
     {
       verboseModePrint(F("... "), false);
       WiFi.disconnect();
       yield();
       initiateConnectionToAP(targetSSID, targetChannel, targetBSSID);
-      attemptNumber++;
+      ++attemptNumber;
     }
+    
     delay(1);
-    waitingTime = millis() - connectionStartTime;
   }
 
-  verboseModePrint(String(waitingTime));
+  verboseModePrint(String(connectionAttemptTimeout.elapsedTime()));
   
   /* If the connection timed out */
   if (WiFi.status() != WL_CONNECTED)
   {
     verboseModePrint(F("Timeout"));
-    return TS_CONNECTION_FAILED;
+    return TransmissionStatusType::CONNECTION_FAILED;
   }
 
   return attemptDataTransfer();
 }
 
-transmission_status_t TcpIpMeshBackend::initiateTransmission(const TcpIpNetworkInfo &recipientInfo)
+TransmissionStatusType TcpIpMeshBackend::initiateTransmission(const TcpIpNetworkInfo &recipientInfo)
 {
   WiFi.disconnect();
   yield();
@@ -452,7 +450,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
   
   if(WiFi.status() == WL_CONNECTED)
   {
-    transmission_status_t transmissionResult = attemptDataTransfer();
+    TransmissionStatusType transmissionResult = attemptDataTransfer();
     latestTransmissionOutcomes().push_back(TransmissionOutcome(constConnectionQueue().back(), transmissionResult));
 
     getTransmissionOutcomesUpdateHook()(*this);
@@ -474,7 +472,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
     {
       for(const TcpIpNetworkInfo &currentNetwork : constConnectionQueue())
       {
-        transmission_status_t transmissionResult = initiateTransmission(currentNetwork);
+        TransmissionStatusType transmissionResult = initiateTransmission(currentNetwork);
               
         latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
 
@@ -492,16 +490,16 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
   attemptTransmission(message, scan, scanAllWiFiChannels, true, false);
 }
 
-transmission_status_t TcpIpMeshBackend::attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect, bool initialDisconnect)
+TransmissionStatusType TcpIpMeshBackend::attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect, bool initialDisconnect)
 {  
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
   {
     assert(false && String(F("ERROR! TCP/IP transmission in progress. Don't call attemptTransmission from callbacks as this may corrupt program state! Aborting."))); 
-    return TS_CONNECTION_FAILED;
+    return TransmissionStatusType::CONNECTION_FAILED;
   }
 
-  transmission_status_t transmissionResult = TS_CONNECTION_FAILED;
+  TransmissionStatusType transmissionResult = TransmissionStatusType::CONNECTION_FAILED;
   setTemporaryMessage(message);
   
   if(initialDisconnect)

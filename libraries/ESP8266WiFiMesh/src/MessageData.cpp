@@ -28,15 +28,15 @@
 #include <assert.h>
 
 MessageData::MessageData(String &message, uint8_t transmissionsRemaining, uint32_t creationTimeMs) :
-  TimeTracker(creationTimeMs)
+  _timeTracker(creationTimeMs)
 {
   _transmissionsExpected = transmissionsRemaining + 1;
   _totalMessage += message;
-  _transmissionsReceived++;
+  ++_transmissionsReceived;
 }
 
 MessageData::MessageData(uint8_t *initialTransmission, uint8_t transmissionLength, uint32_t creationTimeMs) :
-  TimeTracker(creationTimeMs)
+  _timeTracker(creationTimeMs)
 {
   _transmissionsExpected = EspnowProtocolInterpreter::espnowGetTransmissionsRemaining(initialTransmission) + 1;
   addToMessage(initialTransmission, transmissionLength);
@@ -49,7 +49,7 @@ bool MessageData::addToMessage(uint8_t *transmission, uint8_t transmissionLength
     String message = EspnowProtocolInterpreter::espnowGetMessageContent(transmission, transmissionLength);
     assert(message.length() <= EspnowMeshBackend::getMaxMessageBytesPerTransmission()); // Should catch some cases where transmission is not null terminated.
     _totalMessage += message;
-    _transmissionsReceived++;
+    ++_transmissionsReceived;
     return true;
   }
 
@@ -75,3 +75,5 @@ String MessageData::getTotalMessage()
 {
   return _totalMessage;
 }
+
+const TimeTracker &MessageData::getTimeTracker() const { return _timeTracker; }

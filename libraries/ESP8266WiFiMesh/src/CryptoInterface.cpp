@@ -34,8 +34,6 @@ namespace
 {
   size_t _ctMinDataLength = 0;
   size_t _ctMaxDataLength = 1024;
-
-  bool _warningsEnabled = true;
   
   br_hkdf_context _storedHkdfContext;
   bool _hkdfContextStored = false;
@@ -186,52 +184,61 @@ namespace
     createBearsslHmacCT(hashType, message.c_str(), message.length(), hashKey, hashKeyLength, hmac, hmacLength);
     return TypeCast::uint8ArrayToHexString(hmac, hmacLength);
   }
-}
 
-namespace CryptoInterface 
-{
-  void setCtMinDataLength(const size_t ctMinDataLength) 
+  
+  // Helper function to avoid deprecated warnings.
+  void *md5HashHelper(const void *data, const size_t dataLength, void *resultArray)
   {
-    assert(ctMaxDataLength() - ctMinDataLength <= CT_MAX_DIFF);
-    _ctMinDataLength = ctMinDataLength; 
-  }
-  size_t ctMinDataLength() {return _ctMinDataLength;}
-
-  void setCtMaxDataLength(const size_t ctMaxDataLength) 
-  { 
-    assert(ctMaxDataLength - ctMinDataLength() <= CT_MAX_DIFF);
-    _ctMaxDataLength = ctMaxDataLength; 
-  }
-  size_t ctMaxDataLength() {return _ctMaxDataLength;}
-
-  void setWarningsEnabled(bool warningsEnabled) { _warningsEnabled = warningsEnabled; }
-  bool warningsEnabled() { return _warningsEnabled; }
-
-  void setNonceGenerator(nonceGeneratorType nonceGenerator) { _nonceGenerator = nonceGenerator; }
-  nonceGeneratorType getNonceGenerator() { return _nonceGenerator; }
-
-
-  // #################### MD5 ####################
-    
-  // resultArray must have size MD5_NATURAL_LENGTH or greater
-  void *md5Hash(const void *data, const size_t dataLength, void *resultArray)
-  {
-    if(warningsEnabled())
-      Serial.println(F("\nWARNING! The MD5 hash is broken in terms of attacker resistance.\n" 
-                       "Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.\n"
-                       "Use CryptoInterface::setWarningsEnabled(false) to turn off this warning.\n"));
-    
     br_md5_context context;
     br_md5_init(&context);
     br_md5_update(&context, data, dataLength);
     br_md5_out(&context, resultArray);
     return resultArray;
   }
+
+  // Helper function to avoid deprecated warnings.
+  void *sha1HashHelper(const void *data, const size_t dataLength, void *resultArray)
+  {    
+    br_sha1_context context;
+    br_sha1_init(&context);
+    br_sha1_update(&context, data, dataLength);
+    br_sha1_out(&context, resultArray);
+    return resultArray;
+  }
+}
+
+namespace CryptoInterface 
+{
+  void setCtMinDataLength(const size_t ctMinDataLength) 
+  {
+    assert(getCtMaxDataLength() - ctMinDataLength <= CT_MAX_DIFF);
+    _ctMinDataLength = ctMinDataLength; 
+  }
+  size_t getCtMinDataLength() {return _ctMinDataLength;}
+
+  void setCtMaxDataLength(const size_t ctMaxDataLength) 
+  { 
+    assert(ctMaxDataLength - getCtMinDataLength() <= CT_MAX_DIFF);
+    _ctMaxDataLength = ctMaxDataLength; 
+  }
+  size_t getCtMaxDataLength() {return _ctMaxDataLength;}
+
+  void setNonceGenerator(nonceGeneratorType nonceGenerator) { _nonceGenerator = nonceGenerator; }
+  nonceGeneratorType getNonceGenerator() { return _nonceGenerator; }
+
+
+  // #################### MD5 ####################
+  
+  // resultArray must have size MD5_NATURAL_LENGTH or greater
+  void *md5Hash(const void *data, const size_t dataLength, void *resultArray)
+  {
+    return md5HashHelper(data, dataLength, resultArray);
+  }
   
   String md5Hash(const String &message)
   {
     uint8_t hash[MD5_NATURAL_LENGTH];
-    md5Hash(message.c_str(), message.length(), hash);
+    md5HashHelper(message.c_str(), message.length(), hash);
     return TypeCast::uint8ArrayToHexString(hash, MD5_NATURAL_LENGTH);
   }
 
@@ -260,23 +267,14 @@ namespace CryptoInterface
 
   // resultArray must have size SHA1_NATURAL_LENGTH or greater
   void *sha1Hash(const void *data, const size_t dataLength, void *resultArray)
-  {
-    if(warningsEnabled())
-      Serial.println(F("\nWARNING! The SHA-1 hash is broken in terms of attacker resistance.\n" 
-                       "Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.\n"
-                       "Use CryptoInterface::setWarningsEnabled(false) to turn off this warning.\n"));
-    
-    br_sha1_context context;
-    br_sha1_init(&context);
-    br_sha1_update(&context, data, dataLength);
-    br_sha1_out(&context, resultArray);
-    return resultArray;
+  {    
+    return sha1HashHelper(data, dataLength, resultArray);
   }
   
   String sha1Hash(const String &message)
   {
     uint8_t hash[SHA1_NATURAL_LENGTH];
-    sha1Hash(message.c_str(), message.length(), hash);
+    sha1HashHelper(message.c_str(), message.length(), hash);
     return TypeCast::uint8ArrayToHexString(hash, SHA1_NATURAL_LENGTH);
   }
 

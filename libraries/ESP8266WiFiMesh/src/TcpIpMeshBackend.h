@@ -43,14 +43,14 @@ public:
    * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
    *          is the request string received from another node and returns the string to send back.
    * @param responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
-   *          is the response string received from another node. Returns a transmission status code as a transmission_status_t.
+   *          is the response string received from another node. Returns a transmission status code as a TransmissionStatusType.
    * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
    * @param meshPassword The WiFi password for the mesh network.
    * @param ssidPrefix The prefix (first part) of the node SSID.
    * @param ssidSuffix The suffix (last part) of the node SSID.
    * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is separate for each TcpIpMeshBackend instance.
    * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
-   *                    WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                    WARNING: The ESP8266 has only one WiFi channel, and the station/client mode is always prioritized for channel selection.
    *                    This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                    In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
    *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
@@ -91,7 +91,7 @@ public:
   static std::vector<TransmissionOutcome> & latestTransmissionOutcomes();
 
   /**
-   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TransmissionStatusType::TRANSMISSION_COMPLETE). False otherwise.
    *         The result is unique for each mesh backend.
    */
   static bool latestTransmissionSuccessful();
@@ -124,7 +124,7 @@ public:
    * 
    * Note that if wifiChannel and BSSID are missing from recipientInfo, connection time will be longer.
    */
-  transmission_status_t attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect = true, bool initialDisconnect = false);
+  TransmissionStatusType attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect = true, bool initialDisconnect = false);
   
   /**
    * If any clients are connected, accept their requests and call the requestHandler function for each one.
@@ -183,8 +183,8 @@ public:
    * 
    * @param connectionAttemptTimeoutMs The timeout for each connection attempt, in milliseconds.
    */
-  void setConnectionAttemptTimeout(int32_t connectionAttemptTimeoutMs);
-  int32_t getConnectionAttemptTimeout();
+  void setConnectionAttemptTimeout(uint32_t connectionAttemptTimeoutMs);
+  uint32_t getConnectionAttemptTimeout();
 
   /**
    * Set the timeout to use for transmissions when this TcpIpMeshBackend instance acts as a station (i.e. when connected to another AP).
@@ -228,12 +228,12 @@ protected:
   /** 
    * Will be true if a transmission initiated by a public method is in progress.
    */
-  static bool _tcpIpTransmissionMutex;
+  static std::shared_ptr<bool> _tcpIpTransmissionMutex;
 
   /** 
    * Will be true when the connectionQueue should not be modified.
    */
-  static bool _tcpIpConnectionQueueMutex;
+  static std::shared_ptr<bool> _tcpIpConnectionQueueMutex;
 
   /**
    * Check if there is an ongoing TCP/IP transmission in the library. Used to avoid interrupting transmissions.
@@ -257,7 +257,7 @@ private:
   uint16_t _serverPort;
   WiFiServer _server;
   uint8_t _maxAPStations = 4; // Only affects TCP/IP connections, not ESP-NOW connections
-  int32_t _connectionAttemptTimeoutMs = 10000;
+  uint32_t _connectionAttemptTimeoutMs = 10000;
   int _stationModeTimeoutMs = 5000; // int is the type used in the Arduino core for this particular API, not uint32_t, which is why we use int here.
   uint32_t _apModeTimeoutMs = 4500;
 
@@ -271,12 +271,12 @@ private:
 
   void fullStop(WiFiClient &currClient);
   void initiateConnectionToAP(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
-  transmission_status_t connectToNode(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
-  transmission_status_t exchangeInfo(WiFiClient &currClient);
+  TransmissionStatusType connectToNode(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
+  TransmissionStatusType exchangeInfo(WiFiClient &currClient);
   bool waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait);
-  transmission_status_t attemptDataTransfer();
-  transmission_status_t attemptDataTransferKernel();
-  transmission_status_t initiateTransmission(const TcpIpNetworkInfo &recipientInfo);
+  TransmissionStatusType attemptDataTransfer();
+  TransmissionStatusType attemptDataTransferKernel();
+  TransmissionStatusType initiateTransmission(const TcpIpNetworkInfo &recipientInfo);
   void enterPostTransmissionState(bool concludingDisconnect);
 };
 

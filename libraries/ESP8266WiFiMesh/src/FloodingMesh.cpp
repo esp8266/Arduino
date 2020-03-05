@@ -40,13 +40,16 @@ char FloodingMesh::_metadataDelimiter = 23;
 
 void floodingMeshDelay(uint32_t durationMs)
 {
-  uint32_t startingTime = millis();
-  
-  while(millis() - startingTime < durationMs)
+  ExpiringTimeTracker timeout(durationMs);
+
+  do
   {
+    // We want to delay before performMeshMaintenance() so background tasks can be managed first.
+    // Initial while combined with YieldAndDelayMs polledTimeout::YieldPolicy is not suitable since the delay then occurs before evaluating the condition (meaning durationMs = 1 never executes the loop interior).
     delay(1);
     FloodingMesh::performMeshMaintenance();
   }
+  while(!timeout);
 }
 
 FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
@@ -428,9 +431,9 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
  * @param meshInstance The MeshBackendBase instance that called the function.
  * @return The status code resulting from the response, as an int
  */
-transmission_status_t FloodingMesh::_defaultResponseHandler(const String &response, MeshBackendBase &meshInstance)
+TransmissionStatusType FloodingMesh::_defaultResponseHandler(const String &response, MeshBackendBase &meshInstance)
 {
-  transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
+  TransmissionStatusType statusCode = TransmissionStatusType::TRANSMISSION_COMPLETE;
 
   getEspnowMeshBackend().warningPrint(String(F("WARNING! Response to FloodingMesh broadcast received, but none is expected!")));
 
@@ -503,26 +506,22 @@ bool FloodingMesh::_defaultBroadcastFilter(String &firstTransmission, EspnowMesh
   {
     return false; // Broadcast is for another mesh network
   }
-  else 
-  {
-    int32_t messageIDEndIndex = firstTransmission.indexOf(metadataDelimiter(), metadataEndIndex + 1);
-
-    if(messageIDEndIndex == -1)
-      return false; // metadataDelimiter not found
   
-    uint64_t messageID = TypeCast::stringToUint64(firstTransmission.substring(metadataEndIndex + 1, messageIDEndIndex));
+  int32_t messageIDEndIndex = firstTransmission.indexOf(metadataDelimiter(), metadataEndIndex + 1);
 
-    if(insertPreliminaryMessageID(messageID))
-    {
-      // Add broadcast identifier to stored message and mark as accepted broadcast.
-      firstTransmission = String(metadataDelimiter()) + firstTransmission;
-      return true;
-    }
-    else
-    {
-      return false; // Broadcast has already been received the maximum number of times
-    }
+  if(messageIDEndIndex == -1)
+    return false; // metadataDelimiter not found
+
+  uint64_t messageID = TypeCast::stringToUint64(firstTransmission.substring(metadataEndIndex + 1, messageIDEndIndex));
+
+  if(insertPreliminaryMessageID(messageID))
+  {
+    // Add broadcast identifier to stored message and mark as accepted broadcast.
+    firstTransmission = String(metadataDelimiter()) + firstTransmission;
+    return true;
   }
+  
+  return false; // Broadcast has already been received the maximum number of times
 }
 
 /**

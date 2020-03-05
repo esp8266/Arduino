@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 
+// Minimal time tracking class. Used instead of other classes like ExpiringTimeTracker when small memory footprint is important and other functionality not required.
 class TimeTracker {
   
 public:

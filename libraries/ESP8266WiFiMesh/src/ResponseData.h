@@ -28,7 +28,7 @@
 #include "TimeTracker.h"
 #include <Arduino.h>
 
-class ResponseData : public TimeTracker {
+class ResponseData {
   
 public:
 
@@ -44,11 +44,15 @@ public:
   String getMessage() const;
 
   void setRequestID(uint64_t requestID);
-  uint64_t getRequestID() const;  
+  uint64_t getRequestID() const;
+
+  const TimeTracker &getTimeTracker() const;
 
 private:
 
   void storeRecipientMac(const uint8_t newRecipientMac[6]);
+
+  TimeTracker _timeTracker;
   
   uint8_t _recipientMacArray[6] {0};
   uint8_t *_recipientMac = nullptr;

@@ -42,7 +42,7 @@ namespace MeshTypeConversionFunctions
    * @param base The radix to convert "number" into. Must be between 2 and 36.
    * @return A string of "number" encoded in radix "base".
    */
-  String uint64ToString(uint64_t number, byte base = 16);
+  String uint64ToString(uint64_t number, const byte base = 16);
   
   /**
    * Note that using base 10 instead of 16 increases conversion time by roughly a factor of 2, due to unfavourable 64-bit arithmetic.
@@ -52,7 +52,7 @@ namespace MeshTypeConversionFunctions
    * @param base The radix of "string". Must be between 2 and 36.
    * @return A uint64_t of the string, using radix "base" during decoding.
    */
-  uint64_t stringToUint64(const String &string, byte base = 16);
+  uint64_t stringToUint64(const String &string, const byte base = 16);
   
   /** 
    *  Convert the contents of a uint8_t array to a String in HEX format. The resulting String starts from index 0 of the array.
@@ -62,7 +62,7 @@ namespace MeshTypeConversionFunctions
    *  @param arrayLength The size of uint8Array, in bytes.
    *  @return Normally a String containing the HEX representation of the uint8Array. An empty String if the memory allocation for the String failed.
    */
-  String uint8ArrayToHexString(const uint8_t *uint8Array, uint32_t arrayLength);
+  String uint8ArrayToHexString(const uint8_t *uint8Array, const uint32_t arrayLength);
   
   /** 
    *  Convert the contents of a String in HEX format to a uint8_t array. Index 0 of the array will represent the start of the String.
@@ -73,7 +73,7 @@ namespace MeshTypeConversionFunctions
    *  @param arrayLength The number of bytes to fill in uint8Array.
    *  @return A pointer to the uint8Array.
    */
-  uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, uint32_t arrayLength);
+  uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength);
   
   /**
    * Stores the exact values of uint8Array in a String, even null values.
@@ -86,7 +86,7 @@ namespace MeshTypeConversionFunctions
    * @param arrayLength The size of uint8Array, in bytes.
    * @return Normally a String containing the same data as the uint8Array. An empty String if the memory allocation for the String failed.
    */
-  String uint8ArrayToMultiString(uint8_t *uint8Array, uint32_t arrayLength);
+  String uint8ArrayToMultiString(uint8_t *uint8Array, const uint32_t arrayLength);
   
   /**
    * Stores the exact values of uint8Array in a String, even null values.
@@ -99,7 +99,7 @@ namespace MeshTypeConversionFunctions
    * @param arrayLength The size of uint8Array, in bytes.
    * @return Normally a String containing the same data as the uint8Array. An empty String if the memory allocation for the String failed.
    */
-  String bufferedUint8ArrayToMultiString(const uint8_t *uint8Array, uint32_t arrayLength);
+  String bufferedUint8ArrayToMultiString(const uint8_t *uint8Array, const uint32_t arrayLength);
   
   /**
    * Takes a uint8_t array and converts the first 6 bytes to a hexadecimal string.
@@ -133,7 +133,7 @@ namespace MeshTypeConversionFunctions
    * @param macArray A uint8_t array that will hold the mac address once the function returns. Should have a size of at least 6 bytes.
    * @return The macArray.
    */
-  uint8_t *uint64ToMac(uint64_t macValue, uint8_t *macArray);
+  uint8_t *uint64ToMac(const uint64_t macValue, uint8_t *macArray);
   
   /**
    * Takes a uint64_t value and stores the bits in a uint8_t array. Assumes index 0 of the array should contain MSB. 
@@ -142,7 +142,7 @@ namespace MeshTypeConversionFunctions
    * @param resultArray A uint8_t array that will hold the result once the function returns. Should have a size of at least 8 bytes.
    * @return The resultArray.
    */
-  uint8_t *uint64ToUint8Array(uint64_t value, uint8_t *resultArray);
+  uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray);
   
   /**
    * Takes a uint8_t array and converts the first 8 (lowest index) elements to a uint64_t. Assumes index 0 of the array contains MSB.

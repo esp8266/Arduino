@@ -25,8 +25,9 @@
 #include "RequestData.h"
 
 RequestData::RequestData(EspnowMeshBackend &meshInstance, uint32_t creationTimeMs) :
-  TimeTracker(creationTimeMs), _meshInstance(meshInstance)
+  _timeTracker(creationTimeMs), _meshInstance(meshInstance)
 { }
 
-void RequestData::setMeshInstance(EspnowMeshBackend &meshInstance) { _meshInstance = meshInstance; }
-EspnowMeshBackend &RequestData::getMeshInstance() { return _meshInstance; }
+void RequestData::setMeshInstance(const EspnowMeshBackend &meshInstance) { _meshInstance = meshInstance; }
+EspnowMeshBackend &RequestData::getMeshInstance() const { return _meshInstance; }
+const TimeTracker &RequestData::getTimeTracker() const { return _timeTracker; }

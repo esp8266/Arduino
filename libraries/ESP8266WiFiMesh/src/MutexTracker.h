@@ -26,6 +26,7 @@
 #define __MUTEXTRACKER_H__
 
 #include <functional>
+#include <memory>
 
 /**
  * A SLIM (Scope LImited Manager)/Scope-Bound Resource Management/RAII class to manage the state of a mutex.
@@ -39,23 +40,23 @@ class MutexTracker
      * Set to false by default.
      * captureBan can be managed by MutexTracker like any other mutex.
      */
-    static bool &captureBan();
+    static std::shared_ptr<bool> captureBan();
 
     /**
     * Attempts to capture the mutex. Use the mutexCaptured() method to check success.
     */
-    MutexTracker(bool &mutexToCapture);
+    MutexTracker(const std::shared_ptr<bool> &mutexToCapture);
 
     /**
     * Attempts to capture the mutex. Use the mutexCaptured() method to check success.
     * 
     * @param destructorHook A function to hook into the MutexTracker destructor. Will be called when the MutexTracker instance is being destroyed, after the mutex has been released.
     */
-    MutexTracker(bool &mutexToCapture, std::function<void()> destructorHook);
+    MutexTracker(const std::shared_ptr<bool> &mutexToCapture, const std::function<void()> destructorHook);
 
     ~MutexTracker();
 
-    bool mutexCaptured();
+    bool mutexCaptured() const;
 
     /**
      * Set the mutex free to roam the binary plains, giving new MutexTrackers a chance to capture it.
@@ -64,17 +65,20 @@ class MutexTracker
 
   private:
 
-    static bool _captureBan;
+    static std::shared_ptr<bool> _captureBan;
 
-    bool *_capturedMutex = nullptr;
+    std::shared_ptr<bool> _capturedMutex;
     std::function<void()> _destructorHook = [](){ };
+
+    static bool mutexFree(const std::shared_ptr<bool> &mutex);
+    static bool mutexCaptured(const std::shared_ptr<bool> &mutex);
 
     /**
      * Attempt to capture the mutex.
      * 
-     * @return True if mutex was caught (meaning no other instance is holding the mutex). False otherwise.
+     * @return True if mutex was caught (meaning it exists and no other instance is holding the mutex). False otherwise.
      */
-    bool attemptMutexCapture(bool &mutexToCapture);
+    bool attemptMutexCapture(const std::shared_ptr<bool> &mutexToCapture);
 };
 
 #endif

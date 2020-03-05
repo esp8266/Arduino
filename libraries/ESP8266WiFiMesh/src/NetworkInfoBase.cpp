@@ -40,7 +40,7 @@ void NetworkInfoBase::storeBSSID(const uint8_t newBSSID[6])
       _BSSID = _bssidArray;
     }
     
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < 6; ++i)
     {
       _BSSID[i] = newBSSID[i];
     }

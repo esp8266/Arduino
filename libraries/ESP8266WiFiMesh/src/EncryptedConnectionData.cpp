@@ -102,10 +102,8 @@ bool EncryptedConnectionData::connectedTo(const uint8_t *peerMac) const
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+  
+  return false;
 }
 
 void EncryptedConnectionData::setHashKey(const uint8_t hashKey[espnowHashKeyLength])

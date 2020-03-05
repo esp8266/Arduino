@@ -24,19 +24,19 @@
 
 #include "MutexTracker.h"
 
-bool MutexTracker::_captureBan = false;
+std::shared_ptr<bool> MutexTracker::_captureBan = std::make_shared<bool>(false);
 
-bool &MutexTracker::captureBan()
+std::shared_ptr<bool> MutexTracker::captureBan()
 {
   return _captureBan;
 }
 
-MutexTracker::MutexTracker(bool &mutexToCapture) 
+MutexTracker::MutexTracker(const std::shared_ptr<bool> &mutexToCapture) 
 {
   attemptMutexCapture(mutexToCapture);
 }
 
-MutexTracker::MutexTracker(bool &mutexToCapture, std::function<void()> destructorHook) : MutexTracker(mutexToCapture)
+MutexTracker::MutexTracker(const std::shared_ptr<bool> &mutexToCapture, const std::function<void()> destructorHook) : MutexTracker(mutexToCapture)
 {
   _destructorHook = destructorHook;
 }
@@ -47,12 +47,25 @@ MutexTracker::~MutexTracker()
   _destructorHook();
 }
 
-bool MutexTracker::mutexCaptured()
+bool MutexTracker::mutexFree(const std::shared_ptr<bool> &mutex)
 {
-  if(_capturedMutex)
+  if(mutex != nullptr && !(*mutex))
     return true;
-  else
-    return false;
+
+  return false;
+}
+
+bool MutexTracker::mutexCaptured(const std::shared_ptr<bool> &mutex)
+{
+  if(mutex != nullptr && (*mutex))
+    return true;
+
+  return false;
+}
+
+bool MutexTracker::mutexCaptured() const
+{
+  return mutexCaptured(_capturedMutex);
 }
 
 void MutexTracker::releaseMutex()
@@ -60,20 +73,18 @@ void MutexTracker::releaseMutex()
   if(mutexCaptured())
   {
     *_capturedMutex = false;
-    _capturedMutex = nullptr;
+    _capturedMutex.reset();
   }
 }
 
-bool MutexTracker::attemptMutexCapture(bool &mutexToCapture)
+bool MutexTracker::attemptMutexCapture(const std::shared_ptr<bool> &mutexToCapture)
 {
-  if(!captureBan() && !mutexToCapture)
+  if(mutexFree(captureBan()) && mutexFree(mutexToCapture))
   {
-    _capturedMutex = &mutexToCapture;
+    _capturedMutex = mutexToCapture;
     *_capturedMutex = true;
     return true;
   }
-  else
-  {
-    return false;
-  }
+  
+  return false;
 }

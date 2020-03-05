@@ -90,32 +90,34 @@
 #include "EspnowNetworkInfo.h"
 #include "CryptoInterface.h"
 
-typedef enum 
+namespace Espnow
 {
-    ECT_NO_CONNECTION          = 0,
-    ECT_TEMPORARY_CONNECTION   = 1,
-    ECT_PERMANENT_CONNECTION   = 2
-} espnow_connection_type_t;
+enum class ConnectionType
+{
+  NO_CONNECTION          = 0,
+  TEMPORARY_CONNECTION   = 1,
+  PERMANENT_CONNECTION   = 2
+};
 
 // A value greater than 0 means that an encrypted connection has been established.
-typedef enum 
+enum class EncryptedConnectionStatus
 {
-    ECS_MAX_CONNECTIONS_REACHED_SELF   = -3,
-    ECS_REQUEST_TRANSMISSION_FAILED   = -2,
-    ECS_MAX_CONNECTIONS_REACHED_PEER   = -1,
-    ECS_API_CALL_FAILED               = 0,
-    ECS_CONNECTION_ESTABLISHED        = 1,
-    ECS_SOFT_LIMIT_CONNECTION_ESTABLISHED = 2 // Only used if _encryptedConnectionsSoftLimit is less than 6.
-} encrypted_connection_status_t;
+  MAX_CONNECTIONS_REACHED_SELF      = -3,
+  REQUEST_TRANSMISSION_FAILED       = -2,
+  MAX_CONNECTIONS_REACHED_PEER      = -1,
+  API_CALL_FAILED                   = 0,
+  CONNECTION_ESTABLISHED            = 1,
+  SOFT_LIMIT_CONNECTION_ESTABLISHED = 2 // Only used if _encryptedConnectionsSoftLimit is less than 6.
+};
 
-typedef enum 
+enum class EncryptedConnectionRemovalOutcome
 {
-    ECRO_REMOVAL_REQUEST_FAILED   = -1,
-    ECRO_REMOVAL_FAILED           = 0,
-    ECRO_REMOVAL_SUCCEEDED        = 1,
-    ECRO_REMOVAL_SCHEDULED        = 2
-} encrypted_connection_removal_outcome_t;
-
+  REMOVAL_REQUEST_FAILED   = -1,
+  REMOVAL_FAILED           = 0,
+  REMOVAL_SUCCEEDED        = 1,
+  REMOVAL_SCHEDULED        = 2
+};
+}
 
 /**
  * An alternative to standard delay(). Will continuously call performEspnowMaintenance() during the waiting time, so that the ESP-NOW node remains responsive.
@@ -130,12 +132,14 @@ void espnowDelay(uint32_t durationMs);
 
 class RequestData;
 
+using namespace Espnow; // TODO: Remove
+
 class EspnowMeshBackend : public MeshBackendBase {
 
 protected: 
 
-  typedef std::function<bool(String &, EspnowMeshBackend &)> broadcastFilterType;
-  typedef std::function<bool(const String &, const uint8_t *, uint32_t, EspnowMeshBackend &)> responseTransmittedHookType;
+  using broadcastFilterType = std::function<bool(String &, EspnowMeshBackend &)>;
+  using responseTransmittedHookType = std::function<bool(const String &, const uint8_t *, uint32_t, EspnowMeshBackend &)>;
 
 public:
   
@@ -145,7 +149,7 @@ public:
    * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
    *          is the request string received from another node and returns the string to send back.
    * @param responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
-   *          is the response string received from another node. Returns a transmission status code as a transmission_status_t.
+   *          is the response string received from another node. Returns a transmission status code as a TransmissionStatusType.
    * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
    * @param broadcastFilter The callback handler for deciding which ESP-NOW broadcasts to accept.
    * @param meshPassword The WiFi password for the mesh network.
@@ -155,7 +159,7 @@ public:
    * @param ssidSuffix The suffix (last part) of the node SSID.
    * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
    * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
-   *                    WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                    WARNING: The ESP8266 has only one WiFi channel, and the station/client mode is always prioritized for channel selection.
    *                    This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                    In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
    *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
@@ -173,7 +177,7 @@ public:
    * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
    *          is the request string received from another node and returns the string to send back.
    * @param responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
-   *          is the response string received from another node. Returns a transmission status code as a transmission_status_t.
+   *          is the response string received from another node. Returns a transmission status code as a TransmissionStatusType.
    * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
    * @param broadcastFilter The callback handler for deciding which ESP-NOW broadcasts to accept.
    * @param meshPassword The WiFi password for the mesh network.
@@ -183,7 +187,7 @@ public:
    * @param ssidSuffix The suffix (last part) of the node SSID.
    * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default. This setting is shared by all EspnowMeshBackend instances.
    * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
-   *                    WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   *                    WARNING: The ESP8266 has only one WiFi channel, and the station/client mode is always prioritized for channel selection.
    *                    This can cause problems if several mesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                    In such a case, whenever the station of one mesh instance connects to an AP, it will silently force the 
    *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
@@ -222,7 +226,7 @@ public:
   static std::vector<TransmissionOutcome> & latestTransmissionOutcomes();
 
   /**
-   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TransmissionStatusType::TRANSMISSION_COMPLETE). False otherwise.
    *         The result is unique for each mesh backend.
    */
   static bool latestTransmissionSuccessful();
@@ -285,7 +289,7 @@ public:
    * 
    * @param recipientInfo The recipient information.
    */
-  transmission_status_t attemptTransmission(const String &message, const EspnowNetworkInfo &recipientInfo);
+  TransmissionStatusType attemptTransmission(const String &message, const EspnowNetworkInfo &recipientInfo);
   
   /* 
    * Will ensure that an encrypted connection exists to each target node before sending the message, 
@@ -317,7 +321,7 @@ public:
    * Transmit message to a single recipient without changing the local transmission state (apart from encrypted connections). 
    * Will not change connectionQueue, latestTransmissionOutcomes or stored message.
    */
-  transmission_status_t attemptAutoEncryptingTransmission(const String &message, const EspnowNetworkInfo &recipientInfo, bool requestPermanentConnection = false);
+  TransmissionStatusType attemptAutoEncryptingTransmission(const String &message, const EspnowNetworkInfo &recipientInfo, bool requestPermanentConnection = false);
 
   /**
    * Send a message simultaneously to all nearby nodes which have ESP-NOW activated.
@@ -736,32 +740,32 @@ public:
   
   // Updates connection with current stored encrypted connection key.
   // At least one of the leftmost 32 bits in each of the session keys should be 1, since the key otherwise indicates the connection is unencrypted.
-  encrypted_connection_status_t addEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey);
+  EncryptedConnectionStatus addEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey);
   // Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized.
   // These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
-  // @param ignoreDuration Ignores any stored duration serializedConnectionState, guaranteeing that the created connection will be permanent. Returns: ECS_REQUEST_TRANSMISSION_FAILED indicates malformed serializedConnectionState.
-  encrypted_connection_status_t addEncryptedConnection(const String &serializedConnectionState, bool ignoreDuration = false);
+  // @param ignoreDuration Ignores any stored duration serializedConnectionState, guaranteeing that the created connection will be permanent. Returns: EncryptedConnectionStatus::REQUEST_TRANSMISSION_FAILED indicates malformed serializedConnectionState.
+  EncryptedConnectionStatus addEncryptedConnection(const String &serializedConnectionState, bool ignoreDuration = false);
   
   // Adds a new temporary encrypted connection, or changes the duration of an existing temporary connection (only updates keys, not duration, for existing permanent connections). 
   // As with all these methods, changes will only take effect once the requester proves it has the ability to decrypt the session key.
   // At least one of the leftmost 32 bits in each of the session keys should be 1, since the key otherwise indicates the connection is unencrypted.
-  encrypted_connection_status_t addTemporaryEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey, uint32_t duration);
+  EncryptedConnectionStatus addTemporaryEncryptedConnection(uint8_t *peerStaMac, uint8_t *peerApMac, uint64_t peerSessionKey, uint64_t ownSessionKey, uint32_t duration);
   // Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized.
   // These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
-  // Uses duration argument instead of any stored duration in serializedConnectionState. Returns: ECS_REQUEST_TRANSMISSION_FAILED indicates malformed serializedConnectionState.
-  encrypted_connection_status_t addTemporaryEncryptedConnection(const String &serializedConnectionState, uint32_t duration);
+  // Uses duration argument instead of any stored duration in serializedConnectionState. Returns: EncryptedConnectionStatus::REQUEST_TRANSMISSION_FAILED indicates malformed serializedConnectionState.
+  EncryptedConnectionStatus addTemporaryEncryptedConnection(const String &serializedConnectionState, uint32_t duration);
 
   // If an encrypted connection to peerMac already exists, only connection duration is updated. All other settings are kept as is. Use removeEncryptedConnection/requestEncryptedConnectionRemoval first if encryption keys should be updated.
   // Makes sure both nodes have an encrypted connection to each other that's permanent.
-  encrypted_connection_status_t requestEncryptedConnection(uint8_t *peerMac);
+  EncryptedConnectionStatus requestEncryptedConnection(uint8_t *peerMac);
   // Makes sure both nodes have an encrypted connection to each other that's either permanent or has the duration specified.
-  encrypted_connection_status_t requestTemporaryEncryptedConnection(uint8_t *peerMac, uint32_t durationMs);
+  EncryptedConnectionStatus requestTemporaryEncryptedConnection(uint8_t *peerMac, uint32_t durationMs);
   // Makes sure both nodes have an encrypted connection to each other that's either permanent or has at least the duration specified.
   // Note that if a temporary encrypted connection already exists to a target node, this method will slightly extend the connection duration 
   // depending on the time it takes to verify the connection to the node.
-  encrypted_connection_status_t requestFlexibleTemporaryEncryptedConnection(uint8_t *peerMac, uint32_t minDurationMs);
-  static encrypted_connection_removal_outcome_t removeEncryptedConnection(uint8_t *peerMac);
-  encrypted_connection_removal_outcome_t requestEncryptedConnectionRemoval(uint8_t *peerMac);
+  EncryptedConnectionStatus requestFlexibleTemporaryEncryptedConnection(uint8_t *peerMac, uint32_t minDurationMs);
+  static EncryptedConnectionRemovalOutcome removeEncryptedConnection(uint8_t *peerMac);
+  EncryptedConnectionRemovalOutcome requestEncryptedConnectionRemoval(uint8_t *peerMac);
 
   /**
    * Set whether this EspnowMeshBackend instance will accept ESP-NOW requests from unencrypted connections or not, when acting as EspnowRequestManager. 
@@ -824,24 +828,24 @@ public:
    * @param peerMac The node MAC for which to get information. Both MAC for AP interface and MAC for STA interface can be used (and will yield the same result).
    *                Use the getEncryptedMac method or the indexed based getConnectionInfo if there is a need to find the actual encrypted interface.
    * @param remainingDuration An optional pointer to a uint32_t variable. 
-   *                          If supplied and the connection type is ECT_TEMPORARY_CONNECTION the variable will be set to the remaining duration of the connection. 
+   *                          If supplied and the connection type is ConnectionType::TEMPORARY_CONNECTION the variable will be set to the remaining duration of the connection. 
    *                          Otherwise the variable value is not modified.
-   * @return The espnow_connection_type_t of the connection with peerMac.
+   * @return The ConnectionType of the connection with peerMac.
    */
-  static espnow_connection_type_t getConnectionInfo(uint8_t *peerMac, uint32_t *remainingDuration = nullptr);
+  static ConnectionType getConnectionInfo(uint8_t *peerMac, uint32_t *remainingDuration = nullptr);
   
   /**
    * Get information about any current ESP-NOW connection with another node.
    * 
    * @param connectionIndex The connection index of the node for which to get information. Valid values are limited by numberOfEncryptedConnections().
    * @param remainingDuration An optional pointer to a uint32_t variable. 
-   *                          If supplied and the connection type is ECT_TEMPORARY_CONNECTION the variable will be set to the remaining duration of the connection. 
+   *                          If supplied and the connection type is ConnectionType::TEMPORARY_CONNECTION the variable will be set to the remaining duration of the connection. 
    *                          Otherwise the variable value is not modified.
    * @param peerMac An optional pointer to an uint8_t array with at least size 6. It will be filled with the MAC of the encrypted peer interface if an encrypted connection exists.
    *                Otherwise the array is not modified.
-   * @return The espnow_connection_type_t of the connection given by connectionIndex.
+   * @return The ConnectionType of the connection given by connectionIndex.
    */
-  static espnow_connection_type_t getConnectionInfo(uint32_t connectionIndex, uint32_t *remainingDuration = nullptr, uint8_t *peerMac = nullptr);
+  static ConnectionType getConnectionInfo(uint32_t connectionIndex, uint32_t *remainingDuration = nullptr, uint8_t *peerMac = nullptr);
 
   /**
    * @return The proportion of ESP-NOW requests made by this node that have failed, since power on or latest reset.
@@ -858,7 +862,7 @@ protected:
   static std::vector<EspnowNetworkInfo> _connectionQueue;
   static std::vector<TransmissionOutcome> _latestTransmissionOutcomes;
 
-  typedef std::vector<EncryptedConnectionLog>::iterator connectionLogIterator; 
+  using connectionLogIterator = std::vector<EncryptedConnectionLog>::iterator; 
   static connectionLogIterator connectionLogEndIterator();
 
   static const uint8_t broadcastMac[6];
@@ -866,7 +870,7 @@ protected:
 
   bool activateEspnow();
 
-  static bool encryptedConnectionEstablished(encrypted_connection_status_t connectionStatus);
+  static bool encryptedConnectionEstablished(EncryptedConnectionStatus connectionStatus);
     
   /*
    * Note that ESP-NOW is not perfect and in rare cases messages may be dropped. 
@@ -906,8 +910,8 @@ protected:
   // Consider using getScheduledResponseRecipient and similar methods for this preparation.
   // Should only be used when there is no transmissions in progress. In practice when _espnowTransmissionMutex is free.
   // @param resultingIterator Will be set to the iterator position after the removed element, if an element to remove was found. Otherwise no change will occur.
-  static encrypted_connection_removal_outcome_t removeEncryptedConnectionUnprotected(const uint8_t *peerMac, std::vector<EncryptedConnectionLog>::iterator *resultingIterator = nullptr);
-  static encrypted_connection_removal_outcome_t removeEncryptedConnectionUnprotected(connectionLogIterator &connectionIterator, std::vector<EncryptedConnectionLog>::iterator *resultingIterator);
+  static EncryptedConnectionRemovalOutcome removeEncryptedConnectionUnprotected(const uint8_t *peerMac, std::vector<EncryptedConnectionLog>::iterator *resultingIterator = nullptr);
+  static EncryptedConnectionRemovalOutcome removeEncryptedConnectionUnprotected(connectionLogIterator &connectionIterator, std::vector<EncryptedConnectionLog>::iterator *resultingIterator);
 
   /**
    * Set the MAC address considered to be the sender of the most recently received ESP-NOW request, response or broadcast.
@@ -935,17 +939,17 @@ protected:
   /** 
    * Will be true if a transmission initiated by a public method is in progress.
    */
-  static bool _espnowTransmissionMutex;
+  static std::shared_ptr<bool> _espnowTransmissionMutex;
 
   /** 
    * Will be true when the connectionQueue should not be modified.
    */
-  static bool _espnowConnectionQueueMutex;
+  static std::shared_ptr<bool> _espnowConnectionQueueMutex;
 
   /** 
    * Will be true when no responsesToSend element should be removed.
    */
-  static bool _responsesToSendMutex;
+  static std::shared_ptr<bool> _responsesToSendMutex;
 
   /**
    * Check if there is an ongoing ESP-NOW transmission in the library. Used to avoid interrupting transmissions.
@@ -955,8 +959,8 @@ protected:
   static bool transmissionInProgress();
 
   enum class macAndType_td : uint64_t {};
-  typedef uint64_t messageID_td;
-  typedef uint64_t peerMac_td;
+  using messageID_td = uint64_t;
+  using peerMac_td = uint64_t;
   
   static macAndType_td createMacAndTypeValue(uint64_t uint64Mac, char messageType);
   static uint64_t macAndTypeToUint64Mac(const macAndType_td &macAndTypeValue);
@@ -985,19 +989,19 @@ protected:
    * @return The transmission status for the transmission.
    */
   // Send a message to the node having targetBSSID as mac, changing targetBSSID to the mac of the encrypted connection if it exists and ensuring such an encrypted connection is synchronized.
-  static transmission_status_t espnowSendToNode(const String &message, const uint8_t *targetBSSID, char messageType, EspnowMeshBackend *espnowInstance = nullptr);
+  static TransmissionStatusType espnowSendToNode(const String &message, const uint8_t *targetBSSID, char messageType, EspnowMeshBackend *espnowInstance = nullptr);
   // Send a message using exactly the arguments given, without consideration for any encrypted connections.
-  static transmission_status_t espnowSendToNodeUnsynchronized(const String message, const uint8_t *targetBSSID, char messageType, uint64_t messageID, EspnowMeshBackend *espnowInstance = nullptr);
+  static TransmissionStatusType espnowSendToNodeUnsynchronized(const String message, const uint8_t *targetBSSID, char messageType, uint64_t messageID, EspnowMeshBackend *espnowInstance = nullptr);
 
-  transmission_status_t sendRequest(const String &message, const uint8_t *targetBSSID);
-  transmission_status_t sendResponse(const String &message, uint64_t requestID, const uint8_t *targetBSSID);
+  TransmissionStatusType sendRequest(const String &message, const uint8_t *targetBSSID);
+  TransmissionStatusType sendResponse(const String &message, uint64_t requestID, const uint8_t *targetBSSID);
 
 private:
 
   EspnowMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, broadcastFilterType broadcastFilter,
                     const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel);
 
-  typedef std::function<String(const String &, const ExpiringTimeTracker &)> encryptionRequestBuilderType;
+  using encryptionRequestBuilderType = std::function<String(const String &, const ExpiringTimeTracker &)>;
   static String defaultEncryptionRequestBuilder(const String &requestHeader, const uint32_t durationMs, const uint8_t *hashKey, const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker);
   static String flexibleEncryptionRequestBuilder(const uint32_t minDurationMs, const uint8_t *hashKey, const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker);
 
@@ -1055,14 +1059,14 @@ private:
   static EncryptedConnectionLog *getEncryptedConnection(const uint8_t *peerMac);
   static EncryptedConnectionLog *getTemporaryEncryptedConnection(const uint8_t *peerMac);
 
-  //@return iterator to connection in connectionVector, or connectionVector.end() if element not found
+  //@return iterator to connection in connectionContainer, or connectionContainer.end() if element not found
   template <typename T>
-  static typename std::vector<T>::iterator getEncryptedConnectionIterator(const uint8_t *peerMac, typename std::vector<T> &connectionVector);
+  static typename T::iterator getEncryptedConnectionIterator(const uint8_t *peerMac, T &connectionContainer);
   static bool getEncryptedConnectionIterator(const uint8_t *peerMac, connectionLogIterator &iterator);
   // @return true if an encrypted connection to peerMac is found and the found connection is temporary. Only changes iterator if true is returned.
   static bool getTemporaryEncryptedConnectionIterator(const uint8_t *peerMac, connectionLogIterator &iterator);
 
-  static espnow_connection_type_t getConnectionInfoHelper(const EncryptedConnectionLog *encryptedConnection, uint32_t *remainingDuration, uint8_t *peerMac = nullptr);
+  static ConnectionType getConnectionInfoHelper(const EncryptedConnectionLog *encryptedConnection, uint32_t *remainingDuration, uint8_t *peerMac = nullptr);
 
   // Should only be used when there is no transmissions in progress, so it is safe to remove encrypted connections. In practice when _espnowTransmissionMutex is free.
   // @param scheduledRemovalOnly If true, only deletes encrypted connections where removalScheduled() is true. This means only connections which have been requested for removal will be deleted,
@@ -1071,6 +1075,9 @@ private:
 
   template <typename T, typename U>
   static void deleteExpiredLogEntries(std::map<std::pair<U, uint64_t>, T> &logEntries, uint32_t maxEntryLifetimeMs);
+
+  template <typename U>
+  static void deleteExpiredLogEntries(std::map<std::pair<U, uint64_t>, TimeTracker> &logEntries, uint32_t maxEntryLifetimeMs);
 
   static void deleteExpiredLogEntries(std::map<std::pair<peerMac_td, messageID_td>, RequestData> &logEntries, uint32_t requestLifetimeMs, uint32_t broadcastLifetimeMs);
 
@@ -1082,7 +1089,6 @@ private:
 
   static uint32_t _encryptionRequestTimeoutMs;
 
-  static uint32_t _timeOfLastLogClear;
   static uint32_t _criticalHeapLevel;
   static uint32_t _criticalHeapLevelBuffer;
 
@@ -1096,8 +1102,7 @@ private:
   static String _ongoingPeerRequestNonce;
   static uint8_t _ongoingPeerRequestMac[6];
   static EspnowMeshBackend *_ongoingPeerRequester;
-  static encrypted_connection_status_t _ongoingPeerRequestResult;
-  static uint32_t _ongoingPeerRequestEncryptionStart;
+  static EncryptedConnectionStatus _ongoingPeerRequestResult;
   static bool _reciprocalPeerRequestConfirmation;
 
   template <typename T>
@@ -1119,7 +1124,7 @@ private:
   uint8_t _senderAPMac[6] = {0};
   bool _receivedEncryptedTransmission = false;
 
-  static bool _espnowSendToNodeMutex;
+  static std::shared_ptr<bool> _espnowSendToNodeMutex;
   static uint8_t _transmissionTargetBSSID[6];
   
   static void storeSentRequest(const uint64_t targetBSSID, const uint64_t messageID, const RequestData &requestData);
@@ -1148,9 +1153,9 @@ private:
    * @param encryptionRequestBuilder A function which is responsible for constructing the request message to send. 
    * Called twice when the request is successful. First to build the initial request message and then to build the connection verification message.
    * The request message should typically be of the form: JsonTranslator::createEncryptionRequestIntro() + JsonTranslator::createEncryptionRequestEnding().
-   * @return The ultimate status of the requested encrypted connection, as encrypted_connection_status_t.
+   * @return The ultimate status of the requested encrypted connection, as EncryptedConnectionStatus.
    */
-  encrypted_connection_status_t requestEncryptedConnectionKernel(uint8_t *peerMac, const encryptionRequestBuilderType &encryptionRequestBuilder);
+  EncryptedConnectionStatus requestEncryptedConnectionKernel(uint8_t *peerMac, const encryptionRequestBuilderType &encryptionRequestBuilder);
 
   /**
    * Generate a new message ID to be used when making a data transmission. The generated ID will be different depending on whether an encrypted connection exists or not.
@@ -1170,12 +1175,12 @@ private:
   static uint64_t createSessionKey();
 
   void prepareForTransmission(const String &message, bool scan, bool scanAllWiFiChannels);
-  transmission_status_t initiateTransmission(const String &message, const EspnowNetworkInfo &recipientInfo);
-  transmission_status_t initiateTransmissionKernel(const String &message, const uint8_t *targetBSSID);
+  TransmissionStatusType initiateTransmission(const String &message, const EspnowNetworkInfo &recipientInfo);
+  TransmissionStatusType initiateTransmissionKernel(const String &message, const uint8_t *targetBSSID);
   void printTransmissionStatistics();
   
-  encrypted_connection_status_t initiateAutoEncryptingConnection(const EspnowNetworkInfo &recipientInfo, bool requestPermanentConnection, uint8_t *targetBSSID, EncryptedConnectionLog **existingEncryptedConnection);
-  transmission_status_t initiateAutoEncryptingTransmission(const String &message, const uint8_t *targetBSSID, encrypted_connection_status_t connectionStatus);
+  EncryptedConnectionStatus initiateAutoEncryptingConnection(const EspnowNetworkInfo &recipientInfo, bool requestPermanentConnection, uint8_t *targetBSSID, EncryptedConnectionLog **existingEncryptedConnection);
+  TransmissionStatusType initiateAutoEncryptingTransmission(const String &message, const uint8_t *targetBSSID, EncryptedConnectionStatus connectionStatus);
   void finalizeAutoEncryptingConnection(const uint8_t *targetBSSID, const EncryptedConnectionLog *existingEncryptedConnection, bool requestPermanentConnection);
 
   // Used for verboseMode printing in attemptTransmission, _AT suffix used to reduce namespace clutter

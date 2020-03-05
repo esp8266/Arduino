@@ -1,6 +1,5 @@
 /*
- * UtilityFunctions
- * Copyright (C) 2019 Anders Löfgren
+ * Copyright (C) 2020 Anders Löfgren
  *
  * License (MIT license):
  *
@@ -23,26 +22,45 @@
  * THE SOFTWARE.
  */
 
-#include "UtilityFunctions.h"
-#include <esp8266_peri.h>
+#ifndef __ESPHEAPMONITOR_H__
+#define __ESPHEAPMONITOR_H__
 
-namespace MeshUtilityFunctions
-{
-  bool macEqual(const uint8_t *macOne, const uint8_t *macTwo)
+#include <Arduino.h>
+
+class HeapMonitor {
+
+public:
+
+  enum class HeapStatus
   {
-    for(int i = 0; i <= 5; ++i)
-    {
-      if(macOne[i] != macTwo[i])
-      {
-        return false;
-      }
-    }
-  
-    return true;
-  }
-  
-  uint64_t randomUint64()
-  {
-    return (((uint64_t)RANDOM_REG32 << 32) | (uint64_t)RANDOM_REG32);
-  }
-}
+    NOMINAL    = 0,
+    LIMITED    = 1,
+    CRITICAL   = 2
+  };
+
+  HeapMonitor(const uint32_t criticalHeapLevel, const uint32_t criticalHeapLevelBuffer);
+
+  virtual ~HeapMonitor() = default; 
+
+  /**
+   * Set the maximum free heap level in bytes within which free heap size is considered critical. 
+   */
+  void setCriticalHeapLevel(const uint32_t freeHeapInBytes);
+  uint32_t getCriticalHeapLevel() const;
+
+  /**
+   * Set the buffer of the critical heap level, within which free heap size is considered limited. 
+   */
+  void setCriticalHeapLevelBuffer(const uint32_t bufferInBytes);
+  uint32_t getCriticalHeapLevelBuffer() const;
+
+  HeapStatus getHeapStatus() const;
+
+private:
+
+  uint32_t _criticalHeapLevel;
+  uint32_t _criticalHeapLevelBuffer;
+
+};
+
+#endif

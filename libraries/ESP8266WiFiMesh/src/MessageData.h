@@ -28,7 +28,7 @@
 #include "TimeTracker.h"
 #include <Arduino.h>
 
-class MessageData : public TimeTracker {
+class MessageData {
 
 public:
 
@@ -43,9 +43,11 @@ public:
   uint8_t getTransmissionsExpected();
   uint8_t getTransmissionsRemaining();
   String getTotalMessage();
+  const TimeTracker &getTimeTracker() const;
 
 private:
 
+  TimeTracker _timeTracker;
   uint8_t _transmissionsReceived = 0;
   uint8_t _transmissionsExpected;
   String _totalMessage;

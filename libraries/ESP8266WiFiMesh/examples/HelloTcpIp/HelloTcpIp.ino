@@ -1,4 +1,4 @@
-#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
 
 #include <ESP8266WiFi.h>
 #include <TcpIpMeshBackend.h>
@@ -25,7 +25,7 @@ unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
 
 String manageRequest(const String &request, MeshBackendBase &meshInstance);
-transmission_status_t manageResponse(const String &response, MeshBackendBase &meshInstance);
+TransmissionStatusType manageResponse(const String &response, MeshBackendBase &meshInstance);
 void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
 
 /* Create the mesh node object */
@@ -68,8 +68,8 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
    @param meshInstance The MeshBackendBase instance that called the function.
    @return The status code resulting from the response, as an int
 */
-transmission_status_t manageResponse(const String &response, MeshBackendBase &meshInstance) {
-  transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
+TransmissionStatusType manageResponse(const String &response, MeshBackendBase &meshInstance) {
+  TransmissionStatusType statusCode = TransmissionStatusType::TRANSMISSION_COMPLETE;
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
   if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
@@ -142,7 +142,7 @@ bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
   // The default hook only returns true and does nothing else.
 
   if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
-    if (tcpIpInstance->latestTransmissionOutcomes().back().transmissionStatus() == TS_TRANSMISSION_COMPLETE) {
+    if (tcpIpInstance->latestTransmissionOutcomes().back().transmissionStatus() == TransmissionStatusType::TRANSMISSION_COMPLETE) {
       // Our last request got a response, so time to create a new request.
       meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + F(" from ")
                               + meshInstance.getMeshName() + meshInstance.getNodeID() + String('.'));
@@ -209,11 +209,11 @@ void loop() {
       Serial.println(F("No mesh AP found."));
     } else {
       for (TransmissionOutcome &transmissionOutcome : tcpIpNode.latestTransmissionOutcomes()) {
-        if (transmissionOutcome.transmissionStatus() == TS_TRANSMISSION_FAILED) {
+        if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::TRANSMISSION_FAILED) {
           Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionOutcome.SSID());
-        } else if (transmissionOutcome.transmissionStatus() == TS_CONNECTION_FAILED) {
+        } else if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::CONNECTION_FAILED) {
           Serial.println(String(F("Connection failed to mesh AP ")) + transmissionOutcome.SSID());
-        } else if (transmissionOutcome.transmissionStatus() == TS_TRANSMISSION_COMPLETE) {
+        } else if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::TRANSMISSION_COMPLETE) {
           // No need to do anything, transmission was successful.
         } else {
           Serial.println(String(F("Invalid transmission status for ")) + transmissionOutcome.SSID() + String('!'));

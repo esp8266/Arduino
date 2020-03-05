@@ -54,6 +54,13 @@
 #include "NetworkInfo.h"
 #include "TransmissionOutcome.h"
 
+typedef enum 
+{
+    TS_CONNECTION_FAILED    = -1,
+    TS_TRANSMISSION_FAILED    = 0,
+    TS_TRANSMISSION_COMPLETE   = 1
+} transmission_status_t;
+
 class TransmissionResult : public NetworkInfo {
 
 public:
@@ -63,11 +70,11 @@ public:
   /**
    * @param autofill Automatically fill in the rest of the network info using newNetworkIndex and the WiFi scan results.
    */
-  TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill = true);
+  TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill = true) __attribute__((deprecated));
 
-  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], transmission_status_t newTransmissionStatus);
+  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], transmission_status_t newTransmissionStatus) __attribute__((deprecated));
 
-  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex, transmission_status_t newTransmissionStatus);
+  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex, transmission_status_t newTransmissionStatus) __attribute__((deprecated));
 
   TransmissionResult(const NetworkInfo& origin, transmission_status_t newTransmissionStatus);
 };

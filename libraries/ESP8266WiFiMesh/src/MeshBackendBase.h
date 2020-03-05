@@ -23,24 +23,24 @@
 #include "TransmissionOutcome.h"
 #include "NetworkInfoBase.h"
 
-typedef enum
+enum class MeshBackendType
 {
-  MB_TCP_IP = 0,
-  MB_ESP_NOW = 1
-} mesh_backend_t;
+  TCP_IP = 0,
+  ESP_NOW = 1
+};
 
 class MeshBackendBase {
 
 protected:
 
-  typedef std::function<String(const String &, MeshBackendBase &)> requestHandlerType;
-  typedef std::function<transmission_status_t(const String &, MeshBackendBase &)> responseHandlerType;
-  typedef std::function<void(int, MeshBackendBase &)> networkFilterType;
-  typedef std::function<bool(MeshBackendBase &)> transmissionOutcomesUpdateHookType;
+  using requestHandlerType = std::function<String(const String &, MeshBackendBase &)> ;
+  using responseHandlerType = std::function<TransmissionStatusType(const String &, MeshBackendBase &)>;
+  using networkFilterType = std::function<void(int, MeshBackendBase &)>;
+  using transmissionOutcomesUpdateHookType = std::function<bool(MeshBackendBase &)>;
 
 public:
 
-  MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, mesh_backend_t classType);
+  MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, MeshBackendType classType);
 
   virtual ~MeshBackendBase();
 
@@ -109,13 +109,13 @@ public:
    * Will also change the WiFi channel for the active AP (via an AP restart)
    * if this MeshBackendBase instance is the current AP controller and it is possible to change channel.
    * 
-   * WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
+   * WARNING: The ESP8266 has only one WiFi channel, and the station/client mode is always prioritized for channel selection.
    * This can cause problems if several MeshBackendBase instances exist on the same ESP8266 and use different WiFi channels. 
    * In such a case, whenever the station of one MeshBackendBase instance connects to an AP, it will silently force the 
    * WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
    * make it impossible for other stations to detect the APs whose WiFi channels have changed.
    * 
-   * @param newWiFiChannel The WiFi channel to change to. Valid values are integers from 1 to 13.
+   * @param newWiFiChannel The WiFi channel to change to. Valid values are determined by wifi_get_country, usually integers from 1 to 11 or 1 to 13.
    *                          
    */
   void setWiFiChannel(uint8 newWiFiChannel);
@@ -284,14 +284,14 @@ public:
    */
   static void warningPrint(const String &stringToPrint, bool newline = true);
 
-  mesh_backend_t getClassType();
+  MeshBackendType getClassType();
 
 protected:
 
   /**
    * @param latestTransmissionOutcomes The transmission outcomes vector to check.
    * 
-   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TS_TRANSMISSION_COMPLETE). False otherwise.
+   * @return True if latest transmission was successful (i.e. latestTransmissionOutcomes is not empty and all entries have transmissionStatus TransmissionStatusType::TRANSMISSION_COMPLETE). False otherwise.
    */
   static bool latestTransmissionSuccessfulBase(const std::vector<TransmissionOutcome> &latestTransmissionOutcomes);
 
@@ -310,13 +310,13 @@ protected:
    */
   virtual void deactivateAPHook();
 
-  void setClassType(mesh_backend_t classType);
+  void setClassType(MeshBackendType classType);
 
-  static bool _scanMutex;
+  static std::shared_ptr<bool> _scanMutex;
 
 private:
 
-  mesh_backend_t _classType;
+  MeshBackendType _classType;
 
   static MeshBackendBase *apController;
 

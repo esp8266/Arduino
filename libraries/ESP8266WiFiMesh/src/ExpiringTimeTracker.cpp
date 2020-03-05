@@ -24,36 +24,101 @@
 
 #include "ExpiringTimeTracker.h"
 
-ExpiringTimeTracker::ExpiringTimeTracker(uint32_t duration, uint32_t creationTimeMs) :
-  TimeTracker(creationTimeMs), _duration(duration)
-{ }
+ExpiringTimeTracker::ExpiringTimeTracker(const uint32_t duration, const uint32_t creationTimeMs) :
+  timeoutTemplate(0)
+{ 
+  setDuration(duration);
+  _start = creationTimeMs;
+}
+
+ExpiringTimeTracker::ExpiringTimeTracker(const calculatorType durationCalculator, const uint32_t creationTimeMs) :
+  timeoutTemplate(0)
+{ 
+  setDuration(durationCalculator);
+  _start = creationTimeMs;
+}
 
 uint32_t ExpiringTimeTracker::duration() const
 {
-  return _duration;
+  if(useCalculator)
+    return _durationCalculator();
+
+  return getTimeout();
 }
 
-void ExpiringTimeTracker::setRemainingDuration(uint32_t remainingDuration)
+IRAM_ATTR // called from ISR
+void ExpiringTimeTracker::setTimeout(const uint32_t newUserTimeout)
 {
-  _duration = timeSinceCreation() + remainingDuration;
+   _timeout = newUserTimeout;
+   _neverExpires = (newUserTimeout > timeMax()); // newUserTimeout < 0 is always false for uint32_t
+}
+
+void ExpiringTimeTracker::setDuration(const uint32_t duration)
+{
+  setTimeout(duration);
+  useCalculator = false;
+}
+
+void ExpiringTimeTracker::setDuration(const calculatorType durationCalculator)
+{
+  _durationCalculator = durationCalculator;
+  useCalculator = true;
+}
+
+void ExpiringTimeTracker::setRemainingDuration(const uint32_t remainingDuration)
+{
+  setDuration(elapsedTime() + remainingDuration);
+}
+
+void ExpiringTimeTracker::setRemainingDuration(const calculatorType remainingDurationCalculator)
+{
+  uint32_t currentElapsedTime = elapsedTime();
+  setDuration([remainingDurationCalculator, currentElapsedTime](){ return currentElapsedTime + remainingDurationCalculator(); });
 }
 
 uint32_t ExpiringTimeTracker::remainingDuration() const
 {
-  uint32_t remainingDuration = duration() - timeSinceCreation();
+  uint32_t remainingDuration = 0;
   
-  if(expired())
+  if(!expired()) // If expired, overflow will probably occur for remainingDuration calculation.
   {
-    // Overflow probably occured for remainingDuration calculation.
-    return 0;
+    remainingDuration = duration() - elapsedTime();
   }
-  else
-  {
-    return remainingDuration;
-  }
+
+  return remainingDuration;
+}
+
+uint32_t ExpiringTimeTracker::elapsedTime() const
+{
+  return millis() - _start;
 }
 
 bool ExpiringTimeTracker::expired() const
+{  
+  if(useCalculator)
+    return elapsedTime() >= duration();
+
+  return expiredOneShot();
+}
+
+void ExpiringTimeTracker::reset()
 {
-  return timeSinceCreation() >= duration();
+  timeoutTemplate::reset();
+}
+
+void ExpiringTimeTracker::reset(const uint32_t newDuration)
+{
+  setDuration(newDuration);
+  ExpiringTimeTracker::reset();
+}
+
+void ExpiringTimeTracker::reset(const calculatorType newDurationCalculator)
+{
+  setDuration(newDurationCalculator);
+  ExpiringTimeTracker::reset();
+}
+
+ExpiringTimeTracker::operator bool() const
+{
+  return ExpiringTimeTracker::expired();
 }

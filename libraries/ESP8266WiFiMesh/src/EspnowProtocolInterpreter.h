@@ -45,7 +45,7 @@ namespace EspnowProtocolInterpreter
   constexpr char basicConnectionInfoHeader[] PROGMEM = "BasicCI:"; // Basic connection info
   constexpr char encryptedConnectionInfoHeader[] PROGMEM = "EncryptedCI:"; // Encrypted connection info
   constexpr char softLimitEncryptedConnectionInfoHeader[] PROGMEM = "SLEncryptedCI:"; // Soft limit encrypted connection info
-  constexpr char maxConnectionsReachedHeader[] PROGMEM = "ECS_MAX_CONNECTIONS_REACHED_PEER:";
+  constexpr char maxConnectionsReachedHeader[] PROGMEM = "MAX_CONNECTIONS_REACHED_PEER:";
   constexpr char encryptedConnectionVerificationHeader[] PROGMEM = "ECVerified:"; // Encrypted connection verified
   constexpr char encryptedConnectionRemovalRequestHeader[] PROGMEM = "RemoveEC:"; // Remove encrypted connection
 

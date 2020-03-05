@@ -1,5 +1,4 @@
 /*
- * UtilityFunctions
  * Copyright (C) 2019 Anders Löfgren
  *
  * License (MIT license):
@@ -23,26 +22,42 @@
  * THE SOFTWARE.
  */
 
-#include "UtilityFunctions.h"
-#include <esp8266_peri.h>
+#include "HeapMonitor.h"
 
-namespace MeshUtilityFunctions
+HeapMonitor::HeapMonitor(const uint32_t criticalHeapLevel, const uint32_t criticalHeapLevelBuffer) : 
+  _criticalHeapLevel(criticalHeapLevel), _criticalHeapLevelBuffer(criticalHeapLevelBuffer)
+{  }
+
+void HeapMonitor::setCriticalHeapLevel(const uint32_t freeHeapInBytes)
 {
-  bool macEqual(const uint8_t *macOne, const uint8_t *macTwo)
-  {
-    for(int i = 0; i <= 5; ++i)
-    {
-      if(macOne[i] != macTwo[i])
-      {
-        return false;
-      }
-    }
+  _criticalHeapLevel = freeHeapInBytes;
+}
+
+uint32_t HeapMonitor::getCriticalHeapLevel() const
+{
+  return _criticalHeapLevel;
+}
+
+void HeapMonitor::setCriticalHeapLevelBuffer(const uint32_t bufferInBytes)
+{
+  _criticalHeapLevelBuffer = bufferInBytes;
+}
+
+uint32_t HeapMonitor::getCriticalHeapLevelBuffer() const
+{
+  return _criticalHeapLevelBuffer;
+}
+
+HeapMonitor::HeapStatus HeapMonitor::getHeapStatus() const
+{
+  HeapStatus heapStatus = HeapStatus::NOMINAL;
   
-    return true;
-  }
+  uint32_t freeHeap = ESP.getFreeHeap();
   
-  uint64_t randomUint64()
-  {
-    return (((uint64_t)RANDOM_REG32 << 32) | (uint64_t)RANDOM_REG32);
-  }
+  if(freeHeap <= getCriticalHeapLevel())
+    heapStatus = HeapStatus::CRITICAL;
+  else if(freeHeap <= getCriticalHeapLevel() + getCriticalHeapLevelBuffer())
+    heapStatus = HeapStatus::LIMITED;
+
+  return heapStatus;
 }
