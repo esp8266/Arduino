@@ -145,7 +145,7 @@ public:
         _op_start_time = millis();
         // will resume on timeout or when _connected or _notify_error fires
         // give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-        esp_delay(_timeout_ms, [this]() { return _connect_pending; }, 1);
+        esp_delay(_timeout_ms, { [](void* self) { return static_cast<ClientContext*>(self)->_connect_pending; }, this }, 1);
         _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -486,7 +486,7 @@ protected:
             _send_waiting = true;
             // will resume on timeout or when _write_some_from_cb or _notify_error fires
             // give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-            esp_delay(_timeout_ms, [this]() { return _send_waiting; }, 1);
+            esp_delay(_timeout_ms, { [](void* self) { return static_cast<ClientContext*>(self)->_send_waiting; }, this }, 1);
             _send_waiting = false;
         } while(true);
 
