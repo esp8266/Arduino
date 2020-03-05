@@ -13,5 +13,3 @@ glue and lwIP debug options are in builder/glue/gluedebug.h
 MSS values are in builder/Makefile.arduino
 
 MSS values in boards.txt are only informative
-
-current lwip2 submodule repository: https://github.com/d-a-v/esp82xx-nonos-linklayer/tree/arduino-2.4.1

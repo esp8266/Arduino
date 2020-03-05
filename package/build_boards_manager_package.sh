@@ -1,13 +1,13 @@
 #!/bin/bash
-#
 
 #set -x
 
 ver=`git describe --tag`
 visiblever=$ver
-if [ "$ver" = 0.0.1 ]; then
+# match 0.0.*
+if [ "${ver%.*}" = 0.0 ]; then
 
-    git tag -d 0.0.1
+    git tag -d ${ver}
     ver=`git describe --tag HEAD`
     plain_ver=$ver
 
@@ -94,7 +94,7 @@ $SED 's/^tools.esptool.network_cmd=.*//g' | \
 $SED 's/^#tools.esptool.cmd=/tools.esptool.cmd=/g' | \
 $SED 's/^#tools.esptool.network_cmd=/tools.esptool.network_cmd=/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
-$SED 's/recipe.hooks.core.prebuild.pattern.*//g' |\
+$SED 's/recipe.hooks.*makecorever.*//g' |\
 $SED "s/version=.*/version=$ver/g" |\
 $SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt
@@ -167,8 +167,21 @@ curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${bas
 new_json=package_esp8266com_index.json
 
 set +e
-# Merge the old and new, then drop any obsolete package versions
-python3 ../../merge_packages.py $new_json $old_json | python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 >tmp && mv tmp $new_json && rm $old_json
+# Merge the old and new
+python3 ../../merge_packages.py $new_json $old_json > tmp
+
+# additional json to merge (for experimental releases)
+echo "Additional json package files: ${MOREJSONPACKAGES}"
+for json in ${MOREJSONPACKAGES}; do
+    if [ ! -z "$json" -a -r "$json" ]; then
+        echo "- merging $json"
+        python3 ../../merge_packages.py tmp $json > tmp2
+        mv tmp2 tmp
+    fi
+done
+
+# drop any obsolete package versions
+python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 < tmp > tmp2 && mv tmp2 $new_json && rm $old_json tmp
 
 # Verify the JSON file can be read, fail if it's not OK
 set -e

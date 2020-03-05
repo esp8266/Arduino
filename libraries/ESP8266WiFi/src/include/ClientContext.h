@@ -40,15 +40,20 @@ public:
         _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
         _sync(::getDefaultPrivateGlobalSyncValue())
     {
-        tcp_setprio(pcb, TCP_PRIO_MIN);
-        tcp_arg(pcb, this);
-        tcp_recv(pcb, &_s_recv);
-        tcp_sent(pcb, &_s_acked);
-        tcp_err(pcb, &_s_error);
-        tcp_poll(pcb, &_s_poll, 1);
+        tcp_setprio(_pcb, TCP_PRIO_MIN);
+        tcp_arg(_pcb, this);
+        tcp_recv(_pcb, &_s_recv);
+        tcp_sent(_pcb, &_s_acked);
+        tcp_err(_pcb, &_s_error);
+        tcp_poll(_pcb, &_s_poll, 1);
 
         // keep-alive not enabled by default
         //keepAlive();
+    }
+
+    tcp_pcb* getPCB ()
+    {
+        return _pcb;
     }
 
     err_t abort()
@@ -130,10 +135,10 @@ public:
         }
         _connect_pending = true;
         _op_start_time = millis();
-        // Following delay will be interrupted by connect callback
         for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _connected or _notify_error fires
         }
         _connect_pending = false;
         if (!_pcb) {
@@ -291,6 +296,7 @@ public:
 
     void discard_received()
     {
+        DEBUGV(":dsrcv %d\n", _rx_buf? _rx_buf->tot_len: 0);
         if(!_rx_buf) {
             return;
         }
@@ -349,7 +355,8 @@ public:
 
     uint8_t state() const
     {
-        if(!_pcb) {
+        if(!_pcb || _pcb->state == CLOSE_WAIT || _pcb->state == CLOSING) {
+            // CLOSED for WiFIClient::status() means nothing more can be written
             return CLOSED;
         }
 
@@ -435,7 +442,7 @@ protected:
         if (_connect_pending || _send_waiting) {
             _send_waiting = false;
             _connect_pending = false;
-            esp_schedule(); // break current delay()
+            esp_schedule(); // break delay in connect or _write_from_source
         }
     }
 
@@ -461,10 +468,11 @@ protected:
             }
 
             _send_waiting = true;
-            // Following delay will be interrupted by on next received ack
             for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
+               // will resume on timeout or when _write_some_from_cb or _notify_error fires
+
             }
             _send_waiting = false;
         } while(true);
@@ -536,7 +544,7 @@ protected:
     {
         if (_send_waiting) {
             _send_waiting = false;
-            esp_schedule(); // break current delay()
+            esp_schedule(); // break delay in _write_from_source
         }
     }
 
@@ -575,11 +583,23 @@ protected:
     {
         (void) pcb;
         (void) err;
-        if(pb == 0) { // connection closed
-            DEBUGV(":rcl\r\n");
+        if(pb == 0) {
+            // connection closed by peer
+            DEBUGV(":rcl pb=%p sz=%d\r\n", _rx_buf, _rx_buf? _rx_buf->tot_len: -1);
             _notify_error();
-            abort();
-            return ERR_ABRT;
+            if (_rx_buf && _rx_buf->tot_len)
+            {
+                // there is still something to read
+                return ERR_OK;
+            }
+            else
+            {
+                // nothing in receive buffer,
+                // peer closed = nothing can be written:
+                // closing in the legacy way
+                abort();
+                return ERR_ABRT;
+            }
         }
 
         if(_rx_buf) {
@@ -612,7 +632,7 @@ protected:
         assert(pcb == _pcb);
         if (_connect_pending) {
             _connect_pending = false;
-            esp_schedule(); // break current delay()
+            esp_schedule(); // break delay in connect
         }
         return ERR_OK;
     }
