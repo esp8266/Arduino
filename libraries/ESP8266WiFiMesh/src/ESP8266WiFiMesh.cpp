@@ -76,7 +76,7 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHand
                                  const String &nodeID, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
                                  : _server(serverPort)
 {  
-  updateNetworkNames(meshName, (nodeID != "" ? nodeID : TypeCast::uint64ToString(ESP.getChipId())));
+  updateNetworkNames(meshName, (!nodeID.isEmpty() ? nodeID : TypeCast::uint64ToString(ESP.getChipId())));
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
   setWiFiChannel(meshWiFiChannel);
