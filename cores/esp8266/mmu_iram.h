@@ -40,7 +40,11 @@
 #define DEBUG_MMU
 #endif
 
-
+/*
+  The more I look at _xtos_c_wrapper_handler the more convinced I am that this
+  USE_ISR_SAFE_EXC_WRAPPER is required.
+*/
+#define USE_ISR_SAFE_EXC_WRAPPER
 
 #if defined( DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_MMU)
 #include <esp8266_peri.h>
@@ -113,18 +117,10 @@ extern mmu_cre_status_t mmu_status;
 static inline bool is_iram(uint32_t addr) {
 // constexpr uint32_t _start = 0x40100000UL;
 #define IRAM_START 0x40100000UL
-
 #ifndef MMU_IRAM_SIZE
-#define MMU_IRAM_SIZE 0xC000UL
+#define MMU_IRAM_SIZE 0x8000UL
 #endif
-
-#ifdef MMU_SEC_HEAP_SIZE
-  // constexpr uint32_t _end = _start + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE;
-  #define IRAM_END (IRAM_START + MMU_IRAM_SIZE + MMU_SEC_HEAP_SIZE)
-#else
-  // constexpr uint32_t _end = _start + MMU_IRAM_SIZE;
-  #define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
-#endif
+#define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
 
   return (IRAM_START <= addr && IRAM_END > addr);
 }
@@ -165,14 +161,14 @@ static inline bool is_icache(uint32_t addr) {
   if (is_iram((uint32_t)a) || is_dram((uint32_t)a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
-    assert(("Outside of Range Write" && false)); \
+    assert(("Outside of Range - Write" && false)); \
   }
 
 #define ASSERT_RANGE_TEST_READ(a) \
-  if (is_iram((uint32_t)a) || is_icache((uint32_t)a) || is_dram((uint32_t)a)) { \
+  if (is_iram((uint32_t)a) || is_dram((uint32_t)a) || is_icache((uint32_t)a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
-    assert(("Outside of Range Read" && false)); \
+    assert(("Outside of Range - Read" && false)); \
   }
 
 #else
@@ -255,6 +251,23 @@ static inline int16_t set_int16_iram(short *p16, const int16_t val) {
 }
 
 #ifdef __cplusplus
+}
+#endif
+
+#if (MMU_IRAM_SIZE > 32*1024) && !defined(MMU_SEC_HEAP)
+extern "C" void _text_end(void);
+#define MMU_SEC_HEAP mmu_sec_heap()
+#define MMU_SEC_HEAP_SIZE mmu_sec_heap_size()
+
+static inline __attribute__((always_inline))
+void *mmu_sec_heap(void) {
+  uint32_t sec_heap = (uint32_t)_text_end + 32;
+  return (void *)(sec_heap &= ~7);
+}
+
+static inline __attribute__((always_inline))
+size_t mmu_sec_heap_size(void) {
+  return (size_t)0xC000UL - ((size_t)mmu_sec_heap() - 0x40100000UL);
 }
 #endif
 

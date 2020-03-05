@@ -164,9 +164,10 @@ size_t umm_block_size( void ) {
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-
-// Adjustment needed for free_blocks to express the number of bytes that can
-// actually be allocated.
+/*
+   Overhead adjustments needed for free_blocks to express the number of bytes
+   that can actually be allocated.
+*/
 #define UMM_OVERHEAD_ADJUST \
   (umm_block_size() + \
   umm_block_size()/2 + \
@@ -177,12 +178,17 @@ size_t umm_block_size( void ) {
 #define UMM_OVERHEAD_ADJUST  (umm_block_size() + umm_block_size()/2)
 #endif
 
+static size_t free_blocks_to_free_space(unsigned short int blocks) {
+  int free_space = (int)blocks * sizeof(umm_block) - UMM_OVERHEAD_ADJUST;
+  return  (free_space > 0) ? (size_t)free_space : 0;
+}
+
 // Keep complete call path in IRAM
 size_t umm_free_heap_size_lw( void ) {
   UMM_INIT_HEAP;
 
   umm_heap_context_t *_context = umm_get_current_heap();
-  return (size_t)_context->stats.free_blocks * sizeof(umm_block) - UMM_OVERHEAD_ADJUST;
+  return free_blocks_to_free_space(_context->stats.free_blocks);
 }
 #endif
 
@@ -241,26 +247,36 @@ size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
 #endif
 
 #ifdef UMM_STATS_FULL
-
+// TODO - Did I mix something up
+//
+//   umm_free_heap_size_min      is the same code as
+//   umm_free_heap_size_lw_min
+//
+// If this is correct use alias.
+//
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_lw_min( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
-  return (size_t)_context->stats.free_blocks_min * umm_block_size() - UMM_OVERHEAD_ADJUST;
+  return free_blocks_to_free_space(_context->stats.free_blocks_min);
 }
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
   _context->stats.free_blocks_min = _context->stats.free_blocks;
-  return (size_t)_context->stats.free_blocks_min * umm_block_size();
+  return free_blocks_to_free_space(_context->stats.free_blocks_min);
 }
 
+#if 0 // TODO - Don't understand this why do both umm_free_heap_size_(lw_)min exist
+size_t umm_free_heap_size_min(void) __attribute__ ((alias("umm_free_heap_size_lw_min")));
+#else
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_min( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
-  return _context->stats.free_blocks_min * umm_block_size() - UMM_OVERHEAD_ADJUST;
+  return free_blocks_to_free_space(_context->stats.free_blocks_min);
 }
+#endif
 
 size_t ICACHE_FLASH_ATTR umm_free_heap_size_isr_min( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
-  return _context->stats.free_blocks_isr_min * umm_block_size() - UMM_OVERHEAD_ADJUST;
+  return free_blocks_to_free_space(_context->stats.free_blocks_isr_min);
 }
 
 size_t ICACHE_FLASH_ATTR umm_get_max_alloc_size( void ) {

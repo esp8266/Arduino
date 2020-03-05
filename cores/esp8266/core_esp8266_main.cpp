@@ -334,7 +334,7 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
-#if defined(NON32XFER_HANDLER) || defined(MMU_SEC_HEAP)
+#if defined(NON32XFER_HANDLER)
     install_non32xfer_exception_handler();
 #endif
 #if defined(MMU_IRAM_HEAP)

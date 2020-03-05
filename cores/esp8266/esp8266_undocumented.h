@@ -67,24 +67,102 @@ struct __exception_frame
   };
   uint32_t cause;
 };
+/*?
+ TODO: A set of static_asserts to confim we are matching these.
+
+ Extracted from information at
+ From https://github.com/fdivitto/ESPWebFramework/blob/master/SDK/xtensa-lx106-elf/xtensa-lx106-elf/lib/libhandlers-null.txt
+
+#define UEXC_pc             0x0000
+#define UEXC_ps             0x0004
+#define UEXC_sar            0x0008
+#define UEXC_vpri           0x000c
+#define UEXC_a0             0x0010
+#define UEXC_a2             0x0014
+#define UEXC_a3             0x0018
+#define UEXC_a4             0x001c
+#define UEXC_a5             0x0020
+#define UEXC_a6             0x0024
+#define UEXC_a7             0x0028
+#define UEXC_a8             0x002c
+#define UEXC_a9             0x0030
+#define UEXC_a10            0x0034
+#define UEXC_a11            0x0038
+#define UEXC_a12            0x003c
+#define UEXC_a13            0x0040
+#define UEXC_a14            0x0044
+#define UEXC_a15            0x0048
+#define UEXC_exccause       0x004c
+#define UserFrameSize       0x0050
+#define UserFrameTotalSize  0x0100
+*/
+
+/*
+ Most of the comments here are gleamed from the xtensa files found at the site
+ listed below and are mostly unverified:
+ https://github.com/qca/open-ath9k-htc-firmware/tree/master/sboot/magpie_1_1/sboot/athos/src/xtos
+  * exc-c-wrapper-handler.S
+  * exc-sethandler.c
+*/
 
 /*
  ROM Function, _xtos_set_exception_handler(), installs a "C" callable exception handler.
- If reason is out of range, >=64, it returns NULL.
- If the new exception handler is installed, it returns the previous handler.
- If the previous handler was _xtos_unhandled_exception/_xtos_p_none, it returns
- NULL.
+  * If reason is out of range, >=64, it returns NULL.
+  * If the new exception handler is installed, it returns the previous handler.
+  * If the previous handler was _xtos_unhandled_exception/_xtos_p_none, it
+    returns NULL.
 
  Note, the installed "C" exception handler is called from the
  _xtos_c_wrapper_handler with IRQs enabled.
  */
 typedef void (*fn_exception_handler_t)(struct __exception_frame *ef, uint32_t cause);
-extern fn_exception_handler_t _xtos_set_exception_handler(uint32_t reason, fn_exception_handler_t fn);
+fn_exception_handler_t _xtos_set_exception_handler(uint32_t reason, fn_exception_handler_t fn);
 
-extern void _xtos_unhandled_exception(struct __exception_frame *ef, uint32_t cause);
+/*
+ Added to eagle.rom.addr.v6.ld
+ PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
+ PROVIDE ( _xtos_c_handler_table = 0x3fffc100 );
+*/
+#ifdef __cplusplus
+typedef void (_xtos_handler_func)(...);
+
+/*
+ Assembly-level handler, used in the _xtos_exc_handler_table[], a wrapper for
+ calling registered "C" exception handlers.
+*/
+void _xtos_c_wrapper_handler(...);
+
+/*
+ Assembly-level handler, used in the _xtos_exc_handler_table[], for exceptions
+ without a registered handler.
+*/
+void _xtos_unhandled_exception(...);
+
+/*
+ The default/empty "C" exception handler, used in the _xtos_c_handler_table[],
+ when an exception handler has not been registered.
+ Supply this to _xtos_set_exception_handler() to reset an exception handler
+ back to the unhandled state, _xtos_unhandled_exception.
+ Note, if you have nesting handlers this is much more complicated than this.
+*/
+void _xtos_p_none(void);
+
+#else
+typedef void (_xtos_handler_func)();
+void	_xtos_c_wrapper_handler();
+void _xtos_unhandled_exception());
+void _xtos_p_none();
+
+#endif
+
+typedef _xtos_handler_func *_xtos_handler;
+
+extern _xtos_handler _xtos_exc_handler_table[];
+extern _xtos_handler _xtos_c_handler_table[];
 
 #ifdef __cplusplus
 };
 #endif
+
 
 #endif

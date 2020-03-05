@@ -50,7 +50,8 @@ extern "C" {
 uint32_t mmu_non32xfer_count = 0;
 uint32_t mmu_non32xfer_withinisr_count = 0;
 
-#define DEBUG_WARNING
+
+// #define DEBUG_WARNING
 #ifdef DEBUG_WARNING
 static void warning(void)
 {
@@ -76,7 +77,9 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
      */
     uint32_t insn;
     __asm(
+#if !defined(USE_ISR_SAFE_EXC_WRAPPER)
       "rsil  %0, 15\n\t"         /* Turn IRQs back off, let exit wrapper restore PS */
+#endif
       "movi  %0, ~3\n\t"         /* prepare a mask for the EPC */
       "and   %0, %0, %1\n\t"     /* apply mask for 32bit aligned base */
       "ssa8l %1\n\t"             /* set up shift register for src op */
@@ -94,12 +97,14 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       an exception handler?
      */
     if (ef->ps & 0x0F) {
+#if !defined(USE_ISR_SAFE_EXC_WRAPPER)
       if (0 == mmu_non32xfer_withinisr_count) {
         ETS_PRINTF("\nload/store exception with INTLEVEL 0x%02X\n", ef->ps & 0x0F);
         #if 0
         continue;     /* fail, not safe for IRQ disabled ?? */
         #endif
       }
+#endif
       if (0 == ++mmu_non32xfer_withinisr_count) {
         --mmu_non32xfer_withinisr_count;  // saturated
       }
@@ -205,7 +210,28 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
   panic();
 }
 
+#if defined(USE_ISR_SAFE_EXC_WRAPPER)
 
+constexpr _xtos_handler ROM_xtos_c_wrapper_handler = (_xtos_handler)0x40000598;
+
+static void IRAM_ATTR _set_exception_handler_wrapper(uint32_t cause) {
+  _xtos_handler old_wrapper = _xtos_exc_handler_table[cause];
+  if (old_wrapper == ROM_xtos_c_wrapper_handler) {
+    _xtos_exc_handler_table[cause] = _xtos_c_wrapper_handler;
+  }
+}
+
+void IRAM_ATTR install_non32xfer_exception_handler(void) {
+  if (NULL == old_handler) {
+    old_handler =
+    _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR,
+      non32xfer_exception_handler);
+
+    _set_exception_handler_wrapper(EXCCAUSE_LOAD_STORE_ERROR);
+  }
+}
+
+#else
 void IRAM_ATTR install_non32xfer_exception_handler(void)
 {
   if (NULL == old_handler) {
@@ -214,5 +240,6 @@ void IRAM_ATTR install_non32xfer_exception_handler(void)
       non32xfer_exception_handler);
   }
 }
+#endif
 
 };

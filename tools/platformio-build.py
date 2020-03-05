@@ -255,17 +255,27 @@ if not current_vtables:
     env.Append(CPPDEFINES=[current_vtables])
 assert current_vtables
 
+current_mmu_iram_size = None
+for d in flatten_cppdefines:
+    if str(d).startswith("MMU_IRAM_SIZE"):
+        current_mmu_iram_size = d
+if not current_mmu_iram_size:
+    current_mmu_iram_size = "MMU_IRAM_SIZE=0x8000"
+    env.Append(CPPDEFINES=[current_mmu_iram_size])
+assert current_mmu_iram_size
+
+
 # Build the eagle.app.v6.common.ld linker file
 app_ld = env.Command(
     join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
-        "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
+        "$CC -CC -E -P -D%s -D%s $SOURCE -o $TARGET" % (current_vtables, current_mmu_iram_size),
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
 
 if not env.BoardConfig().get("build.ldscript", ""):
-    env.Replace(LDSCRIPT_PATH=env.BoardConfig().get("build.arduino.ldscript", "")) 
+    env.Replace(LDSCRIPT_PATH=env.BoardConfig().get("build.arduino.ldscript", ""))
 
 #
 # Dynamic core_version.h for staging builds

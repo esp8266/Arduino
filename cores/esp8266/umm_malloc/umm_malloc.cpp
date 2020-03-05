@@ -405,7 +405,7 @@ static void umm_init_stage_2( umm_heap_context_t *_context ) {
 void umm_init_common( size_t id, void *start_addr, size_t size, bool zero ) {
   /* Preserve internal setup */
   umm_heap_context_t *_context = umm_get_heap_by_id(id);
-  if (NULL == _context || _context->heap) {
+  if (NULL == start_addr || NULL == _context || _context->heap) {
     return;
   }
 
@@ -458,11 +458,7 @@ void _text_end(void);
 void umm_init_iram(void) __attribute__((weak));
 
 void umm_init_iram(void) {
-  uint32_t sec_heap = (uint32_t)_text_end + 32;
-  sec_heap &= ~7;
-  size_t   sec_heap_sz = 0xC000UL - (sec_heap - 0x40100000UL);
-
-  umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
+  umm_init_iram_ex(mmu_sec_heap(), mmu_sec_heap_size(), true);
 }
 #endif	// #ifdef UMM_HEAP_IRAM
 
@@ -711,9 +707,11 @@ void *umm_malloc( size_t size ) {
 
   UMM_CRITICAL_ENTRY(id_malloc);
 
+#if 1 // !defined(USE_ISR_SAFE_EXC_WRAPPER)
   if (UMM_CRITICAL_WITHINISR(id_malloc)) {
     _context = umm_get_heap_by_id(UMM_HEAP_DRAM);
   }
+#endif
 
   ptr = umm_malloc_core( _context, size );
 
@@ -776,10 +774,12 @@ void *umm_realloc( void *ptr, size_t size ) {
 
   STATS__ALLOC_REQUEST(id_realloc, size);
 
+#if !defined(USE_ISR_SAFE_EXC_WRAPPER)
   // Require ISR use DRAM for now.
   if (ETS_INTR_WITHINISR() && UMM_HEAP_DRAM != _context->id) {
     return( (void *)NULL );
   }
+#endif
 
   /*
    * Otherwise we need to actually do a reallocation. A naiive approach

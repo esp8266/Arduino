@@ -18,15 +18,14 @@ static inline char get ## name(void *o) { \
 
 */
 
-#if defined(MMU_IRAM_HEAP)
+#if defined(MMU_IRAM_HEAP) || defined(MMU_SEC_HEAP)
 uint32_t *gobble;
 size_t gobble_sz;
+
 #elif (MMU_IRAM_SIZE > 32*1024)
 uint32_t gobble[4 * 1024] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
-#elif defined(MMU_SEC_HEAP)
-uint32_t *gobble = (uint32_t *)MMU_SEC_HEAP;
-size_t gobble_sz = MMU_SEC_HEAP_SIZE;
+
 #else
 uint32_t gobble[256] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
@@ -139,6 +138,9 @@ void setup() {
   Serial.printf_P(PSTR("gobble_sz: %u\n"), gobble_sz);
   Serial.printf_P(PSTR("gobble:    %p\n"), gobble);
 
+#elif defined(MMU_SEC_HEAP)
+  gobble = (uint32_t *)MMU_SEC_HEAP;
+  gobble_sz = MMU_SEC_HEAP_SIZE;
 #endif
 
 #if (MMU_IRAM_SIZE > 0x8000) || defined(MMU_IRAM_HEAP) || defined(MMU_SEC_HEAP)
