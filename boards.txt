@@ -67,9 +67,9 @@ generic.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 generic.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 generic.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 generic.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-generic.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+generic.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 generic.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-generic.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+generic.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 generic.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 generic.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 generic.menu.non32xfer.fast.build.non32xferflags=
@@ -554,9 +554,9 @@ esp8285.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 esp8285.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp8285.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 esp8285.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-esp8285.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+esp8285.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 esp8285.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-esp8285.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+esp8285.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 esp8285.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 esp8285.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 esp8285.menu.non32xfer.fast.build.non32xferflags=
@@ -850,9 +850,9 @@ espduino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espduino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espduino.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espduino.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espduino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espduino.menu.non32xfer.fast.build.non32xferflags=
@@ -1054,9 +1054,9 @@ huzzah.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 huzzah.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 huzzah.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 huzzah.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-huzzah.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+huzzah.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 huzzah.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-huzzah.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+huzzah.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 huzzah.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 huzzah.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 huzzah.menu.non32xfer.fast.build.non32xferflags=
@@ -1259,9 +1259,9 @@ inventone.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 inventone.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 inventone.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 inventone.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-inventone.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+inventone.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 inventone.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-inventone.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+inventone.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 inventone.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 inventone.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 inventone.menu.non32xfer.fast.build.non32xferflags=
@@ -1464,9 +1464,9 @@ cw01.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 cw01.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 cw01.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 cw01.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-cw01.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+cw01.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 cw01.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-cw01.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+cw01.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 cw01.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 cw01.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 cw01.menu.non32xfer.fast.build.non32xferflags=
@@ -1672,9 +1672,9 @@ espresso_lite_v1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espresso_lite_v1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espresso_lite_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espresso_lite_v1.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espresso_lite_v1.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espresso_lite_v1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espresso_lite_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espresso_lite_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espresso_lite_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espresso_lite_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espresso_lite_v1.menu.non32xfer.fast.build.non32xferflags=
@@ -1880,9 +1880,9 @@ espresso_lite_v2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espresso_lite_v2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espresso_lite_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espresso_lite_v2.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espresso_lite_v2.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espresso_lite_v2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espresso_lite_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espresso_lite_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espresso_lite_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espresso_lite_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espresso_lite_v2.menu.non32xfer.fast.build.non32xferflags=
@@ -2088,9 +2088,9 @@ phoenix_v1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 phoenix_v1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 phoenix_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-phoenix_v1.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+phoenix_v1.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 phoenix_v1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-phoenix_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+phoenix_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 phoenix_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 phoenix_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 phoenix_v1.menu.non32xfer.fast.build.non32xferflags=
@@ -2296,9 +2296,9 @@ phoenix_v2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 phoenix_v2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 phoenix_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-phoenix_v2.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+phoenix_v2.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 phoenix_v2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-phoenix_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+phoenix_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 phoenix_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 phoenix_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 phoenix_v2.menu.non32xfer.fast.build.non32xferflags=
@@ -2504,9 +2504,9 @@ nodemcu.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 nodemcu.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcu.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 nodemcu.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-nodemcu.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+nodemcu.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 nodemcu.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-nodemcu.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+nodemcu.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 nodemcu.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 nodemcu.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 nodemcu.menu.non32xfer.fast.build.non32xferflags=
@@ -2709,9 +2709,9 @@ nodemcuv2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 nodemcuv2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcuv2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 nodemcuv2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-nodemcuv2.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+nodemcuv2.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 nodemcuv2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-nodemcuv2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+nodemcuv2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 nodemcuv2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 nodemcuv2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 nodemcuv2.menu.non32xfer.fast.build.non32xferflags=
@@ -2918,9 +2918,9 @@ modwifi.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 modwifi.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 modwifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 modwifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-modwifi.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+modwifi.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 modwifi.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-modwifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+modwifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 modwifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 modwifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 modwifi.menu.non32xfer.fast.build.non32xferflags=
@@ -3143,9 +3143,9 @@ thing.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 thing.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thing.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 thing.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-thing.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+thing.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 thing.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-thing.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+thing.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 thing.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 thing.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 thing.menu.non32xfer.fast.build.non32xferflags=
@@ -3348,9 +3348,9 @@ thingdev.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 thingdev.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thingdev.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 thingdev.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-thingdev.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+thingdev.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 thingdev.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-thingdev.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+thingdev.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 thingdev.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 thingdev.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 thingdev.menu.non32xfer.fast.build.non32xferflags=
@@ -3553,9 +3553,9 @@ blynk.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 blynk.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 blynk.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 blynk.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-blynk.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+blynk.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 blynk.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-blynk.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+blynk.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 blynk.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 blynk.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 blynk.menu.non32xfer.fast.build.non32xferflags=
@@ -3758,9 +3758,9 @@ esp210.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 esp210.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp210.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 esp210.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-esp210.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+esp210.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 esp210.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-esp210.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+esp210.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 esp210.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 esp210.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 esp210.menu.non32xfer.fast.build.non32xferflags=
@@ -3963,9 +3963,9 @@ d1_mini.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 d1_mini.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1_mini.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-d1_mini.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+d1_mini.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 d1_mini.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-d1_mini.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+d1_mini.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1_mini.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1_mini.menu.non32xfer.fast.build.non32xferflags=
@@ -4168,9 +4168,9 @@ d1_mini_pro.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 d1_mini_pro.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_pro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1_mini_pro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-d1_mini_pro.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+d1_mini_pro.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 d1_mini_pro.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-d1_mini_pro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+d1_mini_pro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1_mini_pro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini_pro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1_mini_pro.menu.non32xfer.fast.build.non32xferflags=
@@ -4356,9 +4356,9 @@ d1_mini_lite.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 d1_mini_lite.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_lite.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1_mini_lite.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-d1_mini_lite.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+d1_mini_lite.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 d1_mini_lite.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-d1_mini_lite.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+d1_mini_lite.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1_mini_lite.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini_lite.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1_mini_lite.menu.non32xfer.fast.build.non32xferflags=
@@ -4601,9 +4601,9 @@ d1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 d1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 d1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-d1.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+d1.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 d1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-d1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+d1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1.menu.non32xfer.fast.build.non32xferflags=
@@ -4806,9 +4806,9 @@ espino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espino.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espino.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espino.menu.non32xfer.fast.build.non32xferflags=
@@ -5014,9 +5014,9 @@ espinotee.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espinotee.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espinotee.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espinotee.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espinotee.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espinotee.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espinotee.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espinotee.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espinotee.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espinotee.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espinotee.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espinotee.menu.non32xfer.fast.build.non32xferflags=
@@ -5236,9 +5236,9 @@ wifinfo.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 wifinfo.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifinfo.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wifinfo.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-wifinfo.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+wifinfo.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 wifinfo.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-wifinfo.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+wifinfo.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wifinfo.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifinfo.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wifinfo.menu.non32xfer.fast.build.non32xferflags=
@@ -5500,9 +5500,9 @@ arduino-esp8266.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 arduino-esp8266.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 arduino-esp8266.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 arduino-esp8266.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-arduino-esp8266.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+arduino-esp8266.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 arduino-esp8266.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-arduino-esp8266.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+arduino-esp8266.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 arduino-esp8266.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 arduino-esp8266.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 arduino-esp8266.menu.non32xfer.fast.build.non32xferflags=
@@ -5706,9 +5706,9 @@ gen4iod.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 gen4iod.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 gen4iod.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 gen4iod.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-gen4iod.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+gen4iod.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 gen4iod.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-gen4iod.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+gen4iod.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 gen4iod.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 gen4iod.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 gen4iod.menu.non32xfer.fast.build.non32xferflags=
@@ -5912,9 +5912,9 @@ oak.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 oak.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 oak.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 oak.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-oak.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+oak.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 oak.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-oak.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+oak.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 oak.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 oak.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 oak.menu.non32xfer.fast.build.non32xferflags=
@@ -6117,9 +6117,9 @@ wifiduino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 wifiduino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifiduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wifiduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-wifiduino.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+wifiduino.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 wifiduino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-wifiduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+wifiduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wifiduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifiduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wifiduino.menu.non32xfer.fast.build.non32xferflags=
@@ -6322,9 +6322,9 @@ wifi_slot.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 wifi_slot.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifi_slot.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wifi_slot.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-wifi_slot.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+wifi_slot.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 wifi_slot.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-wifi_slot.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+wifi_slot.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wifi_slot.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifi_slot.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wifi_slot.menu.non32xfer.fast.build.non32xferflags=
@@ -6641,9 +6641,9 @@ wiolink.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 wiolink.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wiolink.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 wiolink.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-wiolink.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+wiolink.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 wiolink.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-wiolink.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+wiolink.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wiolink.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wiolink.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wiolink.menu.non32xfer.fast.build.non32xferflags=
@@ -6846,9 +6846,9 @@ espectro.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espectro.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espectro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espectro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espectro.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espectro.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espectro.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espectro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espectro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espectro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espectro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espectro.menu.non32xfer.fast.build.non32xferflags=
@@ -7051,9 +7051,9 @@ eduinowifi.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 eduinowifi.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 eduinowifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 eduinowifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-eduinowifi.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+eduinowifi.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 eduinowifi.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-eduinowifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+eduinowifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 eduinowifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 eduinowifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 eduinowifi.menu.non32xfer.fast.build.non32xferflags=
@@ -7266,9 +7266,9 @@ sonoff.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 sonoff.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 sonoff.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 sonoff.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-sonoff.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+sonoff.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 sonoff.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-sonoff.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+sonoff.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 sonoff.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 sonoff.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 sonoff.menu.non32xfer.fast.build.non32xferflags=
@@ -7512,9 +7512,9 @@ espmxdevkit.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
 espmxdevkit.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espmxdevkit.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
 espmxdevkit.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
-espmxdevkit.menu.mmu.4816H=16KB cache + 48KB IRAM (IRAM and Heap)
+espmxdevkit.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
 espmxdevkit.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
-espmxdevkit.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB sec heap (Heap)
+espmxdevkit.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espmxdevkit.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espmxdevkit.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espmxdevkit.menu.non32xfer.fast.build.non32xferflags=
