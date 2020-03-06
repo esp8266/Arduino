@@ -234,7 +234,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         default:
           break;
         }
-        uint32_t nextEventCcy = wave->nextPhaseCcy + ((waveformsState & mask) ? wave->nextTimeDutyCcys : 0);
+        const uint32_t nextEventCcy = wave->nextPhaseCcy + ((waveformsState & mask) ? wave->nextTimeDutyCcys : 0);
         int32_t nextEventCcys =  nextEventCcy - now;
         const int32_t expiryCcys = (WaveformMode::EXPIRES == wave->mode) ? wave->expiryCcy - now : (nextEventCcys + 1);
         if (nextEventCcys <= 0 && expiryCcys > nextEventCcys) {
@@ -248,7 +248,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 SetGPIO(mask);
               }
             }
-            nextEventCcy = (wave->nextPhaseCcy + wave->nextTimeDutyCcys);
+            nextEventCcys += wave->nextTimeDutyCcys;
           }
           else {
             if (wave->nextTimeDutyCcys != wave->nextTimePeriodCcys) {
@@ -260,10 +260,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               }
             }
             wave->nextPhaseCcy += wave->nextTimePeriodCcys;
-            nextEventCcy = wave->nextPhaseCcy;
+            nextEventCcys = wave->nextPhaseCcy - now;
           }
         }
-        nextEventCcys = nextEventCcy - now;
         if (nextTimerCcys > nextEventCcys)
           nextTimerCcys = nextEventCcys;
 
