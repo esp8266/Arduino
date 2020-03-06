@@ -31,8 +31,9 @@ extern "C" {
 // IS this set as part of segment data at load time? appears to be
 mmu_cre_status_t mmu_status = {SOC_CACHE_SIZE, -1, 0, 0, 0, 0, 0};
 
-// Enable all the time so we can gather information on Cache_Read_Enable usage.
-#if 1 //(MMU_ICACHE_SIZE == 0x4000)
+//C Enable all the time so we can gather information on Cache_Read_Enable usage.
+//+ #if (MMU_ICACHE_SIZE == 0x4000)
+#if 1 //D
 /*
  * "Cache_Read_Enable" as in Instruction Read Cache enable, ICACHE.
  *
@@ -208,8 +209,8 @@ extern "C" void pinMode( uint8_t pin, uint8_t mode ) {
 
     __pinMode( pin, mode );
 }
-#endif
+#endif  // #ifdef DEV_DEBUG_PRINT
 
-#endif
+#endif  // #if (MMU_ICACHE_SIZE == 0x4000)
 
 };

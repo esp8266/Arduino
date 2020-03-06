@@ -2,12 +2,6 @@
 // https://github.com/qca/open-ath9k-htc-firmware/blob/master/sboot/magpie_1_1/sboot/athos/src/xtos/exc-c-wrapper-handler.S#L62-L67
 //
 
-
-
-#ifndef PLATFORMIO
-
-
-
 // exc-c-wrapper-handler.S - General Exception Handler that Dispatches C Handlers
 
 // Copyright (c) 2002-2004, 2006-2007, 2010 Tensilica Inc.
@@ -44,7 +38,9 @@
 /*
  *  This is the general exception assembly-level handler that dispatches C handlers.
  */
+        .section .iram.text
         .align  4
+        .literal_position
         .global  _xtos_c_wrapper_handler
 _xtos_c_wrapper_handler:
 
@@ -131,4 +127,3 @@ _xtos_c_wrapper_handler:
 
         /* FIXME: what about _GeneralException ? */
         .size  _xtos_c_wrapper_handler, . - _xtos_c_wrapper_handler
-#endif
