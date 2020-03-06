@@ -259,8 +259,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 ClearGPIO(mask);
               }
             }
-            wave->nextPhaseCcy += wave->nextTimePeriodCcys;
-            nextEventCcys = wave->nextPhaseCcy - now;
+            // handles overshoot where an updated period is shorter than the previous duty cycle
+            // maintains phase if the previous period is an integer multiple of the new period
+            do {
+              wave->nextPhaseCcy += wave->nextTimePeriodCcys;
+              nextEventCcys = wave->nextPhaseCcy - now;
+            } while (nextEventCcys <= 0);
           }
         }
         if (nextTimerCcys > nextEventCcys)
