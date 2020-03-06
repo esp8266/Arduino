@@ -150,7 +150,7 @@ void _xtos_p_none(void);
 #else
 typedef void (_xtos_handler_func)();
 void	_xtos_c_wrapper_handler();
-void _xtos_unhandled_exception());
+void _xtos_unhandled_exception();
 void _xtos_p_none();
 
 #endif

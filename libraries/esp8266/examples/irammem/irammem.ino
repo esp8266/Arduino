@@ -253,6 +253,29 @@ void setup() {
     Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
   }
 #endif
+  {
+    ets_uart_printf("Try and allocate all of the heap in one chunk\n");
+    HeapSelectIram ephemeral;
+    size_t free_iram = ESP.getFreeHeap();
+    ets_uart_printf("IRAM free: %6d\n", free_iram);
+    uint32_t hfree;
+    uint16_t hmax;
+    uint8_t hfrag;
+    ESP.getHeapStats(&hfree, &hmax, &hfrag);
+    ets_uart_printf("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
+                    hfree, hmax, hfrag);
+
+    void *all = malloc(free_iram);
+    ets_uart_printf("%p = malloc(%lu)\n", all, free_iram);
+    umm_info(NULL, true);
+
+    free_iram = ESP.getFreeHeap();
+    ets_uart_printf("IRAM free: %6d\n", free_iram);
+
+    free(all);
+    ets_uart_printf("IRAM free: %6d\n", ESP.getFreeHeap());
+
+  }
 }
 
 void processKey(Print& out, int hotKey) {
@@ -305,7 +328,7 @@ void processKey(Print& out, int hotKey) {
 }
 
 
-void loop(void){
+void loop(void) {
   if (Serial.available() > 0) {
     int hotKey = Serial.read();
     processKey(Serial, hotKey);

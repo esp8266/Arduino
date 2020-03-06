@@ -180,6 +180,11 @@ size_t umm_block_size( void ) {
 
 static size_t free_blocks_to_free_space(unsigned short int blocks) {
   int free_space = (int)blocks * sizeof(umm_block) - UMM_OVERHEAD_ADJUST;
+  /*
+   * There are some strange boundary things at play I don't quite follow.
+   * However, these adjustments allow malloc to be called and succeed in
+   * allocating all of the available memory, assuming it is contiguous.
+   */
   return  (free_space > 0) ? (size_t)free_space : 0;
 }
 
