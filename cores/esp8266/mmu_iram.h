@@ -44,7 +44,9 @@
   The more I look at _xtos_c_wrapper_handler the more convinced I am that this
   USE_ISR_SAFE_EXC_WRAPPER is required.
 */
+#ifndef PLATFORMIO
 #define USE_ISR_SAFE_EXC_WRAPPER
+#endif
 
 #if defined( DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_MMU)
 #include <esp8266_peri.h>

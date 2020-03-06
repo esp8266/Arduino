@@ -266,7 +266,7 @@ void setup() {
                     hfree, hmax, hfrag);
 
     void *all = malloc(free_iram);
-    ets_uart_printf("%p = malloc(%lu)\n", all, free_iram);
+    ets_uart_printf("%p = malloc(%u)\n", all, free_iram);
     umm_info(NULL, true);
 
     free_iram = ESP.getFreeHeap();
