@@ -112,7 +112,7 @@ env.Append(
         join(FRAMEWORK_DIR, "tools", "sdk", "libc",
              "xtensa-lx106-elf", "include"),
         join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core")),
-        join(FRAMEWORK_DIR, "tools", "xtensa-lx106-elf", "include")
+        join(platform.get_package_dir("toolchain-xtensa"), "include")
     ],
 
     LIBPATH=[
