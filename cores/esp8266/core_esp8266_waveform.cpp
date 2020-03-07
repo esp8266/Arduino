@@ -133,7 +133,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     // wave->nextPhaseCcy is initialized by the ISR
     wave->expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
     wave->mode = WaveformMode::INIT;
-    waveformToEnable |= mask;
+    waveformToEnable = mask;
     if (!timerRunning) {
       initTimer();
       timer1_write(microsecondsToClockCycles(2));
