@@ -100,8 +100,8 @@ void Servo::detach()
 
 void Servo::write(int value)
 {
-  // treat values less than _minUs as angles in degrees (values equal or larger are handled as microseconds)
-  if (value < _minUs) {
+  // treat any value less than 200 as angle in degrees (values equal or larger are handled as microseconds)
+  if (value < 200) {
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
     value = improved_map(value, 0, 180, _minUs, _maxUs);
