@@ -264,7 +264,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             do {
               wave->nextPhaseCcy += wave->nextTimePeriodCcys;
               nextEventCcys = wave->nextPhaseCcy - now;
-            } while (nextEventCcys <= 0);
+            } while (nextEventCcys <= -static_cast<int32_t>(wave->nextTimeDutyCcys));
           }
         }
         if (nextTimerCcys > nextEventCcys)
