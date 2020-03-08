@@ -105,14 +105,13 @@ void Servo::write(int value)
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
     value = improved_map(value, 0, 180, _minUs, _maxUs);
-  } else if (value > _maxUs) {
-    value = _maxUs;
   }
   writeMicroseconds(value);
 }
 
 void Servo::writeMicroseconds(int value)
 {
+  value = constrain(value, _minUs, _maxUs);
   _valueUs = value;
   if (_attached) {
     _servoMap &= ~(1 << _pin);
