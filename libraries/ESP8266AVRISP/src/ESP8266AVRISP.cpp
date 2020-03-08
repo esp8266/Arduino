@@ -281,7 +281,7 @@ uint8_t ESP8266AVRISP::write_flash_pages(int length) {
     int x = 0;
     int page = addr_page(here);
     while (x < length) {
-        optimistic_yield(10000);
+        yield();
         if (page != addr_page(here)) {
             commit(page);
             page = addr_page(here);

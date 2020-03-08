@@ -150,7 +150,7 @@ IPAddress ESP8266WiFiMesh::getStaticIP()
 void ESP8266WiFiMesh::disableStaticIP()
 {
   WiFi.config(0u,0u,0u);
-  optimistic_yield(10000);
+  yield();
   staticIPActivated = false;
 }
 
@@ -185,9 +185,9 @@ void ESP8266WiFiMesh::deactivateAP()
 void ESP8266WiFiMesh::restartAP()
 {
   deactivateAP();
-  optimistic_yield(10000);
+  yield();
   activateAP();
-  optimistic_yield(10000);
+  yield();
 }
 
 ESP8266WiFiMesh * ESP8266WiFiMesh::getAPController()
@@ -331,9 +331,9 @@ bool ESP8266WiFiMesh::latestTransmissionSuccessful()
 void ESP8266WiFiMesh::fullStop(WiFiClient &currClient)
 {
   currClient.stop();
-  optimistic_yield(10000);
+  yield();
   WiFi.disconnect();
-  optimistic_yield(10000);
+  yield();
 }
 
 /**
@@ -375,7 +375,7 @@ transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
   verboseModePrint("Transmitting");  // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
     
   currClient.print(getMessage() + '\r');
-  optimistic_yield(10000);
+  yield();
 
   if (!waitForClientTransmission(currClient, _stationModeTimeoutMs))
   {
@@ -390,7 +390,7 @@ transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &currClient)
   }
 
   String response = currClient.readStringUntil('\r');
-  optimistic_yield(10000);
+  yield();
   currClient.flush();
 
   /* Pass data to user callback */
@@ -443,7 +443,7 @@ transmission_status_t ESP8266WiFiMesh::attemptDataTransferKernel()
   }
   
   currClient.stop();
-  optimistic_yield(10000);
+  yield();
 
   return transmissionOutcome;
 }
@@ -476,7 +476,7 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, i
     WiFiMode_t storedWiFiMode = WiFi.getMode();
     WiFi.mode(WIFI_OFF);
     WiFi.mode(storedWiFiMode);
-      optimistic_yield(10000);
+    yield();
     
     #else
     // Disable static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
@@ -500,7 +500,7 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, i
     {
       verboseModePrint(F("... "), false);
       WiFi.disconnect();
-      optimistic_yield(10000);
+      yield();
       initiateConnectionToAP(targetSSID, targetChannel, targetBSSID);
       attemptNumber++;
     }
@@ -527,7 +527,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
   if(initialDisconnect)
   {
     WiFi.disconnect();
-    optimistic_yield(10000);
+    yield();
   }
 
   latestTransmissionOutcomes.clear();
@@ -565,7 +565,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
     for(NetworkInfo &currentNetwork : connectionQueue)
     {
       WiFi.disconnect();
-      optimistic_yield(10000);
+      yield();
 
       String currentSSID;
       int currentWiFiChannel = NETWORK_INFO_DEFAULT_INT;
@@ -614,7 +614,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
   if(concludingDisconnect)
   {
     WiFi.disconnect();
-    optimistic_yield(10000);
+    yield();
   }
 }
 
@@ -658,7 +658,7 @@ void ESP8266WiFiMesh::acceptRequest()
       
       /* Read in request and pass it to the supplied requestHandler */
       String request = _client.readStringUntil('\r');
-      optimistic_yield(10000);
+      yield();
       _client.flush();
       
       String response = _requestHandler(request, *this);
@@ -669,7 +669,7 @@ void ESP8266WiFiMesh::acceptRequest()
         verboseModePrint("Responding"); // Not storing strings in flash (via F()) to avoid performance impacts when using the string.
         _client.print(response + '\r');
         _client.flush();
-        optimistic_yield(10000);
+        yield();
       }
     }
   }
