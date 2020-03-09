@@ -189,7 +189,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
-  constexpr int32_t isrTimeoutCcys = microsecondsToClockCycles(14);
   const uint32_t isrStartCcy = ESP.getCycleCount();
 
   if (waveformToEnable || waveformToDisable) {
@@ -204,18 +203,22 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     endPin = 32 - __builtin_clz(waveformsEnabled);
   }
 
-  uint32_t now = ESP.getCycleCount();
+  // Exit the loop if the next event, if any, is sufficiently distant,
+  // and guard against insanely short waveform periods that the ISR cannot maintain
+  int32_t isrRemainingCcys = microsecondsToClockCycles(14);
+  const uint32_t isrTimeoutCcy = isrStartCcy + isrRemainingCcys;
   int32_t nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
+  uint32_t now = isrStartCcy;
   uint32_t nextTimerCcy = now + nextTimerCcys;
-  if (waveformsEnabled) {
-      bool done = false;
-      do {
+  uint32_t pendingWaveforms = waveformsEnabled;
+  if (pendingWaveforms) {
+    do {
       nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
       for (int i = startPin; i <= endPin; i++) {
         uint32_t mask = 1UL<<i;
 
         // If it's not on, ignore!
-        if (!(waveformsEnabled & mask))
+        if (!(pendingWaveforms & mask))
           continue;
 
         Waveform *wave = &waveforms[i];
@@ -275,25 +278,25 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           if (expiryCcys <= 0) {
             // Done, remove!
             waveformsEnabled &= ~mask;
+            pendingWaveforms &= ~mask;
           }
           else if (nextTimerCcys > expiryCcys)
           {
             nextTimerCcys = expiryCcys;
           }
         }
+        
+        now = ESP.getCycleCount();
+        isrRemainingCcys = isrTimeoutCcy - now;
+        if (nextTimerCcys >= isrRemainingCcys)
+          pendingWaveforms &= ~mask;
       }
 
-      nextTimerCcy = now + nextTimerCcys;
-      now = ESP.getCycleCount();
-      nextTimerCcys = nextTimerCcy - now;
-      // Exit the loop if the next event, if any, is sufficiently distant,
-      // and guard against insanely short waveform periods that the ISR cannot maintain
-      const int32_t isrRemainingCcys = isrTimeoutCcys - (now - isrStartCcy);
-      done = !waveformsEnabled || (nextTimerCcys >= isrRemainingCcys) || (isrRemainingCcys <= 0);
-    } while (!done);
-  } // if (waveformsEnabled)
+    } while (pendingWaveforms && isrRemainingCcys > 0);
+  } // if (pendingWaveforms)
 
   if (timer1CB) {
+    nextTimerCcy = now + nextTimerCcys;
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
     // Account for unknown duration of timer1CB().
     nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
