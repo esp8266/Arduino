@@ -39,9 +39,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+#include "core_esp8266_waveform.h"
 #include <Arduino.h>
 #include "ets_sys.h"
-#include "core_esp8266_waveform.h"
+#include <atomic>
 
 extern "C" {
 
@@ -61,10 +62,10 @@ enum class WaveformMode : uint32_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2,
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
   uint32_t nextPhaseCcy;               // ESP clock cycle when a period begins
-  volatile uint32_t nextTimeDutyCcys;   // Add at low->high to keep smooth waveform
-  volatile uint32_t nextTimePeriodCcys; // Set next phase cycle at low->high to maintain phase
-  volatile uint32_t expiryCcy;         // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
-  volatile WaveformMode mode;
+  uint32_t nextTimeDutyCcys;   // Add at low->high to keep smooth waveform
+  uint32_t nextTimePeriodCcys; // Set next phase cycle at low->high to maintain phase
+  uint32_t expiryCcy;         // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
+  WaveformMode mode;
 } Waveform;
 
 static Waveform waveforms[17];        // State of all possible pins
@@ -134,6 +135,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     wave->expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
     wave->mode = WaveformMode::INIT;
     waveformToEnable = mask;
+    std::atomic_thread_fence(std::memory_order_release);
     if (!timerRunning) {
       initTimer();
       timer1_write(microsecondsToClockCycles(2));
@@ -151,6 +153,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     wave->expiryCcy = runTimeCcys; // in WaveformMode::UPDATEEXPIRY, temporarily hold relative cycle count
     if (runTimeCcys)
       wave->mode = WaveformMode::UPDATEEXPIRY;
+    std::atomic_thread_fence(std::memory_order_release);
   }
   return true;
 }
