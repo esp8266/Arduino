@@ -212,7 +212,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   const uint32_t isrTimeoutCcy = isrStartCcy + isrRemainingCcys;
   int32_t nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
   uint32_t now = isrStartCcy;
-  uint32_t nextTimerCcy = now + nextTimerCcys;
   uint32_t pendingWaveforms = waveformsEnabled;
   if (pendingWaveforms) {
     do {
@@ -299,10 +298,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   } // if (pendingWaveforms)
 
   if (timer1CB) {
-    nextTimerCcy = now + nextTimerCcys;
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
     // Account for unknown duration of timer1CB().
-    nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
+    nextTimerCcys -= ESP.getCycleCount() - now;
     if (nextTimerCcys > callbackCcys)
       nextTimerCcys = callbackCcys;
   }
