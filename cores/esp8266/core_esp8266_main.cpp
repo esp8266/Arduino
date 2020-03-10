@@ -113,12 +113,9 @@ extern "C" IRAM_ATTR void esp_schedule() {
 }
 
 extern "C" void __yield() {
+    esp_schedule();
     if (can_yield()) {
-        esp_schedule();
         esp_yield_within_cont();
-    }
-    else {
-        panic();
     }
 }
 
