@@ -139,7 +139,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
       }
     }
     while (waveformToEnable) {
-      delay(0); // Wait for waveform to update
+      yield(); // Wait for waveform to update
     }
   }
 

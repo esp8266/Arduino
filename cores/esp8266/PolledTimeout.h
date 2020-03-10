@@ -44,7 +44,7 @@ struct DoNothing
 
 struct YieldOrSkip
 {
-  static void execute() {delay(0);}
+  static void execute() {yield();}
 };
 
 template <unsigned long delayMs>

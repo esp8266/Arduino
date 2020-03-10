@@ -65,7 +65,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
             DEBUG_WIFI_MULTI("[WIFI] no networks found\n");
             WiFi.scanDelete();
             DEBUG_WIFI_MULTI("\n\n");
-            delay(0);
+            yield();
             WiFi.disconnect();
             DEBUG_WIFI_MULTI("[WIFI] start scan\n");
             // scan wifi async mode
@@ -81,7 +81,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
             int32_t bestChannel;
 
             DEBUG_WIFI_MULTI("[WIFI] scan done\n");
-            delay(0);
+            yield();
 
             DEBUG_WIFI_MULTI("[WIFI] %d networks found\n", scanResult);
             for(int8_t i = 0; i < scanResult; ++i) {
@@ -118,14 +118,14 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                 }
 
                 DEBUG_WIFI_MULTI(" %d: [%d][%02X:%02X:%02X:%02X:%02X:%02X] %s (%d) %c\n", i, chan_scan, BSSID_scan[0], BSSID_scan[1], BSSID_scan[2], BSSID_scan[3], BSSID_scan[4], BSSID_scan[5], ssid_scan.c_str(), rssi_scan, (sec_scan == ENC_TYPE_NONE) ? ' ' : '*');
-                delay(0);
+                yield();
             }
 
             // clean up ram
             WiFi.scanDelete();
 
             DEBUG_WIFI_MULTI("\n\n");
-            delay(0);
+            yield();
 
             if(bestNetwork.ssid) {
                 DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channel: %d (%d)\n", bestBSSID[0], bestBSSID[1], bestBSSID[2], bestBSSID[3], bestBSSID[4], bestBSSID[5], bestNetwork.ssid, bestChannel, bestNetworkDb);

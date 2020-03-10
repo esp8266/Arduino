@@ -119,7 +119,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         Update.end();
         if (_serial_output) Serial.println("Update was aborted");
       }
-      delay(0);
+      yield();
     });
 }
 
