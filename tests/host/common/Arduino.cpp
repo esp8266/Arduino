@@ -65,7 +65,11 @@ extern "C" void esp_delay (unsigned long ms)
 
 using IsBlockedCB = Delegate<bool(), void*>;
 
-inline void esp_yield(const IsBlockedCB& blocked) {
+inline void esp_suspend() {
+    esp_yield();
+}
+
+inline void esp_suspend(const IsBlockedCB& blocked) {
     (void)blocked;
 }
 

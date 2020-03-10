@@ -97,7 +97,7 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
         }
 
         // will resume when _scanDone fires
-        esp_yield([]() { return !ESP8266WiFiScanClass::_scanComplete && ESP8266WiFiScanClass::_scanStarted; });
+        esp_suspend([]() { return !ESP8266WiFiScanClass::_scanComplete && ESP8266WiFiScanClass::_scanStarted; });
 
         return ESP8266WiFiScanClass::_scanCount;
     } else {
