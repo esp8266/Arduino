@@ -208,6 +208,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("no update"));
 #endif
+    _reset();
     return false;
   }
 
@@ -215,7 +216,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("premature end: res:%u, pos:%zu/%zu\n"), getError(), progress(), _size);
 #endif
-
     _reset();
     return false;
   }
@@ -235,6 +235,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
 
@@ -260,6 +261,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     uint8_t *sig = (uint8_t*)malloc(sigLen);
     if (!sig) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
@@ -271,8 +273,9 @@ bool UpdaterClass::end(bool evenIfRemaining){
     DEBUG_UPDATER.printf("\n");
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
-      _setError(UPDATE_ERROR_SIGN);
       free(sig);
+      _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
     free(sig);
