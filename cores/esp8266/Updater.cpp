@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
+#include "StackThunk.h"
 
 //#define DEBUG_UPDATER Serial
 
@@ -40,6 +41,14 @@ UpdaterClass::UpdaterClass()
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
+  stack_thunk_add_ref();
+#endif
+}
+
+UpdaterClass::~UpdaterClass()
+{
+#if ARDUINO_SIGNING
+    stack_thunk_del_ref();
 #endif
 }
 
@@ -263,8 +272,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       _setError(UPDATE_ERROR_SIGN);
+      free(sig);
       return false;
     }
+    free(sig);
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif
