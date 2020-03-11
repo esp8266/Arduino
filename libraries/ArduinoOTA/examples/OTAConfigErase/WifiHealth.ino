@@ -3,7 +3,8 @@ wifi_health_t wifiHealth = {
   0, 0, 0, 0,
   0, 0, 0, (time_t)LONG_MAX,
   0, 0, 0, (time_t)LONG_MAX,
-  "", 0, INT8_MIN, INT8_MAX, 0};
+  "", 0, INT8_MIN, INT8_MAX, 0
+};
 WiFiDisconnectLog_t wifi_disconnect_log[MAX_CONNECTION_LOST_TIME_LOG] = {0, 0, 0, 0};
 Ticker scheduleCheck;
 bool WifiUp = false;

@@ -3,18 +3,19 @@
 
   Build customization for this PoC:
 
-    * To select one of three erase config methods:
+    @ To select one of three erase config methods:
       Update `#define ERASE_CONFIG_METHOD` in `cores/esp8266/erase_config.cpp`
       A description of the different method is also there.
 
-    * To turn on debug printing:
+    @ To turn on debug printing:
       Uncomment `#define DEBUG_ERASE_CONFIG` in `cores/esp8266/erase_config.h`
       This requires Serial speed 74880 bps.
 
-    * To build w/o erase config option:
+    @ To build w/o erase config option:
       Comment out `#include "erase_config.h"` in both `cores/esp8266/Update.cpp`
       and `Arduino.h`
 */
+#include <limits.h>
 #include <time.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
