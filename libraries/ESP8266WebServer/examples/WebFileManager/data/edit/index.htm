@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>SD Editor</title>
+    <title>File manager</title>
     <style type="text/css" media="screen">
       .contextMenu {
         z-index: 300;
@@ -40,64 +40,54 @@
         margin: 0;
         list-style: none;
       }
-
       .css-treeview input {
         position: absolute;
         opacity: 0;
       }
-
       .css-treeview {
         font: normal 11px Verdana, Arial, Sans-serif;
         -moz-user-select: none;
         -webkit-user-select: none;
         user-select: none;
       }
-
       .css-treeview span {
         color: #00f;
         cursor: pointer;
       }
-
       .css-treeview span:hover {
         text-decoration: underline;
       }
-
       .css-treeview input + label + ul {
         margin: 0 0 0 22px;
       }
-
       .css-treeview input ~ ul {
         display: none;
       }
-
       .css-treeview label, .css-treeview label::before {
         cursor: pointer;
       }
-
       .css-treeview input:disabled + label {
         cursor: default;
         opacity: .6;
       }
-
       .css-treeview input:checked:not(:disabled) ~ ul {
         display: block;
       }
-
-      .css-treeview label, .css-treeview label::before {
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAACgCAYAAAAFOewUAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAApxJREFUeNrslM1u00AQgGdthyalFFOK+ClIIKQKyqUVQvTEE3DmAhLwAhU8QZoH4A2Q2gMSFace4MCtJ8SPBFwAkRuiHKpA6sRN/Lu7zG5i14kctaUqRGhGXnu9O/Pt7MzsMiklvF+9t2kWTDvyIrAsA0aKRRi1T0C/hJ4LUbt5/8rNpWVlp8RSr9J40b48fxFaTQ9+ft8EZ6MJYb0Ok+dnYGpmPgXwKIAvLx8vYXc5GdMAQJgQEkpjRTh36TS2U+DWW/D17WuYgm8pwJyY1npZsZKOxImOV1I/h4+O6vEg5GCZBpgmA6hX8wHKUHDRBXQYicQ4rlc3Tf0VMs8DHBS864F2YFspjgUYjKX/Az3gsdQd2eeBHwmdGWXHcgBGSkZXOXohcEXebRoQcAgjqediNY+AVyu3Z3sAKqfKoGMsewBeEIOPgQxxPJIjcGH6qtL/0AdADzKGnuuD+2tLK7Q8DhHHbOBW+KEzcHLuYc82MkEUekLiwuvVH+guQBQzOG4XdAb8EOcRcqQvDkY2iCLuxECJ43JobMXoutqGgDa2T7UqLKwt9KRyuxKVByqVXXqIoCCUCAqhUOioTWC7G4TQEOD0APy2/7G2Xpu1J4+lxeQ4TXBbITDpoVelRN/BVFbwu5oMMJUBhoXy5tmdRcMwymP2OLQaLjx9/vnBo6V3K6izATmSnMa0Dq7ferIohJhr1p01zrlz49rZF4OMs8JkX23vVQzYp+wbYGV/KpXKjvspl8tsIKCrMNAYFxj2GKS5ZWxg4ewKsJfaGMIY5KXqPz8LBBj6+yDvVP79+yDp/9F9oIx3OisHWwe7Oal0HxCAAAQgAAEIQAACEIAABCAAAQhAAAIQgAAEIAABCEAAAhCAAAQgwD8E/BZgAP0qhKj3rXO7AAAAAElFTkSuQmCC") no-repeat;
-      }
-
       .css-treeview label, .css-treeview span, .css-treeview label::before {
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAACgCAMAAAAy5xwmAAAANlBMVEVHcEzCxMZVW2GHi49iaG1jaG6Xm57///8vNj3Lzc56f4Q6QUfMzc/Y2dqwsrTm5uhIT1Wkp6pc64b3AAAAAXRSTlMAQObYZgAAAKxJREFUSMftk9ESwxAQRUNQSyH//7MltduUTqeZSZqXPW/OwHWHaRoAp7WOG2GlUtKG1wR7K8isKw5QBKcq0qJALFwlSnRN1GATOEXU6Acx28aMnVGKHUKYgvgmdm86BPsPv/UhRCeM6fpQquujE8OSD5ue30e4F2KisXsekUn4uGbwkr4UrCKSaQICmiakljZvhGs/jEQFThR+QbH49wapwwSNNDEMwzDMITwAcVIQIE1OIRcAAAAASUVORK5CYII=") no-repeat;
+      }
+      .css-treeview label, .css-treeview span, .css-treeview label::before, .css-treeview span::before {
         display: inline-block;
         height: 16px;
         line-height: 16px;
         vertical-align: middle;
       }
-
       .css-treeview label {
         background-position: 18px 0;
       }
-
+      .css-treeview span {
+        background-position: 18px -48px;
+      }
       .css-treeview label::before {
         content: "";
         width: 16px;
@@ -105,11 +95,17 @@
         vertical-align: middle;
         background-position: 0 -32px;
       }
-
+      .css-treeview span::before {
+        content: "";
+        width: 16px;
+        margin: 0 22px 0 0;
+        vertical-align: middle;
+        background-position: 0 -48px;
+      }
       .css-treeview input:checked + label::before {
         background-position: 0 -16px;
       }
-
+      
       /* webkit adjacent element selector bugfix */
       @media screen and (-webkit-min-device-pixel-ratio:0)
       {
@@ -144,7 +140,7 @@
         top: 28px;
         bottom: 0;
         left: 0;
-        width:200px;
+        width: 20%;
         padding: 8px;
       }
       #editor, #preview { 
@@ -152,42 +148,55 @@
         top: 28px;
         right: 0;
         bottom: 0;
-        left: 200px;
+        left: 20%;
       }
       #preview {
         background-color: #EEE;
         padding:5px;
       }
+      #uploader span {
+        position: absolute;
+        top: 4px;
+        right: 10px;
+        height: 28px;
+        font: normal 14px Verdana, Arial, Sans-serif;
+      }
     </style>
     <script>
-      function createFileUploader(element, tree, editor){
+      function createFileUploader(element, tree, editor){       
         var xmlHttp;
         var input = document.createElement("input");
+        var uploader = document.getElementById(element);
         input.type = "file";
         input.multiple = false;
         input.name = "data";
-        document.getElementById(element).appendChild(input);
+        uploader.appendChild(input);
         var path = document.createElement("input");
         path.id = "upload-path";
         path.type = "text";
         path.name = "path";
         path.defaultValue = "/";
-        document.getElementById(element).appendChild(path);
-        var button = document.createElement("button");
-        button.innerHTML = 'Upload';
-        document.getElementById(element).appendChild(button);
+        uploader.appendChild(path);
+        var upload = document.createElement("button");
+        upload.innerHTML = "Upload";
+        uploader.appendChild(upload);
         var mkdir = document.createElement("button");
-        mkdir.innerHTML = 'MkDir';
-        document.getElementById(element).appendChild(mkdir);
+        mkdir.innerHTML = "MkDir";
+        uploader.appendChild(mkdir);
         var mkfile = document.createElement("button");
-        mkfile.innerHTML = 'MkFile';
-        document.getElementById(element).appendChild(mkfile);
+        mkfile.innerHTML = "MkFile";
+        uploader.appendChild(mkfile);
+        var status = document.createElement("span");
+        status.id = "status";
+        status.innerHTML = "(loading)";
+        uploader.appendChild(status);
   
         function httpPostProcessRequest(){
           if (xmlHttp.readyState == 4){
             if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
             else {
               tree.refreshPath(path.value);
+              refreshStatus();
             }
           }
         }
@@ -201,30 +210,34 @@
         }
         
         mkfile.onclick = function(e){
-          if(path.value.indexOf(".") === -1) return;
-          createPath(path.value);
-          editor.loadUrl(path.value);
+          var name = path.value
+          if(name.indexOf(".") === -1) return;
+          createPath(name);
+          editor.loadUrl(name);
         };
+        
         mkdir.onclick = function(e){
-          if(path.value.length < 2) return;
-          var dir = path.value
-          if(dir.indexOf(".") !== -1){
-            if(dir.lastIndexOf("/") === 0) return;
-            dir = dir.substring(0, dir.lastIndexOf("/"));
+          var name = path.value
+          if(name.length < 2) return;
+          if(name.indexOf(".") !== -1){
+            if(name.lastIndexOf("/") === 0) return;
+            name = name.substring(0, name.lastIndexOf("/"));
           }
-          createPath(dir);
+          createPath(name);
         };
-        button.onclick = function(e){
+        
+        upload.onclick = function(e){
           if(input.files.length === 0){
             return;
           }
+          setStatus("Uploading...");
           xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = httpPostProcessRequest;
           var formData = new FormData();
           formData.append("data", input.files[0], path.value);
           xmlHttp.open("POST", "/edit");
           xmlHttp.send(formData);
-        }
+        };
         input.onchange = function(e){
           if(input.files.length === 0) return;
           var filename = input.files[0].name;
@@ -247,6 +260,41 @@
         }
       }
 
+      function refreshStatus(){
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+          if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            var statusObj = JSON.parse(xmlHttp.responseText);
+            var statusTxt = statusObj.fs + ": ";
+            if (statusObj.isOk) {
+              statusTxt += "Free space: " + readableSize(statusObj.totalBytes - statusObj.usedBytes) 
+                        +  ". Used: " + readableSize(statusObj.usedBytes) 
+                        +  ". Total: " + readableSize(statusObj.totalBytes);
+            } else {
+              statusTxt += "<span style='color:red'>INIT ERROR !</span>";
+            }
+            document.getElementById("status").innerHTML = statusText;
+          }           
+        }
+        xmlHttp.open("GET", "/status", true);
+        xmlHttp.send(null);
+      }
+      
+      function setStatus(message) {
+        document.getElementById("status").innerHTML = message;
+      }
+
+      function readableSize(bytes) {
+          if (bytes < 1024) return bytes + " B";          
+          var units = [' KiB', ' MiB', ' GiB', ' TiB', 'PiB'];
+          var i = -1;
+          do {
+              bytes = bytes / 1024;
+              i++;
+          } while (bytes > 1024);
+          return bytes.toFixed(2) + units[i];
+      }
+      
       function createTree(element, editor){
         var preview = document.getElementById("preview");
         var treeRoot = document.createElement("div");
@@ -258,6 +306,7 @@
         }
   
         function loadPreview(path){
+          document.getElementById("upload-path").value = path;
           document.getElementById("editor").style.display = "none";
           preview.style.display = "block";
           preview.innerHTML = '<img src="'+path+'" style="max-width:100%; max-height:100%; margin:auto; display:block;" />';
@@ -283,7 +332,7 @@
             refrsh.onclick = function(e){
               var leaf = document.getElementById(path).parentNode;
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpGet(leaf, path);
+              httpList(leaf, path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           } else {
@@ -292,7 +341,7 @@
               document.getElementById(path).checked = true;
               var leaf = document.getElementById(path).parentNode;
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpGet(leaf, path);
+              httpList(leaf, path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           }
@@ -331,6 +380,7 @@
           } else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
+              document.getElementById("upload-path").value = path;
               loadPreview(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
@@ -377,7 +427,7 @@
           var leaf = document.createElement("li");
           leaf.id = (((path == "/")?"":path)+"/"+name).toLowerCase();
           var label = document.createElement("span");
-          label.textContent = name.toLowerCase();
+          label.innerHTML = name.toLowerCase() + " <i>(" + readableSize(size) + ")</i>";
           leaf.appendChild(label);
           leaf.onclick = function(e){
             if(isTextFile(leaf.id)){
@@ -408,14 +458,14 @@
           check.onchange = function(e){
             if(check.checked){
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpGet(leaf, check.id);
+              httpList(leaf, check.id);
             }
           };
           label.onclick = function(e){
             if(!check.checked){
               check.checked = true;
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpGet(leaf, check.id);
+              httpList(leaf, check.id);
             } else {
               check.checked = false;
             }
@@ -429,6 +479,14 @@
         }
   
         function addList(parent, path, items){
+          items.sort(function(a, b) {
+            if (a.type == b.type) {
+              return a.name.localeCompare(b.name); // a before z
+            }
+            else {
+              return a.type.localeCompare(b.type); // dir before file
+            }           
+          });
           var list = document.createElement("ul");
           parent.appendChild(list);
           var ll = items.length;
@@ -483,12 +541,12 @@
           if(path.lastIndexOf('/') < 1){
             path = '/';
             treeRoot.removeChild(treeRoot.childNodes[0]);
-            httpGet(treeRoot, "/");
+            httpList(treeRoot, "/");
           } else {
             path = path.substring(0, path.lastIndexOf('/'));
             var leaf = document.getElementById(path).parentNode;
             if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-            httpGet(leaf, path);
+            httpList(leaf, path);
           }
         };
   
@@ -501,19 +559,21 @@
                 if(path.lastIndexOf('/') < 1){
                   path = '/';
                   treeRoot.removeChild(treeRoot.childNodes[0]);
-                  httpGet(treeRoot, "/");
+                  httpList(treeRoot, "/");
                 } else {
                   path = path.substring(0, path.lastIndexOf('/'));
                   var leaf = document.getElementById(path).parentNode;
                   if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-                  httpGet(leaf, path);
+                  httpList(leaf, path);
                 }
               }
+              refreshStatus();
             }
           }
         }
   
         function httpDelete(filename){
+          setStatus("Deleting...");
           xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = delCb(filename);
           var formData = new FormData();
@@ -531,15 +591,14 @@
           }
         }
   
-        function httpGet(parent, path){
+        function httpList(parent, path){
           xmlHttp = new XMLHttpRequest(parent, path);
           xmlHttp.onreadystatechange = getCb(parent, path);
           xmlHttp.open("GET", "/list?dir="+path, true);
           xmlHttp.send(null);
-          //start loading
         }
   
-        httpGet(treeRoot, "/");
+        httpList(treeRoot, "/");
         return this;
       }
 
@@ -646,6 +705,7 @@
         });
         httpGet(file);
         editor.loadUrl = function(filename){
+          document.getElementById("upload-path").value = filename;
           file = filename;
           lang = getLangFromFilename(file);
           type = "text/"+lang;
@@ -659,6 +719,7 @@
         var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) { vars[key] = value; });
         var editor = createEditor("editor", vars.file, vars.lang, vars.theme);
         var tree = createTree("tree", editor);
+        refreshStatus();
         createFileUploader("uploader", tree, editor);
       };
     </script>
