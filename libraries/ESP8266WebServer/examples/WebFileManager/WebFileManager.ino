@@ -1,13 +1,13 @@
 /* Changes :
  *  
- * Sketch:
+ * Fixes to work on LittleFS based on SDFS
  * - #define logic to select FS
  * - switched from SD to SDFS
  * - begin() does not support parameters > removed SS and added optional config
  * - LittleFS.open() second parametsr is mandatory > specified "r" where needed
  * - 'FILE_WRITE' was not declared in this scope > replaced by "w"
  * 
- * Web page:
+ * Web page improvements:
  * - Tree panel width is now proportional (20%) to see long names on big screens
  * - Added an icon for files, and indented them to the same level as folders
  * - Changed file/folder icon set to use lighter and more neutral ones from https://feathericons.com/ (passed the result through compresspng.com and base64-image.de)
@@ -15,20 +15,42 @@
  * - Added file size after each file name
  * - Added FS status information at the top right
  * - Replaced that FS status by operation status when upload/delete is in progress
- * - Filled filename box in header with the name of the currently selected file
+ * - Filled filename box in header with the name of the last clicked file
+ * - Selecting a file for upload proposes to put it in the same file as the last clicked file
+ * - No limit to 8.3 lowercase filenames if not needed
+ * - Improved refresh of parts of the tree (e.g. upon file delete, refresh subfolder, not root)
  *
  * TODO:
- * - Show file names as they come from server (with "/" for SPIFFS, without for others) and adapt the queries such as "delete" by only adding the leading "/" if not already present
- * - Test fileSystem status in web page and indicate if ERROR
- * - Show FS type in status
+ * - test creation of edit.txt/EDIT.TXT on LittleFS and SPIFFS (should succeed). (correclty fails on SDFS)
+ * - Check directory behaviour on SPIFFS (now that we call file.isDirectory()
+ * - Support Filenames without extension, Dirnames with extension ?
  * - Cleanup (look for TODO below)
- * - Fix Editor (add Save/Discard buttons ?)
+ * - Reload tree (size) and status on Editor Save
+ * - Add Editor Save/Discard buttons ?
  * - Dim screen (and http://www.ajaxload.info/ ) when Upload/Delete in progress ?
+ * - After delete in subfolder, refresh folder, not full tree (with folders closed)
  * 
- * TEST:
- * - Thoroughly on SPIFFS + SDFS + LittleFS :
- * - List / Edit / View image / Download / Create file / Upload file / Mkdir at root
- * - List / Edit / View image / Download / Create file / Upload file / Mkdir in subfolder
+ * TEST: (*) = failed vXXX = OK
+ * - On SPIFFS:
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
+ * - with Long Filenames:
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
+ * 
+ * - On LittleFS:
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ * - with Long Filenames:
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ * 
+ * - On SDFS:
+ * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
+ * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ * - with Long Filenames:
+ * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
+ * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
  * (after PR): reported free space
  */
 
@@ -66,7 +88,7 @@
   Once the data and sketch have been uploaded, access the editor by going to http://webfilemanager.local/edit
 
   Notes:
-  - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line just before "FILESYSTEM.begin()", 
+  - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line "fileSystemConfig.setCSPin(chipSelectPin);"
   specifying the GPIO the CS pin is connected to
   - index.htm is the default index (works on subfolders as well)
   - Filesystem limitations apply. For example, SDFS is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename .
@@ -79,9 +101,9 @@
 
 // Select the FileSystem by uncommenting one of the lines below
 
+// #define USE_SPIFFS
+// #define USE_LITTLEFS
 #define USE_SDFS
-//#define USE_SPIFFS
-//#define USE_LITTLEFS
 
 ////////////////////////////////
 
@@ -91,21 +113,25 @@
 #include <ESP8266mDNS.h>
 #include <SPI.h>
 
-#if defined USE_SDFS
-  #define FILESYSTEM SDFS
-  #include <SDFS.h>
-  const char* fsName = "SDFS";
-#elif defined USE_SPIFFS
-  #define FILESYSTEM SPIFFS
+#if defined USE_SPIFFS
   #include <FS.h>
   const char* fsName = "SPIFFS";
+  FS* fileSystem = &SPIFFS;
+  SPIFFSConfig fileSystemConfig = SPIFFSConfig();
 #elif defined USE_LITTLEFS
-  #define FILESYSTEM LittleFS
   #include <LittleFS.h>
   const char* fsName = "LittleFS";
+  FS* fileSystem = &LittleFS;
+  LitteFSConfig fileSystemConfig = LittleFSConfig();
+#elif defined USE_SDFS
+  #include <SDFS.h>
+  const char* fsName = "SDFS";
+  FS* fileSystem = &SDFS;
+  SDFSConfig fileSystemConfig = SDFSConfig();
 #else 
   #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
+
 
 #define DBG_OUTPUT_PORT Serial
 
@@ -171,15 +197,6 @@ String getContentType(String filename) {
   return "text/plain";
 }
 
-bool isDir(File file) {
-#ifdef USE_SPIFFS
-  return false;
-#else 
-  return file.isDirectory();
-#endif
-}
-
-
 
 ////////////////////////////////
 // Request handlers
@@ -189,10 +206,10 @@ bool isDir(File file) {
  */
 void handleStatus() {
   FSInfo fs_info;
-  String json = String("{\"fs\":\"") + fsName + "\", \"isOk\":";
+  String json = String("{\"type\":\"") + fsName + "\", \"isOk\":";
 
   if (fsOK) {
-    FILESYSTEM.info(fs_info);
+    fileSystem->info(fs_info);
     json += String("\"true\", \"totalBytes\":\"") + fs_info.totalBytes + "\", \"usedBytes\":\""  + fs_info.usedBytes + "\"";
   }
   else {
@@ -216,12 +233,12 @@ void handleFileList() {
   }
 
   String path = server.arg("dir");
-  if (path != "/" && !FILESYSTEM.exists(path)) {
+  if (path != "/" && !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
   }
 
   /* TODO should we still perform a test equivalent to this one 
-  File dir = FILESYSTEM.open(path, "r");
+  File dir = fileSystem->open(path, "r");
   path = String();
   if (!dir.isDirectory()) {
     dir.close();
@@ -230,7 +247,7 @@ void handleFileList() {
    */
    
   DBG_OUTPUT_PORT.println("handleFileList: " + path);
-  Dir dir = FILESYSTEM.openDir(path);
+  Dir dir = fileSystem->openDir(path);
   path = String();
 
   String output = "[";
@@ -240,7 +257,7 @@ void handleFileList() {
       output += ',';
     }
     output += "{\"type\":\"";
-    if (isDir(entry)) {
+    if (entry.isDirectory()) {
       output += "dir";
     }
     else {
@@ -286,11 +303,11 @@ bool handleFileRead(String path) {
   }
   
   String pathWithGz = path + ".gz";
-  if (FILESYSTEM.exists(pathWithGz) || FILESYSTEM.exists(path)) {
-    if (FILESYSTEM.exists(pathWithGz)) {
+  if (fileSystem->exists(pathWithGz) || fileSystem->exists(path)) {
+    if (fileSystem->exists(pathWithGz)) {
       path += ".gz";
     }
-    File file = FILESYSTEM.open(path, "r");
+    File file = fileSystem->open(path, "r");
     if (server.streamFile(file, contentType) != file.size()) {
       DBG_OUTPUT_PORT.println("Sent less data than expected!");
     }
@@ -316,45 +333,50 @@ void handleFileCreate() {
   if (path == "/") {
     return returnFail("BAD PATH");
   }
-  if (FILESYSTEM.exists(path)) {
+  if (fileSystem->exists(path)) {
     return returnFail("FILE EXISTS");
   }
 
   // TODO what ? create file if it has an extension otherwise create folder ?
   if (path.indexOf('.') > 0) {
-    File file = FILESYSTEM.open(path, "w");
+    File file = fileSystem->open(path, "w");
     if (file) {
       file.write((const char *)0);
       file.close();
     }
   } else {
-    FILESYSTEM.mkdir(path);
+    fileSystem->mkdir(path);
   }
   return returnOK();
 }
 
 
 /*
- * Delete the given directory, including all nested files and directories
+ * Delete the file or folder designed by the given path.
+ * If it's a file, delete it.
+ * If it's a folder, delete all nested contents first then the folder itself
  */
 void deleteRecursive(String path) {
-  Dir dir = FILESYSTEM.openDir(path);
-  path = String();
+  File file = fileSystem->open(path, "r");
+  bool isDir = file.isDirectory();
+  file.close();
+  
+  // If it's a plain file, delete it
+  if (!isDir) {
+    fileSystem->remove(path);
+    return;
+  }
+  
+  // Otherwise delete its contents first
+  Dir dir = fileSystem->openDir(path);
 
   while (dir.next()) {
-    File entry = dir.openFile("r");
-    String entryPath = path + "/" + entry.name();
-    if (isDir(entry)) {  
-      entry.close();
-      deleteRecursive(entryPath);
-    }
-    else {
-      entry.close();
-      FILESYSTEM.remove(entryPath);
-    }
+    String entryPath = path + "/" + dir.fileName();
+    deleteRecursive(entryPath);
   }
 
-  FILESYSTEM.rmdir(path);
+  // Then delete the folder itself
+  fileSystem->rmdir(path);
 }
 
 
@@ -370,7 +392,7 @@ void handleFileDelete() {
   }
   String path = server.arg(0);
   DBG_OUTPUT_PORT.println("handleFileDelete: " + path);
-  if (path == "/" || !FILESYSTEM.exists(path)) {
+  if (path == "/" || !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
   }
   deleteRecursive(path);
@@ -394,7 +416,7 @@ void handleFileUpload() {
       filename = "/" + filename;
     }
     DBG_OUTPUT_PORT.println("handleFileUpload Name: " + filename);
-    uploadFile = FILESYSTEM.open(filename, "w");
+    uploadFile = fileSystem->open(filename, "w");
     DBG_OUTPUT_PORT.print("Upload: START, filename: " + filename);
   } 
   else if (upload.status == UPLOAD_FILE_WRITE) {
@@ -449,13 +471,14 @@ void setup(void) {
   ////////////////////////////////
   // FILESYSTEM INIT
 
-  // SDFS.setConfig(SDFSConfig().setCSPin(chipSelectPin));
-  fsOK = FILESYSTEM.begin();
+  fileSystemConfig.setAutoFormat(false);
+  fileSystem->setConfig(fileSystemConfig);
+  fsOK = fileSystem->begin();
   DBG_OUTPUT_PORT.println(fsOK ? "Filesystem initialized." : "Filesystem init failed!");
 
   {
     // Debug: dump contents of root folder on console
-    Dir dir = FILESYSTEM.openDir("/");
+    Dir dir = fileSystem->openDir("/");
     while (dir.next()) DBG_OUTPUT_PORT.println("FS File: " + dir.fileName() + ", size: " + dir.fileSize());
     DBG_OUTPUT_PORT.printf("\n");
   }
