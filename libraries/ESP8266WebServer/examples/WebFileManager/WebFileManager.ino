@@ -1,5 +1,31 @@
+/* Changes :
+ *  
+ * Sketch:
+ * - #define logic to select FS
+ * - switched from SD to SDFS
+ * - begin() does not support parameters > removed SS and added optional config
+ * - LittleFS.open() second parametsr is mandatory > specified "r" where needed
+ * - 'FILE_WRITE' was not declared in this scope > replaced by "w"
+ * 
+ * Web page:
+ * - Tree panel width is now proportional (20%) to see long names on big screens
+ * - Added an icon for files, and indented them to the same level as folders
+ * - Changed file/folder icon set to use lighter and more neutral ones from https://feathericons.com/ (passed the result through compresspng.com and base64-image.de)
+ * - Items are now sorted (folders first, then plain files, each in alphabetic order)
+ * - Added file size after each file name
+ * - Added FS status information at the top right
+ * - Replaced that FS status by operation status when upload/delete is in progress
+ * - Filled filename box in header with the name of the currently selected file
+ *
+ * TODO:
+ * - Fix Editor (add Save/Discard buttons ?)
+ * - Dim screen (and http://www.ajaxload.info/ ) when Upload/Delete in progress ?
+ * - Test on SPIFFS
+ */
+
 /*
-  SDWebServer - Example WebServer with SD Card backend for esp8266
+  WebFileManager - A web-based File Manager for ESP8266 filesystems
+  (unified from former FSBrowser, FSWebServer and SDWebServer examples)
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the ESP8266WebServer library for Arduino environment.
@@ -18,21 +44,56 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  Have a FAT Formatted SD Card connected to the SPI port of the ESP8266
-  The web root is the SD Card root folder
-  File extensions with more than 3 charecters are not supported by the SD Library
-  File Names longer than 8 charecters will be truncated by the SD library, so keep filenames shorter
-  index.htm is the default index (works on subfolders as well)
 
-  upload the contents of SdRoot to the root of the SDcard and access the editor by going to http://esp8266sd.local/edit
+
+  This example implements a file manager using http requests and a html/javascript frontend.
+  The filesystem itself can be SDFS, SPIFFS, LittleFS and has to be selected using one of the "#define USE_xxx" directives below.
+  See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems.
+
+  This example requires that a copy of the 'data' folder be first copied to the filesystem. To do so:
+  - for SDFS, copy that contents to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
+  - for SPIFFS or LittleFS, please follow the instructions at https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#uploading-files-to-file-system
+
+  Once the data and sketch have been uploaded, access the editor by going to http://espfilemanager.local/edit
+
+  Notes:
+  - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line just before "FILESYSTEM.begin()", 
+  specifying the GPIO the CS pin is connected to
+  - index.htm is the default index (works on subfolders as well)
+  - Filesystem limitations apply. For example, SDFS is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename .
+  SPIFFS and LittleFS also have limitations. Plese see the https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
+  - Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character
 
 */
+
+//////////////////
+
+// Select the FileSystem by uncommenting one of the lines below
+
+#define USE_SDFS
+//#define USE_SPIFFS
+//#define USE_LITTLEFS
+
+//////////////////
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <SPI.h>
-#include <SD.h>
+
+#if defined USE_SDFS
+  #define FILESYSTEM SDFS
+  #include <SDFS.h>
+#elif defined USE_SPIFFS
+  #define FILESYSTEM SPIFFS
+  #include <FS.h>
+#elif defined USE_LITTLEFS
+  #define FILESYSTEM LittleFS
+  #include <LittleFS.h>
+#else 
+  #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
+#endif
 
 #define DBG_OUTPUT_PORT Serial
 
@@ -43,7 +104,7 @@
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
-const char* host = "esp8266sd";
+const char* host = "webfilemanager";
 
 ESP8266WebServer server(80);
 
@@ -89,11 +150,11 @@ bool loadFromSdCard(String path) {
     dataType = "application/zip";
   }
 
-  File dataFile = SD.open(path.c_str());
+  File dataFile = FILESYSTEM.open(path.c_str(), "r");
   if (dataFile.isDirectory()) {
     path += "/index.htm";
     dataType = "text/html";
-    dataFile = SD.open(path.c_str());
+    dataFile = FILESYSTEM.open(path.c_str(), "r");
   }
 
   if (!dataFile) {
@@ -118,10 +179,10 @@ void handleFileUpload() {
   }
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
-    if (SD.exists((char *)upload.filename.c_str())) {
-      SD.remove((char *)upload.filename.c_str());
+    if (FILESYSTEM.exists((char *)upload.filename.c_str())) {
+      FILESYSTEM.remove((char *)upload.filename.c_str());
     }
-    uploadFile = SD.open(upload.filename.c_str(), FILE_WRITE);
+    uploadFile = FILESYSTEM.open(upload.filename.c_str(), "w");
     DBG_OUTPUT_PORT.print("Upload: START, filename: "); DBG_OUTPUT_PORT.println(upload.filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
@@ -137,10 +198,10 @@ void handleFileUpload() {
 }
 
 void deleteRecursive(String path) {
-  File file = SD.open((char *)path.c_str());
+  File file = FILESYSTEM.open((char *)path.c_str(), "r");
   if (!file.isDirectory()) {
     file.close();
-    SD.remove((char *)path.c_str());
+    FILESYSTEM.remove((char *)path.c_str());
     return;
   }
 
@@ -156,12 +217,12 @@ void deleteRecursive(String path) {
       deleteRecursive(entryPath);
     } else {
       entry.close();
-      SD.remove((char *)entryPath.c_str());
+      FILESYSTEM.remove((char *)entryPath.c_str());
     }
     yield();
   }
 
-  SD.rmdir((char *)path.c_str());
+  FILESYSTEM.rmdir((char *)path.c_str());
   file.close();
 }
 
@@ -170,7 +231,7 @@ void handleDelete() {
     return returnFail("BAD ARGS");
   }
   String path = server.arg(0);
-  if (path == "/" || !SD.exists((char *)path.c_str())) {
+  if (path == "/" || !FILESYSTEM.exists((char *)path.c_str())) {
     returnFail("BAD PATH");
     return;
   }
@@ -183,33 +244,33 @@ void handleCreate() {
     return returnFail("BAD ARGS");
   }
   String path = server.arg(0);
-  if (path == "/" || SD.exists((char *)path.c_str())) {
+  if (path == "/" || FILESYSTEM.exists((char *)path.c_str())) {
     returnFail("BAD PATH");
     return;
   }
 
   if (path.indexOf('.') > 0) {
-    File file = SD.open((char *)path.c_str(), FILE_WRITE);
+    File file = FILESYSTEM.open((char *)path.c_str(), "w");
     if (file) {
       file.write((const char *)0);
       file.close();
     }
   } else {
-    SD.mkdir((char *)path.c_str());
+    FILESYSTEM.mkdir((char *)path.c_str());
   }
   returnOK();
 }
 
-void printDirectory() {
+void handleList() {
   if (!server.hasArg("dir")) {
     return returnFail("BAD ARGS");
   }
   String path = server.arg("dir");
-  if (path != "/" && !SD.exists((char *)path.c_str())) {
+  if (path != "/" && !FILESYSTEM.exists((char *)path.c_str())) {
     return returnFail("BAD PATH");
   }
-  File dir = SD.open((char *)path.c_str());
-  path.clear();
+  File dir = FILESYSTEM.open((char *)path.c_str(), "r");
+  path = String();
   if (!dir.isDirectory()) {
     dir.close();
     return returnFail("NOT DIR");
@@ -232,7 +293,14 @@ void printDirectory() {
     }
 
     output += "{\"type\":\"";
-    output += (entry.isDirectory()) ? "dir" : "file";
+    if (entry.isDirectory()) {
+      output += "dir";
+    }
+    else {
+      output += "file";
+      output += "\",\"size\":\"";
+      output += entry.size();      
+    }
     output += "\",\"name\":\"";
     output += entry.name();
     output += "\"";
@@ -243,6 +311,17 @@ void printDirectory() {
   server.sendContent("]");
   server.sendContent(""); // Terminate the HTTP chunked transmission with a 0-length chunk
   dir.close();
+}
+
+void handleStatus() {
+  FSInfo fs_info;
+  FILESYSTEM.info(fs_info);
+
+  String json = String("{\"totalBytes\":\"") + fs_info.totalBytes
+  + "\", \"usedBytes\":\"" + fs_info.usedBytes
+  + "\"}";
+
+  server.send(200, "application/json", json);
 }
 
 void handleNotFound() {
@@ -297,10 +376,11 @@ void setup(void) {
   }
 
 
-  server.on("/list", HTTP_GET, printDirectory);
-  server.on("/edit", HTTP_DELETE, handleDelete);
-  server.on("/edit", HTTP_PUT, handleCreate);
-  server.on("/edit", HTTP_POST, []() {
+  server.on("/status",HTTP_GET, handleStatus);
+  server.on("/list",  HTTP_GET, handleList);
+  server.on("/edit",  HTTP_DELETE, handleDelete);
+  server.on("/edit",  HTTP_PUT, handleCreate);
+  server.on("/edit",  HTTP_POST, []() {
     returnOK();
   }, handleFileUpload);
   server.onNotFound(handleNotFound);
@@ -308,7 +388,8 @@ void setup(void) {
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
 
-  if (SD.begin(SS)) {
+  // SDFS.setConfig(SDFSConfig().setCSPin(chipSelectPin));
+  if (FILESYSTEM.begin()) {
     DBG_OUTPUT_PORT.println("SD Card initialized.");
     hasSD = true;
   }
