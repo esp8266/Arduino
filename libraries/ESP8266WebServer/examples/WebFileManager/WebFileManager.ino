@@ -18,9 +18,18 @@
  * - Filled filename box in header with the name of the currently selected file
  *
  * TODO:
+ * - Show file names as they come from server (with "/" for SPIFFS, without for others) and adapt the queries such as "delete" by only adding the leading "/" if not already present
+ * - Test fileSystem status in web page and indicate if ERROR
+ * - Show FS type in status
+ * - Cleanup (look for TODO below)
  * - Fix Editor (add Save/Discard buttons ?)
  * - Dim screen (and http://www.ajaxload.info/ ) when Upload/Delete in progress ?
- * - Test on SPIFFS
+ * 
+ * TEST:
+ * - Thoroughly on SPIFFS + SDFS + LittleFS :
+ * - List / Edit / View image / Download / Create file / Upload file / Mkdir at root
+ * - List / Edit / View image / Download / Create file / Upload file / Mkdir in subfolder
+ * (after PR): reported free space
  */
 
 /*
@@ -54,7 +63,7 @@
   - for SDFS, copy that contents to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
   - for SPIFFS or LittleFS, please follow the instructions at https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#uploading-files-to-file-system
 
-  Once the data and sketch have been uploaded, access the editor by going to http://espfilemanager.local/edit
+  Once the data and sketch have been uploaded, access the editor by going to http://webfilemanager.local/edit
 
   Notes:
   - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line just before "FILESYSTEM.begin()", 
@@ -66,7 +75,7 @@
 
 */
 
-//////////////////
+////////////////////////////////
 
 // Select the FileSystem by uncommenting one of the lines below
 
@@ -74,7 +83,7 @@
 //#define USE_SPIFFS
 //#define USE_LITTLEFS
 
-//////////////////
+////////////////////////////////
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -85,12 +94,15 @@
 #if defined USE_SDFS
   #define FILESYSTEM SDFS
   #include <SDFS.h>
+  const char* fsName = "SDFS";
 #elif defined USE_SPIFFS
   #define FILESYSTEM SPIFFS
   #include <FS.h>
+  const char* fsName = "SPIFFS";
 #elif defined USE_LITTLEFS
   #define FILESYSTEM LittleFS
   #include <LittleFS.h>
+  const char* fsName = "LittleFS";
 #else 
   #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
@@ -108,192 +120,127 @@ const char* host = "webfilemanager";
 
 ESP8266WebServer server(80);
 
-static bool hasSD = false;
+static bool fsOK;
 File uploadFile;
 
+
+////////////////////////////////
+// Utils to return HTTP codes and determine content-type
 
 void returnOK() {
   server.send(200, "text/plain", "");
 }
 
+void returnNotFound(String msg) {
+  server.send(404, "text/plain", msg);
+}
+
 void returnFail(String msg) {
+  DBG_OUTPUT_PORT.println(msg);
   server.send(500, "text/plain", msg + "\r\n");
 }
 
-bool loadFromSdCard(String path) {
-  String dataType = "text/plain";
-  if (path.endsWith("/")) {
-    path += "index.htm";
+String getContentType(String filename) {
+  if (filename.endsWith(".htm")) {
+    return "text/html";
+  } else if (filename.endsWith(".html")) {
+    return "text/html";
+  } else if (filename.endsWith(".css")) {
+    return "text/css";
+  } else if (filename.endsWith(".js")) {
+    return "application/javascript";
+  } else if (filename.endsWith(".png")) {
+    return "image/png";
+  } else if (filename.endsWith(".gif")) {
+    return "image/gif";
+  } else if (filename.endsWith(".jpg")) {
+    return "image/jpeg";
+  } else if (filename.endsWith(".jpeg")) {
+    return "image/jpeg";
+  } else if (filename.endsWith(".ico")) {
+    return "image/x-icon";
+  } else if (filename.endsWith(".xml")) {
+    return "text/xml";
+  } else if (filename.endsWith(".pdf")) {
+    return "application/x-pdf";
+  } else if (filename.endsWith(".zip")) {
+    return "application/x-zip";
+  } else if (filename.endsWith(".gz")) {
+    return "application/x-gzip";
   }
-
-  if (path.endsWith(".src")) {
-    path = path.substring(0, path.lastIndexOf("."));
-  } else if (path.endsWith(".htm")) {
-    dataType = "text/html";
-  } else if (path.endsWith(".css")) {
-    dataType = "text/css";
-  } else if (path.endsWith(".js")) {
-    dataType = "application/javascript";
-  } else if (path.endsWith(".png")) {
-    dataType = "image/png";
-  } else if (path.endsWith(".gif")) {
-    dataType = "image/gif";
-  } else if (path.endsWith(".jpg")) {
-    dataType = "image/jpeg";
-  } else if (path.endsWith(".ico")) {
-    dataType = "image/x-icon";
-  } else if (path.endsWith(".xml")) {
-    dataType = "text/xml";
-  } else if (path.endsWith(".pdf")) {
-    dataType = "application/pdf";
-  } else if (path.endsWith(".zip")) {
-    dataType = "application/zip";
-  }
-
-  File dataFile = FILESYSTEM.open(path.c_str(), "r");
-  if (dataFile.isDirectory()) {
-    path += "/index.htm";
-    dataType = "text/html";
-    dataFile = FILESYSTEM.open(path.c_str(), "r");
-  }
-
-  if (!dataFile) {
-    return false;
-  }
-
-  if (server.hasArg("download")) {
-    dataType = "application/octet-stream";
-  }
-
-  if (server.streamFile(dataFile, dataType) != dataFile.size()) {
-    DBG_OUTPUT_PORT.println("Sent less data than expected!");
-  }
-
-  dataFile.close();
-  return true;
+  return "text/plain";
 }
 
-void handleFileUpload() {
-  if (server.uri() != "/edit") {
-    return;
-  }
-  HTTPUpload& upload = server.upload();
-  if (upload.status == UPLOAD_FILE_START) {
-    if (FILESYSTEM.exists((char *)upload.filename.c_str())) {
-      FILESYSTEM.remove((char *)upload.filename.c_str());
-    }
-    uploadFile = FILESYSTEM.open(upload.filename.c_str(), "w");
-    DBG_OUTPUT_PORT.print("Upload: START, filename: "); DBG_OUTPUT_PORT.println(upload.filename);
-  } else if (upload.status == UPLOAD_FILE_WRITE) {
-    if (uploadFile) {
-      uploadFile.write(upload.buf, upload.currentSize);
-    }
-    DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: "); DBG_OUTPUT_PORT.println(upload.currentSize);
-  } else if (upload.status == UPLOAD_FILE_END) {
-    if (uploadFile) {
-      uploadFile.close();
-    }
-    DBG_OUTPUT_PORT.print("Upload: END, Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
-  }
+bool isDir(File file) {
+#ifdef USE_SPIFFS
+  return false;
+#else 
+  return file.isDirectory();
+#endif
 }
 
-void deleteRecursive(String path) {
-  File file = FILESYSTEM.open((char *)path.c_str(), "r");
-  if (!file.isDirectory()) {
-    file.close();
-    FILESYSTEM.remove((char *)path.c_str());
-    return;
-  }
 
-  file.rewindDirectory();
-  while (true) {
-    File entry = file.openNextFile();
-    if (!entry) {
-      break;
-    }
-    String entryPath = path + "/" + entry.name();
-    if (entry.isDirectory()) {
-      entry.close();
-      deleteRecursive(entryPath);
-    } else {
-      entry.close();
-      FILESYSTEM.remove((char *)entryPath.c_str());
-    }
-    yield();
-  }
 
-  FILESYSTEM.rmdir((char *)path.c_str());
-  file.close();
+////////////////////////////////
+// Request handlers
+
+/* 
+ * Return the FS type, status and size info 
+ */
+void handleStatus() {
+  FSInfo fs_info;
+  String json = String("{\"fs\":\"") + fsName + "\", \"isOk\":";
+
+  if (fsOK) {
+    FILESYSTEM.info(fs_info);
+    json += String("\"true\", \"totalBytes\":\"") + fs_info.totalBytes + "\", \"usedBytes\":\""  + fs_info.usedBytes + "\"";
+  }
+  else {
+    json += "\"false\"";
+  }
+  json += "}";
+  server.send(200, "application/json", json);
 }
 
-void handleDelete() {
-  if (server.args() == 0) {
-    return returnFail("BAD ARGS");
-  }
-  String path = server.arg(0);
-  if (path == "/" || !FILESYSTEM.exists((char *)path.c_str())) {
-    returnFail("BAD PATH");
-    return;
-  }
-  deleteRecursive(path);
-  returnOK();
-}
 
-void handleCreate() {
-  if (server.args() == 0) {
-    return returnFail("BAD ARGS");
-  }
-  String path = server.arg(0);
-  if (path == "/" || FILESYSTEM.exists((char *)path.c_str())) {
-    returnFail("BAD PATH");
-    return;
+/* 
+ * Return the list of files in the directory specified by the "dir" query string parameter 
+ */
+void handleFileList() {
+  if (!fsOK) {
+    return returnFail("FS INIT ERROR");
   }
 
-  if (path.indexOf('.') > 0) {
-    File file = FILESYSTEM.open((char *)path.c_str(), "w");
-    if (file) {
-      file.write((const char *)0);
-      file.close();
-    }
-  } else {
-    FILESYSTEM.mkdir((char *)path.c_str());
-  }
-  returnOK();
-}
-
-void handleList() {
   if (!server.hasArg("dir")) {
     return returnFail("BAD ARGS");
   }
+
   String path = server.arg("dir");
-  if (path != "/" && !FILESYSTEM.exists((char *)path.c_str())) {
+  if (path != "/" && !FILESYSTEM.exists(path)) {
     return returnFail("BAD PATH");
   }
-  File dir = FILESYSTEM.open((char *)path.c_str(), "r");
+
+  /* TODO should we still perform a test equivalent to this one 
+  File dir = FILESYSTEM.open(path, "r");
   path = String();
   if (!dir.isDirectory()) {
     dir.close();
     return returnFail("NOT DIR");
   }
-  dir.rewindDirectory();
-  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server.send(200, "text/json", "");
-  WiFiClient client = server.client();
+   */
+   
+  DBG_OUTPUT_PORT.println("handleFileList: " + path);
+  Dir dir = FILESYSTEM.openDir(path);
+  path = String();
 
-  server.sendContent("[");
-  for (int cnt = 0; true; ++cnt) {
-    File entry = dir.openNextFile();
-    if (!entry) {
-      break;
+  String output = "[";
+  while (dir.next()) {
+    File entry = dir.openFile("r");
+    if (output != "[") {
+      output += ',';
     }
-
-    String output;
-    if (cnt > 0) {
-      output = ',';
-    }
-
     output += "{\"type\":\"";
-    if (entry.isDirectory()) {
+    if (isDir(entry)) {
       output += "dir";
     }
     else {
@@ -302,98 +249,276 @@ void handleList() {
       output += entry.size();      
     }
     output += "\",\"name\":\"";
-    output += entry.name();
-    output += "\"";
-    output += "}";
-    server.sendContent(output);
+    
+    // original code only had     
+    // output += entry.name();
+    // TODO check that the following works with other FS than SPIFFS
+    // The convention is that files listed at the root don't start with "/"
+    if (entry.name()[0] == '/') {
+      output += &(entry.name()[1]);
+    } 
+    else {
+      output += entry.name();
+    }
+    output += "\"}";
     entry.close();
   }
-  server.sendContent("]");
-  server.sendContent(""); // Terminate the HTTP chunked transmission with a 0-length chunk
-  dir.close();
+
+  output += "]";
+  server.send(200, "text/json", output);
 }
 
-void handleStatus() {
-  FSInfo fs_info;
-  FILESYSTEM.info(fs_info);
 
-  String json = String("{\"totalBytes\":\"") + fs_info.totalBytes
-  + "\", \"usedBytes\":\"" + fs_info.usedBytes
-  + "\"}";
-
-  server.send(200, "application/json", json);
+/*
+ * Read the given file from the filesystem and stream it back to the client 
+ */
+bool handleFileRead(String path) {
+  DBG_OUTPUT_PORT.println("handleFileRead: " + path);
+  if (path.endsWith("/")) {
+    path += "index.htm";
+  }
+  
+  String contentType;
+  if (server.hasArg("download")) {
+    contentType = "application/octet-stream";
+  } else {
+    contentType = getContentType(path);
+  }
+  
+  String pathWithGz = path + ".gz";
+  if (FILESYSTEM.exists(pathWithGz) || FILESYSTEM.exists(path)) {
+    if (FILESYSTEM.exists(pathWithGz)) {
+      path += ".gz";
+    }
+    File file = FILESYSTEM.open(path, "r");
+    if (server.streamFile(file, contentType) != file.size()) {
+      DBG_OUTPUT_PORT.println("Sent less data than expected!");
+    }
+    file.close();
+    return true;
+  }
+  return false;
 }
 
-void handleNotFound() {
-  if (hasSD && loadFromSdCard(server.uri())) {
+
+/*
+ * Handle the creation of a new file 
+ */
+void handleFileCreate() {
+  if (!fsOK) {
+    return returnFail("FS INIT ERROR");
+  }
+  if (server.args() == 0) {
+    return returnFail("BAD ARGS");
+  }
+  String path = server.arg(0);
+  DBG_OUTPUT_PORT.println("handleFileCreate: " + path);
+  if (path == "/") {
+    return returnFail("BAD PATH");
+  }
+  if (FILESYSTEM.exists(path)) {
+    return returnFail("FILE EXISTS");
+  }
+
+  // TODO what ? create file if it has an extension otherwise create folder ?
+  if (path.indexOf('.') > 0) {
+    File file = FILESYSTEM.open(path, "w");
+    if (file) {
+      file.write((const char *)0);
+      file.close();
+    }
+  } else {
+    FILESYSTEM.mkdir(path);
+  }
+  return returnOK();
+}
+
+
+/*
+ * Delete the given directory, including all nested files and directories
+ */
+void deleteRecursive(String path) {
+  Dir dir = FILESYSTEM.openDir(path);
+  path = String();
+
+  while (dir.next()) {
+    File entry = dir.openFile("r");
+    String entryPath = path + "/" + entry.name();
+    if (isDir(entry)) {  
+      entry.close();
+      deleteRecursive(entryPath);
+    }
+    else {
+      entry.close();
+      FILESYSTEM.remove(entryPath);
+    }
+  }
+
+  FILESYSTEM.rmdir(path);
+}
+
+
+/*
+ * Handle a file deletion request
+ */
+void handleFileDelete() {
+  if (!fsOK) {
+    return returnFail("FS INIT ERROR");
+  }
+  if (server.args() == 0) {
+    return returnFail("BAD ARGS");
+  }
+  String path = server.arg(0);
+  DBG_OUTPUT_PORT.println("handleFileDelete: " + path);
+  if (path == "/" || !FILESYSTEM.exists(path)) {
+    return returnFail("BAD PATH");
+  }
+  deleteRecursive(path);
+  returnOK();
+}
+
+/*
+ * Handle a file upload request
+ */
+void handleFileUpload() {
+  if (!fsOK) {
+    return returnFail("FS INIT ERROR");
+  }
+  if (server.uri() != "/edit") {
     return;
   }
-  String message = "SDCARD Not Detected\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+  HTTPUpload& upload = server.upload();
+  if (upload.status == UPLOAD_FILE_START) {
+    String filename = upload.filename;
+    if (!filename.startsWith("/")) {
+      filename = "/" + filename;
+    }
+    DBG_OUTPUT_PORT.println("handleFileUpload Name: " + filename);
+    uploadFile = FILESYSTEM.open(filename, "w");
+    DBG_OUTPUT_PORT.print("Upload: START, filename: " + filename);
+  } 
+  else if (upload.status == UPLOAD_FILE_WRITE) {
+    if (uploadFile) {
+      uploadFile.write(upload.buf, upload.currentSize);
+    }
+    DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: " + upload.currentSize);
+  } 
+  else if (upload.status == UPLOAD_FILE_END) {
+    if (uploadFile) {
+      uploadFile.close();
+    }
+    DBG_OUTPUT_PORT.print("Upload: END, Size: " + upload.totalSize);
   }
-  server.send(404, "text/plain", message);
-  DBG_OUTPUT_PORT.print(message);
 }
 
+
+/* 
+ * The "Not Found" handler catches all URI not explicitely declared in code
+ * First try to find and return the requested file from the filesystem,
+ * and if it fails, return a 404 page with details
+ */
+void handleNotFound() {
+  if (!fsOK) {
+    return returnFail("FS INIT ERROR");
+  }
+  if (!handleFileRead(server.uri())) {
+    String message = "Error: File not found\n\n";
+    message += "URI: ";
+    message += server.uri();
+    message += "\nMethod: ";
+    message += (server.method() == HTTP_GET) ? "GET" : "POST";
+    message += "\nArguments: ";
+    message += server.args();
+    message += "\n";
+    for (uint8_t i = 0; i < server.args(); i++) {
+      message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+    }
+    DBG_OUTPUT_PORT.print(message);
+    return returnNotFound(message);
+  }
+}
+
+
 void setup(void) {
+  ////////////////////////////////
+  // SERIAL INIT
   DBG_OUTPUT_PORT.begin(115200);
   DBG_OUTPUT_PORT.setDebugOutput(true);
   DBG_OUTPUT_PORT.print("\n");
+
+  ////////////////////////////////
+  // FILESYSTEM INIT
+
+  // SDFS.setConfig(SDFSConfig().setCSPin(chipSelectPin));
+  fsOK = FILESYSTEM.begin();
+  DBG_OUTPUT_PORT.println(fsOK ? "Filesystem initialized." : "Filesystem init failed!");
+
+  {
+    // Debug: dump contents of root folder on console
+    Dir dir = FILESYSTEM.openDir("/");
+    while (dir.next()) DBG_OUTPUT_PORT.println("FS File: " + dir.fileName() + ", size: " + dir.fileSize());
+    DBG_OUTPUT_PORT.printf("\n");
+  }
+
+  ////////////////////////////////
+  // WI-FI INIT
+  DBG_OUTPUT_PORT.printf("Connecting to %s\n", ssid);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  DBG_OUTPUT_PORT.print("Connecting to ");
-  DBG_OUTPUT_PORT.println(ssid);
-
   // Wait for connection
-  uint8_t i = 0;
-  while (WiFi.status() != WL_CONNECTED && i++ < 20) {//wait 10 seconds
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-  }
-  if (i == 21) {
-    DBG_OUTPUT_PORT.print("Could not connect to");
-    DBG_OUTPUT_PORT.println(ssid);
-    while (1) {
-      delay(500);
-    }
-  }
+    DBG_OUTPUT_PORT.print(".");
+  }  
+  DBG_OUTPUT_PORT.println("");
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());
 
+  ////////////////////////////////
+  // MDNS INIT
   if (MDNS.begin(host)) {
     MDNS.addService("http", "tcp", 80);
-    DBG_OUTPUT_PORT.println("MDNS responder started");
-    DBG_OUTPUT_PORT.print("You can now connect to http://");
+    DBG_OUTPUT_PORT.print("Open http://");
     DBG_OUTPUT_PORT.print(host);
-    DBG_OUTPUT_PORT.println(".local");
+    DBG_OUTPUT_PORT.println(".local/edit to open the file manager");
   }
 
+  ////////////////////////////////
+  // WEB SERVER INIT
 
+  // Filesystem status
   server.on("/status",HTTP_GET, handleStatus);
-  server.on("/list",  HTTP_GET, handleList);
-  server.on("/edit",  HTTP_DELETE, handleDelete);
-  server.on("/edit",  HTTP_PUT, handleCreate);
-  server.on("/edit",  HTTP_POST, []() {
+  
+  // List directory
+  server.on("/list",  HTTP_GET, handleFileList);
+  
+  // Load editor
+  server.on("/edit",  HTTP_GET, []() {
+    if (!handleFileRead("/edit/index.htm")) returnNotFound("FileNotFound");
+  });
+  
+  // Create file
+  server.on("/edit",  HTTP_PUT, handleFileCreate);
+  
+  // Delete file
+  server.on("/edit",  HTTP_DELETE, handleFileDelete);
+  
+  // Upload file
+  // - first callback is called after the request has ended with all parsed arguments
+  // - second callback handles file upload at that location
+  server.on("/edit",  HTTP_POST, /*[]() {
     returnOK();
-  }, handleFileUpload);
+  }*/returnOK, handleFileUpload);
+
+  // Default handler for all URIs not defined above
+  // Use it to read files from filesystem
   server.onNotFound(handleNotFound);
 
+  // Start server
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
-
-  // SDFS.setConfig(SDFSConfig().setCSPin(chipSelectPin));
-  if (FILESYSTEM.begin()) {
-    DBG_OUTPUT_PORT.println("SD Card initialized.");
-    hasSD = true;
-  }
 }
+
 
 void loop(void) {
   server.handleClient();
