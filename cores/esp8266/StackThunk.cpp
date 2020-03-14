@@ -26,6 +26,9 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "pgmspace.h"
+#include "debug.h"
 #include "StackThunk.h"
 #include <ets_sys.h>
 
@@ -46,6 +49,11 @@ void stack_thunk_add_ref()
   stack_thunk_refcnt++;
   if (stack_thunk_refcnt == 1) {
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
+    if (!stack_thunk_ptr) {
+        // This is a fatal error, stop the sketch
+        DEBUGV("Unable to allocate BearSSL stack\n");
+        abort();
+    }
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
     stack_thunk_repaint();
