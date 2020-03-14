@@ -195,20 +195,20 @@
         status.innerHTML = "(loading)";
         uploader.appendChild(status);
   
-        function httpPostProcessRequest(){
-          if (xmlHttp.readyState == 4){
-            if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
-            else {
-              tree.refreshPath(path.value);
-              refreshStatus();
-            }
+        function postCallback(){
+          document.body.style.cursor = "default";
+          if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+          else {            
+            tree.refreshPath(path.value);
+            refreshStatus();
           }
         }
         function createPath(p){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = httpPostProcessRequest;
+          xmlHttp.onloadend = postCallback;
           var formData = new FormData();
           formData.append("path", p);
+          document.body.style.cursor = "wait";
           xmlHttp.open("PUT", "/edit");
           xmlHttp.send(formData);
         }
@@ -243,9 +243,10 @@
           if(input.files.length === 0) return;          
           setStatus("Uploading...");
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = httpPostProcessRequest;
+          xmlHttp.onloadend = postCallback;
           var formData = new FormData();
           formData.append("data", input.files[0], path.value);
+          document.body.style.cursor = "wait";
           xmlHttp.open("POST", "/edit");
           xmlHttp.send(formData);
         };     
@@ -269,26 +270,30 @@
           return filename;
         }
       }
+      
+      function statusCallback() {
+        if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+        else {            
+          fsInfo = JSON.parse(xmlHttp.responseText);
+          var statusText = fsInfo.type + " - ";
+          if (fsInfo.isOk) {
+            statusText += "Free space: " + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) 
+                      +  ". Used: " + readableSize(fsInfo.usedBytes) 
+                      +  ". Total: " + readableSize(fsInfo.totalBytes);
+          } else {
+            statusText += "<span style='color:red'>INIT ERROR !</span>";
+          }
+          document.getElementById("status").innerHTML = statusText;
+          if (fsInfo.type != "SPIFFS") {
+            document.getElementById("mkdir").style.display = "inline";
+          }
+        }
+      }
 
       function refreshStatus(){
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function() {
-          if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            fsInfo = JSON.parse(xmlHttp.responseText);
-            var statusText = fsInfo.type + " - ";
-            if (fsInfo.isOk) {
-              statusText += "Free space: " + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) 
-                        +  ". Used: " + readableSize(fsInfo.usedBytes) 
-                        +  ". Total: " + readableSize(fsInfo.totalBytes);
-            } else {
-              statusText += "<span style='color:red'>INIT ERROR !</span>";
-            }
-            document.getElementById("status").innerHTML = statusText;
-            if (fsInfo.type != "SPIFFS") {
-              document.getElementById("mkdir").style.display = "inline";
-            }
-          }           
-        }
+        xmlHttp.onloadend = statusCallback;
+        document.getElementById("status").innerHTML = "(refreshing...)";
         xmlHttp.open("GET", "/status", true);
         xmlHttp.send(null);
       }
@@ -566,7 +571,6 @@
             httpList(treeRoot, "/");
           } else {
             path = path.substring(0, path.lastIndexOf('/'));
-console.log("path=" + path);
             if (document.getElementById(path)) {
               // We have a parent node (LittleFS or SDFS)
               var leaf = document.getElementById(path).parentNode;
@@ -581,41 +585,40 @@ console.log("path=" + path);
           }
         };
   
-        function delCb(path){
+        function deleteCallback(path){
           return function(){
-            if (xmlHttp.readyState == 4){
-              if(xmlHttp.status != 200){
-                alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
-              } else {
-                refreshPath(path);
-              }
-              refreshStatus();
+            document.body.style.cursor = "default";
+            if(xmlHttp.status != 200){
+              alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+            } else {
+              refreshPath(path);
             }
+            refreshStatus();
           }
         }
   
         function httpDelete(filename){
           setStatus("Deleting...");
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = delCb(filename);
+          xmlHttp.onloadend = deleteCallback(filename);
           var formData = new FormData();
           formData.append("path", filename);
+          document.body.style.cursor = "wait";
           xmlHttp.open("DELETE", "/edit");
           xmlHttp.send(formData);
         }
   
-        function getCb(parent, path){
+        function getCallback(parent, path){
           return function(){
-            if (xmlHttp.readyState == 4){
-              //clear loading
-              if(xmlHttp.status == 200) addList(parent, path, JSON.parse(xmlHttp.responseText));
-            }
+            document.body.style.cursor = "default";
+            if(xmlHttp.status == 200) addList(parent, path, JSON.parse(xmlHttp.responseText));
           }
         }
   
         function httpList(parent, path){
           xmlHttp = new XMLHttpRequest(parent, path);
-          xmlHttp.onreadystatechange = getCb(parent, path);
+          xmlHttp.onloadend = getCallback(parent, path);
+          document.body.style.cursor = "wait";
           xmlHttp.open("GET", "/list?dir="+path, true);
           xmlHttp.send(null);
         }
@@ -664,34 +667,34 @@ console.log("path=" + path);
         var editor = ace.edit(element);
   
         //post
-        function httpPostProcessRequest(){
-          if (xmlHttp.readyState == 4){
-            if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
-          }
+        function postCallback(){
+          document.body.style.cursor = "default";
+          if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
         }
         function httpPost(filename, data, type){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = httpPostProcessRequest;
+          xmlHttp.onloadend = postCallback;
           var formData = new FormData();
           formData.append("data", new Blob([data], { type: type }), filename);
+          document.body.style.cursor = "wait";
           xmlHttp.open("POST", "/edit");
           xmlHttp.send(formData);
         }
         //get
-        function httpGetProcessRequest(){
-          if (xmlHttp.readyState == 4){
-            document.getElementById("preview").style.display = "none";
-            document.getElementById("editor").style.display = "block";
-            if(xmlHttp.status == 200) editor.setValue(xmlHttp.responseText);
-            else editor.setValue("");
-            editor.clearSelection();
-          }
+        function getCallback(){
+          document.body.style.cursor = "default";
+          document.getElementById("preview").style.display = "none";
+          document.getElementById("editor").style.display = "block";
+          if(xmlHttp.status == 200) editor.setValue(xmlHttp.responseText);
+          else editor.setValue("");
+          editor.clearSelection();
         }
         function httpGet(theUrl){
-            xmlHttp = new XMLHttpRequest();
-            xmlHttp.onreadystatechange = httpGetProcessRequest;
-            xmlHttp.open("GET", theUrl, true);
-            xmlHttp.send(null);
+          xmlHttp = new XMLHttpRequest();
+          xmlHttp.onloadend = getCallback;
+          document.body.style.cursor = "wait";
+          xmlHttp.open("GET", theUrl, true);
+          xmlHttp.send(null);
         }
   
         if(lang !== "plain") editor.getSession().setMode("ace/mode/"+lang);
@@ -741,8 +744,8 @@ console.log("path=" + path);
         var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) { vars[key] = value; });
         var editor = createEditor("editor", vars.file, vars.lang, vars.theme);
         var tree = createTree("tree", editor);
-        refreshStatus();
         createFileUploader("uploader", tree, editor);
+        refreshStatus();
       };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript" charset="utf-8"></script>
