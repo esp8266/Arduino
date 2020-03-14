@@ -252,11 +252,8 @@
             else if(ext === "jpeg") ext = "jpg";
             filename = filename + "." + ext;
           }
-          if(path.value === "/" || path.value.lastIndexOf("/") === 0){
-            path.value = "/"+filename;
-          } else {
-            path.value = path.value.substring(0, path.value.lastIndexOf("/")+1)+filename;
-          }
+          if (!path.value.startsWith("/")) path.value = "/" + path.value;
+          path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
         }
       }
 
@@ -265,13 +262,13 @@
         xmlHttp.onreadystatechange = function() {
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             var statusObj = JSON.parse(xmlHttp.responseText);
-            var statusTxt = statusObj.fs + ": ";
+            var statusText = statusObj.fs + " - ";
             if (statusObj.isOk) {
-              statusTxt += "Free space: " + readableSize(statusObj.totalBytes - statusObj.usedBytes) 
+              statusText += "Free space: " + readableSize(statusObj.totalBytes - statusObj.usedBytes) 
                         +  ". Used: " + readableSize(statusObj.usedBytes) 
                         +  ". Total: " + readableSize(statusObj.totalBytes);
             } else {
-              statusTxt += "<span style='color:red'>INIT ERROR !</span>";
+              statusText += "<span style='color:red'>INIT ERROR !</span>";
             }
             document.getElementById("status").innerHTML = statusText;
           }           
@@ -529,6 +526,7 @@
             switch(ext){
               case "png":
               case "jpg":
+              case "jpeg":
               case "gif":
               case "ico":
                 return true;
