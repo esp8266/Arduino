@@ -7,36 +7,35 @@
  * - LittleFS.open() second parametsr is mandatory > specified "r" where needed
  * - 'FILE_WRITE' was not declared in this scope > replaced by "w"
  * 
- * Web page improvements:
- * - Tree panel width is now proportional (20%) to see long names on big screens
+ * UI improvements:
+ * - Tree panel width is now proportional (20%) to see long names on big screens 
  * - Added an icon for files, and indented them to the same level as folders
  * - Changed file/folder icon set to use lighter and more neutral ones from https://feathericons.com/ (passed the result through compresspng.com and base64-image.de)
  * - Items are now sorted (folders first, then plain files, each in alphabetic order)
  * - Added file size after each file name
  * - Added FS status information at the top right
- * - Replaced that FS status by operation status when upload/delete is in progress
+ * - Replaced that FS status by operation status when async operations are in progress
  * - Filled filename box in header with the name of the last clicked file
- * - Selecting a file for upload proposes to put it in the same file as the last clicked file
- * - No limit to 8.3 lowercase filenames if not needed
+ * - Selecting a file for upload proposes to put it in the same folder as the last clicked file
+ * - Removed limitation to 8.3 lowercase filenames
+ * - Removed limitation "files must have an extension, folders may not"
  * - Improved refresh of parts of the tree (e.g. upon file delete, refresh subfolder, not root)
  *
  * TODO:
- * - test creation of edit.txt/EDIT.TXT on LittleFS and SPIFFS (should succeed). (correclty fails on SDFS)
- * - Check directory behaviour on SPIFFS (now that we call file.isDirectory()
+ * - test creation of edit.txt/EDIT.TXT on LittleFS (should succeed). (Correclty supported on SPIFFS but not on SDFS)
  * - Support Filenames without extension, Dirnames with extension ?
  * - Cleanup (look for TODO below)
  * - Reload tree (size) and status on Editor Save
  * - Add Editor Save/Discard buttons ?
- * - Dim screen (and http://www.ajaxload.info/ ) when Upload/Delete in progress ?
- * - After delete in subfolder, refresh folder, not full tree (with folders closed)
+ * - Can we query the fatType of the SDFS ?
  * 
  * TEST: (*) = failed vXXX = OK
  * - On SPIFFS:
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload at root
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload in subfolder
  * - with Long Filenames:
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload at root
+ *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload in subfolder
  * 
  * - On LittleFS:
  *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
@@ -51,7 +50,6 @@
  * - with Long Filenames:
  * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
  * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
- * (after PR): reported free space
  */
 
 /*
@@ -91,7 +89,7 @@
   - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line "fileSystemConfig.setCSPin(chipSelectPin);"
   specifying the GPIO the CS pin is connected to
   - index.htm is the default index (works on subfolders as well)
-  - Filesystem limitations apply. For example, SDFS is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename .
+  - Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename .
   SPIFFS and LittleFS also have limitations. Plese see the https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
   - Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character
 
@@ -101,9 +99,9 @@
 
 // Select the FileSystem by uncommenting one of the lines below
 
-// #define USE_SPIFFS
-// #define USE_LITTLEFS
-#define USE_SDFS
+#define USE_SPIFFS
+//#define USE_LITTLEFS
+//#define USE_SDFS
 
 ////////////////////////////////
 
@@ -128,6 +126,7 @@
   const char* fsName = "SDFS";
   FS* fileSystem = &SDFS;
   SDFSConfig fileSystemConfig = SDFSConfig();
+  // fileSystemConfig.setCSPin(chipSelectPin);
 #else 
   #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
@@ -267,10 +266,6 @@ void handleFileList() {
     }
     output += "\",\"name\":\"";
     
-    // original code only had     
-    // output += entry.name();
-    // TODO check that the following works with other FS than SPIFFS
-    // The convention is that files listed at the root don't start with "/"
     if (entry.name()[0] == '/') {
       output += &(entry.name()[1]);
     } 
@@ -337,15 +332,18 @@ void handleFileCreate() {
     return returnFail("FILE EXISTS");
   }
 
-  // TODO what ? create file if it has an extension otherwise create folder ?
-  if (path.indexOf('.') > 0) {
+  if (path.endsWith("/")) {
+    // Create a folder
+    path.remove(path.length() - 1);
+    fileSystem->mkdir(path);
+  } 
+  else {
+    // Create a file
     File file = fileSystem->open(path, "w");
     if (file) {
       file.write((const char *)0);
       file.close();
     }
-  } else {
-    fileSystem->mkdir(path);
   }
   return returnOK();
 }

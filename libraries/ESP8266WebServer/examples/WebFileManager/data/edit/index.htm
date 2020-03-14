@@ -203,31 +203,35 @@
             refreshStatus();
           }
         }
-        function createPath(p){
+        function createPath(path){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onloadend = postCallback;
+          xmlHttp.onload = postCallback;
           var formData = new FormData();
-          formData.append("path", p);
+          formData.append("path", path);
           document.body.style.cursor = "wait";
           xmlHttp.open("PUT", "/edit");
           xmlHttp.send(formData);
         }
         
         mkfile.onclick = function(e){
-          var name = path.value
-          if(name.indexOf(".") === -1) return;
-          createPath(name);
-          editor.loadUrl(name);
+          var name = path.value.trim();
+          if (name === "") alert("A filename must be given");
+          else if (name.endsWith("/")) alert("Filenames cannot end with a '/' character");
+          else {            
+            if (!name.startsWith("/")) name = "/" + name;
+            createPath(name);
+            editor.loadUrl(name);
+          }
         };
         
         mkdir.onclick = function(e){
-          var name = path.value
-          if(name.length < 2) return;
-          if(name.indexOf(".") !== -1){
-            if(name.lastIndexOf("/") === 0) return;
-            name = name.substring(0, name.lastIndexOf("/"));
+          var name = path.value.trim();
+          if (name.isEmpty()) alert("A folder name must be given");
+          else {
+            if (!name.endsWith("/")) name = name + "/";
+            if (!name.startsWith("/")) name = "/" + name;
+            createPath(name);
           }
-          createPath(name);
         };
               
         input.onchange = function(e){ // A file has been selected
@@ -243,7 +247,7 @@
           if(input.files.length === 0) return;          
           setStatus("Uploading...");
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onloadend = postCallback;
+          xmlHttp.onload = postCallback;
           var formData = new FormData();
           formData.append("data", input.files[0], path.value);
           document.body.style.cursor = "wait";
@@ -281,9 +285,9 @@
                       +  ". Used: " + readableSize(fsInfo.usedBytes) 
                       +  ". Total: " + readableSize(fsInfo.totalBytes);
           } else {
-            statusText += "<span style='color:red'>INIT ERROR !</span>";
+            statusText += "<span style='background-color:red;color:white;font-weight:bold'>INIT ERROR !</span>";
           }
-          document.getElementById("status").innerHTML = statusText;
+          setStatus(statusText);
           if (fsInfo.type != "SPIFFS") {
             document.getElementById("mkdir").style.display = "inline";
           }
@@ -292,8 +296,25 @@
 
       function refreshStatus(){
         var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onloadend = statusCallback;
-        document.getElementById("status").innerHTML = "(refreshing...)";
+        xmlHttp.onload = function() {
+          if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+          else {            
+            fsInfo = JSON.parse(xmlHttp.responseText);
+            var statusText = fsInfo.type + " - ";
+            if (fsInfo.isOk) {
+              statusText += "Free space: " + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) 
+                        +  ". Used: " + readableSize(fsInfo.usedBytes) 
+                        +  ". Total: " + readableSize(fsInfo.totalBytes);
+            } else {
+              statusText += "<span style='background-color:red;color:white;font-weight:bold'>INIT ERROR !</span>";
+            }
+            setStatus(statusText);
+            if (fsInfo.type != "SPIFFS") {
+              document.getElementById("mkdir").style.display = "inline";
+            }
+          }
+        };
+        setStatus("(refreshing...)");
         xmlHttp.open("GET", "/status", true);
         xmlHttp.send(null);
       }
@@ -449,9 +470,9 @@
   
         function createTreeLeaf(path, name, size){
           var leaf = document.createElement("li");
-          leaf.id = ((path == "/")?"":path)+"/"+name; // Removed toLowerCase()
+          leaf.id = ((path == "/")?"":path)+"/"+name;
           var label = document.createElement("span");
-          label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>"; // Removed toLowerCase()
+          label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>";
           leaf.appendChild(label);
           leaf.onclick = function(e){
             if(isTextFile(leaf.id)){
@@ -474,12 +495,12 @@
           var leaf = document.createElement("li");
           var check = document.createElement("input");
           check.type = "checkbox";
-          check.id = ((path == "/")?"":path)+"/"+name; // Removed toLowerCase()
+          check.id = ((path == "/")?"":path)+"/"+name;
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
           var label = document.createElement("label");
           label.for = check.id;
-          label.textContent = name; // Removed toLowerCase()
+          label.textContent = name;
           leaf.appendChild(label);
           check.onchange = function(e){
             if(check.checked){
@@ -532,7 +553,7 @@
         function isTextFile(path){
           var ext = /(?:\.([^.]+))?$/.exec(path)[1];
           if(typeof ext !== undefined){
-            switch(ext){
+            switch(ext.toLowerCase()){
               case "txt":
               case "htm":
               case "html":
@@ -552,7 +573,7 @@
         function isImageFile(path){
           var ext = /(?:\.([^.]+))?$/.exec(path)[1];
           if(typeof ext !== undefined){
-            switch(ext){
+            switch(ext.toLowerCase()){
               case "png":
               case "jpg":
               case "jpeg":
@@ -600,7 +621,7 @@
         function httpDelete(filename){
           setStatus("Deleting...");
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onloadend = deleteCallback(filename);
+          xmlHttp.onload = deleteCallback(filename);
           var formData = new FormData();
           formData.append("path", filename);
           document.body.style.cursor = "wait";
@@ -617,7 +638,7 @@
   
         function httpList(parent, path){
           xmlHttp = new XMLHttpRequest(parent, path);
-          xmlHttp.onloadend = getCallback(parent, path);
+          xmlHttp.onload = getCallback(parent, path);
           document.body.style.cursor = "wait";
           xmlHttp.open("GET", "/list?dir="+path, true);
           xmlHttp.send(null);
@@ -665,7 +686,7 @@
   
         var xmlHttp = null;
         var editor = ace.edit(element);
-  
+        
         //post
         function postCallback(){
           document.body.style.cursor = "default";
@@ -673,7 +694,7 @@
         }
         function httpPost(filename, data, type){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onloadend = postCallback;
+          xmlHttp.onload = postCallback;
           var formData = new FormData();
           formData.append("data", new Blob([data], { type: type }), filename);
           document.body.style.cursor = "wait";
@@ -691,7 +712,7 @@
         }
         function httpGet(theUrl){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onloadend = getCallback;
+          xmlHttp.onload = getCallback;
           document.body.style.cursor = "wait";
           xmlHttp.open("GET", theUrl, true);
           xmlHttp.send(null);
