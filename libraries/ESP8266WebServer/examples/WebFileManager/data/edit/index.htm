@@ -163,6 +163,8 @@
       }
     </style>
     <script>
+      var fsInfo;
+      
       function createFileUploader(element, tree, editor){       
         var xmlHttp;
         var input = document.createElement("input");
@@ -181,6 +183,8 @@
         upload.innerHTML = "Upload";
         uploader.appendChild(upload);
         var mkdir = document.createElement("button");
+        mkdir.id = "mkdir";
+        mkdir.style.display = "none";
         mkdir.innerHTML = "MkDir";
         uploader.appendChild(mkdir);
         var mkfile = document.createElement("button");
@@ -225,11 +229,18 @@
           }
           createPath(name);
         };
-        
-        upload.onclick = function(e){
-          if(input.files.length === 0){
-            return;
+              
+        input.onchange = function(e){ // A file has been selected
+          if(input.files.length === 0) return;          
+          var filename = input.files[0].name;
+          if (mustFormat83()) {
+            filename = to83(filename);
           }
+          if (!path.value.startsWith("/")) path.value = "/" + path.value;
+          path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
+        }
+        upload.onclick = function(e){
+          if(input.files.length === 0) return;          
           setStatus("Uploading...");
           xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = httpPostProcessRequest;
@@ -237,10 +248,13 @@
           formData.append("data", input.files[0], path.value);
           xmlHttp.open("POST", "/edit");
           xmlHttp.send(formData);
-        };
-        input.onchange = function(e){
-          if(input.files.length === 0) return;
-          var filename = input.files[0].name;
+        };     
+
+        function mustFormat83() {
+          return false; // TODO: if needed, test fsInfo.type
+        }
+
+        function to83(filename) {
           var ext = /(?:\.([^.]+))?$/.exec(filename)[1];
           var name = /(.*)\.[^.]+$/.exec(filename)[1];
           if(typeof name !== undefined){
@@ -252,8 +266,7 @@
             else if(ext === "jpeg") ext = "jpg";
             filename = filename + "." + ext;
           }
-          if (!path.value.startsWith("/")) path.value = "/" + path.value;
-          path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
+          return filename;
         }
       }
 
@@ -261,16 +274,19 @@
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function() {
           if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            var statusObj = JSON.parse(xmlHttp.responseText);
-            var statusText = statusObj.fs + " - ";
-            if (statusObj.isOk) {
-              statusText += "Free space: " + readableSize(statusObj.totalBytes - statusObj.usedBytes) 
-                        +  ". Used: " + readableSize(statusObj.usedBytes) 
-                        +  ". Total: " + readableSize(statusObj.totalBytes);
+            fsInfo = JSON.parse(xmlHttp.responseText);
+            var statusText = fsInfo.type + " - ";
+            if (fsInfo.isOk) {
+              statusText += "Free space: " + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) 
+                        +  ". Used: " + readableSize(fsInfo.usedBytes) 
+                        +  ". Total: " + readableSize(fsInfo.totalBytes);
             } else {
               statusText += "<span style='color:red'>INIT ERROR !</span>";
             }
             document.getElementById("status").innerHTML = statusText;
+            if (fsInfo.type != "SPIFFS") {
+              document.getElementById("mkdir").style.display = "inline";
+            }
           }           
         }
         xmlHttp.open("GET", "/status", true);
@@ -306,7 +322,14 @@
           document.getElementById("upload-path").value = path;
           document.getElementById("editor").style.display = "none";
           preview.style.display = "block";
-          preview.innerHTML = '<img src="'+path+'" style="max-width:100%; max-height:100%; margin:auto; display:block;" />';
+          preview.innerHTML = "<img src='"+path+"' style='max-width:100%; max-height:100%; margin:auto; display:block;' />";
+        }
+        
+        function clearMainPanel(path) {
+          document.getElementById("upload-path").value = path;
+          document.getElementById("editor").style.display = "none";
+          preview.style.display = "block";
+          preview.innerHTML = "(format not supported for viewing/editing)";
         }
   
         function fillFolderMenu(el, path){
@@ -354,10 +377,10 @@
             }
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
           };
-          var delFile = document.createElement("li");
-          list.appendChild(delFile);
-          delFile.innerHTML = "<span>Delete</span>";
-          delFile.onclick = function(e){
+          var delFolder = document.createElement("li");
+          list.appendChild(delFolder);
+          delFolder.innerHTML = "<span>Delete</span>";
+          delFolder.onclick = function(e){
             httpDelete(path);
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
           };
@@ -377,7 +400,6 @@
           } else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
-              document.getElementById("upload-path").value = path;
               loadPreview(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
@@ -422,15 +444,17 @@
   
         function createTreeLeaf(path, name, size){
           var leaf = document.createElement("li");
-          leaf.id = (((path == "/")?"":path)+"/"+name).toLowerCase();
+          leaf.id = ((path == "/")?"":path)+"/"+name; // Removed toLowerCase()
           var label = document.createElement("span");
-          label.innerHTML = name.toLowerCase() + " <i>(" + readableSize(size) + ")</i>";
+          label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>"; // Removed toLowerCase()
           leaf.appendChild(label);
           leaf.onclick = function(e){
             if(isTextFile(leaf.id)){
               editor.loadUrl(leaf.id);
             } else if(isImageFile(leaf.id)){
               loadPreview(leaf.id);
+            } else {
+              clearMainPanel(leaf.id);
             }
           };
           leaf.oncontextmenu = function(e){
@@ -445,12 +469,12 @@
           var leaf = document.createElement("li");
           var check = document.createElement("input");
           check.type = "checkbox";
-          check.id = (((path == "/")?"":path)+"/"+name).toLowerCase();
+          check.id = ((path == "/")?"":path)+"/"+name; // Removed toLowerCase()
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
           var label = document.createElement("label");
           label.for = check.id;
-          label.textContent = name.toLowerCase();
+          label.textContent = name; // Removed toLowerCase()
           leaf.appendChild(label);
           check.onchange = function(e){
             if(check.checked){
@@ -542,9 +566,18 @@
             httpList(treeRoot, "/");
           } else {
             path = path.substring(0, path.lastIndexOf('/'));
-            var leaf = document.getElementById(path).parentNode;
-            if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-            httpList(leaf, path);
+console.log("path=" + path);
+            if (document.getElementById(path)) {
+              // We have a parent node (LittleFS or SDFS)
+              var leaf = document.getElementById(path).parentNode;
+              if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
+              httpList(leaf, path);
+            }
+            else {
+              // No parent node (SPIFFS), refresh full tree
+              treeRoot.removeChild(treeRoot.childNodes[0]);
+              httpList(treeRoot, "/");
+            }
           }
         };
   
@@ -554,16 +587,7 @@
               if(xmlHttp.status != 200){
                 alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
               } else {
-                if(path.lastIndexOf('/') < 1){
-                  path = '/';
-                  treeRoot.removeChild(treeRoot.childNodes[0]);
-                  httpList(treeRoot, "/");
-                } else {
-                  path = path.substring(0, path.lastIndexOf('/'));
-                  var leaf = document.getElementById(path).parentNode;
-                  if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-                  httpList(leaf, path);
-                }
+                refreshPath(path);
               }
               refreshStatus();
             }
