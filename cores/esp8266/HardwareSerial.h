@@ -28,6 +28,7 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
+#include <../include/time.h> // See issue #6714
 #include "Stream.h"
 #include "uart.h"
 
@@ -72,70 +73,130 @@ public:
 
     void begin(unsigned long baud)
     {
-        begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
+        begin(baud, SERIAL_8N1, SERIAL_FULL, 1, false);
     }
     void begin(unsigned long baud, SerialConfig config)
     {
-        begin(baud, config, SERIAL_FULL, 1);
+        begin(baud, config, SERIAL_FULL, 1, false);
     }
     void begin(unsigned long baud, SerialConfig config, SerialMode mode)
     {
-        begin(baud, config, mode, 1);
+        begin(baud, config, mode, 1, false);
     }
 
-    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
+    {
+        begin(baud, config, mode, tx_pin, false);
+    }
+
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin, bool invert);
 
     void end();
 
+    void updateBaudRate(unsigned long baud);
+
     size_t setRxBufferSize(size_t size);
+    size_t getRxBufferSize()
+    {
+        return uart_get_rx_buffer_size(_uart);
+    }
 
     void swap()
     {
         swap(1);
     }
-    void swap(uint8_t tx_pin);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+    void swap(uint8_t tx_pin)    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+    {
+        uart_swap(_uart, tx_pin);
+    }
 
     /*
      * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
      * Note: UART 1 can't be used if GPIO2 is used with UART 0!
      */
-    void set_tx(uint8_t tx_pin);
+    void set_tx(uint8_t tx_pin)
+    {
+        uart_set_tx(_uart, tx_pin);
+    }
 
     /*
      * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
      * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
      */
-    void pins(uint8_t tx, uint8_t rx);
+    void pins(uint8_t tx, uint8_t rx)
+    {
+        uart_set_pins(_uart, tx, rx);
+    }
 
     int available(void) override;
-    int peek(void) override;
-    int read(void) override;
-    int availableForWrite(void);
-    void flush(void) override;
-    size_t write(uint8_t) override;
-    inline size_t write(unsigned long n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(long n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(unsigned int n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(int n)
-    {
-        return write((uint8_t) n);
-    }
-    using Print::write; // pull in write(str) and write(buf, size) from Print
-    operator bool() const;
 
+    int peek(void) override
+    {
+        // return -1 when data is unvailable (arduino api)
+        return uart_peek_char(_uart);
+    }
+    int read(void) override
+    {
+        // return -1 when data is unvailable (arduino api)
+        return uart_read_char(_uart);
+    }
+    // ::read(buffer, size): same as readBytes without timeout
+    size_t read(char* buffer, size_t size)
+    {
+        return uart_read(_uart, buffer, size);
+    }
+    size_t readBytes(char* buffer, size_t size) override;
+    size_t readBytes(uint8_t* buffer, size_t size) override
+    {
+        return readBytes((char*)buffer, size);
+    }
+    int availableForWrite(void)
+    {
+        return static_cast<int>(uart_tx_free(_uart));
+    }
+    void flush(void) override;
+    size_t write(uint8_t c) override
+    {
+        return uart_write_char(_uart, c);
+    }
+    size_t write(const uint8_t *buffer, size_t size) override
+    {
+        return uart_write(_uart, (const char*)buffer, size);
+    }
+    using Print::write; // Import other write() methods to support things like write(0) properly
+    operator bool() const
+    {
+        return _uart != 0;
+    }
     void setDebugOutput(bool);
-    bool isTxEnabled(void);
-    bool isRxEnabled(void);
-    int  baudRate(void);
+    bool isTxEnabled(void)
+    {
+        return uart_tx_enabled(_uart);
+    }
+    bool isRxEnabled(void)
+    {
+        return uart_rx_enabled(_uart);
+    }
+    int baudRate(void)
+    {
+        return uart_get_baudrate(_uart);
+    }
+
+    bool hasOverrun(void)
+    {
+        return uart_has_overrun(_uart);
+    }
+
+    bool hasRxError(void)
+    {
+        return uart_has_rx_error(_uart);
+    }
+
+    void startDetectBaudrate();
+
+    unsigned long testBaudrate();
+
+    unsigned long detectBaudrate(time_t timeoutMillis);
 
 protected:
     int _uart_nr;

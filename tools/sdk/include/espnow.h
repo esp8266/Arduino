@@ -25,6 +25,11 @@
 #ifndef __ESPNOW_H__
 #define __ESPNOW_H__
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum esp_now_role {
 	ESP_NOW_ROLE_IDLE = 0,
 	ESP_NOW_ROLE_CONTROLLER,
@@ -69,5 +74,9 @@ int esp_now_is_peer_exist(u8 *mac_addr);
 int esp_now_get_cnt_info(u8 *all_cnt, u8 *encrypt_cnt);
 
 int esp_now_set_kok(u8 *key, u8 len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

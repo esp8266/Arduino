@@ -3,3 +3,4 @@
 sphinx
 sphinx-rtd-theme
 breathe
+nbsphinx

@@ -33,9 +33,24 @@
 
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size) {
+
+#ifdef DEBUG_ESP_CORE
+    static char not_the_best_way [] PROGMEM STORE_ATTR = "Print::write(data,len) should be overridden for better efficiency\r\n";
+    static bool once = false;
+    if (!once) {
+        once = true;
+        os_printf_plus(not_the_best_way);
+    }
+#endif
+
     size_t n = 0;
-    while(size--) {
-        n += write(*buffer++);
+    while (size--) {
+        size_t ret = write(pgm_read_byte(buffer++));
+        if (ret == 0) {
+            // Write of last byte didn't complete, abort additional processing
+            break;
+        }
+        n += ret;
     }
     return n;
 }
@@ -89,11 +104,19 @@ size_t Print::printf_P(PGM_P format, ...) {
 size_t Print::print(const __FlashStringHelper *ifsh) {
     PGM_P p = reinterpret_cast<PGM_P>(ifsh);
 
+    char buff[128] __attribute__ ((aligned(4)));
+    auto len = strlen_P(p);
     size_t n = 0;
-    while (1) {
-        uint8_t c = pgm_read_byte(p++);
-        if (c == 0) break;
-        n += write(c);
+    while (n < len) {
+        int to_write = std::min(sizeof(buff), len - n);
+        memcpy_P(buff, p, to_write);
+        auto written = write(buff, to_write);
+        n += written;
+        p += written;
+        if (!written) {
+            // Some error, write() should write at least 1 byte before returning
+            break;
+        }
     }
     return n;
 }
@@ -245,47 +268,6 @@ size_t Print::printNumber(unsigned long n, uint8_t base) {
 }
 
 size_t Print::printFloat(double number, uint8_t digits) {
-    size_t n = 0;
-
-    if(isnan(number))
-        return print("nan");
-    if(isinf(number))
-        return print("inf");
-    if(number > 4294967040.0)
-        return print("ovf");  // constant determined empirically
-    if(number < -4294967040.0)
-        return print("ovf");  // constant determined empirically
-
-    // Handle negative numbers
-    if(number < 0.0) {
-        n += print('-');
-        number = -number;
-    }
-
-    // Round correctly so that print(1.999, 2) prints as "2.00"
-    double rounding = 0.5;
-    for(uint8_t i = 0; i < digits; ++i)
-        rounding /= 10.0;
-
-    number += rounding;
-
-    // Extract the integer part of the number and print it
-    unsigned long int_part = (unsigned long) number;
-    double remainder = number - (double) int_part;
-    n += print(int_part);
-
-    // Print the decimal point, but only if there are digits beyond
-    if(digits > 0) {
-        n += print(".");
-    }
-
-    // Extract digits from the remainder one at a time
-    while(digits-- > 0) {
-        remainder *= 10.0;
-        int toPrint = int(remainder);
-        n += print(toPrint);
-        remainder -= toPrint;
-    }
-
-    return n;
+    char buf[40];
+    return write(dtostrf(number, 0, digits, buf));
 }

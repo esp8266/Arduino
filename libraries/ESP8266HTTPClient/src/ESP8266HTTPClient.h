@@ -20,23 +20,29 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
+ * Modified by Jeroen Döll, June 2018
  */
 
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
+#ifndef HTTPCLIENT_1_1_COMPATIBLE
+#define HTTPCLIENT_1_1_COMPATIBLE 1
+#endif
+
 #include <memory>
 #include <Arduino.h>
+
 #include <WiFiClient.h>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_HTTPCLIENT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_HTTPCLIENT(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ## __VA_ARGS__ )
 #endif
 #endif
 
 #ifndef DEBUG_HTTPCLIENT
-#define DEBUG_HTTPCLIENT(...)
+#define DEBUG_HTTPCLIENT(...) do { (void)0; } while (0)
 #endif
 
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
@@ -124,8 +130,12 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+#if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
+#endif
+
+class StreamString;
 
 class HTTPClient
 {
@@ -133,12 +143,26 @@ public:
     HTTPClient();
     ~HTTPClient();
 
-    bool begin(String url);
-    bool begin(String url, String httpsFingerprint);
-    bool begin(String host, uint16_t port, String uri = "/");
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+/*
+ * Since both begin() functions take a reference to client as a parameter, you need to 
+ * ensure the client object lives the entire time of the HTTPClient
+ */
+    bool begin(WiFiClient &client, const String& url);
+    bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
+
+#if HTTPCLIENT_1_1_COMPATIBLE
+    // Plain HTTP connection, unencrypted
+    bool begin(String url)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
+    // Use axTLS for secure HTTPS connection
+    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
+    // Use BearSSL for secure HTTPS connection
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+#endif
 
     void end(void);
 
@@ -149,20 +173,22 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
-
+    void setFollowRedirects(bool follow);
+    void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
+    bool setURL(const String& url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
     /// request handling
     int GET();
-    int POST(uint8_t * payload, size_t size);
-    int POST(String payload);
-    int PUT(uint8_t * payload, size_t size);
-    int PUT(String payload);
-    int PATCH(uint8_t * payload, size_t size);
-    int PATCH(String payload);
-    int sendRequest(const char * type, String payload);
-    int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-    int sendRequest(const char * type, Stream * stream, size_t size = 0);
+    int POST(const uint8_t* payload, size_t size);
+    int POST(const String& payload);
+    int PUT(const uint8_t* payload, size_t size);
+    int PUT(const String& payload);
+    int PATCH(const uint8_t* payload, size_t size);
+    int PATCH(const String& payload);
+    int sendRequest(const char* type, const String& payload);
+    int sendRequest(const char* type, const uint8_t* payload = NULL, size_t size = 0);
+    int sendRequest(const char* type, Stream * stream, size_t size = 0);
 
     void addHeader(const String& name, const String& value, bool first = false, bool replace = true);
 
@@ -176,12 +202,12 @@ public:
 
 
     int getSize(void);
+    const String& getLocation(void); // Location header from redirect if 3XX
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
     int writeToStream(Stream* stream);
-    String getString(void);
-
+    const String& getString(void);
     static String errorToString(int error);
 
 protected:
@@ -190,7 +216,8 @@ protected:
         String value;
     };
 
-    bool beginInternal(String url, const char* expectedProtocol);
+    bool beginInternal(const String& url, const char* expectedProtocol);
+    void disconnect(bool preserveClient = false);
     void clear();
     int returnError(int error);
     bool connect(void);
@@ -199,20 +226,23 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
+#if HTTPCLIENT_1_1_COMPATIBLE
     TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcp;
+    std::unique_ptr<WiFiClient> _tcpDeprecated;
+#endif
+    WiFiClient* _client;
 
     /// request handling
     String _host;
     uint16_t _port = 0;
-    bool _reuse = false;
+    bool _reuse = true;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
     bool _useHTTP10 = false;
 
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent = "ESP8266HTTPClient";
+    String _userAgent;
     String _base64Authorization;
 
     /// Response handling
@@ -222,7 +252,12 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
+    bool _followRedirects = false;
+    uint16_t _redirectCount = 0;
+    uint16_t _redirectLimit = 10;
+    String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    std::unique_ptr<StreamString> _payload;
 };
 
 

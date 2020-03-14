@@ -25,6 +25,10 @@
 #ifndef _GPIO_H_
 #define _GPIO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define GPIO_PIN_ADDR(i) (GPIO_PIN0_ADDRESS + i*4)
 
 #define GPIO_ID_IS_PIN_REGISTER(reg_id) \
@@ -115,5 +119,9 @@ void gpio_pin_wakeup_enable(uint32 i, GPIO_INT_TYPE intr_state);
 void gpio_pin_wakeup_disable();
 
 void gpio_pin_intr_state_set(uint32 i, GPIO_INT_TYPE intr_state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _GPIO_H_

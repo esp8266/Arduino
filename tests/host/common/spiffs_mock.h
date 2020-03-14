@@ -20,19 +20,26 @@
 #include <stddef.h>
 #include <vector>
 #include <FS.h>
+#include "flash_hal_mock.h"
+
+#define DEFAULT_SPIFFS_FILE_NAME "spiffs.bin"
 
 class SpiffsMock {
 public:
-    SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page);
+    SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~SpiffsMock();
     
 protected:
+    void load ();
+    void save ();
+
     std::vector<uint8_t> m_fs;
+    String m_storage;
+    bool m_overwrite;
 };
 
-#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b)
+#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
 #define SPIFFS_MOCK_RESET() spiffs_mock.reset()
-
 
 #endif /* spiffs_mock_hpp */

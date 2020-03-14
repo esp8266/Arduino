@@ -1,8 +1,8 @@
-/* 
+/*
  debug.cpp - debug helper functions
  Copyright (c) 2015 Markus Sattler. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -27,11 +27,10 @@ void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     for(uint32_t i = 0; i < len; i++) {
         if(i % cols == 0) {
             os_printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
-        	yield();
+            yield();
         }
         os_printf("%02X ", *src);
         src++;
     }
     os_printf("\n");
 }
-

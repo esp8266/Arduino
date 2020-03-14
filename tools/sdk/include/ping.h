@@ -25,6 +25,9 @@
 #ifndef __PING_H__
 #define __PING_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef void (* ping_recv_function)(void* arg, void *pdata);
 typedef void (* ping_sent_function)(void* arg, void *pdata);
@@ -52,5 +55,9 @@ struct ping_resp{
 bool ping_start(struct ping_option *ping_opt);
 bool ping_regist_recv(struct ping_option *ping_opt, ping_recv_function ping_recv);
 bool ping_regist_sent(struct ping_option *ping_opt, ping_sent_function ping_sent);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PING_H__ */

@@ -1,248 +1,381 @@
 {
-  "packages": [
-    {
-      "name": "esp8266",
-      "maintainer": "ESP8266 Community",
-      "websiteURL": "https://github.com/esp8266/Arduino",
-      "email": "ivan@esp8266.com",
-      "help": {
-        "online": "http://esp8266.com/arduino"
-      },
-      "platforms": [
-        {
-          "name": "esp8266",
-          "architecture": "esp8266",
-          "version": "",
-          "category": "ESP8266",
-          "url": "",
-          "archiveFileName": "",
-          "help": {
-            "online": ""
-          },
-          "boards": [
+   "packages": [
+      {
+         "name": "esp8266",
+         "maintainer": "ESP8266 Community",
+         "websiteURL": "https://github.com/esp8266/Arduino",
+         "email": "ivan@esp8266.com",
+         "help": {
+            "online": "https://esp8266.com/arduino"
+         },
+         "platforms": [
             {
-              "name": "Generic ESP8266 Module"
-            },
-            {
-              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
-            },
-            {
-              "name": "NodeMCU 0.9 (ESP-12 Module)"
-            },
-            {
-              "name": "NodeMCU 1.0 (ESP-12E Module)"
-            },
-            {
-              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
-            },
-            {
-              "name": "ESPresso Lite 1.0"
-            },
-            {
-              "name": "ESPresso Lite 2.0"
-            },
-            {
-              "name": "Phoenix 1.0"
-            },
-            {
-              "name": "Phoenix 2.0"
-            },                        
-            {
-              "name": "SparkFun Thing"
-            },
-            {
-              "name": "SweetPea ESP-210"
-            },
-            {
-              "name": "WeMos D1"
-            },
-            {
-              "name": "WeMos D1 mini"
-            },
-            {
-              "name": "ESPino (ESP-12 Module)"
-            },
-            {
-              "name": "ESPino (WROOM-02 Module)"
-            },
-            {
-              "name": "WifInfo"
-            },
-            {
-              "name": "ESPDuino"
-            },
-            {
-              "name": "4D Systems gen4 IoD Range"
-            },
-            {
-              "name": "DigiStump Oak"
+               "category": "ESP8266",
+               "name": "esp8266",
+               "url": "",
+               "version": "",
+               "architecture": "esp8266",
+               "archiveFileName": "",
+               "boards": [
+                  {
+                     "name": "Generic ESP8266 Module"
+                  },
+                  {
+                     "name": "Generic ESP8285 Module"
+                  },
+                  {
+                     "name": "ESPDuino (ESP-13 Module)"
+                  },
+                  {
+                     "name": "Adafruit Feather HUZZAH ESP8266"
+                  },
+                  {
+                     "name": "Invent One"
+                  },
+                  {
+                     "name": "XinaBox CW01"
+                  },
+                  {
+                     "name": "ESPresso Lite 1.0"
+                  },
+                  {
+                     "name": "ESPresso Lite 2.0"
+                  },
+                  {
+                     "name": "Phoenix 1.0"
+                  },
+                  {
+                     "name": "Phoenix 2.0"
+                  },
+                  {
+                     "name": "NodeMCU 0.9 (ESP-12 Module)"
+                  },
+                  {
+                     "name": "NodeMCU 1.0 (ESP-12E Module)"
+                  },
+                  {
+                     "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+                  },
+                  {
+                     "name": "SparkFun ESP8266 Thing"
+                  },
+                  {
+                     "name": "SparkFun ESP8266 Thing Dev"
+                  },
+                  {
+                     "name": "SparkFun Blynk Board"
+                  },
+                  {
+                     "name": "SweetPea ESP-210"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 R2 & mini"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 mini Pro"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 mini Lite"
+                  },
+                  {
+                     "name": "WeMos D1 R1"
+                  },
+                  {
+                     "name": "ESPino (ESP-12 Module)"
+                  },
+                  {
+                     "name": "ThaiEasyElec's ESPino"
+                  },
+                  {
+                     "name": "WifInfo"
+                  },
+                  {
+                     "name": "Arduino"
+                  },
+                  {
+                     "name": "4D Systems gen4 IoD Range"
+                  },
+                  {
+                     "name": "Digistump Oak"
+                  },
+                  {
+                     "name": "WiFiduino"
+                  },
+                  {
+                     "name": "Amperka WiFi Slot"
+                  },
+                  {
+                     "name": "Seeed Wio Link"
+                  },
+                  {
+                     "name": "ESPectro Core"
+                  },
+                  {
+                     "name": "Schirmilabs Eduino WiFi"
+                  },
+                  {
+                     "name": "ITEAD Sonoff"
+                  },
+                  {
+                     "name": "DOIT ESP-Mx DevKit (ESP8285)"
+                  }
+               ],
+               "toolsDependencies": [
+                  {
+                     "packager": "esp8266",
+                     "version": "2.5.0-4-b40a506",
+                     "name": "xtensa-lx106-elf-gcc"
+                  },
+                  {
+                     "packager": "esp8266",
+                     "version": "2.5.0-4-b40a506",
+                     "name": "mkspiffs"
+                  },
+                  {
+                     "packager": "esp8266",
+                     "version": "2.5.0-4-fe5bb56",
+                     "name": "mklittlefs"
+                  },
+                  {
+                     "packager": "esp8266",
+                     "version": "3.7.2-post1",
+                     "name": "python3"
+                  }
+               ],
+               "help": {
+                  "online": ""
+               }
             }
-          ],
-          "toolsDependencies": [
+         ],
+         "tools": [
             {
-              "packager": "esp8266",
-              "name": "esptool",
-              "version": "0.4.12"
+               "version": "3.7.2-post1",
+               "name": "python3",
+               "systems": [
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip",
+                     "archiveFileName": "python3-3.7.2.post1-embed-win32v2a.zip",
+                     "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
+                     "size": "6428926"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-3.7.2.post1-embed-win32v2a.zip",
+                     "archiveFileName": "python3-3.7.2.post1-embed-win32va2.zip",
+                     "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
+                     "size": "6428926"
+                  },
+                  {
+                     "host": "aarch64-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+                     "archiveFileName": "python3-via-env.tar.gz",
+                     "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+                     "size": "292"
+                  },
+                  {
+                     "host": "arm-linux-gnueabihf",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+                     "archiveFileName": "python3-via-env.tar.gz",
+                     "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+                     "size": "292"
+                  },
+                  {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+                     "archiveFileName": "python3-via-env.tar.gz",
+                     "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+                     "size": "292"
+                  },
+                  {
+                     "host": "x86_64-apple-darwin",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+                     "archiveFileName": "python3-via-env.tar.gz",
+                     "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+                     "size": "292"
+                  },
+                  {
+                     "host": "x86_64-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
+                     "archiveFileName": "python3-via-env.tar.gz",
+                     "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
+                     "size": "292"
+                  }
+               ]
             },
             {
-              "packager": "esp8266",
-              "name": "xtensa-lx106-elf-gcc",
-              "version": "1.20.0-26-gb404fb9-2"
+               "version": "2.5.0-4-b40a506",
+               "name": "xtensa-lx106-elf-gcc",
+               "systems": [
+                  {
+                     "host": "aarch64-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/aarch64-linux-gnu.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "archiveFileName": "aarch64-linux-gnu.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "checksum": "SHA-256:88c5e9a813bd01c97fe2a07a7280e0685cf18a937ad3ea756d33f8bfbbcbfec3",
+                     "size": "40983153"
+                  },
+                  {
+                     "host": "arm-linux-gnueabihf",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/arm-linux-gnueabihf.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "archiveFileName": "arm-linux-gnueabihf.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "checksum": "SHA-256:244d958e2532e5e1195aa6c8bb38e6fcf1601d88b67631a371d93c818a5a5b65",
+                     "size": "37027468"
+                  },
+                  {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-linux-gnu.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "checksum": "SHA-256:7c84fa929231d2467060b82ba51599cfb227dea1ac58964c74d46800ac33ba47",
+                     "size": "42926131"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-w64-mingw32.xtensa-lx106-elf-b40a506.1563313032.zip",
+                     "archiveFileName": "i686-w64-mingw32.xtensa-lx106-elf-b40a506.1563313032.zip",
+                     "checksum": "SHA-256:694680c2215a65364748ca876c701479580c017757cd8ed6c3df0d48c2f7bd79",
+                     "size": "44955630"
+                  },
+                  {
+                     "host": "x86_64-apple-darwin",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-apple-darwin14.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "archiveFileName": "x86_64-apple-darwin14.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "checksum": "SHA-256:ddf7a7ea4d53469918671ea662cf529dae5b255f06054db17621b34c71710641",
+                     "size": "44393288"
+                  },
+                  {
+                     "host": "x86_64-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-linux-gnu.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-b40a506.1563313032.tar.gz",
+                     "checksum": "SHA-256:90e04da49be288f36097d231e2f46ac46204a7640507011358f8f72c04700080",
+                     "size": "43790957"
+                  },
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-w64-mingw32.xtensa-lx106-elf-b40a506.1563313032.zip",
+                     "archiveFileName": "x86_64-w64-mingw32.xtensa-lx106-elf-b40a506.1563313032.zip",
+                     "checksum": "SHA-256:01c31cd521b058e0805b9d1f3728798a42b1a217a7a34debcda3fcba23414b0e",
+                     "size": "48656678"
+                  }
+               ]
             },
             {
-              "packager": "esp8266",
-              "name": "mkspiffs",
-              "version": "0.2.0"
+               "version": "2.5.0-4-b40a506",
+               "name": "mkspiffs",
+               "systems": [
+                  {
+                     "host": "aarch64-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/aarch64-linux-gnu.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "archiveFileName": "aarch64-linux-gnu.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "checksum": "SHA-256:49cc1938d5df2bec3eec0b3bf2c84ab887c379b04973a67705c80cf1dec523b3",
+                     "size": "51017"
+                  },
+                  {
+                     "host": "arm-linux-gnueabihf",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/arm-linux-gnueabihf.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "archiveFileName": "arm-linux-gnueabihf.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "checksum": "SHA-256:084518fe5452bc2a33c346e3f0825a7c42e36bdb41ee3320f767a248452813be",
+                     "size": "44050"
+                  },
+                  {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-linux-gnu.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "checksum": "SHA-256:d121a44416db8c9772372978f5accd13fe5a926fd17faf55a8dce23744dfc88c",
+                     "size": "54278"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-w64-mingw32.mkspiffs-7fefeac.1563313032.zip",
+                     "archiveFileName": "i686-w64-mingw32.mkspiffs-7fefeac.1563313032.zip",
+                     "checksum": "SHA-256:3e0fd9212027cba06e362ae6921f48d252834996d81e1ade41d5b5c54735837a",
+                     "size": "337874"
+                  },
+                  {
+                     "host": "x86_64-apple-darwin",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-apple-darwin14.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "archiveFileName": "x86_64-apple-darwin14.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "checksum": "SHA-256:efa480b351be563d35bd6a9bee809cd860f49efd26df711500df02b61460e19c",
+                     "size": "368555"
+                  },
+                  {
+                     "host": "x86_64-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-linux-gnu.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.1563313032.tar.gz",
+                     "checksum": "SHA-256:238f9936f5b39f747602becfe90fae0ed6b31e63ea1fa6f5da062fcb33e0aae9",
+                     "size": "52429"
+                  },
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-w64-mingw32.mkspiffs-7fefeac.1563313032.zip",
+                     "archiveFileName": "x86_64-w64-mingw32.mkspiffs-7fefeac.1563313032.zip",
+                     "checksum": "SHA-256:1c71a7ce71bd39fb83bfab138388adca8c1f9b798e09efd9932aa99d26c04c9b",
+                     "size": "350035"
+                  }
+               ]
+            },
+            {
+               "version": "2.5.0-4-fe5bb56",
+               "name": "mklittlefs",
+               "systems": [
+                  {
+                     "host": "aarch64-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/aarch64-linux-gnu.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "archiveFileName": "aarch64-linux-gnu.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "checksum": "SHA-256:ac50bae3b580053ba98a181ae3700fafd2b2f8a37ed9c16bc22a5d7c1659388e",
+                     "size": "44433"
+                  },
+                  {
+                     "host": "arm-linux-gnueabihf",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/arm-linux-gnueabihf.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "archiveFileName": "arm-linux-gnueabihf.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "checksum": "SHA-256:092555612e7e229fbe622df75db70560896c3aea8d0ac2e5fa16d92dc16857cf",
+                     "size": "36917"
+                  },
+                  {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-linux-gnu.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "checksum": "SHA-256:060e2525223269d2a5d01055542ff36837f0b19598d78cb02d58563aeda441cd",
+                     "size": "47833"
+                  },
+                  {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-linux-gnu.mklittlefs-7f77f2b.1563313032.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.mklittlefs-7f77f2b.1563313032.tar.gz",
+                     "checksum": "SHA-256:022c96df4d110f957d43f6d23e9c5e8b699a66d8ab041056dd5da7411a8ade42",
+                     "size": "47544"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/i686-w64-mingw32.mklittlefs-fe5bb56.1578453304.zip",
+                     "archiveFileName": "i686-w64-mingw32.mklittlefs-fe5bb56.1578453304.zip",
+                     "checksum": "SHA-256:2e570bed4ec59a9ecc73290e16c31ed53ee15e3abd8c82cb038b2148596d112e",
+                     "size": "332329"
+                  },
+                  {
+                     "host": "x86_64-apple-darwin",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-apple-darwin14.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "archiveFileName": "x86_64-apple-darwin14.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "checksum": "SHA-256:fcb57ff58eceac79e988cc26a9e009a11ebda68d4ae97e44fed8e7c6d98a35b5",
+                     "size": "362389"
+                  },
+                  {
+                     "host": "x86_64-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-linux-gnu.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.mklittlefs-fe5bb56.1578453304.tar.gz",
+                     "checksum": "SHA-256:5ef79d76e8e76f8287dc70d10c33f020d4cf5320354571adf666665eeef2e2de",
+                     "size": "46580"
+                  },
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/x86_64-w64-mingw32.mklittlefs-fe5bb56.1578453304.zip",
+                     "archiveFileName": "x86_64-w64-mingw32.mklittlefs-fe5bb56.1578453304.zip",
+                     "checksum": "SHA-256:a460f410a22a59e23d7f862b8d08d6b7dfbc93aa558f8161a3d640d4df2ab86f",
+                     "size": "344792"
+                  }
+               ]
             }
-          ]
-        }
-      ],
-      "tools": [
-        {
-          "name": "esptool",
-          "version": "0.4.12",
-          "systems": [
-            {
-              "host": "i686-mingw32",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-win32.zip",
-              "archiveFileName": "esptool-0.4.12-win32.zip",
-              "checksum": "SHA-256:f47b3bcf7c29c7a184859bbea68c9d468cf3346ca41e202ed60a0a49d987f223",
-              "size": "16537"
-            },
-            {
-              "host": "x86_64-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.12-osx.tar.gz",
-              "checksum": "SHA-256:8232a70611768dca49321f488e3ada29648e28aa83a6d826fcbb871aed4a9c08",
-              "size": "31981"
-            },
-            {
-              "host": "i386-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.12-osx.tar.gz",
-              "checksum": "SHA-256:8232a70611768dca49321f488e3ada29648e28aa83a6d826fcbb871aed4a9c08",
-              "size": "31981"
-            },
-            {
-              "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux64.tar.gz",
-              "archiveFileName": "esptool-0.4.12-linux64.tar.gz",
-              "checksum": "SHA-256:f7ca7666557139bda7b2130022623a004a30d20ea47e1612b9b365783f00d8cb",
-              "size": "15542"
-            },
-            {
-              "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux32.tar.gz",
-              "archiveFileName": "esptool-0.4.12-linux32.tar.gz",
-              "checksum": "SHA-256:2d9970c8574908c35656e35f433082aeb7d79c1967067d7d2cff83f5ed2acbaa",
-              "size": "14668"
-            },
-            {
-              "host": "arm-linux-gnueabihf",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux-armhf.tar.gz",
-              "archiveFileName": "esptool-0.4.12-linux-armhf.tar.gz",
-              "checksum": "SHA-256:2ab4784c10020cdfc467175fe8885db702e7dd95fa5bdc428ec549257eae1a0e",
-              "size": "13097"
-            }
-          ]
-        },
-        {
-          "name": "xtensa-lx106-elf-gcc",
-          "version": "1.20.0-26-gb404fb9-2",
-          "systems": [
-            {
-              "host": "i686-mingw32",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
-              "size": "153527527"
-            },
-            {
-              "host": "x86_64-apple-darwin",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
-              "size": "35385382"
-            },
-            {
-              "host": "i386-apple-darwin",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
-              "size": "35385382"
-            },
-            {
-              "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linux64-xtensa-lx106-elf-gb404fb9.tgz",
-              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
-              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7",
-              "size": "30262903"
-            },
-            {
-              "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linux32-xtensa-lx106-elf.tar.gz",
-              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
-              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
-              "size": "32734156"
-            },
-            {
-              "host": "arm-linux-gnueabihf",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
-              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
-              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443",
-              "size": "34938475"
-            }
-          ]
-        },
-        {
-          "name": "mkspiffs",
-          "version": "0.2.0",
-          "systems": [
-            {
-              "host": "i686-mingw32",
-              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-windows.zip",
-              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-windows.zip",
-              "checksum": "SHA-256:4fbe17d2be4229c0eebb3939d14e9d96e74ba17724ab34276eb6d019006ce900",
-              "size": "347038"
-            },
-            {
-              "host": "x86_64-apple-darwin",
-              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-osx.tar.gz",
-              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-osx.tar.gz",
-              "checksum": "SHA-256:e784d0b60c8b0ddc28e6467f5bffb7ae50db0a52c46b9ca18e71de0bf7f40a4d",
-              "size": "119145"
-            },
-            {
-              "host": "i386-apple-darwin",
-              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-osx.tar.gz",
-              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-osx.tar.gz",
-              "checksum": "SHA-256:e784d0b60c8b0ddc28e6467f5bffb7ae50db0a52c46b9ca18e71de0bf7f40a4d",
-              "size": "119145"
-            },
-            {
-              "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-linux64.tar.gz",
-              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-linux64.tar.gz",
-              "checksum": "SHA-256:b63a99b844c3debeffe605ff2632d8b8a5c365431ee5a091fa0e6e3e1be1bc6c",
-              "size": "48995"
-            },
-            {
-              "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-linux32.tar.gz",
-              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-linux32.tar.gz",
-              "checksum": "SHA-256:dfed9bc40a88a2c89b78acc83181aff401abf1620b8041b136aa2ad6cd08779d",
-              "size": "47659"
-            },
-            {
-              "host": "arm-linux-gnueabihf",
-              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-linux-armhf.tar.gz",
-              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-linux-armhf.tar.gz",
-              "checksum": "SHA-256:42367eb960ac8e3af32a2b4c5dd93dcff94464964e30f483d58e8cb96a895eb5",
-              "size": "43609"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+         ]
+      }
+   ]
 }
