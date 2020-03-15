@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
+#include "StackThunk.h"
 
 //#define DEBUG_UPDATER Serial
 
@@ -40,6 +41,14 @@ UpdaterClass::UpdaterClass()
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
+  stack_thunk_add_ref();
+#endif
+}
+
+UpdaterClass::~UpdaterClass()
+{
+#if ARDUINO_SIGNING
+    stack_thunk_del_ref();
 #endif
 }
 
@@ -199,6 +208,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("no update"));
 #endif
+    _reset();
     return false;
   }
 
@@ -206,7 +216,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("premature end: res:%u, pos:%zu/%zu\n"), getError(), progress(), _size);
 #endif
-
     _reset();
     return false;
   }
@@ -226,6 +235,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
 
@@ -251,6 +261,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     uint8_t *sig = (uint8_t*)malloc(sigLen);
     if (!sig) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
@@ -262,9 +273,12 @@ bool UpdaterClass::end(bool evenIfRemaining){
     DEBUG_UPDATER.printf("\n");
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
+      free(sig);
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
+    free(sig);
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif
