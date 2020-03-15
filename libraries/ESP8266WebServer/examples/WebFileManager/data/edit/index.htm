@@ -188,7 +188,7 @@
         alert("ERROR: [" + request.status+"] " + request.responseText);
       }
         
-      function canLoadEditor() {
+      function canLoadContents() {
         return (document.getElementById("saveBtn").disabled || confirm("Changes to your document will be lost if you continue"));
       }
       
@@ -209,6 +209,7 @@
         path.id = "upload-path";
         path.type = "text";
         path.name = "path";
+        // TODO Is this correct if path does not start with "/" ?
         path.defaultValue = "/";
         header.appendChild(path);
 
@@ -260,7 +261,7 @@
           if (mustFormat83()) {
             filename = to83(filename);
           }
-          // TODO is this suitable ?
+          // TODO Is this correct if path does not start with "/" ?
           if (!path.value.startsWith("/")) path.value = "/" + path.value;
           path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
         }
@@ -271,6 +272,7 @@
           else {            
             tree.refreshPath(path.value);
             refreshStatus();
+            attemptLoad(name);
           }
         }
 
@@ -319,13 +321,11 @@
         mkfile.onclick = function(e){
           var name = path.value.trim();
           if (name === "") alert("A filename must be given");
-          else if (name.endsWith("/")) alert("Filenames cannot end with a '/' character");
-          else {            
+          else if (name.endsWith("/")) alert("Filenames must not end with a '/' character");
+          else {
+            // TODO Is this correct if path does not start with "/" ?
             if (!name.startsWith("/")) name = "/" + name;
             createPath(name);
-            if (canLoadEditor()) {
-              editor.loadUrl(name);
-            }
           }
         };
         
@@ -334,6 +334,7 @@
           if (name === "") alert("A folder name must be given");
           else {
             if (!name.endsWith("/")) name = name + "/";
+            // TODO Is this correct if path does not start with "/" ?
             if (!name.startsWith("/")) name = "/" + name;
             createPath(name);
           }
@@ -468,6 +469,7 @@
           upload.onclick = function(e){
             var pathEl = document.getElementById("upload-path");
             if(pathEl){
+              // TODO Is this correct if path does not start with "/" ?
               var subPath = pathEl.value;
               if(subPath.lastIndexOf("/") < 1) pathEl.value = path+subPath;
               else pathEl.value = path.substring(subPath.lastIndexOf("/"))+subPath;
@@ -491,13 +493,13 @@
           if(isTextFile(path)){
             action.innerHTML = "<span>Edit</span>";
             action.onclick = function(e){
-              if (canLoadEditor()) editor.loadUrl(path);
+              if (canLoadContents()) editor.loadUrl(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           } else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
-              if (canLoadEditor()) loadPreview(path);
+              if (canLoadContents()) loadPreview(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           }
@@ -538,23 +540,28 @@
             }
           };
         }
+        
+        function attemptLoad(path) {
+          if (canLoadContents()) {
+            if(isTextFile(path)){
+              editor.loadUrl(path);
+            } else if(isImageFile(path)){
+              loadPreview(path);
+            } else {
+              clearMainPanel(path);
+            }
+          }
+        }
   
         function createTreeLeaf(path, name, size){
           var leaf = document.createElement("li");
+          // TODO Is this correct if path does not start with "/" ?
           leaf.id = ((path == "/")?"":path)+"/"+name;
           var label = document.createElement("span");
           label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>";
           leaf.appendChild(label);
           leaf.onclick = function(e){
-            if (canLoadEditor()) {
-              if(isTextFile(leaf.id)){
-                editor.loadUrl(leaf.id);
-              } else if(isImageFile(leaf.id)){
-                loadPreview(leaf.id);
-              } else {
-                clearMainPanel(leaf.id);
-              }
-            }
+            attemptLoad(lead.id);
           };
           leaf.oncontextmenu = function(e){
             e.preventDefault();
@@ -568,6 +575,7 @@
           var leaf = document.createElement("li");
           var check = document.createElement("input");
           check.type = "checkbox";
+          // TODO Is this correct if path does not start with "/" ?
           check.id = ((path == "/")?"":path)+"/"+name;
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
@@ -660,8 +668,8 @@
   
         this.refreshPath = function(path){
           if(path.lastIndexOf("/") < 1){
-            // TODO is this what we want ?
-            path = '/';
+            // TODO Is this correct if path does not start with "/" ?
+            path = "/";
             treeRoot.removeChild(treeRoot.childNodes[0]);
             httpList(treeRoot, "/");
           } else {
@@ -675,6 +683,7 @@
             else {
               // No parent node (SPIFFS), refresh full tree
               treeRoot.removeChild(treeRoot.childNodes[0]);
+              // TODO Is this correct if path does not start with "/" ?
               httpList(treeRoot, "/");
             }
           }
@@ -685,7 +694,8 @@
             document.body.style.cursor = "default";
             if(xmlHttp.status != 200) showHttpError(xmlHttp);
             else {
-              refreshPath(path);
+              // Folder to refresh is returned
+              refreshPath(xmlHttp.responseText);
             }
             refreshStatus();
           }
@@ -705,27 +715,8 @@
         function getCallback(parent, path){
           return function(){
             document.body.style.cursor = "default";
-            if(xmlHttp.status == 200) addList(parent, path, JSON.parse(xmlHttp.responseText));
-            else if(xmlHttp.status == 500) {
-              // With littleFS, it could be because we just deleted the last file of a folder, and the folder itself was silently removed. Let's refresh the parent
-/*
-              var lastSlashPos = path.lastIndexOf("/");
-              if (lastSlashPos == -1) {
-                showHttpError(xmlHttp);
-              }
-              else {  
-                httpList(parent.parentElement, path.substring(0, lastSlashPos));
-              }
-*/
-              path = path.substring(0, path.lastIndexOf("/"));
-              if (document.getElementById(path)) {
-                var leaf = document.getElementById(path).parentNode;
-                if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-                httpList(leaf, path);
-              }
-              else showHttpError(xmlHttp);
-            }
-            else showHttpError(xmlHttp);
+            if(xmlHttp.status != 200) showHttpError(xmlHttp);
+            else addList(parent, path, JSON.parse(xmlHttp.responseText));
           }
         }
   
@@ -737,6 +728,7 @@
           xmlHttp.send(null);
         }
   
+        // TODO Is this correct if path does not start with "/" ?
         httpList(treeRoot, "/");
         return this;
       }
