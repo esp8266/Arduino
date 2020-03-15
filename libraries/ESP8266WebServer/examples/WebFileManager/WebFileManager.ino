@@ -20,14 +20,15 @@
  * - Removed limitation to 8.3 lowercase filenames
  * - Removed limitation "files must have an extension, folders may not"
  * - Improved refresh of parts of the tree (e.g. upon file delete, refresh subfolder, not root)
+ * - Support Filenames without extension, Dirnames with extension
+ * - Added Save/Discard/Help buttons to Editor, discard confirmation on leave, and refresh tree/status upon save
  *
  * TODO:
- * - test creation of edit.txt/EDIT.TXT on LittleFS (should succeed). (Correclty supported on SPIFFS but not on SDFS)
- * - Support Filenames without extension, Dirnames with extension ?
- * - Cleanup (look for TODO below)
- * - Reload tree (size) and status on Editor Save
- * - Add Editor Save/Discard buttons ?
- * - Can we query the fatType of the SDFS ?
+ * - Change lengthy FS status by a percentage graph, with numbers as tooltip
+ * - Bug: when deleting a file, we should refresh the parent node unless it has been deleted behind the scene, in which case recurse
+ * - Support Files not starting with '/' (SPIFFS)
+ * - Cleanup (look for TODO below and in HTML)
+ * - Can we query the fatType of the SDFS (and limit to 8.3 if FAT16) ?
  * 
  * TEST: (*) = failed vXXX = OK
  * - On SPIFFS:
@@ -99,8 +100,8 @@
 
 // Select the FileSystem by uncommenting one of the lines below
 
-#define USE_SPIFFS
-//#define USE_LITTLEFS
+//#define USE_SPIFFS
+#define USE_LITTLEFS
 //#define USE_SDFS
 
 ////////////////////////////////
@@ -120,7 +121,7 @@
   #include <LittleFS.h>
   const char* fsName = "LittleFS";
   FS* fileSystem = &LittleFS;
-  LitteFSConfig fileSystemConfig = LittleFSConfig();
+  LittleFSConfig fileSystemConfig = LittleFSConfig();
 #elif defined USE_SDFS
   #include <SDFS.h>
   const char* fsName = "SDFS";
@@ -232,7 +233,7 @@ void handleFileList() {
   }
 
   String path = server.arg("dir");
-  if (path != "/" && !fileSystem->exists(path)) {
+  if (path != "" && !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
   }
 
@@ -413,9 +414,9 @@ void handleFileUpload() {
     if (!filename.startsWith("/")) {
       filename = "/" + filename;
     }
-    DBG_OUTPUT_PORT.println("handleFileUpload Name: " + filename);
+    DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
-    DBG_OUTPUT_PORT.print("Upload: START, filename: " + filename);
+    DBG_OUTPUT_PORT.print(String("Upload: START, filename: ") + filename);
   } 
   else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
@@ -476,8 +477,8 @@ void setup(void) {
 
   {
     // Debug: dump contents of root folder on console
-    Dir dir = fileSystem->openDir("/");
-    while (dir.next()) DBG_OUTPUT_PORT.println("FS File: " + dir.fileName() + ", size: " + dir.fileSize());
+    Dir dir = fileSystem->openDir("");
+    while (dir.next()) DBG_OUTPUT_PORT.println("FS File: " + dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + ")"));
     DBG_OUTPUT_PORT.printf("\n");
   }
 
