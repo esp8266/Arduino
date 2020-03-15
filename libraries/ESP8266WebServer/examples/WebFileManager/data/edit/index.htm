@@ -124,7 +124,7 @@
         }
       }
 
-      #uploader { 
+      #header { 
         position: absolute;
         top: 0;
         right: 0;
@@ -154,7 +154,7 @@
         background-color: #EEE;
         padding:5px;
       }
-      #uploader span {
+      #status {
         position: absolute;
         top: 4px;
         right: 10px;
@@ -164,48 +164,131 @@
     </style>
     <script>
       var fsInfo;
+      var tree;
+           
+      /////////////////////////
+      // UTILS
+
+      function readableSize(bytes) {
+        if (bytes < 1024) return bytes + " B";          
+        var units = [' KiB', ' MiB', ' GiB', ' TiB', 'PiB'];
+        var i = -1;
+        do {
+          bytes = bytes / 1024;
+          i++;
+        } while (bytes > 1024);
+        return bytes.toFixed(2) + units[i];
+      }
+
+      function setStatus(message) {
+        document.getElementById("status").innerHTML = message;
+      }
+
+      function showHttpError(request) {
+        alert("ERROR: [" + request.status+"] " + request.responseText);
+      }
+        
+      function canLoadEditor() {
+        return (document.getElementById("saveBtn").disabled || confirm("Changes to your document will be lost if you continue"));
+      }
       
-      function createFileUploader(element, tree, editor){       
+
+      /////////////////////////
+      // HEADER with uploader, buttons ans status
+
+      function createHeader(element, tree, editor){       
+        var header = document.getElementById(element);
         var xmlHttp;
-        var input = document.createElement("input");
-        var uploader = document.getElementById(element);
-        input.type = "file";
-        input.multiple = false;
-        input.name = "data";
-        uploader.appendChild(input);
+        var fileSelector = document.createElement("input");
+        fileSelector.type = "file";
+        fileSelector.multiple = false;
+        fileSelector.name = "data";
+        header.appendChild(fileSelector);
+        
         var path = document.createElement("input");
         path.id = "upload-path";
         path.type = "text";
         path.name = "path";
         path.defaultValue = "/";
-        uploader.appendChild(path);
+        header.appendChild(path);
+
         var upload = document.createElement("button");
         upload.innerHTML = "Upload";
-        uploader.appendChild(upload);
+        header.appendChild(upload);
+
         var mkdir = document.createElement("button");
         mkdir.id = "mkdir";
         mkdir.style.display = "none";
         mkdir.innerHTML = "MkDir";
-        uploader.appendChild(mkdir);
+        header.appendChild(mkdir);
+
         var mkfile = document.createElement("button");
         mkfile.innerHTML = "MkFile";
-        uploader.appendChild(mkfile);
+        header.appendChild(mkfile);
+
+        var editorButtons = document.createElement("span");
+        editorButtons.id = "editorButtons";
+        editorButtons.style.display = "none";
+        header.appendChild(editorButtons);
+
+        var save = document.createElement("button");
+        save.id = "saveBtn";
+        save.innerHTML = "Save";
+        save.style.marginLeft = "30px";
+        save.disabled = true;
+        editorButtons.appendChild(save);
+  
+        var discard = document.createElement("button");
+        discard.id = "discardBtn";
+        discard.innerHTML = "Discard";
+        discard.disabled = true;
+        editorButtons.appendChild(discard);
+  
+        var help = document.createElement("button");
+        help.id = "helpBtn";
+        help.innerHTML = "?";
+        editorButtons.appendChild(help);
+  
         var status = document.createElement("span");
         status.id = "status";
         status.innerHTML = "(loading)";
-        uploader.appendChild(status);
+        header.appendChild(status);
   
-        function postCallback(){
+        fileSelector.onchange = function(e){ // A file has been selected
+          if(fileSelector.files.length === 0) return;          
+          var filename = fileSelector.files[0].name;
+          if (mustFormat83()) {
+            filename = to83(filename);
+          }
+          // TODO is this suitable ?
+          if (!path.value.startsWith("/")) path.value = "/" + path.value;
+          path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
+        }
+
+        function fileUploaded(){
           document.body.style.cursor = "default";
-          if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+          if(xmlHttp.status != 200) showHttpError(xmlHttp);
           else {            
             tree.refreshPath(path.value);
             refreshStatus();
           }
         }
+
+        upload.onclick = function(e){
+          if(fileSelector.files.length === 0) return;          
+          setStatus("Uploading...");
+          xmlHttp = new XMLHttpRequest();
+          xmlHttp.onload = fileUploaded;
+          var formData = new FormData();
+          formData.append("data", fileSelector.files[0], path.value);
+          document.body.style.cursor = "wait";
+          xmlHttp.open("POST", "/edit");
+          xmlHttp.send(formData);
+        };     
+
         function createPath(path){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = postCallback;
+          xmlHttp.onload = fileUploaded;
           var formData = new FormData();
           formData.append("path", path);
           document.body.style.cursor = "wait";
@@ -213,47 +296,6 @@
           xmlHttp.send(formData);
         }
         
-        mkfile.onclick = function(e){
-          var name = path.value.trim();
-          if (name === "") alert("A filename must be given");
-          else if (name.endsWith("/")) alert("Filenames cannot end with a '/' character");
-          else {            
-            if (!name.startsWith("/")) name = "/" + name;
-            createPath(name);
-            editor.loadUrl(name);
-          }
-        };
-        
-        mkdir.onclick = function(e){
-          var name = path.value.trim();
-          if (name.isEmpty()) alert("A folder name must be given");
-          else {
-            if (!name.endsWith("/")) name = name + "/";
-            if (!name.startsWith("/")) name = "/" + name;
-            createPath(name);
-          }
-        };
-              
-        input.onchange = function(e){ // A file has been selected
-          if(input.files.length === 0) return;          
-          var filename = input.files[0].name;
-          if (mustFormat83()) {
-            filename = to83(filename);
-          }
-          if (!path.value.startsWith("/")) path.value = "/" + path.value;
-          path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
-        }
-        upload.onclick = function(e){
-          if(input.files.length === 0) return;          
-          setStatus("Uploading...");
-          xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = postCallback;
-          var formData = new FormData();
-          formData.append("data", input.files[0], path.value);
-          document.body.style.cursor = "wait";
-          xmlHttp.open("POST", "/edit");
-          xmlHttp.send(formData);
-        };     
 
         function mustFormat83() {
           return false; // TODO: if needed, test fsInfo.type
@@ -262,21 +304,59 @@
         function to83(filename) {
           var ext = /(?:\.([^.]+))?$/.exec(filename)[1];
           var name = /(.*)\.[^.]+$/.exec(filename)[1];
-          if(typeof name !== undefined){
+          if(name !== undefined){
             if(name.length > 8) name = name.substring(0, 8);
             filename = name;
           }
-          if(typeof ext !== undefined){
+          if(ext !== undefined){
             if(ext === "html") ext = "htm";
             else if(ext === "jpeg") ext = "jpg";
             filename = filename + "." + ext;
           }
           return filename;
         }
+
+        mkfile.onclick = function(e){
+          var name = path.value.trim();
+          if (name === "") alert("A filename must be given");
+          else if (name.endsWith("/")) alert("Filenames cannot end with a '/' character");
+          else {            
+            if (!name.startsWith("/")) name = "/" + name;
+            createPath(name);
+            if (canLoadEditor()) {
+              editor.loadUrl(name);
+            }
+          }
+        };
+        
+        mkdir.onclick = function(e){
+          var name = path.value.trim();
+          if (name === "") alert("A folder name must be given");
+          else {
+            if (!name.endsWith("/")) name = name + "/";
+            if (!name.startsWith("/")) name = "/" + name;
+            createPath(name);
+          }
+        };
+        
+        save.onclick = function(e){
+          editor.save();
+        }
+        
+        discard.onclick = function(e){
+          editor.discard();
+        }
+        
+        help.onclick = function(e){
+          editor.showShortcuts();
+        }
+        
       }
       
+      
+      
       function statusCallback() {
-        if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+        if(xmlHttp.status != 200) showHttpError(xmlHttp);
         else {            
           fsInfo = JSON.parse(xmlHttp.responseText);
           var statusText = fsInfo.type + " - ";
@@ -297,7 +377,7 @@
       function refreshStatus(){
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onload = function() {
-          if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+          if(xmlHttp.status != 200) showHttpError(xmlHttp);
           else {            
             fsInfo = JSON.parse(xmlHttp.responseText);
             var statusText = fsInfo.type + " - ";
@@ -319,21 +399,10 @@
         xmlHttp.send(null);
       }
       
-      function setStatus(message) {
-        document.getElementById("status").innerHTML = message;
-      }
 
-      function readableSize(bytes) {
-          if (bytes < 1024) return bytes + " B";          
-          var units = [' KiB', ' MiB', ' GiB', ' TiB', 'PiB'];
-          var i = -1;
-          do {
-              bytes = bytes / 1024;
-              i++;
-          } while (bytes > 1024);
-          return bytes.toFixed(2) + units[i];
-      }
-      
+      /////////////////////////
+      // FILE TREE
+
       function createTree(element, editor){
         var preview = document.getElementById("preview");
         var treeRoot = document.createElement("div");
@@ -347,6 +416,7 @@
         function loadPreview(path){
           document.getElementById("upload-path").value = path;
           document.getElementById("editor").style.display = "none";
+          document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
           preview.innerHTML = "<img src='"+path+"' style='max-width:100%; max-height:100%; margin:auto; display:block;' />";
         }
@@ -354,6 +424,7 @@
         function clearMainPanel(path) {
           document.getElementById("upload-path").value = path;
           document.getElementById("editor").style.display = "none";
+          document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
           preview.innerHTML = "(format not supported for viewing/editing)";
         }
@@ -420,13 +491,13 @@
           if(isTextFile(path)){
             action.innerHTML = "<span>Edit</span>";
             action.onclick = function(e){
-              editor.loadUrl(path);
+              if (canLoadEditor()) editor.loadUrl(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           } else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
-              loadPreview(path);
+              if (canLoadEditor()) loadPreview(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           }
@@ -475,12 +546,14 @@
           label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>";
           leaf.appendChild(label);
           leaf.onclick = function(e){
-            if(isTextFile(leaf.id)){
-              editor.loadUrl(leaf.id);
-            } else if(isImageFile(leaf.id)){
-              loadPreview(leaf.id);
-            } else {
-              clearMainPanel(leaf.id);
+            if (canLoadEditor()) {
+              if(isTextFile(leaf.id)){
+                editor.loadUrl(leaf.id);
+              } else if(isImageFile(leaf.id)){
+                loadPreview(leaf.id);
+              } else {
+                clearMainPanel(leaf.id);
+              }
             }
           };
           leaf.oncontextmenu = function(e){
@@ -552,7 +625,7 @@
   
         function isTextFile(path){
           var ext = /(?:\.([^.]+))?$/.exec(path)[1];
-          if(typeof ext !== undefined){
+          if(ext !== undefined){
             switch(ext.toLowerCase()){
               case "txt":
               case "htm":
@@ -572,7 +645,7 @@
   
         function isImageFile(path){
           var ext = /(?:\.([^.]+))?$/.exec(path)[1];
-          if(typeof ext !== undefined){
+          if(ext !== undefined){
             switch(ext.toLowerCase()){
               case "png":
               case "jpg":
@@ -586,12 +659,13 @@
         }
   
         this.refreshPath = function(path){
-          if(path.lastIndexOf('/') < 1){
+          if(path.lastIndexOf("/") < 1){
+            // TODO is this what we want ?
             path = '/';
             treeRoot.removeChild(treeRoot.childNodes[0]);
             httpList(treeRoot, "/");
           } else {
-            path = path.substring(0, path.lastIndexOf('/'));
+            path = path.substring(0, path.lastIndexOf("/"));
             if (document.getElementById(path)) {
               // We have a parent node (LittleFS or SDFS)
               var leaf = document.getElementById(path).parentNode;
@@ -609,9 +683,8 @@
         function deleteCallback(path){
           return function(){
             document.body.style.cursor = "default";
-            if(xmlHttp.status != 200){
-              alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
-            } else {
+            if(xmlHttp.status != 200) showHttpError(xmlHttp);
+            else {
               refreshPath(path);
             }
             refreshStatus();
@@ -633,6 +706,26 @@
           return function(){
             document.body.style.cursor = "default";
             if(xmlHttp.status == 200) addList(parent, path, JSON.parse(xmlHttp.responseText));
+            else if(xmlHttp.status == 500) {
+              // With littleFS, it could be because we just deleted the last file of a folder, and the folder itself was silently removed. Let's refresh the parent
+/*
+              var lastSlashPos = path.lastIndexOf("/");
+              if (lastSlashPos == -1) {
+                showHttpError(xmlHttp);
+              }
+              else {  
+                httpList(parent.parentElement, path.substring(0, lastSlashPos));
+              }
+*/
+              path = path.substring(0, path.lastIndexOf("/"));
+              if (document.getElementById(path)) {
+                var leaf = document.getElementById(path).parentNode;
+                if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
+                httpList(leaf, path);
+              }
+              else showHttpError(xmlHttp);
+            }
+            else showHttpError(xmlHttp);
           }
         }
   
@@ -648,11 +741,14 @@
         return this;
       }
 
+      /////////////////////////
+      // ACE EDITOR MANAGEMENT
+
       function createEditor(element, file, lang, theme, type){
         function getLangFromFilename(filename){
           var lang = "plain";
           var ext = /(?:\.([^.]+))?$/.exec(filename)[1];
-          if(typeof ext !== undefined){
+          if(ext !== undefined){
             switch(ext){
               case "txt": lang = "plain"; break;
               case "htm": lang = "html"; break;
@@ -687,32 +783,35 @@
         var xmlHttp = null;
         var editor = ace.edit(element);
         
-        //post
-        function postCallback(){
+        function filePosted(){
           document.body.style.cursor = "default";
-          if(xmlHttp.status != 200) alert("ERROR["+xmlHttp.status+"]: "+xmlHttp.responseText);
+          if(xmlHttp.status != 200) showHttpError(xmlHttp);
+          tree.refreshPath(file);
+          refreshStatus();
         }
-        function httpPost(filename, data, type){
+        function postFile(filename, data, type){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = postCallback;
+          xmlHttp.onload = filePosted;
           var formData = new FormData();
           formData.append("data", new Blob([data], { type: type }), filename);
           document.body.style.cursor = "wait";
           xmlHttp.open("POST", "/edit");
           xmlHttp.send(formData);
         }
-        //get
-        function getCallback(){
+
+        function fileLoaded(){
           document.body.style.cursor = "default";
           document.getElementById("preview").style.display = "none";
           document.getElementById("editor").style.display = "block";
+          document.getElementById("editorButtons").style.display = "inline";
           if(xmlHttp.status == 200) editor.setValue(xmlHttp.responseText);
           else editor.setValue("");
           editor.clearSelection();
+          enableSaveDiscard(false);
         }
-        function httpGet(theUrl){
+        function loadFile(theUrl){
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = getCallback;
+          xmlHttp.onload = fileLoaded;
           document.body.style.cursor = "wait";
           xmlHttp.open("GET", theUrl, true);
           xmlHttp.send(null);
@@ -726,53 +825,79 @@
         editor.setHighlightActiveLine(true);
         editor.setShowPrintMargin(false);
         editor.commands.addCommand({
-            name: 'saveCommand',
+            name: 'save',
             bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
             exec: function(editor) {
-              httpPost(file, editor.getValue()+"", type);
+              editor.save();
             },
             readOnly: false
         });
         editor.commands.addCommand({
-            name: 'undoCommand',
-            bindKey: {win: 'Ctrl-Z',  mac: 'Command-Z'},
+            name: "showKeyboardShortcuts",
+            bindKey: {win: "Ctrl-Alt-h", mac: "Command-Alt-h"},
             exec: function(editor) {
-              editor.getSession().getUndoManager().undo(false);
-            },
-            readOnly: false
-        });
-        editor.commands.addCommand({
-            name: 'redoCommand',
-            bindKey: {win: 'Ctrl-Shift-Z',  mac: 'Command-Shift-Z'},
-            exec: function(editor) {
-              editor.getSession().getUndoManager().redo(false);
-            },
-            readOnly: false
-        });
-        httpGet(file);
+                editor.showShortcuts();
+            }
+        })
+
+        editor.session.on('change', function(delta) {
+          enableSaveDiscard(true);
+        });        
+
         editor.loadUrl = function(filename){
+          enableSaveDiscard(false);
           document.getElementById("upload-path").value = filename;
           file = filename;
           lang = getLangFromFilename(file);
           type = "text/"+lang;
           if(lang !== "plain") editor.getSession().setMode("ace/mode/"+lang);
-          httpGet(file);
+          loadFile(file);
         }
+        
+        editor.save = function() {
+          enableSaveDiscard(false);
+          postFile(file, editor.getValue()+"", type);
+        }
+        
+        editor.discard = function() {
+          editor.loadUrl(file);
+          enableSaveDiscard(false);
+        }
+        
+        editor.showShortcuts = function() {
+          ace.config.loadModule("ace/ext/keybinding_menu", function(module) {
+            module.init(editor);
+            editor.showKeyboardShortcuts()
+          });
+        }
+
+        function enableSaveDiscard(enabled) {
+          document.getElementById("saveBtn").disabled = !enabled;
+          document.getElementById("discardBtn").disabled = !enabled;
+        }
+
+
+        loadFile(file);        
+        
         return editor;
       }
+      
+      /////////////////////////
+      // MAIN ENTRY POINT
+      
       function onBodyLoad(){
         var vars = {};
         var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) { vars[key] = value; });
         var editor = createEditor("editor", vars.file, vars.lang, vars.theme);
-        var tree = createTree("tree", editor);
-        createFileUploader("uploader", tree, editor);
+        tree = createTree("tree", editor);
+        createHeader("header", tree, editor);
         refreshStatus();
       };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js" type="text/javascript" charset="utf-8"></script>
   </head>
   <body onload="onBodyLoad();">
-    <div id="uploader"></div>
+    <div id="header"></div>
     <div id="tree"></div>
     <div id="editor"></div>
     <div id="preview" style="display:none;"></div>
