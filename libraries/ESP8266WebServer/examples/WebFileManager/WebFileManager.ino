@@ -25,11 +25,11 @@
  *
  * TODO:
  * - Change lengthy FS status by a percentage graph, with numbers as tooltip
- * - Bug: when deleting a file, we should refresh the parent node unless it has been deleted behind the scene, in which case recurse
+ * - When creating file /d/f/g/h/k, tree should open nodes recursively to show k
  * - Support Files not starting with '/' (SPIFFS)
  * - Cleanup (look for TODO below and in HTML)
  * - Can we query the fatType of the SDFS (and limit to 8.3 if FAT16) ?
- * 
+ *
  * TEST: (*) = failed vXXX = OK
  * - On SPIFFS:
  *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload at root
@@ -267,6 +267,7 @@ void handleFileList() {
     }
     output += "\",\"name\":\"";
     
+    // TODO Is this correct if path does not start with "/" ?
     if (entry.name()[0] == '/') {
       output += &(entry.name()[1]);
     } 
@@ -370,8 +371,7 @@ void deleteRecursive(String path) {
   Dir dir = fileSystem->openDir(path);
 
   while (dir.next()) {
-    String entryPath = path + "/" + dir.fileName();
-    deleteRecursive(entryPath);
+    deleteRecursive(path + "/" + dir.fileName());
   }
 
   // Then delete the folder itself
@@ -395,7 +395,15 @@ void handleFileDelete() {
     return returnFail("BAD PATH");
   }
   deleteRecursive(path);
-  returnOK();
+  
+  // As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed, 
+  // return the path of the closest still existing parent
+  while (path != "" && !fileSystem->exists(path)) {
+    path = path.substring(0, path.lastIndexOf("/"));
+  }
+  DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
+  
+  server.send(200, "text/plain", path + "/");
 }
 
 /*
@@ -411,6 +419,7 @@ void handleFileUpload() {
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
+    // TODO Is this correct if path does not start with "/" ?
     if (!filename.startsWith("/")) {
       filename = "/" + filename;
     }
