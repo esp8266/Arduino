@@ -558,8 +558,17 @@ bool HTTPClient::setURL(const String& url)
 /**
  * set true to follow redirects.
  * @param follow
+ * @deprecated
  */
 void HTTPClient::setFollowRedirects(bool follow)
+{
+    _followRedirects = follow ? HTTPC_FOLLOW_REDIRECTS : HTTPC_DONT_FOLLOW_REDIRECTS;
+}
+/**
+ * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+ * @param follow
+ */
+void HTTPClient::setFollowRedirects(followRedirects_t follow)
 {
     _followRedirects = follow;
 }
@@ -699,32 +708,50 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         // handle Server Response (Header)
         code = handleHeaderResponse();
 
-        //
-        // We can follow redirects for 301/302/307 for GET and HEAD requests and
-        // and we have not exceeded the redirect limit preventing an infinite
-        // redirect loop.
-        //
-        // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-        //
-        if (_followRedirects &&
-                (_redirectCount < _redirectLimit) &&
-                (_location.length() > 0) &&
-                (code == 301 || code == 302 || code == 307) &&
-                (!strcmp(type, "GET") || !strcmp(type, "HEAD"))
+        switch (code) {
+            //
+            // Handle redirections as stated in RFC document:
+            // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+            //
+            case HTTP_CODE_MOVED_PERMANENTLY:
+            case HTTP_CODE_FOUND:
+            case HTTP_CODE_TEMPORARY_REDIRECT: {
+                if (
+                    _followRedirects == HTTPC_DONT_FOLLOW_REDIRECTS || 
+                    _redirectCount >= _redirectLimit || 
+                    _location.length() == 0
                 ) {
-            _redirectCount += 1; // increment the count for redirect.
-            redirect = true;
-            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect:: '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
-            if (!setURL(_location)) {
-                // return the redirect instead of handling on failure of setURL()
-                redirect = false;
+                    // no redirections
+                    redirect = false;
+                    break;
+                }
+                if (
+                    // allow to force redirections on other methods
+                    // (the RFC require user to accept the redirection)
+                    _followRedirects == HTTPC_FORCE_FOLLOW_REDIRECTS ||
+                    // allow GET and HEAD methods
+                    !strcmp(type, "GET") || 
+                    !strcmp(type, "HEAD")
+                ) {
+                    _redirectCount += 1;
+                    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect:: '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
+                    if (!setURL(_location)) {
+                        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
+                        redirect = false;
+                        break;
+                    }
+                    redirect = true;
+                }
+                break;
             }
-        }
 
+            default:
+                break;
+        }
     } while (redirect);
 
     // handle 303 redirect for non GET/HEAD by changing to GET and requesting new url
-    if (_followRedirects &&
+    if (_followRedirects != HTTPC_DONT_FOLLOW_REDIRECTS &&
             (_redirectCount < _redirectLimit) &&
             (_location.length() > 0) &&
             (code == 303) &&

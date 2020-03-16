@@ -130,6 +130,12 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+typedef enum {
+    HTTPC_FOLLOW_REDIRECTS,
+    HTTPC_DONT_FOLLOW_REDIRECTS,
+    HTTPC_FORCE_FOLLOW_REDIRECTS
+} followRedirects_t;
+
 #if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
@@ -173,8 +179,12 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
-    void setFollowRedirects(bool follow);
+
+    // Redirections
+    void setFollowRedirects(bool follow) __attribute__ ((deprecated));
+    void setFollowRedirects(followRedirects_t follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
+
     bool setURL(const String& url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
@@ -252,7 +262,7 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
-    bool _followRedirects = false;
+    followRedirects_t _followRedirects = HTTPC_DONT_FOLLOW_REDIRECTS;
     uint16_t _redirectCount = 0;
     uint16_t _redirectLimit = 10;
     String _location;
