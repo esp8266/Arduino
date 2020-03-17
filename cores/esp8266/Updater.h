@@ -53,6 +53,7 @@ class UpdaterClass {
     typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
 
     UpdaterClass();
+    ~UpdaterClass();
 
     /* Optionally add a cryptographic signature verification hash and method */
     void installSignature(UpdaterHashClass *hash, UpdaterVerifyClass *verify) {  _hash = hash;  _verify = verify; }
