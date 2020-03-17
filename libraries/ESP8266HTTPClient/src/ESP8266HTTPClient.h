@@ -270,7 +270,6 @@ protected:
     int _size = -1;
     bool _canReuse = false;
     followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
-    uint16_t _redirectCount = 0;
     uint16_t _redirectLimit = 10;
     String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;

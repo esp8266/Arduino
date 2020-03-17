@@ -423,7 +423,6 @@ void HTTPClient::end(void)
 {
     disconnect(false);
     clear();
-    _redirectCount = 0;
 }
 
 /**
@@ -661,102 +660,114 @@ int HTTPClient::sendRequest(const char * type, const String& payload)
  */
 int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t size)
 {
-    // wipe out any existing headers from previous request
-    for(size_t i = 0; i < _headerKeysCount; i++) {
-        if (_currentHeaders[i].value.length() > 0) {
-            _currentHeaders[i].value.clear();
-        }
-    }
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, _redirectCount);
-
-    // connect to server
-    if(!connect()) {
-        return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
-    }
-
-    addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
-
-    // send Header
-    if(!sendHeader(type)) {
-        return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
-    }
-
-    // send Payload if needed
-    if (payload && size > 0) {
-        size_t bytesWritten = 0;
-        const uint8_t *p = payload;
-        size_t originalSize = size;
-        while (bytesWritten < originalSize) {
-            int written;
-            int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
-            written = _client->write(p + bytesWritten, towrite);
-            if (written < 0) {
-                    return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
-            } else if (written == 0) {
-                    return returnError(HTTPC_ERROR_CONNECTION_LOST);
+    int code;
+    bool redirect = false;
+    uint16_t redirectCount = 0;
+    do {
+        // wipe out any existing headers from previous request
+        for(size_t i = 0; i < _headerKeysCount; i++) {
+            if (_currentHeaders[i].value.length() > 0) {
+                _currentHeaders[i].value.clear();
             }
-            bytesWritten += written;
-            size -= written;
         }
-    }
 
-    // handle Server Response (Header)
-    int code = handleHeaderResponse();
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, redirectCount);
 
-    //
-    // Handle redirections as stated in RFC document:
-    // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-    //
-    // Implementing HTTP_CODE_FOUND as redirection with GET method,
-    // to follow most of existing user agent implementations.
-    //
-    if (
-        _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS && 
-        _redirectCount < _redirectLimit &&
-        _location.length() > 0
-    ) {
-        switch (code) {
-            // redirecting using the same method
-            case HTTP_CODE_MOVED_PERMANENTLY:
-            case HTTP_CODE_TEMPORARY_REDIRECT: {
-                if (
-                    // allow to force redirections on other methods
-                    // (the RFC require user to accept the redirection)
-                    _followRedirects == HTTPC_FORCE_FOLLOW_REDIRECTS ||
-                    // allow GET and HEAD methods without force
-                    !strcmp(type, "GET") || 
-                    !strcmp(type, "HEAD")
-                ) {
-                    _redirectCount += 1;
-                    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (the same method): '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
+        // connect to server
+        if(!connect()) {
+            return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
+        }
+
+        addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
+
+        // send Header
+        if(!sendHeader(type)) {
+            return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
+        }
+
+        // send Payload if needed
+        if (payload && size > 0) {
+            size_t bytesWritten = 0;
+            const uint8_t *p = payload;
+            size_t originalSize = size;
+            while (bytesWritten < originalSize) {
+                int written;
+                int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
+                written = _client->write(p + bytesWritten, towrite);
+                if (written < 0) {
+                        return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+                } else if (written == 0) {
+                        return returnError(HTTPC_ERROR_CONNECTION_LOST);
+                }
+                bytesWritten += written;
+                size -= written;
+            }
+        }
+
+        // handle Server Response (Header)
+        code = handleHeaderResponse();
+
+        //
+        // Handle redirections as stated in RFC document:
+        // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+        //
+        // Implementing HTTP_CODE_FOUND as redirection with GET method,
+        // to follow most of existing user agent implementations.
+        //
+        redirect = false;
+        if (
+            _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS && 
+            redirectCount < _redirectLimit &&
+            _location.length() > 0
+        ) {
+            switch (code) {
+                // redirecting using the same method
+                case HTTP_CODE_MOVED_PERMANENTLY:
+                case HTTP_CODE_TEMPORARY_REDIRECT: {
+                    if (
+                        // allow to force redirections on other methods
+                        // (the RFC require user to accept the redirection)
+                        _followRedirects == HTTPC_FORCE_FOLLOW_REDIRECTS ||
+                        // allow GET and HEAD methods without force
+                        !strcmp(type, "GET") || 
+                        !strcmp(type, "HEAD")
+                    ) {
+                        redirectCount += 1;
+                        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (the same method): '%s' redirCount: %d\n", _location.c_str(), redirectCount);
+                        if (!setURL(_location)) {
+                            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
+                            // no redirection
+                            break;
+                        }
+                        // redirect using the same request method and payload, diffrent URL
+                        redirect = true;
+                    }
+                    break;
+                }
+                // redirecting with method dropped to GET or HEAD
+                // note: it does not need `HTTPC_FORCE_FOLLOW_REDIRECTS` for any method
+                case HTTP_CODE_FOUND:
+                case HTTP_CODE_SEE_OTHER: {
+                    redirectCount += 1;
+                    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (dropped to GET/HEAD): '%s' redirCount: %d\n", _location.c_str(), redirectCount);
                     if (!setURL(_location)) {
                         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
                         // no redirection
                         break;
                     }
-                    code = sendRequest(type, payload, size);
-                }
-                break;
-            }
-            // redirecting with method dropped to GET or HEAD
-            // note: it does not need `HTTPC_FORCE_FOLLOW_REDIRECTS` for any method
-            case HTTP_CODE_FOUND:
-            case HTTP_CODE_SEE_OTHER: {
-                _redirectCount += 1;
-                DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (dropped to GET/HEAD): '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
-                if (!setURL(_location)) {
-                    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
-                    // no redirection
+                    // redirect after changing method to GET/HEAD and dropping payload
+                    type = "GET";
+                    payload = nullptr;
+                    size = 0;
+                    redirect = true;
                     break;
                 }
-                code = sendRequest("GET");
-            }
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
-    }
+    } while (redirect);
 
     // handle Server Response (Header)
     return returnError(code);
