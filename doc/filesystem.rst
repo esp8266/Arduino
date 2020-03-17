@@ -535,6 +535,11 @@ fileTime
 Returns the time_t write time of the current file pointed
 to by the internal iterator.
 
+fileCreationTime
+~~~~~~~~~~~~~~~~
+Returns the time_t creation time of the current file
+pointed to by the internal iterator.
+
 isFile
 ~~~~~~
 
@@ -641,6 +646,11 @@ getLastWrite
 
 Returns the file last write time, and only valid for files opened in read-only
 mode.  If a file is opened for writing, the returned time may be indeterminate.
+
+getCreationTime
+~~~~~~~~~~~~~~~
+
+Returns the file creation time, if available.
 
 isFile
 ~~~~~~
