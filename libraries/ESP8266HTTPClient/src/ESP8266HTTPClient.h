@@ -130,9 +130,16 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+/**
+ * redirection follow mode.
+ * + `HTTPC_DISABLE_FOLLOW_REDIRECTS` - no redirection will be followed.
+ * + `HTTPC_STRICT_FOLLOW_REDIRECTS` - strict RFC2616, only requests using
+ *      GET or HEAD methods will be redirected without user confirmation.
+ * + `HTTPC_FORCE_FOLLOW_REDIRECTS` - all redirections will be followed.
+ */
 typedef enum {
-    HTTPC_FOLLOW_REDIRECTS,
-    HTTPC_DONT_FOLLOW_REDIRECTS,
+    HTTPC_DISABLE_FOLLOW_REDIRECTS,
+    HTTPC_STRICT_FOLLOW_REDIRECTS,
     HTTPC_FORCE_FOLLOW_REDIRECTS
 } followRedirects_t;
 
@@ -262,7 +269,7 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
-    followRedirects_t _followRedirects = HTTPC_DONT_FOLLOW_REDIRECTS;
+    followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
     uint16_t _redirectCount = 0;
     uint16_t _redirectLimit = 10;
     String _location;

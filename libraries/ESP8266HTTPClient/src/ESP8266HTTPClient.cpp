@@ -562,7 +562,7 @@ bool HTTPClient::setURL(const String& url)
  */
 void HTTPClient::setFollowRedirects(bool follow)
 {
-    _followRedirects = follow ? HTTPC_FOLLOW_REDIRECTS : HTTPC_DONT_FOLLOW_REDIRECTS;
+    _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
 }
 /**
  * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
@@ -712,7 +712,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
     // to follow most of existing user agent implementations.
     //
     if (
-        _followRedirects != HTTPC_DONT_FOLLOW_REDIRECTS && 
+        _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS && 
         _redirectCount < _redirectLimit &&
         _location.length() > 0
     ) {
