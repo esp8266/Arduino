@@ -26,6 +26,9 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "pgmspace.h"
+#include "debug.h"
 #include "StackThunk.h"
 #include <ets_sys.h>
 #include <umm_malloc/umm_malloc.h>
@@ -50,6 +53,11 @@ void stack_thunk_add_ref()
     HeapSelectDram ephemeral;
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
     ETS_PRINTF("StackThunk stack_thunk_ptr: %p\n", stack_thunk_ptr);
+    if (!stack_thunk_ptr) {
+        // This is a fatal error, stop the sketch
+        DEBUGV("Unable to allocate BearSSL stack\n");
+        abort();
+    }
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
     stack_thunk_repaint();
