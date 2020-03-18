@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="en">
   <head>
     <title>File manager</title>
@@ -124,6 +124,47 @@
         }
       }
 
+      #fsTotal {
+        display: inline-block;
+        width:100px;
+        height:10px;
+        border:1px solid #000;
+        overflow:hidden; 
+        background: #E6E6E6; 
+      }
+      #fsUsed {
+        display: inline-block;
+        height:100%;
+        border-right: 1px solid #26A0DA;
+        background: #26A0DA; 
+      }
+      #warning {
+        height:100%;
+        background-color:orange;
+        color:black;
+      }
+      .tooltip {
+        position: absolute;
+        z-index: 2; /* must be above editor which is at 1 */
+        right:0px;
+        top:20px;
+        visibility: hidden;
+        background-color: white;
+        color: black;
+        text-align: center;
+        border: 1px solid #000;
+        padding: 3px;
+        font-size: 10px;
+      }
+
+      #fsTotal:hover .tooltip {
+        visibility: visible;
+      }
+
+      #warning:hover .tooltip {
+        visibility: visible;
+      }
+
       #header { 
         position: absolute;
         top: 0;
@@ -206,10 +247,9 @@
         header.appendChild(fileSelector);
         
         var path = document.createElement("input");
-        path.id = "upload-path";
+        path.id = "filenameTxt";
         path.type = "text";
         path.name = "path";
-        // TODO Is this correct if path does not start with "/" ?
         path.defaultValue = "/";
         header.appendChild(path);
 
@@ -261,7 +301,6 @@
           if (mustFormat83()) {
             filename = to83(filename);
           }
-          // TODO Is this correct if path does not start with "/" ?
           if (!path.value.startsWith("/")) path.value = "/" + path.value;
           path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
         }
@@ -272,7 +311,7 @@
           else {            
             tree.refreshPath(path.value);
             refreshStatus();
-            attemptLoad(name);
+            tree.attemptLoad(path.value);
           }
         }
 
@@ -300,7 +339,7 @@
         
 
         function mustFormat83() {
-          return false; // TODO: if needed, test fsInfo.type
+          return false; // TODO: if needed, test fsInfo.type (and fatType ?)
         }
 
         function to83(filename) {
@@ -323,7 +362,6 @@
           if (name === "") alert("A filename must be given");
           else if (name.endsWith("/")) alert("Filenames must not end with a '/' character");
           else {
-            // TODO Is this correct if path does not start with "/" ?
             if (!name.startsWith("/")) name = "/" + name;
             createPath(name);
           }
@@ -334,7 +372,6 @@
           if (name === "") alert("A folder name must be given");
           else {
             if (!name.endsWith("/")) name = name + "/";
-            // TODO Is this correct if path does not start with "/" ?
             if (!name.startsWith("/")) name = "/" + name;
             createPath(name);
           }
@@ -354,27 +391,7 @@
         
       }
       
-      
-      
-      function statusCallback() {
-        if(xmlHttp.status != 200) showHttpError(xmlHttp);
-        else {            
-          fsInfo = JSON.parse(xmlHttp.responseText);
-          var statusText = fsInfo.type + " - ";
-          if (fsInfo.isOk) {
-            statusText += "Free space: " + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) 
-                      +  ". Used: " + readableSize(fsInfo.usedBytes) 
-                      +  ". Total: " + readableSize(fsInfo.totalBytes);
-          } else {
-            statusText += "<span style='background-color:red;color:white;font-weight:bold'>INIT ERROR !</span>";
-          }
-          setStatus(statusText);
-          if (fsInfo.type != "SPIFFS") {
-            document.getElementById("mkdir").style.display = "inline";
-          }
-        }
-      }
-
+     
       function refreshStatus(){
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onload = function() {
@@ -383,10 +400,19 @@
             fsInfo = JSON.parse(xmlHttp.responseText);
             var statusText = fsInfo.type + " - ";
             if (fsInfo.isOk) {
-              statusText += "Free space: " + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) 
-                        +  ". Used: " + readableSize(fsInfo.usedBytes) 
-                        +  ". Total: " + readableSize(fsInfo.totalBytes);
-            } else {
+              statusText += "<span id='fsTotal'><span id='fsUsed' style='width:" 
+                + (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)) // fake to see the "used" bar in any case
+                + "%'></span><span class='tooltip'>"
+                + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + "\xa0free\xa0of\xa0" + readableSize(fsInfo.totalBytes)
+                + "</span></span>";
+              if (fsInfo.unsupportedFiles) {
+                statusText += " <span id='warning'>WARNING<span class='tooltip'>"
+                  + "Filesystem\xa0contains\xa0unsupported\xa0filenames:<br/>"
+                  + fsInfo.unsupportedFiles
+                  + "</span></span>";
+              }
+            } 
+            else {
               statusText += "<span style='background-color:red;color:white;font-weight:bold'>INIT ERROR !</span>";
             }
             setStatus(statusText);
@@ -415,7 +441,7 @@
         }
   
         function loadPreview(path){
-          document.getElementById("upload-path").value = path;
+          document.getElementById("filenameTxt").value = path;
           document.getElementById("editor").style.display = "none";
           document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
@@ -423,13 +449,48 @@
         }
         
         function clearMainPanel(path) {
-          document.getElementById("upload-path").value = path;
+          document.getElementById("filenameTxt").value = path;
           document.getElementById("editor").style.display = "none";
           document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
           preview.innerHTML = "(format not supported for viewing/editing)";
         }
   
+        function isTextFile(path){
+          var ext = /(?:\.([^.]+))?$/.exec(path)[1];
+          if(ext !== undefined){
+            switch(ext.toLowerCase()){
+              case "txt":
+              case "htm":
+              case "html":
+              case "js":
+              case "json":
+              case "c":
+              case "h":
+              case "cpp":
+              case "css":
+              case "xml":
+                return true;
+            }
+          }
+          return false;
+        }
+  
+        function isImageFile(path){
+          var ext = /(?:\.([^.]+))?$/.exec(path)[1];
+          if(ext !== undefined){
+            switch(ext.toLowerCase()){
+              case "png":
+              case "jpg":
+              case "jpeg":
+              case "gif":
+              case "ico":
+                return true;
+            }
+          }
+          return false;
+        }
+
         function fillFolderMenu(el, path){
           var list = document.createElement("ul");
           el.appendChild(list);
@@ -453,7 +514,8 @@
               httpList(leaf, path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
-          } else {
+          } 
+          else {
             expnd.innerHTML = "<span>Expand</span>";
             expnd.onclick = function(e){
               document.getElementById(path).checked = true;
@@ -467,13 +529,10 @@
           list.appendChild(upload);
           upload.innerHTML = "<span>Upload</span>";
           upload.onclick = function(e){
-            var pathEl = document.getElementById("upload-path");
-            if(pathEl){
-              // TODO Is this correct if path does not start with "/" ?
-              var subPath = pathEl.value;
-              if(subPath.lastIndexOf("/") < 1) pathEl.value = path+subPath;
-              else pathEl.value = path.substring(subPath.lastIndexOf("/"))+subPath;
-            }
+            var filenameTxt = document.getElementById("filenameTxt");
+            var subPath = filenameTxt.value;
+            if(subPath.lastIndexOf("/") < 1) filenameTxt.value = path + subPath;
+            else filenameTxt.value = path.substring(subPath.lastIndexOf("/")) + subPath;
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
           };
           var delFolder = document.createElement("li");
@@ -496,7 +555,8 @@
               if (canLoadContents()) editor.loadUrl(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
-          } else if(isImageFile(path)){
+          } 
+          else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
               if (canLoadContents()) loadPreview(path);
@@ -541,27 +601,22 @@
           };
         }
         
-        function attemptLoad(path) {
+        this.attemptLoad = function(path) {
           if (canLoadContents()) {
-            if(isTextFile(path)){
-              editor.loadUrl(path);
-            } else if(isImageFile(path)){
-              loadPreview(path);
-            } else {
-              clearMainPanel(path);
-            }
+            if(isTextFile(path)) editor.loadUrl(path);
+            else if(isImageFile(path)) loadPreview(path);
+            else clearMainPanel(path);
           }
         }
   
-        function createTreeLeaf(path, name, size){
+        function createTreeLeaf(parentPath, name, size){
           var leaf = document.createElement("li");
-          // TODO Is this correct if path does not start with "/" ?
-          leaf.id = ((path == "/")?"":path)+"/"+name;
+          leaf.id = ((parentPath == "/")?"":parentPath)+"/"+name;
           var label = document.createElement("span");
           label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>";
           leaf.appendChild(label);
           leaf.onclick = function(e){
-            attemptLoad(lead.id);
+            attemptLoad(leaf.id);
           };
           leaf.oncontextmenu = function(e){
             e.preventDefault();
@@ -571,11 +626,10 @@
           return leaf;
         }
   
-        function createTreeBranch(path, name, disabled){
+        function createTreeBranch(parentPath, name, disabled){
           var leaf = document.createElement("li");
           var check = document.createElement("input");
           check.type = "checkbox";
-          // TODO Is this correct if path does not start with "/" ?
           check.id = ((path == "/")?"":path)+"/"+name;
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
@@ -594,7 +648,8 @@
               check.checked = true;
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
               httpList(leaf, check.id);
-            } else {
+            } 
+			else {
               check.checked = false;
             }
           };
@@ -606,7 +661,7 @@
           return leaf;
         }
   
-        function addList(parent, path, items){
+        function addFileNodes(parentEl, parentPath, items){
           items.sort(function(a, b) {
             if (a.type == b.type) {
               return a.name.localeCompare(b.name); // a before z
@@ -616,74 +671,51 @@
             }           
           });
           var list = document.createElement("ul");
-          parent.appendChild(list);
+          parentEl.appendChild(list);
           var ll = items.length;
           for(var i = 0; i < ll; i++){
             var item = items[i];
             var itemEl;
-            if(item.type === "file"){
-              itemEl = createTreeLeaf(path, item.name, item.size);
-            } else {
-              itemEl = createTreeBranch(path, item.name);
-            }
+            if(item.type === "file") itemEl = createTreeLeaf(parentPath, item.name, item.size);
+            else itemEl = createTreeBranch(parentPath, item.name);
             list.appendChild(itemEl);
-          }
-    
+          }    
         }
   
-        function isTextFile(path){
-          var ext = /(?:\.([^.]+))?$/.exec(path)[1];
-          if(ext !== undefined){
-            switch(ext.toLowerCase()){
-              case "txt":
-              case "htm":
-              case "html":
-              case "js":
-              case "json":
-              case "c":
-              case "h":
-              case "cpp":
-              case "css":
-              case "xml":
-                return true;
-            }
+        function onListReceived(parentEl, parentPath){
+          return function(){
+            document.body.style.cursor = "default";
+            if(xmlHttp.status != 200) showHttpError(xmlHttp);
+            else addFileNodes(parentEl, parentPath, JSON.parse(xmlHttp.responseText));
           }
-          return false;
         }
   
-        function isImageFile(path){
-          var ext = /(?:\.([^.]+))?$/.exec(path)[1];
-          if(ext !== undefined){
-            switch(ext.toLowerCase()){
-              case "png":
-              case "jpg":
-              case "jpeg":
-              case "gif":
-              case "ico":
-                return true;
-            }
-          }
-          return false;
+        function httpList(parentEl, parentPath){
+          xmlHttp = new XMLHttpRequest(parentEl, parentPath);
+          xmlHttp.onload = onListReceived(parentEl, parentPath);
+          document.body.style.cursor = "wait";
+          xmlHttp.open("GET", "/list?dir="+parentPath, true);
+          xmlHttp.send(null);
         }
   
         this.refreshPath = function(path){
           if(path.lastIndexOf("/") < 1){
-            // TODO Is this correct if path does not start with "/" ?
+            // No "/" => reset the root
             path = "/";
             treeRoot.removeChild(treeRoot.childNodes[0]);
             httpList(treeRoot, "/");
-          } else {
-            path = path.substring(0, path.lastIndexOf("/"));
-            if (document.getElementById(path)) {
+          } 
+          else {
+            var parentPath = path.substring(0, path.lastIndexOf("/"));
+            if (document.getElementById(parentPath)) {
               // We have a parent node (LittleFS or SDFS)
-              var leaf = document.getElementById(path).parentNode;
+              var leaf = document.getElementById(parentPath).parentNode;
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpList(leaf, path);
+              httpList(leaf, parentPath);
             }
             else {
               // No parent node (SPIFFS), refresh full tree
               treeRoot.removeChild(treeRoot.childNodes[0]);
-              // TODO Is this correct if path does not start with "/" ?
               httpList(treeRoot, "/");
             }
           }
@@ -712,23 +744,6 @@
           xmlHttp.send(formData);
         }
   
-        function getCallback(parent, path){
-          return function(){
-            document.body.style.cursor = "default";
-            if(xmlHttp.status != 200) showHttpError(xmlHttp);
-            else addList(parent, path, JSON.parse(xmlHttp.responseText));
-          }
-        }
-  
-        function httpList(parent, path){
-          xmlHttp = new XMLHttpRequest(parent, path);
-          xmlHttp.onload = getCallback(parent, path);
-          document.body.style.cursor = "wait";
-          xmlHttp.open("GET", "/list?dir="+path, true);
-          xmlHttp.send(null);
-        }
-  
-        // TODO Is this correct if path does not start with "/" ?
         httpList(treeRoot, "/");
         return this;
       }
@@ -838,7 +853,7 @@
 
         editor.loadUrl = function(filename){
           enableSaveDiscard(false);
-          document.getElementById("upload-path").value = filename;
+          document.getElementById("filenameTxt").value = filename;
           file = filename;
           lang = getLangFromFilename(file);
           type = "text/"+lang;
