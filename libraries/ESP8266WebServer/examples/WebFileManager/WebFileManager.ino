@@ -16,46 +16,52 @@
  * - Added FS status information at the top right
  * - Replaced that FS status by operation status when async operations are in progress
  * - Filled filename box in header with the name of the last clicked file
- * - Selecting a file for upload proposes to put it in the same folder as the last clicked file
+ * - Selecting a file for upload defaults to putting it in the same folder as the last clicked file
  * - Removed limitation to 8.3 lowercase filenames
- * - Removed limitation "files must have an extension, folders may not"
- * - Improved refresh of parts of the tree (e.g. upon file delete, refresh subfolder, not root)
  * - Support Filenames without extension, Dirnames with extension
- * - Added Save/Discard/Help buttons to Editor, discard confirmation on leave, and refresh tree/status upon save
+ * - Improved refresh of parts of the tree (e.g. upon file delete, refresh subfolder, not root)
+ * - Added Save/Discard/Help buttons to ACE editor, discard confirmation on leave, and refresh tree/status upon save
  *
  * TODO:
- * - Change lengthy FS status by a percentage graph, with numbers as tooltip
  * - When creating file /d/f/g/h/k, tree should open nodes recursively to show k
- * - Support Files not starting with '/' (SPIFFS)
  * - Cleanup (look for TODO below and in HTML)
  * - Can we query the fatType of the SDFS (and limit to 8.3 if FAT16) ?
+ * - Check/default editor to text viewer if ace.js is not reachable
+ * - Perform test suite again
  *
- * TEST: (*) = failed vXXX = OK
+ * TEST: (#XXX = failed / vXXX = OK)
  * - On SPIFFS:
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload at root
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload in subfolder
+ *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image
+ *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image
+ *  - Create nested file and delete the file / Create nested file and delete top folder
+ *  - Attempt creation of unsupported filenames
  * - with Long Filenames:
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload at root
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload in subfolder
+ *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image
+ *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image
+ *  - Create nested file and delete the file / Create nested file and delete top folder
  * 
  * - On LittleFS:
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
+ *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
+ *  - Create nested file and delete the file / Create nested file and delete top folder
  * - with Long Filenames:
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
- *  - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
+ *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
+ *  - Create nested file and delete the file / Create nested file and delete top folder
  * 
  * - On SDFS:
- * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
- * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
+ *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
+ *  - Create nested file and delete the file / Create nested file and delete top folder
  * - with Long Filenames:
- * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir at root
- * - vList / vEdit / vView image / vMkFile / vDownload / vDelete / vUpload / vMkdir in subfolder
+ *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
+ *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
+ *  - Create nested file and delete the file / Create nested file and delete top folder
  */
 
 /*
   WebFileManager - A web-based File Manager for ESP8266 filesystems
-  (unified from former FSBrowser, FSWebServer and SDWebServer examples)
+  (unified from former FSWebServer, FSBrowser and SDWebServer examples)
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the ESP8266WebServer library for Arduino environment.
@@ -93,6 +99,8 @@
   - Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename .
   SPIFFS and LittleFS also have limitations. Plese see the https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
   - Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character
+  - The convention here is that the root of the filesystem is "/". On SPIFFS, paths not started with a slash are not supported
+  - For creation, the convention is that a path ending with a "/" means create a folder, while without a "/" we create a file. Having an extension or not does not matter.
 
 */
 
@@ -147,6 +155,8 @@ const char* host = "webfilemanager";
 ESP8266WebServer server(80);
 
 static bool fsOK;
+String unsupportedFiles = String();
+
 File uploadFile;
 
 
@@ -215,6 +225,7 @@ void handleStatus() {
   else {
     json += "\"false\"";
   }
+  json += String(",\"unsupportedFiles\":\"") + unsupportedFiles + "\"";
   json += "}";
   server.send(200, "application/json", json);
 }
@@ -233,7 +244,7 @@ void handleFileList() {
   }
 
   String path = server.arg("dir");
-  if (path != "" && !fileSystem->exists(path)) {
+  if (path != "/" && !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
   }
 
@@ -246,36 +257,30 @@ void handleFileList() {
   }
    */
    
-  DBG_OUTPUT_PORT.println("handleFileList: " + path);
+  DBG_OUTPUT_PORT.println(String("handleFileList: ") + path);
   Dir dir = fileSystem->openDir(path);
   path = String();
 
   String output = "[";
   while (dir.next()) {
-    File entry = dir.openFile("r");
-    if (output != "[") {
-      output += ',';
-    }
-    output += "{\"type\":\"";
-    if (entry.isDirectory()) {
-      output += "dir";
+    String error = getFileError(dir.fileName());
+    if (error.length() > 0) {
+      DBG_OUTPUT_PORT.println(String("Ignoring ") + error + dir.fileName());
     }
     else {
-      output += "file";
-      output += "\",\"size\":\"";
-      output += entry.size();      
+      // Filename is supported
+      if (output != "[") output += ',';
+      output += "{\"type\":\"";
+      if (dir.isDirectory()) output += "dir";
+      else output += String("file\",\"size\":\"") + dir.fileSize();
+  
+      output += "\",\"name\":\"";
+      // Always return names without leading "/"
+      if (dir.fileName()[0] == '/') output += &(dir.fileName()[1]);
+      else output += dir.fileName();
+  
+      output += "\"}";
     }
-    output += "\",\"name\":\"";
-    
-    // TODO Is this correct if path does not start with "/" ?
-    if (entry.name()[0] == '/') {
-      output += &(entry.name()[1]);
-    } 
-    else {
-      output += entry.name();
-    }
-    output += "\"}";
-    entry.close();
   }
 
   output += "]";
@@ -287,7 +292,7 @@ void handleFileList() {
  * Read the given file from the filesystem and stream it back to the client 
  */
 bool handleFileRead(String path) {
-  DBG_OUTPUT_PORT.println("handleFileRead: " + path);
+  DBG_OUTPUT_PORT.println(String("handleFileRead: ") + path);
   if (path.endsWith("/")) {
     path += "index.htm";
   }
@@ -326,7 +331,7 @@ void handleFileCreate() {
     return returnFail("BAD ARGS");
   }
   String path = server.arg(0);
-  DBG_OUTPUT_PORT.println("handleFileCreate: " + path);
+  DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path);
   if (path == "/") {
     return returnFail("BAD PATH");
   }
@@ -390,7 +395,7 @@ void handleFileDelete() {
     return returnFail("BAD ARGS");
   }
   String path = server.arg(0);
-  DBG_OUTPUT_PORT.println("handleFileDelete: " + path);
+  DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
   if (path == "/" || !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
   }
@@ -399,7 +404,8 @@ void handleFileDelete() {
   // As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed, 
   // return the path of the closest still existing parent
   while (path != "" && !fileSystem->exists(path)) {
-    path = path.substring(0, path.lastIndexOf("/"));
+    if (path.lastIndexOf("/") > 0) path = path.substring(0, path.lastIndexOf("/"));
+    else path = String(); // No slash => the top folder does not exist
   }
   DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
   
@@ -419,25 +425,25 @@ void handleFileUpload() {
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
-    // TODO Is this correct if path does not start with "/" ?
+    // Make sure paths always start with "/"
     if (!filename.startsWith("/")) {
       filename = "/" + filename;
     }
     DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
-    DBG_OUTPUT_PORT.print(String("Upload: START, filename: ") + filename);
+    DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } 
   else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
       uploadFile.write(upload.buf, upload.currentSize);
     }
-    DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: " + upload.currentSize);
+    DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
   } 
   else if (upload.status == UPLOAD_FILE_END) {
     if (uploadFile) {
       uploadFile.close();
     }
-    DBG_OUTPUT_PORT.print("Upload: END, Size: " + upload.totalSize);
+    DBG_OUTPUT_PORT.println(String("Upload: END, Size: ") + upload.totalSize);
   }
 }
 
@@ -468,6 +474,18 @@ void handleNotFound() {
   }
 }
 
+/*
+ * Checks filename for unsupported combinations
+ * Returns an empty String if supported, or detail of error(s) if unsupported
+ */
+String getFileError(String path) {
+  String error = String();
+  if (!path.startsWith("/")) error += "!NO_LEADING_SLASH! ";
+  if (path.indexOf("//") != -1) error += "!DOUBLE_SLASH! ";
+  if (path.endsWith("/")) error += "!TRAILING_SLASH! ";
+  return error;
+}
+
 
 void setup(void) {
   ////////////////////////////////
@@ -487,8 +505,18 @@ void setup(void) {
   {
     // Debug: dump contents of root folder on console
     Dir dir = fileSystem->openDir("");
-    while (dir.next()) DBG_OUTPUT_PORT.println("FS File: " + dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + ")"));
-    DBG_OUTPUT_PORT.printf("\n");
+    DBG_OUTPUT_PORT.println("List of files at root of filesystem:");
+    while (dir.next()) {
+      String error = getFileError(dir.fileName());
+      String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
+      DBG_OUTPUT_PORT.println(error + fileInfo);
+      if (error.length() > 0) unsupportedFiles += error + fileInfo + "\n";
+    }    
+    DBG_OUTPUT_PORT.println();
+    
+    // Keep the "unsupportedFiles" variable to show it, but clean it up
+    unsupportedFiles.replace("\n", "<br/>");
+    unsupportedFiles = unsupportedFiles.substring(0, unsupportedFiles.length() - 5);
   }
 
   ////////////////////////////////
