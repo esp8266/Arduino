@@ -59,7 +59,7 @@ WiFiClient WiFiServer::available (uint8_t* status)
 {
 	(void)status;
 	if (hasClient())
-		return WiFiClient(new ClientContext(serverAccept(pcb2int(_pcb))));
+		return WiFiClient(new ClientContext(serverAccept(pcb2int(_listen_pcb))));
 	return WiFiClient();
 }
 
