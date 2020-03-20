@@ -25,8 +25,8 @@
  * TODO:
  * - When creating file /d/f/g/h/k, tree should open nodes recursively to show k
  * - Cleanup (look for TODO below and in HTML)
- * - Can we query the fatType of the SDFS (and limit to 8.3 if FAT16) ?
- * - Check/default editor to text viewer if ace.js is not reachable
+ * - ? Can we query the fatType of the SDFS (and limit to 8.3 if FAT16)
+ * - ? Check if ace.js is reachable and default to text viewer otherwise
  * - Perform test suite again
  *
  * TEST: (#XXX = failed / vXXX = OK)
@@ -109,8 +109,8 @@
 // Select the FileSystem by uncommenting one of the lines below
 
 //#define USE_SPIFFS
-#define USE_LITTLEFS
-//#define USE_SDFS
+//#define USE_LITTLEFS
+#define USE_SDFS
 
 ////////////////////////////////
 
@@ -263,24 +263,24 @@ void handleFileList() {
 
   String output = "[";
   while (dir.next()) {
+#ifdef USE_SPIFFS
     String error = getFileError(dir.fileName());
     if (error.length() > 0) {
       DBG_OUTPUT_PORT.println(String("Ignoring ") + error + dir.fileName());
+      continue
     }
-    else {
-      // Filename is supported
-      if (output != "[") output += ',';
-      output += "{\"type\":\"";
-      if (dir.isDirectory()) output += "dir";
-      else output += String("file\",\"size\":\"") + dir.fileSize();
-  
-      output += "\",\"name\":\"";
-      // Always return names without leading "/"
-      if (dir.fileName()[0] == '/') output += &(dir.fileName()[1]);
-      else output += dir.fileName();
-  
-      output += "\"}";
-    }
+#endif
+    if (output != "[") output += ',';
+    output += "{\"type\":\"";
+    if (dir.isDirectory()) output += "dir";
+    else output += String("file\",\"size\":\"") + dir.fileSize();
+
+    output += "\",\"name\":\"";
+    // Always return names without leading "/"
+    if (dir.fileName()[0] == '/') output += &(dir.fileName()[1]);
+    else output += dir.fileName();
+
+    output += "\"}";
   }
 
   output += "]";
@@ -502,8 +502,8 @@ void setup(void) {
   fsOK = fileSystem->begin();
   DBG_OUTPUT_PORT.println(fsOK ? "Filesystem initialized." : "Filesystem init failed!");
 
-  {
-    // Debug: dump contents of root folder on console
+#ifdef USE_SPIFFS
+    // Debug: dump on console contents of filessytem with no filter and check filenames validity
     Dir dir = fileSystem->openDir("");
     DBG_OUTPUT_PORT.println("List of files at root of filesystem:");
     while (dir.next()) {
@@ -517,7 +517,7 @@ void setup(void) {
     // Keep the "unsupportedFiles" variable to show it, but clean it up
     unsupportedFiles.replace("\n", "<br/>");
     unsupportedFiles = unsupportedFiles.substring(0, unsupportedFiles.length() - 5);
-  }
+#endif
 
   ////////////////////////////////
   // WI-FI INIT
