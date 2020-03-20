@@ -123,7 +123,7 @@
           }
         }
       }
-
+      
       #fsTotal {
         display: inline-block;
         width:100px;
@@ -391,7 +391,7 @@
         
       }
       
-     
+      
       function refreshStatus(){
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onload = function() {
@@ -439,8 +439,8 @@
         function loadDownload(path){
           document.getElementById('download-frame').src = path+"?download=true";
         }
-  
-        function loadPreview(path){
+        
+        function loadImgPreview(path){
           document.getElementById("filenameTxt").value = path;
           document.getElementById("editor").style.display = "none";
           document.getElementById("editorButtons").style.display = "none";
@@ -455,7 +455,7 @@
           preview.style.display = "block";
           preview.innerHTML = "(format not supported for viewing/editing)";
         }
-  
+    
         function isTextFile(path){
           var ext = /(?:\.([^.]+))?$/.exec(path)[1];
           if(ext !== undefined){
@@ -559,7 +559,7 @@
           else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
-              if (canLoadContents()) loadPreview(path);
+              if (canLoadContents()) loadImgPreview(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
             };
           }
@@ -604,7 +604,7 @@
         this.attemptLoad = function(path) {
           if (canLoadContents()) {
             if(isTextFile(path)) editor.loadUrl(path);
-            else if(isImageFile(path)) loadPreview(path);
+            else if(isImageFile(path)) loadImgPreview(path);
             else clearMainPanel(path);
           }
         }
@@ -630,7 +630,7 @@
           var leaf = document.createElement("li");
           var check = document.createElement("input");
           check.type = "checkbox";
-          check.id = ((path == "/")?"":path)+"/"+name;
+          check.id = ((parentPath == "/")?"":parentPath)+"/"+name;          
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
           var label = document.createElement("label");
@@ -649,7 +649,7 @@
               if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
               httpList(leaf, check.id);
             } 
-			else {
+            else {
               check.checked = false;
             }
           };
@@ -679,7 +679,7 @@
             if(item.type === "file") itemEl = createTreeLeaf(parentPath, item.name, item.size);
             else itemEl = createTreeBranch(parentPath, item.name);
             list.appendChild(itemEl);
-          }    
+          }   
         }
   
         function onListReceived(parentEl, parentPath){
@@ -697,7 +697,7 @@
           xmlHttp.open("GET", "/list?dir="+parentPath, true);
           xmlHttp.send(null);
         }
-  
+    
         this.refreshPath = function(path){
           if(path.lastIndexOf("/") < 1){
             // No "/" => reset the root
@@ -894,7 +894,7 @@
       
       function onBodyLoad(){
         var vars = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) { vars[key] = value; });
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) { vars[key] = value; });        
         var editor = createEditor("editor", vars.file, vars.lang, vars.theme);
         tree = createTree("tree", editor);
         createHeader("header", tree, editor);
