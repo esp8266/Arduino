@@ -134,8 +134,12 @@ typedef enum {
  * redirection follow mode.
  * + `HTTPC_DISABLE_FOLLOW_REDIRECTS` - no redirection will be followed.
  * + `HTTPC_STRICT_FOLLOW_REDIRECTS` - strict RFC2616, only requests using
- *      GET or HEAD methods will be redirected without user confirmation.
- * + `HTTPC_FORCE_FOLLOW_REDIRECTS` - all redirections will be followed.
+ *      GET or HEAD methods will be redirected (using the same method),
+ *      since the RFC requires end-user confirmation in other cases.
+ * + `HTTPC_FORCE_FOLLOW_REDIRECTS` - all redirections will be followed,
+ *      regardless of a used method. New request will use the same method,
+ *      and they will include the same body data and the same headers.
+ *      In the sense of the RFC, it's just like every redirection is confirmed.
  */
 typedef enum {
     HTTPC_DISABLE_FOLLOW_REDIRECTS,
