@@ -143,9 +143,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
       initTimer();
       timer1_write(DELTAIRQ);
     }
-    else if (T1L > DELTAIRQ) {
-      // Must not interfere if Timer is due shortly
-      timer1_write(DELTAIRQ);
+    else if (T1L > microsecondsToClockCycles(14)) {
+      // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
+      timer1_write(microsecondsToClockCycles(14));
     }
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
