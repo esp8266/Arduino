@@ -143,9 +143,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
       initTimer();
       timer1_write(DELTAIRQ);
     }
-    else if (T1L > microsecondsToClockCycles(14)) {
+    else if (T1L > microsecondsToClockCycles(12)) {
       // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
-      timer1_write(microsecondsToClockCycles(14));
+      timer1_write(microsecondsToClockCycles(12));
     }
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
@@ -210,7 +210,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Exit the loop if the next event, if any, is sufficiently distant.
-  const uint32_t isrTimeoutCcy = isrStartCcy + microsecondsToClockCycles(14);
+  const uint32_t isrTimeoutCcy = isrStartCcy + microsecondsToClockCycles(12);
   uint32_t now = ESP.getCycleCount();
   uint32_t nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
   bool busy = waveformsEnabled;
