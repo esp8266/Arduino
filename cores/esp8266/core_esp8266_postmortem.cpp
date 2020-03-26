@@ -35,7 +35,7 @@
 
 extern "C" {
 
-extern void __real_system_restart_local();
+extern void __real_system_restart_local() __attribute__((noreturn));
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
