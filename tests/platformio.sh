@@ -7,7 +7,7 @@ source "$TRAVIS_BUILD_DIR"/tests/common.sh
 function install_platformio()
 {
     pip3 install --user -U https://github.com/platformio/platformio/archive/develop.zip
-    platformio platform install "https://github.com/platformio/platform-espressif8266.git#develop"
+    platformio platform install "https://github.com/platformio/platform-espressif8266.git#master"
     sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
     ln -sf $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
