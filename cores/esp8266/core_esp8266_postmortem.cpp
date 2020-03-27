@@ -32,10 +32,9 @@
 #include "pgmspace.h"
 #include "gdb_hooks.h"
 #include "StackThunk.h"
+#include "coredecls.h"
 
 extern "C" {
-
-extern void __real_system_restart_local();
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
