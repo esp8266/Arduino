@@ -195,9 +195,6 @@ bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
     }
 }
 
-
-
-extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
     __real_system_restart_local();
