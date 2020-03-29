@@ -14,19 +14,21 @@
  * - Items are now sorted (folders first, then plain files, each in alphabetic order)
  * - Added file size after each file name
  * - Added FS status information at the top right
- * - Replaced that FS status by operation status when async operations are in progress
+ * - Make clear that an async operation is in progress by dimming screen and showing opertation status
  * - Filled filename box in header with the name of the last clicked file
  * - Selecting a file for upload defaults to putting it in the same folder as the last clicked file
  * - Removed limitation to 8.3 lowercase filenames
  * - Support Filenames without extension, Dirnames with extension
- * - Improved refresh of parts of the tree (e.g. upon file delete, refresh subfolder, not root)
- * - Added Save/Discard/Help buttons to ACE editor, discard confirmation on leave, and refresh tree/status upon save
+ * - Improved recursive refresh of parts of the tree (e.g. upon file delete, refresh subfolder, move to a closed folder)
+ * - Added Save/Discard/Help buttons to ACE editor, discard confirmation on leaveand refresh tree/status upon save
+ * - Added Rename/Move feature to context menu
  *
  * TODO:
- * - When creating file /d/f/g/h/k, tree should open nodes recursively to show k
  * - Cleanup (look for TODO below and in HTML)
+ * - ? Add a visible root node "/" (without a delete option) + add the FS type next to it, like <i>LittleFS</i> + move "Mkdir" and "MkFile" to context menu + implement drag/drop for move + make "rename" only a local rename operation (no move) + remove recursive opening ?
  * - ? Can we query the fatType of the SDFS (and limit to 8.3 if FAT16)
  * - ? Check if ace.js is reachable and default to text viewer otherwise
+ * - ? Present SPIFFS as a hierarchical FS
  * - Perform test suite again
  *
  * TEST: (#XXX = failed / vXXX = OK)
@@ -165,6 +167,10 @@ File uploadFile;
 
 void returnOK() {
   server.send(200, "text/plain", "");
+}
+
+void returnOKWithMsg(String msg) {
+  server.send(200, "text/plain", msg);
 }
 
 void returnNotFound(String msg) {
@@ -321,38 +327,85 @@ bool handleFileRead(String path) {
 
 
 /*
- * Handle the creation of a new file 
+ * Handle the creation/rename of a new file 
+ * Operation      | req.responseText
+ * ---------------+--------------------------------------------------------------
+ * Create file    | parent of created file
+ * Create folder  | parent of created folder
+ * Rename file    | parent of source file
+ * Move file      | parent of source file, or remaining ancestor
+ ? Rename folder  | parent of source folder
+ ? Move folder    | parent of source folder, or remaining ancestor
  */
 void handleFileCreate() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
-  if (server.args() == 0) {
+  if (server.args() == 0 || server.args() > 2) {
     return returnFail("BAD ARGS");
   }
-  String path = server.arg(0);
-  DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path);
+  
+  String path = server.arg("path");
+  if (path == "") { // todo is this the right test in case of no arg
+    return returnFail("MISSING PATH ARG");
+  }
   if (path == "/") {
     return returnFail("BAD PATH");
   }
   if (fileSystem->exists(path)) {
-    return returnFail("FILE EXISTS");
+    return returnFail("PATH FILE EXISTS");
   }
-
-  if (path.endsWith("/")) {
-    // Create a folder
-    path.remove(path.length() - 1);
-    fileSystem->mkdir(path);
-  } 
-  else {
-    // Create a file
-    File file = fileSystem->open(path, "w");
-    if (file) {
-      file.write((const char *)0);
-      file.close();
+    
+  if (server.args() == 1) {
+    // One argument: create  
+    DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path);
+    if (path.endsWith("/")) {
+      // Create a folder
+      path.remove(path.length() - 1);
+      if (!fileSystem->mkdir(path)) {
+        return returnFail("MKDIR FAILED");
+      }
+    } 
+    else {
+      // Create a file
+      File file = fileSystem->open(path, "w");
+      if (file) {
+        file.write((const char *)0);
+        file.close();
+      }
+      else {
+        return returnFail("CREATE FAILED");
+      }
     }
+    if (path.lastIndexOf("/") > 0) path = path.substring(0, path.lastIndexOf("/"));
+    returnOKWithMsg(path);
   }
-  return returnOK();
+  else {  
+    // Two arguments: rename
+    String src = server.arg("src");
+    if (src == "") { // todo is this the right test in case of no arg
+      return returnFail("MISSING SRC ARG");
+    }
+    if (src == "/") {
+      return returnFail("BAD SRC");
+    }
+    if (!fileSystem->exists(src)) {
+      return returnFail("SRC FILE NOT FOUND");
+    }
+    
+    DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path + " from " + src);
+
+    if (path.endsWith("/")) {
+      path.remove(path.length() - 1);      
+    }
+    if (src.endsWith("/")) {
+      src.remove(src.length() - 1);
+    }
+    if (!fileSystem->rename(src, path)) {
+      return returnFail("RENAME FAILED");
+    }
+    returnOKWithMsg(lastExistingParent(src) + "/");
+  }
 }
 
 
@@ -384,8 +437,24 @@ void deleteRecursive(String path) {
 }
 
 
+// TODO test delete and move on SPIFFS
+// As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed, 
+// return the path of the closest parent still existing
+String lastExistingParent(String path) {
+  while (path != "" && !fileSystem->exists(path)) {
+    if (path.lastIndexOf("/") > 0) path = path.substring(0, path.lastIndexOf("/"));
+    else path = String(); // No slash => the top folder does not exist
+  }
+  DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
+  return path;
+}
+
 /*
  * Handle a file deletion request
+ * Operation      | req.responseText
+ * ---------------+--------------------------------------------------------------
+ * Delete file    | parent of deleted file, or remaining ancestor
+ * Delete folder  | parent of deleted folder, or remaining ancestor
  */
 void handleFileDelete() {
   if (!fsOK) {
@@ -400,16 +469,8 @@ void handleFileDelete() {
     return returnFail("BAD PATH");
   }
   deleteRecursive(path);
-  
-  // As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed, 
-  // return the path of the closest still existing parent
-  while (path != "" && !fileSystem->exists(path)) {
-    if (path.lastIndexOf("/") > 0) path = path.substring(0, path.lastIndexOf("/"));
-    else path = String(); // No slash => the top folder does not exist
-  }
-  DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
-  
-  server.send(200, "text/plain", path + "/");
+
+  returnOKWithMsg(lastExistingParent(path) + "/");
 }
 
 /*
@@ -451,13 +512,14 @@ void handleFileUpload() {
 /* 
  * The "Not Found" handler catches all URI not explicitely declared in code
  * First try to find and return the requested file from the filesystem,
- * and if it fails, return a 404 page with details
+ * and if it fails, return a 404 page with debug information
  */
 void handleNotFound() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
   if (!handleFileRead(server.uri())) {
+    // Dump debug data
     String message = "Error: File not found\n\n";
     message += "URI: ";
     message += server.uri();
@@ -467,8 +529,9 @@ void handleNotFound() {
     message += server.args();
     message += "\n";
     for (uint8_t i = 0; i < server.args(); i++) {
-      message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+      message += String(" NAME:") + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
     }
+    message += String("path=") + server.arg("path") + "\n";
     DBG_OUTPUT_PORT.print(message);
     return returnNotFound(message);
   }

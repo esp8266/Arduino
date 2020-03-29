@@ -202,13 +202,78 @@
         height: 28px;
         font: normal 14px Verdana, Arial, Sans-serif;
       }
+      
+      /* Spinner based on from https://github.com/jlong/css-spinners */
+      #loading {
+        position:absolute;
+        // note: changing between block and none cancels the opacity anim, so we move it in and out of screen instead by changing the top value
+        // ? TODO: see https://www.impressivewebs.com/animate-display-block-none/ for another approach
+        display:block; 
+        top: -100vh;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 500ms ease-in-out;
+      }
+      #loading.shown {
+        top: 0;
+        opacity: 1;
+      }
+      
+      #loading-msg {
+        display: inline-block;
+        position: relative;
+        top: 0px;
+        left: 50%;
+        transform: translateX(-50%);
+        color:white;
+        font: normal 32px Verdana, Arial, Sans-serif;
+      }
+
+      @keyframes spinner-anim {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      /* :not(:required) hides this rule from IE9 and below */
+      .spinner-anim:not(:required) {
+        display: inline-block;
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: spinner-anim 1s infinite linear;
+        border: 16px solid #eee;
+        border-right-color: transparent;
+        border-radius: 32px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-indent: -9999px;
+        width: 64px;
+        height: 64px;
+      }
     </style>
     <script>
-      var fsInfo;
-      var tree;
-           
+      var tree; // needed by editor to refresh file size on save
+
       /////////////////////////
       // UTILS
+
+      function setLoading(show, message) {
+        if (message) console.log(message);        
+        document.getElementById("loading-msg").innerHTML = message?message:"";
+        if (show) document.getElementById("loading").classList.add("shown");
+        else      document.getElementById("loading").classList.remove("shown");
+        //document.getElementById("loading").style.top = show?"0":"-100vh"; // Show or hide. Display property is incompatible with opacity animation
+        //document.getElementById("loading").style.opacity = show?1:0;
+        document.body.style.cursor = show?"wait":"default";
+      }
 
       function readableSize(bytes) {
         if (bytes < 1024) return bytes + " B";          
@@ -221,18 +286,79 @@
         return bytes.toFixed(2) + units[i];
       }
 
-      function setStatus(message) {
-        document.getElementById("status").innerHTML = message;
+      function refreshStatus(){
+        document.getElementById("status").innerHTML = "(refreshing...)";
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onload = function() {
+          if(xmlHttp.status != 200) showHttpError(xmlHttp);
+          else {            
+            var fsInfo = JSON.parse(xmlHttp.responseText);
+            var status = fsInfo.type + " - ";
+            if (fsInfo.isOk) {
+              status += "<span id='fsTotal'><span id='fsUsed' style='width:" 
+                + (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)) // fake to see the "used" bar in any case
+                + "%'></span><span class='tooltip'>"
+                + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + "\xa0free\xa0of\xa0" + readableSize(fsInfo.totalBytes)
+                + "</span></span>";
+              if (fsInfo.unsupportedFiles) {
+                status += " <span id='warning'>WARNING<span class='tooltip'>"
+                  + "Filesystem\xa0contains\xa0unsupported\xa0filenames:<br/>"
+                  + fsInfo.unsupportedFiles
+                  + "</span></span>";
+              }
+            } 
+            else {
+              status += "<span style='background-color:red;color:white;font-weight:bold'>INIT ERROR !</span>";
+            }
+            document.getElementById("status").innerHTML = status;
+            if (fsInfo.type != "SPIFFS") {
+              document.getElementById("mkdir").style.display = "inline";
+            }
+          }
+        };
+        xmlHttp.open("GET", "/status", true);
+        xmlHttp.send(null);
       }
-
+      
       function showHttpError(request) {
         alert("ERROR: [" + request.status+"] " + request.responseText);
       }
-        
-      function canLoadContents() {
-        return (document.getElementById("saveBtn").disabled || confirm("Changes to your document will be lost if you continue"));
+           
+      function canLoadNewContents() {
+        // The fact the save button is enabled indicates the editor has unsaved changes
+        if (document.getElementById("saveBtn").disabled) return true;
+        if (confirm("Changes to your document will be lost if you continue")) {
+          enableSaveDiscardBtns(false);
+          return true;
+        }
+        return false;
       }
-      
+
+      function enableSaveDiscardBtns(enabled) {
+        document.getElementById("saveBtn").disabled = !enabled;
+        document.getElementById("discardBtn").disabled = !enabled;
+      }
+
+
+      /*
+       * Returns the parent folder of a given path
+       * ""      > ""
+       * "/"     > ""
+       * "a"     > ""
+       * "/a"    > ""
+       * "a/"    > ""
+       * "/a/"   > ""
+       * "a/b"   > "/a"
+       * "/a/b"  > "/a"
+       * "a/b/"  > "/a" 
+       * "/a/b/" > "/a" 
+       */
+      function getParentFolder(path) {
+        if (!path.startsWith("/")) path = "/" + path;
+        if (path.endsWith("/")) path = path.slice(0, -1);
+        return path.substring(0, path.lastIndexOf("/"));        
+      }
+
 
       /////////////////////////
       // HEADER with uploader, buttons ans status
@@ -246,12 +372,12 @@
         fileSelector.name = "data";
         header.appendChild(fileSelector);
         
-        var path = document.createElement("input");
-        path.id = "filenameTxt";
-        path.type = "text";
-        path.name = "path";
-        path.defaultValue = "/";
-        header.appendChild(path);
+        var pathInput = document.createElement("input");
+        pathInput.id = "pathInput";
+        pathInput.type = "text";
+        pathInput.name = "path";
+        pathInput.defaultValue = "/";
+        header.appendChild(pathInput);
 
         var upload = document.createElement("button");
         upload.innerHTML = "Upload";
@@ -301,42 +427,14 @@
           if (mustFormat83()) {
             filename = to83(filename);
           }
-          if (!path.value.startsWith("/")) path.value = "/" + path.value;
-          path.value = path.value.substring(0, path.value.lastIndexOf("/")+1) + filename;
-        }
-
-        function fileUploaded(){
-          document.body.style.cursor = "default";
-          if(xmlHttp.status != 200) showHttpError(xmlHttp);
-          else {            
-            tree.refreshPath(path.value);
-            refreshStatus();
-            tree.attemptLoad(path.value);
-          }
+          if (!pathInput.value.startsWith("/")) pathInput.value = "/" + pathInput.value;
+          pathInput.value = getParentFolder(pathInput.value) + "/" + filename;
         }
 
         upload.onclick = function(e){
-          if(fileSelector.files.length === 0) return;          
-          setStatus("Uploading...");
-          xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = fileUploaded;
-          var formData = new FormData();
-          formData.append("data", fileSelector.files[0], path.value);
-          document.body.style.cursor = "wait";
-          xmlHttp.open("POST", "/edit");
-          xmlHttp.send(formData);
-        };     
-
-        function createPath(path){
-          xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = fileUploaded;
-          var formData = new FormData();
-          formData.append("path", path);
-          document.body.style.cursor = "wait";
-          xmlHttp.open("PUT", "/edit");
-          xmlHttp.send(formData);
+          if(fileSelector.files.length === 0) return;   
+          tree.httpUpload(fileSelector.files[0], pathInput.value);
         }
-        
 
         function mustFormat83() {
           return false; // TODO: if needed, test fsInfo.type (and fatType ?)
@@ -358,22 +456,18 @@
         }
 
         mkfile.onclick = function(e){
-          var name = path.value.trim();
-          if (name === "") alert("A filename must be given");
-          else if (name.endsWith("/")) alert("Filenames must not end with a '/' character");
-          else {
-            if (!name.startsWith("/")) name = "/" + name;
-            createPath(name);
-          }
+          var path = pathInput.value.trim();
+          if (path === "") alert("A filename must be given");
+          else if (path.endsWith("/")) alert("Filenames must not end with a '/' character");
+          else tree.httpCreate(path);
         };
         
         mkdir.onclick = function(e){
-          var name = path.value.trim();
-          if (name === "") alert("A folder name must be given");
+          var path = pathInput.value.trim();
+          if (path === "") alert("A folder name must be given");
           else {
-            if (!name.endsWith("/")) name = name + "/";
-            if (!name.startsWith("/")) name = "/" + name;
-            createPath(name);
+            if (!path.endsWith("/")) path = path + "/";
+            tree.httpCreate(path);
           }
         };
         
@@ -392,41 +486,6 @@
       }
       
       
-      function refreshStatus(){
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onload = function() {
-          if(xmlHttp.status != 200) showHttpError(xmlHttp);
-          else {            
-            fsInfo = JSON.parse(xmlHttp.responseText);
-            var statusText = fsInfo.type + " - ";
-            if (fsInfo.isOk) {
-              statusText += "<span id='fsTotal'><span id='fsUsed' style='width:" 
-                + (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)) // fake to see the "used" bar in any case
-                + "%'></span><span class='tooltip'>"
-                + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + "\xa0free\xa0of\xa0" + readableSize(fsInfo.totalBytes)
-                + "</span></span>";
-              if (fsInfo.unsupportedFiles) {
-                statusText += " <span id='warning'>WARNING<span class='tooltip'>"
-                  + "Filesystem\xa0contains\xa0unsupported\xa0filenames:<br/>"
-                  + fsInfo.unsupportedFiles
-                  + "</span></span>";
-              }
-            } 
-            else {
-              statusText += "<span style='background-color:red;color:white;font-weight:bold'>INIT ERROR !</span>";
-            }
-            setStatus(statusText);
-            if (fsInfo.type != "SPIFFS") {
-              document.getElementById("mkdir").style.display = "inline";
-            }
-          }
-        };
-        setStatus("(refreshing...)");
-        xmlHttp.open("GET", "/status", true);
-        xmlHttp.send(null);
-      }
-      
-
       /////////////////////////
       // FILE TREE
 
@@ -434,26 +493,26 @@
         var preview = document.getElementById("preview");
         var treeRoot = document.createElement("div");
         treeRoot.className = "css-treeview";
+        treeRoot.id = "/";
         document.getElementById(element).appendChild(treeRoot);
   
         function loadDownload(path){
-          document.getElementById('download-frame').src = path+"?download=true";
+          document.getElementById("download-frame").src = path+"?download=true";
         }
         
         function loadImgPreview(path){
-          document.getElementById("filenameTxt").value = path;
+          document.getElementById("pathInput").value = path;
           document.getElementById("editor").style.display = "none";
           document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
           preview.innerHTML = "<img src='"+path+"' style='max-width:100%; max-height:100%; margin:auto; display:block;' />";
         }
         
-        function clearMainPanel(path) {
-          document.getElementById("filenameTxt").value = path;
+        this.clearMainPanel = function() {
           document.getElementById("editor").style.display = "none";
           document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
-          preview.innerHTML = "(format not supported for viewing/editing)";
+          preview.innerHTML = "(file not found or format not supported)";
         }
     
         function isTextFile(path){
@@ -490,57 +549,64 @@
           }
           return false;
         }
-
+        
         function fillFolderMenu(el, path){
           var list = document.createElement("ul");
           el.appendChild(list);
           var action = document.createElement("li");
-          list.appendChild(action);
-          var isChecked = document.getElementById(path).checked;
+          list.appendChild(action);          
+          var isChecked = document.getElementById(path).childNodes[0].checked;
           var expnd = document.createElement("li");
           list.appendChild(expnd);
           if(isChecked){
             expnd.innerHTML = "<span>Collapse</span>";
             expnd.onclick = function(e){
-              document.getElementById(path).checked = false;
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+              document.getElementById(path).childNodes[0].checked = false;
             };
             var refrsh = document.createElement("li");
             list.appendChild(refrsh);
             refrsh.innerHTML = "<span>Refresh</span>";
             refrsh.onclick = function(e){
-              var leaf = document.getElementById(path).parentNode;
-              if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpList(leaf, path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+              httpList(path);
             };
           } 
           else {
             expnd.innerHTML = "<span>Expand</span>";
             expnd.onclick = function(e){
-              document.getElementById(path).checked = true;
-              var leaf = document.getElementById(path).parentNode;
-              if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpList(leaf, path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+              document.getElementById(path).childNodes[0].checked = true;
+              httpList(path);
             };
           }
           var upload = document.createElement("li");
           list.appendChild(upload);
           upload.innerHTML = "<span>Upload</span>";
           upload.onclick = function(e){
-            var filenameTxt = document.getElementById("filenameTxt");
-            var subPath = filenameTxt.value;
-            if(subPath.lastIndexOf("/") < 1) filenameTxt.value = path + subPath;
-            else filenameTxt.value = path.substring(subPath.lastIndexOf("/")) + subPath;
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+            var pathInput = document.getElementById("pathInput");
+            var subPath = pathInput.value.trim();
+            if(subPath.lastIndexOf("/") < 1) pathInput.value = path + subPath;
+            else pathInput.value = getParentFolder(path) + subPath;
+            // TODO errr... where is the actual upload ? Did it get lost ?
+          };
+          var renFolder = document.createElement("li");
+          list.appendChild(renFolder);
+          renFolder.innerHTML = "<span>Rename/Move</span>";
+          renFolder.onclick = function(e){
+            if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+            var newPath = prompt("Rename " + path + " to", path);
+            if (newPath != null && newPath != path) {
+              httpRename(path, newPath);
+            }
           };
           var delFolder = document.createElement("li");
           list.appendChild(delFolder);
           delFolder.innerHTML = "<span>Delete</span>";
           delFolder.onclick = function(e){
-            httpDelete(path);
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+            httpDelete(path);
           };
         }
   
@@ -552,30 +618,40 @@
           if(isTextFile(path)){
             action.innerHTML = "<span>Edit</span>";
             action.onclick = function(e){
-              if (canLoadContents()) editor.loadUrl(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+              if (canLoadNewContents()) editor.loadUrl(path);
             };
           } 
           else if(isImageFile(path)){
             action.innerHTML = "<span>Preview</span>";
             action.onclick = function(e){
-              if (canLoadContents()) loadImgPreview(path);
               if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+              if (canLoadNewContents()) loadImgPreview(path);
             };
           }
           var download = document.createElement("li");
           list.appendChild(download);
           download.innerHTML = "<span>Download</span>";
           download.onclick = function(e){
-            loadDownload(path);
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+            loadDownload(path);
+          };
+          var renFile = document.createElement("li");
+          list.appendChild(renFile);
+          renFile.innerHTML = "<span>Rename/Move</span>";
+          renFile.onclick = function(e){
+            if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+            var newPath = prompt("Rename " + path + " to", path);
+            if (newPath != null && newPath != path) {
+              httpRename(path, newPath);
+            }
           };
           var delFile = document.createElement("li");
           list.appendChild(delFile);
           delFile.innerHTML = "<span>Delete</span>";
           delFile.onclick = function(e){
-            httpDelete(path);
             if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
+            httpDelete(path);
           };
         }
   
@@ -601,14 +677,6 @@
           };
         }
         
-        this.attemptLoad = function(path) {
-          if (canLoadContents()) {
-            if(isTextFile(path)) editor.loadUrl(path);
-            else if(isImageFile(path)) loadImgPreview(path);
-            else clearMainPanel(path);
-          }
-        }
-  
         function createTreeLeaf(parentPath, name, size){
           var leaf = document.createElement("li");
           leaf.id = ((parentPath == "/")?"":parentPath)+"/"+name;
@@ -628,26 +696,25 @@
   
         function createTreeBranch(parentPath, name, disabled){
           var leaf = document.createElement("li");
+          leaf.id = ((parentPath == "/")?"":parentPath)+"/"+name;          
           var check = document.createElement("input");
           check.type = "checkbox";
-          check.id = ((parentPath == "/")?"":parentPath)+"/"+name;          
+          //check.id = "check-" + leaf.id;
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
           var label = document.createElement("label");
-          label.for = check.id;
+          //label.for = check.id; // should be label.htmlFor anyway
           label.textContent = name;
           leaf.appendChild(label);
           check.onchange = function(e){
             if(check.checked){
-              if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpList(leaf, check.id);
+              httpList(leaf.id);
             }
           };
           label.onclick = function(e){
             if(!check.checked){
               check.checked = true;
-              if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpList(leaf, check.id);
+              httpList(leaf.id);
             } 
             else {
               check.checked = false;
@@ -656,12 +723,12 @@
           leaf.oncontextmenu = function(e){
             e.preventDefault();
             e.stopPropagation();
-            showContextMenu(e, check.id, false);
+            showContextMenu(e, leaf.id, false);
           }
           return leaf;
         }
   
-        function addFileNodes(parentEl, parentPath, items){
+        function addFileNodes(parentPath, items){
           items.sort(function(a, b) {
             if (a.type == b.type) {
               return a.name.localeCompare(b.name); // a before z
@@ -671,6 +738,12 @@
             }           
           });
           var list = document.createElement("ul");
+
+          var parentEl = document.getElementById(parentPath);
+          if (!parentEl) {
+            // TODO handle this case (happens when moving a file to a closed nested folder)
+            alert("parentEl not found for path '" + parentPath + "'");
+          }
           parentEl.appendChild(list);
           var ll = items.length;
           for(var i = 0; i < ll; i++){
@@ -682,69 +755,190 @@
           }   
         }
   
-        function onListReceived(parentEl, parentPath){
-          return function(){
-            document.body.style.cursor = "default";
-            if(xmlHttp.status != 200) showHttpError(xmlHttp);
-            else addFileNodes(parentEl, parentPath, JSON.parse(xmlHttp.responseText));
+        this.attemptLoad = function(path) {
+          console.log("Attempting load of '" + path  + "'...");
+          document.getElementById("pathInput").value = path;
+          if (canLoadNewContents()) {
+            if(isTextFile(path)) editor.loadUrl(path);
+            else if(isImageFile(path)) loadImgPreview(path);
+            else clearMainPanel();
           }
         }
-  
-        function httpList(parentEl, parentPath){
-          xmlHttp = new XMLHttpRequest(parentEl, parentPath);
-          xmlHttp.onload = onListReceived(parentEl, parentPath);
-          document.body.style.cursor = "wait";
-          xmlHttp.open("GET", "/list?dir="+parentPath, true);
-          xmlHttp.send(null);
-        }
-    
+        
+        /*
+         * Refresh the given path, e.g. "/a/b/c/d"
+         * It means we have to make sure d is already displayed
+         * If not, we get to its parent first (c), if open, and so on (b, a).
+         * Once we have found an ancestor, we refresh it, then we must come back to where we started, refreshing nodes on our way down.
+         * This is done by pushing all paths to be refreshed in an array that will be pop'd in the callback function
+         */
         this.refreshPath = function(path){
-          if(path.lastIndexOf("/") < 1){
+          console.log("Refreshing '" + path + "'...");
+          if(path.lastIndexOf("/") == -1){
             // No "/" => reset the root
-            path = "/";
-            treeRoot.removeChild(treeRoot.childNodes[0]);
-            httpList(treeRoot, "/");
+            httpList("/");
           } 
           else {
-            var parentPath = path.substring(0, path.lastIndexOf("/"));
-            if (document.getElementById(parentPath)) {
-              // We have a parent node (LittleFS or SDFS)
-              var leaf = document.getElementById(parentPath).parentNode;
-              if(leaf.childNodes.length == 3) leaf.removeChild(leaf.childNodes[2]);
-              httpList(leaf, parentPath);
+            var paths = [];            
+            // Climb the tree until we get to an open node, adding paths to the array
+            var parentPath = path;
+            while ((parentPath.lastIndexOf("/") != -1) && !document.getElementById(parentPath)) {
+              paths.push(parentPath);
+              parentPath = getParentFolder(parentPath);
             }
+            // TODO if on SPIFFS : No parent node => refresh full tree
+            //  httpList("/");
+            // else 
+            
+            // If we've reached the top
+            if (parentPath == "") paths.push("/"); // list the root
+            else paths.push(parentPath); // otherwise list the last folder
+            
+            // And list it back down by iterating on collected paths
+            listPaths(paths);  
+          }
+        }
+
+        
+        //////////////////////////////
+        // HTTP OPERATIONS
+        
+        // Callbacks
+        
+        function onListReceived(req, parentPath, remainingPaths){
+          return function(){
+            setLoading(false);
+            if(req.status != 200) showHttpError(req);
             else {
-              // No parent node (SPIFFS), refresh full tree
-              treeRoot.removeChild(treeRoot.childNodes[0]);
-              httpList(treeRoot, "/");
+              addFileNodes(parentPath, JSON.parse(req.responseText));
+              if (document.getElementById(parentPath).childNodes[0].checked !== undefined) {
+                document.getElementById(parentPath).childNodes[0].checked = true;              
+              }
+              if (remainingPaths && remainingPaths.length) {
+                listPaths(remainingPaths);
+              }
             }
           }
-        };
+        }
   
-        function deleteCallback(path){
+        /*
+         * Callback after a FS operation was performed. 
+         * The "req" param is the http request
+         * The "path" param is the "affected" (created, moved, renamed, delteted) path, of which the parent must be refreshed
+         * In case of move/delete, the "target" path is returned in the response, so that it can be refreshed too
+         * Operation      | path (file to be loaded) | req.responseText (between brackets if same as parent of path)
+         * ---------------+--------------------------+--------------------------------------------------------------
+         * Create file    | created file             | (parent of created file)
+         * Create folder  | created folder           | (parent of created folder)
+         * Rename file    | target file              | (parent of source file)
+         * Move file      | target file              | parent of source file, or remaining ancestor
+         ? Rename folder  | target folder            | (parent of source folder)
+         ? Move folder    | target folder            | parent of source folder, or remaining ancestor
+         * Delete file    |                          | parent of deleted file, or remaining ancestor
+         * Delete folder  |                          | parent of deleted folder, or remaining ancestor
+         */
+        function onOperationComplete(req, path){
           return function(){
-            document.body.style.cursor = "default";
-            if(xmlHttp.status != 200) showHttpError(xmlHttp);
+            setLoading(false);
+            if(req.status != 200) showHttpError(req);
             else {
-              // Folder to refresh is returned
-              refreshPath(xmlHttp.responseText);
+              if (path) {                
+                var parentPath = getParentFolder(path);
+
+                // Refresh returned path, if requested and different from path
+                if (req.responseText && req.responseText != parentPath) {
+                  refreshPath(req.responseText);
+                }
+
+                // Refresh original path
+                refreshPath(parentPath);
+                              
+                // Try to load given path
+                attemptLoad(path);
+              }
+              else {
+                // Delete, only refresh returned path
+                refreshPath(req.responseText);
+              }              
             }
             refreshStatus();
           }
         }
-  
-        function httpDelete(filename){
-          setStatus("Deleting...");
+
+
+        // Requests        
+        
+        function httpList(parentPath, remainingPaths){
+          setLoading(true, "Listing '" + parentPath + "'...");
+          // Remove previous child list, if any
+          var parentEl = document.getElementById(parentPath);
+          if (parentEl) {
+            var lastChild = parentEl.lastElementChild;
+            if (lastChild && lastChild.tagName == "UL") parentEl.removeChild(lastChild);
+          }
+          
+          // And fetch an updated list
           xmlHttp = new XMLHttpRequest();
-          xmlHttp.onload = deleteCallback(filename);
+          xmlHttp.onload = onListReceived(xmlHttp, parentPath, remainingPaths);
+          xmlHttp.open("GET", "/list?dir="+parentPath, true);
+          xmlHttp.send(null);
+        }
+        
+        function listPaths(paths) {
+          var path = paths.pop();     
+          if (path) {
+            httpList(path, paths);
+          }
+        }
+  
+
+    
+        this.httpUpload = function(file, path) {
+          setLoading(true, "Uploading '" + path + "'...");
+          if (!path.startsWith("/")) path = "/" + path;
+          xmlHttp = new XMLHttpRequest();
+          xmlHttp.onload = onOperationComplete(xmlHttp, path);
           var formData = new FormData();
-          formData.append("path", filename);
-          document.body.style.cursor = "wait";
+          formData.append("data", file, path);
+          xmlHttp.open("POST", "/edit");
+          xmlHttp.send(formData);
+        };     
+
+        this.httpCreate = function(path){
+          setLoading(true, "Creating '" + path + "'...");
+          if (!path.startsWith("/")) path = "/" + path;
+          xmlHttp = new XMLHttpRequest();
+          xmlHttp.onload = onOperationComplete(xmlHttp, path);
+          var formData = new FormData();
+          formData.append("path", path);
+          xmlHttp.open("PUT", "/edit");
+          xmlHttp.send(formData);
+        }
+        
+        function httpRename(srcPath, dstPath){
+          setLoading(true, "Renaming '" + srcPath + "' to '" + dstPath + "'...");
+          if (!dstPath.startsWith("/")) dstPath = "/" + dstPath;
+          xmlHttp = new XMLHttpRequest();
+          xmlHttp.onload = onOperationComplete(xmlHttp, dstPath);
+          var formData = new FormData();
+          formData.append("path", dstPath);
+          formData.append("src", srcPath);
+          xmlHttp.open("PUT", "/edit");
+          xmlHttp.send(formData);
+        }
+
+        function httpDelete(path) {
+          setLoading(true, "Deleting '" + path + "'...");
+          xmlHttp = new XMLHttpRequest();
+          xmlHttp.onload = onOperationComplete(xmlHttp);
+          var formData = new FormData();
+          formData.append("path", path);
           xmlHttp.open("DELETE", "/edit");
           xmlHttp.send(formData);
         }
+
   
-        httpList(treeRoot, "/");
+        httpList("/");
         return this;
       }
 
@@ -791,36 +985,38 @@
         var editor = ace.edit(element);
         
         function filePosted(){
-          document.body.style.cursor = "default";
+          setLoading(false);
           if(xmlHttp.status != 200) showHttpError(xmlHttp);
-          tree.refreshPath(file);
+          tree.refreshPath(getParentFolder(file)); // to update size in tree
           refreshStatus();
         }
-        function postFile(filename, data, type){
+        function postFile(path, data, type){
+          setLoading(true, "Saving '" + path + "'...");
           xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = filePosted;
           var formData = new FormData();
-          formData.append("data", new Blob([data], { type: type }), filename);
-          document.body.style.cursor = "wait";
+          formData.append("data", new Blob([data], { type: type }), path);
           xmlHttp.open("POST", "/edit");
           xmlHttp.send(formData);
         }
 
         function fileLoaded(){
-          document.body.style.cursor = "default";
+          setLoading(false);
           document.getElementById("preview").style.display = "none";
           document.getElementById("editor").style.display = "block";
           document.getElementById("editorButtons").style.display = "inline";
-          if(xmlHttp.status == 200) editor.setValue(xmlHttp.responseText);
-          else editor.setValue("");
-          editor.clearSelection();
-          enableSaveDiscard(false);
+          if(xmlHttp.status == 200) {
+            editor.setValue(xmlHttp.responseText);
+            editor.clearSelection();
+            enableSaveDiscardBtns(false);
+          }
+          else tree.clearMainPanel();
         }
-        function loadFile(theUrl){
+        function loadFile(path){
+          setLoading(true, "Loading '" + path + "'...");
           xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = fileLoaded;
-          document.body.style.cursor = "wait";
-          xmlHttp.open("GET", theUrl, true);
+          xmlHttp.open("GET", path, true);
           xmlHttp.send(null);
         }
   
@@ -848,13 +1044,13 @@
         })
 
         editor.session.on('change', function(delta) {
-          enableSaveDiscard(true);
+          enableSaveDiscardBtns(true);
         });        
 
-        editor.loadUrl = function(filename){
-          enableSaveDiscard(false);
-          document.getElementById("filenameTxt").value = filename;
-          file = filename;
+        editor.loadUrl = function(path){
+          document.getElementById("pathInput").value = path;
+          enableSaveDiscardBtns(false);
+          file = path;
           lang = getLangFromFilename(file);
           type = "text/"+lang;
           if(lang !== "plain") editor.getSession().setMode("ace/mode/"+lang);
@@ -862,13 +1058,13 @@
         }
         
         editor.save = function() {
-          enableSaveDiscard(false);
+          enableSaveDiscardBtns(false);
           postFile(file, editor.getValue()+"", type);
         }
         
         editor.discard = function() {
           editor.loadUrl(file);
-          enableSaveDiscard(false);
+          enableSaveDiscardBtns(false);
         }
         
         editor.showShortcuts = function() {
@@ -877,12 +1073,6 @@
             editor.showKeyboardShortcuts()
           });
         }
-
-        function enableSaveDiscard(enabled) {
-          document.getElementById("saveBtn").disabled = !enabled;
-          document.getElementById("discardBtn").disabled = !enabled;
-        }
-
 
         loadFile(file);        
         
@@ -908,6 +1098,7 @@
     <div id="tree"></div>
     <div id="editor"></div>
     <div id="preview" style="display:none;"></div>
+    <div id="loading"><div id="loading-msg"></span><div class="spinner-anim">Loading...</div></div>
     <iframe id=download-frame style='display:none;'></iframe>
   </body>
 </html>
