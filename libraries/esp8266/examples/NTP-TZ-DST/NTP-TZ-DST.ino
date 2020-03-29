@@ -134,7 +134,7 @@ void showTime() {
   Serial.println((uint32_t)now);
 
   // timezone and demo in the future
-  Serial.printf("timezone:  %s\n", getenv("TZ"));
+  Serial.printf("timezone:  %s\n", getenv("TZ") ? : "(none)");
 
   // human readable
   Serial.print("ctime:     ");
