@@ -225,7 +225,7 @@
       
       #loading-msg {
         display: inline-block;
-        position: relative;
+        position: absolute;
         top: 0px;
         left: 50%;
         transform: translateX(-50%);
@@ -1098,7 +1098,7 @@
     <div id="tree"></div>
     <div id="editor"></div>
     <div id="preview" style="display:none;"></div>
-    <div id="loading"><div id="loading-msg"></span><div class="spinner-anim">Loading...</div></div>
+    <div id="loading"><span id="loading-msg"></span><br/><div class="spinner-anim">Loading...</div></div>
     <iframe id=download-frame style='display:none;'></iframe>
   </body>
 </html>
