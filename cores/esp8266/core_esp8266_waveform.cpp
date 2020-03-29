@@ -250,19 +250,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         nextEventCcy = wave->expiryCcy;
       }
       else if (static_cast<int32_t>(nextEventCcy - now) <= 0) {
-        waveformsState ^= 1UL << pin;
         if (waveformsState & (1UL << pin)) {
-          if (wave->nextTimeDutyCcys) {
-            if (pin == 16) {
-              GP16O |= 1; // GPIO16 write slow as it's RMW
-            }
-            else {
-              SetGPIO(1UL << pin);
-            }
-          }
-          nextEventCcy += wave->nextTimeDutyCcys;
-        }
-        else {
           if (wave->nextTimeDutyCcys != wave->nextTimePeriodCcys) {
             if (pin == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
@@ -270,13 +258,27 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             else {
               ClearGPIO(1UL << pin);
             }
+            waveformsState ^= 1UL << pin;
           }
-          // handles overshoot where an updated period is shorter than the previous duty cycle
-          // maintains phase if the previous period is an integer multiple of the new period
-          do {
+          wave->nextPhaseCcy += wave->nextTimePeriodCcys;
+          nextEventCcy = wave->nextPhaseCcy;
+        }
+        else {
+          // skip duty cycle if overshot before even starting
+          if (static_cast<int32_t>(nextEventCcy - now) > -static_cast<int32_t>(wave->nextTimeDutyCcys)) {
+            if (pin == 16) {
+              GP16O |= 1; // GPIO16 write slow as it's RMW
+            }
+            else {
+              SetGPIO(1UL << pin);
+            }
+            waveformsState ^= 1UL << pin;
+            nextEventCcy += wave->nextTimeDutyCcys;
+          }
+          else {
             wave->nextPhaseCcy += wave->nextTimePeriodCcys;
             nextEventCcy = wave->nextPhaseCcy;
-          } while (static_cast<int32_t>(nextEventCcy - now) <= -static_cast<int32_t>(wave->nextTimeDutyCcys));
+          }
         }
       }
 
