@@ -3,6 +3,10 @@
   <head>
     <title>File manager</title>
     <style type="text/css" media="screen">
+      body {
+        font-size: 12px;
+        font-family: Verdana, Arial, Sans-serif;
+      }
       .contextMenu {
         z-index: 300;
         position: absolute;
@@ -11,9 +15,8 @@
         background-color: #F5F5F5;
         display: none;
         box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
-        font-size: 12px;
-        font-family: sans-serif;
-        font-weight:bold;
+        font-size: 11px;
+        font-weight: bold;
       }
       .contextMenu ul {
         list-style: none;
@@ -45,7 +48,7 @@
         opacity: 0;
       }
       .css-treeview {
-        font: normal 11px Verdana, Arial, Sans-serif;
+        font-size: 11px;
         -moz-user-select: none;
         -webkit-user-select: none;
         user-select: none;
@@ -200,14 +203,14 @@
         top: 4px;
         right: 10px;
         height: 28px;
-        font: normal 14px Verdana, Arial, Sans-serif;
+        font-size: 14px;
       }
       
       /* Spinner based on from https://github.com/jlong/css-spinners */
       #loading {
         position:absolute;
         // note: changing between block and none cancels the opacity anim, so we move it in and out of screen instead by changing the top value
-        // ? TODO: see https://www.impressivewebs.com/animate-display-block-none/ for another approach
+        // maybe see https://www.impressivewebs.com/animate-display-block-none/ for another approach
         display:block; 
         top: -100vh;
         left: 0;
@@ -230,7 +233,7 @@
         left: 50%;
         transform: translateX(-50%);
         color:white;
-        font: normal 32px Verdana, Arial, Sans-serif;
+        font-size: 32px;
       }
 
       @keyframes spinner-anim {
@@ -431,7 +434,7 @@
           pathInput.value = getParentFolder(pathInput.value) + "/" + filename;
         }
 
-        upload.onclick = function(e){
+        upload.onclick = function(e) {
           if(fileSelector.files.length === 0) return;   
           tree.httpUpload(fileSelector.files[0], pathInput.value);
         }
@@ -512,7 +515,7 @@
           document.getElementById("editor").style.display = "none";
           document.getElementById("editorButtons").style.display = "none";
           preview.style.display = "block";
-          preview.innerHTML = "(file not found or format not supported)";
+          preview.innerHTML = "<div style='text-align:center'>(file not found or format not supported)</div>";
         }
     
         function isTextFile(path){
@@ -580,17 +583,6 @@
               httpList(path);
             };
           }
-          var upload = document.createElement("li");
-          list.appendChild(upload);
-          upload.innerHTML = "<span>Upload</span>";
-          upload.onclick = function(e){
-            if(document.body.getElementsByClassName('contextMenu').length > 0) document.body.removeChild(el);
-            var pathInput = document.getElementById("pathInput");
-            var subPath = pathInput.value.trim();
-            if(subPath.lastIndexOf("/") < 1) pathInput.value = path + subPath;
-            else pathInput.value = getParentFolder(path) + subPath;
-            // TODO errr... where is the actual upload ? Did it get lost ?
-          };
           var renFolder = document.createElement("li");
           list.appendChild(renFolder);
           renFolder.innerHTML = "<span>Rename/Move</span>";
@@ -739,12 +731,7 @@
           });
           var list = document.createElement("ul");
 
-          var parentEl = document.getElementById(parentPath);
-          if (!parentEl) {
-            // TODO handle this case (happens when moving a file to a closed nested folder)
-            alert("parentEl not found for path '" + parentPath + "'");
-          }
-          parentEl.appendChild(list);
+          document.getElementById(parentPath).appendChild(list);
           var ll = items.length;
           for(var i = 0; i < ll; i++){
             var item = items[i];

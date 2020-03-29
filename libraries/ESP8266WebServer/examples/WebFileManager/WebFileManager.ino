@@ -21,14 +21,17 @@
  * - Support Filenames without extension, Dirnames with extension
  * - Improved recursive refresh of parts of the tree (e.g. upon file delete, refresh subfolder, move to a closed folder)
  * - Added Save/Discard/Help buttons to ACE editor, discard confirmation on leaveand refresh tree/status upon save
+ * - Removed Upload from context menu (didn't work anyway)
  * - Added Rename/Move feature to context menu
  *
  * TODO:
  * - Cleanup (look for TODO below and in HTML)
+ * - Include minified version of the JS code
  * - ? Add a visible root node "/" (without a delete option) + add the FS type next to it, like <i>LittleFS</i> + move "Mkdir" and "MkFile" to context menu + implement drag/drop for move + make "rename" only a local rename operation (no move) + remove recursive opening ?
  * - ? Can we query the fatType of the SDFS (and limit to 8.3 if FAT16)
  * - ? Check if ace.js is reachable and default to text viewer otherwise
  * - ? Present SPIFFS as a hierarchical FS
+ * - ? Is there a case where we need to limit files to 8.3 ?
  * - Perform test suite again
  *
  * TEST: (#XXX = failed / vXXX = OK)
@@ -346,7 +349,7 @@ void handleFileCreate() {
   }
   
   String path = server.arg("path");
-  if (path == "") { // todo is this the right test in case of no arg
+  if (path == "") {
     return returnFail("MISSING PATH ARG");
   }
   if (path == "/") {
@@ -383,7 +386,7 @@ void handleFileCreate() {
   else {  
     // Two arguments: rename
     String src = server.arg("src");
-    if (src == "") { // todo is this the right test in case of no arg
+    if (src == "") {
       return returnFail("MISSING SRC ARG");
     }
     if (src == "/") {
@@ -404,7 +407,7 @@ void handleFileCreate() {
     if (!fileSystem->rename(src, path)) {
       return returnFail("RENAME FAILED");
     }
-    returnOKWithMsg(lastExistingParent(src) + "/");
+    returnOKWithMsg(lastExistingParent(src));
   }
 }
 
@@ -470,7 +473,7 @@ void handleFileDelete() {
   }
   deleteRecursive(path);
 
-  returnOKWithMsg(lastExistingParent(path) + "/");
+  returnOKWithMsg(lastExistingParent(path));
 }
 
 /*
