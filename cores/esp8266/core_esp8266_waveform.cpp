@@ -212,7 +212,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + microsecondsToClockCycles(12);
   uint32_t now = ESP.getCycleCount();
-  uint32_t nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
+  int32_t nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
+  uint32_t nextTimerCcy = now + nextTimerCcys;
   bool busy = waveformsEnabled;
   while (busy) {
     nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
@@ -264,8 +265,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           nextEventCcy = wave->nextPhaseCcy;
         }
         else {
-          // skip duty cycle if overshot before even starting
-          if (static_cast<int32_t>(nextEventCcy - now) > -static_cast<int32_t>(wave->nextTimeDutyCcys)) {
+          if (wave->nextTimeDutyCcys) {
             if (pin == 16) {
               GP16O |= 1; // GPIO16 write slow as it's RMW
             }
@@ -288,16 +288,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       now = ESP.getCycleCount();
     }
+    nextTimerCcys = nextTimerCcy - now;
     busy = waveformsEnabled &&
       static_cast<int32_t>(isrTimeoutCcy - nextTimerCcy) > 0 &&
-      static_cast<int32_t>(isrTimeoutCcy - now) > 0;
+      nextTimerCcys < DELTAIRQ * 2;
   }
 
-  int32_t nextTimerCcys;
-  if (!timer1CB) {
-      nextTimerCcys = nextTimerCcy - now;
-  }
-  else {
+  if (timer1CB) {
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
     // Account for unknown duration of timer1CB().
     nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
