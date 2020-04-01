@@ -35,10 +35,12 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, unsigned long 
 
   pinMode(_pin, OUTPUT);
 
-  high = std::max(high, (uint32_t)100);
-  low = std::max(low, (uint32_t)100);
+  high = std::max(high, (uint32_t)100);  // 5KHz maximum tone for Arduino compatibility
+  low = std::max(low, (uint32_t)100);    // (100us high + 100us low period = 5KHz)
 
-  if (startWaveform(_pin, high, low, (uint32_t) duration * 1000)) {
+  duration *= 1000UL;
+  duration -= duration % (high + low);
+  if (startWaveform(_pin, high, low, duration)) {
     _toneMap |= 1 << _pin;
   }
 }
