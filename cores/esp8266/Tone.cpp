@@ -38,9 +38,7 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, unsigned long 
   high = std::max(high, (uint32_t)100);  // 5KHz maximum tone for Arduino compatibility
   low = std::max(low, (uint32_t)100);    // (100us high + 100us low period = 5KHz)
 
-  duration *= 1000UL;
-  duration -= duration % (high + low);
-  if (startWaveform(_pin, high, low, duration)) {
+  if (startWaveform(_pin, high, low, (uint32_t) duration * 1000)) {
     _toneMap |= 1 << _pin;
   }
 }
