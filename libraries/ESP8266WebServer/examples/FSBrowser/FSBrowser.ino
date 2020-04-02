@@ -27,7 +27,7 @@
 // Select the FileSystem by uncommenting one of the lines below
 
 //#define USE_SPIFFS
-//#define USE_LITTLEFS
+#define USE_LITTLEFS
 //#define USE_SDFS
 
 ////////////////////////////////
@@ -240,12 +240,12 @@ bool handleFileRead(String path) {
   } else {
     contentType = getContentType(path);
   }
-  
-  String pathWithGz = path + ".gz";
-  if (fileSystem->exists(pathWithGz) || fileSystem->exists(path)) {
-    if (fileSystem->exists(pathWithGz)) {
-      path += ".gz";
-    }
+
+  if (!fileSystem->exists(path)) {
+    // File not found, try gzip version
+    path = path + ".gz";
+  }  
+  if (fileSystem->exists(path)) { 
     File file = fileSystem->open(path, "r");
     if (server.streamFile(file, contentType) != file.size()) {
       DBG_OUTPUT_PORT.println("Sent less data than expected!");
@@ -253,6 +253,7 @@ bool handleFileRead(String path) {
     file.close();
     return true;
   }
+
   return false;
 }
 
@@ -375,9 +376,10 @@ void deleteRecursive(String path) {
 }
 
 
-// TODO test delete and move on SPIFFS
-// As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed, 
-// return the path of the closest parent still existing
+/* 
+ * As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed, 
+ * return the path of the closest parent still existing
+ */
 String lastExistingParent(String path) {
   while (path != "" && !fileSystem->exists(path)) {
     if (path.lastIndexOf("/") > 0) path = path.substring(0, path.lastIndexOf("/"));
