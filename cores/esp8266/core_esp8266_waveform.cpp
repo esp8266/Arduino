@@ -110,7 +110,7 @@ void setTimer1Callback(uint32_t (*fn)()) {
   timer1CB = fn;
   if (!timerRunning && fn) {
     initTimer();
-    timer1_write(microsecondsToClockCycles(2)); // Cause an interrupt post-haste
+    timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
   } else if (timerRunning && !fn && !waveformsEnabled) {
     deinitTimer();
   }
@@ -141,11 +141,11 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     std::atomic_thread_fence(std::memory_order_release);
     if (!timerRunning) {
       initTimer();
-      timer1_write(microsecondsToClockCycles(2));
+      timer1_write(microsecondsToClockCycles(1));
     }
-    else if (T1L > microsecondsToClockCycles(2)) {
+    else if (T1L > microsecondsToClockCycles(6)) {
       // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
-      timer1_write(microsecondsToClockCycles(2));
+      timer1_write(microsecondsToClockCycles(6));
     }
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
@@ -172,8 +172,8 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (waveformsEnabled & (1UL << pin)) {
     waveformToDisable = 1UL << pin;
   // Must not interfere if Timer is due shortly
-  if (T1L > DELTAIRQ) {
-    timer1_write(DELTAIRQ);
+  if (T1L > microsecondsToClockCycles(6)) {
+    timer1_write(microsecondsToClockCycles(6));
   }
     while (waveformToDisable) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
@@ -291,7 +291,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
     nextTimerCcys = nextTimerCcy - now;
     busy = waveformsEnabled && timerMarginCcys > 0 &&
-      (nextTimerCcys < microsecondsToClockCycles(2) + DELTAIRQ);
+      (nextTimerCcys < microsecondsToClockCycles(6) + DELTAIRQ);
   }
 
   if (timer1CB) {
@@ -303,8 +303,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys <= microsecondsToClockCycles(2) + DELTAIRQ)
-    nextTimerCcys = microsecondsToClockCycles(2);
+  if (nextTimerCcys <= microsecondsToClockCycles(6) + DELTAIRQ)
+    nextTimerCcys = microsecondsToClockCycles(6);
   else
     nextTimerCcys -= DELTAIRQ;
 
