@@ -2,7 +2,7 @@
 
 ## What is this sketch about ?
 
-This example is a FileSystem browser for the ESP8266 using http requests and a html/javascript frontend, 
+This example is a FileSystem Browser for the ESP8266 using http requests and a html/javascript frontend, 
 working for both SPIFFS, LittleFS and SDFS.
 This unified version is based on the previous examples named FSWebServer, FSBrowser and SDWebServer, Copyright (c) 2015 Hristo Gochkov. All rights reserved.
 
@@ -10,11 +10,12 @@ This unified version is based on the previous examples named FSWebServer, FSBrow
 
 1. Uncomment one of the "#define USE_xxx" directives in the sketch
 2. Add the credentials of your WiFi network (search for "STASSID")
-3. Copy the contents of the 'data' folder to the filesystem. To do so:
+3. Compile and upload the sketch to your ESP8266 device
+4. Copy the contents of the 'data' folder to the filesystem. To do so:
 - for SDFS, copy that contents to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
 - for SPIFFS or LittleFS, please follow the instructions at https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#uploading-files-to-file-system
-4. Once the data and sketch have been uploaded, access the editor by pointing your browser to http://fsbrowser.local/edit
-5. If you need to free as much space as possible, you can delete the sample files at the root but also the /edit/index.htm file, because the compressed version /edit/index.htm.gz will be used instead, for a total usage of less than 7KB
+5. Once the data and sketch have been uploaded, access the editor by pointing your browser to http://fsbrowser.local/edit
+6. If you need as much free space as possible on your filesystem, you can delete the sample files at the root but also the /edit/index.htm file, because the compressed version /edit/index.htm.gz will be used instead, for a total FS usage of less than 7KB
 
 ## Notes
 - See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems supported by the ESP8266.
@@ -63,7 +64,7 @@ This unified version is based on the previous examples named FSWebServer, FSBrow
 - ? Optionally mount several filesystems at the same time (SPIFFS + SDFS or LittleFS + SDFS)
 
 ## Test suite
- 
+These tests are a checklist of operations to verify the FSBrowser behaviour.
 ### On SPIFFS
 #### 8.3 filenames
 - At root : MkFile '/1.txt' / List / Edit / Download / Delete / Upload '/1.png' / View image / Delete image
@@ -100,7 +101,7 @@ This unified version is based on the previous examples named FSWebServer, FSBrow
 - Create nested file '/My folder/My test file.txt' and delete file 'My test file.txt' 
 
 ## Credits
-- Icons are from https://feathericons.com/ . The resulting PNG is passed first through https://compresspng.com/ before converting it using https://www.base64-image.de/
-- Spinner is based on https://github.com/jlong/css-spinners
-- Minifiying of index.htm done by : https://css-minifier.com/ (css) + https://www.javascriptminifier.com/ (js) + https://www.willpeavy.com/tools/minifier/ (html)
+- Icons are from https://feathericons.com/ . The resulting PNG is passed first through https://compresspng.com/ before being converted to base64 using https://www.base64-image.de/
+- The spinner is based on https://github.com/jlong/css-spinners
+- Minifiying of index.htm is done by : https://css-minifier.com/ (css) + https://www.javascriptminifier.com/ (js) + https://www.willpeavy.com/tools/minifier/ (html)
 
