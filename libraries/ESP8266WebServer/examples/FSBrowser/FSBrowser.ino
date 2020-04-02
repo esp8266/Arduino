@@ -1,7 +1,5 @@
-
-
 /*
-  WebFileManager - A web-based File Manager for ESP8266 filesystems  
+  FSBrowser - A web-based FileSystem Browser for ESP8266 filesystems  
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the ESP8266WebServer library for Arduino environment.
@@ -70,7 +68,7 @@
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
-const char* host = "webfilemanager";
+const char* host = "fsbrowser";
 
 ESP8266WebServer server(80);
 
@@ -543,7 +541,7 @@ void setup(void) {
     MDNS.addService("http", "tcp", 80);
     DBG_OUTPUT_PORT.print("Open http://");
     DBG_OUTPUT_PORT.print(host);
-    DBG_OUTPUT_PORT.println(".local/edit to open the file manager");
+    DBG_OUTPUT_PORT.println(".local/edit to open the FileSystem Browser");
   }
 
   ////////////////////////////////
