@@ -22,14 +22,14 @@ The html page uses the ace.js text editor which is hosted on a CDN, so Internet 
 
 ## Notes
 - See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems supported by the ESP8266.
-- For SDFS, if your card's CS pin is not connected the default pin (4), enable the line "fileSystemConfig.setCSPin(chipSelectPin);" specifying the GPIO the CS pin is connected to
+- For SDFS, if your card's CS pin is not connected the default pin (4), enable the "fileSystemConfig.setCSPin(chipSelectPin);" line, specifying the GPIO the CS pin is connected to
 - index.htm is the default index (works on subfolders as well)
-- Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename - SPIFFS and LittleFS also have limitations, please see https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
-- Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character
+- Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - see https://en.wikipedia.org/wiki/8.3_filename - SPIFFS and LittleFS also have limitations, please see https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
+- Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character.
 - The convention here is that the root of the filesystem is "/". On SPIFFS, paths not started with a slash are not supported
 - For creation, the convention is that a path ending with a "/" means create a folder, while without a "/" we create a file. Having an extension or not does not matter.
 
-## Changeslog since original FSBrowser
+## Changelog since original FSBrowser
  
 ### Fixes to work on LittleFS based on SDFS
 - #define logic to select FS
@@ -57,8 +57,7 @@ The html page uses the ace.js text editor which is hosted on a CDN, so Internet 
 - Added "Rename/Move" feature to context menu
 
 ## TODO (maybe)
-- ? Is there a case where we need to limit files to 8.3 ? FAT16 maybe ?
-- ? If so, how can we query the fatType of the SDFS (FAT16 or FAT32)
+- ? How can we query the fatType of the SDFS (FAT16 or FAT32) to limit filenames to 8.3 on FAT16 ?
 - ? Add a visible root node "/" (with no delete option) + add the FS type next to it, like <i>LittleFS</i> 
 - ? move "Mkdir" and "MkFile" to context menu, with prompt like for Rename/Move
 - ? implement drag/drop for move + make "rename" only a local rename operation (no move)
