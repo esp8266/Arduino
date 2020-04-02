@@ -17,6 +17,9 @@ This unified version is based on the previous examples named FSWebServer, FSBrow
 5. Once the data and sketch have been uploaded, access the editor by pointing your browser to http://fsbrowser.local/edit
 6. If you need as much free space as possible on your filesystem, you can delete the sample files at the root but also the /edit/index.htm file, because the compressed version /edit/index.htm.gz will be used instead, for a total FS usage of less than 7KB
 
+## Dependency
+The html page uses the ace.js text editor which is hosted on a CDN, so Internet access from your web browser is required for the FSBrowser to work.
+
 ## Notes
 - See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems supported by the ESP8266.
 - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line "fileSystemConfig.setCSPin(chipSelectPin);" specifying the GPIO the CS pin is connected to
