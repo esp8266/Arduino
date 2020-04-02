@@ -39,14 +39,14 @@ The html page uses the ace.js text editor which is hosted on a CDN, so Internet 
 - 'FILE_WRITE' was not declared in this scope > replaced by "w"
 
 ### UI/usability improvements
-- Never format filesystem, just return "FS INIT ERROR" when FS could not be mounted 
+- Never format filesystem, just return "FS INIT ERROR" when FS cannot be mounted 
 - Tree panel width is now proportional (20%) to see long names on big screens 
-- Added an icon for files, and indented them to the same level as folders
-- Changed file/folder icon set to use lighter and more neutral ones, and added specific "text" and "image" icons for formats recognized as such
+- Added icons for files, and indented them to the same level as folders
+- Changed file/folder icon set to use a lighter and more neutral one, and added specific "text" and "image" icons for formats recognized as such
 - Items are now sorted (folders first, then plain files, each in alphabetic order)
 - Added file size after each file name
 - Added FS status information at the top right
-- Made clear that an async operation is in progress by dimming screen and showing opertation status
+- Made clear that an async operation is in progress by dimming screen and showing operation status
 - Filled filename box in header with the name of the last clicked file
 - Selecting a file for upload defaults to putting it in the same folder as the last clicked file
 - Removed limitation to 8.3 lowercase filenames
