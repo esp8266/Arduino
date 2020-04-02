@@ -1,72 +1,7 @@
-/* Changes :
- *  
- * Fixes to work on LittleFS based on SDFS
- * - #define logic to select FS
- * - switched from SD to SDFS
- * - begin() does not support parameters > removed SS and added optional config
- * - LittleFS.open() second parametsr is mandatory > specified "r" where needed
- * - 'FILE_WRITE' was not declared in this scope > replaced by "w"
- * 
- * UI improvements:
- * - Tree panel width is now proportional (20%) to see long names on big screens 
- * - Added an icon for files, and indented them to the same level as folders
- * - Changed file/folder icon set to use lighter and more neutral ones from https://feathericons.com/ (passed the result through compresspng.com and base64-image.de)
- * - Items are now sorted (folders first, then plain files, each in alphabetic order)
- * - Added file size after each file name
- * - Added FS status information at the top right
- * - Make clear that an async operation is in progress by dimming screen and showing opertation status
- * - Filled filename box in header with the name of the last clicked file
- * - Selecting a file for upload defaults to putting it in the same folder as the last clicked file
- * - Removed limitation to 8.3 lowercase filenames
- * - Support Filenames without extension, Dirnames with extension
- * - Improved recursive refresh of parts of the tree (e.g. upon file delete, refresh subfolder, move to a closed folder)
- * - Added Save/Discard/Help buttons to ACE editor, discard confirmation on leaveand refresh tree/status upon save
- * - Removed Upload from context menu (didn't work anyway)
- * - Added Rename/Move feature to context menu
- *
- * TODO:
- * - Cleanup (look for TODO below and in HTML)
- * - Include minified version of the JS code
- * - ? Add a visible root node "/" (without a delete option) + add the FS type next to it, like <i>LittleFS</i> + move "Mkdir" and "MkFile" to context menu + implement drag/drop for move + make "rename" only a local rename operation (no move) + remove recursive opening ?
- * - ? Can we query the fatType of the SDFS (and limit to 8.3 if FAT16)
- * - ? Check if ace.js is reachable and default to text viewer otherwise
- * - ? Present SPIFFS as a hierarchical FS
- * - ? Is there a case where we need to limit files to 8.3 ?
- * - Perform test suite again
- *
- * TEST: (#XXX = failed / vXXX = OK)
- * - On SPIFFS:
- *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image
- *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image
- *  - Create nested file and delete the file / Create nested file and delete top folder
- *  - Attempt creation of unsupported filenames
- * - with Long Filenames:
- *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image
- *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image
- *  - Create nested file and delete the file / Create nested file and delete top folder
- * 
- * - On LittleFS:
- *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
- *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
- *  - Create nested file and delete the file / Create nested file and delete top folder
- * - with Long Filenames:
- *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
- *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
- *  - Create nested file and delete the file / Create nested file and delete top folder
- * 
- * - On SDFS:
- *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
- *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
- *  - Create nested file and delete the file / Create nested file and delete top folder
- * - with Long Filenames:
- *  - At root   : MkFile 'x.txt' / List / Edit / Download / Delete / Upload 'x.png' / View image / Mkdir
- *  - In subdir : MkFile 'y.txt' / List / Edit / Download / Delete / Upload 'y.png' / View image / Mkdir
- *  - Create nested file and delete the file / Create nested file and delete top folder
- */
+
 
 /*
-  WebFileManager - A web-based File Manager for ESP8266 filesystems
-  (unified from former FSWebServer, FSBrowser and SDWebServer examples)
+  WebFileManager - A web-based File Manager for ESP8266 filesystems  
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the ESP8266WebServer library for Arduino environment.
@@ -85,27 +20,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-
-  This example implements a file manager using http requests and a html/javascript frontend.
-  The filesystem itself can be SDFS, SPIFFS, LittleFS and has to be selected using one of the "#define USE_xxx" directives below.
-  See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems.
-
-  This example requires that a copy of the 'data' folder be first copied to the filesystem. To do so:
-  - for SDFS, copy that contents to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
-  - for SPIFFS or LittleFS, please follow the instructions at https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#uploading-files-to-file-system
-
-  Once the data and sketch have been uploaded, access the editor by going to http://webfilemanager.local/edit
-
-  Notes:
-  - For SDFS, if your card's CS pin is not connected the default pin (4), enable the line "fileSystemConfig.setCSPin(chipSelectPin);"
-  specifying the GPIO the CS pin is connected to
-  - index.htm is the default index (works on subfolders as well)
-  - Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - https://en.wikipedia.org/wiki/8.3_filename .
-  SPIFFS and LittleFS also have limitations. Plese see the https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
-  - Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character
-  - The convention here is that the root of the filesystem is "/". On SPIFFS, paths not started with a slash are not supported
-  - For creation, the convention is that a path ending with a "/" means create a folder, while without a "/" we create a file. Having an extension or not does not matter.
+  See readme.md for more information.
 
 */
 
@@ -115,7 +30,7 @@
 
 //#define USE_SPIFFS
 //#define USE_LITTLEFS
-#define USE_SDFS
+//#define USE_SDFS
 
 ////////////////////////////////
 
@@ -166,7 +81,7 @@ File uploadFile;
 
 
 ////////////////////////////////
-// Utils to return HTTP codes and determine content-type
+// Utils to return HTTP codes, determine content-type and URLdecode params of GET method
 
 void returnOK() {
   server.send(200, "text/plain", "");
@@ -186,34 +101,53 @@ void returnFail(String msg) {
 }
 
 String getContentType(String filename) {
-  if (filename.endsWith(".htm")) {
-    return "text/html";
-  } else if (filename.endsWith(".html")) {
-    return "text/html";
-  } else if (filename.endsWith(".css")) {
-    return "text/css";
-  } else if (filename.endsWith(".js")) {
-    return "application/javascript";
-  } else if (filename.endsWith(".png")) {
-    return "image/png";
-  } else if (filename.endsWith(".gif")) {
-    return "image/gif";
-  } else if (filename.endsWith(".jpg")) {
-    return "image/jpeg";
-  } else if (filename.endsWith(".jpeg")) {
-    return "image/jpeg";
-  } else if (filename.endsWith(".ico")) {
-    return "image/x-icon";
-  } else if (filename.endsWith(".xml")) {
-    return "text/xml";
-  } else if (filename.endsWith(".pdf")) {
-    return "application/x-pdf";
-  } else if (filename.endsWith(".zip")) {
-    return "application/x-zip";
-  } else if (filename.endsWith(".gz")) {
-    return "application/x-gzip";
-  }
+  if (filename.endsWith(".htm"))  return "text/html";
+  if (filename.endsWith(".html")) return "text/html";
+  if (filename.endsWith(".css"))  return "text/css";
+  if (filename.endsWith(".js"))   return "application/javascript";
+  if (filename.endsWith(".png"))  return "image/png";
+  if (filename.endsWith(".gif"))  return "image/gif";
+  if (filename.endsWith(".jpg"))  return "image/jpeg";
+  if (filename.endsWith(".jpeg")) return "image/jpeg";
+  if (filename.endsWith(".ico"))  return "image/x-icon";
+  if (filename.endsWith(".xml"))  return "text/xml";
+  if (filename.endsWith(".pdf"))  return "application/x-pdf";
+  if (filename.endsWith(".zip"))  return "application/x-zip";
+  if (filename.endsWith(".gz"))   return "application/x-gzip";
   return "text/plain";
+}
+
+unsigned char h2int(char c) {
+  if (c >= '0' && c <='9') return((unsigned char)c - '0');
+  if (c >= 'a' && c <='f') return((unsigned char)c - 'a' + 10);
+  if (c >= 'A' && c <='F') return((unsigned char)c - 'A' + 10);
+  return(0);
+}
+
+String urlDecode(String str) {    
+    String decodedString="";
+    char c;
+    char code0;
+    char code1;
+    for (int i =0; i < str.length(); i++) {
+      c=str.charAt(i);
+      if (c == '+') {
+        decodedString+=' ';  
+      }
+      else if (c == '%') {
+        i++;
+        code0=str.charAt(i);
+        i++;
+        code1=str.charAt(i);
+        c = (h2int(code0) << 4) | h2int(code1);
+        decodedString+=c;
+      } 
+      else {        
+        decodedString+=c;  
+      }
+    }
+    
+   return decodedString;
 }
 
 
@@ -252,20 +186,11 @@ void handleFileList() {
     return returnFail("BAD ARGS");
   }
 
-  String path = server.arg("dir");
-  if (path != "/" && !fileSystem->exists(path)) {
+  String path = urlDecode(server.arg("dir"));
+  if (path != "/" && !fileSystem->exists(path)) {   
     return returnFail("BAD PATH");
   }
-
-  /* TODO should we still perform a test equivalent to this one 
-  File dir = fileSystem->open(path, "r");
-  path = String();
-  if (!dir.isDirectory()) {
-    dir.close();
-    return returnFail("NOT DIR");
-  }
-   */
-   
+  
   DBG_OUTPUT_PORT.println(String("handleFileList: ") + path);
   Dir dir = fileSystem->openDir(path);
   path = String();
@@ -276,7 +201,7 @@ void handleFileList() {
     String error = getFileError(dir.fileName());
     if (error.length() > 0) {
       DBG_OUTPUT_PORT.println(String("Ignoring ") + error + dir.fileName());
-      continue
+      continue;
     }
 #endif
     if (output != "[") output += ',';
@@ -302,6 +227,11 @@ void handleFileList() {
  */
 bool handleFileRead(String path) {
   DBG_OUTPUT_PORT.println(String("handleFileRead: ") + path);
+  if (!fsOK) {
+    returnFail("FS INIT ERROR");
+    return true;
+  }
+
   if (path.endsWith("/")) {
     path += "index.htm";
   }
@@ -352,6 +282,13 @@ void handleFileCreate() {
   if (path == "") {
     return returnFail("MISSING PATH ARG");
   }
+
+#ifdef USE_SPIFFS
+  if (getFileError(path).length() > 0) {
+    return returnFail("INVALID FILENAME");
+  }
+#endif
+
   if (path == "/") {
     return returnFail("BAD PATH");
   }
@@ -380,7 +317,7 @@ void handleFileCreate() {
         return returnFail("CREATE FAILED");
       }
     }
-    if (path.lastIndexOf("/") > 0) path = path.substring(0, path.lastIndexOf("/"));
+    if (path.lastIndexOf("/") > -1) path = path.substring(0, path.lastIndexOf("/"));
     returnOKWithMsg(path);
   }
   else {  
@@ -521,11 +458,12 @@ void handleNotFound() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
-  if (!handleFileRead(server.uri())) {
+  String uri = urlDecode(server.uri());
+  if (!handleFileRead(uri)) {
     // Dump debug data
     String message = "Error: File not found\n\n";
     message += "URI: ";
-    message += server.uri();
+    message += uri;
     message += "\nMethod: ";
     message += (server.method() == HTTP_GET) ? "GET" : "POST";
     message += "\nArguments: ";
@@ -631,9 +569,7 @@ void setup(void) {
   // Upload file
   // - first callback is called after the request has ended with all parsed arguments
   // - second callback handles file upload at that location
-  server.on("/edit",  HTTP_POST, /*[]() {
-    returnOK();
-  }*/returnOK, handleFileUpload);
+  server.on("/edit",  HTTP_POST, returnOK, handleFileUpload);
 
   // Default handler for all URIs not defined above
   // Use it to read files from filesystem

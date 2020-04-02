@@ -77,7 +77,7 @@
         display: block;
       }
       .css-treeview label, .css-treeview span, .css-treeview label::before {
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAACgCAMAAAAy5xwmAAAANlBMVEVHcEzCxMZVW2GHi49iaG1jaG6Xm57///8vNj3Lzc56f4Q6QUfMzc/Y2dqwsrTm5uhIT1Wkp6pc64b3AAAAAXRSTlMAQObYZgAAAKxJREFUSMftk9ESwxAQRUNQSyH//7MltduUTqeZSZqXPW/OwHWHaRoAp7WOG2GlUtKG1wR7K8isKw5QBKcq0qJALFwlSnRN1GATOEXU6Acx28aMnVGKHUKYgvgmdm86BPsPv/UhRCeM6fpQquujE8OSD5ue30e4F2KisXsekUn4uGbwkr4UrCKSaQICmiakljZvhGs/jEQFThR+QbH49wapwwSNNDEMwzDMITwAcVIQIE1OIRcAAAAASUVORK5CYII=") no-repeat;
+        background: url(" data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAACgCAMAAAAy5xwmAAAAb1BMVEVHcEyWm55WW2E6QUdAQEBiaG1jaG7///8vNj3KzM7CxMbm5ufMzc/Y2dqxtLaGio58gYWJjZFRVFZJTE/Lzc+vsbNdXV74+PhvdHlsbW2kp6q7vLzy8vMuNTzf39+ho6UyOUCFhYWUl5nv7+/p6ekQi/GRAAAAAXRSTlMAQObYZgAAASRJREFUSMftk9tywiAQhoUAhVAwJpqDRqfavv8zluNKkurEjrY3+e74JizLn2W1miAKxphOBMeUYq6uH/A3A66YpRBRqJZaMI8iwsV/CdM6A2xj5nIUsK0/iTUPrGNm0MUDIkeG/J54uOiksb9hXh55PhIIjfKgdJTHSEy2/FD06Xmod8NOwrrwFUsQmXZHZhhekHBiByYIoaIJAjP8USWiCA8KhEW8UGT7KPaZExsObHyrUgTkjTz8liPXwzwEB+OPFVxHE8X2ckRByLaVyhVKxP27KN+nAtH7Rvur2Dr621tekMes+WiG86Hr6jKYj+7Q1Kd0PpxI58NsQdN/25zlQDQdKb9AnM6fHSGkPsQaJamIpQzCrywhD1iT2XksLCws/IZv8Zof7t25YlkAAAAASUVORK5CYII=") no-repeat;
       }
       .css-treeview label, .css-treeview span, .css-treeview label::before, .css-treeview span::before {
         display: inline-block;
@@ -86,27 +86,31 @@
         vertical-align: middle;
       }
       .css-treeview label {
-        background-position: 18px 0;
+        background-position: 18px 0; /* folder icon */
       }
       .css-treeview span {
-        background-position: 18px -48px;
+        background-position: 18px -48px; /* generic file icon */
+      }
+      .css-treeview span.txt {
+        background-position: 18px -64px; /* text file icon */
+      }
+      .css-treeview span.img {
+        background-position: 18px -80px; /* image file icon */
       }
       .css-treeview label::before {
         content: "";
         width: 16px;
         margin: 0 22px 0 0;
         vertical-align: middle;
-        background-position: 0 -32px;
+        background-position: 0 -32px; /* expand icon */
       }
       .css-treeview span::before {
         content: "";
         width: 16px;
         margin: 0 22px 0 0;
-        vertical-align: middle;
-        background-position: 0 -48px;
       }
       .css-treeview input:checked + label::before {
-        background-position: 0 -16px;
+        background-position: 0 -16px; /* collapse icon */
       }
       
       /* webkit adjacent element selector bugfix */
@@ -206,7 +210,6 @@
         font-size: 14px;
       }
       
-      /* Spinner based on from https://github.com/jlong/css-spinners */
       #loading {
         position:absolute;
         // note: changing between block and none cancels the opacity anim, so we move it in and out of screen instead by changing the top value
@@ -263,8 +266,8 @@
       }
     </style>
     <script>
-      var tree; // needed by editor to refresh file size on save
-
+      var tree;   // needed by editor to refresh file size on save
+      var fsInfo; // needed to change refreshPath behaviour on SPIFFS
       /////////////////////////
       // UTILS
 
@@ -273,8 +276,6 @@
         document.getElementById("loading-msg").innerHTML = message?message:"";
         if (show) document.getElementById("loading").classList.add("shown");
         else      document.getElementById("loading").classList.remove("shown");
-        //document.getElementById("loading").style.top = show?"0":"-100vh"; // Show or hide. Display property is incompatible with opacity animation
-        //document.getElementById("loading").style.opacity = show?1:0;
         document.body.style.cursor = show?"wait":"default";
       }
 
@@ -295,7 +296,7 @@
         xmlHttp.onload = function() {
           if(xmlHttp.status != 200) showHttpError(xmlHttp);
           else {            
-            var fsInfo = JSON.parse(xmlHttp.responseText);
+            fsInfo = JSON.parse(xmlHttp.responseText);
             var status = fsInfo.type + " - ";
             if (fsInfo.isOk) {
               status += "<span id='fsTotal'><span id='fsUsed' style='width:" 
@@ -672,9 +673,11 @@
         function createTreeLeaf(parentPath, name, size){
           var leaf = document.createElement("li");
           leaf.id = ((parentPath == "/")?"":parentPath)+"/"+name;
-          var label = document.createElement("span");
-          label.innerHTML = name + " <i>(" + readableSize(size) + ")</i>";
-          leaf.appendChild(label);
+          var span = document.createElement("span");
+          if(isTextFile(name)) span.classList.add("txt");
+          else if(isImageFile(name)) span.classList.add("img");
+          span.innerHTML = name + " <i>(" + readableSize(size) + ")</i>";
+          leaf.appendChild(span);
           leaf.onclick = function(e){
             attemptLoad(leaf.id);
           };
@@ -691,11 +694,9 @@
           leaf.id = ((parentPath == "/")?"":parentPath)+"/"+name;          
           var check = document.createElement("input");
           check.type = "checkbox";
-          //check.id = "check-" + leaf.id;
           if(typeof disabled !== "undefined" && disabled) check.disabled = "disabled";
           leaf.appendChild(check);
           var label = document.createElement("label");
-          //label.for = check.id; // should be label.htmlFor anyway
           label.textContent = name;
           leaf.appendChild(label);
           check.onchange = function(e){
@@ -760,29 +761,33 @@
          * This is done by pushing all paths to be refreshed in an array that will be pop'd in the callback function
          */
         this.refreshPath = function(path){
-          console.log("Refreshing '" + path + "'...");
-          if(path.lastIndexOf("/") == -1){
-            // No "/" => reset the root
+          if (fsInfo.type == "SPIFFS") {
+            // on SPIFFS : No parent node => refresh full tree
+            console.log("Refreshing '/'...");
             httpList("/");
-          } 
+          }
           else {
-            var paths = [];            
-            // Climb the tree until we get to an open node, adding paths to the array
-            var parentPath = path;
-            while ((parentPath.lastIndexOf("/") != -1) && !document.getElementById(parentPath)) {
-              paths.push(parentPath);
-              parentPath = getParentFolder(parentPath);
+            console.log("Refreshing '" + path + "'...");
+            if(path.lastIndexOf("/") == -1){
+              // No "/" => reset the root
+              httpList("/");
+            } 
+            else {
+              var paths = [];            
+              // Climb the tree until we get to an open node, adding paths to the array
+              var parentPath = path;
+              while ((parentPath.lastIndexOf("/") != -1) && !document.getElementById(parentPath)) {
+                paths.push(parentPath);
+                parentPath = getParentFolder(parentPath);
+              }
+              
+              // If we've reached the top
+              if (parentPath == "") paths.push("/"); // list the root
+              else paths.push(parentPath); // otherwise list the last folder
+              
+              // And list it back down by iterating on collected paths
+              listPaths(paths);  
             }
-            // TODO if on SPIFFS : No parent node => refresh full tree
-            //  httpList("/");
-            // else 
-            
-            // If we've reached the top
-            if (parentPath == "") paths.push("/"); // list the root
-            else paths.push(parentPath); // otherwise list the last folder
-            
-            // And list it back down by iterating on collected paths
-            listPaths(paths);  
           }
         }
 
@@ -792,15 +797,23 @@
         
         // Callbacks
         
-        function onListReceived(req, parentPath, remainingPaths){
+        function onListReceived(req, parentPath, remainingPaths) {
           return function(){
             setLoading(false);
             if(req.status != 200) showHttpError(req);
             else {
+               // Remove previous child list, if any
+              var parentEl = document.getElementById(parentPath);
+              if (parentEl) {
+                var lastChild = parentEl.lastElementChild;
+                if (lastChild && lastChild.tagName == "UL") parentEl.removeChild(lastChild);
+              }
+              // And reinsert the received ones instead
               addFileNodes(parentPath, JSON.parse(req.responseText));
               if (document.getElementById(parentPath).childNodes[0].checked !== undefined) {
                 document.getElementById(parentPath).childNodes[0].checked = true;              
               }
+              // If there are more folders to refresh, go ahead
               if (remainingPaths && remainingPaths.length) {
                 listPaths(remainingPaths);
               }
@@ -856,15 +869,8 @@
         // Requests        
         
         function httpList(parentPath, remainingPaths){
-          setLoading(true, "Listing '" + parentPath + "'...");
-          // Remove previous child list, if any
-          var parentEl = document.getElementById(parentPath);
-          if (parentEl) {
-            var lastChild = parentEl.lastElementChild;
-            if (lastChild && lastChild.tagName == "UL") parentEl.removeChild(lastChild);
-          }
-          
-          // And fetch an updated list
+          setLoading(true, "Listing '" + parentPath + "'...");         
+          // Fetch an updated list
           xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = onListReceived(xmlHttp, parentPath, remainingPaths);
           xmlHttp.open("GET", "/list?dir="+parentPath, true);
@@ -876,8 +882,7 @@
           if (path) {
             httpList(path, paths);
           }
-        }
-  
+        }  
 
     
         this.httpUpload = function(file, path) {
