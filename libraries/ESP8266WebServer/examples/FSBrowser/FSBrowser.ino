@@ -158,7 +158,7 @@ String urlDecode(String str) {
   char c;
   char code0;
   char code1;
-  for (int i = 0; i < str.length(); i++) {
+  for (unsigned int i = 0; i < str.length(); i++) {
     c = str.charAt(i);
     if (c == '+') {
       decodedString += ' ';
