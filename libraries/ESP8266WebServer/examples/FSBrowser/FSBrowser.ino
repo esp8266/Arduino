@@ -473,7 +473,10 @@ void handleFileUpload() {
     DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
-      uploadFile.write(upload.buf, upload.currentSize);
+      size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
+      if (bytesWritten != upload.currentSize) {
+        return returnFail("WRITE FAILED");
+      }
     }
     DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
   } else if (upload.status == UPLOAD_FILE_END) {
