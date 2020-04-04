@@ -69,7 +69,7 @@ extern void __analogWrite(uint8_t pin, int val) {
     stopWaveform(pin);
     digitalWrite(pin, LOW);
   } else {
-    if (startWaveform(pin, high, low, 0)) {
+    if (startWaveformCycles(pin, high, low, 0)) {
       analogMap |= (1 << pin);
     }
   }
