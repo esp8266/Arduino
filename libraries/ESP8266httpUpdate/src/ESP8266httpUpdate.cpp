@@ -43,6 +43,26 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
 {
 }
 
+/**
+ * set the Authorization for the http request
+ * @param user const String&
+ * @param password const String&
+ */
+void ESP8266HTTPUpdate::setAuthorization(const String &user, const String &password)
+{
+    _user = user;
+    _password = password;
+}
+
+/**
+ * set the Authorization for the http request
+ * @param auth const String& base64
+ */
+void ESP8266HTTPUpdate::setAuthorization(const String &auth)
+{
+    _auth= auth;
+}
+
 #if HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
         const String& httpsFingerprint, bool reboot)
@@ -241,6 +261,8 @@ String ESP8266HTTPUpdate::getLastErrorString(void)
         return F("Verify Bin Header Failed");
     case HTTP_UE_BIN_FOR_WRONG_FLASH:
         return F("New Binary Does Not Fit Flash Size");
+    case HTTP_UE_SERVER_UNAUTHORIZED:
+        return F("Unauthorized (401)");
     }
 
     return String();
@@ -280,6 +302,16 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
     if(currentVersion && currentVersion[0] != 0x00) {
         http.addHeader(F("x-ESP8266-version"), currentVersion);
+    }
+
+    if (_user && _user[0] != 0x00 && _password && _password[0] != 0x00)
+    {
+        http.setAuthorization(_user.c_str(), _password.c_str());
+    }
+
+    if (_auth && _auth[0] != 0x00)
+    {
+        http.setAuthorization(_auth.c_str());
     }
 
     const char * headerkeys[] = { "x-MD5" };
@@ -430,6 +462,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         break;
     case HTTP_CODE_FORBIDDEN:
         _setLastError(HTTP_UE_SERVER_FORBIDDEN);
+        ret = HTTP_UPDATE_FAILED;
+        break;
+    case HTTP_CODE_UNAUTHORIZED:
+        _setLastError(HTTP_UE_SERVER_UNAUTHORIZED);
         ret = HTTP_UPDATE_FAILED;
         break;
     default:
