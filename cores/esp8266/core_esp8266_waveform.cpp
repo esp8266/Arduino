@@ -54,8 +54,10 @@ extern "C" {
 typedef struct {
   uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
   uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
-  uint32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
-  uint32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
+  uint32_t timeHighCycles;     // Currently running waveform period
+  uint32_t timeLowCycles;      //
+  uint32_t gotoTimeHighCycles; // Copied over on the next period to preserve phase
+  uint32_t gotoTimeLowCycles;  //
 } Waveform;
 
 static Waveform waveform[17];        // State of all possible pins
@@ -116,16 +118,28 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     return false;
   }
   Waveform *wave = &waveform[pin];
-  // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = microsecondsToClockCycles(timeHighUS);
-  wave->nextTimeLowCycles = microsecondsToClockCycles(timeLowUS);
+
   wave->expiryCycle = runTimeUS ? GetCycleCount() + microsecondsToClockCycles(runTimeUS) : 0;
   if (runTimeUS && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
 
   uint32_t mask = 1<<pin;
-  if (!(waveformEnabled & mask)) {
+  if (waveformEnabled & mask) {
+    // Don't interrupt a cycle, so store the new high and low
+    // Need to manually do RSIL here because this is "C" code and can't use the InterruptLock class
+    uint32_t _state = xt_rsil(15);
+
+    wave->gotoTimeLowCycles = microsecondsToClockCycles(timeLowUS);
+    wave->gotoTimeHighCycles = microsecondsToClockCycles(timeHighUS);
+
+    // Restore interrupt state
+    xt_wsr_ps(_state);
+  } else { //  if (!(waveformEnabled & mask))
+    wave->timeHighCycles = microsecondsToClockCycles(timeHighUS);
+    wave->timeLowCycles = microsecondsToClockCycles(timeLowUS);
+    wave->gotoTimeHighCycles = wave->timeHighCycles;
+    wave->gotoTimeLowCycles = wave->timeLowCycles;
     // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
     waveformToEnable |= mask;
@@ -263,16 +277,19 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeHighCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
+            wave->nextServiceCycle = now + wave->timeHighCycles;
+            nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
           } else {
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
             } else {
               ClearGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeLowCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
+            wave->nextServiceCycle = now + wave->timeLowCycles;
+            nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
+            // Copy over next full-cycle timings
+            wave->timeHighCycles = wave->gotoTimeHighCycles;
+            wave->timeLowCycles = wave->gotoTimeLowCycles;
           }
         } else {
           uint32_t deltaCycles = wave->nextServiceCycle - now;
