@@ -35,7 +35,7 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, unsigned long 
 
   pinMode(_pin, OUTPUT);
 
-  high = std::max(high, (uint32_t)25);  // new 20KHz maximum tone frequency,
+  high = std::max(high, (uint32_t)25);  // 20KHz maximum tone frequency (new),
   low = std::max(low, (uint32_t)25);   // (25us high + 25us low period = 20KHz)
 
   if (startWaveform(_pin, high, low, (uint32_t) duration * 1000)) {
