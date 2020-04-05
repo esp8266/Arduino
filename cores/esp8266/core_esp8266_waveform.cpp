@@ -38,7 +38,7 @@
 */
 
 #include <Arduino.h>
-#include "ets_sys.h"
+#include "interrupts.h"
 #include "core_esp8266_waveform.h"
 
 extern "C" {
@@ -130,15 +130,9 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
 
   uint32_t mask = 1<<pin;
   if (waveformEnabled & mask) {
-    // Don't interrupt a cycle, so store the new high and low
-    // Need to manually do RSIL here because this is "C" code and can't use the InterruptLock class
-    uint32_t _state = xt_rsil(15);
-
+    esp8266::InterruptLock il; // Make the variable sets atomic
     wave->gotoTimeLowCycles = timeLowCycles;
     wave->gotoTimeHighCycles = timeHighCycles;
-
-    // Restore interrupt state
-    xt_wsr_ps(_state);
   } else { //  if (!(waveformEnabled & mask))
     wave->timeHighCycles = timeHighCycles;
     wave->timeLowCycles = timeLowCycles;
