@@ -122,37 +122,42 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
     return false;
   }
   Waveform *wave = &waveform[pin];
-
-  wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
-  if (runTimeCycles && !wave->expiryCycle) {
-    wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
-  }
-
   uint32_t mask = 1<<pin;
-  if (waveformEnabled & mask) {
-    esp8266::InterruptLock il; // Make the variable sets atomic
-    wave->gotoTimeLowCycles = timeLowCycles;
-    wave->gotoTimeHighCycles = timeHighCycles;
-  } else { //  if (!(waveformEnabled & mask))
-    wave->timeHighCycles = timeHighCycles;
-    wave->timeLowCycles = timeLowCycles;
-    wave->gotoTimeHighCycles = wave->timeHighCycles;
-    wave->gotoTimeLowCycles = wave->timeLowCycles;
-    // Actually set the pin high or low in the IRQ service to guarantee times
-    wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
-    waveformToEnable |= mask;
-    if (!timerRunning) {
-      initTimer();
-      timer1_write(microsecondsToClockCycles(10));
-    } else {
-      // Ensure timely service....
-      if (T1L > microsecondsToClockCycles(10)) {
+
+  do {
+    esp8266::InterruptLock il; // Can't have the IRQ changing variables behind our backs for this
+
+    wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
+    if (runTimeCycles && !wave->expiryCycle) {
+      wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
+    }
+
+    if (waveformEnabled & mask) {
+      // Just update the values to be copied on the next full period
+      wave->gotoTimeLowCycles = timeLowCycles;
+      wave->gotoTimeHighCycles = timeHighCycles;
+    } else { //  if (!(waveformEnabled & mask))
+      wave->timeHighCycles = timeHighCycles;
+      wave->timeLowCycles = timeLowCycles;
+      wave->gotoTimeHighCycles = wave->timeHighCycles;
+      wave->gotoTimeLowCycles = wave->timeLowCycles;
+      // Actually set the pin high or low in the IRQ service to guarantee times
+      wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
+      waveformToEnable |= mask;
+      if (!timerRunning) {
+        initTimer();
         timer1_write(microsecondsToClockCycles(10));
+      } else {
+        // Ensure timely service....
+        if (T1L > microsecondsToClockCycles(10)) {
+          timer1_write(microsecondsToClockCycles(10));
+        }
       }
     }
-    while (waveformToEnable) {
-      delay(0); // Wait for waveform to update
-    }
+  } while (0); // Run above if()/else exactly once
+
+  while (waveformToEnable) {
+    delay(0); // Wait for waveform to update
   }
 
   return true;
