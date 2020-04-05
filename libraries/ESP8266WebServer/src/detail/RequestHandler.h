@@ -2,6 +2,8 @@
 #define REQUESTHANDLER_H
 
 #include <ESP8266WebServer.h>
+#include <vector>
+#include <assert.h>
 
 template<typename ServerType>
 class RequestHandler {
@@ -18,6 +20,15 @@ public:
 
 private:
     RequestHandler<ServerType>* _next = nullptr;
+	
+protected:
+    std::vector<String> pathArgs;
+
+public:
+    const String& pathArg(unsigned int i) { 
+        assert(i < pathArgs.size());
+        return pathArgs[i];
+    }
 };
 
 #endif //REQUESTHANDLER_H
