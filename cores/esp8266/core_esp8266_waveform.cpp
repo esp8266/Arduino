@@ -68,6 +68,10 @@ static volatile uint32_t waveformEnabled = 0; // Is it actively running, updated
 static volatile uint32_t waveformToEnable = 0;  // Message to the NMI handler to start a waveform on a inactive pin
 static volatile uint32_t waveformToDisable = 0; // Message to the NMI handler to disable a pin from waveform generation
 
+static volatile int32_t waveformToChange = -1;
+static volatile uint32_t waveformNewHigh = 0;
+static volatile uint32_t waveformNewLow = 0;
+
 static uint32_t (*timer1CB)() = NULL;
 
 
@@ -122,42 +126,40 @@ int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCy
     return false;
   }
   Waveform *wave = &waveform[pin];
+
+  wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
+  if (runTimeCycles && !wave->expiryCycle) {
+    wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
+  }
+
   uint32_t mask = 1<<pin;
-
-  do {
-    esp8266::InterruptLock il; // Can't have the IRQ changing variables behind our backs for this
-
-    wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
-    if (runTimeCycles && !wave->expiryCycle) {
-      wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
+  if (waveformEnabled & mask) {
+    waveformNewHigh = timeHighCycles;
+    waveformNewLow = timeLowCycles;
+    waveformToChange = pin;
+    while (waveformToChange >= 0) {
+      delay(0); // Wait for waveform to update
     }
-
-    if (waveformEnabled & mask) {
-      // Just update the values to be copied on the next full period
-      wave->gotoTimeLowCycles = timeLowCycles;
-      wave->gotoTimeHighCycles = timeHighCycles;
-    } else { //  if (!(waveformEnabled & mask))
-      wave->timeHighCycles = timeHighCycles;
-      wave->timeLowCycles = timeLowCycles;
-      wave->gotoTimeHighCycles = wave->timeHighCycles;
-      wave->gotoTimeLowCycles = wave->timeLowCycles;
-      // Actually set the pin high or low in the IRQ service to guarantee times
-      wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
-      waveformToEnable |= mask;
-      if (!timerRunning) {
-        initTimer();
+  } else { //  if (!(waveformEnabled & mask))
+    wave->timeHighCycles = timeHighCycles;
+    wave->timeLowCycles = timeLowCycles;
+    wave->gotoTimeHighCycles = wave->timeHighCycles;
+    wave->gotoTimeLowCycles = wave->timeLowCycles;
+    // Actually set the pin high or low in the IRQ service to guarantee times
+    wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
+    waveformToEnable |= mask;
+    if (!timerRunning) {
+      initTimer();
+      timer1_write(microsecondsToClockCycles(10));
+    } else {
+      // Ensure timely service....
+      if (T1L > microsecondsToClockCycles(10)) {
         timer1_write(microsecondsToClockCycles(10));
-      } else {
-        // Ensure timely service....
-        if (T1L > microsecondsToClockCycles(10)) {
-          timer1_write(microsecondsToClockCycles(10));
-        }
       }
     }
-  } while (0); // Run above if()/else exactly once
-
-  while (waveformToEnable) {
-    delay(0); // Wait for waveform to update
+    while (waveformToEnable) {
+      delay(0); // Wait for waveform to update
+    }
   }
 
   return true;
@@ -228,7 +230,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
   uint32_t timeoutCycle = GetCycleCountIRQ() + microsecondsToClockCycles(14);
 
-  if (waveformToEnable || waveformToDisable) {
+  if (waveformToChange >=0) {
+    waveform[waveformToChange].gotoTimeHighCycles = waveformNewHigh;
+    waveform[waveformToChange].gotoTimeLowCycles = waveformNewLow;
+    waveformToChange = -1;
+  } else if (waveformToEnable || waveformToDisable) {
     // Handle enable/disable requests from main app.
     waveformEnabled = (waveformEnabled & ~waveformToDisable) | waveformToEnable; // Set the requested waveforms on/off
     waveformState &= ~waveformToEnable;  // And clear the state of any just started
