@@ -65,10 +65,10 @@ enum class WaveformMode : uint32_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2,
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
-  uint32_t nextPhaseCcy;       // ESP clock cycle when a period begins
-  uint32_t nextTimeDutyCcys;   // Add at low->high to keep smooth waveform
-  uint32_t nextTimePeriodCcys; // Set next phase cycle at low->high to maintain phase
-  uint32_t expiryCcy;          // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
+  uint32_t nextPhaseCcy; // ESP clock cycle when a period begins
+  uint32_t dutyCcys;     // Add at low->high to keep smooth waveform
+  uint32_t periodCcys;   // Set next phase cycle at low->high to maintain phase
+  uint32_t expiryCcy;    // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
   WaveformMode mode;
 } Waveform;
 
@@ -130,8 +130,8 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     return false;
   }
   Waveform* wave = &waveforms[pin];
-  wave->nextTimeDutyCcys = timeHighCcys;
-  wave->nextTimePeriodCcys = periodCcys;
+  wave->dutyCcys = timeHighCcys;
+  wave->periodCcys = periodCcys;
 
   if (!(waveformsEnabled & (1UL << pin))) {
     // wave->nextPhaseCcy is initialized by the ISR
@@ -239,7 +239,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         break;
       }
 
-      uint32_t nextEventCcy = wave->nextPhaseCcy + ((waveformsState & (1UL << pin)) ? wave->nextTimeDutyCcys : 0);
+      uint32_t nextEventCcy = wave->nextPhaseCcy + ((waveformsState & (1UL << pin)) ? wave->dutyCcys : 0);
 
       if (WaveformMode::EXPIRES == wave->mode && static_cast<int32_t>(wave->expiryCcy - now) <= 0) {    	
         // Disable any waveforms that are done
@@ -252,7 +252,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
       else if (static_cast<int32_t>(nextEventCcy - now) <= 0) {
         if (waveformsState & (1UL << pin)) {
-          if (wave->nextTimeDutyCcys != wave->nextTimePeriodCcys) {
+          if (wave->dutyCcys != wave->periodCcys) {
             if (pin == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
             }
@@ -261,11 +261,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             waveformsState ^= 1UL << pin;
           }
-          wave->nextPhaseCcy += wave->nextTimePeriodCcys;
+          wave->nextPhaseCcy += wave->periodCcys;
           nextEventCcy = wave->nextPhaseCcy;
         }
         else {
-          if (wave->nextTimeDutyCcys) {
+          if (wave->dutyCcys) {
             if (pin == 16) {
               GP16O |= 1; // GPIO16 write slow as it's RMW
             }
@@ -273,10 +273,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               SetGPIO(1UL << pin);
             }
             waveformsState ^= 1UL << pin;
-            nextEventCcy += wave->nextTimeDutyCcys;
+            nextEventCcy += wave->dutyCcys;
           }
           else {
-            wave->nextPhaseCcy += wave->nextTimePeriodCcys;
+            wave->nextPhaseCcy += wave->periodCcys;
             nextEventCcy = wave->nextPhaseCcy;
           }
         }
