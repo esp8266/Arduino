@@ -178,6 +178,25 @@ String urlDecode(String str) {
 }
 
 
+/*
+   Checks filename for unsupported combinations
+   Returns an empty String if supported, or detail of error(s) if unsupported
+*/
+String getFileError(String path) {
+  String error = String();
+  if (!path.startsWith("/")) {
+    error += "!NO_LEADING_SLASH! ";
+  }
+  if (path.indexOf("//") != -1) {
+    error += "!DOUBLE_SLASH! ";
+  }
+  if (path.endsWith("/")) {
+    error += "!TRAILING_SLASH! ";
+  }
+  return error;
+}
+
+
 ////////////////////////////////
 // Request handlers
 
@@ -185,6 +204,7 @@ String urlDecode(String str) {
    Return the FS type, status and size info
 */
 void handleStatus() {
+  DBG_OUTPUT_PORT.println("handleStatus");
   FSInfo fs_info;
   String json = String("{\"type\":\"") + fsName + "\", \"isOk\":";
 
@@ -515,24 +535,6 @@ void handleNotFound() {
     DBG_OUTPUT_PORT.print(message);
     return returnNotFound(message);
   }
-}
-
-/*
-   Checks filename for unsupported combinations
-   Returns an empty String if supported, or detail of error(s) if unsupported
-*/
-String getFileError(String path) {
-  String error = String();
-  if (!path.startsWith("/")) {
-    error += "!NO_LEADING_SLASH! ";
-  }
-  if (path.indexOf("//") != -1) {
-    error += "!DOUBLE_SLASH! ";
-  }
-  if (path.endsWith("/")) {
-    error += "!TRAILING_SLASH! ";
-  }
-  return error;
 }
 
 
