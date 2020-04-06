@@ -25,8 +25,8 @@
 
 // Select the FileSystem by uncommenting one of the lines below
 
-//#define USE_SPIFFS
-#define USE_LITTLEFS
+#define USE_SPIFFS
+//#define USE_LITTLEFS
 //#define USE_SDFS
 
 ////////////////////////////////
@@ -295,6 +295,22 @@ bool handleFileRead(String path) {
 
 
 /*
+   As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed,
+   return the path of the closest parent still existing
+*/
+String lastExistingParent(String path) {
+  while (path != "" && !fileSystem->exists(path)) {
+    if (path.lastIndexOf("/") > 0) {
+      path = path.substring(0, path.lastIndexOf("/"));
+    } else {
+      path = String();  // No slash => the top folder does not exist
+    }
+  }
+  DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
+  return path;
+}
+
+/*
    Handle the creation/rename of a new file
    Operation      | req.responseText
    ---------------+--------------------------------------------------------------
@@ -410,22 +426,6 @@ void deleteRecursive(String path) {
   fileSystem->rmdir(path);
 }
 
-
-/*
-   As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed,
-   return the path of the closest parent still existing
-*/
-String lastExistingParent(String path) {
-  while (path != "" && !fileSystem->exists(path)) {
-    if (path.lastIndexOf("/") > 0) {
-      path = path.substring(0, path.lastIndexOf("/"));
-    } else {
-      path = String();  // No slash => the top folder does not exist
-    }
-  }
-  DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
-  return path;
-}
 
 /*
    Handle a file deletion request
