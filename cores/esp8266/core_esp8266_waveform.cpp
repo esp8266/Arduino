@@ -212,8 +212,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + microsecondsToClockCycles(12);
   uint32_t now = ESP.getCycleCount();
-  int32_t nextTimerCcys = microsecondsToClockCycles(MAXIRQUS);
-  uint32_t nextTimerCcy = now + nextTimerCcys;
+  uint32_t nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
   bool busy = waveformsEnabled;
   while (busy) {
     nextTimerCcy = now + microsecondsToClockCycles(MAXIRQUS);
@@ -293,12 +292,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       now = ESP.getCycleCount();
     }
-    int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
-    nextTimerCcys = nextTimerCcy - now;
-    busy = waveformsEnabled && timerMarginCcys > 0 &&
-      (nextTimerCcys < microsecondsToClockCycles(6) + DELTAIRQ);
+    const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
+    busy = waveformsEnabled && timerMarginCcys > 0;
   }
 
+  int32_t nextTimerCcys;
   if (timer1CB) {
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
     // Account for unknown duration of timer1CB().
@@ -306,17 +304,26 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     if (nextTimerCcys > callbackCcys)
       nextTimerCcys = callbackCcys;
   }
+  else {
+    nextTimerCcys = nextTimerCcy - now;
+  }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys <= microsecondsToClockCycles(6) + DELTAIRQ)
+  if (nextTimerCcys <= microsecondsToClockCycles(6) + DELTAIRQ) {
     nextTimerCcys = microsecondsToClockCycles(6);
-  else
+  }
+  else {
     nextTimerCcys -= DELTAIRQ;
+  }
 
-  if (clockCyclesPerMicrosecond() == 160)
-    timer1_write(nextTimerCcys / 2);
-  else
-    timer1_write(nextTimerCcys);
+  // Do it here instead of global function to save time and because we know it's edge-IRQ
+  if (clockCyclesPerMicrosecond() == 160) {
+    T1L = nextTimerCcys >> 1;
+  }
+  else {
+    T1L = nextTimerCcys;
+  }
+  TEIE |= TEIE1; // Edge int enable
 }
 
 };
