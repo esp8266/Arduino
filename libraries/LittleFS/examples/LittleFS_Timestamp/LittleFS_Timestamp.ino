@@ -53,9 +53,12 @@ void listDir(const char * dirname) {
     Serial.print(root.fileName());
     Serial.print("  SIZE: ");
     Serial.print(file.size());
-    time_t t = file.getLastWrite();
-    struct tm * tmstruct = localtime(&t);
+    time_t cr = file.getCreationTime();
+    time_t lw = file.getLastWrite();
     file.close();
+    struct tm * tmstruct = localtime(&cr);
+    Serial.printf("    CREATION: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
+    tmstruct = localtime(&lw);
     Serial.printf("  LAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
   }
 }
@@ -90,6 +93,7 @@ void writeFile(const char * path, const char * message) {
   } else {
     Serial.println("Write failed");
   }
+  delay(2000); // Make sure the CREATE and LASTWRITE times are different
   file.close();
 }
 

@@ -71,10 +71,10 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         http.end();
     }
     {
-        // 301 redirect with follow enabled
+        // GET 301 redirect with strict RFC follow enabled 
         WiFiClient client;
         HTTPClient http;
-        http.setFollowRedirects(true);
+        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
         String uri = String("/redirect301?host=")+getenv("SERVER_IP");
         http.begin(client, getenv("SERVER_IP"), 8088, uri.c_str());
         auto httpCode = http.GET();
@@ -83,7 +83,7 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(payload == "redirect success");
     }
     {
-        // 301 redirect with follow disabled
+        // GET 301 redirect with follow disabled
         WiFiClient client;
         HTTPClient http;
         String uri = String("/redirect301?host=")+getenv("SERVER_IP");
@@ -92,10 +92,10 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(httpCode == 301);
     }
     {
-        // 302 redirect with follow enabled
+        // GET 302 redirect with strict RFC follow enabled 
         WiFiClient client;
         HTTPClient http;
-        http.setFollowRedirects(true);
+        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
         String uri = String("/redirect302?host=")+getenv("SERVER_IP");
         http.begin(client, getenv("SERVER_IP"), 8088, uri.c_str());
         auto httpCode = http.GET();
@@ -104,7 +104,7 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(payload == "redirect success");
     }
     {
-        // 302 redirect with follow disabled
+        // GET 302 redirect with follow disabled
         WiFiClient client;
         HTTPClient http;
         String uri = String("/redirect302?host=")+getenv("SERVER_IP");
@@ -113,10 +113,10 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(httpCode == 302);
     }
     {
-        // 307 redirect with follow enabled
+        // GET 307 redirect with strict RFC follow enabled
         WiFiClient client;
         HTTPClient http;
-        http.setFollowRedirects(true);
+        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
         String uri = String("/redirect307?host=")+getenv("SERVER_IP");
         http.begin(client, getenv("SERVER_IP"), 8088, uri.c_str());
         auto httpCode = http.GET();
@@ -125,7 +125,7 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(payload == "redirect success");
     }
     {
-        // 307 redirect with follow disabled
+        // GET 307 redirect with follow disabled
         WiFiClient client;
         HTTPClient http;
         String uri = String("/redirect307?host=")+getenv("SERVER_IP");
@@ -134,10 +134,10 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(httpCode == 307);
     }
     {
-        // 301 exceeding redirect limit
+        // GET 301 exceeding redirect limit
         WiFiClient client;
         HTTPClient http;
-        http.setFollowRedirects(true);
+        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
         http.setRedirectLimit(0);
         String uri = String("/redirect301?host=")+getenv("SERVER_IP");
         http.begin(client, getenv("SERVER_IP"), 8088, uri.c_str());
@@ -145,20 +145,22 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         REQUIRE(httpCode == 301);
     }
     {
-        // POST 303 redirect with follow enabled
+        // POST 303 redirect with strict RFC follow enabled
         WiFiClient client;
         HTTPClient http;
-        http.setFollowRedirects(true);
+        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
         http.begin(client, getenv("SERVER_IP"), 8088, "/redirect303");
         auto httpCode = http.POST(getenv("SERVER_IP"));
         REQUIRE(httpCode == HTTP_CODE_OK);
         String payload = http.getString();
         REQUIRE(payload == "redirect success");
+        // TODO: need check for dropping: redirection should use GET method
     }
     {
         // POST 303 redirect with follow disabled
         WiFiClient client;
         HTTPClient http;
+        http.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS);
         http.begin(client, getenv("SERVER_IP"), 8088, "/redirect303");
         auto httpCode = http.POST(getenv("SERVER_IP"));
         REQUIRE(httpCode == 303);
@@ -167,6 +169,7 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         // 302 redirect with follow disabled
         WiFiClient client;
         HTTPClient http;
+        http.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS);
         String uri = String("/redirect302?host=")+getenv("SERVER_IP");
         http.begin(client, getenv("SERVER_IP"), 8088, uri.c_str());
         auto httpCode = http.GET();
@@ -210,6 +213,7 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
     //
     // Same tests with axTLS
     //
+#if !CORE_MOCK
     {
         // small request
 #pragma GCC diagnostic push
@@ -242,6 +246,7 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
             }
         }
     }
+#endif
 }
 
 void loop()

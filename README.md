@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.6.2/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.6.3/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -36,7 +36,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.6.2/](https://arduino-esp8266.readthedocs.io/en/2.6.2/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.6.3/](https://arduino-esp8266.readthedocs.io/en/2.6.3/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -48,19 +48,19 @@ Also known as latest git or master branch.
 
 ### Using PlatformIO
 
-[PlatformIO](https://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
+[PlatformIO](https://platformio.org?utm_source=arduino-esp8266) is an open source ecosystem for IoT
 development with a cross-platform build system, a library manager, and full support
 for Espressif (ESP8266) development. It works on the following popular host operating systems: macOS, Windows,
 Linux 32/64, and Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
-- [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
-- [PlatformIO Core](https://docs.platformio.org/en/latest/core.html?utm_source=github&utm_medium=arduino-esp8266) (command line tool)
-- [Advanced usage](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266) -
+- [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=arduino-esp8266)
+- [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=arduino-esp8266)
+- [PlatformIO Core](https://docs.platformio.org/en/latest/core.html?utm_source=arduino-esp8266) (command line tool)
+- [Advanced usage](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266) -
   custom settings, uploading to SPIFFS, Over-the-Air (OTA), staging version
-- [Integration with Cloud and Standalone IDEs](https://docs.platformio.org/en/latest/ide.html?utm_source=github&utm_medium=arduino-esp8266) -
+- [Integration with Cloud and Standalone IDEs](https://docs.platformio.org/en/latest/ide.html?utm_source=arduino-esp8266) -
   Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
-- [Project Examples](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266#examples)
+- [Project Examples](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266#examples)
 
 ### Building with make
 
@@ -106,7 +106,7 @@ Arduino IDE is developed and maintained by the Arduino team. The IDE is licensed
 
 ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
-Esptool written by Christian Klippel is licensed under GPLv2, currently maintained by Ivan Grokhotkov: https://github.com/igrr/esptool-ck.
+Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), and is currently maintained by Angus Gratton (@projectgus) under GPL 2.0 license.
 
 Espressif SDK included in this build is under Espressif MIT License.
 
@@ -123,6 +123,8 @@ ESP8266 core files are licensed under LGPL.
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 
 [LittleFS](https://github.com/ARMmbed/littlefs) library written by ARM Limited and released under the [BSD 3-clause license](https://github.com/ARMmbed/littlefs/blob/master/LICENSE.md).
+
+[uzlib](https://github.com/pfalcon/uzlib) library written and (c) 2014-2018 Paul Sokolovsky, licensed under the ZLib license (https://www.zlib.net/zlib_license.html). uzlib is based on: tinf library by Joergen Ibsen (Deflate decompression); Deflate Static Huffman tree routines by Simon Tatham; LZ77 compressor by Paul Sokolovsky; with library integrated and maintained by Paul Sokolovsky.
 
 ### Other useful links ###
 
