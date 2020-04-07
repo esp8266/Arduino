@@ -221,7 +221,8 @@ void handleStatus() {
 
 
 /*
-   Return the list of files in the directory specified by the "dir" query string parameter
+   Return the list of files in the directory specified by the "dir" query string parameter.
+   Also demonstrates the use of chuncked responses.
 */
 void handleFileList() {
   if (!fsOK) {
@@ -241,7 +242,15 @@ void handleFileList() {
   Dir dir = fileSystem->openDir(path);
   path = String();
 
-  String output = "[";
+  // use HTTP/1.1 Chunked response to avoid building a huge temporary string
+  if (!server.chunkedResponseModeStart(200, "text/json")) {
+    server.send(505, FPSTR("text/html"), FPSTR("HTTP1.1 required"));
+    return;
+  }
+
+  // use the same string for every line
+  String output;
+  output.reserve(64);
   while (dir.next()) {
 #ifdef USE_SPIFFS
     String error = getFileError(dir.fileName());
@@ -250,9 +259,15 @@ void handleFileList() {
       continue;
     }
 #endif
-    if (output != "[") {
-      output += ',';
+    if (output.length()) {
+      // send string from previous iteration
+      // as an HTTP chunk
+      server.sendContent(output);
+      output = ',';
+    } else {
+      output = '[';
     }
+
     output += "{\"type\":\"";
     if (dir.isDirectory()) {
       output += "dir";
@@ -271,8 +286,10 @@ void handleFileList() {
     output += "\"}";
   }
 
+  // send last string
   output += "]";
-  server.send(200, "text/json", output);
+  server.sendContent(output);
+  server.chunkedResponseFinalize();
 }
 
 
