@@ -288,7 +288,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->timeHighCycles;
+            wave->nextServiceCycle += wave->timeHighCycles;
             nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
           } else {
             if (i == 16) {
@@ -296,7 +296,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               ClearGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->timeLowCycles;
+            wave->nextServiceCycle += wave->timeLowCycles;
             nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
             // Copy over next full-cycle timings
             wave->timeHighCycles = wave->gotoTimeHighCycles;
