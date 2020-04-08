@@ -273,7 +273,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           //
           // detect interrupt storm, for example during wifi connection.
           // if we overshoot the cycle by more than 25%, we forget phase and keep PWM duration
-          int32_t overshoot = (-cyclesToGo) > ((wave->nextTimeHighCycles + wave->nextTimeLowCycles) >> 2);
+          int32_t overshoot = ((uint32_t)-cyclesToGo) > ((wave->nextTimeHighCycles + wave->nextTimeLowCycles) >> 2);
           waveformState ^= mask;
           if (waveformState & mask) {
             if (i == 16) {
