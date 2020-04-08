@@ -23,7 +23,7 @@
 #ifndef ESP8266WIFISTA_H_
 #define ESP8266WIFISTA_H_
 
-
+#include <Ticker.h>
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 #include "user_interface.h"
@@ -83,13 +83,13 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
-        // disable(0) or enable/update automatic sending of Gratuitous ARP packets
-        // a gratuitous ARP packet is sent at start, then
+        // disable(0) or enable/update automatic sending of Gratuitous ARP packets.
+        // A gratuitous ARP packet is immediately sent when calling this function, then
         // based on a time interval in milliseconds, default 1s
-        void stationKeepAliveSetIntervalMs (uint32_t ms = 1000);
+        bool stationKeepAliveSetIntervalMs (uint32_t ms = 1000);
 
         // request for stopping arp gratuitous packets
-        void stationKeepAliveStop () { stationKeepAliveSetIntervalMs(0); }
+        void stationKeepAliveStop () { (void)stationKeepAliveSetIntervalMs(0); }
 
         // immediately send one gratuitous ARP from STA
         static void stationKeepAliveNow ();
@@ -101,7 +101,7 @@ class ESP8266WiFiSTAClass {
         static bool _useStaticIp;
         static bool _useInsecureWEP;
 
-        int _keepStationState = 0;
+        Ticker* _keepalive;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------

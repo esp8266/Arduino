@@ -731,40 +731,28 @@ void ESP8266WiFiSTAClass::stationKeepAliveNow ()
         }
 }
 
-void ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (uint32_t ms)
+bool ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (uint32_t ms)
 {
-    uint32_t us;
-    if (ms > std::numeric_limits<uint32_t>::max() / 1000)
-        // for sanity only, 49 days is not really meaningful
-        us = std::numeric_limits<uint32_t>::max();
-    else
-        us = ms * 1000;
+    if (_keepalive) {
+        delete _keepalive;
+        _keepalive = nullptr;
+    }
 
-    // cancel possibly already scheduled future events
-    _keepStationState++;
-
-    if (us)
-    {
+    if (ms) {
         // send one now
         stationKeepAliveNow();
 
-        // schedule next ones
-        int checkState = _keepStationState;
-        schedule_recurrent_function_us([&, checkState]()
+        _keepalive = new (std::nothrow) Ticker;
+        if (_keepalive == nullptr)
+            return false;
+
+        _keepalive->attach_ms_scheduled(ms, [&]()
         {
-            // this recurring scheduled function will be cancelled
-            // when this->_keepStationState != checkState
-            if (checkState != this->_keepStationState)
-                // cancel this recurring event
-                return false;
-
-            // send gratuitous ARP
             this->stationKeepAliveNow();
-
-            // keep on with next event
-            return true;
-        }, us);
+        });
     }
+
+    return true;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------
