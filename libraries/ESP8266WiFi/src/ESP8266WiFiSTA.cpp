@@ -746,8 +746,7 @@ bool ESP8266WiFiSTAClass::stationKeepAliveSetIntervalMs (uint32_t ms)
         if (_keepalive == nullptr)
             return false;
 
-        _keepalive->attach_ms_scheduled(ms, [&]()
-        {
+        _keepalive->attach_ms_scheduled_accurate(ms, [&]() {
             this->stationKeepAliveNow();
         });
     }
