@@ -26,6 +26,7 @@ PublicKey	KEYWORD1
 CertStoreSPIFFSBearSSL	KEYWORD1
 CertStoreSDBearSSL	KEYWORD1
 Session	KEYWORD1
+ESP8266WiFiGratuitous	KEYWORD1
 
 
 #######################################
