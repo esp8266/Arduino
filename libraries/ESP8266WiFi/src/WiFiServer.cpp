@@ -125,12 +125,14 @@ WiFiClient WiFiServer::available(byte* status) {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
 #if LWIP_VERSION_MAJOR != 1
-        _unclaimed->acceptPCB();
-        tcp_backlog_accepted(_unclaimed->getPCB());
+        // pcb can be null when peer has already closed the connection
+        if (_unclaimed->getPCB())
+            // give permission to lwIP to accept one more peer
+            tcp_backlog_accepted(_unclaimed->getPCB());
 #endif
         _unclaimed = _unclaimed->next();
         result.setNoDelay(getNoDelay());
-        DEBUGV("WS:av\r\n");
+        DEBUGV("WS:av status=%d WCav=%d\r\n", result.status(), result.available());
         return result;
     }
 
@@ -187,9 +189,12 @@ long WiFiServer::_accept(tcp_pcb* apcb, long err) {
     (void) err;
     DEBUGV("WS:ac\r\n");
 
+    // always accept new PCB so incoming data can be stored in our buffers even before
+    // user calls ::available()
+    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
+
 #if LWIP_VERSION_MAJOR == 1
 
-    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
     tcp_accepted(_listen_pcb);
 
 #else
@@ -198,19 +203,8 @@ long WiFiServer::_accept(tcp_pcb* apcb, long err) {
     // http://lwip.100.n7.nabble.com/Problem-re-opening-listening-pbc-tt32484.html#a32494
     // https://www.nongnu.org/lwip/2_1_x/group__tcp__raw.html#gaeff14f321d1eecd0431611f382fcd338
 
-    // lwip-v2: Tell ClientContext to not accept yet the connection (final 'false' below)
-    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this, false);
     // increase lwIP's backlog
     tcp_backlog_delayed(apcb);
-
-    // Optimization Path:
-    // when lwip-v1.4 is not allowed anymore,
-    // - _accept() should not create ClientContext anymore
-    // - apcb should be stored into some sort of linked list (->_unclaimed)
-    //   (the linked list would store tcp_pcb* instead of ClientContext*)
-    //   (TCP_PCB_EXTARGS might be used for that (lwIP's struct tcp_pcb))
-    // - on available(), get the pcb back and create the ClientContext
-    // (this is not done today for better source readability with lwip-1.4 around)
 
 #endif
 
