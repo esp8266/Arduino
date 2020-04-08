@@ -51,13 +51,19 @@ extern "C" {
 // Start or change a waveform of the specified high and low times on specific pin.
 // If runtimeUS > 0 then automatically stop it after that many usecs, relative to the next
 // full period.
+// If waveform is not yet started on pin, and on pin == alignPhase a waveform is running,
+// the new waveform is started in phase with that.
 // Returns true or false on success or failure.
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
+int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS,
+  uint32_t runTimeUS = 0, int8_t alignPhase = -1);
 // Start or change a waveform of the specified high and low CPU clock cycles on specific pin.
 // If runtimeCycles > 0 then automatically stop it after that many CPU clock cycles, relative to the next
 // full period.
+// If waveform is not yet started on pin, and on pin == alignPhase a waveform is running,
+// the new waveform is started in phase with that.
 // Returns true or false on success or failure.
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys, uint32_t runTimeCcys);
+int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys,
+  uint32_t runTimeCcys = 0, int8_t alignPhase = -1);
 // Stop a waveform, if any, on the specified pin.
 // Returns true or false on success or failure.
 int stopWaveform(uint8_t pin);

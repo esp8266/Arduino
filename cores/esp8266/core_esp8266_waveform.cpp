@@ -61,7 +61,7 @@ constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ? microsecondsTo
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
 // for UPDATEEXPIRY, the NMI recomputes the exact expiry ccy and transitions to EXPIRES.
 // for INIT, the NMI initializes nextPhaseCcy, and if expiryCcy != 0 includes UPDATEEXPIRY.
-enum class WaveformMode : uint32_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2, INIT = 3};
+enum class WaveformMode : uint8_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2, INIT = 3};
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
@@ -71,6 +71,7 @@ typedef struct {
   uint32_t periodCcys;   // Set next phase cycle at low->high to maintain phase
   uint32_t expiryCcy;    // For time-limited waveform, the CPU clock cycle when this waveform must stop. If ExpiryState::UPDATE, temporarily holds relative ccy count
   WaveformMode mode;
+  int8_t alignPhase;     // < 0 no phase alignment, otherwise starts waveform in phase with given pin
 } Waveform;
 
 static Waveform waveforms[17];        // State of all possible pins
@@ -117,17 +118,20 @@ void setTimer1Callback(uint32_t (*fn)()) {
   }
 }
 
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
+int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS,
+  uint32_t runTimeUS, int8_t alignPhase) {
   return startWaveformClockCycles(pin,
-    microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
+    microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS),
+    microsecondsToClockCycles(runTimeUS), alignPhase);
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys, uint32_t runTimeCcys) {
+int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys,
+  uint32_t runTimeCcys, int8_t alignPhase) {
   const auto periodCcys = timeHighCcys + timeLowCcys;
-  if ((pin > 16) || isFlashInterfacePin(pin) || !periodCcys) {
+  if ((pin > 16) || isFlashInterfacePin(pin) || !periodCcys || (alignPhase > 16)) {
     return false;
   }
   Waveform* wave = &waveforms[pin];
@@ -138,6 +142,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     // wave->nextPhaseCcy and wave->nextOffCcy are initialized by the ISR
     wave->expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
     wave->mode = WaveformMode::INIT;
+    wave->alignPhase = (alignPhase < 0) ? -1 : alignPhase;
     waveformToEnable = 1UL << pin;
     std::atomic_thread_fence(std::memory_order_release);
     if (!timerRunning) {
@@ -226,7 +231,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       switch (wave->mode) {
       case WaveformMode::INIT:
         waveformsState &= ~(1UL << pin); // Clear the state of any just started
-        wave->nextPhaseCcy = now;
+        wave->nextPhaseCcy = (waveformsEnabled & (1UL << wave->alignPhase)) ?
+          waveforms[wave->alignPhase].nextPhaseCcy : now;
         if (!wave->expiryCcy) {
           wave->mode = WaveformMode::INFINITE;
           break;
