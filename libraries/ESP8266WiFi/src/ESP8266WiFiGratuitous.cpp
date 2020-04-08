@@ -19,13 +19,17 @@
 
 #include <Ticker.h>
 
+extern "C"
+{
 #include "lwip/init.h" // LWIP_VERSION_*
 #if LWIP_VERSION_MAJOR == 1
 #include "netif/wlan_lwip_if.h" // eagle_lwip_getif()
 #include "netif/etharp.h" // gratuitous arp
+#include "user_interface.h"
 #else
 #include "lwip/etharp.h" // gratuitous arp
 #endif
+} // extern "C"
 
 #include "ESP8266WiFiGratuitous.h"
 
