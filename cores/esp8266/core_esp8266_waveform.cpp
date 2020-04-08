@@ -256,38 +256,42 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       else if (WaveformMode::EXPIRES == wave->mode && static_cast<int32_t>(nextEventCcy - wave->expiryCcy) > 0) {
         nextEventCcy = wave->expiryCcy;
       }
-      else if (static_cast<int32_t>(nextEventCcy - now) <= 0) {
-        if (waveformsState & (1UL << pin)) {
-          wave->nextPhaseCcy += wave->periodCcys;
-          if (wave->dutyCcys != wave->periodCcys) {
-            if (pin == 16) {
-              GP16O &= ~1; // GPIO16 write slow as it's RMW
+      else {
+      	int32_t nextEventCcys = nextEventCcy - now;
+      	if (nextEventCcys <= 0) {
+          uint32_t skipPeriodCcys = (-nextEventCcys / wave->periodCcys) * wave->periodCcys;
+          if (waveformsState & (1UL << pin)) {
+            wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
+            if (wave->dutyCcys != wave->periodCcys) {
+              if (pin == 16) {
+                GP16O &= ~1; // GPIO16 write slow as it's RMW
+              }
+              else {
+                ClearGPIO(1UL << pin);
+              }
+              waveformsState ^= 1UL << pin;
             }
             else {
-              ClearGPIO(1UL << pin);
+              wave->nextOffCcy = wave->nextPhaseCcy;
             }
-            waveformsState ^= 1UL << pin;
-          }
-          else {
-            wave->nextOffCcy = wave->nextPhaseCcy;
-          }
-          nextEventCcy = wave->nextPhaseCcy;
-        }
-        else {
-          if (wave->dutyCcys) {
-            if (pin == 16) {
-              GP16O |= 1; // GPIO16 write slow as it's RMW
-            }
-            else {
-              SetGPIO(1UL << pin);
-            }
-            waveformsState ^= 1UL << pin;
-            wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys;
-            nextEventCcy = wave->nextOffCcy;
-          }
-          else {
-            wave->nextPhaseCcy += wave->periodCcys;
             nextEventCcy = wave->nextPhaseCcy;
+          }
+          else {
+            if (wave->dutyCcys) {
+              if (pin == 16) {
+                GP16O |= 1; // GPIO16 write slow as it's RMW
+              }
+              else {
+                SetGPIO(1UL << pin);
+              }
+              waveformsState ^= 1UL << pin;
+              wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys + skipPeriodCcys;
+              nextEventCcy = wave->nextOffCcy;
+            }
+            else {
+              wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
+              nextEventCcy = wave->nextPhaseCcy;
+            }
           }
         }
       }
