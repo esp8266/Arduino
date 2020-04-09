@@ -248,9 +248,12 @@ else:
 #
 
 current_vtables = None
+fp_in_irom = ""
 for d in flatten_cppdefines:
     if str(d).startswith("VTABLES_IN_"):
         current_vtables = d
+    if str(d) == "FP_IN_IROM":
+        fp_in_irom = "-DFP_IN_IROM"
 if not current_vtables:
     current_vtables = "VTABLES_IN_FLASH"
     env.Append(CPPDEFINES=[current_vtables])
@@ -271,7 +274,7 @@ app_ld = env.Command(
     join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
-        "$CC -CC -E -P -D%s -D%s $SOURCE -o $TARGET" % (current_vtables, current_mmu_iram_size),
+        "$CC -CC -E -P -D%s -D%s %s $SOURCE -o $TARGET" % (current_vtables, current_mmu_iram_size, fp_in_irom),
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
 
