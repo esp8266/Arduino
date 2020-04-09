@@ -186,12 +186,27 @@ void handleFileList() {
   Dir dir = filesystem->openDir(path);
   path.clear();
 
-  String output = "[";
+  // use HTTP/1.1 Chunked response to avoid building a huge temporary string
+  if (!server.chunkedResponseModeStart(200, "text/json")) {
+    server.send(505, FPSTR("text/html"), FPSTR("HTTP1.1 required"));
+    return;
+  }
+
+  // use the same string for every line
+  String output;
+  output.reserve(64);
   while (dir.next()) {
-    File entry = dir.openFile("r");
-    if (output != "[") {
-      output += ',';
+
+    if (output.length()) {
+      // send string from previous iteration
+      // as an HTTP chunk
+      server.sendContent(output);
+      output = ',';
+    } else {
+      output = '[';
     }
+
+    File entry = dir.openFile("r");
     bool isDir = false;
     output += "{\"type\":\"";
     output += (isDir) ? "dir" : "file";
@@ -205,8 +220,10 @@ void handleFileList() {
     entry.close();
   }
 
+  // send last string
   output += "]";
-  server.send(200, "text/json", output);
+  server.sendContent(output);
+  server.chunkedResponseFinalize();
 }
 
 void setup(void) {
