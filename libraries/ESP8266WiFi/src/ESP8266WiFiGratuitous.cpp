@@ -72,6 +72,7 @@ bool ESP8266WiFiGratuitous::stationKeepAliveSetIntervalMs (uint32_t ms)
     if (_timer)
     {
         os_timer_disarm(_timer);
+        free(_timer);
         _timer = nullptr;
     }
 
