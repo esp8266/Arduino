@@ -362,9 +362,6 @@ void handleFileCreate() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
-  if (server.args() == 0 || server.args() > 2) {
-    return returnFail("BAD ARGS");
-  }
 
   String path = server.arg("path");
   if (path == "") {
@@ -384,8 +381,9 @@ void handleFileCreate() {
     return returnFail("PATH FILE EXISTS");
   }
 
-  if (server.args() == 1) {
-    // One argument: create
+  String src = server.arg("src");
+  if (src == "") {
+    // No source specified: creation
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path);
     if (path.endsWith("/")) {
       // Create a folder
@@ -408,11 +406,7 @@ void handleFileCreate() {
     }
     returnOKWithMsg(path);
   } else {
-    // Two arguments: rename
-    String src = server.arg("src");
-    if (src == "") {
-      return returnFail("MISSING SRC ARG");
-    }
+    // Source specified: rename
     if (src == "/") {
       return returnFail("BAD SRC");
     }
@@ -475,10 +469,12 @@ void handleFileDelete() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
-  if (server.args() == 0) {
+
+  String path = server.arg(0);
+  if (path == "") {
     return returnFail("BAD ARGS");
   }
-  String path = server.arg(0);
+  
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
   if (path == "/" || !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
