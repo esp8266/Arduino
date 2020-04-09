@@ -55,6 +55,7 @@ bool MD5Builder::addStream(Stream & stream, const size_t maxLen){
         // read data and check if we got something
         int numBytesRead = stream.readBytes(buf, readBytes);
         if(numBytesRead< 1) {
+            free(buf); // release the buffer
             return false;
         }
 
