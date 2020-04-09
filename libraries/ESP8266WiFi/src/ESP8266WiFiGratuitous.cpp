@@ -17,8 +17,6 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <Ticker.h>
-
 extern "C"
 {
 #include "lwip/init.h" // LWIP_VERSION_*

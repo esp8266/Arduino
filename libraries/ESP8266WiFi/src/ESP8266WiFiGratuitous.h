@@ -22,7 +22,7 @@
 
 #include <stdint.h> // uint32_t
 
-class Ticker;
+#include <Ticker.h>
 
 namespace experimental
 {
