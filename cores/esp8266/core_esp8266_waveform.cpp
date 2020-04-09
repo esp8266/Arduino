@@ -260,9 +260,19 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       	int32_t nextEventCcys = nextEventCcy - now;
       	if (nextEventCcys <= 0) {
           uint32_t skipPeriodCcys = (-nextEventCcys / wave->periodCcys) * wave->periodCcys;
+          bool flatLine = wave->nextPhaseCcy == wave->nextOffCcy;
           if (waveformsState & (1UL << pin)) {
-            wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
-            if (wave->dutyCcys != wave->periodCcys) {
+            if (wave->dutyCcys == wave->periodCcys) {
+              wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
+              wave->nextOffCcy = wave->nextPhaseCcy;
+              nextEventCcy = wave->nextPhaseCcy;
+            }
+            else if (flatLine) {
+              wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys + skipPeriodCcys;
+              wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
+              nextEventCcy = wave->nextOffCcy;
+            }
+            else {
               if (pin == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
               }
@@ -270,14 +280,15 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 ClearGPIO(1UL << pin);
               }
               waveformsState ^= 1UL << pin;
+              nextEventCcy = wave->nextPhaseCcy;
             }
-            else {
-              wave->nextOffCcy = wave->nextPhaseCcy;
-            }
-            nextEventCcy = wave->nextPhaseCcy;
           }
           else {
-            if (wave->dutyCcys) {
+            wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys + skipPeriodCcys;
+            if (!wave->dutyCcys) {
+              wave->nextPhaseCcy = wave->nextOffCcy;
+            }
+            else {
               if (pin == 16) {
                 GP16O |= 1; // GPIO16 write slow as it's RMW
               }
@@ -285,13 +296,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 SetGPIO(1UL << pin);
               }
               waveformsState ^= 1UL << pin;
-              wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys + skipPeriodCcys;
-              nextEventCcy = wave->nextOffCcy;
-            }
-            else {
               wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
-              nextEventCcy = wave->nextPhaseCcy;
             }
+            nextEventCcy = wave->nextOffCcy;
           }
         }
       }
