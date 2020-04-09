@@ -29,12 +29,14 @@ extern "C"
 #endif
 } // extern "C"
 
+#include <Schedule.h>
+
 #include "ESP8266WiFiGratuitous.h"
 
 namespace experimental
 {
 
-Ticker* ESP8266WiFiGratuitous::_keepalive = nullptr;
+ETSTimer* ESP8266WiFiGratuitous::_timer = nullptr;
 
 void ESP8266WiFiGratuitous::stationKeepAliveNow ()
 {
@@ -56,26 +58,34 @@ void ESP8266WiFiGratuitous::stationKeepAliveNow ()
         }
 }
 
+void ESP8266WiFiGratuitous::scheduleItForNextYieldOnce (void*)
+{
+    schedule_recurrent_function_us([]()
+    {
+        ESP8266WiFiGratuitous::stationKeepAliveNow();
+        return false;
+    }, 0);
+}
+
 bool ESP8266WiFiGratuitous::stationKeepAliveSetIntervalMs (uint32_t ms)
 {
-    if (_keepalive)
+    if (_timer)
     {
-        delete _keepalive;
-        _keepalive = nullptr;
+        os_timer_disarm(_timer);
+        _timer = nullptr;
     }
 
-    if (ms) {
+    if (ms)
+    {
         // send one now
         stationKeepAliveNow();
 
-        _keepalive = new (std::nothrow) Ticker;
-        if (_keepalive != nullptr)
-        {
-            _keepalive->attach_ms_scheduled_accurate(ms, []()
-            {
-                stationKeepAliveNow();
-            });
-        }
+        _timer = (ETSTimer*)malloc(sizeof(ETSTimer));
+        if (_timer == nullptr)
+            return false;
+
+        os_timer_setfn(_timer, ESP8266WiFiGratuitous::scheduleItForNextYieldOnce, nullptr);
+        os_timer_arm(_timer, ms, true);
     }
 
     return true;

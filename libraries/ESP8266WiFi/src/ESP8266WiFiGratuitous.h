@@ -20,9 +20,8 @@
 #ifndef ESP8266WIFIGRATUITOUS_H_
 #define ESP8266WIFIGRATUITOUS_H_
 
-#include <stdint.h> // uint32_t
-
-#include <Ticker.h>
+#include <stdint.h>  // uint32_t
+#include <ets_sys.h> // ETSTimer
 
 namespace experimental
 {
@@ -45,7 +44,9 @@ public:
 
 protected:
 
-    static Ticker* _keepalive;
+    static void scheduleItForNextYieldOnce (void*);
+
+    static ETSTimer* _timer;
 };
 
 }; // experimental::
