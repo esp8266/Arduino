@@ -1,11 +1,11 @@
 #/bin/sh
 
 # Requires xdd which is part of the VIM package
-# Requires html-minifier 
-#   sudo npm install html-minifier -g 
 # Requires npm
 #   sudo apt install npm
 #   ln -s /usr/bin/nodejs /usr/bin/node
+# Requires html-minifier
+#   sudo npm install html-minifier -g
 
 html-minifier \
  --case-sensitive \
@@ -53,5 +53,5 @@ echo Reduce complete.
 echo index.htm.gz can be used instead of data/edit/index.htm to save FileSystem space
 echo Alternately, you can leave the filesystem untouched by embedding index.htm
 echo inside the code. To do so, uncomment the line 
-echo "  #define BUILT_IN_INDEX_HTM" 
+echo "  #define INCLUDE_FALLBACK_INDEX_HTM" 
 echo in FSBrowser.ino
