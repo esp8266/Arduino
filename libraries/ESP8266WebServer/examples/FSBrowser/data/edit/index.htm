@@ -302,7 +302,7 @@
               status += "<span id='fsTotal'><span id='fsUsed' style='width:" 
                 + (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)) // fake to see the "used" bar in any case
                 + "%'></span><span class='tooltip'>"
-                + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + "\xa0free\xa0of\xa0" + readableSize(fsInfo.totalBytes)
+                + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + "&nbsp;free&nbsp;of&nbsp;" + readableSize(fsInfo.totalBytes)
                 + "</span></span>";
               if (fsInfo.unsupportedFiles) {
                 status += " <span id='warning'>WARNING<span class='tooltip'>"

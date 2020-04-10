@@ -221,7 +221,8 @@ void handleStatus() {
 
 
 /*
-   Return the list of files in the directory specified by the "dir" query string parameter
+   Return the list of files in the directory specified by the "dir" query string parameter.
+   Also demonstrates the use of chuncked responses.
 */
 void handleFileList() {
   if (!fsOK) {
@@ -241,7 +242,15 @@ void handleFileList() {
   Dir dir = fileSystem->openDir(path);
   path = String();
 
-  String output = "[";
+  // use HTTP/1.1 Chunked response to avoid building a huge temporary string
+  if (!server.chunkedResponseModeStart(200, "text/json")) {
+    server.send(505, FPSTR("text/html"), FPSTR("HTTP1.1 required"));
+    return;
+  }
+
+  // use the same string for every line
+  String output;
+  output.reserve(64);
   while (dir.next()) {
 #ifdef USE_SPIFFS
     String error = getFileError(dir.fileName());
@@ -250,9 +259,15 @@ void handleFileList() {
       continue;
     }
 #endif
-    if (output != "[") {
-      output += ',';
+    if (output.length()) {
+      // send string from previous iteration
+      // as an HTTP chunk
+      server.sendContent(output);
+      output = ',';
+    } else {
+      output = '[';
     }
+
     output += "{\"type\":\"";
     if (dir.isDirectory()) {
       output += "dir";
@@ -271,8 +286,10 @@ void handleFileList() {
     output += "\"}";
   }
 
+  // send last string
   output += "]";
-  server.send(200, "text/json", output);
+  server.sendContent(output);
+  server.chunkedResponseFinalize();
 }
 
 
@@ -345,9 +362,6 @@ void handleFileCreate() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
-  if (server.args() == 0 || server.args() > 2) {
-    return returnFail("BAD ARGS");
-  }
 
   String path = server.arg("path");
   if (path == "") {
@@ -367,8 +381,9 @@ void handleFileCreate() {
     return returnFail("PATH FILE EXISTS");
   }
 
-  if (server.args() == 1) {
-    // One argument: create
+  String src = server.arg("src");
+  if (src == "") {
+    // No source specified: creation
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path);
     if (path.endsWith("/")) {
       // Create a folder
@@ -391,11 +406,7 @@ void handleFileCreate() {
     }
     returnOKWithMsg(path);
   } else {
-    // Two arguments: rename
-    String src = server.arg("src");
-    if (src == "") {
-      return returnFail("MISSING SRC ARG");
-    }
+    // Source specified: rename
     if (src == "/") {
       return returnFail("BAD SRC");
     }
@@ -458,10 +469,12 @@ void handleFileDelete() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
-  if (server.args() == 0) {
+
+  String path = server.arg(0);
+  if (path == "") {
     return returnFail("BAD ARGS");
   }
-  String path = server.arg(0);
+  
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
   if (path == "/" || !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
