@@ -330,10 +330,10 @@ void ArduinoOTAClass::_runUpdate() {
   if (Update.end()) {
     // Ensure last count packet has been sent out and not combined with the final OK
     client.flush();
-	delay(1000);
-	client.print("OK");
-	client.flush();
-	delay(1000);
+    delay(1000);
+    client.print("OK");
+    client.flush();
+    delay(1000);
     client.stop();
 #ifdef OTA_DEBUG
     OTA_DEBUG.printf("Update Success\n");
