@@ -1351,9 +1351,10 @@ int HTTPClient::handleHeaderResponse()
 
             if (headerLine.startsWith(F("HTTP/1."))) {
 
-                _canReuse = _canReuse && (headerLine[sizeof "HTTP/1." - 1] != '0');
-                _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
-                _canReuse = _canReuse && (_returnCode != '0');
+                constexpr auto httpVersionIdx = sizeof "HTTP/1." - 1;
+                _canReuse = _canReuse && (headerLine[httpVersionIdx] != '0');
+                _returnCode = headerLine.substring(httpVersionIdx + 2, headerLine.indexOf(' ', httpVersionIdx + 2)).toInt();
+                _canReuse = _canReuse && (_returnCode > 0) && (_returnCode < 500);
 
             } else if ((headerSeparator = headerLine.indexOf(':')) > 0) {
                 String headerName = headerLine.substring(0, headerSeparator);
