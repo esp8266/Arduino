@@ -156,6 +156,7 @@ public:
             format();
             _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         }
+	sdfat::SdFile::dateTimeCallback(dateTimeCB);
         return _mounted;
     }
 
@@ -202,6 +203,17 @@ public:
         tiempo.tm_year = ((int)(d >> 9) & 0x7f) + 80;
         tiempo.tm_isdst = -1;
         return mktime(&tiempo);
+    }
+
+    // Because SdFat has a single, global setting for this we can only use a
+    // static member of our class to return the time/date.  However, since
+    // this is static, we can't see the time callback variable.  Punt for now,
+    // using time(NULL) as the best we can do.
+    static void dateTimeCB(uint16_t *dosYear, uint16_t *dosTime) {
+        time_t now = time(nullptr);
+        struct tm *tiempo = localtime(&now);
+        *dosYear = ((tiempo->tm_year - 80) << 9) | ((tiempo->tm_mon + 1) << 5) | tiempo->tm_mday;
+        *dosTime = (tiempo->tm_hour << 11) | (tiempo->tm_min << 5) | tiempo->tm_sec;
     }
 
 protected:
@@ -363,6 +375,18 @@ public:
         return ftime;
     }
 
+    time_t getCreationTime() override {
+        time_t ftime = 0;
+        if (_opened && _fd) {
+            sdfat::dir_t tmp;
+            if (_fd.get()->dirEntry(&tmp)) {
+                ftime = SDFSImpl::FatToTimeT(tmp.creationDate, tmp.creationTime);
+            }
+        }
+        return ftime;
+    }
+
+
 
 protected:
     SDFSImpl*                     _fs;
@@ -417,6 +441,24 @@ public:
         return _size;
     }
 
+    time_t fileTime() override
+    {
+        if (!_valid) {
+            return 0;
+        }
+
+        return _time;
+    }
+
+    time_t fileCreationTime() override
+    {
+        if (!_valid) {
+            return 0;
+        }
+
+        return _creation;
+    }
+
     bool isFile() const override
     {
         return _valid ? _isFile : false;
@@ -441,8 +483,10 @@ public:
                 sdfat::dir_t tmp;
                 if (file.dirEntry(&tmp)) {
                     _time = SDFSImpl::FatToTimeT(tmp.lastWriteDate, tmp.lastWriteTime);
+                    _creation = SDFSImpl::FatToTimeT(tmp.creationDate, tmp.creationTime);
 		} else {
                     _time = 0;
+                    _creation = 0;
                }
                 file.getName(_lfn, sizeof(_lfn));
                 file.close();
@@ -467,6 +511,7 @@ protected:
     bool                         _valid;
     char                         _lfn[64];
     time_t                       _time;
+    time_t                       _creation;
     std::shared_ptr<char>        _dirPath;
     uint32_t                     _size;
     bool                         _isFile;

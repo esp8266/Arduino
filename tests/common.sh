@@ -34,17 +34,11 @@ function print_size_info()
     elf_name=$(basename $elf_file)
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
+    xtensa-lx106-elf-size --format=sysv $elf_file | sed s/irom0.text/irom0text/g > size.txt
     declare -A segments
-    while read -a tokens; do
-        seg=${tokens[0]}
-        seg=${seg//./}
-        size=${tokens[1]}
-        addr=${tokens[2]}
-        if [ "$addr" -eq "$addr" -a "$addr" -ne "0" ] 2>/dev/null; then
-            segments[$seg]=$size
-        fi
-
-    done < <(xtensa-lx106-elf-size --format=sysv $elf_file | sed 's/\r//g' )
+    for seg in data rodata bss text irom0text; do
+        segments[$seg]=$(grep ^.$seg size.txt | awk '{sum += $2} END {print sum}')
+    done
 
     total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
     total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
@@ -165,16 +159,20 @@ function install_ide()
     local core_path=$2
     local debug=$3
     if [ "$WINDOWS" = "1" ]; then
-        # Acquire needed packages from Windows package manager
-        choco install --no-progress python3 >& pylog.txt
-	# Parse the python instrall dir from the output log.  Sorry, can't set it via choco on the free version
-	PYDIR=$(cat pylog.txt | grep "^Installed to:"  | cut -f2 -d"'" | sed 's/C:\\/\/c\//')
-	echo "Detected python3 install dir: $PYDIR"
-        export PATH="$PYDIR:$PATH"  # Ensure it's live from now on...
-        cp "$PYDIR/python.exe" "$PYDIR/python3.exe"
-        choco install --no-progress unzip
-        choco install --no-progress sed
-        #choco install --no-progress golang
+        mkdir /c/mybin
+        pushd /c/mybin
+            # Use Python.org to install python3 and make sure it is in path
+            wget -nv https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-win32.zip
+            unzip -q python-3.8.1-embed-win32.zip
+            cp "python.exe" "python3.exe"
+            wget -nv -O sed.exe https://github.com/mbuilov/sed-windows/raw/master/sed-4.8-x64.exe
+            #wget -nv https://fossies.org/windows/misc/unz600xn.exe
+            #unzip -q ./unz600xn.exe
+        popd
+        export PATH="c:\\mybin:$PATH"  # Ensure it's live from now on...
+        python3 --version
+        sed --version
+        awk --version
         test -r arduino-windows.zip || wget -nv -O arduino-windows.zip "${ideurl}-windows.zip"
         unzip -q arduino-windows.zip
         mv arduino-${idever} arduino-distrib

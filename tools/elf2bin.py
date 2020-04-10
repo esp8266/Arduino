@@ -30,6 +30,9 @@ fmodeb = { 'dout': 3, 'dio': 2, 'qout': 1, 'qio': 0 }
 ffreqb = { '40': 0, '26': 1, '20': 2, '80': 15 }
 fsizeb = { '512K': 0, '256K': 1, '1M': 2, '2M': 3, '4M': 4, '8M': 8, '16M': 9 }
 
+crcsize_offset = 4088
+crcval_offset = 4092
+
 def get_elf_entry(elf, path):
     p = subprocess.Popen([path + "/xtensa-lx106-elf-readelf", '-h', elf], stdout=subprocess.PIPE, universal_newlines=True )
     lines = p.stdout.readlines()
@@ -90,9 +93,52 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
         out.write(bytearray([0]))
     out.write(bytearray([checksum]))
     if to_addr != 0:
+        if total_size + 8 > to_addr:
+            raise Exception('Bin image of ' + elf + ' is too big, actual size ' + str(total_size  + 8) + ', target size ' + str(to_addr) + '.')
         while total_size < to_addr:
             out.write(bytearray([0xaa]))
             total_size += 1
+
+def crc8266(ldata):
+    "Return the CRC of ldata using same algorithm as eboot"
+    crc = 0xffffffff
+    idx = 0
+    while idx < len(ldata):
+        byte = int(ldata[idx])
+        idx = idx + 1
+        for i in [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01]:
+            bit = crc & 0x80000000
+            if (byte & i) != 0:
+                if bit == 0:
+                    bit = 1
+                else:
+                    bit = 0
+            crc = int(crc << 1) & 0xffffffff
+            if bit != 0:
+                crc = int(crc ^ 0x04c11db7)
+    return crc
+
+def store_word(raw, offset, val):
+    "Place a 4-byte word in 8266-dependent order in the raw image"
+    raw[offset] = val & 255
+    raw[offset + 1] = (val >> 8) & 255
+    raw[offset + 2] = (val >> 16) & 255
+    raw[offset + 3] = (val >> 24) & 255
+    return raw
+
+def add_crc(out):
+    with open(out, "rb") as binfile:
+        raw = bytearray(binfile.read())
+
+    # Zero out the spots we're going to overwrite to be idempotent
+    raw = store_word(raw, crcsize_offset, 0)
+    raw = store_word(raw, crcval_offset, 0)
+    crc = crc8266(raw)
+    raw = store_word(raw, crcsize_offset, len(raw))
+    raw = store_word(raw, crcval_offset, int(crc))
+
+    with open(out, "wb") as binfile:
+        binfile.write(raw)
 
 def main():
     parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
@@ -112,6 +158,9 @@ def main():
     write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
     write_bin(out, args.app, ['.irom0.text', '.text', '.text1', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
     out.close()
+
+    # Because the CRC includes both eboot and app, can only calculate it after the entire BIN generated
+    add_crc(args.out)
 
     return 0
 
