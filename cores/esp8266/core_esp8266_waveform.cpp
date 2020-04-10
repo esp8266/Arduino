@@ -284,11 +284,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
           }
           else {
-            wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
             if (!wave.dutyCcys) {
-              wave.nextPhaseCcy = wave.nextOffCcy;
+              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
+              wave.nextOffCcy = wave.nextPhaseCcy;
             }
             else {
+              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
               if (pin == 16) {
                 GP16O |= 1; // GPIO16 write slow as it's RMW
               }
