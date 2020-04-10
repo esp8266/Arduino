@@ -474,7 +474,7 @@ void handleFileDelete() {
   if (path == "") {
     return returnFail("BAD ARGS");
   }
-  
+
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
   if (path == "/" || !fileSystem->exists(path)) {
     return returnFail("BAD PATH");
