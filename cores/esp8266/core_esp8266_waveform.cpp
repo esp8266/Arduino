@@ -134,15 +134,15 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
   if ((pin > 16) || isFlashInterfacePin(pin) || !periodCcys || (alignPhase > 16)) {
     return false;
   }
-  Waveform* wave = &waveforms[pin];
-  wave->dutyCcys = timeHighCcys;
-  wave->periodCcys = periodCcys;
+  Waveform& wave = waveforms[pin];
+  wave.dutyCcys = timeHighCcys;
+  wave.periodCcys = periodCcys;
 
   if (!(waveformsEnabled & (1UL << pin))) {
-    // wave->nextPhaseCcy and wave->nextOffCcy are initialized by the ISR
-    wave->expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
-    wave->mode = WaveformMode::INIT;
-    wave->alignPhase = (alignPhase < 0) ? -1 : alignPhase;
+    // wave.nextPhaseCcy and wave.nextOffCcy are initialized by the ISR
+    wave.expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
+    wave.mode = WaveformMode::INIT;
+    wave.alignPhase = (alignPhase < 0) ? -1 : alignPhase;
     waveformToEnable = 1UL << pin;
     std::atomic_thread_fence(std::memory_order_release);
     if (!timerRunning) {
@@ -158,10 +158,10 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
     }
   }
   else {
-    wave->mode = WaveformMode::INFINITE; // turn off possible expiry to make update atomic from NMI
-    wave->expiryCcy = runTimeCcys; // in WaveformMode::UPDATEEXPIRY, temporarily hold relative cycle count
+    wave.mode = WaveformMode::INFINITE; // turn off possible expiry to make update atomic from NMI
+    wave.expiryCcy = runTimeCcys; // in WaveformMode::UPDATEEXPIRY, temporarily hold relative cycle count
     if (runTimeCcys)
-      wave->mode = WaveformMode::UPDATEEXPIRY;
+      wave.mode = WaveformMode::UPDATEEXPIRY;
     std::atomic_thread_fence(std::memory_order_release);
   }
   return true;
@@ -226,51 +226,51 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       if (!(waveformsEnabled & (1UL << pin)))
         continue;
 
-      Waveform *wave = &waveforms[pin];
+      Waveform& wave = waveforms[pin];
 
-      switch (wave->mode) {
+      switch (wave.mode) {
       case WaveformMode::INIT:
         waveformsState &= ~(1UL << pin); // Clear the state of any just started
-        wave->nextPhaseCcy = (waveformsEnabled & (1UL << wave->alignPhase)) ?
-          waveforms[wave->alignPhase].nextPhaseCcy : now;
-        if (!wave->expiryCcy) {
-          wave->mode = WaveformMode::INFINITE;
+        wave.nextPhaseCcy = (waveformsEnabled & (1UL << wave.alignPhase)) ?
+          waveforms[wave.alignPhase].nextPhaseCcy : now;
+        if (!wave.expiryCcy) {
+          wave.mode = WaveformMode::INFINITE;
           break;
         }
       case WaveformMode::UPDATEEXPIRY:
-        wave->expiryCcy += wave->nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
-        wave->mode = WaveformMode::EXPIRES;
+        wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
+        wave.mode = WaveformMode::EXPIRES;
         break;
       default:
         break;
       }
 
-      uint32_t nextEventCcy = (waveformsState & (1UL << pin)) ? wave->nextOffCcy : wave->nextPhaseCcy;
+      uint32_t nextEventCcy = (waveformsState & (1UL << pin)) ? wave.nextOffCcy : wave.nextPhaseCcy;
 
-      if (WaveformMode::EXPIRES == wave->mode && static_cast<int32_t>(wave->expiryCcy - now) <= 0) {    	
+      if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(wave.expiryCcy - now) <= 0) {    	
         // Disable any waveforms that are done
         waveformsEnabled ^= 1UL << pin;
         // impossibly large value to prevent setting nextTimerCcy
         nextEventCcy = now + microsecondsToClockCycles(MAXIRQUS);
       }
-      else if (WaveformMode::EXPIRES == wave->mode && static_cast<int32_t>(nextEventCcy - wave->expiryCcy) > 0) {
-        nextEventCcy = wave->expiryCcy;
+      else if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEventCcy - wave.expiryCcy) > 0) {
+        nextEventCcy = wave.expiryCcy;
       }
       else {
       	int32_t nextEventCcys = nextEventCcy - now;
       	if (nextEventCcys <= 0) {
-          uint32_t skipPeriodCcys = (-nextEventCcys / wave->periodCcys) * wave->periodCcys;
-          bool flatLine = wave->nextPhaseCcy == wave->nextOffCcy;
+          uint32_t skipPeriodCcys = (-nextEventCcys / wave.periodCcys) * wave.periodCcys;
+          bool flatLine = wave.nextPhaseCcy == wave.nextOffCcy;
           if (waveformsState & (1UL << pin)) {
-            if (wave->dutyCcys == wave->periodCcys) {
-              wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
-              wave->nextOffCcy = wave->nextPhaseCcy;
-              nextEventCcy = wave->nextPhaseCcy;
+            if (wave.dutyCcys == wave.periodCcys) {
+              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
+              wave.nextOffCcy = wave.nextPhaseCcy;
+              nextEventCcy = wave.nextPhaseCcy;
             }
             else if (flatLine) {
-              wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys + skipPeriodCcys;
-              wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
-              nextEventCcy = wave->nextOffCcy;
+              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
+              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
+              nextEventCcy = wave.nextOffCcy;
             }
             else {
               if (pin == 16) {
@@ -280,13 +280,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 ClearGPIO(1UL << pin);
               }
               waveformsState ^= 1UL << pin;
-              nextEventCcy = wave->nextPhaseCcy;
+              nextEventCcy = wave.nextPhaseCcy;
             }
           }
           else {
-            wave->nextOffCcy = wave->nextPhaseCcy + wave->dutyCcys + skipPeriodCcys;
-            if (!wave->dutyCcys) {
-              wave->nextPhaseCcy = wave->nextOffCcy;
+            wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
+            if (!wave.dutyCcys) {
+              wave.nextPhaseCcy = wave.nextOffCcy;
             }
             else {
               if (pin == 16) {
@@ -296,9 +296,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 SetGPIO(1UL << pin);
               }
               waveformsState ^= 1UL << pin;
-              wave->nextPhaseCcy += wave->periodCcys + skipPeriodCcys;
+              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
             }
-            nextEventCcy = wave->nextOffCcy;
+            nextEventCcy = wave.nextOffCcy;
           }
         }
       }
