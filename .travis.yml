@@ -1,18 +1,10 @@
 language: bash
 os: linux
-dist: trusty
+dist: bionic
 
 git:
   depth: 1
   submodules: false
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - gcc-7
 
 before_install:
   - git submodule update --init  # no recursive update
@@ -32,11 +24,15 @@ jobs:
     - name: "Platformio (1)"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      install:
+          - sudo apt-get install python3-pip python3-setuptools
       env:
         - BUILD_PARITY=even
     - name: "Platformio (2)"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      install:
+          - sudo apt-get install python3-pip python3-setuptools
       env:
         - BUILD_PARITY=odd
 
@@ -84,29 +80,6 @@ jobs:
       env:
         - BUILD_PARITY=odd
 
-    - name: "Host tests"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
-      install: sudo apt-get install valgrind lcov
-      env: CC=gcc-7 CXX=g++-7
-
-    - name: "Docs"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
-      install:
-          - sudo apt-get install python3-pip
-          - pip3 install --user -r doc/requirements.txt;
-
-    - name: "Style check"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
-      install: tests/ci/install_astyle.sh
-
-    - name: "Mock trivial test"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/buildm.sh
-      env: CC=gcc-7 CXX=g++-7
-
     - name: "Mac OSX can build sketches"
       os: osx
       stage: build
@@ -118,6 +91,28 @@ jobs:
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/build.sh
       env: WINDOWS=1 BUILD_PARITY=custom mod=500 rem=1
+
+    - name: "Host tests"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
+      install:
+        - sudo apt-get install valgrind lcov
+
+    - name: "Docs"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
+      install:
+          - sudo apt-get install python3-pip python3-setuptools
+          - pip3 install --user -r doc/requirements.txt;
+
+    - name: "Style check"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
+      install: tests/ci/install_astyle.sh
+
+    - name: "Mock trivial test"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/buildm.sh
 
     - name: "Boards"
       stage: build

@@ -130,6 +130,23 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+/**
+ * redirection follow mode.
+ * + `HTTPC_DISABLE_FOLLOW_REDIRECTS` - no redirection will be followed.
+ * + `HTTPC_STRICT_FOLLOW_REDIRECTS` - strict RFC2616, only requests using
+ *      GET or HEAD methods will be redirected (using the same method),
+ *      since the RFC requires end-user confirmation in other cases.
+ * + `HTTPC_FORCE_FOLLOW_REDIRECTS` - all redirections will be followed,
+ *      regardless of a used method. New request will use the same method,
+ *      and they will include the same body data and the same headers.
+ *      In the sense of the RFC, it's just like every redirection is confirmed.
+ */
+typedef enum {
+    HTTPC_DISABLE_FOLLOW_REDIRECTS,
+    HTTPC_STRICT_FOLLOW_REDIRECTS,
+    HTTPC_FORCE_FOLLOW_REDIRECTS
+} followRedirects_t;
+
 #if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
@@ -147,8 +164,8 @@ public:
  * Since both begin() functions take a reference to client as a parameter, you need to 
  * ensure the client object lives the entire time of the HTTPClient
  */
-    bool begin(WiFiClient &client, String url);
-    bool begin(WiFiClient &client, String host, uint16_t port, String uri = "/", bool https = false);
+    bool begin(WiFiClient &client, const String& url);
+    bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
 #if HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
@@ -173,22 +190,26 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
-    void setFollowRedirects(bool follow);
+
+    // Redirections
+    void setFollowRedirects(bool follow) __attribute__ ((deprecated));
+    void setFollowRedirects(followRedirects_t follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
-    bool setURL(String url); // handy for handling redirects
+
+    bool setURL(const String& url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
     /// request handling
     int GET();
-    int POST(uint8_t * payload, size_t size);
-    int POST(String payload);
-    int PUT(uint8_t * payload, size_t size);
-    int PUT(String payload);
-    int PATCH(uint8_t * payload, size_t size);
-    int PATCH(String payload);
-    int sendRequest(const char * type, String payload);
-    int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-    int sendRequest(const char * type, Stream * stream, size_t size = 0);
+    int POST(const uint8_t* payload, size_t size);
+    int POST(const String& payload);
+    int PUT(const uint8_t* payload, size_t size);
+    int PUT(const String& payload);
+    int PATCH(const uint8_t* payload, size_t size);
+    int PATCH(const String& payload);
+    int sendRequest(const char* type, const String& payload);
+    int sendRequest(const char* type, const uint8_t* payload = NULL, size_t size = 0);
+    int sendRequest(const char* type, Stream * stream, size_t size = 0);
 
     void addHeader(const String& name, const String& value, bool first = false, bool replace = true);
 
@@ -216,7 +237,7 @@ protected:
         String value;
     };
 
-    bool beginInternal(String url, const char* expectedProtocol);
+    bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
     int returnError(int error);
@@ -242,7 +263,7 @@ protected:
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent = "ESP8266HTTPClient";
+    String _userAgent;
     String _base64Authorization;
 
     /// Response handling
@@ -252,8 +273,7 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
-    bool _followRedirects = false;
-    uint16_t _redirectCount = 0;
+    followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
     uint16_t _redirectLimit = 10;
     String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;

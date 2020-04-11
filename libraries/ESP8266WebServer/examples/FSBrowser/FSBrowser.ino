@@ -122,7 +122,7 @@ void handleFileUpload() {
     }
     DBG_OUTPUT_PORT.print("handleFileUpload Name: "); DBG_OUTPUT_PORT.println(filename);
     fsUploadFile = filesystem->open(filename, "w");
-    filename = String();
+    filename.clear();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     //DBG_OUTPUT_PORT.print("handleFileUpload Data: "); DBG_OUTPUT_PORT.println(upload.currentSize);
     if (fsUploadFile) {
@@ -150,7 +150,7 @@ void handleFileDelete() {
   }
   filesystem->remove(path);
   server.send(200, "text/plain", "");
-  path = String();
+  path.clear();
 }
 
 void handleFileCreate() {
@@ -172,7 +172,7 @@ void handleFileCreate() {
     return server.send(500, "text/plain", "CREATE FAILED");
   }
   server.send(200, "text/plain", "");
-  path = String();
+  path.clear();
 }
 
 void handleFileList() {
@@ -184,14 +184,29 @@ void handleFileList() {
   String path = server.arg("dir");
   DBG_OUTPUT_PORT.println("handleFileList: " + path);
   Dir dir = filesystem->openDir(path);
-  path = String();
+  path.clear();
 
-  String output = "[";
+  // use HTTP/1.1 Chunked response to avoid building a huge temporary string
+  if (!server.chunkedResponseModeStart(200, "text/json")) {
+    server.send(505, FPSTR("text/html"), FPSTR("HTTP1.1 required"));
+    return;
+  }
+
+  // use the same string for every line
+  String output;
+  output.reserve(64);
   while (dir.next()) {
-    File entry = dir.openFile("r");
-    if (output != "[") {
-      output += ',';
+
+    if (output.length()) {
+      // send string from previous iteration
+      // as an HTTP chunk
+      server.sendContent(output);
+      output = ',';
+    } else {
+      output = '[';
     }
+
+    File entry = dir.openFile("r");
     bool isDir = false;
     output += "{\"type\":\"";
     output += (isDir) ? "dir" : "file";
@@ -205,8 +220,10 @@ void handleFileList() {
     entry.close();
   }
 
+  // send last string
   output += "]";
-  server.send(200, "text/json", output);
+  server.sendContent(output);
+  server.chunkedResponseFinalize();
 }
 
 void setup(void) {
@@ -275,13 +292,13 @@ void setup(void) {
 
   //get heap status, analog input value and all GPIO statuses in one json call
   server.on("/all", HTTP_GET, []() {
-    String json = "{";
+    String json('{');
     json += "\"heap\":" + String(ESP.getFreeHeap());
     json += ", \"analog\":" + String(analogRead(A0));
     json += ", \"gpio\":" + String((uint32_t)(((GPI | GPO) & 0xFFFF) | ((GP16I & 0x01) << 16)));
     json += "}";
     server.send(200, "text/json", json);
-    json = String();
+    json.clear();
   });
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");

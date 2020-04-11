@@ -39,6 +39,8 @@
 
 extern "C" {
 
+bool blocking_uart = true; // system default
+
 static int s_uart_debug_nr = UART1;
 
 static uart_t *UART[2] = { NULL, NULL };
@@ -190,6 +192,13 @@ uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 	if(uart == NULL || !uart->rx_enabled)
 		return 0;
 
+    if (!blocking_uart)
+    {
+        char c;
+        if (read(0, &c, 1) == 1)
+            uart_new_data(0, c);
+    }
+
 	size_t ret = 0;
 	while (ret < usersize && uart_rx_available_unsafe(uart->rx_buffer))
 	{
@@ -313,11 +322,21 @@ uart_get_baudrate(uart_t* uart)
 	return uart->baud_rate;
 }
 
+uint8_t
+uart_get_bit_length(const int uart_nr)
+{
+	uint8_t width = ((uart_nr % 16) >> 2) + 5;
+	uint8_t parity = (uart_nr >> 5) + 1;
+	uint8_t stop = uart_nr % 4;
+	return (width + parity + stop + 1);
+}
+
 uart_t*
-uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
 {
 	(void) config;
 	(void) tx_pin;
+	(void) invert;
 	uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
 	if(uart == NULL)
 		return NULL;

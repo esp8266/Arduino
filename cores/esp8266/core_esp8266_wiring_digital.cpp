@@ -30,7 +30,7 @@
 
 extern "C" {
 
-uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x04, 0x08, 0x0C, 0x10};
+volatile uint32_t* const esp8266_gpioToFn[16] PROGMEM = { &GPF0, &GPF1, &GPF2, &GPF3, &GPF4, &GPF5, &GPF6, &GPF7, &GPF8, &GPF9, &GPF10, &GPF11, &GPF12, &GPF13, &GPF14, &GPF15 };
 
 extern void __pinMode(uint8_t pin, uint8_t mode) {
   if(pin < 16){
@@ -235,21 +235,23 @@ extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode)
     __attachInterruptFunctionalArg(pin, (voidFuncPtrArg)userFunc, 0, mode, false);
 }
 
+extern void __resetPins() {
+  for (int i = 0; i <= 16; ++i) {
+    if (!isFlashInterfacePin(i))
+        pinMode(i, INPUT);
+  }
+}
+
 extern void initPins() {
   //Disable UART interrupts
   system_set_os_print(0);
   U0IE = 0;
   U1IE = 0;
 
-  for (int i = 0; i <= 5; ++i) {
-    pinMode(i, INPUT);
-  }
-  // pins 6-11 are used for the SPI flash interface
-  for (int i = 12; i <= 16; ++i) {
-    pinMode(i, INPUT);
-  }
+  resetPins();
 }
 
+extern void resetPins() __attribute__ ((weak, alias("__resetPins")));
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));
 extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
 extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead"), nothrow));

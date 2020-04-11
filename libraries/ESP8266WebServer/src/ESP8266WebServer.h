@@ -29,6 +29,7 @@
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include "detail/mimetable.h"
+#include "Uri.h"
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
@@ -91,9 +92,9 @@ public:
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
-  void on(const String &uri, THandlerFunction handler);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  void on(const Uri &uri, THandlerFunction handler);
+  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
+  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
@@ -107,17 +108,18 @@ public:
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
-  const String& arg(String name) const;    // get request argument value by name
+  const String& pathArg(unsigned int i) const; // get request path argument by number
+  const String& arg(const String& name) const;    // get request argument value by name
   const String& arg(int i) const;          // get request argument value by number
   const String& argName(int i) const;      // get request argument name by number
   int args() const;                        // get arguments count
   bool hasArg(const String& name) const;   // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
-  const String& header(String name) const; // get request header value by name
+  const String& header(const String& name) const; // get request header value by name
   const String& header(int i) const;       // get request header value by number
   const String& headerName(int i) const;   // get request header name by number
   int headers() const;                     // get header count
-  bool hasHeader(String name) const;       // check if header exists
+  bool hasHeader(const String& name) const;       // check if header exists
   const String& hostHeader() const;        // get request host header if available or empty String if not
 
   // send response to the client
@@ -127,6 +129,15 @@ public:
   void send(int code, const char* content_type = NULL, const String& content = String(""));
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
+  void send(int code, const char *content_type, const char *content) {
+    send_P(code, content_type, content);
+  }
+  void send(int code, const char *content_type, const char *content, size_t content_length) {
+    send_P(code, content_type, content, content_length);
+  }
+  void send(int code, const char *content_type, const uint8_t *content, size_t content_length) {
+    send_P(code, content_type, (const char *)content, content_length);
+  }
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
@@ -138,17 +149,47 @@ public:
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
+  bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
+    if (_currentVersion == 0)
+        // no chunk mode in HTTP/1.0
+        return false;
+    setContentLength(CONTENT_LENGTH_UNKNOWN);
+    send_P(code, content_type, "");
+    return true;
+  }
+  bool chunkedResponseModeStart (int code, const char* content_type) {
+    return chunkedResponseModeStart_P(code, content_type);
+  }
+  bool chunkedResponseModeStart (int code, const String& content_type) {
+    return chunkedResponseModeStart_P(code, content_type.c_str());
+  }
+  void chunkedResponseFinalize () {
+    sendContent(emptyString);
+  }
+
   static String credentialHash(const String& username, const String& realm, const String& password);
 
   static String urlDecode(const String& text);
 
+  // Handle a GET request by sending a response header and stream file content to response body
   template<typename T>
   size_t streamFile(T &file, const String& contentType) {
-    _streamFileCore(file.size(), file.name(), contentType);
-    return _currentClient.write(file);
+    return streamFile(file, contentType, HTTP_GET);
   }
 
-  static const String responseCodeToString(const int code);
+  // Implement GET and HEAD requests for files.
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t streamFile(T &file, const String& contentType, HTTPMethod requestMethod) {
+    size_t contentLength = 0;
+    _streamFileCore(file.size(), file.name(), contentType);
+    if (requestMethod == HTTP_GET) {
+      contentLength = _currentClient.write(file);
+    }
+    return contentLength;
+  }
+
+  static String responseCodeToString(const int code);
 
 protected:
   void _addRequestHandler(RequestHandlerType* handler);

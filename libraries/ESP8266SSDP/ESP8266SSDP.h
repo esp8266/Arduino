@@ -62,7 +62,8 @@ class SSDPClass{
     ~SSDPClass();
     bool begin();
     void end();
-    void schema(WiFiClient client);
+    void schema(WiFiClient client) const { schema((Print&)std::ref(client)); }
+    void schema(Print &print) const;
     void setDeviceType(const String& deviceType) { setDeviceType(deviceType.c_str()); }
     void setDeviceType(const char *deviceType);
 	
@@ -70,13 +71,13 @@ class SSDPClass{
     void setUUID(const String& uuid)	{ setUUID(uuid.c_str()); }
     void setUUID(const char *uuid);
 	
-	  void setName(const String& name) { setName(name.c_str()); }
+    void setName(const String& name) { setName(name.c_str()); }
     void setName(const char *name);
     void setURL(const String& url) { setURL(url.c_str()); }
     void setURL(const char *url);
     void setSchemaURL(const String& url) { setSchemaURL(url.c_str()); }
     void setSchemaURL(const char *url);
-	  void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
+    void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
     void setSerialNumber(const char *serialNumber);
     void setSerialNumber(const uint32_t serialNumber);
     void setModelName(const String& name) { setModelName(name.c_str()); }
@@ -91,6 +92,7 @@ class SSDPClass{
     void setManufacturerURL(const char *url);
     void setHTTPPort(uint16_t port);
     void setTTL(uint8_t ttl);
+    void setInterval(uint32_t interval);
 
   protected:
     void _send(ssdp_method_t method);
@@ -103,6 +105,7 @@ class SSDPClass{
     SSDPTimer* _timer;
     uint16_t _port;
     uint8_t _ttl;
+    uint32_t _interval;
 
     IPAddress _respondToAddr;
     uint16_t  _respondToPort;
