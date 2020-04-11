@@ -89,7 +89,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
-    
+
     if(lhs.threshold.rssi != rhs.threshold.rssi) {
         return false;
     }
