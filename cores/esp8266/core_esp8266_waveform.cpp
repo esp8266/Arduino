@@ -51,7 +51,14 @@ constexpr uint32_t MAXIRQUS = 1000000;
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle counter we want for the waveforms.
-constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ? microsecondsToClockCycles(2) : microsecondsToClockCycles(3);
+constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
+  microsecondsToClockCycles(4) >> 1 : microsecondsToClockCycles(4);
+// The generator has a time quantum for switching wave cycles during the same ISR invocation
+constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
+  (microsecondsToClockCycles(3) / 2) >> 1 : microsecondsToClockCycles(3) / 2;
+// The latency between in-ISR rearming of the timer and the earliest firing
+constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
@@ -118,24 +125,34 @@ void setTimer1Callback(uint32_t (*fn)()) {
   }
 }
 
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS,
+int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
   uint32_t runTimeUS, int8_t alignPhase) {
   return startWaveformClockCycles(pin,
-    microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS),
+    microsecondsToClockCycles(highUS), microsecondsToClockCycles(lowUS),
     microsecondsToClockCycles(runTimeUS), alignPhase);
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys,
+int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase) {
-  const auto periodCcys = timeHighCcys + timeLowCcys;
+  const auto periodCcys = highCcys + lowCcys;
+  // correct the upward bias for duty cycles shorter than generator quantum
+  // effectively rounds to nearest quantum
+  if (highCcys < QUANTUM)
+  {
+    highCcys = 0;
+  }
+  else if (lowCcys < QUANTUM)
+  {
+    highCcys = periodCcys;  
+  }
   if ((pin > 16) || isFlashInterfacePin(pin) || !periodCcys || (alignPhase > 16)) {
     return false;
   }
   Waveform& wave = waveforms[pin];
-  wave.dutyCcys = timeHighCcys;
+  wave.dutyCcys = highCcys;
   wave.periodCcys = periodCcys;
 
   if (!(waveformsEnabled & (1UL << pin))) {
@@ -149,9 +166,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLo
       initTimer();
       timer1_write(microsecondsToClockCycles(1));
     }
-    else if (T1L > microsecondsToClockCycles(6)) {
+    else if (T1L > DELTAIRQ + IRQLATENCY) {
       // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
-      timer1_write(microsecondsToClockCycles(6));
+      timer1_write(microsecondsToClockCycles(1));
     }
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
@@ -178,8 +195,8 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (waveformsEnabled & (1UL << pin)) {
     waveformToDisable = 1UL << pin;
   // Must not interfere if Timer is due shortly
-  if (T1L > microsecondsToClockCycles(6)) {
-    timer1_write(microsecondsToClockCycles(6));
+  if (T1L > DELTAIRQ + IRQLATENCY) {
+    timer1_write(microsecondsToClockCycles(1));
   }
     while (waveformToDisable) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
@@ -327,8 +344,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys <= microsecondsToClockCycles(6) + DELTAIRQ) {
-    nextTimerCcys = microsecondsToClockCycles(6);
+  if (nextTimerCcys <= IRQLATENCY + DELTAIRQ) {
+    nextTimerCcys = IRQLATENCY;
   }
   else {
     nextTimerCcys -= DELTAIRQ;
