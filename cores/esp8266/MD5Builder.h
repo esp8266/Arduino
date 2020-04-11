@@ -40,9 +40,9 @@ class MD5Builder {
     void addHexString(const String& data){ addHexString(data.c_str()); }
     bool addStream(Stream & stream, const size_t maxLen);
     void calculate(void);
-    void getBytes(uint8_t * output);
-    void getChars(char * output);
-    String toString(void);
+    void getBytes(uint8_t * output) const;
+    void getChars(char * output) const;
+    String toString(void) const;
 };
 
 
