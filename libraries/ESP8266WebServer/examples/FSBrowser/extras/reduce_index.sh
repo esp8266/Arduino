@@ -1,5 +1,8 @@
 #/bin/sh
 
+# Processing script to optionally reduce filesystem use by miniying, gzipping and preparing index.htm for embedding in code.
+# Please see readme.md for more information.
+
 # Requires xdd which is part of the VIM package
 # Requires npm
 #   sudo apt install npm
@@ -50,8 +53,4 @@ then
 fi
 
 echo Reduce complete.
-echo index.htm.gz can be used instead of data/edit/index.htm to save FileSystem space
-echo Alternately, you can leave the filesystem untouched by embedding index.htm
-echo inside the code. To do so, uncomment the line 
-echo "  #define INCLUDE_FALLBACK_INDEX_HTM" 
-echo in FSBrowser.ino
+

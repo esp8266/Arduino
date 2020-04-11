@@ -11,11 +11,16 @@ This unified version is based on the previous examples named FSWebServer, FSBrow
 1. Uncomment one of the "#define USE_xxx" directives in the sketch
 2. Add the credentials of your WiFi network (search for "STASSID")
 3. Compile and upload the sketch to your ESP8266 device
-4. Copy the contents of the 'data' folder to the filesystem. To do so:
+4. For normal use, copy the contents of the 'data' folder to the filesystem. To do so:
 - for SDFS, copy that contents to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
 - for SPIFFS or LittleFS, please follow the instructions at https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#uploading-files-to-file-system
 5. Once the data and sketch have been uploaded, access the editor by pointing your browser to http://fsbrowser.local/edit
-6. If you need as much free space as possible on your filesystem, you can delete the sample files at the root but also the /edit/index.htm file, because the compressed version /edit/index.htm.gz will be used instead, for a total FS usage of less than 7KB
+
+## Options
+If you need to free some space on your filesystem, you can delete the sample files at the root but also the /edit/index.htm file, because the compressed version /edit/index.htm.gz will be used instead, for a total FS usage of less than 7KB.
+If you want to use the browser on a an existing filesystem and cannot thus execute step 4 above, you can uncomment the line 
+"#define INCLUDE_FALLBACK_INDEX_HTM", which will embed a version of the gzipped index in the source code and return it if the index.htm file is not found on the filesystem.
+The files required for those two options can be regenerated using the script "reduce_index.sh" located in the "extras" subfolder.
 
 ## Dependency
 The html page uses the ace.js text editor which is hosted on a CDN, so Internet access from your web browser is required for the FSBrowser to work.
@@ -55,6 +60,7 @@ The html page uses the ace.js text editor which is hosted on a CDN, so Internet 
 - Added Save/Discard/Help buttons to ACE editor, discard confirmation on leave, and refresh tree and status upon save
 - Removed "Upload" from context menu (which didn't work anyway)
 - Added "Rename/Move" feature to context menu
+- Sketch can be used on a preexisting filesystem by embedding the index.htm file in the program
 
 ## TODO (maybe)
 - ? How can we query the fatType of the SDFS (FAT16 or FAT32) to limit filenames to 8.3 on FAT16 ?
@@ -105,5 +111,6 @@ These tests are a checklist of operations to verify the FSBrowser behaviour.
 ## Credits
 - Icons are from https://feathericons.com/ . The resulting PNG is passed first through https://compresspng.com/ before being converted to base64 using https://www.base64-image.de/
 - The spinner is based on https://github.com/jlong/css-spinners
-- Minifiying of index.htm is done by : https://css-minifier.com/ (css) + https://www.javascriptminifier.com/ (js) + https://www.willpeavy.com/tools/minifier/ (html)
+- Minifiying of index.htm is done using the command line version of https://kangax.github.io/html-minifier/
+- Idea of embedding webpage in code borrowed from https://github.com/me-no-dev/ESPAsyncWebServer
 
