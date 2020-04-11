@@ -42,7 +42,7 @@ then
   exit -1
 fi
 
-xxd index.htm.gz > index_htm.h
+xxd -i index.htm.gz > index_htm.h
 if [ $? -ne 0 ]
 then
   echo "Error creating include file for index.htm"
