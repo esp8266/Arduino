@@ -84,10 +84,16 @@ void initVariant() {
 extern "C" void __preloop_update_frequency() {
 #if defined(F_CPU) && (F_CPU == 160000000L)
     ets_update_cpu_frequency(160);
-    CPU2X |= 1;
+    CPU2X |= 1UL;
+#elif defined(F_CPU)
+    ets_update_cpu_frequency(80);
+    CPU2X &= ~1UL;
 #elif !defined(F_CPU)
     if (system_get_cpu_freq() == 160) {
-        CPU2X |= 1;
+        CPU2X |= 1UL;
+    }
+    else {
+        CPU2X &= ~1UL;
     }
 #endif
 }
