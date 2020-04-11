@@ -74,7 +74,6 @@ If the ace.js cannot be found on the local filesystem either, the page will defa
 - ? move "Mkdir" and "MkFile" to context menu, with prompt like for Rename/Move
 - ? implement drag/drop for move + make "rename" only a local rename operation (no move)
 - ? Optionally present SPIFFS as a hierarchical FS too
-- ? Check if internet access is available and and replace ace editor by a text viewer otherwise
 - ? Optionally mount several filesystems at the same time (SPIFFS + SDFS or LittleFS + SDFS)
 
 ## Test suite
