@@ -127,8 +127,14 @@ public:
         }
     }
 
-    int connect(CONST ip_addr_t* addr, uint16_t port)
+    int connect(ip_addr_t* addr, uint16_t port)
     {
+#if LWIP_IPV6
+        // Set zone so that link local addresses use the default interface
+        if (IP_IS_V6(addr) && ip6_addr_lacks_zone(ip_2_ip6(addr), IP6_UNKNOWN)) {
+            ip6_addr_assign_zone(ip_2_ip6(addr), IP6_UNKNOWN, netif_default);
+        }
+#endif
         err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
         if (err != ERR_OK) {
             return 0;
