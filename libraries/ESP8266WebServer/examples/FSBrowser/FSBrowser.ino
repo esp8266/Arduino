@@ -513,6 +513,9 @@ void handleFileUpload() {
     }
     DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
+    if (!uploadFile) {
+      return returnFail("CREATE FAILED");
+    }
     DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
