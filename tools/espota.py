@@ -192,6 +192,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       received_error = False
       while not (received_ok or received_error):
         reply = connection.recv(64).decode()
+        # Look for either the "E" in ERROR or the "O" in OK response
+        # Check for "E" first, since both strings contain "O"
         if reply.find('E') >= 0:
           sys.stderr.write('\n')
           logging.error('%s', reply)
@@ -204,8 +206,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       sock.close()
       if received_ok:
         return 0
-      else:
-        return 1
+      return 1
     except:
       logging.error('No Result!')
       connection.close()
