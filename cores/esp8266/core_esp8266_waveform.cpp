@@ -50,12 +50,12 @@ extern "C" {
 constexpr uint32_t MAXIRQUS = 1000000;
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
-// real CPU cycle counter we want for the waveforms.
+// real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(4) >> 1 : microsecondsToClockCycles(4);
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
 // The generator has a time quantum for switching wave cycles during the same ISR invocation
 constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(3) / 2) >> 1 : microsecondsToClockCycles(3) / 2;
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
@@ -89,7 +89,7 @@ static volatile uint32_t waveformsEnabled = 0; // Is it actively running, update
 static volatile uint32_t waveformToEnable = 0;  // Message to the NMI handler to start exactly one waveform on a inactive pin
 static volatile uint32_t waveformToDisable = 0; // Message to the NMI handler to disable exactly one pin from waveform generation
 
-static uint32_t (*timer1CB)() = NULL;
+static uint32_t (*timer1CB)() = nullptr;
 
 // Interrupt on/off control
 static ICACHE_RAM_ATTR void timer1Interrupt();
@@ -117,6 +117,7 @@ static void ICACHE_RAM_ATTR deinitTimer() {
 // Set a callback.  Pass in NULL to stop it
 void setTimer1Callback(uint32_t (*fn)()) {
   timer1CB = fn;
+  std::atomic_thread_fence(std::memory_order_release);
   if (!timerRunning && fn) {
     initTimer();
     timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
@@ -140,11 +141,11 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   const auto periodCcys = highCcys + lowCcys;
   // correct the upward bias for duty cycles shorter than generator quantum
   // effectively rounds to nearest quantum
-  if (highCcys < QUANTUM)
+  if (highCcys < QUANTUM / 2)
   {
     highCcys = 0;
   }
-  else if (lowCcys < QUANTUM)
+  else if (lowCcys < QUANTUM / 2)
   {
     highCcys = periodCcys;  
   }
@@ -160,8 +161,8 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     wave.expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
     wave.mode = WaveformMode::INIT;
     wave.alignPhase = (alignPhase < 0) ? -1 : alignPhase;
-    waveformToEnable = 1UL << pin;
     std::atomic_thread_fence(std::memory_order_release);
+    waveformToEnable = 1UL << pin;
     if (!timerRunning) {
       initTimer();
       timer1_write(microsecondsToClockCycles(1));
@@ -176,10 +177,13 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   }
   else {
     wave.mode = WaveformMode::INFINITE; // turn off possible expiry to make update atomic from NMI
-    wave.expiryCcy = runTimeCcys; // in WaveformMode::UPDATEEXPIRY, temporarily hold relative cycle count
-    if (runTimeCcys)
-      wave.mode = WaveformMode::UPDATEEXPIRY;
     std::atomic_thread_fence(std::memory_order_release);
+    wave.expiryCcy = runTimeCcys; // in WaveformMode::UPDATEEXPIRY, temporarily hold relative cycle count
+    std::atomic_thread_fence(std::memory_order_release);
+    if (runTimeCcys) {
+      wave.mode = WaveformMode::UPDATEEXPIRY;
+      std::atomic_thread_fence(std::memory_order_release);
+    }
   }
   return true;
 }
@@ -264,7 +268,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       uint32_t nextEventCcy = (waveformsState & (1UL << pin)) ? wave.nextOffCcy : wave.nextPhaseCcy;
 
-      if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(wave.expiryCcy - now) <= 0) {    	
+      if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(now - wave.expiryCcy) >= 0) {    	
         // Disable any waveforms that are done
         waveformsEnabled ^= 1UL << pin;
         // impossibly large value to prevent setting nextTimerCcy
@@ -274,17 +278,17 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         nextEventCcy = wave.expiryCcy;
       }
       else {
-      	int32_t nextEventCcys = nextEventCcy - now;
-      	if (nextEventCcys <= 0) {
-          uint32_t skipPeriodCcys = (-nextEventCcys / wave.periodCcys) * wave.periodCcys;
-          bool flatLine = wave.nextPhaseCcy == wave.nextOffCcy;
+        const int32_t overshootCcys = now - nextEventCcy;
+        if (overshootCcys >= 0) {
+          const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
           if (waveformsState & (1UL << pin)) {
+            const uint32_t skipPeriodCcys = ((overshootCcys + wave.dutyCcys) / wave.periodCcys) * wave.periodCcys;
             if (wave.dutyCcys == wave.periodCcys) {
-              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
+              wave.nextPhaseCcy += skipPeriodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
               nextEventCcy = wave.nextPhaseCcy;
             }
-            else if (flatLine) {
+            else if (endOfPeriod) {
               wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
               wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
               nextEventCcy = wave.nextOffCcy;
@@ -301,6 +305,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
           }
           else {
+            const uint32_t skipPeriodCcys = (overshootCcys / wave.periodCcys) * wave.periodCcys;
             if (!wave.dutyCcys) {
               wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
