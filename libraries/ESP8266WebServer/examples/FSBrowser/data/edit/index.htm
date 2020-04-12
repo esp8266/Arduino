@@ -131,20 +131,48 @@
         }
       }
       
-      #fsTotal {
-        display: inline-block;
+      #header { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height:24px;
+        padding: 1px 1px 0px 10px;
+        background-color: #444;
+        color:#EEE;
+      }
+      #tree { 
+        position: absolute;
+        top: 25px;
+        bottom: 0;
+        left: 0;
+        width: 20%;
+        padding: 8px;
+      }
+      #editor, #preview { 
+        position: absolute;
+        top: 25px;
+        right: 0;
+        bottom: 0;
+        left: 20%;
+      }
+      #preview {
+        background-color: #EEE;
+        padding:5px;
+      }
+      
+      #status {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        font-size: 15px;
+      }
+      
+      #fsMeter {
         width:100px;
-        height:10px;
-        border:1px solid #000;
-        overflow:hidden; 
-        background: #E6E6E6; 
+        padding-bottom:2px;
       }
-      #fsUsed {
-        display: inline-block;
-        height:100%;
-        border-right: 1px solid #26A0DA;
-        background: #26A0DA; 
-      }
+      
       #warning {
         height:100%;
         background-color:orange;
@@ -163,53 +191,10 @@
         padding: 3px;
         font-size: 10px;
       }
-
-      #fsTotal:hover .tooltip {
-        visibility: visible;
-      }
-
       #warning:hover .tooltip {
         visibility: visible;
       }
 
-      #header { 
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        height:28px;
-        line-height: 24px;
-        padding-left: 10px;
-        background-color: #444;
-        color:#EEE;
-      }
-      #tree { 
-        position: absolute;
-        top: 28px;
-        bottom: 0;
-        left: 0;
-        width: 20%;
-        padding: 8px;
-      }
-      #editor, #preview { 
-        position: absolute;
-        top: 28px;
-        right: 0;
-        bottom: 0;
-        left: 20%;
-      }
-      #preview {
-        background-color: #EEE;
-        padding:5px;
-      }
-      #status {
-        position: absolute;
-        top: 4px;
-        right: 10px;
-        height: 28px;
-        font-size: 14px;
-      }
-      
       #loading {
         position:absolute;
         // note: changing between block and none cancels the opacity anim, so we move it in and out of screen instead by changing the top value
@@ -299,14 +284,12 @@
             fsInfo = JSON.parse(xmlHttp.responseText);
             var status = fsInfo.type + " - ";
             if (fsInfo.isOk) {
-              status += "<span id='fsTotal'><span id='fsUsed' style='width:" 
-                + (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)) // fake to see the "used" bar in any case
-                + "%'></span><span class='tooltip'>"
-                + readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + "&nbsp;free&nbsp;of&nbsp;" + readableSize(fsInfo.totalBytes)
-                + "</span></span>";
+              var percent = (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)); // fake to see the "used" bar in any case
+              var text = readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + " free of " + readableSize(fsInfo.totalBytes);
+              status += "<meter id='fsMeter' min='0' optimum='0'low='90' high='95' max='100' value='" + percent + "' title='" + text + "'>" + text + "</meter>"
               if (fsInfo.unsupportedFiles) {
                 status += " <span id='warning'>WARNING<span class='tooltip'>"
-                  + "Filesystem\xa0contains\xa0unsupported\xa0filenames:<br/>"
+                  + "Filesystem&nbsp;contains&nbsp;unsupported&nbsp;filenames:<br/>"
                   + fsInfo.unsupportedFiles
                   + "</span></span>";
               }
