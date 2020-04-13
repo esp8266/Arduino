@@ -23,24 +23,25 @@
 
 #include "Arduino.h"
 #include "core_esp8266_waveform.h"
+#include "user_interface.h"
 
 // Which pins have a tone running on them?
 static uint32_t _toneMap = 0;
 
 
-static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, unsigned long duration) {
+static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t duration) {
   if (_pin > 16) {
     return;
   }
 
   pinMode(_pin, OUTPUT);
 
-  high = std::max(high, (uint32_t)25);  // new 20KHz maximum tone frequency,
-  low = std::max(low, (uint32_t)25);   // (25us high + 25us low period = 20KHz)
+  high = std::max(high, (uint32_t)microsecondsToClockCycles(25));  // new 20KHz maximum tone frequency,
+  low = std::max(low, (uint32_t)microsecondsToClockCycles(25));   // (25us high + 25us low period = 20KHz)
 
-  duration *= 1000UL;
+  duration = microsecondsToClockCycles(duration * 1000UL);
   duration -= duration % (high + low);
-  if (startWaveform(_pin, high, low, duration)) {
+  if (startWaveformClockCycles(_pin, high, low, duration)) {
     _toneMap |= 1 << _pin;
   }
 }
@@ -50,7 +51,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
   if (frequency == 0) {
     noTone(_pin);
   } else {
-    uint32_t period = 1000000L / frequency;
+    uint32_t period = microsecondsToClockCycles(1000000UL) / frequency;
     uint32_t high = period / 2;
     uint32_t low = period - high;
     _startTone(_pin, high, low, duration);
@@ -64,7 +65,7 @@ void tone(uint8_t _pin, double frequency, unsigned long duration) {
   if (frequency < 1.0) { // FP means no exact comparisons
     noTone(_pin);
   } else {
-    double period = 1000000.0 / frequency;
+    double period = (double)microsecondsToClockCycles(1000000UL) / frequency;
     uint32_t high = (uint32_t)((period / 2.0) + 0.5);
     uint32_t low = (uint32_t)(period + 0.5) - high;
     _startTone(_pin, high, low, duration);
