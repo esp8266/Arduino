@@ -52,10 +52,10 @@ constexpr uint32_t MAXIRQUS = 1000000;
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+  (microsecondsToClockCycles(5) / 2) >> 1 : microsecondsToClockCycles(5) / 2;
 // The generator has a time quantum for switching wave cycles during the same ISR invocation
 constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
@@ -161,6 +161,15 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     wave.expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
     wave.mode = WaveformMode::INIT;
     wave.alignPhase = (alignPhase < 0) ? -1 : alignPhase;
+    if (!wave.dutyCcys) {
+      // If initially at zero duty cycle, force GPIO off
+      if (pin == 16) {
+        GP16O &= ~1; // GPIO16 write slow as it's RMW
+      }
+      else {
+        ClearGPIO(1UL << pin);
+      }
+    }
     std::atomic_thread_fence(std::memory_order_release);
     waveformToEnable = 1UL << pin;
     if (!timerRunning) {
@@ -266,68 +275,71 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         break;
       }
 
-      uint32_t nextEventCcy = (waveformsState & (1UL << pin)) ? wave.nextOffCcy : wave.nextPhaseCcy;
+      const bool duty = waveformsState & (1UL << pin);
+      uint32_t nextEventCcy = duty ? wave.nextOffCcy : wave.nextPhaseCcy;
 
       if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(now - wave.expiryCcy) >= 0) {    	
         // Disable any waveforms that are done
         waveformsEnabled ^= 1UL << pin;
-        // impossibly large value to prevent setting nextTimerCcy
-        nextEventCcy = now + microsecondsToClockCycles(MAXIRQUS);
       }
       else if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEventCcy - wave.expiryCcy) > 0) {
-        nextEventCcy = wave.expiryCcy;
+        if (static_cast<int32_t>(nextTimerCcy - wave.expiryCcy) > 0) {
+          nextTimerCcy = wave.expiryCcy;
+        }
       }
       else {
         const int32_t overshootCcys = now - nextEventCcy;
         if (overshootCcys >= 0) {
-          const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
-          if (waveformsState & (1UL << pin)) {
-            const uint32_t skipPeriodCcys = ((overshootCcys + wave.dutyCcys) / wave.periodCcys) * wave.periodCcys;
+          if (duty) {
+            const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
+            const uint32_t skipPeriodCcys = ((overshootCcys + wave.dutyCcys) > wave.periodCcys) ? ((overshootCcys + wave.dutyCcys) / wave.periodCcys) * wave.periodCcys : 0;
             if (wave.dutyCcys == wave.periodCcys) {
               wave.nextPhaseCcy += skipPeriodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
               nextEventCcy = wave.nextPhaseCcy;
             }
             else if (endOfPeriod) {
-              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
-              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
+              // preceeding period had zero off cycle, continue direct into new duty cycle
+              wave.nextPhaseCcy += skipPeriodCcys;
+              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys;
+              wave.nextPhaseCcy += wave.periodCcys;
               nextEventCcy = wave.nextOffCcy;
             }
             else {
+              waveformsState ^= 1UL << pin;
+              nextEventCcy = wave.nextPhaseCcy;
               if (pin == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
               }
               else {
                 ClearGPIO(1UL << pin);
               }
-              waveformsState ^= 1UL << pin;
-              nextEventCcy = wave.nextPhaseCcy;
             }
           }
           else {
-            const uint32_t skipPeriodCcys = (overshootCcys / wave.periodCcys) * wave.periodCcys;
+            const uint32_t skipPeriodCcys = (static_cast<uint32_t>(overshootCcys) > wave.periodCcys) ? (overshootCcys / wave.periodCcys) * wave.periodCcys : 0;
+            wave.nextPhaseCcy += skipPeriodCcys;
             if (!wave.dutyCcys) {
-              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
+              wave.nextPhaseCcy += wave.periodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
             }
             else {
-              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + skipPeriodCcys;
+              waveformsState ^= 1UL << pin;
+              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys;
+              wave.nextPhaseCcy += wave.periodCcys;
               if (pin == 16) {
                 GP16O |= 1; // GPIO16 write slow as it's RMW
               }
               else {
                 SetGPIO(1UL << pin);
               }
-              waveformsState ^= 1UL << pin;
-              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
             }
             nextEventCcy = wave.nextOffCcy;
           }
         }
-      }
-
-      if (static_cast<int32_t>(nextTimerCcy - nextEventCcy) > 0) {
-        nextTimerCcy = nextEventCcy;
+        if (static_cast<int32_t>(nextTimerCcy - nextEventCcy) > 0) {
+          nextTimerCcy = nextEventCcy;
+        }
       }
 
       now = ESP.getCycleCount();
