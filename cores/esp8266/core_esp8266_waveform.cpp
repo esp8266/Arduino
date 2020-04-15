@@ -278,12 +278,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       const bool duty = waveformsState & (1UL << pin);
       uint32_t nextEventCcy = duty ? wave.nextOffCcy : wave.nextPhaseCcy;
 
-      if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(now - wave.expiryCcy) >= 0) {    	
-        // Disable any waveforms that are done
-        waveformsEnabled ^= 1UL << pin;
-      }
-      else if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEventCcy - wave.expiryCcy) > 0) {
-        if (static_cast<int32_t>(nextTimerCcy - wave.expiryCcy) > 0) {
+      if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEventCcy - wave.expiryCcy) >= 0) {
+        if (static_cast<int32_t>(now - wave.expiryCcy) >= 0) {
+          // Disable any waveforms that are done
+          waveformsEnabled ^= 1UL << pin;
+        }
+        else if (static_cast<int32_t>(nextTimerCcy - wave.expiryCcy) > 0) {
           nextTimerCcy = wave.expiryCcy;
         }
       }
