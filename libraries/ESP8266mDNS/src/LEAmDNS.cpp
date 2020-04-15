@@ -767,6 +767,12 @@ uint32_t MDNSResponder::queryService(const char* p_pcService,
                                      const char* p_pcProtocol,
                                      const uint16_t p_u16Timeout /*= MDNS_QUERYSERVICES_WAIT_TIME*/)
 {
+    if (0 == m_pUDPContext)
+    {
+        // safeguard against misuse
+        return 0;
+    }
+
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryService '%s.%s'\n"), p_pcService, p_pcProtocol););
 
     uint32_t    u32Result = 0;

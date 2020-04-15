@@ -76,7 +76,7 @@ struct TimeSourceCycles
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType ticksPerSecond    = F_CPU;     // 80'000'000 or 160'000'000 Hz
+  static constexpr timeType ticksPerSecond    = ESP.getCpuFreqMHz() * 1000000UL;     // 80'000'000 or 160'000'000 Hz
   static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
 
