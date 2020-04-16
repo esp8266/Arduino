@@ -140,12 +140,11 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase) {
   const auto periodCcys = highCcys + lowCcys;
   // correct the upward bias for duty cycles shorter than generator quantum
-  // effectively rounds to nearest quantum
-  if (highCcys < QUANTUM / 2)
+  if (highCcys < 7 * QUANTUM / 10)
   {
     highCcys = 0;
   }
-  else if (lowCcys < QUANTUM / 2)
+  else if (lowCcys < 7 * QUANTUM / 10)
   {
     highCcys = periodCcys;  
   }
@@ -251,9 +250,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t now = ESP.getCycleCount();
   uint32_t nextEventCcy = now + MAXIRQCCYS;
   bool busy = waveformsEnabled;
-  while (busy) {
+  if (busy) {
     for (int pin = startPin; pin <= endPin; ++pin) {
-      // If it's not on, ignore!
+      // If it's not on, ignore
       if (!(waveformsEnabled & (1UL << pin)))
         continue;
 
@@ -268,6 +267,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           wave.mode = WaveformMode::INFINITE;
           break;
         }
+      	// fall through
       case WaveformMode::UPDATEEXPIRY:
         wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
         wave.mode = WaveformMode::EXPIRES;
@@ -275,6 +275,15 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       default:
         break;
       }
+    }
+  }
+  while (busy) {
+    for (int pin = startPin; pin <= endPin; ++pin) {
+      // If it's not on, ignore
+      if (!(waveformsEnabled & (1UL << pin)))
+        continue;
+
+      Waveform& wave = waveforms[pin];
 
       const bool duty = waveformsState & (1UL << pin);
       nextEventCcy = duty ? wave.nextOffCcy : wave.nextPhaseCcy;
