@@ -157,7 +157,14 @@ class EspClass {
         uint8_t getBootVersion();
         uint8_t getBootMode();
 
+#if defined(F_CPU) || defined(CORE_MOCK)
+        constexpr uint8_t getCpuFreqMHz() const
+        {
+            return clockCyclesPerMicrosecond();
+        }
+#else
         uint8_t getCpuFreqMHz();
+#endif
 
         uint32_t getFlashChipId();
         uint8_t getFlashChipVendorId();
@@ -212,6 +219,7 @@ private:
 };
 
 #ifndef CORE_MOCK
+
 uint32_t EspClass::getCycleCount()
 {
     return esp_get_cycle_count();
