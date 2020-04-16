@@ -149,7 +149,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   {
     highCcys = periodCcys;  
   }
-  if ((pin > 16) || isFlashInterfacePin(pin) || !periodCcys || (alignPhase > 16)) {
+  // sanity checks, including mixed signed/unsigned arithmetic safety
+  if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
+    static_cast<int32_t>(periodCcys) <= 0 || highCcys > periodCcys) {
     return false;
   }
   Waveform& wave = waveforms[pin];
