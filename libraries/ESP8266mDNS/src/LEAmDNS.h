@@ -196,7 +196,7 @@ public:
 
     bool isRunning(void)
     {
-        return(m_pUDPContext!=0);
+        return (m_pUDPContext != 0);
     }
 
     /**
