@@ -40,6 +40,7 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t durat
   low = std::max(low, (uint32_t)microsecondsToClockCycles(25));   // (25us high + 25us low period = 20KHz)
 
   duration = microsecondsToClockCycles(duration * 1000UL);
+  duration += high + low - 1;
   duration -= duration % (high + low);
   if (startWaveformClockCycles(_pin, high, low, duration)) {
     _toneMap |= 1 << _pin;
