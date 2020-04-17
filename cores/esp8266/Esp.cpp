@@ -193,9 +193,6 @@ bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
     }
 }
 
-
-
-extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
     __real_system_restart_local();
@@ -267,11 +264,12 @@ uint8_t EspClass::getBootMode(void)
     return system_get_boot_mode();
 }
 
+#ifndef F_CPU
 uint8_t EspClass::getCpuFreqMHz(void)
 {
     return system_get_cpu_freq();
 }
-
+#endif
 
 uint32_t EspClass::getFlashChipId(void)
 {

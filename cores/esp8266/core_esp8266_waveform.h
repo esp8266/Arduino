@@ -50,6 +50,8 @@ extern "C" {
 // If runtimeUS > 0 then automatically stop it after that many usecs.
 // Returns true or false on success or failure.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
+// Same as above, but pass in CPU clock cycles instead of microseconds
+int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles);
 // Stop a waveform, if any, on the specified pin.
 // Returns true or false on success or failure.
 int stopWaveform(uint8_t pin);
