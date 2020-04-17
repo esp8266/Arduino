@@ -367,7 +367,7 @@ uint16_t WiFiClient::remotePort()
 
 IPAddress WiFiClient::localIP()
 {
-    if (!_client)
+    if (!_client || !_client->getLocalAddress())
         return IPAddress(0U);
 
     return IPAddress(_client->getLocalAddress());
@@ -389,7 +389,7 @@ void WiFiClient::stopAll()
 }
 
 
-void WiFiClient::stopAllExcept(WiFiClient* except) 
+void WiFiClient::stopAllExcept(WiFiClient* except)
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
         if (it != except) {
