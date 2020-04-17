@@ -194,6 +194,11 @@ public:
     // for compatibility...
     bool setHostname(const String& p_strHostname);
 
+    bool isRunning(void)
+    {
+        return(m_pUDPContext!=0);
+    }
+
     /**
         hMDNSService (opaque handle to access the service)
     */
