@@ -25,6 +25,7 @@
 #include "core_esp8266_waveform.h"
 
 extern "C" {
+#include "user_interface.h"
 
 static uint32_t analogMap = 0;
 static int32_t analogScale = PWMRANGE;
@@ -50,7 +51,7 @@ extern void __analogWrite(uint8_t pin, int val) {
   if (pin > 16) {
     return;
   }
-  uint32_t analogPeriod = 1000000L / analogFreq;
+  uint32_t analogPeriod = (1000000L * system_get_cpu_freq()) / analogFreq;
   if (val < 0) {
     val = 0;
   } else if (val > analogScale) {
@@ -68,7 +69,7 @@ extern void __analogWrite(uint8_t pin, int val) {
     stopWaveform(pin);
     digitalWrite(pin, LOW);
   } else {
-    if (startWaveform(pin, high, low, 0)) {
+    if (startWaveformCycles(pin, high, low, 0)) {
       analogMap |= (1 << pin);
     }
   }
