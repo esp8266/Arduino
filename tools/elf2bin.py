@@ -93,6 +93,8 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
         out.write(bytearray([0]))
     out.write(bytearray([checksum]))
     if to_addr != 0:
+        if total_size + 8 > to_addr:
+            raise Exception('Bin image of ' + elf + ' is too big, actual size ' + str(total_size  + 8) + ', target size ' + str(to_addr) + '.')
         while total_size < to_addr:
             out.write(bytearray([0xaa]))
             total_size += 1

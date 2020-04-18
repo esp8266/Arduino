@@ -870,9 +870,9 @@ uint32_t SigningVerifier::length()
   }
 }
 
-bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
-  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
-
+// We need to use the 2nd stack to do a verification, so do the thunk
+// directly inside the class function for ease of use.
+extern "C" bool SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (_pubKey->isRSA()) {
     bool ret;
     unsigned char vrf[hash->len()];
@@ -889,6 +889,20 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
     return vrfy(br_ec_get_default(), hash->hash(), hash->len(), _pubKey->getEC(), (const unsigned char *)signature, signatureLen);
   }
 };
+
+#if !CORE_MOCK
+make_stack_thunk(SigningVerifier_verify);
+extern "C" bool thunk_SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *hash, const void *signature, uint32_t signatureLen);
+#endif
+
+bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
+  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
+#if !CORE_MOCK
+    return thunk_SigningVerifier_verify(_pubKey, hash, signature, signatureLen);
+#else
+    return SigningVerifier_verify(_pubKey, hash, signature, signatureLen);
+#endif
+}
 
 #if !CORE_MOCK
 

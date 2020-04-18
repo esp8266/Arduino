@@ -423,7 +423,6 @@ void HTTPClient::end(void)
 {
     disconnect(false);
     clear();
-    _redirectCount = 0;
 }
 
 /**
@@ -549,7 +548,8 @@ bool HTTPClient::setURL(const String& url)
         DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
         return false;
     }
-    // disconnect but preserve _client
+    // disconnect but preserve _client (clear _canReuse so disconnect will close the connection)
+    _canReuse = false;
     disconnect(true);
     return beginInternal(url, nullptr);
 }
@@ -557,8 +557,17 @@ bool HTTPClient::setURL(const String& url)
 /**
  * set true to follow redirects.
  * @param follow
+ * @deprecated
  */
 void HTTPClient::setFollowRedirects(bool follow)
+{
+    _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
+}
+/**
+ * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+ * @param follow
+ */
+void HTTPClient::setFollowRedirects(followRedirects_t follow)
 {
     _followRedirects = follow;
 }
@@ -651,8 +660,9 @@ int HTTPClient::sendRequest(const char * type, const String& payload)
  */
 int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t size)
 {
+    int code;
     bool redirect = false;
-    int code = 0;
+    uint16_t redirectCount = 0;
     do {
         // wipe out any existing headers from previous request
         for(size_t i = 0; i < _headerKeysCount; i++) {
@@ -661,8 +671,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
             }
         }
 
-        redirect = false;
-        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, _redirectCount);
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, redirectCount);
 
         // connect to server
         if(!connect()) {
@@ -680,14 +689,15 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         if (payload && size > 0) {
             size_t bytesWritten = 0;
             const uint8_t *p = payload;
-            while (bytesWritten < size) {
+            size_t originalSize = size;
+            while (bytesWritten < originalSize) {
                 int written;
                 int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
                 written = _client->write(p + bytesWritten, towrite);
                 if (written < 0) {
-                     return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+                        return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
                 } else if (written == 0) {
-                     return returnError(HTTPC_ERROR_CONNECTION_LOST);
+                        return returnError(HTTPC_ERROR_CONNECTION_LOST);
                 }
                 bytesWritten += written;
                 size -= written;
@@ -698,41 +708,66 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         code = handleHeaderResponse();
 
         //
-        // We can follow redirects for 301/302/307 for GET and HEAD requests and
-        // and we have not exceeded the redirect limit preventing an infinite
-        // redirect loop.
-        //
+        // Handle redirections as stated in RFC document:
         // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
         //
-        if (_followRedirects &&
-                (_redirectCount < _redirectLimit) &&
-                (_location.length() > 0) &&
-                (code == 301 || code == 302 || code == 307) &&
-                (!strcmp(type, "GET") || !strcmp(type, "HEAD"))
-                ) {
-            _redirectCount += 1; // increment the count for redirect.
-            redirect = true;
-            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect:: '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
-            if (!setURL(_location)) {
-                // return the redirect instead of handling on failure of setURL()
-                redirect = false;
+        // Implementing HTTP_CODE_FOUND as redirection with GET method,
+        // to follow most of existing user agent implementations.
+        //
+        redirect = false;
+        if (
+            _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS && 
+            redirectCount < _redirectLimit &&
+            _location.length() > 0
+        ) {
+            switch (code) {
+                // redirecting using the same method
+                case HTTP_CODE_MOVED_PERMANENTLY:
+                case HTTP_CODE_TEMPORARY_REDIRECT: {
+                    if (
+                        // allow to force redirections on other methods
+                        // (the RFC require user to accept the redirection)
+                        _followRedirects == HTTPC_FORCE_FOLLOW_REDIRECTS ||
+                        // allow GET and HEAD methods without force
+                        !strcmp(type, "GET") || 
+                        !strcmp(type, "HEAD")
+                    ) {
+                        redirectCount += 1;
+                        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (the same method): '%s' redirCount: %d\n", _location.c_str(), redirectCount);
+                        if (!setURL(_location)) {
+                            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
+                            // no redirection
+                            break;
+                        }
+                        // redirect using the same request method and payload, diffrent URL
+                        redirect = true;
+                    }
+                    break;
+                }
+                // redirecting with method dropped to GET or HEAD
+                // note: it does not need `HTTPC_FORCE_FOLLOW_REDIRECTS` for any method
+                case HTTP_CODE_FOUND:
+                case HTTP_CODE_SEE_OTHER: {
+                    redirectCount += 1;
+                    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (dropped to GET/HEAD): '%s' redirCount: %d\n", _location.c_str(), redirectCount);
+                    if (!setURL(_location)) {
+                        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
+                        // no redirection
+                        break;
+                    }
+                    // redirect after changing method to GET/HEAD and dropping payload
+                    type = "GET";
+                    payload = nullptr;
+                    size = 0;
+                    redirect = true;
+                    break;
+                }
+
+                default:
+                    break;
             }
         }
-
     } while (redirect);
-
-    // handle 303 redirect for non GET/HEAD by changing to GET and requesting new url
-    if (_followRedirects &&
-            (_redirectCount < _redirectLimit) &&
-            (_location.length() > 0) &&
-            (code == 303) &&
-            strcmp(type, "GET") && strcmp(type, "HEAD")
-            ) {
-        _redirectCount += 1;
-        if (setURL(_location)) {
-            code = sendRequest("GET");
-        }
-    }
 
     // handle Server Response (Header)
     return returnError(code);

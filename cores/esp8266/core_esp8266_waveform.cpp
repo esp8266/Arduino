@@ -112,15 +112,19 @@ void setTimer1Callback(uint32_t (*fn)()) {
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
-  if ((pin > 16) || isFlashInterfacePin(pin)) {
+  return startWaveformCycles(pin, microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
+}
+
+int startWaveformCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
+   if ((pin > 16) || isFlashInterfacePin(pin)) {
     return false;
   }
   Waveform *wave = &waveform[pin];
   // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = microsecondsToClockCycles(timeHighUS);
-  wave->nextTimeLowCycles = microsecondsToClockCycles(timeLowUS);
-  wave->expiryCycle = runTimeUS ? GetCycleCount() + microsecondsToClockCycles(runTimeUS) : 0;
-  if (runTimeUS && !wave->expiryCycle) {
+  wave->nextTimeHighCycles = timeHighCycles;
+  wave->nextTimeLowCycles = timeLowCycles;
+  wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
+  if (runTimeCycles && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
 
