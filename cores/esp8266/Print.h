@@ -39,6 +39,14 @@ class Print {
         size_t printNumber(unsigned long, uint8_t);
         size_t printNumber(unsigned long long, uint8_t);
         size_t printFloat(double, uint8_t);
+
+        template<typename T, typename... P> inline size_t _println(T v, P... args)
+        {
+            size_t n = print(v, args...);
+            n += println();
+            return n;
+        };
+
     protected:
         void setWriteError(int err = 1) {
             write_error = err;

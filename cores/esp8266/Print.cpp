@@ -181,12 +181,6 @@ size_t Print::print(double n, int digits) {
     return printFloat(n, digits);
 }
 
-size_t Print::println(const __FlashStringHelper *ifsh) {
-    size_t n = print(ifsh);
-    n += println();
-    return n;
-}
-
 size_t Print::print(const Printable& x) {
     return x.printTo(*this);
 }
@@ -195,76 +189,56 @@ size_t Print::println(void) {
     return print("\r\n");
 }
 
+size_t Print::println(const __FlashStringHelper* ifsh) {
+    return _println<const __FlashStringHelper*>(ifsh);
+}
+
 size_t Print::println(const String &s) {
-    size_t n = print(s);
-    n += println();
-    return n;
+    return _println(s);
 }
 
 size_t Print::println(const char c[]) {
-    size_t n = print(c);
-    n += println();
-    return n;
+    return _println(c);
 }
 
 size_t Print::println(char c) {
-    size_t n = print(c);
-    n += println();
-    return n;
+    return _println(c);
 }
 
 size_t Print::println(unsigned char b, int base) {
-    size_t n = print(b, base);
-    n += println();
-    return n;
+    return _println(b, base);
 }
 
 size_t Print::println(int num, int base) {
-    size_t n = print(num, base);
-    n += println();
-    return n;
+    return _println(num, base);
 }
 
 size_t Print::println(unsigned int num, int base) {
-    size_t n = print(num, base);
-    n += println();
-    return n;
+    return _println(num, base);
 }
 
 size_t Print::println(long num, int base) {
-    size_t n = print(num, base);
-    n += println();
-    return n;
+    return _println(num, base);
 }
 
 size_t Print::println(unsigned long num, int base) {
-    size_t n = print(num, base);
-    n += println();
-    return n;
+    return _println(num, base);
 }
 
 size_t Print::println(long long num, int base) {
-    size_t n = print(num, base);
-    n += println();
-    return n;
+    return _println(num, base);
 }
 
 size_t Print::println(unsigned long long num, int base) {
-    size_t n = print(num, base);
-    n += println();
-    return n;
+    return _println(num, base);
 }
 
 size_t Print::println(double num, int digits) {
-    size_t n = print(num, digits);
-    n += println();
-    return n;
+    return _println(num, digits);
 }
 
 size_t Print::println(const Printable& x) {
-    size_t n = print(x);
-    n += println();
-    return n;
+    return _println<const Printable&>(x);
 }
 
 // Private Methods /////////////////////////////////////////////////////////////
