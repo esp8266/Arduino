@@ -36,18 +36,9 @@
 class Print {
     private:
         int write_error;
-        size_t printNumber(unsigned long, uint8_t);
-        size_t printNumber(unsigned long long, uint8_t);
-        size_t printFloat(double, uint8_t);
-
-        template<typename T, typename... P> inline size_t _println(T v, P... args)
-        {
-            size_t n = print(v, args...);
-            n += println();
-            return n;
-        };
-
-    protected:
+        template<typename T> size_t printNumber(T n, uint8_t base);
+        template<typename T, typename... P> inline size_t _println(T v, P... args);
+protected:
         void setWriteError(int err = 1) {
             write_error = err;
         }
@@ -119,5 +110,7 @@ class Print {
 
         virtual void flush() { /* Empty implementation for backward compatibility */ }
 };
+
+template<> size_t Print::printNumber(double number, uint8_t digits);
 
 #endif

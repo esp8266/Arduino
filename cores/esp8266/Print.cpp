@@ -178,7 +178,7 @@ size_t Print::print(unsigned long long n, int base) {
 }
 
 size_t Print::print(double n, int digits) {
-    return printFloat(n, digits);
+    return printNumber(n, digits);
 }
 
 size_t Print::print(const Printable& x) {
@@ -243,29 +243,14 @@ size_t Print::println(const Printable& x) {
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-size_t Print::printNumber(unsigned long n, uint8_t base) {
-    char buf[8 * sizeof(n) + 1]; // Assumes 8-bit chars plus zero byte.
-    char *str = &buf[sizeof(buf) - 1];
+template<typename T, typename... P> inline size_t Print::_println(T v, P... args)
+{
+    size_t n = print(v, args...);
+    n += println();
+    return n;
+};
 
-    *str = '\0';
-
-    // prevent crash if called with base == 1
-    if(base < 2) {
-        base = 10;
-    }
-
-    do {
-        auto m = n;
-        n /= base;
-        char c = m - base * n;
-
-        *--str = c < 10 ? c + '0' : c + 'A' - 10;
-    } while (n);
-
-    return write(str);
-}
-
-size_t Print::printNumber(unsigned long long n, uint8_t base) {
+template<typename T> size_t Print::printNumber(T n, uint8_t base) {
     char buf[8 * sizeof(n) + 1]; // Assumes 8-bit chars plus zero byte.
     char* str = &buf[sizeof(buf) - 1];
 
@@ -287,7 +272,7 @@ size_t Print::printNumber(unsigned long long n, uint8_t base) {
     return write(str);
 }
 
-size_t Print::printFloat(double number, uint8_t digits) {
+template<> size_t Print::printNumber(double number, uint8_t digits) {
     char buf[40];
     return write(dtostrf(number, 0, digits, buf));
 }
