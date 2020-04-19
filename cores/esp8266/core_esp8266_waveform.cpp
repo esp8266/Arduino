@@ -5,13 +5,13 @@
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds).  TIMER1 is set to 1-shot
-  mode and is always loaded with the time until the next edge of any live
-  waveforms.
+  high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
+  set to 1-shot mode and is always loaded with the time until the next edge
+  of any live waveforms.
 
   Up to one waveform generator per pin supported.
 
-  Each waveform generator is synchronized to the ESP cycle counter, not the
+  Each waveform generator is synchronized to the ESP clock cycle counter, not the
   timer.  This allows for removing interrupt jitter and delay as the counter
   always increments once per 80MHz clock.  Changes to a waveform are
   contiguous and only take effect on the next waveform transition,
@@ -19,8 +19,9 @@
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
-  Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
-  cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
+  Everywhere in the code where "cycles" is used, it means ESP.getCycleCount()
+  clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
+  cycles (which may be 2 CPU clock cycles @ 160MHz).
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -112,15 +113,19 @@ void setTimer1Callback(uint32_t (*fn)()) {
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
-  if ((pin > 16) || isFlashInterfacePin(pin)) {
+  return startWaveformClockCycles(pin, microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
+}
+
+int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
+   if ((pin > 16) || isFlashInterfacePin(pin)) {
     return false;
   }
   Waveform *wave = &waveform[pin];
   // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = microsecondsToClockCycles(timeHighUS);
-  wave->nextTimeLowCycles = microsecondsToClockCycles(timeLowUS);
-  wave->expiryCycle = runTimeUS ? GetCycleCount() + microsecondsToClockCycles(runTimeUS) : 0;
-  if (runTimeUS && !wave->expiryCycle) {
+  wave->nextTimeHighCycles = timeHighCycles;
+  wave->nextTimeLowCycles = timeLowCycles;
+  wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
+  if (runTimeCycles && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
 
