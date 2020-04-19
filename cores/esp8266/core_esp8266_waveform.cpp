@@ -218,10 +218,10 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // If they send >=32, then the shift will result in 0 and it will also return false
   if (waveformsEnabled & (1UL << pin)) {
     waveformToDisable = 1UL << pin;
-  // Must not interfere if Timer is due shortly
-  if (T1L > DELTAIRQ + IRQLATENCY) {
-    timer1_write(microsecondsToClockCycles(1));
-  }
+    // Must not interfere if Timer is due shortly
+    if (T1L > DELTAIRQ + IRQLATENCY) {
+      timer1_write(microsecondsToClockCycles(1));
+    }
     while (waveformToDisable) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
     }
