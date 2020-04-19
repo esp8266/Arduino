@@ -147,7 +147,10 @@ static volatile PWMState *pwmUpdate = nullptr; // Set by main code, cleared by I
 static uint32_t pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
 
 // Called when analogWriteFreq() changed to update the PWM total period
-void _setPWMPeriodCC(int cc) {
+void _setPWMPeriodCC(uint32_t cc) {
+  if (cc == pwmPeriod) {
+    return;
+  }
   if (pwmState.cnt) {
     // Adjust any running ones to the best of our abilities by scaling them
     // Used FP math for speed and code size
@@ -219,7 +222,7 @@ bool _stopPWM(int pin) {
 }
 
 // Called by analogWrite(1...99%) to set the PWM duty in clock cycles
-bool _setPWM(int pin, int cc) {
+bool _setPWM(int pin, uint32_t cc) {
   PWMState p;  // Working copy
   p = pwmState;
   // Get rid of any entries for this pin
@@ -236,8 +239,8 @@ bool _setPWM(int pin, int cc) {
     p.cnt = 1;
     p.mask = 1<<pin;
   } else {
-    int ttl=0;
-    int i;
+    uint32_t ttl=0;
+    uint32_t i;
     // Skip along until we're at the spot to insert
     for (i=0; (i <= p.cnt) && (ttl + p.edge[i].delta < cc); i++) {
       ttl += p.edge[i].delta;

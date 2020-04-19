@@ -72,9 +72,9 @@ void setTimer1Callback(uint32_t (*fn)());
 
 
 // Internal-only calls, not for applications
-extern void _setPWMPeriodCC(int cc);
+extern void _setPWMPeriodCC(uint32_t cc);
 extern bool _stopPWM(int pin);
-extern bool _setPWM(int pin, int cc);
+extern bool _setPWM(int pin, uint32_t cc);
 
 #ifdef __cplusplus
 }
