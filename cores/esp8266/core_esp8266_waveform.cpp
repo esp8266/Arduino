@@ -53,9 +53,9 @@ constexpr int32_t MAXIRQCCYS = microsecondsToClockCycles(1000000);
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
   (microsecondsToClockCycles(5) / 2) >> 1 : microsecondsToClockCycles(5) / 2;
-// The generator has a time quantum for switching wave cycles during the same ISR invocation
+// The generator has a measurable time quantum for switching wave cycles during the same ISR invocation
 constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
+  (microsecondsToClockCycles(11) / 10) >> 1 : (microsecondsToClockCycles(11) / 10);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
@@ -140,13 +140,22 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
   const auto periodCcys = highCcys + lowCcys;
   // correct the upward bias for duty cycles shorter than generator quantum
-  if (highCcys < 7 * QUANTUM / 10)
+  if (highCcys < lowCcys)
   {
-    highCcys = 0;
+    if (highCcys < 3 * QUANTUM / 2) {
+      highCcys = 0;
+    }
+    else if (highCcys < 2 * QUANTUM) {
+      highCcys = 2 * QUANTUM;
+    }
   }
-  else if (lowCcys < 7 * QUANTUM / 10)
-  {
-    highCcys = periodCcys;  
+  else {
+    if (lowCcys < 3 * QUANTUM / 2) {
+      highCcys = periodCcys;
+    }
+    else if (lowCcys < 2 * QUANTUM) {
+      highCcys = periodCcys - 2 * QUANTUM;
+    }
   }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
@@ -268,7 +277,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           wave.mode = WaveformMode::INFINITE;
           break;
         }
-      	// fall through
+        // fall through
       case WaveformMode::UPDATEEXPIRY:
         wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
         wave.mode = WaveformMode::EXPIRES;
