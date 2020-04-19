@@ -235,6 +235,24 @@ int WiFiClientSecure::connect(const String& host, uint16_t port) {
   return connect(host.c_str(), port);
 }
 
+int WiFiClientSecure::connectAsync(const char* name, uint16_t port, uint8_t* waiting) {
+  if (waiting != NULL) *waiting = 0;
+  if (connected()) return 1;
+
+  IPAddress remote_addr;
+
+  if (!WiFi.hostByNameAsync(name, remote_addr, waiting)) {
+    DEBUG_BSSL("connect: Name loopup failure\n");
+    return 0;
+  }
+  if (!WiFiClient::connect(remote_addr, port)) {
+    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
+	return 0;
+  }
+
+  return _connectSSL(name);
+}
+
 void WiFiClientSecure::_freeSSL() {
   // These are smart pointers and will free if refcnt==0
   _sc = nullptr;

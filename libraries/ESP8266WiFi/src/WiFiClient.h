@@ -55,7 +55,11 @@ public:
   uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;
+  virtual int connectAsync(const char* host, uint16_t port, uint8_t* waiting = NULL);
   virtual int connect(const String& host, uint16_t port);
+  virtual int connectAsync(const String& host, uint16_t port, uint8_t* waiting = NULL) {
+    return connectAsync(host.c_str(), port, waiting);
+  }
   virtual size_t write(uint8_t) override;
   virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);

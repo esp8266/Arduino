@@ -137,6 +137,22 @@ int WiFiClient::connect(const String& host, uint16_t port)
     return connect(host.c_str(), port);
 }
 
+int WiFiClient::connectAsync(const char* host, uint16_t port, uint8_t* waiting) // Non blocking
+{
+    if (waiting != NULL)
+        *waiting = 0;
+    if (connected())
+        return 1;
+
+    IPAddress remote_addr;
+
+    if (WiFi.hostByNameAsync(host, remote_addr, waiting))
+    {
+        return connect(remote_addr, port);
+    }
+    return 0;
+}
+
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     if (_client) {
