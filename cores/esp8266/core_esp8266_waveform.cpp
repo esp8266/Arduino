@@ -40,7 +40,7 @@
 #include <Arduino.h>
 #include "ets_sys.h"
 #include "core_esp8266_waveform.h"
-
+#include "user_interface.h"
 extern "C" {
 
 // Maximum delay between IRQs
@@ -67,7 +67,6 @@ static volatile uint32_t waveformToEnable = 0;  // Message to the NMI handler to
 static volatile uint32_t waveformToDisable = 0; // Message to the NMI handler to disable a pin from waveform generation
 
 static uint32_t (*timer1CB)() = NULL;
-
 
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
@@ -107,6 +106,133 @@ void setTimer1Callback(uint32_t (*fn)()) {
     deinitTimer();
   }
 }
+
+// PWM implementation using special purpose state machine
+//
+// Keep an ordered list of pins with the delta in cycles between each
+// element, with a terminal entry making up the remainder of the PWM
+// period.  With this method sum(all deltas) == PWM period clock cycles.
+//
+// At t=0 set all pins high and set the timeout for the 1st edge.
+// On interrupt, if we're at the last element reset to t=0 state
+// Otherwise, clear that pin down and set delay for next element
+// and so forth.
+
+constexpr int maxPWMs = 8;
+
+// PWM edge definition
+typedef struct {
+  unsigned int pin   : 8;
+  unsigned int delta : 24;
+} PWMEntry;
+
+// PWM machine state
+typedef struct {
+  uint32_t mask; // Bitmask of active pins
+  uint8_t cnt;   // How many entries
+  uint8_t idx;   // Where the state machine is along the list
+  PWMEntry edge[maxPWMs + 1]; // Include space for terminal element
+  uint32_t nextServiceCycle;  // Clock cycle for next step
+} PWMState;
+
+static PWMState pwmState;
+static volatile PWMState *pwmUpdate = nullptr; // Set by main code, cleared by ISR
+static int pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
+
+// Called when analogWriteFreq() changed to update the PWM total period
+void _setPWMPeriodCC(int cc) {
+  pwmPeriod = cc;
+  // TODO - should we drop all waveforms?
+}
+
+// Helper routine to remove an entry from the state machine
+static void _removePWMEntry(int pin, PWMState *p) {
+  if (!((1<<pin) & p->mask)) {
+    return;
+  }
+
+  int delta = 0;
+  int i;
+  for (i=0; i < p->cnt; i++) {
+    if (p->edge[i].pin == pin) {
+      delta = p->edge[i].delta;
+      break;
+    }
+  }
+  // Add the removed previous pin delta to preserve absolute position
+  p->edge[i+1].delta += delta;
+  // Move everything back one and clean up
+  for (i++; i <= p->cnt; i++) {
+    p->edge[i-1] = p->edge[i];
+  }
+  p->mask &= ~(1<<pin);
+  p->cnt--;
+}
+
+// Called by analogWrite(0/100%) to disable PWM on a specific pin
+bool _stopPWM(int pin) {
+  if (!((1<<pin) & pwmState.mask)) {
+    return false; // Pin not actually active
+  }
+  
+  PWMState p;  // The working copy since we can't edit the one in use
+  p = pwmState;
+  _removePWMEntry(pin, &p);
+  // Update and wait for mailbox to be emptied
+  pwmUpdate = &p;
+  while (pwmUpdate) {
+    delay(0);
+  }
+  // Possibly shut doen the timer completely if we're done
+  if (!waveformEnabled && !pwmState.cnt && !timer1CB) {
+    deinitTimer();
+  }
+  return true;
+}
+
+// Called by analogWrite(1...99%) to set the PWM duty in clock cycles
+bool _setPWM(int pin, int cc) {
+  PWMState p;  // Working copy
+  p = pwmState;
+  // Get rid of any entries for this pin
+  _removePWMEntry(pin, &p);
+  // And add it to the list, in order
+  if (p.cnt >= maxPWMs) {
+    return false; // No space left
+  } else if (p.cnt == 0) {
+    // Starting up from scratch, special case 1st element and PWM period
+    p.edge[0].pin = pin;
+    p.edge[0].delta = cc;
+    p.edge[1].pin = 0xff;
+    p.edge[1].delta = pwmPeriod - cc;
+    p.cnt = 1;
+    p.mask = 1<<pin;
+  } else {
+    int ttl=0;
+    int i;
+    // Skip along until we're at the spot to insert
+    for (i=0; (i <= p.cnt) && (ttl + p.edge[i].delta < cc); i++) {
+      ttl += p.edge[i].delta;
+    }
+    // Shift everything out by one to make space for new edge
+    memmove(&p.edge[i + 1], &p.edge[i], (1 + p.cnt - i) * sizeof(p.edge[0]));
+    int off = cc - ttl; // The delta from the last edge to the one we're inserting
+    p.edge[i].pin = pin;
+    p.edge[i].delta = off; // Add the delta to this new pin
+    p.edge[i + 1].delta -= off; // And subtract it from the follower to keep sum(deltas) constant
+    p.cnt++;
+    p.mask |= 1<<pin;
+  }
+  // Set mailbox and wait for ISR to copy it over
+  pwmUpdate = &p;
+  if (!timerRunning) {
+    initTimer();
+    timer1_write(microsecondsToClockCycles(10));
+  }
+  while (pwmUpdate) { delay(0); }
+  return true;
+}
+
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
@@ -189,7 +315,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   while (waveformToDisable) {
     /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
   }
-  if (!waveformEnabled && !timer1CB) {
+  if (!waveformEnabled && !pwmState.cnt && !timer1CB) {
     deinitTimer();
   }
   return true;
@@ -216,7 +342,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t timeoutCycle = GetCycleCountIRQ() + microsecondsToClockCycles(14);
 
   if (waveformToEnable || waveformToDisable) {
-    // Handle enable/disable requests from main app.
+    // Handle enable/disable requests from main app
     waveformEnabled = (waveformEnabled & ~waveformToDisable) | waveformToEnable; // Set the requested waveforms on/off
     waveformState &= ~waveformToEnable;  // And clear the state of any just started
     waveformToEnable = 0;
@@ -225,12 +351,56 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     startPin = __builtin_ffs(waveformEnabled) - 1;
     // Find the last bit by subtracting off GCC's count-leading-zeros (no offset in this one)
     endPin = 32 - __builtin_clz(waveformEnabled);
+  } else if (!pwmState.cnt && pwmUpdate) {
+    // Start up the PWM generator by copying from the mailbox
+    pwmState = *(PWMState*)pwmUpdate;
+    pwmUpdate = nullptr;
+    pwmState.nextServiceCycle = GetCycleCountIRQ(); // Do it this loop!
+    pwmState.idx = pwmState.cnt; // Cause it to start at t=0
   }
 
   bool done = false;
-  if (waveformEnabled) {
+  if (waveformEnabled || pwmState.cnt) {
     do {
       nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
+      
+      // PWM state machine implementation
+      if (pwmState.cnt) {
+        uint32_t now =  GetCycleCountIRQ();
+        int32_t cyclesToGo = pwmState.nextServiceCycle - now;
+        if (cyclesToGo <= 10) {
+            if (pwmState.idx == pwmState.cnt) { // Start of pulses, possibly copy new
+                if (pwmUpdate) {
+                    // Do the memory copy from temp to global and clear mailbox
+                    pwmState = *(PWMState*)pwmUpdate;
+                    pwmUpdate = nullptr;
+                }
+                GPOS = pwmState.mask; // Set all active pins high
+                // GPIO16 isn't the same as the others
+                if (pwmState.mask & 0x100) {
+                  GP16O |= 1;
+                }
+                pwmState.idx = 0;
+            } else {
+                do {
+                    // Drop the pin at this edge
+                    GPOC = 1<<pwmState.edge[pwmState.idx].pin;
+                    // GPIO16 still needs manual work
+                    if (pwmState.edge[pwmState.idx].pin == 16) {
+                      GP16O &= ~1;
+                    }
+                    pwmState.idx++;
+                    // Any other pins at this same PWM value will have delta==0, drop them too.
+                } while (pwmState.edge[pwmState.idx].delta == 0);
+            }
+            // Preserve duty cycle over PWM period by using now+xxx instead of += delta
+            pwmState.nextServiceCycle = now + pwmState.edge[pwmState.idx].delta;
+            cyclesToGo = pwmState.nextServiceCycle - now;
+            if (cyclesToGo<0) cyclesToGo=0;
+        }
+        nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
+      }
+
       for (int i = startPin; i <= endPin; i++) {
         uint32_t mask = 1<<i;
 

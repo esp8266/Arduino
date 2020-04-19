@@ -37,6 +37,7 @@ extern void __analogWriteRange(uint32_t range) {
   }
 }
 
+
 extern void __analogWriteFreq(uint32_t freq) {
   if (freq < 100) {
     analogFreq = 100;
@@ -52,6 +53,7 @@ extern void __analogWrite(uint8_t pin, int val) {
     return;
   }
   uint32_t analogPeriod = (1000000L * system_get_cpu_freq()) / analogFreq;
+  _setPWMPeriodCC(analogPeriod);
   if (val < 0) {
     val = 0;
   } else if (val > analogScale) {
@@ -63,15 +65,14 @@ extern void __analogWrite(uint8_t pin, int val) {
   uint32_t low = analogPeriod - high;
   pinMode(pin, OUTPUT);
   if (low == 0) {
-    stopWaveform(pin);
+    _stopPWM(pin);
     digitalWrite(pin, HIGH);
   } else if (high == 0) {
-    stopWaveform(pin);
+    _stopPWM(pin);
     digitalWrite(pin, LOW);
   } else {
-    if (startWaveformCycles(pin, high, low, 0)) {
-      analogMap |= (1 << pin);
-    }
+    _setPWM(pin, high);
+    analogMap |= (1 << pin);
   }
 }
 
