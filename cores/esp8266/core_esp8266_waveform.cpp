@@ -55,8 +55,10 @@ extern "C" {
 typedef struct {
   uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
   uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
-  uint32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
-  uint32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
+  uint32_t timeHighCycles;     // Currently running waveform period
+  uint32_t timeLowCycles;      //
+  uint32_t gotoTimeHighCycles; // Copied over on the next period to preserve phase
+  uint32_t gotoTimeLowCycles;  //
 } Waveform;
 
 static Waveform waveform[17];        // State of all possible pins
@@ -66,6 +68,10 @@ static volatile uint32_t waveformEnabled = 0; // Is it actively running, updated
 // Enable lock-free by only allowing updates to waveformState and waveformEnabled from IRQ service routine
 static volatile uint32_t waveformToEnable = 0;  // Message to the NMI handler to start a waveform on a inactive pin
 static volatile uint32_t waveformToDisable = 0; // Message to the NMI handler to disable a pin from waveform generation
+
+volatile int32_t waveformToChange = -1;
+volatile uint32_t waveformNewHigh = 0;
+volatile uint32_t waveformNewLow = 0;
 
 static uint32_t (*timer1CB)() = NULL;
 
@@ -268,17 +274,24 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
     return false;
   }
   Waveform *wave = &waveform[pin];
-  // Adjust to shave off some of the IRQ time, approximately
-  wave->nextTimeHighCycles = timeHighCycles;
-  wave->nextTimeLowCycles = timeLowCycles;
   wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
   if (runTimeCycles && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
 
   uint32_t mask = 1<<pin;
-  if (!(waveformEnabled & mask)) {
-    // Actually set the pin high or low in the IRQ service to guarantee times
+  if (waveformEnabled & mask) {
+    waveformNewHigh = timeHighCycles;
+    waveformNewLow = timeLowCycles;
+    waveformToChange = pin;
+    while (waveformToChange >= 0) {
+      delay(0); // Wait for waveform to update
+    }
+  } else { //  if (!(waveformEnabled & mask)) {
+    wave->timeHighCycles = timeHighCycles;
+    wave->timeLowCycles = timeLowCycles;
+    wave->gotoTimeHighCycles = wave->timeHighCycles;
+    wave->gotoTimeLowCycles = wave->timeLowCycles;    // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
     waveformToEnable |= mask;
     if (!timerRunning) {
@@ -379,6 +392,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     pwmUpdate = nullptr;
     pwmState.nextServiceCycle = GetCycleCountIRQ(); // Do it this loop!
     pwmState.idx = pwmState.cnt; // Cause it to start at t=0
+  } else if (waveformToChange >=0) {
+    waveform[waveformToChange].gotoTimeHighCycles = waveformNewHigh;
+    waveform[waveformToChange].gotoTimeLowCycles = waveformNewLow;
+    waveformToChange = -1;
   }
 
   bool done = false;
@@ -459,16 +476,19 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeHighCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
+            wave->nextServiceCycle = now + wave->timeHighCycles;
+            nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
           } else {
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
             } else {
               ClearGPIO(mask);
             }
-            wave->nextServiceCycle = now + wave->nextTimeLowCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
+            wave->nextServiceCycle = now + wave->timeLowCycles;
+            nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
+            // Copy over next full-cycle timings
+            wave->timeHighCycles = wave->gotoTimeHighCycles;
+            wave->timeLowCycles = wave->gotoTimeLowCycles;
           }
         } else {
           uint32_t deltaCycles = wave->nextServiceCycle - now;
