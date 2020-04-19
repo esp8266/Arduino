@@ -138,12 +138,33 @@ typedef struct {
 
 static PWMState pwmState;
 static volatile PWMState *pwmUpdate = nullptr; // Set by main code, cleared by ISR
-static int pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
+static uint32_t pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
 
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(int cc) {
+  if (pwmState.cnt) {
+    // Adjust any running ones to the best of our abilities by scaling them
+    // Used FP math for speed and code size
+    uint64_t oldCC64p0 = ((uint64_t)pwmPeriod);
+    uint64_t newCC64p16 = ((uint64_t)cc) << 16;
+    uint64_t ratio64p16 = (newCC64p16 / oldCC64p0);
+    PWMState p;  // The working copy since we can't edit the one in use
+    p = pwmState;
+    uint32_t ttl = 0;
+    for (auto i = 0; i < p.cnt; i++) {
+      uint64_t val64p16 = ((uint64_t)p.edge[i].delta) << 16;
+      uint64_t newVal64p32 = val64p16 * ratio64p16;
+      p.edge[i].delta = newVal64p32 >> 32;
+      ttl += p.edge[i].delta;
+    }
+    p.edge[p.cnt].delta = cc - ttl; // Final cleanup exactly cc total cycles
+    // Update and wait for mailbox to be emptied
+    pwmUpdate = &p;
+    while (pwmUpdate) {
+      delay(0);
+    }
+  }
   pwmPeriod = cc;
-  // TODO - should we drop all waveforms?
 }
 
 // Helper routine to remove an entry from the state machine

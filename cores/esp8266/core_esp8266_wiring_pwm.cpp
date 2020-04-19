@@ -45,6 +45,8 @@ extern void __analogWriteFreq(uint32_t freq) {
   } else {
     analogFreq = freq;
   }
+  uint32_t analogPeriod = microsecondsToClockCycles(1000000UL) / analogFreq;
+  _setPWMPeriodCC(analogPeriod);
 }
 
 extern void __analogWrite(uint8_t pin, int val) {
@@ -52,7 +54,6 @@ extern void __analogWrite(uint8_t pin, int val) {
     return;
   }
   uint32_t analogPeriod = microsecondsToClockCycles(1000000UL) / analogFreq;
-  _setPWMPeriodCC(analogPeriod);
   if (val < 0) {
     val = 0;
   } else if (val > analogScale) {
