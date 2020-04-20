@@ -260,9 +260,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + ISRTIMEOUTCCYS;
   uint32_t now = ESP.getCycleCount();
-  uint32_t nextEventCcy = now + MAXIRQCCYS;
+  uint32_t nextTimerCcy;
   bool busy = waveformsEnabled;
-  if (busy) {
+  if (!busy) {
+    nextTimerCcy = now + MAXIRQCCYS;
+  }
+  else {
     for (int pin = startPin; pin <= endPin; ++pin) {
       // If it's not on, ignore
       if (!(waveformsEnabled & (1UL << pin)))
@@ -290,6 +293,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     }
   }
   while (busy) {
+    nextTimerCcy = now + MAXIRQCCYS;
     for (int pin = startPin; pin <= endPin; ++pin) {
       // If it's not on, ignore
       if (!(waveformsEnabled & (1UL << pin)))
@@ -298,7 +302,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       Waveform& wave = waveforms[pin];
 
       const bool duty = waveformsState & (1UL << pin);
-      nextEventCcy = duty ? wave.nextOffCcy : wave.nextPhaseCcy;
+      uint32_t nextEventCcy = duty ? wave.nextOffCcy : wave.nextPhaseCcy;
 
       if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEventCcy - wave.expiryCcy) >= 0) {
         if (static_cast<int32_t>(now - wave.expiryCcy) >= 0) {
@@ -339,7 +343,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
           }
           else {
-            const uint32_t skipPeriodCcys = (static_cast<uint32_t>(overshootCcys) > wave.periodCcys) ? (overshootCcys / wave.periodCcys) * wave.periodCcys : 0;
+            const uint32_t skipPeriodCcys = (static_cast<uint32_t>(overshootCcys) >= wave.periodCcys) ? (overshootCcys / wave.periodCcys) * wave.periodCcys : 0;
             wave.nextPhaseCcy += skipPeriodCcys;
             if (!wave.dutyCcys) {
               wave.nextPhaseCcy += wave.periodCcys;
@@ -361,9 +365,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
       }
 
+      if (static_cast<int32_t>(nextTimerCcy - nextEventCcy) > 0) {
+        nextTimerCcy = nextEventCcy;
+      }
       now = ESP.getCycleCount();
     }
-    const int32_t timerMarginCcys = isrTimeoutCcy - nextEventCcy;
+    const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
     busy = waveformsEnabled && timerMarginCcys > 0;
   }
 
@@ -371,12 +378,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   if (timer1CB) {
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
     // Account for unknown duration of timer1CB().
-    nextTimerCcys = nextEventCcy - ESP.getCycleCount();
+    nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
     if (nextTimerCcys > callbackCcys)
       nextTimerCcys = callbackCcys;
   }
   else {
-    nextTimerCcys = nextEventCcy - now;
+    nextTimerCcys = nextTimerCcy - now;
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
