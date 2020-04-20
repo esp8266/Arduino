@@ -176,12 +176,6 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (!timerRunning) {
     return false;
   }
-  // If user sends in a pin >16 but <32, this will always point to a 0 bit
-  // If they send >=32, then the shift will result in 0 and it will also return false
-  uint32_t mask = 1<<pin;
-  if (!(waveformEnabled & mask)) {
-    return false; // It's not running, nothing to do here
-  }
   waveformToDisable |= mask;
   // Ensure timely service....
   if (T1L > microsecondsToClockCycles(10)) {
