@@ -182,7 +182,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
     timer1_write(microsecondsToClockCycles(10));
   }
   while (waveformToDisable) {
-    /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
+    /* no-op */ // Can't delay() because stopWaveform may be called from an IRQ
   }
   if (!waveformEnabled && !timer1CB) {
     deinitTimer();
