@@ -26,4 +26,11 @@ const ip_addr_t* sntp_getserver(u8_t)
     return IP_ADDR_ANY;
 }
 
+err_t etharp_request(struct netif *netif, const ip4_addr_t *ipaddr)
+{
+    (void)netif;
+    (void)ipaddr;
+    return ERR_OK;
+}
+
 } // extern "C"

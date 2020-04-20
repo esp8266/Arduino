@@ -26,6 +26,7 @@ PublicKey	KEYWORD1
 CertStoreSPIFFSBearSSL	KEYWORD1
 CertStoreSDBearSSL	KEYWORD1
 Session	KEYWORD1
+ESP8266WiFiGratuitous	KEYWORD1
 
 
 #######################################
@@ -108,6 +109,9 @@ psk	KEYWORD2
 BSSID	KEYWORD2
 BSSIDstr	KEYWORD2
 RSSI	KEYWORD2
+stationKeepAliveSetIntervalMs	KEYWORD2
+stationKeepAliveStop	KEYWORD2
+stationKeepAliveNow	KEYWORD2
 enableInsecureWEP	KEYWORD2
 getListenInterval	KEYWORD2
 isSleepLevelMax		KEYWORD2
