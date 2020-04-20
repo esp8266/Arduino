@@ -185,7 +185,15 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
 
     /*** end of posix replacement ***/
 }
-
+void setTZ(const char* tz){
+	
+    char tzram[strlen_P(tz) + 1];
+    memcpy_P(tzram, tz, sizeof(tzram));
+    setenv("TZ", tzram, 1/*overwrite*/);
+    tzset();
+	
+	
+}
 void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
 {
     sntp_stop();
@@ -193,10 +201,12 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     setServer(0, server1);
     setServer(1, server2);
     setServer(2, server3);
+	/*
     char tzram[strlen_P(tz) + 1];
     memcpy_P(tzram, tz, sizeof(tzram));
-    setenv("TZ", tzram, 1/*overwrite*/);
-    tzset();
-
+    setenv("TZ", tzram, 1/*overwrite*/ //);FIXME
+    //tzset();
+	setTZ(tz);
     sntp_init();
 }
+
