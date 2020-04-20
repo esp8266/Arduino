@@ -48,6 +48,8 @@ extern "C" {
 
 // Maximum delay between IRQs, 1Hz
 constexpr int32_t MAXIRQCCYS = microsecondsToClockCycles(1000000);
+// Maximum servicing time for any single IRQ
+constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(12);
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
@@ -142,19 +144,19 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   // correct the upward bias for duty cycles shorter than generator quantum
   if (highCcys < lowCcys)
   {
-    if (highCcys < 3 * QUANTUM / 2) {
+    if (highCcys < QUANTUM) {
       highCcys = 0;
     }
-    else if (highCcys < 2 * QUANTUM) {
-      highCcys = 2 * QUANTUM;
+    else if (highCcys < ISRTIMEOUTCCYS) {
+      highCcys += QUANTUM / 2;
     }
   }
   else {
-    if (lowCcys < 3 * QUANTUM / 2) {
+    if (lowCcys < QUANTUM) {
       highCcys = periodCcys;
     }
-    else if (lowCcys < 2 * QUANTUM) {
-      highCcys = periodCcys - 2 * QUANTUM;
+    else if (lowCcys < ISRTIMEOUTCCYS) {
+      highCcys -= QUANTUM / 2;
     }
   }
   // sanity checks, including mixed signed/unsigned arithmetic safety
@@ -187,7 +189,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
       initTimer();
       timer1_write(microsecondsToClockCycles(1));
     }
-    else if (T1L > DELTAIRQ + IRQLATENCY) {
+    else if (T1L > IRQLATENCY + DELTAIRQ) {
       // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
       timer1_write(microsecondsToClockCycles(1));
     }
@@ -219,7 +221,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (waveformsEnabled & (1UL << pin)) {
     waveformToDisable = 1UL << pin;
     // Must not interfere if Timer is due shortly
-    if (T1L > DELTAIRQ + IRQLATENCY) {
+    if (T1L > IRQLATENCY + DELTAIRQ) {
       timer1_write(microsecondsToClockCycles(1));
     }
     while (waveformToDisable) {
@@ -256,7 +258,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Exit the loop if the next event, if any, is sufficiently distant.
-  const uint32_t isrTimeoutCcy = isrStartCcy + microsecondsToClockCycles(12);
+  const uint32_t isrTimeoutCcy = isrStartCcy + ISRTIMEOUTCCYS;
   uint32_t now = ESP.getCycleCount();
   uint32_t nextEventCcy = now + MAXIRQCCYS;
   bool busy = waveformsEnabled;
