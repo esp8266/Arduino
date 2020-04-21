@@ -2,6 +2,14 @@
 #define DNSServer_h
 #include <WiFiUdp.h>
 
+// #define DEBUG_DNSSERVER
+
+// https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.txt
+#ifndef IANA_DNS_PORT
+#define IANA_DNS_PORT 53        // AKA domain
+constexpr uint16_t kIanaDnsPort = 53;
+#endif
+
 #define DNS_QR_QUERY 0
 #define DNS_QR_RESPONSE 1
 #define DNS_OPCODE_QUERY 0
@@ -45,6 +53,15 @@ struct DNSHeader
   uint16_t ARCount;          // number of resource entries
 };
 
+constexpr size_t kDNSSQueSizeAddrBits = 3; // The number of bits used to address que entries
+constexpr size_t kDNSSQueSize = BIT(kDNSSQueSizeAddrBits);
+
+typedef struct DNSS_REQUESTER {
+  uint32_t ip;
+  uint16_t port;
+  uint16_t id;
+} dnss_requester_t;
+
 class DNSServer
 {
   public:
@@ -52,24 +69,44 @@ class DNSServer
     ~DNSServer() {
         stop();
     };
+    bool enableForwarder(const String &domainName = emptyString, const IPAddress &dns = (uint32_t)0);
+    void disableForwarder(const String &domainName = emptyString, bool freeResources = false);
+    bool isForwarding() { return _forwarder && _dns.isSet(); }
+    void setDNS(const IPAddress& dns) { _dns = dns; }
+    IPAddress getDNS() { return _dns; }
+    bool isDNSSet() { return _dns.isSet(); }
+
     void processNextRequest();
     void setErrorReplyCode(const DNSReplyCode &replyCode);
     void setTTL(const uint32_t &ttl);
+    uint32_t getTTL();
+    String getDomainName() { return _domainName; }
 
     // Returns true if successful, false if there are no sockets available
     bool start(const uint16_t &port,
               const String &domainName,
-              const IPAddress &resolvedIP);
+              const IPAddress &resolvedIP,
+              const IPAddress &dns = (uint32_t)0);
     // stops the DNS server
     void stop();
 
   private:
     WiFiUDP _udp;
-    uint16_t _port;
     String _domainName;
-    unsigned char _resolvedIP[4];
+    IPAddress _dns;
+    std::unique_ptr<dnss_requester_t[]> _que;
     uint32_t _ttl;
+#ifdef DEBUG_DNSSERVER
+    // There are 2 possiblities for OverFlow:
+    //   1) we have more than kDNSSQueSize request already outstanding.
+    //   2) we have request that never received a reply.
+    uint32_t _que_ov;
+    uint32_t _que_drop;
+#endif
     DNSReplyCode _errorReplyCode;
+    bool _forwarder;
+    unsigned char _resolvedIP[4];
+    uint16_t _port;
 
     void downcaseAndRemoveWwwPrefix(String &domainName);
     void replyWithIP(DNSHeader *dnsHeader,
@@ -81,7 +118,9 @@ class DNSServer
 			size_t queryLength);
     void replyWithError(DNSHeader *dnsHeader,
 			DNSReplyCode rcode);
-    void respondToRequest(uint8_t *buffer, size_t length);
+    bool respondToRequest(uint8_t *buffer, size_t length);
+    void forwardRequest(uint8_t *buffer, size_t length);
+    void forwardReply(uint8_t *buffer, size_t length);
     void writeNBOShort(uint16_t value);
 };
 #endif
