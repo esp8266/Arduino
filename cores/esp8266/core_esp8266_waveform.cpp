@@ -318,17 +318,24 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         if (overshootCcys >= 0) {
           if (duty) {
             const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
-            const uint32_t skipPeriodCcys = ((overshootCcys + wave.dutyCcys) > wave.periodCcys) ? ((overshootCcys + wave.dutyCcys) / wave.periodCcys) * wave.periodCcys : 0;
-            if (wave.dutyCcys == wave.periodCcys) {
+            uint32_t skipPeriodCcys = 0;
+            if (overshootCcys + wave.dutyCcys >= wave.periodCcys) {
+              skipPeriodCcys = ((overshootCcys + wave.dutyCcys) / wave.periodCcys) * wave.periodCcys;
               wave.nextPhaseCcy += skipPeriodCcys;
+            }
+            if (wave.dutyCcys == wave.periodCcys) {
               wave.nextOffCcy = wave.nextPhaseCcy;
               nextEventCcy = wave.nextPhaseCcy;
             }
             else if (endOfPeriod) {
               // preceeding period had zero off cycle, continue direct into new duty cycle
-              wave.nextPhaseCcy += skipPeriodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys;
               wave.nextPhaseCcy += wave.periodCcys;
+              nextEventCcy = wave.nextOffCcy;
+            }
+            else if (skipPeriodCcys) {
+              // complete off cycle overshoot, continue direct into new duty cycle
+              wave.nextOffCcy = wave.nextPhaseCcy - wave.periodCcys + wave.dutyCcys;
               nextEventCcy = wave.nextOffCcy;
             }
             else {
@@ -343,8 +350,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
           }
           else {
-            const uint32_t skipPeriodCcys = (static_cast<uint32_t>(overshootCcys) >= wave.periodCcys) ? (overshootCcys / wave.periodCcys) * wave.periodCcys : 0;
-            wave.nextPhaseCcy += skipPeriodCcys;
+            if (static_cast<uint32_t>(overshootCcys) >= wave.periodCcys) {
+              wave.nextPhaseCcy += (overshootCcys / wave.periodCcys) * wave.periodCcys;
+            }
             if (!wave.dutyCcys) {
               wave.nextPhaseCcy += wave.periodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
@@ -379,8 +387,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     int32_t callbackCcys = microsecondsToClockCycles(timer1CB());
     // Account for unknown duration of timer1CB().
     nextTimerCcys = nextTimerCcy - ESP.getCycleCount();
-    if (nextTimerCcys > callbackCcys)
+    if (nextTimerCcys > callbackCcys) {
       nextTimerCcys = callbackCcys;
+    }
   }
   else {
     nextTimerCcys = nextTimerCcy - now;
