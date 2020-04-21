@@ -2,6 +2,15 @@
 
 const int pin[] = { D0, D1, D2, D3, D4, D5, D6, D7, D8 };
 
+void cputest() {
+  volatile uint32_t x = 0;
+  uint32_t start, end;
+  start = ESP.getCycleCount();
+  for (auto i=0; i<1000000; i++) x += x;
+  end = ESP.getCycleCount();
+  Serial.printf("%d\n", end - start);
+}
+
 void setup() {
   WiFi.disconnect(true);
   WiFi.forceSleepBegin();
@@ -12,7 +21,8 @@ void setup() {
   Serial.printf("t # freq = pinMode(D#, OUTPUT); tone(D#, freq)\n");
   Serial.printf("f freq   = analogWriteFreq(freq)\n");
   Serial.printf("r range  = analogWriteRange(range)\n");
-  Serial.printf("a # val  = pinMode(D#, OUTPUT); analogWrite(D#, val)\n\n");
+  Serial.printf("a # val  = pinMode(D#, OUTPUT); analogWrite(D#, val)\n");
+  Serial.printf("c        = Run CPU test, report clock cycles to count to 1 million\n\n");
 }
 
 void loop() {
@@ -37,6 +47,8 @@ void loop() {
       analogWrite(pin[a], b);
     } else if (buff[0] == 'z') {
       ESP.reset();
+    } else if (buff[0] == 'c'){
+      cputest();
     }
   }
 }
