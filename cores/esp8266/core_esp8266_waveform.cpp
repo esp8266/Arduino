@@ -511,8 +511,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     nextEventCycles = min_u32(nextEventCycles, timer1CB());
   }
 
-  if (nextEventCycles < microsecondsToClockCycles(10)) {
-    nextEventCycles = microsecondsToClockCycles(10);
+  if (nextEventCycles < microsecondsToClockCycles(5)) {
+    nextEventCycles = microsecondsToClockCycles(5);
   }
   nextEventCycles -= DELTAIRQ;
 
