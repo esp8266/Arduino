@@ -60,7 +60,7 @@ constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
   (microsecondsToClockCycles(11) / 10) >> 1 : (microsecondsToClockCycles(11) / 10);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
