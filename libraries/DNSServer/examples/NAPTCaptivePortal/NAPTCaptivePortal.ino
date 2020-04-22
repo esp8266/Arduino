@@ -365,14 +365,14 @@ void loop() {
   server.handleClient();
 }
 
-#else
+#else  // LWIP_FEATURES && !LWIP_IPV6
 
 void setup() {
   Serial.begin(115200);
   Serial.printf("\n\nNAPT not supported in this configuration\n");
 }
 
-#endif
-
 void loop() {
 }
+
+#endif // LWIP_FEATURES && !LWIP_IPV6
