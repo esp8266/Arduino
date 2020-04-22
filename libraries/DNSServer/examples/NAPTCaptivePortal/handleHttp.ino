@@ -93,19 +93,20 @@ void handleWifi() {
 
   // Send a few chunks of the HTML that don't need to change.
   server.sendContent_P(configHead);
+  server.sendContent_P(configHead2);
 
   String page;
 
-  page = FPSTR(configHead2);
+  page = FPSTR(configPresetInput);
   /*
     Set previously used/entered credentials as a default entries.
     This allows an opportunity to correct them and try again.
   */
   page.replace("{s}", String(ssid));
   page.replace("{p}", String(password));
-  sendIfOver(page, 0);
+  sendIfOver(page);
 
-  page = FPSTR(configConnection);
+  page += FPSTR(configConnection);
   if (server.client().localIP() == apIP) {
     page.replace("{w}", String(F("SoftAP: ")) + softAP_ssid);
   } else {
@@ -123,7 +124,6 @@ void handleWifi() {
     uint8_t sta_cnt = wifi_softap_get_station_num();
     page.replace("{s}", String(softAP_ssid));
     page.replace("{b}", String(WiFi.softAPmacAddress()));
-    // page.replace("{c}", String(WiFi.softAPchannel())); //WiFi.softAPIP().channel()));
     page.replace("{i}", WiFi.softAPIP().toString());
     page.replace("{a}", String(sta_cnt));
     if (sta_cnt) {

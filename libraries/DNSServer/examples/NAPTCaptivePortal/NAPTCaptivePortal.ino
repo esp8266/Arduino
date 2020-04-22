@@ -41,11 +41,12 @@
    DHCP server will supply a suffix list, if there is one. Then when a name
    lookup fails and the name does not have a trailing (.)dot the host computer
    will append a suffix from the list and try again, until successful or the
-   list is exhaused. This I fear is becoming a TL;DR. On a Ubuntu system run
-   'nmcli dev show eth0 | grep IP4\.DOMAIN` that may show you a suffix list.
-   (replace eth0 with your wlan interface name) Try adding them to the local
-   name you are failing to connect to. For example, assume 'myhost' fails. You
-   see that 'lan' is in the suffix list. Try connecting to 'myhost.lan'.
+   list is exhaused. This topic I fear can become a TL;DR. A quick wrapup by way
+   of an example. On an Ubuntu system run `nmcli dev show eth0 | grep
+   IP4\.DOMAIN` that may show you a suffix list. (replace eth0 with your wlan
+   interface name) Try adding them to the local name you are failing to connect
+   to. For example, assume 'myhost' fails. You see that 'lan' is in the suffix
+   list. Try connecting to 'myhost.lan'.
 
    mDNS names also will not work. We do not have a way to pass those request
    back and forth through the NAPT.
@@ -62,7 +63,7 @@
    time, this PR-author with a different Android device running the latest
    version of Android has seen no problems in using either. At least not yet :)
    FWIW: My device also works with the original CaptivePortalAdvanced example
-   when using a private address. I would suggest keeping the private address
+   when using a private address. I would suggest keeping the public address
    for a while. At lest until you are confident everything is working well
    before experimenting with a private address.
 */
@@ -185,11 +186,15 @@ void setup() {
     }
   });
 
-  /* You can remove the password parameter if you want the AP to be open. */
+  /*
+    While you can remove the password parameter to make the AP open.
+    You will be operating with less security and allowing snoopers to see
+    the credentials you use for your WiFi.
+  */
   WiFi.softAPConfig(apIP, apIP, netMsk);
   WiFi.softAP(softAP_ssid, softAP_password);
-  // The following comment was committed Aug 19, 2015; is it still true??
-  // Comment out for verification.
+  // The following comment for delay(500) was committed Aug 19, 2015; is it
+  // still true? Commented out for verification. - APR 2020
   // delay(500); // Without delay I've seen the IP address blank
   CONSOLE_PRINTF("SoftAP '%s' started\r\n", softAP_ssid);
   CONSOLE_PRINTLN2("  IP address: ", WiFi.softAPIP().toString());
@@ -266,7 +271,6 @@ void connectWifi() {
 
 void loop() {
   if (connect) {
-    // CONSOLE.println("Connect requested");
     connect = false;
     connectWifi();
     lastConnectTry = millis();
@@ -368,6 +372,8 @@ void loop() {
 #else  // LWIP_FEATURES && !LWIP_IPV6
 
 void setup() {
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
   Serial.printf("\n\nNAPT not supported in this configuration\n");
 }

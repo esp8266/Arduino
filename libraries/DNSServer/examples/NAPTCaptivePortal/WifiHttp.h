@@ -59,7 +59,6 @@ a {
 }
 
 .lg {
-  /*width: 90%;*/
   font-size: 1em;
   height: 1.8em;
 }
@@ -152,7 +151,22 @@ function cs(i){
   j.value='';
   af(j);
 }
+</script>
+<!--
+-->
+)EOF";
+#else
+static const char configHead2[] PROGMEM = R"EOF(<style>.left{text-align:left}.center{text-align:center}.right{text-align:right}@media screen and (orientation: portrait){#inner{display:block;margin:0 auto;max-width:400px;min-width:350px;text-align:left}#outer{width:100%}}@media screen and (orientation: landscape){#inner{display:block;margin:0 auto;width:400px;text-align:left}#outer{width:100%}}</style></head><body onload='ol()'> <script>function ge(i){return document.getElementById(i);} function af(e){e.focus();e.scrollIntoView();} function pv(){let e=ge('p');if(e.type==='password'){e.type='text';}else{e.type='password';} af(e);} function cs(i){ge('s').value=i.innerText||i.textContent;let j=ge('p');j.value='';af(j);}</script>)EOF";
+#endif
 
+#ifdef DEBUG_VIEW
+static const char configPresetInput[] PROGMEM = R"EOF(
+<!--
+Prefill input fields with the last credentials used.
+{s} - Network Name/SSID
+{p} - Password
+-->
+<script>
 // After web page load init SSID/PSK field
 // onload copy credentials
 function ol() {
@@ -164,7 +178,7 @@ function ol() {
 -->
 )EOF";
 #else
-static const char configHead2[] PROGMEM = R"EOF(<style>.left{text-align:left}.center{text-align:center}.right{text-align:right}@media screen and (orientation: portrait){#inner{display:block;margin:0 auto;max-width:400px;min-width:350px;text-align:left}#outer{width:100%}}@media screen and (orientation: landscape){#inner{display:block;margin:0 auto;width:400px;text-align:left}#outer{width:100%}}</style></head><body onload='ol()'> <script>function ge(i){return document.getElementById(i);} function af(e){e.focus();e.scrollIntoView();} function pv(){let e=ge('p');if(e.type==='password'){e.type='text';}else{e.type='password';} af(e);} function cs(i){ge('s').value=i.innerText||i.textContent;let j=ge('p');j.value='';af(j);} function ol(){ge('s').value='{s}';ge('p').value='{p}';}</script> )EOF";
+static const char configPresetInput[] PROGMEM = R"EOF(<script>function ol(){ge('s').value='{s}';ge('p').value='{p}';}</script>)EOF";
 #endif
 
 #ifdef DEBUG_VIEW
@@ -302,9 +316,9 @@ static const char configEnd[] PROGMEM = R"EOF(
 -->
 </table>
 <br /><form method='POST' action='wifisave'><h4>Connect to Network:</h4>
-<input id='s' class='lg' type='text' size=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/>
+<input id='s' class='lg' type='text' size=32 maxlength=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/>
 <br /><br />
-<input id='p' class='lg' type='password' size=32 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/>
+<input id='p' class='lg' type='password' size=32 maxlength=64 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/>
 &nbsp;&nbsp;<a class='lg' onclick='pv();'>&#x1f441;</a>
 <br /><br /><input type='submit' value='Connect/Disconnect'/>
 </form>
@@ -319,7 +333,7 @@ static const char configEnd[] PROGMEM = R"EOF(
 -->
 )EOF";
 #else
-static const char configEnd[] PROGMEM = R"EOF(</table> <br /><form method='POST' action='wifisave'><h4>Connect to Network:</h4> <input id='s' class='lg' type='text' size=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/> <br /><br /> <input id='p' class='lg' type='password' size=32 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/> &nbsp;&nbsp;<a class='lg' onclick='pv();'>&#x1f441;</a> <br /><br /><input type='submit' value='Connect/Disconnect'/></form> <br /><p>You may want to <a href='/'>return to the home page</a>.</p><p></p></div></div></body></html>)EOF";
+static const char configEnd[] PROGMEM = R"EOF(</table> <br /><form method='POST' action='wifisave'><h4>Connect to Network:</h4> <input id='s' class='lg' type='text' size=32 maxlength=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/> <br /><br /> <input id='p' class='lg' type='password' size=32 maxlength=64 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/> &nbsp;&nbsp;<a class='lg' onclick='pv();'>&#x1f441;</a> <br /><br /><input type='submit' value='Connect/Disconnect'/></form> <br /><p>You may want to <a href='/'>return to the home page</a>.</p><p></p></div></div></body></html>)EOF";
 #endif
 
 #endif

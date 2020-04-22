@@ -69,7 +69,23 @@ class DNSServer
     ~DNSServer() {
         stop();
     };
+    /*
+      If specified, `enableForwarder` will update the `domainName` that is used
+      to match DNS request to this AP's IP Address. A non-matching request will
+      be forwarded to the DNS server specified by `dns`.
+
+      Returns `true` on success.
+
+      Returns `false`,
+        * when forwarding `dns` is not set, or
+        * unable to allocate resources for managing the DNS forward function.
+    */
     bool enableForwarder(const String &domainName = emptyString, const IPAddress &dns = (uint32_t)0);
+    /*
+      `disableForwarder` will stop forwarding DNS requests. If specified,
+      updates the `domainName` that is matched for returning this AP's IP Address.
+      Optionally, resources used for the DNS forward function can be freed.
+    */
     void disableForwarder(const String &domainName = emptyString, bool freeResources = false);
     bool isForwarding() { return _forwarder && _dns.isSet(); }
     void setDNS(const IPAddress& dns) { _dns = dns; }
