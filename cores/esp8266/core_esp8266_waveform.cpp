@@ -74,6 +74,7 @@ enum class WaveformMode : uint8_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2, 
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
+  uint32_t nextEventCcy; // ESP clock cycle when switching wave cycle, or expiring wave.
   uint32_t nextPhaseCcy; // ESP clock cycle when a period begins. If WaveformMode::INIT, temporarily holds positive phase offset ccy count
   uint32_t nextOffCcy;   // ESP clock cycle when going from duty to off
   uint32_t dutyCcys;     // Set next off cycle at low->high to maintain phase
@@ -280,6 +281,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         waveform.states &= ~(1UL << pin); // Clear the state of any just started
         wave.nextPhaseCcy = (waveform.enabled & (1UL << wave.alignPhase)) ?
           waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy : now;
+        wave.nextEventCcy = wave.nextPhaseCcy;
         if (!wave.expiryCcy) {
           wave.mode = WaveformMode::INFINITE;
           break;
@@ -305,23 +307,15 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         continue;
 
       Waveform& wave = waveform.pins[pin];
-
-      const bool duty = waveform.states & (1UL << pin);
-      uint32_t nextEventCcy = duty ? wave.nextOffCcy : wave.nextPhaseCcy;
-
-      if (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEventCcy - wave.expiryCcy) >= 0) {
-        if (static_cast<int32_t>(now - wave.expiryCcy) >= 0) {
+      const int32_t overshootCcys = now - wave.nextEventCcy;
+      if (overshootCcys >= 0) {
+        if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
           // Disable any waveforms that are done
           waveform.enabled ^= 1UL << pin;
         }
         else {
-          nextEventCcy = wave.expiryCcy;
-        }
-      }
-      else {
-        const int32_t overshootCcys = now - nextEventCcy;
-        if (overshootCcys >= 0) {
-          if (duty) {
+          uint32_t nextEdgeCcy;
+          if (waveform.states & (1UL << pin)) {
             const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
             uint32_t skipPeriodCcys = 0;
             if (overshootCcys + wave.dutyCcys >= wave.periodCcys) {
@@ -330,22 +324,22 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             if (wave.dutyCcys == wave.periodCcys) {
               wave.nextOffCcy = wave.nextPhaseCcy;
-              nextEventCcy = wave.nextPhaseCcy;
+              nextEdgeCcy = wave.nextPhaseCcy;
             }
             else if (endOfPeriod) {
               // preceeding period had zero off cycle, continue direct into new duty cycle
               wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys;
               wave.nextPhaseCcy += wave.periodCcys;
-              nextEventCcy = wave.nextOffCcy;
+              nextEdgeCcy = wave.nextOffCcy;
             }
             else if (skipPeriodCcys) {
               // complete off cycle overshoot, continue direct into new duty cycle
               wave.nextOffCcy = wave.nextPhaseCcy - wave.periodCcys + wave.dutyCcys;
-              nextEventCcy = wave.nextOffCcy;
+              nextEdgeCcy = wave.nextOffCcy;
             }
             else {
               waveform.states ^= 1UL << pin;
-              nextEventCcy = wave.nextPhaseCcy;
+              nextEdgeCcy = wave.nextPhaseCcy;
               if (pin == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
               }
@@ -371,25 +365,30 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 SetGPIO(1UL << pin);
               }
             }
-            nextEventCcy = wave.nextOffCcy;
+            nextEdgeCcy = wave.nextOffCcy;
           }
+
+          wave.nextEventCcy =
+            (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEdgeCcy - wave.expiryCcy) > 0) ?
+            wave.expiryCcy : nextEdgeCcy;
         }
       }
 
-      if (static_cast<int32_t>(nextTimerCcy - nextEventCcy) > 0) {
-        nextTimerCcy = nextEventCcy;
+      if (static_cast<int32_t>(nextTimerCcy - wave.nextEventCcy) > 0) {
+        nextTimerCcy = wave.nextEventCcy;
         nextPin = pin;
       }
+
       now = ESP.getCycleCount();
     } while ((pin = (pin < endPin) ? pin + 1 : startPin, pin != stopPin));
 
     const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
     busy = timerMarginCcys > 0;
-  	if (busy) {
+    if (busy) {
       while (static_cast<int32_t>(nextTimerCcy - now) > 0) {
         now = ESP.getCycleCount();
       }
-  	}
+    }
   }
 
   int32_t nextTimerCcys;
