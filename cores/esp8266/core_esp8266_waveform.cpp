@@ -142,22 +142,11 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
   const auto periodCcys = highCcys + lowCcys;
   // correct the upward bias for duty cycles shorter than generator quantum
-  if (highCcys < lowCcys)
-  {
-    if (highCcys < QUANTUM) {
-      highCcys = 0;
-    }
-    else if (highCcys < ISRTIMEOUTCCYS) {
-      highCcys += QUANTUM / 2;
-    }
+  if (highCcys < QUANTUM) {
+    highCcys = 0;
   }
-  else {
-    if (lowCcys < QUANTUM) {
-      highCcys = periodCcys;
-    }
-    else if (lowCcys < ISRTIMEOUTCCYS) {
-      highCcys -= QUANTUM / 2;
-    }
+  else if (lowCcys < QUANTUM) {
+    highCcys = periodCcys;
   }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
@@ -350,17 +339,15 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
           }
           else {
-            if (static_cast<uint32_t>(overshootCcys) >= wave.periodCcys) {
-              wave.nextPhaseCcy += (overshootCcys / wave.periodCcys) * wave.periodCcys;
-            }
+            uint32_t skipPeriodCcys = static_cast<uint32_t>(overshootCcys) >= wave.periodCcys ? (overshootCcys / wave.periodCcys) * wave.periodCcys : 0;
             if (!wave.dutyCcys) {
-              wave.nextPhaseCcy += wave.periodCcys;
+              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
             }
             else {
               waveformsState ^= 1UL << pin;
-              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys;
-              wave.nextPhaseCcy += wave.periodCcys;
+              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + overshootCcys;
+              wave.nextPhaseCcy += wave.periodCcys + skipPeriodCcys;
               if (pin == 16) {
                 GP16O |= 1; // GPIO16 write slow as it's RMW
               }
