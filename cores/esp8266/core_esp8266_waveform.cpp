@@ -54,13 +54,13 @@ constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(12);
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(5) / 2) >> 1 : microsecondsToClockCycles(5) / 2;
+  microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
 // The generator has a measurable time quantum for switching wave cycles during the same ISR invocation
 constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
   (microsecondsToClockCycles(11) / 10) >> 1 : (microsecondsToClockCycles(11) / 10);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
