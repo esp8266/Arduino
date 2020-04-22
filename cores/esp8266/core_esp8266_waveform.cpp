@@ -294,9 +294,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
     }
   }
+  int nextPin = startPin;
   while (busy) {
     nextTimerCcy = now + MAXIRQCCYS;
-    for (int pin = startPin; pin <= endPin; ++pin) {
+    int stopPin = nextPin;
+    int pin = nextPin;
+    do {
       // If it's not on, ignore
       if (!(waveform.enabled & (1UL << pin)))
         continue;
@@ -375,11 +378,18 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       if (static_cast<int32_t>(nextTimerCcy - nextEventCcy) > 0) {
         nextTimerCcy = nextEventCcy;
+        nextPin = pin;
       }
       now = ESP.getCycleCount();
-    }
+    } while ((pin = (pin < endPin) ? pin + 1 : startPin, pin != stopPin));
+
     const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
     busy = timerMarginCcys > 0;
+  	if (busy) {
+      while (static_cast<int32_t>(nextTimerCcy - now) > 0) {
+        now = ESP.getCycleCount();
+      }
+  	}
   }
 
   int32_t nextTimerCcys;
