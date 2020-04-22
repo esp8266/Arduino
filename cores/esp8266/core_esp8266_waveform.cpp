@@ -127,18 +127,13 @@ void setTimer1Callback(uint32_t (*fn)()) {
 
 constexpr int maxPWMs = 8;
 
-// PWM edge definition
-typedef struct {
-  unsigned int pin   : 8;
-  unsigned int delta : 24;
-} PWMEntry;
-
 // PWM machine state
 typedef struct {
   uint32_t mask; // Bitmask of active pins
-  uint8_t cnt;   // How many entries
-  uint8_t idx;   // Where the state machine is along the list
-  PWMEntry edge[maxPWMs + 1]; // Include space for terminal element
+  uint8_t  cnt;   // How many entries
+  uint8_t  idx;   // Where the state machine is along the list
+  uint8_t  pin[maxPWMs + 1];
+  uint32_t delta[maxPWMs + 1];
   uint32_t nextServiceCycle;  // Clock cycle for next step
 } PWMState;
 
@@ -161,12 +156,12 @@ void _setPWMPeriodCC(uint32_t cc) {
     p = pwmState;
     uint32_t ttl = 0;
     for (auto i = 0; i < p.cnt; i++) {
-      uint64_t val64p16 = ((uint64_t)p.edge[i].delta) << 16;
+      uint64_t val64p16 = ((uint64_t)p.delta[i]) << 16;
       uint64_t newVal64p32 = val64p16 * ratio64p16;
-      p.edge[i].delta = newVal64p32 >> 32;
-      ttl += p.edge[i].delta;
+      p.delta[i] = newVal64p32 >> 32;
+      ttl += p.delta[i];
     }
-    p.edge[p.cnt].delta = cc - ttl; // Final cleanup exactly cc total cycles
+    p.delta[p.cnt] = cc - ttl; // Final cleanup exactly cc total cycles
     // Update and wait for mailbox to be emptied
     pwmUpdate = &p;
     while (pwmUpdate) {
@@ -185,16 +180,17 @@ static void _removePWMEntry(int pin, PWMState *p) {
   int delta = 0;
   int i;
   for (i=0; i < p->cnt; i++) {
-    if (p->edge[i].pin == pin) {
-      delta = p->edge[i].delta;
+    if (p->pin[i] == pin) {
+      delta = p->delta[i];
       break;
     }
   }
   // Add the removed previous pin delta to preserve absolute position
-  p->edge[i+1].delta += delta;
+  p->delta[i+1] += delta;
   // Move everything back one and clean up
   for (i++; i <= p->cnt; i++) {
-    p->edge[i-1] = p->edge[i];
+    p->pin[i-1] = p->pin[i];
+    p->delta[i-1] = p->delta[i];
   }
   p->mask &= ~(1<<pin);
   p->cnt--;
@@ -232,25 +228,26 @@ bool _setPWM(int pin, uint32_t cc) {
     return false; // No space left
   } else if (p.cnt == 0) {
     // Starting up from scratch, special case 1st element and PWM period
-    p.edge[0].pin = pin;
-    p.edge[0].delta = cc;
-    p.edge[1].pin = 0xff;
-    p.edge[1].delta = pwmPeriod - cc;
+    p.pin[0] = pin;
+    p.delta[0] = cc;
+    p.pin[1] = 0xff;
+    p.delta[1] = pwmPeriod - cc;
     p.cnt = 1;
     p.mask = 1<<pin;
   } else {
     uint32_t ttl=0;
     uint32_t i;
     // Skip along until we're at the spot to insert
-    for (i=0; (i <= p.cnt) && (ttl + p.edge[i].delta < cc); i++) {
-      ttl += p.edge[i].delta;
+    for (i=0; (i <= p.cnt) && (ttl + p.delta[i] < cc); i++) {
+      ttl += p.delta[i];
     }
     // Shift everything out by one to make space for new edge
-    memmove(&p.edge[i + 1], &p.edge[i], (1 + p.cnt - i) * sizeof(p.edge[0]));
+    memmove(&p.pin[i + 1], &p.pin[i], (1 + p.cnt - i) * sizeof(p.pin[0]));
+    memmove(&p.delta[i + 1], &p.delta[i], (1 + p.cnt - i) * sizeof(p.delta[0]));
     int off = cc - ttl; // The delta from the last edge to the one we're inserting
-    p.edge[i].pin = pin;
-    p.edge[i].delta = off; // Add the delta to this new pin
-    p.edge[i + 1].delta -= off; // And subtract it from the follower to keep sum(deltas) constant
+    p.pin[i] = pin;
+    p.delta[i] = off; // Add the delta to this new pin
+    p.delta[i + 1] -= off; // And subtract it from the follower to keep sum(deltas) constant
     p.cnt++;
     p.mask |= 1<<pin;
   }
@@ -426,19 +423,19 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
                 do {
                     // Drop the pin at this edge
-                    GPOC = 1<<pwmState.edge[pwmState.idx].pin;
+                    GPOC = 1<<pwmState.pin[pwmState.idx];
                     // GPIO16 still needs manual work
-                    if (pwmState.edge[pwmState.idx].pin == 16) {
+                    if (pwmState.pin[pwmState.idx] == 16) {
                       GP16O &= ~1;
                     }
                     pwmState.idx++;
                     // Any other pins at this same PWM value will have delta==0, drop them too.
-                } while (pwmState.edge[pwmState.idx].delta == 0);
+                } while (pwmState.delta[pwmState.idx] == 0);
             }
             // Preserve duty cycle over PWM period by using now+xxx instead of += delta
-            pwmState.nextServiceCycle = now + pwmState.edge[pwmState.idx].delta;
+            pwmState.nextServiceCycle = now + pwmState.delta[pwmState.idx];
             cyclesToGo = pwmState.nextServiceCycle - now;
-            if (cyclesToGo<0) cyclesToGo=0;
+            if (cyclesToGo<0) cyclesToGo = 0;
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
       }
