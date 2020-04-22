@@ -142,11 +142,18 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
   const auto periodCcys = highCcys + lowCcys;
   // correct the upward bias for duty cycles shorter than generator quantum
-  if (highCcys < QUANTUM) {
+  if (highCcys <= QUANTUM / 2) {
     highCcys = 0;
   }
-  else if (lowCcys < QUANTUM) {
+  else if (highCcys < ISRTIMEOUTCCYS - QUANTUM)
+  {
+    highCcys -= QUANTUM / 2;
+  }
+  else if (lowCcys <= QUANTUM / 2) {
     highCcys = periodCcys;
+  }
+  else if (lowCcys < ISRTIMEOUTCCYS) {
+    highCcys -= 3 * QUANTUM / 2 * (ISRTIMEOUTCCYS - lowCcys) / ISRTIMEOUTCCYS;
   }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
