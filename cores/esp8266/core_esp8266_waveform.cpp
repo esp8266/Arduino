@@ -373,7 +373,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       now = ESP.getCycleCount();
     }
     const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
-    busy = waveformsEnabled && timerMarginCcys > 0;
+    busy = timerMarginCcys > 0;
   }
 
   int32_t nextTimerCcys;
