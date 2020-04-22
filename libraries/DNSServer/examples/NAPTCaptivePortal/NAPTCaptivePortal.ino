@@ -1,16 +1,3 @@
-#include <ESP8266WiFi.h>
-#include <lwip/napt.h>
-#include <lwip/dns.h>
-#include <dhcpserver.h>
-#include <WiFiClient.h>
-#include <ESP8266WebServer.h>
-#include <DNSServer.h>
-#include <ESP8266mDNS.h>
-#include <EEPROM.h>
-
-#define NAPT 1000
-#define NAPT_PORT 10
-
 /*
    This example shows the use of the 'DNS forwarder' feature in the DNSServer.
    It does so by combining two examples CaptivePortalAdvanced and
@@ -80,6 +67,22 @@
    before experimenting with a private address.
 */
 
+
+#if LWIP_FEATURES && !LWIP_IPV6
+
+#include <ESP8266WiFi.h>
+#include <lwip/napt.h>
+#include <lwip/dns.h>
+#include <dhcpserver.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+#include <DNSServer.h>
+#include <ESP8266mDNS.h>
+#include <EEPROM.h>
+
+#define NAPT 1000
+#define NAPT_PORT 10
+
 /*
   Some defines for debugging
 */
@@ -113,9 +116,6 @@
 #endif
 
 
-#if !(LWIP_FEATURES && !LWIP_IPV6)
-#error "Requirements: LWIP_FEATURES && ! LWIP_IPV6"
-#endif
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 #ifndef APSSID
@@ -168,21 +168,21 @@ void setup() {
   CONSOLE_PRINTLN("\r\n\r\nNAPT with Configuration Portal ...");
 
   staModeConnectedHandler = WiFi.onStationModeConnected(
-    [](WiFiEventStationModeConnected data) {
-      // Keep a copy of the BSSID for the AP that WLAN connects to.
-      // This is used in the WLAN report on WiFi Details page.
-      memcpy(bssid, data.bssid, sizeof(bssid));
+  [](WiFiEventStationModeConnected data) {
+    // Keep a copy of the BSSID for the AP that WLAN connects to.
+    // This is used in the WLAN report on WiFi Details page.
+    memcpy(bssid, data.bssid, sizeof(bssid));
   });
 
   staModeDisconnectedHandler = WiFi.onStationModeDisconnected(
-    [](WiFiEventStationModeDisconnected data) {
-      (void)data;
-      if (dnsServer.isForwarding()) {
-        dnsServer.disableForwarder("*");
-        dnsServer.setTTL(0);
-        // Reminder, Serial.println() will not work from these callbacks.
-        // For debug printf use ets_uart_printf().
-      }
+  [](WiFiEventStationModeDisconnected data) {
+    (void)data;
+    if (dnsServer.isForwarding()) {
+      dnsServer.disableForwarder("*");
+      dnsServer.setTTL(0);
+      // Reminder, Serial.println() will not work from these callbacks.
+      // For debug printf use ets_uart_printf().
+    }
   });
 
   /* You can remove the password parameter if you want the AP to be open. */
@@ -363,4 +363,16 @@ void loop() {
   dnsServer.processNextRequest();
   //HTTP
   server.handleClient();
+}
+
+#else
+
+void setup() {
+  Serial.begin(115200);
+  Serial.printf("\n\nNAPT not supported in this configuration\n");
+}
+
+#endif
+
+void loop() {
 }

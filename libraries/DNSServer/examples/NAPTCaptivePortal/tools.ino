@@ -2,6 +2,8 @@
      These functions may exist in other projects
 */
 
+#if LWIP_FEATURES && !LWIP_IPV6
+
 /*
   Returns a descriptive string for WiFi.status() value
 */
@@ -72,10 +74,12 @@ char getPhyModeChar(WiFiPhyMode_t i) {
 String macToString(const unsigned char* mac) {
   char buf[20];
   int rc = snprintf(buf, sizeof(buf), PSTR("%02X:%02X:%02X:%02X:%02X:%02X"),
-           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+                    mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
   if (rc < 0 || rc >= (int)sizeof(buf)) {
     return emptyString;
   }
   return String(buf);
 }
+
+#endif // LWIP_FEATURES && !LWIP_IPV6

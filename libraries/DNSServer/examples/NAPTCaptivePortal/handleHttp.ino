@@ -1,3 +1,5 @@
+#if LWIP_FEATURES && !LWIP_IPV6
+
 #include "WifiHttp.h"
 String& sendIfOver(String & str, size_t threshold = 512);
 
@@ -13,9 +15,9 @@ void addNoCacheHeader() {
 String& sendIfOver(String & str, size_t threshold) {
   size_t len = str.length();
   if (len > threshold) {
-      maxPage = std::max(maxPage, len);
-      server.sendContent(str);
-      str = "";
+    maxPage = std::max(maxPage, len);
+    server.sendContent(str);
+    str = "";
   }
   return str;
 }
@@ -68,8 +70,8 @@ boolean captivePortal() {
   }
 
   if (hAddr.isSet() ||
-     (server.hostHeader() != (String(myHostname) + ".local") && // arrived here by mDNS
-      server.hostHeader() != String(myHostname))) { // arrived here by local router DNS
+      (server.hostHeader() != (String(myHostname) + ".local") && // arrived here by mDNS
+       server.hostHeader() != String(myHostname))) { // arrived here by local router DNS
     String whereTo = String("http://") + server.client().localIP().toString();
     sendPortalRedirect(whereTo, F("Captive Portal Example"));
     return true;
@@ -178,8 +180,8 @@ void handleWifi() {
       sendIfOver(page);
     }
   } else {
-      page += FPSTR(configNoAPs);
-      sendIfOver(page);
+    page += FPSTR(configNoAPs);
+    sendIfOver(page);
   }
 
   page += FPSTR(configEnd);
@@ -217,3 +219,5 @@ void handleNotFound() {
   addNoCacheHeader();
   server.send(404, F("text/plain"), message);
 }
+
+#endif // LWIP_FEATURES && !LWIP_IPV6

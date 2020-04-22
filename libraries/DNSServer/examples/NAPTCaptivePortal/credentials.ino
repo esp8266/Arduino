@@ -1,3 +1,6 @@
+
+#if LWIP_FEATURES && !LWIP_IPV6
+
 /** Load WLAN credentials from EEPROM */
 void loadCredentials() {
   EEPROM.begin(512);
@@ -26,3 +29,5 @@ void saveCredentials() {
   EEPROM.commit();
   EEPROM.end();
 }
+
+#endif // LWIP_FEATURES && !LWIP_IPV6
