@@ -49,18 +49,15 @@ extern "C" {
 // Maximum delay between IRQs, 1Hz
 constexpr int32_t MAXIRQCCYS = microsecondsToClockCycles(1000000);
 // Maximum servicing time for any single IRQ
-constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(12);
+constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
-// The generator has a measurable time quantum for switching wave cycles during the same ISR invocation
-constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(11) / 10) >> 1 : (microsecondsToClockCycles(11) / 10);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+  microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
@@ -148,13 +145,6 @@ int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
 int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
   const auto periodCcys = highCcys + lowCcys;
-  // correct the upward bias for duty cycles shorter than generator quantum
-  if (highCcys <= QUANTUM / 2) {
-    highCcys = 0;
-  }
-  else if (lowCcys <= QUANTUM / 2) {
-    highCcys = periodCcys;
-  }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
     static_cast<int32_t>(periodCcys) <= 0 || highCcys > periodCcys) {
