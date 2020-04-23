@@ -67,7 +67,6 @@ OS-less SDK defines. Defines some headers for things that aren't in the include 
 the xthal stack frame struct.
 */
 #include "osapi.h"
-#include "user_interface.h"
 
 void _xtos_set_exception_handler(int cause, void (exhandler)(struct XTensa_exception_frame_s *frame));
 

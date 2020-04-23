@@ -133,7 +133,7 @@ unsigned long HardwareSerial::testBaudrate()
 unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
     esp8266::polledTimeout::oneShotFastMs timeOut(timeoutMillis);
-    unsigned long detectedBaudrate;
+    unsigned long detectedBaudrate = 0;
     while (!timeOut) {
         if ((detectedBaudrate = testBaudrate())) {
           break;

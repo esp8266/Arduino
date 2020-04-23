@@ -286,7 +286,7 @@ boards = collections.OrderedDict([
             'crystalfreq_menu',
             'flashmode_dout',
             'flashfreq_40',
-            '1M',
+            '1M', '2M',
             'led',
             ],
         'desc': [ 'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.',
@@ -863,21 +863,41 @@ boards = collections.OrderedDict([
             'More details at https://shop.makestro.com/product/espectrocore/',
         ],
     }),
+
+	( 'eduinowifi', {
+        'name': 'Schirmilabs Eduino WiFi',
+        'opts': {
+            '.build.board': 'ESP8266_SCHIRMILABS_EDUINO_WIFI',
+            '.build.variant': 'eduinowifi',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'serial': '512',
+        'desc': [ 'Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module',
+		          '',
+				  'Product page: https://schirmilabs.de/?page_id=165',
+				  ]
+
+    }),
     ( 'sonoff', {
         'name': 'ITEAD Sonoff',
         'opts': {
-            '.build.board': 'SONOFF_SV',
+            '.build.board': 'ESP8266_SONOFF_SV',
             '.build.variant': 'itead',
             '.build.extra_flags': '-DESP8266',
             '.build.flash_size': '1M',
             '.menu.BoardModel.sonoffSV': 'ITEAD Sonoff SV',
-            '.menu.BoardModel.sonoffSV.build.board': 'SONOFF_SV',
+            '.menu.BoardModel.sonoffSV.build.board': 'ESP8266_SONOFF_SV',
             '.menu.BoardModel.sonoffTH': 'ITEAD Sonoff TH',
-            '.menu.BoardModel.sonoffTH.build.board': 'SONOFF_TH',
+            '.menu.BoardModel.sonoffTH.build.board': 'ESP8266_SONOFF_TH',
             '.menu.BoardModel.sonoffBasic': 'ITEAD Sonoff Basic',
-            '.menu.BoardModel.sonoffBasic.build.board': 'SONOFF_BASIC',
+            '.menu.BoardModel.sonoffBasic.build.board': 'ESP8266_SONOFF_BASIC',
             '.menu.BoardModel.sonoffS20': 'ITEAD Sonoff S20',
-            '.menu.BoardModel.sonoffS20.build.board': 'SONOFF_S20',
+            '.menu.BoardModel.sonoffS20.build.board': 'ESP8266_SONOFF_S20',
              },
         'macro': [
             'resetmethod_none',
@@ -932,8 +952,10 @@ boards = collections.OrderedDict([
             'is a multi-chip package which contains ESP8266 and 1MB flash. ',
             '',
         ],
+
     })
-    ])
+	])
+    
 
 ################################################################
 
@@ -1043,7 +1065,7 @@ macros = {
     'resetmethod_nodtr_nosync': collections.OrderedDict([
         ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
-  
+
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1457,12 +1479,14 @@ def led (name, default, ledList):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
-                        ('.menu.sdk.nonosdk_191024.build.sdk', 'NONOSDK22x_191024'),
-                        ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
-                        ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
                         ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
                         ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
+                        ('.menu.sdk.nonosdk_191122', 'nonos-sdk 2.2.1+119 (191122)'),
+                        ('.menu.sdk.nonosdk_191122.build.sdk', 'NONOSDK22x_191122'),
+                        ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
+                        ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
+                        ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
+                        ('.menu.sdk.nonosdk_191024.build.sdk', 'NONOSDK22x_191024'),
                      #  ('.menu.sdk.nonosdk_190313', 'nonos-sdk 2.2.1+61 (190313 testing)'),
                      #  ('.menu.sdk.nonosdk_190313.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
@@ -1633,7 +1657,7 @@ def package ():
     # To get consistent indent/formatting read the JSON and write it out programattically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
-            filejson = json.loads(filestr, object_pairs_hook=collections.OrderedDict)
+            filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)
             package_file.write(json.dumps(filejson, indent=3, separators=(',',': ')))
         print("updated:   %s" % pkgfname)
     else:

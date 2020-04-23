@@ -204,6 +204,7 @@ void setup(void);
 void loop(void);
 
 void yield(void);
+
 void optimistic_yield(uint32_t interval_us);
 
 #define _PORT_GPIO16    1
@@ -275,11 +276,20 @@ long secureRandom(long);
 long secureRandom(long, long);
 long map(long, long, long, long, long);
 
+void setTZ(const char* tz);
+
 void configTime(int timezone, int daylightOffset_sec, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
 void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
+
+// esp32 api compatibility
+inline void configTzTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr)
+{
+    configTime(tz, server1, server2, server3);
+}
 
 #endif // __cplusplus
 
