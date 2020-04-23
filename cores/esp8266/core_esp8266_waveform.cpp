@@ -239,6 +239,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // we can avoid looking at the other pins.
   static int startPin = 0;
   static int endPin = 0;
+  static int nextPin = 0;
 
   const uint32_t isrStartCcy = ESP.getCycleCount();
 
@@ -272,8 +273,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       switch (wave.mode) {
       case WaveformMode::INIT:
         waveform.states &= ~(1UL << pin); // Clear the state of any just started
-        wave.nextPhaseCcy = (waveform.enabled & (1UL << wave.alignPhase)) ?
-          waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy : now;
+        if (waveform.enabled & (1UL << wave.alignPhase)) {
+          wave.nextPhaseCcy = waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy;
+        }
+        else {
+          wave.nextPhaseCcy = now;
+          // Immediately due, go straight to it. Also good for initial wave.
+          nextPin = pin;
+        }
         wave.nextEventCcy = wave.nextPhaseCcy;
         if (!wave.expiryCcy) {
           wave.mode = WaveformMode::INFINITE;
@@ -289,7 +296,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
     }
   }
-  int nextPin = startPin;
   while (busy) {
     nextTimerCcy = now + MAXIRQCCYS;
     int stopPin = nextPin;
