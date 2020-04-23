@@ -34,6 +34,7 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include "flash_quirks.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -333,6 +334,8 @@ extern "C" void user_init(void) {
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
+
+    experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
 
