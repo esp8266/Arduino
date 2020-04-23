@@ -371,6 +371,7 @@ void loop() {
 
 #else  // LWIP_FEATURES && !LWIP_IPV6
 
+#include <ESP8266WiFi.h>
 void setup() {
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
