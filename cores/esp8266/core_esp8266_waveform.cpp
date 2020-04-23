@@ -252,40 +252,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   if (!busy) {
     nextTimerCcy = now + MAXIRQCCYS;
   }
-  else {
-    for (int pin = startPin; pin <= endPin; ++pin) {
-      // If it's not on, ignore
-      if (!(waveform.enabled & (1UL << pin)))
-        continue;
-
-      Waveform& wave = waveform.pins[pin];
-
-      switch (wave.mode) {
-      case WaveformMode::INIT:
-        waveform.states &= ~(1UL << pin); // Clear the state of any just started
-        if (waveform.enabled & (1UL << wave.alignPhase)) {
-          wave.nextPhaseCcy = waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy;
-        }
-        else {
-          wave.nextPhaseCcy = now;
-          // Immediately due, go straight to it. Also good for initial wave.
-          nextPin = pin;
-        }
-        wave.nextEventCcy = wave.nextPhaseCcy;
-        if (!wave.expiryCcy) {
-          wave.mode = WaveformMode::INFINITE;
-          break;
-        }
-        // fall through
-      case WaveformMode::UPDATEEXPIRY:
-        wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
-        wave.mode = WaveformMode::EXPIRES;
-        break;
-      default:
-        break;
-      }
-    }
+  else if (!(waveform.enabled & (1UL << nextPin))) {
+    nextPin = startPin;
   }
+  bool initPins = true;
   while (busy) {
     nextTimerCcy = now + MAXIRQCCYS;
     int stopPin = nextPin;
@@ -296,6 +266,29 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         continue;
 
       Waveform& wave = waveform.pins[pin];
+
+      if (initPins) {
+        switch (wave.mode) {
+        case WaveformMode::INIT:
+          waveform.states &= ~(1UL << pin); // Clear the state of any just started
+          wave.nextPhaseCcy = (waveform.enabled & (1UL << wave.alignPhase)) ?
+            waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy : now;
+          wave.nextEventCcy = wave.nextPhaseCcy;
+          if (!wave.expiryCcy) {
+            wave.mode = WaveformMode::INFINITE;
+            break;
+          }
+          // fall through
+        case WaveformMode::UPDATEEXPIRY:
+          wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
+          wave.mode = WaveformMode::EXPIRES;
+          initPins = false; // only one pin per IRQ
+          break;
+        default:
+          break;
+        }
+      }
+
       const int32_t overshootCcys = now - wave.nextEventCcy;
       if (overshootCcys >= 0) {
         if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
@@ -370,6 +363,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
     } while ((pin = (pin < endPin) ? pin + 1 : startPin, pin != stopPin));
 
+    initPins = false;
     now = ESP.getCycleCount();
     const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
     busy = timerMarginCcys > 0;
