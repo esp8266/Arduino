@@ -161,6 +161,19 @@ TEST_CASE(TESTPRE "truncate", TESTPAT)
     REQUIRE( s == "some" );
 }
 
+TEST_CASE(TESTPRE "open(w+) truncates file", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    String s = readFile("/file1");
+    REQUIRE( s == "some text");
+    auto f = FSTYPE.open("/file1", "w+");
+    f.close();
+    String t = readFile("/file1");
+    REQUIRE( t == "");
+}
+
 #ifdef FS_HAS_DIRS
 
 #if FSTYPE != SDFS
