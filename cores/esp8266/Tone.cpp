@@ -34,7 +34,9 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t durat
     return;
   }
 
-  pinMode(_pin, OUTPUT);
+  if (!(_toneMap & 1UL << _pin)) {
+    pinMode(_pin, OUTPUT);
+  }
 
   high = std::max(high, (uint32_t)microsecondsToClockCycles(25));  // new 20KHz maximum tone frequency,
   low = std::max(low, (uint32_t)microsecondsToClockCycles(25));   // (25us high + 25us low period = 20KHz)
@@ -43,7 +45,7 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t durat
   duration += high + low - 1;
   duration -= duration % (high + low);
   if (startWaveformClockCycles(_pin, high, low, duration)) {
-    _toneMap |= 1 << _pin;
+    _toneMap |= 1UL << _pin;
   }
 }
 
@@ -86,6 +88,6 @@ void noTone(uint8_t _pin) {
     return;
   }
   stopWaveform(_pin);
-  _toneMap &= ~(1 << _pin);
+  _toneMap &= ~(1UL << _pin);
   digitalWrite(_pin, 0);
 }
