@@ -41,6 +41,10 @@ class LogicAnalyzer:
         listDutyCycle = []
         cnt = len(vals) - 1
     
+        # Find a 0 to start looking for 1st 0->1 edge
+        while (vals[x][col] != 0) and (x < cnt):
+            x = x + 1
+
         # Must start looking on a 0->1 to ensure full cycle sample start
         while (vals[x][col] == 0) and (x < cnt):
             x = x + 1
@@ -68,9 +72,19 @@ class LogicAnalyzer:
                     cycleCnt = cycleCnt + 1
         
         if cycleCnt == 0:
-            return 0, 0, 0, [], [], [], 0, 0
-    
-        return cycleCnt, totalPeriod / cycleCnt, totalHigh / totalPeriod, listPeriod, listHigh, listDutyCycle, statistics.stdev(listPeriod), statistics.stdev(listDutyCycle)
+            # This was a DC signal
+            cycleCnt = 1
+            totalPeriod = vals[cnt][0] - vals[0][0]
+            if vals[cnt][col]:
+                totalHigh = totalPeriod
+                listHigh = [ totalHigh ]
+            stdevPeriod = 0
+            stdevDuty = 0
+        else:
+            stdevPeriod = statistics.stdev(listPeriod)
+            stdevDuty = statistics.stdev(listDutyCycle)
+            
+        return cycleCnt, totalPeriod / cycleCnt, totalHigh / totalPeriod, listPeriod, listHigh, listDutyCycle, stdevPeriod, stdevDuty
 
 
 class ESP8266:

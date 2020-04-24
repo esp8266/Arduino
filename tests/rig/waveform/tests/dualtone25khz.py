@@ -17,7 +17,7 @@ print("IFO = " + str(sut.info()) )
 print("analogWriteFreq,analogWrite,Measured Cycles,Average Period,Average Duty Cycle,Period StdDev,Duty Cycle Stdev,Pin2 Average Period,Pin2 Average Duty Cycle,Pin2 Period StdDev,Pin2 Duty Cycle Stdev,CPU Slowdown Factor")
 for f in freqs:
     sut.analogWriteFreq(f)
-    for i in range(0, 1000, 10):
+    for i in range(0, 1001, 10):
         sut.analogWrite(5, i)
         sut.analogWrite(6, 1000-i)
         csv = la.capture(pins = 'D1,D2', samples = 120000, rate = '24mhz')
