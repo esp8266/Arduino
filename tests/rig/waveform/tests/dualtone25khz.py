@@ -1,24 +1,28 @@
 import sys
 sys.path.append("/Users/earle/Documents/Arduino/hardware/esp8266com/esp8266/tests/rig/waveform") # Add pyserial dir to search path
 
-from analyzer import WriteTest, Capture, DecodePWM
+import analyzer
 from time import sleep
 
-# Reset the chip
-WriteTest("z\n")
-sleep(5)
+sut = analyzer.ESP8266(port = 'COM6')
+la = analyzer.LogicAnalyzer()
 
-WriteTest("r 1000\n")
+sut.reset()
+idle = sut.perfTest()
+sut.analogWriteRange(1000)
 
-freqs = [ 25000 ]# 1000, 5000, 10000, 20000, 30000, 40000
-
-print("analogWriteFreq,analogWrite,Measured Cycles,Average Period,Average Duty Cycle,Period StdDev,Duty Cycle Stdev")
+freqs = [ 25000 ] # [ 1000, 5000, 10000, 20000, 30000, 40000 ]
+print("MHZ = " + str(sut.cpuMHz()) )
+print("IFO = " + str(sut.info()) )
+print("analogWriteFreq,analogWrite,Measured Cycles,Average Period,Average Duty Cycle,Period StdDev,Duty Cycle Stdev,Pin2 Average Period,Pin2 Average Duty Cycle,Pin2 Period StdDev,Pin2 Duty Cycle Stdev,CPU Slowdown Factor")
 for f in freqs:
-    WriteTest("f %d\n"%(f))
+    sut.analogWriteFreq(f)
     for i in range(0, 1000, 10):
-        WriteTest("a 5 %d\n"%(i))
-        WriteTest("a 6 %d\n"%(1000 - i))
-        csv = Capture(pins = 'D1', samples = 120000, samplerate = '24mhz', driver = 'fx2lafw')
-        cycleCnt, avgPeriod, avgDuty, periods, highs, duties, stdP, stdD = DecodePWM(csv)
-        print("%d,%d,%d,%.0f,%.4f,%.1f,%.4f"%(f, i, cycleCnt, avgPeriod, avgDuty, stdP, stdD))
+        sut.analogWrite(5, i)
+        sut.analogWrite(6, 1000-i)
+        csv = la.capture(pins = 'D1,D2', samples = 120000, rate = '24mhz')
+        cycleCnt, avgPeriod, avgDuty, periods, highs, duties, stdP, stdD = la.decodePWM(csv, 1)
+        cycleCnt2, avgPeriod2, avgDuty2, periods2, highs2, duties2, stdP2, stdD2 = la.decodePWM(csv, 2)
+        running = sut.perfTest()
+        print("%d,%d,%d,%.0f,%.4f,%.1f,%.4f,%.0f,%.4f,%.1f,%.4f,%.2f" % (f, i, cycleCnt, avgPeriod, avgDuty, stdP, stdD, avgPeriod2, avgDuty2, stdP2, stdD2,(running / idle)))
  
