@@ -47,7 +47,7 @@
 extern "C" {
 
 // Maximum delay between IRQs, 1Hz
-constexpr int32_t MAXIRQCCYS = microsecondsToClockCycles(1000000);
+constexpr int32_t MAXIRQCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // The SDK and hardware take some time to actually get to our NMI code, so
@@ -146,6 +146,14 @@ int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
 int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys, bool autoPwm) {
   uint32_t periodCcys = highCcys + lowCcys;
+  if (periodCcys < MAXIRQCCYS) {
+    if (!highCcys) {
+      periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
+    }
+    else if (!lowCcys) {
+      highCcys = periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
+    }
+  }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
     static_cast<int32_t>(periodCcys) <= 0 || highCcys > periodCcys) {
@@ -270,26 +278,26 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       Waveform& wave = waveform.pins[pin];
 
       if (initPins) {
-      switch (wave.mode) {
-      case WaveformMode::INIT:
-        waveform.states &= ~(1UL << pin); // Clear the state of any just started
+        switch (wave.mode) {
+        case WaveformMode::INIT:
+          waveform.states &= ~(1UL << pin); // Clear the state of any just started
           wave.nextPhaseCcy = (waveform.enabled & (1UL << wave.alignPhase)) ?
             waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy : now;
-        wave.nextEventCcy = wave.nextPhaseCcy;
-        if (!wave.expiryCcy) {
-          wave.mode = WaveformMode::INFINITE;
+          wave.nextEventCcy = wave.nextPhaseCcy;
+          if (!wave.expiryCcy) {
+            wave.mode = WaveformMode::INFINITE;
+            break;
+          }
+          // fall through
+        case WaveformMode::UPDATEEXPIRY:
+          wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
+          wave.mode = WaveformMode::EXPIRES;
+          initPins = false; // only one pin per IRQ
+          break;
+        default:
           break;
         }
-        // fall through
-      case WaveformMode::UPDATEEXPIRY:
-        wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
-        wave.mode = WaveformMode::EXPIRES;
-          initPins = false; // only one pin per IRQ
-        break;
-      default:
-        break;
       }
-    }
 
       int32_t overshootCcys = now - wave.nextEventCcy;
       if (overshootCcys >= 0) {
