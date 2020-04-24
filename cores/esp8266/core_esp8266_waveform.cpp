@@ -55,6 +55,9 @@ constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
+// The generator has a measurable time quantum for switching wave cycles during the same ISR invocation
+constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
+  (microsecondsToClockCycles(50) / 10) >> 1 : (microsecondsToClockCycles(50) / 10);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
@@ -144,7 +147,28 @@ int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
 // first, then it will immediately begin.
 int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
-  const auto periodCcys = highCcys + lowCcys;
+  uint32_t periodCcys = highCcys + lowCcys;
+  // correct period for cycles shorter than generator quantum
+  if (highCcys < QUANTUM) {
+    if (highCcys < QUANTUM / 2) {
+      highCcys = 0;
+      periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
+    }
+  	else {
+        highCcys *= 5;
+        periodCcys *= 5;
+    }
+  }
+  else if (lowCcys < QUANTUM) {
+    if (lowCcys < QUANTUM / 2) {
+      periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
+      highCcys = periodCcys;
+    }
+    else {
+      highCcys *= 5;
+      periodCcys *= 5;
+    }
+  }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
     static_cast<int32_t>(periodCcys) <= 0 || highCcys > periodCcys) {
@@ -268,26 +292,26 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       Waveform& wave = waveform.pins[pin];
 
       if (initPins) {
-        switch (wave.mode) {
-        case WaveformMode::INIT:
-          waveform.states &= ~(1UL << pin); // Clear the state of any just started
+      switch (wave.mode) {
+      case WaveformMode::INIT:
+        waveform.states &= ~(1UL << pin); // Clear the state of any just started
           wave.nextPhaseCcy = (waveform.enabled & (1UL << wave.alignPhase)) ?
             waveform.pins[wave.alignPhase].nextPhaseCcy + wave.nextPhaseCcy : now;
-          wave.nextEventCcy = wave.nextPhaseCcy;
-          if (!wave.expiryCcy) {
-            wave.mode = WaveformMode::INFINITE;
-            break;
-          }
-          // fall through
-        case WaveformMode::UPDATEEXPIRY:
-          wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
-          wave.mode = WaveformMode::EXPIRES;
-          initPins = false; // only one pin per IRQ
-          break;
-        default:
+        wave.nextEventCcy = wave.nextPhaseCcy;
+        if (!wave.expiryCcy) {
+          wave.mode = WaveformMode::INFINITE;
           break;
         }
+        // fall through
+      case WaveformMode::UPDATEEXPIRY:
+        wave.expiryCcy += wave.nextPhaseCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
+        wave.mode = WaveformMode::EXPIRES;
+          initPins = false; // only one pin per IRQ
+        break;
+      default:
+        break;
       }
+    }
 
       const int32_t overshootCcys = now - wave.nextEventCcy;
       if (overshootCcys >= 0) {
@@ -348,7 +372,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               }
               else
               {
-                wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + overshootCcys;
+              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + overshootCcys;
                 wave.nextPhaseCcy += wave.periodCcys;
               }
               if (pin == 16) {
