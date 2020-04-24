@@ -7,34 +7,34 @@ working for both SPIFFS, LittleFS and SDFS.
 This unified version is based on the previous examples named FSWebServer, FSBrowser and SDWebServer, Copyright (c) 2015 Hristo Gochkov. All rights reserved.
 
 ## How to use ?
-1. Uncomment one of the "#define USE_xxx" directives in the sketch
-2. Add the credentials of your WiFi network (search for "STASSID")
+1. Uncomment one of the `#define USE_xxx` directives in the sketch
+2. Add the credentials of your WiFi network (search for `STASSID`)
 3. Compile and upload the sketch to your ESP8266 device
-4. For normal use, copy the contents of the 'data' folder to the filesystem. To do so:
-- for SDFS, copy that contents to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
+4. For normal use, copy the contents of the `data` folder to the filesystem. To do so:
+- for SDFS, copy that contents (not the data folder itself, just its contents) to the root of a FAT/FAT32-formated SD card connected to the SPI port of the ESP8266
 - for SPIFFS or LittleFS, please follow the instructions at https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#uploading-files-to-file-system
 5. Once the data and sketch have been uploaded, access the editor by pointing your browser to http://fsbrowser.local/edit
 
 ## Options
-If you need to free some space on your filesystem, you can delete the sample files at the root but also the /edit/index.htm file, because the compressed version /edit/index.htm.gz will be used instead, for a total FS usage of less than 7KB.
-If you want to use the browser on a an existing filesystem and cannot thus execute step 4 above, you have two possibilities :
-- either upload the index.htm file to the filesystem by opening a command shell in the "data" folder and running the following cURL command:
+If you need to free some space on the ESP filesystem, you can delete all the sample files at the root but also replace the `index.htm` file in the `data/edit` subfolder by the `index.htm.gz` file from the `extras` folder. That compressed version is not suited for learning or debugging, but will bring the total FS usage under 7KB.
+If you want to use the browser on a an existing filesystem or don't want to perform step 4 above, you have two possibilities :
+- either upload the `index.htm` file to the filesystem by opening a command shell in the `data` folder and running the following cURL command:
 `curl -F file=@edit/index.htm;filename=/edit/index.htm fsbrowser.local/edit`
-- or embed a version of the gzipped index in the source code by uncommenting the line in the code and rebuilding
+- or embed a version of the html page in the source code itself by uncommenting the following line in the sketch and rebuilding:
 `#define INCLUDE_FALLBACK_INDEX_HTM`
-That version will be return if no "/edit/index.htm" or "/edit/index.htm.gz" file can be found on the filesystem.
+That embedded version is functionally equivalent and will be returned if no `/edit/index.htm` or `/edit/index.htm.gz` file can be found on the filesystem, at the cost of a larger compiled file.
 
-The files required for the previous options can be regenerated using the script "reduce_index.sh" located in the "extras" subfolder.
+To regenerate the files required for the previous options or understand how they are build, see the `reduce_index.sh` script located in the `extras` subfolder.
 
 ## Dependency
-The html page uses the ace.js text editor which is loaded from a CDN, so Internet access from your web browser is required for the FSBrowser editing feature to work as-is.
-If your browser has no web access (e.g. if you are connected to the ESP8266 as an access-point), you can upload ace.js (and dependancies) to the edit subfolder ESP filesystem.
-If the ace.js cannot be found on the local filesystem either, the page will default to a plain text viewer, with a warning message
+The html page uses the [ace.js](https://ace.c9.io/) text editor which is loaded from a CDN. Consequently, internet access from your web browser is required for the FSBrowser editing feature to work as-is.
+If your browser has no web access (e.g. if you are connected to the ESP8266 as an access-point), you can copy the `ace.js` file (and dependencies) to the `edit` subfolder of the ESP filesystem.
+If `ace.js` cannot be found on the ESP filesystem either, the page will default to a plain text viewer, with a warning message.
 
 ## Notes
 - See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems supported by the ESP8266.
-- For SDFS, if your card's CS pin is not connected the default pin (4), enable the "fileSystemConfig.setCSPin(chipSelectPin);" line, specifying the GPIO the CS pin is connected to
-- index.htm is the default index (works on subfolders as well)
+- For SDFS, if your card's CS pin is not connected the default pin (4), enable the `fileSystemConfig.setCSPin(chipSelectPin);` line, specifying the GPIO the CS pin is connected to
+- `index.htm` is the default index returned if your URL does not end with a filename (works on subfolders as well)
 - Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - see https://en.wikipedia.org/wiki/8.3_filename - SPIFFS and LittleFS also have limitations, please see https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
 - Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character.
 - The convention here is that the root of the filesystem is "/". On SPIFFS, paths not started with a slash are not supported

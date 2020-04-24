@@ -52,12 +52,5 @@ then
   exit -1
 fi
 
-mv index.htm.gz ../data/edit
-if [ $? -ne 0 ]
-then
-  echo "Error moving gzipped version back to data/edit"
-  exit -1
-fi
-
 echo Reduce complete.
 
