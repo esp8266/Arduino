@@ -291,8 +291,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
     }
 
-      const int32_t overshootCcys = now - wave.nextEventCcy;
+      int32_t overshootCcys = now - wave.nextEventCcy;
       if (overshootCcys >= 0) {
+        if (!wave.autoPwm) {
+          // for best effort hard timings
+          overshootCcys = 0;
+        }
         if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
           // Disable any waveforms that are done
           waveform.enabled ^= 1UL << pin;
@@ -305,10 +309,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           if (waveform.states & (1UL << pin)) {
             const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
             if (fwdPeriods) {
-              // for hard real time, like servos, this is unacceptable
-              if (!wave.autoPwm) {
-                panic();
-              }
               wave.nextPhaseCcy += fwdPeriods * wave.periodCcys;
             }
             if (!idleCcys) {
@@ -349,10 +349,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveform.states ^= 1UL << pin;
               if (fwdPeriods)
               {
-                // for hard real time, like servos, this is unacceptable
-                if (!wave.autoPwm) {
-                  panic();
-                }
                 const uint32_t fwdPeriodsCcys = fwdPeriods * wave.periodCcys;
                 // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
                 // plus dynamically scale frequency
