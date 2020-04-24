@@ -264,11 +264,12 @@ uint8_t EspClass::getBootMode(void)
     return system_get_boot_mode();
 }
 
+#ifndef F_CPU
 uint8_t EspClass::getCpuFreqMHz(void)
 {
     return system_get_cpu_freq();
 }
-
+#endif
 
 uint32_t EspClass::getFlashChipId(void)
 {
@@ -403,6 +404,8 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (64_kB);
 
         // Winbond
+        case 0x1840EF: // W25Q128
+            return (16_MB);
         case 0x1640EF: // W25Q32
             return (4_MB);
         case 0x1540EF: // W25Q16
@@ -421,6 +424,10 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (1_MB);
         case 0x1340E0: // BG25Q40
             return (512_kB);
+
+        // XMC - Wuhan Xinxin Semiconductor Manufacturing Corp
+        case 0x164020: // XM25QH32B
+            return (4_MB);
 
         default:
             return 0;
