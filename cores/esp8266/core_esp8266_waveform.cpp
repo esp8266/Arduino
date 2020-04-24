@@ -79,6 +79,7 @@ typedef struct {
   uint32_t expiryCcy;    // For time-limited waveform, the CPU clock cycle when this waveform must stop. If WaveformMode::UPDATE, temporarily holds relative ccy count
   WaveformMode mode;
   int8_t alignPhase;     // < 0 no phase alignment, otherwise starts waveform in relative phase offset to given pin
+  bool autoPwm;          // perform PWM duty to idle cycle ratio correction under high load at the expense of precise timings
 } Waveform;
 
 namespace {
@@ -133,17 +134,17 @@ void setTimer1Callback(uint32_t (*fn)()) {
 }
 
 int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
-  uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS) {
+  uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
   return startWaveformClockCycles(pin,
     microsecondsToClockCycles(highUS), microsecondsToClockCycles(lowUS),
-    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS));
+    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS), autoPwm);
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
 int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
-  uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
+  uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys, bool autoPwm) {
   uint32_t periodCcys = highCcys + lowCcys;
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
@@ -153,6 +154,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   Waveform& wave = waveform.pins[pin];
   wave.dutyCcys = highCcys;
   wave.periodCcys = periodCcys;
+  wave.autoPwm = autoPwm;
 
   if (!(waveform.enabled & (1UL << pin))) {
     // wave.nextPhaseCcy and wave.nextOffCcy are initialized by the ISR
@@ -303,6 +305,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           if (waveform.states & (1UL << pin)) {
             const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
             if (fwdPeriods) {
+              // for hard real time, like servos, this is unacceptable
+              if (!wave.autoPwm) {
+                panic();
+              }
               wave.nextPhaseCcy += fwdPeriods * wave.periodCcys;
             }
             if (!idleCcys) {
@@ -343,6 +349,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveform.states ^= 1UL << pin;
               if (fwdPeriods)
               {
+                // for hard real time, like servos, this is unacceptable
+                if (!wave.autoPwm) {
+                  panic();
+                }
                 const uint32_t fwdPeriodsCcys = fwdPeriods * wave.periodCcys;
                 // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
                 // plus dynamically scale frequency
@@ -354,7 +364,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               }
               else
               {
-              wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + overshootCcys;
+                wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys + overshootCcys;
                 wave.nextPhaseCcy += wave.periodCcys;
               }
               if (pin == 16) {
