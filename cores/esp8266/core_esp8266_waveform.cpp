@@ -405,9 +405,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       
       // PWM state machine implementation
       if (pwmState.cnt) {
-        uint32_t now =  GetCycleCountIRQ();
+        uint32_t now = GetCycleCountIRQ();
         int32_t cyclesToGo = pwmState.nextServiceCycle - now;
-        if (cyclesToGo <= 10) {
+        if (cyclesToGo < 0) {
             if (pwmState.idx == pwmState.cnt) { // Start of pulses, possibly copy new
                 if (pwmUpdate) {
                     // Do the memory copy from temp to global and clear mailbox
@@ -434,8 +434,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             // Preserve duty cycle over PWM period by using now+xxx instead of += delta
             pwmState.nextServiceCycle = now + pwmState.delta[pwmState.idx];
-            cyclesToGo = pwmState.nextServiceCycle - now;
-            if (cyclesToGo<0) cyclesToGo = 0;
+            cyclesToGo = pwmState.nextServiceCycle - now; // Guaranteed to be >= 0 always
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
       }
