@@ -55,9 +55,6 @@ constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
-// The generator has a measurable time quantum for switching wave cycles during the same ISR invocation
-constexpr uint32_t QUANTUM = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(50) / 10) >> 1 : (microsecondsToClockCycles(50) / 10);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
@@ -148,27 +145,6 @@ int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
 int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys) {
   uint32_t periodCcys = highCcys + lowCcys;
-  // correct period for cycles shorter than generator quantum
-  if (highCcys < QUANTUM) {
-    if (highCcys < QUANTUM / 2) {
-      highCcys = 0;
-      periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
-    }
-  	else {
-        highCcys *= 5;
-        periodCcys *= 5;
-    }
-  }
-  else if (lowCcys < QUANTUM) {
-    if (lowCcys < QUANTUM / 2) {
-      periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
-      highCcys = periodCcys;
-    }
-    else {
-      highCcys *= 5;
-      periodCcys *= 5;
-    }
-  }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
     static_cast<int32_t>(periodCcys) <= 0 || highCcys > periodCcys) {
@@ -341,7 +317,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else if (fwdPeriods) {
               // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
+              // plus dynamically scale frequency
               wave.nextOffCcy = wave.nextPhaseCcy - (fwdPeriods + 1) * idleCcys;
+              wave.dutyCcys *= 2;
+              wave.periodCcys *= 2;
               nextEdgeCcy = wave.nextOffCcy;
             }
             else {
@@ -366,9 +345,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               {
                 const uint32_t fwdPeriodsCcys = fwdPeriods * wave.periodCcys;
                 // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
+                // plus dynamically scale frequency
                 wave.nextOffCcy =
                   wave.nextPhaseCcy + fwdPeriods * wave.dutyCcys + (overshootCcys + wave.dutyCcys - fwdPeriodsCcys);
                 wave.nextPhaseCcy += fwdPeriodsCcys;
+                wave.dutyCcys *= 2;
+                wave.periodCcys *= 2;
               }
               else
               {
