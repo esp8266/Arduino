@@ -126,13 +126,7 @@ function ge(i) {
   return document.getElementById(i);
 }
 
-// apply focus - move to element and scroll into view
-function af(e) {
-  e.focus();
-  e.scrollIntoView();
-}
-
-// Password View
+// Toggle password view
 function pv() {
   let e = ge('p');
   if (e.type === 'password') {
@@ -140,23 +134,25 @@ function pv() {
   } else {
     e.type = 'password';
   }
-  af(e);
+  e.focus();
 }
 
 // Copy SSID value to input element for SSID
 // Move focus to password input element and clear
 function cs(i){
-  ge('s').value=i.innerText||i.textContent;
-  let j=ge('p');
-  j.value='';
-  af(j);
+  ge('s').value = i.innerText;
+  let e = ge('p');
+  e.type = 'password';
+  e.value = '';
+  e.focus();
+  e.scrollIntoView();
 }
 </script>
 <!--
 -->
 )EOF";
 #else
-static const char configHead2[] PROGMEM = R"EOF(<style>.left{text-align:left}.center{text-align:center}.right{text-align:right}@media screen and (orientation: portrait){#inner{display:block;margin:0 auto;max-width:400px;min-width:350px;text-align:left}#outer{width:100%}}@media screen and (orientation: landscape){#inner{display:block;margin:0 auto;width:400px;text-align:left}#outer{width:100%}}</style></head><body onload='ol()'> <script>function ge(i){return document.getElementById(i);} function af(e){e.focus();e.scrollIntoView();} function pv(){let e=ge('p');if(e.type==='password'){e.type='text';}else{e.type='password';} af(e);} function cs(i){ge('s').value=i.innerText||i.textContent;let j=ge('p');j.value='';af(j);}</script>)EOF";
+static const char configHead2[] PROGMEM = R"EOF(<style>.left{text-align:left}.center{text-align:center}.right{text-align:right}@media screen and (orientation: portrait){#inner{display:block;margin:0 auto;max-width:400px;min-width:350px;text-align:left}#outer{width:100%}}@media screen and (orientation: landscape){#inner{display:block;margin:0 auto;width:400px;text-align:left}#outer{width:100%}}</style></head><body onload='ol()'> <script>function ge(i){return document.getElementById(i);} function pv(){let e=ge('p');if(e.type==='password'){e.type='text';}else{e.type='password';} e.focus();} function cs(i){ge('s').value=i.innerText;let e=ge('p');e.type='password';e.value='';e.focus();e.scrollIntoView();}</script>)EOF";
 #endif
 
 #ifdef DEBUG_VIEW
