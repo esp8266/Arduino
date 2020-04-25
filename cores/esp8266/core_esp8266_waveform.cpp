@@ -310,31 +310,31 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           waveform.enabled ^= 1UL << pin;
         }
         else {
+          // get true accumulated overshoot
+          overshootCcys = now - ((waveform.states & (1UL << pin)) ? wave.nextOffCcy : wave.nextPhaseCcy);
           const uint32_t idleCcys = wave.periodCcys - wave.dutyCcys;
-          const uint32_t fwdPeriods = static_cast<uint32_t>(overshootCcys) >= idleCcys ?
+          uint32_t fwdPeriods = static_cast<uint32_t>(overshootCcys) >= idleCcys ?
             ((overshootCcys + wave.dutyCcys) / wave.periodCcys) : 0;
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
             const bool endOfPeriod = wave.nextPhaseCcy == wave.nextOffCcy;
-            if (fwdPeriods) {
-              wave.nextPhaseCcy += fwdPeriods * wave.periodCcys;
-            }
             if (!idleCcys) {
+              wave.nextPhaseCcy += (fwdPeriods + 1) * wave.periodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
               nextEdgeCcy = wave.nextPhaseCcy;
             }
             else if (endOfPeriod) {
               // preceeding period had zero idle cycle, continue direct into new duty cycle
+              wave.nextPhaseCcy += fwdPeriods * wave.periodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy + wave.dutyCcys;
               wave.nextPhaseCcy += wave.periodCcys;
               nextEdgeCcy = wave.nextOffCcy;
             }
             else if (fwdPeriods) {
               // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
-              // plus dynamically scale frequency
-              wave.nextOffCcy = wave.nextPhaseCcy - (fwdPeriods + 1) * idleCcys;
-              wave.dutyCcys *= 2;
-              wave.periodCcys *= 2;
+              fwdPeriods = (now + wave.periodCcys - wave.nextOffCcy) / wave.dutyCcys;
+              wave.nextOffCcy += fwdPeriods * wave.dutyCcys;
+              wave.nextPhaseCcy += fwdPeriods * wave.periodCcys;
               nextEdgeCcy = wave.nextOffCcy;
             }
             else {
@@ -350,21 +350,17 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           }
           else {
             if (!wave.dutyCcys) {
-              wave.nextPhaseCcy += wave.periodCcys + fwdPeriods * wave.periodCcys;
+              wave.nextPhaseCcy += (fwdPeriods + 1) * wave.periodCcys;
               wave.nextOffCcy = wave.nextPhaseCcy;
             }
             else {
               waveform.states ^= 1UL << pin;
               if (fwdPeriods)
               {
-                const uint32_t fwdPeriodsCcys = fwdPeriods * wave.periodCcys;
                 // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
-                // plus dynamically scale frequency
                 wave.nextOffCcy =
-                  wave.nextPhaseCcy + fwdPeriods * wave.dutyCcys + (overshootCcys + wave.dutyCcys - fwdPeriodsCcys);
-                wave.nextPhaseCcy += fwdPeriodsCcys;
-                wave.dutyCcys *= 2;
-                wave.periodCcys *= 2;
+                  wave.nextPhaseCcy + (1 * fwdPeriods + 1) * wave.dutyCcys + (overshootCcys + wave.dutyCcys - fwdPeriods * wave.periodCcys);
+                wave.nextPhaseCcy += (1 * fwdPeriods + 1) * wave.periodCcys;
               }
               else
               {
