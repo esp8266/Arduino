@@ -87,21 +87,6 @@
  * With this module active, postmortem stack dumps will be a little longer than
  * they need to be. The sys stack now ends at 0x3FFFFC00 instead of 0x3FFFFB0.
  *
- * Uh, there is a third stack ?? ctx: bearssl - I have not coded for this.
- * I'll leave this for later, as a possible future enhancement.
- * There are three possible stacks to hang in!?
- * Notes for later:
- *   * Stack is allocted with malloc - must be recovered before SDK init
- *     (umm_init() called on 1ST heap free call early in SDK init)
- *   * Function calls for addresses are pageable. Need to access pointers
- *     directly.
- *   * stackpaint is 0xdeadbeef
- *   * stack_thunk_save has reg a1.
- *   * stack_thunk_ptr malloc-ed address
- *   * use stack_thunk_refcnt to determine if present
- *   * malloc addresses are aligned 8 not 16
- *   * stack_thunk_top beginning of stack. Defined as stack_thunk_ptr + size -1
- *
  * Maybe an in/out ref count would be nice for bearssl and cont stacks.
  */
 
@@ -183,7 +168,7 @@
  * till FIFO empty loop. I now believe the lost greeting message after an
  * esptool firmware update, has to do with the transition period between the
  * tool performing hardware reset and exiting, then the serial monitor
- * re-ngaging. This is not an issue that needs to be addressed here.
+ * re-engaging. This is not an issue that needs to be addressed here.
  */
  // #define HWDT_PRINT_GREETING
 
@@ -334,7 +319,7 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
 #if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_VERIFY_HWDT_INFO)
 #define HWDT_STACK_DUMP_H
 
-typedef struct HWDT_INFO {
+typedef struct HWDT_INFO_S {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
@@ -1041,7 +1026,7 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
 }
 
 
-#if defined(HWDT_INFO)
+#if defined(HWDT_INFO) || defined(ROM_STACK_DUMP)
 void preinit(void) {
     /*
      * Fill the rom_stack while it is not actively being used.

@@ -1,7 +1,7 @@
 #if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_VERIFY_HWDT_INFO)
 #define HWDT_STACK_DUMP_H
 
-typedef struct HWDT_INFO {
+typedef struct HWDT_INFO_S {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
