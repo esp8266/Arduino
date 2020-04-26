@@ -45,10 +45,13 @@ then
   exit -1
 fi
 
-xxd -i index.htm.gz > index_htm.h
+echo 'This file is an embeddable version of the gzipped index.htm file.' > index_htm.h
+echo 'Please rerun the `reduce_index.sh` script located in the `extras` subfolder and recompile' >> index_htm.h
+echo 'the sketch after each change to the `index.html` file.' >> index_htm.h
+xxd -i index.htm.gz >> index_htm.h
 if [ $? -ne 0 ]
 then
-  echo "Error creating include file for index.htm"
+  echo "Error creating include file from index.htm.gz"
   exit -1
 fi
 

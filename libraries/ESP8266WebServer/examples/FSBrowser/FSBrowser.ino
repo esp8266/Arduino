@@ -43,6 +43,9 @@
 #include <ESP8266mDNS.h>
 #include <SPI.h>
 
+// Important : If you use the gzipped or `INCLUDE_FALLBACK_INDEX_HTM` options, please remember 
+// to rerun the `reduce_index.sh` script located in the `extras` subfolder and recompile 
+// the sketch after each change to the `index.html` file.
 #ifdef INCLUDE_FALLBACK_INDEX_HTM
 #include "extras/index_htm.h"
 #endif

@@ -24,7 +24,7 @@ If you want to use the browser on a an existing filesystem or don't want to perf
 `#define INCLUDE_FALLBACK_INDEX_HTM`
 That embedded version is functionally equivalent and will be returned if no `/edit/index.htm` or `/edit/index.htm.gz` file can be found on the filesystem, at the cost of a larger compiled file.
 
-To regenerate the files required for the previous options or understand how they are built, see the `reduce_index.sh` script located in the `extras` subfolder.
+If you use the gzipped or `INCLUDE_FALLBACK_INDEX_HTM` options, please remember to rerun the `reduce_index.sh` script located in the `extras` subfolder and recompile the sketch after each change to the `index.html` file.
 
 ## Dependency
 The html page uses the [Ace.js](https://ace.c9.io/) (v1.4.9 at the time of writing) text editor which is loaded from a CDN. Consequently, internet access from your web browser is required for the FSBrowser editing feature to work as-is.
