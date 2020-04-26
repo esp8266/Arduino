@@ -285,7 +285,7 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
 
 #ifdef DEBUG_HWDT_DEBUG
 /*
- * We have two copies of HWDT_INFO_t. Verify internal and external structures
+ * We have two copies of hwdt_info_t. Verify internal and external structures
  * match.
  *
  * This duplication is done so that in most cases, a simple/quick add one file
@@ -302,13 +302,14 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
  * Verify that the internal and external structure definitions match.
  */
 #ifdef HWDT_STACK_DUMP_H
-#define HWDT_INFO_t LOCAL_HWDT_INFO_t
-#define hwdt_info LOCAL_hwdt_info
+#define hwdt_info_t LOCAL_HWDT_INFO_T
+#define hwdt_info_ LOCAL_HWDT_INFO_
+#define hwdt_info LOCAL_HWDT_INFO
 #define HWDT_VERIFY_HWDT_INFO
 #endif
 
 /*
- * If you are using the HWDT_INFO_t structure, and are missing the include file.
+ * If you are using the hwdt_info_t structure, and are missing the include file.
  * Copy-paste the include block below into its respective filename.
  */
 
@@ -319,7 +320,7 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
 #if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_VERIFY_HWDT_INFO)
 #define HWDT_STACK_DUMP_H
 
-typedef struct HWDT_INFO_S {
+typedef struct hwdt_info_ {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
@@ -329,12 +330,12 @@ typedef struct HWDT_INFO_S {
     uint32_t reset_reason;
     uint32_t cont_integrity;
     bool g_pcont_valid;
-} HWDT_INFO_t;
+} hwdt_info_t;
 
 void enable_debug_hwdt_at_link_time(void);
 
 extern uint32_t *g_rom_stack;
-extern HWDT_INFO_t hwdt_info;
+extern hwdt_info_t hwdt_info;
 
 #endif
 /*____________________________________________________________________________*/
@@ -344,10 +345,11 @@ extern HWDT_INFO_t hwdt_info;
 
 
 #ifdef HWDT_VERIFY_HWDT_INFO
-#undef HWDT_INFO_t
+#undef hwdt_info_t
+#undef hwdt_info_
 #undef hwdt_info
 #undef HWDT_VERIFY_HWDT_INFO
-static_assert(sizeof(HWDT_INFO_t) == sizeof(LOCAL_HWDT_INFO_t), "Local and include verison of HWDT_INFO_t do not match.");
+static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and include verison of hwdt_info_t do not match.");
 #endif
 
 
@@ -394,7 +396,7 @@ constexpr uint32_t *sys_stack_first = (uint32_t *)((uintptr_t)cont_stack);
 
 uint32_t *g_rom_stack  __attribute__((section(".noinit")));
 size_t g_rom_stack_A16_sz  __attribute__((section(".noinit")));
-HWDT_INFO_t hwdt_info __attribute__((section(".noinit")));
+hwdt_info_t hwdt_info __attribute__((section(".noinit")));
 
 void enable_debug_hwdt_at_link_time(void) {
     /*
@@ -730,6 +732,12 @@ void adjust_uart_speed(uint32_t uart_divisor) {
      * displaying, received rubout characters should be discarded. At least that
      * was true 40 years ago.
      *
+     * EDIT: In today's world, it appears the rubout character is no longer
+     * discarded. However, I think we are better off using it since it allows
+     * for creating a deterministic last character that will not clear the
+     * screen or something worse. And it is simpler than the other option of
+     * calculating and waiting for a character time to pass.
+     *
      * These adjustments appear to resolve the lost data problem that occurs
      * when printing after a flash upload using esptool.
      */
@@ -749,6 +757,11 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
      * UART_CLK_FREQ is used in user_init, and ESP8266_CLOCK is used in
      * uart.h. Both are defined to be 80000000.
      */
+#if (1 < F_CRYSTAL)
+    constexpr uint32_t crystal_freq = F_CRYSTAL;
+#else
+    constexpr uint32_t crystal_freq = 26000000;
+#endif
     uint32_t master_freq = UART_CLK_FREQ;
     if (REASON_DEFAULT_RST       == hwdt_info.reset_reason ||
         REASON_EXT_SYS_RST       == hwdt_info.reset_reason ||
@@ -759,11 +772,6 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
          * running at 52MHz. Tweak UART speed here, so printing works. To avoid
          * confusion on exit, we later restore the divisor.
          */
-#if (1 < F_CRYSTAL)
-        constexpr uint32_t crystal_freq = F_CRYSTAL;
-#else
-        constexpr uint32_t crystal_freq = 26000000;
-#endif
         master_freq = crystal_freq * 2;
     }
 
@@ -772,7 +780,7 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
     if (UART_CLKDIV_MASK < new_uart_divisor ||
         2 > new_uart_divisor ||
         new_uart_divisor == uart_divisor) {
-        uart_divisor = 0;
+        uart_divisor = 0;   // used to indicate no change
 
     } else {
         adjust_uart_speed(new_uart_divisor);

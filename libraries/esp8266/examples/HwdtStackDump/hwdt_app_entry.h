@@ -1,7 +1,7 @@
 #if !defined(HWDT_STACK_DUMP_H) || defined(HWDT_VERIFY_HWDT_INFO)
 #define HWDT_STACK_DUMP_H
 
-typedef struct HWDT_INFO_S {
+typedef struct hwdt_info_ {
     uint32_t rom;
     uint32_t sys;
     uint32_t cont;
@@ -11,11 +11,11 @@ typedef struct HWDT_INFO_S {
     uint32_t reset_reason;
     uint32_t cont_integrity;
     bool g_pcont_valid;
-} HWDT_INFO_t;
+} hwdt_info_t;
 
 void enable_debug_hwdt_at_link_time(void);
 
 extern uint32_t *g_rom_stack;
-extern HWDT_INFO_t hwdt_info;
+extern hwdt_info_t hwdt_info;
 
 #endif
