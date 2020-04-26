@@ -357,7 +357,7 @@ bool handleFileRead(String path) {
    return the path of the closest parent still existing
 */
 String lastExistingParent(String path) {
-  while (path != "" && !fileSystem->exists(path)) {
+  while (!path.isEmpty() && !fileSystem->exists(path)) {
     if (path.lastIndexOf("/") > 0) {
       path = path.substring(0, path.lastIndexOf("/"));
     } else {
@@ -385,7 +385,7 @@ void handleFileCreate() {
   }
 
   String path = server.arg("path");
-  if (path == "") {
+  if (path.isEmpty()) {
     return returnFail("MISSING PATH ARG");
   }
 
@@ -403,7 +403,7 @@ void handleFileCreate() {
   }
 
   String src = server.arg("src");
-  if (src == "") {
+  if (src.isEmpty()) {
     // No source specified: creation
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path);
     if (path.endsWith("/")) {
@@ -492,7 +492,7 @@ void handleFileDelete() {
   }
 
   String path = server.arg(0);
-  if (path == "") {
+  if(path.isEmpty()) {
     return returnFail("BAD ARGS");
   }
 
