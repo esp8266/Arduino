@@ -3,10 +3,10 @@
 ## What is this sketch about ?
 
 This example is a FileSystem Browser for the ESP8266 using http requests and a html/javascript frontend, 
-working for both SPIFFS, LittleFS and SDFS.
+working for all of SPIFFS, LittleFS and SDFS.
 This unified version is based on the previous examples named FSWebServer, FSBrowser and SDWebServer, Copyright (c) 2015 Hristo Gochkov. All rights reserved.
 
-## How to use ?
+## How to use it ?
 1. Uncomment one of the `#define USE_xxx` directives in the sketch
 2. Add the credentials of your WiFi network (search for `STASSID`)
 3. Compile and upload the sketch to your ESP8266 device
@@ -22,7 +22,7 @@ If you want to use the browser on a an existing filesystem or don't want to perf
 `curl -F file=@edit/index.htm;filename=/edit/index.htm fsbrowser.local/edit`
 - or embed a version of the html page in the source code itself by uncommenting the following line in the sketch and rebuilding:
 `#define INCLUDE_FALLBACK_INDEX_HTM`
-That embedded version is functionally equivalent and will be returned if no `/edit/index.htm` or `/edit/index.htm.gz` file can be found on the filesystem, at the cost of a larger compiled file.
+That embedded version is functionally equivalent and will be returned if no `/edit/index.htm` or `/edit/index.htm.gz` file can be found on the filesystem, at the expense of a higher binary size.
 
 If you use the gzipped or `INCLUDE_FALLBACK_INDEX_HTM` options, please remember to rerun the `reduce_index.sh` script located in the `extras` subfolder and recompile the sketch after each change to the `index.html` file.
 
