@@ -24,16 +24,16 @@ If you want to use the browser on a an existing filesystem or don't want to perf
 `#define INCLUDE_FALLBACK_INDEX_HTM`
 That embedded version is functionally equivalent and will be returned if no `/edit/index.htm` or `/edit/index.htm.gz` file can be found on the filesystem, at the cost of a larger compiled file.
 
-To regenerate the files required for the previous options or understand how they are build, see the `reduce_index.sh` script located in the `extras` subfolder.
+To regenerate the files required for the previous options or understand how they are built, see the `reduce_index.sh` script located in the `extras` subfolder.
 
 ## Dependency
-The html page uses the [ace.js](https://ace.c9.io/) text editor which is loaded from a CDN. Consequently, internet access from your web browser is required for the FSBrowser editing feature to work as-is.
-If your browser has no web access (e.g. if you are connected to the ESP8266 as an access-point), you can copy the `ace.js` file (and dependencies) to the `edit` subfolder of the ESP filesystem.
+The html page uses the [Ace.js](https://ace.c9.io/) (v1.4.9 at the time of writing) text editor which is loaded from a CDN. Consequently, internet access from your web browser is required for the FSBrowser editing feature to work as-is.
+If your browser has no web access (e.g. if you are connected to the ESP8266 as an access-point), you can copy the `ace.js` file to the `edit` subfolder of the ESP filesystem, as well as optional themes, plugins etc. according to your needs (see https://github.com/ajaxorg/ace-builds for a full list).
 If `ace.js` cannot be found on the ESP filesystem either, the page will default to a plain text viewer, with a warning message.
 
 ## Notes
 - See https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html for more information on FileSystems supported by the ESP8266.
-- For SDFS, if your card's CS pin is not connected the default pin (4), enable the `fileSystemConfig.setCSPin(chipSelectPin);` line, specifying the GPIO the CS pin is connected to
+- For SDFS, if your card's CS pin is not connected to the default pin (4), uncomment the `fileSystemConfig.setCSPin(chipSelectPin);` line, specifying the GPIO the CS pin is connected to
 - `index.htm` is the default index returned if your URL does not end with a filename (works on subfolders as well)
 - Filesystem limitations apply. For example, FAT16 is limited to 8.3 filenames - see https://en.wikipedia.org/wiki/8.3_filename - SPIFFS and LittleFS also have limitations, please see https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html#spiffs-file-system-limitations
 - Directories are supported on SDFS and LittleFS. On SPIFFS, all files are at the root, although their names may contain the "/" character.
@@ -114,6 +114,7 @@ These tests are a checklist of operations to verify the FSBrowser behaviour.
 - Create nested file '/My folder/My test file.txt' and delete file 'My test file.txt' 
 
 ## Credits
+- Original version of FSBrowser written by me-no-dev, contributions over time by various contributors
 - Icons are from https://feathericons.com/ . The resulting PNG is passed first through https://compresspng.com/ before being converted to base64 using https://www.base64-image.de/
 - The spinner is based on https://github.com/jlong/css-spinners
 - Minifiying of index.htm is done using the command line version of https://kangax.github.io/html-minifier/
