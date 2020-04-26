@@ -224,7 +224,7 @@ void handleStatus() {
   FSInfo fs_info;
   String json;
   json.reserve(128);
-  
+
   json = "{\"type\":\"";
   json += fsName;
   json += "\", \"isOk\":";
@@ -241,7 +241,7 @@ void handleStatus() {
   json += ",\"unsupportedFiles\":\"";
   json += unsupportedFiles;
   json += "\"}";
-  
+
   server.send(200, "application/json", json);
 }
 
@@ -498,7 +498,7 @@ void handleFileDelete() {
   }
 
   String path = server.arg(0);
-  if(path.isEmpty() || path == "/") {
+  if (path.isEmpty() || path == "/") {
     return replyBadRequest("BAD PATH");
   }
 
