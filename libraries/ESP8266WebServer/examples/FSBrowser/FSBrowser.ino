@@ -554,24 +554,29 @@ void handleNotFound() {
   if (!fsOK) {
     return returnFail("FS INIT ERROR");
   }
+
   String uri = urlDecode(server.uri());
-  if (!handleFileRead(uri)) {
-    // Dump debug data
-    String message = "Error: File not found\n\n";
-    message += "URI: ";
-    message += uri;
-    message += "\nMethod: ";
-    message += (server.method() == HTTP_GET) ? "GET" : "POST";
-    message += "\nArguments: ";
-    message += server.args();
-    message += '\n';
-    for (uint8_t i = 0; i < server.args(); i++) {
-      message += String(" NAME:") + server.argName(i) + "\n VALUE:" + server.arg(i) + '\n';
-    }
-    message += String("path=") + server.arg("path") + '\n';
-    DBG_OUTPUT_PORT.print(message);
-    return returnNotFound(message);
+
+  if (handleFileRead(uri)) {
+    return;
   }
+
+  // Dump debug data
+  String message = "Error: File not found\n\n";
+  message += "URI: ";
+  message += uri;
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += '\n';
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += String(" NAME:") + server.argName(i) + "\n VALUE:" + server.arg(i) + '\n';
+  }
+  message += String("path=") + server.arg("path") + '\n';
+  DBG_OUTPUT_PORT.print(message);
+
+  return returnNotFound(message);
 }
 
 /*
@@ -581,14 +586,17 @@ void handleNotFound() {
    Otherwise, fails with a 404 page with debug information
 */
 void handleGetEdit() {
-  if (!handleFileRead("/edit/index.htm")) {
-#ifdef INCLUDE_FALLBACK_INDEX_HTM
-    server.sendHeader("Content-Encoding", "gzip");
-    server.send(200, "text/html", index_htm_gz, index_htm_gz_len);
-#else
-    returnNotFound("FileNotFound");
-#endif
+  if (handleFileRead("/edit/index.htm")) {
+    return;
   }
+
+#ifdef INCLUDE_FALLBACK_INDEX_HTM
+  server.sendHeader("Content-Encoding", "gzip");
+  server.send(200, "text/html", index_htm_gz, index_htm_gz_len);
+#else
+  returnNotFound("FileNotFound");
+#endif
+
 }
 
 void setup(void) {
