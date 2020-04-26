@@ -318,9 +318,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           }
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
-          	// up to and including this period 100% duty
+            // up to and including this period 100% duty
             const bool endOfPeriod = wave.nextPeriodCcy == wave.endDutyCcy;
-          	// active configuration and forward 100% duty
+            // active configuration and forward 100% duty
             if (!idleCcys) {
               wave.nextPeriodCcy += (fwdPeriods + 1) * wave.periodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
@@ -333,15 +333,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += wave.periodCcys;
               nextEdgeCcy = wave.endDutyCcy;
             }
-            else if (fwdPeriods) {
-              // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
-              fwdPeriods = (overshootCcys + wave.periodCcys) / wave.dutyCcys;
-              wave.endDutyCcy += fwdPeriods * wave.dutyCcys;
-              wave.nextPeriodCcy += fwdPeriods * wave.periodCcys;
-              nextEdgeCcy = wave.endDutyCcy;
-            }
             else {
               waveform.states ^= 1UL << pin;
+              // the idle cycle code updating for the next period will approximate the duty/idle ratio.
               nextEdgeCcy = wave.nextPeriodCcy + overshootCcys;
               if (pin == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
@@ -360,7 +354,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveform.states ^= 1UL << pin;
               if (fwdPeriods)
               {
-                // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by skipPeriods
+                // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
                 wave.endDutyCcy =
                   wave.nextPeriodCcy + (fwdPeriods + 1) * wave.dutyCcys +
                   (overshootCcys + wave.dutyCcys - fwdPeriods * wave.periodCcys);
