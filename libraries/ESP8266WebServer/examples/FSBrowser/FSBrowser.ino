@@ -568,7 +568,9 @@ void handleNotFound() {
   }
 
   // Dump debug data
-  String message = "Error: File not found\n\n";
+  String message;
+  message.reserve(100);
+  message = "Error: File not found\n\n";
   message += "URI: ";
   message += uri;
   message += "\nMethod: ";
@@ -577,9 +579,15 @@ void handleNotFound() {
   message += server.args();
   message += '\n';
   for (uint8_t i = 0; i < server.args(); i++) {
-    message += String(" NAME:") + server.argName(i) + "\n VALUE:" + server.arg(i) + '\n';
+    message += " NAME:";
+    message += server.argName(i);
+    message += "\n VALUE:";
+    message += server.arg(i);
+    message += '\n';
   }
-  message += String("path=") + server.arg("path") + '\n';
+  message += "path=";
+  message += server.arg("path");
+  message += '\n';
   DBG_OUTPUT_PORT.print(message);
 
   return replyNotFound(message);
