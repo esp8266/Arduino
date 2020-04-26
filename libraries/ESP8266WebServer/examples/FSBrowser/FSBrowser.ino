@@ -150,7 +150,7 @@ String getContentType(String filename) {
   return "text/plain";
 }
 
-unsigned char h2int(char c) {
+unsigned char hexDigitToInt(char c) {
   if (c >= '0' && c <= '9') {
     return ((unsigned char)c - '0');
   }
@@ -177,7 +177,7 @@ String urlDecode(String str) {
       code0 = str.charAt(i);
       i++;
       code1 = str.charAt(i);
-      c = (h2int(code0) << 4) | h2int(code1);
+      c = (hexDigitToInt(code0) << 4) | hexDigitToInt(code1);
       decodedString += c;
     } else {
       decodedString += c;
