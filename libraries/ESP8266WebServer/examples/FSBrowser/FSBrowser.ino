@@ -43,9 +43,6 @@
 #include <ESP8266mDNS.h>
 #include <SPI.h>
 
-// Important : If you use the gzipped or `INCLUDE_FALLBACK_INDEX_HTM` options, please remember 
-// to rerun the `reduce_index.sh` script located in the `extras` subfolder and recompile 
-// the sketch after each change to the `index.html` file.
 #ifdef INCLUDE_FALLBACK_INDEX_HTM
 #include "extras/index_htm.h"
 #endif
@@ -105,7 +102,12 @@ void replyNotFound(String msg) {
   server.send(404, "text/plain", msg);
 }
 
-void replyFail(String msg) {
+void replyBadRequest(String msg) {
+  DBG_OUTPUT_PORT.println(msg);
+  server.send(400, "text/plain", msg + "\r\n");
+}
+
+void replyServerError(String msg) {
   DBG_OUTPUT_PORT.println(msg);
   server.send(500, "text/plain", msg + "\r\n");
 }
@@ -250,16 +252,16 @@ void handleStatus() {
 */
 void handleFileList() {
   if (!fsOK) {
-    return replyFail("FS INIT ERROR");
+    return replyServerError("FS INIT ERROR");
   }
 
   if (!server.hasArg("dir")) {
-    return replyFail("BAD ARGS");
+    return replyBadRequest("BAD ARGS");
   }
 
   String path = urlDecode(server.arg("dir"));
   if (path != "/" && !fileSystem->exists(path)) {
-    return replyFail("BAD PATH");
+    return replyBadRequest("BAD PATH");
   }
 
   DBG_OUTPUT_PORT.println(String("handleFileList: ") + path);
@@ -324,7 +326,7 @@ void handleFileList() {
 bool handleFileRead(String path) {
   DBG_OUTPUT_PORT.println(String("handleFileRead: ") + path);
   if (!fsOK) {
-    replyFail("FS INIT ERROR");
+    replyServerError("FS INIT ERROR");
     return true;
   }
 
@@ -385,25 +387,25 @@ String lastExistingParent(String path) {
 */
 void handleFileCreate() {
   if (!fsOK) {
-    return replyFail("FS INIT ERROR");
+    return replyServerError("FS INIT ERROR");
   }
 
   String path = server.arg("path");
   if (path.isEmpty()) {
-    return replyFail("MISSING PATH ARG");
+    return replyBadRequest("MISSING PATH ARG");
   }
 
 #ifdef USE_SPIFFS
   if (checkForUnsupportedPath(path).length() > 0) {
-    return replyFail("INVALID FILENAME");
+    return replyServerError("INVALID FILENAME");
   }
 #endif
 
   if (path == "/") {
-    return replyFail("BAD PATH");
+    return replyBadRequest("BAD PATH");
   }
   if (fileSystem->exists(path)) {
-    return replyFail("PATH FILE EXISTS");
+    return replyBadRequest("PATH FILE EXISTS");
   }
 
   String src = server.arg("src");
@@ -414,7 +416,7 @@ void handleFileCreate() {
       // Create a folder
       path.remove(path.length() - 1);
       if (!fileSystem->mkdir(path)) {
-        return replyFail("MKDIR FAILED");
+        return replyServerError("MKDIR FAILED");
       }
     } else {
       // Create a file
@@ -423,7 +425,7 @@ void handleFileCreate() {
         file.write((const char *)0);
         file.close();
       } else {
-        return replyFail("CREATE FAILED");
+        return replyServerError("CREATE FAILED");
       }
     }
     if (path.lastIndexOf('/') > -1) {
@@ -433,10 +435,10 @@ void handleFileCreate() {
   } else {
     // Source specified: rename
     if (src == "/") {
-      return replyFail("BAD SRC");
+      return replyBadRequest("BAD SRC");
     }
     if (!fileSystem->exists(src)) {
-      return replyFail("SRC FILE NOT FOUND");
+      return replyBadRequest("SRC FILE NOT FOUND");
     }
 
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path + " from " + src);
@@ -448,7 +450,7 @@ void handleFileCreate() {
       src.remove(src.length() - 1);
     }
     if (!fileSystem->rename(src, path)) {
-      return replyFail("RENAME FAILED");
+      return replyServerError("RENAME FAILED");
     }
     replyOKWithMsg(lastExistingParent(src));
   }
@@ -492,17 +494,17 @@ void deleteRecursive(String path) {
 */
 void handleFileDelete() {
   if (!fsOK) {
-    return replyFail("FS INIT ERROR");
+    return replyServerError("FS INIT ERROR");
   }
 
   String path = server.arg(0);
-  if(path.isEmpty()) {
-    return replyFail("BAD ARGS");
+  if(path.isEmpty() || path == "/") {
+    return replyBadRequest("BAD PATH");
   }
 
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
-  if (path == "/" || !fileSystem->exists(path)) {
-    return replyFail("BAD PATH");
+  if (!fileSystem->exists(path)) {
+    return replyNotFound("FileNotFound");
   }
   deleteRecursive(path);
 
@@ -514,7 +516,7 @@ void handleFileDelete() {
 */
 void handleFileUpload() {
   if (!fsOK) {
-    return replyFail("FS INIT ERROR");
+    return replyServerError("FS INIT ERROR");
   }
   if (server.uri() != "/edit") {
     return;
@@ -529,14 +531,14 @@ void handleFileUpload() {
     DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
     if (!uploadFile) {
-      return replyFail("CREATE FAILED");
+      return replyServerError("CREATE FAILED");
     }
     DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
       size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
       if (bytesWritten != upload.currentSize) {
-        return replyFail("WRITE FAILED");
+        return replyServerError("WRITE FAILED");
       }
     }
     DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
@@ -556,7 +558,7 @@ void handleFileUpload() {
 */
 void handleNotFound() {
   if (!fsOK) {
-    return replyFail("FS INIT ERROR");
+    return replyServerError("FS INIT ERROR");
   }
 
   String uri = urlDecode(server.uri());
