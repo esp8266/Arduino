@@ -216,16 +216,26 @@ String getFileError(String path) {
 void handleStatus() {
   DBG_OUTPUT_PORT.println("handleStatus");
   FSInfo fs_info;
-  String json = String("{\"type\":\"") + fsName + "\", \"isOk\":";
-
+  String json;
+  json.reserve(128);
+  
+  json = "{\"type\":\"";
+  json += fsName;
+  json += "\", \"isOk\":";
   if (fsOK) {
     fileSystem->info(fs_info);
-    json += String("\"true\", \"totalBytes\":\"") + fs_info.totalBytes + "\", \"usedBytes\":\""  + fs_info.usedBytes + "\"";
+    json += "\"true\", \"totalBytes\":\"";
+    json += fs_info.totalBytes;
+    json += "\", \"usedBytes\":\"";
+    json += fs_info.usedBytes;
+    json += "\"";
   } else {
     json += "\"false\"";
   }
-  json += String(",\"unsupportedFiles\":\"") + unsupportedFiles + "\"";
-  json += "}";
+  json += ",\"unsupportedFiles\":\"";
+  json += unsupportedFiles;
+  json += "\"}";
+  
   server.send(200, "application/json", json);
 }
 
@@ -282,7 +292,8 @@ void handleFileList() {
     if (dir.isDirectory()) {
       output += "dir";
     } else {
-      output += String("file\",\"size\":\"") + dir.fileSize();
+      output += "file\",\"size\":\"";
+      output += dir.fileSize();
     }
 
     output += "\",\"name\":\"";
