@@ -301,10 +301,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       int32_t overshootCcys = now - wave.nextEventCcy;
       if (overshootCcys >= 0) {
-        if (!wave.autoPwm) {
-          // for best effort hard timings
-          overshootCcys = 0;
-        }
         if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
           // Disable any waveforms that are done
           waveform.enabled ^= 1UL << pin;
@@ -315,6 +311,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           const uint32_t idleCcys = wave.periodCcys - wave.dutyCcys;
           uint32_t fwdPeriods = static_cast<uint32_t>(overshootCcys) >= idleCcys ?
             ((overshootCcys + wave.dutyCcys) / wave.periodCcys) : 0;
+          if (fwdPeriods && !wave.autoPwm) {
+              // for best effort hard timings - allow only limited duty cycle floating
+              fwdPeriods = 0;
+              overshootCcys = 0;
+          }
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
           	// up to and including this period 100% duty
