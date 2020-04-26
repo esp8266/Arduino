@@ -187,24 +187,25 @@ String urlDecode(String str) {
   return decodedString;
 }
 
-
+#ifdef USE_SPIFFS
 /*
-   Checks filename for unsupported combinations
+   Checks filename for character combinations that are not supported by FSBrowser (alhtough valid on SPIFFS).
    Returns an empty String if supported, or detail of error(s) if unsupported
 */
-String getFileError(String path) {
+String checkForUnsupportedPath(String filename) {
   String error = String();
-  if (!path.startsWith("/")) {
+  if (!filename.startsWith("/")) {
     error += "!NO_LEADING_SLASH! ";
   }
-  if (path.indexOf("//") != -1) {
+  if (filename.indexOf("//") != -1) {
     error += "!DOUBLE_SLASH! ";
   }
-  if (path.endsWith("/")) {
+  if (filename.endsWith("/")) {
     error += "!TRAILING_SLASH! ";
   }
   return error;
 }
+#endif
 
 
 ////////////////////////////////
@@ -273,7 +274,7 @@ void handleFileList() {
   output.reserve(64);
   while (dir.next()) {
 #ifdef USE_SPIFFS
-    String error = getFileError(dir.fileName());
+    String error = checkForUnsupportedPath(dir.fileName());
     if (error.length() > 0) {
       DBG_OUTPUT_PORT.println(String("Ignoring ") + error + dir.fileName());
       continue;
@@ -390,7 +391,7 @@ void handleFileCreate() {
   }
 
 #ifdef USE_SPIFFS
-  if (getFileError(path).length() > 0) {
+  if (checkForUnsupportedPath(path).length() > 0) {
     return replyFail("INVALID FILENAME");
   }
 #endif
@@ -619,7 +620,7 @@ void setup(void) {
   Dir dir = fileSystem->openDir("");
   DBG_OUTPUT_PORT.println("List of files at root of filesystem:");
   while (dir.next()) {
-    String error = getFileError(dir.fileName());
+    String error = checkForUnsupportedPath(dir.fileName());
     String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
     DBG_OUTPUT_PORT.println(error + fileInfo);
     if (error.length() > 0) {
