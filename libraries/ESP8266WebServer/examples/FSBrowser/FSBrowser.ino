@@ -260,7 +260,7 @@ void handleFileList() {
 
   DBG_OUTPUT_PORT.println(String("handleFileList: ") + path);
   Dir dir = fileSystem->openDir(path);
-  path = String();
+  path.clear();
 
   // use HTTP/1.1 Chunked response to avoid building a huge temporary string
   if (!server.chunkedResponseModeStart(200, "text/json")) {
