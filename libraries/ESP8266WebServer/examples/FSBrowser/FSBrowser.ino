@@ -90,19 +90,19 @@ File uploadFile;
 ////////////////////////////////
 // Utils to return HTTP codes, determine content-type and URLdecode params of GET method
 
-void returnOK() {
+void replyOK() {
   server.send(200, "text/plain", "");
 }
 
-void returnOKWithMsg(String msg) {
+void replyOKWithMsg(String msg) {
   server.send(200, "text/plain", msg);
 }
 
-void returnNotFound(String msg) {
+void replyNotFound(String msg) {
   server.send(404, "text/plain", msg);
 }
 
-void returnFail(String msg) {
+void replyFail(String msg) {
   DBG_OUTPUT_PORT.println(msg);
   server.send(500, "text/plain", msg + "\r\n");
 }
@@ -246,16 +246,16 @@ void handleStatus() {
 */
 void handleFileList() {
   if (!fsOK) {
-    return returnFail("FS INIT ERROR");
+    return replyFail("FS INIT ERROR");
   }
 
   if (!server.hasArg("dir")) {
-    return returnFail("BAD ARGS");
+    return replyFail("BAD ARGS");
   }
 
   String path = urlDecode(server.arg("dir"));
   if (path != "/" && !fileSystem->exists(path)) {
-    return returnFail("BAD PATH");
+    return replyFail("BAD PATH");
   }
 
   DBG_OUTPUT_PORT.println(String("handleFileList: ") + path);
@@ -320,7 +320,7 @@ void handleFileList() {
 bool handleFileRead(String path) {
   DBG_OUTPUT_PORT.println(String("handleFileRead: ") + path);
   if (!fsOK) {
-    returnFail("FS INIT ERROR");
+    replyFail("FS INIT ERROR");
     return true;
   }
 
@@ -381,25 +381,25 @@ String lastExistingParent(String path) {
 */
 void handleFileCreate() {
   if (!fsOK) {
-    return returnFail("FS INIT ERROR");
+    return replyFail("FS INIT ERROR");
   }
 
   String path = server.arg("path");
   if (path.isEmpty()) {
-    return returnFail("MISSING PATH ARG");
+    return replyFail("MISSING PATH ARG");
   }
 
 #ifdef USE_SPIFFS
   if (getFileError(path).length() > 0) {
-    return returnFail("INVALID FILENAME");
+    return replyFail("INVALID FILENAME");
   }
 #endif
 
   if (path == "/") {
-    return returnFail("BAD PATH");
+    return replyFail("BAD PATH");
   }
   if (fileSystem->exists(path)) {
-    return returnFail("PATH FILE EXISTS");
+    return replyFail("PATH FILE EXISTS");
   }
 
   String src = server.arg("src");
@@ -410,7 +410,7 @@ void handleFileCreate() {
       // Create a folder
       path.remove(path.length() - 1);
       if (!fileSystem->mkdir(path)) {
-        return returnFail("MKDIR FAILED");
+        return replyFail("MKDIR FAILED");
       }
     } else {
       // Create a file
@@ -419,20 +419,20 @@ void handleFileCreate() {
         file.write((const char *)0);
         file.close();
       } else {
-        return returnFail("CREATE FAILED");
+        return replyFail("CREATE FAILED");
       }
     }
     if (path.lastIndexOf('/') > -1) {
       path = path.substring(0, path.lastIndexOf('/'));
     }
-    returnOKWithMsg(path);
+    replyOKWithMsg(path);
   } else {
     // Source specified: rename
     if (src == "/") {
-      return returnFail("BAD SRC");
+      return replyFail("BAD SRC");
     }
     if (!fileSystem->exists(src)) {
-      return returnFail("SRC FILE NOT FOUND");
+      return replyFail("SRC FILE NOT FOUND");
     }
 
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path + " from " + src);
@@ -444,9 +444,9 @@ void handleFileCreate() {
       src.remove(src.length() - 1);
     }
     if (!fileSystem->rename(src, path)) {
-      return returnFail("RENAME FAILED");
+      return replyFail("RENAME FAILED");
     }
-    returnOKWithMsg(lastExistingParent(src));
+    replyOKWithMsg(lastExistingParent(src));
   }
 }
 
@@ -488,21 +488,21 @@ void deleteRecursive(String path) {
 */
 void handleFileDelete() {
   if (!fsOK) {
-    return returnFail("FS INIT ERROR");
+    return replyFail("FS INIT ERROR");
   }
 
   String path = server.arg(0);
   if(path.isEmpty()) {
-    return returnFail("BAD ARGS");
+    return replyFail("BAD ARGS");
   }
 
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
   if (path == "/" || !fileSystem->exists(path)) {
-    return returnFail("BAD PATH");
+    return replyFail("BAD PATH");
   }
   deleteRecursive(path);
 
-  returnOKWithMsg(lastExistingParent(path));
+  replyOKWithMsg(lastExistingParent(path));
 }
 
 /*
@@ -510,7 +510,7 @@ void handleFileDelete() {
 */
 void handleFileUpload() {
   if (!fsOK) {
-    return returnFail("FS INIT ERROR");
+    return replyFail("FS INIT ERROR");
   }
   if (server.uri() != "/edit") {
     return;
@@ -525,14 +525,14 @@ void handleFileUpload() {
     DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
     if (!uploadFile) {
-      return returnFail("CREATE FAILED");
+      return replyFail("CREATE FAILED");
     }
     DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
       size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
       if (bytesWritten != upload.currentSize) {
-        return returnFail("WRITE FAILED");
+        return replyFail("WRITE FAILED");
       }
     }
     DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
@@ -552,7 +552,7 @@ void handleFileUpload() {
 */
 void handleNotFound() {
   if (!fsOK) {
-    return returnFail("FS INIT ERROR");
+    return replyFail("FS INIT ERROR");
   }
 
   String uri = urlDecode(server.uri());
@@ -576,7 +576,7 @@ void handleNotFound() {
   message += String("path=") + server.arg("path") + '\n';
   DBG_OUTPUT_PORT.print(message);
 
-  return returnNotFound(message);
+  return replyNotFound(message);
 }
 
 /*
@@ -594,7 +594,7 @@ void handleGetEdit() {
   server.sendHeader("Content-Encoding", "gzip");
   server.send(200, "text/html", index_htm_gz, index_htm_gz_len);
 #else
-  returnNotFound("FileNotFound");
+  replyNotFound("FileNotFound");
 #endif
 
 }
@@ -677,7 +677,7 @@ void setup(void) {
   // Upload file
   // - first callback is called after the request has ended with all parsed arguments
   // - second callback handles file upload at that location
-  server.on("/edit",  HTTP_POST, returnOK, handleFileUpload);
+  server.on("/edit",  HTTP_POST, replyOK, handleFileUpload);
 
   // Default handler for all URIs not defined above
   // Use it to read files from filesystem
