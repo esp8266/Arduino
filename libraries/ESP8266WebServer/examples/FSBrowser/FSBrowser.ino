@@ -358,8 +358,8 @@ bool handleFileRead(String path) {
 */
 String lastExistingParent(String path) {
   while (!path.isEmpty() && !fileSystem->exists(path)) {
-    if (path.lastIndexOf("/") > 0) {
-      path = path.substring(0, path.lastIndexOf("/"));
+    if (path.lastIndexOf('/') > 0) {
+      path = path.substring(0, path.lastIndexOf('/'));
     } else {
       path = String();  // No slash => the top folder does not exist
     }
@@ -422,8 +422,8 @@ void handleFileCreate() {
         return returnFail("CREATE FAILED");
       }
     }
-    if (path.lastIndexOf("/") > -1) {
-      path = path.substring(0, path.lastIndexOf("/"));
+    if (path.lastIndexOf('/') > -1) {
+      path = path.substring(0, path.lastIndexOf('/'));
     }
     returnOKWithMsg(path);
   } else {
@@ -471,7 +471,7 @@ void deleteRecursive(String path) {
   Dir dir = fileSystem->openDir(path);
 
   while (dir.next()) {
-    deleteRecursive(path + "/" + dir.fileName());
+    deleteRecursive(path + '/' + dir.fileName());
   }
 
   // Then delete the folder itself
@@ -564,11 +564,11 @@ void handleNotFound() {
     message += (server.method() == HTTP_GET) ? "GET" : "POST";
     message += "\nArguments: ";
     message += server.args();
-    message += "\n";
+    message += '\n';
     for (uint8_t i = 0; i < server.args(); i++) {
-      message += String(" NAME:") + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+      message += String(" NAME:") + server.argName(i) + "\n VALUE:" + server.arg(i) + '\n';
     }
-    message += String("path=") + server.arg("path") + "\n";
+    message += String("path=") + server.arg("path") + '\n';
     DBG_OUTPUT_PORT.print(message);
     return returnNotFound(message);
   }
@@ -596,7 +596,7 @@ void setup(void) {
   // SERIAL INIT
   DBG_OUTPUT_PORT.begin(115200);
   DBG_OUTPUT_PORT.setDebugOutput(true);
-  DBG_OUTPUT_PORT.print("\n");
+  DBG_OUTPUT_PORT.print('\n');
 
   ////////////////////////////////
   // FILESYSTEM INIT
@@ -615,7 +615,7 @@ void setup(void) {
     String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
     DBG_OUTPUT_PORT.println(error + fileInfo);
     if (error.length() > 0) {
-      unsupportedFiles += error + fileInfo + "\n";
+      unsupportedFiles += error + fileInfo + '\n';
     }
   }
   DBG_OUTPUT_PORT.println();
