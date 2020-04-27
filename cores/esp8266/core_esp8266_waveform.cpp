@@ -175,11 +175,7 @@ void _setPWMPeriodCC(uint32_t cc) {
 }
 
 // Helper routine to remove an entry from the state machine
-static void _removePWMEntry(int pin, PWMState *p) {
-  if (!((1<<pin) & p->mask)) {
-    return;
-  }
-
+static ICACHE_RAM_ATTR void _removePWMEntry(int pin, PWMState *p) {
   int delta = 0;
   int i;
   for (i=0; i < p->cnt; i++) {
@@ -200,7 +196,7 @@ static void _removePWMEntry(int pin, PWMState *p) {
 }
 
 // Called by analogWrite(0/100%) to disable PWM on a specific pin
-bool _stopPWM(int pin) {
+ICACHE_RAM_ATTR bool _stopPWM(int pin) {
   if (!((1<<pin) & pwmState.mask)) {
     return false; // Pin not actually active
   }
@@ -211,7 +207,7 @@ bool _stopPWM(int pin) {
   // Update and wait for mailbox to be emptied
   pwmUpdate = &p;
   while (pwmUpdate) {
-    delay(0);
+    /* Busy wait, could be in ISR */
   }
   // Possibly shut doen the timer completely if we're done
   if (!waveformEnabled && !pwmState.cnt && !timer1CB) {
@@ -225,7 +221,9 @@ bool _setPWM(int pin, uint32_t cc) {
   PWMState p;  // Working copy
   p = pwmState;
   // Get rid of any entries for this pin
-  _removePWMEntry(pin, &p);
+  if ((1<<pin) & p.mask) {
+    _removePWMEntry(pin, &p);
+  }
   // And add it to the list, in order
   if (p.cnt >= maxPWMs) {
     return false; // No space left
