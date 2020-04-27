@@ -59,21 +59,21 @@ String uint8ArrayToHexString(const uint8_t *uint8Array, const uint32_t arrayLeng
 uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength);
 
 /**
-    Takes a uint64_t value and stores the bits in a uint8_t array. Assumes index 0 of the array should contain MSB.
+    Takes a uint64_t value and stores the bits in a uint8_t array. Assumes index 0 of the array should contain MSB (big endian).
 
     @param value The uint64_t value to convert to a uint8_t array.
     @param resultArray A uint8_t array that will hold the result once the function returns. Should have a size of at least 8 bytes.
     @return The resultArray.
 */
-uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray);
+uint8_t *uint64ToUint8ArrayBE(const uint64_t value, uint8_t *resultArray);
 
 /**
-    Takes a uint8_t array and converts the first 8 (lowest index) elements to a uint64_t. Assumes index 0 of the array contains MSB.
+    Takes a uint8_t array and converts the first 8 (lowest index) elements to a uint64_t. Assumes index 0 of the array contains MSB (big endian).
 
     @param inputArray A uint8_t array containing the data to convert to a uint64_t. Should have a size of at least 8 bytes.
     @return A uint64_t representation of the first 8 bytes of the array.
 */
-uint64_t uint8ArrayToUint64(const uint8_t *inputArray);
+uint64_t uint8ArrayToUint64BE(const uint8_t *inputArray);
 }
 }
 

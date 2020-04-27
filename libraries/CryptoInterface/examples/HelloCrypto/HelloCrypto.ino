@@ -28,9 +28,6 @@ void setup() {
   WiFi.persistent(false);
 
   Serial.begin(115200);
-  delay(50); // Wait for Serial.
-
-  //yield(); // Use this if you don't want to wait for Serial.
 
   Serial.println();
   Serial.println();
@@ -42,7 +39,7 @@ void loop() {
   String exampleData = F("Hello Crypto World!");
   Serial.println(String(F("This is our example data: ")) + exampleData);
 
-  uint8_t resultArray[CryptoInterface::SHA256_NATURAL_LENGTH] { 0 };
+  uint8_t resultArray[CryptoInterface::SHA256::NATURAL_LENGTH] { 0 };
   uint8_t derivedKey[CryptoInterface::ENCRYPTION_KEY_LENGTH] { 0 };
 
   static uint32_t encryptionCounter = 0;
@@ -53,20 +50,20 @@ void loop() {
   CryptoInterface::getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
 
   // Generate the key to use for HMAC and encryption
-  CryptoInterface::hkdfInit(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
-  CryptoInterface::hkdfProduce(derivedKey, sizeof derivedKey);
+  CryptoInterface::HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
+  hkdfInstance.produce(derivedKey, sizeof derivedKey);
 
   // Hash
-  CryptoInterface::sha256Hash(exampleData.c_str(), exampleData.length(), resultArray);
+  CryptoInterface::SHA256::hash(exampleData.c_str(), exampleData.length(), resultArray);
   Serial.println(String(F("\nThis is the SHA256 hash of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
-  Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + CryptoInterface::sha256Hash(exampleData));
+  Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + CryptoInterface::SHA256::hash(exampleData));
 
 
   // HMAC
   // Note that HMAC output length is limited
-  CryptoInterface::sha256Hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
+  CryptoInterface::SHA256::hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
   Serial.println(String(F("\nThis is the SHA256 HMAC of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
-  Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + CryptoInterface::sha256Hmac(exampleData, derivedKey, sizeof derivedKey, CryptoInterface::SHA256_NATURAL_LENGTH));
+  Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + CryptoInterface::SHA256::hmac(exampleData, derivedKey, sizeof derivedKey, CryptoInterface::SHA256::NATURAL_LENGTH));
 
 
   // Authenticated Encryption with Associated Data (AEAD)
@@ -77,10 +74,10 @@ void loop() {
   Serial.println(String(F("\nThis is the data to encrypt: ")) + dataToEncrypt);
 
   // Note that the key must be ENCRYPTION_KEY_LENGTH long.
-  CryptoInterface::chacha20Poly1305Encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
+  CryptoInterface::ChaCha20Poly1305::encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   Serial.println(String(F("Encrypted data: ")) + dataToEncrypt);
 
-  bool decryptionSucceeded = CryptoInterface::chacha20Poly1305Decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
+  bool decryptionSucceeded = CryptoInterface::ChaCha20Poly1305::decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   encryptionCounter++;
 
   if (decryptionSucceeded) {

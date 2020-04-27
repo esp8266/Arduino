@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  */
 
+#include <bearssl/bearssl.h>
 #include "CryptoInterface.h"
 #include <TypeConversion.h>
 
-#include <bearssl/bearssl.h>
 #include <assert.h>
 
 namespace TypeCast = esp8266::TypeConversion;
@@ -37,9 +37,6 @@ namespace experimental
   {
     size_t _ctMinDataLength = 0;
     size_t _ctMaxDataLength = 1024;
-    
-    br_hkdf_context _storedHkdfContext;
-    bool _hkdfContextStored = false;
 
     uint8_t *defaultNonceGenerator(uint8_t *nonceArray, const size_t nonceLength)
     {
@@ -232,80 +229,80 @@ namespace experimental
 
     // #################### MD5 ####################
     
-    // resultArray must have size MD5_NATURAL_LENGTH or greater
-    void *md5Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size MD5::NATURAL_LENGTH or greater
+    void *MD5::hash(const void *data, const size_t dataLength, void *resultArray)
     {
       return md5HashHelper(data, dataLength, resultArray);
     }
     
-    String md5Hash(const String &message)
+    String MD5::hash(const String &message)
     {
-      uint8_t hash[MD5_NATURAL_LENGTH];
-      md5HashHelper(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, MD5_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      md5HashHelper(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
-    void *md5Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *MD5::hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {  
       return createBearsslHmac(&br_md5_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String md5Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String MD5::hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmac(&br_md5_vtable, MD5_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmac(&br_md5_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
-    void *md5HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *MD5::hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {
       return createBearsslHmacCT(&br_md5_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String md5HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String MD5::hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmacCT(&br_md5_vtable, MD5_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmacCT(&br_md5_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
 
     // #################### SHA-1 ####################
 
-    // resultArray must have size SHA1_NATURAL_LENGTH or greater
-    void *sha1Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size SHA1::NATURAL_LENGTH or greater
+    void *SHA1::hash(const void *data, const size_t dataLength, void *resultArray)
     {    
       return sha1HashHelper(data, dataLength, resultArray);
     }
     
-    String sha1Hash(const String &message)
+    String SHA1::hash(const String &message)
     {
-      uint8_t hash[SHA1_NATURAL_LENGTH];
-      sha1HashHelper(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, SHA1_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      sha1HashHelper(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
-    void *sha1Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA1::hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {  
       return createBearsslHmac(&br_sha1_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha1Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA1::hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmac(&br_sha1_vtable, SHA1_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmac(&br_sha1_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
-    void *sha1HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA1::hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {
       return createBearsslHmacCT(&br_sha1_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha1HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA1::hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmacCT(&br_sha1_vtable, SHA1_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmacCT(&br_sha1_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
 
     // #################### SHA-224 ####################
 
-    // resultArray must have size SHA224_NATURAL_LENGTH or greater
-    void *sha224Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size SHA224::NATURAL_LENGTH or greater
+    void *SHA224::hash(const void *data, const size_t dataLength, void *resultArray)
     {    
       br_sha224_context context;
       br_sha224_init(&context);
@@ -314,38 +311,38 @@ namespace experimental
       return resultArray;
     }
     
-    String sha224Hash(const String &message)
+    String SHA224::hash(const String &message)
     {
-      uint8_t hash[SHA224_NATURAL_LENGTH];
-      sha224Hash(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, SHA224_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      hash(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
-    void *sha224Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA224::hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {  
       return createBearsslHmac(&br_sha224_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha224Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA224::hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmac(&br_sha224_vtable, SHA224_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmac(&br_sha224_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
-    void *sha224HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA224::hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {
       return createBearsslHmacCT(&br_sha224_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha224HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA224::hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmacCT(&br_sha224_vtable, SHA224_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmacCT(&br_sha224_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
     
 
     // #################### SHA-256 ####################
 
-    // resultArray must have size SHA256_NATURAL_LENGTH or greater
-    void *sha256Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size SHA256::NATURAL_LENGTH or greater
+    void *SHA256::hash(const void *data, const size_t dataLength, void *resultArray)
     {    
       br_sha256_context context;
       br_sha256_init(&context);
@@ -354,38 +351,38 @@ namespace experimental
       return resultArray;
     }
     
-    String sha256Hash(const String &message)
+    String SHA256::hash(const String &message)
     {
-      uint8_t hash[SHA256_NATURAL_LENGTH];
-      sha256Hash(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, SHA256_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      hash(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
-    void *sha256Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA256::hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {  
       return createBearsslHmac(&br_sha256_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha256Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA256::hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmac(&br_sha256_vtable, SHA256_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmac(&br_sha256_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
-    void *sha256HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA256::hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {
       return createBearsslHmacCT(&br_sha256_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha256HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA256::hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmacCT(&br_sha256_vtable, SHA256_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmacCT(&br_sha256_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
 
     // #################### SHA-384 ####################
 
-    // resultArray must have size SHA384_NATURAL_LENGTH or greater
-    void *sha384Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size SHA384::NATURAL_LENGTH or greater
+    void *SHA384::hash(const void *data, const size_t dataLength, void *resultArray)
     {    
       br_sha384_context context;
       br_sha384_init(&context);
@@ -394,38 +391,38 @@ namespace experimental
       return resultArray;
     }
     
-    String sha384Hash(const String &message)
+    String SHA384::hash(const String &message)
     {
-      uint8_t hash[SHA384_NATURAL_LENGTH];
-      sha384Hash(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, SHA384_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      hash(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
-    void *sha384Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA384::hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {  
       return createBearsslHmac(&br_sha384_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha384Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA384::hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmac(&br_sha384_vtable, SHA384_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmac(&br_sha384_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
-    void *sha384HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA384::hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {
       return createBearsslHmacCT(&br_sha384_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha384HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA384::hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmacCT(&br_sha384_vtable, SHA384_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmacCT(&br_sha384_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
 
     // #################### SHA-512 ####################
 
-    // resultArray must have size SHA512_NATURAL_LENGTH or greater
-    void *sha512Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size SHA512::NATURAL_LENGTH or greater
+    void *SHA512::hash(const void *data, const size_t dataLength, void *resultArray)
     {    
       br_sha512_context context;
       br_sha512_init(&context);
@@ -434,38 +431,38 @@ namespace experimental
       return resultArray;
     }
     
-    String sha512Hash(const String &message)
+    String SHA512::hash(const String &message)
     {
-      uint8_t hash[SHA512_NATURAL_LENGTH];
-      sha512Hash(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, SHA512_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      hash(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
-    void *sha512Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA512::hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {  
       return createBearsslHmac(&br_sha512_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha512Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA512::hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmac(&br_sha512_vtable, SHA512_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmac(&br_sha512_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
 
-    void *sha512HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
+    void *SHA512::hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
     {
       return createBearsslHmacCT(&br_sha512_vtable, data, dataLength, hashKey, hashKeyLength, resultArray, outputLength);
     }
     
-    String sha512HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
+    String SHA512::hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
     {
-      return createBearsslHmacCT(&br_sha512_vtable, SHA512_NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
+      return createBearsslHmacCT(&br_sha512_vtable, NATURAL_LENGTH, message, hashKey, hashKeyLength, hmacLength);
     }
     
 
     // #################### MD5+SHA-1 ####################
 
-    // resultArray must have size MD5SHA1_NATURAL_LENGTH or greater
-    void *md5sha1Hash(const void *data, const size_t dataLength, void *resultArray)
+    // resultArray must have size MD5SHA1::NATURAL_LENGTH or greater
+    void *MD5SHA1::hash(const void *data, const size_t dataLength, void *resultArray)
     {    
       br_md5sha1_context context;
       br_md5sha1_init(&context);
@@ -474,46 +471,43 @@ namespace experimental
       return resultArray;
     }
     
-    String md5sha1Hash(const String &message)
+    String MD5SHA1::hash(const String &message)
     {
-      uint8_t hash[MD5SHA1_NATURAL_LENGTH];
-      md5sha1Hash(message.c_str(), message.length(), hash);
-      return TypeCast::uint8ArrayToHexString(hash, MD5SHA1_NATURAL_LENGTH);
+      uint8_t hashArray[NATURAL_LENGTH];
+      hash(message.c_str(), message.length(), hashArray);
+      return TypeCast::uint8ArrayToHexString(hashArray, NATURAL_LENGTH);
     }
 
 
     // #################### HKDF ####################
 
-    void hkdfInit(const void *keyMaterial, const size_t keyMaterialLength, const void *salt, const size_t saltLength)
+    HKDF::HKDF(const void *keyMaterial, const size_t keyMaterialLength, const void *salt, const size_t saltLength)
+    {
+      init(keyMaterial, keyMaterialLength, salt, saltLength);
+    }
+
+    void HKDF::init(const void *keyMaterial, const size_t keyMaterialLength, const void *salt, const size_t saltLength)
     {
       // Comments mainly from https://www.bearssl.org/apidoc/bearssl__kdf_8h.html
-      
-      br_hkdf_context context;
 
       // Initialize an HKDF context, with a hash function, and the salt. This starts the HKDF-Extract process.
-      br_hkdf_init(&context, &br_sha256_vtable, salt, saltLength);
+      br_hkdf_init(&hkdfContext, &br_sha256_vtable, salt, saltLength);
 
       // Inject more input bytes. This function may be called repeatedly if the input data is provided by chunks, after br_hkdf_init() but before br_hkdf_flip().
-      br_hkdf_inject(&context, keyMaterial, keyMaterialLength);
+      br_hkdf_inject(&hkdfContext, keyMaterial, keyMaterialLength);
 
       // End the HKDF-Extract process, and start the HKDF-Expand process.
-      br_hkdf_flip(&context);
-
-      _storedHkdfContext = context;
-      _hkdfContextStored = true;
+      br_hkdf_flip(&hkdfContext);
     }
     
-    size_t hkdfProduce(void *resultArray, const size_t outputLength, const void *info, const size_t infoLength)
+    size_t HKDF::produce(void *resultArray, const size_t outputLength, const void *info, const size_t infoLength)
     {
       // Comments mainly from https://www.bearssl.org/apidoc/bearssl__kdf_8h.html
-      
-      if(!_hkdfContextStored) // hkdfInit has not yet been executed
-        return 0;
       
       // HKDF output production (HKDF-Expand).
       // Produces more output bytes from the current state. This function may be called several times, but only after br_hkdf_flip().
       // Returned value is the number of actually produced bytes. The total output length is limited to 255 times the output length of the underlying hash function.
-      return br_hkdf_produce(&_storedHkdfContext, info, infoLength, resultArray, outputLength);
+      return br_hkdf_produce(&hkdfContext, info, infoLength, resultArray, outputLength);
     }
 
 
@@ -531,14 +525,14 @@ namespace experimental
       }
       else
       {
-        hkdfInit(key, ENCRYPTION_KEY_LENGTH, keySalt, keySaltLength);
+        HKDF hkdfInstance(key, ENCRYPTION_KEY_LENGTH, keySalt, keySaltLength);
         uint8_t derivedEncryptionKey[ENCRYPTION_KEY_LENGTH] {0};
-        hkdfProduce(derivedEncryptionKey, ENCRYPTION_KEY_LENGTH);
+        hkdfInstance.produce(derivedEncryptionKey, ENCRYPTION_KEY_LENGTH);
         br_poly1305_ctmul32_run(derivedEncryptionKey, nonce, data, dataLength, aad, aadLength, tag, br_chacha20_ct_run, encrypt);
       }  
     }
 
-    void chacha20Poly1305Encrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
+    void ChaCha20Poly1305::encrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
                                  void *resultingNonce, void *resultingTag, const void *aad, const size_t aadLength)
     {
       uint8_t *nonce = (uint8_t *)resultingNonce;
@@ -547,7 +541,7 @@ namespace experimental
       chacha20Poly1305Kernel(1, data, dataLength, key, keySalt, keySaltLength, nonce, resultingTag, aad, aadLength);            
     }
     
-    bool chacha20Poly1305Decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
+    bool ChaCha20Poly1305::decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength,
                                  const void *encryptionNonce, const void *encryptionTag, const void *aad, const size_t aadLength)
     {
       const uint8_t *oldTag = (const uint8_t *)encryptionTag;

@@ -66,7 +66,7 @@ uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, con
     return uint8Array;
 }
 
-uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray)
+uint8_t *uint64ToUint8ArrayBE(const uint64_t value, uint8_t *resultArray)
 {
     resultArray[7] = value;
     resultArray[6] = value >> 8;
@@ -80,7 +80,7 @@ uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray)
     return resultArray;
 }
 
-uint64_t uint8ArrayToUint64(const uint8_t *inputArray)
+uint64_t uint8ArrayToUint64BE(const uint8_t *inputArray)
 {
     uint64_t result = (uint64_t)inputArray[0] << 56 | (uint64_t)inputArray[1] << 48 | (uint64_t)inputArray[2] << 40 | (uint64_t)inputArray[3] << 32
                       | (uint64_t)inputArray[4] << 24 | (uint64_t)inputArray[5] << 16 | (uint64_t)inputArray[6] << 8 | (uint64_t)inputArray[7];

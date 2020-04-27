@@ -32,6 +32,8 @@ namespace experimental
 {
   namespace CryptoInterface 
   {
+    #include <bearssl/bearssl.h>
+    
     /**
      * Regarding constant-time (CT) HMAC:
      * 
@@ -57,19 +59,6 @@ namespace experimental
      * The uint8_t array should then be returned by the nonce generator.
      */
     using nonceGeneratorType = std::function<uint8_t *(uint8_t *, const size_t)>;
-     
-    constexpr uint8_t MD5_NATURAL_LENGTH = 16;
-    constexpr uint8_t SHA1_NATURAL_LENGTH = 20;
-    constexpr uint8_t SHA224_NATURAL_LENGTH = 28;
-    constexpr uint8_t SHA256_NATURAL_LENGTH = 32;
-    constexpr uint8_t SHA384_NATURAL_LENGTH = 48;
-    constexpr uint8_t SHA512_NATURAL_LENGTH = 64;
-
-    /**
-     * MD5+SHA-1 is the concatenation of MD5 and SHA-1 computed over the same input; in the implementation, the internal data buffer is shared, 
-     * thus making it more memory-efficient than separate MD5 and SHA-1. It can be useful in implementing SSL 3.0, TLS 1.0 and TLS 1.1.
-     */
-    constexpr uint8_t MD5SHA1_NATURAL_LENGTH = 36;
 
     constexpr uint8_t ENCRYPTION_KEY_LENGTH = 32;
 
@@ -112,605 +101,648 @@ namespace experimental
 
     // #################### MD5 ####################
 
-    /**
-     * WARNING! The MD5 hash is broken in terms of attacker resistance.
-     * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
-     * 
-     * Create a MD5 hash of the data. The result will be MD5_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain MD5_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *md5Hash(const void *data, const size_t dataLength, void *resultArray) __attribute__((deprecated));
-    
-    /**
-     * WARNING! The MD5 hash is broken in terms of attacker resistance.
-     * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
-     * 
-     * Create a MD5 hash of the data. The result will be MD5_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String md5Hash(const String &message) __attribute__((deprecated));
+    struct MD5
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 16;
+      
+      /**
+       * WARNING! The MD5 hash is broken in terms of attacker resistance.
+       * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+       * 
+       * Create a MD5 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray) __attribute__((deprecated));
 
-    /**
-     * Create a MD5 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than MD5_NATURAL_LENGTH, 
-     *                     the first (lowest index) MD5_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *md5Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a MD5 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to MD5_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String md5Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
-
-    /**
-     * Create a MD5 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than MD5_NATURAL_LENGTH, 
-     *                     the first (lowest index) MD5_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *md5HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a MD5 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to MD5_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String md5HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+      /**
+       * WARNING! The MD5 hash is broken in terms of attacker resistance.
+       * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+       * 
+       * Create a MD5 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message) __attribute__((deprecated));
+      
+      /**
+       * Create a MD5 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a MD5 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+  
+      /**
+       * Create a MD5 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a MD5 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    };
 
 
     // #################### SHA-1 ####################
-
-    /**
-     * WARNING! The SHA-1 hash is broken in terms of attacker resistance.
-     * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
-     * 
-     * Create a SHA1 hash of the data. The result will be SHA1_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain SHA1_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha1Hash(const void *data, const size_t dataLength, void *resultArray) __attribute__((deprecated));
     
-    /**
-     * WARNING! The SHA-1 hash is broken in terms of attacker resistance.
-     * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
-     * 
-     * Create a SHA1 hash of the data. The result will be SHA1_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String sha1Hash(const String &message) __attribute__((deprecated));
-
-    /**
-     * Create a SHA1 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA1_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA1_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha1Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA1 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA1_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha1Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
-
-    /**
-     * Create a SHA1 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA1_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA1_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha1HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA1 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA1_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha1HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    struct SHA1
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 20;
+      
+      /**
+       * WARNING! The SHA-1 hash is broken in terms of attacker resistance.
+       * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+       * 
+       * Create a SHA1 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray) __attribute__((deprecated));
+      
+      /**
+       * WARNING! The SHA-1 hash is broken in terms of attacker resistance.
+       * Only use it in those cases where attacker resistance is not important. Prefer SHA-256 or higher otherwise.
+       * 
+       * Create a SHA1 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message) __attribute__((deprecated));
+  
+      /**
+       * Create a SHA1 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA1 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+  
+      /**
+       * Create a SHA1 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA1 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    };
 
 
     // #################### SHA-224 ####################
-
-    /**
-     * Create a SHA224 hash of the data. The result will be SHA224_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain SHA224_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha224Hash(const void *data, const size_t dataLength, void *resultArray);
     
-    /**
-     * Create a SHA224 hash of the data. The result will be SHA224_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String sha224Hash(const String &message);
-
-    /**
-     * Create a SHA224 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA224_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA224_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha224Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA224 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA224_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha224Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
-
-    /**
-     * Create a SHA224 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA224_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA224_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha224HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA224 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA224_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha224HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    struct SHA224
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 28;
+      
+      /**
+       * Create a SHA224 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray);
+      
+      /**
+       * Create a SHA224 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message);
+  
+      /**
+       * Create a SHA224 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA224 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+  
+      /**
+       * Create a SHA224 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA224 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    };
 
 
     // #################### SHA-256 ####################
-
-    /**
-     * Create a SHA256 hash of the data. The result will be SHA256_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain SHA256_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha256Hash(const void *data, const size_t dataLength, void *resultArray);
     
-    /**
-     * Create a SHA256 hash of the data. The result will be SHA256_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String sha256Hash(const String &message);
-
-    /**
-     * Create a SHA256 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA256_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA256_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha256Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA256 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA256_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha256Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
-
-    /**
-     * Create a SHA256 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA256_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA256_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha256HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA256 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA256_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha256HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    struct SHA256
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 32;
+      
+      /**
+       * Create a SHA256 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray);
+      
+      /**
+       * Create a SHA256 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message);
+  
+      /**
+       * Create a SHA256 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA256 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+  
+      /**
+       * Create a SHA256 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA256 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    };
 
 
     // #################### SHA-384 ####################
 
-    /**
-     * Create a SHA384 hash of the data. The result will be SHA384_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain SHA384_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha384Hash(const void *data, const size_t dataLength, void *resultArray);
-    
-    /**
-     * Create a SHA384 hash of the data. The result will be SHA384_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String sha384Hash(const String &message);
-
-    /**
-     * Create a SHA384 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA384_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA384_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha384Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA384 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA384_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha384Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
-
-    /**
-     * Create a SHA384 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA384_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA384_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha384HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA384 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA384_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha384HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    struct SHA384
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 48;
+      
+      /**
+       * Create a SHA384 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray);
+      
+      /**
+       * Create a SHA384 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message);
+  
+      /**
+       * Create a SHA384 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA384 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+  
+      /**
+       * Create a SHA384 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA384 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    };
 
 
     // #################### SHA-512 ####################
 
-    /**
-     * Create a SHA512 hash of the data. The result will be SHA512_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain SHA512_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha512Hash(const void *data, const size_t dataLength, void *resultArray);
-    
-    /**
-     * Create a SHA512 hash of the data. The result will be SHA512_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String sha512Hash(const String &message);
-
-    /**
-     * Create a SHA512 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA512_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA512_NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha512Hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA512 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC.
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA512_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha512Hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
-
-    /**
-     * Create a SHA512 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param data The data array from which to create the HMAC.
-     * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param resultArray The array wherein to store the resulting HMAC.
-     * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than SHA512_NATURAL_LENGTH, 
-     *                     the first (lowest index) SHA512_NATURAL_LENGTH bytes of resultArray will be used for the HMAC. 
-     *                     If outputLength is 0, then the natural HMAC output length is selected.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *sha512HmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
-
-    /**
-     * Create a SHA512 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
-     * Constant-time version.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
-     * @param hashKey The hash key to use when creating the HMAC.
-     * @param hashKeyLength The length of the hash key in bytes.
-     * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to SHA512_NATURAL_LENGTH.
-     * 
-     * @return A String with the generated HMAC in HEX format.
-     */
-    String sha512HmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    struct SHA512
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 64;
+      
+      /**
+       * Create a SHA512 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray);
+      
+      /**
+       * Create a SHA512 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message);
+  
+      /**
+       * Create a SHA512 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC.
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmac(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA512 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC.
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+  
+      /**
+       * Create a SHA512 HMAC from the data, using the provided hashKey. The result will be up to outputLength bytes long and stored in resultArray.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param data The data array from which to create the HMAC.
+       * @param dataLength The length of the data array in bytes. Valid values are in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param resultArray The array wherein to store the resulting HMAC.
+       * @param outputLength The desired length of the generated HMAC, in bytes. Must fit within resultArray. If outputLength is greater than NATURAL_LENGTH, 
+       *                     the first (lowest index) NATURAL_LENGTH bytes of resultArray will be used for the HMAC. 
+       *                     If outputLength is 0, then the natural HMAC output length is selected.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hmacCT(const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength);
+  
+      /**
+       * Create a SHA512 HMAC from the message, using the provided hashKey. The result will be hmacLength bytes long and returned as a String in HEX format.
+       * Constant-time version.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param message The string from which to create the HMAC. Must have a length in the range [getCtMinDataLength(), getCtMaxDataLength()].
+       * @param hashKey The hash key to use when creating the HMAC.
+       * @param hashKeyLength The length of the hash key in bytes.
+       * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to NATURAL_LENGTH.
+       * 
+       * @return A String with the generated HMAC in HEX format.
+       */
+      static String hmacCT(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength);
+    };
 
 
     // #################### MD5+SHA-1 ####################
-    
-    /**
-     * Create a MD5+SHA-1 hash of the data. The result will be MD5SHA1_NATURAL_LENGTH bytes long and stored in resultArray.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * MD5+SHA-1 is the concatenation of MD5 and SHA-1 computed over the same input; in the implementation, the internal data buffer is shared, 
-     * thus making it more memory-efficient than separate MD5 and SHA-1. It can be useful in implementing SSL 3.0, TLS 1.0 and TLS 1.1.
-     * 
-     * @param data The data array from which to create the hash.
-     * @param dataLength The length of the data array in bytes.
-     * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain MD5SHA1_NATURAL_LENGTH bytes or more.
-     * 
-     * @return A pointer to resultArray.
-     */
-    void *md5sha1Hash(const void *data, const size_t dataLength, void *resultArray);
-    
-    /**
-     * Create a MD5+SHA-1 hash of the data. The result will be MD5SHA1_NATURAL_LENGTH bytes long and returned as a String in HEX format.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * MD5+SHA-1 is the concatenation of MD5 and SHA-1 computed over the same input; in the implementation, the internal data buffer is shared, 
-     * thus making it more memory-efficient than separate MD5 and SHA-1. It can be useful in implementing SSL 3.0, TLS 1.0 and TLS 1.1.
-     * 
-     * @param message The string from which to create the hash.
-     * 
-     * @return A String with the generated hash in HEX format.
-     */
-    String md5sha1Hash(const String &message);
+
+    struct MD5SHA1
+    {
+      static constexpr uint8_t NATURAL_LENGTH = 36;
+      
+      /**
+       * Create a MD5+SHA-1 hash of the data. The result will be NATURAL_LENGTH bytes long and stored in resultArray.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * MD5+SHA-1 is the concatenation of MD5 and SHA-1 computed over the same input; in the implementation, the internal data buffer is shared, 
+       * thus making it more memory-efficient than separate MD5 and SHA-1. It can be useful in implementing SSL 3.0, TLS 1.0 and TLS 1.1.
+       * 
+       * @param data The data array from which to create the hash.
+       * @param dataLength The length of the data array in bytes.
+       * @param resultArray The array wherein to store the resulting hash. MUST be be able to contain NATURAL_LENGTH bytes or more.
+       * 
+       * @return A pointer to resultArray.
+       */
+      static void *hash(const void *data, const size_t dataLength, void *resultArray);
+      
+      /**
+       * Create a MD5+SHA-1 hash of the data. The result will be NATURAL_LENGTH bytes long and returned as a String in HEX format.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * MD5+SHA-1 is the concatenation of MD5 and SHA-1 computed over the same input; in the implementation, the internal data buffer is shared, 
+       * thus making it more memory-efficient than separate MD5 and SHA-1. It can be useful in implementing SSL 3.0, TLS 1.0 and TLS 1.1.
+       * 
+       * @param message The string from which to create the hash.
+       * 
+       * @return A String with the generated hash in HEX format.
+       */
+      static String hash(const String &message);
+    };
 
 
     // #################### HKDF ####################
 
-    /**
-     * KDFs (key derivation functions) are functions that takes a variable length input, and provide a variable length output, meant to be used to derive subkeys from a master key.
-     * HKDF is a KDF defined by RFC 5869. It is based on HMAC. The provided implementation uses SHA-256 as the underlying hash function.
-     * 
-     * This function initializes the HKDF implementation with the input data to use for HKDF processing.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * Must be called at least once before hkdfProduce() can be used.
-     * 
-     * @param keyMaterial An array containing the key material to use when deriving subkeys. Typically this would be the master key.
-     * @param keyMaterialLength The length of keyMaterial in bytes.
-     * @param salt An array containing the salt to use when ingesting key material. Salt is non-secret and can be empty.
-     *             Its role is normally to bind the input to a conventional identifier that qualify it within the used protocol or application.
-     * @param saltLength The length of the salt array, in bytes.
-     */
-    void hkdfInit(const void *keyMaterial, const size_t keyMaterialLength, const void *salt = nullptr, const size_t saltLength = 0);
+    struct HKDF
+    {
+      /**
+       * KDFs (key derivation functions) are functions that takes a variable length input, and provide a variable length output, meant to be used to derive subkeys from a master key.
+       * HKDF is a KDF defined by RFC 5869. It is based on HMAC. The provided implementation uses SHA-256 as the underlying hash function.
+       * 
+       * This method initializes the HKDF implementation with the input data to use for HKDF processing. (calls HKDF::Init())
+       */
+      HKDF(const void *keyMaterial, const size_t keyMaterialLength, const void *salt = nullptr, const size_t saltLength = 0);
 
-    /**
-     * Produce more output bytes from the current HKDF state. This function may be called several times to obtain the full output by chunks. 
-     * The total output size is limited to 255 * SHA256_NATURAL_LENGTH bytes per unique hkdfInit() call.
-     * Uses the BearSSL cryptographic library.
-     * 
-     * Should only be used when hkdfInit() has been called at least once.
-     * 
-     * @param resultArray The array wherein to store the resulting HKDF.
-     * @param outputLength The requested number of bytes to fill with HKDF output in resultArray.
-     * @param info NOTE: For correct HKDF processing, the same "info" string must be provided for every call until there's a new unique hkdfInit().
-     *             An array containing the information string to use when producing output. Info is non-secret and can be empty.
-     *             Its role is normally to bind the output to a conventional identifier that qualify it within the used protocol or application.            
-     * @param infoLength The length of the info array, in bytes.            
-     * 
-     * @return The number of HKDF bytes actually produced.
-     */
-    size_t hkdfProduce(void *resultArray, const size_t outputLength, const void *info = nullptr, size_t infoLength = 0);
+      /**
+       * This method initializes the HKDF implementation with the input data to use for HKDF processing.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param keyMaterial An array containing the key material to use when deriving subkeys. Typically this would be the master key.
+       * @param keyMaterialLength The length of keyMaterial in bytes.
+       * @param salt An array containing the salt to use when ingesting key material. Salt is non-secret and can be empty.
+       *             Its role is normally to bind the input to a conventional identifier that qualify it within the used protocol or application.
+       * @param saltLength The length of the salt array, in bytes.
+       */
+      void init(const void *keyMaterial, const size_t keyMaterialLength, const void *salt = nullptr, const size_t saltLength = 0);
+  
+      /**
+       * Produce more output bytes from the current HKDF state. This method may be called several times to obtain the full output by chunks. 
+       * The total output size is limited to 255 * SHA256::NATURAL_LENGTH bytes per unique HKDF::Init()/constructor call.
+       * Uses the BearSSL cryptographic library.
+       * 
+       * @param resultArray The array wherein to store the resulting HKDF.
+       * @param outputLength The requested number of bytes to fill with HKDF output in resultArray.
+       * @param info NOTE: For correct HKDF processing, the same "info" string must be provided for every call until there's a new unique HKDF::Init().
+       *             An array containing the information string to use when producing output. Info is non-secret and can be empty.
+       *             Its role is normally to bind the output to a conventional identifier that qualify it within the used protocol or application.            
+       * @param infoLength The length of the info array, in bytes.            
+       * 
+       * @return The number of HKDF bytes actually produced.
+       */
+      size_t produce(void *resultArray, const size_t outputLength, const void *info = nullptr, size_t infoLength = 0);
+
+      private:
+
+        br_hkdf_context hkdfContext;
+    };
 
 
     // #################### Authenticated Encryption with Associated Data (AEAD) ####################
@@ -736,70 +768,73 @@ namespace experimental
     
     // #################### ChaCha20+Poly1305 AEAD ####################
 
-    /**
-     * Encrypt the data array using the ChaCha20 stream cipher and use Poly1305 for message authentication.
-     * The function generates in place an equal-length ChaCha20 encrypted version of the data array.
-     * More information about this encryption standard can be found here: https://tools.ietf.org/html/rfc7539 , https://tools.ietf.org/html/rfc8439
-     * Uses the BearSSL cryptographic library.
-     * 
-     * Encryption of small messages (up to a few hundred data bytes) takes around 0.5-1 ms with the default nonceGenerator, half of this without keySalt.
-     * 
-     * The output values of chacha20Poly1305Encrypt should be passed as input values to chacha20Poly1305Decrypt.
-     * 
-     * Note that a 12 byte nonce is generated via getNonceGenerator() every time chacha20Poly1305Encrypt is called.
-     * If the same key and nonce combination is used more than once for distinct messages, the encryption will be broken, so keep the following in mind:
-     * 
-     * By default the nonce is generated via the hardware random number generator of the ESP8266. 
-     * The entropy of this source may not be sufficient to avoid nonce collisions, so to further reduce the risk of encryption failure
-     * it is recommended that a keySalt is always provided when using the default nonceGenerator. Using a keySalt will create a 
-     * pseudorandom subkey from the original key via HKDF, and use that for the encryption/decryption.
-     * The same key + keySalt will always generate the same subkey.
-     * 
-     * An alternative to using a keySalt is to change the nonceGenerator so that it does not rely on random numbers.
-     * One way to do this would be to use a counter that guarantees the same key + nonce combination is never used.
-     * This may not be easily achievable in all scenarios, however.
-     * 
-     * @param data An array containing the data to encrypt. The encrypted data is generated in place, so when the function returns the data array will contain the encrypted data.
-     * @param dataLength The length of the data array in bytes.
-     * @param key The secret encryption key to use. Must be 32 bytes (ENCRYPTION_KEY_LENGTH) long.
-     * @param keySalt The salt to use when generating a subkey from key. Note that the same salt must be used during decryption as during encryption. Set to nullptr to prevent subkey generation.
-     * @param keySaltLength The length of keySalt in bytes.
-     * @param resultingNonce The array that will store the nonce generated during encryption. Must be able to contain at least 12 bytes. The nonce is not secret and must be passed to the decryption function.
-     * @param resultingTag The array that will store the message authentication tag generated during encryption. Must be able to contain at least 16 bytes. The tag is not secret and must be passed to the decryption function.
-     * @param aad Additional authenticated data. This data will be covered by the Poly1305 MAC, but not encrypted. 
-     *            You can include the unencrypted parts of your message as AAD to ensure that the encrypted content cannot 
-     *            be re-sent with replaced unencrypted data by an attacker.
-     *            Defaults to nullptr.
-     * @param aadLength The length of the aad array in bytes. Defaults to 0.
-     */
-    void chacha20Poly1305Encrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength, void *resultingNonce, void *resultingTag, const void *aad = nullptr, const size_t aadLength = 0);
-    
-    /**
-     * Decrypt the data array using the ChaCha20 stream cipher and use Poly1305 for message authentication.
-     * The function generates in place an equal-length ChaCha20 decrypted version of the data array.
-     * More information about this encryption standard can be found here: https://tools.ietf.org/html/rfc7539 , https://tools.ietf.org/html/rfc8439
-     * Uses the BearSSL cryptographic library.
-     * 
-     * Decryption of small messages (up to a few hundred data bytes) takes around 0.5-1 ms, half of this without keySalt.
-     * 
-     * The output values of chacha20Poly1305Encrypt should be passed as input values to chacha20Poly1305Decrypt.
-     * 
-     * @param data An array containing the data to decrypt. The decrypted data is generated in place, so when the function returns the data array will contain the decrypted data.
-     * @param dataLength The length of the data array in bytes.
-     * @param key The secret encryption key to use. Must be 32 bytes (ENCRYPTION_KEY_LENGTH) long.
-     * @param keySalt The salt to use when generating a subkey from key. Note that the same salt must be used during decryption as during encryption. Set to nullptr to prevent subkey generation.
-     * @param keySaltLength The length of keySalt in bytes.
-     * @param encryptionNonce An array containing the nonce that was generated during encryption. The nonce should be 12 bytes.
-     * @param encryptionTag An array containing the message authentication tag that was generated during encryption. The tag should be 16 bytes.
-     * @param aad Additional authenticated data. This data will be covered by the Poly1305 MAC, but not decrypted. 
-     *            You can include the unencrypted parts of your message as AAD to ensure that the encrypted content cannot 
-     *            be re-sent with replaced unencrypted data by an attacker.
-     *            Defaults to nullptr.
-     * @param aadLength The length of the aad array in bytes. Defaults to 0.
-     * 
-     * @return True if the decryption was successful (the generated tag matches encryptionTag). False otherwise. Note that the data array is modified regardless of this outcome.
-     */
-    bool chacha20Poly1305Decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength, const void *encryptionNonce, const void *encryptionTag, const void *aad = nullptr, const size_t aadLength = 0);
+    struct ChaCha20Poly1305
+    {
+      /**
+       * Encrypt the data array using the ChaCha20 stream cipher and use Poly1305 for message authentication.
+       * The function generates in place an equal-length ChaCha20 encrypted version of the data array.
+       * More information about this encryption standard can be found here: https://tools.ietf.org/html/rfc7539 , https://tools.ietf.org/html/rfc8439
+       * Uses the BearSSL cryptographic library.
+       * 
+       * Encryption of small messages (up to a few hundred data bytes) takes around 0.5-1 ms with the default nonceGenerator, half of this without keySalt.
+       * 
+       * The output values of ChaCha20Poly1305::encrypt should be passed as input values to ChaCha20Poly1305::decrypt.
+       * 
+       * Note that a 12 byte nonce is generated via getNonceGenerator() every time ChaCha20Poly1305::encrypt is called.
+       * If the same key and nonce combination is used more than once for distinct messages, the encryption will be broken, so keep the following in mind:
+       * 
+       * By default the nonce is generated via the hardware random number generator of the ESP8266. 
+       * The entropy of this source may not be sufficient to avoid nonce collisions, so to further reduce the risk of encryption failure
+       * it is recommended that a keySalt is always provided when using the default nonceGenerator. Using a keySalt will create a 
+       * pseudorandom subkey from the original key via HKDF, and use that for the encryption/decryption.
+       * The same key + keySalt will always generate the same subkey.
+       * 
+       * An alternative to using a keySalt is to change the nonceGenerator so that it does not rely on random numbers.
+       * One way to do this would be to use a counter that guarantees the same key + nonce combination is never used.
+       * This may not be easily achievable in all scenarios, however.
+       * 
+       * @param data An array containing the data to encrypt. The encrypted data is generated in place, so when the function returns the data array will contain the encrypted data.
+       * @param dataLength The length of the data array in bytes.
+       * @param key The secret encryption key to use. Must be 32 bytes (ENCRYPTION_KEY_LENGTH) long.
+       * @param keySalt The salt to use when generating a subkey from key. Note that the same salt must be used during decryption as during encryption. Set to nullptr to prevent subkey generation.
+       * @param keySaltLength The length of keySalt in bytes.
+       * @param resultingNonce The array that will store the nonce generated during encryption. Must be able to contain at least 12 bytes. The nonce is not secret and must be passed to the decryption function.
+       * @param resultingTag The array that will store the message authentication tag generated during encryption. Must be able to contain at least 16 bytes. The tag is not secret and must be passed to the decryption function.
+       * @param aad Additional authenticated data. This data will be covered by the Poly1305 MAC, but not encrypted. 
+       *            You can include the unencrypted parts of your message as AAD to ensure that the encrypted content cannot 
+       *            be re-sent with replaced unencrypted data by an attacker.
+       *            Defaults to nullptr.
+       * @param aadLength The length of the aad array in bytes. Defaults to 0.
+       */
+      static void encrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength, void *resultingNonce, void *resultingTag, const void *aad = nullptr, const size_t aadLength = 0);
+      
+      /**
+       * Decrypt the data array using the ChaCha20 stream cipher and use Poly1305 for message authentication.
+       * The function generates in place an equal-length ChaCha20 decrypted version of the data array.
+       * More information about this encryption standard can be found here: https://tools.ietf.org/html/rfc7539 , https://tools.ietf.org/html/rfc8439
+       * Uses the BearSSL cryptographic library.
+       * 
+       * Decryption of small messages (up to a few hundred data bytes) takes around 0.5-1 ms, half of this without keySalt.
+       * 
+       * The output values of ChaCha20Poly1305::encrypt should be passed as input values to ChaCha20Poly1305::decrypt.
+       * 
+       * @param data An array containing the data to decrypt. The decrypted data is generated in place, so when the function returns the data array will contain the decrypted data.
+       * @param dataLength The length of the data array in bytes.
+       * @param key The secret encryption key to use. Must be 32 bytes (ENCRYPTION_KEY_LENGTH) long.
+       * @param keySalt The salt to use when generating a subkey from key. Note that the same salt must be used during decryption as during encryption. Set to nullptr to prevent subkey generation.
+       * @param keySaltLength The length of keySalt in bytes.
+       * @param encryptionNonce An array containing the nonce that was generated during encryption. The nonce should be 12 bytes.
+       * @param encryptionTag An array containing the message authentication tag that was generated during encryption. The tag should be 16 bytes.
+       * @param aad Additional authenticated data. This data will be covered by the Poly1305 MAC, but not decrypted. 
+       *            You can include the unencrypted parts of your message as AAD to ensure that the encrypted content cannot 
+       *            be re-sent with replaced unencrypted data by an attacker.
+       *            Defaults to nullptr.
+       * @param aadLength The length of the aad array in bytes. Defaults to 0.
+       * 
+       * @return True if the decryption was successful (the generated tag matches encryptionTag). False otherwise. Note that the data array is modified regardless of this outcome.
+       */
+      static bool decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength, const void *encryptionNonce, const void *encryptionTag, const void *aad = nullptr, const size_t aadLength = 0);
+    };
   }
 }
 
