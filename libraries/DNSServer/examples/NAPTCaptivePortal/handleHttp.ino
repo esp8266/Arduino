@@ -97,6 +97,16 @@ void handleWifi() {
 
   String page;
 
+  // Just do max on some of the visually larger HTML chunks that will be loaded
+  // into page and add a little for growth when substituting values in.
+  size_t thisMany = std::max(sizeof(configWLANInfo), std::max(sizeof(configList), sizeof(configEnd))) + 200;
+  CONSOLE_PRINTLN2("sizeof(configWLANInfo): ", (sizeof(configWLANInfo)));
+  CONSOLE_PRINTLN2("sizeof(configList): ", (sizeof(configList)));
+  CONSOLE_PRINTLN2("sizeof(configEnd): ", (sizeof(configEnd)));
+  CONSOLE_PRINTLN2("sizeof(configEnd2): ", (sizeof(configEnd2)));
+  CONSOLE_PRINTLN2("page reserve size: ", (thisMany));
+  page.reserve(thisMany);
+
   page = FPSTR(configPresetInput);
   /*
     Set previously used/entered credentials as a default entries.
@@ -119,7 +129,7 @@ void handleWifi() {
   */
   sendIfOver(page);
 
-  page += FPSTR(configInfo);
+  page += FPSTR(configAPInfo);
   {
     uint8_t sta_cnt = wifi_softap_get_station_num();
     page.replace("{s}", String(softAP_ssid));
@@ -146,7 +156,7 @@ void handleWifi() {
   sendIfOver(page, 0);
 
   if (WiFi.localIP().isSet()) {
-    page += FPSTR(configInfo2);
+    page += FPSTR(configWLANInfo);
     page.replace("{s}", String(ssid));
     page.replace("{b}", macToString(bssid));
     page.replace("{c}", String(WiFi.channel()));
@@ -159,7 +169,7 @@ void handleWifi() {
     page.replace("{2}", WiFi.dnsIP(1).toString());
     sendIfOver(page, 0);
   } else {
-    page += F("<br /><h2>WLAN - offline</h2>");
+    page += FPSTR(configWLANOffline); //F("<br /><h2>WLAN - offline</h2>");
   }
 
   page += FPSTR(configList);
@@ -183,10 +193,13 @@ void handleWifi() {
     page += FPSTR(configNoAPs);
     sendIfOver(page);
   }
+  sendIfOver(page, 0); // send what we have buffered before next direct send.
 
-  page += FPSTR(configEnd);
-  page.replace("<p></p>", String(F("<p>MAX String memory used: ")) + (maxPage) + F("</p>"));
-  server.sendContent(page);
+  // No changes to this chunk, no need to use Strings class. Send asis.
+  server.sendContent_P(configEnd);
+  server.sendContent_P(configEnd2);
+
+  CONSOLE_PRINTLN2("MAX String memory used: ", (maxPage));
   server.chunkedResponseFinalize();
 }
 
