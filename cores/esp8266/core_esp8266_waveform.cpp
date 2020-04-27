@@ -57,8 +57,11 @@ typedef struct {
   uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
   uint32_t timeHighCycles;     // Currently running waveform period
   uint32_t timeLowCycles;      //
+  uint32_t desiredHighCycles;     // Currently running waveform period
+  uint32_t desiredLowCycles;      //
   uint32_t gotoTimeHighCycles; // Copied over on the next period to preserve phase
   uint32_t gotoTimeLowCycles;  //
+  uint32_t lastEdge; //
 } Waveform;
 
 static Waveform waveform[17];        // State of all possible pins
@@ -290,6 +293,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
   } else { //  if (!(waveformEnabled & mask)) {
     wave->timeHighCycles = timeHighCycles;
     wave->timeLowCycles = timeLowCycles;
+    wave->desiredHighCycles = wave->timeHighCycles;
+    wave->desiredLowCycles = wave->timeLowCycles;
+    wave->lastEdge = 0;
     wave->gotoTimeHighCycles = wave->timeHighCycles;
     wave->gotoTimeLowCycles = wave->timeLowCycles;    // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
@@ -475,6 +481,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
+            if (wave->lastEdge) {
+              int32_t err = wave->desiredLowCycles - (now - wave->lastEdge);
+              err /= 4;
+              wave->timeLowCycles += err;
+            }
             wave->nextServiceCycle = now + wave->timeHighCycles;
             nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
           } else {
@@ -483,12 +494,22 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               ClearGPIO(mask);
             }
+            if (wave->gotoTimeHighCycles) {
+              // Copy over next full-cycle timings
+              wave->timeHighCycles = wave->gotoTimeHighCycles;
+              wave->desiredHighCycles = wave->gotoTimeHighCycles;
+              wave->timeLowCycles = wave->gotoTimeLowCycles;
+              wave->desiredLowCycles = wave->gotoTimeLowCycles;
+              wave->gotoTimeHighCycles = 0;
+            } else {
+              int32_t err = wave->desiredHighCycles - (now - wave->lastEdge);
+              err /= 4;
+              wave->timeHighCycles += err; // Feedback 1/4 of the error
+            }
             wave->nextServiceCycle = now + wave->timeLowCycles;
             nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
-            // Copy over next full-cycle timings
-            wave->timeHighCycles = wave->gotoTimeHighCycles;
-            wave->timeLowCycles = wave->gotoTimeLowCycles;
           }
+          wave->lastEdge = now;
         } else {
           uint32_t deltaCycles = wave->nextServiceCycle - now;
           nextEventCycles = min_u32(nextEventCycles, deltaCycles);
