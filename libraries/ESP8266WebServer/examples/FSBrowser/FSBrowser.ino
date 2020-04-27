@@ -86,30 +86,33 @@ String unsupportedFiles = String();
 
 File uploadFile;
 
+static const char TEXT_PLAIN[] PROGMEM = "text/plain";
+static const char FS_INIT_ERROR[] PROGMEM = "FS INIT ERROR";
+static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 
 ////////////////////////////////
 // Utils to return HTTP codes, determine content-type and URLdecode params of GET method
 
 void replyOK() {
-  server.send(200, "text/plain", "");
+  server.send(200, FPSTR(TEXT_PLAIN), "");
 }
 
 void replyOKWithMsg(String msg) {
-  server.send(200, "text/plain", msg);
+  server.send(200, FPSTR(TEXT_PLAIN), msg);
 }
 
 void replyNotFound(String msg) {
-  server.send(404, "text/plain", msg);
+  server.send(404, FPSTR(TEXT_PLAIN), msg);
 }
 
 void replyBadRequest(String msg) {
   DBG_OUTPUT_PORT.println(msg);
-  server.send(400, "text/plain", msg + "\r\n");
+  server.send(400, FPSTR(TEXT_PLAIN), msg + "\r\n");
 }
 
 void replyServerError(String msg) {
   DBG_OUTPUT_PORT.println(msg);
-  server.send(500, "text/plain", msg + "\r\n");
+  server.send(500, FPSTR(TEXT_PLAIN), msg + "\r\n");
 }
 
 String getContentType(String filename) {
@@ -152,7 +155,7 @@ String getContentType(String filename) {
   if (filename.endsWith(".gz")) {
     return "application/x-gzip";
   }
-  return "text/plain";
+  return FPSTR(TEXT_PLAIN);
 }
 
 unsigned char hexDigitToInt(char c) {
@@ -200,13 +203,13 @@ String urlDecode(String str) {
 String checkForUnsupportedPath(String filename) {
   String error = String();
   if (!filename.startsWith("/")) {
-    error += "!NO_LEADING_SLASH! ";
+    error += F("!NO_LEADING_SLASH! ");
   }
   if (filename.indexOf("//") != -1) {
-    error += "!DOUBLE_SLASH! ";
+    error += F("!DOUBLE_SLASH! ");
   }
   if (filename.endsWith("/")) {
-    error += "!TRAILING_SLASH! ";
+    error += F("!TRAILING_SLASH! ");
   }
   return error;
 }
@@ -230,15 +233,15 @@ void handleStatus() {
   json += "\", \"isOk\":";
   if (fsOK) {
     fileSystem->info(fs_info);
-    json += "\"true\", \"totalBytes\":\"";
+    json += F("\"true\", \"totalBytes\":\"");
     json += fs_info.totalBytes;
-    json += "\", \"usedBytes\":\"";
+    json += F("\", \"usedBytes\":\"");
     json += fs_info.usedBytes;
     json += "\"";
   } else {
     json += "\"false\"";
   }
-  json += ",\"unsupportedFiles\":\"";
+  json += F(",\"unsupportedFiles\":\"");
   json += unsupportedFiles;
   json += "\"}";
 
@@ -252,11 +255,11 @@ void handleStatus() {
 */
 void handleFileList() {
   if (!fsOK) {
-    return replyServerError("FS INIT ERROR");
+    return replyServerError(FPSTR(FS_INIT_ERROR));
   }
 
   if (!server.hasArg("dir")) {
-    return replyBadRequest("BAD ARGS");
+    return replyBadRequest(F("DIR ARG MISSING"));
   }
 
   String path = urlDecode(server.arg("dir"));
@@ -270,7 +273,7 @@ void handleFileList() {
 
   // use HTTP/1.1 Chunked response to avoid building a huge temporary string
   if (!server.chunkedResponseModeStart(200, "text/json")) {
-    server.send(505, FPSTR("text/html"), FPSTR("HTTP1.1 required"));
+    server.send(505, F("text/html"), F("HTTP1.1 required"));
     return;
   }
 
@@ -298,11 +301,11 @@ void handleFileList() {
     if (dir.isDirectory()) {
       output += "dir";
     } else {
-      output += "file\",\"size\":\"";
+      output += F("file\",\"size\":\"");
       output += dir.fileSize();
     }
 
-    output += "\",\"name\":\"";
+    output += F("\",\"name\":\"");
     // Always return names without leading "/"
     if (dir.fileName()[0] == '/') {
       output += &(dir.fileName()[1]);
@@ -326,7 +329,7 @@ void handleFileList() {
 bool handleFileRead(String path) {
   DBG_OUTPUT_PORT.println(String("handleFileRead: ") + path);
   if (!fsOK) {
-    replyServerError("FS INIT ERROR");
+    replyServerError(FPSTR(FS_INIT_ERROR));
     return true;
   }
 
@@ -336,7 +339,7 @@ bool handleFileRead(String path) {
 
   String contentType;
   if (server.hasArg("download")) {
-    contentType = "application/octet-stream";
+    contentType = F("application/octet-stream");
   } else {
     contentType = getContentType(path);
   }
@@ -387,17 +390,17 @@ String lastExistingParent(String path) {
 */
 void handleFileCreate() {
   if (!fsOK) {
-    return replyServerError("FS INIT ERROR");
+    return replyServerError(FPSTR(FS_INIT_ERROR));
   }
 
   String path = server.arg("path");
   if (path.isEmpty()) {
-    return replyBadRequest("MISSING PATH ARG");
+    return replyBadRequest(F("PATH ARG MISSING"));
   }
 
 #ifdef USE_SPIFFS
   if (checkForUnsupportedPath(path).length() > 0) {
-    return replyServerError("INVALID FILENAME");
+    return replyServerError(F("INVALID FILENAME"));
   }
 #endif
 
@@ -405,7 +408,7 @@ void handleFileCreate() {
     return replyBadRequest("BAD PATH");
   }
   if (fileSystem->exists(path)) {
-    return replyBadRequest("PATH FILE EXISTS");
+    return replyBadRequest(F("PATH FILE EXISTS"));
   }
 
   String src = server.arg("src");
@@ -416,7 +419,7 @@ void handleFileCreate() {
       // Create a folder
       path.remove(path.length() - 1);
       if (!fileSystem->mkdir(path)) {
-        return replyServerError("MKDIR FAILED");
+        return replyServerError(F("MKDIR FAILED"));
       }
     } else {
       // Create a file
@@ -425,7 +428,7 @@ void handleFileCreate() {
         file.write((const char *)0);
         file.close();
       } else {
-        return replyServerError("CREATE FAILED");
+        return replyServerError(F("CREATE FAILED"));
       }
     }
     if (path.lastIndexOf('/') > -1) {
@@ -438,7 +441,7 @@ void handleFileCreate() {
       return replyBadRequest("BAD SRC");
     }
     if (!fileSystem->exists(src)) {
-      return replyBadRequest("SRC FILE NOT FOUND");
+      return replyBadRequest(F("SRC FILE NOT FOUND"));
     }
 
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path + " from " + src);
@@ -450,7 +453,7 @@ void handleFileCreate() {
       src.remove(src.length() - 1);
     }
     if (!fileSystem->rename(src, path)) {
-      return replyServerError("RENAME FAILED");
+      return replyServerError(F("RENAME FAILED"));
     }
     replyOKWithMsg(lastExistingParent(src));
   }
@@ -494,7 +497,7 @@ void deleteRecursive(String path) {
 */
 void handleFileDelete() {
   if (!fsOK) {
-    return replyServerError("FS INIT ERROR");
+    return replyServerError(FPSTR(FS_INIT_ERROR));
   }
 
   String path = server.arg(0);
@@ -504,7 +507,7 @@ void handleFileDelete() {
 
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
   if (!fileSystem->exists(path)) {
-    return replyNotFound("FileNotFound");
+    return replyNotFound(FPSTR(FILE_NOT_FOUND));
   }
   deleteRecursive(path);
 
@@ -516,7 +519,7 @@ void handleFileDelete() {
 */
 void handleFileUpload() {
   if (!fsOK) {
-    return replyServerError("FS INIT ERROR");
+    return replyServerError(FPSTR(FS_INIT_ERROR));
   }
   if (server.uri() != "/edit") {
     return;
@@ -531,14 +534,14 @@ void handleFileUpload() {
     DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
     if (!uploadFile) {
-      return replyServerError("CREATE FAILED");
+      return replyServerError(F("CREATE FAILED"));
     }
     DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
       size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
       if (bytesWritten != upload.currentSize) {
-        return replyServerError("WRITE FAILED");
+        return replyServerError(F("WRITE FAILED"));
       }
     }
     DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
@@ -558,7 +561,7 @@ void handleFileUpload() {
 */
 void handleNotFound() {
   if (!fsOK) {
-    return replyServerError("FS INIT ERROR");
+    return replyServerError(FPSTR(FS_INIT_ERROR));
   }
 
   String uri = urlDecode(server.uri());
@@ -570,18 +573,17 @@ void handleNotFound() {
   // Dump debug data
   String message;
   message.reserve(100);
-  message = "Error: File not found\n\n";
-  message += "URI: ";
+  message = F("Error: File not found\n\nURI: ");
   message += uri;
-  message += "\nMethod: ";
+  message += F("\nMethod: ");
   message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
+  message += F("\nArguments: ");
   message += server.args();
   message += '\n';
   for (uint8_t i = 0; i < server.args(); i++) {
-    message += " NAME:";
+    message += F(" NAME:");
     message += server.argName(i);
-    message += "\n VALUE:";
+    message += F("\n VALUE:");
     message += server.arg(i);
     message += '\n';
   }
@@ -600,15 +602,15 @@ void handleNotFound() {
    Otherwise, fails with a 404 page with debug information
 */
 void handleGetEdit() {
-  if (handleFileRead("/edit/index.htm")) {
+  if (handleFileRead(F("/edit/index.htm"))) {
     return;
   }
 
 #ifdef INCLUDE_FALLBACK_INDEX_HTM
-  server.sendHeader("Content-Encoding", "gzip");
+  server.sendHeader(F("Content-Encoding"), "gzip");
   server.send(200, "text/html", index_htm_gz, index_htm_gz_len);
 #else
-  replyNotFound("FileNotFound");
+  replyNotFound(FPSTR(FILE_NOT_FOUND));
 #endif
 
 }
@@ -626,12 +628,12 @@ void setup(void) {
   fileSystemConfig.setAutoFormat(false);
   fileSystem->setConfig(fileSystemConfig);
   fsOK = fileSystem->begin();
-  DBG_OUTPUT_PORT.println(fsOK ? "Filesystem initialized." : "Filesystem init failed!");
+  DBG_OUTPUT_PORT.println(fsOK ? F("Filesystem initialized.") : F("Filesystem init failed!"));
 
 #ifdef USE_SPIFFS
   // Debug: dump on console contents of filessytem with no filter and check filenames validity
   Dir dir = fileSystem->openDir("");
-  DBG_OUTPUT_PORT.println("List of files at root of filesystem:");
+  DBG_OUTPUT_PORT.println(F("List of files at root of filesystem:"));
   while (dir.next()) {
     String error = checkForUnsupportedPath(dir.fileName());
     String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
@@ -658,16 +660,16 @@ void setup(void) {
     DBG_OUTPUT_PORT.print(".");
   }
   DBG_OUTPUT_PORT.println("");
-  DBG_OUTPUT_PORT.print("Connected! IP address: ");
+  DBG_OUTPUT_PORT.print(F("Connected! IP address: "));
   DBG_OUTPUT_PORT.println(WiFi.localIP());
 
   ////////////////////////////////
   // MDNS INIT
   if (MDNS.begin(host)) {
     MDNS.addService("http", "tcp", 80);
-    DBG_OUTPUT_PORT.print("Open http://");
+    DBG_OUTPUT_PORT.print(F("Open http://"));
     DBG_OUTPUT_PORT.print(host);
-    DBG_OUTPUT_PORT.println(".local/edit to open the FileSystem Browser");
+    DBG_OUTPUT_PORT.println(F(".local/edit to open the FileSystem Browser"));
   }
 
   ////////////////////////////////
