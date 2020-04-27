@@ -106,6 +106,12 @@ static void ICACHE_RAM_ATTR deinitTimer() {
   timerRunning = false;
 }
 
+static ICACHE_RAM_ATTR void forceTimerInterrupt() {
+  if (T1L > microsecondsToClockCycles(10)) {
+    timer1_write(microsecondsToClockCycles(10));
+  }
+}
+
 // Set a callback.  Pass in NULL to stop it
 void setTimer1Callback(uint32_t (*fn)()) {
   timer1CB = fn;
@@ -141,7 +147,7 @@ typedef struct {
 } PWMState;
 
 static PWMState pwmState;
-static volatile PWMState *pwmUpdate = nullptr; // Set by main code, cleared by ISR
+static volatile PWMState * volatile pwmUpdate = nullptr; // Set by main code, cleared by ISR
 static uint32_t pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
 
 // Called when analogWriteFreq() changed to update the PWM total period
@@ -167,6 +173,7 @@ void _setPWMPeriodCC(uint32_t cc) {
     p.delta[p.cnt] = cc - ttl; // Final cleanup exactly cc total cycles
     // Update and wait for mailbox to be emptied
     pwmUpdate = &p;
+    forceTimerInterrupt();
     while (pwmUpdate) {
       delay(0);
     }
@@ -176,21 +183,21 @@ void _setPWMPeriodCC(uint32_t cc) {
 
 // Helper routine to remove an entry from the state machine
 static ICACHE_RAM_ATTR void _removePWMEntry(int pin, PWMState *p) {
-  int delta = 0;
   int i;
-  for (i=0; i < p->cnt; i++) {
-    if (p->pin[i] == pin) {
-      delta = p->delta[i];
-      break;
-    }
-  }
+
+  // Find the pin to pull out...
+  for (i = 0; p->pin[i] != pin; i++) { /* no-op */ }
+  auto delta = p->delta[i];
+
   // Add the removed previous pin delta to preserve absolute position
   p->delta[i+1] += delta;
-  // Move everything back one and clean up
+
+  // Move everything back one
   for (i++; i <= p->cnt; i++) {
     p->pin[i-1] = p->pin[i];
     p->delta[i-1] = p->delta[i];
   }
+  // Remove the pin from the active list
   p->mask &= ~(1<<pin);
   p->cnt--;
 }
@@ -200,16 +207,19 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
   if (!((1<<pin) & pwmState.mask)) {
     return false; // Pin not actually active
   }
-  
+
   PWMState p;  // The working copy since we can't edit the one in use
   p = pwmState;
   _removePWMEntry(pin, &p);
+
   // Update and wait for mailbox to be emptied
   pwmUpdate = &p;
+  forceTimerInterrupt();
   while (pwmUpdate) {
     /* Busy wait, could be in ISR */
   }
-  // Possibly shut doen the timer completely if we're done
+
+  // Possibly shut down the timer completely if we're done
   if (!waveformEnabled && !pwmState.cnt && !timer1CB) {
     deinitTimer();
   }
@@ -257,8 +267,13 @@ bool _setPWM(int pin, uint32_t cc) {
   if (!timerRunning) {
     initTimer();
     timer1_write(microsecondsToClockCycles(10));
+  } else {
+    forceTimerInterrupt();
   }
-  while (pwmUpdate) { delay(0); }
+
+  while (pwmUpdate) {
+    delay(0);
+  }
   return true;
 }
 
@@ -302,10 +317,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
       initTimer();
       timer1_write(microsecondsToClockCycles(10));
     } else {
-      // Ensure timely service....
-      if (T1L > microsecondsToClockCycles(10)) {
-        timer1_write(microsecondsToClockCycles(10));
-      }
+      forceTimerInterrupt();
     }
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
@@ -406,7 +418,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   if (waveformEnabled || pwmState.cnt) {
     do {
       nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
-      
+
       // PWM state machine implementation
       if (pwmState.cnt) {
         uint32_t now = GetCycleCountIRQ();
