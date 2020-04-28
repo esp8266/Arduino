@@ -286,7 +286,7 @@ boards = collections.OrderedDict([
             'crystalfreq_menu',
             'flashmode_dout',
             'flashfreq_40',
-            '1M',
+            '1M', '2M',
             'led',
             ],
         'desc': [ 'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.',

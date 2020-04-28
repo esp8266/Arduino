@@ -118,11 +118,6 @@ uint32_t EspClass::getFreeSketchSpace()
   return 4 * 1024 * 1024;
 }
 
-uint8_t EspClass::getCpuFreqMHz()
-{
-  return F_CPU / 1000000;
-}
-
 const char *EspClass::getSdkVersion()
 {
   return "2.5.0";
