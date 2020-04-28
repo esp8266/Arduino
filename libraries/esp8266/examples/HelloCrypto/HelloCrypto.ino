@@ -1,13 +1,14 @@
 /**
-   This example shows the functionality of the CryptoInterface library.
+   This example demonstrates the usage of the ESP8266 Crypto implementation, which aims to contain easy-to-use cryptographic functions.
+   Crypto is currently primarily a frontend for the cryptographic library BearSSL which is used by `BearSSL::WiFiClientSecure` and `BearSSL::WiFiServerSecure` in the ESP8266 Arduino Core.
+   Extensive documentation can be found in the Crypto source code files and on the [BearSSL homepage](https://www.bearssl.org).
 */
 
 #include <ESP8266WiFi.h>
 #include <TypeConversion.h>
-#include <CryptoInterface.h>
+#include <Crypto.h>
 
 namespace TypeCast = esp8266::TypeConversion;
-using namespace experimental;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -39,31 +40,31 @@ void loop() {
   String exampleData = F("Hello Crypto World!");
   Serial.println(String(F("This is our example data: ")) + exampleData);
 
-  uint8_t resultArray[CryptoInterface::SHA256::NATURAL_LENGTH] { 0 };
-  uint8_t derivedKey[CryptoInterface::ENCRYPTION_KEY_LENGTH] { 0 };
+  uint8_t resultArray[esp8266::Crypto::SHA256::NATURAL_LENGTH] { 0 };
+  uint8_t derivedKey[esp8266::Crypto::ENCRYPTION_KEY_LENGTH] { 0 };
 
   static uint32_t encryptionCounter = 0;
 
 
   // Generate the salt to use for HKDF
   uint8_t hkdfSalt[16] { 0 };
-  CryptoInterface::getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
+  esp8266::Crypto::getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
 
   // Generate the key to use for HMAC and encryption
-  CryptoInterface::HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
+  esp8266::Crypto::HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
   hkdfInstance.produce(derivedKey, sizeof derivedKey);
 
   // Hash
-  CryptoInterface::SHA256::hash(exampleData.c_str(), exampleData.length(), resultArray);
+  esp8266::Crypto::SHA256::hash(exampleData.c_str(), exampleData.length(), resultArray);
   Serial.println(String(F("\nThis is the SHA256 hash of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
-  Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + CryptoInterface::SHA256::hash(exampleData));
+  Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + esp8266::Crypto::SHA256::hash(exampleData));
 
 
   // HMAC
   // Note that HMAC output length is limited
-  CryptoInterface::SHA256::hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
+  esp8266::Crypto::SHA256::hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
   Serial.println(String(F("\nThis is the SHA256 HMAC of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
-  Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + CryptoInterface::SHA256::hmac(exampleData, derivedKey, sizeof derivedKey, CryptoInterface::SHA256::NATURAL_LENGTH));
+  Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + esp8266::Crypto::SHA256::hmac(exampleData, derivedKey, sizeof derivedKey, esp8266::Crypto::SHA256::NATURAL_LENGTH));
 
 
   // Authenticated Encryption with Associated Data (AEAD)
@@ -74,10 +75,10 @@ void loop() {
   Serial.println(String(F("\nThis is the data to encrypt: ")) + dataToEncrypt);
 
   // Note that the key must be ENCRYPTION_KEY_LENGTH long.
-  CryptoInterface::ChaCha20Poly1305::encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
+  esp8266::Crypto::ChaCha20Poly1305::encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   Serial.println(String(F("Encrypted data: ")) + dataToEncrypt);
 
-  bool decryptionSucceeded = CryptoInterface::ChaCha20Poly1305::decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
+  bool decryptionSucceeded = esp8266::Crypto::ChaCha20Poly1305::decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   encryptionCounter++;
 
   if (decryptionSucceeded) {
