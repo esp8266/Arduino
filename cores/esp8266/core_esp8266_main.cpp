@@ -34,6 +34,7 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include "flash_quirks.h"
 #include <umm_malloc/umm_malloc.h>
 #include <core_esp8266_non32xfer.h>
 
