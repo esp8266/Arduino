@@ -30,8 +30,8 @@ const char *softAP_password = APPSK;
 const char *myHostname = "esp8266";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
-char ssid[32] = "";
-char password[32] = "";
+char ssid[33] = "";
+char password[65] = "";
 
 // DNS server
 const byte DNS_PORT = 53;
@@ -140,4 +140,3 @@ void loop() {
   //HTTP
   server.handleClient();
 }
-
