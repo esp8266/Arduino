@@ -78,6 +78,9 @@ volatile uint32_t waveformNewLow = 0;
 
 static uint32_t (*timer1CB)() = NULL;
 
+uint32_t at160 = 0;
+uint32_t at80 = 0;
+
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
 
@@ -382,6 +385,21 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   #define DELTAIRQ (microsecondsToClockCycles(2))
 #endif
 
+static inline ICACHE_RAM_ATTR uint32_t turboAdjust(uint32_t cycles, bool turbo) {
+#if F_CPU == 80000000
+  if (turbo) {
+      return cycles * 2;
+  } else {
+      return cycles;
+  }
+#else
+  if (turbo) {
+      return cycles;
+  } else {
+      return cycles / 2;
+  }
+#endif
+}
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Optimize the NMI inner loop by keeping track of the min and max GPIO that we
@@ -389,6 +407,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // we can avoid looking at the other pins.
   static int startPin = 0;
   static int endPin = 0;
+
+  bool turbo = (*(uint32_t*)0x3FF00014) & 1 ? true : false;
+  if (turbo) at160++;
+  else at80++;
+  //if (turbo) GPOS = 1<<14; else GPOC = 1<<14;
 
   uint32_t nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
   uint32_t timeoutCycle = GetCycleCountIRQ() + microsecondsToClockCycles(14);
@@ -450,7 +473,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 } while (pwmState.delta[pwmState.idx] == 0);
             }
             // Preserve duty cycle over PWM period by using now+xxx instead of += delta
-            pwmState.nextServiceCycle = now + pwmState.delta[pwmState.idx];
+#if F_CPU == 80000000
+            pwmState.nextServiceCycle = now + (turbo ? 2 : 1) * pwmState.delta[pwmState.idx];
+#else
+            pwmState.nextServiceCycle = now + pwmState.delta[pwmState.idx] / (turbo ? 1 : 2);
+#endif
             cyclesToGo = pwmState.nextServiceCycle - now; // Guaranteed to be >= 0 always
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
@@ -493,12 +520,24 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               SetGPIO(mask);
             }
             if (wave->lastEdge) {
-              int32_t err = wave->desiredLowCycles - (now - wave->lastEdge);
-              err /= 4;
-              wave->timeLowCycles += err;
+#if F_CPU == 80000000
+              auto desiredLowCycles = wave->desiredLowCycles << (turbo ? 1 : 0);
+#else
+              auto desiredLowCycles = wave->desiredLowCycles >> (turbo ? 0 : 1);
+#endif
+              int32_t err = desiredLowCycles - (now - wave->lastEdge);
+              if (abs(err) < desiredLowCycles) { // If we've lost > the entire phase, ignore this error signal
+                err /= 4;
+                wave->timeLowCycles += err;
+              }
             }
-            wave->nextServiceCycle = now + wave->timeHighCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
+#if F_CPU == 80000000
+            auto timeHighCycles = wave->timeHighCycles << (turbo ? 1 : 0);
+#else
+            auto timeHighCycles = wave->timeHighCycles >> (turbo ? 0 : 1);
+#endif
+            wave->nextServiceCycle = now + timeHighCycles;
+            nextEventCycles = min_u32(nextEventCycles, timeHighCycles);
           } else {
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
@@ -513,12 +552,24 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave->desiredLowCycles = wave->gotoTimeLowCycles;
               wave->gotoTimeHighCycles = 0;
             } else {
-              int32_t err = wave->desiredHighCycles - (now - wave->lastEdge);
-              err /= 4;
-              wave->timeHighCycles += err; // Feedback 1/4 of the error
+#if F_CPU == 80000000
+              auto desiredHighCycles = wave->desiredHighCycles << (turbo ? 1 : 0);
+#else
+              auto desiredHighCycles = wave->desiredHighCycles >> (turbo ? 0 : 1);
+#endif
+              int32_t err = desiredHighCycles - (now - wave->lastEdge);
+              if (abs(err) < desiredHighCycles) { // If we've lost > the entire phase, ignore this error signal
+                err /= 4;
+                wave->timeHighCycles += err; // Feedback 1/4 of the error
+              }
             }
-            wave->nextServiceCycle = now + wave->timeLowCycles;
-            nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
+#if F_CPU == 80000000
+            auto timeLowCycles = wave->timeLowCycles << (turbo ? 1 : 0);
+#else
+            auto timeLowCycles = wave->timeLowCycles >> (turbo ? 0 : 1);
+#endif
+            wave->nextServiceCycle = now + timeLowCycles;
+            nextEventCycles = min_u32(nextEventCycles, timeLowCycles);
           }
           wave->lastEdge = now;
         } else {
@@ -545,11 +596,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   nextEventCycles -= DELTAIRQ;
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
-#if F_CPU == 160000000
-  T1L = nextEventCycles >> 1; // Already know we're in range by MAXIRQUS
-#else
-  T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
-#endif
+  T1L = nextEventCycles >> (turbo ? 1 : 0);
   TEIE |= TEIE1; // Edge int enable
 }
 
