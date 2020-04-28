@@ -155,6 +155,10 @@ static uint32_t pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
 
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(uint32_t cc) {
+  // Simple constant shift in period to overcome fixed ISR start time
+  if (cc > microsecondsToClockCycles(3)) {
+      cc -= microsecondsToClockCycles(3) >> 1; // Go back 1.5us
+  }
   if (cc == pwmPeriod) {
     return;
   }
