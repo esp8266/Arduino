@@ -344,6 +344,8 @@ extern "C" void user_init(void) {
 
     initVariant();
 
+    experimental::initFlashQuirks(); // Chip specific flash init.
+
     cont_init(g_pcont);
 
 #if defined(NON32XFER_HANDLER)
