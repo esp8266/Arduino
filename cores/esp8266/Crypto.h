@@ -28,11 +28,9 @@
 
 #include <Arduino.h>
 
-namespace esp8266
-{
 namespace experimental
 {
-namespace Crypto
+namespace crypto
 {
 /**
     Regarding constant-time (CT) HMAC:
@@ -842,7 +840,6 @@ struct ChaCha20Poly1305
     */
     static bool decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength, const void *encryptionNonce, const void *encryptionTag, const void *aad = nullptr, const size_t aadLength = 0);
 };
-}
 }
 }
 #endif
