@@ -450,7 +450,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 }
                 GPOS = pwmState.mask; // Set all active pins high
                 // GPIO16 isn't the same as the others
-                if (pwmState.mask & 0x100) {
+                if (pwmState.mask & (1<<16)) {
                   GP16O |= 1;
                 }
                 pwmState.idx = 0;
