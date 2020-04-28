@@ -228,6 +228,7 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
 
 // Called by analogWrite(1...99%) to set the PWM duty in clock cycles
 bool _setPWM(int pin, uint32_t cc) {
+  stopWaveform(pin);
   PWMState p;  // Working copy
   p = pwmState;
   // Get rid of any entries for this pin
@@ -294,6 +295,8 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
   if (runTimeCycles && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
+
+  _stopPWM(pin); // Make sure there's no PWM live here
 
   uint32_t mask = 1<<pin;
   if (waveformEnabled & mask) {
