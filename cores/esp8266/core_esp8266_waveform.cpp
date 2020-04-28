@@ -54,7 +54,7 @@ constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
+  microsecondsToClockCycles(4) >> 1 : microsecondsToClockCycles(4);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
@@ -306,18 +306,16 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           waveform.enabled ^= 1UL << pin;
         }
         else {
+          const uint32_t idleCcys = wave.periodCcys - wave.dutyCcys;
           // get true accumulated overshoot
           overshootCcys = now - ((waveform.states & (1UL << pin)) ? wave.endDutyCcy : wave.nextPeriodCcy);
-          const uint32_t idleCcys = wave.periodCcys - wave.dutyCcys;
           uint32_t fwdPeriods = static_cast<uint32_t>(overshootCcys) >= idleCcys ?
             ((overshootCcys + wave.dutyCcys) / wave.periodCcys) : 0;
-          if (fwdPeriods && !wave.autoPwm) {
-              // for best effort hard timings - allow only limited duty cycle floating
-              fwdPeriods = 0;
-              overshootCcys = 0;
-          }
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
+            if (!wave.autoPwm) {
+              overshootCcys = 0;
+            }
             // up to and including this period 100% duty
             const bool endOfPeriod = wave.nextPeriodCcy == wave.endDutyCcy;
             // active configuration and forward 100% duty
@@ -328,7 +326,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else if (endOfPeriod) {
               // preceeding period had zero idle cycle, continue direct into new duty cycle
-              wave.nextPeriodCcy += fwdPeriods * wave.periodCcys;
+              if (fwdPeriods) {
+                wave.nextPeriodCcy += fwdPeriods * wave.periodCcys;
+              	// adapt expiry such that it occurs during intended cycle
+                if (WaveformMode::EXPIRES == wave.mode)
+                  wave.expiryCcy += fwdPeriods * wave.periodCcys;
+              }
               wave.endDutyCcy = wave.nextPeriodCcy + wave.dutyCcys;
               wave.nextPeriodCcy += wave.periodCcys;
               nextEdgeCcy = wave.endDutyCcy;
@@ -352,18 +355,18 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else {
               waveform.states ^= 1UL << pin;
+              wave.endDutyCcy = now + wave.dutyCcys;
+              wave.nextPeriodCcy += wave.periodCcys;
               if (fwdPeriods)
               {
-                // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
-                wave.endDutyCcy =
-                  wave.nextPeriodCcy + (fwdPeriods + 1) * wave.dutyCcys +
-                  (overshootCcys + wave.dutyCcys - fwdPeriods * wave.periodCcys);
-                wave.nextPeriodCcy += (fwdPeriods + 1) * wave.periodCcys;
-              }
-              else
-              {
-                wave.endDutyCcy = wave.nextPeriodCcy + wave.dutyCcys + overshootCcys;
-                wave.nextPeriodCcy += wave.periodCcys;
+                if (wave.autoPwm) {
+                  // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
+                  wave.endDutyCcy += (fwdPeriods + 1) * wave.dutyCcys - fwdPeriods * wave.periodCcys;
+                }
+                wave.nextPeriodCcy += fwdPeriods * wave.periodCcys;
+                // adapt expiry such that it occurs during intended cycle
+                if (WaveformMode::EXPIRES == wave.mode)
+                  wave.expiryCcy += fwdPeriods * wave.periodCcys;
               }
               if (pin == 16) {
                 GP16O |= 1; // GPIO16 write slow as it's RMW
