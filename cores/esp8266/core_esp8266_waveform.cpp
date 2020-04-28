@@ -5,23 +5,23 @@
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
-  set to 1-shot mode and is always loaded with the time until the next edge
-  of any live waveforms.
+  high and low period (defined in microseconds or CPU clock cycles).  TIMER1
+  is set to 1-shot mode and is always loaded with the time until the next
+  edge of any live waveforms.
 
   Up to one waveform generator per pin supported.
 
-  Each waveform generator is synchronized to the ESP clock cycle counter, not the
-  timer.  This allows for removing interrupt jitter and delay as the counter
-  always increments once per 80MHz clock.  Changes to a waveform are
+  Each waveform generator is synchronized to the ESP clock cycle counter, not
+  the timer.  This allows for removing interrupt jitter and delay as the
+  counter always increments once per 80MHz clock.  Changes to a waveform are
   contiguous and only take effect on the next waveform transition,
   allowing for smooth transitions.
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
   Everywhere in the code where "cycles" is used, it means ESP.getCycleCount()
-  clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
-  cycles (which may be 2 CPU clock cycles @ 160MHz).
+  clock cycle count, or an interval measured in CPU clock cycles, but not
+  TIMER1 cycles (which may be 2 CPU clock cycles @ 160MHz).
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -379,27 +379,19 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle counter we want for the waveforms.
+
+// The SDK also sometimes is running at a different speed the the Arduino core
+// so the ESP cycle counter is actually running at a variable speed.
+// adjust(x) takes care of adjusting a delta clock cycle amount accordingly.
 #if F_CPU == 80000000
   #define DELTAIRQ (microsecondsToClockCycles(3))
+  #define adjust(x) ((x) << (turbo ? 1 : 0))
 #else
   #define DELTAIRQ (microsecondsToClockCycles(2))
+  #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
-static inline ICACHE_RAM_ATTR uint32_t turboAdjust(uint32_t cycles, bool turbo) {
-#if F_CPU == 80000000
-  if (turbo) {
-      return cycles * 2;
-  } else {
-      return cycles;
-  }
-#else
-  if (turbo) {
-      return cycles;
-  } else {
-      return cycles / 2;
-  }
-#endif
-}
+
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Optimize the NMI inner loop by keeping track of the min and max GPIO that we
@@ -408,10 +400,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   static int startPin = 0;
   static int endPin = 0;
 
+  // Flag if the core is at 160 MHz, for use by adjust()
   bool turbo = (*(uint32_t*)0x3FF00014) & 1 ? true : false;
-  if (turbo) at160++;
-  else at80++;
-  //if (turbo) GPOS = 1<<14; else GPOC = 1<<14;
 
   uint32_t nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
   uint32_t timeoutCycle = GetCycleCountIRQ() + microsecondsToClockCycles(14);
@@ -473,11 +463,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 } while (pwmState.delta[pwmState.idx] == 0);
             }
             // Preserve duty cycle over PWM period by using now+xxx instead of += delta
-#if F_CPU == 80000000
-            pwmState.nextServiceCycle = now + (turbo ? 2 : 1) * pwmState.delta[pwmState.idx];
-#else
-            pwmState.nextServiceCycle = now + pwmState.delta[pwmState.idx] / (turbo ? 1 : 2);
-#endif
+            pwmState.nextServiceCycle = now + adjust(pwmState.delta[pwmState.idx]);
             cyclesToGo = pwmState.nextServiceCycle - now; // Guaranteed to be >= 0 always
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
@@ -520,22 +506,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               SetGPIO(mask);
             }
             if (wave->lastEdge) {
-#if F_CPU == 80000000
-              auto desiredLowCycles = wave->desiredLowCycles << (turbo ? 1 : 0);
-#else
-              auto desiredLowCycles = wave->desiredLowCycles >> (turbo ? 0 : 1);
-#endif
+              auto desiredLowCycles = adjust(wave->desiredLowCycles);
               int32_t err = desiredLowCycles - (now - wave->lastEdge);
               if (abs(err) < desiredLowCycles) { // If we've lost > the entire phase, ignore this error signal
                 err /= 4;
                 wave->timeLowCycles += err;
               }
             }
-#if F_CPU == 80000000
-            auto timeHighCycles = wave->timeHighCycles << (turbo ? 1 : 0);
-#else
-            auto timeHighCycles = wave->timeHighCycles >> (turbo ? 0 : 1);
-#endif
+            auto timeHighCycles = adjust(wave->timeHighCycles);
             wave->nextServiceCycle = now + timeHighCycles;
             nextEventCycles = min_u32(nextEventCycles, timeHighCycles);
           } else {
@@ -552,22 +530,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave->desiredLowCycles = wave->gotoTimeLowCycles;
               wave->gotoTimeHighCycles = 0;
             } else {
-#if F_CPU == 80000000
-              auto desiredHighCycles = wave->desiredHighCycles << (turbo ? 1 : 0);
-#else
-              auto desiredHighCycles = wave->desiredHighCycles >> (turbo ? 0 : 1);
-#endif
+              auto desiredHighCycles = adjust(wave->desiredHighCycles);
               int32_t err = desiredHighCycles - (now - wave->lastEdge);
               if (abs(err) < desiredHighCycles) { // If we've lost > the entire phase, ignore this error signal
                 err /= 4;
                 wave->timeHighCycles += err; // Feedback 1/4 of the error
               }
             }
-#if F_CPU == 80000000
-            auto timeLowCycles = wave->timeLowCycles << (turbo ? 1 : 0);
-#else
-            auto timeLowCycles = wave->timeLowCycles >> (turbo ? 0 : 1);
-#endif
+            auto timeLowCycles = adjust(wave->timeLowCycles);
             wave->nextServiceCycle = now + timeLowCycles;
             nextEventCycles = min_u32(nextEventCycles, timeLowCycles);
           }
