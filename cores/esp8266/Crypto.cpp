@@ -63,7 +63,7 @@ uint8_t *defaultNonceGenerator(uint8_t *nonceArray, const size_t nonceLength)
     return ESP.random(nonceArray, nonceLength);
 }
 
-esp8266::Crypto::nonceGeneratorType _nonceGenerator = defaultNonceGenerator;
+esp8266::experimental::Crypto::nonceGeneratorType _nonceGenerator = defaultNonceGenerator;
 
 void *createBearsslHmac(const br_hash_class *hashType, const void *data, const size_t dataLength, const void *hashKey, const size_t hashKeyLength, void *resultArray, const size_t outputLength)
 {
@@ -183,6 +183,8 @@ void *sha1HashHelper(const void *data, const size_t dataLength, void *resultArra
 }
 
 namespace esp8266
+{
+namespace experimental
 {
 namespace Crypto
 {
@@ -547,6 +549,7 @@ bool ChaCha20Poly1305::decrypt(void *data, const size_t dataLength, const void *
     }
 
     return true;
+}
 }
 }
 }

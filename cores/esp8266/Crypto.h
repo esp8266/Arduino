@@ -30,6 +30,8 @@
 
 namespace esp8266
 {
+namespace experimental
+{
 namespace Crypto
 {
 /**
@@ -745,6 +747,7 @@ struct HKDF
 
 private:
 
+    // Use an opaque type to avoid #include <bearssl/bearssl.h> which drags the lib declarations into userland. The global scope prefix is required for compilation to succeed, it seems.
     ::br_hkdf_context hkdfContext;
 };
 
@@ -839,6 +842,7 @@ struct ChaCha20Poly1305
     */
     static bool decrypt(void *data, const size_t dataLength, const void *key, const void *keySalt, const size_t keySaltLength, const void *encryptionNonce, const void *encryptionTag, const void *aad = nullptr, const size_t aadLength = 0);
 };
+}
 }
 }
 #endif
