@@ -91,7 +91,7 @@ static const char FS_INIT_ERROR[] PROGMEM = "FS INIT ERROR";
 static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 
 ////////////////////////////////
-// Utils to return HTTP codes, determine content-type and URLdecode params of GET method
+// Utils to return HTTP codes, and determine content-type
 
 void replyOK() {
   server.send(200, FPSTR(TEXT_PLAIN), "");
@@ -156,43 +156,6 @@ String getContentType(String filename) {
     return "application/x-gzip";
   }
   return FPSTR(TEXT_PLAIN);
-}
-
-unsigned char hexDigitToInt(char c) {
-  if (c >= '0' && c <= '9') {
-    return ((unsigned char)c - '0');
-  }
-  if (c >= 'a' && c <= 'f') {
-    return ((unsigned char)c - 'a' + 10);
-  }
-  if (c >= 'A' && c <= 'F') {
-    return ((unsigned char)c - 'A' + 10);
-  }
-  return (0);
-}
-
-String urlDecode(String str) {
-  String decodedString = "";
-  char c;
-  char code0;
-  char code1;
-  for (unsigned int i = 0; i < str.length(); i++) {
-    c = str.charAt(i);
-    if (c == '+') {
-      decodedString += ' ';
-    } else if (c == '%') {
-      i++;
-      code0 = str.charAt(i);
-      i++;
-      code1 = str.charAt(i);
-      c = (hexDigitToInt(code0) << 4) | hexDigitToInt(code1);
-      decodedString += c;
-    } else {
-      decodedString += c;
-    }
-  }
-
-  return decodedString;
 }
 
 #ifdef USE_SPIFFS
@@ -262,7 +225,7 @@ void handleFileList() {
     return replyBadRequest(F("DIR ARG MISSING"));
   }
 
-  String path = urlDecode(server.arg("dir"));
+  String path = server.arg("dir");
   if (path != "/" && !fileSystem->exists(path)) {
     return replyBadRequest("BAD PATH");
   }
@@ -564,7 +527,7 @@ void handleNotFound() {
     return replyServerError(FPSTR(FS_INIT_ERROR));
   }
 
-  String uri = urlDecode(server.uri());
+  String uri = ESP8266WebServer::urlDecode(server.uri()); // required to read paths with blanks
 
   if (handleFileRead(uri)) {
     return;
