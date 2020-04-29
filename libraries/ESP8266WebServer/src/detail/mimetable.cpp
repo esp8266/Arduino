@@ -17,6 +17,7 @@ const Entry mimeTable[maxType] PROGMEM =
     { ".png", "image/png" },
     { ".gif", "image/gif" },
     { ".jpg", "image/jpeg" },
+    { ".jpeg", "image/jpeg" },
     { ".ico", "image/x-icon" },
     { ".svg", "image/svg+xml" },
     { ".ttf", "application/x-font-ttf" },
