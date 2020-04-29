@@ -432,10 +432,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     wvfState.endPin = 32 - __builtin_clz(wvfState.waveformEnabled);
   } else if (!pwmState.cnt && pwmUpdate) {
     // Start up the PWM generator by copying from the mailbox
-    pwmState = *(PWMState*)pwmUpdate;
-    pwmUpdate = nullptr;
+    pwmState.cnt = 1;
+    pwmState.idx = 1; // Ensure copy this cycle, cause it to start at t=0
     pwmState.nextServiceCycle = GetCycleCountIRQ(); // Do it this loop!
-    pwmState.idx = pwmState.cnt; // Cause it to start at t=0
     // No need for mem barrier here.  Global must be written by IRQ exit
   } else if (wvfState.waveformToChange >= 0) {
     wvfState.waveform[wvfState.waveformToChange].gotoTimeHighCycles = wvfState.waveformNewHigh;
