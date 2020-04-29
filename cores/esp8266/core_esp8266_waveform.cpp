@@ -475,7 +475,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 GPOS = pwmState.mask; // Set all active pins high
                 // GPIO16 isn't the same as the others
                 if (pwmState.mask & (1<<16)) {
-                  GP16O |= 1;
+                  GP16O = 1;
                 }
                 pwmState.idx = 0;
             } else {
@@ -484,7 +484,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                     GPOC = 1<<pwmState.pin[pwmState.idx];
                     // GPIO16 still needs manual work
                     if (pwmState.pin[pwmState.idx] == 16) {
-                      GP16O &= ~1;
+                      GP16O = 0;
                     }
                     pwmState.idx++;
                     // Any other pins at this same PWM value will have delta==0, drop them too.
@@ -516,7 +516,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               // Done, remove!
               wvfState.waveformEnabled &= ~mask;
               if (i == 16) {
-                GP16O &= ~1;
+                GP16O = 0;
               } else {
                 ClearGPIO(mask);
               }
@@ -533,7 +533,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           wvfState.waveformState ^= mask;
           if (wvfState.waveformState & mask) {
             if (i == 16) {
-              GP16O |= 1; // GPIO16 write slow as it's RMW
+              GP16O = 1; // GPIO16 write slow as it's RMW
             } else {
               SetGPIO(mask);
             }
@@ -546,7 +546,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             nextEdgeCycles = wave->timeHighCycles;
           } else {
             if (i == 16) {
-              GP16O &= ~1; // GPIO16 write slow as it's RMW
+              GP16O = 0; // GPIO16 write slow as it's RMW
             } else {
               ClearGPIO(mask);
             }
