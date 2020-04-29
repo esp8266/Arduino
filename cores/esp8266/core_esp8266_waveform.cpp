@@ -135,8 +135,8 @@ constexpr int maxPWMs = 8;
 // PWM machine state
 typedef struct {
   uint32_t mask; // Bitmask of active pins
-  uint8_t  cnt;   // How many entries
-  uint8_t  idx;   // Where the state machine is along the list
+  uint32_t cnt;  // How many entries
+  uint32_t idx;  // Where the state machine is along the list
   uint8_t  pin[maxPWMs + 1];
   uint32_t delta[maxPWMs + 1];
   uint32_t nextServiceCycle;  // Clock cycle for next step
@@ -172,7 +172,7 @@ void _setPWMPeriodCC(uint32_t cc) {
     PWMState p;  // The working copy since we can't edit the one in use
     p = pwmState;
     uint32_t ttl = 0;
-    for (auto i = 0; i < p.cnt; i++) {
+    for (uint32_t i = 0; i < p.cnt; i++) {
       uint64_t val64p16 = ((uint64_t)p.delta[i]) << 16;
       uint64_t newVal64p32 = val64p16 * ratio64p16;
       p.delta[i] = newVal64p32 >> 32;
@@ -193,7 +193,7 @@ void _setPWMPeriodCC(uint32_t cc) {
 
 // Helper routine to remove an entry from the state machine
 static ICACHE_RAM_ATTR void _removePWMEntry(int pin, PWMState *p) {
-  int i;
+  uint32_t i;
 
   // Find the pin to pull out...
   for (i = 0; p->pin[i] != pin; i++) { /* no-op */ }
@@ -498,7 +498,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
 #endif
 
-      for (int i = wvfState.startPin; i <= wvfState.endPin; i++) {
+      for (auto i = wvfState.startPin; i <= wvfState.endPin; i++) {
         uint32_t mask = 1<<i;
 
         // If it's not on, ignore!
