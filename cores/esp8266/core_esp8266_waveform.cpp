@@ -113,19 +113,11 @@ static void initTimer() {
   timerRunning = true;
 }
 
-static void ICACHE_RAM_ATTR deinitTimer() {
-  ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
-  timer1_disable();
-  timer1_isr_init();
-  timerRunning = false;
-}
-
 static ICACHE_RAM_ATTR void forceTimerInterrupt() {
   if (T1L > microsecondsToClockCycles(10)) {
     timer1_write(microsecondsToClockCycles(10));
   }
 }
-
 
 // PWM implementation using special purpose state machine
 //
@@ -153,6 +145,18 @@ typedef struct {
 static PWMState pwmState;
 static PWMState *pwmUpdate = nullptr; // Set by main code, cleared by ISR
 static uint32_t pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
+
+
+
+static ICACHE_RAM_ATTR void disableIdleTimer() {
+ if (timerRunning && !wvfState.waveformEnabled && !pwmState.cnt && !wvfState.timer1CB) {
+    ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
+    timer1_disable();
+    timer1_isr_init();
+    timerRunning = false;
+  }
+}
+
 
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(uint32_t cc) {
@@ -226,11 +230,8 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
     MEMBARRIER();
     /* Busy wait, could be in ISR */
   }
-  MEMBARRIER();
   // Possibly shut down the timer completely if we're done
-  if (!wvfState.waveformEnabled && !pwmState.cnt && !wvfState.timer1CB) {
-    deinitTimer();
-  }
+  disableIdleTimer();
   return true;
 }
 
@@ -351,8 +352,8 @@ void setTimer1Callback(uint32_t (*fn)()) {
   if (!timerRunning && fn) {
     initTimer();
     timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
-  } else if (timerRunning && !fn && !wvfState.waveformEnabled && !pwmState.cnt) {
-    deinitTimer();
+  } else {
+    disableIdleTimer();
   }
 }
 
@@ -392,10 +393,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
     }
   }
-  MEMBARRIER();
-  if (!wvfState.waveformEnabled && !pwmState.cnt && !wvfState.timer1CB) {
-    deinitTimer();
-  }
+  disableIdleTimer();
   return true;
 }
 
