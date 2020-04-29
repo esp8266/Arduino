@@ -28,7 +28,23 @@ If you use the gzipped or `INCLUDE_FALLBACK_INDEX_HTM` options, please remember 
 
 ## Dependency
 The html page uses the [Ace.js](https://ace.c9.io/) (v1.4.9 at the time of writing) text editor which is loaded from a CDN. Consequently, internet access from your web browser is required for the FSBrowser editing feature to work as-is.
-If your browser has no web access (e.g. if you are connected to the ESP8266 as an access-point), you can copy the `ace.js` file to the `edit` subfolder of the ESP filesystem, as well as optional themes, plugins etc. according to your needs (see https://github.com/ajaxorg/ace-builds for a full list).
+
+If your browser has no web access (e.g. if you are connected to the ESP8266 as an access-point), you can copy the `ace.js` file to the `edit` subfolder of the ESP filesystem, along with optional plugins etc. according to your needs. A typical set might be:
+```
+ace.js
+ext-keybinding_menu.js
+ext-searchbox.js
+mode-html.js
+worker-html.js
+worker-css.js
+worker-javascript.js
+mode-xml.js
+worker-xml.js
+mode-json.js
+worker-json.js
+```
+(see https://github.com/ajaxorg/ace-builds for a full list).
+
 If `ace.js` cannot be found on the ESP filesystem either, the page will default to a plain text viewer, with a warning message.
 
 ## Notes
