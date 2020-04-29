@@ -427,7 +427,7 @@ void handleFileCreate() {
    Delete the file or folder designed by the given path.
    If it's a file, delete it.
    If it's a folder, delete all nested contents first then the folder itself
-   
+
    IMPORTANT NOTE: using recursion is generally not recommended on embedded devices and can lead to crashes (stack overflow errors).
    This use is just for demonstration purpose, and FSBrowser might crash in case of deeply nested filesystems.
    Please don't do this on a production system.
