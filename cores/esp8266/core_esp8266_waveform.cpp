@@ -87,11 +87,11 @@ namespace {
   static struct {
     Waveform pins[17];             // State of all possible pins
     uint32_t states = 0;           // Is the pin high or low, updated in NMI so no access outside the NMI code
-    volatile uint32_t enabled = 0; // Is it actively running, updated in NMI so no access outside the NMI code
+    uint32_t enabled = 0; // Is it actively running, updated in NMI so no access outside the NMI code
 
     // Enable lock-free by only allowing updates to waveform.states and waveform.enabled from IRQ service routine
-    volatile int32_t toSet = -1;     // Message to the NMI handler to start/modify exactly one waveform
-    volatile int32_t toDisable = -1; // Message to the NMI handler to disable exactly one pin from waveform generation
+    int32_t toSet = -1;     // Message to the NMI handler to start/modify exactly one waveform
+    int32_t toDisable = -1; // Message to the NMI handler to disable exactly one pin from waveform generation
 
     uint32_t(*timer1CB)() = nullptr;
 
@@ -112,6 +112,7 @@ static void initTimer() {
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
   timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
   waveform.timer1Running = true;
+  timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
 }
 
 static void ICACHE_RAM_ATTR deinitTimer() {
@@ -124,10 +125,9 @@ static void ICACHE_RAM_ATTR deinitTimer() {
 // Set a callback.  Pass in NULL to stop it
 void setTimer1Callback(uint32_t (*fn)()) {
   waveform.timer1CB = fn;
-  std::atomic_thread_fence(std::memory_order_release);
+  std::atomic_thread_fence(std::memory_order_acq_rel);
   if (!waveform.timer1Running && fn) {
     initTimer();
-    timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
   } else if (waveform.timer1Running && !fn && !waveform.enabled) {
     deinitTimer();
   }
@@ -164,6 +164,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   wave.periodCcys = periodCcys;
   wave.autoPwm = autoPwm;
 
+  std::atomic_thread_fence(std::memory_order_acquire);
   if (!(waveform.enabled & (1UL << pin))) {
     // wave.nextPeriodCcy and wave.endDutyCcy are initialized by the ISR
     wave.nextPeriodCcy = phaseOffsetCcys;
@@ -183,7 +184,6 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     waveform.toSet = pin;
     if (!waveform.timer1Running) {
       initTimer();
-      timer1_write(microsecondsToClockCycles(1));
     }
     else if (T1L > IRQLATENCY + DELTAIRQ) {
       // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
@@ -200,8 +200,10 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
       waveform.toSet = pin;
     }
   }
+  std::atomic_thread_fence(std::memory_order_acq_rel);
   while (waveform.toSet >= 0) {
-      delay(0); // Wait for waveform to update
+    delay(0); // Wait for waveform to update
+    std::atomic_thread_fence(std::memory_order_acquire);
   }
   return true;
 }
@@ -214,14 +216,17 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   }
   // If user sends in a pin >16 but <32, this will always point to a 0 bit
   // If they send >=32, then the shift will result in 0 and it will also return false
+  std::atomic_thread_fence(std::memory_order_acquire);
   if (waveform.enabled & (1UL << pin)) {
     waveform.toDisable = pin;
     // Must not interfere if Timer is due shortly
     if (T1L > IRQLATENCY + DELTAIRQ) {
       timer1_write(microsecondsToClockCycles(1));
     }
+    std::atomic_thread_fence(std::memory_order_acq_rel);
     while (waveform.toDisable >= 0) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
+      std::atomic_thread_fence(std::memory_order_acquire);
     }
   }
   if (!waveform.enabled && !waveform.timer1CB) {
