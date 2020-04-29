@@ -68,7 +68,10 @@ class LogicAnalyzer:
                     totalHigh = totalHigh + timeHigh
                     listPeriod += [ period ]
                     listHigh += [ timeHigh ]
-                    listDutyCycle += [ timeHigh / period ]
+                    if period:
+                        listDutyCycle += [ timeHigh / period ]
+                    else:
+                        listDutyCycle += [ 0 ]
                     cycleCnt = cycleCnt + 1
         
         if cycleCnt == 0:
@@ -127,8 +130,26 @@ class ESP8266:
         self._comm('a %d %d\n' % (pin, val))
     
     def tone(self, pin, f):
-        self._comm('t %d %d\n' % (pin, val))
+        self._comm('t %d %d\n' % (pin, f))
+
+    def servoAttach(self, pin, angle):
+        self._comm('s %d %d\n' % (pin, angle))
+
+    def servoDetach(self, pin):
+        self._comm('S %d\n' % (pin))
     
+    def startWaveform(self, pin, lo, hi):
+        self._comm('v %d %d %d\n' % (pin, lo, hi))
+
+    def stopWaveform(self, pin):
+        self._comm('V %d' % (pin))
+
+    def wifiConnect(self, ssid, password):
+        self._comm('w %s %s' % (ssid, password))
+
+    def wifiDisconnect(self):
+        self._comm('W')
+
     def perfTest(self):
         return int(self._comm('c\n'))
 

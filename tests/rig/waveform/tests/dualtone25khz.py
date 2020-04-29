@@ -4,7 +4,7 @@ sys.path.append("/Users/earle/Documents/Arduino/hardware/esp8266com/esp8266/test
 import analyzer
 from time import sleep
 
-sut = analyzer.ESP8266(port = 'COM6')
+sut = analyzer.ESP8266(port = 'COM3')
 la = analyzer.LogicAnalyzer()
 
 sut.reset()
@@ -18,8 +18,8 @@ print("analogWriteFreq,analogWrite,Measured Cycles,Average Period,Average Duty C
 for f in freqs:
     sut.analogWriteFreq(f)
     for i in range(0, 1001, 10):
-        sut.analogWrite(5, i)
-        sut.analogWrite(6, 1000-i)
+        sut.analogWrite(1, i)
+        sut.analogWrite(2, 1000-i)
         csv = la.capture(pins = 'D1,D2', samples = 120000, rate = '24mhz')
         cycleCnt, avgPeriod, avgDuty, periods, highs, duties, stdP, stdD = la.decodePWM(csv, 1)
         cycleCnt2, avgPeriod2, avgDuty2, periods2, highs2, duties2, stdP2, stdD2 = la.decodePWM(csv, 2)
