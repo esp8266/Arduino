@@ -28,7 +28,7 @@
 
 #include <Arduino.h>
 
-namespace esp8266
+namespace experimental
 {
 namespace TypeConversion
 {

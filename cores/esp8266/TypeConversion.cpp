@@ -26,7 +26,7 @@
 #include <assert.h>
 #include "TypeConversion.h"
 
-namespace esp8266
+namespace experimental
 {
 namespace TypeConversion
 {

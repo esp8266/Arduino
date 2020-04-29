@@ -8,8 +8,7 @@
 #include <TypeConversion.h>
 #include <Crypto.h>
 
-namespace TypeCast = esp8266::TypeConversion;
-using namespace experimental;
+namespace TypeCast = experimental::TypeConversion;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -38,34 +37,36 @@ void setup() {
 void loop() {
   // This serves only to demonstrate the library use. See the header file for a full list of functions.
 
+  using namespace experimental::crypto;
+
   String exampleData = F("Hello Crypto World!");
   Serial.println(String(F("This is our example data: ")) + exampleData);
 
-  uint8_t resultArray[crypto::SHA256::NATURAL_LENGTH] { 0 };
-  uint8_t derivedKey[crypto::ENCRYPTION_KEY_LENGTH] { 0 };
+  uint8_t resultArray[SHA256::NATURAL_LENGTH] { 0 };
+  uint8_t derivedKey[ENCRYPTION_KEY_LENGTH] { 0 };
 
   static uint32_t encryptionCounter = 0;
 
 
   // Generate the salt to use for HKDF
   uint8_t hkdfSalt[16] { 0 };
-  crypto::getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
+  getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
 
   // Generate the key to use for HMAC and encryption
-  crypto::HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
+  HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
   hkdfInstance.produce(derivedKey, sizeof derivedKey);
 
   // Hash
-  crypto::SHA256::hash(exampleData.c_str(), exampleData.length(), resultArray);
+  SHA256::hash(exampleData.c_str(), exampleData.length(), resultArray);
   Serial.println(String(F("\nThis is the SHA256 hash of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
-  Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + crypto::SHA256::hash(exampleData));
+  Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + SHA256::hash(exampleData));
 
 
   // HMAC
   // Note that HMAC output length is limited
-  crypto::SHA256::hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
+  SHA256::hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
   Serial.println(String(F("\nThis is the SHA256 HMAC of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
-  Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + crypto::SHA256::hmac(exampleData, derivedKey, sizeof derivedKey, crypto::SHA256::NATURAL_LENGTH));
+  Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + SHA256::hmac(exampleData, derivedKey, sizeof derivedKey, SHA256::NATURAL_LENGTH));
 
 
   // Authenticated Encryption with Associated Data (AEAD)
@@ -76,10 +77,10 @@ void loop() {
   Serial.println(String(F("\nThis is the data to encrypt: ")) + dataToEncrypt);
 
   // Note that the key must be ENCRYPTION_KEY_LENGTH long.
-  crypto::ChaCha20Poly1305::encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
+  ChaCha20Poly1305::encrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   Serial.println(String(F("Encrypted data: ")) + dataToEncrypt);
 
-  bool decryptionSucceeded = crypto::ChaCha20Poly1305::decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
+  bool decryptionSucceeded = ChaCha20Poly1305::decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   encryptionCounter++;
 
   if (decryptionSucceeded) {

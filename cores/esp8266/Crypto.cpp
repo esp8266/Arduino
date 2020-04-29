@@ -29,7 +29,7 @@
 
 #include <assert.h>
 
-namespace TypeCast = esp8266::TypeConversion;
+namespace TypeCast = experimental::TypeConversion;
 
 namespace
 {
