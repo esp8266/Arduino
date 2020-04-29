@@ -389,10 +389,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         nextTimerCcy = wave.nextEventCcy;
         nextPin = pin;
       }
-
+      now = ESP.getCycleCount();
     } while ((pin = (pin < endPin) ? pin + 1 : startPin, pin != stopPin));
 
-    now = ESP.getCycleCount();
     const int32_t timerMarginCcys = isrTimeoutCcy - nextTimerCcy;
     busy = timerMarginCcys > 0;
     if (busy) {
