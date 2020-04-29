@@ -40,7 +40,7 @@ protected:
 
 public:
 
-  MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, MeshBackendType classType);
+  MeshBackendBase(const requestHandlerType requestHandler, const responseHandlerType responseHandler, const networkFilterType networkFilter, const MeshBackendType classType);
 
   virtual ~MeshBackendBase();
 
@@ -102,7 +102,7 @@ public:
    * 
    * @return True if this MeshBackendBase instance is in control of the ESP8266 AP. False otherwise.
    */
-  bool isAPController();
+  bool isAPController() const;
 
   /**
    * Change the WiFi channel used by this MeshBackendBase instance. 
@@ -118,7 +118,7 @@ public:
    * @param newWiFiChannel The WiFi channel to change to. Valid values are determined by wifi_get_country, usually integers from 1 to 11 or 1 to 13.
    *                          
    */
-  void setWiFiChannel(uint8 newWiFiChannel);
+  void setWiFiChannel(const uint8 newWiFiChannel);
   uint8 getWiFiChannel() const;
 
   /**
@@ -175,7 +175,7 @@ public:
    * @param newMeshName The mesh name to change to.                        
    */
   virtual void setMeshName(const String &newMeshName);
-  virtual String getMeshName();
+  virtual String getMeshName() const;
       
   /**
    * Change the node id used by this MeshBackendBase instance. 
@@ -187,7 +187,7 @@ public:
    * @param newNodeID The node id to change to.                        
    */
   virtual void setNodeID(const String &newNodeID);
-  virtual String getNodeID();
+  virtual String getNodeID() const;
 
   /**
    * Set the password used when connecting to other AP:s and when other nodes connect to the AP of this node.
@@ -207,16 +207,16 @@ public:
   void setMessage(const String &newMessage);
   String getMessage() const;
 
-  virtual void attemptTransmission(const String &message, bool scan = true, bool scanAllWiFiChannels = false) = 0;
+  virtual void attemptTransmission(const String &message, const bool scan = true, const bool scanAllWiFiChannels = false) = 0;
 
-  void setRequestHandler(requestHandlerType requestHandler);
-  requestHandlerType getRequestHandler();
+  void setRequestHandler(const requestHandlerType requestHandler);
+  requestHandlerType getRequestHandler() const;
   
-  void setResponseHandler(responseHandlerType responseHandler);
-  responseHandlerType getResponseHandler();
+  void setResponseHandler(const responseHandlerType responseHandler);
+  responseHandlerType getResponseHandler() const;
     
-  void setNetworkFilter(networkFilterType networkFilter);
-  networkFilterType getNetworkFilter();
+  void setNetworkFilter(const networkFilterType networkFilter);
+  networkFilterType getNetworkFilter() const;
 
   /**
    * Set a function that should be called after each update of the latestTransmissionOutcomes vector during attemptTransmission. (which happens after each individual transmission has finished)
@@ -225,8 +225,8 @@ public:
    * 
    * Example use cases is modifying getMessage() between transmissions, or aborting attemptTransmission before all nodes in the connectionQueue have been contacted.
    */
-  void setTransmissionOutcomesUpdateHook(transmissionOutcomesUpdateHookType transmissionOutcomesUpdateHook);
-  transmissionOutcomesUpdateHookType getTransmissionOutcomesUpdateHook();
+  void setTransmissionOutcomesUpdateHook(const transmissionOutcomesUpdateHookType transmissionOutcomesUpdateHook);
+  transmissionOutcomesUpdateHookType getTransmissionOutcomesUpdateHook() const;
 
   /**
    * Set whether scan results from this MeshBackendBase instance will include WiFi networks with hidden SSIDs.
@@ -236,7 +236,7 @@ public:
    *
    * @param scanHidden If true, WiFi networks with hidden SSIDs will be included in scan results.
    */
-  void setScanHidden(bool scanHidden);
+  void setScanHidden(const bool scanHidden);
   bool getScanHidden() const;
 
   /**
@@ -247,7 +247,7 @@ public:
    *
    * @param apHidden If true, the WiFi network created will have a hidden SSID.
    */
-  void setAPHidden(bool apHidden);
+  void setAPHidden(const bool apHidden);
   bool getAPHidden() const;
 
   /**
@@ -256,8 +256,8 @@ public:
    * 
    * @param enabled If true, library Serial prints are activated.
    */
-  virtual void setVerboseModeState(bool enabled);
-  virtual bool verboseMode();
+  virtual void setVerboseModeState(const bool enabled);
+  virtual bool verboseMode() const;
   
   /**
    * Only print stringToPrint if verboseMode() returns true.
@@ -265,7 +265,7 @@ public:
    * @param stringToPrint String to print.
    * @param newline If true, will end the print with a newline. True by default.
    */
-  virtual void verboseModePrint(const String &stringToPrint, bool newline = true);
+  virtual void verboseModePrint(const String &stringToPrint, const bool newline = true) const;
   
   /**
    * Set whether the warnings occurring in the library will be printed to Serial or not. On by default.
@@ -273,7 +273,7 @@ public:
    * 
    * @param printEnabled If true, warning Serial prints from the library are activated.
    */
-  static void setPrintWarnings(bool printEnabled);
+  static void setPrintWarnings(const bool printEnabled);
   static bool printWarnings();
 
   /**
@@ -282,9 +282,9 @@ public:
    * @param stringToPrint String to print.
    * @param newline If true, will end the print with a newline. True by default.
    */
-  static void warningPrint(const String &stringToPrint, bool newline = true);
+  static void warningPrint(const String &stringToPrint, const bool newline = true);
 
-  MeshBackendType getClassType();
+  MeshBackendType getClassType() const;
 
 protected:
 
@@ -295,7 +295,7 @@ protected:
    */
   static bool latestTransmissionSuccessfulBase(const std::vector<TransmissionOutcome> &latestTransmissionOutcomes);
 
-  virtual void scanForNetworks(bool scanAllWiFiChannels);
+  virtual void scanForNetworks(const bool scanAllWiFiChannels);
   virtual void printAPInfo(const NetworkInfoBase &apNetworkInfo);
 
   /**
@@ -310,7 +310,7 @@ protected:
    */
   virtual void deactivateAPHook();
 
-  void setClassType(MeshBackendType classType);
+  void setClassType(const MeshBackendType classType);
 
   static std::shared_ptr<bool> _scanMutex;
 

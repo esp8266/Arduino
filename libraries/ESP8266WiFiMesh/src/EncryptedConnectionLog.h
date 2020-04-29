@@ -32,10 +32,10 @@ class EncryptedConnectionLog : public EncryptedConnectionData {
   
 public:
 
-  EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, 
+  EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, 
                          const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
-  EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, 
-                         uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+  EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, 
+                         const uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
 
   // Only guaranteed to expire at the latest when the soonestExpiringConnection does. Can expire before the soonestExpiringConnection since it is not updated on connection removal.
   // Needs to be a copy to avoid invalidation during operations on temporaryEncryptedConnections.
@@ -46,23 +46,23 @@ public:
   static bool _newRemovalsScheduled;
 
   // Can be used to set a duration both for temporary and permanent encrypted connections (transforming the latter into a temporary connection in the process).
-  void setRemainingDuration(uint32_t remainingDuration) override;
+  void setRemainingDuration(const uint32_t remainingDuration) override;
   void removeDuration() override;
 
   void scheduleForRemoval();
   bool removalScheduled() const;
 
-  static void setNewRemovalsScheduled(bool newRemovalsScheduled);
+  static void setNewRemovalsScheduled(const bool newRemovalsScheduled);
   static bool newRemovalsScheduled();
 
   static const ExpiringTimeTracker *getSoonestExpiringConnectionTracker();
-  static void updateSoonestExpiringConnectionTracker(uint32_t remainingDuration);
+  static void updateSoonestExpiringConnectionTracker(const uint32_t remainingDuration);
   static void clearSoonestExpiringConnectionTracker();
 
 private:
 
   bool _scheduledForRemoval = false;
-  void setScheduledForRemoval(bool scheduledForRemoval);
+  void setScheduledForRemoval(const bool scheduledForRemoval);
 };
 
 #endif

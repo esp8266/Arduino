@@ -30,7 +30,7 @@ std::shared_ptr<bool> MeshBackendBase::_scanMutex = std::make_shared<bool>(false
 
 bool MeshBackendBase::_printWarnings = true;
 
-MeshBackendBase::MeshBackendBase(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, MeshBackendType classType)
+MeshBackendBase::MeshBackendBase(const requestHandlerType requestHandler, const responseHandlerType responseHandler, const networkFilterType networkFilter, const MeshBackendType classType)
 {
   setRequestHandler(requestHandler);
   setResponseHandler(responseHandler);
@@ -43,12 +43,12 @@ MeshBackendBase::~MeshBackendBase()
   deactivateControlledAP();
 }
 
-void MeshBackendBase::setClassType(MeshBackendType classType)
+void MeshBackendBase::setClassType(const MeshBackendType classType)
 {
   _classType = classType;
 }
 
-MeshBackendType MeshBackendBase::getClassType() {return _classType;}
+MeshBackendType MeshBackendBase::getClassType() const {return _classType;}
 
 void MeshBackendBase::activateAP()
 {
@@ -108,12 +108,12 @@ MeshBackendBase *MeshBackendBase::getAPController()
   return apController; 
 }
 
-bool MeshBackendBase::isAPController()
+bool MeshBackendBase::isAPController() const
 {
   return (this == getAPController());
 }
 
-void MeshBackendBase::setWiFiChannel(uint8 newWiFiChannel)
+void MeshBackendBase::setWiFiChannel(const uint8 newWiFiChannel)
 {
   wifi_country_t wifiCountry;
   wifi_get_country(&wifiCountry); // Note: Should return 0 on success and -1 on failure, but always seems to return 1. Possibly broken API. Channels 1 to 13 are the default limits.
@@ -188,14 +188,14 @@ void MeshBackendBase::setMeshName(const String &newMeshName)
   setSSIDPrefix(newMeshName);
 }
 
-String MeshBackendBase::getMeshName() {return getSSIDPrefix();}
+String MeshBackendBase::getMeshName() const {return getSSIDPrefix();}
 
 void MeshBackendBase::setNodeID(const String &newNodeID)
 {
   setSSIDSuffix(newNodeID);
 }
 
-String MeshBackendBase::getNodeID() {return getSSIDSuffix();}
+String MeshBackendBase::getNodeID() const {return getSSIDSuffix();}
 
 void MeshBackendBase::setMeshPassword(const String &newMeshPassword)
 {
@@ -213,26 +213,26 @@ String MeshBackendBase::getMeshPassword() const {return _meshPassword;}
 void MeshBackendBase::setMessage(const String &newMessage) {_message = newMessage;}
 String MeshBackendBase::getMessage() const {return _message;}
 
-void MeshBackendBase::setRequestHandler(MeshBackendBase::requestHandlerType requestHandler) {_requestHandler = requestHandler;}
-MeshBackendBase::requestHandlerType MeshBackendBase::getRequestHandler() {return _requestHandler;}
+void MeshBackendBase::setRequestHandler(const MeshBackendBase::requestHandlerType requestHandler) {_requestHandler = requestHandler;}
+MeshBackendBase::requestHandlerType MeshBackendBase::getRequestHandler() const {return _requestHandler;}
 
-void MeshBackendBase::setResponseHandler(MeshBackendBase::responseHandlerType responseHandler) {_responseHandler = responseHandler;}
-MeshBackendBase::responseHandlerType MeshBackendBase::getResponseHandler() {return _responseHandler;}
+void MeshBackendBase::setResponseHandler(const MeshBackendBase::responseHandlerType responseHandler) {_responseHandler = responseHandler;}
+MeshBackendBase::responseHandlerType MeshBackendBase::getResponseHandler() const {return _responseHandler;}
 
-void MeshBackendBase::setNetworkFilter(MeshBackendBase::networkFilterType networkFilter) {_networkFilter = networkFilter;}
-MeshBackendBase::networkFilterType MeshBackendBase::getNetworkFilter() {return _networkFilter;}
+void MeshBackendBase::setNetworkFilter(const MeshBackendBase::networkFilterType networkFilter) {_networkFilter = networkFilter;}
+MeshBackendBase::networkFilterType MeshBackendBase::getNetworkFilter() const {return _networkFilter;}
 
-void MeshBackendBase::setTransmissionOutcomesUpdateHook(MeshBackendBase::transmissionOutcomesUpdateHookType transmissionOutcomesUpdateHook) {_transmissionOutcomesUpdateHook = transmissionOutcomesUpdateHook;}
-MeshBackendBase::transmissionOutcomesUpdateHookType MeshBackendBase::getTransmissionOutcomesUpdateHook() {return _transmissionOutcomesUpdateHook;}
+void MeshBackendBase::setTransmissionOutcomesUpdateHook(const MeshBackendBase::transmissionOutcomesUpdateHookType transmissionOutcomesUpdateHook) {_transmissionOutcomesUpdateHook = transmissionOutcomesUpdateHook;}
+MeshBackendBase::transmissionOutcomesUpdateHookType MeshBackendBase::getTransmissionOutcomesUpdateHook() const {return _transmissionOutcomesUpdateHook;}
 
-void MeshBackendBase::setScanHidden(bool scanHidden)
+void MeshBackendBase::setScanHidden(const bool scanHidden)
 {
   _scanHidden = scanHidden;
 }
 
 bool MeshBackendBase::getScanHidden() const {return _scanHidden;}
 
-void MeshBackendBase::setAPHidden(bool apHidden)
+void MeshBackendBase::setAPHidden(const bool apHidden)
 {
   if(getAPHidden() != apHidden)
   {
@@ -258,7 +258,7 @@ bool MeshBackendBase::latestTransmissionSuccessfulBase(const std::vector<Transmi
   return true;
 }
 
-void MeshBackendBase::scanForNetworks(bool scanAllWiFiChannels)
+void MeshBackendBase::scanForNetworks(const bool scanAllWiFiChannels)
 {
   MutexTracker mutexTracker(_scanMutex);
   if(!mutexTracker.mutexCaptured())

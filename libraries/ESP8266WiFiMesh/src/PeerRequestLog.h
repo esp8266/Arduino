@@ -32,26 +32,26 @@ class PeerRequestLog : public EncryptedConnectionData {
   
 public:
 
-  PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
+  PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
                  const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
-  PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce,
-                 const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, 
+  PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce,
+                 const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, 
                  const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
 
-  void setRequestID(uint64_t requestID);
-  uint64_t getRequestID();
+  void setRequestID(const uint64_t requestID);
+  uint64_t getRequestID() const;
 
-  void setRequestEncrypted(bool requestEncrypted);
-  bool requestEncrypted();
+  void setRequestEncrypted(const bool requestEncrypted);
+  bool requestEncrypted() const;
 
   void setAuthenticationPassword(const String &password);
-  String getAuthenticationPassword();
+  String getAuthenticationPassword() const;
 
-  void setEncryptedConnectionsSoftLimit(uint8_t softLimit);
-  uint8_t getEncryptedConnectionsSoftLimit();
+  void setEncryptedConnectionsSoftLimit(const uint8_t softLimit);
+  uint8_t getEncryptedConnectionsSoftLimit() const;
   
   void setPeerRequestNonce(const String &nonce);
-  String getPeerRequestNonce();
+  String getPeerRequestNonce() const;
 
 private:
 

@@ -38,7 +38,7 @@ std::set<FloodingMesh *> FloodingMesh::availableFloodingMeshes = {};
 
 char FloodingMesh::_metadataDelimiter = 23;
 
-void floodingMeshDelay(uint32_t durationMs)
+void floodingMeshDelay(const uint32_t durationMs)
 {
   ExpiringTimeTracker timeout(durationMs);
 
@@ -54,7 +54,7 @@ void floodingMeshDelay(uint32_t durationMs)
 
 FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                            const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
-                           const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel) 
+                           const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel) 
                            : _espnowBackend(
                             [this](const String &request, MeshBackendBase &meshInstance){ return _defaultRequestHandler(request, meshInstance); }, 
                             [this](const String &response, MeshBackendBase &meshInstance){ return _defaultResponseHandler(response, meshInstance); }, 
@@ -68,7 +68,7 @@ FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &mesh
 }
 
 FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed,
-                           const String &ssidPrefix, const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel) 
+                           const String &ssidPrefix, const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel) 
                            : FloodingMesh(messageHandler, meshPassword, (const uint8_t[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]){0}, 
                                           (const uint8_t[EspnowProtocolInterpreter::espnowHashKeyLength]){0}, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
 {
@@ -79,7 +79,7 @@ FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &mesh
 FloodingMesh::FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
                            const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                            const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
-                           const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel)
+                           const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel)
                            : FloodingMesh(messageHandler, meshPassword, espnowEncryptedConnectionKey, espnowHashKey, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel) 
 {
   loadMeshState(serializedMeshState);
@@ -87,7 +87,7 @@ FloodingMesh::FloodingMesh(const String &serializedMeshState, messageHandlerType
 
 FloodingMesh::FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
                            const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed, const String &ssidPrefix, 
-                           const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel)
+                           const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel)
                            : FloodingMesh(messageHandler, meshPassword, espnowEncryptedConnectionKeySeed, espnowHashKeySeed, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel) 
 {
   loadMeshState(serializedMeshState);
@@ -151,13 +151,13 @@ void FloodingMesh::performMeshInstanceMaintenance()
   }
 }
 
-String FloodingMesh::serializeMeshState()
+String FloodingMesh::serializeMeshState() const
 {
   using namespace JsonTranslator;
   
   // Returns: {"meshState":{"connectionState":{"unsyncMsgID":"123"},"meshMsgCount":"123"}}
 
-  String connectionState = getEspnowMeshBackend().serializeUnencryptedConnection();
+  String connectionState = getEspnowMeshBackendConst().serializeUnencryptedConnection();
   
   return 
   String(F("{\"meshState\":{"))
@@ -204,12 +204,12 @@ void FloodingMesh::broadcastKernel(const String &message)
   getEspnowMeshBackend().broadcast(message);
 }
 
-void FloodingMesh::setBroadcastReceptionRedundancy(uint8_t redundancy) 
+void FloodingMesh::setBroadcastReceptionRedundancy(const uint8_t redundancy) 
 { 
   assert(redundancy < 255);
   _broadcastReceptionRedundancy = redundancy;
 }
-uint8_t FloodingMesh::getBroadcastReceptionRedundancy() { return _broadcastReceptionRedundancy; }
+uint8_t FloodingMesh::getBroadcastReceptionRedundancy() const { return _broadcastReceptionRedundancy; }
 
 void FloodingMesh::encryptedBroadcast(const String &message)
 {
@@ -236,40 +236,40 @@ void FloodingMesh::clearForwardingBacklog()
   _forwardingBacklog.clear();
 }
  
-void FloodingMesh::setMessageHandler(messageHandlerType messageHandler) { _messageHandler = messageHandler; }
-FloodingMesh::messageHandlerType FloodingMesh::getMessageHandler() { return _messageHandler; }
+void FloodingMesh::setMessageHandler(const messageHandlerType messageHandler) { _messageHandler = messageHandler; }
+FloodingMesh::messageHandlerType FloodingMesh::getMessageHandler() const { return _messageHandler; }
 
-void FloodingMesh::setOriginMac(uint8_t *macArray)
+void FloodingMesh::setOriginMac(const uint8_t *macArray)
 {
   std::copy_n(macArray, 6, _originMac);
 }
 
-String FloodingMesh::getOriginMac() { return TypeCast::macToString(_originMac); }
-uint8_t *FloodingMesh::getOriginMac(uint8_t *macArray)
+String FloodingMesh::getOriginMac() const { return TypeCast::macToString(_originMac); }
+uint8_t *FloodingMesh::getOriginMac(uint8_t *macArray) const
 {
   std::copy_n(_originMac, 6, macArray);
   return macArray;
 }
 
-uint32_t FloodingMesh::maxUnencryptedMessageLength()
+uint32_t FloodingMesh::maxUnencryptedMessageLength() const
 {
-  return getEspnowMeshBackend().getMaxMessageLength() - MESSAGE_ID_LENGTH - (getEspnowMeshBackend().getMeshName().length() + 1); // Need room for mesh name + delimiter
+  return getEspnowMeshBackendConst().getMaxMessageLength() - MESSAGE_ID_LENGTH - (getEspnowMeshBackendConst().getMeshName().length() + 1); // Need room for mesh name + delimiter
 }
 
-uint32_t FloodingMesh::maxEncryptedMessageLength()
+uint32_t FloodingMesh::maxEncryptedMessageLength() const
 {
   // Need 1 extra delimiter character for maximum metadata efficiency (makes it possible to store exactly 18 MACs in metadata by adding an extra transmission)
-  return getEspnowMeshBackend().getMaxMessageLength() - MESSAGE_ID_LENGTH - 1;
+  return getEspnowMeshBackendConst().getMaxMessageLength() - MESSAGE_ID_LENGTH - 1;
 }
  
-void FloodingMesh::setMessageLogSize(uint16_t messageLogSize) 
+void FloodingMesh::setMessageLogSize(const uint16_t messageLogSize) 
 { 
   assert(messageLogSize >= 1);
   _messageLogSize = messageLogSize; 
 }
-uint16_t FloodingMesh::messageLogSize() { return _messageLogSize; }
+uint16_t FloodingMesh::messageLogSize() const { return _messageLogSize; }
 
-void FloodingMesh::setMetadataDelimiter(char metadataDelimiter) 
+void FloodingMesh::setMetadataDelimiter(const char metadataDelimiter) 
 { 
   // Using HEX number characters as a delimiter is a bad idea regardless of broadcast type, since they are always in the broadcast metadata.
   // We therefore check for those characters below.
@@ -286,7 +286,12 @@ EspnowMeshBackend &FloodingMesh::getEspnowMeshBackend()
   return _espnowBackend;
 }
 
-bool FloodingMesh::insertPreliminaryMessageID(uint64_t messageID)
+const EspnowMeshBackend &FloodingMesh::getEspnowMeshBackendConst() const
+{
+  return _espnowBackend;
+}
+
+bool FloodingMesh::insertPreliminaryMessageID(const uint64_t messageID)
 {
   uint8_t apMacArray[6] = { 0 };
   if(messageID >> 16 == TypeCast::macToUint64(WiFi.softAPmacAddress(apMacArray)))
@@ -304,7 +309,7 @@ bool FloodingMesh::insertPreliminaryMessageID(uint64_t messageID)
   return true;
 }
 
-bool FloodingMesh::insertCompletedMessageID(uint64_t messageID)
+bool FloodingMesh::insertCompletedMessageID(const uint64_t messageID)
 {
   uint8_t apMacArray[6] = { 0 };
   if(messageID >> 16 == TypeCast::macToUint64(WiFi.softAPmacAddress(apMacArray)))
@@ -322,7 +327,7 @@ bool FloodingMesh::insertCompletedMessageID(uint64_t messageID)
   return true;
 }
 
-void FloodingMesh::updateMessageQueue(messageQueueElementType messageIterator)
+void FloodingMesh::updateMessageQueue(const messageQueueElementType messageIterator)
 {
   _messageIdOrder.emplace(messageIterator);
   
@@ -449,7 +454,7 @@ TransmissionStatusType FloodingMesh::_defaultResponseHandler(const String &respo
  * @param numberOfNetworks The number of networks found in the WiFi scan.
  * @param meshInstance The MeshBackendBase instance that called the function.
  */
-void FloodingMesh::_defaultNetworkFilter(int numberOfNetworks, MeshBackendBase &meshInstance)
+void FloodingMesh::_defaultNetworkFilter(const int numberOfNetworks, MeshBackendBase &meshInstance)
 {
   // Note that the network index of a given node may change whenever a new scan is done.
   for (int networkIndex = 0; networkIndex < numberOfNetworks; ++networkIndex) 
@@ -554,7 +559,7 @@ bool FloodingMesh::_defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshI
  * @return True if the response transmission process should continue with the next response in the waiting list.
  *         False if the response transmission process should stop after removing the just sent response from the waiting list.
  */
-bool FloodingMesh::_defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance)
+bool FloodingMesh::_defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance)
 {
   (void)response; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
   (void)recipientMac;

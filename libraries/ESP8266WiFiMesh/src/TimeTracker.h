@@ -34,7 +34,7 @@ public:
 
   virtual ~TimeTracker() = default; 
 
-  TimeTracker(uint32_t creationTimeMs);
+  TimeTracker(const uint32_t creationTimeMs);
   uint32_t timeSinceCreation() const;
   uint32_t creationTimeMs() const;
   

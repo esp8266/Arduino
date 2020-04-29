@@ -41,7 +41,7 @@ namespace JsonTranslator
     return valueIdentifier + '\"' + value + F("\"}}");
   }
   
-  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey)
+  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, const uint64_t ownSessionKey, const uint64_t peerSessionKey)
   {
     // Returns: Encrypted connection info:{"arguments":{"nonce":"1F2","password":"abc","ownSK":"3B4","peerSK":"1A2"}}
 
@@ -53,7 +53,7 @@ namespace JsonTranslator
     + createJsonEndPair(FPSTR(jsonPeerSessionKey), TypeCast::uint64ToString(ownSessionKey));
   }
   
-  String createEncryptionRequestIntro(const String &requestHeader, uint32_t duration)
+  String createEncryptionRequestIntro(const String &requestHeader, const uint32_t duration)
   {
     return 
     requestHeader + String(F("{\"arguments\":{")) 
@@ -65,7 +65,7 @@ namespace JsonTranslator
     return createJsonEndPair(FPSTR(jsonNonce), requestNonce);
   }
   
-  String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, uint8_t hashKeyLength, uint32_t duration)
+  String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, const uint8_t hashKeyLength, const uint32_t duration)
   {
     String mainMessage = createEncryptionRequestIntro(requestHeader, duration) + createJsonPair(FPSTR(jsonNonce), requestNonce);
     uint8_t staMac[6] {0};
@@ -76,7 +76,7 @@ namespace JsonTranslator
   }
 
   bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, 
-                                   const uint8_t *hashKey, uint8_t hashKeyLength)
+                                   const uint8_t *hashKey, const uint8_t hashKeyLength)
   {
     using MeshCryptoInterface::verifyMeshHmac;
     
@@ -97,7 +97,7 @@ namespace JsonTranslator
     return false;
   }
   
-  int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, int32_t searchStartIndex)
+  int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, const int32_t searchStartIndex)
   {
     int32_t startIndex = jsonString.indexOf(valueIdentifier, searchStartIndex);
     if(startIndex < 0)
@@ -107,7 +107,7 @@ namespace JsonTranslator
     return startIndex;
   }
   
-  int32_t getEndIndex(const String &jsonString, int32_t searchStartIndex)
+  int32_t getEndIndex(const String &jsonString, const int32_t searchStartIndex)
   {
     int32_t endIndex = jsonString.indexOf(',', searchStartIndex);
     if(endIndex < 0)

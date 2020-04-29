@@ -32,17 +32,17 @@ class MessageData {
 
 public:
 
-  MessageData(String &message, uint8_t transmissionsRemaining, uint32_t creationTimeMs = millis());
-  MessageData(uint8_t *initialTransmission, uint8_t transmissionLength, uint32_t creationTimeMs = millis());
+  MessageData(const String &message, const uint8_t transmissionsRemaining, const uint32_t creationTimeMs = millis());
+  MessageData(uint8_t *initialTransmission, const uint8_t transmissionLength, const uint32_t creationTimeMs = millis());
   /**
-   * @transmission A string of characters, including initial protocol bytes.
+   * @transmission A string of characters, including initial protocol bytes. Not const since that would increase heap consumption during processing.
    * @transmissionLength Length of transmission.
    */
-  bool addToMessage(uint8_t *transmission, uint8_t transmissionLength);
-  uint8_t getTransmissionsReceived();
-  uint8_t getTransmissionsExpected();
-  uint8_t getTransmissionsRemaining();
-  String getTotalMessage();
+  bool addToMessage(uint8_t *transmission, const uint8_t transmissionLength);
+  uint8_t getTransmissionsReceived() const;
+  uint8_t getTransmissionsExpected() const;
+  uint8_t getTransmissionsRemaining() const;
+  String getTotalMessage() const;
   const TimeTracker &getTimeTracker() const;
 
 private:

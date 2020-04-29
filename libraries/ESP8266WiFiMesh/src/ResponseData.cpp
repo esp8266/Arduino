@@ -24,7 +24,7 @@
 
 #include "ResponseData.h"
 
-ResponseData::ResponseData(const String &message, const uint8_t recipientMac[6], uint64_t requestID, uint32_t creationTimeMs) : 
+ResponseData::ResponseData(const String &message, const uint8_t recipientMac[6], const uint64_t requestID, const uint32_t creationTimeMs) : 
   _timeTracker(creationTimeMs), _message(message), _requestID(requestID)
 {      
   storeRecipientMac(recipientMac);
@@ -71,10 +71,10 @@ void ResponseData::storeRecipientMac(const uint8_t newRecipientMac[6])
 void ResponseData::setRecipientMac(const uint8_t recipientMac[6]) { storeRecipientMac(recipientMac); }
 const uint8_t *ResponseData::getRecipientMac() const { return _recipientMac; }
 
-void ResponseData::setMessage(String &message) { _message = message; }
+void ResponseData::setMessage(const String &message) { _message = message; }
 String ResponseData::getMessage() const { return _message; }
 
-void ResponseData::setRequestID(uint64_t requestID) { _requestID = requestID; }
+void ResponseData::setRequestID(const uint64_t requestID) { _requestID = requestID; }
 uint64_t ResponseData::getRequestID() const { return _requestID; }
 
 const TimeTracker &ResponseData::getTimeTracker() const { return _timeTracker; }

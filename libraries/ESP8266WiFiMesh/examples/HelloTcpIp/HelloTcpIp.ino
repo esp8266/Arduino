@@ -160,13 +160,6 @@ void setup() {
   WiFi.persistent(false);
 
   Serial.begin(115200);
-  delay(50); // Wait for Serial.
-
-  //yield(); // Use this if you don't want to wait for Serial.
-
-  // The WiFi.disconnect() ensures that the WiFi is working correctly. If this is not done before receiving WiFi connections,
-  // those WiFi connections will take a long time to make or sometimes will not work at all.
-  WiFi.disconnect();
 
   Serial.println();
   Serial.println();

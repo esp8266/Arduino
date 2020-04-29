@@ -38,7 +38,7 @@
  *  
  * @param durationMs The shortest allowed delay duration, in milliseconds.
  */
-void floodingMeshDelay(uint32_t durationMs);
+void floodingMeshDelay(const uint32_t durationMs);
 
 class FloodingMesh {
 
@@ -69,7 +69,7 @@ public:
    */
   FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
-               const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+               const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   /**
    * FloodingMesh constructor method. Creates a FloodingMesh node, ready to be initialised.
@@ -90,7 +90,7 @@ public:
    * 
    */
   FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed, 
-               const String &ssidPrefix, const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+               const String &ssidPrefix, const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   /**
    * This constructor should be used in combination with serializeMeshState() when the node has gone to sleep while other nodes stayed awake.
@@ -101,7 +101,7 @@ public:
   FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
                const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
                const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
-               const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+               const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   /**
    * This constructor should be used in combination with serializeMeshState() when the node has gone to sleep while other nodes stayed awake.
@@ -110,7 +110,7 @@ public:
    * @param serializedMeshState A String with a serialized mesh node state that the node should use.
    */
   FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, 
-               const String &espnowHashKeySeed, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode = false, uint8 meshWiFiChannel = 1);
+               const String &espnowHashKeySeed, const String &ssidPrefix, const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   virtual ~FloodingMesh();
 
@@ -155,7 +155,7 @@ public:
    * 
    * @return A string with the serialized current mesh node state.
    */
-  String serializeMeshState();
+  String serializeMeshState() const;
 
   /**
    * Make an unencrypted broadcast to the entire mesh network.
@@ -173,8 +173,8 @@ public:
    * 
    * @param redundancy The maximum number of extra copies that will be accepted. Defaults to 2. Valid values are 0 to 254.
    */
-  void setBroadcastReceptionRedundancy(uint8_t redundancy);
-  uint8_t getBroadcastReceptionRedundancy();
+  void setBroadcastReceptionRedundancy(const uint8_t redundancy);
+  uint8_t getBroadcastReceptionRedundancy() const;
   
   /**
    * Make an encrypted broadcast to the entire mesh network.
@@ -205,8 +205,8 @@ public:
    * 
    * @param messageHandler The message handler callback function to use.
    */
-  void setMessageHandler(messageHandlerType messageHandler);
-  messageHandlerType getMessageHandler();
+  void setMessageHandler(const messageHandlerType messageHandler);
+  messageHandlerType getMessageHandler() const;
 
   /**
    * Get the origin AP MAC address of the most recently received mesh message.
@@ -214,7 +214,7 @@ public:
    * 
    * @return A String filled with a hexadecimal representation of the MAC, without delimiters.
    */
-  String getOriginMac();
+  String getOriginMac() const;
 
   /**
    * Get the origin AP MAC address of the most recently received mesh message.
@@ -223,7 +223,7 @@ public:
    * @param macArray The array that should store the MAC address. Must be at least 6 bytes.
    * @return macArray filled with the origin MAC.
    */
-  uint8_t *getOriginMac(uint8_t *macArray);
+  uint8_t *getOriginMac(uint8_t *macArray) const;
 
  /**
  * The number of received messageID:s that will be stored by the node. Used to remember which messages have been received. 
@@ -237,8 +237,8 @@ public:
  *                       If a value close to the maximum is chosen, there is a high risk the node will ignore transmissions on messageID rollover if they are sent only by one node 
  *                       (especially if some transmissions are missed), since the messageID also uses uint16_t.
  */
-  void setMessageLogSize(uint16_t messageLogSize);
-  uint16_t messageLogSize();
+  void setMessageLogSize(const uint16_t messageLogSize);
+  uint16_t messageLogSize() const;
 
   /**
    * Hint: Use String.length() to get the ASCII length of a String.
@@ -247,7 +247,7 @@ public:
    *         Note that non-ASCII characters usually require at least two bytes each.
    *         Also note that for unencrypted messages the maximum size will depend on getEspnowMeshBackend().getMeshName().length()
    */
-  uint32_t maxUnencryptedMessageLength();
+  uint32_t maxUnencryptedMessageLength() const;
   
   /**
    * Hint: Use String.length() to get the ASCII length of a String.
@@ -255,7 +255,7 @@ public:
    * @return The maximum length in bytes an encrypted ASCII message is allowed to be when broadcasted by this node. 
    *         Note that non-ASCII characters usually require at least two bytes each.
    */
-  uint32_t maxEncryptedMessageLength();
+  uint32_t maxEncryptedMessageLength() const;
 
   /**
    * Set the delimiter character used for metadata by every FloodingMesh instance. 
@@ -264,7 +264,7 @@ public:
    * @param metadataDelimiter The metadata delimiter character to use.
    *                          Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
    */
-  static void setMetadataDelimiter(char metadataDelimiter);
+  static void setMetadataDelimiter(const char metadataDelimiter);
   static char metadataDelimiter();
 
   /*
@@ -274,6 +274,7 @@ public:
    * and so are discouraged for those who prefer it when things just work.
    */
   EspnowMeshBackend &getEspnowMeshBackend();
+  const EspnowMeshBackend &getEspnowMeshBackendConst() const;
 
   void restoreDefaultRequestHandler();
   void restoreDefaultResponseHandler();
@@ -292,9 +293,9 @@ protected:
 
   void encryptedBroadcastKernel(const String &message);
 
-  bool insertPreliminaryMessageID(uint64_t messageID);
-  bool insertCompletedMessageID(uint64_t messageID);
-  void updateMessageQueue(messageQueueElementType messageIterator);
+  bool insertPreliminaryMessageID(const uint64_t messageID);
+  bool insertCompletedMessageID(const uint64_t messageID);
+  void updateMessageQueue(const messageQueueElementType messageIterator);
   
   void loadMeshState(const String &serializedMeshState);
 
@@ -303,7 +304,7 @@ protected:
    * 
    * @param macArray An uint8_t array which contains the MAC address to store. The method will store the first 6 bytes of the array.
    */
-  void setOriginMac(uint8_t *macArray);
+  void setOriginMac(const uint8_t *macArray);
   
 private:
 
@@ -328,10 +329,10 @@ private:
   
   String _defaultRequestHandler(const String &request, MeshBackendBase &meshInstance);
   TransmissionStatusType _defaultResponseHandler(const String &response, MeshBackendBase &meshInstance);
-  void _defaultNetworkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
+  void _defaultNetworkFilter(const int numberOfNetworks, MeshBackendBase &meshInstance);
   bool _defaultBroadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
   bool _defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance);
-  bool _defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance);
+  bool _defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance);
 };
 
 #endif

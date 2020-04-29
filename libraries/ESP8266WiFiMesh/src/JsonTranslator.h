@@ -45,12 +45,12 @@ namespace JsonTranslator
   String createJsonPair(const String &valueIdentifier, const String &value);
   String createJsonEndPair(const String &valueIdentifier, const String &value);
   
-  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, uint64_t ownSessionKey, uint64_t peerSessionKey);
-  String createEncryptionRequestIntro(const String &requestHeader, uint32_t duration = 0);
+  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, const uint64_t ownSessionKey, const uint64_t peerSessionKey);
+  String createEncryptionRequestIntro(const String &requestHeader, const uint32_t duration = 0);
   String createEncryptionRequestEnding(const String &requestNonce);
-  String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, uint8_t hashKeyLength, uint32_t duration = 0);
+  String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, const uint8_t hashKeyLength, const uint32_t duration = 0);
 
-  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, uint8_t hashKeyLength);
+  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, const uint8_t hashKeyLength);
 
   /**
    * Provides the index within jsonString where the value of valueIdentifier starts.
@@ -61,7 +61,7 @@ namespace JsonTranslator
    *          
    * @return An int32_t containing the index within jsonString where the value of valueIdentifier starts, or a negative value if valueIdentifier was not found.
    */
-  int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, int32_t searchStartIndex = 0);
+  int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, const int32_t searchStartIndex = 0);
   
   /**
    * Provides the index within jsonString where the next JSON termination character (',' or '}') is found, starting from searchStartIndex.
@@ -71,7 +71,7 @@ namespace JsonTranslator
    *          
    * @return An int32_t containing the index within jsonString where the next JSON termination character is found, or a negative value if no such character was found.
    */
-  int32_t getEndIndex(const String &jsonString, int32_t searchStartIndex);
+  int32_t getEndIndex(const String &jsonString, const int32_t searchStartIndex);
   
   bool getConnectionState(const String &jsonString, String &result);
   /**

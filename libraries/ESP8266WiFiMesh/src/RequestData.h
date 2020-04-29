@@ -34,9 +34,8 @@ class RequestData {
 
 public:
 
-  RequestData(EspnowMeshBackend &meshInstance, uint32_t creationTimeMs = millis());
+  RequestData(EspnowMeshBackend &meshInstance, const uint32_t creationTimeMs = millis());
   
-  void setMeshInstance(const EspnowMeshBackend &meshInstance);
   EspnowMeshBackend &getMeshInstance() const;
   const TimeTracker &getTimeTracker() const;
 

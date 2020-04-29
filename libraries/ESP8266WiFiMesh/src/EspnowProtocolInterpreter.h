@@ -63,7 +63,7 @@ namespace EspnowProtocolInterpreter
 
   constexpr uint64_t uint64LeftmostBits = 0xFFFFFFFF00000000;
 
-  String espnowGetMessageContent(uint8_t *transmissionDataArray, uint8_t transmissionLength);
+  String espnowGetMessageContent(uint8_t *transmissionDataArray, const uint8_t transmissionLength);
   char espnowGetMessageType(const uint8_t *transmissionDataArray);
   uint8_t espnowGetTransmissionsRemaining(const uint8_t *transmissionDataArray);
   bool espnowIsMessageStart(const uint8_t *transmissionDataArray);
@@ -71,9 +71,9 @@ namespace EspnowProtocolInterpreter
   uint8_t *espnowGetTransmissionMac(const uint8_t *transmissionDataArray, uint8_t *resultArray);
   uint64_t espnowGetMessageID(const uint8_t *transmissionDataArray);
   // @return a pointer to transmissionDataArray
-  uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, uint64_t messageID);
+  uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, const uint64_t messageID);
 
-  bool usesEncryption(uint64_t messageID);
+  bool usesEncryption(const uint64_t messageID);
 }
 
 #endif

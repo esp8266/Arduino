@@ -36,12 +36,12 @@ public:
   /**
    * Automatically fill in the rest of the network info using networkIndex and the WiFi scan results.
    */
-  NetworkInfoBase(uint8_t networkIndex);
+  NetworkInfoBase(const uint8_t networkIndex);
 
   /**
    * Without giving channel and BSSID, connection time is longer.
    */
-  NetworkInfoBase(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden);
+  NetworkInfoBase(const String &SSID, const int32_t wifiChannel, const uint8_t BSSID[6], const uint8_t encryptionType, const int32_t RSSI, const bool isHidden);
 
   NetworkInfoBase(const NetworkInfoBase &other);
 
@@ -54,19 +54,19 @@ public:
    */
   uint8_t *getBSSID(uint8_t resultArray[6]) const;
 
-  void setSSID(String &SSID);
+  void setSSID(const String &SSID);
   String SSID() const;
 
-  void setWifiChannel(int32_t wifiChannel);
+  void setWifiChannel(const int32_t wifiChannel);
   int32_t wifiChannel() const;
 
-  void setEncryptionType(uint8_t encryptionType);
+  void setEncryptionType(const uint8_t encryptionType);
   uint8_t encryptionType() const;  
 
-  void setRSSI(int32_t RSSI);
+  void setRSSI(const int32_t RSSI);
   int32_t RSSI() const;
 
-  void setIsHidden(bool isHidden);
+  void setIsHidden(const bool isHidden);
   bool isHidden() const;
 
   static uint8_t * const defaultBSSID;

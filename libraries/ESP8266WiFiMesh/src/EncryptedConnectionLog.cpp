@@ -26,11 +26,11 @@
 
 using EspnowProtocolInterpreter::espnowHashKeyLength;
 
-EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
   : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, hashKey)
 { }
 
-EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, uint32_t duration, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint32_t duration, const uint8_t hashKey[espnowHashKeyLength]) 
   : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, duration, hashKey)
 { }
 
@@ -38,7 +38,7 @@ std::unique_ptr<ExpiringTimeTracker> EncryptedConnectionLog::_soonestExpiringCon
 
 bool EncryptedConnectionLog::_newRemovalsScheduled = false;
 
-void EncryptedConnectionLog::setRemainingDuration(uint32_t remainingDuration)
+void EncryptedConnectionLog::setRemainingDuration(const uint32_t remainingDuration)
 {  
   EncryptedConnectionData::setRemainingDuration(remainingDuration);
   
@@ -61,7 +61,7 @@ void EncryptedConnectionLog::scheduleForRemoval()
   setScheduledForRemoval(true);
 }
 
-void EncryptedConnectionLog::setScheduledForRemoval(bool scheduledForRemoval) 
+void EncryptedConnectionLog::setScheduledForRemoval(const bool scheduledForRemoval) 
 { 
   _scheduledForRemoval = scheduledForRemoval;
 
@@ -70,15 +70,15 @@ void EncryptedConnectionLog::setScheduledForRemoval(bool scheduledForRemoval)
 }
 bool EncryptedConnectionLog::removalScheduled() const { return _scheduledForRemoval; }
 
-void EncryptedConnectionLog::setNewRemovalsScheduled(bool newRemovalsScheduled) { _newRemovalsScheduled = newRemovalsScheduled; }
-bool EncryptedConnectionLog::newRemovalsScheduled( ){ return _newRemovalsScheduled; }
+void EncryptedConnectionLog::setNewRemovalsScheduled(const bool newRemovalsScheduled) { _newRemovalsScheduled = newRemovalsScheduled; }
+bool EncryptedConnectionLog::newRemovalsScheduled( ) { return _newRemovalsScheduled; }
 
 const ExpiringTimeTracker *EncryptedConnectionLog::getSoonestExpiringConnectionTracker()
 {
   return _soonestExpiringConnectionTracker.get();
 }
 
-void EncryptedConnectionLog::updateSoonestExpiringConnectionTracker(uint32_t remainingDuration)
+void EncryptedConnectionLog::updateSoonestExpiringConnectionTracker(const uint32_t remainingDuration)
 {
   if(!getSoonestExpiringConnectionTracker() || remainingDuration < getSoonestExpiringConnectionTracker()->remainingDuration())
   {

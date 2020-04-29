@@ -32,7 +32,7 @@ namespace MeshCryptoInterface
     return CryptoInterface::sha256Hmac(message, hashKey, hashKeyLength, hmacLength);
   }
 
-  bool verifyMeshHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, uint8_t hashKeyLength)
+  bool verifyMeshHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, const uint8_t hashKeyLength)
   {
     String generatedHmac = createMeshHmac(message, hashKey, hashKeyLength, messageHmac.length()/2); // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
     if(generatedHmac == messageHmac)
@@ -41,7 +41,7 @@ namespace MeshCryptoInterface
       return false;
   }
 
-  uint8_t *initializeKey(uint8_t *key, uint8_t keyLength, const String &keySeed)
+  uint8_t *initializeKey(uint8_t *key, const uint8_t keyLength, const String &keySeed)
   {
     assert(keyLength <= CryptoInterface::SHA256_NATURAL_LENGTH);
     uint8_t hashArray[CryptoInterface::SHA256_NATURAL_LENGTH] {};

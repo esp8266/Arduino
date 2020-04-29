@@ -48,9 +48,9 @@ IPAddress TcpIpMeshBackend::subnetMask(255,255,255,0);
 std::vector<TcpIpNetworkInfo> TcpIpMeshBackend::_connectionQueue = {};
 std::vector<TransmissionOutcome> TcpIpMeshBackend::_latestTransmissionOutcomes = {};
 
-TcpIpMeshBackend::TcpIpMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, 
-                                   networkFilterType networkFilter, const String &meshPassword, const String &ssidPrefix, 
-                                   const String &ssidSuffix, bool verboseMode, uint8 meshWiFiChannel, uint16_t serverPort) 
+TcpIpMeshBackend::TcpIpMeshBackend(const requestHandlerType requestHandler, const responseHandlerType responseHandler, 
+                                   const networkFilterType networkFilter, const String &meshPassword, const String &ssidPrefix, 
+                                   const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel, const uint16_t serverPort) 
                                    : MeshBackendBase(requestHandler, responseHandler, networkFilter, MeshBackendType::TCP_IP), _server(serverPort)
 {
   setSSID(ssidPrefix, emptyString, ssidSuffix);
@@ -114,10 +114,10 @@ void TcpIpMeshBackend::deactivateAPHook()
 bool TcpIpMeshBackend::transmissionInProgress(){return *_tcpIpTransmissionMutex;}
 
 void TcpIpMeshBackend::setTemporaryMessage(const String &newTemporaryMessage) {_temporaryMessage = newTemporaryMessage;}
-String TcpIpMeshBackend::getTemporaryMessage() {return _temporaryMessage;}
+String TcpIpMeshBackend::getTemporaryMessage() const {return _temporaryMessage;}
 void TcpIpMeshBackend::clearTemporaryMessage() {_temporaryMessage.clear();}
 
-String TcpIpMeshBackend::getCurrentMessage()
+String TcpIpMeshBackend::getCurrentMessage() const
 {
   String message = getTemporaryMessage();
   
@@ -138,7 +138,7 @@ void TcpIpMeshBackend::setStaticIP(const IPAddress &newIP)
   staticIP = newIP;
 }
 
-IPAddress TcpIpMeshBackend::getStaticIP()
+IPAddress TcpIpMeshBackend::getStaticIP() const
 {
   if(staticIPActivated)
     return staticIP;
@@ -153,7 +153,7 @@ void TcpIpMeshBackend::disableStaticIP()
   staticIPActivated = false;
 }
 
-void TcpIpMeshBackend::setServerPort(uint16_t serverPort)
+void TcpIpMeshBackend::setServerPort(const uint16_t serverPort)
 {
   _serverPort = serverPort;
   
@@ -162,9 +162,9 @@ void TcpIpMeshBackend::setServerPort(uint16_t serverPort)
     restartAP();
 }
 
-uint16_t TcpIpMeshBackend::getServerPort() {return _serverPort;}
+uint16_t TcpIpMeshBackend::getServerPort() const {return _serverPort;}
 
-void TcpIpMeshBackend::setMaxAPStations(uint8_t maxAPStations)
+void TcpIpMeshBackend::setMaxAPStations(const uint8_t maxAPStations)
 {
   assert(maxAPStations <= 8); // Valid values are 0 to 8, but uint8_t is always at least 0.
   
@@ -178,28 +178,28 @@ void TcpIpMeshBackend::setMaxAPStations(uint8_t maxAPStations)
   }
 }
 
-bool TcpIpMeshBackend::getMaxAPStations() {return _maxAPStations;}
+bool TcpIpMeshBackend::getMaxAPStations() const {return _maxAPStations;}
 
-void TcpIpMeshBackend::setConnectionAttemptTimeout(uint32_t connectionAttemptTimeoutMs)
+void TcpIpMeshBackend::setConnectionAttemptTimeout(const uint32_t connectionAttemptTimeoutMs)
 {
   _connectionAttemptTimeoutMs = connectionAttemptTimeoutMs;
 }
 
-uint32_t TcpIpMeshBackend::getConnectionAttemptTimeout() {return _connectionAttemptTimeoutMs;}
+uint32_t TcpIpMeshBackend::getConnectionAttemptTimeout() const {return _connectionAttemptTimeoutMs;}
 
-void TcpIpMeshBackend::setStationModeTimeout(int stationModeTimeoutMs)
+void TcpIpMeshBackend::setStationModeTimeout(const int stationModeTimeoutMs)
 {
   _stationModeTimeoutMs = stationModeTimeoutMs;
 }
 
-int TcpIpMeshBackend::getStationModeTimeout() {return _stationModeTimeoutMs;}
+int TcpIpMeshBackend::getStationModeTimeout() const {return _stationModeTimeoutMs;}
 
-void TcpIpMeshBackend::setAPModeTimeout(uint32_t apModeTimeoutMs)
+void TcpIpMeshBackend::setAPModeTimeout(const uint32_t apModeTimeoutMs)
 {
   _apModeTimeoutMs = apModeTimeoutMs;
 }
 
-uint32_t TcpIpMeshBackend::getAPModeTimeout() {return _apModeTimeoutMs;}
+uint32_t TcpIpMeshBackend::getAPModeTimeout() const {return _apModeTimeoutMs;}
 
 /**
  * Disconnect completely from a network.
@@ -218,7 +218,7 @@ void TcpIpMeshBackend::fullStop(WiFiClient &currClient)
  * @return True if the client is ready, false otherwise.
  * 
  */
-bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait)
+bool TcpIpMeshBackend::waitForClientTransmission(WiFiClient &currClient, const uint32_t maxWait)
 {
   ExpiringTimeTracker timeout(maxWait);
   
@@ -323,7 +323,7 @@ TransmissionStatusType TcpIpMeshBackend::attemptDataTransferKernel()
   return transmissionOutcome;
 }
 
-void TcpIpMeshBackend::initiateConnectionToAP(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
+void TcpIpMeshBackend::initiateConnectionToAP(const String &targetSSID, const int targetChannel, const uint8_t *targetBSSID)
 {
   if(targetChannel == NETWORK_INFO_DEFAULT_INT)
     WiFi.begin( targetSSID.c_str(), getMeshPassword().c_str() ); // Without giving channel and BSSID, connection time is longer.
@@ -342,7 +342,7 @@ void TcpIpMeshBackend::initiateConnectionToAP(const String &targetSSID, int targ
  * @return A status code based on the outcome of the connection and data transfer process.
  * 
  */
-TransmissionStatusType TcpIpMeshBackend::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
+TransmissionStatusType TcpIpMeshBackend::connectToNode(const String &targetSSID, const int targetChannel, const uint8_t *targetBSSID)
 {  
   if(staticIPActivated && !lastSSID.isEmpty() && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
   {
@@ -413,7 +413,7 @@ TransmissionStatusType TcpIpMeshBackend::initiateTransmission(const TcpIpNetwork
   return connectToNode(targetSSID, targetWiFiChannel, targetBSSID);
 }
 
-void TcpIpMeshBackend::enterPostTransmissionState(bool concludingDisconnect)
+void TcpIpMeshBackend::enterPostTransmissionState(const bool concludingDisconnect)
 {
   if(WiFi.status() == WL_CONNECTED && staticIP != emptyIP && !staticIPActivated)
   {
@@ -429,7 +429,7 @@ void TcpIpMeshBackend::enterPostTransmissionState(bool concludingDisconnect)
   }
 }
 
-void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool concludingDisconnect, bool initialDisconnect)
+void TcpIpMeshBackend::attemptTransmission(const String &message, const bool scan, const bool scanAllWiFiChannels, const bool concludingDisconnect, const bool initialDisconnect)
 {  
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())
@@ -485,12 +485,12 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, boo
   enterPostTransmissionState(concludingDisconnect);
 }
 
-void TcpIpMeshBackend::attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels)
+void TcpIpMeshBackend::attemptTransmission(const String &message, const bool scan, const bool scanAllWiFiChannels)
 {
   attemptTransmission(message, scan, scanAllWiFiChannels, true, false);
 }
 
-TransmissionStatusType TcpIpMeshBackend::attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect, bool initialDisconnect)
+TransmissionStatusType TcpIpMeshBackend::attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, const bool concludingDisconnect, const bool initialDisconnect)
 {  
   MutexTracker mutexTracker(_tcpIpTransmissionMutex);
   if(!mutexTracker.mutexCaptured())

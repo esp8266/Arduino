@@ -39,11 +39,12 @@ class TransmissionOutcome : public NetworkInfoBase {
 
 public:
 
-  TransmissionOutcome(const NetworkInfoBase &origin, TransmissionStatusType transmissionStatus);
+  TransmissionOutcome(const NetworkInfoBase &origin, const TransmissionStatusType transmissionStatus);
 
-  TransmissionOutcome(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden, TransmissionStatusType transmissionStatus);
+  TransmissionOutcome(const String &SSID, const int32_t wifiChannel, const uint8_t BSSID[6], const uint8_t encryptionType, 
+                      const int32_t RSSI, const bool isHidden, const TransmissionStatusType transmissionStatus);
 
-  void setTransmissionStatus(TransmissionStatusType transmissionStatus);
+  void setTransmissionStatus(const TransmissionStatusType transmissionStatus);
   TransmissionStatusType transmissionStatus() const;
 
 private:

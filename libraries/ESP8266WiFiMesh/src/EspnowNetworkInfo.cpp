@@ -25,14 +25,14 @@
 #include "EspnowNetworkInfo.h"
 #include <assert.h>
 
-EspnowNetworkInfo::EspnowNetworkInfo(int networkIndex) : NetworkInfoBase(networkIndex) { };
+EspnowNetworkInfo::EspnowNetworkInfo(const int networkIndex) : NetworkInfoBase(networkIndex) { };
 
 EspnowNetworkInfo::EspnowNetworkInfo(const NetworkInfoBase &originalNetworkInfo) : NetworkInfoBase(originalNetworkInfo) 
 {
   assert(BSSID() != defaultBSSID); // We need at least BSSID to be able to connect. 
 };
 
-EspnowNetworkInfo::EspnowNetworkInfo(const uint8_t BSSID[6], const String &SSID, int32_t wifiChannel, uint8_t encryptionType, int32_t RSSI , bool isHidden)
+EspnowNetworkInfo::EspnowNetworkInfo(const uint8_t BSSID[6], const String &SSID, const int32_t wifiChannel, const uint8_t encryptionType, const int32_t RSSI , const bool isHidden)
                    : NetworkInfoBase(SSID, wifiChannel, BSSID, encryptionType, RSSI, isHidden)
 { }
                   

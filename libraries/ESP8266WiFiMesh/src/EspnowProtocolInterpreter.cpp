@@ -36,7 +36,7 @@ namespace EspnowProtocolInterpreter
     return espnowProtocolBytesSize + (EspnowMeshBackend::useEncryptedMessages() ? aeadMetadataSize : 0);
   }
   
-  String espnowGetMessageContent(uint8_t *transmissionDataArray, uint8_t transmissionLength)
+  String espnowGetMessageContent(uint8_t *transmissionDataArray, const uint8_t transmissionLength)
   {
     String messageContent = emptyString;
     
@@ -81,12 +81,12 @@ namespace EspnowProtocolInterpreter
     return TypeCast::uint8ArrayToUint64(transmissionDataArray + espnowMessageIDIndex);
   }
 
-  uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, uint64_t messageID)
+  uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, const uint64_t messageID)
   {
     return TypeCast::uint64ToUint8Array(messageID, transmissionDataArray + espnowMessageIDIndex);
   }
 
-  bool usesEncryption(uint64_t messageID)
+  bool usesEncryption(const uint64_t messageID)
   {
     // At least one of the leftmost half of bits in messageID is 1 if the transmission is encrypted.
     return messageID & uint64LeftmostBits;

@@ -36,10 +36,10 @@ public:
 
   virtual ~EncryptedConnectionData() = default; 
 
-  EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey,
+  EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey,
                           const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
-  EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey,
-                          uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+  EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey,
+                          const uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
   
   EncryptedConnectionData(const EncryptedConnectionData &other);
 
@@ -65,15 +65,15 @@ public:
   // @param resultArray At least size espnowHashKeyLength. 
   uint8_t *getHashKey(uint8_t *resultArray) const;
   
-  void setPeerSessionKey(uint64_t sessionKey);
+  void setPeerSessionKey(const uint64_t sessionKey);
   uint64_t getPeerSessionKey() const;
-  void setOwnSessionKey(uint64_t sessionKey);
+  void setOwnSessionKey(const uint64_t sessionKey);
   uint64_t getOwnSessionKey() const;
 
-  static uint64_t incrementSessionKey(uint64_t sessionKey, const uint8_t *hashKey, uint8_t hashKeyLength);
+  static uint64_t incrementSessionKey(const uint64_t sessionKey, const uint8_t *hashKey, const uint8_t hashKeyLength);
   void incrementOwnSessionKey();
 
-  void setDesync(bool desync);
+  void setDesync(const bool desync);
   bool desync() const;
 
   // Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized. 
@@ -81,7 +81,7 @@ public:
   String serialize() const;
 
   const ExpiringTimeTracker *temporary() const;
-  virtual void setRemainingDuration(uint32_t remainingDuration);
+  virtual void setRemainingDuration(const uint32_t remainingDuration);
   virtual void removeDuration();
     
 private:

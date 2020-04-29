@@ -66,7 +66,7 @@ namespace MeshCryptoInterface
    * 
    * @return True if the HMAC is correct. False otherwise.
    */
-  bool verifyMeshHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, uint8_t hashKeyLength);
+  bool verifyMeshHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, const uint8_t hashKeyLength);
   
   /**
    * Initialize key with a SHA-256 hash of keySeed.
@@ -77,7 +77,7 @@ namespace MeshCryptoInterface
    * 
    * @return A pointer to the initialized key array.
    */
-  uint8_t *initializeKey(uint8_t *key, uint8_t keyLength, const String &keySeed);
+  uint8_t *initializeKey(uint8_t *key, const uint8_t keyLength, const String &keySeed);
 }
 
 #endif

@@ -53,14 +53,14 @@ void NetworkInfoBase::storeBSSID(const uint8_t newBSSID[6])
 
 NetworkInfoBase::NetworkInfoBase() {};
 
-NetworkInfoBase::NetworkInfoBase(uint8_t networkIndex)
+NetworkInfoBase::NetworkInfoBase(const uint8_t networkIndex)
 {
   uint8_t *bssidPtr = nullptr;
   WiFi.getNetworkInfo(networkIndex, _SSID, _encryptionType, _RSSI, bssidPtr, _wifiChannel, _isHidden);
   storeBSSID(bssidPtr);
 }
 
-NetworkInfoBase::NetworkInfoBase(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI, bool isHidden) : 
+NetworkInfoBase::NetworkInfoBase(const String &SSID, const int32_t wifiChannel, const uint8_t BSSID[6], const uint8_t encryptionType, const int32_t RSSI, const bool isHidden) : 
   _SSID(SSID), _wifiChannel(wifiChannel), _encryptionType(encryptionType), _RSSI(RSSI), _isHidden(isHidden)
 {
   storeBSSID(BSSID);
@@ -104,17 +104,17 @@ uint8_t *NetworkInfoBase::getBSSID(uint8_t resultArray[6]) const
   }
 }
 
-void NetworkInfoBase::setSSID(String &SSID) { _SSID = SSID; }
+void NetworkInfoBase::setSSID(const String &SSID) { _SSID = SSID; }
 String NetworkInfoBase::SSID() const { return _SSID; }
 
-void NetworkInfoBase::setWifiChannel(int32_t wifiChannel) { _wifiChannel = wifiChannel; }
+void NetworkInfoBase::setWifiChannel(const int32_t wifiChannel) { _wifiChannel = wifiChannel; }
 int32_t NetworkInfoBase::wifiChannel() const { return _wifiChannel; }
 
-void NetworkInfoBase::setEncryptionType(uint8_t encryptionType) { _encryptionType = encryptionType; }
+void NetworkInfoBase::setEncryptionType(const uint8_t encryptionType) { _encryptionType = encryptionType; }
 uint8_t NetworkInfoBase::encryptionType() const { return _encryptionType; }
 
-void NetworkInfoBase::setRSSI(int32_t RSSI) { _RSSI = RSSI; }
+void NetworkInfoBase::setRSSI(const int32_t RSSI) { _RSSI = RSSI; }
 int32_t NetworkInfoBase::RSSI() const { return _RSSI; }
 
-void NetworkInfoBase::setIsHidden(bool isHidden) { _isHidden = isHidden; }
+void NetworkInfoBase::setIsHidden(const bool isHidden) { _isHidden = isHidden; }
 bool NetworkInfoBase::isHidden() const { return _isHidden; }

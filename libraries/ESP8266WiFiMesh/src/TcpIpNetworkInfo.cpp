@@ -25,7 +25,7 @@
 #include "TcpIpNetworkInfo.h"
 #include <assert.h>
 
-TcpIpNetworkInfo::TcpIpNetworkInfo(int networkIndex) : NetworkInfoBase(networkIndex) { };
+TcpIpNetworkInfo::TcpIpNetworkInfo(const int networkIndex) : NetworkInfoBase(networkIndex) { };
 
 
 TcpIpNetworkInfo::TcpIpNetworkInfo(const NetworkInfoBase &originalNetworkInfo) : NetworkInfoBase(originalNetworkInfo) 
@@ -33,6 +33,6 @@ TcpIpNetworkInfo::TcpIpNetworkInfo(const NetworkInfoBase &originalNetworkInfo) :
   assert(SSID() != defaultSSID); // We need at least SSID to be able to connect. 
 };
 
-TcpIpNetworkInfo::TcpIpNetworkInfo(const String &SSID, int32_t wifiChannel, const uint8_t BSSID[6], uint8_t encryptionType, int32_t RSSI , bool isHidden)
+TcpIpNetworkInfo::TcpIpNetworkInfo(const String &SSID, const int32_t wifiChannel, const uint8_t BSSID[6], const uint8_t encryptionType, const int32_t RSSI , const bool isHidden)
                   : NetworkInfoBase(SSID, wifiChannel, BSSID, encryptionType, RSSI, isHidden)
 { }

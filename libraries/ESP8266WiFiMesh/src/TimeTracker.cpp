@@ -25,7 +25,7 @@
 #include "TimeTracker.h"
 #include <Arduino.h>
 
-TimeTracker::TimeTracker(uint32_t creationTimeMs) : _creationTimeMs(creationTimeMs)
+TimeTracker::TimeTracker(const uint32_t creationTimeMs) : _creationTimeMs(creationTimeMs)
 { }
 
 uint32_t TimeTracker::timeSinceCreation() const

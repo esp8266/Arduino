@@ -27,7 +27,7 @@
 #include "EspnowMeshBackend.h"
 #include <assert.h>
 
-MessageData::MessageData(String &message, uint8_t transmissionsRemaining, uint32_t creationTimeMs) :
+MessageData::MessageData(const String &message, const uint8_t transmissionsRemaining, const uint32_t creationTimeMs) :
   _timeTracker(creationTimeMs)
 {
   _transmissionsExpected = transmissionsRemaining + 1;
@@ -35,14 +35,14 @@ MessageData::MessageData(String &message, uint8_t transmissionsRemaining, uint32
   ++_transmissionsReceived;
 }
 
-MessageData::MessageData(uint8_t *initialTransmission, uint8_t transmissionLength, uint32_t creationTimeMs) :
+MessageData::MessageData(uint8_t *initialTransmission, const uint8_t transmissionLength, const uint32_t creationTimeMs) :
   _timeTracker(creationTimeMs)
 {
   _transmissionsExpected = EspnowProtocolInterpreter::espnowGetTransmissionsRemaining(initialTransmission) + 1;
   addToMessage(initialTransmission, transmissionLength);
 }
 
-bool MessageData::addToMessage(uint8_t *transmission, uint8_t transmissionLength)
+bool MessageData::addToMessage(uint8_t *transmission, const uint8_t transmissionLength)
 {
   if(EspnowProtocolInterpreter::espnowGetTransmissionsRemaining(transmission) == getTransmissionsRemaining() - 1)
   {
@@ -56,22 +56,22 @@ bool MessageData::addToMessage(uint8_t *transmission, uint8_t transmissionLength
   return false;
 }
 
-uint8_t MessageData::getTransmissionsReceived()
+uint8_t MessageData::getTransmissionsReceived() const
 {
   return _transmissionsReceived;
 }
 
-uint8_t MessageData::getTransmissionsExpected()
+uint8_t MessageData::getTransmissionsExpected() const
 {
   return _transmissionsExpected;
 }
 
-uint8_t MessageData::getTransmissionsRemaining()
+uint8_t MessageData::getTransmissionsRemaining() const
 {
   return getTransmissionsExpected() - getTransmissionsReceived();
 }
 
-String MessageData::getTotalMessage()
+String MessageData::getTotalMessage() const
 {
   return _totalMessage;
 }

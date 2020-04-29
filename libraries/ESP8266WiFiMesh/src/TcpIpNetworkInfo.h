@@ -34,7 +34,7 @@ public:
   /**
    * Automatically fill in the rest of the network info using networkIndex and the WiFi scan results.
    */
-  TcpIpNetworkInfo(int networkIndex);
+  TcpIpNetworkInfo(const int networkIndex);
 
   
   TcpIpNetworkInfo(const NetworkInfoBase &originalNetworkInfo);
@@ -42,8 +42,8 @@ public:
   /**
    * Without giving wifiChannel and BSSID, connection time is longer.
    */
-  TcpIpNetworkInfo(const String &SSID, int32_t wifiChannel = defaultWifiChannel, const uint8_t BSSID[6] = defaultBSSID, uint8_t encryptionType = defaultEncryptionType, 
-                    int32_t RSSI = defaultRSSI, bool isHidden = defaultIsHidden);
+  TcpIpNetworkInfo(const String &SSID, const int32_t wifiChannel = defaultWifiChannel, const uint8_t BSSID[6] = defaultBSSID, const uint8_t encryptionType = defaultEncryptionType, 
+                    const int32_t RSSI = defaultRSSI, const bool isHidden = defaultIsHidden);
 };
 
 #endif

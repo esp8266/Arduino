@@ -32,7 +32,7 @@ class ResponseData {
   
 public:
 
-  ResponseData(const String &message, const uint8_t recipientMac[6], uint64_t requestID, uint32_t creationTimeMs = millis());
+  ResponseData(const String &message, const uint8_t recipientMac[6], const uint64_t requestID, const uint32_t creationTimeMs = millis());
   ResponseData(const ResponseData &other);
   ResponseData & operator=(const ResponseData &other);
   // No need for explicit destructor with current class design
@@ -40,10 +40,10 @@ public:
   void setRecipientMac(const uint8_t recipientMac[6]);
   const uint8_t *getRecipientMac() const;
 
-  void setMessage(String &message);
+  void setMessage(const String &message);
   String getMessage() const;
 
-  void setRequestID(uint64_t requestID);
+  void setRequestID(const uint64_t requestID);
   uint64_t getRequestID() const;
 
   const TimeTracker &getTimeTracker() const;

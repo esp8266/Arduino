@@ -27,31 +27,31 @@
 
 using EspnowProtocolInterpreter::espnowHashKeyLength;
 
-PeerRequestLog::PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, uint8_t encryptedConnectionsSoftLimit, 
+PeerRequestLog::PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, 
                                const String &peerRequestNonce, const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[espnowHashKeyLength])
  : EncryptedConnectionData(peerStaMac, peerApMac, 0, 0, EspnowMeshBackend::getEncryptionRequestTimeout(), hashKey), 
    _requestID(requestID), _requestEncrypted(requestEncrypted), _authenticationPassword(authenticationPassword), 
    _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit), _peerRequestNonce(peerRequestNonce)
 { }
 
-PeerRequestLog::PeerRequestLog(uint64_t requestID, bool requestEncrypted, const String &authenticationPassword, uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
-                               const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength])
+PeerRequestLog::PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
+                               const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength])
  : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, EspnowMeshBackend::getEncryptionRequestTimeout(), hashKey), 
    _requestID(requestID), _requestEncrypted(requestEncrypted), _authenticationPassword(authenticationPassword), 
    _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit), _peerRequestNonce(peerRequestNonce)
 { }
 
-void PeerRequestLog::setRequestID(uint64_t requestID) { _requestID = requestID; }
-uint64_t PeerRequestLog::getRequestID() { return _requestID; }
+void PeerRequestLog::setRequestID(const uint64_t requestID) { _requestID = requestID; }
+uint64_t PeerRequestLog::getRequestID() const { return _requestID; }
 
-void PeerRequestLog::setRequestEncrypted(bool requestEncrypted) { _requestEncrypted = requestEncrypted; }
-bool PeerRequestLog::requestEncrypted() { return _requestEncrypted; }
+void PeerRequestLog::setRequestEncrypted(const bool requestEncrypted) { _requestEncrypted = requestEncrypted; }
+bool PeerRequestLog::requestEncrypted() const { return _requestEncrypted; }
 
 void PeerRequestLog::setAuthenticationPassword(const String &password) { _authenticationPassword = password; }
-String PeerRequestLog::getAuthenticationPassword() { return _authenticationPassword; }
+String PeerRequestLog::getAuthenticationPassword() const { return _authenticationPassword; }
 
-void PeerRequestLog::setEncryptedConnectionsSoftLimit(uint8_t softLimit) { _encryptedConnectionsSoftLimit = softLimit; }
-uint8_t PeerRequestLog::getEncryptedConnectionsSoftLimit() { return _encryptedConnectionsSoftLimit; }
+void PeerRequestLog::setEncryptedConnectionsSoftLimit(const uint8_t softLimit) { _encryptedConnectionsSoftLimit = softLimit; }
+uint8_t PeerRequestLog::getEncryptedConnectionsSoftLimit() const { return _encryptedConnectionsSoftLimit; }
 
 void PeerRequestLog::setPeerRequestNonce(const String &nonce) { _peerRequestNonce = nonce; }
-String PeerRequestLog::getPeerRequestNonce() { return _peerRequestNonce; }
+String PeerRequestLog::getPeerRequestNonce() const { return _peerRequestNonce; }

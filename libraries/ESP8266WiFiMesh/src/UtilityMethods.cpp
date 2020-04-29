@@ -27,10 +27,10 @@
 #include "MeshBackendBase.h"
 #include "EspnowMeshBackend.h"
 
-void MeshBackendBase::setVerboseModeState(bool enabled) {_verboseMode = enabled;}
-bool MeshBackendBase::verboseMode() {return _verboseMode;}
+void MeshBackendBase::setVerboseModeState(const bool enabled) {_verboseMode = enabled;}
+bool MeshBackendBase::verboseMode() const {return _verboseMode;}
 
-void MeshBackendBase::verboseModePrint(const String &stringToPrint, bool newline)
+void MeshBackendBase::verboseModePrint(const String &stringToPrint, const bool newline) const
 {
   if(verboseMode())
   {
@@ -41,10 +41,10 @@ void MeshBackendBase::verboseModePrint(const String &stringToPrint, bool newline
   }
 }
 
-void EspnowMeshBackend::setVerboseModeState(bool enabled) {MeshBackendBase::setVerboseModeState(enabled); _staticVerboseMode = enabled;}
-bool EspnowMeshBackend::verboseMode() {return staticVerboseMode();}
+void EspnowMeshBackend::setVerboseModeState(const bool enabled) {MeshBackendBase::setVerboseModeState(enabled); _staticVerboseMode = enabled;}
+bool EspnowMeshBackend::verboseMode() const {return staticVerboseMode();}
 
-void EspnowMeshBackend::verboseModePrint(const String &stringToPrint, bool newline)
+void EspnowMeshBackend::verboseModePrint(const String &stringToPrint, const bool newline) const
 {
   if(verboseMode())
   {
@@ -57,7 +57,7 @@ void EspnowMeshBackend::verboseModePrint(const String &stringToPrint, bool newli
 
 bool EspnowMeshBackend::staticVerboseMode() {return _staticVerboseMode;}
 
-void EspnowMeshBackend::staticVerboseModePrint(const String &stringToPrint, bool newline)
+void EspnowMeshBackend::staticVerboseModePrint(const String &stringToPrint, const bool newline)
 {
   if(staticVerboseMode())
   {
@@ -68,10 +68,10 @@ void EspnowMeshBackend::staticVerboseModePrint(const String &stringToPrint, bool
   }
 }
 
-void MeshBackendBase::setPrintWarnings(bool printEnabled) {_printWarnings = printEnabled;}
+void MeshBackendBase::setPrintWarnings(const bool printEnabled) {_printWarnings = printEnabled;}
 bool MeshBackendBase::printWarnings() {return _printWarnings;}
 
-void MeshBackendBase::warningPrint(const String &stringToPrint, bool newline)
+void MeshBackendBase::warningPrint(const String &stringToPrint, const bool newline)
 {
   if(printWarnings())
   {

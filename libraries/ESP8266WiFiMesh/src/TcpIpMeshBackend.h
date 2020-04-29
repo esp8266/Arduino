@@ -61,9 +61,9 @@ public:
    *                   This is managed automatically by the activateAP method.
    * 
    */
-  TcpIpMeshBackend(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
-                  const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, bool verboseMode = false, 
-                  uint8 meshWiFiChannel = 1, uint16_t serverPort = 4011);
+  TcpIpMeshBackend(const requestHandlerType requestHandler, const responseHandlerType responseHandler, const networkFilterType networkFilter, 
+                  const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, const bool verboseMode = false, 
+                  const uint8 meshWiFiChannel = 1, const uint16_t serverPort = 4011);
 
   /** 
   * Returns a vector that contains the NetworkInfo for each WiFi network to connect to.
@@ -114,9 +114,9 @@ public:
    *                               Note that if the ESP8266 has an active AP, that AP will switch WiFi channel to match that of any other AP the ESP8266 connects to.
    *                               This can make it impossible for other nodes to detect the AP if they are scanning the wrong WiFi channel.
    */
-  void attemptTransmission(const String &message, bool scan, bool scanAllWiFiChannels, bool concludingDisconnect, bool initialDisconnect = false);
+  void attemptTransmission(const String &message, const bool scan, const bool scanAllWiFiChannels, const bool concludingDisconnect, const bool initialDisconnect = false);
 
-  void attemptTransmission(const String &message, bool scan = true, bool scanAllWiFiChannels = false) override;
+  void attemptTransmission(const String &message, const bool scan = true, const bool scanAllWiFiChannels = false) override;
 
   /**
    * Transmit message to a single recipient without changing the local transmission state (apart from connecting to the recipient if required). 
@@ -124,7 +124,7 @@ public:
    * 
    * Note that if wifiChannel and BSSID are missing from recipientInfo, connection time will be longer.
    */
-  TransmissionStatusType attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, bool concludingDisconnect = true, bool initialDisconnect = false);
+  TransmissionStatusType attemptTransmission(const String &message, const TcpIpNetworkInfo &recipientInfo, const bool concludingDisconnect = true, const bool initialDisconnect = false);
   
   /**
    * If any clients are connected, accept their requests and call the requestHandler function for each one.
@@ -135,14 +135,14 @@ public:
    * Get the TCP/IP message that is currently scheduled for transmission.
    * Unlike the getMessage() method, this will be correct even when the single recipient attemptTransmission method is used.
    */
-  String getCurrentMessage();
+  String getCurrentMessage() const;
 
   /**
    * Set a static IP address for the ESP8266 and activate use of static IP.
    * The static IP needs to be at the same subnet as the server's gateway.
    */
   void setStaticIP(const IPAddress &newIP);
-  IPAddress getStaticIP();
+  IPAddress getStaticIP() const;
   void disableStaticIP();
 
   /**
@@ -161,8 +161,8 @@ public:
    * @param serverPort The server port to use.
    *                    
    */
-  void setServerPort(uint16_t serverPort);
-  uint16_t getServerPort();
+  void setServerPort(const uint16_t serverPort);
+  uint16_t getServerPort() const;
 
   /**
    * Set the maximum number of stations that can simultaneously be connected to the AP controlled by this TcpIpMeshBackend instance. 
@@ -174,8 +174,8 @@ public:
    *
    * @param maxAPStations The maximum number of simultaneous station connections allowed. Valid values are 0 to 8.
    */
-  void setMaxAPStations(uint8_t maxAPStations);
-  bool getMaxAPStations();
+  void setMaxAPStations(const uint8_t maxAPStations);
+  bool getMaxAPStations() const;
 
   /**
    * Set the timeout for each attempt to connect to another AP that occurs through the attemptTransmission method by this TcpIpMeshBackend instance.
@@ -183,8 +183,8 @@ public:
    * 
    * @param connectionAttemptTimeoutMs The timeout for each connection attempt, in milliseconds.
    */
-  void setConnectionAttemptTimeout(uint32_t connectionAttemptTimeoutMs);
-  uint32_t getConnectionAttemptTimeout();
+  void setConnectionAttemptTimeout(const uint32_t connectionAttemptTimeoutMs);
+  uint32_t getConnectionAttemptTimeout() const;
 
   /**
    * Set the timeout to use for transmissions when this TcpIpMeshBackend instance acts as a station (i.e. when connected to another AP).
@@ -193,8 +193,8 @@ public:
    * 
    * @param stationModeTimeoutMs The timeout to use, in milliseconds.
    */
-  void setStationModeTimeout(int stationModeTimeoutMs);
-  int getStationModeTimeout();
+  void setStationModeTimeout(const int stationModeTimeoutMs);
+  int getStationModeTimeout() const;
 
   /**
    * Set the timeout to use for transmissions when this TcpIpMeshBackend instance acts as an AP (i.e. when receiving connections from other stations).
@@ -205,8 +205,8 @@ public:
    *
    * @param apModeTimeoutMs The timeout to use, in milliseconds.
    */
-  void setAPModeTimeout(uint32_t apModeTimeoutMs);
-  uint32_t getAPModeTimeout();
+  void setAPModeTimeout(const uint32_t apModeTimeoutMs);
+  uint32_t getAPModeTimeout() const;
 
 protected:
 
@@ -249,7 +249,7 @@ protected:
    * @param newMessage The message to send.
    */
   void setTemporaryMessage(const String &newMessage);
-  String getTemporaryMessage();
+  String getTemporaryMessage() const;
   void clearTemporaryMessage();
 
 private:
@@ -270,14 +270,14 @@ private:
   static IPAddress subnetMask;
 
   void fullStop(WiFiClient &currClient);
-  void initiateConnectionToAP(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
-  TransmissionStatusType connectToNode(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
+  void initiateConnectionToAP(const String &targetSSID, const int targetChannel = NETWORK_INFO_DEFAULT_INT, const uint8_t *targetBSSID = NULL);
+  TransmissionStatusType connectToNode(const String &targetSSID, const int targetChannel = NETWORK_INFO_DEFAULT_INT, const uint8_t *targetBSSID = NULL);
   TransmissionStatusType exchangeInfo(WiFiClient &currClient);
-  bool waitForClientTransmission(WiFiClient &currClient, uint32_t maxWait);
+  bool waitForClientTransmission(WiFiClient &currClient, const uint32_t maxWait);
   TransmissionStatusType attemptDataTransfer();
   TransmissionStatusType attemptDataTransferKernel();
   TransmissionStatusType initiateTransmission(const TcpIpNetworkInfo &recipientInfo);
-  void enterPostTransmissionState(bool concludingDisconnect);
+  void enterPostTransmissionState(const bool concludingDisconnect);
 };
 
 #endif

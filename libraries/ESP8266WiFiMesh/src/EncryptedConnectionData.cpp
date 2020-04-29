@@ -31,7 +31,7 @@
 using EspnowProtocolInterpreter::espnowHashKeyLength;
 namespace TypeCast = MeshTypeConversionFunctions;
 
-EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
   : _peerSessionKey(peerSessionKey), _ownSessionKey(ownSessionKey)
 { 
   std::copy_n(peerStaMac, 6, _peerStaMac);
@@ -39,7 +39,7 @@ EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], co
   std::copy_n(hashKey, espnowHashKeyLength, _hashKey);
 }
 
-EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], uint64_t peerSessionKey, uint64_t ownSessionKey, uint32_t duration, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint32_t duration, const uint8_t hashKey[espnowHashKeyLength]) 
   : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, hashKey)
 {
   setRemainingDuration(duration);
@@ -119,13 +119,13 @@ uint8_t *EncryptedConnectionData::getHashKey(uint8_t *resultArray) const
   return resultArray;
 }
 
-void EncryptedConnectionData::setPeerSessionKey(uint64_t sessionKey) { _peerSessionKey = sessionKey; }
+void EncryptedConnectionData::setPeerSessionKey(const uint64_t sessionKey) { _peerSessionKey = sessionKey; }
 uint64_t EncryptedConnectionData::getPeerSessionKey() const { return _peerSessionKey; }
 
-void EncryptedConnectionData::setOwnSessionKey(uint64_t sessionKey) { _ownSessionKey = sessionKey; }
+void EncryptedConnectionData::setOwnSessionKey(const uint64_t sessionKey) { _ownSessionKey = sessionKey; }
 uint64_t EncryptedConnectionData::getOwnSessionKey() const { return _ownSessionKey; }
 
-uint64_t EncryptedConnectionData::incrementSessionKey(uint64_t sessionKey, const uint8_t *hashKey, uint8_t hashKeyLength)
+uint64_t EncryptedConnectionData::incrementSessionKey(const uint64_t sessionKey, const uint8_t *hashKey, const uint8_t hashKeyLength)
 {
   uint8_t inputArray[8] {0};
   uint8_t hmacArray[CryptoInterface::SHA256_NATURAL_LENGTH] {0};
@@ -149,7 +149,7 @@ void EncryptedConnectionData::incrementOwnSessionKey()
   setOwnSessionKey(incrementSessionKey(getOwnSessionKey(), _hashKey, EspnowProtocolInterpreter::espnowHashKeyLength));
 }
 
-void EncryptedConnectionData::setDesync(bool desync) { _desync = desync; }
+void EncryptedConnectionData::setDesync(const bool desync) { _desync = desync; }
 bool EncryptedConnectionData::desync() const { return _desync; }
 
 String EncryptedConnectionData::serialize() const
@@ -171,7 +171,7 @@ const ExpiringTimeTracker *EncryptedConnectionData::temporary() const
   return _timeTracker.get();
 }
 
-void EncryptedConnectionData::setRemainingDuration(uint32_t remainingDuration)
+void EncryptedConnectionData::setRemainingDuration(const uint32_t remainingDuration)
 {
   if(!_timeTracker)
   {
