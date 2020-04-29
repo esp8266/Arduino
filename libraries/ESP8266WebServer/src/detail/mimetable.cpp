@@ -1,5 +1,6 @@
 #include "mimetable.h"
 #include "pgmspace.h"
+#include "WString.h"
 
 namespace mime
 {
@@ -31,5 +32,20 @@ const Entry mimeTable[maxType] PROGMEM =
     { ".appcache", "text/cache-manifest" },
     { "", "application/octet-stream" } 
 };
+
+    String getContentType(const String& path) {
+        char buff[sizeof(mimeTable[0].mimeType)];
+        // Check all entries but last one for match, return if found
+        for (size_t i=0; i < sizeof(mimeTable)/sizeof(mimeTable[0])-1; i++) {
+            strcpy_P(buff, mimeTable[i].endsWith);
+            if (path.endsWith(buff)) {
+                strcpy_P(buff, mimeTable[i].mimeType);
+                return String(buff);
+            }
+        }
+        // Fall-through and just return default type
+        strcpy_P(buff, mimeTable[sizeof(mimeTable)/sizeof(mimeTable[0])-1].mimeType);
+        return String(buff);
+    }
 
 }
