@@ -115,49 +115,6 @@ void replyServerError(String msg) {
   server.send(500, FPSTR(TEXT_PLAIN), msg + "\r\n");
 }
 
-String getContentType(String filename) {
-  if (filename.endsWith(".htm")) {
-    return "text/html";
-  }
-  if (filename.endsWith(".html")) {
-    return "text/html";
-  }
-  if (filename.endsWith(".css")) {
-    return "text/css";
-  }
-  if (filename.endsWith(".js")) {
-    return "application/javascript";
-  }
-  if (filename.endsWith(".png")) {
-    return "image/png";
-  }
-  if (filename.endsWith(".gif")) {
-    return "image/gif";
-  }
-  if (filename.endsWith(".jpg")) {
-    return "image/jpeg";
-  }
-  if (filename.endsWith(".jpeg")) {
-    return "image/jpeg";
-  }
-  if (filename.endsWith(".ico")) {
-    return "image/x-icon";
-  }
-  if (filename.endsWith(".xml")) {
-    return "text/xml";
-  }
-  if (filename.endsWith(".pdf")) {
-    return "application/x-pdf";
-  }
-  if (filename.endsWith(".zip")) {
-    return "application/x-zip";
-  }
-  if (filename.endsWith(".gz")) {
-    return "application/x-gzip";
-  }
-  return FPSTR(TEXT_PLAIN);
-}
-
 #ifdef USE_SPIFFS
 /*
    Checks filename for character combinations that are not supported by FSBrowser (alhtough valid on SPIFFS).
@@ -304,7 +261,7 @@ bool handleFileRead(String path) {
   if (server.hasArg("download")) {
     contentType = F("application/octet-stream");
   } else {
-    contentType = getContentType(path);
+    contentType = mime::getContentType(path);
   }
 
   if (!fileSystem->exists(path)) {
