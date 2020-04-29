@@ -412,15 +412,15 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
-#define ENABLE_ADJUST // Adjust takes 36 bytes
+#define ENABLE_ADJUST   // Adjust takes 36 bytes
+#define ENABLE_FEEDBACK // Feedback costs 68 bytes
+#define ENABLE_PWM      // PWM takes 160 bytes
+
 #ifndef ENABLE_ADJUST
   #undef adjust
   #define adjust(x) (x)
 #endif
 
-#define ENABLE_FEEDBACK // Feedback costs 68 bytes
-
-#define ENABLE_PWM // PWM takes 160 bytes
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Flag if the core is at 160 MHz, for use by adjust()
@@ -440,12 +440,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     wvfState.startPin = __builtin_ffs(wvfState.waveformEnabled) - 1;
     // Find the last bit by subtracting off GCC's count-leading-zeros (no offset in this one)
     wvfState.endPin = 32 - __builtin_clz(wvfState.waveformEnabled);
+#ifdef ENABLE_PWM
   } else if (!pwmState.cnt && pwmUpdate) {
     // Start up the PWM generator by copying from the mailbox
     pwmState.cnt = 1;
     pwmState.idx = 1; // Ensure copy this cycle, cause it to start at t=0
     pwmState.nextServiceCycle = GetCycleCountIRQ(); // Do it this loop!
     // No need for mem barrier here.  Global must be written by IRQ exit
+#endif
   } else if (wvfState.waveformToChange >= 0) {
     wvfState.waveform[wvfState.waveformToChange].gotoTimeHighCycles = wvfState.waveformNewHigh;
     wvfState.waveform[wvfState.waveformToChange].gotoTimeLowCycles = wvfState.waveformNewLow;
@@ -526,6 +528,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         int32_t cyclesToGo = wave->nextServiceCycle - now;
         if (cyclesToGo < 0) {
           uint32_t nextEdgeCycles;
+          uint32_t desired = 0;
+          uint32_t *timeToUpdate;
           wvfState.waveformState ^= mask;
           if (wvfState.waveformState & mask) {
             if (i == 16) {
@@ -535,12 +539,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
 #ifdef ENABLE_FEEDBACK
             if (wave->lastEdge) {
-              auto desiredLowCycles = adjust(wave->desiredLowCycles);
-              int32_t err = desiredLowCycles - (now - wave->lastEdge);
-              if (abs(err) < desiredLowCycles) { // If we've lost > the entire phase, ignore this error signal
-                err /= 4;
-                wave->timeLowCycles += err;
-              }
+              desired = wave->desiredLowCycles;
+              timeToUpdate = &wave->timeLowCycles;
             }
 #endif
             nextEdgeCycles = wave->timeHighCycles;
@@ -559,16 +559,22 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave->gotoTimeHighCycles = 0;
             } else {
 #ifdef ENABLE_FEEDBACK
-              auto desiredHighCycles = adjust(wave->desiredHighCycles);
-              int32_t err = desiredHighCycles - (now - wave->lastEdge);
-              if (abs(err) < desiredHighCycles) { // If we've lost > the entire phase, ignore this error signal
-                err /= 4;
-                wave->timeHighCycles += err; // Feedback 1/4 of the error
-              }
+              desired = wave->desiredHighCycles;
+              timeToUpdate = &wave->timeHighCycles;
 #endif
             }
             nextEdgeCycles = wave->timeLowCycles;
           }
+#ifdef ENABLE_FEEDBACK
+          if (desired) {
+            desired = adjust(desired);
+            int32_t err = desired - (now - wave->lastEdge);
+            if (abs(err) < desired) { // If we've lost > the entire phase, ignore this error signal
+                err /= 4;
+                *timeToUpdate += err;
+            }
+          }
+#endif
           nextEdgeCycles = adjust(nextEdgeCycles);
           wave->nextServiceCycle = now + nextEdgeCycles;
           nextEventCycles = min_u32(nextEventCycles, nextEdgeCycles);
