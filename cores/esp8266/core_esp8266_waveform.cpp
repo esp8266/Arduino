@@ -412,6 +412,16 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
+#define ENABLE_ADJUST // Adjust takes 36 bytes
+#ifndef ENABLE_ADJUST
+  #undef adjust
+  #define adjust(x) (x)
+#endif
+
+#define ENABLE_FEEDBACK // Feedback costs 68 bytes
+
+#define ENABLE_PWM // PWM takes 160 bytes
+
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Flag if the core is at 160 MHz, for use by adjust()
   bool turbo = (*(uint32_t*)0x3FF00014) & 1 ? true : false;
@@ -448,6 +458,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     do {
       nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
 
+#ifdef ENABLE_PWM
       // PWM state machine implementation
       if (pwmState.cnt) {
         uint32_t now = GetCycleCountIRQ();
@@ -483,6 +494,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
       }
+#endif
 
       for (int i = wvfState.startPin; i <= wvfState.endPin; i++) {
         uint32_t mask = 1<<i;
@@ -513,6 +525,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         // Check for toggles
         int32_t cyclesToGo = wave->nextServiceCycle - now;
         if (cyclesToGo < 0) {
+          uint32_t nextEdgeCycles;
           wvfState.waveformState ^= mask;
           if (wvfState.waveformState & mask) {
             if (i == 16) {
@@ -520,6 +533,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
+#ifdef ENABLE_FEEDBACK
             if (wave->lastEdge) {
               auto desiredLowCycles = adjust(wave->desiredLowCycles);
               int32_t err = desiredLowCycles - (now - wave->lastEdge);
@@ -528,9 +542,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 wave->timeLowCycles += err;
               }
             }
-            auto timeHighCycles = adjust(wave->timeHighCycles);
-            wave->nextServiceCycle = now + timeHighCycles;
-            nextEventCycles = min_u32(nextEventCycles, timeHighCycles);
+#endif
+            nextEdgeCycles = wave->timeHighCycles;
           } else {
             if (i == 16) {
               GP16O &= ~1; // GPIO16 write slow as it's RMW
@@ -545,17 +558,20 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave->desiredLowCycles = wave->gotoTimeLowCycles;
               wave->gotoTimeHighCycles = 0;
             } else {
+#ifdef ENABLE_FEEDBACK
               auto desiredHighCycles = adjust(wave->desiredHighCycles);
               int32_t err = desiredHighCycles - (now - wave->lastEdge);
               if (abs(err) < desiredHighCycles) { // If we've lost > the entire phase, ignore this error signal
                 err /= 4;
                 wave->timeHighCycles += err; // Feedback 1/4 of the error
               }
+#endif
             }
-            auto timeLowCycles = adjust(wave->timeLowCycles);
-            wave->nextServiceCycle = now + timeLowCycles;
-            nextEventCycles = min_u32(nextEventCycles, timeLowCycles);
+            nextEdgeCycles = wave->timeLowCycles;
           }
+          nextEdgeCycles = adjust(nextEdgeCycles);
+          wave->nextServiceCycle = now + nextEdgeCycles;
+          nextEventCycles = min_u32(nextEventCycles, nextEdgeCycles);
           wave->lastEdge = now;
         } else {
           uint32_t deltaCycles = wave->nextServiceCycle - now;
