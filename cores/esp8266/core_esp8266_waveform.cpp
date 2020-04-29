@@ -78,9 +78,6 @@ volatile uint32_t waveformNewLow = 0;
 
 static uint32_t (*timer1CB)() = NULL;
 
-uint32_t at160 = 0;
-uint32_t at80 = 0;
-
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
 
@@ -115,16 +112,6 @@ static ICACHE_RAM_ATTR void forceTimerInterrupt() {
   }
 }
 
-// Set a callback.  Pass in NULL to stop it
-void setTimer1Callback(uint32_t (*fn)()) {
-  timer1CB = fn;
-  if (!timerRunning && fn) {
-    initTimer();
-    timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
-  } else if (timerRunning && !fn && !waveformEnabled) {
-    deinitTimer();
-  }
-}
 
 // PWM implementation using special purpose state machine
 //
@@ -151,14 +138,10 @@ typedef struct {
 
 static PWMState pwmState;
 static volatile PWMState * volatile pwmUpdate = nullptr; // Set by main code, cleared by ISR
-static uint32_t pwmPeriod = (1000000L * system_get_cpu_freq()) / 1000;
+static uint32_t pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
 
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(uint32_t cc) {
-  // Simple constant shift in period to overcome fixed ISR start time
-  if (cc > microsecondsToClockCycles(3)) {
-      cc -= microsecondsToClockCycles(3) >> 1; // Go back 1.5us
-  }
   if (cc == pwmPeriod) {
     return;
   }
@@ -270,6 +253,7 @@ bool _setPWM(int pin, uint32_t cc) {
     p.cnt++;
     p.mask |= 1<<pin;
   }
+
   // Set mailbox and wait for ISR to copy it over
   pwmUpdate = &p;
   if (!timerRunning) {
@@ -284,7 +268,6 @@ bool _setPWM(int pin, uint32_t cc) {
   }
   return true;
 }
-
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
@@ -336,6 +319,19 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
 
   return true;
 }
+
+
+// Set a callback.  Pass in NULL to stop it
+void setTimer1Callback(uint32_t (*fn)()) {
+  timer1CB = fn;
+  if (!timerRunning && fn) {
+    initTimer();
+    timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
+  } else if (timerRunning && !fn && !waveformEnabled && !pwmState.cnt) {
+    deinitTimer();
+  }
+}
+
 
 // Speed critical bits
 #pragma GCC optimize ("O2")
@@ -394,8 +390,6 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   #define DELTAIRQ (microsecondsToClockCycles(2))
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
-
-
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Optimize the NMI inner loop by keeping track of the min and max GPIO that we
