@@ -542,7 +542,7 @@ uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) co
    * It should be noted that the ESP8266 has no Bluetooth functionality, so turning the WiFi off is likely to cause RANDOM_REG32 to use pseudo-random numbers.
    * 
    * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available. 
-   * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during nonce generation.
+   * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during number generation.
    * Thus only delayMicroseconds() is used below.
    */ 
 
