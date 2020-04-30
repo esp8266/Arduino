@@ -17,6 +17,7 @@ enum type
   png,
   gif,
   jpg,
+  jpeg,
   ico,
   svg,
   ttf,
