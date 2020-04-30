@@ -1,6 +1,32 @@
+/*
+ lwIPDhcpServer.c - DHCP server
 
-// adapted from dhcpserver.c distributed in esp8266-nonos-sdk 2.0.0
-// same license may apply
+ Copyright (c) 2016 Espressif. All rights reserved.
+ Copyright (c) 2020 esp8266 arduino. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+// original sources (no license provided)
+// ESP8266_NONOS_SDK/third_party/lwip/app/dhcpserver.c
+// ESP8266_NONOS_SDK/third_party/include/lwip/app/dhcpserver.h
+ */
+
+// lwIPDhcpServer.{cc,h} encapsulate original nonos-sdk dhcp server
+// nearly as-is. This is an initial version to guaranty legacy behavior
+// with same default values.
 
 #include <lwip/init.h> // LWIP_VERSION
 
@@ -154,17 +180,20 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
 
     if (netif->num == SOFTAP_IF && fw_has_started_softap_dhcps == 1)
     {
-        // nonos-sdk always starts DHCPS at boot
-        // now that dhcps is in a class, we must wait c++ constructors to be initialized
-        // when global variable `dhcpSoftAP` (netif number SOFTAP_IF) is initialized,
-        // this constructor is called and calls begin(legacy-values):
-        // 192.168.4.1 netmask 255.255.255.0 gateway 0.0.0.0
-        ip_info ip = { { 0x0104a8c0 }, { 0x00ffffff }, { 0 } };
+        // When nonos-sdk starts DHCPS at boot:
+        // 1. `fw_has_started_softap_dhcps` is already initialized to 1
+        // 2. global ctor DhcpServer's `dhcpSoftAP(&netif_git[SOFTAP_IF])` is called
+        // 3. (that's here) => begin(legacy-values) is called
+        ip_info ip =
+        {
+            { 0x0104a8c0 }, // IP 192.168.4.1
+            { 0x00ffffff }, // netmask 255.255.255.0
+            { 0 }           // gateway 0.0.0.0
+        };
         begin(&ip);
-        fw_has_started_softap_dhcps = 2;
+        fw_has_started_softap_dhcps = 2; // not 1, ending intial boot sequence
     }
 };
-
 
 // wifi_softap_set_station_info is missing in user_interface.h:
 extern "C" void wifi_softap_set_station_info (uint8_t* mac, struct ipv4_addr*);
