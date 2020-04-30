@@ -343,8 +343,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveform.states ^= 1UL << pin;
               nextEdgeCcy = wave.nextPeriodCcy;
               // the idle cycle code updating for the next period will approximate the duty/idle ratio.
-              if (wave.autoPwm) {
-                nextEdgeCcy += overshootCcys;
+              if (wave.autoPwm && wave.dutyCcys >= microsecondsToClockCycles(3)) {
+                nextEdgeCcy += (overshootCcys / wave.dutyCcys) * idleCcys;
               }
               if (pin == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
@@ -361,15 +361,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else {
               waveform.states ^= 1UL << pin;
-              wave.endDutyCcy = now + wave.dutyCcys;
               wave.nextPeriodCcy += wave.periodCcys;
-              if (fwdPeriods)
-              {
+              wave.endDutyCcy = now + wave.dutyCcys;
+              if (fwdPeriods) {
+                wave.nextPeriodCcy += fwdPeriodCcys;
                 if (wave.autoPwm) {
                   // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
-                  wave.endDutyCcy += wave.dutyCcys - fwdPeriods * idleCcys;
+                  wave.endDutyCcy += fwdPeriods * wave.dutyCcys;
                 }
-                wave.nextPeriodCcy += fwdPeriodCcys;
                 // adapt expiry such that it occurs during intended cycle
                 if (WaveformMode::EXPIRES == wave.mode)
                   wave.expiryCcy += fwdPeriodCcys;
