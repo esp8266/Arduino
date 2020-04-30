@@ -28,6 +28,12 @@
 // nearly as-is. This is an initial version to guaranty legacy behavior
 // with same default values.
 
+// vv this comment is supposed to be removed after the first commit
+// Logic and coding style in this file can be wrong but left to the closest
+// of the initial version for easier issue tracking.
+// (better is enemy of [good = already working])
+// ^^ this comment is supposed to be removed after the first commit
+
 #include <lwip/init.h> // LWIP_VERSION
 
 #if LWIP_VERSION_MAJOR != 1
@@ -1123,6 +1129,9 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 
     if (please->enable)
     {
+        // logic below is subject for improvement
+        // - is wrong
+        // - limited to /24 address plans
 #if 1
         softap_ip = ip_2_ip4(&_netif->ip_addr)->addr;
 #else
