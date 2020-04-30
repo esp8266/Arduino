@@ -82,7 +82,20 @@ public:
         _rebootOnUpdate = reboot;
     }
 
-    void followRedirects(bool follow)
+    /**
+     * set true to follow redirects.
+     * @param follow
+     * @deprecated Please use `setFollowRedirects(followRedirects_t follow)`
+      */
+    void followRedirects(bool follow) __attribute__ ((deprecated))
+    {
+        _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
+    }
+    /**
+      * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+      * @param follow
+      */
+    void setFollowRedirects(followRedirects_t follow)
     {
         _followRedirects = follow;
     }
@@ -160,7 +173,7 @@ protected:
     bool _closeConnectionsOnUpdate = true;
 private:
     int _httpClientTimeout;
-    bool _followRedirects;
+    followRedirects_t _followRedirects;
 
     // Callbacks
     HTTPUpdateStartCB    _cbStart;
