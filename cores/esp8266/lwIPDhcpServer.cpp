@@ -163,7 +163,7 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #define LWIP_IS_OK(what,err) ((err) == ERR_OK)
 #endif
 
-const uint32 DhcpServer::magic_cookie = 0x63538263;
+const uint32 DhcpServer::magic_cookie = 0x63538263; // https://tools.ietf.org/html/rfc1497
 
 int fw_has_started_softap_dhcps = 0;
 
@@ -497,23 +497,17 @@ void DhcpServer::create_msg(struct dhcps_msg *m)
     m->htype = DHCP_HTYPE_ETHERNET;
     m->hlen = 6;
     m->hops = 0;
-    //memcpy((char *) xid, (char *) m->xid, sizeof(m->xid));
     m->secs = 0;
     m->flags = htons(BOOTP_BROADCAST);
 
     memcpy((char *) m->yiaddr, (char *) &client.addr, sizeof(m->yiaddr));
-
     memset((char *) m->ciaddr, 0, sizeof(m->ciaddr));
     memset((char *) m->siaddr, 0, sizeof(m->siaddr));
     memset((char *) m->giaddr, 0, sizeof(m->giaddr));
     memset((char *) m->sname, 0, sizeof(m->sname));
     memset((char *) m->file, 0, sizeof(m->file));
-
     memset((char *) m->options, 0, sizeof(m->options));
-
-    //For xiaomi crash bug
-    uint32 magic_cookie1 = magic_cookie;
-    memcpy((char *) m->options, &magic_cookie1, sizeof(magic_cookie1));
+    memcpy((char *) m->options, magic_cookie, sizeof(magic_cookie));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
