@@ -347,12 +347,12 @@ bool DhcpServer::add_dhcps_lease(uint8 *macaddr)
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ��DHCP msg��Ϣ�ṹ����������
+    DHCP msg
 
-    @param optptr -- DHCP msg��Ϣλ��
-    @param type -- Ҫ��ӵ�����option
+    @param optptr -- DHCP msg
+    @param type -- option
 
-    @return uint8_t* ����DHCP msgƫ�Ƶ�ַ
+    @return uint8_t* DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_msg_type(uint8_t *optptr, uint8_t type)
@@ -365,11 +365,11 @@ uint8_t* DhcpServer::add_msg_type(uint8_t *optptr, uint8_t type)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ��DHCP msg�ṹ������offerӦ������
+    DHCP msg offer
 
-    @param optptr -- DHCP msg��Ϣλ��
+    @param optptr -- DHCP msg
 
-    @return uint8_t* ����DHCP msgƫ�Ƶ�ַ
+    @return uint8_t* DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
@@ -472,11 +472,11 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ��DHCP msg�ṹ����ӽ����־����
+    DHCP msg
 
-    @param optptr -- DHCP msg��Ϣλ��
+    @param optptr -- DHCP msg
 
-    @return uint8_t* ����DHCP msgƫ�Ƶ�ַ
+    @return uint8_t* DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_end(uint8_t *optptr)
@@ -517,9 +517,9 @@ void DhcpServer::create_msg(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����һ��OFFER
+    OFFER
 
-    @param -- m ָ����Ҫ���͵�DHCP msg����
+    @param -- m DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_offer(struct dhcps_msg *m)
@@ -583,9 +583,9 @@ void DhcpServer::send_offer(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����һ��NAK��Ϣ
+    NAK
 
-    @param m ָ����Ҫ���͵�DHCP msg����
+    @param m DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_nak(struct dhcps_msg *m)
@@ -644,9 +644,9 @@ void DhcpServer::send_nak(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����һ��ACK��DHCP�ͻ���
+    ACK DHCP
 
-    @param m ָ����Ҫ���͵�DHCP msg����
+    @param m DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_ack(struct dhcps_msg *m)
@@ -712,12 +712,12 @@ void DhcpServer::send_ack(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����DHCP�ͻ��˷�����DHCP����������Ϣ�����Բ�ͬ��DHCP��������������Ӧ��Ӧ��
+    DHCP
 
-    @param optptr DHCP msg�е���������
-    @param len ��������Ĵ��?(byte)
+    @param optptr DHCP msg е
+    @param len
 
-    @return uint8_t ���ش�����DHCP Server״ֵ̬
+    @return uint8_t* DHCP Server
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t DhcpServer::parse_options(uint8_t *optptr, sint16_t len)
@@ -848,14 +848,14 @@ sint16_t DhcpServer::parse_msg(struct dhcps_msg *m, u16_t len)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    DHCP ��������ݰ���մ���ص�����˺�����LWIP UDPģ������ʱ������
-    ��Ҫ����udp_recv()������LWIP����ע��.
+    DHCP
+    udp_recv() callback
 
     @param arg
-    @param pcb ���յ�UDP��Ŀ��ƿ�?
-    @param p ���յ���UDP�е��������?
-    @param addr ���ʹ�UDP���Դ�����IP��ַ
-    @param port ���ʹ�UDP���Դ�����UDPͨ���˿ں�
+    @param pcb
+    @param p
+    @param addr
+    @param port
 */
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -929,9 +929,6 @@ void DhcpServer::handle_dhcp(
         }
     }
 
-    /*
-        DHCP �ͻ���������Ϣ����
-    */
 #if DHCPS_DEBUG
     os_printf("dhcps: handle_dhcp-> parse_msg(p)\n");
 #endif
