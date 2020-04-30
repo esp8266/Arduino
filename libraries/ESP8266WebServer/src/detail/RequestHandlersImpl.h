@@ -120,7 +120,7 @@ public:
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
 
-        String contentType = getContentType(path);
+        String contentType = mime::getContentType(path);
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
@@ -146,19 +146,9 @@ public:
         return true;
     }
 
-    static String getContentType(const String& path) {
-        char buff[sizeof(mimeTable[0].mimeType)];
-        // Check all entries but last one for match, return if found
-        for (size_t i=0; i < sizeof(mimeTable)/sizeof(mimeTable[0])-1; i++) {
-            strcpy_P(buff, mimeTable[i].endsWith);
-            if (path.endsWith(buff)) {
-                strcpy_P(buff, mimeTable[i].mimeType);
-                return String(buff);
-            }
-        }
-        // Fall-through and just return default type
-        strcpy_P(buff, mimeTable[sizeof(mimeTable)/sizeof(mimeTable[0])-1].mimeType);
-        return String(buff);
+    /* Deprecated version. Please use mime::getContentType instead */
+    static String getContentType(const String& path) __attribute__((deprecated)) {
+        return mime::getContentType(path);
     }
 
 protected:
