@@ -271,6 +271,8 @@ long secureRandom(long);
 long secureRandom(long, long);
 long map(long, long, long, long, long);
 
+void setTZ(const char* tz);
+
 void configTime(int timezone, int daylightOffset_sec, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 

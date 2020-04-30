@@ -151,6 +151,14 @@ SECTIONS
 
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
+#ifdef FP_IN_IROM
+    *libgcc.a:*f2.o(.literal .text)
+    *libgcc.a:*f3.o(.literal .text)
+    *libgcc.a:*fsi.o(.literal .text)
+    *libgcc.a:*fdi.o(.literal .text)
+    *libgcc.a:*ifs.o(.literal .text)
+    *libgcc.a:*idf.o(.literal .text)
+#endif
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
     *libgcc.a:_divsf3.o(.literal .text)
