@@ -339,13 +339,18 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += wave.periodCcys;
               nextEdgeCcy = wave.endDutyCcy;
             }
+            else if (wave.autoPwm && (overshootCcys << 6) > wave.periodCcys && wave.nextEventCcy == wave.endDutyCcy) {
+              uint32_t adjPeriods = ((overshootCcys << 6) - 1) / wave.periodCcys;
+              wave.nextPeriodCcy += adjPeriods * wave.periodCcys;
+              // adapt expiry such that it occurs during intended cycle
+              if (WaveformMode::EXPIRES == wave.mode) {
+                wave.expiryCcy += adjPeriods * wave.periodCcys;
+              }
+              nextEdgeCcy = wave.endDutyCcy + adjPeriods * wave.dutyCcys;
+            }
             else {
               waveform.states ^= 1UL << pin;
               nextEdgeCcy = wave.nextPeriodCcy;
-              // the idle cycle code updating for the next period will approximate the duty/idle ratio.
-              if (wave.autoPwm && wave.dutyCcys >= microsecondsToClockCycles(3)) {
-                nextEdgeCcy += (overshootCcys / wave.dutyCcys) * idleCcys;
-              }
               if (pin == 16) {
                 GP16O &= ~1; // GPIO16 write slow as it's RMW
               }
