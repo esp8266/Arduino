@@ -513,7 +513,7 @@ void DhcpServer::create_msg(struct dhcps_msg *m)
     memset((char *) m->sname, 0, sizeof(m->sname));
     memset((char *) m->file, 0, sizeof(m->file));
     memset((char *) m->options, 0, sizeof(m->options));
-    memcpy((char *) m->options, magic_cookie, sizeof(magic_cookie));
+    memcpy((char *) m->options, &magic_cookie, sizeof(magic_cookie));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
