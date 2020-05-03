@@ -85,7 +85,7 @@ uint8_t WiFiUDP::begin(uint16_t port)
     return (_ctx->listen(IPAddress(), port)) ? 1 : 0;
 }
 
-uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
+uint8_t WiFiUDP::beginMulticast(IPAddress multicast, uint16_t port)
 {
     return beginMulticast(IPAddress(IP4_ADDR_ANY), multicast port);
 }

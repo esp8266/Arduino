@@ -133,7 +133,7 @@ bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParamet
 #endif
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: Will send to '%s'.\n"), toMulticastAddress.toString().c_str()););
     bResult = ((_prepareMDNSMessage(p_rSendParameter, fromIPAddress)) &&
-               (m_pUDPContext->send(toMulticastAddress, DNS_MQUERY_PORT)));
+               (m_pUDPContext->send_multicast_all(toMulticastAddress, DNS_MQUERY_PORT)));
 
     DEBUG_EX_ERR(if (!bResult)
 {

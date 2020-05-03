@@ -62,11 +62,10 @@ MDNSResponder::MDNSResponder(void)
         m_pServiceQueries(0),
         m_fnServiceTxtCallback(0),
 #ifdef ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
-        m_bPassivModeEnabled(true),
+        m_bPassivModeEnabled(true)
 #else
-        m_bPassivModeEnabled(false),
+        m_bPassivModeEnabled(false)
 #endif
-        m_netif(nullptr)
 {
 }
 
@@ -95,6 +94,7 @@ MDNSResponder::~MDNSResponder(void)
 bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress, uint32_t p_u32TTL)
 {
 
+    (void)p_IPAddress;
     (void)p_u32TTL; // ignored
     bool    bResult = false;
 
@@ -102,82 +102,25 @@ bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress
     {
         if (_setHostname(p_pcHostname))
         {
-
-            //// select interface
-
-            m_netif = nullptr;
-            IPAddress ipAddress = p_IPAddress;
-
-            if (!ipAddress.isSet())
+            m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP & pEvent)
             {
-
-                IPAddress sta = WiFi.localIP();
-                IPAddress ap = WiFi.softAPIP();
-
-                if (sta.isSet())
+                (void) pEvent;
+                // Ensure that _restart() runs in USER context
+                schedule_function([this]()
                 {
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] STA interface selected\n")));
-                    ipAddress = sta;
-                }
-                else if (ap.isSet())
-                {
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] AP interface selected\n")));
-                    ipAddress = ap;
-                }
-                else
-                {
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] standard interfaces are not up, please specify one in ::begin()\n")));
-                    return false;
-                }
-
-                // continue to ensure interface is UP
-            }
-
-            // check existence of this IP address in the interface list
-            bool found = false;
-            m_netif = nullptr;
-            for (auto a : addrList)
-                if (ipAddress == a.addr())
-                {
-                    if (a.ifUp())
-                    {
-                        found = true;
-                        m_netif = a.interface();
-                        break;
-                    }
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), ipAddress.toString().c_str()););
-                }
-            if (!found)
-            {
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] interface defined by IP '%s' not found\n"), ipAddress.toString().c_str()););
-                return false;
-            }
-
-            //// done selecting the interface
-
-            if (m_netif->num == STATION_IF)
-            {
-
-                m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP & pEvent)
-                {
-                    (void) pEvent;
-                    // Ensure that _restart() runs in USER context
-                    schedule_function([this]()
-                    {
-                        MDNSResponder::_restart();
-                    });
+                    MDNSResponder::_restart();
                 });
+            });
 
-                m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected & pEvent)
+            m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected & pEvent)
+            {
+                (void) pEvent;
+                // Ensure that _restart() runs in USER context
+                schedule_function([this]()
                 {
-                    (void) pEvent;
-                    // Ensure that _restart() runs in USER context
-                    schedule_function([this]()
-                    {
-                        MDNSResponder::_restart();
-                    });
+                    MDNSResponder::_restart();
                 });
-            }
+            });
 
             bResult = _restart();
         }

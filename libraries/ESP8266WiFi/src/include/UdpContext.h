@@ -419,7 +419,7 @@ public:
         return size;
     }
 
-    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0, bool release_source = true)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -435,11 +435,13 @@ public:
                 data_size -= will_copy;
             }
         }
-        if (_tx_buf_head)
-            pbuf_free(_tx_buf_head);
-        _tx_buf_head = 0;
-        _tx_buf_cur = 0;
-        _tx_buf_offset = 0;
+        if (release_source) {
+            if (_tx_buf_head)
+                pbuf_free(_tx_buf_head);
+            _tx_buf_head = 0;
+            _tx_buf_cur = 0;
+            _tx_buf_offset = 0;
+        }
         if(!tx_copy){
             return false;
         }
@@ -483,8 +485,16 @@ public:
             {
                 // change multicast interface
                 setMulticastInterface(nif);
-                ret ||= send(addr, port);
+                ret ||= send(addr, port, false);
             }
+
+        // release source
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
+        _tx_buf_head = 0;
+        _tx_buf_cur = 0;
+        _tx_buf_offset = 0;
+        // ^^ optimization path: avoid tx_copy multiple times in ::send(,,false)
 
         // restore PCB multicast settings
         udp_set_multicast_netif_index(_pcb, backup_mcast_index);

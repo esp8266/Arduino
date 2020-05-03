@@ -84,9 +84,7 @@ bool MDNSResponder::_process(bool p_bUserContext)
     }
     else
     {
-        bResult = (m_netif != nullptr) &&
-                  (m_netif->flags & NETIF_FLAG_UP) &&  // network interface is up and running
-                  _updateProbeStatus() &&              // Probing
+        bResult = _updateProbeStatus() &&              // Probing
                   _checkServiceQueryCache();           // Service query cache check
     }
     return bResult;
@@ -98,9 +96,7 @@ bool MDNSResponder::_process(bool p_bUserContext)
 bool MDNSResponder::_restart(void)
 {
 
-    return ((m_netif != nullptr) &&
-            (m_netif->flags & NETIF_FLAG_UP) &&  // network interface is up and running
-            (_resetProbeStatus(true)) &&         // Stop and restart probing
+    return ((_resetProbeStatus(true)) &&         // Stop and restart probing
             (_allocUDPContext()));               // Restart UDP
 }
 
