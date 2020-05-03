@@ -42,23 +42,24 @@ Load client certificate from file system.
 .. code:: cpp
 
     #include <FS.h>
+    #include <LittleFS.h>
     #include <ESP8266WiFi.h>
     #include <WiFiClientSecure.h>
 
-    const char* certyficateFile = "/client.cer";
+    const char* certificateFile = "/client.cer";
 
 *setup() or loop()*
 
 .. code:: cpp
 
-    if (!SPIFFS.begin()) 
+    if (!LittleFS.begin())
     {
       Serial.println("Failed to mount the file system");
       return;
     }
 
-    Serial.printf("Opening %s", certyficateFile);
-    File crtFile = SPIFFS.open(certyficateFile, "r");
+    Serial.printf("Opening %s", certificateFile);
+    File crtFile = LittleFS.open(certificateFile, "r");
     if (!crtFile)
     {
       Serial.println(" Failed!");
@@ -66,7 +67,7 @@ Load client certificate from file system.
 
     WiFiClientSecure client;
 
-    Serial.print("Loading %s", certyficateFile);
+    Serial.print("Loading %s", certificateFile);
     if (!client.loadCertificate(crtFile))
     {
       Serial.println(" Failed!");
