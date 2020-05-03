@@ -57,7 +57,7 @@ TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
     REQUIRE_FALSE(SPIFFS.setConfig(d));
     REQUIRE_FALSE(LittleFS.setConfig(l));
 }
-#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
 
 };
 
