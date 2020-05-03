@@ -31,6 +31,9 @@
 
 #define SPIFFS_FILE_NAME "spiffs.bin"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 FS SPIFFS(nullptr);
 
 SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage)
@@ -126,3 +129,6 @@ void SpiffsMock::save ()
     if (::close(fs) == -1)
         fprintf(stderr, "SPIFFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
 }
+
+#pragma GCC diagnostic pop
+
