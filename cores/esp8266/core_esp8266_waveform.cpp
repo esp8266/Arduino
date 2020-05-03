@@ -44,20 +44,18 @@
 #include "ets_sys.h"
 #include <atomic>
 
-extern "C" {
-
-// Maximum delay between IRQs, 1Hz
-constexpr int32_t MAXIRQCCYS = microsecondsToClockCycles(10000);
+// Maximum delay between IRQs, Timer1, <= 2^23 / 80MHz
+constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(100000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
-constexpr int32_t DELTAIRQ = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
+constexpr int32_t DELTAIRQCCYS = clockCyclesPerMicrosecond() == 160 ?
+  microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
 // The latency between in-ISR rearming of the timer and the earliest firing
-constexpr int32_t IRQLATENCY = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(5) / 2) >> 1 : (microsecondsToClockCycles(5) / 2);
+constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
+  (microsecondsToClockCycles(3) / 2) >> 1 : microsecondsToClockCycles(3) / 2;
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
@@ -120,7 +118,7 @@ static void initTimer() {
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
   timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
   waveform.timer1Running = true;
-  timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
+  timer1_write(CPU2X & 1 ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1)); // Cause an interrupt post-haste
 }
 
 static void ICACHE_RAM_ATTR deinitTimer() {
@@ -129,6 +127,8 @@ static void ICACHE_RAM_ATTR deinitTimer() {
   timer1_isr_init();
   waveform.timer1Running = false;
 }
+
+extern "C" {
 
 // Set a callback.  Pass in NULL to stop it
 void setTimer1Callback(uint32_t (*fn)()) {
@@ -154,12 +154,12 @@ int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
 int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys, bool autoPwm) {
   uint32_t periodCcys = highCcys + lowCcys;
-  if (periodCcys < MAXIRQCCYS) {
+  if (periodCcys < MAXIRQTICKSCCYS) {
     if (!highCcys) {
-      periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
+      periodCcys = (MAXIRQTICKSCCYS / periodCcys) * periodCcys;
     }
     else if (!lowCcys) {
-      highCcys = periodCcys = (MAXIRQCCYS / periodCcys) * periodCcys;
+      highCcys = periodCcys = (MAXIRQTICKSCCYS / periodCcys) * periodCcys;
     }
   }
   // sanity checks, including mixed signed/unsigned arithmetic safety
@@ -193,9 +193,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     if (!waveform.timer1Running) {
       initTimer();
     }
-    else if (T1L > IRQLATENCY + DELTAIRQ) {
-      // Must not interfere if Timer is due shortly, cluster phases to reduce interrupt load
-      timer1_write(microsecondsToClockCycles(1));
+    else if (((CPU2X & 1) ? T1V << 1 : T1V) > IRQLATENCYCCYS + DELTAIRQCCYS) {
+      // Must not interfere if Timer is due shortly
+      timer1_write(CPU2X & 1 ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
     }
   }
   else {
@@ -228,8 +228,8 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (waveform.enabled & (1UL << pin)) {
     waveform.toDisable = pin;
     // Must not interfere if Timer is due shortly
-    if (T1L > IRQLATENCY + DELTAIRQ) {
-      timer1_write(microsecondsToClockCycles(1));
+    if (((CPU2X & 1) ? T1V << 1 : T1V) > IRQLATENCYCCYS + DELTAIRQCCYS) {
+      timer1_write(CPU2X & 1 ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
     }
     std::atomic_thread_fence(std::memory_order_acq_rel);
     while (waveform.toDisable >= 0) {
@@ -242,6 +242,8 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   }
   return true;
 }
+
+};
 
 // Speed critical bits
 #pragma GCC optimize ("O2")
@@ -296,7 +298,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   bool busy;
   if (!waveform.enabled) {
     busy = false;
-    waveform.nextEventCcy = ESP.getCycleCount() + MAXIRQCCYS;
+    waveform.nextEventCcy = ESP.getCycleCount() + MAXIRQTICKSCCYS;
   }
   else {
     busy = static_cast<int32_t>(isrTimeoutCcy - waveform.nextEventCcy) > 0;
@@ -311,7 +313,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     do {
       now = ESP.getCycleCount();
     } while (static_cast<int32_t>(waveform.nextEventCcy - now) > 0);
-    waveform.nextEventCcy = now + MAXIRQCCYS;
+    waveform.nextEventCcy = now + MAXIRQTICKSCCYS;
     do {
       // If it's not on, ignore
       if (!(waveform.enabled & (1UL << pin)))
@@ -354,7 +356,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               nextEdgeCcy = wave.endDutyCcy;
             }
             else if (wave.autoPwm && (overshootCcys << 6) > wave.periodCcys && wave.nextEventCcy == wave.endDutyCcy) {
-              uint32_t adjPeriods = ((overshootCcys << 6) - 1) / wave.periodCcys;
+              uint32_t adjPeriods = (overshootCcys << 6) / wave.periodCcys;
               wave.nextPeriodCcy += adjPeriods * wave.periodCcys;
               // adapt expiry such that it occurs during intended cycle
               if (WaveformMode::EXPIRES == wave.mode) {
@@ -431,24 +433,20 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys <= IRQLATENCY + DELTAIRQ) {
-    nextTimerCcys = IRQLATENCY;
+  if (nextTimerCcys <= IRQLATENCYCCYS + DELTAIRQCCYS) {
+    nextTimerCcys = IRQLATENCYCCYS;
   }
-  else if (nextTimerCcys >= MAXIRQCCYS) {
-    nextTimerCcys = MAXIRQCCYS - DELTAIRQ;
+  else if (nextTimerCcys >= MAXIRQTICKSCCYS + DELTAIRQCCYS) {
+    nextTimerCcys = MAXIRQTICKSCCYS;
   }
   else {
-    nextTimerCcys -= DELTAIRQ;
+    nextTimerCcys -= DELTAIRQCCYS;
   }
 
-  // Do it here instead of global function to save time and because we know it's edge-IRQ
-  if (CPU2X & 1) {
-    T1L = nextTimerCcys >> 1;
-  }
-  else {
-    T1L = nextTimerCcys;
-  }
+  // Register access is fast and edge IRQ was configured before.
+  // Timer is 80MHz fixed. 160MHz binaries need scaling,
+  // 80MHz binaries in 160MHz boost (SDK) need NMI scaling
+  // to maintain duty/idle ratio.
+  T1L = CPU2X & 1 ? nextTimerCcys >> 1 : nextTimerCcys;
   TEIE |= TEIE1; // Edge int enable
 }
-
-};
