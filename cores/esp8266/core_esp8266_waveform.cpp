@@ -442,7 +442,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
-  if (clockCyclesPerMicrosecond() == 160) {
+  if (CPU2X & 1) {
     T1L = nextTimerCcys >> 1;
   }
   else {
