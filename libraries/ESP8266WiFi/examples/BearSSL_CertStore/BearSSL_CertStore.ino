@@ -2,11 +2,11 @@
 //
 // Before running, you must download the set of certs using
 // the script "certs-from-mozilla.py" (no parameters)
-// and then uploading the generated .AR file to SPIFFS or SD.
+// and then uploading the generated .AR file to LittleFS or SD.
 //
 // You do not need to generate the ".IDX" file listed below,
 // it is generated automatically when the CertStore object
-// is created and written to SD or SPIFFS by the ESP8266.
+// is created and written to SD or LittleFS by the ESP8266.
 //
 // Why would you need a CertStore?
 //
@@ -37,6 +37,7 @@
 #include <CertStoreBearSSL.h>
 #include <time.h>
 #include <FS.h>
+#include <LittleFS.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -117,7 +118,7 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  SPIFFS.begin();
+  LittleFS.begin();
   // If using a SD card or LittleFS, call the appropriate ::begin instead
 
   // We start by connecting to a WiFi network
@@ -138,10 +139,10 @@ void setup() {
 
   setClock(); // Required for X.509 validation
 
-  int numCerts = certStore.initCertStore(SPIFFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
+  int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   Serial.printf("Number of CA certs read: %d\n", numCerts);
   if (numCerts == 0) {
-    Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the SPIFFS directory before running?\n");
+    Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
     return; // Can't connect to anything w/o certs!
   }
 

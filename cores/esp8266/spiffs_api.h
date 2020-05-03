@@ -171,7 +171,7 @@ public:
             return false;
         }
         _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
-	return true;
+        return true;
     }
 
     bool begin() override
@@ -356,6 +356,8 @@ protected:
     std::unique_ptr<uint8_t[]> _cacheBuf;
 
     SPIFFSConfig _cfg;
+
+    int _called = 0;
 };
 
 #define CHECKFD() while (_fd == 0) { panic(); }
