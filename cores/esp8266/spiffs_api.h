@@ -356,8 +356,6 @@ protected:
     std::unique_ptr<uint8_t[]> _cacheBuf;
 
     SPIFFSConfig _cfg;
-
-    int _called = 0;
 };
 
 #define CHECKFD() while (_fd == 0) { panic(); }
