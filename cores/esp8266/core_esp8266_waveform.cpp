@@ -95,12 +95,6 @@ static WVFState wvfState;
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
 
-static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
-  uint32_t ccount;
-  __asm__ __volatile__("esync; rsr %0,ccount":"=a"(ccount));
-  return ccount;
-}
-
 // Interrupt on/off control
 static ICACHE_RAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
@@ -301,7 +295,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
     return false;
   }
   Waveform *wave = &wvfState.waveform[pin];
-  wave->expiryCycle = runTimeCycles ? GetCycleCount() + runTimeCycles : 0;
+  wave->expiryCycle = runTimeCycles ? ESP.getCycleCount() + runTimeCycles : 0;
   if (runTimeCycles && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
   }
@@ -327,7 +321,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
     wave->lastEdge = 0;
     wave->gotoTimeHighCycles = wave->timeHighCycles;
     wave->gotoTimeLowCycles = wave->timeLowCycles;    // Actually set the pin high or low in the IRQ service to guarantee times
-    wave->nextServiceCycle = GetCycleCount() + microsecondsToClockCycles(1);
+    wave->nextServiceCycle = ESP.getCycleCount() + microsecondsToClockCycles(1);
     wvfState.waveformToEnable |= mask;
     MEMBARRIER();
     if (!timerRunning) {
