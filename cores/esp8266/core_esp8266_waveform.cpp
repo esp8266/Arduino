@@ -491,8 +491,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 } while (pwmState.delta[pwmState.idx] == 0);
             }
             // Preserve duty cycle over PWM period by using now+xxx instead of += delta
-            pwmState.nextServiceCycle = now + adjust(pwmState.delta[pwmState.idx]);
-            cyclesToGo = pwmState.nextServiceCycle - now; // Guaranteed to be >= 0 always
+            cyclesToGo = adjust(pwmState.delta[pwmState.idx]);
+            pwmState.nextServiceCycle = GetCycleCountIRQ() + cyclesToGo;
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
       }
