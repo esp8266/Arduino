@@ -100,16 +100,19 @@ static ICACHE_RAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
 
 static void initTimer() {
-  timer1_disable();
-  ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
-  ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
-  timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
-  timerRunning = true;
+  if (!timerRunning) {
+    timer1_disable();
+    ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
+    ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
+    timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
+    timerRunning = true;
+    timer1_write(microsecondsToClockCycles(10));
+  }
 }
 
 static ICACHE_RAM_ATTR void forceTimerInterrupt() {
   if (T1L > microsecondsToClockCycles(10)) {
-    timer1_write(microsecondsToClockCycles(10));
+    T1L = microsecondsToClockCycles(10);
   }
 }
 
@@ -270,13 +273,8 @@ bool _setPWM(int pin, uint32_t cc) {
   // Set mailbox and wait for ISR to copy it over
   pwmUpdate = &p;
   MEMBARRIER();
-  if (!timerRunning) {
-    initTimer();
-    timer1_write(microsecondsToClockCycles(10));
-  } else {
-    forceTimerInterrupt();
-  }
-
+  initTimer();
+  forceTimerInterrupt();
   while (pwmUpdate) {
     delay(0);
   }
@@ -324,12 +322,8 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
     wave->nextServiceCycle = ESP.getCycleCount() + microsecondsToClockCycles(1);
     wvfState.waveformToEnable |= mask;
     MEMBARRIER();
-    if (!timerRunning) {
-      initTimer();
-      timer1_write(microsecondsToClockCycles(10));
-    } else {
-      forceTimerInterrupt();
-    }
+    initTimer();
+    forceTimerInterrupt();
     while (wvfState.waveformToEnable) {
       delay(0); // Wait for waveform to update
       // No mem barrier here, the call to a global function implies global state updated
@@ -343,12 +337,11 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
 // Set a callback.  Pass in NULL to stop it
 void setTimer1Callback(uint32_t (*fn)()) {
   wvfState.timer1CB = fn;
-  if (!timerRunning && fn) {
+  if (fn) {
     initTimer();
-    timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
-  } else {
-    disableIdleTimer();
+    forceTimerInterrupt();
   }
+  disableIdleTimer();
 }
 
 
