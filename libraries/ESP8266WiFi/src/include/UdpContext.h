@@ -444,26 +444,53 @@ public:
             return false;
         }
 
-
         if (!addr) {
             addr = &_pcb->remote_ip;
             port = _pcb->remote_port;
         }
-#ifdef LWIP_MAYBE_XCC
-        uint16_t old_ttl = _pcb->ttl;
-        if (ip_addr_ismulticast(addr)) {
-            _pcb->ttl = _mcast_ttl;
-        }
-#endif
+
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
             DEBUGV(":ust rc=%d\r\n", (int) err);
         }
-#ifdef LWIP_MAYBE_XCC
-        _pcb->ttl = old_ttl;
-#endif
+
         pbuf_free(tx_copy);
         return err == ERR_OK;
+    }
+
+    bool send_multicast_all (CONST ip_addr_t* addr, uint16_t port)
+    {
+        if (!ip_addr_ismulticast(addr))
+        {
+            return false;
+        }
+
+        // backup PCB multicast settings
+
+        // backup multicast IPv4 address
+        ip4_addr_t backup_mcast_addr;
+        ip4_addr_set(&backup_mcast_addr, udp_get_multicast_netif_addr(_pcb));
+        // reset it in PCB (may be useless, interface setting is used first (i set)))
+        ip4_addr_set_any(udp_get_multicast_netif_addr(_pcb));
+        // backup multicast interface (will be overwritten)
+        u8_t backup_mcast_index = udp_get_multicast_netif_index(_pcb);
+
+        // loop on all interfaces and send
+
+        bool ret = false;
+        for (netif* nif = netif_list; nif; nif = nif->next)
+            if (netif_is_up(nif))
+            {
+                // change multicast interface
+                setMulticastInterface(nif);
+                ret ||= send(addr, port);
+            }
+
+        // restore PCB multicast settings
+        udp_set_multicast_netif_index(_pcb, backup_mcast_index);
+        udp_set_multicast_netif_addr(_pcb, &backup_mcast_addr);
+
+        return ret;
     }
 
 private:

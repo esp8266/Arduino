@@ -48,15 +48,18 @@ public:
   void stop() override;
   // join a multicast group and listen on the given port
   uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port);
+  uint8_t beginMulticast(IPAddress multicast, uint16_t port);
 
   // Sending UDP packets
   
   // Start building up a packet to send to the remote host specific in ip and port
   // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
   int beginPacket(IPAddress ip, uint16_t port) override;
+
   // Start building up a packet to send to the remote host specific in host and port
   // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
   int beginPacket(const char *host, uint16_t port) override;
+
   // Start building up a packet to send to the multicast address
   // multicastAddress - muticast address to send to
   // interfaceAddress - the local IP address of the interface that should be used
@@ -67,9 +70,14 @@ public:
                                    uint16_t port, 
                                    IPAddress interfaceAddress,
                                    int ttl = 1);
+
   // Finish off this packet and send it
   // Returns 1 if the packet was sent successfully, 0 if there was an error
   int endPacket() override;
+
+  int beginPacketOverMulticast(const IPAddress& ip, uint16_t port) { return beginPacket(ip, port); }
+  int endPacketOverMulticast();
+
   // Write a single byte into the packet
   size_t write(uint8_t) override;
   // Write size bytes from buffer into the packet
