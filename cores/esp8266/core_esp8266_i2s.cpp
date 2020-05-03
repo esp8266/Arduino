@@ -464,14 +464,28 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
+  /*
+  Following this post: https://github.com/esp8266/Arduino/issues/2590
+  We should reset the transmitter while changing the configuration bits to avoid random distortion.
+  */
+ 
+  uint32_t i2sc_temp = I2SC;
+  i2sc_temp |= (I2STXR); // Hold transmitter in reset
+  I2SC = i2sc_temp;
+
   // trans master(active low), recv master(active_low), !bits mod(==16 bits/chanel), clear clock dividers
-  I2SC &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+  i2sc_temp &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
 
   // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
   // I2SMR = MSB recv/xmit first
   // I2SRMS, I2STMS = 1-bit delay from WS to MSB (I2S format)
   // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
-  I2SC |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+  i2sc_temp |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+
+  I2SC = i2sc_temp;
+  
+  i2sc_temp &= ~(I2STXR); // Release reset
+  I2SC = i2sc_temp;
 }
 
 float i2s_get_real_rate(){
