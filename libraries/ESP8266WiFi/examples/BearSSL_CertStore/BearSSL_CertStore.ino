@@ -119,7 +119,6 @@ void setup() {
   Serial.println();
 
   LittleFS.begin();
-  // If using a SD card or LittleFS, call the appropriate ::begin instead
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
