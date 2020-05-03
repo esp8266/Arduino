@@ -40,7 +40,7 @@ public:
     Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
         : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {
-    	setPacketTypes();
+        setPacketTypes();
     };
 
     Packet() {};
@@ -50,24 +50,24 @@ public:
         NONE,
         FULL,
         CHAR,
-		RAW
+        RAW
     };
 
-     const char* rawData() const
+    const char* rawData() const
     {
-    	return data;
+        return data;
     }
     int getInOut() const
     {
-    	return out;
+        return out;
     }
     time_t getTime() const
     {
-    	return packetTime;
+        return packetTime;
     }
     uint32_t getPacketSize() const
     {
-    	return packetLength;
+        return packetLength;
     }
     uint16_t ntoh16(uint16_t idx) const
     {
@@ -99,7 +99,7 @@ public:
     }
     uint16_t getIpTotalLen() const
     {
-        return isIP() ? isIPv4() ? ntoh16(ETH_HDR_LEN + 2) :  (packetLength - ETH_HDR_LEN)   :  0;
+        return isIP() ? isIPv4() ? ntoh16(ETH_HDR_LEN + 2) : (packetLength - ETH_HDR_LEN)   :  0;
     }
     uint32_t getTcpSeq() const
     {
@@ -213,15 +213,15 @@ public:
     };
     bool isOTA() const
     {
-    	return (isUDP() && hasPort(8266));
+        return (isUDP() && hasPort(8266));
     }
     bool isNETBIOS() const
     {
-    	return (isUDP() && (hasPort(137) || hasPort(138) || hasPort(139)));
+        return (isUDP() && (hasPort(137) || hasPort(138) || hasPort(139)));
     }
     bool isSMB() const
     {
-    	return (isUDP() && hasPort(445));
+        return (isUDP() && hasPort(445));
     }
     NetdumpIP getIP(uint16_t idx) const
     {

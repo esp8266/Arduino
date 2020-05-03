@@ -31,17 +31,17 @@ CallBackList<Netdump::LwipCallback> Netdump::lwipCallback;
 
 Netdump::Netdump()
 {
-	using namespace std::placeholders;
+    using namespace std::placeholders;
     phy_capture = capture;
-    lwipHandler = lwipCallback.add(std::bind(&Netdump::netdumpCapture,this,_1,_2,_3,_4,_5));
+    lwipHandler = lwipCallback.add(std::bind(&Netdump::netdumpCapture, this, _1, _2, _3, _4, _5));
 };
 
 Netdump::~Netdump()
 {
-	reset();
+    reset();
     if (packetBuffer)
     {
-    	delete[] packetBuffer;
+        delete[] packetBuffer;
     }
 };
 
@@ -69,7 +69,7 @@ void Netdump::reset()
 void Netdump::printDump(Print& out, Packet::PacketDetail ndd, const Filter nf)
 {
     out.printf("netDump starting\r\n");
-    setCallback([&out, ndd, this](Packet & ndp)
+    setCallback([&out, ndd, this](const Packet & ndp)
     {
         printDumpProcess(out, ndd, ndp);
     }, nf);
@@ -79,7 +79,7 @@ void Netdump::fileDump(File& outfile, const Filter nf)
 {
 
     writePcapHeader(outfile);
-    setCallback([&outfile, this](Packet & ndp)
+    setCallback([&outfile, this](const Packet & ndp)
     {
         fileDumpProcess(outfile, ndp);
     }, nf);
@@ -89,7 +89,7 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 
     if (!packetBuffer)
     {
-    	packetBuffer = new char[tcpBuffersize];
+        packetBuffer = new char[tcpBuffersize];
     }
     bufferIndex = 0;
 
@@ -101,17 +101,17 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
 {
-	if (lwipCallback.execute(netif_idx,data,len,out,success) == 0)
-	{
-		phy_capture = nullptr; // No active callback/netdump instances, will be set again by new object.
-	}
+    if (lwipCallback.execute(netif_idx, data, len, out, success) == 0)
+    {
+        phy_capture = nullptr; // No active callback/netdump instances, will be set again by new object.
+    }
 }
 
 void Netdump::netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success)
 {
-    Packet np(millis(), netif_idx, data, len, out, success);
     if (netDumpCallback)
     {
+        Packet np(millis(), netif_idx, data, len, out, success);
         if (netDumpFilter  && !netDumpFilter(np))
         {
             return;
@@ -162,7 +162,7 @@ void Netdump::tcpDumpProcess(const Packet& np)
     }
     size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
 
-    if (bufferIndex+16+incl_len < tcpBuffersize) // only add if enough space available
+    if (bufferIndex + 16 + incl_len < tcpBuffersize) // only add if enough space available
     {
         struct timeval tv;
         gettimeofday(&tv, nullptr);
@@ -193,7 +193,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
         bufferIndex = 0;
         writePcapHeader(tcpDumpClient);
 
-        setCallback([this](Packet & ndp)
+        setCallback([this](const Packet & ndp)
         {
             tcpDumpProcess(ndp);
         }, nf);

@@ -66,79 +66,113 @@ void Packet::printDetail(Print& out, const String& indent, const char* data, siz
 
 void Packet::setPacketType(PacketType pt)
 {
-	thisPacketType = pt;
-	thisAllPacketTypes.emplace_back(pt);
+    thisPacketType = pt;
+    thisAllPacketTypes.emplace_back(pt);
 }
 
 void Packet::setPacketTypes()
 {
-	if (isARP())
-	{
-	   setPacketType(PacketType::ARP);
-	} else
-	if (isIP())
-	{
-		setPacketType(PacketType::IP);
-		setPacketType(isIPv4() ? PacketType::IPv4 : PacketType::IPv6);
-		if (isUDP())
-		{
-			setPacketType(PacketType::UDP);
-			if (isMDNS()) setPacketType(PacketType::MDNS);
-			if (isDNS())  setPacketType(PacketType::DNS);
-			if (isSSDP()) setPacketType(PacketType::SSDP);
-			if (isDHCP()) setPacketType(PacketType::DHCP);
-			if (isWSDD()) setPacketType(PacketType::WSDD);
-			if (isNETBIOS()) setPacketType(PacketType::NETBIOS);
-			if (isSMB())  setPacketType(PacketType::SMB);
-			if (isOTA())  setPacketType(PacketType::OTA);
-		}
-		if (isTCP())
-		{
-			setPacketType(PacketType::TCP);
-			if (isHTTP()) setPacketType(PacketType::HTTP);
-		}
-		if (isICMP()) setPacketType(PacketType::ICMP);
-		if (isIGMP()) setPacketType(PacketType::IGMP);
-	} else
-	{
-		setPacketType(PacketType::UKNW);
-	}
+    if (isARP())
+    {
+        setPacketType(PacketType::ARP);
+    }
+    else if (isIP())
+    {
+        setPacketType(PacketType::IP);
+        setPacketType(isIPv4() ? PacketType::IPv4 : PacketType::IPv6);
+        if (isUDP())
+        {
+            setPacketType(PacketType::UDP);
+            if (isMDNS())
+            {
+                setPacketType(PacketType::MDNS);
+            }
+            if (isDNS())
+            {
+                setPacketType(PacketType::DNS);
+            }
+            if (isSSDP())
+            {
+                setPacketType(PacketType::SSDP);
+            }
+            if (isDHCP())
+            {
+                setPacketType(PacketType::DHCP);
+            }
+            if (isWSDD())
+            {
+                setPacketType(PacketType::WSDD);
+            }
+            if (isNETBIOS())
+            {
+                setPacketType(PacketType::NETBIOS);
+            }
+            if (isSMB())
+            {
+                setPacketType(PacketType::SMB);
+            }
+            if (isOTA())
+            {
+                setPacketType(PacketType::OTA);
+            }
+        }
+        if (isTCP())
+        {
+            setPacketType(PacketType::TCP);
+            if (isHTTP())
+            {
+                setPacketType(PacketType::HTTP);
+            }
+        }
+        if (isICMP())
+        {
+            setPacketType(PacketType::ICMP);
+        }
+        if (isIGMP())
+        {
+            setPacketType(PacketType::IGMP);
+        }
+    }
+    else
+    {
+        setPacketType(PacketType::UKNW);
+    }
 }
 
 const PacketType Packet::packetType() const
 {
-	return thisPacketType;
+    return thisPacketType;
 }
 
 const std::vector<PacketType> Packet::allPacketTypes() const
 {
-	return thisAllPacketTypes;
+    return thisAllPacketTypes;
 }
 
 void Packet::MACtoString(int dataIdx, StreamString& sstr) const
 {
-	for (int i = 0; i < 6; i++)
-	{
-		sstr.printf_P(PSTR("%02x"), (unsigned char)data[dataIdx + i]);
-		if (i < 5)
-		{
-			sstr.print(':');
-		}
-	}
+    for (int i = 0; i < 6; i++)
+    {
+        sstr.printf_P(PSTR("%02x"), (unsigned char)data[dataIdx + i]);
+        if (i < 5)
+        {
+            sstr.print(':');
+        }
+    }
 
 }
 
 void Packet::ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 {
-	switch (getARPType())
-	{
-	case 1 : sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
-		break;
-	case 2 : sstr.printf_P(PSTR("%s is at "), getIP(ETH_HDR_LEN + 14).toString().c_str());
-	         MACtoString(ETH_HDR_LEN + 8, sstr);
-		break;
-	}
-	sstr.printf("\r\n");
+    switch (getARPType())
+    {
+    case 1 : sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
+        break;
+    case 2 : sstr.printf_P(PSTR("%s is at "), getIP(ETH_HDR_LEN + 14).toString().c_str());
+        MACtoString(ETH_HDR_LEN + 8, sstr);
+        break;
+    }
+    sstr.printf("\r\n");
     printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN], packetLength - ETH_HDR_LEN, netdumpDetail);
 }
 
@@ -224,7 +258,7 @@ void Packet::ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 
 void Packet::IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 {
-	switch (getIgmpType())
+    switch (getIgmpType())
     {
     case 1 : sstr.printf_P(PSTR("Create Group Request")); break;
     case 2 : sstr.printf_P(PSTR("Create Group Reply")); break;
@@ -244,24 +278,24 @@ void Packet::IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 
 void Packet::IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 {
-	sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
-	sstr.printf_P(PSTR("Unknown IP type : %d\r\n"), ipType());
+    sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
+    sstr.printf_P(PSTR("Unknown IP type : %d\r\n"), ipType());
     printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN], getIpHdrLen(), netdumpDetail);
-    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen()], getIpTotalLen() - getIpHdrLen() , netdumpDetail);
+    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen()], getIpTotalLen() - getIpHdrLen(), netdumpDetail);
 }
 
 void Packet::UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 {
-	sstr.printf_P(PSTR("Unknown EtherType 0x%04x Src : "), ethType());
-	MACtoString(0,sstr);
-	sstr.printf_P(PSTR(" Dst : "));
-	MACtoString(6,sstr);
-	sstr.printf_P(PSTR("\r\n"));
+    sstr.printf_P(PSTR("Unknown EtherType 0x%04x Src : "), ethType());
+    MACtoString(0, sstr);
+    sstr.printf_P(PSTR(" Dst : "));
+    MACtoString(6, sstr);
+    sstr.printf_P(PSTR("\r\n"));
 }
 
 const String Packet::toString() const
 {
-	return toString(PacketDetail::NONE);
+    return toString(PacketDetail::NONE);
 }
 
 
@@ -274,72 +308,72 @@ const String Packet::toString(PacketDetail netdumpDetail) const
 
     if (netdumpDetail == PacketDetail::RAW)
     {
-    	sstr.printf_P(PSTR(" : "));
-    	for (auto at : thisAllPacketTypes)
-    	{
-    		sstr.printf_P(PSTR("%s "),at.toString().c_str());
-    	}
-    	sstr.printf_P(PSTR("\r\n"));
-    	printDetail(sstr, PSTR("           D "), data, packetLength, netdumpDetail);
-    	return sstr;
+        sstr.printf_P(PSTR(" : "));
+        for (auto at : thisAllPacketTypes)
+        {
+            sstr.printf_P(PSTR("%s "), at.toString().c_str());
+        }
+        sstr.printf_P(PSTR("\r\n"));
+        printDetail(sstr, PSTR("           D "), data, packetLength, netdumpDetail);
+        return sstr;
     }
 
     switch (thisPacketType)
     {
-		case PacketType::ARP :
-		{
-			ARPtoString(netdumpDetail,sstr);
-			break;
-		}
-		case PacketType::MDNS :
-		case PacketType::DNS :
-		{
-			DNStoString(netdumpDetail, sstr);
-			break;
-		}
-		case PacketType::SSDP :
-		case PacketType::DHCP :
-		case PacketType::WSDD :
-		case PacketType::NETBIOS :
-		case PacketType::SMB :
-		case PacketType::OTA :
-		case PacketType::UDP :
-		{
-			UDPtoString(netdumpDetail, sstr);
-			break;
-		}
-		case PacketType::TCP :
-		case PacketType::HTTP :
-		{
-			TCPtoString(netdumpDetail, sstr);
-			break;
-		}
-		case PacketType::ICMP :
-		{
-			ICMPtoString(netdumpDetail, sstr);
-			break;
-		}
-		case PacketType::IGMP :
-		{
-			IGMPtoString(netdumpDetail, sstr);
-			break;
-		}
-		case PacketType::IPv4 :
-		case PacketType::IPv6 :
-		{
-			IPtoString(netdumpDetail, sstr);
-			break;
-		}
-		case PacketType::UKNW :
-		{
-			UKNWtoString(netdumpDetail, sstr);
-			break;
-		}
-		default :
-		{
-			sstr.printf_P(PSTR("Non identified packet\r\n"));
-			break;
-		}
+    case PacketType::ARP :
+    {
+        ARPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::MDNS :
+    case PacketType::DNS :
+    {
+        DNStoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::SSDP :
+    case PacketType::DHCP :
+    case PacketType::WSDD :
+    case PacketType::NETBIOS :
+    case PacketType::SMB :
+    case PacketType::OTA :
+    case PacketType::UDP :
+    {
+        UDPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::TCP :
+    case PacketType::HTTP :
+    {
+        TCPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::ICMP :
+    {
+        ICMPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::IGMP :
+    {
+        IGMPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::IPv4 :
+    case PacketType::IPv6 :
+    {
+        IPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::UKNW :
+    {
+        UKNWtoString(netdumpDetail, sstr);
+        break;
+    }
+    default :
+    {
+        sstr.printf_P(PSTR("Non identified packet\r\n"));
+        break;
+    }
     }
     return sstr;
 }

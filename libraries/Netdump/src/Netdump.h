@@ -39,8 +39,8 @@ class Netdump
 {
 public:
 
-    using Filter = std::function<bool(Packet&)>;
-    using Callback = std::function<void(Packet&)>;
+    using Filter = std::function<bool(const Packet&)>;
+    using Callback = std::function<void(const Packet&)>;
     using LwipCallback = std::function<void(int, const char*, int, int, int)>;
 
     Netdump();
