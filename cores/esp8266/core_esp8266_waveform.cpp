@@ -524,19 +524,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-#ifdef ENABLE_FEEDBACK
-            if (wave->lastEdge) {
-              desired = wave->desiredLowCycles;
-              timeToUpdate = &wave->timeLowCycles;
-            }
-#endif
-            nextEdgeCycles = wave->timeHighCycles;
-          } else {
-            if (i == 16) {
-              GP16O = 0; // GPIO16 write slow as it's RMW
-            } else {
-              ClearGPIO(mask);
-            }
             if (wave->gotoTimeHighCycles) {
               // Copy over next full-cycle timings
               wave->timeHighCycles = wave->gotoTimeHighCycles;
@@ -546,10 +533,23 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave->gotoTimeHighCycles = 0;
             } else {
 #ifdef ENABLE_FEEDBACK
-              desired = wave->desiredHighCycles;
-              timeToUpdate = &wave->timeHighCycles;
-#endif
+              if (wave->lastEdge) {
+                desired = wave->desiredLowCycles;
+                timeToUpdate = &wave->timeLowCycles;
+              }
             }
+#endif
+            nextEdgeCycles = wave->timeHighCycles;
+          } else {
+            if (i == 16) {
+              GP16O = 0; // GPIO16 write slow as it's RMW
+            } else {
+              ClearGPIO(mask);
+            }
+#ifdef ENABLE_FEEDBACK
+            desired = wave->desiredHighCycles;
+            timeToUpdate = &wave->timeHighCycles;
+#endif
             nextEdgeCycles = wave->timeLowCycles;
           }
 #ifdef ENABLE_FEEDBACK
@@ -557,7 +557,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             desired = adjust(desired);
             int32_t err = desired - (now - wave->lastEdge);
             if (abs(err) < desired) { // If we've lost > the entire phase, ignore this error signal
-                err /= 4;
+                err /= 2;
                 *timeToUpdate += err;
             }
           }
