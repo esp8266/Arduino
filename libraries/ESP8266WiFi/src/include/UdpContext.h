@@ -436,11 +436,7 @@ public:
             }
         }
         if (release_source) {
-            if (_tx_buf_head)
-                pbuf_free(_tx_buf_head);
-            _tx_buf_head = 0;
-            _tx_buf_cur = 0;
-            _tx_buf_offset = 0;
+            reset_send_buffer();
         }
         if(!tx_copy){
             return false;
@@ -460,8 +456,12 @@ public:
         return err == ERR_OK;
     }
 
-    bool send_multicast_all (CONST ip_addr_t* addr, uint16_t port)
+    bool send_multicast_all (CONST ip_addr_t* addr = 0, uint16_t port = 0)
     {
+        if (!addr) {
+            addr = &_pcb->remote_ip;
+            port = _pcb->remote_port;
+        }
         if (!ip_addr_ismulticast(addr))
         {
             return false;
@@ -485,15 +485,11 @@ public:
             {
                 // change multicast interface
                 setMulticastInterface(nif);
-                ret ||= send(addr, port, false);
+                ret = ret || send(addr, port, false);
             }
 
         // release source
-        if (_tx_buf_head)
-            pbuf_free(_tx_buf_head);
-        _tx_buf_head = 0;
-        _tx_buf_cur = 0;
-        _tx_buf_offset = 0;
+        reset_send_buffer();
         // ^^ optimization path: avoid tx_copy multiple times in ::send(,,false)
 
         // restore PCB multicast settings
@@ -504,6 +500,15 @@ public:
     }
 
 private:
+
+    void reset_send_buffer ()
+    {
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
+        _tx_buf_head = 0;
+        _tx_buf_cur = 0;
+        _tx_buf_offset = 0;
+    }
 
     size_t _processSize (const pbuf* pb)
     {

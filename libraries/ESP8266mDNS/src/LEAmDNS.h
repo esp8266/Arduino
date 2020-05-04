@@ -1257,12 +1257,10 @@ protected:
                         uint16_t p_u16QueryType,
                         stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
 
-/*
     const IPAddress _getResponseMulticastInterface() const
     {
-        return IPAddress(IP4_ANY_ADDR);
+        return IPAddress(IP4_ADDR_ANY);
     }
-*/
 
     uint8_t _replyMaskForHost(const stcMDNS_RRHeader& p_RRHeader,
                               bool* p_pbFullNameMatch = 0) const;

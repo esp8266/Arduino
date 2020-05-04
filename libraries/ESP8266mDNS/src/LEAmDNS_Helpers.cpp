@@ -221,7 +221,7 @@ bool MDNSResponder::_allocUDPContext(void)
     //TODO: set multicast address (lwip_joingroup() is IPv4 only at the time of writing)
     multicast_addr.addr = DNS_MQUERY_IPV6_GROUP_INIT;
 #endif
-    if (ERR_OK == igmp_joingroup(IP4_ADDR_ANY, ip_2_ip4(&multicast_addr)))
+    if (ERR_OK == igmp_joingroup(IP4_ADDR_ANY4, ip_2_ip4(&multicast_addr)))
     {
         m_pUDPContext = new UdpContext;
         m_pUDPContext->ref();
