@@ -155,19 +155,21 @@ static ICACHE_RAM_ATTR void disableIdleTimer() {
 }
 
 
+//#define ENABLE_ONLINECHANGE
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(uint32_t cc) {
   if (cc == pwmPeriod) {
     return;
   }
   if (pwmState.cnt) {
+    PWMState p;  // The working copy since we can't edit the one in use
+    p = pwmState;
+#ifdef ENABLE_ONLINECHANGE
     // Adjust any running ones to the best of our abilities by scaling them
     // Used FP math for speed and code size
     uint64_t oldCC64p0 = ((uint64_t)pwmPeriod);
     uint64_t newCC64p16 = ((uint64_t)cc) << 16;
     uint64_t ratio64p16 = (newCC64p16 / oldCC64p0);
-    PWMState p;  // The working copy since we can't edit the one in use
-    p = pwmState;
     uint32_t ttl = 0;
     for (uint32_t i = 0; i < p.cnt; i++) {
       uint64_t val64p16 = ((uint64_t)p.delta[i]) << 16;
@@ -176,6 +178,11 @@ void _setPWMPeriodCC(uint32_t cc) {
       ttl += p.delta[i];
     }
     p.delta[p.cnt] = cc - ttl; // Final cleanup exactly cc total cycles
+#else
+    // Turn off all old PWMs
+    p.mask = 0;
+    p.cnt = 0;
+#endif
     // Update and wait for mailbox to be emptied
     pwmUpdate = &p;
     MEMBARRIER();
@@ -260,8 +267,10 @@ bool _setPWM(int pin, uint32_t cc) {
       ttl += p.delta[i];
     }
     // Shift everything out by one to make space for new edge
-    memmove(&p.pin[i + 1], &p.pin[i], (1 + p.cnt - i) * sizeof(p.pin[0]));
-    memmove(&p.delta[i + 1], &p.delta[i], (1 + p.cnt - i) * sizeof(p.delta[0]));
+    for (int32_t j = p.cnt; j >= (int)i; j--) {
+      p.pin[j + 1] = p.pin[j];
+      p.delta[j + 1] = p.delta[j];
+    }
     int off = cc - ttl; // The delta from the last edge to the one we're inserting
     p.pin[i] = pin;
     p.delta[i] = off; // Add the delta to this new pin
