@@ -164,7 +164,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   }
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
-    static_cast<int32_t>(periodCcys) <= 0 || highCcys > periodCcys) {
+    static_cast<int32_t>(periodCcys) <= 0 ||
+    (periodCcys >> 6) == 0 ||
+    highCcys > periodCcys) {
     return false;
   }
   Waveform& wave = waveform.pins[pin];
@@ -355,8 +357,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += wave.periodCcys;
               nextEdgeCcy = wave.endDutyCcy;
             }
-            else if (wave.autoPwm && (overshootCcys << 6) > wave.periodCcys && wave.nextEventCcy == wave.endDutyCcy) {
-              uint32_t adjPeriods = (overshootCcys << 6) / wave.periodCcys;
+            else if (wave.autoPwm &&
+              overshootCcys >= (wave.periodCcys >> 6) &&
+              overshootCcys >= (wave.dutyCcys >> 3) &&
+              wave.nextEventCcy == wave.endDutyCcy) {
+              uint32_t adjPeriods = overshootCcys / (wave.periodCcys >> 6);
               wave.nextPeriodCcy += adjPeriods * wave.periodCcys;
               // adapt expiry such that it occurs during intended cycle
               if (WaveformMode::EXPIRES == wave.mode) {
