@@ -195,8 +195,27 @@ void _setPWMPeriodCC(uint32_t cc) {
   pwmPeriod = cc;
 }
 
+// Helper routine to clean up any tagged off pins
+static void _cleaupPWM(PWMState *p) {
+  uint32_t leftover = 0;
+  uint32_t in, out;
+  for (in = 0, out = 0; in < p->cnt; in++) {
+    if (p->mask & (1<<p->pin[in])) {
+        p->pin[out] = p->pin[in];
+        p->delta[out] = p->delta[in] + leftover;
+        leftover = 0;
+        out++;
+    } else {
+        leftover += p->delta[in];
+    }
+  }
+  p->cnt = out;
+  p->pin[out] = 0xff;
+  p->delta[out] = p->delta[in] + leftover;
+}
+
 // Helper routine to remove an entry from the state machine
-static ICACHE_RAM_ATTR void _removePWMEntry(int pin, PWMState *p) {
+static void _removePWMEntry(int pin, PWMState *p) {
   uint32_t i;
 
   // Find the pin to pull out...
@@ -224,9 +243,16 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
 
   PWMState p;  // The working copy since we can't edit the one in use
   p = pwmState;
-  _removePWMEntry(pin, &p);
 
-  // Update and wait for mailbox to be emptied
+  // In _stopPWM we just clear the mask but keep everything else
+  // untouched to save IRAM.  The main startPWM will handle cleanup.
+  p.mask &= ~(1<<pin);
+  if (!p.mask) {
+    // If all have been stopped, then turn PWM off completely
+    p.cnt = 0;
+  }
+
+ // Update and wait for mailbox to be emptied
   pwmUpdate = &p;
   MEMBARRIER();
   forceTimerInterrupt();
@@ -244,6 +270,7 @@ bool _setPWM(int pin, uint32_t cc) {
   stopWaveform(pin);
   PWMState p;  // Working copy
   p = pwmState;
+  _cleaupPWM(&p);
   // Get rid of any entries for this pin
   if ((1<<pin) & p.mask) {
     _removePWMEntry(pin, &p);
@@ -477,10 +504,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
                 do {
                     // Drop the pin at this edge
-                    GPOC = 1<<pwmState.pin[pwmState.idx];
-                    // GPIO16 still needs manual work
-                    if (pwmState.pin[pwmState.idx] == 16) {
-                      GP16O = 0;
+                    if (1<<pwmState.pin[pwmState.idx]) {
+                      GPOC = 1<<pwmState.pin[pwmState.idx];
+                      // GPIO16 still needs manual work
+                      if (pwmState.pin[pwmState.idx] == 16) {
+                        GP16O = 0;
+                      }
                     }
                     pwmState.idx++;
                     // Any other pins at this same PWM value will have delta==0, drop them too.
