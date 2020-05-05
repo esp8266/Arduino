@@ -26,7 +26,6 @@
 
 extern "C" {
 
-static uint32_t analogMap = 0;
 static int32_t analogScale = PWMRANGE;
 static uint16_t analogFreq = 1000;
 
@@ -35,7 +34,6 @@ extern void __analogWriteRange(uint32_t range) {
     analogScale = range;
   }
 }
-
 
 extern void __analogWriteFreq(uint32_t freq) {
   if (freq < 100) {
@@ -62,7 +60,6 @@ extern void __analogWrite(uint8_t pin, int val) {
     val = analogScale;
   }
 
-  analogMap &= ~(1 << pin);
   uint32_t high = (analogPeriod * val) / analogScale;
   uint32_t low = analogPeriod - high;
   pinMode(pin, OUTPUT);
@@ -74,7 +71,6 @@ extern void __analogWrite(uint8_t pin, int val) {
     digitalWrite(pin, LOW);
   } else {
     _setPWM(pin, high);
-    analogMap |= (1 << pin);
   }
 }
 
