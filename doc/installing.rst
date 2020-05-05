@@ -244,6 +244,6 @@ BeagleBone, CubieBoard).
 - `What is PlatformIO? <https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=arduino-esp8266>`__
 - `PlatformIO IDE <https://platformio.org/platformio-ide?utm_source=arduino-esp8266>`__
 - `PlatformIO Core <https://docs.platformio.org/en/latest/core.html?utm_source=arduino-esp8266>`__ (command line tool)
-- `Advanced usage <https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266>`__ - custom settings, uploading to SPIFFS, Over-the-Air (OTA), staging version
+- `Advanced usage <https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266>`__ - custom settings, uploading to LittleFS, Over-the-Air (OTA), staging version
 - `Integration with Cloud and Standalone IDEs <https://docs.platformio.org/en/latest/ide.html?utm_source=arduino-esp8266>`__ - Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
 - `Project Examples <https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266#examples>`__
