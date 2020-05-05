@@ -1,6 +1,7 @@
 #ifndef __MIMETABLE_H__
 #define __MIMETABLE_H__
 
+#include "WString.h"
 
 namespace mime
 {
@@ -16,6 +17,7 @@ enum type
   png,
   gif,
   jpg,
+  jpeg,
   ico,
   svg,
   ttf,
@@ -41,7 +43,8 @@ struct Entry
 
 
 extern const Entry mimeTable[maxType];
-}
 
+String getContentType(const String& path);
+}
 
 #endif

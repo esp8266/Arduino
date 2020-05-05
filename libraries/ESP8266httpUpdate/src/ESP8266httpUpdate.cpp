@@ -146,7 +146,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String
 }
 #endif
 
-HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion)
+HTTPUpdateResult ESP8266HTTPUpdate::updateFS(WiFiClient& client, const String& url, const String& currentVersion)
 {
     HTTPClient http;
     http.begin(client, url);

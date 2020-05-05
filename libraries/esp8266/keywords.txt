@@ -12,6 +12,17 @@
 
 ESP	KEYWORD1
 
+nonceGeneratorType	KEYWORD1
+MD5	KEYWORD1
+SHA1	KEYWORD1
+SHA224	KEYWORD1
+SHA256	KEYWORD1
+SHA384	KEYWORD1
+SHA512	KEYWORD1
+MD5SHA1	KEYWORD1
+HKDF	KEYWORD1
+ChaCha20Poly1305	KEYWORD1
+
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
@@ -60,6 +71,21 @@ getResetInfo	KEYWORD2
 getResetInfoPtr	KEYWORD2
 eraseConfig	KEYWORD2
 getCycleCount	KEYWORD2
+random->KEYWORD2
+
+setCtMinDataLength	KEYWORD2
+getCtMinDataLength	KEYWORD2
+setCtMaxDataLength	KEYWORD2
+getCtMaxDataLength	KEYWORD2
+setNonceGenerator	KEYWORD2
+getNonceGenerator	KEYWORD2
+hash	KEYWORD2
+hmac	KEYWORD2
+hmacCT	KEYWORD2
+init	KEYWORD2
+produce	KEYWORD2
+encrypt	KEYWORD2
+decrypt	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
@@ -78,6 +104,10 @@ WAKE_NO_RFCAL	LITERAL1
 WAKE_RF_DISABLED	LITERAL1
 ADC_VCC	LITERAL1
 ADC_TOUT	LITERAL1
+
+NATURAL_LENGTH	LITERAL1
+ENCRYPTION_KEY_LENGTH	LITERAL1
+CT_MAX_DIFF	LITERAL1
 
 #######################################
 # namespace esp8266

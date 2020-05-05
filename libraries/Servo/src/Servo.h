@@ -72,6 +72,7 @@ public:
     int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
     bool attached();                   // return true if this servo is attached, otherwise false 
 private:
+    static uint32_t _servoMap;
     bool     _attached;
     uint8_t  _pin;
     uint16_t _minUs;                   
