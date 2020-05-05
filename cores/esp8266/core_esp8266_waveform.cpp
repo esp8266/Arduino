@@ -195,18 +195,20 @@ void _setPWMPeriodCC(uint32_t cc) {
   pwmPeriod = cc;
 }
 
-// Helper routine to clean up any tagged off pins
-static void _cleaupPWM(PWMState *p) {
+// Helper routine to remove an entry from the state machine
+// and clean up any marked-off entries
+static void _cleanAndRemovePWM(PWMState *p, int pin) {
   uint32_t leftover = 0;
   uint32_t in, out;
   for (in = 0, out = 0; in < p->cnt; in++) {
-    if (p->mask & (1<<p->pin[in])) {
+    if ((p->pin[in] != pin) && (p->mask & (1<<p->pin[in]))) {
         p->pin[out] = p->pin[in];
         p->delta[out] = p->delta[in] + leftover;
         leftover = 0;
         out++;
     } else {
         leftover += p->delta[in];
+        p->mask &= ~(1<<p->pin[in]);
     }
   }
   p->cnt = out;
@@ -214,26 +216,6 @@ static void _cleaupPWM(PWMState *p) {
   p->delta[out] = p->delta[in] + leftover;
 }
 
-// Helper routine to remove an entry from the state machine
-static void _removePWMEntry(int pin, PWMState *p) {
-  uint32_t i;
-
-  // Find the pin to pull out...
-  for (i = 0; p->pin[i] != pin; i++) { /* no-op */ }
-  auto delta = p->delta[i];
-
-  // Add the removed previous pin delta to preserve absolute position
-  p->delta[i+1] += delta;
-
-  // Move everything back one
-  for (i++; i <= p->cnt; i++) {
-    p->pin[i-1] = p->pin[i];
-    p->delta[i-1] = p->delta[i];
-  }
-  // Remove the pin from the active list
-  p->mask &= ~(1<<pin);
-  p->cnt--;
-}
 
 // Called by analogWrite(0/100%) to disable PWM on a specific pin
 ICACHE_RAM_ATTR bool _stopPWM(int pin) {
@@ -270,11 +252,8 @@ bool _setPWM(int pin, uint32_t cc) {
   stopWaveform(pin);
   PWMState p;  // Working copy
   p = pwmState;
-  _cleaupPWM(&p);
   // Get rid of any entries for this pin
-  if ((1<<pin) & p.mask) {
-    _removePWMEntry(pin, &p);
-  }
+  _cleanAndRemovePWM(&p, pin);
   // And add it to the list, in order
   if (p.cnt >= maxPWMs) {
     return false; // No space left
