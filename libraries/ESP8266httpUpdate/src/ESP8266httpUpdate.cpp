@@ -60,7 +60,7 @@ void ESP8266HTTPUpdate::setAuthorization(const String &user, const String &passw
  */
 void ESP8266HTTPUpdate::setAuthorization(const String &auth)
 {
-    _auth= auth;
+    _auth = auth;
 }
 
 #if HTTPUPDATE_1_2_COMPATIBLE
@@ -304,12 +304,12 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         http.addHeader(F("x-ESP8266-version"), currentVersion);
     }
 
-    if (_user && _user[0] != 0x00 && _password && _password[0] != 0x00)
+    if (!_user.isEmpty() && !_password.isEmpty())
     {
         http.setAuthorization(_user.c_str(), _password.c_str());
     }
 
-    if (_auth && _auth[0] != 0x00)
+    if (!_auth.isEmpty())
     {
         http.setAuthorization(_auth.c_str());
     }
