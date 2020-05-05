@@ -504,7 +504,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
                 do {
                     // Drop the pin at this edge
-                    if (1<<pwmState.pin[pwmState.idx]) {
+                    if (pwmState.mask & (1<<pwmState.pin[pwmState.idx])) {
                       GPOC = 1<<pwmState.pin[pwmState.idx];
                       // GPIO16 still needs manual work
                       if (pwmState.pin[pwmState.idx] == 16) {
