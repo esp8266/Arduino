@@ -598,7 +598,7 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
     *power_on = false;
     /*
      * This logic takes the reason left in memory by the SDK as an initial
-     * estimate and expands on it.
+     * estimate and improves on it.
      */
     hwdt_info.reset_reason = rtc_sys_reason;
     if (REASON_DEFAULT_RST == rtc_sys_reason ||
@@ -608,7 +608,8 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
          *    quickly. The 1 value (REASON_WDT_RST), previous if, shows up if
          *    you wait a while before the EXT_RST.
          * 2) The 0 value also shows up if a HWDT reset occurs too quickly after
-         *    the system starts. Note even the SDK gets this one right.
+         *    the system starts. Note the current SDK will get this one wrong
+         *    and indicate power-on reset.
          */
         if (OWDT_RESET == rom_api_reason) {
              *hwdt_reset = true;
@@ -634,7 +635,7 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
         }
     } else {
         /*
-         * REASON_EXT_SYS_RST is not expected at reboot, let it fall through to
+         * REASON_EXT_SYS_RST is not expected at reboot, let it fall through
          * for confirmation in debug option.
          */
         if (REASON_EXT_SYS_RST == rtc_sys_reason) {
