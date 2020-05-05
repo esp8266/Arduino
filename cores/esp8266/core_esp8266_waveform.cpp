@@ -496,7 +496,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           wvfState.waveformState ^= mask;
           if (wvfState.waveformState & mask) {
             if (i == 16) {
-              GP16O = 1; // GPIO16 write slow as it's RMW
+              GP16O = 1;
             }
             GPOS = mask;
 
@@ -516,7 +516,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             nextEdgeCycles = wave->timeHighCycles;
           } else {
             if (i == 16) {
-              GP16O = 0; // GPIO16 write slow as it's RMW
+              GP16O = 0;
             }
             GPOC = mask;
             desired = wave->desiredHighCycles;
