@@ -27,7 +27,7 @@
 extern "C" {
 
 static int32_t analogScale = PWMRANGE;
-static uint16_t analogFreq = 1000;
+extern uint32_t _pwmPeriod;
 
 extern void __analogWriteRange(uint32_t range) {
   if (range > 0) {
@@ -37,13 +37,13 @@ extern void __analogWriteRange(uint32_t range) {
 
 extern void __analogWriteFreq(uint32_t freq) {
   if (freq < 100) {
-    analogFreq = 100;
+    freq = 100;
   } else if (freq > 60000) {
-    analogFreq = 60000;
+    freq = 60000;
   } else {
-    analogFreq = freq;
+    freq = freq;
   }
-  uint32_t analogPeriod = microsecondsToClockCycles(1000000UL) / analogFreq;
+  uint32_t analogPeriod = microsecondsToClockCycles(1000000UL) / freq;
   _setPWMPeriodCC(analogPeriod);
 }
 
@@ -52,16 +52,14 @@ extern void __analogWrite(uint8_t pin, int val) {
     return;
   }
 
-  uint32_t analogPeriod = microsecondsToClockCycles(1000000UL) / analogFreq;
-  _setPWMPeriodCC(analogPeriod);
   if (val < 0) {
     val = 0;
   } else if (val > analogScale) {
     val = analogScale;
   }
 
-  uint32_t high = (analogPeriod * val) / analogScale;
-  uint32_t low = analogPeriod - high;
+  uint32_t high = (_pwmPeriod * val) / analogScale;
+  uint32_t low = _pwmPeriod - high;
   pinMode(pin, OUTPUT);
   if (low == 0) {
     _stopPWM(pin);

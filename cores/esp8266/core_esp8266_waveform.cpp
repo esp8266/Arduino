@@ -139,7 +139,7 @@ typedef struct {
 
 static PWMState pwmState;
 static PWMState *pwmUpdate = nullptr; // Set by main code, cleared by ISR
-static uint32_t pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
+uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
 
 
 
@@ -156,7 +156,7 @@ static ICACHE_RAM_ATTR void disableIdleTimer() {
 //#define ENABLE_ONLINECHANGE
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(uint32_t cc) {
-  if (cc == pwmPeriod) {
+  if (cc == _pwmPeriod) {
     return;
   }
   if (pwmState.cnt) {
@@ -165,7 +165,7 @@ void _setPWMPeriodCC(uint32_t cc) {
 #ifdef ENABLE_ONLINECHANGE
     // Adjust any running ones to the best of our abilities by scaling them
     // Used FP math for speed and code size
-    uint64_t oldCC64p0 = ((uint64_t)pwmPeriod);
+    uint64_t oldCC64p0 = ((uint64_t)_pwmPeriod);
     uint64_t newCC64p16 = ((uint64_t)cc) << 16;
     uint64_t ratio64p16 = (newCC64p16 / oldCC64p0);
     uint32_t ttl = 0;
@@ -190,7 +190,7 @@ void _setPWMPeriodCC(uint32_t cc) {
       // No mem barrier.  The external function call guarantees it's re-read
     }
   }
-  pwmPeriod = cc;
+  _pwmPeriod = cc;
 }
 
 // Helper routine to remove an entry from the state machine
@@ -260,7 +260,7 @@ bool _setPWM(int pin, uint32_t cc) {
     p.pin[0] = pin;
     p.delta[0] = cc;
     p.pin[1] = 0xff;
-    p.delta[1] = pwmPeriod - cc;
+    p.delta[1] = _pwmPeriod - cc;
     p.cnt = 1;
     p.mask = 1<<pin;
   } else {
