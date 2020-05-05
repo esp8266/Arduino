@@ -38,15 +38,15 @@ MessageData::MessageData(const String &message, const uint8_t transmissionsRemai
 MessageData::MessageData(uint8_t *initialTransmission, const uint8_t transmissionLength, const uint32_t creationTimeMs) :
   _timeTracker(creationTimeMs)
 {
-  _transmissionsExpected = EspnowProtocolInterpreter::espnowGetTransmissionsRemaining(initialTransmission) + 1;
+  _transmissionsExpected = EspnowProtocolInterpreter::getTransmissionsRemaining(initialTransmission) + 1;
   addToMessage(initialTransmission, transmissionLength);
 }
 
 bool MessageData::addToMessage(uint8_t *transmission, const uint8_t transmissionLength)
 {
-  if(EspnowProtocolInterpreter::espnowGetTransmissionsRemaining(transmission) == getTransmissionsRemaining() - 1)
+  if(EspnowProtocolInterpreter::getTransmissionsRemaining(transmission) == getTransmissionsRemaining() - 1)
   {
-    String message = EspnowProtocolInterpreter::espnowGetMessageContent(transmission, transmissionLength);
+    String message = EspnowProtocolInterpreter::getHashKeyLength(transmission, transmissionLength);
     assert(message.length() <= EspnowMeshBackend::getMaxMessageBytesPerTransmission()); // Should catch some cases where transmission is not null terminated.
     _totalMessage += message;
     ++_transmissionsReceived;

@@ -22,9 +22,12 @@
 
 #include <assert.h>
 
-namespace TypeCast = MeshTypeConversionFunctions;
-
-MeshBackendBase *MeshBackendBase::apController = nullptr;
+namespace
+{
+  namespace TypeCast = MeshTypeConversionFunctions;
+  
+  MeshBackendBase *apController = nullptr;
+}
 
 std::shared_ptr<bool> MeshBackendBase::_scanMutex = std::make_shared<bool>(false);
 

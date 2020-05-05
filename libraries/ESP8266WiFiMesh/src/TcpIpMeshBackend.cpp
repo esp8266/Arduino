@@ -28,22 +28,21 @@
 namespace
 {
   constexpr char SERVER_IP_ADDR[] PROGMEM = "192.168.4.1";
+
+  String _temporaryMessage;
+  String lastSSID;
+  bool staticIPActivated = false;
+
+  // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
+  IPAddress staticIP;
+  IPAddress gateway(192,168,4,1);
+  IPAddress subnetMask(255,255,255,0);
 }
 
 const IPAddress TcpIpMeshBackend::emptyIP;
 
 std::shared_ptr<bool> TcpIpMeshBackend::_tcpIpTransmissionMutex = std::make_shared<bool>(false);
 std::shared_ptr<bool> TcpIpMeshBackend::_tcpIpConnectionQueueMutex = std::make_shared<bool>(false);
-
-String TcpIpMeshBackend::lastSSID;
-bool TcpIpMeshBackend::staticIPActivated = false;
-
-String TcpIpMeshBackend::_temporaryMessage;
-
-// IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
-IPAddress TcpIpMeshBackend::staticIP;
-IPAddress TcpIpMeshBackend::gateway(192,168,4,1);
-IPAddress TcpIpMeshBackend::subnetMask(255,255,255,0);
 
 std::vector<TcpIpNetworkInfo> TcpIpMeshBackend::_connectionQueue = {};
 std::vector<TransmissionOutcome> TcpIpMeshBackend::_latestTransmissionOutcomes = {};

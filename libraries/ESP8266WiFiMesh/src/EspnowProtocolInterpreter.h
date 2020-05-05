@@ -49,29 +49,29 @@ namespace EspnowProtocolInterpreter
   constexpr char encryptedConnectionVerificationHeader[] PROGMEM = "ECVerified:"; // Encrypted connection verified
   constexpr char encryptedConnectionRemovalRequestHeader[] PROGMEM = "RemoveEC:"; // Remove encrypted connection
 
-  constexpr uint8_t espnowMessageTypeIndex = 0;
-  constexpr uint8_t espnowTransmissionsRemainingIndex = 1;
-  constexpr uint8_t espnowTransmissionMacIndex = 2;
-  constexpr uint8_t espnowMessageIDIndex = 8;
+  constexpr uint8_t messageTypeIndex = 0;
+  constexpr uint8_t transmissionsRemainingIndex = 1;
+  constexpr uint8_t transmissionMacIndex = 2;
+  constexpr uint8_t messageIDIndex = 8;
 
-  constexpr uint8_t espnowProtocolBytesSize = 16;
+  constexpr uint8_t protocolBytesSize = 16;
   constexpr uint8_t aeadMetadataSize = 28;
-  uint8_t espnowMetadataSize();
+  uint8_t metadataSize();
 
-  constexpr uint8_t espnowEncryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
-  constexpr uint8_t espnowHashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
+  constexpr uint8_t encryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
+  constexpr uint8_t hashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
 
   constexpr uint64_t uint64LeftmostBits = 0xFFFFFFFF00000000;
 
-  String espnowGetMessageContent(uint8_t *transmissionDataArray, const uint8_t transmissionLength);
-  char espnowGetMessageType(const uint8_t *transmissionDataArray);
-  uint8_t espnowGetTransmissionsRemaining(const uint8_t *transmissionDataArray);
-  bool espnowIsMessageStart(const uint8_t *transmissionDataArray);
-  uint64_t espnowGetTransmissionMac(const uint8_t *transmissionDataArray);
-  uint8_t *espnowGetTransmissionMac(const uint8_t *transmissionDataArray, uint8_t *resultArray);
-  uint64_t espnowGetMessageID(const uint8_t *transmissionDataArray);
+  String getHashKeyLength(uint8_t *transmissionDataArray, const uint8_t transmissionLength);
+  char getMessageType(const uint8_t *transmissionDataArray);
+  uint8_t getTransmissionsRemaining(const uint8_t *transmissionDataArray);
+  bool isMessageStart(const uint8_t *transmissionDataArray);
+  uint64_t getTransmissionMac(const uint8_t *transmissionDataArray);
+  uint8_t *getTransmissionMac(const uint8_t *transmissionDataArray, uint8_t *resultArray);
+  uint64_t getMessageID(const uint8_t *transmissionDataArray);
   // @return a pointer to transmissionDataArray
-  uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, const uint64_t messageID);
+  uint8_t *setMessageID(uint8_t *transmissionDataArray, const uint64_t messageID);
 
   bool usesEncryption(const uint64_t messageID);
 }

@@ -261,13 +261,7 @@ private:
   int _stationModeTimeoutMs = 5000; // int is the type used in the Arduino core for this particular API, not uint32_t, which is why we use int here.
   uint32_t _apModeTimeoutMs = 4500;
 
-  static String _temporaryMessage;
-  static String lastSSID;
-  static bool staticIPActivated;
   bool useStaticIP;
-  static IPAddress staticIP;
-  static IPAddress gateway;
-  static IPAddress subnetMask;
 
   void fullStop(WiFiClient &currClient);
   void initiateConnectionToAP(const String &targetSSID, const int targetChannel = NETWORK_INFO_DEFAULT_INT, const uint8_t *targetBSSID = NULL);

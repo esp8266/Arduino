@@ -67,8 +67,8 @@ public:
    *                        make it impossible for other stations to detect the APs whose WiFi channels have changed.
    * 
    */
-  FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
-               const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+  FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength], 
+               const uint8_t espnowHashKey[EspnowProtocolInterpreter::hashKeyLength], const String &ssidPrefix, 
                const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   /**
@@ -99,8 +99,8 @@ public:
    * @param serializedMeshState A String with a serialized mesh node state that the node should use.
    */
   FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
-               const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
-               const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+               const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength], 
+               const uint8_t espnowHashKey[EspnowProtocolInterpreter::hashKeyLength], const String &ssidPrefix, 
                const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   /**
@@ -316,8 +316,6 @@ private:
   uint16_t _messageLogSize = 100;
 
   uint8_t _broadcastReceptionRedundancy = 2;
-
-  static char _metadataDelimiter; // Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
 
   uint8_t _originMac[6] = {0};
 

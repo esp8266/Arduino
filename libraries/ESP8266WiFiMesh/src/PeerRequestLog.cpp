@@ -25,17 +25,20 @@
 #include "PeerRequestLog.h"
 #include "EspnowMeshBackend.h"
 
-using EspnowProtocolInterpreter::espnowHashKeyLength;
+namespace
+{
+  using EspnowProtocolInterpreter::hashKeyLength;
+}
 
 PeerRequestLog::PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, 
-                               const String &peerRequestNonce, const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[espnowHashKeyLength])
+                               const String &peerRequestNonce, const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[hashKeyLength])
  : EncryptedConnectionData(peerStaMac, peerApMac, 0, 0, EspnowMeshBackend::getEncryptionRequestTimeout(), hashKey), 
    _requestID(requestID), _requestEncrypted(requestEncrypted), _authenticationPassword(authenticationPassword), 
    _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit), _peerRequestNonce(peerRequestNonce)
 { }
 
 PeerRequestLog::PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
-                               const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength])
+                               const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[hashKeyLength])
  : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, EspnowMeshBackend::getEncryptionRequestTimeout(), hashKey), 
    _requestID(requestID), _requestEncrypted(requestEncrypted), _authenticationPassword(authenticationPassword), 
    _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit), _peerRequestNonce(peerRequestNonce)

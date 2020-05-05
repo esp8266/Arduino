@@ -26,17 +26,17 @@
 #include "TypeConversionFunctions.h"
 #include "JsonTranslator.h"
 
-namespace TypeCast = MeshTypeConversionFunctions;
-
 namespace
 {
+  namespace TypeCast = MeshTypeConversionFunctions;
+  
   constexpr uint8_t MESSAGE_ID_LENGTH = 17; // 16 characters and one delimiter
   constexpr uint8_t MESSAGE_COMPLETE = 255;
+
+  char _metadataDelimiter = 23; // Defaults to 23 = End-of-Transmission-Block (ETB) control character in ASCII
 }
 
 std::set<FloodingMesh *> FloodingMesh::availableFloodingMeshes = {};
-
-char FloodingMesh::_metadataDelimiter = 23;
 
 void floodingMeshDelay(const uint32_t durationMs)
 {
@@ -52,8 +52,8 @@ void floodingMeshDelay(const uint32_t durationMs)
   while(!timeout);
 }
 
-FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
-                           const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength], 
+                           const uint8_t espnowHashKey[EspnowProtocolInterpreter::hashKeyLength], const String &ssidPrefix, 
                            const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel) 
                            : _espnowBackend(
                             [this](const String &request, MeshBackendBase &meshInstance){ return _defaultRequestHandler(request, meshInstance); }, 
@@ -69,16 +69,16 @@ FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &mesh
 
 FloodingMesh::FloodingMesh(messageHandlerType messageHandler, const String &meshPassword, const String &espnowEncryptedConnectionKeySeed, const String &espnowHashKeySeed,
                            const String &ssidPrefix, const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel) 
-                           : FloodingMesh(messageHandler, meshPassword, (const uint8_t[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]){0}, 
-                                          (const uint8_t[EspnowProtocolInterpreter::espnowHashKeyLength]){0}, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
+                           : FloodingMesh(messageHandler, meshPassword, (const uint8_t[EspnowProtocolInterpreter::encryptedConnectionKeyLength]){0}, 
+                                          (const uint8_t[EspnowProtocolInterpreter::hashKeyLength]){0}, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel)
 {
   getEspnowMeshBackend().setEspnowEncryptedConnectionKey(espnowEncryptedConnectionKeySeed);
   getEspnowMeshBackend().setEspnowHashKey(espnowHashKeySeed);
 }
 
 FloodingMesh::FloodingMesh(const String &serializedMeshState, messageHandlerType messageHandler, const String &meshPassword, 
-                           const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
-                           const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+                           const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength], 
+                           const uint8_t espnowHashKey[EspnowProtocolInterpreter::hashKeyLength], const String &ssidPrefix, 
                            const String &ssidSuffix, const bool verboseMode, const uint8 meshWiFiChannel)
                            : FloodingMesh(messageHandler, meshPassword, espnowEncryptedConnectionKey, espnowHashKey, ssidPrefix, ssidSuffix, verboseMode, meshWiFiChannel) 
 {

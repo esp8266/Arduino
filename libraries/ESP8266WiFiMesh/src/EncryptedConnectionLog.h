@@ -33,9 +33,9 @@ class EncryptedConnectionLog : public EncryptedConnectionData {
 public:
 
   EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, 
-                         const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+                         const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
   EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, 
-                         const uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+                         const uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
 
   // Only guaranteed to expire at the latest when the soonestExpiringConnection does. Can expire before the soonestExpiringConnection since it is not updated on connection removal.
   // Needs to be a copy to avoid invalidation during operations on temporaryEncryptedConnections.

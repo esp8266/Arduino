@@ -65,8 +65,6 @@ class MutexTracker
 
   private:
 
-    static std::shared_ptr<bool> _captureBan;
-
     std::shared_ptr<bool> _capturedMutex;
     std::function<void()> _destructorHook = [](){ };
 

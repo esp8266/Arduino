@@ -27,63 +27,66 @@
 #include <algorithm>
 #include "EspnowMeshBackend.h"
 
-namespace TypeCast = MeshTypeConversionFunctions;
+namespace
+{
+  namespace TypeCast = MeshTypeConversionFunctions;
+}
 
 namespace EspnowProtocolInterpreter
 {   
-  uint8_t espnowMetadataSize()
+  uint8_t metadataSize()
   {
-    return espnowProtocolBytesSize + (EspnowMeshBackend::useEncryptedMessages() ? aeadMetadataSize : 0);
+    return protocolBytesSize + (EspnowMeshBackend::useEncryptedMessages() ? aeadMetadataSize : 0);
   }
   
-  String espnowGetMessageContent(uint8_t *transmissionDataArray, const uint8_t transmissionLength)
+  String getHashKeyLength(uint8_t *transmissionDataArray, const uint8_t transmissionLength)
   {
     String messageContent = emptyString;
     
-    if(transmissionLength >= espnowMetadataSize())
+    if(transmissionLength >= metadataSize())
     {
-      uint8_t messageSize = transmissionLength - espnowMetadataSize();
+      uint8_t messageSize = transmissionLength - metadataSize();
       
-      messageContent = TypeCast::uint8ArrayToMultiString(transmissionDataArray + espnowMetadataSize(), messageSize);
+      messageContent = TypeCast::uint8ArrayToMultiString(transmissionDataArray + metadataSize(), messageSize);
     }
 
     return messageContent;
   }
   
-  char espnowGetMessageType(const uint8_t *transmissionDataArray)
+  char getMessageType(const uint8_t *transmissionDataArray)
   {
-    return char(transmissionDataArray[espnowMessageTypeIndex]);
+    return char(transmissionDataArray[messageTypeIndex]);
   }
 
-  uint8_t espnowGetTransmissionsRemaining(const uint8_t *transmissionDataArray)
+  uint8_t getTransmissionsRemaining(const uint8_t *transmissionDataArray)
   {
-    return (transmissionDataArray[espnowTransmissionsRemainingIndex] & 0x7F);
+    return (transmissionDataArray[transmissionsRemainingIndex] & 0x7F);
   }
 
-  bool espnowIsMessageStart(const uint8_t *transmissionDataArray)
+  bool isMessageStart(const uint8_t *transmissionDataArray)
   {
-    return (transmissionDataArray[espnowTransmissionsRemainingIndex] & 0x80); // If MSB is one we have messageStart
+    return (transmissionDataArray[transmissionsRemainingIndex] & 0x80); // If MSB is one we have messageStart
   }
 
-  uint64_t espnowGetTransmissionMac(const uint8_t *transmissionDataArray)
+  uint64_t getTransmissionMac(const uint8_t *transmissionDataArray)
   {
-    return TypeCast::macToUint64(transmissionDataArray + espnowTransmissionMacIndex);
+    return TypeCast::macToUint64(transmissionDataArray + transmissionMacIndex);
   }
 
-  uint8_t *espnowGetTransmissionMac(const uint8_t *transmissionDataArray, uint8_t *resultArray)
+  uint8_t *getTransmissionMac(const uint8_t *transmissionDataArray, uint8_t *resultArray)
   {
-    std::copy_n((transmissionDataArray + espnowTransmissionMacIndex), 6, resultArray);
+    std::copy_n((transmissionDataArray + transmissionMacIndex), 6, resultArray);
     return resultArray;
   }
 
-  uint64_t espnowGetMessageID(const uint8_t *transmissionDataArray)
+  uint64_t getMessageID(const uint8_t *transmissionDataArray)
   {
-    return TypeCast::uint8ArrayToUint64(transmissionDataArray + espnowMessageIDIndex);
+    return TypeCast::uint8ArrayToUint64(transmissionDataArray + messageIDIndex);
   }
 
-  uint8_t *espnowSetMessageID(uint8_t *transmissionDataArray, const uint64_t messageID)
+  uint8_t *setMessageID(uint8_t *transmissionDataArray, const uint64_t messageID)
   {
-    return TypeCast::uint64ToUint8Array(messageID, transmissionDataArray + espnowMessageIDIndex);
+    return TypeCast::uint64ToUint8Array(messageID, transmissionDataArray + messageIDIndex);
   }
 
   bool usesEncryption(const uint64_t messageID)

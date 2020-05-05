@@ -24,7 +24,10 @@
 
 #include "MutexTracker.h"
 
-std::shared_ptr<bool> MutexTracker::_captureBan = std::make_shared<bool>(false);
+namespace
+{  
+  static std::shared_ptr<bool> _captureBan = std::make_shared<bool>(false);
+}
 
 std::shared_ptr<bool> MutexTracker::captureBan()
 {

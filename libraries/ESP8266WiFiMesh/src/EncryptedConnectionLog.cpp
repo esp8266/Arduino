@@ -24,13 +24,16 @@
 
 #include "EncryptedConnectionLog.h"
 
-using EspnowProtocolInterpreter::espnowHashKeyLength;
+namespace
+{
+  using EspnowProtocolInterpreter::hashKeyLength;
+}
 
-EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[hashKeyLength]) 
   : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, hashKey)
 { }
 
-EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint32_t duration, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionLog::EncryptedConnectionLog(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint32_t duration, const uint8_t hashKey[hashKeyLength]) 
   : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, duration, hashKey)
 { }
 

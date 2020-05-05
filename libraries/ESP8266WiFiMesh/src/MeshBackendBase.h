@@ -318,8 +318,6 @@ private:
 
   MeshBackendType _classType;
 
-  static MeshBackendBase *apController;
-
   String _SSID;
   String _SSIDPrefix;
   String _SSIDRoot;

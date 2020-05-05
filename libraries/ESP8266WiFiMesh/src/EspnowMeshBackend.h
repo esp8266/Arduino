@@ -167,8 +167,8 @@ public:
    * 
    */
   EspnowMeshBackend(const requestHandlerType requestHandler, const responseHandlerType responseHandler, const networkFilterType networkFilter, const broadcastFilterType broadcastFilter,
-                    const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength], 
-                    const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength], const String &ssidPrefix, 
+                    const String &meshPassword, const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength], 
+                    const uint8_t espnowHashKey[EspnowProtocolInterpreter::hashKeyLength], const String &ssidPrefix, 
                     const String &ssidSuffix, const bool verboseMode = false, const uint8 meshWiFiChannel = 1);
 
   /**
@@ -396,9 +396,9 @@ public:
    * Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible. 
    * Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
    * 
-   * @param espnowEncryptedConnectionKey An array containing the espnowEncryptedConnectionKeyLength bytes that will be used as the encryption key.
+   * @param espnowEncryptedConnectionKey An array containing the encryptedConnectionKeyLength bytes that will be used as the encryption key.
    */
-  void setEspnowEncryptedConnectionKey(const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]);
+  void setEspnowEncryptedConnectionKey(const uint8_t espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength]);
 
   /** 
    * Change the key used by this EspnowMeshBackend instance for creating encrypted ESP-NOW connections.
@@ -421,7 +421,7 @@ public:
    * @return The current espnowEncryptedConnectionKey for this EspnowMeshBackend instance.
    */
   const uint8_t *getEspnowEncryptedConnectionKey() const;
-  uint8_t *getEspnowEncryptedConnectionKey(uint8_t resultArray[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]) const; 
+  uint8_t *getEspnowEncryptedConnectionKey(uint8_t resultArray[EspnowProtocolInterpreter::encryptedConnectionKeyLength]) const; 
 
   /** 
    * Change the key used to encrypt/decrypt the encrypted connection key when creating encrypted ESP-NOW connections. (Kok = key of keys, perhaps) If no Kok is provided by the user, a default Kok is used.
@@ -433,10 +433,10 @@ public:
    * Both Kok and encrypted connection key must match in an encrypted connection pair for encrypted communication to be possible. 
    * Otherwise the transmissions will never reach the recipient, even though acks are received by the sender.
    * 
-   * @param espnowEncryptionKok An array containing the espnowEncryptedConnectionKeyLength bytes that will be used as the Kok.
+   * @param espnowEncryptionKok An array containing the encryptedConnectionKeyLength bytes that will be used as the Kok.
    * @return True if Kok was changed successfully. False if Kok was not changed.
    */
-  static bool setEspnowEncryptionKok(uint8_t espnowEncryptionKok[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength]);
+  static bool setEspnowEncryptionKok(uint8_t espnowEncryptionKok[EspnowProtocolInterpreter::encryptedConnectionKeyLength]);
 
   /** 
    * Change the key used to encrypt/decrypt the encryption key when creating encrypted ESP-NOW connections. (Kok = key of keys, perhaps) If no Kok is provided by the user, a default Kok is used.
@@ -469,9 +469,9 @@ public:
   * NOTE: Encrypted connections added before the key change will retain their old key.
   * Only changes the secret hash key used by this EspnowMeshBackend instance, so each instance can use a separate secret key.
   * 
-  * @param espnowHashKey An array containing the espnowHashKeyLength bytes that will be used as the HMAC key.
+  * @param espnowHashKey An array containing the hashKeyLength bytes that will be used as the HMAC key.
   */
-  void setEspnowHashKey(const uint8_t espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+  void setEspnowHashKey(const uint8_t espnowHashKey[EspnowProtocolInterpreter::hashKeyLength]);
   
  /** 
   * Change the secret key used to generate HMACs for encrypted ESP-NOW connections.
@@ -970,7 +970,7 @@ protected:
   static connectionLogIterator connectionLogEndIterator();
 
   static const uint8_t broadcastMac[6];
-  static const uint64_t uint64BroadcastMac = 0xFFFFFFFFFFFF;
+  static const uint64_t uint64BroadcastMac;
 
   bool activateEspnow();
 
@@ -1129,19 +1129,9 @@ private:
   static bool synchronizePeerSessionKey(const uint64_t sessionKey, const uint8_t *peerMac);
   static bool synchronizePeerSessionKey(const uint64_t sessionKey, EncryptedConnectionLog &encryptedConnection);
 
-  static const uint32_t _maxBytesPerTransmission = 250;
-  static uint8_t _maxTransmissionsPerMessage;
-
-  static uint32_t _espnowTransmissionTimeoutMs;
-  static uint32_t _espnowRetransmissionIntervalMs; 
-
   uint32_t _autoEncryptionDuration = 50;
 
   uint8_t _encryptedConnectionsSoftLimit = 6;
-
-  static bool _staticVerboseMode;
-
-  static EspnowMeshBackend *_espnowRequestManager;
 
   static std::map<std::pair<macAndType_td, messageID_td>, MessageData> receivedEspnowTransmissions;
   static std::map<std::pair<peerMac_td, messageID_td>, RequestData> sentRequests;
@@ -1154,11 +1144,6 @@ private:
    * @return The current number of encrypted ESP-NOW connections, but with an encrypted connection immediately reserved if required while making a peer request.
    */
   static uint8_t reservedEncryptedConnections();
-  
-  static std::list<ResponseData> responsesToSend;
-  static std::list<PeerRequestLog> peerRequestConfirmationsToSend;
-  
-  static std::vector<EncryptedConnectionLog> encryptedConnections;
   
   static EncryptedConnectionLog *getEncryptedConnection(const uint8_t *peerMac);
   static EncryptedConnectionLog *getTemporaryEncryptedConnection(const uint8_t *peerMac);
@@ -1188,26 +1173,10 @@ private:
   template <typename T>
   static void deleteExpiredLogEntries(std::list<T> &logEntries, const uint32_t maxEntryLifetimeMs);
 
-  static uint32_t _logEntryLifetimeMs;
-  static uint32_t _broadcastResponseTimeoutMs;
-
-  static uint32_t _encryptionRequestTimeoutMs;
-
-  static uint32_t _criticalHeapLevel;
-  static uint32_t _criticalHeapLevelBuffer;
-
-  static bool _espnowSendConfirmed;
-
   broadcastFilterType _broadcastFilter;
   responseTransmittedHookType _responseTransmittedHook = [](const String &, const uint8_t *, uint32_t, EspnowMeshBackend &){ return true; };
 
   uint8_t _broadcastTransmissionRedundancy = 1;
-
-  static String _ongoingPeerRequestNonce;
-  static uint8_t _ongoingPeerRequestMac[6];
-  static EspnowMeshBackend *_ongoingPeerRequester;
-  static EncryptedConnectionStatus _ongoingPeerRequestResult;
-  static bool _reciprocalPeerRequestConfirmation;
 
   template <typename T>
   static T *getMapValue(std::map<uint64_t, T> &mapIn, const uint64_t keyIn);
@@ -1216,20 +1185,12 @@ private:
 
   bool _acceptsUnverifiedRequests = true;
 
-  uint8_t _espnowEncryptedConnectionKey[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength] {0};
-  uint8_t _espnowHashKey[EspnowProtocolInterpreter::espnowHashKeyLength] {0};
-  static uint8_t _espnowEncryptionKok[EspnowProtocolInterpreter::espnowEncryptedConnectionKeyLength];
-  static bool _espnowEncryptionKokSet;
-  static uint8_t _espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH];
-  static bool _useEncryptedMessages;
-  static uint32_t _unsynchronizedMessageID;
-
+  uint8_t _espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength] {0};
+  uint8_t _espnowHashKey[EspnowProtocolInterpreter::hashKeyLength] {0};
+  
   uint8_t _senderMac[6] = {0};
   uint8_t _senderAPMac[6] = {0};
   bool _receivedEncryptedTransmission = false;
-
-  static std::shared_ptr<bool> _espnowSendToNodeMutex;
-  static uint8_t _transmissionTargetBSSID[6];
   
   static void storeSentRequest(const uint64_t targetBSSID, const uint64_t messageID, const RequestData &requestData);
   static void storeReceivedRequest(const uint64_t senderBSSID, const uint64_t messageID, const TimeTracker &timeTracker);
@@ -1292,8 +1253,7 @@ private:
   uint32_t successfulTransmissions_AT = 0;
   uint32_t maxTransmissionDuration_AT = 0;
 
-  static double _transmissionsTotal;
-  static double _transmissionsFailed;
+  static bool _staticVerboseMode;
 };
 
 #endif

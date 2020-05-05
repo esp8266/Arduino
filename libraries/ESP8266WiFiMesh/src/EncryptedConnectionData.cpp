@@ -28,18 +28,21 @@
 #include "JsonTranslator.h"
 #include "MeshCryptoInterface.h"
 
-using EspnowProtocolInterpreter::espnowHashKeyLength;
-namespace TypeCast = MeshTypeConversionFunctions;
+namespace
+{
+  using EspnowProtocolInterpreter::hashKeyLength;
+  namespace TypeCast = MeshTypeConversionFunctions;
+}
 
-EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[hashKeyLength]) 
   : _peerSessionKey(peerSessionKey), _ownSessionKey(ownSessionKey)
 { 
   std::copy_n(peerStaMac, 6, _peerStaMac);
   std::copy_n(peerApMac, 6, _peerApMac);
-  std::copy_n(hashKey, espnowHashKeyLength, _hashKey);
+  std::copy_n(hashKey, hashKeyLength, _hashKey);
 }
 
-EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint32_t duration, const uint8_t hashKey[espnowHashKeyLength]) 
+EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint32_t duration, const uint8_t hashKey[hashKeyLength]) 
   : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, hashKey)
 {
   setRemainingDuration(duration);
@@ -106,16 +109,16 @@ bool EncryptedConnectionData::connectedTo(const uint8_t *peerMac) const
   return false;
 }
 
-void EncryptedConnectionData::setHashKey(const uint8_t hashKey[espnowHashKeyLength])
+void EncryptedConnectionData::setHashKey(const uint8_t hashKey[hashKeyLength])
 {
   assert(hashKey != nullptr);
 
-  std::copy_n(hashKey, espnowHashKeyLength, _hashKey);
+  std::copy_n(hashKey, hashKeyLength, _hashKey);
 }
 
 uint8_t *EncryptedConnectionData::getHashKey(uint8_t *resultArray) const
 {
-  std::copy_n(_hashKey, espnowHashKeyLength, resultArray);
+  std::copy_n(_hashKey, hashKeyLength, resultArray);
   return resultArray;
 }
 
@@ -146,7 +149,7 @@ uint64_t EncryptedConnectionData::incrementSessionKey(const uint64_t sessionKey,
 
 void EncryptedConnectionData::incrementOwnSessionKey()
 {
-  setOwnSessionKey(incrementSessionKey(getOwnSessionKey(), _hashKey, EspnowProtocolInterpreter::espnowHashKeyLength));
+  setOwnSessionKey(incrementSessionKey(getOwnSessionKey(), _hashKey, EspnowProtocolInterpreter::hashKeyLength));
 }
 
 void EncryptedConnectionData::setDesync(const bool desync) { _desync = desync; }

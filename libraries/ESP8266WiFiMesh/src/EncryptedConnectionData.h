@@ -37,9 +37,9 @@ public:
   virtual ~EncryptedConnectionData() = default; 
 
   EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey,
-                          const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+                          const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
   EncryptedConnectionData(const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey,
-                          const uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+                          const uint32_t duration, const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
   
   EncryptedConnectionData(const EncryptedConnectionData &other);
 
@@ -61,8 +61,8 @@ public:
 
   bool connectedTo(const uint8_t *peerMac) const;
 
-  void setHashKey(const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
-  // @param resultArray At least size espnowHashKeyLength. 
+  void setHashKey(const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
+  // @param resultArray At least size hashKeyLength. 
   uint8_t *getHashKey(uint8_t *resultArray) const;
   
   void setPeerSessionKey(const uint64_t sessionKey);
@@ -90,7 +90,7 @@ private:
   uint8_t _peerApMac[6] {0};
   uint64_t _peerSessionKey;
   uint64_t _ownSessionKey;
-  uint8_t _hashKey[EspnowProtocolInterpreter::espnowHashKeyLength] {0};
+  uint8_t _hashKey[EspnowProtocolInterpreter::hashKeyLength] {0};
   bool _desync = false;
   std::unique_ptr<ExpiringTimeTracker> _timeTracker = nullptr;
 };

@@ -33,10 +33,10 @@ class PeerRequestLog : public EncryptedConnectionData {
 public:
 
   PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
-                 const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+                 const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
   PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce,
                  const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, 
-                 const uint8_t hashKey[EspnowProtocolInterpreter::espnowHashKeyLength]);
+                 const uint8_t hashKey[EspnowProtocolInterpreter::hashKeyLength]);
 
   void setRequestID(const uint64_t requestID);
   uint64_t getRequestID() const;

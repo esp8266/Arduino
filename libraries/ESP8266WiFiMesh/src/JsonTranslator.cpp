@@ -27,7 +27,10 @@
 #include "TypeConversionFunctions.h"
 #include "MeshCryptoInterface.h"
 
-namespace TypeCast = MeshTypeConversionFunctions;
+namespace
+{
+  namespace TypeCast = MeshTypeConversionFunctions;
+}
 
 namespace JsonTranslator
 {
