@@ -164,6 +164,9 @@ class EspClass {
 
         bool eraseConfig();
 
+        uint8_t *random(uint8_t *resultArray, const size_t outputSizeBytes) const;
+        uint32_t random() const;
+
 #ifndef CORE_MOCK
         inline uint32_t getCycleCount() __attribute__((always_inline));
 #else
