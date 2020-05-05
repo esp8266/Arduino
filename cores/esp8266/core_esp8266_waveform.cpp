@@ -195,9 +195,9 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     if (!waveform.timer1Running) {
       initTimer();
     }
-    else if (((CPU2X & 1) ? T1V << 1 : T1V) > IRQLATENCYCCYS + DELTAIRQCCYS) {
+    else if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
       // Must not interfere if Timer is due shortly
-      timer1_write(CPU2X & 1 ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
+      timer1_write((clockCyclesPerMicrosecond() == 160) ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
     }
   }
   else {
@@ -230,8 +230,8 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (waveform.enabled & (1UL << pin)) {
     waveform.toDisable = pin;
     // Must not interfere if Timer is due shortly
-    if (((CPU2X & 1) ? T1V << 1 : T1V) > IRQLATENCYCCYS + DELTAIRQCCYS) {
-      timer1_write(CPU2X & 1 ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
+    if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
+      timer1_write((clockCyclesPerMicrosecond() == 160) ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
     }
     std::atomic_thread_fence(std::memory_order_acq_rel);
     while (waveform.toDisable >= 0) {
