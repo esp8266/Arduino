@@ -62,20 +62,7 @@ a {
   font-size: 1em;
   height: 1.8em;
 }
-/*
-*/
-</style>
-)EOF";
-#else
-static const char configHead[] PROGMEM = R"EOF(<!DOCTYPE html><html lang="en"><head><meta name='viewport' content='width=device-width'><title>WiFi</title><style>html,body{width:100%;font-family:'Open Sans',Helvetica,Arial,sans-serif;font-size:16px}h1,h2,h3,h4{vertical-align:middle;text-align:center}input[type=submit]{width:98%;font-family:'Open Sans',Helvetica,Arial,sans-serif;height:3em}a{text-decoration:none;color:blue}.mono,td,input{font-family:'Source Code Pro',monospace;height:1.5em;font-size:1em;vertical-align:middle}.lg{font-size:1em;height:1.8em}</style>)EOF";
-#endif
 
-#ifdef DEBUG_VIEW
-static const char configHead2[] PROGMEM = R"EOF(
-<style>
-/*
-
-*/
 .left {
   text-align: left;
 }
@@ -135,7 +122,7 @@ function cs(i){
 -->
 )EOF";
 #else
-static const char configHead2[] PROGMEM = R"EOF(<style>.left{text-align:left}.center{text-align:center}.right{text-align:right}#outer{width:100% overflow-y: auto}#inner{margin: .75em auto;max-width:500px;min-width:428px;text-align:left}</style></head><body onload='ol()'> <script>function ge(i){return document.getElementById(i);} function pv(){let e=ge('p');if(e.type==='password'){e.type='text';}else{e.type='password';} e.focus();} function cs(i){ge('s').value=i.innerText;let e=ge('p');e.type='password';e.value='';e.focus();e.scrollIntoView();}</script>)EOF";
+static const char configHead[] PROGMEM = R"EOF(<!DOCTYPE html><html lang="en"><head><meta name='viewport' content='width=device-width'><title>WiFi</title><style>html,body{width:100%;font-family:'Open Sans',Helvetica,Arial,sans-serif;font-size:16px}h1,h2,h3,h4{vertical-align:middle;text-align:center}input[type=submit]{width:98%;font-family:'Open Sans',Helvetica,Arial,sans-serif;height:3em}a{text-decoration:none;color:blue}.mono,td,input{font-family:'Source Code Pro',monospace;height:1.5em;font-size:1em;vertical-align:middle}.lg{font-size:1em;height:1.8em}.left{text-align:left}.center{text-align:center}.right{text-align:right}#outer{width:100% overflow-y: auto}#inner{margin: .75em auto;max-width:500px;min-width:428px;text-align:left}</style></head><body onload='ol()'> <script>function ge(i){return document.getElementById(i);} function pv(){let e=ge('p');if(e.type==='password'){e.type='text';}else{e.type='password';} e.focus();} function cs(i){ge('s').value=i.innerText;let e=ge('p');e.type='password';e.value='';e.focus();e.scrollIntoView();}</script> )EOF";
 #endif
 
 #ifdef DEBUG_VIEW
@@ -317,7 +304,6 @@ static const char configEnd[] PROGMEM = R"EOF(
 -->
 )EOF";
 #else
-static const char configEnd[] PROGMEM = R"EOF(</table> <br /><form method='POST' action='wifisave'><h4>Connect to Network:</h4> <input id='s' class='lg' type='text' size=32 maxlength=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/> <br /><br /> <input id='p' class='lg' type='password' size=32 maxlength=64 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/> )EOF";
 #endif
 
 #ifdef DEBUG_VIEW
@@ -338,7 +324,7 @@ static const char configEnd2[] PROGMEM = R"EOF(
 -->
 )EOF";
 #else
-static const char configEnd2[] PROGMEM = R"EOF(&nbsp;&nbsp;<a class='lg' onclick='pv();'>&#x1f441;</a> <br /><br /><input type='submit' value='Connect/Disconnect'/></form> <br /><p>You may want to <a href='/'>return to the home page</a>.</p><p></p></div></div></body></html>)EOF";
+static const char configEnd[] PROGMEM = R"EOF(</table> <br /><form method='POST' action='wifisave'><h4>Connect to Network:</h4> <input id='s' class='lg' type='text' size=32 maxlength=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/> <br /><br /> <input id='p' class='lg' type='password' size=32 maxlength=64 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/> &nbsp;&nbsp;<a class='lg' onclick='pv();'>&#x1f441;</a> <br /><br /><input type='submit' value='Connect/Disconnect'/></form> <br /><p>You may want to <a href='/'>return to the home page</a>.</p><p></p></div></div></body></html>)EOF";
 #endif
 
 #endif

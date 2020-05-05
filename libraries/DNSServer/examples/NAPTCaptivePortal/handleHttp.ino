@@ -1,7 +1,16 @@
 #if LWIP_FEATURES && !LWIP_IPV6
 
-#include "WifiHttp.h"
-String& sendIfOver(String & str, size_t threshold = 512);
+#include "WifiHttpv2.h"
+
+#ifndef TCP_MSS
+#define TCP_MSS 1460
+#endif
+/*
+  Use kMaxChunkSize to limit size of chuncks
+*/
+constexpr size_t kMaxChunkSize = TCP_MSS;
+String& sendIfOver(String & str, size_t threshold = kMaxChunkSize/2);
+size_t sendAsChunks_P(PGM_P content, size_t chunkSize = kMaxChunkSize);
 
 size_t maxPage = 0;
 
@@ -15,6 +24,7 @@ void addNoCacheHeader() {
 String& sendIfOver(String & str, size_t threshold) {
   size_t len = str.length();
   if (len > threshold) {
+    // Use later to determine if we reserved enough room in page to avoid realloc
     maxPage = std::max(maxPage, len);
     server.sendContent(str);
     str = "";
@@ -22,11 +32,22 @@ String& sendIfOver(String & str, size_t threshold) {
   return str;
 }
 
+/*
+  The idea here is to avoid a large allocation by sendContent_P to copy a
+  big PROGMEM string. Slice PROGMEM string into chuncks and send.
+*/
+size_t sendAsChunks_P(PGM_P content, size_t chunkSize) {
+  size_t len = strlen_P(content);
+  for (size_t pos = 0; pos < len; pos += chunkSize) {
+    server.sendContent_P(&content[pos], ((len - pos) >= chunkSize) ? chunkSize : len - pos);
+  }
+  return len;
+}
 
 /** Handle root or redirect to captive portal */
 void handleRoot() {
   if (captivePortal()) {
-    // If caprive portal is needed, redirect instead of displaying the page.
+    // If captive portal is needed, redirect instead of displaying the page.
     return;
   }
   addNoCacheHeader();
@@ -92,20 +113,19 @@ void handleWifi() {
   }
 
   // Send a few chunks of the HTML that don't need to change.
-  server.sendContent_P(configHead);
-  server.sendContent_P(configHead2);
+  sendAsChunks_P(configHead);
 
   String page;
 
-  // Just do max on some of the visually larger HTML chunks that will be loaded
-  // into page and add a little for growth when substituting values in.
-  size_t thisMany = std::max(sizeof(configWLANInfo), std::max(sizeof(configList), sizeof(configEnd))) + 200;
+  CONSOLE_PRINTLN2("sizeof(configHead): ", (sizeof(configHead)));
   CONSOLE_PRINTLN2("sizeof(configWLANInfo): ", (sizeof(configWLANInfo)));
   CONSOLE_PRINTLN2("sizeof(configList): ", (sizeof(configList)));
   CONSOLE_PRINTLN2("sizeof(configEnd): ", (sizeof(configEnd)));
-  CONSOLE_PRINTLN2("sizeof(configEnd2): ", (sizeof(configEnd2)));
-  CONSOLE_PRINTLN2("page reserve size: ", (thisMany));
-  page.reserve(thisMany);
+  // Just do max on some of the visually larger HTML chunks that will be loaded
+  // into page and add a little for growth when substituting values in.
+  size_t thisMany = std::max(sizeof(configWLANInfo), sizeof(configList)) + 200;
+  CONSOLE_PRINTLN2("Estimate Minimum page reserve size: ", (thisMany));
+  page.reserve(std::max(kMaxChunkSize, thisMany));
 
   page = FPSTR(configPresetInput);
   /*
@@ -136,6 +156,7 @@ void handleWifi() {
     page.replace("{b}", String(WiFi.softAPmacAddress()));
     page.replace("{i}", WiFi.softAPIP().toString());
     page.replace("{a}", String(sta_cnt));
+    sendIfOver(page);
     if (sta_cnt) {
       page += String(F("\r\n<PRE>\r\n"));
       struct station_info *info = wifi_softap_get_station_info();
@@ -144,6 +165,7 @@ void handleWifi() {
         addr = info->ip;
         page += macToString(info->bssid) + F("  ") + addr.toString() + F("\r\n");
         info = STAILQ_NEXT(info, next);
+        sendIfOver(page);
       }
       page += F("</PRE>\r\n");
     }
@@ -153,9 +175,9 @@ void handleWifi() {
     Before we prepare a large block for sending, we call 'sendIfOver' with a
     threshold of 0 to force the sending of the current 'page' content.
   */
-  sendIfOver(page, 0);
 
   if (WiFi.localIP().isSet()) {
+    sendIfOver(page, 0);
     page += FPSTR(configWLANInfo);
     page.replace("{s}", String(ssid));
     page.replace("{b}", macToString(bssid));
@@ -167,13 +189,12 @@ void handleWifi() {
     page.replace("{m}", WiFi.subnetMask().toString());
     page.replace("{1}", WiFi.dnsIP(0).toString());
     page.replace("{2}", WiFi.dnsIP(1).toString());
-    sendIfOver(page, 0);
   } else {
-    page += FPSTR(configWLANOffline); //F("<br /><h2>WLAN - offline</h2>");
+    page += FPSTR(configWLANOffline);
   }
 
-  page += FPSTR(configList);
   sendIfOver(page, 0);
+  sendAsChunks_P(configList);
 
   CONSOLE_PRINTLN("scan start");
   int n = WiFi.scanNetworks();
@@ -191,13 +212,9 @@ void handleWifi() {
     }
   } else {
     page += FPSTR(configNoAPs);
-    sendIfOver(page);
   }
   sendIfOver(page, 0); // send what we have buffered before next direct send.
-
-  // No changes to this chunk, no need to use Strings class. Send asis.
-  server.sendContent_P(configEnd);
-  server.sendContent_P(configEnd2);
+  sendAsChunks_P(configEnd);
 
   CONSOLE_PRINTLN2("MAX String memory used: ", (maxPage));
   server.chunkedResponseFinalize();
