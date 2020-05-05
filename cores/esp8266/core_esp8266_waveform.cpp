@@ -55,7 +55,7 @@ constexpr int32_t DELTAIRQCCYS = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(3) >> 1 : microsecondsToClockCycles(3);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(3) / 2) >> 1 : microsecondsToClockCycles(3) / 2;
+  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
@@ -453,5 +453,4 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // 80MHz binaries in 160MHz boost (SDK) need NMI scaling
   // to maintain duty/idle ratio.
   T1L = CPU2X & 1 ? nextTimerCcys >> 1 : nextTimerCcys;
-  TEIE |= TEIE1; // Edge int enable
 }
