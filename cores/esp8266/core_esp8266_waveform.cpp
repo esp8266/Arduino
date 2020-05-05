@@ -47,10 +47,6 @@ extern "C" {
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
 
-// Set/clear GPIO 0-15 by bitmask
-#define SetGPIO(a) do { GPOS = a; } while (0)
-#define ClearGPIO(a) do { GPOC = a; } while (0)
-
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
   uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
@@ -128,21 +124,22 @@ static ICACHE_RAM_ATTR void forceTimerInterrupt() {
 constexpr int maxPWMs = 8;
 
 // PWM machine state
-typedef struct {
+typedef struct PWMState {
   uint32_t mask; // Bitmask of active pins
   uint32_t cnt;  // How many entries
   uint32_t idx;  // Where the state machine is along the list
   uint8_t  pin[maxPWMs + 1];
   uint32_t delta[maxPWMs + 1];
   uint32_t nextServiceCycle;  // Clock cycle for next step
+  struct PWMState *pwmUpdate; // Set by main code, cleared by ISR
 } PWMState;
 
 static PWMState pwmState;
-static PWMState *pwmUpdate = nullptr; // Set by main code, cleared by ISR
 uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
 
 
-
+// If there are no more scheduled activities, shut down Timer 1.
+// Otherwise, do nothing.
 static ICACHE_RAM_ATTR void disableIdleTimer() {
  if (timerRunning && !wvfState.waveformEnabled && !pwmState.cnt && !wvfState.timer1CB) {
     ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
@@ -152,8 +149,21 @@ static ICACHE_RAM_ATTR void disableIdleTimer() {
   }
 }
 
+// Notify the NMI that a new PWM state is available through the mailbox.
+// Wait for mailbox to be emptied (either busy or delay() as needed)
+static ICACHE_RAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
+  p->pwmUpdate = nullptr;
+  pwmState.pwmUpdate = p;
+  MEMBARRIER();
+  forceTimerInterrupt();
+  while (pwmState.pwmUpdate) {
+    if (idle) {
+      delay(0);
+    }
+    MEMBARRIER();
+  }
+}
 
-//#define ENABLE_ONLINECHANGE
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMPeriodCC(uint32_t cc) {
   if (cc == _pwmPeriod) {
@@ -162,33 +172,11 @@ void _setPWMPeriodCC(uint32_t cc) {
   if (pwmState.cnt) {
     PWMState p;  // The working copy since we can't edit the one in use
     p = pwmState;
-#ifdef ENABLE_ONLINECHANGE
-    // Adjust any running ones to the best of our abilities by scaling them
-    // Used FP math for speed and code size
-    uint64_t oldCC64p0 = ((uint64_t)_pwmPeriod);
-    uint64_t newCC64p16 = ((uint64_t)cc) << 16;
-    uint64_t ratio64p16 = (newCC64p16 / oldCC64p0);
-    uint32_t ttl = 0;
-    for (uint32_t i = 0; i < p.cnt; i++) {
-      uint64_t val64p16 = ((uint64_t)p.delta[i]) << 16;
-      uint64_t newVal64p32 = val64p16 * ratio64p16;
-      p.delta[i] = newVal64p32 >> 32;
-      ttl += p.delta[i];
-    }
-    p.delta[p.cnt] = cc - ttl; // Final cleanup exactly cc total cycles
-#else
     // Turn off all old PWMs
     p.mask = 0;
     p.cnt = 0;
-#endif
     // Update and wait for mailbox to be emptied
-    pwmUpdate = &p;
-    MEMBARRIER();
-    forceTimerInterrupt();
-    while (pwmUpdate) {
-      delay(0);
-      // No mem barrier.  The external function call guarantees it's re-read
-    }
+    _notifyPWM(&p, true);
   }
   _pwmPeriod = cc;
 }
@@ -215,7 +203,7 @@ static void _cleanAndRemovePWM(PWMState *p, int pin) {
 }
 
 
-// Called by analogWrite(0/100%) to disable PWM on a specific pin
+// Disable PWM on a specific pin (i.e. when a digitalWrite or analogWrite(0%/100%))
 ICACHE_RAM_ATTR bool _stopPWM(int pin) {
   if (!((1<<pin) & pwmState.mask)) {
     return false; // Pin not actually active
@@ -232,14 +220,8 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
     p.cnt = 0;
   }
 
- // Update and wait for mailbox to be emptied
-  pwmUpdate = &p;
-  MEMBARRIER();
-  forceTimerInterrupt();
-  while (pwmUpdate) {
-    MEMBARRIER();
-    /* Busy wait, could be in ISR */
-  }
+  // Update and wait for mailbox to be emptied, no delay (could be in ISR)
+  _notifyPWM(&p, false);
   // Possibly shut down the timer completely if we're done
   disableIdleTimer();
   return true;
@@ -284,13 +266,7 @@ bool _setPWM(int pin, uint32_t cc) {
   }
 
   // Set mailbox and wait for ISR to copy it over
-  pwmUpdate = &p;
-  MEMBARRIER();
-  initTimer();
-  forceTimerInterrupt();
-  while (pwmUpdate) {
-    delay(0);
-  }
+  _notifyPWM(&p, true);
   return true;
 }
 
@@ -360,10 +336,10 @@ void setTimer1Callback(uint32_t (*fn)()) {
 
 // Speed critical bits
 #pragma GCC optimize ("O2")
+
 // Normally would not want two copies like this, but due to different
 // optimization levels the inline attribute gets lost if we try the
 // other version.
-
 static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
   uint32_t ccount;
   __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
@@ -417,15 +393,6 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
-#define ENABLE_ADJUST   // Adjust takes 36 bytes
-#define ENABLE_FEEDBACK // Feedback costs 68 bytes
-#define ENABLE_PWM      // PWM takes 160 bytes
-
-#ifndef ENABLE_ADJUST
-  #undef adjust
-  #define adjust(x) (x)
-#endif
-
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Flag if the core is at 160 MHz, for use by adjust()
@@ -445,14 +412,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     wvfState.startPin = __builtin_ffs(wvfState.waveformEnabled) - 1;
     // Find the last bit by subtracting off GCC's count-leading-zeros (no offset in this one)
     wvfState.endPin = 32 - __builtin_clz(wvfState.waveformEnabled);
-#ifdef ENABLE_PWM
-  } else if (!pwmState.cnt && pwmUpdate) {
+  } else if (!pwmState.cnt && pwmState.pwmUpdate) {
     // Start up the PWM generator by copying from the mailbox
     pwmState.cnt = 1;
     pwmState.idx = 1; // Ensure copy this cycle, cause it to start at t=0
     pwmState.nextServiceCycle = GetCycleCountIRQ(); // Do it this loop!
     // No need for mem barrier here.  Global must be written by IRQ exit
-#endif
   }
 
   bool done = false;
@@ -460,17 +425,15 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     do {
       nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
 
-#ifdef ENABLE_PWM
       // PWM state machine implementation
       if (pwmState.cnt) {
         uint32_t now = GetCycleCountIRQ();
         int32_t cyclesToGo = pwmState.nextServiceCycle - now;
         if (cyclesToGo < 0) {
             if (pwmState.idx == pwmState.cnt) { // Start of pulses, possibly copy new
-                if (pwmUpdate) {
+                if (pwmState.pwmUpdate) {
                     // Do the memory copy from temp to global and clear mailbox
-                    pwmState = *(PWMState*)pwmUpdate;
-                    pwmUpdate = nullptr;
+                    pwmState = *(PWMState*)pwmState.pwmUpdate;
                 }
                 GPOS = pwmState.mask; // Set all active pins high
                 // GPIO16 isn't the same as the others
@@ -498,7 +461,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
         nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
       }
-#endif
 
       for (auto i = wvfState.startPin; i <= wvfState.endPin; i++) {
         uint32_t mask = 1<<i;
@@ -516,12 +478,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           int32_t expiryToGo = wave->expiryCycle - now;
           if (expiryToGo < 0) {
               // Done, remove!
-              wvfState.waveformEnabled &= ~mask;
               if (i == 16) {
                 GP16O = 0;
-              } else {
-                ClearGPIO(mask);
-              }
+              } 
+              GPOC = mask;
+              wvfState.waveformEnabled &= ~mask;
               continue;
             }
         }
@@ -536,9 +497,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           if (wvfState.waveformState & mask) {
             if (i == 16) {
               GP16O = 1; // GPIO16 write slow as it's RMW
-            } else {
-              SetGPIO(mask);
             }
+            GPOS = mask;
+
             if (wvfState.waveformToChange & mask) {
               // Copy over next full-cycle timings
               wave->timeHighCycles = wvfState.waveformNewHigh;
@@ -547,27 +508,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave->desiredLowCycles = wvfState.waveformNewLow;
               wvfState.waveformToChange = 0;
             } else {
-#ifdef ENABLE_FEEDBACK
               if (wave->lastEdge) {
                 desired = wave->desiredLowCycles;
                 timeToUpdate = &wave->timeLowCycles;
               }
             }
-#endif
             nextEdgeCycles = wave->timeHighCycles;
           } else {
             if (i == 16) {
               GP16O = 0; // GPIO16 write slow as it's RMW
-            } else {
-              ClearGPIO(mask);
             }
-#ifdef ENABLE_FEEDBACK
+            GPOC = mask;
             desired = wave->desiredHighCycles;
             timeToUpdate = &wave->timeHighCycles;
-#endif
             nextEdgeCycles = wave->timeLowCycles;
           }
-#ifdef ENABLE_FEEDBACK
           if (desired) {
             desired = adjust(desired);
             int32_t err = desired - (now - wave->lastEdge);
@@ -576,7 +531,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 *timeToUpdate += err;
             }
           }
-#endif
           nextEdgeCycles = adjust(nextEdgeCycles);
           wave->nextServiceCycle = now + nextEdgeCycles;
           nextEventCycles = min_u32(nextEventCycles, nextEdgeCycles);
