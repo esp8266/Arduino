@@ -7,10 +7,11 @@
   1. Creating a secure web server using ESP8266ESP8266WebServerSecure
   2. Use of HTTP authentication on this secure server
   3. A simple web interface to allow an authenticated user to change Credentials
-  4. Persisting those credentials through a reboot of the ESP by saving them to SPIFFS without storing them as plain text
+  4. Persisting those credentials through a reboot of the ESP by saving them to LittleFS without storing them as plain text
 */
 
 #include <FS.h>
+#include <LittleFS.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServerSecure.h>
 
@@ -23,8 +24,8 @@
 const char* ssid = STASSID;
 const char* wifi_pw = STAPSK;
 
-const String file_credentials = R"(/credentials.txt)"; //SPIFFS file name for the saved credentials
-const String change_creds =  "changecreds"; //address for a credential change
+const String file_credentials = R"(/credentials.txt)"; // LittleFS file name for the saved credentials
+const String change_creds =  "changecreds";            // Address for a credential change
 
 //The ESP8266WebServerSecure requires an encryption certificate and matching key.
 //These can generated with the bash script available in the ESP8266 Arduino repository.
@@ -83,7 +84,7 @@ gz5JWYhbD6c38khSzJb0pNXCo3EuYAVa36kDM96k1BtWuhRS10Q1VXk=
 
 ESP8266WebServerSecure server(443);
 
-//These are temporary credentials that will only be used if none are found saved in SPIFFS.
+//These are temporary credentials that will only be used if none are found saved in LittleFS.
 String login = "admin";
 const String realm = "global";
 String H1 = "";
@@ -92,9 +93,9 @@ String authentication_failed = "User authentication has failed.";
 void setup() {
   Serial.begin(115200);
 
-  //Initialize SPIFFS to save credentials
-  if(!SPIFFS.begin()){
-		Serial.println("SPIFFS initialization error, programmer flash configured?");
+  //Initialize LittleFS to save credentials
+  if(!LittleFS.begin()){
+		Serial.println("LittleFS initialization error, programmer flash configured?");
     ESP.restart();
 	}
 
@@ -187,16 +188,16 @@ void showcredentialpage(){
   server.send(200, "text/html", page);
 }
 
-//Saves credentials to SPIFFS
+//Saves credentials to LittleFS
 void savecredentials(String new_login, String new_password)
 {
   //Set global variables to new values
   login=new_login;
   H1=ESP8266WebServer::credentialHash(new_login,realm,new_password);
 
-  //Save new values to SPIFFS for loading on next reboot
+  //Save new values to LittleFS for loading on next reboot
   Serial.println("Saving credentials.");
-  File f=SPIFFS.open(file_credentials,"w"); //open as a brand new file, discard old contents
+  File f=LittleFS.open(file_credentials,"w"); //open as a brand new file, discard old contents
   if(f){
     Serial.println("Modifying credentials in file system.");
     f.println(login);
@@ -208,12 +209,12 @@ void savecredentials(String new_login, String new_password)
   Serial.println("Credentials saved.");
 }
 
-//loads credentials from SPIFFS
+//loads credentials from LittleFS
 void loadcredentials()
 {
   Serial.println("Searching for credentials.");
   File f;
-  f=SPIFFS.open(file_credentials,"r");
+  f=LittleFS.open(file_credentials,"r");
   if(f){
     Serial.println("Loading credentials from file system.");
     String mod=f.readString(); //read the file to a String

@@ -25,8 +25,8 @@
 
 // Select the FileSystem by uncommenting one of the lines below
 
-#define USE_SPIFFS
-//#define USE_LITTLEFS
+//#define USE_SPIFFS
+#define USE_LITTLEFS
 //#define USE_SDFS
 
 // Uncomment the following line to embed a version of the web page in the code
@@ -113,49 +113,6 @@ void replyBadRequest(String msg) {
 void replyServerError(String msg) {
   DBG_OUTPUT_PORT.println(msg);
   server.send(500, FPSTR(TEXT_PLAIN), msg + "\r\n");
-}
-
-String getContentType(String filename) {
-  if (filename.endsWith(".htm")) {
-    return "text/html";
-  }
-  if (filename.endsWith(".html")) {
-    return "text/html";
-  }
-  if (filename.endsWith(".css")) {
-    return "text/css";
-  }
-  if (filename.endsWith(".js")) {
-    return "application/javascript";
-  }
-  if (filename.endsWith(".png")) {
-    return "image/png";
-  }
-  if (filename.endsWith(".gif")) {
-    return "image/gif";
-  }
-  if (filename.endsWith(".jpg")) {
-    return "image/jpeg";
-  }
-  if (filename.endsWith(".jpeg")) {
-    return "image/jpeg";
-  }
-  if (filename.endsWith(".ico")) {
-    return "image/x-icon";
-  }
-  if (filename.endsWith(".xml")) {
-    return "text/xml";
-  }
-  if (filename.endsWith(".pdf")) {
-    return "application/x-pdf";
-  }
-  if (filename.endsWith(".zip")) {
-    return "application/x-zip";
-  }
-  if (filename.endsWith(".gz")) {
-    return "application/x-gzip";
-  }
-  return FPSTR(TEXT_PLAIN);
 }
 
 #ifdef USE_SPIFFS
@@ -304,7 +261,7 @@ bool handleFileRead(String path) {
   if (server.hasArg("download")) {
     contentType = F("application/octet-stream");
   } else {
-    contentType = getContentType(path);
+    contentType = mime::getContentType(path);
   }
 
   if (!fileSystem->exists(path)) {
