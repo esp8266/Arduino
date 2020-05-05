@@ -55,13 +55,11 @@ extern "C" {
 typedef struct {
   uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
   uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
-  uint32_t timeHighCycles;     // Currently running waveform period
+  uint32_t timeHighCycles;     // Actual running waveform period (adjusted using desiredCycles)
   uint32_t timeLowCycles;      //
-  uint32_t desiredHighCycles;     // Currently running waveform period
-  uint32_t desiredLowCycles;      //
-  uint32_t gotoTimeHighCycles; // Copied over on the next period to preserve phase
-  uint32_t gotoTimeLowCycles;  //
-  uint32_t lastEdge; //
+  uint32_t desiredHighCycles;  // Ideal waveform period to drive the error signal
+  uint32_t desiredLowCycles;   //
+  uint32_t lastEdge;           // Cycle when this generator last changed
 } Waveform;
 
 class WVFState {
@@ -74,7 +72,7 @@ public:
   uint32_t waveformToEnable = 0;  // Message to the NMI handler to start a waveform on a inactive pin
   uint32_t waveformToDisable = 0; // Message to the NMI handler to disable a pin from waveform generation
 
-  int32_t waveformToChange = -1;
+  uint32_t waveformToChange = 0; // Mask of pin to change. One bit set in main app, cleared when effected in the NMI
   uint32_t waveformNewHigh = 0;
   uint32_t waveformNewLow = 0;
 
@@ -83,8 +81,8 @@ public:
   // Optimize the NMI inner loop by keeping track of the min and max GPIO that we
   // are generating.  In the common case (1 PWM) these may be the same pin and
   // we can avoid looking at the other pins.
-  int startPin = 0;
-  int endPin = 0;
+  uint16_t startPin = 0;
+  uint16_t endPin = 0;
 };
 static WVFState wvfState;
 
@@ -318,22 +316,22 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
   uint32_t mask = 1<<pin;
   MEMBARRIER();
   if (wvfState.waveformEnabled & mask) {
-    wvfState.waveformNewHigh = timeHighCycles;
-    wvfState.waveformNewLow = timeLowCycles;
-    MEMBARRIER();
-    wvfState.waveformToChange = pin;
-    while (wvfState.waveformToChange >= 0) {
+    // Make sure no waveform changes are waiting to be applied
+    while (wvfState.waveformToChange) {
       delay(0); // Wait for waveform to update
       // No mem barrier here, the call to a global function implies global state updated
     }
+    wvfState.waveformNewHigh = timeHighCycles;
+    wvfState.waveformNewLow = timeLowCycles;
+    MEMBARRIER();
+    wvfState.waveformToChange = mask;
+    // The waveform will be updated some time in the future on the next period for the signal
   } else { //  if (!(wvfState.waveformEnabled & mask)) {
     wave->timeHighCycles = timeHighCycles;
     wave->timeLowCycles = timeLowCycles;
     wave->desiredHighCycles = wave->timeHighCycles;
     wave->desiredLowCycles = wave->timeLowCycles;
     wave->lastEdge = 0;
-    wave->gotoTimeHighCycles = wave->timeHighCycles;
-    wave->gotoTimeLowCycles = wave->timeLowCycles;    // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = ESP.getCycleCount() + microsecondsToClockCycles(1);
     wvfState.waveformToEnable |= mask;
     MEMBARRIER();
@@ -387,8 +385,13 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   }
   // If user sends in a pin >16 but <32, this will always point to a 0 bit
   // If they send >=32, then the shift will result in 0 and it will also return false
-  if (wvfState.waveformEnabled & (1UL << pin)) {
-    wvfState.waveformToDisable = 1UL << pin;
+  uint32_t mask = 1<<pin;
+  if (wvfState.waveformEnabled & mask) {
+    wvfState.waveformToDisable = mask;
+    // Cancel any pending updates for this waveform, too.
+    if (wvfState.waveformToChange & mask) {
+        wvfState.waveformToChange = 0;
+    }
     forceTimerInterrupt();
     while (wvfState.waveformToDisable) {
       MEMBARRIER(); // If it wasn't written yet, it has to be by now
@@ -450,11 +453,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     pwmState.nextServiceCycle = GetCycleCountIRQ(); // Do it this loop!
     // No need for mem barrier here.  Global must be written by IRQ exit
 #endif
-  } else if (wvfState.waveformToChange >= 0) {
-    wvfState.waveform[wvfState.waveformToChange].gotoTimeHighCycles = wvfState.waveformNewHigh;
-    wvfState.waveform[wvfState.waveformToChange].gotoTimeLowCycles = wvfState.waveformNewLow;
-    wvfState.waveformToChange = -1;
-    // No need for memory barrier here.  The global has to be written before exit the ISR.
   }
 
   bool done = false;
@@ -541,13 +539,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             } else {
               SetGPIO(mask);
             }
-            if (wave->gotoTimeHighCycles) {
+            if (wvfState.waveformToChange & mask) {
               // Copy over next full-cycle timings
-              wave->timeHighCycles = wave->gotoTimeHighCycles;
-              wave->desiredHighCycles = wave->gotoTimeHighCycles;
-              wave->timeLowCycles = wave->gotoTimeLowCycles;
-              wave->desiredLowCycles = wave->gotoTimeLowCycles;
-              wave->gotoTimeHighCycles = 0;
+              wave->timeHighCycles = wvfState.waveformNewHigh;
+              wave->desiredHighCycles = wvfState.waveformNewHigh;
+              wave->timeLowCycles = wvfState.waveformNewLow;
+              wave->desiredLowCycles = wvfState.waveformNewLow;
+              wvfState.waveformToChange = 0;
             } else {
 #ifdef ENABLE_FEEDBACK
               if (wave->lastEdge) {
