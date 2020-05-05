@@ -93,7 +93,7 @@ static WVFState wvfState;
 static ICACHE_RAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
 
-static void initTimer() {
+static __attribute__((noinline)) void initTimer() {
   if (!timerRunning) {
     timer1_disable();
     ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
@@ -176,7 +176,9 @@ void _setPWMPeriodCC(uint32_t cc) {
     p.mask = 0;
     p.cnt = 0;
     // Update and wait for mailbox to be emptied
+    initTimer();
     _notifyPWM(&p, true);
+    disableIdleTimer();
   }
   _pwmPeriod = cc;
 }
@@ -266,6 +268,7 @@ bool _setPWM(int pin, uint32_t cc) {
   p.mask |= 1<<pin;
 
   // Set mailbox and wait for ISR to copy it over
+  initTimer();
   _notifyPWM(&p, true);
   return true;
 }
