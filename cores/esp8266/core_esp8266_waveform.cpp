@@ -341,7 +341,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             const bool endOfPeriod = wave.nextPeriodCcy == wave.endDutyCcy;
             // active configuration and forward 100% duty
             if (!idleCcys) {
-              wave.nextPeriodCcy += fwdPeriodCcys + wave.periodCcys;
+              wave.nextPeriodCcy += fwdPeriodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
               nextEdgeCcy = wave.nextPeriodCcy;
             }
