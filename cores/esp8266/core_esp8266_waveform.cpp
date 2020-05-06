@@ -57,10 +57,6 @@ constexpr int32_t DELTAIRQCCYS = clockCyclesPerMicrosecond() == 160 ?
 constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 
-// Set/clear GPIO 0-15 by bitmask
-#define SetGPIO(a) do { GPOS = a; } while (0)
-#define ClearGPIO(a) do { GPOC = a; } while (0)
-
 // for INFINITE, the NMI proceeds on the waveform without expiry deadline.
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
 // for UPDATEEXPIRY, the NMI recomputes the exact expiry ccy and transitions to EXPIRES.
@@ -184,10 +180,10 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     if (!wave.dutyCcys) {
       // If initially at zero duty cycle, force GPIO off
       if (pin == 16) {
-        GP16O &= ~1; // GPIO16 write slow as it's RMW
+        GP16O = 0;
       }
       else {
-        ClearGPIO(1UL << pin);
+        GPOC = 1UL << pin;
       }
     }
     std::atomic_thread_fence(std::memory_order_release);
@@ -373,10 +369,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveform.states ^= 1UL << pin;
               nextEdgeCcy = wave.nextPeriodCcy;
               if (pin == 16) {
-                GP16O &= ~1; // GPIO16 write slow as it's RMW
+                GP16O = 0;
               }
               else {
-                ClearGPIO(1UL << pin);
+                GPOC = 1UL << pin;
               }
             }
           }
@@ -400,10 +396,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                   wave.expiryCcy += fwdPeriodCcys;
               }
               if (pin == 16) {
-                GP16O |= 1; // GPIO16 write slow as it's RMW
+                GP16O = 1;
               }
               else {
-                SetGPIO(1UL << pin);
+                GPOS = 1UL << pin;
               }
             }
             nextEdgeCcy = wave.endDutyCcy;
