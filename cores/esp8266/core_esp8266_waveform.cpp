@@ -331,20 +331,20 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           const uint32_t overshootCcys = now - ((waveform.states & (1UL << pin)) ? wave.endDutyCcy : wave.nextPeriodCcy);
           const uint32_t fwdPeriods = static_cast<uint32_t>(overshootCcys) >= idleCcys ?
             ((overshootCcys + wave.dutyCcys) / wave.periodCcys) : 0;
-          const uint32_t fwdPeriodCcys = fwdPeriods * wave.periodCcys;
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
             // up to and including this period 100% duty
             const bool endOfPeriod = wave.nextPeriodCcy == wave.endDutyCcy;
             // active configuration and forward 100% duty
             if (!idleCcys) {
-              wave.nextPeriodCcy += fwdPeriodCcys;
+              wave.nextPeriodCcy += fwdPeriods * wave.periodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
               nextEdgeCcy = wave.nextPeriodCcy;
             }
             else if (endOfPeriod) {
               // preceeding period had zero idle cycle, continue direct into new duty cycle
-              if (fwdPeriods) {
+              if (fwdPeriods >= 2) {
+                const uint32_t fwdPeriodCcys = (fwdPeriods - 1) * wave.periodCcys;
                 wave.nextPeriodCcy += fwdPeriodCcys;
                 // adapt expiry such that it occurs during intended cycle
                 if (WaveformMode::EXPIRES == wave.mode)
@@ -379,7 +379,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           }
           else {
             if (!wave.dutyCcys) {
-              wave.nextPeriodCcy += fwdPeriodCcys + wave.periodCcys;
+              wave.nextPeriodCcy += (fwdPeriods + 1) * wave.periodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
@@ -387,6 +387,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += wave.periodCcys;
               wave.endDutyCcy = now + wave.dutyCcys;
               if (fwdPeriods) {
+                const uint32_t fwdPeriodCcys = fwdPeriods * wave.periodCcys;
                 wave.nextPeriodCcy += fwdPeriodCcys;
                 if (wave.autoPwm) {
                   // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
