@@ -188,6 +188,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     }
     std::atomic_thread_fence(std::memory_order_release);
     waveform.toSet = pin;
+    std::atomic_thread_fence(std::memory_order_release);
     if (!waveform.timer1Running) {
       initTimer();
     }
@@ -225,11 +226,11 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   std::atomic_thread_fence(std::memory_order_acquire);
   if (waveform.enabled & (1UL << pin)) {
     waveform.toDisable = pin;
+    std::atomic_thread_fence(std::memory_order_release);
     // Must not interfere if Timer is due shortly
     if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
       timer1_write((clockCyclesPerMicrosecond() == 160) ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
     }
-    std::atomic_thread_fence(std::memory_order_acq_rel);
     while (waveform.toDisable >= 0) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
       std::atomic_thread_fence(std::memory_order_acquire);
@@ -411,7 +412,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
       }
 
-      if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > 0) {
+      // join events below performance threshold apart
+      if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > IRQLATENCYCCYS) {
         waveform.nextEventCcy = wave.nextEventCcy;
         waveform.nextPin = pin;
       }
