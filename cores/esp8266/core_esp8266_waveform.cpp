@@ -560,7 +560,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
   T1L = nextEventCycles >> (turbo ? 1 : 0);
-  TEIE |= TEIE1; // Edge int enable
 }
 
 };
