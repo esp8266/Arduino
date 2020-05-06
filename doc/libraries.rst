@@ -25,7 +25,7 @@ This is a bit different from standard EEPROM class. You need to call ``EEPROM.be
 
 ``EEPROM.write`` does not write to flash immediately, instead you must call ``EEPROM.commit()`` whenever you wish to save changes to flash. ``EEPROM.end()`` will also commit, and will release the RAM copy of EEPROM contents.
 
-EEPROM library uses one sector of flash located just after the SPIFFS.
+EEPROM library uses one sector of flash located just after the embedded filesystem.
 
 `Three examples <https://github.com/esp8266/Arduino/tree/master/libraries/EEPROM>`__  included.
 

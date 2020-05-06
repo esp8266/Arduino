@@ -226,7 +226,7 @@ bool MDNSResponder::_allocUDPContext(void)
         m_pUDPContext = new UdpContext;
         m_pUDPContext->ref();
 
-        if (m_pUDPContext->listen(&m_netif->ip_addr, DNS_MQUERY_PORT))
+        if (m_pUDPContext->listen(IP4_ADDR_ANY, DNS_MQUERY_PORT))
         {
             m_pUDPContext->setMulticastTTL(MDNS_MULTICAST_TTL);
             m_pUDPContext->onRx(std::bind(&MDNSResponder::_callProcess, this));

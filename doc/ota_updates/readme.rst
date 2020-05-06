@@ -360,7 +360,7 @@ If this is the case, then most likely ESP module has not been reset after initia
 The most common causes of OTA failure are as follows:
 
 - not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA).
-- too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process-memory-view>`__.
+- too much memory declared for the filesystem so new sketch will not fit between existing sketch and the filesystem – see `Update process - memory view <#update-process-memory-view>`__.
 - too little memory declared in Arduino IDE for your selected board (i.e. less than physical size).
 - not resetting the ESP module after initial upload using serial port.
 

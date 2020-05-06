@@ -88,7 +88,10 @@ uart_do_write_char(const int uart_nr, char c)
 		}
 		else
 		{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
 			write(uart_nr + 1, &c, 1);
+#pragma GCC diagnostic pop
 			w = true;
 		}
 	}
