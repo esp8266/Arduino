@@ -190,7 +190,7 @@ int copy_raw(const uint32_t src_addr,
     return 0;
 }
 
-#define XMC_SUPPORT
+//#define XMC_SUPPORT
 #ifdef XMC_SUPPORT
 // Define a few SPI0 registers we need access to
 #define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
