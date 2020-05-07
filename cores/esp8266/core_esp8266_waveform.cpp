@@ -164,23 +164,31 @@ static ICACHE_RAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
   }
 }
 
+static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range);
+
 // Called when analogWriteFreq() changed to update the PWM total period
-void _setPWMPeriodCC(uint32_t cc) {
+void _setPWMFreq(uint32_t freq) {
+  // Convert frequency into clock cycles
+  uint32_t cc = microsecondsToClockCycles(1000000UL) / freq;
+
   if (cc == _pwmPeriod) {
-    return;
+    return; // No change
   }
+
+  _pwmPeriod = cc;
+
   if (pwmState.cnt) {
     PWMState p;  // The working copy since we can't edit the one in use
-    p = pwmState;
-    // Turn off all old PWMs
-    p.mask = 0;
     p.cnt = 0;
+    for (uint32_t i = 0; i < pwmState.cnt; i++) {
+      auto pin = pwmState.pin[i];
+      _addPWMtoList(p, pin, wvfState.waveform[pin].desiredHighCycles, wvfState.waveform[pin].desiredLowCycles);
+    }
     // Update and wait for mailbox to be emptied
     initTimer();
     _notifyPWM(&p, true);
     disableIdleTimer();
   }
-  _pwmPeriod = cc;
 }
 
 // Helper routine to remove an entry from the state machine
@@ -229,16 +237,25 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
   return true;
 }
 
-// Called by analogWrite(1...99%) to set the PWM duty in clock cycles
-bool _setPWM(int pin, uint32_t cc) {
-  stopWaveform(pin);
-  PWMState p;  // Working copy
-  p = pwmState;
-  // Get rid of any entries for this pin
-  _cleanAndRemovePWM(&p, pin);
-  // And add it to the list, in order
-  if (p.cnt >= maxPWMs) {
-    return false; // No space left
+static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range) {
+  // Stash the val and range so we can re-evaluate the fraction
+  // should the user change PWM frequency.  This allows us to
+  // give as great a precision as possible.  We know by construction
+  // that the waveform for this pin will be inactive so we can borrow
+  // memory from that structure.
+  wvfState.waveform[pin].desiredHighCycles = val;  // Numerator == high
+  wvfState.waveform[pin].desiredLowCycles = range; // Denominator == low
+
+  uint32_t cc = (_pwmPeriod * val) / range;
+
+  if (cc == 0) {
+    _stopPWM(pin);
+    digitalWrite(pin, HIGH);
+    return;
+  } else if (cc >= _pwmPeriod) {
+    _stopPWM(pin);
+    digitalWrite(pin, LOW);
+    return;
   }
 
   if (p.cnt == 0) {
@@ -266,10 +283,26 @@ bool _setPWM(int pin, uint32_t cc) {
   }
   p.cnt++;
   p.mask |= 1<<pin;
+}
+
+// Called by analogWrite(1...99%) to set the PWM duty in clock cycles
+bool _setPWM(int pin, uint32_t val, uint32_t range) {
+  stopWaveform(pin);
+  PWMState p;  // Working copy
+  p = pwmState;
+  // Get rid of any entries for this pin
+  _cleanAndRemovePWM(&p, pin);
+  // And add it to the list, in order
+  if (p.cnt >= maxPWMs) {
+    return false; // No space left
+  }
+
+  _addPWMtoList(p, pin, val, range);
 
   // Set mailbox and wait for ISR to copy it over
   initTimer();
   _notifyPWM(&p, true);
+  disableIdleTimer();
   return true;
 }
 
