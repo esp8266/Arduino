@@ -161,8 +161,8 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
     static_cast<int32_t>(periodCcys) <= 0 ||
-    (periodCcys >> 6) == 0 ||
-    highCcys > periodCcys) {
+    static_cast<int32_t>(highCcys) < 0 || static_cast<int32_t>(lowCcys) < 0 ||
+    (periodCcys >> 6) == 0) {
     return false;
   }
   Waveform& wave = waveform.pins[pin];
@@ -313,6 +313,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       now = ESP.getCycleCount();
     } while (static_cast<int32_t>(waveform.nextEventCcy - now) > 0);
     waveform.nextEventCcy = now + MAXIRQTICKSCCYS;
+
     do {
       // If it's not on, ignore
       if (!(waveform.enabled & (1UL << pin)))
@@ -320,39 +321,33 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       Waveform& wave = waveform.pins[pin];
 
-      if (static_cast<int32_t>(now - wave.nextEventCcy) >= 0) {
+      const uint32_t overshootCcys = now - wave.nextEventCcy;
+      if (static_cast<int32_t>(overshootCcys) >= 0) {
         if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
           // Disable any waveforms that are done
           waveform.enabled ^= 1UL << pin;
         }
         else {
-          const uint32_t idleCcys = wave.periodCcys - wave.dutyCcys;
-          // get true accumulated overshoot, guaranteed >= 0 in this spot
-          const uint32_t overshootCcys = now - ((waveform.states & (1UL << pin)) ? wave.endDutyCcy : wave.nextPeriodCcy);
-          const uint32_t fwdPeriods = static_cast<uint32_t>(overshootCcys) >= idleCcys ?
-            ((overshootCcys + wave.dutyCcys) / wave.periodCcys) : 0;
+          const uint32_t fwdPeriods = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
-            // up to and including this period 100% duty
-            const bool endOfPeriod = wave.nextPeriodCcy == wave.endDutyCcy;
-            // active configuration and forward 100% duty
-            if (!idleCcys) {
-              wave.nextPeriodCcy += fwdPeriods * wave.periodCcys;
-              wave.endDutyCcy = wave.nextPeriodCcy;
-              nextEdgeCcy = wave.nextPeriodCcy;
+            // active configuration and forward are 100% duty
+            if (wave.periodCcys == wave.dutyCcys) {
+              wave.nextPeriodCcy += wave.periodCcys;
+              nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
-            else if (endOfPeriod) {
-              // preceeding period had zero idle cycle, continue direct into new duty cycle
-              if (fwdPeriods >= 2) {
+            else if (wave.nextPeriodCcy == wave.endDutyCcy) {
+              // preceeding period had zero idle cycle, continue directly into new duty cycle
+              if (fwdPeriods > 1) {
                 const uint32_t fwdPeriodCcys = (fwdPeriods - 1) * wave.periodCcys;
                 wave.nextPeriodCcy += fwdPeriodCcys;
                 // adapt expiry such that it occurs during intended cycle
-                if (WaveformMode::EXPIRES == wave.mode)
+                if (WaveformMode::EXPIRES == wave.mode) {
                   wave.expiryCcy += fwdPeriodCcys;
+                }
               }
-              wave.endDutyCcy = wave.nextPeriodCcy + wave.dutyCcys;
+              nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy + wave.dutyCcys;
               wave.nextPeriodCcy += wave.periodCcys;
-              nextEdgeCcy = wave.endDutyCcy;
             }
             else if (wave.autoPwm &&
               overshootCcys >= (wave.periodCcys >> 6) &&
@@ -367,9 +362,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               nextEdgeCcy = wave.endDutyCcy + adjPeriods * wave.dutyCcys;
             }
             else {
-              waveform.states ^= 1UL << pin;
               nextEdgeCcy = wave.nextPeriodCcy;
-              if (pin == 16) {
+              waveform.states &= ~(1UL << pin);
+              if (16 == pin) {
                 GP16O = 0;
               }
               else {
@@ -379,11 +374,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           }
           else {
             if (!wave.dutyCcys) {
-              wave.nextPeriodCcy += (fwdPeriods + 1) * wave.periodCcys;
+              wave.nextPeriodCcy += wave.periodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
-              waveform.states ^= 1UL << pin;
               wave.nextPeriodCcy += wave.periodCcys;
               wave.endDutyCcy = now + wave.dutyCcys;
               if (fwdPeriods) {
@@ -397,7 +391,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 if (WaveformMode::EXPIRES == wave.mode)
                   wave.expiryCcy += fwdPeriodCcys;
               }
-              if (pin == 16) {
+              waveform.states |= 1UL << pin;
+              if (16 == pin) {
                 GP16O = 1;
               }
               else {
