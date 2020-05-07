@@ -1,5 +1,5 @@
 /*
-    LEAmDNS2_Host_Debug.h
+    LEAmDNS2Host_Debug.h
 
     License (MIT license):
       Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,88 +22,70 @@
 
 */
 
-//#include <arch/cc.h>
-//#include <sys/time.h>
-//#include <HardwareSerial.h>
-//#include <IPAddress.h>
-//#include <lwip/ip_addr.h>
-//#include <lwip/netif.h>
-//#include <WString.h>
-//#include <cstdint>
-
-/*
-    ESP8266mDNS Control.cpp
-*/
-
-extern "C" {
-    //#include "user_interface.h"
-}
-
-#include "LEAmDNS2_lwIPdefs.h"
-#include "LEAmDNS2_Priv.h"
-
-#ifdef MDNS_IPV4_SUPPORT
-//#include <lwip/igmp.h>
-#endif
-#ifdef MDNS_IPV6_SUPPORT
-//#include <lwip/mld6.h>
-#endif
+#include "LEAmDNS2Host.h"
 
 
 namespace esp8266
 {
 
-/*
-    LEAmDNS
-*/
+
 namespace experimental
 {
+
 
 #ifdef DEBUG_ESP_MDNS_RESPONDER
 
 /*
-    MDNSResponder::clsHost::_DH
+    clsLEAmDNS2_Host::_DH
+
 */
-const char* MDNSResponder::clsHost::_DH(const MDNSResponder::clsHost::stcService* p_pMDNSService /*= 0*/) const
+const char* clsLEAMDNSHost::_DH(const clsLEAMDNSHost::clsService* p_pService /*= 0*/) const
 {
     static char acBuffer[16 + 64];
 
     *acBuffer = 0;
-    if (p_pMDNSService)
+    if (m_pNetIf)
     {
-        sprintf_P(acBuffer, PSTR("[MDNSResponder (%c%c%u)->%s]"), m_rNetIf.name[0], m_rNetIf.name[1], m_rNetIf.num, _service2String(p_pMDNSService));
+        sprintf_P(acBuffer, PSTR("[mDNS %c%c%u]"), m_pNetIf->name[0], m_pNetIf->name[1], m_pNetIf->num);
+        if (p_pService)
+        {
+            strcat_P(acBuffer, PSTR(">"));
+            strcat(acBuffer, _service2String(p_pService));
+        }
     }
     else
     {
-        sprintf_P(acBuffer, PSTR("[MDNSResponder (%c%c%u)]"), m_rNetIf.name[0], m_rNetIf.name[1], m_rNetIf.num);
+        strcpy_P(acBuffer, PSTR("[mDNS]"));
     }
     return acBuffer;
 }
 
 /*
-    MDNSResponder::clsHost::_service2String
+    clsLEAmDNS2_Host::_service2String
+
 */
-const char* MDNSResponder::clsHost::_service2String(const MDNSResponder::clsHost::stcService* p_pMDNSService) const
+const char* clsLEAMDNSHost::_service2String(const clsLEAMDNSHost::clsService* p_pService) const
 {
     static  char acBuffer[64];
 
     *acBuffer = 0;
-    if (p_pMDNSService)
+    if (p_pService)
     {
         sprintf_P(acBuffer, PSTR("%s.%s%s.%s%s.local"),
-                  (p_pMDNSService->m_pcName ? : "-"),
-                  (p_pMDNSService->m_pcServiceType ? ('_' == *(p_pMDNSService->m_pcServiceType) ? "" : "_") : "-"),
-                  (p_pMDNSService->m_pcServiceType ? : "-"),
-                  (p_pMDNSService->m_pcProtocol ? ('_' == *(p_pMDNSService->m_pcProtocol) ? "" : "_") : "-"),
-                  (p_pMDNSService->m_pcProtocol ? : "-"));
+                  (p_pService->m_pcInstanceName ? : "-"),
+                  (p_pService->m_pcType ? ('_' == *(p_pService->m_pcType) ? "" : "_") : "-"),
+                  (p_pService->m_pcType ? : "-"),
+                  (p_pService->m_pcProtocol ? ('_' == *(p_pService->m_pcProtocol) ? "" : "_") : "-"),
+                  (p_pService->m_pcProtocol ? : "-"));
     }
     return acBuffer;
 }
 
 /*
-    MDNSResponder::clsHost::_printRRDomain
+    clsLEAmDNS2_Host::_printRRDomain
+
 */
-bool MDNSResponder::clsHost::_printRRDomain(const MDNSResponder::clsHost::stcRRDomain& p_RRDomain) const
+bool clsLEAMDNSHost::_printRRDomain(const clsLEAMDNSHost::clsRRDomain& p_RRDomain) const
 {
     //DEBUG_OUTPUT.printf_P(PSTR("Domain: "));
 
@@ -134,9 +116,10 @@ bool MDNSResponder::clsHost::_printRRDomain(const MDNSResponder::clsHost::stcRRD
 }
 
 /*
-    MDNSResponder::clsHost::_printRRAnswer
+    clsLEAmDNS2_Host::_printRRAnswer
+
 */
-bool MDNSResponder::clsHost::_printRRAnswer(const MDNSResponder::clsHost::stcRRAnswer& p_RRAnswer) const
+bool clsLEAMDNSHost::_printRRAnswer(const clsLEAMDNSHost::clsRRAnswer& p_RRAnswer) const
 {
     DEBUG_OUTPUT.printf_P(PSTR("%s RRAnswer: "), _DH());
     _printRRDomain(p_RRAnswer.m_Header.m_Domain);
@@ -145,20 +128,20 @@ bool MDNSResponder::clsHost::_printRRAnswer(const MDNSResponder::clsHost::stcRRA
     {
 #ifdef MDNS_IPV4_SUPPORT
     case DNS_RRTYPE_A:
-        DEBUG_OUTPUT.printf_P(PSTR("A IP:%s"), ((const stcRRAnswerA*)&p_RRAnswer)->m_IPAddress.toString().c_str());
+        DEBUG_OUTPUT.printf_P(PSTR("A IP:%s"), ((const clsRRAnswerA*)&p_RRAnswer)->m_IPAddress.toString().c_str());
         break;
 #endif
     case DNS_RRTYPE_PTR:
         DEBUG_OUTPUT.printf_P(PSTR("PTR "));
-        _printRRDomain(((const stcRRAnswerPTR*)&p_RRAnswer)->m_PTRDomain);
+        _printRRDomain(((const clsRRAnswerPTR*)&p_RRAnswer)->m_PTRDomain);
         break;
     case DNS_RRTYPE_TXT:
     {
-        size_t  stTxtLength = ((const stcRRAnswerTXT*)&p_RRAnswer)->m_Txts.c_strLength();
+        size_t  stTxtLength = ((const clsRRAnswerTXT*)&p_RRAnswer)->m_Txts.c_strLength();
         char*   pTxts = new char[stTxtLength];
         if (pTxts)
         {
-            ((/*const c_str()!!*/stcRRAnswerTXT*)&p_RRAnswer)->m_Txts.c_str(pTxts);
+            ((/*const c_str()!!*/clsRRAnswerTXT*)&p_RRAnswer)->m_Txts.c_str(pTxts);
             DEBUG_OUTPUT.printf_P(PSTR("TXT(%u) %s"), stTxtLength, pTxts);
             delete[] pTxts;
         }
@@ -166,12 +149,12 @@ bool MDNSResponder::clsHost::_printRRAnswer(const MDNSResponder::clsHost::stcRRA
     }
 #ifdef MDNS_IPV6_SUPPORT
     case DNS_RRTYPE_AAAA:
-        DEBUG_OUTPUT.printf_P(PSTR("AAAA IP:%s"), ((stcRRAnswerAAAA*&)p_RRAnswer)->m_IPAddress.toString().c_str());
+        DEBUG_OUTPUT.printf_P(PSTR("AAAA IP:%s"), ((clsRRAnswerAAAA*&)p_RRAnswer)->m_IPAddress.toString().c_str());
         break;
 #endif
     case DNS_RRTYPE_SRV:
-        DEBUG_OUTPUT.printf_P(PSTR("SRV Port:%u "), ((const stcRRAnswerSRV*)&p_RRAnswer)->m_u16Port);
-        _printRRDomain(((const stcRRAnswerSRV*)&p_RRAnswer)->m_SRVDomain);
+        DEBUG_OUTPUT.printf_P(PSTR("SRV Port:%u "), ((const clsRRAnswerSRV*)&p_RRAnswer)->m_u16Port);
+        _printRRDomain(((const clsRRAnswerSRV*)&p_RRAnswer)->m_SRVDomain);
         break;
     default:
         DEBUG_OUTPUT.printf_P(PSTR("generic "));
@@ -183,33 +166,38 @@ bool MDNSResponder::clsHost::_printRRAnswer(const MDNSResponder::clsHost::stcRRA
 }
 
 /*
-    MDNSResponder::clsHost::_RRType2Name
+    clsLEAmDNS2_Host::_RRType2Name
+
 */
-const char* MDNSResponder::clsHost::_RRType2Name(uint16_t p_u16RRType) const
+const char* clsLEAMDNSHost::_RRType2Name(uint16_t p_u16RRType) const
 {
     static char acRRName[16];
     *acRRName = 0;
 
     switch (p_u16RRType & (~0x8000))    // Topmost bit might carry 'cache flush' flag
     {
-    case DNS_RRTYPE_A:      strcpy(acRRName, "A");      break;
-    case DNS_RRTYPE_PTR:    strcpy(acRRName, "PTR");    break;
-    case DNS_RRTYPE_TXT:    strcpy(acRRName, "TXT");    break;
-    case DNS_RRTYPE_AAAA:   strcpy(acRRName, "AAAA");   break;
-    case DNS_RRTYPE_SRV:    strcpy(acRRName, "SRV");    break;
-    case DNS_RRTYPE_NSEC:   strcpy(acRRName, "NSEC");   break;
-    case DNS_RRTYPE_ANY:    strcpy(acRRName, "ANY");    break;
-    default:
-        sprintf(acRRName, "Unknown(0x%04X)", p_u16RRType);  // MAX 15!
+#ifdef MDNS_IPV4_SUPPORT
+    case DNS_RRTYPE_A:              strcpy(acRRName, "A");      break;
+#endif
+    case DNS_RRTYPE_PTR:            strcpy(acRRName, "PTR");    break;
+    case DNS_RRTYPE_TXT:            strcpy(acRRName, "TXT");    break;
+#ifdef MDNS_IPV6_SUPPORT
+    case DNS_RRTYPE_AAAA:           strcpy(acRRName, "AAAA");   break;
+#endif
+    case DNS_RRTYPE_SRV:            strcpy(acRRName, "SRV");    break;
+    case clsConsts::u8DNS_RRTYPE_NSEC: strcpy(acRRName, "NSEC");   break;
+    case DNS_RRTYPE_ANY:            strcpy(acRRName, "ANY");    break;
+    default:                        sprintf(acRRName, "Unknown(0x%04X)", p_u16RRType);  // MAX 15!
     }
     return acRRName;
 }
 
 /*
-    MDNSResponder::clsHost::_RRClass2String
+    clsLEAmDNS2_Host::_RRClass2String
+
 */
-const char* MDNSResponder::clsHost::_RRClass2String(uint16_t p_u16RRClass,
-                                                    bool p_bIsQuery) const
+const char* clsLEAMDNSHost::_RRClass2String(uint16_t p_u16RRClass,
+                                            bool p_bIsQuery) const
 {
     static char acClassString[16];
     *acClassString = 0;
@@ -227,9 +215,10 @@ const char* MDNSResponder::clsHost::_RRClass2String(uint16_t p_u16RRClass,
 }
 
 /*
-    MDNSResponder::clsHost::_replyFlags2String
+    clsLEAmDNS2_Host::_replyFlags2String
+
 */
-const char* MDNSResponder::clsHost::_replyFlags2String(uint32_t p_u32ReplyFlags) const
+const char* clsLEAMDNSHost::_replyFlags2String(uint32_t p_u32ReplyFlags) const
 {
     static char acFlagsString[64];
 
@@ -276,29 +265,41 @@ const char* MDNSResponder::clsHost::_replyFlags2String(uint32_t p_u32ReplyFlags)
         strcpy(acFlagsString, "none");
     }
 
+    // Remove trailing spaces
+    while ((*acFlagsString) &&
+           (' '  == acFlagsString[strlen(acFlagsString) - 1]))
+    {
+        acFlagsString[strlen(acFlagsString) - 1] = 0;
+    }
+
     return acFlagsString;                                                                           // 63
 }
 
 /*
-    MDNSResponder::clsHost::_NSECBitmap2String
+    clsLEAmDNS2_Host::_NSECBitmap2String
+
 */
-const char* MDNSResponder::clsHost::_NSECBitmap2String(const stcNSECBitmap* p_pNSECBitmap) const
+const char* clsLEAMDNSHost::_NSECBitmap2String(const clsNSECBitmap* p_pNSECBitmap) const
 {
     static char acFlagsString[32];
 
     *acFlagsString = 0;
+#ifdef MDNS_IPV4_SUPPORT
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_A))
     {
         strcat(acFlagsString, "A ");    //  2
     }
+#endif
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_PTR))
     {
         strcat(acFlagsString, "PTR ");  //  4
     }
+#ifdef MDNS_IPV6_SUPPORT
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_AAAA))
     {
         strcat(acFlagsString, "AAAA "); //  5
     }
+#endif
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_TXT))
     {
         strcat(acFlagsString, "TXT ");  //  4
@@ -307,7 +308,7 @@ const char* MDNSResponder::clsHost::_NSECBitmap2String(const stcNSECBitmap* p_pN
     {
         strcat(acFlagsString, "SRV ");  //  4
     }
-    if (p_pNSECBitmap->getBit(DNS_RRTYPE_NSEC))
+    if (p_pNSECBitmap->getBit(clsConsts::u8DNS_RRTYPE_NSEC))
     {
         strcat(acFlagsString, "NSEC "); //  5
     }
@@ -322,6 +323,12 @@ const char* MDNSResponder::clsHost::_NSECBitmap2String(const stcNSECBitmap* p_pN
 
 #endif  // DEBUG_ESP_MDNS_RESPONDER
 
+
 }   // namespace MDNSImplementation
 
+
 }   // namespace esp8266
+
+
+
+

@@ -1,5 +1,5 @@
 /*
-    LEAmDNS2_Host_Control.cpp
+    LEAmDNS2Host_Control.cpp
 
     License (MIT license):
       Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,54 +22,41 @@
 
 */
 
-#include <arch/cc.h>
-#include <sys/time.h>
-#include <HardwareSerial.h>
-#include <IPAddress.h>
-#include <lwip/ip_addr.h>
-#include <WString.h>
-#include <cstdint>
+#include "LEAmDNS2Host.h"
 
-/*
-    ESP8266mDNS Control.cpp
-*/
-
-extern "C" {
-#include "user_interface.h"
-}
-
-#include "LEAmDNS2_lwIPdefs.h"
-#include "LEAmDNS2_Priv.h"
 
 namespace esp8266
 {
-/*
-    LEAmDNS
-*/
+
+
 namespace experimental
 {
 
-/**
+
+/*
+
     RECEIVING
+
 */
 
 /*
-    MDNSResponder::clsHost::_parseMessage
+    clsLEAmDNS2_Host::_parseMessage
+
 */
-bool MDNSResponder::clsHost::_parseMessage(void)
+bool clsLEAMDNSHost::_parseMessage(void)
 {
     DEBUG_EX_INFO(
         unsigned long   ulStartTime = millis();
         unsigned        uStartMemory = ESP.getFreeHeap();
         DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage (Time: %lu ms, heap: %u bytes, from %s, to %s)\n"), _DH(), ulStartTime, uStartMemory,
-                              m_rUDPContext.getRemoteAddress().toString().c_str(),
-                              m_rUDPContext.getDestAddress().toString().c_str());
+                              m_pUDPContext->getRemoteAddress().toString().c_str(),
+                              m_pUDPContext->getDestAddress().toString().c_str());
     );
     //DEBUG_EX_INFO(_udpDump(););
 
     bool    bResult = false;
 
-    stcMsgHeader   header;
+    clsMsgHeader   header;
     if (_readMDNSMsgHeader(header))
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage: ID:%u QR:%u OP:%u AA:%u TC:%u RD:%u RA:%u R:%u QD:%u AN:%u NS:%u AR:%u\n"),
@@ -81,15 +68,18 @@ bool MDNSResponder::clsHost::_parseMessage(void)
                                             (unsigned)header.m_u16ANCount,
                                             (unsigned)header.m_u16NSCount,
                                             (unsigned)header.m_u16ARCount));
-        if (0 == header.m_4bOpcode)     // A standard query
+        if (0 == header.m_4bOpcode)
         {
-            if (header.m_1bQR)          // Received a response -> answers to a query
+            // A standard query
+            if (header.m_1bQR)
             {
+                // Received a response -> answers to a query
                 //DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage: Reading answers: ID:%u, Q:%u, A:%u, NS:%u, AR:%u\n"), _DH(), header.m_u16ID, header.m_u16QDCount, header.m_u16ANCount, header.m_u16NSCount, header.m_u16ARCount););
                 bResult = _parseResponse(header);
             }
-            else                        // Received a query (Questions)
+            else
             {
+                // Received a query (Questions)
                 //DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage: Reading query: ID:%u, Q:%u, A:%u, NS:%u, AR:%u\n"), _DH(), header.m_u16ID, header.m_u16QDCount, header.m_u16ANCount, header.m_u16NSCount, header.m_u16ARCount););
                 bResult = _parseQuery(header);
             }
@@ -97,13 +87,13 @@ bool MDNSResponder::clsHost::_parseMessage(void)
         else
         {
             DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage: Received UNEXPECTED opcode:%u. Ignoring message!\n"), _DH(), header.m_4bOpcode););
-            m_rUDPContext.flush();
+            m_pUDPContext->flush();
         }
     }
     else
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage: FAILED to read header\n"), _DH()););
-        m_rUDPContext.flush();
+        m_pUDPContext->flush();
     }
     DEBUG_EX_INFO(
         unsigned    uFreeHeap = ESP.getFreeHeap();
@@ -113,7 +103,7 @@ bool MDNSResponder::clsHost::_parseMessage(void)
 }
 
 /*
-    MDNSResponder::clsHost::_parseQuery
+    clsLEAmDNS2_Host::_parseQuery
 
     Queries are of interest in two cases:
     1. allow for tiebreaking while probing in the case of a race condition between two instances probing for
@@ -127,17 +117,17 @@ bool MDNSResponder::clsHost::_parseMessage(void)
     As any mDNS responder should be able to handle 'legacy' queries (from DNS clients), this case is handled here also.
     Legacy queries have got only one (unicast) question and are directed to the local DNS port (not the multicast port).
 
-    1.
 */
-bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHeader& p_MsgHeader)
+bool clsLEAMDNSHost::_parseQuery(const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader)
 {
     bool    bResult = true;
 
-    stcSendParameter    sendParameter;
-    uint32_t                u32HostOrServiceReplies = 0;
+    clsSendParameter    sendParameter;
+    uint32_t            u32HostOrServiceReplies = 0;
+    bool                bHostOrServiceTiebreakNeeded = false;
     for (uint16_t qd = 0; ((bResult) && (qd < p_MsgHeader.m_u16QDCount)); ++qd)
     {
-        stcRRQuestion  questionRR;
+        clsRRQuestion  questionRR;
         if ((bResult = _readRRQuestion(questionRR)))
         {
             // Define host replies, BUT only answer queries after probing is done
@@ -148,26 +138,28 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
             DEBUG_EX_INFO(if (u32HostOrServiceReplies) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Host reply needed %s\n"), _DH(), _replyFlags2String(u32HostOrServiceReplies)););
 
             // Check tiebreak need for host domain
-            if (enuProbingStatus::InProgress == m_HostProbeInformation.m_ProbingStatus)
+            if (clsProbeInformation_Base::clsProbeInformation_Base::enuProbingStatus::InProgress == m_ProbeInformation.m_ProbingStatus)
             {
                 bool    bFullNameMatch = false;
                 if ((_replyMaskForHost(questionRR.m_Header, &bFullNameMatch)) &&
                     (bFullNameMatch))
                 {
                     // We're in 'probing' state and someone is asking for our host domain: this might be
-                    // a race-condition: Two host with the same domain names try simutanously to probe their domains
+                    // a race-condition: Two hosts with the same domain names try simutanously to probe their domains
                     // See: RFC 6762, 8.2 (Tiebraking)
                     // However, we're using a max. reduced approach for tiebreaking here: The higher IP-address wins!
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Possible race-condition for host domain detected while probing.\n"), _DH()););
-                    Serial.printf_P(PSTR("%s _parseQuery: Possible race-condition for host domain detected while probing.\n"), _DH());
 
-                    m_HostProbeInformation.m_bTiebreakNeeded = true;
+                    bHostOrServiceTiebreakNeeded =
+                        m_ProbeInformation.m_bTiebreakNeeded = true;
                 }
             }
 
             // Define service replies
-            for (stcService* pService = m_pServices; pService; pService = pService->m_pNext)
+            for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
             {
+                clsService* pService = *it;
+
                 // Define service replies, BUT only answer queries after probing is done
                 uint32_t u32ReplyMaskForQuestion = ((pService->probeStatus())
                                                     ? _replyMaskForService(questionRR.m_Header, *pService, 0)
@@ -176,7 +168,7 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                 DEBUG_EX_INFO(if (u32ReplyMaskForQuestion) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service reply needed: %s\n"), _DH(pService), _replyFlags2String(u32ReplyMaskForQuestion)););
 
                 // Check tiebreak need for service domain
-                if (enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus)
+                if (clsProbeInformation_Base::clsProbeInformation_Base::enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus)
                 {
                     bool    bFullNameMatch = false;
                     if ((_replyMaskForService(questionRR.m_Header, *pService, &bFullNameMatch)) &&
@@ -187,26 +179,25 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                         // See: RFC 6762, 8.2 (Tiebraking)
                         // However, we're using a max. reduced approach for tiebreaking here: The 'higher' SRV host wins!
                         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Possible race-condition for service domain detected while probing.\n"), _DH(pService)););
-                        Serial.printf_P(PSTR("%s _parseQuery: Possible race-condition for service domain detected while probing.\n"), _DH(pService));
 
-                        pService->m_ProbeInformation.m_bTiebreakNeeded = true;
+                        bHostOrServiceTiebreakNeeded =
+                            pService->m_ProbeInformation.m_bTiebreakNeeded = true;
                     }
                 }
             }
 
             // Handle unicast and legacy specialities
             // If only one question asks for unicast reply, the whole reply packet is send unicast
-            if (((DNS_MQUERY_PORT != m_rUDPContext.getRemotePort()) ||     // Unicast (maybe legacy) query OR
+            if (((DNS_MQUERY_PORT != m_pUDPContext->getRemotePort()) ||     // Unicast (maybe legacy) query OR
                  (questionRR.m_bUnicast)) &&                                // Expressivly unicast query
                 (!sendParameter.m_bUnicast))
             {
-
                 sendParameter.m_bUnicast = true;
                 //sendParameter.m_bCacheFlush = false;
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Unicast response asked for %s!\n"), _DH(), m_rUDPContext.getRemoteAddress().toString().c_str()););
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Unicast response asked for %s!\n"), _DH(), m_pUDPContext->getRemoteAddress().toString().c_str()););
                 //Serial.printf_P(PSTR("%s _parseQuery: Ignored Unicast response asked for by %s!\n"), _DH(), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str());
 
-                if ((DNS_MQUERY_PORT != m_rUDPContext.getRemotePort()) &&  // Unicast (maybe legacy) query AND
+                if ((DNS_MQUERY_PORT != m_pUDPContext->getRemotePort()) &&  // Unicast (maybe legacy) query AND
                     (1 == p_MsgHeader.m_u16QDCount) &&                          // Only one question AND
                     ((sendParameter.m_u32HostReplyMask) ||                      //  Host replies OR
                      (u32HostOrServiceReplies)))                                //  Host or service replies available
@@ -217,22 +208,23 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
 #ifdef MDNS_IPV4_SUPPORT
                     ip_info IPInfo_Local;
 #endif
-                    if (
+                    if ((m_pNetIf) &&
+                        (m_pUDPContext) &&
 #ifdef MDNS_IPV4_SUPPORT
-                        (m_rUDPContext.getRemoteAddress().isV4()) &&
-                        ((wifi_get_ip_info(netif_get_index(&m_rNetIf), &IPInfo_Local))) &&
-                        (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)m_rUDPContext.getRemoteAddress()), &IPInfo_Local.ip, &IPInfo_Local.netmask))
+                        (m_pUDPContext->getRemoteAddress().isV4()) &&
+                        ((wifi_get_ip_info(netif_get_index(m_pNetIf), &IPInfo_Local))) &&
+                        (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)m_pUDPContext->getRemoteAddress()), &IPInfo_Local.ip, &IPInfo_Local.netmask))
 #else
                         (true)
 #endif
                         &&
 #ifdef MDNS_IPV6_SUPPORT
-                        (m_rUDPContext.getRemoteAddress().isV6()) &&
-                        (ip6_addr_islinklocal(ip_2_ip6((const ip_addr_t*)m_rUDPContext.getRemoteAddress())))
+                        (m_pUDPContext->getRemoteAddress().isV6()) &&
+                        (ip6_addr_islinklocal(ip_2_ip6((const ip_addr_t*)m_pUDPContext->getRemoteAddress())))
 #else
                         (true)
 #endif
-                    )
+                       )
                     {
                         /*  ip_info IPInfo_Local;
                             ip_info IPInfo_Remote;
@@ -243,27 +235,29 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                               (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask)))))   // Remote IP in STATION's subnet
                             {*/
                         Serial.println("\n\n\nUNICAST QUERY\n\n");
-                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Legacy query from local host %s!\n"), _DH(), m_rUDPContext.getRemoteAddress().toString().c_str()););
+                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Legacy DNS query from local host %s!\n"), _DH(), m_pUDPContext->getRemoteAddress().toString().c_str()););
 
                         sendParameter.m_u16ID = p_MsgHeader.m_u16ID;
-                        sendParameter.m_bLegacyQuery = true;
+                        sendParameter.m_bLegacyDNSQuery = true;
                         sendParameter.m_bCacheFlush = false;
-                        sendParameter.m_pQuestions = new stcRRQuestion;
-                        if ((bResult = (0 != sendParameter.m_pQuestions)))
+                        clsRRQuestion*  pNewRRQuestion = new clsRRQuestion;
+                        if (pNewRRQuestion)
                         {
-                            sendParameter.m_pQuestions->m_Header.m_Domain = questionRR.m_Header.m_Domain;
-                            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = questionRR.m_Header.m_Attributes.m_u16Type;
-                            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = questionRR.m_Header.m_Attributes.m_u16Class;
+                            pNewRRQuestion->m_Header.m_Domain = questionRR.m_Header.m_Domain;
+                            pNewRRQuestion->m_Header.m_Attributes.m_u16Type = questionRR.m_Header.m_Attributes.m_u16Type;
+                            pNewRRQuestion->m_Header.m_Attributes.m_u16Class = questionRR.m_Header.m_Attributes.m_u16Class;
+
+                            sendParameter.m_RRQuestions.push_back(pNewRRQuestion);
                         }
                         else
                         {
-                            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: FAILED to add legacy question!\n"), _DH()););
+                            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: FAILED to add legacy DNS question!\n"), _DH()););
                         }
                     }
                     else
                     {
-                        Serial.println("\n\n\nINVALID UNICAST QUERY\n\n");
-                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Legacy query from NON-LOCAL host!\n"), _DH()););
+                        Serial.printf("\n\n\nINVALID UNICAST QUERY from %s\n\n\n", m_pUDPContext->getRemoteAddress().toString().c_str());
+                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Legacy DNS query from NON-LOCAL host at %s!\n"), _DH(), m_pUDPContext->getRemoteAddress().toString().c_str()););
                         bResult = false;
                     }
                 }
@@ -276,30 +270,31 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
     }   // for questions
 
     //DEBUG_EX_INFO(if (u8HostOrServiceReplies) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Reply needed: %u (%s: %s->%s)\n"), _DH(), u8HostOrServiceReplies, clsTimeSyncer::timestr(), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), IPAddress(m_pUDPContext->getDestAddress()).toString().c_str()););
+    //bHostOrServiceTiebreakNeeded = false;
 
     // Handle known answers
     uint32_t    u32Answers = (p_MsgHeader.m_u16ANCount + p_MsgHeader.m_u16NSCount + p_MsgHeader.m_u16ARCount);
-    if ((u32HostOrServiceReplies) &&
+    if (((u32HostOrServiceReplies) ||
+         (bHostOrServiceTiebreakNeeded)) &&
         (u32Answers))
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Reading known answers(%u):\n"), _DH(), u32Answers););
 
         for (uint32_t an = 0; ((bResult) && (an < u32Answers)); ++an)
         {
-            stcRRAnswer*   pKnownRRAnswer = 0;
+            clsRRAnswer*   pKnownRRAnswer = 0;
             if (((bResult = _readRRAnswer(pKnownRRAnswer))) &&
                 (pKnownRRAnswer))
             {
-
                 if ((DNS_RRTYPE_ANY != pKnownRRAnswer->m_Header.m_Attributes.m_u16Type) &&                  // No ANY type answer
                     (DNS_RRCLASS_ANY != (pKnownRRAnswer->m_Header.m_Attributes.m_u16Class & (~0x8000))))    // No ANY class answer
                 {
-
-                    // Find match between planned answer (sendParameter.m_u8HostReplyMask) and this 'known answer'
-                    uint32_t u32HostMatchMask = (sendParameter.m_u32HostReplyMask & _replyMaskForHost(pKnownRRAnswer->m_Header));
-                    if ((u32HostMatchMask) &&                                           // The RR in the known answer matches an RR we are planning to send, AND
-                        ((MDNS_HOST_TTL / 2) <= pKnownRRAnswer->m_u32TTL))              // The TTL of the known answer is longer than half of the new host TTL (120s)
-                    {
+                    /*  - RFC6762 7.1 Suppression only for 'Shared Records' -
+                        // Find match between planned answer (sendParameter.m_u8HostReplyMask) and this 'known answer'
+                        uint32_t u32HostMatchMask = (sendParameter.m_u32HostReplyMask & _replyMaskForHost(pKnownRRAnswer->m_Header));
+                        if ((u32HostMatchMask) &&                                           // The RR in the known answer matches an RR we are planning to send, AND
+                        ((Consts::u32HostTTL / 2) <= pKnownRRAnswer->m_u32TTL))              // The TTL of the known answer is longer than half of the new host TTL (120s)
+                        {
 
                         // Compare contents
                         if (enuAnswerType::PTR == pKnownRRAnswer->answerType())
@@ -309,41 +304,41 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                                 (((stcRRAnswerPTR*)pKnownRRAnswer)->m_PTRDomain == hostDomain))
                             {
                                 // Host domain match
-#ifdef MDNS_IPV4_SUPPORT
+                        #ifdef MDNS_IPV4_SUPPORT
                                 if (u32HostMatchMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv4))
                                 {
                                     // IPv4 PTR was asked for, but is already known -> skipping
-                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv4 PTR already known... skipping!\n"), _DH()););
+                                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv4 PTR already known (TTL:%u)... skipping!\n"), _DH(), pKnownRRAnswer->m_u32TTL););
                                     sendParameter.m_u32HostReplyMask &= ~static_cast<uint32_t>(enuContentFlag::PTR_IPv4);
                                 }
-#endif
-#ifdef MDNS_IPV6_SUPPORT
+                        #endif
+                        #ifdef MDNS_IPV6_SUPPORT
                                 if (u32HostMatchMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv6))
                                 {
                                     // IPv6 PTR was asked for, but is already known -> skipping
-                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv6 PTR already known... skipping!\n"), _DH()););
+                                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv6 PTR already known (TTL:%u)... skipping!\n"), _DH(), pKnownRRAnswer->m_u32TTL););
                                     sendParameter.m_u32HostReplyMask &= ~static_cast<uint32_t>(enuContentFlag::PTR_IPv6);
                                 }
-#endif
+                        #endif
                             }
                         }
                         else if (u32HostMatchMask & static_cast<uint32_t>(enuContentFlag::A))
                         {
                             // IPv4 address was asked for
-#ifdef MDNS_IPV4_SUPPORT
+                        #ifdef MDNS_IPV4_SUPPORT
                             if ((enuAnswerType::A == pKnownRRAnswer->answerType()) &&
                                 (((stcRRAnswerA*)pKnownRRAnswer)->m_IPAddress == _getResponderIPAddress(enuIPProtocolType::V4)))
                             {
 
-                                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv4 address already known... skipping!\n"), _DH()););
+                                DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv4 address already known (TTL:%u)... skipping!\n"), _DH(), pKnownRRAnswer->m_u32TTL););
                                 sendParameter.m_u32HostReplyMask &= ~static_cast<uint32_t>(enuContentFlag::A);
                             }   // else: RData NOT IPv4 length !!
-#endif
+                        #endif
                         }
                         else if (u32HostMatchMask & static_cast<uint32_t>(enuContentFlag::AAAA))
                         {
                             // IPv6 address was asked for
-#ifdef MDNS_IPV6_SUPPORT
+                        #ifdef MDNS_IPV6_SUPPORT
                             if ((enuAnswerType::AAAA == pKnownRRAnswer->answerType()) &&
                                 (((stcRRAnswerAAAA*)pKnownRRAnswer)->m_IPAddress == _getResponderIPAddress(enuIPProtocolType::V6)))
                             {
@@ -351,15 +346,16 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: IPv6 address already known... skipping!\n"), _DH()););
                                 sendParameter.m_u32HostReplyMask &= ~static_cast<uint32_t>(enuContentFlag::AAAA);
                             }   // else: RData NOT IPv6 length !!
-#endif
+                        #endif
                         }
-                    }   // Host match /*and TTL*/
+                        }   // Host match and TTL
+                    */
 
                     //
                     // Check host tiebreak possibility
-                    if (m_HostProbeInformation.m_bTiebreakNeeded)
+                    if (m_ProbeInformation.m_bTiebreakNeeded)
                     {
-                        stcRRDomain    hostDomain;
+                        clsRRDomain    hostDomain;
                         if ((_buildDomainForHost(m_pcHostName, hostDomain)) &&
                             (pKnownRRAnswer->m_Header.m_Domain == hostDomain))
                         {
@@ -369,26 +365,26 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                             {
                                 // CHECK
                                 IPAddress   localIPAddress(_getResponderIPAddress(enuIPProtocolType::V4));
-                                if (((stcRRAnswerA*)pKnownRRAnswer)->m_IPAddress == localIPAddress)
+                                if (((clsRRAnswerA*)pKnownRRAnswer)->m_IPAddress == localIPAddress)
                                 {
                                     // SAME IP address -> We've received an old message from ourselfs (same IP)
                                     DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv4) WON (was an old message)!\n"), _DH()););
-                                    m_HostProbeInformation.m_bTiebreakNeeded = false;
+                                    m_ProbeInformation.m_bTiebreakNeeded = false;
                                 }
                                 else
                                 {
-                                    if ((uint32_t)(((stcRRAnswerA*)pKnownRRAnswer)->m_IPAddress) > (uint32_t)localIPAddress)   // The OTHER IP is 'higher' -> LOST
+                                    if ((uint32_t)(((clsRRAnswerA*)pKnownRRAnswer)->m_IPAddress) > (uint32_t)localIPAddress)   // The OTHER IP is 'higher' -> LOST
                                     {
                                         // LOST tiebreak
-                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv4) LOST (lower)!\n"), _DH()););
+                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv4) LOST (lower IPv4)!\n"), _DH()););
                                         _cancelProbingForHost();
-                                        m_HostProbeInformation.m_bTiebreakNeeded = false;
+                                        m_ProbeInformation.m_bTiebreakNeeded = false;
                                     }
-                                    else    // WON tiebreak
+                                    else
                                     {
-                                        //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselfs -> Just ignore
-                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv4) WON (higher IP)!\n"), _DH()););
-                                        m_HostProbeInformation.m_bTiebreakNeeded = false;
+                                        // WON tiebreak
+                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv4) WON (higher IPv4)!\n"), _DH()););
+                                        m_ProbeInformation.m_bTiebreakNeeded = false;
                                     }
                                 }
                             }
@@ -396,28 +392,28 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
 #ifdef MDNS_IPV6_SUPPORT
                             if (enuAnswerType::AAAA == pKnownRRAnswer->answerType())
                             {
-                                // TODO / CHECK
                                 IPAddress   localIPAddress(_getResponderIPAddress(enuIPProtocolType::V6));
-                                if (((stcRRAnswerAAAA*)pKnownRRAnswer)->m_IPAddress == localIPAddress)
+                                if (((clsRRAnswerAAAA*)pKnownRRAnswer)->m_IPAddress == localIPAddress)
                                 {
                                     // SAME IP address -> We've received an old message from ourselfs (same IP)
                                     DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv6) WON (was an old message)!\n"), _DH()););
-                                    m_HostProbeInformation.m_bTiebreakNeeded = false;
+                                    m_ProbeInformation.m_bTiebreakNeeded = false;
                                 }
                                 else
                                 {
-                                    if ((uint32_t)(((stcRRAnswerAAAA*)pKnownRRAnswer)->m_IPAddress) > (uint32_t)localIPAddress)   // The OTHER IP is 'higher' -> LOST
+                                    // memcmp delivers >0 (positive) if the first non-matching byte in A is higher than in B
+                                    if (0 < memcmp((((clsRRAnswerAAAA*)pKnownRRAnswer)->m_IPAddress).raw6(), localIPAddress.raw6(), clsConsts::u16IPv6Size))    // The OTHER IP is 'higher' -> LOST
                                     {
                                         // LOST tiebreak
-                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv6) LOST (lower)!\n"), _DH()););
+                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv6) LOST (lower IPv6)!\n"), _DH()););
                                         _cancelProbingForHost();
-                                        m_HostProbeInformation.m_bTiebreakNeeded = false;
+                                        m_ProbeInformation.m_bTiebreakNeeded = false;
                                     }
-                                    else    // WON tiebreak
+                                    else
                                     {
-                                        //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselfs -> Just ignore
-                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv6) WON (higher IP)!\n"), _DH()););
-                                        m_HostProbeInformation.m_bTiebreakNeeded = false;
+                                        // WON tiebreak
+                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (IPv6) WON (higher IPv6)!\n"), _DH()););
+                                        m_ProbeInformation.m_bTiebreakNeeded = false;
                                     }
                                 }
                             }
@@ -426,97 +422,98 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                     }   // Host tiebreak possibility
 
                     // Check service answers
-                    for (stcService* pService = m_pServices; pService; pService = pService->m_pNext)
+                    for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
                     {
+                        clsService* pService = *it;
 
                         uint32_t    u32ServiceMatchMask = (pService->m_u32ReplyMask & _replyMaskForService(pKnownRRAnswer->m_Header, *pService));
 
                         if ((u32ServiceMatchMask) &&                                // The RR in the known answer matches an RR we are planning to send, AND
-                            ((MDNS_SERVICE_TTL / 2) <= pKnownRRAnswer->m_u32TTL))   // The TTL of the known answer is longer than half of the new service TTL (4500s)
+                            ((clsConsts::u32ServiceTTL / 2) <= pKnownRRAnswer->m_u32TTL))   // The TTL of the known answer is longer than half of the new service TTL (4500s)
                         {
-
                             if (enuAnswerType::PTR == pKnownRRAnswer->answerType())
                             {
-                                stcRRDomain    serviceDomain;
+                                clsRRDomain    serviceDomain;
                                 if ((u32ServiceMatchMask & static_cast<uint32_t>(enuContentFlag::PTR_TYPE)) &&
                                     (_buildDomainForService(*pService, false, serviceDomain)) &&
-                                    (serviceDomain == ((stcRRAnswerPTR*)pKnownRRAnswer)->m_PTRDomain))
+                                    (serviceDomain == ((clsRRAnswerPTR*)pKnownRRAnswer)->m_PTRDomain))
                                 {
-                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service type PTR already known... skipping!\n"), _DH()););
+                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service type PTR already known (TTL:%u)... skipping!\n"), _DH(pService), pKnownRRAnswer->m_u32TTL););
                                     pService->m_u32ReplyMask &= ~static_cast<uint32_t>(enuContentFlag::PTR_TYPE);
                                 }
                                 if ((u32ServiceMatchMask & static_cast<uint32_t>(enuContentFlag::PTR_NAME)) &&
                                     (_buildDomainForService(*pService, true, serviceDomain)) &&
-                                    (serviceDomain == ((stcRRAnswerPTR*)pKnownRRAnswer)->m_PTRDomain))
+                                    (serviceDomain == ((clsRRAnswerPTR*)pKnownRRAnswer)->m_PTRDomain))
                                 {
-                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service name PTR already known... skipping!\n"), _DH()););
+                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service name PTR already known (TTL:%u)... skipping!\n"), _DH(pService), pKnownRRAnswer->m_u32TTL););
                                     pService->m_u32ReplyMask &= ~static_cast<uint32_t>(enuContentFlag::PTR_NAME);
                                 }
                             }
-                            else if (u32ServiceMatchMask & static_cast<uint32_t>(enuContentFlag::SRV))
-                            {
-                                DEBUG_EX_ERR(if (enuAnswerType::SRV != pKnownRRAnswer->answerType()) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: ERROR! INVALID answer type (SRV)!\n"), _DH()););
+                            /*  - RFC6762 7.1 Suppression only for 'Shared Records'
+                                else if (u32ServiceMatchMask & static_cast<uint32_t>(enuContentFlag::SRV))
+                                {
+                                DEBUG_EX_ERR(if (enuAnswerType::SRV != pKnownRRAnswer->answerType()) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: ERROR! INVALID answer type (SRV)!\n"), _DH(pService)););
                                 stcRRDomain    hostDomain;
                                 if ((_buildDomainForHost(m_pcHostName, hostDomain)) &&
                                     (hostDomain == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_SRVDomain))    // Host domain match
                                 {
 
-                                    if ((MDNS_SRV_PRIORITY == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_u16Priority) &&
-                                        (MDNS_SRV_WEIGHT == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_u16Weight) &&
+                                    if ((Consts::u16SRVPriority == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_u16Priority) &&
+                                        (Consts::u16SRVWeight == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_u16Weight) &&
                                         (pService->m_u16Port == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_u16Port))
                                     {
 
-                                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service SRV answer already known... skipping!\n"), _DH()););
+                                        DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service SRV answer already known (TTL:%u)... skipping!\n"), _DH(pService), pKnownRRAnswer->m_u32TTL););
                                         pService->m_u32ReplyMask &= ~static_cast<uint32_t>(enuContentFlag::SRV);
                                     }   // else: Small differences -> send update message
                                 }
-                            }
-                            else if (u32ServiceMatchMask & static_cast<uint32_t>(enuContentFlag::TXT))
-                            {
-                                DEBUG_EX_ERR(if (enuAnswerType::TXT != pKnownRRAnswer->answerType()) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: ERROR! INVALID answer type (TXT)!\n"), _DH()););
+                                }*/
+                            /*  - RFC6762 7.1 Suppression only for 'Shared Records'
+                                else if (u32ServiceMatchMask & static_cast<uint32_t>(enuContentFlag::TXT))
+                                {
+                                DEBUG_EX_ERR(if (enuAnswerType::TXT != pKnownRRAnswer->answerType()) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: ERROR! INVALID answer type (TXT)!\n"), _DH(pService)););
                                 _collectServiceTxts(*pService);
                                 if (pService->m_Txts == ((stcRRAnswerTXT*)pKnownRRAnswer)->m_Txts)
                                 {
-                                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service TXT answer already known... skipping!\n"), _DH()););
+                                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Service TXT answer already known (TTL:%u)... skipping!\n"), _DH(pService), pKnownRRAnswer->m_u32TTL););
                                     pService->m_u32ReplyMask &= ~static_cast<uint32_t>(enuContentFlag::TXT);
                                 }
                                 _releaseTempServiceTxts(*pService);
-                            }
+                                }*/
                         }   // Service match and enough TTL
 
                         //
                         // Check service tiebreak possibility
                         if (pService->m_ProbeInformation.m_bTiebreakNeeded)
                         {
-                            stcRRDomain    serviceDomain;
+                            clsRRDomain    serviceDomain;
                             if ((_buildDomainForService(*pService, true, serviceDomain)) &&
                                 (pKnownRRAnswer->m_Header.m_Domain == serviceDomain))
                             {
                                 // Service domain match
                                 if (enuAnswerType::SRV == pKnownRRAnswer->answerType())
                                 {
-                                    stcRRDomain    hostDomain;
+                                    clsRRDomain    hostDomain;
                                     if ((_buildDomainForHost(m_pcHostName, hostDomain)) &&
-                                        (hostDomain == ((stcRRAnswerSRV*)pKnownRRAnswer)->m_SRVDomain))    // Host domain match
+                                        (hostDomain == ((clsRRAnswerSRV*)pKnownRRAnswer)->m_SRVDomain))    // Host domain match
                                     {
-
                                         // We've received an old message from ourselfs (same SRV)
-                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (SRV) won (was an old message)!\n"), _DH()););
+                                        DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (SRV) won (was an old message)!\n"), _DH(pService)););
                                         pService->m_ProbeInformation.m_bTiebreakNeeded = false;
                                     }
                                     else
                                     {
-                                        if (((stcRRAnswerSRV*)pKnownRRAnswer)->m_SRVDomain > hostDomain)   // The OTHER domain is 'higher' -> LOST
+                                        if (((clsRRAnswerSRV*)pKnownRRAnswer)->m_SRVDomain > hostDomain)   // The OTHER domain is 'higher' -> LOST
                                         {
                                             // LOST tiebreak
-                                            DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (SRV) LOST (lower)!\n"), _DH()););
+                                            DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (SRV) LOST (lower)!\n"), _DH(pService)););
                                             _cancelProbingForService(*pService);
                                             pService->m_ProbeInformation.m_bTiebreakNeeded = false;
                                         }
-                                        else    // WON tiebreak
+                                        else
                                         {
-                                            //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselfs -> Just ignore
-                                            DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (SRV) won (higher)!\n"), _DH()););
+                                            // WON tiebreak
+                                            DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Tiebreak (SRV) won (higher)!\n"), _DH(pService)););
                                             pService->m_ProbeInformation.m_bTiebreakNeeded = false;
                                         }
                                     }
@@ -541,48 +538,47 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
     else
     {
         DEBUG_EX_INFO(if (u32Answers) DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Skipped %u known answers!\n"), _DH(), u32Answers););
-        m_rUDPContext.flush();
+        m_pUDPContext->flush();
     }
 
     if (bResult)
     {
         // Check, if a reply is needed
         uint32_t    u32ReplyNeeded = sendParameter.m_u32HostReplyMask;
-        for (stcService* pService = m_pServices; pService; pService = pService->m_pNext)
+        for (const clsService* pService : m_Services)
         {
             u32ReplyNeeded |= pService->m_u32ReplyMask;
         }
 
         if (u32ReplyNeeded)
         {
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Sending answer(%s)...\n"), _DH(), _replyFlags2String(u32ReplyNeeded)););
+            DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Sending %s answer(%s)...\n"), _DH(), (sendParameter.m_bUnicast ? "UC" : "MC"), _replyFlags2String(u32ReplyNeeded)););
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Sending %s answer(%s)...\n"), _DH(), (sendParameter.m_bUnicast ? "UC" : "MC"), _replyFlags2String(u32ReplyNeeded)););
 
-            sendParameter.m_Response = stcSendParameter::enuResponseType::Response;
+            sendParameter.m_Response = clsSendParameter::enuResponseType::Response;
             sendParameter.m_bAuthorative = true;
 
-            bResult = _sendMDNSMessage(sendParameter);
+            bResult = _sendMessage(sendParameter);
         }
-        DEBUG_EX_INFO(
-            else
+        DEBUG_EX_INFO(else
         {
             DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: No reply needed\n"), _DH());
-        }
-        );
+        });
     }
     else
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Something FAILED!\n"), _DH()););
-        m_rUDPContext.flush();
+        m_pUDPContext->flush();
     }
 
     //
     // Check and reset tiebreak-states
-    if (m_HostProbeInformation.m_bTiebreakNeeded)
+    if (m_ProbeInformation.m_bTiebreakNeeded)
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: UNSOLVED tiebreak-need for host domain!\n"), _DH()););
-        m_HostProbeInformation.m_bTiebreakNeeded = false;
+        m_ProbeInformation.m_bTiebreakNeeded = false;
     }
-    for (stcService* pService = m_pServices; pService; pService = pService->m_pNext)
+    for (clsService* pService : m_Services)
     {
         if (pService->m_ProbeInformation.m_bTiebreakNeeded)
         {
@@ -595,7 +591,7 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
 }
 
 /*
-    MDNSResponder::clsHost::_parseResponse
+    clsLEAmDNS2_Host::_parseResponse
 
     Responses are of interest in two cases:
     1. find domain name conflicts while probing
@@ -621,7 +617,7 @@ bool MDNSResponder::clsHost::_parseQuery(const MDNSResponder::clsHost::stcMsgHea
                TXT - links the instance name to services TXTs
       Level 3: A/AAAA - links the host domain to an IP address
 */
-bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsgHeader& p_MsgHeader)
+bool clsLEAMDNSHost::_parseResponse(const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseResponse\n")););
     //DEBUG_EX_INFO(_udpDump(););
@@ -632,7 +628,6 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
     if ((_hasQueriesWaitingForAnswers()) ||     // Waiting for query answers OR
         (_hasProbesWaitingForAnswers()))        // Probe responses
     {
-
         DEBUG_EX_INFO(
             DEBUG_OUTPUT.printf_P(PSTR("%s _parseResponse: Received a response\n"), _DH());
             //_udpDump();
@@ -641,7 +636,7 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
         bResult = true;
         //
         // Ignore questions here
-        stcRRQuestion  dummyRRQ;
+        clsRRQuestion  dummyRRQ;
         for (uint16_t qd = 0; ((bResult) && (qd < p_MsgHeader.m_u16QDCount)); ++qd)
         {
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseResponse: Received a response containing a question... ignoring!\n"), _DH()););
@@ -650,11 +645,11 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
 
         //
         // Read and collect answers
-        stcRRAnswer*   pCollectedRRAnswers = 0;
+        clsRRAnswer*   pCollectedRRAnswers = 0;
         uint32_t            u32NumberOfAnswerRRs = (p_MsgHeader.m_u16ANCount + p_MsgHeader.m_u16NSCount + p_MsgHeader.m_u16ARCount);
         for (uint32_t an = 0; ((bResult) && (an < u32NumberOfAnswerRRs)); ++an)
         {
-            stcRRAnswer*   pRRAnswer = 0;
+            clsRRAnswer*   pRRAnswer = 0;
             if (((bResult = _readRRAnswer(pRRAnswer))) &&
                 (pRRAnswer))
             {
@@ -684,14 +679,14 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
         else    // Some failure while reading answers
         {
             DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _parseResponse: FAILED to read answers!\n"), _DH()););
-            m_rUDPContext.flush();
+            m_pUDPContext->flush();
         }
 
         // Delete collected answers
         while (pCollectedRRAnswers)
         {
             //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _parseResponse: DELETING answer!\n"), _DH()););
-            stcRRAnswer*   pNextAnswer = pCollectedRRAnswers->m_pNext;
+            clsRRAnswer*   pNextAnswer = pCollectedRRAnswers->m_pNext;
             delete pCollectedRRAnswers;
             pCollectedRRAnswers = pNextAnswer;
         }
@@ -719,7 +714,7 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
                 }
             */
         );
-        m_rUDPContext.flush();
+        m_pUDPContext->flush();
         bResult = true;
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _parseResponse: FAILED!\n"), _DH()););
@@ -727,7 +722,7 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
 }
 
 /*
-    MDNSResponder::clsHost::_processAnswers
+    clsLEAmDNS2_Host::_processAnswers
     Host:
     A (0x01):               eg. esp8266.local A OP TTL 123.456.789.012
     AAAA (01Cx):            eg. esp8266.local AAAA OP TTL 1234:5678::90
@@ -740,7 +735,7 @@ bool MDNSResponder::clsHost::_parseResponse(const MDNSResponder::clsHost::stcMsg
     TXT (0x10):             eg. MyESP._http._tcp.local TXT OP TTL c#=1
 
 */
-bool MDNSResponder::clsHost::_processAnswers(const MDNSResponder::clsHost::stcRRAnswer* p_pAnswers)
+bool clsLEAMDNSHost::_processAnswers(const clsLEAMDNSHost::clsRRAnswer* p_pAnswers)
 {
     bool    bResult = false;
 
@@ -756,78 +751,70 @@ bool MDNSResponder::clsHost::_processAnswers(const MDNSResponder::clsHost::stcRR
         {
             bFoundNewKeyAnswer = false;
 
-            const stcRRAnswer* pRRAnswer = p_pAnswers;
+            const clsRRAnswer* pRRAnswer = p_pAnswers;
             while ((pRRAnswer) &&
                    (bResult))
             {
                 // 1. level answer (PTR)
                 if (enuAnswerType::PTR == pRRAnswer->answerType())
-                {
-                    // eg. _http._tcp.local PTR xxxx xx MyESP._http._tcp.local
-                    bResult = _processPTRAnswer((stcRRAnswerPTR*)pRRAnswer, bFoundNewKeyAnswer);   // May 'enable' new SRV or TXT answers to be linked to queries
+                {   // eg. _http._tcp.local PTR xxxx xx MyESP._http._tcp.local
+                    bResult = _processPTRAnswer((clsRRAnswerPTR*)pRRAnswer, bFoundNewKeyAnswer);   // May 'enable' new SRV or TXT answers to be linked to queries
                 }
                 // 2. level answers
                 // SRV -> host domain and port
                 else if (enuAnswerType::SRV == pRRAnswer->answerType())
-                {
-                    // eg. MyESP._http._tcp.local SRV xxxx xx yy zz 5000 esp8266.local
-                    bResult = _processSRVAnswer((stcRRAnswerSRV*)pRRAnswer, bFoundNewKeyAnswer);   // May 'enable' new A/AAAA answers to be linked to queries
+                {   // eg. MyESP._http._tcp.local SRV xxxx xx yy zz 5000 esp8266.local
+                    bResult = _processSRVAnswer((clsRRAnswerSRV*)pRRAnswer, bFoundNewKeyAnswer);   // May 'enable' new A/AAAA answers to be linked to queries
                 }
                 // TXT -> Txts
                 else if (enuAnswerType::TXT == pRRAnswer->answerType())
-                {
-                    // eg. MyESP_http._tcp.local TXT xxxx xx c#=1
-                    bResult = _processTXTAnswer((stcRRAnswerTXT*)pRRAnswer);
+                {   // eg. MyESP_http._tcp.local TXT xxxx xx c#=1
+                    bResult = _processTXTAnswer((clsRRAnswerTXT*)pRRAnswer);
                 }
                 // 3. level answers
 #ifdef MDNS_IPV4_SUPPORT
                 // A -> IPv4Address
                 else if (enuAnswerType::A == pRRAnswer->answerType())
-                {
-                    // eg. esp8266.local A xxxx xx 192.168.2.120
-                    bResult = _processAAnswer((stcRRAnswerA*)pRRAnswer);
+                {   // eg. esp8266.local A xxxx xx 192.168.2.120
+                    bResult = _processAAnswer((clsRRAnswerA*)pRRAnswer);
                 }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
                 // AAAA -> IPv6Address
                 else if (enuAnswerType::AAAA == pRRAnswer->answerType())
-                {
-                    // eg. esp8266.local AAAA xxxx xx 09cf::0c
-                    bResult = _processAAAAAnswer((stcRRAnswerAAAA*)pRRAnswer);
+                {   // eg. esp8266.local AAAA xxxx xx 09cf::0c
+                    bResult = _processAAAAAnswer((clsRRAnswerAAAA*)pRRAnswer);
                 }
 #endif
 
                 // Finally check for probing conflicts
                 // Host domain
-                if ((enuProbingStatus::InProgress == m_HostProbeInformation.m_ProbingStatus) &&
+                if ((clsProbeInformation_Base::enuProbingStatus::InProgress == m_ProbeInformation.m_ProbingStatus) &&
                     ((enuAnswerType::A == pRRAnswer->answerType()) ||
                      (enuAnswerType::AAAA == pRRAnswer->answerType())))
                 {
-
-                    stcRRDomain    hostDomain;
+                    clsRRDomain    hostDomain;
                     if ((_buildDomainForHost(m_pcHostName, hostDomain)) &&
                         (pRRAnswer->m_Header.m_Domain == hostDomain))
                     {
-
                         bool    bPossibleEcho = false;
 #ifdef MDNS_IPV4_SUPPORT
                         if ((enuAnswerType::A == pRRAnswer->answerType()) &&
-                            (((stcRRAnswerA*)pRRAnswer)->m_IPAddress == _getResponderIPAddress(enuIPProtocolType::V4)))
+                            (((clsRRAnswerA*)pRRAnswer)->m_IPAddress == _getResponderIPAddress(enuIPProtocolType::V4)))
                         {
-
                             bPossibleEcho = true;
                         }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
                         if ((enuAnswerType::AAAA == pRRAnswer->answerType()) &&
-                            (((stcRRAnswerAAAA*)pRRAnswer)->m_IPAddress == _getResponderIPAddress(enuIPProtocolType::V6)))
+                            (((clsRRAnswerAAAA*)pRRAnswer)->m_IPAddress == _getResponderIPAddress(enuIPProtocolType::V6)))
                         {
-
                             bPossibleEcho = true;
                         }
 #endif
                         if (!bPossibleEcho)
                         {
+                            DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _processAnswers: Probing CONFLICT found with '%s.local'\n"), _DH(), m_pcHostName););
                             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _processAnswers: Probing CONFLICT found with '%s.local'\n"), _DH(), m_pcHostName););
                             _cancelProbingForHost();
                         }
@@ -838,19 +825,18 @@ bool MDNSResponder::clsHost::_processAnswers(const MDNSResponder::clsHost::stcRR
                     }
                 }
                 // Service domains
-                for (stcService* pService = m_pServices; pService; pService = pService->m_pNext)
+                for (clsService* pService : m_Services)
                 {
-                    if ((enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&
+                    if ((clsProbeInformation_Base::enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&
                         ((enuAnswerType::TXT == pRRAnswer->answerType()) ||
                          (enuAnswerType::SRV == pRRAnswer->answerType())))
                     {
-
-                        stcRRDomain    serviceDomain;
+                        clsRRDomain    serviceDomain;
                         if ((_buildDomainForService(*pService, true, serviceDomain)) &&
                             (pRRAnswer->m_Header.m_Domain == serviceDomain))
                         {
-
                             // TODO: Echo management needed?
+                            DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _processAnswers: Probing CONFLICT found with '%s'\n"), _DH(), _service2String(pService)););
                             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _processAnswers: Probing CONFLICT found with '%s'\n"), _DH(), _service2String(pService)););
                             _cancelProbingForService(*pService);
                         }
@@ -867,10 +853,10 @@ bool MDNSResponder::clsHost::_processAnswers(const MDNSResponder::clsHost::stcRR
 }
 
 /*
-    MDNSResponder::clsHost::_processPTRAnswer (level 1)
+    clsLEAmDNS2_Host::_processPTRAnswer (level 1)
 */
-bool MDNSResponder::clsHost::_processPTRAnswer(const MDNSResponder::clsHost::stcRRAnswerPTR* p_pPTRAnswer,
-                                               bool& p_rbFoundNewKeyAnswer)
+bool clsLEAMDNSHost::_processPTRAnswer(const clsLEAMDNSHost::clsRRAnswerPTR* p_pPTRAnswer,
+                                       bool& p_rbFoundNewKeyAnswer)
 {
     bool    bResult = false;
 
@@ -880,17 +866,16 @@ bool MDNSResponder::clsHost::_processPTRAnswer(const MDNSResponder::clsHost::stc
         // eg. _http._tcp.local PTR xxxx xx MyESP._http._tcp.local
         // Check pending service queries for eg. '_http._tcp'
 
-        stcQuery*    pQuery = _findNextQueryByDomain(p_pPTRAnswer->m_Header.m_Domain, stcQuery::enuQueryType::Service, 0);
+        clsQuery*    pQuery = _findNextQueryByDomain(p_pPTRAnswer->m_Header.m_Domain, clsQuery::enuQueryType::Service, 0);
         while (pQuery)
         {
             if (pQuery->m_bAwaitingAnswers)
-            {
-                // Find answer for service domain (eg. MyESP._http._tcp.local)
-                stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForServiceDomain(p_pPTRAnswer->m_PTRDomain);
-                if (pSQAnswer)      // existing answer
-                {
-                    if (p_pPTRAnswer->m_u32TTL)     // Received update message
-                    {
+            {   // Find answer for service domain (eg. MyESP._http._tcp.local)
+                clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForServiceDomain(p_pPTRAnswer->m_PTRDomain);
+                if (pSQAnswer)
+                {   // existing answer
+                    if (p_pPTRAnswer->m_u32TTL)
+                    {   // Received update message
                         pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL);    // Update TTL tag
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _processPTRAnswer: Updated TTL(%lu) for "), _DH(), p_pPTRAnswer->m_u32TTL);
@@ -898,8 +883,8 @@ bool MDNSResponder::clsHost::_processPTRAnswer(const MDNSResponder::clsHost::stc
                             DEBUG_OUTPUT.printf_P(PSTR("\n"));
                         );
                     }
-                    else                            // received goodbye-message
-                    {
+                    else
+                    {   // received goodbye-message
                         pSQAnswer->m_TTLServiceDomain.prepareDeletion();    // Prepare answer deletion according to RFC 6762, 10.1
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _processPTRAnswer: 'Goodbye' received for "), _DH());
@@ -908,11 +893,11 @@ bool MDNSResponder::clsHost::_processPTRAnswer(const MDNSResponder::clsHost::stc
                         );
                     }
                 }
-                else if ((p_pPTRAnswer->m_u32TTL) &&                                // Not just a goodbye-message
-                         ((pSQAnswer = new stcQuery::stcAnswer)))        // Not yet included -> add answer
+                else if ((p_pPTRAnswer->m_u32TTL) &&                        // Not just a goodbye-message
+                         ((pSQAnswer = new clsQuery::clsAnswer)))           // Not yet included -> add answer
                 {
                     pSQAnswer->m_ServiceDomain = p_pPTRAnswer->m_PTRDomain;
-                    pSQAnswer->m_QueryAnswerFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::ServiceDomain);
+                    pSQAnswer->m_QueryAnswerFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain);
                     pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL);
                     //pSQAnswer->releaseServiceDomain();
 
@@ -925,10 +910,10 @@ bool MDNSResponder::clsHost::_processPTRAnswer(const MDNSResponder::clsHost::stc
                     );
 
                     p_rbFoundNewKeyAnswer = true;
-                    _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::ServiceDomain), true);
+                    _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain), true);
                 }
             }
-            pQuery = _findNextQueryByDomain(p_pPTRAnswer->m_Header.m_Domain, stcQuery::enuQueryType::Service, pQuery);
+            pQuery = _findNextQueryByDomain(p_pPTRAnswer->m_Header.m_Domain, clsQuery::enuQueryType::Service, pQuery);
         }
     }   // else: No p_pPTRAnswer
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _processPTRAnswer: FAILED!\n"), _DH()););
@@ -936,27 +921,28 @@ bool MDNSResponder::clsHost::_processPTRAnswer(const MDNSResponder::clsHost::stc
 }
 
 /*
-    MDNSResponder::clsHost::_processSRVAnswer (level 2)
+    clsLEAmDNS2_Host::_processSRVAnswer (level 2)
 */
-bool MDNSResponder::clsHost::_processSRVAnswer(const MDNSResponder::clsHost::stcRRAnswerSRV* p_pSRVAnswer,
-                                               bool& p_rbFoundNewKeyAnswer)
+bool clsLEAMDNSHost::_processSRVAnswer(const clsLEAMDNSHost::clsRRAnswerSRV* p_pSRVAnswer,
+                                       bool& p_rbFoundNewKeyAnswer)
 {
     bool    bResult = false;
 
     if ((bResult = (0 != p_pSRVAnswer)))
     {
         // eg. MyESP._http._tcp.local SRV xxxx xx yy zz 5000 esp8266.local
-
-        stcQuery*    pQuery = m_pQueries;
-        while (pQuery)
+        for (clsQuery::list::iterator it = m_Queries.begin(); ((bResult) && (it != m_Queries.end())); it++)
         {
+            clsQuery* pQuery = *it;
+
             if (pQuery->m_bAwaitingAnswers)
             {
-                stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForServiceDomain(p_pSRVAnswer->m_Header.m_Domain);
-                if (pSQAnswer)      // Answer for this service domain (eg. MyESP._http._tcp.local) available
+                clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForServiceDomain(p_pSRVAnswer->m_Header.m_Domain);
+                if (pSQAnswer)
                 {
-                    if (p_pSRVAnswer->m_u32TTL)     // First or update message (TTL != 0)
-                    {
+                    // Answer for this service domain (eg. MyESP._http._tcp.local) available
+                    if (p_pSRVAnswer->m_u32TTL)
+                    {   // First or update message (TTL != 0)
                         pSQAnswer->m_TTLHostDomainAndPort.set(p_pSRVAnswer->m_u32TTL);    // Update TTL tag
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _processSRVAnswer: Updated TTL(%lu) for "), _DH(), p_pSRVAnswer->m_u32TTL);
@@ -971,7 +957,7 @@ bool MDNSResponder::clsHost::_processSRVAnswer(const MDNSResponder::clsHost::stc
                             pSQAnswer->m_HostDomain = p_pSRVAnswer->m_SRVDomain;
                             //pSQAnswer->releaseHostDomain();
                             pSQAnswer->m_u16Port = p_pSRVAnswer->m_u16Port;
-                            pSQAnswer->m_QueryAnswerFlags |= (static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain) | static_cast<typeQueryAnswerType>(enuQueryAnswerType::Port));
+                            pSQAnswer->m_QueryAnswerFlags |= (static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain) | static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Port));
 
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _processSVRAnswer: Added host domain and port to "), _DH());
@@ -982,11 +968,11 @@ bool MDNSResponder::clsHost::_processSRVAnswer(const MDNSResponder::clsHost::stc
                             );
 
                             p_rbFoundNewKeyAnswer = true;
-                            _executeQueryCallback(*pQuery, *pSQAnswer, (static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain) | static_cast<typeQueryAnswerType>(enuQueryAnswerType::Port)), true);
+                            _executeQueryCallback(*pQuery, *pSQAnswer, (static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain) | static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Port)), true);
                         }
                     }
-                    else                        // Goodby message
-                    {
+                    else
+                    {   // Goodby message
                         pSQAnswer->m_TTLHostDomainAndPort.prepareDeletion();    // Prepare answer deletion according to RFC 6762, 10.1
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _processSRVAnswer: 'Goodbye' received for "), _DH());
@@ -996,34 +982,33 @@ bool MDNSResponder::clsHost::_processSRVAnswer(const MDNSResponder::clsHost::stc
                     }
                 }
             }   // m_bAwaitingAnswers
-            pQuery = pQuery->m_pNext;
-        }   // while(service query)
+        }   // for(queries)
     }   // else: No p_pSRVAnswer
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _processSRVAnswer: FAILED!\n"), _DH()););
     return bResult;
 }
 
 /*
-    MDNSResponder::clsHost::_processTXTAnswer (level 2)
+    clsLEAmDNS2_Host::_processTXTAnswer (level 2)
 */
-bool MDNSResponder::clsHost::_processTXTAnswer(const MDNSResponder::clsHost::stcRRAnswerTXT* p_pTXTAnswer)
+bool clsLEAMDNSHost::_processTXTAnswer(const clsLEAMDNSHost::clsRRAnswerTXT* p_pTXTAnswer)
 {
     bool    bResult = false;
 
     if ((bResult = (0 != p_pTXTAnswer)))
     {
         // eg. MyESP._http._tcp.local TXT xxxx xx c#=1
-
-        stcQuery*    pQuery = m_pQueries;
-        while (pQuery)
+        for (clsQuery::list::iterator it = m_Queries.begin(); ((bResult) && (it != m_Queries.end())); it++)
         {
+            clsQuery* pQuery = *it;
+
             if (pQuery->m_bAwaitingAnswers)
             {
-                stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForServiceDomain(p_pTXTAnswer->m_Header.m_Domain);
-                if (pSQAnswer)      // Answer for this service domain (eg. MyESP._http._tcp.local) available
-                {
-                    if (p_pTXTAnswer->m_u32TTL)     // First or update message
-                    {
+                clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForServiceDomain(p_pTXTAnswer->m_Header.m_Domain);
+                if (pSQAnswer)
+                {   // Answer for this service domain (eg. MyESP._http._tcp.local) available
+                    if (p_pTXTAnswer->m_u32TTL)
+                    {   // First or update message
                         pSQAnswer->m_TTLTxts.set(p_pTXTAnswer->m_u32TTL); // Update TTL tag
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _processTXTAnswer: Updated TTL(%lu) for "), _DH(), p_pTXTAnswer->m_u32TTL);
@@ -1033,7 +1018,7 @@ bool MDNSResponder::clsHost::_processTXTAnswer(const MDNSResponder::clsHost::stc
                         if (!pSQAnswer->m_Txts.compare(p_pTXTAnswer->m_Txts))
                         {
                             pSQAnswer->m_Txts = p_pTXTAnswer->m_Txts;
-                            pSQAnswer->m_QueryAnswerFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::Txts);
+                            pSQAnswer->m_QueryAnswerFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Txts);
                             //pSQAnswer->releaseTxts();
 
                             DEBUG_EX_INFO(
@@ -1042,11 +1027,11 @@ bool MDNSResponder::clsHost::_processTXTAnswer(const MDNSResponder::clsHost::stc
                                 DEBUG_OUTPUT.println();
                             );
 
-                            _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::Txts), true);
+                            _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Txts), true);
                         }
                     }
-                    else                        // Goodby message
-                    {
+                    else
+                    {   // Goodby message
                         pSQAnswer->m_TTLTxts.prepareDeletion(); // Prepare answer deletion according to RFC 6762, 10.1
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _processTXTAnswer: 'Goodbye' received for "), _DH());
@@ -1056,8 +1041,7 @@ bool MDNSResponder::clsHost::_processTXTAnswer(const MDNSResponder::clsHost::stc
                     }
                 }
             }   // m_bAwaitingAnswers
-            pQuery = pQuery->m_pNext;
-        }   // while(service query)
+        }   // for(queries)
     }   // else: No p_pTXTAnswer
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _processTXTAnswer: FAILED!\n"), _DH()););
     return bResult;
@@ -1065,32 +1049,29 @@ bool MDNSResponder::clsHost::_processTXTAnswer(const MDNSResponder::clsHost::stc
 
 #ifdef MDNS_IPV4_SUPPORT
 /*
-    MDNSResponder::clsHost::_processAAnswer (level 3)
+    clsLEAmDNS2_Host::_processAAnswer (level 3)
 */
-bool MDNSResponder::clsHost::_processAAnswer(const MDNSResponder::clsHost::stcRRAnswerA* p_pAAnswer)
+bool clsLEAMDNSHost::_processAAnswer(const clsLEAMDNSHost::clsRRAnswerA* p_pAAnswer)
 {
     bool    bResult = false;
 
     if ((bResult = (0 != p_pAAnswer)))
     {
         // eg. esp8266.local A xxxx xx 192.168.2.120
-
-        stcQuery*    pQuery = m_pQueries;
-        while (pQuery)
+        for (clsQuery::list::iterator it = m_Queries.begin(); ((bResult) && (it != m_Queries.end())); it++)
         {
-            if (pQuery->m_bAwaitingAnswers)
-            {
-                // Look for answers to host queries
-                if ((p_pAAnswer->m_u32TTL) &&                                       // NOT just a goodbye message
-                    (stcQuery::enuQueryType::Host == pQuery->m_QueryType) &&    // AND a host query
-                    (pQuery->m_Domain == p_pAAnswer->m_Header.m_Domain))            // AND a matching host domain
-                {
+            clsQuery* pQuery = *it;
 
-                    stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAnswer->m_Header.m_Domain);
+            if (pQuery->m_bAwaitingAnswers)
+            {   // Look for answers to host queries
+                if ((p_pAAnswer->m_u32TTL) &&                                   // NOT just a goodbye message
+                    (clsQuery::enuQueryType::Host == pQuery->m_QueryType) &&    // AND a host query
+                    (pQuery->m_Domain == p_pAAnswer->m_Header.m_Domain))        // AND a matching host domain
+                {
+                    clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAnswer->m_Header.m_Domain);
                     if ((!pSQAnswer) &&
-                        ((pSQAnswer = new stcQuery::stcAnswer)))
-                    {
-                        // Add not yet included answer
+                        ((pSQAnswer = new clsQuery::clsAnswer)))
+                    {   // Add not yet included answer
                         pSQAnswer->m_HostDomain = p_pAAnswer->m_Header.m_Domain;
                         //pSQAnswer->releaseHostDomain();
 
@@ -1101,21 +1082,20 @@ bool MDNSResponder::clsHost::_processAAnswer(const MDNSResponder::clsHost::stcRR
                             DEBUG_OUTPUT.println();
                         );
 
-                        pSQAnswer->m_QueryAnswerFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain);
-                        _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain), true);
+                        pSQAnswer->m_QueryAnswerFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain);
+                        _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain), true);
                     }
                 }
 
                 // Look for answers to service queries
-                stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAnswer->m_Header.m_Domain);
-                if (pSQAnswer)      // Answer for this host domain (eg. esp8266.local) available
-                {
-                    stcQuery::stcAnswer::stcIPAddress*  pIPAddress = pSQAnswer->findIPv4Address(p_pAAnswer->m_IPAddress);
+                clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAnswer->m_Header.m_Domain);
+                if (pSQAnswer)
+                {   // Answer for this host domain (eg. esp8266.local) available
+                    clsQuery::clsAnswer::clsIPAddressWithTTL*  pIPAddress = pSQAnswer->findIPv4Address(p_pAAnswer->m_IPAddress);
                     if (pIPAddress)
-                    {
-                        // Already known IPv4 address
-                        if (p_pAAnswer->m_u32TTL)   // Valid TTL -> Update answers TTL
-                        {
+                    {   // Already known IPv4 address
+                        if (p_pAAnswer->m_u32TTL)
+                        {   // Valid TTL -> Update answers TTL
                             pIPAddress->m_TTL.set(p_pAAnswer->m_u32TTL);
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _processAAnswer: Updated TTL(%lu) for "), _DH(), p_pAAnswer->m_u32TTL);
@@ -1123,8 +1103,8 @@ bool MDNSResponder::clsHost::_processAAnswer(const MDNSResponder::clsHost::stcRR
                                 DEBUG_OUTPUT.printf_P(PSTR(" IPv4 address (%s)\n"), pIPAddress->m_IPAddress.toString().c_str());
                             );
                         }
-                        else                        // 'Goodbye' message for known IPv4 address
-                        {
+                        else
+                        {   // 'Goodbye' message for known IPv4 address
                             pIPAddress->m_TTL.prepareDeletion();	// Prepare answer deletion according to RFC 6762, 10.1
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _processAAnswer: 'Goodbye' received for "), _DH());
@@ -1134,23 +1114,21 @@ bool MDNSResponder::clsHost::_processAAnswer(const MDNSResponder::clsHost::stcRR
                         }
                     }
                     else
-                    {
-                        // Until now unknown IPv4 address -> Add (if the message isn't just a 'Goodbye' note)
-                        if (p_pAAnswer->m_u32TTL)   // NOT just a 'Goodbye' message
-                        {
-                            pIPAddress = new stcQuery::stcAnswer::stcIPAddress(p_pAAnswer->m_IPAddress, p_pAAnswer->m_u32TTL);
+                    {   // Until now unknown IPv4 address -> Add (if the message isn't just a 'Goodbye' note)
+                        if (p_pAAnswer->m_u32TTL)
+                        {   // NOT just a 'Goodbye' message
+                            pIPAddress = new clsQuery::clsAnswer::clsIPAddressWithTTL(p_pAAnswer->m_IPAddress, p_pAAnswer->m_u32TTL);
                             if ((pIPAddress) &&
                                 (pSQAnswer->addIPv4Address(pIPAddress)))
                             {
-
                                 DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR("%s _processAAnswer: Added IPv4 address to "), _DH());
                                     _printRRDomain(pSQAnswer->m_ServiceDomain);
                                     DEBUG_OUTPUT.printf_P(PSTR(": %s\n"), pIPAddress->m_IPAddress.toString().c_str());
                                 );
 
-                                pSQAnswer->m_QueryAnswerFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv4Address);
-                                _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv4Address), true);
+                                pSQAnswer->m_QueryAnswerFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address);
+                                _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address), true);
                             }
                             else
                             {
@@ -1160,8 +1138,7 @@ bool MDNSResponder::clsHost::_processAAnswer(const MDNSResponder::clsHost::stcRR
                     }
                 }
             }   // m_bAwaitingAnswers
-            pQuery = pQuery->m_pNext;
-        }   // while(service query)
+        }   // for(queries)
     }   // else: No p_pAAnswer
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _processAAnswer: FAILED!\n"), _DH()););
     return bResult;
@@ -1170,32 +1147,29 @@ bool MDNSResponder::clsHost::_processAAnswer(const MDNSResponder::clsHost::stcRR
 
 #ifdef MDNS_IPV6_SUPPORT
 /*
-    MDNSResponder::clsHost::_processAAAAAnswer (level 3)
+    clsLEAmDNS2_Host::_processAAAAAnswer (level 3)
 */
-bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::stcRRAnswerAAAA* p_pAAAAAnswer)
+bool clsLEAMDNSHost::_processAAAAAnswer(const clsLEAMDNSHost::clsRRAnswerAAAA* p_pAAAAAnswer)
 {
     bool    bResult = false;
 
     if ((bResult = (0 != p_pAAAAAnswer)))
     {
         // eg. esp8266.local AAAA xxxx xx 0bf3::0c
-
-        stcQuery*	pQuery = m_pQueries;
-        while (pQuery)
+        for (clsQuery::list::iterator it = m_Queries.begin(); ((bResult) && (it != m_Queries.end())); it++)
         {
-            if (pQuery->m_bAwaitingAnswers)
-            {
-                // Look for answers to host queries
-                if ((p_pAAAAAnswer->m_u32TTL) &&                                    // NOT just a goodbye message
-                    (stcQuery::enuQueryType::Host == pQuery->m_QueryType) &&    // AND a host query
-                    (pQuery->m_Domain == p_pAAAAAnswer->m_Header.m_Domain))         // AND a matching host domain
-                {
+            clsQuery* pQuery = *it;
 
-                    stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAAAAnswer->m_Header.m_Domain);
+            if (pQuery->m_bAwaitingAnswers)
+            {   // Look for answers to host queries
+                if ((p_pAAAAAnswer->m_u32TTL) &&                                // NOT just a goodbye message
+                    (clsQuery::enuQueryType::Host == pQuery->m_QueryType) &&    // AND a host query
+                    (pQuery->m_Domain == p_pAAAAAnswer->m_Header.m_Domain))     // AND a matching host domain
+                {
+                    clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAAAAnswer->m_Header.m_Domain);
                     if ((!pSQAnswer) &&
-                        ((pSQAnswer = new stcQuery::stcAnswer)))
-                    {
-                        // Add not yet included answer
+                        ((pSQAnswer = new clsQuery::clsAnswer)))
+                    {   // Add not yet included answer
                         pSQAnswer->m_HostDomain = p_pAAAAAnswer->m_Header.m_Domain;
                         //pSQAnswer->releaseHostDomain();
 
@@ -1206,21 +1180,20 @@ bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::st
                             DEBUG_OUTPUT.println();
                         );
 
-                        pSQAnswer->m_QueryAnswerFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain);
-                        _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain), true);
+                        pSQAnswer->m_QueryAnswerFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain);
+                        _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain), true);
                     }
                 }
 
                 // Look for answers to service queries
-                stcQuery::stcAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAAAAnswer->m_Header.m_Domain);
+                clsQuery::clsAnswer* pSQAnswer = pQuery->findAnswerForHostDomain(p_pAAAAAnswer->m_Header.m_Domain);
                 if (pSQAnswer)      // Answer for this host domain (eg. esp8266.local) available
                 {
-                    stcQuery::stcAnswer::stcIPAddress*  pIPAddress = pSQAnswer->findIPv6Address(p_pAAAAAnswer->m_IPAddress);
+                    clsQuery::clsAnswer::clsIPAddressWithTTL*  pIPAddress = pSQAnswer->findIPv6Address(p_pAAAAAnswer->m_IPAddress);
                     if (pIPAddress)
-                    {
-                        // Already known IPv6 address
-                        if (p_pAAAAAnswer->m_u32TTL)   // Valid TTL -> Update answers TTL
-                        {
+                    {   // Already known IPv6 address
+                        if (p_pAAAAAnswer->m_u32TTL)
+                        {   // Valid TTL -> Update answers TTL
                             pIPAddress->m_TTL.set(p_pAAAAAnswer->m_u32TTL);
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _processAAAAAnswer: Updated TTL(%lu) for "), _DH(), p_pAAAAAnswer->m_u32TTL);
@@ -1228,8 +1201,8 @@ bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::st
                                 DEBUG_OUTPUT.printf_P(PSTR(" IPv6 address (%s)\n"), pIPAddress->m_IPAddress.toString().c_str());
                             );
                         }
-                        else                        // 'Goodbye' message for known IPv6 address
-                        {
+                        else
+                        {   // 'Goodbye' message for known IPv6 address
                             pIPAddress->m_TTL.prepareDeletion();	// Prepare answer deletion according to RFC 6762, 10.1
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _processAAAAAnswer: 'Goodbye' received for "), _DH());
@@ -1239,23 +1212,22 @@ bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::st
                         }
                     }
                     else
-                    {
-                        // Until now unknown IPv6 address -> Add (if the message isn't just a 'Goodbye' note)
-                        if (p_pAAAAAnswer->m_u32TTL)   // NOT just a 'Goodbye' message
+                    {   // Until now unknown IPv6 address -> Add (if the message isn't just a 'Goodbye' note)
+                        if (p_pAAAAAnswer->m_u32TTL)
                         {
-                            pIPAddress = new stcQuery::stcAnswer::stcIPAddress(p_pAAAAAnswer->m_IPAddress, p_pAAAAAnswer->m_u32TTL);
+                            // NOT just a 'Goodbye' message
+                            pIPAddress = new clsQuery::clsAnswer::clsIPAddressWithTTL(p_pAAAAAnswer->m_IPAddress, p_pAAAAAnswer->m_u32TTL);
                             if ((pIPAddress) &&
                                 (pSQAnswer->addIPv6Address(pIPAddress)))
                             {
-
                                 DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR("%s _processAAAAAnswer: Added IPv6 address to "), _DH());
                                     _printRRDomain(pSQAnswer->m_ServiceDomain);
                                     DEBUG_OUTPUT.printf_P(PSTR(": %s\n"), pIPAddress->m_IPAddress.toString().c_str());
                                 );
 
-                                pSQAnswer->m_QueryAnswerFlags |= static_cast<uint32_t>(enuQueryAnswerType::IPv6Address);
-                                _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv6Address), true);
+                                pSQAnswer->m_QueryAnswerFlags |= static_cast<uint32_t>(clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address);
+                                _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address), true);
                             }
                             else
                             {
@@ -1265,8 +1237,7 @@ bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::st
                     }
                 }
             }   // m_bAwaitingAnswers
-            pQuery = pQuery->m_pNext;
-        }   // while(service query)
+        }   // for(queries)
     }   // else: No p_pAAAAAnswer
 
     return bResult;
@@ -1275,11 +1246,13 @@ bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::st
 
 
 /*
+
     PROBING
+
 */
 
 /*
-    MDNSResponder::clsHost::_updateProbeStatus
+    clsLEAmDNS2_Host::_updateProbeStatus
 
     Manages the (outgoing) probing process.
     - If probing has not been started yet (ProbingStatus_NotStarted), the initial delay (see RFC 6762) is determined and
@@ -1290,13 +1263,13 @@ bool MDNSResponder::clsHost::_processAAAAAnswer(const MDNSResponder::clsHost::st
     Conflict management is handled in '_parseResponse ff.'
     Tiebraking is handled in 'parseQuery ff.'
 */
-bool MDNSResponder::clsHost::_updateProbeStatus(void)
+bool clsLEAMDNSHost::_updateProbeStatus(void)
 {
     bool    bResult = true;
 
     //
     // Probe host domain
-    if ((enuProbingStatus::ReadyToStart == m_HostProbeInformation.m_ProbingStatus) &&       // Ready to get started AND
+    if ((clsProbeInformation_Base::enuProbingStatus::ReadyToStart == m_ProbeInformation.m_ProbingStatus) &&       // Ready to get started AND
         ((
 #ifdef MDNS_IPV4_SUPPORT
              _getResponderIPAddress(enuIPProtocolType::V4).isSet()                             // AND has IPv4 address
@@ -1314,111 +1287,122 @@ bool MDNSResponder::clsHost::_updateProbeStatus(void)
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Starting host probing...\n"), _DH()););
 
         // First probe delay SHOULD be random 0-250 ms
-        m_HostProbeInformation.m_Timeout.reset(rand() % MDNS_PROBE_DELAY);
-        m_HostProbeInformation.m_ProbingStatus = enuProbingStatus::InProgress;
+        m_ProbeInformation.m_Timeout.reset(rand() % clsConsts::u32ProbeDelay);
+        m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::InProgress;
     }
-    else if ((enuProbingStatus::InProgress == m_HostProbeInformation.m_ProbingStatus) &&    // Probing AND
-             (m_HostProbeInformation.m_Timeout.expired()))                                  // Time for next probe
+    else if ((clsProbeInformation_Base::enuProbingStatus::InProgress == m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
+             (m_ProbeInformation.m_Timeout.expired()))                                                          // Time for next probe
     {
-
-        if (MDNS_PROBE_COUNT > m_HostProbeInformation.m_u8SentCount)                        // Send next probe
+        if (clsConsts::u32ProbeCount > m_ProbeInformation.m_u8SentCount)
         {
+            // Send next probe
             if ((bResult = _sendHostProbe()))
             {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent host probe for '%s.local'\n\n"), _DH(), (m_pcHostName ? : "")););
-                m_HostProbeInformation.m_Timeout.reset(MDNS_PROBE_DELAY);
-                ++m_HostProbeInformation.m_u8SentCount;
+                m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
+                ++m_ProbeInformation.m_u8SentCount;
             }
         }
-        else                                                                                // Probing finished
+        else
         {
+            // Probing finished
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("\n%s _updateProbeStatus: Done host probing for '%s.local'.\n\n\n"), _DH(), (m_pcHostName ? : "")););
-            m_HostProbeInformation.m_ProbingStatus = enuProbingStatus::Done;
-            m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+            m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce;
+            m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShot::neverExpires);
 
             _callHostProbeResultCallback(true);
 
             // Prepare to announce host
-            m_HostProbeInformation.m_u8SentCount = 0;
-            m_HostProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
+            m_ProbeInformation.m_u8SentCount = 0;
+            m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay);
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Prepared host announcing.\n\n"), _DH()););
         }
     }   // else: Probing already finished OR waiting for next time slot
-    else if ((enuProbingStatus::Done == m_HostProbeInformation.m_ProbingStatus) &&
-             (m_HostProbeInformation.m_Timeout.expired()))
+    else if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) &&
+             (m_ProbeInformation.m_Timeout.expired()))
     {
-
-        if ((bResult = _announce(true, false)))     // Don't announce services here
+        if ((bResult = _announce(true, false)))
         {
-            ++m_HostProbeInformation.m_u8SentCount; // 1..
+            // Don't announce services here
+            ++m_ProbeInformation.m_u8SentCount; // 1..
 
-            if (MDNS_ANNOUNCE_COUNT > m_HostProbeInformation.m_u8SentCount)
+            if (clsConsts::u32AnnounceCount > m_ProbeInformation.m_u8SentCount)
             {
-                m_HostProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY * pow(2, (m_HostProbeInformation.m_u8SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing host '%s.local' (%lu).\n\n"), _DH(), (m_pcHostName ? : ""), m_HostProbeInformation.m_u8SentCount););
+                m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay * pow(2, (m_ProbeInformation.m_u8SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing host '%s.local' (%lu).\n\n"), _DH(), (m_pcHostName ? : ""), m_ProbeInformation.m_u8SentCount););
             }
             else
             {
-                m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::DoneFinally;
+                m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShot::neverExpires);
+                DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Done host announcing for '%s.local'.\n"), _DH(), (m_pcHostName ? : "")););
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Done host announcing for '%s.local'.\n\n"), _DH(), (m_pcHostName ? : "")););
+                //DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Done host announcing for '%s.local'.\n"), _DH(), (m_pcHostName ? : ""));
             }
         }
     }
 
     //
     // Probe services
-    for (stcService* pService = m_pServices; ((bResult) && (pService)); pService = pService->m_pNext)
+    for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
     {
-        if (enuProbingStatus::ReadyToStart == pService->m_ProbeInformation.m_ProbingStatus)         // Ready to get started
-        {
+        clsService* pService = *it;
 
-            pService->m_ProbeInformation.m_Timeout.reset(MDNS_PROBE_DELAY);                         // More or equal than first probe for host domain
-            pService->m_ProbeInformation.m_ProbingStatus = enuProbingStatus::InProgress;
+        if (clsProbeInformation_Base::enuProbingStatus::ReadyToStart == pService->m_ProbeInformation.m_ProbingStatus)
+        {
+            // Ready to get started
+            pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);                         // More or equal than first probe for host domain
+            pService->m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::InProgress;
         }
-        else if ((enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
-                 (pService->m_ProbeInformation.m_Timeout.expired()))                                // Time for next probe
+        else if ((clsProbeInformation_Base::enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&    // Probing AND
+                 (pService->m_ProbeInformation.m_Timeout.expired()))                                                            // Time for next probe
         {
-
-            if (MDNS_PROBE_COUNT > pService->m_ProbeInformation.m_u8SentCount)                      // Send next probe
+            if (clsConsts::u32ProbeCount > pService->m_ProbeInformation.m_u8SentCount)
             {
+                // Send next probe
                 if ((bResult = _sendServiceProbe(*pService)))
                 {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent service probe for '%s' (%u)\n\n"), _DH(), _service2String(pService), (pService->m_ProbeInformation.m_u8SentCount + 1)););
-                    pService->m_ProbeInformation.m_Timeout.reset(MDNS_PROBE_DELAY);
+                    pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
                     ++pService->m_ProbeInformation.m_u8SentCount;
                 }
             }
-            else                                                                                    // Probing finished
+            else
             {
+                // Probing finished
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("\n%s _updateProbeStatus: Done service probing '%s'\n\n\n"), _DH(), _service2String(pService)););
-                pService->m_ProbeInformation.m_ProbingStatus = enuProbingStatus::Done;
-                pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                pService->m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce;
+                pService->m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShot::neverExpires);
 
                 _callServiceProbeResultCallback(*pService, true);
 
                 // Prepare to announce service
                 pService->m_ProbeInformation.m_u8SentCount = 0;
-                pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
+                pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay);
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Prepared service announcing.\n\n"), _DH()););
             }
-        }   // else: Probing already finished OR waiting for next time slot
-        else if ((enuProbingStatus::Done == pService->m_ProbeInformation.m_ProbingStatus) &&
+        }
+        else if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == pService->m_ProbeInformation.m_ProbingStatus) &&
                  (pService->m_ProbeInformation.m_Timeout.expired()))
         {
-
-            if ((bResult = _announceService(*pService)))        // Announce service
+            // Probing already finished OR waiting for next time slot
+            if ((bResult = _announceService(*pService)))
             {
+                // Announce service
                 ++pService->m_ProbeInformation.m_u8SentCount;   // 1..
 
-                if (MDNS_ANNOUNCE_COUNT > pService->m_ProbeInformation.m_u8SentCount)
+                if (clsConsts::u32AnnounceCount > pService->m_ProbeInformation.m_u8SentCount)
                 {
-                    pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY * pow(2, (pService->m_ProbeInformation.m_u8SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
+                    pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay * pow(2, (pService->m_ProbeInformation.m_u8SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing service '%s' (%lu)\n\n"), _DH(), _service2String(pService), pService->m_ProbeInformation.m_u8SentCount););
                 }
                 else
                 {
-                    pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                    pService->m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::DoneFinally;
+                    pService->m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShot::neverExpires);
+                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Done service announcing for '%s'\n"), _DH(), _service2String(pService)););
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Done service announcing for '%s'\n\n"), _DH(), _service2String(pService)););
+                    //DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Done service announcing for '%s'\n"), _DH(), _service2String(pService));
                 }
             }
         }
@@ -1428,44 +1412,48 @@ bool MDNSResponder::clsHost::_updateProbeStatus(void)
 }
 
 /*
-    MDNSResponder::clsHost::_resetProbeStatus
+    clsLEAmDNS2_Host::_resetProbeStatus
 
     Resets the probe status.
     If 'p_bRestart' is set, the status is set to ProbingStatus_NotStarted. Consequently,
     when running 'updateProbeStatus' (which is done in every '_update' loop), the probing
     process is restarted.
-*/
-bool MDNSResponder::clsHost::_resetProbeStatus(bool p_bRestart /*= true*/)
-{
-    m_HostProbeInformation.clear(false);
-    m_HostProbeInformation.m_ProbingStatus = (p_bRestart ? enuProbingStatus::ReadyToStart : enuProbingStatus::Done);
 
-    for (stcService* pService = m_pServices; pService; pService = pService->m_pNext)
+*/
+bool clsLEAMDNSHost::_resetProbeStatus(bool p_bRestart /*= true*/)
+{
+    m_ProbeInformation.clear(false);
+    m_ProbeInformation.m_ProbingStatus = (p_bRestart ? clsProbeInformation_Base::enuProbingStatus::ReadyToStart : clsProbeInformation_Base::enuProbingStatus::DoneFinally);
+
+    for (clsService* pService : m_Services)
     {
         pService->m_ProbeInformation.clear(false);
-        pService->m_ProbeInformation.m_ProbingStatus = (p_bRestart ? enuProbingStatus::ReadyToStart : enuProbingStatus::Done);
+        pService->m_ProbeInformation.m_ProbingStatus = (p_bRestart ? clsProbeInformation_Base::enuProbingStatus::ReadyToStart : clsProbeInformation_Base::enuProbingStatus::DoneFinally);
     }
     return true;
 }
 
 /*
-    MDNSResponder::clsHost::_hasProbesWaitingForAnswers
-*/
-bool MDNSResponder::clsHost::_hasProbesWaitingForAnswers(void) const
-{
-    bool    bResult = ((enuProbingStatus::InProgress == m_HostProbeInformation.m_ProbingStatus) &&	// Probing
-                       (0 < m_HostProbeInformation.m_u8SentCount));                                 // And really probing
+    clsLEAmDNS2_Host::_hasProbesWaitingForAnswers
 
-    for (stcService* pService = m_pServices; ((!bResult) && (pService)); pService = pService->m_pNext)
+*/
+bool clsLEAMDNSHost::_hasProbesWaitingForAnswers(void) const
+{
+    bool    bResult = ((clsProbeInformation_Base::enuProbingStatus::InProgress == m_ProbeInformation.m_ProbingStatus) &&	    // Probing
+                       (0 < m_ProbeInformation.m_u8SentCount));                                                                 // And really probing
+
+    for (clsService::list::const_iterator it = m_Services.cbegin(); ((!bResult) && (it != m_Services.cend())); it++)
     {
-        bResult = ((enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&    // Probing
-                   (0 < pService->m_ProbeInformation.m_u8SentCount));                               // And really probing
+        clsService* pService = *it;
+
+        bResult = ((clsProbeInformation_Base::enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing
+                   (0 < pService->m_ProbeInformation.m_u8SentCount));                                                           // And really probing
     }
     return bResult;
 }
 
 /*
-    MDNSResponder::clsHost::_sendHostProbe
+    clsLEAmDNS2_Host::_sendHostProbe
 
     Asks (probes) in the local network for the planned host domain
     - (eg. esp8266.local)
@@ -1474,50 +1462,52 @@ bool MDNSResponder::clsHost::_hasProbesWaitingForAnswers(void) const
     the 'knwon answers' section of the query.
     Host domain:
     - A/AAAA (eg. esp8266.esp -> 192.168.2.120)
+
 */
-bool MDNSResponder::clsHost::_sendHostProbe(void)
+bool clsLEAMDNSHost::_sendHostProbe(void)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe (%s.local, %lu)\n"), _DH(), m_pcHostName, millis()););
 
     bool    bResult = true;
 
     // Requests for host domain
-    stcSendParameter    sendParameter;
+    clsSendParameter    sendParameter;
     sendParameter.m_bCacheFlush = false;    // RFC 6762 10.2
 
-    sendParameter.m_pQuestions = new stcRRQuestion;
-    if (((bResult = (0 != sendParameter.m_pQuestions))) &&
-        ((bResult = _buildDomainForHost(m_pcHostName, sendParameter.m_pQuestions->m_Header.m_Domain))))
+    clsRRQuestion*  pNewRRQuestion = new clsRRQuestion;
+    if (((bResult = (0 != pNewRRQuestion))) &&
+        ((bResult = _buildDomainForHost(m_pcHostName, pNewRRQuestion->m_Header.m_Domain))))
     {
-
         //sendParameter.m_pQuestions->m_bUnicast = true;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
+        pNewRRQuestion->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
+        pNewRRQuestion->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);       // Unicast & INternet
+
+        sendParameter.m_RRQuestions.push_back(pNewRRQuestion);
 
         // Add known answers
 #ifdef MDNS_IPV4_SUPPORT
-        sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::A);               // Add A answer
+        sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::A);       // Add A answer
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-        sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::AAAA);            // Add AAAA answer
+        sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::AAAA);    // Add AAAA answer
 #endif
     }
     else
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe: FAILED to create host question!\n"), _DH()););
-        if (sendParameter.m_pQuestions)
+        if (pNewRRQuestion)
         {
-            delete sendParameter.m_pQuestions;
-            sendParameter.m_pQuestions = 0;
+            delete pNewRRQuestion;
+            pNewRRQuestion = 0;
         }
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMDNSMessage(sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 /*
-    MDNSResponder::clsHost::_sendServiceProbe
+    clsLEAmDNS2_Host::_sendServiceProbe
 
     Asks (probes) in the local network for the planned service instance domain
     - (eg. MyESP._http._tcp.local).
@@ -1527,25 +1517,27 @@ bool MDNSResponder::clsHost::_sendHostProbe(void)
     Service domain:
     - SRV (eg. MyESP._http._tcp.local -> 5000 esp8266.local)
     - PTR NAME (eg. _http._tcp.local -> MyESP._http._tcp.local) (TODO: Check if needed, maybe TXT is better)
+
 */
-bool MDNSResponder::clsHost::_sendServiceProbe(stcService& p_rService)
+bool clsLEAMDNSHost::_sendServiceProbe(clsService& p_rService)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe (%s, %lu)\n"), _DH(), _service2String(&p_rService), millis()););
 
     bool    bResult = true;
 
     // Requests for service instance domain
-    stcSendParameter    sendParameter;
+    clsSendParameter    sendParameter;
     sendParameter.m_bCacheFlush = false;    // RFC 6762 10.2
 
-    sendParameter.m_pQuestions = new stcRRQuestion;
-    if (((bResult = (0 != sendParameter.m_pQuestions))) &&
-        ((bResult = _buildDomainForService(p_rService, true, sendParameter.m_pQuestions->m_Header.m_Domain))))
+    clsRRQuestion*  pNewRRQuestion = new clsRRQuestion;
+    if (((bResult = (0 != pNewRRQuestion))) &&
+        ((bResult = _buildDomainForService(p_rService, true, pNewRRQuestion->m_Header.m_Domain))))
     {
+        pNewRRQuestion->m_bUnicast = true;
+        pNewRRQuestion->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
+        pNewRRQuestion->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
 
-        sendParameter.m_pQuestions->m_bUnicast = true;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
+        sendParameter.m_RRQuestions.push_back(pNewRRQuestion);
 
         // Add known answers
         p_rService.m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::SRV) | static_cast<uint32_t>(enuContentFlag::PTR_NAME));	// Add SRV and PTR NAME answers
@@ -1553,30 +1545,31 @@ bool MDNSResponder::clsHost::_sendServiceProbe(stcService& p_rService)
     else
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe: FAILED to create service question!\n"), _DH()););
-        if (sendParameter.m_pQuestions)
+        if (pNewRRQuestion)
         {
-            delete sendParameter.m_pQuestions;
-            sendParameter.m_pQuestions = 0;
+            delete pNewRRQuestion;
+            pNewRRQuestion = 0;
         }
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMDNSMessage(sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 /*
-    MDNSResponder::clsHost::_cancelProbingForHost
+    clsLEAmDNS2_Host::_cancelProbingForHost
+
 */
-bool MDNSResponder::clsHost::_cancelProbingForHost(void)
+bool clsLEAMDNSHost::_cancelProbingForHost(void)
 {
     bool    bResult = false;
 
-    m_HostProbeInformation.clear(false);
+    m_ProbeInformation.clear(false);
 
     // Send host notification
     bResult = _callHostProbeResultCallback(false);
 
-    for (stcService* pService = m_pServices; ((!bResult) && (pService)); pService = pService->m_pNext)
+    for (clsService* pService : m_Services)
     {
         bResult = _cancelProbingForService(*pService);
     }
@@ -1584,9 +1577,10 @@ bool MDNSResponder::clsHost::_cancelProbingForHost(void)
 }
 
 /*
-    MDNSResponder::clsHost::_cancelProbingForService
+    clsLEAmDNS2_Host::_cancelProbingForService
+
 */
-bool MDNSResponder::clsHost::_cancelProbingForService(stcService& p_rService)
+bool clsLEAMDNSHost::_cancelProbingForService(clsService& p_rService)
 {
     p_rService.m_ProbeInformation.clear(false);
 
@@ -1595,81 +1589,53 @@ bool MDNSResponder::clsHost::_cancelProbingForService(stcService& p_rService)
 }
 
 /*
-    MDNSResponder::clsHost::_callHostProbeResultCallback
+    clsLEAmDNS2_Host::_callHostProbeResultCallback
 
 */
-bool MDNSResponder::clsHost::_callHostProbeResultCallback(bool p_bResult)
+bool clsLEAMDNSHost::_callHostProbeResultCallback(bool p_bResult)
 {
-    if (m_HostProbeInformation.m_fnProbeResultCallback)
+    if (m_ProbeInformation.m_fnProbeResultCallback)
     {
-        m_HostProbeInformation.m_fnProbeResultCallback(*this, m_pcHostName, p_bResult);
+        m_ProbeInformation.m_fnProbeResultCallback(*this, m_pcHostName, p_bResult);
     }
     else if (!p_bResult)
     {
         // Auto-Handle failure by changing the host name, use '-' as divider between base name and index
-        char*   pcHostDomainTemp = strdup(m_pcHostName);
-        if (pcHostDomainTemp)
-        {
-            if (MDNSResponder::indexDomain(pcHostDomainTemp, "-", 0))
-            {
-                setHostName(pcHostDomainTemp);
-            }
-            else
-            {
-                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _callHostProbeResultCallback: FAILED to update host domain '%s'!\n"), _DH(), (m_pcHostName ? : "")););
-            }
-            free(pcHostDomainTemp);
-        }
-        else
-        {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _callHostProbeResultCallback: FAILED to copy host domain '%s'!\n"), _DH(), (m_pcHostName ? : "")););
-        }
+        indexHostName();
+        DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _callHostProbeResultCallback: Changed Host Name: %s\n"), _DH(), (m_pcHostName ? : "")));
     }
     return true;
 }
 
 /*
-    MDNSResponder::clsHost::_callServiceProbeResultCallback
+    clsLEAmDNS2_Host::_callServiceProbeResultCallback
 
 */
-bool MDNSResponder::clsHost::_callServiceProbeResultCallback(MDNSResponder::clsHost::stcService& p_rService,
-                                                             bool p_bResult)
+bool clsLEAMDNSHost::_callServiceProbeResultCallback(clsLEAMDNSHost::clsService& p_rService,
+                                                     bool p_bResult)
 {
     if (p_rService.m_ProbeInformation.m_fnProbeResultCallback)
     {
-        p_rService.m_ProbeInformation.m_fnProbeResultCallback(*this, p_rService, p_rService.m_pcName, p_bResult);
+        p_rService.m_ProbeInformation.m_fnProbeResultCallback(p_rService, p_rService.instanceName(), p_bResult);
     }
     else if (!p_bResult)
     {
         // Auto-Handle failure by changing the service name, use ' #' as divider between base name and index
-        char*   pcServiceNameTemp = strdup(p_rService.m_pcName);
-        if (pcServiceNameTemp)
-        {
-            if (MDNSResponder::indexDomain(pcServiceNameTemp, " #", 0))
-            {
-                setServiceName(&p_rService, pcServiceNameTemp);
-            }
-            else
-            {
-                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _callServiceProbeResultCallback: FAILED to update service name for '%s'!\n"), _DH(), _service2String(&p_rService)););
-            }
-            free(pcServiceNameTemp);
-        }
-        else
-        {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _callServiceProbeResultCallback: FAILED to copy service name for '%s'!\n"), _DH(), _service2String(&p_rService)););
-        }
+        p_rService.indexInstanceName();
+        DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _callServiceProbeResultCallback: Changed Service Domain: %s\n"), _DH(), _service2String(&p_rService)));
     }
     return true;
 }
 
 
-/**
+/*
+
     ANNOUNCING
+
 */
 
 /*
-    MDNSResponder::clsHost::_announce
+    clsLEAmDNS2_Host::_announce
 
     Announces the host domain:
     - A/AAAA (eg. esp8266.local -> 192.168.2.120)
@@ -1684,18 +1650,19 @@ bool MDNSResponder::clsHost::_callServiceProbeResultCallback(MDNSResponder::clsH
     Goodbye (Un-Announcing) for the host domain and all services is also handled here.
     Goodbye messages are created by setting the TTL for the answer to 0, this happens
     inside the '_writeXXXAnswer' procs via 'sendParameter.m_bUnannounce = true'
+
 */
-bool MDNSResponder::clsHost::_announce(bool p_bAnnounce,
-                                       bool p_bIncludeServices)
+bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
+                               bool p_bIncludeServices)
 {
     bool    bResult = false;
 
-    stcSendParameter    sendParameter;
-    if (enuProbingStatus::Done == m_HostProbeInformation.m_ProbingStatus)
+    clsSendParameter    sendParameter;
+    if (clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus)
     {
         bResult = true;
 
-        sendParameter.m_Response = stcSendParameter::enuResponseType::Unsolicited;  // Announces are 'Unsolicited authorative responses'
+        sendParameter.m_Response = clsSendParameter::enuResponseType::Unsolicited;  // Announces are 'Unsolicited authorative responses'
         sendParameter.m_bAuthorative = true;
         sendParameter.m_bCacheFlush = true;                                             // RFC 6762 8.3
         sendParameter.m_bUnannounce = !p_bAnnounce;                                     // When unannouncing, the TTL is set to '0' while creating the answers
@@ -1716,12 +1683,14 @@ bool MDNSResponder::clsHost::_announce(bool p_bAnnounce,
         if (p_bIncludeServices)
         {
             // Announce services (service type, name, SRV (location) and TXTs)
-            for (stcService* pService = m_pServices; ((bResult) && (pService)); pService = pService->m_pNext)
+            for (clsService* pService : m_Services)
             {
-                if (enuProbingStatus::Done == pService->m_ProbeInformation.m_ProbingStatus)
+                if (clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == pService->m_ProbeInformation.m_ProbingStatus)
                 {
-                    pService->m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) | static_cast<uint32_t>(enuContentFlag::PTR_NAME) | static_cast<uint32_t>(enuContentFlag::SRV) | static_cast<uint32_t>(enuContentFlag::TXT));
-
+                    pService->m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) |
+                                                static_cast<uint32_t>(enuContentFlag::PTR_NAME) |
+                                                static_cast<uint32_t>(enuContentFlag::SRV) |
+                                                static_cast<uint32_t>(enuContentFlag::TXT));
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _announce: Announcing service '%s' (content %s)\n"), _DH(), _service2String(pService), _replyFlags2String(pService->m_u32ReplyMask)););
                 }
             }
@@ -1729,22 +1698,22 @@ bool MDNSResponder::clsHost::_announce(bool p_bAnnounce,
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announce: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMDNSMessage(sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 /*
-    MDNSResponder::clsHost::_announceService
+    clsLEAmDNS2_Host::_announceService
+
 */
-bool MDNSResponder::clsHost::_announceService(MDNSResponder::clsHost::stcService& p_rService,
-                                              bool p_bAnnounce /*= true*/)
+bool clsLEAMDNSHost::_announceService(clsLEAMDNSHost::clsService& p_rService,
+                                      bool p_bAnnounce /*= true*/)
 {
     bool    bResult = false;
 
-    stcSendParameter    sendParameter;
-    if (enuProbingStatus::Done == p_rService.m_ProbeInformation.m_ProbingStatus)
+    clsSendParameter    sendParameter;
+    if (clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == p_rService.m_ProbeInformation.m_ProbingStatus)
     {
-
-        sendParameter.m_Response = stcSendParameter::enuResponseType::Unsolicited;  // Announces are 'Unsolicited authorative responses'
+        sendParameter.m_Response = clsSendParameter::enuResponseType::Unsolicited;  // Announces are 'Unsolicited authorative responses'
         sendParameter.m_bAuthorative = true;
         sendParameter.m_bUnannounce = !p_bAnnounce; // When unannouncing, the TTL is set to '0' while creating the answers
 
@@ -1752,23 +1721,28 @@ bool MDNSResponder::clsHost::_announceService(MDNSResponder::clsHost::stcService
         sendParameter.m_u32HostReplyMask = 0;
 
         // Announce services (service type, name, SRV (location) and TXTs)
-        p_rService.m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) | static_cast<uint32_t>(enuContentFlag::PTR_NAME) | static_cast<uint32_t>(enuContentFlag::SRV) | static_cast<uint32_t>(enuContentFlag::TXT));
+        p_rService.m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) |
+                                     static_cast<uint32_t>(enuContentFlag::PTR_NAME) |
+                                     static_cast<uint32_t>(enuContentFlag::SRV) |
+                                     static_cast<uint32_t>(enuContentFlag::TXT));
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _announceService: Announcing service '%s' (content: %s)\n"), _DH(), _service2String(&p_rService), _replyFlags2String(p_rService.m_u32ReplyMask)););
 
         bResult = true;
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announceService: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMDNSMessage(sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 
-/**
+/*
+
     QUERY CACHE
+
 */
 
 /*
-    MDNSResponder::clsHost::_checkQueryCache
+    clsLEAmDNS2_Host::_checkQueryCache
 
     For any 'living' query (m_bAwaitingAnswers == true) all available answers (their components)
     are checked for topicality based on the stored reception time and the answers TTL.
@@ -1776,28 +1750,32 @@ bool MDNSResponder::clsHost::_announceService(MDNSResponder::clsHost::stcService
     When no update arrived (in time), the component is removed from the answer (cache).
 
 */
-bool MDNSResponder::clsHost::_checkQueryCache(void)
+bool clsLEAMDNSHost::_checkQueryCache(void)
 {
     bool        bResult = true;
 
     DEBUG_EX_INFO(
         bool    printedInfo = false;
     );
-    for (stcQuery* pQuery = m_pQueries; ((bResult) && (pQuery)); pQuery = pQuery->m_pNext)
+    for (clsQuery::list::iterator itQ = m_Queries.begin(); ((bResult) && (itQ != m_Queries.end())); itQ++)
     {
+        clsQuery* pQuery = *itQ;
         //
         // Resend dynamic queries, if not already done often enough
-        if ((!pQuery->m_bLegacyQuery) &&
+        if ((!pQuery->m_bStaticQuery) &&
             (pQuery->m_ResendTimeout.expired()))
         {
-
-            if ((bResult = _sendMDNSQuery(*pQuery)))
+            if ((bResult = _sendQuery(*pQuery)))
             {
                 // The re-query rate is increased to more than one hour (RFC 6762 5.2)
                 ++pQuery->m_u8SentCount;
-                uint32_t    u32NewDelay = (MDNS_DYNAMIC_QUERY_RESEND_DELAY * pow(2, std::min((pQuery->m_u8SentCount - 1), 12)));
+                uint32_t    u32NewDelay = (clsConsts::u32DynamicQueryResendDelay * pow(2, std::min((pQuery->m_u8SentCount - 1), 12)));
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Next query in %u seconds!\n"), _DH(), (u32NewDelay)););
                 pQuery->m_ResendTimeout.reset(u32NewDelay);
+            }
+            else
+            {
+                break;
             }
             DEBUG_EX_INFO(
                 DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: %s to resend query!\n"), _DH(), (bResult ? "Succeeded" : "FAILED"));
@@ -1809,25 +1787,22 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
         // Schedule updates for cached answers
         if (pQuery->m_bAwaitingAnswers)
         {
-            stcQuery::stcAnswer* pSQAnswer = pQuery->m_pAnswers;
-            while ((bResult) &&
-                   (pSQAnswer))
+            clsQuery::clsAnswer::list   expiredAnswers;
+            for (clsQuery::clsAnswer::list::iterator itQA = pQuery->m_Answers.begin(); ((bResult) && (itQA != pQuery->m_Answers.end())); itQA++)
             {
-                stcQuery::stcAnswer* pNextSQAnswer = pSQAnswer->m_pNext;
+                clsQuery::clsAnswer*    pQAnswer = *itQA;
 
                 // 1. level answer
                 if ((bResult) &&
-                    (pSQAnswer->m_TTLServiceDomain.flagged()))
+                    (pQAnswer->m_TTLServiceDomain.flagged()))
                 {
-
-                    if (!pSQAnswer->m_TTLServiceDomain.finalTimeoutLevel())
+                    if (!pQAnswer->m_TTLServiceDomain.finalTimeoutLevel())
                     {
-
-                        bResult = ((_sendMDNSQuery(*pQuery)) &&
-                                   (pSQAnswer->m_TTLServiceDomain.restart()));
+                        bResult = ((_sendQuery(*pQuery)) &&
+                                   (pQAnswer->m_TTLServiceDomain.restart()));
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: PTR update scheduled for "), _DH());
-                            _printRRDomain(pSQAnswer->m_ServiceDomain);
+                            _printRRDomain(pQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" %s\n"), (bResult ? "OK" : "FAILURE"));
                             printedInfo = true;
                         );
@@ -1835,16 +1810,15 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
                     else
                     {
                         // Timed out! -> Delete
-                        _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::ServiceDomain), false);
+                        _executeQueryCallback(*pQuery, *pQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain), false);
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Will remove PTR answer for "), _DH());
-                            _printRRDomain(pSQAnswer->m_ServiceDomain);
+                            _printRRDomain(pQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR("\n"));
                             printedInfo = true;
                         );
 
-                        bResult = pQuery->removeAnswer(pSQAnswer);
-                        pSQAnswer = 0;
+                        expiredAnswers.push_back(pQAnswer);
                         continue;   // Don't use this answer anymore
                     }
                 }   // ServiceDomain flagged
@@ -1852,17 +1826,15 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
                 // 2. level answers
                 // HostDomain & Port (from SRV)
                 if ((bResult) &&
-                    (pSQAnswer->m_TTLHostDomainAndPort.flagged()))
+                    (pQAnswer->m_TTLHostDomainAndPort.flagged()))
                 {
-
-                    if (!pSQAnswer->m_TTLHostDomainAndPort.finalTimeoutLevel())
+                    if (!pQAnswer->m_TTLHostDomainAndPort.finalTimeoutLevel())
                     {
-
-                        bResult = ((_sendMDNSQuery(pSQAnswer->m_ServiceDomain, DNS_RRTYPE_SRV)) &&
-                                   (pSQAnswer->m_TTLHostDomainAndPort.restart()));
+                        bResult = ((_sendQuery(pQAnswer->m_ServiceDomain, DNS_RRTYPE_SRV)) &&
+                                   (pQAnswer->m_TTLHostDomainAndPort.restart()));
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: SRV update scheduled for "), _DH());
-                            _printRRDomain(pSQAnswer->m_ServiceDomain);
+                            _printRRDomain(pQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" host domain and port %s\n"), (bResult ? "OK" : "FAILURE"));
                             printedInfo = true;
                         );
@@ -1872,45 +1844,43 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
                         // Timed out! -> Delete
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Will remove SRV answer for "), _DH());
-                            _printRRDomain(pSQAnswer->m_ServiceDomain);
+                            _printRRDomain(pQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" host domain and port\n"));
                             printedInfo = true;
                         );
                         // Delete
-                        pSQAnswer->m_HostDomain.clear();
+                        pQAnswer->m_HostDomain.clear();
                         //pSQAnswer->releaseHostDomain();
-                        pSQAnswer->m_u16Port = 0;
-                        pSQAnswer->m_TTLHostDomainAndPort.set(0);
-                        typeQueryAnswerType queryAnswerContentFlags = (static_cast<typeQueryAnswerType>(enuQueryAnswerType::HostDomain) | static_cast<typeQueryAnswerType>(enuQueryAnswerType::Port));
+                        pQAnswer->m_u16Port = 0;
+                        pQAnswer->m_TTLHostDomainAndPort.set(0);
+                        clsQuery::clsAnswer::typeQueryAnswerType queryAnswerContentFlags = (static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::HostDomain) | static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Port));
                         // As the host domain is the base for the IPv4- and IPv6Address, remove these too
 #ifdef MDNS_IPV4_SUPPORT
-                        pSQAnswer->releaseIPv4Addresses();
-                        queryAnswerContentFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv4Address);
+                        pQAnswer->releaseIPv4Addresses();
+                        queryAnswerContentFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address);
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-                        pSQAnswer->releaseIPv6Addresses();
-                        queryAnswerContentFlags |= static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv6Address);
+                        pQAnswer->releaseIPv6Addresses();
+                        queryAnswerContentFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address);
 #endif
 
                         // Remove content flags for deleted answer parts
-                        pSQAnswer->m_QueryAnswerFlags &= ~queryAnswerContentFlags;
-                        _executeQueryCallback(*pQuery, *pSQAnswer, queryAnswerContentFlags, false);
+                        pQAnswer->m_QueryAnswerFlags &= ~queryAnswerContentFlags;
+                        _executeQueryCallback(*pQuery, *pQAnswer, queryAnswerContentFlags, false);
                     }
                 }   // HostDomainAndPort flagged
 
                 // Txts (from TXT)
                 if ((bResult) &&
-                    (pSQAnswer->m_TTLTxts.flagged()))
+                    (pQAnswer->m_TTLTxts.flagged()))
                 {
-
-                    if (!pSQAnswer->m_TTLTxts.finalTimeoutLevel())
+                    if (!pQAnswer->m_TTLTxts.finalTimeoutLevel())
                     {
-
-                        bResult = ((_sendMDNSQuery(pSQAnswer->m_ServiceDomain, DNS_RRTYPE_TXT)) &&
-                                   (pSQAnswer->m_TTLTxts.restart()));
+                        bResult = ((_sendQuery(pQAnswer->m_ServiceDomain, DNS_RRTYPE_TXT)) &&
+                                   (pQAnswer->m_TTLTxts.restart()));
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: TXT update scheduled for "), _DH());
-                            _printRRDomain(pSQAnswer->m_ServiceDomain);
+                            _printRRDomain(pQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" TXTs %s\n"), (bResult ? "OK" : "FAILURE"));
                             printedInfo = true;
                         );
@@ -1920,47 +1890,43 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
                         // Timed out! -> Delete
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Will remove TXT answer for "), _DH());
-                            _printRRDomain(pSQAnswer->m_ServiceDomain);
+                            _printRRDomain(pQAnswer->m_ServiceDomain);
                             DEBUG_OUTPUT.printf_P(PSTR(" TXTs\n"));
                             printedInfo = true;
                         );
                         // Delete
-                        pSQAnswer->m_Txts.clear();
-                        pSQAnswer->m_TTLTxts.set(0);
+                        pQAnswer->m_Txts.clear();
+                        pQAnswer->m_TTLTxts.set(0);
 
                         // Remove content flags for deleted answer parts
-                        pSQAnswer->m_QueryAnswerFlags &= ~static_cast<typeQueryAnswerType>(enuQueryAnswerType::Txts);
-                        _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::Txts), false);
+                        pQAnswer->m_QueryAnswerFlags &= ~static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Txts);
+                        _executeQueryCallback(*pQuery, *pQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::Txts), false);
                     }
                 }   // TXTs flagged
 
                 // 3. level answers
 #ifdef MDNS_IPV4_SUPPORT
                 // IPv4Address (from A)
-                stcQuery::stcAnswer::stcIPAddress*  pIPv4Address = pSQAnswer->m_pIPv4Addresses;
+                clsQuery::clsAnswer::clsIPAddressWithTTL::list expiredIPv4Addresses;
                 bool                                    bAUpdateQuerySent = false;
-                while ((pIPv4Address) &&
-                       (bResult))
+                for (clsQuery::clsAnswer::clsIPAddressWithTTL::list::iterator itQAIPv4 = pQAnswer->m_IPv4Addresses.begin(); ((bResult) && (itQAIPv4 != pQAnswer->m_IPv4Addresses.end())); itQAIPv4++)
                 {
-
-                    stcQuery::stcAnswer::stcIPAddress*  pNextIPv4Address = pIPv4Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
+                    clsQuery::clsAnswer::clsIPAddressWithTTL*  pIPv4Address = *itQAIPv4;
 
                     if (pIPv4Address->m_TTL.flagged())
                     {
-
-                        if (!pIPv4Address->m_TTL.finalTimeoutLevel())    // Needs update
+                        if (!pIPv4Address->m_TTL.finalTimeoutLevel())
                         {
-
+                            // Needs update
                             if ((bAUpdateQuerySent) ||
-                                ((bResult = _sendMDNSQuery(pSQAnswer->m_HostDomain, DNS_RRTYPE_A))))
+                                ((bResult = _sendQuery(pQAnswer->m_HostDomain, DNS_RRTYPE_A))))
                             {
-
                                 pIPv4Address->m_TTL.restart();
                                 bAUpdateQuerySent = true;
 
                                 DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: IPv4 update scheduled for "), _DH());
-                                    _printRRDomain(pSQAnswer->m_ServiceDomain);
+                                    _printRRDomain(pQAnswer->m_ServiceDomain);
                                     DEBUG_OUTPUT.printf_P(PSTR(" IPv4 address (%s)\n"), (pIPv4Address->m_IPAddress.toString().c_str()));
                                     printedInfo = true;
                                 );
@@ -1971,49 +1937,49 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
                             // Timed out! -> Delete
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Will remove IPv4 answer for "), _DH());
-                                _printRRDomain(pSQAnswer->m_ServiceDomain);
+                                _printRRDomain(pQAnswer->m_ServiceDomain);
                                 DEBUG_OUTPUT.printf_P(PSTR(" IPv4 address\n"));
                                 printedInfo = true;
                             );
-                            pSQAnswer->removeIPv4Address(pIPv4Address);
-                            if (!pSQAnswer->m_pIPv4Addresses)    // NO IPv4 address left -> remove content flag
+                            if (1 == pQAnswer->m_IPv4Addresses.size())
                             {
-                                pSQAnswer->m_QueryAnswerFlags &= ~static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv4Address);
+                                // NO IPv4 address left after this -> remove content flag
+                                pQAnswer->m_QueryAnswerFlags &= ~static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address);
                             }
                             // Notify client
-                            _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv4Address), false);
+                            _executeQueryCallback(*pQuery, *pQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address), false);
+                            expiredIPv4Addresses.push_back(pIPv4Address);
                         }
                     }   // IPv4 flagged
-
-                    pIPv4Address = pNextIPv4Address;  // Next
-                }   // while
+                }   // for
+                // Finally remove expired IPv4 addresses
+                for (clsQuery::clsAnswer::clsIPAddressWithTTL* pIPv4Address : expiredIPv4Addresses)
+                {
+                    pQAnswer->removeIPv4Address(pIPv4Address);
+                }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
                 // IPv6Address (from AAAA)
-                stcQuery::stcAnswer::stcIPAddress*  pIPv6Address = pSQAnswer->m_pIPv6Addresses;
+                clsQuery::clsAnswer::clsIPAddressWithTTL::list expiredIPv6Addresses;
                 bool                                    bAAAAUpdateQuerySent = false;
-                while ((pIPv6Address) &&
-                       (bResult))
+                for (clsQuery::clsAnswer::clsIPAddressWithTTL::list::iterator itQAIPv6 = pQAnswer->m_IPv6Addresses.begin(); ((bResult) && (itQAIPv6 != pQAnswer->m_IPv6Addresses.end())); itQAIPv6++)
                 {
-
-                    stcQuery::stcAnswer::stcIPAddress*  pNextIPv6Address = pIPv6Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
+                    clsQuery::clsAnswer::clsIPAddressWithTTL*  pIPv6Address = *itQAIPv6;
 
                     if (pIPv6Address->m_TTL.flagged())
                     {
-
-                        if (!pIPv6Address->m_TTL.finalTimeoutLevel())    // Needs update
+                        if (!pIPv6Address->m_TTL.finalTimeoutLevel())
                         {
-
+                            // Needs update
                             if ((bAAAAUpdateQuerySent) ||
-                                ((bResult = _sendMDNSQuery(pSQAnswer->m_HostDomain, DNS_RRTYPE_AAAA))))
+                                ((bResult = _sendQuery(pQAnswer->m_HostDomain, DNS_RRTYPE_AAAA))))
                             {
-
                                 pIPv6Address->m_TTL.restart();
                                 bAAAAUpdateQuerySent = true;
 
                                 DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: IPv6 update scheduled for "), _DH());
-                                    _printRRDomain(pSQAnswer->m_ServiceDomain);
+                                    _printRRDomain(pQAnswer->m_ServiceDomain);
                                     DEBUG_OUTPUT.printf_P(PSTR(" IPv6 address (%s)\n"), (pIPv6Address->m_IPAddress.toString().c_str()));
                                     printedInfo = true;
                                 );
@@ -2024,24 +1990,33 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
                             // Timed out! -> Delete
                             DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Will remove answer for "), _DH());
-                                _printRRDomain(pSQAnswer->m_ServiceDomain);
+                                _printRRDomain(pQAnswer->m_ServiceDomain);
                                 DEBUG_OUTPUT.printf_P(PSTR(" IPv6 address\n"));
                                 printedInfo = true;
                             );
-                            pSQAnswer->removeIPv6Address(pIPv6Address);
-                            if (!pSQAnswer->m_pIPv6Addresses)    // NO IPv6 address left -> remove content flag
+                            if (1 == pQAnswer->m_IPv6Addresses.size())
                             {
-                                pSQAnswer->m_QueryAnswerFlags &= ~static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv6Address);
+                                // NO IPv6 address left after this -> remove content flag
+                                pQAnswer->m_QueryAnswerFlags &= ~static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address);
                             }
                             // Notify client
-                            _executeQueryCallback(*pQuery, *pSQAnswer, static_cast<typeQueryAnswerType>(enuQueryAnswerType::IPv6Address), false);
+                            _executeQueryCallback(*pQuery, *pQAnswer, static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address), false);
+                            expiredIPv6Addresses.push_back(pIPv6Address);
                         }
                     }   // IPv6 flagged
-
-                    pIPv6Address = pNextIPv6Address;  // Next
+                    // Finally remove expired IPv6 addresses
+                    for (clsQuery::clsAnswer::clsIPAddressWithTTL* pIPv6Address : expiredIPv6Addresses)
+                    {
+                        pQAnswer->removeIPv6Address(pIPv6Address);
+                    }
                 }   // while
 #endif
-                pSQAnswer = pNextSQAnswer;
+            }
+
+            // Finally remove expired answers
+            for (clsQuery::clsAnswer* pAnswer : expiredAnswers)
+            {
+                pQuery->removeAnswer(pAnswer);
             }
         }
     }
@@ -2052,7 +2027,7 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
 
 
 /*
-    MDNSResponder::clsHost::_replyMaskForHost
+    clsLEAmDNS2_Host::_replyMaskForHost
 
     Determines the relavant host answers for the given question.
     - A question for the hostname (eg. esp8266.local) will result in an A/AAAA (eg. 192.168.2.129) reply.
@@ -2060,8 +2035,8 @@ bool MDNSResponder::clsHost::_checkQueryCache(void)
 
     In addition, a full name match (question domain == host domain) is marked.
 */
-uint32_t MDNSResponder::clsHost::_replyMaskForHost(const MDNSResponder::clsHost::stcRRHeader& p_RRHeader,
-                                                   bool* p_pbFullNameMatch /*= 0*/) const
+uint32_t clsLEAMDNSHost::_replyMaskForHost(const clsLEAMDNSHost::clsRRHeader& p_RRHeader,
+                                           bool* p_pbFullNameMatch /*= 0*/) const
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _replyMaskForHost\n")););
 
@@ -2077,7 +2052,7 @@ uint32_t MDNSResponder::clsHost::_replyMaskForHost(const MDNSResponder::clsHost:
         {
             // PTR request
 #ifdef MDNS_IPV4_SUPPORT
-            stcRRDomain    reverseIPv4Domain;
+            clsRRDomain    reverseIPv4Domain;
             if ((_getResponderIPAddress(enuIPProtocolType::V4).isSet()) &&
                 (_buildDomainForReverseIPv4(_getResponderIPAddress(enuIPProtocolType::V4), reverseIPv4Domain)) &&
                 (p_RRHeader.m_Domain == reverseIPv4Domain))
@@ -2087,7 +2062,7 @@ uint32_t MDNSResponder::clsHost::_replyMaskForHost(const MDNSResponder::clsHost:
             }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-            stcRRDomain    reverseIPv6Domain;
+            clsRRDomain    reverseIPv6Domain;
             if ((_getResponderIPAddress(enuIPProtocolType::V6).isSet()) &&
                 (_buildDomainForReverseIPv6(_getResponderIPAddress(enuIPProtocolType::V6), reverseIPv6Domain)) &&
                 (p_RRHeader.m_Domain == reverseIPv6Domain))
@@ -2098,11 +2073,10 @@ uint32_t MDNSResponder::clsHost::_replyMaskForHost(const MDNSResponder::clsHost:
 #endif
         }   // Address qeuest
 
-        stcRRDomain    hostDomain;
+        clsRRDomain    hostDomain;
         if ((_buildDomainForHost(m_pcHostName, hostDomain)) &&
             (p_RRHeader.m_Domain == hostDomain))    // Host domain match
         {
-
             (p_pbFullNameMatch ? (*p_pbFullNameMatch = true) : (0));
 
 #ifdef MDNS_IPV4_SUPPORT
@@ -2132,7 +2106,7 @@ uint32_t MDNSResponder::clsHost::_replyMaskForHost(const MDNSResponder::clsHost:
 }
 
 /*
-    MDNSResponder::clsHost::_replyMaskForService
+    clsLEAmDNS2_Host::_replyMaskForService
 
     Determines the relevant service answers for the given question
     - A PTR dns-sd service enum question (_services.dns-sd._udp.local) will result into an PTR_TYPE (eg. _http._tcp.local) answer
@@ -2142,10 +2116,11 @@ uint32_t MDNSResponder::clsHost::_replyMaskForHost(const MDNSResponder::clsHost:
     - A TXT service name question (eg. MyESP._http._tcp.local) will result into an TXT (eg. c#=1) answer
 
     In addition, a full name match (question domain == service instance domain) is marked.
+
 */
-uint32_t MDNSResponder::clsHost::_replyMaskForService(const MDNSResponder::clsHost::stcRRHeader& p_RRHeader,
-                                                      const MDNSResponder::clsHost::stcService& p_Service,
-                                                      bool* p_pbFullNameMatch /*= 0*/) const
+uint32_t clsLEAMDNSHost::_replyMaskForService(const clsLEAMDNSHost::clsRRHeader& p_RRHeader,
+                                              clsLEAMDNSHost::clsService& p_rService,
+                                              bool* p_pbFullNameMatch /*= 0*/)
 {
     uint32_t    u32ReplyMask = 0;
     (p_pbFullNameMatch ? *p_pbFullNameMatch = false : 0);
@@ -2153,8 +2128,7 @@ uint32_t MDNSResponder::clsHost::_replyMaskForService(const MDNSResponder::clsHo
     if ((DNS_RRCLASS_IN == (p_RRHeader.m_Attributes.m_u16Class & (~0x8000))) ||
         (DNS_RRCLASS_ANY == (p_RRHeader.m_Attributes.m_u16Class & (~0x8000))))
     {
-
-        stcRRDomain    DNSSDDomain;
+        clsRRDomain    DNSSDDomain;
         if ((_buildDomainForDNSSD(DNSSDDomain)) &&                          // _services._dns-sd._udp.local
             (p_RRHeader.m_Domain == DNSSDDomain) &&
             ((DNS_RRTYPE_PTR == p_RRHeader.m_Attributes.m_u16Type) ||
@@ -2164,8 +2138,8 @@ uint32_t MDNSResponder::clsHost::_replyMaskForService(const MDNSResponder::clsHo
             u32ReplyMask |= static_cast<uint32_t>(enuContentFlag::PTR_TYPE);
         }
 
-        stcRRDomain    serviceDomain;
-        if ((_buildDomainForService(p_Service, false, serviceDomain)) &&    // eg. _http._tcp.local
+        clsRRDomain    serviceDomain;
+        if ((_buildDomainForService(p_rService, false, serviceDomain)) &&    // eg. _http._tcp.local
             (p_RRHeader.m_Domain == serviceDomain) &&
             ((DNS_RRTYPE_PTR == p_RRHeader.m_Attributes.m_u16Type) ||
              (DNS_RRTYPE_ANY == p_RRHeader.m_Attributes.m_u16Type)))
@@ -2174,10 +2148,9 @@ uint32_t MDNSResponder::clsHost::_replyMaskForService(const MDNSResponder::clsHo
             u32ReplyMask |= static_cast<uint32_t>(enuContentFlag::PTR_NAME);
         }
 
-        if ((_buildDomainForService(p_Service, true, serviceDomain)) &&     // eg. MyESP._http._tcp.local
+        if ((_buildDomainForService(p_rService, true, serviceDomain)) &&     // eg. MyESP._http._tcp.local
             (p_RRHeader.m_Domain == serviceDomain))
         {
-
             (p_pbFullNameMatch ? (*p_pbFullNameMatch = true) : (0));
 
             if ((DNS_RRTYPE_SRV == p_RRHeader.m_Attributes.m_u16Type) ||
@@ -2198,10 +2171,15 @@ uint32_t MDNSResponder::clsHost::_replyMaskForService(const MDNSResponder::clsHo
     {
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _replyMaskForService: INVALID RR-class (0x%04X)!\n"), p_RRHeader.m_Attributes.m_u16Class););
     }
-    DEBUG_EX_INFO(if (u32ReplyMask) DEBUG_OUTPUT.printf_P(PSTR("%s _replyMaskForService(%s.%s.%s): %s\n"), _DH(), p_Service.m_pcName, p_Service.m_pcServiceType, p_Service.m_pcProtocol, _replyFlags2String(u32ReplyMask)););
+    DEBUG_EX_INFO(if (u32ReplyMask) DEBUG_OUTPUT.printf_P(PSTR("%s _replyMaskForService(%s.%s.%s): %s\n"), _DH(), p_rService.m_pcInstanceName, p_rService.m_pcType, p_rService.m_pcProtocol, _replyFlags2String(u32ReplyMask)););
     return u32ReplyMask;
 }
 
+
 } // namespace MDNSImplementation
 
+
 } // namespace esp8266
+
+
+
