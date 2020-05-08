@@ -7,9 +7,8 @@
 
 template<typename ServerType>
 class RequestHandler {
-public:
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
-
+public:
     virtual ~RequestHandler() { }
     virtual bool canHandle(HTTPMethod method, String uri) { (void) method; (void) uri; return false; }
     virtual bool canUpload(String uri) { (void) uri; return false; }
