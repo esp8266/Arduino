@@ -22,6 +22,7 @@
 
 */
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS2Host.h"
 
 

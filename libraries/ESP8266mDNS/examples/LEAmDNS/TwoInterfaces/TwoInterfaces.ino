@@ -15,6 +15,8 @@
 #define APPSK  "12345678"
 #endif
 
+// uses API MDNSApiVersion::LEAv2
+
 clsMDNSHost         mDNSHost_AP;
 clsMDNSHost         mDNSHost_STA;
 ESP8266WebServer    server(80);

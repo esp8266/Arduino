@@ -129,9 +129,9 @@
 /*
     Enable/disable debug trace macros
 */
-#ifdef DEBUG_ESP_MDNS_RESPONDER
-//#define DEBUG_ESP_MDNS_INFO
-//#define DEBUG_ESP_MDNS_INFO2
+#if defined(DEBUG_ESP_PORT) && defined(DEBUG_ESP_MDNS_RESPONDER)
+#define DEBUG_ESP_MDNS_INFO
+#define DEBUG_ESP_MDNS_INFO2
 #define DEBUG_ESP_MDNS_ERR
 #define DEBUG_ESP_MDNS_TX
 #define DEBUG_ESP_MDNS_RX
@@ -144,7 +144,7 @@
 #define DEBUG_EX_INFO(A)
 #endif
 #ifdef DEBUG_ESP_MDNS_INFO2
-#define DEBUG_EX_INFO2(A)    A
+#define DEBUG_EX_INFO2(A)   A
 #else
 #define DEBUG_EX_INFO2(A)
 #endif
@@ -340,6 +340,9 @@ protected:
     };
 
 public:
+
+    static constexpr auto ApiVersion = MDNSApiVersion::LEAv2;
+
     /**
         clsServiceTxt
     */
@@ -621,6 +624,7 @@ public:
         */
         using list = std::list<clsService*>;
     };
+    using hMDNSService = clsService; // backward compatibility with LEAmDNS
 
 protected:
     /**

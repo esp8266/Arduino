@@ -23,7 +23,7 @@
 */
 
 #include <coredecls.h>  // for can_yield()
-
+#include "ESP8266mDNS.h"
 #include "LEAmDNS2Host.h"
 
 
