@@ -135,7 +135,7 @@ typedef struct PWMState {
 } PWMState;
 
 static PWMState pwmState;
-uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
+static uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
 
 
 // If there are no more scheduled activities, shut down Timer 1.
@@ -170,6 +170,13 @@ static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range);
 void _setPWMFreq(uint32_t freq) {
   // Convert frequency into clock cycles
   uint32_t cc = microsecondsToClockCycles(1000000UL) / freq;
+
+  // Simple static adjustment to bring period closer to requested due to overhead
+#if F_CPU == 80000000
+  cc -= microsecondsToClockCycles(2);
+#else
+  cc -= microsecondsToClockCycles(1);
+#endif
 
   if (cc == _pwmPeriod) {
     return; // No change
