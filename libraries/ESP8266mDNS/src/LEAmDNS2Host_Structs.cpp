@@ -52,8 +52,8 @@ namespace experimental
 
 */
 clsLEAMDNSHost::clsServiceTxt::clsServiceTxt(const char* p_pcKey /*= 0*/,
-                                             const char* p_pcValue /*= 0*/,
-                                             bool p_bTemp /*= false*/)
+        const char* p_pcValue /*= 0*/,
+        bool p_bTemp /*= false*/)
     :   m_pcKey(0),
         m_pcValue(0),
         m_bTemp(p_bTemp)
@@ -127,7 +127,7 @@ char* clsLEAMDNSHost::clsServiceTxt::allocKey(size_t p_stLength)
 
 */
 bool clsLEAMDNSHost::clsServiceTxt::setKey(const char* p_pcKey,
-                                           size_t p_stLength)
+        size_t p_stLength)
 {
     bool bResult = false;
 
@@ -186,7 +186,7 @@ char* clsLEAMDNSHost::clsServiceTxt::allocValue(size_t p_stLength)
 
 */
 bool clsLEAMDNSHost::clsServiceTxt::setValue(const char* p_pcValue,
-                                             size_t p_stLength)
+        size_t p_stLength)
 {
     bool bResult = false;
 
@@ -446,7 +446,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsServiceTxts::find(const char* 
     for (clsServiceTxt* pTxt : m_Txts)
     {
         if ((p_pcKey) &&
-            (0 == strcmp(pTxt->m_pcKey, p_pcKey)))
+                (0 == strcmp(pTxt->m_pcKey, p_pcKey)))
         {
             pResult = pTxt;
             break;
@@ -466,7 +466,7 @@ const clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsServiceTxts::find(const 
     for (const clsServiceTxt* pTxt : m_Txts)
     {
         if ((p_pcKey) &&
-            (0 == strcmp(pTxt->m_pcKey, p_pcKey)))
+                (0 == strcmp(pTxt->m_pcKey, p_pcKey)))
         {
             pResult = pTxt;
             break;
@@ -571,8 +571,8 @@ const char* clsLEAMDNSHost::clsServiceTxts::c_str(void) const
 {
 
     if ((!m_pcCache) &&
-        (m_Txts.size()) &&
-        ((((clsServiceTxts*)this)->m_pcCache = new char[c_strLength()])))   // TRANSPARENT caching
+            (m_Txts.size()) &&
+            ((((clsServiceTxts*)this)->m_pcCache = new char[c_strLength()])))   // TRANSPARENT caching
     {
         ((clsServiceTxts*)this)->c_str(m_pcCache);
     }
@@ -825,7 +825,7 @@ bool clsLEAMDNSHost::clsService::setInstanceName(const char* p_pcInstanceName)
     _releaseInstanceName();
     size_t stLength = (p_pcInstanceName ? strlen(p_pcInstanceName) : 0);
     if ((stLength) &&
-        (stLength <= clsConsts::stDomainLabelMaxLength))
+            (stLength <= clsConsts::stDomainLabelMaxLength))
     {
         if ((bResult = (0 != (m_pcInstanceName = new char[stLength + 1]))))
         {
@@ -887,7 +887,7 @@ bool clsLEAMDNSHost::clsService::setType(const char* p_pcType)
     _releaseType();
     size_t stLength = (p_pcType ? strlen(p_pcType) : 0);
     if ((stLength) &&
-        (stLength <= clsConsts::stServiceTypeMaxLength))
+            (stLength <= clsConsts::stServiceTypeMaxLength))
     {
         if ((bResult = (0 != (m_pcType = new char[stLength + 1]))))
         {
@@ -934,7 +934,7 @@ bool clsLEAMDNSHost::clsService::setProtocol(const char* p_pcProtocol)
     _releaseProtocol();
     size_t stLength = (p_pcProtocol ? strlen(p_pcProtocol) : 0);
     if ((stLength) &&
-        (stLength <= clsConsts::stServiceProtocolMaxLength))
+            (stLength <= clsConsts::stServiceProtocolMaxLength))
     {
         if ((bResult = (0 != (m_pcProtocol = new char[stLength + 1]))))
         {
@@ -1030,7 +1030,7 @@ void clsLEAMDNSHost::clsService::_resetProbeStatus(void)
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         const char* p_pcValue)
+        const char* p_pcValue)
 {
     return _addServiceTxt(p_pcKey, p_pcValue, false);
 }
@@ -1040,7 +1040,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         uint32_t p_u32Value)
+        uint32_t p_u32Value)
 {
     return _addServiceTxt(p_pcKey, p_u32Value, false);
 }
@@ -1050,7 +1050,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         uint16_t p_u16Value)
+        uint16_t p_u16Value)
 {
     return _addServiceTxt(p_pcKey, p_u16Value, false);
 }
@@ -1060,7 +1060,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         uint8_t p_u8Value)
+        uint8_t p_u8Value)
 {
     return _addServiceTxt(p_pcKey, p_u8Value, false);
 }
@@ -1070,7 +1070,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         int32_t p_i32Value)
+        int32_t p_i32Value)
 {
     return _addServiceTxt(p_pcKey, p_i32Value, false);
 }
@@ -1080,7 +1080,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         int16_t p_i16Value)
+        int16_t p_i16Value)
 {
     return _addServiceTxt(p_pcKey, p_i16Value, false);
 }
@@ -1090,7 +1090,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const char* p_pcKey,
-                                                                         int8_t p_i8Value)
+        int8_t p_i8Value)
 {
     return _addServiceTxt(p_pcKey, p_i8Value, false);
 }
@@ -1100,7 +1100,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addServiceTxt(const c
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                const char* p_pcValue)
+        const char* p_pcValue)
 {
     return _addServiceTxt(p_pcKey, p_pcValue, true);
 }
@@ -1110,7 +1110,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                uint32_t p_u32Value)
+        uint32_t p_u32Value)
 {
     return _addServiceTxt(p_pcKey, p_u32Value, true);
 }
@@ -1120,7 +1120,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                uint16_t p_u16Value)
+        uint16_t p_u16Value)
 {
     return _addServiceTxt(p_pcKey, p_u16Value, true);
 }
@@ -1130,7 +1130,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                uint8_t p_u8Value)
+        uint8_t p_u8Value)
 {
     return _addServiceTxt(p_pcKey, p_u8Value, true);
 }
@@ -1140,7 +1140,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                int32_t p_i32Value)
+        int32_t p_i32Value)
 {
     return _addServiceTxt(p_pcKey, p_i32Value, true);
 }
@@ -1150,7 +1150,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                int16_t p_i16Value)
+        int16_t p_i16Value)
 {
     return _addServiceTxt(p_pcKey, p_i16Value, true);
 }
@@ -1160,7 +1160,7 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::addDynamicServiceTxt(const char* p_pcKey,
-                                                                                int8_t p_i8Value)
+        int8_t p_i8Value)
 {
     return _addServiceTxt(p_pcKey, p_i8Value, true);
 }
@@ -1180,13 +1180,13 @@ bool clsLEAMDNSHost::clsService::setDynamicServiceTxtCallback(fnDynamicServiceTx
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          const char* p_pcValue,
-                                                                          bool p_bTemp)
+        const char* p_pcValue,
+        bool p_bTemp)
 {
     clsServiceTxt*  pServiceTxt = 0;
 
     if ((p_pcKey) &&
-        (*p_pcKey))
+            (*p_pcKey))
     {
         if ((pServiceTxt = m_Txts.find(p_pcKey)))
         {
@@ -1220,8 +1220,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
                                                     (p_pcValue ? strlen(p_pcValue) : 0)))
             {
                 if (!(((pServiceTxt = new clsServiceTxt)) &&
-                      (pServiceTxt->set(p_pcKey, p_pcValue, p_bTemp)) &&
-                      (m_Txts.add(pServiceTxt))))
+                        (pServiceTxt->set(p_pcKey, p_pcValue, p_bTemp)) &&
+                        (m_Txts.add(pServiceTxt))))
                 {
                     DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("[LEAmDNS2_Host] clsService::_addServiceTxt: FAILED to add TXT item '%s'!\n"), p_pcKey));
                     if (pServiceTxt)
@@ -1247,8 +1247,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          uint32_t p_u32Value,
-                                                                          bool p_bTemp)
+        uint32_t p_u32Value,
+        bool p_bTemp)
 {
     char    acValueBuffer[16];  // 32-bit max 10 digits
     *acValueBuffer = 0;
@@ -1262,8 +1262,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          uint16_t p_u16Value,
-                                                                          bool p_bTemp)
+        uint16_t p_u16Value,
+        bool p_bTemp)
 {
     char    acValueBuffer[8];   // 16-bit max 5 digits
     *acValueBuffer = 0;
@@ -1277,8 +1277,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          uint8_t p_u8Value,
-                                                                          bool p_bTemp)
+        uint8_t p_u8Value,
+        bool p_bTemp)
 {
     char    acValueBuffer[8];   // 8-bit max 3 digits
     *acValueBuffer = 0;
@@ -1292,8 +1292,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          int32_t p_i32Value,
-                                                                          bool p_bTemp)
+        int32_t p_i32Value,
+        bool p_bTemp)
 {
     char    acValueBuffer[16];  // 32-bit max 10 digits
     *acValueBuffer = 0;
@@ -1307,8 +1307,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          int16_t p_i16Value,
-                                                                          bool p_bTemp)
+        int16_t p_i16Value,
+        bool p_bTemp)
 {
     char    acValueBuffer[8];   // 16-bit max 5 digits
     *acValueBuffer = 0;
@@ -1322,8 +1322,8 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-                                                                          int8_t p_i8Value,
-                                                                          bool p_bTemp)
+        int8_t p_i8Value,
+        bool p_bTemp)
 {
     char    acValueBuffer[8];   // 8-bit max 3 digits
     *acValueBuffer = 0;
@@ -1345,17 +1345,17 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
 */
 clsLEAMDNSHost::clsMsgHeader::clsMsgHeader(uint16_t p_u16ID /*= 0*/,
-                                           bool p_bQR /*= false*/,
-                                           uint8_t p_u8Opcode /*= 0*/,
-                                           bool p_bAA /*= false*/,
-                                           bool p_bTC /*= false*/,
-                                           bool p_bRD /*= false*/,
-                                           bool p_bRA /*= false*/,
-                                           uint8_t p_u8RCode /*= 0*/,
-                                           uint16_t p_u16QDCount /*= 0*/,
-                                           uint16_t p_u16ANCount /*= 0*/,
-                                           uint16_t p_u16NSCount /*= 0*/,
-                                           uint16_t p_u16ARCount /*= 0*/)
+        bool p_bQR /*= false*/,
+        uint8_t p_u8Opcode /*= 0*/,
+        bool p_bAA /*= false*/,
+        bool p_bTC /*= false*/,
+        bool p_bRD /*= false*/,
+        bool p_bRA /*= false*/,
+        uint8_t p_u8RCode /*= 0*/,
+        uint16_t p_u16QDCount /*= 0*/,
+        uint16_t p_u16ANCount /*= 0*/,
+        uint16_t p_u16NSCount /*= 0*/,
+        uint16_t p_u16ARCount /*= 0*/)
     :   m_u16ID(p_u16ID),
         m_1bQR(p_bQR), m_4bOpcode(p_u8Opcode), m_1bAA(p_bAA), m_1bTC(p_bTC), m_1bRD(p_bRD),
         m_1bRA(p_bRA), m_3bZ(0), m_4bRCode(p_u8RCode),
@@ -1456,7 +1456,7 @@ bool clsLEAMDNSHost::clsRRDomain::clearNameCache(void)
 
 */
 bool clsLEAMDNSHost::clsRRDomain::addLabel(const char* p_pcLabel,
-                                           bool p_bPrependUnderline /*= false*/)
+        bool p_bPrependUnderline /*= false*/)
 {
     bool    bResult = false;
 
@@ -1464,7 +1464,7 @@ bool clsLEAMDNSHost::clsRRDomain::addLabel(const char* p_pcLabel,
                         ? (strlen(p_pcLabel) + (p_bPrependUnderline ? 1 : 0))
                         : 0);
     if ((clsConsts::stDomainLabelMaxLength >= stLength) &&
-        (clsConsts::stDomainMaxLength >= (m_u16NameLength + (1 + stLength))))
+            (clsConsts::stDomainMaxLength >= (m_u16NameLength + (1 + stLength))))
     {
         // Length byte
         m_acName[m_u16NameLength] = (unsigned char)stLength;    // Might be 0!
@@ -1498,9 +1498,9 @@ bool clsLEAMDNSHost::clsRRDomain::compare(const clsRRDomain& p_Other) const
         const char* pT = m_acName;
         const char* pO = p_Other.m_acName;
         while ((pT) &&
-               (pO) &&
-               (*((unsigned char*)pT) == *((unsigned char*)pO)) &&              // Same length AND
-               (0 == strncasecmp((pT + 1), (pO + 1), *((unsigned char*)pT))))   // Same content
+                (pO) &&
+                (*((unsigned char*)pT) == *((unsigned char*)pO)) &&              // Same length AND
+                (0 == strncasecmp((pT + 1), (pO + 1), *((unsigned char*)pT))))   // Same content
         {
             if (*((unsigned char*)pT))              // Not 0
             {
@@ -1593,8 +1593,8 @@ bool clsLEAMDNSHost::clsRRDomain::c_str(char* p_pcBuffer) const
 const char* clsLEAMDNSHost::clsRRDomain::c_str(void) const
 {
     if ((!m_pcDecodedName) &&
-        (m_u16NameLength) &&
-        ((((clsRRDomain*)this)->m_pcDecodedName = new char[c_strLength()])))   // TRANSPARENT caching
+            (m_u16NameLength) &&
+            ((((clsRRDomain*)this)->m_pcDecodedName = new char[c_strLength()])))   // TRANSPARENT caching
     {
         ((clsRRDomain*)this)->c_str(m_pcDecodedName);
     }
@@ -1614,7 +1614,7 @@ const char* clsLEAMDNSHost::clsRRDomain::c_str(void) const
 
 */
 clsLEAMDNSHost::clsRRAttributes::clsRRAttributes(uint16_t p_u16Type /*= 0*/,
-                                                 uint16_t p_u16Class /*= 1 DNS_RRCLASS_IN Internet*/)
+        uint16_t p_u16Class /*= 1 DNS_RRCLASS_IN Internet*/)
     :   m_u16Type(p_u16Type),
         m_u16Class(p_u16Class)
 {
@@ -1753,7 +1753,7 @@ bool clsLEAMDNSHost::clsNSECBitmap::setBit(uint16_t p_u16Bit)
     bool    bResult = false;
 
     if ((p_u16Bit) &&
-        (length() > (p_u16Bit / 8)))                    // bit between 0..47(2F)
+            (length() > (p_u16Bit / 8)))                    // bit between 0..47(2F)
     {
 
         uint8_t&    ru8Byte = m_au8BitmapData[p_u16Bit / 8];
@@ -1775,7 +1775,7 @@ bool clsLEAMDNSHost::clsNSECBitmap::getBit(uint16_t p_u16Bit) const
     bool    bResult = false;
 
     if ((p_u16Bit) &&
-        (length() > (p_u16Bit / 8)))                    // bit between 0..47(2F)
+            (length() > (p_u16Bit / 8)))                    // bit between 0..47(2F)
     {
 
         uint8_t u8Byte = m_au8BitmapData[p_u16Bit / 8];
@@ -1800,8 +1800,8 @@ bool clsLEAMDNSHost::clsNSECBitmap::getBit(uint16_t p_u16Bit) const
 
 */
 clsLEAMDNSHost::clsRRAnswer::clsRRAnswer(enuAnswerType p_AnswerType,
-                                         const clsLEAMDNSHost::clsRRHeader& p_Header,
-                                         uint32_t p_u32TTL)
+        const clsLEAMDNSHost::clsRRHeader& p_Header,
+        uint32_t p_u32TTL)
     :   m_pNext(0),
         m_AnswerType(p_AnswerType),
         m_Header(p_Header),
@@ -1855,7 +1855,7 @@ bool clsLEAMDNSHost::clsRRAnswer::clear(void)
 
 */
 clsLEAMDNSHost::clsRRAnswerA::clsRRAnswerA(const clsLEAMDNSHost::clsRRHeader& p_Header,
-                                           uint32_t p_u32TTL)
+        uint32_t p_u32TTL)
     :   clsRRAnswer(enuAnswerType::A, p_Header, p_u32TTL),
         m_IPAddress()
 {
@@ -1895,7 +1895,7 @@ bool clsLEAMDNSHost::clsRRAnswerA::clear(void)
 
 */
 clsLEAMDNSHost::clsRRAnswerPTR::clsRRAnswerPTR(const clsLEAMDNSHost::clsRRHeader& p_Header,
-                                               uint32_t p_u32TTL)
+        uint32_t p_u32TTL)
     :   clsRRAnswer(enuAnswerType::PTR, p_Header, p_u32TTL)
 {
 }
@@ -1933,7 +1933,7 @@ bool clsLEAMDNSHost::clsRRAnswerPTR::clear(void)
 
 */
 clsLEAMDNSHost::clsRRAnswerTXT::clsRRAnswerTXT(const clsLEAMDNSHost::clsRRHeader& p_Header,
-                                               uint32_t p_u32TTL)
+        uint32_t p_u32TTL)
     :   clsRRAnswer(enuAnswerType::TXT, p_Header, p_u32TTL)
 {
 }
@@ -1972,7 +1972,7 @@ bool clsLEAMDNSHost::clsRRAnswerTXT::clear(void)
 
 */
 clsLEAMDNSHost::clsRRAnswerAAAA::clsRRAnswerAAAA(const clsLEAMDNSHost::clsRRHeader& p_Header,
-                                                 uint32_t p_u32TTL)
+        uint32_t p_u32TTL)
     :   clsRRAnswer(enuAnswerType::AAAA, p_Header, p_u32TTL),
         m_IPAddress()
 {
@@ -2012,7 +2012,7 @@ bool clsLEAMDNSHost::clsRRAnswerAAAA::clear(void)
 
 */
 clsLEAMDNSHost::clsRRAnswerSRV::clsRRAnswerSRV(const clsLEAMDNSHost::clsRRHeader& p_Header,
-                                               uint32_t p_u32TTL)
+        uint32_t p_u32TTL)
     :   clsRRAnswer(enuAnswerType::SRV, p_Header, p_u32TTL),
         m_u16Priority(0),
         m_u16Weight(0),
@@ -2056,7 +2056,7 @@ bool clsLEAMDNSHost::clsRRAnswerSRV::clear(void)
 
 */
 clsLEAMDNSHost::clsRRAnswerGeneric::clsRRAnswerGeneric(const clsRRHeader& p_Header,
-                                                       uint32_t p_u32TTL)
+        uint32_t p_u32TTL)
     :   clsRRAnswer(enuAnswerType::Generic, p_Header, p_u32TTL),
         m_u16RDLength(0),
         m_pu8RDData(0)
@@ -2111,8 +2111,8 @@ bool clsLEAMDNSHost::clsRRAnswerGeneric::clear(void)
 
 */
 clsLEAMDNSHost::clsSendParameter::clsDomainCacheItem::clsDomainCacheItem(const void* p_pHostNameOrService,
-                                                                         bool p_bAdditionalData,
-                                                                         uint32_t p_u16Offset)
+        bool p_bAdditionalData,
+        uint32_t p_u16Offset)
     :   m_pHostNameOrService(p_pHostNameOrService),
         m_bAdditionalData(p_bAdditionalData),
         m_u16Offset(p_u16Offset)
@@ -2227,15 +2227,15 @@ bool clsLEAMDNSHost::clsSendParameter::shiftOffset(uint16_t p_u16Shift)
 
 */
 bool clsLEAMDNSHost::clsSendParameter::addDomainCacheItem(const void* p_pHostNameOrService,
-                                                          bool p_bAdditionalData,
-                                                          uint16_t p_u16Offset)
+        bool p_bAdditionalData,
+        uint16_t p_u16Offset)
 {
     bool    bResult = false;
 
     clsDomainCacheItem* pNewItem = 0;
     if ((p_pHostNameOrService) &&
-        (p_u16Offset) &&
-        ((pNewItem = new clsDomainCacheItem(p_pHostNameOrService, p_bAdditionalData, p_u16Offset))))
+            (p_u16Offset) &&
+            ((pNewItem = new clsDomainCacheItem(p_pHostNameOrService, p_bAdditionalData, p_u16Offset))))
     {
         m_DomainCacheItems.push_back(pNewItem);
         bResult = true;
@@ -2248,14 +2248,14 @@ bool clsLEAMDNSHost::clsSendParameter::addDomainCacheItem(const void* p_pHostNam
 
 */
 uint16_t clsLEAMDNSHost::clsSendParameter::findCachedDomainOffset(const void* p_pHostNameOrService,
-                                                                  bool p_bAdditionalData) const
+        bool p_bAdditionalData) const
 {
     const clsDomainCacheItem*   pMatchingCacheItem = 0;
 
     for (const clsDomainCacheItem* pCacheItem : m_DomainCacheItems)
     {
         if ((pCacheItem->m_pHostNameOrService == p_pHostNameOrService) &&
-            (pCacheItem->m_bAdditionalData == p_bAdditionalData))   // Found cache item
+                (pCacheItem->m_bAdditionalData == p_bAdditionalData))   // Found cache item
         {
             pMatchingCacheItem = pCacheItem;
             break;
@@ -2356,7 +2356,7 @@ bool clsLEAMDNSHost::clsQuery::clsAnswer::clsTTL::restart(void)
     bool    bResult = true;
 
     if ((static_cast<typeTimeoutLevel>(enuTimeoutLevel::Base) <= m_TimeoutLevel) &&     // >= 80% AND
-        (static_cast<typeTimeoutLevel>(enuTimeoutLevel::Final) > m_TimeoutLevel))       // < 100%
+            (static_cast<typeTimeoutLevel>(enuTimeoutLevel::Final) > m_TimeoutLevel))       // < 100%
     {
         m_TimeoutLevel += static_cast<typeTimeoutLevel>(enuTimeoutLevel::Interval);     // increment by 5%
         m_TTLTimeout.reset(timeout());
@@ -2422,7 +2422,7 @@ unsigned long clsLEAMDNSHost::clsQuery::clsAnswer::clsTTL::timeout(void) const
 
 */
 clsLEAMDNSHost::clsQuery::clsAnswer::clsIPAddressWithTTL::clsIPAddressWithTTL(IPAddress p_IPAddress,
-                                                                              uint32_t p_u32TTL /*= 0*/)
+        uint32_t p_u32TTL /*= 0*/)
     :   m_IPAddress(p_IPAddress)
 {
     m_TTL.set(p_u32TTL);
@@ -2514,8 +2514,8 @@ bool clsLEAMDNSHost::clsQuery::clsAnswer::removeIPv4Address(clsLEAMDNSHost::clsQ
     bool    bResult = false;
 
     clsIPAddressWithTTL::list::iterator    it(p_pIPv4Address
-                                              ? std::find(m_IPv4Addresses.begin(), m_IPv4Addresses.end(), p_pIPv4Address)
-                                              : m_IPv4Addresses.end());
+            ? std::find(m_IPv4Addresses.begin(), m_IPv4Addresses.end(), p_pIPv4Address)
+            : m_IPv4Addresses.end());
     if (m_IPv4Addresses.end() != it)
     {
         m_IPv4Addresses.erase(it);
@@ -2583,8 +2583,8 @@ const clsLEAMDNSHost::clsQuery::clsAnswer::clsIPAddressWithTTL* clsLEAMDNSHost::
 
     uint32_t    u32CurIndex = 0;
     for (clsIPAddressWithTTL::list::const_iterator it = m_IPv4Addresses.begin();
-         (((uint32_t)(-1) != p_u32Index) && (u32CurIndex <= p_u32Index) && (it != m_IPv4Addresses.end()));
-         it++, u32CurIndex++)
+            (((uint32_t)(-1) != p_u32Index) && (u32CurIndex <= p_u32Index) && (it != m_IPv4Addresses.end()));
+            it++, u32CurIndex++)
     {
         if (p_u32Index == u32CurIndex++)
         {
@@ -2636,8 +2636,8 @@ bool clsLEAMDNSHost::clsQuery::clsAnswer::removeIPv6Address(clsLEAMDNSHost::clsQ
     bool    bResult = false;
 
     clsIPAddressWithTTL::list::iterator    it(p_pIPv6Address
-                                              ? std::find(m_IPv6Addresses.begin(), m_IPv6Addresses.end(), p_pIPv6Address)
-                                              : m_IPv6Addresses.end());
+            ? std::find(m_IPv6Addresses.begin(), m_IPv6Addresses.end(), p_pIPv6Address)
+            : m_IPv6Addresses.end());
     if (m_IPv6Addresses.end() != it)
     {
         m_IPv6Addresses.erase(it);
@@ -2705,8 +2705,8 @@ const clsLEAMDNSHost::clsQuery::clsAnswer::clsIPAddressWithTTL* clsLEAMDNSHost::
 
     uint32_t    u32CurIndex = 0;
     for (clsIPAddressWithTTL::list::const_iterator it = m_IPv6Addresses.begin();
-         (((uint32_t)(-1) != p_u32Index) && (u32CurIndex <= p_u32Index) && (it != m_IPv6Addresses.end()));
-         it++, u32CurIndex++)
+            (((uint32_t)(-1) != p_u32Index) && (u32CurIndex <= p_u32Index) && (it != m_IPv6Addresses.end()));
+            it++, u32CurIndex++)
     {
         if (p_u32Index == u32CurIndex++)
         {
@@ -2732,7 +2732,7 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::clsAnswerAccessor(const clsLEAMDNSH
     :   m_pAnswer(p_pAnswer)
 {
     if ((m_pAnswer) &&
-        (txtsAvailable()))
+            (txtsAvailable()))
     {
         // Prepare m_TxtKeyValueMap
         for (const clsLEAMDNSHost::clsServiceTxt* pTxt : m_pAnswer->m_Txts.m_Txts)
@@ -2759,7 +2759,7 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::~clsAnswerAccessor(void)
 
 */
 bool clsLEAMDNSHost::clsQuery::clsAnswerAccessor::stcCompareTxtKey::operator()(char const* p_pA,
-                                                                               char const* p_pB) const
+        char const* p_pB) const
 {
     return (0 > strcasecmp(p_pA, p_pB));
 }
@@ -2846,7 +2846,7 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::clsIPAddressVector clsLEAMDNSHost::
 {
     clsIPAddressVector  internalIP;
     if ((m_pAnswer) &&
-        (IPv4AddressAvailable()))
+            (IPv4AddressAvailable()))
     {
         for (uint32_t u = 0; u < m_pAnswer->IPv4AddressCount(); ++u)
         {
@@ -2880,7 +2880,7 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::clsIPAddressVector clsLEAMDNSHost::
 {
     clsIPAddressVector  internalIP;
     if ((m_pAnswer) &&
-        (IPv6AddressAvailable()))
+            (IPv6AddressAvailable()))
     {
         for (uint32_t u = 0; u < m_pAnswer->IPv6AddressCount(); ++u)
         {
@@ -2941,7 +2941,7 @@ const char* clsLEAMDNSHost::clsQuery::clsAnswerAccessor::txtValue(const char* p_
         for (const clsLEAMDNSHost::clsServiceTxt* pTxt : m_pAnswer->m_Txts.m_Txts)
         {
             if ((p_pcKey) &&
-                (0 == strcasecmp(pTxt->m_pcKey, p_pcKey)))
+                    (0 == strcasecmp(pTxt->m_pcKey, p_pcKey)))
             {
                 pcResult = pTxt->m_pcValue;
                 break;
@@ -3110,8 +3110,8 @@ const clsLEAMDNSHost::clsQuery::clsAnswer* clsLEAMDNSHost::clsQuery::answer(uint
 
     uint32_t    u32CurIndex = 0;
     for (clsAnswer::list::const_iterator it = m_Answers.begin();
-         (((uint32_t)(-1) != p_u32Index) && (u32CurIndex <= p_u32Index) && (it != m_Answers.end()));
-         it++, u32CurIndex++)
+            (((uint32_t)(-1) != p_u32Index) && (u32CurIndex <= p_u32Index) && (it != m_Answers.end()));
+            it++, u32CurIndex++)
     {
         if (p_u32Index == u32CurIndex++)
         {

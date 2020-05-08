@@ -51,8 +51,8 @@ const char* strrstr(const char*__restrict p_pcString,
     size_t      stPatternLength = (p_pcPattern ? strlen(p_pcPattern) : 0);
 
     if ((stStringLength) &&
-        (stPatternLength) &&
-        (stPatternLength <= stStringLength))
+            (stPatternLength) &&
+            (stPatternLength <= stStringLength))
     {
         // Pattern is shorter or has the same length than the string
         for (const char* s = (p_pcString + stStringLength - stPatternLength); s >= p_pcString; --s)
@@ -99,8 +99,8 @@ namespace experimental
 */
 //static
 const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
-                                            const char* p_pcDivider /*= "-"*/,
-                                            const char* p_pcDefaultDomainName /*= 0*/)
+        const char* p_pcDivider /*= "-"*/,
+        const char* p_pcDefaultDomainName /*= 0*/)
 {
     static char acResultDomainName[clsConsts::stDomainLabelMaxLength];
     *acResultDomainName = 0;
@@ -117,8 +117,8 @@ const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
             char*         pEnd = 0;
             unsigned long ulIndex = strtoul((pFoundDivider + strlen(pcDivider)), &pEnd, 10);
             if ((ulIndex) &&
-                ((pEnd - p_pcDomainName) == (ptrdiff_t)strlen(p_pcDomainName)) &&
-                (!*pEnd))
+                    ((pEnd - p_pcDomainName) == (ptrdiff_t)strlen(p_pcDomainName)) &&
+                    (!*pEnd))
             {
                 // Valid (old) index found
                 char    acIndexBuffer[16];
@@ -165,7 +165,7 @@ bool clsLEAMDNSHost::setNetIfHostName(netif* p_pNetIf,
                                       const char* p_pcHostName)
 {
     if ((p_pNetIf) &&
-        (p_pcHostName))
+            (p_pcHostName))
     {
         netif_set_hostname(p_pNetIf, (char*)p_pcHostName);  // LWIP 1.x forces 'char*' instead of 'const char*'
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s!\n"), p_pcHostName););
@@ -332,7 +332,7 @@ bool clsLEAMDNSHost::setHostName(const char* p_pcHostName)
         for (clsService* pService : m_Services)
         {
             if ((pService->m_bAutoName) &&
-                (!m_pcDefaultInstanceName))
+                    (!m_pcDefaultInstanceName))
             {
                 if (!((bResult = pService->setInstanceName(p_pcHostName))))
                 {
@@ -426,10 +426,10 @@ const char* clsLEAMDNSHost::defaultInstanceName(void) const
 
 */
 clsLEAMDNSHost::clsService* clsLEAMDNSHost::addService(const char* p_pcInstanceName,
-                                                       const char* p_pcType,
-                                                       const char* p_pcProtocol,
-                                                       uint16_t p_u16Port,
-                                                       clsLEAMDNSHost::clsService::fnProbeResultCallback p_fnCallback /*= 0*/)
+        const char* p_pcType,
+        const char* p_pcProtocol,
+        uint16_t p_u16Port,
+        clsLEAMDNSHost::clsService::fnProbeResultCallback p_fnCallback /*= 0*/)
 {
     clsService* pService = 0;
 
@@ -439,10 +439,10 @@ clsLEAMDNSHost::clsService* clsLEAMDNSHost::addService(const char* p_pcInstanceN
         if ((pService = new clsService))
         {
             if ((pService->setInstanceName(_instanceName(p_pcInstanceName))) &&
-                (pService->setType(p_pcType)) &&
-                (pService->setProtocol(p_pcProtocol)) &&
-                (pService->setPort(p_u16Port)) &&
-                (p_fnCallback ? pService->setProbeResultCallback(p_fnCallback) : true))
+                    (pService->setType(p_pcType)) &&
+                    (pService->setProtocol(p_pcProtocol)) &&
+                    (pService->setPort(p_u16Port)) &&
+                    (p_fnCallback ? pService->setProbeResultCallback(p_fnCallback) : true))
             {
                 m_Services.push_back(pService);
             }
@@ -482,19 +482,19 @@ bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
 
 */
 const clsLEAMDNSHost::clsService* clsLEAMDNSHost::findService(const char* p_pcInstanceName,
-                                                              const char* p_pcType,
-                                                              const char* p_pcProtocol,
-                                                              uint16_t p_u16Port/*= (uint16_t)(-1)*/) const
+        const char* p_pcType,
+        const char* p_pcProtocol,
+        uint16_t p_u16Port/*= (uint16_t)(-1)*/) const
 {
     clsService* pFoundService = 0;
 
     for (clsService* pService : m_Services)
     {
         if ((0 == strcmp(pService->instanceName(), _instanceName(p_pcInstanceName))) &&
-            (0 == strcmp(pService->type(), p_pcType)) &&
-            (0 == strcmp(pService->protocol(), p_pcProtocol)) &&
-            (((uint16_t)(-1) == p_u16Port) ||
-             (pService->port() == p_u16Port)))
+                (0 == strcmp(pService->type(), p_pcType)) &&
+                (0 == strcmp(pService->protocol(), p_pcProtocol)) &&
+                (((uint16_t)(-1) == p_u16Port) ||
+                 (pService->port() == p_u16Port)))
         {
             pFoundService = pService;
             break;
@@ -508,20 +508,20 @@ const clsLEAMDNSHost::clsService* clsLEAMDNSHost::findService(const char* p_pcIn
 
 */
 clsLEAMDNSHost::clsService* clsLEAMDNSHost::findService(const char* p_pcInstanceName,
-                                                        const char* p_pcType,
-                                                        const char* p_pcProtocol,
-                                                        uint16_t p_u16Port /*= (uint16_t)(-1)*/)
+        const char* p_pcType,
+        const char* p_pcProtocol,
+        uint16_t p_u16Port /*= (uint16_t)(-1)*/)
 {
     return (clsService*)((const clsLEAMDNSHost*)this)->findService(p_pcInstanceName, p_pcType, p_pcProtocol, p_u16Port);
 }
 
 /*
 	clsLEAMDNSHost::services
-	
+
 */
 const clsLEAMDNSHost::clsService::list& clsLEAMDNSHost::services(void) const
 {
-	return m_Services;
+    return m_Services;
 }
 
 
@@ -536,21 +536,21 @@ const clsLEAMDNSHost::clsService::list& clsLEAMDNSHost::services(void) const
 
 */
 clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryService(const char* p_pcService,
-                                                                                 const char* p_pcProtocol,
-                                                                                 const uint16_t p_u16Timeout)
+        const char* p_pcProtocol,
+        const uint16_t p_u16Timeout)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryService '_%s._%s.local'\n"), _DH(), p_pcService, p_pcProtocol););
 
     clsQuery*    pQuery = 0;
     if ((p_pcService) && (*p_pcService) &&
-        (p_pcProtocol) && (*p_pcProtocol) &&
-        (p_u16Timeout) &&
-        ((pQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
-        (_buildDomainForService(p_pcService, p_pcProtocol, pQuery->m_Domain)))
+            (p_pcProtocol) && (*p_pcProtocol) &&
+            (p_u16Timeout) &&
+            ((pQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
+            (_buildDomainForService(p_pcService, p_pcProtocol, pQuery->m_Domain)))
     {
         if ((_removeLegacyQuery()) &&
-            ((pQuery->m_bStaticQuery = true)) &&
-            (_sendQuery(*pQuery)))
+                ((pQuery->m_bStaticQuery = true)) &&
+                (_sendQuery(*pQuery)))
         {
             // Wait for answers to arrive
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryService: Waiting %u ms for answers...\n"), _DH(), p_u16Timeout););
@@ -579,19 +579,19 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryService
 
 */
 clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryHost(const char* p_pcHostName,
-                                                                              const uint16_t p_u16Timeout)
+        const uint16_t p_u16Timeout)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryHost '%s.local'\n"), _DH(), p_pcHostName););
 
     clsQuery*    pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName) &&
-        (p_u16Timeout) &&
-        ((pQuery = _allocQuery(clsQuery::enuQueryType::Host))) &&
-        (_buildDomainForHost(p_pcHostName, pQuery->m_Domain)))
+            (p_u16Timeout) &&
+            ((pQuery = _allocQuery(clsQuery::enuQueryType::Host))) &&
+            (_buildDomainForHost(p_pcHostName, pQuery->m_Domain)))
     {
         if ((_removeLegacyQuery()) &&
-            ((pQuery->m_bStaticQuery = true)) &&
-            (_sendQuery(*pQuery)))
+                ((pQuery->m_bStaticQuery = true)) &&
+                (_sendQuery(*pQuery)))
         {
             // Wait for answers to arrive
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryHost: Waiting %u ms for answers...\n"), _DH(), p_u16Timeout););
@@ -647,8 +647,8 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
 
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
-                                                              const char* p_pcProtocol,
-                                                              clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
+        const char* p_pcProtocol,
+        clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
     clsQuery*   pQuery = 0;
     if ((pQuery = _installServiceQuery(p_pcService, p_pcProtocol)))
@@ -663,8 +663,8 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
 
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
-                                                              const char* p_pcProtocol,
-                                                              clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
+        const char* p_pcProtocol,
+        clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
     clsQuery*   pQuery = 0;
     if ((pQuery = _installServiceQuery(p_pcService, p_pcProtocol)))
@@ -678,7 +678,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
     clsLEAmDNS2_Host::installHostQuery (answer)
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
-                                                           clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
+        clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
@@ -698,7 +698,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostN
     clsLEAmDNS2_Host::installHostQuery (accessor)
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
-                                                           clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
+        clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
@@ -803,7 +803,7 @@ UdpContext* clsLEAMDNSHost::_allocBackbone(void)
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _allocBackbone: Created backbone.\n"), _DH()););
 
         if ((clsBackbone::sm_pBackbone) &&
-            (!clsBackbone::sm_pBackbone->init()))
+                (!clsBackbone::sm_pBackbone->init()))
         {
             DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _allocBackbone: FAILED to init backbone!\n"), _DH()););
 
@@ -828,8 +828,8 @@ bool clsLEAMDNSHost::_releaseBackbone(void)
     bool    bResult = false;
 
     if ((clsBackbone::sm_pBackbone) &&
-        ((bResult = clsBackbone::sm_pBackbone->removeHost(this))) &&
-        (0 == clsBackbone::sm_pBackbone->hostCount()))
+            ((bResult = clsBackbone::sm_pBackbone->removeHost(this))) &&
+            (0 == clsBackbone::sm_pBackbone->hostCount()))
     {
         delete clsBackbone::sm_pBackbone;
         clsBackbone::sm_pBackbone = 0;
@@ -945,14 +945,14 @@ clsLEAMDNSHost::typeNetIfState clsLEAMDNSHost::_getNetIfState(void) const
     typeNetIfState  curNetIfState = static_cast<typeNetIfState>(enuNetIfState::None);
 
     if ((m_pNetIf) &&
-        (netif_is_up(m_pNetIf)))
+            (netif_is_up(m_pNetIf)))
     {
         curNetIfState |= static_cast<typeNetIfState>(enuNetIfState::IsUp);
 
         // Check if netif link is up
         if ((netif_is_link_up(m_pNetIf)) &&
-            ((m_pNetIf != netif_get_by_index(WIFI_STA)) ||
-             (STATION_GOT_IP == wifi_station_get_connect_status())))
+                ((m_pNetIf != netif_get_by_index(WIFI_STA)) ||
+                 (STATION_GOT_IP == wifi_station_get_connect_status())))
         {
             curNetIfState |= static_cast<typeNetIfState>(enuNetIfState::LinkIsUp);
         }
@@ -1084,7 +1084,7 @@ bool clsLEAMDNSHost::_allocDomainName(const char* p_pcNewDomainName,
 
     size_t  stLength = 0;
     if ((p_pcNewDomainName) &&
-        (clsConsts::stDomainLabelMaxLength >= (stLength = strlen(p_pcNewDomainName))))   // char max size for a single label
+            (clsConsts::stDomainLabelMaxLength >= (stLength = strlen(p_pcNewDomainName))))   // char max size for a single label
     {
         // Copy in hostname characters as lowercase
         if ((bResult = (0 != (p_rpcDomainName = new char[stLength + 1]))))
@@ -1156,7 +1156,7 @@ bool clsLEAMDNSHost::_releaseDefaultInstanceName(void)
     clsLEAmDNS2_Host::_instanceName
 */
 const char* clsLEAMDNSHost::_instanceName(const char* p_pcInstanceName,
-                                          bool p_bReturnZero /*= true*/) const
+        bool p_bReturnZero /*= true*/) const
 {
     return (p_pcInstanceName ? : (m_pcDefaultInstanceName ? : (m_pcHostName ? : (p_bReturnZero ? 0 : "-"))));
 }
@@ -1283,8 +1283,8 @@ bool clsLEAMDNSHost::_releaseQueries(void)
 
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDNSHost::clsRRDomain& p_Domain,
-                                                                 const clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType,
-                                                                 const clsQuery* p_pPrevQuery)
+        const clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType,
+        const clsQuery* p_pPrevQuery)
 {
     clsQuery*    pMatchingQuery = 0;
 
@@ -1292,17 +1292,21 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDN
     if (p_pPrevQuery)
     {
         if (m_Queries.end() != ((it = std::find(m_Queries.begin(), m_Queries.end(), p_pPrevQuery))))
-        {   // Found previous object
+        {
+            // Found previous object
             it++;
         }
-        DEBUG_EX_ERR(else DEBUG_OUTPUT.printf_P(PSTR("%s _findNextQueryByDomain: FAILED to find 'previous' object!\n"), _DH()););   // if not prev was found -> 'cancel'
+        DEBUG_EX_ERR(else
+        {
+            DEBUG_OUTPUT.printf_P(PSTR("%s _findNextQueryByDomain: FAILED to find 'previous' object!\n"), _DH());
+        });   // if not prev was found -> 'cancel'
     }
 
     for (; it != m_Queries.end(); it++)
     {
         if (((clsQuery::enuQueryType::None == p_QueryType) ||
-             ((*it)->m_QueryType == p_QueryType)) &&
-            (p_Domain == (*it)->m_Domain))
+                ((*it)->m_QueryType == p_QueryType)) &&
+                (p_Domain == (*it)->m_Domain))
         {
             pMatchingQuery = *it;
             break;
@@ -1316,14 +1320,14 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDN
 
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(const char* p_pcService,
-                                                               const char* p_pcProtocol)
+        const char* p_pcProtocol)
 {
     clsQuery*   pMDNSQuery = 0;
 
     if ((p_pcService) && (*p_pcService) &&
-        (p_pcProtocol) && (*p_pcProtocol) &&
-        ((pMDNSQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
-        (_buildDomainForService(p_pcService, p_pcProtocol, pMDNSQuery->m_Domain)))
+            (p_pcProtocol) && (*p_pcProtocol) &&
+            ((pMDNSQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
+            (_buildDomainForService(p_pcService, p_pcProtocol, pMDNSQuery->m_Domain)))
     {
         pMDNSQuery->m_bStaticQuery = false;
 
@@ -1346,7 +1350,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(const char* p_pcS
     clsLEAmDNS2_Host::_installDomainQuery
 */
 clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(clsLEAMDNSHost::clsRRDomain& p_Domain,
-                                                              clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType)
+        clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType)
 {
     clsQuery*    pQuery = 0;
 
@@ -1402,9 +1406,9 @@ bool clsLEAMDNSHost::_hasQueriesWaitingForAnswers(void) const
     clsLEAmDNS2_Host::_executeQueryCallback
 */
 bool clsLEAMDNSHost::_executeQueryCallback(const clsQuery& p_Query,
-                                           const clsQuery::clsAnswer& p_Answer,
-                                           clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
-                                           bool p_bSetContent)
+        const clsQuery::clsAnswer& p_Answer,
+        clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
+        bool p_bSetContent)
 {
     if (p_Query.m_fnCallbackAnswer)
     {

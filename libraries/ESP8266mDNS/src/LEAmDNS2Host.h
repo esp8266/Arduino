@@ -465,8 +465,8 @@ public:
         Callback function for host domain probe results
     */
     using fnProbeResultCallback = std::function<void(clsLEAMDNSHost& p_rHost,
-                                                     const char* p_pcDomainName,
-                                                     bool p_bProbeResult)>;
+                                  const char* p_pcDomainName,
+                                  bool p_bProbeResult)>;
 
 protected:
     /**
@@ -498,8 +498,8 @@ public:
             fnProbeResultCallback
         */
         using fnProbeResultCallback = std::function<void(clsService& p_rMDNSService,
-                                                         const char* p_pcInstanceName,
-                                                         bool p_bProbeResult)>;
+                                      const char* p_pcInstanceName,
+                                      bool p_bProbeResult)>;
 
     protected:
         friend clsLEAMDNSHost;
@@ -1188,16 +1188,16 @@ public:
             QueryCallbackAnswerFn
         */
         using QueryCallbackAnswerFn = std::function<void(const clsQuery& p_Query,
-                                                         const clsAnswer& p_Answer,
-                                                         clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags, // flags for the updated answer item
-                                                         bool p_bSetContent)>;                                  // true: Answer component set, false: component deleted
+                                      const clsAnswer& p_Answer,
+                                      clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags, // flags for the updated answer item
+                                      bool p_bSetContent)>;                                  // true: Answer component set, false: component deleted
         /**
             QueryCallbackAccessorFn
         */
         using QueryCallbackAccessorFn = std::function<void(const clsQuery& p_Query,
-                                                           const clsAnswerAccessor& p_AnswerAccessor,
-                                                           clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
-                                                           bool p_bSetContent)>;                                    // true: Answer component set, false: component deleted
+                                        const clsAnswerAccessor& p_AnswerAccessor,
+                                        clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
+                                        bool p_bSetContent)>;                                    // true: Answer component set, false: component deleted
 
     protected:
         friend  clsLEAMDNSHost;
@@ -1292,7 +1292,7 @@ public:
                             const char* p_pcType,
                             const char* p_pcProtocol,
                             uint16_t p_u16Port = (uint16_t)(-1));
-	const clsService::list& services(void) const;
+    const clsService::list& services(void) const;
 
     // QUERIES
 
@@ -1303,10 +1303,10 @@ public:
     // - answerIP (or IP)
     // - answerPort (or port)
     clsQuery::clsAnswerAccessor::vector queryService(const char* p_pcService,
-                                                     const char* p_pcProtocol,
-                                                     const uint16_t p_u16Timeout);
+            const char* p_pcProtocol,
+            const uint16_t p_u16Timeout);
     clsQuery::clsAnswerAccessor::vector queryHost(const char* p_pcHostName,
-                                                  const uint16_t p_u16Timeout);
+            const uint16_t p_u16Timeout);
     bool removeQuery(void);
     bool hasQuery(void);
     clsQuery* getQuery(void);

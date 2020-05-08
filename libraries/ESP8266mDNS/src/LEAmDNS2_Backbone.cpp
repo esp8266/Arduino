@@ -71,7 +71,7 @@ UdpContext* clsLEAMDNSHost::clsBackbone::addHost(clsLEAMDNSHost* p_pHost)
     UdpContext* pUDPContext = 0;
 
     if ((m_pUDPContext) &&
-        (p_pHost))
+            (p_pHost))
     {
         m_HostList.push_back(p_pHost);
         pUDPContext = m_pUDPContext;
@@ -89,7 +89,7 @@ bool clsLEAMDNSHost::clsBackbone::removeHost(clsLEAMDNSHost* p_pHost)
     bool    bResult = false;
 
     if ((p_pHost) &&
-        (m_HostList.end() != std::find(m_HostList.begin(), m_HostList.end(), p_pHost)))
+            (m_HostList.end() != std::find(m_HostList.begin(), m_HostList.end(), p_pHost)))
     {
         // Remove host object
         m_HostList.remove(p_pHost);
@@ -126,7 +126,7 @@ bool clsLEAMDNSHost::clsBackbone::setDelayUDPProcessing(bool p_bDelayUDPProcessi
         m_bDelayUDPProcessing = p_bDelayUDPProcessing;
 
         if ((!m_bDelayUDPProcessing) &&
-            (m_u32DelayedDatagrams))
+                (m_u32DelayedDatagrams))
         {
             DEBUG_EX_INFO2(if (6 <= m_u32DelayedDatagrams) DEBUG_OUTPUT.printf_P(PSTR("%s setDelayUDPProcessing: Processing %u delayed datagram(s)\n"), _DH(), m_u32DelayedDatagrams););
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s setDelayUDPProcessing: Processing %u delayed datagram(s)\n"), _DH(), m_u32DelayedDatagrams););
@@ -215,19 +215,19 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
     {
         DEBUG_EX_INFO(uint32_t    u32LoopCounter = 0; IPAddress remoteIPAddr;);
         while ((m_pUDPContext) &&
-               (m_pUDPContext->next()))
+                (m_pUDPContext->next()))
         {
             netif*          pNetIf = m_pUDPContext->getInputNetif();//ip_current_input_netif();	// Probably changed inbetween!!!!
             clsLEAMDNSHost*   pHost = 0;
             if ((pNetIf) &&
-                ((pHost = _findHost(pNetIf))))
+                    ((pHost = _findHost(pNetIf))))
             {
                 DEBUG_EX_INFO(
                     if (u32LoopCounter++)
             {
                 DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);
                     if ((remoteIPAddr.isSet()) &&
-                        (remoteIPAddr != m_pUDPContext->getRemoteAddress()))
+                            (remoteIPAddr != m_pUDPContext->getRemoteAddress()))
                     {
                         DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Changed IP address %s->%s!\n"), _DH(), remoteIPAddr.toString().c_str(), m_pUDPContext->getRemoteAddress().toString().c_str());
                     }
@@ -264,7 +264,7 @@ const clsLEAMDNSHost* clsLEAMDNSHost::clsBackbone::_findHost(netif* p_pNetIf) co
     for (const clsLEAMDNSHost* pHost : m_HostList)
     {
         if ((p_pNetIf) &&
-            (pHost->m_pNetIf == p_pNetIf))
+                (pHost->m_pNetIf == p_pNetIf))
         {
             pResult = pHost;
             break;

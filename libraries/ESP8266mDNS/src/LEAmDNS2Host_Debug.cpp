@@ -197,7 +197,7 @@ const char* clsLEAMDNSHost::_RRType2Name(uint16_t p_u16RRType) const
 
 */
 const char* clsLEAMDNSHost::_RRClass2String(uint16_t p_u16RRClass,
-                                            bool p_bIsQuery) const
+        bool p_bIsQuery) const
 {
     static char acClassString[16];
     *acClassString = 0;
@@ -267,7 +267,7 @@ const char* clsLEAMDNSHost::_replyFlags2String(uint32_t p_u32ReplyFlags) const
 
     // Remove trailing spaces
     while ((*acFlagsString) &&
-           (' '  == acFlagsString[strlen(acFlagsString) - 1]))
+            (' '  == acFlagsString[strlen(acFlagsString) - 1]))
     {
         acFlagsString[strlen(acFlagsString) - 1] = 0;
     }

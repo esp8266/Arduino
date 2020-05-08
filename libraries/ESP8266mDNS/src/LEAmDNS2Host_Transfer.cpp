@@ -100,7 +100,7 @@ bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParam
                 DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage (V4): FAILED!\n"), _DH()););
 
                 if ((clsConsts::u32SendCooldown) &&
-                    (can_yield()))
+                        (can_yield()))
                 {
                     delay(clsConsts::u32SendCooldown);
                 }
@@ -110,16 +110,16 @@ bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParam
                 // Multicast response -> Send via the same network interface, that received the query
 #ifdef MDNS_IPV4_SUPPORT
                 if (((!ipRemote.isSet()) ||                                                 // NO remote IP
-                     (ipRemote.isV4())) &&                                                  // OR  IPv4
-                    (u8AvailableProtocols & static_cast<uint8_t>(enuIPProtocolType::V4)))   // AND IPv4 protocol available
+                        (ipRemote.isV4())) &&                                                  // OR  IPv4
+                        (u8AvailableProtocols & static_cast<uint8_t>(enuIPProtocolType::V4)))   // AND IPv4 protocol available
                 {
                     bResult = _sendMessage_Multicast(p_rSendParameter, static_cast<uint8_t>(enuIPProtocolType::V4));
                 }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
                 if (((!ipRemote.isSet()) ||                                                 // NO remote IP
-                     (ipRemote.isV6())) &&                                                  // OR  IPv6
-                    (u8AvailableProtocols & static_cast<uint8_t>(enuIPProtocolType::V6)))   // AND IPv6 protocol available
+                        (ipRemote.isV6())) &&                                                  // OR  IPv6
+                        (u8AvailableProtocols & static_cast<uint8_t>(enuIPProtocolType::V6)))   // AND IPv6 protocol available
                 {
                     bResult = _sendMessage_Multicast(p_rSendParameter, static_cast<uint8_t>(enuIPProtocolType::V6));
                 }
@@ -153,7 +153,7 @@ bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParam
     via the selected WiFi protocols
 */
 bool clsLEAMDNSHost::_sendMessage_Multicast(clsLEAMDNSHost::clsSendParameter& p_rSendParameter,
-                                            uint8_t p_IPProtocolTypes)
+        uint8_t p_IPProtocolTypes)
 {
     bool    bIPv4Result = true;
     bool    bIPv6Result = true;
@@ -173,7 +173,7 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(clsLEAMDNSHost::clsSendParameter& p_
         DEBUG_EX_ERR(if (!bIPv4Result) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast (V4): FAILED!\n"), _DH()););
 
         if ((clsConsts::u32SendCooldown) &&
-            (can_yield()))
+                (can_yield()))
         {
             delay(clsConsts::u32SendCooldown);
         }
@@ -199,7 +199,7 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(clsLEAMDNSHost::clsSendParameter& p_
         DEBUG_EX_ERR(if (!bIPv6Result) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast (IPv6): FAILED! (%s, %s, %s)\n"), _DH(), (_getResponderIPAddress(enuIPProtocolType::V6).isSet() ? "1" : "0"), (bPrepareMessage ? "1" : "0"), (bUDPContextSend ? "1" : "0")););
 
         if ((clsConsts::u32SendCooldown) &&
-            (can_yield()))
+                (can_yield()))
         {
             delay(clsConsts::u32SendCooldown);
         }
@@ -287,8 +287,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
 #ifdef MDNS_IPV4_SUPPORT
         // A
         if ((bResult) &&
-            (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::A)) &&
-            (_getResponderIPAddress(enuIPProtocolType::V4).isSet()))
+                (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::A)) &&
+                (_getResponderIPAddress(enuIPProtocolType::V4).isSet()))
         {
 
             u32NSECContent |= static_cast<uint32_t>(enuContentFlag::A);
@@ -299,8 +299,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
         }
         // PTR_IPv4
         if ((bResult) &&
-            (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv4)) &&
-            (_getResponderIPAddress(enuIPProtocolType::V4).isSet()))
+                (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv4)) &&
+                (_getResponderIPAddress(enuIPProtocolType::V4).isSet()))
         {
 
             u32NSECContent |= static_cast<uint32_t>(enuContentFlag::PTR_IPv4);
@@ -313,8 +313,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
 #ifdef MDNS_IPV6_SUPPORT
         // AAAA
         if ((bResult) &&
-            (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::AAAA)) &&
-            (_getResponderIPAddress(enuIPProtocolType::V6).isSet()))
+                (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::AAAA)) &&
+                (_getResponderIPAddress(enuIPProtocolType::V6).isSet()))
         {
 
             u32NSECContent |= static_cast<uint32_t>(enuContentFlag::AAAA);
@@ -325,8 +325,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
         }
         // PTR_IPv6
         if ((bResult) &&
-            (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv6)) &&
-            (_getResponderIPAddress(enuIPProtocolType::V6).isSet()))
+                (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv6)) &&
+                (_getResponderIPAddress(enuIPProtocolType::V6).isSet()))
         {
 
             u32NSECContent |= static_cast<uint32_t>(enuContentFlag::PTR_IPv6);
@@ -343,7 +343,7 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
 
             // PTR_TYPE
             if ((bResult) &&
-                (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_TYPE)))
+                    (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_TYPE)))
             {
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
                  ? ++ru16Answers
@@ -352,7 +352,7 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
             }
             // PTR_NAME
             if ((bResult) &&
-                (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_NAME)))
+                    (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_NAME)))
             {
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
                  ? ++ru16Answers
@@ -361,7 +361,7 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
             }
             // SRV
             if ((bResult) &&
-                (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::SRV)))
+                    (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::SRV)))
             {
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
                  ? ++ru16Answers
@@ -370,7 +370,7 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
             }
             // TXT
             if ((bResult) &&
-                (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::TXT)))
+                    (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::TXT)))
             {
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
                  ? ++ru16Answers
@@ -393,8 +393,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
             clsService* pService = *it;
 
             if ((bResult) &&
-                (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_NAME)) &&    // If PTR_NAME is requested, AND
-                (!(pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::SRV))))        // NOT SRV -> add SRV as additional answer
+                    (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_NAME)) &&    // If PTR_NAME is requested, AND
+                    (!(pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::SRV))))        // NOT SRV -> add SRV as additional answer
             {
 
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
@@ -413,18 +413,18 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
                 }
             */
             if ((pService->m_u32ReplyMask & (static_cast<uint32_t>(enuContentFlag::PTR_NAME) | static_cast<uint32_t>(enuContentFlag::SRV))) ||          // If service instance name or SRV OR
-                (p_rSendParameter.m_u32HostReplyMask & (static_cast<uint32_t>(enuContentFlag::A) | static_cast<uint32_t>(enuContentFlag::AAAA))))       // any host IP address is requested
+                    (p_rSendParameter.m_u32HostReplyMask & (static_cast<uint32_t>(enuContentFlag::A) | static_cast<uint32_t>(enuContentFlag::AAAA))))       // any host IP address is requested
             {
 #ifdef MDNS_IPV4_SUPPORT
                 if ((bResult) &&
-                    (!(p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::A))))                   // Add IPv4 address
+                        (!(p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::A))))                   // Add IPv4 address
                 {
                     bNeedsAdditionalAnswerA = true;
                 }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
                 if ((bResult) &&
-                    (!(p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::AAAA))))                // Add IPv6 address
+                        (!(p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::AAAA))))                // Add IPv6 address
                 {
                     bNeedsAdditionalAnswerAAAA = true;
                 }
@@ -432,8 +432,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
             }
             // NSEC record for service
             if ((bResult) &&
-                (pService->m_u32ReplyMask) &&
-                ((clsSendParameter::enuResponseType::None != p_rSendParameter.m_Response)))
+                    (pService->m_u32ReplyMask) &&
+                    ((clsSendParameter::enuResponseType::None != p_rSendParameter.m_Response)))
             {
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
                  ? ++ru16AdditionalAnswers
@@ -445,8 +445,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
 #ifdef MDNS_IPV4_SUPPORT
         // Answer A needed?
         if ((bResult) &&
-            (bNeedsAdditionalAnswerA) &&
-            (_getResponderIPAddress(enuIPProtocolType::V4).isSet()))
+                (bNeedsAdditionalAnswerA) &&
+                (_getResponderIPAddress(enuIPProtocolType::V4).isSet()))
         {
             // Additional A
             u32NSECContent |= static_cast<uint32_t>(enuContentFlag::A);
@@ -460,8 +460,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
 #ifdef MDNS_IPV6_SUPPORT
         // Answer AAAA needed?
         if ((bResult) &&
-            (bNeedsAdditionalAnswerAAAA) &&
-            (_getResponderIPAddress(enuIPProtocolType::V6).isSet()))
+                (bNeedsAdditionalAnswerAAAA) &&
+                (_getResponderIPAddress(enuIPProtocolType::V6).isSet()))
         {
             // Additional AAAA
             u32NSECContent |= static_cast<uint32_t>(enuContentFlag::AAAA);
@@ -475,8 +475,8 @@ bool clsLEAMDNSHost::_prepareMessage(clsLEAMDNSHost::clsSendParameter& p_rSendPa
 
         // NSEC host (part 2)
         if ((bResult) &&
-            ((clsSendParameter::enuResponseType::None != p_rSendParameter.m_Response)) &&
-            (u32NSECContent))
+                ((clsSendParameter::enuResponseType::None != p_rSendParameter.m_Response)) &&
+                (u32NSECContent))
         {
             // NSEC PTR IPv4/IPv6 are separate answers; make sure, that this is counted for
 #ifdef MDNS_IPV4_SUPPORT
@@ -640,8 +640,8 @@ IPAddress clsLEAMDNSHost::_getResponderIPAddress(enuIPProtocolType p_IPProtocolT
             {
                 //DEBUG_EX_INFO(if ip6_addr_isvalid(netif_ip6_addr_state(&m_rNetIf, idx)) DEBUG_OUTPUT.printf_P(PSTR("%s _getResponderIPAddress: Checking IPv6 address %s (LL: %s)\n"), _DH(), IPAddress(netif_ip_addr6(m_pNetIf, idx)).toString().c_str(), (bCheckLinkLocal ? "YES" : "NO")););
                 if ((ip6_addr_isvalid(netif_ip6_addr_state(m_pNetIf, idx))) &&
-                    (((!bCheckLinkLocal) ||
-                      (ip6_addr_islinklocal(netif_ip6_addr(m_pNetIf, idx))))))
+                        (((!bCheckLinkLocal) ||
+                          (ip6_addr_islinklocal(netif_ip6_addr(m_pNetIf, idx))))))
                 {
                     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _getResponderIPAddress: Selected IPv6 address %s (LL: %s)\n"), _DH(), IPAddress(netif_ip_addr6(m_pNetIf, idx)).toString().c_str(), (bCheckLinkLocal ? "YES" : "NO")););
                     ipResponder = netif_ip_addr6(m_pNetIf, idx);
@@ -713,8 +713,8 @@ bool clsLEAMDNSHost::_readRRAnswer(clsLEAMDNSHost::clsRRAnswer*& p_rpRRAnswer)
     uint32_t            u32TTL;
     uint16_t            u16RDLength;
     if ((_readRRHeader(header)) &&
-        (_udpRead32(u32TTL)) &&
-        (_udpRead16(u16RDLength)))
+            (_udpRead32(u32TTL)) &&
+            (_udpRead16(u16RDLength)))
     {
         /*  DEBUG_EX_INFO(
                 DEBUG_OUTPUT.printf_P(PSTR("%s _readRRAnswer: Reading 0x%04X answer (class:0x%04X, TTL:%u, RDLength:%u) for "), header.m_Attributes.m_u16Type, header.m_Attributes.m_u16Class, u32TTL, u16RDLength);
@@ -876,7 +876,7 @@ bool clsLEAMDNSHost::_readRRAnswerTXT(clsLEAMDNSHost::clsRRAnswerTXT& p_rRRAnswe
 
                 const unsigned char*    pucCursor = pucBuffer;
                 while ((pucCursor < (pucBuffer + p_u16RDLength)) &&
-                       (bResult))
+                        (bResult))
                 {
                     bResult = false;
 
@@ -894,7 +894,7 @@ bool clsLEAMDNSHost::_readRRAnswerTXT(clsLEAMDNSHost::clsRRAnswerTXT& p_rRRAnswe
                         unsigned char*  pucEqualSign = (unsigned char*)os_strchr((const char*)pucCursor, '=');  // Position of the '=' sign
                         unsigned char   ucKeyLength;
                         if ((pucEqualSign) &&
-                            ((ucKeyLength = (pucEqualSign - pucCursor))))
+                                ((ucKeyLength = (pucEqualSign - pucCursor))))
                         {
                             unsigned char   ucValueLength = (ucLength - (pucEqualSign - pucCursor + 1));
                             bResult = (((pTxt = new clsServiceTxt)) &&
@@ -914,7 +914,7 @@ bool clsLEAMDNSHost::_readRRAnswerTXT(clsLEAMDNSHost::clsRRAnswerTXT& p_rRRAnswe
                     }
 
                     if ((bResult) &&
-                        (pTxt))
+                            (pTxt))
                     {
                         // Everythings fine so far
                         // Link TXT item to answer TXTs
@@ -1012,13 +1012,13 @@ bool clsLEAMDNSHost::_readRRAnswerSRV(clsLEAMDNSHost::clsRRAnswerSRV& p_rRRAnswe
     MDNSResponder::_readRRAnswerGeneric
 */
 bool clsLEAMDNSHost::_readRRAnswerGeneric(clsLEAMDNSHost::clsRRAnswerGeneric& p_rRRAnswerGeneric,
-                                          uint16_t p_u16RDLength)
+        uint16_t p_u16RDLength)
 {
     bool    bResult = (0 == p_u16RDLength);
 
     p_rRRAnswerGeneric.clear();
     if (((p_rRRAnswerGeneric.m_u16RDLength = p_u16RDLength)) &&
-        ((p_rRRAnswerGeneric.m_pu8RDData = new unsigned char[p_rRRAnswerGeneric.m_u16RDLength])))
+            ((p_rRRAnswerGeneric.m_pu8RDData = new unsigned char[p_rRRAnswerGeneric.m_u16RDLength])))
     {
         bResult = _udpReadBuffer(p_rRRAnswerGeneric.m_pu8RDData, p_rRRAnswerGeneric.m_u16RDLength);
     }
@@ -1178,7 +1178,7 @@ bool clsLEAMDNSHost::_readRRAttributes(clsLEAMDNSHost::clsRRAttributes& p_rRRAtt
 
 */
 bool clsLEAMDNSHost::_buildDomainForHost(const char* p_pcHostName,
-                                         clsLEAMDNSHost::clsRRDomain& p_rHostDomain) const
+        clsLEAMDNSHost::clsRRDomain& p_rHostDomain) const
 {
 
     p_rHostDomain.clear();
@@ -1218,8 +1218,8 @@ bool clsLEAMDNSHost::_buildDomainForDNSSD(clsLEAMDNSHost::clsRRDomain& p_rDNSSDD
 
 */
 bool clsLEAMDNSHost::_buildDomainForService(const clsLEAMDNSHost::clsService& p_Service,
-                                            bool p_bIncludeName,
-                                            clsLEAMDNSHost::clsRRDomain& p_rServiceDomain) const
+        bool p_bIncludeName,
+        clsLEAMDNSHost::clsRRDomain& p_rServiceDomain) const
 {
     p_rServiceDomain.clear();
     bool    bResult = (((!p_bIncludeName) ||
@@ -1240,8 +1240,8 @@ bool clsLEAMDNSHost::_buildDomainForService(const clsLEAMDNSHost::clsService& p_
 
 */
 bool clsLEAMDNSHost::_buildDomainForService(const char* p_pcServiceType,
-                                            const char* p_pcProtocol,
-                                            clsLEAMDNSHost::clsRRDomain& p_rServiceDomain) const
+        const char* p_pcProtocol,
+        clsLEAMDNSHost::clsRRDomain& p_rServiceDomain) const
 {
     p_rServiceDomain.clear();
     bool    bResult = ((p_pcServiceType) &&
@@ -1264,7 +1264,7 @@ bool clsLEAMDNSHost::_buildDomainForService(const char* p_pcServiceType,
 
 */
 bool clsLEAMDNSHost::_buildDomainForReverseIPv4(IPAddress p_IPv4Address,
-                                                clsLEAMDNSHost::clsRRDomain& p_rReverseIPv4Domain) const
+        clsLEAMDNSHost::clsRRDomain& p_rReverseIPv4Domain) const
 {
     bool    bResult = ((p_IPv4Address.isSet()) &&
                        (p_IPv4Address.isV4()));
@@ -1296,7 +1296,7 @@ bool clsLEAMDNSHost::_buildDomainForReverseIPv4(IPAddress p_IPv4Address,
 
 */
 bool clsLEAMDNSHost::_buildDomainForReverseIPv6(IPAddress p_IPv6Address,
-                                                clsLEAMDNSHost::clsRRDomain& p_rReverseIPv6Domain) const
+        clsLEAMDNSHost::clsRRDomain& p_rReverseIPv6Domain) const
 {
     bool    bResult = ((p_IPv6Address.isSet()) &&
                        (p_IPv6Address.isV6()));
@@ -1507,12 +1507,12 @@ bool clsLEAMDNSHost::_readMDNSMsgHeader(clsLEAMDNSHost::clsMsgHeader& p_rMsgHead
     uint8_t u8B1;
     uint8_t u8B2;
     if ((_udpRead16(p_rMsgHeader.m_u16ID)) &&
-        (_udpRead8(u8B1)) &&
-        (_udpRead8(u8B2)) &&
-        (_udpRead16(p_rMsgHeader.m_u16QDCount)) &&
-        (_udpRead16(p_rMsgHeader.m_u16ANCount)) &&
-        (_udpRead16(p_rMsgHeader.m_u16NSCount)) &&
-        (_udpRead16(p_rMsgHeader.m_u16ARCount)))
+            (_udpRead8(u8B1)) &&
+            (_udpRead8(u8B2)) &&
+            (_udpRead16(p_rMsgHeader.m_u16QDCount)) &&
+            (_udpRead16(p_rMsgHeader.m_u16ANCount)) &&
+            (_udpRead16(p_rMsgHeader.m_u16NSCount)) &&
+            (_udpRead16(p_rMsgHeader.m_u16ARCount)))
     {
 
         p_rMsgHeader.m_1bQR     = (u8B1 & 0x80);    // Query/Responde flag
@@ -1584,7 +1584,7 @@ bool clsLEAMDNSHost::_write32(uint32_t p_u32Value,
 
 */
 bool clsLEAMDNSHost::_writeMDNSMsgHeader(const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader,
-                                         clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     /*  DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSMsgHeader: ID:%u QR:%u OP:%u AA:%u TC:%u RD:%u RA:%u R:%u QD:%u AN:%u NS:%u AR:%u\n"),
             _DH(),
@@ -1615,7 +1615,7 @@ bool clsLEAMDNSHost::_writeMDNSMsgHeader(const clsLEAMDNSHost::clsMsgHeader& p_M
 
 */
 bool clsLEAMDNSHost::_writeMDNSRRAttributes(const clsLEAMDNSHost::clsRRAttributes& p_Attributes,
-                                            clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     bool    bResult = ((_write16(p_Attributes.m_u16Type, p_rSendParameter)) &&
                        (_write16(p_Attributes.m_u16Class, p_rSendParameter)));
@@ -1654,9 +1654,9 @@ bool clsLEAMDNSHost::_writeMDNSRRDomain(const clsLEAMDNSHost::clsRRDomain& p_Dom
 
 */
 bool clsLEAMDNSHost::_writeMDNSHostDomain(const char* p_pcHostName,
-                                          bool p_bPrependRDLength,
-                                          uint16_t p_u16AdditionalLength,
-                                          clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        bool p_bPrependRDLength,
+        uint16_t p_u16AdditionalLength,
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     // The 'skip-compression' version is handled in '_writeMDNSAnswer_SRV'
     uint16_t            u16CachedDomainOffset = p_rSendParameter.findCachedDomainOffset((const void*)p_pcHostName, false);
@@ -1694,10 +1694,10 @@ bool clsLEAMDNSHost::_writeMDNSHostDomain(const char* p_pcHostName,
 
 */
 bool clsLEAMDNSHost::_writeMDNSServiceDomain(const clsLEAMDNSHost::clsService& p_Service,
-                                             bool p_bIncludeName,
-                                             bool p_bPrependRDLength,
-                                             uint16_t p_u16AdditionalLength,
-                                             clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        bool p_bIncludeName,
+        bool p_bPrependRDLength,
+        uint16_t p_u16AdditionalLength,
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     // The 'skip-compression' version is handled in '_writeMDNSAnswer_SRV'
     uint16_t            u16CachedDomainOffset = p_rSendParameter.findCachedDomainOffset((const void*)&p_Service, p_bIncludeName);
@@ -1815,7 +1815,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_A(IPAddress p_IPAddress,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_IPv4(IPAddress p_IPAddress,
-                                               clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_PTR_IPv4 (%s)%s\n"), p_IPAddress.toString().c_str(), (p_rSendParameter.m_bCacheFlush ? "" : " nF")););
 
@@ -1860,7 +1860,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_IPv4(IPAddress p_IPAddress,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_TYPE(clsLEAMDNSHost::clsService& p_rService,
-                                               clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_PTR_TYPE\n")););
 
@@ -1903,7 +1903,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_TYPE(clsLEAMDNSHost::clsService& p_rSe
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_NAME(clsLEAMDNSHost::clsService& p_rService,
-                                               clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_PTR_NAME\n"), _DH()););
 
@@ -1947,7 +1947,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_NAME(clsLEAMDNSHost::clsService& p_rSe
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_TXT(clsLEAMDNSHost::clsService& p_rService,
-                                          clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_TXT%s\n"), (p_rSendParameter.m_bCacheFlush ? "" : " nF"), _DH()););
 
@@ -1957,16 +1957,16 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_TXT(clsLEAMDNSHost::clsService& p_rService
                                   ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
 
     if ((_collectServiceTxts(p_rService)) &&
-        (_writeMDNSServiceDomain(p_rService, true, false, 0, p_rSendParameter)) &&	// MyESP._http._tcp.local
-        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                   // TYPE & CLASS
-        (_write32((p_rSendParameter.m_bUnannounce
-                   ? 0
-                   : (p_rSendParameter.m_bLegacyDNSQuery                               // TTL
-                      ? clsConsts::u32LegacyTTL
-                      : clsConsts::u32ServiceTTL)), p_rSendParameter)) &&
-        (_write16((p_rService.m_Txts.count()                                        // RDLength
-                   ? p_rService.m_Txts.length()                                    // default case
-                   : 1), p_rSendParameter)))                                       // If no TXT records exist, a single 0 byte is sent
+            (_writeMDNSServiceDomain(p_rService, true, false, 0, p_rSendParameter)) &&	// MyESP._http._tcp.local
+            (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                   // TYPE & CLASS
+            (_write32((p_rSendParameter.m_bUnannounce
+                       ? 0
+                       : (p_rSendParameter.m_bLegacyDNSQuery                               // TTL
+                          ? clsConsts::u32LegacyTTL
+                          : clsConsts::u32ServiceTTL)), p_rSendParameter)) &&
+            (_write16((p_rService.m_Txts.count()                                        // RDLength
+                       ? p_rService.m_Txts.length()                                    // default case
+                       : 1), p_rSendParameter)))                                       // If no TXT records exist, a single 0 byte is sent
     {
         bResult = true;
         // RData    Txts
@@ -2035,7 +2035,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_TXT(clsLEAMDNSHost::clsService& p_rService
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_AAAA(IPAddress p_IPAddress,
-                                           clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_AAAA (%s)%s\n"), p_IPAddress.toString().c_str(), (p_rSendParameter.m_bCacheFlush ? "" : " nF")););
 
@@ -2077,7 +2077,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_AAAA(IPAddress p_IPAddress,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_IPv6(IPAddress p_IPAddress,
-                                               clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_PTR_IPv6%s\n"), (p_rSendParameter.m_bCacheFlush ? "" : " nF")););
 
@@ -2117,13 +2117,13 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_PTR_IPv6(IPAddress p_IPAddress,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_SRV(clsLEAMDNSHost::clsService& p_rService,
-                                          clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_SRV%s\n"), (p_rSendParameter.m_bCacheFlush ? "" : " nF")););
 
     uint16_t                u16CachedDomainOffset = (p_rSendParameter.m_bLegacyDNSQuery
-                                                     ? 0
-                                                     : p_rSendParameter.findCachedDomainOffset((const void*)m_pcHostName, false));
+            ? 0
+            : p_rSendParameter.findCachedDomainOffset((const void*)m_pcHostName, false));
 
     clsRRAttributes    attributes(DNS_RRTYPE_SRV,
                                   ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
@@ -2194,7 +2194,7 @@ clsLEAMDNSHost::clsNSECBitmap* clsLEAMDNSHost::_createNSECBitmap(uint32_t p_u32N
         }
 #endif
         if ((p_u32NSECContent & static_cast<uint32_t>(enuContentFlag::PTR_IPv4)) ||
-            (p_u32NSECContent & static_cast<uint32_t>(enuContentFlag::PTR_IPv6)))
+                (p_u32NSECContent & static_cast<uint32_t>(enuContentFlag::PTR_IPv6)))
         {
             pNSECBitmap->setBit(DNS_RRTYPE_PTR);            // 12/0x0C
         }
@@ -2225,7 +2225,7 @@ clsLEAMDNSHost::clsNSECBitmap* clsLEAMDNSHost::_createNSECBitmap(uint32_t p_u32N
 
 */
 bool clsLEAMDNSHost::_writeMDNSNSECBitmap(const clsLEAMDNSHost::clsNSECBitmap& p_NSECBitmap,
-                                          clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     /*  DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("_writeMDNSNSECBitmap: "));
     			  for (uint16_t u=0; u<p_NSECBitmap.m_u16BitmapLength; ++u) {
@@ -2249,7 +2249,7 @@ bool clsLEAMDNSHost::_writeMDNSNSECBitmap(const clsLEAMDNSHost::clsNSECBitmap& p
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC(uint32_t p_u32NSECContent,
-                                           clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_NSEC (host: %s)%s\n"), _replyFlags2String(p_u32NSECContent), (p_rSendParameter.m_bCacheFlush ? "" : " nF")););
 
@@ -2298,7 +2298,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC(uint32_t p_u32NSECContent,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC_PTR_IPv4(IPAddress p_IPAddress,
-                                                    clsSendParameter& p_rSendParameter)
+        clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_NSEC_PTR_IPv4\n")););
 
@@ -2353,7 +2353,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC_PTR_IPv4(IPAddress p_IPAddress,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC_PTR_IPv6(IPAddress p_IPAddress,
-                                                    clsSendParameter& p_rSendParameter)
+        clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_NSEC_PTR_IPv6\n")););
 
@@ -2406,8 +2406,8 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC_PTR_IPv6(IPAddress p_IPAddress,
 
 */
 bool clsLEAMDNSHost::_writeMDNSAnswer_NSEC(clsLEAMDNSHost::clsService& p_rService,
-                                           uint32_t p_u32NSECContent,
-                                           clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+        uint32_t p_u32NSECContent,
+        clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _writeMDNSAnswer_NSEC (service: %s)\n"), _DH(), _replyFlags2String(p_u32NSECContent)););
 
