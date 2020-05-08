@@ -294,29 +294,26 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + ISRTIMEOUTCCYS;
-  bool busy;
-  if (!waveform.enabled) {
-    busy = false;
-    waveform.nextEventCcy = ESP.getCycleCount() + MAXIRQTICKSCCYS;
-  }
-  else {
-    busy = static_cast<int32_t>(isrTimeoutCcy - waveform.nextEventCcy) > 0;
+  uint32_t busyPins = waveform.enabled;
+  if (busyPins) {
+    if (static_cast<int32_t>(waveform.nextEventCcy - isrTimeoutCcy) >= 0) {
+      busyPins = 0;
+    }
+    else {
+      waveform.nextEventCcy = ESP.getCycleCount() + MAXIRQTICKSCCYS;
+    }
     if (!(waveform.enabled & (1UL << waveform.nextPin))) {
       waveform.nextPin = waveform.startPin;
     }
   }
-  while (busy) {
+  while (busyPins) {
     int stopPin = waveform.nextPin;
     int pin = waveform.nextPin;
-    uint32_t now;
-    do {
-      now = ESP.getCycleCount();
-    } while (static_cast<int32_t>(waveform.nextEventCcy - now) > 0);
-    waveform.nextEventCcy = now + MAXIRQTICKSCCYS;
+    uint32_t now = ESP.getCycleCount();
 
     do {
       // If it's not on, ignore
-      if (!(waveform.enabled & (1UL << pin)))
+      if (!(busyPins & (1UL << pin)))
         continue;
 
       Waveform& wave = waveform.pins[pin];
@@ -325,7 +322,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       if (static_cast<int32_t>(overshootCcys) >= 0) {
         if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
           // Disable any waveforms that are done
-          waveform.enabled ^= 1UL << pin;
+          waveform.enabled &= ~(1UL << pin);
+          busyPins &= ~(1UL << pin);
         }
         else {
           const uint32_t fwdPeriods = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
@@ -408,14 +406,16 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
       }
 
-      // join events below performance threshold apart
-      if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > IRQLATENCYCCYS) {
-        waveform.nextEventCcy = wave.nextEventCcy;
-        waveform.nextPin = pin;
+      if (static_cast<int32_t>(wave.nextEventCcy - isrTimeoutCcy) >= 0) {
+        busyPins &= ~(1UL << pin);
+        // join events below performance threshold apart
+        if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > IRQLATENCYCCYS) {
+          waveform.nextEventCcy = wave.nextEventCcy;
+          waveform.nextPin = pin;
+        }
       }
-    } while ((pin = (pin < waveform.endPin) ? pin + 1 : waveform.startPin, pin != stopPin));
 
-    busy = static_cast<int32_t>(isrTimeoutCcy - waveform.nextEventCcy) > 0;
+    } while ((pin = (pin < waveform.endPin) ? pin + 1 : waveform.startPin) != stopPin);
   }
 
   int32_t nextTimerCcys;
