@@ -45,7 +45,7 @@
 #include <atomic>
 
 // Maximum delay between IRQs, Timer1, <= 2^23 / 80MHz
-constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(100000);
+constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
 // The SDK and hardware take some time to actually get to our NMI code, so
