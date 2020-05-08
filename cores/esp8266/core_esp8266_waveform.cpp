@@ -257,11 +257,11 @@ static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range) {
 
   if (cc == 0) {
     _stopPWM(pin);
-    digitalWrite(pin, HIGH);
+    digitalWrite(pin, LOW);
     return;
   } else if (cc >= _pwmPeriod) {
     _stopPWM(pin);
-    digitalWrite(pin, LOW);
+    digitalWrite(pin, HIGH);
     return;
   }
 
