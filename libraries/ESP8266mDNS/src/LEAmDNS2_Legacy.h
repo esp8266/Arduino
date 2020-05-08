@@ -128,6 +128,9 @@ class clsLEAMDNSHost_Legacy
     };
 
 public:
+
+    static constexpr auto ApiVersion = MDNSApiVersion::LEAv2Compat;
+
     /* INTERFACE */
     clsLEAMDNSHost_Legacy(void);
     virtual ~clsLEAMDNSHost_Legacy(void);
