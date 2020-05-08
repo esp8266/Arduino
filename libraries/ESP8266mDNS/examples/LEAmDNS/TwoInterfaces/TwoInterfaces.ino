@@ -5,9 +5,18 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 
+#ifndef STASSID
+#define STASSID "ssid"
+#define STAPSK  "12345678"
+#endif
 
-clsMDNSHost            mDNSHost_AP;
-clsMDNSHost            mDNSHost_STA;
+#ifndef APSSID
+#define APSSID "espap"
+#define APPSK  "12345678"
+#endif
+
+clsMDNSHost         mDNSHost_AP;
+clsMDNSHost         mDNSHost_STA;
 ESP8266WebServer    server(80);
 
 void connectToWiFi(const char* p_pcSSID,
@@ -43,7 +52,7 @@ void setup(void) {
   // Setup WiFi and AP
   WiFi.setAutoConnect(false);
   WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP("ESP8266", "12345678");
+  WiFi.softAP(APSSID, APPSK);
   Serial.print("Created AP ");
   Serial.println("ESP8266");
   Serial.print("AP-IP address: ");
@@ -62,8 +71,9 @@ void setup(void) {
     Serial.println("FAILED to start mDNS-AP");
   }
 
-  // Connect to WiFi network, with WRONG password
-  connectToWiFi("AP8", "WRONG_PW", 5);
+  // Connect to WiFi network, with WRONG password (timeout 5 seconds)
+  // (good password will be given in `loop()`)
+  connectToWiFi(STASSID, "WRONG_PW", 5);
 
   if (mDNSHost_STA.begin("esp8266", WIFI_STA, [](clsMDNSHost & p_rMDNSHost,
                          const char* p_pcDomainName,
@@ -125,7 +135,7 @@ void loop(void) {
   static esp8266::polledTimeout::oneShotMs    timer2(esp8266::polledTimeout::oneShotMs::alwaysExpired);
   if (timer2) {
     Serial.println("FIX PASSWORD");
-    connectToWiFi("AP8", "_______");
+    connectToWiFi(STASSID, STAPSK);
 
     timer2.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
   }

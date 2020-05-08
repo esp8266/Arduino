@@ -42,8 +42,8 @@
 
 */
 
-#include "ESP8266mDNS_Legacy.h"
-#include "LEAmDNS.h"
+//#include "ESP8266mDNS_Legacy.h"
+//#include "LEAmDNS.h"
 #include "LEAmDNS2Host.h"
 
 
@@ -53,6 +53,7 @@
 //using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder; //new
 //using MDNSResponder = esp8266::experimental::MDNSResponder; //new^2 not compatible
 using clsMDNSHost = esp8266::experimental::clsLEAMDNSHost;
+using MDNSResponder = esp8266::experimental::clsLEAMDNSHost;
 
 //extern MDNSResponder MDNS;
 #endif
