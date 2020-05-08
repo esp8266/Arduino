@@ -32,6 +32,15 @@
 #include <lwip/mld6.h>
 #endif
 
+/**
+    STRINGIZE
+*/
+#ifndef STRINGIZE
+#define STRINGIZE(x) #x
+#endif
+#ifndef STRINGIZE_VALUE_OF
+#define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
+#endif
 
 namespace   // anonymous
 {
@@ -777,6 +786,27 @@ bool clsLEAMDNSHost::restart(void)
     return (_resetProbeStatus(true));   // Stop and restart probing
 }
 
+
+/*
+    clsLEAMDNSHost_Legacy::enableArduino
+*/
+clsLEAMDNSHost::clsService* clsLEAMDNSHost::enableArduino(uint16_t p_u16Port,
+        bool p_bAuthUpload /*= false*/)
+{
+    clsLEAMDNSHost::clsService* svc = addService("arduino", "arduino", "tcp", p_u16Port);
+    if (svc)
+    {
+        if ((!svc->addServiceTxt("tcp_check", "no"))
+                || (!svc->addServiceTxt("ssh_upload", "no"))
+                || (!svc->addServiceTxt("board", STRINGIZE_VALUE_OF(ARDUINO_BOARD)))
+                || (!svc->addServiceTxt("auth_upload", (p_bAuthUpload) ? "yes" : "no")))
+        {
+            removeService(svc);
+            svc = 0;
+        }
+    }
+    return svc;
+}
 
 
 /*

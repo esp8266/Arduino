@@ -1350,6 +1350,8 @@ public:
 
     bool restart(void);
 
+    clsService* enableArduino(uint16_t p_u16Port, bool p_bAuthUpload = false);
+
 protected:
     // File: ..._Host
     UdpContext* _allocBackbone(void);
