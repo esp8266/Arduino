@@ -161,8 +161,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   // sanity checks, including mixed signed/unsigned arithmetic safety
   if ((pin > 16) || isFlashInterfacePin(pin) || (alignPhase > 16) ||
     static_cast<int32_t>(periodCcys) <= 0 ||
-    static_cast<int32_t>(highCcys) < 0 || static_cast<int32_t>(lowCcys) < 0 ||
-    (periodCcys >> 6) == 0) {
+    static_cast<int32_t>(highCcys) < 0 || static_cast<int32_t>(lowCcys) < 0) {
     return false;
   }
   Waveform& wave = waveform.pins[pin];
@@ -326,7 +325,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           busyPins &= ~(1UL << pin);
         }
         else {
-          const uint32_t fwdPeriods = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
             // active configuration and forward are 100% duty
@@ -334,30 +332,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += wave.periodCcys;
               nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
-            else if (wave.nextPeriodCcy == wave.endDutyCcy) {
-              // preceeding period had zero idle cycle, continue directly into new duty cycle
-              if (fwdPeriods > 1) {
-                const uint32_t fwdPeriodCcys = (fwdPeriods - 1) * wave.periodCcys;
-                wave.nextPeriodCcy += fwdPeriodCcys;
-                // adapt expiry such that it occurs during intended cycle
-                if (WaveformMode::EXPIRES == wave.mode) {
-                  wave.expiryCcy += fwdPeriodCcys;
-                }
-              }
-              nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy + wave.dutyCcys;
-              wave.nextPeriodCcy += wave.periodCcys;
-            }
-            else if (wave.autoPwm &&
-              overshootCcys >= (wave.periodCcys >> 6) &&
-              overshootCcys >= (wave.dutyCcys >> 3) &&
-              wave.nextEventCcy == wave.endDutyCcy) {
-              uint32_t adjPeriods = overshootCcys / (wave.periodCcys >> 6);
-              wave.nextPeriodCcy += adjPeriods * wave.periodCcys;
+            else if (wave.autoPwm && now >= wave.nextPeriodCcy) {
+              const uint32_t adj = 2 + ((overshootCcys / wave.periodCcys) << 1);
+              // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
+              nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy + adj * wave.dutyCcys;
+              wave.nextPeriodCcy += adj * wave.periodCcys;
               // adapt expiry such that it occurs during intended cycle
-              if (WaveformMode::EXPIRES == wave.mode) {
-                wave.expiryCcy += adjPeriods * wave.periodCcys;
-              }
-              nextEdgeCcy = wave.endDutyCcy + adjPeriods * wave.dutyCcys;
+              if (WaveformMode::EXPIRES == wave.mode)
+                wave.expiryCcy += adj * wave.periodCcys;
             }
             else {
               nextEdgeCcy = wave.nextPeriodCcy;
@@ -378,16 +360,16 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             else {
               wave.nextPeriodCcy += wave.periodCcys;
               wave.endDutyCcy = now + wave.dutyCcys;
-              if (fwdPeriods) {
-                const uint32_t fwdPeriodCcys = fwdPeriods * wave.periodCcys;
-                wave.nextPeriodCcy += fwdPeriodCcys;
+              if (overshootCcys >= wave.dutyCcys) {
+                const uint32_t adj = 1 + ((overshootCcys / wave.dutyCcys) << 1);
+                wave.nextPeriodCcy += adj * wave.periodCcys;
                 if (wave.autoPwm) {
                   // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
-                  wave.endDutyCcy += fwdPeriods * wave.dutyCcys;
+                  wave.endDutyCcy += adj * wave.dutyCcys;
                 }
                 // adapt expiry such that it occurs during intended cycle
                 if (WaveformMode::EXPIRES == wave.mode)
-                  wave.expiryCcy += fwdPeriodCcys;
+                  wave.expiryCcy += adj * wave.periodCcys;
               }
               waveform.states |= 1UL << pin;
               if (16 == pin) {
