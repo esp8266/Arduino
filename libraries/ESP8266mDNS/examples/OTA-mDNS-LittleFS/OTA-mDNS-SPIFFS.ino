@@ -1,5 +1,5 @@
 /**
-   @file OTA-mDNS-SPIFFS.ino
+   @file OTA-mDNS-LittleFS.ino
 
    @author Pascal Gollor (http://www.pgollor.de/cms/)
    @date 2015-09-18
@@ -22,6 +22,7 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <FS.h>
+#include <LittleFS.h>
 #include <ArduinoOTA.h>
 
 
@@ -55,7 +56,7 @@ const char* ap_default_psk = STAPSK; ///< Default PSK.
 */
 bool loadConfig(String *ssid, String *pass) {
   // open file for reading.
-  File configFile = SPIFFS.open("/cl_conf.txt", "r");
+  File configFile = LittleFS.open("/cl_conf.txt", "r");
   if (!configFile) {
     Serial.println("Failed to open cl_conf.txt.");
 
@@ -115,7 +116,7 @@ bool loadConfig(String *ssid, String *pass) {
 */
 bool saveConfig(String *ssid, String *pass) {
   // Open config file for writing.
-  File configFile = SPIFFS.open("/cl_conf.txt", "w");
+  File configFile = LittleFS.open("/cl_conf.txt", "w");
   if (!configFile) {
     Serial.println("Failed to open cl_conf.txt for writing");
 
@@ -158,7 +159,7 @@ void setup() {
 
 
   // Initialize file system.
-  if (!SPIFFS.begin()) {
+  if (!LittleFS.begin()) {
     Serial.println("Failed to mount file system");
     return;
   }

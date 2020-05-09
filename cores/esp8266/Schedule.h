@@ -2,6 +2,7 @@
 #define ESP_SCHEDULE_H
 
 #include <functional>
+#include <stdint.h>
 
 #define SCHEDULED_FN_MAX_COUNT 32
 

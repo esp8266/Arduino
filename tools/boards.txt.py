@@ -29,7 +29,7 @@
 #            resetmethod_menu_extra      menus for additional reset methods
 #            crystalfreq/flashfreq_menu: menus for crystal/flash frequency selection
 #            flashmode_menu:             menus for flashmode selection (dio/dout/qio/qout)
-#            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
+#            512K/1M/2M/4M/8M/16M:       menus for flash & FS size
 #            lwip/lwip2                  menus for available lwip versions
 
 from __future__ import print_function
@@ -613,7 +613,7 @@ boards = collections.OrderedDict([
             '~~~~~~~~~~~~~~~~~~~~~~~~~~',
             '',
             '- Card: "WEMOS D1 Mini Lite"',
-            '- Flash Size: "1M (512K SPIFFS)"',
+            '- Flash Size: "1M (512K FS)"',
             '- CPU Frequency: "80 Mhz"',
           # '- Upload Speed: "230400"',
             '',
@@ -696,7 +696,7 @@ boards = collections.OrderedDict([
         'opts': collections.OrderedDict([
             ( '.build.board', 'WIFINFO' ),
             ( '.build.variant', 'wifinfo' ),
-            ( '.menu.ESPModule.ESP07192', 'ESP07 (1M/192K SPIFFS)' ),
+            ( '.menu.ESPModule.ESP07192', 'ESP07 (1M/192K FS)' ),
             ( '.menu.ESPModule.ESP07192.build.board', 'ESP8266_ESP07' ),
             ( '.menu.ESPModule.ESP07192.build.flash_size', '1M' ),
             ( '.menu.ESPModule.ESP07192.build.flash_ld', 'eagle.flash.1m192.ld' ),
@@ -704,7 +704,7 @@ boards = collections.OrderedDict([
             ( '.menu.ESPModule.ESP07192.build.spiffs_end', '0xFB000' ),
             ( '.menu.ESPModule.ESP07192.build.spiffs_blocksize', '4096' ),
             ( '.menu.ESPModule.ESP07192.upload.maximum_size', '827376' ),
-            ( '.menu.ESPModule.ESP12', 'ESP12 (4M/1M SPIFFS)' ),
+            ( '.menu.ESPModule.ESP12', 'ESP12 (4M/1M FS)' ),
             ( '.menu.ESPModule.ESP12.build.board', 'ESP8266_ESP12' ),
             ( '.menu.ESPModule.ESP12.build.flash_size', '4M' ),
             ( '.menu.ESPModule.ESP12.build.flash_ld', 'eagle.flash.4m1m.ld' ),
@@ -1337,7 +1337,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     else:
         fs_blocksize = 8192
 
-    # Adjust SPIFFS_end to be a multiple of the block size
+    # Adjust FS_end to be a multiple of the block size
     fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start;
 
     max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
