@@ -332,8 +332,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += wave.periodCcys;
               nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
-            else if (wave.autoPwm && now >= wave.nextPeriodCcy) {
-              const uint32_t adj = 2 + ((overshootCcys / wave.periodCcys) << 1);
+            else if (wave.autoPwm && static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
+              const uint32_t adj = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
               // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
               nextEdgeCcy = wave.endDutyCcy = wave.nextPeriodCcy + adj * wave.dutyCcys;
               wave.nextPeriodCcy += adj * wave.periodCcys;
@@ -360,8 +360,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             else {
               wave.nextPeriodCcy += wave.periodCcys;
               wave.endDutyCcy = now + wave.dutyCcys;
-              if (overshootCcys >= wave.dutyCcys) {
-                const uint32_t adj = 1 + ((overshootCcys / wave.dutyCcys) << 1);
+              if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) >= 0) {
+                const uint32_t adj = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
                 wave.nextPeriodCcy += adj * wave.periodCcys;
                 if (wave.autoPwm) {
                   // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
