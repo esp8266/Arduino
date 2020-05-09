@@ -408,8 +408,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       if (static_cast<int32_t>(wave.nextEventCcy - isrTimeoutCcy) >= 0) {
         busyPins &= ~(1UL << pin);
-        // join events below performance threshold apart
-        if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > IRQLATENCYCCYS) {
+        if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > 0) {
           waveform.nextEventCcy = wave.nextEventCcy;
           waveform.nextPin = pin;
         }
