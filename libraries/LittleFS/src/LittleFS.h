@@ -282,13 +282,13 @@ protected:
         while (*path) {
             const char *slash = strchr(path, '/');
             if (!slash) {
-                if (strlen(path) >= LFS_NAME_MAX) {
+                if (strlen(path) > LFS_NAME_MAX) {
                     // Terminal filename is too long
                     return false;
                 }
                 break;
             }
-            if ((slash - path) >= LFS_NAME_MAX) {
+            if ((slash - path) > LFS_NAME_MAX) {
                 // This subdir name too long
                 return false;
             }
