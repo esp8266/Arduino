@@ -112,17 +112,17 @@ TEST_CASE(TESTPRE "File names which are too long are rejected", TESTPAT)
     FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     const char* emptyName = "";
-    const char* longName_32 = "/2345678901234567890123456789012";
-    const char* longName_33 = TOOLONGFILENAME;
+    const char* longName_good = TOOLONGFILENAME_GOOD;
+    const char* longName_bad = TOOLONGFILENAME;
     REQUIRE_FALSE(FSTYPE.open(emptyName, "w"));
     REQUIRE_FALSE(FSTYPE.open(emptyName, "r"));
     REQUIRE_FALSE(FSTYPE.exists(emptyName));
-    REQUIRE_FALSE(FSTYPE.open(longName_33, "w"));
-    REQUIRE_FALSE(FSTYPE.open(longName_33, "r"));
-    REQUIRE_FALSE(FSTYPE.exists(longName_33));
-    REQUIRE(FSTYPE.open(longName_32, "w"));
-    REQUIRE(FSTYPE.open(longName_32, "r"));
-    REQUIRE(FSTYPE.exists(longName_32));
+    REQUIRE_FALSE(FSTYPE.open(longName_bad, "w"));
+    REQUIRE_FALSE(FSTYPE.open(longName_bad, "r"));
+    REQUIRE_FALSE(FSTYPE.exists(longName_bad));
+    REQUIRE(FSTYPE.open(longName_good, "w"));
+    REQUIRE(FSTYPE.open(longName_good, "r"));
+    REQUIRE(FSTYPE.exists(longName_good));
 }
 
 TEST_CASE(TESTPRE "#1685 Duplicate files", "[fs][bugreport]")

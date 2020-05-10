@@ -33,6 +33,7 @@ namespace spiffs_test {
 #define TESTPRE "SPIFFS - "
 #define TESTPAT "[fs]"
 #define TOOLONGFILENAME "/2345678901234567890123456789012"
+#define TOOLONGFILENAME_GOOD "/234567890123456789012345678901"
 #define FS_MOCK_DECLARE SPIFFS_MOCK_DECLARE
 #define FS_MOCK_RESET SPIFFS_MOCK_RESET
 #undef FS_HAS_DIRS
@@ -41,6 +42,7 @@ namespace spiffs_test {
 #undef TESTPRE
 #undef TESTPAT
 #undef TOOLONGFILENAME
+#undef TOOLONGFILENAME_GOOD
 #undef FS_MOCK_DECLARE
 #undef FS_MOCK_RESET
 
@@ -68,6 +70,7 @@ namespace littlefs_test {
 #define TESTPAT "[lfs]"
 // LittleFS routines strip leading slashes before doing anything, so up to 31 char names are allowable
 #define TOOLONGFILENAME "/123456789012345678901234567890123"
+#define TOOLONGFILENAME_GOOD "/2345678901234567890123456789012"
 #define FS_MOCK_DECLARE LITTLEFS_MOCK_DECLARE
 #define FS_MOCK_RESET LITTLEFS_MOCK_RESET
 #define FS_HAS_DIRS
@@ -76,6 +79,7 @@ namespace littlefs_test {
 #undef TESTPRE
 #undef TESTPAT
 #undef TOOLONGFILENAME
+#undef TOOLONGFILENAME_GOOD
 #undef FS_MOCK_DECLARE
 #undef FS_MOCK_RESET
 
