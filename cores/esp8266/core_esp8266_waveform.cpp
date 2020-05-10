@@ -376,26 +376,6 @@ void setTimer1Callback(uint32_t (*fn)()) {
   disableIdleTimer();
 }
 
-
-// Speed critical bits
-#pragma GCC optimize ("O2")
-
-// Normally would not want two copies like this, but due to different
-// optimization levels the inline attribute gets lost if we try the
-// other version.
-static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
-  uint32_t ccount;
-  __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
-  return ccount;
-}
-
-static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
-  if (a < b) {
-    return a;
-  }
-  return b;
-}
-
 // Stops a waveform on a pin
 int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
@@ -419,6 +399,25 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   }
   disableIdleTimer();
   return true;
+}
+
+// Speed critical bits
+#pragma GCC optimize ("O2")
+
+// Normally would not want two copies like this, but due to different
+// optimization levels the inline attribute gets lost if we try the
+// other version.
+static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
+  uint32_t ccount;
+  __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
+  return ccount;
+}
+
+static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
+  if (a < b) {
+    return a;
+  }
+  return b;
 }
 
 // The SDK and hardware take some time to actually get to our NMI code, so
