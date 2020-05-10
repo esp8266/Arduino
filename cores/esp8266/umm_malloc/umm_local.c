@@ -244,7 +244,7 @@ int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
     return result;
 }
 
-#if defined(UMM_STATS)
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
   umm_heap_context_t *_context = umm_get_current_heap();
   return _context->stats.oom_count;
