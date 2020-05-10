@@ -68,8 +68,9 @@ namespace littlefs_test {
 #define FSTYPE LittleFS
 #define TESTPRE "LittleFS - "
 #define TESTPAT "[lfs]"
-// LittleFS routines strip leading slashes before doing anything, so up to 31 char names are allowable
-#define TOOLONGFILENAME "/123456789012345678901234567890123"
+// LittleFS routines strip leading slashes before doing anything,
+// so up to LFS_NAME_MAX (32) char names are allowable
+#define TOOLONGFILENAME "/23456789012345678901234567890123"
 #define TOOLONGFILENAME_GOOD "/2345678901234567890123456789012"
 #define FS_MOCK_DECLARE LITTLEFS_MOCK_DECLARE
 #define FS_MOCK_RESET LITTLEFS_MOCK_RESET
