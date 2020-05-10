@@ -25,59 +25,171 @@
 #include "JsonTranslator.h"
 #include "EspnowProtocolInterpreter.h"
 #include "TypeConversionFunctions.h"
-#include "MeshCryptoInterface.h"
+#include "MeshCryptoInterface.h" // TODO: Remove?
 
 namespace
 {
   namespace TypeCast = MeshTypeConversionFunctions;
+  
+  bool getMac(const String &jsonString, const String &valueIdentifier, uint8_t *resultArray)
+  {
+    String jsonValue;
+    bool decoded = JsonTranslator::decode(jsonString, valueIdentifier, jsonValue);
+
+    if(jsonValue.length() != 12)
+      decoded = false; // Mac String is always 12 characters long
+    
+    if(decoded)
+      TypeCast::stringToMac(jsonValue, resultArray);
+  
+    return decoded;
+  }
 }
 
 namespace JsonTranslator
 {
-  String createJsonPair(const String &valueIdentifier, const String &value)
+  int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, const int32_t searchStartIndex)
   {
-    return valueIdentifier + '\"' + value + F("\",");
+    int32_t startIndex = jsonString.indexOf(String('"') + valueIdentifier + F("\":"), searchStartIndex);
+    if(startIndex < 0)
+      return startIndex;
+  
+    startIndex += valueIdentifier.length() + 3; // Do not include valueIdentifier and associated characters
+    return startIndex;
+  }
+  
+  int32_t getEndIndex(const String &jsonString, const int32_t searchStartIndex)
+  {
+    int32_t endIndex = -1;
+    
+    if(jsonString[searchStartIndex] == '"')
+    {
+      endIndex = jsonString.indexOf('"', searchStartIndex + 1);
+    }
+    else if(jsonString[searchStartIndex] == '{')
+    {
+      uint32_t depth = 1;
+      bool withinString = false;
+      
+      for(uint32_t index = searchStartIndex + 1; depth != 0 && index < jsonString.length(); ++index)
+      {
+        if(jsonString[index] == '"')
+          withinString = !withinString;
+        else if(!withinString)
+        {
+          if(jsonString[index] == '{')
+            ++depth;
+          else if(jsonString[index] == '}')
+            --depth;
+        }
+
+        if(depth == 0)
+        {
+          assert(index < 0x80000000); // Must avoid int32_t overflow
+          endIndex = index;
+        }
+      }
+    }
+  
+    return endIndex;
+  }
+  
+  String encode(std::initializer_list<String> identifiersAndValues)
+  {
+    assert(identifiersAndValues.size() % 2 == 0); // List must consist of identifer-value pairs.
+    
+    String result = String('{');
+
+    bool isIdentifier = true;
+    for(String element : identifiersAndValues)
+    {
+      bool isObject = !isIdentifier && element[0] == '{';
+      if(isObject)
+        result += element;
+      else
+        result += String('"') + element + String('"');
+      
+      if(isIdentifier)
+        result += ':';
+      else
+        result += ',';
+
+      isIdentifier = !isIdentifier;
+    }
+
+    result[result.length() - 1] = '}';
+
+    return result;
   }
 
-  String createJsonEndPair(const String &valueIdentifier, const String &value)
+  String encodeLiterally(std::initializer_list<String> identifiersAndValues)
   {
-    return valueIdentifier + '\"' + value + F("\"}}");
-  }
-  
-  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, const uint64_t ownSessionKey, const uint64_t peerSessionKey)
-  {
-    // Returns: Encrypted connection info:{"arguments":{"nonce":"1F2","password":"abc","ownSK":"3B4","peerSK":"1A2"}}
+    assert(identifiersAndValues.size() % 2 == 0); // List must consist of identifer-value pairs.
+    
+    String result = String('{');
 
-    return
-    infoHeader + String(F("{\"arguments\":{")) 
-    + createJsonPair(FPSTR(jsonNonce), requestNonce)
-    + createJsonPair(FPSTR(jsonPassword), authenticationPassword)
-    + createJsonPair(FPSTR(jsonOwnSessionKey), TypeCast::uint64ToString(peerSessionKey))   // Exchanges session keys since it should be valid for the receiver.
-    + createJsonEndPair(FPSTR(jsonPeerSessionKey), TypeCast::uint64ToString(ownSessionKey));
-  }
-  
-  String createEncryptionRequestIntro(const String &requestHeader, const uint32_t duration)
-  {
-    return 
-    requestHeader + String(F("{\"arguments\":{")) 
-    + (requestHeader == FPSTR(EspnowProtocolInterpreter::temporaryEncryptionRequestHeader) ? createJsonPair(FPSTR(jsonDuration), String(duration)) : emptyString);
-  }
-  
-  String createEncryptionRequestEnding(const String &requestNonce)
-  {
-    return createJsonEndPair(FPSTR(jsonNonce), requestNonce);
-  }
-  
-  String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, const uint8_t hashKeyLength, const uint32_t duration)
-  {
-    String mainMessage = createEncryptionRequestIntro(requestHeader, duration) + createJsonPair(FPSTR(jsonNonce), requestNonce);
-    uint8_t staMac[6] {0};
-    uint8_t apMac[6] {0};
-    String requesterStaApMac = TypeCast::macToString(WiFi.macAddress(staMac)) + TypeCast::macToString(WiFi.softAPmacAddress(apMac));
-    String hmac = MeshCryptoInterface::createMeshHmac(requesterStaApMac + mainMessage, hashKey, hashKeyLength);
-    return mainMessage + createJsonEndPair(FPSTR(jsonHmac), hmac);
+    bool isIdentifier = true;
+    for(String element : identifiersAndValues)
+    {
+      if(isIdentifier)
+        result += String('"') + element + String('"') + ':';
+      else
+        result += element + ',';
+
+      isIdentifier = !isIdentifier;
+    }
+
+    result[result.length() - 1] = '}';
+
+    return result;
   }
 
+  bool decode(const String &jsonString, const String &valueIdentifier, String &value)
+  {
+    int32_t startIndex = getStartIndex(jsonString, valueIdentifier);
+    if(startIndex < 0)
+      return false;
+    
+    int32_t endIndex = getEndIndex(jsonString, startIndex);
+    if(endIndex < 0)
+      return false;
+
+    if(jsonString[startIndex] == '"')
+      ++startIndex; // Should not include starting "
+    else if(jsonString[startIndex] == '{')
+      ++endIndex; // Should include ending }
+    else
+      assert(false && F("Illegal JSON starting character!"));
+      
+    value = jsonString.substring(startIndex, endIndex);
+    return true;
+  }
+
+  bool decode(const String &jsonString, const String &valueIdentifier, uint32_t &value)
+  {
+    String jsonValue;
+    bool decoded = decode(jsonString, valueIdentifier, jsonValue);
+    
+    if(decoded)
+      value = strtoul(jsonValue.c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
+  
+    return decoded;
+  }
+
+  bool decodeRadix(const String &jsonString, const String &valueIdentifier, uint64_t &value, const uint8_t radix)
+  {
+    String jsonValue;
+    bool decoded = decode(jsonString, valueIdentifier, jsonValue);
+    
+    if(decoded)
+      value = TypeCast::stringToUint64(jsonValue, radix);
+  
+    return decoded;
+  }
+
+
+
+  // TODO: Move to encryptedEspnow class?
   bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, 
                                    const uint8_t *hashKey, const uint8_t hashKeyLength)
   {
@@ -86,7 +198,7 @@ namespace JsonTranslator
     String hmac;
     if(getHmac(encryptionRequestHmacMessage, hmac))
     {
-      int32_t hmacStartIndex = encryptionRequestHmacMessage.indexOf(FPSTR(jsonHmac));
+      int32_t hmacStartIndex = encryptionRequestHmacMessage.indexOf(String('"') + FPSTR(jsonHmac) + F("\":"));
       if(hmacStartIndex < 0)
         return false;
      
@@ -99,180 +211,79 @@ namespace JsonTranslator
 
     return false;
   }
-  
-  int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, const int32_t searchStartIndex)
-  {
-    int32_t startIndex = jsonString.indexOf(valueIdentifier, searchStartIndex);
-    if(startIndex < 0)
-      return startIndex;
-  
-    startIndex += valueIdentifier.length() + 1; // Do not include valueIdentifier and initial quotation mark
-    return startIndex;
-  }
-  
-  int32_t getEndIndex(const String &jsonString, const int32_t searchStartIndex)
-  {
-    int32_t endIndex = jsonString.indexOf(',', searchStartIndex);
-    if(endIndex < 0)
-      endIndex = jsonString.indexOf('}', searchStartIndex);
-  
-    endIndex -= 1; // End index will be at the character after the closing quotation mark, so need to subtract 1.
-  
-    return endIndex;
-  }
 
   bool getConnectionState(const String &jsonString, String &result)
   {
-    int32_t startIndex = jsonString.indexOf(FPSTR(jsonConnectionState));
-    if(startIndex < 0)
-      return false;
-    
-    int32_t endIndex = jsonString.indexOf('}');
-    if(endIndex < 0)
-      return false;
-      
-    result = jsonString.substring(startIndex, endIndex + 1);
-    return true;
+    return decode(jsonString, FPSTR(jsonConnectionState), result);
   }
   
   bool getPassword(const String &jsonString, String &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPassword));
-    if(startIndex < 0)
-      return false;
-    
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0)
-      return false;
-  
-    result = jsonString.substring(startIndex, endIndex);
-    return true;
+    return decode(jsonString, FPSTR(jsonPassword), result);
   }
   
   bool getOwnSessionKey(const String &jsonString, uint64_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonOwnSessionKey));
-    if(startIndex < 0)
-      return false;
-    
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0)
-      return false;
-  
-    result = TypeCast::stringToUint64(jsonString.substring(startIndex, endIndex));
-    return true;
+    return decodeRadix(jsonString, FPSTR(jsonOwnSessionKey), result);
   }
   
   bool getPeerSessionKey(const String &jsonString, uint64_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPeerSessionKey));
-    if(startIndex < 0)
-      return false;
-    
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0)
-      return false;
-    
-    result = TypeCast::stringToUint64(jsonString.substring(startIndex, endIndex));
-    return true;
+    return decodeRadix(jsonString, FPSTR(jsonPeerSessionKey), result);
   }
   
   bool getPeerStaMac(const String &jsonString, uint8_t *resultArray)
   {  
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPeerStaMac));
-    if(startIndex < 0)
-      return false;
-  
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0 || endIndex - startIndex != 12) // Mac String is always 12 characters long
-      return false;
-    
-    TypeCast::stringToMac(jsonString.substring(startIndex, endIndex), resultArray);
-    return true;
+    return getMac(jsonString, FPSTR(jsonPeerStaMac), resultArray);
   }
   
   bool getPeerApMac(const String &jsonString, uint8_t *resultArray)
-  {  
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonPeerApMac));
-    if(startIndex < 0)
-      return false;
-      
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0 || endIndex - startIndex != 12) // Mac String is always 12 characters long
-      return false;
-    
-    TypeCast::stringToMac(jsonString.substring(startIndex, endIndex), resultArray);
-    return true;
+  {
+    return getMac(jsonString, FPSTR(jsonPeerApMac), resultArray);
   }
   
   bool getDuration(const String &jsonString, uint32_t &result)
   {  
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonDuration));
-    if(startIndex < 0)
-      return false;
-    
-    result = strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
-    return true;
+    return decode(jsonString, FPSTR(jsonDuration), result);
   }
   
   bool getNonce(const String &jsonString, String &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonNonce));
-    if(startIndex < 0)
-      return false;
-    
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0)
-      return false;
-      
-    result = jsonString.substring(startIndex, endIndex);
-    return true;
+    return decode(jsonString, FPSTR(jsonNonce), result);
   }
 
   bool getHmac(const String &jsonString, String &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonHmac));
-    if(startIndex < 0)
-      return false;
-    
-    int32_t endIndex = getEndIndex(jsonString, startIndex);
-    if(endIndex < 0)
-      return false;
-      
-    result = jsonString.substring(startIndex, endIndex);
-    return true;
+    return decode(jsonString, FPSTR(jsonHmac), result);
   }
 
   bool getDesync(const String &jsonString, bool &result)
   {  
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonDesync));
-    if(startIndex < 0)
-      return false;
+    String jsonValue;
+    bool decoded = decode(jsonString, FPSTR(jsonDesync), jsonValue);
     
-    result = bool(strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0)); // strtoul stops reading input when an invalid character is discovered.
-    return true;
+    if(decoded)
+      result = bool(strtoul(jsonValue.c_str(), nullptr, 0)); // strtoul stops reading input when an invalid character is discovered.
+  
+    return decoded;
   }
 
   bool getUnsynchronizedMessageID(const String &jsonString, uint32_t &result)
   {
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonUnsynchronizedMessageID));
-    if(startIndex < 0)
-      return false;
-    
-    result = strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
-    return true;
+    return decode(jsonString, FPSTR(jsonUnsynchronizedMessageID), result);
   }
 
   bool getMeshMessageCount(const String &jsonString, uint16_t &result)
   {  
-    int32_t startIndex = getStartIndex(jsonString, FPSTR(jsonMeshMessageCount));
-    if(startIndex < 0)
-      return false;
+    uint32_t longResult = 0;
+    bool decoded = decode(jsonString, FPSTR(jsonMeshMessageCount), longResult);
 
-    uint32_t longResult = strtoul(jsonString.substring(startIndex).c_str(), nullptr, 0); // strtoul stops reading input when an invalid character is discovered.
-    assert(longResult <= 65535); // Must fit within uint16_t
-    
-    result = longResult;
-    return true;
+    if(longResult > 65535) // Must fit within uint16_t
+      decoded = false;
+
+    if(decoded)
+      result = longResult;
+      
+    return decoded;
   }
 }

@@ -26,34 +26,29 @@
 #define __ESPNOWJSONTRANSLATOR_H__
 
 #include <WString.h>
+#include <initializer_list>
 
 namespace JsonTranslator 
 {
-  constexpr char jsonConnectionState[] PROGMEM = "{\"connectionState\":{";
-  constexpr char jsonPassword[] PROGMEM = "\"password\":";
-  constexpr char jsonOwnSessionKey[] PROGMEM = "\"ownSK\":";
-  constexpr char jsonPeerSessionKey[] PROGMEM = "\"peerSK\":";
-  constexpr char jsonPeerStaMac[] PROGMEM = "\"peerStaMac\":";
-  constexpr char jsonPeerApMac[] PROGMEM = "\"peerApMac\":";
-  constexpr char jsonDuration[] PROGMEM = "\"duration\":";
-  constexpr char jsonNonce[] PROGMEM = "\"nonce\":";
-  constexpr char jsonHmac[] PROGMEM = "\"hmac\":";
-  constexpr char jsonDesync[] PROGMEM = "\"desync\":";
-  constexpr char jsonUnsynchronizedMessageID[] PROGMEM = "\"unsyncMsgID\":";
-  constexpr char jsonMeshMessageCount[] PROGMEM = "\"meshMsgCount\":";
-  
-  String createJsonPair(const String &valueIdentifier, const String &value);
-  String createJsonEndPair(const String &valueIdentifier, const String &value);
-  
-  String createEncryptedConnectionInfo(const String &infoHeader, const String &requestNonce, const String &authenticationPassword, const uint64_t ownSessionKey, const uint64_t peerSessionKey);
-  String createEncryptionRequestIntro(const String &requestHeader, const uint32_t duration = 0);
-  String createEncryptionRequestEnding(const String &requestNonce);
-  String createEncryptionRequestHmacMessage(const String &requestHeader, const String &requestNonce, const uint8_t *hashKey, const uint8_t hashKeyLength, const uint32_t duration = 0);
+  constexpr char jsonConnectionState[] PROGMEM = "connectionState";
+  constexpr char jsonMeshState[] PROGMEM = "meshState";
+  constexpr char jsonPassword[] PROGMEM = "password";
+  constexpr char jsonOwnSessionKey[] PROGMEM = "ownSK";
+  constexpr char jsonPeerSessionKey[] PROGMEM = "peerSK";
+  constexpr char jsonPeerStaMac[] PROGMEM = "peerStaMac";
+  constexpr char jsonPeerApMac[] PROGMEM = "peerApMac";
+  constexpr char jsonDuration[] PROGMEM = "duration";
+  constexpr char jsonNonce[] PROGMEM = "nonce";
+  constexpr char jsonHmac[] PROGMEM = "hmac";
+  constexpr char jsonDesync[] PROGMEM = "desync";
+  constexpr char jsonUnsynchronizedMessageID[] PROGMEM = "unsyncMsgID";
+  constexpr char jsonMeshMessageCount[] PROGMEM = "meshMsgCount";
+  constexpr char jsonArguments[] PROGMEM = "arguments";
 
-  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, const uint8_t hashKeyLength);
-
+  
   /**
    * Provides the index within jsonString where the value of valueIdentifier starts.
+   * Note that including " within a JSON string value will result in errors.
    *
    * @param jsonString The String to search within.
    * @param valueIdentifier The identifier to search for.
@@ -64,14 +59,86 @@ namespace JsonTranslator
   int32_t getStartIndex(const String &jsonString, const String &valueIdentifier, const int32_t searchStartIndex = 0);
   
   /**
-   * Provides the index within jsonString where the next JSON termination character (',' or '}') is found, starting from searchStartIndex.
+   * Provides the index within jsonString where the JSON object or JSON string value ends, starting the search from searchStartIndex.
+   * Note that including " within a JSON string value will result in errors.
+   * 
+   * The character at searchStartIndex must be either " (for a string) or { (for an object), otherwise the search fails.
    *
    * @param jsonString The String to search within.
-   * @param searchStartIndex The index of jsonString where the search will start.
+   * @param searchStartIndex The index of jsonString where the search will start. The index position should contain either " or {.
    *          
-   * @return An int32_t containing the index within jsonString where the next JSON termination character is found, or a negative value if no such character was found.
+   * @return An int32_t containing the index within jsonString where the JSON string/object ends, or a negative value if no such character was found.
    */
   int32_t getEndIndex(const String &jsonString, const int32_t searchStartIndex);
+
+  /*
+   * Create a JSON String based on the identifiers and values given.
+   * 
+   * Assumes all values are either strings or JSON objects. A value is interpreted as a JSON object if it starts with {
+   * Assumes all identifiers are strings.
+   * 
+   * @param identifiersAndValues Any even number of String arguments. It is assumed that the identifiers and values are given in an alternating manner, as in encode({Identifier1, Value1, Identifier2, Value2, ...})
+   */
+  String encode(std::initializer_list<String> identifiersAndValues);
+
+  /*
+   * Create a JSON String based on the identifiers and values given.
+   * 
+   * Does not make any assumptions regarding value types. " must be added manually around string values.
+   * Useful for example if your JSON values can contain starting { characters, since the regular encode() will then interpret them as JSON objects.
+   * Assumes all identifiers are strings.
+   * 
+   * @param identifiersAndValues Any even number of String arguments. It is assumed that the identifiers and values are given in an alternating manner, as in encodeLiterally({Identifier1, Value1, Identifier2, Value2, ...})
+   */
+  String encodeLiterally(std::initializer_list<String> identifiersAndValues);
+  
+  /*
+   * Get a value from a JSON String.
+   * Assumes all values are either JSON strings ( starting with " ) or JSON objects ( starting with { ).
+   * 
+   * Note that including " within a JSON string value will result in errors.
+   * Escape characters are not supported at this moment, since we do not want string length modification to occur during ESP-NOW protocol transmissions.
+   * 
+   * @param jsonString The String to search within.
+   * @param valueIdentifier The identifier to search for.
+   * @param value The String variable to put the result in.
+   * 
+   * @return True if a value was found. False otherwise. The value argument is not modified if false is returned.
+   */
+  bool decode(const String &jsonString, const String &valueIdentifier, String &value);
+
+  /*
+   * Get a value from a JSON String.
+   * Assumes all values are stored as strings in standard C-format (i.e. decimal by default).
+   * 
+   * Note that including " within a JSON string value will result in errors.
+   * Escape characters are not supported at this moment, since we do not want string length modification to occur during ESP-NOW protocol transmissions.
+   * 
+   * @param jsonString The String to search within.
+   * @param valueIdentifier The identifier to search for.
+   * @param value The uint32_t variable to put the result in.
+   * 
+   * @return True if a value was found. False otherwise. The value argument is not modified if false is returned.
+   */
+  bool decode(const String &jsonString, const String &valueIdentifier, uint32_t &value);
+
+  /*
+   * Get a value from a JSON String.
+   * Assumes all values are stored as strings encoded in the specified radix. Hexadecimal encoding is the default.
+   * 
+   * Note that including " within a JSON string value will result in errors.
+   * Escape characters are not supported at this moment, since we do not want string length modification to occur during ESP-NOW protocol transmissions.
+   * 
+   * @param jsonString The String to search within.
+   * @param valueIdentifier The identifier to search for.
+   * @param value The uint64_t variable to put the result in.
+   * @param radix The base to use when converting the string value to uint64_t. Must be between 2 and 36.
+   * 
+   * @return True if a value was found. False otherwise. The value argument is not modified if false is returned.
+   */
+  bool decodeRadix(const String &jsonString, const String &valueIdentifier, uint64_t &value, const uint8_t radix = 16);
+  
+  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, const uint8_t hashKeyLength);
   
   bool getConnectionState(const String &jsonString, String &result);
   /**

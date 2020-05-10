@@ -194,7 +194,7 @@ public:
    * Will also change the setting for the active AP (via an AP restart)
    * if this MeshBackendBase instance is the current AP controller.
    * 
-   * @param newMeshPassword The password to use.
+   * @param newMeshPassword The password to use. Must be between 8 and 64 characters long. " is an illegal character because of JSON parsing requirements.
    */
   void setMeshPassword(const String &newMeshPassword);
   String getMeshPassword() const;

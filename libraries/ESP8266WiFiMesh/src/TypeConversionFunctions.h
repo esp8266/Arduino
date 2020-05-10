@@ -42,7 +42,7 @@ namespace MeshTypeConversionFunctions
    * @param base The radix to convert "number" into. Must be between 2 and 36.
    * @return A string of "number" encoded in radix "base".
    */
-  String uint64ToString(uint64_t number, const byte base = 16);
+  String uint64ToString(uint64_t number, const uint8_t base = 16);
   
   /**
    * Note that using base 10 instead of 16 increases conversion time by roughly a factor of 2, due to unfavourable 64-bit arithmetic.
@@ -52,7 +52,7 @@ namespace MeshTypeConversionFunctions
    * @param base The radix of "string". Must be between 2 and 36.
    * @return A uint64_t of the string, using radix "base" during decoding.
    */
-  uint64_t stringToUint64(const String &string, const byte base = 16);
+  uint64_t stringToUint64(const String &string, const uint8_t base = 16);
   
   /** 
    *  Convert the contents of a uint8_t array to a String in HEX format. The resulting String starts from index 0 of the array.

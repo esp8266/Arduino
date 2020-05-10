@@ -25,6 +25,7 @@
 #include "FloodingMesh.h"
 #include "TypeConversionFunctions.h"
 #include "JsonTranslator.h"
+#include "Serializer.h"
 
 namespace
 {
@@ -153,16 +154,11 @@ void FloodingMesh::performMeshInstanceMaintenance()
 
 String FloodingMesh::serializeMeshState() const
 {
-  using namespace JsonTranslator;
-  
-  // Returns: {"meshState":{"connectionState":{"unsyncMsgID":"123"},"meshMsgCount":"123"}}
-
   String connectionState = getEspnowMeshBackendConst().serializeUnencryptedConnection();
+  uint32_t unsyncMsgID = 0;
+  JsonTranslator::getUnsynchronizedMessageID(connectionState, unsyncMsgID);
   
-  return 
-  String(F("{\"meshState\":{"))
-  + connectionState.substring(1, connectionState.length() - 1) + String(',')
-  + createJsonEndPair(FPSTR(jsonMeshMessageCount), String(_messageCount));
+  return Serializer::serializeMeshState(String(unsyncMsgID), String(_messageCount));
 }
 
 void FloodingMesh::loadMeshState(const String &serializedMeshState)

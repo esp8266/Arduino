@@ -27,6 +27,8 @@ extern "C" {
 #include "MutexTracker.h"
 #include "JsonTranslator.h"
 #include "MeshCryptoInterface.h"
+#include "EspnowUtility.h"
+#include "Serializer.h"
 
 namespace
 {
@@ -1112,7 +1114,7 @@ TransmissionStatusType EspnowMeshBackend::espnowSendToNode(const String &message
 TransmissionStatusType EspnowMeshBackend::espnowSendToNodeUnsynchronized(const String message, const uint8_t *targetBSSID, const char messageType, const uint64_t messageID, EspnowMeshBackend *espnowInstance)
 {
   using namespace EspnowProtocolInterpreter;
-  
+
   MutexTracker mutexTracker(_espnowSendToNodeMutex);
   if(!mutexTracker.mutexCaptured())
   {
@@ -1773,7 +1775,7 @@ EncryptedConnectionStatus EspnowMeshBackend::requestEncryptedConnectionKernel(co
       requestMessage = encryptionRequestBuilder(requestNonce, existingTimeTracker);
     else if(_ongoingPeerRequestResult == EncryptedConnectionStatus::SOFT_LIMIT_CONNECTION_ESTABLISHED)
       // We will only get a soft limit connection. Adjust future actions based on this.
-      requestMessage = JsonTranslator::createEncryptionRequestHmacMessage(FPSTR(temporaryEncryptionRequestHeader), requestNonce, getEspnowHashKey(), 
+      requestMessage = Serializer::createEncryptionRequestHmacMessage(FPSTR(temporaryEncryptionRequestHeader), requestNonce, getEspnowHashKey(), 
                                                                           hashKeyLength, getAutoEncryptionDuration());
     else
       assert(false && String(F("Unknown _ongoingPeerRequestResult during encrypted connection finalization!")));
@@ -1848,7 +1850,7 @@ String EspnowMeshBackend::defaultEncryptionRequestBuilder(const String &requestH
 {
   (void)existingTimeTracker; // This removes a "unused parameter" compiler warning. Does nothing else.
   
-  return JsonTranslator::createEncryptionRequestHmacMessage(requestHeader, requestNonce, hashKey, hashKeyLength, durationMs);
+  return Serializer::createEncryptionRequestHmacMessage(requestHeader, requestNonce, hashKey, hashKeyLength, durationMs);
 }
     
 String EspnowMeshBackend::flexibleEncryptionRequestBuilder(const uint32_t minDurationMs, const uint8_t *hashKey, 
@@ -1860,7 +1862,7 @@ String EspnowMeshBackend::flexibleEncryptionRequestBuilder(const uint32_t minDur
   uint32_t connectionDuration = minDurationMs >= existingTimeTracker.remainingDuration() ? 
                                 minDurationMs : existingTimeTracker.remainingDuration();
 
-  return createEncryptionRequestHmacMessage(FPSTR(temporaryEncryptionRequestHeader), requestNonce, hashKey, hashKeyLength, connectionDuration);
+  return Serializer::createEncryptionRequestHmacMessage(FPSTR(temporaryEncryptionRequestHeader), requestNonce, hashKey, hashKeyLength, connectionDuration);
 }
 
 EncryptedConnectionStatus EspnowMeshBackend::requestEncryptedConnection(const uint8_t *peerMac)
@@ -2437,13 +2439,13 @@ void EspnowMeshBackend::sendPeerRequestConfirmations(const ExpiringTimeTracker *
     if(!existingEncryptedConnection && 
        ((reciprocalPeerRequest && encryptedConnections.size() >= maxEncryptedConnections) || (!reciprocalPeerRequest && reservedEncryptedConnections() >= maxEncryptedConnections)))
     {
-      espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptionRequestHmacMessage(FPSTR(maxConnectionsReachedHeader), 
+      espnowSendToNodeUnsynchronized(Serializer::createEncryptionRequestHmacMessage(FPSTR(maxConnectionsReachedHeader), 
                                                         confirmationsIterator->getPeerRequestNonce(), hashKey, hashKeyLength),
                                                         defaultBSSID, 'C', generateMessageID(nullptr)); // Generates a new message ID to avoid sending encrypted sessionKeys over unencrypted connections.
                                                         
       confirmationsIterator = peerRequestConfirmationsToSend.erase(confirmationsIterator);
     }
-    else if(espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptionRequestHmacMessage(FPSTR(basicConnectionInfoHeader),
+    else if(espnowSendToNodeUnsynchronized(Serializer::createEncryptionRequestHmacMessage(FPSTR(basicConnectionInfoHeader),
                                                               confirmationsIterator->getPeerRequestNonce(), hashKey, hashKeyLength),
                                                               sendToDefaultBSSID ? defaultBSSID : unencryptedBSSID, 'C', generateMessageID(nullptr)) // Generates a new message ID to avoid sending encrypted sessionKeys over unencrypted connections.
                                                               == TransmissionStatusType::TRANSMISSION_COMPLETE)
@@ -2475,7 +2477,7 @@ void EspnowMeshBackend::sendPeerRequestConfirmations(const ExpiringTimeTracker *
       if(!existingEncryptedConnection)
       {
         // Send "node full" message
-        espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptionRequestHmacMessage(FPSTR(maxConnectionsReachedHeader), 
+        espnowSendToNodeUnsynchronized(Serializer::createEncryptionRequestHmacMessage(FPSTR(maxConnectionsReachedHeader), 
                                                           confirmationsIterator->getPeerRequestNonce(), hashKey, hashKeyLength), 
                                                           defaultBSSID, 'C', generateMessageID(nullptr)); // Generates a new message ID to avoid sending encrypted sessionKeys over unencrypted connections.
       }
@@ -2503,7 +2505,7 @@ void EspnowMeshBackend::sendPeerRequestConfirmations(const ExpiringTimeTracker *
         
         // Send password and keys.
         // Probably no need to know which connection type to use, that is stored in request node and will be sent over for finalization.
-        espnowSendToNodeUnsynchronized(JsonTranslator::createEncryptedConnectionInfo(messageHeader,
+        espnowSendToNodeUnsynchronized(Serializer::createEncryptedConnectionInfo(messageHeader,
                                                           confirmationsIterator->getPeerRequestNonce(), confirmationsIterator->getAuthenticationPassword(), 
                                                           existingEncryptedConnection->getOwnSessionKey(), existingEncryptedConnection->getPeerSessionKey()),
                                                           defaultBSSID, 'C', generateMessageID(nullptr));  // Generates a new message ID to avoid sending encrypted sessionKeys over unencrypted connections.
@@ -2678,12 +2680,8 @@ void EspnowMeshBackend::resetTransmissionFailRate()
 }
 
 String EspnowMeshBackend::serializeUnencryptedConnection()
-{
-  using namespace JsonTranslator;
-  
-  // Returns: {"connectionState":{"unsyncMsgID":"123"}}
-  
-  return String(FPSTR(jsonConnectionState)) + createJsonEndPair(FPSTR(jsonUnsynchronizedMessageID), String(_unsynchronizedMessageID));
+{  
+  return Serializer::serializeUnencryptedConnection(String(_unsynchronizedMessageID));
 }
 
 String EspnowMeshBackend::serializeEncryptedConnection(const uint8_t *peerMac)

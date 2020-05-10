@@ -657,11 +657,11 @@ public:
    * @param intervalMs The time to wait for an ack after having made an ESP-NOW transmission, in milliseconds. Defaults to 15 ms.
    */
   static void setEspnowRetransmissionInterval(const uint32_t intervalMs);
-  static uint32_t getEspnowRetransmissionInterval(); 
+  static uint32_t getEspnowRetransmissionInterval();
 
   // The maximum amount of time each of the two stages in an encrypted connection request may take.
   static void setEncryptionRequestTimeout(const uint32_t timeoutMs);
-  static uint32_t getEncryptionRequestTimeout(); 
+  static uint32_t getEncryptionRequestTimeout();
   
   void setAutoEncryptionDuration(const uint32_t duration);
   uint32_t getAutoEncryptionDuration() const;
@@ -1217,7 +1217,7 @@ private:
    * @param peerMac The MAC of the node with which an encrypted connection should be established.
    * @param encryptionRequestBuilder A function which is responsible for constructing the request message to send. 
    * Called twice when the request is successful. First to build the initial request message and then to build the connection verification message.
-   * The request message should typically be of the form: JsonTranslator::createEncryptionRequestIntro() + JsonTranslator::createEncryptionRequestEnding().
+   * The request message should typically be of the form found in Serializer::createEncryptionRequestHmacMessage.
    * @return The ultimate status of the requested encrypted connection, as EncryptedConnectionStatus.
    */
   EncryptedConnectionStatus requestEncryptedConnectionKernel(const uint8_t *peerMac, const encryptionRequestBuilderType &encryptionRequestBuilder);

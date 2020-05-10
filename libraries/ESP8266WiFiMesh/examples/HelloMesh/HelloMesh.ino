@@ -26,7 +26,7 @@ namespace TypeCast = MeshTypeConversionFunctions;
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
 constexpr char exampleMeshName[] PROGMEM = "MeshNode_"; // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
-constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.

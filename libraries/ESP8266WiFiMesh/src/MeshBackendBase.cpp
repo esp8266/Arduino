@@ -203,6 +203,7 @@ String MeshBackendBase::getNodeID() const {return getSSIDSuffix();}
 void MeshBackendBase::setMeshPassword(const String &newMeshPassword)
 {
   assert(8 <= newMeshPassword.length() && newMeshPassword.length() <= 64); // Limited by the ESP8266 API.
+  assert(newMeshPassword.indexOf('"') == -1); // " is not allowed in passwords to allow for easier JSON parsing and predictable password length (no need for extra escape characters).
   
   _meshPassword = newMeshPassword;
 

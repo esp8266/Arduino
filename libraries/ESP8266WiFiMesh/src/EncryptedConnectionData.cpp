@@ -27,6 +27,7 @@
 #include "TypeConversionFunctions.h"
 #include "JsonTranslator.h"
 #include "MeshCryptoInterface.h"
+#include "Serializer.h"
 
 namespace
 {
@@ -157,16 +158,8 @@ bool EncryptedConnectionData::desync() const { return _desync; }
 
 String EncryptedConnectionData::serialize() const
 {
-  // Returns: {"connectionState":{"duration":"123","password":"abc","ownSK":"1A2","peerSK":"3B4","peerStaMac":"F2","peerApMac":"E3"}}
-  
-  return 
-  String(FPSTR(JsonTranslator::jsonConnectionState))
-  + (temporary() ? String(FPSTR(JsonTranslator::jsonDuration)) + '\"' + String(temporary()->remainingDuration()) + F("\",") : emptyString)
-  + FPSTR(JsonTranslator::jsonDesync) + '\"' + String(desync()) + F("\",") 
-  + FPSTR(JsonTranslator::jsonOwnSessionKey) + '\"' + TypeCast::uint64ToString(getOwnSessionKey()) + F("\",") 
-  + FPSTR(JsonTranslator::jsonPeerSessionKey) + '\"' + TypeCast::uint64ToString(getPeerSessionKey()) + F("\",") 
-  + FPSTR(JsonTranslator::jsonPeerStaMac) + '\"' + TypeCast::macToString(_peerStaMac) + F("\",") 
-  + FPSTR(JsonTranslator::jsonPeerApMac) + '\"' + TypeCast::macToString(_peerApMac) +  F("\"}}");
+  return Serializer:: serializeEncryptedConnection((temporary() ? String(temporary()->remainingDuration()) : emptyString), String(desync()), TypeCast::uint64ToString(getOwnSessionKey()), 
+                                                   TypeCast::uint64ToString(getPeerSessionKey()), TypeCast::macToString(_peerStaMac), TypeCast::macToString(_peerApMac));
 }
 
 const ExpiringTimeTracker *EncryptedConnectionData::temporary() const

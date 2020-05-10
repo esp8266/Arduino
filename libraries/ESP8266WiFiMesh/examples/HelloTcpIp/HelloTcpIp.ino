@@ -19,7 +19,7 @@ namespace TypeCast = MeshTypeConversionFunctions;
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
 constexpr char exampleMeshName[] PROGMEM = "MeshNode_";
-constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
