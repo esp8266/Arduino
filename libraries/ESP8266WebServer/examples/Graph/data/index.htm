@@ -1,0 +1,527 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.7.7/chartjs-plugin-zoom.js"></script>
+  
+  <!-- or instead, put those files on the ESP filesystem along with index.htm and use:
+  <script src="Chart.js"></script>
+  <script src="hammer.js"></script>
+  <script src="chartjs-plugin-zoom.js"></script>
+  -->
+  <style>
+    body {
+      height:100%; 
+      padding:0; 
+      margin:0; 
+      width:100%;
+      display:flex; 
+      flex-direction:column;
+    }
+    #config {
+      margin:0px 8px;
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      justify-content: flex-start;
+      height: 40px;
+    }
+    #periodRange {
+      width:100%;
+    }
+    .left {
+      float:left;
+    }
+    #charts {
+      flex-grow:1;
+    }
+  </style>
+</head>
+<body >
+  <div id="config">
+    <span class="left">Max&nbsp;number&nbsp;of&nbsp;samples:&nbsp;</span>
+    <input id="maxSamplesField" type="number" min="100" max="10000" value="1000" step="100" size="4" class="left" />    
+    <span class="left">.&nbsp;Sampling&nbsp;period:&nbsp;</span>
+    <input id="periodField" type="number" min="0" max="10000" value="1000" step="100" size="4" class="left" />
+    <span class="left">&nbsp;ms&nbsp;</span>
+    <input id="periodRange" type="range"  min="0" max="10000" value="1000" step="100" />
+    <button id="startPauseButton">Pause</button>
+    <button id="clearButton" disabled="true">Clear</button>
+  </div>
+  <div id="charts">
+    <div class="chart-container" style="position: relative; height:50%;"><canvas id="digital" style="background-color:#000000"></canvas></div>
+    <div class="chart-container" style="position: relative; height:25%;"><canvas id="analog"></canvas></div>
+    <div class="chart-container" style="position: relative; height:25%;"><canvas id="heap" style="background-color:#EEEEEE"></canvas>
+  </div>
+  <script>  
+
+  /////////////////////////////////////
+  // CREATE DIGITAL CHART
+  
+  // Remember all GPIO datasets
+  var allDigitalDatasets = [];  
+
+  var gpioColors = ['#D2FF71', '#59FFF4', '#DB399C', '#4245FF', '#FFB312', '#BB54E9', '#0BD400', '#42C2FF', '#FFFFFF', '#FF4242'];
+ 
+  var digitalChart = new Chart(document.getElementById('digital'), {
+    // The type of chart we want to create
+    type: 'scatter',      
+
+    // The data for our dataset
+    data: {
+      // 17 GPIO datasets will be added by a loop at init time
+      datasets: []
+    },
+
+    // Configuration options go here
+    options: {
+      maintainAspectRatio: false,
+      title: {
+        display: true,
+        text: 'Digital I/Os'
+      },
+      scales: {
+        xAxes: [{
+          id:"x-axis",
+          ticks: {
+            minRotation:0,
+            maxRotation:0
+          }
+        }],
+        // 17 GPIO scales will be added by a loop at init time
+        yAxes: []
+      },
+      tooltips: {
+        intersect: false
+      },
+      animation: {
+          duration: 0
+      },
+      hover: {
+          animationDuration: 0
+      }
+    }
+  });
+
+
+  /////////////////////////////////////
+  // CREATE ANALOG CHART
+  
+  var analogChart = new Chart(document.getElementById('analog'), {
+    // The type of chart we want to create
+    type: 'scatter',
+
+    // The data for our dataset
+    data: {
+      datasets: [{
+        label: 'Analog',
+        backgroundColor: 'rgb(0,0,0,0)',
+        borderColor: 'rgb(255, 99, 132)',
+        data: [],
+        showLine:true
+      }]
+    },
+
+    // Configuration options go here
+    options: {
+      maintainAspectRatio: false,
+      title: {
+        display: true,
+        text: 'Analog input'
+      },
+      legend: {
+        display: false
+      },
+      scales: {
+        xAxes: [{
+          id:"x-axis",
+          ticks: {
+            minRotation:0,
+            maxRotation:0
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero:true
+          }
+        }]
+      },
+      tooltips: {
+        intersect: false
+      },
+      animation: {
+        duration: 0
+      },
+      hover: {
+        animationDuration: 0
+      },
+      
+      // Zoom plugin options
+      plugins: {
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'y',
+          },
+          zoom: {
+            enabled: true,
+            mode: 'y',
+          }
+        }
+      },
+      
+      onClick: function() {this.resetZoom()}
+    }
+
+  });
+
+  
+  /////////////////////////////////////
+  // CREATE HEAP CHART
+  
+  var heapChart = new Chart(document.getElementById('heap'), {
+    // The type of chart we want to create
+    type: 'scatter',
+
+    // The data for our dataset
+    data: {
+      datasets: [{
+        label: 'Heap',
+        backgroundColor: 'rgb(99, 99, 255)',
+        borderColor: 'rgb(99, 99, 255)',
+        data: [],
+        showLine:true,
+        cubicInterpolationMode:'monotone'
+      }]
+    },
+
+    // Configuration options go here
+    options: {
+      maintainAspectRatio: false,
+      title: {
+        display: true,
+        text: 'Free heap'
+      },
+      legend: {
+        display: false
+      },
+      scales: {
+        xAxes: [{
+          id:"x-axis",
+          ticks: {
+            minRotation:0,
+            maxRotation:0
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero:true
+          }
+        }]          
+      },
+      tooltips: {
+        intersect: false
+      },
+      animation: {
+          duration: 0
+      },
+      hover: {
+          animationDuration: 0
+      },
+      
+      // Zoom plugin options
+      plugins: {
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'y',
+          },
+          zoom: {
+            enabled: true,
+            mode: 'y',
+          }
+        }
+      },
+      
+      onClick: function() {this.resetZoom()}
+
+    }
+  });
+
+
+  /////////////////////////////////////
+  // UTILITY FUNCTIONS
+
+  // Crete a blank dataset for the Digital chart
+  function createDigitalDataset(gpio) {  
+    return {
+      showLine:true,
+      steppedLine: true,
+      backgroundColor: 'rgb(0, 0, 0, 0)',
+      xAxisID: 'x-axis',
+      pointRadius: 1,
+      borderWidth: 1,
+
+      data: [],
+      label: gpio,
+      yAxisID: 'gpio' + gpio + '-axis'
+    }
+  }
+
+  
+  // Init structures for digitalChart
+  function initDigitalChart() {
+    // Clear auto-generated Y axis
+    digitalChart.options.scales.yAxes.length = 0;
+    
+    // Add 17 hidden axes (one per GPIO) to be able to shift (stack) graphs vertically
+    for (var gpio = 0; gpio <= 16; gpio++) { // 17 GPIOs
+      // Add a scale
+      digitalChart.options.scales.yAxes.push(
+        {
+          id: 'gpio' + gpio + '-axis',
+          type: 'linear',
+          display:false,
+          ticks: {
+            min:0,
+            max:2
+          }
+        }
+      );
+        
+      // Create a blank dataset for this gpio
+      allDigitalDatasets.push(createDigitalDataset(gpio));
+    }
+
+    // Only show the first two Y axes (one for each side), with all tick labels showing only 0's and 1's (modulo)
+    for (var i = 0; i < 2; i++) {
+      digitalChart.options.scales.yAxes[i].display = true;
+      digitalChart.options.scales.yAxes[i].ticks.autoSkip = false;
+      digitalChart.options.scales.yAxes[i].ticks.stepSize = 1;
+      digitalChart.options.scales.yAxes[i].ticks.callback = function(value, index, values) {return Math.abs(value)%2;};
+    }
+    // Show gridLines of first axis
+    digitalChart.options.scales.yAxes[0].gridLines = {color: "#333333"};
+
+    // Move second axis to the right
+    digitalChart.options.scales.yAxes[1].position = 'right';
+  }
+
+  
+  // Compute a string with min/max/average on the given array of (x, y) points
+  function computeStats(sampleArray) {
+    var minY = Number.MAX_SAFE_INTEGER, maxY = 0, avgY = 0;       
+    var prevX = 0;
+    sampleArray.forEach(function (point, index) {
+      if (point.y < minY) minY = point.y;
+      if (point.y > maxY) maxY = point.y;
+      if (prevX > 0) avgY = avgY + point.y * (point.x - prevX); // avg is weighted: samples with a longer period weight more
+      prevX = point.x;
+    });
+    avgY = avgY / (prevX - sampleArray[0].x);
+    return "min: " + minY + ", max: " + maxY + ", avg: " + Math.floor(avgY);
+  }
+
+
+  /////////////////////////////////////
+  // PERIODIC FETCH OF NEW DATA
+
+  var running = true;
+  var configDiv = document.getElementById("config");
+  var periodField = document.getElementById("periodField");
+  
+  var currentGpioMask = 0;
+  
+  function fetchNewData() {
+    if (!running) return;
+    var fetchStartMs = Date.now();
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onload = function() {
+      var processingDurationMs;
+      if(xmlHttp.status != 200) {
+        // Server error
+        configDiv.style.backgroundColor = "red";
+        console.log("GET ERROR: [" + xmlHttp.status+"] " + xmlHttp.responseText);
+        processingDurationMs = new Date() - fetchStartMs;
+      }
+      else {
+        configDiv.style.backgroundColor = "white";
+
+        // Response is e.g.: {"time":963074, "heap":47160, "analog":60, "gpioMask":16447, "gpioData":16405}
+        var espData = JSON.parse(xmlHttp.responseText);
+
+        var x = espData.time;
+
+        var maxSamples = parseInt(document.getElementById("maxSamplesField").value);
+        
+        // Add point to heap chart
+        var data = heapChart.data.datasets[0].data;
+        data.push({x: espData.time, y: espData.heap});
+        // Limit its length to maxSamples
+        data.splice(0, data.length - maxSamples);
+        // Put stats in chart title
+        heapChart.options.title.text = "Free heap (" + computeStats(data) + ")";
+        // Remember smallest X
+        var minX = data[0].x;
+        
+        // Add point to analog chart
+        data = analogChart.data.datasets[0].data;
+        data.push({x: espData.time, y: espData.analog});
+        // Limit its length to maxSamples
+        data.splice(0, data.length - maxSamples);
+        // Put stats in chart title
+        analogChart.options.title.text = "Analog input (" + computeStats(data) + ")";
+        // Remember smallest X
+        if (data[0].x < minX) minX = data[0].x;
+        
+
+        // If GPIO mask has changed, reconfigure chart
+        if (espData.gpioMask != currentGpioMask) {        
+          // Remove all datasets from chart
+          digitalChart.data.datasets.length = 0;
+
+          // And re-add the required datasets                    
+          var position = 0;
+          for (var gpio = 0; gpio <= 16; gpio++) { // 17 GPIOs
+            var gpioBitMask = 1 << gpio;          
+                        
+            if (espData.gpioMask & gpioBitMask) {
+              // This GPIO must be part of the chart
+              dataset = allDigitalDatasets[gpio];
+              // give it the next available color
+              dataset.borderColor = gpioColors[position % gpioColors.length];
+              // add it to the chart
+              digitalChart.data.datasets.push(dataset);
+              
+              // offset graph
+              digitalChart.options.scales.yAxes[gpio].ticks.min = position * -2;
+              position++;
+            }
+            else {
+              // Clear data
+              allDigitalDatasets[gpio].data = [];
+            }
+          }
+              
+          // make sure all graphs have the same scale (max-min)
+          for (var gpio = 0; gpio <= 16; gpio++) { // 17 GPIOs
+            var ticks = digitalChart.options.scales.yAxes[gpio].ticks;
+            ticks.max = ticks.min + position * 2 - 1;
+          }
+          
+          // chart must be updated, otherwise adding to previously hidden dataset fail
+          digitalChart.update(); 
+          
+          currentGpioMask = espData.gpioMask
+        }
+
+
+        // And process each dataset, adding it back to the chart if requested, and adding the received value to it.
+        var position = 0;
+        for (var gpio = 0; gpio <= 16; gpio++) { // 17 GPIOs
+          var gpioBitMask = 1 << gpio;
+          
+          if (espData.gpioMask & gpioBitMask) {
+            // This GPIO must be part of the chart
+            var dataset = digitalChart.data.datasets[position];
+                           
+            // Add received value to dataset
+//            console.log(espData.gpioData + " & " + gpioBitMask + " => " + (espData.gpioData & gpioBitMask));
+            data = dataset.data;
+            var point = {x: espData.time, y: (espData.gpioData & gpioBitMask)?1:0}
+            data.push(point);
+            
+            // limit number of samples to maxSamples
+            data.splice(0, data.length - maxSamples);
+            // Remember smallest X
+            if (data[0].x < minX) minX = data[0].x;
+            
+            position++;
+          }         
+        }
+
+        // Set origin of X axis to minimum X value
+        if (heapChart.options.scales.xAxes[0].ticks.min === undefined || heapChart.options.scales.xAxes[0].ticks.min < minX) {
+          heapChart.options.scales.xAxes[0].ticks.min = minX;
+          analogChart.options.scales.xAxes[0].ticks.min = minX;
+          digitalChart.options.scales.xAxes[0].ticks.min = minX;
+        }
+
+        heapChart.update();
+        analogChart.update();
+        digitalChart.update(); 
+
+        // Check if we can keep up with this fetch rate, or increase interval by 50ms if not.        
+        processingDurationMs = new Date() - fetchStartMs;
+        periodField.style.backgroundColor = (processingDurationMs > parseInt(periodField.value))?"#FF7777":"#FFFFFF";
+      }
+      
+      // Schedule next call with the requested interval minus the time needed to process the previous call
+      // Note that contrary to setInterval, this technique guarantees that we will never have 
+      // several fetch in parallel in case we can't keep up with the requested interval
+      var waitingDelayMs = parseInt(periodField.value) - processingDurationMs;
+      if (running) {
+        window.setTimeout(fetchNewData, (waitingDelayMs > 0)?waitingDelayMs:0);
+      }
+    };    
+    xmlHttp.onerror = function(e) {
+      // Ajax call error
+      configDiv.style.backgroundColor = "red";
+      console.log("ERROR: [" + xmlHttp.status+"] " + xmlHttp.responseText);
+      // Also schedule next call in case of error
+      var waitingDelayMs = parseInt(periodField.value) - (new Date() - fetchStartMs);
+      window.setTimeout(fetchNewData, (waitingDelayMs > 0)?waitingDelayMs:0);      
+    };
+    xmlHttp.open("GET", "/espData", true);
+    xmlHttp.send();
+  }
+  
+  /////////////////////////////////////
+  // EVENT HANDLERS
+
+  // Keep range slider and text input in sync
+  document.getElementById('periodRange').addEventListener('input', function (e) {
+    document.getElementById('periodField').value = e.target.value;
+  });
+  document.getElementById('periodField').addEventListener('input', function (e) {
+    document.getElementById('periodRange').value = e.target.value;
+  });      
+
+  // Start/pause button
+  document.getElementById('startPauseButton').addEventListener('click', function (e) {    
+    running = !running;
+    if (running) {
+      document.getElementById('startPauseButton').textContent = "Pause";
+      document.getElementById('clearButton').disabled = true;
+      fetchNewData();
+    }
+    else {
+      document.getElementById('startPauseButton').textContent = "Start";
+      document.getElementById('clearButton').disabled = false;
+    }
+  });
+
+  // Clear button
+  document.getElementById('clearButton').addEventListener('click', function (e) {
+    heapChart.data.datasets[0].data.length = 0;
+    analogChart.data.datasets[0].data.length = 0;
+    for (var gpio = 0; gpio <= 16; gpio++) { // 17 GPIOs
+      allDigitalDatasets[gpio].data = [];
+    }
+    heapChart.update();
+    analogChart.update();
+    digitalChart.update(); 
+  });
+
+
+  /////////////////////////////////////
+  // GET THE BALL ROLLING
+  
+  // Configure the digital chart
+  initDigitalChart();
+
+  // Get first sample
+  fetchNewData();
+   
+  </script>
+</html>
