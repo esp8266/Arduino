@@ -246,6 +246,19 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 // Speed critical bits
 #pragma GCC optimize ("O2")
 
+// For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
+// Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
+static ICACHE_RAM_ATTR uint32_t __attribute__((noinline)) getScaledCcyCount(uint32_t ref) {
+  constexpr bool cpuFreq80MHz = clockCyclesPerMicrosecond() == 80;
+  const uint32_t elapsed = ESP.getCycleCount() - ref;
+  if (cpuFreq80MHz) {
+    return ref + ((CPU2X & 1) ? elapsed >> 1 : elapsed);
+  }
+  else {
+    return ref + ((CPU2X & 1) ? elapsed : elapsed << 1);
+  }
+}
+
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   const uint32_t isrStartCcy = ESP.getCycleCount();
   const uint32_t toSetMask = waveform.toSet >= 0 ? 1UL << waveform.toSet : 0;
@@ -318,7 +331,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   while (busyPins) {
     uint32_t now;
     do {
-      now = ESP.getCycleCount();
+      now = getScaledCcyCount(isrStartCcy);
     } while (static_cast<int32_t>(isrNextEventCcy - now) > 0);
     isrNextEventCcy = isrTimeoutCcy;
     do {
@@ -410,7 +423,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         isrNextEventCcy = wave.nextEventCcy;
       }
 
-      now = ESP.getCycleCount();
+      now = getScaledCcyCount(isrStartCcy);
     } while ((pin = (pin < waveform.endPin) ? pin + 1 : waveform.startPin) != stopPin);
   }
 
@@ -418,13 +431,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   if (waveform.timer1CB) {
     int32_t callbackCcys = microsecondsToClockCycles(waveform.timer1CB());
     // Account for unknown duration of timer1CB().
-    nextTimerCcys = waveform.nextEventCcy - ESP.getCycleCount();
+    nextTimerCcys = waveform.nextEventCcy - getScaledCcyCount(isrStartCcy);
     if (nextTimerCcys > callbackCcys) {
       nextTimerCcys = callbackCcys;
     }
   }
   else {
-    nextTimerCcys = waveform.nextEventCcy - ESP.getCycleCount();
+    nextTimerCcys = waveform.nextEventCcy - getScaledCcyCount(isrStartCcy);
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
