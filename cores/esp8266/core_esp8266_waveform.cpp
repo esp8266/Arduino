@@ -452,8 +452,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Register access is fast and edge IRQ was configured before.
-  // Timer is 80MHz fixed. 160MHz binaries need scaling,
-  // 80MHz binaries in 160MHz boost (SDK) need NMI scaling
-  // to maintain duty/idle ratio.
-  T1L = CPU2X & 1 ? nextTimerCcys >> 1 : nextTimerCcys;
+  // Timer is 80MHz fixed. 160MHz binaries need scaling.
+  // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
+  // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
+  constexpr bool cpuFreq80MHz = clockCyclesPerMicrosecond() == 80;
+  T1L = cpuFreq80MHz ? nextTimerCcys : nextTimerCcys >> 1;
 }
