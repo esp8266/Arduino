@@ -47,15 +47,15 @@
 // Maximum delay between IRQs, Timer1, <= 2^23 / 80MHz
 constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
-constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(14);
+constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
 // The SDK and hardware take some time to actually get to our NMI code, so
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQCCYS = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(5) >> 1 : microsecondsToClockCycles(5);
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
+  (microsecondsToClockCycles(3) / 2) >> 1 : (microsecondsToClockCycles(3) / 2);
 
 // for INFINITE, the NMI proceeds on the waveform without expiry deadline.
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
