@@ -27,7 +27,6 @@ extern "C" {
 #include "MutexTracker.h"
 #include "JsonTranslator.h"
 #include "MeshCryptoInterface.h"
-#include "EspnowUtility.h"
 #include "Serializer.h"
 
 namespace
