@@ -138,6 +138,8 @@ public:
   int args() const;                        // get arguments count
   bool hasArg(const String& name) const;   // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
+  template<typename... Args>
+  void collectHeaders(const Args&... args); // set the request headers to collect (variadic template version)
   const String& header(const String& name) const; // get request header value by name
   const String& header(int i) const;       // get request header value by number
   const String& headerName(int i) const;   // get request header name by number

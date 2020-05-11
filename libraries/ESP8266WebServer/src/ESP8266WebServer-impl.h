@@ -372,7 +372,7 @@ void ESP8266WebServerTemplate<ServerType>::close() {
   _server.close();
   _currentStatus = HC_NONE;
   if(!_headerKeysCount)
-    collectHeaders(0, 0);
+    collectHeaders();
 }
 
 template <typename ServerType>
@@ -557,7 +557,7 @@ void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize
 }
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) const { 
+const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) const {
   if (_currentHandler != nullptr)
     return _currentHandler->pathArg(i);
   return emptyString;
@@ -608,7 +608,6 @@ bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
   return false;
 }
 
-
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
@@ -618,19 +617,28 @@ const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) c
   return emptyString;
 }
 
-
 template<typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount + 2;
-  if (_currentHeaders){
+  if (_currentHeaders)
     delete[] _currentHeaders;
-  }
-  _currentHeaders = new RequestArgument[_headerKeysCount];
+  _currentHeaders = new RequestArgument[_headerKeysCount = headerKeysCount + 2];
   _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
   _currentHeaders[1].key = FPSTR(ETAG_HEADER);
   for (int i = 2; i < _headerKeysCount; i++){
-      _currentHeaders[i].key = headerKeys[i-2];
+      _currentHeaders[i].key = headerKeys[i - 2];
   }
+}
+
+template <typename ServerType>
+template <typename... Args>
+void ESP8266WebServerTemplate<ServerType>::collectHeaders(const Args&... args) {
+  if (_currentHeaders)
+    delete[] _currentHeaders;
+  _currentHeaders = new RequestArgument[_headerKeysCount = sizeof...(args) + 2] {
+    { .key = FPSTR(AUTHORIZATION_HEADER), .value = emptyString },
+    { .key = FPSTR(ETAG_HEADER), .value = emptyString },
+    { .key = args, .value = emptyString } ...
+  };
 }
 
 template <typename ServerType>
