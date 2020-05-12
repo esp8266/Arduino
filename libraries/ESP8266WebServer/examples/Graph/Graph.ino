@@ -62,7 +62,7 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 #endif
 
 // Indicate which digital I/Os should be displayed on the chart.
-// From GPIO16 to GPIO0, a '1' means the corresponding GPIO will be shown 
+// From GPIO16 to GPIO0, a '1' means the corresponding GPIO will be shown
 // Note: SD GPIOs are hidden by default:
 #define DEFAULT_GPIO_MASK 0b11111000000111111
 
@@ -189,11 +189,11 @@ void setup(void) {
 
   ////////////////////////////////
   // PIN INIT
-  pinMode(4 , INPUT);
+  pinMode(4, INPUT);
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
   pinMode(15, OUTPUT);
-  
+
   ////////////////////////////////
   // WI-FI INIT
   DBG_OUTPUT_PORT.printf("Connecting to %s\n", ssid);
@@ -246,7 +246,7 @@ void setup(void) {
   // Start server
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
-  
+
   DBG_OUTPUT_PORT.println("Please pull GPIO4 low (e.g. press button) to switch output mode:");
   DBG_OUTPUT_PORT.println(" 0 (OFF):    outputs are off and hidden from chart");
   DBG_OUTPUT_PORT.println(" 1 (AUTO):   outputs are rotated automatically every second");
@@ -274,15 +274,17 @@ void loop(void) {
     // see if a mode change was requested
     if (modeChangeRequested) {
       // increment mode (reset after 2)
-      rgbMode++;      
-      if (rgbMode > 2) rgbMode = 0;
-       
+      rgbMode++;
+      if (rgbMode > 2) {
+        rgbMode = 0;
+      }
+
       modeChangeRequested = false;
     }
 
     // act according to mode
     switch (rgbMode) {
-      case 0: // off       
+      case 0: // off
         gpioMask = 0b10100000000111111; // GPIOs 12-13-15 are hidden
         // output 0
         digitalWrite(12, 0);
@@ -293,22 +295,24 @@ void loop(void) {
       case 1: // auto
         gpioMask = DEFAULT_GPIO_MASK;
         // increment value (reset after 7)
-        rgbValue++;      
-        if (rgbValue > 7) rgbValue = 0;
-        
+        rgbValue++;
+        if (rgbValue > 7) {
+          rgbValue = 0;
+        }
+
         // output values
         digitalWrite(12, rgbValue & 0b001);
         digitalWrite(13, rgbValue & 0b010);
         digitalWrite(15, rgbValue & 0b100);
         break;
-        
+
       case 2: // manual
         gpioMask = DEFAULT_GPIO_MASK;
         // don't change values
         break;
     }
-        
+
     // update last change time
-    lastChangeTime = now;    
+    lastChangeTime = now;
   }
 }
