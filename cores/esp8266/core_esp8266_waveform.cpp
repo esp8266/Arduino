@@ -170,7 +170,8 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   wave.autoPwm = autoPwm;
 
   std::atomic_thread_fence(std::memory_order_acquire);
-  if (!(waveform.enabled & (1UL << pin))) {
+  const uint32_t pinBit = 1UL << pin;
+  if (!(waveform.enabled & pinBit)) {
     // wave.nextPeriodCcy and wave.endDutyCcy are initialized by the ISR
     wave.nextPeriodCcy = phaseOffsetCcys;
     wave.expiryCcy = runTimeCcys; // in WaveformMode::INIT, temporarily hold relative cycle count
@@ -182,7 +183,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
         GP16O = 0;
       }
       else {
-        GPOC = 1UL << pin;
+        GPOC = pinBit;
       }
     }
     std::atomic_thread_fence(std::memory_order_release);
@@ -223,7 +224,8 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // If user sends in a pin >16 but <32, this will always point to a 0 bit
   // If they send >=32, then the shift will result in 0 and it will also return false
   std::atomic_thread_fence(std::memory_order_acquire);
-  if (waveform.enabled & (1UL << pin)) {
+  const uint32_t pinBit = 1UL << pin;
+  if (waveform.enabled & pinBit) {
     waveform.toDisable = pin;
     std::atomic_thread_fence(std::memory_order_release);
     // Must not interfere if Timer is due shortly
@@ -335,8 +337,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     } while (static_cast<int32_t>(isrNextEventCcy - now) > 0);
     isrNextEventCcy = isrTimeoutCcy;
     do {
+      const uint32_t pinBit = 1UL << pin;
       // If it's not on, ignore
-      if (!(busyPins & (1UL << pin)))
+      if (!(busyPins & pinBit))
         continue;
 
       Waveform& wave = waveform.pins[pin];
@@ -345,13 +348,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy &&
         static_cast<int32_t>(overshootCcys) >= 0) {
         // Disable any waveforms that are done
-        waveform.enabled &= ~(1UL << pin);
-        busyPins &= ~(1UL << pin);
+        waveform.enabled &= ~pinBit;
+        busyPins &= ~pinBit;
       }
       else {
         if (static_cast<int32_t>(overshootCcys) >= 0) {
           uint32_t nextEdgeCcy;
-          if (waveform.states & (1UL << pin)) {
+          if (waveform.states & pinBit) {
             // active configuration and forward are 100% duty
             if (wave.periodCcys == wave.dutyCcys) {
               wave.nextPeriodCcy += wave.periodCcys;
@@ -368,12 +371,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else {
               nextEdgeCcy = wave.nextPeriodCcy;
-              waveform.states &= ~(1UL << pin);
+              waveform.states &= ~pinBit;
               if (16 == pin) {
                 GP16O = 0;
               }
               else {
-                GPOC = 1UL << pin;
+                GPOC = pinBit;
               }
             }
           }
@@ -396,12 +399,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 if (WaveformMode::EXPIRES == wave.mode)
                   wave.expiryCcy += adj * wave.periodCcys;
               }
-              waveform.states |= 1UL << pin;
+              waveform.states |= pinBit;
               if (16 == pin) {
                 GP16O = 1;
               }
               else {
-                GPOS = 1UL << pin;
+                GPOS = pinBit;
               }
             }
             nextEdgeCcy = wave.endDutyCcy;
@@ -413,7 +416,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
 
         if (static_cast<int32_t>(wave.nextEventCcy - isrTimeoutCcy) >= 0) {
-          busyPins &= ~(1UL << pin);
+          busyPins &= ~pinBit;
           if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > 0) {
             waveform.nextEventCcy = wave.nextEventCcy;
             waveform.nextPin = pin;
