@@ -342,13 +342,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       Waveform& wave = waveform.pins[pin];
 
       const uint32_t overshootCcys = now - wave.nextEventCcy;
-      if (static_cast<int32_t>(overshootCcys) >= 0) {
-        if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy) {
-          // Disable any waveforms that are done
-          waveform.enabled &= ~(1UL << pin);
-          busyPins &= ~(1UL << pin);
-        }
-        else {
+      if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy &&
+        static_cast<int32_t>(overshootCcys) >= 0) {
+        // Disable any waveforms that are done
+        waveform.enabled &= ~(1UL << pin);
+        busyPins &= ~(1UL << pin);
+      }
+      else {
+        if (static_cast<int32_t>(overshootCcys) >= 0) {
           uint32_t nextEdgeCcy;
           if (waveform.states & (1UL << pin)) {
             // active configuration and forward are 100% duty
@@ -410,17 +411,17 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             (WaveformMode::EXPIRES == wave.mode && static_cast<int32_t>(nextEdgeCcy - wave.expiryCcy) > 0) ?
             wave.expiryCcy : nextEdgeCcy;
         }
-      }
 
-      if (static_cast<int32_t>(wave.nextEventCcy - isrTimeoutCcy) >= 0) {
-        busyPins &= ~(1UL << pin);
-        if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > 0) {
-          waveform.nextEventCcy = wave.nextEventCcy;
-          waveform.nextPin = pin;
+        if (static_cast<int32_t>(wave.nextEventCcy - isrTimeoutCcy) >= 0) {
+          busyPins &= ~(1UL << pin);
+          if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > 0) {
+            waveform.nextEventCcy = wave.nextEventCcy;
+            waveform.nextPin = pin;
+          }
         }
-      }
-      else if (static_cast<int32_t>(isrNextEventCcy - wave.nextEventCcy) > 0) {
-        isrNextEventCcy = wave.nextEventCcy;
+        else if (static_cast<int32_t>(isrNextEventCcy - wave.nextEventCcy) > 0) {
+          isrNextEventCcy = wave.nextEventCcy;
+        }
       }
 
       now = getScaledCcyCount(isrStartCcy);
