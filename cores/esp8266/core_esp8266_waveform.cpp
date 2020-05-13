@@ -255,14 +255,11 @@ static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range) {
 
   uint32_t cc = (_pwmPeriod * val) / range;
 
+  // Clip to sane values in the case we go from OK to not-OK when adjusting frequencies
   if (cc == 0) {
-    _stopPWM(pin);
-    digitalWrite(pin, LOW);
-    return;
+    cc = 1;
   } else if (cc >= _pwmPeriod) {
-    _stopPWM(pin);
-    digitalWrite(pin, HIGH);
-    return;
+    cc = _pwmPeriod - 1;
   }
 
   if (p.cnt == 0) {
@@ -302,6 +299,13 @@ bool _setPWM(int pin, uint32_t val, uint32_t range) {
   // And add it to the list, in order
   if (p.cnt >= maxPWMs) {
     return false; // No space left
+  }
+
+  // Sanity check for all-on/off
+  uint32_t cc = (_pwmPeriod * val) / range;
+  if ((cc == 0) || (cc >= _pwmPeriod)) {
+    digitalWrite(pin, cc ? HIGH : LOW);
+    return true;
   }
 
   _addPWMtoList(p, pin, val, range);
