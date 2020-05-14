@@ -348,8 +348,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       if (WaveformMode::EXPIRES == wave.mode && wave.nextEventCcy == wave.expiryCcy &&
         static_cast<int32_t>(overshootCcys) >= 0) {
         // Disable any waveforms that are done
-        waveform.enabled &= ~pinBit;
-        busyPins &= ~pinBit;
+        waveform.enabled ^= pinBit;
+        busyPins ^= pinBit;
       }
       else {
         if (static_cast<int32_t>(overshootCcys) >= 0) {
@@ -371,7 +371,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else {
               nextEdgeCcy = wave.nextPeriodCcy;
-              waveform.states &= ~pinBit;
+              waveform.states ^= pinBit;
               if (16 == pin) {
                 GP16O = 0;
               }
@@ -416,7 +416,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         }
 
         if (static_cast<int32_t>(wave.nextEventCcy - isrTimeoutCcy) >= 0) {
-          busyPins &= ~pinBit;
+          busyPins ^= pinBit;
           if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextEventCcy) > 0) {
             waveform.nextEventCcy = wave.nextEventCcy;
             waveform.nextPin = pin;
