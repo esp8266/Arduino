@@ -34,6 +34,7 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include "flash_quirks.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -81,13 +82,24 @@ void initVariant() __attribute__((weak));
 void initVariant() {
 }
 
-void preloop_update_frequency() __attribute__((weak));
-void preloop_update_frequency() {
+extern "C" void __preloop_update_frequency() {
 #if defined(F_CPU) && (F_CPU == 160000000L)
-    REG_SET_BIT(0x3ff00014, BIT(0));
     ets_update_cpu_frequency(160);
+    CPU2X |= 1UL;
+#elif defined(F_CPU)
+    ets_update_cpu_frequency(80);
+    CPU2X &= ~1UL;
+#elif !defined(F_CPU)
+    if (system_get_cpu_freq() == 160) {
+        CPU2X |= 1UL;
+    }
+    else {
+        CPU2X &= ~1UL;
+    }
 #endif
 }
+
+extern "C" void preloop_update_frequency() __attribute__((weak, alias("__preloop_update_frequency")));
 
 extern "C" bool can_yield() {
   return cont_can_yield(g_pcont);
@@ -322,6 +334,8 @@ extern "C" void user_init(void) {
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
+
+    experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
 

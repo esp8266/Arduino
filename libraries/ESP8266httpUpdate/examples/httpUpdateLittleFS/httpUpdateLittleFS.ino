@@ -1,5 +1,5 @@
 /**
-   httpUpdateSPIFFS.ino
+   httpUpdateLittleFS.ino
 
     Created on: 05.12.2015
 
@@ -13,8 +13,6 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
-#define USE_SERIAL Serial
-
 ESP8266WiFiMulti WiFiMulti;
 
 #ifndef APSSID
@@ -24,16 +22,16 @@ ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
 
-  USE_SERIAL.begin(115200);
-  // USE_SERIAL.setDebugOutput(true);
+  Serial.begin(115200);
+  // Serial.setDebugOutput(true);
 
-  USE_SERIAL.println();
-  USE_SERIAL.println();
-  USE_SERIAL.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
 
   for (uint8_t t = 4; t > 0; t--) {
-    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-    USE_SERIAL.flush();
+    Serial.printf("[SETUP] WAIT %d...\n", t);
+    Serial.flush();
     delay(1000);
   }
 
@@ -46,7 +44,7 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    USE_SERIAL.println("Update SPIFFS...");
+    Serial.println("Update LittleFS...");
 
     WiFiClient client;
 
@@ -58,22 +56,22 @@ void loop() {
     // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
     ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 
-    t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs(client, "http://server/spiffs.bin");
+    t_httpUpdate_return ret = ESPhttpUpdate.updateFS(client, "http://server/spiffs.bin");
     if (ret == HTTP_UPDATE_OK) {
-      USE_SERIAL.println("Update sketch...");
+      Serial.println("Update sketch...");
       ret = ESPhttpUpdate.update(client, "http://server/file.bin");
 
       switch (ret) {
         case HTTP_UPDATE_FAILED:
-          USE_SERIAL.printf("HTTP_UPDATE_FAILED Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+          Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
           break;
 
         case HTTP_UPDATE_NO_UPDATES:
-          USE_SERIAL.println("HTTP_UPDATE_NO_UPDATES");
+          Serial.println("HTTP_UPDATE_NO_UPDATES");
           break;
 
         case HTTP_UPDATE_OK:
-          USE_SERIAL.println("HTTP_UPDATE_OK");
+          Serial.println("HTTP_UPDATE_OK");
           break;
       }
     }
