@@ -54,7 +54,7 @@ void loop() {
   // First 10 loop()s, retrieve the URL
   if (pass < 10) {
     pass++;
-    Serial.printf("Reuse connection example, GET url for the %d time\n", i + 1);
+    Serial.printf("Reuse connection example, GET url for the %d time\n", pass);
     int httpCode = http.GET();
     if (httpCode > 0) {
       Serial.printf("[HTTP] GET... code: %d\n", httpCode);
