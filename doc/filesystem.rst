@@ -63,6 +63,16 @@ following include to the sketch:
 
     #include "FS.h"
 
+SPIFFS Deprecation Warning
+--------------------------
+
+SPIFFS is currently deprecated and may be removed in future releases of
+the core.  Please consider moving your code to LittleFS.  SPIFFS is not
+actively supported anymore by the upstream developer, while LittleFS is
+under active development, supports real directories, and is many times
+faster for most operations.
+
+
 SPIFFS and LittleFS
 -------------------
 
@@ -535,6 +545,11 @@ fileTime
 Returns the time_t write time of the current file pointed
 to by the internal iterator.
 
+fileCreationTime
+~~~~~~~~~~~~~~~~
+Returns the time_t creation time of the current file
+pointed to by the internal iterator.
+
 isFile
 ~~~~~~
 
@@ -641,6 +656,11 @@ getLastWrite
 
 Returns the file last write time, and only valid for files opened in read-only
 mode.  If a file is opened for writing, the returned time may be indeterminate.
+
+getCreationTime
+~~~~~~~~~~~~~~~
+
+Returns the file creation time, if available.
 
 isFile
 ~~~~~~

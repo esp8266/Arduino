@@ -15,8 +15,8 @@
      if all is well, the following is being displayed on the ESP console
       SSEHandler - registered client with IP <your client IP address> is listening...
       broadcast status change to client IP <your client IP>> for sensor[A|B] with new state <some number>>
-     every minute you will see on the ESP: SSEKeepAlive - client is still connected  
-      
+     every minute you will see on the ESP: SSEKeepAlive - client is still connected
+
      on the client, you should see the SSE messages coming in:
       event: event
       data: { "TYPE":"KEEP-ALIVE" }
@@ -33,7 +33,7 @@
 
 extern "C" {
 #include "c_types.h"
-} 
+}
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -54,10 +54,10 @@ ESP8266WebServer server(port);
 #define SSE_MAX_CHANNELS 8  // in this simplified example, only eight SSE clients subscription allowed
 struct SSESubscription {
   uint32_t clientIP;
-	WiFiClient client;
+  WiFiClient client;
   Ticker keepAliveTimer;
 } subscription[SSE_MAX_CHANNELS];
-uint8_t subscriptionCount = 0; 
+uint8_t subscriptionCount = 0;
 
 unsigned short sensorA = 0, sensorB = 0;   //Simulate two sensors
 Ticker update;
@@ -80,12 +80,14 @@ void handleNotFound() {
 
 void SSEKeepAlive() {
   for (uint8_t i = 0; i < SSE_MAX_CHANNELS; i++) {
-    if (!(subscription[i].clientIP)) continue;
-    WiFiClient client = subscription[i].client;  
+    if (!(subscription[i].clientIP)) {
+      continue;
+    }
+    WiFiClient client = subscription[i].client;
     if (client.connected()) {
       Serial.printf_P(PSTR("SSEKeepAlive - client is still listening on channel %d\n"), i);
       client.println(F("event: event\ndata: { \"TYPE\":\"KEEP-ALIVE\" }\n"));   // Extra newline required by SSE standard
-    } else { 
+    } else {
       Serial.printf_P(PSTR("SSEKeepAlive - client not listening on channel %d, remove subscription\n"), i);
       subscription[i].keepAliveTimer.detach();
       client.flush();
@@ -102,40 +104,46 @@ void SSEHandler(uint8_t channel) {
   WiFiClient client = server.client();
   SSESubscription &s = subscription[channel];
   if (s.clientIP != uint32_t(client.remoteIP())) { // IP addresses don't match, reject this client
-   	Serial.printf_P(PSTR("SSEHandler - unregistered client with IP %s tries to listen\n"), server.client().remoteIP().toString().c_str());
+    Serial.printf_P(PSTR("SSEHandler - unregistered client with IP %s tries to listen\n"), server.client().remoteIP().toString().c_str());
     return handleNotFound();
-  }  
+  }
   client.setNoDelay(true);
   client.setSync(true);
- 	Serial.printf_P(PSTR("SSEHandler - registered client with IP %s is listening\n"), IPAddress(s.clientIP).toString().c_str());
-	s.client = client; // capture SSE server client connection
- 	server.setContentLength(CONTENT_LENGTH_UNKNOWN); // the payload can go on forever
+  Serial.printf_P(PSTR("SSEHandler - registered client with IP %s is listening\n"), IPAddress(s.clientIP).toString().c_str());
+  s.client = client; // capture SSE server client connection
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN); // the payload can go on forever
   server.sendContent_P(PSTR("HTTP/1.1 200 OK\nContent-Type: text/event-stream;\nConnection: keep-alive\nCache-Control: no-cache\nAccess-Control-Allow-Origin: *\n\n"));
   s.keepAliveTimer.attach_scheduled(30.0, SSEKeepAlive);  // Refresh time every 30s for demo
 }
 
-void handleAll() { 
+void handleAll() {
   const char *uri = server.uri().c_str();
-  if (strncmp_P(uri, PSTR("/rest/events/"), sizeof("/rest/events"))) return handleNotFound();
+  if (strncmp_P(uri, PSTR("/rest/events/"), sizeof("/rest/events"))) {
+    return handleNotFound();
+  }
   uri += sizeof("/rest/events");
   unsigned int channel = atoi(uri);
-  if (channel < SSE_MAX_CHANNELS)
+  if (channel < SSE_MAX_CHANNELS) {
     return SSEHandler(channel);
+  }
   handleNotFound();
 };
 
 void SSEBroadcastState(const char *sensorName, unsigned short prevSensorValue, unsigned short sensorValue) {
-  for (uint8_t i = 0; i < SSE_MAX_CHANNELS; i++) { 
-    if (!(subscription[i].clientIP)) continue;
+  for (uint8_t i = 0; i < SSE_MAX_CHANNELS; i++) {
+    if (!(subscription[i].clientIP)) {
+      continue;
+    }
     WiFiClient client = subscription[i].client;
     String IPaddrstr = IPAddress(subscription[i].clientIP).toString();
     if (client.connected()) {
-      Serial.printf_P(PSTR("broadcast status change to client IP %s on channel %d for %s with new state %d\n"), 
-        IPaddrstr.c_str(), i, sensorName, sensorValue);	
+      Serial.printf_P(PSTR("broadcast status change to client IP %s on channel %d for %s with new state %d\n"),
+                      IPaddrstr.c_str(), i, sensorName, sensorValue);
       client.printf_P(PSTR("event: event\ndata: {\"TYPE\":\"STATE\", \"%s\":{\"state\":%d, \"prevState\":%d}}\n\n"),
-        sensorName, sensorValue, prevSensorValue);
-    } else
+                      sensorName, sensorValue, prevSensorValue);
+    } else {
       Serial.printf_P(PSTR("SSEBroadcastState - client %s registered on channel %d but not listening\n"), IPaddrstr.c_str(), i);
+    }
   }
 }
 
@@ -143,38 +151,44 @@ void SSEBroadcastState(const char *sensorName, unsigned short prevSensorValue, u
 void updateSensor(const char* name, unsigned short *value) {
   unsigned short newVal = (unsigned short)RANDOM_REG32; // (not so good) random value for the sensor
   unsigned short val = *value;
- 	Serial.printf_P(PSTR("update sensor %s - previous state: %d, new state: %d\n"), name, val, newVal);
-  if (val != newVal) SSEBroadcastState(name, val, newVal); // only broadcast if state is different
+  Serial.printf_P(PSTR("update sensor %s - previous state: %d, new state: %d\n"), name, val, newVal);
+  if (val != newVal) {
+    SSEBroadcastState(name, val, newVal);  // only broadcast if state is different
+  }
   *value = newVal;
-  update.once(rand() % 20 + 10, std::bind(updateSensor, name, value));  // randomly update sensor A 
+  update.once(rand() % 20 + 10, std::bind(updateSensor, name, value));  // randomly update sensor A
 }
 
 void handleSubscribe() {
-	uint8_t channel;
-	IPAddress clientIP = server.client().remoteIP();   // get IP address of client
-	String SSEurl = F("http://");
-	SSEurl += WiFi.localIP().toString();
-	SSEurl += F(":");
-	SSEurl += port;
-	size_t offset = SSEurl.length();
-	SSEurl += F("/rest/events/");
+  uint8_t channel;
+  IPAddress clientIP = server.client().remoteIP();   // get IP address of client
+  String SSEurl = F("http://");
+  SSEurl += WiFi.localIP().toString();
+  SSEurl += F(":");
+  SSEurl += port;
+  size_t offset = SSEurl.length();
+  SSEurl += F("/rest/events/");
 
-  if (subscriptionCount == SSE_MAX_CHANNELS - 1) return handleNotFound();  // We ran out of channels
+  if (subscriptionCount == SSE_MAX_CHANNELS - 1) {
+    return handleNotFound();  // We ran out of channels
+  }
   ++subscriptionCount;
   for (channel = 0; channel < SSE_MAX_CHANNELS; channel++) // Find first free slot
-    if (!subscription[channel].clientIP) break;
+    if (!subscription[channel].clientIP) {
+      break;
+    }
   subscription[channel] = {(uint32_t) clientIP, server.client()};
   SSEurl += channel;
-  Serial.printf_P(PSTR("Allocated channel %d, on uri %s\n"), channel, SSEurl.substring(offset).c_str());	
+  Serial.printf_P(PSTR("Allocated channel %d, on uri %s\n"), channel, SSEurl.substring(offset).c_str());
   //server.on(SSEurl.substring(offset), std::bind(SSEHandler, &(subscription[channel])));
-	Serial.printf_P(PSTR("subscription for client IP %s: event bus location: %s\n"), clientIP.toString().c_str(), SSEurl.c_str());	
+  Serial.printf_P(PSTR("subscription for client IP %s: event bus location: %s\n"), clientIP.toString().c_str(), SSEurl.c_str());
   server.send_P(200, "text/plain", SSEurl.c_str());
 }
 
 void startServers() {
-	server.on(F("/rest/events/subscribe"), handleSubscribe);
-	server.onNotFound(handleAll);
-	server.begin();
+  server.on(F("/rest/events/subscribe"), handleSubscribe);
+  server.onNotFound(handleAll);
+  server.begin();
   Serial.println("HTTP server and  SSE EventSource started");
 }
 
@@ -188,8 +202,9 @@ void setup(void) {
     Serial.print(".");
   }
   Serial.printf_P(PSTR("\nConnected to %s with IP address: %s\n"), ssid, WiFi.localIP().toString().c_str());
-  if (MDNS.begin("esp8266"))
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
+  }
 
   startServers();   // start web and SSE servers
   updateSensor("sensorA", &sensorA);
