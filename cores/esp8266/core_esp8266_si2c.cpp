@@ -31,31 +31,31 @@ extern "C" {
 #include "ets_sys.h"
 };
 
-    // Inline helpers
-    static inline __attribute__((always_inline)) void SDA_LOW(const int twi_sda)
-    {
-        GPES = (1 << twi_sda);
-    }
-    static inline __attribute__((always_inline)) void SDA_HIGH(const int twi_sda)
-    {
-        GPEC = (1 << twi_sda);
-    }
-    static inline __attribute__((always_inline)) bool SDA_READ(const int twi_sda)
-    {
-        return (GPI & (1 << twi_sda)) != 0;
-    }
-    static inline __attribute__((always_inline)) void SCL_LOW(const int twi_scl)
-    {
-        GPES = (1 << twi_scl);
-    }
-    static inline __attribute__((always_inline)) void SCL_HIGH(const int twi_scl)
-    {
-        GPEC = (1 << twi_scl);
-    }
-    static inline __attribute__((always_inline)) bool SCL_READ(const int twi_scl)
-    {
-        return (GPI & (1 << twi_scl)) != 0;
-    }
+// Inline helpers
+static inline __attribute__((always_inline)) void SDA_LOW(const int twi_sda)
+{
+    GPES = (1 << twi_sda);
+}
+static inline __attribute__((always_inline)) void SDA_HIGH(const int twi_sda)
+{
+    GPEC = (1 << twi_sda);
+}
+static inline __attribute__((always_inline)) bool SDA_READ(const int twi_sda)
+{
+    return (GPI & (1 << twi_sda)) != 0;
+}
+static inline __attribute__((always_inline)) void SCL_LOW(const int twi_scl)
+{
+    GPES = (1 << twi_scl);
+}
+static inline __attribute__((always_inline)) void SCL_HIGH(const int twi_scl)
+{
+    GPEC = (1 << twi_scl);
+}
+static inline __attribute__((always_inline)) bool SCL_READ(const int twi_scl)
+{
+    return (GPI & (1 << twi_scl)) != 0;
+}
 
 
 // Implement as a class to reduce code size by allowing access to many global variables with a single base pointer
@@ -126,10 +126,12 @@ private:
     {
         esp8266::polledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
         esp8266::polledTimeout::periodicFastUs yieldTimeout(5000);
-        while(!timeout && !SCL_READ(twi_scl))  // outer loop is stretch duration up to stretch limit
-        { 
+        while (!timeout && !SCL_READ(twi_scl)) // outer loop is stretch duration up to stretch limit
+        {
             if (yieldTimeout)   // inner loop yields every 5ms
+            {
                 yield();
+            }
         }
     }
 
@@ -161,23 +163,29 @@ static Twi twi;
 void Twi::setClock(unsigned int freq)
 {
     if (freq < 1000)  // minimum freq 1000Hz to minimize slave timeouts and WDT resets
+    {
         freq = 1000;
-    
+    }
+
     preferred_si2c_clock = freq;
 
 #if F_CPU == FCPU80
 
     if (freq > 400000)
+    {
         freq = 400000;
+    }
     twi_dcount = (500000000 / freq);  // half-cycle period in ns
-    twi_dcount = (1000*(twi_dcount - 1120)) / 62500;  // (half cycle - overhead) / busywait loop time 
-    
+    twi_dcount = (1000 * (twi_dcount - 1120)) / 62500; // (half cycle - overhead) / busywait loop time
+
 #else
 
     if (freq > 800000)
+    {
         freq = 800000;
+    }
     twi_dcount = (500000000 / freq);  // half-cycle period in ns
-    twi_dcount = (1000*(twi_dcount - 560)) / 31250;  // (half cycle - overhead) / busywait loop time
+    twi_dcount = (1000 * (twi_dcount - 560)) / 31250; // (half cycle - overhead) / busywait loop time
 
 #endif
 }
@@ -221,7 +229,7 @@ void Twi::enableSlave()
     }
 }
 
- void ICACHE_RAM_ATTR Twi::busywait(unsigned int v)
+void ICACHE_RAM_ATTR Twi::busywait(unsigned int v)
 {
     unsigned int i;
     for (i = 0; i < v; i++)  // loop time is 5 machine cycles: 31.25ns @ 160MHz, 62.5ns @ 80MHz
@@ -463,7 +471,7 @@ void Twi::attachSlaveTxEvent(void (*function)(void))
     twi_onSlaveTransmit = function;
 }
 
-// DO NOT INLINE, inlining reply() in combination with compiler optimizations causes function breakup into 
+// DO NOT INLINE, inlining reply() in combination with compiler optimizations causes function breakup into
 // parts and the ICACHE_RAM_ATTR isn't propagated correctly to all parts, which of course causes crashes.
 // TODO: test with gcc 9.x and if it still fails, disable optimization with -fdisable-ipa-fnsplit
 void ICACHE_RAM_ATTR Twi::reply(uint8_t ack)
@@ -660,7 +668,7 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
     unsigned int scl;
 
     // Store bool return in int to reduce final code size.
-    
+
     sda = SDA_READ(twi.twi_sda);
     scl = SCL_READ(twi.twi_scl);
 

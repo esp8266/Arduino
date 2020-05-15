@@ -9,9 +9,10 @@
 
 #include <ArduinoJson.h>
 #include "FS.h"
+#include <LittleFS.h>
 
 bool loadConfig() {
-  File configFile = SPIFFS.open("/config.json", "r");
+  File configFile = LittleFS.open("/config.json", "r");
   if (!configFile) {
     Serial.println("Failed to open config file");
     return false;
@@ -56,7 +57,7 @@ bool saveConfig() {
   doc["serverName"] = "api.example.com";
   doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 
-  File configFile = SPIFFS.open("/config.json", "w");
+  File configFile = LittleFS.open("/config.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
@@ -72,7 +73,7 @@ void setup() {
   delay(1000);
   Serial.println("Mounting FS...");
 
-  if (!SPIFFS.begin()) {
+  if (!LittleFS.begin()) {
     Serial.println("Failed to mount file system");
     return;
   }
