@@ -177,7 +177,7 @@ void handleSubscribe() {
     if (!subscription[channel].clientIP) {
       break;
     }
-  subscription[channel] = {(uint32_t) clientIP, server.client()};
+  subscription[channel] = {(uint32_t) clientIP, server.client(), Ticker()};
   SSEurl += channel;
   Serial.printf_P(PSTR("Allocated channel %d, on uri %s\n"), channel, SSEurl.substring(offset).c_str());
   //server.on(SSEurl.substring(offset), std::bind(SSEHandler, &(subscription[channel])));
