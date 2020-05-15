@@ -48,8 +48,12 @@ void setup() {
   //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
 }
 
+int pass = 0;
+
 void loop() {
-  for (int i = 0; i < 10; i++) {
+  // First 10 loop()s, retrieve the URL
+  if (pass < 10) {
+    pass++;
     Serial.printf("Reuse connection example, GET url for the %d time\n", i + 1);
     int httpCode = http.GET();
     if (httpCode > 0) {
@@ -66,15 +70,15 @@ void loop() {
       http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
       //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
     }
-
-    Serial.println("\n\n\nWait 5 second...\n");
-    delay(5000);
-  }
-
-  http.end();
-
-  Serial.println("Done testing, now wait forever");
-  for (;;) {
-    delay(100); // Wait forever
+     
+    if (pass == 10) {
+      // On the 11th loop(), c
+      pass++;
+      http.end();
+      Serial.println("Done testing, now wait forever");
+    } else {
+      Serial.println("\n\n\nWait 5 second...\n");
+      delay(5000);
+    }
   }
 }
