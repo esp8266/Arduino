@@ -23,6 +23,7 @@
  */
 
 #include "RequestData.h"
+#include "EspnowMeshBackend.h"
 
 RequestData::RequestData(EspnowMeshBackend &meshInstance, const uint32_t creationTimeMs) :
   _timeTracker(creationTimeMs), _meshInstance(meshInstance)

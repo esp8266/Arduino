@@ -1,6 +1,5 @@
 /*
- * UtilityMethods
- * Copyright (C) 2018 Anders Löfgren
+ * Copyright (C) 2020 Anders Löfgren
  *
  * License (MIT license):
  *
@@ -27,10 +26,16 @@
 #include "MeshBackendBase.h"
 #include "EspnowMeshBackend.h"
 
-void MeshBackendBase::setVerboseModeState(const bool enabled) {_verboseMode = enabled;}
-bool MeshBackendBase::verboseMode() const {return _verboseMode;}
+namespace
+{
+  bool _staticVerboseMode = false;
+  bool _printWarnings = true;
+}
 
-void MeshBackendBase::verboseModePrint(const String &stringToPrint, const bool newline) const
+void ConditionalPrinter::setVerboseModeState(const bool enabled) {_verboseMode = enabled;}
+bool ConditionalPrinter::verboseMode() const {return _verboseMode;}
+
+void ConditionalPrinter::verboseModePrint(const String &stringToPrint, const bool newline) const
 {
   if(verboseMode())
   {
@@ -41,23 +46,10 @@ void MeshBackendBase::verboseModePrint(const String &stringToPrint, const bool n
   }
 }
 
-void EspnowMeshBackend::setVerboseModeState(const bool enabled) {MeshBackendBase::setVerboseModeState(enabled); _staticVerboseMode = enabled;}
-bool EspnowMeshBackend::verboseMode() const {return staticVerboseMode();}
+void ConditionalPrinter::setStaticVerboseModeState(const bool enabled) {_staticVerboseMode = enabled;};
+bool ConditionalPrinter::staticVerboseMode() {return _staticVerboseMode;}
 
-void EspnowMeshBackend::verboseModePrint(const String &stringToPrint, const bool newline) const
-{
-  if(verboseMode())
-  {
-    if(newline)
-      Serial.println(stringToPrint);
-    else
-      Serial.print(stringToPrint);
-  }
-}
-
-bool EspnowMeshBackend::staticVerboseMode() {return _staticVerboseMode;}
-
-void EspnowMeshBackend::staticVerboseModePrint(const String &stringToPrint, const bool newline)
+void ConditionalPrinter::staticVerboseModePrint(const String &stringToPrint, const bool newline)
 {
   if(staticVerboseMode())
   {
@@ -68,10 +60,10 @@ void EspnowMeshBackend::staticVerboseModePrint(const String &stringToPrint, cons
   }
 }
 
-void MeshBackendBase::setPrintWarnings(const bool printEnabled) {_printWarnings = printEnabled;}
-bool MeshBackendBase::printWarnings() {return _printWarnings;}
+void ConditionalPrinter::setPrintWarnings(const bool printEnabled) {_printWarnings = printEnabled;}
+bool ConditionalPrinter::printWarnings() {return _printWarnings;}
 
-void MeshBackendBase::warningPrint(const String &stringToPrint, const bool newline)
+void ConditionalPrinter::warningPrint(const String &stringToPrint, const bool newline)
 {
   if(printWarnings())
   {

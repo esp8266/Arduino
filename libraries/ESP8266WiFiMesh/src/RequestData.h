@@ -25,8 +25,8 @@
 #ifndef __ESPNOWREQUESTDATA_H__
 #define __ESPNOWREQUESTDATA_H__
 
+#include <Arduino.h>
 #include "TimeTracker.h"
-#include "EspnowMeshBackend.h"
 
 class EspnowMeshBackend;
 

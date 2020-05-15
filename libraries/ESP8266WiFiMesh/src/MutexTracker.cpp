@@ -26,12 +26,7 @@
 
 namespace
 {  
-  static std::shared_ptr<bool> _captureBan = std::make_shared<bool>(false);
-}
-
-std::shared_ptr<bool> MutexTracker::captureBan()
-{
-  return _captureBan;
+  std::shared_ptr<bool> _captureBan = std::make_shared<bool>(false);
 }
 
 MutexTracker::MutexTracker(const std::shared_ptr<bool> &mutexToCapture) 
@@ -49,6 +44,14 @@ MutexTracker::~MutexTracker()
   releaseMutex();
   _destructorHook();
 }
+
+MutexTracker MutexTracker::captureBan()
+{
+  // Syntax like this will move the resulting value into its new position (similar to NRVO): https://stackoverflow.com/a/11540204
+  return MutexTracker(_captureBan);
+}
+
+MutexTracker MutexTracker::captureBan(const std::function<void()> destructorHook) { return MutexTracker(_captureBan, destructorHook); }
 
 bool MutexTracker::mutexFree(const std::shared_ptr<bool> &mutex)
 {
@@ -82,7 +85,7 @@ void MutexTracker::releaseMutex()
 
 bool MutexTracker::attemptMutexCapture(const std::shared_ptr<bool> &mutexToCapture)
 {
-  if(mutexFree(captureBan()) && mutexFree(mutexToCapture))
+  if(mutexFree(_captureBan) && mutexFree(mutexToCapture))
   {
     _capturedMutex = mutexToCapture;
     *_capturedMutex = true;

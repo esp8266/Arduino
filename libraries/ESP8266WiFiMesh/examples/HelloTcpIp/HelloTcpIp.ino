@@ -2,6 +2,7 @@
 
 #include <ESP8266WiFi.h>
 #include <TcpIpMeshBackend.h>
+#include <EspnowMeshBackend.h>
 #include <TypeConversionFunctions.h>
 #include <assert.h>
 

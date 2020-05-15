@@ -25,7 +25,6 @@
 #include "JsonTranslator.h"
 #include "EspnowProtocolInterpreter.h"
 #include "TypeConversionFunctions.h"
-#include "MeshCryptoInterface.h" // TODO: Remove?
 
 namespace
 {
@@ -185,31 +184,6 @@ namespace JsonTranslator
       value = TypeCast::stringToUint64(jsonValue, radix);
   
     return decoded;
-  }
-
-
-
-  // TODO: Move to encryptedEspnow class?
-  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, 
-                                   const uint8_t *hashKey, const uint8_t hashKeyLength)
-  {
-    using MeshCryptoInterface::verifyMeshHmac;
-    
-    String hmac;
-    if(getHmac(encryptionRequestHmacMessage, hmac))
-    {
-      int32_t hmacStartIndex = encryptionRequestHmacMessage.indexOf(String('"') + FPSTR(jsonHmac) + F("\":"));
-      if(hmacStartIndex < 0)
-        return false;
-     
-      if(hmac.length() == 2*CryptoInterface::SHA256_NATURAL_LENGTH // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
-         && verifyMeshHmac(TypeCast::macToString(requesterStaMac) + TypeCast::macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
-      {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   bool getConnectionState(const String &jsonString, String &result)

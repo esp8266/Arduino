@@ -25,7 +25,9 @@
 #include "Serializer.h"
 #include "JsonTranslator.h"
 #include "TypeConversionFunctions.h"
-#include "MeshCryptoInterface.h" 
+#include "MeshCryptoInterface.h"
+#include "EspnowProtocolInterpreter.h" 
+#include <ESP8266WiFi.h>
 
 namespace
 {

@@ -28,9 +28,10 @@
 
 #include <Arduino.h>
 #include <assert.h>
-#include "MeshBackendBase.h"
-#include "TcpIpMeshBackend.h"
-#include "EspnowMeshBackend.h"
+
+class MeshBackendBase;
+class TcpIpMeshBackend;
+class EspnowMeshBackend;
 
 namespace MeshTypeConversionFunctions 
 {

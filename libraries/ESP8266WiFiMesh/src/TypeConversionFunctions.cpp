@@ -24,6 +24,9 @@
  */
 
 #include "TypeConversionFunctions.h"
+#include "MeshBackendBase.h"
+#include "TcpIpMeshBackend.h"
+#include "EspnowMeshBackend.h"
 
 namespace
 {

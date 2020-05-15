@@ -25,7 +25,8 @@
 #include "EspnowProtocolInterpreter.h"
 #include "TypeConversionFunctions.h"
 #include <algorithm>
-#include "EspnowMeshBackend.h"
+#include "EspnowTransmitter.h"
+#include "UtilityFunctions.h"
 
 namespace
 {
@@ -36,7 +37,17 @@ namespace EspnowProtocolInterpreter
 {   
   uint8_t metadataSize()
   {
-    return protocolBytesSize + (EspnowMeshBackend::useEncryptedMessages() ? aeadMetadataSize : 0);
+    return protocolBytesSize + (EspnowTransmitter::useEncryptedMessages() ? aeadMetadataSize : 0);
+  }
+
+  uint32_t getMaxBytesPerTransmission()
+  {
+    return 250;
+  }
+
+  uint32_t getMaxMessageBytesPerTransmission()
+  {
+    return getMaxBytesPerTransmission() - metadataSize();
   }
   
   String getHashKeyLength(uint8_t *transmissionDataArray, const uint8_t transmissionLength)
@@ -93,5 +104,26 @@ namespace EspnowProtocolInterpreter
   {
     // At least one of the leftmost half of bits in messageID is 1 if the transmission is encrypted.
     return messageID & uint64LeftmostBits;
+  }
+
+  bool usesConstantSessionKey(const char messageType)
+  {
+    return messageType == 'A' || messageType == 'C';
+  }
+  
+  uint64_t createSessionKey()
+  {
+    uint64_t newSessionKey = MeshUtilityFunctions::randomUint64();
+    return usesEncryption(newSessionKey) ? newSessionKey : (newSessionKey | ((uint64_t)RANDOM_REG32) << 32 | uint64MSB); // TODO: Replace RANDOM_REG32 use with ESP.random().
+  }
+
+  macAndType_td createMacAndTypeValue(const uint64_t uint64Mac, const char messageType)
+  {
+    return static_cast<macAndType_td>(uint64Mac << 8 | (uint64_t)messageType);
+  }
+  
+  uint64_t macAndTypeToUint64Mac(const macAndType_td &macAndTypeValue)
+  {
+    return static_cast<uint64_t>(macAndTypeValue) >> 8;
   }
 }

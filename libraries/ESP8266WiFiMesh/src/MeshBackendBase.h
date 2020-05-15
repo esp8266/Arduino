@@ -22,6 +22,7 @@
 #include <ESP8266WiFi.h>
 #include "TransmissionOutcome.h"
 #include "NetworkInfoBase.h"
+#include "ConditionalPrinter.h"
 
 enum class MeshBackendType
 {
@@ -118,8 +119,8 @@ public:
    * @param newWiFiChannel The WiFi channel to change to. Valid values are determined by wifi_get_country, usually integers from 1 to 11 or 1 to 13.
    *                          
    */
-  void setWiFiChannel(const uint8 newWiFiChannel);
-  uint8 getWiFiChannel() const;
+  virtual void setWiFiChannel(const uint8 newWiFiChannel);
+  virtual uint8 getWiFiChannel() const;
 
   /**
    * Change the SSID used by this MeshBackendBase instance. 
@@ -285,6 +286,8 @@ public:
   static void warningPrint(const String &stringToPrint, const bool newline = true);
 
   MeshBackendType getClassType() const;
+  
+  virtual void printAPInfo(const NetworkInfoBase &apNetworkInfo);
 
 protected:
 
@@ -296,7 +299,6 @@ protected:
   static bool latestTransmissionSuccessfulBase(const std::vector<TransmissionOutcome> &latestTransmissionOutcomes);
 
   virtual void scanForNetworks(const bool scanAllWiFiChannels);
-  virtual void printAPInfo(const NetworkInfoBase &apNetworkInfo);
 
   /**
    * Called just before we activate the AP.
@@ -314,6 +316,8 @@ protected:
 
   static std::shared_ptr<bool> _scanMutex;
 
+  ConditionalPrinter _conditionalPrinter;
+
 private:
 
   MeshBackendType _classType;
@@ -324,7 +328,6 @@ private:
   String _SSIDSuffix;
   String _meshPassword;
   uint8 _meshWiFiChannel;
-  bool _verboseMode;
   String _message;
   bool _scanHidden = false;
   bool _apHidden = false;
@@ -333,8 +336,6 @@ private:
   responseHandlerType _responseHandler;
   networkFilterType _networkFilter;
   transmissionOutcomesUpdateHookType _transmissionOutcomesUpdateHook = [](MeshBackendBase &){return true;};
-
-  static bool _printWarnings;
 };
 
 #endif

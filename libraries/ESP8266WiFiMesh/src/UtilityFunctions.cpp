@@ -45,4 +45,17 @@ namespace MeshUtilityFunctions
   {
     return (((uint64_t)RANDOM_REG32 << 32) | (uint64_t)RANDOM_REG32);
   }
+
+  template <typename T>
+  T *getMapValue(std::map<uint64_t, T> &mapIn, const uint64_t keyIn)
+  {
+    typename std::map<uint64_t, T>::iterator mapIterator = mapIn.find(keyIn);
+
+    if(mapIterator != mapIn.end())
+    {
+      return &mapIterator->second;
+    }
+
+    return nullptr;
+  }
 }

@@ -24,6 +24,7 @@
 #include "TcpIpMeshBackend.h"
 #include "TypeConversionFunctions.h"
 #include "MutexTracker.h"
+#include "ExpiringTimeTracker.h"
 
 namespace
 {

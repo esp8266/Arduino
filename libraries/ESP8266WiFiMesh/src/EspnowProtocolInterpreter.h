@@ -57,11 +57,19 @@ namespace EspnowProtocolInterpreter
   constexpr uint8_t protocolBytesSize = 16;
   constexpr uint8_t aeadMetadataSize = 28;
   uint8_t metadataSize();
+  uint32_t getMaxBytesPerTransmission();
+  uint32_t getMaxMessageBytesPerTransmission();
+  
+  constexpr uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  constexpr uint64_t uint64BroadcastMac = 0xFFFFFFFFFFFF;
+    
+  constexpr uint8_t maxEncryptedConnections = 6; // This is limited by the ESP-NOW API. Max 6 in AP or AP+STA mode. Max 10 in STA mode. See "ESP-NOW User Guide" for more info. 
 
   constexpr uint8_t encryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
   constexpr uint8_t hashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
 
   constexpr uint64_t uint64LeftmostBits = 0xFFFFFFFF00000000;
+  constexpr uint64_t uint64MSB = 0x8000000000000000;
 
   String getHashKeyLength(uint8_t *transmissionDataArray, const uint8_t transmissionLength);
   char getMessageType(const uint8_t *transmissionDataArray);
@@ -74,6 +82,23 @@ namespace EspnowProtocolInterpreter
   uint8_t *setMessageID(uint8_t *transmissionDataArray, const uint64_t messageID);
 
   bool usesEncryption(const uint64_t messageID);
+  bool usesConstantSessionKey(const char messageType);
+
+  /**
+   * Create a new session key for an encrypted connection using the built in RANDOM_REG32 of the ESP8266. 
+   * Should only be used when initializing a new connection. 
+   * Use generateMessageID instead when the encrypted connection is already initialized to keep the connection synchronized.
+   * 
+   * @return A uint64_t containing a new session key for an encrypted connection.
+   */
+  uint64_t createSessionKey();
+
+  enum class macAndType_td : uint64_t {};
+  using messageID_td = uint64_t;
+  using peerMac_td = uint64_t;
+  
+  macAndType_td createMacAndTypeValue(const uint64_t uint64Mac, const char messageType);
+  uint64_t macAndTypeToUint64Mac(const macAndType_td &macAndTypeValue);
 }
 
 #endif

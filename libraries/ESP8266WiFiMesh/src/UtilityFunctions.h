@@ -27,12 +27,16 @@
 #define __UTILITYFUNCTIONS_H__
 
 #include <inttypes.h>
+#include <map>
 
 namespace MeshUtilityFunctions
 {
   bool macEqual(const uint8_t *macOne, const uint8_t *macTwo);
   
   uint64_t randomUint64();
+
+  template <typename T>
+  T *getMapValue(std::map<uint64_t, T> &mapIn, const uint64_t keyIn);
 }
 
 #endif

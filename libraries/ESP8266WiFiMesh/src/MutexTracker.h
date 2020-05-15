@@ -35,13 +35,6 @@ class MutexTracker
 {
   public:
 
-    /*
-     * If captureBan is true, trying to capture a mutex will always fail. 
-     * Set to false by default.
-     * captureBan can be managed by MutexTracker like any other mutex.
-     */
-    static std::shared_ptr<bool> captureBan();
-
     /**
     * Attempts to capture the mutex. Use the mutexCaptured() method to check success.
     */
@@ -55,6 +48,14 @@ class MutexTracker
     MutexTracker(const std::shared_ptr<bool> &mutexToCapture, const std::function<void()> destructorHook);
 
     ~MutexTracker();
+
+    /*
+     * If captureBan is active, trying to capture a mutex will always fail. 
+     * Inactive by default.
+     * captureBan can be managed by MutexTracker like any other mutex.
+     */
+    static MutexTracker captureBan();
+    static MutexTracker captureBan(const std::function<void()> destructorHook);
 
     bool mutexCaptured() const;
 

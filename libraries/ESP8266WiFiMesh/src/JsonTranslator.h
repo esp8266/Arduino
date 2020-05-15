@@ -138,8 +138,6 @@ namespace JsonTranslator
    */
   bool decodeRadix(const String &jsonString, const String &valueIdentifier, uint64_t &value, const uint8_t radix = 16);
   
-  bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, const uint8_t hashKeyLength);
-  
   bool getConnectionState(const String &jsonString, String &result);
   /**
    * Stores the value of the password field within jsonString into the result variable. 

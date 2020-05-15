@@ -31,8 +31,6 @@ namespace
 
 std::shared_ptr<bool> MeshBackendBase::_scanMutex = std::make_shared<bool>(false);
 
-bool MeshBackendBase::_printWarnings = true;
-
 MeshBackendBase::MeshBackendBase(const requestHandlerType requestHandler, const responseHandlerType responseHandler, const networkFilterType networkFilter, const MeshBackendType classType)
 {
   setRequestHandler(requestHandler);
@@ -52,6 +50,22 @@ void MeshBackendBase::setClassType(const MeshBackendType classType)
 }
 
 MeshBackendType MeshBackendBase::getClassType() const {return _classType;}
+
+void MeshBackendBase::setVerboseModeState(const bool enabled) { _conditionalPrinter.setVerboseModeState(enabled); }
+bool MeshBackendBase::verboseMode() const { return _conditionalPrinter.verboseMode(); }
+
+void MeshBackendBase::verboseModePrint(const String &stringToPrint, const bool newline) const
+{
+  _conditionalPrinter.verboseModePrint(stringToPrint, newline);
+}
+
+void MeshBackendBase::setPrintWarnings(const bool printEnabled) { ConditionalPrinter::setPrintWarnings(printEnabled); }
+bool MeshBackendBase::printWarnings() {return ConditionalPrinter::printWarnings();}
+
+void MeshBackendBase::warningPrint(const String &stringToPrint, const bool newline)
+{
+  ConditionalPrinter::warningPrint(stringToPrint, newline);
+}
 
 void MeshBackendBase::activateAP()
 {
