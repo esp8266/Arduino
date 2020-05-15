@@ -1206,12 +1206,8 @@ bool HTTPClient::hasHeader(const char* name)
  */
 bool HTTPClient::connect(void)
 {
-    if(connected()) {
-        if(_reuse) {
-            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
-        }
+    if(_reuse && _canReuse && connected()) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
         while(_client->available() > 0) {
             _client->read();
         }
