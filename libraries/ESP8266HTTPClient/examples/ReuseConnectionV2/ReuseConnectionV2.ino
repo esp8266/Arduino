@@ -70,7 +70,7 @@ void loop() {
       http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
       //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
     }
-     
+
     if (pass == 10) {
       // On the 11th loop(), c
       pass++;
