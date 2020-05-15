@@ -72,10 +72,8 @@ void loop() {
     }
 
     if (pass == 10) {
-      // On the 11th loop(), c
-      pass++;
       http.end();
-      Serial.println("Done testing, now wait forever");
+      Serial.println("Done testing");
     } else {
       Serial.println("\n\n\nWait 5 second...\n");
       delay(5000);
