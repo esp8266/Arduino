@@ -234,6 +234,8 @@ namespace brssl {
     if (po) {
       free(po->name);
       free(po->data);
+      po->name = nullptr;
+      po->data = nullptr;
     }
   }
 
