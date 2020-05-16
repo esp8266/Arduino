@@ -53,14 +53,18 @@ ESP8266WebServer server(port);
 
 #define SSE_MAX_CHANNELS 8  // in this simplified example, only eight SSE clients subscription allowed
 struct SSESubscription {
-  uint32_t clientIP;
+  IPAddress clientIP;
   WiFiClient client;
   Ticker keepAliveTimer;
 } subscription[SSE_MAX_CHANNELS];
 uint8_t subscriptionCount = 0;
 
-unsigned short sensorA = 0, sensorB = 0;   //Simulate two sensors
-Ticker update;
+typedef struct {
+  const char *name;
+  unsigned short value;
+  Ticker update;
+} sensorType;
+sensorType sensor[2];
 
 void handleNotFound() {
   Serial.println(F("Handle not found"));
@@ -92,7 +96,7 @@ void SSEKeepAlive() {
       subscription[i].keepAliveTimer.detach();
       client.flush();
       client.stop();
-      subscription[i].clientIP = 0;
+      subscription[i].clientIP = {0,0,0,0};
       subscriptionCount--;
     }
   }
@@ -103,7 +107,7 @@ void SSEKeepAlive() {
 void SSEHandler(uint8_t channel) {
   WiFiClient client = server.client();
   SSESubscription &s = subscription[channel];
-  if (s.clientIP != uint32_t(client.remoteIP())) { // IP addresses don't match, reject this client
+  if (s.clientIP != client.remoteIP()) { // IP addresses don't match, reject this client
     Serial.printf_P(PSTR("SSEHandler - unregistered client with IP %s tries to listen\n"), server.client().remoteIP().toString().c_str());
     return handleNotFound();
   }
@@ -118,10 +122,11 @@ void SSEHandler(uint8_t channel) {
 
 void handleAll() {
   const char *uri = server.uri().c_str();
-  if (strncmp_P(uri, PSTR("/rest/events/"), sizeof("/rest/events"))) {
+  const char *restEvents = PSTR("/rest/events/");
+  if (strncmp_P(uri, restEvents, strlen_P(restEvents))) {
     return handleNotFound();
   }
-  uri += sizeof("/rest/events");
+  uri += strlen_P(restEvents); // Skip the "/rest/events/" and get to the channel number
   unsigned int channel = atoi(uri);
   if (channel < SSE_MAX_CHANNELS) {
     return SSEHandler(channel);
@@ -134,12 +139,11 @@ void SSEBroadcastState(const char *sensorName, unsigned short prevSensorValue, u
     if (!(subscription[i].clientIP)) {
       continue;
     }
-    WiFiClient client = subscription[i].client;
     String IPaddrstr = IPAddress(subscription[i].clientIP).toString();
-    if (client.connected()) {
+    if (subscription[i].client.connected()) {
       Serial.printf_P(PSTR("broadcast status change to client IP %s on channel %d for %s with new state %d\n"),
                       IPaddrstr.c_str(), i, sensorName, sensorValue);
-      client.printf_P(PSTR("event: event\ndata: {\"TYPE\":\"STATE\", \"%s\":{\"state\":%d, \"prevState\":%d}}\n\n"),
+      subscription[i].client.printf_P(PSTR("event: event\ndata: {\"TYPE\":\"STATE\", \"%s\":{\"state\":%d, \"prevState\":%d}}\n\n"),
                       sensorName, sensorValue, prevSensorValue);
     } else {
       Serial.printf_P(PSTR("SSEBroadcastState - client %s registered on channel %d but not listening\n"), IPaddrstr.c_str(), i);
@@ -148,18 +152,21 @@ void SSEBroadcastState(const char *sensorName, unsigned short prevSensorValue, u
 }
 
 // Simulate sensors
-void updateSensor(const char* name, unsigned short *value) {
+void updateSensor(sensorType &sensor) {
   unsigned short newVal = (unsigned short)RANDOM_REG32; // (not so good) random value for the sensor
-  unsigned short val = *value;
-  Serial.printf_P(PSTR("update sensor %s - previous state: %d, new state: %d\n"), name, val, newVal);
-  if (val != newVal) {
-    SSEBroadcastState(name, val, newVal);  // only broadcast if state is different
+  Serial.printf_P(PSTR("update sensor %s - previous state: %d, new state: %d\n"), sensor.name, sensor.value, newVal);
+  if (sensor.value != newVal) {
+    SSEBroadcastState(sensor.name, sensor.value, newVal);  // only broadcast if state is different
   }
-  *value = newVal;
-  update.once(rand() % 20 + 10, std::bind(updateSensor, name, value));  // randomly update sensor A
+  sensor.value = newVal;
+  sensor.update.once(rand() % 20 + 10, std::bind(updateSensor, sensor));  // randomly update sensor
 }
 
 void handleSubscribe() {
+  if (subscriptionCount == SSE_MAX_CHANNELS - 1) {
+    return handleNotFound();  // We ran out of channels
+  }
+
   uint8_t channel;
   IPAddress clientIP = server.client().remoteIP();   // get IP address of client
   String SSEurl = F("http://");
@@ -169,15 +176,12 @@ void handleSubscribe() {
   size_t offset = SSEurl.length();
   SSEurl += F("/rest/events/");
 
-  if (subscriptionCount == SSE_MAX_CHANNELS - 1) {
-    return handleNotFound();  // We ran out of channels
-  }
   ++subscriptionCount;
   for (channel = 0; channel < SSE_MAX_CHANNELS; channel++) // Find first free slot
     if (!subscription[channel].clientIP) {
       break;
     }
-  subscription[channel] = {(uint32_t) clientIP, server.client(), Ticker()};
+  subscription[channel] = {clientIP, server.client(), Ticker()};
   SSEurl += channel;
   Serial.printf_P(PSTR("Allocated channel %d, on uri %s\n"), channel, SSEurl.substring(offset).c_str());
   //server.on(SSEurl.substring(offset), std::bind(SSEHandler, &(subscription[channel])));
@@ -207,8 +211,10 @@ void setup(void) {
   }
 
   startServers();   // start web and SSE servers
-  updateSensor("sensorA", &sensorA);
-  updateSensor("sensorB", &sensorB);
+  sensor[0].name = "sensorA";
+  sensor[1].name = "sensorB";
+  updateSensor(sensor[0]);
+  updateSensor(sensor[1]);
 }
 
 void loop(void) {
