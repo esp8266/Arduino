@@ -87,15 +87,14 @@ void SSEKeepAlive() {
     if (!(subscription[i].clientIP)) {
       continue;
     }
-    WiFiClient client = subscription[i].client;
-    if (client.connected()) {
+    if (subscription[i].client.connected()) {
       Serial.printf_P(PSTR("SSEKeepAlive - client is still listening on channel %d\n"), i);
-      client.println(F("event: event\ndata: { \"TYPE\":\"KEEP-ALIVE\" }\n"));   // Extra newline required by SSE standard
+      subscription[i].client.println(F("event: event\ndata: { \"TYPE\":\"KEEP-ALIVE\" }\n"));   // Extra newline required by SSE standard
     } else {
       Serial.printf_P(PSTR("SSEKeepAlive - client not listening on channel %d, remove subscription\n"), i);
       subscription[i].keepAliveTimer.detach();
-      client.flush();
-      client.stop();
+      subscription[i].client.flush();
+      subscription[i].client.stop();
       subscription[i].clientIP = INADDR_NONE;
       subscriptionCount--;
     }
