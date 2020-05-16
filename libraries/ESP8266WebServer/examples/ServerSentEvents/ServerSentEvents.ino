@@ -96,7 +96,7 @@ void SSEKeepAlive() {
       subscription[i].keepAliveTimer.detach();
       client.flush();
       client.stop();
-      subscription[i].clientIP = {0,0,0,0};
+      subscription[i].clientIP = INADDR_NONE;
       subscriptionCount--;
     }
   }
@@ -144,7 +144,7 @@ void SSEBroadcastState(const char *sensorName, unsigned short prevSensorValue, u
       Serial.printf_P(PSTR("broadcast status change to client IP %s on channel %d for %s with new state %d\n"),
                       IPaddrstr.c_str(), i, sensorName, sensorValue);
       subscription[i].client.printf_P(PSTR("event: event\ndata: {\"TYPE\":\"STATE\", \"%s\":{\"state\":%d, \"prevState\":%d}}\n\n"),
-                      sensorName, sensorValue, prevSensorValue);
+                                      sensorName, sensorValue, prevSensorValue);
     } else {
       Serial.printf_P(PSTR("SSEBroadcastState - client %s registered on channel %d but not listening\n"), IPaddrstr.c_str(), i);
     }
