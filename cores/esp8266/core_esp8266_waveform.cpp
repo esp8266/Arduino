@@ -67,8 +67,8 @@ enum class WaveformMode : uint8_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2, 
 typedef struct {
   uint32_t nextPeriodCcy; // ESP clock cycle when a period begins. If WaveformMode::INIT, temporarily holds positive phase offset ccy count
   uint32_t endDutyCcy;   // ESP clock cycle when going from duty to off
-  uint32_t dutyCcys;     // Set next off cycle at low->high to maintain phase
-  uint32_t periodCcys;   // Set next phase cycle at low->high to maintain phase
+  int32_t dutyCcys;     // Set next off cycle at low->high to maintain phase
+  int32_t periodCcys;   // Set next phase cycle at low->high to maintain phase
   uint32_t expiryCcy;    // For time-limited waveform, the CPU clock cycle when this waveform must stop. If WaveformMode::UPDATE, temporarily holds relative ccy count
   WaveformMode mode;
   int8_t alignPhase;     // < 0 no phase alignment, otherwise starts waveform in relative phase offset to given pin
@@ -249,14 +249,13 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 
 // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
 // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
-static ICACHE_RAM_ATTR uint32_t __attribute__((noinline)) getScaledCcyCount(uint32_t ref) {
+static inline ICACHE_RAM_ATTR int32_t scaleCcys(int32_t ccys) {
   constexpr bool cpuFreq80MHz = clockCyclesPerMicrosecond() == 80;
-  const uint32_t elapsed = ESP.getCycleCount() - ref;
   if (cpuFreq80MHz) {
-    return ref + ((CPU2X & 1) ? elapsed >> 1 : elapsed);
+    return ((CPU2X & 1) ? ccys << 1 : ccys);
   }
   else {
-    return ref + ((CPU2X & 1) ? elapsed : elapsed << 1);
+    return ((CPU2X & 1) ? ccys : ccys >> 1);
   }
 }
 
@@ -297,7 +296,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
       // fall through
     case WaveformMode::UPDATEEXPIRY:
-      wave.expiryCcy += wave.nextPeriodCcy; // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
+      // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
+      wave.expiryCcy = wave.nextPeriodCcy + scaleCcys(wave.expiryCcy);
       wave.mode = WaveformMode::EXPIRES;
       break;
     default:
@@ -329,10 +329,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   const int stopPin = waveform.nextPin;
   int pin = stopPin;
   while (busyPins) {
-    uint32_t now;
-    do {
-      now = getScaledCcyCount(isrStartCcy);
-    } while (static_cast<int32_t>(isrNextEventCcy - now) > 0);
+    while (static_cast<int32_t>(isrNextEventCcy - ESP.getCycleCount()) > 0) {
+    }
     isrNextEventCcy = isrTimeoutCcy;
     do {
       const uint32_t pinBit = 1UL << pin;
@@ -343,6 +341,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       Waveform& wave = waveform.pins[pin];
 
       uint32_t waveNextEventCcy = (waveform.states & pinBit) ? wave.endDutyCcy : wave.nextPeriodCcy;
+      const uint32_t now = ESP.getCycleCount();
       if (WaveformMode::EXPIRES == wave.mode &&
         static_cast<int32_t>(waveNextEventCcy - wave.expiryCcy) >= 0 &&
         static_cast<int32_t>(now - wave.expiryCcy) >= 0) {
@@ -356,11 +355,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           if (waveform.states & pinBit) {
             // active configuration and forward are 100% duty
             if (wave.periodCcys == wave.dutyCcys) {
-              wave.nextPeriodCcy += wave.periodCcys;
+              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
               waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else if (wave.autoPwm && static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
-              const uint32_t adj = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
+              const uint32_t adj = (overshootCcys + scaleCcys(wave.dutyCcys)) / wave.periodCcys;
               // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
               waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy + adj * wave.dutyCcys;
               wave.nextPeriodCcy += adj * wave.periodCcys;
@@ -381,14 +380,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           }
           else {
             if (!wave.dutyCcys) {
-              wave.nextPeriodCcy += wave.periodCcys;
+              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
               wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
-              wave.nextPeriodCcy += wave.periodCcys;
-              wave.endDutyCcy = now + wave.dutyCcys;
+              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
+              wave.endDutyCcy = now + scaleCcys(wave.dutyCcys);
               if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) >= 0) {
-                const uint32_t adj = (overshootCcys + wave.dutyCcys) / wave.periodCcys;
+                const uint32_t adj = (overshootCcys + scaleCcys(wave.dutyCcys)) / wave.periodCcys;
                 wave.nextPeriodCcy += adj * wave.periodCcys;
                 if (wave.autoPwm) {
                   // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
@@ -425,16 +424,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           isrNextEventCcy = waveNextEventCcy;
         }
       }
-
-      now = getScaledCcyCount(isrStartCcy);
     } while ((pin = (pin < waveform.endPin) ? pin + 1 : waveform.startPin) != stopPin);
   }
 
   int32_t callbackCcys = 0;
   if (waveform.timer1CB) {
-    callbackCcys = microsecondsToClockCycles(waveform.timer1CB());
+    callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()));
   }
-  const uint32_t now = getScaledCcyCount(isrStartCcy);
+  const uint32_t now = ESP.getCycleCount();
   int32_t nextTimerCcys = waveform.nextEventCcy - now;
   // Account for unknown duration of timer1CB().
   if (waveform.timer1CB && nextTimerCcys > callbackCcys) {
@@ -454,8 +451,5 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Register access is fast and edge IRQ was configured before.
   // Timer is 80MHz fixed. 160MHz binaries need scaling.
-  // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
-  // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
-  constexpr bool cpuFreq80MHz = clockCyclesPerMicrosecond() == 80;
-  T1L = cpuFreq80MHz ? nextTimerCcys : nextTimerCcys >> 1;
+  T1L = (CPU2X & 1) ? nextTimerCcys >> 1 : nextTimerCcys;
 }
