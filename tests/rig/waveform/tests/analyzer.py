@@ -24,10 +24,20 @@ class LogicAnalyzer:
         if code != 0:
             return None
         ret = []
+        if 'mhz' in rate:
+            rateHz = int(rate.split('m')[0]) * 1e6
+        elif 'khz' in rate:
+            rateHz = int(rate.split('k')[0]) * 1e3
+        else:
+            rateHz = int(rate)
+        csvStep = 0
         for row in out.splitlines():
             if row.startswith(b';') or row.startswith(b'nano'):
                 continue # Skip any comments and header line
             line = [ int(i) for i in row.split(b',') ]
+            # Adjust for CSV timestamp issue https://github.com/sigrokproject/libsigrok/pull/63
+            line[0] = 1e9 * csvStep / rateHz
+            csvStep = csvStep + 1
             ret += [ line ]
         return ret
 
