@@ -1,15 +1,15 @@
 # ESP8266 WiFi Mesh
 
 ## Contents
-1. [Overview]
-   * [How does it work?]
-2. [Tell me more]
+1. [Overview](#Overview)
+   * [How does it work?](#Work)
+2. [Tell me more!](#More)
    * [EspnowMeshBackend](#EspnowMeshBackendMore)
    * [TcpIpMeshBackend](#TcpIpMeshBackendMore)
    * [FloodingMesh](#FloodingMeshMore)
 
 
-## Overview
+## <a name="Overview"></a>Overview
 
 This is a library for creating a mesh network using the ESP8266.
 
@@ -17,9 +17,9 @@ The library has been tested and works with Arduino core for ESP8266 version 2.7.
 
 **Note:** This mesh library has been extensively rewritten for core release 2.7.2. The old method signatures have been retained for compatibility purposes, but will be removed in core release 3.0.0. If you are still using these old method signatures please consider migrating to the new API shown in the `EspnowMeshBackend.h` or `TcpIpMeshBackend.h` source files.
 
-### How does it work?
+### <a name="Work"></a>How does it work?
 
-The ESP8266 WiFi Mesh library is a cake. Metaphorically speaking. At the bottom you have the general ESP8266 Arduino core WiFi functionality. On top of this two mesh backends have been created (`EspnowMeshBackend` and `TcpIpMeshBackend`), a yummy filling that completely covers the bottom. Then at the very top over the backends is the beautiful and delicious frosting: `FloodingMesh`. `FloodingMesh` is an actual mesh network implementation that uses the `EspnowMeshBackend`.
+The ESP8266 WiFi Mesh library is a cake, metaphorically speaking. At the bottom you have the general ESP8266 Arduino core WiFi functionality. On top of this two mesh backends have been created (`EspnowMeshBackend` and `TcpIpMeshBackend`), a yummy filling that completely covers the bottom. Then at the very top over the backends is the beautiful and delicious frosting: `FloodingMesh`. `FloodingMesh` is an actual mesh network implementation that uses the `EspnowMeshBackend`.
 
 Eating the cake would typically be a process which involves all the layers, but it is completely possible to use both the EspnowMeshBackend and the TcpIpMeshBackend separately from FloodingMesh, perhaps to construct your own mesh network architecture or just to simplify the usage of TCP/IP or ESP-NOW. If you have made a nice mesh architecture with this library that you would like to share with the rest of the world, feel free to make a PR with it!
 
@@ -31,7 +31,7 @@ Finally, three things are important to note:
 2. Both the `EspnowMeshBackend` and the `TcpIpMeshBackend` can be used simultaneously on the same node. However, since there is only one WiFi radio on the ESP8266, only one backend at a time will be responsible for the settings of this radio (SSID, WiFi channel etc.). The backend in control is known as the `APController` in the library. Both backends can still send messages, regardless of who is `APController`.
 3. The `MeshBackendBase`, `EspnowMeshBackend`, `TcpIpMeshBackend` and `FloodingMesh` source files are supposed to be the main front-ends of the library and are all extensively documented. If you wonder how something is working, chances are good that you will find an answer in the documentation of those files.
 
-## Tell me more
+## <a name="More"></a>Tell me more!
 
 ### <a name="EspnowMeshBackendMore"></a>EspnowMeshBackend
 
