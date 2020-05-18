@@ -135,7 +135,8 @@ typedef struct PWMState {
 } PWMState;
 
 static PWMState pwmState;
-static uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / 1000;
+static uint32_t _pwmFreq = 1000;
+static uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / _pwmFreq;
 
 
 // If there are no more scheduled activities, shut down Timer 1.
@@ -168,14 +169,17 @@ static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range);
 
 // Called when analogWriteFreq() changed to update the PWM total period
 void _setPWMFreq(uint32_t freq) {
+  _pwmFreq = freq;
+
   // Convert frequency into clock cycles
   uint32_t cc = microsecondsToClockCycles(1000000UL) / freq;
 
   // Simple static adjustment to bring period closer to requested due to overhead
+  // Empirically determined as a constant PWM delay and a function of the number of PWMs
 #if F_CPU == 80000000
-  cc -= microsecondsToClockCycles(2);
+  cc -= ((microsecondsToClockCycles(pwmState.cnt) * 13) >> 4) + 110;
 #else
-  cc -= microsecondsToClockCycles(1);
+  cc -= ((microsecondsToClockCycles(pwmState.cnt) * 10) >> 4) + 75;
 #endif
 
   if (cc == _pwmPeriod) {
@@ -314,6 +318,10 @@ bool _setPWM(int pin, uint32_t val, uint32_t range) {
   initTimer();
   _notifyPWM(&p, true);
   disableIdleTimer();
+
+  // Potentially recalculate the PWM period if we've added another pin
+  _setPWMFreq(_pwmFreq);
+
   return true;
 }
 
