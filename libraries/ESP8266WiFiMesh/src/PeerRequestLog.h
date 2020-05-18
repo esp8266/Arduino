@@ -56,10 +56,10 @@ public:
 private:
 
   uint64_t _requestID;
-  bool _requestEncrypted;
   String _authenticationPassword;
-  uint8_t _encryptedConnectionsSoftLimit;
   String _peerRequestNonce;
+  bool _requestEncrypted;
+  uint8_t _encryptedConnectionsSoftLimit;
 };
 
 #endif

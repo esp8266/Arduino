@@ -70,11 +70,11 @@ public:
   bool isHidden() const;
 
   static uint8_t * const defaultBSSID;
+  static const uint8_t defaultEncryptionType;
+  static const bool defaultIsHidden;
   static const String defaultSSID;
   static const int32_t defaultWifiChannel;
-  static const uint8_t defaultEncryptionType;
   static const int32_t defaultRSSI;
-  static const bool defaultIsHidden;
 
 protected:
 
@@ -90,12 +90,12 @@ protected:
 
 private:
 
-  uint8_t _bssidArray[6] {0};
   uint8_t *_BSSID = defaultBSSID;
   String _SSID = defaultSSID;
   int32_t _wifiChannel = defaultWifiChannel;
-  uint8_t _encryptionType = defaultEncryptionType; // see enum wl_enc_type for values
   int32_t _RSSI = defaultRSSI;
+  uint8_t _bssidArray[6] {0};
+  uint8_t _encryptionType = defaultEncryptionType; // see enum wl_enc_type for values
   bool _isHidden = defaultIsHidden;
 };
 

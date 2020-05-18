@@ -48,10 +48,9 @@ public:
 private:
 
   TimeTracker _timeTracker;
+  String _totalMessage;
   uint8_t _transmissionsReceived = 0;
   uint8_t _transmissionsExpected;
-  String _totalMessage;
-
 };
 
 #endif

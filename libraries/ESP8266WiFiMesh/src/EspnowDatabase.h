@@ -202,11 +202,6 @@ private:
   ConditionalPrinter & _conditionalPrinter;
 
   uint32_t _autoEncryptionDuration = 50;
-
-  uint8_t _senderMac[6] = {0};
-  uint8_t _senderAPMac[6] = {0};
-
-  uint8 _espnowWiFiChannel;
   
   template <typename T, typename U>
   static void deleteExpiredLogEntries(std::map<std::pair<U, uint64_t>, T> &logEntries, const uint32_t maxEntryLifetimeMs);
@@ -218,6 +213,11 @@ private:
 
   template <typename T>
   static void deleteExpiredLogEntries(std::list<T> &logEntries, const uint32_t maxEntryLifetimeMs);
+
+  uint8_t _senderMac[6] = {0};
+  uint8_t _senderAPMac[6] = {0};
+  
+  uint8 _espnowWiFiChannel;
 };
 
 #endif

@@ -57,9 +57,9 @@ EspnowMeshBackend::EspnowMeshBackend(const requestHandlerType requestHandler, co
                                      const broadcastFilterType broadcastFilter, const String &meshPassword, const String &ssidPrefix, const String &ssidSuffix, const bool verboseMode,
                                      const uint8 meshWiFiChannel) 
                                      : MeshBackendBase(requestHandler, responseHandler, networkFilter, MeshBackendType::ESP_NOW), 
-                                       _database(_conditionalPrinter, meshWiFiChannel), _connectionManager(_conditionalPrinter, _database),
-                                       _transmitter(_conditionalPrinter, _database, _connectionManager), 
-                                       _encryptionBroker(_conditionalPrinter, _database, _connectionManager, _transmitter)
+                                       _database(*getConditionalPrinter(), meshWiFiChannel), _connectionManager(*getConditionalPrinter(), *getDatabase()),
+                                       _transmitter(*getConditionalPrinter(), *getDatabase(), *getConnectionManager()), 
+                                       _encryptionBroker(*getConditionalPrinter(), *getDatabase(), *getConnectionManager(), *getTransmitter())
 {
   setBroadcastFilter(broadcastFilter);
   setSSID(ssidPrefix, emptyString, ssidSuffix);
@@ -241,7 +241,7 @@ void EspnowMeshBackend::espnowReceiveCallbackWrapper(uint8_t *macaddr, uint8_t *
     {
       // chacha20Poly1305Decrypt decrypts dataArray in place.
       // We are using the protocol bytes as a key salt.
-      if(!CryptoInterface::chacha20Poly1305Decrypt(dataArray + metadataSize(), len - metadataSize(), getEspnowMessageEncryptionKey(), dataArray, 
+      if(!experimental::crypto::ChaCha20Poly1305::decrypt(dataArray + metadataSize(), len - metadataSize(), getEspnowMessageEncryptionKey(), dataArray, 
                                                    protocolBytesSize, dataArray + protocolBytesSize, dataArray + protocolBytesSize + 12))
       {
         return; // Decryption of message failed.
@@ -470,7 +470,7 @@ void EspnowMeshBackend::espnowReceiveCallback(const uint8_t *macaddr, uint8_t *d
      
     if(response.length() > 0)
     {
-      EspnowDatabase::responsesToSend().push_back(ResponseData(response, macaddr, messageID));
+      EspnowDatabase::responsesToSend().emplace_back(response, macaddr, messageID);
       
       //Serial.println("methodStart Q done " + String(millis() - methodStart));
     }
@@ -626,7 +626,7 @@ void EspnowMeshBackend::setUseEncryptedMessages(const bool useEncryptedMessages)
 }
 bool EspnowMeshBackend::useEncryptedMessages() { return EspnowTransmitter::useEncryptedMessages(); }
 
-void EspnowMeshBackend::setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH])
+void EspnowMeshBackend::setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[experimental::crypto::ENCRYPTION_KEY_LENGTH])
 {
   EspnowTransmitter::setEspnowMessageEncryptionKey(espnowMessageEncryptionKey);
 }
@@ -762,10 +762,10 @@ TransmissionStatusType EspnowMeshBackend::initiateTransmission(const String &mes
   assert(recipientInfo.BSSID() != nullptr); // We need at least the BSSID to connect
   recipientInfo.getBSSID(targetBSSID);
 
-  if(_conditionalPrinter.verboseMode()) // Avoid string generation if not required
+  if(verboseMode()) // Avoid string generation if not required
   {
     printAPInfo(recipientInfo);
-    _conditionalPrinter.verboseModePrint(emptyString);
+    verboseModePrint(emptyString);
   }
 
   return initiateTransmissionKernel(message, targetBSSID);
@@ -778,7 +778,7 @@ TransmissionStatusType EspnowMeshBackend::initiateTransmissionKernel(const Strin
 
   uint32_t transmissionDuration = millis() - transmissionStartTime;
   
-  if(_conditionalPrinter.verboseMode() && transmissionResult == TransmissionStatusType::TRANSMISSION_COMPLETE) // Avoid calculations if not required
+  if(verboseMode() && transmissionResult == TransmissionStatusType::TRANSMISSION_COMPLETE) // Avoid calculations if not required
   {
     totalDurationWhenSuccessful_AT += transmissionDuration;
     ++successfulTransmissions_AT;
@@ -793,14 +793,14 @@ TransmissionStatusType EspnowMeshBackend::initiateTransmissionKernel(const Strin
 
 void EspnowMeshBackend::printTransmissionStatistics() const
 {
-  if(_conditionalPrinter.verboseMode() && successfulTransmissions_AT > 0) // Avoid calculations if not required
+  if(verboseMode() && successfulTransmissions_AT > 0) // Avoid calculations if not required
   {
-    _conditionalPrinter.verboseModePrint(String(F("Average duration of successful transmissions: ")) + String(totalDurationWhenSuccessful_AT/successfulTransmissions_AT) + String(F(" ms.")));
-    _conditionalPrinter.verboseModePrint(String(F("Maximum duration of successful transmissions: ")) + String(maxTransmissionDuration_AT) + String(F(" ms.")));
+    verboseModePrint(String(F("Average duration of successful transmissions: ")) + String(totalDurationWhenSuccessful_AT/successfulTransmissions_AT) + String(F(" ms.")));
+    verboseModePrint(String(F("Maximum duration of successful transmissions: ")) + String(maxTransmissionDuration_AT) + String(F(" ms.")));
   }
   else
   {
-    _conditionalPrinter.verboseModePrint(String(F("No successful transmission.")));
+    verboseModePrint(String(F("No successful transmission.")));
   }
 }
 
@@ -947,6 +947,15 @@ uint8_t EspnowMeshBackend::getBroadcastTransmissionRedundancy() const { return _
 void EspnowMeshBackend::setResponseTransmittedHook(const EspnowTransmitter::responseTransmittedHookType responseTransmittedHook) { _transmitter.setResponseTransmittedHook(responseTransmittedHook); }
 EspnowTransmitter::responseTransmittedHookType EspnowMeshBackend::getResponseTransmittedHook() const { return _transmitter.getResponseTransmittedHook(); }
 
+EspnowDatabase *EspnowMeshBackend::getDatabase() { return &_database; }
+const EspnowDatabase *EspnowMeshBackend::getDatabaseConst() const { return &_database; }
+EspnowConnectionManager *EspnowMeshBackend::getConnectionManager() { return &_connectionManager; }
+const EspnowConnectionManager *EspnowMeshBackend::getConnectionManagerConst() const { return &_connectionManager; }
+EspnowTransmitter *EspnowMeshBackend::getTransmitter() { return &_transmitter; }
+const EspnowTransmitter *EspnowMeshBackend::getTransmitterConst() const { return &_transmitter; }
+EspnowEncryptionBroker *EspnowMeshBackend::getEncryptionBroker() { return &_encryptionBroker; }
+const EspnowEncryptionBroker *EspnowMeshBackend::getEncryptionBrokerConst() const { return &_encryptionBroker; }
+
 void EspnowMeshBackend::sendStoredEspnowMessages(const ExpiringTimeTracker *estimatedMaxDurationTracker)
 {
   EspnowEncryptionBroker::sendPeerRequestConfirmations(estimatedMaxDurationTracker);
@@ -974,12 +983,12 @@ uint32_t EspnowMeshBackend::getMaxMessageLength()
   return EspnowTransmitter::getMaxMessageLength();
 }
 
-void EspnowMeshBackend::setVerboseModeState(const bool enabled) {_conditionalPrinter.setVerboseModeState(enabled); ConditionalPrinter::setStaticVerboseModeState(enabled);}
+void EspnowMeshBackend::setVerboseModeState(const bool enabled) {(*getConditionalPrinter()).setVerboseModeState(enabled); ConditionalPrinter::setStaticVerboseModeState(enabled);}
 bool EspnowMeshBackend::verboseMode() const {return ConditionalPrinter::staticVerboseMode();}
 
 void EspnowMeshBackend::verboseModePrint(const String &stringToPrint, const bool newline) const
 {
-  _conditionalPrinter.verboseModePrint(stringToPrint, newline);
+  (*getConditionalPrinterConst()).verboseModePrint(stringToPrint, newline);
 }
 
 bool EspnowMeshBackend::staticVerboseMode() {return ConditionalPrinter::staticVerboseMode();}

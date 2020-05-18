@@ -291,6 +291,9 @@ public:
 
 protected:
 
+  ConditionalPrinter *getConditionalPrinter();
+  const ConditionalPrinter *getConditionalPrinterConst() const;
+  
   /**
    * @param latestTransmissionOutcomes The transmission outcomes vector to check.
    * 
@@ -316,26 +319,27 @@ protected:
 
   static std::shared_ptr<bool> _scanMutex;
 
-  ConditionalPrinter _conditionalPrinter;
-
 private:
 
   MeshBackendType _classType;
+
+  ConditionalPrinter _conditionalPrinter;
 
   String _SSID;
   String _SSIDPrefix;
   String _SSIDRoot;
   String _SSIDSuffix;
   String _meshPassword;
-  uint8 _meshWiFiChannel;
   String _message;
-  bool _scanHidden = false;
-  bool _apHidden = false;
 
   requestHandlerType _requestHandler;
   responseHandlerType _responseHandler;
   networkFilterType _networkFilter;
   transmissionOutcomesUpdateHookType _transmissionOutcomesUpdateHook = [](MeshBackendBase &){return true;};
+  
+  uint8 _meshWiFiChannel;
+  bool _scanHidden = false;
+  bool _apHidden = false;
 };
 
 #endif

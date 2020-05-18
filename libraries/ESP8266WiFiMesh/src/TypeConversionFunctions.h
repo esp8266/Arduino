@@ -137,7 +137,7 @@ namespace MeshTypeConversionFunctions
   uint8_t *uint64ToMac(const uint64_t macValue, uint8_t *macArray);
   
   /**
-   * Takes a uint64_t value and stores the bits in a uint8_t array. Assumes index 0 of the array should contain MSB. 
+   * Takes a uint64_t value and stores the bits in a uint8_t array. Assumes index 0 of the array should contain MSB (big endian). 
    * 
    * @param value The uint64_t value to convert to a uint8_t array.
    * @param resultArray A uint8_t array that will hold the result once the function returns. Should have a size of at least 8 bytes.
@@ -146,7 +146,7 @@ namespace MeshTypeConversionFunctions
   uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray);
   
   /**
-   * Takes a uint8_t array and converts the first 8 (lowest index) elements to a uint64_t. Assumes index 0 of the array contains MSB.
+   * Takes a uint8_t array and converts the first 8 (lowest index) elements to a uint64_t. Assumes index 0 of the array contains MSB (big endian).
    * 
    * @param inputArray A uint8_t array containing the data to convert to a uint64_t. Should have a size of at least 8 bytes.
    * @return A uint64_t representation of the first 8 bytes of the array.

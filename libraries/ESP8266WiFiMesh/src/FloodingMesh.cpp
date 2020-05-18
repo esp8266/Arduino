@@ -465,7 +465,7 @@ void FloodingMesh::_defaultNetworkFilter(const int numberOfNetworks, MeshBackend
       {
         if(EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance))
         {
-          espnowInstance->connectionQueue().push_back(networkIndex);
+          espnowInstance->connectionQueue().emplace_back(networkIndex);
         }
         else
         {

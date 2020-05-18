@@ -140,13 +140,13 @@ private:
 
   ConditionalPrinter & _conditionalPrinter;
   EspnowDatabase & _database;
-
-  uint8_t _encryptedConnectionsSoftLimit = 6;
+  
+  static ConnectionType getConnectionInfoHelper(const EncryptedConnectionLog *encryptedConnection, uint32_t *remainingDuration, uint8_t *peerMac = nullptr);
 
   uint8_t _espnowEncryptedConnectionKey[EspnowProtocolInterpreter::encryptedConnectionKeyLength] {0};
   uint8_t _espnowHashKey[EspnowProtocolInterpreter::hashKeyLength] {0};
-
-  static ConnectionType getConnectionInfoHelper(const EncryptedConnectionLog *encryptedConnection, uint32_t *remainingDuration, uint8_t *peerMac = nullptr);
+  
+  uint8_t _encryptedConnectionsSoftLimit = 6;
 };
 
 #endif

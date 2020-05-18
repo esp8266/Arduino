@@ -312,13 +312,6 @@ private:
 
   messageHandlerType _messageHandler;
 
-  uint16_t _messageCount = 0;
-  uint16_t _messageLogSize = 100;
-
-  uint8_t _broadcastReceptionRedundancy = 2;
-
-  uint8_t _originMac[6] = {0};
-
   std::map<uint64_t, uint8_t> _messageIDs = {};
   std::queue<messageQueueElementType> _messageIdOrder = {};
   std::list<std::pair<String, bool>> _forwardingBacklog = {};
@@ -331,6 +324,13 @@ private:
   bool _defaultBroadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
   bool _defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance);
   bool _defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance);
+
+  uint8_t _originMac[6] = {0};
+  
+  uint16_t _messageCount = 0;
+  uint16_t _messageLogSize = 100;
+
+  uint8_t _broadcastReceptionRedundancy = 2;
 };
 
 #endif

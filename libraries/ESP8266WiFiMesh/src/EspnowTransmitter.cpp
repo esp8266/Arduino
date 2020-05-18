@@ -36,17 +36,17 @@ namespace
   std::shared_ptr<bool> _espnowTransmissionMutex = std::make_shared<bool>(false);
   std::shared_ptr<bool> _espnowSendToNodeMutex = std::make_shared<bool>(false);
   
+  uint32_t _espnowTransmissionTimeoutMs = 40;
+  uint32_t _espnowRetransmissionIntervalMs = 15;
+  
+  uint8_t _espnowMessageEncryptionKey[experimental::crypto::ENCRYPTION_KEY_LENGTH] = { 0 };
   bool _useEncryptedMessages = false;
-  uint8_t _espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH] = { 0 };
   
   uint8_t _transmissionTargetBSSID[6] = {0};
   
   bool _espnowSendConfirmed = false;
 
   uint8_t _maxTransmissionsPerMessage = 3;
-
-  uint32_t _espnowTransmissionTimeoutMs = 40;
-  uint32_t _espnowRetransmissionIntervalMs = 15; 
 }
 
 EspnowTransmitter::EspnowTransmitter(ConditionalPrinter &conditionalPrinterInstance, EspnowDatabase &databaseInstance, EspnowConnectionManager &connectionManagerInstance) 
@@ -74,11 +74,11 @@ void EspnowTransmitter::setUseEncryptedMessages(const bool useEncryptedMessages)
 }
 bool EspnowTransmitter::useEncryptedMessages() { return _useEncryptedMessages; }
 
-void EspnowTransmitter::setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH])
+void EspnowTransmitter::setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[experimental::crypto::ENCRYPTION_KEY_LENGTH])
 {
   assert(espnowMessageEncryptionKey != nullptr);
    
-  for(int i = 0; i < CryptoInterface::ENCRYPTION_KEY_LENGTH; ++i)
+  for(int i = 0; i < experimental::crypto::ENCRYPTION_KEY_LENGTH; ++i)
   {
     _espnowMessageEncryptionKey[i] = espnowMessageEncryptionKey[i];
   }
@@ -86,7 +86,7 @@ void EspnowTransmitter::setEspnowMessageEncryptionKey(const uint8_t espnowMessag
 
 void EspnowTransmitter::setEspnowMessageEncryptionKey(const String &espnowMessageEncryptionKeySeed)
 {
-  MeshCryptoInterface::initializeKey(_espnowMessageEncryptionKey, CryptoInterface::ENCRYPTION_KEY_LENGTH, espnowMessageEncryptionKeySeed);
+  MeshCryptoInterface::initializeKey(_espnowMessageEncryptionKey, experimental::crypto::ENCRYPTION_KEY_LENGTH, espnowMessageEncryptionKeySeed);
 }
 
 const uint8_t *EspnowTransmitter::getEspnowMessageEncryptionKey()
@@ -331,7 +331,7 @@ TransmissionStatusType EspnowTransmitter::espnowSendToNodeUnsynchronized(const S
     {      
       // chacha20Poly1305Encrypt encrypts transmission in place.
       // We are using the protocol bytes as a key salt.
-      CryptoInterface::chacha20Poly1305Encrypt(transmission + espnowMetadataSize, transmissionSize - espnowMetadataSize, getEspnowMessageEncryptionKey(), transmission, 
+      experimental::crypto::ChaCha20Poly1305::encrypt(transmission + espnowMetadataSize, transmissionSize - espnowMetadataSize, getEspnowMessageEncryptionKey(), transmission, 
                                                protocolBytesSize, transmission + protocolBytesSize, transmission + protocolBytesSize + 12);
     }
     

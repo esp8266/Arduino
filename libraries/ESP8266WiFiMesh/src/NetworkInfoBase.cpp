@@ -61,13 +61,13 @@ NetworkInfoBase::NetworkInfoBase(const uint8_t networkIndex)
 }
 
 NetworkInfoBase::NetworkInfoBase(const String &SSID, const int32_t wifiChannel, const uint8_t BSSID[6], const uint8_t encryptionType, const int32_t RSSI, const bool isHidden) : 
-  _SSID(SSID), _wifiChannel(wifiChannel), _encryptionType(encryptionType), _RSSI(RSSI), _isHidden(isHidden)
+  _SSID(SSID), _wifiChannel(wifiChannel), _RSSI(RSSI), _encryptionType(encryptionType), _isHidden(isHidden)
 {
   storeBSSID(BSSID);
 }
 
-NetworkInfoBase::NetworkInfoBase(const NetworkInfoBase &other) : _SSID(other.SSID()), _wifiChannel(other.wifiChannel()), _encryptionType(other.encryptionType()), 
-                                                                 _RSSI(other.RSSI()), _isHidden(other.isHidden())
+NetworkInfoBase::NetworkInfoBase(const NetworkInfoBase &other) :  _SSID(other.SSID()), _wifiChannel(other.wifiChannel()), _RSSI(other.RSSI()),
+                                                                  _encryptionType(other.encryptionType()), _isHidden(other.isHidden())
 {
   storeBSSID(other.BSSID());
 }

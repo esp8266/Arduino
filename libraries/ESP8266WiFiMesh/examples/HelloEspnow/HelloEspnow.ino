@@ -138,9 +138,9 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
 
       if (targetNodeID < TypeCast::stringToUint64(meshInstance.getNodeID())) {
         if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
-          espnowInstance->connectionQueue().push_back(networkIndex);
+          espnowInstance->connectionQueue().emplace_back(networkIndex);
         } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
-          tcpIpInstance->connectionQueue().push_back(networkIndex);
+          tcpIpInstance->connectionQueue().emplace_back(networkIndex);
         } else {
           Serial.println(F("Invalid mesh backend!"));
         }

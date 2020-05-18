@@ -33,15 +33,15 @@ namespace
 PeerRequestLog::PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, 
                                const String &peerRequestNonce, const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint8_t hashKey[hashKeyLength])
  : EncryptedConnectionData(peerStaMac, peerApMac, 0, 0, EspnowMeshBackend::getEncryptionRequestTimeout(), hashKey), 
-   _requestID(requestID), _requestEncrypted(requestEncrypted), _authenticationPassword(authenticationPassword), 
-   _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit), _peerRequestNonce(peerRequestNonce)
+   _requestID(requestID),  _authenticationPassword(authenticationPassword), _peerRequestNonce(peerRequestNonce)
+   , _requestEncrypted(requestEncrypted), _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit)
 { }
 
 PeerRequestLog::PeerRequestLog(const uint64_t requestID, const bool requestEncrypted, const String &authenticationPassword, const uint8_t encryptedConnectionsSoftLimit, const String &peerRequestNonce, 
                                const uint8_t peerStaMac[6], const uint8_t peerApMac[6], const uint64_t peerSessionKey, const uint64_t ownSessionKey, const uint8_t hashKey[hashKeyLength])
  : EncryptedConnectionData(peerStaMac, peerApMac, peerSessionKey, ownSessionKey, EspnowMeshBackend::getEncryptionRequestTimeout(), hashKey), 
-   _requestID(requestID), _requestEncrypted(requestEncrypted), _authenticationPassword(authenticationPassword), 
-   _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit), _peerRequestNonce(peerRequestNonce)
+   _requestID(requestID), _authenticationPassword(authenticationPassword), _peerRequestNonce(peerRequestNonce)
+   , _requestEncrypted(requestEncrypted), _encryptedConnectionsSoftLimit(encryptedConnectionsSoftLimit)
 { }
 
 void PeerRequestLog::setRequestID(const uint64_t requestID) { _requestID = requestID; }

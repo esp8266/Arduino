@@ -90,9 +90,9 @@ private:
   uint8_t _peerApMac[6] {0};
   uint64_t _peerSessionKey;
   uint64_t _ownSessionKey;
+  std::unique_ptr<ExpiringTimeTracker> _timeTracker = nullptr;
   uint8_t _hashKey[EspnowProtocolInterpreter::hashKeyLength] {0};
   bool _desync = false;
-  std::unique_ptr<ExpiringTimeTracker> _timeTracker = nullptr;
 };
 
 #endif

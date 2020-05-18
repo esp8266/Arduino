@@ -92,7 +92,6 @@
 #include <map>
 #include <list>
 #include "EspnowNetworkInfo.h"
-#include "CryptoInterface.h"
 
 /**
  * An alternative to standard delay(). Will continuously call performEspnowMaintenance() during the waiting time, so that the ESP-NOW node remains responsive.
@@ -483,9 +482,9 @@ public:
    * 
    * This changes the message encryption key for all EspnowMeshBackend instances on this ESP8266.
    * 
-   * @param espnowMessageEncryptionKey An array containing the CryptoInterface::ENCRYPTION_KEY_LENGTH bytes that will be used as the message encryption key.
+   * @param espnowMessageEncryptionKey An array containing the experimental::crypto::ENCRYPTION_KEY_LENGTH bytes that will be used as the message encryption key.
    */
-  static void setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH]);
+  static void setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[experimental::crypto::ENCRYPTION_KEY_LENGTH]);
 
   /** 
    * Change the key used to encrypt/decrypt messages when using AEAD encryption.
@@ -501,7 +500,7 @@ public:
   /**
    * Get the key used to encrypt/decrypt messages when using AEAD encryption.
    * 
-   * @return An uint8_t array with size CryptoInterface::ENCRYPTION_KEY_LENGTH containing the currently used message encryption key.
+   * @return An uint8_t array with size experimental::crypto::ENCRYPTION_KEY_LENGTH containing the currently used message encryption key.
    */
   static const uint8_t *getEspnowMessageEncryptionKey();
   
@@ -934,6 +933,15 @@ public:
   void setWiFiChannel(const uint8 newWiFiChannel) override;
   
 protected:
+
+  EspnowDatabase *getDatabase();
+  const EspnowDatabase *getDatabaseConst() const;
+  EspnowConnectionManager *getConnectionManager();
+  const EspnowConnectionManager *getConnectionManagerConst() const;
+  EspnowTransmitter *getTransmitter();
+  const EspnowTransmitter *getTransmitterConst() const;
+  EspnowEncryptionBroker *getEncryptionBroker();
+  const EspnowEncryptionBroker *getEncryptionBrokerConst() const;
 
   bool activateEspnow();
   

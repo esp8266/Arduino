@@ -26,7 +26,7 @@
 #define __MESHCRYPTOINTERFACE_H__
 
 #include <Arduino.h>
-#include "CryptoInterface.h"
+#include <Crypto.h>
 
 namespace MeshCryptoInterface 
 { 
@@ -50,11 +50,11 @@ namespace MeshCryptoInterface
    * @param message The string from which to create the HMAC.
    * @param hashKey The hash key to use when creating the HMAC.
    * @param hashKeyLength The length of the hash key in bytes.
-   * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to 32. Defaults to CryptoInterface::SHA256_NATURAL_LENGTH.
+   * @param hmacLength The desired length of the generated HMAC, in bytes. Valid values are 1 to 32. Defaults to experimental::crypto::SHA256::NATURAL_LENGTH.
    * 
    * @return A String with the generated HMAC in HEX format.
    */
-  String createMeshHmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength = CryptoInterface::SHA256_NATURAL_LENGTH);
+  String createMeshHmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength = experimental::crypto::SHA256::NATURAL_LENGTH);
   
   /**
    * Verify a SHA256 HMAC which was created from the message using the provided hashKey.
@@ -72,7 +72,7 @@ namespace MeshCryptoInterface
    * Initialize key with a SHA-256 hash of keySeed.
    * 
    * @param key A uint8_t array containing the key to be initialized.
-   * @param keyLength The length of the key array in bytes. Maximum value is CryptoInterface::SHA256_NATURAL_LENGTH.
+   * @param keyLength The length of the key array in bytes. Maximum value is experimental::crypto::SHA256::NATURAL_LENGTH.
    * @param keySeed The key seed.
    * 
    * @return A pointer to the initialized key array.

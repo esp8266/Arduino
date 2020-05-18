@@ -37,10 +37,10 @@ namespace
   namespace TypeCast = MeshTypeConversionFunctions;
   
   String _ongoingPeerRequestNonce;
-  uint8_t _ongoingPeerRequestMac[6] = {0};
   EspnowMeshBackend *_ongoingPeerRequester = nullptr;
   EncryptedConnectionStatus _ongoingPeerRequestResult = EncryptedConnectionStatus::MAX_CONNECTIONS_REACHED_SELF;
   ExpiringTimeTracker _ongoingPeerRequestEncryptionTimeout([](){ return EspnowDatabase::getEncryptionRequestTimeout(); });
+  uint8_t _ongoingPeerRequestMac[6] = {0};
   bool _reciprocalPeerRequestConfirmation = false;
 }
 
@@ -465,7 +465,7 @@ bool EspnowEncryptionBroker::verifyEncryptionRequestHmac(const String &encryptio
     if(hmacStartIndex < 0)
       return false;
    
-    if(hmac.length() == 2*CryptoInterface::SHA256_NATURAL_LENGTH // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
+    if(hmac.length() == 2*experimental::crypto::SHA256::NATURAL_LENGTH // We know that each HMAC byte should become 2 String characters due to uint8ArrayToHexString.
        && verifyMeshHmac(TypeCast::macToString(requesterStaMac) + TypeCast::macToString(requesterApMac) + encryptionRequestHmacMessage.substring(0, hmacStartIndex), hmac, hashKey, hashKeyLength))
     {
       return true;

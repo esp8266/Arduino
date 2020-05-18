@@ -254,15 +254,6 @@ protected:
 
 private:
 
-  uint16_t _serverPort;
-  WiFiServer _server;
-  uint8_t _maxAPStations = 4; // Only affects TCP/IP connections, not ESP-NOW connections
-  uint32_t _connectionAttemptTimeoutMs = 10000;
-  int _stationModeTimeoutMs = 5000; // int is the type used in the Arduino core for this particular API, not uint32_t, which is why we use int here.
-  uint32_t _apModeTimeoutMs = 4500;
-
-  bool useStaticIP;
-
   void fullStop(WiFiClient &currClient);
   void initiateConnectionToAP(const String &targetSSID, const int targetChannel = NETWORK_INFO_DEFAULT_INT, const uint8_t *targetBSSID = NULL);
   TransmissionStatusType connectToNode(const String &targetSSID, const int targetChannel = NETWORK_INFO_DEFAULT_INT, const uint8_t *targetBSSID = NULL);
@@ -272,6 +263,16 @@ private:
   TransmissionStatusType attemptDataTransferKernel();
   TransmissionStatusType initiateTransmission(const TcpIpNetworkInfo &recipientInfo);
   void enterPostTransmissionState(const bool concludingDisconnect);
+   
+  uint32_t _connectionAttemptTimeoutMs = 10000;
+  int _stationModeTimeoutMs = 5000; // int is the type used in the Arduino core for this particular API, not uint32_t, which is why we use int here.
+  uint32_t _apModeTimeoutMs = 4500;
+   
+  WiFiServer _server;
+  uint16_t _serverPort;
+  uint8_t _maxAPStations = 4; // Only affects TCP/IP connections, not ESP-NOW connections
+  
+  bool useStaticIP;
 };
 
 #endif

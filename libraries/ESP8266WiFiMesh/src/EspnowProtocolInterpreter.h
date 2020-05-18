@@ -53,17 +53,17 @@ namespace EspnowProtocolInterpreter
   constexpr uint8_t transmissionsRemainingIndex = 1;
   constexpr uint8_t transmissionMacIndex = 2;
   constexpr uint8_t messageIDIndex = 8;
+  
+  constexpr uint8_t maxEncryptedConnections = 6; // This is limited by the ESP-NOW API. Max 6 in AP or AP+STA mode. Max 10 in STA mode. See "ESP-NOW User Guide" for more info. 
 
   constexpr uint8_t protocolBytesSize = 16;
   constexpr uint8_t aeadMetadataSize = 28;
   uint8_t metadataSize();
   uint32_t getMaxBytesPerTransmission();
   uint32_t getMaxMessageBytesPerTransmission();
-  
-  constexpr uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
   constexpr uint64_t uint64BroadcastMac = 0xFFFFFFFFFFFF;
-    
-  constexpr uint8_t maxEncryptedConnections = 6; // This is limited by the ESP-NOW API. Max 6 in AP or AP+STA mode. Max 10 in STA mode. See "ESP-NOW User Guide" for more info. 
+  constexpr uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
   constexpr uint8_t encryptedConnectionKeyLength = 16;  // This is restricted to exactly 16 bytes by the ESP-NOW API. It should not be changed unless the ESP-NOW API is changed.
   constexpr uint8_t hashKeyLength = 16; // This can be changed to any value up to 255. Common values are 16 and 32.
@@ -85,7 +85,7 @@ namespace EspnowProtocolInterpreter
   bool usesConstantSessionKey(const char messageType);
 
   /**
-   * Create a new session key for an encrypted connection using the built in RANDOM_REG32 of the ESP8266. 
+   * Create a new session key for an encrypted connection using the built in RANDOM_REG32/ESP.random() of the ESP8266. 
    * Should only be used when initializing a new connection. 
    * Use generateMessageID instead when the encrypted connection is already initialized to keep the connection synchronized.
    * 

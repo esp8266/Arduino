@@ -81,8 +81,6 @@ private:
   EspnowConnectionManager & _connectionManager;
   EspnowTransmitter & _transmitter;
 
-  bool _receivedEncryptedTransmission = false;
-
   using encryptionRequestBuilderType = std::function<String(const String &, const ExpiringTimeTracker &)>;
   static String defaultEncryptionRequestBuilder(const String &requestHeader, const uint32_t durationMs, const uint8_t *hashKey, const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker);
   static String flexibleEncryptionRequestBuilder(const uint32_t minDurationMs, const uint8_t *hashKey, const String &requestNonce, const ExpiringTimeTracker &existingTimeTracker);
@@ -100,6 +98,8 @@ private:
   EncryptedConnectionStatus requestEncryptedConnectionKernel(const uint8_t *peerMac, const encryptionRequestBuilderType &encryptionRequestBuilder, EspnowMeshBackend &espnowInstance);
 
   static bool verifyEncryptionRequestHmac(const String &encryptionRequestHmacMessage, const uint8_t *requesterStaMac, const uint8_t *requesterApMac, const uint8_t *hashKey, const uint8_t hashKeyLength);
+
+  bool _receivedEncryptedTransmission = false;
 };
 
 #endif

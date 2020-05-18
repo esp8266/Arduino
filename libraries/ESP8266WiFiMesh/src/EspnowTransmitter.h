@@ -18,11 +18,11 @@
 #define __ESPNOWTRANSMITTER_H__
 
 #include <Arduino.h>
+#include <Crypto.h>
 #include "ExpiringTimeTracker.h"
 #include "EspnowDatabase.h"
 #include "EspnowConnectionManager.h"
 #include "ConditionalPrinter.h"
-#include "CryptoInterface.h"
 
 class EspnowMeshBackend;
 
@@ -57,7 +57,7 @@ public:
   
   static void setUseEncryptedMessages(const bool useEncryptedMessages);
   static bool useEncryptedMessages();
-  static void setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[CryptoInterface::ENCRYPTION_KEY_LENGTH]);
+  static void setEspnowMessageEncryptionKey(const uint8_t espnowMessageEncryptionKey[experimental::crypto::ENCRYPTION_KEY_LENGTH]);
   static void setEspnowMessageEncryptionKey(const String &espnowMessageEncryptionKeySeed);
   static const uint8_t *getEspnowMessageEncryptionKey();
 
@@ -101,9 +101,9 @@ private:
   EspnowDatabase & _database;
   EspnowConnectionManager & _connectionManager;
 
-  uint8_t _broadcastTransmissionRedundancy = 1;
-
   responseTransmittedHookType _responseTransmittedHook = [](const String &, const uint8_t *, uint32_t, EspnowMeshBackend &){ return true; };
+
+  uint8_t _broadcastTransmissionRedundancy = 1;
 };
 
 #endif

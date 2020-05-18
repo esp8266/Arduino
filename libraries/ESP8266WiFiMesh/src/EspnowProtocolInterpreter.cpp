@@ -114,7 +114,7 @@ namespace EspnowProtocolInterpreter
   uint64_t createSessionKey()
   {
     uint64_t newSessionKey = MeshUtilityFunctions::randomUint64();
-    return usesEncryption(newSessionKey) ? newSessionKey : (newSessionKey | ((uint64_t)RANDOM_REG32) << 32 | uint64MSB); // TODO: Replace RANDOM_REG32 use with ESP.random().
+    return usesEncryption(newSessionKey) ? newSessionKey : (newSessionKey | ((uint64_t)ESP.random()) << 32 | uint64MSB);
   }
 
   macAndType_td createMacAndTypeValue(const uint64_t uint64Mac, const char messageType)

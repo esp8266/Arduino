@@ -25,11 +25,11 @@
 #include "MeshCryptoInterface.h"
 #include <assert.h>
 
-namespace MeshCryptoInterface 
+namespace MeshCryptoInterface
 {
   String createMeshHmac(const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
   {
-    return CryptoInterface::sha256Hmac(message, hashKey, hashKeyLength, hmacLength);
+    return experimental::crypto::SHA256::hmac(message, hashKey, hashKeyLength, hmacLength);
   }
 
   bool verifyMeshHmac(const String &message, const String &messageHmac, const uint8_t *hashKey, const uint8_t hashKeyLength)
@@ -43,9 +43,9 @@ namespace MeshCryptoInterface
 
   uint8_t *initializeKey(uint8_t *key, const uint8_t keyLength, const String &keySeed)
   {
-    assert(keyLength <= CryptoInterface::SHA256_NATURAL_LENGTH);
-    uint8_t hashArray[CryptoInterface::SHA256_NATURAL_LENGTH] {};
-    CryptoInterface::sha256Hash(keySeed.c_str(), keySeed.length(), hashArray);
+    assert(keyLength <= experimental::crypto::SHA256::NATURAL_LENGTH);
+    uint8_t hashArray[experimental::crypto::SHA256::NATURAL_LENGTH] {};
+    experimental::crypto::SHA256::hash(keySeed.c_str(), keySeed.length(), hashArray);
     memcpy(key, hashArray, keyLength);
     return key;
   }

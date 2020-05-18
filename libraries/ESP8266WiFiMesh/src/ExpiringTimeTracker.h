@@ -69,10 +69,11 @@ public:
   
 private:
 
-  bool useCalculator = false;
   calculatorType _durationCalculator;
 
   void setTimeout(const uint32_t newUserTimeout);
+  
+  bool useCalculator = false;
 };
 
 #endif

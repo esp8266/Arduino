@@ -27,14 +27,9 @@
 #include "MeshBackendBase.h"
 #include "TcpIpMeshBackend.h"
 #include "EspnowMeshBackend.h"
+#include "TypeConversion.h"
 
-namespace
-{
-  constexpr char chars[36] PROGMEM = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-  constexpr uint8_t charValues[75] PROGMEM {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, // 0 to 9
-                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0, 0, 0, 0, 0, 0, // Upper case letters
-                                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}; // Lower case letters
-}
+using namespace experimental::TypeConversion;
 
 namespace MeshTypeConversionFunctions 
 {
@@ -47,14 +42,14 @@ namespace MeshTypeConversionFunctions
     if(base == 16)
     {
       do {
-        result += (char)pgm_read_byte(chars + number % base);
+        result += (char)pgm_read_byte(base36Chars + number % base);
         number >>= 4; // We could write number /= 16; and the compiler would optimize it to a shift, but the explicit shift notation makes it clearer where the speed-up comes from.
       } while ( number );
     }
     else
     {
       do {
-        result += (char)pgm_read_byte(chars + number % base);
+        result += (char)pgm_read_byte(base36Chars + number % base);
         number /= base;
       } while ( number );
     }
@@ -75,7 +70,7 @@ namespace MeshTypeConversionFunctions
       for(uint32_t i = 0; i < string.length(); ++i)
       {
         result <<= 4; // We could write result *= 16; and the compiler would optimize it to a shift, but the explicit shift notation makes it clearer where the speed-up comes from.
-        result += pgm_read_byte(charValues + string.charAt(i) - '0');
+        result += pgm_read_byte(base36CharValues + string.charAt(i) - '0');
       }
     }
     else
@@ -83,7 +78,7 @@ namespace MeshTypeConversionFunctions
       for(uint32_t i = 0; i < string.length(); ++i)
       {
         result *= base;
-        result += pgm_read_byte(charValues + string.charAt(i) - '0');
+        result += pgm_read_byte(base36CharValues + string.charAt(i) - '0');
       }
     }
     
@@ -92,29 +87,12 @@ namespace MeshTypeConversionFunctions
   
   String uint8ArrayToHexString(const uint8_t *uint8Array, const uint32_t arrayLength)
   {
-    String hexString;
-    if(!hexString.reserve(2*arrayLength))  // Each uint8_t will become two characters (00 to FF)
-      return emptyString;
-    
-    for(uint32_t i = 0; i < arrayLength; ++i)
-    {
-      hexString += (char)pgm_read_byte(chars + (uint8Array[i] >> 4));
-      hexString += (char)pgm_read_byte(chars + uint8Array[i] % 16 );
-    }
-    
-    return hexString;  
+    return experimental::TypeConversion::uint8ArrayToHexString(uint8Array, arrayLength);
   }
   
   uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength)
   {
-    assert(hexString.length() >= arrayLength*2); // Each array element can hold two hexString characters
-    
-    for(uint32_t i = 0; i < arrayLength; ++i)
-    {
-      uint8Array[i] = (pgm_read_byte(charValues + hexString.charAt(i*2) - '0') << 4) + pgm_read_byte(charValues + hexString.charAt(i*2 + 1) - '0'); 
-    }
-    
-    return uint8Array;
+    return experimental::TypeConversion::hexStringToUint8Array(hexString, uint8Array, arrayLength);
   }
   
   String uint8ArrayToMultiString(uint8_t *uint8Array, const uint32_t arrayLength)
@@ -193,24 +171,12 @@ namespace MeshTypeConversionFunctions
   
   uint8_t *uint64ToUint8Array(const uint64_t value, uint8_t *resultArray)
   {
-    resultArray[7] = value;
-    resultArray[6] = value >> 8;
-    resultArray[5] = value >> 16;
-    resultArray[4] = value >> 24;
-    resultArray[3] = value >> 32;
-    resultArray[2] = value >> 40;
-    resultArray[1] = value >> 48;
-    resultArray[0] = value >> 56;
-  
-    return resultArray;
+    return uint64ToUint8ArrayBE(value, resultArray);
   }
   
   uint64_t uint8ArrayToUint64(const uint8_t *inputArray)
   {
-    uint64_t result = (uint64_t)inputArray[0] << 56 | (uint64_t)inputArray[1] << 48 | (uint64_t)inputArray[2] << 40 | (uint64_t)inputArray[3] << 32 
-                      | (uint64_t)inputArray[4] << 24 | (uint64_t)inputArray[5] << 16 | (uint64_t)inputArray[6] << 8 | (uint64_t)inputArray[7];
-                       
-    return result;
+    return uint8ArrayToUint64BE(inputArray);
   }
   
   /**

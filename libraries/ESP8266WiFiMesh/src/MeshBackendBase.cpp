@@ -264,6 +264,9 @@ void MeshBackendBase::setAPHidden(const bool apHidden)
 
 bool MeshBackendBase::getAPHidden() const {return _apHidden;}
 
+ConditionalPrinter *MeshBackendBase::getConditionalPrinter() {return &_conditionalPrinter;}
+const ConditionalPrinter *MeshBackendBase::getConditionalPrinterConst() const  {return &_conditionalPrinter;}
+
 bool MeshBackendBase::latestTransmissionSuccessfulBase(const std::vector<TransmissionOutcome> &latestTransmissionOutcomes)
 {
   if(latestTransmissionOutcomes.empty())

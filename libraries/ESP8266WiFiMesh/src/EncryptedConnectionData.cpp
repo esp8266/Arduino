@@ -50,8 +50,9 @@ EncryptedConnectionData::EncryptedConnectionData(const uint8_t peerStaMac[6], co
 }
 
 EncryptedConnectionData::EncryptedConnectionData(const EncryptedConnectionData &other)
-  : _peerSessionKey(other.getPeerSessionKey()), _ownSessionKey(other.getOwnSessionKey()), _desync(other.desync()),
-    _timeTracker(other.temporary() ? new ExpiringTimeTracker(*other.temporary()) : nullptr)
+  : _peerSessionKey(other.getPeerSessionKey()), _ownSessionKey(other.getOwnSessionKey()),
+    _timeTracker(other.temporary() ? new ExpiringTimeTracker(*other.temporary()) : nullptr),
+    _desync(other.desync())
 {
   other.getPeerStaMac(_peerStaMac);
   other.getPeerApMac(_peerApMac);
@@ -132,8 +133,8 @@ uint64_t EncryptedConnectionData::getOwnSessionKey() const { return _ownSessionK
 uint64_t EncryptedConnectionData::incrementSessionKey(const uint64_t sessionKey, const uint8_t *hashKey, const uint8_t hashKeyLength)
 {
   uint8_t inputArray[8] {0};
-  uint8_t hmacArray[CryptoInterface::SHA256_NATURAL_LENGTH] {0};
-  CryptoInterface::sha256Hmac(TypeCast::uint64ToUint8Array(sessionKey, inputArray), 8, hashKey, hashKeyLength, hmacArray, CryptoInterface::SHA256_NATURAL_LENGTH);
+  uint8_t hmacArray[experimental::crypto::SHA256::NATURAL_LENGTH] {0};
+  experimental::crypto::SHA256::hmac(TypeCast::uint64ToUint8Array(sessionKey, inputArray), 8, hashKey, hashKeyLength, hmacArray, experimental::crypto::SHA256::NATURAL_LENGTH);
 
   /* HMAC truncation should be OK since hmac sha256 is a PRF and we are truncating to the leftmost (MSB) bits.
   PRF: https://crypto.stackexchange.com/questions/26410/whats-the-gcm-sha-256-of-a-tls-protocol/26434#26434
@@ -141,7 +142,7 @@ uint64_t EncryptedConnectionData::incrementSessionKey(const uint64_t sessionKey,
   uint64_t newLeftmostBits = TypeCast::uint8ArrayToUint64(hmacArray) & EspnowProtocolInterpreter::uint64LeftmostBits;
   
   if(newLeftmostBits == 0)
-    newLeftmostBits = ((uint64_t)RANDOM_REG32 | (1 << 31)) << 32; // We never want newLeftmostBits == 0 since that would indicate an unencrypted transmission.
+    newLeftmostBits = ((uint64_t)ESP.random() | (1 << 31)) << 32; // We never want newLeftmostBits == 0 since that would indicate an unencrypted transmission.
   
   uint64_t newRightmostBits = (uint32_t)(sessionKey + 1);
 

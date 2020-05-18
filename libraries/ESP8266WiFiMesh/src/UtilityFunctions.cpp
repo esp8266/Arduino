@@ -25,6 +25,7 @@
 
 #include "UtilityFunctions.h"
 #include <esp8266_peri.h>
+#include <Esp.h>
 
 namespace MeshUtilityFunctions
 {
@@ -43,7 +44,7 @@ namespace MeshUtilityFunctions
   
   uint64_t randomUint64()
   {
-    return (((uint64_t)RANDOM_REG32 << 32) | (uint64_t)RANDOM_REG32);
+    return (((uint64_t)ESP.random() << 32) | (uint64_t)ESP.random());
   }
 
   template <typename T>
