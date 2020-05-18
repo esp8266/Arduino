@@ -10,8 +10,9 @@ enum type
 {
   html,
   htm,
-  css,
   txt,
+#ifndef MIMETYPE_MINIMAL    // allow to compile with only the strict minimum of mime-types
+  css,
   js,
   json,
   png,
@@ -29,20 +30,16 @@ enum type
   xml,
   pdf,
   zip,
-  gz,
   appcache,
+#endif // MIMETYPE_MINIMAL
+  gz,
   none,
   maxType
 };
 
-struct Entry
-{
-  const char endsWith[16]; 
-  const char mimeType[32];
-};
 
-
-extern const Entry mimeTable[maxType];
+extern const char * mimeTableSuffix[maxType];
+extern const char * mimeTable[maxType];
 
 String getContentType(const String& path);
 }

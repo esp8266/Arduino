@@ -259,7 +259,7 @@ void ESP8266WebServerTemplate<ServerType>::requestAuthentication(HTTPAuthMethod 
     sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String('\"'));
   }
   using namespace mime;
-  send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
+  send(401, String(FPSTR(mimeTable[html])), authFailMsg);
 }
 
 template <typename ServerType>
@@ -408,7 +408,7 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
 
     using namespace mime;
     if (!content_type)
-        content_type = mimeTable[html].mimeType;
+        content_type = mimeTable[html];
 
     sendHeader(String(F("Content-Type")), String(FPSTR(content_type)), true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
@@ -536,9 +536,9 @@ void ESP8266WebServerTemplate<ServerType>::_streamFileCore(const size_t fileSize
 {
   using namespace mime;
   setContentLength(fileSize);
-  if (fileName.endsWith(String(FPSTR(mimeTable[gz].endsWith))) &&
-      contentType != String(FPSTR(mimeTable[gz].mimeType)) &&
-      contentType != String(FPSTR(mimeTable[none].mimeType))) {
+  if (fileName.endsWith(String(FPSTR(mimeTableSuffix[gz]))) &&
+      contentType != String(FPSTR(mimeTable[gz])) &&
+      contentType != String(FPSTR(mimeTable[none]))) {
     sendHeader(F("Content-Encoding"), F("gzip"));
   }
   send(200, contentType, emptyString);
@@ -683,7 +683,7 @@ void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
   }
   if (!handled) {
     using namespace mime;
-    send(404, String(FPSTR(mimeTable[html].mimeType)), String(F("Not found: ")) + _currentUri);
+    send(404, String(FPSTR(mimeTable[html])), String(F("Not found: ")) + _currentUri);
     handled = true;
   }
   if (handled) {

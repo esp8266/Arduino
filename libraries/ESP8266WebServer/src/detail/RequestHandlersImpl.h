@@ -124,10 +124,10 @@ public:
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
-        if (!path.endsWith(FPSTR(mimeTable[gz].endsWith)) && !_fs.exists(path))  {
-            String pathWithGz = path + FPSTR(mimeTable[gz].endsWith);
+        if (!path.endsWith(FPSTR(mimeTableSuffix[gz])) && !_fs.exists(path))  {
+            String pathWithGz = path + FPSTR(mimeTableSuffix[gz]);
             if(_fs.exists(pathWithGz))
-                path += FPSTR(mimeTable[gz].endsWith);
+                path += FPSTR(mimeTableSuffix[gz]);
         }
 
         File f = _fs.open(path, "r");

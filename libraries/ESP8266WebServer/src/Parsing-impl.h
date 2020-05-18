@@ -163,7 +163,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
 
       if (headerName.equalsIgnoreCase(FPSTR(Content_Type))){
         using namespace mime;
-        if (headerValue.startsWith(FPSTR(mimeTable[txt].mimeType))){
+        if (headerValue.startsWith(FPSTR(mimeTable[txt]))){
           isForm = false;
         } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
           isForm = false;
@@ -434,7 +434,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
           DEBUG_OUTPUT.println(argName);
 #endif
           using namespace mime;
-          argType = FPSTR(mimeTable[txt].mimeType);
+          argType = FPSTR(mimeTable[txt]);
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
           if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase(FPSTR(Content_Type))){
