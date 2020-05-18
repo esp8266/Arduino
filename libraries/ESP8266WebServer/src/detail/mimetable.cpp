@@ -7,8 +7,9 @@ namespace mime
 
 static const char kHtmlSuffix[] PROGMEM = ".html";
 static const char kHtmSuffix[] PROGMEM = ".htm";
-static const char kCssSuffix[] PROGMEM = ".css";
 static const char kTxtSuffix[] PROGMEM = ".txt";
+#ifndef MIMETYPE_MINIMAL
+static const char kCssSuffix[] PROGMEM = ".css";
 static const char kJsSuffix[] PROGMEM = ".js";
 static const char kJsonSuffix[] PROGMEM = ".json";
 static const char kPngSuffix[] PROGMEM = ".png";
@@ -26,13 +27,15 @@ static const char kSfntSuffix[] PROGMEM = ".sfnt";
 static const char kXmlSuffix[] PROGMEM = ".xml";
 static const char kPdfSuffix[] PROGMEM = ".pdf";
 static const char kZipSuffix[] PROGMEM = ".zip";
-static const char kGzSuffix[] PROGMEM = ".gz";
 static const char kAppcacheSuffix[] PROGMEM = ".appcache";
+#endif // MIMETYPE_MINIMAL
+static const char kGzSuffix[] PROGMEM = ".gz";
 static const char kDefaultSuffix[] PROGMEM = "";
 
 static const char kHtml[] PROGMEM = "text/html";
-static const char kCss[] PROGMEM = "text/css";
 static const char kTxt[] PROGMEM = "text/plain";
+#ifndef MIMETYPE_MINIMAL
+static const char kCss[] PROGMEM = "text/css";
 static const char kJs[] PROGMEM = "application/javascript";
 static const char kJson[] PROGMEM = "application/json";
 static const char kPng[] PROGMEM = "image/png";
@@ -50,8 +53,9 @@ static const char kSfnt[] PROGMEM = "application/font-sfnt";
 static const char kXml[] PROGMEM = "text/xml";
 static const char kPdf[] PROGMEM = "application/pdf";
 static const char kZip[] PROGMEM = "application/zip";
-static const char kGz[] PROGMEM = "application/x-gzip";
 static const char kAppcache[] PROGMEM = "text/cache-manifest";
+#endif // MIMETYPE_MINIMAL
+static const char kGz[] PROGMEM = "application/x-gzip";
 static const char kDefault[] PROGMEM = "application/octet-stream";
 
 const Entry mimeTable[maxType] PROGMEM =
