@@ -63,10 +63,8 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 
 // Indicate which digital I/Os should be displayed on the chart.
 // From GPIO16 to GPIO0, a '1' means the corresponding GPIO will be shown
-// Note: SD GPIOs are hidden by default:
-#define DEFAULT_GPIO_MASK 0b11111000000111111
-
-unsigned int gpioMask = DEFAULT_GPIO_MASK;
+// e.g. 0b11111000000111111
+unsigned int gpioMask;
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
@@ -254,6 +252,17 @@ void setup(void) {
 
 }
 
+// Return default GPIO mask, that is all I/Os except SD card ones
+unsigned int defaultMask() {
+  unsigned int mask = 0b11111111111111111;
+  for (auto pin=0; pin <= 16; pin++) {
+    if (isFlashInterfacePin(pin)) {
+      mask &= ~(1<<pin);
+    }
+  }
+  return mask;
+}
+
 int rgbMode = 1; // 0=off - 1=auto - 2=manual
 int rgbValue = 0;
 long lastChangeTime = 0;
@@ -285,30 +294,36 @@ void loop(void) {
     // act according to mode
     switch (rgbMode) {
       case 0: // off
-        gpioMask = 0b10100000000111111; // GPIOs 12-13-15 are hidden
-        // output 0
+        gpioMask = defaultMask();
+        gpioMask &= ~(1<<12); // Hide GPIO 12
+        gpioMask &= ~(1<<13); // Hide GPIO 13
+        gpioMask &= ~(1<<15); // Hide GPIO 15
+        
+        // reset outputs
         digitalWrite(12, 0);
         digitalWrite(13, 0);
         digitalWrite(15, 0);
         break;
 
       case 1: // auto
-        gpioMask = DEFAULT_GPIO_MASK;
+        gpioMask = defaultMask();
+
         // increment value (reset after 7)
         rgbValue++;
         if (rgbValue > 7) {
           rgbValue = 0;
         }
 
-        // output values
+        // output new values
         digitalWrite(12, rgbValue & 0b001);
         digitalWrite(13, rgbValue & 0b010);
         digitalWrite(15, rgbValue & 0b100);
         break;
 
       case 2: // manual
-        gpioMask = DEFAULT_GPIO_MASK;
-        // don't change values
+        gpioMask = defaultMask();
+
+        // keep outputs unchanged
         break;
     }
 
@@ -316,3 +331,4 @@ void loop(void) {
     lastChangeTime = now;
   }
 }
+
