@@ -23,10 +23,9 @@
     THE SOFTWARE.
 */
 
-#include <bearssl/bearssl.h>
 #include "Crypto.h"
 #include <TypeConversion.h>
-
+#include <bearssl/bearssl.h>
 #include <assert.h>
 
 namespace TypeCast = experimental::TypeConversion;
