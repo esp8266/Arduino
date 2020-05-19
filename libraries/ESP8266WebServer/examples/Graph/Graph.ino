@@ -255,9 +255,9 @@ void setup(void) {
 // Return default GPIO mask, that is all I/Os except SD card ones
 unsigned int defaultMask() {
   unsigned int mask = 0b11111111111111111;
-  for (auto pin=0; pin <= 16; pin++) {
+  for (auto pin = 0; pin <= 16; pin++) {
     if (isFlashInterfacePin(pin)) {
-      mask &= ~(1<<pin);
+      mask &= ~(1 << pin);
     }
   }
   return mask;
@@ -295,10 +295,10 @@ void loop(void) {
     switch (rgbMode) {
       case 0: // off
         gpioMask = defaultMask();
-        gpioMask &= ~(1<<12); // Hide GPIO 12
-        gpioMask &= ~(1<<13); // Hide GPIO 13
-        gpioMask &= ~(1<<15); // Hide GPIO 15
-        
+        gpioMask &= ~(1 << 12); // Hide GPIO 12
+        gpioMask &= ~(1 << 13); // Hide GPIO 13
+        gpioMask &= ~(1 << 15); // Hide GPIO 15
+
         // reset outputs
         digitalWrite(12, 0);
         digitalWrite(13, 0);
