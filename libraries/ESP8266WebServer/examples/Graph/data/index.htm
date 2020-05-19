@@ -360,7 +360,7 @@
         // Limit its length to maxSamples
         data.splice(0, data.length - maxSamples);
         // Put stats in chart title
-        heapChart.options.title.text = "Free heap (" + computeStats(data) + ")";
+        heapChart.options.title.text = "Free heap (" + computeStats(data) + ") - use mouse wheel or pinch to zoom";
         // Remember smallest X
         var minX = data[0].x;
         
@@ -370,7 +370,7 @@
         // Limit its length to maxSamples
         data.splice(0, data.length - maxSamples);
         // Put stats in chart title
-        analogChart.options.title.text = "Analog input (" + computeStats(data) + ")";
+        analogChart.options.title.text = "Analog input (" + computeStats(data) + ") - use mouse wheel or pinch to zoom";
         // Remember smallest X
         if (data[0].x < minX) minX = data[0].x;
         
