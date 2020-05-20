@@ -359,13 +359,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else if (wave.autoPwm && static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
-              const uint32_t adj = (overshootCcys + scaleCcys(wave.dutyCcys)) / wave.periodCcys;
-              // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
-              waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy + adj * wave.dutyCcys;
-              wave.nextPeriodCcy += adj * wave.periodCcys;
+              waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy + scaleCcys(wave.dutyCcys) - overshootCcys;
+              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
               // adapt expiry such that it occurs during intended cycle
               if (WaveformMode::EXPIRES == wave.mode)
-                wave.expiryCcy += adj * wave.periodCcys;
+                wave.expiryCcy += scaleCcys(wave.periodCcys);
             }
             else {
               waveNextEventCcy = wave.nextPeriodCcy;
@@ -387,15 +385,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
               wave.endDutyCcy = now + scaleCcys(wave.dutyCcys);
               if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) >= 0) {
-                const uint32_t adj = (overshootCcys + scaleCcys(wave.dutyCcys)) / wave.periodCcys;
-                wave.nextPeriodCcy += adj * wave.periodCcys;
-                if (wave.autoPwm) {
-                  // maintain phase, maintain duty/idle ratio, temporarily reduce frequency by fwdPeriods
-                  wave.endDutyCcy += adj * wave.dutyCcys;
-                }
-                // adapt expiry such that it occurs during intended cycle
-                if (WaveformMode::EXPIRES == wave.mode)
-                  wave.expiryCcy += adj * wave.periodCcys;
+                wave.endDutyCcy = wave.nextPeriodCcy;
               }
               waveform.states |= pinBit;
               if (16 == pin) {
