@@ -52,7 +52,7 @@ static SpiOpResult PRECACHE_ATTR
 _SPICommand(volatile uint32_t spiIfNum,
             uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
             uint32_t *data,uint32_t writeWords,uint32_t readWords)
-{ 
+{
   if (spiIfNum>1)
      return SPI_RESULT_ERR;
 
@@ -69,8 +69,11 @@ _SPICommand(volatile uint32_t spiIfNum,
   volatile SpiFlashChip *fchip=flashchip;
   volatile uint32_t spicmdusr=SPICMDUSR;
 
+  uint32_t saved_ps=0;
+
   if (!spiIfNum) {
-     // Only need to precache when using SPI0
+     // Only need to disable interrupts and precache when using SPI0
+     saved_ps = xt_rsil(15);
      PRECACHE_START();
      Wait_SPI_Idlep((SpiFlashChip *)fchip);
   }
@@ -116,6 +119,9 @@ _SPICommand(volatile uint32_t spiIfNum,
   SPIREG(SPI0C) = oldSPI0C;
   
   PRECACHE_END();
+  if (!spiIfNum) {
+      xt_wsr_ps(saved_ps);
+  }
   return (timeout>0 ? SPI_RESULT_OK : SPI_RESULT_TIMEOUT);
 }
 
