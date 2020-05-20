@@ -31,12 +31,26 @@ extern "C" {
   #define PGM_VOID_P         const void *
 #endif
 
-// PSTR() macro modified to start on a 32-bit boundary.  This adds on average
-// 1.5 bytes/string, but in return memcpy_P and strcpy_P will work 4~8x faster
-#ifndef PSTR
+#ifndef PSTR_ALIGN
+  // PSTR() macro starts by default on a 32-bit boundary.  This adds on average
+  // 1.5 bytes/string, but in return memcpy_P and strcpy_P will work 4~8x faster
+  // Allow users to override the alignment with PSTR_ALIGN
+  #define PSTR_ALIGN 4
+#endif
+#ifndef PSTRN
+    // Multi-alignment variant of PSTR, n controls the alignment and should typically be 1 or 4
     // Adapted from AVR-specific code at https://forum.arduino.cc/index.php?topic=194603.0
     // Uses C attribute section instead of ASM block to allow for C language string concatenation ("x" "y" === "xy")
-    #define PSTR(s) (__extension__({static const char __pstr__[] __attribute__((__aligned__(4))) __attribute__((section( "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\", \"aSM\", @progbits, 1 #"))) = (s); &__pstr__[0];}))
+    #define PSTRN(s,n) (__extension__({static const char __pstr__[] __attribute__((__aligned__(n))) __attribute__((section( "\".irom0.pstr." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\", \"aSM\", @progbits, 1 #"))) = (s); &__pstr__[0];}))
+#endif
+#ifndef PSTR
+  // PSTR() uses the default alignment defined by PSTR_ALIGN
+  #define PSTR(s) PSTRN(s,PSTR_ALIGN)
+#endif
+#ifndef PSTR4
+  // PSTR4() enforces 4-bytes alignment whatever the value of PSTR_ALIGN
+  // as required by functions like ets_strlen() or ets_memcpy()
+  #define PSTR4(s) PSTRN(s,4)
 #endif
 
 // Flash memory must be read using 32 bit aligned addresses else a processor
