@@ -26,7 +26,7 @@
 #include <FS.h>
 
 // Base class for the certificate stores, which allow use
-// of a large set of certificates stored on SPIFFS of SD card to
+// of a large set of certificates stored on FS or SD card to
 // be dynamically used when validating a X509 certificate
 
 namespace BearSSL {

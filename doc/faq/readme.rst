@@ -79,7 +79,7 @@ perform. It is not listed among libraries verified to work with ESP8266.
 
 `Read more <a03-library-does-not-work.rst>`__.
 
-In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M SPIFFS) or 4M (3M SPIFFS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
+In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M FS) or 4M (3M FS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The reason we cannot have more than 1MB of code in flash has to do with
@@ -90,7 +90,7 @@ total, but switching such "banks" on the fly is not easy and efficient,
 so we don't bother doing that. Besides, no one has so far complained
 about 1MB of code space being insufficient for practical purposes.
 
-The option to choose 3M or 1M SPIFFS is to optimize the upload time.
+The option to choose 3M or 1M filesystem is to optimize the upload time.
 Uploading 3MB takes a long time so sometimes you can just use 1MB. Other
 2MB of flash can still be used with ``ESP.flashRead`` and
 ``ESP.flashWrite`` APIs if necessary.
