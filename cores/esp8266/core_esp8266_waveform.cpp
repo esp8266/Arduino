@@ -66,13 +66,14 @@ enum class WaveformMode : uint8_t {INFINITE = 0, EXPIRES = 1, UPDATEEXPIRY = 2, 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
   uint32_t nextPeriodCcy; // ESP clock cycle when a period begins. If WaveformMode::INIT, temporarily holds positive phase offset ccy count
-  uint32_t endDutyCcy;   // ESP clock cycle when going from duty to off
-  int32_t dutyCcys;     // Set next off cycle at low->high to maintain phase
-  int32_t periodCcys;   // Set next phase cycle at low->high to maintain phase
-  uint32_t expiryCcy;    // For time-limited waveform, the CPU clock cycle when this waveform must stop. If WaveformMode::UPDATE, temporarily holds relative ccy count
+  uint32_t endDutyCcy;    // ESP clock cycle when going from duty to off
+  int32_t dutyCcys;       // Set next off cycle at low->high to maintain phase
+  int32_t adjDutyCcys;    // Temporary correction for next period
+  int32_t periodCcys;     // Set next phase cycle at low->high to maintain phase
+  uint32_t expiryCcy;     // For time-limited waveform, the CPU clock cycle when this waveform must stop. If WaveformMode::UPDATE, temporarily holds relative ccy count
   WaveformMode mode;
-  int8_t alignPhase;     // < 0 no phase alignment, otherwise starts waveform in relative phase offset to given pin
-  bool autoPwm;          // perform PWM duty to idle cycle ratio correction under high load at the expense of precise timings
+  int8_t alignPhase;      // < 0 no phase alignment, otherwise starts waveform in relative phase offset to given pin
+  bool autoPwm;           // perform PWM duty to idle cycle ratio correction under high load at the expense of precise timings
 } Waveform;
 
 namespace {
@@ -165,6 +166,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   }
   Waveform& wave = waveform.pins[pin];
   wave.dutyCcys = highCcys;
+  wave.adjDutyCcys = 0;
   wave.periodCcys = periodCcys;
   wave.autoPwm = autoPwm;
 
@@ -352,38 +354,58 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       else {
         const uint32_t overshootCcys = now - waveNextEventCcy;
         if (static_cast<int32_t>(overshootCcys) >= 0) {
+          const int32_t periodCcys = scaleCcys(wave.periodCcys);
           if (waveform.states & pinBit) {
             // active configuration and forward are 100% duty
             if (wave.periodCcys == wave.dutyCcys) {
-              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
+              wave.nextPeriodCcy += periodCcys;
               waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
-            else if (wave.autoPwm && static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
-              waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy + scaleCcys(wave.dutyCcys) - overshootCcys;
-              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
-              // adapt expiry such that it occurs during intended cycle
-              if (WaveformMode::EXPIRES == wave.mode)
-                wave.expiryCcy += scaleCcys(wave.periodCcys);
-            }
             else {
-              waveNextEventCcy = wave.nextPeriodCcy;
-              waveform.states ^= pinBit;
-              if (16 == pin) {
-                GP16O = 0;
+              if (wave.autoPwm && static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
+                wave.endDutyCcy += periodCcys - overshootCcys;
+                wave.nextPeriodCcy += periodCcys;
+                if (static_cast<int32_t>(now - wave.endDutyCcy) >= 0) {
+                  waveNextEventCcy = wave.nextPeriodCcy;
+                }
+                else {
+                  waveNextEventCcy = wave.endDutyCcy;
+                }
+                // adapt expiry such that it occurs during intended cycle
+                if (WaveformMode::EXPIRES == wave.mode)
+                  wave.expiryCcy += periodCcys;
+              }
+              else if (wave.autoPwm) {
+                wave.adjDutyCcys = overshootCcys;
+                waveNextEventCcy = wave.nextPeriodCcy;
               }
               else {
-                GPOC = pinBit;
+                waveNextEventCcy = wave.nextPeriodCcy;
+              }
+              if (waveNextEventCcy == wave.nextPeriodCcy) {
+                waveform.states ^= pinBit;
+                if (16 == pin) {
+                  GP16O = 0;
+                }
+                else {
+                  GPOC = pinBit;
+                }
               }
             }
           }
           else {
             if (!wave.dutyCcys) {
-              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
+              wave.nextPeriodCcy += periodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
-              wave.nextPeriodCcy += scaleCcys(wave.periodCcys);
-              wave.endDutyCcy = now + scaleCcys(wave.dutyCcys);
+              wave.nextPeriodCcy += periodCcys;
+              int32_t dutyCcys = scaleCcys(wave.dutyCcys);
+              if (dutyCcys > wave.adjDutyCcys) {
+                dutyCcys -= wave.adjDutyCcys;
+              }
+              wave.adjDutyCcys = 0;
+              wave.endDutyCcy = now + dutyCcys;
               if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) >= 0) {
                 wave.endDutyCcy = wave.nextPeriodCcy;
               }
