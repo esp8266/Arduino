@@ -362,22 +362,19 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
-              if (wave.autoPwm && static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
-                wave.endDutyCcy += periodCcys - overshootCcys;
-                wave.nextPeriodCcy += periodCcys;
-                if (static_cast<int32_t>(now - wave.endDutyCcy) >= 0) {
-                  waveNextEventCcy = wave.nextPeriodCcy;
+              if (wave.autoPwm) {
+                if (static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
+                  wave.endDutyCcy += periodCcys - overshootCcys;
+                  wave.nextPeriodCcy += periodCcys;
+                  waveNextEventCcy = wave.endDutyCcy;
+                  // adapt expiry such that it occurs during intended cycle
+                  if (WaveformMode::EXPIRES == wave.mode)
+                    wave.expiryCcy += periodCcys;
                 }
                 else {
-                  waveNextEventCcy = wave.endDutyCcy;
+                  wave.adjDutyCcys = overshootCcys;
+                  waveNextEventCcy = wave.nextPeriodCcy;
                 }
-                // adapt expiry such that it occurs during intended cycle
-                if (WaveformMode::EXPIRES == wave.mode)
-                  wave.expiryCcy += periodCcys;
-              }
-              else if (wave.autoPwm) {
-                wave.adjDutyCcys = overshootCcys;
-                waveNextEventCcy = wave.nextPeriodCcy;
               }
               else {
                 waveNextEventCcy = wave.nextPeriodCcy;
