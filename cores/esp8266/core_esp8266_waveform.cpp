@@ -359,36 +359,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             // active configuration and forward are 100% duty
             if (wave.periodCcys == wave.dutyCcys) {
               wave.nextPeriodCcy += periodCcys;
-              waveNextEventCcy = wave.endDutyCcy = wave.nextPeriodCcy;
+              wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
               if (wave.autoPwm) {
-                if (static_cast<int32_t>(now - wave.nextPeriodCcy) >= 0) {
-                  wave.endDutyCcy += periodCcys - overshootCcys;
-                  wave.nextPeriodCcy += periodCcys;
-                  waveNextEventCcy = wave.endDutyCcy;
-                  // adapt expiry such that it occurs during intended cycle
-                  if (WaveformMode::EXPIRES == wave.mode)
-                    wave.expiryCcy += periodCcys;
-                }
-                else {
-                  wave.adjDutyCcys = overshootCcys;
-                  waveNextEventCcy = wave.nextPeriodCcy;
-                }
+                wave.adjDutyCcys += overshootCcys;
+              }
+              waveform.states ^= pinBit;
+              if (16 == pin) {
+                GP16O = 0;
               }
               else {
-                waveNextEventCcy = wave.nextPeriodCcy;
-              }
-              if (waveNextEventCcy == wave.nextPeriodCcy) {
-                waveform.states ^= pinBit;
-                if (16 == pin) {
-                  GP16O = 0;
-                }
-                else {
-                  GPOC = pinBit;
-                }
+                GPOC = pinBit;
               }
             }
+            waveNextEventCcy = wave.nextPeriodCcy;
           }
           else {
             if (!wave.dutyCcys) {
@@ -400,8 +385,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               int32_t dutyCcys = scaleCcys(wave.dutyCcys);
               if (dutyCcys > wave.adjDutyCcys) {
                 dutyCcys -= wave.adjDutyCcys;
+                wave.adjDutyCcys = 0;
               }
-              wave.adjDutyCcys = 0;
+              else {
+                wave.adjDutyCcys -= dutyCcys;
+                dutyCcys = 0;
+              }
               wave.endDutyCcy = now + dutyCcys;
               if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) >= 0) {
                 wave.endDutyCcy = wave.nextPeriodCcy;
