@@ -51,20 +51,6 @@ clsLEAMDNSHost_Legacy::~clsLEAMDNSHost_Legacy(void)
 */
 
 /*
-    clsLEAMDNSHost_Legacy::begin
-
-*/
-bool clsLEAMDNSHost_Legacy::begin(const char* p_pcHostname)
-{
-    bool	bResult = (((!(WIFI_STA & (WiFiMode_t)wifi_get_opmode()))
-                        || (addHostForNetIf(p_pcHostname, netif_get_by_index(WIFI_STA))))
-                       && ((!(WIFI_AP & (WiFiMode_t)wifi_get_opmode()))
-                           || (addHostForNetIf(p_pcHostname, netif_get_by_index(WIFI_AP)))));
-    return ((bResult)
-            && (0 != m_HostInformations.size()));
-}
-
-/*
     clsLEAMDNSHost_Legacy::begin (String)
 
 */
@@ -130,19 +116,18 @@ bool clsLEAMDNSHost_Legacy::end(void)
     NEW!
 
 */
-bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname,
-        netif* p_pNetIf)
+bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname)
 {
-    clsLEAMDNSHost*	pHost = 0;
+    bool    bResult = true;
 
-    if (((pHost = new esp8266::experimental::clsLEAMDNSHost))
-            && (!((pHost->begin(p_pcHostname, p_pNetIf /*, default callback*/))
+    clsLEAMDNSHost* pHost = &esp8266::experimental::clsLEAMDNSHost::clsBackbone::sm_pBackbone.m_uniqueHost;
+
+    if ((!((pHost->begin(p_pcHostname /*, default callback*/))
                   && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
     {
-        delete pHost;
-        pHost = 0;
+        bResult = false;
     }
-    return (0 != pHost);
+    return bResult;
 }
 
 /*
