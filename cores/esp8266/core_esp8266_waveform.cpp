@@ -96,7 +96,6 @@ namespace {
     // we can avoid looking at the other pins.
     int startPin = 0;
     int endPin = 0;
-    int nextPin = 0;
     uint32_t nextEventCcy;
   } waveform;
 
@@ -284,13 +283,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         wave.nextPeriodCcy = waveform.pins[wave.alignPhase].nextPeriodCcy + wave.nextPeriodCcy;
         if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextPeriodCcy) > 0) {
           waveform.nextEventCcy = wave.nextPeriodCcy;
-          waveform.nextPin = waveform.toSet;
         }
       }
       else {
         wave.nextPeriodCcy = isrStartCcy;
         waveform.nextEventCcy = wave.nextPeriodCcy;
-        waveform.nextPin = waveform.toSet;
       }
       if (!wave.expiryCcy) {
         wave.mode = WaveformMode::INFINITE;
@@ -310,31 +307,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + ISRTIMEOUTCCYS;
-  uint32_t isrNextEventCcy;
-  uint32_t busyPins = waveform.enabled;
-  if (waveform.enabled) {
-    if (static_cast<int32_t>(waveform.nextEventCcy - isrTimeoutCcy) >= 0) {
-      busyPins = 0;
-    }
-    else {
-      isrNextEventCcy = waveform.nextEventCcy;
-      waveform.nextEventCcy = isrStartCcy + MAXIRQTICKSCCYS;
-      if (!(waveform.enabled & (1UL << waveform.nextPin))) {
-        waveform.nextPin = waveform.startPin;
-      }
-    }
-  }
-  else {
+  uint32_t busyPins = (static_cast<int32_t>(waveform.nextEventCcy - isrTimeoutCcy) < 0) ? waveform.enabled : 0;
+  if (!waveform.enabled) {
     waveform.nextEventCcy = isrStartCcy + MAXIRQTICKSCCYS;
   }
 
-  const int stopPin = waveform.nextPin;
-  int pin = stopPin;
   while (busyPins) {
-    while (static_cast<int32_t>(isrNextEventCcy - ESP.getCycleCount()) > 0) {
-    }
-    isrNextEventCcy = isrTimeoutCcy;
-    do {
+    for (int pin = waveform.startPin; pin <= waveform.endPin; ++pin) {
       const uint32_t pinBit = 1UL << pin;
       // If it's not on, ignore
       if (!(busyPins & pinBit))
@@ -415,14 +394,10 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           busyPins ^= pinBit;
           if (static_cast<int32_t>(waveform.nextEventCcy - waveNextEventCcy) > 0) {
             waveform.nextEventCcy = waveNextEventCcy;
-            waveform.nextPin = pin;
           }
         }
-        else if (static_cast<int32_t>(isrNextEventCcy - waveNextEventCcy) > 0) {
-          isrNextEventCcy = waveNextEventCcy;
-        }
       }
-    } while ((pin = (pin < waveform.endPin) ? pin + 1 : waveform.startPin) != stopPin);
+    }
   }
 
   int32_t callbackCcys = 0;
