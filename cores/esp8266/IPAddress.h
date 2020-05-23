@@ -42,6 +42,7 @@
 #define CONST /* nothing: lwIP-v1 does not use const */
 #define ip4_addr_netcmp ip_addr_netcmp
 #define netif_dhcp_data(netif) ((netif)->dhcp)
+#define netif_get_index(netif) ((u8_t)((netif)->num + 1))
 #else // lwIP-v2+
 #define CONST const
 #if !LWIP_IPV6

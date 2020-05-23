@@ -941,7 +941,7 @@ bool clsLEAMDNSHost::_leaveMulticastGroups(void)
 #ifdef MDNS_IPV4_SUPPORT
         ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
 #if LWIP_VERSION_MAJOR == 1
-        if (ERR_OK != igmp_leavegroup(ip_2_ip4(&m_rNetIf.ip_addr), ip_2_ip4(&multicast_addr_V4)))
+        if (ERR_OK != igmp_leavegroup(ip_2_ip4(&m_pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4)))
 #else
         if (ERR_OK != igmp_leavegroup_netif(m_pNetIf, ip_2_ip4(&multicast_addr_V4)))
 #endif
