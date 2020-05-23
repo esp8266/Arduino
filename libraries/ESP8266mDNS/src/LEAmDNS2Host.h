@@ -267,7 +267,7 @@ protected:
     /**
          list
     */
-    using list = std::list<clsLEAMDNSHost*>;
+    //using list = std::list<clsLEAMDNSHost*>;
 
     // File: ..._Backbone
     /**
@@ -291,15 +291,16 @@ protected:
         UdpContext*         m_pUDPContext;
         bool                m_bDelayUDPProcessing;
         uint32_t            m_u32DelayedDatagrams;
-        list                m_HostList;
+        //list                m_HostList;
+        clsLEAMDNSHost      m_uniqueHost;
 
         bool _allocUDPContext(void);
         bool _releaseUDPContext(void);
 
         bool _processUDPInput(void);
 
-        const clsLEAMDNSHost* _findHost(netif* p_pNetIf) const;
-        clsLEAMDNSHost* _findHost(netif* p_pNetIf);
+        const clsLEAMDNSHost* _findHost() const { return &m_uniqueHost; }
+        clsLEAMDNSHost* _findHost() { return &m_uniqueHost; }
 
         const char* _DH(void) const;
     };
@@ -1257,12 +1258,6 @@ public:
     // (probing, announcing, responding, ...)
     // If no callback is given, the (maybe) already installed callback stays set
     bool begin(const char* p_pcHostName,
-               netif* p_pNetIf,
-               fnProbeResultCallback p_fnCallback = 0);
-    bool begin(const char* p_pcHostName,
-               WiFiMode_t p_WiFiMode,
-               fnProbeResultCallback p_fnCallback = 0);
-    bool begin(const char* p_pcHostName,
                fnProbeResultCallback p_fnCallback = 0);
 
     bool close(void);
@@ -1640,8 +1635,6 @@ protected:
 
 
 protected:
-    netif*                      m_pNetIf;
-    typeNetIfState              m_NetIfState;
     UdpContext*                 m_pUDPContext;
 
     char*                       m_pcHostName;

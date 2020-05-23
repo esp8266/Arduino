@@ -246,15 +246,13 @@ clsLEAMDNSHost::~clsLEAMDNSHost(void)
 
 */
 bool clsLEAMDNSHost::begin(const char* p_pcHostName,
-                           netif* p_pNetIf,
                            clsLEAMDNSHost::fnProbeResultCallback p_fnCallback /*= 0*/)
 {
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin(%s, netif: %u)\n"), _DH(), (p_pcHostName ? : "_"), (p_pNetIf ? netif_get_index(p_pNetIf) : 0)););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin(%s)\n"), _DH(), (p_pcHostName ? : "_")););
 
     bool    bResult = false;
 
     if (!((bResult = ((setHostName(p_pcHostName)) &&
-                      ((m_pNetIf = p_pNetIf)) &&
                       (_joinMulticastGroups()) &&
                       (p_fnCallback ? setProbeResultCallback(p_fnCallback) : true) &&
                       ((m_pUDPContext = _allocBackbone())) &&

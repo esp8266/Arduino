@@ -218,10 +218,9 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
         while ((m_pUDPContext) &&
                 (m_pUDPContext->next()))
         {
-            netif*          pNetIf = m_pUDPContext->getInputNetif();//ip_current_input_netif();	// Probably changed inbetween!!!!
+            netif*          pNetIf = m_pUDPContext->getInputNetif();//ip_current_input_netif();	// Probably changed in between!!!!
             clsLEAMDNSHost*   pHost = 0;
-            if ((pNetIf) &&
-                    ((pHost = _findHost(pNetIf))))
+            if ((pHost = _findHost(pNetIf)))
             {
                 DEBUG_EX_INFO(
                     if (u32LoopCounter++)
@@ -254,34 +253,6 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
     }
     return bResult;
 }
-
-/*
-    clsLEAmDNS2_Host::clsBackbone::_findHost
-*/
-const clsLEAMDNSHost* clsLEAMDNSHost::clsBackbone::_findHost(netif* p_pNetIf) const
-{
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _findHost\n"), _DH()););
-    const clsLEAMDNSHost* pResult = 0;
-    for (const clsLEAMDNSHost* pHost : m_HostList)
-    {
-        if ((p_pNetIf) &&
-                (pHost->m_pNetIf == p_pNetIf))
-        {
-            pResult = pHost;
-            break;
-        }
-    }
-    return pResult;
-}
-
-/*
-    MDNSResponder::_findHost
-*/
-clsLEAMDNSHost* clsLEAMDNSHost::clsBackbone::_findHost(netif* p_pNetIf)
-{
-    return (clsLEAMDNSHost*)(((const clsLEAMDNSHost::clsBackbone*)this)->_findHost(p_pNetIf));
-}
-
 
 /*
     MISC
