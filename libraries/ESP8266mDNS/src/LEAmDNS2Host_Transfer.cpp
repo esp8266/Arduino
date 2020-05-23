@@ -624,7 +624,7 @@ IPAddress clsLEAMDNSHost::_getResponderIPAddress(enuIPProtocolType p_IPProtocolT
     if (enuIPProtocolType::V4 == p_IPProtocolType)
     {
 #if LWIP_VERSION_MAJOR == 1
-        ipResponder = ip_2_ip4(m_rNetIf.ip_addr);
+        ipResponder = ip_2_ip4(m_pNetIf->ip_addr);
 #else
         ipResponder = netif_ip_addr4(m_pNetIf);
 #endif
