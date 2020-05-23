@@ -308,7 +308,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + ISRTIMEOUTCCYS;
   uint32_t busyPins = (static_cast<int32_t>(waveform.nextEventCcy - isrTimeoutCcy) < 0) ? waveform.enabled : 0;
-  if (!waveform.enabled) {
+  if (!waveform.enabled || busyPins) {
     waveform.nextEventCcy = isrStartCcy + MAXIRQTICKSCCYS;
   }
 
