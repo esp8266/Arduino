@@ -28,19 +28,60 @@
 #include "NetdumpIP.h"
 #include "PacketType.h"
 #include <vector>
+#include "NetdumpUtils.h"
+#include "structures.h"
 
 namespace NetCapture
 {
 
-int constexpr ETH_HDR_LEN = 14;
-
 class Packet
 {
 public:
+	static int constexpr ETH_HDR_LEN = 14;
+
     Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
         : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {
         setPacketTypes();
+        ethernetFrame = new EthernetFrame(rawData());
+
+        switch (ethernetFrame->type())
+        {
+        case 0x0800 :
+        	ipv4Packet = new IPv4Packet(ethernetFrame->hdr->payload);
+        	ipPacket = new IPPacket(ipv4Packet);
+        	break;
+        case 0x86dd :
+        	ipv6Packet = new IPv6Packet(ethernetFrame->hdr->payload);
+        	ipPacket = new IPPacket(ipv6Packet);
+        	break;
+        case 0x0806 :
+			arpPacket = new ARPPacket(ethernetFrame->hdr->payload);
+        	break;
+        default :
+        	break;
+        }
+
+        if (ipPacket)
+        {
+        	switch (ipPacket->packetType())
+			{
+        	case 17 : udpPacket = new UDPPacket(ipPacket->payload());
+        			  break;
+        	case 6  : tcpPacket = new TCPPacket(ipPacket->payload());
+        			  break;
+        	case 1	: icmpPacket = new ICMPPacket(ipPacket->payload());
+        			  break;
+        	default : break;
+			}
+        }
+        if (udpPacket)
+        {
+        	if ((udpPacket->sourcePort() == 5353) || (udpPacket->destinationPort() == 5353))
+        	{
+        		dnsPacket = new DNSPacket(udpPacket->hdr->payload);
+        	}
+        }
     };
 
     Packet() {};
@@ -53,9 +94,20 @@ public:
         RAW
     };
 
-    const char* rawData() const
+    EthernetFrame* ethernetFrame = nullptr;
+    ARPPacket* arpPacket = nullptr;
+    IPv4Packet* ipv4Packet = nullptr;
+    IPv6Packet* ipv6Packet = nullptr;
+    IPPacket* ipPacket = nullptr;
+    UDPPacket* udpPacket = nullptr;
+    DNSPacket* dnsPacket = nullptr;
+    TCPPacket* tcpPacket = nullptr;
+    ICMPPacket* icmpPacket = nullptr;
+
+
+    const uint8_t* rawData() const
     {
-        return data;
+        return reinterpret_cast<const uint8_t*>(data);
     }
     int getInOut() const
     {
@@ -128,7 +180,7 @@ public:
 
     uint8_t  getIcmpType() const
     {
-        return isICMP() ? data[ETH_HDR_LEN + getIpHdrLen() + 0] : 0;
+        return icmpPacket ? icmpPacket->hdr->type : 0;
     }
     uint8_t  getIgmpType() const
     {
@@ -234,6 +286,7 @@ public:
     };
     NetdumpIP sourceIP() const
     {
+    	return ipPacket ? ipPacket->sourceIP() : NetdumpIP();
         NetdumpIP ip;
         if (isIPv4())
         {
@@ -253,6 +306,7 @@ public:
 
     NetdumpIP destIP() const
     {
+    	return ipPacket ? ipPacket->destinationIP() : NetdumpIP();
         NetdumpIP ip;
         if (isIPv4())
         {
@@ -266,10 +320,12 @@ public:
     };
     uint16_t getSrcPort() const
     {
+    	return tcpPacket ? tcpPacket->sourcePort() : (udpPacket ? udpPacket->sourcePort() : 0);
         return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 0) : 0;
     }
     uint16_t getDstPort() const
     {
+    	return tcpPacket ? tcpPacket->destinationPort() : (udpPacket ? udpPacket->destinationPort() : 0);
         return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 2) : 0;
     }
     bool     hasPort(uint16_t p) const
@@ -279,7 +335,7 @@ public:
 
     const String toString() const;
     const String toString(PacketDetail netdumpDetail) const;
-    void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
+    void printDetail(Print& out, const String& indent, const uint8_t* data, size_t size, PacketDetail pd) const;
 
     const PacketType packetType() const;
     const std::vector<PacketType> allPacketTypes() const;
@@ -290,7 +346,7 @@ private:
     void setPacketType(PacketType);
     void setPacketTypes();
 
-    void MACtoString(int dataIdx, StreamString& sstr) const;
+    void MACtoString(const uint8_t* mac, StreamString& sstr) const;
     void ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
     void DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
     void UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;

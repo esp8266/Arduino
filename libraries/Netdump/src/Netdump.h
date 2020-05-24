@@ -42,8 +42,15 @@ public:
     using Filter = std::function<bool(const Packet&)>;
     using Callback = std::function<void(const Packet&)>;
     using LwipCallback = std::function<void(int, const char*, int, int, int)>;
+    using WifiCallback = std::function<void(const char*, int)>;
 
-    Netdump();
+    enum class interface
+	{
+    	LWIP,
+		WIFI
+	};
+
+    Netdump(interface ifc = interface::WIFI);
     ~Netdump();
 
     void setCallback(const Callback nc);
@@ -60,11 +67,16 @@ private:
     Callback netDumpCallback = nullptr;
     Filter   netDumpFilter   = nullptr;
 
-    static void capture(int netif_idx, const char* data, size_t len, int out, int success);
+    static void lwipCapture(int netif_idx, const char* data, size_t len, int out, int success);
+    static void wifiCapture(unsigned char* data, uint16_t len);
     static CallBackList<LwipCallback> lwipCallback;
     CallBackList<LwipCallback>::CallBackHandler lwipHandler;
+    static CallBackList<WifiCallback> wifiCallback;
+    CallBackList<WifiCallback>::CallBackHandler wifiHandler;
+
 
     void netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success);
+    void wifidumpCapture(const char* data, uint16_t len);
 
     void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const;
     void fileDumpProcess(File& outfile, const Packet& np) const;
