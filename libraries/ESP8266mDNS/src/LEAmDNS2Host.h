@@ -278,6 +278,7 @@ protected:
     // File: ..._Backbone
     /**
         clsBackbone
+        XXXX should be merged with holder clsLEAMDNSHost because there is no list anymore in it
     */
     class clsBackbone
     {
@@ -292,6 +293,8 @@ protected:
         bool removeHost(clsLEAMDNSHost* p_pHost);
         size_t hostCount(void) const;
         bool setDelayUDPProcessing(bool p_bDelayProcessing);
+        
+        clsLEAMDNSHost* getUniqueHost() { return m_uniqueHost; }
 
     protected:
         UdpContext*         m_pUDPContext;
@@ -1438,12 +1441,12 @@ protected:
 
     // File: ..._Host_Control
     // RECEIVING
-    bool _parseMessage(void);
+    bool _parseMessage();
     bool _parseQuery(netif* pNetIf,
                      const clsMsgHeader& p_Header);
 
-    bool _parseResponse(const clsMsgHeader& p_Header);
-    bool _processAnswers(const clsRRAnswer* p_pPTRAnswers);
+    bool _parseResponse(netif* pNetIf, const clsMsgHeader& p_Header);
+    bool _processAnswers(netif* pNetIf, const clsRRAnswer* p_pPTRAnswers);
     bool _processPTRAnswer(const clsRRAnswerPTR* p_pPTRAnswer,
                            bool& p_rbFoundNewKeyAnswer);
     bool _processSRVAnswer(const clsRRAnswerSRV* p_pSRVAnswer,
@@ -1477,9 +1480,10 @@ protected:
                           bool p_bAnnounce = true);
 
     // QUERY CACHE
-    bool _checkQueryCache(void);
+    bool _checkQueryCache(netif* pNetIf);
 
-    uint32_t _replyMaskForHost(const clsRRHeader& p_RRHeader,
+    uint32_t _replyMaskForHost(netif* pNetIf,
+                               const clsRRHeader& p_RRHeader,
                                bool* p_pbFullNameMatch = 0) const;
     uint32_t _replyMaskForService(const clsRRHeader& p_RRHeader,
                                   clsService& p_rService,
@@ -1492,7 +1496,7 @@ protected:
     bool _sendMessage_Multicast(netif* pNetIf,
                                 clsSendParameter& p_rSendParameter,
                                 uint8_t p_IPProtocolTypes);
-    bool _prepareMessage(clsSendParameter& p_SendParameter);
+    bool _prepareMessage(netif* pNetIf, clsSendParameter& p_SendParameter);
     bool _addQueryRecord(clsSendParameter& p_rSendParameter,
                          const clsRRDomain& p_QueryDomain,
                          uint16_t p_u16QueryType);
@@ -1504,7 +1508,8 @@ protected:
                     uint16_t p_u16RecordType,
                     clsQuery::clsAnswer::list* p_pKnownAnswers = 0);
 
-    IPAddress _getResponderIPAddress(enuIPProtocolType p_IPProtocolType) const;
+    IPAddress _getResponderIPAddress(netif* pNetIf,
+                                     enuIPProtocolType p_IPProtocolType) const;
 
     // RESOURCE RECORD
     bool _readRRQuestion(clsRRQuestion& p_rQuestion);

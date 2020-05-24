@@ -431,9 +431,18 @@ bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
 {
     bool    bResult = false;
 
-    if ((bResult = ((p_pService) &&
-                    (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)) &&
-                    (_announceService(*p_pService, false)))))
+    if (p_pService &&
+        (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)))
+    {
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+            if (netif_is_up(pNetIf) &&
+                (_announceService(pNetIf, *p_pService, false)))
+            {
+                bResult = true;
+            }
+    }
+
+    if (bResult)
     {
         m_Services.remove(p_pService);
         delete p_pService;
@@ -760,7 +769,7 @@ bool clsLEAMDNSHost::update(void)
             //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
             //{
             if ((_updateProbeStatus(pNetIf)) &&    // Probing and announcing
-                    (_checkQueryCache()))
+                    (_checkQueryCache(pNetIf)))
             {
                 bResult = true;
             }
@@ -778,7 +787,11 @@ bool clsLEAMDNSHost::update(void)
 bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
                               bool p_bIncludeServices /*= true*/)
 {
-    return _announce(p_bAnnounce, p_bIncludeServices);
+    bool bResult = false;
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf) && _announce(pNetIf, p_bAnnounce, p_bIncludeServices))
+            bResult = true;
+    return bResult;
 }
 
 /*
@@ -787,7 +800,11 @@ bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
 bool clsLEAMDNSHost::announceService(clsService * p_pService,
                                      bool p_bAnnounce /*= true*/)
 {
-    return _announceService(*p_pService, p_bAnnounce);
+    bool bResult = false;
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf) && _announceService(pNetIf, *p_pService, p_bAnnounce))
+            bResult = true;
+    return bResult;
 }
 
 /*

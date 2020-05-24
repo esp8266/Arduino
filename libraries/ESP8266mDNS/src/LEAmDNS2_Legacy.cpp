@@ -120,17 +120,17 @@ bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname)
 {
     bool    bResult = true;
     
-    if (m_HostInformations.length() > 0)
+    if (m_HostInformations.size() > 0)
     {
         //XXXFIXME only one pHost instance, many things can be simplified
         bResult = false;
     }
     else
     {
-        clsLEAMDNSHost* pHost = &esp8266::experimental::clsLEAMDNSHost::clsBackbone::sm_pBackbone.m_uniqueHost;
-
-        if ((!((pHost->begin(p_pcHostname /*, default callback*/))
-                      && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
+        clsLEAMDNSHost* pHost = new esp8266::experimental::clsLEAMDNSHost;
+        if (pHost
+            && (!((pHost->begin(p_pcHostname /*, default callback*/))
+            && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
         {
             bResult = false;
         }
