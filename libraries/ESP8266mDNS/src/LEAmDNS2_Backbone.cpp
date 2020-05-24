@@ -71,10 +71,9 @@ UdpContext* clsLEAMDNSHost::clsBackbone::addHost(clsLEAMDNSHost* p_pHost)
 {
     UdpContext* pUDPContext = 0;
 
-    if ((m_pUDPContext) &&
-            (p_pHost))
+    if ((m_pUDPContext) && (p_pHost) && (m_uniqueHost == nullptr))
     {
-        m_HostList.push_back(p_pHost);
+        m_uniqueHost = p_pHost;
         pUDPContext = m_pUDPContext;
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s addHost: %s to add host!\n"), _DH(), (pUDPContext ? "Succeeded" : "FAILED")););
@@ -89,11 +88,9 @@ bool clsLEAMDNSHost::clsBackbone::removeHost(clsLEAMDNSHost* p_pHost)
 {
     bool    bResult = false;
 
-    if ((p_pHost) &&
-            (m_HostList.end() != std::find(m_HostList.begin(), m_HostList.end(), p_pHost)))
+    if ((p_pHost) && (m_uniqueHost == p_pHost))
     {
-        // Remove host object
-        m_HostList.remove(p_pHost);
+        m_uniqueHost = nullptr;
         bResult = true;
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s removeHost: %s to remove host!\n"), _DH(), (bResult ? "Succeeded" : "FAILED")););
@@ -107,7 +104,7 @@ bool clsLEAMDNSHost::clsBackbone::removeHost(clsLEAMDNSHost* p_pHost)
 */
 size_t clsLEAMDNSHost::clsBackbone::hostCount(void) const
 {
-    return m_HostList.size();
+    return m_uniqueHost == nullptr? 0: 1;
 }
 
 /*
@@ -220,7 +217,7 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
         {
             netif*          pNetIf = m_pUDPContext->getInputNetif();
             clsLEAMDNSHost*   pHost = 0;
-            if ((pHost = _findHost(pNetIf)))
+            if ((pHost = _findHost()))
             {
                 DEBUG_EX_INFO_IF(u32LoopCounter++,
                                  DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);

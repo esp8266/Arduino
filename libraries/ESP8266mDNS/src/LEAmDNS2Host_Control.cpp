@@ -82,7 +82,7 @@ bool clsLEAMDNSHost::_parseMessage(void)
             {
                 // Received a query (Questions)
                 //DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseMessage: Reading query: ID:%u, Q:%u, A:%u, NS:%u, AR:%u\n"), _DH(), header.m_u16ID, header.m_u16QDCount, header.m_u16ANCount, header.m_u16NSCount, header.m_u16ARCount););
-                bResult = _parseQuery(header);
+                bResult = _parseQuery(m_pUDPContext->getInputNetif(), header);
             }
         }
         else
@@ -119,7 +119,8 @@ bool clsLEAMDNSHost::_parseMessage(void)
     Legacy queries have got only one (unicast) question and are directed to the local DNS port (not the multicast port).
 
 */
-bool clsLEAMDNSHost::_parseQuery(const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader)
+bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
+                                 const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader)
 {
     bool    bResult = true;
 
@@ -209,9 +210,9 @@ bool clsLEAMDNSHost::_parseQuery(const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader
                     if ((m_pUDPContext) &&
 #ifdef MDNS_IPV4_SUPPORT
                             (m_pUDPContext->getRemoteAddress().isV4()) &&
-                            (ip4_addr_netcmp(ip_2_ip4(m_pUDPContext->getRemoteAddress()),
-                                             ip_2_ip4(m_pUDPContext->getInputNetif()->ip_addr),
-                                             ip_2_ip4(m_pUDPContext->getInputNetif()->netmask))
+                            (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)m_pUDPContext->getRemoteAddress()),
+                                             ip_2_ip4(&m_pUDPContext->getInputNetif()->ip_addr),
+                                             ip_2_ip4(&m_pUDPContext->getInputNetif()->netmask)))
 #else
                             (true)
 #endif
@@ -548,7 +549,7 @@ bool clsLEAMDNSHost::_parseQuery(const clsLEAMDNSHost::clsMsgHeader& p_MsgHeader
             sendParameter.m_Response = clsSendParameter::enuResponseType::Response;
             sendParameter.m_bAuthorative = true;
 
-            bResult = _sendMessage(sendParameter);
+            bResult = _sendMessage(pNetIf, sendParameter);
         }
         DEBUG_EX_INFO(else
         {
@@ -1281,7 +1282,7 @@ bool clsLEAMDNSHost::_processAAAAAnswer(const clsLEAMDNSHost::clsRRAnswerAAAA* p
     Conflict management is handled in '_parseResponse ff.'
     Tiebraking is handled in 'parseQuery ff.'
 */
-bool clsLEAMDNSHost::_updateProbeStatus(void)
+bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
 {
     bool    bResult = true;
 
@@ -1314,7 +1315,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(void)
         if (clsConsts::u32ProbeCount > m_ProbeInformation.m_u8SentCount)
         {
             // Send next probe
-            if ((bResult = _sendHostProbe()))
+            if ((bResult = _sendHostProbe(pNetIf)))
             {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent host probe for '%s.local'\n\n"), _DH(), (m_pcHostName ? : "")););
                 m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
@@ -1378,7 +1379,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(void)
             if (clsConsts::u32ProbeCount > pService->m_ProbeInformation.m_u8SentCount)
             {
                 // Send next probe
-                if ((bResult = _sendServiceProbe(*pService)))
+                if ((bResult = _sendServiceProbe(pNetIf, *pService)))
                 {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent service probe for '%s' (%u)\n\n"), _DH(), _service2String(pService), (pService->m_ProbeInformation.m_u8SentCount + 1)););
                     pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
@@ -1482,7 +1483,7 @@ bool clsLEAMDNSHost::_hasProbesWaitingForAnswers(void) const
     - A/AAAA (eg. esp8266.esp -> 192.168.2.120)
 
 */
-bool clsLEAMDNSHost::_sendHostProbe(void)
+bool clsLEAMDNSHost::_sendHostProbe(netif* pNetIf)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe (%s.local, %lu)\n"), _DH(), m_pcHostName, millis()););
 
@@ -1521,7 +1522,7 @@ bool clsLEAMDNSHost::_sendHostProbe(void)
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(sendParameter)));
+            (_sendMessage(pNetIf, sendParameter)));
 }
 
 /*
@@ -1537,7 +1538,7 @@ bool clsLEAMDNSHost::_sendHostProbe(void)
     - PTR NAME (eg. _http._tcp.local -> MyESP._http._tcp.local) (TODO: Check if needed, maybe TXT is better)
 
 */
-bool clsLEAMDNSHost::_sendServiceProbe(clsService& p_rService)
+bool clsLEAMDNSHost::_sendServiceProbe(netif* pNetIf, clsService& p_rService)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe (%s, %lu)\n"), _DH(), _service2String(&p_rService), millis()););
 
@@ -1571,7 +1572,7 @@ bool clsLEAMDNSHost::_sendServiceProbe(clsService& p_rService)
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(sendParameter)));
+            (_sendMessage(pNetIf, sendParameter)));
 }
 
 /*
@@ -1670,7 +1671,8 @@ bool clsLEAMDNSHost::_callServiceProbeResultCallback(clsLEAMDNSHost::clsService&
     inside the '_writeXXXAnswer' procs via 'sendParameter.m_bUnannounce = true'
 
 */
-bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
+bool clsLEAMDNSHost::_announce(netif* pNetIf,
+                               bool p_bAnnounce,
                                bool p_bIncludeServices)
 {
     bool    bResult = false;
@@ -1716,14 +1718,15 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announce: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(sendParameter)));
+            (_sendMessage(pNetIf, sendParameter)));
 }
 
 /*
     clsLEAmDNS2_Host::_announceService
 
 */
-bool clsLEAMDNSHost::_announceService(clsLEAMDNSHost::clsService& p_rService,
+bool clsLEAMDNSHost::_announceService(netif* pNetIf,
+                                      clsLEAMDNSHost::clsService& p_rService,
                                       bool p_bAnnounce /*= true*/)
 {
     bool    bResult = false;
@@ -1749,7 +1752,7 @@ bool clsLEAMDNSHost::_announceService(clsLEAMDNSHost::clsService& p_rService,
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announceService: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(sendParameter)));
+            (_sendMessage(pNetIf, sendParameter)));
 }
 
 

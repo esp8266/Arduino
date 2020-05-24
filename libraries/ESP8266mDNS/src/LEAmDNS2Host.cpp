@@ -175,10 +175,10 @@ bool clsLEAMDNSHost::setNetIfHostName(const char* p_pcHostName)
 {
     if (p_pcHostName)
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
-        {
-            netif_set_hostname(pNetIf, p_pcHostName);
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s on " NETIFID_STR "!\n"), p_pcHostName, NETIFID_VAL(pNetIf)););
-        }
+            {
+                netif_set_hostname(pNetIf, p_pcHostName);
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s on " NETIFID_STR "!\n"), p_pcHostName, NETIFID_VAL(pNetIf)););
+            }
     return true;
 }
 
@@ -506,37 +506,55 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryService
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryService '_%s._%s.local'\n"), _DH(), p_pcService, p_pcProtocol););
 
-    clsQuery*    pQuery = 0;
-    if ((p_pcService) && (*p_pcService) &&
+    clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector ret;
+
+    if (_removeLegacyQuery() &&
+            (p_pcService) && (*p_pcService) &&
             (p_pcProtocol) && (*p_pcProtocol) &&
-            (p_u16Timeout) &&
-            ((pQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
-            (_buildDomainForService(p_pcService, p_pcProtocol, pQuery->m_Domain)))
+            (p_u16Timeout))
     {
-        if ((_removeLegacyQuery()) &&
-                ((pQuery->m_bStaticQuery = true)) &&
-                (_sendQuery(*pQuery)))
+        std::list<clsQuery*> queries;
+
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+            if (netif_is_up(pNetIf))
+            {
+                clsQuery*    pQuery = 0;
+                if (((pQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
+                        (_buildDomainForService(p_pcService, p_pcProtocol, pQuery->m_Domain)))
+                {
+                    if (((pQuery->m_bStaticQuery = true)) && (_sendQuery(pNetIf, *pQuery)))
+                    {
+                        queries.push_back(pQuery);
+                    }
+                    else
+                    {
+                        // FAILED to send query
+                        _removeQuery(pQuery);
+                    }
+                }
+            }
+
+        if (queries.size())
         {
             // Wait for answers to arrive
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryService: Waiting %u ms for answers...\n"), _DH(), p_u16Timeout););
+            //XXXFIXME could this delay be ASYNC?
             delay(p_u16Timeout);
 
             // All answers should have arrived by now -> stop adding new answers
-            pQuery->m_bAwaitingAnswers = false;
+            for (auto& q : queries)
+            {
+                q->m_bAwaitingAnswers = false;
+                ret.insert(ret.end(), std::make_move_iterator(q->answerAccessors().begin()), std::make_move_iterator(q->answerAccessors().end()));
+            }
         }
         else
         {
-            // FAILED to send query
-            _removeQuery(pQuery);
+            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s queryService: INVALID input data!\n"), _DH()););
         }
+
     }
-    else
-    {
-        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s queryService: INVALID input data!\n"), _DH()););
-    }
-    return ((pQuery)
-            ? pQuery->answerAccessors()
-            : clsQuery::clsAnswerAccessor::vector());
+    return ret;
 }
 
 /*
@@ -546,40 +564,58 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryService
 clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryHost(const char* p_pcHostName,
         const uint16_t p_u16Timeout)
 {
+    clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector ret;
+
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryHost '%s.local'\n"), _DH(), p_pcHostName););
 
-    clsQuery*    pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName) &&
             (p_u16Timeout) &&
-            ((pQuery = _allocQuery(clsQuery::enuQueryType::Host))) &&
-            (_buildDomainForHost(p_pcHostName, pQuery->m_Domain)))
+            (_removeLegacyQuery()))
     {
-        if ((_removeLegacyQuery()) &&
-                ((pQuery->m_bStaticQuery = true)) &&
-                (_sendQuery(*pQuery)))
+        std::list<clsQuery*> queries;
+
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+            if (netif_is_up(pNetIf))
+            {
+                clsQuery*    pQuery = 0;
+                if (((pQuery = _allocQuery(clsQuery::enuQueryType::Host))) &&
+                        (_buildDomainForHost(p_pcHostName, pQuery->m_Domain)))
+                {
+                    if (((pQuery->m_bStaticQuery = true)) && (_sendQuery(pNetIf, *pQuery)))
+                    {
+                        queries.push_back(pQuery);
+                    }
+                    else
+                    {
+                        // FAILED to send query
+                        _removeQuery(pQuery);
+                    }
+                }
+            }
+
+        if (queries.size())
         {
             // Wait for answers to arrive
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s queryHost: Waiting %u ms for answers...\n"), _DH(), p_u16Timeout););
+            //XXXFIXME could this delay be ASYNC?
             delay(p_u16Timeout);
 
             // All answers should have arrived by now -> stop adding new answers
-            pQuery->m_bAwaitingAnswers = false;
+
+            for (auto& q : queries)
+            {
+                q->m_bAwaitingAnswers = false;
+                ret.insert(ret.end(), std::make_move_iterator(q->answerAccessors().begin()), std::make_move_iterator(q->answerAccessors().end()));
+            }
         }
         else
         {
-            // FAILED to send query
-            _removeQuery(pQuery);
+            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s queryHost: INVALID input data!\n"), _DH()););
         }
     }
-    else
-    {
-        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s queryHost: INVALID input data!\n"), _DH()););
-    }
-    return ((pQuery)
-            ? pQuery->answerAccessors()
-            : clsQuery::clsAnswerAccessor::vector());
-}
 
+    return ret;
+}
 /*
     clsLEAmDNS2_Host::removeQuery
 
@@ -611,84 +647,100 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
     clsLEAmDNS2_Host::installServiceQuery (answer)
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
+/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
         const char* p_pcProtocol,
         clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
+    bool bResult = false;
     clsQuery*   pQuery = 0;
-    if ((pQuery = _installServiceQuery(p_pcService, p_pcProtocol)))
-    {
-        pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
-    }
-    return pQuery;
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf) && (pQuery = _installServiceQuery(pNetIf, p_pcService, p_pcProtocol)))
+        {
+            pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
+            bResult = true;
+        }
+    return bResult;
 }
 
 /*
     clsLEAmDNS2_Host::installServiceQuery (accessor)
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
+/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
         const char* p_pcProtocol,
         clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
+    bool bResult = false;
     clsQuery*   pQuery = 0;
-    if ((pQuery = _installServiceQuery(p_pcService, p_pcProtocol)))
-    {
-        pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
-    }
-    return pQuery;
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf) && (pQuery = _installServiceQuery(pNetIf, p_pcService, p_pcProtocol)))
+        {
+            pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
+            bResult = true;
+        }
+    return bResult;
 }
 
 /*
     clsLEAmDNS2_Host::installHostQuery (answer)
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
+/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
         clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
+    bool bResult = false;
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
-    {
-        clsRRDomain    domain;
-        if ((pQuery = ((_buildDomainForHost(p_pcHostName, domain))
-                       ? _installDomainQuery(domain, clsQuery::enuQueryType::Host)
-                       : 0)))
-        {
-            pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
-        }
-    }
-    return pQuery;
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+            if (netif_is_up(pNetIf))
+            {
+                clsRRDomain    domain;
+                if ((pQuery = ((_buildDomainForHost(p_pcHostName, domain))
+                               ? _installDomainQuery(pNetIf, domain, clsQuery::enuQueryType::Host)
+                               : 0)))
+                {
+                    pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
+                    bResult = true;
+                }
+            }
+    return bResult;
 }
 
 /*
     clsLEAmDNS2_Host::installHostQuery (accessor)
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
+/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
         clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
+    bool bResult = true;
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
-    {
-        clsRRDomain    domain;
-        if ((pQuery = ((_buildDomainForHost(p_pcHostName, domain))
-                       ? _installDomainQuery(domain, clsQuery::enuQueryType::Host)
-                       : 0)))
-        {
-            pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
-        }
-    }
-    return pQuery;
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+            if (netif_is_up(pNetIf))
+            {
+                clsRRDomain    domain;
+                if ((pQuery = ((_buildDomainForHost(p_pcHostName, domain))
+                               ? _installDomainQuery(pNetIf, domain, clsQuery::enuQueryType::Host)
+                               : 0)))
+                {
+                    pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
+                    bResult = true;
+                }
+            }
+    return bResult;
 }
 
 /*
     clsLEAmDNS2_Host::removeQuery
 */
-bool clsLEAMDNSHost::removeQuery(clsLEAMDNSHost::clsQuery* p_pMDNSQuery)
-{
+/*
+    bool clsLEAMDNSHost::removeQuery(clsLEAMDNSHost::clsQuery * p_pMDNSQuery)
+    {
     bool    bResult = ((p_pMDNSQuery) &&
                        (_removeQuery(p_pMDNSQuery)));
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s removeQuery: FAILED!\n"), _DH()););
     return bResult;
-}
+    }
+*/
 
 
 /*
@@ -702,15 +754,21 @@ bool clsLEAMDNSHost::update(void)
 {
     bool    bResult = false;
 
-    //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
-    //{
-    bResult = ((_updateProbeStatus()) &&    // Probing and announcing
-               (_checkQueryCache()));
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf))
+        {
+            //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
+            //{
+            if ((_updateProbeStatus(pNetIf)) &&    // Probing and announcing
+                    (_checkQueryCache()))
+            {
+                bResult = true;
+            }
 
-    //    clsBackbone::sm_pBackbone->setDelayUDPProcessing(false);
-    //}
+            //    clsBackbone::sm_pBackbone->setDelayUDPProcessing(false);
+            //}
+        }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s update: FAILED (Not connected?)!\n"), _DH()););
-
     return bResult;
 }
 
@@ -726,7 +784,7 @@ bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
 /*
     clsLEAmDNS2_Host::announceService
 */
-bool clsLEAMDNSHost::announceService(clsService* p_pService,
+bool clsLEAMDNSHost::announceService(clsService * p_pService,
                                      bool p_bAnnounce /*= true*/)
 {
     return _announceService(*p_pService, p_bAnnounce);
@@ -840,45 +898,45 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
 
     // Join multicast group(s)
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
-    {
+        {
 #ifdef MDNS_IPV4_SUPPORT
-        ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
-        if (!(m_pNetIf->flags & NETIF_FLAG_IGMP))
-        {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: Setting flag: flags & NETIF_FLAG_IGMP\n"), _DH()););
-            m_pNetIf->flags |= NETIF_FLAG_IGMP;
-
-            if (ERR_OK != igmp_start(m_pNetIf))
+            ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
+            if (!(pNetIf->flags & NETIF_FLAG_IGMP))
             {
-                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: igmp_start FAILED!\n"), _DH()););
-            }
-        }
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: Setting flag: flags & NETIF_FLAG_IGMP\n"), _DH()););
+                pNetIf->flags |= NETIF_FLAG_IGMP;
 
-        if (
+                if (ERR_OK != igmp_start(pNetIf))
+                {
+                    DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: igmp_start FAILED!\n"), _DH()););
+                }
+            }
+
+            if (
 #if LWIP_VERSION_MAJOR == 1
-                   (ERR_OK == igmp_joingroup(&pNetIf->ip_addr, &multicast_addr_V4))
+                (ERR_OK == igmp_joingroup(&pNetIf->ip_addr, &multicast_addr_V4))
 #else
-                   (ERR_OK == igmp_joingroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
+                (ERR_OK == igmp_joingroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
 #endif
-           )
-        {
-            bResult = true;
-        }
-        else
-        {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: igmp_joingroup_netif(" NETIFID_STR ": %s) FAILED!\n"),
-                _DH(), NETIFID_VAL(pNetIf), IPAddress(multicast_addr_V4).toString().c_str()););
-        }
+            )
+            {
+                bResult = true;
+            }
+            else
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: igmp_joingroup_netif(" NETIFID_STR ": %s) FAILED!\n"),
+                                                   _DH(), NETIFID_VAL(pNetIf), IPAddress(multicast_addr_V4).toString().c_str()););
+            }
 #endif
 
 #ifdef MDNS_IPV6_SUPPORT
-        ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
-        bResult = ((bResult) &&
-                   (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
-        DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: mld6_joingroup_netif (" NETIFID_STR ") FAILED!\n"),
-            _DH(), NETIFID_VAL(pNetIf)););
+            ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
+            bResult = ((bResult) &&
+                       (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
+            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: mld6_joingroup_netif (" NETIFID_STR ") FAILED!\n"),
+                         _DH(), NETIFID_VAL(pNetIf)););
 #endif
-    }
+        }
     return bResult;
 }
 
@@ -890,33 +948,33 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
     bool    bResult = false;
 
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
-    {
-        bResult = true;
-        /*  _resetProbeStatus(false);   // Stop probing
-            _releaseQueries();
-            _releaseServices();
-            _releaseHostName();*/
-
-        // Leave multicast group(s)
-#ifdef MDNS_IPV4_SUPPORT
-        ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
-#if LWIP_VERSION_MAJOR == 1
-        if (ERR_OK != igmp_leavegroup(ip_2_ip4(pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4)))
-#else
-        if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
-#endif
         {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
-        }
+            bResult = true;
+            /*  _resetProbeStatus(false);   // Stop probing
+                _releaseQueries();
+                _releaseServices();
+                _releaseHostName();*/
+
+            // Leave multicast group(s)
+#ifdef MDNS_IPV4_SUPPORT
+            ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
+#if LWIP_VERSION_MAJOR == 1
+            if (ERR_OK != igmp_leavegroup(ip_2_ip4(pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4)))
+#else
+            if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
+#endif
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
+            }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-        ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
-        if (ERR_OK != mld6_leavegroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6)/*&(multicast_addr_V6.u_addr.ip6)*/))
-        {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
-        }
+            ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
+            if (ERR_OK != mld6_leavegroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6)/*&(multicast_addr_V6.u_addr.ip6)*/))
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
+            }
 #endif
-    }
+        }
     return bResult;
 }
 
@@ -1041,7 +1099,7 @@ const char* clsLEAMDNSHost::_instanceName(const char* p_pcInstanceName,
 /*
     clsLEAmDNS2_Host::_collectServiceTxts
 */
-bool clsLEAMDNSHost::_collectServiceTxts(clsLEAMDNSHost::clsService& p_rService)
+bool clsLEAMDNSHost::_collectServiceTxts(clsLEAMDNSHost::clsService & p_rService)
 {
     if (p_rService.m_fnTxtCallback)
     {
@@ -1053,7 +1111,7 @@ bool clsLEAMDNSHost::_collectServiceTxts(clsLEAMDNSHost::clsService& p_rService)
 /*
     clsLEAmDNS2_Host::_releaseTempServiceTxts
 */
-bool clsLEAMDNSHost::_releaseTempServiceTxts(clsLEAMDNSHost::clsService& p_rService)
+bool clsLEAMDNSHost::_releaseTempServiceTxts(clsLEAMDNSHost::clsService & p_rService)
 {
     return (p_rService.m_Txts.removeTempTxts());
 }
@@ -1084,7 +1142,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_allocQuery(clsLEAMDNSHost::clsQuery::
     MDNSResponder:clsHost:::_removeQuery
 
 */
-bool clsLEAMDNSHost::_removeQuery(clsLEAMDNSHost::clsQuery* p_pQuery)
+bool clsLEAMDNSHost::_removeQuery(clsLEAMDNSHost::clsQuery * p_pQuery)
 {
     bool    bResult = false;
 
@@ -1154,9 +1212,9 @@ bool clsLEAMDNSHost::_releaseQueries(void)
     clsLEAmDNS2_Host::_findNextQueryByDomain
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDNSHost::clsRRDomain& p_Domain,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDNSHost::clsRRDomain & p_Domain,
         const clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType,
-        const clsQuery* p_pPrevQuery)
+        const clsQuery * p_pPrevQuery)
 {
     clsQuery*    pMatchingQuery = 0;
 
@@ -1191,7 +1249,8 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDN
     clsLEAmDNS2_Host::_installServiceQuery
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(const char* p_pcService,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(netif* pNetIf,
+        const char* p_pcService,
         const char* p_pcProtocol)
 {
     clsQuery*   pMDNSQuery = 0;
@@ -1203,7 +1262,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(const char* p_pcS
     {
         pMDNSQuery->m_bStaticQuery = false;
 
-        if (_sendQuery(*pMDNSQuery))
+        if (_sendQuery(pNetIf, *pMDNSQuery))
         {
             pMDNSQuery->m_u8SentCount = 1;
             pMDNSQuery->m_ResendTimeout.reset(clsConsts::u32DynamicQueryResendDelay);
@@ -1221,7 +1280,8 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(const char* p_pcS
 /*
     clsLEAmDNS2_Host::_installDomainQuery
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(clsLEAMDNSHost::clsRRDomain& p_Domain,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(netif* pNetIf,
+        clsLEAMDNSHost::clsRRDomain & p_Domain,
         clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType)
 {
     clsQuery*    pQuery = 0;
@@ -1231,7 +1291,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(clsLEAMDNSHost::cl
         pQuery->m_Domain = p_Domain;
         pQuery->m_bStaticQuery = false;
 
-        if (_sendQuery(*pQuery))
+        if (_sendQuery(pNetIf, *pQuery))
         {
             pQuery->m_u8SentCount = 1;
             pQuery->m_ResendTimeout.reset(clsConsts::u32DynamicQueryResendDelay);
@@ -1246,13 +1306,10 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(clsLEAMDNSHost::cl
         _printRRDomain(p_Domain);
         DEBUG_OUTPUT.println();
     );
-    DEBUG_EX_ERR(if (!pQuery)
-{
-    DEBUG_OUTPUT.printf_P(PSTR("%s _installDomainQuery: FAILED for "), _DH());
-        _printRRDomain(p_Domain);
-        DEBUG_OUTPUT.println();
-    }
-                );
+    DEBUG_EX_ERR_IF(!pQuery,
+                    DEBUG_OUTPUT.printf_P(PSTR("%s _installDomainQuery: FAILED for "), _DH());
+                    _printRRDomain(p_Domain);
+                    DEBUG_OUTPUT.println());
     return pQuery;
 }
 
@@ -1277,8 +1334,8 @@ bool clsLEAMDNSHost::_hasQueriesWaitingForAnswers(void) const
 /*
     clsLEAmDNS2_Host::_executeQueryCallback
 */
-bool clsLEAMDNSHost::_executeQueryCallback(const clsQuery& p_Query,
-        const clsQuery::clsAnswer& p_Answer,
+bool clsLEAMDNSHost::_executeQueryCallback(const clsQuery & p_Query,
+        const clsQuery::clsAnswer & p_Answer,
         clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
         bool p_bSetContent)
 {
