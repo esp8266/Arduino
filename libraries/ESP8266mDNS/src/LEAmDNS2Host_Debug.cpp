@@ -40,23 +40,16 @@ namespace experimental
     clsLEAmDNS2_Host::_DH
 
 */
-const char* clsLEAMDNSHost::_DH(const clsLEAMDNSHost::clsService* p_pService /*= 0*/) const
+xxxxx const char* clsLEAMDNSHost::_DH(const clsLEAMDNSHost::clsService* p_pService /*= 0*/) const
 {
     static char acBuffer[16 + 64];
 
     *acBuffer = 0;
-    if (m_pNetIf)
+    sprintf_P(acBuffer, PSTR("[mDNS]");
+    if (p_pService)
     {
-        sprintf_P(acBuffer, PSTR("[mDNS %c%c%u]"), m_pNetIf->name[0], m_pNetIf->name[1], m_pNetIf->num);
-        if (p_pService)
-        {
-            strcat_P(acBuffer, PSTR(">"));
-            strcat(acBuffer, _service2String(p_pService));
-        }
-    }
-    else
-    {
-        strcpy_P(acBuffer, PSTR("[mDNS]"));
+        strcat_P(acBuffer, PSTR(">"));
+        strcat(acBuffer, _service2String(p_pService));
     }
     return acBuffer;
 }

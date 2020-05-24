@@ -154,8 +154,7 @@ public:
     // NEW! The ESP-default network interfaces are 'auto-added' via 'begin' when active
     // Additional netifs may be added, but if done so after calling 'update' for the
     // first time, 'notifyAPChange' should be called to restart the probing/announcing process
-    bool addHostForNetIf(const char* p_pcHostname,
-                         netif* p_pNetIf);
+    bool addHostForNetIf(const char* p_pcHostname);
 
     // Change hostname (probing is restarted)
     // Caution! The final hostname (after probing) may be different for every host

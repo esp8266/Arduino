@@ -171,15 +171,14 @@ const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
 
 */
 // static
-bool clsLEAMDNSHost::setNetIfHostName(netif* p_pNetIf,
-                                      const char* p_pcHostName)
+bool clsLEAMDNSHost::setNetIfHostName(const char* p_pcHostName)
 {
-    if ((p_pNetIf) &&
-            (p_pcHostName))
-    {
-        netif_set_hostname(p_pNetIf, (char*)p_pcHostName);  // LWIP 1.x forces 'char*' instead of 'const char*'
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s!\n"), p_pcHostName););
-    }
+    if (p_pcHostName)
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
+        {
+            netif_set_hostname(pNetIf, p_pcHostName);
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s on " NETIFID_STR "!\n"), p_pcHostName, NETIFID_VAL(pNetIf)););
+        }
     return true;
 }
 
@@ -214,9 +213,7 @@ const char* clsLEAMDNSHost::clsConsts::pcReverseTopDomain             = "arpa";
 
 */
 clsLEAMDNSHost::clsLEAMDNSHost(void)
-    :   m_pNetIf(0),
-        m_NetIfState(static_cast<typeNetIfState>(enuNetIfState::None)),
-        m_pUDPContext(0),
+    :   m_pUDPContext(0),
         m_pcHostName(0),
         m_pcDefaultInstanceName(0),
         m_ProbeInformation()
@@ -239,9 +236,9 @@ clsLEAMDNSHost::~clsLEAMDNSHost(void)
 */
 
 /*
-    clsLEAmDNS2_Host::begin (hostname, netif, probe_callback)
+    clsLEAmDNS2_Host::begin (hostname, probe_callback)
 
-    Creates a new mDNS host (adding the netif to the multicast groups),
+    setup global mDNS (adding all netif to the multicast groups),
     sets up the instance data (hostname, ...) and starts the probing process
 
 */
@@ -261,46 +258,6 @@ bool clsLEAMDNSHost::begin(const char* p_pcHostName,
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: FAILED for '%s'!\n"), _DH(), (p_pcHostName ? : "-")););
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin: %s to init with hostname %s!\n"), _DH(), (bResult ? "Succeeded" : "FAILED"), (p_pcHostName ? : "-")););
-    return bResult;
-}
-
-/*
-    clsLEAmDNS2_Host::begin (hostname, probe_callback)
-
-*/
-bool clsLEAMDNSHost::begin(const char* p_pcHostName,
-                           clsLEAMDNSHost::fnProbeResultCallback p_fnCallback /*= 0*/)
-{
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin(%s)\n"), _DH(), (p_pcHostName ? : "_")););
-
-    return begin(p_pcHostName, (WiFiMode_t)wifi_get_opmode(), p_fnCallback);
-}
-
-/*
-    clsLEAmDNS2_Host::begin (hostname, WiFiMode, probe_callback)
-
-*/
-bool clsLEAMDNSHost::begin(const char* p_pcHostName,
-                           WiFiMode_t p_WiFiMode,
-                           clsLEAMDNSHost::fnProbeResultCallback p_fnCallback /*= 0*/)
-{
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin(%s, opmode: %u)\n"), _DH(), (p_pcHostName ? : "_"), (uint32_t)p_WiFiMode););
-
-    bool bResult = false;
-
-    if (p_WiFiMode == WIFI_STA)
-    {
-        bResult = begin(p_pcHostName, netif_get_by_index(WIFI_STA), p_fnCallback);
-    }
-    else if (p_WiFiMode == WIFI_AP)
-    {
-        bResult = begin(p_pcHostName, netif_get_by_index(WIFI_AP), p_fnCallback);
-    }
-    else
-    {
-        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: FAILED for WiFi mode '%u'! Only 'WIFI_STA' or 'WIFI_AP' is allowed (HostName: %s)!\n"), _DH(), (bResult ? "Succeeded" : "FAILED"), p_WiFiMode, (p_pcHostName ? : "-")););
-    }
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin: %s for WiFi mode '%u' (HostName: %s)!\n"), _DH(), (bResult ? "Succeeded" : "FAILED"), p_WiFiMode, (p_pcHostName ? : "-")););
     return bResult;
 }
 
@@ -747,8 +704,7 @@ bool clsLEAMDNSHost::update(void)
 
     //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
     //{
-    bResult = ((_checkNetIfState()) &&      // Any changes in the netif state?
-               (_updateProbeStatus()) &&    // Probing and announcing
+    bResult = ((_updateProbeStatus()) &&    // Probing and announcing
                (_checkQueryCache()));
 
     //    clsBackbone::sm_pBackbone->setDelayUDPProcessing(false);
@@ -883,10 +839,8 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
     bool    bResult = false;
 
     // Join multicast group(s)
-    if (m_pNetIf)
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
     {
-        bResult = true;
-
 #ifdef MDNS_IPV4_SUPPORT
         ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
         if (!(m_pNetIf->flags & NETIF_FLAG_IGMP))
@@ -900,20 +854,29 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
             }
         }
 
-        bResult = ((bResult) &&
+        if (
 #if LWIP_VERSION_MAJOR == 1
-                   (ERR_OK == igmp_joingroup(ip_2_ip4(&m_pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4))));
+                   (ERR_OK == igmp_joingroup(&pNetIf->ip_addr, &multicast_addr_V4))
 #else
-                   (ERR_OK == igmp_joingroup_netif(m_pNetIf, ip_2_ip4(&multicast_addr_V4))));
+                   (ERR_OK == igmp_joingroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
 #endif
-        DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: igmp_joingroup_netif(%s) FAILED!\n"), _DH(), IPAddress(multicast_addr_V4).toString().c_str()););
+           )
+        {
+            bResult = true;
+        }
+        else
+        {
+            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: igmp_joingroup_netif(" NETIFID_STR ": %s) FAILED!\n"),
+                _DH(), NETIFID_VAL(pNetIf), IPAddress(multicast_addr_V4).toString().c_str()););
+        }
 #endif
 
 #ifdef MDNS_IPV6_SUPPORT
         ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
         bResult = ((bResult) &&
-                   (ERR_OK == mld6_joingroup_netif(m_pNetIf, ip_2_ip6(&multicast_addr_V6))));
-        DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: mld6_joingroup_netif FAILED!\n"), _DH()););
+                   (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
+        DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: mld6_joingroup_netif (" NETIFID_STR ") FAILED!\n"),
+            _DH(), NETIFID_VAL(pNetIf)););
 #endif
     }
     return bResult;
@@ -922,15 +885,14 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
 /*
     clsLEAmDNS2_Host::_leaveMulticastGroups
 */
-bool clsLEAMDNSHost::_leaveMulticastGroups(void)
+bool clsLEAMDNSHost::_leaveMulticastGroups()
 {
     bool    bResult = false;
 
-    if (m_pNetIf)
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
     {
         bResult = true;
         /*  _resetProbeStatus(false);   // Stop probing
-
             _releaseQueries();
             _releaseServices();
             _releaseHostName();*/
@@ -939,9 +901,9 @@ bool clsLEAMDNSHost::_leaveMulticastGroups(void)
 #ifdef MDNS_IPV4_SUPPORT
         ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
 #if LWIP_VERSION_MAJOR == 1
-        if (ERR_OK != igmp_leavegroup(ip_2_ip4(&m_pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4)))
+        if (ERR_OK != igmp_leavegroup(ip_2_ip4(pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4)))
 #else
-        if (ERR_OK != igmp_leavegroup_netif(m_pNetIf, ip_2_ip4(&multicast_addr_V4)))
+        if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
 #endif
         {
             DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
@@ -949,129 +911,12 @@ bool clsLEAMDNSHost::_leaveMulticastGroups(void)
 #endif
 #ifdef MDNS_IPV6_SUPPORT
         ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
-        if (ERR_OK != mld6_leavegroup_netif(m_pNetIf, ip_2_ip6(&multicast_addr_V6)/*&(multicast_addr_V6.u_addr.ip6)*/))
+        if (ERR_OK != mld6_leavegroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6)/*&(multicast_addr_V6.u_addr.ip6)*/))
         {
             DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
         }
 #endif
     }
-    return bResult;
-}
-
-
-/*
-    NETIF
-*/
-
-/*
-    clsLEAmDNS2_Host::_getNetIfState
-
-    Returns the current netif state.
-
-*/
-clsLEAMDNSHost::typeNetIfState clsLEAMDNSHost::_getNetIfState(void) const
-{
-    typeNetIfState  curNetIfState = static_cast<typeNetIfState>(enuNetIfState::None);
-
-    if ((m_pNetIf) &&
-            (netif_is_up(m_pNetIf)))
-    {
-        curNetIfState |= static_cast<typeNetIfState>(enuNetIfState::IsUp);
-
-        // Check if netif link is up
-        if ((netif_is_link_up(m_pNetIf)) &&
-                ((m_pNetIf != netif_get_by_index(WIFI_STA)) ||
-                 (STATION_GOT_IP == wifi_station_get_connect_status())))
-        {
-            curNetIfState |= static_cast<typeNetIfState>(enuNetIfState::LinkIsUp);
-        }
-
-#ifdef MDNS_IPV4_SUPPORT
-        // Check for IPv4 address
-        if (_getResponderIPAddress(enuIPProtocolType::V4).isSet())
-        {
-            curNetIfState |= static_cast<typeNetIfState>(enuNetIfState::IPv4);
-        }
-#endif
-#ifdef MDNS_IPV6_SUPPORT
-        // Check for IPv6 address
-        if (_getResponderIPAddress(enuIPProtocolType::V6).isSet())
-        {
-            curNetIfState |= static_cast<typeNetIfState>(enuNetIfState::IPv6);
-        }
-#endif
-    }
-    return curNetIfState;
-}
-
-/*
-    clsLEAmDNS2_Host::_checkNetIfState
-
-    Checks the netif state.
-    If eg. a new address appears, the announcing is restarted.
-
-*/
-bool clsLEAMDNSHost::_checkNetIfState(void)
-{
-    typeNetIfState  curNetIfState;
-    if (m_NetIfState != ((curNetIfState = _getNetIfState())))
-    {
-        // Some state change happened
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: DID CHANGE NETIF STATE\n\n"), _DH()););
-        DEBUG_EX_INFO(
-            if ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IsUp)) != (m_NetIfState & static_cast<typeNetIfState>(enuNetIfState::IsUp))) DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: Netif is up: %s\n"), _DH(), ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IsUp)) ? "YES" : "NO"));
-            if ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkIsUp)) != (m_NetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkIsUp))) DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: Netif link is up: %s\n"), _DH(), ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkIsUp)) ? "YES" : "NO"));
-#ifdef MDNS_IPV4_SUPPORT
-                if ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv4)) != (m_NetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv4)))
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: IPv4 address is set: %s\n"), _DH(), ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv4)) ? "YES" : "NO"));
-                    if (curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv4))
-                    {
-                        DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: IPv4 address: %s\n"), _DH(), _getResponderIPAddress(enuIPProtocolType::V4).toString().c_str());
-                    }
-                }
-#endif
-#ifdef MDNS_IPV6_SUPPORT
-        if ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv6)) != (m_NetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv6)))
-    {
-        DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: IPv6 address is set: %s\n"), _DH(), ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv6)) ? "YES" : "NO"));
-            if (curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPv6))
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: IPv6 address: %s\n"), _DH(), _getResponderIPAddress(enuIPProtocolType::V6).toString().c_str());
-            }
-        }
-#endif
-        );
-        if ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkMask)) != (m_NetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkMask)))
-        {
-            // Link came up or down
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: Link state changed -> restarting\n"), _DH()););
-            restart();
-        }
-        else if (curNetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkIsUp))
-        {
-            // Link is up (unchanged)
-            if ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPMask)) != (m_NetIfState & static_cast<typeNetIfState>(enuNetIfState::IPMask)))
-            {
-                // IP state changed
-                // TODO: If just a new IP address was added, a simple re-announcement should be enough
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: IP state changed -> restarting\n"), _DH()););
-                restart();
-            }
-        }
-        /*  if (enuProbingStatus::Done == m_HostProbeInformation.m_ProbingStatus) {
-            // Probing is done, prepare to (re)announce host
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: Preparing to (re)announce host.\n")););
-            //m_HostProbeInformation.m_ProbingStatus = enuProbingStatus::Done;
-            m_HostProbeInformation.m_u8SentCount = 0;
-            m_HostProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
-            }*/
-        m_NetIfState = curNetIfState;
-    }
-
-    bool    bResult = ((curNetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkMask)) &&    // Continue if Link is UP
-                       (curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPMask)));       // AND has any IP
-    DEBUG_EX_INFO(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _checkNetIfState: Link is DOWN(%s) or NO IP address(%s)!\n"), _DH(), (curNetIfState & static_cast<typeNetIfState>(enuNetIfState::LinkMask) ? "NO" : "YES"), (curNetIfState & static_cast<typeNetIfState>(enuNetIfState::IPMask) ? "NO" : "YES")););
     return bResult;
 }
 
@@ -1089,8 +934,6 @@ bool clsLEAMDNSHost::_processUDPInput(void)
 
     bool    bResult = _parseMessage();
 
-    /*   bResult = ((_checkNetIfState()) &&      // Any changes in the netif state?
-                  (_parseMessage()));*/
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s processUDPInput: FAILED!\n"), _DH()););
 
     return bResult;
