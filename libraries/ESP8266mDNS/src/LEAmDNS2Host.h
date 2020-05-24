@@ -140,18 +140,24 @@
 #ifdef DEBUG_ESP_MDNS_RESPONDER
 #ifdef DEBUG_ESP_MDNS_INFO
 #define DEBUG_EX_INFO(A)    A
+#define DEBUG_EX_INFO_IF(C,A...)    do if (C) { A; } while (0)
 #else
 #define DEBUG_EX_INFO(A)
+#define DEBUG_EX_INFO_IF(C,A...)
 #endif
 #ifdef DEBUG_ESP_MDNS_INFO2
 #define DEBUG_EX_INFO2(A)   A
+#define DEBUG_EX_INFO2_IF(C,A...)    do if (C) { A; } while (0)
 #else
 #define DEBUG_EX_INFO2(A)
+#define DEBUG_EX_INFO2_IF(C,A...)
 #endif
 #ifdef DEBUG_ESP_MDNS_ERR
 #define DEBUG_EX_ERR(A) A
+#define DEBUG_EX_ERR_IF(C,A...)    do if (C) { A; } while (0)
 #else
 #define DEBUG_EX_ERR(A)
+#define DEBUG_EX_ERR_IF(C,A...)
 #endif
 #ifdef DEBUG_ESP_MDNS_TX
 #define DEBUG_EX_TX(A)  A

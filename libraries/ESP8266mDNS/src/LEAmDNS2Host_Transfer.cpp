@@ -636,15 +636,16 @@ IPAddress clsLEAMDNSHost::_getResponderIPAddress(enuIPProtocolType p_IPProtocolT
         bool	bCheckLinkLocal = true;
         for (int i = 0; ((!ipResponder.isSet()) && (i < 2)); ++i)  	// Two loops: First with link-local check, second without
         {
+            for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
             for (int idx = 0; idx < LWIP_IPV6_NUM_ADDRESSES; ++idx)
             {
-                //DEBUG_EX_INFO(if ip6_addr_isvalid(netif_ip6_addr_state(&m_rNetIf, idx)) DEBUG_OUTPUT.printf_P(PSTR("%s _getResponderIPAddress: Checking IPv6 address %s (LL: %s)\n"), _DH(), IPAddress(netif_ip_addr6(m_pNetIf, idx)).toString().c_str(), (bCheckLinkLocal ? "YES" : "NO")););
-                if ((ip6_addr_isvalid(netif_ip6_addr_state(m_pNetIf, idx))) &&
+                //DEBUG_EX_INFO(if ip6_addr_isvalid(netif_ip6_addr_state(&pNetIf, idx)) DEBUG_OUTPUT.printf_P(PSTR("%s _getResponderIPAddress: Checking IPv6 address %s (LL: %s)\n"), _DH(), IPAddress(netif_ip_addr6(pNetIf, idx)).toString().c_str(), (bCheckLinkLocal ? "YES" : "NO")););
+                if ((ip6_addr_isvalid(netif_ip6_addr_state(pNetIf, idx))) &&
                         (((!bCheckLinkLocal) ||
-                          (ip6_addr_islinklocal(netif_ip6_addr(m_pNetIf, idx))))))
+                          (ip6_addr_islinklocal(netif_ip6_addr(pNetIf, idx))))))
                 {
-                    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _getResponderIPAddress: Selected IPv6 address %s (LL: %s)\n"), _DH(), IPAddress(netif_ip_addr6(m_pNetIf, idx)).toString().c_str(), (bCheckLinkLocal ? "YES" : "NO")););
-                    ipResponder = netif_ip_addr6(m_pNetIf, idx);
+                    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _getResponderIPAddress: Selected IPv6 address %s (LL: %s)\n"), _DH(), IPAddress(netif_ip_addr6(pNetIf, idx)).toString().c_str(), (bCheckLinkLocal ? "YES" : "NO")););
+                    ipResponder = netif_ip_addr6(pNetIf, idx);
                     break;
                 }
             }

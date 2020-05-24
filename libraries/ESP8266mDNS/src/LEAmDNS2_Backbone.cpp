@@ -218,30 +218,32 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
         while ((m_pUDPContext) &&
                 (m_pUDPContext->next()))
         {
-            netif*          pNetIf = m_pUDPContext->getInputNetif();//ip_current_input_netif();	// Probably changed in between!!!!
+            netif*          pNetIf = m_pUDPContext->getInputNetif();
             clsLEAMDNSHost*   pHost = 0;
             if ((pHost = _findHost(pNetIf)))
             {
-                DEBUG_EX_INFO(
-                    if (u32LoopCounter++)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);
-                    if ((remoteIPAddr.isSet()) &&
-                            (remoteIPAddr != m_pUDPContext->getRemoteAddress()))
-                    {
-                        DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Changed IP address %s->%s!\n"), _DH(), remoteIPAddr.toString().c_str(), m_pUDPContext->getRemoteAddress().toString().c_str());
-                    }
-                }
-                remoteIPAddr = m_pUDPContext->getRemoteAddress();
-                );
-                bResult = pHost->_processUDPInput();
-                DEBUG_EX_INFO2(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: FAILED to process UDP input!\n"), _DH()););
+                DEBUG_EX_INFO_IF(u32LoopCounter++,
+                                 DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);
+                                 DEBUG_EX_INFO_IF((remoteIPAddr.isSet()) && (remoteIPAddr != m_pUDPContext->getRemoteAddress()),
+                                                  DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Changed IP address %s->%s!\n"),
+                                                          _DH(),
+                                                          remoteIPAddr.toString().c_str(),
+                                                          m_pUDPContext->getRemoteAddress().toString().c_str())));
+                DEBUG_EX_INFO(remoteIPAddr = m_pUDPContext->getRemoteAddress());
 
-                DEBUG_EX_ERR(if ((-1) != m_pUDPContext->peek()) DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: !!!!    CONTENT LEFT IN UDP BUFFER    !!!!\n"), _DH()););
+                bResult = pHost->_processUDPInput();
+
+                DEBUG_EX_INFO2_IF(!bResult,
+                                  DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: FAILED to process UDP input!\n"), _DH()));
+                DEBUG_EX_ERR_IF((-1) != m_pUDPContext->peek(),
+                                DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: !!!!    CONTENT LEFT IN UDP BUFFER    !!!!\n"),
+                                                      _DH()));
             }
             else
             {
-                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Received UDP datagramm for unused netif at index: %u\n"), _DH(), (pNetIf ? netif_get_index(pNetIf) : (-1))););
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Received UDP datagramm for unused netif at index: %u\n"),
+                                                   _DH(),
+                                                   (pNetIf ? netif_get_index(pNetIf) : (-1))));
             }
             m_pUDPContext->flush();
         }
