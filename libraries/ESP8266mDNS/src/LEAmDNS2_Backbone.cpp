@@ -311,6 +311,7 @@ const char* clsLEAMDNSHost::clsBackbone::_DH(void) const
 
     Extracted (and slightly changed) from: https://github.com/yarrick/lwip/blob/master/src/core/netif.c
 */
+extern "C"
 struct netif* netif_get_by_index(u8_t idx)
 {
     struct netif *netif;
