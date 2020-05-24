@@ -312,7 +312,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     waveform.nextEventCcy = isrStartCcy + MAXIRQTICKSCCYS;
   }
 
+  uint32_t now = ESP.getCycleCount();
+  uint32_t isrNextEventCcy = now;
   while (busyPins) {
+    if (static_cast<int32_t>(isrNextEventCcy - now) > IRQLATENCYCCYS + DELTAIRQCCYS) {
+      waveform.nextEventCcy = isrNextEventCcy;
+      break;
+    }
+    isrNextEventCcy = waveform.nextEventCcy;
     for (int pin = waveform.startPin; pin <= waveform.endPin; ++pin) {
       const uint32_t pinBit = 1UL << pin;
       // If it's not on, ignore
@@ -322,7 +329,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       Waveform& wave = waveform.pins[pin];
 
       uint32_t waveNextEventCcy = (waveform.states & pinBit) ? wave.endDutyCcy : wave.nextPeriodCcy;
-      const uint32_t now = ESP.getCycleCount();
       if (WaveformMode::EXPIRES == wave.mode &&
         static_cast<int32_t>(waveNextEventCcy - wave.expiryCcy) >= 0 &&
         static_cast<int32_t>(now - wave.expiryCcy) >= 0) {
@@ -396,7 +402,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             waveform.nextEventCcy = waveNextEventCcy;
           }
         }
+        else if (static_cast<int32_t>(isrNextEventCcy - waveNextEventCcy) > 0) {
+          isrNextEventCcy = waveNextEventCcy;
+        }
       }
+      now = ESP.getCycleCount();
     }
   }
 
@@ -404,7 +414,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   if (waveform.timer1CB) {
     callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()));
   }
-  const uint32_t now = ESP.getCycleCount();
+  now = ESP.getCycleCount();
   int32_t nextTimerCcys = waveform.nextEventCcy - now;
   // Account for unknown duration of timer1CB().
   if (waveform.timer1CB && nextTimerCcys > callbackCcys) {
