@@ -175,7 +175,7 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
         tzr->d = 0;
         tzr->s = 0;
         tzr->change = 0;
-        tzr->offset = _timezone;
+        tzr->offset = -_timezone;
     }
 
     // sntp servers
