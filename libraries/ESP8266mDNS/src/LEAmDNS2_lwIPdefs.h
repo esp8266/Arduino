@@ -35,6 +35,9 @@
 #define DNS_MQUERY_IPV4_GROUP_INIT IPAddress(224,0,0,251)     /* resolver1.opendns.com */
 #define DNS_RRCLASS_ANY            255                        /* any class */
 
+#ifdef __cplusplus
+extern "C"
+#endif
 struct netif* netif_get_by_index(u8_t idx);
 
 #else // lwIP > 1
