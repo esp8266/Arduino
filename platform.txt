@@ -5,8 +5,8 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
-name=ESP8266 Boards (2.7.0-dev)
-version=2.7.0-dev
+name=ESP8266 Boards (3.0.0-dev)
+version=3.0.0-dev
 
 # These will be removed by the packager script when doing a JSON release
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
@@ -42,8 +42,8 @@ build.led=
 
 # default SDK for all boards
 # (generic board overrides this variable)
-#build.sdk=NONOSDK22x_190703
-build.sdk=NONOSDK22x_191024
+build.sdk=NONOSDK22x_190703
+#build.sdk=NONOSDK22x_191024
 #build.sdk=NONOSDK22x_191105
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/

@@ -95,7 +95,7 @@ TEST_CASE("STA mode events are called both when using DHCP and static config", "
     delay(100);
 
     REQUIRE(events == "connected,got_ip,disconnected,");
-    events = String();
+    events.clear();
 
     // now run the same with static IP config saved above
 

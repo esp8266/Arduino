@@ -344,7 +344,7 @@ Parameters in Arduino IDE:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Card: "WEMOS D1 Mini Lite"
-- Flash Size: "1M (512K SPIFFS)"
+- Flash Size: "1M (512K FS)"
 - CPU Frequency: "80 Mhz"
 
 Power:
@@ -451,6 +451,13 @@ ESPectro Core is ESP8266 development board as the culmination of our 3+ year exp
 Initially designed for kids in mind, everybody should be able to use it. Yet it's still hacker-friendly as we break out all ESP8266 ESP-12F pins.
 
 More details at https://shop.makestro.com/product/espectrocore/
+
+Schirmilabs Eduino WiFi
+-----------------------
+
+Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module
+
+Product page: https://schirmilabs.de/?page_id=165
 
 ITEAD Sonoff
 ------------

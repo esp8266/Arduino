@@ -30,12 +30,12 @@ extern "C" uint32_t _FS_start;
 extern "C" uint32_t _FS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000), _followRedirects(false), _ledPin(-1)
+        : _httpClientTimeout(8000), _followRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS), _ledPin(-1)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout), _followRedirects(false), _ledPin(-1)
+        : _httpClientTimeout(httpClientTimeout), _followRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS), _ledPin(-1)
 {
 }
 
@@ -126,7 +126,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String
 }
 #endif
 
-HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion)
+HTTPUpdateResult ESP8266HTTPUpdate::updateFS(WiFiClient& client, const String& url, const String& currentVersion)
 {
     HTTPClient http;
     http.begin(client, url);
@@ -345,8 +345,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                 WiFiClient * tcp = http.getStreamPtr();
 
-                WiFiUDP::stopAll();
-                WiFiClient::stopAllExcept(tcp);
+                if (_closeConnectionsOnUpdate) {
+                    WiFiUDP::stopAll();
+                    WiFiClient::stopAllExcept(tcp);
+                }
 
                 delay(100);
 
@@ -370,7 +372,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     }
 
                     // check for valid first magic byte
-                    if(buf[0] != 0xE9) {
+                    if(buf[0] != 0xE9 && buf[0] != 0x1f) {
                         DEBUG_HTTP_UPDATE("[httpUpdate] Magic header does not start with 0xE9\n");
                         _setLastError(HTTP_UE_BIN_VERIFY_HEADER_FAILED);
                         http.end();
@@ -378,14 +380,16 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     }
 
-                    uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
+                    if (buf[0] == 0xe9) {
+                        uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
-                    // check if new bin fits to SPI flash
-                    if(bin_flash_size > ESP.getFlashChipRealSize()) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] New binary does not fit SPI Flash size\n");
-                        _setLastError(HTTP_UE_BIN_FOR_WRONG_FLASH);
-                        http.end();
-                        return HTTP_UPDATE_FAILED;
+                        // check if new bin fits to SPI flash
+                        if(bin_flash_size > ESP.getFlashChipRealSize()) {
+                            DEBUG_HTTP_UPDATE("[httpUpdate] New binary does not fit SPI Flash size\n");
+                            _setLastError(HTTP_UE_BIN_FOR_WRONG_FLASH);
+                            http.end();
+                            return HTTP_UPDATE_FAILED;
+                        }
                     }
                 }
                 if(runUpdate(*tcp, len, http.header("x-MD5"), command)) {

@@ -32,10 +32,9 @@
 #include "pgmspace.h"
 #include "gdb_hooks.h"
 #include "StackThunk.h"
+#include "coredecls.h"
 
 extern "C" {
-
-extern void __real_system_restart_local();
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
@@ -89,7 +88,7 @@ static void ets_printf_P(const char *str, ...) {
     vsnprintf(destStr, sizeof(destStr), str, argPtr);
     va_end(argPtr);
     while (*c) {
-        ets_putc(*(c++));
+        ets_uart_putc1(*(c++));
     }
 }
 
@@ -147,10 +146,10 @@ void __wrap_system_restart_local() {
     // (determined empirically, might break)
     uint32_t offset = 0;
     if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        offset = 0x1b0;
+        offset = 0x1a0;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        offset = 0x1a0;
+        offset = 0x190;
     }
     else if (rst_info.reason == REASON_WDT_RST) {
         offset = 0x10;

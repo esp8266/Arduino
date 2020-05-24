@@ -121,6 +121,9 @@ def main():
     if len(sys.argv) == 2:
         if sys.argv[1] == "-q":
             verbose = False
+    # Remove a symlink generated in 2.6.3 which causes later issues since the tarball can't properly overwrite it
+    if (os.path.exists('python3/python3')):
+        os.unlink('python3/python3')
     print('Platform: {0}'.format(identify_platform()))
     tools_to_download = load_tools_list('../package/package_esp8266com_index.template.json', identify_platform())
     mkdir_p(dist_dir)
