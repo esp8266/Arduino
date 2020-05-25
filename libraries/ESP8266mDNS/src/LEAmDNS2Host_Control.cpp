@@ -226,7 +226,7 @@ bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
 #endif
                        )
                     {
-                        Serial.println("\n\n\nUNICAST QUERY\n\n");
+                        DEBUG_EX_RX(DEBUG_OUTPUT.println("\n\n\nUNICAST QUERY\n\n"));
                         DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Legacy DNS query from local host %s!\n"), _DH(), m_pUDPContext->getRemoteAddress().toString().c_str()););
 
                         sendParameter.m_u16ID = p_MsgHeader.m_u16ID;
@@ -248,7 +248,7 @@ bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
                     }
                     else
                     {
-                        Serial.printf("\n\n\nINVALID UNICAST QUERY from %s\n\n\n", m_pUDPContext->getRemoteAddress().toString().c_str());
+                        DEBUG_EX_RX(DEBUG_OUTPUT.printf("\n\n\nINVALID UNICAST QUERY from %s\n\n\n", m_pUDPContext->getRemoteAddress().toString().c_str()));
                         DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("%s _parseQuery: Legacy DNS query from NON-LOCAL host at %s!\n"), _DH(), m_pUDPContext->getRemoteAddress().toString().c_str()););
                         bResult = false;
                     }

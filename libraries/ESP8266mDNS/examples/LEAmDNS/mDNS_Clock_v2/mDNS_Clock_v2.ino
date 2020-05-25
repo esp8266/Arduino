@@ -69,6 +69,11 @@
 #define STAPSK  "your-password"
 #endif
 
+#ifndef APSSID
+#define APSSID "ap4mdnsClock"
+#define APPSK  "mdnsClock"
+#endif
+
 const char*                   ssid                    = STASSID;
 const char*                   password                = STAPSK;
 
@@ -181,7 +186,8 @@ void setup(void) {
   Serial.begin(115200);
 
   // Connect to WiFi network
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(APSSID, APPSK);
   WiFi.begin(ssid, password);
   Serial.println("");
 
@@ -201,12 +207,12 @@ void setup(void) {
 
   // Setup MDNS responder
   // Init the (currently empty) host domain string with 'esp8266'
-  if (responder.begin("ESP8266", WIFI_STA, [](clsMDNSHost & p_rMDNSHost,
+  if (responder.begin("leamdnsv2", [](clsMDNSHost & p_rMDNSHost,
                       const char* p_pcDomainName,
   bool p_bProbeResult)->void {
   Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
     // Unattended added service
-    p_rMDNSHost.addService(0, "http", "tcp", 80);
+    p_rMDNSHost.addService(0, "espclk", "tcp", 80);
   })) {
     Serial.println("mDNS-AP started");
   } else {
