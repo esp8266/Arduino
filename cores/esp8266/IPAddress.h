@@ -51,8 +51,11 @@ struct ip_addr: ipv4_addr { };
 #endif // lwIP-v2+
 
 // to display a netif id with printf:
-#define NETIFID_STR        "%c%c%d"
-#define NETIFID_VAL(netif) (netif)->name[0], (netif)->name[1], netif_get_index((netif))
+#define NETIFID_STR        "%c%c%u"
+#define NETIFID_VAL(netif) \
+        ((netif)? (netif)->name[0]: '-'),     \
+        ((netif)? (netif)->name[1]: '-'),     \
+        ((netif)? netif_get_index(netif): 42)
 
 // A class to make it easier to handle and pass around IP addresses
 // IPv6 update:

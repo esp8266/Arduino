@@ -41,7 +41,8 @@ namespace experimental
 clsLEAMDNSHost::clsBackbone::clsBackbone(void)
     :   m_pUDPContext(0),
         m_bDelayUDPProcessing(false),
-        m_u32DelayedDatagrams(0)
+        m_u32DelayedDatagrams(0),
+        m_uniqueHost(0)
 {
 }
 

@@ -51,6 +51,17 @@ clsLEAMDNSHost_Legacy::~clsLEAMDNSHost_Legacy(void)
 */
 
 /*
+    clsLEAMDNSHost_Legacy::begin
+
+*/
+bool clsLEAMDNSHost_Legacy::begin(const char* p_pcHostname)
+{
+    return addHostForNetIf(p_pcHostname)
+            && (0 != m_HostInformations.size());
+}
+
+
+/*
     clsLEAMDNSHost_Legacy::begin (String)
 
 */

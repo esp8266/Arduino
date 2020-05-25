@@ -53,8 +53,10 @@ namespace experimental
 bool clsLEAMDNSHost::_sendMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     bool    bResult = false;
-
     uint8_t	u8AvailableProtocols = 0;
+
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage: if=" NETIFID_STR "\n"), _DH(), NETIFID_VAL(pNetIf)));
+
 #ifdef MDNS_IPV4_SUPPORT
     // Only send out IPv4 messages, if we've got an IPv4 address
     if (_getResponderIPAddress(pNetIf, enuIPProtocolType::V4).isSet())
@@ -157,6 +159,8 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(netif* pNetIf, clsLEAMDNSHost::clsSe
 {
     bool    bIPv4Result = true;
     bool    bIPv6Result = true;
+    
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast: if=" NETIFID_STR "\n"), _DH(), NETIFID_VAL(pNetIf)));
 
 #ifdef MDNS_IPV4_SUPPORT
     if (p_IPProtocolTypes & static_cast<uint8_t>(enuIPProtocolType::V4))
