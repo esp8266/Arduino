@@ -208,7 +208,7 @@ void setup(void) {
   // Setup MDNS responder
   // Init the (currently empty) host domain string with 'esp8266'
   if (responder.begin("leamdnsv2", [](clsMDNSHost & p_rMDNSHost,
-                      const char* p_pcDomainName,
+                                      const char* p_pcDomainName,
   bool p_bProbeResult)->void {
   Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
     // Unattended added service

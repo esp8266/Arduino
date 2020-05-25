@@ -159,7 +159,7 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(netif* pNetIf, clsLEAMDNSHost::clsSe
 {
     bool    bIPv4Result = true;
     bool    bIPv6Result = true;
-    
+
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast: if=" NETIFID_STR "\n"), _DH(), NETIFID_VAL(pNetIf)));
 
 #ifdef MDNS_IPV4_SUPPORT

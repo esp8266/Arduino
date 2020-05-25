@@ -956,8 +956,8 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
             ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
             bResult = ((bResult) &&
                        (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
-            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: mld6_joingroup_netif (" NETIFID_STR ") FAILED!\n"),
-                         _DH(), NETIFID_VAL(pNetIf)););
+            DEBUG_EX_ERR_IF(!bResult, DEBUG_OUTPUT.printf_P(PSTR("%s _createHost: mld6_joingroup_netif (" NETIFID_STR ") FAILED!\n"),
+                            _DH(), NETIFID_VAL(pNetIf)));
 #endif
         }
     return bResult;
