@@ -174,7 +174,8 @@ const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
 bool clsLEAMDNSHost::setNetIfHostName(const char* p_pcHostName)
 {
     if (p_pcHostName)
-        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
+        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+            if (netif_is_up(pNetIf))
             {
                 netif_set_hostname(pNetIf, p_pcHostName);
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s on " NETIFID_STR "!\n"), p_pcHostName, NETIFID_VAL(pNetIf)););
@@ -920,7 +921,8 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
     bool    bResult = false;
 
     // Join multicast group(s)
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf))
         {
 #ifdef MDNS_IPV4_SUPPORT
             ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
@@ -970,7 +972,8 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
 {
     bool    bResult = false;
 
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next) if (netif_is_up(pNetIf))
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf))
         {
             bResult = true;
             /*  _resetProbeStatus(false);   // Stop probing
