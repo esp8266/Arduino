@@ -293,8 +293,11 @@ protected:
         bool removeHost(clsLEAMDNSHost* p_pHost);
         size_t hostCount(void) const;
         bool setDelayUDPProcessing(bool p_bDelayProcessing);
-        
-        clsLEAMDNSHost* getUniqueHost() { return m_uniqueHost; }
+
+        clsLEAMDNSHost* getUniqueHost()
+        {
+            return m_uniqueHost;
+        }
 
     protected:
         UdpContext*         m_pUDPContext;
@@ -308,8 +311,14 @@ protected:
 
         bool _processUDPInput(void);
 
-        const clsLEAMDNSHost* _findHost() const { return m_uniqueHost; }
-        clsLEAMDNSHost* _findHost() { return m_uniqueHost; }
+        const clsLEAMDNSHost* _findHost() const
+        {
+            return m_uniqueHost;
+        }
+        clsLEAMDNSHost* _findHost()
+        {
+            return m_uniqueHost;
+        }
 
         const char* _DH(void) const;
     };
@@ -1330,23 +1339,24 @@ public:
     // - hasAnswerIPv6Address/answerIPv6Address     service/host
     // - hasAnswerPort/answerPort                   service
     // - hasAnswerTxts/answerTxts                   service
-    
+
     /*
-       install*Query() creates several queries on the interfaces.
-       it no more returns a single query but a boolean until the API is adapted
+        install*Query() creates several queries on the interfaces.
+        it no more returns a single query but a boolean until the API is adapted
     */
-    /*clsQuery**/bool installServiceQuery(const char* p_pcServiceType,
-                                  const char* p_pcProtocol,
-                                  clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    /*clsQuery**/bool installServiceQuery(const char* p_pcServiceType,
-                                  const char* p_pcProtocol,
-                                  clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
-    /*clsQuery**/bool installHostQuery(const char* p_pcHostName,
-                               clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    /*clsQuery**/bool installHostQuery(const char* p_pcHostName,
-                               clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
+    /*clsQuery* */bool installServiceQuery(const char* p_pcServiceType,
+                                           const char* p_pcProtocol,
+                                           clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
+    /*clsQuery* */bool installServiceQuery(const char* p_pcServiceType,
+                                           const char* p_pcProtocol,
+                                           clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor,
+                                           std::list<clsQuery*>* ret = nullptr);
+    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+                                        clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
+    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+                                        clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
     // Remove a dynamic service query
-    /*bool removeQuery(clsQuery* p_pQuery);*/
+    bool removeQuery(clsQuery* p_pQuery);
 
     // PROCESSING
     bool update(void);

@@ -432,11 +432,11 @@ bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
     bool    bResult = false;
 
     if (p_pService &&
-        (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)))
+            (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)))
     {
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
             if (netif_is_up(pNetIf) &&
-                (_announceService(pNetIf, *p_pService, false)))
+                    (_announceService(pNetIf, *p_pService, false)))
             {
                 bResult = true;
             }
@@ -677,7 +677,8 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
 */
 /*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
         const char* p_pcProtocol,
-        clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
+        clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor,
+        std::list<clsLEAMDNSHost::clsQuery*>* ret)
 {
     bool bResult = false;
     clsQuery*   pQuery = 0;
@@ -686,6 +687,10 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
         {
             pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
             bResult = true;
+            if (ret)
+            {
+                ret->push_back(pQuery);
+            }
         }
     return bResult;
 }
@@ -741,16 +746,13 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
 /*
     clsLEAmDNS2_Host::removeQuery
 */
-/*
-    bool clsLEAMDNSHost::removeQuery(clsLEAMDNSHost::clsQuery * p_pMDNSQuery)
-    {
+bool clsLEAMDNSHost::removeQuery(clsLEAMDNSHost::clsQuery * p_pMDNSQuery)
+{
     bool    bResult = ((p_pMDNSQuery) &&
                        (_removeQuery(p_pMDNSQuery)));
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s removeQuery: FAILED!\n"), _DH()););
     return bResult;
-    }
-*/
-
+}
 
 /*
     PROCESSING
@@ -790,7 +792,9 @@ bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
     bool bResult = false;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf) && _announce(pNetIf, p_bAnnounce, p_bIncludeServices))
+        {
             bResult = true;
+        }
     return bResult;
 }
 
@@ -803,7 +807,9 @@ bool clsLEAMDNSHost::announceService(clsService * p_pService,
     bool bResult = false;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf) && _announceService(pNetIf, *p_pService, p_bAnnounce))
+        {
             bResult = true;
+        }
     return bResult;
 }
 

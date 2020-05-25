@@ -315,34 +315,34 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
         if ((bResult) &&
                 (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::AAAA)) &&
                 (_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)).isSet()))
-    {
+        {
 
-        u32NSECContent |= static_cast<uint32_t>(enuContentFlag::AAAA);
+            u32NSECContent |= static_cast<uint32_t>(enuContentFlag::AAAA);
             ((static_cast<typeSequence>(enuSequence::Count) == sequence)
              ? ++ru16Answers
              : (bResult = _writeMDNSAnswer_AAAA(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)), p_rSendParameter)));
-             DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_AAAA(A) FAILED!\n"), _DH()););
+            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_AAAA(A) FAILED!\n"), _DH()););
         }
-    // PTR_IPv6
-    if ((bResult) &&
+        // PTR_IPv6
+        if ((bResult) &&
                 (p_rSendParameter.m_u32HostReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv6)) &&
                 (_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)).isSet()))
-    {
+        {
 
-        u32NSECContent |= static_cast<uint32_t>(enuContentFlag::PTR_IPv6);
+            u32NSECContent |= static_cast<uint32_t>(enuContentFlag::PTR_IPv6);
             ((static_cast<typeSequence>(enuSequence::Count) == sequence)
              ? ++ru16Answers
              : (bResult = _writeMDNSAnswer_PTR_IPv6(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)), p_rSendParameter)));
-             DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_PTR_IPv6 FAILED!\n"), _DH()););
+            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_PTR_IPv6 FAILED!\n"), _DH()););
         }
 #endif
 
-    for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
-    {
-        clsService* pService = *it;
+        for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
+        {
+            clsService* pService = *it;
 
-        // PTR_TYPE
-        if ((bResult) &&
+            // PTR_TYPE
+            if ((bResult) &&
                     (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_TYPE)))
             {
                 ((static_cast<typeSequence>(enuSequence::Count) == sequence)
@@ -383,16 +383,16 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
         uint16_t&   ru16AdditionalAnswers = msgHeader.m_u16ARCount;
 
 #ifdef MDNS_IPV4_SUPPORT
-                                            bool    bNeedsAdditionalAnswerA = false;
+        bool    bNeedsAdditionalAnswerA = false;
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-                                            bool    bNeedsAdditionalAnswerAAAA = false;
+        bool    bNeedsAdditionalAnswerAAAA = false;
 #endif
-                                            for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
-    {
-        clsService* pService = *it;
+        for (clsService::list::iterator it = m_Services.begin(); ((bResult) && (it != m_Services.end())); it++)
+        {
+            clsService* pService = *it;
 
-        if ((bResult) &&
+            if ((bResult) &&
                     (pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::PTR_NAME)) &&    // If PTR_NAME is requested, AND
                     (!(pService->m_u32ReplyMask & static_cast<uint32_t>(enuContentFlag::SRV))))        // NOT SRV -> add SRV as additional answer
             {
@@ -447,40 +447,40 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
         if ((bResult) &&
                 (bNeedsAdditionalAnswerA) &&
                 (_getResponderIPAddress(pNetIf, (enuIPProtocolType::V4)).isSet()))
-    {
-        // Additional A
-        u32NSECContent |= static_cast<uint32_t>(enuContentFlag::A);
+        {
+            // Additional A
+            u32NSECContent |= static_cast<uint32_t>(enuContentFlag::A);
             ((static_cast<typeSequence>(enuSequence::Count) == sequence)
              ? ++ru16AdditionalAnswers
              : (bResult = _writeMDNSAnswer_A(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V4)), p_rSendParameter)));
 
-             DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_A(B) FAILED!\n"), _DH()););
+            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_A(B) FAILED!\n"), _DH()););
         }
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-    // Answer AAAA needed?
-    if ((bResult) &&
+        // Answer AAAA needed?
+        if ((bResult) &&
                 (bNeedsAdditionalAnswerAAAA) &&
                 (_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)).isSet()))
-    {
-        // Additional AAAA
-        u32NSECContent |= static_cast<uint32_t>(enuContentFlag::AAAA);
+        {
+            // Additional AAAA
+            u32NSECContent |= static_cast<uint32_t>(enuContentFlag::AAAA);
             ((static_cast<typeSequence>(enuSequence::Count) == sequence)
              ? ++ru16AdditionalAnswers
              : (bResult = _writeMDNSAnswer_AAAA(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)), p_rSendParameter)));
 
-             DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_AAAA(B) FAILED!\n"), _DH()););
+            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_AAAA(B) FAILED!\n"), _DH()););
         }
 #endif
 
-    // NSEC host (part 2)
-    if ((bResult) &&
+        // NSEC host (part 2)
+        if ((bResult) &&
                 ((clsSendParameter::enuResponseType::None != p_rSendParameter.m_Response)) &&
                 (u32NSECContent))
-    {
-        // NSEC PTR IPv4/IPv6 are separate answers; make sure, that this is counted for
+        {
+            // NSEC PTR IPv4/IPv6 are separate answers; make sure, that this is counted for
 #ifdef MDNS_IPV4_SUPPORT
-        uint32_t    u32NSECContent_PTR_IPv4 = (u32NSECContent & static_cast<uint32_t>(enuContentFlag::PTR_IPv4));
+            uint32_t    u32NSECContent_PTR_IPv4 = (u32NSECContent & static_cast<uint32_t>(enuContentFlag::PTR_IPv4));
             u32NSECContent &= ~static_cast<uint32_t>(enuContentFlag::PTR_IPv4);
 #endif
 #ifdef MDNS_IPV6_SUPPORT
@@ -504,17 +504,17 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
                            // Write separate answer for host PTR IPv4
                            && ((!u32NSECContent_PTR_IPv4) ||
                                ((!_getResponderIPAddress(pNetIf, (enuIPProtocolType::V4)).isSet()) ||
-                                 (_writeMDNSAnswer_NSEC_PTR_IPv4(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V4)), p_rSendParameter))))
+                                (_writeMDNSAnswer_NSEC_PTR_IPv4(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V4)), p_rSendParameter))))
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-                                // Write separate answer for host PTR IPv6
-                                && ((!u32NSECContent_PTR_IPv6) ||
-                                    ((!_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)).isSet()) ||
-                                      (_writeMDNSAnswer_NSEC_PTR_IPv6(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)), p_rSendParameter))))
+                           // Write separate answer for host PTR IPv6
+                           && ((!u32NSECContent_PTR_IPv6) ||
+                               ((!_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)).isSet()) ||
+                                (_writeMDNSAnswer_NSEC_PTR_IPv6(_getResponderIPAddress(pNetIf, (enuIPProtocolType::V6)), p_rSendParameter))))
 #endif
-                                    )));
+                          )));
 
-                               DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_NSEC(Host) FAILED!\n"), _DH()););
+            DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: _writeMDNSAnswer_NSEC(Host) FAILED!\n"), _DH()););
         }
 
         DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: Loop %i FAILED!\n"), _DH(), sequence););
@@ -523,15 +523,15 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
     return bResult;
 }
 
- /*
-     MDNSResponder::_addQueryRecord
+/*
+    MDNSResponder::_addQueryRecord
 
-     Adds a query for the given domain and query type.
+    Adds a query for the given domain and query type.
 
- */
- bool clsLEAMDNSHost::_addQueryRecord(clsLEAMDNSHost::clsSendParameter& p_rSendParameter,
-                                      const clsLEAMDNSHost::clsRRDomain& p_QueryDomain,
-                                      uint16_t p_u16RecordType)
+*/
+bool clsLEAMDNSHost::_addQueryRecord(clsLEAMDNSHost::clsSendParameter& p_rSendParameter,
+                                     const clsLEAMDNSHost::clsRRDomain& p_QueryDomain,
+                                     uint16_t p_u16RecordType)
 {
     bool    bResult = false;
 

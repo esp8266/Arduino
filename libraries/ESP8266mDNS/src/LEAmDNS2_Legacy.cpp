@@ -119,7 +119,7 @@ bool clsLEAMDNSHost_Legacy::end(void)
 bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname)
 {
     bool    bResult = true;
-    
+
     if (m_HostInformations.size() > 0)
     {
         //XXXFIXME only one pHost instance, many things can be simplified
@@ -129,8 +129,8 @@ bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname)
     {
         clsLEAMDNSHost* pHost = new esp8266::experimental::clsLEAMDNSHost;
         if (pHost
-            && (!((pHost->begin(p_pcHostname /*, default callback*/))
-            && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
+                && (!((pHost->begin(p_pcHostname /*, default callback*/))
+                      && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
         {
             bResult = false;
         }
@@ -788,24 +788,41 @@ clsLEAMDNSHost_Legacy::hMDNSServiceQuery clsLEAMDNSHost_Legacy::installServiceQu
 
     for (stcHostInformation& hostInformation : m_HostInformations)
     {
-        clsLEAMDNSHost::clsQuery*	pQuery = hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
-                                             const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
-                                             clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
-                                             bool p_bSetContent)->void
+        std::list<clsLEAMDNSHost::clsQuery*> queries;
+
+        /*clsLEAMDNSHost::clsQuery*	pQuery =*/
+        hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
+                const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
+                clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
+                bool p_bSetContent)->void
         {
             if (p_fnCallback)	// void(const stcMDNSServiceInfo& p_MDNSServiceInfo, MDNSResponder::AnswerType p_AnswerType, bool p_bSetContent)
             {
                 p_fnCallback(stcMDNSServiceInfo(p_AnswerAccessor), _answerFlagsToAnswerType(p_QueryAnswerTypeFlags), p_bSetContent);
             }
-        });
-        if (pQuery)
+        }, &queries);
+
+        if (queries.size())
         {
             if (!hResult)
             {
+                // - hMDNSServiceQuery handle is 'const void*'
+                //   used to retrieve pQuery when updating or removing.
+
+                // - unexplained - before multi interface change:
+                //   there is a loop, only the first is returned, why ?
+
                 // Store first query as result and key
-                hResult = (hMDNSServiceQuery)pQuery;
+                //hResult = (hMDNSServiceQuery)pQuery; <- before netif, only the first query is returned
+
+                // - netif transformation: even more returned values (a list per loop),
+                //   still, only the first handle is returned.
+                hResult = (hMDNSServiceQuery) * queries.begin(); // take the first
             }
-            hostInformation.m_HandleToPtr[hResult] = pQuery;
+            // this was overwritten ?
+            //hostInformation.m_HandleToPtr[hResult] = pQuery;
+            // ... overwritten with only the first query
+            hostInformation.m_HandleToPtr[hResult] = *queries.begin();
         }
     }
     return hResult;
