@@ -25,16 +25,17 @@ import sys
 
 def get_segment_hints(iram):
     hints = {}
+    hints['ICACHE'] = '          - flash instruction cache'
     hints['IROM'] = '         - code in flash         (default or ICACHE_FLASH_ATTR)'
     hints['IRAM'] = '  / ' + str(iram) + ' - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)'
     hints['DATA'] = ')         - initialized variables (global, static) in RAM/HEAP'
     hints['RODATA'] = ') / 81920 - constants             (global, static) in RAM/HEAP'
     hints['BSS'] = ')         - zeroed variables      (global, static) in RAM/HEAP'
-    hints['ICACHE'] = ')         - flash instruction cache'
     return hints
 
 def get_segment_sizes(elf, path):
     sizes = {}
+    sizes['ICACHE'] = 0
     sizes['IROM'] = 0
     sizes['IRAM'] = 0
     sizes['DATA'] = 0
