@@ -337,8 +337,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         busyPins ^= pinBit;
       }
       else {
-        const uint32_t overshootCcys = now - waveNextEventCcy;
-        if (static_cast<int32_t>(overshootCcys) >= 0) {
+        const int32_t overshootCcys = now - waveNextEventCcy;
+        if (overshootCcys >= 0) {
           const int32_t periodCcys = scaleCcys(wave.periodCcys);
           if (waveform.states & pinBit) {
             // active configuration and forward are 100% duty
@@ -361,12 +361,11 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             waveNextEventCcy = wave.nextPeriodCcy;
           }
           else {
+            wave.nextPeriodCcy += periodCcys;
             if (!wave.dutyCcys) {
-              wave.nextPeriodCcy += periodCcys;
               wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
-              wave.nextPeriodCcy += periodCcys;
               int32_t dutyCcys = scaleCcys(wave.dutyCcys);
               if (dutyCcys > wave.adjDutyCcys) {
                 dutyCcys -= wave.adjDutyCcys;
@@ -377,7 +376,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
                 dutyCcys = 0;
               }
               wave.endDutyCcy = now + dutyCcys;
-              if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) >= 0) {
+              if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) > 0) {
                 wave.endDutyCcy = wave.nextPeriodCcy;
               }
               waveform.states |= pinBit;
