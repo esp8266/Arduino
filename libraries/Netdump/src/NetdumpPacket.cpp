@@ -207,8 +207,17 @@ void Packet::DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const
     {
         sstr.printf_P(PSTR("DR=%d "), t);
     }
-
     sstr.printf_P(PSTR("\r\n"));
+    for (int i = 0;i<dnsPacket->qdcount();i++)
+	  {
+		  DNSPacket::DNSQuestion dq = dnsPacket->getQuestion(i);
+		  sstr.printf("               Q : %s, type %d\r\n",dq.qname.c_str(),dq.qtype);
+	  }
+	  for (int i=0;i<dnsPacket->ancount();i++)
+	  {
+		  DNSPacket::DNSAnswer da = dnsPacket->getAnswer(i);
+		  sstr.printf("               R : %s IP : %s\r\n",da.name.c_str(),da.getIP().toString().c_str());
+	  }
     printDetail(sstr, PSTR("           H "), udpPacket->raw, udpPacket->hdrLength(), netdumpDetail);
     printDetail(sstr, PSTR("           D "), udpPacket->hdr->payload, udpPacket->length(), netdumpDetail);
 }

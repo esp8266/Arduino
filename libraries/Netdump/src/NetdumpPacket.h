@@ -30,7 +30,7 @@
 #include <vector>
 #include "NetdumpUtils.h"
 #include "structures.h"
-
+#include <memory>
 namespace NetCapture
 {
 
@@ -43,20 +43,27 @@ public:
         : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {
         setPacketTypes();
-        ethernetFrame = new EthernetFrame(rawData());
-
+//        ethernetFrame = new EthernetFrame(rawData());
+        ethernetFrame.reset(new EthernetFrame(rawData()));
+//        ethernetFrame = std::unique_ptr<EthernetFrame>(new EthernetFrame(rawData()));
         switch (ethernetFrame->type())
         {
         case 0x0800 :
-        	ipv4Packet = new IPv4Packet(ethernetFrame->hdr->payload);
-        	ipPacket = new IPPacket(ipv4Packet);
+//        	ipv4Packet = new IPv4Packet(ethernetFrame->hdr->payload);
+//        	ipPacket = new IPPacket(ipv4Packet);
+ //       	ipv4Packet->reset(new IPv4Packet(ethernetFrame->hdr->payload));
+        	ipv4Packet.reset(new IPv4Packet(ethernetFrame->hdr->payload));
+        	ipPacket.reset(new IPPacket(ipv4Packet));
         	break;
         case 0x86dd :
-        	ipv6Packet = new IPv6Packet(ethernetFrame->hdr->payload);
-        	ipPacket = new IPPacket(ipv6Packet);
+//        	ipv6Packet = new IPv6Packet(ethernetFrame->hdr->payload);
+//        	ipPacket = new IPPacket(ipv6Packet);
+        	ipv6Packet.reset(new IPv6Packet(ethernetFrame->hdr->payload));
+        	ipPacket.reset(new IPPacket(ipv6Packet));
         	break;
         case 0x0806 :
-			arpPacket = new ARPPacket(ethernetFrame->hdr->payload);
+//			arpPacket = new ARPPacket(ethernetFrame->hdr->payload);
+        	arpPacket.reset(new ARPPacket(ethernetFrame->hdr->payload));
         	break;
         default :
         	break;
@@ -66,20 +73,25 @@ public:
         {
         	switch (ipPacket->packetType())
 			{
-        	case 17 : udpPacket = new UDPPacket(ipPacket->payload());
+        	case 17 : //udpPacket = new UDPPacket(ipPacket->payload());
+        			  udpPacket.reset(new UDPPacket(ipPacket->payload()));
         			  break;
-        	case 6  : tcpPacket = new TCPPacket(ipPacket->payload());
+        	case 6  : //tcpPacket = new TCPPacket(ipPacket->payload());
+        			  tcpPacket.reset(new TCPPacket(ipPacket->payload()));
         			  break;
-        	case 1	: icmpPacket = new ICMPPacket(ipPacket->payload());
+        	case 1	: //icmpPacket = new ICMPPacket(ipPacket->payload());
+        			  icmpPacket.reset(new ICMPPacket(ipPacket->payload()));
         			  break;
         	default : break;
 			}
         }
         if (udpPacket)
         {
-        	if ((udpPacket->sourcePort() == 5353) || (udpPacket->destinationPort() == 5353))
+        	if (((udpPacket->sourcePort() == 5353) || (udpPacket->destinationPort() == 5353))
+        		|| ((udpPacket->sourcePort() == 53) || (udpPacket->destinationPort() == 53)))
         	{
-        		dnsPacket = new DNSPacket(udpPacket->hdr->payload);
+//        		dnsPacket = new DNSPacket(udpPacket->hdr->payload);
+        		dnsPacket.reset(new DNSPacket(udpPacket->hdr->payload));
         	}
         }
     };
@@ -94,15 +106,16 @@ public:
         RAW
     };
 
-    EthernetFrame* ethernetFrame = nullptr;
-    ARPPacket* arpPacket = nullptr;
-    IPv4Packet* ipv4Packet = nullptr;
-    IPv6Packet* ipv6Packet = nullptr;
-    IPPacket* ipPacket = nullptr;
-    UDPPacket* udpPacket = nullptr;
-    DNSPacket* dnsPacket = nullptr;
-    TCPPacket* tcpPacket = nullptr;
-    ICMPPacket* icmpPacket = nullptr;
+    std::unique_ptr<EthernetFrame> ethernetFrame = nullptr;
+//    EthernetFrame* ethernetFrame = nullptr;
+    std::unique_ptr<ARPPacket> arpPacket = nullptr;
+    std::unique_ptr<IPv4Packet> ipv4Packet = nullptr;
+    std::unique_ptr<IPv6Packet> ipv6Packet = nullptr;
+    std::unique_ptr<IPPacket> ipPacket = nullptr;
+    std::unique_ptr<UDPPacket> udpPacket = nullptr;
+    std::unique_ptr<DNSPacket> dnsPacket = nullptr;
+    std::unique_ptr<TCPPacket> tcpPacket = nullptr;
+    std::unique_ptr<ICMPPacket> icmpPacket = nullptr;
 
 
     const uint8_t* rawData() const
@@ -320,12 +333,12 @@ public:
     };
     uint16_t getSrcPort() const
     {
-    	return tcpPacket ? tcpPacket->sourcePort() : (udpPacket ? udpPacket->sourcePort() : 0);
+ //   	return tcpPacket ? tcpPacket->sourcePort() : (udpPacket ? udpPacket->sourcePort() : 0);
         return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 0) : 0;
     }
     uint16_t getDstPort() const
     {
-    	return tcpPacket ? tcpPacket->destinationPort() : (udpPacket ? udpPacket->destinationPort() : 0);
+   // 	return tcpPacket ? tcpPacket->destinationPort() : (udpPacket ? udpPacket->destinationPort() : 0);
         return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 2) : 0;
     }
     bool     hasPort(uint16_t p) const

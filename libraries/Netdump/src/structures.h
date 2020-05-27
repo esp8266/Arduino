@@ -183,11 +183,13 @@ public:
 class IPPacket
 {
 public:
-	IPPacket(IPv4Packet* i4) : ip4(true), ipv4(i4)
+	IPPacket(std::unique_ptr<IPv4Packet>& i4) : ip4(true)
 	{
+		ipv4.reset(new IPv4Packet(i4->raw));
 	};
-	IPPacket(IPv6Packet* i6) : ip4(false), ipv6(i6)
+	IPPacket(std::unique_ptr<IPv6Packet>& i6) : ip4(false)
 	{
+		ipv6.reset(new IPv6Packet(i6->raw));
 	};
 
 	union ipv4v6
@@ -199,8 +201,8 @@ public:
 	ipv4v6 ht;
 
 	bool ip4 = false;
-	IPv4Packet* ipv4 = nullptr;
-	IPv6Packet* ipv6 = nullptr;
+	std::unique_ptr<IPv4Packet> ipv4 = nullptr;
+	std::unique_ptr<IPv6Packet> ipv6 = nullptr;
 
 	uint8_t packetType()
 	{
@@ -222,20 +224,6 @@ public:
 	{
 		return ip4 ? ipv4->raw : ipv6->raw;
 	}
-};
-
-class IPPacket_1 : public IPv4Packet, public IPv6Packet
-{
-public:
-	IPPacket_1(IPv4Packet* i4) : IPv4Packet(i4->raw), IPv6Packet(nullptr)
-	{
-		const uint8_t* raw = IPv4Packet::raw;
-		hdr = reinterpret_cast<const IPv4Header*>(IPv4Packet::raw);
-	}
-	const uint8_t* raw;
-	const IPv4Header* hdr;
-
-
 };
 
 class TCPPacket
