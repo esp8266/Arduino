@@ -8,7 +8,7 @@
 #include "LEAmDNS2_Legacy.h"
 
 
-namespace esp8266
+namespace experimental // esp8266
 {
 
 /**
@@ -1487,7 +1487,7 @@ clsLEAMDNSHost_Legacy::clsLEAMDNSHost::clsQuery::clsAnswerAccessor clsLEAMDNSHos
 }	// namespace MDNSImplementation
 
 
-}	// namespace esp8266
+}	// namespace experimental // esp8266
 
 
 
