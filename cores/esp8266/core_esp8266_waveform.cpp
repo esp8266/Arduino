@@ -48,11 +48,6 @@
 constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
-// The SDK and hardware take some time to actually get to our NMI code, so
-// decrement the next IRQ's timer value by a bit so we can actually catch the
-// real CPU cycle count we want for the waveforms.
-constexpr int32_t DELTAIRQCCYS = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
   microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
@@ -187,7 +182,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     if (!waveform.timer1Running) {
       initTimer();
     }
-    else if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
+    else if (T1V > ((clockCyclesPerMicrosecond() == 160) ? IRQLATENCYCCYS >> 1 : IRQLATENCYCCYS)) {
       // Must not interfere if Timer is due shortly
       timer1_write(IRQLATENCYCCYS);
     }
@@ -224,7 +219,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
     waveform.toDisableBits = 1UL << pin;
     std::atomic_thread_fence(std::memory_order_release);
     // Must not interfere if Timer is due shortly
-    if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
+    if (T1V > ((clockCyclesPerMicrosecond() == 160) ? IRQLATENCYCCYS >> 1 : IRQLATENCYCCYS)) {
       timer1_write(IRQLATENCYCCYS);
     }
     while (waveform.toDisableBits) {
@@ -306,7 +301,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t now = ESP.getCycleCount();
   uint32_t isrNextEventCcy = now;
   while (busyPins) {
-    if (static_cast<int32_t>(isrNextEventCcy - now) > IRQLATENCYCCYS + DELTAIRQCCYS) {
+    if (static_cast<int32_t>(isrNextEventCcy - now) > IRQLATENCYCCYS) {
       waveform.nextEventCcy = isrNextEventCcy;
       break;
     }
@@ -412,14 +407,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys <= IRQLATENCYCCYS + DELTAIRQCCYS) {
+  if (nextTimerCcys <= IRQLATENCYCCYS) {
     nextTimerCcys = IRQLATENCYCCYS;
-  }
-  else if (nextTimerCcys >= MAXIRQTICKSCCYS + DELTAIRQCCYS) {
-    nextTimerCcys = MAXIRQTICKSCCYS;
-  }
-  else {
-    nextTimerCcys -= DELTAIRQCCYS;
   }
 
   // Register access is fast and edge IRQ was configured before.
