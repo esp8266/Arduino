@@ -52,10 +52,10 @@ constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
 // decrement the next IRQ's timer value by a bit so we can actually catch the
 // real CPU cycle count we want for the waveforms.
 constexpr int32_t DELTAIRQCCYS = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 // The latency between in-ISR rearming of the timer and the earliest firing
 constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
-  (microsecondsToClockCycles(3) / 2) >> 1 : (microsecondsToClockCycles(3) / 2);
+  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
 
 // for INFINITE, the NMI proceeds on the waveform without expiry deadline.
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
@@ -108,7 +108,7 @@ static void initTimer() {
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
   timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
   waveform.timer1Running = true;
-  timer1_write(CPU2X & 1 ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1)); // Cause an interrupt post-haste
+  timer1_write(IRQLATENCYCCYS); // Cause an interrupt post-haste
 }
 
 static void ICACHE_RAM_ATTR deinitTimer() {
@@ -189,7 +189,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     }
     else if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
       // Must not interfere if Timer is due shortly
-      timer1_write((clockCyclesPerMicrosecond() == 160) ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
+      timer1_write(IRQLATENCYCCYS);
     }
   }
   else {
@@ -225,7 +225,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
     std::atomic_thread_fence(std::memory_order_release);
     // Must not interfere if Timer is due shortly
     if (T1V > ((clockCyclesPerMicrosecond() == 160) ? (IRQLATENCYCCYS + DELTAIRQCCYS) >> 1 : IRQLATENCYCCYS + DELTAIRQCCYS)) {
-      timer1_write((clockCyclesPerMicrosecond() == 160) ? microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1));
+      timer1_write(IRQLATENCYCCYS);
     }
     while (waveform.toDisableBits) {
       /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
