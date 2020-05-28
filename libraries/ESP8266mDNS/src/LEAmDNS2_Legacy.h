@@ -105,7 +105,7 @@
 #include "LEAmDNS2Host.h"
 
 
-namespace esp8266
+namespace experimental
 {
 
 namespace MDNSImplementation
@@ -689,7 +689,7 @@ protected:
 }   // namespace MDNSImplementation
 
 
-}   // namespace esp8266
+}   // namespace experimental
 
 
 #endif // __LEAMDNS2HOST_LEGACY_H__

@@ -56,7 +56,7 @@ using clsMDNSHost = esp8266::experimental::clsLEAMDNSHost;
 // Maps the implementation to use to the global namespace type
 //using MDNSResponder = Legacy_MDNSResponder::MDNSResponder;                // Legacy
 using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;           // LEA
-//using MDNSResponder = esp8266::MDNSImplementation::clsLEAMDNSHost_Legacy; // LEAv2Compat
+//using MDNSResponder = experimental::MDNSImplementation::clsLEAMDNSHost_Legacy; // LEAv2Compat
 //using MDNSResponder = clsMDNSHost;                                        // LEAv2
 
 extern MDNSResponder MDNS;
