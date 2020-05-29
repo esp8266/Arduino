@@ -314,7 +314,7 @@ size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
 
 void system_show_malloc(void)
 {
-    umm_info(NULL, 1);
+    umm_info(NULL, true);
 }
 
 };

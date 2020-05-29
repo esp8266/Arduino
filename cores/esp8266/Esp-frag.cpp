@@ -29,20 +29,23 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
     // Having getFreeHeap()=sum(hole-size), fragmentation is given by
     // 100 * (1 - sqrt(sum(hole-size²)) / sum(hole-size))
 
-    umm_info(NULL, 0);
-    uint8_t block_size = umm_block_size();
-    uint32_t fh = ummHeapInfo.freeBlocks * block_size;
+    umm_info(NULL, false);
     if (hfree)
-        *hfree = fh;
+        *hfree = (uint32_t)ummHeapInfo.freeBlocks * umm_block_size();
     if (hmax)
-        *hmax = ummHeapInfo.maxFreeContiguousBlocks * block_size;
+        *hmax = umm_free_blocks_to_free_space(ummHeapInfo.maxFreeContiguousBlocks);
     if (hfrag)
-        *hfrag = 100 - (sqrt32(ummHeapInfo.freeSize2) * 100) / fh;
+        *hfrag = 100 - (sqrt32(ummHeapInfo.freeBlocksSquared) * 100) / ummHeapInfo.freeBlocks;
+
 }
 
 uint8_t EspClass::getHeapFragmentation()
 {
+#ifdef UMM_INLINE_METRICS
+    return (uint8_t)umm_fragmentation_metric();
+#else
     uint8_t hfrag;
     getHeapStats(nullptr, nullptr, &hfrag);
     return hfrag;
+#endif
 }
