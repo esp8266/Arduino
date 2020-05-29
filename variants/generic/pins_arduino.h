@@ -36,6 +36,21 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define LED_BUILTIN 1
 #endif
 
+// routed
+//  on
+// ESP01  GPIO
+//        16  (no intr, internal-pull-down-not-up)
+//         5                   i2c-sclk
+//         4                   i2c-sda
+//   X     0                                      (boot:flash=up,uart=down)
+//   X     2  uart1-tx                  i2so-ws   (boot:up)
+//        14                   spi-sclk i2si-ws
+//        12                   spi-miso i2si-data
+//        13  uart0-swapped-rx spi-mosi i2si-bck
+//        15  uart0-swapped-tx spi-ss   i2so-bck  (boot:down)
+//   X     3  uart0-rx                  i2so-data
+//   X     1  uart0-tx
+
 #include "common.h"
 
 #endif /* Pins_Arduino_h */
