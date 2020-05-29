@@ -179,4 +179,4 @@ to implement deep sleep with ``WAKE_RF_DISABLED`` and later connect to WiFi, you
 will need to implement an additional (short) deep sleep using
 ``WAKE_RF_DEFAULT``.
 
-Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072#issuecomment-288530130>`__
+Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__
