@@ -41,7 +41,6 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
         *hfrag = 0;
       }
     }
-
 }
 
 uint8_t EspClass::getHeapFragmentation()
