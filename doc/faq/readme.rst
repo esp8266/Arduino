@@ -136,7 +136,7 @@ For reference:
 
 Time-wait PCB state helps TCP not confusing two consecutive connections with the
 same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
-having duplicate packets lost in internet arriving later during the second. 
+having duplicate packets lost in internet arriving later during the second.
 Artificially clearing them is a workaround to help saving precious heap.
 
 The following lines are compatible with both lwIP versions:
@@ -147,7 +147,7 @@ The following lines are compatible with both lwIP versions:
     struct tcp_pcb;
     extern struct tcp_pcb* tcp_tw_pcbs;
     extern "C" void tcp_abort (struct tcp_pcb* pcb);
-    
+
     void tcpCleanup (void) {
       while (tcp_tw_pcbs)
         tcp_abort(tcp_tw_pcbs);
@@ -168,3 +168,13 @@ This script is also used to manage uncommon options that are currently not
 available in the IDE menu.
 
 `Read more <a05-board-generator.rst>`__.
+
+My WiFi won't reconnect after deep sleep using ``WAKE_RF_DISABLED``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you implement deep sleep using ``WAKE_RF_DISABLED``, this forces what
+appears to be a bare metal disabling of WiFi functionality, which is not
+restored using ``WiFi.forceSleepWake()`` or ``WiFi.mode(WIFI_STA)``. If you need
+to implement deep sleep with ``WAKE_RF_DISABLED`` and later connect to WiFi, you
+will need to implement an additional (short) deep sleep using
+``WAKE_RF_DEFAULT``.
