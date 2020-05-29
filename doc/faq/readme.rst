@@ -178,3 +178,5 @@ restored using ``WiFi.forceSleepWake()`` or ``WiFi.mode(WIFI_STA)``. If you need
 to implement deep sleep with ``WAKE_RF_DISABLED`` and later connect to WiFi, you
 will need to implement an additional (short) deep sleep using
 ``WAKE_RF_DEFAULT``.
+
+Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072#issuecomment-288530130>`__
