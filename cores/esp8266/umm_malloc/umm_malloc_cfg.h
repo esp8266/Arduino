@@ -110,12 +110,14 @@ extern "C" {
  *   1) -DUMM_STATS or -DUMM_STATS_FULL
  *   2) -DUMM_INLINE_METRICS (and implicitly includes -DUMM_INFO)
  *
- * If frequent call are made to ESP.getHeapFragmentation(), -DUMM_INLINE_METRICS
- * would reduce system overhead. This appears to require an additional 116 bytes
- * of IRAM vs using UMM_STATS with UMM_INFO.
+ * If frequent calls are made to ESP.getHeapFragmentation(),
+ * -DUMM_INLINE_METRICS would reduce long periods of interrupts disabled caused
+ * by frequent calls to `umm_info()`. Instead, the computations get distributed
+ * across each malloc, realloc, and free. This appears to require an additional
+ * 116 bytes of IRAM vs using `UMM_STATS` with `UMM_INFO`.
  *
  * When both UMM_STATS and UMM_INLINE_METRICS are defined, macros and structures
- * have been optimized to reduce duplicate operations.
+ * have been optimized to reduce duplications.
  *
  */
 
@@ -258,8 +260,8 @@ extern size_t umm_get_alloc_overhead(void);
 
 typedef struct UMM_STATISTICS_t {
 #ifndef UMM_INLINE_METRICS
-// If not doing UMM_STATS_FULL and we are doing UMM_INLINE_METRICS we can move
-// oom_count to umm_info's structure and save a little DRAM and IRAM.
+// If we are doing UMM_INLINE_METRICS, we can move oom_count and free_blocks to
+// umm_info's structure and save a little DRAM and IRAM.
 // Otherwise it is defined here.
   size_t free_blocks;
   size_t oom_count;
@@ -290,7 +292,7 @@ extern UMM_STATISTICS ummStats;
 
 #define STATS__OOM_UPDATE() UMM_OOM_COUNT += 1
 
-size_t umm_free_heap_size_lw( void );
+extern size_t umm_free_heap_size_lw( void );
 
 static inline size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
   return UMM_OOM_COUNT;
