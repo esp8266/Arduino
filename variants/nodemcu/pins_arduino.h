@@ -37,17 +37,20 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #endif
 #define LED_BUILTIN_AUX 16
 
-static const uint8_t D0   = 16;
-static const uint8_t D1   = 5;
-static const uint8_t D2   = 4;
-static const uint8_t D3   = 0;
-static const uint8_t D4   = 2;
-static const uint8_t D5   = 14;
-static const uint8_t D6   = 12;
-static const uint8_t D7   = 13;
-static const uint8_t D8   = 15;
-static const uint8_t D9   = 3;
-static const uint8_t D10  = 1;
+//                nodemcu  GPIO
+static const uint8_t D0   = 16; // (no pwm, no intr, internal-pull-down-poosible-no-pullup)
+static const uint8_t D1   = 5;  //                i2c-sclk
+static const uint8_t D2   = 4;  //                i2c-sda
+static const uint8_t D3   = 0;  // 12k pull-up                               (boot:flash=pull-up,uart=down)
+static const uint8_t D4   = 2;  // 12k pull-up,   LED,      uart1-TX         (boot:pull-up)
+static const uint8_t D5   = 14; //                spi-sclk
+static const uint8_t D6   = 12; //                spi-miso
+static const uint8_t D7   = 13; //                spi-mosi, uart0-swapped-rx
+static const uint8_t D8   = 15; // 12k pull-down, spi-ss,   uart0-swapped-tx (boot:pull-down)
+static const uint8_t D9   = 3;  // uart0-rx
+static const uint8_t D10  = 1;  // uart0-tx
+
+// https://github.com/nodemcu/nodemcu-devkit-v1.0/blob/master/NODEMCU_DEVKIT_V1.0.PDF
 
 #include "../generic/common.h"
 

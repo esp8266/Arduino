@@ -32,19 +32,25 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
+#ifndef LED_BUILTIN
 #define LED_BUILTIN 2
+#endif
 
-static const uint8_t D0   = 16;
-static const uint8_t D1   = 5;
-static const uint8_t D2   = 4;
-static const uint8_t D3   = 0;
-static const uint8_t D4   = 2;
-static const uint8_t D5   = 14;
-static const uint8_t D6   = 12;
-static const uint8_t D7   = 13;
-static const uint8_t D8   = 15;
-static const uint8_t RX   = 3;
-static const uint8_t TX   = 1;
+
+//                D1-mini  GPIO
+static const uint8_t D0   = 16; // (no pwm, no intr, internal-pull-down-poosible-no-pullup)
+static const uint8_t D1   = 5;  //                i2c-sclk
+static const uint8_t D2   = 4;  //                i2c-sda
+static const uint8_t D3   = 0;  // 10k pull-up                               (boot:flash=pull-up,uart=down)
+static const uint8_t D4   = 2;  // 10k pull-up,   LED,      uart1-TX         (boot:pull-up)
+static const uint8_t D5   = 14; //                spi-sclk
+static const uint8_t D6   = 12; //                spi-miso
+static const uint8_t D7   = 13; //                spi-mosi, uart0-swapped-rx
+static const uint8_t D8   = 15; // 10k pull-down, spi-ss,   uart0-swapped-tx (boot:pull-down)
+static const uint8_t RX   = 3;  // uart0-rx
+static const uint8_t TX   = 1;  // uart0-tx
+
+// https://www.wemos.cc/en/latest/d1/d1_mini.html
 
 #include "../generic/common.h"
 
