@@ -49,8 +49,7 @@ constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
 // The latency between in-ISR rearming of the timer and the earliest firing
-constexpr int32_t IRQLATENCYCCYS = clockCyclesPerMicrosecond() == 160 ?
-  microsecondsToClockCycles(1) >> 1 : microsecondsToClockCycles(1);
+constexpr int32_t IRQLATENCYCCYS = microsecondsToClockCycles(1);
 
 // for INFINITE, the NMI proceeds on the waveform without expiry deadline.
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
@@ -406,12 +405,17 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     nextTimerCcys = callbackCcys;
   }
 
+  // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
+  constexpr bool cpuFreq160MHz = clockCyclesPerMicrosecond() == 160;
+  if (cpuFreq160MHz || CPU2X & 1) {
+    nextTimerCcys >>= 1;
+  }
+
   // Firing timer too soon, the NMI occurs before ISR has returned.
   if (nextTimerCcys <= IRQLATENCYCCYS) {
     nextTimerCcys = IRQLATENCYCCYS;
   }
 
   // Register access is fast and edge IRQ was configured before.
-  // Timer is 80MHz fixed. 160MHz binaries need scaling.
-  T1L = (CPU2X & 1) ? nextTimerCcys >> 1 : nextTimerCcys;
+  T1L = nextTimerCcys;
 }
