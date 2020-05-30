@@ -157,25 +157,8 @@ size_t umm_block_size( void ) {
 }
 #endif
 
-size_t umm_get_alloc_overhead(void) {
-  return (size_t)UMM_OVERHEAD_ADJUST;
-}
-
 #if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
 UMM_STATISTICS ummStats;
-#endif
-
-#if defined(UMM_INFO) || defined(UMM_STATS) || defined(UMM_STATS_FULL)
-// The value returned is adjusted down by the required overhead, to allow for a
-// successful malloc of 100% of free memory, with the assumption that the
-// available memory is contiguous.
-size_t umm_free_blocks_to_free_space(uint16_t blocks) {
-  // With UMM_POISON it is possible for the adjustment to go negative with a
-  // small remaining block of memory. It is possible to have a fragment that
-  // cannot be allocated.
-  int free_space = (int)blocks * sizeof(umm_block) - UMM_OVERHEAD_ADJUST;
-  return  (free_space > 0) ? (size_t)free_space : 0;
-}
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)

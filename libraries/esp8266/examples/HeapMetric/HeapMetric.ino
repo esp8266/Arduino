@@ -27,9 +27,6 @@ void tryit(int blocksize) {
   void** p;
   int blocks;
 
-  if (umm_get_oom_count()) {
-    return;
-  }
   /*
     heap-used ~= blocks*sizeof(void*) + blocks*blocksize
 
@@ -41,32 +38,35 @@ void tryit(int blocksize) {
     plus alignment to the allocation size and more for debug builds. This
     complicates the calculation of `blocks` a little.
 
-    With Core Version 2.7.2, ESP.getMaxFreeBlockSize() returns a value that has
-    already been adjusted for umm_malloc overhead. It reports a value that could
-    have been allocated at the time of the call. The overhead size is different
-    for the debug build.
+    ESP.getMaxFreeBlockSize() does not indicate the amount of memory that is
+    available for use in a single malloc call.  It indicates the size of a
+    contiguous block of (raw) memory before the umm_malloc overhead is removed.
 
-    umm_get_alloc_overhead() provides a value that can be used to adjust
-    calculations when trying to dividing up memory as we are here. However, the
-    calculation of multiple elements combined with the rounding up for the
-    8-byte alignment of each allocation can make for some challenging
-    calculations.
+    It should also be pointed out that, if you allow for the needed overhead in
+    your malloc call, it could still fail. An IRQ handler could have allocated
+    memory between the time you call ESP.getMaxFreeBlockSize() and your malloc
+    call, reducing the available memory.
+
+    UMM_OVERHEAD_ADJUST provides a value that can be used to adjust calculations
+    when trying to dividing up memory as we are here. However, the calculation
+    of multiple elements combined with the rounding up for the 8-byte alignment
+    of each allocation can make for some tricky calculations.
   */
-  int maxFreeBlockSize = ESP.getMaxFreeBlockSize();
-  int rawMemoryMaxFreeBlockSize = maxFreeBlockSize + umm_get_alloc_overhead();
+  int rawMemoryMaxFreeBlockSize =  ESP.getMaxFreeBlockSize();
+  // Remove overhead for blocks*sizeof(void*) array.
+  int maxFreeBlockSize = rawMemoryMaxFreeBlockSize - UMM_OVERHEAD_ADJUST;
   // Initial estimate to use all of the heap with multiples of 8 rounding up.
   blocks = maxFreeBlockSize /
-           (((blocksize + umm_get_alloc_overhead() + 7) & ~7) + sizeof(void*));
+           (((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + sizeof(void*));
   /*
-    Note we did not include any adjustment for the overhead of the
-    blocks*sizeof(void*) component. It has already been accounted for in the
-    value returned by ESP.getMaxFreeBlockSize(). It was reduced by the amount of
-    `umm_get_alloc_overhead()`. However, `blocks` could still be off by a count
-    of 1, because of the 8-byte aligning on the blocks*sizeof(void*) allocation.
+    While we allowed for the 8-byte alignment overhead for blocks*blocksize we
+    were unable to compensate in advance for the later 8-byte aligning needed
+    for the blocks*sizeof(void*) allocation. Thus blocks may be off by one count.
+    We now validate the estimate and adjust as needed.
   */
   int rawMemoryEstimate =
-    blocks * ((blocksize + umm_get_alloc_overhead() + 7) & ~7) +
-    ((blocks * sizeof(void*) + umm_get_alloc_overhead() + 7) & ~7);
+    blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) +
+    ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
   if (rawMemoryMaxFreeBlockSize < rawMemoryEstimate) {
     --blocks;
   }
@@ -76,10 +76,6 @@ void tryit(int blocksize) {
   p = (void**)malloc(sizeof(void*) * blocks);
   for (int i = 0; i < blocks; i++) {
     p[i] = malloc(blocksize);
-    if (umm_get_oom_count()) {
-      ETS_PRINTF("\n\nOOM at block index %d of possible %d.\n\n",  i, blocks);
-      return;
-    }
   }
   stats("array and blocks allocation");
 

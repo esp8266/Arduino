@@ -220,9 +220,6 @@ extern char _heap_start[];
   #define umm_usage_metric() (0)
 #endif
 
-extern size_t umm_free_blocks_to_free_space(uint16_t blocks);
-extern size_t umm_get_alloc_overhead(void);
-
 /*
  * -D UMM_STATS :
  * -D UMM_STATS_FULL
@@ -680,6 +677,23 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #  define POISON_CHECK() 1
 #  define POISON_CHECK_NEIGHBORS(c) do{}while(false)
 #endif
+
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+/*
+ * Overhead adjustments needed for free_blocks to express the number of bytes
+ * that can actually be allocated.
+ */
+#define UMM_OVERHEAD_ADJUST ( \
+  umm_block_size()/2 + \
+  UMM_POISON_SIZE_BEFORE + \
+  UMM_POISON_SIZE_AFTER + \
+  sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
+
+#else
+#define UMM_OVERHEAD_ADJUST  (umm_block_size()/2)
+#endif
+
 
 /////////////////////////////////////////////////
 #undef DBGLOG_FUNCTION

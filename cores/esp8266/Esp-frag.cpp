@@ -30,10 +30,11 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
     // 100 * (1 - sqrt(sum(hole-size²)) / sum(hole-size))
 
     umm_info(NULL, false);
+    uint8_t block_size = umm_block_size();
     if (hfree)
-        *hfree = (uint32_t)ummHeapInfo.freeBlocks * umm_block_size();
+        *hfree = ummHeapInfo.freeBlocks * block_size;
     if (hmax)
-        *hmax = umm_free_blocks_to_free_space(ummHeapInfo.maxFreeContiguousBlocks);
+        *hmax = (uint16_t)ummHeapInfo.maxFreeContiguousBlocks * block_size;
     if (hfrag) {
       if (ummHeapInfo.freeBlocks) {
         *hfrag = 100 - (sqrt32(ummHeapInfo.freeBlocksSquared) * 100) / ummHeapInfo.freeBlocks;

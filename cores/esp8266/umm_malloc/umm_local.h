@@ -35,20 +35,6 @@
 #define umm_free(p)      free(p)
 #endif
 
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-/*
- * Overhead adjustments needed for free_blocks to express the number of bytes
- * that can actually be allocated.
- */
-#define UMM_OVERHEAD_ADJUST ( \
-  sizeof(umm_block)/2 + \
-  UMM_POISON_SIZE_BEFORE + \
-  UMM_POISON_SIZE_AFTER + \
-  sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
-
-#else
-#define UMM_OVERHEAD_ADJUST  (sizeof(umm_block)/2)
-#endif
 
 #if defined(UMM_POISON_CHECK_LITE)
 static bool check_poison_neighbors( uint16_t cur );
