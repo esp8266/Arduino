@@ -44,6 +44,8 @@
 #include "ets_sys.h"
 #include <atomic>
 
+// Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
+constexpr bool ISCPUFREQ160MHZ = clockCyclesPerMicrosecond() == 160;
 // Maximum delay between IRQs, Timer1, <= 2^23 / 80MHz
 constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
@@ -181,7 +183,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
     if (!waveform.timer1Running) {
       initTimer();
     }
-    else if (T1V > ((clockCyclesPerMicrosecond() == 160) ? IRQLATENCYCCYS >> 1 : IRQLATENCYCCYS)) {
+    else if (T1V > IRQLATENCYCCYS) {
       // Must not interfere if Timer is due shortly
       timer1_write(IRQLATENCYCCYS);
     }
@@ -218,7 +220,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
     waveform.toDisableBits = 1UL << pin;
     std::atomic_thread_fence(std::memory_order_release);
     // Must not interfere if Timer is due shortly
-    if (T1V > ((clockCyclesPerMicrosecond() == 160) ? IRQLATENCYCCYS >> 1 : IRQLATENCYCCYS)) {
+    if (T1V > IRQLATENCYCCYS) {
       timer1_write(IRQLATENCYCCYS);
     }
     while (waveform.toDisableBits) {
@@ -240,12 +242,11 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
 // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
 static inline ICACHE_RAM_ATTR int32_t scaleCcys(int32_t ccys) {
-  constexpr bool cpuFreq80MHz = clockCyclesPerMicrosecond() == 80;
-  if (cpuFreq80MHz) {
-    return ((CPU2X & 1) ? ccys << 1 : ccys);
+  if (ISCPUFREQ160MHZ) {
+    return ((CPU2X & 1) ? ccys : ccys >> 1);
   }
   else {
-    return ((CPU2X & 1) ? ccys : ccys >> 1);
+    return ((CPU2X & 1) ? ccys << 1 : ccys);
   }
 }
 
@@ -406,8 +407,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
-  constexpr bool cpuFreq160MHz = clockCyclesPerMicrosecond() == 160;
-  if (cpuFreq160MHz || CPU2X & 1) {
+  if (ISCPUFREQ160MHZ || CPU2X & 1) {
     nextTimerCcys >>= 1;
   }
 
