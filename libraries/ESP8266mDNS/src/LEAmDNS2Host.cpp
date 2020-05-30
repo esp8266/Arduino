@@ -108,6 +108,9 @@ namespace experimental
 
 */
 //static
+
+clsLEAMDNSHost::fnProbeResultCallback clsLEAMDNSHost::stProbeResultCallback = nullptr;
+
 const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
         const char* p_pcDivider /*= "-"*/,
         const char* p_pcDefaultDomainName /*= 0*/)

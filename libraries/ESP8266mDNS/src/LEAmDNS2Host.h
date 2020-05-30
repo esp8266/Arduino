@@ -471,8 +471,10 @@ public:
                                   const char* p_pcDomainName,
                                   bool p_bProbeResult)>;
 
+    static fnProbeResultCallback stProbeResultCallback;
+
 protected:
-    /**
+	/**
         clsProbeInformation
     */
     class clsProbeInformation : public clsProbeInformation_Base
