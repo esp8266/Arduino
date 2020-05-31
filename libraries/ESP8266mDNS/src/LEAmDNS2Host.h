@@ -474,7 +474,7 @@ public:
     static fnProbeResultCallback stProbeResultCallback;
 
 protected:
-	/**
+    /**
         clsProbeInformation
     */
     class clsProbeInformation : public clsProbeInformation_Base

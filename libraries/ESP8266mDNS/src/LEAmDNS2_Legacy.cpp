@@ -1063,15 +1063,15 @@ bool clsLEAMDNSHost_Legacy::setHostProbeResultCallback(clsLEAMDNSHost_Legacy::MD
     bool	bResult = true;
 
     clsLEAMDNSHost::stProbeResultCallback =
-    		[p_fnCallback](clsLEAMDNSHost& /*p_rHost*/,
-    		                  const char* p_pcDomainName,
-    		                  bool p_bProbeResult)->void
-    		        {
-    		            if (p_fnCallback)	// void(const char* p_pcDomainName, bool p_bProbeResult)
-    		            {
-    		                p_fnCallback(p_pcDomainName, p_bProbeResult);
-    		            }
-    		        };
+        [p_fnCallback](clsLEAMDNSHost& /*p_rHost*/,
+                       const char* p_pcDomainName,
+                       bool p_bProbeResult)->void
+    {
+        if (p_fnCallback)	// void(const char* p_pcDomainName, bool p_bProbeResult)
+        {
+            p_fnCallback(p_pcDomainName, p_bProbeResult);
+        }
+    };
 
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
@@ -1090,15 +1090,15 @@ bool clsLEAMDNSHost_Legacy::setHostProbeResultCallback(clsLEAMDNSHost_Legacy::MD
     bool	bResult = true;
 
     clsLEAMDNSHost::stProbeResultCallback =
-    	[this, p_fnCallback](clsLEAMDNSHost& /*p_rHost*/,
-            const char* p_pcDomainName,
-            bool p_bProbeResult)->void
-		{
-      		if (p_fnCallback)	// void(clsLEAMDNSHost_Legacy* p_pMDNSResponder, const char* p_pcDomainName, bool p_bProbeResult)
-      		{
-      			p_fnCallback(this, p_pcDomainName, p_bProbeResult);
-       		}
-		};
+        [this, p_fnCallback](clsLEAMDNSHost& /*p_rHost*/,
+                             const char* p_pcDomainName,
+                             bool p_bProbeResult)->void
+    {
+        if (p_fnCallback)	// void(clsLEAMDNSHost_Legacy* p_pMDNSResponder, const char* p_pcDomainName, bool p_bProbeResult)
+        {
+            p_fnCallback(this, p_pcDomainName, p_bProbeResult);
+        }
+    };
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
@@ -1122,16 +1122,16 @@ bool clsLEAMDNSHost_Legacy::setServiceProbeResultCallback(const clsLEAMDNSHost_L
         bResult = (((pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService]))
                    && (pService->setProbeResultCallback(
 
-                		   [this, p_hService, p_fnCallback](clsLEAMDNSHost::clsService& /*p_rMDNSService*/,
-                				   	   const char* p_pcInstanceName,
-									   bool p_bProbeResult)->void
-							{
-            				  if (p_fnCallback)	// void(const char* p_pcServiceName, const hMDNSService p_hMDNSService, bool p_bProbeResult)
-            				  	  {
-            					  	  p_fnCallback(p_pcInstanceName, p_hService, p_bProbeResult);
-            				  	  }
-							}
-        )));
+                           [this, p_hService, p_fnCallback](clsLEAMDNSHost::clsService& /*p_rMDNSService*/,
+                                   const char* p_pcInstanceName,
+                                   bool p_bProbeResult)->void
+        {
+            if (p_fnCallback)	// void(const char* p_pcServiceName, const hMDNSService p_hMDNSService, bool p_bProbeResult)
+            {
+                p_fnCallback(p_pcInstanceName, p_hService, p_bProbeResult);
+            }
+        }
+                       )));
     }
     return bResult;
 }
