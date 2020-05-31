@@ -353,13 +353,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
             }
             else {
               int32_t dutyCcys = scaleCcys(wave.dutyCcys);
-              if (dutyCcys > wave.adjDutyCcys) {
+              if (dutyCcys <= wave.adjDutyCcys) {
+                dutyCcys >>= 1;
+                wave.adjDutyCcys -= dutyCcys;
+              }
+              else if (wave.adjDutyCcys) {
                 dutyCcys -= wave.adjDutyCcys;
                 wave.adjDutyCcys = 0;
-              }
-              else {
-                wave.adjDutyCcys -= dutyCcys;
-                dutyCcys = 0;
               }
               wave.endDutyCcy = now + dutyCcys;
               if (static_cast<int32_t>(wave.endDutyCcy - wave.nextPeriodCcy) > 0) {
