@@ -5,11 +5,6 @@
 #include <ESP8266WiFi.h>
 #include <umm_malloc/umm_malloc.h>
 
-// A macro to handle printing w/o using the heap.
-#ifndef ETS_PRINTF
-#define ETS_PRINTF(a, ...) ets_uart_printf(a, ##__VA_ARGS__)
-#endif
-
 void stats(const char* what) {
   // we could use getFreeHeap() getMaxFreeBlockSize() and getHeapFragmentation()
   // or all at once:
@@ -31,7 +26,9 @@ void tryit(int blocksize) {
     heap-used ~= blocks*sizeof(void*) + blocks*blocksize
 
     This calculation gets deep into how umm_malloc divides up memory and
-    understanding it is not important to this example.
+    understanding it is not important for this example. However, some may find
+    the details useful when creating memory restricted test cases and possibly
+    other manufactured failures.
 
     Internally the umm_malloc works with memory in 8-byte increments and aligns
     to 8 bytes. The creation of an allocation adds about 4-bytes of overhead
@@ -43,19 +40,21 @@ void tryit(int blocksize) {
     contiguous block of (raw) memory before the umm_malloc overhead is removed.
 
     It should also be pointed out that, if you allow for the needed overhead in
-    your malloc call, it could still fail. An IRQ handler could have allocated
-    memory between the time you call ESP.getMaxFreeBlockSize() and your malloc
-    call, reducing the available memory.
+    your malloc call, it could still fail in the general case. An IRQ handler
+    could have allocated memory between the time you call
+    ESP.getMaxFreeBlockSize() and your malloc call, reducing the available
+    memory. In this particular sketch, with "WiFi off" we are not expecting this
+    to be an issue.
 
-    UMM_OVERHEAD_ADJUST provides a value that can be used to adjust calculations
-    when trying to dividing up memory as we are here. However, the calculation
-    of multiple elements combined with the rounding up for the 8-byte alignment
-    of each allocation can make for some tricky calculations.
+    The macro UMM_OVERHEAD_ADJUST provides a value that can be used to adjust
+    calculations when trying to dividing up memory as we are here. However, the
+    calculation of multiple elements combined with the rounding up for the
+    8-byte alignment of each allocation can make for some tricky calculations.
   */
   int rawMemoryMaxFreeBlockSize =  ESP.getMaxFreeBlockSize();
-  // Remove overhead for blocks*sizeof(void*) array.
+  // Remove the space for overhead component of the blocks*sizeof(void*) array.
   int maxFreeBlockSize = rawMemoryMaxFreeBlockSize - UMM_OVERHEAD_ADJUST;
-  // Initial estimate to use all of the heap with multiples of 8 rounding up.
+  // Initial estimate to use all of the MaxFreeBlock with multiples of 8 rounding up.
   blocks = maxFreeBlockSize /
            (((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + sizeof(void*));
   /*
