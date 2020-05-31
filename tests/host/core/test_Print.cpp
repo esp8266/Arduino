@@ -16,15 +16,16 @@
 #include <catch.hpp>
 #include <string.h>
 #include <FS.h>
-#include "../common/spiffs_mock.h"
+#include <LittleFS.h>
+#include "../common/littlefs_mock.h"
 #include <spiffs/spiffs.h>
 
-// Use a SPIFFS file because we can't instantiate a virtual class like Print
+// Use a LittleFS file because we can't instantiate a virtual class like Print
 TEST_CASE("Print::write overrides all compile properly", "[core][Print]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
-    REQUIRE(SPIFFS.begin());
-    auto p = SPIFFS.open("test.bin", "w");
+    LITTLEFS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(LittleFS.begin());
+    auto p = LittleFS.open("test.bin", "w");
     REQUIRE(p);
     uint8_t    uint8 = 1;
     uint16_t  uint16 = 2;
@@ -56,7 +57,7 @@ TEST_CASE("Print::write overrides all compile properly", "[core][Print]")
     p.write(1);
     p.close();
 
-    p = SPIFFS.open("test.bin", "r");
+    p = LittleFS.open("test.bin", "r");
     REQUIRE(p);
     uint8_t buff[16];
     int len = p.read(buff, 16);

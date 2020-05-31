@@ -174,6 +174,30 @@ TEST_CASE(TESTPRE "open(w+) truncates file", TESTPAT)
     REQUIRE( t == "");
 }
 
+TEST_CASE(TESTPRE "peek() returns -1 on EOF", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    auto f = FSTYPE.open("/file1", "r+");
+    REQUIRE(f.seek(8));
+    REQUIRE(f.peek() == 't');
+    REQUIRE(f.read() == 't');
+    REQUIRE(f.peek() == -1);
+    REQUIRE(f.read() == -1);
+    f.close();
+}
+
+TEST_CASE(TESTPRE "seek() pase EOF returns error (#7323)", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    auto f = FSTYPE.open("/file1", "r+");
+    REQUIRE_FALSE(f.seek(10));
+    f.close();
+}
+
 #ifdef FS_HAS_DIRS
 
 #if FSTYPE != SDFS
