@@ -147,8 +147,8 @@ extern "C" {
 
 
 
-#if defined(__GNUC__) || defined(__clang__)
-    /* For GCC and clang */
+#if defined(__GNUC__) || defined(__clang__) || defined(__TI_COMPILER_VERSION__)
+    /* For GCC, clang and TI compilers */
 #define SPIFFS_PACKED __attribute__((packed))
 #elif defined(__ICCARM__) || defined(__CC_ARM)
     /* For IAR ARM and Keil MDK-ARM compilers */
@@ -266,8 +266,8 @@ extern "C" {
 #define SPIFFS_FH_OFFS(fs, fh)   ((fh) != 0 ? ((fh) + (fs)->cfg.fh_ix_offset) : 0)
 #define SPIFFS_FH_UNOFFS(fs, fh) ((fh) != 0 ? ((fh) - (fs)->cfg.fh_ix_offset) : 0)
 #else
-#define SPIFFS_FH_OFFS(fs, fh)   (fh)
-#define SPIFFS_FH_UNOFFS(fs, fh) (fh)
+#define SPIFFS_FH_OFFS(fs, fh)   ((spiffs_file)(fh))
+#define SPIFFS_FH_UNOFFS(fs, fh) ((spiffs_file)(fh))
 #endif
 
 
