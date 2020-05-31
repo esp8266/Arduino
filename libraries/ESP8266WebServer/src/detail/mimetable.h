@@ -10,8 +10,9 @@ enum type
 {
   html,
   htm,
-  css,
   txt,
+#ifndef MIMETYPE_MINIMAL    // allow to compile with only the strict minimum of mime-types
+  css,
   js,
   json,
   png,
@@ -29,16 +30,17 @@ enum type
   xml,
   pdf,
   zip,
-  gz,
   appcache,
+#endif // MIMETYPE_MINIMAL
+  gz,
   none,
   maxType
 };
 
 struct Entry
 {
-  const char endsWith[16]; 
-  const char mimeType[32];
+  const char * endsWith; 
+  const char * mimeType;
 };
 
 
