@@ -135,3 +135,5 @@ ESP8266 core files are licensed under LGPL.
 [SoftwareSerial repo](https://github.com/plerup/espsoftwareserial)
 
 [Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).
+
+[FTP Client/Server Library](https://github.com/dplasa/FTPClientServer) 
