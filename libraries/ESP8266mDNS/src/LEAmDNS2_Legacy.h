@@ -397,7 +397,7 @@ public:
         */
         bool hostDomainAvailable(void) const
         {
-            return m_rAnswerAccessor.serviceDomainAvailable();
+            return m_rAnswerAccessor.hostDomainAvailable();
         }
         /*
             hostDomain
