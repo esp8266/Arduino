@@ -146,7 +146,7 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
     ip_addr_copy(netmask, _netif.netmask);
     ip_addr_copy(gw, _netif.gw);
 
-    if (!netif_add(&_netif, &ip_addr, &netmask, &gw, this, netif_init_s, ethernet_input))
+    if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this, netif_init_s, ethernet_input))
         return ERR_IF;
 
     _netif.flags |= NETIF_FLAG_UP;
