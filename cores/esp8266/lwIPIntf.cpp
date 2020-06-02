@@ -1,12 +1,15 @@
 
 extern "C" {
 #include "lwip/err.h"
+#include "lwip/ip_addr.h"
 #include "lwip/dns.h"
 #include "lwip/dhcp.h"
 #include "lwip/init.h" // LWIP_VERSION_
 #if LWIP_IPV6
 #include "lwip/netif.h" // struct netif
 #endif
+
+#include <user_interface.h>
 }
 
 #include "debug.h"
@@ -46,7 +49,7 @@ bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1
     if(gateway.isSet() && (local_ip.v4() & netmask.v4()) != (gateway.v4() & netmask.v4())) {
         return false;
     }
-    
+
     return true;
 }
 

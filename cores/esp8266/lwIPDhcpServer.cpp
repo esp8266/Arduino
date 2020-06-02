@@ -1,6 +1,38 @@
+/*
+ lwIPDhcpServer.c - DHCP server
 
-// adapted from dhcpserver.c distributed in esp8266-nonos-sdk 2.0.0
-// same license may apply
+ Copyright (c) 2016 Espressif. All rights reserved.
+ Copyright (c) 2020 esp8266 arduino. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+// original sources (no license provided)
+// ESP8266_NONOS_SDK/third_party/lwip/app/dhcpserver.c
+// ESP8266_NONOS_SDK/third_party/include/lwip/app/dhcpserver.h
+ */
+
+// lwIPDhcpServer.{cc,h} encapsulate original nonos-sdk dhcp server
+// nearly as-is. This is an initial version to guaranty legacy behavior
+// with same default values.
+
+// vv this comment is supposed to be removed after the first commit
+// Logic and coding style in this file can be wrong but left to the closest
+// of the initial version for easier issue tracking.
+// (better is enemy of [good = already working])
+// ^^ this comment is supposed to be removed after the first commit
 
 #include <lwip/init.h> // LWIP_VERSION
 
@@ -137,7 +169,7 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #define LWIP_IS_OK(what,err) ((err) == ERR_OK)
 #endif
 
-const uint32 DhcpServer::magic_cookie = 0x63538263;
+const uint32 DhcpServer::magic_cookie = 0x63538263; // https://tools.ietf.org/html/rfc1497
 
 int fw_has_started_softap_dhcps = 0;
 
@@ -151,20 +183,23 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
     offer = 0xFF;
     renew = false;
     dhcps_lease_time = DHCPS_LEASE_TIME_DEF;  //minute
-    
+
     if (netif->num == SOFTAP_IF && fw_has_started_softap_dhcps == 1)
     {
-        // nonos-sdk always starts DHCPS at boot
-        // now that dhcps is in a class, we must wait c++ constructors to be initialized
-        // when global variable `dhcpSoftAP` (netif number SOFTAP_IF) is initialized,
-        // this constructor is called and calls begin(legacy-values):
-        // 192.168.4.1 netmask 255.255.255.0 gateway 0.0.0.0
-        ip_info ip = { { 0x0104a8c0 }, { 0x00ffffff }, { 0 } };
+        // When nonos-sdk starts DHCPS at boot:
+        // 1. `fw_has_started_softap_dhcps` is already initialized to 1
+        // 2. global ctor DhcpServer's `dhcpSoftAP(&netif_git[SOFTAP_IF])` is called
+        // 3. (that's here) => begin(legacy-values) is called
+        ip_info ip =
+        {
+            { 0x0104a8c0 }, // IP 192.168.4.1
+            { 0x00ffffff }, // netmask 255.255.255.0
+            { 0 }           // gateway 0.0.0.0
+        };
         begin(&ip);
-        fw_has_started_softap_dhcps = 2;
+        fw_has_started_softap_dhcps = 2; // not 1, ending intial boot sequence
     }
 };
-
 
 // wifi_softap_set_station_info is missing in user_interface.h:
 extern "C" void wifi_softap_set_station_info (uint8_t* mac, struct ipv4_addr*);
@@ -318,12 +353,12 @@ bool DhcpServer::add_dhcps_lease(uint8 *macaddr)
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ��DHCP msg��Ϣ�ṹ����������
+    DHCP msg
 
-    @param optptr -- DHCP msg��Ϣλ��
-    @param type -- Ҫ��ӵ�����option
+    @param optptr -- DHCP msg
+    @param type -- option
 
-    @return uint8_t* ����DHCP msgƫ�Ƶ�ַ
+    @return uint8_t* DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_msg_type(uint8_t *optptr, uint8_t type)
@@ -336,11 +371,11 @@ uint8_t* DhcpServer::add_msg_type(uint8_t *optptr, uint8_t type)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ��DHCP msg�ṹ������offerӦ������
+    DHCP msg offer
 
-    @param optptr -- DHCP msg��Ϣλ��
+    @param optptr -- DHCP msg
 
-    @return uint8_t* ����DHCP msgƫ�Ƶ�ַ
+    @return uint8_t* DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
@@ -443,11 +478,11 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ��DHCP msg�ṹ����ӽ����־����
+    DHCP msg
 
-    @param optptr -- DHCP msg��Ϣλ��
+    @param optptr -- DHCP msg
 
-    @return uint8_t* ����DHCP msgƫ�Ƶ�ַ
+    @return uint8_t* DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t* DhcpServer::add_end(uint8_t *optptr)
@@ -468,29 +503,23 @@ void DhcpServer::create_msg(struct dhcps_msg *m)
     m->htype = DHCP_HTYPE_ETHERNET;
     m->hlen = 6;
     m->hops = 0;
-    //memcpy((char *) xid, (char *) m->xid, sizeof(m->xid));
     m->secs = 0;
     m->flags = htons(BOOTP_BROADCAST);
 
     memcpy((char *) m->yiaddr, (char *) &client.addr, sizeof(m->yiaddr));
-
     memset((char *) m->ciaddr, 0, sizeof(m->ciaddr));
     memset((char *) m->siaddr, 0, sizeof(m->siaddr));
     memset((char *) m->giaddr, 0, sizeof(m->giaddr));
     memset((char *) m->sname, 0, sizeof(m->sname));
     memset((char *) m->file, 0, sizeof(m->file));
-
     memset((char *) m->options, 0, sizeof(m->options));
-
-    //For xiaomi crash bug
-    uint32 magic_cookie1 = magic_cookie;
-    memcpy((char *) m->options, &magic_cookie1, sizeof(magic_cookie1));
+    memcpy((char *) m->options, &magic_cookie, sizeof(magic_cookie));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����һ��OFFER
+    OFFER
 
-    @param -- m ָ����Ҫ���͵�DHCP msg����
+    @param -- m DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_offer(struct dhcps_msg *m)
@@ -554,9 +583,9 @@ void DhcpServer::send_offer(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����һ��NAK��Ϣ
+    NAK
 
-    @param m ָ����Ҫ���͵�DHCP msg����
+    @param m DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_nak(struct dhcps_msg *m)
@@ -615,9 +644,9 @@ void DhcpServer::send_nak(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����һ��ACK��DHCP�ͻ���
+    ACK DHCP
 
-    @param m ָ����Ҫ���͵�DHCP msg����
+    @param m DHCP msg
 */
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_ack(struct dhcps_msg *m)
@@ -683,12 +712,12 @@ void DhcpServer::send_ack(struct dhcps_msg *m)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    ����DHCP�ͻ��˷�����DHCP����������Ϣ�����Բ�ͬ��DHCP��������������Ӧ��Ӧ��
+    DHCP
 
-    @param optptr DHCP msg�е���������
-    @param len ��������Ĵ��?(byte)
+    @param optptr DHCP msg е
+    @param len
 
-    @return uint8_t ���ش�����DHCP Server״ֵ̬
+    @return uint8_t* DHCP Server
 */
 ///////////////////////////////////////////////////////////////////////////////////
 uint8_t DhcpServer::parse_options(uint8_t *optptr, sint16_t len)
@@ -819,14 +848,14 @@ sint16_t DhcpServer::parse_msg(struct dhcps_msg *m, u16_t len)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
-    DHCP ��������ݰ���մ���ص�����˺�����LWIP UDPģ������ʱ������
-    ��Ҫ����udp_recv()������LWIP����ע��.
+    DHCP
+    udp_recv() callback
 
     @param arg
-    @param pcb ���յ�UDP��Ŀ��ƿ�?
-    @param p ���յ���UDP�е��������?
-    @param addr ���ʹ�UDP���Դ�����IP��ַ
-    @param port ���ʹ�UDP���Դ�����UDPͨ���˿ں�
+    @param pcb
+    @param p
+    @param addr
+    @param port
 */
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -900,9 +929,6 @@ void DhcpServer::handle_dhcp(
         }
     }
 
-    /*
-        DHCP �ͻ���������Ϣ����
-    */
 #if DHCPS_DEBUG
     os_printf("dhcps: handle_dhcp-> parse_msg(p)\n");
 #endif
@@ -1026,7 +1052,7 @@ bool DhcpServer::begin (struct ip_info *info)
     if (_netif->num == SOFTAP_IF)
         wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
     _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP; // added for lwip-git
-    
+
     return true;
 }
 
@@ -1043,7 +1069,7 @@ void DhcpServer::end ()
     udp_disconnect(pcb_dhcps);
     udp_remove(pcb_dhcps);
     pcb_dhcps = nullptr;
-    
+
     //udp_remove(pcb_dhcps);
     list_node *pnode = nullptr;
     list_node *pback_node = nullptr;
@@ -1103,6 +1129,9 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 
     if (please->enable)
     {
+        // logic below is subject for improvement
+        // - is wrong
+        // - limited to /24 address plans
 #if 1
         softap_ip = ip_2_ip4(&_netif->ip_addr)->addr;
 #else

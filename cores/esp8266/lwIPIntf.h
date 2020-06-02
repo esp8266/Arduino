@@ -9,7 +9,7 @@ class LwipIntf {
 public:
 
     LwipIntf () { }
-    
+
     // reorder WiFi.config() parameters for a esp8266/official Arduino dual-compatibility API
     // args     | esp order  arduino order
     // ----     + ---------  -------------

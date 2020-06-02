@@ -37,7 +37,7 @@
 #define RX 13 // d1mini D7
 #define TX 15 // d1mini D8
 
-SoftwareSerial ppplink;
+SoftwareSerial ppplink(RX, TX);
 HardwareSerial& logger = Serial;
 PPPServer ppp(&ppplink);
 
@@ -84,7 +84,7 @@ void setup() {
                 WiFi.dnsIP(0).toString().c_str(),
                 WiFi.dnsIP(1).toString().c_str());
 
-  ppplink.begin(PPPLINKBAUD, RX, TX);
+  ppplink.begin(PPPLINKBAUD);
   ppplink.enableIntTx(true);
   logger.println();
   logger.printf("\n\nhey, trying to be a PPP server here\n\n");

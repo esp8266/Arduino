@@ -145,7 +145,7 @@ constructor:
 
 .. code:: cpp
 
-    String(const char *cstr = ""); // constructor from const char * 
+    String(const char *cstr = nullptr); // constructor from const char *
     String(const String &str); // copy constructor
     String(const __FlashStringHelper *str); // constructor for flash strings 
 
