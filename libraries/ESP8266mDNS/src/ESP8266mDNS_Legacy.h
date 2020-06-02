@@ -65,6 +65,9 @@ struct MDNSAnswer;
 class MDNSResponder
 {
 public:
+
+    static constexpr auto ApiVersion = MDNSApiVersion::Legacy;
+
     MDNSResponder();
     ~MDNSResponder();
     bool begin(const char* hostName);

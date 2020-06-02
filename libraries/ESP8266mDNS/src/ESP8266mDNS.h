@@ -42,15 +42,22 @@
 
 */
 
-#include "ESP8266mDNS_Legacy.h"
-#include "LEAmDNS.h"
+enum class MDNSApiVersion { Legacy, LEA, LEAv2Compat, LEAv2 };
 
+#include "ESP8266mDNS_Legacy.h" // Legacy
+#include "LEAmDNS.h"            // LEA
+#include "LEAmDNS2_Legacy.h"    // LEAv2Compat - replacement for LEA using v2
+#include "LEAmDNS2Host.h"       // LEAv2       - API updated
+
+// clsMDNSHost replaces MDNSResponder in LEAv2
+using clsMDNSHost = esp8266::experimental::clsLEAMDNSHost;
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 // Maps the implementation to use to the global namespace type
-//using MDNSResponder = Legacy_MDNSResponder::MDNSResponder; //legacy
-using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder; //new
+//using MDNSResponder = Legacy_MDNSResponder::MDNSResponder;                // Legacy
+using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;           // LEA
+//using MDNSResponder = experimental::MDNSImplementation::clsLEAMDNSHost_Legacy; // LEAv2Compat
+//using MDNSResponder = clsMDNSHost;                                        // LEAv2
 
 extern MDNSResponder MDNS;
 #endif
-

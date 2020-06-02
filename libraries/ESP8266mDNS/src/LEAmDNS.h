@@ -172,6 +172,9 @@ class MDNSResponder
 {
 public:
     /* INTERFACE */
+
+    static constexpr auto ApiVersion = MDNSApiVersion::LEA;
+
     MDNSResponder(void);
     virtual ~MDNSResponder(void);
 
