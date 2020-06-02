@@ -182,7 +182,7 @@ void setup(void) {
 
   fileSystemConfig.setAutoFormat(false);
   fileSystem->setConfig(fileSystemConfig);
-  boolean fsOK = fileSystem->begin();
+  bool fsOK = fileSystem->begin();
   DBG_OUTPUT_PORT.println(fsOK ? F("Filesystem initialized.") : F("Filesystem init failed!"));
 
   ////////////////////////////////
@@ -265,8 +265,8 @@ unsigned int defaultMask() {
 
 int rgbMode = 1; // 0=off - 1=auto - 2=manual
 int rgbValue = 0;
-long lastChangeTime = 0;
-boolean modeChangeRequested = false;
+esp8266::polledTimeout::periodicMs timeToChange(1000);
+bool modeChangeRequested = false;
 
 void loop(void) {
   server.handleClient();
@@ -277,58 +277,56 @@ void loop(void) {
     modeChangeRequested = true;
   }
 
-  // see if one second has passed since last change
-  long now = millis();
-  if (now - lastChangeTime > 1000) {
-    // see if a mode change was requested
-    if (modeChangeRequested) {
-      // increment mode (reset after 2)
-      rgbMode++;
-      if (rgbMode > 2) {
-        rgbMode = 0;
+  // see if one second has passed since last change, otherwise stop here
+  if (!timeToChange) {
+    return;
+  }
+
+  // see if a mode change was requested
+  if (modeChangeRequested) {
+    // increment mode (reset after 2)
+    rgbMode++;
+    if (rgbMode > 2) {
+      rgbMode = 0;
+    }
+
+    modeChangeRequested = false;
+  }
+
+  // act according to mode
+  switch (rgbMode) {
+    case 0: // off
+      gpioMask = defaultMask();
+      gpioMask &= ~(1 << 12); // Hide GPIO 12
+      gpioMask &= ~(1 << 13); // Hide GPIO 13
+      gpioMask &= ~(1 << 15); // Hide GPIO 15
+
+      // reset outputs
+      digitalWrite(12, 0);
+      digitalWrite(13, 0);
+      digitalWrite(15, 0);
+      break;
+
+    case 1: // auto
+      gpioMask = defaultMask();
+
+      // increment value (reset after 7)
+      rgbValue++;
+      if (rgbValue > 7) {
+        rgbValue = 0;
       }
 
-      modeChangeRequested = false;
-    }
+      // output new values
+      digitalWrite(12, rgbValue & 0b001);
+      digitalWrite(13, rgbValue & 0b010);
+      digitalWrite(15, rgbValue & 0b100);
+      break;
 
-    // act according to mode
-    switch (rgbMode) {
-      case 0: // off
-        gpioMask = defaultMask();
-        gpioMask &= ~(1 << 12); // Hide GPIO 12
-        gpioMask &= ~(1 << 13); // Hide GPIO 13
-        gpioMask &= ~(1 << 15); // Hide GPIO 15
+    case 2: // manual
+      gpioMask = defaultMask();
 
-        // reset outputs
-        digitalWrite(12, 0);
-        digitalWrite(13, 0);
-        digitalWrite(15, 0);
-        break;
-
-      case 1: // auto
-        gpioMask = defaultMask();
-
-        // increment value (reset after 7)
-        rgbValue++;
-        if (rgbValue > 7) {
-          rgbValue = 0;
-        }
-
-        // output new values
-        digitalWrite(12, rgbValue & 0b001);
-        digitalWrite(13, rgbValue & 0b010);
-        digitalWrite(15, rgbValue & 0b100);
-        break;
-
-      case 2: // manual
-        gpioMask = defaultMask();
-
-        // keep outputs unchanged
-        break;
-    }
-
-    // update last change time
-    lastChangeTime = now;
+      // keep outputs unchanged
+      break;
   }
 }
 
