@@ -384,6 +384,10 @@ uint16_t Wiznet5500::readFrameData(uint8_t *buffer, uint16_t framesize)
     wizchip_recv_data(buffer, framesize);
     setSn_CR(Sn_CR_RECV);
 
+#if 1
+    // let lwIP deal with mac address filtering
+    return framesize;
+#else
     // Had problems with W5500 MAC address filtering (the Sn_MR_MFEN option)
     // Do it in software instead:
     if ((buffer[0] & 0x01) || memcmp(&buffer[0], _mac_address, 6) == 0)
@@ -395,6 +399,7 @@ uint16_t Wiznet5500::readFrameData(uint8_t *buffer, uint16_t framesize)
     {
         return 0;
     }
+#endif
 }
 
 uint16_t Wiznet5500::sendFrame(const uint8_t *buf, uint16_t len)
