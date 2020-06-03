@@ -129,7 +129,9 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
         memset(_macAddress, 0, 6);
         _macAddress[0] = 0xEE;
 #endif
-        _macAddress[3] += _netif.num;
+        _macAddress[3] += _netif.num;   // alter base mac address
+        _macAddress[0] &= 0xfe;         // set as locally administered, unicast, per
+        _macAddress[0] |= 0x02;         // https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
     }
 
     if (!RawDev::begin(_macAddress))
