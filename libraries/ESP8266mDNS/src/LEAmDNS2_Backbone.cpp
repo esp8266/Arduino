@@ -41,7 +41,8 @@ namespace experimental
 clsLEAMDNSHost::clsBackbone::clsBackbone(void)
     :   m_pUDPContext(0),
         m_bDelayUDPProcessing(false),
-        m_u32DelayedDatagrams(0)
+        m_u32DelayedDatagrams(0),
+        m_uniqueHost(0)
 {
 }
 
@@ -71,10 +72,9 @@ UdpContext* clsLEAMDNSHost::clsBackbone::addHost(clsLEAMDNSHost* p_pHost)
 {
     UdpContext* pUDPContext = 0;
 
-    if ((m_pUDPContext) &&
-            (p_pHost))
+    if ((m_pUDPContext) && (p_pHost) && (m_uniqueHost == nullptr))
     {
-        m_HostList.push_back(p_pHost);
+        m_uniqueHost = p_pHost;
         pUDPContext = m_pUDPContext;
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s addHost: %s to add host!\n"), _DH(), (pUDPContext ? "Succeeded" : "FAILED")););
@@ -89,11 +89,9 @@ bool clsLEAMDNSHost::clsBackbone::removeHost(clsLEAMDNSHost* p_pHost)
 {
     bool    bResult = false;
 
-    if ((p_pHost) &&
-            (m_HostList.end() != std::find(m_HostList.begin(), m_HostList.end(), p_pHost)))
+    if ((p_pHost) && (m_uniqueHost == p_pHost))
     {
-        // Remove host object
-        m_HostList.remove(p_pHost);
+        m_uniqueHost = nullptr;
         bResult = true;
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s removeHost: %s to remove host!\n"), _DH(), (bResult ? "Succeeded" : "FAILED")););
@@ -107,7 +105,7 @@ bool clsLEAMDNSHost::clsBackbone::removeHost(clsLEAMDNSHost* p_pHost)
 */
 size_t clsLEAMDNSHost::clsBackbone::hostCount(void) const
 {
-    return m_HostList.size();
+    return m_uniqueHost == nullptr ? 0 : 1;
 }
 
 /*
@@ -218,32 +216,23 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
         while ((m_pUDPContext) &&
                 (m_pUDPContext->next()))
         {
-            netif*          pNetIf = m_pUDPContext->getInputNetif();//ip_current_input_netif();	// Probably changed inbetween!!!!
-            clsLEAMDNSHost*   pHost = 0;
-            if ((pNetIf) &&
-                    ((pHost = _findHost(pNetIf))))
-            {
-                DEBUG_EX_INFO(
-                    if (u32LoopCounter++)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);
-                    if ((remoteIPAddr.isSet()) &&
-                            (remoteIPAddr != m_pUDPContext->getRemoteAddress()))
-                    {
-                        DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Changed IP address %s->%s!\n"), _DH(), remoteIPAddr.toString().c_str(), m_pUDPContext->getRemoteAddress().toString().c_str());
-                    }
-                }
-                remoteIPAddr = m_pUDPContext->getRemoteAddress();
-                );
-                bResult = pHost->_processUDPInput();
-                DEBUG_EX_INFO2(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: FAILED to process UDP input!\n"), _DH()););
+            clsLEAMDNSHost*   pHost = _findHost();
+            DEBUG_EX_INFO_IF(u32LoopCounter++,
+                             DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);
+                             DEBUG_EX_INFO_IF((remoteIPAddr.isSet()) && (remoteIPAddr != m_pUDPContext->getRemoteAddress()),
+                                              DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Changed IP address %s->%s!\n"),
+                                                      _DH(),
+                                                      remoteIPAddr.toString().c_str(),
+                                                      m_pUDPContext->getRemoteAddress().toString().c_str())));
+            DEBUG_EX_INFO(remoteIPAddr = m_pUDPContext->getRemoteAddress());
 
-                DEBUG_EX_ERR(if ((-1) != m_pUDPContext->peek()) DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: !!!!    CONTENT LEFT IN UDP BUFFER    !!!!\n"), _DH()););
-            }
-            else
-            {
-                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Received UDP datagramm for unused netif at index: %u\n"), _DH(), (pNetIf ? netif_get_index(pNetIf) : (-1))););
-            }
+            bResult = pHost->_processUDPInput();
+
+            DEBUG_EX_INFO2_IF(!bResult,
+                              DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: FAILED to process UDP input!\n"), _DH()));
+            DEBUG_EX_ERR_IF((-1) != m_pUDPContext->peek(),
+                            DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: !!!!    CONTENT LEFT IN UDP BUFFER    !!!!\n"),
+                                                  _DH()));
             m_pUDPContext->flush();
         }
     }
@@ -254,34 +243,6 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
     }
     return bResult;
 }
-
-/*
-    clsLEAmDNS2_Host::clsBackbone::_findHost
-*/
-const clsLEAMDNSHost* clsLEAMDNSHost::clsBackbone::_findHost(netif* p_pNetIf) const
-{
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _findHost\n"), _DH()););
-    const clsLEAMDNSHost* pResult = 0;
-    for (const clsLEAMDNSHost* pHost : m_HostList)
-    {
-        if ((p_pNetIf) &&
-                (pHost->m_pNetIf == p_pNetIf))
-        {
-            pResult = pHost;
-            break;
-        }
-    }
-    return pResult;
-}
-
-/*
-    MDNSResponder::_findHost
-*/
-clsLEAMDNSHost* clsLEAMDNSHost::clsBackbone::_findHost(netif* p_pNetIf)
-{
-    return (clsLEAMDNSHost*)(((const clsLEAMDNSHost::clsBackbone*)this)->_findHost(p_pNetIf));
-}
-
 
 /*
     MISC

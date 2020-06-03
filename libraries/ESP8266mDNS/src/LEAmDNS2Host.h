@@ -140,18 +140,24 @@
 #ifdef DEBUG_ESP_MDNS_RESPONDER
 #ifdef DEBUG_ESP_MDNS_INFO
 #define DEBUG_EX_INFO(A)    A
+#define DEBUG_EX_INFO_IF(C,A...)    do if (C) { A; } while (0)
 #else
 #define DEBUG_EX_INFO(A)
+#define DEBUG_EX_INFO_IF(C,A...)
 #endif
 #ifdef DEBUG_ESP_MDNS_INFO2
 #define DEBUG_EX_INFO2(A)   A
+#define DEBUG_EX_INFO2_IF(C,A...)    do if (C) { A; } while (0)
 #else
 #define DEBUG_EX_INFO2(A)
+#define DEBUG_EX_INFO2_IF(C,A...)
 #endif
 #ifdef DEBUG_ESP_MDNS_ERR
 #define DEBUG_EX_ERR(A) A
+#define DEBUG_EX_ERR_IF(C,A...)    do if (C) { A; } while (0)
 #else
 #define DEBUG_EX_ERR(A)
+#define DEBUG_EX_ERR_IF(C,A...)
 #endif
 #ifdef DEBUG_ESP_MDNS_TX
 #define DEBUG_EX_TX(A)  A
@@ -267,11 +273,12 @@ protected:
     /**
          list
     */
-    using list = std::list<clsLEAMDNSHost*>;
+    //using list = std::list<clsLEAMDNSHost*>;
 
     // File: ..._Backbone
     /**
         clsBackbone
+        XXXX should be merged with holder clsLEAMDNSHost because there is no list anymore in it
     */
     class clsBackbone
     {
@@ -287,19 +294,31 @@ protected:
         size_t hostCount(void) const;
         bool setDelayUDPProcessing(bool p_bDelayProcessing);
 
+        clsLEAMDNSHost* getUniqueHost()
+        {
+            return m_uniqueHost;
+        }
+
     protected:
         UdpContext*         m_pUDPContext;
         bool                m_bDelayUDPProcessing;
         uint32_t            m_u32DelayedDatagrams;
-        list                m_HostList;
+        //list                m_HostList;
+        clsLEAMDNSHost*     m_uniqueHost;
 
         bool _allocUDPContext(void);
         bool _releaseUDPContext(void);
 
         bool _processUDPInput(void);
 
-        const clsLEAMDNSHost* _findHost(netif* p_pNetIf) const;
-        clsLEAMDNSHost* _findHost(netif* p_pNetIf);
+        const clsLEAMDNSHost* _findHost() const
+        {
+            return m_uniqueHost;
+        }
+        clsLEAMDNSHost* _findHost()
+        {
+            return m_uniqueHost;
+        }
 
         const char* _DH(void) const;
     };
@@ -1247,8 +1266,7 @@ public:
     static const char* indexDomainName(const char* p_pcDomainName,
                                        const char* p_pcDivider = "-",
                                        const char* p_pcDefaultDomainName = 0);
-    static bool setNetIfHostName(netif* p_pNetIf,
-                                 const char* p_pcHostName);
+    static bool setNetIfHostName(const char* p_pcHostName);
 
     clsLEAMDNSHost(void);
     ~clsLEAMDNSHost(void);
@@ -1258,12 +1276,6 @@ public:
     // Later call 'update()' in every 'loop' to run the process loop
     // (probing, announcing, responding, ...)
     // If no callback is given, the (maybe) already installed callback stays set
-    bool begin(const char* p_pcHostName,
-               netif* p_pNetIf,
-               fnProbeResultCallback p_fnCallback = 0);
-    bool begin(const char* p_pcHostName,
-               WiFiMode_t p_WiFiMode,
-               fnProbeResultCallback p_fnCallback = 0);
     bool begin(const char* p_pcHostName,
                fnProbeResultCallback p_fnCallback = 0);
 
@@ -1329,16 +1341,22 @@ public:
     // - hasAnswerIPv6Address/answerIPv6Address     service/host
     // - hasAnswerPort/answerPort                   service
     // - hasAnswerTxts/answerTxts                   service
-    clsQuery* installServiceQuery(const char* p_pcServiceType,
-                                  const char* p_pcProtocol,
-                                  clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    clsQuery* installServiceQuery(const char* p_pcServiceType,
-                                  const char* p_pcProtocol,
-                                  clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
-    clsQuery* installHostQuery(const char* p_pcHostName,
-                               clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    clsQuery* installHostQuery(const char* p_pcHostName,
-                               clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
+
+    /*
+        install*Query() creates several queries on the interfaces.
+        it no more returns a single query but a boolean until the API is adapted
+    */
+    /*clsQuery* */bool installServiceQuery(const char* p_pcServiceType,
+                                           const char* p_pcProtocol,
+                                           clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
+    /*clsQuery* */bool installServiceQuery(const char* p_pcServiceType,
+                                           const char* p_pcProtocol,
+                                           clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor,
+                                           std::list<clsQuery*>* ret = nullptr);
+    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+                                        clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
+    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+                                        clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
     // Remove a dynamic service query
     bool removeQuery(clsQuery* p_pQuery);
 
@@ -1420,9 +1438,11 @@ protected:
     clsQuery* _findNextQueryByDomain(const clsRRDomain& p_Domain,
                                      const clsQuery::enuQueryType p_QueryType,
                                      const clsQuery* p_pPrevQuery);
-    clsQuery* _installServiceQuery(const char* p_pcService,
+    clsQuery* _installServiceQuery(netif* pNetIf,
+                                   const char* p_pcService,
                                    const char* p_pcProtocol);
-    clsQuery* _installDomainQuery(clsRRDomain& p_Domain,
+    clsQuery* _installDomainQuery(netif *pNetIf,
+                                  clsRRDomain& p_Domain,
                                   clsQuery::enuQueryType p_QueryType);
     bool _hasQueriesWaitingForAnswers(void) const;
     bool _executeQueryCallback(const clsQuery& p_Query,
@@ -1433,11 +1453,12 @@ protected:
 
     // File: ..._Host_Control
     // RECEIVING
-    bool _parseMessage(void);
-    bool _parseQuery(const clsMsgHeader& p_Header);
+    bool _parseMessage();
+    bool _parseQuery(netif* pNetIf,
+                     const clsMsgHeader& p_Header);
 
-    bool _parseResponse(const clsMsgHeader& p_Header);
-    bool _processAnswers(const clsRRAnswer* p_pPTRAnswers);
+    bool _parseResponse(netif* pNetIf, const clsMsgHeader& p_Header);
+    bool _processAnswers(netif* pNetIf, const clsRRAnswer* p_pPTRAnswers);
     bool _processPTRAnswer(const clsRRAnswerPTR* p_pPTRAnswer,
                            bool& p_rbFoundNewKeyAnswer);
     bool _processSRVAnswer(const clsRRAnswerSRV* p_pSRVAnswer,
@@ -1451,11 +1472,11 @@ protected:
 #endif
 
     // PROBING
-    bool _updateProbeStatus(void);
+    bool _updateProbeStatus(netif* pNetIf);
     bool _resetProbeStatus(bool p_bRestart = true);
     bool _hasProbesWaitingForAnswers(void) const;
-    bool _sendHostProbe(void);
-    bool _sendServiceProbe(clsService& p_rService);
+    bool _sendHostProbe(netif* pNetIf);
+    bool _sendServiceProbe(netif* pNetIf, clsService& p_rService);
     bool _cancelProbingForHost(void);
     bool _cancelProbingForService(clsService& p_rService);
     bool _callHostProbeResultCallback(bool p_bResult);
@@ -1463,15 +1484,18 @@ protected:
                                          bool p_bResult);
 
     // ANNOUNCE
-    bool _announce(bool p_bAnnounce,
+    bool _announce(netif* pNetIf,
+                   bool p_bAnnounce,
                    bool p_bIncludeServices);
-    bool _announceService(clsService& p_pService,
+    bool _announceService(netif* pNetIf,
+                          clsService& p_pService,
                           bool p_bAnnounce = true);
 
     // QUERY CACHE
-    bool _checkQueryCache(void);
+    bool _checkQueryCache(netif* pNetIf);
 
-    uint32_t _replyMaskForHost(const clsRRHeader& p_RRHeader,
+    uint32_t _replyMaskForHost(netif* pNetIf,
+                               const clsRRHeader& p_RRHeader,
                                bool* p_pbFullNameMatch = 0) const;
     uint32_t _replyMaskForService(const clsRRHeader& p_RRHeader,
                                   clsService& p_rService,
@@ -1480,20 +1504,24 @@ protected:
 
     // File: ..._Host_Transfer
     // SENDING
-    bool _sendMessage(clsSendParameter& p_SendParameter);
-    bool _sendMessage_Multicast(clsSendParameter& p_rSendParameter,
+    bool _sendMessage(netif* pNetIf, clsSendParameter& p_SendParameter);
+    bool _sendMessage_Multicast(netif* pNetIf,
+                                clsSendParameter& p_rSendParameter,
                                 uint8_t p_IPProtocolTypes);
-    bool _prepareMessage(clsSendParameter& p_SendParameter);
+    bool _prepareMessage(netif* pNetIf, clsSendParameter& p_SendParameter);
     bool _addQueryRecord(clsSendParameter& p_rSendParameter,
                          const clsRRDomain& p_QueryDomain,
                          uint16_t p_u16QueryType);
-    bool _sendQuery(const clsQuery& p_Query,
+    bool _sendQuery(netif* netif,
+                    const clsQuery& p_Query,
                     clsQuery::clsAnswer::list* p_pKnownAnswers = 0);
-    bool _sendQuery(const clsRRDomain& p_QueryDomain,
+    bool _sendQuery(netif* netif,
+                    const clsRRDomain& p_QueryDomain,
                     uint16_t p_u16RecordType,
                     clsQuery::clsAnswer::list* p_pKnownAnswers = 0);
 
-    IPAddress _getResponderIPAddress(enuIPProtocolType p_IPProtocolType) const;
+    IPAddress _getResponderIPAddress(netif* pNetIf,
+                                     enuIPProtocolType p_IPProtocolType) const;
 
     // RESOURCE RECORD
     bool _readRRQuestion(clsRRQuestion& p_rQuestion);
@@ -1642,8 +1670,6 @@ protected:
 
 
 protected:
-    netif*                      m_pNetIf;
-    typeNetIfState              m_NetIfState;
     UdpContext*                 m_pUDPContext;
 
     char*                       m_pcHostName;

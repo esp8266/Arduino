@@ -56,13 +56,10 @@ clsLEAMDNSHost_Legacy::~clsLEAMDNSHost_Legacy(void)
 */
 bool clsLEAMDNSHost_Legacy::begin(const char* p_pcHostname)
 {
-    bool	bResult = (((!(WIFI_STA & (WiFiMode_t)wifi_get_opmode()))
-                        || (addHostForNetIf(p_pcHostname, netif_get_by_index(WIFI_STA))))
-                       && ((!(WIFI_AP & (WiFiMode_t)wifi_get_opmode()))
-                           || (addHostForNetIf(p_pcHostname, netif_get_by_index(WIFI_AP)))));
-    return ((bResult)
-            && (0 != m_HostInformations.size()));
+    return addHostForNetIf(p_pcHostname)
+           && (0 != m_HostInformations.size());
 }
+
 
 /*
     clsLEAMDNSHost_Legacy::begin (String)
@@ -130,19 +127,26 @@ bool clsLEAMDNSHost_Legacy::end(void)
     NEW!
 
 */
-bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname,
-        netif* p_pNetIf)
+bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname)
 {
-    clsLEAMDNSHost*	pHost = 0;
+    bool    bResult = true;
 
-    if (((pHost = new esp8266::experimental::clsLEAMDNSHost))
-            && (!((pHost->begin(p_pcHostname, p_pNetIf, clsLEAMDNSHost::stProbeResultCallback))
-                  && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
+    if (m_HostInformations.size() > 0)
     {
-        delete pHost;
-        pHost = 0;
+        //XXXFIXME only one pHost instance, many things can be simplified
+        bResult = false;
     }
-    return (0 != pHost);
+    else
+    {
+        clsLEAMDNSHost* pHost = new esp8266::experimental::clsLEAMDNSHost;
+        if (pHost
+                && (!((pHost->begin(p_pcHostname /*, default callback*/))
+                      && (m_HostInformations.push_back(stcHostInformation(pHost)), true))))
+        {
+            bResult = false;
+        }
+    }
+    return bResult;
 }
 
 /*
@@ -795,24 +799,41 @@ clsLEAMDNSHost_Legacy::hMDNSServiceQuery clsLEAMDNSHost_Legacy::installServiceQu
 
     for (stcHostInformation& hostInformation : m_HostInformations)
     {
-        clsLEAMDNSHost::clsQuery*	pQuery = hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
-                                             const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
-                                             clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
-                                             bool p_bSetContent)->void
+        std::list<clsLEAMDNSHost::clsQuery*> queries;
+
+        /*clsLEAMDNSHost::clsQuery*	pQuery =*/
+        hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
+                const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
+                clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
+                bool p_bSetContent)->void
         {
             if (p_fnCallback)	// void(const stcMDNSServiceInfo& p_MDNSServiceInfo, MDNSResponder::AnswerType p_AnswerType, bool p_bSetContent)
             {
                 p_fnCallback(stcMDNSServiceInfo(p_AnswerAccessor), _answerFlagsToAnswerType(p_QueryAnswerTypeFlags), p_bSetContent);
             }
-        });
-        if (pQuery)
+        }, &queries);
+
+        if (queries.size())
         {
             if (!hResult)
             {
+                // - hMDNSServiceQuery handle is 'const void*'
+                //   used to retrieve pQuery when updating or removing.
+
+                // - unexplained - before multi interface change:
+                //   there is a loop, only the first is returned, why ?
+
                 // Store first query as result and key
-                hResult = (hMDNSServiceQuery)pQuery;
+                //hResult = (hMDNSServiceQuery)pQuery; <- before netif, only the first query is returned
+
+                // - netif transformation: even more returned values (a list per loop),
+                //   still, only the first handle is returned.
+                hResult = (hMDNSServiceQuery) * queries.begin(); // take the first
             }
-            hostInformation.m_HandleToPtr[hResult] = pQuery;
+            // this was overwritten ?
+            //hostInformation.m_HandleToPtr[hResult] = pQuery;
+            // ... overwritten with only the first query
+            hostInformation.m_HandleToPtr[hResult] = *queries.begin();
         }
     }
     return hResult;
