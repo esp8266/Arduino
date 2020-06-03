@@ -129,7 +129,7 @@ bool clsLEAMDNSHost_Legacy::end(void)
 */
 bool clsLEAMDNSHost_Legacy::addHostForNetIf(const char* p_pcHostname)
 {
-    bool    bResult = true;
+    bool   bResult = true;
 
     if (m_HostInformations.size() > 0)
     {
