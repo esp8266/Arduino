@@ -106,11 +106,9 @@ void espnowDelay(const uint32_t durationMs);
 
 class EspnowMeshBackend : public MeshBackendBase {
 
-protected: 
+public: 
 
   using broadcastFilterType = std::function<bool(String &, EspnowMeshBackend &)>;
-
-public:
   
   /**
    * ESP-NOW constructor method. Creates an ESP-NOW node, ready to be initialised.
@@ -298,6 +296,8 @@ public:
    * There is no limit to the number of responses a node can get when sending a broadcast, it will always accept new responses until the broadcastResponseTimeout is reached.
    * This also means that the broadcaster can receive duplicate responses from the same node if transmission conditions are poor and an ack is lost.
    * A broadcast can never be sent encrypted.
+   * 
+   * Note that the node needs to have its AP active to be able to receive broadcasts. Nodes can send broadcasts even if their AP is off.
    * 
    * @param message The message to send to the other nodes. Unlike the attemptTransmission method, the message will not be stored in the class instance, since there is no certain way to change the message during an ongoing broadcast.
    */
@@ -639,13 +639,13 @@ public:
   broadcastFilterType getBroadcastFilter() const;
 
   /**
-   * Set a function that should be called after each successful ESP-NOW response transmission, just before the response is removed from the waiting list. 
-   * If a particular response is not sent, there will be no function call for it.
+   * Set a function that should be called after each attempted ESP-NOW response transmission.
+   * In case of a successful response transmission, the call happens just before the response is removed from the waiting list.
    * Only the hook of the EspnowMeshBackend instance that is getEspnowRequestManager() will be called.
    * 
    * The hook should return a bool. 
    * If this return value is true, the response transmission process will continue with the next response in the waiting list. 
-   * If it is false, the response transmission process will stop after removing the just sent response from the waiting list.
+   * If it is false, the response transmission process will stop once processing of the just sent response is complete.
    * The default responseTransmittedHook always returns true.
    */
   void setResponseTransmittedHook(const EspnowTransmitter::responseTransmittedHookType responseTransmittedHook);
@@ -714,6 +714,8 @@ public:
    * 
    * When called, the method will update an existing encrypted ESP-NOW connection with the current stored encrypted connection key. (in case it has changed since the connection was established)
    * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
+   * 
    * @param peerStaMac The station MAC of the other node.
    * @param peerApMac The AP MAC of the other node.
    * @param peerSessionKey The session key of the other node. At least one of the leftmost 32 bits should be 1, since the key otherwise indicates the connection is unencrypted.
@@ -729,6 +731,8 @@ public:
    * Methods such as requestEncryptedConnection creates an encrypted connection automatically in both nodes, but requires information exchange between the nodes before the connection is established (and is thus much slower).
    * 
    * When called, the method will update an existing encrypted ESP-NOW connection with the current stored encrypted connection key. (in case it has changed since the connection was established)
+   * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
    * 
    * Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized.
    * These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
@@ -746,6 +750,8 @@ public:
    * Methods such as requestEncryptedConnection creates an encrypted connection automatically in both nodes, but requires information exchange between the nodes before the connection is established (and is thus much slower).
    * 
    * When called, the method will update an existing encrypted ESP-NOW connection with the current stored encrypted connection key. (in case it has changed since the connection was established)
+   * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
    * 
    * As with all these methods, changes will only take effect once the requester proves it has the ability to decrypt the session key.
    * 
@@ -766,6 +772,8 @@ public:
    * 
    * When called, the method will update an existing encrypted ESP-NOW connection with the current stored encrypted connection key. (in case it has changed since the connection was established)
    * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
+   * 
    * Note that the espnowEncryptedConnectionKey, espnowEncryptionKok, espnowHashKey and espnowMessageEncryptionKey are not serialized.
    * These will be set to the values of the EspnowMeshBackend instance that is adding the serialized encrypted connection.
    * 
@@ -782,6 +790,8 @@ public:
    * If an encrypted connection to peerMac already exists, only connection duration is updated. All other settings are kept as is. Use removeEncryptedConnection/requestEncryptedConnectionRemoval first if encryption keys should be updated.
    * The method makes sure both nodes have an encrypted connection to each other that's permanent.
    * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
+   * 
    * @param peerMac The MAC of the other node to which the request should be sent.
    * 
    * @return EncryptedConnectionStatus::CONNECTION_ESTABLISHED if the permanent connection was created. EncryptedConnectionStatus::SOFT_LIMIT_CONNECTION_ESTABLISHED if only a temporary soft limit connection could be established (see the setEncryptedConnectionsSoftLimit method documentation for details). Otherwise another status code based on the outcome.
@@ -792,6 +802,8 @@ public:
    * Request a temporary encrypted ESP-NOW connection with the node that uses peerMac.
    * If a temporary encrypted connection to peerMac already exists, only connection duration is updated. All other settings are kept as is. Permanent connections are not modified. Use removeEncryptedConnection/requestEncryptedConnectionRemoval first if encryption keys should be updated.
    * The method makes sure both nodes have an encrypted connection to each other that's either permanent or has exactly the duration specified.
+   * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
    * 
    * @param peerMac The MAC of the other node to which the request should be sent.
    * @param durationMs The desired duration of the connection.
@@ -804,6 +816,8 @@ public:
    * Request a flexible temporary encrypted ESP-NOW connection with the node that uses peerMac.
    * If a temporary encrypted connection to peerMac with a shorter duration already exists, connection duration is updated. All other settings are kept as is. Permanent connections are not modified. Use removeEncryptedConnection/requestEncryptedConnectionRemoval first if encryption keys should be updated.
    * The method makes sure both nodes have an encrypted connection to each other that's either permanent or has at least the duration specified.
+   * 
+   * The maximum number of simultaneous encrypted connections is restricted by the ESP-NOW API and is EspnowProtocolInterpreter::maxEncryptedConnections (6 by default).
    * 
    * Note that if a temporary encrypted connection already exists to a target node, this method will slightly extend the connection duration 
    * depending on the time it takes to verify the connection to the node.

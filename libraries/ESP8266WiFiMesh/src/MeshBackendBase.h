@@ -32,14 +32,12 @@ enum class MeshBackendType
 
 class MeshBackendBase {
 
-protected:
+public:
 
   using requestHandlerType = std::function<String(const String &, MeshBackendBase &)> ;
   using responseHandlerType = std::function<TransmissionStatusType(const String &, MeshBackendBase &)>;
   using networkFilterType = std::function<void(int, MeshBackendBase &)>;
   using transmissionOutcomesUpdateHookType = std::function<bool(MeshBackendBase &)>;
-
-public:
 
   MeshBackendBase(const requestHandlerType requestHandler, const responseHandlerType responseHandler, const networkFilterType networkFilter, const MeshBackendType classType);
 

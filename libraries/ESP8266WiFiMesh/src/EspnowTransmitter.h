@@ -31,7 +31,7 @@ class EspnowTransmitter
 
 public:
 
-  using responseTransmittedHookType = std::function<bool(const String &, const uint8_t *, uint32_t, EspnowMeshBackend &)>;
+  using responseTransmittedHookType = std::function<bool(bool, const String &, const uint8_t *, uint32_t, EspnowMeshBackend &)>;
 
   EspnowTransmitter(ConditionalPrinter &conditionalPrinterInstance, EspnowDatabase &databaseInstance, EspnowConnectionManager &connectionManagerInstance);
 
@@ -101,7 +101,7 @@ private:
   EspnowDatabase & _database;
   EspnowConnectionManager & _connectionManager;
 
-  responseTransmittedHookType _responseTransmittedHook = [](const String &, const uint8_t *, uint32_t, EspnowMeshBackend &){ return true; };
+  responseTransmittedHookType _responseTransmittedHook = [](bool, const String &, const uint8_t *, uint32_t, EspnowMeshBackend &){ return true; };
 
   uint8_t _broadcastTransmissionRedundancy = 1;
 };

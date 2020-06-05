@@ -3,6 +3,9 @@
    Once 28 seconds have passed, the node that has the highest AP MAC will start broadcasting benchmark messages, which will allow you to see how many messages are lost at the other nodes.
    If you have an onboard LED on your ESP8266 it is recommended that you change the useLED variable below to true.
    That way you will get instant confirmation of the mesh communication without checking the Serial Monitor.
+   
+   If you want to experiment with reducing error rates you can use the mesh method "void setBroadcastReceptionRedundancy(uint8_t redundancy);" (default 2) at the cost of more RAM.
+   Or "floodingMesh.getEspnowMeshBackend().setBroadcastTransmissionRedundancy(uint8_t redundancy)" (default 1) at the cost of longer transmission times.
 */
 
 #define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
@@ -133,7 +136,7 @@ void setup() {
   Serial.println(F("Setting up mesh node..."));
 
   floodingMesh.begin();
-  floodingMesh.activateAP();
+  floodingMesh.activateAP(); // Required to receive messages
 
   uint8_t apMacArray[6] {0};
   theOneMac = TypeCast::macToString(WiFi.softAPmacAddress(apMacArray));

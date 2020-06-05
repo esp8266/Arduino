@@ -205,22 +205,24 @@ bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
 
 /**
    Once passed to the setResponseTransmittedHook method of the ESP-NOW backend,
-   this function will be called after each successful ESP-NOW response transmission, just before the response is removed from the waiting list.
-   If a particular response is not sent, there will be no function call for it.
+   this function will be called after each attempted ESP-NOW response transmission.
+   In case of a successful response transmission, this happens just before the response is removed from the waiting list.
    Only the hook of the EspnowMeshBackend instance that is getEspnowRequestManager() will be called.
 
+   @param transmissionSuccessful True if the response was transmitted successfully. False otherwise.
    @param response The sent response.
    @param recipientMac The MAC address the response was sent to.
    @param responseIndex The index of the response in the waiting list.
    @param meshInstance The EspnowMeshBackend instance that called the function.
 
    @return True if the response transmission process should continue with the next response in the waiting list.
-           False if the response transmission process should stop after removing the just sent response from the waiting list.
+           False if the response transmission process should stop once processing of the just sent response is complete.
 */
-bool exampleResponseTransmittedHook(const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance) {
+bool exampleResponseTransmittedHook(bool transmissionSuccessful, const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance) {
   // Currently this is exactly the same as the default hook, but you can modify it to alter the behaviour of sendEspnowResponses.
 
-  (void)response; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  (void)transmissionSuccessful; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  (void)response;
   (void)recipientMac;
   (void)responseIndex;
   (void)meshInstance;
@@ -255,7 +257,7 @@ void setup() {
   EspnowMeshBackend::setEspnowEncryptionKok(espnowEncryptionKok);
   espnowNode.setEspnowEncryptedConnectionKey(espnowEncryptedConnectionKey);
 
-  // Makes it possible to find the node through scans, and also makes it possible to recover from an encrypted connection where only the other node is encrypted.
+  // Makes it possible to find the node through scans, makes it possible to recover from an encrypted connection where only the other node is encrypted, and also makes it possible to receive broadcast transmissions.
   // Note that only one AP can be active at a time in total, and this will always be the one which was last activated.
   // Thus the AP is shared by all backends.
   espnowNode.activateAP();

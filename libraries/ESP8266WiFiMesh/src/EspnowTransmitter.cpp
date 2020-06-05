@@ -162,15 +162,17 @@ void EspnowTransmitter::sendEspnowResponses(const ExpiringTimeTracker *estimated
       continue;
     }
 
-    bool hookOutcome = true;
     // Note that callbacks can be called during delay time, so it is possible to receive a transmission during espnowSendToNode
     // (which may add an element to the responsesToSend list).
-    if(espnowSendToNodeUnsynchronized(responseIterator->getMessage(), responseIterator->getRecipientMac(), 'A', responseIterator->getRequestID())
-       == TransmissionStatusType::TRANSMISSION_COMPLETE)
+    bool transmissionSuccessful = espnowSendToNodeUnsynchronized(responseIterator->getMessage(), responseIterator->getRecipientMac(), 'A', responseIterator->getRequestID())
+       == TransmissionStatusType::TRANSMISSION_COMPLETE;
+
+    bool hookOutcome = true;
+    if(EspnowMeshBackend *currentEspnowRequestManager = EspnowMeshBackend::getEspnowRequestManager())
+      hookOutcome = currentEspnowRequestManager->getResponseTransmittedHook()(transmissionSuccessful, responseIterator->getMessage(), responseIterator->getRecipientMac(), responseIndex, *currentEspnowRequestManager);
+
+    if(transmissionSuccessful)
     {
-      if(EspnowMeshBackend *currentEspnowRequestManager = EspnowMeshBackend::getEspnowRequestManager())
-        hookOutcome = currentEspnowRequestManager->getResponseTransmittedHook()(responseIterator->getMessage(), responseIterator->getRecipientMac(), responseIndex, *currentEspnowRequestManager);
-      
       responseIterator = EspnowDatabase::responsesToSend().erase(responseIterator);
       --responseIndex;
     }

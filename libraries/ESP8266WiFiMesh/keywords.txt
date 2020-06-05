@@ -12,48 +12,96 @@ ESP8266WiFiMesh	KEYWORD3
 # Datatypes (KEYWORD1)
 #######################################
 
+MeshBackendBase	KEYWORD1
+MeshBackendType	KEYWORD1
+requestHandlerType	KEYWORD1
+responseHandlerType	KEYWORD1
+networkFilterType	KEYWORD1
+transmissionOutcomesUpdateHookType	KEYWORD1
+
+TcpIpMeshBackend	KEYWORD1
+
+EspnowMeshBackend	KEYWORD1
+broadcastFilterType	KEYWORD1
+ConnectionType	KEYWORD1
+EncryptedConnectionStatus	KEYWORD1
+EncryptedConnectionRemovalOutcome	KEYWORD1
+responseTransmittedHookType	KEYWORD1
+
+FloodingMesh	KEYWORD1
+messageHandlerType	KEYWORD1
+
+TransmissionOutcome	KEYWORD1
 TransmissionStatusType	KEYWORD1
+
+NetworkInfoBase	KEYWORD1
+TcpIpNetworkInfo	KEYWORD1
+EspnowNetworkInfo	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-connectionQueue	KEYWORD2
-latestTransmissionOutcomes	KEYWORD2
-latestTransmissionSuccessful	KEYWORD2
+# MeshBackendBase
 begin	KEYWORD2
 activateAP	KEYWORD2
 deactivateAP	KEYWORD2
+deactivateControlledAP	KEYWORD2
 restartAP	KEYWORD2
 getAPController	KEYWORD2
 isAPController	KEYWORD2
 setWiFiChannel	KEYWORD2
 getWiFiChannel	KEYWORD2
+setSSID	KEYWORD2
+getSSID	KEYWORD2
+setSSIDPrefix	KEYWORD2
+getSSIDPrefix	KEYWORD2
+setSSIDRoot	KEYWORD2
+getSSIDRoot	KEYWORD2
+setSSIDSuffix	KEYWORD2
+getSSIDSuffix	KEYWORD2
 setMeshName	KEYWORD2
 getMeshName	KEYWORD2
 setNodeID	KEYWORD2
 getNodeID	KEYWORD2
-setSSID	KEYWORD2
-getSSID	KEYWORD2
+setMeshPassword	KEYWORD2
+getMeshPassword	KEYWORD2
 setMessage	KEYWORD2
 getMessage	KEYWORD2
 attemptTransmission	KEYWORD2
-acceptRequests	KEYWORD2
-setStaticIP	KEYWORD2
-getStaticIP	KEYWORD2
-disableStaticIP->KEYWORD2
-uint64ToString	KEYWORD2
-stringToUint64	KEYWORD2
 setRequestHandler	KEYWORD2
 getRequestHandler	KEYWORD2
 setResponseHandler	KEYWORD2
 getResponseHandler	KEYWORD2
 setNetworkFilter	KEYWORD2
 getNetworkFilter	KEYWORD2
+setTransmissionOutcomesUpdateHook	KEYWORD2
+getTransmissionOutcomesUpdateHook	KEYWORD2
 setScanHidden	KEYWORD2
 getScanHidden	KEYWORD2
 setAPHidden	KEYWORD2
 getAPHidden	KEYWORD2
+setVerboseModeState	KEYWORD2
+verboseMode	KEYWORD2
+verboseModePrint	KEYWORD2
+setPrintWarnings	KEYWORD2
+printWarnings	KEYWORD2
+warningPrint	KEYWORD2
+getClassType	KEYWORD2
+printAPInfo	KEYWORD2
+
+# TcpIpMeshBackend
+connectionQueue	KEYWORD2
+constConnectionQueue	KEYWORD2
+latestTransmissionOutcomes	KEYWORD2
+latestTransmissionSuccessful	KEYWORD2
+acceptRequests	KEYWORD2
+getCurrentMessage	KEYWORD2
+setStaticIP	KEYWORD2
+getStaticIP	KEYWORD2
+disableStaticIP->KEYWORD2
+setServerPort	KEYWORD2
+getServerPort	KEYWORD2
 setMaxAPStations	KEYWORD2
 getMaxAPStations	KEYWORD2
 setConnectionAttemptTimeout	KEYWORD2
@@ -63,10 +111,152 @@ getStationModeTimeout	KEYWORD2
 setAPModeTimeout	KEYWORD2
 getAPModeTimeout	KEYWORD2
 
+# EspnowMeshBackend
+espnowDelay	KEYWORD2
+performEspnowMaintenance	KEYWORD2
+criticalHeapLevel	KEYWORD2
+setCriticalHeapLevelBuffer	KEYWORD2
+criticalHeapLevelBuffer	KEYWORD2
+deactivateEspnow	KEYWORD2
+attemptAutoEncryptingTransmission	KEYWORD2
+broadcast	KEYWORD2
+setBroadcastTransmissionRedundancy	KEYWORD2
+getBroadcastTransmissionRedundancy	KEYWORD2
+setEspnowRequestManager	KEYWORD2
+getEspnowRequestManager	KEYWORD2
+isEspnowRequestManager	KEYWORD2
+setLogEntryLifetimeMs	KEYWORD2
+logEntryLifetimeMs	KEYWORD2
+setBroadcastResponseTimeoutMs	KEYWORD2
+broadcastResponseTimeoutMs	KEYWORD2
+setEspnowEncryptedConnectionKey	KEYWORD2
+getEspnowEncryptedConnectionKey	KEYWORD2
+setEspnowEncryptionKok	KEYWORD2
+getEspnowEncryptionKok	KEYWORD2
+setEspnowHashKey	KEYWORD2
+getEspnowHashKey	KEYWORD2
+setUseEncryptedMessages	KEYWORD2
+useEncryptedMessages	KEYWORD2
+setEspnowMessageEncryptionKey	KEYWORD2
+getEspnowMessageEncryptionKey	KEYWORD2
+getMaxMessageBytesPerTransmission	KEYWORD2
+setMaxTransmissionsPerMessage	KEYWORD2
+getMaxTransmissionsPerMessage	KEYWORD2
+getMaxMessageLength	KEYWORD2
+staticVerboseMode	KEYWORD2
+staticVerboseModePrint	KEYWORD2
+getScheduledResponseMessage	KEYWORD2
+getScheduledResponseRecipient	KEYWORD2
+numberOfScheduledResponses	KEYWORD2
+clearAllScheduledResponses	KEYWORD2
+deleteScheduledResponsesByRecipient	KEYWORD2
+setEspnowTransmissionTimeout	KEYWORD2
+getEspnowTransmissionTimeout	KEYWORD2
+setEspnowRetransmissionInterval	KEYWORD2
+getEspnowRetransmissionInterval	KEYWORD2
+setEncryptionRequestTimeout	KEYWORD2
+getEncryptionRequestTimeout	KEYWORD2
+setAutoEncryptionDuration	KEYWORD2
+getAutoEncryptionDuration	KEYWORD2
+setBroadcastFilter	KEYWORD2
+getBroadcastFilter	KEYWORD2
+setResponseTransmittedHook	KEYWORD2
+getResponseTransmittedHook	KEYWORD2
+getSenderMac	KEYWORD2
+getSenderAPMac	KEYWORD2
+receivedEncryptedTransmission	KEYWORD2
+addUnencryptedConnection	KEYWORD2
+addEncryptedConnection	KEYWORD2
+addTemporaryEncryptedConnection	KEYWORD2
+requestEncryptedConnection	KEYWORD2
+requestTemporaryEncryptedConnection	KEYWORD2
+requestFlexibleTemporaryEncryptedConnection	KEYWORD2
+removeEncryptedConnection	KEYWORD2
+requestEncryptedConnectionRemoval	KEYWORD2
+setAcceptsUnverifiedRequests	KEYWORD2
+acceptsUnverifiedRequests	KEYWORD2
+setEncryptedConnectionsSoftLimit	KEYWORD2
+encryptedConnectionsSoftLimit	KEYWORD2
+numberOfEncryptedConnections	KEYWORD2
+getEncryptedMac	KEYWORD2
+serializeUnencryptedConnection	KEYWORD2
+serializeEncryptedConnection	KEYWORD2
+serializeEncryptedConnection	KEYWORD2
+getConnectionInfo	KEYWORD2
+getTransmissionFailRate	KEYWORD2
+resetTransmissionFailRate	KEYWORD2
+
+# FloodingMesh
+floodingMeshDelay	KEYWORD2
+performMeshMaintenance	KEYWORD2
+performMeshInstanceMaintenance	KEYWORD2
+serializeMeshState	KEYWORD2
+setBroadcastReceptionRedundancy	KEYWORD2
+getBroadcastReceptionRedundancy	KEYWORD2
+encryptedBroadcast	KEYWORD2
+clearMessageLogs	KEYWORD2
+clearForwardingBacklog	KEYWORD2
+setMessageHandler	KEYWORD2
+getMessageHandler	KEYWORD2
+getOriginMac	KEYWORD2
+setMessageLogSize	KEYWORD2
+messageLogSize	KEYWORD2
+maxUnencryptedMessageLength	KEYWORD2
+maxEncryptedMessageLength	KEYWORD2
+setMetadataDelimiter	KEYWORD2
+metadataDelimiter	KEYWORD2
+getEspnowMeshBackend	KEYWORD2
+getEspnowMeshBackendConst	KEYWORD2
+restoreDefaultRequestHandler	KEYWORD2
+restoreDefaultResponseHandler	KEYWORD2
+restoreDefaultNetworkFilter	KEYWORD2
+restoreDefaultBroadcastFilter	KEYWORD2
+restoreDefaultTransmissionOutcomesUpdateHook	KEYWORD2
+restoreDefaultResponseTransmittedHook	KEYWORD2
+
+# NetworkInfoBase
+setBSSID	KEYWORD2
+getBSSID	KEYWORD2
+setWifiChannel	KEYWORD2
+wifiChannel	KEYWORD2
+setEncryptionType	KEYWORD2
+setRSSI	KEYWORD2
+setIsHidden	KEYWORD2
+
+# TransmissionOutcome
+setTransmissionStatus	KEYWORD2
+transmissionStatus	KEYWORD2
+
+# TypeConversionFunctions
+uint64ToString	KEYWORD2
+stringToUint64	KEYWORD2
+uint8ArrayToHexString	KEYWORD2
+hexStringToUint8Array	KEYWORD2
+uint8ArrayToMultiString	KEYWORD2
+bufferedUint8ArrayToMultiString	KEYWORD2
+macToString	KEYWORD2
+stringToMac	KEYWORD2
+macToUint64	KEYWORD2
+uint64ToMac	KEYWORD2
+uint64ToUint8Array	KEYWORD2
+uint8ArrayToUint64	KEYWORD2
+meshBackendCast	KEYWORD2
+
+# UtilityFunctions
+macEqual	KEYWORD2
+randomUint64	KEYWORD2
+getMapValue	KEYWORD2
+
 #######################################
 # Constants (LITERAL1)
 #######################################
 
 emptyIP	LITERAL1
+
 NETWORK_INFO_DEFAULT_INT	LITERAL1
-WIFI_MESH_EMPTY_STRING	LITERAL1
+defaultBSSID	LITERAL1
+defaultEncryptionType	LITERAL1
+defaultIsHidden	LITERAL1
+defaultSSID	LITERAL1
+defaultWifiChannel	LITERAL1
+defaultRSSI	LITERAL1

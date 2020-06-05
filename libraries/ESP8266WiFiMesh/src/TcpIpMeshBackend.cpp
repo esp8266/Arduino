@@ -280,7 +280,7 @@ TransmissionStatusType TcpIpMeshBackend::exchangeInfo(WiFiClient &currClient)
 TransmissionStatusType TcpIpMeshBackend::attemptDataTransfer()
 {
   // Unlike WiFi.mode(WIFI_AP);, WiFi.mode(WIFI_AP_STA); allows us to stay connected to the AP we connected to in STA mode, at the same time as we can receive connections from other stations. 
-  // We cannot send data to the AP in STA_AP mode though, that requires STA mode. 
+  // We cannot send data to the AP in AP_STA mode though, that requires STA mode. 
   // Switching to STA mode will disconnect all stations connected to the node AP (though they can request a reconnect even while we are in STA mode).
   WiFiMode_t storedWiFiMode = WiFi.getMode();
   WiFi.mode(WIFI_STA);

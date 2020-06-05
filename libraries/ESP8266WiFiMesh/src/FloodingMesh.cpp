@@ -272,6 +272,9 @@ void FloodingMesh::setMetadataDelimiter(const char metadataDelimiter)
   assert(metadataDelimiter < '0' || '9' < metadataDelimiter);
   assert(metadataDelimiter < 'A' || 'F' < metadataDelimiter);
   assert(metadataDelimiter < 'a' || 'f' < metadataDelimiter);
+
+  // Reserved for encryptedBroadcast for now
+  assert(metadataDelimiter != ',');
   
   _metadataDelimiter = metadataDelimiter; 
 }
@@ -370,8 +373,8 @@ void FloodingMesh::restoreDefaultTransmissionOutcomesUpdateHook()
 
 void FloodingMesh::restoreDefaultResponseTransmittedHook()
 {  
-  getEspnowMeshBackend().setResponseTransmittedHook([this](const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance)
-                                                    { return _defaultResponseTransmittedHook(response, recipientMac, responseIndex, meshInstance); });
+  getEspnowMeshBackend().setResponseTransmittedHook([this](bool transmissionSuccessful, const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance)
+                                                    { return _defaultResponseTransmittedHook(transmissionSuccessful, response, recipientMac, responseIndex, meshInstance); });
 }
 
 /**
@@ -543,21 +546,23 @@ bool FloodingMesh::_defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshI
 
 /**
  * Once passed to the setResponseTransmittedHook method of the ESP-NOW backend, 
- * this function will be called after each successful ESP-NOW response transmission, just before the response is removed from the waiting list.
- * If a particular response is not sent, there will be no function call for it.
+ * this function will be called after each attempted ESP-NOW response transmission. 
+ * In case of a successful response transmission, this happens just before the response is removed from the waiting list.
  * Only the hook of the EspnowMeshBackend instance that is getEspnowRequestManager() will be called.
  * 
+ * @param transmissionSuccessful True if the response was transmitted successfully. False otherwise.
  * @param response The sent response.
  * @param recipientMac The MAC address the response was sent to.
  * @param responseIndex The index of the response in the waiting list.
  * @param meshInstance The EspnowMeshBackend instance that called the function.
  * 
  * @return True if the response transmission process should continue with the next response in the waiting list.
- *         False if the response transmission process should stop after removing the just sent response from the waiting list.
+ *         False if the response transmission process should stop after processing of the just sent response is complete.
  */
-bool FloodingMesh::_defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance)
+bool FloodingMesh::_defaultResponseTransmittedHook(bool transmissionSuccessful, const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance)
 {
-  (void)response; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  (void)transmissionSuccessful; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  (void)response;
   (void)recipientMac;
   (void)responseIndex;
   (void)meshInstance;

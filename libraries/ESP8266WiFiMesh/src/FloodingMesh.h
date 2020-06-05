@@ -41,13 +41,10 @@
 void floodingMeshDelay(const uint32_t durationMs);
 
 class FloodingMesh {
-
-protected:
-
-  using messageHandlerType = std::function<bool(String &, FloodingMesh &)>;
-  using messageQueueElementType = std::map<uint64_t, uint8_t>::iterator;
   
 public:
+
+  using messageHandlerType = std::function<bool(String &, FloodingMesh &)>;
 
   /**
    * FloodingMesh constructor method. Creates a FloodingMesh node, ready to be initialised.
@@ -160,6 +157,8 @@ public:
   /**
    * Make an unencrypted broadcast to the entire mesh network.
    * 
+   * activateAP() must have been called for nodes to be able to receive broadcasts. Nodes can however send broadcasts even if their AP is off.
+   * 
    * It is recommended that there is at most one new message transmitted in the mesh every 10, 20, 30 ms for messages up to length maxUnencryptedMessageLength()*n, 
    * where n is (roughly, depending on mesh name length) 1/4, 3/5 and 1 respectively. If transmissions are more frequent than this, message loss will increase.
    * 
@@ -178,6 +177,8 @@ public:
   
   /**
    * Make an encrypted broadcast to the entire mesh network.
+   * 
+   * activateAP() must have been called for encryptedBroadcast to work.
    * 
    * ########## WARNING! This an experimental feature. API may change at any time. Only use if you like it when things break. ##########
    * Will be very slow compared to unencrypted broadcasts. Probably works OK in a small mesh with a maximum of 2-3 new messages transmitted in the mesh every second.
@@ -285,6 +286,8 @@ public:
 
 protected:
 
+  using messageQueueElementType = std::map<uint64_t, uint8_t>::iterator;
+
   static std::set<FloodingMesh *> availableFloodingMeshes;
   
   String generateMessageID();
@@ -323,7 +326,7 @@ private:
   void _defaultNetworkFilter(const int numberOfNetworks, MeshBackendBase &meshInstance);
   bool _defaultBroadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
   bool _defaultTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance);
-  bool _defaultResponseTransmittedHook(const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance);
+  bool _defaultResponseTransmittedHook(bool transmissionSuccessful, const String &response, const uint8_t *recipientMac, const uint32_t responseIndex, EspnowMeshBackend &meshInstance);
 
   uint8_t _originMac[6] = {0};
   
