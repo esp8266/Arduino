@@ -135,7 +135,7 @@ To do this, send over the station mac to the transmitting node and then manually
 
 * If the available heap goes under `criticalHeapLevel()` bytes (6000 bytes by default), the ESP-NOW backend will temporarily cease accepting new incoming ESP-NOW requests in an attempt to avoid running out of RAM. Warning messages about this will also be printed to the Serial Monitor, assuming `printWarnings()` is `true` (this is the default value).
 
-* During very heavy load the `performEspnowMaintenance` method may occasionally need to process requests for tens of milliseconds. Since this won't happen until the method is called, you can choose when this is done. Callbacks can be executed while the request processing is ongoing, but note that they should have a very fast execution time in this case. Also be sure to take into account the callback restrictions mentioned [below](EspnowMeshBackendCallbacks).
+* During very heavy load the `performEspnowMaintenance` method may occasionally need to process requests for tens of milliseconds. Since this won't happen until the method is called, you can choose when this is done. Callbacks can be executed while the request processing is ongoing, but note that they should have a very fast execution time in this case. Also be sure to take into account the callback restrictions mentioned [below](#EspnowMeshBackendCallbacks).
 
 * When `WiFi.mode(WIFI_STA)` is used, nodes are unable to receive ESP-NOW broadcast messages. All nodes can however still receive direct ESP-NOW messages to their STA mac. Nodes seem to continue transmitting successfully to the correct (broadcast) MAC regardless of WiFi mode, only message reception is affected. Different combinations of ESP-NOW roles do not seem to have any influence on the outcome. Stripping out all library code and only using the bare minimum required for a broadcast does not change the outcome. Thus, this issue seems to be unfixable until corrected by Espressif. 
 
@@ -221,7 +221,9 @@ More information about this encryption standard can be found here: https://tools
 
 **Important:** As of now, the ESP8266 must have the AP active to receive mesh messages (either via AP mode (use only if CCMP encryption is not required) or AP+STA mode). Messages can however be transmitted even when the AP is turned off. This is limited by the Espressif binary in the ESP8266 Arduino Core and so cannot be corrected by the library code.
 
-The FloodingMesh exclusively uses the `EspnowMeshBackend`. The mesh network size is only limited by available MAC addresses, so the maximum is (2^48)/2 = 140 trillion give or take. However, the maximum throughput of the FloodingMesh is around 100 messages per second with 234 bytes per message, so using the maximum number of nodes is not recommended in most cases. Note that while ASCII characters require 1 byte each, non-ASCII characters usually require 2 bytes each.
+***
+
+The FloodingMesh exclusively uses the `EspnowMeshBackend`. The mesh network size is only limited by available MAC addresses, so the maximum is (2^48)/2 = 140 trillion give or take. However, the maximum throughput of the FloodingMesh is around 100 messages per second with 234 bytes per message, so using the maximum number of nodes is not recommended in most cases. Note that while ASCII characters require 1 message byte each, non-ASCII characters usually require 2 message bytes each.
 
 As the name implies, FloodingMesh is a simple flooding mesh architecture, which means it stores no mesh network routing data in the nodes but only passes new messages on to all surrounding nodes. It therefore has no RAM overhead for network size, which is important for the ESP8266 since available RAM is very limited. The downside is that there is a lot of network traffic for each sent message, and all nodes use the same WiFi channel, so especially for dense networks a lot of interference will be created. Based on tests, a mesh with 30 nodes close together (-44 dBm RSSI) will work well (1-2 dropped messages of 1000). A mesh with around 160 nodes close together will not work at all (though this would probably be solved by spreading out the nodes more, so the interference is reduced).
 
@@ -259,7 +261,7 @@ Since FloodingMesh is based on EspnowMeshBackend, it shares all the limitations 
 
 * The network needs enough time to re-broadcast messages. In practice, if the mesh transmits more than 100 new messages per second (in total), there is a risk of running out of RAM since more messages will be received by the nodes than they can re-transmit.
 
-* A too low value for `messageLogSize` can result in a message storm since the number of "active" messages will be greater than the log size, resulting in messages that bounce around in the network without end. The message log stores all unique FloodingMesh message IDs seen by a node, with more recent ones replacing the older ones when `messageLogSize` is reached. This means that a node in a mesh network containing 2 nodes will have to send `messageLogSize + 1` transmissions to cause the message log of the other node to forget the first message, while a node in a mesh network containing 101 nodes will have to send 1 % as many messages (on average) to do the same.
+* A too low value for `messageLogSize` can result in a message storm since the number of "active" messages will be greater than the log size, resulting in messages that bounce around in the network without end. The message log stores all unique FloodingMesh message IDs seen by a node, with more recent IDs replacing the older ones when `messageLogSize` is reached. This means that a node in a mesh network containing 2 nodes will have to send `messageLogSize + 1` transmissions to cause the message log of the other node to forget the first message, while a node in a mesh network containing 101 nodes will have to send 1 % as many messages (on average) to do the same.
 
    Use `FloodingMesh::setMessageLogSize` to adapt the log size to your needs. A larger log size will of course lead to a higher RAM usage.
 
@@ -272,8 +274,8 @@ For the node state of FloodingMesh there are a few things to keep in mind.
 1. If you use the serialization functionality everything should just work.
 2. If all nodes go to sleep without serializing, they will of course lose their memory but the network will be recreated and work as normal when the nodes wake up.
 3. If only some nodes go to sleep without serializing the state, things get more complicated. The following is possible: 
-   * If you use encryptedBroadcast, the nodes that wake up may silently ignore messages forever from the nodes they used to have an encrypted connection with.
-   * If you do not use encryptedBroadcasts the ESP-NOW backend will by default clear its message ID logs in 2.5 seconds (`logEntryLifetimeMs`) and FloodingMesh will have done the same after 100 new message IDs have been received (`messageLogSize`). Once the logs of both classes have been cleared, things will work as normal. Before that any new message the awoken node sends may have the same ID as an old message, and will then be silently ignored by the receiver.
+   * If you use `encryptedBroadcast`, the nodes that wake up may silently ignore messages forever from the nodes they used to have an encrypted connection with.
+   * If you do not use `encryptedBroadcast` the ESP-NOW backend will by default clear its message ID logs in 2.5 seconds (`logEntryLifetimeMs`) and FloodingMesh will have done the same after 100 new message IDs have been received (`messageLogSize`). Once the logs of both classes have been cleared, things will work as normal. Before that, any new message the awoken node sends may have the same ID as an old message, and will then be silently ignored by the receiver.
 
 The messageID is always used together with the node MAC of the sender. For details on how the ID is generated, check out the `generateMessageID` methods.
 
@@ -353,7 +355,7 @@ void myActivateAP()
 }
 ```
 
-Please note that having an AP active is required when receiving broadcasts with FloodingMesh and EspnowMeshBackend (transmitting broadcasts work even when the AP is off). Regular `attemptTransmission` will work with AP turned off if the recipient STA MAC is already known (then you can set WiFi mode to any mode you like, apart from `WIFI_OFF`).
+Please note that having an AP active is required when receiving broadcasts with FloodingMesh and EspnowMeshBackend (transmitting broadcasts work even when the AP is off). The regular `attemptTransmission` method will transmit even to nodes that have their AP turned off if the recipient STA MAC is already known (then you can set WiFi mode to any mode you like, apart from `WIFI_OFF`).
 
 When an AP is required, AP+STA mode is used in the ESP-NOW backend to keep compatibility with the TCP/IP backend (both backends can be used at the same time). The reason AP+STA mode is used in the TCP/IP backend can be found in TcpIpMeshBackend.cpp : "Unlike WiFi.mode(WIFI_AP);, WiFi.mode(WIFI_AP_STA); allows us to stay connected to the AP we connected to in STA mode, at the same time as we can receive connections from other stations."
 Also, AP+STA mode allows encrypted ESP-NOW connections to recover from failure in some cases.
@@ -367,7 +369,7 @@ In general, you can switch WiFi channel for some nodes (use only channel 1, 6 an
 If using FloodingMesh you can try to experiment with reducing error rates by using the mesh method `void setBroadcastReceptionRedundancy(uint8_t redundancy);` (default 2) at the cost of more RAM.
 
 
-With both FloodingMesh and the EspnowMeshBackend it is possible to use `floodingMesh.getEspnowMeshBackend().setBroadcastTransmissionRedundancy(uint8_t redundancy)` (default 1) to increase the chance of a message arriving at the cost of longer transmission times.
+With both FloodingMesh and the EspnowMeshBackend it is possible to use `floodingMesh.getEspnowMeshBackend().setBroadcastTransmissionRedundancy(uint8_t redundancy)` (default 1) to increase the chance of a message arriving, at the cost of longer transmission times.
 
 For reducing the amount of transmissions in the network, that will either require you to optimize your transmission usage or reduce the amount of background protocol transmissions. The latter option is described in greater detail in the two answers below.
 
