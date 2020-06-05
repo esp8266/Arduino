@@ -55,7 +55,7 @@ def get_segment_size_addr(elf, segment, path):
     raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '"')
 
 def read_segment(elf, tmpdir, segment, path):
-    dumpfile = os.path.join(tmpdir, "read_segment")
+    dumpfile = os.path.join(tmpdir, segment + '.read_segment')
     p = subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, dumpfile], stdout=subprocess.PIPE)
     with open(dumpfile, "rb") as binfile:
         raw = binfile.read()
