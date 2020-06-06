@@ -1283,14 +1283,15 @@ bool clsLEAMDNSHost::_processAAAAAnswer(const clsLEAMDNSHost::clsRRAnswerAAAA* p
     Conflict management is handled in '_parseResponse ff.'
     Tiebraking is handled in 'parseQuery ff.'
 */
-bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
+bool clsLEAMDNSHost::_updateProbeStatus()
 {
     bool    bResult = true;
 
     //
     // Probe host domain
-    if ((clsProbeInformation_Base::enuProbingStatus::ReadyToStart == m_ProbeInformation.m_ProbingStatus) &&       // Ready to get started AND
-            ((
+    if ((clsProbeInformation_Base::enuProbingStatus::ReadyToStart == m_ProbeInformation.m_ProbingStatus))// &&       // Ready to get started AND
+/*
+    	((
 #ifdef MDNS_IPV4_SUPPORT
                  _getResponderIPAddress(pNetIf, enuIPProtocolType::V4).isSet()                             // AND has IPv4 address
 #else
@@ -1303,6 +1304,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
                  true
 #endif
              )))                // Has IP address
+*/
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Starting host probing...\n"), _DH()););
 
@@ -1316,7 +1318,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
         if (clsConsts::u32ProbeCount > m_ProbeInformation.m_u8SentCount)
         {
             // Send next probe
-            if ((bResult = _sendHostProbe(pNetIf)))
+            if ((bResult = _sendHostProbe()))
             {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent host probe for '%s.local'\n\n"), _DH(), (m_pcHostName ? : "")););
                 m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
@@ -1341,7 +1343,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
     else if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) &&
              (m_ProbeInformation.m_Timeout.expired()))
     {
-        if ((bResult = _announce(pNetIf, true, false)))
+        if ((bResult = _announce(true, false)))
         {
             // Don't announce services here
             ++m_ProbeInformation.m_u8SentCount; // 1..
@@ -1380,9 +1382,9 @@ bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
             if (clsConsts::u32ProbeCount > pService->m_ProbeInformation.m_u8SentCount)
             {
                 // Send next probe
-                if ((bResult = _sendServiceProbe(pNetIf, *pService)))
+                if ((bResult = _sendServiceProbe(*pService)))
                 {
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent service probe for '%s' (%u)\n\n"), _DH(), _service2String(pService), (pService->m_ProbeInformation.m_u8SentCount + 1)););
+                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent service probe for '%s' (%u)\n\n"), _DH(), _service2String(pService), (pService->m_ProbeInformation.m_u8SentCount + 1)););
                     pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
                     ++pService->m_ProbeInformation.m_u8SentCount;
                 }
@@ -1390,7 +1392,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
             else
             {
                 // Probing finished
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("\n%s _updateProbeStatus: Done service probing '%s'\n\n\n"), _DH(), _service2String(pService)););
+                DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("\n%s _updateProbeStatus: Done service probing '%s'\n\n\n"), _DH(), _service2String(pService)););
                 pService->m_ProbeInformation.m_ProbingStatus = clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce;
                 pService->m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShot::neverExpires);
 
@@ -1406,7 +1408,7 @@ bool clsLEAMDNSHost::_updateProbeStatus(netif* pNetIf)
                  (pService->m_ProbeInformation.m_Timeout.expired()))
         {
             // Probing already finished OR waiting for next time slot
-            if ((bResult = _announceService(pNetIf, *pService)))
+            if ((bResult = _announceService(*pService)))
             {
                 // Announce service
                 ++pService->m_ProbeInformation.m_u8SentCount;   // 1..
@@ -1484,7 +1486,7 @@ bool clsLEAMDNSHost::_hasProbesWaitingForAnswers(void) const
     - A/AAAA (eg. esp8266.esp -> 192.168.2.120)
 
 */
-bool clsLEAMDNSHost::_sendHostProbe(netif* pNetIf)
+bool clsLEAMDNSHost::_sendHostProbe()
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe (%s.local, %lu)\n"), _DH(), m_pcHostName, millis()););
 
@@ -1523,7 +1525,7 @@ bool clsLEAMDNSHost::_sendHostProbe(netif* pNetIf)
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendHostProbe: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(pNetIf, sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 /*
@@ -1539,7 +1541,7 @@ bool clsLEAMDNSHost::_sendHostProbe(netif* pNetIf)
     - PTR NAME (eg. _http._tcp.local -> MyESP._http._tcp.local) (TODO: Check if needed, maybe TXT is better)
 
 */
-bool clsLEAMDNSHost::_sendServiceProbe(netif* pNetIf, clsService& p_rService)
+bool clsLEAMDNSHost::_sendServiceProbe(clsService& p_rService)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe (%s, %lu)\n"), _DH(), _service2String(&p_rService), millis()););
 
@@ -1573,7 +1575,7 @@ bool clsLEAMDNSHost::_sendServiceProbe(netif* pNetIf, clsService& p_rService)
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendServiceProbe: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(pNetIf, sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 /*
@@ -1672,8 +1674,7 @@ bool clsLEAMDNSHost::_callServiceProbeResultCallback(clsLEAMDNSHost::clsService&
     inside the '_writeXXXAnswer' procs via 'sendParameter.m_bUnannounce = true'
 
 */
-bool clsLEAMDNSHost::_announce(netif* pNetIf,
-                               bool p_bAnnounce,
+bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
                                bool p_bIncludeServices)
 {
     bool    bResult = false;
@@ -1719,15 +1720,14 @@ bool clsLEAMDNSHost::_announce(netif* pNetIf,
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announce: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(pNetIf, sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 /*
     clsLEAmDNS2_Host::_announceService
 
 */
-bool clsLEAMDNSHost::_announceService(netif* pNetIf,
-                                      clsLEAMDNSHost::clsService& p_rService,
+bool clsLEAMDNSHost::_announceService(clsLEAMDNSHost::clsService& p_rService,
                                       bool p_bAnnounce /*= true*/)
 {
     bool    bResult = false;
@@ -1753,7 +1753,7 @@ bool clsLEAMDNSHost::_announceService(netif* pNetIf,
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announceService: FAILED!\n"), _DH()););
     return ((bResult) &&
-            (_sendMessage(pNetIf, sendParameter)));
+            (_sendMessage(sendParameter)));
 }
 
 

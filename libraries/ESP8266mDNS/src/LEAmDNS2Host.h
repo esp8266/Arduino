@@ -132,9 +132,9 @@
 #if defined(DEBUG_ESP_PORT) && defined(DEBUG_ESP_MDNS_RESPONDER)
 #define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_INFO2
-#define DEBUG_ESP_MDNS_ERR
-#define DEBUG_ESP_MDNS_TX
-#define DEBUG_ESP_MDNS_RX
+//#define DEBUG_ESP_MDNS_ERR
+//#define DEBUG_ESP_MDNS_TX
+//#define DEBUG_ESP_MDNS_RX
 #endif
 
 #ifdef DEBUG_ESP_MDNS_RESPONDER
@@ -1472,11 +1472,11 @@ protected:
 #endif
 
     // PROBING
-    bool _updateProbeStatus(netif* pNetIf);
+    bool _updateProbeStatus();
     bool _resetProbeStatus(bool p_bRestart = true);
     bool _hasProbesWaitingForAnswers(void) const;
-    bool _sendHostProbe(netif* pNetIf);
-    bool _sendServiceProbe(netif* pNetIf, clsService& p_rService);
+    bool _sendHostProbe();
+    bool _sendServiceProbe(clsService& p_rService);
     bool _cancelProbingForHost(void);
     bool _cancelProbingForService(clsService& p_rService);
     bool _callHostProbeResultCallback(bool p_bResult);
@@ -1484,11 +1484,9 @@ protected:
                                          bool p_bResult);
 
     // ANNOUNCE
-    bool _announce(netif* pNetIf,
-                   bool p_bAnnounce,
+    bool _announce(bool p_bAnnounce,
                    bool p_bIncludeServices);
-    bool _announceService(netif* pNetIf,
-                          clsService& p_pService,
+    bool _announceService(clsService& p_pService,
                           bool p_bAnnounce = true);
 
     // QUERY CACHE
@@ -1505,6 +1503,7 @@ protected:
     // File: ..._Host_Transfer
     // SENDING
     bool _sendMessage(netif* pNetIf, clsSendParameter& p_SendParameter);
+    bool _sendMessage(clsSendParameter& p_SendParameter);
     bool _sendMessage_Multicast(netif* pNetIf,
                                 clsSendParameter& p_rSendParameter,
                                 uint8_t p_IPProtocolTypes);

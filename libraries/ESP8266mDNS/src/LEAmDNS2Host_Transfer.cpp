@@ -50,6 +50,20 @@ namespace experimental
     Any reply flags in installed services are removed at the end!
 
 */
+bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
+{
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        if (netif_is_up(pNetIf))
+        {
+        	_sendMessage(pNetIf, p_rSendParameter);
+        }
+
+    // Finally clear service reply masks
+    for (clsService* pService : m_Services)
+    {
+        pService->m_u32ReplyMask = 0;
+    }
+}
 bool clsLEAMDNSHost::_sendMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
     bool    bResult = false;
@@ -133,12 +147,6 @@ bool clsLEAMDNSHost::_sendMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParamete
             // Multicast query -> Send by all available protocols
             bResult = ((u8AvailableProtocols) &&
                        (_sendMessage_Multicast(pNetIf, p_rSendParameter, u8AvailableProtocols)));
-        }
-
-        // Finally clear service reply masks
-        for (clsService* pService : m_Services)
-        {
-            pService->m_u32ReplyMask = 0;
         }
 
         clsBackbone::sm_pBackbone->setDelayUDPProcessing(false);
@@ -256,6 +264,7 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
     // Two step sequence: 'Count' and 'Send'
     for (typeSequence sequence = static_cast<typeSequence>(enuSequence::Count); ((bResult) && (sequence <= static_cast<typeSequence>(enuSequence::Send))); ++sequence)
     {
+    	/*
         DEBUG_EX_INFO(
             if (static_cast<typeSequence>(enuSequence::Send) == sequence)
             DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: ID:%u QR:%u OP:%u AA:%u TC:%u RD:%u RA:%u R:%u QD:%u AN:%u NS:%u AR:%u\n"),
@@ -268,6 +277,7 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
                                   (unsigned)msgHeader.m_u16NSCount,
                                   (unsigned)msgHeader.m_u16ARCount);
         );
+        */
         // Count/send
         // Header
         bResult = ((static_cast<typeSequence>(enuSequence::Count) == sequence)

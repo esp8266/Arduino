@@ -438,12 +438,15 @@ bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
     if (p_pService &&
             (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)))
     {
+    	bResult = _announceService(*p_pService, false);
+ /*
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
             if (netif_is_up(pNetIf) &&
                     (_announceService(pNetIf, *p_pService, false)))
             {
                 bResult = true;
             }
+*/
     }
 
     if (bResult)
@@ -769,13 +772,14 @@ bool clsLEAMDNSHost::update(void)
 {
     bool    bResult = false;
 
+    bResult = _updateProbeStatus();
+
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf))
         {
             //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
             //{
-            if ((_updateProbeStatus(pNetIf)) &&    // Probing and announcing
-                    (_checkQueryCache(pNetIf)))
+            if (_checkQueryCache(pNetIf))
             {
                 bResult = true;
             }
@@ -790,8 +794,10 @@ bool clsLEAMDNSHost::update(void)
 /*
     clsLEAmDNS2_Host::announce
 */
-bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
-                              bool p_bIncludeServices /*= true*/)
+
+//bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
+//                              bool p_bIncludeServices /*= true*/)
+/*
 {
     bool bResult = false;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
@@ -801,12 +807,14 @@ bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
         }
     return bResult;
 }
-
+*/
 /*
     clsLEAmDNS2_Host::announceService
 */
-bool clsLEAMDNSHost::announceService(clsService * p_pService,
-                                     bool p_bAnnounce /*= true*/)
+
+//bool clsLEAMDNSHost::announceService(clsService * p_pService,
+//                                     bool p_bAnnounce /*= true*/)
+/*
 {
     bool bResult = false;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
@@ -816,6 +824,7 @@ bool clsLEAMDNSHost::announceService(clsService * p_pService,
         }
     return bResult;
 }
+*/
 
 /*
     clsLEAmDNS2_Host::restart
