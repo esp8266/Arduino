@@ -308,6 +308,10 @@ protected:
    * @param macArray An uint8_t array which contains the MAC address to store. The method will store the first 6 bytes of the array.
    */
   void setOriginMac(const uint8_t *macArray);
+
+  std::list<std::pair<String, bool>> & getForwardingBacklog();
+  
+  String & getMacIgnoreList(); // Experimental, may break in the future.
   
 private:
 

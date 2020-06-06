@@ -132,21 +132,21 @@ void FloodingMesh::performMeshInstanceMaintenance()
 {
   EspnowMeshBackend::performEspnowMaintenance(); 
   
-  for(std::list<std::pair<String, bool>>::iterator backlogIterator = _forwardingBacklog.begin();  backlogIterator != _forwardingBacklog.end(); )
+  for(std::list<std::pair<String, bool>>::iterator backlogIterator = getForwardingBacklog().begin();  backlogIterator != getForwardingBacklog().end(); )
   {
     std::pair<String, bool> &messageData = *backlogIterator;
     if(messageData.second) // message encrypted
     {
-      _macIgnoreList = messageData.first.substring(0, 12) + ','; // The message should contain the messageID first
+      getMacIgnoreList() = messageData.first.substring(0, 12) + ','; // The message should contain the messageID first
       encryptedBroadcastKernel(messageData.first); 
-      _macIgnoreList = emptyString;
+      getMacIgnoreList() = emptyString;
     }
     else
     {
       broadcastKernel(messageData.first);
     }
 
-    backlogIterator = _forwardingBacklog.erase(backlogIterator);
+    backlogIterator = getForwardingBacklog().erase(backlogIterator);
     
     EspnowMeshBackend::performEspnowMaintenance(); // It is best to performEspnowMaintenance frequently to keep the Espnow backend responsive. Especially if each encryptedBroadcast takes a lot of time.
   }
@@ -229,7 +229,7 @@ void FloodingMesh::clearMessageLogs()
 
 void FloodingMesh::clearForwardingBacklog()
 {
-  _forwardingBacklog.clear();
+  getForwardingBacklog().clear();
 }
  
 void FloodingMesh::setMessageHandler(const messageHandlerType messageHandler) { _messageHandler = messageHandler; }
@@ -246,6 +246,10 @@ uint8_t *FloodingMesh::getOriginMac(uint8_t *macArray) const
   std::copy_n(_originMac, 6, macArray);
   return macArray;
 }
+
+std::list<std::pair<String, bool>> &  FloodingMesh::getForwardingBacklog() { return _forwardingBacklog; }
+
+String & FloodingMesh::getMacIgnoreList() { return _macIgnoreList; }
 
 uint32_t FloodingMesh::maxUnencryptedMessageLength() const
 {
@@ -421,7 +425,7 @@ String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBa
     {
       message = broadcastTarget + remainingRequest.substring(0, messageIDEndIndex + 1) + message;
       assert(message.length() <= _espnowBackend.getMaxMessageLength());
-      _forwardingBacklog.emplace_back(message, getEspnowMeshBackend().receivedEncryptedTransmission());
+      getForwardingBacklog().emplace_back(message, getEspnowMeshBackend().receivedEncryptedTransmission());
     }
   }
   
@@ -464,7 +468,7 @@ void FloodingMesh::_defaultNetworkFilter(const int numberOfNetworks, MeshBackend
     // Connect to any APs which contain meshInstance.getMeshName()
     if(meshNameIndex >= 0)
     {      
-      if(_macIgnoreList.indexOf(TypeCast::macToString(WiFi.BSSID(networkIndex))) == -1) // If the BSSID is not in the ignore list
+      if(getMacIgnoreList().indexOf(TypeCast::macToString(WiFi.BSSID(networkIndex))) == -1) // If the BSSID is not in the ignore list
       {
         if(EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance))
         {
