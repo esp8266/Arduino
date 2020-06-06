@@ -190,6 +190,7 @@ void _setPWMFreq(uint32_t freq) {
 
   if (pwmState.cnt) {
     PWMState p;  // The working copy since we can't edit the one in use
+    p.mask = 0;
     p.cnt = 0;
     for (uint32_t i = 0; i < pwmState.cnt; i++) {
       auto pin = pwmState.pin[i];
