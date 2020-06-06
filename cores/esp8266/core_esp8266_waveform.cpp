@@ -426,11 +426,12 @@ static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
   return ccount;
 }
 
-static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
-  if (a < b) {
-    return a;
-  }
-  return b;
+// Find the earliest cycle as compared to right now
+static inline ICACHE_RAM_ATTR uint32_t earliest(uint32_t a, uint32_t b) {
+    uint32_t now = GetCycleCountIRQ();
+    int32_t da = a - now;
+    int32_t db = b - now;
+    return (da < db) ? a : b;
 }
 
 // The SDK and hardware take some time to actually get to our NMI code, so
@@ -441,10 +442,10 @@ static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
 // so the ESP cycle counter is actually running at a variable speed.
 // adjust(x) takes care of adjusting a delta clock cycle amount accordingly.
 #if F_CPU == 80000000
-  #define DELTAIRQ (microsecondsToClockCycles(3))
+  #define DELTAIRQ (microsecondsToClockCycles(2))
   #define adjust(x) ((x) << (turbo ? 1 : 0))
 #else
-  #define DELTAIRQ (microsecondsToClockCycles(2))
+  #define DELTAIRQ (microsecondsToClockCycles(1))
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
@@ -453,7 +454,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Flag if the core is at 160 MHz, for use by adjust()
   bool turbo = (*(uint32_t*)0x3FF00014) & 1 ? true : false;
 
-  uint32_t nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
+  uint32_t nextEventCycle = GetCycleCountIRQ() + microsecondsToClockCycles(MAXIRQUS);
   uint32_t timeoutCycle = GetCycleCountIRQ() + microsecondsToClockCycles(14);
 
   if (wvfState.waveformToEnable || wvfState.waveformToDisable) {
@@ -478,40 +479,43 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   bool done = false;
   if (wvfState.waveformEnabled || pwmState.cnt) {
     do {
-      nextEventCycles = microsecondsToClockCycles(MAXIRQUS);
+      nextEventCycle = GetCycleCountIRQ() + microsecondsToClockCycles(MAXIRQUS);
 
       // PWM state machine implementation
       if (pwmState.cnt) {
-        int32_t cyclesToGo = pwmState.nextServiceCycle - GetCycleCountIRQ();
-        if (cyclesToGo < 0) {
-            if (pwmState.idx == pwmState.cnt) { // Start of pulses, possibly copy new
-              if (pwmState.pwmUpdate) {
-                // Do the memory copy from temp to global and clear mailbox
-                pwmState = *(PWMState*)pwmState.pwmUpdate;
-              }
-              GPOS = pwmState.mask; // Set all active pins high
-              if (pwmState.mask & (1<<16)) {
-                GP16O = 1;
-              }
-              pwmState.idx = 0;
-            } else {
-              do {
-                // Drop the pin at this edge
-                if (pwmState.mask & (1<<pwmState.pin[pwmState.idx])) {
-                  GPOC = 1<<pwmState.pin[pwmState.idx];
-                  if (pwmState.pin[pwmState.idx] == 16) {
-                    GP16O = 0;
+        int32_t cyclesToGo;
+        do {
+            cyclesToGo = pwmState.nextServiceCycle - GetCycleCountIRQ();
+            if (cyclesToGo < 0) {
+                if (pwmState.idx == pwmState.cnt) { // Start of pulses, possibly copy new
+                  if (pwmState.pwmUpdate) {
+                    // Do the memory copy from temp to global and clear mailbox
+                    pwmState = *(PWMState*)pwmState.pwmUpdate;
                   }
+                  GPOS = pwmState.mask; // Set all active pins high
+                  if (pwmState.mask & (1<<16)) {
+                    GP16O = 1;
+                  }
+                  pwmState.idx = 0;
+                } else {
+                  do {
+                    // Drop the pin at this edge
+                    if (pwmState.mask & (1<<pwmState.pin[pwmState.idx])) {
+                      GPOC = 1<<pwmState.pin[pwmState.idx];
+                      if (pwmState.pin[pwmState.idx] == 16) {
+                        GP16O = 0;
+                      }
+                    }
+                    pwmState.idx++;
+                    // Any other pins at this same PWM value will have delta==0, drop them too.
+                  } while (pwmState.delta[pwmState.idx] == 0);
                 }
-                pwmState.idx++;
-                // Any other pins at this same PWM value will have delta==0, drop them too.
-              } while (pwmState.delta[pwmState.idx] == 0);
+                // Preserve duty cycle over PWM period by using now+xxx instead of += delta
+                cyclesToGo = adjust(pwmState.delta[pwmState.idx]);
+                pwmState.nextServiceCycle = GetCycleCountIRQ() + cyclesToGo;
             }
-            // Preserve duty cycle over PWM period by using now+xxx instead of += delta
-            cyclesToGo = adjust(pwmState.delta[pwmState.idx]);
-            pwmState.nextServiceCycle = GetCycleCountIRQ() + cyclesToGo;
-        }
-        nextEventCycles = min_u32(nextEventCycles, cyclesToGo);
+            nextEventCycle = earliest(nextEventCycle, pwmState.nextServiceCycle);
+        } while (pwmState.cnt && (cyclesToGo < 100));
       }
 
       for (auto i = wvfState.startPin; i <= wvfState.endPin; i++) {
@@ -585,25 +589,24 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           }
           nextEdgeCycles = adjust(nextEdgeCycles);
           wave->nextServiceCycle = now + nextEdgeCycles;
-          nextEventCycles = min_u32(nextEventCycles, nextEdgeCycles);
           wave->lastEdge = now;
-        } else {
-          uint32_t deltaCycles = wave->nextServiceCycle - now;
-          nextEventCycles = min_u32(nextEventCycles, deltaCycles);
         }
+        nextEventCycle = earliest(nextEventCycle, wave->nextServiceCycle);
       }
 
       // Exit the loop if we've hit the fixed runtime limit or the next event is known to be after that timeout would occur
       uint32_t now = GetCycleCountIRQ();
-      int32_t cycleDeltaNextEvent = timeoutCycle - (now + nextEventCycles);
+      int32_t cycleDeltaNextEvent = nextEventCycle - now;
       int32_t cyclesLeftTimeout = timeoutCycle - now;
-      done = (cycleDeltaNextEvent < 0) || (cyclesLeftTimeout < 0);
+      done = (cycleDeltaNextEvent > microsecondsToClockCycles(4)) || (cyclesLeftTimeout < 0);
     } while (!done);
   } // if (wvfState.waveformEnabled)
 
   if (wvfState.timer1CB) {
-    nextEventCycles = min_u32(nextEventCycles, wvfState.timer1CB());
+    nextEventCycle = earliest(nextEventCycle, GetCycleCountIRQ() + wvfState.timer1CB());
   }
+
+  int32_t nextEventCycles = nextEventCycle - GetCycleCountIRQ();
 
   if (nextEventCycles < microsecondsToClockCycles(5)) {
     nextEventCycles = microsecondsToClockCycles(5);
