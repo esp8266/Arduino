@@ -54,15 +54,17 @@ def get_segment_size_addr(elf, segment, path):
             return [ size, addr ]
     raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '"')
 
-def read_segment(elf, tmpdir, segment, path):
-    tmpfile = os.path.join(tmpdir, segment + '.read_segment')
+def read_segment(elf, segment, path):
+    fd, tmpfile = tempfile.mkstemp()
+    os.close(fd)
     p = subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, tmpfile], stdout=subprocess.PIPE)
     with open(tmpfile, "rb") as f:
         raw = f.read()
+    os.remove(tmpfile)
 
     return raw
 
-def write_bin(*, out, tmpdir, args, elf, segments, to_addr):
+def write_bin(out, args, elf, segments, to_addr):
     entry = int(get_elf_entry( elf, args.path ))
     header = [ 0xe9, len(segments), fmodeb[args.flash_mode], ffreqb[args.flash_freq] + 16 * fsizeb[args.flash_size],
                entry & 255, (entry>>8) & 255, (entry>>16) & 255, (entry>>24) & 255 ]
@@ -75,7 +77,7 @@ def write_bin(*, out, tmpdir, args, elf, segments, to_addr):
                    size & 255, (size>>8) & 255, (size>>16) & 255, (size>>24) & 255]
         out.write(bytearray(seghdr));
         total_size += 8;
-        raw = read_segment(elf, tmpdir, segment, args.path)
+        raw = read_segment(elf, segment, args.path)
         if len(raw) != size:
             raise Exception('Segment size doesn\'t match read data for "' + segment + '" in "' + elf + '"')
         out.write(raw)
@@ -154,9 +156,9 @@ def main():
     print('Creating BIN file "{out}" using "{eboot}" and "{app}"'.format(
         out=args.out, eboot=args.eboot, app=args.app))
 
-    with tempfile.TemporaryDirectory() as tmpdir, open(args.out, "wb") as out:
+    with open(args.out, "wb") as out:
         def wrapper(**kwargs):
-            write_bin(out=out, tmpdir=tmpdir, args=args, **kwargs)
+            write_bin(out=out, args=args, **kwargs)
 
         wrapper(
             elf=args.eboot,
@@ -167,7 +169,7 @@ def main():
         wrapper(
             elf=args.app,
             segments=[".irom0.text", ".text", ".text1", ".data", ".rodata"],
-            to_addr=0,
+            to_addr=0
         )
 
     # Because the CRC includes both eboot and app, can only calculate it after the entire BIN generated
