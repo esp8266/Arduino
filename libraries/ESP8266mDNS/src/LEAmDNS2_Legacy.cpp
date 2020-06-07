@@ -802,16 +802,16 @@ clsLEAMDNSHost_Legacy::hMDNSServiceQuery clsLEAMDNSHost_Legacy::installServiceQu
         std::list<clsLEAMDNSHost::clsQuery*> queries;
 
         /*clsLEAMDNSHost::clsQuery*	pQuery =*/
-        hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
-                const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
-                clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
-                bool p_bSetContent)->void
-        {
-            if (p_fnCallback)	// void(const stcMDNSServiceInfo& p_MDNSServiceInfo, MDNSResponder::AnswerType p_AnswerType, bool p_bSetContent)
-            {
-                p_fnCallback(stcMDNSServiceInfo(p_AnswerAccessor), _answerFlagsToAnswerType(p_QueryAnswerTypeFlags), p_bSetContent);
-            }
-        }, &queries);
+//        hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
+//                const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
+//                clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
+//                bool p_bSetContent)->void
+//        {
+//            if (p_fnCallback)	// void(const stcMDNSServiceInfo& p_MDNSServiceInfo, MDNSResponder::AnswerType p_AnswerType, bool p_bSetContent)
+//            {
+//                p_fnCallback(stcMDNSServiceInfo(p_AnswerAccessor), _answerFlagsToAnswerType(p_QueryAnswerTypeFlags), p_bSetContent);
+//            }
+//        }, &queries);
 
         if (queries.size())
         {

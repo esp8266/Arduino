@@ -1680,7 +1680,8 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
     bool    bResult = false;
 
     clsSendParameter    sendParameter;
-    if (clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus)
+    if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) ||
+    		(clsProbeInformation_Base::enuProbingStatus::DoneFinally == m_ProbeInformation.m_ProbingStatus))
     {
         bResult = true;
 

@@ -656,43 +656,32 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
     clsLEAmDNS2_Host::installServiceQuery (answer)
 
 */
-/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
         const char* p_pcProtocol,
         clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
-    bool bResult = false;
     clsQuery*   pQuery = 0;
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-        if (netif_is_up(pNetIf) && (pQuery = _installServiceQuery(pNetIf, p_pcService, p_pcProtocol)))
+        if (pQuery = _installServiceQuery(p_pcService, p_pcProtocol))
         {
             pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
-            bResult = true;
         }
-    return bResult;
+    return pQuery;
 }
 
 /*
     clsLEAmDNS2_Host::installServiceQuery (accessor)
 
 */
-/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcService,
         const char* p_pcProtocol,
-        clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor,
-        std::list<clsLEAMDNSHost::clsQuery*>* ret)
+        clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
-    bool bResult = false;
     clsQuery*   pQuery = 0;
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-        if (netif_is_up(pNetIf) && (pQuery = _installServiceQuery(pNetIf, p_pcService, p_pcProtocol)))
+        if (pQuery = _installServiceQuery(p_pcService, p_pcProtocol))
         {
             pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
-            bResult = true;
-            if (ret)
-            {
-                ret->push_back(pQuery);
-            }
         }
-    return bResult;
+    return pQuery;
 }
 
 /*
@@ -785,36 +774,23 @@ bool clsLEAMDNSHost::update(void)
     clsLEAmDNS2_Host::announce
 */
 
-//bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
-//                              bool p_bIncludeServices /*= true*/)
-/*
+bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
+                              bool p_bIncludeServices /*= true*/)
 {
-    bool bResult = false;
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-        if (netif_is_up(pNetIf) && _announce(pNetIf, p_bAnnounce, p_bIncludeServices))
-        {
-            bResult = true;
-        }
-    return bResult;
+	return _announce(p_bAnnounce, p_bIncludeServices);
 }
-*/
+
 /*
     clsLEAmDNS2_Host::announceService
 */
 
-//bool clsLEAMDNSHost::announceService(clsService * p_pService,
-//                                     bool p_bAnnounce /*= true*/)
-/*
+bool clsLEAMDNSHost::announceService(clsService * p_pService,
+                                     bool p_bAnnounce /*= true*/)
 {
-    bool bResult = false;
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-        if (netif_is_up(pNetIf) && _announceService(pNetIf, *p_pService, p_bAnnounce))
-        {
-            bResult = true;
-        }
-    return bResult;
+
+	return _announceService(*p_pService, p_bAnnounce);
 }
-*/
+
 
 /*
     clsLEAmDNS2_Host::restart
@@ -1277,7 +1253,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findNextQueryByDomain(const clsLEAMDN
     clsLEAmDNS2_Host::_installServiceQuery
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(netif* pNetIf,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(
         const char* p_pcService,
         const char* p_pcProtocol)
 {
