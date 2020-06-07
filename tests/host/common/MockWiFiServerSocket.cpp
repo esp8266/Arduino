@@ -67,8 +67,8 @@ void WiFiServer::begin (uint16_t port, uint8_t backlog)
 {
     if (!backlog)
         return;
-	_port = port;
-	return begin();
+    _port = port;
+    return begin();
 }
 
 void WiFiServer::begin ()
