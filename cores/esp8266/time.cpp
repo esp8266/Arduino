@@ -157,6 +157,10 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
 
     ***/
 
+    const char* tz = getenv("TZ");
+    if (timezone_sec == 0 && daylightOffset_sec == 0 && tz != nullptr)
+        return configTime(tz, server1, server2, server3);
+
     static char gmt[] = "GMT";
 
     _timezone = timezone_sec + daylightOffset_sec;
