@@ -407,14 +407,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     nextTimerCcys = callbackCcys;
   }
 
+  // Firing timer too soon, the NMI occurs before ISR has returned.
+  if (nextTimerCcys < IRQLATENCYCCYS) {
+      nextTimerCcys = IRQLATENCYCCYS;
+  }
+
   // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
   if (ISCPUFREQ160MHZ || isCPU2X) {
     nextTimerCcys >>= 1;
-  }
-
-  // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys <= IRQLATENCYCCYS) {
-    nextTimerCcys = IRQLATENCYCCYS;
   }
 
   // Register access is fast and edge IRQ was configured before.
