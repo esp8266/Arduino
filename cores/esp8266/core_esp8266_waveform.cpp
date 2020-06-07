@@ -442,10 +442,10 @@ static inline ICACHE_RAM_ATTR uint32_t earliest(uint32_t a, uint32_t b) {
 // so the ESP cycle counter is actually running at a variable speed.
 // adjust(x) takes care of adjusting a delta clock cycle amount accordingly.
 #if F_CPU == 80000000
-  #define DELTAIRQ (microsecondsToClockCycles(2))
+  #define DELTAIRQ (microsecondsToClockCycles(9)/4)
   #define adjust(x) ((x) << (turbo ? 1 : 0))
 #else
-  #define DELTAIRQ (microsecondsToClockCycles(1))
+  #define DELTAIRQ (microsecondsToClockCycles(9)/8)
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
