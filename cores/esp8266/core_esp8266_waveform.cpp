@@ -449,6 +449,8 @@ static inline ICACHE_RAM_ATTR uint32_t earliest(uint32_t a, uint32_t b) {
   #define adjust(x) ((x) >> (turbo ? 0 : 1))
 #endif
 
+// When the time to the next edge is greater than this, RTI and set another IRQ to minimize CPU usage
+#define MINIRQTIME microsecondsToClockCycles(4)
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Flag if the core is at 160 MHz, for use by adjust()
@@ -598,7 +600,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       uint32_t now = GetCycleCountIRQ();
       int32_t cycleDeltaNextEvent = nextEventCycle - now;
       int32_t cyclesLeftTimeout = timeoutCycle - now;
-      done = (cycleDeltaNextEvent > microsecondsToClockCycles(4)) || (cyclesLeftTimeout < 0);
+      done = (cycleDeltaNextEvent > MINIRQTIME) || (cyclesLeftTimeout < 0);
     } while (!done);
   } // if (wvfState.waveformEnabled)
 
@@ -608,8 +610,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   int32_t nextEventCycles = nextEventCycle - GetCycleCountIRQ();
 
-  if (nextEventCycles < microsecondsToClockCycles(5)) {
-    nextEventCycles = microsecondsToClockCycles(5);
+  if (nextEventCycles < MINIRQTIME) {
+    nextEventCycles = MINIRQTIME;
   }
   nextEventCycles -= DELTAIRQ;
 
