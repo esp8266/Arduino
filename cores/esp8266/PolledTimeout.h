@@ -24,7 +24,7 @@
  */
 
 #include <limits>
-
+#include <c_types.h>
 #include <core_esp8266_features.h>
 
 namespace esp8266
@@ -76,7 +76,7 @@ struct TimeSourceCycles
 
   using timeType = decltype(esp_get_cycle_count());
   static timeType time() {return esp_get_cycle_count();}
-  static constexpr timeType ticksPerSecond    = ESP.getCpuFreqMHz() * 1000000UL;     // 80'000'000 or 160'000'000 Hz
+  static constexpr timeType ticksPerSecond    = esp_get_cpu_freq_mhz() * 1000000UL;     // 80'000'000 or 160'000'000 Hz
   static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
 
