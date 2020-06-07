@@ -23,8 +23,9 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <limits>
-#include <c_types.h>
+#include <c_types.h>               // IRAM_ATTR
+#include <limits>                  // std::numeric_limits
+#include <type_traits>             // std::is_unsigned
 #include <core_esp8266_features.h>
 
 namespace esp8266
