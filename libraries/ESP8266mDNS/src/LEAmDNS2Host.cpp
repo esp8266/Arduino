@@ -438,12 +438,15 @@ bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
     if (p_pService &&
             (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)))
     {
+    	bResult = _announceService(*p_pService, false);
+ /*
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
             if (netif_is_up(pNetIf) &&
                     (_announceService(pNetIf, *p_pService, false)))
             {
                 bResult = true;
             }
+*/
     }
 
     if (bResult)
@@ -528,14 +531,11 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryService
     {
         std::list<clsQuery*> queries;
 
-        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-            if (netif_is_up(pNetIf))
-            {
                 clsQuery*    pQuery = 0;
                 if (((pQuery = _allocQuery(clsQuery::enuQueryType::Service))) &&
                         (_buildDomainForService(p_pcService, p_pcProtocol, pQuery->m_Domain)))
                 {
-                    if (((pQuery->m_bStaticQuery = true)) && (_sendQuery(pNetIf, *pQuery)))
+                    if (((pQuery->m_bStaticQuery = true)) && (_sendQuery(*pQuery)))
                     {
                         queries.push_back(pQuery);
                     }
@@ -545,7 +545,6 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryService
                         _removeQuery(pQuery);
                     }
                 }
-            }
 
         if (queries.size())
         {
@@ -587,14 +586,11 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryHost(co
     {
         std::list<clsQuery*> queries;
 
-        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-            if (netif_is_up(pNetIf))
-            {
                 clsQuery*    pQuery = 0;
                 if (((pQuery = _allocQuery(clsQuery::enuQueryType::Host))) &&
                         (_buildDomainForHost(p_pcHostName, pQuery->m_Domain)))
                 {
-                    if (((pQuery->m_bStaticQuery = true)) && (_sendQuery(pNetIf, *pQuery)))
+                    if (((pQuery->m_bStaticQuery = true)) && (_sendQuery(*pQuery)))
                     {
                         queries.push_back(pQuery);
                     }
@@ -604,7 +600,7 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::vector clsLEAMDNSHost::queryHost(co
                         _removeQuery(pQuery);
                     }
                 }
-            }
+
 
         if (queries.size())
         {
@@ -708,18 +704,16 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
     bool bResult = false;
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
-        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-            if (netif_is_up(pNetIf))
-            {
+    {
                 clsRRDomain    domain;
                 if ((pQuery = ((_buildDomainForHost(p_pcHostName, domain))
-                               ? _installDomainQuery(pNetIf, domain, clsQuery::enuQueryType::Host)
+                               ? _installDomainQuery(domain, clsQuery::enuQueryType::Host)
                                : 0)))
                 {
                     pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
                     bResult = true;
                 }
-            }
+    }
     return bResult;
 }
 
@@ -732,12 +726,10 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
     bool bResult = true;
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
-        for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-            if (netif_is_up(pNetIf))
             {
                 clsRRDomain    domain;
                 if ((pQuery = ((_buildDomainForHost(p_pcHostName, domain))
-                               ? _installDomainQuery(pNetIf, domain, clsQuery::enuQueryType::Host)
+                               ? _installDomainQuery(domain, clsQuery::enuQueryType::Host)
                                : 0)))
                 {
                     pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
@@ -769,13 +761,14 @@ bool clsLEAMDNSHost::update(void)
 {
     bool    bResult = false;
 
+    bResult = (_updateProbeStatus() && _checkQueryCache())
+/*
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf))
         {
             //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
             //{
-            if ((_updateProbeStatus(pNetIf)) &&    // Probing and announcing
-                    (_checkQueryCache(pNetIf)))
+            if (_checkQueryCache(pNetIf))
             {
                 bResult = true;
             }
@@ -783,6 +776,7 @@ bool clsLEAMDNSHost::update(void)
             //    clsBackbone::sm_pBackbone->setDelayUDPProcessing(false);
             //}
         }
+*/
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s update: FAILED (Not connected?)!\n"), _DH()););
     return bResult;
 }
@@ -790,8 +784,10 @@ bool clsLEAMDNSHost::update(void)
 /*
     clsLEAmDNS2_Host::announce
 */
-bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
-                              bool p_bIncludeServices /*= true*/)
+
+//bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
+//                              bool p_bIncludeServices /*= true*/)
+/*
 {
     bool bResult = false;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
@@ -801,12 +797,14 @@ bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
         }
     return bResult;
 }
-
+*/
 /*
     clsLEAmDNS2_Host::announceService
 */
-bool clsLEAMDNSHost::announceService(clsService * p_pService,
-                                     bool p_bAnnounce /*= true*/)
+
+//bool clsLEAMDNSHost::announceService(clsService * p_pService,
+//                                     bool p_bAnnounce /*= true*/)
+/*
 {
     bool bResult = false;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
@@ -816,6 +814,7 @@ bool clsLEAMDNSHost::announceService(clsService * p_pService,
         }
     return bResult;
 }
+*/
 
 /*
     clsLEAmDNS2_Host::restart
@@ -1291,7 +1290,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(netif* pNetIf,
     {
         pMDNSQuery->m_bStaticQuery = false;
 
-        if (_sendQuery(pNetIf, *pMDNSQuery))
+        if (_sendQuery(*pMDNSQuery))
         {
             pMDNSQuery->m_u8SentCount = 1;
             pMDNSQuery->m_ResendTimeout.reset(clsConsts::u32DynamicQueryResendDelay);
@@ -1309,7 +1308,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(netif* pNetIf,
 /*
     clsLEAmDNS2_Host::_installDomainQuery
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(netif* pNetIf,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(
         clsLEAMDNSHost::clsRRDomain & p_Domain,
         clsLEAMDNSHost::clsQuery::enuQueryType p_QueryType)
 {
@@ -1320,7 +1319,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(netif* pNetIf,
         pQuery->m_Domain = p_Domain;
         pQuery->m_bStaticQuery = false;
 
-        if (_sendQuery(pNetIf, *pQuery))
+        if (_sendQuery(*pQuery))
         {
             pQuery->m_u8SentCount = 1;
             pQuery->m_ResendTimeout.reset(clsConsts::u32DynamicQueryResendDelay);
