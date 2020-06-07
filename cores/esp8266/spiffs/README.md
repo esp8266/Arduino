@@ -49,6 +49,9 @@ What spiffs does not:
  - Presently, it does not detect or handle bad blocks.
  - One configuration, one binary. There's no generic spiffs binary that handles all types of configurations.
 
+## NOTICE
+
+0.4.0 is under construction. This is a full rewrite and will change the underlying structure. Hence, it will not be compatible with earlier versions of the filesystem. The API is the same, with minor modifications. Some config flags will be removed (as they are mandatory in 0.4.0) and some features might fall away until 0.4.1. If you have any worries or questions, it can be discussed in issue [#179](https://github.com/pellepl/spiffs/issues/179)
  
 ## MORE INFO 
  
