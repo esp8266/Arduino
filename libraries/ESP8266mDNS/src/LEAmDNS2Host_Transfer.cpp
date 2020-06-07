@@ -52,10 +52,11 @@ namespace experimental
 */
 bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
+	bool bResult = true;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf))
         {
-        	_sendMessage(pNetIf, p_rSendParameter);
+        	bResult = bResult && _sendMessage(pNetIf, p_rSendParameter);
         }
 
     // Finally clear service reply masks
@@ -63,6 +64,7 @@ bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParam
     {
         pService->m_u32ReplyMask = 0;
     }
+    return bResult;
 }
 bool clsLEAMDNSHost::_sendMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
