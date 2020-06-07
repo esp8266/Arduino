@@ -4,7 +4,7 @@
 
 /*
  PolledTimeout.h - Encapsulation of a polled Timeout
- 
+
  Copyright (c) 2018 Daniel Salazar. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
 
@@ -161,13 +161,13 @@ public:
       return expiredRetrigger();
     return expiredOneShot();
   }
-  
+
   IRAM_ATTR // fast
   operator bool()
   {
-    return expired(); 
+    return expired();
   }
-  
+
   bool canExpire () const
   {
     return !_neverExpires;
@@ -192,6 +192,18 @@ public:
     _start = TimePolicyT::time();
   }
 
+  void resetAndSetExpired (const timeType newUserTimeout)
+  {
+    reset(newUserTimeout);
+    _start -= _timeout;
+  }
+
+  void resetAndSetExpired ()
+  {
+    reset();
+    _start -= _timeout;
+  }
+
   void resetToNeverExpires ()
   {
     _timeout = alwaysExpired + 1; // because canWait() has precedence
@@ -202,7 +214,7 @@ public:
   {
     return TimePolicyT::toUserUnit(_timeout);
   }
-  
+
   static constexpr timeType timeMax()
   {
     return TimePolicyT::timeMax;
@@ -235,14 +247,14 @@ protected:
     }
     return false;
   }
-  
+
   IRAM_ATTR // fast
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
     return !canWait() || checkExpired(TimePolicyT::time());
   }
-  
+
   timeType _timeout;
   timeType _start;
   bool _neverExpires;

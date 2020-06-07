@@ -24,6 +24,10 @@
 #include <Arduino.h>
 #include "spi_vendors.h"
 
+// brings PolledTimeout at the same level as `millis()`
+#include <PolledTimeout.h>
+using namespace esp8266::polledTimeout;
+
 /**
  * AVR macros for WDT managment
  */
