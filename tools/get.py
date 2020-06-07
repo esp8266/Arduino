@@ -113,6 +113,8 @@ def identify_platform():
         sys_name = 'Windows'
     if 'MSYS_NT' in sys_name:
         sys_name = 'Windows'
+    if 'MINGW' in sys_name:
+        sys_name = 'Windows'
     return arduino_platform_names[sys_name][bits]
 
 def main():

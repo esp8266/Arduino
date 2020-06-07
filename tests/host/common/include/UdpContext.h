@@ -28,6 +28,8 @@ class UdpContext;
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
 #define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
 
+extern netif netif0;
+
 class UdpContext
 {
 public:
@@ -86,10 +88,22 @@ public:
         _dst.addr = staticMCastAddr;
     }
 
+    void setMulticastInterface(netif* p_pNetIf)
+    {
+        (void)p_pNetIf;
+        // user multicast, and this is how it works with posix: send to multicast address:
+        _dst.addr = staticMCastAddr;
+    }
+
     void setMulticastTTL(int ttl)
     {
         (void)ttl;
         //mockverbose("TODO: UdpContext::setMulticastTTL\n");
+    }
+
+    netif* getInputNetif() const
+    {
+        return &netif0;
     }
 
     // warning: handler is called from tcp stack context
@@ -246,7 +260,7 @@ private:
     uint8_t addr[16];
 };
 
-inline err_t igmp_joingroup (const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
+extern "C" inline err_t igmp_joingroup (const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
 {
     (void)ifaddr;
     UdpContext::staticMCastAddr = groupaddr->addr;
