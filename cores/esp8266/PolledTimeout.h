@@ -25,7 +25,7 @@
 
 #include <limits>
 
-#include <Arduino.h>
+#include <core_esp8266_features.h>
 
 namespace esp8266
 {
@@ -70,12 +70,12 @@ struct TimeSourceMillis
 
 struct TimeSourceCycles
 {
-  // time policy based on ESP.getCycleCount()
+  // time policy based on esp_get_cycle_count()
   // this particular time measurement is intended to be called very often
   // (every loop, every yield)
 
-  using timeType = decltype(ESP.getCycleCount());
-  static timeType time() {return ESP.getCycleCount();}
+  using timeType = decltype(esp_get_cycle_count());
+  static timeType time() {return esp_get_cycle_count();}
   static constexpr timeType ticksPerSecond    = ESP.getCpuFreqMHz() * 1000000UL;     // 80'000'000 or 160'000'000 Hz
   static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
@@ -271,14 +271,14 @@ using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecate
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
 
-// Time policy based on ESP.getCycleCount(), and intended to be called very often:
+// Time policy based on esp_get_cycle_count(), and intended to be called very often:
 // "Fast" versions sacrifices time range for improved precision and reduced execution time (by 86%)
-// (cpu cycles for ::expired(): 372 (millis()) vs 52 (ESP.getCycleCount()))
+// (cpu cycles for ::expired(): 372 (millis()) vs 52 (esp_get_cycle_count()))
 // timeMax() values:
 // Ms: max is 26843       ms (26.8  s)
 // Us: max is 26843545    us (26.8  s)
 // Ns: max is  1073741823 ns ( 1.07 s)
-// (time policy based on ESP.getCycleCount() is intended to be called very often)
+// (time policy based on esp_get_cycle_count() is intended to be called very often)
 
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
