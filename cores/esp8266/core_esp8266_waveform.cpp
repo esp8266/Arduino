@@ -241,16 +241,17 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 
 // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
 // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
-static inline ICACHE_RAM_ATTR int32_t scaleCcys(int32_t ccys) {
+static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X) {
   if (ISCPUFREQ160MHZ) {
-    return ((CPU2X & 1) ? ccys : ccys >> 1);
+    return isCPU2X ? ccys : (ccys >> 1);
   }
   else {
-    return ((CPU2X & 1) ? ccys << 1 : ccys);
+    return isCPU2X ? (ccys << 1) : ccys;
   }
 }
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
+  const bool isCPU2X = CPU2X & 1;
   const uint32_t isrStartCcy = ESP.getCycleCount();
   if ((waveform.toSetBits && !(waveform.enabled & waveform.toSetBits)) || waveform.toDisableBits) {
     // Handle enable/disable requests from main app.
@@ -282,7 +283,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       // fall through
     case WaveformMode::UPDATEEXPIRY:
       // in WaveformMode::UPDATEEXPIRY, expiryCcy temporarily holds relative CPU cycle count
-      wave.expiryCcy = wave.nextPeriodCcy + scaleCcys(wave.expiryCcy);
+      wave.expiryCcy = wave.nextPeriodCcy + scaleCcys(wave.expiryCcy, isCPU2X);
       wave.mode = WaveformMode::EXPIRES;
       break;
     default:
@@ -325,7 +326,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       else {
         const int32_t overshootCcys = now - waveNextEventCcy;
         if (overshootCcys >= 0) {
-          const int32_t periodCcys = scaleCcys(wave.periodCcys);
+          const int32_t periodCcys = scaleCcys(wave.periodCcys, isCPU2X);
           if (waveform.states & pinBit) {
             // active configuration and forward are 100% duty
             if (wave.periodCcys == wave.dutyCcys) {
@@ -352,7 +353,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
               wave.endDutyCcy = wave.nextPeriodCcy;
             }
             else {
-              int32_t dutyCcys = scaleCcys(wave.dutyCcys);
+              int32_t dutyCcys = scaleCcys(wave.dutyCcys, isCPU2X);
               if (dutyCcys <= wave.adjDutyCcys) {
                 dutyCcys >>= 1;
                 wave.adjDutyCcys -= dutyCcys;
@@ -397,7 +398,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   int32_t callbackCcys = 0;
   if (waveform.timer1CB) {
-    callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()));
+    callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()), isCPU2X);
   }
   now = ESP.getCycleCount();
   int32_t nextTimerCcys = waveform.nextEventCcy - now;
@@ -407,7 +408,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
-  if (ISCPUFREQ160MHZ || CPU2X & 1) {
+  if (ISCPUFREQ160MHZ || isCPU2X) {
     nextTimerCcys >>= 1;
   }
 
