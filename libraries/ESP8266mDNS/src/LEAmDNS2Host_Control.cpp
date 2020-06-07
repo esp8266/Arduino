@@ -1772,7 +1772,7 @@ bool clsLEAMDNSHost::_announceService(clsLEAMDNSHost::clsService& p_rService,
     When no update arrived (in time), the component is removed from the answer (cache).
 
 */
-bool clsLEAMDNSHost::_checkQueryCache(netif* pNetIf)
+bool clsLEAMDNSHost::_checkQueryCache()
 {
     bool        bResult = true;
 
@@ -1787,7 +1787,7 @@ bool clsLEAMDNSHost::_checkQueryCache(netif* pNetIf)
         if ((!pQuery->m_bStaticQuery) &&
                 (pQuery->m_ResendTimeout.expired()))
         {
-            if ((bResult = _sendQuery(pNetIf, *pQuery)))
+            if ((bResult = _sendQuery(*pQuery)))
             {
                 // The re-query rate is increased to more than one hour (RFC 6762 5.2)
                 ++pQuery->m_u8SentCount;
@@ -1820,7 +1820,7 @@ bool clsLEAMDNSHost::_checkQueryCache(netif* pNetIf)
                 {
                     if (!pQAnswer->m_TTLServiceDomain.finalTimeoutLevel())
                     {
-                        bResult = ((_sendQuery(pNetIf, *pQuery)) &&
+                        bResult = ((_sendQuery(*pQuery)) &&
                                    (pQAnswer->m_TTLServiceDomain.restart()));
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: PTR update scheduled for "), _DH());
@@ -1852,7 +1852,7 @@ bool clsLEAMDNSHost::_checkQueryCache(netif* pNetIf)
                 {
                     if (!pQAnswer->m_TTLHostDomainAndPort.finalTimeoutLevel())
                     {
-                        bResult = ((_sendQuery(pNetIf, pQAnswer->m_ServiceDomain, DNS_RRTYPE_SRV)) &&
+                        bResult = ((_sendQuery(pQAnswer->m_ServiceDomain, DNS_RRTYPE_SRV)) &&
                                    (pQAnswer->m_TTLHostDomainAndPort.restart()));
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: SRV update scheduled for "), _DH());
@@ -1898,7 +1898,7 @@ bool clsLEAMDNSHost::_checkQueryCache(netif* pNetIf)
                 {
                     if (!pQAnswer->m_TTLTxts.finalTimeoutLevel())
                     {
-                        bResult = ((_sendQuery(pNetIf, pQAnswer->m_ServiceDomain, DNS_RRTYPE_TXT)) &&
+                        bResult = ((_sendQuery(pQAnswer->m_ServiceDomain, DNS_RRTYPE_TXT)) &&
                                    (pQAnswer->m_TTLTxts.restart()));
                         DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: TXT update scheduled for "), _DH());
@@ -1941,7 +1941,7 @@ bool clsLEAMDNSHost::_checkQueryCache(netif* pNetIf)
                         {
                             // Needs update
                             if ((bAUpdateQuerySent) ||
-                                    ((bResult = _sendQuery(pNetIf, pQAnswer->m_HostDomain, DNS_RRTYPE_A))))
+                                    ((bResult = _sendQuery(pQAnswer->m_HostDomain, DNS_RRTYPE_A))))
                             {
                                 pIPv4Address->m_TTL.restart();
                                 bAUpdateQuerySent = true;

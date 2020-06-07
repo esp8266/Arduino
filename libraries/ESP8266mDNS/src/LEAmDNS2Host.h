@@ -1441,8 +1441,7 @@ protected:
     clsQuery* _installServiceQuery(netif* pNetIf,
                                    const char* p_pcService,
                                    const char* p_pcProtocol);
-    clsQuery* _installDomainQuery(netif *pNetIf,
-                                  clsRRDomain& p_Domain,
+    clsQuery* _installDomainQuery(clsRRDomain& p_Domain,
                                   clsQuery::enuQueryType p_QueryType);
     bool _hasQueriesWaitingForAnswers(void) const;
     bool _executeQueryCallback(const clsQuery& p_Query,
@@ -1490,7 +1489,7 @@ protected:
                           bool p_bAnnounce = true);
 
     // QUERY CACHE
-    bool _checkQueryCache(netif* pNetIf);
+    bool _checkQueryCache();
 
     uint32_t _replyMaskForHost(netif* pNetIf,
                                const clsRRHeader& p_RRHeader,
@@ -1511,11 +1510,9 @@ protected:
     bool _addQueryRecord(clsSendParameter& p_rSendParameter,
                          const clsRRDomain& p_QueryDomain,
                          uint16_t p_u16QueryType);
-    bool _sendQuery(netif* netif,
-                    const clsQuery& p_Query,
+    bool _sendQuery(const clsQuery& p_Query,
                     clsQuery::clsAnswer::list* p_pKnownAnswers = 0);
-    bool _sendQuery(netif* netif,
-                    const clsRRDomain& p_QueryDomain,
+    bool _sendQuery(const clsRRDomain& p_QueryDomain,
                     uint16_t p_u16RecordType,
                     clsQuery::clsAnswer::list* p_pKnownAnswers = 0);
 

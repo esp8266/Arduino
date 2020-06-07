@@ -570,8 +570,7 @@ bool clsLEAMDNSHost::_addQueryRecord(clsLEAMDNSHost::clsSendParameter& p_rSendPa
     Creates and sends a query for the given domain and query type.
 
 */
-bool clsLEAMDNSHost::_sendQuery(netif* pNetIf,
-                                const clsLEAMDNSHost::clsQuery& p_Query,
+bool clsLEAMDNSHost::_sendQuery(const clsLEAMDNSHost::clsQuery& p_Query,
                                 clsLEAMDNSHost::clsQuery::clsAnswer::list* p_pKnownAnswers /*= 0*/)
 {
     bool                    bResult = false;
@@ -600,7 +599,7 @@ bool clsLEAMDNSHost::_sendQuery(netif* pNetIf,
     // TODO: Add known answers to query
     (void)p_pKnownAnswers;
     bResult = ((bResult) &&
-               (_sendMessage(pNetIf, sendParameter)));
+               (_sendMessage(sendParameter)));
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendQuery: FAILED!\n"), _DH()););
     return bResult;
 }
@@ -611,8 +610,7 @@ bool clsLEAMDNSHost::_sendQuery(netif* pNetIf,
     Creates and sends a query for the given domain and record type.
 
 */
-bool clsLEAMDNSHost::_sendQuery(netif* pNetIf,
-                                const clsLEAMDNSHost::clsRRDomain& p_QueryDomain,
+bool clsLEAMDNSHost::_sendQuery(const clsLEAMDNSHost::clsRRDomain& p_QueryDomain,
                                 uint16_t p_u16RecordType,
                                 clsLEAMDNSHost::clsQuery::clsAnswer::list* p_pKnownAnswers /*= 0*/)
 {
@@ -620,7 +618,7 @@ bool clsLEAMDNSHost::_sendQuery(netif* pNetIf,
 
     clsSendParameter    sendParameter;
     bResult = ((_addQueryRecord(sendParameter, p_QueryDomain, p_u16RecordType)) &&
-               (_sendMessage(pNetIf, sendParameter)));
+               (_sendMessage(sendParameter)));
 
     // TODO: Add known answer records
     (void) p_pKnownAnswers;
