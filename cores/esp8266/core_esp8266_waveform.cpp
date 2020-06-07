@@ -51,7 +51,7 @@ constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
 // The latency between in-ISR rearming of the timer and the earliest firing
-constexpr int32_t IRQLATENCYCCYS = microsecondsToClockCycles(1);
+constexpr int32_t IRQLATENCYCCYS = microsecondsToClockCycles(2);
 
 // for INFINITE, the NMI proceeds on the waveform without expiry deadline.
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
