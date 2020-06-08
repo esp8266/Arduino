@@ -212,7 +212,9 @@ void setup(void) {
   bool p_bProbeResult)->void {
   Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
     // Unattended added service
-    p_rMDNSHost.addService(0, "espclk", "tcp", 80);
+  hMDNSService = p_rMDNSHost.addService(0, "espclk", "tcp", 80);
+  hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
+  hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
   })) {
     Serial.println("mDNS-AP started");
   } else {
