@@ -39,6 +39,7 @@ String PacketType::toString() const
     case PType::IGMP :   return PSTR("IGMP");
     case PType::IPv4:    return PSTR("IPv4");
     case PType::IPv6:    return PSTR("IPv6");
+    case PType::LLMNR:   return PSTR("LLMR");
     case PType::UKNW :   return PSTR("UKNW");
     default :            return PSTR("ERR");
     };

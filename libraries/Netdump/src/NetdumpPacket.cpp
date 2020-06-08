@@ -91,6 +91,10 @@ void Packet::setPacketTypes()
             {
                 setPacketType(PacketType::DNS);
             }
+            if (isLLMNR())
+            {
+            	setPacketType(PacketType::LLMNR);
+            }
             if (isSSDP())
             {
                 setPacketType(PacketType::SSDP);
@@ -216,7 +220,15 @@ void Packet::DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const
 	  for (int i=0;i<dnsPacket->ancount();i++)
 	  {
 		  DNSPacket::DNSAnswer da = dnsPacket->getAnswer(i);
-		  sstr.printf("               R : %s IP : %s\r\n",da.name.c_str(),da.getIP().toString().c_str());
+		  sstr.printf("               R : %s TP : %d TTL : %d",da.name.c_str(),da.type,da.ttl);
+		  if (da.getIP().isSet())
+		  {
+			  sstr.printf(" IP : %s\r\n",da.getIP().toString().c_str());
+		  }
+		  else
+		  {
+			  sstr.printf("\r\n");
+		  }
 	  }
     printDetail(sstr, PSTR("           H "), udpPacket->raw, udpPacket->hdrLength(), netdumpDetail);
     printDetail(sstr, PSTR("           D "), udpPacket->hdr->payload, udpPacket->length(), netdumpDetail);
@@ -259,16 +271,25 @@ void Packet::ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 {
 	if (!icmpPacket || !ipPacket)
 	{
-		sstr.printf_P(PSTR("ICMPtoString access error\r\n"));
+		sstr.printf_P(PSTR("ICMPtoString access error icmp\r\n"));
 		return;
 	}
-    sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
+	if (!ipPacket)
+	{
+		sstr.printf_P(PSTR("ICMPtoString access error ip\r\n"));
+		return;
+	}
+
+	sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
     if (isIPv4())
     {
         switch (getIcmpType())
         {
         case 0 : sstr.printf_P(PSTR("ping reply")); break;
+        case 3 : sstr.printf_P(PSTR("destination unreachable")); break;
+        case 5 : sstr.printf_P(PSTR("redirect")); break;
         case 8 : sstr.printf_P(PSTR("ping request")); break;
+
         default: sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType()); break;
         }
     }
@@ -357,6 +378,7 @@ const String Packet::toString(PacketDetail netdumpDetail) const
     }
     case PacketType::MDNS :
     case PacketType::DNS :
+    case PacketType::LLMNR:
     {
         DNStoString(netdumpDetail, sstr);
         break;

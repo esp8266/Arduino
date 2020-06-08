@@ -35,6 +35,7 @@ public:
         IGMP,
         IPv4,
         IPv6,
+		LLMNR,
         UKNW,
     };
 

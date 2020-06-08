@@ -79,7 +79,9 @@ public:
         	case 6  : //tcpPacket = new TCPPacket(ipPacket->payload());
         			  tcpPacket.reset(new TCPPacket(ipPacket->payload()));
         			  break;
-        	case 1	: //icmpPacket = new ICMPPacket(ipPacket->payload());
+        	case 1	:
+        	case 58 :
+        			  //icmpPacket = new ICMPPacket(ipPacket->payload());
         			  icmpPacket.reset(new ICMPPacket(ipPacket->payload()));
         			  break;
         	default : break;
@@ -88,7 +90,8 @@ public:
         if (udpPacket)
         {
         	if (((udpPacket->sourcePort() == 5353) || (udpPacket->destinationPort() == 5353))
-        		|| ((udpPacket->sourcePort() == 53) || (udpPacket->destinationPort() == 53)))
+        		|| ((udpPacket->sourcePort() == 53) || (udpPacket->destinationPort() == 53))
+				|| ((udpPacket->sourcePort() == 5355) || (udpPacket->destinationPort() == 5355)))
         	{
 //        		dnsPacket = new DNSPacket(udpPacket->hdr->payload);
         		dnsPacket.reset(new DNSPacket(udpPacket->hdr->payload));
@@ -260,6 +263,10 @@ public:
     {
         return (isUDP() && hasPort(53));
     };
+    bool isLLMNR() const
+    {
+    	return (isUDP() && hasPort(5355));
+    }
     bool isSSDP() const
     {
         return (isUDP() && hasPort(1900));

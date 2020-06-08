@@ -512,6 +512,7 @@ public:
 		std::tie(n,p) = qName(answerPtr); // c++17 : auto [n,p] = qName(questionPtr);
 		da.name = n;
 		da.type = NetdumpUtils::ntoh16(p);
+		da.ttl = NetdumpUtils::ntoh32(p+4);
 		da.rdlength = NetdumpUtils::ntoh16(p+8);
 		uint16_t next = NetdumpUtils::ntoh16(p+8)+10;
 		da.rdata = p+10;

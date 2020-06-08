@@ -54,6 +54,17 @@ private:
     {
         ipv = IPversion::UNSET;
     };
+
+    bool compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b) const;
+    bool compareIP(const IPAddress& ip) const;
+    bool compareIP(const NetdumpIP& nip) const;
+
+    bool fromString4(const char *address);
+    bool fromString6(const char *address);
+
+    size_t printTo(Print& p);
+public:
+
     bool isV4() const
     {
         return (ipv == IPversion::IPV4);
@@ -71,15 +82,6 @@ private:
         return (ipv != IPversion::UNSET);
     };
 
-    bool compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b) const;
-    bool compareIP(const IPAddress& ip) const;
-    bool compareIP(const NetdumpIP& nip) const;
-
-    bool fromString4(const char *address);
-    bool fromString6(const char *address);
-
-    size_t printTo(Print& p);
-public:
     bool operator==(const IPAddress& addr) const
     {
         return compareIP(addr);
