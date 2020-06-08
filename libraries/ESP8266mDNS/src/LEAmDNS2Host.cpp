@@ -687,10 +687,9 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
 /*
     clsLEAmDNS2_Host::installHostQuery (answer)
 */
-/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
         clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
-    bool bResult = false;
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
     {
@@ -700,19 +699,17 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
                                : 0)))
                 {
                     pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
-                    bResult = true;
                 }
     }
-    return bResult;
+    return pQuery;
 }
-
 /*
     clsLEAmDNS2_Host::installHostQuery (accessor)
 */
-/*clsLEAMDNSHost::clsQuery* */ bool clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
+
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installHostQuery(const char* p_pcHostName,
         clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
-    bool bResult = true;
     clsQuery*   pQuery = 0;
     if ((p_pcHostName) && (*p_pcHostName))
             {
@@ -722,10 +719,9 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
                                : 0)))
                 {
                     pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
-                    bResult = true;
                 }
             }
-    return bResult;
+    return pQuery;
 }
 
 /*

@@ -130,7 +130,7 @@
     Enable/disable debug trace macros
 */
 #if defined(DEBUG_ESP_PORT) && defined(DEBUG_ESP_MDNS_RESPONDER)
-//#define DEBUG_ESP_MDNS_INFO
+#define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_INFO2
 //#define DEBUG_ESP_MDNS_ERR
 //#define DEBUG_ESP_MDNS_TX
@@ -1352,9 +1352,9 @@ public:
     clsQuery* installServiceQuery(const char* p_pcServiceType,
                                            const char* p_pcProtocol,
                                            clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
-    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+    clsQuery* installHostQuery(const char* p_pcHostName,
                                         clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+    clsQuery* installHostQuery(const char* p_pcHostName,
                                         clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
     // Remove a dynamic service query
     bool removeQuery(clsQuery* p_pQuery);
