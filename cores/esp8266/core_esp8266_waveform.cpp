@@ -446,7 +446,7 @@ static inline ICACHE_RAM_ATTR uint32_t earliest(uint32_t a, uint32_t b) {
   #define adjust(x) ((x) << (turbo ? 1 : 0))
 #else
   #define DELTAIRQ (microsecondsToClockCycles(9)/8)
-  #define adjust(x) ((x) >> (turbo ? 0 : 1))
+  #define adjust(x) ((x) >> 0)
 #endif
 
 // When the time to the next edge is greater than this, RTI and set another IRQ to minimize CPU usage
