@@ -51,7 +51,11 @@ constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
 // The latency between in-ISR rearming of the timer and the earliest firing
-constexpr int32_t IRQLATENCYCCYS = microsecondsToClockCycles(2);
+constexpr int32_t IRQLATENCYCCYS = ISCPUFREQ160MHZ ?
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+// The SDK and hardware take some time to actually get to our NMI code
+constexpr int32_t DELTAIRQCCYS = ISCPUFREQ160MHZ ?
+  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
 
 // for INFINITE, the NMI proceeds on the waveform without expiry deadline.
 // for EXPIRES, the NMI expires the waveform automatically on the expiry ccy.
@@ -251,8 +255,9 @@ static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool i
 }
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
-  const bool isCPU2X = CPU2X & 1;
   const uint32_t isrStartCcy = ESP.getCycleCount();
+  int32_t clockDrift = isrStartCcy - waveform.nextEventCcy - DELTAIRQCCYS;
+  const bool isCPU2X = CPU2X & 1;
   if ((waveform.toSetBits && !(waveform.enabled & waveform.toSetBits)) || waveform.toDisableBits) {
     // Handle enable/disable requests from main app.
     waveform.enabled = (waveform.enabled & ~waveform.toDisableBits) | waveform.toSetBits; // Set the requested waveforms on/off
@@ -268,13 +273,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       waveform.states &= ~waveform.toSetBits; // Clear the state of any just started
       if (wave.alignPhase >= 0 && waveform.enabled & (1UL << wave.alignPhase)) {
         wave.nextPeriodCcy = waveform.pins[wave.alignPhase].nextPeriodCcy + wave.nextPeriodCcy;
-        if (static_cast<int32_t>(waveform.nextEventCcy - wave.nextPeriodCcy) > 0) {
-          waveform.nextEventCcy = wave.nextPeriodCcy;
-        }
       }
       else {
-        wave.nextPeriodCcy = isrStartCcy;
-        waveform.nextEventCcy = wave.nextPeriodCcy;
+        wave.nextPeriodCcy = waveform.nextEventCcy;
       }
       if (!wave.expiryCcy) {
         wave.mode = WaveformMode::INFINITE;
@@ -294,10 +295,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   // Exit the loop if the next event, if any, is sufficiently distant.
   const uint32_t isrTimeoutCcy = isrStartCcy + ISRTIMEOUTCCYS;
-  uint32_t busyPins = (static_cast<int32_t>(waveform.nextEventCcy - isrTimeoutCcy) < 0) ? waveform.enabled : 0;
-  if (!waveform.enabled || busyPins) {
-    waveform.nextEventCcy = isrStartCcy + MAXIRQTICKSCCYS;
-  }
+  uint32_t busyPins = waveform.enabled;
+  waveform.nextEventCcy = isrStartCcy + MAXIRQTICKSCCYS;
 
   uint32_t now = ESP.getCycleCount();
   uint32_t isrNextEventCcy = now;
@@ -314,6 +313,12 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       loopPins ^= pinBit;
 
       Waveform& wave = waveform.pins[pin];
+
+      if (clockDrift) {
+        wave.endDutyCcy += clockDrift;
+        wave.nextPeriodCcy += clockDrift;
+        wave.expiryCcy += clockDrift;
+      }
 
       uint32_t waveNextEventCcy = (waveform.states & pinBit) ? wave.endDutyCcy : wave.nextPeriodCcy;
       if (WaveformMode::EXPIRES == wave.mode &&
@@ -394,6 +399,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
       now = ESP.getCycleCount();
     }
+    clockDrift = 0;
   }
 
   int32_t callbackCcys = 0;
@@ -401,22 +407,24 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()), isCPU2X);
   }
   now = ESP.getCycleCount();
-  int32_t nextTimerCcys = waveform.nextEventCcy - now;
+  int32_t nextEventCcys = waveform.nextEventCcy - now;
   // Account for unknown duration of timer1CB().
-  if (waveform.timer1CB && nextTimerCcys > callbackCcys) {
-    nextTimerCcys = callbackCcys;
-  }
-
-  // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextTimerCcys < IRQLATENCYCCYS) {
-      nextTimerCcys = IRQLATENCYCCYS;
+  if (waveform.timer1CB && nextEventCcys > callbackCcys) {
+    waveform.nextEventCcy = now + callbackCcys;
+    nextEventCcys = callbackCcys;
   }
 
   // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
-  if (ISCPUFREQ160MHZ || isCPU2X) {
-    nextTimerCcys >>= 1;
+  if (isCPU2X) {
+    nextEventCcys >>= 1;
+  }
+
+  // Firing timer too soon, the NMI occurs before ISR has returned.
+  if (nextEventCcys < IRQLATENCYCCYS) {
+    waveform.nextEventCcy = now + IRQLATENCYCCYS;
+    nextEventCcys = IRQLATENCYCCYS;
   }
 
   // Register access is fast and edge IRQ was configured before.
-  T1L = nextTimerCcys;
+  T1L = nextEventCcys;
 }
