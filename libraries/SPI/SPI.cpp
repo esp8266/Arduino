@@ -260,7 +260,7 @@ void SPIClass::setFrequency(uint32_t freq) {
                 break;
             } else if(calFreq < (int32_t) freq) {
                 // never go over the requested frequency
-                if(abs(freq - calFreq) < abs(freq - bestFreq)) {
+                if((freq - calFreq) < (freq - bestFreq)) {
                     bestFreq = calFreq;
                     memcpy(&bestReg, &reg, sizeof(bestReg));
                 }
