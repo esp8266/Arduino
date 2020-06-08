@@ -1996,7 +1996,7 @@ bool clsLEAMDNSHost::_checkQueryCache()
                         {
                             // Needs update
                             if ((bAAAAUpdateQuerySent) ||
-                                    ((bResult = _sendQuery(pNetIf, pQAnswer->m_HostDomain, DNS_RRTYPE_AAAA))))
+                                    ((bResult = _sendQuery(pQAnswer->m_HostDomain, DNS_RRTYPE_AAAA))))
                             {
                                 pIPv6Address->m_TTL.restart();
                                 bAAAAUpdateQuerySent = true;
