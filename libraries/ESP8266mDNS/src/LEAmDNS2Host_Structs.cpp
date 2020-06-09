@@ -26,7 +26,7 @@
 
 #include "ESP8266mDNS.h"
 #include "LEAmDNS2Host.h"
-
+#include "LEAmDNS2_Priv.h"
 
 namespace esp8266
 {

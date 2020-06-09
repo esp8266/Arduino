@@ -26,6 +26,7 @@
 
 #include "ESP8266mDNS.h"
 #include "LEAmDNS2Host.h"
+#include "LEAmDNS2_Priv.h"
 
 #ifdef MDNS_IPV4_SUPPORT
 #include <lwip/igmp.h>
@@ -748,7 +749,7 @@ bool clsLEAMDNSHost::update(void)
 {
     bool    bResult = false;
 
-    bResult = (_updateProbeStatus() && _checkQueryCache())
+    bResult = (_updateProbeStatus() && _checkQueryCache());
 /*
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf))
@@ -764,7 +765,7 @@ bool clsLEAMDNSHost::update(void)
             //}
         }
 */
-    DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s update: FAILED (Not connected?)!\n"), _DH()););
+    DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s update: FAILED (Not connected?)!\n"), _DH()));
     return bResult;
 }
 
