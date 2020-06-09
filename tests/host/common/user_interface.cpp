@@ -39,12 +39,10 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#include "MocklwIP.h"
 
 extern "C"
 {
-
-#include <user_interface.h>
-#include <lwip/netif.h>
 
 uint8 wifi_get_opmode(void)
 {

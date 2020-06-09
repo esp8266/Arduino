@@ -23,6 +23,9 @@
 
 #include <functional>
 
+#include <MocklwIP.h>
+#include <IPAddress.h>
+
 class UdpContext;
 
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
@@ -136,7 +139,7 @@ public:
         return pos <= _inbufsize;
     }
 
-    uint32_t getRemoteAddress()
+    IPAddress getRemoteAddress()
     {
         return _dst.addr;
     }
@@ -146,7 +149,7 @@ public:
         return _dstport;
     }
 
-    uint32_t getDestAddress()
+    IPAddress getDestAddress()
     {
         mockverbose("TODO: implement UDP getDestAddress\n");
         return 0; //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
