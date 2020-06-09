@@ -51,8 +51,7 @@ constexpr int32_t MAXIRQTICKSCCYS = microsecondsToClockCycles(10000);
 // Maximum servicing time for any single IRQ
 constexpr uint32_t ISRTIMEOUTCCYS = microsecondsToClockCycles(18);
 // The latency between in-ISR rearming of the timer and the earliest firing
-constexpr int32_t IRQLATENCYCCYS = ISCPUFREQ160MHZ ?
-  microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
+constexpr int32_t IRQLATENCYCCYS = microsecondsToClockCycles(2);
 // The SDK and hardware take some time to actually get to our NMI code
 constexpr int32_t DELTAIRQCCYS = ISCPUFREQ160MHZ ?
   microsecondsToClockCycles(2) >> 1 : microsecondsToClockCycles(2);
@@ -256,7 +255,7 @@ static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool i
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   const uint32_t isrStartCcy = ESP.getCycleCount();
-  int32_t clockDrift = isrStartCcy - waveform.nextEventCcy - DELTAIRQCCYS;
+  int32_t clockDrift = isrStartCcy - waveform.nextEventCcy;
   const bool isCPU2X = CPU2X & 1;
   if ((waveform.toSetBits && !(waveform.enabled & waveform.toSetBits)) || waveform.toDisableBits) {
     // Handle enable/disable requests from main app.
@@ -415,14 +414,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   }
 
   // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
+  int32_t deltaIrqCcys = DELTAIRQCCYS;
+  int32_t irqLatencyCcys = IRQLATENCYCCYS;
   if (isCPU2X) {
     nextEventCcys >>= 1;
+    deltaIrqCcys >>= 1;
+    irqLatencyCcys >>= 1;
   }
 
   // Firing timer too soon, the NMI occurs before ISR has returned.
-  if (nextEventCcys < IRQLATENCYCCYS) {
-    waveform.nextEventCcy = now + IRQLATENCYCCYS;
-    nextEventCcys = IRQLATENCYCCYS;
+  if (nextEventCcys < irqLatencyCcys + deltaIrqCcys) {
+    waveform.nextEventCcy = now + IRQLATENCYCCYS + DELTAIRQCCYS;
+    nextEventCcys = irqLatencyCcys;
+  }
+  else {
+    nextEventCcys -= deltaIrqCcys;
   }
 
   // Register access is fast and edge IRQ was configured before.
