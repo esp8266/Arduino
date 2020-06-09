@@ -663,7 +663,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
         clsLEAMDNSHost::clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer)
 {
     clsQuery*   pQuery = 0;
-        if (pQuery = _installServiceQuery(p_pcService, p_pcProtocol))
+        if ((pQuery = _installServiceQuery(p_pcService, p_pcProtocol)))
         {
             pQuery->m_fnCallbackAnswer = p_fnCallbackAnswer;
         }
@@ -679,7 +679,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::installServiceQuery(const char* p_pcSe
         clsLEAMDNSHost::clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor)
 {
     clsQuery*   pQuery = 0;
-        if (pQuery = _installServiceQuery(p_pcService, p_pcProtocol))
+        if ((pQuery = _installServiceQuery(p_pcService, p_pcProtocol)))
         {
             pQuery->m_fnCallbackAccessor = p_fnCallbackAccessor;
         }
