@@ -1346,16 +1346,15 @@ public:
         install*Query() creates several queries on the interfaces.
         it no more returns a single query but a boolean until the API is adapted
     */
-    /*clsQuery* */bool installServiceQuery(const char* p_pcServiceType,
+    clsQuery* installServiceQuery(const char* p_pcServiceType,
                                            const char* p_pcProtocol,
                                            clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    /*clsQuery* */bool installServiceQuery(const char* p_pcServiceType,
+    clsQuery* installServiceQuery(const char* p_pcServiceType,
                                            const char* p_pcProtocol,
-                                           clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor,
-                                           std::list<clsQuery*>* ret = nullptr);
-    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+                                           clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
+    clsQuery* installHostQuery(const char* p_pcHostName,
                                         clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
-    /*clsQuery* */bool installHostQuery(const char* p_pcHostName,
+    clsQuery* installHostQuery(const char* p_pcHostName,
                                         clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
     // Remove a dynamic service query
     bool removeQuery(clsQuery* p_pQuery);
@@ -1438,8 +1437,7 @@ protected:
     clsQuery* _findNextQueryByDomain(const clsRRDomain& p_Domain,
                                      const clsQuery::enuQueryType p_QueryType,
                                      const clsQuery* p_pPrevQuery);
-    clsQuery* _installServiceQuery(netif* pNetIf,
-                                   const char* p_pcService,
+    clsQuery* _installServiceQuery(const char* p_pcService,
                                    const char* p_pcProtocol);
     clsQuery* _installDomainQuery(clsRRDomain& p_Domain,
                                   clsQuery::enuQueryType p_QueryType);

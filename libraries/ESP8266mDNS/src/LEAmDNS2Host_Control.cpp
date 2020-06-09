@@ -1680,7 +1680,8 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
     bool    bResult = false;
 
     clsSendParameter    sendParameter;
-    if (clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus)
+    if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) ||
+    		(clsProbeInformation_Base::enuProbingStatus::DoneFinally == m_ProbeInformation.m_ProbingStatus))
     {
         bResult = true;
 
@@ -1707,7 +1708,8 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
             // Announce services (service type, name, SRV (location) and TXTs)
             for (clsService* pService : m_Services)
             {
-                if (clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == pService->m_ProbeInformation.m_ProbingStatus)
+                if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == pService->m_ProbeInformation.m_ProbingStatus) ||
+                		(clsProbeInformation_Base::enuProbingStatus::DoneFinally == pService->m_ProbeInformation.m_ProbingStatus))
                 {
                     pService->m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) |
                                                 static_cast<uint32_t>(enuContentFlag::PTR_NAME) |
@@ -1994,7 +1996,7 @@ bool clsLEAMDNSHost::_checkQueryCache()
                         {
                             // Needs update
                             if ((bAAAAUpdateQuerySent) ||
-                                    ((bResult = _sendQuery(pNetIf, pQAnswer->m_HostDomain, DNS_RRTYPE_AAAA))))
+                                    ((bResult = _sendQuery(pQAnswer->m_HostDomain, DNS_RRTYPE_AAAA))))
                             {
                                 pIPv6Address->m_TTL.restart();
                                 bAAAAUpdateQuerySent = true;
