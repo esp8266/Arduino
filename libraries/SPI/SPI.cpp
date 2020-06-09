@@ -203,6 +203,7 @@ void SPIClass::setFrequency(uint32_t freq) {
     static uint32_t lastSetRegister = 0;
 
     if(freq >= ESP8266_CLOCK) {
+        // magic number to set spi sysclock bit (see below.)
         setClockDivider(0x80000000);
         return;
     }
@@ -215,7 +216,7 @@ void SPIClass::setFrequency(uint32_t freq) {
     const spiClk_t minFreqReg = { 0x7FFFF020 };
     uint32_t minFreq = ClkRegToFreq((spiClk_t*) &minFreqReg);
     if(freq < minFreq) {
-        // use minimum possible clock
+        // use minimum possible clock regardless
         setClockDivider(minFreqReg.regValue);
         lastSetRegister = SPI1CLK;
         lastSetFrequency = freq;
@@ -227,8 +228,14 @@ void SPIClass::setFrequency(uint32_t freq) {
     spiClk_t bestReg = { 0 };
     int32_t bestFreq = 0;
 
-    // find the best match
-    while(calN <= 0x3F) { // 0x3F max for N
+    // aka 0x3F, aka 63, max for regN:6
+    const uint8_t regNMax = (1 << 6) - 1;
+
+    // aka 0x1fff, aka 8191, max for regPre:13
+    const int32_t regPreMax = (1 << 13) - 1;
+
+    // find the best match for the next 63 iterations
+    while(calN <= regNMax) {
 
         spiClk_t reg = { 0 };
         int32_t calFreq;
@@ -239,8 +246,8 @@ void SPIClass::setFrequency(uint32_t freq) {
 
         while(calPreVari++ <= 1) { // test different variants for Pre (we calculate in int so we miss the decimals, testing is the easyest and fastest way)
             calPre = (((ESP8266_CLOCK / (reg.regN + 1)) / freq) - 1) + calPreVari;
-            if(calPre > 0x1FFF) {
-                reg.regPre = 0x1FFF; // 8191
+            if(calPre > regPreMax) {
+                reg.regPre = regPreMax;
             } else if(calPre <= 0) {
                 reg.regPre = 0;
             } else {
@@ -254,19 +261,21 @@ void SPIClass::setFrequency(uint32_t freq) {
             calFreq = ClkRegToFreq(&reg);
             //os_printf("-----[0x%08X][%d]\t EQU: %d\t Pre: %d\t N: %d\t H: %d\t L: %d = %d\n", reg.regValue, freq, reg.regEQU, reg.regPre, reg.regN, reg.regH, reg.regL, calFreq);
 
-            if(calFreq == (int32_t) freq) {
+            if(calFreq == static_cast<int32_t>(freq)) {
                 // accurate match use it!
                 memcpy(&bestReg, &reg, sizeof(bestReg));
                 break;
-            } else if(calFreq < (int32_t) freq) {
+            } else if(calFreq < static_cast<int32_t>(freq)) {
                 // never go over the requested frequency
-                if((freq - calFreq) < (freq - bestFreq)) {
+                auto cal = std::abs(static_cast<int32_t>(freq) - calFreq);
+                auto best = std::abs(static_cast<int32_t>(freq) - bestFreq);
+                if(cal < best) {
                     bestFreq = calFreq;
                     memcpy(&bestReg, &reg, sizeof(bestReg));
                 }
             }
         }
-        if(calFreq == (int32_t) freq) {
+        if(calFreq == static_cast<int32_t>(freq)) {
             // accurate match use it!
             break;
         }
