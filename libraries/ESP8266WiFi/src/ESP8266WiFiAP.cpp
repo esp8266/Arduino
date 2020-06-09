@@ -170,8 +170,8 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         if(ip.ip.addr == 0x00000000) {
             // Invalid config
             DEBUG_WIFI("[AP] IP config Invalid resetting...\n");
-            //192.168.244.1 , 192.168.244.1 , 255.255.255.0
-            ret = softAPConfig(0x01F4A8C0, 0x01F4A8C0, 0x00FFFFFF);
+            //192.168.4.1 , 192.168.4.1 , 255.255.255.0
+            ret = softAPConfig(0x0104A8C0, 0x00F4A8C0, 0x00FFFFFF);
             if(!ret) {
                 DEBUG_WIFI("[AP] softAPConfig failed!\n");
                 ret = false;
