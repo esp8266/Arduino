@@ -87,13 +87,32 @@ void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
 							  MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
 							  bool p_bSetContent)
 {
-	Serial.printf("----------------Query callback cnt = %d tp = %2x set = %s\r\n",p_Query.answerCount(),p_QueryAnswerTypeFlags,p_bSetContent?"true":"false");
+	String answerInfo;
+	  switch (p_QueryAnswerTypeFlags) {
+	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
+	      answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
+	      break;
 
-	for (int i=0;i<p_Query.answerCount();i++)
-	{
-		Serial.printf("AnswerID = %d\r\n",i);
-		p_Query.answerAccessor(i).printTo(Serial);
-	}
+	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
+	      answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
+	      break;
+	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
+	      answerInfo = "IP4Address ";
+	      for (auto ip : p_Answer.m_IPv4Addresses) {
+	    	  answerInfo += "- " + ip->m_IPAddress.toString();
+	      };
+	      break;
+	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
+	      answerInfo = "TXT ";
+	      for (auto kv : p_Answer.m_Txts.m_Txts) {
+	        answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
+	      }
+	      break;
+	    default :
+	      answerInfo = "Unknown Answertype " + String(p_QueryAnswerTypeFlags);
+
+	  }
+	  Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
 }
 
 /*
