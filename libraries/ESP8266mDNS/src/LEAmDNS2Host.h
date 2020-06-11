@@ -945,6 +945,7 @@ public:
                 ServiceDomain       = 0x01,     // Service domain
                 HostDomain          = 0x02,     // Host domain
                 Port                = 0x04,     // Port
+				HostDomainPort      = 0x06,
                 Txts                = 0x08,     // TXT items
 #ifdef MDNS_IPV4_SUPPORT
                 IPv4Address         = 0x10,     // IPv4 address
