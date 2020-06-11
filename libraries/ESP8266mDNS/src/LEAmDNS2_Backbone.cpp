@@ -212,19 +212,10 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
 
     if (!m_bDelayUDPProcessing)
     {
-        DEBUG_EX_INFO(uint32_t    u32LoopCounter = 0; IPAddress remoteIPAddr;);
         while ((m_pUDPContext) &&
                 (m_pUDPContext->next()))
         {
             clsLEAMDNSHost*   pHost = _findHost();
-            DEBUG_EX_INFO_IF(u32LoopCounter++,
-                             DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Multi-Loop (%u)!\n"), _DH(), u32LoopCounter);
-                             DEBUG_EX_INFO_IF((remoteIPAddr.isSet()) && (remoteIPAddr != m_pUDPContext->getRemoteAddress()),
-                                              DEBUG_OUTPUT.printf_P(PSTR("%s _processUDPInput: Changed IP address %s->%s!\n"),
-                                                      _DH(),
-                                                      remoteIPAddr.toString().c_str(),
-                                                      m_pUDPContext->getRemoteAddress().toString().c_str())));
-            DEBUG_EX_INFO(remoteIPAddr = m_pUDPContext->getRemoteAddress());
 
             bResult = pHost->_processUDPInput();
 
