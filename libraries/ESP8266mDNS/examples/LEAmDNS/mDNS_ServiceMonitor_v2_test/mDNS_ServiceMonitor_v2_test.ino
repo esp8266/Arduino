@@ -221,7 +221,7 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
     {
         // Set station hostname
         setStationHostname(pcHostDomain);
-        Serial.printf("settng hostname = '%s'\n", pcHostDomain);
+        Serial.printf("setting hostname = '%s'\n", pcHostDomain?: "nullptr");
 
         if (!bHostDomainConfirmed)
         {
