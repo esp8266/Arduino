@@ -36,7 +36,7 @@
     Enable class debug functions
 */
 #define ESP_8266_MDNS_INCLUDE
-//#define DEBUG_ESP_MDNS_RESPONDER
+//#define DEBUG_ESP_MDNS_RESPONDER  // force debug, arduino IDE uses DEBUG_ESP_MDNS
 
 /*
     Enable/disable debug trace macros
@@ -46,7 +46,7 @@
 #define DEBUG_ESP_MDNS_ERR
 #endif
 
-#if defined(DEBUG_ESP_PORT) && defined(DEBUG_ESP_MDNS_RESPONDER)
+#if defined(DEBUG_ESP_PORT) && (defined(DEBUG_ESP_MDNS) || defined(DEBUG_ESP_MDNS_RESPONDER))
 #define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_INFO2
 //#define DEBUG_ESP_MDNS_TX
