@@ -110,7 +110,8 @@
 
 #define MDNS_IPV4_SUPPORT
 #if LWIP_IPV6
-#define MDNS_IPV6_SUPPORT   // If we've got IPv6 support, then we need IPv6 support :-)
+#pragma message "IPV6 for MDNS temporarily disabled"
+//#define MDNS_IPV6_SUPPORT   // If we've got IPv6 support, then we need IPv6 support :-)
 #endif
 
 namespace esp8266
