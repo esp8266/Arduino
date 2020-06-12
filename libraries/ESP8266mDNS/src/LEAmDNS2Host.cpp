@@ -747,26 +747,19 @@ bool clsLEAMDNSHost::removeQuery(clsLEAMDNSHost::clsQuery * p_pMDNSQuery)
 */
 bool clsLEAMDNSHost::update(void)
 {
-    bool    bResult = false;
+    if (!_updateProbeStatus())
+    {
+        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: FAILED\n"), _DH()));
+        return false;
+    }
 
-    bResult = (_updateProbeStatus() && _checkQueryCache());
-/*
-    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-        if (netif_is_up(pNetIf))
-        {
-            //if (clsBackbone::sm_pBackbone->setDelayUDPProcessing(true))
-            //{
-            if (_checkQueryCache(pNetIf))
-            {
-                bResult = true;
-            }
+    if (!_checkQueryCache())
+    {
+        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: FAILED\n"), _DH()));
+        return false;
+    }
 
-            //    clsBackbone::sm_pBackbone->setDelayUDPProcessing(false);
-            //}
-        }
-*/
-    DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s update: FAILED (Not connected?)!\n"), _DH()));
-    return bResult;
+    return true;
 }
 
 /*

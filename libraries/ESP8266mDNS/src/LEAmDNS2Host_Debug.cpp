@@ -34,7 +34,7 @@ namespace experimental
 {
 
 
-#ifdef DEBUG_ESP_MDNS_RESPONDER
+#ifdef DEBUG_ESP_PORT
 
 /*
     clsLEAmDNS2_Host::_DH
@@ -315,7 +315,7 @@ const char* clsLEAMDNSHost::_NSECBitmap2String(const clsNSECBitmap* p_pNSECBitma
     return acFlagsString;               // 31
 }
 
-#endif  // DEBUG_ESP_MDNS_RESPONDER
+#endif  // DEBUG_ESP_PORT
 
 
 }   // namespace MDNSImplementation

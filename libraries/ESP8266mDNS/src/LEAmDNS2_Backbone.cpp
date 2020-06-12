@@ -239,7 +239,7 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
     MISC
 */
 
-#if not defined ESP_8266_MDNS_INCLUDE || defined DEBUG_ESP_MDNS_RESPONDER
+#if not defined ESP_8266_MDNS_INCLUDE || defined DEBUG_ESP_PORT
 
 /*
     clsLEAmDNS2_Host::clsBackbone::_DH

@@ -56,10 +56,8 @@
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_OUTPUT DEBUG_ESP_PORT
 #else
-#define DEBUG_OUTPUT Serial
+#define DEBUG_OUTPUT Serialx
 #endif
-
-#ifdef DEBUG_ESP_MDNS_RESPONDER
 
 #ifdef DEBUG_ESP_MDNS_INFO
 #define DEBUG_EX_INFO(A)            A
@@ -96,19 +94,6 @@
 #else
 #define DEBUG_EX_RX(A)
 #endif
-
-#else // !defined(DEBUG_ESP_MDNS_RESPONDER)
-
-#define DEBUG_EX_INFO(A)
-#define DEBUG_EX_INFO_IF(C,A...)
-#define DEBUG_EX_INFO2(A)
-#define DEBUG_EX_INFO2_IF(C,A...)
-#define DEBUG_EX_ERR(A)
-#define DEBUG_EX_ERR_IF(C,A...)
-#define DEBUG_EX_TX(A)
-#define DEBUG_EX_RX(A)
-
-#endif // !defined(DEBUG_ESP_MDNS_RESPONDER)
 
 /*
     Enable/disable the usage of the F() macro in debug trace printf calls.

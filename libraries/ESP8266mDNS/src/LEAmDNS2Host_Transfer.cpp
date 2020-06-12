@@ -1451,7 +1451,7 @@ bool clsLEAMDNSHost::_udpAppend32(uint32_t p_u32Value)
     return (_udpAppendBuffer((unsigned char*)&p_u32Value, sizeof(p_u32Value)));
 }
 
-#ifdef DEBUG_ESP_MDNS_RESPONDER
+#ifdef DEBUG_ESP_PORT
 /*
     MDNSResponder::_udpDump
 
@@ -1500,7 +1500,7 @@ bool clsLEAMDNSHost::_udpDump(unsigned p_uOffset,
     }
     return true;
 }
-#endif
+#endif // DEBUG_ESP_PORT
 
 
 /**
