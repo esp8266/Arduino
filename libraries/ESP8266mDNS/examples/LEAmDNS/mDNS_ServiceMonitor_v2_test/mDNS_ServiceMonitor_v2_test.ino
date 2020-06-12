@@ -257,7 +257,6 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
                     if (hMDNSServiceQuery)
                     {
                         Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
-                        Serial.printf("hMDNSServiceQuery:%p/%p\n", hMDNSServiceQuery->m_fnCallbackAnswer, MDNSServiceQueryCallback);
                     }
                     else
                     {

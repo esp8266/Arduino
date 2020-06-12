@@ -36,14 +36,16 @@
     Enable class debug functions
 */
 #define ESP_8266_MDNS_INCLUDE
-#define DEBUG_ESP_MDNS_RESPONDER
+//#define DEBUG_ESP_MDNS_RESPONDER
 
 /*
     Enable/disable debug trace macros
 */
+
 #if defined(DEBUG_ESP_PORT)
 #define DEBUG_ESP_MDNS_ERR
 #endif
+
 #if defined(DEBUG_ESP_PORT) && defined(DEBUG_ESP_MDNS_RESPONDER)
 #define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_INFO2
@@ -51,7 +53,14 @@
 //#define DEBUG_ESP_MDNS_RX
 #endif
 
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_OUTPUT DEBUG_ESP_PORT
+#else
+#define DEBUG_OUTPUT Serial
+#endif
+
 #ifdef DEBUG_ESP_MDNS_RESPONDER
+
 #ifdef DEBUG_ESP_MDNS_INFO
 #define DEBUG_EX_INFO(A)            A
 #define DEBUG_EX_INFO_IF(C,A...)    do if (C) { A; } while (0)
@@ -59,6 +68,7 @@
 #define DEBUG_EX_INFO(A)
 #define DEBUG_EX_INFO_IF(C,A...)
 #endif
+
 #ifdef DEBUG_ESP_MDNS_INFO2
 #define DEBUG_EX_INFO2(A)           A
 #define DEBUG_EX_INFO2_IF(C,A...)   do if (C) { A; } while (0)
@@ -66,6 +76,7 @@
 #define DEBUG_EX_INFO2(A)
 #define DEBUG_EX_INFO2_IF(C,A...)
 #endif
+
 #ifdef DEBUG_ESP_MDNS_ERR
 #define DEBUG_EX_ERR(A)             A
 #define DEBUG_EX_ERR_IF(C,A...)     do if (C) { A; } while (0)
@@ -73,29 +84,31 @@
 #define DEBUG_EX_ERR(A)
 #define DEBUG_EX_ERR_IF(C,A...)
 #endif
+
 #ifdef DEBUG_ESP_MDNS_TX
 #define DEBUG_EX_TX(A)              do { A; } while (0)
 #else
 #define DEBUG_EX_TX(A)
 #endif
+
 #ifdef DEBUG_ESP_MDNS_RX
 #define DEBUG_EX_RX(A)              do { A; } while (0)
 #else
 #define DEBUG_EX_RX(A)
 #endif
 
-#ifdef DEBUG_ESP_PORT
-#define DEBUG_OUTPUT DEBUG_ESP_PORT
-#else
-#define DEBUG_OUTPUT Serial
-#endif
-#else
+#else // !defined(DEBUG_ESP_MDNS_RESPONDER)
+
 #define DEBUG_EX_INFO(A)
+#define DEBUG_EX_INFO_IF(C,A...)
 #define DEBUG_EX_INFO2(A)
+#define DEBUG_EX_INFO2_IF(C,A...)
 #define DEBUG_EX_ERR(A)
+#define DEBUG_EX_ERR_IF(C,A...)
 #define DEBUG_EX_TX(A)
 #define DEBUG_EX_RX(A)
-#endif
+
+#endif // !defined(DEBUG_ESP_MDNS_RESPONDER)
 
 /*
     Enable/disable the usage of the F() macro in debug trace printf calls.
