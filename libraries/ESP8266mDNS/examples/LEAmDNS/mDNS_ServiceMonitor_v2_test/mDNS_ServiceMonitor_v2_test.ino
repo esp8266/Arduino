@@ -30,6 +30,8 @@
 */
 
 
+#define END 0 // enable netdump
+
 #ifndef STASSID
 #define STASSID "ssid"
 #define STAPSK "psk"
@@ -39,6 +41,14 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+
+#if END
+#include <Netdump.h>
+using namespace NetCapture;
+Netdump nd;
+#endif
+
+
 
 /*
     Include the clsMDNSHost (the library needs to be included also)
@@ -326,7 +336,6 @@ void handleHTTPRequest()
     Serial.println("Done with request");
 }
 
-//Netdump nd(Netdump::interface::LWIP);
 
 
 /*
@@ -378,6 +387,11 @@ void setup(void)
     // Start HTTP server
     server.begin();
     Serial.println("HTTP server started");
+
+#if END
+    nd.printDump(Serial, Packet::PacketDetail::FULL);
+#endif
+
 }
 
 void loop(void)
