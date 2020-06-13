@@ -101,7 +101,7 @@ void WiFiServer::begin ()
 
     	server.sin_family = AF_INET;
 	server.sin_port = htons(mockport);
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_addr.s_addr = htonl(global_source_address);
 	if (bind(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
 	{
 		perror(MOCK "bind()");
