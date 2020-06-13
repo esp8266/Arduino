@@ -115,41 +115,54 @@ void wifi_fpm_set_sleep_type (sleep_type_t type)
 uint32_t global_ipv4_netfmt = 0; // global binding
 
 netif netif0;
+uint32_t global_source_address = INADDR_ANY;
 
 bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 {
+    // emulate wifi_get_ip_info()
+    // ignore if_index
+    // use global option -i (host_interface) to select bound interface/address
+
 	struct ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
 	uint32_t ipv4 = lwip_htonl(0x7f000001);
 	uint32_t mask = lwip_htonl(0xff000000);
+	global_source_address = INADDR_ANY; // =0
 
 	if (getifaddrs(&ifAddrStruct) != 0)
 	{
 		perror("getifaddrs");
 		exit(EXIT_FAILURE);
 	}
+	if (host_interface)
+	    mockverbose("host: looking for interface '%s':\n", host_interface);
+	else
+	    mockverbose("host: looking the first for non-local IPv4 interface:\n");
 	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
 	{
+        mockverbose("host: interface: %s", ifa->ifa_name);
 		if (   ifa->ifa_addr
 		    && ifa->ifa_addr->sa_family == AF_INET // ip_info is IPv4 only
 		   )
 		{
-			if (lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*) ifa->ifa_netmask)->sin_addr) != 0xff000000)
+		    auto test_ipv4 = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
+            mockverbose(" IPV4 (0x%08lx)", test_ipv4);
+			if ((test_ipv4 & 0xff000000) == 0x7f000000)
+			    // 127./8
+			    mockverbose(" (local, ignored)");
+			else
 			{
-				if (ipv4 == lwip_htonl(0x7f000001))
+				if (!host_interface || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
 				{
-					// take the first by default
+					// use the first non-local interface, or, if specified, the one selected by user on cmdline
 					ipv4 = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
 					mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
-				}
-				if (host_interface && strcmp(ifa->ifa_name, host_interface) == 0)
-				{
-					// .. or the one specified by user on cmdline
-					ipv4 = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
-					mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
+				    mockverbose(" (selected)\n");
+				    global_source_address = ntohl(ipv4);
 					break;
 				}
 			}
 		}
+		mockverbose("\n");
 	}
 	if (ifAddrStruct != NULL)
 		freeifaddrs(ifAddrStruct);
