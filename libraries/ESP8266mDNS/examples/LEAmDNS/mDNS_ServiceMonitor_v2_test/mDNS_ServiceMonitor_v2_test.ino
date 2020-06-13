@@ -13,7 +13,7 @@
     The ESP itself is initially announced to clients as 'esp8266.local', if this host domain
     is already used in the local network, another host domain is negociated. Keep an
     eye to the serial output to learn the final host domain for the HTTP service.
-    The service itself is is announced as 'host domain'._http._tcp.local.
+    The service itself is is announced as 'host domain'._sapuducul._tcp.local.
     The HTTP server delivers a short greeting and the current  list of other 'HTTP' services (not updated).
     The web server code is taken nearly 1:1 from the 'mDNS_Web_Server.ino' example.
     Point your browser to 'host domain'.local to see this web page.
@@ -76,8 +76,8 @@ clsMDNSHost MDNSv2;
 
 char*                                          pcHostDomain            = 0;        // Negociated host domain
 bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-clsMDNSHost::clsService*                     hMDNSService            = 0;        // The handle of the http service in the MDNS responder
-clsMDNSHost::clsQuery*                hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
+clsMDNSHost::clsService*                     hMDNSService            = 0;        // The handle of the sapuducu service in the MDNS responder
+clsMDNSHost::clsQuery*                hMDNSServiceQuery       = 0;        // The handle of the 'espclk.tcp' service query in the MDNS responder
 
 const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
 String                                         strHTTPServices         = cstrNoHTTPServices;
@@ -240,9 +240,9 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
 
             if (!hMDNSService)
             {
-                Serial.printf("adding service tcp.http port %d\n", SERVICE_PORT);
-                // Add a 'http.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-                hMDNSService = MDNSv2.addService(0, "http", "tcp", SERVICE_PORT, serviceProbeResult);
+                Serial.printf("adding service tcp.sapuducu port %d\n", SERVICE_PORT);
+                // Add a 'sapuducu.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
+                hMDNSService = MDNSv2.addService(0, "sapuducu", "tcp", SERVICE_PORT, serviceProbeResult);
 
                 if (hMDNSService)
                 {
@@ -250,7 +250,7 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
                     hMDNSService->setProbeResultCallback(serviceProbeResult);
                     //         MDNSv2.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
 
-                    // Add some '_http._tcp' protocol specific MDNS service TXT items
+                    // Add some '_sapuducu._tcp' protocol specific MDNS service TXT items
                     // See: http://www.dns-sd.org/txtrecords.html#http
                     hMDNSService->addServiceTxt("user", "x");
                     hMDNSService->addServiceTxt("password", "y");
@@ -259,18 +259,18 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
                 else
                     Serial.printf("hMDNSService=0 ??\n");
 
-                // Install dynamic 'http.tcp' service query
+                // Install dynamic 'espclk.tcp' service query
                 if (!hMDNSServiceQuery)
                 {
                     Serial.printf("installing hMDNSServiceQuery\n");
-                    hMDNSServiceQuery = MDNSv2.installServiceQuery("http", "tcp", MDNSServiceQueryCallback);
+                    hMDNSServiceQuery = MDNSv2.installServiceQuery("espclk", "tcp", MDNSServiceQueryCallback);
                     if (hMDNSServiceQuery)
                     {
-                        Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
+                        Serial.printf("MDNSProbeResultCallback: Service query for 'espclk.tcp' services installed.\n");
                     }
                     else
                     {
-                        Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'http.tcp' services!\n");
+                        Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'espclk.tcp' services!\n");
                     }
                 }
             }
@@ -394,12 +394,20 @@ void setup(void)
 
 }
 
+
+
 void loop(void)
 {
     // Check if a request has come in
     server.handleClient();
     // Allow MDNS processing
     MDNSv2.update();
+
+    static esp8266::polledTimeout::periodicMs timeout(10000);
+    if (timeout.expired())
+    {
+        Serial.printf("up=%lumn heap=%u\n", millis() / 1000 / 60, ESP.getFreeHeap());
+    }
 }
 
 
