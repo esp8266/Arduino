@@ -67,9 +67,18 @@ public:
                                    uint16_t port, 
                                    IPAddress interfaceAddress,
                                    int ttl = 1);
-  // Finish off this packet and send it
+  // Finish off this packet and send it #1
   // Returns 1 if the packet was sent successfully, 0 if there was an error
   int endPacket() override;
+
+  // Finish off this packet and send it #2
+  // Returns true if the packet was sent successfully, but false will not cancel data.
+  // In that case either endPacketMayRetry() may be later recalled,
+  // or cancelPacket() must be called.
+  // cancelPacket() needs not be called if endPacketMayRetry()'s return value is true.
+  bool endPacketMayRetry();
+  void cancelPacket();
+
   // Write a single byte into the packet
   size_t write(uint8_t) override;
   // Write size bytes from buffer into the packet

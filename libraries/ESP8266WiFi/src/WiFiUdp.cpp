@@ -176,6 +176,24 @@ int WiFiUDP::endPacket()
     return (_ctx->send()) ? 1 : 0;
 }
 
+bool WiFiUDP::endPacketMayRetry()
+{
+    if (!_ctx)
+        return false;
+
+    if (_ctx->trySend() == ERR_OK)
+        return true;
+
+    delay(0);
+    return false;
+}
+
+void WiFiUDP::cancelPacket ()
+{
+    if (_ctx)
+        _ctx->cancelBuffer();
+}
+
 size_t WiFiUDP::write(uint8_t byte)
 {
     return write(&byte, 1);
