@@ -25,6 +25,7 @@
 
 #include <MocklwIP.h>
 #include <IPAddress.h>
+#include <PolledTimeout.h>
 
 class UdpContext;
 
@@ -233,6 +234,18 @@ public:
     bool send(ip_addr_t* addr = 0, uint16_t port = 0)
     {
         return trySend(addr, port, false) == ERR_OK;
+    }
+
+    bool sendTimeout(ip_addr_t* addr, uint16_t port,
+                     esp8266::polledTimeout::oneShotFastUs::timeType timeoutMs)
+    {
+        err_t err;
+        esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
+        while (((err = trySend(addr, port)) != ERR_OK) && !timeout)
+            delay(0);
+        if (err != ERR_OK)
+            cancelBuffer();
+        return err == ERR_OK;
     }
 
     void mock_cb(void)
