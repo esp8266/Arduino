@@ -37,7 +37,7 @@
 
 
 #if defined(UMM_POISON_CHECK_LITE)
-static int check_poison_neighbors( umm_heap_context_t *_context, unsigned short cur );
+static bool check_poison_neighbors( umm_heap_context_t *_context, uint16_t cur );
 #endif
 
 
@@ -57,7 +57,7 @@ typedef struct umm_block_t umm_block;
 struct UMM_HEAP_CONTEXT {
   umm_block *heap;
   void *heap_end;
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+#if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
   UMM_STATISTICS stats;
 #endif
   unsigned short int numblocks;
