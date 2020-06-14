@@ -295,45 +295,54 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
 */
 void handleHTTPRequest()
 {
-    Serial.println("");
-    Serial.println("HTTP Request");
+  Serial.println("");
+  Serial.println("HTTP Request");
 
-    IPAddress ip = server.client().localIP();
-    String ipStr = ip.toString();
-    String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
-    s += WiFi.hostname() + ".local at " + server.client().localIP().toString() + "</h3></head>";
-    s += "<br/><h4>Local HTTP services are :</h4>";
-    s += "<ol>";
-    /*
-        for (auto info :  MDNSv2.answerInfo(hMDNSServiceQuery)) {
-        s += "<li>";
-        s += info.serviceDomain();
-        if (info.hostDomainAvailable()) {
-        s += "<br/>Hostname: ";
-        s += String(info.hostDomain());
-        s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
-        }
-        if (info.IP4AddressAvailable()) {
-        s += "<br/>IP4:";
-        for (auto ip : info.IP4Adresses()) {
-          s += " " + ip.toString();
-        }
-        }
-        if (info.txtAvailable()) {
-        s += "<br/>TXT:<br/>";
-        for (auto kv : info.keyValues()) {
-          s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
-        }
-        }
-        s += "</li>";
+  IPAddress ip = server.client().localIP();
+  String ipStr = ip.toString();
+  String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
+  s += WiFi.hostname() + ".local at " + server.client().localIP().toString() + "</h3></head>";
+  s += "<br/><h4>Local HTTP services are :</h4>";
+  s += "<ol>";
+ // hMDNSServiceQuery->
 
-        }
-    */
-    s += "</ol><br/>";
 
-    Serial.println("Sending 200");
-    server.send(200, "text/html", s);
-    Serial.println("Done with request");
+  for (auto info : hMDNSServiceQuery->answerAccessors()) {
+    s += "<li>";
+    s += info.serviceDomain();
+
+    if (info.hostDomainAvailable()) {
+      s += "<br/>Hostname: ";
+      s += String(info.hostDomain());
+      s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
+    }
+    if (info.IPv4AddressAvailable()) {
+      s += "<br/>IPv4:";
+      for (auto ip : info.IPv4Addresses()) {
+        s += " " + ip.toString();
+      }
+    }
+#ifdef MDNS_IPV6_SUPPORT
+    if (info.IPv6AddressAvailable()) {
+      s += "<br/>IPv6:";
+      for (auto ip : info.IPv6Addresses()) {
+        s += " " + ip.toString();
+      }
+    }
+#endif
+    if (info.txtsAvailable()) {
+      s += "<br/>TXT:<br/>";
+      for (auto kv : info.txtKeyValues()) {
+        s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
+      }
+    }
+    s += "</li>";
+  }
+  s += "</ol><br/>";
+
+  Serial.println("Sending 200");
+  server.send(200, "text/html", s);
+  Serial.println("Done with request");
 }
 
 
