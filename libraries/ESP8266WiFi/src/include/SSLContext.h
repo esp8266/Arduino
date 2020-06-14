@@ -39,6 +39,7 @@ extern "C"
 #include "lwip/netif.h"
 #include <include/ClientContext.h>
 #include <WiFiClientSecureAxTLS.h>
+#include <debug.h>
 #include "c_types.h"
 
 namespace axTLS {

@@ -27,6 +27,7 @@
 #include "SDFS.h"
 #include "SDFSFormatter.h"
 #include <FS.h>
+#include <debug.h>
 
 using namespace fs;
 
