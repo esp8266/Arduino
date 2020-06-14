@@ -113,11 +113,10 @@ bool clsLEAMDNSHost::_sendMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParamete
 
                 bResult = ((ipRemote.isSet()) &&
                            (_prepareMessage(pNetIf, p_rSendParameter)) &&
-                           (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())) /*&&
+                           (m_pUDPContext->sendTimeout(ipRemote, m_pUDPContext->getRemotePort(), clsConsts::u32SendTimeoutMs)) /*&&
                            (Serial.println("Did send UC"), true)*/);
                 DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage (V4): FAILED!\n"), _DH()););
-
-#if 1
+#if 0
                 if ((clsConsts::u32SendCooldown) &&
                         1)//(can_yield()))
                 {
@@ -183,12 +182,11 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(netif* pNetIf, clsLEAMDNSHost::clsSe
         DEBUG_EX_INFO(if (!_getResponderIPAddress(pNetIf, enuIPProtocolType::V4)) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast IPv4: NO IPv4 address!.\n"), _DH()););
         bIPv4Result = ((_prepareMessage(pNetIf, p_rSendParameter)) &&
                        (m_pUDPContext->setMulticastInterface(pNetIf), true) &&
-                       (m_pUDPContext->send(ip4MulticastAddress, DNS_MQUERY_PORT)) &&
+                       (m_pUDPContext->sendTimeout(ip4MulticastAddress, DNS_MQUERY_PORT, clsConsts::u32SendTimeoutMs)) &&
                        (m_pUDPContext->setMulticastInterface(0), true) /*&&
                        (Serial.println("Did send MC V4"), true)*/);
         DEBUG_EX_ERR(if (!bIPv4Result) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast (V4): FAILED!\n"), _DH()););
-
-#if 1
+#if 0
         if ((clsConsts::u32SendCooldown) &&
                 1)//(can_yield()))
         {
@@ -211,12 +209,11 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(netif* pNetIf, clsLEAMDNSHost::clsSe
         );
         bIPv6Result = ((DEBUG_EX_ERR(bPrepareMessage =)_prepareMessage(pNetIf, p_rSendParameter)) &&
                        (m_pUDPContext->setMulticastInterface(pNetIf), true) &&
-                       (DEBUG_EX_ERR(bUDPContextSend =)m_pUDPContext->send(ip6MulticastAddress, DNS_MQUERY_PORT)) &&
+                       (DEBUG_EX_ERR(bUDPContextSend =)m_pUDPContext->sendTimeout(ip6MulticastAddress, DNS_MQUERY_PORT, clsConsts::u32SendTimeoutMs)) &&
                        (m_pUDPContext->setMulticastInterface(0), true) /*&&
                        (Serial.println("Did send MC V6"), true)*/);
         DEBUG_EX_ERR(if (!bIPv6Result) DEBUG_OUTPUT.printf_P(PSTR("%s _sendMessage_Multicast (IPv6): FAILED! (%s, %s, %s)\n"), _DH(), (_getResponderIPAddress(pNetIf, enuIPProtocolType::V6).isSet() ? "1" : "0"), (bPrepareMessage ? "1" : "0"), (bUDPContextSend ? "1" : "0")););
-
-#if 1
+#if 0
         if ((clsConsts::u32SendCooldown) &&
                 1)//(can_yield()))
         {

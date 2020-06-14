@@ -179,7 +179,8 @@ protected:
 #else
         static const uint8_t    u8DNS_RRTYPE_NSEC               = 0x2F;
 #endif
-        static const uint32_t   u32SendCooldown                 = 50;       // Delay (ms) between to 'UDPContext->send()' calls
+        //static const uint32_t   u32SendCooldown                 = 50;       // Delay (ms) between to 'UDPContext->send()' calls
+        static constexpr uint32_t u32SendTimeoutMs              = 5;       // timeout (ms) for a call to `UDPContext->send()` (1.5ms=1460@1Mbits/s)
 
     };
 
