@@ -28,6 +28,8 @@
 #include "ESP8266WiFiSTA.h"
 #include "coredecls.h" // disable_extra4k_at_link_time()
 
+#include "debug.h"
+
 static void wifi_wps_status_cb(wps_cb_status status);
 
 /**
