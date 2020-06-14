@@ -1,22 +1,22 @@
 /*
-  UdpContext.h - emulation of UDP connection handling on top of lwIP
+    UdpContext.h - emulation of UDP connection handling on top of lwIP
 
-  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
-  This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #ifndef UDPCONTEXT_H
 #define UDPCONTEXT_H
@@ -52,12 +52,13 @@ public:
 
     void unref()
     {
-        if(--_refcnt == 0) {
+        if (--_refcnt == 0)
+        {
             delete this;
         }
     }
 
-    bool connect (const ip_addr_t* addr, uint16_t port)
+    bool connect(const ip_addr_t* addr, uint16_t port)
     {
         _dst = *addr;
         _dstport = port;
@@ -108,7 +109,8 @@ public:
 
     // warning: handler is called from tcp stack context
     // esp_yield and non-reentrant functions which depend on it will fail
-    void onRx(rxhandler_t handler) {
+    void onRx(rxhandler_t handler)
+    {
         _on_rx = handler;
     }
 
@@ -132,7 +134,8 @@ public:
         mockUDPSwallow(pos, _inbuf, _inbufsize);
     }
 
-    bool isValidOffset(const size_t pos) const {
+    bool isValidOffset(const size_t pos) const
+    {
         return pos <= _inbufsize;
     }
 
@@ -173,7 +176,7 @@ public:
     int read()
     {
         char c;
-        return read(&c, 1)? c: -1;
+        return read(&c, 1) ? c : -1;
     }
 
     size_t read(char* dst, size_t size)
@@ -184,7 +187,7 @@ public:
     int peek()
     {
         char c;
-        return mockUDPPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize)?: -1;
+        return mockUDPPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize) ? : -1;
     }
 
     void flush()
@@ -195,7 +198,7 @@ public:
         _inbufsize = 0;
     }
 
-    size_t append (const char* data, size_t size)
+    size_t append(const char* data, size_t size)
     {
         if (size + _outbufsize > sizeof _outbuf)
         {
@@ -208,16 +211,28 @@ public:
         return size;
     }
 
-    bool send (ip_addr_t* addr = 0, uint16_t port = 0)
+    err_t trySend(ip_addr_t* addr = 0, uint16_t port = 0, bool keepBuffer = true)
     {
-    uint32_t dst = addr? addr->addr: _dst.addr;
-    uint16_t dstport = port?: _dstport;
-        size_t ret = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
-        _outbufsize = 0;
-        return ret > 0;
+        uint32_t dst = addr ? addr->addr : _dst.addr;
+        uint16_t dstport = port ? : _dstport;
+        size_t wrt = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
+        err_t ret = _outbufsize ? ERR_OK : ERR_ABRT;
+        if (!keepBuffer || wrt == _outbufsize)
+            cancelBuffer();
+        return ret;
     }
 
-    void mock_cb (void)
+    void cancelBuffer()
+    {
+        _outbufsize = 0;
+    }
+
+    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
+    {
+        return trySend(addr, port, false) == ERR_OK;
+    }
+
+    void mock_cb(void)
     {
         if (_on_rx) _on_rx();
     }
@@ -228,7 +243,7 @@ public:
 
 private:
 
-    void translate_addr ()
+    void translate_addr()
     {
         if (addrsize == 4)
         {
@@ -260,7 +275,7 @@ private:
     uint8_t addr[16];
 };
 
-extern "C" inline err_t igmp_joingroup (const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
+extern "C" inline err_t igmp_joingroup(const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
 {
     (void)ifaddr;
     UdpContext::staticMCastAddr = groupaddr->addr;
