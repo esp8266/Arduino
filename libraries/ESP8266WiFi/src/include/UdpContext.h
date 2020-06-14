@@ -480,7 +480,7 @@ public:
     }
 
     bool sendTimeout(CONST ip_addr_t* addr, uint16_t port,
-                     esp8266::polledTimeout::oneShotFastUs::timeType timeoutMs)
+                     esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
     {
         err_t err;
         esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
