@@ -22,6 +22,7 @@
 #define ESP_H
 
 #include <Arduino.h>
+#include "core_esp8266_features.h"
 #include "spi_vendors.h"
 
 /**
@@ -168,20 +169,13 @@ class EspClass {
         uint32_t random() const;
 
 #ifndef CORE_MOCK
-        inline uint32_t getCycleCount() __attribute__((always_inline));
+        uint32_t getCycleCount() __attribute__((always_inline)) {
+            return esp_get_cycle_count();
+        }
 #else
         uint32_t getCycleCount();
 #endif
 };
-
-#ifndef CORE_MOCK
-
-uint32_t EspClass::getCycleCount()
-{
-    return esp_get_cycle_count();
-}
-
-#endif // !defined(CORE_MOCK)
 
 extern EspClass ESP;
 

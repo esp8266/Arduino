@@ -37,6 +37,7 @@ extern "C" {
 #include "binary.h"
 #include "esp8266_peri.h"
 #include "twi.h"
+
 #include "core_esp8266_features.h"
 #include "core_esp8266_version.h"
 
@@ -127,20 +128,25 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's abs if encountered
+// undefine stdlib's definitions when encountered, provide abs that supports floating point for C code
+// in case we are using c++, these will either be:
+// - undef'ed by the algorithm include down below, implicitly including cstdlib
+// - undef'ed by the stdlib.h header up above in a more recent versions of gcc
 #ifdef abs
 #undef abs
+#define abs(x) ((x)>0?(x):-(x))
 #endif
 
-#define abs(x) ((x)>0?(x):-(x))
+#ifdef round
+#undef round
+#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#endif
+
+// the rest of math definitions are from Arduino
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
-
-void ets_intr_lock();
-void ets_intr_unlock();
 
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
@@ -170,10 +176,11 @@ typedef uint16_t word;
 typedef bool boolean;
 typedef uint8_t byte;
 
+void ets_intr_lock();
+void ets_intr_unlock();
+
 void init(void);
 void initVariant(void);
-
-int atexit(void (*func)()) __attribute__((weak));
 
 void pinMode(uint8_t pin, uint8_t mode);
 void digitalWrite(uint8_t pin, uint8_t val);
@@ -233,24 +240,21 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 
 
 
+// from this point onward, we need to configure the c++ environment
 #ifdef __cplusplus
 
 #include <algorithm>
+#include <cstdlib>
 #include <cmath>
-#include <pgmspace.h>
-
-#include "WCharacter.h"
-#include "WString.h"
-
-#include "HardwareSerial.h"
-#include "Esp.h"
-#include "Updater.h"
-#include "debug.h"
 
 using std::min;
 using std::max;
 using std::isinf;
 using std::isnan;
+
+// these are important, as we may end up using C versions otherwise
+using std::abs;
+using std::round;
 
 #define _min(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a < _b? _a : _b; })
 #define _max(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a > _b? _a : _b; })
@@ -290,6 +294,16 @@ inline void configTzTime(const char* tz, const char* server1,
 {
     configTime(tz, server1, server2, server3);
 }
+
+// Everything we expect to be implicitly loaded for the sketch
+#include <pgmspace.h>
+
+#include "WCharacter.h"
+#include "WString.h"
+
+#include "HardwareSerial.h"
+#include "Esp.h"
+#include "Updater.h"
 
 #endif // __cplusplus
 

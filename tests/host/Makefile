@@ -157,6 +157,7 @@ FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
+FLAGS += -DF_CPU=80000000
 FLAGS += $(MKFLAGS)
 FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
 CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char

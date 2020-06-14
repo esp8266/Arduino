@@ -38,6 +38,8 @@
 
 #ifdef __cplusplus
 
+#include <pgmspace.h>
+
 namespace arduino
 {
     extern "C++"
@@ -82,7 +84,13 @@ namespace arduino
 // level 15 will disable ALL interrupts,
 // level 0 will enable ALL interrupts,
 //
-#ifndef CORE_MOCK
+#ifdef CORE_MOCK
+
+#define xt_rsil(level) (level)
+#define xt_wsr_ps(state) do { (void)(state); } while (0)
+
+#else
+
 #define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
@@ -92,7 +100,8 @@ inline uint32_t esp_get_cycle_count() {
   __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
   return ccount;
 }
-#endif // not CORE_MOCK
+
+#endif // ifdef CORE_MOCK
 
 
 // Tools for preloading code into the flash cache
