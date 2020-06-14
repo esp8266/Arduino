@@ -31,6 +31,7 @@ void esp_schedule();
 }
 
 #include <AddrList.h>
+#include <PolledTimeout.h>
 
 #define PBUF_ALIGNER_ADJUST 4
 #define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
@@ -419,7 +420,16 @@ public:
         return size;
     }
 
-    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
+    void cancelBuffer ()
+    {
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
+        _tx_buf_head = 0;
+        _tx_buf_cur = 0;
+        _tx_buf_offset = 0;
+    }
+
+    err_t trySend(CONST ip_addr_t* addr = 0, uint16_t port = 0, bool keepBuffer = true)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -435,15 +445,11 @@ public:
                 data_size -= will_copy;
             }
         }
-        if (_tx_buf_head)
-            pbuf_free(_tx_buf_head);
-        _tx_buf_head = 0;
-        _tx_buf_cur = 0;
-        _tx_buf_offset = 0;
+        if (!keepBuffer)
+            cancelBuffer();
         if(!tx_copy){
-            return false;
+            return ERR_MEM;
         }
-
 
         if (!addr) {
             addr = &_pcb->remote_ip;
@@ -463,6 +469,25 @@ public:
         _pcb->ttl = old_ttl;
 #endif
         pbuf_free(tx_copy);
+        if (err == ERR_OK)
+            cancelBuffer();
+        return err;
+    }
+
+    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
+    {
+        return trySend(addr, port, /* don't keep buffer */false) == ERR_OK;
+    }
+
+    bool sendTimeout(CONST ip_addr_t* addr, uint16_t port,
+                     esp8266::polledTimeout::oneShotFastUs::timeType timeoutMs)
+    {
+        err_t err;
+        esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
+        while (((err = trySend(addr, port)) != ERR_OK) && !timeout)
+            delay(0);
+        if (err != ERR_OK)
+            cancelBuffer();
         return err == ERR_OK;
     }
 
