@@ -2029,10 +2029,7 @@ bool clsLEAMDNSHost::_writeMDNSAnswer_TXT(clsLEAMDNSHost::clsService& p_rService
                                         attributes.m_u16Class,
                                         (p_rSendParameter.m_bUnannounce
                                          ? 0
-                                         : (p_rSendParameter.m_bLegacyDNSQuery ? clsConsts::u32LegacyTTL : clsConsts::u32ServiceTTL)),
-                                        p_rService.m_pcInstanceName,
-                                        p_rService.m_pcType,
-                                        p_rService.m_pcProtocol);
+                                         : (p_rSendParameter.m_bLegacyDNSQuery ? clsConsts::u32LegacyTTL : clsConsts::u32ServiceTTL)));
                  );
 
     _releaseTempServiceTxts(p_rService);
