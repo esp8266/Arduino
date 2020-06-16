@@ -22,7 +22,6 @@
 #define _SPI_H_INCLUDED
 
 #include <Arduino.h>
-#include <stdlib.h>
 
 #define SPI_HAS_TRANSACTION 1
 
