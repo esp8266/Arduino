@@ -889,20 +889,23 @@ std::vector<clsLEAMDNSHost_Legacy::stcMDNSServiceInfo> clsLEAMDNSHost_Legacy::an
 {
     std::vector<stcMDNSServiceInfo>	serviceInfos;
 
-    for (stcHostInformation& hostInformation : m_HostInformations)
+    if (p_hServiceQuery)
     {
-        clsLEAMDNSHost::clsQuery*   pQuery = (clsLEAMDNSHost::clsQuery*)hostInformation.m_HandleToPtr[p_hServiceQuery];
-        if (pQuery)
+        for (stcHostInformation& hostInformation : m_HostInformations)
         {
-            for (clsLEAMDNSHost::clsQuery::clsAnswerAccessor& answerAccessor : pQuery->answerAccessors())
+            clsLEAMDNSHost::clsQuery*   pQuery = (clsLEAMDNSHost::clsQuery*)hostInformation.m_HandleToPtr[p_hServiceQuery];
+            if (pQuery)
             {
-                serviceInfos.push_back(stcMDNSServiceInfo(answerAccessor));
+                for (clsLEAMDNSHost::clsQuery::clsAnswerAccessor& answerAccessor : pQuery->answerAccessors())
+                {
+                    serviceInfos.push_back(stcMDNSServiceInfo(answerAccessor));
+                }
             }
-        }
-        else
-        {
-            serviceInfos.clear();
-            break;
+            else
+            {
+                serviceInfos.clear();
+                break;
+            }
         }
     }
     return serviceInfos;

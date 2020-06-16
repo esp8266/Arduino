@@ -307,36 +307,38 @@ void handleHTTPRequest()
  // hMDNSServiceQuery->
 
 
-  for (auto info : hMDNSServiceQuery->answerAccessors()) {
-    s += "<li>";
-    s += info.serviceDomain();
+  if (hMDNSServiceQuery) {
+    for (auto info : hMDNSServiceQuery->answerAccessors()) {
+      s += "<li>";
+      s += info.serviceDomain();
 
-    if (info.hostDomainAvailable()) {
-      s += "<br/>Hostname: ";
-      s += String(info.hostDomain());
-      s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
-    }
-    if (info.IPv4AddressAvailable()) {
-      s += "<br/>IPv4:";
-      for (auto ip : info.IPv4Addresses()) {
-        s += " " + ip.toString();
+      if (info.hostDomainAvailable()) {
+        s += "<br/>Hostname: ";
+        s += String(info.hostDomain());
+        s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
       }
-    }
+      if (info.IPv4AddressAvailable()) {
+        s += "<br/>IPv4:";
+        for (auto ip : info.IPv4Addresses()) {
+          s += " " + ip.toString();
+        }
+      }
 #ifdef MDNS_IPV6_SUPPORT
-    if (info.IPv6AddressAvailable()) {
-      s += "<br/>IPv6:";
-      for (auto ip : info.IPv6Addresses()) {
-        s += " " + ip.toString();
+      if (info.IPv6AddressAvailable()) {
+        s += "<br/>IPv6:";
+        for (auto ip : info.IPv6Addresses()) {
+          s += " " + ip.toString();
+        }
       }
-    }
 #endif
-    if (info.txtsAvailable()) {
-      s += "<br/>TXT:<br/>";
-      for (auto kv : info.txtKeyValues()) {
-        s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
+      if (info.txtsAvailable()) {
+        s += "<br/>TXT:<br/>";
+        for (auto kv : info.txtKeyValues()) {
+          s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
+        }
       }
+      s += "</li>";
     }
-    s += "</li>";
   }
   s += "</ol><br/>";
 
