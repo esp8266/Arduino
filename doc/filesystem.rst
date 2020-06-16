@@ -61,7 +61,8 @@ following include to the sketch:
 
 .. code:: cpp
 
-    #include "FS.h"
+    //#include "FS.h" // SPIFFS is declared
+    #include "LittleFS.h" // LittleFS is declared
 
 SPIFFS Deprecation Warning
 --------------------------
