@@ -20,7 +20,6 @@
   Modified 8 May 2015 by Hristo Gochkov (proper post and file upload handling)
 */
 
-
 #include <Arduino.h>
 #include <libb64/cencode.h>
 #include "WiFiServer.h"
@@ -45,7 +44,8 @@ static const char Content_Length[] PROGMEM = "Content-Length";
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
-: _server(addr, port)
+: _corsEnabled(false)
+, _server(addr, port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
@@ -66,7 +66,8 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
-: _server(port)
+: _corsEnabled(false)
+, _server(port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
@@ -98,6 +99,10 @@ ESP8266WebServerTemplate<ServerType>::~ESP8266WebServerTemplate() {
   }
 }
 
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::enableCORS(bool _ec) {
+  _corsEnabled = _ec;
+}
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::begin() {
   close();
@@ -421,7 +426,10 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
       sendHeader(String(F("Accept-Ranges")),String(F("none")));
       sendHeader(String(F("Transfer-Encoding")),String(F("chunked")));
     }
-    sendHeader(String(F("Connection")), String(F("close")));
+    if (_corsEnabled) {
+      sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
+    }
+  sendHeader(String(F("Connection")), String(F("close")));
 
     response += _responseHeaders;
     response += "\r\n";

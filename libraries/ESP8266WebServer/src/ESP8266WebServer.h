@@ -99,6 +99,7 @@ public:
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
+  void enableCORS(bool _ec);
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
@@ -248,6 +249,8 @@ protected:
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
+
+  bool             _corsEnabled;
 
 };
 
