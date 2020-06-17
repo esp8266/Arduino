@@ -1005,6 +1005,13 @@ macros = {
         ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
         ]),
 
+    'stacksmash_menu': collections.OrderedDict([
+        ( '.menu.stacksmash.disabled', 'Disabled' ),
+        ( '.menu.stacksmash.disabled.build.stacksmash_flags', '' ),
+        ( '.menu.stacksmash.enabled', 'Enabled' ),
+        ( '.menu.stacksmash.enabled.build.stacksmash_flags', '-fstack-protector' ),
+        ]),
+
     'crystalfreq_menu': collections.OrderedDict([
         ( '.menu.CrystalFreq.26', '26 MHz' ),
         ( '.menu.CrystalFreq.40', '40 MHz' ),
@@ -1565,6 +1572,7 @@ def all_boards ():
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=Exceptions')
+    print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
@@ -1586,7 +1594,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:

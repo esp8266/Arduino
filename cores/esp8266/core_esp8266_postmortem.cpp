@@ -54,6 +54,7 @@ static void print_stack(uint32_t start, uint32_t end);
 // using numbers different from "REASON_" in user_interface.h (=0..6)
 enum rst_reason_sw
 {
+    REASON_USER_STACK_SMASH = 253,
     REASON_USER_SWEXCEPTION_RST = 254
 };
 static int s_user_reset_reason = REASON_DEFAULT_RST;
@@ -133,6 +134,9 @@ void __wrap_system_restart_local() {
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
     }
+    else if (rst_info.reason == REASON_USER_STACK_SMASH) {
+        ets_printf_P(PSTR("\nStack corrupted, stack smash detected.\n"));
+   }
     else {
         ets_printf_P(PSTR("\nGeneric Reset\n"));
     }
@@ -273,5 +277,19 @@ void __panic_func(const char* file, int line, const char* func) {
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
+
+uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
+void __stack_chk_fail(void) {
+    s_user_reset_reason = REASON_USER_STACK_SMASH;
+    ets_printf_P(PSTR("\nGCC detected stack overrun"));
+
+    if (gdb_present())
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+
+    __wrap_system_restart_local();
+
+    while (1); // never reached, needed to satisfy "noreturn" attribute
+}
+
 
 };
