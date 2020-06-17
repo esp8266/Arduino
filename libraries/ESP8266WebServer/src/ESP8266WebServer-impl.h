@@ -44,8 +44,7 @@ static const char Content_Length[] PROGMEM = "Content-Length";
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
-: _corsEnabled(false)
-, _server(addr, port)
+: _server(addr, port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
@@ -61,13 +60,13 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 , _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
+, _corsEnabled(false)
 {
 }
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
-: _corsEnabled(false)
-, _server(port)
+: _server(port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
@@ -83,6 +82,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 , _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
+, _corsEnabled(false)
 {
 }
 
@@ -100,8 +100,8 @@ ESP8266WebServerTemplate<ServerType>::~ESP8266WebServerTemplate() {
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::enableCORS(bool _ec) {
-  _corsEnabled = _ec;
+void ESP8266WebServerTemplate<ServerType>::enableCORS(bool enable) {
+  _corsEnabled = enable;
 }
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::begin() {

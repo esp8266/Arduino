@@ -245,12 +245,13 @@ protected:
 
   String           _hostHeader;
   bool             _chunked;
-
+  bool             _corsEnabled;
+  
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
 
-  bool             _corsEnabled;
+  
 
 };
 
