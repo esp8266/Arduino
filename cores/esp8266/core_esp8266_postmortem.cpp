@@ -93,6 +93,18 @@ static void ets_printf_P(const char *str, ...) {
     }
 }
 
+static void cut_here() {
+    ets_putc('\n');
+    for (auto i = 0; i < 15; i++ ) {
+        ets_putc('-');
+    }
+    ets_printf_P(PSTR(" CUT HERE FOR EXCEPTION DECODER "));
+    for (auto i = 0; i < 15; i++ ) {
+        ets_putc('-');
+    }
+    ets_putc('\n');
+}
+
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
@@ -113,6 +125,8 @@ void __wrap_system_restart_local() {
         rst_info.reason = s_user_reset_reason;
 
     ets_install_putc1(&uart_write_char_d);
+
+    cut_here();
 
     if (s_panic_line) {
         ets_printf_P(PSTR("\nPanic %S:%d %S"), s_panic_file, s_panic_line, s_panic_func);
@@ -196,6 +210,8 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
 #endif
     }
+
+    cut_here();
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 

@@ -184,10 +184,10 @@
                   },
                   {
                      "host": "x86_64-apple-darwin",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-via-env.tar.gz",
-                     "archiveFileName": "python3-via-env.tar.gz",
-                     "checksum": "SHA-256:c9237bfe0f62842d7187a39495baa4a7e3ab8b87c0b433614294b023cf0bc0f3",
-                     "size": "292"
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-4/python3-macosx-portable.tar.gz",
+                     "archiveFileName": "python3-macosx-portable.tar.gz",
+                     "checksum": "SHA-256:01a5bf1fa264c6f04cfaadf4c6e9f6caaacb6833ef40104dfbe953fcdb9bca1c",
+                     "size": "25494144"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
