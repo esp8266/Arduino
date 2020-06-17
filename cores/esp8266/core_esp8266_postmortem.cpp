@@ -149,7 +149,7 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
     }
     else if (rst_info.reason == REASON_USER_STACK_SMASH) {
-        ets_printf_P(PSTR("\nStack corrupted, stack smash detected.\n"));
+        ets_printf_P(PSTR("\nStack overflow detected.\n"));
    }
     else {
         ets_printf_P(PSTR("\nGeneric Reset\n"));
@@ -297,7 +297,7 @@ void __panic_func(const char* file, int line, const char* func) {
 uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
 void __stack_chk_fail(void) {
     s_user_reset_reason = REASON_USER_STACK_SMASH;
-    ets_printf_P(PSTR("\nGCC detected stack overrun"));
+    ets_printf_P(PSTR("\nPANIC: Stack overrun"));
 
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
