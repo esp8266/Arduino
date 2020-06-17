@@ -45,6 +45,8 @@ static const char* s_panic_what = 0;
 static bool s_abort_called = false;
 static const char* s_unhandled_exception = NULL;
 
+static uint32_t s_stacksmash_addr = 0;
+
 void abort() __attribute__((noreturn));
 static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
@@ -150,6 +152,8 @@ void __wrap_system_restart_local() {
     }
     else if (rst_info.reason == REASON_USER_STACK_SMASH) {
         ets_printf_P(PSTR("\nStack overflow detected.\n"));
+        ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
+            5 /* Alloca exception, closest thing to stack fault*/, s_stacksmash_addr, 0, 0, 0, 0);
    }
     else {
         ets_printf_P(PSTR("\nGeneric Reset\n"));
@@ -298,6 +302,8 @@ uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
 void __stack_chk_fail(void) {
     s_user_reset_reason = REASON_USER_STACK_SMASH;
     ets_printf_P(PSTR("\nPANIC: Stack overrun"));
+
+    s_stacksmash_addr = (uint32_t)__builtin_return_address(0);
 
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
