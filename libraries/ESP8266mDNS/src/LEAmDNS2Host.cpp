@@ -23,6 +23,7 @@
 */
 
 #include <algorithm>
+#include <LwipIntf.h> // LwipIntf::stateUpCB()
 
 #include "ESP8266mDNS.h"
 #include "LEAmDNS2Host.h"
@@ -256,11 +257,37 @@ bool clsLEAMDNSHost::begin(const char* p_pcHostName,
 
     bool    bResult = false;
 
-    if (!((bResult = ((setHostName(p_pcHostName)) &&
-                      (_joinMulticastGroups()) &&
-                      (p_fnCallback ? setProbeResultCallback(p_fnCallback) : true) &&
-                      ((m_pUDPContext = _allocBackbone())) &&
-                      (restart())))))
+    bResult = (setHostName(p_pcHostName)) &&
+              (_joinMulticastGroups()) &&
+              (p_fnCallback ? setProbeResultCallback(p_fnCallback) : true) &&
+              ((m_pUDPContext = _allocBackbone())) &&
+              (restart());
+
+    if (bResult)
+    {
+        if (!LwipIntf::stateUpCB([this](netif* nif)
+            {
+                (void)nif;
+                // This called after a new interface appears:
+                // resend announces on all available interfaces.
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s a new interface %c%c/%d is up, restarting mDNS\n"),
+                    _DH(), nif->name[0], nif->name[1], netif_get_index(nif)););
+                if (restart())
+                {
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s restart: success!\n"), _DH()));
+                }
+                else
+                {
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s restart failed!\n"), _DH()));
+                }
+                // No need to react when an interface disappears,
+                // because mDNS always loop on all available interfaces.
+            }))
+        {
+            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: could not add netif status callback\n"), _DH()));
+        }
+    }
+    else
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: FAILED for '%s'!\n"), _DH(), (p_pcHostName ? : "-")););
     }
