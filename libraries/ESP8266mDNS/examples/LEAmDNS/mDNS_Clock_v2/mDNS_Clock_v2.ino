@@ -35,6 +35,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <LwipIntf.h>
 #include <time.h>
 
 // uses API MDNSApiVersion::LEAv2
@@ -62,6 +63,7 @@
 #define DST_OFFSET          1                                   // CEST
 #define UPDATE_CYCLE        (1 * 1000)                          // every second
 
+#define START_AP_AFTER_MS   10000 //60000                               // start AP after delay
 #define SERVICE_PORT        80                                  // HTTP port
 
 #ifndef STASSID
@@ -186,8 +188,23 @@ void setup(void) {
   Serial.begin(115200);
 
   // Connect to WiFi network
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(APSSID, APPSK);
+
+  WiFi.persistent(false);
+
+  // useless informative callback
+  if (!LwipIntf::stateUpCB([](netif* nif)
+    {
+        Serial.printf("New interface %c%c(%d) is up(%d)\n",
+            nif->name[0],
+            nif->name[1],
+            netif_get_index(nif),
+            netif_is_up(nif));
+      }))
+  {
+    Serial.println("Error: could not add useless informative callback\n");
+  }
+
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
 
@@ -245,5 +262,18 @@ void loop(void) {
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       responder.announce();
     }
+  }
+
+  static bool AP_started = false;
+  if (!AP_started && millis() > START_AP_AFTER_MS)
+  {
+    AP_started = true;
+    Serial.printf("Starting AP...\n");
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP(APSSID, APPSK);
+    Serial.printf("AP started...(%s:%s, %s)\n",
+        WiFi.softAPSSID().c_str(),
+        WiFi.softAPPSK().c_str(),
+        WiFi.softAPIP().toString().c_str());
   }
 }
