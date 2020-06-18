@@ -1,12 +1,15 @@
 
 #include <LwipIntf.h>
 #include <Schedule.h>
+#include <debug.h>
 
 #define NETIF_STATUS_CB_SIZE 3
 
 static int netifStatusChangeListLength = 0;
 std::function<void(netif*)> netifStatusChangeList [NETIF_STATUS_CB_SIZE];
 
+// this function needs to be in a separate file
+// (overriding a weak function)
 extern "C" void netif_status_changed (struct netif* netif)
 {
     // override the default empty weak function
