@@ -60,6 +60,9 @@ struct UMM_HEAP_CONTEXT {
 #if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
   UMM_STATISTICS stats;
 #endif
+#ifdef UMM_INFO
+  UMM_HEAP_INFO info;
+#endif
   unsigned short int numblocks;
   unsigned char id;
 };

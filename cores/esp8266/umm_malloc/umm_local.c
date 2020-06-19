@@ -15,7 +15,7 @@ UMM_TIME_STATS time_stats = {
 #ifdef UMM_INFO
     {0xFFFFFFFF, 0U, 0U, 0U},
 #endif
-#ifdef UMM_POISON_CHECK
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
     {0xFFFFFFFF, 0U, 0U, 0U},
 #endif
 #ifdef UMM_INTEGRITY_CHECK
@@ -96,7 +96,7 @@ static void *get_unpoisoned_check_neighbors( void *vptr, const char* file, int l
     UMM_CRITICAL_DECL(id_poison);
     uint16_t c;
     bool poison = false;
-    umm_heap_context_t *_context = umm_get_ptr_context( v_ptr );
+    umm_heap_context_t *_context = umm_get_ptr_context( vptr );
     if (NULL == _context) {
       panic();
       return NULL;

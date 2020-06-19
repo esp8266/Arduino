@@ -195,9 +195,9 @@ extern char _heap_start[];
 /* -------------------------------------------------------------------------- */
 
 #ifdef UMM_INLINE_METRICS
-  #define UMM_FRAGMENTATION_METRIC_INIT() umm_fragmentation_metric_init()
-  #define UMM_FRAGMENTATION_METRIC_ADD(c) umm_fragmentation_metric_add(c)
-  #define UMM_FRAGMENTATION_METRIC_REMOVE(c) umm_fragmentation_metric_remove(c)
+  #define UMM_FRAGMENTATION_METRIC_INIT() umm_fragmentation_metric_init(_context)
+  #define UMM_FRAGMENTATION_METRIC_ADD(c) umm_fragmentation_metric_add(_context, c)
+  #define UMM_FRAGMENTATION_METRIC_REMOVE(c) umm_fragmentation_metric_remove(_context, c)
   #ifndef UMM_INFO
   #define UMM_INFO
   #endif
@@ -231,14 +231,14 @@ extern char _heap_start[];
     unsigned int freeBlocksSquared;
 #ifdef UMM_INLINE_METRICS
     size_t oom_count;
-    #define UMM_OOM_COUNT ummHeapInfo.oom_count
-    #define UMM_FREE_BLOCKS ummHeapInfo.freeBlocks
+    #define UMM_OOM_COUNT info.oom_count
+    #define UMM_FREE_BLOCKS info.freeBlocks
 #endif
     unsigned int maxFreeContiguousBlocks;
   }
   UMM_HEAP_INFO;
 
-  extern UMM_HEAP_INFO ummHeapInfo;
+  // extern UMM_HEAP_INFO ummHeapInfo;
 
   extern ICACHE_FLASH_ATTR void *umm_info( void *ptr, bool force );
 #ifdef UMM_INLINE_METRICS
@@ -250,12 +250,18 @@ extern char _heap_start[];
   extern ICACHE_FLASH_ATTR size_t umm_max_block_size( void );
   extern ICACHE_FLASH_ATTR int umm_usage_metric( void );
   extern ICACHE_FLASH_ATTR int umm_fragmentation_metric( void );
+  extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core( void );
+  extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core( void );
+  extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core( void );
 #else
   #define umm_info(p,b)
   #define umm_free_heap_size() (0)
   #define umm_max_block_size() (0)
   #define umm_fragmentation_metric() (0)
   #define umm_usage_metric() (0)
+  #define umm_free_heap_size_core() (0)
+  #define umm_max_block_size_core() (0)
+  #define umm_fragmentation_metric_core() (0)
 #endif
 
 struct UMM_HEAP_CONTEXT;

@@ -449,7 +449,7 @@ void umm_init_common( size_t id, void *start_addr, size_t size, bool zero ) {
   // post-crash discovery.
   if (zero) {
   	memset(_context->heap, 0x00, size);
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+#if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
     memset(&_context->stats, 0x00, sizeof(_context->stats));
 #endif
 
