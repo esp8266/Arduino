@@ -55,28 +55,29 @@ def get_segment_size_addr(elf, segment, path):
     raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '"')
 
 def read_segment(elf, segment, path):
-    tmpfile, dumpfile = tempfile.mkstemp()
-    os.close(tmpfile)
-    p = subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, dumpfile], stdout=subprocess.PIPE)
-    binfile = open(dumpfile, "rb")
-    raw = binfile.read()
-    binfile.close()
+    fd, tmpfile = tempfile.mkstemp()
+    os.close(fd)
+    p = subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, tmpfile], stdout=subprocess.PIPE)
+    with open(tmpfile, "rb") as f:
+        raw = f.read()
+    os.remove(tmpfile)
+
     return raw
 
-def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, path):
-    entry = int(get_elf_entry( elf, path ))
-    header = [ 0xe9, len(segments), fmodeb[flash_mode], ffreqb[flash_freq] + 16 * fsizeb[flash_size],
+def write_bin(out, args, elf, segments, to_addr):
+    entry = int(get_elf_entry( elf, args.path ))
+    header = [ 0xe9, len(segments), fmodeb[args.flash_mode], ffreqb[args.flash_freq] + 16 * fsizeb[args.flash_size],
                entry & 255, (entry>>8) & 255, (entry>>16) & 255, (entry>>24) & 255 ]
     out.write(bytearray(header))
     total_size = 8
     checksum = 0xef
     for segment in segments:
-        [size, addr] = get_segment_size_addr(elf, segment, path)
+        [size, addr] = get_segment_size_addr(elf, segment, args.path)
         seghdr = [ addr & 255, (addr>>8) & 255, (addr>>16) & 255, (addr>>24) & 255,
                    size & 255, (size>>8) & 255, (size>>16) & 255, (size>>24) & 255]
         out.write(bytearray(seghdr));
         total_size += 8;
-        raw = read_segment(elf, segment, path)
+        raw = read_segment(elf, segment, args.path)
         if len(raw) != size:
             raise Exception('Segment size doesn\'t match read data for "' + segment + '" in "' + elf + '"')
         out.write(raw)
@@ -152,12 +153,24 @@ def main():
 
     args = parser.parse_args()
 
-    print('Creating BIN file "' + args.out + '" using "' + args.app + '"')
+    print('Creating BIN file "{out}" using "{eboot}" and "{app}"'.format(
+        out=args.out, eboot=args.eboot, app=args.app))
 
-    out = open(args.out, "wb")
-    write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-    write_bin(out, args.app, ['.irom0.text', '.text', '.text1', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-    out.close()
+    with open(args.out, "wb") as out:
+        def wrapper(**kwargs):
+            write_bin(out=out, args=args, **kwargs)
+
+        wrapper(
+            elf=args.eboot,
+            segments=[".text"],
+            to_addr=4096
+        )
+
+        wrapper(
+            elf=args.app,
+            segments=[".irom0.text", ".text", ".text1", ".data", ".rodata"],
+            to_addr=0
+        )
 
     # Because the CRC includes both eboot and app, can only calculate it after the entire BIN generated
     add_crc(args.out)
