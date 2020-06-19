@@ -15,7 +15,7 @@
 #define memset ets_memset
 
 
-/* 
+/*
  * This redefines DBGLOG_FORCE defined in dbglog/dbglog.h
  * Just for printing from umm_info() which is assumed to always be called from
  * non-ISR. Thus SPI bus is available to handle cache-miss and reading a flash
@@ -37,7 +37,7 @@
 
 
 #if defined(UMM_POISON_CHECK_LITE)
-static int check_poison_neighbors( unsigned short cur );
+static bool check_poison_neighbors( uint16_t cur );
 #endif
 
 
@@ -50,6 +50,5 @@ void ICACHE_FLASH_ATTR print_stats(int force);
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define UMM_INFO_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR4(fmt), ##__VA_ARGS__)
 // use PSTR4() instead of PSTR() to ensure 4-bytes alignment in Flash, whatever the default alignment of PSTR_ALIGN
-
 
 #endif
