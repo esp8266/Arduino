@@ -125,6 +125,7 @@ coreVersionNumeric	LITERAL1
 
 # Filesystem objects
 SPIFFS	KEYWORD1
+LittleFS	KEYWORD1
 SDFS	KEYWORD1
 File	KEYWORD1
 Dir	KEYWORD1

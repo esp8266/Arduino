@@ -77,7 +77,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	// Filling server information
 	servaddr.sin_family = AF_INET;
 	(void) dstaddr;
-	servaddr.sin_addr.s_addr = htonl(global_source_address);
+	//servaddr.sin_addr.s_addr = htonl(global_source_address);
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port = htons(mockport);
 
 	// Bind the socket with the server address
@@ -89,6 +90,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	else
 		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
+    if (!mcast)
+        mcast = inet_addr("224.0.0.1"); // all hosts group
 	if (mcast)
 	{
 		// https://web.cs.wpi.edu/~claypool/courses/4514-B99/samples/multicast.c
@@ -96,8 +99,10 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 
 		struct ip_mreq mreq;
 		mreq.imr_multiaddr.s_addr = mcast;
-		mreq.imr_interface.s_addr = htonl(global_source_address);
-		if (global_ipv4_netfmt)
+		//mreq.imr_interface.s_addr = htonl(global_source_address);
+		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+
+		if (host_interface)
 		{
 #if __APPLE__
 			int idx = if_nametoindex(host_interface);
@@ -115,6 +120,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 			fprintf(stderr, MOCK "can't join multicast group addr %08x\n", (int)mcast);
 			return false;
 		}
+		else
+			mockverbose("joined multicast group addr %08lx\n", ntohl(mcast));
 	}
 
 	return true;
