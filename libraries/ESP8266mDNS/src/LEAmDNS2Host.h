@@ -944,7 +944,7 @@ public:
                 ServiceDomain       = 0x01,     // Service domain
                 HostDomain          = 0x02,     // Host domain
                 Port                = 0x04,     // Port
-				HostDomainPort      = 0x06,
+                HostDomainPort      = 0x06,
                 Txts                = 0x08,     // TXT items
 #ifdef MDNS_IPV4_SUPPORT
                 IPv4Address         = 0x10,     // IPv4 address
@@ -1260,15 +1260,15 @@ public:
         it no more returns a single query but a boolean until the API is adapted
     */
     clsQuery* installServiceQuery(const char* p_pcServiceType,
-                                           const char* p_pcProtocol,
-                                           clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
+                                  const char* p_pcProtocol,
+                                  clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
     clsQuery* installServiceQuery(const char* p_pcServiceType,
-                                           const char* p_pcProtocol,
-                                           clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
+                                  const char* p_pcProtocol,
+                                  clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
     clsQuery* installHostQuery(const char* p_pcHostName,
-                                        clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
+                               clsQuery::QueryCallbackAnswerFn p_fnCallbackAnswer);
     clsQuery* installHostQuery(const char* p_pcHostName,
-                                        clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
+                               clsQuery::QueryCallbackAccessorFn p_fnCallbackAccessor);
     // Remove a dynamic service query
     bool removeQuery(clsQuery* p_pQuery);
 

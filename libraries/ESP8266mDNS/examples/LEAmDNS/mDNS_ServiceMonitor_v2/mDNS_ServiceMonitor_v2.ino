@@ -91,38 +91,37 @@ bool setStationHostname(const char* p_pcHostname) {
 
 
 void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
-							  const MDNSResponder::clsQuery::clsAnswer& p_Answer,
-							  MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
-							  bool p_bSetContent)
-{
-    (void)p_Query;
+                              const MDNSResponder::clsQuery::clsAnswer& p_Answer,
+                              MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
+                              bool p_bSetContent) {
+  (void)p_Query;
 
-	String answerInfo;
-	  switch (p_QueryAnswerTypeFlags) {
-	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
-	      answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
-	      break;
+  String answerInfo;
+  switch (p_QueryAnswerTypeFlags) {
+    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
+      answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
+      break;
 
-	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
-	      answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
-	      break;
-	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
-	      answerInfo = "IP4Address ";
-	      for (auto ip : p_Answer.m_IPv4Addresses) {
-	    	  answerInfo += "- " + ip->m_IPAddress.toString();
-	      };
-	      break;
-	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
-	      answerInfo = "TXT ";
-	      for (auto kv : p_Answer.m_Txts.m_Txts) {
-	        answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
-	      }
-	      break;
-	    default :
-	      answerInfo = "Unknown Answertype " + String(p_QueryAnswerTypeFlags);
+    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
+      answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
+      break;
+    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
+      answerInfo = "IP4Address ";
+      for (auto ip : p_Answer.m_IPv4Addresses) {
+        answerInfo += "- " + ip->m_IPAddress.toString();
+      };
+      break;
+    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
+      answerInfo = "TXT ";
+      for (auto kv : p_Answer.m_Txts.m_Txts) {
+        answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
+      }
+      break;
+    default :
+      answerInfo = "Unknown Answertype " + String(p_QueryAnswerTypeFlags);
 
-	  }
-	  Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
+  }
+  Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
 }
 
 /*
@@ -131,7 +130,7 @@ void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
 */
 
 void serviceProbeResult(MDNSResponder::clsService& p_rMDNSService,
-						const char* p_pcInstanceName,
+                        const char* p_pcInstanceName,
                         bool p_bProbeResult) {
   (void)p_rMDNSService;
   Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcInstanceName, (p_bProbeResult ? "succeeded." : "failed!"));
@@ -165,8 +164,8 @@ void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p
         hMDNSService = MDNS.addService(0, "http", "tcp", SERVICE_PORT, serviceProbeResult);
 
         if (hMDNSService)  {
-        	hMDNSService->setProbeResultCallback(serviceProbeResult);
-        	//         MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
+          hMDNSService->setProbeResultCallback(serviceProbeResult);
+          //         MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
 
           // Add some '_http._tcp' protocol specific MDNS service TXT items
           // See: http://www.dns-sd.org/txtrecords.html#http
@@ -186,8 +185,7 @@ void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p
         }
       }
     }
-  }
-  else {
+  } else {
     // Change hostname, use '-' as divider between base name and index
     if (MDNSResponder::indexDomainName(pcHostDomain, "-", 0)) {
       MDNS.setHostName(pcHostDomain);
@@ -211,7 +209,7 @@ void handleHTTPRequest() {
   s += "<br/><h4>Local HTTP services are :</h4>";
   s += "<ol>";
   /*
-  for (auto info :  MDNS.answerInfo(hMDNSServiceQuery)) {
+    for (auto info :  MDNS.answerInfo(hMDNSServiceQuery)) {
     s += "<li>";
     s += info.serviceDomain();
     if (info.hostDomainAvailable()) {
@@ -233,7 +231,7 @@ void handleHTTPRequest() {
     }
     s += "</li>";
 
-  }
+    }
   */
   s += "</ol><br/>";
 
@@ -270,19 +268,19 @@ void setup(void) {
   server.on("/", handleHTTPRequest);
 
   // Setup MDNS responders
- MDNS.setProbeResultCallback(hostProbeResult);
+  MDNS.setProbeResultCallback(hostProbeResult);
 
   // Init the (currently empty) host domain string with 'esp8266'
   MDNS.begin("esp8266_v2");
-/*
-  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!MDNS.begin(pcHostDomain))) {
-    Serial.println(" Error setting up MDNS responder!");
-    while (1) { // STOP
-      delay(1000);
+  /*
+    if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
+        (!MDNS.begin(pcHostDomain))) {
+      Serial.println(" Error setting up MDNS responder!");
+      while (1) { // STOP
+        delay(1000);
+      }
     }
-  }
-*/
+  */
   Serial.println("MDNS responder started");
 
   // Start HTTP server

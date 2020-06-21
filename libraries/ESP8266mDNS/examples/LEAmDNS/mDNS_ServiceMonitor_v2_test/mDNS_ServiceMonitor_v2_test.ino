@@ -91,114 +91,99 @@ ESP8266WebServer                                     server(SERVICE_PORT);
 /*
     setStationHostname
 */
-bool setStationHostname(const char* p_pcHostname)
-{
+bool setStationHostname(const char* p_pcHostname) {
 
-    if (p_pcHostname)
-    {
-        WiFi.hostname(p_pcHostname);
-        Serial.printf("setStationHostname: Station hostname is set to '%s'\n", p_pcHostname);
-        return true;
-    }
-    return false;
+  if (p_pcHostname) {
+    WiFi.hostname(p_pcHostname);
+    Serial.printf("setStationHostname: Station hostname is set to '%s'\n", p_pcHostname);
+    return true;
+  }
+  return false;
 }
 
 void MDNSServiceQueryCallback(const clsLEAMDNSHost::clsQuery& p_Query,
                               const clsLEAMDNSHost::clsQuery::clsAnswer& p_Answer,
                               clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
-                              bool p_bSetContent)
-{
-    Serial.printf("CB MDNSServiceQueryCallback\n");
+                              bool p_bSetContent) {
+  Serial.printf("CB MDNSServiceQueryCallback\n");
 
-    String answerInfo;
-    clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType mask = 0;
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain)
-    {
-        answerInfo += "(ServiceDomain ";
-        answerInfo += p_Answer.m_ServiceDomain.c_str();
-        answerInfo += ")";
-        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain;
+  String answerInfo;
+  clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType mask = 0;
+  if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain) {
+    answerInfo += "(ServiceDomain ";
+    answerInfo += p_Answer.m_ServiceDomain.c_str();
+    answerInfo += ")";
+    mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain;
+  }
+  if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort) {
+    answerInfo += "(HostDomainAndPort ";
+    answerInfo += p_Answer.m_HostDomain.c_str();
+    answerInfo += ")";
+    mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort;
+  }
+  if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address) {
+    answerInfo += "(IP4Address ";
+    for (auto ip : p_Answer.m_IPv4Addresses) {
+      answerInfo += "- ";
+      answerInfo += ip->m_IPAddress.toString();
     }
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort)
-    {
-        answerInfo += "(HostDomainAndPort ";
-        answerInfo += p_Answer.m_HostDomain.c_str();
-        answerInfo += ")";
-        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort;
-    }
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address)
-    {
-        answerInfo += "(IP4Address ";
-        for (auto ip : p_Answer.m_IPv4Addresses)
-        {
-            answerInfo += "- ";
-            answerInfo += ip->m_IPAddress.toString();
-        }
-        answerInfo += ")";
-        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address;
-    }
+    answerInfo += ")";
+    mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address;
+  }
 #ifdef MDNS_IPV6_SUPPORT
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address)
-    {
-        answerInfo += "(IP6Address ";
-        for (auto ip : p_Answer.m_IPv6Addresses)
-        {
-            answerInfo += "- ";
-            answerInfo += ip->m_IPAddress.toString();
-        }
-        answerInfo += ")";
-        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address;
+  if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address) {
+    answerInfo += "(IP6Address ";
+    for (auto ip : p_Answer.m_IPv6Addresses) {
+      answerInfo += "- ";
+      answerInfo += ip->m_IPAddress.toString();
     }
+    answerInfo += ")";
+    mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address;
+  }
 #endif // MDNS_IPV6_SUPPORT
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts)
-    {
-        answerInfo += "(TXT ";
-        for (auto kv : p_Answer.m_Txts.m_Txts)
-        {
-            answerInfo += "kv: ";
-            answerInfo += kv->m_pcKey;
-            answerInfo += ": ";
-            answerInfo += kv->m_pcValue;
-        }
-        answerInfo += ")";
-        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts;
+  if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts) {
+    answerInfo += "(TXT ";
+    for (auto kv : p_Answer.m_Txts.m_Txts) {
+      answerInfo += "kv: ";
+      answerInfo += kv->m_pcKey;
+      answerInfo += ": ";
+      answerInfo += kv->m_pcValue;
     }
-    if (p_QueryAnswerTypeFlags & ~mask)
-    {
-        answerInfo += "(other flags are set)";
-    }
+    answerInfo += ")";
+    mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts;
+  }
+  if (p_QueryAnswerTypeFlags & ~mask) {
+    answerInfo += "(other flags are set)";
+  }
 
 #if 0
-    switch (p_QueryAnswerTypeFlags)
-    {
+  switch (p_QueryAnswerTypeFlags) {
     case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
-        answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
-        break;
+      answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
+      break;
 
     case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
-        answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
-        break;
+      answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
+      break;
     case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
-        answerInfo = "IP4Address ";
-        for (auto ip : p_Answer.m_IPv4Addresses)
-        {
-            answerInfo += "- " + ip->m_IPAddress.toString();
-        };
-        break;
+      answerInfo = "IP4Address ";
+      for (auto ip : p_Answer.m_IPv4Addresses) {
+        answerInfo += "- " + ip->m_IPAddress.toString();
+      };
+      break;
     case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
-        answerInfo = "TXT ";
-        for (auto kv : p_Answer.m_Txts.m_Txts)
-        {
-            answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
-        }
-        break;
+      answerInfo = "TXT ";
+      for (auto kv : p_Answer.m_Txts.m_Txts) {
+        answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
+      }
+      break;
     default :
-        answerInfo = "Unknown Answertype " + String(p_QueryAnswerTypeFlags);
+      answerInfo = "Unknown Answertype " + String(p_QueryAnswerTypeFlags);
 
-    }
+  }
 #endif
 
-    Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
+  Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
 }
 
 /*
@@ -208,9 +193,8 @@ void MDNSServiceQueryCallback(const clsLEAMDNSHost::clsQuery& p_Query,
 
 void serviceProbeResult(clsLEAMDNSHost::clsService& p_rMDNSService,
                         const char* p_pcInstanceName,
-                        bool p_bProbeResult)
-{
-    Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcInstanceName, (p_bProbeResult ? "succeeded." : "failed!"));
+                        bool p_bProbeResult) {
+  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcInstanceName, (p_bProbeResult ? "succeeded." : "failed!"));
 }
 
 /*
@@ -224,79 +208,64 @@ void serviceProbeResult(clsLEAMDNSHost::clsService& p_rMDNSService,
 
 */
 
-void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult)
-{
+void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult) {
 
-    Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
+  Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
-    if (true == p_bProbeResult)
-    {
-        // Set station hostname
-        setStationHostname(pcHostDomain);
-        Serial.printf("setting hostname = '%s'\n", pcHostDomain?: "nullptr");
+  if (true == p_bProbeResult) {
+    // Set station hostname
+    setStationHostname(pcHostDomain);
+    Serial.printf("setting hostname = '%s'\n", pcHostDomain ? : "nullptr");
 
-        if (!bHostDomainConfirmed)
-        {
-            // Hostname free -> setup clock service
-            bHostDomainConfirmed = true;
+    if (!bHostDomainConfirmed) {
+      // Hostname free -> setup clock service
+      bHostDomainConfirmed = true;
 
-            if (!hMDNSService)
-            {
-                Serial.printf("adding service tcp.sapuducu port %d\n", SERVICE_PORT);
-                // Add a 'sapuducu.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-                hMDNSService = MDNSv2.addService(0, "sapuducu", "tcp", SERVICE_PORT, serviceProbeResult);
+      if (!hMDNSService) {
+        Serial.printf("adding service tcp.sapuducu port %d\n", SERVICE_PORT);
+        // Add a 'sapuducu.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
+        hMDNSService = MDNSv2.addService(0, "sapuducu", "tcp", SERVICE_PORT, serviceProbeResult);
 
-                if (hMDNSService)
-                {
-                    Serial.printf("hMDNSService\n");
-                    hMDNSService->setProbeResultCallback(serviceProbeResult);
-                    //         MDNSv2.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
+        if (hMDNSService) {
+          Serial.printf("hMDNSService\n");
+          hMDNSService->setProbeResultCallback(serviceProbeResult);
+          //         MDNSv2.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
 
-                    // Add some '_sapuducu._tcp' protocol specific MDNS service TXT items
-                    // See: http://www.dns-sd.org/txtrecords.html#http
-                    hMDNSService->addServiceTxt("user", "x");
-                    hMDNSService->addServiceTxt("password", "y");
-                    hMDNSService->addServiceTxt("path", "/");
-                }
-                else
-                    Serial.printf("hMDNSService=0 ??\n");
-
-                // Install dynamic 'espclk.tcp' service query
-                if (!hMDNSServiceQuery)
-                {
-                    Serial.printf("installing hMDNSServiceQuery\n");
-                    hMDNSServiceQuery = MDNSv2.installServiceQuery("espclk", "tcp", MDNSServiceQueryCallback);
-                    if (hMDNSServiceQuery)
-                    {
-                        Serial.printf("MDNSProbeResultCallback: Service query for 'espclk.tcp' services installed.\n");
-                    }
-                    else
-                    {
-                        Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'espclk.tcp' services!\n");
-                    }
-                }
-            }
+          // Add some '_sapuducu._tcp' protocol specific MDNS service TXT items
+          // See: http://www.dns-sd.org/txtrecords.html#http
+          hMDNSService->addServiceTxt("user", "x");
+          hMDNSService->addServiceTxt("password", "y");
+          hMDNSService->addServiceTxt("path", "/");
+        } else {
+          Serial.printf("hMDNSService=0 ??\n");
         }
+
+        // Install dynamic 'espclk.tcp' service query
+        if (!hMDNSServiceQuery) {
+          Serial.printf("installing hMDNSServiceQuery\n");
+          hMDNSServiceQuery = MDNSv2.installServiceQuery("espclk", "tcp", MDNSServiceQueryCallback);
+          if (hMDNSServiceQuery) {
+            Serial.printf("MDNSProbeResultCallback: Service query for 'espclk.tcp' services installed.\n");
+          } else {
+            Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'espclk.tcp' services!\n");
+          }
+        }
+      }
     }
-    else
-    {
-        // Change hostname, use '-' as divider between base name and index
-        if (clsLEAMDNSHost::indexDomainName(pcHostDomain, "-", 0))
-        {
-            MDNSv2.setHostName(pcHostDomain);
-        }
-        else
-        {
-            Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
+  } else {
+    // Change hostname, use '-' as divider between base name and index
+    if (clsLEAMDNSHost::indexDomainName(pcHostDomain, "-", 0)) {
+      MDNSv2.setHostName(pcHostDomain);
+    } else {
+      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
     }
+  }
 }
 
 /*
     HTTP request function (not found is handled by server)
 */
-void handleHTTPRequest()
-{
+void handleHTTPRequest() {
   Serial.println("");
   Serial.println("HTTP Request");
 
@@ -306,7 +275,7 @@ void handleHTTPRequest()
   s += WiFi.hostname() + ".local at " + server.client().localIP().toString() + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4>";
   s += "<ol>";
- // hMDNSServiceQuery->
+  // hMDNSServiceQuery->
 
 
   if (hMDNSServiceQuery) {
@@ -354,73 +323,69 @@ void handleHTTPRequest()
 /*
     setup
 */
-void setup(void)
-{
-    Serial.begin(115200);
-    //  nd.printDump(Serial, Packet::PacketDetail::NONE, [](const Packet& p){return(p.getInOut() &&  p.isMDNS());});
-    Serial.setDebugOutput(false);
+void setup(void) {
+  Serial.begin(115200);
+  //  nd.printDump(Serial, Packet::PacketDetail::NONE, [](const Packet& p){return(p.getInOut() &&  p.isMDNS());});
+  Serial.setDebugOutput(false);
 
-    // Connect to WiFi network
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP("Soft1");
-    WiFi.begin(STASSID, STAPSK);
-    Serial.println("");
+  // Connect to WiFi network
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP("Soft1");
+  WiFi.begin(STASSID, STAPSK);
+  Serial.println("");
 
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(STASSID);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(STASSID);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 
-    // Setup HTTP server
-    server.on("/", handleHTTPRequest);
+  // Setup HTTP server
+  server.on("/", handleHTTPRequest);
 
-    // Setup MDNS responders
-    MDNSv2.setProbeResultCallback(hostProbeResult);
+  // Setup MDNS responders
+  MDNSv2.setProbeResultCallback(hostProbeResult);
 
-    // Init the (currently empty) host domain string with 'esp8266'
-    MDNSv2.begin("esp8266_v2");
-    /*
-        if ((!clsLEAMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
-          (!MDNSv2.begin(pcHostDomain))) {
-        Serial.println(" Error setting up MDNS responder!");
-        while (1) { // STOP
-          delay(1000);
-        }
-        }
-    */
-    Serial.println("MDNS responder started");
+  // Init the (currently empty) host domain string with 'esp8266'
+  MDNSv2.begin("esp8266_v2");
+  /*
+      if ((!clsLEAMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
+        (!MDNSv2.begin(pcHostDomain))) {
+      Serial.println(" Error setting up MDNS responder!");
+      while (1) { // STOP
+        delay(1000);
+      }
+      }
+  */
+  Serial.println("MDNS responder started");
 
-    // Start HTTP server
-    server.begin();
-    Serial.println("HTTP server started");
+  // Start HTTP server
+  server.begin();
+  Serial.println("HTTP server started");
 
 #if END
-    nd.printDump(Serial, Packet::PacketDetail::FULL);
+  nd.printDump(Serial, Packet::PacketDetail::FULL);
 #endif
 
 }
 
 
 
-void loop(void)
-{
-    // Check if a request has come in
-    server.handleClient();
-    // Allow MDNS processing
-    MDNSv2.update();
+void loop(void) {
+  // Check if a request has come in
+  server.handleClient();
+  // Allow MDNS processing
+  MDNSv2.update();
 
-    static esp8266::polledTimeout::periodicMs timeout(10000);
-    if (timeout.expired())
-    {
-        Serial.printf("up=%lumn heap=%u\n", millis() / 1000 / 60, ESP.getFreeHeap());
-    }
+  static esp8266::polledTimeout::periodicMs timeout(10000);
+  if (timeout.expired()) {
+    Serial.printf("up=%lumn heap=%u\n", millis() / 1000 / 60, ESP.getFreeHeap());
+  }
 }
 
 

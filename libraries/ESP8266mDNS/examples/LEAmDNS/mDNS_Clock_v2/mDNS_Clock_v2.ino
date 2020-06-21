@@ -194,15 +194,13 @@ void setup(void) {
   WiFi.persistent(false);
 
   // useless informative callback
-  if (!LwipIntf::stateUpCB([](netif* nif)
-    {
-        Serial.printf("New interface %c%c(%d) is up(%d)\n",
-            nif->name[0],
-            nif->name[1],
-            netif_get_index(nif),
-            netif_is_up(nif));
-      }))
-  {
+  if (!LwipIntf::stateUpCB([](netif * nif) {
+  Serial.printf("New interface %c%c(%d) is up(%d)\n",
+                nif->name[0],
+                nif->name[1],
+                netif_get_index(nif),
+                netif_is_up(nif));
+  })) {
     Serial.println("Error: could not add useless informative callback\n");
   }
 
@@ -231,9 +229,9 @@ void setup(void) {
   bool p_bProbeResult)->void {
   Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
     // Unattended added service
-  hMDNSService = p_rMDNSHost.addService(0, "espclk", "tcp", 80);
-  hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
-  hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
+    hMDNSService = p_rMDNSHost.addService(0, "espclk", "tcp", 80);
+    hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
+    hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
   })) {
     Serial.println("mDNS-AP started");
   } else {
@@ -267,15 +265,14 @@ void loop(void) {
   }
 
   static bool AP_started = false;
-  if (!AP_started && millis() > START_AP_AFTER_MS)
-  {
+  if (!AP_started && millis() > START_AP_AFTER_MS) {
     AP_started = true;
     Serial.printf("Starting AP...\n");
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP(APSSID, APPSK);
     Serial.printf("AP started...(%s:%s, %s)\n",
-        WiFi.softAPSSID().c_str(),
-        WiFi.softAPPSK().c_str(),
-        WiFi.softAPIP().toString().c_str());
+                  WiFi.softAPSSID().c_str(),
+                  WiFi.softAPPSK().c_str(),
+                  WiFi.softAPIP().toString().c_str());
   }
 }

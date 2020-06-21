@@ -52,11 +52,11 @@ namespace experimental
 */
 bool clsLEAMDNSHost::_sendMessage(clsLEAMDNSHost::clsSendParameter& p_rSendParameter)
 {
-	bool bResult = true;
+    bool bResult = true;
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         if (netif_is_up(pNetIf))
         {
-        	bResult = bResult && _sendMessage(pNetIf, p_rSendParameter);
+            bResult = bResult && _sendMessage(pNetIf, p_rSendParameter);
         }
 
     // Finally clear service reply masks
@@ -269,8 +269,8 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
     // Two step sequence: 'Count' and 'Send'
     for (typeSequence sequence = static_cast<typeSequence>(enuSequence::Count); ((bResult) && (sequence <= static_cast<typeSequence>(enuSequence::Send))); ++sequence)
     {
-    	/*
-        DEBUG_EX_INFO(
+        /*
+            DEBUG_EX_INFO(
             if (static_cast<typeSequence>(enuSequence::Send) == sequence)
             DEBUG_OUTPUT.printf_P(PSTR("%s _prepareMDNSMessage: ID:%u QR:%u OP:%u AA:%u TC:%u RD:%u RA:%u R:%u QD:%u AN:%u NS:%u AR:%u\n"),
                                   _DH(),
@@ -281,7 +281,7 @@ bool clsLEAMDNSHost::_prepareMessage(netif* pNetIf, clsLEAMDNSHost::clsSendParam
                                   (unsigned)msgHeader.m_u16ANCount,
                                   (unsigned)msgHeader.m_u16NSCount,
                                   (unsigned)msgHeader.m_u16ARCount);
-        );
+            );
         */
         // Count/send
         // Header

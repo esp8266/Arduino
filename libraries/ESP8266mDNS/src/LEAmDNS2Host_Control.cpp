@@ -1290,21 +1290,21 @@ bool clsLEAMDNSHost::_updateProbeStatus()
     //
     // Probe host domain
     if ((clsProbeInformation_Base::enuProbingStatus::ReadyToStart == m_ProbeInformation.m_ProbingStatus))// &&       // Ready to get started AND
-/*
-    	((
-#ifdef MDNS_IPV4_SUPPORT
-                 _getResponderIPAddress(pNetIf, enuIPProtocolType::V4).isSet()                             // AND has IPv4 address
-#else
-                 true
-#endif
-             ) || (
-#ifdef MDNS_IPV6_SUPPORT
-                 _getResponderIPAddress(pNetIf, enuIPProtocolType::V6).isSet()                             // OR has IPv6 address
-#else
-                 true
-#endif
-             )))                // Has IP address
-*/
+        /*
+            	((
+            #ifdef MDNS_IPV4_SUPPORT
+                         _getResponderIPAddress(pNetIf, enuIPProtocolType::V4).isSet()                             // AND has IPv4 address
+            #else
+                         true
+            #endif
+                     ) || (
+            #ifdef MDNS_IPV6_SUPPORT
+                         _getResponderIPAddress(pNetIf, enuIPProtocolType::V6).isSet()                             // OR has IPv6 address
+            #else
+                         true
+            #endif
+                     )))                // Has IP address
+        */
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Starting host probing...\n"), _DH()););
 
@@ -1683,7 +1683,7 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
     Serial.printf("Announce : %d\r\n", m_ProbeInformation.m_ProbingStatus);
 #if 0
     if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) ||
-    		(clsProbeInformation_Base::enuProbingStatus::DoneFinally == m_ProbeInformation.m_ProbingStatus))
+            (clsProbeInformation_Base::enuProbingStatus::DoneFinally == m_ProbeInformation.m_ProbingStatus))
 #endif
     {
         bResult = true;
@@ -1713,7 +1713,7 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
             {
 #if 0
                 if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == pService->m_ProbeInformation.m_ProbingStatus) ||
-                		(clsProbeInformation_Base::enuProbingStatus::DoneFinally == pService->m_ProbeInformation.m_ProbingStatus))
+                        (clsProbeInformation_Base::enuProbingStatus::DoneFinally == pService->m_ProbeInformation.m_ProbingStatus))
 #endif
                 {
                     pService->m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) |
