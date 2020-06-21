@@ -429,7 +429,7 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     if (_corsEnabled) {
       sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
     }
-  sendHeader(String(F("Connection")), String(F("close")));
+    sendHeader(String(F("Connection")), String(F("close")));
 
     response += _responseHeaders;
     response += "\r\n";
