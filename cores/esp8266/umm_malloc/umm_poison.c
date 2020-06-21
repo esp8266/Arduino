@@ -69,7 +69,7 @@ static bool check_poison( const void *ptr, size_t poison_size,
  * blocks.
  */
 static bool check_poison_block( umm_block *pblock ) {
-  int ok = true;
+  bool ok = true;
 
   if (pblock->header.used.next & UMM_FREELIST_MASK) {
     DBGLOG_ERROR( "check_poison_block is called for free block 0x%lx\n", (unsigned long)pblock);

@@ -15,7 +15,7 @@ UMM_TIME_STATS time_stats = {
 #ifdef UMM_INFO
     {0xFFFFFFFF, 0U, 0U, 0U},
 #endif
-#ifdef UMM_POISON_CHECK
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
     {0xFFFFFFFF, 0U, 0U, 0U},
 #endif
 #ifdef UMM_INTEGRITY_CHECK
