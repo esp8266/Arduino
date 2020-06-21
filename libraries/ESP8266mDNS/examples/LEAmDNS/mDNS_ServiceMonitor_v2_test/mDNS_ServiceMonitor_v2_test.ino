@@ -51,12 +51,12 @@ Netdump nd;
 
 
 /*
-    Include the clsMDNSHost (the library needs to be included also)
-    As LEA clsMDNSHost is experimantal in the ESP8266 environment currently, the
-    legacy clsMDNSHost is defaulted in th include file.
-    There are two ways to access LEA clsMDNSHost:
+    Include the clsLEAMDNSHost (the library needs to be included also)
+    As LEA clsLEAMDNSHost is experimantal in the ESP8266 environment currently, the
+    legacy clsLEAMDNSHost is defaulted in th include file.
+    There are two ways to access LEA clsLEAMDNSHost:
     1. Prepend every declaration and call to global declarations or functions with the namespace, like:
-      'LEAmDNS:clsMDNSHost::hMDNSService  hMDNSService;'
+      'LEAmDNS:clsLEAMDNSHost::hMDNSService  hMDNSService;'
       This way is used in the example. But be careful, if the namespace declaration is missing
       somewhere, the call might go to the legacy implementation...
     2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
@@ -72,14 +72,14 @@ Netdump nd;
     Global defines and vars
 */
 
-clsMDNSHost MDNSv2;
+clsLEAMDNSHost MDNSv2;
 
 #define SERVICE_PORT                                    80                                  // HTTP port
 
 char*                                          pcHostDomain            = 0;        // Negociated host domain
 bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-clsMDNSHost::clsService*                     hMDNSService            = 0;        // The handle of the sapuducu service in the MDNS responder
-clsMDNSHost::clsQuery*                hMDNSServiceQuery       = 0;        // The handle of the 'espclk.tcp' service query in the MDNS responder
+clsLEAMDNSHost::clsService*                     hMDNSService            = 0;        // The handle of the sapuducu service in the MDNS responder
+clsLEAMDNSHost::clsQuery*                hMDNSServiceQuery       = 0;        // The handle of the 'espclk.tcp' service query in the MDNS responder
 
 const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
 String                                         strHTTPServices         = cstrNoHTTPServices;
@@ -103,30 +103,30 @@ bool setStationHostname(const char* p_pcHostname)
     return false;
 }
 
-void MDNSServiceQueryCallback(const clsMDNSHost::clsQuery& p_Query,
-                              const clsMDNSHost::clsQuery::clsAnswer& p_Answer,
-                              clsMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
+void MDNSServiceQueryCallback(const clsLEAMDNSHost::clsQuery& p_Query,
+                              const clsLEAMDNSHost::clsQuery::clsAnswer& p_Answer,
+                              clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
                               bool p_bSetContent)
 {
     Serial.printf("CB MDNSServiceQueryCallback\n");
 
     String answerInfo;
-    clsMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType mask = 0;
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain)
+    clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType mask = 0;
+    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain)
     {
         answerInfo += "(ServiceDomain ";
         answerInfo += p_Answer.m_ServiceDomain.c_str();
         answerInfo += ")";
-        mask |= (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain;
+        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain;
     }
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort)
+    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort)
     {
         answerInfo += "(HostDomainAndPort ";
         answerInfo += p_Answer.m_HostDomain.c_str();
         answerInfo += ")";
-        mask |= (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort;
+        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort;
     }
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address)
+    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address)
     {
         answerInfo += "(IP4Address ";
         for (auto ip : p_Answer.m_IPv4Addresses)
@@ -135,10 +135,10 @@ void MDNSServiceQueryCallback(const clsMDNSHost::clsQuery& p_Query,
             answerInfo += ip->m_IPAddress.toString();
         }
         answerInfo += ")";
-        mask |= (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address;
+        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address;
     }
 #ifdef MDNS_IPV6_SUPPORT
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address)
+    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address)
     {
         answerInfo += "(IP6Address ";
         for (auto ip : p_Answer.m_IPv6Addresses)
@@ -147,10 +147,10 @@ void MDNSServiceQueryCallback(const clsMDNSHost::clsQuery& p_Query,
             answerInfo += ip->m_IPAddress.toString();
         }
         answerInfo += ")";
-        mask |= (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address;
+        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address;
     }
 #endif // MDNS_IPV6_SUPPORT
-    if (p_QueryAnswerTypeFlags & (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts)
+    if (p_QueryAnswerTypeFlags & (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts)
     {
         answerInfo += "(TXT ";
         for (auto kv : p_Answer.m_Txts.m_Txts)
@@ -161,7 +161,7 @@ void MDNSServiceQueryCallback(const clsMDNSHost::clsQuery& p_Query,
             answerInfo += kv->m_pcValue;
         }
         answerInfo += ")";
-        mask |= (uint8_t)clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts;
+        mask |= (uint8_t)clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts;
     }
     if (p_QueryAnswerTypeFlags & ~mask)
     {
@@ -171,21 +171,21 @@ void MDNSServiceQueryCallback(const clsMDNSHost::clsQuery& p_Query,
 #if 0
     switch (p_QueryAnswerTypeFlags)
     {
-    case static_cast<clsMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
         answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
         break;
 
-    case static_cast<clsMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
         answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
         break;
-    case static_cast<clsMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
         answerInfo = "IP4Address ";
         for (auto ip : p_Answer.m_IPv4Addresses)
         {
             answerInfo += "- " + ip->m_IPAddress.toString();
         };
         break;
-    case static_cast<clsMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
         answerInfo = "TXT ";
         for (auto kv : p_Answer.m_Txts.m_Txts)
         {
@@ -206,7 +206,7 @@ void MDNSServiceQueryCallback(const clsMDNSHost::clsQuery& p_Query,
     Probe result callback for Services
 */
 
-void serviceProbeResult(clsMDNSHost::clsService& p_rMDNSService,
+void serviceProbeResult(clsLEAMDNSHost::clsService& p_rMDNSService,
                         const char* p_pcInstanceName,
                         bool p_bProbeResult)
 {
@@ -220,11 +220,11 @@ void serviceProbeResult(clsMDNSHost::clsService& p_rMDNSService,
     If the domain is free, the host domain is set and the http service is
     added.
     If the domain is already used, a new name is created and the probing is
-    restarted via p_pclsMDNSHost->setHostname().
+    restarted via p_pclsLEAMDNSHost->setHostname().
 
 */
 
-void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult)
+void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult)
 {
 
     Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
@@ -281,7 +281,7 @@ void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bP
     else
     {
         // Change hostname, use '-' as divider between base name and index
-        if (clsMDNSHost::indexDomainName(pcHostDomain, "-", 0))
+        if (clsLEAMDNSHost::indexDomainName(pcHostDomain, "-", 0))
         {
             MDNSv2.setHostName(pcHostDomain);
         }
@@ -387,7 +387,7 @@ void setup(void)
     // Init the (currently empty) host domain string with 'esp8266'
     MDNSv2.begin("esp8266_v2");
     /*
-        if ((!clsMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
+        if ((!clsLEAMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
           (!MDNSv2.begin(pcHostDomain))) {
         Serial.println(" Error setting up MDNS responder!");
         while (1) { // STOP

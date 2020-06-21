@@ -1,7 +1,7 @@
 /*
   ESP8266 mDNS responder clock
 
-  This example demonstrates two features of the LEA clsMDNSHost:
+  This example demonstrates two features of the LEA clsLEAMDNSHost:
   1. The host and service domain negotiation process that ensures
      the uniqueness of the finally choosen host and service domain name.
   2. The dynamic MDNS service TXT feature
@@ -41,12 +41,12 @@
 // uses API MDNSApiVersion::LEAv2
 
 /*
-   Include the clsMDNSHost (the library needs to be included also)
-   As LEA clsMDNSHost is experimantal in the ESP8266 environment currently, the
-   legacy clsMDNSHost is defaulted in th include file.
-   There are two ways to access LEA clsMDNSHost:
+   Include the clsLEAMDNSHost (the library needs to be included also)
+   As LEA clsLEAMDNSHost is experimantal in the ESP8266 environment currently, the
+   legacy clsLEAMDNSHost is defaulted in th include file.
+   There are two ways to access LEA clsLEAMDNSHost:
    1. Prepend every declaration and call to global declarations or functions with the namespace, like:
-      'LEAmDNS::clsMDNSHost::hMDNSService  hMDNSService;'
+      'LEAmDNS::clsLEAMDNSHost::hMDNSService  hMDNSService;'
       This way is used in the example. But be careful, if the namespace declaration is missing
       somewhere, the call might go to the legacy implementation...
    2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
@@ -81,9 +81,9 @@
 const char*                   ssid                    = STASSID;
 const char*                   password                = STAPSK;
 
-clsMDNSHost                   responder;                          // MDNS responder
+clsLEAMDNSHost                responder;                          // MDNS responder
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-clsMDNSHost::clsService*      hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
+clsLEAMDNSHost::clsService*   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
 ESP8266WebServer              server(SERVICE_PORT);
@@ -147,7 +147,7 @@ bool setStationHostname(const char* p_pcHostname) {
    This can be triggered by calling responder.announce().
 
 */
-void MDNSDynamicServiceTxtCallback(const clsMDNSHost::hMDNSService& p_hService) {
+void MDNSDynamicServiceTxtCallback(const clsLEAMDNSHost::hMDNSService& p_hService) {
   Serial.println("MDNSDynamicServiceTxtCallback");
 
   if (hMDNSService == &p_hService) {
@@ -226,7 +226,7 @@ void setup(void) {
 
   // Setup MDNS responder
   // Init the (currently empty) host domain string with 'esp8266'
-  if (responder.begin("leamdnsv2", [](clsMDNSHost & p_rMDNSHost,
+  if (responder.begin("leamdnsv2", [](clsLEAMDNSHost & p_rMDNSHost,
                                       const char* p_pcDomainName,
   bool p_bProbeResult)->void {
   Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));

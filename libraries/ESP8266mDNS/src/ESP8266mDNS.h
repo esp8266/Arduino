@@ -59,12 +59,12 @@ using MDNSResponder = experimental::MDNSImplementation::clsLEAMDNSHost_Legacy;
 
 #elif defined(MDNS2_EXPERIMENTAL)
 #include "LEAmDNS2Host.h"
-using clsMDNSHost = esp8266::experimental::clsLEAMDNSHost;
-using MDNSResponder = clsMDNSHost;
+using esp8266::experimental::clsLEAMDNSHost;
+using MDNSResponder = clsLEAMDNSHost;
 
 #else // default
 #include "LEAmDNS.h"
-using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;
+using esp8266::MDNSImplementation::MDNSResponder;
 
 #endif // version selection
 

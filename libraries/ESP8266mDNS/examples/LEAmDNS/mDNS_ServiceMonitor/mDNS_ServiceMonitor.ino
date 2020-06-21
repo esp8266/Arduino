@@ -46,7 +46,6 @@
    2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
 
 */
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
 
 /*

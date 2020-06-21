@@ -29,6 +29,15 @@
 
 */
 
+#ifndef STASSID
+#define STASSID "ssid"
+#define STAPSK "psk"
+#endif
+
+#ifndef APSSID
+#define APSSID "esp8266"
+//#define APPSK "psk"
+#endif
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -48,25 +57,23 @@
 */
 #define MDNS2_EXPERIMENTAL
 #include <ESP8266mDNS.h>
-#include "LocalDefines.h"
-#include "Netdump.h"
-using namespace NetCapture;
+
 /*
    Global defines and vars
 */
 
-#define SERVICE_PORT                                    80                                  // HTTP port
+#define SERVICE_PORT                           80                                  // HTTP port
 
 char*                                          pcHostDomain            = 0;        // Negociated host domain
 bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::clsService*                     hMDNSService            = 0;        // The handle of the http service in the MDNS responder
-MDNSResponder::clsQuery*                hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
+MDNSResponder::clsQuery*                       hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
 
 const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
 String                                         strHTTPServices         = cstrNoHTTPServices;
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
-ESP8266WebServer                                     server(SERVICE_PORT);
+ESP8266WebServer                               server(SERVICE_PORT);
 
 
 /*
@@ -88,6 +95,8 @@ void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
 							  MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
 							  bool p_bSetContent)
 {
+    (void)p_Query;
+
 	String answerInfo;
 	  switch (p_QueryAnswerTypeFlags) {
 	    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
@@ -124,6 +133,7 @@ void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
 void serviceProbeResult(MDNSResponder::clsService& p_rMDNSService,
 						const char* p_pcInstanceName,
                         bool p_bProbeResult) {
+  (void)p_rMDNSService;
   Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcInstanceName, (p_bProbeResult ? "succeeded." : "failed!"));
 }
 
@@ -138,7 +148,7 @@ void serviceProbeResult(MDNSResponder::clsService& p_rMDNSService,
 
 */
 
-void hostProbeResult(clsMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult) {
+void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult) {
 
   Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
@@ -232,21 +242,17 @@ void handleHTTPRequest() {
   Serial.println("Done with request");
 }
 
-//Netdump nd(Netdump::interface::LWIP);
-
-
 /*
    setup
 */
 void setup(void) {
   Serial.begin(115200);
-//  nd.printDump(Serial, Packet::PacketDetail::NONE, [](const Packet& p){return(p.getInOut() &&  p.isMDNS());});
   Serial.setDebugOutput(false);
 
   // Connect to WiFi network
   WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP("Soft1");
-  WiFi.begin(ssid, password);
+  WiFi.softAP(APSSID);
+  WiFi.begin(STASSID, STAPSK);
   Serial.println("");
 
   // Wait for connection
@@ -256,7 +262,7 @@ void setup(void) {
   }
   Serial.println("");
   Serial.print("Connected to ");
-  Serial.println(ssid);
+  Serial.println(STASSID);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
@@ -290,6 +296,3 @@ void loop(void) {
   // Allow MDNS processing
   MDNS.update();
 }
-
-
-
