@@ -799,45 +799,24 @@ clsLEAMDNSHost_Legacy::hMDNSServiceQuery clsLEAMDNSHost_Legacy::installServiceQu
 
     for (stcHostInformation& hostInformation : m_HostInformations)
     {
-        std::list<clsLEAMDNSHost::clsQuery*> queries;
-
-        (void)p_pcService;
-        (void)p_pcProtocol;
-        (void)p_fnCallback;
-        /*clsLEAMDNSHost::clsQuery*	pQuery =*/
-//        hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
-//                const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
-//                clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
-//                bool p_bSetContent)->void
-//        {
-//            if (p_fnCallback)	// void(const stcMDNSServiceInfo& p_MDNSServiceInfo, MDNSResponder::AnswerType p_AnswerType, bool p_bSetContent)
-//            {
-//                p_fnCallback(stcMDNSServiceInfo(p_AnswerAccessor), _answerFlagsToAnswerType(p_QueryAnswerTypeFlags), p_bSetContent);
-//            }
-//        }, &queries);
-
-///XXX Aways false
-        if (queries.size())
+        clsLEAMDNSHost::clsQuery*	pQuery = hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
+                                             const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
+                                             clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,   // flags for the updated answer item
+                                             bool p_bSetContent)->void
+        {
+            if (p_fnCallback)	// void(const stcMDNSServiceInfo& p_MDNSServiceInfo, MDNSResponder::AnswerType p_AnswerType, bool p_bSetContent)
+            {
+                p_fnCallback(stcMDNSServiceInfo(p_AnswerAccessor), _answerFlagsToAnswerType(p_QueryAnswerTypeFlags), p_bSetContent);
+            }
+        });
+        if (pQuery)
         {
             if (!hResult)
             {
-                // - hMDNSServiceQuery handle is 'const void*'
-                //   used to retrieve pQuery when updating or removing.
-
-                // - unexplained - before multi interface change:
-                //   there is a loop, only the first is returned, why ?
-
                 // Store first query as result and key
-                //hResult = (hMDNSServiceQuery)pQuery; <- before netif, only the first query is returned
-
-                // - netif transformation: even more returned values (a list per loop),
-                //   still, only the first handle is returned.
-                hResult = (hMDNSServiceQuery) * queries.begin(); // take the first
+                hResult = (hMDNSServiceQuery)pQuery;
             }
-            // this was overwritten ?
-            //hostInformation.m_HandleToPtr[hResult] = pQuery;
-            // ... overwritten with only the first query
-            hostInformation.m_HandleToPtr[hResult] = *queries.begin();
+            hostInformation.m_HandleToPtr[hResult] = pQuery;
         }
     }
     return hResult;
