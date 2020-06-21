@@ -1,7 +1,9 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 #include <ESP8266WebServer.h>
+
+//#define MDNS2_EXPERIMENTAL_V1COMPAT
+#include <ESP8266mDNS.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"

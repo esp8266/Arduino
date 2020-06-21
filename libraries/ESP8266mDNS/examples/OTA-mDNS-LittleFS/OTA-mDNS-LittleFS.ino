@@ -24,11 +24,13 @@
 
 // includes
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <FS.h>
 #include <LittleFS.h>
 #include <ArduinoOTA.h>
+
+//#define MDNS2_EXPERIMENTAL_V1COMPAT
+#include <ESP8266mDNS.h>
 
 
 /**

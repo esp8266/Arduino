@@ -37,8 +37,10 @@ extern "C" {
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
 #include <Ticker.h>
+
+//#define MDNS2_EXPERIMENTAL_V1COMPAT
+#include <ESP8266mDNS.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"

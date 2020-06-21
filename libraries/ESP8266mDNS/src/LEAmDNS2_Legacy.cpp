@@ -801,6 +801,9 @@ clsLEAMDNSHost_Legacy::hMDNSServiceQuery clsLEAMDNSHost_Legacy::installServiceQu
     {
         std::list<clsLEAMDNSHost::clsQuery*> queries;
 
+        (void)p_pcService;
+        (void)p_pcProtocol;
+        (void)p_fnCallback;
         /*clsLEAMDNSHost::clsQuery*	pQuery =*/
 //        hostInformation.m_pHost->installServiceQuery(p_pcService, p_pcProtocol, [this, p_fnCallback](const clsLEAMDNSHost::clsQuery& /*p_Query*/,
 //                const clsLEAMDNSHost::clsQuery::clsAnswerAccessor & p_AnswerAccessor,
@@ -813,6 +816,7 @@ clsLEAMDNSHost_Legacy::hMDNSServiceQuery clsLEAMDNSHost_Legacy::installServiceQu
 //            }
 //        }, &queries);
 
+///XXX Aways false
         if (queries.size())
         {
             if (!hResult)

@@ -43,7 +43,7 @@
 #ifndef ESP8266MDNS_LEGACY_H
 #define ESP8266MDNS_LEGACY_H
 
-#include "ESP8266WiFi.h"
+#include "LEAmDNS2Host.h"
 #include "WiFiUdp.h"
 
 //this should be defined at build time
@@ -65,8 +65,6 @@ struct MDNSAnswer;
 class MDNSResponder
 {
 public:
-
-    static constexpr auto ApiVersion = MDNSApiVersion::Legacy;
 
     MDNSResponder();
     ~MDNSResponder();

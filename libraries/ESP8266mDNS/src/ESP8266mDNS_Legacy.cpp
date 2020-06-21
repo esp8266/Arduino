@@ -38,7 +38,7 @@
 #define LWIP_OPEN_SRC
 #endif
 
-#include "ESP8266mDNS.h"
+#include <ESP8266mDNS_Legacy.h>
 #include <functional>
 
 #include "debug.h"

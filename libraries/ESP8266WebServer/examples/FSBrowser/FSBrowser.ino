@@ -40,8 +40,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
 #include <SPI.h>
+
+//#define MDNS2_EXPERIMENTAL_V1COMPAT
+#include <ESP8266mDNS.h>
 
 #ifdef INCLUDE_FALLBACK_INDEX_HTM
 #include "extras/index_htm.h"

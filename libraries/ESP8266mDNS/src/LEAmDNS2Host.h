@@ -274,8 +274,6 @@ protected:
 
 public:
 
-    static constexpr auto ApiVersion = MDNSApiVersion::LEAv2;
-
     /**
         clsServiceTxt
     */

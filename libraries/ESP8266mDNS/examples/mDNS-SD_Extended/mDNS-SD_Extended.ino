@@ -10,6 +10,8 @@
 */
 
 #include <ESP8266WiFi.h>
+
+//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
 
 #ifndef STASSID

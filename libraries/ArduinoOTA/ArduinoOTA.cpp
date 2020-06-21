@@ -21,6 +21,7 @@ extern "C" {
 #include "include/UdpContext.h"
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
+//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
 #endif
 

@@ -42,22 +42,31 @@
 
 */
 
-enum class MDNSApiVersion { Legacy, LEA, LEAv2Compat, LEAv2 };
+// mDNS on esp8266 Arduino, 4 available versions, select one with a define
+// to add before `#include <ESP8266mDNS>` prior `#include <ESP8266mDNS.h>`:
+//
+// - original (default until core-2.4.2):    add `#define MDNS_ORIGINAL`
+// - default LEAmDNS (v1, from core-2.5.0 to core 2.7.2)  (nothing to add)
+// - LEAmDNSv2 with V1 API compatibility:    add `#define MDNS2_EXPERIMENTAL_V1COMPAT`
+// - LEAmDNSv2, new API:                     add `#define MDNS2_EXPERIMENTAL`
 
-#include "ESP8266mDNS_Legacy.h" // Legacy
-#include "LEAmDNS.h"            // LEA
-#include "LEAmDNS2_Legacy.h"    // LEAv2Compat - replacement for LEA using v2
-#include "LEAmDNS2Host.h"       // LEAv2       - API updated
+#if defined(MDNS_ORIGINAL)
+#include "ESP8266mDNS_Legacy.h"
 
-// clsMDNSHost replaces MDNSResponder in LEAv2
-using clsMDNSHost = esp8266::experimental::clsLEAMDNSHost;
+#elif defined(MDNS2_EXPERIMENTAL_V1COMPAT)
+#include "LEAmDNS2_Legacy.h"
+using MDNSResponder = experimental::MDNSImplementation::clsLEAMDNSHost_Legacy;
+
+#elif defined(MDNS2_EXPERIMENTAL)
+#include "LEAmDNS2Host.h"
+using MDNSResponder = esp8266::experimental::clsLEAMDNSHost;
+
+#else // default
+#include "LEAmDNS.h"
+using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;
+
+#endif // version selection
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-// Maps the implementation to use to the global namespace type
-//using MDNSResponder = Legacy_MDNSResponder::MDNSResponder;                // Legacy
-//using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;           // LEA
-//using MDNSResponder = experimental::MDNSImplementation::clsLEAMDNSHost_Legacy; // LEAv2Compat
-using MDNSResponder = clsMDNSHost;                                        // LEAv2
-
 extern MDNSResponder MDNS;
-#endif
+#endif // global instance
