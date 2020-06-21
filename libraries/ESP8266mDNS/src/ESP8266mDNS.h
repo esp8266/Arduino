@@ -43,12 +43,12 @@
 */
 
 // mDNS on esp8266 Arduino, 4 available versions, select one with a define
-// to add before `#include <ESP8266mDNS>` prior `#include <ESP8266mDNS.h>`:
+// to add before `#include <ESP8266mDNS>`:
 //
-// - original (default until core-2.4.2):    add `#define MDNS_ORIGINAL`
-// - default LEAmDNS (v1, from core-2.5.0 to core 2.7.2)  (nothing to add)
-// - LEAmDNSv2 with V1 API compatibility:    add `#define MDNS2_EXPERIMENTAL_V1COMPAT`
-// - LEAmDNSv2, new API:                     add `#define MDNS2_EXPERIMENTAL`
+// - original (default until core-2.4.2):         add `#define MDNS_ORIGINAL`
+// - LEAmDNS (v1, from core-2.5.0 to core 2.7.2): default
+// - LEAmDNSv2, with V1 API compatibility:        add `#define MDNS2_EXPERIMENTAL_V1COMPAT`
+// - LEAmDNSv2, new API:                          add `#define MDNS2_EXPERIMENTAL`
 
 #if defined(MDNS_ORIGINAL)
 #include "ESP8266mDNS_Legacy.h"
