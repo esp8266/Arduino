@@ -1682,12 +1682,12 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
 
     clsSendParameter    sendParameter;
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s ::announce() status=%d (waiting4data:%d ready2start:%d inprogress:%d ready2announce:%d done:%d\r\n"),
-        _DH(), m_ProbeInformation.m_ProbingStatus,
-        clsProbeInformation_Base::enuProbingStatus::WaitingForData,
-        clsProbeInformation_Base::enuProbingStatus::ReadyToStart,
-        clsProbeInformation_Base::enuProbingStatus::InProgress,
-        clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce,
-        clsProbeInformation_Base::enuProbingStatus::DoneFinally););
+                                        _DH(), m_ProbeInformation.m_ProbingStatus,
+                                        clsProbeInformation_Base::enuProbingStatus::WaitingForData,
+                                        clsProbeInformation_Base::enuProbingStatus::ReadyToStart,
+                                        clsProbeInformation_Base::enuProbingStatus::InProgress,
+                                        clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce,
+                                        clsProbeInformation_Base::enuProbingStatus::DoneFinally););
 
     if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) ||
             (clsProbeInformation_Base::enuProbingStatus::DoneFinally == m_ProbeInformation.m_ProbingStatus))

@@ -149,6 +149,7 @@ void serviceProbeResult(MDNSResponder::clsService& p_rMDNSService,
 
 void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult) {
 
+  (void)p_rMDNSHost;
   Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
   if (true == p_bProbeResult) {
@@ -187,11 +188,7 @@ void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p
     }
   } else {
     // Change hostname, use '-' as divider between base name and index
-    if (MDNSResponder::indexDomainName(pcHostDomain, "-", 0)) {
-      MDNS.setHostName(pcHostDomain);
-    } else {
-      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-    }
+    MDNS.setHostName(MDNSResponder::indexDomainName(p_pcDomainName.c_str(), "-", 0));
   }
 }
 

@@ -65,7 +65,7 @@
 #define DST_OFFSET          1                                   // CEST
 #define UPDATE_CYCLE        (1 * 1000)                          // every second
 
-#define START_AP_AFTER_MS   10000 //60000                               // start AP after delay
+#define START_AP_AFTER_MS   10000                               // start AP after delay
 #define SERVICE_PORT        80                                  // HTTP port
 
 #ifndef STASSID
@@ -81,7 +81,7 @@
 const char*                   ssid                    = STASSID;
 const char*                   password                = STAPSK;
 
-clsLEAMDNSHost                responder;                          // MDNS responder
+clsLEAMDNSHost                MDNS;                               // MDNS responder
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 clsLEAMDNSHost::clsService*   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
@@ -144,7 +144,7 @@ bool setStationHostname(const char* p_pcHostname) {
    Add a dynamic MDNS TXT item 'ct' to the clock service.
    The callback function is called every time, the TXT items for the clock service
    are needed.
-   This can be triggered by calling responder.announce().
+   This can be triggered by calling MDNS.announce().
 
 */
 void MDNSDynamicServiceTxtCallback(const clsLEAMDNSHost::hMDNSService& p_hService) {
@@ -223,14 +223,18 @@ void setup(void) {
 
   // Setup MDNS responder
   // Init the (currently empty) host domain string with 'esp8266'
-  if (responder.begin("leamdnsv2", [](clsLEAMDNSHost & p_rMDNSHost,
-                                      const char* p_pcDomainName,
-  bool p_bProbeResult)->void {
-  Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
-    // Unattended added service
-    hMDNSService = p_rMDNSHost.addService(0, "espclk", "tcp", 80);
-    hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
-    hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
+  if (MDNS.begin("leamdnsv2",
+  [](clsLEAMDNSHost & p_rMDNSHost, const char* p_pcDomainName, bool p_bProbeResult)->void {
+  if (p_bProbeResult) {
+      Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
+      // Unattended added service
+      hMDNSService = p_rMDNSHost.addService(0, "espclk", "tcp", 80);
+      hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
+      hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
+    } else {
+      // Change hostname, use '-' as divider between base name and index
+      MDNS.setHostName(MDNSResponder::indexDomainName(p_pcDomainName, "-", 0));
+    }
   })) {
     Serial.println("mDNS-AP started");
   } else {
@@ -251,7 +255,7 @@ void loop(void) {
   // Check if a request has come in
   server.handleClient();
   // Allow MDNS processing
-  responder.update();
+  MDNS.update();
 
   static esp8266::polledTimeout::periodicMs timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
@@ -260,7 +264,7 @@ void loop(void) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       Serial.printf("Announce trigger from user\n");
-      responder.announce();
+      MDNS.announce();
     }
   }
 
