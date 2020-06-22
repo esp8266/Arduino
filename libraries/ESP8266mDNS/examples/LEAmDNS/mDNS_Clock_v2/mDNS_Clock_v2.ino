@@ -195,11 +195,10 @@ void setup(void) {
 
   // useless informative callback
   if (!LwipIntf::stateUpCB([](netif * nif) {
-  Serial.printf("New interface %c%c(%d) is up(%d)\n",
+  Serial.printf("New interface %c%c/%d is up\n",
                 nif->name[0],
                 nif->name[1],
-                netif_get_index(nif),
-                netif_is_up(nif));
+                netif_get_index(nif));
   })) {
     Serial.println("Error: could not add useless informative callback\n");
   }
@@ -260,6 +259,7 @@ void loop(void) {
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
+      Serial.printf("Announce trigger from user\n");
       responder.announce();
     }
   }

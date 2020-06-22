@@ -1343,6 +1343,7 @@ bool clsLEAMDNSHost::_updateProbeStatus()
     else if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) &&
              (m_ProbeInformation.m_Timeout.expired()))
     {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: ReadyToAnnounce => Announce (without services), now\n"), _DH()););
         if ((bResult = _announce(true, false)))
         {
             // Don't announce services here
@@ -1680,11 +1681,16 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
     bool    bResult = false;
 
     clsSendParameter    sendParameter;
-    Serial.printf("Announce : %d\r\n", m_ProbeInformation.m_ProbingStatus);
-#if 0
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s ::announce() status=%d (waiting4data:%d ready2start:%d inprogress:%d ready2announce:%d done:%d\r\n"),
+        _DH(), m_ProbeInformation.m_ProbingStatus,
+        clsProbeInformation_Base::enuProbingStatus::WaitingForData,
+        clsProbeInformation_Base::enuProbingStatus::ReadyToStart,
+        clsProbeInformation_Base::enuProbingStatus::InProgress,
+        clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce,
+        clsProbeInformation_Base::enuProbingStatus::DoneFinally););
+
     if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == m_ProbeInformation.m_ProbingStatus) ||
             (clsProbeInformation_Base::enuProbingStatus::DoneFinally == m_ProbeInformation.m_ProbingStatus))
-#endif
     {
         bResult = true;
 
@@ -1711,10 +1717,8 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
             // Announce services (service type, name, SRV (location) and TXTs)
             for (clsService* pService : m_Services)
             {
-#if 0
                 if ((clsProbeInformation_Base::enuProbingStatus::ReadyToAnnounce == pService->m_ProbeInformation.m_ProbingStatus) ||
                         (clsProbeInformation_Base::enuProbingStatus::DoneFinally == pService->m_ProbeInformation.m_ProbingStatus))
-#endif
                 {
                     pService->m_u32ReplyMask = (static_cast<uint32_t>(enuContentFlag::PTR_TYPE) |
                                                 static_cast<uint32_t>(enuContentFlag::PTR_NAME) |
@@ -1725,7 +1729,7 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
             }
         }
     }
-    DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announce: FAILED!\n"), _DH()););
+    DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _announce: FAILED!\n\n"), _DH()););
     return ((bResult) &&
             (_sendMessage(sendParameter)));
 }

@@ -796,6 +796,7 @@ bool clsLEAMDNSHost::update(void)
 bool clsLEAMDNSHost::announce(bool p_bAnnounce /*= true*/,
                               bool p_bIncludeServices /*= true*/)
 {
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s ::announce() externally called\n"), _DH()););
     return _announce(p_bAnnounce, p_bIncludeServices);
 }
 
