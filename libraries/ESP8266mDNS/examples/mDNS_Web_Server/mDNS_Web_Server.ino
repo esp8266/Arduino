@@ -17,10 +17,8 @@
 
 
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
-
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
+#include <WiFiClient.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"

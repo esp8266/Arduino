@@ -44,8 +44,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServerSecure.h>
-
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
 
 #ifndef STASSID

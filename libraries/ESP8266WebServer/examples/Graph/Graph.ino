@@ -33,10 +33,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <SPI.h>
-
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
+#include <SPI.h>
 
 #if defined USE_SPIFFS
 #include <FS.h>

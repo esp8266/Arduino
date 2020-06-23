@@ -28,8 +28,6 @@
 #include <FS.h>
 #include <LittleFS.h>
 #include <ArduinoOTA.h>
-
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
 
 

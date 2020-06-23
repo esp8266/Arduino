@@ -49,14 +49,12 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServerSecure.h>
+#include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <WiFiServerSecure.h>
 #include <WiFiServerSecureAxTLS.h>
 #include <WiFiClientSecure.h>
 #include <WiFiClientSecureAxTLS.h>
-
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
-#include <ESP8266mDNS.h>
 
 #pragma GCC diagnostic pop
 

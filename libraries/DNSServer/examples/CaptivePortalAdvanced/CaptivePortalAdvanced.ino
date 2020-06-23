@@ -2,10 +2,8 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <EEPROM.h>
-
-//#define MDNS2_EXPERIMENTAL_V1COMPAT
 #include <ESP8266mDNS.h>
+#include <EEPROM.h>
 
 /*
    This example serves a "hello world" on a WLAN and a SoftAP at the same time.
