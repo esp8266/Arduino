@@ -48,7 +48,6 @@
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
 
 /// HTTP client errors
-#define HTTPC_ERROR_CONNECTION_REFUSED  (-1) // backward compatibility
 #define HTTPC_ERROR_CONNECTION_FAILED   (-1)
 #define HTTPC_ERROR_SEND_HEADER_FAILED  (-2)
 #define HTTPC_ERROR_SEND_PAYLOAD_FAILED (-3)
@@ -60,6 +59,8 @@
 #define HTTPC_ERROR_ENCODING            (-9)
 #define HTTPC_ERROR_STREAM_WRITE        (-10)
 #define HTTPC_ERROR_READ_TIMEOUT        (-11)
+
+constexpr int HTTPC_ERROR_CONNECTION_REFUSED __attribute__((deprecated)) = HTTPC_ERROR_CONNECTION_FAILED;
 
 /// size for the stream handling
 #define HTTP_TCP_BUFFER_SIZE (1460)
