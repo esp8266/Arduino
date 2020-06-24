@@ -145,3 +145,8 @@ void WiFiServer::close ()
 		::close(pcb2int(_listen_pcb));
 	_listen_pcb = int2pcb(-1);
 }
+
+void WiFiServer::stop ()
+{
+    close();
+}
