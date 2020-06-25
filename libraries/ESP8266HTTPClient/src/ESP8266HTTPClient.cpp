@@ -692,7 +692,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
 
         // connect to server
         if(!connect()) {
-            return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
+            return returnError(HTTPC_ERROR_CONNECTION_FAILED);
         }
 
         addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
@@ -791,7 +791,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
     // connect to server
     if(!connect()) {
-        return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
+        return returnError(HTTPC_ERROR_CONNECTION_FAILED);
     }
 
     if(size > 0) {
@@ -982,8 +982,8 @@ const String& HTTPClient::getString(void)
 String HTTPClient::errorToString(int error)
 {
     switch(error) {
-    case HTTPC_ERROR_CONNECTION_REFUSED:
-        return F("connection refused");
+    case HTTPC_ERROR_CONNECTION_FAILED:
+        return F("connection failed");
     case HTTPC_ERROR_SEND_HEADER_FAILED:
         return F("send header failed");
     case HTTPC_ERROR_SEND_PAYLOAD_FAILED:

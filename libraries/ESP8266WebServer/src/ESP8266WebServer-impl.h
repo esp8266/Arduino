@@ -20,7 +20,6 @@
   Modified 8 May 2015 by Hristo Gochkov (proper post and file upload handling)
 */
 
-
 #include <Arduino.h>
 #include <libb64/cencode.h>
 #include "WiFiServer.h"
@@ -62,6 +61,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 , _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
+, _corsEnabled(false)
 {
 }
 
@@ -83,6 +83,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 , _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
+, _corsEnabled(false)
 {
 }
 
@@ -99,6 +100,10 @@ ESP8266WebServerTemplate<ServerType>::~ESP8266WebServerTemplate() {
   }
 }
 
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::enableCORS(bool enable) {
+  _corsEnabled = enable;
+}
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::begin() {
   close();
@@ -421,6 +426,9 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
       _chunked = true;
       sendHeader(String(F("Accept-Ranges")),String(F("none")));
       sendHeader(String(F("Transfer-Encoding")),String(F("chunked")));
+    }
+    if (_corsEnabled) {
+      sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
     }
     sendHeader(String(F("Connection")), String(F("close")));
 
