@@ -168,6 +168,13 @@ public:
     sendContent(emptyString);
   }
 
+  // Whether other requests should be accepted from the client on the
+  // same socket after a response is sent.
+  // This will automatically configure the "Connection" header.
+  // Defaults to false.
+  void keepAlive(bool keepAlive) { _keepAlive = keepAlive; }
+  bool keepAlive() { return _keepAlive; }
+
   static String credentialHash(const String& username, const String& realm, const String& password);
 
   static String urlDecode(const String& text);
@@ -224,6 +231,7 @@ protected:
   uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
+  bool _keepAlive;
 
   RequestHandlerType*  _currentHandler;
   RequestHandlerType*  _firstHandler;
