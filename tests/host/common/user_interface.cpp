@@ -44,6 +44,9 @@
 extern "C"
 {
 
+#include <user_interface.h>
+#include <lwip/netif.h>
+
     uint8 wifi_get_opmode(void)
     {
         return STATION_MODE;
@@ -133,10 +136,10 @@ extern "C"
             perror("getifaddrs");
             exit(EXIT_FAILURE);
         }
+
         if (host_interface)
             mockverbose("host: looking for interface '%s':\n", host_interface);
-        else
-            mockverbose("host: looking the first for non-local IPv4 interface:\n");
+
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
@@ -157,13 +160,15 @@ extern "C"
                         ipv4 = *(uint32_t*) & ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
                         mask = *(uint32_t*) & ((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
                         mockverbose(" (selected)\n");
-                        global_source_address = ntohl(ipv4);
+                        if (host_interface)
+                            global_source_address = ntohl(ipv4);
                         break;
                     }
                 }
             }
             mockverbose("\n");
         }
+
         if (ifAddrStruct != NULL)
             freeifaddrs(ifAddrStruct);
 
