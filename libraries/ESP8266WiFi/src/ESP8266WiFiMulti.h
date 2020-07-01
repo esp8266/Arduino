@@ -55,7 +55,7 @@ class ESP8266WiFiMulti {
         bool addAP(const char* ssid, const char *passphrase = NULL);
         bool existsAP(const char* ssid, const char *passphrase = NULL);
 
-        wl_status_t run(uint32_t connectTimeout=5000);
+        wl_status_t run(uint32_t connectTimeoutMs=5000);
 
         void cleanAPlist(void);
 
