@@ -201,6 +201,7 @@ int main (int argc, char* const argv [])
 	blocking_uart = false; // global
 
 	signal(SIGINT, control_c);
+	signal(SIGTERM, control_c);
 	if (geteuid() == 0)
 		mock_port_shifter = 0;
 	else
