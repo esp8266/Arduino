@@ -90,8 +90,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	else
 		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
-    if (!mcast)
-        mcast = inet_addr("224.0.0.1"); // all hosts group
+	if (!mcast)
+		mcast = inet_addr("224.0.0.1"); // all hosts group
 	if (mcast)
 	{
 		// https://web.cs.wpi.edu/~claypool/courses/4514-B99/samples/multicast.c
@@ -121,7 +121,7 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 			return false;
 		}
 		else
-			mockverbose("joined multicast group addr %08lx\n", ntohl(mcast));
+			mockverbose("joined multicast group addr %08lx\n", (long)ntohl(mcast));
 	}
 
 	return true;

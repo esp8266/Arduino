@@ -862,9 +862,21 @@ void *umm_realloc( void *ptr, size_t size ) {
 
   DBGLOG_DEBUG( "realloc blocks %d blockSize %d nextBlockSize %d prevBlockSize %d\n", blocks, blockSize, nextBlockSize, prevBlockSize );
 
-//C This has changed need to review and see if UMM_REALLOC_MINIMIZE_COPY really
-//C is that any more. or is it equivalent or close enough to my defrag
-//C - mjh
+//C With each upstream update this section should be reevaluated.
+/*C
+ *
+ * The `#if defined(UMM_REALLOC_MINIMIZE_COPY)` section tracks the content of
+ * the upstream with some local macros added. Back when I made my 1st update to
+ * umm_malloc PR, I found the upstream had been refactored and removed the
+ * defragmenting properties that were originally present. It took some looking
+ * to see the logic, it didn't have any comments to make it stand out.
+ *
+ * I added the `#elif defined(UMM_REALLOC_DEFRAG)` to recreate and preserve the
+ * defragmenting functionality that was lost. This is the default build option
+ * we have set in `umm_malloc_cfg.h`. I have not done any structured testing to
+ * confirm; however, I think this to be the best option when considering the
+ * amount of reallocates that can occur with the Strings library.
+ */
 #if defined(UMM_REALLOC_MINIMIZE_COPY)
   /*
    * Ok, now that we're here we know how many blocks we want and the current

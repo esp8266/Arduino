@@ -108,6 +108,11 @@ uint32_t EspClass::getFreeHeap()
 	return 30000;
 }
 
+uint16_t EspClass::getMaxFreeBlockSize()
+{
+	return 20000;
+}
+
 String EspClass::getResetReason()
 {
   return "Power on";
