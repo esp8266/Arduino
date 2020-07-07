@@ -28,7 +28,7 @@
 #include <lwip/ip_addr.h>
 
 #if !LWIP_IPV6
-//struct ip_addr: ipv4_addr { };
+struct ip_addr: ipv4_addr { };
 #endif // !LWIP_IPV6
 
 // A class to make it easier to handle and pass around IP addresses
