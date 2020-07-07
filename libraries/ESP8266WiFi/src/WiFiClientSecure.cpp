@@ -34,7 +34,7 @@ extern "C" {
 #include "ESP8266WiFi.h"
 #include "PolledTimeout.h"
 #include "WiFiClient.h"
-#include "WiFiClientSecureBearSSL.h"
+#include "WiFiClientSecure.h"
 #include "StackThunk.h"
 #include "lwip/opt.h"
 #include "lwip/ip.h"

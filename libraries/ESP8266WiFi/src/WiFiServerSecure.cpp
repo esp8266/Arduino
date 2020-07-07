@@ -35,7 +35,7 @@ extern "C" {
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include <include/ClientContext.h>
-#include "WiFiServerSecureBearSSL.h"
+#include "WiFiServerSecure.h"
 
 namespace BearSSL {
 
