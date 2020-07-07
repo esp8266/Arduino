@@ -28,8 +28,9 @@ static void (*_hspi_slave_rx_status_cb)(void * arg, uint32_t data) = NULL;
 static void (*_hspi_slave_tx_status_cb)(void * arg) = NULL;
 static uint8_t _hspi_slave_buffer[33];
 
-void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
+void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg, void *frame)
 {
+    (void) frame;
     uint32_t status;
     uint32_t istatus;
 
