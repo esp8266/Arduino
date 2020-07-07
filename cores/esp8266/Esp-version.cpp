@@ -42,23 +42,7 @@ String EspClass::getFullVersion() {
     s += system_get_sdk_version();
     s += FPSTR(arduino_esp8266_git_ver);
     s += String(esp8266::coreVersionNumeric());
-#if LWIP_VERSION_MAJOR == 1
-    s += F("/lwIP:");
-    s += LWIP_VERSION_MAJOR;
-    s += '.';
-    s += LWIP_VERSION_MINOR;
-    s += '.';
-    s += LWIP_VERSION_REVISION;
-#if LWIP_VERSION_IS_DEVELOPMENT
-    s += F("-dev");
-#endif
-#if LWIP_VERSION_IS_RC
-    s += F("rc");
-    s += String(LWIP_VERSION_RC);
-#endif
-#else // LWIP_VERSION_MAJOR != 1
     s += FPSTR(lwip_version);
-#endif // LWIP_VERSION_MAJOR != 1
     s += FPSTR(bearssl_version);
 
     return s;
