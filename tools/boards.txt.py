@@ -759,8 +759,9 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_dio',
+            'flashmode_menu',
             'flashfreq_80',
+            '2M',
             '512K',
             ],
         'desc': [ 'gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.',
@@ -771,7 +772,7 @@ boards = collections.OrderedDict([
                   '',
                   'The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.',
                   '',
-                  '- Product page: http://www.4dsystems.com.au/product/gen4-IoD',
+                  '- Product page: https://4dsystems.com.au/products/iot-display-modules',
                   ],
     }),
     ( 'oak', {
