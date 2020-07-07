@@ -110,10 +110,13 @@ void fetchFingerprint() {
   Serial.printf(R"EOF(
 The SHA-1 fingerprint of an X.509 certificate can be used to validate it
 instead of the while certificate.  This is not nearly as secure as real
-X.509 validation, but is better than nothing.
+X.509 validation, but is better than nothing.  Also be aware that these
+fingerprints will change if anything changes in the certificate chain
+(i.e. re-generating the certificate for a new end date, any updates to
+the root authorities, etc.).
 )EOF");
   BearSSL::WiFiClientSecure client;
-  static const char fp[] PROGMEM = "5F:F1:60:31:09:04:3E:F2:90:D2:B0:8A:50:38:04:E8:37:9F:BC:76";
+  static const char fp[] PROGMEM = "59:74:61:88:13:CA:12:34:15:4D:11:0A:C1:7F:E6:67:07:69:42:F5";
   client.setFingerprint(fp);
   fetchURL(&client, host, port, path);
 }
