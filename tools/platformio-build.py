@@ -54,7 +54,7 @@ env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
     CFLAGS=[
-        "-std=gnu99",
+        "-std=c17",
         "-Wpointer-arith",
         "-Wno-implicit-function-declaration",
         "-Wl,-EL",
@@ -76,7 +76,7 @@ env.Append(
 
     CXXFLAGS=[
         "-fno-rtti",
-        "-std=c++11"
+        "-std=gnu++17"
     ],
 
     LINKFLAGS=[
