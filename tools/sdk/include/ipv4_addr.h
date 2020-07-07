@@ -37,14 +37,6 @@
 // official lwIP's definitions (1.4 or 2)
 #include "lwip/ip_addr.h"
 
-///////////////////////////////////////////////
-#if LWIP_VERSION_MAJOR == 1
-
-#define ipv4_addr ip_addr
-
-///////////////////////////////////////////////
-#else // lwIP-v2
-
 #define ipv4_addr ip4_addr
 #define ipv4_addr_t ip4_addr_t
 
@@ -54,8 +46,5 @@ struct ip_info {
     struct ipv4_addr netmask;
     struct ipv4_addr gw;
 };
-
-///////////////////////////////////////////////
-#endif // lwIP-v2
 
 #endif // __IPV4_ADDR_H__

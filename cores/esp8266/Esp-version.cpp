@@ -21,7 +21,6 @@
 #include <Arduino.h>
 #include <user_interface.h>
 #include <core_version.h>
-#include <lwip/init.h>      // LWIP_VERSION_*
 #include <lwipopts.h>       // LWIP_HASH_STR (lwip2)
 #include <bearssl/bearssl_git.h>  // BEARSSL_GIT short hash
 
@@ -29,12 +28,10 @@
 #define STR(x) STRHELPER(x) // stringifier
 
 static const char arduino_esp8266_git_ver [] PROGMEM = "/Core:" STR(ARDUINO_ESP8266_GIT_DESC) "=";
-#if LWIP_VERSION_MAJOR > 1
 #if LWIP_IPV6
 static const char lwip_version [] PROGMEM = "/lwIP:IPv6+" LWIP_HASH_STR;
 #else
 static const char lwip_version [] PROGMEM = "/lwIP:" LWIP_HASH_STR;
-#endif
 #endif
 static const char bearssl_version [] PROGMEM = "/BearSSL:" STR(BEARSSL_GIT);
 

@@ -69,17 +69,6 @@ jobs:
       env:
         - BUILD_PARITY=odd
 
-    - name: "Build lwIP-v1.4 (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build1.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build lwIP-v1.4 (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build1.sh
-      env:
-        - BUILD_PARITY=odd
-
     - name: "Mac OSX can build sketches"
       os: osx
       stage: build
