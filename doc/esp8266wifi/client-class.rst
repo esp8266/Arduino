@@ -108,6 +108,3 @@ Other Function Calls
     uint16_t  localPort () 
 
 Documentation for the above functions is not yet prepared.
-
-For code samples please refer to separate section with `examples
-:arrow\_right: <client-examples.rst>`__ dedicated specifically to the Client Class.
