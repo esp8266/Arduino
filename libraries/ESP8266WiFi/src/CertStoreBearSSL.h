@@ -37,13 +37,13 @@ class CertStore {
     ~CertStore();
 
     // Set the file interface instances, do preprocessing
-    int initCertStore(FS &fs, const char *indexFileName, const char *dataFileName);
+    int initCertStore(fs::FS &fs, const char *indexFileName, const char *dataFileName);
 
     // Installs the cert store into the X509 decoder (normally via static function callbacks)
     void installCertStore(br_x509_minimal_context *ctx);
 
   protected:
-    FS *_fs = nullptr;
+    fs::FS *_fs = nullptr;
     char *_indexName = nullptr;
     char *_dataName = nullptr;
     X509List *_x509 = nullptr;
