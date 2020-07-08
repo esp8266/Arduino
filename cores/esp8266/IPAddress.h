@@ -26,6 +26,7 @@
 
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
+#include <lwip/ip4_addr.h>
 
 #if !LWIP_IPV6
 struct ip_addr: ipv4_addr { };

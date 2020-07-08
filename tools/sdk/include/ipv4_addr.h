@@ -34,8 +34,9 @@
 // hence ipv4_addr/t is IPv4 version/copy of IPv4 ip_addr/_t
 // when IPv6 is enabled so we can deal with IPv4 use from firmware API.
 
-// official lwIP's definitions (1.4 or 2)
+// official lwIP's definitions
 #include "lwip/ip_addr.h"
+#include <lwip/ip4_addr.h>
 
 #define ipv4_addr ip4_addr
 #define ipv4_addr_t ip4_addr_t
