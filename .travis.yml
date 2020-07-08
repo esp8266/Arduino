@@ -27,14 +27,28 @@ jobs:
       install:
           - sudo apt-get install python3-pip python3-setuptools
       env:
-        - BUILD_PARITY=even
+        - BUILD_PARITY=quart1
     - name: "Platformio (2)"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/platformio.sh
       install:
           - sudo apt-get install python3-pip python3-setuptools
       env:
-        - BUILD_PARITY=odd
+        - BUILD_PARITY=quart2
+    - name: "Platformio (3)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      install:
+          - sudo apt-get install python3-pip python3-setuptools
+      env:
+        - BUILD_PARITY=quart3
+    - name: "Platformio (4)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      install:
+          - sudo apt-get install python3-pip python3-setuptools
+      env:
+        - BUILD_PARITY=quart4
 
     - name: "Build (1)"
       stage: build
