@@ -1,0 +1,35 @@
+# Whenever a tag of the form #.xxxx is pushed against master, generate a
+# draft release and upload the ZIP and JSON file to it.  Maintainers then
+# will manually add the changelist and publish it.
+
+name: ESP8266 Arduino Draft Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Set GIT tag name
+      run: |
+        echo "::set-env name=TRAVIS_TAG::$(git describe --exact-match --tags)"
+    - name: Build package JSON
+      env:
+        TRAVIS_BUILD_DIR: ${{ github.workspace }}
+        BUILD_TYPE: package
+        CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+           export TRAVIS_TAG=$(git describe --exact-match --tags)
+           bash ./tests/ci/build_package.sh
+           pip3 install PyGithub
+           python3 ./package/upload_release.py --user "$GITHUB_ACTOR" --repo "$GITHUB_REPOSITORY" --token "$CI_GITHUB_API_KEY" --tag "$TRAVIS_TAG" --name "Release $TRAVIS_TAG" --msg "Text goes here" package/versions/*/*.zip package/versions/*/package_esp8266com_index.json

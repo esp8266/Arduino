@@ -1,0 +1,61 @@
+# Whenever a release is published from a draft, this will update the
+# master Arduino JSON file to add its new entry.
+
+# We keep the master JSON file in another repo, so we need to use a pre-set GH
+# SSH key to be able to push a change to the repo.
+
+# At some point this should really be moved to the main repo to avoid this grief
+
+#### Steps to follow when you need to make a new SSH key for upload (not
+#### normally needed!)
+
+# We encrypt the id_rda (private key) using a key and IV generated randomly:
+# openssl enc -nosalt -aes-256-cbc -pbkdf2 -k "$(openssl rand -base64 100 | sed s/=//)" -P
+# > key = <long string of hex>
+# > iv  = <long string of hex>
+
+# Set that key and IV strings are set as secrets in the *Arduino repo* GitHub
+# CI Secrets object as GHKEY and GHIV.
+
+# Now make a SSH key using ssh-keygen (do not use your own, make a new one!)
+# ssh-keygen ...
+
+# Upload the id_rsa.pub (public key) to GitHub
+#    Settings->SSH and GPG Keys->New SSH Key
+
+# Encrypt the private part of the key using the key and IV above and commit the change
+# openssl enc -aes-256-cbc -K <key> -iv <iv> -in id_rsa -out package/esp8266_github_io_deploy.enc
+# git add package/esp8266_github_io_deploy.enc
+
+
+name: ESP8266 Arduino Release Publisher
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package:
+    name: Update master JSON file
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Set GIT tag name
+      run: |
+        echo "::set-env name=TRAVIS_TAG::$(git describe --exact-match --tags)"
+    - name: Deploy updated JSON
+      env:
+        TRAVIS_BUILD_DIR: ${{ github.workspace }}
+        BUILD_TYPE: package
+        CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        GHKEY: ${{ secrets.GHKEY }}
+        GHIV: ${{ secrets.GHIV }}
+      run: |
+           bash ./tests/ci/build_package.sh
+           # Only the regenerated JSON file will be used, but it's simpler than looking for it in a GH release
+           bash ./package/deploy_package_index.sh
