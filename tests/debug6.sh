@@ -4,7 +4,10 @@ cache_dir=$(mktemp -d)
 
 source "$TRAVIS_BUILD_DIR"/tests/common.sh
 
-if [ "$BUILD_PARITY" = "even" ]; then
+if [ -z "$BUILD_PARITY" ]; then
+    mod=1
+    rem=0
+elif [ "$BUILD_PARITY" = "even" ]; then
     mod=2
     rem=0
 elif [ "$BUILD_PARITY" = "odd" ]; then
