@@ -13,6 +13,6 @@ elif [ "$BUILD_PARITY" = "odd" ]; then
 fi
 
 install_arduino debug
-build_sketches_with_arduino "$mod" "$rem" lm2f
+build_sketches_with_arduino "$mod" "$rem" lm6f
 
 rm -rf "$cache_dir"
