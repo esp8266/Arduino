@@ -759,8 +759,9 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_dio',
+            'flashmode_menu',
             'flashfreq_80',
+            '2M',
             '512K',
             ],
         'desc': [ 'gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.',
@@ -771,7 +772,7 @@ boards = collections.OrderedDict([
                   '',
                   'The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.',
                   '',
-                  '- Product page: http://www.4dsystems.com.au/product/gen4-IoD',
+                  '- Product page: https://4dsystems.com.au/products/iot-display-modules',
                   ],
     }),
     ( 'oak', {
@@ -1003,6 +1004,13 @@ macros = {
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
         ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
+        ]),
+
+    'stacksmash_menu': collections.OrderedDict([
+        ( '.menu.stacksmash.disabled', 'Disabled' ),
+        ( '.menu.stacksmash.disabled.build.stacksmash_flags', '' ),
+        ( '.menu.stacksmash.enabled', 'Enabled' ),
+        ( '.menu.stacksmash.enabled.build.stacksmash_flags', '-fstack-protector' ),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -1565,6 +1573,7 @@ def all_boards ():
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=Exceptions')
+    print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
@@ -1586,7 +1595,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:

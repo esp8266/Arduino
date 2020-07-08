@@ -54,12 +54,18 @@ mode
 .. code:: cpp
 
     WiFi.mode(m)
-    WiFi.getMode()
 
 -  ``WiFi.mode(m)``: set mode to ``WIFI_AP``, ``WIFI_STA``,
    ``WIFI_AP_STA`` or ``WIFI_OFF``
--  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes
-   above)
+
+getMode
+~~~~~~~
+
+.. code:: cpp
+
+    WiFiMode_t WiFi.getMode()
+
+-  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes above)
 
 WiFi power management, DTIM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,6 +101,49 @@ periodic beacon at a frequency specified by the DTIM Interval.  Beacons are
 packets sent by an access point to synchronize a wireless network.
 
 
+setOutputPower
+~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    void WiFi.setOutputPower(float dBm)
+
+Sets the max transmit power, in dBm. Values range from 0 to 20.5 [dBm] inclusive, and should be multiples of 0.25.
+This is essentially a thin wrapper around the SDK's system_phy_set_max_tpw() api call.
+
+If wifi connection issues are encountered due to signal noise, one thing to try is to reduce the Tx power.
+This has been found effective in cases where STA mode is in use with 802.11n phy (default). Reducing to
+e.g.: 17.5dBm or slightly lower can reduce noise and improve connectivity, although max range will also be reduced.
+
+setPhyMode
+~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  setPhyMode (WiFiPhyMode_t mode)
+
+Sets the WiFi radio phy mode. Argument is an enum of type WiFiPhyMode_t, valid values are:
+-  ``WIFI_PHY_MODE_11B``: 802.11b mode
+-  ``WIFI_PHY_MODE_11G``: 802.11g mode
+-  ``WIFI_PHY_MODE_11N``: 802.11n mode
+
+Per the NONOS SDK API Reference document, the AP mode only supports b/g, see notes in section on wifi_set_phy_mode() api.
+Returns true success, false otherwise.
+
+Some experiments have shown that 802.11b mode has longest LOS range, while 802.11n mode has longest indoor range.
+
+It has been observed that some wifi routers may degrade from 802.11n to g/b if an ESP8266 in g/b phy mode connects to them. That 
+means that the entire wifi connectivity of all devices are impacted.
+
+getPhyMode
+~~~~~~~~~~
+
+.. code:: cpp
+
+    WiFiPhyMode_t  getPhyMode (WiFiPhyMode_t mode)
+
+Gets the WiFi radio phy mode that is currently set.
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -102,10 +151,6 @@ Other Function Calls
 
     int32_t  channel (void)
     WiFiSleepType_t  getSleepMode ()
-    bool  setPhyMode (WiFiPhyMode_t mode)
-    WiFiPhyMode_t  getPhyMode ()
-    void  setOutputPower (float dBm)
-    WiFiMode_t  getMode ()
     bool  enableSTA (bool enable)
     bool  enableAP (bool enable)
     bool  forceSleepBegin (uint32 sleepUs=0)

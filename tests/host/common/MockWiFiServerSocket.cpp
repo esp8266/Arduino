@@ -101,7 +101,7 @@ void WiFiServer::begin ()
 
     	server.sin_family = AF_INET;
 	server.sin_port = htons(mockport);
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_addr.s_addr = htonl(global_source_address);
 	if (bind(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
 	{
 		perror(MOCK "bind()");
@@ -144,4 +144,9 @@ void WiFiServer::close ()
 	if (pcb2int(_listen_pcb) >= 0)
 		::close(pcb2int(_listen_pcb));
 	_listen_pcb = int2pcb(-1);
+}
+
+void WiFiServer::stop ()
+{
+    close();
 }
