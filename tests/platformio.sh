@@ -76,18 +76,6 @@ elif [ "$BUILD_PARITY" = "even" ]; then
 elif [ "$BUILD_PARITY" = "odd" ]; then
     mod=2
     rem=1
-elif [ "$BUILD_PARITY" = "quart1" ]; then
-    mod=4
-    rem=0
-elif [ "$BUILD_PARITY" = "quart2" ]; then
-    mod=4
-    rem=1
-elif [ "$BUILD_PARITY" = "quart3" ]; then
-    mod=4
-    rem=2
-elif [ "$BUILD_PARITY" = "quart4" ]; then
-    mod=4
-    rem=3
 fi
 
 install_platformio
