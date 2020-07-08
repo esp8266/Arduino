@@ -39,9 +39,6 @@ extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/dhcp.h"
-#if LWIP_IPV6
-#include "lwip/netif.h" // struct netif
-#endif
 }
 
 #include "debug.h"

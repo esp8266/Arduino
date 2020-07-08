@@ -36,16 +36,16 @@ jobs:
       env:
         - BUILD_PARITY=odd
 
-    - name: "Build (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build.sh
-      env:
-        - BUILD_PARITY=odd
+#    - name: "Build (1)"
+#      stage: build
+#      script: $TRAVIS_BUILD_DIR/tests/build.sh
+#      env:
+#        - BUILD_PARITY=even
+#    - name: "Build (2)"
+#      stage: build
+#      script: $TRAVIS_BUILD_DIR/tests/build.sh
+#      env:
+#        - BUILD_PARITY=odd
 
     - name: "Debug (1)"
       stage: build
