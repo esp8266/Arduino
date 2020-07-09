@@ -20,27 +20,6 @@
 
 */
 
-//#include "WiFiClientSecureAxTLS.h"
-//using namespace axTLS;
-
-/**********************************
- * !! Now BearSSL is the default !!
- *
- * While not advised,
- * Use legacy API without updating with:
- *
-#define USING_AXTLS
-#include <ESP8266WiFi.h>
-//#include <WiFiClientSecure.h>
-#include "WiFiClientSecureAxTLS.h"
-using namespace axTLS;
- *
- *
- **********************************/
-
 #include "WiFiClientSecureBearSSL.h"
 
-#ifndef USING_AXTLS
-// do not default to BearSSL API ("using" has no "unusing" counterpart)
 using namespace BearSSL;
-#endif

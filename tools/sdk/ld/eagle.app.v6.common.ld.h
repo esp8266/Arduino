@@ -177,7 +177,6 @@ SECTIONS
     *liblwip6-536-feat.a:(.literal .text .literal.* .text.*)
     *liblwip6-1460-feat.a:(.literal .text .literal.* .text.*)
     *libbearssl.a:(.literal .text .literal.* .text.*)
-    *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
     *libcrypto.a:(.literal.* .text.*)
     *libespnow.a:(.literal.* .text.*)
