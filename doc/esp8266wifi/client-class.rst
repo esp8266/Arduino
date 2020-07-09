@@ -107,4 +107,4 @@ Other Function Calls
     IPAddress  localIP () 
     uint16_t  localPort () 
 
-Documentation for the above functions is not yet prepared.
+Documentation for the above functions is not yet available.
