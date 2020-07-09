@@ -20,7 +20,7 @@ echo -e "Host github.com\nStrictHostKeyChecking no\n" >> ~/.ssh/config
 chmod go-w  ~/.ssh/config
 
 # Clone the Github pages repository
-git clone git@github.com:earlephilhower/esp8266.github.io.git
+git clone git@github.com:esp8266/esp8266.github.io.git
 pushd esp8266.github.io
 
 # Update the package index
