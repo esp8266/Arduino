@@ -320,6 +320,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
     _currentClient = client;
     _currentStatus = HC_WAIT_READ;
     _statusChange = millis();
+    _keepAlive = true;
   }
 
   bool keepCurrentClient = false;
@@ -367,7 +368,6 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   if (!keepCurrentClient) {
     _currentClient = ClientType();
     _currentStatus = HC_NONE;
-    _keepAlive = false;
     _currentUpload.reset();
   }
 
@@ -380,7 +380,6 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::close() {
   _server.close();
   _currentStatus = HC_NONE;
-  _keepAlive = false;
   if(!_headerKeysCount)
     collectHeaders(0, 0);
 }
