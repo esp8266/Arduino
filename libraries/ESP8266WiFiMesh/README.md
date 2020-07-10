@@ -26,15 +26,16 @@
    * [I have a lot of interference from all the nodes that are close to each other. What can I do?](#FAQInterference)
    * [How do I change the interval of the WiFi AP beacon broadcast?](#FAQBeaconInterval)
    * [My ESP is ignoring the WiFi AP beacon broadcast interval settings you just told me about above! (a.k.a. How do I change the WiFi scan mode to passive?)](#FAQPassiveScan)
+   * [My internet is slower when I connect the ESP8266 to my router!](#FAQSlowRouter)
 
 
 ## <a name="Overview"></a>Overview
 
 This is a library for creating a mesh network using the ESP8266.
 
-The library has been tested and works with Arduino Core for ESP8266 version 2.7.2 (with lwIP2). It may work with earlier and later core releases, but this has not been tested during development.
+The library has been tested and works with Arduino Core for ESP8266 version 3.0.0 (with lwIP2). It may work with earlier and later core releases, but this has not been tested during development.
 
-**Note:** This mesh library has been extensively rewritten for core release 2.7.2. The old method signatures have been retained for compatibility purposes, but will be removed in core release 3.0.0. If you are still using these old method signatures please consider migrating to the new API shown in the `EspnowMeshBackend.h` or `TcpIpMeshBackend.h` source files.
+**Note:** This mesh library has been extensively rewritten for core release 3.0.0. The old method signatures have been retained for compatibility purposes, but will be removed in core release 3.0.X. If you are still using these old method signatures please consider migrating to the new API shown in the `EspnowMeshBackend.h` or `TcpIpMeshBackend.h` source files.
 
 ## <a name="Work"></a>How does it work?
 
@@ -223,9 +224,9 @@ More information about this encryption standard can be found here: https://tools
 
 ***
 
-The FloodingMesh exclusively uses the `EspnowMeshBackend`. The mesh network size is only limited by available MAC addresses, so the maximum is (2^48)/2 = 140 trillion give or take. However, the maximum throughput of the FloodingMesh is around 100 messages per second with 234 bytes per message, so using the maximum number of nodes is not recommended in most cases. Note that while ASCII characters require 1 message byte each, non-ASCII characters usually require 2 message bytes each.
-
 As the name implies, FloodingMesh is a simple flooding mesh architecture, which means it stores no mesh network routing data in the nodes but only passes new messages on to all surrounding nodes. It therefore has no RAM overhead for network size, which is important for the ESP8266 since available RAM is very limited. The downside is that there is a lot of network traffic for each sent message, and all nodes use the same WiFi channel, so especially for dense networks a lot of interference will be created. Based on tests, a mesh with 30 nodes close together (-44 dBm RSSI) will work well (1-2 dropped messages of 1000). A mesh with around 160 nodes close together will not work at all (though this would probably be solved by spreading out the nodes more, so the interference is reduced).
+
+The FloodingMesh exclusively uses the `EspnowMeshBackend`. The mesh network size is only limited by available MAC addresses, so the maximum is (2^48)/2 = 140 trillion give or take. However, the maximum throughput of the FloodingMesh is around 100 messages per second with 234 bytes per message, so using the maximum number of nodes is not recommended in most cases. Note that while ASCII characters require 1 message byte each, non-ASCII characters usually require 2 message bytes each.
 
 ### <a name="FloodingMeshUsage"></a>Usage
 
@@ -233,7 +234,7 @@ There are two primary ways to send a message in FloodingMesh: `broadcast` and `e
 
 Messages sent via `encryptedBroadcast` use CCMP encryption. Messages sent via `broadcast` are by default unencrypted, but can optionally be encrypted with AEAD encryption. See the "[Encryption](#EspnowMeshBackendEncryption)" segment of the EspnowMeshBackend documentation for more information on the forms of encryption.
 
-The main advantage of `encryptedBroadcast` over `broadcast` is that replay attack protection comes built-in. However, `encryptedBroadcast` is currently slow and experimental so for now `broadcast` is the recommended method to use. This means that replay attacks must be handled separately in a manner suitable for your application (e.g. by adding a counter to your messages or just designing your application so repeated messages is not an issue).
+The main advantage of `encryptedBroadcast` over `broadcast` is that replay attack protection comes built-in. However, `encryptedBroadcast` is currently slow and experimental so for now `broadcast` is the recommended method to use. This means that replay attacks must be handled separately in a manner suitable for your application (e.g. by adding a counter to your messages or just by designing your application so repeated messages is not an issue).
 
 When `broadcast` is used, the message is sent to all surrounding nodes in one transmission without any WiFi scan.
 
@@ -388,3 +389,10 @@ Note though, that any device that uses active WiFi scans will trigger probe resp
 To change the WiFi scan mode to passive, the following information is helpful:
 1. A `scan_config` struct is found in `user_interface.h` (and the ESP8266 API documentation). We want to modify `scan_type`, but note that `scan_time` can also be set here if we want faster or slower scans.
 2. In `ESP8266WiFiScan.cpp` one can find the following variable declaration: `struct scan_config config;` around line 87. Adding `config.scan_type = WIFI_SCAN_TYPE_PASSIVE;` after `memset(&config, 0, sizeof(config));` on line 88 will ensure passive scans are used.
+
+### <a name="FAQSlowRouter"></a>My internet is slower when I connect the ESP8266 to my router!
+There has been some reports about this happening when the ESP8266 is in AP+STA mode while connected to the router. The ESP8266 automatically switches to 802.11g in AP+STA mode, so if your router normally uses a faster WiFi standard such as 802.11n or 802.11ac the router may change mode of operation to 802.11g. Typically this would result in a WiFi speed of around 30-40 Mbit/s.
+
+A possible workaround is to use only AP mode or STA mode (see "[I want to control the WiFi mode myself](#FAQModeControl)"), perhaps with an extra ESP8266 in one of these modes as a buffer between your ESP8266 mesh network and your router. Remember that the ESP8266 must have the AP active in order to receive ESP-NOW broadcast messages.
+
+Another possible workaround is to try with a different router or router firmware.
