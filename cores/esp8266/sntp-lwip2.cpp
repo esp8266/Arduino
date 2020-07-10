@@ -60,44 +60,6 @@ void settimeofday_cb (const TrivialCB& cb)
 
 extern "C" {
 
-#if LWIP_VERSION_MAJOR == 1
-
-#include <pgmspace.h>
-
-static const char stod14[] PROGMEM = "settimeofday() can't set time!\n";
-bool sntp_set_timezone(sint8 timezone);
-bool sntp_set_timezone_in_seconds(int32_t timezone)
-{
-    return sntp_set_timezone((sint8)(timezone/(60*60))); //TODO: move this to the same file as sntp_set_timezone() in lwip1.4, and implement correctly over there.
-}
-
-void sntp_set_daylight(int daylight);
-
-int settimeofday(const struct timeval* tv, const struct timezone* tz)
-{
-    if (tz) /*before*/
-    {
-        sntp_set_timezone_in_seconds(tz->tz_minuteswest * 60);
-        // apparently tz->tz_dsttime is a bitfield and should not be further used (cf man)
-        sntp_set_daylight(0);
-    }
-    if (tv) /* after*/
-    {
-        // can't call lwip1.4's static sntp_set_system_time()
-        os_printf(stod14);
-
-        // reset time subsystem
-        timeshift64_is_set = false;
-
-        return -1;
-    }
-    return 0;
-}
-
-#endif // lwip 1.4 only
-
-#if LWIP_VERSION_MAJOR == 2
-
 #include <lwip/apps/sntp.h>
 
 uint32_t sntp_real_timestamp = 0;
@@ -127,7 +89,5 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
 
     return 0;
 }
-
-#endif // lwip2 only
 
 };
