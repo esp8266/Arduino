@@ -103,7 +103,7 @@ public:
         DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
 
         String path;
-        path.reserve(_path.length() + requestUri().length() + 32);
+        path.reserve(_path.length() + requestUri.length() + 32);
         path = _path;
 
         if (!_isFile) {
