@@ -147,7 +147,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req.isEmpty()) break;//no moar headers
+      if (req.isEmpty()) break; //no more headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
