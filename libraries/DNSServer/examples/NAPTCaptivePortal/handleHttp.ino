@@ -1,6 +1,6 @@
 #if LWIP_FEATURES && !LWIP_IPV6
 
-#include "WifiHttpv2.h"
+#include "WifiHttpv.h"
 
 #ifndef TCP_MSS
 #define TCP_MSS 1460
@@ -9,7 +9,7 @@
   Use kMaxChunkSize to limit size of chuncks
 */
 constexpr size_t kMaxChunkSize = TCP_MSS;
-String& sendIfOver(String & str, size_t threshold = kMaxChunkSize/2);
+String& sendIfOver(String & str, size_t threshold = kMaxChunkSize / 2);
 size_t sendAsChunks_P(PGM_P content, size_t chunkSize = kMaxChunkSize);
 
 size_t maxPage = 0;
