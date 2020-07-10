@@ -78,7 +78,7 @@ The last line will then print out the IP address assigned to the ESP module by `
 
     Serial.println(WiFi.localIP());
 
-If you don't see the last line but just more and more dots ``.........``, then likely name or password to the Wi-Fi network is entered incorrectl in the sketchy. Verify the name and password by connecting from scratch to this Wi-Fi network with a PC or a mobile phone.
+If you don't see the last line but just more and more dots ``.........``, then likely name or password to the Wi-Fi network is entered incorrectly in the sketch. Verify the name and password by connecting from scratch to this Wi-Fi network with a PC or a mobile phone.
 
 *Note:* if connection is established, and then lost for some reason, ESP will automatically reconnect to the last used access point once it is again back on-line. This will be done automatically by Wi-Fi library, without any user intervention.
 
@@ -165,7 +165,7 @@ BearSSL Client Secure and Server Secure
 .. figure:: pictures/esp8266-client-secure.png
    :alt: ESP8266 operating as the Client Secure
 
-Secure clients and servers require siginificant amounts of additional memory and processing to enable their cryptographic algorithms.  In general, only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
+Secure clients and servers require significant amounts of additional memory and processing to enable their cryptographic algorithms.  In general, only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
 
 `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ contains more information on using and configuring TLS connections.
 
@@ -309,11 +309,11 @@ The tool crawls through all header and source files collecting information from 
    :alt: Example of documentation for station begin method by Doxygen
 
 .. figure:: pictures/doxygen-example-station-hostname.png
-   :alt: Example of documentation for station hostname propert by Doxygen
+   :alt: Example of documentation for station hostname property by Doxygen
 
 If code is not annotated, you will still see the function prototype including types of arguments, and can use provided links to jump straight to the source code to check it out on your own. Doxygen provides really excellent navigation between members of library.
 
 .. figure:: pictures/doxygen-example-udp-begin.png
-   :alt: Example of documentation for UDP begin method (not annotaed in code)by Doxygen
+   :alt: Example of documentation for UDP begin method (not annotated in code)by Doxygen
 
 Several classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ are not annotated. When preparing this document, `Doxygen <https://www.doxygen.nl/>`__ has been tremendous help to quickly navigate through almost 30 files that make this library.
