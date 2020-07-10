@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
+#include "StackThunk.h"
 
 //#define DEBUG_UPDATER Serial
 
@@ -40,6 +41,14 @@ UpdaterClass::UpdaterClass()
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
+  stack_thunk_add_ref();
+#endif
+}
+
+UpdaterClass::~UpdaterClass()
+{
+#if ARDUINO_SIGNING
+    stack_thunk_del_ref();
 #endif
 }
 
@@ -104,7 +113,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   _reset();
   clearError(); //  _error = 0
 
+#ifndef HOST_MOCK
   wifi_set_sleep_type(NONE_SLEEP_T);
+#endif
 
   //address where we will start writing the update
   uintptr_t updateStartAddress = 0;
@@ -197,6 +208,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("no update"));
 #endif
+    _reset();
     return false;
   }
 
@@ -204,7 +216,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("premature end: res:%u, pos:%zu/%zu\n"), getError(), progress(), _size);
 #endif
-
     _reset();
     return false;
   }
@@ -224,6 +235,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
 
@@ -249,6 +261,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     uint8_t *sig = (uint8_t*)malloc(sigLen);
     if (!sig) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
@@ -260,9 +273,12 @@ bool UpdaterClass::end(bool evenIfRemaining){
     DEBUG_UPDATER.printf("\n");
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
+      free(sig);
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
+    free(sig);
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif
@@ -329,7 +345,8 @@ bool UpdaterClass::_writeBuffer(){
   bool modifyFlashMode = false;
   FlashMode_t flashMode = FM_QIO;
   FlashMode_t bufferFlashMode = FM_QIO;
-  if (_currentAddress == _startAddress + FLASH_MODE_PAGE) {
+  //TODO - GZIP can't do this
+  if ((_currentAddress == _startAddress + FLASH_MODE_PAGE) && (_buffer[0] != 0x1f) && (_command == U_FLASH)) {
     flashMode = ESP.getFlashChipMode();
     #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf_P(PSTR("Header: 0x%1X %1X %1X %1X\n"), _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
@@ -377,9 +394,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
   if(hasError() || !isRunning())
     return 0;
 
-  if(len > remaining()){
-    //len = remaining();
-    //fail instead
+  if(progress() + _bufferLen + len > _size) {
     _setError(UPDATE_ERROR_SPACE);
     return 0;
   }
@@ -411,7 +426,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
 bool UpdaterClass::_verifyHeader(uint8_t data) {
     if(_command == U_FLASH) {
         // check for valid first magic byte (is always 0xE9)
-        if(data != 0xE9) {
+        if ((data != 0xE9) && (data != 0x1f)) {
             _currentAddress = (_startAddress + _size);
             _setError(UPDATE_ERROR_MAGIC_BYTE);
             return false;
@@ -435,7 +450,12 @@ bool UpdaterClass::_verifyEnd() {
         }
 
         // check for valid first magic byte
-        if(buf[0] != 0xE9) {
+	//
+	// TODO: GZIP compresses the chipsize flags, so can't do check here
+	if ((buf[0] == 0x1f) && (buf[1] == 0x8b)) {
+            // GZIP, just assume OK
+            return true;
+        } else if (buf[0] != 0xE9) {
             _currentAddress = (_startAddress);
             _setError(UPDATE_ERROR_MAGIC_BYTE);            
             return false;

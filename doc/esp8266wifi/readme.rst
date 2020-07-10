@@ -7,7 +7,7 @@ ESP8266 is all about Wi-Fi. If you are eager to connect your new ESP8266 module 
 Introduction
 ------------
 
-The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP9266 SDK to `esp8266 /
+The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP8266 SDK to `esp8266 /
 Arduino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we would need to provide separate documentation on what is new and extra.
 
 This documentation will walk you through several classes, methods and properties of the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
@@ -154,18 +154,7 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 .. figure:: pictures/esp8266-client.png
    :alt: ESP8266 operating as the Client
 
-Check out the separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
-
-axTLS Client Secure - DEPRECATED
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The following section details axTLS, the older TLS library used by the project.  It is still supported, but additional fixes and documentation will generally not be undertaken.  See the following section for the updated TLS client object.
-
-The axTLS Client Secure is an extension of `Client Class <#client>`__ where connection and data exchange with servers is done using a `secure protocol <https://en.wikipedia.org/wiki/Transport_Layer_Security>`__. It supports `TLS 1.1 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.1>`__. The `TLS 1.2 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2>`__ is not supported.
-
-Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add; the flash memory size is usually not the issue. If you would like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, what server access has been tested, and how memory limitations have been overcome, read this fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
-
-Check out the separate section with `examples <client-secure-examples.rst>`__ / `list of functions <client-secure-class.rst>`__
+Check out the separate section with `list of functions <client-class.rst>`__
 
 
 BearSSL Client Secure and Server Secure
@@ -181,6 +170,9 @@ Secure clients and servers require siginificant amounts of additional memory and
 `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ contains more information on using and configuring TLS connections.
 
 `BearSSL::WiFiServerSecure <bearssl-server-secure-class.rst>`__ discusses the TLS server mode available.  Please read and understand the `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ first as the server uses most of the same concepts.
+
+Check out the separate section with `examples <client-secure-examples.rst>`__ .
+
 
 Server
 ~~~~~~

@@ -102,9 +102,9 @@ The web browser you're using to read this document keeps a list of 100s of certi
 
 In many cases your application will know the specific CA it needs to validate web or MQTT servers against (often just a single, self-signing CA private to your institution).  Simply load your private CA in a `BearSSL::X509List` and use that as your trust anchor.
 
-However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to SPIFFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
+However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to LittleFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
 
-See the `BearSSL_CertStore` example for full details as the `BearSSL::CertStore` requires the creation of a cookie-cutter object for filesystem access (because the SD and SPIFFS filesystems are presently incompatible with each other).  At a high level in your `setup()` you will call `BearSSL::initCertStore()` on a global object, and then pass this global certificate store to `client.setCertStore(&gCA)` before every connection attempt to enable it as a validation option.
+See the `BearSSL_CertStore` example for full details.
 
 Supported Crypto
 ~~~~~~~~~~~~~~~~

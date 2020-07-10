@@ -37,7 +37,7 @@ int eboot_command_read(struct eboot_command* cmd)
     }
 
     uint32_t crc32 = eboot_command_calculate_crc32(cmd);
-    if (cmd->magic & EBOOT_MAGIC_MASK != EBOOT_MAGIC || 
+    if ((cmd->magic & EBOOT_MAGIC_MASK) != EBOOT_MAGIC ||
         cmd->crc32 != crc32) {
         return 1;
     }

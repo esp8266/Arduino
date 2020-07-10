@@ -20,6 +20,7 @@
  */
 
 #include "coredecls.h"
+#include "pgmspace.h"
 
 // moved from core_esp8266_eboot_command.cpp
 uint32_t crc32 (const void* data, size_t length, uint32_t crc /*= 0xffffffff*/)
@@ -27,7 +28,7 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc /*= 0xffffffff*/)
     const uint8_t* ldata = (const uint8_t*)data;
     while (length--)
     {
-        uint8_t c = *ldata++;
+        uint8_t c = pgm_read_byte(ldata++);
         for (uint32_t i = 0x80; i > 0; i >>= 1)
         {
             bool bit = crc & 0x80000000;

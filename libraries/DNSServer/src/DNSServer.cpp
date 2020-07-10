@@ -119,7 +119,7 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
 			  query, queryLength);
 
   // If we have no domain name configured, just return an error
-  if (_domainName == "")
+  if (_domainName.isEmpty())
     return replyWithError(dnsHeader, _errorReplyCode,
 			  query, queryLength);
 
