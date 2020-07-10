@@ -320,7 +320,6 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
     _currentClient = client;
     _currentStatus = HC_WAIT_READ;
     _statusChange = millis();
-    _keepAlive = true;
   }
 
   bool keepCurrentClient = false;

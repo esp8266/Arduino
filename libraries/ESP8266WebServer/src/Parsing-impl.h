@@ -114,6 +114,9 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   }
   _currentMethod = method;
 
+  _keepAlive = _currentVersion > 0; // Keep the connection alive by default
+                                    // if the protocol version is greater than HTTP 1.0
+
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("method: ");
   DEBUG_OUTPUT.print(methodStr);
@@ -177,6 +180,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
         contentLength = headerValue.toInt();
       } else if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
 
@@ -240,6 +245,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
 
       if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
     _parseArguments(searchStr);
