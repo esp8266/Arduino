@@ -73,27 +73,29 @@ OTAEraseConfig. It also gathers some WiFi signal/connection statistics.
 #endif
 
 #ifdef DEBUG_ERASE_CONFIG
-#define ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
-#define ETS_DELAY_US(a) ets_delay_us(a)
-#define ETS_FLUSH(a) while((USS(a) >> USTXC) & 0xff){}
-#define FIX_DIVIDER() fix_divider()
+#define ERASE_CFG__ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
+#define ERASE_CFG__ETS_DELAY_US(a) ets_delay_us(a)
+#define ERASE_CFG__ETS_FLUSH(a) while((USS(a) >> USTXC) & 0xff){}
+#define ERASE_CFG__FIX_DIVIDER() erase_config__fix_divider()
 
 #else
-#define ETS_PRINTF(...) do {} while(0)
-#define ETS_DELAY_US(a) do {} while(0)
-#define ETS_FLUSH(a) do {} while(false)
-#define FIX_DIVIDER()  do {} while(false)
+#define ERASE_CFG__ETS_PRINTF(...) do {} while(0)
+#define ERASE_CFG__ETS_DELAY_US(a) do {} while(0)
+#define ERASE_CFG__ETS_FLUSH(a) do {} while(0)
+#define ERASE_CFG__FIX_DIVIDER()  do {} while(0)
 #endif
 
 #ifdef ERASE_CONFIG_H
 extern "C" {
 #include "user_interface.h"
 
+#undef IRAM_ATTR
+#define IRAM_ATTR __attribute__((noinline)) ICACHE_RAM_ATTR
 #if   (ERASE_CONFIG_METHOD == 1)
 void __real_system_restart_local();
 #define IRAM_MAYBE
 #elif (ERASE_CONFIG_METHOD == 2)
-#define IRAM_MAYBE ICACHE_RAM_ATTR
+#define IRAM_MAYBE IRAM_ATTR
 #elif (ERASE_CONFIG_METHOD == 3)
 #define IRAM_MAYBE
 #else
@@ -110,9 +112,9 @@ void enable_erase_config_at_link_time(void) {
 extern "C" void Cache_Read_Enable_2(void);
 extern "C" void Cache_Read_Disable_2(void);
 
-/* Cannot be made static. The compiler will inline into erase_config and lose
-   ICACHE_RAM_ATTR. Make name longer to be more unique */
-int ICACHE_RAM_ATTR erase_config__erase_sector(const uint32_t sector) {
+/* The compiler will inline into erase_config and lose ICACHE_RAM_ATTR unless
+   __attribute__((noinline)) is added. IRAM_ATTR is modified to include noinline */
+static int IRAM_ATTR erase_config__erase_sector(const uint32_t sector) {
     /*
        Toggle Flash execution off and on, around ROM flash function calls.
        The SDK APIs would have normally handled this operation; however,
@@ -141,10 +143,10 @@ bool IRAM_MAYBE erase_config(const uint32_t flash_erase_mask) {
 #elif (ERASE_CONFIG_METHOD == 3)
             if (0 != erase_config__erase_sector(sector)) {
 #endif
-                ETS_PRINTF("Erase sector 0x%04X failed!\n", sector);
+                ERASE_CFG__ETS_PRINTF("Erase sector 0x%04X failed!\n", sector);
                 return false;
             } else {
-                ETS_PRINTF("Erased sector 0x%04X\n", sector);
+                ERASE_CFG__ETS_PRINTF("Erased sector 0x%04X\n", sector);
             }
         }
     }
@@ -176,11 +178,11 @@ bool IRAM_MAYBE check_and_erase_config(void) {
             ebcmd->args[i] = 0U;
 
         if (erase_flash_option) {
-            ETS_PRINTF("\nerase_config(0x%03X)\n", erase_flash_option);
+            ERASE_CFG__ETS_PRINTF("\nerase_config(0x%03X)\n", erase_flash_option);
 #if (ERASE_CONFIG_METHOD == 1)
             erase_config(erase_flash_option);
-            ETS_PRINTF("\n__real_system_restart_local\n\n");
-            ETS_FLUSH(0);
+            ERASE_CFG__ETS_PRINTF("\n__real_system_restart_local\n\n");
+            ERASE_CFG__ETS_FLUSH(0);
             __real_system_restart_local();
             while(true){}
 #elif (ERASE_CONFIG_METHOD == 2) || (ERASE_CONFIG_METHOD == 3)
@@ -188,7 +190,7 @@ bool IRAM_MAYBE check_and_erase_config(void) {
 #endif
         }
     } else {
-        ETS_PRINTF("\nNo OTA erase flags\n");
+        ERASE_CFG__ETS_PRINTF("\nNo OTA erase flags\n");
     }
     return true;
 }
@@ -231,10 +233,10 @@ typedef enum ROM_RST_REASON { /* Comments on the right are from RTOS SDK */
     SDIO_RESET             =  6,    /*                    *//**<6, Reset by SLC module, reset digital core*/
 } ROM_RST_REASON_t;
 
-constexpr volatile uint32_t *RTC_SYS = (volatile uint32_t*)0x60001100;
+#define RTC_SYS ((volatile uint32_t*)0x60001100)
 extern uint32_t rtc_get_reset_reason(void);
 
-bool ICACHE_RAM_ATTR is_cpu_freq_cal(void) {
+bool IRAM_ATTR is_cpu_freq_cal(void) {
     const uint32_t rtc_sys_reason = RTC_SYS[0];
     const uint32_t rom_api_reason = rtc_get_reset_reason();
     if (1 >= rtc_sys_reason && OWDT_RESET != rom_api_reason) {
@@ -254,12 +256,12 @@ bool ICACHE_RAM_ATTR is_cpu_freq_cal(void) {
    is not in IRAM and reauires SDK initialization.
  */
 #ifndef ROM_uart_div_modify
-#define ROM_uart_div_modify         0x400039d8
+#define ROM_uart_div_modify         0x400039d8U
 #endif
 typedef void (*fp_uart_div_modify_t)(uint32_t uart_no, uint32 DivLatchValue);
-constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_uart_div_modify;
+#define real_uart_div_modify ((fp_uart_div_modify_t)ROM_uart_div_modify)
 
-void ICACHE_RAM_ATTR fix_divider(void) {
+void IRAM_ATTR erase_config__fix_divider(void) {
     /*
        When reset cause is not power-on or EXT_RST the CPU crystal calibration
        has been done and there is no need to correct. With the exception of some
@@ -271,17 +273,17 @@ void ICACHE_RAM_ATTR fix_divider(void) {
         divider = UART_CLK_FREQ / 74880;
     }
     real_uart_div_modify(0, divider);
-    ETS_DELAY_US(150);
+    ERASE_CFG__ETS_DELAY_US(150);
 }
 
 /*
   Something to see when we are in the SDK initialization.
 */
-extern "C" void ICACHE_RAM_ATTR _Z22__run_user_rf_pre_initv(void) {
+extern "C" void IRAM_ATTR _Z22__run_user_rf_pre_initv(void) {
     real_uart_div_modify(0, UART_CLK_FREQ / 115200);
-    ETS_DELAY_US(150);
-    ETS_PRINTF("\n__run_user_rf_pre_init()\n");
-    ETS_FLUSH(0);
+    ERASE_CFG__ETS_DELAY_US(150);
+    ERASE_CFG__ETS_PRINTF("\n__run_user_rf_pre_init()\n");
+    ERASE_CFG__ETS_FLUSH(0);
 }
 
 #if 1
@@ -335,7 +337,7 @@ int eboot_two_shots __attribute__((section(".noinit")));
 extern cont_t* g_pcont;
 extern "C" void call_user_start();
 
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) {
+extern "C" void IRAM_ATTR app_entry_redefinable(void) {
     /* Allocate continuation context on this SYS stack,
        and save pointer to it. */
     cont_t s_cont __attribute__((aligned(16)));
@@ -343,17 +345,17 @@ extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) {
 
     eboot_two_shots = 2;
 
-    FIX_DIVIDER();
-    ETS_PRINTF("\n\ncall_user_start()\n");
-    ETS_FLUSH(0);
+    ERASE_CFG__FIX_DIVIDER();
+    ERASE_CFG__ETS_PRINTF("\n\ncall_user_start()\n");
+    ERASE_CFG__ETS_FLUSH(0);
 
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
 
 
-void ICACHE_RAM_ATTR dbg_log_SPIRead(uint32_t addr, void *dest, size_t size, int err) __attribute__((weak));
-void ICACHE_RAM_ATTR dbg_log_SPIRead(uint32_t addr, void *dest, size_t size, int err) {
+void IRAM_ATTR dbg_log_SPIRead(uint32_t addr, void *dest, size_t size, int err) __attribute__((weak));
+void IRAM_ATTR dbg_log_SPIRead(uint32_t addr, void *dest, size_t size, int err) {
   (void)addr;
   (void)dest;
   (void)size;
@@ -364,9 +366,9 @@ void ICACHE_RAM_ATTR dbg_log_SPIRead(uint32_t addr, void *dest, size_t size, int
 #define ROM_SPIRead         0x40004b1cU
 #endif
 typedef int (*fp_SPIRead_t)(uint32_t addr, void *dest, size_t size);
-constexpr fp_SPIRead_t real_SPIRead = (fp_SPIRead_t)ROM_SPIRead;
+#define real_SPIRead ((fp_SPIRead_t)ROM_SPIRead)
 
-int ICACHE_RAM_ATTR SPIRead(uint32_t addr, void *dest, size_t size) {
+int IRAM_ATTR SPIRead(uint32_t addr, void *dest, size_t size) {
     /*
        The very 1st read that goes by is to get the config flash size from
        image header. The NONOS SDK will update flashchip->chip_size. Then, a
@@ -377,7 +379,7 @@ int ICACHE_RAM_ATTR SPIRead(uint32_t addr, void *dest, size_t size) {
         eboot_two_shots--;
         if (0 == eboot_two_shots) {
             check_and_erase_config();
-            ETS_FLUSH(0);
+            ERASE_CFG__ETS_FLUSH(0);
         }
     }
 
@@ -393,12 +395,12 @@ extern "C" uint32_t esp_c_magic_flash_chip_size(uint8_t byte);
 
 #if defined(DEBUG_ERASE_CONFIG)
 void print_flashchip() {
-    ETS_PRINTF("\nflashchip->deviceId:      0x%08X, %8u\n", flashchip->deviceId,    flashchip->deviceId);
-    ETS_PRINTF("flashchip->chip_size:     0x%08X, %8u\n", flashchip->chip_size,   flashchip->chip_size);
-    ETS_PRINTF("flashchip->block_size:    0x%08X, %8u\n", flashchip->block_size,  flashchip->block_size);
-    ETS_PRINTF("flashchip->sector_size:   0x%08X, %8u\n", flashchip->sector_size, flashchip->sector_size);
-    ETS_PRINTF("flashchip->page_size:     0x%08X, %8u\n", flashchip->page_size,   flashchip->page_size);
-    ETS_PRINTF("flashchip->status_mask:   0x%08X, %8u\n", flashchip->status_mask, flashchip->status_mask);
+    ERASE_CFG__ETS_PRINTF("\nflashchip->deviceId:      0x%08X, %8u\n", flashchip->deviceId,    flashchip->deviceId);
+    ERASE_CFG__ETS_PRINTF("flashchip->chip_size:     0x%08X, %8u\n", flashchip->chip_size,   flashchip->chip_size);
+    ERASE_CFG__ETS_PRINTF("flashchip->block_size:    0x%08X, %8u\n", flashchip->block_size,  flashchip->block_size);
+    ERASE_CFG__ETS_PRINTF("flashchip->sector_size:   0x%08X, %8u\n", flashchip->sector_size, flashchip->sector_size);
+    ERASE_CFG__ETS_PRINTF("flashchip->page_size:     0x%08X, %8u\n", flashchip->page_size,   flashchip->page_size);
+    ERASE_CFG__ETS_PRINTF("flashchip->status_mask:   0x%08X, %8u\n", flashchip->status_mask, flashchip->status_mask);
 }
 #define PRINT_FLASHCHIP() print_flashchip()
 #else
@@ -419,7 +421,9 @@ void set_flashchip_and_check_erase_config(void) {
     PRINT_FLASHCHIP();
     /* Since Flash code has been mapped for execution, we can just address the
        flash image header located at the beginning of flash as iCACHE like memory. */
-    const uint32_t imghdr_4bytes = *((uint32_t *)0x40200000);
+    /* the tool chain update is optomizing out my 32-bit access to an 8-bit
+       unless I use volatile */
+    const uint32_t imghdr_4bytes = *((const uint32_t volatile *)0x40200000);
     const image_header_t *partial_imghdr = (const image_header_t *)&imghdr_4bytes;
     uint32_t old_flash_size = flashchip->chip_size;
     flashchip->chip_size = esp_c_magic_flash_chip_size((partial_imghdr->flash_size_freq >> 4) & 0x0F);
@@ -430,7 +434,7 @@ void set_flashchip_and_check_erase_config(void) {
     flashchip->chip_size = old_flash_size;
 }
 
-void ICACHE_RAM_ATTR erase_config_method3(void) {
+void IRAM_ATTR erase_config_method3(void) {
     Cache_Read_Enable(0, 0, 0); // 16K ICACHE
     set_flashchip_and_check_erase_config();
     Cache_Read_Disable();
@@ -441,17 +445,17 @@ void ICACHE_RAM_ATTR erase_config_method3(void) {
 extern cont_t* g_pcont;
 extern "C" void call_user_start();
 
-extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) {
+extern "C" void IRAM_ATTR app_entry_redefinable(void) {
     /* Allocate continuation context on this SYS stack,
        and save pointer to it. */
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
-    FIX_DIVIDER();
+    ERASE_CFG__FIX_DIVIDER();
     erase_config_method3();
 
-    ETS_PRINTF("\n\ncall_user_start()\n");
-    ETS_FLUSH(0);
+    ERASE_CFG__ETS_PRINTF("\n\ncall_user_start()\n");
+    ERASE_CFG__ETS_FLUSH(0);
 
     /* Call the entry point of the SDK code. */
     call_user_start();

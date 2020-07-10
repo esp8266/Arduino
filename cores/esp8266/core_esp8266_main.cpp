@@ -300,14 +300,14 @@ void init_done() {
 
 */
 #if defined(DEBUG_ERASE_CONFIG)
-extern "C" void fix_divider(void);
-#define FIX_DIVIDER fix_divider
-#define ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
-#define ETS_DELAY_US(a) ets_delay_us(a)
+extern "C" void erase_config__fix_divider(void);
+#define ERASE_CFG__FIX_DIVIDER erase_config__fix_divider
+#define ERASE_CFG__ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
+#define ERASE_CFG__ETS_DELAY_US(a) ets_delay_us(a)
 #else
-#define FIX_DIVIDER() do {} while(0)
-#define ETS_PRINTF(...) do {} while(0)
-#define ETS_DELAY_US(a) do {} while(0)
+#define ERASE_CFG__FIX_DIVIDER() do {} while(0)
+#define ERASE_CFG__ETS_PRINTF(...) do {} while(0)
+#define ERASE_CFG__ETS_DELAY_US(a) do {} while(0)
 #endif
 
 
@@ -319,8 +319,8 @@ extern "C" void app_entry_redefinable(void)
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
-    FIX_DIVIDER();
-    ETS_PRINTF("\n\ncall_user_start()\n");
+    ERASE_CFG__FIX_DIVIDER();
+    ERASE_CFG__ETS_PRINTF("\n\ncall_user_start()\n");
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
@@ -344,8 +344,8 @@ extern "C" void user_init(void) {
 
 #if defined(DEBUG_ERASE_CONFIG)
     uart_div_modify(0, UART_CLK_FREQ / (74880));
-    ETS_DELAY_US(150);
-    ETS_PRINTF("\nuser_init()\n");
+    ERASE_CFG__ETS_DELAY_US(150);
+    ERASE_CFG__ETS_PRINTF("\nuser_init()\n");
 #else
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 #endif
