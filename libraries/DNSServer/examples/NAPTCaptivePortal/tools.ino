@@ -53,18 +53,17 @@ String getWiFiStatusString(uint32_t status) {
   mode of a WiFi device. Can be used with the value returned by WiFi.getPhyMode().
 */
 char getPhyModeChar(WiFiPhyMode_t i) {
-  char phy = '?';
   switch (i) {
     case WIFI_PHY_MODE_11B:
-      phy = 'b'; // = 1
+      return 'b'; // = 1
     case WIFI_PHY_MODE_11G:
-      phy = 'g'; // = 2,
+      return 'g'; // = 2,
     case WIFI_PHY_MODE_11N:
-      phy = 'n'; // = 3,
+      return 'n'; // = 3,
     default:
       break;
   }
-  return phy;
+  return '?';
 }
 
 /*
