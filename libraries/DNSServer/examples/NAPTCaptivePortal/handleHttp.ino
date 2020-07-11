@@ -1,6 +1,6 @@
 #if LWIP_FEATURES && !LWIP_IPV6
 
-#include "WifiHttpv.h"
+#include "WifiHttp.h"
 
 #ifndef TCP_MSS
 #define TCP_MSS 1460
