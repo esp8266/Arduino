@@ -125,7 +125,7 @@
  * extra 4K in the heap.
  *
  */
-#define DEBUG_HWDT_NO4KEXTRA
+ // #define DEBUG_HWDT_NO4KEXTRA
 
 
 /*
@@ -360,14 +360,14 @@ static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and inclu
 #ifndef CONT_STACKGUARD
 #define CONT_STACKGUARD 0xfeefeffe
 #endif
-constexpr volatile uint32_t *RTC_SYS = (volatile uint32_t*)0x60001100;
+#define RTC_SYS         ((volatile uint32_t*)0x60001100)
 
 
-constexpr uint32_t *dram_start      = (uint32_t *)0x3FFE8000;
-constexpr uint32_t *dram_end        = (uint32_t *)0x40000000;
+#define dram_start      ((uint32_t *)0x3FFE8000)
+#define dram_end        ((uint32_t *)0x40000000)
 
-constexpr uint32_t *rom_stack_first = (uint32_t *)0x40000000;
-constexpr uint32_t *sys_stack       = (uint32_t *)0x3fffeb30;
+#define rom_stack_first ((uint32_t *)0x40000000)
+#define sys_stack       ((uint32_t *)0x3fffeb30)
 /*
  * The space between 0x3fffe000 up to 0x3fffeb30 is a ROM BSS area that is later
  * claimed by the SDK for stack space. This is a problem area for this tool,
@@ -375,23 +375,23 @@ constexpr uint32_t *sys_stack       = (uint32_t *)0x3fffeb30;
  * the "sys" stack residing there is lost. On the other hand, it becomes a prime
  * candidate for DRAM address space to handle the needs of this tool.
  */
-constexpr uint32_t *sys_stack_e000  = (uint32_t *)0x3fffe000;
+#define sys_stack_e000     ((uint32_t *)0x3fffe000)
 
 // Map out who will live where.
-constexpr size_t rom_stack_A16_sz = MK_ALIGN16_SZ(ROM_STACK_SIZE);
-constexpr size_t cont_stack_A16_sz = MK_ALIGN16_SZ(sizeof(cont_t));
-constexpr uint32_t *rom_stack = (uint32_t *)((uintptr_t)rom_stack_first - rom_stack_A16_sz);
+#define rom_stack_A16_sz   (MK_ALIGN16_SZ(ROM_STACK_SIZE))
+#define cont_stack_A16_sz  (MK_ALIGN16_SZ(sizeof(cont_t)))
+#define rom_stack ((uint32_t *) ((uintptr_t)rom_stack_first - rom_stack_A16_sz))
 
 
 #ifdef DEBUG_HWDT_NO4KEXTRA
 /* This is the default NONOS-SDK user's heap location for NO4KEXTRA */
 static cont_t g_cont __attribute__ ((aligned (16)));
-constexpr uint32_t *sys_stack_first = (uint32_t *)((uintptr_t)rom_stack);
+#define sys_stack_first ((uint32_t *)((uintptr_t)rom_stack))
 
 #else
-constexpr uint32_t *cont_stack_first = (uint32_t *)((uintptr_t)rom_stack); // only for computation
-constexpr cont_t *cont_stack = (cont_t *)((uintptr_t)cont_stack_first - cont_stack_A16_sz);
-constexpr uint32_t *sys_stack_first = (uint32_t *)((uintptr_t)cont_stack);
+#define cont_stack_first ((uint32_t *)((uintptr_t)rom_stack)) // only for computation
+#define cont_stack ((cont_t *)((uintptr_t)cont_stack_first - cont_stack_A16_sz))
+#define sys_stack_first ((uint32_t *)((uintptr_t)cont_stack))
 #endif
 
 uint32_t *g_rom_stack  __attribute__((section(".noinit")));
@@ -805,6 +805,7 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
  *
  *
  */
+STATIC void IRAM_MAYBE handle_hwdt(void)  __attribute__((used));
 STATIC void IRAM_MAYBE handle_hwdt(void) {
 
     ets_memset(&hwdt_info, 0, sizeof(hwdt_info));
@@ -960,9 +961,21 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
 extern "C" void Cache_Read_Disable(void);
 extern "C" void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 
+#ifndef USE_IRAM
+void ICACHE_RAM_ATTR handle_hwdt_icache() {
+  Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
+  handle_hwdt();
+  Cache_Read_Disable();
+}
+#endif
+
 void ICACHE_RAM_ATTR app_entry_start(void) {
 
+#ifdef USE_IRAM
     handle_hwdt();
+#else
+    handle_hwdt_icache();
+#endif
 
 #ifdef DEBUG_HWDT_NO4KEXTRA
     /*
@@ -981,18 +994,11 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
      *  Use new calculated SYS stack from top.
      *  Call the entry point of the SDK code.
      */
-    asm volatile ("" ::: "memory");
-
-#ifndef USE_IRAM
-    asm volatile ("callx0 %0\n\t" ::
-                  "r" (Cache_Read_Disable) : "memory");
-#endif
-
     asm volatile ("mov.n a1, %0\n\t"
                   "movi a0, 0x4000044c\n\t"     /* Should never return; however, set return to Boot ROM Breakpoint */
                   "jx %1\n\t" ::
                   "r" (sys_stack_first), "r" (call_user_start):
-                  "a0", "a1");
+                  "a0", "memory");
 
     __builtin_unreachable();
 }
@@ -1012,19 +1018,9 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
      * tool from the list of possible concerns for stack overwrite.
      *
      */
-    asm volatile ("movi a1, 0x3fffeb30\n\t" ::: "a1");
 
-#ifndef USE_IRAM
-    // Enable cache over flash
-    asm volatile ("movi.n a2, 0\n\t"
-                  "movi.n a3, 0\n\t"
-                  "movi.n a4, 0\n\t"    // 0 == ICACHE_SIZE_16
-                  "callx0 %0\n\t" ::
-                  "r" (Cache_Read_Enable):
-                  "a2", "a3", "a4", "memory");
-#endif
-
-    asm volatile ("j app_entry_start" ::);
+    asm volatile ("movi a1, 0x3fffeb30\n\t"
+                  "j app_entry_start" ::: "memory");
 
     /*
      * Keep this function with just asm seems to help avoid a stack frame being
@@ -1033,7 +1029,6 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
 
     __builtin_unreachable();
 }
-
 
 #if defined(HWDT_INFO) || defined(ROM_STACK_DUMP)
 void preinit(void) {

@@ -21,7 +21,7 @@
 
 #include "AddOn.h"
 /*
-  If you need to run your sketch w/o this tool or you want to  see the
+  If you need to run your sketch w/o this tool or you want to see the
   difference with and without this tool. Comment out the #include below. And
   comment out the "#define DEBUG_HWDT" line in hwdt_app_entry.cpp.
 */
