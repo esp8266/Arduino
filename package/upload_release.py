@@ -8,7 +8,7 @@ import json
 import mimetypes
 import os
 
-parser = argparse.ArgumentParser(description='Patch in a section of the Arduino tools JSON')
+parser = argparse.ArgumentParser(description='Upload a set of files to a new draft release')
 parser.add_argument('--user', help="Github username", type=str, required=True)
 parser.add_argument('--token', help="Github Personal Access Token (PAT)", type=str, required=True)
 parser.add_argument('--repo', help="Repository", type=str, required=True)
