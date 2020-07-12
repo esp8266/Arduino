@@ -20,8 +20,11 @@
 # Now make a SSH key using ssh-keygen (do not use your own, make a new one!)
 # ssh-keygen ...
 
-# Upload the id_rsa.pub (public key) to GitHub
-#    Settings->SSH and GPG Keys->New SSH Key
+# Upload the id_rsa.pub (public key) to the GH.IO GitHub as a *deploy key*
+# (https://github.com/esp8266/esp8266.github.io->Settings->Deploy Keys->Add Key)
+# DO NOT USE Settings->SSH and GPG Keys->New SSH Key because that allows
+# full access to all repos owned by the user, while a Deploy Key only allows
+# access to a single repo.
 
 # Encrypt the private part of the key using the key and IV above and commit the change
 # openssl enc -aes-256-cbc -K <key> -iv <iv> -in id_rsa -out package/esp8266_github_io_deploy.enc
