@@ -45,7 +45,7 @@ Eating the cake in its current form is a process which involves all the layers. 
 
 In general ESP-NOW is faster than TCP/IP for small data payloads (up to a few kB). The data segment of a standard ESP-NOW transmission is 234 bytes, which takes around 2-4 ms to transmit.
 
-TCP/IP takes longer to connect (around 1000 ms), and an AP has to disconnect all connected stations in order to transfer data to another AP, but this backend has a much higher data transfer speed than ESP-NOW once connected (100x faster or so).
+TCP/IP takes longer to connect (around 1000 ms), and an AP has to disconnect all connected stations in order to transfer data to another AP. However, this backend has a much higher data transfer speed than ESP-NOW once connected (100x faster or so).
 
 ## <a name="Start"></a>The first step
 
@@ -391,7 +391,7 @@ To change the WiFi scan mode to passive, the following information is helpful:
 2. In `ESP8266WiFiScan.cpp` one can find the following variable declaration: `struct scan_config config;` around line 87. Adding `config.scan_type = WIFI_SCAN_TYPE_PASSIVE;` after `memset(&config, 0, sizeof(config));` on line 88 will ensure passive scans are used.
 
 ### <a name="FAQSlowRouter"></a>My internet is slower when I connect the ESP8266 to my router!
-There has been some reports about this happening when the ESP8266 is in AP+STA mode while connected to the router. The ESP8266 automatically switches to 802.11g in AP+STA mode, so if your router normally uses a faster WiFi standard such as 802.11n or 802.11ac the router may change mode of operation to 802.11g. Typically this would result in a WiFi speed of around 30-40 Mbit/s.
+There has been some reports about this happening when the ESP8266 is in AP+STA mode while connected to the router. The ESP8266 automatically switches to 802.11g in AP+STA mode, so if your router normally uses a faster WiFi standard such as 802.11n or 802.11ac the router may change mode of operation to 802.11g. Typically this would result in a maximum WiFi speed of around 30 Mbit/s.
 
 A possible workaround is to use only AP mode or STA mode (see "[I want to control the WiFi mode myself](#FAQModeControl)"), perhaps with an extra ESP8266 in one of these modes as a buffer between your ESP8266 mesh network and your router. Remember that the ESP8266 must have the AP active in order to receive ESP-NOW broadcast messages.
 
