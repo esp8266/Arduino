@@ -62,3 +62,4 @@ jobs:
            bash ./tests/ci/build_package.sh
            # Only the regenerated JSON file will be used, but it's simpler than looking for it in a GH release
            bash ./package/deploy_package_index.sh
+
