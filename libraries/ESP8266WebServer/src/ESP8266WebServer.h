@@ -26,6 +26,7 @@
 
 #include <functional>
 #include <memory>
+#include <functional>
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include "detail/mimetable.h"
@@ -80,6 +81,7 @@ public:
   using ClientType = typename ServerType::ClientType;
   using RequestHandlerType = RequestHandler<ServerType>;
   using WebServerType = ESP8266WebServerTemplate<ServerType>;
+  using hook_f = std::function<bool(const String& method, const String& url, ClientType& client)>;
 
   void begin();
   void begin(uint16_t port);
@@ -192,6 +194,22 @@ public:
 
   static String responseCodeToString(const int code);
 
+  void addHook (hook_f hook)
+  {
+    if (_hook)
+    {
+      auto old = _hook;
+      _hook = [old, hook](const String& method, const String& url, ClientType& client)
+        {
+          if (first(method, url, client))
+            return true;
+          return hook(method, url, client);
+        };
+    }
+    else
+      _hook = hook;
+  }
+
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
@@ -251,7 +269,7 @@ protected:
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
 
-  
+  hook_f           _hook;
 
 };
 

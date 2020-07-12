@@ -336,12 +336,14 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
           _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
           _contentLength = CONTENT_LENGTH_NOT_SET;
           _handleRequest();
-
-          if (_currentClient.connected()) {
-            _currentStatus = HC_WAIT_CLOSE;
-            _statusChange = millis();
-            keepCurrentClient = true;
-          }
+        } else {
+          keepCurrentClient = false;
+          _currentClient.stop();
+        }
+        if (_currentClient.connected()) {
+          _currentStatus = HC_WAIT_CLOSE;
+          _statusChange = millis();
+          keepCurrentClient = true;
         }
       } else { // !_currentClient.available()
         if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {

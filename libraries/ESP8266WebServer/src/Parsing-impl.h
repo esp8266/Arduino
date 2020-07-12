@@ -71,7 +71,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   client.readStringUntil('\n');
   //reset header value
   for (int i = 0; i < _headerKeysCount; ++i) {
-    _currentHeaders[i].value =String();
+    _currentHeaders[i].value.clear();
    }
 
   // First line of HTTP request looks like "GET /path HTTP/1.1"
@@ -97,6 +97,15 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   }
   _currentUri = url;
   _chunked = false;
+
+  if (_hook && _hook(methodStr, url, client))
+  {
+    // _hook() must return true when method is recognized
+    // (even when request goes wrong)
+    // in any case, request header and content must be read
+    // returning false because request is now already handled
+    return false;
+  }
 
   HTTPMethod method = HTTP_GET;
   if (methodStr == F("HEAD")) {
