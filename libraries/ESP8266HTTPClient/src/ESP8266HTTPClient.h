@@ -26,10 +26,6 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#ifndef HTTPCLIENT_1_1_COMPATIBLE
-#define HTTPCLIENT_1_1_COMPATIBLE 1
-#endif
-
 #include <memory>
 #include <Arduino.h>
 
@@ -48,7 +44,7 @@
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
 
 /// HTTP client errors
-#define HTTPC_ERROR_CONNECTION_REFUSED  (-1)
+#define HTTPC_ERROR_CONNECTION_FAILED   (-1)
 #define HTTPC_ERROR_SEND_HEADER_FAILED  (-2)
 #define HTTPC_ERROR_SEND_PAYLOAD_FAILED (-3)
 #define HTTPC_ERROR_NOT_CONNECTED       (-4)
@@ -59,6 +55,8 @@
 #define HTTPC_ERROR_ENCODING            (-9)
 #define HTTPC_ERROR_STREAM_WRITE        (-10)
 #define HTTPC_ERROR_READ_TIMEOUT        (-11)
+
+constexpr int HTTPC_ERROR_CONNECTION_REFUSED __attribute__((deprecated)) = HTTPC_ERROR_CONNECTION_FAILED;
 
 /// size for the stream handling
 #define HTTP_TCP_BUFFER_SIZE (1460)
@@ -147,10 +145,8 @@ typedef enum {
     HTTPC_FORCE_FOLLOW_REDIRECTS
 } followRedirects_t;
 
-#if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
-#endif
 
 class StreamString;
 
@@ -167,19 +163,14 @@ public:
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
-#if HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
     bool begin(String url)  __attribute__ ((deprecated));
     bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
-    // Use axTLS for secure HTTPS connection
-    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
     // Use BearSSL for secure HTTPS connection
     bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
-#endif
 
     void end(void);
 
@@ -247,10 +238,8 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
-#if HTTPCLIENT_1_1_COMPATIBLE
     TransportTraitsPtr _transportTraits;
     std::unique_ptr<WiFiClient> _tcpDeprecated;
-#endif
     WiFiClient* _client;
 
     /// request handling

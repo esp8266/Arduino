@@ -47,38 +47,27 @@ jobs:
       env:
         - BUILD_PARITY=odd
 
-    - name: "Debug (1)"
+    - name: "Debug IPv6 (1)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/debug.sh
+      script: $TRAVIS_BUILD_DIR/tests/debug6.sh
       env:
         - BUILD_PARITY=even
-    - name: "Debug (2)"
+    - name: "Debug IPv6 (2)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/debug.sh
+      script: $TRAVIS_BUILD_DIR/tests/debug6.sh
       env:
         - BUILD_PARITY=odd
 
-    - name: "Build IPv6 (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build6.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build IPv6 (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build6.sh
-      env:
-        - BUILD_PARITY=odd
-
-    - name: "Build lwIP-v1.4 (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build1.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build lwIP-v1.4 (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build1.sh
-      env:
-        - BUILD_PARITY=odd
+#    - name: "Build IPv6 (1)"
+#      stage: build
+#      script: $TRAVIS_BUILD_DIR/tests/build6.sh
+#      env:
+#        - BUILD_PARITY=even
+#    - name: "Build IPv6 (2)"
+#      stage: build
+#      script: $TRAVIS_BUILD_DIR/tests/build6.sh
+#      env:
+#        - BUILD_PARITY=odd
 
     - name: "Mac OSX can build sketches"
       os: osx
