@@ -36,7 +36,7 @@ void printHelpAddOn(Print& out) {
   out.println(F("  d    - Print some HWDT Debug info."));
 }
 
-
+int divideA_B(int a, int b);
 
 int hotKeyHandlerAddOn(Print& out, int hotKey) {
   switch (hotKey) {
@@ -50,6 +50,7 @@ int hotKeyHandlerAddOn(Print& out, int hotKey) {
     case '0':
       out.println(F("Crashing by dividing by zero."));
       out.printf_P(PSTR("This should not print %d\n"), divideA_B(1, 0));
+      // out.printf("This should not print %d\r\n", divideA_B(1, 0));
       break;
     case 'c':
       out.println(F("Now calling: void crashMeIfYouCan(void)__attribute__((weak));"));
@@ -62,7 +63,9 @@ int hotKeyHandlerAddOn(Print& out, int hotKey) {
   return 1;
 }
 
-int divideA_B(int a, int b) {
+// Will HWDT if not set to NOINLINE
+// int divideA_B(int a, int b) {
+int __attribute__((noinline)) divideA_B(int a, int b) {
   return (a / b);
 }
 
