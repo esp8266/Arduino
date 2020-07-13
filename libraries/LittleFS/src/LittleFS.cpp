@@ -87,6 +87,7 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
         // a directory whose name we are carrying around but which cannot be read or written
         return std::make_shared<LittleFSFileImpl>(this, path, nullptr, flags, creation);
     } else if (rc == 0) {
+        lfs_file_sync(&_lfs, fd.get());
         return std::make_shared<LittleFSFileImpl>(this, path, fd, flags, creation);
     } else {
         DEBUGV("LittleFSDirImpl::openFile: rc=%d fd=%p path=`%s` openMode=%d accessMode=%d err=%d\n",

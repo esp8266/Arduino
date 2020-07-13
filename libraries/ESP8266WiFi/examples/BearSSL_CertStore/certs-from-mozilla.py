@@ -3,7 +3,7 @@
 # This script pulls the list of Mozilla trusted certificate authorities
 # from the web at the "mozurl" below, parses the file to grab the PEM
 # for each cert, and then generates DER files in a new ./data directory
-# Upload these to a SPIFFS filesystem and use the CertManager to parse
+# Upload these to an on-chip filesystem and use the CertManager to parse
 # and use them for your outgoing SSL connections.
 #
 # Script by Earle F. Philhower, III.  Released to the public domain.

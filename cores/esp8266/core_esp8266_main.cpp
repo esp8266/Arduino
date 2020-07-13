@@ -34,6 +34,7 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include "flash_quirks.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -171,7 +172,7 @@ extern "C" bool ets_post_rom(uint8 prio, ETSSignal sig, ETSParam par);
 
 extern "C" bool IRAM_ATTR ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
   uint32_t saved;
-  asm volatile ("rsr %0,ps":"=a" (saved));
+  __asm__ __volatile__ ("rsr %0,ps":"=a" (saved));
   bool rc=ets_post_rom(prio, sig, par);
   xt_wsr_ps(saved);
   return rc;
@@ -333,6 +334,8 @@ extern "C" void user_init(void) {
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
+
+    experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
 

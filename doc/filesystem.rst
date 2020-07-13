@@ -61,7 +61,18 @@ following include to the sketch:
 
 .. code:: cpp
 
-    #include "FS.h"
+    //#include "FS.h" // SPIFFS is declared
+    #include "LittleFS.h" // LittleFS is declared
+
+SPIFFS Deprecation Warning
+--------------------------
+
+SPIFFS is currently deprecated and may be removed in future releases of
+the core.  Please consider moving your code to LittleFS.  SPIFFS is not
+actively supported anymore by the upstream developer, while LittleFS is
+under active development, supports real directories, and is many times
+faster for most operations.
+
 
 SPIFFS and LittleFS
 -------------------

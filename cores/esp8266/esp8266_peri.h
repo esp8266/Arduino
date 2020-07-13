@@ -250,7 +250,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
 #define UIFF	0 //RX FIFO Full
 
 //UART STATUS Registers Bits
-#define USTX    31 //TX PIN Level
+#define USTX    31 //TX PIN Level (Doesn't seem to work, always reads as 0 for both uarts. HW bug? Possible workaround: Enable loopback UxC0 |= 1<<UCLBE and read USRXD, see https://github.com/esp8266/Arduino/issues/7256 for discussion.)
 #define USRTS   30 //RTS PIN Level
 #define USDTR   39 //DTR PIN Level
 #define USTXC   16 //TX FIFO COUNT (8bit)

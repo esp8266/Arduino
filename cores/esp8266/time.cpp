@@ -73,13 +73,6 @@ int clock_gettime(clockid_t unused, struct timespec *tp)
     return 0;
 }
 
-#if LWIP_VERSION_MAJOR == 1
-// hack for espressif time management included in patched lwIP-1.4
-#define sntp_real_timestamp sntp_get_current_timestamp()
-#endif
-
-#if LWIP_VERSION_MAJOR != 1
-
 // backport Espressif api
 
 bool sntp_set_timezone_in_seconds (int32_t timezone_sec)
@@ -102,8 +95,6 @@ uint32 sntp_get_current_timestamp()
 {
     return sntp_real_timestamp;
 }
-
-#endif
 
 time_t time(time_t * t)
 {
@@ -175,7 +166,7 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
         tzr->d = 0;
         tzr->s = 0;
         tzr->change = 0;
-        tzr->offset = _timezone;
+        tzr->offset = -_timezone;
     }
 
     // sntp servers
@@ -186,6 +177,14 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     /*** end of posix replacement ***/
 }
 
+void setTZ(const char* tz){
+	
+    char tzram[strlen_P(tz) + 1];
+    memcpy_P(tzram, tz, sizeof(tzram));
+    setenv("TZ", tzram, 1/*overwrite*/);
+    tzset();
+}
+
 void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
 {
     sntp_stop();
@@ -193,10 +192,8 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     setServer(0, server1);
     setServer(1, server2);
     setServer(2, server3);
-    char tzram[strlen_P(tz) + 1];
-    memcpy_P(tzram, tz, sizeof(tzram));
-    setenv("TZ", tzram, 1/*overwrite*/);
-    tzset();
-
+	setTZ(tz);
+	
     sntp_init();
 }
+
