@@ -233,6 +233,7 @@ protected:
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
+  int              _currentArgsHavePlain;
   std::unique_ptr<HTTPUpload> _currentUpload;
   int              _postArgsLen;
   RequestArgument* _postArgs;
