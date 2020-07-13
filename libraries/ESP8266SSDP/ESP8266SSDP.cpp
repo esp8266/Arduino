@@ -69,11 +69,11 @@ static const char _ssdp_notify_template[] PROGMEM =
 
 static const char _ssdp_packet_template[] PROGMEM =
   "%s" // _ssdp_response_template / _ssdp_notify_template
-  "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
+  "CACHE-CONTROL: max-age=%u\r\n" // _interval
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
   "USN: %s\r\n" // _uuid
   "%s: %s\r\n"  // "NT" or "ST", _deviceType
-  "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
+  "LOCATION: http://%s:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
 static const char _ssdp_schema_template[] PROGMEM =
@@ -88,7 +88,7 @@ static const char _ssdp_schema_template[] PROGMEM =
   "<major>1</major>"
   "<minor>0</minor>"
   "</specVersion>"
-  "<URLBase>http://%u.%u.%u.%u:%u/</URLBase>" // WiFi.localIP(), _port
+  "<URLBase>http://%s:%u/</URLBase>" // WiFi.localIP(), _port
   "<device>"
   "<deviceType>%s</deviceType>"
   "<friendlyName>%s</friendlyName>"
@@ -130,6 +130,7 @@ SSDPClass::SSDPClass() :
   _timer(0),
   _port(80),
   _ttl(SSDP_MULTICAST_TTL),
+  _interval(SSDP_INTERVAL),
   _respondToAddr(0,0,0,0),
   _respondToPort(0),
   _pending(false),
@@ -241,13 +242,13 @@ void SSDPClass::_send(ssdp_method_t method) {
   int len = snprintf_P(buffer, sizeof(buffer),
                        _ssdp_packet_template,
                        valueBuffer,
-                       SSDP_INTERVAL,
+                       _interval,
                        _modelName,
                        _modelNumber,
                        _uuid,
                        (method == NONE) ? "ST" : "NT",
                        (_st_is_uuid) ? _uuid : _deviceType,
-                       ip[0], ip[1], ip[2], ip[3], _port, _schemaURL
+                       ip.toString().c_str(), _port, _schemaURL
                       );
 
   _server->append(buffer, len);
@@ -276,12 +277,12 @@ void SSDPClass::_send(ssdp_method_t method) {
   _server->send(remoteAddr, remotePort);
 }
 
-void SSDPClass::schema(WiFiClient client) {
+void SSDPClass::schema(Print &client) const {
   IPAddress ip = WiFi.localIP();
   char buffer[strlen_P(_ssdp_schema_template) + 1];
   strcpy_P(buffer, _ssdp_schema_template);
   client.printf(buffer,
-                ip[0], ip[1], ip[2], ip[3], _port,
+                ip.toString().c_str(), _port,
                 _deviceType,
                 _friendlyName,
                 _presentationURL,
@@ -428,7 +429,7 @@ void SSDPClass::_update() {
   if (_pending && (millis() - _process_time) > _delay) {
     _pending = false; _delay = 0;
     _send(NONE);
-  } else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
+  } else if(_notify_time == 0 || (millis() - _notify_time) > (_interval * 1000L)){
     _notify_time = millis();
     _st_is_uuid = false;
     _send(NOTIFY);
@@ -493,9 +494,12 @@ void SSDPClass::setManufacturerURL(const char *url) {
   strlcpy(_manufacturerURL, url, sizeof(_manufacturerURL));
 }
 
-
 void SSDPClass::setTTL(const uint8_t ttl) {
   _ttl = ttl;
+}
+
+void SSDPClass::setInterval(uint32_t interval) {
+  _interval = interval;
 }
 
 void SSDPClass::_onTimerStatic(SSDPClass* self) {

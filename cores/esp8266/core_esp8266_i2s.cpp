@@ -464,14 +464,28 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
+  /*
+  Following this post: https://github.com/esp8266/Arduino/issues/2590
+  We should reset the transmitter while changing the configuration bits to avoid random distortion.
+  */
+ 
+  uint32_t i2sc_temp = I2SC;
+  i2sc_temp |= (I2STXR); // Hold transmitter in reset
+  I2SC = i2sc_temp;
+
   // trans master(active low), recv master(active_low), !bits mod(==16 bits/chanel), clear clock dividers
-  I2SC &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+  i2sc_temp &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
 
   // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
   // I2SMR = MSB recv/xmit first
   // I2SRMS, I2STMS = 1-bit delay from WS to MSB (I2S format)
   // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
-  I2SC |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+  i2sc_temp |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+
+  I2SC = i2sc_temp;
+  
+  i2sc_temp &= ~(I2STXR); // Release reset
+  I2SC = i2sc_temp;
 }
 
 float i2s_get_real_rate(){
@@ -507,7 +521,6 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
   }
 
-  _i2s_sample_rate = 0;
   if (!i2s_slc_begin()) {
     // OOM in SLC memory allocations, tear it all down and abort!
     i2s_end();
@@ -530,7 +543,13 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
   // I2STXCMM, I2SRXCMM=0 => Dual channel mode
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); // Set RX/TX CHAN_MOD=0
 
-  i2s_set_rate(44100);
+  // Ensure a sane clock is set, but don't change any pre-existing ones.
+  // But we also need to make sure the other bits weren't reset by a previous
+  // reset.  So, store the present one, clear the flag, then set the same
+  // value (writing all needed config bits in the process
+  uint32_t save_rate = _i2s_sample_rate;
+  _i2s_sample_rate  = 0;
+   i2s_set_rate(save_rate ? save_rate : 44100);
 
   if (rx) {
     // Need to prime the # of samples to receive in the engine

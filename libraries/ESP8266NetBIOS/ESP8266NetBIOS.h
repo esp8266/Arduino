@@ -3,7 +3,6 @@
 #define __ESPNBNS_h__
 
 extern "C" {
-#include "lwip/init.h" // LWIP_VERSION_
 #include <lwip/ip_addr.h>
 }
 #include <ESP8266WiFi.h>
@@ -28,8 +27,8 @@ protected:
     void _getnbname(char *nbname, char *name, uint8_t maxlen);
     void _makenbname(char *name, char *nbname, uint8_t outlen);
    
-    void _recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint16_t port);
-    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, CONST ip_addr_t *addr, uint16_t port);
+    void _recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port);
+    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port);
 
 public:
     ESP8266NetBIOS();

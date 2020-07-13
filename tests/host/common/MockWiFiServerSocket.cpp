@@ -60,8 +60,15 @@ int serverAccept (int srvsock)
 
 void WiFiServer::begin (uint16_t port)
 {
-	_port = port;
-	return begin();
+    return begin(port, !0);
+}
+
+void WiFiServer::begin (uint16_t port, uint8_t backlog)
+{
+    if (!backlog)
+        return;
+    _port = port;
+    return begin();
 }
 
 void WiFiServer::begin ()
@@ -94,7 +101,7 @@ void WiFiServer::begin ()
 
     	server.sin_family = AF_INET;
 	server.sin_port = htons(mockport);
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_addr.s_addr = htonl(global_source_address);
 	if (bind(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
 	{
 		perror(MOCK "bind()");
@@ -109,13 +116,13 @@ void WiFiServer::begin ()
 
 
 	// store int into pointer
-	_pcb = int2pcb(sock);
+	_listen_pcb = int2pcb(sock);
 }
 
 bool WiFiServer::hasClient ()
 {
 	struct pollfd p;
-	p.fd = pcb2int(_pcb);
+	p.fd = pcb2int(_listen_pcb);
 	p.events = POLLIN;
 	return poll(&p, 1, 0) && p.revents == POLLIN;
 }
@@ -134,7 +141,12 @@ size_t WiFiServer::write (const uint8_t *buf, size_t size)
 
 void WiFiServer::close ()
 {
-	if (pcb2int(_pcb) >= 0)
-		::close(pcb2int(_pcb));
-	_pcb = int2pcb(-1);
+	if (pcb2int(_listen_pcb) >= 0)
+		::close(pcb2int(_listen_pcb));
+	_listen_pcb = int2pcb(-1);
+}
+
+void WiFiServer::stop ()
+{
+    close();
 }

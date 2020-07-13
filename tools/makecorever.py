@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Generate the core_version.h header per-build
 #
@@ -35,9 +35,19 @@ def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
     except:
         pass
 
+    text = "#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver)
+    text += "#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc)
+
+    try:
+        with open(path, "r") as inp:
+            old_text = inp.read()
+        if old_text == text:
+            return
+    except:
+        pass
+
     with open(path, "w") as out:
-        out.write("#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver))
-        out.write("#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc))
+        out.write(text)
 
 
 if __name__ == "__main__":

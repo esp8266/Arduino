@@ -87,6 +87,7 @@ void setup() {
   // use SoftwareSerial on regular RX(3)/TX(1) for logging
   logger = new SoftwareSerial(3, 1);
   logger->begin(BAUD_LOGGER);
+  logger->enableIntTx(false);
   logger->println("\n\nUsing SoftwareSerial for logging");
 #else
   logger->begin(BAUD_LOGGER);

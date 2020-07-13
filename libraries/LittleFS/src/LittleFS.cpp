@@ -52,7 +52,7 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
     int flags = _getFlags(openMode, accessMode);
     auto fd = std::make_shared<lfs_file_t>();
 
-    if ((openMode && OM_CREATE) && strchr(path, '/')) {
+    if ((openMode & OM_CREATE) && strchr(path, '/')) {
         // For file creation, silently make subdirs as needed.  If any fail,
         // it will be caught by the real file open later on
         char *pathStr = strdup(path);
@@ -68,13 +68,27 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
         }
         free(pathStr);
     }
+
+    time_t creation = 0;
+    if (timeCallback && (openMode & OM_CREATE)) {
+        // O_CREATE means we *may* make the file, but not if it already exists.
+        // See if it exists, and only if not update the creation time
+        int rc = lfs_file_open(&_lfs, fd.get(), path, LFS_O_RDONLY);
+	if (rc == 0) {
+            lfs_file_close(&_lfs, fd.get()); // It exists, don't update create time
+        } else {
+            creation = timeCallback();  // File didn't exist or otherwise, so we're going to create this time
+        }
+    }
+
     int rc = lfs_file_open(&_lfs, fd.get(), path, flags);
     if (rc == LFS_ERR_ISDIR) {
         // To support the SD.openNextFile, a null FD indicates to the LittleFSFile this is just
         // a directory whose name we are carrying around but which cannot be read or written
-        return std::make_shared<LittleFSFileImpl>(this, path, nullptr);
+        return std::make_shared<LittleFSFileImpl>(this, path, nullptr, flags, creation);
     } else if (rc == 0) {
-        return std::make_shared<LittleFSFileImpl>(this, path, fd);
+        lfs_file_sync(&_lfs, fd.get());
+        return std::make_shared<LittleFSFileImpl>(this, path, fd, flags, creation);
     } else {
         DEBUGV("LittleFSDirImpl::openFile: rc=%d fd=%p path=`%s` openMode=%d accessMode=%d err=%d\n",
                rc, fd.get(), path, openMode, accessMode, rc);
@@ -190,6 +204,14 @@ int LittleFSImpl::lfs_flash_sync(const struct lfs_config *c) {
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LITTLEFS)
 FS LittleFS = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(FS_PHYS_ADDR, FS_PHYS_SIZE, FS_PHYS_PAGE, FS_PHYS_BLOCK, FS_MAX_OPEN_FILES)));
+
+extern "C" void littlefs_request_end(void)
+{
+    // override default weak function
+    //ets_printf("debug: not weak littlefs end\n");
+    LittleFS.end();
+}
+
 #endif
 
 #endif // !CORE_MOCK

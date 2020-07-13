@@ -127,14 +127,8 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's abs if encountered
-#ifdef abs
-#undef abs
-#endif
-
-#define abs(x) ((x)>0?(x):-(x))
+// Use stdlib abs() and round() to avoid issues with the C++ libraries
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
@@ -142,29 +136,8 @@ void timer0_detachInterrupt(void);
 void ets_intr_lock();
 void ets_intr_unlock();
 
-#ifndef __STRINGIFY
-#define __STRINGIFY(a) #a
-#endif
-
-// these low level routines provide a replacement for SREG interrupt save that AVR uses
-// but are esp8266 specific. A normal use pattern is like
-//
-//{
-//    uint32_t savedPS = xt_rsil(1); // this routine will allow level 2 and above
-//    // do work here
-//    xt_wsr_ps(savedPS); // restore the state
-//}
-//
-// level (0-15), interrupts of the given level and above will be active
-// level 15 will disable ALL interrupts,
-// level 0 will enable ALL interrupts,
-//
-#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
-#define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
-
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
-
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
@@ -225,6 +198,7 @@ void setup(void);
 void loop(void);
 
 void yield(void);
+
 void optimistic_yield(uint32_t interval_us);
 
 #define _PORT_GPIO16    1
@@ -245,13 +219,6 @@ void optimistic_yield(uint32_t interval_us);
 #endif
 
 
-//for compatibility, below 4 lines to be removed in release 3.0.0
-#ifdef __cplusplus
-extern "C"
-#endif
-const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
-
-
 
 #ifdef __cplusplus
 
@@ -269,11 +236,12 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 
 using std::min;
 using std::max;
+using std::round;
 using std::isinf;
 using std::isnan;
 
-#define _min(a,b) ((a)<(b)?(a):(b))
-#define _max(a,b) ((a)>(b)?(a):(b))
+#define _min(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a < _b? _a : _b; })
+#define _max(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a > _b? _a : _b; })
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
@@ -296,10 +264,22 @@ long secureRandom(long);
 long secureRandom(long, long);
 long map(long, long, long, long, long);
 
-extern "C" void configTime(long timezone, int daylightOffset_sec,
-    const char* server1, const char* server2 = nullptr, const char* server3 = nullptr);
+void setTZ(const char* tz);
 
-#endif
+void configTime(int timezone, int daylightOffset_sec, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr);
+
+void configTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr);
+
+// esp32 api compatibility
+inline void configTzTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr)
+{
+    configTime(tz, server1, server2, server3);
+}
+
+#endif // __cplusplus
 
 #include "pins_arduino.h"
 

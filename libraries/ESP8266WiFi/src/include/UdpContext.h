@@ -26,7 +26,6 @@ class UdpContext;
 extern "C" {
 void esp_yield();
 void esp_schedule();
-#include "lwip/init.h" // LWIP_VERSION_
 #include <assert.h>
 }
 
@@ -47,6 +46,7 @@ public:
     , _rx_buf(0)
     , _first_buf_taken(false)
     , _rx_buf_offset(0)
+    , _rx_buf_size(0)
     , _refcnt(0)
     , _tx_buf_head(0)
     , _tx_buf_cur(0)
@@ -74,6 +74,7 @@ public:
             pbuf_free(_rx_buf);
             _rx_buf = 0;
             _rx_buf_offset = 0;
+            _rx_buf_size = 0;
         }
     }
 
@@ -90,28 +91,16 @@ public:
         }
     }
 
-#if LWIP_VERSION_MAJOR == 1
-
-    bool connect(IPAddress addr, uint16_t port)
-    {
-        _pcb->remote_ip = addr;
-        _pcb->remote_port = port;
-        return true;
-    }
-
-    bool listen(IPAddress addr, uint16_t port)
-    {
-        udp_recv(_pcb, &_s_recv, (void *) this);
-        err_t err = udp_bind(_pcb, addr, port);
-        return err == ERR_OK;
-    }
-
-#else // lwIP-v2
-
     bool connect(const IPAddress& addr, uint16_t port)
     {
         _pcb->remote_ip = addr;
         _pcb->remote_port = port;
+#if LWIP_IPV6
+        // Set zone so that link local addresses use the default interface
+        if (IP_IS_V6(&_pcb->remote_ip) && ip6_addr_lacks_zone(ip_2_ip6(&_pcb->remote_ip), IP6_UNKNOWN)) {
+            ip6_addr_assign_zone(ip_2_ip6(&_pcb->remote_ip), IP6_UNKNOWN, netif_default);
+        }
+#endif
         return true;
     }
 
@@ -121,8 +110,6 @@ public:
         err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
-
-#endif // lwIP-v2
 
     void disconnect()
     {
@@ -158,14 +145,26 @@ public:
 
     void setMulticastInterface(const IPAddress& addr)
     {
-#if LWIP_VERSION_MAJOR == 1
-        udp_set_multicast_netif_addr(_pcb, (ip_addr_t)addr);
-#else
         udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
-#endif
     }
 
 #endif // !LWIP_IPV6
+
+    /*
+     * Add a netif (by its index) as the multicast interface
+     */
+    void setMulticastInterface(netif* p_pNetIf)
+    {
+        udp_set_multicast_netif_index(_pcb, (p_pNetIf ? netif_get_index(p_pNetIf) : NETIF_NO_INDEX));
+    }
+
+    /*
+     * Allow access to pcb to change eg. options
+     */
+    udp_pcb* pcb(void)
+    {
+        return _pcb;
+    }
 
     void setMulticastTTL(int ttl)
     {
@@ -182,12 +181,36 @@ public:
         _on_rx = handler;
     }
 
+#ifdef DEBUG_ESP_CORE
+    // this helper is ready to be used when debugging UDP
+    void printChain (const pbuf* pb, const char* msg, size_t n) const
+    {
+        // printf the pb pbuf chain, bufferred and all at once
+        char buf[128];
+        int l = snprintf(buf, sizeof(buf), "UDP: %s %u: ", msg, n);
+        while (pb)
+        {
+            l += snprintf(&buf[l], sizeof(buf) -l, "%p(H=%d,%d<=%d)-",
+                pb, pb->flags == PBUF_HELPER_FLAG, pb->len, pb->tot_len);
+            pb = pb->next;
+        }
+        l += snprintf(&buf[l], sizeof(buf) - l, "(end)");
+        DEBUGV("%s\n", buf);
+    }
+#else
+    void printChain (const pbuf* pb, const char* msg) const
+    {
+        (void)pb;
+        (void)msg;
+    }
+#endif
+
     size_t getSize() const
     {
         if (!_rx_buf)
             return 0;
 
-        return _rx_buf->len - _rx_buf_offset;
+        return _rx_buf_size - _rx_buf_offset;
     }
 
     size_t tell() const
@@ -202,10 +225,15 @@ public:
     }
 
     bool isValidOffset(const size_t pos) const {
-        return (pos <= _rx_buf->len);
+        return (pos <= _rx_buf_size);
     }
 
-    CONST IPAddress& getRemoteAddress() CONST
+    netif* getInputNetif() const
+    {
+        return _currentAddr.input_netif;
+    }
+
+    const IPAddress& getRemoteAddress() const
     {
         return _currentAddr.srcaddr;
     }
@@ -237,46 +265,57 @@ public:
             return true;
         }
 
+        // We have interleaved informations on addresses within received pbuf chain:
+        // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
+        // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
+        //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...
+        // _rx_buf is currently adressing a data pbuf,
+        // in this function it is going to be discarded.
+
         auto deleteme = _rx_buf;
-        _rx_buf = _rx_buf->next;
+
+        // forward in the chain until next address-info pbuf or end of chain
+        while(_rx_buf && _rx_buf->flags != PBUF_HELPER_FLAG)
+            _rx_buf = _rx_buf->next;
 
         if (_rx_buf)
         {
-            if (_rx_buf->flags == PBUF_HELPER_FLAG)
-            {
-                // we have interleaved informations on addresses within reception pbuf chain:
-                // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
-                // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
+            assert(_rx_buf->flags == PBUF_HELPER_FLAG);
 
-                // so the first rx_buf contains an address helper,
-                // copy it to "current address"
-                auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
-                _currentAddr = *helper;
+            // copy address helper to "current address"
+            auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
+            _currentAddr = *helper;
 
-                // destroy the helper in the about-to-be-released pbuf
-                helper->~AddrHelper();
+            // destroy the helper in the about-to-be-released pbuf
+            helper->~AddrHelper();
 
-                // forward in rx_buf list, next one is effective data
-                // current (not ref'ed) one will be pbuf_free'd with deleteme
-                _rx_buf = _rx_buf->next;
-            }
+            // forward in rx_buf list, next one is effective data
+            // current (not ref'ed) one will be pbuf_free'd
+            // with the 'deleteme' pointer above
+            _rx_buf = _rx_buf->next;
 
             // this rx_buf is not nullptr by construction,
+            assert(_rx_buf);
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
+            // (ref counter prevents release and will be decreased by pbuf_free)
             pbuf_ref(_rx_buf);
         }
+
+        // release in chain previous data, and if any:
+        // current helper, but not start of current data
         pbuf_free(deleteme);
 
         _rx_buf_offset = 0;
+        _rx_buf_size = _processSize(_rx_buf);
         return _rx_buf != nullptr;
     }
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf_size)
             return -1;
 
-        char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        char c = pbuf_get_at(_rx_buf, _rx_buf_offset);
         _consume(1);
         return c;
     }
@@ -286,11 +325,17 @@ public:
         if (!_rx_buf)
             return 0;
 
-        size_t max_size = _rx_buf->len - _rx_buf_offset;
+        size_t max_size = _rx_buf_size - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
-        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->len, _rx_buf_offset);
+        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf_size, _rx_buf_offset);
 
-        memcpy(dst, reinterpret_cast<char*>(_rx_buf->payload) + _rx_buf_offset, size);
+        void* buf = pbuf_get_contiguous(_rx_buf, dst, size, size, _rx_buf_offset);
+        if(!buf)
+            return 0;
+
+        if(buf != dst)
+            memcpy(dst, buf, size);
+
         _consume(size);
 
         return size;
@@ -298,10 +343,10 @@ public:
 
     int peek() const
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset == _rx_buf_size)
             return -1;
 
-        return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        return pbuf_get_at(_rx_buf, _rx_buf_offset);
     }
 
     void flush()
@@ -310,7 +355,7 @@ public:
         if (!_rx_buf)
             return;
 
-        _consume(_rx_buf->len - _rx_buf_offset);
+        _consume(_rx_buf_size - _rx_buf_offset);
     }
 
     size_t append(const char* data, size_t size)
@@ -345,7 +390,7 @@ public:
         return size;
     }
 
-    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(const ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -394,6 +439,14 @@ public:
 
 private:
 
+    size_t _processSize (const pbuf* pb)
+    {
+        size_t ret = 0;
+        for (; pb && pb->flags != PBUF_HELPER_FLAG; pb = pb->next)
+            ret += pb->len;
+        return ret;
+    }
+
     void _reserve(size_t size)
     {
         const size_t pbuf_unit_size = 128;
@@ -431,8 +484,8 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
-        if (_rx_buf_offset > _rx_buf->len) {
-            _rx_buf_offset = _rx_buf->len;
+        if (_rx_buf_offset > _rx_buf_size) {
+            _rx_buf_offset = _rx_buf_size;
         }
     }
 
@@ -440,12 +493,20 @@ private:
             const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
-
-#if LWIP_VERSION_MAJOR == 1
-    #define TEMPDSTADDR (&current_iphdr_dest)
-#else
-    #define TEMPDSTADDR (ip_current_dest_addr())
-#endif
+        // check receive pbuf chain depth
+        // optimization path: cache the pbuf chain length
+        {
+            pbuf* p;
+            int count = 0;
+            for (p = _rx_buf; p && ++count < rxBufMaxDepth*2; p = p->next);
+            if (p)
+            {
+                // pbuf chain too deep, dropping
+                pbuf_free(pb);
+                DEBUGV(":udr\r\n");
+                return;
+            }
+        }
 
         // chain this helper pbuf first
         if (_rx_buf)
@@ -472,7 +533,7 @@ private:
                 return;
             }
             // construct in place
-            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, ip_current_dest_addr(), srcport, ip_current_input_netif());
             pb_helper->flags = PBUF_HELPER_FLAG; // mark helper pbuf
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
@@ -484,26 +545,26 @@ private:
         else
         {
             _currentAddr.srcaddr = srcaddr;
-            _currentAddr.dstaddr = TEMPDSTADDR;
+            _currentAddr.dstaddr = ip_current_dest_addr();
             _currentAddr.srcport = srcport;
+            _currentAddr.input_netif = ip_current_input_netif();
 
             DEBUGV(":urn %d\r\n", pb->tot_len);
             _first_buf_taken = false;
             _rx_buf = pb;
             _rx_buf_offset = 0;
+            _rx_buf_size = pb->tot_len;
         }
 
         if (_on_rx) {
             _on_rx();
         }
 
-    #undef TEMPDSTADDR
-
     }
 
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            CONST ip_addr_t *srcaddr, u16_t srcport)
+            const ip_addr_t *srcaddr, u16_t srcport)
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, srcaddr, srcport);
     }
@@ -513,6 +574,7 @@ private:
     pbuf* _rx_buf;
     bool _first_buf_taken;
     size_t _rx_buf_offset;
+    size_t _rx_buf_size;
     int _refcnt;
     pbuf* _tx_buf_head;
     pbuf* _tx_buf_cur;
@@ -525,12 +587,17 @@ private:
     {
         IPAddress srcaddr, dstaddr;
         int16_t srcport;
+        netif* input_netif;
 
         AddrHelper() { }
-        AddrHelper(const ip_addr_t* src, const ip_addr_t* dst, uint16_t srcport):
-            srcaddr(src), dstaddr(dst), srcport(srcport) { }
+        AddrHelper(const ip_addr_t* src, const ip_addr_t* dst, uint16_t srcport, netif* input_netif):
+            srcaddr(src), dstaddr(dst), srcport(srcport), input_netif(input_netif) { }
     };
     AddrHelper _currentAddr;
+
+    // rx pbuf depth barrier (counter of buffered UDP received packets)
+    // keep it small
+    static constexpr int rxBufMaxDepth = 4;
 };
 
 

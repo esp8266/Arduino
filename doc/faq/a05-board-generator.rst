@@ -52,7 +52,7 @@ As of today you can:
 
 * change led pin ``LED_BUILTIN`` for the two generic boards
 
-* change the default lwIP version (1.4 or 2)
+* create an abridged boards.txt file
 
 
 When do I need to mess with it ?
@@ -77,5 +77,62 @@ global coherency can be checked by the continuous integration facilities.
 After a modification in the generator, it is **mandatory** to regenerate all
 files (option ``--allgen``) and add them in the pull-request.
 
+
+How to create an abridged boards.txt file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The list of boards presented by the IDE has gotten quite long. You can reduce
+the ESP8266 boards shown by the IDE to a favorites list. This can
+be done by generating a new boards.txt file using the ``--filter <file>``
+option.
+
+Start by getting a current list of boards supported by boards.txt.py.
+This command will write a list of supported board names to favorites.txt.
+
+::
+
+    ./tools/boards.txt.py --boardnames >favorites.txt
+
+Edit favorites.txt, keeping the name of the boards you want generated in
+boards.txt.
+
+to generate a new abridged boards.txt run:
+
+::
+
+   ./tools/boards.txt.py --boardsgen --filter favorites.txt
+
+
+You can turn the process around by creating a list of boards, you do not want
+to be generated. To do this we use the ``--xfilter <file>`` option.
+
+to generate this abridged boards.txt run:
+
+::
+
+    ./tools/boards.txt.py --boardsgen --xfilter favorites.txt
+
+
+Yet another option, you can split the boards between boards.txt and
+boards.local.txt.
+
+The commands below will generate a boards.txt file that omits the boards named
+in favorites.txt, and generates a boards.local.txt ( via option ``--boardslocalgen`` ) that only contains boards
+named in favorites.txt.
+
+::
+
+    ./tools/boards.txt.py --boardsgen --xfilter favorites.txt
+    ./tools/boards.txt.py --boardslocalgen --filter favorites.txt
+
+Additional Notes:
+
+1. The boards.txt file will always contain the generic and esp8285 boards.
+
+2. If boards.txt file exist and no backup copy named boards.txt.orig exist, the current boards.txt will be renamed to boards.txt.orig. Otherwise, the existing boards.txt is over-writen when you generate a new boards.txt file. Similar behavior for when generating a new boards.local.txt.
+
+3. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--filter <file>``.
+
+4. It is outside the scope of this document, but you could manually edit any boards.txt file to have fewer boards. One last observation, the Arduino IDE appears to need at least one board in a board.txt file.
 
 `FAQ list :back: <readme.rst>`__

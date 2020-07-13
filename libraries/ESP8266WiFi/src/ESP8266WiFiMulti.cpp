@@ -38,11 +38,15 @@ bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
     return APlistAdd(ssid, passphrase);
 }
 
+void ESP8266WiFiMulti::cleanAPlist(void) {
+    APlistClean();
+}
+
 bool ESP8266WiFiMulti::existsAP(const char* ssid, const char *passphrase) {
     return APlistExists(ssid, passphrase);
 }
 
-wl_status_t ESP8266WiFiMulti::run(void) {
+wl_status_t ESP8266WiFiMulti::run(uint32_t connectTimeoutMs) {
 
     wl_status_t status = WiFi.status();
     if(status == WL_DISCONNECTED || status == WL_NO_SSID_AVAIL || status == WL_IDLE_STATUS || status == WL_CONNECT_FAILED) {
@@ -128,12 +132,10 @@ wl_status_t ESP8266WiFiMulti::run(void) {
 
                 WiFi.begin(bestNetwork.ssid, bestNetwork.passphrase, bestChannel, bestBSSID);
                 status = WiFi.status();
-
-                static const uint32_t connectTimeout = 5000; //5s timeout
                 
                 auto startTime = millis();
                 // wait for connection, fail, or timeout
-                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeout) {
+                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeoutMs) {
                     delay(10);
                     status = WiFi.status();
                 }

@@ -1,27 +1,39 @@
 #!/bin/bash
-#
 
 #set -x
 
-# Extract next version from platform.txt
-next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
+ver=`git describe --tag`
+visiblever=$ver
+# match 0.0.*
+if [ "${ver%.*}" = 0.0 ]; then
 
-# Figure out how will the package be called
-ver=`git describe --exact-match`
-if [ $? -ne 0 ]; then
-    # not tagged version; generate nightly package
-    date_str=`date +"%Y%m%d"`
-    is_nightly=1
-    plain_ver="${next}-nightly"
-    ver="${plain_ver}+${date_str}"
-else
+    git tag -d ${ver}
+    ver=`git describe --tag HEAD`
     plain_ver=$ver
+
+else
+
+    # Extract next version from platform.txt
+    next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
+
+    # Figure out how will the package be called
+    ver=`git describe --exact-match`
+    if [ $? -ne 0 ]; then
+        # not tagged version; generate nightly package
+        date_str=`date +"%Y%m%d"`
+        is_nightly=1
+        plain_ver="${next}-nightly"
+        ver="${plain_ver}+${date_str}"
+    else
+        plain_ver=$ver
+    fi
+    visiblever=$ver
 fi
 
 set -e
 
-package_name=esp8266-$ver
-echo "Version: $ver"
+package_name=esp8266-$visiblever
+echo "Version: $visiblever ($ver)"
 echo "Package name: $package_name"
 
 # Set REMOTE_URL environment variable to the address where the package will be
@@ -34,7 +46,7 @@ echo "Remote: $REMOTE_URL"
 
 if [ -z "$PKG_URL" ]; then
     if [ -z "$PKG_URL_PREFIX" ]; then
-        PKG_URL_PREFIX="$REMOTE_URL/versions/$ver"
+        PKG_URL_PREFIX="$REMOTE_URL/versions/$visiblever"
     fi
     PKG_URL="$PKG_URL_PREFIX/$package_name.zip"
 fi
@@ -43,9 +55,9 @@ echo "Docs: $DOC_URL"
 
 pushd ..
 # Create directory for the package
-outdir=package/versions/$ver/$package_name
+outdir=package/versions/$visiblever/$package_name
 srcdir=$PWD
-rm -rf package/versions/$ver
+rm -rf package/versions/$visiblever
 mkdir -p $outdir
 
 # Some files should be excluded from the package
@@ -74,7 +86,7 @@ fi
 # handles tool paths differently when package is installed in hardware folder
 cat $srcdir/platform.txt | \
 $SED 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
-$SED 's/runtime.tools.python.path=.*//g' | \
+$SED 's/runtime.tools.python3.path=.*//g' | \
 $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' | \
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
 $SED 's/^tools.esptool.cmd=.*//g' | \
@@ -82,7 +94,7 @@ $SED 's/^tools.esptool.network_cmd=.*//g' | \
 $SED 's/^#tools.esptool.cmd=/tools.esptool.cmd=/g' | \
 $SED 's/^#tools.esptool.network_cmd=/tools.esptool.network_cmd=/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
-$SED 's/recipe.hooks.core.prebuild.pattern.*//g' |\
+$SED 's/recipe.hooks.*makecorever.*//g' |\
 $SED "s/version=.*/version=$ver/g" |\
 $SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt
@@ -96,7 +108,7 @@ echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_v
 echo \#define ARDUINO_ESP8266_RELEASE \"$ver_define\" >>$outdir/cores/esp8266/core_version.h
 
 # Zip the package
-pushd package/versions/$ver
+pushd package/versions/$visiblever
 echo "Making $package_name.zip"
 zip -qr $package_name.zip $package_name
 rm -rf $package_name
@@ -109,7 +121,7 @@ echo SHA-256: $sha
 
 echo "Making package_esp8266com_index.json"
 
-jq_arg=".packages[0].platforms[0].version = \"$ver\" | \
+jq_arg=".packages[0].platforms[0].version = \"$visiblever\" | \
     .packages[0].platforms[0].url = \"$PKG_URL\" |\
     .packages[0].platforms[0].archiveFileName = \"$package_name.zip\""
 
@@ -155,8 +167,21 @@ curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${bas
 new_json=package_esp8266com_index.json
 
 set +e
-# Merge the old and new, then drop any obsolete package versions
-python ../../merge_packages.py $new_json $old_json | python ../../drop_versions.py - tools 1.20.0-26-gb404fb9 >tmp && mv tmp $new_json && rm $old_json
+# Merge the old and new
+python3 ../../merge_packages.py $new_json $old_json > tmp
+
+# additional json to merge (for experimental releases)
+echo "Additional json package files: ${MOREJSONPACKAGES}"
+for json in ${MOREJSONPACKAGES}; do
+    if [ ! -z "$json" -a -r "$json" ]; then
+        echo "- merging $json"
+        python3 ../../merge_packages.py tmp $json > tmp2
+        mv tmp2 tmp
+    fi
+done
+
+# drop any obsolete package versions
+python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 < tmp > tmp2 && mv tmp2 $new_json && rm $old_json tmp
 
 # Verify the JSON file can be read, fail if it's not OK
 set -e
