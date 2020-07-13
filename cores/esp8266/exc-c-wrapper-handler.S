@@ -65,7 +65,9 @@ _xtos_c_wrapper_handler:
         //  CALLINC  = __XTENSA_CALL0_ABI__ ? 0 : 1
         //  OWB      = 0 (really, a dont care if !__XTENSA_CALL0_ABI__)
 
-        movi   a2, 0x23 // 0x21, PS_UM|PS_INTLEVEL(XCHAL_EXCM_LEVEL)
+//        movi   a2, 0x23 // 0x21, PS_UM|PS_INTLEVEL(XCHAL_EXCM_LEVEL)
+// @mhightower83 - testing to see if we need INTLEVEL 15 instead of 3
+        movi   a2, 0x2F // 0x21, PS_UM|PS_INTLEVEL(XCHAL_EXCM_LEVEL)
         rsr    a3, EPC_1
 // @mhightower83 - I assume PS.EXCM was set and now is being cleared, thus
 // allowing new exceptions and interrupts within PS_INTLEVEL to be possible.

@@ -96,12 +96,11 @@ mmu_cre_status_t mmu_status = {SOC_CACHE_SIZE, -1, 0, 0, 0, 0, 0};
  */
 
 #ifndef ROM_Cache_Read_Enable
-#define ROM_Cache_Read_Enable         0x40004678
+#define ROM_Cache_Read_Enable         0x40004678U
 #endif
 
 typedef void (*fp_Cache_Read_Enable_t)(uint8_t map, uint8_t p, uint8_t v);
-constexpr fp_Cache_Read_Enable_t real_Cache_Read_Enable =
-         (fp_Cache_Read_Enable_t)ROM_Cache_Read_Enable;
+#define real_Cache_Read_Enable (reinterpret_cast<fp_Cache_Read_Enable_t>(ROM_Cache_Read_Enable))
 
 void IRAM_ATTR Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v) {
   mmu_status.map = map;
@@ -125,8 +124,7 @@ void IRAM_ATTR Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v) {
 #endif
 
 typedef void (*fp_Cache_Read_Disable_t)(void);
-constexpr fp_Cache_Read_Disable_t real_Cache_Read_Disable =
-         (fp_Cache_Read_Disable_t)ROM_Cache_Read_Disable;
+#define real_Cache_Read_Disable (reinterpret_cast<fp_Cache_Read_Disable_t>(ROM_Cache_Read_Disable))
 /*
  *
  */

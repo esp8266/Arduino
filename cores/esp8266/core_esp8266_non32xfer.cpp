@@ -212,7 +212,7 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
 
 #if defined(USE_ISR_SAFE_EXC_WRAPPER)
 
-constexpr _xtos_handler ROM_xtos_c_wrapper_handler = (_xtos_handler)0x40000598;
+#define ROM_xtos_c_wrapper_handler (reinterpret_cast<_xtos_handler>(0x40000598))
 
 static void IRAM_ATTR _set_exception_handler_wrapper(uint32_t cause) {
   _xtos_handler old_wrapper = _xtos_exc_handler_table[cause];

@@ -4,6 +4,16 @@
 
 uint32_t timed_byte_read(char *pc, uint32_t * o);
 uint32_t timed_byte_read2(char *pc, uint32_t * o);
+int divideA_B(int a, int b);
+
+int* nullPointer = NULL;
+
+char *probe_b  = NULL;
+short *probe_s = NULL;
+char *probe_c  = (char *)0x40110000;
+short *unaligned_probe_s = NULL;
+
+uint32_t read_var = 0x11223344;
 
 #define GET_BYTE_FN(name,wo,bo) \
 static inline char get ## name(void *o) { \
@@ -132,11 +142,12 @@ void setup() {
   {
     HeapSelectIram ephemeral;
     // Serial.printf_P(PSTR("ESP.getFreeHeap(): %u\n"), ESP.getFreeHeap());
-    gobble_sz = ESP.getFreeHeap(); // - 4096;
+    gobble_sz = ESP.getFreeHeap() - UMM_OVERHEAD_ADJUST; // - 4096;
     gobble = (uint32_t *)malloc(gobble_sz);
   }
-  Serial.printf_P(PSTR("gobble_sz: %u\n"), gobble_sz);
-  Serial.printf_P(PSTR("gobble:    %p\n"), gobble);
+  Serial.printf_P(PSTR("\nmalloc() from IRAM Heap:\n"));
+  Serial.printf_P(PSTR("  gobble_sz: %u\n"), gobble_sz);
+  Serial.printf_P(PSTR("  gobble:    %p\n"), gobble);
 
 #elif defined(MMU_SEC_HEAP)
   gobble = (uint32_t *)MMU_SEC_HEAP;
@@ -158,17 +169,15 @@ void setup() {
 #endif
 
   // Lets peak over the edge
+  Serial.printf_P(PSTR("\nPeek over the edge of memory at 0x4010C000\n"));
   dump_mem32((void *)(0x4010C000 - 16 * 4), 32);
+
+  probe_b = (char *)gobble;
+  probe_s = (short *)((uintptr_t)gobble);
+  unaligned_probe_s = (short *)((uintptr_t)gobble + 1);
+
 }
 
-int* nullPointer = NULL;
-
-char *probe_b = (char *)gobble;
-short *probe_s = (short *)((uintptr_t)gobble);
-char *probe_c = (char *)0x40110000;
-short *unaligned_probe_s = (short *)((uintptr_t)gobble + 1);
-
-uint32_t read_var = 0x11223344;
 
 extern uint32_t mmu_non32xfer_count;
 
@@ -286,11 +295,19 @@ void processKey(Print& out, int hotKey) {
       out.println(F("  t    - exception vs inline method timing info."));
       out.println(F("  ?    - Print Help"));
       out.println();
+#if defined(NON32XFER_HANDLER)
+      out.println(F("Test exception handling with non-32 bit transfer handler:"));
+#else
       out.println(F("Crash with:"));
+#endif
       out.println(F("  b    - read byte, Load/Store exception"));
       out.println(F("  B    - write byte, Load/Store exception"));
       out.println(F("  s    - read short, Load/Store exception"));
       out.println(F("  S    - write short, Load/Store exception"));
+#if defined(NON32XFER_HANDLER)
+      out.println();
+      out.println(F("Crash with:"));
+#endif
       out.println(F("  c    - read byte, Load/Store exception outside of handler range"));
       out.println(F("  9    - read short, Unaligned exception"));
 
@@ -301,7 +318,6 @@ void processKey(Print& out, int hotKey) {
     default:
       out.printf_P(PSTR("\"%c\" - Not an option?  / ? - help"), hotKey);
       out.println();
-      processKey(out, '?');
       break;
   }
 }
@@ -319,7 +335,7 @@ void loop() {
 }
 
 
-int divideA_B(int a, int b) {
+int __attribute__((noinline)) divideA_B(int a, int b) {
   return (a / b);
 }
 
