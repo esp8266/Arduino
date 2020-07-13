@@ -145,17 +145,6 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         _client = nullptr;
     }
 
-#if LWIP_VERSION_MAJOR == 1
-    // if the default interface is down, tcp_connect exits early without
-    // ever calling tcp_err
-    // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
-    netif* interface = ip_route(ip);
-    if (!interface) {
-        DEBUGV("no route to host\r\n");
-        return 0;
-    }
-#endif
-
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return 0;
@@ -367,7 +356,7 @@ uint16_t WiFiClient::remotePort()
 
 IPAddress WiFiClient::localIP()
 {
-    if (!_client)
+    if (!_client || !_client->getLocalAddress())
         return IPAddress(0U);
 
     return IPAddress(_client->getLocalAddress());
@@ -389,7 +378,7 @@ void WiFiClient::stopAll()
 }
 
 
-void WiFiClient::stopAllExcept(WiFiClient* except) 
+void WiFiClient::stopAllExcept(WiFiClient* except)
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
         if (it != except) {

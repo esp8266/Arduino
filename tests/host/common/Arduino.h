@@ -20,7 +20,7 @@
 #ifndef Arduino_h
 #define Arduino_h
 
-#define MOCK "mock: "
+#define MOCK "(mock) "
 
 #ifdef __cplusplus
 extern "C" {
