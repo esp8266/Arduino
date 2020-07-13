@@ -194,6 +194,11 @@ public:
     // for compatibility...
     bool setHostname(const String& p_strHostname);
 
+    bool isRunning(void)
+    {
+        return (m_pUDPContext != 0);
+    }
+
     /**
         hMDNSService (opaque handle to access the service)
     */
@@ -1198,7 +1203,7 @@ protected:
     MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
     bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
-    CONST netif*                    m_netif; // network interface to run on
+    const netif*                    m_netif; // network interface to run on
 
     /** CONTROL **/
     /* MAINTENANCE */

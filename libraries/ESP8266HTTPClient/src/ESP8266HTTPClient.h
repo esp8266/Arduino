@@ -26,10 +26,6 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#ifndef HTTPCLIENT_1_1_COMPATIBLE
-#define HTTPCLIENT_1_1_COMPATIBLE 1
-#endif
-
 #include <memory>
 #include <Arduino.h>
 
@@ -48,7 +44,7 @@
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
 
 /// HTTP client errors
-#define HTTPC_ERROR_CONNECTION_REFUSED  (-1)
+#define HTTPC_ERROR_CONNECTION_FAILED   (-1)
 #define HTTPC_ERROR_SEND_HEADER_FAILED  (-2)
 #define HTTPC_ERROR_SEND_PAYLOAD_FAILED (-3)
 #define HTTPC_ERROR_NOT_CONNECTED       (-4)
@@ -59,6 +55,8 @@
 #define HTTPC_ERROR_ENCODING            (-9)
 #define HTTPC_ERROR_STREAM_WRITE        (-10)
 #define HTTPC_ERROR_READ_TIMEOUT        (-11)
+
+constexpr int HTTPC_ERROR_CONNECTION_REFUSED __attribute__((deprecated)) = HTTPC_ERROR_CONNECTION_FAILED;
 
 /// size for the stream handling
 #define HTTP_TCP_BUFFER_SIZE (1460)
@@ -130,10 +128,25 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
-#if HTTPCLIENT_1_1_COMPATIBLE
+/**
+ * redirection follow mode.
+ * + `HTTPC_DISABLE_FOLLOW_REDIRECTS` - no redirection will be followed.
+ * + `HTTPC_STRICT_FOLLOW_REDIRECTS` - strict RFC2616, only requests using
+ *      GET or HEAD methods will be redirected (using the same method),
+ *      since the RFC requires end-user confirmation in other cases.
+ * + `HTTPC_FORCE_FOLLOW_REDIRECTS` - all redirections will be followed,
+ *      regardless of a used method. New request will use the same method,
+ *      and they will include the same body data and the same headers.
+ *      In the sense of the RFC, it's just like every redirection is confirmed.
+ */
+typedef enum {
+    HTTPC_DISABLE_FOLLOW_REDIRECTS,
+    HTTPC_STRICT_FOLLOW_REDIRECTS,
+    HTTPC_FORCE_FOLLOW_REDIRECTS
+} followRedirects_t;
+
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
-#endif
 
 class StreamString;
 
@@ -150,19 +163,14 @@ public:
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
-#if HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
     bool begin(String url)  __attribute__ ((deprecated));
     bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
-    // Use axTLS for secure HTTPS connection
-    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
     // Use BearSSL for secure HTTPS connection
     bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
-#endif
 
     void end(void);
 
@@ -173,8 +181,12 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
-    void setFollowRedirects(bool follow);
+
+    // Redirections
+    void setFollowRedirects(bool follow) __attribute__ ((deprecated));
+    void setFollowRedirects(followRedirects_t follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
+
     bool setURL(const String& url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
@@ -226,10 +238,8 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
-#if HTTPCLIENT_1_1_COMPATIBLE
     TransportTraitsPtr _transportTraits;
     std::unique_ptr<WiFiClient> _tcpDeprecated;
-#endif
     WiFiClient* _client;
 
     /// request handling
@@ -252,8 +262,7 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
-    bool _followRedirects = false;
-    uint16_t _redirectCount = 0;
+    followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
     uint16_t _redirectLimit = 10;
     String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;

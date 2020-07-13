@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <Servo.h>
 #include "core_esp8266_waveform.h"
 
+uint32_t Servo::_servoMap = 0;
+
 // similiar to map but will have increased accuracy that provides a more
 // symetric api (call it and use result to reverse will provide the original value)
 int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
@@ -82,6 +84,7 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
 void Servo::detach()
 {
   if (_attached) {
+    _servoMap &= ~(1 << _pin);
     stopWaveform(_pin);
     _attached = false;
     digitalWrite(_pin, LOW);
@@ -105,7 +108,10 @@ void Servo::writeMicroseconds(int value)
 {
   _valueUs = value;
   if (_attached) {
-    startWaveform(_pin, _valueUs, REFRESH_INTERVAL - _valueUs, 0);
+    _servoMap &= ~(1 << _pin);
+    if (startWaveform(_pin, _valueUs, REFRESH_INTERVAL - _valueUs, 0)) {
+      _servoMap |= (1 << _pin);
+    }
   }
 }
 

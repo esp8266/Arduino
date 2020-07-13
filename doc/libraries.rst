@@ -25,7 +25,7 @@ This is a bit different from standard EEPROM class. You need to call ``EEPROM.be
 
 ``EEPROM.write`` does not write to flash immediately, instead you must call ``EEPROM.commit()`` whenever you wish to save changes to flash. ``EEPROM.end()`` will also commit, and will release the RAM copy of EEPROM contents.
 
-EEPROM library uses one sector of flash located just after the SPIFFS.
+EEPROM library uses one sector of flash located just after the embedded filesystem.
 
 `Three examples <https://github.com/esp8266/Arduino/tree/master/libraries/EEPROM>`__  included.
 
@@ -41,7 +41,7 @@ SPI
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA). Setting the Clock polarity (CPOL) is not supported, yet (SPI\_MODE2 and SPI\_MODE3 not working).
 
-The usual SPI pins are: 
+The usual SPI pins are:
 
 - ``MOSI`` = GPIO13
 - ``MISO`` = GPIO12
@@ -73,7 +73,7 @@ ESP-specific APIs
 
 Some ESP-specific APIs related to deep sleep, RTC and flash memories are available in the ``ESP`` object.
 
-``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds.
+``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds. If you implement deep sleep with ``WAKE_RF_DISABLED`` and require WiFi functionality on wake up, you will need to implement an additional ``WAKE_RF_DEFAULT`` before WiFi functionality is available.
 
 ``ESP.deepSleepInstant(microseconds, mode)`` works similarly to ``ESP.deepSleep`` but  sleeps instantly without waiting for WiFi to shutdown.
 
@@ -87,7 +87,7 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getHeapFragmentation()`` returns the fragmentation metric (0% is clean, more than ~50% is not harmless)
 
-``ESP.getMaxFreeBlockSize()`` returns the maximum allocatable ram block regarding heap fragmentation
+``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()``able block will be smaller due to memory manager overheads.
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 
@@ -112,6 +112,8 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 ``ESP.getFlashChipSpeed(void)`` returns the flash chip frequency, in Hz.
 
 ``ESP.getCycleCount()`` returns the cpu instruction cycle count since start as an unsigned 32-bit. This is useful for accurate timing of very short actions like bit banging.
+
+``ESP.random()`` should be used to generate true random numbers on the ESP. Returns an unsigned 32-bit integer with the random number. An alternate version is also available that fills an array of arbitrary length. Note that it seems as though the WiFi needs to be enabled to generate entropy for the random numbers, otherwise pseudo-random numbers are used.
 
 ``ESP.checkFlashCRC()`` calculates the CRC of the program memory (not including any filesystems) and compares it to the one embedded in the image.  If this call returns ``false`` then the flash has been corrupted.  At that point, you may want to consider trying to send a MQTT message, to start a re-download of the application, blink a LED in an `SOS` pattern, etc.  However, since the flash is known corrupted at this point there is no guarantee the app will be able to perform any of these operations, so in safety critical deployments an immediate shutdown to a fail-safe mode may be indicated.
 

@@ -29,9 +29,6 @@ File root;
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for Leonardo only
-  }
 
   Serial.print("Initializing SD card...");
 
@@ -71,11 +68,12 @@ void printDirectory(File dir, int numTabs) {
       // files have sizes, directories do not
       Serial.print("\t\t");
       Serial.print(entry.size(), DEC);
-      Serial.print("\t\t");
-      time_t ft = entry.getLastWrite();
-      struct tm *tm = localtime(&ft);
-      // US format.  Feel free to convert to your own locale...
-      Serial.printf("%02d-%02d-%02d %02d:%02d:%02d\n", tm->tm_mon + 1, tm->tm_mday, tm->tm_year % 100, tm->tm_hour, tm->tm_min, tm->tm_sec);
+      time_t cr = entry.getCreationTime();
+      time_t lw = entry.getLastWrite();
+      struct tm * tmstruct = localtime(&cr);
+      Serial.printf("\tCREATION: %d-%02d-%02d %02d:%02d:%02d", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
+      tmstruct = localtime(&lw);
+      Serial.printf("\tLAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
     }
     entry.close();
   }
