@@ -32,7 +32,8 @@ jobs:
       install:
           - sudo apt-get install python3-pip python3-setuptools
       env:
-        - BUILD_PARITY=custom mod=10 rem=1
+        # PIO is very slow, so do 1/2 as many builds as Arduino
+        - BUILD_PARITY=custom mod=20 rem=5
 
     - name: "Build 1/4"
       stage: build
