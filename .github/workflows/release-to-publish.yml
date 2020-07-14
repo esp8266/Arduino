@@ -1,35 +1,26 @@
 # Whenever a release is published from a draft, this will update the
 # master Arduino JSON file to add its new entry.
 
-# We keep the master JSON file in another repo, so we need to use a pre-set GH
-# SSH key to be able to push a change to the repo.
-
-# At some point this should really be moved to the main repo to avoid this grief
+# We keep the master JSON file in another repo, so we need to use a pre-set
+# Deployment SSH key to be able to push a change to the repo.
 
 #### Steps to follow when you need to make a new SSH key for upload (not
 #### normally needed!)
 
-# We encrypt the id_rda (private key) using a key and IV generated randomly:
-# openssl enc -nosalt -aes-256-cbc -pbkdf2 -k "$(openssl rand -base64 100 | sed s/=//)" -P
-# > key = <long string of hex>
-# > iv  = <long string of hex>
+# Generate a new SSH key private/public pair
 
-# Set that key and IV strings are set as secrets in the *Arduino repo* GitHub
-# CI Secrets object as GHKEY and GHIV.
+# ssh-keygen -t rsa -b 4096 -C "your@email.com" -f ./deploy_rsa
 
-# Now make a SSH key using ssh-keygen (do not use your own, make a new one!)
-# ssh-keygen ...
+# Upload deploy_rsa.pub to the *ESP8266.GITHUB.IO* repo as a deployment key
 
-# Upload the id_rsa.pub (public key) to the GH.IO GitHub as a *deploy key*
-# (https://github.com/esp8266/esp8266.github.io->Settings->Deploy Keys->Add Key)
-# DO NOT USE Settings->SSH and GPG Keys->New SSH Key because that allows
-# full access to all repos owned by the user, while a Deploy Key only allows
-# access to a single repo.
+# Convert the private key to base64 (to remove line breaks and allow easier
+# usage in the script as an environment variable)
 
-# Encrypt the private part of the key using the key and IV above and commit the change
-# openssl enc -aes-256-cbc -K <key> -iv <iv> -in id_rsa -out package/esp8266_github_io_deploy.enc
-# git add package/esp8266_github_io_deploy.enc
+# base64.exe -w 0 < deploy_rsa > deploy_rsa.b64
 
+# Copy the contents of the .b64 file to the clipboard, make a new GitHub
+# secret in the ESP8266/Arduino repo called "GHCI_DEPLOY_KEY" and paste
+# the B64 code into the variable.
 
 name: ESP8266 Arduino Release Publisher
 
@@ -56,8 +47,7 @@ jobs:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         BUILD_TYPE: package
         CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
-        GHKEY: ${{ secrets.GHKEY }}
-        GHIV: ${{ secrets.GHIV }}
+        GHCI_DEPLOY_KEY: ${{ secrets.GHCI_DEPLOY_KEY }}
       run: |
            bash ./tests/ci/build_package.sh
            # Only the regenerated JSON file will be used, but it's simpler
