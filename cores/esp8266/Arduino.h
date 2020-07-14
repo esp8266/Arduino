@@ -43,7 +43,7 @@ extern "C" {
 #define HIGH 0x1
 #define LOW  0x0
 
-#define PWMRANGE 1023
+#define PWMRANGE 255
 
 //GPIO FUNCTIONS
 #define INPUT             0x00
