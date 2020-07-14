@@ -37,6 +37,14 @@ extern int ets_uart_printf(const char *format, ...) __attribute__ ((format (prin
 
 extern void ets_delay_us(uint32_t us);
 
+#ifndef GDBSTUB_H
+/*
+  GDBSTUB duplicates these with some variances that are not compatible with our
+  references (offsets), which are synced with those used by the BootROM. In
+  particular, the BootROM does not have register "a1" in the structure where
+  GDBSTUB does.
+*/
+
 /* The Xtensa OS code in ROM for handling hardware exceptions */
 struct __exception_frame
 {
@@ -117,6 +125,8 @@ struct __exception_frame
  */
 typedef void (*fn_exception_handler_t)(struct __exception_frame *ef, uint32_t cause);
 fn_exception_handler_t _xtos_set_exception_handler(uint32_t reason, fn_exception_handler_t fn);
+
+#endif
 
 /*
  Added to eagle.rom.addr.v6.ld
