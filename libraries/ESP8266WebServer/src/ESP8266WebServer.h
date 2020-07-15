@@ -81,7 +81,9 @@ public:
   using ClientType = typename ServerType::ClientType;
   using RequestHandlerType = RequestHandler<ServerType>;
   using WebServerType = ESP8266WebServerTemplate<ServerType>;
-  using hook_f = std::function<bool(const String& method, const String& url, ClientType& client)>;
+  using ContentType_f = std::function<String(const String&)>;
+  enum ClientFuture_e { CLIENT_REQUEST_CAN_CONTINUE, CLIENT_REQUEST_IS_HANDLED, CLIENT_MUST_STOP, CLIENT_IS_GIVEN };
+  using Hook_f = std::function<ClientFuture_e(const String& method, const String& url, WiFiClient* client, ContentType_f contentType)>;
 
   void begin();
   void begin(uint16_t port);
@@ -194,16 +196,17 @@ public:
 
   static String responseCodeToString(const int code);
 
-  void addHook (hook_f hook)
+  void addHook (Hook_f hook)
   {
     if (_hook)
     {
-      auto old = _hook;
-      _hook = [old, hook](const String& method, const String& url, ClientType& client)
+      auto previous = _hook;
+      _hook = [previous, hook](const String& method, const String& url, WiFiClient* client, ContentType_f contentType)
         {
-          if (first(method, url, client))
-            return true;
-          return hook(method, url, client);
+          auto whatNow = previous(method, url, client, contentType);
+          if (whatNow == CLIENT_REQUEST_CAN_CONTINUE)
+            return hook(method, url, client, contentType);
+          return whatNow;
         };
     }
     else
@@ -214,7 +217,7 @@ protected:
   void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
   void _finalizeResponse();
-  bool _parseRequest(ClientType& client);
+  ClientFuture_e _parseRequest(ClientType& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
   bool _parseForm(ClientType& client, const String& boundary, uint32_t len);
@@ -269,8 +272,7 @@ protected:
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
 
-  hook_f           _hook;
-
+  Hook_f           _hook;
 };
 
 

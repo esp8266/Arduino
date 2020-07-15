@@ -35,6 +35,12 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
+#ifdef DEBUG_ESP_HTTP_SERVER
+#define DBGWS(x...) do { DEBUG_OUTPUT.printf(x); } while (0)
+#else
+#define DBGWS(x...) do { (void)0; } while (0)
+#endif
+
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
@@ -324,6 +330,13 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool keepCurrentClient = false;
   bool callYield = false;
 
+  DBGWS("http-server loop: conn=%d avail=%d status=%s\n",
+    _currentClient.connected(), _currentClient.available(),
+    _currentStatus==HC_NONE?"none":
+    _currentStatus==HC_WAIT_READ?"wait-read":
+    _currentStatus==HC_WAIT_CLOSE?"wait-close":
+    "??");
+
   if (_currentClient.connected() || _currentClient.available()) {
     switch (_currentStatus) {
     case HC_NONE:
@@ -332,36 +345,57 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
     case HC_WAIT_READ:
       // Wait for data from client to become available
       if (_currentClient.available()) {
-        if (_parseRequest(_currentClient)) {
+        switch (_parseRequest(_currentClient))
+        {
+        case CLIENT_REQUEST_CAN_CONTINUE:
           _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
           _contentLength = CONTENT_LENGTH_NOT_SET;
           _handleRequest();
-        } else {
-          keepCurrentClient = false;
+          /* fallthrough */
+        case CLIENT_REQUEST_IS_HANDLED:
+          if (_currentClient.connected() || _currentClient.available()) {
+            _currentStatus = HC_WAIT_CLOSE;
+            _statusChange = millis();
+            keepCurrentClient = true;
+          }
+          else
+            DBGWS("webserver: peer has closed after served\n");
+          break;
+        case CLIENT_MUST_STOP:
+          DBGWS("Close client\n");
           _currentClient.stop();
-        }
-        if (_currentClient.connected()) {
-          _currentStatus = HC_WAIT_CLOSE;
-          _statusChange = millis();
-          keepCurrentClient = true;
-        }
-      } else { // !_currentClient.available()
+          break;
+        case CLIENT_IS_GIVEN:
+          // client must not be stopped but must not be handled here anymore
+          // (example: tcp connection given to websocket)
+          DBGWS("Give client\n");
+          break;
+        } // switch _parseRequest()
+      } else {
+        // !_currentClient.available(): waiting for more data
         if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
           keepCurrentClient = true;
         }
+        else
+          DBGWS("webserver: closing after read timeout\n");
         callYield = true;
       }
       break;
     case HC_WAIT_CLOSE:
       // Wait for client to close the connection
-      if (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT) {
+      if (!_server.available() && (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT)) {
         keepCurrentClient = true;
         callYield = true;
+        if (_currentClient.available())
+            // continue serving current client
+            _currentStatus = HC_WAIT_READ;
       }
-    }
+      break;
+    } // switch _currentStatus
   }
 
   if (!keepCurrentClient) {
+    DBGWS("Drop client\n");
     _currentClient = ClientType();
     _currentStatus = HC_NONE;
     _currentUpload.reset();

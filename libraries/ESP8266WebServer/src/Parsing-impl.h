@@ -61,7 +61,7 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
 }
 
 template <typename ServerType>
-bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
+typename ESP8266WebServerTemplate<ServerType>::ClientFuture_e ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -82,7 +82,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.println("Invalid request");
 #endif
-    return false;
+    return CLIENT_MUST_STOP;
   }
 
   String methodStr = req.substring(0, addr_start);
@@ -98,13 +98,11 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   _currentUri = url;
   _chunked = false;
 
-  if (_hook && _hook(methodStr, url, client))
+  if (_hook)
   {
-    // _hook() must return true when method is recognized
-    // (even when request goes wrong)
-    // in any case, request header and content must be read
-    // returning false because request is now already handled
-    return false;
+    auto whatNow = _hook(methodStr, url, &client, mime::getContentType);
+    if (whatNow != CLIENT_REQUEST_CAN_CONTINUE)
+        return whatNow;
   }
 
   HTTPMethod method = HTTP_GET;
@@ -197,7 +195,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
            )
        )
     {
-        return false;
+        return CLIENT_MUST_STOP;
     }
 
     if (isEncoded) {
@@ -221,7 +219,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
     } else { // isForm is true
       // here: content is not yet read (plainBuf is still empty)
       if (!_parseForm(client, boundaryStr, contentLength)) {
-        return false;
+        return CLIENT_MUST_STOP;
       }
     }
   } else {
@@ -268,7 +266,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
       _currentArgs[i].value.c_str());
 #endif
 
-  return true;
+  return CLIENT_REQUEST_CAN_CONTINUE;
 }
 
 template <typename ServerType>
