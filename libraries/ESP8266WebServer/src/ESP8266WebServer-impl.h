@@ -60,6 +60,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _currentArgsHavePlain(0)
 , _postArgsLen(0)
 , _postArgs(nullptr)
 , _headerKeysCount(0)
@@ -82,6 +83,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _currentArgsHavePlain(0)
 , _postArgsLen(0)
 , _postArgs(nullptr)
 , _headerKeysCount(0)
@@ -601,7 +603,7 @@ const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) cons
     if ( _postArgs[j].key == name )
       return _postArgs[j].value;
   }
-  for (int i = 0; i < _currentArgCount; ++i) {
+  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
@@ -610,14 +612,14 @@ const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) cons
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(int i) const {
-  if (i >= 0 && i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
     return _currentArgs[i].value;
   return emptyString;
 }
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::argName(int i) const {
-  if (i >= 0 && i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
     return _currentArgs[i].key;
   return emptyString;
 }
@@ -633,7 +635,7 @@ bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
     if (_postArgs[j].key == name)
       return true;
   }
-  for (int i = 0; i < _currentArgCount; ++i) {
+  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if (_currentArgs[i].key == name)
       return true;
   }

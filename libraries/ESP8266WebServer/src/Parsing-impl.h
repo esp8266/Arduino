@@ -215,6 +215,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture_e ESP8266WebServerTe
         RequestArgument& arg = _currentArgs[_currentArgCount++];
         arg.key = F("plain");
         arg.value = plainBuf;
+        _currentArgsHavePlain = 1;
       }
     } else { // isForm is true
       // here: content is not yet read (plainBuf is still empty)
