@@ -19,4 +19,3 @@ install_arduino debug
 build_sketches_with_arduino "$mod" "$rem" lm6f
 
 rm -rf "$cache_dir"
-
