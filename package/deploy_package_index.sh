@@ -1,7 +1,10 @@
 #!/bin/bash
 # This script updates package index hosted on esp8266.github.io (aka arduino.esp8266.com).
 
-tag=`git describe --tags`
+tag=$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")
+if [ "$tag" == "" ]; then
+    tag=`git describe --tags`
+fi
 
 cd $(dirname "$0")
 
