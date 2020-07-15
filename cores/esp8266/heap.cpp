@@ -20,7 +20,7 @@ extern "C" {
 #undef realloc
 #undef free
 
-#elif defined(DEBUG_ESP_OOM)
+#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK)
 #define UMM_MALLOC(s)           umm_malloc(s)
 #define UMM_CALLOC(n,s)         umm_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) umm_realloc(p,s)
