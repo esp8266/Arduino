@@ -3625,6 +3625,9 @@ struct netif;
 //#define LWIP_ERR_T s8
 LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif);
 
+// called when STA OR AP is set up or down
+void netif_status_changed (struct netif*);
+
 /*
    --------------------------------------------------
    ----------------- TIME-WAIT tweak ----------------
