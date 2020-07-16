@@ -33,8 +33,6 @@
 
 #include <lwip/init.h> // LWIP_VERSION
 
-#if LWIP_VERSION_MAJOR != 1
-
 class DhcpServer
 {
 public:
@@ -121,7 +119,5 @@ protected:
 // SoftAP DHCP server always exists and is started on boot
 extern DhcpServer dhcpSoftAP;
 extern "C" int fw_has_started_softap_dhcps;
-
-#endif // LWIP_VERSION_MAJOR != 1
 
 #endif // __DHCPS_H__

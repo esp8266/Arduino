@@ -36,8 +36,6 @@
 
 #include <lwip/init.h> // LWIP_VERSION
 
-#if LWIP_VERSION_MAJOR != 1
-
 #define DHCPS_LEASE_TIME_DEF    (120)
 
 #define USE_DNS
@@ -1601,5 +1599,3 @@ uint32 DhcpServer::dhcps_client_update(u8 *bssid, struct ipv4_addr *ip)
 
     return pdhcps_pool->ip.addr;
 }
-
-#endif // LWIP_VERSION_MAJOR != 1

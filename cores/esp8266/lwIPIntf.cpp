@@ -124,11 +124,7 @@ bool LwipIntf::hostname(const char* aHostname) {
     for (netif* intf = netif_list; intf; intf = intf->next) {
 
         // unconditionally update all known interfaces
-#if LWIP_VERSION_MAJOR == 1
-        intf->hostname = (char*)wifi_station_get_hostname();
-#else
         intf->hostname = wifi_station_get_hostname();
-#endif
 
         if (netif_dhcp_data(intf) != nullptr) {
             // renew already started DHCP leases

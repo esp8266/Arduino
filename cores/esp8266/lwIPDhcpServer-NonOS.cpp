@@ -25,8 +25,6 @@
 
 #include <lwip/init.h> // LWIP_VERSION
 
-#if LWIP_VERSION_MAJOR != 1
-
 #include <lwip/netif.h>
 #include "lwIPDhcpServer.h"
 
@@ -64,5 +62,3 @@ void dhcps_stop ()
 }
 
 } // extern "C"
-
-#endif // LWIP_VERSION_MAJOR != 1
