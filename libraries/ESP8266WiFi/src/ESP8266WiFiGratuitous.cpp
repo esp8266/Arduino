@@ -19,14 +19,7 @@
 
 extern "C"
 {
-#include "lwip/init.h" // LWIP_VERSION_*
-#if LWIP_VERSION_MAJOR == 1
-#include "netif/wlan_lwip_if.h" // eagle_lwip_getif()
-#include "netif/etharp.h" // gratuitous arp
-#include "user_interface.h"
-#else
 #include "lwip/etharp.h" // gratuitous arp
-#endif
 } // extern "C"
 
 #include <Schedule.h>
@@ -44,14 +37,8 @@ void ESP8266WiFiGratuitous::stationKeepAliveNow ()
         if (
                (interface->flags & NETIF_FLAG_LINK_UP)
             && (interface->flags & NETIF_FLAG_UP)
-#if LWIP_VERSION_MAJOR == 1
-            && interface == eagle_lwip_getif(STATION_IF) /* lwip1 does not set if->num properly */
-            && (!ip_addr_isany(&interface->ip_addr))
-#else
             && interface->num == STATION_IF
-            && (!ip4_addr_isany_val(*netif_ip4_addr(interface)))
-#endif
-        )
+            && (!ip4_addr_isany_val(*netif_ip4_addr(interface))))
         {
             etharp_gratuitous(interface);
             break;
