@@ -204,7 +204,8 @@ protected:
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(ClientType& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
-  bool _collectHeader(const char* headerName, const char* headerValue);
+  bool _collectHeader(const char* headerName, const char* headerValue)  __attribute__((deprecated));
+  bool _collectHeader(const String& headerName, const String& headerValue);
 
   void _streamFileCore(const size_t fileSize, const String & fileName, const String & contentType);
 
