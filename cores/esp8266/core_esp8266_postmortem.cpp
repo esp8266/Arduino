@@ -32,10 +32,9 @@
 #include "pgmspace.h"
 #include "gdb_hooks.h"
 #include "StackThunk.h"
+#include "coredecls.h"
 
 extern "C" {
-
-extern void __real_system_restart_local();
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
@@ -46,6 +45,8 @@ static const char* s_panic_what = 0;
 static bool s_abort_called = false;
 static const char* s_unhandled_exception = NULL;
 
+static uint32_t s_stacksmash_addr = 0;
+
 void abort() __attribute__((noreturn));
 static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
@@ -55,6 +56,7 @@ static void print_stack(uint32_t start, uint32_t end);
 // using numbers different from "REASON_" in user_interface.h (=0..6)
 enum rst_reason_sw
 {
+    REASON_USER_STACK_SMASH = 253,
     REASON_USER_SWEXCEPTION_RST = 254
 };
 static int s_user_reset_reason = REASON_DEFAULT_RST;
@@ -93,6 +95,18 @@ static void ets_printf_P(const char *str, ...) {
     }
 }
 
+static void cut_here() {
+    ets_putc('\n');
+    for (auto i = 0; i < 15; i++ ) {
+        ets_putc('-');
+    }
+    ets_printf_P(PSTR(" CUT HERE FOR EXCEPTION DECODER "));
+    for (auto i = 0; i < 15; i++ ) {
+        ets_putc('-');
+    }
+    ets_putc('\n');
+}
+
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
@@ -114,6 +128,8 @@ void __wrap_system_restart_local() {
 
     ets_install_putc1(&uart_write_char_d);
 
+    cut_here();
+
     if (s_panic_line) {
         ets_printf_P(PSTR("\nPanic %S:%d %S"), s_panic_file, s_panic_line, s_panic_func);
         if (s_panic_what) {
@@ -134,6 +150,11 @@ void __wrap_system_restart_local() {
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
     }
+    else if (rst_info.reason == REASON_USER_STACK_SMASH) {
+        ets_printf_P(PSTR("\nStack overflow detected.\n"));
+        ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
+            5 /* Alloca exception, closest thing to stack fault*/, s_stacksmash_addr, 0, 0, 0, 0);
+   }
     else {
         ets_printf_P(PSTR("\nGeneric Reset\n"));
     }
@@ -193,6 +214,8 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
 #endif
     }
+
+    cut_here();
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
@@ -274,5 +297,21 @@ void __panic_func(const char* file, int line, const char* func) {
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
+
+uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
+void __stack_chk_fail(void) {
+    s_user_reset_reason = REASON_USER_STACK_SMASH;
+    ets_printf_P(PSTR("\nPANIC: Stack overrun"));
+
+    s_stacksmash_addr = (uint32_t)__builtin_return_address(0);
+
+    if (gdb_present())
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+
+    __wrap_system_restart_local();
+
+    while (1); // never reached, needed to satisfy "noreturn" attribute
+}
+
 
 };

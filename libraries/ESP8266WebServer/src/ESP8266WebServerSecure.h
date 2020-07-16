@@ -22,10 +22,6 @@
 #include <ESP8266WebServer.h>
 #include <WiFiClientSecure.h>
 
-namespace axTLS {
-  using ESP8266WebServerSecure = esp8266webserver::ESP8266WebServerTemplate<WiFiServerSecure>;
-};
-
 namespace BearSSL {
   using ESP8266WebServerSecure = esp8266webserver::ESP8266WebServerTemplate<WiFiServerSecure>;
 };

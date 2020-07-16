@@ -29,6 +29,7 @@
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include "detail/mimetable.h"
+#include "Uri.h"
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
@@ -91,13 +92,14 @@ public:
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
-  void on(const String &uri, THandlerFunction handler);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  void on(const Uri &uri, THandlerFunction handler);
+  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
+  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
+  void enableCORS(bool enable);
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
@@ -107,6 +109,7 @@ public:
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
+  const String& pathArg(unsigned int i) const; // get request path argument by number
   const String& arg(const String& name) const;    // get request argument value by name
   const String& arg(int i) const;          // get request argument value by number
   const String& argName(int i) const;      // get request argument name by number
@@ -147,18 +150,44 @@ public:
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
+  bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
+    if (_currentVersion == 0)
+        // no chunk mode in HTTP/1.0
+        return false;
+    setContentLength(CONTENT_LENGTH_UNKNOWN);
+    send_P(code, content_type, "");
+    return true;
+  }
+  bool chunkedResponseModeStart (int code, const char* content_type) {
+    return chunkedResponseModeStart_P(code, content_type);
+  }
+  bool chunkedResponseModeStart (int code, const String& content_type) {
+    return chunkedResponseModeStart_P(code, content_type.c_str());
+  }
+  void chunkedResponseFinalize () {
+    sendContent(emptyString);
+  }
+
+  // Whether other requests should be accepted from the client on the
+  // same socket after a response is sent.
+  // This will automatically configure the "Connection" header of the response.
+  // Defaults to true when the client's HTTP version is 1.1 or above, otherwise it defaults to false.
+  // If the client sends the "Connection" header, the value given by the header is used.
+  void keepAlive(bool keepAlive) { _keepAlive = keepAlive; }
+  bool keepAlive() { return _keepAlive; }
+
   static String credentialHash(const String& username, const String& realm, const String& password);
 
   static String urlDecode(const String& text);
 
-  // Handle a GET request by sending a response header and stream file content to response body 
+  // Handle a GET request by sending a response header and stream file content to response body
   template<typename T>
   size_t streamFile(T &file, const String& contentType) {
     return streamFile(file, contentType, HTTP_GET);
   }
 
   // Implement GET and HEAD requests for files.
-  // Stream body on HTTP_GET but not on HTTP_HEAD requests. 
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
   template<typename T>
   size_t streamFile(T &file, const String& contentType, HTTPMethod requestMethod) {
     size_t contentLength = 0;
@@ -203,6 +232,7 @@ protected:
   uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
+  bool _keepAlive;
 
   RequestHandlerType*  _currentHandler;
   RequestHandlerType*  _firstHandler;
@@ -212,6 +242,7 @@ protected:
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
+  int              _currentArgsHavePlain;
   std::unique_ptr<HTTPUpload> _currentUpload;
   int              _postArgsLen;
   RequestArgument* _postArgs;
@@ -224,10 +255,13 @@ protected:
 
   String           _hostHeader;
   bool             _chunked;
+  bool             _corsEnabled;
 
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
+
+  
 
 };
 

@@ -24,16 +24,10 @@
 #include <Arduino.h>
 
 #include "ESP8266HTTPClient.h"
-
-#if HTTPCLIENT_1_1_COMPATIBLE
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecureAxTLS.h>
-#endif
-
 #include <StreamString.h>
 #include <base64.h>
 
-#if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits
 {
 public:
@@ -54,31 +48,6 @@ public:
     }
 };
 
-class TLSTraits : public TransportTraits
-{
-public:
-    TLSTraits(const String& fingerprint) :
-        _fingerprint(fingerprint)
-    {
-    }
-
-    std::unique_ptr<WiFiClient> create() override
-    {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-        return std::unique_ptr<WiFiClient>(new axTLS::WiFiClientSecure());
-#pragma GCC diagnostic pop
-    }
-
-    bool verify(WiFiClient& client, const char* host) override
-    {
-        auto wcs = static_cast<axTLS::WiFiClientSecure&>(client);
-        return wcs.verify(_fingerprint.c_str(), host);
-    }
-
-protected:
-    String _fingerprint;
-};
 
 class BearSSLTraits : public TransportTraits
 {
@@ -107,7 +76,6 @@ public:
 protected:
     uint8_t _fingerprint[20];
 };
-#endif // HTTPCLIENT_1_1_COMPATIBLE
 
 /**
  * constructor
@@ -115,9 +83,7 @@ protected:
 HTTPClient::HTTPClient()
     : _client(nullptr), _userAgent(F("ESP8266HTTPClient"))
 {
-#if HTTPCLIENT_1_1_COMPATIBLE
     _tcpDeprecated.reset(nullptr);
-#endif
 }
 
 /**
@@ -151,13 +117,11 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, const String& url) {
-#if HTTPCLIENT_1_1_COMPATIBLE
     if(_tcpDeprecated) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
         _canReuse = false;
         end();
     }
-#endif
 
     _client = &client;
 
@@ -190,13 +154,11 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
  */
 bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, const String& uri, bool https)
 {
-#if HTTPCLIENT_1_1_COMPATIBLE
     if(_tcpDeprecated) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
         _canReuse = false;
         end();
     }
-#endif
 
     _client = &client;
 
@@ -205,32 +167,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     _port = port;
     _uri = uri;
     _protocol = (https ? "https" : "http");
-    return true;
-}
-
-
-#if HTTPCLIENT_1_1_COMPATIBLE
-bool HTTPClient::begin(String url, String httpsFingerprint)
-{
-    if(_client && !_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
-    if (httpsFingerprint.length() == 0) {
-        return false;
-    }
-    if (!beginInternal(url, "https")) {
-        return false;
-    }
-    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
-    if(!_transportTraits) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
-        return false;
-    }
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
     return true;
 }
 
@@ -279,7 +215,7 @@ bool HTTPClient::begin(String url)
     _transportTraits = TransportTraitsPtr(new TransportTraits());
     return true;
 }
-#endif // HTTPCLIENT_1_1_COMPATIBLE
+
 
 bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol)
 {
@@ -341,7 +277,7 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
     return true;
 }
 
-#if HTTPCLIENT_1_1_COMPATIBLE
+
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
     if(_client && !_tcpDeprecated) {
@@ -359,38 +295,6 @@ bool HTTPClient::begin(String host, uint16_t port, String uri)
     return true;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)
-{
-    if (https) {
-        return begin(host, port, uri, httpsFingerprint);
-    } else {
-        return begin(host, port, uri);
-    }
-}
-#pragma GCC diagnostic pop
-
-bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
-{
-    if(_client && !_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
-    clear();
-    _host = host;
-    _port = port;
-    _uri = uri;
-
-    if (httpsFingerprint.length() == 0) {
-        return false;
-    }
-    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s httpsFingerprint: %s\n", host.c_str(), port, uri.c_str(), httpsFingerprint.c_str());
-    return true;
-}
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
 {
@@ -413,7 +317,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
     DEBUG_HTTPCLIENT("\n");
     return true;
 }
-#endif // HTTPCLIENT_1_1_COMPATIBLE
+
 
 /**
  * end
@@ -423,7 +327,6 @@ void HTTPClient::end(void)
 {
     disconnect(false);
     clear();
-    _redirectCount = 0;
 }
 
 /**
@@ -450,14 +353,16 @@ void HTTPClient::disconnect(bool preserveClient)
                     _client = nullptr;
                 }
             }
-#if HTTPCLIENT_1_1_COMPATIBLE
             if(_tcpDeprecated) {
                 _transportTraits.reset(nullptr);
                 _tcpDeprecated.reset(nullptr);
             }
-#endif
         }
     } else {
+        if (!preserveClient && _client) { // Also destroy _client if not connected()
+            _client = nullptr;
+        }
+
         DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
     }
 }
@@ -558,8 +463,17 @@ bool HTTPClient::setURL(const String& url)
 /**
  * set true to follow redirects.
  * @param follow
+ * @deprecated
  */
 void HTTPClient::setFollowRedirects(bool follow)
+{
+    _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
+}
+/**
+ * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+ * @param follow
+ */
+void HTTPClient::setFollowRedirects(followRedirects_t follow)
 {
     _followRedirects = follow;
 }
@@ -652,8 +566,9 @@ int HTTPClient::sendRequest(const char * type, const String& payload)
  */
 int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t size)
 {
+    int code;
     bool redirect = false;
-    int code = 0;
+    uint16_t redirectCount = 0;
     do {
         // wipe out any existing headers from previous request
         for(size_t i = 0; i < _headerKeysCount; i++) {
@@ -662,12 +577,11 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
             }
         }
 
-        redirect = false;
-        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, _redirectCount);
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, redirectCount);
 
         // connect to server
         if(!connect()) {
-            return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
+            return returnError(HTTPC_ERROR_CONNECTION_FAILED);
         }
 
         addHeader(F("Content-Length"), String(payload && size > 0 ? size : 0));
@@ -687,9 +601,9 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
                 int towrite = std::min((int)size, (int)HTTP_TCP_BUFFER_SIZE);
                 written = _client->write(p + bytesWritten, towrite);
                 if (written < 0) {
-                     return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+                        return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
                 } else if (written == 0) {
-                     return returnError(HTTPC_ERROR_CONNECTION_LOST);
+                        return returnError(HTTPC_ERROR_CONNECTION_LOST);
                 }
                 bytesWritten += written;
                 size -= written;
@@ -700,41 +614,66 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         code = handleHeaderResponse();
 
         //
-        // We can follow redirects for 301/302/307 for GET and HEAD requests and
-        // and we have not exceeded the redirect limit preventing an infinite
-        // redirect loop.
-        //
+        // Handle redirections as stated in RFC document:
         // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
         //
-        if (_followRedirects &&
-                (_redirectCount < _redirectLimit) &&
-                (_location.length() > 0) &&
-                (code == 301 || code == 302 || code == 307) &&
-                (!strcmp(type, "GET") || !strcmp(type, "HEAD"))
-                ) {
-            _redirectCount += 1; // increment the count for redirect.
-            redirect = true;
-            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect:: '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
-            if (!setURL(_location)) {
-                // return the redirect instead of handling on failure of setURL()
-                redirect = false;
+        // Implementing HTTP_CODE_FOUND as redirection with GET method,
+        // to follow most of existing user agent implementations.
+        //
+        redirect = false;
+        if (
+            _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS && 
+            redirectCount < _redirectLimit &&
+            _location.length() > 0
+        ) {
+            switch (code) {
+                // redirecting using the same method
+                case HTTP_CODE_MOVED_PERMANENTLY:
+                case HTTP_CODE_TEMPORARY_REDIRECT: {
+                    if (
+                        // allow to force redirections on other methods
+                        // (the RFC require user to accept the redirection)
+                        _followRedirects == HTTPC_FORCE_FOLLOW_REDIRECTS ||
+                        // allow GET and HEAD methods without force
+                        !strcmp(type, "GET") || 
+                        !strcmp(type, "HEAD")
+                    ) {
+                        redirectCount += 1;
+                        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (the same method): '%s' redirCount: %d\n", _location.c_str(), redirectCount);
+                        if (!setURL(_location)) {
+                            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
+                            // no redirection
+                            break;
+                        }
+                        // redirect using the same request method and payload, diffrent URL
+                        redirect = true;
+                    }
+                    break;
+                }
+                // redirecting with method dropped to GET or HEAD
+                // note: it does not need `HTTPC_FORCE_FOLLOW_REDIRECTS` for any method
+                case HTTP_CODE_FOUND:
+                case HTTP_CODE_SEE_OTHER: {
+                    redirectCount += 1;
+                    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect (dropped to GET/HEAD): '%s' redirCount: %d\n", _location.c_str(), redirectCount);
+                    if (!setURL(_location)) {
+                        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] failed setting URL for redirection\n");
+                        // no redirection
+                        break;
+                    }
+                    // redirect after changing method to GET/HEAD and dropping payload
+                    type = "GET";
+                    payload = nullptr;
+                    size = 0;
+                    redirect = true;
+                    break;
+                }
+
+                default:
+                    break;
             }
         }
-
     } while (redirect);
-
-    // handle 303 redirect for non GET/HEAD by changing to GET and requesting new url
-    if (_followRedirects &&
-            (_redirectCount < _redirectLimit) &&
-            (_location.length() > 0) &&
-            (code == 303) &&
-            strcmp(type, "GET") && strcmp(type, "HEAD")
-            ) {
-        _redirectCount += 1;
-        if (setURL(_location)) {
-            code = sendRequest("GET");
-        }
-    }
 
     // handle Server Response (Header)
     return returnError(code);
@@ -756,7 +695,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
     // connect to server
     if(!connect()) {
-        return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
+        return returnError(HTTPC_ERROR_CONNECTION_FAILED);
     }
 
     if(size > 0) {
@@ -937,7 +876,9 @@ int HTTPClient::writeToStream(Stream * stream)
         return returnError(HTTPC_ERROR_NO_STREAM);
     }
 
-    if(!connected()) {
+    // Only return error if not connected and no data available, because otherwise ::getString() will return an error instead of an empty
+    // string when the server returned a http code 204 (no content)
+    if(!connected() && _transferEncoding != HTTPC_TE_IDENTITY && _size > 0) {
         return returnError(HTTPC_ERROR_NOT_CONNECTED);
     }
 
@@ -946,11 +887,13 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-        ret = writeToStreamDataBlock(stream, len);
+        if(len > 0) {
+            ret = writeToStreamDataBlock(stream, len);
 
-        // have we an error?
-        if(ret < 0) {
-            return returnError(ret);
+            // have we an error?
+            if(ret < 0) {
+                return returnError(ret);
+            }
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
@@ -1042,8 +985,8 @@ const String& HTTPClient::getString(void)
 String HTTPClient::errorToString(int error)
 {
     switch(error) {
-    case HTTPC_ERROR_CONNECTION_REFUSED:
-        return F("connection refused");
+    case HTTPC_ERROR_CONNECTION_FAILED:
+        return F("connection failed");
     case HTTPC_ERROR_SEND_HEADER_FAILED:
         return F("send header failed");
     case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
@@ -1165,19 +1108,14 @@ bool HTTPClient::hasHeader(const char* name)
  */
 bool HTTPClient::connect(void)
 {
-    if(connected()) {
-        if(_reuse) {
-            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, try reuse!\n");
-        }
+    if(_reuse && _canReuse && connected()) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
         while(_client->available() > 0) {
             _client->read();
         }
         return true;
     }
 
-#if HTTPCLIENT_1_1_COMPATIBLE
     if(!_client && _transportTraits) {
         _tcpDeprecated = _transportTraits->create();
         if(!_tcpDeprecated) {
@@ -1186,7 +1124,6 @@ bool HTTPClient::connect(void)
         }
         _client = _tcpDeprecated.get();
     }
-#endif
 
     if(!_client) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
@@ -1202,14 +1139,11 @@ bool HTTPClient::connect(void)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-#if HTTPCLIENT_1_1_COMPATIBLE
     if (_tcpDeprecated && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _client->stop();
         return false;
     }
-#endif
-
 
 #ifdef ESP8266
     _client->setNoDelay(true);
@@ -1301,6 +1235,7 @@ int HTTPClient::handleHeaderResponse()
     while(connected()) {
         size_t len = _client->available();
         if(len > 0) {
+            int headerSeparator = -1;
             String headerLine = _client->readStringUntil('\n');
 
             lastDataTime = millis();
@@ -1308,15 +1243,13 @@ int HTTPClient::handleHeaderResponse()
             DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
             if (headerLine.startsWith(F("HTTP/1."))) {
-                if (_canReuse) {
-                    _canReuse = (headerLine[sizeof "HTTP/1." - 1] != '0');
-                }
-                _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
-                continue;
-            }
 
-            int headerSeparator = headerLine.indexOf(':');
-            if (headerSeparator > 0) {
+                constexpr auto httpVersionIdx = sizeof "HTTP/1." - 1;
+                _canReuse = _canReuse && (headerLine[httpVersionIdx] != '0');
+                _returnCode = headerLine.substring(httpVersionIdx + 2, headerLine.indexOf(' ', httpVersionIdx + 2)).toInt();
+                _canReuse = _canReuse && (_returnCode > 0) && (_returnCode < 500);
+
+            } else if ((headerSeparator = headerLine.indexOf(':')) > 0) {
                 String headerName = headerLine.substring(0, headerSeparator);
                 String headerValue = headerLine.substring(headerSeparator + 1);
                 headerValue.trim();

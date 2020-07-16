@@ -68,13 +68,27 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
         }
         free(pathStr);
     }
+
+    time_t creation = 0;
+    if (timeCallback && (openMode & OM_CREATE)) {
+        // O_CREATE means we *may* make the file, but not if it already exists.
+        // See if it exists, and only if not update the creation time
+        int rc = lfs_file_open(&_lfs, fd.get(), path, LFS_O_RDONLY);
+	if (rc == 0) {
+            lfs_file_close(&_lfs, fd.get()); // It exists, don't update create time
+        } else {
+            creation = timeCallback();  // File didn't exist or otherwise, so we're going to create this time
+        }
+    }
+
     int rc = lfs_file_open(&_lfs, fd.get(), path, flags);
     if (rc == LFS_ERR_ISDIR) {
         // To support the SD.openNextFile, a null FD indicates to the LittleFSFile this is just
         // a directory whose name we are carrying around but which cannot be read or written
-        return std::make_shared<LittleFSFileImpl>(this, path, nullptr, flags);
+        return std::make_shared<LittleFSFileImpl>(this, path, nullptr, flags, creation);
     } else if (rc == 0) {
-        return std::make_shared<LittleFSFileImpl>(this, path, fd, flags);
+        lfs_file_sync(&_lfs, fd.get());
+        return std::make_shared<LittleFSFileImpl>(this, path, fd, flags, creation);
     } else {
         DEBUGV("LittleFSDirImpl::openFile: rc=%d fd=%p path=`%s` openMode=%d accessMode=%d err=%d\n",
                rc, fd.get(), path, openMode, accessMode, rc);

@@ -161,6 +161,65 @@ TEST_CASE(TESTPRE "truncate", TESTPAT)
     REQUIRE( s == "some" );
 }
 
+TEST_CASE(TESTPRE "open(w+) truncates file", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    String s = readFile("/file1");
+    REQUIRE( s == "some text");
+    auto f = FSTYPE.open("/file1", "w+");
+    f.close();
+    String t = readFile("/file1");
+    REQUIRE( t == "");
+}
+
+TEST_CASE(TESTPRE "peek() returns -1 on EOF", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    auto f = FSTYPE.open("/file1", "r+");
+    REQUIRE(f.seek(8));
+    REQUIRE(f.peek() == 't');
+    REQUIRE(f.read() == 't');
+    REQUIRE(f.peek() == -1);
+    REQUIRE(f.read() == -1);
+    f.close();
+}
+
+TEST_CASE(TESTPRE "seek() pase EOF returns error (#7323)", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    auto f = FSTYPE.open("/file1", "r+");
+    REQUIRE_FALSE(f.seek(10));
+    f.close();
+}
+
+TEST_CASE(TESTPRE "Rewriting file frees space immediately (#7426)", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    FSInfo inf;
+    FSTYPE.info(inf);
+    // Calculate the size to write per-FS, due to differing overheads
+    int kbToWrite = (inf.totalBytes - inf.usedBytes - 8192) / 1024;
+    // Create and overwrite a file >50% of spaceA (48/64K)
+    for (auto x = 0; x < 2; x++) {
+        auto f = FSTYPE.open("/file1.bin", "w");
+        REQUIRE(f);
+        uint8_t buff[1024];
+        memset(buff, 0xaa, 1024);
+        for (auto i = 0; i < kbToWrite; i++) {
+            REQUIRE(f.write(buff, 1024));
+        }
+        f.close();
+        FSTYPE.info(inf);
+    }
+}
+
 #ifdef FS_HAS_DIRS
 
 #if FSTYPE != SDFS
