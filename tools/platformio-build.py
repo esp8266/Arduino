@@ -54,7 +54,7 @@ env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
     CFLAGS=[
-        "-std=gnu99",
+        "-std=c17",
         "-Wpointer-arith",
         "-Wno-implicit-function-declaration",
         "-Wl,-EL",
@@ -76,7 +76,7 @@ env.Append(
 
     CXXFLAGS=[
         "-fno-rtti",
-        "-std=c++11"
+        "-std=gnu++17"
     ],
 
     LINKFLAGS=[
@@ -123,7 +123,7 @@ env.Append(
 
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
-        "wps", "bearssl", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
+        "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
         "stdc++", "m", "c", "gcc"
     ],
 
@@ -199,12 +199,7 @@ else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_c
 #
 # lwIP
 #
-if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
-    env.Append(
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
-        LIBS=["lwip_gcc"]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
+if "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],

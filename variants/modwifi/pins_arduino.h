@@ -27,7 +27,7 @@
 #define Pins_Arduino_h
 
 #define PIN_WIRE_SDA (2)
-#define PIN_WIRE_SCL (4)
+#define PIN_WIRE_SCL (14)
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;

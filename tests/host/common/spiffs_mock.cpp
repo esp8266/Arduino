@@ -94,7 +94,7 @@ void SpiffsMock::load ()
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
-        if (!m_overwrite)
+        if (!m_overwrite && flen > 0)
         {
             fprintf(stderr, "SPIFFS: aborting at user request\n");
             exit(1);
