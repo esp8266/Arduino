@@ -326,6 +326,17 @@ typedef uint8_t u8_t;
 #define SPIFFS_IX_MAP                         1
 #endif
 
+// By default SPIFFS in some cases relies on the property of NOR flash that bits
+// cannot be set from 0 to 1 by writing and that controllers will ignore such
+// bit changes. This results in fewer reads as SPIFFS can in some cases perform
+// blind writes, with all bits set to 1 and only those it needs reset set to 0.
+// Most of the chips and controllers allow this behavior, so the default is to
+// use this technique. If your controller is one of the rare ones that don't,
+// turn this option on and SPIFFS will perform a read-modify-write instead.
+#ifndef SPIFFS_NO_BLIND_WRITES
+#define SPIFFS_NO_BLIND_WRITES                0
+#endif
+
 // Set SPIFFS_TEST_VISUALISATION to non-zero to enable SPIFFS_vis function
 // in the api. This function will visualize all filesystem using given printf
 // function.
@@ -354,11 +365,20 @@ typedef uint8_t u8_t;
 #endif
 #endif
 
+#ifndef SPIFFS_SECURE_ERASE
+#define SPIFFS_SECURE_ERASE 0
+#endif
+
 // Types depending on configuration such as the amount of flash bytes
 // given to spiffs file system in total (spiffs_file_system_size),
 // the logical block size (log_block_size), and the logical page size
 // (log_page_size)
+//
+// Set SPIFFS_TYPES_OVERRIDE if you wish to have your own
+// definitions for these types (for example, if you want them
+// to be u32_t)
 
+#ifndef SPIFFS_TYPES_OVERRIDE
 // Block index type. Make sure the size of this type can hold
 // the highest number of all blocks - i.e. spiffs_file_system_size / log_block_size
 typedef u16_t spiffs_block_ix;
@@ -373,5 +393,6 @@ typedef u16_t spiffs_obj_id;
 // hold the largest possible span index on the system -
 // i.e. (spiffs_file_system_size / log_page_size) - 1
 typedef u16_t spiffs_span_ix;
+#endif
 
 #endif /* SPIFFS_CONFIG_H_ */

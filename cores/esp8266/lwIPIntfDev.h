@@ -129,7 +129,9 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
         memset(_macAddress, 0, 6);
         _macAddress[0] = 0xEE;
 #endif
-        _macAddress[3] += _netif.num;
+        _macAddress[3] += _netif.num;   // alter base mac address
+        _macAddress[0] &= 0xfe;         // set as locally administered, unicast, per
+        _macAddress[0] |= 0x02;         // https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
     }
 
     if (!RawDev::begin(_macAddress))
@@ -146,7 +148,7 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
     ip_addr_copy(netmask, _netif.netmask);
     ip_addr_copy(gw, _netif.gw);
 
-    if (!netif_add(&_netif, &ip_addr, &netmask, &gw, this, netif_init_s, ethernet_input))
+    if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this, netif_init_s, ethernet_input))
         return ERR_IF;
 
     _netif.flags |= NETIF_FLAG_UP;
