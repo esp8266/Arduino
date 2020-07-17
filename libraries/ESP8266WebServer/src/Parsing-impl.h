@@ -109,8 +109,11 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
   }
   _currentMethod = method;
 
-  DBGWS("method: %s url: %s search: %s\n",
-      methodStr.c_str(), url.c_str(), searchStr.c_str());
+  _keepAlive = _currentVersion > 0; // Keep the connection alive by default
+                                    // if the protocol version is greater than HTTP 1.0
+
+  DBGWS("method: %s url: %s search: %s keepAlive=: %d\n",
+      methodStr.c_str(), url.c_str(), searchStr.c_str(), _keepAlive);
 
   //attach handler
   RequestHandlerType* handler;
@@ -133,7 +136,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req.isEmpty()) break;//no moar headers
+      if (req.isEmpty()) break; //no more headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -161,6 +164,8 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
         contentLength = headerValue.toInt();
       } else if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
 
@@ -220,6 +225,8 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
 
       if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
     _parseArguments(searchStr);
