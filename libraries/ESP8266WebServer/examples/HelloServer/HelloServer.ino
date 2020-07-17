@@ -95,6 +95,7 @@ void setup(void) {
     (void)client;
     (void)contentType;
     Serial.printf("A useless web hook has passed\n");
+    Serial.printf("(this hook is in 0x%08x area (401x=IRAM 402x=FLASH))\n", esp_get_program_counter());
     return ESP8266WebServer::CLIENT_REQUEST_CAN_CONTINUE;
   });
 
@@ -102,6 +103,7 @@ void setup(void) {
     (void)method;
     (void)client;
     (void)contentType;
+    Serial.printf("(this hook is in 0x%08x area (401x=IRAM 402x=FLASH))\n", esp_get_program_counter());
     if (url.startsWith("/fail")) {
       Serial.printf("An always failing web hook has been triggered\n");
       return ESP8266WebServer::CLIENT_MUST_STOP;
@@ -113,6 +115,7 @@ void setup(void) {
     (void)method;
     (void)client;
     (void)contentType;
+    Serial.printf("(this hook is in 0x%08x area (401x=IRAM 402x=FLASH))\n", esp_get_program_counter());
     if (url.startsWith("/dump")) {
       Serial.printf("The dumper web hook is on the run\n");
 
