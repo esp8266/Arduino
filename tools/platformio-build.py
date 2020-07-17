@@ -260,9 +260,13 @@ if not current_vtables:
 assert current_vtables
 
 current_mmu_iram_size = None
-for d in flatten_cppdefines:
-    if str(d).startswith("MMU_IRAM_SIZE"):
-        current_mmu_iram_size = d
+for flag in env["CPPDEFINES"]:
+    try:
+        d, val = flag
+        if str(d).startswith("MMU_IRAM_SIZE"):
+            current_mmu_iram_size = "{}={}".format(d, val)
+    except ValueError:
+        continue
 if not current_mmu_iram_size:
     current_mmu_iram_size = "MMU_IRAM_SIZE=0x8000"
     env.Append(CPPDEFINES=[current_mmu_iram_size])
