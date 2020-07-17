@@ -216,7 +216,13 @@ void optimistic_yield(uint32_t interval_us);
 } // extern "C"
 #endif
 
-
+// undefine stdlib's definitions when encountered, provide abs that supports floating point for C code
+#ifndef __cplusplus
+#undef abs
+#define abs(x) ((x)>0?(x):-(x))
+#undef round
+#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#endif // ifndef __cplusplus
 
 // from this point onward, we need to configure the c++ environment
 #ifdef __cplusplus
@@ -232,7 +238,6 @@ using std::isinf;
 using std::isnan;
 
 // Use float-compatible stl abs() and round(), we don't use Arduino macros to avoid issues with the C++ libraries
-// TODO: ...does C code need Arduino macros?
 using std::abs;
 using std::round;
 
