@@ -114,6 +114,9 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   }
   _currentMethod = method;
 
+  _keepAlive = _currentVersion > 0; // Keep the connection alive by default
+                                    // if the protocol version is greater than HTTP 1.0
+
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("method: ");
   DEBUG_OUTPUT.print(methodStr);
@@ -144,7 +147,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req.isEmpty()) break;//no moar headers
+      if (req.isEmpty()) break; //no more headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -177,6 +180,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
         contentLength = headerValue.toInt();
       } else if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
 
@@ -208,6 +213,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
         RequestArgument& arg = _currentArgs[_currentArgCount++];
         arg.key = F("plain");
         arg.value = plainBuf;
+        _currentArgsHavePlain = 1;
       }
     } else { // isForm is true
       // here: content is not yet read (plainBuf is still empty)
@@ -240,6 +246,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
 
       if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
     _parseArguments(searchStr);

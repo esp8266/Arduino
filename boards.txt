@@ -427,13 +427,6 @@ generic.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 generic.menu.ip.hb6f.build.lwip_include=lwip2/include
 generic.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 generic.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-generic.menu.ip.hb1=v1.4 Higher Bandwidth
-generic.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-generic.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-generic.menu.ip.src=v1.4 Compile from source
-generic.menu.ip.src.build.lwip_lib=-llwip_src
-generic.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-generic.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 generic.menu.dbg.Disabled=Disabled
 generic.menu.dbg.Disabled.build.debug_port=
 generic.menu.dbg.Serial=Serial
@@ -775,13 +768,6 @@ esp8285.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 esp8285.menu.ip.hb6f.build.lwip_include=lwip2/include
 esp8285.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 esp8285.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-esp8285.menu.ip.hb1=v1.4 Higher Bandwidth
-esp8285.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-esp8285.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-esp8285.menu.ip.src=v1.4 Compile from source
-esp8285.menu.ip.src.build.lwip_lib=-llwip_src
-esp8285.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-esp8285.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 esp8285.menu.dbg.Disabled=Disabled
 esp8285.menu.dbg.Disabled.build.debug_port=
 esp8285.menu.dbg.Serial=Serial
@@ -992,13 +978,6 @@ espduino.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espduino.menu.ip.hb6f.build.lwip_include=lwip2/include
 espduino.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espduino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espduino.menu.ip.hb1=v1.4 Higher Bandwidth
-espduino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espduino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espduino.menu.ip.src=v1.4 Compile from source
-espduino.menu.ip.src.build.lwip_lib=-llwip_src
-espduino.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espduino.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espduino.menu.dbg.Disabled=Disabled
 espduino.menu.dbg.Disabled.build.debug_port=
 espduino.menu.dbg.Serial=Serial
@@ -1201,13 +1180,6 @@ huzzah.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 huzzah.menu.ip.hb6f.build.lwip_include=lwip2/include
 huzzah.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 huzzah.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-huzzah.menu.ip.hb1=v1.4 Higher Bandwidth
-huzzah.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-huzzah.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-huzzah.menu.ip.src=v1.4 Compile from source
-huzzah.menu.ip.src.build.lwip_lib=-llwip_src
-huzzah.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-huzzah.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 huzzah.menu.dbg.Disabled=Disabled
 huzzah.menu.dbg.Disabled.build.debug_port=
 huzzah.menu.dbg.Serial=Serial
@@ -1410,13 +1382,6 @@ inventone.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 inventone.menu.ip.hb6f.build.lwip_include=lwip2/include
 inventone.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 inventone.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-inventone.menu.ip.hb1=v1.4 Higher Bandwidth
-inventone.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-inventone.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-inventone.menu.ip.src=v1.4 Compile from source
-inventone.menu.ip.src.build.lwip_lib=-llwip_src
-inventone.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-inventone.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 inventone.menu.dbg.Disabled=Disabled
 inventone.menu.dbg.Disabled.build.debug_port=
 inventone.menu.dbg.Serial=Serial
@@ -1622,13 +1587,6 @@ cw01.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 cw01.menu.ip.hb6f.build.lwip_include=lwip2/include
 cw01.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 cw01.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-cw01.menu.ip.hb1=v1.4 Higher Bandwidth
-cw01.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-cw01.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-cw01.menu.ip.src=v1.4 Compile from source
-cw01.menu.ip.src.build.lwip_lib=-llwip_src
-cw01.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-cw01.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 cw01.menu.dbg.Disabled=Disabled
 cw01.menu.dbg.Disabled.build.debug_port=
 cw01.menu.dbg.Serial=Serial
@@ -1834,13 +1792,6 @@ espresso_lite_v1.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espresso_lite_v1.menu.ip.hb6f.build.lwip_include=lwip2/include
 espresso_lite_v1.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espresso_lite_v1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espresso_lite_v1.menu.ip.hb1=v1.4 Higher Bandwidth
-espresso_lite_v1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espresso_lite_v1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v1.menu.ip.src=v1.4 Compile from source
-espresso_lite_v1.menu.ip.src.build.lwip_lib=-llwip_src
-espresso_lite_v1.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v1.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espresso_lite_v1.menu.dbg.Disabled=Disabled
 espresso_lite_v1.menu.dbg.Disabled.build.debug_port=
 espresso_lite_v1.menu.dbg.Serial=Serial
@@ -2046,13 +1997,6 @@ espresso_lite_v2.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espresso_lite_v2.menu.ip.hb6f.build.lwip_include=lwip2/include
 espresso_lite_v2.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espresso_lite_v2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espresso_lite_v2.menu.ip.hb1=v1.4 Higher Bandwidth
-espresso_lite_v2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espresso_lite_v2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v2.menu.ip.src=v1.4 Compile from source
-espresso_lite_v2.menu.ip.src.build.lwip_lib=-llwip_src
-espresso_lite_v2.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v2.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espresso_lite_v2.menu.dbg.Disabled=Disabled
 espresso_lite_v2.menu.dbg.Disabled.build.debug_port=
 espresso_lite_v2.menu.dbg.Serial=Serial
@@ -2258,13 +2202,6 @@ phoenix_v1.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 phoenix_v1.menu.ip.hb6f.build.lwip_include=lwip2/include
 phoenix_v1.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 phoenix_v1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-phoenix_v1.menu.ip.hb1=v1.4 Higher Bandwidth
-phoenix_v1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-phoenix_v1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v1.menu.ip.src=v1.4 Compile from source
-phoenix_v1.menu.ip.src.build.lwip_lib=-llwip_src
-phoenix_v1.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v1.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 phoenix_v1.menu.dbg.Disabled=Disabled
 phoenix_v1.menu.dbg.Disabled.build.debug_port=
 phoenix_v1.menu.dbg.Serial=Serial
@@ -2470,13 +2407,6 @@ phoenix_v2.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 phoenix_v2.menu.ip.hb6f.build.lwip_include=lwip2/include
 phoenix_v2.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 phoenix_v2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-phoenix_v2.menu.ip.hb1=v1.4 Higher Bandwidth
-phoenix_v2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-phoenix_v2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v2.menu.ip.src=v1.4 Compile from source
-phoenix_v2.menu.ip.src.build.lwip_lib=-llwip_src
-phoenix_v2.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v2.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 phoenix_v2.menu.dbg.Disabled=Disabled
 phoenix_v2.menu.dbg.Disabled.build.debug_port=
 phoenix_v2.menu.dbg.Serial=Serial
@@ -2679,13 +2609,6 @@ nodemcu.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 nodemcu.menu.ip.hb6f.build.lwip_include=lwip2/include
 nodemcu.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 nodemcu.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-nodemcu.menu.ip.hb1=v1.4 Higher Bandwidth
-nodemcu.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-nodemcu.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcu.menu.ip.src=v1.4 Compile from source
-nodemcu.menu.ip.src.build.lwip_lib=-llwip_src
-nodemcu.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcu.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 nodemcu.menu.dbg.Disabled=Disabled
 nodemcu.menu.dbg.Disabled.build.debug_port=
 nodemcu.menu.dbg.Serial=Serial
@@ -2892,13 +2815,6 @@ nodemcuv2.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 nodemcuv2.menu.ip.hb6f.build.lwip_include=lwip2/include
 nodemcuv2.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 nodemcuv2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-nodemcuv2.menu.ip.hb1=v1.4 Higher Bandwidth
-nodemcuv2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-nodemcuv2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcuv2.menu.ip.src=v1.4 Compile from source
-nodemcuv2.menu.ip.src.build.lwip_lib=-llwip_src
-nodemcuv2.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcuv2.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 nodemcuv2.menu.dbg.Disabled=Disabled
 nodemcuv2.menu.dbg.Disabled.build.debug_port=
 nodemcuv2.menu.dbg.Serial=Serial
@@ -3121,13 +3037,6 @@ modwifi.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 modwifi.menu.ip.hb6f.build.lwip_include=lwip2/include
 modwifi.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 modwifi.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-modwifi.menu.ip.hb1=v1.4 Higher Bandwidth
-modwifi.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-modwifi.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-modwifi.menu.ip.src=v1.4 Compile from source
-modwifi.menu.ip.src.build.lwip_lib=-llwip_src
-modwifi.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-modwifi.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 modwifi.menu.dbg.Disabled=Disabled
 modwifi.menu.dbg.Disabled.build.debug_port=
 modwifi.menu.dbg.Serial=Serial
@@ -3330,13 +3239,6 @@ thing.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 thing.menu.ip.hb6f.build.lwip_include=lwip2/include
 thing.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 thing.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-thing.menu.ip.hb1=v1.4 Higher Bandwidth
-thing.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-thing.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-thing.menu.ip.src=v1.4 Compile from source
-thing.menu.ip.src.build.lwip_lib=-llwip_src
-thing.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-thing.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 thing.menu.dbg.Disabled=Disabled
 thing.menu.dbg.Disabled.build.debug_port=
 thing.menu.dbg.Serial=Serial
@@ -3539,13 +3441,6 @@ thingdev.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 thingdev.menu.ip.hb6f.build.lwip_include=lwip2/include
 thingdev.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 thingdev.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-thingdev.menu.ip.hb1=v1.4 Higher Bandwidth
-thingdev.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-thingdev.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-thingdev.menu.ip.src=v1.4 Compile from source
-thingdev.menu.ip.src.build.lwip_lib=-llwip_src
-thingdev.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-thingdev.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 thingdev.menu.dbg.Disabled=Disabled
 thingdev.menu.dbg.Disabled.build.debug_port=
 thingdev.menu.dbg.Serial=Serial
@@ -3748,13 +3643,6 @@ blynk.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 blynk.menu.ip.hb6f.build.lwip_include=lwip2/include
 blynk.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 blynk.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-blynk.menu.ip.hb1=v1.4 Higher Bandwidth
-blynk.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-blynk.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-blynk.menu.ip.src=v1.4 Compile from source
-blynk.menu.ip.src.build.lwip_lib=-llwip_src
-blynk.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-blynk.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 blynk.menu.dbg.Disabled=Disabled
 blynk.menu.dbg.Disabled.build.debug_port=
 blynk.menu.dbg.Serial=Serial
@@ -3957,13 +3845,6 @@ esp210.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 esp210.menu.ip.hb6f.build.lwip_include=lwip2/include
 esp210.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 esp210.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-esp210.menu.ip.hb1=v1.4 Higher Bandwidth
-esp210.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-esp210.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-esp210.menu.ip.src=v1.4 Compile from source
-esp210.menu.ip.src.build.lwip_lib=-llwip_src
-esp210.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-esp210.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 esp210.menu.dbg.Disabled=Disabled
 esp210.menu.dbg.Disabled.build.debug_port=
 esp210.menu.dbg.Serial=Serial
@@ -4166,13 +4047,6 @@ d1_mini.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 d1_mini.menu.ip.hb6f.build.lwip_include=lwip2/include
 d1_mini.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 d1_mini.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-d1_mini.menu.ip.hb1=v1.4 Higher Bandwidth
-d1_mini.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-d1_mini.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini.menu.ip.src=v1.4 Compile from source
-d1_mini.menu.ip.src.build.lwip_lib=-llwip_src
-d1_mini.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 d1_mini.menu.dbg.Disabled=Disabled
 d1_mini.menu.dbg.Disabled.build.debug_port=
 d1_mini.menu.dbg.Serial=Serial
@@ -4358,13 +4232,6 @@ d1_mini_pro.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 d1_mini_pro.menu.ip.hb6f.build.lwip_include=lwip2/include
 d1_mini_pro.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 d1_mini_pro.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-d1_mini_pro.menu.ip.hb1=v1.4 Higher Bandwidth
-d1_mini_pro.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-d1_mini_pro.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_pro.menu.ip.src=v1.4 Compile from source
-d1_mini_pro.menu.ip.src.build.lwip_lib=-llwip_src
-d1_mini_pro.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_pro.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 d1_mini_pro.menu.dbg.Disabled=Disabled
 d1_mini_pro.menu.dbg.Disabled.build.debug_port=
 d1_mini_pro.menu.dbg.Serial=Serial
@@ -4607,13 +4474,6 @@ d1_mini_lite.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 d1_mini_lite.menu.ip.hb6f.build.lwip_include=lwip2/include
 d1_mini_lite.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 d1_mini_lite.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-d1_mini_lite.menu.ip.hb1=v1.4 Higher Bandwidth
-d1_mini_lite.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-d1_mini_lite.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_lite.menu.ip.src=v1.4 Compile from source
-d1_mini_lite.menu.ip.src.build.lwip_lib=-llwip_src
-d1_mini_lite.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_lite.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 d1_mini_lite.menu.dbg.Disabled=Disabled
 d1_mini_lite.menu.dbg.Disabled.build.debug_port=
 d1_mini_lite.menu.dbg.Serial=Serial
@@ -4816,13 +4676,6 @@ d1.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 d1.menu.ip.hb6f.build.lwip_include=lwip2/include
 d1.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 d1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-d1.menu.ip.hb1=v1.4 Higher Bandwidth
-d1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-d1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-d1.menu.ip.src=v1.4 Compile from source
-d1.menu.ip.src.build.lwip_lib=-llwip_src
-d1.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-d1.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 d1.menu.dbg.Disabled=Disabled
 d1.menu.dbg.Disabled.build.debug_port=
 d1.menu.dbg.Serial=Serial
@@ -5028,13 +4881,6 @@ espino.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espino.menu.ip.hb6f.build.lwip_include=lwip2/include
 espino.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espino.menu.ip.hb1=v1.4 Higher Bandwidth
-espino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espino.menu.ip.src=v1.4 Compile from source
-espino.menu.ip.src.build.lwip_lib=-llwip_src
-espino.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espino.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espino.menu.dbg.Disabled=Disabled
 espino.menu.dbg.Disabled.build.debug_port=
 espino.menu.dbg.Serial=Serial
@@ -5237,13 +5083,6 @@ espinotee.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espinotee.menu.ip.hb6f.build.lwip_include=lwip2/include
 espinotee.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espinotee.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espinotee.menu.ip.hb1=v1.4 Higher Bandwidth
-espinotee.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espinotee.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espinotee.menu.ip.src=v1.4 Compile from source
-espinotee.menu.ip.src.build.lwip_lib=-llwip_src
-espinotee.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espinotee.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espinotee.menu.dbg.Disabled=Disabled
 espinotee.menu.dbg.Disabled.build.debug_port=
 espinotee.menu.dbg.Serial=Serial
@@ -5510,13 +5349,6 @@ wifinfo.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 wifinfo.menu.ip.hb6f.build.lwip_include=lwip2/include
 wifinfo.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 wifinfo.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-wifinfo.menu.ip.hb1=v1.4 Higher Bandwidth
-wifinfo.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-wifinfo.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-wifinfo.menu.ip.src=v1.4 Compile from source
-wifinfo.menu.ip.src.build.lwip_lib=-llwip_src
-wifinfo.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-wifinfo.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 wifinfo.menu.dbg.Disabled=Disabled
 wifinfo.menu.dbg.Disabled.build.debug_port=
 wifinfo.menu.dbg.Serial=Serial
@@ -5731,13 +5563,6 @@ arduino-esp8266.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 arduino-esp8266.menu.ip.hb6f.build.lwip_include=lwip2/include
 arduino-esp8266.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 arduino-esp8266.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-arduino-esp8266.menu.ip.hb1=v1.4 Higher Bandwidth
-arduino-esp8266.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-arduino-esp8266.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-arduino-esp8266.menu.ip.src=v1.4 Compile from source
-arduino-esp8266.menu.ip.src.build.lwip_lib=-llwip_src
-arduino-esp8266.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-arduino-esp8266.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 arduino-esp8266.menu.dbg.Disabled=Disabled
 arduino-esp8266.menu.dbg.Disabled.build.debug_port=
 arduino-esp8266.menu.dbg.Serial=Serial
@@ -6008,13 +5833,6 @@ gen4iod.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 gen4iod.menu.ip.hb6f.build.lwip_include=lwip2/include
 gen4iod.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 gen4iod.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-gen4iod.menu.ip.hb1=v1.4 Higher Bandwidth
-gen4iod.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-gen4iod.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-gen4iod.menu.ip.src=v1.4 Compile from source
-gen4iod.menu.ip.src.build.lwip_lib=-llwip_src
-gen4iod.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-gen4iod.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 gen4iod.menu.dbg.Disabled=Disabled
 gen4iod.menu.dbg.Disabled.build.debug_port=
 gen4iod.menu.dbg.Serial=Serial
@@ -6218,13 +6036,6 @@ oak.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 oak.menu.ip.hb6f.build.lwip_include=lwip2/include
 oak.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 oak.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-oak.menu.ip.hb1=v1.4 Higher Bandwidth
-oak.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-oak.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-oak.menu.ip.src=v1.4 Compile from source
-oak.menu.ip.src.build.lwip_lib=-llwip_src
-oak.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-oak.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 oak.menu.dbg.Disabled=Disabled
 oak.menu.dbg.Disabled.build.debug_port=
 oak.menu.dbg.Serial=Serial
@@ -6427,13 +6238,6 @@ wifiduino.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 wifiduino.menu.ip.hb6f.build.lwip_include=lwip2/include
 wifiduino.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 wifiduino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-wifiduino.menu.ip.hb1=v1.4 Higher Bandwidth
-wifiduino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-wifiduino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-wifiduino.menu.ip.src=v1.4 Compile from source
-wifiduino.menu.ip.src.build.lwip_lib=-llwip_src
-wifiduino.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-wifiduino.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 wifiduino.menu.dbg.Disabled=Disabled
 wifiduino.menu.dbg.Disabled.build.debug_port=
 wifiduino.menu.dbg.Serial=Serial
@@ -6750,13 +6554,6 @@ wifi_slot.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 wifi_slot.menu.ip.hb6f.build.lwip_include=lwip2/include
 wifi_slot.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 wifi_slot.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-wifi_slot.menu.ip.hb1=v1.4 Higher Bandwidth
-wifi_slot.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-wifi_slot.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-wifi_slot.menu.ip.src=v1.4 Compile from source
-wifi_slot.menu.ip.src.build.lwip_lib=-llwip_src
-wifi_slot.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-wifi_slot.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 wifi_slot.menu.dbg.Disabled=Disabled
 wifi_slot.menu.dbg.Disabled.build.debug_port=
 wifi_slot.menu.dbg.Serial=Serial
@@ -6959,13 +6756,6 @@ wiolink.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 wiolink.menu.ip.hb6f.build.lwip_include=lwip2/include
 wiolink.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 wiolink.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-wiolink.menu.ip.hb1=v1.4 Higher Bandwidth
-wiolink.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-wiolink.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-wiolink.menu.ip.src=v1.4 Compile from source
-wiolink.menu.ip.src.build.lwip_lib=-llwip_src
-wiolink.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-wiolink.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 wiolink.menu.dbg.Disabled=Disabled
 wiolink.menu.dbg.Disabled.build.debug_port=
 wiolink.menu.dbg.Serial=Serial
@@ -7168,13 +6958,6 @@ espectro.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espectro.menu.ip.hb6f.build.lwip_include=lwip2/include
 espectro.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espectro.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espectro.menu.ip.hb1=v1.4 Higher Bandwidth
-espectro.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espectro.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espectro.menu.ip.src=v1.4 Compile from source
-espectro.menu.ip.src.build.lwip_lib=-llwip_src
-espectro.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espectro.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espectro.menu.dbg.Disabled=Disabled
 espectro.menu.dbg.Disabled.build.debug_port=
 espectro.menu.dbg.Serial=Serial
@@ -7377,13 +7160,6 @@ eduinowifi.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 eduinowifi.menu.ip.hb6f.build.lwip_include=lwip2/include
 eduinowifi.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 eduinowifi.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-eduinowifi.menu.ip.hb1=v1.4 Higher Bandwidth
-eduinowifi.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-eduinowifi.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-eduinowifi.menu.ip.src=v1.4 Compile from source
-eduinowifi.menu.ip.src.build.lwip_lib=-llwip_src
-eduinowifi.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-eduinowifi.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 eduinowifi.menu.dbg.Disabled=Disabled
 eduinowifi.menu.dbg.Disabled.build.debug_port=
 eduinowifi.menu.dbg.Serial=Serial
@@ -7636,13 +7412,6 @@ sonoff.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 sonoff.menu.ip.hb6f.build.lwip_include=lwip2/include
 sonoff.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 sonoff.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-sonoff.menu.ip.hb1=v1.4 Higher Bandwidth
-sonoff.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-sonoff.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-sonoff.menu.ip.src=v1.4 Compile from source
-sonoff.menu.ip.src.build.lwip_lib=-llwip_src
-sonoff.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-sonoff.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 sonoff.menu.dbg.Disabled=Disabled
 sonoff.menu.dbg.Disabled.build.debug_port=
 sonoff.menu.dbg.Serial=Serial
@@ -7886,13 +7655,6 @@ espmxdevkit.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
 espmxdevkit.menu.ip.hb6f.build.lwip_include=lwip2/include
 espmxdevkit.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
 espmxdevkit.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-espmxdevkit.menu.ip.hb1=v1.4 Higher Bandwidth
-espmxdevkit.menu.ip.hb1.build.lwip_lib=-llwip_gcc
-espmxdevkit.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
-espmxdevkit.menu.ip.src=v1.4 Compile from source
-espmxdevkit.menu.ip.src.build.lwip_lib=-llwip_src
-espmxdevkit.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
-espmxdevkit.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 espmxdevkit.menu.dbg.Disabled=Disabled
 espmxdevkit.menu.dbg.Disabled.build.debug_port=
 espmxdevkit.menu.dbg.Serial=Serial

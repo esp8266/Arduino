@@ -3,7 +3,7 @@
 ## Release model
 
 The release model is linear. That means that there is only one main code branch, and releases are snapshots of that branch at specific points in the sequence of commits.
-The advantage of this model is that the maintenance effort is greately reduced compared to other release models, such as a branched model.
+The advantage of this model is that the maintenance effort is greatly reduced compared to other release models, such as a branched model.
 The disadvantage is that progress is ever only forward, and fixes can't be backported to prior releases. this means there is no such thing as a "stable" release (however, see Sub releases below).
 
 There are 4 types of releases:
@@ -118,7 +118,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 6. Navigate to [Travis CI options](https://travis-ci.org/esp8266/Arduino/settings), enable ´Build pushed branches´ (before tagging in next step)
 
-7. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `3.0.0`, or `X.Y.Z-betaN` for release candiate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
+7. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `3.0.0`, or `X.Y.Z-betaN` for release candidate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
    git tag -a -m "Release 3.0.0" 3.0.0

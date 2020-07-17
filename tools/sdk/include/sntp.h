@@ -5,11 +5,7 @@
 
 #include "lwip/init.h"
 #include "lwip/ip_addr.h"
-#if LWIP_VERSION_MAJOR == 1
-#include "lwip/sntp.h"
-#else
 #include "lwip/apps/sntp.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
