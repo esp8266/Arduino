@@ -113,6 +113,10 @@ out in which line of application it is triggered. Please refer to `Check
 Where the Code Crashes <#check-where-the-code-crashes>`__ point below
 for a quick example how to do it.
 
+**NOTE:** When decoding exceptions be sure to include all lines between
+the ``---- CUT HERE ----`` marks in the output to allow the decoder to also
+provide the line of code that's actually causing the exception.
+
 Watchdog
 ^^^^^^^^
 
