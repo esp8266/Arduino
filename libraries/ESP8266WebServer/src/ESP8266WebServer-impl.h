@@ -49,11 +49,13 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
 , _statusChange(0)
+, _keepAlive(false)
 , _currentHandler(nullptr)
 , _firstHandler(nullptr)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _currentArgsHavePlain(0)
 , _postArgsLen(0)
 , _postArgs(nullptr)
 , _headerKeysCount(0)
@@ -76,6 +78,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _currentArgsHavePlain(0)
 , _postArgsLen(0)
 , _postArgs(nullptr)
 , _headerKeysCount(0)
@@ -325,6 +328,10 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool callYield = false;
 
   if (_currentClient.connected() || _currentClient.available()) {
+    if (_currentClient.available() && _keepAlive) {
+      _currentStatus = HC_WAIT_READ;
+    }
+
     switch (_currentStatus) {
     case HC_NONE:
       // No-op to avoid C++ compiler warning
@@ -429,7 +436,14 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     if (_corsEnabled) {
       sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
     }
-    sendHeader(String(F("Connection")), String(F("close")));
+
+    if (_keepAlive && _server.hasClient()) { // Disable keep alive if another client is waiting.
+      _keepAlive = false;
+    }
+    sendHeader(String(F("Connection")), String(_keepAlive ? F("keep-alive") : F("close")));
+    if (_keepAlive) {
+      sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
+    }
 
     response += _responseHeaders;
     response += "\r\n";
@@ -565,7 +579,7 @@ const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) cons
     if ( _postArgs[j].key == name )
       return _postArgs[j].value;
   }
-  for (int i = 0; i < _currentArgCount; ++i) {
+  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
@@ -574,14 +588,14 @@ const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) cons
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(int i) const {
-  if (i >= 0 && i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
     return _currentArgs[i].value;
   return emptyString;
 }
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::argName(int i) const {
-  if (i >= 0 && i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
     return _currentArgs[i].key;
   return emptyString;
 }
@@ -597,7 +611,7 @@ bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
     if (_postArgs[j].key == name)
       return true;
   }
-  for (int i = 0; i < _currentArgCount; ++i) {
+  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if (_currentArgs[i].key == name)
       return true;
   }
