@@ -14,6 +14,7 @@ typedef struct hwdt_info_ {
 } hwdt_info_t;
 
 void enable_debug_hwdt_at_link_time(void);
+extern "C" void debug_hwdt_init(void);
 
 extern uint32_t *g_rom_stack;
 extern hwdt_info_t hwdt_info;

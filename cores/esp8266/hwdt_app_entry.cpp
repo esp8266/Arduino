@@ -42,13 +42,13 @@
  *    `void enable_debug_hwdt_at_link_time (void);`
  * in `setup()`. This tool prints to the serial port at the default serial port
  * speed set by the Boot ROM. On a Hardware WDT reset that port speed is
- * 115200 bps. If your needs differ, see the HWDT_UART_SPEED option below.
+ * 115200 bps. If your needs differ, see the DEBUG_ESP_HWDT_UART_SPEED option below.
  *
  * More on crystal differences and data rates:
  *     When the ESP8266 restarts because of a Hardware WDT reset, the port speed
  *     defaults to 115200. This will be the speed, even if you have a 26MHz or
  *     40MHz Crystal. If you would like to use a different data rate, use the
- *     option HWDT_UART_SPEED described below.
+ *     option DEBUG_ESP_HWDT_UART_SPEED described below.
  *
  *     The Boot ROM initially sets the UART clock divisor to support a data rate
  *     of 115200 bps with the assumption that it has a 40MHz crystal. When a
@@ -97,16 +97,17 @@
 
 
 /*
- * DEBUG_HWDT
+ * DEBUG_ESP_HWDT
  *
  * Enables this debug tool for printing a Hardware WDT stack dump at restart.
  *
+ * This option is now managed from the Arduinoo IDE menu 'Tools->Debug Level'
+ #define DEBUG_ESP_HWDT
  */
- #define DEBUG_HWDT
 
 
 /*
- * DEBUG_HWDT_NO4KEXTRA
+ * DEBUG_ESP_HWDT_NO4KEXTRA
  *
  * This option will leave more of the system stack available for the stack dump.
  * A problem we have with the "4K extra" option, is it pushes the system stack
@@ -124,12 +125,13 @@
  * complete stack dump of the "sys" stack. You can omit this define and have an
  * extra 4K in the heap.
  *
+ * This option is now managed from the Arduinoo IDE menu 'Tools->Debug Level'
+ #define DEBUG_ESP_HWDT_NO4KEXTRA
  */
- // #define DEBUG_HWDT_NO4KEXTRA
 
 
 /*
- * HWDT_UART_SPEED
+ * DEBUG_ESP_HWDT_UART_SPEED
  *
  * This option alters the UART serial speed used for printing the Hardware WDT
  * reset stack dump. Without this option on an HWDT reset, the existing default
@@ -141,19 +143,19 @@
  * and data rates" in the comments at the top.
  *
  */
- // #define HWDT_UART_SPEED (19200)
- // #define HWDT_UART_SPEED (74880)
- // #define HWDT_UART_SPEED (115200)
- // #define HWDT_UART_SPEED (230400)
+ // #define DEBUG_ESP_HWDT_UART_SPEED (19200)
+ // #define DEBUG_ESP_HWDT_UART_SPEED (74880)
+ // #define DEBUG_ESP_HWDT_UART_SPEED (115200)
+ // #define DEBUG_ESP_HWDT_UART_SPEED (230400)
 
 
 /*
- * HWDT_PRINT_GREETING
+ * DEBUG_ESP_HWDT_PRINT_GREETING
  *
  * Prints a simple introduction to let you know this tool is active and in the
- * build. At power-on, this may not be viewable on some devices. The crystal
- * has to be 40Mhz for this to work w/o using the HWDT_UART_SPEED option above.
- * May not be worth the cost in IRAM.
+ * build. At power-on, this may not be viewable on some devices. The crystal has
+ * to be 40Mhz for this to work w/o using the DEBUG_ESP_HWDT_UART_SPEED option
+ * above. May not be worth the cost in IRAM.
  *
  * EDIT: There is something different in the UART setup after a flash upload. I
  * am unable to print using the same code that works for Power-on and an EXT_RST
@@ -170,11 +172,11 @@
  * tool performing hardware reset and exiting, then the serial monitor
  * re-engaging. This is not an issue that needs to be addressed here.
  */
- // #define HWDT_PRINT_GREETING
+ #define DEBUG_ESP_HWDT_PRINT_GREETING
 
 
 /*
- * ROM_STACK_SIZE
+ * DEBUG_ESP_HWDT_ROM_STACK_SIZE
  *
  * There are four sections of code starting just before 0x40000000, that share
  * the same stack space.
@@ -193,20 +195,20 @@
  * safe, I am leaving this at 1024; however, I think there is room to lower it
  * without loss of information.
  */
-#ifndef ROM_STACK_SIZE
-#define ROM_STACK_SIZE (1024)
+#ifndef DEBUG_ESP_HWDT_ROM_STACK_SIZE
+#define DEBUG_ESP_HWDT_ROM_STACK_SIZE (1024)
 #endif
 
 
 /*
- * HWDT_INFO
+ * DEBUG_ESP_HWDT_INFO
  *
  * Gather some information on ROM and bootloader combined, sys, and cont stack
  * usage. If you are missing the include file for this structure, you can
  * copy-paste from the embedded version of the .h below.
  *
  */
- #define HWDT_INFO
+ // #define DEBUG_ESP_HWDT_INFO
 
 
 /*
@@ -215,7 +217,7 @@
  * Dump the stack contents of the ROM Stack area. This gives us a visual of the
  * stack usage. Probably not of value, beyond developing this tool.
  *
- * To see printing, you may need to use this option with HWDT_UART_SPEED.
+ * To see printing, you may need to use this option with DEBUG_ESP_HWDT_UART_SPEED.
  */
  // #define ROM_STACK_DUMP
 
@@ -226,12 +228,12 @@
  * "If" statement or "switch" method to implement, the reset reason logic. Both
  * can be made smaller by removing confirmation checks.
  *
- * Checks are performed when DEBUG_HWDT_DEBUG_RESET_REASON has been defined.
+ * Checks are performed when DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON has been defined.
  *
  * EDIT: I should settle on one or the other; however, new issues continue to
  * pop up on determining reset reason. I'll wait until later and pick one.
  *
- #define DEBUG_HWDT_DEBUG_RESET_REASON
+ #define DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON
  */
  #define HWDT_IF_METHOD_RESET_REASON
 
@@ -240,8 +242,7 @@
 /*                     End of Configuration Options                           */
 /*____________________________________________________________________________*/
 
-
-#ifdef DEBUG_HWDT
+#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NO4KEXTRA)
 
 #include <c_types.h>
 #include "cont.h"
@@ -267,9 +268,12 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
 
 }
 
-// #define DEBUG_HWDT_DEBUG
+// #define DEBUG_ESP_HWDT_DEV_DEBUG
 // #define USE_IRAM
 
+//C To the maintainers: Since the Cache_Read_Enable logic seems to work, do you
+//C see a need or would you like to keep the IRAM build path?
+//C If you see no need for it the USE_IRAM build path could be deleted.
 #ifdef USE_IRAM
 #undef USE_IRAM
 #define USE_IRAM 1
@@ -283,7 +287,7 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
 #define STATIC static __attribute__((noinline))
 // #define STATIC
 
-#ifdef DEBUG_HWDT_DEBUG
+#ifdef DEBUG_ESP_HWDT_DEV_DEBUG
 /*
  * We have two copies of hwdt_info_t. Verify internal and external structures
  * match.
@@ -333,6 +337,7 @@ typedef struct hwdt_info_ {
 } hwdt_info_t;
 
 void enable_debug_hwdt_at_link_time(void);
+extern "C" void debug_hwdt_init(void);
 
 extern uint32_t *g_rom_stack;
 extern hwdt_info_t hwdt_info;
@@ -353,66 +358,52 @@ static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and inclu
 #endif
 
 
-#define MK_ALIGN16_SZ(a) (((a) + 0x0F) & ~0x0F)
+#define MK_ALIGN16_SZ(a) (((a) + 0x0FUL) & ~0x0FUL)
 #define ALIGN_UP(a, s) ((decltype(a))((((uintptr_t)(a)) + (s-1)) & ~(s-1)))
 #define ALIGN_DOWN(a, s) ((decltype(a))(((uintptr_t)(a)) & ~(s-1)))
 
 #ifndef CONT_STACKGUARD
 #define CONT_STACKGUARD 0xfeefeffe
 #endif
-#define RTC_SYS         ((volatile uint32_t*)0x60001100)
+#define RTC_SYS         ((volatile uint32_t*)0x60001100UL)
 
-
-#define dram_start      ((uint32_t *)0x3FFE8000)
-#define dram_end        ((uint32_t *)0x40000000)
-
-#define rom_stack_first ((uint32_t *)0x40000000)
-#define sys_stack       ((uint32_t *)0x3fffeb30)
 /*
+ *
+ #define DRAM_START      ((uint32_t *)0x3FFE8000UL)
+ #define DRAM_END        ((uint32_t *)0x40000000UL)
+ *
  * The space between 0x3fffe000 up to 0x3fffeb30 is a ROM BSS area that is later
  * claimed by the SDK for stack space. This is a problem area for this tool,
  * because the ROM BSS gets zeroed as part of ROM init on reboot. Any part of
  * the "sys" stack residing there is lost. On the other hand, it becomes a prime
  * candidate for DRAM address space to handle the needs of this tool.
+ *
+ #define SYS_STACK_E000     ((uint32_t *)0x3fffe000UL)
  */
-#define sys_stack_e000     ((uint32_t *)0x3fffe000)
+
+#define ROM_STACK_FIRST ((uint32_t *)0x40000000UL)
+#define SYS_STACK       ((uint32_t *)0x3fffeb30UL)
 
 // Map out who will live where.
-#define rom_stack_A16_sz   (MK_ALIGN16_SZ(ROM_STACK_SIZE))
-#define cont_stack_A16_sz  (MK_ALIGN16_SZ(sizeof(cont_t)))
-#define rom_stack ((uint32_t *) ((uintptr_t)rom_stack_first - rom_stack_A16_sz))
+#define ROM_STACK_A16_SZ   (MK_ALIGN16_SZ(DEBUG_ESP_HWDT_ROM_STACK_SIZE))
+#define CONT_STACK_A16_SZ  (MK_ALIGN16_SZ(sizeof(cont_t)))
+#define ROM_STACK ((uint32_t *) ((uintptr_t)ROM_STACK_FIRST - ROM_STACK_A16_SZ))
 
 
-#ifdef DEBUG_HWDT_NO4KEXTRA
+#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
 /* This is the default NONOS-SDK user's heap location for NO4KEXTRA */
 static cont_t g_cont __attribute__ ((aligned (16)));
-#define sys_stack_first ((uint32_t *)((uintptr_t)rom_stack))
+#define SYS_STACK_FIRST ROM_STACK
 
 #else
-#define cont_stack_first ((uint32_t *)((uintptr_t)rom_stack)) // only for computation
-#define cont_stack ((cont_t *)((uintptr_t)cont_stack_first - cont_stack_A16_sz))
-#define sys_stack_first ((uint32_t *)((uintptr_t)cont_stack))
+#define CONT_STACK_FIRST ROM_STACK // only for computation
+#define CONT_STACK ((cont_t *)((uintptr_t)CONT_STACK_FIRST - CONT_STACK_A16_SZ))
+#define SYS_STACK_FIRST CONT_STACK
 #endif
 
 uint32_t *g_rom_stack  __attribute__((section(".noinit")));
 size_t g_rom_stack_A16_sz  __attribute__((section(".noinit")));
 hwdt_info_t hwdt_info __attribute__((section(".noinit")));
-
-void enable_debug_hwdt_at_link_time(void) {
-    /*
-     * This function does nothing; however, including a call to it in setup,
-     * allows this module to override, at link time, the core_esp8266_main.cpp's
-     * `app_entry()` with the one below. This will create a stack dump on
-     * Hardware WDT resets.
-     *
-     * It appears just including this module in the sketch directory before
-     * opening the project is enough. However, just play it safe, call this
-     * function from setup.
-     */
-}
-
-
-/* the following code is linked only if a call to the above function is made somewhere */
 
 extern "C" {
 
@@ -517,25 +508,25 @@ STATIC void IRAM_MAYBE check_g_pcont_validity(void) {
      * Testing of vital pointers for validity could also aid as a partial
      * indicator of power-on. Not needed for that purpose at this time.
      */
-    if (g_rom_stack == rom_stack &&
-        g_rom_stack_A16_sz == rom_stack_A16_sz &&
-#ifdef DEBUG_HWDT_NO4KEXTRA
+    if (g_rom_stack == ROM_STACK &&
+        g_rom_stack_A16_sz == ROM_STACK_A16_SZ &&
+#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
         g_pcont == &g_cont
 #else
-        g_pcont == cont_stack
+        g_pcont == CONT_STACK
 #endif
         ) {
             hwdt_info.g_pcont_valid = true;
     } else {
         hwdt_info.g_pcont_valid = false;
-        g_rom_stack = rom_stack;
-        g_rom_stack_A16_sz = rom_stack_A16_sz;
+        g_rom_stack = ROM_STACK;
+        g_rom_stack_A16_sz = ROM_STACK_A16_SZ;
     }
 }
 
-#if defined(DEBUG_HWDT_DEBUG) || defined(DEBUG_HWDT_DEBUG_RESET_REASON)
-#ifndef DEBUG_HWDT_DEBUG_RESET_REASON
-#define DEBUG_HWDT_DEBUG_RESET_REASON
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) || defined(DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON)
+#ifndef DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON
+#define DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON
 #endif
 #define debug__confirm_rom_reason(a) ((a) == rom_api_reason)
 #else
@@ -586,6 +577,9 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
      * I need to know if this is the 1st boot at power on. Combining these
      * indicators has been tricky, I think I now have it.
      *
+     * Maybe a TODO: This logic is for the general case of detecting the true
+     * reset cause before the SDK is started. It may be possible to reduce to
+     * a specific HWDT test. Leaving for now.
      */
 
     hwdt_info.rtc_sys_reason = RTC_SYS[0];
@@ -593,6 +587,11 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
     hwdt_info.rom_api_reason = rtc_get_reset_reason();
     const ROM_RST_REASON_t rom_api_reason = (ROM_RST_REASON_t)hwdt_info.rom_api_reason;
 
+//C To maintainers: Cleanup: Of these two methods is there one you prefer?
+//C The other could be deleted.
+//C I did it two ways looking to see if one was shorter than the other. I think
+//C they ended out being about the same. Also coding it twice, helped check my
+//C logic.
 #ifdef HWDT_IF_METHOD_RESET_REASON
     *hwdt_reset = false;
     *power_on = false;
@@ -702,7 +701,7 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
     return hwdt_info.reset_reason;
 }
 
-#ifdef HWDT_UART_SPEED
+#ifdef DEBUG_ESP_HWDT_UART_SPEED
 /*
  * Here we use uart_div_modify in the Boot ROM. Note the Boot ROM version does
  * not do any input validation.
@@ -787,7 +786,7 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
         adjust_uart_speed(new_uart_divisor);
     }
 
-#if defined(DEBUG_HWDT_DEBUG)
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG)
     ETS_PRINTF("\n\nreal_uart_div_modify(0, %u / %u);\n", master_freq, new_speed);
     ETS_PRINTF("F_CRYSTAL = %u\n", crystal_freq);
     ETS_PRINTF("old uart_divisor = %u\n", uart_divisor);
@@ -815,16 +814,16 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
     bool hwdt_reset = false;
     get_reset_reason(&power_on, &hwdt_reset);
 
-#ifdef HWDT_UART_SPEED
-    const uint32_t uart_divisor = set_uart_speed(0, HWDT_UART_SPEED);
+#ifdef DEBUG_ESP_HWDT_UART_SPEED
+    const uint32_t uart_divisor = set_uart_speed(0, DEBUG_ESP_HWDT_UART_SPEED);
 #endif
-#if defined(DEBUG_HWDT_DEBUG)
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG)
     ETS_PRINTF("Basic boot reason: %s\n", (power_on) ? "Power-on" : "Reboot");
     ETS_PRINTF("RTC_SYS Reset Reason = %u\n", hwdt_info.rtc_sys_reason);
     ETS_PRINTF("ROM API Reset Reason = %u\n", hwdt_info.rom_api_reason);
     ETS_PRINTF("HWDT Reset Reason = %u\n\n", hwdt_info.reset_reason);
 #endif
-#if defined(DEBUG_HWDT_DEBUG_RESET_REASON)
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON)
     if (REASON_EXT_SYS_RST < hwdt_info.reset_reason) {
         ETS_PRINTF("Reset reason confirmation failed!\n");
         ETS_PRINTF("  RTC_SYS Reset Reason = %u\n", hwdt_info.rtc_sys_reason);
@@ -864,13 +863,13 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
         }
         hwdt_info.cont_integrity = cont_integrity;
 
-#if defined(DEBUG_HWDT_NO4KEXTRA) || defined(HWDT_INFO)
+#if defined(DEBUG_ESP_HWDT_NO4KEXTRA) || defined(DEBUG_ESP_HWDT_INFO)
         const uint32_t *ctx_cont_ptr = skip_stackguard(g_pcont->stack, g_pcont->stack_end, CONT_STACKGUARD);
         hwdt_info.cont = (uintptr_t)g_pcont->stack_end - (uintptr_t)ctx_cont_ptr;
 #endif
 
-        const uint32_t *ctx_sys_ptr = skip_stackguard(sys_stack, rom_stack, CONT_STACKGUARD);
-        hwdt_info.sys = (uintptr_t)rom_stack - (uintptr_t)ctx_sys_ptr;
+        const uint32_t *ctx_sys_ptr = skip_stackguard(SYS_STACK, ROM_STACK, CONT_STACKGUARD);
+        hwdt_info.sys = (uintptr_t)ROM_STACK - (uintptr_t)ctx_sys_ptr;
 
 #ifndef USE_IRAM
         const uint32_t *bearssl_stack_top = NULL;
@@ -891,9 +890,9 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
             }
 #endif
             /* Print context SYS */
-            print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)rom_stack, PRINT_STACK::SYS);
+            print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)ROM_STACK, PRINT_STACK::SYS);
 
-#ifdef DEBUG_HWDT_NO4KEXTRA
+#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
             /* Print separate ctx: cont stack */
             print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
 #endif
@@ -908,34 +907,34 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
      *  skip the unused section of the stack when printing a Stack Dump.
      */
     {
-        size_t this_mutch = (uintptr_t)rom_stack - (uintptr_t)sys_stack;
+        size_t this_mutch = (uintptr_t)ROM_STACK - (uintptr_t)SYS_STACK;
         this_mutch /= sizeof(uint32_t);
         for (size_t i = 0; i < this_mutch; i++) {
-            sys_stack[i] = CONT_STACKGUARD;
+            SYS_STACK[i] = CONT_STACKGUARD;
         }
     }
 
-#if defined(HWDT_INFO) || defined(ROM_STACK_DUMP)
+#if defined(DEBUG_ESP_HWDT_INFO) || defined(ROM_STACK_DUMP)
     /*
-     *  Reports on rom_stack usage by ROM and eboot.
-     *  Used to confirm ROM_STACK_SIZE is large enough.
+     *  Reports on ROM_STACK usage by ROM and eboot.
+     *  Used to confirm DEBUG_ESP_HWDT_ROM_STACK_SIZE is large enough.
      */
     {
-        const uint32_t *ctx_rom_ptr = skip_stackguard(rom_stack, rom_stack_first, CONT_STACKGUARD);
-        hwdt_info.rom = (uintptr_t)rom_stack_first - (uintptr_t)ctx_rom_ptr;
+        const uint32_t *ctx_rom_ptr = skip_stackguard(ROM_STACK, ROM_STACK_FIRST, CONT_STACKGUARD);
+        hwdt_info.rom = (uintptr_t)ROM_STACK_FIRST - (uintptr_t)ctx_rom_ptr;
 #if defined(ROM_STACK_DUMP)
-        print_stack((uintptr_t)ctx_rom_ptr, (uintptr_t)rom_stack_first, PRINT_STACK::ROM);
+        print_stack((uintptr_t)ctx_rom_ptr, (uintptr_t)ROM_STACK_FIRST, PRINT_STACK::ROM);
 #endif
     }
 #endif
 
-#if defined(HWDT_PRINT_GREETING)
+#if defined(DEBUG_ESP_HWDT_PRINT_GREETING)
     ETS_PRINTF("\n\nHardware WDT Stack Dump - enabled\n\n");
 #else
     ETS_PRINTF("\n\n");
 #endif
 
-#ifdef HWDT_UART_SPEED
+#ifdef DEBUG_ESP_HWDT_UART_SPEED
     if (uart_divisor) {
         adjust_uart_speed(uart_divisor);
     }
@@ -977,7 +976,7 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     handle_hwdt_icache();
 #endif
 
-#ifdef DEBUG_HWDT_NO4KEXTRA
+#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
     /*
      *  Continuation context is in BSS.
      */
@@ -988,7 +987,7 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
      *  for the ROM/eboot stack and before the SYS stack begins.
      *  All computations were done at top, save pointer to it now.
      */
-    g_pcont = cont_stack;
+    g_pcont = CONT_STACK;
 #endif
     /*
      *  Use new calculated SYS stack from top.
@@ -997,7 +996,7 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     asm volatile ("mov.n a1, %0\n\t"
                   "movi a0, 0x4000044c\n\t"     /* Should never return; however, set return to Boot ROM Breakpoint */
                   "jx %1\n\t" ::
-                  "r" (sys_stack_first), "r" (call_user_start):
+                  "r" (SYS_STACK_FIRST), "r" (call_user_start):
                   "a0", "memory");
 
     __builtin_unreachable();
@@ -1030,10 +1029,10 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
     __builtin_unreachable();
 }
 
-#if defined(HWDT_INFO) || defined(ROM_STACK_DUMP)
-void preinit(void) {
+#if defined(DEBUG_ESP_HWDT_INFO) || defined(ROM_STACK_DUMP)
+void debug_hwdt_init(void) {
     /*
-     * Fill the rom_stack while it is not actively being used.
+     * Fill the ROM_STACK while it is not actively being used.
      *
      * I am thinking that during the time the sketch is running this block of
      * memory could be used for a scratch buffer.
@@ -1042,11 +1041,11 @@ void preinit(void) {
         g_rom_stack[i] = CONT_STACKGUARD;
     }
 }
+#else
+void debug_hwdt_init(void) {
+}
 #endif
 
 };
 
-#else
-void enable_debug_hwdt_at_link_time(void) {
-}
-#endif // end of #ifdef DEBUG_HWDT
+#endif // end of #if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NO4KEXTRA)

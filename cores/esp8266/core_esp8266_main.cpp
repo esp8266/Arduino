@@ -35,6 +35,7 @@ extern "C" {
 #include <core_version.h>
 #include "gdb_hooks.h"
 #include "flash_quirks.h"
+#include "hwdt_app_entry.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -338,6 +339,10 @@ extern "C" void user_init(void) {
     experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
+
+#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NO4KEXTRA)
+    debug_hwdt_init();
+#endif
 
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 

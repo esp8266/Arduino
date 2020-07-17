@@ -956,7 +956,7 @@ boards = collections.OrderedDict([
 
     })
 	])
-    
+
 
 ################################################################
 
@@ -1227,20 +1227,30 @@ def combn (lst):
         all += comb(i + 1, lst)
     return all
 
-def comb1 (lst):
+def comb1 (lst, lstplusone):
     all = []
     for i in range(0, len(lst)):
         all += [ [ lst[i] ] ]
-    all += [ lst ]
+    if len(lstplusone):
+        for i in range(0, len(lstplusone)):
+            all += [ [ lstplusone[i] ] ]
+        all += [ lst ]
+        for i in range(0, len(lstplusone)):
+            all += [ lst + [ lstplusone[i] ] ]
+    else:
+        all += [ lst ]
     return all
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
     listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
+    listplusone = [ 'HWDT', 'HWDT_NO4KEXTRA' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
-    options += comb1(listnocomb)
+    options += comb1(listnocomb, listplusone)
     options += [ listcomb + listnocomb ]
+    for i in range(0, len(listplusone)):
+        options += [ listcomb + listnocomb + [ listplusone[i] ] ]
     options += [ listsingle ]
     debugmenu = collections.OrderedDict([
             ( '.menu.dbg.Disabled', 'Disabled' ),
