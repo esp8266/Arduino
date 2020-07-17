@@ -128,21 +128,6 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's definitions when encountered, provide abs that supports floating point for C code
-// in case we are using c++, these will either be:
-// - undef'ed by the algorithm include down below, implicitly including cstdlib
-// - undef'ed by the stdlib.h header up above in a more recent versions of gcc
-#ifdef abs
-#undef abs
-#define abs(x) ((x)>0?(x):-(x))
-#endif
-
-#ifdef round
-#undef round
-#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-#endif
-
-// the rest of math definitions are from Arduino
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
@@ -232,13 +217,6 @@ void optimistic_yield(uint32_t interval_us);
 #endif
 
 
-//for compatibility, below 4 lines to be removed in release 3.0.0
-#ifdef __cplusplus
-extern "C"
-#endif
-const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
-
-
 
 // from this point onward, we need to configure the c++ environment
 #ifdef __cplusplus
@@ -249,10 +227,12 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 
 using std::min;
 using std::max;
+using std::round;
 using std::isinf;
 using std::isnan;
 
-// these are important, as we may end up using C versions otherwise
+// Use stdlib abs() and round() to avoid issues with the C++ libraries
+// TODO: does C code need Arduino macros?
 using std::abs;
 using std::round;
 

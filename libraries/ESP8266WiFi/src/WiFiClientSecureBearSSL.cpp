@@ -96,11 +96,8 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
   _use_fingerprint = false;
   _use_self_signed = false;
   _knownkey = nullptr;
-  _sk = nullptr;
   _ta = nullptr;
   _axtls_ta = nullptr;
-  _axtls_chain = nullptr;
-  _axtls_sk = nullptr;
 }
 
 
