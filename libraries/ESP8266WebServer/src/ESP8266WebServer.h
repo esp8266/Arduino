@@ -103,7 +103,7 @@ public:
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
-  ClientType client() { return _currentClient; }
+  ClientType& client() { return _currentClient; }
   HTTPUpload& upload() { return *_currentUpload; }
 
   // Allows setting server options (i.e. SSL keys) by the instantiator
@@ -169,6 +169,14 @@ public:
   void chunkedResponseFinalize () {
     sendContent(emptyString);
   }
+
+  // Whether other requests should be accepted from the client on the
+  // same socket after a response is sent.
+  // This will automatically configure the "Connection" header of the response.
+  // Defaults to true when the client's HTTP version is 1.1 or above, otherwise it defaults to false.
+  // If the client sends the "Connection" header, the value given by the header is used.
+  void keepAlive(bool keepAlive) { _keepAlive = keepAlive; }
+  bool keepAlive() { return _keepAlive; }
 
   static String credentialHash(const String& username, const String& realm, const String& password);
 
@@ -250,6 +258,7 @@ protected:
   uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
+  bool _keepAlive;
 
   RequestHandlerType*  _currentHandler;
   RequestHandlerType*  _firstHandler;
@@ -259,6 +268,7 @@ protected:
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
+  int              _currentArgsHavePlain;
   std::unique_ptr<HTTPUpload> _currentUpload;
   int              _postArgsLen;
   RequestArgument* _postArgs;

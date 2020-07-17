@@ -37,7 +37,7 @@ build.exception_flags=-fno-exceptions
 build.stdcpp_lib=-lstdc++
 build.stdcpp_level=-std=gnu++17
 
-build.stacksmash=
+build.stacksmash_flags=
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
