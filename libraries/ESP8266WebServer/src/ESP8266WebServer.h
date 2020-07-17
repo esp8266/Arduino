@@ -32,6 +32,18 @@
 #include "detail/mimetable.h"
 #include "Uri.h"
 
+//#define DEBUG_ESP_HTTP_SERVER
+
+#ifdef DEBUG_ESP_HTTP_SERVER
+#ifdef DEBUG_ESP_PORT
+#define DBGWS(f,...) do { DEBUG_ESP_PORT.printf(PSTR(f), ##__VA_ARGS__); } while (0)
+#else
+#define DBGWS(f,...) do { Serial.printf(F(f), ##__VA_ARGS__); } while (0)
+#endif
+#else
+#define DBGWS(x...) do { (void)0; } while (0)
+#endif
+
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
                         UPLOAD_FILE_ABORTED };

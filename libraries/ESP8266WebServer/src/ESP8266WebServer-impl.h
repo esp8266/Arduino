@@ -28,25 +28,11 @@
 #include "FS.h"
 #include "detail/RequestHandlersImpl.h"
 
-//#define DEBUG_ESP_HTTP_SERVER
-#ifdef DEBUG_ESP_PORT
-#define DEBUG_OUTPUT DEBUG_ESP_PORT
-#else
-#define DEBUG_OUTPUT Serial
-#endif
-
-#ifdef DEBUG_ESP_HTTP_SERVER
-#define DBGWS(x...) do { DEBUG_OUTPUT.printf(x); } while (0)
-#else
-#define DBGWS(x...) do { (void)0; } while (0)
-#endif
-
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
-
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
@@ -176,9 +162,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
     String authReq = header(FPSTR(AUTHORIZATION_HEADER));
     if(authReq.startsWith(F("Digest"))) {
       authReq = authReq.substring(7);
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println(authReq);
-      #endif
+      DBGWS("%s\n", authReq.c_str());
       String _username = _extractParam(authReq,F("username=\""));
       if(!_username.length() || _username != String(username)) {
         authReq = "";
@@ -205,9 +189,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
         _nc = _extractParam(authReq, F("nc="), ',');
         _cnonce = _extractParam(authReq, F("cnonce=\""));
       }
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + H1);
-      #endif
+      DBGWS("Hash of user:realm:pass=%s\n", H1.c_str());
       MD5Builder md5;
       md5.begin();
       if(_currentMethod == HTTP_GET){
@@ -223,9 +205,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
       }
       md5.calculate();
       String _H2 = md5.toString();
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
-      #endif
+      DBGWS("Hash of GET:uri=%s\n", _H2.c_str());
       md5.begin();
       if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
         md5.add(H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
@@ -234,9 +214,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
       }
       md5.calculate();
       String _responsecheck = md5.toString();
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
-      #endif
+      DBGWS("The Proper response=%s\n", _responsecheck.c_str());
       if(_response == _responsecheck){
         authReq = "";
         return true;
@@ -320,9 +298,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
       return;
     }
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("New client");
-#endif
+    DBGWS("New client\n");
 
     _currentClient = client;
     _currentStatus = HC_WAIT_READ;
@@ -711,17 +687,13 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
   bool handled = false;
   if (!_currentHandler){
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("request handler not found");
-#endif
+    DBGWS("request handler not found\n");
   }
   else {
     handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
-#ifdef DEBUG_ESP_HTTP_SERVER
     if (!handled) {
-      DEBUG_OUTPUT.println("request handler failed to handle request");
+      DBGWS("request handler failed to handle request\n");
     }
-#endif
   }
   if (!handled && _notFoundHandler) {
     _notFoundHandler();
