@@ -96,11 +96,15 @@ inline uint32_t esp_get_cycle_count() {
 inline uint32_t esp_get_program_counter() __attribute__((always_inline));
 inline uint32_t esp_get_program_counter() {
   uint32_t pc;
-  __asm__ __volatile__("movi %0, ." : "=r" (pc) : : );
+  __asm__ __volatile__("movi %0, ." : "=r" (pc) : : ); // ©earlephilhower
   return pc;
 }
 
-#endif // not CORE_MOCK
+#else // CORE_MOCK
+
+inline uint32_t esp_get_program_counter() { return 0; }
+
+#endif // CORE_MOCK
 
 
 // Tools for preloading code into the flash cache

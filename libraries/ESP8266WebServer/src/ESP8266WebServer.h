@@ -209,7 +209,6 @@ public:
   static String responseCodeToString(const int code);
 
   void addHook (HookFunction hook) {
-    DBGWS("addHook: @=%p\n", hook);
     if (_hook) {
       auto previousHook = _hook;
       _hook = [previousHook, hook](const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType) {
