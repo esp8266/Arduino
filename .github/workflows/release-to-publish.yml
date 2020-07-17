@@ -1,0 +1,56 @@
+# Whenever a release is published from a draft, this will update the
+# master Arduino JSON file to add its new entry.
+
+# We keep the master JSON file in another repo, so we need to use a pre-set
+# Deployment SSH key to be able to push a change to the repo.
+
+#### Steps to follow when you need to make a new SSH key for upload (not
+#### normally needed!)
+
+# Generate a new SSH key private/public pair
+
+# ssh-keygen -t rsa -b 4096 -C "your@email.com" -f ./deploy_rsa
+
+# Upload deploy_rsa.pub to the *ESP8266.GITHUB.IO* repo as a deployment key
+
+# Convert the private key to base64 (to remove line breaks and allow easier
+# usage in the script as an environment variable)
+
+# base64.exe -w 0 < deploy_rsa > deploy_rsa.b64
+
+# Copy the contents of the .b64 file to the clipboard, make a new GitHub
+# secret in the ESP8266/Arduino repo called "GHCI_DEPLOY_KEY" and paste
+# the B64 code into the variable.
+
+name: ESP8266 Arduino Release Publisher
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package:
+    name: Update master JSON file
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Set GIT tag name
+      run: |
+        echo "::set-env name=TRAVIS_TAG::$(git describe --exact-match --tags)"
+    - name: Deploy updated JSON
+      env:
+        TRAVIS_BUILD_DIR: ${{ github.workspace }}
+        BUILD_TYPE: package
+        CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        GHCI_DEPLOY_KEY: ${{ secrets.GHCI_DEPLOY_KEY }}
+      run: |
+           bash ./tests/ci/build_package.sh
+           # Only the regenerated JSON file will be used, but it's simpler
+           # than looking for it in a GH release.
+           bash ./package/deploy_package_index.sh
+
