@@ -90,20 +90,16 @@ void setup(void) {
   // Hook examples
 
   server.addHook([](const String & method, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction contentType) {
-    (void)method;
-    (void)url;
-    (void)client;
-    (void)contentType;
+    (void)method;      // GET, PUT, ...
+    (void)url;         // example: /root/myfile.html
+    (void)client;      // the webserver tcp client connection
+    (void)contentType; // contentType(".html") => "text/html"
     Serial.printf("A useless web hook has passed\n");
     Serial.printf("(this hook is in 0x%08x area (401x=IRAM 402x=FLASH))\n", esp_get_program_counter());
     return ESP8266WebServer::CLIENT_REQUEST_CAN_CONTINUE;
   });
 
-  server.addHook([](const String & method, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction contentType) {
-    (void)method;
-    (void)client;
-    (void)contentType;
-    Serial.printf("(this hook is in 0x%08x area (401x=IRAM 402x=FLASH))\n", esp_get_program_counter());
+  server.addHook([](const String&, const String & url, WiFiClient*, ESP8266WebServer::ContentTypeFunction) {
     if (url.startsWith("/fail")) {
       Serial.printf("An always failing web hook has been triggered\n");
       return ESP8266WebServer::CLIENT_MUST_STOP;
@@ -111,11 +107,7 @@ void setup(void) {
     return ESP8266WebServer::CLIENT_REQUEST_CAN_CONTINUE;
   });
 
-  server.addHook([](const String & method, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction contentType) {
-    (void)method;
-    (void)client;
-    (void)contentType;
-    Serial.printf("(this hook is in 0x%08x area (401x=IRAM 402x=FLASH))\n", esp_get_program_counter());
+  server.addHook([](const String&, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction) {
     if (url.startsWith("/dump")) {
       Serial.printf("The dumper web hook is on the run\n");
 
@@ -125,7 +117,7 @@ void setup(void) {
       // webserver.
 #ifdef STREAMTO_API
       // we are lucky
-      client->streamToWithTimeout(Serial, 500);
+      client->toWithTimeout(Serial, 500);
 #else
       auto last = millis();
       while ((millis() - last) < 500) {
