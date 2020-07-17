@@ -157,5 +157,5 @@ void setup(void) {
 
 void loop(void) {
   server.handleClient();
-  //MDNS.update();
+  MDNS.update();
 }
