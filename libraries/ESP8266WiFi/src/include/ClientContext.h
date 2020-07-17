@@ -29,8 +29,9 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-#include "DataSource.h"
 #include <debug.h>
+
+#include "DataSource.h"
 
 bool getDefaultPrivateGlobalSyncValue ();
 

@@ -26,7 +26,6 @@
 #include "SDFS.h"
 #include <FS.h>
 #include <PolledTimeout.h>
-#include <debug.h>
 
 namespace sdfs {
 

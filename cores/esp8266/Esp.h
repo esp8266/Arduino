@@ -174,7 +174,7 @@ class EspClass {
         }
 #else
         uint32_t getCycleCount();
-#endif
+#endif // ifndef CORE_MOCK
 };
 
 extern EspClass ESP;

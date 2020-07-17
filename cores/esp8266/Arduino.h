@@ -231,8 +231,8 @@ using std::round;
 using std::isinf;
 using std::isnan;
 
-// Use stdlib abs() and round() to avoid issues with the C++ libraries
-// TODO: does C code need Arduino macros?
+// Use float-compatible stl abs() and round(), we don't use Arduino macros to avoid issues with the C++ libraries
+// TODO: ...does C code need Arduino macros?
 using std::abs;
 using std::round;
 
@@ -287,6 +287,7 @@ inline void configTzTime(const char* tz, const char* server1,
 
 #endif // __cplusplus
 
+#include "debug.h"
 #include "pins_arduino.h"
 
 #endif

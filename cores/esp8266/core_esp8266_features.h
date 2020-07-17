@@ -84,13 +84,7 @@ namespace arduino
 // level 15 will disable ALL interrupts,
 // level 0 will enable ALL interrupts,
 //
-#ifdef CORE_MOCK
-
-#define xt_rsil(level) (level)
-#define xt_wsr_ps(state) do { (void)(state); } while (0)
-
-#else
-
+#ifndef CORE_MOCK
 #define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
@@ -101,7 +95,10 @@ inline uint32_t esp_get_cycle_count() {
   return ccount;
 }
 
-#endif // ifdef CORE_MOCK
+#else
+#define xt_rsil(level) (level)
+#define xt_wsr_ps(state) do { (void)(state); } while (0)
+#endif // ifndef CORE_MOCK
 
 
 // Tools for preloading code into the flash cache
