@@ -32,7 +32,7 @@
 #include "detail/mimetable.h"
 #include "Uri.h"
 
-#define DEBUG_ESP_HTTP_SERVER
+//#define DEBUG_ESP_HTTP_SERVER
 
 #ifdef DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT

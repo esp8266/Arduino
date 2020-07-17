@@ -17,7 +17,7 @@ const int led = 13;
 
 void handleRoot() {
   digitalWrite(led, 1);
-  server.send(200, "text/plain", "hello from esp8266!");
+  server.send(200, "text/plain", "hello from esp8266!\r\n");
   digitalWrite(led, 0);
 }
 
@@ -86,11 +86,76 @@ void setup(void) {
 
   server.onNotFound(handleNotFound);
 
+  /////////////////////////////////////////////////////////
+  // Hook examples
+
+  server.addHook([](const String & method, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction contentType) {
+    (void)method;
+    (void)url;
+    (void)client;
+    (void)contentType;
+    Serial.printf("A useless web hook has passed\n");
+    return ESP8266WebServer::CLIENT_REQUEST_CAN_CONTINUE;
+  });
+
+  server.addHook([](const String & method, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction contentType) {
+    (void)method;
+    (void)client;
+    (void)contentType;
+    if (url.startsWith("/fail")) {
+      Serial.printf("An always failing web hook has been triggered\n");
+      return ESP8266WebServer::CLIENT_MUST_STOP;
+    }
+    return ESP8266WebServer::CLIENT_REQUEST_CAN_CONTINUE;
+  });
+
+  server.addHook([](const String & method, const String & url, WiFiClient * client, ESP8266WebServer::ContentTypeFunction contentType) {
+    (void)method;
+    (void)client;
+    (void)contentType;
+    if (url.startsWith("/dump")) {
+      Serial.printf("The dumper web hook is on the run\n");
+
+      // Here the request is not interpreted, so we cannot for sure
+      // swallow the exact amount matching the full request+content,
+      // hence the tcp connection cannot be handled anymore by the
+      // webserver.
+#ifdef STREAMTO_API
+      // we are lucky
+      client->streamToWithTimeout(Serial, 500);
+#else
+      auto last = millis();
+      while ((millis() - last) < 500) {
+        char buf[32];
+        size_t len = client->read((uint8_t*)buf, sizeof(buf));
+        if (len > 0) {
+          Serial.printf("(<%d> chars)", (int)len);
+          Serial.write(buf, len);
+          last = millis();
+        }
+      }
+#endif
+      // Two choices: return MUST STOP and webserver will close it
+      //                       (we already have the example with '/fail' hook)
+      // or                  IS GIVEN and webserver will forget it
+      // trying with IS GIVEN and storing it on a dumb WiFiClient.
+      // check the client connection: it should not immediately be closed
+      // (make another '/dump' one to close the first)
+      Serial.printf("\nTelling server to forget this connection\n");
+      static WiFiClient forgetme = *client; // stop previous one if present and transfer client refcounter
+      return ESP8266WebServer::CLIENT_IS_GIVEN;
+    }
+    return ESP8266WebServer::CLIENT_REQUEST_CAN_CONTINUE;
+  });
+
+  // Hook examples
+  /////////////////////////////////////////////////////////
+
   server.begin();
   Serial.println("HTTP server started");
 }
 
 void loop(void) {
   server.handleClient();
-  MDNS.update();
+  //MDNS.update();
 }
