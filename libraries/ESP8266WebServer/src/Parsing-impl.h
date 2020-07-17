@@ -54,7 +54,7 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
 }
 
 template <typename ServerType>
-typename ESP8266WebServerTemplate<ServerType>::ClientFuture_e ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
+typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
   DBGWS("request: %s\n", req.c_str());

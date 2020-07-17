@@ -93,9 +93,9 @@ public:
   using ClientType = typename ServerType::ClientType;
   using RequestHandlerType = RequestHandler<ServerType>;
   using WebServerType = ESP8266WebServerTemplate<ServerType>;
-  enum ClientFuture_e { CLIENT_REQUEST_CAN_CONTINUE, CLIENT_REQUEST_IS_HANDLED, CLIENT_MUST_STOP, CLIENT_IS_GIVEN };
+  enum ClientFuture { CLIENT_REQUEST_CAN_CONTINUE, CLIENT_REQUEST_IS_HANDLED, CLIENT_MUST_STOP, CLIENT_IS_GIVEN };
   typedef String (*ContentTypeFunction) (const String&);
-  using HookFunction = std::function<ClientFuture_e(const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType)>;
+  using HookFunction = std::function<ClientFuture(const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType)>;
 
   void begin();
   void begin(uint16_t port);
@@ -227,7 +227,7 @@ protected:
   void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
   void _finalizeResponse();
-  ClientFuture_e _parseRequest(ClientType& client);
+  ClientFuture _parseRequest(ClientType& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
   bool _parseForm(ClientType& client, const String& boundary, uint32_t len);
