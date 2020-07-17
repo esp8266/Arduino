@@ -30,7 +30,7 @@
 #            crystalfreq/flashfreq_menu: menus for crystal/flash frequency selection
 #            flashmode_menu:             menus for flashmode selection (dio/dout/qio/qout)
 #            512K/1M/2M/4M/8M/16M:       menus for flash & FS size
-#            lwip/lwip2                  menus for available lwip versions
+#            lwip                        menus for available lwip versions
 
 from __future__ import print_function
 import os
@@ -759,8 +759,9 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_dio',
+            'flashmode_menu',
             'flashfreq_80',
+            '2M',
             '512K',
             ],
         'desc': [ 'gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.',
@@ -771,7 +772,7 @@ boards = collections.OrderedDict([
                   '',
                   'The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.',
                   '',
-                  '- Product page: http://www.4dsystems.com.au/product/gen4-IoD',
+                  '- Product page: https://4dsystems.com.au/products/iot-display-modules',
                   ],
     }),
     ( 'oak', {
@@ -1005,6 +1006,13 @@ macros = {
         ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
         ]),
 
+    'stacksmash_menu': collections.OrderedDict([
+        ( '.menu.stacksmash.disabled', 'Disabled' ),
+        ( '.menu.stacksmash.disabled.build.stacksmash_flags', '' ),
+        ( '.menu.stacksmash.enabled', 'Enabled' ),
+        ( '.menu.stacksmash.enabled.build.stacksmash_flags', '-fstack-protector' ),
+        ]),
+
     'crystalfreq_menu': collections.OrderedDict([
         ( '.menu.CrystalFreq.26', '26 MHz' ),
         ( '.menu.CrystalFreq.40', '40 MHz' ),
@@ -1107,7 +1115,7 @@ macros = {
 
     ####################### lwip
 
-    'lwip2': collections.OrderedDict([
+    'lwip': collections.OrderedDict([
         ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
         ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
@@ -1132,19 +1140,6 @@ macros = {
         ( '.menu.ip.hb6f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.hb6f.build.lwip_lib', '-llwip6-1460-feat' ),
         ( '.menu.ip.hb6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
-        ]),
-
-    'lwip': collections.OrderedDict([
-        ( '.menu.ip.hb1', 'v1.4 Higher Bandwidth' ),
-        ( '.menu.ip.hb1.build.lwip_lib', '-llwip_gcc' ),
-        ( '.menu.ip.hb1.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        #( '.menu.ip.Espressif', 'v1.4 Espressif (xcc)' ),
-        #( '.menu.ip.Espressif.build.lwip_lib', '-llwip' ),
-        #( '.menu.ip.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.ip.src', 'v1.4 Compile from source' ),
-        ( '.menu.ip.src.build.lwip_lib', '-llwip_src' ),
-        ( '.menu.ip.src.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        ( '.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
         ]),
 
     ####################### serial
@@ -1565,6 +1560,7 @@ def all_boards ():
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=Exceptions')
+    print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
@@ -1586,14 +1582,10 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
-        if lwip == 2:
-            macrolist += [ 'lwip2', 'lwip' ]
-        else:
-            macrolist += [ 'lwip', 'lwip2' ]
-        macrolist += [ 'debug_menu', 'flash_erase_menu' ]
+        macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
 
         for cs in customspeeds:
             print(id + cs)
@@ -1723,7 +1715,6 @@ def usage (name,ret):
     print("usage: %s [options]" % name)
     print("")
     print(" -h, --help")
-    print(" --lwip            - preferred default lwIP version (default %d)" % lwip)
     print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
     print(" --board <b>       - board to modify:")
     print(" --filter <file>   - create a short boards.txt based on the boards listed in <file>")
@@ -1772,7 +1763,6 @@ def usage (name,ret):
 ################################################################
 # entry point
 
-lwip = 2
 default_speed = '115'
 led_default = 2
 led_max = 16
@@ -1800,7 +1790,7 @@ lddir = "tools/sdk/ld/"
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
-        [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
+        [ "help", "led=", "speed=", "board=", "customspeed=", "nofloat",
           "noextra4kheap", "allowWPS",
           "boardslocalgen", "filter=", "xfilter=", "boardnames",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
@@ -1819,9 +1809,6 @@ for o, a in opts:
 
     elif o in ("--boardnames"):
        boardnames()
-
-    elif o in ("--lwip"):
-        lwip = a
 
     elif o in ("--led"):
         led_default = int(a)

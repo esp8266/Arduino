@@ -51,7 +51,7 @@ extern uint32_t stack_thunk_refcnt;
 
 // Thunking macro
 #define make_stack_thunk(fcnToThunk) \
-__asm("\n\
+__asm__ ("\n\
 .text\n\
 .literal_position\n\
 .literal .LC_STACK_VALUE"#fcnToThunk", 0xdeadbeef\n\

@@ -25,20 +25,6 @@
 #ifndef MDNS_LWIPDEFS_H
 #define MDNS_LWIPDEFS_H
 
-#include <lwip/init.h>
-#if LWIP_VERSION_MAJOR == 1
-
-#include <lwip/mdns.h>      // DNS_RRTYPE_xxx
-
-// cherry pick from lwip1 dns.c/mdns.c source files:
-#define DNS_MQUERY_PORT            5353
-#define DNS_MQUERY_IPV4_GROUP_INIT IPAddress(224,0,0,251)     /* resolver1.opendns.com */
-#define DNS_RRCLASS_ANY            255                        /* any class */
-
-#else // lwIP > 1
-
 #include <lwip/prot/dns.h>  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
-
-#endif
 
 #endif // MDNS_LWIPDEFS_H

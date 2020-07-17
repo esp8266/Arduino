@@ -127,14 +127,8 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's abs if encountered
-#ifdef abs
-#undef abs
-#endif
-
-#define abs(x) ((x)>0?(x):-(x))
+// Use stdlib abs() and round() to avoid issues with the C++ libraries
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
@@ -220,13 +214,6 @@ void optimistic_yield(uint32_t interval_us);
 #endif
 
 
-//for compatibility, below 4 lines to be removed in release 3.0.0
-#ifdef __cplusplus
-extern "C"
-#endif
-const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
-
-
 
 #ifdef __cplusplus
 
@@ -244,6 +231,7 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 
 using std::min;
 using std::max;
+using std::round;
 using std::isinf;
 using std::isnan;
 
