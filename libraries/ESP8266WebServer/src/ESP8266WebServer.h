@@ -208,21 +208,18 @@ public:
 
   static String responseCodeToString(const int code);
 
-  void addHook (Hook_f hook)
-  {
-    if (_hook)
-    {
-      auto previous = _hook;
-      _hook = [previous, hook](const String& method, const String& url, WiFiClient* client, ContentType_f contentType)
-        {
-          auto whatNow = previous(method, url, client, contentType);
+  void addHook (Hook_f hook) {
+    if (_hook) {
+      auto previousHook = _hook;
+      _hook = [previousHook, hook](const String& method, const String& url, WiFiClient* client, ContentType_f contentType) {
+          auto whatNow = previousHook(method, url, client, contentType);
           if (whatNow == CLIENT_REQUEST_CAN_CONTINUE)
             return hook(method, url, client, contentType);
           return whatNow;
         };
-    }
-    else
+    } else {
       _hook = hook;
+    }
   }
 
 protected:
