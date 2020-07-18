@@ -24,6 +24,7 @@
 #define _BEARSSLHELPERS_H
 
 #include <bearssl/bearssl.h>
+#include <StackThunk.h>
 #include <Updater.h>
 
 // Internal opaque structures, not needed by user applications
@@ -157,7 +158,8 @@ class SigningVerifier : public UpdaterVerifyClass {
     virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) override;
 
   public:
-    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; }
+    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; stack_thunk_add_ref(); }
+    ~SigningVerifier() { stack_thunk_del_ref(); }
 
   private:
     PublicKey *_pubKey;

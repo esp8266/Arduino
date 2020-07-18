@@ -1,33 +1,25 @@
 #!/bin/bash
 
-#set -x
+# Extract the release name from a release
 
-ver=`git describe --tag`
+# Default to draft tag name
+ver=$(basename $(jq -e -r '.ref' "$GITHUB_EVENT_PATH"))
+# If not available, try the publish tag name
+if [ "$ver" == "null" ]; then
+    ver=$(jq -e -r '.release.tag_name' "$GITHUB_EVENT_PATH")
+fi
+# Fall back to the git description OTW (i.e. interactive)
+if [ "$ver" == "null" ]; then
+    ver=$(git describe --tag)
+fi
 visiblever=$ver
-# match 0.0.*
-if [ "${ver%.*}" = 0.0 ]; then
+plainver=$ver
 
+# Match 0.0.* as special-case early-access builds
+if [ "${ver%.*}" = 0.0 ]; then
     git tag -d ${ver}
     ver=`git describe --tag HEAD`
     plain_ver=$ver
-
-else
-
-    # Extract next version from platform.txt
-    next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
-
-    # Figure out how will the package be called
-    ver=`git describe --exact-match`
-    if [ $? -ne 0 ]; then
-        # not tagged version; generate nightly package
-        date_str=`date +"%Y%m%d"`
-        is_nightly=1
-        plain_ver="${next}-nightly"
-        ver="${plain_ver}+${date_str}"
-    else
-        plain_ver=$ver
-    fi
-    visiblever=$ver
 fi
 
 set -e

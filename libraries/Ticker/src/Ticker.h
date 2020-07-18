@@ -74,16 +74,22 @@ public:
     template<typename TArg>
     void attach(float seconds, void (*callback)(TArg), TArg arg)
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
         _attach_ms(1000UL * seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+#pragma GCC diagnostic pop
     }
 
     // callback will be called in SYS ctx when ticker fires
     template<typename TArg>
     void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
         static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
         _attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+#pragma GCC diagnostic pop
     }
 
     // callback will be called at following loop() after ticker fires

@@ -27,6 +27,7 @@
 #define __ESP8266_ARDUINO_CRYPTO_H__
 
 #include <Arduino.h>
+#include <bearssl/bearssl_kdf.h>
 
 namespace experimental
 {
@@ -745,8 +746,7 @@ struct HKDF
 
 private:
 
-    // Use an opaque type to avoid #include <bearssl/bearssl.h> which drags the lib declarations into userland. The global scope prefix is required for compilation to succeed, it seems.
-    ::br_hkdf_context hkdfContext;
+    br_hkdf_context hkdfContext;
 };
 
 
