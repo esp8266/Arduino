@@ -230,6 +230,7 @@ int main()
 
         ets_putc('0'+res); ets_putc('\n');
 
+/** disabled in 2.7.3
         // Verify the copy
         ets_putc('c'); ets_putc('m'); ets_putc('p'); ets_putc(':');
         if (res == 0) {
@@ -237,8 +238,9 @@ int main()
             res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
             ets_wdt_enable();
             }
-
         ets_putc('0'+res); ets_putc('\n');
+**/
+
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
