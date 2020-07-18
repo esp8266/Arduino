@@ -46,7 +46,9 @@ TEST_CASE("abs works with ints", "[arduino-math]")
     CHECK(abs(b) == b);
 }
 
-bool compare_floats(float a, float b) {
+template <typename T>
+bool compare_floats(T a, T b) {
+    static_assert(std::is_floating_point<T>::value, "");
     return std::fabs(a - b) < std::numeric_limits<float>::epsilon();
 }
 
@@ -60,17 +62,17 @@ TEST_CASE("abs works with floats", "[arduino-math]")
     CHECK(compare_floats(abs(b), b));
 }
 
-TEST_CASE("round works with floats", "[arduino-math]")
+TEST_CASE("round works with ints", "[arduino-math]")
 {
-    float a = 2.9;
-    float b = 3.0;
-    CHECK(TEST_MATH_IS_SAME(round(a), a));
-    CHECK(TEST_MATH_IS_SAME(round(b), b));
-    CHECK(compare_floats(round(a), b));
-    CHECK(compare_floats(round(b), b));
+    int a = 5;
+    int b = 10;
+    CHECK(TEST_MATH_IS_SAME(round(a), std::round(a)));
+    CHECK(TEST_MATH_IS_SAME(round(b), std::round(b)));
+    CHECK(compare_floats(round(a), std::round(a)));
+    CHECK(compare_floats(round(b), std::round(b)));
 }
 
-TEST_CASE("round result is float", "[arduino-math]")
+TEST_CASE("round works with floats", "[arduino-math]")
 {
     float a = 2.9;
     float b = 3.0;
