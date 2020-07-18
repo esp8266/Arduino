@@ -196,18 +196,15 @@ class Stream: public Print {
 
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
 
-        size_t to (Print* to,
-                   const ssize_t maxLen = -1,
-                   int readUntilChar = -1,
-                   oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */);
+        size_t toNow (Print* to) { return toFull(to, -1, -1, oneShotMs::alwaysExpired); }
+        size_t toUntil (Print* to, int readUntilChar, oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, readUntilChar, timeout); }
+        size_t toSize (Print* to, const ssize_t maxLen, oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, maxLen, -1, timeout); }
 
-        size_t to (Print& to,
-                   const ssize_t maxLen = -1,
-                   int readUntilChar = -1,
-                   oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */)
-        {
-            return this->to(&to, maxLen, readUntilChar, timeoutMs);
-        }
+
+        size_t toFull (Print* to,
+                       const ssize_t maxLen = -1,
+                       int readUntilChar = -1,
+                       oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */);
 
         typedef enum
         {
