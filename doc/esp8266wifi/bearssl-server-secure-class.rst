@@ -8,7 +8,7 @@ Implements a TLS encrypted server with optional client certificate validation.  
 setBufferSizes(int recv, int xmit)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Similar to the `BearSSL::WiFiClientSecure` method, sets the receive and transmit buffer sizes.  Note that servers cannot request a buffer size from the client, so if these are shrunk and the client tries to send a chunk larger than the receive buffer, it will always fail.  This must be called before the server is 
+Similar to the `BearSSL::WiFiClientSecure` method, sets the receive and transmit buffer sizes.  Note that servers cannot request a buffer size from the client, so if these are shrunk and the client tries to send a chunk larger than the receive buffer, it will always fail.  Needs to be called before `begin()`
 
 Setting Server Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
