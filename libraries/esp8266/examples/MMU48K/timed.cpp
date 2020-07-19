@@ -10,7 +10,7 @@ uint32_t IRAM_ATTR timed_byte_read(char *pc, uint32_t * o) {
 
 uint32_t IRAM_ATTR timed_byte_read2(char *pc, uint32_t * o) {
   uint32_t start = esp_get_cycle_count();
-  *o = get_uint8_iram(pc);
+  *o = mmu_get_uint8(pc);
   // return clockCyclesToMicroseconds(esp_get_cycle_count() - start);
   return (esp_get_cycle_count() - start);
 }

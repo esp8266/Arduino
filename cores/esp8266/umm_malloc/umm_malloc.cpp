@@ -471,22 +471,21 @@ void umm_init( void ) {
 }
 
 #ifdef UMM_HEAP_IRAM
-#include <core_esp8266_non32xfer.h>
-
 void umm_init_iram_ex( void *addr, unsigned int size, bool zero ) {
   /* We need the main, internal heap set up first */
   UMM_INIT_HEAP;
 
-  /* Required to use umm_malloc on iRAM */
-  install_non32xfer_exception_handler();
-
-  // umm_init_common(UMM_HEAP_IRAM, addr, size);
   umm_init_common(UMM_HEAP_IRAM, addr, size, zero);
 }
 
 void _text_end(void);
 void umm_init_iram(void) __attribute__((weak));
 
+/*
+  By using a weak link, it is possible to reduce the IRAM heap size with a
+  user-supplied init function. This would allow the creation of a block of IRAM
+  dedicated to a sketch and possibly used/preserved across reboots.
+ */
 void umm_init_iram(void) {
   umm_init_iram_ex(mmu_sec_heap(), mmu_sec_heap_size(), true);
 }
@@ -494,7 +493,7 @@ void umm_init_iram(void) {
 
 #ifdef UMM_HEAP_EXTERNAL
 void umm_init_vm( void *vmaddr, unsigned int vmsize ) {
-  /* We need the main, internal heap set up first */
+  /* We need the main, internal (DRAM) heap set up first */
   UMM_INIT_HEAP;
 
   umm_init_common(UMM_HEAP_EXTERNAL, vmaddr, vmsize, true);

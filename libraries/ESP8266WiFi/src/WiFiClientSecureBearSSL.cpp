@@ -47,6 +47,7 @@ extern "C" {
 #include "coredecls.h"
 #include <mmu_iram.h>
 #include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 #if !CORE_MOCK
 
@@ -1067,14 +1068,16 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  { // ESP.setIramHeap();
+  //C This was borrowed from @earlephilhower PoC, to exemplify the use of IRAM.
+  //C Is this something we want to keep in the final release?
+  { // ESP.setIramHeap(); would be an alternative to using a class to set a scope for IRAM usage.
     HeapSelectIram ephemeral;
     _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
     _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
-    ETS_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
-    ETS_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
-    ETS_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
-    ETS_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
+    DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+    DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+    DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+    DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
   } // ESP.resetHeap();
 
   if (!_sc || !_iobuf_in || !_iobuf_out) {
@@ -1194,10 +1197,10 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
     HeapSelectIram ephemeral;
     _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
     _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
-    ETS_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
-    ETS_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
-    ETS_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
-    ETS_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
+    DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+    DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+    DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+    DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
   }	// ESP.resetHeap();
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
@@ -1238,10 +1241,10 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
     HeapSelectIram ephemeral;
     _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
     _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
-    ETS_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
-    ETS_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
-    ETS_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
-    ETS_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
+    DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+    DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+    DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+    DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
   }	// ESP.resetHeap();
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {

@@ -52,10 +52,11 @@ uint32_t mmu_non32xfer_withinisr_count = 0;
 
 
 // #define DEBUG_WARNING
+//C Do we want to keep this warning
 #ifdef DEBUG_WARNING
 static void warning(void)
 {
-    ETS_PRINTF("WARNING: The Non-32-bit transfer hander has been invoked, and performance may suffer.\n");
+    DBG_MMU_PRINTF("WARNING: The Non-32-bit transfer hander has been invoked, and performance may suffer.\n");
 }
 #endif
 
@@ -95,16 +96,27 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       turned back on by _xtos_c_wrapper_handler. Is there something about an
       exception that would prevent the CPU from servicing an interrupt while in
       an exception handler?
+
+      New interrupts are blocked by EXCM being set. Once cleared, interrupts
+      above the current INTLEVEL and exceptions (w/o creating a DoubleException)
+      can occur. With USE_ISR_SAFE_EXC_WRAPPER, INTLEVEL is raised to 15 with
+      EXCM cleared. The original ROM _xtos_c_wrapper_handler: set INTLEVEL to 1
+      with EXCM cleared, saved registers, then did an rsil 0, and called the
+      registerd C Exception handler with interrupts fully enabled!
+      Our replacement keeps INTLEVEL at 15. This must be done for umm_malloc to
+      safely work with an IRAM heap from an ISR call.
      */
+    //C Should we make defined(USE_ISR_SAFE_EXC_WRAPPER) the only build path
     if (ef->ps & 0x0F) {
 #if !defined(USE_ISR_SAFE_EXC_WRAPPER)
       if (0 == mmu_non32xfer_withinisr_count) {
-        ETS_PRINTF("\nload/store exception with INTLEVEL 0x%02X\n", ef->ps & 0x0F);
+        DBG_MMU_PRINTF("\nload/store exception with INTLEVEL 0x%02X\n", ef->ps & 0x0F);
         #if 0
         continue;     /* fail, not safe for IRQ disabled ?? */
         #endif
       }
 #endif
+      //C Do we want to keep this tracking
       if (0 == ++mmu_non32xfer_withinisr_count) {
         --mmu_non32xfer_withinisr_count;  // saturated
       }
@@ -129,12 +141,14 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
     }
 
 #ifdef DEBUG_WARNING
+    //C Do we want to keep this warning
     if (0 == mmu_non32xfer_count) {
       // This may be causing some issues TODO retest with umm_malloc within
       // interrupt context.
       schedule_function(warning);
     }
 #endif
+    //C Do we want to keep this tracking
     // Some accounting information so we know this is happending.
     if (0 == ++mmu_non32xfer_count) {
       --mmu_non32xfer_count;  // saturated
@@ -152,7 +166,7 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
     __asm("rsr %0, EXCVADDR;" :"=r"(excvaddr)::);
 
     /* debug option, validate address so we don't hide memory access bugs in APP */
-    if (is_iram(excvaddr) || (is_read && is_icache(excvaddr))) {
+    if (is_iram((void *)excvaddr) || (is_read && is_icache((void *)excvaddr))) {
       /* all is good  */
     } else {
       continue;  /* fail */
@@ -196,7 +210,7 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
     problem; however, my test case shows no problem ?? Maybe I was confused.
    */
   if (old_handler) { // if (0 == (ef->ps & 0x0F)) {
-    ETS_PRINTF("\ncalling previous load/store handler(%p)\n", old_handler);
+    DBG_MMU_PRINTF("\ncalling previous load/store handler(%p)\n", old_handler);
     old_handler(ef, cause);
     return;
   }

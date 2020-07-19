@@ -28,12 +28,12 @@ extern "C" {
 #define SOC_CACHE_SIZE 1 // 32KB
 #endif
 
-// IS this set as part of segment data at load time? appears to be
+#ifdef DEV_DEBUG_MMU_IRAM
+// Is this set as part of segment data at load time? appears to be
 mmu_cre_status_t mmu_status = {SOC_CACHE_SIZE, -1, 0, 0, 0, 0, 0};
+#endif
 
-//C Enable all the time so we can gather information on Cache_Read_Enable usage.
-//+ #if (MMU_ICACHE_SIZE == 0x4000)
-#if 1 //D
+#if (MMU_ICACHE_SIZE == 0x4000)
 /*
  * "Cache_Read_Enable" as in Instruction Read Cache enable, ICACHE.
  *
@@ -103,6 +103,8 @@ typedef void (*fp_Cache_Read_Enable_t)(uint8_t map, uint8_t p, uint8_t v);
 #define real_Cache_Read_Enable (reinterpret_cast<fp_Cache_Read_Enable_t>(ROM_Cache_Read_Enable))
 
 void IRAM_ATTR Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v) {
+  (void)v;
+#ifdef DEV_DEBUG_MMU_IRAM
   mmu_status.map = map;
   mmu_status.p = p;
   mmu_status.v = v;
@@ -111,6 +113,7 @@ void IRAM_ATTR Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v) {
   if (0 == mmu_status.enable_count) {
     mmu_status.enable_count--;   // keep saturated value
   }
+#endif
   DBG_MMU_PRINT_IRAM_BANK_REG("before", "Enable");
 
   real_Cache_Read_Enable(map, p, SOC_CACHE_SIZE);
@@ -129,11 +132,13 @@ typedef void (*fp_Cache_Read_Disable_t)(void);
  *
  */
 void IRAM_ATTR Cache_Read_Disable(void) {
+#ifdef DEV_DEBUG_MMU_IRAM
   mmu_status.disable_count++;
   mmu_status.state = 0;
   if (0 == mmu_status.disable_count) {
     mmu_status.disable_count--;   // keep saturated value
   }
+#endif
   DBG_MMU_PRINT_IRAM_BANK_REG("before", "Disable");
 
   real_Cache_Read_Disable();
@@ -145,7 +150,7 @@ void IRAM_ATTR Cache_Read_Disable(void) {
 #ifdef DEV_DEBUG_PRINT
 /*
  * Early adjustment for CPU crystal frequency, so debug printing will work.
- * This should not be left enabled all the time in Crash_Read..., I am concerned
+ * This should not be left enabled all the time in Cashe_Read..., I am concerned
  * that there may be unknown interference with the NONOS SDK startup.
  *
  * Inspired by:
@@ -173,6 +178,8 @@ extern "C" void IRAM_ATTR set_pll(void)
   }
 }
 
+//C This was used to probe at different stages of boot the state of the PLL
+//C register. I think we can get rid of this one.
 extern "C" void IRAM_ATTR dbg_set_pll(void)
 {
   char r103_4_1 = rom_i2c_readReg(103,4,1);

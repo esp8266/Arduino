@@ -311,11 +311,13 @@ extern "C" void app_entry_redefinable(void)
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
+#ifdef DEV_DEBUG_MMU_IRAM
     DBG_MMU_PRINT_STATUS();
 
     DBG_MMU_PRINT_IRAM_BANK_REG(0, "");
 
     DBG_MMU_PRINTF("\nCall call_user_start()\n");
+#endif
 
     /* Call the entry point of the SDK code. */
     call_user_start();
@@ -344,11 +346,11 @@ extern "C" void user_init(void) {
 
     initVariant();
 
-    // experimental::initFlashQuirks(); // Chip specific flash init.
+    experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
 
-#if defined(NON32XFER_HANDLER)
+#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
     install_non32xfer_exception_handler();
 #endif
 #if defined(MMU_IRAM_HEAP)

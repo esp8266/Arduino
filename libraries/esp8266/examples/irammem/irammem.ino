@@ -5,6 +5,7 @@
 
 #include <ESP8266WiFi.h>
 #include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 // #define USE_SET_IRAM_HEAP
 
@@ -80,7 +81,7 @@ uint32_t cyclesToRead1Kx16_viaInline(unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < 1024; i++) {
-    sum += get_uint16_iram(x++); //*(x++);
+    sum += mmu_get_uint16(x++); //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
@@ -92,7 +93,7 @@ uint32_t cyclesToWrite1Kx16_viaInline(unsigned short *x) {
   for (int i = 0; i < 1024; i++) {
     sum += i;
     // *(x++) = sum;
-    set_uint16_iram(x++, sum);
+    mmu_set_uint16(x++, sum);
   }
   return ESP.getCycleCount() - b;
 }
@@ -101,7 +102,7 @@ uint32_t cyclesToRead1Kx8_viaInline(unsigned char*x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < 1024; i++) {
-    sum += get_uint8_iram(x++); //*(x++);
+    sum += mmu_get_uint8(x++); //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
@@ -113,7 +114,7 @@ uint32_t cyclesToWrite1Kx8_viaInline(unsigned char*x) {
   for (int i = 0; i < 1024; i++) {
     sum += i;
     // *(x++) = sum;
-    set_uint8_iram(x++, sum);
+    mmu_set_uint8(x++, sum);
   }
   return ESP.getCycleCount() - b;
 }
@@ -125,11 +126,15 @@ void setup() {
   Serial.begin(115200);
   delay(20);
   Serial.printf_P(PSTR("\n\nSetup ...\n"));
+#ifndef UMM_HEAP_IRAM
+  Serial.printf("\r\n"
+    "This example needs IRAM Heap support enabled.\r\n"
+    "  eg. Arduino IDE 'Tools->MMU:\"16KB cache + 48KB IRAM and 2nd Heap (shared)\"'\r\n"
+    "This build has IRAM Heap support disabled.\r\n"
+    "In this situation, all IRAM requests are satisfied with DRAM.\r\n\r\n");
+#endif
 
-  // IRAM Heap Inialized moed to user_init() in core_esp8266_main.cpp
-  // umm_init_iram();
-
-  // Compiling with Secondary Heap option VM does not change malloc to use the
+  // Compiling with Secondary Heap option does not change malloc to use the
   // IRAM region.  It will continue to use the builtin DRAM until we request
   // otherwise.
   Serial.printf("DRAM free: %6d\n", ESP.getFreeHeap());
@@ -148,15 +153,16 @@ void setup() {
   uint32_t *imem;
   {
     HeapSelectIram ephemeral;
+    // This class effectively does this
     // size_t _heap_id = umm_get_current_heap_id();
     // umm_set_heap_by_id(UMM_HEAP_IRAM);
+    //  ...
+    // umm_set_heap_by_id(_heap_id);
     Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
     imem = (uint32_t *)malloc(1024 * sizeof(uint32_t));
     Serial.printf("IRAM buffer: Address %p, free %d\n", imem, ESP.getFreeHeap());
-    // umm_set_heap_by_id(_heap_id);
   }
 #endif
-
   uint32_t res;
   uint32_t t;
   t = cyclesToWrite1Kx32(imem);

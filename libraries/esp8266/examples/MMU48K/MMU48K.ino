@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 uint32_t timed_byte_read(char *pc, uint32_t * o);
 uint32_t timed_byte_read2(char *pc, uint32_t * o);
@@ -14,12 +15,6 @@ char *probe_c  = (char *)0x40110000;
 short *unaligned_probe_s = NULL;
 
 uint32_t read_var = 0x11223344;
-
-#define GET_BYTE_FN(name,wo,bo) \
-static inline char get ## name(void *o) { \
-  char res;  /* extract named field */ \
-  asm ("l32i  %0, %1, " #wo "; extui %0, %0, " #bo ", 8;" : "=r"(res) : "r"(o) : );\
-  return res; }
 
 /*
   Notes,
@@ -90,12 +85,6 @@ void print_mmu_status(Print& oStream) {
   oStream.println();
   oStream.printf_P(PSTR("MMU Configuration"));
   oStream.println();
-  oStream.printf_P(PSTR("  mmu_status = {"
-                        "v_cfg = %u, state = %d, enable/disable count = %u/%u, "
-                        "map = 0x%02X, p = 0x%02X, v = 0x%02X}"),
-                   mmu_status.v_cfg, mmu_status.state,
-                   mmu_status.enable_count, mmu_status.disable_count,
-                   mmu_status.map, mmu_status.p, mmu_status.v);
   oStream.println();
   uint32_t iram_bank_reg = ESP8266_DREG(0x24);
   if (0 == (iram_bank_reg & 0x10)) {  // if bit clear, is enabled
@@ -133,8 +122,8 @@ void setup() {
   WiFi.mode(WIFI_OFF);
   // Serial.begin(74880);
   Serial.begin(115200);
-  delay(20);
-  Serial.printf_P(PSTR("\n\nSetup ...\n"));
+  delay(10);
+  Serial.printf_P(PSTR("\r\n\r\nSetup ...\r\n"));
 
   print_mmu_status(Serial);
 
@@ -145,9 +134,9 @@ void setup() {
     gobble_sz = ESP.getFreeHeap() - UMM_OVERHEAD_ADJUST; // - 4096;
     gobble = (uint32_t *)malloc(gobble_sz);
   }
-  Serial.printf_P(PSTR("\nmalloc() from IRAM Heap:\n"));
-  Serial.printf_P(PSTR("  gobble_sz: %u\n"), gobble_sz);
-  Serial.printf_P(PSTR("  gobble:    %p\n"), gobble);
+  Serial.printf_P(PSTR("\r\nmalloc() from IRAM Heap:\r\n"));
+  Serial.printf_P(PSTR("  gobble_sz: %u\r\n"), gobble_sz);
+  Serial.printf_P(PSTR("  gobble:    %p\r\n"), gobble);
 
 #elif defined(MMU_SEC_HEAP)
   gobble = (uint32_t *)MMU_SEC_HEAP;
@@ -169,7 +158,7 @@ void setup() {
 #endif
 
   // Lets peak over the edge
-  Serial.printf_P(PSTR("\nPeek over the edge of memory at 0x4010C000\n"));
+  Serial.printf_P(PSTR("\r\nPeek over the edge of memory at 0x4010C000\r\n"));
   dump_mem32((void *)(0x4010C000 - 16 * 4), 32);
 
   probe_b = (char *)gobble;
@@ -230,6 +219,8 @@ void processKey(Print& out, int hotKey) {
       xt_rsil(3);
       out.printf_P(PSTR("Read Byte, 0x%02X at %p"), probe_c[0], probe_c);
       xt_rsil(0);
+      out.println();
+      out.printf_P(PSTR("With Non32-bit access enabled, access range check is only done when 'Tools->Debug Level: CORE ...' is set."));
       out.println();
       break;
     case 'b':
@@ -338,17 +329,3 @@ void loop() {
 int __attribute__((noinline)) divideA_B(int a, int b) {
   return (a / b);
 }
-
-#if 0
-#ifdef MMU_SEC_HEAP
-extern "C" void _text_end(void);
-
-extern "C" void umm_init_iram(void) {
-  uint32_t sec_heap = (uint32_t)_text_end + 32;
-  sec_heap &= ~7;
-  size_t   sec_heap_sz = 0xC000UL - (sec_heap - 0x40100000UL);
-
-  umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
-}
-#endif
-#endif

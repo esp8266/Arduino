@@ -68,6 +68,8 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
             load = true;
         }
 
+        // The final IRAM size, once boot has completed, can be either 32K or 48K.
+        // Allow for the higher in range testing.
         if (address >= 0x40100000 && address < 0x4010C000) {
             load = true;
         }

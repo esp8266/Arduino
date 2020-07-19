@@ -36,8 +36,9 @@
  #define DEV_DEBUG_PRINT
  */
 
+//C This turns on range checking. Is this the value you want to trigger it?
 #ifdef DEBUG_ESP_CORE
-#define DEBUG_MMU
+#define DEBUG_ESP_MMU
 #endif
 
 /*
@@ -46,32 +47,30 @@
 */
 #define USE_ISR_SAFE_EXC_WRAPPER
 
-#if defined( DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_MMU)
+#if defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_ESP_MMU)
 #include <esp8266_peri.h>
 
-#if defined( DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM)
+#define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
+
+#if defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM)
 extern "C" void set_pll(void);
 extern "C" void dbg_set_pll(void);
-#define SET_PLL() set_pll()
+
+#define DBG_MMU_PRINTF(fmt, ...) \
+set_pll(); \
+uart_buff_switch(0); \
+ets_uart_printf(fmt, ##__VA_ARGS__); \
+DBG_MMU_FLUSH(0)
 
 #else
-#define SET_PLL() do {} while(false)
+// ! defined(DEBUG_ESP_MMU)
+#define DBG_MMU_PRINTF(fmt, ...) ets_uart_printf(fmt, ##__VA_ARGS__)
 #endif
 
-#define ETS_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
-
-#define ETS_PRINTF(fmt, ...) \
-  SET_PLL(); \
-  uart_buff_switch(0); \
-  ets_uart_printf(fmt, ##__VA_ARGS__); \
-  ETS_FLUSH(0)
-
-#else     // ! DEV_DEBUG_PRINT
-#define ETS_FLUSH(...) do {} while(false)
-#define ETS_PRINTF(...) do {} while(false)
-#endif    // DEV_DEBUG_PRINT
-
-#define DBG_MMU_PRINTF ETS_PRINTF
+#else     // ! defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_ESP_MMU)
+#define DBG_MMU_FLUSH(...) do {} while(false)
+#define DBG_MMU_PRINTF(...) do {} while(false)
+#endif    // defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_ESP_MMU)
 
 #ifdef DEV_DEBUG_MMU_IRAM
 #define DBG_MMU_PRINT_STATUS() { \
@@ -81,7 +80,7 @@ extern "C" void dbg_set_pll(void);
                    mmu_status.v_cfg, mmu_status.state, \
                    mmu_status.enable_count, mmu_status.disable_count, \
                    mmu_status.map, mmu_status.p, mmu_status.v); \
-    ETS_FLUSH(0); \
+    DBG_MMU_FLUSH(0); \
 }
 
 #define DBG_MMU_PRINT_IRAM_BANK_REG(a, b) { \
@@ -99,6 +98,7 @@ extern "C" void dbg_set_pll(void);
 extern "C" {
 #endif
 
+#ifdef DEV_DEBUG_MMU_IRAM
 typedef struct MMU_CRE_STATUS {
   uint32_t v_cfg;
   int32_t state;      // -1 - not initialized, 0 - disabled, 1 - enabled
@@ -110,62 +110,61 @@ typedef struct MMU_CRE_STATUS {
 }  mmu_cre_status_t;
 
 extern mmu_cre_status_t mmu_status;
-
-
-#ifdef DEBUG_MMU
-
-static inline bool is_iram(uint32_t addr) {
-// constexpr uint32_t _start = 0x40100000UL;
-#define IRAM_START 0x40100000UL
-#ifndef MMU_IRAM_SIZE
-#define MMU_IRAM_SIZE 0x8000UL
 #endif
-#define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
 
-  return (IRAM_START <= addr && IRAM_END > addr);
+#ifdef DEBUG_ESP_MMU
+
+static inline bool is_iram(const void *addr) {
+  #define IRAM_START 0x40100000UL
+  #ifndef MMU_IRAM_SIZE
+  #error "MMU_IRAM_SIZE was undefined!"
+  #endif
+  #define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
+
+  return (IRAM_START <= (uint32_t)addr && IRAM_END > (uint32_t)addr);
 }
 
-static inline bool is_dram(uint32_t addr) {
-  // constexpr uint32_t _start = 0x3FF80000UL;
-  // constexpr uint32_t _end = 0x40000000UL;
-  return (0x3FF80000UL <= addr && 0x40000000UL > addr);
+static inline bool is_dram(const void *addr) {
+  #define DRAM_START 0x3FF80000UL
+  #define DRAM_END 0x40000000UL
+
+  return (DRAM_START <= (uint32_t)addr && DRAM_END > (uint32_t)addr);
 }
 
-static inline bool is_icache(uint32_t addr) {
-  // constexpr uint32_t _start = 0x40200000UL;
-  // constexpr uint32_t _end = _start + 0x100000UL;
+static inline bool is_icache(const void *addr) {
   #define ICACHE_START 0x40200000UL
   #define ICACHE_END (ICACHE_START + 0x100000UL)
-  return (ICACHE_START <= addr && ICACHE_END > addr);
+
+  return (ICACHE_START <= (uint32_t)addr && ICACHE_END > (uint32_t)addr);
 }
 
 #else
-static inline bool is_iram(uint32_t addr) {
+static inline bool is_iram(const void *addr) {
   (void)addr;
   return true;
 }
 
-static inline bool is_dram(uint32_t addr) {
+static inline bool is_dram(const void *addr) {
   (void)addr;
   return true;
 }
 
-static inline bool is_icache(uint32_t addr) {
+static inline bool is_icache(const void *addr) {
   (void)addr;
   return true;
 }
-#endif  // #ifdef DEBUG_MMU
+#endif  // #ifdef DEBUG_ESP_MMU
 
-#ifdef DEBUG_MMU
+#ifdef DEBUG_ESP_MMU
 #define ASSERT_RANGE_TEST_WRITE(a) \
-  if (is_iram((uint32_t)a) || is_dram((uint32_t)a)) { \
+  if (is_iram(a) || is_dram(a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
     assert(("Outside of Range - Write" && false)); \
   }
 
 #define ASSERT_RANGE_TEST_READ(a) \
-  if (is_iram((uint32_t)a) || is_dram((uint32_t)a) || is_icache((uint32_t)a)) { \
+  if (is_iram(a) || is_dram(a) || is_icache(a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
     assert(("Outside of Range - Read" && false)); \
@@ -181,7 +180,7 @@ static inline bool is_icache(uint32_t addr) {
  * iCACHE data elements. These remove the extra time and stack space that would
  * have occured by relying on exception processing.
  */
-static inline uint8_t get_uint8_iram(const void *p8) {
+static inline uint8_t mmu_get_uint8(const void *p8) {
   ASSERT_RANGE_TEST_READ(p8);
   uint32_t val = (*(uint32_t *)((uintptr_t)p8 & ~0x3));
   uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
@@ -189,7 +188,7 @@ static inline uint8_t get_uint8_iram(const void *p8) {
   return (uint8_t)val;
 }
 
-static inline uint16_t get_uint16_iram(const unsigned short *p16) {
+static inline uint16_t mmu_get_uint16(const unsigned short *p16) {
   ASSERT_RANGE_TEST_READ(p16);
   uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
@@ -197,7 +196,7 @@ static inline uint16_t get_uint16_iram(const unsigned short *p16) {
   return (uint16_t)val;
 }
 
-static inline int16_t get_int16_iram(const short *p16) {
+static inline int16_t mmu_get_int16(const short *p16) {
   ASSERT_RANGE_TEST_READ(p16);
   uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
@@ -205,9 +204,7 @@ static inline int16_t get_int16_iram(const short *p16) {
   return (int16_t)val;
 }
 
-
-
-static inline uint8_t set_uint8_iram(void *p8, const uint8_t val) {
+static inline uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
   ASSERT_RANGE_TEST_WRITE(p8);
   uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
   uint32_t sval = val << pos;
@@ -221,7 +218,7 @@ static inline uint8_t set_uint8_iram(void *p8, const uint8_t val) {
   return val;
 }
 
-static inline uint16_t set_uint16_iram(unsigned short *p16, const uint16_t val) {
+static inline uint16_t mmu_set_uint16(unsigned short *p16, const uint16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
   uint32_t sval = val << pos;
@@ -235,7 +232,7 @@ static inline uint16_t set_uint16_iram(unsigned short *p16, const uint16_t val) 
   return val;
 }
 
-static inline int16_t set_int16_iram(short *p16, const int16_t val) {
+static inline int16_t mmu_set_int16(short *p16, const int16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t sval = (uint16_t)val;
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
