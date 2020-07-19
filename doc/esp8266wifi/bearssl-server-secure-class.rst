@@ -33,6 +33,26 @@ setECCert(const BearSSL::X509List \*chain, unsigned cert_issuer_key_type, const 
 
 Sets an elliptic curve certificate and key for the server.  Needs to be called before `begin()`.
 
+Client sessions (Resuming connections fast)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The TLS handshake process takes a long time because of all the back and forth between the client and the server.  You can shorten it by caching the clients' sessions which will skip a few steps in the TLS handshake.  In order for this to work, your client also needs to cache the session. `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst#sessions-resuming-connections-fast>`__ can do that as well as modern web browers.
+
+Here are the kind of performance improvements that you'll be able to see for TLS handshakes with an ESP8266 with it's clock set at 160MHz on a network with fairly low latency:
+
+* With an EC key of 256 bits, a request taking ~360ms without caching takes ~60ms with caching.
+* With an RSA key of 2048 bits, a request taking ~1850ms without caching takes ~70ms with caching.
+
+setCache(BearSSL::ServerSessions \*cache)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sets the cache for the server's sessions.  When choosing the size of the cache, remember that each client session takes 100 bytes.  If you setup a cache of 1000 bytes, you'll be able to store the sessions of the 10 most recent clients.  Needs to be called before `begin()`
+
+When creating the cache, you can use any of the 2 available constructors:
+
+* `BearSSL::ServerSessions(uint8_t *store, uint32_t size)`: Creates a cache with the given buffer and size.
+* `BearSSL::ServerSessions(uint32_t size)`: Dynamically allocates a cache of the given size.
+
 Requiring Client Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
