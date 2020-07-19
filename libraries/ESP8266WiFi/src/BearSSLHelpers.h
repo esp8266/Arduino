@@ -133,6 +133,9 @@ class X509List {
 // significantly faster.  Completely optional.
 class WiFiClientSecure;
 
+// Cache for a TLS session with a server
+// Use with BearSSL::WiFiClientSecure::setSession
+// to accelerate the TLS handshake
 class Session {
   friend class WiFiClientSecureCtx;
 
@@ -140,7 +143,7 @@ class Session {
     Session() { memset(&_session, 0, sizeof(_session)); }
   private:
     br_ssl_session_parameters *getSession() { return &_session; }
-    // The actual BearSSL ession information
+    // The actual BearSSL session information
     br_ssl_session_parameters _session;
 };
 
