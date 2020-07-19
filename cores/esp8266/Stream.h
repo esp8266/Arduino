@@ -216,7 +216,7 @@ class Stream: public Print {
                        int readUntilChar = -1,
                        oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */)
         {
-            return to(&to, maxLenm readUntilChar, timeoutMs);
+            return to(&to, maxLen, readUntilChar, timeoutMs);
         }
 #endif
 
