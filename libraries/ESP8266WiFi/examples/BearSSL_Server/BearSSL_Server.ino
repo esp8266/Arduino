@@ -138,6 +138,23 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 
 #endif
 
+#define CACHE_SIZE 500 // Size of the cache for SSL sessions.
+                       // Each SSL session requires 100 bytes,
+                       // so 500 is enough for 5 sessions.
+#define USE_CACHE // Enable SSL session caching.
+                  // Caching SSL sessions shortens the length of the SSL handshake.
+                  // You can see the performance improvement by looking at the
+                  // Network tab of the developper tools of your browser.
+//#define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
+
+#if defined(USE_CACHE) && defined(DYNAMIC_CACHE)
+// Dynamically allocated cache.
+BearSSL::ServerSessions serverCache(STORE, CACHE_SIZE);
+#elif defined(USE_CACHE)
+// Statically allocated cache.
+uint8_t store[CACHE_SIZE];
+BearSSL::ServerSessions serverCache(CACHE_SIZE);
+#endif
 
 void setup() {
   Serial.begin(115200);
@@ -167,6 +184,11 @@ void setup() {
   server.setRSACert(serverCertList, serverPrivKey);
 #else
   server.setECCert(serverCertList, BR_KEYTYPE_KEYX|BR_KEYTYPE_SIGN, serverPrivKey);
+#endif
+
+  // Set the server's cache
+#if defined(USE_CACHE)
+  server.setCache(&serverCache);
 #endif
 
   // Actually start accepting connections
