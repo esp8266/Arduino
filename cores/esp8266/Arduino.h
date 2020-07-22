@@ -220,13 +220,6 @@ void optimistic_yield(uint32_t interval_us);
 #endif
 
 
-//for compatibility, below 4 lines to be removed in release 3.0.0
-#ifdef __cplusplus
-extern "C"
-#endif
-const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
-
-
 
 #ifdef __cplusplus
 

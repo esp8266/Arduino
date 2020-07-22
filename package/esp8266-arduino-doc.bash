@@ -43,7 +43,7 @@ echo "documentation template url: "$doc_template_url
 echo "                       url: "$url
 
 # continue?
-read -e -p "Dou you wish to continue (y/n)? " -n 1 decision
+read -e -p "Do you wish to continue (y/n)? " -n 1 decision
 if echo "$decision" | grep -iq "^y" ;then
 	echo "okay"
 else
@@ -59,7 +59,7 @@ rm -fR $destination_path
 mkdir -p $destination_path/src
 mkdir -p $destination_path/$version
 
-# copy doc files to destination soruce dir
+# copy doc files to destination source dir
 cp -R $arduinoESP_src/doc/* $destination_path/src
 
 # download doc template
@@ -68,7 +68,7 @@ rsync -av $doc_src_path/ $destination_path/build/
 
 # create versions.html file
 
-# ... read verions
+# ... read versions
 pushd $arduinoESP_src
 old_versions=$(git ls-tree -d --name-only remotes/origin/gh-pages versions/ | sed -e 's/versions\///g')
 popd

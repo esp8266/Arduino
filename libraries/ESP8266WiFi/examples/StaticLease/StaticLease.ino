@@ -1,18 +1,4 @@
 
-#include <lwip/init.h>
-
-#if LWIP_VERSION_MAJOR == 1
-
-void setup() {
-  Serial.begin(115200);
-  Serial.println("wifi_softap_add_dhcps_lease() is not implemented with lwIP-v1");
-}
-
-void loop() {
-}
-
-#else
-
 /* Create a WiFi access point and provide static lease */
 
 #include <ESP8266WiFi.h>
@@ -104,5 +90,3 @@ void setup() {
 void loop() {
   server.handleClient();
 }
-
-#endif // lwIP-v2
