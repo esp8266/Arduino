@@ -66,11 +66,12 @@ _xtos_c_wrapper_handler:
         //  OWB      = 0 (really, a dont care if !__XTENSA_CALL0_ABI__)
 
 //        movi   a2, 0x23 // 0x21, PS_UM|PS_INTLEVEL(XCHAL_EXCM_LEVEL)
-// @mhightower83 - testing to see if we need INTLEVEL 15 instead of 3
-        movi   a2, 0x2F // 0x21, PS_UM|PS_INTLEVEL(XCHAL_EXCM_LEVEL)
+// @mhightower83 - use INTLEVEL 15 instead of 3 for Arduino like interrupt support??
+        movi   a2, 0x2F // 0x21, PS_UM|PS_INTLEVEL(15)
         rsr    a3, EPC_1
 // @mhightower83 - I assume PS.EXCM was set and now is being cleared, thus
 // allowing new exceptions and interrupts within PS_INTLEVEL to be possible.
+// We have set INTLEVEL to 15 to block any possible interrupts.
         xsr    a2, PS
 
         //  HERE:  window overflows enabled, but NOT SAFE because we're not quite
@@ -115,14 +116,17 @@ _xtos_c_wrapper_handler:
         // Restore special registers
         l32i    a14,  a1, UEXC_sar
 
-        /*
-         *  Disable interrupts while returning from the pseudo-CALL setup above,
-         *  for the same reason they were disabled while doing the pseudo-CALL:
-         *  this sequence restores SP such that it doesn't reflect the allocation
-         *  of the exception stack frame, which we still need to return from
-         *  the exception.
-         */
+// For compatibility with Arduino interrupt architecture, we keep interrupts 100%
+// disabled.
+//        /*
+//         *  Disable interrupts while returning from the pseudo-CALL setup above,
+//         *  for the same reason they were disabled while doing the pseudo-CALL:
+//         *  this sequence restores SP such that it doesn't reflect the allocation
+//         *  of the exception stack frame, which we still need to return from
+//         *  the exception.
+//         */
 //        rsil  a12, 1 // XCHAL_EXCM_LEVEL
+        rsil  a12, 15  // All levels blocked.
         wsr   a14, SAR
         movi   a0, _xtos_return_from_exc
         jx     a0
