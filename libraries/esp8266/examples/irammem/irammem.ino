@@ -128,10 +128,10 @@ void setup() {
   Serial.printf_P(PSTR("\n\nSetup ...\n"));
 #ifndef UMM_HEAP_IRAM
   Serial.printf("\r\n"
-    "This example needs IRAM Heap support enabled.\r\n"
-    "  eg. Arduino IDE 'Tools->MMU:\"16KB cache + 48KB IRAM and 2nd Heap (shared)\"'\r\n"
-    "This build has IRAM Heap support disabled.\r\n"
-    "In this situation, all IRAM requests are satisfied with DRAM.\r\n\r\n");
+                "This example needs IRAM Heap support enabled.\r\n"
+                "  eg. Arduino IDE 'Tools->MMU:\"16KB cache + 48KB IRAM and 2nd Heap (shared)\"'\r\n"
+                "This build has IRAM Heap support disabled.\r\n"
+                "In this situation, all IRAM requests are satisfied with DRAM.\r\n\r\n");
 #endif
 
   // Compiling with Secondary Heap option does not change malloc to use the
