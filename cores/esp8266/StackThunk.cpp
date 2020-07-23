@@ -51,11 +51,10 @@ void stack_thunk_add_ref()
   stack_thunk_refcnt++;
   if (stack_thunk_refcnt == 1) {
     DBG_MMU_PRINTF("\nStackThunk malloc(%u)\n", _stackSize * sizeof(uint32_t));
-    // The stack must be in DRAM, or an HWDT will follow. I am not sure why
-    // maybe an exception handler hits a non32-bit access exception. Or too much
-    // time is consumed in a non32-bit exception handler with IRQs off. Also,
-    // interrupt handling on an IRAM stack would greatly slow an ISR handler
-    // with interrupts turned off.
+    // The stack must be in DRAM, or an Soft WDT will follow. Maybe too much
+    // time is consumed with the non32-bit exception handler. Also,
+    // interrupt handling on an IRAM stack would als be greatly slower.
+    // Strings on the stack would be very slow to access as well.
     HeapSelectDram ephemeral;
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
     DBG_MMU_PRINTF("StackThunk stack_thunk_ptr: %p\n", stack_thunk_ptr);

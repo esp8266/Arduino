@@ -14,6 +14,7 @@
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 #include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
