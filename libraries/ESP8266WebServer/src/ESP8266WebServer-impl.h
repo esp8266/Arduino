@@ -524,7 +524,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
     sprintf(chunkSize, "%zx\r\n", len);
     _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
   }
-  size_t sent = content->toAll(_currentClient);
+  size_t sent = content->toAll(&_currentClient);
   (void)sent; /// if (sent != len) print-error-on-console-and-return-false
   if(_chunked){
     _currentClient.write((const uint8_t *)footer, 2);
@@ -534,7 +534,20 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
   }
 }
 
-#if 0 //XXX removeme (String is Stream)
+#if 1
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
+  StreamPtr ref(content.c_str(), content.length());
+  return sendContent(&ref);
+}
+
+//template <typename ServerType>
+//void ESP8266WebServerTemplate<ServerType>::sendContent(String& content) {
+//  return sendContent(&content);
+//}
+
+#else
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
   if (_currentMethod == HTTP_HEAD) return;
