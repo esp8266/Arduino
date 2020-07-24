@@ -91,8 +91,7 @@ void loop() {
 
   else if (t == 3) {
     // stream to print, possibly with only one copy
-    //client.to(client); // <=> client.to(&client, -1, -1, client->getTimeout())
-    client.to(client, -1, -1, breathMs);
+    client.toNow(&client);
 
     switch (client.getLastTo()) {
       case Stream::STREAMTO_SUCCESS: break;

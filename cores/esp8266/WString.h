@@ -359,11 +359,6 @@ public:
     void peekPointerSetConsume () { peekPointer = -1; }
     void peekPointerReset (int pointer = 0) { peekPointer = pointer; }
 
-    // substitute for `virtual int ::read(buf, len)` in `Stream::`
-    virtual int readNow (char* buffer, size_t len) override {
-        return read(buffer, len);
-    }
-
     virtual ssize_t streamSize () override { return length(); }
 
     //// Print:

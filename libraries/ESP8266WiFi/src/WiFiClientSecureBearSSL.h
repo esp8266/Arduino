@@ -54,7 +54,7 @@ class WiFiClientSecure : public WiFiClient {
     }
     size_t write(Stream& stream); // Note this is not virtual
     int read(uint8_t *buf, size_t size) override;
-    int read(char *buf, size_t size) override { return read((uint8_t*)buf, size); }
+    int read(char *buf, size_t size) { return read((uint8_t*)buf, size); }
     int available() override;
     int read() override;
     int peek() override;
@@ -134,7 +134,6 @@ class WiFiClientSecure : public WiFiClient {
 
     // peek buffer API is present
     virtual bool peekBufferAPI () const override { return true; }
-    virtual int readNow (char* buffer, size_t len) override { return WiFiClientSecure::read((uint8_t*)buffer, len); }
 
     // return number of byte accessible by peekBuffer()
     virtual size_t availableForPeek () override { return WiFiClientSecure::available(); }

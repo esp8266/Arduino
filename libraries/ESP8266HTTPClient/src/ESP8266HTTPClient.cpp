@@ -604,8 +604,8 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
             return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
         }
 
-        // transfer all of it, with timeout
-        if (size && StreamPtr(payload, size).to(_client) != size)
+        // transfer all of it, with send-timeout
+        if (size && StreamPtr(payload, size).toAll(_client) != size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
 
         // handle Server Response (Header)
@@ -706,7 +706,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     }
 
     // transfer all of it, with timeout
-    size_t transferred = stream->to(_client, size);
+    size_t transferred = stream->toSize(_client, size);
     if (transferred != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
@@ -788,7 +788,7 @@ int HTTPClient::writeToStream(Stream * stream)
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
         // len < 0: transfer all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->to(stream, len);
+        ret = _client->toSize(stream, len);
 
         // have we an error?
         if(_client->getLastTo() != Stream::STREAMTO_SUCCESS) {
@@ -816,7 +816,7 @@ int HTTPClient::writeToStream(Stream * stream)
             // data left?
             if(len > 0) {
                 // read len bytes with timeout
-                int r = _client->to(stream, len);
+                int r = _client->toSize(stream, len);
                 if (_client->getLastTo() != Stream::STREAMTO_SUCCESS)
                     // not all data transferred
                     return returnError(TO2HTTPC(_client->getLastTo()));
@@ -1009,8 +1009,8 @@ bool HTTPClient::connect(void)
 {
     if(_reuse && _canReuse && connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
-        StreamNull devNull; // should we have a global one?
-        _client->to(devNull); // clear _client's output (all of it, no timeout)
+        StreamNull devnull; //XXXFIXME a global one would be nice
+        _client->toNow(&devnull); // clear _client's output (all of it, no timeout)
         return true;
     }
 
@@ -1105,7 +1105,7 @@ bool HTTPClient::sendHeader(const char * type)
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     // transfer all of it, with timeout
-    return header.to(_client, header.length()) == header.length();
+    return header.toSize(_client, header.length()) == header.length();
 }
 
 /**

@@ -346,7 +346,7 @@ public:
         return result;
     }
 
-    size_t read(uint8_t* buf, size_t size) override {
+    int read(uint8_t* buf, size_t size) override {
         if (!_opened || !_fd | !buf) {
             return 0;
         }

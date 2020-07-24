@@ -43,7 +43,7 @@ public:
     virtual int read() override { return -1; }
     virtual int peek() override { return -1; }
     virtual size_t readBytes(char* buffer, size_t len) override { (void)buffer; (void)len; return 0; }
-    virtual int readNow(char* buffer, size_t len) override { (void)buffer; (void)len; return 0; }
+    virtual int read(uint8_t* buffer, size_t len) override { (void)buffer; (void)len; return 0; }
     virtual bool outputTimeoutPossible () override { return false; }
     virtual bool inputTimeoutPossible () override { return false; }
 
@@ -67,7 +67,7 @@ public:
     virtual int read() override { return _x; }
     virtual int peek() override { return _x; }
     virtual size_t readBytes(char* buffer, size_t len) override { memset(buffer, _x, len); return len; }
-    virtual int readNow(char* buffer, size_t len) override { memset(buffer, _x, len); return len; }
+    virtual int read(uint8_t* buffer, size_t len) override { memset((char*)buffer, _x, len); return len; }
 
     virtual ssize_t streamSize () override { return 32767; }
 };
@@ -109,7 +109,7 @@ public:
         _peekPointer += cpylen;
         return cpylen;
     }
-    virtual int readNow(char* buffer, size_t len) override { return readBytes(buffer, len); }
+    virtual int read(uint8_t* buffer, size_t len) override { return readBytes((char*)buffer, len); }
 
     virtual ssize_t streamSize () override { return _size; }
 
@@ -231,7 +231,7 @@ public:
         }
     }
 
-    virtual int readNow(char* buffer, size_t len) override
+    virtual int read(uint8_t* buffer, size_t len) override
     {
         while (true)
         {
@@ -239,7 +239,7 @@ public:
                 // end of all
                 return 0;
 
-            int ret = m_segments[m_current]->readNow(buffer, len);
+            int ret = m_segments[m_current]->read(buffer, len);
             if (ret > 0)
                 return ret;
 

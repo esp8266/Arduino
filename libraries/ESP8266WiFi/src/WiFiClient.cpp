@@ -262,6 +262,10 @@ int WiFiClient::read()
     return _client->read();
 }
 
+int WiFiClient::read(uint8_t* buf, size_t size)
+{
+    return (int)_client->read((char*)buf, size);
+}
 
 int WiFiClient::read(char* buf, size_t size)
 {

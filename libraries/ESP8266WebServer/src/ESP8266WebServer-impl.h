@@ -458,7 +458,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
     //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
     //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
-    size_t sent = StreamPtr(header.c_str(), header.length()).to(&_currentClient); // transfer all of it, with timeout
+    size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient); // transfer all of it, with timeout
     (void)sent;
 #ifdef DEBUG_ESP_HTTP_SERVER
     if (sent != header.length())
@@ -524,7 +524,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
     sprintf(chunkSize, "%zx\r\n", len);
     _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
   }
-  size_t sent = content->to(_currentClient);
+  size_t sent = content->toAll(_currentClient);
   (void)sent; /// if (sent != len) print-error-on-console-and-return-false
   if(_chunked){
     _currentClient.write((const uint8_t *)footer, 2);
@@ -534,6 +534,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
   }
 }
 
+#if 0 //XXX removeme (String is Stream)
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
   if (_currentMethod == HTTP_HEAD) return;
@@ -552,6 +553,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
     }
   }
 }
+#endif
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content) {

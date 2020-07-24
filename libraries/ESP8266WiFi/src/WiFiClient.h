@@ -66,11 +66,8 @@ public:
 
   virtual int available() override;
   virtual int read() override;
-  virtual int read(char *buf, size_t size); // should override, see Stream.h
-  virtual int read(uint8_t *buf, size_t size) // should override, see Stream.h
-  {
-    return WiFiClient::read((char*)buf, size);
-  }
+  virtual int read(uint8_t* buf, size_t size) override;
+  int read(char* buf, size_t size);
 
   virtual int peek() override;
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
@@ -124,11 +121,6 @@ public:
   static bool getDefaultSync ();
   bool getSync() const;
   void setSync(bool sync);
-
-  // substitute for virtual int ::read(buf, len)
-  virtual int readNow (char* buffer, size_t len) override {
-    return WiFiClient::read(buffer, len);
-  }
 
   // peek buffer API is present
   virtual bool peekBufferAPI () const override;

@@ -141,12 +141,6 @@ public:
         return true;
     }
 
-    // substitute for virtual int ::read(buf, len)
-    virtual int readNow (char* buffer, size_t len) override
-    {
-        return HardwareSerial::read(buffer, len);
-    }
-
     // return a pointer to available data buffer (size = available())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer () override
@@ -172,11 +166,11 @@ public:
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
-    size_t read(char* buffer, size_t size) // should override, see Stream.h
+    int read(char* buffer, size_t size)
     {
         return uart_read(_uart, buffer, size);
     }
-    size_t read(uint8_t* buffer, size_t size) // should override, see Stream.h
+    int read(uint8_t* buffer, size_t size) override
     {
         return uart_read(_uart, (char*)buffer, size);
     }

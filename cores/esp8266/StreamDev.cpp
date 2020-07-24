@@ -26,10 +26,10 @@
 using esp8266::polledTimeout::oneShotFastMs;
 using esp8266::polledTimeout::periodicFastMs;
 
-size_t Stream::to (Print* to,
-                   const ssize_t len,
-                   int readUntilChar,
-                   oneShotFastMs::timeType timeoutMs)
+size_t Stream::toFull (Print* to,
+                       const ssize_t len,
+                       int readUntilChar,
+                       oneShotFastMs::timeType timeoutMs)
 {
     setWriteError(STREAMTO_SUCCESS);
 
@@ -182,7 +182,7 @@ size_t Stream::to (Print* to,
             if (w)
             {
                 char temp[w];
-                ssize_t r = readNow(temp, w);
+                ssize_t r = read(temp, w);
                 if (r < 0)
                 {
                     setWriteError(STREAMTO_READ_ERROR);
