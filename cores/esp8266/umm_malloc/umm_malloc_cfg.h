@@ -239,6 +239,8 @@ extern char _heap_start[];
   UMM_HEAP_INFO;
 
   // extern UMM_HEAP_INFO ummHeapInfo;
+struct UMM_HEAP_CONTEXT;
+typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
 
   extern ICACHE_FLASH_ATTR void *umm_info( void *ptr, bool force );
 #ifdef UMM_INLINE_METRICS
@@ -250,9 +252,10 @@ extern char _heap_start[];
   extern ICACHE_FLASH_ATTR size_t umm_max_block_size( void );
   extern ICACHE_FLASH_ATTR int umm_usage_metric( void );
   extern ICACHE_FLASH_ATTR int umm_fragmentation_metric( void );
-  extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core( void );
-  extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core( void );
-  extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core( void );
+  extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core( umm_heap_context_t *_context );
+  extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core( umm_heap_context_t *_context );
+  extern ICACHE_FLASH_ATTR int umm_usage_metric_core( umm_heap_context_t *_context );
+  extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core( umm_heap_context_t *_context );
 #else
   #define umm_info(p,b)
   #define umm_free_heap_size() (0)
@@ -263,9 +266,6 @@ extern char _heap_start[];
   #define umm_max_block_size_core() (0)
   #define umm_fragmentation_metric_core() (0)
 #endif
-
-struct UMM_HEAP_CONTEXT;
-typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
 
 /*
  * -D UMM_STATS :

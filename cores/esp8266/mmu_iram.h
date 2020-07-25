@@ -115,9 +115,10 @@ extern mmu_cre_status_t mmu_status;
 static inline __attribute__((always_inline))
 bool mmu_is_iram(const void *addr) {
   #define IRAM_START 0x40100000UL
-  #ifndef MMU_IRAM_SIZE
-  #error "MMU_IRAM_SIZE was undefined!"
-  #endif
+#ifndef MMU_IRAM_SIZE
+  #pragma warning("MMU_IRAM_SIZE was undefined, setting to 0x8000UL!")
+  #define MMU_IRAM_SIZE 0x8000UL
+#endif
   #define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
 
   return (IRAM_START <= (uint32_t)addr && IRAM_END > (uint32_t)addr);

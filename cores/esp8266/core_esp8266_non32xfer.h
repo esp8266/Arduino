@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 extern void install_non32xfer_exception_handler();
-extern uint32_t mmu_non32xfer_count;
 
 #ifdef __cplusplus
 }

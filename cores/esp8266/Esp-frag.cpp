@@ -31,14 +31,14 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
 
     umm_info(NULL, false);
 
-    uint32_t free_size = umm_free_heap_size_core();
+    uint32_t free_size = umm_free_heap_size_core(umm_get_current_heap());
     if (hfree)
         *hfree = free_size;
     if (hmax)
-        *hmax = (uint16_t)umm_max_block_size_core();
+        *hmax = (uint16_t)umm_max_block_size_core(umm_get_current_heap());
     if (hfrag) {
       if (free_size) {
-        *hfrag = umm_fragmentation_metric_core();
+        *hfrag = umm_fragmentation_metric_core(umm_get_current_heap());
       } else {
         *hfrag = 0;
       }

@@ -142,8 +142,8 @@ void *umm_info( void *ptr, bool force ) {
 
   DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
-  DBGLOG_FORCE( force, "Usage Metric:               %5d\n", umm_usage_metric());
-  DBGLOG_FORCE( force, "Fragmentation Metric:       %5d\n", umm_fragmentation_metric());
+  DBGLOG_FORCE( force, "Usage Metric:               %5d\n", umm_usage_metric_core(_context));
+  DBGLOG_FORCE( force, "Fragmentation Metric:       %5d\n", umm_fragmentation_metric_core(_context));
 
   DBGLOG_FORCE( force, "+--------------------------------------------------------------+\n" );
 
@@ -170,8 +170,7 @@ void *umm_info( void *ptr, bool force ) {
 
 /* ------------------------------------------------------------------------ */
 
-size_t umm_free_heap_size_core( void ) {
-  umm_heap_context_t *_context = umm_get_current_heap();
+size_t umm_free_heap_size_core( umm_heap_context_t *_context ) {
   return (size_t)_context->info.freeBlocks * sizeof(umm_block);
 }
 
@@ -180,21 +179,20 @@ size_t umm_free_heap_size( void ) {
   umm_info(NULL, false);
 #endif
 
-  return umm_free_heap_size_core();
+  return umm_free_heap_size_core(umm_get_current_heap());
 }
 
 //C Breaking change in upstream umm_max_block_size() was changed to
 //C umm_max_free_block_size() keeping old function name for (dot) releases.
 //C TODO: update at next major release.
 //C size_t umm_max_free_block_size( void ) {
-size_t umm_max_block_size_core( void ) {
-  umm_heap_context_t *_context = umm_get_current_heap();
+size_t umm_max_block_size_core( umm_heap_context_t *_context ) {
   return _context->info.maxFreeContiguousBlocks * sizeof(umm_block);
 }
 
 size_t umm_max_block_size( void ) {
   umm_info(NULL, false);
-  return umm_max_block_size_core();
+  return umm_max_block_size_core(umm_get_current_heap());
 }
 
 /*
@@ -202,13 +200,7 @@ size_t umm_max_block_size( void ) {
   umm_fragmentation_metric() must to be preceeded by a call to umm_info(NULL, false)
   for updated results.
 */
-int umm_usage_metric( void ) {
-#ifndef UMM_INLINE_METRICS
-  umm_info(NULL, false);
-#endif
-
-  umm_heap_context_t *_context = umm_get_current_heap();
-
+int umm_usage_metric_core( umm_heap_context_t *_context ) {
 //C Note, umm_metrics also appears in the upstrean w/o definition. I suspect it is suppose to be ummHeapInfo.
   // DBGLOG_DEBUG( "usedBlocks %d totalBlocks %d\n", umm_metrics.usedBlocks, ummHeapInfo.totalBlocks);
   DBGLOG_DEBUG( "usedBlocks %d totalBlocks %d\n", _context->info.usedBlocks, _context->info.totalBlocks);
@@ -218,10 +210,16 @@ int umm_usage_metric( void ) {
   return -1;  // no freeBlocks
 }
 
+int umm_usage_metric( void ) {
+#ifndef UMM_INLINE_METRICS
+  umm_info(NULL, false);
+#endif
+
+  return umm_usage_metric_core(umm_get_current_heap());
+}
 uint32_t sqrt32 (uint32_t n);
 
-int umm_fragmentation_metric_core( void ) {
-  umm_heap_context_t *_context = umm_get_current_heap();
+int umm_fragmentation_metric_core( umm_heap_context_t *_context ) {
   // DBGLOG_DEBUG( "freeBlocks %d freeBlocksSquared %d\n", umm_metrics.freeBlocks, ummHeapInfo.freeBlocksSquared);
   DBGLOG_DEBUG( "freeBlocks %d freeBlocksSquared %d\n", _context->info.freeBlocks, _context->info.freeBlocksSquared);
   if (0 == _context->info.freeBlocks) {
@@ -237,7 +235,7 @@ int umm_fragmentation_metric( void ) {
   umm_info(NULL, false);
 #endif
 
-  return umm_fragmentation_metric_core();
+  return umm_fragmentation_metric_core(umm_get_current_heap());
 }
 
 #ifdef UMM_INLINE_METRICS

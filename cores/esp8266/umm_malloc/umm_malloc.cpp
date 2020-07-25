@@ -129,7 +129,7 @@ size_t umm_get_current_heap_id(void) {
   return 0;
 }
 
-static umm_heap_context_t *umm_get_current_heap(void) {
+umm_heap_context_t *umm_get_current_heap(void) {
   return &heap_context[0];
 }
 
@@ -148,7 +148,7 @@ size_t umm_get_current_heap_id(void) {
   return umm_heap_cur;
 }
 
-static umm_heap_context_t *umm_get_current_heap(void) {
+umm_heap_context_t *umm_get_current_heap(void) {
   return &heap_context[umm_heap_cur];
 }
 
