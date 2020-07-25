@@ -165,12 +165,14 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
     /* read out the faulting address */
     __asm("rsr %0, EXCVADDR;" :"=r"(excvaddr)::);
 
-    /* debug option, validate address so we don't hide memory access bugs in APP */
-    if (is_iram((void *)excvaddr) || (is_read && is_icache((void *)excvaddr))) {
+#ifdef DEBUG_ESP_MMU
+    /* debug option to validate address so we don't hide memory access bugs in APP */
+    if (mmu_is_iram((void *)excvaddr) || (is_read && mmu_is_icache((void *)excvaddr))) {
       /* all is good  */
     } else {
       continue;  /* fail */
     }
+#endif
 
     if (is_read) {
       /* Load, shift and mask down to correct size */

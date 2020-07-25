@@ -29,8 +29,8 @@ handler for this later.
 Option Summary
 --------------
 
-**The Arduino IDE Tools menu option, ``MMU`` allows for the following
-selections:**
+The Arduino IDE Tools menu option, ``MMU`` has the following selections:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. ``32KB cache + 32KB IRAM (balanced)``
 
@@ -91,10 +91,10 @@ indicated with the menu options above:
 +-------------------------+--------------+--------------+------------------------------------+------------------------------+
 
 \*\* This define is to an inline function that calculates the value,
-based on unused code space.
+based on unused code space, requires ``#include <mmu_iram.h>``.
 
-**The Arduino IDE Tools menu option, ``Non-32-Bit Access`` allows for
-the following selections:**
+The Arduino IDE Tools menu option, ``Non-32-Bit Access`` has the following selections:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  ``Use pgm_read macros for IRAM/PROGMEM``
 -  ``Byte/Word access to IRAM/PROGMEM (very slow)``
@@ -138,8 +138,8 @@ For calls to ``umm_malloc`` with interrupts disabled.
    disabled is **not** officially supported. You are on your own if you
    do this.
 -  If you must use IRAM memory in your ISR, allocate the memory ahead of
-   time. And avoid non32-bit access that would trigger the exception
-   handler.
+   time. To reduce the time spent in the ISR, avoid non32-bit access
+   that would trigger the exception handler.
 
     I think this block should go away and we always use
     ``USE_ISR_SAFE_EXC_WRAPPER`` with the exception handler.
@@ -213,4 +213,45 @@ provide some additional control:
    Heap API for an IRAM selection.
 -  ``ESP.setDramHeap()`` Pushes current heap ID onto a stack and sets
    Heap API for a DRAM selection.
--  ``ESP.resetHeap()`` Restores previously pushed heap.
+-  ``ESP.resetHeap()`` Restores previously pushed heap. ### Identify
+   Memory
+
+These always inlined functions can be used to determine the resource of
+a pointer:
+
+.. code:: cpp
+
+    bool mmu_is_iram(const void *addr);
+    bool mmu_is_dram(const void *addr);
+    bool mmu_is_icache(const void *addr);
+
+Performance Functions
+~~~~~~~~~~~~~~~~~~~~~
+
+While these, always inlined functions, will bypass the need for the
+exception handler reducing execution time and stack use, it comes at the
+cost of increased code size.
+
+These are an alternative to the ``pgm_read`` macros for reading from
+IRAM. When compiled with 'Debug Level: core' range checks are performed
+on the pointer value to make sure you are reading from the address range
+of IRAM, DRAM, or ICACHE.
+
+.. code:: cpp
+
+    uint8_t mmu_get_uint8(const void *p8);
+    uint16_t mmu_get_uint16(const uint16_t *p16);
+    int16_t mmu_get_int16(const int16_t *p16);
+
+While these functions are intended for writing to IRAM, they will work
+with DRAM. When compiled with 'Debug Level: core', range checks are
+performed on the pointer value to make sure you are writing to the
+address range of IRAM or DRAM.
+
+.. code:: cpp
+
+    uint8_t mmu_set_uint8(void *p8, const uint8_t val);
+    uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val);
+    int16_t mmu_set_int16(int16_t *p16, const int16_t val);
+
+::

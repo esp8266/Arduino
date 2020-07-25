@@ -112,9 +112,8 @@ typedef struct MMU_CRE_STATUS {
 extern mmu_cre_status_t mmu_status;
 #endif
 
-#ifdef DEBUG_ESP_MMU
-
-static inline bool is_iram(const void *addr) {
+static inline __attribute__((always_inline))
+bool mmu_is_iram(const void *addr) {
   #define IRAM_START 0x40100000UL
   #ifndef MMU_IRAM_SIZE
   #error "MMU_IRAM_SIZE was undefined!"
@@ -124,47 +123,32 @@ static inline bool is_iram(const void *addr) {
   return (IRAM_START <= (uint32_t)addr && IRAM_END > (uint32_t)addr);
 }
 
-static inline bool is_dram(const void *addr) {
+static inline __attribute__((always_inline))
+bool mmu_is_dram(const void *addr) {
   #define DRAM_START 0x3FF80000UL
   #define DRAM_END 0x40000000UL
 
   return (DRAM_START <= (uint32_t)addr && DRAM_END > (uint32_t)addr);
 }
 
-static inline bool is_icache(const void *addr) {
+static inline __attribute__((always_inline))
+bool mmu_is_icache(const void *addr) {
   #define ICACHE_START 0x40200000UL
   #define ICACHE_END (ICACHE_START + 0x100000UL)
 
   return (ICACHE_START <= (uint32_t)addr && ICACHE_END > (uint32_t)addr);
 }
 
-#else
-static inline bool is_iram(const void *addr) {
-  (void)addr;
-  return true;
-}
-
-static inline bool is_dram(const void *addr) {
-  (void)addr;
-  return true;
-}
-
-static inline bool is_icache(const void *addr) {
-  (void)addr;
-  return true;
-}
-#endif  // #ifdef DEBUG_ESP_MMU
-
 #ifdef DEBUG_ESP_MMU
 #define ASSERT_RANGE_TEST_WRITE(a) \
-  if (is_iram(a) || is_dram(a)) { \
+  if (mmu_is_iram(a) || mmu_is_dram(a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
     assert(("Outside of Range - Write" && false)); \
   }
 
 #define ASSERT_RANGE_TEST_READ(a) \
-  if (is_iram(a) || is_dram(a) || is_icache(a)) { \
+  if (mmu_is_iram(a) || mmu_is_dram(a) || mmu_is_icache(a)) { \
   } else { \
     DBG_MMU_PRINTF("\nexcvaddr: %p\n", a); \
     assert(("Outside of Range - Read" && false)); \
@@ -180,7 +164,8 @@ static inline bool is_icache(const void *addr) {
  * iCACHE data elements. These remove the extra time and stack space that would
  * have occured by relying on exception processing.
  */
-static inline uint8_t mmu_get_uint8(const void *p8) {
+static inline __attribute__((always_inline))
+uint8_t mmu_get_uint8(const void *p8) {
   ASSERT_RANGE_TEST_READ(p8);
   uint32_t val = (*(uint32_t *)((uintptr_t)p8 & ~0x3));
   uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
@@ -188,7 +173,8 @@ static inline uint8_t mmu_get_uint8(const void *p8) {
   return (uint8_t)val;
 }
 
-static inline uint16_t mmu_get_uint16(const unsigned short *p16) {
+static inline __attribute__((always_inline))
+uint16_t mmu_get_uint16(const uint16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
   uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
@@ -196,7 +182,8 @@ static inline uint16_t mmu_get_uint16(const unsigned short *p16) {
   return (uint16_t)val;
 }
 
-static inline int16_t mmu_get_int16(const short *p16) {
+static inline __attribute__((always_inline))
+int16_t mmu_get_int16(const int16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
   uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
@@ -204,7 +191,8 @@ static inline int16_t mmu_get_int16(const short *p16) {
   return (int16_t)val;
 }
 
-static inline uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
+static inline __attribute__((always_inline))
+uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
   ASSERT_RANGE_TEST_WRITE(p8);
   uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
   uint32_t sval = val << pos;
@@ -218,7 +206,8 @@ static inline uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
   return val;
 }
 
-static inline uint16_t mmu_set_uint16(unsigned short *p16, const uint16_t val) {
+static inline __attribute__((always_inline))
+uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
   uint32_t sval = val << pos;
@@ -232,7 +221,8 @@ static inline uint16_t mmu_set_uint16(unsigned short *p16, const uint16_t val) {
   return val;
 }
 
-static inline int16_t mmu_set_int16(short *p16, const int16_t val) {
+static inline __attribute__((always_inline))
+int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t sval = (uint16_t)val;
   uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
