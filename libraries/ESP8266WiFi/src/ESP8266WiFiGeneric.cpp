@@ -133,12 +133,6 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeAuthModeChanged(std::func
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_AUTHMODE_CHANGE, [f](System_Event_t* e){
         auto& src = e->event_info.auth_change;
         WiFiEventStationModeAuthModeChanged dst;
-        if ((src.old_mode != AUTH_OPEN) && (src.new_mode == AUTH_OPEN)) {
-            // CVE-2020-12638 workaround.  When we get a change to AUTH_OPEN from any other mode, drop the WiFi link because it's a downgrade attack
-            // TODO - When upgrading to 3.x.x with fix, remove this code
-            DEBUG_WIFI("WIFI_EVENT_STAMODE_AUTHMODE_CHANGE from encrypted(%d) to AUTH_OPEN, potential downgrade attack. Reconnecting WiFi. See CVE-2020-12638 for more details\n", src.old_mode);
-            WiFi.reconnect();  // Disconnects from STA and then reconnects
-        }
         dst.oldMode = src.old_mode;
         dst.newMode = src.new_mode;
         f(dst);
@@ -232,6 +226,16 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
     if(event->event == EVENT_STAMODE_DISCONNECTED) {
         DEBUG_WIFI("STA disconnect: %d\n", event->event_info.disconnected.reason);
         WiFiClient::stopAll();
+    }
+
+    if (event->event == EVENT_STAMODE_AUTHMODE_CHANGE) {
+        auto& src = event->event_info.auth_change;
+        if ((src.old_mode != AUTH_OPEN) && (src.new_mode == AUTH_OPEN)) {
+            // CVE-2020-12638 workaround.  When we get a change to AUTH_OPEN from any other mode, drop the WiFi link because it's a downgrade attack
+            // TODO - When upgrading to 3.x.x with fix, remove this code
+            DEBUG_WIFI("WIFI_EVENT_STAMODE_AUTHMODE_CHANGE from encrypted(%d) to AUTH_OPEN, potential downgrade attack. Reconnecting WiFi. See CVE-2020-12638 for more details\n", src.old_mode);
+            WiFi.reconnect();  // Disconnects from STA and then reconnects
+        }
     }
 
     for(auto it = std::begin(sCbEventList); it != std::end(sCbEventList); ) {
