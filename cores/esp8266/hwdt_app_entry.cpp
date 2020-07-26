@@ -422,7 +422,7 @@ int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
       the PROGMEM address must be word (4 bytes) aligned. The destination
       address for ets_memcpy must also be word-aligned.
     */
-    char ram_buf[ets_strlen(fmt)] __attribute__ ((aligned(4)));
+    char ram_buf[ets_strlen(fmt) + 1] __attribute__((aligned(4)));
     ets_strcpy(ram_buf, fmt);
     va_list argPtr;
     va_start(argPtr, fmt);
