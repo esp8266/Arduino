@@ -38,6 +38,7 @@ UpdaterClass::UpdaterClass()
 , _hash(nullptr)
 , _verify(nullptr)
 , _progress_callback(nullptr)
+, _ledPin(-1)
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
