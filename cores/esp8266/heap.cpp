@@ -164,7 +164,7 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
         if (inISR && (uint32_t)file >= 0x40200000) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
-            char buf[ets_strlen(file)] __attribute__ ((aligned(4)));
+            char buf[ets_strlen(file) + 1] __attribute__((aligned(4)));
             ets_strcpy(buf, file);
             DEBUG_HEAP_PRINTF(buf);
         } else {
