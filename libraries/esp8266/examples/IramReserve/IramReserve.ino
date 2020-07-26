@@ -17,7 +17,7 @@
 //#include <umm_malloc/umm_heap_select.h>
 
 
-#ifndef UMM_HEAP_IRAM
+#if !defined(UMM_HEAP_IRAM) && !defined(MOCK)
 #error "This sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd Heap (shared)'"
 #endif
 
@@ -56,8 +56,8 @@ extern struct rst_info resetInfo;
   XOR sum on the IRAM data (or just a section of the IRAM data).
 */
 inline bool is_iram_valid(void) {
-  return(REASON_WDT_RST      <= resetInfo.reason &&
-         REASON_SOFT_RESTART >= resetInfo.reason);
+  return (REASON_WDT_RST      <= resetInfo.reason &&
+          REASON_SOFT_RESTART >= resetInfo.reason);
 }
 
 

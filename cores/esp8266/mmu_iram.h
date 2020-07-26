@@ -121,7 +121,7 @@ bool mmu_is_iram(const void *addr) {
 #endif
   #define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
 
-  return (IRAM_START <= (uint32_t)addr && IRAM_END > (uint32_t)addr);
+  return (IRAM_START <= (uintptr_t)addr && IRAM_END > (uintptr_t)addr);
 }
 
 static inline __attribute__((always_inline))
@@ -129,7 +129,7 @@ bool mmu_is_dram(const void *addr) {
   #define DRAM_START 0x3FF80000UL
   #define DRAM_END 0x40000000UL
 
-  return (DRAM_START <= (uint32_t)addr && DRAM_END > (uint32_t)addr);
+  return (DRAM_START <= (uintptr_t)addr && DRAM_END > (uintptr_t)addr);
 }
 
 static inline __attribute__((always_inline))
@@ -137,7 +137,7 @@ bool mmu_is_icache(const void *addr) {
   #define ICACHE_START 0x40200000UL
   #define ICACHE_END (ICACHE_START + 0x100000UL)
 
-  return (ICACHE_START <= (uint32_t)addr && ICACHE_END > (uint32_t)addr);
+  return (ICACHE_START <= (uintptr_t)addr && ICACHE_END > (uintptr_t)addr);
 }
 
 #ifdef DEBUG_ESP_MMU
