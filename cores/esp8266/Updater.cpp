@@ -35,10 +35,10 @@ UpdaterClass::UpdaterClass()
 , _startAddress(0)
 , _currentAddress(0)
 , _command(U_FLASH)
+, _ledPin(-1)
 , _hash(nullptr)
 , _verify(nullptr)
 , _progress_callback(nullptr)
-, _ledPin(-1)
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
