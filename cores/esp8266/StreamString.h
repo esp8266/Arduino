@@ -25,8 +25,24 @@
 
 #include "WString.h"
 
-// StreamString has been integrated into String
+#if STRING_IS_STREAM
 
+// StreamString has been integrated into String
 using StreamString = String;
+
+#else // !STRING_IS_STREAM
+
+class StreamString: public Stream, public String {
+public:
+    size_t write(const uint8_t *buffer, size_t size) override;
+    size_t write(uint8_t data) override;
+
+    int available() override;
+    int read() override;
+    int peek() override;
+    void flush() override;
+};
+
+#endif // !STRING_IS_STREAM
 
 #endif /* STREAMSTRING_H_ */

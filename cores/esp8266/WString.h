@@ -40,10 +40,14 @@ class __FlashStringHelper;
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
-#define STRING_IS_STREAM 1 // helper to avoid overloading functions using String:: with StreamString::
+#define STRING_IS_STREAM 0 // helper to avoid overloading functions using String:: with StreamString::
 
 // The string class
-class String: public Stream {
+class String
+#if STRING_IS_STREAM
+    : public Stream
+#endif
+{
         // use a function pointer to allow for "if (s)" without the
         // complications of an operator bool(). for more information, see:
         // http://www.artima.com/cppsource/safebool.html
@@ -60,10 +64,9 @@ class String: public Stream {
         String(const char *cstr = nullptr);
         String(const String &str);
         String(const __FlashStringHelper *str);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
         String(String &&rval);
         String(StringSumHelper &&rval);
-#endif
+
         explicit String(char c);
         explicit String(unsigned char, unsigned char base = 10);
         explicit String(int, unsigned char base = 10);
@@ -99,10 +102,8 @@ class String: public Stream {
         String & operator =(const String &rhs);
         String & operator =(const char *cstr);
         String & operator = (const __FlashStringHelper *str);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
         String & operator =(String &&rval);
         String & operator =(StringSumHelper &&rval);
-#endif
 
         // concatenate (works w/ built-in types)
 
@@ -320,10 +321,9 @@ class String: public Stream {
         // copy and move
         String & copy(const char *cstr, unsigned int length);
         String & copy(const __FlashStringHelper *pstr, unsigned int length);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
         void move(String &rhs);
-#endif
 
+#if STRING_IS_STREAM
     /////////////////////////////////////////////
     // Print/Stream/peekBuffer API:
 
@@ -367,6 +367,9 @@ public:
 
     virtual bool outputTimeoutPossible () override { return false; }
     virtual int availableForWrite() override { return 64; } // or biggestChunk()/4 or max(1,reserved-length)?
+
+#endif // STRING_IS_STREAM
+
 };
 
 class StringSumHelper: public String {

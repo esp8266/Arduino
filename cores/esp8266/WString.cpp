@@ -48,7 +48,6 @@ String::String(const __FlashStringHelper *pstr) {
     *this = pstr; // see operator =
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 String::String(String &&rval) {
     init();
     move(rval);
@@ -58,7 +57,6 @@ String::String(StringSumHelper &&rval) {
     init();
     move(rval);
 }
-#endif
 
 String::String(char c) {
     init();
@@ -226,7 +224,6 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
     return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 void String::move(String &rhs) {
     if (buffer()) {
         if (capacity() >= rhs.len()) {
@@ -255,7 +252,6 @@ void String::move(String &rhs) {
     rhs.setLen(0);
     rhs.setBuffer(nullptr);
 }
-#endif
 
 String & String::operator =(const String &rhs) {
     if (this == &rhs)
@@ -269,7 +265,6 @@ String & String::operator =(const String &rhs) {
     return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 String & String::operator =(String &&rval) {
     if (this != &rval)
         move(rval);
@@ -281,7 +276,6 @@ String & String::operator =(StringSumHelper &&rval) {
         move(rval);
     return *this;
 }
-#endif
 
 String & String::operator =(const char *cstr) {
     if (cstr)
@@ -858,6 +852,8 @@ double String::toDouble(void) const
 
 const String emptyString;
 
+#if STRING_IS_STREAM
+
 /////////////////////////////////////////////
 // Stream API:
 
@@ -965,3 +961,5 @@ int String::read (char* buffer, size_t len)
     peekPointer += l;
     return l;
 }
+
+#endif // STRING_IS_STREAM
