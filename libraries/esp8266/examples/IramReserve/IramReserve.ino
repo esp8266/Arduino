@@ -2,24 +2,20 @@
    This example show one way of maintaining a boot count across reboots.
    We will store the value in IRAM after the 2nd Heap.
 
-   The remaining IRAM out the 48KB, after your code, is mostly untouched during the reboot process.
-   For a given executable that does not do deep-sleep, it is possible to pass/hold
-   information between reboot cycles.
+   Of the 48KB of IRAM, the remaining IRAM after your code is mostly untouched
+   during the reboot process. For a given executable that does not do
+   deep-sleep, it is possible to pass/hold information between reboot cycles.
 
-   The objective of this example is to show how to modify the 2nd Heap creation such that
-   a block of IRAM at the end of the 2nd Heap is left untouched and available for special use cases.
+   The objective of this example is to show how to modify the 2nd Heap creation
+   such that a block of IRAM at the end of the 2nd Heap is left untouched and
+   available for special use cases.
 
 */
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <umm_malloc/umm_malloc.h>
-//#include <umm_malloc/umm_heap_select.h>
-
-
-#if !defined(UMM_HEAP_IRAM) && !defined(MOCK)
-#error "This sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd Heap (shared)'"
-#endif
+#if defined(UMM_HEAP_IRAM)
 
 // durable - as in long life, persisting across reboots.
 struct durable {
@@ -77,6 +73,7 @@ void setup() {
   Serial.printf("Number of reboots at %u\r\n", DURABLE->bootCounter);
   Serial.printf("\r\nSome less than direct, ways to restart:\r\n");
   processKey(Serial, '?');
+
 }
 
 void loop(void) {
@@ -88,7 +85,6 @@ void loop(void) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-#ifdef UMM_HEAP_IRAM
 /*
   Create a block of unmanaged IRAM for special uses.
 
@@ -114,4 +110,15 @@ extern "C" void umm_init_iram(void) {
   }
 }
 
+#else
+void setup() {
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
+  Serial.begin(115200);
+  delay(10);
+  Serial.println("\r\n\r\nThis sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd Heap (shared)'");
+}
+
+void loop(void) {
+}
 #endif
