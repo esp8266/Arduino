@@ -40,7 +40,7 @@ class __FlashStringHelper;
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
-#define STRING_IS_STREAM 0 // helper to avoid overloading functions using String:: with StreamString::
+#define STRING_IS_STREAM 1 // helper to avoid overloading functions using String:: with StreamString::
 
 // The string class
 class String
