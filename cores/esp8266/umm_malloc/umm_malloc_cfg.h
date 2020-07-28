@@ -67,6 +67,10 @@ extern "C" {
 
 #define UMM_NUM_HEAPS (UMM_HEAP_DRAM_DEFINED + UMM_HEAP_IRAM_DEFINED + UMM_HEAP_EXTERNAL_DEFINED)
 
+#if (UMM_NUM_HEAPS == 1)
+#else
+#define UMM_HEAP_STACK_DEPTH 32
+#endif
 
 /*
  * There are a number of defines you can set at compile time that affect how

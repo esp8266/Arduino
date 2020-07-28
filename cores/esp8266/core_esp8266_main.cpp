@@ -204,7 +204,14 @@ static void loop_wrapper() {
 static void loop_task(os_event_t *events) {
     (void) events;
     s_cycles_at_yield_start = ESP.getCycleCount();
+    ESP.resetHeap();
     cont_run(g_pcont, &loop_wrapper);
+    ESP.setDramHeap();
+#if defined(DEBUG_ESP_CORE) && (UMM_NUM_HEAPS > 1)
+    if (UMM_HEAP_STACK_DEPTH <= umm_get_heap_stack_index()) {
+        panic();
+    }
+#endif
     if (cont_check(g_pcont) != 0) {
         panic();
     }
@@ -256,6 +263,7 @@ void init_done() {
     std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
     esp_schedule();
+    ESP.setDramHeap();
 }
 
 /* This is the entry point of the application.

@@ -114,7 +114,6 @@ umm_heap_context_t heap_context[UMM_NUM_HEAPS] __attribute__((section(".noinit")
 
 #else
 static size_t umm_heap_cur = UMM_HEAP_DRAM;
-#define UMM_HEAP_STACK_DEPTH 32
 static int umm_heap_stack_ptr = 0;
 static unsigned char umm_heap_stack[UMM_HEAP_STACK_DEPTH];
 #endif
@@ -179,6 +178,9 @@ umm_heap_context_t *umm_pop_heap( void ) {
   return &heap_context[0];
 }
 
+int umm_get_heap_stack_index( void ) {
+  return 0;
+}
 #else
 /* ------------------------------------------------------------------------ */
 
@@ -197,6 +199,11 @@ umm_heap_context_t *umm_pop_heap( void ) {
     return umm_set_heap_by_id(umm_heap_stack[--umm_heap_stack_ptr]);
   }
   return NULL;
+}
+
+// Intended for diagnosic use
+int umm_get_heap_stack_index( void ) {
+  return umm_heap_stack_ptr;
 }
 #endif
 /* ------------------------------------------------------------------------ */
