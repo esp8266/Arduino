@@ -207,11 +207,6 @@ static void loop_task(os_event_t *events) {
     ESP.resetHeap();
     cont_run(g_pcont, &loop_wrapper);
     ESP.setDramHeap();
-#if defined(DEBUG_ESP_CORE) && (UMM_NUM_HEAPS > 1)
-    if (UMM_HEAP_STACK_DEPTH <= umm_get_heap_stack_index()) {
-        panic();
-    }
-#endif
     if (cont_check(g_pcont) != 0) {
         panic();
     }
