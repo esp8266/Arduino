@@ -85,6 +85,7 @@ namespace arduino
 // level 0 will enable ALL interrupts,
 //
 #ifndef CORE_MOCK
+
 #define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
@@ -95,10 +96,21 @@ inline uint32_t esp_get_cycle_count() {
   return ccount;
 }
 
-#else
+inline uint32_t esp_get_program_counter() __attribute__((always_inline));
+inline uint32_t esp_get_program_counter() {
+  uint32_t pc;
+  __asm__ __volatile__("movi %0, ." : "=r" (pc) : : ); // ©earlephilhower
+  return pc;
+}
+
+#else // CORE_MOCK
+
 #define xt_rsil(level) (level)
 #define xt_wsr_ps(state) do { (void)(state); } while (0)
-#endif // ifndef CORE_MOCK
+
+inline uint32_t esp_get_program_counter() { return 0; }
+
+#endif // CORE_MOCK
 
 
 // Tools for preloading code into the flash cache
