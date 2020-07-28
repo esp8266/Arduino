@@ -75,7 +75,7 @@ public:
 ///////////////////////////////////////////////
 // static buffer (in flash or ram)
 // - black hole as output, swallow everything, availableForWrite = infinite
-// - Stream buffer out, resettable
+// - Stream buffer out as input, resettable
 
 class StreamPtr: public StreamNull
 {
@@ -266,4 +266,9 @@ class SerialStream: public SerialStreamArray<>
 };
 
 ///////////////////////////////////////////////
+
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_STREAMDEV)
+extern StreamNull devnull;
+#endif
+
 #endif // __STREAMDEV_H

@@ -58,7 +58,7 @@ class Stream: public Print {
 // parsing methods
 
         void setTimeout(unsigned long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
-        unsigned long getTimeout () { return _timeout; }
+        unsigned long getTimeout () const { return _timeout; }
 
         bool find(const char *target);   // reads data from the stream until the target string is found
         bool find(uint8_t *target) {
@@ -109,26 +109,8 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
-#if 0
-        //////////////////// extension: readNow (is ::read() with unified signature)
-        // (supposed to be internally used, and ephemeral)
-        //
-        // about ::read(buf, len): conflicting returned type:
-        // - `int` in arduino's Client::
-        // - `size_t` in esp8266 API (HardwareSerial::, FS::)
-        // - not existent in arduino's Stream::
-        // changing every read()/write() `size_t` return type to `int` will be a breaking change
-        // => adding int ::readNow(buf, len) for now (following official `int Client::read(buf, len))`
-        //
-        // int ::readNow(buf, len)
-        // read at most len bytes, returns effectively transferred bytes (can be less than 'len')
-        // with no timeout: immediate return when no more data are available
-        virtual int readNow (char* buffer, size_t len);
-        virtual int readNow (uint8_t* buffer, size_t len) final { return readNow((char*)buffer, len); }
-#else
         virtual int read (uint8_t* buffer, size_t len);
         int read (char* buffer, size_t len) { return read((uint8_t*)buffer, len); }
-#endif
 
         //////////////////// extension: direct access to input buffer
         // for providing, when possible, a pointer to available data for read
@@ -201,7 +183,6 @@ class Stream: public Print {
 
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
 
-#if 1
         // ::to*() methods:
         // - always stop before timeout when "no-more-input-possible-data" or "no-more-output-possible-data" condition is met
         // - always return number of transfered bytes
@@ -209,41 +190,35 @@ class Stream: public Print {
         // transfers already buffered / immediately available data
         // returns number of transfered bytes
         size_t toNow (Print* to) { return toFull(to, -1, -1, oneShotMs::alwaysExpired); }
+        template <typename T>
+        size_t toNow (T& to) { return toNow((Print*)&to); }
 
-        // transfers data until standard or specified timeout
+        // transfers data until timeout
         // returns number of transfered bytes
-        size_t toAll (Print* to, oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */) { return toFull(to, -1, -1, timeoutMs); }
+        size_t toAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, -1, timeoutMs); }
+        template <typename T>
+        size_t toAll (T& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toAll((Print*)&to, timeoutMs); }
 
-        // transfers data until a char is encountered (the char is also transfered) with standard timeout
+        // transfers data until a char is encountered (the char is also transfered) with timeout
         // returns number of transfered bytes
-        size_t toUntil (Print* to, int readUntilChar, oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, readUntilChar, timeoutMs); }
+        size_t toUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, readUntilChar, timeoutMs); }
+        template <typename T>
+        size_t toUntil (T& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toUntil((Print*)&to, readUntilChar, timeoutMs); }
 
-        // transfers data until requested size or standard timeout
+        // transfers data until requested size or timeout
         // returns number of transfered bytes
-        size_t toSize (Print* to, const ssize_t maxLen, oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, maxLen, -1, timeoutMs); }
+        size_t toSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, maxLen, -1, timeoutMs); }
+        template <typename T>
+        size_t toSize (T& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toSize((Print*)&to, maxLen, timeoutMs); }
 
 protected:
 
         size_t toFull (Print* to,
                        const ssize_t maxLen = -1,
-                       int readUntilChar = -1,
+                       const int readUntilChar = -1,
                        oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */);
 
 public:
-
-#else
-        size_t to (Print* to,
-                       const ssize_t maxLen = -1,
-                       int readUntilChar = -1,
-                       oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */);
-        size_t to (Print& to,
-                       const ssize_t maxLen = -1,
-                       int readUntilChar = -1,
-                       oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */)
-        {
-            return to(&to, maxLen, readUntilChar, timeoutMs);
-        }
-#endif
 
         typedef enum
         {

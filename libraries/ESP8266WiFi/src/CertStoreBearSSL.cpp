@@ -121,7 +121,7 @@ int CertStore::initCertStore(FS &fs, const char *indexFileName, const char *data
     uint8_t fileHeader[60];
     // 0..15 = filename in ASCII
     // 48...57 = length in decimal ASCII
-    uint32_t length;
+    int32_t length;
     if (data.read(fileHeader, sizeof(fileHeader)) != sizeof(fileHeader)) {
       break;
     }
@@ -197,7 +197,7 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
         free(der);
         return nullptr;
       }
-      if (data.read((uint8_t *)der, ci.length) != ci.length) {
+      if (data.read((uint8_t *)der, ci.length) != (int)ci.length) {
         free(der);
         return nullptr;
       }

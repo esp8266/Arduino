@@ -21,15 +21,15 @@
 
 
 #include <Arduino.h>
-#include <assert.h>
+#include <StreamDev.h>
 
 using esp8266::polledTimeout::oneShotFastMs;
 using esp8266::polledTimeout::periodicFastMs;
 
 size_t Stream::toFull (Print* to,
                        const ssize_t len,
-                       int readUntilChar,
-                       oneShotFastMs::timeType timeoutMs)
+                       const int readUntilChar,
+                       const oneShotFastMs::timeType timeoutMs)
 {
     setWriteError(STREAMTO_SUCCESS);
 
@@ -228,3 +228,7 @@ size_t Stream::toFull (Print* to,
     }
     return written;
 }
+
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_STREAMDEV)
+StreamNull devnull;
+#endif

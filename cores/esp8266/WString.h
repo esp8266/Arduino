@@ -356,8 +356,9 @@ public:
     virtual const char* peekBuffer () override;
     virtual void peekConsume (size_t consume) override;
     virtual bool inputTimeoutPossible () override { return false; }
-    virtual int read (char* buffer, size_t len) /*should override*/;
+    virtual int read (uint8_t* buffer, size_t len) override;
 
+    // calling peekPointerSetConsume() will consume bytes as they are stream-read
     void peekPointerSetConsume () { peekPointer = -1; }
     void peekPointerReset (int pointer = 0) { peekPointer = pointer; }
 

@@ -941,7 +941,7 @@ void String::peekConsume (size_t consume)
         peekPointer = std::min((size_t)length(), peekPointer + consume);
 }
 
-int String::read (char* buffer, size_t len)
+int String::read (uint8_t* buffer, size_t len)
 {
     if (peekPointer < 0)
     {
