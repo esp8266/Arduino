@@ -39,6 +39,16 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
+#if STRING_IS_STREAM
+
+template <typename ServerType>
+static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
+{
+    return client.toSize(data, maxLength, timeout_ms) == maxLength;
+}
+
+#else
+
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
@@ -59,6 +69,8 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
   }
   return data.length() == maxLength;
 }
+
+#endif
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
