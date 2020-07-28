@@ -1,25 +1,37 @@
 #!/bin/bash
 
-# Extract the release name from a release
 
-# Default to draft tag name
-ver=$(basename $(jq -e -r '.ref' "$GITHUB_EVENT_PATH"))
-# If not available, try the publish tag name
-if [ "$ver" == "null" ]; then
-    ver=$(jq -e -r '.release.tag_name' "$GITHUB_EVENT_PATH")
-fi
-# Fall back to the git description OTW (i.e. interactive)
-if [ "$ver" == "null" ]; then
-    ver=$(git describe --tag)
-fi
-visiblever=$ver
-plainver=$ver
+if [ ! -z "${manualversion}" ]; then
 
-# Match 0.0.* as special-case early-access builds
-if [ "${ver%.*}" = 0.0 ]; then
-    git tag -d ${ver}
-    ver=`git describe --tag HEAD`
-    plain_ver=$ver
+    # manual-made release based on $manualversion
+    ver=${manualversion}
+    plain_ver=${ver}
+    visiblever=${ver}
+    [ -z "${REMOTE_URL}" ] && REMOTE_URL=https://github.com/esp8266/Arduino/releases/download
+
+else
+
+    # Extract the release name from a release
+
+    # Default to draft tag name
+    ver=$(basename $(jq -e -r '.ref' "$GITHUB_EVENT_PATH"))
+    # If not available, try the publish tag name
+    if [ "$ver" == "null" ]; then
+        ver=$(jq -e -r '.release.tag_name' "$GITHUB_EVENT_PATH")
+    fi
+    # Fall back to the git description OTW (i.e. interactive)
+    if [ "$ver" == "null" ]; then
+        ver=$(git describe --tag)
+    fi
+    visiblever=$ver
+    plainver=$ver
+
+    # Match 0.0.* as special-case early-access builds
+    if [ "${ver%.*}" = 0.0 ]; then
+        git tag -d ${ver}
+        ver=`git describe --tag HEAD`
+        plain_ver=$ver
+    fi
 fi
 
 set -e
