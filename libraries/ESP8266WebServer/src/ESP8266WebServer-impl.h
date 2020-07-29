@@ -494,17 +494,13 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
       content_length = std::max(0, stream->streamSize());
   _prepareHeader(header, code, content_type, content_length);
 #if STRING_IS_STREAM
-  size_t sent = header.toAll(&_currentClient); // with timeout
+  size_t sent = header.toAll(&_currentClient);
 #else
-  size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient); // with timeout
+  size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient);
 #endif
-#ifdef DEBUG_ESP_HTTP_SERVER
   if (sent != header.length())
-      DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
-#else
-  (void)sent;
-#endif
-  if(content_length)
+      DBGWS("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
+  if (content_length)
     return sendContent(stream, content_length);
 }
 
