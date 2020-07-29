@@ -27,7 +27,7 @@ class WiFiClient;
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-#include <include/DataSource.h>
+#include <assert.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 

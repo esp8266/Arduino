@@ -113,9 +113,9 @@ class Stream: public Print {
         int read (char* buffer, size_t len) { return read((uint8_t*)buffer, len); }
 
         //////////////////// extension: direct access to input buffer
-        // for providing, when possible, a pointer to available data for read
+        // to provide when possible a pointer to available data for read
 
-        // informs user and ::to() on effective buffered peek API implementation
+        // informs user and ::to*() on effective buffered peek API implementation
         // by default: not available
         virtual bool peekBufferAPI () const { return false; }
 
@@ -134,48 +134,16 @@ class Stream: public Print {
 
         // by default read timeout is possible (incoming data from network,serial..)
         // children can override to false (like String::)
-        // (outputTimeoutPossible() is defined in Print::)
         virtual bool inputTimeoutPossible () { return true; }
 
-        //////////////////// extensions: Stream streams
-        // Stream::to()
+        // (outputTimeoutPossible() is defined in Print::)
+
+        //////////////////// extensions: Streaming streams to streams
+        // Stream::to*()
         //
-        // Stream::to() uses 1-copy transfers when peekBuffer API is
-        // available, or makes a regular transfer through a local temporary
-        // stack 2-copies buffer.
+        // Stream::to*() uses 1-copy transfers when peekBuffer API is
+        // available, or makes a regular transfer through a temporary buffer.
         //
-        // By default "source->to(&dest)" transfers everything until
-        // available (read or write) gets to 0, then immediately returns.
-        //
-        // "source->to(&dest, maxLen)" is like above but also returns when
-        // maxLen bytes are transferred, using the default Stream timeout.
-        //
-        // "source->to(&string, -1, '\n')" transfers source to string until
-        // and including a specific character, with the default Stream
-        // timeout.
-        //
-        // More generally ::to() will transfer as much as possible with the
-        // following constraints:
-        //      - at most maxLen bytes (-1 by default is no length
-        //        constraint)
-        //      - readUntilChar as last transferred byte (-1 by default is
-        //        no last char contraint)
-        //      - timeoutMs as maximum wait time (only if maxLen>=0 or
-        //        readUntilChar>=0, immediate otherwise)
-        //
-        // timeoutMs value is by default "oneShotMs::neverExpires" which is
-        // internally converted to this->getTimeout() but it can be set to
-        // "oneShotMs::alwaysExpired" (=0) or any value within oneShotMs
-        // allowed range.
-        //
-        // Return value:
-        //      >0: the number of transferred bytes
-        //      0:  nothing has been transferred
-        // When result is 0 or less than requested maxLen, this->getLastTo()
-        // may contain an error reason.
-        //
-        // Notes:
-        // - readUntilChar is copied and counted
         // - for efficiency, Stream classes should implement peekAPI when
         //   possible
         // - for an efficient timeout management, Print/Stream classes
@@ -184,10 +152,13 @@ class Stream: public Print {
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
 
         // ::to*() methods:
-        // - always stop before timeout when "no-more-input-possible-data" or "no-more-output-possible-data" condition is met
+        // - always stop before timeout when "no-more-input-possible-data"
+        //   or "no-more-output-possible-data" condition is met
         // - always return number of transfered bytes
+        // When result is 0 or less than requested maxLen, this->getLastTo()
+        // contains an error reason.
 
-        // transfers already buffered / immediately available data
+        // transfers already buffered / immediately available data, not timeout
         // returns number of transfered bytes
         size_t toNow (Print* to) { return toFull(to, -1, -1, oneShotMs::alwaysExpired); }
         template <typename T>
@@ -211,14 +182,8 @@ class Stream: public Print {
         template <typename T>
         size_t toSize (T& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toSize((Print*)&to, maxLen, timeoutMs); }
 
-protected:
-
-        size_t toFull (Print* to,
-                       const ssize_t maxLen = -1,
-                       const int readUntilChar = -1,
-                       oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* =>getTimeout() */);
-
-public:
+        // size of input (-1 by default = unknown)
+        virtual ssize_t streamSize () { return -1; }
 
         typedef enum
         {
@@ -232,20 +197,20 @@ public:
         toReport_e getLastTo () /*const*/ { return (toReport_e)getWriteError(); }
 
         ////////////////////
-        // size of input
-        // -1 by default is unknown
-        // may be used by http streamer (using a SerialStream as a file)
 
-        virtual ssize_t streamSize () { return -1; }
+    protected:
+        size_t toFull (Print* to,
+                       const ssize_t maxLen = -1,
+                       const int readUntilChar = -1,
+                       oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
 
         //////////////////// end of extensions
 
     protected:
-        long parseInt(char skipChar); // as above but the given skipChar is ignored
-        // as above but the given skipChar is ignored
+        long parseInt(char skipChar); // as parseInt() but the given skipChar is ignored
         // this allows format characters (typically commas) in values to be ignored
 
-        float parseFloat(char skipChar);  // as above but the given skipChar is ignored
+        float parseFloat(char skipChar);  // as parseFloat() but the given skipChar is ignored
 };
 
 #endif
