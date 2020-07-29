@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.7.1/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.7.2/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -36,7 +36,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.7.1/](https://arduino-esp8266.readthedocs.io/en/2.7.1/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.7.2/](https://arduino-esp8266.readthedocs.io/en/2.7.2/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -135,3 +135,5 @@ ESP8266 core files are licensed under LGPL.
 [SoftwareSerial repo](https://github.com/plerup/espsoftwareserial)
 
 [Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).
+
+[FTP Client/Server Library](https://github.com/dplasa/FTPClientServer) 

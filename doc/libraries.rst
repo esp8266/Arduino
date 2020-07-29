@@ -41,7 +41,7 @@ SPI
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA). Setting the Clock polarity (CPOL) is not supported, yet (SPI\_MODE2 and SPI\_MODE3 not working).
 
-The usual SPI pins are: 
+The usual SPI pins are:
 
 - ``MOSI`` = GPIO13
 - ``MISO`` = GPIO12
@@ -73,7 +73,7 @@ ESP-specific APIs
 
 Some ESP-specific APIs related to deep sleep, RTC and flash memories are available in the ``ESP`` object.
 
-``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds.
+``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds. If you implement deep sleep with ``WAKE_RF_DISABLED`` and require WiFi functionality on wake up, you will need to implement an additional ``WAKE_RF_DEFAULT`` before WiFi functionality is available.
 
 ``ESP.deepSleepInstant(microseconds, mode)`` works similarly to ``ESP.deepSleep`` but  sleeps instantly without waiting for WiFi to shutdown.
 
@@ -87,7 +87,7 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getHeapFragmentation()`` returns the fragmentation metric (0% is clean, more than ~50% is not harmless)
 
-``ESP.getMaxFreeBlockSize()`` returns the maximum allocatable ram block regarding heap fragmentation
+``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()``able block will be smaller due to memory manager overheads.
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 
