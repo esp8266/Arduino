@@ -127,7 +127,7 @@ public:
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
-  void send(int code, const char* content_type = NULL, const String& content = String(""));
+  void send(int code, const char* content_type = NULL, const String& content = emptyString);
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
   void send(int code, const char *content_type, const char *content) {
@@ -142,15 +142,20 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
+  void send(int code, const char* content_type, Stream* stream, size_t content_length = 0);
+  void send(int code, const char* content_type, Stream& stream, size_t content_length = 0);
+
   void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
-  void sendContent(Stream& content);
-  void sendContent(Stream* content);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
+
+  void sendContent(Stream* content, ssize_t content_length = 0);
+  template <typename T>
+  void sendContent(T& content, ssize_t content_length = 0) { sendContent(&content, content_length); }
 
   bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
     if (_currentVersion == 0)

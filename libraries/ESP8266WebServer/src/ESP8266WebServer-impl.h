@@ -451,6 +451,95 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     _responseHeaders = "";
 }
 
+#if 1 //////////////////////////////////////////////////////////////////////////////////////////////////
+// new stream::to
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send(int code, char* content_type, const String& content) {
+  return send(code, (const char*)content_type, content);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, const String& content) {
+  return send(code, content_type, content.c_str(), content.length());
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_type, const String& content) {
+  return send(code, (const char*)content_type.c_str(), content);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
+  StreamPtr ref(content.c_str(), content.length());
+  sendContent(&ref);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, Stream* stream, size_t content_length /*= 0*/) {
+  String header;
+  if (content_length == 0)
+      content_length = std::max(0, stream->streamSize());
+  _prepareHeader(header, code, content_type, content_length);
+#if STRING_IS_STREAM
+  size_t sent = header.toAll(&_currentClient); // with timeout
+#else
+  size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient); // with timeout
+#endif
+#ifdef DEBUG_ESP_HTTP_SERVER
+  if (sent != content_length)
+      DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, content_length);
+#else
+  (void)sent;
+#endif
+  if(content_length)
+    return sendContent(stream, content_length);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, PGM_P content) {
+  StreamPtr ref(content, strlen_P(content));
+  return send(code, String(content_type).c_str(), &ref);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
+  StreamPtr ref(content, contentLength);
+  return send(code, String(content_type).c_str(), &ref);
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content, ssize_t content_length /* = 0*/) {
+  if (_currentMethod == HTTP_HEAD)
+    return;
+  if (content_length == 0)
+      content_length = std::max(0, content->streamSize());
+  if(_chunked) {
+    _currentClient.printf("%zx\r\n", content_length);
+  }
+  size_t sent = content->toSize(&_currentClient, content_length);
+  (void)sent; //XXXFIXME if (sent != content_length) print-error-on-console-and-return-false
+  if(_chunked) {
+    _currentClient.printf_P(PSTR("\r\n"));
+    if (content_length == 0) {
+      _chunked = false;
+    }
+  }
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content) {
+  sendContent_P(content, strlen_P(content));
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t size) {
+  StreamPtr ptr(content, size);
+  return sendContent(&ptr, size);
+}
+
+#else //////////////////////////////////////////////////////////////////////////////////////////////////
+
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, const String& content) {
     String header;
@@ -534,39 +623,11 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
   }
 }
 
-#if 1
-
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
   StreamPtr ref(content.c_str(), content.length());
   return sendContent(&ref);
 }
-
-//template <typename ServerType>
-//void ESP8266WebServerTemplate<ServerType>::sendContent(String& content) {
-//  return sendContent(&content);
-//}
-
-#else
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
-  if (_currentMethod == HTTP_HEAD) return;
-  const char * footer = "\r\n";
-  size_t len = content.length();
-  if(_chunked) {
-    char chunkSize[11];
-    sprintf(chunkSize, "%zx\r\n", len);
-    _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
-  }
-  _currentClient.write((const uint8_t *)content.c_str(), len);
-  if(_chunked){
-    _currentClient.write((const uint8_t *)footer, 2);
-    if (len == 0) {
-      _chunked = false;
-    }
-  }
-}
-#endif
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content) {
@@ -589,6 +650,8 @@ void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t s
     }
   }
 }
+
+#endif //////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename ServerType>
 String ESP8266WebServerTemplate<ServerType>::credentialHash(const String& username, const String& realm, const String& password)
@@ -752,7 +815,7 @@ void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
   }
   if (!handled) {
     using namespace mime;
-    send(404, String(FPSTR(mimeTable[html].mimeType)), String(F("Not found: ")) + _currentUri);
+    send(404, FPSTR(mimeTable[html].mimeType), String(F("Not found: ")) + _currentUri);
     handled = true;
   }
   if (handled) {
