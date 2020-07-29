@@ -487,8 +487,8 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
   size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient); // with timeout
 #endif
 #ifdef DEBUG_ESP_HTTP_SERVER
-  if (sent != content_length)
-      DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, content_length);
+  if (sent != header.length())
+      DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
 #else
   (void)sent;
 #endif
