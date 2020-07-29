@@ -26,10 +26,23 @@
 
 #include <functional>
 #include <memory>
+#include <functional>
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include "detail/mimetable.h"
 #include "Uri.h"
+
+//#define DEBUG_ESP_HTTP_SERVER
+
+#ifdef DEBUG_ESP_HTTP_SERVER
+#ifdef DEBUG_ESP_PORT
+#define DBGWS(f,...) do { DEBUG_ESP_PORT.printf(PSTR(f), ##__VA_ARGS__); } while (0)
+#else
+#define DBGWS(f,...) do { Serial.printf(PSTR(f), ##__VA_ARGS__); } while (0)
+#endif
+#else
+#define DBGWS(x...) do { (void)0; } while (0)
+#endif
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
@@ -80,6 +93,9 @@ public:
   using ClientType = typename ServerType::ClientType;
   using RequestHandlerType = RequestHandler<ServerType>;
   using WebServerType = ESP8266WebServerTemplate<ServerType>;
+  enum ClientFuture { CLIENT_REQUEST_CAN_CONTINUE, CLIENT_REQUEST_IS_HANDLED, CLIENT_MUST_STOP, CLIENT_IS_GIVEN };
+  typedef String (*ContentTypeFunction) (const String&);
+  using HookFunction = std::function<ClientFuture(const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType)>;
 
   void begin();
   void begin(uint16_t port);
@@ -231,11 +247,25 @@ public:
 
   static String responseCodeToString(const int code);
 
+  void addHook (HookFunction hook) {
+    if (_hook) {
+      auto previousHook = _hook;
+      _hook = [previousHook, hook](const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType) {
+          auto whatNow = previousHook(method, url, client, contentType);
+          if (whatNow == CLIENT_REQUEST_CAN_CONTINUE)
+            return hook(method, url, client, contentType);
+          return whatNow;
+        };
+    } else {
+      _hook = hook;
+    }
+  }
+
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
   void _finalizeResponse();
-  bool _parseRequest(ClientType& client);
+  ClientFuture _parseRequest(ClientType& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
   bool _parseForm(ClientType& client, const String& boundary, uint32_t len);
@@ -292,8 +322,7 @@ protected:
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
 
-  
-
+  HookFunction     _hook;
 };
 
 
