@@ -463,9 +463,6 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     _responseHeaders = "";
 }
 
-#if 1 //////////////////////////////////////////////////////////////////////////////////////////////////
-// new stream::to
-
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send(int code, char* content_type, const String& content) {
   return send(code, (const char*)content_type, content);
@@ -545,121 +542,6 @@ void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t s
   StreamPtr ptr(content, size);
   return sendContent(&ptr, size);
 }
-
-#else //////////////////////////////////////////////////////////////////////////////////////////////////
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, const String& content) {
-    String header;
-    // Can we asume the following?
-    //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
-    //  _contentLength = CONTENT_LENGTH_UNKNOWN;
-    _prepareHeader(header, code, content_type, content.length());
-    size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient); // transfer all of it, with timeout
-    (void)sent;
-#ifdef DEBUG_ESP_HTTP_SERVER
-    if (sent != header.length())
-        DEBUG_OUTPUT.printf("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
-#endif
-
-    if(content.length())
-      sendContent(content);
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, PGM_P content) {
-    size_t contentLength = 0;
-
-    if (content != NULL) {
-        contentLength = strlen_P(content);
-    }
-
-    String header;
-    char type[64];
-    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
-    _prepareHeader(header, code, (const char* )type, contentLength);
-    _currentClient.write((const uint8_t *)header.c_str(), header.length());
-    if (contentLength) {
-        sendContent_P(content);
-    }
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
-    String header;
-    char type[64];
-    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
-    _prepareHeader(header, code, (const char* )type, contentLength);
-    _currentClient.write((const uint8_t *)header.c_str(), header.length());
-    if (contentLength) {
-      sendContent_P(content, contentLength);
-    }
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::send(int code, char* content_type, const String& content) {
-  send(code, (const char*)content_type, content);
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_type, const String& content) {
-  send(code, (const char*)content_type.c_str(), content);
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendContent(Stream& content) {
-    sendContent(&content);
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content) {
-  if (_currentMethod == HTTP_HEAD) return;
-  const char * footer = "\r\n";
-  size_t len = content->streamSize();
-  if(_chunked) {
-    char chunkSize[11];
-    sprintf(chunkSize, "%zx\r\n", len);
-    _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
-  }
-  size_t sent = content->toAll(&_currentClient);
-  (void)sent; /// if (sent != len) print-error-on-console-and-return-false
-  if(_chunked){
-    _currentClient.write((const uint8_t *)footer, 2);
-    if (len == 0) {
-      _chunked = false;
-    }
-  }
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
-  StreamPtr ref(content.c_str(), content.length());
-  return sendContent(&ref);
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content) {
-  sendContent_P(content, strlen_P(content));
-}
-
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t size) {
-  const char * footer = "\r\n";
-  if(_chunked) {
-    char chunkSize[11];
-    sprintf(chunkSize, "%zx\r\n", size);
-    _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
-  }
-  _currentClient.write_P(content, size);
-  if(_chunked){
-    _currentClient.write((const uint8_t *)footer, 2);
-    if (size == 0) {
-      _chunked = false;
-    }
-  }
-}
-
-#endif //////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename ServerType>
 String ESP8266WebServerTemplate<ServerType>::credentialHash(const String& username, const String& realm, const String& password)
