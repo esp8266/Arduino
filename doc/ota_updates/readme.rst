@@ -360,7 +360,7 @@ If this is the case, then most likely ESP module has not been reset after initia
 The most common causes of OTA failure are as follows:
 
 - not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA).
-- too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process-memory-view>`__.
+- too much memory declared for the filesystem so new sketch will not fit between existing sketch and the filesystem – see `Update process - memory view <#update-process-memory-view>`__.
 - too little memory declared in Arduino IDE for your selected board (i.e. less than physical size).
 - not resetting the ESP module after initial upload using serial port.
 
@@ -668,6 +668,8 @@ Updater class
 Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader (eboot) to load the new firmware on the next boot.
 
 **Note:** The bootloader command will be stored into the first 128 bytes of user RTC memory, then it will be retrieved by eboot on boot. That means that user data present there will be lost `(per discussion in #5330) <https://github.com/esp8266/Arduino/pull/5330#issuecomment-437803456>`__.
+
+**Note:** For uncompressed firmware images, the Updater will change the flash mode bits if they differ from the flash mode the device is currently running at. This ensures that the flash mode is not changed to an incompatible mode when the device is in a remote or hard to access area. Compressed images are not modified, thus changing the flash mode in this instance could result in damage to the ESP8266 and/or flash memory chip or your device no longer be accessible via OTA, and requiring re-flashing via a serial connection `(per discussion in #7307) <https://github.com/esp8266/Arduino/issues/7307#issuecomment-631523053>`__.
 
 Update process - memory view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

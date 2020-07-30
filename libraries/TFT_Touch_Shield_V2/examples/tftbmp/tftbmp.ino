@@ -42,7 +42,7 @@ File bmpFile;
 
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   pinMode(PIN_SD_CS, OUTPUT);
   digitalWrite(PIN_SD_CS, HIGH);

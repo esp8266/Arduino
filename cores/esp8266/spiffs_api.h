@@ -171,7 +171,7 @@ public:
             return false;
         }
         _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
-	return true;
+        return true;
     }
 
     bool begin() override

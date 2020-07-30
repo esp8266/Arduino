@@ -134,13 +134,11 @@ void showTime() {
   Serial.println((uint32_t)now);
 
   // timezone and demo in the future
-  Serial.printf("timezone:  %s\n", getenv("TZ"));
+  Serial.printf("timezone:  %s\n", getenv("TZ") ? : "(none)");
 
   // human readable
   Serial.print("ctime:     ");
   Serial.print(ctime(&now));
-
-#if LWIP_VERSION_MAJOR > 1
 
   // LwIP v2 is able to list more details about the currently configured SNTP servers
   for (int i = 0; i < SNTP_MAX_SERVERS; i++) {
@@ -158,7 +156,6 @@ void showTime() {
                     sntp_getreachability(i));
     }
   }
-#endif
 
   Serial.println();
 }

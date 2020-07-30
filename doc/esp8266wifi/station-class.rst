@@ -410,7 +410,7 @@ Get the DHCP hostname assigned to ESP station.
 
     WiFi.hostname()
 
-Function returns ``String`` type. Default hostname is in format ``ESP_24xMAC``\ where 24xMAC are the last 24 bits of module's MAC address.
+Function returns ``String`` type. Default hostname is in format ``ESP_24xMAC`` where 24xMAC are the last 24 bits of module's MAC address.
 
 The hostname may be changed using the following function:
 
@@ -644,13 +644,13 @@ The Smart Config connection of an ESP module an access point is done by sniffing
 
 The following three functions are provided to implement Smart Config.
 
-Start smart configuration mode by sniffing for special packets that contain SSID and password of desired Access Point. Depending on result either ``true`` or \`false is returned.
+Start smart configuration mode by sniffing for special packets that contain SSID and password of desired Access Point. Depending on result either ``true`` or ``false`` is returned.
 
 .. code:: cpp
 
     beginSmartConfig()
 
-Query Smart Config status, to decide when stop configuration. Function returns either ``true`` or ``false of``\ boolean\` type.
+Query Smart Config status, to decide when stop configuration. Function returns either ``true`` or ``false`` of ``boolean`` type.
 
 .. code:: cpp
 

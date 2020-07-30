@@ -194,9 +194,6 @@ bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
     }
 }
 
-
-
-extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
     __real_system_restart_local();
@@ -268,11 +265,12 @@ uint8_t EspClass::getBootMode(void)
     return system_get_boot_mode();
 }
 
+#ifndef F_CPU
 uint8_t EspClass::getCpuFreqMHz(void)
 {
     return system_get_cpu_freq();
 }
-
+#endif
 
 uint32_t EspClass::getFlashChipId(void)
 {
@@ -413,6 +411,8 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (64_kB);
 
         // Winbond
+        case 0x1840EF: // W25Q128
+            return (16_MB);
         case 0x1640EF: // W25Q32
             return (4_MB);
         case 0x1540EF: // W25Q16
@@ -431,6 +431,10 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (1_MB);
         case 0x1340E0: // BG25Q40
             return (512_kB);
+
+        // XMC - Wuhan Xinxin Semiconductor Manufacturing Corp
+        case 0x164020: // XM25QH32B
+            return (4_MB);
 
         default:
             return 0;
@@ -523,6 +527,63 @@ bool EspClass::eraseConfig(void) {
     }
 
     return true;
+}
+
+uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) const
+{
+  /**
+   * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
+   * 
+   * "When used correctly, every 32-bit value the system reads from the RNG_DATA_REG register of the random number generator is a true random number.
+   * These true random numbers are generated based on the noise in the Wi-Fi/BT RF system.
+   * When Wi-Fi and BT are disabled, the random number generator will give out pseudo-random numbers.
+   * 
+   * When Wi-Fi or BT is enabled, the random number generator is fed two bits of entropy every APB clock cycle (normally 80 MHz).
+   * Thus, for the maximum amount of entropy, it is advisable to read the random register at a maximum rate of 5 MHz.
+   * A data sample of 2 GB, read from the random number generator with Wi-Fi enabled and the random register read at 5 MHz,
+   * has been tested using the Dieharder Random Number Testsuite (version 3.31.1).
+   * The sample passed all tests."
+   * 
+   * Since ESP32 is the sequal to ESP8266 it is unlikely that the ESP8266 is able to generate random numbers more quickly than 5 MHz when run at a 80 MHz frequency.
+   * A maximum random number frequency of 0.5 MHz is used here to leave some margin for possibly inferior components in the ESP8266.
+   * It should be noted that the ESP8266 has no Bluetooth functionality, so turning the WiFi off is likely to cause RANDOM_REG32 to use pseudo-random numbers.
+   * 
+   * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available. 
+   * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during number generation.
+   * Thus only delayMicroseconds() is used below.
+   */ 
+
+  constexpr uint8_t cooldownMicros = 2;
+  static uint32_t lastCalledMicros = micros() - cooldownMicros;
+
+  uint32_t randomNumber = 0;
+  
+  for(size_t byteIndex = 0; byteIndex < outputSizeBytes; ++byteIndex)
+  {
+    if(byteIndex % 4 == 0)
+    {
+      // Old random number has been used up (random number could be exactly 0, so we can't check for that)
+              
+      uint32_t timeSinceLastCall = micros() - lastCalledMicros;
+      if(timeSinceLastCall < cooldownMicros)
+        delayMicroseconds(cooldownMicros - timeSinceLastCall);
+      
+      randomNumber = RANDOM_REG32;
+      lastCalledMicros = micros();
+    }
+    
+    resultArray[byteIndex] = randomNumber;
+    randomNumber >>= 8;
+  }
+
+  return resultArray;
+}
+
+uint32_t EspClass::random() const
+{
+  union { uint32_t b32; uint8_t b8[4]; } result;
+  random(result.b8, 4);
+  return result.b32;
 }
 
 uint32_t EspClass::getSketchSize() {
@@ -641,15 +702,16 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
         } else {
             bytesLeft = 0;
         }
-        rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
+        size_t bytesAligned = (bytesNow + 3) & ~3;
+        rc = spi_flash_read(pos, flash_write_puya_buf, bytesAligned);
         if (rc != SPI_FLASH_RESULT_OK) {
             return rc;
         }
-        for (size_t i = 0; i < bytesNow / 4; ++i) {
+        for (size_t i = 0; i < bytesAligned / 4; ++i) {
             flash_write_puya_buf[i] &= *ptr;
             ++ptr;
         }
-        rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
+        rc = spi_flash_write(pos, flash_write_puya_buf, bytesAligned);
         pos += bytesNow;
     }
     return rc;
