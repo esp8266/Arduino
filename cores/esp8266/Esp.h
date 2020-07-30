@@ -24,9 +24,12 @@
 #include <Arduino.h>
 #include "spi_vendors.h"
 
+#if EXPERIMENTAL_POLLEDTIMEOUT_GLOBAL
 // proposal: brings PolledTimeout at the same level as `millis()`
-//#include <PolledTimeout.h>
-//using namespace esp8266::polledTimeout;
+//           use global define EXPERIMENTAL_POLLEDTIMEOUT_GLOBAL=1 to enable
+#include <PolledTimeout.h>
+using namespace esp8266::polledTimeout;
+#endif
 
 /**
  * AVR macros for WDT managment
