@@ -697,7 +697,7 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
         } else {
             bytesLeft = 0;
         }
-        size_t bytesAligned = (bytesNow & 3) ? ((bytesNow & ~3) + 4) : bytesNow;
+        size_t bytesAligned = (bytesNow + 3) & ~3;
         rc = spi_flash_read(pos, flash_write_puya_buf, bytesAligned);
         if (rc != SPI_FLASH_RESULT_OK) {
             return rc;
