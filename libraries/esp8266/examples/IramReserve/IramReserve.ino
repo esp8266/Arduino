@@ -1,15 +1,15 @@
 /*
-   This example show one way of maintaining a boot count across reboots.
-   We will store the value in IRAM after the 2nd Heap.
+  Overview: Of the 48KB of IRAM, the remaining IRAM after your code is untouched
+  during the reboot process. For a sketch that does not use deep-sleep, it is
+  possible to pass/hold information across boot cycles in this area of IRAM.
 
-   Of the 48KB of IRAM, the remaining IRAM after your code is mostly untouched
-   during the reboot process. For a given executable that does not do
-   deep-sleep, it is possible to pass/hold information between reboot cycles.
+  With the selection of Arduino IDE Tools Option: 'MMU: 16KB cache + 48KB IRAM
+  and 2nd Heap (shared)' all of this space goes into a managed 2nd Heap.
+  Managed, in this case, refers to using malloc, free, realloc, etc. API.
 
-   The objective of this example is to show how to modify the 2nd Heap creation
-   such that a block of IRAM at the end of the 2nd Heap is left untouched and
-   available for special use cases.
-
+  The objective of this example is to show how to modify the 2nd Heap creation
+  to omit a block of IRAM at the end of the 2nd Heap. In this example, we use
+  this block to store a boot count.
 */
 
 #include <Arduino.h>

@@ -167,16 +167,11 @@ void setup() {
 
 }
 
-
-extern uint32_t mmu_non32xfer_count;
-
 void processKey(Print& out, int hotKey) {
   switch (hotKey) {
     case 't': {
         uint32_t tmp;
         out.printf_P(PSTR("Test how much time is added by exception handling"));
-        out.println();
-        out.printf_P(PSTR("mmu_non32xfer_count %u"), mmu_non32xfer_count);
         out.println();
         out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read((char *)0x40200003, &tmp), tmp);
         out.println();
@@ -185,8 +180,6 @@ void processKey(Print& out, int hotKey) {
         out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."), timed_byte_read((char *)0x40108000, &tmp), tmp);
         out.println();
         out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."), timed_byte_read((char *)((uintptr_t)&read_var + 1), &tmp), tmp);
-        out.println();
-        out.printf_P(PSTR("mmu_non32xfer_count %u"), mmu_non32xfer_count);
         out.println();
         out.printf_P(PSTR("Test how much time is used by the inline function method"));
         out.println();
@@ -197,8 +190,6 @@ void processKey(Print& out, int hotKey) {
         out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."), timed_byte_read2((char *)0x40108000, &tmp), tmp);
         out.println();
         out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."), timed_byte_read2((char *)((uintptr_t)&read_var + 1), &tmp), tmp);
-        out.println();
-        out.printf_P(PSTR("mmu_non32xfer_count %u"), mmu_non32xfer_count);
         out.println();
         out.println();
         break;
