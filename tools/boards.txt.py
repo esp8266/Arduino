@@ -1312,7 +1312,7 @@ def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
         fs_blocksize = 8192
 
     # Adjust FS_end to be a multiple of the block size
-    fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start;
+    fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start
 
     max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
@@ -1434,16 +1434,16 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     512, 'MAX_FS' ))
     f1m.update( flash_map(    1024,       0, 'NO_FS'  ))
 
-    f2m.update( flash_map(  2*1024,      64, 'OTA_FS' ))
+    f2m.update( flash_map(  2*1024,      64 ))
     f2m.update( flash_map(  2*1024,     128 ))
-    f2m.update( flash_map(  2*1024,     256 ))
+    f2m.update( flash_map(  2*1024,     256, 'OTA_FS' ))
     f2m.update( flash_map(  2*1024,     512 ))
     f2m.update( flash_map(  2*1024,    1024, 'MAX_FS' ))
     f2m.update( flash_map(  2*1024,       0, 'NO_FS'  ))
 
     f4m.update( flash_map(  4*1024,  2*1024, 'OTA_FS' ))
-    f4m.update( flash_map(  4*1024,  3*1024 ))
-    f4m.update( flash_map(  4*1024,    1024, 'MAX_FS' ))
+    f4m.update( flash_map(  4*1024,  3*1024, 'MAX_FS' ))
+    f4m.update( flash_map(  4*1024,    1024 ))
     f4m.update( flash_map(  4*1024,       0, 'NO_FS'  ))
 
     f8m.update( flash_map(  8*1024,  6*1024, 'OTA_FS' ))
@@ -1473,18 +1473,26 @@ def all_flash_map ():
         define += '#ifndef __FLASH_MAP_H\n'
         define += '#define __FLASH_MAP_H\n'
         define += '\n'
-        define += '#include <stdint.h>\n';
-        define += '#include <stddef.h>\n';
+        define += '#include <stdint.h>\n'
+        define += '#include <stddef.h>\n'
         define += '\n'
-        define += 'typedef struct\n';
-        define += '{\n';
-        define += '    uint32_t eeprom_start;\n';
-        define += '    uint32_t fs_start;\n';
-        define += '    uint32_t fs_end;\n';
-        define += '    uint16_t fs_block_size;\n';
-        define += '    uint16_t fs_page_size;\n';
-        define += '    uint16_t flash_size_kb;\n';
-        define += '} flash_map_s;\n';
+        define += 'typedef struct\n'
+        define += '{\n'
+        define += '    uint32_t eeprom_start;\n'
+        define += '    uint32_t fs_start;\n'
+        define += '    uint32_t fs_end;\n'
+        define += '    uint16_t fs_block_size;\n'
+        define += '    uint16_t fs_page_size;\n'
+        define += '    uint16_t flash_size_kb;\n'
+        define += '} flash_map_s;\n'
+        define += '\n'
+        define += '/*\n'
+        define += '  Following definitions map the above structure, one per line.\n'
+        define += '  FLASH_MAP_* is a user choice in sketch:\n'
+        define += '      `FLASHMAPCONFIG(FLASH_MAP_OTA_FS)`\n'
+        define += '  Configuration is made at boot with detected flash chip size (last argument 512..16384)\n'
+        define += '  Other values are defined from `tools/boards.txt.py`.\n'
+        define += '*/\n'
         for i in c_flash_map:
             define += '\n#define FLASH_MAP_' + i + ' \\\n    { \\\n'
             for d in c_flash_map[i]:
@@ -1522,7 +1530,7 @@ def led (name, default, ledList):
     led = collections.OrderedDict([
                 ('.menu.led.' + str(default), str(default)),
                 ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
-          ]);
+          ])
     for i in ledList: # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not i == default:
             led.update(
@@ -1632,7 +1640,7 @@ def all_boards ():
     missingboards = []
     for id in boardlist:
         if id not in boards:
-            missingboards += [ id ];
+            missingboards += [ id ]
             continue
 
         print('##############################################################')

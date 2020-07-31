@@ -17,10 +17,18 @@ typedef struct
     uint16_t flash_size_kb;
 } flash_map_s;
 
+/*
+  Following definitions map the above structure, one per line.
+  FLASH_MAP_* is a user choice in sketch:
+      `FLASHMAPCONFIG(FLASH_MAP_OTA_FS)`
+  Configuration is made at boot with detected flash chip size (last argument 512..16384)
+  Other values are defined from `tools/boards.txt.py`.
+*/
+
 #define FLASH_MAP_OTA_FS \
     { \
         { 0x402fb000, 0x402eb000, 0x402fb000, 0x1000, 0x100, 1024 }, \
-        { 0x403fb000, 0x403f0000, 0x403fb000, 0x1000, 0x100, 2048 }, \
+        { 0x403fb000, 0x403c0000, 0x403fb000, 0x1000, 0x100, 2048 }, \
         { 0x405fb000, 0x40400000, 0x405fa000, 0x2000, 0x100, 4096 }, \
         { 0x409fb000, 0x40400000, 0x409fa000, 0x2000, 0x100, 8192 }, \
         { 0x411fb000, 0x40400000, 0x411fa000, 0x2000, 0x100, 16384 }, \
@@ -31,7 +39,7 @@ typedef struct
     { \
         { 0x402fb000, 0x4027b000, 0x402fb000, 0x2000, 0x100, 1024 }, \
         { 0x403fb000, 0x40300000, 0x403fa000, 0x2000, 0x100, 2048 }, \
-        { 0x405fb000, 0x40500000, 0x405fa000, 0x2000, 0x100, 4096 }, \
+        { 0x405fb000, 0x40300000, 0x405fa000, 0x2000, 0x100, 4096 }, \
         { 0x409fb000, 0x40300000, 0x409fa000, 0x2000, 0x100, 8192 }, \
         { 0x411fb000, 0x40300000, 0x411fa000, 0x2000, 0x100, 16384 }, \
         { 0x4027b000, 0x4025b000, 0x4027b000, 0x1000, 0x100, 512 }, \

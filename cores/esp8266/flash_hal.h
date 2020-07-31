@@ -42,6 +42,8 @@ extern uint16_t FS_block;
 extern void flashinit(void);
 extern uint32_t spi_flash_get_id (void); // <user_interface.h>
 #define FLASHMAPCONFIG(conf) \
+  extern void flashinit (void); \
+  void flashinit (void) \
   { \
     static const flash_map_s flashdesc[] PROGMEM = conf; \
     uint32_t flash_chip_size_kb = 1 << (((spi_flash_get_id() >> 16) & 0xff) - 10); \
@@ -53,7 +55,9 @@ extern uint32_t spi_flash_get_id (void); // <user_interface.h>
         FS_end = (uint32_t)pgm_read_dword(&flashdesc[i].fs_end); \
         FS_block = pgm_read_word(&flashdesc[i].fs_block_size); \
         FS_page = pgm_read_word(&flashdesc[i].fs_page_size); \
+        return; \
       } \
+    panic(); /* configuration not found */ \
   }
 
 #else // !AUTOFLASHSIZE

@@ -177,3 +177,8 @@ will need to implement an additional (short) deep sleep using
 ``WAKE_RF_DEFAULT``.
 
 Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__
+
+How to resolve "undefined reference to `flashinit'" error ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please read 'filesystem' > 'flash layout' documentation entry

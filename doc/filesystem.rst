@@ -15,46 +15,50 @@ environment:
 
 ::
 
-    |--------------|-------|---------------|--|--|--|--|--|
-    ^              ^       ^               ^     ^
-    Sketch    OTA update   File system   EEPROM  WiFi config (SDK)
+    |--------------|-------|---------------------|--|--|--|--|--|
+    ^              ^       ^                     ^     ^
+    Sketch    OTA update   Onboard File system   EEPROM  WiFi config (SDK)
 
 File system size depends on the flash chip size. Depending on the board
-which is selected in IDE, you have the following options for flash size:
+which is selected in IDE, the following table shows options for flash size.
 
-+---------------------------------+--------------------------+---------------------------+
-| Board                           | Flash chip size, bytes   | File system size, bytes   |
-+=================================+==========================+===========================+
-| Generic module                  | 512k                     | 64k, 128k                 |
-+---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 1M                       | 64k, 128k, 256k, 512k     |
-+---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 2M                       | 1M                        |
-+---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| Adafruit HUZZAH                 | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 1.0               | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 2.0               | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| NodeMCU 0.9                     | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| NodeMCU 1.0                     | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| Olimex MOD-WIFI-ESP8266(-DEV)   | 2M                       | 1M                        |
-+---------------------------------+--------------------------+---------------------------+
-| SparkFun Thing                  | 512k                     | 64k                       |
-+---------------------------------+--------------------------+---------------------------+
-| SweetPea ESP-210                | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| WeMos D1 R1, R2 & mini          | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| ESPDuino                        | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| WiFiduino                       | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
+Another option called 'Mapping defined by Hardware and Sketch' is available.
+It allows a sketch, not the user, to select FS configuration at boot
+according to flash chip size.
+
+This option is also enabled with this compilation define: '-DAUTOFLASHSIZE=1'.
+
+There are three possible configurations:
+- FLASH_MAP_OTA_FS
+  largest available space for onboard FS, allowing OTA (noted 'OTA' in the table)
+- FLASH_MAP_MAX_FS
+  largest available space for onboard FS (noted 'MAX' in the table)
+- FLASH_MAP_NO_FS
+  no onboard FS
+
+Sketch can invoke a particular configuration by adding this line:
+
+.. code:: cpp
+
+    FLASHMAPCONFIG(FLASH_MAP_OTA_FS)
+    void setup () { ... }
+    void loop () { ... }
+
++-------+--------------------------+----------------------------------------------------------+
+| Board | Flash chip size (bytes)  | File system size (bytes)                                 |
++=======+==========================+==========================================================+
+| Any   | 512KBytes                | 32KB(OTA), 64KB, 128KB(MAX)                              |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 1MBytes                  | 64KB(OTA), 128KB, 144KB, 160KB, 192KB, 256KB, 512KB(MAX) |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 2MBytes                  | 64KB, 128KB, 256KB(OTA), 512KB, 1MB(MAX)                 |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 4MBytes                  | 1MB, 2MB(OTA), 3MB(MAX)                                  |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 8MBytes                  | 6MB(OTA), 7MB(MAX)                                       |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 16MBytes                 | 14MB(OTA), 15MB(MAX)                                     |
++-------+--------------------------+----------------------------------------------------------+
 
 **Note:** to use any of file system functions in the sketch, add the
 following include to the sketch:
@@ -63,6 +67,7 @@ following include to the sketch:
 
     //#include "FS.h" // SPIFFS is declared
     #include "LittleFS.h" // LittleFS is declared
+    //#include "SDFS.h" // SDFS is declared
 
 SPIFFS Deprecation Warning
 --------------------------
