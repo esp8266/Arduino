@@ -38,8 +38,7 @@ bool PPPServer::handlePackets()
 
 void PPPServer::link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx)
 {
-    (void)ctx;
-
+    bool stop = true;
     netif* nif = ppp_netif(pcb);
 
     switch (err_code)
@@ -69,6 +68,7 @@ void PPPServer::link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx)
         ets_printf("   our6_ipaddr = %s\n\r", ip6addr_ntoa(netif_ip6_addr(nif, 0)));
 #endif /* PPP_IPV6_SUPPORT */
     }
+    stop = false;
     break;
 
     case PPPERR_PARAM:             /* Invalid parameter. */
@@ -122,6 +122,11 @@ void PPPServer::link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx)
     default:
         ets_printf("ppp_link_status_cb: unknown errCode %d\n", err_code);
         break;
+    }
+
+    if (stop)
+    {
+        netif_remove(&static_cast<PPPServer*>(ctx)->_netif);
     }
 }
 
