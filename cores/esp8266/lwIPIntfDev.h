@@ -42,7 +42,7 @@ public:
     boolean config (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, const IPAddress& dns2);
 
     // default mac-address is inferred from esp8266's STA interface
-    boolean begin (const uint8_t *macAddress = nullptr, uint16_t mtu = DEFAULT_MTU);
+    boolean begin (const uint8_t *macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
 
     const netif* getNetIf   () const { return &_netif; }
 
@@ -102,7 +102,7 @@ boolean LwipIntfDev<RawDev>::config (const IPAddress& localIP, const IPAddress& 
 }
 
 template <class RawDev>
-boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
+boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, const uint16_t mtu)
 {
     if (mtu)
         _mtu = mtu;
@@ -145,11 +145,12 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
     ip_addr_copy(gw, _netif.gw);
 
     if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this, netif_init_s, ethernet_input))
-        return ERR_IF;
+        return false;
 
     _netif.flags |= NETIF_FLAG_UP;
 
     if (localIP().v4() == 0)
+    {
         switch (dhcp_start(&_netif))
         {
         case ERR_OK:
@@ -162,6 +163,7 @@ boolean LwipIntfDev<RawDev>::begin (const uint8_t* macAddress, uint16_t mtu)
             netif_remove(&_netif);
             return false;
         }
+    }
 
     _started = true;
 
