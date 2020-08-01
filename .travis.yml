@@ -1,147 +1,63 @@
+# TravisCI left in repo as a backup CI solution in case GitHub CI suffers a
+# major disruption.  Only a few, quick tests are run in order to keep the
+# TravisCI runtime equal to the GitHub CI time (to avoid bottlenecking on
+# TravisCI).
+#
+# If GitHub CI goes away, it would make sense to drop this .YML file and
+# use the complete one from release tag 2.7.2
+
+
 language: bash
 os: linux
-dist: trusty
+dist: bionic
 
 git:
   depth: 1
   submodules: false
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
-      - gcc-7
-
 before_install:
   - git submodule update --init  # no recursive update
-
-cache:
-  directories:
-    - $HOME/astyle
 
 stages:
   - build
   - deploy
 
+
+# Run only 5 jobs since TravisCI only allows 5 in parallel
 jobs:
   include:
-    # Build stage. To save time, run all kinds of builds and tests in parallel.
-
-    - name: "Platformio (1)"
+    - name: "Platform.IO"
       stage: build
       script: $TRAVIS_BUILD_DIR/tests/platformio.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Platformio (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
-      env:
-        - BUILD_PARITY=odd
-
-    - name: "Build (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build.sh
-      env:
-        - BUILD_PARITY=odd
-
-    - name: "Debug (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/debug.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Debug (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/debug.sh
-      env:
-        - BUILD_PARITY=odd
-
-    - name: "Build IPv6 (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build6.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build IPv6 (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build6.sh
-      env:
-        - BUILD_PARITY=odd
-
-    - name: "Build lwIP-v1.4 (1)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build1.sh
-      env:
-        - BUILD_PARITY=even
-    - name: "Build lwIP-v1.4 (2)"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/build1.sh
-      env:
-        - BUILD_PARITY=odd
-
-    - name: "Host tests"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
-      install: sudo apt-get install valgrind lcov
-      env: CC=gcc-7 CXX=g++-7
-
-    - name: "Docs"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
       install:
-          - sudo apt-get install python3-pip
-          - pip3 install --user -r doc/requirements.txt;
+          - sudo apt-get install python3-pip python3-setuptools
+      env:
+        # PIO is very slow, so do 1/2 as many builds as Arduino
+        - BUILD_PARITY=custom mod=20 rem=5
 
-    - name: "Style check"
+    - name: "Build 1/4"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
-      install: tests/ci/install_astyle.sh
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=custom mod=10 rem=1
 
-    - name: "Mock trivial test"
+    - name: "Build 2/4"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/buildm.sh
-      env: CC=gcc-7 CXX=g++-7
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=custom mod=10 rem=2
 
-    - name: "Boards"
+    - name: "Build 3/4"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/build_boards.sh
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=custom mod=10 rem=3
 
-    # Deploy stage.
-    # Here we build the package JSON (always) and do the deployments
-    - name: "Package / deploy"
-      stage: deploy
-      script: tests/ci/build_package.sh
-      env: BUILD_TYPE=package
-      before_deploy: git submodule update --init
-      deploy:
-      # Create Github release, upload artifacts
-      - provider: releases
-        draft: true
-        skip_cleanup: true
-        api_key:
-          secure: kYsxX/N21fwLSTLpbb0c96PnQHn1CIMqZstm02hfUhCX83FygWSh4vs3gzW28DMpjQMZ6vC4g+jtfosYU2tUhht/bynurDH4edpEyGeMyK+fzCI9pAr4JT0RbKQI84EC18ScpgP/UP0jTc1LJ+xl8UMwSiDE0mzHx7xJ4mMNQbA=
-        file_glob: true
-        tag_name: $TRAVIS_TAG
-        target_commitish: $TRAVIS_COMMIT
-        file:
-          - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
-          - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
-        on:
-          repo: esp8266/Arduino
-          tags: true
-
-      # Update the package index URL to point to the new version
-      - provider: script
-        skip_cleanup: true
-        script: bash package/deploy_package_index.sh
-        on:
-          repo: esp8266/Arduino
-          tags: true
+    - name: "Build 4/4"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=custom mod=10 rem=4
 
 notifications:
   email:

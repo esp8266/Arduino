@@ -2,6 +2,7 @@
 #define ESP_SCHEDULE_H
 
 #include <functional>
+#include <stdint.h>
 
 #define SCHEDULED_FN_MAX_COUNT 32
 
@@ -10,7 +11,7 @@
 // in user stack (called CONT stack) without the common restrictions from
 // system context.  Details are below.
 
-// The purpose of recurrent scheduled function is to independantly execute
+// The purpose of recurrent scheduled function is to independently execute
 // user code in CONT stack on a regular basis.
 // It has been introduced with ethernet service in mind, it can also be used
 // for all libraries in the need of a regular `libdaemon_handlestuff()`.
@@ -46,7 +47,7 @@ void run_scheduled_functions();
 
 // recurrent scheduled function:
 //
-// * Internal queue may not be a FIFO.
+// * Internal queue is a FIFO.
 // * Run the lambda periodically about every <repeat_us> microseconds until
 //   it returns false.
 // * Note that it may be more than <repeat_us> microseconds between calls if
@@ -58,14 +59,15 @@ void run_scheduled_functions();
 //   functions.  However a user function returning false will cancel itself.
 // * Long running operations or yield() or delay() are not allowed in the
 //   recurrent function.
-// * A recurrent function currently must not schedule another recurrent
-//   functions.
+// * If alarm is used, anytime during scheduling when it returns true,
+//   any remaining delay from repeat_us is disregarded, and fn is executed.
 
-bool schedule_recurrent_function_us (const std::function<bool(void)>& fn, uint32_t repeat_us);
+bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
+    uint32_t repeat_us, const std::function<bool(void)>& alarm = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
 
-void run_scheduled_recurrent_functions ();
+void run_scheduled_recurrent_functions();
 
 #endif // ESP_SCHEDULE_H

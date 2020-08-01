@@ -41,6 +41,7 @@ uint32_t lwip_ntohl (uint32_t netlong)   { return ntohl(netlong);   }
 uint16_t lwip_ntohs (uint16_t netshort)  { return ntohs(netshort);  }
 
 char* ets_strcpy (char* d, const char* s) { return strcpy(d, s); }
+char* ets_strncpy (char* d, const char* s, size_t n) { return strncpy(d, s, n); }
 size_t ets_strlen (const char* s) { return strlen(s); }
 
 int ets_printf (const char* fmt, ...)

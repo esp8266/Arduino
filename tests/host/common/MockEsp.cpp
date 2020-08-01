@@ -108,6 +108,11 @@ uint32_t EspClass::getFreeHeap()
 	return 30000;
 }
 
+uint16_t EspClass::getMaxFreeBlockSize()
+{
+	return 20000;
+}
+
 String EspClass::getResetReason()
 {
   return "Power on";
@@ -116,11 +121,6 @@ String EspClass::getResetReason()
 uint32_t EspClass::getFreeSketchSpace()
 {
   return 4 * 1024 * 1024;
-}
-
-uint8_t EspClass::getCpuFreqMHz()
-{
-  return 160;
 }
 
 const char *EspClass::getSdkVersion()

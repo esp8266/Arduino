@@ -26,6 +26,9 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "pgmspace.h"
+#include "debug.h"
 #include "StackThunk.h"
 #include <ets_sys.h>
 
@@ -36,7 +39,8 @@ uint32_t *stack_thunk_top = NULL;
 uint32_t *stack_thunk_save = NULL;  /* Saved A1 while in BearSSL */
 uint32_t stack_thunk_refcnt = 0;
 
-#define _stackSize (5748/4)
+/* Largest stack usage seen in the wild at  6120 */
+#define _stackSize (6200/4)
 #define _stackPaint 0xdeadbeef
 
 /* Add a reference, and allocate the stack if necessary */
@@ -45,6 +49,11 @@ void stack_thunk_add_ref()
   stack_thunk_refcnt++;
   if (stack_thunk_refcnt == 1) {
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
+    if (!stack_thunk_ptr) {
+        // This is a fatal error, stop the sketch
+        DEBUGV("Unable to allocate BearSSL stack\n");
+        abort();
+    }
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
     stack_thunk_repaint();
@@ -110,14 +119,14 @@ uint32_t stack_thunk_get_max_usage()
 /* Print the stack from the first used 16-byte chunk to the top, decodable by the exception decoder */
 void stack_thunk_dump_stack()
 {
-  uint32_t *pos = stack_thunk_top;
-  while (pos < stack_thunk_ptr) {
+  uint32_t *pos = stack_thunk_ptr;
+  while (pos < stack_thunk_top) {
     if ((pos[0] != _stackPaint) || (pos[1] != _stackPaint) || (pos[2] != _stackPaint) || (pos[3] != _stackPaint))
       break;
     pos += 4;
   }
   ets_printf(">>>stack>>>\n");
-  while (pos < stack_thunk_ptr) {
+  while (pos < stack_thunk_top) {
     ets_printf("%08x:  %08x %08x %08x %08x\n", (int32_t)pos, pos[0], pos[1], pos[2], pos[3]);
     pos += 4;
   }

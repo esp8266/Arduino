@@ -34,10 +34,10 @@ extern "C" {
 }
 #include <core_version.h>
 #include "gdb_hooks.h"
+#include "flash_quirks.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
-#define OPTIMISTIC_YIELD_TIME_US 16000
 
 extern "C" void call_user_start();
 extern void loop();
@@ -58,7 +58,14 @@ cont_t* g_pcont __attribute__((section(".noinit")));
 static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 
 /* Used to implement optimistic_yield */
-static uint32_t s_micros_at_task_start;
+static uint32_t s_cycles_at_yield_start;
+
+/* For ets_intr_lock_nest / ets_intr_unlock_nest
+ * Max nesting seen by SDK so far is 2.
+ */
+#define ETS_INTR_LOCK_NEST_MAX 7
+static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
+static byte     ets_intr_lock_stack_ptr=0;
 
 
 extern "C" {
@@ -75,34 +82,50 @@ void initVariant() __attribute__((weak));
 void initVariant() {
 }
 
-void preloop_update_frequency() __attribute__((weak));
-void preloop_update_frequency() {
+extern "C" void __preloop_update_frequency() {
 #if defined(F_CPU) && (F_CPU == 160000000L)
-    REG_SET_BIT(0x3ff00014, BIT(0));
     ets_update_cpu_frequency(160);
+    CPU2X |= 1UL;
+#elif defined(F_CPU)
+    ets_update_cpu_frequency(80);
+    CPU2X &= ~1UL;
+#elif !defined(F_CPU)
+    if (system_get_cpu_freq() == 160) {
+        CPU2X |= 1UL;
+    }
+    else {
+        CPU2X &= ~1UL;
+    }
 #endif
 }
 
+extern "C" void preloop_update_frequency() __attribute__((weak, alias("__preloop_update_frequency")));
+
+extern "C" bool can_yield() {
+  return cont_can_yield(g_pcont);
+}
 
 static inline void esp_yield_within_cont() __attribute__((always_inline));
 static void esp_yield_within_cont() {
         cont_yield(g_pcont);
+        s_cycles_at_yield_start = ESP.getCycleCount();
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void esp_yield() {
-    if (cont_can_yield(g_pcont)) {
+extern "C" void __esp_yield() {
+    if (can_yield()) {
         esp_yield_within_cont();
     }
 }
 
-extern "C" void esp_schedule() {
-    // always on CONT stack here
+extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
+
+extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
-    if (cont_can_yield(g_pcont)) {
+    if (can_yield()) {
         esp_schedule();
         esp_yield_within_cont();
     }
@@ -114,11 +137,45 @@ extern "C" void __yield() {
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
-    if (cont_can_yield(g_pcont) &&
-        (system_get_time() - s_micros_at_task_start) > interval_us)
+    const uint32_t intvl_cycles = interval_us *
+#if defined(F_CPU)
+        clockCyclesPerMicrosecond();
+#else
+        ESP.getCpuFreqMHz();
+#endif
+    if ((ESP.getCycleCount() - s_cycles_at_yield_start) > intvl_cycles &&
+        can_yield())
     {
         yield();
     }
+}
+
+// Replace ets_intr_(un)lock with nestable versions
+extern "C" void IRAM_ATTR ets_intr_lock() {
+  if (ets_intr_lock_stack_ptr < ETS_INTR_LOCK_NEST_MAX)
+     ets_intr_lock_stack[ets_intr_lock_stack_ptr++] = xt_rsil(3);
+  else
+     xt_rsil(3);
+}
+
+extern "C" void IRAM_ATTR ets_intr_unlock() {
+  if (ets_intr_lock_stack_ptr > 0)
+     xt_wsr_ps(ets_intr_lock_stack[--ets_intr_lock_stack_ptr]);
+  else
+     xt_rsil(0);
+}
+
+
+// Save / Restore the PS state across the rom ets_post call as the rom code
+// does not implement this correctly.
+extern "C" bool ets_post_rom(uint8 prio, ETSSignal sig, ETSParam par);
+
+extern "C" bool IRAM_ATTR ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
+  uint32_t saved;
+  __asm__ __volatile__ ("rsr %0,ps":"=a" (saved));
+  bool rc=ets_post_rom(prio, sig, par);
+  xt_wsr_ps(saved);
+  return rc;
 }
 
 extern "C" void __loop_end (void)
@@ -143,7 +200,7 @@ static void loop_wrapper() {
 
 static void loop_task(os_event_t *events) {
     (void) events;
-    s_micros_at_task_start = system_get_time();
+    s_cycles_at_yield_start = ESP.getCycleCount();
     cont_run(g_pcont, &loop_wrapper);
     if (cont_check(g_pcont) != 0) {
         panic();
@@ -171,7 +228,7 @@ extern void __unhandled_exception(const char *str);
 static void  __unhandled_exception_cpp()
 {
 #ifndef __EXCEPTIONS
-	abort();
+    abort();
 #else
     static bool terminating;
     if (terminating)
@@ -277,6 +334,8 @@ extern "C" void user_init(void) {
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
+
+    experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
 

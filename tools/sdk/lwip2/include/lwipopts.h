@@ -1402,7 +1402,7 @@
  * TCP_LISTEN_BACKLOG: Enable the backlog option for tcp listen pcb.
  */
 #if !defined TCP_LISTEN_BACKLOG || defined __DOXYGEN__
-#define TCP_LISTEN_BACKLOG              0
+#define TCP_LISTEN_BACKLOG              LWIP_FEATURES // 0
 #endif
 
 /**
@@ -2278,6 +2278,12 @@
  * @ingroup lwip_opts_infrastructure
  * @{
  */
+/**
+ * LWIP_CHKSUM_ALGORITHM==3: Checksum algorithm fastest for ESP8266
+ */
+#if !defined LWIP_CHKSUM_ALGORITHM || defined __DOXYGEN__
+#define LWIP_CHKSUM_ALGORITHM           3 // 2
+#endif
 /**
  * LWIP_CHECKSUM_CTRL_PER_NETIF==1: Checksum generation/check can be enabled/disabled
  * per netif.
@@ -3545,6 +3551,9 @@
 #error LWIP_FEATURES must be defined
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * TCP_RANDOM_PORT: randomize port instead of simply increasing
@@ -3561,27 +3570,34 @@
 // so we do not define it. sntp server can come from dhcp server, or by
 // user.
 //#define SNTP_SERVER_ADDRESS	"pool.ntp.org"   // default
-//#define SNTP_GET_SERVERS_FROM_DHCP	// implicitely enabled by LWIP_DHCP_GET_NTP_SRV
+//#define SNTP_GET_SERVERS_FROM_DHCP        // implicitely enabled by LWIP_DHCP_GET_NTP_SRV
 
-#define SNTP_SERVER_DNS			1        // enable SNTP support DNS names through sntp_setservername / sntp_getservername
+#define SNTP_SERVER_DNS 1                   // enable SNTP support DNS names through sntp_setservername / sntp_getservername
 
 #define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
 
+#define SNTP_SUPPRESS_DELAY_CHECK 1
+#define SNTP_UPDATE_DELAY_DEFAULT 3600000   // update delay defined by a default weak function
+#define SNTP_UPDATE_DELAY sntp_update_delay_MS_rfc_not_less_than_15000()
+uint32_t SNTP_UPDATE_DELAY;
+
 #if LWIP_FEATURES
-// lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
+// esp8266/arduino/lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
 #define SNTP_MAX_SERVERS                3
 #endif
 
-// turn off random delay before sntp request
-// when SNTP_STARTUP_DELAY is not defined,
-// LWIP_RAND is used to set a delay
+// no delay by default before sntp request
+// https://github.com/esp8266/Arduino/pull/5564
 // from sntp_opts.h:
 /** According to the RFC, this shall be a random delay
  * between 1 and 5 minutes (in milliseconds) to prevent load peaks.
  * This can be defined to a random generation function,
  * which must return the delay in milliseconds as u32_t.
  */
-#define SNTP_STARTUP_DELAY              0
+#define SNTP_STARTUP_DELAY 1                // enable startup delay
+#define SNTP_STARTUP_DELAY_FUNC_DEFAULT 0   // to 0 by default via a default weak function
+#define SNTP_STARTUP_DELAY_FUNC sntp_startup_delay_MS_rfc_not_less_than_60000()
+uint32_t SNTP_STARTUP_DELAY_FUNC;
 
 /*
    --------------------------------------------------
@@ -3601,7 +3617,7 @@ struct netif;
 #error LWIP_ERR_T definition should come from lwip1.4 from espressif
 #endif
 //#define LWIP_ERR_T s8
-LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif) __attribute__((weak));
+LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif);
 
 /*
    --------------------------------------------------
@@ -3631,6 +3647,10 @@ void tcp_kill_timewait (void);
  */
 #ifndef MEMP_NUM_TCP_PCB_TIME_WAIT
 #define MEMP_NUM_TCP_PCB_TIME_WAIT       5
+#endif
+
+#ifdef __cplusplus
+} // extern "C"
 #endif
 
 #endif // MYLWIPOPTS_H

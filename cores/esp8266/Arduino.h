@@ -43,8 +43,6 @@ extern "C" {
 #define HIGH 0x1
 #define LOW  0x0
 
-#define PWMRANGE 1023
-
 //GPIO FUNCTIONS
 #define INPUT             0x00
 #define INPUT_PULLUP      0x02
@@ -127,14 +125,8 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's abs if encountered
-#ifdef abs
-#undef abs
-#endif
-
-#define abs(x) ((x)>0?(x):-(x))
+// Use stdlib abs() and round() to avoid issues with the C++ libraries
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
@@ -182,6 +174,7 @@ int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(uint32_t freq);
+void analogWriteResolution(int res);
 void analogWriteRange(uint32_t range);
 
 unsigned long millis(void);
@@ -204,6 +197,7 @@ void setup(void);
 void loop(void);
 
 void yield(void);
+
 void optimistic_yield(uint32_t interval_us);
 
 #define _PORT_GPIO16    1
@@ -224,13 +218,6 @@ void optimistic_yield(uint32_t interval_us);
 #endif
 
 
-//for compatibility, below 4 lines to be removed in release 3.0.0
-#ifdef __cplusplus
-extern "C"
-#endif
-const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
-
-
 
 #ifdef __cplusplus
 
@@ -248,6 +235,7 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 
 using std::min;
 using std::max;
+using std::round;
 using std::isinf;
 using std::isnan;
 
@@ -275,16 +263,24 @@ long secureRandom(long);
 long secureRandom(long, long);
 long map(long, long, long, long, long);
 
-extern "C" void configTime(long timezone, int daylightOffset_sec,
-    const char* server1, const char* server2 = nullptr, const char* server3 = nullptr);
+void setTZ(const char* tz);
 
-#endif
+void configTime(int timezone, int daylightOffset_sec, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr);
+
+void configTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr);
+
+// esp32 api compatibility
+inline void configTzTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr)
+{
+    configTime(tz, server1, server2, server3);
+}
+
+#endif // __cplusplus
 
 #include "pins_arduino.h"
-
-#ifndef PUYA_SUPPORT
-#define PUYA_SUPPORT 1
-#endif
 
 #endif
 
