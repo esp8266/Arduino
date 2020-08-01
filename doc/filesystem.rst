@@ -29,9 +29,10 @@ according to flash chip size.
 This option is also enabled with this compilation define: ``-DAUTOFLASHSIZE=1``.
 
 There are three possible configurations:
--  ``FLASH_MAP_OTA_FS`` - largest available space for onboard FS, allowing OTA (noted 'OTA' in the table)
--  ``FLASH_MAP_MAX_FS`` - largest available space for onboard FS (noted 'MAX' in the table)
--  ``FLASH_MAP_NO_FS`` - no onboard FS
+
+-  ``FLASH_MAP_OTA_FS``: largest available space for onboard FS, allowing OTA (noted 'OTA' in the table)
+-  ``FLASH_MAP_MAX_FS``: largest available space for onboard FS (noted 'MAX' in the table)
+-  ``FLASH_MAP_NO_FS``: no onboard FS
 
 Sketch can invoke a particular configuration by adding this line:
 
