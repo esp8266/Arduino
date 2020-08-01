@@ -32,8 +32,9 @@ public:
     LwipIntfDev (int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1):
         RawDev(cs, spi, intr),
         _mtu(DEFAULT_MTU),
-        _default(false),
-        _intrPin(intr)
+        _intrPin(intr),
+        _started(false),
+        _default(false)
     {
         memset(&_netif, 0, sizeof(_netif));
     }
@@ -57,17 +58,7 @@ public:
 
     wl_status_t status ();
 
-//protected:
-
-    netif _netif;
-
 protected:
-
-    uint16_t _mtu;
-    bool _default;
-    int8_t _intrPin;
-    uint8_t _macAddress[6];
-    bool _started = false;
 
     err_t netif_init ();
     void  netif_status_callback ();
@@ -78,6 +69,17 @@ protected:
 
     // called on a regular basis or on interrupt
     err_t handlePackets ();
+
+    // members
+
+    netif       _netif;
+
+    uint16_t    _mtu;
+    int8_t      _intrPin;
+    uint8_t     _macAddress[6];
+    bool        _started;
+    bool        _default;
+
 };
 
 template <class RawDev>
