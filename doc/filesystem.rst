@@ -22,19 +22,16 @@ environment:
 File system size depends on the flash chip size. Depending on the board
 which is selected in IDE, the following table shows options for flash size.
 
-Another option called 'Mapping defined by Hardware and Sketch' is available.
+Another option called ``Mapping defined by Hardware and Sketch`` is available.
 It allows a sketch, not the user, to select FS configuration at boot
 according to flash chip size.
 
-This option is also enabled with this compilation define: '-DAUTOFLASHSIZE=1'.
+This option is also enabled with this compilation define: ``-DAUTOFLASHSIZE=1``.
 
 There are three possible configurations:
-- FLASH_MAP_OTA_FS
-  largest available space for onboard FS, allowing OTA (noted 'OTA' in the table)
-- FLASH_MAP_MAX_FS
-  largest available space for onboard FS (noted 'MAX' in the table)
-- FLASH_MAP_NO_FS
-  no onboard FS
+- ``FLASH_MAP_OTA_FS`` - largest available space for onboard FS, allowing OTA (noted 'OTA' in the table)
+- ``FLASH_MAP_MAX_FS`` - largest available space for onboard FS (noted 'MAX' in the table)
+- ``FLASH_MAP_NO_FS`` - no onboard FS
 
 Sketch can invoke a particular configuration by adding this line:
 
