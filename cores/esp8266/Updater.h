@@ -144,9 +144,7 @@ class UpdaterClass {
 
       // load exactly one _bufSize before flashing it
       // (the last one may be smaller)
-      size_t wantedBufSize = remaining() < _bufferSize?
-        remaining():
-        _bufferSize;
+      size_t wantedBufSize = std::min(remaining(), _bufferSize);
       size_t readThisTime = 0;
 
       while (data.available() && _bufferLen < wantedBufSize) {
