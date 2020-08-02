@@ -2,6 +2,15 @@
 
 #set -x
 
+if true; then
+
+# hand made
+ver=2.7.4
+visiblever=${ver}
+plain_ver=${ver}
+
+else
+
 ver=`git describe --tag`
 visiblever=$ver
 # match 0.0.*
@@ -28,6 +37,7 @@ else
         plain_ver=$ver
     fi
     visiblever=$ver
+fi
 fi
 
 set -e
