@@ -350,6 +350,8 @@
         // Response is e.g.: {"time":963074, "heap":47160, "analog":60, "gpioMask":16447, "gpioData":16405}
         var espData = JSON.parse(xmlHttp.responseText);
 
+        var x = espData.time;
+
         var maxSamples = parseInt(document.getElementById("maxSamplesField").value);
         
         // Add point to heap chart
@@ -385,7 +387,7 @@
                         
             if (espData.gpioMask & gpioBitMask) {
               // This GPIO must be part of the chart
-              var dataset = allDigitalDatasets[gpio];
+              dataset = allDigitalDatasets[gpio];
               // give it the next available color
               dataset.borderColor = gpioColors[position % gpioColors.length];
               // add it to the chart
@@ -410,7 +412,7 @@
           // chart must be updated, otherwise adding to previously hidden dataset fail
           digitalChart.update(); 
           
-          currentGpioMask = espData.gpioMask;
+          currentGpioMask = espData.gpioMask
         }
 
 
@@ -426,7 +428,7 @@
             // Add received value to dataset
 //            console.log(espData.gpioData + " & " + gpioBitMask + " => " + (espData.gpioData & gpioBitMask));
             data = dataset.data;
-            var point = {x: espData.time, y: (espData.gpioData & gpioBitMask)?1:0};
+            var point = {x: espData.time, y: (espData.gpioData & gpioBitMask)?1:0}
             data.push(point);
             
             // limit number of samples to maxSamples

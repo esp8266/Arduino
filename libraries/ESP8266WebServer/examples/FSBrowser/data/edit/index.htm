@@ -292,7 +292,7 @@ the sketch after each change to this file.
             if (fsInfo.isOk) {
               var percent = (1+Math.round(99*fsInfo.usedBytes/fsInfo.totalBytes)); // fake to see the "used" bar in any case
               var text = readableSize(fsInfo.totalBytes - fsInfo.usedBytes) + " free of " + readableSize(fsInfo.totalBytes);
-              status += "<meter id='fsMeter' min='0' optimum='0'low='90' high='95' max='100' value='" + percent + "' title='" + text + "'>" + text + "</meter>";
+              status += "<meter id='fsMeter' min='0' optimum='0'low='90' high='95' max='100' value='" + percent + "' title='" + text + "'>" + text + "</meter>"
               if (fsInfo.unsupportedFiles) {
                 status += " <span id='warning'>WARNING<span class='tooltip'>"
                   + "Filesystem&nbsp;contains&nbsp;unsupported&nbsp;filenames:<br/>"
@@ -358,6 +358,7 @@ the sketch after each change to this file.
 
       function createHeader(element, tree, editor){       
         var header = document.getElementById(element);
+        var xmlHttp;
         var fileSelector = document.createElement("input");
         fileSelector.type = "file";
         fileSelector.multiple = false;
@@ -421,12 +422,12 @@ the sketch after each change to this file.
           }
           if (!pathInput.value.startsWith("/")) pathInput.value = "/" + pathInput.value;
           pathInput.value = getParentFolder(pathInput.value) + "/" + filename;
-        };
+        }
 
         upload.onclick = function(e) {
           if (fileSelector.files.length === 0) return;   
           tree.httpUpload(fileSelector.files[0], pathInput.value);
-        };
+        }
 
         function mustFormat83() {
           return false; // TODO: if needed, test fsInfo.type (and fatType ?)
@@ -465,15 +466,15 @@ the sketch after each change to this file.
         
         save.onclick = function(e){
           editor.save();
-        };
+        }
         
         discard.onclick = function(e){
           editor.discard();
-        };
+        }
         
         help.onclick = function(e){
           editor.showShortcuts();
-        };
+        }
         
       }
       
@@ -730,7 +731,7 @@ the sketch after each change to this file.
             e.preventDefault();
             e.stopPropagation();
             showContextMenu(e, leaf.id, false);
-          };
+          }
           return leaf;
         }
   
@@ -891,7 +892,7 @@ the sketch after each change to this file.
         function httpList(parentPath, remainingPaths){
           setLoading(true, "Listing '" + parentPath + "'...");         
           // Fetch an updated list
-          var xmlHttp = new XMLHttpRequest();
+          xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = onListReceived(xmlHttp, parentPath, remainingPaths);
           xmlHttp.open("GET", "/list?dir="+parentPath, true);
           xmlHttp.send(null);
@@ -908,7 +909,7 @@ the sketch after each change to this file.
         this.httpUpload = function(file, path) {
           setLoading(true, "Uploading '" + path + "'...");
           if (!path.startsWith("/")) path = "/" + path;
-          var xmlHttp = new XMLHttpRequest();
+          xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = onOperationComplete(xmlHttp, path);
           var formData = new FormData();
           formData.append("data", file, path);
@@ -919,7 +920,7 @@ the sketch after each change to this file.
         this.httpCreate = function(path){
           setLoading(true, "Creating '" + path + "'...");
           if (!path.startsWith("/")) path = "/" + path;
-          var xmlHttp = new XMLHttpRequest();
+          xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = onOperationComplete(xmlHttp, path);
           var formData = new FormData();
           formData.append("path", path);
@@ -930,7 +931,7 @@ the sketch after each change to this file.
         function httpRename(srcPath, dstPath){
           setLoading(true, "Renaming '" + srcPath + "' to '" + dstPath + "'...");
           if (!dstPath.startsWith("/")) dstPath = "/" + dstPath;
-          var xmlHttp = new XMLHttpRequest();
+          xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = onOperationComplete(xmlHttp, dstPath);
           var formData = new FormData();
           formData.append("path", dstPath);
@@ -941,7 +942,7 @@ the sketch after each change to this file.
 
         function httpDelete(path) {
           setLoading(true, "Deleting '" + path + "'...");
-          var xmlHttp = new XMLHttpRequest();
+          xmlHttp = new XMLHttpRequest();
           xmlHttp.onload = onOperationComplete(xmlHttp);
           var formData = new FormData();
           formData.append("path", path);
@@ -1096,6 +1097,7 @@ the sketch after each change to this file.
       
       function onBodyLoad(){
         var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) { vars[key] = value; });        
         if (typeof ace != "undefined") {
           var editor = createEditor("editor", vars.file, vars.lang, vars.theme);
         }
