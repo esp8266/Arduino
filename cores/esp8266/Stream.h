@@ -38,6 +38,12 @@
  readBytesBetween( pre_string, terminator, buffer, length)
  */
 
+// Arduino `Client: public Stream` class defines `virtual int read(uint8_t *buf, size_t size) = 0;`
+// This function is now imported into `Stream::` for `Stream::to*()`.
+// Other classes inheriting from `Stream::` and implementing `read(uint8_t *buf, size_t size)`
+// must consequently use `int` as return type, namely Hardware/SoftwareSerial, FileSystems...
+#define STREAM_READ_RETURNS_INT 1
+
 class Stream: public Print {
     protected:
         unsigned long _timeout;      // number of milliseconds to wait for the next char before aborting timed read
