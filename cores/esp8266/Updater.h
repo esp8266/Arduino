@@ -149,6 +149,8 @@ class UpdaterClass {
 
       while (data.available() && _bufferLen < wantedBufSize) {
         size_t got = data.read(_buffer + _bufferLen, wantedBufSize - _bufferLen);
+        if (!got)
+          break;
         _bufferLen += got;
         readThisTime += got;
       }
