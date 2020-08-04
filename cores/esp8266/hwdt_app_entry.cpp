@@ -36,13 +36,15 @@
  * `app_entry_redefinable()`, and also to the stack pointer passed to the SDK,
  * we can preserve the stack during an HWDT event.
  *
- * To use, just place this file in the sketch directory before opening the
- * project and build and upload your sketch. That should be enough to get it
- * included in your sketch. If that does not work, then add a call to:
- *    `void enable_debug_hwdt_at_link_time (void);`
- * in `setup()`. This tool prints to the serial port at the default serial port
- * speed set by the Boot ROM. On a Hardware WDT reset that port speed is
- * 115200 bps. If your needs differ, see the DEBUG_ESP_HWDT_UART_SPEED option below.
+ * To use this tool, select HWDT or HWDT_NO4KEXTRA from the Arduino IDE menu
+ * "Tools->Debug Level" before building your sketch. Note, 'Tools->Debug port'
+ * selection is not needed or referenced for printing the HWDT stack dump.
+ * To enable in other build environments, add DEBUG_ESP_HWDT_NO4KEXTRA or
+ * DEBUG_ESP_HWDT global defines to your build.
+ *
+ * This tool prints to the serial port at the default serial port speed set by
+ * the Boot ROM. On a Hardware WDT reset that port speed is 115200 bps. If your
+ * needs differ, see the DEBUG_ESP_HWDT_UART_SPEED option below.
  *
  * More on crystal differences and data rates:
  *     When the ESP8266 restarts because of a Hardware WDT reset, the port speed
