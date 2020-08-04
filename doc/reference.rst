@@ -113,7 +113,7 @@ or ``bits`` may be from 4...16.
 3.0, but this lead to incompatibility with external libraries which
 depended on the Arduino core default of 256.  Existing applications which
 rely on the prior 1023 value may add a call to ``analogWriteRange(1023)``
-to their ``setup()`` routine to retrurn to their old behavior.  Applications
+to their ``setup()`` routine to return to their old behavior.  Applications
 which already were calling ``analogWriteRange`` need no change.
 
 PWM frequency is 1kHz by default. Call
