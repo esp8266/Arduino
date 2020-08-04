@@ -2,11 +2,6 @@
 
 from github import Github
 import argparse
-import collections
-import glob
-import json
-import mimetypes
-import os
 
 parser = argparse.ArgumentParser(description='Upload a set of files to a new draft release')
 parser.add_argument('--user', help="Github username", type=str, required=True)

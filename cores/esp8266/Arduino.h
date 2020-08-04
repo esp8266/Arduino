@@ -43,8 +43,6 @@ extern "C" {
 #define HIGH 0x1
 #define LOW  0x0
 
-#define PWMRANGE 1023
-
 //GPIO FUNCTIONS
 #define INPUT             0x00
 #define INPUT_PULLUP      0x02
@@ -176,6 +174,7 @@ int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(uint32_t freq);
+void analogWriteResolution(int res);
 void analogWriteRange(uint32_t range);
 
 unsigned long millis(void);
