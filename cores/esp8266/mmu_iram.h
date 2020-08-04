@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <c_types.h>
 #include <assert.h>
+#include <esp8266_undocumented.h>
 
 /*
  * DEV_DEBUG_MMU_IRAM:
