@@ -42,6 +42,7 @@
 #define MOCK_PORT_SHIFTER 9000
 
 bool user_exit = false;
+bool run_once = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
 size_t littlefs_kb = 1024;
@@ -137,6 +138,7 @@ void help (const char* argv0, int exitcode)
         "\tgeneral:\n"
 		"\t-c             - ignore CTRL-C (send it via Serial)\n"
 		"\t-f             - no throttle (possibly 100%%CPU)\n"
+		"\t-1             - run loop once then exit (for host testing)\n"
 		"\t-v             - verbose\n"
 		, argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
 	exit(exitcode);
@@ -152,10 +154,11 @@ static struct option options[] =
 	{ "verbose",        no_argument,        NULL, 'v' },
 	{ "timestamp",      no_argument,        NULL, 'T' },
 	{ "interface",      required_argument,  NULL, 'i' },
-    { "fspath",         required_argument,  NULL, 'P' },
+	{ "fspath",         required_argument,  NULL, 'P' },
 	{ "spiffskb",       required_argument,  NULL, 'S' },
 	{ "littlefskb",     required_argument,  NULL, 'L' },
 	{ "portshifter",    required_argument,  NULL, 's' },
+	{ "once",           no_argument,        NULL, '1' },
 };
 
 void cleanup ()
@@ -209,7 +212,7 @@ int main (int argc, char* const argv [])
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -249,6 +252,9 @@ int main (int argc, char* const argv [])
 			break;
 		case 'T':
 			serial_timestamp = true;
+			break;
+		case '1':
+			run_once = true;
 			break;
 		default:
 			help(argv[0], EXIT_FAILURE);
@@ -301,6 +307,9 @@ int main (int argc, char* const argv [])
 			usleep(1000); // not 100% cpu, ~1000 loops per second
 		loop();
 		check_incoming_udp();
+
+		if (run_once)
+			user_exit = true;
 	}
 	cleanup();
 
