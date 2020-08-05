@@ -174,7 +174,9 @@ HardwareSerial Serial(UART0);
 // Executed at end of loop() processing when > 0 bytes available in the Serial port
 void serialEventRun(void)
 {
-  if (serialEvent && Serial.available()) serialEvent();
+  if (serialEvent && Serial.available()) {
+    serialEvent();
+  }
 }
 #endif
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)

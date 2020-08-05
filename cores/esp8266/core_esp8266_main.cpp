@@ -195,7 +195,9 @@ static void loop_wrapper() {
     }
     loop();
     loop_end();
-    if (serialEventRun) serialEventRun();
+    if (serialEventRun) {
+        serialEventRun();
+    }
     esp_schedule();
 }
 
