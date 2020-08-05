@@ -394,8 +394,8 @@ static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and inclu
 
 #ifdef DEBUG_ESP_HWDT_NO4KEXTRA
 /* This is the default NONOS-SDK user's heap location for NO4KEXTRA */
-static cont_t g_cont __attribute__ ((aligned (16)));
 #define SYS_STACK_FIRST ROM_STACK
+extern cont_t * get_g_cont(void);
 
 #else
 #define CONT_STACK_FIRST ROM_STACK // only for computation
@@ -513,7 +513,7 @@ STATIC void IRAM_MAYBE check_g_pcont_validity(void) {
     if (g_rom_stack == ROM_STACK &&
         g_rom_stack_A16_sz == ROM_STACK_A16_SZ &&
 #ifdef DEBUG_ESP_HWDT_NO4KEXTRA
-        g_pcont == &g_cont
+        g_pcont == get_g_cont()
 #else
         g_pcont == CONT_STACK
 #endif
@@ -808,6 +808,9 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
  */
 STATIC void IRAM_MAYBE handle_hwdt(void)  __attribute__((used));
 STATIC void IRAM_MAYBE handle_hwdt(void) {
+#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
+    disable_extra4k_at_link_time();
+#endif
 
     ets_memset(&hwdt_info, 0, sizeof(hwdt_info));
     check_g_pcont_validity();
@@ -963,7 +966,7 @@ extern "C" void Cache_Read_Disable(void);
 extern "C" void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 
 #ifndef USE_IRAM
-void ICACHE_RAM_ATTR handle_hwdt_icache() {
+static void ICACHE_RAM_ATTR __attribute__((noinline)) handle_hwdt_icache() {
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
   handle_hwdt();
   Cache_Read_Disable();
@@ -982,7 +985,7 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     /*
      *  Continuation context is in BSS.
      */
-    g_pcont = &g_cont;
+    g_pcont = get_g_cont();
 #else
     /*
      *  The continuation context is on the stack just after the reserved space

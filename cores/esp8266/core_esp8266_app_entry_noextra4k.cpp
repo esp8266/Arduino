@@ -27,6 +27,13 @@ extern "C" void call_user_start();
 /* this is the default NONOS-SDK user's heap location */
 static cont_t g_cont __attribute__ ((aligned (16)));
 
+#if defined(DEBUG_ESP_HWDT_NO4KEXTRA)
+extern "C" cont_t * ICACHE_RAM_ATTR get_g_cont(void)
+{
+    return &g_cont;
+}
+
+#else
 extern "C" void app_entry_redefinable(void)
 {
     g_pcont = &g_cont;
@@ -34,3 +41,4 @@ extern "C" void app_entry_redefinable(void)
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
+#endif
