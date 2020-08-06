@@ -718,7 +718,7 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
     esp_schedule(); // break delay in hostByName
 }
 
-void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg);
+void wifi_dns_found_callback_async(const char* name, const ip_addr_t* ipaddr, void* callback_arg);
 
 /**
  * Resolves the given hostname to an IP address asynchronously.
@@ -754,7 +754,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
     return 0;
 }
 
-void wifi_dns_found_callback_async(const char* name, CONST ip_addr_t* ipaddr, void* callback_arg) {
+void wifi_dns_found_callback_async(const char* name, const ip_addr_t* ipaddr, void* callback_arg) {
     (void) name;
     (void) ipaddr;
     (void) callback_arg;
