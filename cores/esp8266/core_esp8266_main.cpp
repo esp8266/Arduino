@@ -340,7 +340,7 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
-#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NO4KEXTRA)
+#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NOEXTRA4K)
     debug_hwdt_init();
 #endif
 

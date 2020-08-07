@@ -36,10 +36,14 @@
  * `app_entry_redefinable()`, and also to the stack pointer passed to the SDK,
  * we can preserve the stack during an HWDT event.
  *
- * To use this tool, select HWDT or HWDT_NO4KEXTRA from the Arduino IDE menu
+ * To use this tool, select HWDT or HWDT_NOEXTRA4K from the Arduino IDE menu
  * "Tools->Debug Level" before building your sketch. Note, 'Tools->Debug port'
  * selection is not needed or referenced for printing the HWDT stack dump.
- * To enable in other build environments, add DEBUG_ESP_HWDT_NO4KEXTRA or
+ * If the sketch is calling `disable_extra4k_at_link_time()`, then building with
+ * HWDT selected on the Arduino IDE menu "Tools->Debug Level", will have the
+ * same result as if built with HWDT_NOEXTRA4K selected.
+ *
+ * To enable in other build environments, add DEBUG_ESP_HWDT_NOEXTRA4K or
  * DEBUG_ESP_HWDT global defines to your build.
  *
  * This tool prints to the serial port at the default serial port speed set by
@@ -109,7 +113,7 @@
 
 
 /*
- * DEBUG_ESP_HWDT_NO4KEXTRA
+ * DEBUG_ESP_HWDT_NOEXTRA4K
  *
  * This option will leave more of the system stack available for the stack dump.
  * A problem we have with the "4K extra" option, is it pushes the system stack
@@ -128,7 +132,7 @@
  * extra 4K in the heap.
  *
  * This option is now managed from the Arduinoo IDE menu 'Tools->Debug Level'
- #define DEBUG_ESP_HWDT_NO4KEXTRA
+ #define DEBUG_ESP_HWDT_NOEXTRA4K
  */
 
 
@@ -244,7 +248,7 @@
 /*                     End of Configuration Options                           */
 /*____________________________________________________________________________*/
 
-#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NO4KEXTRA)
+#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NOEXTRA4K)
 
 #include <c_types.h>
 #include "cont.h"
@@ -389,41 +393,66 @@ static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and inclu
 // Map out who will live where.
 #define ROM_STACK_A16_SZ   (MK_ALIGN16_SZ(DEBUG_ESP_HWDT_ROM_STACK_SIZE))
 #define CONT_STACK_A16_SZ  (MK_ALIGN16_SZ(sizeof(cont_t)))
+/*
+ * For WPS support, cont stack comes out of the user's heap address space.
+ * The the NONOS-SDK stack address is initialized before tbe reserved ROM stack
+ * space. In this configuration there is no extra 4K in the heap.
+ * Memory map: 0x3FFE8000, ..., (CONT_STACK), ..., (SYS), (ROM_STACK), 0x4000000
+ *
+ * sys_stack_first <= ROM_STACK
+ */
 #define ROM_STACK ((uint32_t *) ((uintptr_t)ROM_STACK_FIRST - ROM_STACK_A16_SZ))
 
 
-#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
-/* This is the default NONOS-SDK user's heap location for NO4KEXTRA */
-#define SYS_STACK_FIRST ROM_STACK
-extern cont_t * get_g_cont(void);
-
-#else
 #define CONT_STACK_FIRST ROM_STACK // only for computation
+/*
+ * For extra 4K of heap space, the continuation stack (user's stack) is created
+ * in the SYS stack address space. The NONOS-SDK stack starts before the cont
+ * stack.
+ * Memory map: 0x3FFE8000, ..., (SYS), (CONT_STACK), (ROM_STACK), 0x4000000
+ *
+ * sys_stack_first <= CONT_STACK
+ */
 #define CONT_STACK ((cont_t *)((uintptr_t)CONT_STACK_FIRST - CONT_STACK_A16_SZ))
-#define SYS_STACK_FIRST CONT_STACK
-#endif
+
 
 uint32_t *g_rom_stack  __attribute__((section(".noinit")));
+uint32_t *sys_stack_first  __attribute__((section(".noinit")));
 size_t g_rom_stack_A16_sz  __attribute__((section(".noinit")));
 hwdt_info_t hwdt_info __attribute__((section(".noinit")));
 
 extern "C" {
+
+extern cont_t * get_noextra4k_g_pcont(void);
+
+cont_t * ICACHE_RAM_ATTR get_noextra4k_g_pcont(void) __attribute__((weak));
+cont_t * ICACHE_RAM_ATTR get_noextra4k_g_pcont(void) {
+    return NULL;
+}
+
+static void IRAM_MAYBE set__sys_stack_first(void) {
+  if (get_noextra4k_g_pcont()) {
+    sys_stack_first = ROM_STACK;
+  } else {
+    sys_stack_first = (uint32_t *)CONT_STACK;
+  }
+}
 
 #if USE_IRAM
 #define ETS_PRINTF ets_uart_printf
 
 #else
 /*
- This function is already in umm_malloc for some debug options.
- Define here in case they are not enabled.
-*/
+ * This function is already in umm_malloc for some debug options.
+ * Define here in case they are not enabled.
+ */
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((weak));
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
     /*
-      To use ets_strlen() and ets_strcpy() safely with PROGMEM, flash storage,
-      the PROGMEM address must be word (4 bytes) aligned. The destination
-      address for ets_memcpy must also be word-aligned.
-    */
+     * To use ets_strlen() and ets_strcpy() safely with PROGMEM, flash storage,
+     * the PROGMEM address must be word (4 bytes) aligned. The destination
+     * address for ets_memcpy must also be word-aligned.
+     */
     char ram_buf[ets_strlen(fmt) + 1] __attribute__((aligned(4)));
     ets_strcpy(ram_buf, fmt);
     va_list argPtr;
@@ -510,13 +539,10 @@ STATIC void IRAM_MAYBE check_g_pcont_validity(void) {
      * Testing of vital pointers for validity could also aid as a partial
      * indicator of power-on. Not needed for that purpose at this time.
      */
+    cont_t *noextra4k_g_pcont = get_noextra4k_g_pcont();
     if (g_rom_stack == ROM_STACK &&
         g_rom_stack_A16_sz == ROM_STACK_A16_SZ &&
-#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
-        g_pcont == get_g_cont()
-#else
-        g_pcont == CONT_STACK
-#endif
+        g_pcont == ((noextra4k_g_pcont) ? noextra4k_g_pcont : CONT_STACK)
         ) {
             hwdt_info.g_pcont_valid = true;
     } else {
@@ -808,9 +834,10 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
  */
 STATIC void IRAM_MAYBE handle_hwdt(void)  __attribute__((used));
 STATIC void IRAM_MAYBE handle_hwdt(void) {
-#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
+#ifdef DEBUG_ESP_HWDT_NOEXTRA4K
     disable_extra4k_at_link_time();
 #endif
+    set__sys_stack_first();
 
     ets_memset(&hwdt_info, 0, sizeof(hwdt_info));
     check_g_pcont_validity();
@@ -868,10 +895,14 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
         }
         hwdt_info.cont_integrity = cont_integrity;
 
-#if defined(DEBUG_ESP_HWDT_NO4KEXTRA) || defined(DEBUG_ESP_HWDT_INFO)
-        const uint32_t *ctx_cont_ptr = skip_stackguard(g_pcont->stack, g_pcont->stack_end, CONT_STACKGUARD);
-        hwdt_info.cont = (uintptr_t)g_pcont->stack_end - (uintptr_t)ctx_cont_ptr;
+        const uint32_t *ctx_cont_ptr = NULL;
+#if !defined(DEBUG_ESP_HWDT_INFO)
+        if (get_noextra4k_g_pcont())
 #endif
+        {
+            ctx_cont_ptr = skip_stackguard(g_pcont->stack, g_pcont->stack_end, CONT_STACKGUARD);
+            hwdt_info.cont = (uintptr_t)g_pcont->stack_end - (uintptr_t)ctx_cont_ptr;
+        }
 
         const uint32_t *ctx_sys_ptr = skip_stackguard(SYS_STACK, ROM_STACK, CONT_STACKGUARD);
         hwdt_info.sys = (uintptr_t)ROM_STACK - (uintptr_t)ctx_sys_ptr;
@@ -897,10 +928,11 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
             /* Print context SYS */
             print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)ROM_STACK, PRINT_STACK::SYS);
 
-#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
-            /* Print separate ctx: cont stack */
-            print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
-#endif
+            if (get_noextra4k_g_pcont()) {
+                /* Print separate ctx: cont stack */
+                print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
+            }
+
             if (hwdt_info.cont_integrity) {
                 ETS_PRINTF("\nCaution, the stack is possibly corrupt integrity checks did not pass.\n\n");
             }
@@ -981,19 +1013,20 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     handle_hwdt_icache();
 #endif
 
-#ifdef DEBUG_ESP_HWDT_NO4KEXTRA
     /*
      *  Continuation context is in BSS.
      */
-    g_pcont = get_g_cont();
-#else
-    /*
-     *  The continuation context is on the stack just after the reserved space
-     *  for the ROM/eboot stack and before the SYS stack begins.
-     *  All computations were done at top, save pointer to it now.
-     */
-    g_pcont = CONT_STACK;
-#endif
+    g_pcont = get_noextra4k_g_pcont();
+
+    if (!g_pcont) {
+        /*
+         *  The continuation context is on the stack just after the reserved
+         *  space for the ROM/eboot stack and before the SYS stack begins. All
+         *  computations were done at top, save pointer to it now.
+         */
+        g_pcont = CONT_STACK;
+    }
+
     /*
      *  Use new calculated SYS stack from top.
      *  Call the entry point of the SDK code.
@@ -1001,7 +1034,7 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     asm volatile ("mov.n a1, %0\n\t"
                   "movi a0, 0x4000044c\n\t"     /* Should never return; however, set return to Boot ROM Breakpoint */
                   "jx %1\n\t" ::
-                  "r" (SYS_STACK_FIRST), "r" (call_user_start):
+                  "r" (sys_stack_first), "r" (call_user_start):
                   "a0", "memory");
 
     __builtin_unreachable();
@@ -1053,4 +1086,4 @@ void debug_hwdt_init(void) {
 
 };
 
-#endif // end of #if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NO4KEXTRA)
+#endif // end of #if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NOEXTRA4K)

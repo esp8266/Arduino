@@ -1243,7 +1243,7 @@ def comb1 (lst, lstplusone):
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
     listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
-    listplusone = [ 'HWDT', 'HWDT_NO4KEXTRA' ]
+    listplusone = [ 'HWDT', 'HWDT_NOEXTRA4K' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
     options += comb1(listnocomb, listplusone)
