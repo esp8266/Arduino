@@ -236,4 +236,6 @@ protected:
 extern HardwareSerial Serial;
 extern HardwareSerial Serial1;
 
+extern void serialEventRun(void) __attribute__((weak));
+
 #endif
