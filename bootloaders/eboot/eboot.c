@@ -231,7 +231,10 @@ int main()
         ets_wdt_enable();
 
         ets_putc('0'+res); ets_putc('\n');
-
+#if 0
+	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
+	//beginning of the image in the empty area, see #7458. Disabling for now. 
+        //TODO: replace the below verify with hash type, crc, or similar.
         // Verify the copy
         ets_putc('c'); ets_putc('m'); ets_putc('p'); ets_putc(':');
         if (res == 0) {
@@ -241,6 +244,7 @@ int main()
             }
 
         ets_putc('0'+res); ets_putc('\n');
+#endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
