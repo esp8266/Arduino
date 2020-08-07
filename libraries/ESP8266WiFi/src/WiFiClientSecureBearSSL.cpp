@@ -109,6 +109,9 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
+  _sk = nullptr;
+  _axtls_chain = nullptr;
+  _axtls_sk = nullptr;
   stack_thunk_add_ref();
 }
 
