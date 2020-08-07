@@ -29,14 +29,14 @@ void setup(void) {
   Serial.println();
   Serial.println();
 
-// #define DEMO_NOEXTRA4K
+  // #define DEMO_NOEXTRA4K
 #ifdef DEMO_NOEXTRA4K
-    /*
-      When a call to disable_extra4k_at_link_time() is made, building with HWDT
-      selected on the Arduino IDE menu "Tools->Debug Level", will have the same
-      result as if built with HWDT_NOEXTRA4K selected.
-    */
-    disable_extra4k_at_link_time();
+  /*
+    When a call to disable_extra4k_at_link_time() is made, building with HWDT
+    selected on the Arduino IDE menu "Tools->Debug Level", will have the same
+    result as if built with HWDT_NOEXTRA4K selected.
+  */
+  disable_extra4k_at_link_time();
 #endif
 
   Serial.printf_P(PSTR("This example was built with%s an extra 4K of heap space (g_pcont == 0x%08lX)\r\n"),
