@@ -42,6 +42,10 @@
 #define DEBUG_ESP_MMU
 #endif
 
+#if defined(CORE_MOCK)
+#define ets_uart_printf(...) do {} while(false)
+#endif
+
 /*
   The more I look at _xtos_c_wrapper_handler the more convinced I am that this
   USE_ISR_SAFE_EXC_WRAPPER is required.
