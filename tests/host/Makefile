@@ -53,6 +53,7 @@ endif
 $(shell mkdir -p $(BINDIR))
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
+	debug.cpp \
 	StreamDev.cpp \
 	Stream.cpp \
 	WString.cpp \
@@ -236,7 +237,7 @@ build-info:				# show toolchain version
 
 $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $^
-	ranlib -c $@
+	ranlib $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
 	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@
@@ -249,7 +250,6 @@ ARDUINO_LIBS := \
 		IPAddress.cpp \
 		Updater.cpp \
 		base64.cpp \
-		debug.cpp \
 	) \
 	$(addprefix ../../libraries/ESP8266WiFi/src/,\
 		ESP8266WiFi.cpp \
@@ -323,7 +323,7 @@ CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	$(VERBAR) ar -rcu $@ $^
-	$(VERBAR) ranlib -c $@
+	$(VERBAR) ranlib $@
 
 %: %.ino.cpp$(E32).o bin/fullcore.a
 	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@

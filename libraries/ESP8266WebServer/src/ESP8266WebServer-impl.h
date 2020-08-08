@@ -488,7 +488,7 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, Stream* stream, size_t content_length /*= 0*/) {
   String header;
   if (content_length == 0)
-      content_length = std::max(0, stream->streamSize());
+      content_length = std::max((ssize_t)0, stream->streamSize());
   _prepareHeader(header, code, content_type, content_length);
 #if STRING_IS_STREAM
   size_t sent = header.toAll(&_currentClient);
@@ -496,7 +496,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
   size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient);
 #endif
   if (sent != header.length())
-      DBGWS("HTTPServer: error: sent %zd on %zd bytes\n", sent, header.length());
+      DBGWS("HTTPServer: error: sent %zd on %u bytes\n", sent, header.length());
   if (content_length)
     return sendContent(stream, content_length);
 }
@@ -518,7 +518,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content, ssize_t 
   if (_currentMethod == HTTP_HEAD)
     return;
   if (content_length == 0)
-      content_length = std::max(0, content->streamSize());
+      content_length = std::max((ssize_t)0, content->streamSize());
   if(_chunked) {
     _currentClient.printf("%zx\r\n", content_length);
   }
