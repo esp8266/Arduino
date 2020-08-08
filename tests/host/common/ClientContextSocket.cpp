@@ -200,7 +200,7 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 		}
 	}
 #ifdef DEBUG_ESP_WIFI
-	fprintf(stderr, MOCK "ClientContext::write: total sent %zd bytes\n", sent);
+    mockverbose(MOCK "ClientContext::write: total sent %zd bytes\n", sent);
 #endif
 	return sent;
 }
