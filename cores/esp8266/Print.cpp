@@ -263,8 +263,3 @@ size_t Print::printFloat(double number, uint8_t digits) {
     char buf[40];
     return write(dtostrf(number, 0, digits, buf));
 }
-
-int Print::availableForWrite() {
-    IAMSLOW();
-    return 1;
-}

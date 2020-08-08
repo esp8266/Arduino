@@ -107,8 +107,9 @@ class Print {
 
         virtual void flush() { /* Empty implementation for backward compatibility */ }
 
-        virtual int availableForWrite();
-        // return type: int
+        // default to zero, meaning "a single write may block"
+        // should be overriden by subclasses with buffering
+        virtual int availableForWrite() { return 0; }
 
         // by default write timeout is possible (outgoing data from network,serial..)
         // (children can override to false (like String))
