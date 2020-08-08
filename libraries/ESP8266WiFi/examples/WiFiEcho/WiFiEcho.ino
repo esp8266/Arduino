@@ -60,15 +60,17 @@ void loop() {
 
   static uint32_t tot = 0;
   static uint32_t cnt = 0;
-  if (test && cnt)
-  {
-    Serial.printf("measured-block-size=%u min-free-stack=%u", tot/cnt, ESP.getFreeContStack());
-    if (t == 2 && sizes[s])
-        Serial.printf(" (blocks: at most %d bytes)", sizes[s]);
-    if (t == 3 && sizes[s])
-        Serial.printf(" (blocks: exactly %d bytes)", sizes[s]);
-    if (t == 3 && !sizes[s])
-        Serial.printf(" (blocks: any size)");
+  if (test && cnt) {
+    Serial.printf("measured-block-size=%u min-free-stack=%u", tot / cnt, ESP.getFreeContStack());
+    if (t == 2 && sizes[s]) {
+      Serial.printf(" (blocks: at most %d bytes)", sizes[s]);
+    }
+    if (t == 3 && sizes[s]) {
+      Serial.printf(" (blocks: exactly %d bytes)", sizes[s]);
+    }
+    if (t == 3 && !sizes[s]) {
+      Serial.printf(" (blocks: any size)");
+    }
     Serial.printf("\n");
   }
 
@@ -78,8 +80,7 @@ void loop() {
     Serial.println("New client");
   }
 
-  if (Serial.available())
-  {
+  if (Serial.available()) {
     s = (s + 1) % (sizeof(sizes) / sizeof(sizes[0]));
     switch (Serial.read()) {
       case '1': if (t != 1) s = 0; t = 1; Serial.println("byte-by-byte"); break;
@@ -98,7 +99,7 @@ void loop() {
       // working char by char is not efficient
       client.write(client.read());
       cnt++;
-      tot+=1;
+      tot += 1;
     }
   }
 
@@ -120,10 +121,11 @@ void loop() {
 
   else if (t == 3) {
     // stream to print, possibly with only one copy
-    if (sizes[s])
+    if (sizes[s]) {
       tot += client.toSize(&client, sizes[s]);
-    else
+    } else {
       tot += client.toAll(&client);
+    }
     cnt++;
 
     switch (client.getLastTo()) {
