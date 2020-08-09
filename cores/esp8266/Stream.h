@@ -164,7 +164,7 @@ class Stream: public Print {
         // When result is 0 or less than requested maxLen, this->getLastTo()
         // contains an error reason.
 
-        // transfers already buffered / immediately available data, not timeout
+        // transfers already buffered / immediately available data (no timeout)
         // returns number of transfered bytes
         size_t toNow (Print* to) { return toFull(to, -1, -1, oneShotMs::alwaysExpired); }
         template <typename T>

@@ -116,8 +116,8 @@ public:
     // peekBuffer
     virtual bool peekBufferAPI () const override { return !_in_flash; }
     virtual size_t availableForPeek () override { return _peekPointer < _size? _size - _peekPointer: 0; }
-    virtual const char* peekBuffer () { return _peekPointer < _size? _buffer + _peekPointer: nullptr; }
-    virtual void peekConsume (size_t consume) { _peekPointer += consume; }
+    virtual const char* peekBuffer () override { return _peekPointer < _size? _buffer + _peekPointer: nullptr; }
+    virtual void peekConsume (size_t consume) override { _peekPointer += consume; }
 };
 
 ///////////////////////////////////////////////
