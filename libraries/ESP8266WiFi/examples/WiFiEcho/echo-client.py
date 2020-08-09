@@ -4,7 +4,7 @@ import os
 import asyncio
 
 # 512 bytes
-message = 'abcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnopabcdefghijklmnop'.encode('utf8') #bytearray(os.urandom(bufsize))
+message = bytearray(512);
 bufsize=len(message)
 print('message len=', bufsize)
 
@@ -33,14 +33,17 @@ async def tcp_echo_receiver(message, reader, loop):
 
 async def tcp_stat(loop):
     global recv
+    dur = 0
+    loopsec = 2
     while True:
         last = recv
-        await asyncio.sleep(2)
-        print('BW=', (recv - last) * 8 / 1024, 'Kibits/s')
+        await asyncio.sleep(loopsec) # drifting
+        dur += loopsec
+        print('BW=', (recv - last) * 2 * 8 / 1024 / loopsec, 'Kibits/s avg=', recv * 2 * 8 / 1024 / dur)
 
 loop = asyncio.get_event_loop()
 reader, writer = loop.run_until_complete(tcp_echo_open('echo23.local', 23, loop))
-loop.create_task(tcp_echo_receiver(message, reader,loop))
+loop.create_task(tcp_echo_receiver(message, reader, loop))
 loop.create_task(tcp_echo_sender(message, writer, loop))
 loop.create_task(tcp_stat(loop))
 loop.run_forever()
