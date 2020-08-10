@@ -668,7 +668,6 @@ bool EspClass::flashEraseSector(uint32_t sector) {
     return rc == 0;
 }
 
-namespace {
 #if PUYA_SUPPORT
 #if PUYA_BUFFER_SIZE % 256 != 0
 #error PUYA_BUFFER_SIZE is not 256 byte aligned
@@ -719,21 +718,6 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
 }
 #endif
 
-static SpiFlashOpResult spi_flash_write_unaligned(uint32_t offset, uint32_t data, size_t remainder) {
-    uint32_t tempData;
-    SpiFlashOpResult rc = spi_flash_read(offset, &tempData, 4);
-    if (rc != SPI_FLASH_RESULT_OK) {
-        return rc;
-    }
-    for (int i = 4 - remainder; i < 4; i++) {
-        ((uint8_t *)&data)[i] = 0xFF;
-    }
-    tempData &= data;
-    rc = spi_flash_write(offset, &tempData, 4);
-    return rc;
-}
-} // namespace
-
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
     size_t sizeAligned = size & ~3;
@@ -747,7 +731,23 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
         rc = spi_flash_write(offset, data, sizeAligned);
     }
     if (sizeAligned < size) {
-        rc = spi_flash_write_unaligned(offset + sizeAligned, data[sizeAligned / 4], size - sizeAligned);
+        uint32_t tempData;
+        SpiFlashOpResult rc = spi_flash_read(offset, &tempData, 4);
+        if (rc == SPI_FLASH_RESULT_OK) {
+            memcpy(&tempData, (uint8_t *)data + sizeAligned, size - sizeAligned);
+            rc = spi_flash_write(offset, &tempData, 4);
+        }
+    }
+    return rc == SPI_FLASH_RESULT_OK;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
+    size_t sizeAligned = size & ~3;
+    auto rc = spi_flash_read(offset, data, sizeAligned);
+    if (sizeAligned < size) {
+        uint32_t tempData;
+        rc = spi_flash_read(offset + sizeAligned, &tempData, 4);
+        memcpy((uint8_t *)data + sizeAligned, &tempData, size - sizeAligned);
     }
     return rc == SPI_FLASH_RESULT_OK;
 }
