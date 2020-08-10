@@ -752,17 +752,6 @@ bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
     return rc == SPI_FLASH_RESULT_OK;
 }
 
-bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
-    size_t sizeAligned = size & ~3;
-    auto rc = spi_flash_read(offset, data, sizeAligned);
-    if (sizeAligned < size) {
-        uint32_t tempData;
-        rc = spi_flash_read(offset + sizeAligned, &tempData, 4);
-        memcpy((uint8_t *)data + sizeAligned, &tempData, size - sizeAligned);
-    }
-    return rc == SPI_FLASH_RESULT_OK;
-}
-
 String EspClass::getSketchMD5()
 {
     static String result;
