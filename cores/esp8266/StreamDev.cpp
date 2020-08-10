@@ -84,7 +84,7 @@ size_t Stream::toFull (Print* to,
                     const char* last = (const char*)memchr(directbuf, readUntilChar, w);
                     if (last)
                     {
-                        w = std::min((size_t)(last - directbuf + 1), w);
+                        w = std::min((size_t)(last - directbuf), w);
                         foundChar = true;
                     }
                 }
@@ -94,8 +94,11 @@ size_t Stream::toFull (Print* to,
                     written += w;
                     if (maxLen)
                         timedOut.reset();
-                    if (foundChar)
-                        break;
+                }
+                if (foundChar)
+                {
+                    peekConsume(1);
+                    break;
                 }
             }
 
@@ -133,6 +136,8 @@ size_t Stream::toFull (Print* to,
             int c = read();
             if (c != -1)
             {
+                if (c == readUntilChar)
+                    break;
                 w = to->write(c);
                 if (w != 1)
                 {
@@ -142,8 +147,6 @@ size_t Stream::toFull (Print* to,
                 written += 1;
                 if (maxLen)
                     timedOut.reset();
-                if (c == readUntilChar)
-                    break;
             }
 
             if (!w && !maxLen && readUntilChar < 0)

@@ -176,7 +176,7 @@ class Stream: public Print {
         template <typename T>
         size_t toAll (T& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toAll((Print*)&to, timeoutMs); }
 
-        // transfers data until a char is encountered (the char is also transfered) with timeout
+        // transfers data until a char is encountered (the char is swallowed but not transfered) with timeout
         // returns number of transfered bytes
         size_t toUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, readUntilChar, timeoutMs); }
         template <typename T>
