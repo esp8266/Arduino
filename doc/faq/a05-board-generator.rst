@@ -52,8 +52,6 @@ As of today you can:
 
 * change led pin ``LED_BUILTIN`` for the two generic boards
 
-* change the default lwIP version (1.4 or 2)
-
 * create an abridged boards.txt file
 
 

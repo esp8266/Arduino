@@ -77,7 +77,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   try:
     sock.bind(server_address)
     sock.listen(1)
-  except:
+  except Exception:
     logging.error("Listen Failed")
     return 1
 
@@ -100,11 +100,11 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   logging.info('Sending invitation to: %s', remoteAddr)
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   remote_address = (remoteAddr, int(remotePort))
-  sent = sock2.sendto(message.encode(), remote_address)
+  sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
     data = sock2.recv(128).decode()
-  except:
+  except Exception:
     logging.error('No Answer')
     sock2.close()
     return 1
@@ -123,7 +123,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       sock2.settimeout(10)
       try:
         data = sock2.recv(32).decode()
-      except:
+      except Exception:
         sys.stderr.write('FAIL\n')
         logging.error('No Answer to our Authentication')
         sock2.close()
@@ -132,7 +132,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
         sys.stderr.write('FAIL\n')
         logging.error('%s', data)
         sock2.close()
-        sys.exit(1);
+        sys.exit(1)
         return 1
       sys.stderr.write('OK\n')
     else:
@@ -147,7 +147,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     connection, client_address = sock.accept()
     sock.settimeout(None)
     connection.settimeout(None)
-  except:
+  except Exception:
     logging.error('No response from device')
     sock.close()
     return 1
@@ -172,8 +172,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
         connection.sendall(chunk)
         if connection.recv(32).decode().find('O') >= 0:
           # connection will receive only digits or 'OK'
-          received_ok = True;
-      except:
+          received_ok = True
+      except Exception:
         sys.stderr.write('\n')
         logging.error('Error Uploading')
         connection.close()
@@ -188,20 +188,26 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     # the connection before receiving the 'O' of 'OK'
     try:
       connection.settimeout(60)
-      while not received_ok:
-        if connection.recv(32).decode().find('O') >= 0:
-          # connection will receive only digits or 'OK'
-          received_ok = True;
-      logging.info('Result: OK')
+      received_ok = False
+      received_error = False
+      while not (received_ok or received_error):
+        reply = connection.recv(64).decode()
+        # Look for either the "E" in ERROR or the "O" in OK response
+        # Check for "E" first, since both strings contain "O"
+        if reply.find('E') >= 0:
+          sys.stderr.write('\n')
+          logging.error('%s', reply)
+          received_error = True
+        elif reply.find('O') >= 0:
+          logging.info('Result: OK')
+          received_ok = True
       connection.close()
       f.close()
       sock.close()
-      if (data != "OK"):
-        sys.stderr.write('\n')
-        logging.error('%s', data)
-        return 1;
-      return 0
-    except:
+      if received_ok:
+        return 0
+      return 1
+    except Exception:
       logging.error('No Result!')
       connection.close()
       f.close()

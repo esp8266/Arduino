@@ -29,8 +29,8 @@
 #            resetmethod_menu_extra      menus for additional reset methods
 #            crystalfreq/flashfreq_menu: menus for crystal/flash frequency selection
 #            flashmode_menu:             menus for flashmode selection (dio/dout/qio/qout)
-#            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
-#            lwip/lwip2                  menus for available lwip versions
+#            512K/1M/2M/4M/8M/16M:       menus for flash & FS size
+#            lwip                        menus for available lwip versions
 
 from __future__ import print_function
 import os
@@ -286,7 +286,7 @@ boards = collections.OrderedDict([
             'crystalfreq_menu',
             'flashmode_dout',
             'flashfreq_40',
-            '1M',
+            '1M', '2M',
             'led',
             ],
         'desc': [ 'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.',
@@ -613,7 +613,7 @@ boards = collections.OrderedDict([
             '~~~~~~~~~~~~~~~~~~~~~~~~~~',
             '',
             '- Card: "WEMOS D1 Mini Lite"',
-            '- Flash Size: "1M (512K SPIFFS)"',
+            '- Flash Size: "1M (512K FS)"',
             '- CPU Frequency: "80 Mhz"',
           # '- Upload Speed: "230400"',
             '',
@@ -696,7 +696,7 @@ boards = collections.OrderedDict([
         'opts': collections.OrderedDict([
             ( '.build.board', 'WIFINFO' ),
             ( '.build.variant', 'wifinfo' ),
-            ( '.menu.ESPModule.ESP07192', 'ESP07 (1M/192K SPIFFS)' ),
+            ( '.menu.ESPModule.ESP07192', 'ESP07 (1M/192K FS)' ),
             ( '.menu.ESPModule.ESP07192.build.board', 'ESP8266_ESP07' ),
             ( '.menu.ESPModule.ESP07192.build.flash_size', '1M' ),
             ( '.menu.ESPModule.ESP07192.build.flash_ld', 'eagle.flash.1m192.ld' ),
@@ -704,7 +704,7 @@ boards = collections.OrderedDict([
             ( '.menu.ESPModule.ESP07192.build.spiffs_end', '0xFB000' ),
             ( '.menu.ESPModule.ESP07192.build.spiffs_blocksize', '4096' ),
             ( '.menu.ESPModule.ESP07192.upload.maximum_size', '827376' ),
-            ( '.menu.ESPModule.ESP12', 'ESP12 (4M/1M SPIFFS)' ),
+            ( '.menu.ESPModule.ESP12', 'ESP12 (4M/1M FS)' ),
             ( '.menu.ESPModule.ESP12.build.board', 'ESP8266_ESP12' ),
             ( '.menu.ESPModule.ESP12.build.flash_size', '4M' ),
             ( '.menu.ESPModule.ESP12.build.flash_ld', 'eagle.flash.4m1m.ld' ),
@@ -759,8 +759,9 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_dio',
+            'flashmode_menu',
             'flashfreq_80',
+            '2M',
             '512K',
             ],
         'desc': [ 'gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.',
@@ -771,7 +772,7 @@ boards = collections.OrderedDict([
                   '',
                   'The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.',
                   '',
-                  '- Product page: http://www.4dsystems.com.au/product/gen4-IoD',
+                  '- Product page: https://4dsystems.com.au/products/iot-display-modules',
                   ],
     }),
     ( 'oak', {
@@ -863,21 +864,41 @@ boards = collections.OrderedDict([
             'More details at https://shop.makestro.com/product/espectrocore/',
         ],
     }),
+
+	( 'eduinowifi', {
+        'name': 'Schirmilabs Eduino WiFi',
+        'opts': {
+            '.build.board': 'ESP8266_SCHIRMILABS_EDUINO_WIFI',
+            '.build.variant': 'eduinowifi',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'serial': '512',
+        'desc': [ 'Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module',
+		          '',
+				  'Product page: https://schirmilabs.de/?page_id=165',
+				  ]
+
+    }),
     ( 'sonoff', {
         'name': 'ITEAD Sonoff',
         'opts': {
-            '.build.board': 'SONOFF_SV',
+            '.build.board': 'ESP8266_SONOFF_SV',
             '.build.variant': 'itead',
             '.build.extra_flags': '-DESP8266',
             '.build.flash_size': '1M',
             '.menu.BoardModel.sonoffSV': 'ITEAD Sonoff SV',
-            '.menu.BoardModel.sonoffSV.build.board': 'SONOFF_SV',
+            '.menu.BoardModel.sonoffSV.build.board': 'ESP8266_SONOFF_SV',
             '.menu.BoardModel.sonoffTH': 'ITEAD Sonoff TH',
-            '.menu.BoardModel.sonoffTH.build.board': 'SONOFF_TH',
+            '.menu.BoardModel.sonoffTH.build.board': 'ESP8266_SONOFF_TH',
             '.menu.BoardModel.sonoffBasic': 'ITEAD Sonoff Basic',
-            '.menu.BoardModel.sonoffBasic.build.board': 'SONOFF_BASIC',
+            '.menu.BoardModel.sonoffBasic.build.board': 'ESP8266_SONOFF_BASIC',
             '.menu.BoardModel.sonoffS20': 'ITEAD Sonoff S20',
-            '.menu.BoardModel.sonoffS20.build.board': 'SONOFF_S20',
+            '.menu.BoardModel.sonoffS20.build.board': 'ESP8266_SONOFF_S20',
              },
         'macro': [
             'resetmethod_none',
@@ -886,23 +907,23 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'desc': [
-            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, '
+            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, ' +
             'and Sonoff S20',
             '',
-            'These are not development boards. The development process is '
-            'inconvenient with these devices. When flashing firmware you will '
+            'These are not development boards. The development process is ' +
+            'inconvenient with these devices. When flashing firmware you will ' +
             'need a Serial Adapter to connect it to your computer.',
             '',
-            ' | Most of these devices, during normal operation, are connected to '
-            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these '
-            'devices when connected to *wall power*. **ALWAYS** have them '
-            'disconnected from *wall power* when connecting them to your '
+            ' | Most of these devices, during normal operation, are connected to ' +
+            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these ' +
+            'devices when connected to *wall power*. **ALWAYS** have them ' +
+            'disconnected from *wall power* when connecting them to your ' +
             'computer. Your life may depend on it!',
             '',
-            'When flashing you will need to hold down the push button connected '
-            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB '
-            'Serial Adapters may supply enough power to handle flashing; '
-            'however, it many may not supply enough power to handle the '
+            'When flashing you will need to hold down the push button connected ' +
+            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB ' +
+            'Serial Adapters may supply enough power to handle flashing; ' +
+            'however, it many may not supply enough power to handle the ' +
             'activities when the device reboots.',
             '',
             'More product details at the bottom of https://www.itead.cc/wiki/Product/'
@@ -922,18 +943,19 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'desc': [
-            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module '
-            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) '
-            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. '
-            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 '
-            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. '
+            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module ' +
+            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) ' +
+            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. ' +
+            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 ' +
+            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. ',
             '',
-            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) '
-            'is a multi-chip package which contains ESP8266 and 1MB flash. ',
-            '',
+            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) ' +
+            'is a multi-chip package which contains ESP8266 and 1MB flash. '
         ],
+
     })
-    ])
+	])
+    
 
 ################################################################
 
@@ -981,6 +1003,13 @@ macros = {
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
         ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
+        ]),
+
+    'stacksmash_menu': collections.OrderedDict([
+        ( '.menu.stacksmash.disabled', 'Disabled' ),
+        ( '.menu.stacksmash.disabled.build.stacksmash_flags', '' ),
+        ( '.menu.stacksmash.enabled', 'Enabled' ),
+        ( '.menu.stacksmash.enabled.build.stacksmash_flags', '-fstack-protector' ),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -1043,7 +1072,7 @@ macros = {
     'resetmethod_nodtr_nosync': collections.OrderedDict([
         ( '.upload.resetmethod', '--before no_reset_no_sync --after soft_reset' ),
         ]),
-  
+
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -1085,7 +1114,7 @@ macros = {
 
     ####################### lwip
 
-    'lwip2': collections.OrderedDict([
+    'lwip': collections.OrderedDict([
         ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
         ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
@@ -1110,19 +1139,6 @@ macros = {
         ( '.menu.ip.hb6f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.hb6f.build.lwip_lib', '-llwip6-1460-feat' ),
         ( '.menu.ip.hb6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
-        ]),
-
-    'lwip': collections.OrderedDict([
-        ( '.menu.ip.hb1', 'v1.4 Higher Bandwidth' ),
-        ( '.menu.ip.hb1.build.lwip_lib', '-llwip_gcc' ),
-        ( '.menu.ip.hb1.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        #( '.menu.ip.Espressif', 'v1.4 Espressif (xcc)' ),
-        #( '.menu.ip.Espressif.build.lwip_lib', '-llwip' ),
-        #( '.menu.ip.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.ip.src', 'v1.4 Compile from source' ),
-        ( '.menu.ip.src.build.lwip_lib', '-llwip_src' ),
-        ( '.menu.ip.src.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        ( '.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
         ]),
 
     ####################### serial
@@ -1294,7 +1310,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     else:
         fs_blocksize = 8192
 
-    # Adjust SPIFFS_end to be a multiple of the block size
+    # Adjust FS_end to be a multiple of the block size
     fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start;
 
     max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
@@ -1457,12 +1473,14 @@ def led (name, default, ledList):
 
 def sdk ():
     return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
-                        ('.menu.sdk.nonosdk_191024.build.sdk', 'NONOSDK22x_191024'),
-                        ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
-                        ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
                         ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
                         ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
+                        ('.menu.sdk.nonosdk_191122', 'nonos-sdk 2.2.1+119 (191122)'),
+                        ('.menu.sdk.nonosdk_191122.build.sdk', 'NONOSDK22x_191122'),
+                        ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
+                        ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
+                        ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
+                        ('.menu.sdk.nonosdk_191024.build.sdk', 'NONOSDK22x_191024'),
                      #  ('.menu.sdk.nonosdk_190313', 'nonos-sdk 2.2.1+61 (190313 testing)'),
                      #  ('.menu.sdk.nonosdk_190313.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
@@ -1541,6 +1559,7 @@ def all_boards ():
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=Exceptions')
+    print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
@@ -1562,14 +1581,10 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
-        if lwip == 2:
-            macrolist += [ 'lwip2', 'lwip' ]
-        else:
-            macrolist += [ 'lwip', 'lwip2' ]
-        macrolist += [ 'debug_menu', 'flash_erase_menu' ]
+        macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
 
         for cs in customspeeds:
             print(id + cs)
@@ -1633,7 +1648,7 @@ def package ():
     # To get consistent indent/formatting read the JSON and write it out programattically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
-            filejson = json.loads(filestr, object_pairs_hook=collections.OrderedDict)
+            filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)
             package_file.write(json.dumps(filejson, indent=3, separators=(',',': ')))
         print("updated:   %s" % pkgfname)
     else:
@@ -1699,7 +1714,6 @@ def usage (name,ret):
     print("usage: %s [options]" % name)
     print("")
     print(" -h, --help")
-    print(" --lwip            - preferred default lwIP version (default %d)" % lwip)
     print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
     print(" --board <b>       - board to modify:")
     print(" --filter <file>   - create a short boards.txt based on the boards listed in <file>")
@@ -1748,7 +1762,6 @@ def usage (name,ret):
 ################################################################
 # entry point
 
-lwip = 2
 default_speed = '115'
 led_default = 2
 led_max = 16
@@ -1776,7 +1789,7 @@ lddir = "tools/sdk/ld/"
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
-        [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
+        [ "help", "led=", "speed=", "board=", "customspeed=", "nofloat",
           "noextra4kheap", "allowWPS",
           "boardslocalgen", "filter=", "xfilter=", "boardnames",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
@@ -1795,9 +1808,6 @@ for o, a in opts:
 
     elif o in ("--boardnames"):
        boardnames()
-
-    elif o in ("--lwip"):
-        lwip = a
 
     elif o in ("--led"):
         led_default = int(a)

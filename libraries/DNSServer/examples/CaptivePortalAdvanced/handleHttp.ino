@@ -9,7 +9,9 @@ void handleRoot() {
 
   String Page;
   Page += F(
-            "<html><head></head><body>"
+            "<!DOCTYPE html><html lang='en'><head>"
+            "<meta name='viewport' content='width=device-width'>"
+            "<title>CaptivePortal</title></head><body>"
             "<h1>HELLO WORLD!!</h1>");
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
@@ -43,7 +45,9 @@ void handleWifi() {
 
   String Page;
   Page += F(
-            "<html><head></head><body>"
+            "<!DOCTYPE html><html lang='en'><head>"
+            "<meta name='viewport' content='width=device-width'>"
+            "<title>CaptivePortal</title></head><body>"
             "<h1>Wifi config</h1>");
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
@@ -130,4 +134,3 @@ void handleNotFound() {
   server.sendHeader("Expires", "-1");
   server.send(404, "text/plain", message);
 }
-

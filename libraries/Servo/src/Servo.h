@@ -50,6 +50,7 @@
 #define MAX_PULSE_WIDTH      2400     // the longest pulse sent to a servo 
 #define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
 #define REFRESH_INTERVAL    20000     // minumim time to refresh servos in microseconds 
+#define MAX_SERVOS             12
 
 #if !defined(ESP8266)
 
@@ -71,6 +72,7 @@ public:
     int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
     bool attached();                   // return true if this servo is attached, otherwise false 
 private:
+    static uint32_t _servoMap;
     bool     _attached;
     uint8_t  _pin;
     uint16_t _minUs;                   

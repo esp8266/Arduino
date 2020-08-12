@@ -21,36 +21,29 @@
 #include <Arduino.h>
 #include <user_interface.h>
 #include <core_version.h>
-#include <lwip/init.h>      // LWIP_VERSION_*
 #include <lwipopts.h>       // LWIP_HASH_STR (lwip2)
 #include <bearssl/bearssl_git.h>  // BEARSSL_GIT short hash
 
 #define STRHELPER(x) #x
 #define STR(x) STRHELPER(x) // stringifier
 
-static const char arduino_esp8266_git_ver [] PROGMEM = STR(ARDUINO_ESP8266_GIT_DESC);
+static const char arduino_esp8266_git_ver [] PROGMEM = "/Core:" STR(ARDUINO_ESP8266_GIT_DESC) "=";
+#if LWIP_IPV6
+static const char lwip_version [] PROGMEM = "/lwIP:IPv6+" LWIP_HASH_STR;
+#else
+static const char lwip_version [] PROGMEM = "/lwIP:" LWIP_HASH_STR;
+#endif
 static const char bearssl_version [] PROGMEM = "/BearSSL:" STR(BEARSSL_GIT);
 
-String EspClass::getFullVersion()
-{
-    return   String(F("SDK:")) + system_get_sdk_version()
-           + F("/Core:") + FPSTR(arduino_esp8266_git_ver)
-           + F("=") + String(esp8266::coreVersionNumeric())
-#if LWIP_VERSION_MAJOR == 1
-           + F("/lwIP:") + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
-#if LWIP_VERSION_IS_DEVELOPMENT
-             + F("-dev")
-#endif
-#if LWIP_VERSION_IS_RC
-             + F("rc") + String(LWIP_VERSION_RC)
-#endif
-#else // LWIP_VERSION_MAJOR != 1
-             + F("/lwIP:")
-#if LWIP_IPV6
-             + F("IPv6+")
-#endif // LWIP_IPV6
-             + F(LWIP_HASH_STR)
-#endif // LWIP_VERSION_MAJOR != 1
-             + FPSTR(bearssl_version)
-           ;
+String EspClass::getFullVersion() {
+    String s(F("SDK:"));
+    s.reserve(127);
+
+    s += system_get_sdk_version();
+    s += FPSTR(arduino_esp8266_git_ver);
+    s += String(esp8266::coreVersionNumeric());
+    s += FPSTR(lwip_version);
+    s += FPSTR(bearssl_version);
+
+    return s;
 }

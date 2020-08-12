@@ -34,17 +34,11 @@ function print_size_info()
     elf_name=$(basename $elf_file)
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
+    xtensa-lx106-elf-size --format=sysv $elf_file | sed s/irom0.text/irom0text/g > size.txt
     declare -A segments
-    while read -a tokens; do
-        seg=${tokens[0]}
-        seg=${seg//./}
-        size=${tokens[1]}
-        addr=${tokens[2]}
-        if [ "$addr" -eq "$addr" -a "$addr" -ne "0" ] 2>/dev/null; then
-            segments[$seg]=$size
-        fi
-
-    done < <(xtensa-lx106-elf-size --format=sysv $elf_file | sed 's/\r//g' )
+    for seg in data rodata bss text irom0text; do
+        segments[$seg]=$(grep ^.$seg size.txt | awk '{sum += $2} END {print sum}')
+    done
 
     total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
     total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
@@ -64,7 +58,7 @@ function build_sketches()
     local build_rem=$5
     local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
+    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p ./$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
         # Paths to the arduino builder need to be / referenced, not our native ones
         build_cmd=$(echo $build_cmd --ide_path $arduino | sed 's/ \/c\// \//g' ) # replace '/c/' with '/'
@@ -146,7 +140,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0.zip || wget -nv https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
+    { test -r ArduinoJson-v6.11.0.zip || curl --output ArduinoJson-v6.11.0.zip -L https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
 
     popd
 }
@@ -165,33 +159,22 @@ function install_ide()
     local core_path=$2
     local debug=$3
     if [ "$WINDOWS" = "1" ]; then
-        # Acquire needed packages from Windows package manager
-        choco install --no-progress python3 >& pylog.txt
-	# Parse the python instrall dir from the output log.  Sorry, can't set it via choco on the free version
-	PYDIR=$(cat pylog.txt | grep "^Installed to:"  | cut -f2 -d"'" | sed 's/C:\\/\/c\//')
-	echo "Detected python3 install dir: $PYDIR"
-        export PATH="$PYDIR:$PATH"  # Ensure it's live from now on...
-        cp "$PYDIR/python.exe" "$PYDIR/python3.exe"
-        choco install --no-progress unzip
-        choco install --no-progress sed
-        #choco install --no-progress golang
-        test -r arduino-windows.zip || wget -nv -O arduino-windows.zip "${ideurl}-windows.zip"
+        test -r arduino-windows.zip || curl --output arduino-windows.zip -L "${ideurl}-windows.zip"
         unzip -q arduino-windows.zip
         mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
-        wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
+        wget -q https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
         sudo installer -pkg python-3.7.4-macosx10.9.pkg -target /
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino-macos.zip || wget -O arduino-macos.zip "${ideurl}-macosx.zip"
+        test -r arduino-macos.zip || wget -q -O arduino-macos.zip "${ideurl}-macosx.zip"
         unzip -q arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-        test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        test -r arduino-linux.tar.xz || wget -q -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
         tar xf arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi

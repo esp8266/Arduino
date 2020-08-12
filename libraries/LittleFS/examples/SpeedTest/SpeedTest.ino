@@ -1,8 +1,17 @@
 // Simple speed test for filesystem objects
 // Released to the public domain by Earle F. Philhower, III
 
+#include <FS.h>
 #include <LittleFS.h>
 
+// Choose the filesystem to test
+// WARNING:  The filesystem will be formatted at the start of the test!
+
+#define TESTFS LittleFS
+//#define TESTFS SPIFFS
+//#define TESTFS SDFS
+
+// How large of a file to test
 #define TESTSIZEKB 512
 
 void DoTest(FS *fs) {
@@ -112,12 +121,9 @@ void DoTest(FS *fs) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.printf("Beginning LittleFS test\n");
+  Serial.printf("Beginning test\n");
   Serial.flush();
-  DoTest(&LittleFS);
-  Serial.printf("Beginning SPIFFS test\n");
-  Serial.flush();
-  DoTest(&SPIFFS);
+  DoTest(&TESTFS);
 }
 
 void loop() {

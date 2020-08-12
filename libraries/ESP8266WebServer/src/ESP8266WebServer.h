@@ -26,15 +26,31 @@
 
 #include <functional>
 #include <memory>
+#include <functional>
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #include "detail/mimetable.h"
+#include "Uri.h"
+
+//#define DEBUG_ESP_HTTP_SERVER
+
+#ifdef DEBUG_ESP_HTTP_SERVER
+#ifdef DEBUG_ESP_PORT
+#define DBGWS(f,...) do { DEBUG_ESP_PORT.printf(PSTR(f), ##__VA_ARGS__); } while (0)
+#else
+#define DBGWS(f,...) do { Serial.printf(PSTR(f), ##__VA_ARGS__); } while (0)
+#endif
+#else
+#define DBGWS(x...) do { (void)0; } while (0)
+#endif
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_HEAD, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
                         UPLOAD_FILE_ABORTED };
 enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
 enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
+
+#define WEBSERVER_HAS_HOOK 1
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 
@@ -79,6 +95,9 @@ public:
   using ClientType = typename ServerType::ClientType;
   using RequestHandlerType = RequestHandler<ServerType>;
   using WebServerType = ESP8266WebServerTemplate<ServerType>;
+  enum ClientFuture { CLIENT_REQUEST_CAN_CONTINUE, CLIENT_REQUEST_IS_HANDLED, CLIENT_MUST_STOP, CLIENT_IS_GIVEN };
+  typedef String (*ContentTypeFunction) (const String&);
+  using HookFunction = std::function<ClientFuture(const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType)>;
 
   void begin();
   void begin(uint16_t port);
@@ -91,22 +110,24 @@ public:
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
-  void on(const String &uri, THandlerFunction handler);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  void on(const Uri &uri, THandlerFunction handler);
+  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
+  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
+  void enableCORS(bool enable);
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
-  ClientType client() { return _currentClient; }
+  ClientType& client() { return _currentClient; }
   HTTPUpload& upload() { return *_currentUpload; }
 
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
+  const String& pathArg(unsigned int i) const; // get request path argument by number
   const String& arg(const String& name) const;    // get request argument value by name
   const String& arg(int i) const;          // get request argument value by number
   const String& argName(int i) const;      // get request argument name by number
@@ -127,10 +148,10 @@ public:
   void send(int code, const char* content_type = NULL, const String& content = String(""));
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
-  void send(int code, const char *content_type, const char *content, size_t content_length = 0) {
-    if (content_length == 0) {
-      content_length = strlen_P(content);
-    }
+  void send(int code, const char *content_type, const char *content) {
+    send_P(code, content_type, content);
+  }
+  void send(int code, const char *content_type, const char *content, size_t content_length) {
     send_P(code, content_type, content, content_length);
   }
   void send(int code, const char *content_type, const uint8_t *content, size_t content_length) {
@@ -147,23 +168,75 @@ public:
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
+  bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
+    if (_currentVersion == 0)
+        // no chunk mode in HTTP/1.0
+        return false;
+    setContentLength(CONTENT_LENGTH_UNKNOWN);
+    send_P(code, content_type, "");
+    return true;
+  }
+  bool chunkedResponseModeStart (int code, const char* content_type) {
+    return chunkedResponseModeStart_P(code, content_type);
+  }
+  bool chunkedResponseModeStart (int code, const String& content_type) {
+    return chunkedResponseModeStart_P(code, content_type.c_str());
+  }
+  void chunkedResponseFinalize () {
+    sendContent(emptyString);
+  }
+
+  // Whether other requests should be accepted from the client on the
+  // same socket after a response is sent.
+  // This will automatically configure the "Connection" header of the response.
+  // Defaults to true when the client's HTTP version is 1.1 or above, otherwise it defaults to false.
+  // If the client sends the "Connection" header, the value given by the header is used.
+  void keepAlive(bool keepAlive) { _keepAlive = keepAlive; }
+  bool keepAlive() { return _keepAlive; }
+
   static String credentialHash(const String& username, const String& realm, const String& password);
 
   static String urlDecode(const String& text);
 
+  // Handle a GET request by sending a response header and stream file content to response body
   template<typename T>
   size_t streamFile(T &file, const String& contentType) {
-    _streamFileCore(file.size(), file.name(), contentType);
-    return _currentClient.write(file);
+    return streamFile(file, contentType, HTTP_GET);
   }
 
-  static const String responseCodeToString(const int code);
+  // Implement GET and HEAD requests for files.
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t streamFile(T &file, const String& contentType, HTTPMethod requestMethod) {
+    size_t contentLength = 0;
+    _streamFileCore(file.size(), file.name(), contentType);
+    if (requestMethod == HTTP_GET) {
+      contentLength = _currentClient.write(file);
+    }
+    return contentLength;
+  }
+
+  static String responseCodeToString(const int code);
+
+  void addHook (HookFunction hook) {
+    if (_hook) {
+      auto previousHook = _hook;
+      _hook = [previousHook, hook](const String& method, const String& url, WiFiClient* client, ContentTypeFunction contentType) {
+          auto whatNow = previousHook(method, url, client, contentType);
+          if (whatNow == CLIENT_REQUEST_CAN_CONTINUE)
+            return hook(method, url, client, contentType);
+          return whatNow;
+        };
+    } else {
+      _hook = hook;
+    }
+  }
 
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
   void _finalizeResponse();
-  bool _parseRequest(ClientType& client);
+  ClientFuture _parseRequest(ClientType& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
   bool _parseForm(ClientType& client, const String& boundary, uint32_t len);
@@ -191,6 +264,7 @@ protected:
   uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
+  bool _keepAlive;
 
   RequestHandlerType*  _currentHandler;
   RequestHandlerType*  _firstHandler;
@@ -200,6 +274,7 @@ protected:
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
+  int              _currentArgsHavePlain;
   std::unique_ptr<HTTPUpload> _currentUpload;
   int              _postArgsLen;
   RequestArgument* _postArgs;
@@ -212,11 +287,13 @@ protected:
 
   String           _hostHeader;
   bool             _chunked;
+  bool             _corsEnabled;
 
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
   String           _srealm;  // Store the Auth realm between Calls
 
+  HookFunction     _hook;
 };
 
 
