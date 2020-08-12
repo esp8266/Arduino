@@ -151,12 +151,25 @@ milliseconds is not recommended.
 Serial
 ------
 
-``Serial`` object works much the same way as on a regular Arduino. Apart
-from hardware FIFO (128 bytes for TX and RX) ``Serial`` has
-additional 256-byte TX and RX buffers. Both transmit and receive is
-interrupt-driven. Write and read functions only block the sketch
-execution when the respective FIFO/buffers are full/empty. Note that
-the length of additional 256-bit buffer can be customized.
+The ``Serial`` object works much the same way as on a regular Arduino. Apart
+from the hardware FIFO (128 bytes for TX and RX), ``Serial`` has an 
+additional customizable 256-byte RX buffer. The size of this software buffer can
+be changed by the user. It is suggested to use a bigger size at higher receive speeds.
+
+The ``::setRxBufferSize(size_t size`` method changes the RX buffer size as needed. This 
+should be called before ``::begin()``. The size argument should be at least large enough
+to hold all data received before reading.
+
+For transmit-only operation, the buffer can be switched off by passing mode SERIAL_TX_ONLY 
+to Serial.begin(). Other modes are SERIAL_RX_ONLY and SERIAL_FULL (the default).
+
+Receive is interrupt-driven, but transmit polls and busy-waits. Both are 
+blocking:
+The ``::write()`` call blocks if the TX FIFO is full and waits until there is room
+in the FIFO before writing more bytes into it.
+The ``::read()`` call does not block if there are no bytes available for reading.
+The ``::readBytes()`` call blocks until the number of bytes read complies with the 
+number of bytes required by the argument passed in.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
@@ -180,14 +193,13 @@ instead, call ``Serial1.setDebugOutput(true)``.
 You also need to use ``Serial.setDebugOutput(true)`` to enable output
 from ``printf()`` function.
 
-The method ``Serial.setRxBufferSize(size_t size)`` allows to define the
-receiving buffer depth. The default value is 256.
-
 Both ``Serial`` and ``Serial1`` objects support 5, 6, 7, 8 data bits,
 odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the
 desired mode, call ``Serial.begin(baudrate, SERIAL_8N1)``,
 ``Serial.begin(baudrate, SERIAL_6E2)``, etc.
-
+Default configuration mode is SERIAL_8N1. Possibilities are SERIAL_[5678][NEO][12].
+Example: ``SERIAL_8N1`` means 8bits No parity 1 stop bit.
+ 
 A new method has been implemented on both ``Serial`` and ``Serial1`` to
 get current baud rate setting. To get the current baud rate, call
 ``Serial.baudRate()``, ``Serial1.baudRate()``. Return a ``int`` of
@@ -206,7 +218,7 @@ current speed. For example
 
 | ``Serial`` and ``Serial1`` objects are both instances of the
   ``HardwareSerial`` class.
-| I've done this also for official ESP8266 `Software
+| This is also done for official ESP8266 `Software
   Serial <libraries.rst#softwareserial>`__
   library, see this `pull
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
