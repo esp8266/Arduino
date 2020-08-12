@@ -58,7 +58,7 @@ function build_sketches()
     local build_rem=$5
     local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
+    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p ./$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
         # Paths to the arduino builder need to be / referenced, not our native ones
         build_cmd=$(echo $build_cmd --ide_path $arduino | sed 's/ \/c\// \//g' ) # replace '/c/' with '/'
@@ -140,7 +140,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0.zip || wget -nv https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
+    { test -r ArduinoJson-v6.11.0.zip || curl --output ArduinoJson-v6.11.0.zip -L https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
 
     popd
 }
@@ -159,37 +159,22 @@ function install_ide()
     local core_path=$2
     local debug=$3
     if [ "$WINDOWS" = "1" ]; then
-        mkdir /c/mybin
-        pushd /c/mybin
-            # Use Python.org to install python3 and make sure it is in path
-            wget -nv https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-win32.zip
-            unzip -q python-3.8.1-embed-win32.zip
-            cp "python.exe" "python3.exe"
-            wget -nv -O sed.exe https://github.com/mbuilov/sed-windows/raw/master/sed-4.8-x64.exe
-            #wget -nv https://fossies.org/windows/misc/unz600xn.exe
-            #unzip -q ./unz600xn.exe
-        popd
-        export PATH="c:\\mybin:$PATH"  # Ensure it's live from now on...
-        python3 --version
-        sed --version
-        awk --version
-        test -r arduino-windows.zip || wget -nv -O arduino-windows.zip "${ideurl}-windows.zip"
+        test -r arduino-windows.zip || curl --output arduino-windows.zip -L "${ideurl}-windows.zip"
         unzip -q arduino-windows.zip
         mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
-        wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
+        wget -q https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
         sudo installer -pkg python-3.7.4-macosx10.9.pkg -target /
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino-macos.zip || wget -O arduino-macos.zip "${ideurl}-macosx.zip"
+        test -r arduino-macos.zip || wget -q -O arduino-macos.zip "${ideurl}-macosx.zip"
         unzip -q arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-        test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        test -r arduino-linux.tar.xz || wget -q -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
         tar xf arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi

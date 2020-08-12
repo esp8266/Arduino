@@ -32,7 +32,7 @@ def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
     try:
         git_ver = git("rev-parse", "--short=8", "HEAD")
         git_desc = git("describe", "--tags")
-    except:
+    except Exception:
         pass
 
     text = "#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver)
@@ -43,7 +43,7 @@ def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
             old_text = inp.read()
         if old_text == text:
             return
-    except:
+    except Exception:
         pass
 
     with open(path, "w") as out:
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     include_dir = os.path.join(args.build_path, args.include_dir)
     try:
         os.makedirs(include_dir)
-    except:
+    except Exception:
         pass
 
     generate(

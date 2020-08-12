@@ -1204,7 +1204,7 @@ protected:
     MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
     bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
-    CONST netif*                    m_netif; // network interface to run on
+    const netif*                    m_netif; // network interface to run on
 
     /** CONTROL **/
     /* MAINTENANCE */

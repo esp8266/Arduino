@@ -102,9 +102,19 @@ Analog output
 
 ``analogWrite(pin, value)`` enables software PWM on the given pin. PWM
 may be used on pins 0 to 16. Call ``analogWrite(pin, 0)`` to disable PWM
-on the pin. ``value`` may be in range from 0 to ``PWMRANGE``, which is
-equal to 1023 by default. PWM range may be changed by calling
-``analogWriteRange(new_range)``.
+on the pin.
+
+``value`` may be in range from 0 to 255 (which is the Arduino default).
+PWM range may be changed by calling ``analogWriteRange(new_range)`` or
+``analogWriteResolution(bits)``.  ``new_range`` may be from 15...65535
+or ``bits`` may be from 4...16.
+
+**NOTE:** The default ``analogWrite`` range was 1023 in releases before
+3.0, but this lead to incompatibility with external libraries which
+depended on the Arduino core default of 256.  Existing applications which
+rely on the prior 1023 value may add a call to ``analogWriteRange(1023)``
+to their ``setup()`` routine to return to their old behavior.  Applications
+which already were calling ``analogWriteRange`` need no change.
 
 PWM frequency is 1kHz by default. Call
 ``analogWriteFreq(new_frequency)`` to change the frequency. Valid values 
@@ -113,7 +123,7 @@ are from 100Hz up to 40000Hz.
 The ESP doesn't have hardware PWM, so the implementation is by software. 
 With one PWM output at 40KHz, the CPU is already rather loaded. The more 
 PWM outputs used, and the higher their frequency, the closer you get to 
-the CPU limits, and the less CPU cycles are available for sketch execution. 
+the CPU limits, and the fewer CPU cycles are available for sketch execution.
 
 Timing and delays
 -----------------

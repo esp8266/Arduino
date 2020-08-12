@@ -172,7 +172,7 @@ extern "C" bool ets_post_rom(uint8 prio, ETSSignal sig, ETSParam par);
 
 extern "C" bool IRAM_ATTR ets_post(uint8 prio, ETSSignal sig, ETSParam par) {
   uint32_t saved;
-  asm volatile ("rsr %0,ps":"=a" (saved));
+  __asm__ __volatile__ ("rsr %0,ps":"=a" (saved));
   bool rc=ets_post_rom(prio, sig, par);
   xt_wsr_ps(saved);
   return rc;
@@ -195,6 +195,9 @@ static void loop_wrapper() {
     }
     loop();
     loop_end();
+    if (serialEventRun) {
+        serialEventRun();
+    }
     esp_schedule();
 }
 
