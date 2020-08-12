@@ -145,7 +145,6 @@ void help (const char* argv0, int exitcode)
 		"\t-1             - run loop once then exit (for host testing)\n"
 		"\t-v             - verbose\n"
 		, argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
->>>>>>> master
 	exit(exitcode);
 }
 
