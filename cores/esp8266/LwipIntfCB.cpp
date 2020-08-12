@@ -1,6 +1,7 @@
 
 #include <LwipIntf.h>
 #include <Schedule.h>
+#include <debug.h>
 
 #define NETIF_STATUS_CB_SIZE 3
 
