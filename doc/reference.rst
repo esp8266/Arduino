@@ -160,8 +160,9 @@ The ``::setRxBufferSize(size_t size)`` method changes the RX buffer size as need
 should be called before ``::begin()``. The size argument should be at least large enough
 to hold all data received before reading.
 
-For transmit-only operation, the buffer can be switched off o save RAM by passing mode 
-SERIAL_TX_ONLY to Serial.begin(). Other modes are SERIAL_RX_ONLY and SERIAL_FULL (the default).
+For transmit-only operation, the 256-byte RX buffer can be switched off to save RAM by 
+passing mode SERIAL_TX_ONLY to Serial.begin(). Other modes are SERIAL_RX_ONLY and 
+SERIAL_FULL (the default).
 
 Receive is interrupt-driven, but transmit polls and busy-waits. Blocking behavior is as follows:
 The ``::write()`` call does not block if the number of bytes fits in the current space available
