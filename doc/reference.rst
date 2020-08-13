@@ -165,11 +165,13 @@ to Serial.begin(). Other modes are SERIAL_RX_ONLY and SERIAL_FULL (the default).
 
 Receive is interrupt-driven, but transmit polls and busy-waits. Both are 
 blocking:
-The ``::write()`` call blocks if the TX FIFO is full and waits until there is room
-in the FIFO before writing more bytes into it.
+The ``::write()`` call does not block if the number of bytes fits in the current space available
+in the TX FIFO. The call blocks if the TX FIFO is full and waits until there is room before 
+writing more bytes into it. In other words, when the call returns, all bytes have been written
+to the FIFO, but that doesn't mean that all bytes have been sent out through the serial line yet.
 The ``::read()`` call does not block if there are no bytes available for reading.
-The ``::readBytes()`` call blocks until the number of bytes read complies with the 
-number of bytes required by the argument passed in.
+The ``::readBytes()`` call blocks until the number of bytes read complies with the number of 
+bytes required by the argument passed in.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
