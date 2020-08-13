@@ -172,6 +172,9 @@ to the FIFO, but that doesn't mean that all bytes have been sent out through the
 The ``::read()`` call does not block if there are no bytes available for reading.
 The ``::readBytes()`` call blocks until the number of bytes read complies with the number of 
 bytes required by the argument passed in.
+The ``::flush()`` call blocks waiting for the FIFO to be empty before returning. It is recommended
+to call this to make sure all bytes have been sent before doing configuration changes on the serial 
+port (e.g. changing baudrate) or doing a board reset.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
