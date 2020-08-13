@@ -156,25 +156,25 @@ from the hardware FIFO (128 bytes for TX and RX), ``Serial`` has an
 additional customizable 256-byte RX buffer. The size of this software buffer can
 be changed by the user. It is suggested to use a bigger size at higher receive speeds.
 
-The ``::setRxBufferSize(size_t size`` method changes the RX buffer size as needed. This 
+The ``::setRxBufferSize(size_t size)`` method changes the RX buffer size as needed. This 
 should be called before ``::begin()``. The size argument should be at least large enough
 to hold all data received before reading.
 
-For transmit-only operation, the buffer can be switched off by passing mode SERIAL_TX_ONLY 
-to Serial.begin(). Other modes are SERIAL_RX_ONLY and SERIAL_FULL (the default).
+For transmit-only operation, the buffer can be switched off o save RAM by passing mode 
+SERIAL_TX_ONLY to Serial.begin(). Other modes are SERIAL_RX_ONLY and SERIAL_FULL (the default).
 
-Receive is interrupt-driven, but transmit polls and busy-waits. Both are 
-blocking:
+Receive is interrupt-driven, but transmit polls and busy-waits. Blocking behavior is as follows:
 The ``::write()`` call does not block if the number of bytes fits in the current space available
 in the TX FIFO. The call blocks if the TX FIFO is full and waits until there is room before 
-writing more bytes into it. In other words, when the call returns, all bytes have been written
-to the FIFO, but that doesn't mean that all bytes have been sent out through the serial line yet.
-The ``::read()`` call does not block if there are no bytes available for reading.
+writing more bytes into it, until all bytes are written. In other words, when the call returns, 
+all bytes have been written to the TX FIFO, but that doesn't mean that all bytes have been sent 
+out through the serial line yet.
+The ``::read()`` call doesn't block, not even if there are no bytes available for reading.
 The ``::readBytes()`` call blocks until the number of bytes read complies with the number of 
 bytes required by the argument passed in.
-The ``::flush()`` call blocks waiting for the FIFO to be empty before returning. It is recommended
-to call this to make sure all bytes have been sent before doing configuration changes on the serial 
-port (e.g. changing baudrate) or doing a board reset.
+The ``::flush()`` call blocks waiting for the TX FIFO to be empty before returning. It is 
+recommended to call this to make sure all bytes have been sent before doing configuration changes 
+on the serial port (e.g. changing baudrate) or doing a board reset.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
