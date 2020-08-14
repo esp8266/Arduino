@@ -267,7 +267,7 @@ void Packet::TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
     printDetail(sstr, PSTR("           D "), tcpPacket->hdr->payload, getTcpLen(), netdumpDetail);
 }
 
-void Packet::ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
+void Packet::ICMPtoString(PacketDetail, StreamString& sstr) const
 {
 	if (!icmpPacket || !ipPacket)
 	{
@@ -307,7 +307,7 @@ void Packet::ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
     sstr.printf("\r\n");
 }
 
-void Packet::IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
+void Packet::IGMPtoString(PacketDetail, StreamString& sstr) const
 {
     switch (getIgmpType())
     {
@@ -335,7 +335,7 @@ void Packet::IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
     printDetail(sstr, PSTR("           D "), ipPacket->raw(), getIpTotalLen() - getIpHdrLen(), netdumpDetail);
 }
 
-void Packet::UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const
+void Packet::UKNWtoString(PacketDetail, StreamString& sstr) const
 {
     sstr.printf_P(PSTR("Unknown EtherType 0x%04x Src : "), ethType());
     MACtoString(rawData(), sstr);

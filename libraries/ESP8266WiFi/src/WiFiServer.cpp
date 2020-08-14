@@ -35,7 +35,6 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "lwip/init.h" // LWIP_VERSION_
 #include <include/ClientContext.h>
 
 #ifndef MAX_PENDING_CLIENTS_PER_PORT
@@ -85,11 +84,7 @@ void WiFiServer::begin(uint16_t port, uint8_t backlog) {
         return;
     }
 
-#if LWIP_VERSION_MAJOR == 1
-    tcp_pcb* listen_pcb = tcp_listen(pcb);
-#else
     tcp_pcb* listen_pcb = tcp_listen_with_backlog(pcb, backlog);
-#endif
 
     if (!listen_pcb) {
         tcp_close(pcb);
@@ -124,12 +119,12 @@ WiFiClient WiFiServer::available(byte* status) {
     (void) status;
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
-#if LWIP_VERSION_MAJOR != 1
+
         // pcb can be null when peer has already closed the connection
         if (_unclaimed->getPCB())
             // give permission to lwIP to accept one more peer
             tcp_backlog_accepted(_unclaimed->getPCB());
-#endif
+
         _unclaimed = _unclaimed->next();
         result.setNoDelay(getNoDelay());
         DEBUGV("WS:av status=%d WCav=%d\r\n", result.status(), result.available());
@@ -193,20 +188,12 @@ long WiFiServer::_accept(tcp_pcb* apcb, long err) {
     // user calls ::available()
     ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
 
-#if LWIP_VERSION_MAJOR == 1
-
-    tcp_accepted(_listen_pcb);
-
-#else
-
     // backlog doc:
     // http://lwip.100.n7.nabble.com/Problem-re-opening-listening-pbc-tt32484.html#a32494
     // https://www.nongnu.org/lwip/2_1_x/group__tcp__raw.html#gaeff14f321d1eecd0431611f382fcd338
 
     // increase lwIP's backlog
     tcp_backlog_delayed(apcb);
-
-#endif
 
     _unclaimed = slist_append_tail(_unclaimed, client);
 

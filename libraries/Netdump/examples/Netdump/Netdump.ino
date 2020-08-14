@@ -4,7 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-#include <FS.h>
+#include <LittleFS.h>
 #include <map>
 
 using namespace NetCapture;
@@ -19,8 +19,8 @@ const char* password = STAPSK;
 
 Netdump nd;
 
-FS* filesystem = &SPIFFS;
-//FS* filesystem = &LittleFS;
+//FS* filesystem = &SPIFFS;
+FS* filesystem = &LittleFS;
 
 ESP8266WebServer webServer(80);    // Used for sending commands
 WiFiServer       tcpServer(8000);  // Used to show netcat option.

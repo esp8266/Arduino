@@ -148,8 +148,8 @@ void setup() {
   BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
-  Serial.printf("Attempting to fetch https://www.github.com/...\n");
-  fetchURL(bear, "www.github.com", 443, "/");
+  Serial.printf("Attempting to fetch https://github.com/...\n");
+  fetchURL(bear, "github.com", 443, "/");
   delete bear;
 }
 

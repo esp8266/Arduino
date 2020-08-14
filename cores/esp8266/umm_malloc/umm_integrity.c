@@ -1,6 +1,10 @@
 #if defined(BUILD_UMM_MALLOC_C)
 /* integrity check (UMM_INTEGRITY_CHECK) {{{ */
 #if defined(UMM_INTEGRITY_CHECK)
+
+#include <stdint.h>
+#include <stdbool.h>
+
 /*
  * Perform integrity check of the whole heap data. Returns 1 in case of
  * success, 0 otherwise.
@@ -23,11 +27,11 @@
  * This way, we ensure that the free flag is in sync with the free pointers
  * chain.
  */
-int umm_integrity_check(void) {
+bool umm_integrity_check(void) {
   UMM_CRITICAL_DECL(id_integrity);
-  int ok = 1;
-  unsigned short int prev;
-  unsigned short int cur;
+  bool ok = true;
+  uint16_t prev;
+  uint16_t cur;
 
   if (umm_heap == NULL) {
     umm_init();
@@ -42,9 +46,9 @@ int umm_integrity_check(void) {
     /* Check that next free block number is valid */
     if (cur >= UMM_NUMBLOCKS) {
       DBGLOG_FUNCTION("heap integrity broken: too large next free num: %d "
-          "(in block %d, addr 0x%lx)\n", cur, prev,
-          (unsigned long)&UMM_NBLOCK(prev));
-      ok = 0;
+          "(in block %d, addr 0x%08x)\n", cur, prev,
+          DBGLOG_32_BIT_PTR(&UMM_NBLOCK(prev)));
+      ok = false;
       goto clean;
     }
     if (cur == 0) {
@@ -57,7 +61,7 @@ int umm_integrity_check(void) {
       DBGLOG_FUNCTION("heap integrity broken: free links don't match: "
           "%d -> %d, but %d -> %d\n",
           prev, cur, cur, UMM_PFREE(cur));
-      ok = 0;
+      ok = false;
       goto clean;
     }
 
@@ -74,9 +78,9 @@ int umm_integrity_check(void) {
     /* Check that next block number is valid */
     if (cur >= UMM_NUMBLOCKS) {
       DBGLOG_FUNCTION("heap integrity broken: too large next block num: %d "
-          "(in block %d, addr 0x%lx)\n", cur, prev,
-          (unsigned long)&UMM_NBLOCK(prev));
-      ok = 0;
+          "(in block %d, addr 0x%08x)\n", cur, prev,
+          DBGLOG_32_BIT_PTR(&UMM_NBLOCK(prev)));
+      ok = false;
       goto clean;
     }
     if (cur == 0) {
@@ -88,21 +92,20 @@ int umm_integrity_check(void) {
     if ((UMM_NBLOCK(cur) & UMM_FREELIST_MASK)
         != (UMM_PBLOCK(cur) & UMM_FREELIST_MASK))
     {
-      DBGLOG_FUNCTION("heap integrity broken: mask wrong at addr 0x%lx: n=0x%x, p=0x%x\n",
-          (unsigned long)&UMM_NBLOCK(cur),
+      DBGLOG_FUNCTION("heap integrity broken: mask wrong at addr 0x%08x: n=0x%x, p=0x%x\n",
+          DBGLOG_32_BIT_PTR(&UMM_NBLOCK(cur)),
           (UMM_NBLOCK(cur) & UMM_FREELIST_MASK),
-          (UMM_PBLOCK(cur) & UMM_FREELIST_MASK)
-          );
-      ok = 0;
+          (UMM_PBLOCK(cur) & UMM_FREELIST_MASK));
+      ok = false;
       goto clean;
     }
 
     /* make sure the block list is sequential */
     if (cur <= prev ) {
      DBGLOG_FUNCTION("heap integrity broken: next block %d is before prev this one "
-          "(in block %d, addr 0x%lx)\n", cur, prev,
-          (unsigned long)&UMM_NBLOCK(prev));
-      ok = 0;
+          "(in block %d, addr 0x%08x)\n", cur, prev,
+          DBGLOG_32_BIT_PTR(&UMM_NBLOCK(prev)));
+      ok = false;
       goto clean;
     }
 
@@ -114,7 +117,7 @@ int umm_integrity_check(void) {
       DBGLOG_FUNCTION("heap integrity broken: block links don't match: "
           "%d -> %d, but %d -> %d\n",
           prev, cur, cur, UMM_PBLOCK(cur));
-      ok = 0;
+      ok = false;
       goto clean;
     }
 

@@ -12,7 +12,6 @@
 #include <string.h>
 #include "flash.h"
 #include "eboot_command.h"
-#include "spi_vendors.h"
 #include <uzlib.h>
 
 extern unsigned char _gzip_dict;
@@ -115,10 +114,12 @@ int uzlib_flash_read_cb(struct uzlib_uncomp *m)
 }
 
 unsigned char gzip_dict[32768];
+uint8_t buffer2[FLASH_SECTOR_SIZE]; // no room for this on the stack
 
 int copy_raw(const uint32_t src_addr,
              const uint32_t dst_addr,
-             const uint32_t size)
+             const uint32_t size,
+             const bool verify)
 {
     // require regions to be aligned
     if ((src_addr & 0xfff) != 0 ||
@@ -158,8 +159,10 @@ int copy_raw(const uint32_t src_addr,
 	gzip = true;
     }
     while (left > 0) {
-        if (SPIEraseSector(daddr/buffer_size)) {
-            return 2;
+        if (!verify) {
+           if (SPIEraseSector(daddr/buffer_size)) {
+               return 2;
+           }
         }
         if (!gzip) {
             if (SPIRead(saddr, buffer, buffer_size)) {
@@ -179,8 +182,17 @@ int copy_raw(const uint32_t src_addr,
                 buffer[i] = 0xff;
             }
         }
-        if (SPIWrite(daddr, buffer, buffer_size)) {
-            return 4;
+        if (verify) {
+            if (SPIRead(daddr, buffer2, buffer_size)) {
+                return 4;
+            }
+            if (memcmp(buffer, buffer2, buffer_size)) {
+                return 9;
+            }
+        } else {
+            if (SPIWrite(daddr, buffer, buffer_size)) {
+                return 4;
+            }
         }
         saddr += buffer_size;
         daddr += buffer_size;
@@ -189,29 +201,6 @@ int copy_raw(const uint32_t src_addr,
 
     return 0;
 }
-
-//#define XMC_SUPPORT
-#ifdef XMC_SUPPORT
-// Define a few SPI0 registers we need access to
-#define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
-#define SPI0CMD ESP8266_REG(0x200)
-#define SPI0CLK ESP8266_REG(0x218)
-#define SPI0C   ESP8266_REG(0x208)
-#define SPI0W0  ESP8266_REG(0x240)
-
-#define SPICMDRDID (1 << 28)
-
-/* spi_flash_get_id()
-   Returns the flash chip ID - same as the SDK function.
-   We need our own version as the SDK isn't available here.
- */
-uint32_t __attribute__((noinline)) spi_flash_get_id() {
-  SPI0W0=0;
-  SPI0CMD=SPICMDRDID;
-  while (SPI0CMD) {}
-  return SPI0W0;
-}
-#endif // XMC_SUPPORT
 
 int main()
 {
@@ -235,48 +224,25 @@ int main()
     if (cmd.action == ACTION_COPY_RAW) {
         ets_putc('c'); ets_putc('p'); ets_putc(':');
 
-#ifdef XMC_SUPPORT
-        // save the flash access speed registers
-        uint32_t spi0clk = SPI0CLK;
-        uint32_t spi0c   = SPI0C;
-        
-        uint32_t vendor  = spi_flash_get_id() & 0x000000ff;
-        if (vendor == SPI_FLASH_VENDOR_XMC) {
-           uint32_t flashinfo=0;
-           if (SPIRead(0, &flashinfo, 4)) {
-              // failed to read the configured flash speed.
-              // Do not change anything,
-           } else {
-              // select an appropriate flash speed
-              // Register values are those used by ROM
-              switch ((flashinfo >> 24) & 0x0f) {
-                 case 0x0: // 40MHz, slow to 20
-                 case 0x1: // 26MHz, slow to 20
-                      SPI0CLK = 0x00003043;
-                      SPI0C   = 0x00EAA313;
-                      break;
-                 case 0x2: // 20MHz, no change
-                      break;
-                 case 0xf: // 80MHz, slow to 26
-                      SPI0CLK = 0x00002002;
-                      SPI0C   = 0x00EAA202;
-                      break;
-                 default:
-                      break;
-              }
-           }
-        }
-#endif // XMC_SUPPORT
         ets_wdt_disable();
-        res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
+        res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
         ets_wdt_enable();
-        
-#ifdef XMC_SUPPORT
-        // restore the saved flash access speed registers
-        SPI0CLK = spi0clk;
-        SPI0C   = spi0c;
-#endif        
+
         ets_putc('0'+res); ets_putc('\n');
+#if 0
+	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
+	//beginning of the image in the empty area, see #7458. Disabling for now. 
+        //TODO: replace the below verify with hash type, crc, or similar.
+        // Verify the copy
+        ets_putc('c'); ets_putc('m'); ets_putc('p'); ets_putc(':');
+        if (res == 0) {
+            ets_wdt_disable();
+            res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
+            ets_wdt_enable();
+            }
+
+        ets_putc('0'+res); ets_putc('\n');
+#endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];

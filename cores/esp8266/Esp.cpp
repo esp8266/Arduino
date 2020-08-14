@@ -697,15 +697,16 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
         } else {
             bytesLeft = 0;
         }
-        rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
+        size_t bytesAligned = (bytesNow + 3) & ~3;
+        rc = spi_flash_read(pos, flash_write_puya_buf, bytesAligned);
         if (rc != SPI_FLASH_RESULT_OK) {
             return rc;
         }
-        for (size_t i = 0; i < bytesNow / 4; ++i) {
+        for (size_t i = 0; i < bytesAligned / 4; ++i) {
             flash_write_puya_buf[i] &= *ptr;
             ++ptr;
         }
-        rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
+        rc = spi_flash_write(pos, flash_write_puya_buf, bytesAligned);
         pos += bytesNow;
     }
     return rc;
