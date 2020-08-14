@@ -493,7 +493,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
 #if STRING_IS_STREAM
   size_t sent = header.toAll(&_currentClient);
 #else
-  size_t sent = StreamPtr(header.c_str(), header.length()).toAll(&_currentClient);
+  size_t sent = StreamPtr(header).toAll(&_currentClient);
 #endif
   if (sent != header.length())
       DBGWS("HTTPServer: error: sent %zd on %u bytes\n", sent, header.length());

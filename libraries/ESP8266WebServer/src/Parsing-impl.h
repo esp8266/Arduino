@@ -45,22 +45,7 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
-  if (!data.reserve(maxLength + 1))
-    return false;
-  data[0] = 0;  // data.clear()??
-  while (data.length() < maxLength) {
-    int tries = timeout_ms;
-    size_t avail;
-    while (!(avail = client.available()) && tries--)
-      delay(1);
-    if (!avail)
-      break;
-    if (data.length() + avail > maxLength)
-      avail = maxLength - data.length();
-    while (avail--)
-      data += (char)client.read();
-  }
-  return data.length() == maxLength;
+  return client.toSize(sstream(data), maxLength, timeout_ms) == maxLength;
 }
 
 #endif

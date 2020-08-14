@@ -1,22 +1,22 @@
 /*
- StreamDev.cpp - 1-copy transfer function
- Copyright (c) 2019 David Gauchard.  All right reserved.
+    StreamDev.cpp - 1-copy transfer function
+    Copyright (c) 2019 David Gauchard.  All right reserved.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- parsing functions based on TextFinder library by Michael Margolis
+    parsing functions based on TextFinder library by Michael Margolis
 */
 
 
@@ -26,15 +26,17 @@
 using esp8266::polledTimeout::oneShotFastMs;
 using esp8266::polledTimeout::periodicFastMs;
 
-size_t Stream::toFull (Print* to,
-                       const ssize_t len,
-                       const int readUntilChar,
-                       const oneShotFastMs::timeType timeoutMs)
+size_t Stream::toFull(Print* to,
+                      const ssize_t len,
+                      const int readUntilChar,
+                      const oneShotFastMs::timeType timeoutMs)
 {
     setWriteError(STREAMTO_SUCCESS);
 
     if (len == 0)
-        return 0;   // conveniently avoids timeout for no requested data
+    {
+        return 0;    // conveniently avoids timeout for no requested data
+    }
 
     // There are two timeouts:
     // - read (network, serial, ...)
@@ -46,7 +48,7 @@ size_t Stream::toFull (Print* to,
     // (also when inputTimeoutPossible() is false)
 
     // "neverExpires (default, impossible)" is translated to default timeout
-    oneShotFastMs timedOut(timeoutMs >= oneShotFastMs::neverExpires? getTimeout(): timeoutMs);
+    oneShotFastMs timedOut(timeoutMs >= oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
 
     // yield about every 5ms (XXX SHOULD BE A SYSTEM-WIDE CONSTANT?)
     periodicFastMs yieldNow(5);
@@ -65,16 +67,22 @@ size_t Stream::toFull (Print* to,
             size_t avpk = availableForPeek();
             if (avpk == 0 && !inputTimeoutPossible())
                 // no more data to read, ever
+            {
                 break;
+            }
 
             size_t w = to->availableForWrite();
             if (w == 0 && !outputTimeoutPossible())
                 // no more data can be written, ever
+            {
                 break;
+            }
 
             w = std::min(w, avpk);
             if (maxLen)
+            {
                 w = std::min(w, maxLen - written);
+            }
             if (w)
             {
                 const char* directbuf = peekBuffer();
@@ -93,7 +101,9 @@ size_t Stream::toFull (Print* to,
                     peekConsume(w);
                     written += w;
                     if (maxLen)
+                    {
                         timedOut.reset();
+                    }
                 }
                 if (foundChar)
                 {
@@ -104,16 +114,22 @@ size_t Stream::toFull (Print* to,
 
             if (!w && !maxLen && readUntilChar < 0)
                 // nothing has been transferred and no specific condition is requested
+            {
                 break;
+            }
 
             if (timedOut)
                 // either (maxLen>0) nothing has been transferred for too long
                 // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
+            {
                 break;
+            }
 
             if (yieldNow)
+            {
                 yield();
+            }
         }
 
     else if (readUntilChar >= 0)
@@ -126,18 +142,24 @@ size_t Stream::toFull (Print* to,
             size_t avpk = availableForPeek();
             if (avpk == 0 && !inputTimeoutPossible())
                 // no more data to read, ever
+            {
                 break;
+            }
 
             size_t w = to->availableForWrite();
             if (w == 0 && !outputTimeoutPossible())
                 // no more data can be written, ever
+            {
                 break;
+            }
 
             int c = read();
             if (c != -1)
             {
                 if (c == readUntilChar)
+                {
                     break;
+                }
                 w = to->write(c);
                 if (w != 1)
                 {
@@ -146,21 +168,29 @@ size_t Stream::toFull (Print* to,
                 }
                 written += 1;
                 if (maxLen)
+                {
                     timedOut.reset();
+                }
             }
 
             if (!w && !maxLen && readUntilChar < 0)
                 // nothing has been transferred and no specific condition is requested
+            {
                 break;
+            }
 
             if (timedOut)
                 // either (maxLen>0) nothing has been transferred for too long
                 // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
+            {
                 break;
+            }
 
             if (yieldNow)
+            {
                 yield();
+            }
         }
 
     else
@@ -173,12 +203,16 @@ size_t Stream::toFull (Print* to,
             size_t avr = available();
             if (avr == 0 && !inputTimeoutPossible())
                 // no more data to read, ever
+            {
                 break;
+            }
 
             size_t w = to->availableForWrite();
             if (w == 0 && !to->outputTimeoutPossible())
                 // no more data can be written, ever
+            {
                 break;
+            }
 
             w = std::min(w, avr);
             w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
@@ -199,27 +233,37 @@ size_t Stream::toFull (Print* to,
                     break;
                 }
                 if (maxLen && w)
+                {
                     timedOut.reset();
+                }
             }
 
             if (!w && !maxLen && readUntilChar < 0)
                 // nothing has been transferred and no specific condition is requested
+            {
                 break;
+            }
 
             if (timedOut)
                 // either (maxLen>0) nothing has been transferred for too long
                 // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
+            {
                 break;
+            }
 
             if (yieldNow)
+            {
                 yield();
+            }
         }
 
     if (getWriteError() == STREAMTO_SUCCESS && maxLen > 0)
     {
         if (timeoutMs && timedOut)
+        {
             setWriteError(STREAMTO_TIMED_OUT);
+        }
         else if ((ssize_t)written != len)
             // This is happening when source cannot timeout (ex: a String)
             // but has not enough data, or a dest has closed or cannot
@@ -227,7 +271,9 @@ size_t Stream::toFull (Print* to,
             //
             // Mark it as an error because user usually wants to get what is
             // asked for.
+        {
             setWriteError(STREAMTO_SHORT);
+        }
     }
     return written;
 }

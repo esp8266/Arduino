@@ -1105,9 +1105,9 @@ bool HTTPClient::sendHeader(const char * type)
 
     // transfer all of it, with timeout
 #if STRING_IS_STREAM
-    return header.toSize(_client, header.length()) == header.length();
+    return header.toAll(_client, header.length()) == header.length();
 #else
-    return (_client->write((const uint8_t *) header.c_str(), header.length()) == header.length());
+    return StreamPtr(header).toAll(_client) == header.length();
 #endif
 }
 
