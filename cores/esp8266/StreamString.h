@@ -195,6 +195,14 @@ protected:
 
 class StreamString: public String, public S2Stream
 {
+protected:
+
+    void resetpp ()
+    {
+        if (peekPointer > 0)
+            peekPointer = 0;
+    }
+
 public:
 
     StreamString(StreamString&& bro): String(bro), S2Stream(this) { }
@@ -220,26 +228,35 @@ public:
     StreamString& operator= (const String& rhs)
     {
         String::operator=(rhs);
+        resetpp();
         return *this;
     }
+
     StreamString& operator= (const char* cstr)
     {
         String::operator=(cstr);
+        resetpp();
         return *this;
     }
+
     StreamString& operator= (const __FlashStringHelper* str)
     {
         String::operator=(str);
+        resetpp();
         return *this;
     }
+
     StreamString& operator= (String&& rval)
     {
         String::operator=(rval);
+        resetpp();
         return *this;
     }
+
     StreamString& operator= (StringSumHelper&& rval)
     {
         String::operator=(rval);
+        resetpp();
         return *this;
     }
 };
