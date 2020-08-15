@@ -66,15 +66,15 @@ size_t Stream::toFull(Print* to,
         {
             size_t avpk = availableForPeek();
             if (avpk == 0 && !inputTimeoutPossible())
-                // no more data to read, ever
             {
+                // no more data to read, ever
                 break;
             }
 
             size_t w = to->availableForWrite();
             if (w == 0 && !outputTimeoutPossible())
-                // no more data can be written, ever
             {
+                // no more data can be written, ever
                 break;
             }
 
@@ -113,16 +113,16 @@ size_t Stream::toFull(Print* to,
             }
 
             if (!w && !maxLen && readUntilChar < 0)
-                // nothing has been transferred and no specific condition is requested
             {
+                // nothing has been transferred and no specific condition is requested
                 break;
             }
 
             if (timedOut)
+            {
                 // either (maxLen>0) nothing has been transferred for too long
                 // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
-            {
                 break;
             }
 
@@ -141,15 +141,15 @@ size_t Stream::toFull(Print* to,
         {
             size_t avpk = availableForPeek();
             if (avpk == 0 && !inputTimeoutPossible())
-                // no more data to read, ever
             {
+                // no more data to read, ever
                 break;
             }
 
             size_t w = to->availableForWrite();
             if (w == 0 && !outputTimeoutPossible())
-                // no more data can be written, ever
             {
+                // no more data can be written, ever
                 break;
             }
 
@@ -174,16 +174,16 @@ size_t Stream::toFull(Print* to,
             }
 
             if (!w && !maxLen && readUntilChar < 0)
-                // nothing has been transferred and no specific condition is requested
             {
+                // nothing has been transferred and no specific condition is requested
                 break;
             }
 
             if (timedOut)
+            {
                 // either (maxLen>0) nothing has been transferred for too long
                 // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
-            {
                 break;
             }
 
@@ -202,8 +202,8 @@ size_t Stream::toFull(Print* to,
         {
             size_t avr = available();
             if (avr == 0 && !inputTimeoutPossible())
-                // no more data to read, ever
             {
+                // no more data to read, ever
                 break;
             }
 
@@ -239,16 +239,16 @@ size_t Stream::toFull(Print* to,
             }
 
             if (!w && !maxLen && readUntilChar < 0)
-                // nothing has been transferred and no specific condition is requested
             {
+                // nothing has been transferred and no specific condition is requested
                 break;
             }
 
             if (timedOut)
+            {
                 // either (maxLen>0) nothing has been transferred for too long
                 // or readUntilChar >= 0 but char is not encountered for too long
                 // or (maxLen=0) too much time has been spent here
-            {
                 break;
             }
 
@@ -265,17 +265,47 @@ size_t Stream::toFull(Print* to,
             setWriteError(STREAMTO_TIMED_OUT);
         }
         else if ((ssize_t)written != len)
+        {
             // This is happening when source cannot timeout (ex: a String)
             // but has not enough data, or a dest has closed or cannot
             // timeout but is too small (String, buffer...)
             //
             // Mark it as an error because user usually wants to get what is
             // asked for.
-        {
             setWriteError(STREAMTO_SHORT);
         }
     }
     return written;
+}
+
+Stream& operator << (Stream& out, String& string)
+{
+    StreamPtr(string).toNow(out);
+    return out;
+}
+
+Stream& operator << (Stream& out, Stream& stream)
+{
+    stream.toNow(out);
+    return out;
+}
+
+Stream& operator << (Stream& out, StreamString& stream)
+{
+    stream.toNow(out);
+    return out;
+}
+
+Stream& operator << (Stream& out, const char* text)
+{
+    StreamPtr(text).toNow(out);
+    return out;
+}
+
+Stream& operator << (Stream& out, const __FlashStringHelper* text)
+{
+    StreamPtr(text).toNow(text);
+    return out;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_STREAMDEV)

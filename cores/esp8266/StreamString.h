@@ -26,14 +26,6 @@
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
-#if STRING_IS_STREAM
-
-// StreamString has been integrated into String
-using StreamString = String;
-
-#else // !STRING_IS_STREAM
-
-///////////////////////////////////////////////////////////////
 // using sstream helper as Stream and String pointer
 
 class sstream: public Stream
@@ -51,6 +43,11 @@ public:
     virtual int available() override
     {
         return string->length();
+    }
+
+    virtual int availableForWrite() override
+    {
+        return 256; // XXX
     }
 
     virtual int read() override
@@ -103,9 +100,9 @@ public:
         return l;
     }
 
-    virtual size_t write(const uint8_t *buffer, size_t size) override
+    virtual size_t write(const uint8_t* buffer, size_t len) override
     {
-        return string->concat((const char*)buffer, size) ? size : 0;
+        return string->concat((const char*)buffer, len) ? len : 0;
     }
 
     virtual int peek() override
@@ -200,9 +197,18 @@ public:
     StreamString(const String& string): String(string), sstream(this) { }
     StreamString(StreamString&& bro): String(bro), sstream(this) { }
     StreamString(const StreamString& bro): String(bro), sstream(this) { }
+    StreamString(const char* text): String(text), sstream(this) { }
+    StreamString(const __FlashStringHelper *str): String(str), sstream(this) { }
     StreamString(): String(), sstream(this) { }
-};
 
-#endif // !STRING_IS_STREAM
+    explicit StreamString(char c): String(c), sstream(this) { }
+    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), sstream(this) { }
+    explicit StreamString(int i, unsigned char base = 10): String(i, base), sstream(this) { }
+    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), sstream(this) { }
+    explicit StreamString(long l, unsigned char base = 10): String(l, base), sstream(this) { }
+    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), sstream(this) { }
+    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), sstream(this) { }
+    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), sstream(this) { }
+};
 
 #endif // __STREAMSTRING_H
