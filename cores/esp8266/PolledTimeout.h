@@ -4,7 +4,7 @@
 
 /*
  PolledTimeout.h - Encapsulation of a polled Timeout
- 
+
  Copyright (c) 2018 Daniel Salazar. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
 
@@ -23,10 +23,10 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <limits>                  // std::numeric_limits<>
-#include <type_traits>             // std::is_unsigned<>
 #include <c_types.h>               // IRAM_ATTR
-#include <core_esp8266_features.h> // esp_get_cycle_count(), delay()
+#include <limits>                  // std::numeric_limits
+#include <type_traits>             // std::is_unsigned
+#include <core_esp8266_features.h>
 
 namespace esp8266
 {
@@ -162,13 +162,13 @@ public:
       return expiredRetrigger();
     return expiredOneShot();
   }
-  
+
   IRAM_ATTR // fast
   operator bool()
   {
-    return expired(); 
+    return expired();
   }
-  
+
   bool canExpire () const
   {
     return !_neverExpires;
@@ -179,6 +179,7 @@ public:
     return _timeout != alwaysExpired;
   }
 
+  // Resets, will trigger after this new timeout.
   IRAM_ATTR // called from ISR
   void reset(const timeType newUserTimeout)
   {
@@ -187,10 +188,28 @@ public:
     _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
   }
 
+  // Resets, will trigger after the timeout previously set.
   IRAM_ATTR // called from ISR
   void reset()
   {
     _start = TimePolicyT::time();
+  }
+
+  // Resets to just expired so that on next poll the check will immediately trigger for the user,
+  // also change timeout (after next immediate trigger).
+  IRAM_ATTR // called from ISR
+  void resetAndSetExpired (const timeType newUserTimeout)
+  {
+    reset(newUserTimeout);
+    _start -= _timeout;
+  }
+
+  // Resets to just expired so that on next poll the check will immediately trigger for the user.
+  IRAM_ATTR // called from ISR
+  void resetAndSetExpired ()
+  {
+    reset();
+    _start -= _timeout;
   }
 
   void resetToNeverExpires ()
@@ -203,7 +222,7 @@ public:
   {
     return TimePolicyT::toUserUnit(_timeout);
   }
-  
+
   static constexpr timeType timeMax()
   {
     return TimePolicyT::timeMax;
@@ -236,14 +255,14 @@ protected:
     }
     return false;
   }
-  
+
   IRAM_ATTR // fast
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
     return !canWait() || checkExpired(TimePolicyT::time());
   }
-  
+
   timeType _timeout;
   timeType _start;
   bool _neverExpires;

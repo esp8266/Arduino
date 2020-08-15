@@ -244,29 +244,21 @@ size_t Stream::readBytesUntil(char terminator, char *buffer, size_t length) {
 
 String Stream::readString() {
     String ret;
-#if STRING_IS_STREAM
-    toAll(ret);
-#else
     int c = timedRead();
     while(c >= 0) {
         ret += (char) c;
         c = timedRead();
     }
-#endif
     return ret;
 }
 
 String Stream::readStringUntil(char terminator) {
     String ret;
-#if STRING_IS_STREAM
-    toUntil(ret, terminator);
-#else
     int c = timedRead();
     while(c >= 0 && c != terminator) {
         ret += (char) c;
         c = timedRead();
     }
-#endif
     return ret;
 }
 
