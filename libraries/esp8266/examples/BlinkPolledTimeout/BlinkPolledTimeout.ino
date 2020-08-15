@@ -22,6 +22,7 @@
   Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
 */
 
+
 #include <PolledTimeout.h>
 
 void ledOn() {
@@ -37,7 +38,7 @@ void ledToggle() {
 }
 
 
-esp8266::polledTimeout::periodicFastUs halfPeriod(500000);
+esp8266::polledTimeout::periodicFastUs halfPeriod(500000); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 // the setup function runs only once at start
 void setup() {
@@ -58,11 +59,13 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
 
+  using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace
+
   //STEP1; turn the led ON
   ledOn();
 
   //STEP2: wait for ON timeout
-  esp8266::polledTimeout::oneShotMs timeoutOn(2000);
+  oneShotMs timeoutOn(2000);
   while (!timeoutOn) {
     yield();
   }
@@ -71,7 +74,7 @@ void setup() {
   ledOff();
 
   //STEP4: wait for OFF timeout to assure the led is kept off for this time before exiting setup
-  esp8266::polledTimeout::oneShotMs timeoutOff(2000);
+  oneShotMs timeoutOff(2000);
   while (!timeoutOff) {
     yield();
   }
