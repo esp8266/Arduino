@@ -490,11 +490,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
   if (content_length == 0)
       content_length = std::max((ssize_t)0, stream->streamSize());
   _prepareHeader(header, code, content_type, content_length);
-#if STRING_IS_STREAM
-  size_t sent = header.toAll(&_currentClient);
-#else
   size_t sent = StreamPtr(header).toAll(&_currentClient);
-#endif
   if (sent != header.length())
       DBGWS("HTTPServer: error: sent %zd on %u bytes\n", sent, header.length());
   if (content_length)

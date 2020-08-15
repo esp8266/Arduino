@@ -1104,11 +1104,7 @@ bool HTTPClient::sendHeader(const char * type)
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     // transfer all of it, with timeout
-#if STRING_IS_STREAM
-    return header.toAll(_client, header.length()) == header.length();
-#else
     return StreamPtr(header).toAll(_client) == header.length();
-#endif
 }
 
 /**

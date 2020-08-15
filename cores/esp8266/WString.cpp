@@ -6,9 +6,6 @@
  Modified by Ivan Grokhotkov, 2014 - esp8266 support
  Modified by Michael C. Miller, 2015 - esp8266 progmem support
 
- imported:
- StringStream Copyright (c) 2015 Markus Sattler. All rights reserved.
-
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either

@@ -26,18 +26,18 @@
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
-// SStream points to a String and makes it a Stream
+// S2Stream points to a String and makes it a Stream
 // (it is also the helper for StreamString)
 
-class SStream: public Stream
+class S2Stream: public Stream
 {
 public:
 
-    SStream(String& string): string(&string)
+    S2Stream(String& string): string(&string)
     {
     }
 
-    SStream(String* string): string(string)
+    S2Stream(String* string): string(string)
     {
     }
 
@@ -191,31 +191,31 @@ protected:
 };
 
 
-// StreamString is a SStream holding the String
+// StreamString is a S2Stream holding the String
 
-class StreamString: public String, public SStream
+class StreamString: public String, public S2Stream
 {
 public:
 
-    StreamString(StreamString&& bro): String(bro), SStream(this) { }
-    StreamString(const StreamString& bro): String(bro), SStream(this) { }
+    StreamString(StreamString&& bro): String(bro), S2Stream(this) { }
+    StreamString(const StreamString& bro): String(bro), S2Stream(this) { }
 
     // duplicate String contructors and operator=:
 
-    StreamString(const char* text = nullptr): String(text), SStream(this) { }
-    StreamString(const String& string): String(string), SStream(this) { }
-    StreamString(const __FlashStringHelper *str): String(str), SStream(this) { }
-    StreamString(String&& string): String(string), SStream(this) { }
-    StreamString(StringSumHelper&& sum): String(sum), SStream(this) { }
+    StreamString(const char* text = nullptr): String(text), S2Stream(this) { }
+    StreamString(const String& string): String(string), S2Stream(this) { }
+    StreamString(const __FlashStringHelper *str): String(str), S2Stream(this) { }
+    StreamString(String&& string): String(string), S2Stream(this) { }
+    StreamString(StringSumHelper&& sum): String(sum), S2Stream(this) { }
 
-    explicit StreamString(char c): String(c), SStream(this) { }
-    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), SStream(this) { }
-    explicit StreamString(int i, unsigned char base = 10): String(i, base), SStream(this) { }
-    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), SStream(this) { }
-    explicit StreamString(long l, unsigned char base = 10): String(l, base), SStream(this) { }
-    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), SStream(this) { }
-    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), SStream(this) { }
-    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), SStream(this) { }
+    explicit StreamString(char c): String(c), S2Stream(this) { }
+    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), S2Stream(this) { }
+    explicit StreamString(int i, unsigned char base = 10): String(i, base), S2Stream(this) { }
+    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), S2Stream(this) { }
+    explicit StreamString(long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
+    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
+    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), S2Stream(this) { }
+    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), S2Stream(this) { }
 
     StreamString& operator= (const String& rhs)
     {
