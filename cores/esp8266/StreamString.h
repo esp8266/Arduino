@@ -26,17 +26,18 @@
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
-// using sstream helper as Stream and String pointer
+// SStream points to a String and makes it a Stream
+// (it is also the helper for StreamString)
 
-class sstream: public Stream
+class SStream: public Stream
 {
 public:
 
-    sstream(String& string): string(&string)
+    SStream(String& string): string(&string)
     {
     }
 
-    sstream(String* string): string(string)
+    SStream(String* string): string(string)
     {
     }
 
@@ -47,7 +48,7 @@ public:
 
     virtual int availableForWrite() override
     {
-        return 256; // XXX
+        return 32767;
     }
 
     virtual int read() override
@@ -63,8 +64,8 @@ public:
             }
         }
         else if (peekPointer < (int)string->length())
-            // return pointed and move pointer
         {
+            // return pointed and move pointer
             return string->charAt(peekPointer++);
         }
 
@@ -131,6 +132,7 @@ public:
     {
         return false;
     }
+
     virtual bool outputTimeoutPossible() override
     {
         return false;
@@ -154,23 +156,28 @@ public:
     virtual void peekConsume(size_t consume) override
     {
         if (peekPointer < 0)
-            // string is really consumed
         {
+            // string is really consumed
             string->remove(0, consume);
         }
         else
-            // only the pointer is moved
         {
+            // only the pointer is moved
             peekPointer = std::min((size_t)string->length(), peekPointer + consume);
         }
     }
 
-    // calling peekPointerSetConsume() will consume bytes as they are stream-read
-    void peekPointerSetConsume()
+    // calling setConsume() will consume bytes as the stream is read
+    // (not enabled by default)
+    void setConsume()
     {
         peekPointer = -1;
     }
-    void peekPointerReset(int pointer = 0)
+
+    // Reading this stream will mark the string as read without consuming
+    // This is the default.
+    // Calling reset() resets the read state and allows rereading.
+    void reset(int pointer = 0)
     {
         peekPointer = pointer;
     }
@@ -179,36 +186,62 @@ protected:
 
     String* string;
 
-    // peekPointer is used with peekBufferAPI,
-    // on peekConsume(), chars can either:
-    // - be really consumed = disappeared
-    //   (case when peekPointer==-1)
-    // - marked as read
-    //   (peekPointer >=0 is increased)
+    // default (0): read marks as read without consuming(erasing) the string:
     int peekPointer = 0;
 };
 
-// StreamString is a String and a sstream pointing to itself-as-String
 
-class StreamString: public String, public sstream
+// StreamString is a SStream holding the String
+
+class StreamString: public String, public SStream
 {
 public:
-    StreamString(String&& string): String(string), sstream(this) { }
-    StreamString(const String& string): String(string), sstream(this) { }
-    StreamString(StreamString&& bro): String(bro), sstream(this) { }
-    StreamString(const StreamString& bro): String(bro), sstream(this) { }
-    StreamString(const char* text): String(text), sstream(this) { }
-    StreamString(const __FlashStringHelper *str): String(str), sstream(this) { }
-    StreamString(): String(), sstream(this) { }
 
-    explicit StreamString(char c): String(c), sstream(this) { }
-    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), sstream(this) { }
-    explicit StreamString(int i, unsigned char base = 10): String(i, base), sstream(this) { }
-    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), sstream(this) { }
-    explicit StreamString(long l, unsigned char base = 10): String(l, base), sstream(this) { }
-    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), sstream(this) { }
-    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), sstream(this) { }
-    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), sstream(this) { }
+    StreamString(StreamString&& bro): String(bro), SStream(this) { }
+    StreamString(const StreamString& bro): String(bro), SStream(this) { }
+
+    // duplicate String contructors and operator=:
+
+    StreamString(const char* text = nullptr): String(text), SStream(this) { }
+    StreamString(const String& string): String(string), SStream(this) { }
+    StreamString(const __FlashStringHelper *str): String(str), SStream(this) { }
+    StreamString(String&& string): String(string), SStream(this) { }
+    StreamString(StringSumHelper&& sum): String(sum), SStream(this) { }
+
+    explicit StreamString(char c): String(c), SStream(this) { }
+    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), SStream(this) { }
+    explicit StreamString(int i, unsigned char base = 10): String(i, base), SStream(this) { }
+    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), SStream(this) { }
+    explicit StreamString(long l, unsigned char base = 10): String(l, base), SStream(this) { }
+    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), SStream(this) { }
+    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), SStream(this) { }
+    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), SStream(this) { }
+
+    StreamString& operator= (const String& rhs)
+    {
+        String::operator=(rhs);
+        return *this;
+    }
+    StreamString& operator= (const char* cstr)
+    {
+        String::operator=(cstr);
+        return *this;
+    }
+    StreamString& operator= (const __FlashStringHelper* str)
+    {
+        String::operator=(str);
+        return *this;
+    }
+    StreamString& operator= (String&& rval)
+    {
+        String::operator=(rval);
+        return *this;
+    }
+    StreamString& operator= (StringSumHelper&& rval)
+    {
+        String::operator=(rval);
+        return *this;
+    }
 };
 
 #endif // __STREAMSTRING_H

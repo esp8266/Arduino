@@ -280,31 +280,31 @@ size_t Stream::toFull(Print* to,
 
 Stream& operator << (Stream& out, String& string)
 {
-    StreamPtr(string).toNow(out);
+    StreamPtr(string).toAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, Stream& stream)
 {
-    stream.toNow(out);
+    stream.toAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, StreamString& stream)
 {
-    stream.toNow(out);
+    stream.toAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, const char* text)
 {
-    StreamPtr(text).toNow(out);
+    StreamPtr(text).toAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, const __FlashStringHelper* text)
 {
-    StreamPtr(text).toNow(text);
+    StreamPtr(text).toAll(text);
     return out;
 }
 

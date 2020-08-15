@@ -149,9 +149,9 @@ public:
     StreamPtr(const char* buffer, size_t size, bool in_flash = false): _buffer(buffer), _size(size), _in_flash(in_flash) { }
     StreamPtr(const uint8_t* buffer, size_t size, bool in_flash = false): _buffer((const char*)buffer), _size(size), _in_flash(in_flash) { }
     StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _in_flash(true) { }
-//    StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P(text)), _in_flash(true) { }
+    StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _in_flash(true) { }
 
-    void peekPointerReset(int pointer = 0)
+    void reset(int pointer = 0)
     {
         _peekPointer = pointer;
     }
