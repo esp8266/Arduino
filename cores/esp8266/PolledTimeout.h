@@ -179,6 +179,7 @@ public:
     return _timeout != alwaysExpired;
   }
 
+  // Resets, will trigger after this new timeout.
   IRAM_ATTR // called from ISR
   void reset(const timeType newUserTimeout)
   {
@@ -187,18 +188,24 @@ public:
     _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
   }
 
+  // Resets, will trigger after the timeout previously set.
   IRAM_ATTR // called from ISR
   void reset()
   {
     _start = TimePolicyT::time();
   }
 
+  // Resets to just expired so that on next poll the check will immediately trigger for the user,
+  // also change timeout (after next immediate trigger).
+  IRAM_ATTR // called from ISR
   void resetAndSetExpired (const timeType newUserTimeout)
   {
     reset(newUserTimeout);
     _start -= _timeout;
   }
 
+  // Resets to just expired so that on next poll the check will immediately trigger for the user.
+  IRAM_ATTR // called from ISR
   void resetAndSetExpired ()
   {
     reset();
