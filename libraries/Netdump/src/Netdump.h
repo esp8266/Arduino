@@ -77,7 +77,7 @@ private:
     char* packetBuffer = nullptr;
     size_t bufferIndex = 0;
 
-    static constexpr int tcpBuffersize = 2048;
+    static constexpr int tcpBufferSize = 2048;
     static constexpr int maxPcapLength = 1024;
     static constexpr uint32_t pcapMagic = 0xa1b2c3d4;
 };

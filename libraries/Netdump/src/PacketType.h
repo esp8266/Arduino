@@ -41,8 +41,6 @@ public:
     PacketType();
     PacketType(PType pt) : ptype(pt) {};
 
-    ~PacketType();
-
     operator PType() const
     {
         return ptype;

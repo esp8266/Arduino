@@ -43,8 +43,6 @@ public:
         setPacketTypes();
     };
 
-    Packet() {};
-
     enum class PacketDetail
     {
         NONE,

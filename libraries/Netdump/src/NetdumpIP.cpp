@@ -28,10 +28,6 @@ NetdumpIP::NetdumpIP()
 {
 }
 
-NetdumpIP::~NetdumpIP()
-{
-}
-
 NetdumpIP::NetdumpIP(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet)
 {
     setV4();

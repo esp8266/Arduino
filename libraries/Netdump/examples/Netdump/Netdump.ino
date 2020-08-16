@@ -29,26 +29,26 @@ File             tracefile;
 
 std::map<PacketType, int> packetCount;
 
-enum SerialOption {
+enum class SerialOption : uint8_t {
   AllFull,
   LocalNone,
   HTTPChar
 };
 
-void startSerial(int option) {
+void startSerial(SerialOption option) {
   switch (option) {
-    case AllFull : //All Packets, show packet summary.
+    case SerialOption::AllFull : //All Packets, show packet summary.
       nd.printDump(Serial, Packet::PacketDetail::FULL);
       break;
 
-    case LocalNone : // Only local IP traffic, full details
+    case SerialOption::LocalNone : // Only local IP traffic, full details
       nd.printDump(Serial, Packet::PacketDetail::NONE,
       [](Packet n) {
         return (n.hasIP(WiFi.localIP()));
       }
                   );
       break;
-    case HTTPChar : // Only HTTP traffic, show packet content as chars
+    case SerialOption::HTTPChar : // Only HTTP traffic, show packet content as chars
       nd.printDump(Serial, Packet::PacketDetail::CHAR,
       [](Packet n) {
         return (n.isHTTP());
@@ -79,7 +79,7 @@ void setup(void) {
   WiFi.begin(ssid, password);
 
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WiFi Failed");
+    Serial.println("WiFi Failed, stopping sketch");
     while (1) {
       delay(1000);
     }
@@ -122,7 +122,7 @@ void setup(void) {
   webServer.serveStatic("/", *filesystem, "/");
   webServer.begin();
 
-  startSerial(AllFull); // Serial output examples, use enum SerialOption for selection
+  startSerial(SerialOption::AllFull); // Serial output examples, use enum SerialOption for selection
 
   //  startTcpDump();     // tcpdump option
   //  startTracefile();  // output to SPIFFS or LittleFS

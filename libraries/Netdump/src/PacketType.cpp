@@ -14,10 +14,6 @@ PacketType::PacketType()
 {
 }
 
-PacketType::~PacketType()
-{
-}
-
 String PacketType::toString() const
 {
     switch (ptype)
