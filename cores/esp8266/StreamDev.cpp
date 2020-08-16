@@ -215,6 +215,10 @@ size_t Stream::toFull(Print* to,
             }
 
             w = std::min(w, avr);
+            if (maxLen)
+            {
+                w = std::min(w, maxLen - written);
+            }
             w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
             if (w)
             {
@@ -284,15 +288,31 @@ Stream& operator << (Stream& out, String& string)
     return out;
 }
 
-Stream& operator << (Stream& out, Stream& stream)
+Stream& operator << (Stream& out, StreamString& stream)
 {
     stream.toAll(out);
     return out;
 }
 
-Stream& operator << (Stream& out, StreamString& stream)
+Stream& operator << (Stream& out, Stream& stream)
 {
-    stream.toAll(out);
+    if (stream.streamSize() < 0)
+    {
+        if (stream.inputTimeoutPossible())
+        {
+            // restrict with only what's buffered on input
+            stream.toNow(out);
+        }
+        else
+        {
+            // take all what is in input
+            stream.toAll(out);
+        }
+    }
+    else
+    {
+        stream.toSize(out, stream.streamSize());
+    }
     return out;
 }
 

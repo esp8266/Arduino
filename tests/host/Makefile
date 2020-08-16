@@ -321,12 +321,12 @@ INC_PATHS += $(USERLIBDIRS)
 INC_PATHS += -I$(INODIR)/..
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o)
 
-bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
+bin/fullcore$(E32).a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	$(VERBAR) ar -rcu $@ $^
 	$(VERBAR) ranlib $@
 
-%: %.ino.cpp$(E32).o bin/fullcore.a
-	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
+%: %.ino.cpp$(E32).o bin/fullcore$(E32).a
+	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore$(E32).a $(LIBSSL) -o $@
 	@echo "----> $@ <----"
 
 #################################################

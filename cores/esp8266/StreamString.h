@@ -140,6 +140,20 @@ public:
 
     //// Stream's peekBufferAPI
 
+    virtual bool peekBufferAPI() const override
+    {
+        return true;
+    }
+
+    virtual size_t availableForPeek()
+    {
+        if (peekPointer < 0)
+        {
+            return string->length();
+        }
+        return string->length() - peekPointer;
+    }
+
     virtual const char* peekBuffer() override
     {
         if (peekPointer < 0)
@@ -165,6 +179,11 @@ public:
             // only the pointer is moved
             peekPointer = std::min((size_t)string->length(), peekPointer + consume);
         }
+    }
+
+    virtual ssize_t streamSize() override
+    {
+        return peekPointer < 0 ? string->length() : string->length() - peekPointer;
     }
 
     // calling setConsume() will consume bytes as the stream is read
@@ -197,10 +216,12 @@ class StreamString: public String, public S2Stream
 {
 protected:
 
-    void resetpp ()
+    void resetpp()
     {
         if (peekPointer > 0)
+        {
             peekPointer = 0;
+        }
     }
 
 public:
@@ -224,6 +245,13 @@ public:
     explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
     explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), S2Stream(this) { }
     explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), S2Stream(this) { }
+
+    StreamString& operator= (const StreamString& rhs)
+    {
+        String::operator=(rhs);
+        resetpp();
+        return *this;
+    }
 
     StreamString& operator= (const String& rhs)
     {
