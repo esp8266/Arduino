@@ -6,18 +6,15 @@ source "$TRAVIS_BUILD_DIR"/tests/common.sh
 
 function install_platformio()
 {
-    pip3 install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    pip3 install -U platformio
     platformio platform install "https://github.com/platformio/platform-espressif8266.git"
-# Note that PIO ignores the requested toolchain.  The code below attempted to patch in
-# the current Arduino version, but due to recent PIO changes it no longer succeeds.
-# Dropping it for now, leaving PIO to pick up whatever toolchain it feels like.
-#    # Overwrite toolchain with this PR's toolset.  Probably better way to do this
-#    ( cd $TRAVIS_BUILD_DIR/tools && python3 get.py -q )
-#    mv ~/.platformio/packages/toolchain-xtensa/package.json .save
-#    rm -rf ~/.platformio/packages/toolchain-xtensa
-#    mv $TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf ~/.platformio/packages/toolchain-xtensa
-#    mv .save ~/.platformio/packages/toolchain-xtensa/package.json
-#    python -c "import json; import os; fp=open(os.path.expanduser('~/.platformio/platforms/espressif8266/platform.json'), 'r+'); data=json.load(fp); data['packages']['framework-arduinoespressif8266']['version'] = '*'; fp.seek(0); fp.truncate(); json.dump(data, fp); fp.close()"
+    # Overwrite toolchain with this PR's toolset.  Probably better way to do this
+    ( cd $TRAVIS_BUILD_DIR/tools && python3 get.py -q )
+    mv ~/.platformio/packages/toolchain-xtensa/package.json .save
+    rm -rf ~/.platformio/packages/toolchain-xtensa
+    mv $TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf ~/.platformio/packages/toolchain-xtensa
+    mv .save ~/.platformio/packages/toolchain-xtensa/package.json
+    python -c "import json; import os; fp=open(os.path.expanduser('~/.platformio/platforms/espressif8266/platform.json'), 'r+'); data=json.load(fp); data['packages']['framework-arduinoespressif8266']['version'] = '*'; fp.seek(0); fp.truncate(); json.dump(data, fp); fp.close()"
     ln -sf $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
     # - esp8266/examples/ConfigFile
