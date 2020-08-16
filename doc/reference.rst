@@ -249,8 +249,13 @@ The Program memory features work much the same way as on a regular
 Arduino; placing read only data and strings in read only memory and
 freeing heap for your application.
 
-This is no longer true since core-v2.7 (duplicate literal strings within r/o memory are now handled by gcc):
-<span style="text-decoration:overline">The important difference is that on the ESP8266 the literal strings are not pooled. This means that the same literal string defined inside a ``F("")`` and/or ``PSTR("")`` will take up space for each instance in the code. So you will need to manage the duplicate strings yourself.</span>
+In core version prior to 2.7, the important difference is that on the
+ESP8266 the literal strings are not pooled.  This means that the same
+literal string defined inside a ``F("")`` and/or ``PSTR("")`` will take up
+space for each instance in the code.  So you will need to manage the
+duplicate strings yourself.
+Starting from v2.7, this is no longer true: duplicate literal strings within
+r/o memory are now handled.
 
 There is one additional helper macro to make it easier to pass
 ``const PROGMEM`` strings to methods that take a ``__FlashStringHelper``
