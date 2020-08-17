@@ -123,6 +123,29 @@ extern "C" {
 #endif
 
 void precache(void *f, uint32_t bytes);
+unsigned long millis(void);
+unsigned long micros(void);
+uint64_t micros64(void);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
+
+#if defined(F_CPU) || defined(CORE_MOCK)
+#ifdef __cplusplus
+constexpr
+#else
+inline
+#endif
+int esp_get_cpu_freq_mhz()
+{
+    return F_CPU / 1000000L;
+}
+#else
+inline int esp_get_cpu_freq_mhz()
+{
+    return system_get_cpu_freq();
+}
+#endif
+
 
 #ifdef __cplusplus
 }

@@ -61,7 +61,7 @@ In this mode, every ``write()`` is flushed.  It means that after a call to
 
 When set to ``true`` in ``WiFiClient`` implementation,
 
-- It slows down transfers, and implicitely disable the Nagle algorithm.
+- It slows down transfers, and implicitly disable the Nagle algorithm.
 
 - It also allows to avoid a temporary copy of data that otherwise consumes
   at most ``TCP_SND_BUF`` = (2 * ``MSS``) bytes per connection,
