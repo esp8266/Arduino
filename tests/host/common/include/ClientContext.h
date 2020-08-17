@@ -28,7 +28,6 @@ extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
 #include <include/DataSource.h>
-#include <debug.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 

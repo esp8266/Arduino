@@ -30,7 +30,6 @@ void esp_schedule();
 }
 
 #include <AddrList.h>
-#include <debug.h>
 
 #define PBUF_ALIGNER_ADJUST 4
 #define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
