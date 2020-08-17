@@ -35,7 +35,8 @@ static const char filename[] PROGMEM = "filename";
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
-  return client.toSize(S2Stream(data), maxLength, timeout_ms) == maxLength;
+  S2Stream dataStream(data);
+  return client.toSize(dataStream, maxLength, timeout_ms) == maxLength;
 }
 
 template <typename ServerType>
