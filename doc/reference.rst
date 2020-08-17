@@ -464,8 +464,8 @@ Stream extensions
 
       A ``Stream::`` is made from ``const char*``, ``F("some words in
       flash")`` or ``PROGMEM`` strings.  This class makes no copy, even with
-      data in flash.  For them, byte-by-byte transfers is a consequence.
-      Others can be transfered at once when possible.
+      data in flash.  For flash content, byte-by-byte transfers is a
+      consequence.  Other contents can be transfered at once when possible.
 
       .. code:: cpp
 
@@ -479,16 +479,16 @@ Stream extensions
         String helloString("hello");
         S2Stream hello(helloString);
 
-        hello.toAll(Serial); // shows "hello";
+        hello.toAll(Serial); // shows "hello"
         hello.toAll(Serial); // shows nothing, content has already been read
         hello.reset();       // reset content pointer
-        hello.toAll(Serial); // shows "hello";
+        hello.toAll(Serial); // shows "hello"
         hello.reset(3);      // reset content pointer to a specific position
-        hello.toAll(Serial); // shows "lo";
+        hello.toAll(Serial); // shows "lo"
 
         hello.setConsume();
         Serial.println(helloString.length()); // shows 5
-        hello.toAll(Serial);                  // shows "hello";
+        hello.toAll(Serial);                  // shows "hello"
         Serial.println(helloString.length()); // shows 0, string is consumed
 
       ``StreamString::``, which derives from ``S2Stream`` is now a r/w class:
@@ -507,7 +507,7 @@ Stream extensions
 
   - Internal Stream API: ``peekBuffer``
 
-    Here is the method list and their significations.  It is currently
+    Here is the method list and their significations.  They are currently
     implemented in ``HardwareSerial``, ``WiFiClient`` and
     ``WiFiClientSecure``.
 
@@ -524,7 +524,7 @@ Stream extensions
 
     - ``virtual bool inputTimeoutPossible ()``
 
-      A StringStream will return false. A closed network connection returns false.
+      A ``StringStream`` will return false. A closed network connection returns false.
       This function allows ``Stream::toAll()`` to return early.
 
     - ``virtual bool outputTimeoutPossible ()``
