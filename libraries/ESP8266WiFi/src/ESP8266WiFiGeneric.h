@@ -121,7 +121,7 @@ class ESP8266WiFiGenericClass {
     public:
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
-        int hostByNameAsync(const char* aHostname, IPAddress& aResult, uint8_t* waiting = nullptr);
+        int hostByNameAsync(const char* aHostname, IPAddress& aResult, bool* waiting = nullptr);
 #if LWIP_IPV4 && LWIP_IPV6
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType);
 #endif

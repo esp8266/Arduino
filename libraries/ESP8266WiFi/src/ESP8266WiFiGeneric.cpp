@@ -729,11 +729,11 @@ static void wifi_dns_found_callback_async(const char* name, const ip_addr_t* ipa
  *         else 0
  */
 
-int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult, uint8_t* waiting) {
+int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& aResult, bool* waiting) {
     ip_addr_t addr;
 
     if (waiting != nullptr) {
-        *waiting = 0;
+        *waiting = false;
     }
 
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback_async, NULL);
@@ -746,7 +746,7 @@ int ESP8266WiFiGenericClass::hostByNameAsync(const char* aHostname, IPAddress& a
     if (err == ERR_INPROGRESS) {
         DEBUG_WIFI_GENERIC("[hostByName] DNS search in progress. Host %s\n", aHostname);
         if (waiting != nullptr) {
-            *waiting = 1;
+            *waiting = true;
         }
     } else { // ERR_TIMEOUT
         DEBUG_WIFI_GENERIC("[hostByName] DNS search failed. Host %s\n", aHostname);
