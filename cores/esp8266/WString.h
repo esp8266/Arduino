@@ -28,8 +28,6 @@
 #include <ctype.h>
 #include <pgmspace.h>
 
-#include <Stream.h>
-
 // An inherited class for holding the result of a concatenation.  These
 // result objects are assumed to be writable by subsequent concatenations.
 class StringSumHelper;
@@ -40,14 +38,8 @@ class __FlashStringHelper;
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
-#define STRING_IS_STREAM 1 // helper to avoid overloading functions using String:: with StreamString::
-
 // The string class
-class String
-#if STRING_IS_STREAM
-    : public Stream
-#endif
-{
+class String {
         // use a function pointer to allow for "if (s)" without the
         // complications of an operator bool(). for more information, see:
         // http://www.artima.com/cppsource/safebool.html
@@ -322,55 +314,6 @@ class String
         String & copy(const char *cstr, unsigned int length);
         String & copy(const __FlashStringHelper *pstr, unsigned int length);
         void move(String &rhs);
-
-#if STRING_IS_STREAM
-    /////////////////////////////////////////////
-    // Print/Stream/peekBuffer API:
-
-protected:
-
-    // peekPointer is used with peekBufferAPI,
-    // on peekConsume(), chars can either:
-    // - be really consumed = disappeared
-    //   (case when peekPointer==-1)
-    // - marked as read
-    //   (peekPointer >=0 is increased)
-    int peekPointer = 0;
-
-public:
-
-    //// Stream:
-
-    size_t write(const uint8_t *buffer, size_t size) override;
-    size_t write(uint8_t data) override;
-
-    int available() override;
-    int read() override;
-    int peek() override;
-    void flush() override;
-
-    //// peekBuffer API:
-
-    virtual bool peekBufferAPI () const override { return true; }
-    virtual size_t availableForPeek () override { return available(); }
-    virtual const char* peekBuffer () override;
-    virtual void peekConsume (size_t consume) override;
-    virtual bool inputTimeoutPossible () override { return false; }
-    virtual int read (uint8_t* buffer, size_t len) override;
-
-    // calling peekPointerSetConsume() will consume bytes as they are stream-read
-    void peekPointerSetConsume () { peekPointer = -1; }
-    void peekPointerReset (int pointer = 0) { peekPointer = pointer; }
-
-    virtual ssize_t streamSize () override { return length(); }
-
-    //// Print:
-
-    virtual bool outputTimeoutPossible () override { return false; }
-    virtual int availableForWrite() override { return 64; } // or biggestChunk()/4 or max(1,reserved-length)?
-
-#endif // STRING_IS_STREAM
-
 };
 
 class StringSumHelper: public String {

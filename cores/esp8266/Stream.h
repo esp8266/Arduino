@@ -188,7 +188,7 @@ class Stream: public Print {
         template <typename T>
         size_t toSize (T& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toSize((Print*)&to, maxLen, timeoutMs); }
 
-        // size of input (-1 by default = unknown)
+        // remaining size (-1 by default = unknown)
         virtual ssize_t streamSize () { return -1; }
 
         typedef enum

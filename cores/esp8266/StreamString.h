@@ -26,31 +26,29 @@
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
-#if STRING_IS_STREAM
+// S2Stream points to a String and makes it a Stream
+// (it is also the helper for StreamString)
 
-// StreamString has been integrated into String
-using StreamString = String;
-
-#else // !STRING_IS_STREAM
-
-///////////////////////////////////////////////////////////////
-// using sstream helper as Stream and String pointer
-
-class sstream: public Stream
+class S2Stream: public Stream
 {
 public:
 
-    sstream(String& string): string(&string)
+    S2Stream(String& string): string(&string)
     {
     }
 
-    sstream(String* string): string(string)
+    S2Stream(String* string): string(string)
     {
     }
 
     virtual int available() override
     {
         return string->length();
+    }
+
+    virtual int availableForWrite() override
+    {
+        return 32767;
     }
 
     virtual int read() override
@@ -66,8 +64,8 @@ public:
             }
         }
         else if (peekPointer < (int)string->length())
-            // return pointed and move pointer
         {
+            // return pointed and move pointer
             return string->charAt(peekPointer++);
         }
 
@@ -103,9 +101,9 @@ public:
         return l;
     }
 
-    virtual size_t write(const uint8_t *buffer, size_t size) override
+    virtual size_t write(const uint8_t* buffer, size_t len) override
     {
-        return string->concat((const char*)buffer, size) ? size : 0;
+        return string->concat((const char*)buffer, len) ? len : 0;
     }
 
     virtual int peek() override
@@ -134,12 +132,27 @@ public:
     {
         return false;
     }
+
     virtual bool outputTimeoutPossible() override
     {
         return false;
     }
 
     //// Stream's peekBufferAPI
+
+    virtual bool peekBufferAPI() const override
+    {
+        return true;
+    }
+
+    virtual size_t availableForPeek()
+    {
+        if (peekPointer < 0)
+        {
+            return string->length();
+        }
+        return string->length() - peekPointer;
+    }
 
     virtual const char* peekBuffer() override
     {
@@ -157,23 +170,33 @@ public:
     virtual void peekConsume(size_t consume) override
     {
         if (peekPointer < 0)
-            // string is really consumed
         {
+            // string is really consumed
             string->remove(0, consume);
         }
         else
-            // only the pointer is moved
         {
+            // only the pointer is moved
             peekPointer = std::min((size_t)string->length(), peekPointer + consume);
         }
     }
 
-    // calling peekPointerSetConsume() will consume bytes as they are stream-read
-    void peekPointerSetConsume()
+    virtual ssize_t streamSize() override
+    {
+        return peekPointer < 0 ? string->length() : string->length() - peekPointer;
+    }
+
+    // calling setConsume() will consume bytes as the stream is read
+    // (not enabled by default)
+    void setConsume()
     {
         peekPointer = -1;
     }
-    void peekPointerReset(int pointer = 0)
+
+    // Reading this stream will mark the string as read without consuming
+    // This is the default.
+    // Calling reset() resets the read state and allows rereading.
+    void reset(int pointer = 0)
     {
         peekPointer = pointer;
     }
@@ -182,27 +205,88 @@ protected:
 
     String* string;
 
-    // peekPointer is used with peekBufferAPI,
-    // on peekConsume(), chars can either:
-    // - be really consumed = disappeared
-    //   (case when peekPointer==-1)
-    // - marked as read
-    //   (peekPointer >=0 is increased)
+    // default (0): read marks as read without consuming(erasing) the string:
     int peekPointer = 0;
 };
 
-// StreamString is a String and a sstream pointing to itself-as-String
 
-class StreamString: public String, public sstream
+// StreamString is a S2Stream holding the String
+
+class StreamString: public String, public S2Stream
 {
-public:
-    StreamString(String&& string): String(string), sstream(this) { }
-    StreamString(const String& string): String(string), sstream(this) { }
-    StreamString(StreamString&& bro): String(bro), sstream(this) { }
-    StreamString(const StreamString& bro): String(bro), sstream(this) { }
-    StreamString(): String(), sstream(this) { }
-};
+protected:
 
-#endif // !STRING_IS_STREAM
+    void resetpp()
+    {
+        if (peekPointer > 0)
+        {
+            peekPointer = 0;
+        }
+    }
+
+public:
+
+    StreamString(StreamString&& bro): String(bro), S2Stream(this) { }
+    StreamString(const StreamString& bro): String(bro), S2Stream(this) { }
+
+    // duplicate String contructors and operator=:
+
+    StreamString(const char* text = nullptr): String(text), S2Stream(this) { }
+    StreamString(const String& string): String(string), S2Stream(this) { }
+    StreamString(const __FlashStringHelper *str): String(str), S2Stream(this) { }
+    StreamString(String&& string): String(string), S2Stream(this) { }
+    StreamString(StringSumHelper&& sum): String(sum), S2Stream(this) { }
+
+    explicit StreamString(char c): String(c), S2Stream(this) { }
+    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), S2Stream(this) { }
+    explicit StreamString(int i, unsigned char base = 10): String(i, base), S2Stream(this) { }
+    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), S2Stream(this) { }
+    explicit StreamString(long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
+    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
+    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), S2Stream(this) { }
+    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), S2Stream(this) { }
+
+    StreamString& operator= (const StreamString& rhs)
+    {
+        String::operator=(rhs);
+        resetpp();
+        return *this;
+    }
+
+    StreamString& operator= (const String& rhs)
+    {
+        String::operator=(rhs);
+        resetpp();
+        return *this;
+    }
+
+    StreamString& operator= (const char* cstr)
+    {
+        String::operator=(cstr);
+        resetpp();
+        return *this;
+    }
+
+    StreamString& operator= (const __FlashStringHelper* str)
+    {
+        String::operator=(str);
+        resetpp();
+        return *this;
+    }
+
+    StreamString& operator= (String&& rval)
+    {
+        String::operator=(rval);
+        resetpp();
+        return *this;
+    }
+
+    StreamString& operator= (StringSumHelper&& rval)
+    {
+        String::operator=(rval);
+        resetpp();
+        return *this;
+    }
+};
 
 #endif // __STREAMSTRING_H

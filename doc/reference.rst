@@ -356,3 +356,188 @@ C++
 
       SomeClass* scs = arduino_newarray(SomeClass, 42);
       delete [] scs;
+
+Streams
+-------
+
+Arduino API
+
+  Stream is one of the core classes in the Arduino API.  Wire, serial, network and
+  filesystems are streams, from which data are read or written.
+
+  Making a transfer with streams is quite common, like for example the
+  historical WiFiSerial sketch:
+
+  .. code:: cpp
+
+    //check clients for data
+    //get data from the telnet client and push it to the UART
+    while (serverClient.available()) {
+      Serial.write(serverClient.read());
+    }
+
+    //check UART for data
+    if (Serial.available()) {
+      size_t len = Serial.available();
+      uint8_t sbuf[len];
+      Serial.readBytes(sbuf, len);
+      //push UART data to all connected telnet clients
+      if (serverClient && serverClient.connected()) {
+        serverClient.write(sbuf, len);
+      }
+    }
+
+  One will notice that in the network to serial direction, data are transfered
+  byte by byte while data are available.  On the other direction, a temporary
+  buffer is created on stack, filled with available serial data, then
+  transfered to network.
+
+  The ``readBytes(buffer, length)`` method includes a timeout to ensure that
+  all required bytes are received.  The ``write(buffer, length)`` (inherited
+  from ``Print::`) function is also usually blocking until the full buffer is
+  transmitted. Both functions return the number of transmitted bytes.
+
+  That's the way the Stream class works and is commonly used.
+
+  Classes derived from ``Stream::`` also usually introduce the ``read(buffer,
+  len)`` method, which is similar to ``readBytes(buffer, len)`` without
+  timeout: the returned value can be less than the requested size, so special
+  care must be taken with this function, introduced in the Arduino
+  ``Client::`` class.  This function has also been introduced in other classes
+  not derivating from ``Client::``, e.g.  ``HardwareSerial::``.
+
+Stream extensions
+
+  Proposed Stream extensions are designed to be compatible with Arduino API,
+  and offer a additional methods to make transfers more efficients and easier
+  to use.
+
+  The serial to network transfer above can be written like this:
+
+  .. code:: cpp
+
+    serverClient.toNow(Serial); // chunk by chunk
+    Serial.toNow(serverClient); // chunk by chunk
+
+  An echo service can be written like this:
+
+  .. code:: cpp
+
+    serverClient.toNow(serverClient); // tcp echo service
+
+    Serial.toNow(Serial);             // serial software loopback
+
+  Beside reducing coding time, these methods optimize transfers by avoiding
+  buffer copies and when possible.
+
+  - User facing API: ``Stream::to()``
+
+    The goal of streams is to transfer data between producers and consumers,
+    like the telnet/serial example above.  Four methods are proposed, all of
+    them return the number of transmitted bytes:
+
+    - ``Stream::toSize(dest, size [, timeout])``
+
+      This method waits up to the given or default timeout to transfer
+      ``size`` bytes to the the ``dest`` Stream.
+
+    - ``Stream::toUntil(dest, delim [, timeout])``
+
+      This method waits up to the given or default timeout to transfer data
+      until the character ``delim`` is met.  The delimiter is read but not
+      transfered.
+
+    - ``Stream::toNow(dest)``
+
+      This method transfers all already available data to the destination.
+      There is no timeout and the returned value is 0 when there is nothing
+      to transfer or no room in the destination.
+
+    - ``Stream::toAll(dest [, timeout])``
+
+      This method waits up to the given or default timeout to transfer all
+      available data.  It is useful when source is able to tell that no more
+      data will be available for this call, or when destination is able to
+      tell that it will no more be able to receive.
+
+      For example, a source String will not grow during the transfer, or a
+      particular network connection supposed to send a fixed amount of data
+      before closing.  ``::toAll()`` will receive all bytes.  Timeout is
+      useful when destination needs processing time (e.g.  network or serial
+      input buffer full = please wait a bit).
+
+  - String, flash strings helpers
+
+    Two additional classes are proposed.
+
+    - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
+
+      A ``Stream::`` is made from ``const char*``, ``F("some words in
+      flash")`` or ``PROGMEM`` strings.  This class makes no copy, even with
+      data in flash.  For flash content, byte-by-byte transfers is a
+      consequence.  Other contents can be transfered at once when possible.
+
+      .. code:: cpp
+
+        StreamPtr css(F("my long css data")); // no heap/stack allocation
+        server.toAll(css);
+
+    - ``S2Stream::`` is designed to make a ``Stream::`` out of a ``String::`` without copy.
+
+      .. code:: cpp
+
+        String helloString("hello");
+        S2Stream hello(helloString);
+
+        hello.toAll(Serial); // shows "hello"
+        hello.toAll(Serial); // shows nothing, content has already been read
+        hello.reset();       // reset content pointer
+        hello.toAll(Serial); // shows "hello"
+        hello.reset(3);      // reset content pointer to a specific position
+        hello.toAll(Serial); // shows "lo"
+
+        hello.setConsume();
+        Serial.println(helloString.length()); // shows 5
+        hello.toAll(Serial);                  // shows "hello"
+        Serial.println(helloString.length()); // shows 0, string is consumed
+
+      ``StreamString::``, which derives from ``S2Stream`` is now a r/w class:
+
+      .. code:: cpp
+
+        StreamString contentStream;
+        client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+
+        // equivalent to:
+
+        String content;
+        S2Stream contentStream(content);
+        client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+        // content has the data
+
+  - Internal Stream API: ``peekBuffer``
+
+    Here is the method list and their significations.  They are currently
+    implemented in ``HardwareSerial``, ``WiFiClient`` and
+    ``WiFiClientSecure``.
+
+    - ``virtual bool peekBufferAPI ()`` returns ``true`` when the API is present in the class
+
+    - ``virtual size_t availableForPeek ()`` returns the number of reachable bytes
+
+    - ``virtual const char* peekBuffer ()`` returns the pointer to these bytes
+
+      This API requires that any kind of ``"read"`` function must not be called after ``peekBuffer()``
+      and until ``peekConsume()`` is called.
+
+    - ``virtual void peekConsume (size_t consume)`` tells to discard that number of bytes
+
+    - ``virtual bool inputTimeoutPossible ()``
+
+      A ``StringStream`` will return false. A closed network connection returns false.
+      This function allows ``Stream::toAll()`` to return early.
+
+    - ``virtual bool outputTimeoutPossible ()``
+
+      A closed network connection returns false.
+      This function allows ``Stream::toAll()`` to return early.
