@@ -371,27 +371,19 @@ Arduino API
   .. code:: cpp
 
     //check clients for data
-    for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-      if (serverClients[i] && serverClients[i].connected()) {
-        if (serverClients[i].available()) {
-          //get data from the telnet client and push it to the UART
-          while (serverClients[i].available()) {
-            Serial.write(serverClients[i].read());
-          }
-        }
-      }
+    //get data from the telnet client and push it to the UART
+    while (serverClient.available()) {
+      Serial.write(serverClient.read());
     }
+
     //check UART for data
     if (Serial.available()) {
       size_t len = Serial.available();
       uint8_t sbuf[len];
       Serial.readBytes(sbuf, len);
       //push UART data to all connected telnet clients
-      for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-        if (serverClients[i] && serverClients[i].connected()) {
-          serverClients[i].write(sbuf, len);
-          delay(1);
-        }
+      if (serverClient && serverClient.connected()) {
+        serverClient.write(sbuf, len);
       }
     }
 
@@ -419,6 +411,24 @@ Stream extensions
   Proposed Stream extensions are designed to be compatible with Arduino API,
   and offer a additional methods to make transfers more efficients and easier
   to use.
+
+  The serial to network transfer above can be written like this:
+
+  .. code:: cpp
+
+    serverClient.toNow(Serial); // chunk by chunk
+    Serial.toNow(serverClient); // chunk by chunk
+
+  An echo service can be written like this:
+
+  .. code:: cpp
+
+    serverClient.toNow(serverClient); // tcp echo service
+
+    Serial.toNow(Serial);             // serial software loopback
+
+  Beside reducing coding time, these methods optimize transfers by avoiding
+  buffer copies and when possible.
 
   - User facing API: ``Stream::to()``
 
