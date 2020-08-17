@@ -460,49 +460,48 @@ Stream extensions
 
     Two additional classes are proposed.
 
-      - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
+    - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
 
-        A `Stream::` is made from `const char*`, `F("some words in flash")`
-        or `PROGMEM` strings.  This class makes no copy, even with data in
-        flash.  For them, byte-by-byte transfers is a consequence.  Others
-        can be transfered at once when possible.
+      A `Stream::` is made from `const char*`, `F("some words in flash")` or
+      `PROGMEM` strings.  This class makes no copy, even with data in flash. 
+      For them, byte-by-byte transfers is a consequence.  Others can be
+      transfered at once when possible.
 
-        .. code:: cpp
+      .. code:: cpp
 
-          StreamPtr css(F("my long css data")); // no heap/stack allocation
-          server.toAll(css);
+        StreamPtr css(F("my long css data")); // no heap/stack allocation
+        server.toAll(css);
 
-      - ``S2Stream::`` is designed to make a ``Stream::` out of a ``String::`` without copy.
+    - ``S2Stream::`` is designed to make a ``Stream::` out of a ``String::`` without copy.
 
-        With examples:
-        .. code:: cpp
+      With examples:
+      .. code:: cpp
 
-          String helloString("hello");
-          S2Stream hello(helloString);
+        String helloString("hello");
+        S2Stream hello(helloString);
 
-          hello.toAll(Serial); // shows "hello";
-          hello.toAll(Serial); // shows nothing, content has already been read
-          hello.reset();       // reset content pointer
-          hello.toAll(Serial); // shows "hello";
-          hello.reset(3);      // reset content pointer to a specific position
-          hello.toAll(Serial); // shows "lo";
+        hello.toAll(Serial); // shows "hello";
+        hello.toAll(Serial); // shows nothing, content has already been read
+        hello.reset();       // reset content pointer
+        hello.toAll(Serial); // shows "hello";
+        hello.reset(3);      // reset content pointer to a specific position
+        hello.toAll(Serial); // shows "lo";
 
-          hello.setConsume();
-          Serial.println(helloString.length()); // shows 5
-          hello.toAll(Serial);                  // shows "hello";
-          Serial.println(helloString.length()); // shows 0, string is consumed
+        hello.setConsume();
+        Serial.println(helloString.length()); // shows 5
+        hello.toAll(Serial);                  // shows "hello";
+        Serial.println(helloString.length()); // shows 0, string is consumed
 
-       ``StreamString::``, which derives from ``S2Stream`` is now a r/w class:
+      ``StreamString::``, which derives from ``S2Stream`` is now a r/w class:
 
-        .. code:: cpp
+      .. code:: cpp
 
-          StreamString contentStream;
-          client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+        StreamString contentStream;
+        client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
 
-          // equivalent to:
-          String content;
-          S2Stream contentStream(content);
-          client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+        // equivalent to:
+        String content;
+        S2Stream contentStream(content);
+        client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
 
   - internal Stream API: peekBuffer
-
