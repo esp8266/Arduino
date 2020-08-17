@@ -139,7 +139,7 @@ int WiFiClient::connect(const String& host, uint16_t port)
 
 int WiFiClient::connectAsync(const char* host, uint16_t port, uint8_t* waiting) // Non blocking
 {
-    if (waiting != NULL)
+    if (waiting != nullptr)
         *waiting = 0;
     if (connected())
         return 1;

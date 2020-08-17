@@ -236,7 +236,7 @@ int WiFiClientSecure::connect(const String& host, uint16_t port) {
 }
 
 int WiFiClientSecure::connectAsync(const char* name, uint16_t port, uint8_t* waiting) {
-  if (waiting != NULL) *waiting = 0;
+  if (waiting != nullptr) *waiting = 0;
   if (connected()) return 1;
 
   IPAddress remote_addr;

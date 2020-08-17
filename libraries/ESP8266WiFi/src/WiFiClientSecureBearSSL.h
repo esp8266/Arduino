@@ -42,8 +42,8 @@ class WiFiClientSecure : public WiFiClient {
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
-    int connectAsync(const char* name, uint16_t port, uint8_t* waiting = NULL) override;
-    int inline connectAsync(const String& host, uint16_t port, uint8_t* waiting = NULL) override {
+    int connectAsync(const char* name, uint16_t port, uint8_t* waiting = nullptr) override;
+    int inline connectAsync(const String& host, uint16_t port, uint8_t* waiting = nullptr) override {
       return connectAsync(host.c_str(), port, waiting);
     }
 
