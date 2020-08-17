@@ -166,6 +166,9 @@ public:
   void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
+  void sendContent(String& content) {
+    sendContent((const String&)content);
+  }
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
   void sendContent(const char *content) { sendContent_P(content); }
@@ -173,7 +176,9 @@ public:
 
   void sendContent(Stream* content, ssize_t content_length = 0);
   template <typename T>
-  void sendContent(T& content, ssize_t content_length = 0) { sendContent(&content, content_length); }
+  void sendContent(T& content, ssize_t content_length = 0) {
+    sendContent(&content, content_length);
+  }
 
   bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
     if (_currentVersion == 0)

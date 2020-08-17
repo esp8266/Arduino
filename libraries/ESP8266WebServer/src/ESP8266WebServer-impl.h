@@ -513,8 +513,8 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content, ssize_t content_length /* = 0*/) {
   if (_currentMethod == HTTP_HEAD)
     return;
-  if (content_length == 0)
-      content_length = std::max((ssize_t)0, content->streamSize());
+  if (content_length <= 0)
+    content_length = std::max((ssize_t)0, content->streamSize());
   if(_chunked) {
     _currentClient.printf("%zx\r\n", content_length);
   }
