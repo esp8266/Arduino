@@ -462,19 +462,18 @@ Stream extensions
 
     - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
 
-      A `Stream::` is made from `const char*`, `F("some words in flash")` or
-      `PROGMEM` strings.  This class makes no copy, even with data in flash. 
-      For them, byte-by-byte transfers is a consequence.  Others can be
-      transfered at once when possible.
+      A ``Stream::`` is made from ``const char*``, ``F("some words in
+      flash")`` or ``PROGMEM`` strings.  This class makes no copy, even with
+      data in flash.  For them, byte-by-byte transfers is a consequence.
+      Others can be transfered at once when possible.
 
       .. code:: cpp
 
         StreamPtr css(F("my long css data")); // no heap/stack allocation
         server.toAll(css);
 
-    - ``S2Stream::`` is designed to make a ``Stream::` out of a ``String::`` without copy.
+    - ``S2Stream::`` is designed to make a ``Stream::`` out of a ``String::`` without copy.
 
-      With examples:
       .. code:: cpp
 
         String helloString("hello");
@@ -500,8 +499,35 @@ Stream extensions
         client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
 
         // equivalent to:
+
         String content;
         S2Stream contentStream(content);
         client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+        // content has the data
 
-  - internal Stream API: peekBuffer
+  - Internal Stream API: ``peekBuffer``
+
+    Here is the method list and their significations.  It is currently
+    implemented in ``HardwareSerial``, ``WiFiClient`` and
+    ``WiFiClientSecure``.
+
+    - ``virtual bool peekBufferAPI ()`` returns ``true`` when the API is present in the class
+
+    - ``virtual size_t availableForPeek ()`` returns the number of reachable bytes
+
+    - ``virtual const char* peekBuffer ()`` returns the pointer to these bytes
+
+      This API requires that any kind of ``"read"`` function must not be called after ``peekBuffer()``
+      and until ``peekConsume()`` is called.
+
+    - ``virtual void peekConsume (size_t consume)`` tells to discard that number of bytes
+
+    - ``virtual bool inputTimeoutPossible ()``
+
+      A StringStream will return false. A closed network connection returns false.
+      This function allows ``Stream::toAll()`` to return early.
+
+    - ``virtual bool outputTimeoutPossible ()``
+
+      A closed network connection returns false.
+      This function allows ``Stream::toAll()`` to return early.
