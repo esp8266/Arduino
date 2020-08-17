@@ -125,10 +125,13 @@ class EspClass {
 #if defined(F_CPU) || defined(CORE_MOCK)
         constexpr uint8_t getCpuFreqMHz() const
         {
-            return clockCyclesPerMicrosecond();
+            return esp_get_cpu_freq_mhz();
         }
 #else
-        uint8_t getCpuFreqMHz();
+        uint8_t getCpuFreqMHz() const
+        {
+            return esp_get_cpu_freq_mhz();
+        }
 #endif
 
         uint32_t getFlashChipId();

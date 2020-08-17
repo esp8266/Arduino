@@ -78,7 +78,6 @@ def main():
             f.write(val)
         return 0
     elif args.mode == "sign":
-        val = ""
         if not os.path.isfile(args.privatekey):
             return
         try:

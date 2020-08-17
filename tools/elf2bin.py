@@ -57,7 +57,7 @@ def get_segment_size_addr(elf, segment, path):
 def read_segment(elf, segment, path):
     fd, tmpfile = tempfile.mkstemp()
     os.close(fd)
-    p = subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, tmpfile], stdout=subprocess.PIPE)
+    subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, tmpfile], stdout=subprocess.PIPE)
     with open(tmpfile, "rb") as f:
         raw = f.read()
     os.remove(tmpfile)
@@ -85,7 +85,7 @@ def write_bin(out, args, elf, segments, to_addr):
         try:
             for data in raw:
                 checksum = checksum ^ ord(data)
-        except:
+        except Exception:
             for data in raw:
                 checksum = checksum ^ data
     total_size += 1

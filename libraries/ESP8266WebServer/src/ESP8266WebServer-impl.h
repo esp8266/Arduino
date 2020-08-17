@@ -366,7 +366,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
       break;
     case HC_WAIT_CLOSE:
       // Wait for client to close the connection
-      if (!_server.available() && (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT)) {
+      if (!_server.hasClient() && (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT)) {
         keepCurrentClient = true;
         callYield = true;
         if (_currentClient.available())

@@ -100,6 +100,7 @@ void *createBearsslHmac(const br_hash_class *hashType, const void *data, const s
 
 String createBearsslHmac(const br_hash_class *hashType, const uint8_t hashTypeNaturalLength, const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
 {
+    (void) hashTypeNaturalLength;
     assert(1 <= hmacLength && hmacLength <= hashTypeNaturalLength);
 
     uint8_t hmac[hmacLength];
@@ -152,6 +153,7 @@ void *createBearsslHmacCT(const br_hash_class *hashType, const void *data, const
 
 String createBearsslHmacCT(const br_hash_class *hashType, const uint8_t hashTypeNaturalLength, const String &message, const void *hashKey, const size_t hashKeyLength, const size_t hmacLength)
 {
+    (void) hashTypeNaturalLength;
     assert(1 <= hmacLength && hmacLength <= hashTypeNaturalLength);
 
     uint8_t hmac[hmacLength];
