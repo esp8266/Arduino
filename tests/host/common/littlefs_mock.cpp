@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cerrno>
 #include "flash_hal_mock.h"
 
 #define LITTLEFS_FILE_NAME "littlefs.bin"
