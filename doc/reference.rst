@@ -360,103 +360,103 @@ C++
 Streams
 -------
 
-### Arduino API
+Arduino API
 
-Stream is one of the core classes in the Arduino API.  Wire, serial, network and
-filesystems are streams, from which data are read or written.
+  Stream is one of the core classes in the Arduino API.  Wire, serial, network and
+  filesystems are streams, from which data are read or written.
 
-Making a transfer with streams is quite common, like for example the
-historical WiFiSerial sketch:
+  Making a transfer with streams is quite common, like for example the
+  historical WiFiSerial sketch:
 
-.. code:: cpp
+  .. code:: cpp
 
-  //check clients for data
-  for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-    if (serverClients[i] && serverClients[i].connected()) {
-      if (serverClients[i].available()) {
-        //get data from the telnet client and push it to the UART
-        while (serverClients[i].available()) {
-          Serial.write(serverClients[i].read());
+    //check clients for data
+    for (i = 0; i < MAX_SRV_CLIENTS; i++) {
+      if (serverClients[i] && serverClients[i].connected()) {
+        if (serverClients[i].available()) {
+          //get data from the telnet client and push it to the UART
+          while (serverClients[i].available()) {
+            Serial.write(serverClients[i].read());
+          }
         }
       }
     }
-  }
-  //check UART for data
-  if (Serial.available()) {
-    size_t len = Serial.available();
-    uint8_t sbuf[len];
-    Serial.readBytes(sbuf, len);
-    //push UART data to all connected telnet clients
-    for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-      if (serverClients[i] && serverClients[i].connected()) {
-        serverClients[i].write(sbuf, len);
-        delay(1);
+    //check UART for data
+    if (Serial.available()) {
+      size_t len = Serial.available();
+      uint8_t sbuf[len];
+      Serial.readBytes(sbuf, len);
+      //push UART data to all connected telnet clients
+      for (i = 0; i < MAX_SRV_CLIENTS; i++) {
+        if (serverClients[i] && serverClients[i].connected()) {
+          serverClients[i].write(sbuf, len);
+          delay(1);
+        }
       }
     }
-  }
 
-One will notice that in the network to serial direction, data are transfered
-byte by byte while data are available.  On the other direction, a temporary
-buffer is created on stack, filled with available serial data, then
-transfered to network.
+  One will notice that in the network to serial direction, data are transfered
+  byte by byte while data are available.  On the other direction, a temporary
+  buffer is created on stack, filled with available serial data, then
+  transfered to network.
 
-The ``readBytes(buffer, length)`` method includes a timeout to ensure that
-all required bytes are received.  The ``write(buffer, length)`` (inherited
-from ``Print::`) function is also usually blocking until the full buffer is
-transmitted. Both functions return the number of transmitted bytes.
+  The ``readBytes(buffer, length)`` method includes a timeout to ensure that
+  all required bytes are received.  The ``write(buffer, length)`` (inherited
+  from ``Print::`) function is also usually blocking until the full buffer is
+  transmitted. Both functions return the number of transmitted bytes.
 
-That's the way the Stream class works and is commonly used.
+  That's the way the Stream class works and is commonly used.
 
-Classes derived from ``Stream::`` also usually introduce the ``read(buffer,
-len)`` method, which is similar to ``readBytes(buffer, len)`` without
-timeout: the returned value can be less than the requested size, so special
-care must be taken with this function, introduced in the Arduino
-``Client::`` class.  This function has also been introduced in other classes
-not derivating from ``Client::``, e.g.  ``HardwareSerial::``.
+  Classes derived from ``Stream::`` also usually introduce the ``read(buffer,
+  len)`` method, which is similar to ``readBytes(buffer, len)`` without
+  timeout: the returned value can be less than the requested size, so special
+  care must be taken with this function, introduced in the Arduino
+  ``Client::`` class.  This function has also been introduced in other classes
+  not derivating from ``Client::``, e.g.  ``HardwareSerial::``.
 
-### Stream extensions
+Stream extensions
 
-Proposed Stream extensions are designed to be compatible with Arduino API,
-and offer a additional methods to make transfers more efficients and easier
-to use.
+  Proposed Stream extensions are designed to be compatible with Arduino API,
+  and offer a additional methods to make transfers more efficients and easier
+  to use.
 
-- User facing API: ``Stream::to()``
+  - User facing API: ``Stream::to()``
 
-  The goal of streams is to transfer data between producers and consumers,
-  like the telnet/serial example above.  Four methods are proposed, all of
-  them return the number of transmitted bytes:
+    The goal of streams is to transfer data between producers and consumers,
+    like the telnet/serial example above.  Four methods are proposed, all of
+    them return the number of transmitted bytes:
 
-  - ``Stream::toSize(dest, size [, timeout])``
+    - ``Stream::toSize(dest, size [, timeout])``
 
-    This method waits up to the given or default timeout to transfer
-    ``size`` bytes to the the ``dest`` Stream.
+      This method waits up to the given or default timeout to transfer
+      ``size`` bytes to the the ``dest`` Stream.
 
-  - ``Stream::toUntil(dest, delim [, timeout])``
+    - ``Stream::toUntil(dest, delim [, timeout])``
 
-    This method waits up to the given or default timeout to transfer data
-    until the character ``delim`` is met.  The delimiter is read but not
-    transfered.
+      This method waits up to the given or default timeout to transfer data
+      until the character ``delim`` is met.  The delimiter is read but not
+      transfered.
 
-  - ``Stream::toNow(dest)``
+    - ``Stream::toNow(dest)``
 
-    This method transfer all already available data to the destination.
-    There is no timeout and the returned value is 0 when there is nothing to
-    transfer or no room in the destination.
+      This method transfer all already available data to the destination.
+      There is no timeout and the returned value is 0 when there is nothing to
+      transfer or no room in the destination.
 
-  - ``Stream::toAll(dest [, timeout])``
+    - ``Stream::toAll(dest [, timeout])``
 
-    This method waits up to the given or default timeout to transfer all
-    available data.  It is useful when source is able to tell that no more
-    data will be available for this call.
+      This method waits up to the given or default timeout to transfer all
+      available data.  It is useful when source is able to tell that no more
+      data will be available for this call.
 
-    For example, a source String will not grow during the transfer, or a
-    particular network connection supposed to send a fixed amount of data
-    before closing.  ``::toAll()`` will receive all bytes.  Timeout is used
-    when source is unable to tell that no more data will come, or with
-    destination when it needs processing time (e.g.  network or serial input
-    buffer full).
+      For example, a source String will not grow during the transfer, or a
+      particular network connection supposed to send a fixed amount of data
+      before closing.  ``::toAll()`` will receive all bytes.  Timeout is used
+      when source is unable to tell that no more data will come, or with
+      destination when it needs processing time (e.g.  network or serial input
+      buffer full).
 
-- String helpers
+  - String helpers
 
-- internal Stream API: peekBuffer
+  - internal Stream API: peekBuffer
 
