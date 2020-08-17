@@ -439,24 +439,70 @@ Stream extensions
 
     - ``Stream::toNow(dest)``
 
-      This method transfer all already available data to the destination.
-      There is no timeout and the returned value is 0 when there is nothing to
-      transfer or no room in the destination.
+      This method transfers all already available data to the destination.
+      There is no timeout and the returned value is 0 when there is nothing
+      to transfer or no room in the destination.
 
     - ``Stream::toAll(dest [, timeout])``
 
       This method waits up to the given or default timeout to transfer all
       available data.  It is useful when source is able to tell that no more
-      data will be available for this call.
+      data will be available for this call, or when destination is able to
+      tell that it will no more be able to receive.
 
       For example, a source String will not grow during the transfer, or a
       particular network connection supposed to send a fixed amount of data
-      before closing.  ``::toAll()`` will receive all bytes.  Timeout is used
-      when source is unable to tell that no more data will come, or with
-      destination when it needs processing time (e.g.  network or serial input
-      buffer full).
+      before closing.  ``::toAll()`` will receive all bytes.  Timeout is
+      useful when destination needs processing time (e.g.  network or serial
+      input buffer full = please wait a bit).
 
-  - String helpers
+  - String, flash strings helpers
+
+    Two additional classes are proposed.
+
+      - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
+
+        A `Stream::` is made from `const char*`, `F("some words in flash")`
+        or `PROGMEM` strings.  This class makes no copy, even with data in
+        flash.  For them, byte-by-byte transfers is a consequence.  Others
+        can be transfered at once when possible.
+
+        .. code:: cpp
+
+          StreamPtr css(F("my long css data")); // no heap/stack allocation
+          server.toAll(css);
+
+      - ``S2Stream::`` is designed to make a ``Stream::` out of a ``String::`` without copy.
+
+        With examples:
+        .. code:: cpp
+
+          String helloString("hello");
+          S2Stream hello(helloString);
+
+          hello.toAll(Serial); // shows "hello";
+          hello.toAll(Serial); // shows nothing, content has already been read
+          hello.reset();       // reset content pointer
+          hello.toAll(Serial); // shows "hello";
+          hello.reset(3);      // reset content pointer to a specific position
+          hello.toAll(Serial); // shows "lo";
+
+          hello.setConsume();
+          Serial.println(helloString.length()); // shows 5
+          hello.toAll(Serial);                  // shows "hello";
+          Serial.println(helloString.length()); // shows 0, string is consumed
+
+       ``StreamString::``, which derives from ``S2Stream`` is now a r/w class:
+
+        .. code:: cpp
+
+          StreamString contentStream;
+          client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+
+          // equivalent to:
+          String content;
+          S2Stream contentStream(content);
+          client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
 
   - internal Stream API: peekBuffer
 
