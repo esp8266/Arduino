@@ -161,8 +161,8 @@ FLAGS += -DNONOSDK221=1
 FLAGS += -DF_CPU=80000000
 FLAGS += $(MKFLAGS)
 FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
-CXXFLAGS += -std=gnu++17 -fno-rtti $(FLAGS) -funsigned-char
-CFLAGS += -std=c17 $(FLAGS) -funsigned-char
+CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
+CFLAGS += -std=c99 $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
