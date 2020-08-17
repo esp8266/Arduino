@@ -41,7 +41,10 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+    std::unique_ptr<BearSSL::WiFiClientSecure>client(new (std::nothrow) BearSSL::WiFiClientSecure);
+    if (client == nullptr) {
+      return;
+    }
 
     client->setFingerprint(fingerprint);
 

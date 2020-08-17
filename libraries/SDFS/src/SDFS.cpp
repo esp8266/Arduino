@@ -32,7 +32,7 @@ using namespace fs;
 
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SDFS)
-FS SDFS = FS(FSImplPtr(new sdfs::SDFSImpl()));
+FS SDFS = FS(FSImplPtr(new (std::nothrow) sdfs::SDFSImpl()));
 #endif
 
 namespace sdfs {

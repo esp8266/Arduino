@@ -80,7 +80,10 @@ uint8_t WiFiUDP::begin(uint16_t port)
         _ctx = 0;
     }
 
-    _ctx = new UdpContext;
+    _ctx = new (std::nothrow) UdpContext;
+    if (_ctx == nullptr) {
+        return 0;
+    }
     _ctx->ref();
     return (_ctx->listen(IPAddress(), port)) ? 1 : 0;
 }
@@ -96,7 +99,10 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
         return 0;
     }
 
-    _ctx = new UdpContext;
+    _ctx = new (std::nothrow) UdpContext;
+    if (_ctx == nullptr) {
+        return 0;
+    }
     _ctx->ref();
     ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
     if (!_ctx->listen(&addr, port)) {
@@ -147,7 +153,10 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
 int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
 {
     if (!_ctx) {
-        _ctx = new UdpContext;
+        _ctx = new (std::nothrow) UdpContext;
+        if (_ctx == nullptr) {
+            return 0;
+        }
         _ctx->ref();
     }
     return (_ctx->connect(ip, port)) ? 1 : 0;
@@ -157,7 +166,10 @@ int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
     IPAddress interfaceAddress, int ttl)
 {
     if (!_ctx) {
-        _ctx = new UdpContext;
+        _ctx = new (std::nothrow) UdpContext;
+        if (_ctx == nullptr) {
+            return 0;
+        }
         _ctx->ref();
     }
     if (!_ctx->connect(multicastAddress, port)) {

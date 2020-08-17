@@ -180,7 +180,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   } else {
     _bufferSize = 256;
   }
-  _buffer = new uint8_t[_bufferSize];
+  _buffer = new (std::nothrow) uint8_t[_bufferSize];
   _command = command;
 
 #ifdef DEBUG_UPDATER

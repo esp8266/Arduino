@@ -25,7 +25,10 @@ bool loadConfig() {
   }
 
   // Allocate a buffer to store contents of the file.
-  std::unique_ptr<char[]> buf(new char[size]);
+  std::unique_ptr<char[]> buf(new (std::nothrow) char[size]);
+  if (buf == nullptr) {
+    return false;
+  }
 
   // We don't use String here because ArduinoJson library requires the input
   // buffer to be mutable. If you don't use ArduinoJson, you may as well

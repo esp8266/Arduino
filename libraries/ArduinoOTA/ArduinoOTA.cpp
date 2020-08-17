@@ -106,7 +106,7 @@ void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
   _rebootOnSuccess = reboot;
 }
 
-void ArduinoOTAClass::begin(bool useMDNS) {
+bool ArduinoOTAClass::begin(bool useMDNS) {
   if (_initialized)
     return;
 
@@ -126,11 +126,13 @@ void ArduinoOTAClass::begin(bool useMDNS) {
     _udp_ota = 0;
   }
 
-  _udp_ota = new UdpContext;
+  _udp_ota = new (std::nothrow) UdpContext;
+  if (_udp_ota == nullptr)
+    return false;
   _udp_ota->ref();
 
   if(!_udp_ota->listen(IP_ADDR_ANY, _port))
-    return;
+    return false;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
   
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
@@ -149,6 +151,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
 #ifdef OTA_DEBUG
   OTA_DEBUG.printf("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
 #endif
+  return true;
 }
 
 int ArduinoOTAClass::parseInt(){

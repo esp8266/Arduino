@@ -43,7 +43,7 @@ size_t cbuf::resize(size_t newSize) {
         return _size;
     }
 
-    char *newbuf = new char[newSize];
+    char *newbuf = new (std::nothrow) char[newSize];
     char *oldbuf = _buf;
 
     if(!newbuf) {

@@ -324,7 +324,11 @@ class LittleFSFileImpl : public FileImpl
 {
 public:
     LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd, int flags, time_t creation) : _fs(fs), _fd(fd), _opened(true), _flags(flags), _creation(creation) {
-        _name = std::shared_ptr<char>(new char[strlen(name) + 1], std::default_delete<char[]>());
+        _name = std::shared_ptr<char>(new (std::nothrow) char[strlen(name) + 1], std::default_delete<char[]>());
+        if (!_name) {
+            close();
+            return;
+        }
         strcpy(_name.get(), name);
     }
 
@@ -517,15 +521,24 @@ public:
     {
         memset(&_dirent, 0, sizeof(_dirent));
         if (dirPath) {
-            _dirPath = std::shared_ptr<char>(new char[strlen(dirPath) + 1], std::default_delete<char[]>());
+            _dirPath = std::shared_ptr<char>(new (std::nothrow) char[strlen(dirPath) + 1], std::default_delete<char[]>());
+            if (_dirPath == nullptr) {
+                close();
+                return;
+            }
             strcpy(_dirPath.get(), dirPath);
         }
     }
 
-    ~LittleFSDirImpl() override {
+    void close () {
         if (_opened) {
             lfs_dir_close(_fs->getFS(), _getDir());
+            _opened = false;
         }
+    }
+
+    ~LittleFSDirImpl() override {
+        close();
     }
 
     FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) override {

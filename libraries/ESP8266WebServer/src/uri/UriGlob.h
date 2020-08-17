@@ -11,7 +11,7 @@ class UriGlob : public Uri {
         explicit UriGlob(const String &uri) : Uri(uri) {};
 
         Uri* clone() const override final {
-            return new UriGlob(_uri);
+            return new (std::nothrow) UriGlob(_uri);
         };
 
         bool canHandle(const String &requestUri, __attribute__((unused)) std::vector<String> &pathArgs) override final {

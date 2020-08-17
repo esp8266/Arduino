@@ -10,7 +10,7 @@ class UriBraces : public Uri {
         explicit UriBraces(const String &uri) : Uri(uri) {};
 
         Uri* clone() const override final {
-            return new UriBraces(_uri);
+            return new (std::nothrow) UriBraces(_uri);
         };
 
         bool canHandle(const String &requestUri, std::vector<String> &pathArgs) override final {

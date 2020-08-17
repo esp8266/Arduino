@@ -128,7 +128,7 @@ void setup(void){
     Serial.println("MDNS responder started");
   }
 
-  server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
+  server.getServer().setRSACert(new (std::nothrow) BearSSL::X509List(serverCert), new (std::nothrow) BearSSL::PrivateKey(serverKey));
 
   server.on("/", handleRoot);
 

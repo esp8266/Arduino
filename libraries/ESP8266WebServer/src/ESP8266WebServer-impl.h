@@ -126,12 +126,12 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen + 1];
+      char *toencode = new (std::nothrow) char[toencodeLen + 1];
       if(toencode == NULL){
         authReq = "";
         return false;
       }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
+      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
       if(encoded == NULL){
         authReq = "";
         delete[] toencode;
@@ -266,7 +266,7 @@ void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method,
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn, ESP8266WebServerTemplate<ServerType>::THandlerFunction ufn) {
-  _addRequestHandler(new FunctionRequestHandler<ServerType>(fn, ufn, uri, method));
+  _addRequestHandler(new (std::nothrow) FunctionRequestHandler<ServerType>(fn, ufn, uri, method));
 }
 
 template <typename ServerType>
@@ -288,7 +288,7 @@ void ESP8266WebServerTemplate<ServerType>::_addRequestHandler(RequestHandlerType
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
-    _addRequestHandler(new StaticRequestHandler<ServerType>(fs, path, uri, cache_header));
+    _addRequestHandler(new (std::nothrow) StaticRequestHandler<ServerType>(fs, path, uri, cache_header));
 }
 
 template <typename ServerType>
@@ -645,7 +645,9 @@ void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys
   _headerKeysCount = headerKeysCount + 1;
   if (_currentHeaders)
      delete[]_currentHeaders;
-  _currentHeaders = new RequestArgument[_headerKeysCount];
+  _currentHeaders = new (std::nothrow) RequestArgument[_headerKeysCount];
+  if (_currentHeaders == nullptr)
+    return;
   _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
   for (int i = 1; i < _headerKeysCount; i++){
     _currentHeaders[i].key = headerKeys[i-1];

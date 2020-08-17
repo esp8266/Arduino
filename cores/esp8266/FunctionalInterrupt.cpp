@@ -7,7 +7,7 @@ typedef void (*voidFuncPtr)(void);
 typedef void (*voidFuncPtrArg)(void*);
 
 // Helper functions for Functional interrupt routines
-extern "C" void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtr userFunc, void*fp, int mode, bool functional);
+extern "C" bool __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtr userFunc, void*fp, int mode, bool functional);
 
 
 void ICACHE_RAM_ATTR interruptFunctional(void* arg)
@@ -34,32 +34,52 @@ extern "C"
    }
 }
 
-void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
+bool attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
 {
 	// use the local interrupt routine which takes the ArgStructure as argument
 
 	InterruptInfo* ii = nullptr;
 
-	FunctionInfo* fi = new FunctionInfo;
+	FunctionInfo* fi = new (std::nothrow) FunctionInfo;
+	if (fi == nullptr)
+	    return false;
 	fi->reqFunction = intRoutine;
 
-	ArgStructure* as = new ArgStructure;
+	ArgStructure* as = new (std::nothrow) ArgStructure;
+    if (as == nullptr)
+    {
+        delete(fi);
+        return false;
+    }
 	as->interruptInfo = ii;
 	as->functionInfo = fi;
 
-	__attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
+	return __attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
 }
 
-void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
+bool attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
 {
-	InterruptInfo* ii = new InterruptInfo;
+	InterruptInfo* ii = new (std::nothrow) InterruptInfo;
+	if (ii == nullptr)
+	    return false;
 
 	FunctionInfo* fi = new FunctionInfo;
+	if (fi == nullptr)
+	{
+	    delete ii;
+	    return false;
+	}
 	fi->reqScheduledFunction = scheduledIntRoutine;
 
-	ArgStructure* as = new ArgStructure;
+	ArgStructure* as = new (std::nothrow) ArgStructure;
+	if (as == nullptr)
+	{
+	    delete ii;
+	    delete fi;
+	    return false;
+	}
 	as->interruptInfo = ii;
 	as->functionInfo = fi;
 
-	__attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
+	return __attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
 }

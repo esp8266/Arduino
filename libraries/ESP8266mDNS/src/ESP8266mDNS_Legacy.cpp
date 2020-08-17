@@ -225,7 +225,11 @@ bool MDNSResponder::_listen()
             return false;
         }
 
-        _conn = new UdpContext;
+        _conn = new (std::nothrow) UdpContext;
+        if (_conn == nullptr)
+        {
+            return false;
+        }
         _conn->ref();
 
         if (!_conn->listen(IP_ADDR_ANY, MDNS_PORT))
@@ -276,7 +280,11 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
             {
                 return false;    //max txt record size
             }
-            MDNSTxt *newtxt = new MDNSTxt;
+            MDNSTxt *newtxt = new (std::nothrow) MDNSTxt;
+            if (newtxt == nullptr)
+            {
+                return false;
+            }
             newtxt->_txt = String(key) + '=' + String(value);
             newtxt->_next = 0;
             if (servicePtr->_txts == 0)  //no services have been added

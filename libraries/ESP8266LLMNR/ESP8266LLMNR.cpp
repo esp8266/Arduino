@@ -116,7 +116,9 @@ bool LLMNRResponder::_restart() {
     if (igmp_joingroup(IP4_ADDR_ANY4, llmnr) != ERR_OK)
         return false;
 
-    _conn = new UdpContext;
+    _conn = new (std::nothrow) UdpContext;
+    if (!_conn)
+        return false;
     _conn->ref();
 
     if (!_conn->listen(IP_ADDR_ANY, LLMNR_PORT))
