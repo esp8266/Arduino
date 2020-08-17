@@ -63,7 +63,7 @@ void loop() {
         } else {
           Serial.println("Connection failed");
         }
-		connectTimeout.reset();
+        connectTimeout.reset();
       } else {
         // isDNSSearchInProgress doesn't matter here
         Serial.println("Connected");
