@@ -394,7 +394,7 @@ Arduino API
 
   The ``readBytes(buffer, length)`` method includes a timeout to ensure that
   all required bytes are received.  The ``write(buffer, length)`` (inherited
-  from ``Print::`) function is also usually blocking until the full buffer is
+  from ``Print::``) function is also usually blocking until the full buffer is
   transmitted. Both functions return the number of transmitted bytes.
 
   That's the way the Stream class works and is commonly used.
@@ -428,7 +428,7 @@ Stream extensions
     Serial.toNow(Serial);             // serial software loopback
 
   Beside reducing coding time, these methods optimize transfers by avoiding
-  buffer copies and when possible.
+  buffer copies when possible.
 
   - User facing API: ``Stream::to()``
 
