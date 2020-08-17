@@ -15,7 +15,7 @@ const char* password = STAPSK;
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
 
-uint8_t isDNSSearchInProgress = 0;
+bool isDNSSearchInProgress = false;
 unsigned long lastTry = 0;
 WiFiClient client;
 
