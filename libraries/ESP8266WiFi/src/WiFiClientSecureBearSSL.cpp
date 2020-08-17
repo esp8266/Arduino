@@ -242,11 +242,15 @@ int WiFiClientSecure::connectAsync(const char* name, uint16_t port, uint8_t* wai
   IPAddress remote_addr;
 
   if (!WiFi.hostByNameAsync(name, remote_addr, waiting)) {
-    DEBUG_BSSL("connect: Name loopup failure\n");
+    if (waiting != nullptr and *waiting == true) {
+      DEBUG_BSSL("connectAsync: Name loopup in progress\n");
+	} else {
+      DEBUG_BSSL("connectAsync: Name loopup failure\n");
+	}
     return 0;
   }
   if (!WiFiClient::connect(remote_addr, port)) {
-    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
+    DEBUG_BSSL("connectAsync: Unable to connect TCP socket\n");
 	return 0;
   }
 
