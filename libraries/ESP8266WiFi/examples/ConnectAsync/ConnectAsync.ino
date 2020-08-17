@@ -1,5 +1,5 @@
 /*
-    This sketch tries to connect asincronously to a remote server.
+    This sketch tries to connect asynchronously to a remote server.
 */
 
 #include <ESP8266WiFi.h>
