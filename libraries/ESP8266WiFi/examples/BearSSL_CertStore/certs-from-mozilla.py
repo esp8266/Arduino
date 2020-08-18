@@ -1,9 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # This script pulls the list of Mozilla trusted certificate authorities
 # from the web at the "mozurl" below, parses the file to grab the PEM
 # for each cert, and then generates DER files in a new ./data directory
-# Upload these to a SPIFFS filesystem and use the CertManager to parse
+# Upload these to an on-chip filesystem and use the CertManager to parse
 # and use them for your outgoing SSL connections.
 #
 # Script by Earle F. Philhower, III.  Released to the public domain.
@@ -14,11 +14,11 @@ import sys
 from subprocess import Popen, PIPE, call
 try:
     from urllib.request import urlopen
-except:
+except Exception:
     from urllib2 import urlopen
 try:
     from StringIO import StringIO
-except:
+except Exception:
     from io import StringIO
 
 # Mozilla's URL for the CSV file with included PEM certs
@@ -42,7 +42,7 @@ del pems[0] # Remove headers
 # Try and make ./data, skip if present
 try:
     os.mkdir("data")
-except:
+except Exception:
     pass
 
 derFiles = []

@@ -31,6 +31,29 @@
 
 #define CORE_MOCK 1
 
+//
+
+#define ARDUINO 267
+#define ESP8266 1
+#define A0 0
+#define LED_BUILTIN 0
+#define F_CPU 80000000
+#define LWIP_OPEN_SRC
+#define TCP_MSS 536
+#define LWIP_FEATURES 1
+
+//
+
+#define D0 0
+#define D1 1
+#define D2 3
+#define D3 3
+#define D4 4
+#define D5 5
+#define D6 6
+#define D7 7
+#define D8 8
+
 // include host's STL before any other include file
 // because core definition like max() is in the way
 
@@ -61,28 +84,10 @@ typedef uint32_t uint32;
 
 //
 
-#define ARDUINO 267
-#define ESP8266 1
-#define A0 0
-#define LED_BUILTIN 0
-#define F_CPU 80000000
-#define LWIP_OPEN_SRC
-#define TCP_MSS 536
-#define LWIP_FEATURES 1
+#include <c_types.h>
+#include <core_esp8266_features.h>
 
-//
-
-#define D0 0
-#define D1 1
-#define D2 3
-#define D3 3
-#define D4 4
-#define D5 5
-#define D6 6
-#define D7 7
-#define D8 8
-
-//
+uint32_t esp_get_cycle_count();
 
 #include <Arduino.h>
 
@@ -112,6 +117,7 @@ extern const char* host_interface; // cmdline parameter
 extern bool serial_timestamp;
 extern int mock_port_shifter;
 extern bool blocking_uart;
+extern uint32_t global_source_address; // 0 = INADDR_ANY by default
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to

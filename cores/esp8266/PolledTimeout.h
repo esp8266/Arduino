@@ -4,7 +4,7 @@
 
 /*
  PolledTimeout.h - Encapsulation of a polled Timeout
- 
+
  Copyright (c) 2018 Daniel Salazar. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
 
@@ -23,9 +23,10 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <limits>
-
-#include <Arduino.h>
+#include <c_types.h>               // IRAM_ATTR
+#include <limits>                  // std::numeric_limits
+#include <type_traits>             // std::is_unsigned
+#include <core_esp8266_features.h>
 
 namespace esp8266
 {
@@ -70,13 +71,13 @@ struct TimeSourceMillis
 
 struct TimeSourceCycles
 {
-  // time policy based on ESP.getCycleCount()
+  // time policy based on esp_get_cycle_count()
   // this particular time measurement is intended to be called very often
   // (every loop, every yield)
 
-  using timeType = decltype(ESP.getCycleCount());
-  static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType ticksPerSecond    = F_CPU;     // 80'000'000 or 160'000'000 Hz
+  using timeType = decltype(esp_get_cycle_count());
+  static timeType time() {return esp_get_cycle_count();}
+  static constexpr timeType ticksPerSecond    = esp_get_cpu_freq_mhz() * 1000000UL;     // 80'000'000 or 160'000'000 Hz
   static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
 
@@ -161,13 +162,13 @@ public:
       return expiredRetrigger();
     return expiredOneShot();
   }
-  
+
   IRAM_ATTR // fast
   operator bool()
   {
-    return expired(); 
+    return expired();
   }
-  
+
   bool canExpire () const
   {
     return !_neverExpires;
@@ -178,6 +179,7 @@ public:
     return _timeout != alwaysExpired;
   }
 
+  // Resets, will trigger after this new timeout.
   IRAM_ATTR // called from ISR
   void reset(const timeType newUserTimeout)
   {
@@ -186,10 +188,28 @@ public:
     _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
   }
 
+  // Resets, will trigger after the timeout previously set.
   IRAM_ATTR // called from ISR
   void reset()
   {
     _start = TimePolicyT::time();
+  }
+
+  // Resets to just expired so that on next poll the check will immediately trigger for the user,
+  // also change timeout (after next immediate trigger).
+  IRAM_ATTR // called from ISR
+  void resetAndSetExpired (const timeType newUserTimeout)
+  {
+    reset(newUserTimeout);
+    _start -= _timeout;
+  }
+
+  // Resets to just expired so that on next poll the check will immediately trigger for the user.
+  IRAM_ATTR // called from ISR
+  void resetAndSetExpired ()
+  {
+    reset();
+    _start -= _timeout;
   }
 
   void resetToNeverExpires ()
@@ -202,7 +222,7 @@ public:
   {
     return TimePolicyT::toUserUnit(_timeout);
   }
-  
+
   static constexpr timeType timeMax()
   {
     return TimePolicyT::timeMax;
@@ -235,14 +255,14 @@ protected:
     }
     return false;
   }
-  
+
   IRAM_ATTR // fast
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
     return !canWait() || checkExpired(TimePolicyT::time());
   }
-  
+
   timeType _timeout;
   timeType _start;
   bool _neverExpires;
@@ -259,14 +279,14 @@ using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecate
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
 
-// Time policy based on ESP.getCycleCount(), and intended to be called very often:
+// Time policy based on esp_get_cycle_count(), and intended to be called very often:
 // "Fast" versions sacrifices time range for improved precision and reduced execution time (by 86%)
-// (cpu cycles for ::expired(): 372 (millis()) vs 52 (ESP.getCycleCount()))
+// (cpu cycles for ::expired(): 372 (millis()) vs 52 (esp_get_cycle_count()))
 // timeMax() values:
 // Ms: max is 26843       ms (26.8  s)
 // Us: max is 26843545    us (26.8  s)
 // Ns: max is  1073741823 ns ( 1.07 s)
-// (time policy based on ESP.getCycleCount() is intended to be called very often)
+// (time policy based on esp_get_cycle_count() is intended to be called very often)
 
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;

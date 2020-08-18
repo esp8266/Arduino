@@ -61,7 +61,7 @@ In this mode, every ``write()`` is flushed.  It means that after a call to
 
 When set to ``true`` in ``WiFiClient`` implementation,
 
-- It slows down transfers, and implicitely disable the Nagle algorithm.
+- It slows down transfers, and implicitly disable the Nagle algorithm.
 
 - It also allows to avoid a temporary copy of data that otherwise consumes
   at most ``TCP_SND_BUF`` = (2 * ``MSS``) bytes per connection,
@@ -107,7 +107,4 @@ Other Function Calls
     IPAddress  localIP () 
     uint16_t  localPort () 
 
-Documentation for the above functions is not yet prepared.
-
-For code samples please refer to separate section with `examples
-:arrow\_right: <client-examples.rst>`__ dedicated specifically to the Client Class.
+Documentation for the above functions is not yet available.

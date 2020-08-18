@@ -108,6 +108,11 @@ uint32_t EspClass::getFreeHeap()
 	return 30000;
 }
 
+uint16_t EspClass::getMaxFreeBlockSize()
+{
+	return 20000;
+}
+
 String EspClass::getResetReason()
 {
   return "Power on";
@@ -116,11 +121,6 @@ String EspClass::getResetReason()
 uint32_t EspClass::getFreeSketchSpace()
 {
   return 4 * 1024 * 1024;
-}
-
-uint8_t EspClass::getCpuFreqMHz()
-{
-  return F_CPU / 1000000;
 }
 
 const char *EspClass::getSdkVersion()
@@ -208,7 +208,7 @@ uint32_t EspClass::getFlashChipSize(void)
 
 String EspClass::getFullVersion ()
 {
-	return "host-emulation";
+	return "emulation-on-host";
 }
 
 uint32_t EspClass::getFreeContStack()
@@ -221,6 +221,11 @@ void EspClass::resetFreeContStack()
 }
 
 uint32_t EspClass::getCycleCount()
+{
+    return esp_get_cycle_count();
+}
+
+uint32_t esp_get_cycle_count()
 {
     timeval t;
     gettimeofday(&t, NULL);

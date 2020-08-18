@@ -1,33 +1,37 @@
 #!/bin/bash
-#
 
-#set -x
 
-ver=`git describe --tag`
-visiblever=$ver
-if [ "$ver" = 0.0.1 ]; then
+if [ ! -z "${manualversion}" ]; then
 
-    git tag -d 0.0.1
-    ver=`git describe --tag HEAD`
-    plain_ver=$ver
+    # manual-made release based on $manualversion
+    ver=${manualversion}
+    plain_ver=${ver}
+    visiblever=${ver}
+    [ -z "${REMOTE_URL}" ] && REMOTE_URL=https://github.com/esp8266/Arduino/releases/download
 
 else
 
-    # Extract next version from platform.txt
-    next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
+    # Extract the release name from a release
 
-    # Figure out how will the package be called
-    ver=`git describe --exact-match`
-    if [ $? -ne 0 ]; then
-        # not tagged version; generate nightly package
-        date_str=`date +"%Y%m%d"`
-        is_nightly=1
-        plain_ver="${next}-nightly"
-        ver="${plain_ver}+${date_str}"
-    else
-        plain_ver=$ver
+    # Default to draft tag name
+    ver=$(basename $(jq -e -r '.ref' "$GITHUB_EVENT_PATH"))
+    # If not available, try the publish tag name
+    if [ "$ver" == "null" ]; then
+        ver=$(jq -e -r '.release.tag_name' "$GITHUB_EVENT_PATH")
+    fi
+    # Fall back to the git description OTW (i.e. interactive)
+    if [ "$ver" == "null" ]; then
+        ver=$(git describe --tag)
     fi
     visiblever=$ver
+    plainver=$ver
+
+    # Match 0.0.* as special-case early-access builds
+    if [ "${ver%.*}" = 0.0 ]; then
+        git tag -d ${ver}
+        ver=`git describe --tag HEAD`
+        plain_ver=$ver
+    fi
 fi
 
 set -e
@@ -167,8 +171,21 @@ curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${bas
 new_json=package_esp8266com_index.json
 
 set +e
-# Merge the old and new, then drop any obsolete package versions
-python3 ../../merge_packages.py $new_json $old_json | python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 >tmp && mv tmp $new_json && rm $old_json
+# Merge the old and new
+python3 ../../merge_packages.py $new_json $old_json > tmp
+
+# additional json to merge (for experimental releases)
+echo "Additional json package files: ${MOREJSONPACKAGES}"
+for json in ${MOREJSONPACKAGES}; do
+    if [ ! -z "$json" -a -r "$json" ]; then
+        echo "- merging $json"
+        python3 ../../merge_packages.py tmp $json > tmp2
+        mv tmp2 tmp
+    fi
+done
+
+# drop any obsolete package versions
+python3 ../../drop_versions.py - tools 1.20.0-26-gb404fb9 < tmp > tmp2 && mv tmp2 $new_json && rm $old_json tmp
 
 # Verify the JSON file can be read, fail if it's not OK
 set -e
