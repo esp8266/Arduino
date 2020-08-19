@@ -33,11 +33,13 @@ class S2Stream: public Stream
 {
 public:
 
-    S2Stream(String& string): string(&string)
+    S2Stream(String& string, int peekPointer = -1):
+        string(&string), peekPointer(peekPointer)
     {
     }
 
-    S2Stream(String* string): string(string)
+    S2Stream(String* string, int peekPointer = -1):
+        string(string), peekPointer(peekPointer)
     {
     }
 
@@ -187,14 +189,14 @@ public:
     }
 
     // calling setConsume() will consume bytes as the stream is read
-    // (not enabled by default)
+    // (enabled by default)
     void setConsume()
     {
         peekPointer = -1;
     }
 
     // Reading this stream will mark the string as read without consuming
-    // This is the default.
+    // (not enabled by default)
     // Calling reset() resets the read state and allows rereading.
     void reset(int pointer = 0)
     {
@@ -204,9 +206,7 @@ public:
 protected:
 
     String* string;
-
-    // default (0): read marks as read without consuming(erasing) the string:
-    int peekPointer = 0;
+    int peekPointer; // -1:String is consumed / >=0:resettable pointer
 };
 
 

@@ -34,6 +34,9 @@ void testStream() {
   String inputString = "hello";
   StreamString result;
 
+  // string will not be modified by read:
+  result.reset();
+
   {
     // use StreamString or S2Stream(String) to make a r/w Stream out of a String,
     // prefer the lighter StreamPtr(String) to make a read-only Stream out of a String
@@ -55,12 +58,13 @@ void testStream() {
   }
 
   {
-    // inputString made into a Stream
+    // inputString made into a Stream, in reset mode
     // after input is loaded once, there's nothing to get from the stream
     // but the String is left untouched
 
     result.clear();
     S2Stream input(inputString);
+    input.reset();
 
     input.toAll(result);
     input.toAll(result);
@@ -90,7 +94,7 @@ void testStream() {
     result.clear();
     S2Stream input(inputString);
     // reading stream will consume the string
-    input.setConsume();
+    input.setConsume(); // can be ommitted, this is the default
 
     input.toSize(result, 1);
     input.toSize(result, 2);
