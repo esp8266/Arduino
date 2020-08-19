@@ -488,6 +488,7 @@ Stream extensions
 
         String helloString("hello");
         S2Stream hello(helloString);
+        hello.reset(0);      // prevents ::read() to consume the string
 
         hello.toAll(Serial); // shows "hello"
         hello.toAll(Serial); // shows nothing, content has already been read
@@ -496,7 +497,7 @@ Stream extensions
         hello.reset(3);      // reset content pointer to a specific position
         hello.toAll(Serial); // shows "lo"
 
-        hello.setConsume();
+        hello.setConsume();  // ::read() will consume, this is the default
         Serial.println(helloString.length()); // shows 5
         hello.toAll(Serial);                  // shows "hello"
         Serial.println(helloString.length()); // shows 0, string is consumed
