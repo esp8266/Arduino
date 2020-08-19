@@ -11,6 +11,11 @@ DEFSYM_FS ?= -Wl,--defsym,_FS_start=0x40300000 -Wl,--defsym,_FS_end=0x411FA000 -
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
+ifeq ($(shell g++-8 -v; echo $$?),0)
+CC  = gcc-8
+CXX = g++-8
+endif
+
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
 CC  ?= gcc

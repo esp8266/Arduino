@@ -501,7 +501,7 @@ Stream extensions
         hello.toAll(Serial);                  // shows "hello"
         Serial.println(helloString.length()); // shows 0, string is consumed
 
-      ``StreamString::``, which derives from ``S2Stream`` is now a r/w class:
+      ``StreamString::``, derives from ``S2Stream``
 
       .. code:: cpp
 
@@ -541,3 +541,7 @@ Stream extensions
 
       A closed network connection returns false.
       This function allows ``Stream::toAll()`` to return early.
+
+    - ``virtual ssize_t streamSize()``
+
+      -1 when stream size is unknown, depending on implementation (string size, file size..)
