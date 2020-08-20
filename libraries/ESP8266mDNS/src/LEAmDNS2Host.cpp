@@ -940,13 +940,7 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
                 }
             }
 
-            if (
-#if LWIP_VERSION_MAJOR == 1
-                (ERR_OK == igmp_joingroup(&pNetIf->ip_addr, &multicast_addr_V4))
-#else
-                (ERR_OK == igmp_joingroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
-#endif
-            )
+            if ((ERR_OK == igmp_joingroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4))))
             {
                 bResult = true;
             }
@@ -987,11 +981,7 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
             // Leave multicast group(s)
 #ifdef MDNS_IPV4_SUPPORT
             ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
-#if LWIP_VERSION_MAJOR == 1
-            if (ERR_OK != igmp_leavegroup(ip_2_ip4(pNetIf->ip_addr), ip_2_ip4(&multicast_addr_V4)))
-#else
             if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
-#endif
             {
                 DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
             }

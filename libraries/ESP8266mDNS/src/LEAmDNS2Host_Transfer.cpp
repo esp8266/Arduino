@@ -641,11 +641,7 @@ IPAddress clsLEAMDNSHost::_getResponderIPAddress(netif* pNetIf, enuIPProtocolTyp
 #ifdef MDNS_IPV4_SUPPORT
     if (enuIPProtocolType::V4 == p_IPProtocolType)
     {
-#if LWIP_VERSION_MAJOR == 1
-        ipResponder = ip_2_ip4(pNetIf->ip_addr);
-#else
         ipResponder = netif_ip_addr4(pNetIf);
-#endif
     }
 #endif
 #ifdef MDNS_IPV6_SUPPORT

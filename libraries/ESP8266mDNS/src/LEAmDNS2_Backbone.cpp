@@ -256,37 +256,6 @@ const char* clsLEAMDNSHost::clsBackbone::_DH(void) const
 
 #endif
 
-#if LWIP_VERSION_MAJOR == 1
-
-/*
-    netif_get_by_index
-
-    Extracted (and slightly changed) from: https://github.com/yarrick/lwip/blob/master/src/core/netif.c
-*/
-extern "C"
-struct netif* netif_get_by_index(u8_t idx)
-{
-    struct netif *netif;
-
-    //LWIP_ASSERT_CORE_LOCKED();
-
-    if (idx != 0)   // <- NETIF_NO_INDEX
-    {
-        for ((netif) = netif_list; (netif) != NULL; (netif) = (netif)->next)    // <- NETIF_FOREACH(netif)
-        {
-            if (idx == netif_get_index(netif))
-            {
-                return netif; /* found! */
-            }
-        }
-    }
-
-    return NULL;
-}
-
-#endif  // LWIP_VERSION_MAJOR == 1
-
-
 } // namespace MDNSImplementation
 
 
