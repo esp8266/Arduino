@@ -1,7 +1,7 @@
 /*
   ESP8266 mDNS Responder Service Monitor
 
-  This example demonstrates two features of the LEA MDNSResponder:
+  This example demonstrates two features of the LEA clsLEAMDNSHost:
   1. The host and service domain negotiation process that ensures
      the uniqueness of the finally choosen host and service domain name.
   2. The dynamic MDNS service lookup/query feature.
@@ -44,18 +44,18 @@
 #include <ESP8266WebServer.h>
 
 /*
-   Include the MDNSResponder (the library needs to be included also)
-   As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
-   legacy MDNSResponder is defaulted in th include file.
-   There are two ways to access LEA MDNSResponder:
+   Include the clsLEAMDNSHost (the library needs to be included also)
+   As LEA clsLEAMDNSHost is experimental in the ESP8266 environment currently, the
+   legacy clsLEAMDNSHost is defaulted in th include file.
+   There are two ways to access LEA clsLEAMDNSHost:
    1. Prepend every declaration and call to global declarations or functions with the namespace, like:
-      'LEAmDNS:MDNSResponder::hMDNSService  hMDNSService;'
+      'LEAmDNS:clsLEAMDNSHost::hMDNSService  hMDNSService;'
       This way is used in the example. But be careful, if the namespace declaration is missing
       somewhere, the call might go to the legacy implementation...
    2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
 
 */
-#define MDNS2_EXPERIMENTAL
+#define NO_GLOBAL_MDNS // our MDNS is defined below
 #include <ESP8266mDNS.h>
 
 /*
@@ -63,11 +63,12 @@
 */
 
 #define SERVICE_PORT                           80                                  // HTTP port
+clsLEAMDNSHost                                 MDNS;                               // MDNS responder
 
 char*                                          pcHostDomain            = 0;        // Negociated host domain
 bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-MDNSResponder::clsService*                     hMDNSService            = 0;        // The handle of the http service in the MDNS responder
-MDNSResponder::clsQuery*                       hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
+clsLEAMDNSHost::clsService*                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
+clsLEAMDNSHost::clsQuery*                      hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
 
 const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
 String                                         strHTTPServices         = cstrNoHTTPServices;
@@ -90,28 +91,28 @@ bool setStationHostname(const char* p_pcHostname) {
 }
 
 
-void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
-                              const MDNSResponder::clsQuery::clsAnswer& p_Answer,
-                              MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
+void MDNSServiceQueryCallback(const clsLEAMDNSHost::clsQuery& p_Query,
+                              const clsLEAMDNSHost::clsQuery::clsAnswer& p_Answer,
+                              clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
                               bool p_bSetContent) {
   (void)p_Query;
 
   String answerInfo;
   switch (p_QueryAnswerTypeFlags) {
-    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
       answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
       break;
 
-    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
       answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
       break;
-    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
       answerInfo = "IP4Address ";
       for (auto ip : p_Answer.m_IPv4Addresses) {
         answerInfo += "- " + ip->m_IPAddress.toString();
       };
       break;
-    case static_cast<MDNSResponder::clsQuery::clsAnswer::typeQueryAnswerType>(MDNSResponder::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
       answerInfo = "TXT ";
       for (auto kv : p_Answer.m_Txts.m_Txts) {
         answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
@@ -129,7 +130,7 @@ void MDNSServiceQueryCallback(const MDNSResponder::clsQuery& p_Query,
    Probe result callback for Services
 */
 
-void serviceProbeResult(MDNSResponder::clsService& p_rMDNSService,
+void serviceProbeResult(clsLEAMDNSHost::clsService& p_rMDNSService,
                         const char* p_pcInstanceName,
                         bool p_bProbeResult) {
   (void)p_rMDNSService;
@@ -143,7 +144,7 @@ void serviceProbeResult(MDNSResponder::clsService& p_rMDNSService,
    If the domain is free, the host domain is set and the http service is
    added.
    If the domain is already used, a new name is created and the probing is
-   restarted via p_pMDNSResponder->setHostname().
+   restarted via p_pclsLEAMDNSHost->setHostname().
 
 */
 
@@ -188,7 +189,7 @@ void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p
     }
   } else {
     // Change hostname, use '-' as divider between base name and index
-    MDNS.setHostName(MDNSResponder::indexDomainName(p_pcDomainName.c_str(), "-", 0));
+    MDNS.setHostName(clsLEAMDNSHost::indexDomainName(p_pcDomainName.c_str(), "-", 0));
   }
 }
 
@@ -270,7 +271,7 @@ void setup(void) {
   // Init the (currently empty) host domain string with 'esp8266'
   MDNS.begin("esp8266_v2");
   /*
-    if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
+    if ((!clsLEAMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
         (!MDNS.begin(pcHostDomain))) {
       Serial.println(" Error setting up MDNS responder!");
       while (1) { // STOP

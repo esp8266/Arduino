@@ -258,7 +258,9 @@ bool clsLEAMDNSHost::begin(const char* p_pcHostName,
     bool    bResult = false;
 
     if (m_pUDPContext)
+    {
         close();
+    }
 
     bResult = (setHostName(p_pcHostName)) &&
               (_joinMulticastGroups()) &&

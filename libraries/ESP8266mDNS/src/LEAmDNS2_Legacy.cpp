@@ -525,7 +525,7 @@ bool clsLEAMDNSHost_Legacy::removeServiceTxt(const hMDNSService p_hService,
                           ? 0
                           : (clsLEAMDNSHost::clsService*)m_HostInformations.front().m_HandleToPtr[p_hService])))
             && ((pTxt = pService->findServiceTxt(p_pcKey)))
-            && (removeServiceTxt(p_hService, (const hMDNSTxt)pTxt)));
+            && (removeServiceTxt(p_hService, (hMDNSTxt)pTxt)));
 }
 
 /*

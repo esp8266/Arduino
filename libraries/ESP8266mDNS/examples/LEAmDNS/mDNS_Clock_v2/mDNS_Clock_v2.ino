@@ -52,7 +52,7 @@
    2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
 
 */
-#define MDNS2_EXPERIMENTAL
+#define NO_GLOBAL_MDNS // our MDNS is defined below
 #include <ESP8266mDNS.h>
 
 #include <PolledTimeout.h>
@@ -233,7 +233,7 @@ void setup(void) {
       hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
     } else {
       // Change hostname, use '-' as divider between base name and index
-      MDNS.setHostName(MDNSResponder::indexDomainName(p_pcDomainName, "-", 0));
+      MDNS.setHostName(clsLEAMDNSHost::indexDomainName(p_pcDomainName, "-", 0));
     }
   })) {
     Serial.println("mDNS-AP started");
