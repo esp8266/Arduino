@@ -144,7 +144,7 @@ const PacketType Packet::packetType() const
     return thisPacketType;
 }
 
-const std::vector<PacketType> Packet::allPacketTypes() const
+const std::vector<PacketType>& Packet::allPacketTypes() const
 {
     return thisAllPacketTypes;
 }

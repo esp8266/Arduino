@@ -280,7 +280,7 @@ public:
     void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
     const PacketType packetType() const;
-    const std::vector<PacketType> allPacketTypes() const;
+    const std::vector<PacketType>& allPacketTypes() const;
 
 
 private:

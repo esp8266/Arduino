@@ -14,6 +14,7 @@ all="
 libraries/ESP8266mDNS
 libraries/Wire
 cores/esp8266/core_esp8266_si2c.cpp
+libraries/Netdump
 "
 
 # core
