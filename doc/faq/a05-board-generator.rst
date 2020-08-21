@@ -129,7 +129,7 @@ Additional Notes:
 
 1. The boards.txt file will always contain the generic and esp8285 boards.
 
-2. If boards.txt file exist and no backup copy named boards.txt.orig exist, the current boards.txt will be renamed to boards.txt.orig. Otherwise, the existing boards.txt is over-writen when you generate a new boards.txt file. Similar behavior for when generating a new boards.local.txt.
+2. If boards.txt file exist and no backup copy named boards.txt.orig exist, the current boards.txt will be renamed to boards.txt.orig. Otherwise, the existing boards.txt is over-written when you generate a new boards.txt file. Similar behavior for when generating a new boards.local.txt.
 
 3. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--filter <file>``.
 

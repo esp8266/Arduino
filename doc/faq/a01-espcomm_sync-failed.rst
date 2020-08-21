@@ -313,14 +313,14 @@ example at 921600 baud, but with two reset retries.
 
    Reset Method: nodemcu, reset retries
 
-If you are interested how noodemcu reset method is implemented, then
+If you are interested how nodemcu reset method is implemented, then
 check circuit below. As indicated it does not pull to ground RTS and DTR
 lines once you open Serial Monitor in Arduino IDE.
 
 .. figure:: pictures/a01-nodemcu-reset-implementation.png
-   :alt: Implementation of noodemcu reset
+   :alt: Implementation of nodemcu reset
 
-   Implementation of noodemcu reset
+   Implementation of nodemcu reset
 
 It consists of two transistors and resistors that you can locate on
 NodeMCU board on right. On left you can see complete circuit and the
