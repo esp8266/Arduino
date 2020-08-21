@@ -55,7 +55,7 @@ How can I get some extra KBs in flash ?
 About WPS
 ~~~~~~~~~
 
-From release 2.4.2 and ahead, not using WPS will give an exra ~4.5KB in
+From release 2.4.2 and ahead, not using WPS will give an extra ~4.5KB in
 heap.
 
 In release 2.4.2 only, WPS is disabled by default and the board generator is
