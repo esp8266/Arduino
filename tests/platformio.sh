@@ -6,10 +6,10 @@ source "$TRAVIS_BUILD_DIR"/tests/common.sh
 
 function install_platformio()
 {
-    pip3 install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    pip3 install -U platformio
     platformio platform install "https://github.com/platformio/platform-espressif8266.git"
     # Overwrite toolchain with this PR's toolset.  Probably better way to do this
-    ( cd $TRAVIS_BUILD_DIR/tools && python3 get.py )
+    ( cd $TRAVIS_BUILD_DIR/tools && python3 get.py -q )
     mv ~/.platformio/packages/toolchain-xtensa/package.json .save
     rm -rf ~/.platformio/packages/toolchain-xtensa
     mv $TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf ~/.platformio/packages/toolchain-xtensa
