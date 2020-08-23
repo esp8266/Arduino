@@ -171,17 +171,17 @@ const char* clsLEAMDNSHost::_RRType2Name(uint16_t p_u16RRType) const
     switch (p_u16RRType & (~0x8000))    // Topmost bit might carry 'cache flush' flag
     {
 #ifdef MDNS_IPV4_SUPPORT
-    case DNS_RRTYPE_A:              strcpy(acRRName, "A");      break;
+    case DNS_RRTYPE_A:              strcpy_P(acRRName, PSTR("A"));     break;
 #endif
-    case DNS_RRTYPE_PTR:            strcpy(acRRName, "PTR");    break;
-    case DNS_RRTYPE_TXT:            strcpy(acRRName, "TXT");    break;
+    case DNS_RRTYPE_PTR:            strcpy_P(acRRName, PSTR("PTR"));   break;
+    case DNS_RRTYPE_TXT:            strcpy_P(acRRName, PSTR("TXT"));   break;
 #ifdef MDNS_IPV6_SUPPORT
-    case DNS_RRTYPE_AAAA:           strcpy(acRRName, "AAAA");   break;
+    case DNS_RRTYPE_AAAA:           strcpy_P(acRRName, PSTR("AAAA"));  break;
 #endif
-    case DNS_RRTYPE_SRV:            strcpy(acRRName, "SRV");    break;
-    case clsConsts::u8DNS_RRTYPE_NSEC: strcpy(acRRName, "NSEC");   break;
-    case DNS_RRTYPE_ANY:            strcpy(acRRName, "ANY");    break;
-    default:                        sprintf(acRRName, "Unknown(0x%04X)", p_u16RRType);  // MAX 15!
+    case DNS_RRTYPE_SRV:            strcpy_P(acRRName, PSTR("SRV"));   break;
+    case clsConsts::u8DNS_RRTYPE_NSEC: strcpy_P(acRRName, PSTR("NSEC"));   break;
+    case DNS_RRTYPE_ANY:            strcpy_P(acRRName, PSTR("ANY"));   break;
+    default:                        sprintf_P(acRRName, PSTR("Unknown(0x%04X)", p_u16RRType);  // MAX 15!
     }
     return acRRName;
 }
@@ -198,11 +198,11 @@ const char* clsLEAMDNSHost::_RRClass2String(uint16_t p_u16RRClass,
 
     if (p_u16RRClass & 0x0001)
     {
-        strcat(acClassString, "IN ");    //  3
+        strcat_P(acClassString, PSTR("IN "));    //  3
     }
     if (p_u16RRClass & 0x8000)
     {
-        strcat(acClassString, (p_bIsQuery ? "UNICAST " : "FLUSH "));    //  8/6
+        strcat_P(acClassString, (p_bIsQuery ? PSTR("UNICAST ") : PSTR("FLUSH ")));    //  8/6
     }
 
     return acClassString;                                                                       // 11
@@ -219,44 +219,44 @@ const char* clsLEAMDNSHost::_replyFlags2String(uint32_t p_u32ReplyFlags) const
     *acFlagsString = 0;
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::A))
     {
-        strcat(acFlagsString, "A ");    //  2
+        strcat_P(acFlagsString, PSTR("A "));    //  2
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::PTR_IPv4))
     {
-        strcat(acFlagsString, "PTR_IPv4 ");    //  7
+        strcat_P(acFlagsString, PSTR("PTR_IPv4 "));    //  7
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::PTR_IPv6))
     {
-        strcat(acFlagsString, "PTR_IPv6 ");    //  7
+        strcat_P(acFlagsString, PSTR("PTR_IPv6 "));    //  7
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::AAAA))
     {
-        strcat(acFlagsString, "AAAA ");    //  5
+        strcat_P(acFlagsString, PSTR("AAAA "));    //  5
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::PTR_TYPE))
     {
-        strcat(acFlagsString, "PTR_TYPE ");    //  9
+        strcat_P(acFlagsString, PSTR("PTR_TYPE "));    //  9
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::PTR_NAME))
     {
-        strcat(acFlagsString, "PTR_NAME ");    //  9
+        strcat_P(acFlagsString, PSTR("PTR_NAME "));    //  9
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::TXT))
     {
-        strcat(acFlagsString, "TXT ");    //  4
+        strcat_P(acFlagsString, PSTR("TXT "));    //  4
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::SRV))
     {
-        strcat(acFlagsString, "SRV ");    //  4
+        strcat_P(acFlagsString, PSTR("SRV "));    //  4
     }
     if (p_u32ReplyFlags & static_cast<uint32_t>(enuContentFlag::NSEC))
     {
-        strcat(acFlagsString, "NSEC ");    //  5
+        strcat_P(acFlagsString, PSTR("NSEC "));    //  5
     }
 
     if (0 == p_u32ReplyFlags)
     {
-        strcpy(acFlagsString, "none");
+        strcpy_P(acFlagsString, PSTR("none"));
     }
 
     // Remove trailing spaces
@@ -281,35 +281,35 @@ const char* clsLEAMDNSHost::_NSECBitmap2String(const clsNSECBitmap* p_pNSECBitma
 #ifdef MDNS_IPV4_SUPPORT
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_A))
     {
-        strcat(acFlagsString, "A ");    //  2
+        strcat_P(acFlagsString, PSTR("A "));    //  2
     }
 #endif
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_PTR))
     {
-        strcat(acFlagsString, "PTR ");  //  4
+        strcat_P(acFlagsString, PSTR("PTR "));  //  4
     }
 #ifdef MDNS_IPV6_SUPPORT
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_AAAA))
     {
-        strcat(acFlagsString, "AAAA "); //  5
+        strcat_P(acFlagsString, PSTR("AAAA ")); //  5
     }
 #endif
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_TXT))
     {
-        strcat(acFlagsString, "TXT ");  //  4
+        strcat_P(acFlagsString, PSTR("TXT "));  //  4
     }
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_SRV))
     {
-        strcat(acFlagsString, "SRV ");  //  4
+        strcat_P(acFlagsString, PSTR("SRV "));  //  4
     }
     if (p_pNSECBitmap->getBit(clsConsts::u8DNS_RRTYPE_NSEC))
     {
-        strcat(acFlagsString, "NSEC "); //  5
+        strcat_P(acFlagsString, PSTR("NSEC ")); //  5
     }
 
     if (!*acFlagsString)
     {
-        strcpy(acFlagsString, "none");
+        strcpy_P(acFlagsString, PSTR("none"));
     }
 
     return acFlagsString;               // 31
