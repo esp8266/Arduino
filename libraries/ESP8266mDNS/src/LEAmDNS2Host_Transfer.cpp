@@ -767,11 +767,10 @@ bool clsLEAMDNSHost::_readRRAnswer(clsLEAMDNSHost::clsRRAnswer*& p_rpRRAnswer)
             bResult = _readRRAnswerGeneric(*(clsRRAnswerGeneric*&)p_rpRRAnswer, u16RDLength);
             break;
         }
-        DEBUG_EX_INFO(
-            if ((bResult) &&
-                (p_rpRRAnswer))
-    {
-        DEBUG_OUTPUT.printf_P(PSTR("%s _readRRAnswer: "), _DH());
+
+        DEBUG_EX_INFO_IF((bResult) && (p_rpRRAnswer),
+        {
+            DEBUG_OUTPUT.printf_P(PSTR("%s _readRRAnswer: "), _DH());
             _printRRDomain(p_rpRRAnswer->m_Header.m_Domain);
             DEBUG_OUTPUT.printf_P(PSTR(" Type:%s Class:0x%04X TTL:%u, RDLength:%u "),
                                   _RRType2Name(p_rpRRAnswer->m_Header.m_Attributes.m_u16Type),
@@ -826,12 +825,12 @@ bool clsLEAMDNSHost::_readRRAnswer(clsLEAMDNSHost::clsRRAnswer*& p_rpRRAnswer)
                 break;
             }
             DEBUG_OUTPUT.printf_P(PSTR("\n"));
-        }
-        else
+        });  // DEBUG_EX_INFO
+
+        DEBUG_EX_INFO_IF(!((bResult) && (p_rpRRAnswer)),
         {
             DEBUG_OUTPUT.printf_P(PSTR("%s _readRRAnswer: FAILED to read specific answer of type 0x%04X!\n"), _DH(), p_rpRRAnswer->m_Header.m_Attributes.m_u16Type);
-        }
-        );  // DEBUG_EX_INFO
+        });
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _readRRAnswer: FAILED!\n"), _DH()););
     return bResult;
