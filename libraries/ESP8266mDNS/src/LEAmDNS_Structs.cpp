@@ -788,7 +788,7 @@ bool MDNSResponder::stcMDNS_RRDomain::compare(const stcMDNS_RRDomain& p_Other) c
         {
             if (*((unsigned char*)pT))              // Not 0
             {
-                pT += (1 + * ((unsigned char*)pT)); // Shift by length byte and lenght
+                pT += (1 + * ((unsigned char*)pT)); // Shift by length byte and length
                 pO += (1 + * ((unsigned char*)pO));
             }
             else                                    // Is 0 -> Successfully reached the end

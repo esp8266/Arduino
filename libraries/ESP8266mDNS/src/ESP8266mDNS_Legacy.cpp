@@ -411,11 +411,11 @@ int MDNSResponder::queryService(char *service, char *proto)
 
         // Only supports sending one PTR query
         // Send the Name field (eg. "_http._tcp.local")
-        _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
+        _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // length of "_" + service
         _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
-        _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
+        _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // length of "_" + proto
         _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
-        _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
+        _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // length of "local"
         _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
         _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
 
