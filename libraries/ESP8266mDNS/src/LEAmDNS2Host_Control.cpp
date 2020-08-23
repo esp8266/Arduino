@@ -1482,7 +1482,7 @@ bool clsLEAMDNSHost::_hasProbesWaitingForAnswers(void) const
     - (eg. esp8266.local)
 
     To allow 'tiebreaking' (see '_parseQuery'), the answers for these questions are delivered in
-    the 'knwon answers' section of the query.
+    the 'known answers' section of the query.
     Host domain:
     - A/AAAA (eg. esp8266.esp -> 192.168.2.120)
 
@@ -1536,7 +1536,7 @@ bool clsLEAMDNSHost::_sendHostProbe()
     - (eg. MyESP._http._tcp.local).
 
     To allow 'tiebreaking' (see '_parseQuery'), the answers for these questions are delivered in
-    the 'knwon answers' section of the query.
+    the 'known answers' section of the query.
     Service domain:
     - SRV (eg. MyESP._http._tcp.local -> 5000 esp8266.local)
     - PTR NAME (eg. _http._tcp.local -> MyESP._http._tcp.local) (TODO: Check if needed, maybe TXT is better)
