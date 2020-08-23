@@ -1030,7 +1030,7 @@ bool clsLEAMDNSHost::_allocDomainName(const char* p_pcNewDomainName,
             }
             p_rpcDomainName[i] = 0;
 #else
-            strncpy(p_rpcDomainName, p_pcNewDomainName, (stLength + 1));
+            strncpy(p_rpcDomainName, p_pcNewDomainName, stLength);
 #endif
         }
     }
