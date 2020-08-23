@@ -935,9 +935,7 @@ bool clsLEAMDNSHost::clsService::setProtocol(const char* p_pcProtocol)
     {
         if ((bResult = (0 != (m_pcProtocol = new char[stLength + 1]))))
         {
-            strncpy(m_pcProtocol, p_pcProtocol, stLength);
-            m_pcProtocol[stLength] = 0;
-
+            strcpy(m_pcProtocol, p_pcProtocol);
             _resetProbeStatus();
         }
     }
