@@ -60,7 +60,7 @@ class ArduinoOTAClass
     void onProgress(THandlerFunction_Progress fn);
 
     //Starts the ArduinoOTA service
-    void begin(bool useMDNS = true);
+    bool begin(bool useMDNS = true);
 
     //Call this in loop() to run the service. Also calls MDNS.update() when begin() or begin(true) is used.
     void handle();

@@ -108,7 +108,7 @@ void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
 
 bool ArduinoOTAClass::begin(bool useMDNS) {
   if (_initialized)
-    return;
+    return true;
 
   _useMDNS = useMDNS;
 
