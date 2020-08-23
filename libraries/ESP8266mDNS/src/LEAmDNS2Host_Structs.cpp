@@ -830,9 +830,7 @@ bool clsLEAMDNSHost::clsService::setInstanceName(const char* p_pcInstanceName)
     {
         if ((bResult = (0 != (m_pcInstanceName = new char[stLength + 1]))))
         {
-            strncpy(m_pcInstanceName, p_pcInstanceName, stLength);
-            m_pcInstanceName[stLength] = 0;
-
+            strcpy(m_pcInstanceName, p_pcInstanceName);
             _resetProbeStatus();
         }
     }
