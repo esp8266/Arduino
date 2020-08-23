@@ -474,11 +474,9 @@ bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
         bResult = bResult && _announceService(*p_pService, false);
     }
 
-    if (bResult)
-    {
-        m_Services.remove(p_pService);
-        delete p_pService;
-    }
+    m_Services.remove(p_pService);
+    delete p_pService;
+
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("%s _removeService: FAILED!\n"), _DH(p_pService)););
     return bResult;
 }
