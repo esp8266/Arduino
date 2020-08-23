@@ -457,8 +457,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                         break;
                     boundBuf[i] = argByte;
                 }
-                if (String((const char*)boundBuf).startsWith("--" + boundary))   //found the boundary, done parsing this file
-                    break;
+                if ((strncmp((const char*)boundBuf, "--", 2) == 0) && (strcmp((const char*)(boundBuf + 2), boundary.c_str()) == 0))
+                    break;   //found the boundary, done parsing this file
                 if (first) first = false;   //only add newline characters after the first line
                 else {
                     _uploadWriteByte('\r');
