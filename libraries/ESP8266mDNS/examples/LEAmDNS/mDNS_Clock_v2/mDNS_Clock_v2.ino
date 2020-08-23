@@ -200,7 +200,7 @@ void setup(void) {
                 nif->name[1],
                 netif_get_index(nif));
   })) {
-    Serial.println("Error: could not add useless informative callback\n");
+    Serial.println("Error: could not add informative callback\n");
   }
 
   WiFi.mode(WIFI_STA);
