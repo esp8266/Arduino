@@ -1253,36 +1253,6 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 }
 
 /*
-    clsLEAMDNSHost::clsService::_addServiceTxt (uint16_t)
-
-*/
-clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-        uint16_t p_u16Value,
-        bool p_bTemp)
-{
-    char    acValueBuffer[8];   // 16-bit max 5 digits
-    *acValueBuffer = 0;
-    sprintf(acValueBuffer, "%hu", p_u16Value);
-
-    return _addServiceTxt(p_pcKey, acValueBuffer, p_bTemp);
-}
-
-/*
-    clsLEAMDNSHost::clsService::_addServiceTxt (uint8_t)
-
-*/
-clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-        uint8_t p_u8Value,
-        bool p_bTemp)
-{
-    char    acValueBuffer[8];   // 8-bit max 3 digits
-    *acValueBuffer = 0;
-    sprintf(acValueBuffer, "%hhu", p_u8Value);
-
-    return _addServiceTxt(p_pcKey, acValueBuffer, p_bTemp);
-}
-
-/*
     clsLEAMDNSHost::clsService::_addServiceTxt (int32_t)
 
 */
@@ -1296,37 +1266,6 @@ clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const 
 
     return _addServiceTxt(p_pcKey, acValueBuffer, p_bTemp);
 }
-
-/*
-    clsLEAMDNSHost::clsService::_addServiceTxt (int16_t)
-
-*/
-clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-        int16_t p_i16Value,
-        bool p_bTemp)
-{
-    char    acValueBuffer[8];   // 16-bit max 5 digits
-    *acValueBuffer = 0;
-    sprintf(acValueBuffer, "%hi", p_i16Value);
-
-    return _addServiceTxt(p_pcKey, acValueBuffer, p_bTemp);
-}
-
-/*
-    clsLEAMDNSHost::clsService::_addServiceTxt (int8_t)
-
-*/
-clsLEAMDNSHost::clsServiceTxt* clsLEAMDNSHost::clsService::_addServiceTxt(const char* p_pcKey,
-        int8_t p_i8Value,
-        bool p_bTemp)
-{
-    char    acValueBuffer[8];   // 8-bit max 3 digits
-    *acValueBuffer = 0;
-    sprintf(acValueBuffer, "%hhi", p_i8Value);
-
-    return _addServiceTxt(p_pcKey, acValueBuffer, p_bTemp);
-}
-
 
 /**
     clsLEAMDNSHost::clsMsgHeader

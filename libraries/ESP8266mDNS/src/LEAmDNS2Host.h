@@ -478,19 +478,7 @@ public:
                                       uint32_t p_u32Value,
                                       bool p_bTemp);
         clsServiceTxt* _addServiceTxt(const char* p_pcKey,
-                                      uint16_t p_u16Value,
-                                      bool p_bTemp);
-        clsServiceTxt* _addServiceTxt(const char* p_pcKey,
-                                      uint8_t p_u8Value,
-                                      bool p_bTemp);
-        clsServiceTxt* _addServiceTxt(const char* p_pcKey,
                                       int32_t p_i32Value,
-                                      bool p_bTemp);
-        clsServiceTxt* _addServiceTxt(const char* p_pcKey,
-                                      int16_t p_i16Value,
-                                      bool p_bTemp);
-        clsServiceTxt* _addServiceTxt(const char* p_pcKey,
-                                      int8_t p_i8Value,
                                       bool p_bTemp);
 
     public:
