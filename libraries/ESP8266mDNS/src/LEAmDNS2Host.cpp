@@ -111,7 +111,6 @@ namespace experimental
     if no default is given, 'ESP8266' is used.
 
 */
-//static
 
 clsLEAMDNSHost::fnProbeResultCallback clsLEAMDNSHost::stProbeResultCallback = nullptr;
 
