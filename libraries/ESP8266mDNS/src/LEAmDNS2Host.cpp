@@ -1026,7 +1026,7 @@ bool clsLEAMDNSHost::_allocDomainName(const char* p_pcNewDomainName,
             size_t i = 0;
             for (; i < stLength; ++i)
             {
-                p_rpcDomainName[i] = (isupper(p_pcNewDomainName[i]) ? tolower(p_pcNewDomainName[i]) : p_pcNewDomainName[i]);
+                p_rpcDomainName[i] = tolower(p_pcNewDomainName[i]);
             }
             p_rpcDomainName[i] = 0;
 #else
