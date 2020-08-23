@@ -1503,7 +1503,7 @@ bool clsLEAMDNSHost::_udpDump(unsigned p_uOffset,
     MDNSResponder::_readMDNSMsgHeader
 
     Read a MDNS header from the UDP input buffer.
-     |   8    |   8    |   8    |   8    |
+      |   8    |   8    |   8    |   8    |
     00|   Identifier    |  Flags & Codes  |
     01| Question count  |  Answer count   |
     02| NS answer count | Ad answer count |
