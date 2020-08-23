@@ -1073,7 +1073,7 @@ bool clsLEAMDNSHost::_readRRDomain(clsLEAMDNSHost::clsRRDomain& p_rRRDomain)
 
     Reads a domain from the UDP input buffer. For every compression level, the functions
     calls itself recursively. To avoid endless recursion because of malformed MDNS records,
-    the maximum recursion depth is set by MDNS_DOMAIN_MAX_REDIRCTION.
+    the maximum recursion depth is set by clsConsts::u8DomainMaxRedirections.
 
 */
 bool clsLEAMDNSHost::_readRRDomain_Loop(clsLEAMDNSHost::clsRRDomain& p_rRRDomain,
