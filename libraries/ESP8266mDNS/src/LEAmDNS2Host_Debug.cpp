@@ -181,7 +181,7 @@ const char* clsLEAMDNSHost::_RRType2Name(uint16_t p_u16RRType) const
     case DNS_RRTYPE_SRV:            strcpy_P(acRRName, PSTR("SRV"));   break;
     case clsConsts::u8DNS_RRTYPE_NSEC: strcpy_P(acRRName, PSTR("NSEC"));   break;
     case DNS_RRTYPE_ANY:            strcpy_P(acRRName, PSTR("ANY"));   break;
-    default:                        sprintf_P(acRRName, PSTR("Unknown(0x%04X)", p_u16RRType);  // MAX 15!
+    default:                        sprintf_P(acRRName, PSTR("Unknown(0x%04X"), p_u16RRType);  // MAX 15!
     }
     return acRRName;
 }
