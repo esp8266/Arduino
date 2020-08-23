@@ -41,9 +41,9 @@
 // uses API MDNSApiVersion::LEAv2
 
 /*
-   Include the clsLEAMDNSHost (the library needs to be included also)
+   Include the clsLEAMDNSHost (the library needs also to be included)
    As LEA clsLEAMDNSHost is experimantal in the ESP8266 environment currently, the
-   legacy clsLEAMDNSHost is defaulted in th include file.
+   legacy clsLEAMDNSHost is defaulted in the include file.
    There are two ways to access LEA clsLEAMDNSHost:
    1. Prepend every declaration and call to global declarations or functions with the namespace, like:
       'LEAmDNS::clsLEAMDNSHost::hMDNSService  hMDNSService;'
