@@ -29,6 +29,8 @@
 
 */
 
+// THIS IS A WORK IN PROGRESS: some TODOs need completion
+
 #ifndef STASSID
 #define STASSID "ssid"
 #define STAPSK "psk"
@@ -206,31 +208,9 @@ void handleHTTPRequest() {
   s += WiFi.hostname() + ".local at " + server.client().localIP().toString() + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4>";
   s += "<ol>";
-  /*
-    for (auto info :  MDNS.answerInfo(hMDNSServiceQuery)) {
-    s += "<li>";
-    s += info.serviceDomain();
-    if (info.hostDomainAvailable()) {
-      s += "<br/>Hostname: ";
-      s += String(info.hostDomain());
-      s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
-    }
-    if (info.IP4AddressAvailable()) {
-      s += "<br/>IP4:";
-      for (auto ip : info.IP4Adresses()) {
-        s += " " + ip.toString();
-      }
-    }
-    if (info.txtAvailable()) {
-      s += "<br/>TXT:<br/>";
-      for (auto kv : info.keyValues()) {
-        s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
-      }
-    }
-    s += "</li>";
 
-    }
-  */
+  // TODO: list services
+
   s += "</ol><br/>";
 
   Serial.println("Sending 200");
@@ -244,6 +224,10 @@ void handleHTTPRequest() {
 void setup(void) {
   Serial.begin(115200);
   Serial.setDebugOutput(false);
+
+  Serial.println("");
+  Serial.println("THIS IS A WORK IN PROGRESS: some TODOs need completion");
+  Serial.println("");
 
   // Connect to WiFi network
   WiFi.mode(WIFI_AP_STA);
@@ -270,15 +254,6 @@ void setup(void) {
 
   // Init the (currently empty) host domain string with 'leamdnsv2'
   MDNS.begin("leamdnsv2");
-  /*
-    if ((!clsLEAMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
-        (!MDNS.begin(pcHostDomain))) {
-      Serial.println(" Error setting up MDNS responder!");
-      while (1) { // STOP
-        delay(1000);
-      }
-    }
-  */
   Serial.println("MDNS responder started");
 
   // Start HTTP server
