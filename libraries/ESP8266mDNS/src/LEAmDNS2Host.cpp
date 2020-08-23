@@ -466,20 +466,12 @@ clsLEAMDNSHost::clsService* clsLEAMDNSHost::addService(const char* p_pcInstanceN
 */
 bool clsLEAMDNSHost::removeService(clsLEAMDNSHost::clsService* p_pService)
 {
-    bool    bResult = false;
+    bool    bResult = true;
 
     if (p_pService &&
             (m_Services.end() != std::find(m_Services.begin(), m_Services.end(), p_pService)))
     {
-        bResult = _announceService(*p_pService, false);
-        /*
-               for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
-                   if (netif_is_up(pNetIf) &&
-                           (_announceService(pNetIf, *p_pService, false)))
-                   {
-                       bResult = true;
-                   }
-        */
+        bResult = bResult && _announceService(*p_pService, false);
     }
 
     if (bResult)
