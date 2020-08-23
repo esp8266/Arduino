@@ -266,35 +266,35 @@ bool clsLEAMDNSHost::begin(const char* p_pcHostName,
               ((m_pUDPContext = _allocBackbone())) &&
               (restart());
 
-    if (bResult)
-    {
-        if (!LwipIntf::stateUpCB([this](netif * nif)
-    {
-        (void)nif;
-            // This called after a new interface appears:
-            // resend announces on all available interfaces.
-            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s a new interface %c%c/%d is up, restarting mDNS\n"),
-                                                _DH(), nif->name[0], nif->name[1], netif_get_index(nif)););
-            if (restart())
-            {
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s restart: success!\n"), _DH()));
-            }
-            else
-            {
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s restart failed!\n"), _DH()));
-            }
-            // No need to react when an interface disappears,
-            // because mDNS always loop on all available interfaces.
-        }))
-        {
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: could not add netif status callback\n"), _DH()));
-        }
-    }
-    else
+    if (!bResult)
     {
         DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: FAILED for '%s'!\n"), _DH(), (p_pcHostName ? : "-")););
+        return false;
     }
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s begin: %s to init with hostname %s!\n"), _DH(), (bResult ? "Succeeded" : "FAILED"), (p_pcHostName ? : "-")););
+
+    bResult = LwipIntf::stateUpCB([this](netif * nif)
+    {
+        (void)nif;
+        // This called after a new interface appears:
+        // resend announces on all available interfaces.
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s a new interface %c%c/%d is up, restarting mDNS\n"),
+                                            _DH(), nif->name[0], nif->name[1], netif_get_index(nif)););
+        if (restart())
+        {
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s restart: success!\n"), _DH()));
+        }
+        else
+        {
+            DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s restart failed!\n"), _DH()));
+        }
+        // No need to react when an interface disappears,
+        // because mDNS always loop on all available interfaces.
+    });
+
+    if (!bResult)
+    {
+        DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("%s begin: could not add netif status callback\n"), _DH()));
+    }
     return bResult;
 }
 
