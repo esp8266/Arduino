@@ -961,10 +961,6 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
         if (netif_is_up(pNetIf))
         {
             bResult = true;
-            /*  _resetProbeStatus(false);   // Stop probing
-                _releaseQueries();
-                _releaseServices();
-                _releaseHostName();*/
 
             // Leave multicast group(s)
 #ifdef MDNS_IPV4_SUPPORT
