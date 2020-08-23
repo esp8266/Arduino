@@ -108,7 +108,7 @@ namespace experimental
     is incremented. If not, the delimiter and index '2' is added.
 
     If 'p_pcDomainName' is empty (==0), the given default name 'p_pcDefaultDomainName' is used,
-    if no default is given, 'ESP8266' is used.
+    if no default is given, 'esp8266' is used.
 
 */
 
@@ -161,7 +161,7 @@ const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
     else
     {
         // No given domain, use base or default
-        const char* cpcDefaultName = (p_pcDefaultDomainName ? : "ESP8266");
+        const char* cpcDefaultName = (p_pcDefaultDomainName ? : "esp8266");
         size_t      stLength = strlen(cpcDefaultName) + 1;   // '\0'
         strncpy(acResultDomainName, cpcDefaultName, stLength);
     }
