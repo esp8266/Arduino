@@ -16,6 +16,6 @@ make
 diff git.txt build.txt
 if [ $? -ne 0 ]; then
     echo ERROR:  eboot.elf in repo does not match output from compile.
-    echo ERROR:  Need to rebuild and check in updated eboot from repo.
+    echo ERROR:  Need to rebuild and check in updated eboot.
     exit 1
 fi
