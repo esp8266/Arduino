@@ -1983,7 +1983,7 @@ bool MDNSResponder::_checkServiceQueryCache(void)
 /*
     MDNSResponder::_replyMaskForHost
 
-    Determines the relavant host answers for the given question.
+    Determines the relevant host answers for the given question.
     - A question for the hostname (eg. esp8266.local) will result in an A/AAAA (eg. 192.168.2.129) reply.
     - A question for the reverse IP address (eg. 192-168.2.120.inarpa.arpa) will result in an PTR_IP4 (eg. esp8266.local) reply.
 
