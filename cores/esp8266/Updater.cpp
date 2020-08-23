@@ -113,6 +113,8 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   _reset();
   clearError(); //  _error = 0
+  _target_md5 = emptyString;
+  _md5 = MD5Builder();
 
 #ifndef HOST_MOCK
   wifi_set_sleep_type(NONE_SLEEP_T);
