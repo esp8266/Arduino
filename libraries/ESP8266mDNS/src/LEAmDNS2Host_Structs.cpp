@@ -547,12 +547,12 @@ bool clsLEAMDNSHost::clsServiceTxts::c_str(char* p_pcBuffer)
                 {
                     *pcCursor++ = ';';
                 }
-                strncpy(pcCursor, pTxt->m_pcKey, stLength); pcCursor[stLength] = 0;
+                strcpy(pcCursor, pTxt->m_pcKey);
                 pcCursor += stLength;
                 *pcCursor++ = '=';
                 if ((stLength = (pTxt->m_pcValue ? strlen(pTxt->m_pcValue) : 0)))
                 {
-                    strncpy(pcCursor, pTxt->m_pcValue, stLength); pcCursor[stLength] = 0;
+                    strcpy(pcCursor, pTxt->m_pcValue);
                     pcCursor += stLength;
                 }
             }
@@ -561,7 +561,6 @@ bool clsLEAMDNSHost::clsServiceTxts::c_str(char* p_pcBuffer)
                 break;
             }
         }
-        *pcCursor++ = 0;
     }
     return bResult;
 }
