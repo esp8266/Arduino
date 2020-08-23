@@ -1508,7 +1508,7 @@ bool clsLEAMDNSHost::_udpDump(unsigned p_uOffset,
     01| Question count  |  Answer count   |
     02| NS answer count | Ad answer count |
 
-    All 16-bit and 32-bit elements need to be translated form network coding to host coding (done in _udpRead16 and _udpRead32)
+    All 16-bit and 32-bit elements need to be translated from network coding to host coding (done in _udpRead16 and _udpRead32)
     In addition, bitfield memory order is undefined in C standard (GCC doesn't order them in the coded direction...), so they
     need some mapping here
 
@@ -1591,7 +1591,7 @@ bool clsLEAMDNSHost::_write32(uint32_t p_u32Value,
 
     Write MDNS header to the UDP output buffer.
 
-    All 16-bit and 32-bit elements need to be translated form host coding to network coding (done in _udpAppend16 and _udpAppend32)
+    All 16-bit and 32-bit elements need to be translated from host coding to network coding (done in _udpAppend16 and _udpAppend32)
     In addition, bitfield memory order is undefined in C standard (GCC doesn't order them in the coded direction...), so they
     need some mapping here
 
