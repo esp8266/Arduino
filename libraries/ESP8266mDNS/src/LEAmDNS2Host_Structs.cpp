@@ -890,9 +890,7 @@ bool clsLEAMDNSHost::clsService::setType(const char* p_pcType)
     {
         if ((bResult = (0 != (m_pcType = new char[stLength + 1]))))
         {
-            strncpy(m_pcType, p_pcType, stLength);
-            m_pcType[stLength] = 0;
-
+            strcpy(m_pcType, p_pcType);
             _resetProbeStatus();
         }
     }
