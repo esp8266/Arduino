@@ -246,11 +246,11 @@ bool clsLEAMDNSHost::clsBackbone::_processUDPInput(void)
 */
 const char* clsLEAMDNSHost::clsBackbone::_DH(void) const
 {
-    static char acBuffer[24];
-
-    *acBuffer = 0;
-    sprintf_P(acBuffer, PSTR("[mDNS::backbone]"));
-
+    static char acBuffer[20] = { 0, };
+    if (!acBuffer[0])
+    {
+        strcpy_P(acBuffer, PSTR("[mDNS::backbone]"));
+    }
     return acBuffer;
 }
 
