@@ -28,19 +28,11 @@
 #include "FS.h"
 #include "detail/RequestHandlersImpl.h"
 
-//#define DEBUG_ESP_HTTP_SERVER
-#ifdef DEBUG_ESP_PORT
-#define DEBUG_OUTPUT DEBUG_ESP_PORT
-#else
-#define DEBUG_OUTPUT Serial
-#endif
-
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
-
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
@@ -49,6 +41,7 @@ ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, i
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
 , _statusChange(0)
+, _keepAlive(false)
 , _currentHandler(nullptr)
 , _firstHandler(nullptr)
 , _lastHandler(nullptr)
@@ -170,9 +163,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
     String authReq = header(FPSTR(AUTHORIZATION_HEADER));
     if(authReq.startsWith(F("Digest"))) {
       authReq = authReq.substring(7);
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println(authReq);
-      #endif
+      DBGWS("%s\n", authReq.c_str());
       String _username = _extractParam(authReq,F("username=\""));
       if(!_username.length() || _username != String(username)) {
         authReq = "";
@@ -199,9 +190,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
         _nc = _extractParam(authReq, F("nc="), ',');
         _cnonce = _extractParam(authReq, F("cnonce=\""));
       }
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + H1);
-      #endif
+      DBGWS("Hash of user:realm:pass=%s\n", H1.c_str());
       MD5Builder md5;
       md5.begin();
       if(_currentMethod == HTTP_GET){
@@ -217,9 +206,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
       }
       md5.calculate();
       String _H2 = md5.toString();
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
-      #endif
+      DBGWS("Hash of GET:uri=%s\n", _H2.c_str());
       md5.begin();
       if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
         md5.add(H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
@@ -228,9 +215,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
       }
       md5.calculate();
       String _responsecheck = md5.toString();
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
-      #endif
+      DBGWS("The Proper response=%s\n", _responsecheck.c_str());
       if(_response == _responsecheck){
         authReq = "";
         return true;
@@ -314,9 +299,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
       return;
     }
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("New client");
-#endif
+    DBGWS("New client\n");
 
     _currentClient = client;
     _currentStatus = HC_WAIT_READ;
@@ -326,7 +309,18 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool keepCurrentClient = false;
   bool callYield = false;
 
+  DBGWS("http-server loop: conn=%d avail=%d status=%s\n",
+    _currentClient.connected(), _currentClient.available(),
+    _currentStatus==HC_NONE?"none":
+    _currentStatus==HC_WAIT_READ?"wait-read":
+    _currentStatus==HC_WAIT_CLOSE?"wait-close":
+    "??");
+
   if (_currentClient.connected() || _currentClient.available()) {
+    if (_currentClient.available() && _keepAlive) {
+      _currentStatus = HC_WAIT_READ;
+    }
+
     switch (_currentStatus) {
     case HC_NONE:
       // No-op to avoid C++ compiler warning
@@ -334,34 +328,57 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
     case HC_WAIT_READ:
       // Wait for data from client to become available
       if (_currentClient.available()) {
-        if (_parseRequest(_currentClient)) {
+        switch (_parseRequest(_currentClient))
+        {
+        case CLIENT_REQUEST_CAN_CONTINUE:
           _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
           _contentLength = CONTENT_LENGTH_NOT_SET;
           _handleRequest();
-
-          if (_currentClient.connected()) {
+          /* fallthrough */
+        case CLIENT_REQUEST_IS_HANDLED:
+          if (_currentClient.connected() || _currentClient.available()) {
             _currentStatus = HC_WAIT_CLOSE;
             _statusChange = millis();
             keepCurrentClient = true;
           }
-        }
-      } else { // !_currentClient.available()
+          else
+            DBGWS("webserver: peer has closed after served\n");
+          break;
+        case CLIENT_MUST_STOP:
+          DBGWS("Close client\n");
+          _currentClient.stop();
+          break;
+        case CLIENT_IS_GIVEN:
+          // client must not be stopped but must not be handled here anymore
+          // (example: tcp connection given to websocket)
+          DBGWS("Give client\n");
+          break;
+        } // switch _parseRequest()
+      } else {
+        // !_currentClient.available(): waiting for more data
         if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
           keepCurrentClient = true;
         }
+        else
+          DBGWS("webserver: closing after read timeout\n");
         callYield = true;
       }
       break;
     case HC_WAIT_CLOSE:
       // Wait for client to close the connection
-      if (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT) {
+      if (!_server.hasClient() && (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT)) {
         keepCurrentClient = true;
         callYield = true;
+        if (_currentClient.available())
+            // continue serving current client
+            _currentStatus = HC_WAIT_READ;
       }
-    }
+      break;
+    } // switch _currentStatus
   }
 
   if (!keepCurrentClient) {
+    DBGWS("Drop client\n");
     _currentClient = ClientType();
     _currentStatus = HC_NONE;
     _currentUpload.reset();
@@ -431,7 +448,14 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     if (_corsEnabled) {
       sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
     }
-    sendHeader(String(F("Connection")), String(F("close")));
+
+    if (_keepAlive && _server.hasClient()) { // Disable keep alive if another client is waiting.
+      _keepAlive = false;
+    }
+    sendHeader(String(F("Connection")), String(_keepAlive ? F("keep-alive") : F("close")));
+    if (_keepAlive) {
+      sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
+    }
 
     response += _responseHeaders;
     response += "\r\n";
@@ -675,17 +699,13 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
   bool handled = false;
   if (!_currentHandler){
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("request handler not found");
-#endif
+    DBGWS("request handler not found\n");
   }
   else {
     handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
-#ifdef DEBUG_ESP_HTTP_SERVER
     if (!handled) {
-      DEBUG_OUTPUT.println("request handler failed to handle request");
+      DBGWS("request handler failed to handle request\n");
     }
-#endif
   }
   if (!handled && _notFoundHandler) {
     _notFoundHandler();

@@ -92,7 +92,19 @@ inline uint32_t esp_get_cycle_count() {
   __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
   return ccount;
 }
-#endif // not CORE_MOCK
+
+inline uint32_t esp_get_program_counter() __attribute__((always_inline));
+inline uint32_t esp_get_program_counter() {
+  uint32_t pc;
+  __asm__ __volatile__("movi %0, ." : "=r" (pc) : : ); // ©earlephilhower
+  return pc;
+}
+
+#else // CORE_MOCK
+
+inline uint32_t esp_get_program_counter() { return 0; }
+
+#endif // CORE_MOCK
 
 
 // Tools for preloading code into the flash cache
@@ -111,6 +123,29 @@ extern "C" {
 #endif
 
 void precache(void *f, uint32_t bytes);
+unsigned long millis(void);
+unsigned long micros(void);
+uint64_t micros64(void);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
+
+#if defined(F_CPU) || defined(CORE_MOCK)
+#ifdef __cplusplus
+constexpr
+#else
+inline
+#endif
+int esp_get_cpu_freq_mhz()
+{
+    return F_CPU / 1000000L;
+}
+#else
+inline int esp_get_cpu_freq_mhz()
+{
+    return system_get_cpu_freq();
+}
+#endif
+
 
 #ifdef __cplusplus
 }

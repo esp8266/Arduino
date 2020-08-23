@@ -26,11 +26,19 @@
 
 extern "C" {
 
-static int32_t analogScale = PWMRANGE;
+static uint32_t analogMap = 0;
+static int32_t analogScale = 255;  // Match upstream default, breaking change from 2.x.x
+static uint16_t analogFreq = 1000;
 
 extern void __analogWriteRange(uint32_t range) {
-  if (range > 0) {
+  if ((range >= 15) && (range <= 65535)) {
     analogScale = range;
+  }
+}
+
+extern void __analogWriteResolution(int res) {
+  if ((res >= 4) && (res <= 16)) {
+    analogScale = (1 << res) - 1;
   }
 }
 
@@ -56,6 +64,9 @@ extern void __analogWrite(uint8_t pin, int val) {
     val = analogScale;
   }
 
+  // Per the Arduino docs at https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
+  // val: the duty cycle: between 0 (always off) and 255 (always on).
+  // So if val = 0 we have digitalWrite(LOW), if we have val==range we have digitalWrite(HIGH)
   pinMode(pin, OUTPUT);
   _setPWM(pin, val, analogScale);
 }
@@ -63,5 +74,6 @@ extern void __analogWrite(uint8_t pin, int val) {
 extern void analogWrite(uint8_t pin, int val) __attribute__((weak, alias("__analogWrite")));
 extern void analogWriteFreq(uint32_t freq) __attribute__((weak, alias("__analogWriteFreq")));
 extern void analogWriteRange(uint32_t range) __attribute__((weak, alias("__analogWriteRange")));
+extern void analogWriteResolution(int res) __attribute__((weak, alias("__analogWriteResolution")));
 
 };
