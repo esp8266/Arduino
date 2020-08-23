@@ -222,7 +222,7 @@ void setup(void) {
   setClock();
 
   // Setup MDNS responder
-  // Init the (currently empty) host domain string with 'esp8266'
+  // Init the (currently empty) host domain string with 'leamdnsv2'
   if (MDNS.begin("leamdnsv2",
   [](clsLEAMDNSHost & p_rMDNSHost, const char* p_pcDomainName, bool p_bProbeResult)->void {
   if (p_bProbeResult) {

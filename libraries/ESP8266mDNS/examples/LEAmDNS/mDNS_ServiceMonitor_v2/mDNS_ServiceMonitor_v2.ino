@@ -268,8 +268,8 @@ void setup(void) {
   // Setup MDNS responders
   MDNS.setProbeResultCallback(hostProbeResult);
 
-  // Init the (currently empty) host domain string with 'esp8266'
-  MDNS.begin("esp8266_v2");
+  // Init the (currently empty) host domain string with 'leamdnsv2'
+  MDNS.begin("leamdnsv2");
   /*
     if ((!clsLEAMDNSHost::indexDomain(pcHostDomain, 0, "esp8266")) ||
         (!MDNS.begin(pcHostDomain))) {
