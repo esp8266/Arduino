@@ -1585,7 +1585,7 @@ bool clsLEAMDNSHost::_sendServiceProbe(clsService& p_rService)
 */
 bool clsLEAMDNSHost::_cancelProbingForHost(void)
 {
-    bool    bResult = false;
+    bool    bResult;
 
     m_ProbeInformation.clear(false);
 
@@ -1594,7 +1594,7 @@ bool clsLEAMDNSHost::_cancelProbingForHost(void)
 
     for (clsService* pService : m_Services)
     {
-        bResult = _cancelProbingForService(*pService);
+        bResult = bResult && _cancelProbingForService(*pService);
     }
     return bResult;
 }
