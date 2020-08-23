@@ -28,7 +28,7 @@ int print_version(const uint32_t flash_addr)
         return 1;
     }
     char fmt[7];
-    fmt[0] = 'V';
+    fmt[0] = 'v';
     fmt[1] = '%';
     fmt[2] = '0';
     fmt[3] = '8';
