@@ -1411,7 +1411,7 @@ bool clsLEAMDNSHost::clsRRDomain::addLabel(const char* p_pcLabel,
                 m_acName[m_u16NameLength++] = '_';
                 --stLength;
             }
-            strncpy(&(m_acName[m_u16NameLength]), p_pcLabel, stLength); m_acName[m_u16NameLength + stLength] = 0;
+            strcpy(&(m_acName[m_u16NameLength]), p_pcLabel);
             m_u16NameLength += stLength;
         }
         bResult = clearNameCache();
