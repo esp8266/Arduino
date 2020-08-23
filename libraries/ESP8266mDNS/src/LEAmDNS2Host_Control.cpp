@@ -1315,14 +1315,14 @@ bool clsLEAMDNSHost::_updateProbeStatus()
     else if ((clsProbeInformation_Base::enuProbingStatus::InProgress == m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
              (m_ProbeInformation.m_Timeout.expired()))                                                          // Time for next probe
     {
-        if (clsConsts::u32ProbeCount > m_ProbeInformation.m_u8SentCount)
+        if (clsConsts::u32ProbeCount > m_ProbeInformation.m_u32SentCount)
         {
             // Send next probe
             if ((bResult = _sendHostProbe()))
             {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent host probe for '%s.local'\n\n"), _DH(), (m_pcHostName ? : "")););
                 m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
-                ++m_ProbeInformation.m_u8SentCount;
+                ++m_ProbeInformation.m_u32SentCount;
             }
         }
         else
@@ -1335,7 +1335,7 @@ bool clsLEAMDNSHost::_updateProbeStatus()
             _callHostProbeResultCallback(true);
 
             // Prepare to announce host
-            m_ProbeInformation.m_u8SentCount = 0;
+            m_ProbeInformation.m_u32SentCount = 0;
             m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay);
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Prepared host announcing.\n\n"), _DH()););
         }
@@ -1347,12 +1347,12 @@ bool clsLEAMDNSHost::_updateProbeStatus()
         if ((bResult = _announce(true, false)))
         {
             // Don't announce services here
-            ++m_ProbeInformation.m_u8SentCount; // 1..
+            ++m_ProbeInformation.m_u32SentCount; // 1..
 
-            if (clsConsts::u32AnnounceCount > m_ProbeInformation.m_u8SentCount)
+            if (clsConsts::u32AnnounceCount > m_ProbeInformation.m_u32SentCount)
             {
-                m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay * pow(2, (m_ProbeInformation.m_u8SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing host '%s.local' (%lu).\n\n"), _DH(), (m_pcHostName ? : ""), m_ProbeInformation.m_u8SentCount););
+                m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay * pow(2, (m_ProbeInformation.m_u32SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing host '%s.local' (%lu).\n\n"), _DH(), (m_pcHostName ? : ""), m_ProbeInformation.m_u32SentCount););
             }
             else
             {
@@ -1380,14 +1380,14 @@ bool clsLEAMDNSHost::_updateProbeStatus()
         else if ((clsProbeInformation_Base::enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&    // Probing AND
                  (pService->m_ProbeInformation.m_Timeout.expired()))                                                            // Time for next probe
         {
-            if (clsConsts::u32ProbeCount > pService->m_ProbeInformation.m_u8SentCount)
+            if (clsConsts::u32ProbeCount > pService->m_ProbeInformation.m_u32SentCount)
             {
                 // Send next probe
                 if ((bResult = _sendServiceProbe(*pService)))
                 {
-                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent service probe for '%s' (%u)\n\n"), _DH(), _service2String(pService), (pService->m_ProbeInformation.m_u8SentCount + 1)););
+                    DEBUG_EX_INFO2(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Did sent service probe for '%s' (%u)\n\n"), _DH(), _service2String(pService), (pService->m_ProbeInformation.m_u32SentCount + 1)););
                     pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32ProbeDelay);
-                    ++pService->m_ProbeInformation.m_u8SentCount;
+                    ++pService->m_ProbeInformation.m_u32SentCount;
                 }
             }
             else
@@ -1400,7 +1400,7 @@ bool clsLEAMDNSHost::_updateProbeStatus()
                 _callServiceProbeResultCallback(*pService, true);
 
                 // Prepare to announce service
-                pService->m_ProbeInformation.m_u8SentCount = 0;
+                pService->m_ProbeInformation.m_u32SentCount = 0;
                 pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay);
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Prepared service announcing.\n\n"), _DH()););
             }
@@ -1412,12 +1412,12 @@ bool clsLEAMDNSHost::_updateProbeStatus()
             if ((bResult = _announceService(*pService)))
             {
                 // Announce service
-                ++pService->m_ProbeInformation.m_u8SentCount;   // 1..
+                ++pService->m_ProbeInformation.m_u32SentCount;   // 1..
 
-                if (clsConsts::u32AnnounceCount > pService->m_ProbeInformation.m_u8SentCount)
+                if (clsConsts::u32AnnounceCount > pService->m_ProbeInformation.m_u32SentCount)
                 {
-                    pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay * pow(2, (pService->m_ProbeInformation.m_u8SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing service '%s' (%lu)\n\n"), _DH(), _service2String(pService), pService->m_ProbeInformation.m_u8SentCount););
+                    pService->m_ProbeInformation.m_Timeout.reset(clsConsts::u32AnnounceDelay * pow(2, (pService->m_ProbeInformation.m_u32SentCount - 1))); // 2^(0..) -> 1, 2, 4, ...
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _updateProbeStatus: Announcing service '%s' (%lu)\n\n"), _DH(), _service2String(pService), pService->m_ProbeInformation.m_u32SentCount););
                 }
                 else
                 {
@@ -1463,14 +1463,14 @@ bool clsLEAMDNSHost::_resetProbeStatus(bool p_bRestart /*= true*/)
 bool clsLEAMDNSHost::_hasProbesWaitingForAnswers(void) const
 {
     bool    bResult = ((clsProbeInformation_Base::enuProbingStatus::InProgress == m_ProbeInformation.m_ProbingStatus) &&	    // Probing
-                       (0 < m_ProbeInformation.m_u8SentCount));                                                                 // And really probing
+                       (0 < m_ProbeInformation.m_u32SentCount));                                                                 // And really probing
 
     for (clsService::list::const_iterator it = m_Services.cbegin(); ((!bResult) && (it != m_Services.cend())); it++)
     {
         clsService* pService = *it;
 
         bResult = ((clsProbeInformation_Base::enuProbingStatus::InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing
-                   (0 < pService->m_ProbeInformation.m_u8SentCount));                                                           // And really probing
+                   (0 < pService->m_ProbeInformation.m_u32SentCount));                                                           // And really probing
     }
     return bResult;
 }
@@ -1801,8 +1801,8 @@ bool clsLEAMDNSHost::_checkQueryCache()
             if ((bResult = _sendQuery(*pQuery)))
             {
                 // The re-query rate is increased to more than one hour (RFC 6762 5.2)
-                ++pQuery->m_u8SentCount;
-                uint32_t    u32NewDelay = (clsConsts::u32DynamicQueryResendDelay * pow(2, std::min((pQuery->m_u8SentCount - 1), 12)));
+                ++pQuery->m_u32SentCount;
+                uint32_t    u32NewDelay = (clsConsts::u32DynamicQueryResendDelay * pow(2, std::min((pQuery->m_u32SentCount - 1), (uint32_t)12)));
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s _checkQueryCache: Next query in %u seconds!\n"), _DH(), (u32NewDelay)););
                 pQuery->m_ResendTimeout.reset(u32NewDelay);
             }

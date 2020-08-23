@@ -383,7 +383,7 @@ protected:
         };
 
         enuProbingStatus                m_ProbingStatus;
-        uint8_t                         m_u8SentCount;  // Used for probes and announcements
+        uint32_t                        m_u32SentCount; // Used for probes and announcements
         esp8266::polledTimeout::oneShot m_Timeout;      // Used for probes and announcements
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
@@ -1145,7 +1145,7 @@ public:
         QueryCallbackAnswerFn           m_fnCallbackAnswer;
         QueryCallbackAccessorFn         m_fnCallbackAccessor;
         bool                            m_bStaticQuery;
-        uint8_t                         m_u8SentCount;
+        uint32_t                        m_u32SentCount;
         esp8266::polledTimeout::oneShot m_ResendTimeout;
         bool                            m_bAwaitingAnswers;
         clsAnswer::list                 m_Answers;

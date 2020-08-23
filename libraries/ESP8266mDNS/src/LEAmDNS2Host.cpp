@@ -1267,7 +1267,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installServiceQuery(
 
         if (_sendQuery(*pMDNSQuery))
         {
-            pMDNSQuery->m_u8SentCount = 1;
+            pMDNSQuery->m_u32SentCount = 1;
             pMDNSQuery->m_ResendTimeout.reset(clsConsts::u32DynamicQueryResendDelay);
         }
         else
@@ -1296,7 +1296,7 @@ clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_installDomainQuery(
 
         if (_sendQuery(*pQuery))
         {
-            pQuery->m_u8SentCount = 1;
+            pQuery->m_u32SentCount = 1;
             pQuery->m_ResendTimeout.reset(clsConsts::u32DynamicQueryResendDelay);
         }
         else

@@ -702,7 +702,7 @@ bool clsLEAMDNSHost::clsServiceTxts::operator!=(const clsServiceTxts& p_Other) c
 */
 clsLEAMDNSHost::clsProbeInformation_Base::clsProbeInformation_Base(void)
     :   m_ProbingStatus(enuProbingStatus::WaitingForData),
-        m_u8SentCount(0),
+        m_u32SentCount(0),
         m_Timeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
         m_bConflict(false),
         m_bTiebreakNeeded(false)
@@ -715,7 +715,7 @@ clsLEAMDNSHost::clsProbeInformation_Base::clsProbeInformation_Base(void)
 bool clsLEAMDNSHost::clsProbeInformation_Base::clear(void)
 {
     m_ProbingStatus = enuProbingStatus::WaitingForData;
-    m_u8SentCount = 0;
+    m_u32SentCount = 0;
     m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
     m_bConflict = false;
     m_bTiebreakNeeded = false;
@@ -3055,7 +3055,7 @@ clsLEAMDNSHost::clsQuery::clsQuery(const enuQueryType p_QueryType)
         m_fnCallbackAnswer(0),
         m_fnCallbackAccessor(0),
         m_bStaticQuery(false),
-        m_u8SentCount(0),
+        m_u32SentCount(0),
         m_ResendTimeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
         m_bAwaitingAnswers(true)
 {
@@ -3082,7 +3082,7 @@ bool clsLEAMDNSHost::clsQuery::clear(void)
     m_fnCallbackAnswer = 0;
     m_fnCallbackAccessor = 0;
     m_bStaticQuery = false;
-    m_u8SentCount = 0;
+    m_u32SentCount = 0;
     m_ResendTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
     m_bAwaitingAnswers = true;
     for (clsAnswer* pAnswer : m_Answers)
