@@ -32,13 +32,19 @@ extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
-#if !defined(__cpp_exceptions) && !defined(NEW_OOM_ABORT)
+#if !defined(__cpp_exceptions)
+
+// overwrite weak operators new/new[] definitions
+
 void *operator new(size_t size)
 {
     void *ret = malloc(size);
     if (0 != size && 0 == ret) {
         umm_last_fail_alloc_addr = __builtin_return_address(0);
         umm_last_fail_alloc_size = size;
+#if defined(NEW_OOM_ABORT)
+        __unhandled_exception(PSTR("OOM"));
+#endif
     }
    return ret;
 }
@@ -49,10 +55,14 @@ void *operator new[](size_t size)
     if (0 != size && 0 == ret) {
         umm_last_fail_alloc_addr = __builtin_return_address(0);
         umm_last_fail_alloc_size = size;
+#if defined(NEW_OOM_ABORT)
+        __unhandled_exception(PSTR("OOM"));
+#endif
     }
     return ret;
 }
-#endif // arduino's std::new legacy
+
+#endif // !defined(__cpp_exceptions)
 
 void __cxa_pure_virtual(void)
 {
