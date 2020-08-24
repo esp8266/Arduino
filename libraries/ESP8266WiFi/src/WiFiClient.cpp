@@ -153,10 +153,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         pcb->local_port = _localPort++;
     }
 
-    _client = new (std::nothrow) ClientContext(pcb, nullptr, nullptr);
-    if (_client == nullptr) {
-        return 0;
-    }
+    _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
     _client->setTimeout(_timeout);
     int res = _client->connect(ip, port);

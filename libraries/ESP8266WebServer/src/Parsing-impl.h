@@ -283,9 +283,7 @@ void ESP8266WebServerTemplate<ServerType>::_parseArguments(const String& data) {
   _currentArgCount = _parseArgumentsPrivate(data, nullArgHandler());
 
   // allocate one more, this is needed because {"plain": plainBuf} is always added
-  _currentArgs = new (std::nothrow) RequestArgument[_currentArgCount + 1];
-  if (_currentArgs == nullptr)
-    return;
+  _currentArgs = new RequestArgument[_currentArgCount + 1];
 
   (void)_parseArgumentsPrivate(data, storeArgHandler<ServerType>());
 }
@@ -372,11 +370,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
   //start reading the form
   if (line == ("--"+boundary)){
     if(_postArgs) delete[] _postArgs;
-    _postArgs = new (std::nothrow) RequestArgument[WEBSERVER_MAX_POST_ARGS];
-    if (_postArgs == nullptr) {
-      DBGWS("Parse form: oom\n");
-      return false;
-    }
+    _postArgs = new RequestArgument[WEBSERVER_MAX_POST_ARGS];
     _postArgsLen = 0;
     while(1){
       String argName;
@@ -434,11 +428,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
               break;
             }
           } else {
-            _currentUpload.reset(new (std::nothrow) HTTPUpload());
-            if (_currentUpload == nullptr) {
-              DBGWS("Parse form: oom\n");
-              return false;
-            }
+            _currentUpload.reset(new HTTPUpload());
             _currentUpload->status = UPLOAD_FILE_START;
             _currentUpload->name = argName;
             _currentUpload->filename = argFilename;
@@ -531,9 +521,7 @@ readfile:
       arg.value = _currentArgs[iarg].value;
     }
     if (_currentArgs) delete[] _currentArgs;
-    _currentArgs = new (std::nothrow) RequestArgument[_postArgsLen];
-    if (_currentArgs == nullptr)
-      return false;
+    _currentArgs = new RequestArgument[_postArgsLen];
     for (iarg = 0; iarg < _postArgsLen; iarg++){
       RequestArgument& arg = _currentArgs[iarg];
       arg.key = _postArgs[iarg].key;

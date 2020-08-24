@@ -37,7 +37,7 @@ public:
 
     virtual std::unique_ptr<WiFiClient> create()
     {
-        return std::unique_ptr<WiFiClient>(new (std::nothrow) WiFiClient());
+        return std::unique_ptr<WiFiClient>(new WiFiClient());
     }
 
     virtual bool verify(WiFiClient& client, const char* host)
@@ -59,9 +59,8 @@ public:
 
     std::unique_ptr<WiFiClient> create() override
     {
-        BearSSL::WiFiClientSecure *client = new (std::nothrow) BearSSL::WiFiClientSecure();
-        if (client != nullptr)
-            client->setFingerprint(_fingerprint);
+        BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure();
+        client->setFingerprint(_fingerprint);
         return std::unique_ptr<WiFiClient>(client);
     }
 
@@ -213,8 +212,8 @@ bool HTTPClient::begin(String url)
     if (!beginInternal(url, "http")) {
         return false;
     }
-    _transportTraits = TransportTraitsPtr(new (std::nothrow) TransportTraits());
-    return _transportTraits != nullptr;
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    return true;
 }
 
 
@@ -291,9 +290,9 @@ bool HTTPClient::begin(String host, uint16_t port, String uri)
     _host = host;
     _port = port;
     _uri = uri;
-    _transportTraits = TransportTraitsPtr(new (std::nothrow) TransportTraits());
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
-    return _transportTraits != nullptr;
+    return true;
 }
 
 
@@ -310,13 +309,13 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
     _port = port;
     _uri = uri;
 
-    _transportTraits = TransportTraitsPtr(new (std::nothrow) BearSSLTraits(httpsFingerprint));
+    _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s BearSSL-httpsFingerprint:", host.c_str(), port, uri.c_str());
     for (size_t i=0; i < 20; i++) {
         DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
     }
     DEBUG_HTTPCLIENT("\n");
-    return _transportTraits != nullptr;
+    return true;
 }
 
 

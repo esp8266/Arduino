@@ -374,7 +374,7 @@ public:
         if (!_pcb) {
             return 0;
         }
-        return _write_from_source(new (std::nothrow) BufferDataSource(data, size));
+        return _write_from_source(new BufferDataSource(data, size));
     }
 
     size_t write(Stream& stream)
@@ -382,7 +382,7 @@ public:
         if (!_pcb) {
             return 0;
         }
-        return _write_from_source(new (std::nothrow) BufferedStreamDataSource<Stream>(stream, stream.available()));
+        return _write_from_source(new BufferedStreamDataSource<Stream>(stream, stream.available()));
     }
 
     size_t write_P(PGM_P buf, size_t size)
@@ -391,7 +391,7 @@ public:
             return 0;
         }
         ProgmemStream stream(buf, size);
-        return _write_from_source(new (std::nothrow) BufferedStreamDataSource<ProgmemStream>(stream, size));
+        return _write_from_source(new BufferedStreamDataSource<ProgmemStream>(stream, size));
     }
 
     void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)

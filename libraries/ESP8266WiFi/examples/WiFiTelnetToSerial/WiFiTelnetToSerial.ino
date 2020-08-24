@@ -85,7 +85,7 @@ void setup() {
   Serial.swap();
   // Hardware serial is now on RX:GPIO13 TX:GPIO15
   // use SoftwareSerial on regular RX(3)/TX(1) for logging
-  logger = new (std::nothrow) SoftwareSerial(3, 1);
+  logger = new SoftwareSerial(3, 1);
   logger->begin(BAUD_LOGGER);
   logger->enableIntTx(false);
   logger->println("\n\nUsing SoftwareSerial for logging");

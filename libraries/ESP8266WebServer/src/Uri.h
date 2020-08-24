@@ -16,7 +16,7 @@ class Uri {
         virtual ~Uri() {}
 
         virtual Uri* clone() const {
-            return new (std::nothrow) Uri(_uri);
+            return new Uri(_uri);
         };
 
         virtual bool canHandle(const String &requestUri, __attribute__((unused)) std::vector<String> &pathArgs) {

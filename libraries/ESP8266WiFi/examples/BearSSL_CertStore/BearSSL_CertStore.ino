@@ -145,7 +145,7 @@ void setup() {
     return; // Can't connect to anything w/o certs!
   }
 
-  BearSSL::WiFiClientSecure *bear = new (std::nothrow) BearSSL::WiFiClientSecure();
+  BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
   Serial.printf("Attempting to fetch https://github.com/...\n");
@@ -164,7 +164,7 @@ void loop() {
   site.replace(String("\n"), emptyString);
   Serial.printf("https://%s/\n", site.c_str());
 
-  BearSSL::WiFiClientSecure *bear = new (std::nothrow) BearSSL::WiFiClientSecure();
+  BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
   fetchURL(bear, site.c_str(), 443, "/");

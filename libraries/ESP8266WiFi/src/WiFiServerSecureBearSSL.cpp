@@ -107,8 +107,8 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
 void WiFiServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
   _axtls_chain = nullptr;
   _axtls_sk = nullptr;
-  _axtls_chain = std::shared_ptr<X509List>(new (std::nothrow) X509List(cert, certLen));
-  _axtls_sk = std::shared_ptr<PrivateKey>(new (std::nothrow) PrivateKey(key, keyLen));
+  _axtls_chain = std::shared_ptr<X509List>(new X509List(cert, certLen));
+  _axtls_sk = std::shared_ptr<PrivateKey>(new PrivateKey(key, keyLen));
   setRSACert(_axtls_chain.get(), _axtls_sk.get());
 }
 

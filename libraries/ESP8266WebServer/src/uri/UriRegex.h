@@ -25,7 +25,7 @@ class UriRegex : public Uri {
         }
 
         Uri* clone() const override final {
-            return new (std::nothrow) UriRegex(_uri);
+            return new UriRegex(_uri);
         };
 
         bool canHandle(const String &requestUri, std::vector<String> &pathArgs) override final {

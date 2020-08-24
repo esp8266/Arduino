@@ -308,10 +308,7 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
         if(i == 0) {
             ESP8266WiFiScanClass::_scanResult = 0;
         } else {
-            bss_info* copied_info = new (std::nothrow) bss_info[i];
-            if (copied_info == nullptr) {
-                return;
-            }
+            bss_info* copied_info = new bss_info[i];
             i = 0;
             for(bss_info* it = head; it; it = STAILQ_NEXT(it, next), ++i) {
                 memcpy(copied_info + i, it, sizeof(bss_info));

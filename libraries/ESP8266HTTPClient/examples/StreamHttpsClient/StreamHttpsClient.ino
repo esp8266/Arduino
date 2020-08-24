@@ -38,10 +38,7 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    std::unique_ptr<BearSSL::WiFiClientSecure> client(new (std::nothrow) BearSSL::WiFiClientSecure);
-    if (client == nullptr) {
-      return;
-    }
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
     bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
     Serial.printf("\nConnecting to https://tls.mbed.org\n");

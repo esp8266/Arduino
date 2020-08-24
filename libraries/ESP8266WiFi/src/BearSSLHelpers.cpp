@@ -109,7 +109,7 @@ namespace brssl {
   }
 
   static bool certificate_to_trust_anchor_inner(br_x509_trust_anchor *ta, const br_x509_certificate *xc) {
-    std::unique_ptr<br_x509_decoder_context> dc(new (std::nothrow) br_x509_decoder_context); // auto-delete on exit
+    std::unique_ptr<br_x509_decoder_context> dc(new br_x509_decoder_context); // auto-delete on exit
     std::vector<uint8_t> vdn;
     br_x509_pkey *pk;
 
@@ -244,7 +244,7 @@ namespace brssl {
   // blobs may be returned.
   pem_object *decode_pem(const void *src, size_t len, size_t *num) {
     std::vector<pem_object> pem_list;
-    std::unique_ptr<br_pem_decoder_context> pc(new (std::nothrow) br_pem_decoder_context); // auto-delete on exit
+    std::unique_ptr<br_pem_decoder_context> pc(new br_pem_decoder_context); // auto-delete on exit
     if (!pc.get()) {
       return nullptr;
     }
@@ -405,7 +405,7 @@ namespace brssl {
   }
 
   static public_key *decode_public_key(const unsigned char *buff, size_t len) {
-    std::unique_ptr<br_pkey_decoder_context> dc(new (std::nothrow) br_pkey_decoder_context); // auto-delete on exit
+    std::unique_ptr<br_pkey_decoder_context> dc(new br_pkey_decoder_context); // auto-delete on exit
     if (!dc.get()) {
       return nullptr;
     }
@@ -477,7 +477,7 @@ namespace brssl {
   }
 
   static private_key *decode_private_key(const unsigned char *buff, size_t len) {
-    std::unique_ptr<br_skey_decoder_context> dc(new (std::nothrow) br_skey_decoder_context); // auto-delete on exit
+    std::unique_ptr<br_skey_decoder_context> dc(new br_skey_decoder_context); // auto-delete on exit
     if (!dc.get()) {
       return nullptr;
     }

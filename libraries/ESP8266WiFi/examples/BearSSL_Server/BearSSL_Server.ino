@@ -161,8 +161,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Attach the server private cert/key combo
-  BearSSL::X509List *serverCertList = new (std::nothrow) BearSSL::X509List(server_cert);
-  BearSSL::PrivateKey *serverPrivKey = new (std::nothrow) BearSSL::PrivateKey(server_private_key);
+  BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
 #ifndef USE_EC
   server.setRSACert(serverCertList, serverPrivKey);
 #else

@@ -186,10 +186,7 @@ long WiFiServer::_accept(tcp_pcb* apcb, long err) {
 
     // always accept new PCB so incoming data can be stored in our buffers even before
     // user calls ::available()
-    ClientContext* client = new (std::nothrow) ClientContext(apcb, &WiFiServer::_s_discard, this);
-    if (client == nullptr) {
-        return ERR_MEM;
-    }
+    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
 
     // backlog doc:
     // http://lwip.100.n7.nabble.com/Problem-re-opening-listening-pbc-tt32484.html#a32494

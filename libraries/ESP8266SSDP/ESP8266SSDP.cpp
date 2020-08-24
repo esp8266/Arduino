@@ -175,10 +175,7 @@ bool SSDPClass::begin() {
 
   assert(NULL == _server);
 
-  _server = new (std::nothrow) UdpContext;
-  if (_server == nullptr) {
-    return false;
-  }
+  _server = new UdpContext;
   _server->ref();
 
   IPAddress local = WiFi.localIP();
@@ -511,9 +508,7 @@ void SSDPClass::_onTimerStatic(SSDPClass* self) {
 
 void SSDPClass::_startTimer() {
   _stopTimer();
-  _timer = new (std::nothrow) SSDPTimer();
-  if (_timer == nullptr)
-    return;
+  _timer = new SSDPTimer();
   ETSTimer* tm = &(_timer->timer);
   const int interval = 1000;
   os_timer_disarm(tm);

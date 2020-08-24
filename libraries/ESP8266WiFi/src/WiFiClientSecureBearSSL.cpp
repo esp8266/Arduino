@@ -1580,21 +1580,21 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
 // AXTLS compatibility interfaces
 bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size) {
   _axtls_ta = nullptr;
-  _axtls_ta = std::shared_ptr<X509List>(new (std::nothrow) X509List(pk, size));
+  _axtls_ta = std::shared_ptr<X509List>(new X509List(pk, size));
   _ta = _axtls_ta.get();
   return _ta ? true : false;
 }
 
 bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size) {
   _axtls_chain = nullptr;
-  _axtls_chain = std::shared_ptr<X509List>(new (std::nothrow) X509List(pk, size));
+  _axtls_chain = std::shared_ptr<X509List>(new X509List(pk, size));
   _chain = _axtls_chain.get();
   return _chain ? true : false;
 }
 
 bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
   _axtls_sk = nullptr;
-  _axtls_sk = std::shared_ptr<PrivateKey>(new (std::nothrow) PrivateKey(pk, size));
+  _axtls_sk = std::shared_ptr<PrivateKey>(new PrivateKey(pk, size));
   _sk = _axtls_sk.get();
   return _sk ? true : false;
 

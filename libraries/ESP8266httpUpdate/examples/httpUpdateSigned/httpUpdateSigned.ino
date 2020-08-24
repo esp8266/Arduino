@@ -74,9 +74,9 @@ void setup() {
   WiFiMulti.addAP(STASSID, STAPSK);
 
   #if MANUAL_SIGNING
-  signPubKey = new (std::nothrow) BearSSL::PublicKey(pubkey);
-  hash = new (std::nothrow) BearSSL::HashSHA256();
-  sign = new (std::nothrow) BearSSL::SigningVerifier(signPubKey);
+  signPubKey = new BearSSL::PublicKey(pubkey);
+  hash = new BearSSL::HashSHA256();
+  sign = new BearSSL::SigningVerifier(signPubKey);
   #endif
 }
 
