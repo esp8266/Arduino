@@ -220,9 +220,11 @@ void __wrap_system_restart_local() {
 
     cut_here();
 
-    // now outside from the "cut-here" zone, print correctly the malloc address,
-    // idf-monitor.py will be able to decode this one and show exact location in sources
-    ets_printf_P(PSTR("\nlast failed alloc call: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
+    if (s_unhandled_exception && umm_last_fail_alloc_addr) {
+        // now outside from the "cut-here" zone, print correctly the `new` caller address,
+        // idf-monitor.py will be able to decode this one and show exact location in sources
+        ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
+    }
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
