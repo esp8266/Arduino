@@ -324,7 +324,7 @@ Stream& operator << (Stream& out, const char* text)
 
 Stream& operator << (Stream& out, const __FlashStringHelper* text)
 {
-    StreamPtr(text).toAll(text);
+    StreamPtr(text).toAll(out);
     return out;
 }
 
