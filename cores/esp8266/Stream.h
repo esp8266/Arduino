@@ -167,26 +167,22 @@ class Stream: public Print {
         // transfers already buffered / immediately available data (no timeout)
         // returns number of transfered bytes
         size_t toNow (Print* to) { return toFull(to, -1, -1, oneShotMs::alwaysExpired); }
-        template <typename T>
-        size_t toNow (T& to) { return toNow((Print*)&to); }
+        size_t toNow (Print& to) { return toNow(&to); }
 
         // transfers data until timeout
         // returns number of transfered bytes
         size_t toAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, -1, timeoutMs); }
-        template <typename T>
-        size_t toAll (T& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toAll((Print*)&to, timeoutMs); }
+        size_t toAll (Print& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toAll(&to, timeoutMs); }
 
         // transfers data until a char is encountered (the char is swallowed but not transfered) with timeout
         // returns number of transfered bytes
         size_t toUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, readUntilChar, timeoutMs); }
-        template <typename T>
-        size_t toUntil (T& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toUntil((Print*)&to, readUntilChar, timeoutMs); }
+        size_t toUntil (Print& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toUntil(&to, readUntilChar, timeoutMs); }
 
         // transfers data until requested size or timeout
         // returns number of transfered bytes
         size_t toSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, maxLen, -1, timeoutMs); }
-        template <typename T>
-        size_t toSize (T& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toSize((Print*)&to, maxLen, timeoutMs); }
+        size_t toSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toSize(&to, maxLen, timeoutMs); }
 
         // remaining size (-1 by default = unknown)
         virtual ssize_t streamSize () { return -1; }
