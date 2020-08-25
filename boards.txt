@@ -1,6 +1,6 @@
 #
 # Do not create pull-requests for this file only, CI will not accept them.
-# You *must* edit/modify/run boards.py to regenerate boards.txt.
+# You *must* edit/modify/run boards.txt.py to regenerate boards.txt.
 # All modified files after running with option "--allgen" must be included in the pull-request.
 #
 
@@ -7339,3 +7339,4 @@ espmxdevkit.menu.baud.921600=921600
 espmxdevkit.menu.baud.921600.upload.speed=921600
 espmxdevkit.menu.baud.3000000=3000000
 espmxdevkit.menu.baud.3000000.upload.speed=3000000
+
