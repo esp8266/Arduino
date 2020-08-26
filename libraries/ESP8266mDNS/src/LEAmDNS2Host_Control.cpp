@@ -1451,7 +1451,7 @@ bool clsLEAMDNSHost::_resetProbeStatus(bool p_bRestart /*= true*/)
     for (clsService* pService : m_Services)
     {
         pService->m_ProbeInformation.clear(false);
-        pService->m_ProbeInformation.m_ProbingStatus = (p_bRestart ? clsProbeInformation_Base::enuProbingStatus::ReadyToStart : clsProbeInformation_Base::enuProbingStatus::DoneFinally);
+        pService->m_ProbeInformation.m_ProbingStatus = m_ProbeInformation.m_ProbingStatus;
     }
     return true;
 }
