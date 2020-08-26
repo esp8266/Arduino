@@ -124,7 +124,7 @@ the root authorities, etc.).
   client.setFingerprint(fp);
   if (fetchURL(&client, host, port, path) != false)
     ret = false;
-  static const char fp2[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:86";
+  static const char fp2[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:87";
   Serial.printf("Now we'll try and connect with a valid fingerprint (will pass):\n");
   client.setFingerprint(fp2);
   if (fetchURL(&client, host, port, path) != true)
@@ -165,7 +165,7 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh76
 jCeKf2rIRugEb0xfTEiapoDBCNucboGLVFnwxm1YKj1C6tpdqmuQe68SNDAbIlyv
 ze7yPAiQmZG+QRbG4JVZqdZSOd7powLiaOP5tVbOrmInXv+jlB+Jgg9d6oJNr94P
 O6oESm+khUOAETXxO9ZmgGiXbgrpeVdjRJHB4kXb3Sy5LT0Wdq8LpASAwBA1JvKf
-OEOoHaUZefCwYJhA+ExUU18yDt6GZedPXCF6xzV/3qPgjrLTAkJkQBQhIJYUCVQf
+OEOoHaUZefCwYJhA+ExUU18yDt6GZedPXCF6xzV/3qPgjrLTAkJkQBQhIJYUCVQd
 UwIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
