@@ -40,18 +40,18 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
+bool fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
   if (!path) {
     path = "/";
   }
 
   ESP.resetFreeContStack();
   uint32_t freeStackStart = ESP.getFreeContStack();
-  Serial.printf("Trying: %s:443...", host);
+  Serial.printf("Trying: %s:443...\n", host);
   client->connect(host, port);
   if (!client->connected()) {
     Serial.printf("*** Can't connect. ***\n-------\n");
-    return;
+    return false;
   }
   Serial.printf("Connected!\n-------\n");
   client->write("GET ");
@@ -84,18 +84,19 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
   uint32_t freeStackEnd = ESP.getFreeContStack();
   Serial.printf("\nCONT stack used: %d\n", freeStackStart - freeStackEnd);
   Serial.printf("BSSL stack used: %d\n-------\n\n", stack_thunk_get_max_usage());
+  return true;
 }
 
-void fetchNoConfig() {
+bool fetchNoConfig() {
   Serial.printf(R"EOF(
 If there are no CAs or insecure options specified, BearSSL will not connect.
 Expect the following call to fail as none have been configured.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  fetchURL(&client, host, port, path);
+  return !fetchURL(&client, host, port, path);
 }
 
-void fetchInsecure() {
+bool fetchInsecure() {
   Serial.printf(R"EOF(
 This is absolutely *insecure*, but you can tell BearSSL not to check the
 certificate of the server.  In this mode it will accept ANY certificate,
@@ -103,10 +104,10 @@ which is subject to man-in-the-middle (MITM) attacks.
 )EOF");
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
-  fetchURL(&client, host, port, path);
+  return fetchURL(&client, host, port, path);
 }
 
-void fetchFingerprint() {
+bool fetchFingerprint() {
   Serial.printf(R"EOF(
 The SHA-1 fingerprint of an X.509 certificate can be used to validate it
 instead of the while certificate.  This is not nearly as secure as real
@@ -115,26 +116,40 @@ fingerprints will change if anything changes in the certificate chain
 (i.e. re-generating the certificate for a new end date, any updates to
 the root authorities, etc.).
 )EOF");
+  bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
+  // Old fingerprint, no longer valid.
   static const char fp[] PROGMEM = "59:74:61:88:13:CA:12:34:15:4D:11:0A:C1:7F:E6:67:07:69:42:F5";
+  Serial.printf("First, try and connect with a wrong fingerprint (will fail):\n");
   client.setFingerprint(fp);
-  fetchURL(&client, host, port, path);
+  if (fetchURL(&client, host, port, path) != false)
+    ret = false;
+  static const char fp2[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:87";
+  Serial.printf("Now we'll try and connect with a valid fingerprint (will pass):\n");
+  client.setFingerprint(fp2);
+  if (fetchURL(&client, host, port, path) != true)
+    ret = false;
+  return ret;
 }
 
-void fetchSelfSigned() {
+bool fetchSelfSigned() {
   Serial.printf(R"EOF(
 It is also possible to accept *any* self-signed certificate.  This is
 absolutely insecure as anyone can make a self-signed certificate.
 )EOF");
+  bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
   Serial.printf("First, try and connect to a badssl.com self-signed website (will fail):\n");
-  fetchURL(&client, "self-signed.badssl.com", 443, "/");
+  if (fetchURL(&client, "self-signed.badssl.com", 443, "/") != false)
+    ret = false;
   Serial.printf("Now we'll enable self-signed certs (will pass)\n");
   client.allowSelfSignedCerts();
-  fetchURL(&client, "self-signed.badssl.com", 443, "/");
+  if (fetchURL(&client, "self-signed.badssl.com", 443, "/") != true)
+    ret = false;
+  return ret;
 }
 
-void fetchKnownKey() {
+bool fetchKnownKey() {
   Serial.printf(R"EOF(
 The server certificate can be completely ignored and its public key
 hardcoded in your application. This should be secure as the public key
@@ -145,22 +160,22 @@ able to establish communications.
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
   static const char pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+3Up8qBkIn/7S9AfWlH
-Od8SdXmnWx+JCIHvnWzjFcLeLvQb2rMqqCDL5XDlvkyC5SZ8ZyLITemej5aJYuBv
-zcKPzyZ0QfYZiskU9nzL2qBQj8alzJJ/Cc32AWuuWrPrzVxBmOEW9gRCGFCD3m0z
-53y6GjcmBS2wcX7RagqbD7g2frEGko4G7kmW96H6dyh2j9Rou8TwAK6CnbiXPAM/
-5Q6dyfdYlHOCgP75F7hhdKB5gpprm9A/OnQsmZjUPzy4u0EKCxE8MfhBerZrZdod
-88ZdDG3CvTgm050bc+lGlbsT+s09lp0dgxSZIeI8+syV2Owt4YF/PdjeeymtzQdI
-wQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh76
+3a+BCjfEia21jp0dDFXapLHLq9MUvNJtuNF8Nh9FoQYlMmN/lEz01pcGPyTyhfWD
+jCeKf2rIRugEb0xfTEiapoDBCNucboGLVFnwxm1YKj1C6tpdqmuQe68SNDAbIlyv
+ze7yPAiQmZG+QRbG4JVZqdZSOd7powLiaOP5tVbOrmInXv+jlB+Jgg9d6oJNr94P
+O6oESm+khUOAETXxO9ZmgGiXbgrpeVdjRJHB4kXb3Sy5LT0Wdq8LpASAwBA1JvKf
+OEOoHaUZefCwYJhA+ExUU18yDt6GZedPXCF6xzV/3qPgjrLTAkJkQBQhIJYUCVQf
+UwIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
   BearSSL::WiFiClientSecure client;
   BearSSL::PublicKey key(pubkey);
   client.setKnownKey(&key);
-  fetchURL(&client, host, port, path);
+  return fetchURL(&client, host, port, path);
 }
 
-void fetchCertAuthority() {
+bool fetchCertAuthority() {
   static const char digicert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs
@@ -196,15 +211,18 @@ can also be used.  ESP8266 time needs to be valid for checks to pass as
 BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
+  bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
   BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
-  fetchURL(&client, host, port, path);
-
+  if (fetchURL(&client, host, port, path) != true) // Error here, time already set
+    ret = false;
   Serial.printf("Try again after setting NTP time (should pass)\n");
   setClock();
-  fetchURL(&client, host, port, path);
+  if (fetchURL(&client, host, port, path) != true)
+    ret = false;
+  return ret;
 }
 
 void fetchFaster() {
@@ -254,13 +272,18 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  fetchNoConfig();
-  fetchInsecure();
-  fetchFingerprint();
-  fetchSelfSigned();
-  fetchKnownKey();
-  fetchCertAuthority();
+  bool ret = true;
+  ret &= fetchNoConfig();
+  ret &= fetchInsecure();
+  ret &= fetchFingerprint();
+  ret &= fetchSelfSigned();
+  ret &= fetchKnownKey();
+  ret &= fetchCertAuthority();
   fetchFaster();
+#ifdef HOST_MOCK
+  if (!ret)
+    exit(1);
+#endif
 }
 
 
