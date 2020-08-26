@@ -45,7 +45,7 @@ Optional 'V=1' enables makefile verbosity
 Optional 'D=1' enables core debug (same as IDE's tools menu)
 Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, D=1 implies -O0)
 Optional 'FORCE32=0' will use native/default gcc (default is FORCE32=1 unless gcc-multilib is not detected)
-
+Optional 'R="<options>"' (ex: R="-b -v") runs the executable with given options after build
 
 Non exhaustive list of working examples:
 	make D=1 ../../libraries/ESP8266WiFi/examples/udp/udp
@@ -64,7 +64,7 @@ Compile other sketches:
   or:
 	ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  make  D=1  /path/to/your/sketchdir/sketch/sketch
 
-  or (preferred):
+  or:
 	export ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2
 	export D=1
 	export OPTZ=-O2
@@ -72,6 +72,12 @@ Compile other sketches:
 	make /path/to/your/sketchdir/sketch/sketch
 	./bin/sketch/sketch
 
+Additional flags:
+    make USERCFLAGS="-I some/where -I some/where/else" \
+         USERCSOURCES="some/where/file1.c some/where/file2.c ..." \
+         USERCXXSOURCES="some/where/file3.cpp some/where/file4.cpp ..." \
+         USERLDFLAGS="-L some/where/around" \
+         ...
 
 Executable location is always in bin/. Once a sketch is compiled, just run it:
 	bin/sketch/sketch
