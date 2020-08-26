@@ -124,7 +124,7 @@ the root authorities, etc.).
   client.setFingerprint(fp);
   if (fetchURL(&client, host, port, path) != false)
     ret = false;
-  static const char fp2[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:87";
+  static const char fp2[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:86";
   Serial.printf("Now we'll try and connect with a valid fingerprint (will pass):\n");
   client.setFingerprint(fp2);
   if (fetchURL(&client, host, port, path) != true)
