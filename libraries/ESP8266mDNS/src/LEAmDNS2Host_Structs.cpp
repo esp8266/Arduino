@@ -646,7 +646,6 @@ bool clsLEAMDNSHost::clsServiceTxts::compare(const clsLEAMDNSHost::clsServiceTxt
             if (!((bResult = ((pOtherTxt) &&
                               (pTxt->m_pcValue) &&
                               (pOtherTxt->m_pcValue) &&
-                              (strlen(pTxt->m_pcValue) == strlen(pOtherTxt->m_pcValue)) &&
                               (0 == strcmp(pTxt->m_pcValue, pOtherTxt->m_pcValue))))))
             {
                 break;
@@ -659,8 +658,7 @@ bool clsLEAMDNSHost::clsServiceTxts::compare(const clsLEAMDNSHost::clsServiceTxt
             if (!((bResult = ((pTxt) &&
                               (pOtherTxt->m_pcValue) &&
                               (pTxt->m_pcValue) &&
-                              (strlen(pOtherTxt->m_pcValue) == strlen(pTxt->m_pcValue)) /* &&
-                              redundant: (0 == strcmp(pOtherTxt->m_pcValue, pTxt->m_pcValue)) */))))
+                              (0 == strcmp(pOtherTxt->m_pcValue, pTxt->m_pcValue))))))
             {
                 break;
             }
