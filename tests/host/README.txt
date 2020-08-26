@@ -64,7 +64,7 @@ Compile other sketches:
   or:
 	ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  make  D=1  /path/to/your/sketchdir/sketch/sketch
 
-  or (preferred):
+  or:
 	export ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2
 	export D=1
 	export OPTZ=-O2
@@ -72,6 +72,12 @@ Compile other sketches:
 	make /path/to/your/sketchdir/sketch/sketch
 	./bin/sketch/sketch
 
+Additional flags:
+    make USERCFLAGS="-I some/where -I some/where/else" \
+         USERCSOURCES="some/where/file1.c some/where/file2.c ..." \
+         USERCXXSOURCES="some/where/file3.cpp some/where/file4.cpp ..." \
+         USERLDFLAGS="-L some/where/around" \
+         ...
 
 Executable location is always in bin/. Once a sketch is compiled, just run it:
 	bin/sketch/sketch
