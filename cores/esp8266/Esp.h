@@ -127,10 +127,7 @@ class EspClass {
             return esp_get_cpu_freq_mhz();
         }
 #else
-        uint8_t getCpuFreqMHz() const
-        {
-            return esp_get_cpu_freq_mhz();
-        }
+        uint8_t getCpuFreqMHz() const;
 #endif
 
         uint32_t getFlashChipId();
