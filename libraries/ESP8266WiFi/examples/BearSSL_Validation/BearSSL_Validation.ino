@@ -7,6 +7,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <StackThunk.h>
+#include <sntp.h>
 #include <time.h>
 
 #ifndef STASSID
@@ -169,10 +170,30 @@ OEOoHaUZefCwYJhA+ExUU18yDt6GZedPXCF6xzV/3qPgjrLTAkJkQBQhIJYUCVQf
 UwIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
+  // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
+  static const char pubkey2[] PROGMEM = R"KEY(
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh77
+3a+BCjfEia21jp0dDFXapLHLq9MUvNJtuNF8Nh9FoQYlMmN/lEz01pcGPyTyhfWD
+jCeKf2rIRugEb0xfTEiapoDBCNucboGLVFnwxm1YKj1C6tpdqmuQe68SNDAbIlyv
+ze7yPAiQmZG+QRbG4JVZqdZSOd7powLiaOP5tVbOrmInXv+jlB+Jgg9d6oJNr94P
+O6oESm+khUOAETXxO9ZmgGiXbgrpeVdjRJHB4kXb3Sy5LT0Wdq8LpASAwBA1JvKf
+OEOoHaUZefCwYJhA+ExUU18yDt6GZedPXCF6xzV/3qPgjrLTAkJkQBQhIJYUCVQf
+UwIDAQAB
+-----END PUBLIC KEY-----
+)KEY";
+
+  bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
   BearSSL::PublicKey key(pubkey);
+  BearSSL::PublicKey key2(pubkey2);
   client.setKnownKey(&key);
-  return fetchURL(&client, host, port, path);
+  if (fetchURL(&client, host, port, path) != false)
+    ret = false;
+  client.setKnownKey(&key2);
+  if (fetchURL(&client, host, port, path) != true)
+    ret = false;
+  return ret;
 }
 
 bool fetchCertAuthority() {
@@ -216,7 +237,7 @@ BearSSL does verify the notValidBefore/After fields.
   BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
-  if (fetchURL(&client, host, port, path) != true) // Error here, time already set
+  if (fetchURL(&client, host, port, path) != false) // Error here, time already set
     ret = false;
   Serial.printf("Try again after setting NTP time (should pass)\n");
   setClock();
@@ -255,6 +276,9 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
+  
+  // Disable automatic time configuring
+  sntp_servermode_dhcp(0);
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
