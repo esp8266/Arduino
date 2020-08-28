@@ -166,6 +166,7 @@ void cleanup ()
 	mock_stop_spiffs();
 	mock_stop_littlefs();
 	mock_stop_uart();
+	Serial.end();
 }
 
 void make_fs_filename (String& name, const char* fspath, const char* argv0)

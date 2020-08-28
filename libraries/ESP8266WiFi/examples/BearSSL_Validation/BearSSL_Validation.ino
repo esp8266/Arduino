@@ -161,7 +161,7 @@ able to establish communications.
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
   static const char pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh76
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh77
 3a+BCjfEia21jp0dDFXapLHLq9MUvNJtuNF8Nh9FoQYlMmN/lEz01pcGPyTyhfWD
 jCeKf2rIRugEb0xfTEiapoDBCNucboGLVFnwxm1YKj1C6tpdqmuQe68SNDAbIlyv
 ze7yPAiQmZG+QRbG4JVZqdZSOd7powLiaOP5tVbOrmInXv+jlB+Jgg9d6oJNr94P
@@ -173,7 +173,7 @@ UwIDAQAB
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
   static const char pubkey2[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh77
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh76
 3a+BCjfEia21jp0dDFXapLHLq9MUvNJtuNF8Nh9FoQYlMmN/lEz01pcGPyTyhfWD
 jCeKf2rIRugEb0xfTEiapoDBCNucboGLVFnwxm1YKj1C6tpdqmuQe68SNDAbIlyv
 ze7yPAiQmZG+QRbG4JVZqdZSOd7powLiaOP5tVbOrmInXv+jlB+Jgg9d6oJNr94P
@@ -237,7 +237,7 @@ BearSSL does verify the notValidBefore/After fields.
   BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
-  if (fetchURL(&client, host, port, path) != false) // Error here, time already set
+  if (fetchURL(&client, host, port, path) != true) // Error here, time already set
     ret = false;
   Serial.printf("Try again after setting NTP time (should pass)\n");
   setClock();
@@ -278,7 +278,7 @@ void setup() {
   Serial.println();
   
   // Disable automatic time configuring
-  sntp_servermode_dhcp(0);
+  //sntp_servermode_dhcp(0);
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
