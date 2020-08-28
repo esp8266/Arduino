@@ -70,10 +70,10 @@ class WiFiServer : public Server {
 protected:
   uint16_t _port;
   IPAddress _addr;
-  tcp_pcb* _listen_pcb;
+  tcp_pcb* _listen_pcb = nullptr;
 
-  ClientContext* _unclaimed;
-  ClientContext* _discarded;
+  ClientContext* _unclaimed = nullptr;
+  ClientContext* _discarded = nullptr;
   enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:

@@ -101,20 +101,20 @@ class SSDPClass{
     void _stopTimer();
     static void _onTimerStatic(SSDPClass* self);
 
-    UdpContext* _server;
-    SSDPTimer* _timer;
-    uint16_t _port;
-    uint8_t _ttl;
-    uint32_t _interval;
+    UdpContext* _server = nullptr;
+    SSDPTimer* _timer = nullptr;
+    uint16_t _port = 80;
+    uint8_t _ttl = 2;
+    uint32_t _interval = 1200;
 
     IPAddress _respondToAddr;
-    uint16_t  _respondToPort;
+    uint16_t  _respondToPort = 0;
 
-    bool _pending;
-    bool _st_is_uuid;
-    unsigned short _delay;
-    unsigned long _process_time;
-    unsigned long _notify_time;
+    bool _pending = false;
+    bool _st_is_uuid = false;
+    unsigned short _delay = 0;
+    unsigned long _process_time = 0;
+    unsigned long _notify_time = 0;
 
     char _schemaURL[SSDP_SCHEMA_URL_SIZE];
     char _uuid[SSDP_UUID_SIZE];
