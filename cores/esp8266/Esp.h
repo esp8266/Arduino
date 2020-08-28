@@ -122,10 +122,9 @@ class EspClass {
         uint8_t getBootMode();
 
 #if defined(F_CPU) || defined(CORE_MOCK)
-        constexpr uint8_t getCpuFreqMHz() const
-#else
-        uint8_t getCpuFreqMHz() const
+        constexpr 
 #endif
+            uint8_t getCpuFreqMHz() const
         {
             return esp_get_cpu_freq_mhz();
         }
