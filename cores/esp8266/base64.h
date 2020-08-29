@@ -25,6 +25,8 @@
 #ifndef CORE_BASE64_H_
 #define CORE_BASE64_H_
 
+#include <WString.h>
+
 class base64
 {
 public:

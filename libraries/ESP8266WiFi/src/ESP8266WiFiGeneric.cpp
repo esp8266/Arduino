@@ -369,10 +369,10 @@ WiFiPhyMode_t ESP8266WiFiGenericClass::getPhyMode() {
  */
 void ESP8266WiFiGenericClass::setOutputPower(float dBm) {
 
-    if(dBm > 20.5) {
-        dBm = 20.5;
-    } else if(dBm < 0) {
-        dBm = 0;
+    if(dBm > 20.5f) {
+        dBm = 20.5f;
+    } else if(dBm < 0.0f) {
+        dBm = 0.0f;
     }
 
     uint8_t val = (dBm*4.0f);
