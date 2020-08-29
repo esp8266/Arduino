@@ -718,6 +718,18 @@ esp8285.menu.led.15=15
 esp8285.menu.led.15.build.led=-DLED_BUILTIN=15
 esp8285.menu.led.16=16
 esp8285.menu.led.16.build.led=-DLED_BUILTIN=16
+esp8285.menu.sdk.nonosdk_190703=nonos-sdk 2.2.1+100 (190703)
+esp8285.menu.sdk.nonosdk_190703.build.sdk=NONOSDK22x_190703
+esp8285.menu.sdk.nonosdk_191122=nonos-sdk 2.2.1+119 (191122)
+esp8285.menu.sdk.nonosdk_191122.build.sdk=NONOSDK22x_191122
+esp8285.menu.sdk.nonosdk_191105=nonos-sdk 2.2.1+113 (191105)
+esp8285.menu.sdk.nonosdk_191105.build.sdk=NONOSDK22x_191105
+esp8285.menu.sdk.nonosdk_191024=nonos-sdk 2.2.1+111 (191024)
+esp8285.menu.sdk.nonosdk_191024.build.sdk=NONOSDK22x_191024
+esp8285.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
+esp8285.menu.sdk.nonosdk221.build.sdk=NONOSDK221
+esp8285.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (180626 known issues)
+esp8285.menu.sdk.nonosdk3v0.build.sdk=NONOSDK3V0
 esp8285.menu.ip.lm2f=v2 Lower Memory
 esp8285.menu.ip.lm2f.build.lwip_include=lwip2/include
 esp8285.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat

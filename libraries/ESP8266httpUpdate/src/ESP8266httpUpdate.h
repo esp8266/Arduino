@@ -184,7 +184,7 @@ protected:
 
 private:
     int _httpClientTimeout;
-    followRedirects_t _followRedirects;
+    followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
 
     // Callbacks
     HTTPUpdateStartCB    _cbStart;
@@ -192,7 +192,7 @@ private:
     HTTPUpdateErrorCB    _cbError;
     HTTPUpdateProgressCB _cbProgress;
 
-    int _ledPin;
+    int _ledPin = -1;
     uint8_t _ledOn;
 };
 
