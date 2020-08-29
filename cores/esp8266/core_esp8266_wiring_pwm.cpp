@@ -28,7 +28,6 @@ extern "C" {
 
 static uint32_t analogMap = 0;
 static int32_t analogScale = 255;  // Match upstream default, breaking change from 2.x.x
-static uint16_t analogFreq = 1000;
 
 extern void __analogWriteRange(uint32_t range) {
   if ((range >= 15) && (range <= 65535)) {
