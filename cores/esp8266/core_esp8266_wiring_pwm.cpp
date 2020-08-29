@@ -26,7 +26,6 @@
 
 extern "C" {
 
-static uint32_t analogMap = 0;
 static int32_t analogScale = 255;  // Match upstream default, breaking change from 2.x.x
 
 extern void __analogWriteRange(uint32_t range) {
