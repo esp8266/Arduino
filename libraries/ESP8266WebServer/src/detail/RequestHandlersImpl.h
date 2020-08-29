@@ -7,7 +7,7 @@
 #include "WString.h"
 #include "Uri.h"
 
-using namespace mime;
+namespace esp8266webserver {
 
 template<typename ServerType>
 class FunctionRequestHandler : public RequestHandler<ServerType> {
@@ -126,6 +126,7 @@ public:
 
         String contentType = mime::getContentType(path);
 
+        using namespace mime;
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
         if (!path.endsWith(FPSTR(mimeTable[gz].endsWith)) && !_fs.exists(path))  {
@@ -164,5 +165,6 @@ protected:
     size_t _baseUriLength;
 };
 
+} // namespace
 
 #endif //REQUESTHANDLERSIMPL_H
