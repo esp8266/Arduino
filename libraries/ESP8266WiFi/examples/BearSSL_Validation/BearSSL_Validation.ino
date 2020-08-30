@@ -120,14 +120,14 @@ the root authorities, etc.).
   bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
   // Old fingerprint, no longer valid.
-  static const char fp[] PROGMEM = "59:74:61:88:13:CA:12:34:15:4D:11:0A:C1:7F:E6:67:07:69:42:F5";
-  Serial.printf("First, try and connect with a wrong fingerprint (will fail):\n");
-  client.setFingerprint(fp);
+  static const char wrong_fp[] PROGMEM = "59:74:61:88:13:CA:12:34:15:4D:11:0A:C1:7F:E6:67:07:69:42:F5";
+  Serial.printf("\nFirst, try and connect with a wrong fingerprint (will fail):\n");
+  client.setFingerprint(wrong_fp);
   if (fetchURL(&client, host, port, path) != false)
     ret = false;
-  static const char fp2[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:87";
-  Serial.printf("Now we'll try and connect with a valid fingerprint (will pass):\n");
-  client.setFingerprint(fp2);
+  static const char right_fp[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:87";
+  Serial.printf("\nNow we'll try and connect with a valid fingerprint (will pass):\n");
+  client.setFingerprint(right_fp);
   if (fetchURL(&client, host, port, path) != true)
     ret = false;
   return ret;
@@ -140,10 +140,10 @@ absolutely insecure as anyone can make a self-signed certificate.
 )EOF");
   bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
-  Serial.printf("First, try and connect to a badssl.com self-signed website (will fail):\n");
+  Serial.printf("\nFirst, try and connect to a badssl.com self-signed website (will fail):\n");
   if (fetchURL(&client, "self-signed.badssl.com", 443, "/") != false)
     ret = false;
-  Serial.printf("Now we'll enable self-signed certs (will pass)\n");
+  Serial.printf("\nNow we'll enable self-signed certs (will pass):\n");
   client.allowSelfSignedCerts();
   if (fetchURL(&client, "self-signed.badssl.com", 443, "/") != true)
     ret = false;
@@ -159,7 +159,7 @@ private and not shared.  A MITM without the private key would not be
 able to establish communications.
 )EOF");
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
-  static const char pubkey[] PROGMEM = R"KEY(
+  static const char wrong_pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh77
 3a+BCjfEia21jp0dDFXapLHLq9MUvNJtuNF8Nh9FoQYlMmN/lEz01pcGPyTyhfWD
@@ -171,7 +171,7 @@ UwIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
-  static const char pubkey2[] PROGMEM = R"KEY(
+  static const char right_pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoObTh6xvTjspdWBMSh76
 3a+BCjfEia21jp0dDFXapLHLq9MUvNJtuNF8Nh9FoQYlMmN/lEz01pcGPyTyhfWD
@@ -185,12 +185,14 @@ UwIDAQAB
 
   bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
-  BearSSL::PublicKey key(pubkey);
-  BearSSL::PublicKey key2(pubkey2);
-  client.setKnownKey(&key);
+  BearSSL::PublicKey wrong_key(wrong_pubkey);
+  BearSSL::PublicKey right_key(right_pubkey);
+  client.setKnownKey(&wrong_key);
+  Serial.printf("\nFirst, try and connect with a wrong PubKey (will fail):\n");
   if (fetchURL(&client, host, port, path) != false)
     ret = false;
-  client.setKnownKey(&key2);
+  client.setKnownKey(&right_key);
+  Serial.printf("\nNow we'll try and connect with a correct PubKey (will pass):\n");
   if (fetchURL(&client, host, port, path) != true)
     ret = false;
   return ret;
@@ -236,10 +238,12 @@ BearSSL does verify the notValidBefore/After fields.
   BearSSL::WiFiClientSecure client;
   BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
-  Serial.printf("Try validating without setting the time (should fail)\n");
+#ifndef CORE_MOCK
+  Serial.printf("\nTry validating without setting the time (should fail):\n");
   if (fetchURL(&client, host, port, path) != true) // Error here, time already set
     ret = false;
-  Serial.printf("Try again after setting NTP time (should pass)\n");
+#endif
+  Serial.printf("\nTry again after setting NTP time (should pass):\n");
   setClock();
   if (fetchURL(&client, host, port, path) != true)
     ret = false;
@@ -276,9 +280,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
-  
-  // Disable automatic time configuring
-  //sntp_servermode_dhcp(0);
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
@@ -304,7 +305,7 @@ void setup() {
   ret &= fetchKnownKey();
   ret &= fetchCertAuthority();
   fetchFaster();
-#ifdef HOST_MOCK
+#ifdef CORE_MOCK
   if (!ret)
     exit(1);
 #endif
