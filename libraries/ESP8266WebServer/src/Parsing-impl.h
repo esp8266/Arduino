@@ -469,6 +469,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                     _uploadWriteByte(boundBuf[j]);
                 // the initial pass (filling up the boundary buffer) did not reach the end of the line. Upload the rest of the line now
                 if (i >= 2 + bLen) {
+                    if (!client.connected()) return _parseFormUploadAborted();
                     argByte = _uploadReadByte(client);
                     while (argByte != '\r') {
                         if (!client.connected()) return _parseFormUploadAborted();
@@ -476,6 +477,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                         argByte = _uploadReadByte(client);
                     }
                 }
+                if (!client.connected()) return _parseFormUploadAborted();
                 _uploadReadByte(client); // '\n'
             }
             //Found the boundary string, finish processing this file upload
@@ -489,6 +491,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                 _currentUpload->filename.c_str(),
                 _currentUpload->type.c_str(),
                 (int)_currentUpload->totalSize);
+            if (!client.connected()) return _parseFormUploadAborted();
             line = client.readStringUntil('\r');
             client.readStringUntil('\n');
             if (line == "--") {     // extra two dashes mean we reached the end of all form fields
