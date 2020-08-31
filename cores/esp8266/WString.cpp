@@ -124,9 +124,9 @@ String::~String() {
     invalidate();
 }
 
-// /*********************************************/
-// /*  Memory Management                        */
-// /*********************************************/
+/*********************************************/
+/*  Memory Management                        */
+/*********************************************/
 
 inline void String::init(void) {
     setSSO(true);
@@ -199,9 +199,9 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     return 0;
 }
 
-// /*********************************************/
-// /*  Copy and Move                            */
-// /*********************************************/
+/*********************************************/
+/*  Copy and Move                            */
+/*********************************************/
 
 String & String::copy(const char *cstr, unsigned int length) {
     if (!reserve(length)) {
@@ -297,9 +297,9 @@ String & String::operator = (const __FlashStringHelper *pstr)
     return *this;
 }
 
-// /*********************************************/
-// /*  concat                                   */
-// /*********************************************/
+/*********************************************/
+/*  concat                                   */
+/*********************************************/
 
 unsigned char String::concat(const String &s) {
     // Special case if we're concatting ourself (s += s;) since we may end up
@@ -483,9 +483,9 @@ StringSumHelper & operator + (const StringSumHelper &lhs, const __FlashStringHel
     return a;
 }
 
-// /*********************************************/
-// /*  Comparison                               */
-// /*********************************************/
+/*********************************************/
+/*  Comparison                               */
+/*********************************************/
 
 int String::compareTo(const String &s) const {
     if(!buffer() || !s.buffer()) {
@@ -587,9 +587,9 @@ unsigned char String::endsWith(const String &s2) const {
     return strcmp(&buffer()[len() - s2.len()], s2.buffer()) == 0;
 }
 
-// /*********************************************/
-// /*  Character Access                         */
-// /*********************************************/
+/*********************************************/
+/*  Character Access                         */
+/*********************************************/
 
 char String::charAt(unsigned int loc) const {
     return operator[](loc);
@@ -629,9 +629,9 @@ void String::getBytes(unsigned char *buf, unsigned int bufsize, unsigned int ind
     buf[n] = 0;
 }
 
-// /*********************************************/
-// /*  Search                                   */
-// /*********************************************/
+/*********************************************/
+/*  Search                                   */
+/*********************************************/
 
 int String::indexOf(char c) const {
     return indexOf(c, 0);
@@ -713,9 +713,9 @@ String String::substring(unsigned int left, unsigned int right) const {
     return out;
 }
 
-// /*********************************************/
-// /*  Modification                             */
-// /*********************************************/
+/*********************************************/
+/*  Modification                             */
+/*********************************************/
 
 void String::replace(char find, char replace) {
     if (!buffer())
@@ -828,9 +828,9 @@ void String::trim(void) {
     wbuffer()[newlen] = 0;
 }
 
-// /*********************************************/
-// /*  Parsing / Conversion                     */
-// /*********************************************/
+/*********************************************/
+/*  Parsing / Conversion                     */
+/*********************************************/
 
 long String::toInt(void) const {
     if (buffer())
