@@ -1,6 +1,7 @@
 
 #include <AddrList.h>
 #include <lwip/netif.h>
+#include <sntp.h>
 
 esp8266::AddressListImplementation::AddressList addrList;
 
@@ -17,7 +18,11 @@ err_t dhcp_renew(struct netif *netif)
 	return ERR_OK;
 }
 
-void sntp_setserver(u8_t, const ip_addr_t)
+void sntp_setserver(u8_t, const ip_addr_t*)
+{
+}
+
+void sntp_servermode_dhcp(int)
 {
 }
 

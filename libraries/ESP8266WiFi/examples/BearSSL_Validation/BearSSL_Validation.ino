@@ -7,6 +7,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <StackThunk.h>
+#include <sntp.h>
 #include <time.h>
 
 #ifndef STASSID
@@ -120,12 +121,12 @@ the root authorities, etc.).
   BearSSL::WiFiClientSecure client;
   // Old fingerprint, no longer valid.
   static const char wrong_fp[] PROGMEM = "59:74:61:88:13:CA:12:34:15:4D:11:0A:C1:7F:E6:67:07:69:42:F5";
-  Serial.printf("\nFirst, try and connect with a wrong fingerprint (will fail):\n");
+  Serial.println("\nFirst, try and connect with a wrong fingerprint (will fail):\n");
   client.setFingerprint(wrong_fp);
   if (fetchURL(&client, host, port, path) != false)
     ret = false;
   static const char right_fp[] PROGMEM = "df:b2:29:c6:a6:38:1a:59:9d:c9:ad:92:2d:26:f5:3c:83:8f:a5:87";
-  Serial.printf("\nNow we'll try and connect with a valid fingerprint (will pass):\n");
+  Serial.println("\nNow we'll try and connect with a valid fingerprint (will pass):\n");
   client.setFingerprint(right_fp);
   if (fetchURL(&client, host, port, path) != true)
     ret = false;
@@ -139,10 +140,10 @@ absolutely insecure as anyone can make a self-signed certificate.
 )EOF");
   bool ret = true; // Expect to be all ok
   BearSSL::WiFiClientSecure client;
-  Serial.printf("\nFirst, try and connect to a badssl.com self-signed website (will fail):\n");
+  Serial.println("\nFirst, try and connect to a badssl.com self-signed website (will fail):\n");
   if (fetchURL(&client, "self-signed.badssl.com", 443, "/") != false)
     ret = false;
-  Serial.printf("\nNow we'll enable self-signed certs (will pass):\n");
+  Serial.println("\nNow we'll enable self-signed certs (will pass):\n");
   client.allowSelfSignedCerts();
   if (fetchURL(&client, "self-signed.badssl.com", 443, "/") != true)
     ret = false;
@@ -187,11 +188,11 @@ UwIDAQAB
   BearSSL::PublicKey wrong_key(wrong_pubkey);
   BearSSL::PublicKey right_key(right_pubkey);
   client.setKnownKey(&wrong_key);
-  Serial.printf("\nFirst, try and connect with a wrong PubKey (will fail):\n");
+  Serial.println("\nFirst, try and connect with a wrong PubKey (will fail):\n");
   if (fetchURL(&client, host, port, path) != false)
     ret = false;
   client.setKnownKey(&right_key);
-  Serial.printf("\nNow we'll try and connect with a correct PubKey (will pass):\n");
+  Serial.println("\nNow we'll try and connect with a correct PubKey (will pass):\n");
   if (fetchURL(&client, host, port, path) != true)
     ret = false;
   return ret;
@@ -237,12 +238,13 @@ BearSSL does verify the notValidBefore/After fields.
   BearSSL::WiFiClientSecure client;
   BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
-#ifndef CORE_MOCK
-  Serial.printf("\nTry validating without setting the time (should fail):\n");
+#if !defined(CORE_MOCK)
+  // Skip this step on emulation because time is already set by host
+  Serial.println("\nTry validating without setting the time (should fail):\n");
   if (fetchURL(&client, host, port, path) != true) // Error here, time already set
     ret = false;
 #endif
-  Serial.printf("\nTry again after setting NTP time (should pass):\n");
+  Serial.println("\nTry again after setting NTP time (should pass):\n");
   setClock();
   if (fetchURL(&client, host, port, path) != true)
     ret = false;
@@ -280,6 +282,9 @@ void setup() {
   Serial.println();
   Serial.println();
 
+  Serial.println("Disabling automatic time configuration (caused by dhcp)\n");
+  sntp_servermode_dhcp(0);
+
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -304,12 +309,12 @@ void setup() {
   ret &= fetchKnownKey();
   ret &= fetchCertAuthority();
   fetchFaster();
-#ifdef CORE_MOCK
+
+#if defined(CORE_MOCK)
   if (!ret)
     exit(1);
 #endif
 }
-
 
 void loop() {
   // Nothing to do here
