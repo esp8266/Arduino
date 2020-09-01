@@ -11,7 +11,7 @@ Sketch emulation on host
 
 This environment let compile esp8266/Arduino sketches into native
 environment.  Network (tcp, udp, including ssl and multicast) is linked to
-local host interfaces.  WiFi is trivialy emulated and reported as "just"
+local host interfaces.  WiFi is trivially emulated and reported as "just"
 already connected and usable.
 
 Currently network emulation is a complete rewrite of
@@ -24,7 +24,7 @@ stdin is connected to UART0(RX) and stdout is connected to UART0(TX).
 UART1(TX) writes to stderr.  Reading from stdin happens in non-blocking
 raw mode, that means each character is directly injected into the UART
 FIFO without any buffering in the console.  The command line switch -c
-can be used to stop the emulation from intersepting CTRL-C (SIGINT).
+can be used to stop the emulation from intercepting CTRL-C (SIGINT).
 
 How to compile and run a sketch
 -------------------------------
@@ -102,7 +102,7 @@ Make fun, propose PRs.
 - SDCARD on Host filesystem ? or in an image ?
 - nice curses interface to display/change gpios ?
 - display device emulation (like ssd1306)
-- optionaly use arduino-builder ?
+- optionally use arduino-builder ?
 - store sketch objects and binaries outside from the source directories (done for sketches)
 - compile and use lwIP on host
 - easily debug HTTP classes
