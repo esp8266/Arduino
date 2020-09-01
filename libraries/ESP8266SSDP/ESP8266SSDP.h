@@ -46,6 +46,9 @@ class UdpContext;
 #define SSDP_MODEL_VERSION_SIZE     32
 #define SSDP_MANUFACTURER_SIZE      64
 #define SSDP_MANUFACTURER_URL_SIZE  128
+#define SSDP_INTERVAL_SECONDS       1200
+#define SSDP_MULTICAST_TTL          2
+#define SSDP_HTTP_PORT              80
 
 typedef enum {
   NONE,
@@ -103,9 +106,9 @@ class SSDPClass{
 
     UdpContext* _server = nullptr;
     SSDPTimer* _timer = nullptr;
-    uint16_t _port = 80;
-    uint8_t _ttl = 2;
-    uint32_t _interval = 1200;
+    uint16_t _port = SSDP_HTTP_PORT;
+    uint8_t _ttl = SSDP_MULTICAST_TTL;
+    uint32_t _interval = SSDP_INTERVAL_SECONDS;
 
     IPAddress _respondToAddr;
     uint16_t  _respondToPort = 0;
