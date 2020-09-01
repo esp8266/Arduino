@@ -122,13 +122,12 @@ class EspClass {
         uint8_t getBootMode();
 
 #if defined(F_CPU) || defined(CORE_MOCK)
-        constexpr uint8_t getCpuFreqMHz() const
+        constexpr 
+#endif
+            inline uint8_t getCpuFreqMHz() const __attribute__((always_inline))
         {
             return esp_get_cpu_freq_mhz();
         }
-#else
-        uint8_t getCpuFreqMHz() const;
-#endif
 
         uint32_t getFlashChipId();
         uint8_t getFlashChipVendorId();
@@ -167,21 +166,15 @@ class EspClass {
         uint8_t *random(uint8_t *resultArray, const size_t outputSizeBytes) const;
         uint32_t random() const;
 
-#ifndef CORE_MOCK
-        inline uint32_t getCycleCount() __attribute__((always_inline));
+#if !defined(CORE_MOCK)
+        inline uint32_t getCycleCount() __attribute__((always_inline))
+        {
+            return esp_get_cycle_count();
+        }
 #else
         uint32_t getCycleCount();
-#endif
-};
-
-#ifndef CORE_MOCK
-
-uint32_t EspClass::getCycleCount()
-{
-    return esp_get_cycle_count();
-}
-
 #endif // !defined(CORE_MOCK)
+};
 
 extern EspClass ESP;
 
