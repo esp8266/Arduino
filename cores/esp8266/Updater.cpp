@@ -36,10 +36,10 @@ UpdaterClass::UpdaterClass()
 , _startAddress(0)
 , _currentAddress(0)
 , _command(U_FLASH)
+, _ledPin(-1)
 #ifdef ERASE_CONFIG_H
 , _eraseConfigOption(ERASE_CONFIG_BLANK_BIN)
 #endif
-, _ledPin(-1)
 , _hash(nullptr)
 , _verify(nullptr)
 , _progress_callback(nullptr)
