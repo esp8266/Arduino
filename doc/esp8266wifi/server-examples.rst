@@ -204,7 +204,7 @@ Complete sketch is presented below.
 
         // close the connection:
         client.stop();
-        Serial.println("[Client disonnected]");
+        Serial.println("[Client disconnected]");
       }
     }
 
@@ -236,7 +236,7 @@ The page would be refreshed every 5 seconds. Each time this happens, you should 
     Host: 192.168.1.104
     DNT: 1
     Connection: Keep-Alive
-    [client disonnected]
+    [client disconnected]
 
 Conclusion
 ~~~~~~~~~~

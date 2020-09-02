@@ -369,16 +369,17 @@ WiFiPhyMode_t ESP8266WiFiGenericClass::getPhyMode() {
  */
 void ESP8266WiFiGenericClass::setOutputPower(float dBm) {
 
-    if(dBm > 20.5) {
-        dBm = 20.5;
-    } else if(dBm < 0) {
-        dBm = 0;
+    int i_dBm = int(dBm * 4.0f);
+
+    // i_dBm 82 == 20.5 dBm
+    if(i_dBm > 82) {
+        i_dBm = 82;
+    } else if(i_dBm < 0) {
+        i_dBm = 0;
     }
 
-    uint8_t val = (dBm*4.0f);
-    system_phy_set_max_tpw(val);
+    system_phy_set_max_tpw((uint8_t) i_dBm);
 }
-
 
 /**
  * store WiFi config in SDK flash area
