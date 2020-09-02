@@ -264,13 +264,6 @@ uint8_t EspClass::getBootMode(void)
     return system_get_boot_mode();
 }
 
-#ifndef F_CPU
-uint8_t EspClass::getCpuFreqMHz(void)
-{
-    return system_get_cpu_freq();
-}
-#endif
-
 uint32_t EspClass::getFlashChipId(void)
 {
     static uint32_t flash_chip_id = 0;
@@ -728,15 +721,16 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
         } else {
             bytesLeft = 0;
         }
-        rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
+        size_t bytesAligned = (bytesNow + 3) & ~3;
+        rc = spi_flash_read(pos, flash_write_puya_buf, bytesAligned);
         if (rc != SPI_FLASH_RESULT_OK) {
             return rc;
         }
-        for (size_t i = 0; i < bytesNow / 4; ++i) {
+        for (size_t i = 0; i < bytesAligned / 4; ++i) {
             flash_write_puya_buf[i] &= *ptr;
             ++ptr;
         }
-        rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
+        rc = spi_flash_write(pos, flash_write_puya_buf, bytesAligned);
         pos += bytesNow;
     }
     return rc;
@@ -770,17 +764,17 @@ String EspClass::getSketchMD5()
     }
     uint32_t lengthLeft = getSketchSize();
     const size_t bufSize = 512;
-    std::unique_ptr<uint8_t[]> buf(new uint8_t[bufSize]);
+    std::unique_ptr<uint8_t[]> buf(new (std::nothrow) uint8_t[bufSize]);
     uint32_t offset = 0;
     if(!buf.get()) {
-        return String();
+        return emptyString;
     }
     MD5Builder md5;
     md5.begin();
     while( lengthLeft > 0) {
         size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
         if (!flashRead(offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3)) {
-            return String();
+            return emptyString;
         }
         md5.add(buf.get(), readBytes);
         lengthLeft -= readBytes;

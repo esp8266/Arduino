@@ -288,6 +288,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '1M', '2M',
             'led',
+            'sdk',
             ],
         'desc': [ 'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.',
                   '',
@@ -907,23 +908,23 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'desc': [
-            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, '
+            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, ' +
             'and Sonoff S20',
             '',
-            'These are not development boards. The development process is '
-            'inconvenient with these devices. When flashing firmware you will '
+            'These are not development boards. The development process is ' +
+            'inconvenient with these devices. When flashing firmware you will ' +
             'need a Serial Adapter to connect it to your computer.',
             '',
-            ' | Most of these devices, during normal operation, are connected to '
-            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these '
-            'devices when connected to *wall power*. **ALWAYS** have them '
-            'disconnected from *wall power* when connecting them to your '
+            ' | Most of these devices, during normal operation, are connected to ' +
+            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these ' +
+            'devices when connected to *wall power*. **ALWAYS** have them ' +
+            'disconnected from *wall power* when connecting them to your ' +
             'computer. Your life may depend on it!',
             '',
-            'When flashing you will need to hold down the push button connected '
-            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB '
-            'Serial Adapters may supply enough power to handle flashing; '
-            'however, it many may not supply enough power to handle the '
+            'When flashing you will need to hold down the push button connected ' +
+            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB ' +
+            'Serial Adapters may supply enough power to handle flashing; ' +
+            'however, it many may not supply enough power to handle the ' +
             'activities when the device reboots.',
             '',
             'More product details at the bottom of https://www.itead.cc/wiki/Product/'
@@ -943,15 +944,14 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'desc': [
-            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module '
-            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) '
-            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. '
-            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 '
-            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. '
+            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module ' +
+            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) ' +
+            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. ' +
+            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 ' +
+            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. ',
             '',
-            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) '
-            'is a multi-chip package which contains ESP8266 and 1MB flash. ',
-            '',
+            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) ' +
+            'is a multi-chip package which contains ESP8266 and 1MB flash. '
         ],
 
     })
@@ -995,11 +995,8 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
-        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
-        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
-        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
+        ( '.menu.exception.disabled', 'Disabled (new aborts on oom)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),

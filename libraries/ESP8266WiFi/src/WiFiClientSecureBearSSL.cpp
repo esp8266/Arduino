@@ -105,6 +105,9 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
+  _sk = nullptr;
+  _axtls_chain = nullptr;
+  _axtls_sk = nullptr;
   stack_thunk_add_ref();
 }
 
@@ -974,7 +977,7 @@ extern "C" {
 // Set custom list of ciphers
 bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
   _cipher_list = nullptr;
-  _cipher_list = std::shared_ptr<uint16_t>(new uint16_t[cipherCount], std::default_delete<uint16_t[]>());
+  _cipher_list = std::shared_ptr<uint16_t>(new (std::nothrow) uint16_t[cipherCount], std::default_delete<uint16_t[]>());
   if (!_cipher_list.get()) {
     DEBUG_BSSL("setCiphers: list empty\n");
     return false;
@@ -1064,8 +1067,8 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-  _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+  _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
 
   if (!_sc || !_iobuf_in || !_iobuf_out) {
     _freeSSL(); // Frees _sc, _iobuf*
@@ -1180,8 +1183,8 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-  _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+  _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
@@ -1217,8 +1220,8 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-  _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+  _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+  _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
@@ -1418,7 +1421,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
     default: return false; // Invalid size
   }
   int ttlLen = sizeof(clientHelloHead_P) + (2 + sizeof(suites_P)) + (sizeof(clientHelloTail_P) + 1);
-  uint8_t *clientHello = new uint8_t[ttlLen];
+  uint8_t *clientHello = new (std::nothrow) uint8_t[ttlLen];
   if (!clientHello) {
     DEBUG_BSSL("probeMaxFragmentLength: OOM\n");
     return false;
