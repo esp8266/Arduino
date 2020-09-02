@@ -206,7 +206,7 @@ Complete sketch is below. The code inside ``setup()`` is the same as described i
         lastScanMillis = currentMillis;
       }
 
-      // print out Wi-Fi network scan result uppon completion
+      // print out Wi-Fi network scan result upon completion
       int n = WiFi.scanComplete();
       if(n >= 0)
       {

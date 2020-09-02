@@ -251,9 +251,16 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+    - name: Cache Linux toolchain
+      id: cache-linux
+      uses: actions/cache@v2
+      with:
+        path: ./tools/dist
+        key: key-linux-toolchain
     - name: Boards.txt diff
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         TRAVIS_TAG: ${{ github.ref }}
       run: |
           bash ./tests/ci/build_boards.sh
+          bash ./tests/ci/eboot_test.sh

@@ -981,7 +981,7 @@ extern "C" {
 // Set custom list of ciphers
 bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
   _cipher_list = nullptr;
-  _cipher_list = std::shared_ptr<uint16_t>(new uint16_t[cipherCount], std::default_delete<uint16_t[]>());
+  _cipher_list = std::shared_ptr<uint16_t>(new (std::nothrow) uint16_t[cipherCount], std::default_delete<uint16_t[]>());
   if (!_cipher_list.get()) {
     DEBUG_BSSL("setCiphers: list empty\n");
     return false;
@@ -1075,8 +1075,8 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
   //C Is this something we want to keep in the final release?
   { // ESP.setIramHeap(); would be an alternative to using a class to set a scope for IRAM usage.
     HeapSelectIram ephemeral;
-    _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-    _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+    _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+    _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
     DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
     DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
     DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
@@ -1198,8 +1198,8 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
   { // ESP.setIramHeap();
     HeapSelectIram ephemeral;
-    _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-    _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+    _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+    _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
     DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
     DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
     DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
@@ -1242,8 +1242,8 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
   { // ESP.setIramHeap();
     HeapSelectIram ephemeral;
-    _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-    _iobuf_out = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
+    _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
+    _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
     DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
     DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
     DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
@@ -1448,7 +1448,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
     default: return false; // Invalid size
   }
   int ttlLen = sizeof(clientHelloHead_P) + (2 + sizeof(suites_P)) + (sizeof(clientHelloTail_P) + 1);
-  uint8_t *clientHello = new uint8_t[ttlLen];
+  uint8_t *clientHello = new (std::nothrow) uint8_t[ttlLen];
   if (!clientHello) {
     DEBUG_BSSL("probeMaxFragmentLength: OOM\n");
     return false;
