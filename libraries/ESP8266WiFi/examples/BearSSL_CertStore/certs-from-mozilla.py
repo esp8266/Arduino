@@ -35,7 +35,7 @@ csvFile = StringIO(csvData)
 csvReader = csv.reader(csvFile)
 for row in csvReader:
     names.append(row[0]+":"+row[1]+":"+row[2])
-    pems.append(row[30])
+    pems.append(row[32])
 del names[0] # Remove headers
 del pems[0] # Remove headers
 
