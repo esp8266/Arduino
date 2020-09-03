@@ -24,7 +24,7 @@ except Exception:
 # Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
 
-# Load the manes[] and pems[] array from the URL
+# Load the names[] and pems[] array from the URL
 names = []
 pems = []
 response = urlopen(mozurl)
