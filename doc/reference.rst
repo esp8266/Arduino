@@ -323,36 +323,3 @@ C++
     This assures correct behavior, including handling of all subobjects, which guarantees stability.
 
   History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
-
-- New optional allocator ``arduino_new``
-
-  A new optional global allocator is introduced with a different semantic:
-
-  - never throws exceptions on oom
-
-  - never calls constructors on oom
-
-  - returns nullptr on oom
-
-  It is similar to arduino ``new`` semantic without side effects
-  (except when parent constructors, or member constructors use ``new``).
-
-  Syntax is slightly different, the following shows the different usages:
-
-  .. code:: cpp
-
-      // with new:
-
-      SomeClass* sc = new SomeClass(arg1, arg2, ...);
-      delete sc;
-
-      SomeClass* scs = new SomeClass[42];
-      delete [] scs;
-
-      // with arduino_new:
-
-      SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
-      delete sc;
-
-      SomeClass* scs = arduino_newarray(SomeClass, 42);
-      delete [] scs;

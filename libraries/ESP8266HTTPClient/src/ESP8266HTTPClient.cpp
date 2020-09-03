@@ -182,7 +182,7 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
     if (!beginInternal(url, "https")) {
         return false;
     }
-    _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
+    _transportTraits = TransportTraitsPtr(new (std::nothrow) BearSSLTraits(httpsFingerprint));
     if(!_transportTraits) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
         return false;
