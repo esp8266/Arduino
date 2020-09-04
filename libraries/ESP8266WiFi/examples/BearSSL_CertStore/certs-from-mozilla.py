@@ -24,7 +24,7 @@ except Exception:
     from io import StringIO
 #check if ar is available
 if which('ar') is None and not os.path.isfile('./ar') and not os.path.isfile('./ar.exe'):
-    raise Exception("You need the program 'ar' from xtensa-lx106-elf: https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/get-started/index.html#setup-toolchain")
+    raise Exception("You need the program 'ar' from xtensa-lx106-elf: found here: (esp8266-arduino-core-root-path)/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-ar")
 # Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
 
