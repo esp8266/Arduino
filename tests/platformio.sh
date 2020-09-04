@@ -10,10 +10,8 @@ function install_platformio()
     platformio platform install "https://github.com/platformio/platform-espressif8266.git"
     # Overwrite toolchain with this PR's toolset.  Probably better way to do this
     ( cd $TRAVIS_BUILD_DIR/tools && python3 get.py -q )
-    mv ~/.platformio/packages/toolchain-xtensa/package.json .save
-    rm -rf ~/.platformio/packages/toolchain-xtensa
-    mv $TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf ~/.platformio/packages/toolchain-xtensa
-    mv .save ~/.platformio/packages/toolchain-xtensa/package.json
+    mv $TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf ~/.platformio/packages/toolchain-xtensa-latest
+    mv ~/.platformio/packages/toolchain-xtensa/package.json ~/.platformio/packages/toolchain-xtensa/.piopm ~/.platformio/packages/toolchain-xtensa-latest/
     python -c "import json; import os; fp=open(os.path.expanduser('~/.platformio/platforms/espressif8266/platform.json'), 'r+'); data=json.load(fp); data['packages']['framework-arduinoespressif8266']['version'] = '*'; del data['packages']['framework-arduinoespressif8266']['owner'];fp.seek(0); fp.truncate(); json.dump(data, fp); fp.close()"
     ln -sf $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
