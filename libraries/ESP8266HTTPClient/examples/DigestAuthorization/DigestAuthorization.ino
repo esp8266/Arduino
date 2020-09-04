@@ -81,6 +81,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
 }
 
 void setup() {
+  randomSeed(RANDOM_REG32);
   Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
