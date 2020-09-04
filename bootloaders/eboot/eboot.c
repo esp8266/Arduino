@@ -161,11 +161,6 @@ int copy_raw(const uint32_t src_addr,
 	gzip = true;
     }
     while (left > 0) {
-        if (!verify) {
-           if (SPIEraseSector(daddr/buffer_size)) {
-               return 2;
-           }
-        }
         if (!gzip) {
             if (SPIRead(saddr, buffer, buffer_size)) {
                 return 3;
@@ -192,8 +187,25 @@ int copy_raw(const uint32_t src_addr,
                 return 9;
             }
         } else {
-            if (SPIWrite(daddr, buffer, buffer_size)) {
-                return 4;
+            // Special treatment for address 0 (bootloader).  Only erase and
+            // rewrite if the data is different (i.e. very rarely).
+            bool skip = false;
+            if (daddr == 0) {
+                if (SPIRead(daddr, buffer2, buffer_size)) {
+                    return 4;
+                }
+                if (!memcmp(buffer2, buffer, buffer_size)) {
+                    ets_putc('B'); // Note we skipped the bootloader in output
+                    skip = true;   // And skip erase/write
+                }
+            }
+            if (!skip) {
+                if (SPIEraseSector(daddr/buffer_size)) {
+                   return 2;
+                }
+                if (SPIWrite(daddr, buffer, buffer_size)) {
+                    return 4;
+                }
             }
         }
         saddr += buffer_size;
