@@ -11,6 +11,8 @@ from __future__ import print_function
 import csv
 import os
 import sys
+from shutil import which
+
 from subprocess import Popen, PIPE, call
 try:
     from urllib.request import urlopen
@@ -20,7 +22,9 @@ try:
     from StringIO import StringIO
 except Exception:
     from io import StringIO
-
+#check if ar is available
+if which('ar') is None and not os.path.isfile('./ar') and not os.path.isfile('./ar.exe'):
+    raise Exception("You need the program 'ar' from xtensa-lx106-elf: https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/get-started/index.html#setup-toolchain")
 # Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
 
@@ -35,7 +39,9 @@ csvFile = StringIO(csvData)
 csvReader = csv.reader(csvFile)
 for row in csvReader:
     names.append(row[0]+":"+row[1]+":"+row[2])
-    pems.append(row[32])
+    for item in row:
+        if item.startswith("'-----BEGIN CERTIFICATE-----"):
+            pems.append(item)
 del names[0] # Remove headers
 del pems[0] # Remove headers
 
