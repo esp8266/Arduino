@@ -24,7 +24,7 @@ except Exception:
 # Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
 
-# Load the manes[] and pems[] array from the URL
+# Load the names[] and pems[] array from the URL
 names = []
 pems = []
 response = urlopen(mozurl)
@@ -35,7 +35,7 @@ csvFile = StringIO(csvData)
 csvReader = csv.reader(csvFile)
 for row in csvReader:
     names.append(row[0]+":"+row[1]+":"+row[2])
-    pems.append(row[30])
+    pems.append(row[32])
 del names[0] # Remove headers
 del pems[0] # Remove headers
 

@@ -127,12 +127,12 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen + 1];
+      char *toencode = new (std::nothrow) char[toencodeLen + 1];
       if(toencode == NULL){
         authReq = "";
         return false;
       }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
+      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
       if(encoded == NULL){
         authReq = "";
         delete[] toencode;
