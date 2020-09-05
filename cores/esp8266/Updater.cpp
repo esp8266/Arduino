@@ -281,6 +281,8 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
     free(sig);
+    _size = binSize; // Adjust size to remove signature, not part of bin payload
+
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif
