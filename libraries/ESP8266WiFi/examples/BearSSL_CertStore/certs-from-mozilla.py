@@ -24,8 +24,9 @@ except Exception:
     from io import StringIO
 #check if ar is available
 if which('ar') is None and not os.path.isfile('./ar') and not os.path.isfile('./ar.exe'):
-    raise Exception("You need the program 'ar' from xtensa-lx106-elf: found here: (esp8266-arduino-core-root-path)/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-ar")
-# Mozilla's URL for the CSV file with included PEM certs
+    raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/xtensa-lx106-elf/bin/ar")
+if which('openssl') is None and not os.path.isfile('./openssl') and not os.path.isfile('./openssl.exe'):
+    raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")# Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
 
 # Load the names[] and pems[] array from the URL
