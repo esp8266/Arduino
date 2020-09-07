@@ -11,6 +11,8 @@ from __future__ import print_function
 import csv
 import os
 import sys
+from shutil import which
+
 from subprocess import Popen, PIPE, call
 try:
     from urllib.request import urlopen
@@ -21,6 +23,12 @@ try:
 except Exception:
     from io import StringIO
 
+# check if ar and openssl are available
+if which('ar') is None and not os.path.isfile('./ar') and not os.path.isfile('./ar.exe'):
+    raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/xtensa-lx106-elf/bin/ar")
+if which('openssl') is None and not os.path.isfile('./openssl') and not os.path.isfile('./openssl.exe'):
+    raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")
+    
 # Mozilla's URL for the CSV file with included PEM certs
 mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
 
@@ -35,7 +43,9 @@ csvFile = StringIO(csvData)
 csvReader = csv.reader(csvFile)
 for row in csvReader:
     names.append(row[0]+":"+row[1]+":"+row[2])
-    pems.append(row[32])
+    for item in row:
+        if item.startswith("'-----BEGIN CERTIFICATE-----"):
+            pems.append(item)
 del names[0] # Remove headers
 del pems[0] # Remove headers
 
