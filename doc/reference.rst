@@ -247,11 +247,16 @@ Progmem
 
 The Program memory features work much the same way as on a regular
 Arduino; placing read only data and strings in read only memory and
-freeing heap for your application. The important difference is that on
-the ESP8266 the literal strings are not pooled. This means that the same
-literal string defined inside a ``F("")`` and/or ``PSTR("")`` will take
-up space for each instance in the code. So you will need to manage the
+freeing heap for your application.
+
+In core versions prior to 2.7, the important difference is that on the
+ESP8266 the literal strings are not pooled.  This means that the same
+literal string defined inside a ``F("")`` and/or ``PSTR("")`` will take up
+space for each instance in the code.  So you will need to manage the
 duplicate strings yourself.
+
+Starting from v2.7, this is no longer true: duplicate literal strings within
+r/o memory are now handled.
 
 There is one additional helper macro to make it easier to pass
 ``const PROGMEM`` strings to methods that take a ``__FlashStringHelper``
@@ -318,36 +323,3 @@ C++
     This assures correct behavior, including handling of all subobjects, which guarantees stability.
 
   History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
-
-- New optional allocator ``arduino_new``
-
-  A new optional global allocator is introduced with a different semantic:
-
-  - never throws exceptions on oom
-
-  - never calls constructors on oom
-
-  - returns nullptr on oom
-
-  It is similar to arduino ``new`` semantic without side effects
-  (except when parent constructors, or member constructors use ``new``).
-
-  Syntax is slightly different, the following shows the different usages:
-
-  .. code:: cpp
-
-      // with new:
-
-      SomeClass* sc = new SomeClass(arg1, arg2, ...);
-      delete sc;
-
-      SomeClass* scs = new SomeClass[42];
-      delete [] scs;
-
-      // with arduino_new:
-
-      SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
-      delete sc;
-
-      SomeClass* scs = arduino_newarray(SomeClass, 42);
-      delete [] scs;
