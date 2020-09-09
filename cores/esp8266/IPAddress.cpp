@@ -183,6 +183,10 @@ bool IPAddress::isValid(const char* arg) {
 const IPAddress INADDR_ANY; // generic "0.0.0.0" for IPv4 & IPv6
 const IPAddress INADDR_NONE(255,255,255,255);
 
+void IPAddress::clear() {
+    (*this) = INADDR_ANY;
+}
+
 /**************************************/
 
 #if LWIP_IPV6
