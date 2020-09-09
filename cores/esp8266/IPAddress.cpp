@@ -32,7 +32,7 @@ IPAddress::IPAddress() {
 }
 
 bool IPAddress::isSet () const {
-    return !ip_addr_isany(&_ip);
+    return !ip_addr_isany(&_ip) && ((*this) != IPADDR_NONE);
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
@@ -182,6 +182,10 @@ bool IPAddress::isValid(const char* arg) {
 
 const IPAddress INADDR_ANY; // generic "0.0.0.0" for IPv4 & IPv6
 const IPAddress INADDR_NONE(255,255,255,255);
+
+void IPAddress::clear() {
+    (*this) = INADDR_ANY;
+}
 
 /**************************************/
 
