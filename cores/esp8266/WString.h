@@ -288,8 +288,8 @@ class String {
         enum { SSOSIZE = sizeof(struct _ptr) + 4 - 1 }; // Characters to allocate space for SSO, must be 12 or more
         struct _sso {
             char     buff[SSOSIZE];
-            unsigned char len   : 7; // Ensure only one byte is allocated by GCC for the bitfields
-            unsigned char isSSO : 1;
+            unsigned char len    : 7; // Ensure only one byte is allocated by GCC for the bitfields
+            unsigned char isHeap : 1;
         } __attribute__((packed)); // Ensure that GCC doesn't expand the flag byte to a 32-bit word for alignment issues
         enum { CAPACITY_MAX = 65535 }; // If typeof(cap) changed from uint16_t, be sure to update this enum to the max value storable in the type
         union {
@@ -297,10 +297,10 @@ class String {
             struct _sso sso;
         };
         // Accessor functions
-        inline bool isSSO() const { return sso.isSSO; }
+        inline bool isSSO() const { return !sso.isHeap; }
         inline unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
         inline unsigned int capacity() const { return isSSO() ? (unsigned int)SSOSIZE - 1 : ptr.cap; } // Size of max string not including terminal NUL
-        inline void setSSO(bool set) { sso.isSSO = set; }
+        inline void setSSO(bool set) { sso.isHeap = !set; }
         inline void setLen(int len) { if (isSSO()) sso.len = len; else ptr.len = len; }
         inline void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
 	inline void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
