@@ -102,9 +102,9 @@ The web browser you're using to read this document keeps a list of 100s of certi
 
 In many cases your application will know the specific CA it needs to validate web or MQTT servers against (often just a single, self-signing CA private to your institution).  Simply load your private CA in a `BearSSL::X509List` and use that as your trust anchor.
 
-However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to SPIFFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
+However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to LittleFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
 
-See the `BearSSL_CertStore` example for full details as the `BearSSL::CertStore` requires the creation of a cookie-cutter object for filesystem access (because the SD and SPIFFS filesystems are presently incompatible with each other).  At a high level in your `setup()` you will call `BearSSL::initCertStore()` on a global object, and then pass this global certificate store to `client.setCertStore(&gCA)` before every connection attempt to enable it as a validation option.
+See the `BearSSL_CertStore` example for full details.
 
 Supported Crypto
 ~~~~~~~~~~~~~~~~
@@ -139,7 +139,7 @@ setFingerprint(const uint8_t fp[20]) / setFingerprint(const char \*fpStr)
 
 Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
 
-This fingerprint is calcuated on the raw X509 certificate served by the server.  In very rare cases, these certificates have certain encodings which should be normalized before taking a fingerprint (but in order to preserve memory BearSSL does not do this normalization since it would need RAM for an entire copy of the cert), and the fingerprint BearSSL calculates will not match the fingerprint OpenSSL calculates.  In this case, you can enable SSL debugging and get a dump of BearSSL's calculated fingerprint and use that one in your code, or use full certificate validation.  See the `original issue and debug here <https://github.com/esp8266/Arduino/issues/6209>`__.
+This fingerprint is calculated on the raw X509 certificate served by the server.  In very rare cases, these certificates have certain encodings which should be normalized before taking a fingerprint (but in order to preserve memory BearSSL does not do this normalization since it would need RAM for an entire copy of the cert), and the fingerprint BearSSL calculates will not match the fingerprint OpenSSL calculates.  In this case, you can enable SSL debugging and get a dump of BearSSL's calculated fingerprint and use that one in your code, or use full certificate validation.  See the `original issue and debug here <https://github.com/esp8266/Arduino/issues/6209>`__.
 
 setTrustAnchors(BearSSL::X509List \*ta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

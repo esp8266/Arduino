@@ -15,7 +15,7 @@ UMM_TIME_STATS time_stats = {
 #ifdef UMM_INFO
     {0xFFFFFFFF, 0U, 0U, 0U},
 #endif
-#ifdef UMM_POISON_CHECK
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
     {0xFFFFFFFF, 0U, 0U, 0U},
 #endif
 #ifdef UMM_INTEGRITY_CHECK
@@ -42,11 +42,11 @@ bool ICACHE_FLASH_ATTR get_umm_get_perf_data(UMM_TIME_STATS *p, size_t size)
 #if defined(UMM_POISON_CHECK_LITE)
 // We skip this when doing the full poison check.
 
-static int check_poison_neighbors( unsigned short cur ) {
-  unsigned short int c;
+static bool check_poison_neighbors( uint16_t cur ) {
+  uint16_t c;
 
   if ( 0 == cur )
-    return 1;
+    return true;
 
   c = UMM_PBLOCK(cur) & UMM_BLOCKNO_MASK;
   while( c && (UMM_NBLOCK(c) & UMM_BLOCKNO_MASK) ) {
@@ -57,7 +57,7 @@ static int check_poison_neighbors( unsigned short cur ) {
      */
     if ( !(UMM_NBLOCK(c) & UMM_FREELIST_MASK) ) {
       if ( !check_poison_block(&UMM_BLOCK(c)) )
-        return 0;
+        return false;
 
       break;
     }
@@ -69,7 +69,7 @@ static int check_poison_neighbors( unsigned short cur ) {
   while( (UMM_NBLOCK(c) & UMM_BLOCKNO_MASK) ) {
     if ( !(UMM_NBLOCK(c) & UMM_FREELIST_MASK) ) {
       if ( !check_poison_block(&UMM_BLOCK(c)) )
-        return 0;
+        return false;
 
       break;
     }
@@ -77,7 +77,7 @@ static int check_poison_neighbors( unsigned short cur ) {
     c = UMM_NBLOCK(c) & UMM_BLOCKNO_MASK;
   }
 
-  return 1;
+  return true;
 }
 #endif
 
@@ -85,20 +85,20 @@ static int check_poison_neighbors( unsigned short cur ) {
 
 /* ------------------------------------------------------------------------ */
 
-static void *get_unpoisoned_check_neighbors( void *v_ptr, const char* file, int line ) {
-  unsigned char *ptr = (unsigned char *)v_ptr;
+static void *get_unpoisoned_check_neighbors( void *vptr, const char* file, int line ) {
+  uintptr_t ptr = (uintptr_t)vptr;
 
-  if (ptr != NULL) {
+  if (ptr != 0) {
 
     ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
 
 #if defined(UMM_POISON_CHECK_LITE)
     UMM_CRITICAL_DECL(id_poison);
-    unsigned short int c;
+    uint16_t c;
     bool poison = false;
 
     /* Figure out which block we're in. Note the use of truncated division... */
-    c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
+    c = (ptr - (uintptr_t)(&(umm_heap[0])))/sizeof(umm_block);
 
     UMM_CRITICAL_ENTRY(id_poison);
     poison = check_poison_block(&UMM_BLOCK(c)) && check_poison_neighbors(c);
@@ -157,12 +157,17 @@ size_t umm_block_size( void ) {
 }
 #endif
 
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+#if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
 UMM_STATISTICS ummStats;
+#endif
 
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 // Keep complete call path in IRAM
 size_t umm_free_heap_size_lw( void ) {
-  return (size_t)ummStats.free_blocks * sizeof(umm_block);
+  if (umm_heap == NULL) {
+    umm_init();
+  }
+  return (size_t)UMM_FREE_BLOCKS * sizeof(umm_block);
 }
 #endif
 
@@ -174,15 +179,17 @@ size_t umm_free_heap_size_lw( void ) {
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_lw")));
 #elif defined(UMM_INFO)
+#ifndef UMM_INLINE_METRICS
 #warning "No ISR safe function available to implement xPortGetFreeHeapSize()"
+#endif
 size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size")));
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 void print_stats(int force) {
   DBGLOG_FORCE( force, "umm heap statistics:\n");
-  DBGLOG_FORCE( force,   "  Free Space        %5u\n", ummStats.free_blocks * sizeof(umm_block));
-  DBGLOG_FORCE( force,   "  OOM Count         %5u\n", ummStats.oom_count);
+  DBGLOG_FORCE( force,   "  Raw Free Space    %5u\n", UMM_FREE_BLOCKS * sizeof(umm_block));
+  DBGLOG_FORCE( force,   "  OOM Count         %5u\n", UMM_OOM_COUNT);
 #if defined(UMM_STATS_FULL)
   DBGLOG_FORCE( force,   "  Low Watermark     %5u\n", ummStats.free_blocks_min * sizeof(umm_block));
   DBGLOG_FORCE( force,   "  Low Watermark ISR %5u\n", ummStats.free_blocks_isr_min * sizeof(umm_block));
@@ -193,15 +200,13 @@ void print_stats(int force) {
 }
 #endif
 
-
-
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
     /*
       To use ets_strlen() and ets_strcpy() safely with PROGMEM, flash storage,
       the PROGMEM address must be word (4 bytes) aligned. The destination
       address for ets_memcpy must also be word-aligned.
     */
-    char ram_buf[ets_strlen(fmt)] __attribute__ ((aligned(4)));
+    char ram_buf[ets_strlen(fmt) + 1] __attribute__((aligned(4)));
     ets_strcpy(ram_buf, fmt);
     va_list argPtr;
     va_start(argPtr, fmt);
@@ -211,5 +216,3 @@ int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
 }
 
 #endif // BUILD_UMM_MALLOC_C
-
-

@@ -6,10 +6,12 @@ TARGET_DIR := ./
 
 TARGET_OBJ_FILES := \
 	eboot.o \
-	eboot_command.o \
-
+	eboot_command.o
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
+
+UZLIB_PATH := ../../tools/sdk/uzlib/src
+UZLIB_FLAGS := -DRUNTIME_BITS_TABLES
 
 CC := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
 CXX := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-g++
@@ -17,38 +19,44 @@ AR := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-ar
 LD := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
 OBJDUMP := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-objdump
 
-INC += -I../../tools/sdk/include
-CFLAGS += -std=gnu99 -DEBOOT_ENABLE_FLASH_STORAGE #-DEBOOT_ENABLE_SERIAL_DEBUG
+INC += -I../../tools/sdk/include -I../../tools/sdk/uzlib/src
 
-CFLAGS += -O0 -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals
+CFLAGS += -std=gnu99 -DEBOOT_ENABLE_FLASH_STORAGE
+
+CFLAGS += -Os -fcommon -g -Wall -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals -ffunction-sections -fdata-sections
 
 CFLAGS += $(INC)
 
-LDFLAGS	+= -nostdlib -Wl,--no-check-sections -umain
+CFLAGS += $(UZLIB_FLAGS)
+
+LDFLAGS	+= -nostdlib -Wl,--no-check-sections -Wl,--gc-sections -umain -Wl,-Map,$(@:.elf=.map)
 
 LD_SCRIPT := -Teboot.ld
 
-APP_OUT:= eboot.elf
-APP_AR := eboot.a
-APP_FW := eboot.bin
+APP_OUT := eboot.elf
+APP_AR  := eboot.a
+APP_FW  := eboot.bin
 
-all: $(APP_FW)
 
-$(APP_AR): $(TARGET_OBJ_PATHS)
+all: $(APP_OUT)
+
+tinflate.o: $(UZLIB_PATH)/tinflate.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_conf.h
+	$(CC) $(CFLAGS) -c -o tinflate.o $(UZLIB_PATH)/tinflate.c
+
+tinfgzip.o: $(UZLIB_PATH)/tinfgzip.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_conf.h
+	$(CC) $(CFLAGS) -c -o tinfgzip.o $(UZLIB_PATH)/tinfgzip.c
+
+$(APP_AR): $(TARGET_OBJ_PATHS) tinflate.o tinfgzip.o
 	$(AR) cru $@ $^
 
-
-$(APP_OUT): $(APP_AR)
+$(APP_OUT): $(APP_AR) eboot.ld | Makefile
 	$(LD) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group -Wl,--whole-archive $(APP_AR) -Wl,--end-group -o $@
-
-$(APP_FW): $(APP_OUT)
-	$(ESPTOOL) -vvv -eo $(APP_OUT) -bo $@ -bs .text -bs .data -bs .rodata -bc -ec || true
-
 
 clean:
 	rm -f *.o
 	rm -f $(APP_AR)
 	rm -f $(APP_OUT)
+	rm -f *.map
 
 
 .PHONY: all clean default

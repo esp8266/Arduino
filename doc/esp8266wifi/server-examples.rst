@@ -204,7 +204,7 @@ Complete sketch is presented below.
 
         // close the connection:
         client.stop();
-        Serial.println("[Client disonnected]");
+        Serial.println("[Client disconnected]");
       }
     }
 
@@ -236,12 +236,7 @@ The page would be refreshed every 5 seconds. Each time this happens, you should 
     Host: 192.168.1.104
     DNT: 1
     Connection: Keep-Alive
-    [client disonnected]
-
-What Else?
-~~~~~~~~~~
-
-Looking on `client examples <client-examples.rst>`__ you will quickly find out the similarities in protocol to the server. The protocol starts with a header that contains information what communication will be about. It contains what content type is communicated or accepted like ``text/html``. It states whether connection will be kept alive or closed after submission of the header. It contains identification of the sender like ``User-Agent: Mozilla/5.0 (Windows NT 6.1)``, etc.
+    [client disconnected]
 
 Conclusion
 ~~~~~~~~~~

@@ -3,8 +3,8 @@
 # Wrapper for Arduino core / others that can call esptool.py possibly multiple times
 # Adds pyserial to sys.path automatically based on the path of the current file
 
-# First parameter is pyserial path, second is esptool path, then a series of command arguments separated with --end
-# i.e. upload.py tools/pyserial tools/esptool erase_flash --end write_flash file 0x0 --end
+# First parameter is pyserial path, second is esptool path, then a series of command arguments
+# i.e. upload.py tools/pyserial tools/esptool write_flash file 0x0
 
 import sys
 import os
@@ -16,7 +16,7 @@ try:
     sys.path.insert(0, toolspath + "/pyserial") # Add pyserial dir to search path
     sys.path.insert(0, toolspath + "/esptool") # Add esptool dir to search path
     import esptool # If this fails, we can't continue and will bomb below
-except:
+except Exception:
     sys.stderr.write("pyserial or esptool directories not found next to this upload.py tool.\n")
     sys.exit(1)
 
@@ -42,9 +42,6 @@ while len(sys.argv):
     elif thisarg == 'erase_region':
         erase_addr = sys.argv.pop(0)
         erase_len = sys.argv.pop(0)
-    elif thisarg == '--end':
-        # Backwards compatibility with fs upload tools, eat --end
-        pass
     elif thisarg == 'write_flash':
         write_addr = sys.argv.pop(0)
         binary = sys.argv.pop(0)

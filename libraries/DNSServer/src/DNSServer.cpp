@@ -119,7 +119,7 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
 			  query, queryLength);
 
   // If we have no domain name configured, just return an error
-  if (_domainName == "")
+  if (_domainName.isEmpty())
     return replyWithError(dnsHeader, _errorReplyCode,
 			  query, queryLength);
 
@@ -178,8 +178,7 @@ void DNSServer::processNextRequest()
     return;
 
   std::unique_ptr<uint8_t[]> buffer(new (std::nothrow) uint8_t[currentPacketSize]);
-
-  if (buffer == NULL)
+  if (buffer == nullptr)
     return;
 
   _udp.read(buffer.get(), currentPacketSize);

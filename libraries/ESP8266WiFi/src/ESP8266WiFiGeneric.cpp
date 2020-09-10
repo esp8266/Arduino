@@ -41,12 +41,7 @@ extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/dhcp.h"
-#include "lwip/init.h" // LWIP_VERSION_
-#if LWIP_VERSION_MAJOR == 1
-#include "lwip/sntp.h"
-#else
 #include "lwip/apps/sntp.h"
-#endif
 }
 
 #include "WiFiClient.h"
@@ -233,6 +228,16 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
         WiFiClient::stopAll();
     }
 
+    if (event->event == EVENT_STAMODE_AUTHMODE_CHANGE) {
+        auto& src = event->event_info.auth_change;
+        if ((src.old_mode != AUTH_OPEN) && (src.new_mode == AUTH_OPEN)) {
+            // CVE-2020-12638 workaround.  When we get a change to AUTH_OPEN from any other mode, drop the WiFi link because it's a downgrade attack
+            // TODO - When upgrading to 3.x.x with fix, remove this code
+            DEBUG_WIFI("WIFI_EVENT_STAMODE_AUTHMODE_CHANGE from encrypted(%d) to AUTH_OPEN, potential downgrade attack. Reconnecting WiFi. See CVE-2020-12638 for more details\n", src.old_mode);
+            WiFi.reconnect();  // Disconnects from STA and then reconnects
+        }
+    }
+
     for(auto it = std::begin(sCbEventList); it != std::end(sCbEventList); ) {
         WiFiEventHandler &handler = *it;
         if (handler->canExpire() && handler.unique()) {
@@ -364,16 +369,17 @@ WiFiPhyMode_t ESP8266WiFiGenericClass::getPhyMode() {
  */
 void ESP8266WiFiGenericClass::setOutputPower(float dBm) {
 
-    if(dBm > 20.5) {
-        dBm = 20.5;
-    } else if(dBm < 0) {
-        dBm = 0;
+    int i_dBm = int(dBm * 4.0f);
+
+    // i_dBm 82 == 20.5 dBm
+    if(i_dBm > 82) {
+        i_dBm = 82;
+    } else if(i_dBm < 0) {
+        i_dBm = 0;
     }
 
-    uint8_t val = (dBm*4.0f);
-    system_phy_set_max_tpw(val);
+    system_phy_set_max_tpw((uint8_t) i_dBm);
 }
-
 
 /**
  * store WiFi config in SDK flash area
@@ -588,7 +594,7 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
 
 static bool _dns_lookup_pending = false;
 
@@ -608,7 +614,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     ip_addr_t addr;
-    aResult = static_cast<uint32_t>(0);
+    aResult = static_cast<uint32_t>(INADDR_NONE);
 
     if(aResult.fromString(aHostname)) {
         // Host name is a IP address use it!
@@ -617,7 +623,11 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     }
 
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+#if LWIP_IPV4 && LWIP_IPV6
+    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,LWIP_DNS_ADDRTYPE_DEFAULT);
+#else
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
+#endif
     if(err == ERR_OK) {
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
@@ -640,13 +650,64 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     return (err == ERR_OK) ? 1 : 0;
 }
 
+#if LWIP_IPV4 && LWIP_IPV6
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType)
+{
+    ip_addr_t addr;
+    err_t err;
+    aResult = static_cast<uint32_t>(INADDR_NONE);
+
+    if(aResult.fromString(aHostname)) {
+        // Host name is a IP address use it!
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
+        return 1;
+    }
+
+    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+    switch(resolveType)
+    {
+      // Use selected addrtype
+      case DNSResolveType::DNS_AddrType_IPv4:
+      case DNSResolveType::DNS_AddrType_IPv6:
+      case DNSResolveType::DNS_AddrType_IPv4_IPv6:
+      case DNSResolveType::DNS_AddrType_IPv6_IPv4:
+         err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, (uint8_t) resolveType);
+	 break;
+      default:
+         err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, LWIP_DNS_ADDRTYPE_DEFAULT); // If illegal type, use default.
+	 break;
+    }
+
+    if(err == ERR_OK) {
+        aResult = IPAddress(&addr);
+    } else if(err == ERR_INPROGRESS) {
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        // will resume on timeout or when wifi_dns_found_callback fires
+        _dns_lookup_pending = false;
+        // will return here when dns_found_callback fires
+        if(aResult.isSet()) {
+            err = ERR_OK;
+        }
+    }
+
+    if(err != 0) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
+    } else {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+    }
+
+    return (err == ERR_OK) ? 1 : 0;
+}
+#endif
+
 /**
  * DNS callback
  * @param name
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
 {
     (void) name;
     if (!_dns_lookup_pending) {
@@ -715,11 +776,7 @@ bool ESP8266WiFiGenericClass::shutdown (uint32 sleepUs, WiFiState* state)
         uint8_t i = 0;
         for (auto& ntp: state->state.ntp)
         {
-#if LWIP_VERSION_MAJOR == 1
-            ntp = sntp_getserver(i++);
-#else
             ntp = *sntp_getserver(i++);
-#endif
         }
         i = 0;
         for (auto& dns: state->state.dns)
@@ -759,7 +816,7 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
             DEBUG_WIFI("core: resume: static address '%s'\n", local.toString().c_str());
             WiFi.config(state->state.ip.ip, state->state.ip.gw, state->state.ip.netmask, state->state.dns[0], state->state.dns[1]);
             uint8_t i = 0;
-            for (CONST auto& ntp: state->state.ntp)
+            for (const auto& ntp: state->state.ntp)
             {
                 IPAddress ip(ntp);
                 if (ip.isSet())

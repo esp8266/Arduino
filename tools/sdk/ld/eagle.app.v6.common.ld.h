@@ -153,8 +153,20 @@ SECTIONS
 
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
+#ifdef FP_IN_IROM
+    *libgcc.a:*f2.o(.literal .text)
+    *libgcc.a:*f3.o(.literal .text)
+    *libgcc.a:*fsi.o(.literal .text)
+    *libgcc.a:*fdi.o(.literal .text)
+    *libgcc.a:*ifs.o(.literal .text)
+    *libgcc.a:*idf.o(.literal .text)
+#endif
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
+    *libgcc.a:_divsf3.o(.literal .text)
+    *libgcc.a:_fixsfsi.o(.literal .text)
+    *libgcc.a:_cmpdf2.o(.literal .text)
+    *libgcc.a:_cmpsf2.o(.literal .text)
     *libstdc++.a:( .literal .text .literal.* .text.*)
     *libstdc++-exc.a:( .literal .text .literal.* .text.*)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
@@ -167,7 +179,6 @@ SECTIONS
     *liblwip6-536-feat.a:(.literal .text .literal.* .text.*)
     *liblwip6-1460-feat.a:(.literal .text .literal.* .text.*)
     *libbearssl.a:(.literal .text .literal.* .text.*)
-    *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
     *libcrypto.a:(.literal.* .text.*)
     *libespnow.a:(.literal.* .text.*)
@@ -186,13 +197,17 @@ SECTIONS
     /* Constant strings in flash (PSTRs) */
     *(.irom0.pstr.*)
 
+    /* Inline flash strings PSTR() within templated code */
+    *(.rodata._ZZ*__pstr__*)
+
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)
     *(.rodata._ZZ*__PRETTY_FUNCTION__)
     *(.rodata._ZZ*__func__)
 
     /* std::* exception strings, in their own section to allow string coalescing */
-    *(.irom.exceptiontext)
+    *(.irom.exceptiontext, .rodata.exceptiontext)
+    *(.rodata.*__exception_what__*) /* G++ seems to throw out templatized section attributes */
 
     /* c++ typeof IDs, etc. */
     *(.rodata._ZTIN* .rodata._ZTSN10* .rodata._ZTISt* .rodata._ZTSSt*)

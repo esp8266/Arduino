@@ -50,9 +50,13 @@ CertStore::CertInfo CertStore::_preprocessCert(uint32_t length, uint32_t offset,
   memset(&ci, 0, sizeof(ci));
 
   // Process it using SHA256, same as the hashed_dn
-  br_x509_decoder_context *ctx = new br_x509_decoder_context;
-  br_sha256_context *sha256 = new br_sha256_context;
+  br_x509_decoder_context *ctx = new (std::nothrow) br_x509_decoder_context;
+  br_sha256_context *sha256 = new (std::nothrow) br_sha256_context;
   if (!ctx || !sha256) {
+    if (ctx)
+      delete ctx;
+    if (sha256)
+      delete sha256;
     DEBUG_BSSL("CertStore::_preprocessCert: OOM\n");
     return ci;
   }
@@ -81,6 +85,10 @@ int CertStore::initCertStore(FS &fs, const char *indexFileName, const char *data
   uint32_t offset = 0;
 
   _fs = &fs;
+
+  // In case initCertStore called multiple times, don't leak old filenames
+  free(_indexName);
+  free(_dataName);
 
   // No strdup_P, so manually do it
   _indexName = (char *)malloc(strlen_P(indexFileName) + 1);
@@ -198,7 +206,7 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
         return nullptr;
       }
       data.close();
-      cs->_x509 = new X509List(der, ci.length);
+      cs->_x509 = new (std::nothrow) X509List(der, ci.length);
       free(der);
       if (!cs->_x509) {
         DEBUG_BSSL("CertStore::findHashedTA: OOM\n");

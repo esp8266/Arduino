@@ -73,18 +73,23 @@ public:
 
     void begin(unsigned long baud)
     {
-        begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
+        begin(baud, SERIAL_8N1, SERIAL_FULL, 1, false);
     }
     void begin(unsigned long baud, SerialConfig config)
     {
-        begin(baud, config, SERIAL_FULL, 1);
+        begin(baud, config, SERIAL_FULL, 1, false);
     }
     void begin(unsigned long baud, SerialConfig config, SerialMode mode)
     {
-        begin(baud, config, mode, 1);
+        begin(baud, config, mode, 1, false);
     }
 
-    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
+    {
+        begin(baud, config, mode, tx_pin, false);
+    }
+
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin, bool invert);
 
     void end();
 
@@ -201,5 +206,7 @@ protected:
 
 extern HardwareSerial Serial;
 extern HardwareSerial Serial1;
+
+extern void serialEventRun(void) __attribute__((weak));
 
 #endif
