@@ -67,10 +67,9 @@ static void setServer(int id, const char* name_or_ip)
 int clock_gettime(clockid_t unused, struct timespec *tp)
 {
     (void) unused;
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    tp->tv_sec = tv.tv_sec;
-    tp->tv_nsec = tv.tv_usec * 1000;
+    uint64_t m = micros64();
+    tp->tv_sec = m / 1000000;
+    tp->tv_nsec = (m % 1000000) * 1000;
     return 0;
 }
 
