@@ -115,7 +115,7 @@ bool WiFiServer::hasClient() {
     return false;
 }
 
-WiFiClient WiFiServer::available(byte* status) {
+WiFiClient WiFiServer::accept(byte* status) {
     (void) status;
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
@@ -133,6 +133,24 @@ WiFiClient WiFiServer::available(byte* status) {
 
     optimistic_yield(1000);
     return WiFiClient();
+}
+
+WiFiClient WiFiServer::available() {
+  for (uint8_t i = 0; i < MAX_MONITORED_CLIENTS; i++) {
+    WiFiClient& client = connectedClients[i];
+    if (client && client.status() == CLOSED) {
+      client = WiFiClient();
+    }
+    if (!client) {
+      client = accept();
+    }
+  }
+  for (uint8_t i = 0; i < MAX_MONITORED_CLIENTS; i++) {
+    WiFiClient& client = connectedClients[i];
+    if (client.available())
+      return client;
+  }
+  return WiFiClient();
 }
 
 uint8_t WiFiServer::status()  {

@@ -65,6 +65,10 @@ extern "C" {
 class ClientContext;
 class WiFiClient;
 
+#ifndef MAX_MONITORED_CLIENTS
+#define MAX_MONITORED_CLIENTS 5
+#endif
+
 class WiFiServer : public Server {
   // Secure server needs access to all the private entries here
 protected:
@@ -74,13 +78,17 @@ protected:
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
+
+  WiFiClient connectedClients[MAX_MONITORED_CLIENTS];
+
   enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:
   WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
-  WiFiClient available(uint8_t* status = NULL);
+  WiFiClient accept(uint8_t* status = NULL);
+  WiFiClient available();
   bool hasClient();
   void begin();
   void begin(uint16_t port);
