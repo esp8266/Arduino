@@ -34,6 +34,8 @@ static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
+namespace esp8266webserver {
+
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
@@ -864,3 +866,5 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
     }
     return String(r);
 }
+
+} // namespace
