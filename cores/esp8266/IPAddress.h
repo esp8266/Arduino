@@ -125,6 +125,8 @@ class IPAddress: public Printable {
         virtual size_t printTo(Print& p) const;
         String toString() const;
 
+        void clear();
+
         /*
                 check if input string(arg) is a valid IPV4 address or not.
                 return true on valid.

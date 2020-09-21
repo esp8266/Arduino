@@ -221,7 +221,7 @@ int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
 int WiFiClientSecure::connect(const char* name, uint16_t port) {
   IPAddress remote_addr;
   if (!WiFi.hostByName(name, remote_addr)) {
-    DEBUG_BSSL("connect: Name loopup failure\n");
+    DEBUG_BSSL("connect: Name lookup failure\n");
     return 0;
   }
   if (!WiFiClient::connect(remote_addr, port)) {

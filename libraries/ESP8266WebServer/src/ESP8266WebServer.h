@@ -82,7 +82,11 @@ namespace esp8266webserver {
 template<typename ServerType>
 class ESP8266WebServerTemplate;
 
+}
+
 #include "detail/RequestHandler.h"
+
+namespace esp8266webserver {
 
 template<typename ServerType>
 class ESP8266WebServerTemplate
@@ -332,12 +336,10 @@ protected:
   HookFunction     _hook;
 };
 
+} // namespace
 
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
-
-};
-
 
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;

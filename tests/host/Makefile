@@ -170,7 +170,7 @@ DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP
 endif
 
 FLAGS += $(DEBUG) -Wall $(OPTZ) -fno-common -g $(M32)
-FLAGS += -fstack-check -fstack-protector-all
+FLAGS += -fstack-protector-all
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
