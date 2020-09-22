@@ -142,11 +142,13 @@ bool clsLEAMDNSHost::setNetIfHostName(const char* p_pcHostName)
 {
     if (p_pcHostName)
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+        {
             if (netif_is_up(pNetIf))
             {
                 netif_set_hostname(pNetIf, p_pcHostName);
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] setNetIfHostName host name: %s on " NETIFID_STR "!\n"), p_pcHostName, NETIFID_VAL(pNetIf)););
             }
+        }
     return true;
 }
 
@@ -875,6 +877,7 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
 
     // Join multicast group(s)
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+    {
         if (netif_is_up(pNetIf))
         {
 #ifdef MDNS_IPV4_SUPPORT
@@ -909,6 +912,7 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
                             _DH(), NETIFID_VAL(pNetIf)));
 #endif
         }
+    }
     return bResult;
 }
 
