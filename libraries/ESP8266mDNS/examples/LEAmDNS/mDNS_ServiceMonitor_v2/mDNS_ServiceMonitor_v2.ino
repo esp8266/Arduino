@@ -204,7 +204,9 @@ void handleHTTPRequest() {
 
   IPAddress ip = server.client().localIP();
   String ipStr = ip.toString();
-  String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
+  String s;
+  s.reserve(200 /* + service listed */);
+  s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
   s += WiFi.hostname() + ".local at " + server.client().localIP().toString() + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4>";
   s += "<ol>";
