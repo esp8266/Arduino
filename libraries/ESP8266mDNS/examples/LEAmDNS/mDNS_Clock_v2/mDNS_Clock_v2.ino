@@ -81,7 +81,7 @@
 const char*                   ssid                    = STASSID;
 const char*                   password                = STAPSK;
 
-clsLEAMDNSHost                MDNS;                               // MDNS responder
+clsLEAMDNSHost                MDNSRESP;                           // MDNS responder
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 clsLEAMDNSHost::clsService*   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
@@ -144,7 +144,7 @@ bool setStationHostname(const char* p_pcHostname) {
    Add a dynamic MDNS TXT item 'ct' to the clock service.
    The callback function is called every time, the TXT items for the clock service
    are needed.
-   This can be triggered by calling MDNS.announce().
+   This can be triggered by calling MDNSRESP.announce().
 
 */
 void MDNSDynamicServiceTxtCallback(const clsLEAMDNSHost::hMDNSService& p_hService) {
@@ -223,7 +223,7 @@ void setup(void) {
 
   // Setup MDNS responder
   // Init the (currently empty) host domain string with 'leamdnsv2'
-  if (MDNS.begin("leamdnsv2",
+  if (MDNSRESP.begin("leamdnsv2",
   [](clsLEAMDNSHost & p_rMDNSHost, const char* p_pcDomainName, bool p_bProbeResult)->void {
   if (p_bProbeResult) {
       Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
@@ -233,7 +233,7 @@ void setup(void) {
       hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
     } else {
       // Change hostname, use '-' as divider between base name and index
-      MDNS.setHostName(clsLEAMDNSHost::indexDomainName(p_pcDomainName, "-", 0));
+      MDNSRESP.setHostName(clsLEAMDNSHost::indexDomainName(p_pcDomainName, "-", 0));
     }
   })) {
     Serial.println("mDNS-AP started");
@@ -255,7 +255,7 @@ void loop(void) {
   // Check if a request has come in
   server.handleClient();
   // Allow MDNS processing
-  MDNS.update();
+  MDNSRESP.update();
 
   static esp8266::polledTimeout::periodicMs timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
@@ -264,7 +264,7 @@ void loop(void) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       Serial.printf("Announce trigger from user\n");
-      MDNS.announce();
+      MDNSRESP.announce();
     }
   }
 
