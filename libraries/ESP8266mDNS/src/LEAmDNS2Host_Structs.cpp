@@ -139,7 +139,7 @@ bool clsLEAMDNSHost::clsServiceTxt::setKey(const char* p_pcKey,
     {
         if (allocKey(p_stLength))
         {
-            strncpy(m_pcKey, p_pcKey, p_stLength);
+            strncpy(m_pcKey, p_pcKey, p_stLength + 1);
             m_pcKey[p_stLength] = 0;
             bResult = true;
         }
@@ -198,7 +198,7 @@ bool clsLEAMDNSHost::clsServiceTxt::setValue(const char* p_pcValue,
     {
         if (allocValue(p_stLength))
         {
-            strncpy(m_pcValue, p_pcValue, p_stLength);
+            strncpy(m_pcValue, p_pcValue, p_stLength + 1);
             m_pcValue[p_stLength] = 0;
             bResult = true;
         }

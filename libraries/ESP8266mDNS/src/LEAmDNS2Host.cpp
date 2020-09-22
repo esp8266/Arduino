@@ -162,7 +162,7 @@ const char* clsLEAMDNSHost::indexDomainName(const char* p_pcDomainName,
     {
         // No given domain, use base or default
         const char* cpcDefaultName = (p_pcDefaultDomainName ? : "esp8266");
-        strncpy(acResultDomainName, cpcDefaultName, sizeof(acResultDomainName) - 1);
+        strncpy(acResultDomainName, cpcDefaultName, sizeof(acResultDomainName));
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[mDNS] indexDomainName: From '%s' to '%s'\n"), (p_pcDomainName ? : ""), acResultDomainName););
     return acResultDomainName;

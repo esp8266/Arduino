@@ -898,9 +898,11 @@ bool clsLEAMDNSHost::_readRRAnswerTXT(clsLEAMDNSHost::clsRRAnswerTXT& p_rRRAnswe
                     if (ucLength)
                     {
                         DEBUG_EX_INFO(
-                            static char sacBuffer[64]; *sacBuffer = 0;
+                            char sacBuffer[64];
+                            *sacBuffer = 0;
                             uint8_t u8MaxLength = ((ucLength > (sizeof(sacBuffer) - 1)) ? (sizeof(sacBuffer) - 1) : ucLength);
-                            os_strncpy(sacBuffer, (const char*)pucCursor, u8MaxLength); sacBuffer[u8MaxLength] = 0;
+                            os_strncpy(sacBuffer, (const char*)pucCursor, u8MaxLength + 1);
+                            sacBuffer[u8MaxLength] = 0;
                             DEBUG_OUTPUT.printf_P(PSTR("%s _readRRAnswerTXT: Item(%u): %s\n"), _DH(), ucLength, sacBuffer);
                         );
 
