@@ -710,7 +710,7 @@ protected:
         TXT,
         AAAA,
         SRV,
-        //NSEC,
+        //NSEC, not used - https://tools.ietf.org/html/rfc6762#section-6.1
         Generic
     };
 
