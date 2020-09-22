@@ -10,7 +10,7 @@ class LwipIntf
 {
 private:
 
-    LwipIntf () { }
+    LwipIntf () { } // private, cannot be directly allocated
 
 protected:
 

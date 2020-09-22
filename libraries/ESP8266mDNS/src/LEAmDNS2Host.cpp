@@ -275,7 +275,7 @@ bool clsLEAMDNSHost::begin(const char* p_pcHostName,
     bResult = LwipIntf::stateUpCB([this](netif * nif)
     {
         (void)nif;
-        // This called after a new interface appears:
+        // This is called when a new interface appears:
         // resend announces on all available interfaces.
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s a new interface %c%c/%d is up, restarting mDNS\n"),
                                             _DH(), nif->name[0], nif->name[1], netif_get_index(nif)););
