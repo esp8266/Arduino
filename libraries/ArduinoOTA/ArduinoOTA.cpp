@@ -32,19 +32,6 @@ extern "C" {
 #endif
 
 ArduinoOTAClass::ArduinoOTAClass()
-: _port(0)
-, _udp_ota(0)
-, _initialized(false)
-, _rebootOnSuccess(true)
-, _useMDNS(true)
-, _state(OTA_IDLE)
-, _size(0)
-, _cmd(0)
-, _ota_port(0)
-, _start_callback(NULL)
-, _end_callback(NULL)
-, _error_callback(NULL)
-, _progress_callback(NULL)
 {
 }
 

@@ -18,6 +18,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <new> // std::nothrow
 #include "cbuf.h"
 #include "c_types.h"
 
@@ -43,7 +44,7 @@ size_t cbuf::resize(size_t newSize) {
         return _size;
     }
 
-    char *newbuf = new char[newSize];
+    char *newbuf = new (std::nothrow) char[newSize];
     char *oldbuf = _buf;
 
     if(!newbuf) {

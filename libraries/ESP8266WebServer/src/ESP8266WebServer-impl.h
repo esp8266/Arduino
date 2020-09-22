@@ -34,6 +34,8 @@ static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
+namespace esp8266webserver {
+
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
@@ -126,12 +128,12 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen + 1];
+      char *toencode = new (std::nothrow) char[toencodeLen + 1];
       if(toencode == NULL){
         authReq = "";
         return false;
       }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
+      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
       if(encoded == NULL){
         authReq = "";
         delete[] toencode;
@@ -864,3 +866,5 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
     }
     return String(r);
 }
+
+} // namespace
