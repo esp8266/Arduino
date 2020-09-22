@@ -8,18 +8,19 @@
 
 class LwipIntf
 {
+public:
+
+    using CBType = std::function <void(netif*)>;
+
+    static bool stateUpCB (LwipIntf::CBType&& cb);
+
 private:
 
     LwipIntf () { } // private, cannot be directly allocated
 
 protected:
 
-    static bool stateChangeSysCB (std::function<void(netif*)>&& cb);
-
-public:
-
-    static bool stateUpCB (std::function<void(netif*)>&& cb);
-
+    static bool stateChangeSysCB (LwipIntf::CBType&& cb);
 };
 
 #endif // _LWIPINTF_H
