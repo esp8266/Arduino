@@ -212,7 +212,7 @@ bool clsLEAMDNSHost::_sendMessage_Multicast(netif* pNetIf, clsLEAMDNSHost::clsSe
 
     The MDNS message is composed in a two-step process.
     In the first loop 'only' the header informations (mainly number of answers) are collected,
-    while in the seconds loop, the header and all queries and answers are written to the UDP
+    while in the second loop, the header and all queries and answers are written to the UDP
     output buffer.
 
 */
