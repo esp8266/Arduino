@@ -920,6 +920,7 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
     bool    bResult = false;
 
     for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+    {
         if (netif_is_up(pNetIf))
         {
             bResult = true;
@@ -940,6 +941,7 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
             }
 #endif
         }
+    }
     return bResult;
 }
 
