@@ -134,37 +134,36 @@ protected:
     {
     public:
 #ifdef MDNS_IPV4_SUPPORT
-        static const uint16_t   u16IPv4Size                     = 4;        // IPv4 address size in bytes
+        static constexpr uint16_t   u16IPv4Size                 = 4;        // IPv4 address size in bytes
 #endif
 #ifdef MDNS_IPV6_SUPPORT
-        static const uint16_t   u16IPv6Size                     = 16;       // IPv6 address size in bytes
+        static constexpr uint16_t   u16IPv6Size                 = 16;       // IPv6 address size in bytes
 #endif
-        static const size_t     stServiceTxtMaxLength           = 1300;     // Maximum length for all service txts for one service
-        static const size_t     stDomainMaxLength               = 256;      // Maximum length for a full domain name eg. MyESP._http._tcp.local
-        static const size_t     stDomainLabelMaxLength          = 63;       // Maximum length of on label in a domain name (length info fits into 6 bits)
-        static const size_t     stServiceTypeMaxLength          = 15;       // Maximum length of a service name eg. http
-        static const size_t     stServiceProtocolMaxLength      = 3;        // Maximum length of a service protocol name eg. tcp
+        static constexpr size_t     stServiceTxtMaxLength       = 1300;     // Maximum length for all service txts for one service
+        static constexpr size_t     stDomainMaxLength           = 256;      // Maximum length for a full domain name eg. MyESP._http._tcp.local
+        static constexpr size_t     stDomainLabelMaxLength      = 63;       // Maximum length of on label in a domain name (length info fits into 6 bits)
+        static constexpr size_t     stServiceTypeMaxLength      = 15;       // Maximum length of a service name eg. http
+        static constexpr size_t     stServiceProtocolMaxLength  = 3;        // Maximum length of a service protocol name eg. tcp
 
-        static const uint32_t   u32LegacyTTL                    = 10;       // Legacy DNS record TTL
-        static const uint32_t   u32HostTTL                      = 120;      // Host level records are set to 2min (120s)
-        static const uint32_t   u32ServiceTTL                   = 4500;     // Service level records are set to 75min (4500s)
+        static constexpr uint32_t   u32LegacyTTL                = 10;       // Legacy DNS record TTL
+        static constexpr uint32_t   u32HostTTL                  = 120;      // Host level records are set to 2min (120s)
+        static constexpr uint32_t   u32ServiceTTL               = 4500;     // Service level records are set to 75min (4500s)
 
-        static const uint16_t   u16SRVPriority                  = 0;        // Default service priority and weight in SRV answers
-        static const uint16_t   u16SRVWeight                    = 0;        //
-        static const uint8_t    u8DomainCompressMark            = 0xC0;     // Compressed labels are flaged by the two topmost bits of the length byte being set
-        static const uint8_t    u8DomainMaxRedirections         = 6;        // Avoid endless recursion because of malformed compressed labels
+        static constexpr uint16_t   u16SRVPriority              = 0;        // Default service priority and weight in SRV answers
+        static constexpr uint16_t   u16SRVWeight                = 0;        //
+        static constexpr uint8_t    u8DomainCompressMark        = 0xC0;     // Compressed labels are flaged by the two topmost bits of the length byte being set
+        static constexpr uint8_t    u8DomainMaxRedirections     = 6;        // Avoid endless recursion because of malformed compressed labels
 
-        static const uint32_t   u32ProbeDelay                   = 1000;     // Default 250, but ESP is slow...; delay between and number of probes for host and service domains
-        static const uint32_t   u32ProbeCount                   = 3;
-        static const uint32_t   u32AnnounceDelay                = 1000;     // Delay between and number of announces for host and service domains
-        static const uint32_t   u32AnnounceCount                = 3;
-        static const uint32_t   u32DynamicQueryResendDelay      = 1000;     // Delay between and number of queries; the delay is multiplied by the resent number in '_checkQueryCache'
+        static constexpr uint32_t   u32ProbeDelay               = 1000;     // Default 250, but ESP is slow...; delay between and number of probes for host and service domains
+        static constexpr uint32_t   u32ProbeCount               = 3;
+        static constexpr uint32_t   u32AnnounceDelay            = 1000;     // Delay between and number of announces for host and service domains
+        static constexpr uint32_t   u32AnnounceCount            = 3;
+        static constexpr uint32_t   u32DynamicQueryResendDelay  = 1000;     // Delay between and number of queries; the delay is multiplied by the resent number in '_checkQueryCache'
 
         static const char*      pcLocal;                                    // "local";
         static const char*      pcServices;                                 // "services";
         static const char*      pcDNSSD;                                    // "dns-sd";
         static const char*      pcUDP;                                      // "udp";
-        //static const char*      pcTCP;                                      // "tcp";
 
 #ifdef MDNS_IPV4_SUPPORT
         static const char*      pcReverseIPv4Domain;                        // "in-addr";
@@ -175,11 +174,10 @@ protected:
         static const char*      pcReverseTopDomain;                         // "arpa";
 
 #ifdef DNS_RRTYPE_NSEC
-        static const uint8_t    u8DNS_RRTYPE_NSEC               = DNS_RRTYPE_NSEC;
+        static constexpr uint8_t    u8DNS_RRTYPE_NSEC           = DNS_RRTYPE_NSEC;
 #else
-        static const uint8_t    u8DNS_RRTYPE_NSEC               = 0x2F;
+        static constexpr uint8_t    u8DNS_RRTYPE_NSEC           = 0x2F;
 #endif
-        //static const uint32_t   u32SendCooldown                 = 50;       // Delay (ms) between to 'UDPContext->send()' calls
         static constexpr uint32_t u32SendTimeoutMs              = 50;       // timeout (ms) for a call to `UDPContext->send()` (12ms=1460B@1Mb/s)
 
     };
