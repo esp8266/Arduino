@@ -167,7 +167,7 @@ public:
     /**
         hMDNSService (opaque handle to access the service)
     */
-    typedef const void*     hMDNSService;
+    using hMDNSService = const void*;
 
     // Add a new service to the MDNS responder. If no name (instance name) is given (p_pcName = 0)
     // the current hostname is used. If the hostname is changed later, the instance names for
@@ -206,7 +206,7 @@ public:
     /**
         hMDNSTxt (opaque handle to access the TXT items)
     */
-    typedef void*   hMDNSTxt;
+    using hMDNSTxt = void*;
 
     // Add a (static) MDNS TXT item ('key' = 'value') to the service
     hMDNSTxt addServiceTxt(const hMDNSService p_hService,
@@ -254,7 +254,7 @@ public:
         MDNSDynamicServiceTxtCallbackFn
         Callback function for dynamic MDNS TXT items
     */
-    typedef std::function<void(const hMDNSService p_hService)>  MDNSDynamicServiceTxtCallbackFn;
+    using MDNSDynamicServiceTxtCallbackFn = std::function<void(const hMDNSService p_hService)>;
 
     // Set a global callback for dynamic MDNS TXT items. The callback function is called
     // every time, a TXT item is needed for one of the installed services.
@@ -314,12 +314,12 @@ public:
     /**
         hMDNSServiceQuery (opaque handle to access dynamic service queries)
     */
-    typedef const void*     hMDNSServiceQuery;
+    using hMDNSServiceQuery = const void*;
 
     /**
         enuServiceQueryAnswerType
     */
-    typedef enum _enuServiceQueryAnswerType
+    using enuServiceQueryAnswerType = enum _enuServiceQueryAnswerType
     {
         ServiceQueryAnswerType_Unknown              = 0,
         ServiceQueryAnswerType_ServiceDomain        = (1 << 0), // Service instance name
@@ -331,7 +331,7 @@ public:
 #ifdef MDNS_IP6_SUPPORT
         ServiceQueryAnswerType_IP6Address           = (1 << 4), // IP6 address
 #endif
-    } enuServiceQueryAnswerType;
+    };
 
     /**
         AnswerType (std::map compatible version)
@@ -504,10 +504,11 @@ public:
 
         Callback function for received answers for dynamic service queries
     */
-    typedef std::function<void(const stcMDNSServiceInfo& p_MDNSServiceInfo,
+    using MDNSServiceQueryCallbackFn =
+            std::function<void(const stcMDNSServiceInfo& p_MDNSServiceInfo,
                                AnswerType p_AnswerType,						// flags for the updated answer item
                                bool p_bSetContent                     		// true: Answer component set, false: component deleted
-                              )>    MDNSServiceQueryCallbackFn;
+                              )>;
 
     // Install a dynamic service query. For every received answer (part) the given callback
     // function is called. The query will be updated every time, the TTL for an answer
@@ -566,12 +567,14 @@ public:
         MDNSHostProbeResultCallbackFn/2
         Callback function for host domain probe results
     */
-    typedef std::function<void(const char* p_pcDomainName,
-                               bool p_bProbeResult)> MDNSHostProbeResultCallbackFn;
+    using MDNSHostProbeResultCallbackFn =
+            std::function<void(const char* p_pcDomainName,
+                               bool p_bProbeResult)>;
 
-    typedef std::function<void(clsLEAMDNSHost_Legacy* p_pMDNSResponder,
+    using MDNSHostProbeResultCallbackFn2 =
+            std::function<void(clsLEAMDNSHost_Legacy* p_pMDNSResponder,
                                const char* p_pcDomainName,
-                               bool p_bProbeResult)> MDNSHostProbeResultCallbackFn2;
+                               bool p_bProbeResult)>;
 
     // Set a callback function for host probe results
     // The callback function is called, when the probeing for the host domain
@@ -584,14 +587,16 @@ public:
         MDNSServiceProbeResultCallbackFn/2
         Callback function for service domain probe results
     */
-    typedef std::function<void(const char* p_pcServiceName,
+    using MDNSServiceProbeResultCallbackFn =
+            std::function<void(const char* p_pcServiceName,
                                const hMDNSService p_hMDNSService,
-                               bool p_bProbeResult)> MDNSServiceProbeResultCallbackFn;
+                               bool p_bProbeResult)>;
 
-    typedef std::function<void(clsLEAMDNSHost_Legacy* p_pMDNSResponder,
+    using MDNSServiceProbeResultCallbackFn2 =
+            std::function<void(clsLEAMDNSHost_Legacy* p_pMDNSResponder,
                                const char* p_pcServiceName,
                                const hMDNSService p_hMDNSService,
-                               bool p_bProbeResult)> MDNSServiceProbeResultCallbackFn2;
+                               bool p_bProbeResult)>;
 
     // Set a service specific probe result callcack
     bool setServiceProbeResultCallback(const hMDNSService p_hService,
