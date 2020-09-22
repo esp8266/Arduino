@@ -8,7 +8,7 @@
 
     Supported mDNS features (in some cases somewhat limited):
     - Announcing a DNS-SD service to interested observers, eg. a http server by announcing a esp8266._http._tcp.local. service
-    - Support for multi-level compressed names in input; in output only a very simple one-leven full-name compression is implemented
+    - Support for multi-level compressed names in input; in output only a very simple one-level full-name compression is implemented
     - Probing host and service domains for uniqueness in the local network
     - Tiebreaking while probing is supported in a very minimalistic way (the 'higher' IP address wins the tiebreak)
     - Announcing available services after successful probing
@@ -27,7 +27,7 @@
     In 'setup()':
       Create an clsLEAMDNSHost instance for every netif you plan to use.
       Call 'begin' on every instance with the intended hostname and the associated netif (or WiFi mode, WIFI_STA).
-      The given hostname is the 'probed' for uniqueness in the netifs local link. If domain name conflicts occure, the host name
+      The given hostname is the 'probed' for uniqueness in the netifs local link. If domain name conflicts occur, the host name
       will be automatically changed until it is unique in the local link.
       Optionally a callback can be registered in 'begin', to control the probing process manually.
       Next you can register DNS-SD services with 'addService("MyESP", "http", "tcp", 5000)'
