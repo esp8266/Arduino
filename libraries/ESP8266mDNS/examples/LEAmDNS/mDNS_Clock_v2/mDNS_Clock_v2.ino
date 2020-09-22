@@ -171,6 +171,7 @@ void handleHTTPRequest() {
   gmtime_r(&now, &timeinfo);
 
   String s;
+  s.reserve(300);
 
   s = "<!DOCTYPE HTML>\r\n<html>Hello from ";
   s += WiFi.hostname() + " at " + WiFi.localIP().toString();
