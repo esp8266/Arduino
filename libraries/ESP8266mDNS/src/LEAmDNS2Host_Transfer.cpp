@@ -1530,7 +1530,7 @@ bool clsLEAMDNSHost::_readMDNSMsgHeader(clsLEAMDNSHost::clsMsgHeader& p_rMsgHead
             (_udpRead16(p_rMsgHeader.m_u16ARCount)))
     {
 
-        p_rMsgHeader.m_1bQR     = (u8B1 & 0x80);    // Query/Responde flag
+        p_rMsgHeader.m_1bQR     = (u8B1 & 0x80);    // Query/Response flag
         p_rMsgHeader.m_4bOpcode = (u8B1 & 0x78);    // Operation code (0: Standard query, others ignored)
         p_rMsgHeader.m_1bAA     = (u8B1 & 0x04);    // Authorative answer
         p_rMsgHeader.m_1bTC     = (u8B1 & 0x02);    // Truncation flag
