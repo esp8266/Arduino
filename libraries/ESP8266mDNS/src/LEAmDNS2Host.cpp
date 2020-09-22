@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <LwipIntf.h> // LwipIntf::stateUpCB()
+#include <stdlib_noniso.h> // strrstr()
 
 #include "ESP8266mDNS.h"
 #include "LEAmDNS2Host.h"
@@ -45,45 +46,6 @@
 #ifndef STRINGIZE_VALUE_OF
 #define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
 #endif
-
-namespace   // anonymous
-{
-
-/*
-    strrstr (static)
-
-    Backwards search for p_pcPattern in p_pcString
-    Based on: https://stackoverflow.com/a/1634398/2778898
-
-*/
-const char* strrstr(const char*__restrict p_pcString,
-                    const char*__restrict p_pcPattern)
-{
-    const char* pcResult = 0;
-
-    size_t      stStringLength = (p_pcString ? strlen(p_pcString) : 0);
-    size_t      stPatternLength = (p_pcPattern ? strlen(p_pcPattern) : 0);
-
-    if ((stStringLength) &&
-            (stPatternLength) &&
-            (stPatternLength <= stStringLength))
-    {
-        // Pattern is shorter or has the same length than the string
-        for (const char* s = (p_pcString + stStringLength - stPatternLength); s >= p_pcString; --s)
-        {
-            if (0 == strncmp(s, p_pcPattern, stPatternLength))
-            {
-                pcResult = s;
-                break;
-            }
-        }
-    }
-    return pcResult;
-}
-
-
-} // anonymous
-
 
 namespace esp8266
 {
