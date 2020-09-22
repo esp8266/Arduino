@@ -419,8 +419,8 @@ clsLEAMDNSHost::clsService* clsLEAMDNSHost::addService(const char* p_pcInstanceN
             }
         }
     }
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s addService: %s to add service '%s.%s.%s.local'!\n"), _DH(pService), (pService ? "Succeeded" : "FAILED"), _instanceName(p_pcInstanceName)? : "-", (p_pcType ? : ""), (p_pcProtocol ? : "")););
-    DEBUG_EX_ERR(if (!pService) DEBUG_OUTPUT.printf_P(PSTR("%s addService: FAILED to add service '%s.%s.%s.local'!\n"), _DH(pService), _instanceName(p_pcInstanceName)? : "-", (p_pcType ? : ""), (p_pcProtocol ? : "")););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s addService: %s to add service '%s.%s.%s.local'!\n"), _DH(pService), (pService ? "Succeeded" : "FAILED"), _instanceName(p_pcInstanceName) ? : "-", (p_pcType ? : ""), (p_pcProtocol ? : "")););
+    DEBUG_EX_ERR(if (!pService) DEBUG_OUTPUT.printf_P(PSTR("%s addService: FAILED to add service '%s.%s.%s.local'!\n"), _DH(pService), _instanceName(p_pcInstanceName) ? : "-", (p_pcType ? : ""), (p_pcProtocol ? : "")););
     return pService;
 }
 
