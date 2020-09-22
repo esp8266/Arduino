@@ -81,7 +81,7 @@ public:
             _isFile = false;
         }
 
-        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
+        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header == __null ? "" : cache_header);
         _baseUriLength = _uri.length();
     }
 
