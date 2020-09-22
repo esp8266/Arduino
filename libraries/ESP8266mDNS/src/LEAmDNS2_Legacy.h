@@ -484,9 +484,6 @@ public:
                 {
                     m_KeyValueMap.emplace(std::pair<const char*, const char*>(kv.first, kv.second));
                 }
-                //for (auto kv=m_rMDNSResponder._answerKeyValue(m_hServiceQuery, m_u32AnswerIndex); kv!=nullptr; kv=kv->m_pNext) {
-                //    m_KeyValueMap.emplace(std::pair<const char*,const char*>(kv->m_pcKey, kv->m_pcValue));
-                //}
             }
             return m_KeyValueMap;
         }
