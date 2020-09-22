@@ -46,12 +46,12 @@ String::String(const __FlashStringHelper *pstr) {
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-String::String(String &&rval) {
+String::String(String &&rval) noexcept {
     init();
     move(rval);
 }
 
-String::String(StringSumHelper &&rval) {
+String::String(StringSumHelper &&rval) noexcept {
     init();
     move(rval);
 }
@@ -224,7 +224,7 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-void String::move(String &rhs) {
+void String::move(String &rhs) noexcept {
     if (buffer()) {
         if (capacity() >= rhs.len()) {
             memmove_P(wbuffer(), rhs.buffer(), rhs.length() + 1);
@@ -267,13 +267,13 @@ String & String::operator =(const String &rhs) {
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-String & String::operator =(String &&rval) {
+String & String::operator =(String &&rval) noexcept {
     if (this != &rval)
         move(rval);
     return *this;
 }
 
-String & String::operator =(StringSumHelper &&rval) {
+String & String::operator =(StringSumHelper &&rval) noexcept {
     if (this != &rval)
         move(rval);
     return *this;
