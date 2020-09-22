@@ -634,7 +634,7 @@ bool clsLEAMDNSHost::hasQuery(void)
     clsLEAmDNS2_Host::getQuery
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void)
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::getQuery(void) const
 {
     return _findLegacyQuery();
 }
@@ -1149,7 +1149,7 @@ bool clsLEAMDNSHost::_removeLegacyQuery(void)
     clsLEAmDNS2_Host::_findLegacyQuery
 
 */
-clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findLegacyQuery(void)
+clsLEAMDNSHost::clsQuery* clsLEAMDNSHost::_findLegacyQuery(void) const
 {
     clsQuery*   pLegacyQuery = nullptr;
 

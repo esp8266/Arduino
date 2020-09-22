@@ -206,7 +206,7 @@ protected:
         size_t hostCount(void) const;
         bool setDelayUDPProcessing(bool p_bDelayProcessing);
 
-        clsLEAMDNSHost* getUniqueHost()
+        clsLEAMDNSHost* getUniqueHost() const
         {
             return m_uniqueHost;
         }
@@ -1226,7 +1226,7 @@ public:
             const uint16_t p_u16Timeout);
     bool removeQuery(void);
     bool hasQuery(void);
-    clsQuery* getQuery(void);
+    clsQuery* getQuery(void) const;
 
     // - DYNAMIC
     // Install a dynamic service/host query. For every received answer (part) the given callback
@@ -1330,7 +1330,7 @@ protected:
     clsQuery* _allocQuery(clsQuery::enuQueryType p_QueryType);
     bool _removeQuery(clsQuery* p_pQuery);
     bool _removeLegacyQuery(void);
-    clsQuery* _findLegacyQuery(void);
+    clsQuery* _findLegacyQuery(void) const;
     bool _releaseQueries(void);
     clsQuery* _findNextQueryByDomain(const clsRRDomain& p_Domain,
                                      const clsQuery::enuQueryType p_QueryType,
