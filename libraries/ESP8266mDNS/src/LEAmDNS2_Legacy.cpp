@@ -120,10 +120,10 @@ bool clsLEAMDNSHost_Legacy::close(void)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        if ((bResult = (*it).m_pHost->close()))
+        if ((bResult = it->m_pHost->close()))
         {
-            delete (*it).m_pHost;
-            (*it).m_pHost = 0;
+            delete it->m_pHost;
+            it->m_pHost = 0;
         }
     }
     return ((bResult)
@@ -177,7 +177,7 @@ bool clsLEAMDNSHost_Legacy::setHostname(const char* p_pcHostname)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->setHostName(p_pcHostname);
+        bResult = it->m_pHost->setHostName(p_pcHostname);
     }
     return bResult;
 }
@@ -275,11 +275,11 @@ bool clsLEAMDNSHost_Legacy::removeService(const hMDNSService p_hService)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        clsLEAMDNSHost::clsService*	pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService];
+        clsLEAMDNSHost::clsService*	pService = (clsLEAMDNSHost::clsService*)it->m_HandleToPtr[p_hService];
         if ((bResult = ((pService)
-                        && ((*it).m_pHost->removeService(pService)))))
+                        && (it->m_pHost->removeService(pService)))))
         {
-            (*it).m_HandleToPtr.erase(p_hService);
+            it->m_HandleToPtr.erase(p_hService);
         }
     }
     return bResult;
@@ -311,7 +311,7 @@ bool clsLEAMDNSHost_Legacy::setServiceName(const hMDNSService p_hService,
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        clsLEAMDNSHost::clsService*	pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService];
+        clsLEAMDNSHost::clsService*	pService = (clsLEAMDNSHost::clsService*)it->m_HandleToPtr[p_hService];
         bResult = ((pService)
                    && (pService->setInstanceName(p_pcInstanceName)));
     }
@@ -518,13 +518,13 @@ bool clsLEAMDNSHost_Legacy::removeServiceTxt(const hMDNSService p_hService,
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        clsLEAMDNSHost::clsService*		pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService];
-        clsLEAMDNSHost::clsServiceTxt*	pTxt = (clsLEAMDNSHost::clsServiceTxt*)(*it).m_HandleToPtr[p_hTxt];
+        clsLEAMDNSHost::clsService*		pService = (clsLEAMDNSHost::clsService*)it->m_HandleToPtr[p_hService];
+        clsLEAMDNSHost::clsServiceTxt*	pTxt = (clsLEAMDNSHost::clsServiceTxt*)it->m_HandleToPtr[p_hTxt];
         if ((bResult = ((pService)
                         && (pTxt)
                         && (pService->removeServiceTxt(pTxt)))))
         {
-            (*it).m_HandleToPtr.erase(p_hTxt);
+            it->m_HandleToPtr.erase(p_hTxt);
         }
     }
     return bResult;
@@ -595,7 +595,7 @@ bool clsLEAMDNSHost_Legacy::setDynamicServiceTxtCallback(const hMDNSService p_hS
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        clsLEAMDNSHost::clsService*		pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService];
+        clsLEAMDNSHost::clsService*		pService = (clsLEAMDNSHost::clsService*)it->m_HandleToPtr[p_hService];
         bResult = pService->setDynamicServiceTxtCallback([p_hService, p_fnCallback](clsLEAMDNSHost::clsService& /*p_rMDNSService*/)->void
         {
             if (p_fnCallback)	// void(const hMDNSService p_hService)
@@ -720,7 +720,7 @@ bool clsLEAMDNSHost_Legacy::removeQuery(void)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->removeQuery();
+        bResult = it->m_pHost->removeQuery();
     }
     return bResult;
 }
@@ -850,9 +850,9 @@ bool clsLEAMDNSHost_Legacy::removeServiceQuery(clsLEAMDNSHost_Legacy::hMDNSServi
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        if ((bResult = (*it).m_pHost->removeQuery((clsLEAMDNSHost::clsQuery*)(*it).m_HandleToPtr[p_hServiceQuery])))
+        if ((bResult = it->m_pHost->removeQuery((clsLEAMDNSHost::clsQuery*)it->m_HandleToPtr[p_hServiceQuery])))
         {
-            (*it).m_HandleToPtr.erase(p_hServiceQuery);
+            it->m_HandleToPtr.erase(p_hServiceQuery);
         }
     }
     return bResult;
@@ -1101,7 +1101,7 @@ bool clsLEAMDNSHost_Legacy::setHostProbeResultCallback(clsLEAMDNSHost_Legacy::MD
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->setProbeResultCallback(clsLEAMDNSHost::stProbeResultCallback);
+        bResult = it->m_pHost->setProbeResultCallback(clsLEAMDNSHost::stProbeResultCallback);
     }
     return bResult;
 }
@@ -1127,7 +1127,7 @@ bool clsLEAMDNSHost_Legacy::setHostProbeResultCallback(clsLEAMDNSHost_Legacy::MD
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->setProbeResultCallback(clsLEAMDNSHost::stProbeResultCallback);
+        bResult = it->m_pHost->setProbeResultCallback(clsLEAMDNSHost::stProbeResultCallback);
     }
     return bResult;
 }
@@ -1144,7 +1144,7 @@ bool clsLEAMDNSHost_Legacy::setServiceProbeResultCallback(const clsLEAMDNSHost_L
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
         clsLEAMDNSHost::clsService*	pService = 0;
-        bResult = (((pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService]))
+        bResult = (((pService = (clsLEAMDNSHost::clsService*)it->m_HandleToPtr[p_hService]))
                    && (pService->setProbeResultCallback(
 
                            [this, p_hService, p_fnCallback](clsLEAMDNSHost::clsService& /*p_rMDNSService*/,
@@ -1173,7 +1173,7 @@ bool clsLEAMDNSHost_Legacy::setServiceProbeResultCallback(const clsLEAMDNSHost_L
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
         clsLEAMDNSHost::clsService*	pService = 0;
-        bResult = (((pService = (clsLEAMDNSHost::clsService*)(*it).m_HandleToPtr[p_hService]))
+        bResult = (((pService = (clsLEAMDNSHost::clsService*)it->m_HandleToPtr[p_hService]))
                    && (pService->setProbeResultCallback([this, p_hService, p_fnCallback](clsLEAMDNSHost::clsService& /*p_rMDNSService*/,
                            const char* p_pcInstanceName,
                            bool p_bProbeResult)->void
@@ -1204,7 +1204,7 @@ bool clsLEAMDNSHost_Legacy::notifyAPChange(void)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->restart();
+        bResult = it->m_pHost->restart();
     }
     return bResult;
 }
@@ -1219,7 +1219,7 @@ bool clsLEAMDNSHost_Legacy::update(void)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->update();
+        bResult = it->m_pHost->update();
     }
     return bResult;
 }
@@ -1234,7 +1234,7 @@ bool clsLEAMDNSHost_Legacy::announce(void)
 
     for (stcHostInformation::list::iterator it = m_HostInformations.begin(); ((bResult) && (it != m_HostInformations.end())); ++it)
     {
-        bResult = (*it).m_pHost->announce(true, true);
+        bResult = it->m_pHost->announce(true, true);
     }
     return bResult;
 }
