@@ -1296,8 +1296,7 @@ protected:
 
     bool _allocDefaultInstanceName(const char* p_pcInstanceName);
     bool _releaseDefaultInstanceName(void);
-    const char* _instanceName(const char* p_pcInstanceName,
-                              bool p_bReturnZero = true) const;
+    const char* _instanceName(const char* p_pcInstanceName) const;
 
     // SERVICE
     clsService* _allocService(const char* p_pcName,

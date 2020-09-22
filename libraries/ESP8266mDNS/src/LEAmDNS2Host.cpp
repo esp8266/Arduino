@@ -419,8 +419,8 @@ clsLEAMDNSHost::clsService* clsLEAMDNSHost::addService(const char* p_pcInstanceN
             }
         }
     }
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s addService: %s to add service '%s.%s.%s.local'!\n"), _DH(pService), (pService ? "Succeeded" : "FAILED"), _instanceName(p_pcInstanceName, false), (p_pcType ? : ""), (p_pcProtocol ? : "")););
-    DEBUG_EX_ERR(if (!pService) DEBUG_OUTPUT.printf_P(PSTR("%s addService: FAILED to add service '%s.%s.%s.local'!\n"), _DH(pService), _instanceName(p_pcInstanceName, false), (p_pcType ? : ""), (p_pcProtocol ? : "")););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("%s addService: %s to add service '%s.%s.%s.local'!\n"), _DH(pService), (pService ? "Succeeded" : "FAILED"), _instanceName(p_pcInstanceName)? : "-", (p_pcType ? : ""), (p_pcProtocol ? : "")););
+    DEBUG_EX_ERR(if (!pService) DEBUG_OUTPUT.printf_P(PSTR("%s addService: FAILED to add service '%s.%s.%s.local'!\n"), _DH(pService), _instanceName(p_pcInstanceName)? : "-", (p_pcType ? : ""), (p_pcProtocol ? : "")););
     return pService;
 }
 
@@ -1056,10 +1056,9 @@ bool clsLEAMDNSHost::_releaseDefaultInstanceName(void)
 /*
     clsLEAmDNS2_Host::_instanceName
 */
-const char* clsLEAMDNSHost::_instanceName(const char* p_pcInstanceName,
-        bool p_bReturnZero /*= true*/) const
+const char* clsLEAMDNSHost::_instanceName(const char* p_pcInstanceName) const
 {
-    return (p_pcInstanceName ? : (m_pcDefaultInstanceName ? : (m_pcHostName ? : (p_bReturnZero ? 0 : "-"))));
+    return (p_pcInstanceName ? : (m_pcDefaultInstanceName ? : (m_pcHostName ? : nullptr)));
 }
 
 
