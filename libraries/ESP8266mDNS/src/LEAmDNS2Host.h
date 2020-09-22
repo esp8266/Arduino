@@ -1243,7 +1243,7 @@ public:
 
     /*
         install*Query() creates several queries on the interfaces.
-        it no more returns a single query but a boolean until the API is adapted
+        it does not return a single query but a boolean until the API is adapted
     */
     clsQuery* installServiceQuery(const char* p_pcServiceType,
                                   const char* p_pcProtocol,

@@ -8,11 +8,11 @@
     Essentially, this is an rewrite of the original EPS8266 Multicast DNS code (ESP8266mDNS).
     The target of this rewrite was to keep the existing interface as stable as possible while
     adding and extending the supported set of mDNS features.
-    A lot of the additions were basicly taken from Erik Ekman's lwIP mdns app code.
+    A lot of the additions were basically taken from Erik Ekman's lwIP mdns app code.
 
     Supported mDNS features (in some cases somewhat limited):
     - Presenting a DNS-SD service to interested observers, eg. a http server by presenting _http._tcp service
-    - Support for multi-level compressed names in input; in output only a very simple one-leven full-name compression is implemented
+    - Support for multi-level compressed names in input; in output only a very simple one-level full-name compression is implemented
     - Probing host and service domains for uniqueness in the local network
     - Tiebreaking while probing is supported in a very minimalistic way (the 'higher' IP address wins the tiebreak)
     - Announcing available services after successful probing
