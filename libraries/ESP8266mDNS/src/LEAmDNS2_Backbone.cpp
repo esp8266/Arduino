@@ -70,7 +70,7 @@ bool clsLEAMDNSHost::clsBackbone::init(void)
 */
 UdpContext* clsLEAMDNSHost::clsBackbone::addHost(clsLEAMDNSHost* p_pHost)
 {
-    UdpContext* pUDPContext = 0;
+    UdpContext* pUDPContext = nullptr;
 
     if ((m_pUDPContext) && (p_pHost) && (m_uniqueHost == nullptr))
     {
@@ -193,7 +193,7 @@ bool clsLEAMDNSHost::clsBackbone::_releaseUDPContext(void)
     if (m_pUDPContext)
     {
         m_pUDPContext->unref();
-        m_pUDPContext = 0;
+        m_pUDPContext = nullptr;
     }
     return true;
 }
