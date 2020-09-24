@@ -37,29 +37,15 @@
 #include <ESP8266WebServer.h>
 #include <LwipIntf.h>
 #include <time.h>
+#include <PolledTimeout.h>
 
 // uses API MDNSApiVersion::LEAv2
-
-/*
-   Include the clsLEAMDNSHost (the library needs also to be included)
-   As LEA clsLEAMDNSHost is experimantal in the ESP8266 environment currently, the
-   legacy clsLEAMDNSHost is defaulted in the include file.
-   There are two ways to access LEA clsLEAMDNSHost:
-   1. Prepend every declaration and call to global declarations or functions with the namespace, like:
-      'LEAmDNS::clsLEAMDNSHost::hMDNSService  hMDNSService;'
-      This way is used in the example. But be careful, if the namespace declaration is missing
-      somewhere, the call might go to the legacy implementation...
-   2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
-
-*/
 #define NO_GLOBAL_MDNS // our MDNS is defined below
 #include <ESP8266mDNS.h>
 
-#include <PolledTimeout.h>
 /*
    Global defines and vars
 */
-
 
 #define TIMEZONE_OFFSET     1                                   // CET
 #define DST_OFFSET          1                                   // CEST

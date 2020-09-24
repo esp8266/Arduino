@@ -45,18 +45,6 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-/*
-   Include the clsLEAMDNSHost (the library needs to be included also)
-   As LEA clsLEAMDNSHost is experimental in the ESP8266 environment currently, the
-   legacy clsLEAMDNSHost is defaulted in th include file.
-   There are two ways to access LEA clsLEAMDNSHost:
-   1. Prepend every declaration and call to global declarations or functions with the namespace, like:
-      'LEAmDNS:clsLEAMDNSHost::hMDNSService  hMDNSService;'
-      This way is used in the example. But be careful, if the namespace declaration is missing
-      somewhere, the call might go to the legacy implementation...
-   2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
-
-*/
 #define NO_GLOBAL_MDNS // our MDNS is defined below
 #include <ESP8266mDNS.h>
 
