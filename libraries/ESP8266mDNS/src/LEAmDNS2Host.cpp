@@ -784,7 +784,7 @@ bool clsLEAMDNSHost::restart(void)
 clsLEAMDNSHost::clsService* clsLEAMDNSHost::enableArduino(uint16_t p_u16Port,
         bool p_bAuthUpload /*= false*/)
 {
-    clsLEAMDNSHost::clsService* svc = addService("arduino", "arduino", "tcp", p_u16Port);
+    clsLEAMDNSHost::clsService* svc = addService(nullptr, "arduino", "tcp", p_u16Port);
     if (svc)
     {
         if ((!svc->addServiceTxt("tcp_check", "no"))
