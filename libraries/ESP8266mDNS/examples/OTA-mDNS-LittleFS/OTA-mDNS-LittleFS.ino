@@ -12,33 +12,38 @@
 
 */
 
+#ifndef APSSID
+#define APSSID "your-apssid"
+#define APPSK  "your-password"
+#endif
+
 #ifndef STASSID
-#define STASSID "your-ssid"
+#define STASSID "your-sta"
 #define STAPSK  "your-password"
 #endif
 
 // includes
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <FS.h>
 #include <LittleFS.h>
 #include <ArduinoOTA.h>
+#include <ESP8266mDNS.h>
 
 
 /**
    @brief mDNS and OTA Constants
    @{
 */
-#define HOSTNAME "ESP8266-OTA-" ///< Hostename. The setup function adds the Chip ID at the end.
+#define HOSTNAME "ESP8266-OTA-" ///< Hostname. The setup function adds the Chip ID at the end.
 /// @}
 
 /**
    @brief Default WiFi connection information.
    @{
 */
-const char* ap_default_ssid = STASSID; ///< Default SSID.
-const char* ap_default_psk = STAPSK; ///< Default PSK.
+const char* ap_default_ssid = APSSID; ///< Default SSID.
+const char* ap_default_psk = APPSK; ///< Default PSK.
 /// @}
 
 /// Uncomment the next line for verbose output over UART.
@@ -166,8 +171,8 @@ void setup() {
 
   // Load wifi connection information.
   if (! loadConfig(&station_ssid, &station_psk)) {
-    station_ssid = "";
-    station_psk = "";
+    station_ssid = STASSID;
+    station_psk = STAPSK;
 
     Serial.println("No WiFi connection information available.");
   }

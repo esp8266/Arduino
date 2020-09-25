@@ -1,7 +1,7 @@
 /*
   ESP8266 mDNS Responder Service Monitor
 
-  This example demonstrates two features of the LEA MDNSResponder:
+  This example demonstrates two features of the LEA clsLEAMDNSHost:
   1. The host and service domain negotiation process that ensures
      the uniqueness of the finally choosen host and service domain name.
   2. The dynamic MDNS service lookup/query feature.
@@ -29,36 +29,42 @@
 
 */
 
+// THIS IS A WORK IN PROGRESS: some TODOs need completion
+
+#ifndef STASSID
+#define STASSID "ssid"
+#define STAPSK "psk"
+#endif
+
+#ifndef APSSID
+#define APSSID "esp8266"
+//#define APPSK "psk"
+#endif
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+
+#define NO_GLOBAL_MDNS // our MDNS is defined below
 #include <ESP8266mDNS.h>
 
 /*
    Global defines and vars
 */
 
-#define SERVICE_PORT                                    80                                  // HTTP port
-
-#ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK  "your-password"
-#endif
-
-const char*                                    ssid                    = STASSID;
-const char*                                    password                = STAPSK;
+#define SERVICE_PORT                           80                                  // HTTP port
+clsLEAMDNSHost                                 MDNS;                               // MDNS responder
 
 char*                                          pcHostDomain            = 0;        // Negociated host domain
 bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
-MDNSResponder::hMDNSServiceQuery               hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
+clsLEAMDNSHost::clsService*                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
+clsLEAMDNSHost::clsQuery*                      hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
 
 const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
 String                                         strHTTPServices         = cstrNoHTTPServices;
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
-ESP8266WebServer                                     server(SERVICE_PORT);
+ESP8266WebServer                               server(SERVICE_PORT);
 
 
 /*
@@ -73,33 +79,38 @@ bool setStationHostname(const char* p_pcHostname) {
   }
   return false;
 }
-/*
-   MDNSServiceQueryCallback
-*/
 
-void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
+
+void MDNSServiceQueryCallback(const clsLEAMDNSHost::clsQuery& p_Query,
+                              const clsLEAMDNSHost::clsQuery::clsAnswer& p_Answer,
+                              clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType p_QueryAnswerTypeFlags,
+                              bool p_bSetContent) {
+  (void)p_Query;
+
   String answerInfo;
-  switch (answerType) {
-    case MDNSResponder::AnswerType::ServiceDomain :
-      answerInfo = "ServiceDomain " + String(serviceInfo.serviceDomain());
+  switch (p_QueryAnswerTypeFlags) {
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::ServiceDomain):
+      answerInfo = "ServiceDomain " + String(p_Answer.m_ServiceDomain.c_str());
       break;
-    case MDNSResponder::AnswerType::HostDomainAndPort :
-      answerInfo = "HostDomainAndPort " + String(serviceInfo.hostDomain()) + ":" + String(serviceInfo.hostPort());
+
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::HostDomainPort):
+      answerInfo = "HostDomainAndPort " + String(p_Answer.m_HostDomain.c_str()) + ":" + String(p_Answer.m_u16Port);
       break;
-    case MDNSResponder::AnswerType::IP4Address :
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address):
       answerInfo = "IP4Address ";
-      for (IPAddress ip : serviceInfo.IP4Adresses()) {
-        answerInfo += "- " + ip.toString();
+      for (auto ip : p_Answer.m_IPv4Addresses) {
+        answerInfo += "- " + ip->m_IPAddress.toString();
       };
       break;
-    case MDNSResponder::AnswerType::Txt :
-      answerInfo = "TXT " + String(serviceInfo.strKeyValue());
-      for (auto kv : serviceInfo.keyValues()) {
-        answerInfo += "\nkv : " + String(kv.first) + " : " + String(kv.second);
+    case static_cast<clsLEAMDNSHost::clsQuery::clsAnswer::typeQueryAnswerType>(clsLEAMDNSHost::clsQuery::clsAnswer::enuQueryAnswerType::Txts):
+      answerInfo = "TXT ";
+      for (auto kv : p_Answer.m_Txts.m_Txts) {
+        answerInfo += "\nkv : " + String(kv->m_pcKey) + " : " + String(kv->m_pcValue);
       }
       break;
     default :
-      answerInfo = "Unknown Answertype";
+      answerInfo = "Unknown Answertype " + String(p_QueryAnswerTypeFlags);
+
   }
   Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
 }
@@ -109,11 +120,11 @@ void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
    Probe result callback for Services
 */
 
-void serviceProbeResult(String p_pcServiceName,
-                        const MDNSResponder::hMDNSService p_hMDNSService,
+void serviceProbeResult(clsLEAMDNSHost::clsService& p_rMDNSService,
+                        const char* p_pcInstanceName,
                         bool p_bProbeResult) {
-  (void) p_hMDNSService;
-  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
+  (void)p_rMDNSService;
+  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcInstanceName, (p_bProbeResult ? "succeeded." : "failed!"));
 }
 
 /*
@@ -123,12 +134,13 @@ void serviceProbeResult(String p_pcServiceName,
    If the domain is free, the host domain is set and the http service is
    added.
    If the domain is already used, a new name is created and the probing is
-   restarted via p_pMDNSResponder->setHostname().
+   restarted via p_pclsLEAMDNSHost->setHostname().
 
 */
 
-void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
+void hostProbeResult(clsLEAMDNSHost & p_rMDNSHost, String p_pcDomainName, bool p_bProbeResult) {
 
+  (void)p_rMDNSHost;
   Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
   if (true == p_bProbeResult) {
@@ -141,15 +153,17 @@ void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
 
       if (!hMDNSService) {
         // Add a 'http.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-        hMDNSService = MDNS.addService(0, "http", "tcp", SERVICE_PORT);
-        if (hMDNSService) {
-          MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
+        hMDNSService = MDNS.addService(0, "http", "tcp", SERVICE_PORT, serviceProbeResult);
+
+        if (hMDNSService)  {
+          hMDNSService->setProbeResultCallback(serviceProbeResult);
+          //         MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
 
           // Add some '_http._tcp' protocol specific MDNS service TXT items
           // See: http://www.dns-sd.org/txtrecords.html#http
-          MDNS.addServiceTxt(hMDNSService, "user", "");
-          MDNS.addServiceTxt(hMDNSService, "password", "");
-          MDNS.addServiceTxt(hMDNSService, "path", "/");
+          hMDNSService->addServiceTxt("user", "");
+          hMDNSService->addServiceTxt("password", "");
+          hMDNSService->addServiceTxt("path", "/");
         }
 
         // Install dynamic 'http.tcp' service query
@@ -165,11 +179,7 @@ void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
     }
   } else {
     // Change hostname, use '-' as divider between base name and index
-    if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-      MDNS.setHostname(pcHostDomain);
-    } else {
-      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-    }
+    MDNS.setHostName(clsLEAMDNSHost::indexDomainName(p_pcDomainName.c_str(), "-", 0));
   }
 }
 
@@ -180,34 +190,17 @@ void handleHTTPRequest() {
   Serial.println("");
   Serial.println("HTTP Request");
 
-  IPAddress ip = WiFi.localIP();
+  IPAddress ip = server.client().localIP();
   String ipStr = ip.toString();
-  String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
-  s += WiFi.hostname() + ".local at " + WiFi.localIP().toString() + "</h3></head>";
+  String s;
+  s.reserve(200 /* + service listed */);
+  s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
+  s += WiFi.hostname() + ".local at " + server.client().localIP().toString() + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4>";
   s += "<ol>";
-  for (auto info :  MDNS.answerInfo(hMDNSServiceQuery)) {
-    s += "<li>";
-    s += info.serviceDomain();
-    if (info.hostDomainAvailable()) {
-      s += "<br/>Hostname: ";
-      s += String(info.hostDomain());
-      s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
-    }
-    if (info.IP4AddressAvailable()) {
-      s += "<br/>IP4:";
-      for (auto ip : info.IP4Adresses()) {
-        s += " " + ip.toString();
-      }
-    }
-    if (info.txtAvailable()) {
-      s += "<br/>TXT:<br/>";
-      for (auto kv : info.keyValues()) {
-        s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
-      }
-    }
-    s += "</li>";
-  }
+
+  // TODO: list services
+
   s += "</ol><br/>";
 
   Serial.println("Sending 200");
@@ -222,9 +215,14 @@ void setup(void) {
   Serial.begin(115200);
   Serial.setDebugOutput(false);
 
+  Serial.println("");
+  Serial.println("THIS IS A WORK IN PROGRESS: some TODOs need completion");
+  Serial.println("");
+
   // Connect to WiFi network
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(APSSID);
+  WiFi.begin(STASSID, STAPSK);
   Serial.println("");
 
   // Wait for connection
@@ -234,7 +232,7 @@ void setup(void) {
   }
   Serial.println("");
   Serial.print("Connected to ");
-  Serial.println(ssid);
+  Serial.println(STASSID);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
@@ -242,16 +240,10 @@ void setup(void) {
   server.on("/", handleHTTPRequest);
 
   // Setup MDNS responders
-  MDNS.setHostProbeResultCallback(hostProbeResult);
+  MDNS.setProbeResultCallback(hostProbeResult);
 
-  // Init the (currently empty) host domain string with 'esp8266'
-  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!MDNS.begin(pcHostDomain))) {
-    Serial.println(" Error setting up MDNS responder!");
-    while (1) { // STOP
-      delay(1000);
-    }
-  }
+  // Init the (currently empty) host domain string with 'leamdnsv2'
+  MDNS.begin("leamdnsv2");
   Serial.println("MDNS responder started");
 
   // Start HTTP server
@@ -265,6 +257,3 @@ void loop(void) {
   // Allow MDNS processing
   MDNS.update();
 }
-
-
-

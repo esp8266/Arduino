@@ -1,4 +1,5 @@
 /*
+    LEAmDNS2_lwIPdefs.h
 
     License (MIT license):
       Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,14 +21,11 @@
       THE SOFTWARE.
 
 */
-#include <ESP8266mDNS.h>
 
-/*
-    MDNS responder global instance
+#ifndef LEAMDNS2_LWIPDEFS_H
+#define LEAMDNS2_LWIPDEFS_H
 
-    Class type that is instantiated depends on the type mapping in ESP8266mDNS.h
-*/
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-MDNSResponder MDNS;
-#endif
+#include <lwip/init.h>
+#include <lwip/prot/dns.h>  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
+#endif // LEAMDNS2_LWIPDEFS_H

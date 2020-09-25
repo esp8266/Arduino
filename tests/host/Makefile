@@ -295,6 +295,12 @@ OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 		LEAmDNS_Structs.cpp \
 		LEAmDNS_Transfer.cpp \
 		ESP8266mDNS.cpp \
+		LEAmDNS2Host.cpp \
+		LEAmDNS2Host_Control.cpp \
+		LEAmDNS2Host_Debug.cpp \
+		LEAmDNS2Host_Structs.cpp \
+		LEAmDNS2Host_Transfer.cpp \
+		LEAmDNS2_Backbone.cpp \
 	) \
 	ArduinoOTA/ArduinoOTA.cpp \
 	DNSServer/src/DNSServer.cpp \

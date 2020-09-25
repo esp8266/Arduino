@@ -1,9 +1,9 @@
 /*
   ESP8266 mDNS responder clock
 
-  This example demonstrates two features of the LEA MDNSResponder:
+  This example demonstrates two features of the LEA clsLEAMDNSHost:
   1. The host and service domain negotiation process that ensures
-     the uniqueness of the finally choosen host and service domain name.
+     the uniqueness of the finally chosen host and service domain name.
   2. The dynamic MDNS service TXT feature
 
   A 'clock' service in announced via the MDNS responder and the current
@@ -11,10 +11,10 @@
   The time value is updated every second!
 
   The ESP is initially announced to clients as 'esp8266.local', if this host domain
-  is already used in the local network, another host domain is negociated. Keep an
-  eye to the serial output to learn the final host domain for the clock service.
+  is already used in the local network, another host domain is negotiated. Keep an
+  eye on the serial output to learn the final host domain for the clock service.
   The service itself is is announced as 'host domain'._espclk._tcp.local.
-  As the service uses port 80, a very simple HTTP server is installed also to deliver
+  As the service uses port 80, a very simple HTTP server is also installed to deliver
   a small web page containing a greeting and the current time (not updated).
   The web server code is taken nearly 1:1 from the 'mDNS_Web_Server.ino' example.
   Point your browser to 'host domain'.local to see this web page.
@@ -35,8 +35,12 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <LwipIntf.h>
 #include <time.h>
 #include <PolledTimeout.h>
+
+// uses API MDNSApiVersion::LEAv2
+#define NO_GLOBAL_MDNS // our MDNS is defined below
 #include <ESP8266mDNS.h>
 
 /*
@@ -47,6 +51,7 @@
 #define DST_OFFSET          1                                   // CEST
 #define UPDATE_CYCLE        (1 * 1000)                          // every second
 
+#define START_AP_AFTER_MS   10000                               // start AP after delay
 #define SERVICE_PORT        80                                  // HTTP port
 
 #ifndef STASSID
@@ -54,12 +59,17 @@
 #define STAPSK  "your-password"
 #endif
 
+#ifndef APSSID
+#define APSSID "ap4mdnsClock"
+#define APPSK  "mdnsClock"
+#endif
+
 const char*                   ssid                    = STASSID;
 const char*                   password                = STAPSK;
 
-char*                         pcHostDomain            = 0;        // Negociated host domain
+clsLEAMDNSHost                MDNSRESP;                           // MDNS responder
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
+clsLEAMDNSHost::clsService*   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
 ESP8266WebServer              server(SERVICE_PORT);
@@ -120,59 +130,15 @@ bool setStationHostname(const char* p_pcHostname) {
    Add a dynamic MDNS TXT item 'ct' to the clock service.
    The callback function is called every time, the TXT items for the clock service
    are needed.
-   This can be triggered by calling MDNS.announce().
+   This can be triggered by calling MDNSRESP.announce().
 
 */
-void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService) {
+void MDNSDynamicServiceTxtCallback(const clsLEAMDNSHost::hMDNSService& p_hService) {
   Serial.println("MDNSDynamicServiceTxtCallback");
 
-  if (hMDNSService == p_hService) {
+  if (hMDNSService == &p_hService) {
     Serial.printf("Updating curtime TXT item to: %s\n", getTimeString());
-    MDNS.addDynamicServiceTxt(p_hService, "curtime", getTimeString());
-  }
-}
-
-
-/*
-   MDNSProbeResultCallback
-
-   Probe result callback for the host domain.
-   If the domain is free, the host domain is set and the clock service is
-   added.
-   If the domain is already used, a new name is created and the probing is
-   restarted via p_pMDNSResponder->setHostname().
-
-*/
-void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
-
-  Serial.println("MDNSProbeResultCallback");
-  Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
-  if (true == p_bProbeResult) {
-    // Set station hostname
-    setStationHostname(pcHostDomain);
-
-    if (!bHostDomainConfirmed) {
-      // Hostname free -> setup clock service
-      bHostDomainConfirmed = true;
-
-      if (!hMDNSService) {
-        // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-        hMDNSService = MDNS.addService(0, "espclk", "tcp", SERVICE_PORT);
-        if (hMDNSService) {
-          // Add a simple static MDNS service TXT item
-          MDNS.addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
-          // Set the callback function for dynamic service TXTs
-          MDNS.setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
-        }
-      }
-    }
-  } else {
-    // Change hostname, use '-' as divider between base name and index
-    if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-      MDNS.setHostname(pcHostDomain);
-    } else {
-      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-    }
+    hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
   }
 }
 
@@ -191,6 +157,7 @@ void handleHTTPRequest() {
   gmtime_r(&now, &timeinfo);
 
   String s;
+  s.reserve(300);
 
   s = "<!DOCTYPE HTML>\r\n<html>Hello from ";
   s += WiFi.hostname() + " at " + WiFi.localIP().toString();
@@ -210,6 +177,19 @@ void setup(void) {
   Serial.begin(115200);
 
   // Connect to WiFi network
+
+  WiFi.persistent(false);
+
+  // useless informative callback
+  if (!LwipIntf::stateUpCB([](netif * nif) {
+  Serial.printf("New interface %c%c/%d is up\n",
+                nif->name[0],
+                nif->name[1],
+                netif_get_index(nif));
+  })) {
+    Serial.println("Error: could not add informative callback\n");
+  }
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
@@ -229,16 +209,24 @@ void setup(void) {
   setClock();
 
   // Setup MDNS responder
-  MDNS.setHostProbeResultCallback(hostProbeResult);
-  // Init the (currently empty) host domain string with 'esp8266'
-  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!MDNS.begin(pcHostDomain))) {
-    Serial.println("Error setting up MDNS responder!");
-    while (1) { // STOP
-      delay(1000);
+  // Init the (currently empty) host domain string with 'leamdnsv2'
+  if (MDNSRESP.begin("leamdnsv2",
+  [](clsLEAMDNSHost & p_rMDNSHost, const char* p_pcDomainName, bool p_bProbeResult)->void {
+  if (p_bProbeResult) {
+      Serial.printf("mDNSHost_AP::ProbeResultCallback: '%s' is %s\n", p_pcDomainName, (p_bProbeResult ? "FREE" : "USED!"));
+      // Unattended added service
+      hMDNSService = p_rMDNSHost.addService(0, "espclk", "tcp", 80);
+      hMDNSService->addDynamicServiceTxt("curtime", getTimeString());
+      hMDNSService->setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
+    } else {
+      // Change hostname, use '-' as divider between base name and index
+      MDNSRESP.setHostName(clsLEAMDNSHost::indexDomainName(p_pcDomainName, "-", 0));
     }
+  })) {
+    Serial.println("mDNS-AP started");
+  } else {
+    Serial.println("FAILED to start mDNS-AP");
   }
-  Serial.println("MDNS responder started");
 
   // Setup HTTP server
   server.on("/", handleHTTPRequest);
@@ -254,7 +242,7 @@ void loop(void) {
   // Check if a request has come in
   server.handleClient();
   // Allow MDNS processing
-  MDNS.update();
+  MDNSRESP.update();
 
   static esp8266::polledTimeout::periodicMs timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
@@ -262,7 +250,20 @@ void loop(void) {
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
-      MDNS.announce();
+      Serial.printf("Announce trigger from user\n");
+      MDNSRESP.announce();
     }
+  }
+
+  static bool AP_started = false;
+  if (!AP_started && millis() > START_AP_AFTER_MS) {
+    AP_started = true;
+    Serial.printf("Starting AP...\n");
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP(APSSID, APPSK);
+    Serial.printf("AP started...(%s:%s, %s)\n",
+                  WiFi.softAPSSID().c_str(),
+                  WiFi.softAPPSK().c_str(),
+                  WiFi.softAPIP().toString().c_str());
   }
 }
