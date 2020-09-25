@@ -19,6 +19,18 @@
 #include <limits.h>
 #include <StreamString.h>
 
+TEST_CASE("String::move", "[core][String]")
+{
+    const char buffer[] = "this string goes over the sso limit";
+
+    String copy;
+    String origin(buffer);
+
+    copy = std::move(origin);
+    REQUIRE(origin.c_str() != nullptr);
+    REQUIRE(copy == buffer);
+}
+
 TEST_CASE("String::trim", "[core][String]")
 {
     String str;
