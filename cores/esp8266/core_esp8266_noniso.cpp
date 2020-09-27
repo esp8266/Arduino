@@ -117,4 +117,36 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     return s;
 }
 
+/*
+    strrstr (static)
+
+    Backwards search for p_pcPattern in p_pcString
+    Based on: https://stackoverflow.com/a/1634398/2778898
+
+*/
+const char* strrstr(const char*__restrict p_pcString,
+                    const char*__restrict p_pcPattern)
+{
+    const char* pcResult = 0;
+
+    size_t      stStringLength = (p_pcString ? strlen(p_pcString) : 0);
+    size_t      stPatternLength = (p_pcPattern ? strlen(p_pcPattern) : 0);
+
+    if ((stStringLength) &&
+            (stPatternLength) &&
+            (stPatternLength <= stStringLength))
+    {
+        // Pattern is shorter or has the same length than the string
+        for (const char* s = (p_pcString + stStringLength - stPatternLength); s >= p_pcString; --s)
+        {
+            if (0 == strncmp(s, p_pcPattern, stPatternLength))
+            {
+                pcResult = s;
+                break;
+            }
+        }
+    }
+    return pcResult;
+}
+
 };

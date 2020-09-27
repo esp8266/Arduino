@@ -56,6 +56,8 @@ const char* fspath = nullptr;
 
 static struct termios initial_settings;
 
+std::map<String,String> mockArgs;
+
 int mockverbose (const char* fmt, ...)
 {
 	va_list ap;
@@ -135,6 +137,8 @@ void help (const char* argv0, int exitcode)
 		"\t-S             - spiffs size in KBytes (default: %zd)\n"
 		"\t-L             - littlefs size in KBytes (default: %zd)\n"
 		"\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
+		"\t-K             - key\n"
+		"\t-V             - value\n"
         "\tgeneral:\n"
 		"\t-c             - ignore CTRL-C (send it via Serial)\n"
 		"\t-f             - no throttle (possibly 100%%CPU)\n"
@@ -158,6 +162,8 @@ static struct option options[] =
 	{ "spiffskb",       required_argument,  NULL, 'S' },
 	{ "littlefskb",     required_argument,  NULL, 'L' },
 	{ "portshifter",    required_argument,  NULL, 's' },
+	{ "key",            required_argument,  NULL, 'K' },
+	{ "value",          required_argument,  NULL, 'V' },
 	{ "once",           no_argument,        NULL, '1' },
 };
 
@@ -209,10 +215,11 @@ int main (int argc, char* const argv [])
 		mock_port_shifter = 0;
 	else
 		mock_port_shifter = MOCK_PORT_SHIFTER;
+    String key;
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1K:V:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -253,6 +260,12 @@ int main (int argc, char* const argv [])
 		case 'T':
 			serial_timestamp = true;
 			break;
+	    case 'K':
+	        key = optarg;
+	        break;
+	    case 'V':
+	        mockArgs[key] = optarg;
+	        break;
 		case '1':
 			run_once = true;
 			break;

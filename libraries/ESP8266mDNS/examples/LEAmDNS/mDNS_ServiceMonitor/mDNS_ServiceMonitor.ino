@@ -33,19 +33,6 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-
-/*
-   Include the MDNSResponder (the library needs to be included also)
-   As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
-   legacy MDNSResponder is defaulted in th include file.
-   There are two ways to access LEA MDNSResponder:
-   1. Prepend every declaration and call to global declarations or functions with the namespace, like:
-      'LEAmDNS:MDNSResponder::hMDNSService  hMDNSService;'
-      This way is used in the example. But be careful, if the namespace declaration is missing
-      somewhere, the call might go to the legacy implementation...
-   2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
-
-*/
 #include <ESP8266mDNS.h>
 
 /*

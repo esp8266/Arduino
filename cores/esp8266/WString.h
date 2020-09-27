@@ -57,8 +57,8 @@ class String {
         String(const String &str);
         String(const __FlashStringHelper *str);
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-        String(String &&rval);
-        String(StringSumHelper &&rval);
+        String(String &&rval) noexcept;
+        String(StringSumHelper &&rval) noexcept;
 #endif
         explicit String(char c);
         explicit String(unsigned char, unsigned char base = 10);
@@ -96,8 +96,8 @@ class String {
         String & operator =(const char *cstr);
         String & operator = (const __FlashStringHelper *str);
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-        String & operator =(String &&rval);
-        String & operator =(StringSumHelper &&rval);
+        String & operator =(String &&rval) noexcept;
+        String & operator =(StringSumHelper &&rval) noexcept;
 #endif
 
         // concatenate (works w/ built-in types)
@@ -317,7 +317,7 @@ class String {
         String & copy(const char *cstr, unsigned int length);
         String & copy(const __FlashStringHelper *pstr, unsigned int length);
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-        void move(String &rhs);
+        void move(String &rhs) noexcept;
 #endif
 };
 

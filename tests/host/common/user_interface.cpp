@@ -39,6 +39,8 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#include "MocklwIP.h"
+
 #include <lwIPDhcpServer.h>
 
 bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
@@ -81,7 +83,6 @@ DhcpServer::~DhcpServer ()
 }
 
 DhcpServer dhcpSoftAP(nullptr);
-
 
 extern "C"
 {
@@ -181,6 +182,7 @@ extern "C"
 
         if (host_interface)
             mockverbose("host: looking for interface '%s':\n", host_interface);
+
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
