@@ -13,7 +13,7 @@
 #include <ESP8266WiFi.h>
 #include <lwip/napt.h>
 #include <lwip/dns.h>
-#include <lwIPDhcpServer.h>
+#include <LwipDhcpServer.h>
 
 #define NAPT 1000
 #define NAPT_PORT 10

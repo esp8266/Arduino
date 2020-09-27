@@ -13,7 +13,7 @@ extern "C" {
 }
 
 #include "debug.h"
-#include "lwIPIntf.h"
+#include "LwIPIntf.h"
 
 // args      | esp order    arduino order
 // ----      + ---------    -------------

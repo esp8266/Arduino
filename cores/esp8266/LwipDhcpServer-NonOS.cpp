@@ -26,7 +26,7 @@
 #include <lwip/init.h> // LWIP_VERSION
 
 #include <lwip/netif.h>
-#include "lwIPDhcpServer.h"
+#include "LwipDhcpServer.h"
 
 extern netif netif_git[2];
 

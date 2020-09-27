@@ -27,7 +27,7 @@
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 #include "user_interface.h"
-#include "lwIPIntf.h"
+#include "LwipIntf.h"
 
 
 class ESP8266WiFiSTAClass: public LwipIntf {

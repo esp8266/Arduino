@@ -47,7 +47,7 @@
 #include "lwip/mem.h"
 #include "osapi.h"
 
-#include "lwIPDhcpServer.h"
+#include "LwipDhcpServer.h"
 
 #include "user_interface.h"
 #include "mem.h"
