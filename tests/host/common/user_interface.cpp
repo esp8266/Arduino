@@ -41,7 +41,7 @@
 
 #include "MocklwIP.h"
 
-#include <lwIPDhcpServer.h>
+#include <LwipDhcpServer.h>
 
 bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
 {
