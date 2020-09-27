@@ -32,10 +32,6 @@ public:
     bool hostname(const String& aHostname) { return hostname(aHostname.c_str()); }
     bool hostname(const char* aHostname);
 
-private:
-
-    LwipIntf () { } // private, cannot be directly allocated
-
 protected:
 
     static bool stateChangeSysCB (LwipIntf::CBType&& cb);
