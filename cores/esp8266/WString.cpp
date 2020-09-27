@@ -45,7 +45,6 @@ String::String(const __FlashStringHelper *pstr) {
     *this = pstr; // see operator =
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 String::String(String &&rval) noexcept {
     init();
     move(rval);
@@ -55,7 +54,6 @@ String::String(StringSumHelper &&rval) noexcept {
     init();
     move(rval);
 }
-#endif
 
 String::String(char c) {
     init();
@@ -223,36 +221,11 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
     return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 void String::move(String &rhs) noexcept {
-    if (buffer()) {
-        if (capacity() >= rhs.len()) {
-            memmove_P(wbuffer(), rhs.buffer(), rhs.length() + 1);
-            setLen(rhs.len());
-            rhs.invalidate();
-            return;
-        } else {
-            if (!isSSO()) {
-                free(wbuffer());
-                setBuffer(nullptr);
-            }
-        }
-    }
-    if (rhs.isSSO()) {
-        setSSO(true);
-        memmove_P(sso.buff, rhs.sso.buff, sizeof(sso.buff));
-    } else {
-        setSSO(false);
-        setBuffer(rhs.wbuffer());
-    }
-    setCapacity(rhs.capacity());
-    setLen(rhs.len());
-    rhs.setSSO(false);
-    rhs.setCapacity(0);
-    rhs.setLen(0);
-    rhs.setBuffer(nullptr);
+    invalidate();
+    sso = rhs.sso;
+    rhs.init();
 }
-#endif
 
 String & String::operator =(const String &rhs) {
     if (this == &rhs)
@@ -266,7 +239,6 @@ String & String::operator =(const String &rhs) {
     return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 String & String::operator =(String &&rval) noexcept {
     if (this != &rval)
         move(rval);
@@ -278,7 +250,6 @@ String & String::operator =(StringSumHelper &&rval) noexcept {
         move(rval);
     return *this;
 }
-#endif
 
 String & String::operator =(const char *cstr) {
     if (cstr)
