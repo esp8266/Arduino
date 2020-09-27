@@ -23,12 +23,13 @@ TEST_CASE("String::move", "[core][String]")
 {
     const char buffer[] = "this string goes over the sso limit";
 
-    String copy;
-    String origin(buffer);
+    String target;
+    String source(buffer);
 
-    copy = std::move(origin);
-    REQUIRE(origin.c_str() != nullptr);
-    REQUIRE(copy == buffer);
+    target = std::move(source);
+    REQUIRE(source.c_str() != nullptr);
+    REQUIRE(!source.length());
+    REQUIRE(target == buffer);
 }
 
 TEST_CASE("String::trim", "[core][String]")
