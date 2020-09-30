@@ -42,6 +42,9 @@
 
 */
 
+#ifndef __ESP8266MDNS_H
+#define __ESP8266MDNS_H
+
 enum class MDNSApiVersion { LEA, LEAv2 };
 
 #include "LEAmDNS.h"            // LEA
@@ -57,3 +60,5 @@ using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;               
 
 extern MDNSResponder MDNS;
 #endif
+
+#endif // __ESP8266MDNS_H
