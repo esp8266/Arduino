@@ -26,6 +26,7 @@ extern "C" {
 #include "user_interface.h"
 }
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
 
