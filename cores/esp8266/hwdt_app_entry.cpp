@@ -39,9 +39,6 @@
  * To use this tool, select HWDT or HWDT_NOEXTRA4K from the Arduino IDE menu
  * "Tools->Debug Level" before building your sketch. Note, 'Tools->Debug port'
  * selection is not needed or referenced for printing the HWDT stack dump.
- * If the sketch is calling `disable_extra4k_at_link_time()`, then building with
- * HWDT selected on the Arduino IDE menu "Tools->Debug Level", will have the
- * same result as if built with HWDT_NOEXTRA4K selected.
  *
  * To enable in other build environments, add DEBUG_ESP_HWDT_NOEXTRA4K or
  * DEBUG_ESP_HWDT global defines to your build.
@@ -107,7 +104,7 @@
  *
  * Enables this debug tool for printing a Hardware WDT stack dump at restart.
  *
- * This option is now managed from the Arduinoo IDE menu 'Tools->Debug Level'
+ * This option is now managed from the Arduino IDE menu 'Tools->Debug Level'
  #define DEBUG_ESP_HWDT
  */
 
@@ -197,12 +194,29 @@
  *   2) this stack dump code
  *   3) SDK, Core, and Sketch
  *
- * With this, we can recover a complete stack trace of our failed sketch. To be
+ * ~With this, we can recover a complete stack trace of our failed sketch. To be
  * safe, I am leaving this at 1024; however, I think there is room to lower it
- * without loss of information.
+ * without loss of information.~
+ *
+ * Edited: 1024 is not safe for the "extra 4K of heap" case. This case now uses
+ * 720 bytes. Really bad crashes happend with the 1024 and the "extra 4K of
+ * heap" case. This is so tight. I am a concerned about the robustness of using
+ * this option, "extra 4K of heap" and Debug Level: HWDT.
+ *
+ * If or when eboot.elf uses more than 720 there will be a  little over-writing
+ * of the cont stack that we report. (When retesting, 752 was the max I got away
+ * with crashing the SYS stack.)
+ *
+ * If possible, use the no-extra 4K heap option. This is the optimum choice for
+ * debugging HWDT crashes.
+ *
  */
 #ifndef DEBUG_ESP_HWDT_ROM_STACK_SIZE
-#define DEBUG_ESP_HWDT_ROM_STACK_SIZE (1024)
+  #ifdef DEBUG_ESP_HWDT_NOEXTRA4K
+    #define DEBUG_ESP_HWDT_ROM_STACK_SIZE (1024UL)
+  #else
+    #define DEBUG_ESP_HWDT_ROM_STACK_SIZE (720UL)
+  #endif
 #endif
 
 
@@ -342,7 +356,6 @@ typedef struct hwdt_info_ {
     bool g_pcont_valid;
 } hwdt_info_t;
 
-void enable_debug_hwdt_at_link_time(void);
 extern "C" void debug_hwdt_init(void);
 
 extern uint32_t *g_rom_stack;
@@ -531,7 +544,7 @@ STATIC const uint32_t * IRAM_MAYBE skip_stackguard(const uint32_t *start, const 
     return uptr;
 }
 
-STATIC void IRAM_MAYBE check_g_pcont_validity(void) {
+bool IRAM_MAYBE hwdt_check_g_pcont_validity(void) {
     /*
      * DRAM appears to remain valid after most resets. There is more on this in
      * handle_hwdt().
@@ -550,6 +563,7 @@ STATIC void IRAM_MAYBE check_g_pcont_validity(void) {
         g_rom_stack = ROM_STACK;
         g_rom_stack_A16_sz = ROM_STACK_A16_SZ;
     }
+    return hwdt_info.g_pcont_valid;
 }
 
 #if defined(DEBUG_ESP_HWDT_DEV_DEBUG) || defined(DEBUG_ESP_HWDT_DEV_DEBUG_RESET_REASON)
@@ -740,7 +754,8 @@ STATIC uint32_t IRAM_MAYBE get_reset_reason(bool* power_on, bool* hwdt_reset) {
 #define ROM_uart_div_modify         0x400039d8
 #endif
 typedef void (*fp_uart_div_modify_t)(uint32_t uart_no, uint32 DivLatchValue);
-constexpr fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_uart_div_modify;
+// const fp_uart_div_modify_t real_uart_div_modify = (fp_uart_div_modify_t)ROM_uart_div_modify;
+#define real_uart_div_modify ((fp_uart_div_modify_t)ROM_uart_div_modify)
 
 #define UART_CLKDIV_MASK 0x000FFFFFUL
 
@@ -827,10 +842,35 @@ STATIC uint32_t IRAM_MAYBE set_uart_speed(const uint32_t uart_no, const uint32_t
 #endif
 
 /*
+ * When g_pcont is valid, we expect these checks to be valid. I am not sure
+ * what to do when they are not. An error that could lead to a crash is
+ * corrected. We currently continue and print the stack dump. This assumes
+ * something is better than nothing.
  *
- *
- *
- *
+ * Make global so postmortem can take advange of this check.
+ */
+uint32_t IRAM_MAYBE hwdt_cont_integrity_check() {
+    uint32_t cont_integrity = 0;
+    if (g_pcont->stack_guard1 != CONT_STACKGUARD) {
+      cont_integrity |= 0x0001;
+    }
+    if (g_pcont->stack_guard2 != CONT_STACKGUARD) {
+      cont_integrity |= 0x0020;
+    }
+    if (g_pcont->stack_end != (g_pcont->stack + (sizeof(g_pcont->stack) / 4))) {
+      cont_integrity |= 0x0300;
+      // Fix ending so we don't crash
+      g_pcont->stack_end = (g_pcont->stack + (sizeof(g_pcont->stack) / 4));
+    }
+    if (g_pcont->struct_start != (unsigned*)g_pcont) {
+      cont_integrity |= 0x4000;
+      g_pcont->struct_start = (unsigned*)g_pcont;
+    }
+    hwdt_info.cont_integrity = cont_integrity;
+    return cont_integrity;
+}
+/*
+ * Determine if we have a HWDT reboot and dump stack traces if so.
  */
 STATIC void IRAM_MAYBE handle_hwdt(void)  __attribute__((used));
 STATIC void IRAM_MAYBE handle_hwdt(void) {
@@ -840,7 +880,7 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
     set__sys_stack_first();
 
     ets_memset(&hwdt_info, 0, sizeof(hwdt_info));
-    check_g_pcont_validity();
+    hwdt_check_g_pcont_validity();
 
     bool power_on = false;
     bool hwdt_reset = false;
@@ -872,28 +912,11 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
      *   3) deep sleep
      * Additionally, g_pcont is expected to be invalid after these events.
      *
-     * When g_pcont is valid, we expect these checks to be valid. I am not sure
-     * what to do when they are not. An error that could lead to a crash is
-     * corrected. We currently continue and print the stack dump. This assumes
-     * something is better than nothing.
      */
     if (!power_on && hwdt_info.g_pcont_valid) {
-        uint32_t cont_integrity = 0;
-        if (g_pcont->stack_guard1 != CONT_STACKGUARD) {
-          cont_integrity |= 0x0001;
-        }
-        if (g_pcont->stack_guard2 != CONT_STACKGUARD) {
-          cont_integrity |= 0x0020;
-        }
-        if (g_pcont->stack_end != (g_pcont->stack + (sizeof(g_pcont->stack) / 4))) {
-          cont_integrity |= 0x0300;
-          // Fix ending so we don't crash
-          g_pcont->stack_end = (g_pcont->stack + (sizeof(g_pcont->stack) / 4));
-        }
-        if (g_pcont->struct_start != (unsigned*) g_pcont) {
-          cont_integrity |= 0x4000;
-        }
-        hwdt_info.cont_integrity = cont_integrity;
+        // Checks and fixes incorrect cont_t structure values that might
+        // otherwise cause us to crash.
+        hwdt_cont_integrity_check();
 
         const uint32_t *ctx_cont_ptr = NULL;
 #if !defined(DEBUG_ESP_HWDT_INFO)
@@ -998,13 +1021,126 @@ extern "C" void Cache_Read_Disable(void);
 extern "C" void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 
 #ifndef USE_IRAM
-static void ICACHE_RAM_ATTR __attribute__((noinline)) handle_hwdt_icache() {
+static void ICACHE_RAM_ATTR __attribute__((noinline)) handle_hwdt_icache() __attribute__((used));
+void handle_hwdt_icache() {
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
   handle_hwdt();
   Cache_Read_Disable();
 }
+#endif // USE_IRAM
+
+
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
+static void printSanityCheck() {
+  ETS_PRINTF("\n\nsys_stack_first:         %p\n", sys_stack_first);
+  ETS_PRINTF(    "CONT_STACK:              %p\n", CONT_STACK);
+  ETS_PRINTF(    "g_pcont:                 %p\n", g_pcont);
+  ETS_PRINTF(    "ROM_STACK:               %p\n", ROM_STACK);
+  ETS_PRINTF(    "get_noextra4k_g_pcont(): %p\n", get_noextra4k_g_pcont());
+  ETS_PRINTF(    "g_rom_stack:             %p\n", g_rom_stack);
+  ETS_PRINTF(    "g_rom_stack_A16_sz:      0x%08X\n\n", g_rom_stack_A16_sz);
+}
+
+static void ICACHE_RAM_ATTR __attribute__((noinline)) print_sanity_check_icache(void) __attribute__((used));
+void print_sanity_check_icache(void) {
+  Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
+#ifdef DEBUG_ESP_HWDT_UART_SPEED
+  const uint32_t uart_divisor = set_uart_speed(0, DEBUG_ESP_HWDT_UART_SPEED);
+#endif
+  printSanityCheck();
+#ifdef DEBUG_ESP_HWDT_UART_SPEED
+  if (uart_divisor) {
+      adjust_uart_speed(uart_divisor);
+  }
+#endif
+  Cache_Read_Disable();
+}
+#endif //DEBUG_ESP_HWDT_DEV_DEBUG
+
+
+#if 1
+/*
+  An asm function alternative to the function with inline asm at the #else. I
+  find the inline asm requires constant inspection to verify that the compiler
+  optimizer does not clobber needed registers, after small changes in code or
+  compiler updates. Hints to the compiler don't always work for me. Last I
+  checked, the inline version below was working.
+*/
+cont_t *hwdt_app_entry__cont_stack __attribute__((used)) = CONT_STACK;
+
+asm  (
+    ".section        .iram.text.hwdt_app_entry.cpp,\"ax\",@progbits\n\t"
+    ".literal_position\n\t"
+    ".literal .g_pcont, g_pcont\n\t"
+    ".literal .pcont_stack, hwdt_app_entry__cont_stack\n\t"
+    ".literal .sys_stack_first, sys_stack_first\n\t"
+    ".literal .call_user_start, call_user_start\n\t"
+    ".literal .get_noextra4k_g_pcont, get_noextra4k_g_pcont\n\t"
+    ".align  4\n\t"
+    ".global app_entry_redefinable\n\t"
+    ".type   app_entry_redefinable, @function\n\t"
+    "\n"
+"app_entry_redefinable:\n\t"
+    /*
+     * There are 4 sections of code that share the stack starting near
+     * 0x40000000.
+     *   1) The Boot ROM (uses around 640 bytes)
+     *   2) The Bootloader, eboot.elf (last seen using 720 bytes.)
+     *   3) `app_entry_redefinable()` just before it starts the SDK.
+     *   4) The NONOS SDK, optionally the Core when the extra 4K option is
+     *      selected.
+     *
+     * Use the ROM BSS zeroed out memory as the home for our temporary stack.
+     * This way no additional information will be lost. That will remove this
+     * tool from the list of possible concerns for stack overwrite.
+     *
+     */
+    "movi    a1, 0x3fffeb30\n\t"
+#ifdef USE_IRAM
+    "call0   handle_hwdt\n\t"
+#else
+    "call0   handle_hwdt_icache\n\t"
+#endif
+    /*
+     *  Use new calculated SYS stack from top.
+     *  Call the entry point of the SDK code.
+     */
+    "l32r    a2, .sys_stack_first\n\t"
+    /*
+     * Stack cases:
+     *
+     *  1) Continuation context is in BSS. (noextra4k)
+     *     g_pcont = get_noextra4k_g_pcont(); was &g_cont;
+     *
+     *  2) The continuation context is on the stack just after the reserved
+     *     space for the ROM/eboot stack and before the SYS stack begins.
+     *     All computations were done at top, save pointer to it now.
+     *     g_pcont = CONT_STACK;
+     */
+    "l32r    a13, .pcont_stack\n\t"
+    "l32r     a0, .get_noextra4k_g_pcont\n\t"
+    "l32r    a14, .g_pcont\n\t"
+    "l32i.n   a1,  a2, 0\n\t"          // delayed load for pipeline
+    "l32i.n  a13, a13, 0\n\t"
+    "callx0   a0\n\t"
+    "moveqz   a2, a13, a2\n\t"
+    "s32i.n   a2, a14, 0\n\t"
+
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
+    "call0    print_sanity_check_icache\n\t"
 #endif
 
+    "movi     a2, 0x3FFFE000\n\t" // ROM BSS Area
+    "movi     a3, 0x0b30\n\t"     // ROM BSS Size
+    "call0    ets_bzero\n\t"
+
+    "l32r     a3, .call_user_start\n\t"
+    "movi     a0, 0x4000044c\n\t"
+    "jx       a3\n\t"
+    ".size app_entry_redefinable, .-app_entry_redefinable\n\t"
+);
+
+#else
 void ICACHE_RAM_ATTR app_entry_start(void) {
 
 #ifdef USE_IRAM
@@ -1026,7 +1162,9 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
          */
         g_pcont = CONT_STACK;
     }
-
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
+    print_sanity_check_icache();
+#endif
     /*
      *  Use new calculated SYS stack from top.
      *  Call the entry point of the SDK code.
@@ -1066,6 +1204,7 @@ void ICACHE_RAM_ATTR app_entry_redefinable(void) {
 
     __builtin_unreachable();
 }
+#endif
 
 #if defined(DEBUG_ESP_HWDT_INFO) || defined(ROM_STACK_DUMP)
 void debug_hwdt_init(void) {
@@ -1079,6 +1218,7 @@ void debug_hwdt_init(void) {
         g_rom_stack[i] = CONT_STACKGUARD;
     }
 }
+
 #else
 void debug_hwdt_init(void) {
 }
