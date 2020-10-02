@@ -25,6 +25,7 @@
 #include <Schedule.h>
 #include <AddrList.h>
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS_Priv.h"
 
 

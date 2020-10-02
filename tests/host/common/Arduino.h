@@ -270,3 +270,10 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 #include "pins_arduino.h"
 
 #endif /* Arduino_h */
+
+#if __cplusplus
+#include <WString.h>
+#include <map>
+#define MOCKARGS 1
+extern std::map<String,String> mockArgs;
+#endif
