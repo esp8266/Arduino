@@ -108,7 +108,7 @@ ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
 Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), and is currently maintained by Angus Gratton (@projectgus) under GPL 2.0 license.
 
-Espressif SDK included in this build is under Espressif MIT License.
+[Espressif's NONOS SDK](https://github.com/espressif/ESP8266_NONOS_SDK) included in this build is under Espressif MIT License.
 
 ESP8266 core files are licensed under LGPL.
 
@@ -117,8 +117,6 @@ ESP8266 core files are licensed under LGPL.
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under the MIT license.
 
 [SoftwareSerial](https://github.com/plerup/espsoftwareserial) library and examples written by Peter Lerup. Distributed under LGPL 2.1.
-
-[axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).
 
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 
