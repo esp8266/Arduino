@@ -58,10 +58,6 @@ class WiFiServerSecure : public WiFiServer {
     // If awaiting connection available and authenticated (i.e. client cert), return it.
     WiFiClientSecure available(uint8_t* status = NULL);
 
-    // Compatibility with axTLS interface
-    void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
-    void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
-
     WiFiServerSecure& operator=(const WiFiServerSecure&) = default;
 
   using ClientType = WiFiClientSecure;
@@ -73,10 +69,6 @@ class WiFiServerSecure : public WiFiServer {
     int _iobuf_in_size = BR_SSL_BUFSIZE_INPUT;
     int _iobuf_out_size = 837;
     const X509List *_client_CA_ta = nullptr;
-
-    // axTLS compat
-    std::shared_ptr<X509List>   _axtls_chain;
-    std::shared_ptr<PrivateKey> _axtls_sk;
 
 };
 
