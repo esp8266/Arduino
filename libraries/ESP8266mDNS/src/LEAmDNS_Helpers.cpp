@@ -22,54 +22,12 @@
 
 */
 
-#include "lwip/igmp.h"
+#include <lwip/igmp.h>
+#include <stdlib_noniso.h> // strrstr()
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
-
-
-namespace
-{
-
-/*
-    strrstr (static)
-
-    Backwards search for p_pcPattern in p_pcString
-    Based on: https://stackoverflow.com/a/1634398/2778898
-
-*/
-const char* strrstr(const char*__restrict p_pcString, const char*__restrict p_pcPattern)
-{
-
-    const char* pcResult = 0;
-
-    size_t      stStringLength = (p_pcString ? strlen(p_pcString) : 0);
-    size_t      stPatternLength = (p_pcPattern ? strlen(p_pcPattern) : 0);
-
-    if ((stStringLength) &&
-            (stPatternLength) &&
-            (stPatternLength <= stStringLength))
-    {
-        // Pattern is shorter or has the same length tham the string
-
-        for (const char* s = (p_pcString + stStringLength - stPatternLength); s >= p_pcString; --s)
-        {
-            if (0 == strncmp(s, p_pcPattern, stPatternLength))
-            {
-                pcResult = s;
-                break;
-            }
-        }
-    }
-    return pcResult;
-}
-
-
-} // anonymous
-
-
-
-
 
 namespace esp8266
 {
