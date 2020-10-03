@@ -78,17 +78,22 @@ void EEPROMClass::begin(size_t size) {
   _dirty = false; //make sure dirty is cleared in case begin() is called 2nd+ time
 }
 
-void EEPROMClass::end() {
-  if (!_size)
-    return;
+bool EEPROMClass::end() {
+  bool retval;
 
-  commit();
+  if(!_size) {
+    return false;
+  }
+
+  retval = commit();
   if(_data) {
     delete[] _data;
   }
   _data = 0;
   _size = 0;
   _dirty = false;
+
+  return retval;
 }
 
 
