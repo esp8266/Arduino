@@ -323,12 +323,18 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
     }
     DEBUG_WIFI_MULTI("\n");
 
+    // Create indices for AP connection failures
+    uint8_t connectSkipIndex[_APlist.size()];
+    memset(connectSkipIndex, 0, sizeof(connectSkipIndex));
+
     // Connect to known WiFi AP's sorted by RSSI
     for (int8_t i = 0; i < numNetworks; i++) {
         // Get network information
         WiFi.getNetworkInfo(known[i], ssid, encType, rssi, bssid, channel, hidden);
 
-        for (auto entry : _APlist) {
+        for (uint8_t j = 0; j < _APlist.size(); j++) {
+            auto &entry = _APlist[j];
+
             // Check SSID
             if (ssid == entry.ssid) {
                 DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid);
@@ -340,13 +346,33 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
                 if (waitWiFiConnect(connectTimeoutMs) == WL_CONNECTED) {
                     return WL_CONNECTED;
                 }
+
+                // Failed to connect, skip for hidden SSID connects
+                connectSkipIndex[j] = true;
+            }
+        }
+    }
+
+    // Try to connect to hidden AP's which are not reported by WiFi scan
+    for (uint8_t i = 0; i < _APlist.size(); i++) {
+        auto &entry = _APlist[i];
+
+        if (!connectSkipIndex[i]) {
+            DEBUG_WIFI_MULTI("[WIFIM] Try hidden connect %s\n", entry.ssid);
+
+            // Connect to WiFi
+            WiFi.begin(entry.ssid, entry.passphrase);
+
+            // Wait for status change
+            if (waitWiFiConnect(connectTimeoutMs) == WL_CONNECTED) {
+                return WL_CONNECTED;
             }
         }
     }
 
     DEBUG_WIFI_MULTI("[WIFIM] Could not connect\n", ssid);
 
-    // Coult not connect to any WiFi network
+    // Could not connect to any WiFi network
     return WL_CONNECT_FAILED;
 }
 
