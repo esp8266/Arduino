@@ -39,47 +39,12 @@ namespace esp8266webserver {
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _keepAlive(false)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _currentArgsHavePlain(0)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
-, _corsEnabled(false)
 {
 }
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 : _server(port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _currentArgsHavePlain(0)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
-, _corsEnabled(false)
 {
 }
 
@@ -589,97 +554,101 @@ const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) cons
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) const {
-  for (int j = 0; j < _postArgsLen; ++j) {
-    if ( _postArgs[j].key == name )
-      return _postArgs[j].value;
-  }
-  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
-    if ( _currentArgs[i].key == name )
-      return _currentArgs[i].value;
-  }
-  return emptyString;
+    for (size_t j = 0; j < _postArgsLen; ++j) {
+        if ( _postArgs[j].key == name )
+            return _postArgs[j].value;
+    }
+    for (size_t i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
+        if ( _currentArgs[i].key == name )
+            return _currentArgs[i].value;
+    }
+    return emptyString;
 }
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::arg(int i) const {
-  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
-    return _currentArgs[i].value;
-  return emptyString;
+const String& ESP8266WebServerTemplate<ServerType>::arg(int _i) const {
+    size_t i = (size_t) _i;
+    if (i < _currentArgCount + _currentArgsHavePlain)
+        return _currentArgs[i].value;
+    return emptyString;
 }
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::argName(int i) const {
-  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
-    return _currentArgs[i].key;
-  return emptyString;
+const String& ESP8266WebServerTemplate<ServerType>::argName(int _i) const {
+    size_t i = (size_t) _i;
+    if (i < _currentArgCount + _currentArgsHavePlain)
+        return _currentArgs[i].key;
+    return emptyString;
 }
 
 template <typename ServerType>
 int ESP8266WebServerTemplate<ServerType>::args() const {
-  return _currentArgCount;
+    return (int) _currentArgCount;
 }
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
-  for (int j = 0; j < _postArgsLen; ++j) {
-    if (_postArgs[j].key == name)
-      return true;
-  }
-  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
-    if (_currentArgs[i].key == name)
-      return true;
-  }
-  return false;
+    for (size_t j = 0; j < _postArgsLen; ++j) {
+        if (_postArgs[j].key == name)
+            return true;
+    }
+    for (size_t i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
+        if (_currentArgs[i].key == name)
+            return true;
+    }
+    return false;
 }
 
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) const {
-  for (int i = 0; i < _headerKeysCount; ++i) {
-    if (_currentHeaders[i].key.equalsIgnoreCase(name))
-      return _currentHeaders[i].value;
-  }
-  return emptyString;
+    for (size_t i = 0; i < _headerKeysCount; ++i) {
+        if (_currentHeaders[i].key.equalsIgnoreCase(name))
+            return _currentHeaders[i].value;
+    }
+    return emptyString;
 }
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount + 1;
-  if (_currentHeaders)
-     delete[]_currentHeaders;
-  _currentHeaders = new RequestArgument[_headerKeysCount];
-  _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
-  for (int i = 1; i < _headerKeysCount; i++){
-    _currentHeaders[i].key = headerKeys[i-1];
-  }
+    _headerKeysCount = headerKeysCount + 1;
+    if (_currentHeaders)
+        delete [] _currentHeaders;
+    _currentHeaders = new RequestArgument[_headerKeysCount];
+    _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
+    for (size_t i = 1; i < _headerKeysCount; i++) {
+        _currentHeaders[i].key = headerKeys[i-1];
+    }
 }
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::header(int i) const {
-  if (i < _headerKeysCount)
-    return _currentHeaders[i].value;
-  return emptyString;
+const String& ESP8266WebServerTemplate<ServerType>::header(int _i) const {
+    size_t i = (size_t) _i;
+    if (i < _headerKeysCount)
+        return _currentHeaders[i].value;
+    return emptyString;
 }
 
 template <typename ServerType>
-const String& ESP8266WebServerTemplate<ServerType>::headerName(int i) const {
-  if (i < _headerKeysCount)
-    return _currentHeaders[i].key;
-  return emptyString;
+const String& ESP8266WebServerTemplate<ServerType>::headerName(int _i) const {
+    size_t i = (size_t) _i;
+    if (i < _headerKeysCount)
+        return _currentHeaders[i].key;
+    return emptyString;
 }
 
 template <typename ServerType>
 int ESP8266WebServerTemplate<ServerType>::headers() const {
-  return _headerKeysCount;
+    return (int) _headerKeysCount;
 }
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::hasHeader(const String& name) const {
-  for (int i = 0; i < _headerKeysCount; ++i) {
-    if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
-      return true;
-  }
-  return false;
+    for (size_t i = 0; i < _headerKeysCount; ++i) {
+        if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
+            return true;
+    }
+    return false;
 }
 
 template <typename ServerType>
