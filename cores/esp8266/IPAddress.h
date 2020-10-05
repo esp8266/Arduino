@@ -32,6 +32,13 @@
 struct ip_addr: ipv4_addr { };
 #endif // !LWIP_IPV6
 
+// to display a netif id with printf:
+#define NETIFID_STR        "%c%c%u"
+#define NETIFID_VAL(netif) \
+        ((netif)? (netif)->name[0]: '-'),     \
+        ((netif)? (netif)->name[1]: '-'),     \
+        ((netif)? netif_get_index(netif): 42)
+
 // A class to make it easier to handle and pass around IP addresses
 // IPv6 update:
 // IPAddress is now a decorator class for lwIP's ip_addr_t
@@ -124,6 +131,8 @@ class IPAddress: public Printable {
 
         virtual size_t printTo(Print& p) const;
         String toString() const;
+
+        void clear();
 
         /*
                 check if input string(arg) is a valid IPV4 address or not.
