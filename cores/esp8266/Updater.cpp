@@ -27,18 +27,6 @@ extern "C" uint32_t _FS_start;
 extern "C" uint32_t _FS_end;
 
 UpdaterClass::UpdaterClass()
-: _async(false)
-, _error(0)
-, _buffer(0)
-, _bufferLen(0)
-, _size(0)
-, _startAddress(0)
-, _currentAddress(0)
-, _command(U_FLASH)
-, _ledPin(-1)
-, _hash(nullptr)
-, _verify(nullptr)
-, _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
