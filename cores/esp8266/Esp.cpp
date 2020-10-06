@@ -723,7 +723,7 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     {
         rc = spi_flash_write(offset, data, sizeAligned);
     }
-    if (sizeAligned < size) {
+    if (sizeAligned < size && rc == SPI_FLASH_RESULT_OK) {
         uint32_t tempData;
         SpiFlashOpResult rc = spi_flash_read(offset + sizeAligned, &tempData, 4);
         if (rc == SPI_FLASH_RESULT_OK) {
@@ -737,7 +737,7 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
     size_t sizeAligned = size & ~3;
     auto rc = spi_flash_read(offset, data, sizeAligned);
-    if (sizeAligned < size) {
+    if (sizeAligned < size && rc == SPI_FLASH_RESULT_OK) {
         uint32_t tempData;
         rc = spi_flash_read(offset + sizeAligned, &tempData, 4);
         memcpy((uint8_t *)data + sizeAligned, &tempData, size - sizeAligned);
