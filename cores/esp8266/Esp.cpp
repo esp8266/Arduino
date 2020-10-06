@@ -26,9 +26,11 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
+
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
 // #include "core_esp8266_vm.h"
+#include <pgmspace.h>
 
 extern "C" {
 #include "user_interface.h"
