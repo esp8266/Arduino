@@ -26,7 +26,9 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
+
 #include "coredecls.h"
+#include <pgmspace.h>
 
 extern "C" {
 #include "user_interface.h"
