@@ -143,28 +143,6 @@ For calls to ``umm_malloc`` with interrupts disabled.
    access, consider using the inline functions described in section
    "Performance Functions" below.
 
-    I think this block should go away and we always use
-    ``USE_ISR_SAFE_EXC_WRAPPER`` with the exception handler.
-
-    -  ``realloc`` will fail if not built with
-       ``USE_ISR_SAFE_EXC_WRAPPER`` defined.
-    -  The current build has ``USE_ISR_SAFE_EXC_WRAPPER`` defined in
-       ``mmu_iram.h``.
-
-    .. rubric:: ISR/Exception Handler Issue
-       :name: isrexception-handler-issue
-
-    The non-32-bit exception handler is called by a "C" wrapper function
-    in ROM. This ROM function enables interrupts before calling our
-    registered handler. Defining ``USE_ISR_SAFE_EXC_WRAPPER`` in
-    ``mmu_iram.h`` will install a replacement that does not enable
-    interrupts (now default). The effects on Network performance are
-    unknown.
-
-    To keep ISR execution time with interrupts disabled at a minimum,
-    avoid the use of IRAM from ISRs. Especially the use of non-32-bit
-    read/writes on IRAM.
-
 How to Select Heap
 ~~~~~~~~~~~~~~~~~~
 
