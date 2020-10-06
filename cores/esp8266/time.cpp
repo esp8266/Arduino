@@ -204,14 +204,14 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     sntp_init();
 }
 
-static TrivialCB _settimeofday_cb;
-
-void settimeofday_cb (TrivialCB&& cb)
-{
-    _settimeofday_cb = std::move(cb);
-}
+static BoolCB _settimeofday_cb;
 
 void settimeofday_cb (const TrivialCB& cb)
+{
+    _settimeofday_cb = [cb](bool sntp) { (void)sntp; cb(); };
+}
+
+void settimeofday_cb (const BoolCB& cb)
 {
     _settimeofday_cb = cb;
 }
@@ -222,6 +222,15 @@ extern "C" {
 
 int settimeofday(const struct timeval* tv, const struct timezone* tz)
 {
+    bool from_sntp;
+    if (tz == (struct timezone*)0xFeedC0de)
+    {
+        tz = nullptr;
+        from_sntp = true;
+    }
+    else
+        from_sntp = false;
+
     if (tz || !tv)
         // tz is obsolete (cf. man settimeofday)
         return EINVAL;
@@ -230,7 +239,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
     tune_timeshift64(tv->tv_sec * 1000000ULL + tv->tv_usec);
 
     if (_settimeofday_cb)
-        schedule_recurrent_function_us([](){ _settimeofday_cb(); return false; }, 0);
+        schedule_recurrent_function_us([from_sntp](){ _settimeofday_cb(from_sntp); return false; }, 0);
 
     return 0;
 }
