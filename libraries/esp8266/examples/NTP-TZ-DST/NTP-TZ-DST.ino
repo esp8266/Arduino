@@ -158,6 +158,24 @@ void showTime() {
   }
 
   Serial.println();
+
+  // subsecond synchronisation
+  gettimeofday(&tv, nullptr);
+  time_t sec = tv.tv_sec;
+  do {
+    gettimeofday(&tv, nullptr);
+    Serial.printf("time(): %u   gettimeofday(): %u.%06u",
+                  (uint32_t)time(nullptr),
+                  (uint32_t)tv.tv_sec, (uint32_t)tv.tv_usec);
+    if (tv.tv_sec == sec) {
+      Serial.println("  second unchanged");
+    } else {
+      Serial.println("  <-- second changed");
+    }
+    delay(50);
+  } while (tv.tv_sec == sec);
+
+  Serial.println();
 }
 
 void time_is_set_scheduled() {
