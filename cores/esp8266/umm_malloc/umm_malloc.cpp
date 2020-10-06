@@ -731,13 +731,65 @@ void *umm_malloc( size_t size ) {
   UMM_INIT_HEAP;
 
   /*
+   * "Is it safe"
+   *
+   * Is it safe to call from an ISR? Is there a point during a malloc that a
+   * an interrupt and subsequent call to malloc result in undesired results?
+   *
+   * Heap selection in managed by the functions umm_push_heap, umm_pop_heap,
+   * umm_get_current_heap_id, and umm_set_heap_by_id. These functions are
+   * responsible for getting/setting the module static variable umm_heap_cur.
+   * The umm_heap_cur variable is an index that is used to select the current
+   * heap context. Depending on the situation this selection can be overriddened.
+   *
+   * All variables for a specific Heap are in a single structure. `heap_context`
+   * is an array of these structures. Each heap API function uses a function
+   * local variable `_context` to hold a pointer to the selected heap structure.
+   * This local pointer is referenced for all the "selected heap" operations.
+   * Coupled with critical sections around global data should allow the API
+   * functions to be reentrant.
+   *
+   * Using the `_context` name throughout made it easy to incorporate the
+   * context into existing macros.
+   *
+   * For allocating APIs `umm_heap_cur` is used to index and select a value for
+   * `_context`. If an allocation is made from an ISR, this value is ignored and
+   * the heap context for DRAM is loaded. For APIs that require operating on an
+   * existing allcation such as realloc and free, the heap context selected is
+   * done by matching the allocation's address with that of one of the heap
+   * address ranges.
+   *
+   * I think we are safe with multiple heaps when the non32-bit exception
+   * handler is used, as long as interrupts don't get enabled. There was a
+   * window in the Boot ROM "C" Exception Wrapper that would enable interrupts
+   * when running our non32-exception handler; however, that should be resolved
+   * by our replacement wrapper. For more information on exception handling
+   * issues for IRAM see comments above `_set_exception_handler_wrapper()` in
+   * `core_esp8266_non32xfer.cpp`.
+   *
+   * ISRs should not try and change heaps. umm_malloc will ignore the change.
+   * All should be fine as long as the caller puts the heap back the way it was.
+   * On return, everything must be the same. The foreground thread will continue
+   * with the same information that was there before the interrupt. All malloc()
+   * requests made from an ISR are fulfilled with DRAM.
+   *
+   * For umm_malloc, heap selection involves changing a single variable that is
+   * on the calling context stack. From the umm_mallac side, that variable is
+   * used to load a context pointer by index, heap ID. While an umm_malloc API
+   * function is running, all heap related variables are in the context variable
+   * pointer, registers, or the current stack as the request is processed. With
+   * a single variable to reference for heap selection, I think it is unlikely
+   * that umm_malloc can be called, with things in an unusable transition state.
+   */
+
+  umm_heap_context_t *_context = umm_get_current_heap();
+
+  /*
    * the very first thing we do is figure out if we're being asked to allocate
    * a size of 0 - and if we are we'll simply return a null pointer. if not
    * then reduce the size by 1 byte so that the subsequent calculations on
    * the number of blocks to allocate are easier...
    */
-
-  umm_heap_context_t *_context = umm_get_current_heap();
 
   if( 0 == size ) {
     DBGLOG_DEBUG( "malloc a block of 0 bytes -> do nothing\n" );
@@ -750,11 +802,19 @@ void *umm_malloc( size_t size ) {
 
   UMM_CRITICAL_ENTRY(id_malloc);
 
-#if 1 // !defined(USE_ISR_SAFE_EXC_WRAPPER)
+  /*
+   * We handle the realloc of an existing IRAM allocation from an ISR with IRAM,
+   * while a new malloc from an ISR will always supply DRAM. That said, realloc
+   * from an ISR is not generally safe without special locking mechanisms and is
+   * not formally supported.
+   *
+   * Additionally, to avoid extending the IRQs disabled period, it is best to
+   * use DRAM for an ISR. Each 16-bit access to IRAM that umm_malloc has to make
+   * requires a pass through the exception handling logic.
+   */
   if (UMM_CRITICAL_WITHINISR(id_malloc)) {
     _context = umm_get_heap_by_id(UMM_HEAP_DRAM);
   }
-#endif
 
   ptr = umm_malloc_core( _context, size );
 
@@ -816,13 +876,6 @@ void *umm_realloc( void *ptr, size_t size ) {
   }
 
   STATS__ALLOC_REQUEST(id_realloc, size);
-
-#if !defined(USE_ISR_SAFE_EXC_WRAPPER)
-  // Require ISR use DRAM for now.
-  if (ETS_INTR_WITHINISR() && UMM_HEAP_DRAM != _context->id) {
-    return( (void *)NULL );
-  }
-#endif
 
   /*
    * Otherwise we need to actually do a reallocation. A naiive approach
@@ -1080,7 +1133,7 @@ void *umm_realloc( void *ptr, size_t size ) {
     } else {
         DBGLOG_DEBUG( "realloc a completely new block %d\n", blocks );
         void *oldptr = ptr;
-        if( (ptr = umm_malloc_core( size )) ) {
+        if( (ptr = umm_malloc_core( _context, size )) ) {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks );
             UMM_CRITICAL_SUSPEND(id_realloc);
             memcpy( ptr, oldptr, curSize );

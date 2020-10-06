@@ -28,11 +28,6 @@ extern "C" {
 #define SOC_CACHE_SIZE 1 // 32KB
 #endif
 
-#ifdef DEV_DEBUG_MMU_IRAM
-// Is this set as part of segment data at load time? appears to be
-mmu_cre_status_t mmu_status = {SOC_CACHE_SIZE, -1, 0, 0, 0, 0, 0};
-#endif
-
 #if (MMU_ICACHE_SIZE == 0x4000)
 /*
  * "Cache_Read_Enable" as in Instruction Read Cache enable, ICACHE.
@@ -104,24 +99,12 @@ typedef void (*fp_Cache_Read_Enable_t)(uint8_t map, uint8_t p, uint8_t v);
 
 void IRAM_ATTR Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v) {
   (void)v;
-#ifdef DEV_DEBUG_MMU_IRAM
-  mmu_status.map = map;
-  mmu_status.p = p;
-  mmu_status.v = v;
-  mmu_status.enable_count++;
-  mmu_status.state = 1;
-  if (0 == mmu_status.enable_count) {
-    mmu_status.enable_count--;   // keep saturated value
-  }
-#endif
-  DBG_MMU_PRINT_IRAM_BANK_REG("before", "Enable");
-
   real_Cache_Read_Enable(map, p, SOC_CACHE_SIZE);
-
-  DBG_MMU_PRINT_IRAM_BANK_REG("after", "Enable");
-  DBG_MMU_PRINT_STATUS();
 }
 
+#ifdef DEV_DEBUG_PRINT
+
+#if 0
 #ifndef ROM_Cache_Read_Disable
 #define ROM_Cache_Read_Disable         0x400047f0
 #endif
@@ -132,22 +115,10 @@ typedef void (*fp_Cache_Read_Disable_t)(void);
  *
  */
 void IRAM_ATTR Cache_Read_Disable(void) {
-#ifdef DEV_DEBUG_MMU_IRAM
-  mmu_status.disable_count++;
-  mmu_status.state = 0;
-  if (0 == mmu_status.disable_count) {
-    mmu_status.disable_count--;   // keep saturated value
-  }
-#endif
-  DBG_MMU_PRINT_IRAM_BANK_REG("before", "Disable");
-
   real_Cache_Read_Disable();
-
-  DBG_MMU_PRINT_IRAM_BANK_REG("after", "Disable");
-  DBG_MMU_PRINT_STATUS();
 }
+#endif
 
-#ifdef DEV_DEBUG_PRINT
 /*
  * Early adjustment for CPU crystal frequency, so debug printing will work.
  * This should not be left enabled all the time in Cashe_Read..., I am concerned

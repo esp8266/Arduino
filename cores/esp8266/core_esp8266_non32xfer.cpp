@@ -47,19 +47,6 @@ extern "C" {
 
 #define EXCCAUSE_LOAD_STORE_ERROR 3 /* Non 32-bit read/write error */
 
-uint32_t mmu_non32xfer_count = 0;
-uint32_t mmu_non32xfer_withinisr_count = 0;
-
-
-// #define DEBUG_WARNING
-//C Do we want to keep this warning
-#ifdef DEBUG_WARNING
-static void warning(void)
-{
-    DBG_MMU_PRINTF("WARNING: The Non-32-bit transfer hander has been invoked, and performance may suffer.\n");
-}
-#endif
-
 static fn_exception_handler_t old_handler = NULL;
 
 static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, uint32_t cause)
@@ -73,14 +60,11 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
        Register a15 was used for epc1, then clobbered for rsr. Maybe an
        __asm("":::"memory") before starting the asm would help for these cases.
        For this instance moved setting epc1 closer to where it was used.
-       Edit. "&"" on output register would have resolved the problem.
+       Edit. "&" on output register would have resolved the problem.
        Refactored to reduce and consolidate register usage.
      */
     uint32_t insn;
     __asm(
-#if !defined(USE_ISR_SAFE_EXC_WRAPPER)
-      "rsil  %0, 15\n\t"         /* Turn IRQs back off, let exit wrapper restore PS */
-#endif
       "movi  %0, ~3\n\t"         /* prepare a mask for the EPC */
       "and   %0, %0, %1\n\t"     /* apply mask for 32bit aligned base */
       "ssa8l %1\n\t"             /* set up shift register for src op */
@@ -91,36 +75,6 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       :"r"(ef->epc)
       :
     );
-    /*
-      This is a concern area - exception handlers are called with interrupts
-      turned back on by _xtos_c_wrapper_handler. Is there something about an
-      exception that would prevent the CPU from servicing an interrupt while in
-      an exception handler?
-
-      New interrupts are blocked by EXCM being set. Once cleared, interrupts
-      above the current INTLEVEL and exceptions (w/o creating a DoubleException)
-      can occur. With USE_ISR_SAFE_EXC_WRAPPER, INTLEVEL is raised to 15 with
-      EXCM cleared. The original ROM _xtos_c_wrapper_handler: set INTLEVEL to 1
-      with EXCM cleared, saved registers, then did an rsil 0, and called the
-      registerd C Exception handler with interrupts fully enabled!
-      Our replacement keeps INTLEVEL at 15. This must be done for umm_malloc to
-      safely work with an IRAM heap from an ISR call.
-     */
-    //C Should we make defined(USE_ISR_SAFE_EXC_WRAPPER) the only build path
-    if (ef->ps & 0x0F) {
-#if !defined(USE_ISR_SAFE_EXC_WRAPPER)
-      if (0 == mmu_non32xfer_withinisr_count) {
-        DBG_MMU_PRINTF("\nload/store exception with INTLEVEL 0x%02X\n", ef->ps & 0x0F);
-        #if 0
-        continue;     /* fail, not safe for IRQ disabled ?? */
-        #endif
-      }
-#endif
-      //C Do we want to keep this tracking
-      if (0 == ++mmu_non32xfer_withinisr_count) {
-        --mmu_non32xfer_withinisr_count;  // saturated
-      }
-    }
 
     uint32_t what = insn & LOAD_MASK;
     uint32_t valmask = 0;
@@ -138,20 +92,6 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       }
     } else {
       continue; /* fail */
-    }
-
-#ifdef DEBUG_WARNING
-    //C Do we want to keep this warning
-    if (0 == mmu_non32xfer_count) {
-      // This may be causing some issues TODO retest with umm_malloc within
-      // interrupt context.
-      schedule_function(warning);
-    }
-#endif
-    //C Do we want to keep this tracking
-    // Some accounting information so we know this is happending.
-    if (0 == ++mmu_non32xfer_count) {
-      --mmu_non32xfer_count;  // saturated
     }
 
     int regno = (insn & 0x0000f0u) >> 4;
@@ -226,7 +166,30 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
   panic();
 }
 
-#if defined(USE_ISR_SAFE_EXC_WRAPPER)
+/*
+  An issue, the Boot ROM "C" wrapper for exception handlers,
+  _xtos_c_wrapper_handler, turns interrupts back on. To address this issue we
+  use our replacement in file `exc-c-wrapper-handler.S`.
+
+  An overview, of an exception at entry: New interrupts are blocked by EXCM
+  being set. Once cleared, interrupts above the current INTLEVEL and exceptions
+  (w/o creating a DoubleException) can occur.
+
+  Using our replacement for _xtos_c_wrapper_handler, INTLEVEL is raised to 15
+  with EXCM cleared.
+
+  The original Boot ROM `_xtos_c_wrapper_handler` would set INTLEVEL to 1 with
+  EXCM cleared, saved registers, then do a `rsil 0`, and called the registered
+  "C" Exception handler with interrupts fully enabled! Our replacement keeps
+  INTLEVEL at 15. This is needed to support the Arduino model of interrupts
+  disabled while an ISR runs.
+
+  And we also need it for umm_malloc to work safely with an IRAM heap from an
+  ISR call. While malloc() will supply DRAM for all allocation from an ISR,
+  we want free() to safely operate from an ISR to avoid a leak potential.
+
+  This alternative "C" Wrapper is only applied to this exception handler.
+ */
 
 #define ROM_xtos_c_wrapper_handler (reinterpret_cast<_xtos_handler>(0x40000598))
 
@@ -246,16 +209,5 @@ void IRAM_ATTR install_non32xfer_exception_handler(void) {
     _set_exception_handler_wrapper(EXCCAUSE_LOAD_STORE_ERROR);
   }
 }
-
-#else
-void IRAM_ATTR install_non32xfer_exception_handler(void)
-{
-  if (NULL == old_handler) {
-    old_handler =
-    _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR,
-      non32xfer_exception_handler);
-  }
-}
-#endif
 
 };

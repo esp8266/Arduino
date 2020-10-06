@@ -22,21 +22,6 @@
 #include <assert.h>
 #include <esp8266_undocumented.h>
 
-/*
- * DEV_DEBUG_MMU_IRAM:
- *   Debug printing for developing mmu_iram. I don't think it would be usful for
- *   general debugging.
- *
- * DEV_DEBUG_PRINT:
- *   Debug printing macros for printing before before, during, and after
- *   NONOS SDK initializes. May or maynot be safe during NONOS SDK
- *   initialization. As in printing from functions called on by the SDK
- *   during the SDK initialization.
- *
- #define DEV_DEBUG_MMU_IRAM
- #define DEV_DEBUG_PRINT
- */
-
 //C This turns on range checking. Is this the value you want to trigger it?
 #ifdef DEBUG_ESP_CORE
 #define DEBUG_ESP_MMU
@@ -47,17 +32,21 @@
 #endif
 
 /*
-  The more I look at _xtos_c_wrapper_handler the more convinced I am that this
-  USE_ISR_SAFE_EXC_WRAPPER is required.
-*/
-#define USE_ISR_SAFE_EXC_WRAPPER
+ * DEV_DEBUG_PRINT:
+ *   Debug printing macros for printing before before, during, and after
+ *   NONOS SDK initializes. May or maynot be safe during NONOS SDK
+ *   initialization. As in printing from functions called on by the SDK
+ *   during the SDK initialization.
+ *
+ #define DEV_DEBUG_PRINT
+ */
 
-#if defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_ESP_MMU)
+#if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
 #include <esp8266_peri.h>
 
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
 
-#if defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM)
+#if defined(DEV_DEBUG_PRINT)
 extern "C" void set_pll(void);
 extern "C" void dbg_set_pll(void);
 
@@ -67,54 +56,17 @@ uart_buff_switch(0); \
 ets_uart_printf(fmt, ##__VA_ARGS__); \
 DBG_MMU_FLUSH(0)
 
-#else
-// ! defined(DEBUG_ESP_MMU)
+#else // ! defined(DEV_DEBUG_PRINT)
 #define DBG_MMU_PRINTF(fmt, ...) ets_uart_printf(fmt, ##__VA_ARGS__)
 #endif
 
-#else     // ! defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_ESP_MMU)
+#else     // ! defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
 #define DBG_MMU_FLUSH(...) do {} while(false)
 #define DBG_MMU_PRINTF(...) do {} while(false)
-#endif    // defined(DEV_DEBUG_PRINT) || defined(DEV_DEBUG_MMU_IRAM) || defined(DEBUG_ESP_MMU)
-
-#ifdef DEV_DEBUG_MMU_IRAM
-#define DBG_MMU_PRINT_STATUS() { \
-    DBG_MMU_PRINTF("\nmmu_status = {" \
-                   "v_cfg = %u, state = %d, enable/disable count = %u/%u, " \
-                   "map = 0x%02X, p = 0x%02X, v = 0x%02X}\n", \
-                   mmu_status.v_cfg, mmu_status.state, \
-                   mmu_status.enable_count, mmu_status.disable_count, \
-                   mmu_status.map, mmu_status.p, mmu_status.v); \
-    DBG_MMU_FLUSH(0); \
-}
-
-#define DBG_MMU_PRINT_IRAM_BANK_REG(a, b) { \
-    uint32_t iram_bank_reg = ESP8266_DREG(0x24); \
-    DBG_MMU_PRINTF("\niram_bank_reg %s%s 0x%08X\n", (0 == a) ? "" : a, (0 == a) ? "" : " Cache_Read_" b, iram_bank_reg); \
-}
-
-#else     // ! DEV_DEBUG_MMU_IRAM
-#define DBG_MMU_PRINT_STATUS(...) do {} while(false)
-#define DBG_MMU_PRINT_IRAM_BANK_REG(...) do {} while(false)
-#endif    // #if DEV_DEBUG_MMU_IRAM
-
+#endif    // defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifdef DEV_DEBUG_MMU_IRAM
-typedef struct MMU_CRE_STATUS {
-  uint32_t v_cfg;
-  int32_t state;      // -1 - not initialized, 0 - disabled, 1 - enabled
-  uint32_t enable_count;
-  uint32_t disable_count;
-  uint32_t map;
-  uint32_t p;
-  uint32_t v;
-}  mmu_cre_status_t;
-
-extern mmu_cre_status_t mmu_status;
 #endif
 
 static inline __attribute__((always_inline))
