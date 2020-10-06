@@ -27,18 +27,6 @@ extern "C" uint32_t _FS_start;
 extern "C" uint32_t _FS_end;
 
 UpdaterClass::UpdaterClass()
-: _async(false)
-, _error(0)
-, _buffer(0)
-, _bufferLen(0)
-, _size(0)
-, _startAddress(0)
-, _currentAddress(0)
-, _command(U_FLASH)
-, _ledPin(-1)
-, _hash(nullptr)
-, _verify(nullptr)
-, _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
@@ -113,6 +101,8 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   _reset();
   clearError(); //  _error = 0
+  _target_md5 = emptyString;
+  _md5 = MD5Builder();
 
 #ifndef HOST_MOCK
   wifi_set_sleep_type(NONE_SLEEP_T);
@@ -280,6 +270,8 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
     free(sig);
+    _size = binSize; // Adjust size to remove signature, not part of bin payload
+
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif

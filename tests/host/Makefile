@@ -6,9 +6,25 @@ LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
+R ?= noexec
 DEFSYM_FS ?= -Wl,--defsym,_FS_start=0x40300000 -Wl,--defsym,_FS_end=0x411FA000 -Wl,--defsym,_FS_page=0x100 -Wl,--defsym,_FS_block=0x2000 -Wl,--defsym,_EEPROM_start=0x411fb000
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
+
+CXX =  $(shell for i in g++-10  g++-9  g++-8  g++;  do which $$i > /dev/null && { echo $$i; break; } done)
+CC  =  $(shell for i in gcc-10  gcc-9  gcc-8  gcc;  do which $$i > /dev/null && { echo $$i; break; } done)
+GCOV = $(shell for i in gcov-10 gcov-9 gcov-8 gcov; do which $$i > /dev/null && { echo $$i; break; } done)
+$(warning using $(CXX))
+ifeq ($(CXX),g++)
+CXXFLAGS += -std=gnu++11
+else
+CXXFLAGS += -std=gnu++17
+endif
+ifeq ($(CC),gcc)
+CFLAGS += -std=gnu11
+else
+CFLAGS += -std=gnu17
+endif
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
@@ -23,7 +39,7 @@ GENHTML ?= genhtml
 ifeq ($(FORCE32),1)
 SIZEOFLONG = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
 ifneq ($(SIZEOFLONG),4)
-$(warning Cannot compile in 32 bit mode, switching to native mode)
+$(warning Cannot compile in 32 bit mode (g++-multilib is missing?), switching to native mode)
 else
 N32 = 32
 M32 = -m32
@@ -153,16 +169,18 @@ DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP
 endif
 
 FLAGS += $(DEBUG) -Wall $(OPTZ) -fno-common -g $(M32)
-FLAGS += -fstack-check -fstack-protector-all
+FLAGS += -fstack-protector-all
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
 FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
-CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
-CFLAGS += -std=c99 $(FLAGS) -funsigned-char
+FLAGS += $(USERCFLAGS)
+CXXFLAGS += -fno-rtti $(FLAGS) -funsigned-char
+CFLAGS += $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
+LDFLAGS += $(USERLDFLAGS)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
 #CXXFLAGS += -Wno-format-security      # cores/esp8266/Print.cpp:42:40: warning: format not a string literal and no format arguments [-Wformat-security] -- (os_printf_plus(not_the_best_way))
@@ -219,13 +237,14 @@ build-info:				# show toolchain version
 	$(CC) -v
 	@echo "CXX: " $(CXX)
 	$(CXX) -v
-	@echo "GCOV: " $(GCOV)
-	$(GCOV) -v
+	@echo "CFLAGS: " $(CFLAGS)
+	@echo "CXXFLAGS: " $(CXXFLAGS)
 	@echo "----------------------------------"
 
 -include $(BINDIR)/.*.d
 .SUFFIXES:
 
+.PRECIOUS: %.c$(E32).o
 %.c$(E32).o: %.c
 	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
@@ -235,7 +254,7 @@ build-info:				# show toolchain version
 
 $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $^
-	ranlib -c $@
+	ranlib $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
 	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@
@@ -276,6 +295,12 @@ OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 		LEAmDNS_Structs.cpp \
 		LEAmDNS_Transfer.cpp \
 		ESP8266mDNS.cpp \
+		LEAmDNS2Host.cpp \
+		LEAmDNS2Host_Control.cpp \
+		LEAmDNS2Host_Debug.cpp \
+		LEAmDNS2Host_Structs.cpp \
+		LEAmDNS2Host_Transfer.cpp \
+		LEAmDNS2_Backbone.cpp \
 	) \
 	ArduinoOTA/ArduinoOTA.cpp \
 	DNSServer/src/DNSServer.cpp \
@@ -313,18 +338,19 @@ ssl:							# download source and build BearSSL
 	cd ../../tools/sdk/ssl && make native$(N32)
 
 ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
-USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
-USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp; do test -r $$ss && echo $$ss; done; done)
+USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src $$d/src/libmad; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
+USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp $$d/src/libmad/*.c; do test -r $$ss && echo $$ss; done; done)
 INC_PATHS += $(USERLIBDIRS)
 INC_PATHS += -I$(INODIR)/..
-CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o)
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o) $(USERCXXSOURCES:.cpp=.cpp$(E32).o)
+C_OBJECTS_CORE_EMU = $(USERCSOURCES:.c=.c$(E32).o)
 
-bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
+bin/fullcore$(E32).a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU) $(C_OBJECTS_CORE_EMU)
 	$(VERBAR) ar -rcu $@ $^
-	$(VERBAR) ranlib -c $@
+	$(VERBAR) ranlib $@
 
-%: %.ino.cpp$(E32).o bin/fullcore.a
-	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
+%: %.ino.cpp$(E32).o bin/fullcore$(E32).a
+	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore$(E32).a $(LIBSSL) -o $@
 	@echo "----> $@ <----"
 
 #################################################
@@ -333,7 +359,12 @@ ifeq ($(INO),)
 
 %: %.ino
 	@# recursive 'make' with paths
-	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Wextra INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@)
+	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Wextra INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@) \
+	    USERCFLAGS="$(USERCFLAGS)" \
+	    USERCSOURCES="$(USERCSOURCES)" \
+	    USERCXXSOURCES="$(USERCXXSOURCES)" \
+	    USERLDFLAGS="$(USERLDFLAGS)"
+	test "$(R)" = noexec || $(BINDIR)/$(notdir $@)/$(notdir $@) $(R)
 	@# see below the new build rule with fixed output path outside from core location
 
 #####################

@@ -34,50 +34,17 @@ static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
+namespace esp8266webserver {
+
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _keepAlive(false)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _currentArgsHavePlain(0)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
-, _corsEnabled(false)
 {
 }
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 : _server(port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _currentArgsHavePlain(0)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
-, _corsEnabled(false)
 {
 }
 
@@ -126,12 +93,12 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen + 1];
+      char *toencode = new (std::nothrow) char[toencodeLen + 1];
       if(toencode == NULL){
         authReq = "";
         return false;
       }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
+      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
       if(encoded == NULL){
         authReq = "";
         delete[] toencode;
@@ -864,3 +831,5 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
     }
     return String(r);
 }
+
+} // namespace

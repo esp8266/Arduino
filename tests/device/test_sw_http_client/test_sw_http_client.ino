@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClientSecureAxTLS.h>
 #include <BSTest.h>
 #include <pgmspace.h>
 
@@ -210,43 +209,6 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
             }
         }
     }
-    //
-    // Same tests with axTLS
-    //
-#if !CORE_MOCK
-    {
-        // small request
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-        axTLS::WiFiClientSecure client;
-#pragma GCC diagnostic pop
-        HTTPClient http;
-        http.begin(client, getenv("SERVER_IP"), 8088, "/", fp);
-        auto httpCode = http.GET();
-        REQUIRE(httpCode == HTTP_CODE_OK);
-        String payload = http.getString();
-        REQUIRE(payload == "hello!!!");
-    }
-    {
-        // request which returns 4000 bytes
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-        axTLS::WiFiClientSecure client;
-#pragma GCC diagnostic pop
-        HTTPClient http;
-        http.begin(client, getenv("SERVER_IP"), 8088, "/data?size=4000", fp);
-        auto httpCode = http.GET();
-        REQUIRE(httpCode == HTTP_CODE_OK);
-        String payload = http.getString();
-        auto len = payload.length();
-        REQUIRE(len == 4000);
-        for (size_t i = 0; i < len; ++i) {
-            if (payload[i] != 'a') {
-                REQUIRE(false);
-            }
-        }
-    }
-#endif
 }
 
 void loop()

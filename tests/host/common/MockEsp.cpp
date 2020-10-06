@@ -208,7 +208,7 @@ uint32_t EspClass::getFlashChipSize(void)
 
 String EspClass::getFullVersion ()
 {
-	return "host-emulation";
+	return "emulation-on-host";
 }
 
 uint32_t EspClass::getFreeContStack()
@@ -221,6 +221,11 @@ void EspClass::resetFreeContStack()
 }
 
 uint32_t EspClass::getCycleCount()
+{
+    return esp_get_cycle_count();
+}
+
+uint32_t esp_get_cycle_count()
 {
     timeval t;
     gettimeofday(&t, NULL);
