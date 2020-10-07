@@ -22,6 +22,7 @@
 #define ESP_H
 
 #include <Arduino.h>
+#include "core_esp8266_features.h"
 #include "spi_vendors.h"
 
 /**
