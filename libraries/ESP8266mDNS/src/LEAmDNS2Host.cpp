@@ -33,7 +33,7 @@
 #ifdef MDNS_IPV4_SUPPORT
 #include <lwip/igmp.h>
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
 #include <lwip/mld6.h>
 #endif
 
@@ -172,7 +172,7 @@ const char* clsLEAMDNSHost::clsConsts::pcUDP                          = "udp";
 #ifdef MDNS_IPV4_SUPPORT
 const char* clsLEAMDNSHost::clsConsts::pcReverseIPv4Domain            = "in-addr";
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
 const char* clsLEAMDNSHost::clsConsts::pcReverseIPv6Domain            = "ip6";
 #endif
 const char* clsLEAMDNSHost::clsConsts::pcReverseTopDomain             = "arpa";
@@ -904,7 +904,7 @@ bool clsLEAMDNSHost::_joinMulticastGroups(void)
             }
 #endif
 
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
             bResult = ((bResult) &&
                        (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
@@ -937,7 +937,7 @@ bool clsLEAMDNSHost::_leaveMulticastGroups()
                 DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
             }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
             if (ERR_OK != mld6_leavegroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6)/*&(multicast_addr_V6.u_addr.ip6)*/))
             {

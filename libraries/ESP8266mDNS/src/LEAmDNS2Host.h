@@ -110,7 +110,7 @@
 
 #define MDNS_IPV4_SUPPORT
 #if LWIP_IPV6
-#define MDNS_IPV6_SUPPORT   // If we've got IPv6 support, then we need IPv6 support :-)
+#define MDNS2_IPV6_SUPPORT   // If we've got IPv6 support, then we need IPv6 support :-)
 #endif
 
 namespace esp8266
@@ -136,7 +136,7 @@ protected:
 #ifdef MDNS_IPV4_SUPPORT
         static constexpr uint16_t   u16IPv4Size                 = 4;        // IPv4 address size in bytes
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
         static constexpr uint16_t   u16IPv6Size                 = 16;       // IPv6 address size in bytes
 #endif
         static constexpr size_t     stServiceTxtMaxLength       = 1300;     // Maximum length for all service txts for one service
@@ -168,7 +168,7 @@ protected:
 #ifdef MDNS_IPV4_SUPPORT
         static const char*      pcReverseIPv4Domain;                        // "in-addr";
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
         static const char*      pcReverseIPv6Domain;                        // "ip6";
 #endif
         static const char*      pcReverseTopDomain;                         // "arpa";
@@ -246,7 +246,7 @@ protected:
 #ifdef MDNS_IPV4_SUPPORT
         V4  =   0x01,
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
         V6  =   0x02,
 #endif
     };
@@ -784,7 +784,7 @@ protected:
         bool clear(void);
     };
 
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     /**
         clsRRAnswerAAAA
     */
@@ -935,7 +935,7 @@ public:
 #ifdef MDNS_IPV4_SUPPORT
                 IPv4Address         = 0x10,     // IPv4 address
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                 IPv6Address         = 0x20,     // IPv6 address
 #endif
             };
@@ -1004,7 +1004,7 @@ public:
 #ifdef MDNS_IPV4_SUPPORT
             clsIPAddressWithTTL::list   m_IPv4Addresses;    // 3. level answer (A, using host domain), eg. 123.456.789.012
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             clsIPAddressWithTTL::list   m_IPv6Addresses;    // 3. level answer (AAAA, using host domain), eg. 1234::09
 #endif
             typeQueryAnswerType         m_QueryAnswerFlags; // enuQueryAnswerType
@@ -1029,7 +1029,7 @@ public:
             const clsIPAddressWithTTL* IPv4AddressAtIndex(uint32_t p_u32Index) const;
             clsIPAddressWithTTL* IPv4AddressAtIndex(uint32_t p_u32Index);
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             bool releaseIPv6Addresses(void);
             bool addIPv6Address(clsIPAddressWithTTL* p_pIPAddress);
             bool removeIPv6Address(clsIPAddressWithTTL* p_pIPAddress);
@@ -1081,7 +1081,7 @@ public:
             bool IPv4AddressAvailable(void) const;
             clsIPAddressVector IPv4Addresses(void) const;
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             bool IPv6AddressAvailable(void) const;
             clsIPAddressVector IPv6Addresses(void) const;
 #endif
@@ -1362,7 +1362,7 @@ protected:
 #ifdef MDNS_IPV4_SUPPORT
     bool _processAAnswer(const clsRRAnswerA* p_pAAnswer);
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     bool _processAAAAAnswer(const clsRRAnswerAAAA* p_pAAAAAnswer);
 #endif
 
@@ -1426,7 +1426,7 @@ protected:
                           uint16_t p_u16RDLength);
     bool _readRRAnswerTXT(clsRRAnswerTXT& p_rRRAnswerTXT,
                           uint16_t p_u16RDLength);
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     bool _readRRAnswerAAAA(clsRRAnswerAAAA& p_rRRAnswerAAAA,
                            uint16_t p_u16RDLength);
 #endif
@@ -1455,7 +1455,7 @@ protected:
     bool _buildDomainForReverseIPv4(IPAddress p_IPv4Address,
                                     clsRRDomain& p_rReverseIPv4Domain) const;
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     bool _buildDomainForReverseIPv6(IPAddress p_IPv4Address,
                                     clsRRDomain& p_rReverseIPv6Domain) const;
 #endif
@@ -1520,7 +1520,7 @@ protected:
                                    clsSendParameter& p_rSendParameter);
     bool _writeMDNSAnswer_TXT(clsService& p_rService,
                               clsSendParameter& p_rSendParameter);
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     bool _writeMDNSAnswer_AAAA(IPAddress p_IPAddress,
                                clsSendParameter& p_rSendParameter);
     bool _writeMDNSAnswer_PTR_IPv6(IPAddress p_IPAddress,
@@ -1537,7 +1537,7 @@ protected:
     bool _writeMDNSAnswer_NSEC_PTR_IPv4(IPAddress p_IPAddress,
                                         clsSendParameter& p_rSendParameter);
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     bool _writeMDNSAnswer_NSEC_PTR_IPv6(IPAddress p_IPAddress,
                                         clsSendParameter& p_rSendParameter);
 #endif

@@ -1898,7 +1898,7 @@ bool clsLEAMDNSHost::clsRRAnswerTXT::clear(void)
 
 */
 
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
 /*
     clsLEAMDNSHost::clsRRAnswerAAAA::clsRRAnswerAAAA constructor
 
@@ -2398,7 +2398,7 @@ bool clsLEAMDNSHost::clsQuery::clsAnswer::clear(void)
                (true)
 #endif
                &&
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                (releaseIPv6Addresses())
 #else
                (true)
@@ -2528,7 +2528,7 @@ const clsLEAMDNSHost::clsQuery::clsAnswer::clsIPAddressWithTTL* clsLEAMDNSHost::
 }
 #endif
 
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
 /*
     clsLEAMDNSHost::clsQuery::clsAnswer::releaseIPv6Addresses
 
@@ -2793,7 +2793,7 @@ clsLEAMDNSHost::clsQuery::clsAnswerAccessor::clsIPAddressVector clsLEAMDNSHost::
 }
 #endif
 
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
 /*
     clsLEAMDNSHost::clsQuery::clsAnswerAccessor::IPv6AddressAvailable
 
@@ -2913,7 +2913,7 @@ size_t clsLEAMDNSHost::clsQuery::clsAnswerAccessor::printTo(Print& p_Print) cons
         }
     }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     if (IPv6AddressAvailable())
     {
         stLen += p_Print.print(cpcI);
