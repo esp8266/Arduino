@@ -141,7 +141,7 @@ bool clsLEAMDNSHost::_printRRAnswer(const clsLEAMDNSHost::clsRRAnswer& p_RRAnswe
         }
         break;
     }
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     case DNS_RRTYPE_AAAA:
         DEBUG_OUTPUT.printf_P(PSTR("AAAA IP:%s"), ((clsRRAnswerAAAA*&)p_RRAnswer)->m_IPAddress.toString().c_str());
         break;
@@ -175,7 +175,7 @@ const char* clsLEAMDNSHost::_RRType2Name(uint16_t p_u16RRType) const
 #endif
     case DNS_RRTYPE_PTR:            strcpy_P(acRRName, PSTR("PTR"));   break;
     case DNS_RRTYPE_TXT:            strcpy_P(acRRName, PSTR("TXT"));   break;
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     case DNS_RRTYPE_AAAA:           strcpy_P(acRRName, PSTR("AAAA"));  break;
 #endif
     case DNS_RRTYPE_SRV:            strcpy_P(acRRName, PSTR("SRV"));   break;
@@ -288,7 +288,7 @@ const char* clsLEAMDNSHost::_NSECBitmap2String(const clsNSECBitmap* p_pNSECBitma
     {
         strcat_P(acFlagsString, PSTR("PTR "));  //  4
     }
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
     if (p_pNSECBitmap->getBit(DNS_RRTYPE_AAAA))
     {
         strcat_P(acFlagsString, PSTR("AAAA ")); //  5
