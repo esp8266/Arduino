@@ -236,7 +236,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
 #endif
       // Calculate the MD5 and hash using proper size
-    uint8_t buff[128] __attribute__((aligned(4));
+    uint8_t buff[128] __attribute__((aligned(4)));
     for(int i = 0; i < binSize; i += sizeof(buff)) {
       ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
       size_t read = std::min((int)sizeof(buff), binSize - i);
@@ -435,7 +435,7 @@ bool UpdaterClass::_verifyHeader(uint8_t data) {
 bool UpdaterClass::_verifyEnd() {
     if(_command == U_FLASH) {
 
-        uint8_t buf[4] __attribute__((aligned(4));
+        uint8_t buf[4] __attribute__((aligned(4)));
         if(!ESP.flashRead(_startAddress, (uint32_t *) &buf[0], 4)) {
             _currentAddress = (_startAddress);
             _setError(UPDATE_ERROR_READ);            
