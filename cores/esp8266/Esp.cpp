@@ -720,7 +720,7 @@ bool EspClass::flashWrite(uint32_t offset, const uint32_t *data, size_t size) {
     }
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
-        rc = spi_flash_write_puya(offset, data, size);
+        rc = spi_flash_write_puya(offset, const_cast<uint32_t *>(data), size);
     }
     else
 #endif // PUYA_SUPPORT
@@ -765,8 +765,8 @@ bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size) {
             if (spi_flash_read(offset + currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
                 return false;
             }
-            for (int i = 0; i < size - currentOffset; i++) {
-                tempData[i] &= ((uint8_t *)data)[currentOffset + i];
+            for (size_t i = 0; i < size - currentOffset; i++) {
+                ((uint8_t *)tempData)[i] &= ((uint8_t *)data)[currentOffset + i];
             }
             if (spi_flash_write(currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
                 return false;
