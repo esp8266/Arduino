@@ -32,7 +32,6 @@ extern "C" {
 int32_t flash_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
     optimistic_yield(10000);
 
-    uint32_t result = FLASH_HAL_OK;
     // We use flashRead overload that handles proper alignment
     if (ESP.flashRead(addr, dst, size)) {
         return FLASH_HAL_OK;
