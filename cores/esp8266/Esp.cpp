@@ -713,38 +713,124 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
 }
 #endif
 
-bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
+bool EspClass::flashWrite(uint32_t offset, const uint32_t *data, size_t size) {
     SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
-    size_t sizeAligned = size & ~3;
+    if ((uintptr_t)data % 4 != 0 || size % 4 != 0) {
+        return false;
+    }
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
-        rc = spi_flash_write_puya(offset, data, sizeAligned);
+        rc = spi_flash_write_puya(offset, data, size);
     }
     else
-#endif
+#endif // PUYA_SUPPORT
     {
-        rc = spi_flash_write(offset, data, sizeAligned);
-    }
-    if (sizeAligned < size && rc == SPI_FLASH_RESULT_OK) {
-        uint32_t tempData;
-        SpiFlashOpResult rc = spi_flash_read(offset + sizeAligned, &tempData, 4);
-        if (rc == SPI_FLASH_RESULT_OK) {
-            memcpy(&tempData, (uint8_t *)data + sizeAligned, size - sizeAligned);
-            rc = spi_flash_write(offset + sizeAligned, &tempData, 4);
-        }
+        rc = spi_flash_write(offset, const_cast<uint32_t *>(data), size);
     }
     return rc == SPI_FLASH_RESULT_OK;
 }
 
-bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
+static const int UNALIGNED_WRITE_BUFFER_SIZE = 512;
+
+bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size) {
     size_t sizeAligned = size & ~3;
-    auto rc = spi_flash_read(offset, data, sizeAligned);
-    if (sizeAligned < size && rc == SPI_FLASH_RESULT_OK) {
-        uint32_t tempData;
-        rc = spi_flash_read(offset + sizeAligned, &tempData, 4);
-        memcpy((uint8_t *)data + sizeAligned, &tempData, size - sizeAligned);
+    size_t currentOffset = 0;
+    if ((uintptr_t)data % 4 != 0) {
+        // Memory is unaligned, so we need to copy it to an aligned buffer
+        uint32_t alignedData[UNALIGNED_WRITE_BUFFER_SIZE / sizeof(uint32_t)] __attribute__((aligned(4)));
+        size_t sizeLeft = sizeAligned;
+
+        while (sizeLeft) {
+            size_t willCopy = std::min(sizeLeft, sizeof(alignedData));
+            memcpy(alignedData, data + currentOffset, willCopy);
+            // We now have data and size aligned to 4 bytes, so we can use aligned write
+            if (!flashWrite(offset + currentOffset, alignedData, willCopy))
+            {
+                return false;
+            }
+            sizeLeft -= willCopy;
+            currentOffset += willCopy;
+        }
+    } else {
+        if (!flashWrite(offset, data, sizeAligned)) {
+            return false;
+        }
+        currentOffset = sizeAligned;
     }
-    return rc == SPI_FLASH_RESULT_OK;
+    if (currentOffset < size) {
+        // Size was not aligned, but writes must be 4-byte aligned
+#if PUYA_SUPPORT
+        if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
+            uint32_t tempData;
+            if (spi_flash_read(offset + currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+                return false;
+            }
+            for (int i = 0; i < size - currentOffset; i++) {
+                tempData[i] &= ((uint8_t *)data)[currentOffset + i];
+            }
+            if (spi_flash_write(currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+                return false;
+            }
+        }
+        else
+#endif // PUYA_SUPPORT
+        {
+            uint32_t tempData;
+            if (spi_flash_read(offset + currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+                return false;
+            }
+            memcpy(&tempData, (uint8_t *)data + currentOffset, size - currentOffset);
+            if (spi_flash_write(offset + currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint8_t *data, size_t size) {
+    size_t sizeAligned = size & ~3;
+    size_t currentOffset = 0;
+
+    if ((uintptr_t)data % 4 != 0) {
+        uint32_t alignedData[UNALIGNED_WRITE_BUFFER_SIZE / sizeof(uint32_t)] __attribute__((aligned(4)));
+        size_t sizeLeft = sizeAligned;
+
+        while (sizeLeft) {
+            size_t willCopy = std::min(sizeLeft, sizeof(alignedData));
+            // We read to our aligned buffer and then copy to data
+            if (!flashRead(offset + currentOffset, alignedData, willCopy))
+            {
+                return false;
+            }
+            memcpy(data + currentOffset, alignedData, willCopy);
+            sizeLeft -= willCopy;
+            currentOffset += willCopy;
+        }
+    } else {
+        if (!flashRead(offset, data, sizeAligned)) {
+            return false;
+        }
+        currentOffset = sizeAligned;
+    }
+
+    if (currentOffset < size) {
+        uint32_t tempData;
+        if (spi_flash_read(offset + currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+            return false;
+        }
+        memcpy((uint8_t *)data + currentOffset, &tempData, size - currentOffset);
+    }
+
+    return true;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
+    if ((uintptr_t)data % 4 != 0 || size % 4 != 0) {
+        return false;
+    }
+    return (spi_flash_read(offset, data, size) == SPI_FLASH_RESULT_OK);
 }
 
 String EspClass::getSketchMD5()
