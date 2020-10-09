@@ -752,7 +752,8 @@ bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size) {
             currentOffset += willCopy;
         }
     } else {
-        if (!flashWrite(offset, data, sizeAligned)) {
+        // Pointer is properly aligned, so use aligned write
+        if (!flashWrite(offset, (uint32_t *)data, sizeAligned)) {
             return false;
         }
         currentOffset = sizeAligned;
@@ -809,7 +810,8 @@ bool EspClass::flashRead(uint32_t offset, uint8_t *data, size_t size) {
             currentOffset += willCopy;
         }
     } else {
-        if (!flashRead(offset, data, sizeAligned)) {
+        // Pointer is properly aligned, so use aligned read
+        if (!flashRead(offset, (uint32_t *)data, sizeAligned)) {
             return false;
         }
         currentOffset = sizeAligned;
