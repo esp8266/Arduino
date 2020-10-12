@@ -747,7 +747,7 @@ size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data
     // Memory is unaligned, so we need to copy it to an aligned buffer
     uint32_t alignedData[FLASH_PAGE_SIZE / sizeof(uint32_t)] __attribute__((aligned(4)));
     // Handle page boundary
-    bool pageBreak = ((address % 4) != 0) && ((address / FLASH_PAGE_SIZE) != ((address + sizeLeft) / FLASH_PAGE_SIZE));
+    bool pageBreak = ((address % 4) != 0) && ((address / FLASH_PAGE_SIZE) != ((address + sizeLeft - 1) / FLASH_PAGE_SIZE));
 
     if (pageBreak) {
         size_t byteCount = 4 - (address % 4);
@@ -801,7 +801,7 @@ bool EspClass::flashWritePageBreak(uint32_t address, const uint8_t *data, size_t
 
 bool EspClass::flashWrite(uint32_t address, const uint32_t *data, size_t size) {
     SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
-    bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + size) / FLASH_PAGE_SIZE));
+    bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + size - 1) / FLASH_PAGE_SIZE));
 
     if ((uintptr_t)data % 4 != 0 || size % 4 != 0 || pageBreak) {
         return false;
@@ -835,7 +835,7 @@ bool EspClass::flashWrite(uint32_t address, const uint8_t *data, size_t size) {
             currentOffset += written;
             sizeLeft -= written;
         } else {
-            bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + sizeLeft) / FLASH_PAGE_SIZE));
+            bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + sizeLeft - 1) / FLASH_PAGE_SIZE));
 
             if (pageBreak) {
                 while (sizeLeft) {
@@ -880,7 +880,7 @@ bool EspClass::flashWrite(uint32_t address, const uint8_t *data, size_t size) {
     if (sizeLeft > 0) {
         // Size was not aligned, so we have some bytes left to write, we also need to recheck for
         // page boundary crossing
-        bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + sizeLeft) / FLASH_PAGE_SIZE));
+        bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + sizeLeft - 1) / FLASH_PAGE_SIZE));
 
         if (pageBreak) {
             // Cross the page boundary
