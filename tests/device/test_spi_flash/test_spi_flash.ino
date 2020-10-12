@@ -20,13 +20,30 @@ bool pretest()
     return true;
 }
 
-void dumpBuffer(uint8_t *buffer, size_t len)
+bool compareBuffers(uint32_t *first, uint32_t *second, size_t offset, size_t len)
 {
-    for (size_t i = 0; i < len; i++)
+    uint8_t *firstBytes = (uint8_t *)first;
+    uint8_t *secondBytes = (uint8_t *)second;
+
+    for (size_t i = offset; i < offset + len; i++)
     {
-        Serial.printf("%02x ", buffer[i]);
+        if (firstBytes[i] != secondBytes[i])
+        {
+            Serial.printf("Compare fail @ %u\n", i);
+            for (size_t j = i & ~3; j < (i & ~3) + 4; j++)
+            {
+                Serial.printf("%02x ", firstBytes[j]);
+            }
+            Serial.println();
+            for (size_t j = i & ~3; j < (i & ~3) + 4; j++)
+            {
+                Serial.printf("%02x ", secondBytes[j]);
+            }
+            Serial.println();
+            return false;
+        }
     }
-    Serial.println();
+    return true;
 }
 
 bool testFlash(uint32_t start_offset, uint8_t data_offset, size_t amount)
@@ -54,11 +71,8 @@ bool testFlash(uint32_t start_offset, uint8_t data_offset, size_t amount)
         Serial.printf("Read fail\n");
         return false;
     }
-    if (memcmp((uint8_t *)write_buffer + data_offset, (uint8_t *)read_buffer + data_offset, amount) != 0)
+    if (!compareBuffers(write_buffer, read_buffer, data_offset, amount))
     {
-        Serial.printf("Compare fail\n");
-        dumpBuffer((uint8_t *)write_buffer, 8);
-        dumpBuffer((uint8_t *)read_buffer, 8);
         return false;
     }
     Serial.printf("Write took %lu us\n", micros() - start);
