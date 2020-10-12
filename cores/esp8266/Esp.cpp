@@ -715,14 +715,14 @@ bool EspClass::flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_
     }
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
-        uint32_t tempData;
-        if (spi_flash_read(alignedAddress, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+        uint8_t tempData[4] __attribute__((aligned(4)));
+        if (spi_flash_read(alignedAddress, (uint32_t *)tempData, 4) != SPI_FLASH_RESULT_OK) {
             return false;
         }
         for (size_t i = 0; i < byteCount; i++) {
-            ((uint8_t *)tempData)[i + alignmentOffset] &= value[i];
+            tempData[i + alignmentOffset] &= value[i];
         }
-        if (spi_flash_write(alignedAddress, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+        if (spi_flash_write(alignedAddress, (uint32_t *)tempData, 4) != SPI_FLASH_RESULT_OK) {
             return false;
         }
     }
