@@ -1,6 +1,8 @@
 #include <BSTest.h>
 #include <ESP8266WiFi.h>
 
+BS_ENV_DECLARE();
+
 void preinit() {
     // (no C++ in function)
     // disable wifi
@@ -59,7 +61,7 @@ bool testFlash(uint32_t start_offset, uint8_t data_offset, size_t amount)
         dumpBuffer((uint8_t *)read_buffer, 8);
         return false;
     }
-    Serial.printf("Write took %lu us\n", DL::Timing::diff(start, micros()));
+    Serial.printf("Write took %lu us\n", micros() - start);
     return true;
 }
 
