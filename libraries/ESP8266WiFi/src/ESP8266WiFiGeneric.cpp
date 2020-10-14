@@ -827,13 +827,19 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
             }
         }
         // state->state.fwconfig.bssid is not real bssid (it's what user may have provided when bssid_set==1)
-        if (WiFi.begin((const char*)state->state.fwconfig.ssid,
+	auto beginResult = WiFi.begin((const char*)state->state.fwconfig.ssid,
                        (const char*)state->state.fwconfig.password,
                        state->state.channel,
                        nullptr/*(const uint8_t*)state->state.fwconfig.bssid*/,  // <- try with gw's mac address?
-                       true) == WL_CONNECT_FAILED)
+                       true);
+        if (beginResult == WL_CONNECT_FAILED)
         {
             DEBUG_WIFI("core: resume: WiFi.begin failed\n");
+            return false;
+        }
+        if (beginResult == WL_WRONG_PASSWORD)
+        {
+            DEBUG_WIFI("core: resume: WiFi.begin wrong password\n");
             return false;
         }
     }
