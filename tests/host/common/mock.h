@@ -62,12 +62,14 @@ extern "C" {
 // TODO: #include <stdlib_noniso.h> ?
 char* itoa (int val, char *s, int radix);
 char* ltoa (long val, char *s, int radix);
-#ifdef __cplusplus
-}
-#endif
+
 
 size_t strlcat(char *dst, const char *src, size_t size);
 size_t strlcpy(char *dst, const char *src, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 // exotic typedefs used in the sdk
 
