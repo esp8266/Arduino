@@ -22,6 +22,9 @@ ESP8266WiFiMulti wifiMulti;
 const uint32_t connectTimeoutMs = 5000;
 
 void setup() {
+  // Don't save WiFi configuration in flash - optional
+  WiFi.persistent(false);
+
   Serial.begin(115200);
   Serial.println("\nESP8266 Multi WiFi example");
 
