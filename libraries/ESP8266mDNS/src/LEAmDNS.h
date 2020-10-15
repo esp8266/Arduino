@@ -164,6 +164,10 @@ namespace MDNSImplementation
 */
 #define MDNS_QUERYSERVICES_WAIT_TIME    1000
 
+/*
+    Timeout for udpContext->sendtimeout()
+*/
+#define MDNS_UDPCONTEXT_TIMEOUT  50
 
 /**
     MDNSResponder
@@ -185,6 +189,8 @@ public:
     {
         return begin(p_strHostname.c_str(), p_IPAddress, p_u32TTL);
     }
+    bool _joinMulticastGroups(void);
+    bool _leaveMulticastGroups(void);
 
     // Finish MDNS processing
     bool close(void);
@@ -1184,6 +1190,7 @@ protected:
         ~stcMDNSSendParameter(void);
 
         bool clear(void);
+        bool clearCachedNames(void);
 
         bool shiftOffset(uint16_t p_u16Shift);
 
@@ -1199,12 +1206,8 @@ protected:
     UdpContext*                     m_pUDPContext;
     char*                           m_pcHostname;
     stcMDNSServiceQuery*            m_pServiceQueries;
-    WiFiEventHandler                m_DisconnectedHandler;
-    WiFiEventHandler                m_GotIPHandler;
     MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
-    bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
-    const netif*                    m_netif; // network interface to run on
 
     /** CONTROL **/
     /* MAINTENANCE */
@@ -1258,11 +1261,6 @@ protected:
     bool _sendMDNSQuery(const stcMDNS_RRDomain& p_QueryDomain,
                         uint16_t p_u16QueryType,
                         stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
-
-    const IPAddress _getResponseMulticastInterface() const
-    {
-        return IPAddress(m_netif->ip_addr);
-    }
 
     uint8_t _replyMaskForHost(const stcMDNS_RRHeader& p_RRHeader,
                               bool* p_pbFullNameMatch = 0) const;

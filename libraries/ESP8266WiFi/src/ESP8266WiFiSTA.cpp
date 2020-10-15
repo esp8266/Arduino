@@ -624,8 +624,9 @@ wl_status_t ESP8266WiFiSTAClass::status() {
         case STATION_NO_AP_FOUND:
             return WL_NO_SSID_AVAIL;
         case STATION_CONNECT_FAIL:
-        case STATION_WRONG_PASSWORD:
             return WL_CONNECT_FAILED;
+        case STATION_WRONG_PASSWORD:
+            return WL_WRONG_PASSWORD;
         case STATION_IDLE:
             return WL_IDLE_STATUS;
         default:
