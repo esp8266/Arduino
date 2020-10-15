@@ -22,6 +22,7 @@
 
 */
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS_Priv.h"
 #include "LEAmDNS_lwIPdefs.h"
 
@@ -787,7 +788,7 @@ bool MDNSResponder::stcMDNS_RRDomain::compare(const stcMDNS_RRDomain& p_Other) c
         {
             if (*((unsigned char*)pT))              // Not 0
             {
-                pT += (1 + * ((unsigned char*)pT)); // Shift by length byte and lenght
+                pT += (1 + * ((unsigned char*)pT)); // Shift by length byte and length
                 pO += (1 + * ((unsigned char*)pO));
             }
             else                                    // Is 0 -> Successfully reached the end
@@ -2407,12 +2408,25 @@ bool MDNSResponder::stcMDNSSendParameter::clear(void)
         delete m_pQuestions;
         m_pQuestions = pNext;
     }
+
+    return clearCachedNames();;
+}
+/*
+    MDNSResponder::stcMDNSSendParameter::clear cached names
+*/
+bool MDNSResponder::stcMDNSSendParameter::clearCachedNames(void)
+{
+
+    m_u16Offset = 0;
+
     while (m_pDomainCacheItems)
     {
         stcDomainCacheItem* pNext = m_pDomainCacheItems->m_pNext;
         delete m_pDomainCacheItems;
         m_pDomainCacheItems = pNext;
     }
+    m_pDomainCacheItems = nullptr;
+
     return true;
 }
 
