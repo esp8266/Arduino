@@ -74,6 +74,13 @@ def main():
         outdir = os.path.dirname(args.out)
         if not os.path.exists(outdir):
             os.makedirs(outdir)
+        try:
+            with open(args.out, "r") as inp:
+                old_val = inp.read()
+                if old_val == val:
+                    return
+        except Exception:
+            pass
         with open(args.out, "w") as f:
             f.write(val)
         return 0
