@@ -827,7 +827,7 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
             }
         }
         // state->state.fwconfig.bssid is not real bssid (it's what user may have provided when bssid_set==1)
-	auto beginResult = WiFi.begin((const char*)state->state.fwconfig.ssid,
+        auto beginResult = WiFi.begin((const char*)state->state.fwconfig.ssid,
                        (const char*)state->state.fwconfig.password,
                        state->state.channel,
                        nullptr/*(const uint8_t*)state->state.fwconfig.bssid*/,  // <- try with gw's mac address?
