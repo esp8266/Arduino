@@ -686,7 +686,7 @@ String ESP8266WiFiSTAClass::BSSIDstr(void) {
  * Return the current network RSSI.
  * @return  RSSI value
  */
-int32_t ESP8266WiFiSTAClass::RSSI(void) {
+int8_t ESP8266WiFiSTAClass::RSSI(void) {
     return wifi_station_get_rssi();
 }
 
