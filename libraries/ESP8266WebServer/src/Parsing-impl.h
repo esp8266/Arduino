@@ -32,6 +32,8 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
+namespace esp8266webserver {
+
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
@@ -569,3 +571,5 @@ bool ESP8266WebServerTemplate<ServerType>::_parseFormUploadAborted(){
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }
+
+} // namespace
