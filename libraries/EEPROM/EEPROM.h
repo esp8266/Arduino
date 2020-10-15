@@ -68,9 +68,9 @@ public:
 
 protected:
   uint32_t _sector;
-  uint8_t* _data;
-  size_t _size;
-  bool _dirty;
+  uint8_t* _data = nullptr;
+  size_t _size = 0;
+  bool _dirty = false;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)

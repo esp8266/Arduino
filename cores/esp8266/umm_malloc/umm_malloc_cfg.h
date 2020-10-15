@@ -17,9 +17,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <debug.h>
+
 #include <pgmspace.h>
-#include <esp8266_undocumented.h>
+#include "../debug.h"
+#include "../esp8266_undocumented.h"
 
 #ifdef __cplusplus
 extern "C" {

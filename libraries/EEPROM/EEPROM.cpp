@@ -35,17 +35,11 @@ extern "C" uint32_t _EEPROM_start;
 
 EEPROMClass::EEPROMClass(uint32_t sector)
 : _sector(sector)
-, _data(0)
-, _size(0)
-, _dirty(false)
 {
 }
 
 EEPROMClass::EEPROMClass(void)
 : _sector((((uint32_t)&_EEPROM_start - 0x40200000) / SPI_FLASH_SEC_SIZE))
-, _data(0)
-, _size(0)
-, _dirty(false)
 {
 }
 

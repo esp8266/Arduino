@@ -218,7 +218,7 @@ bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
                             (true)
 #endif
                             &&
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                             (m_pUDPContext->getRemoteAddress().isV6()) &&
                             (ip6_addr_islinklocal(ip_2_ip6((const ip_addr_t*)m_pUDPContext->getRemoteAddress())))
 #else
@@ -304,7 +304,7 @@ bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
                                     sendParameter.m_u32HostReplyMask &= ~static_cast<uint32_t>(enuContentFlag::PTR_IPv4);
                                 }
                         #endif
-                        #ifdef MDNS_IPV6_SUPPORT
+                        #ifdef MDNS2_IPV6_SUPPORT
                                 if (u32HostMatchMask & static_cast<uint32_t>(enuContentFlag::PTR_IPv6))
                                 {
                                     // IPv6 PTR was asked for, but is already known -> skipping
@@ -330,7 +330,7 @@ bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
                         else if (u32HostMatchMask & static_cast<uint32_t>(enuContentFlag::AAAA))
                         {
                             // IPv6 address was asked for
-                        #ifdef MDNS_IPV6_SUPPORT
+                        #ifdef MDNS2_IPV6_SUPPORT
                             if ((enuAnswerType::AAAA == pKnownRRAnswer->answerType()) &&
                                 (((stcRRAnswerAAAA*)pKnownRRAnswer)->m_IPAddress == _getResponderIPAddress(pNetIf, enuIPProtocolType::V6)))
                             {
@@ -381,7 +381,7 @@ bool clsLEAMDNSHost::_parseQuery(netif* pNetIf,
                                 }
                             }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                             if (enuAnswerType::AAAA == pKnownRRAnswer->answerType())
                             {
                                 IPAddress   localIPAddress(_getResponderIPAddress(pNetIf, enuIPProtocolType::V6));
@@ -775,7 +775,7 @@ bool clsLEAMDNSHost::_processAnswers(netif* pNetIf, const clsLEAMDNSHost::clsRRA
                     bResult = _processAAnswer((clsRRAnswerA*)pRRAnswer);
                 }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                 // AAAA -> IPv6Address
                 else if (enuAnswerType::AAAA == pRRAnswer->answerType())
                 {
@@ -802,7 +802,7 @@ bool clsLEAMDNSHost::_processAnswers(netif* pNetIf, const clsLEAMDNSHost::clsRRA
                             bPossibleEcho = true;
                         }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                         if ((enuAnswerType::AAAA == pRRAnswer->answerType()) &&
                                 (((clsRRAnswerAAAA*)pRRAnswer)->m_IPAddress == _getResponderIPAddress(pNetIf, enuIPProtocolType::V6)))
                         {
@@ -1159,7 +1159,7 @@ bool clsLEAMDNSHost::_processAAnswer(const clsLEAMDNSHost::clsRRAnswerA* p_pAAns
 }
 #endif
 
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
 /*
     clsLEAmDNS2_Host::_processAAAAAnswer (level 3)
 */
@@ -1298,7 +1298,7 @@ bool clsLEAMDNSHost::_updateProbeStatus()
                          true
             #endif
                      ) || (
-            #ifdef MDNS_IPV6_SUPPORT
+            #ifdef MDNS2_IPV6_SUPPORT
                          _getResponderIPAddress(pNetIf, enuIPProtocolType::V6).isSet()                             // OR has IPv6 address
             #else
                          true
@@ -1511,7 +1511,7 @@ bool clsLEAMDNSHost::_sendHostProbe()
 #ifdef MDNS_IPV4_SUPPORT
         sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::A);       // Add A answer
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
         sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::AAAA);    // Add AAAA answer
 #endif
     }
@@ -1705,7 +1705,7 @@ bool clsLEAMDNSHost::_announce(bool p_bAnnounce,
         sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::A);                   // A answer
         sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::PTR_IPv4);            // PTR_IPv4 answer
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
         sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::AAAA);                // AAAA answer
         sendParameter.m_u32HostReplyMask |= static_cast<uint32_t>(enuContentFlag::PTR_IPv6);            // PTR_IPv6 answer
 #endif
@@ -1892,7 +1892,7 @@ bool clsLEAMDNSHost::_checkQueryCache()
                         pQAnswer->releaseIPv4Addresses();
                         queryAnswerContentFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv4Address);
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                         pQAnswer->releaseIPv6Addresses();
                         queryAnswerContentFlags |= static_cast<clsQuery::clsAnswer::typeQueryAnswerType>(clsQuery::clsAnswer::enuQueryAnswerType::IPv6Address);
 #endif
@@ -1991,7 +1991,7 @@ bool clsLEAMDNSHost::_checkQueryCache()
                     pQAnswer->removeIPv4Address(pIPv4Address);
                 }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
                 // IPv6Address (from AAAA)
                 clsQuery::clsAnswer::clsIPAddressWithTTL::list expiredIPv6Addresses;
                 bool                                    bAAAAUpdateQuerySent = false;
@@ -2095,7 +2095,7 @@ uint32_t clsLEAMDNSHost::_replyMaskForHost(netif* pNetIf,
                 u32ReplyMask |= static_cast<uint32_t>(enuContentFlag::PTR_IPv4);
             }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             clsRRDomain    reverseIPv6Domain;
             if ((_getResponderIPAddress(pNetIf, enuIPProtocolType::V6).isSet()) &&
                     (_buildDomainForReverseIPv6(_getResponderIPAddress(pNetIf, enuIPProtocolType::V6), reverseIPv6Domain)) &&
@@ -2121,7 +2121,7 @@ uint32_t clsLEAMDNSHost::_replyMaskForHost(netif* pNetIf,
                 u32ReplyMask |= static_cast<uint32_t>(enuContentFlag::A);
             }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#ifdef MDNS2_IPV6_SUPPORT
             if ((DNS_RRTYPE_AAAA == p_RRHeader.m_Attributes.m_u16Type) ||
                     (DNS_RRTYPE_ANY == p_RRHeader.m_Attributes.m_u16Type))
             {

@@ -35,17 +35,15 @@
 
 class Print {
     private:
-        int write_error;
+        int write_error = 0;
         template<typename T> size_t printNumber(T n, uint8_t base);
         template<typename T, typename... P> inline size_t _println(T v, P... args);
-protected:
+    protected:
         void setWriteError(int err = 1) {
             write_error = err;
         }
     public:
-        Print() :
-                write_error(0) {
-        }
+        Print() {}
 
         int getWriteError() {
             return write_error;
