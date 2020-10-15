@@ -2408,12 +2408,25 @@ bool MDNSResponder::stcMDNSSendParameter::clear(void)
         delete m_pQuestions;
         m_pQuestions = pNext;
     }
+
+    return clearCachedNames();;
+}
+/*
+    MDNSResponder::stcMDNSSendParameter::clear cached names
+*/
+bool MDNSResponder::stcMDNSSendParameter::clearCachedNames(void)
+{
+
+    m_u16Offset = 0;
+
     while (m_pDomainCacheItems)
     {
         stcDomainCacheItem* pNext = m_pDomainCacheItems->m_pNext;
         delete m_pDomainCacheItems;
         m_pDomainCacheItems = pNext;
     }
+    m_pDomainCacheItems = nullptr;
+
     return true;
 }
 
