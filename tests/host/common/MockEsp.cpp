@@ -159,7 +159,15 @@ FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 	return FM_DOUT;
 }
 
-bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size)
+bool EspClass::flashWrite(uint32_t offset, const uint32_t *data, size_t size)
+{
+	(void)offset;
+	(void)data;
+	(void)size;
+	return true;
+}
+
+bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size)
 {
 	(void)offset;
 	(void)data;
@@ -168,6 +176,14 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size)
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size)
+{
+	(void)offset;
+	(void)data;
+	(void)size;
+	return true;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint8_t *data, size_t size)
 {
 	(void)offset;
 	(void)data;

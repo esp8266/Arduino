@@ -82,7 +82,11 @@ namespace esp8266webserver {
 template<typename ServerType>
 class ESP8266WebServerTemplate;
 
+}
+
 #include "detail/RequestHandler.h"
+
+namespace esp8266webserver {
 
 template<typename ServerType>
 class ESP8266WebServerTemplate
@@ -259,35 +263,35 @@ protected:
 
   ServerType  _server;
   ClientType  _currentClient;
-  HTTPMethod  _currentMethod;
+  HTTPMethod  _currentMethod = HTTP_ANY;
   String      _currentUri;
-  uint8_t     _currentVersion;
-  HTTPClientStatus _currentStatus;
-  unsigned long _statusChange;
-  bool _keepAlive;
+  uint8_t     _currentVersion = 0;
+  HTTPClientStatus _currentStatus = HC_NONE;
+  unsigned long _statusChange = 0;
 
-  RequestHandlerType*  _currentHandler;
-  RequestHandlerType*  _firstHandler;
-  RequestHandlerType*  _lastHandler;
+  RequestHandlerType*  _currentHandler = nullptr;
+  RequestHandlerType*  _firstHandler = nullptr;
+  RequestHandlerType*  _lastHandler = nullptr;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
 
-  int              _currentArgCount;
-  RequestArgument* _currentArgs;
-  int              _currentArgsHavePlain;
+  int              _currentArgCount = 0;
+  RequestArgument* _currentArgs = nullptr;
+  int              _currentArgsHavePlain = 0;
   std::unique_ptr<HTTPUpload> _currentUpload;
-  int              _postArgsLen;
-  RequestArgument* _postArgs;
+  int              _postArgsLen = 0;
+  RequestArgument* _postArgs = nullptr;
 
-  int              _headerKeysCount;
-  RequestArgument* _currentHeaders;
+  int              _headerKeysCount = 0;
+  RequestArgument* _currentHeaders = nullptr;
 
-  size_t           _contentLength;
+  size_t           _contentLength = 0;
   String           _responseHeaders;
 
   String           _hostHeader;
-  bool             _chunked;
-  bool             _corsEnabled;
+  bool             _chunked = false;
+  bool             _corsEnabled = false;
+  bool             _keepAlive = false;
 
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
@@ -296,12 +300,10 @@ protected:
   HookFunction     _hook;
 };
 
+} // namespace
 
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
-
-};
-
 
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;

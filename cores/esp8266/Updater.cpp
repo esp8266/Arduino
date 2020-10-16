@@ -29,18 +29,6 @@ extern "C" uint32_t _SKETCH_AREA_end;
 
 
 UpdaterClass::UpdaterClass()
-: _async(false)
-, _error(0)
-, _buffer(0)
-, _bufferLen(0)
-, _size(0)
-, _startAddress(0)
-, _currentAddress(0)
-, _command(U_FLASH)
-, _ledPin(-1)
-, _hash(nullptr)
-, _verify(nullptr)
-, _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
@@ -253,7 +241,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
 #endif
       // Calculate the MD5 and hash using proper size
-    uint8_t buff[128];
+    uint8_t buff[128] __attribute__((aligned(4)));
     for(int i = 0; i < binSize; i += sizeof(buff)) {
       ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
       size_t read = std::min((int)sizeof(buff), binSize - i);
@@ -272,7 +260,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       _reset();
       return false;
     }
-    ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
+    ESP.flashRead(_startAddress + binSize, sig, sigLen);
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
     for (size_t i=0; i<sigLen; i++) {
@@ -374,7 +362,7 @@ bool UpdaterClass::_writeBuffer(){
   
   if (eraseResult) {
     if(!_async) yield();
-    writeResult = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+    writeResult = ESP.flashWrite(_currentAddress, _buffer, _bufferLen);
   } else { // if erase was unsuccessful
     _currentAddress = (_startAddress + _size);
     _setError(UPDATE_ERROR_ERASE);
@@ -452,7 +440,7 @@ bool UpdaterClass::_verifyHeader(uint8_t data) {
 bool UpdaterClass::_verifyEnd() {
     if(_command == U_FLASH) {
 
-        uint8_t buf[4];
+        uint8_t buf[4] __attribute__((aligned(4)));
         if(!ESP.flashRead(_startAddress, (uint32_t *) &buf[0], 4)) {
             _currentAddress = (_startAddress);
             _setError(UPDATE_ERROR_READ);            
