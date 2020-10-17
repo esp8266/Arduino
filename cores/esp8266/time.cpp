@@ -127,6 +127,8 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
 
 void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
+    sntp_stop();
+
     // There is no way to tell when DST starts or stop with this API
     // So DST is always integrated in TZ
     // The other API should be preferred
@@ -178,6 +180,8 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     setServer(0, server1);
     setServer(1, server2);
     setServer(2, server3);
+
+    sntp_init();
 }
 
 void setTZ(const char* tz){
