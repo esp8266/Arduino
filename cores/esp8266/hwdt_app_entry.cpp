@@ -70,13 +70,18 @@
  * your way up. At this time, I have not had a lot of practice using this tool.
  * TODO: Update description with more details when available.
  *
+ * SYS Stack Issue with Extra 4K Heap option:
+ *     During WiFi Connect, Reconnect, and about every hour a block of memory
+ *     0x3FFFEA80 - 0x3FFFEB30 (176 bytes) is zeroed by the Boot ROM function
+ *     aes_decrypt_init. All other painted memory in the area was untouched
+ *     after starting WiFi. See `core/esp8266/aes_unwrap.cpp` for more details.
  *
  *
  * Possible Issues/Thoughts/Improvements:
  *
  * On reboot after an OTA download, eboot requires a lot of stack and DRAM
- * space. For routine loads from flash, the stack and DRAM usage are small,
- * leaving us valid data to print a stack dump.
+ * space. On the other hand, for routine loads from flash, the stack and DRAM
+ * usage is small, leaving us valid data to print a stack dump.
  *
  * If a problem should arise with some data elements being corrupted during
  * reboot, would it be possible to move their DRAM location higher in memory?
@@ -194,21 +199,19 @@
  *   2) this stack dump code
  *   3) SDK, Core, and Sketch
  *
- * ~With this, we can recover a complete stack trace of our failed sketch. To be
- * safe, I am leaving this at 1024; however, I think there is room to lower it
- * without loss of information.~
+ * For the "NO extra 4K Heap" case, we use a ROM stack size of 1024. However,
+ * without `aes_unwrap.cpp`, 1024 is not safe for the "extra 4K of heap" case.
+ * Bad crashes happen with the 1024 and the "extra 4K of Heap". For now, leave
+ * this case with 720 bytes for ROM Stack since it also gives more SYS stack for
+ * dumping. See comment in aes_unwrap.cpp for AES buffer clash with SYS stack
+ * space description.
  *
- * Edited: 1024 is not safe for the "extra 4K of heap" case. This case now uses
- * 720 bytes. Really bad crashes happend with the 1024 and the "extra 4K of
- * heap" case. This is so tight. I am a concerned about the robustness of using
- * this option, "extra 4K of heap" and Debug Level: HWDT.
- *
- * If or when eboot.elf uses more than 720 there will be a  little over-writing
- * of the cont stack that we report. (When retesting, 752 was the max I got away
- * with crashing the SYS stack.)
+ * If or when eboot.elf uses more than 720 there will be a little over-writing
+ * of the cont stack that we report. Then 720 can be increased as long as the
+ * replacement aes_unwrap is used.
  *
  * If possible, use the no-extra 4K heap option. This is the optimum choice for
- * debugging HWDT crashes.
+ * debugging HWDT crashes. It has the content of SYS stack fully exposed.
  *
  */
 #ifndef DEBUG_ESP_HWDT_ROM_STACK_SIZE

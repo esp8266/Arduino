@@ -40,9 +40,7 @@ void setup(void) {
   Serial.println();
 
   // We don't need this for this example; however, starting WiFi uses a little
-  // more of the SYS stack and during development a crash serves as a quick
-  // indicator that DEBUG_ESP_HWDT_ROM_STACK_SIZE was set too high. This is not
-  // something you need to be concerned about.
+  // more of the SYS stack.
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println(F("A WiFi connection attmpt has been started."));
