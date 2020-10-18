@@ -1,0 +1,46 @@
+#######################################
+# Syntax Coloring Map For ESP8266WiFiPassMan
+#######################################
+
+#######################################
+# Library (KEYWORD3)
+#######################################
+
+WiFiPasswordManager	KEYWORD3
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+wpm	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+generateteKey	KEYWORD2
+
+checkSecretKey	KEYWORD2
+checkSecretKey_P	KEYWORD2
+
+printKey	KEYWORD2
+printKey_P	KEYWORD2
+encodeString	KEYWORD2
+setAPMAC	KEYWORD2
+encodeWiFiCredentials	KEYWORD2
+decodeWiFiCredentials_P	KEYWORD2
+encode	KEYWORD2
+encode_P	KEYWORD2
+decode	KEYWORD2
+decode_P	KEYWORD2
+selftest	KEYWORD2
+
+isWiFiCredentialSaved	KEYWORD2
+eraseWiFiPasswords	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+XTEA_BUFFER_LEN_B	LITERAL1
+ENCODE_AP_MAC	LITERAL1
