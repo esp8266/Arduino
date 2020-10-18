@@ -254,7 +254,7 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
  * Return the current channel associated with the network
  * @return channel (1-13)
  */
-int32_t ESP8266WiFiGenericClass::channel(void) {
+uint8_t ESP8266WiFiGenericClass::channel(void) {
     return wifi_get_channel();
 }
 
