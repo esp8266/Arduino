@@ -63,7 +63,7 @@ extern "C" {
 
 #endif
 
-#ifdef DEBUG_ESP_SSL
+#if defined(DEBUG_ESP_SSL) && defined(DEBUG_ESP_PORT)
 #define DEBUG_BSSL(fmt, ...)  DEBUG_ESP_PORT.printf_P((PGM_P)PSTR( "BSSL:" fmt), ## __VA_ARGS__)
 #else
 #define DEBUG_BSSL(...)
@@ -668,7 +668,7 @@ extern "C" {
     if (!xc->done_cert) {
       br_sha1_update(&xc->sha1_cert, buf, len);
       br_x509_decoder_push(&xc->ctx, (const void*)buf, len);
-#ifdef DEBUG_ESP_SSL
+#if defined(DEBUG_ESP_SSL) && defined(DEBUG_ESP_PORT)
       DEBUG_BSSL("CERT: ");
       for (size_t i=0; i<len; i++) {
         DEBUG_ESP_PORT.printf_P(PSTR("%02x "), buf[i] & 0xff);
