@@ -156,6 +156,39 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 
 Check out the separate section with `list of functions <client-class.rst>`__
 
+WiFi Multi
+~~~~~~~~~~
+
+`ESP8266WiFiMulti.h` can be used to connect to a WiFi network with strongest WiFi signal (RSSI). This requires registering one or more access points with SSID and password. It automatically switches to another WiFi network when the WiFi connection is lost.
+
+Example:
+
+.. code:: cpp
+    #include <ESP8266WiFiMulti.h>
+
+    ESP8266WiFiMulti wifiMulti;
+
+    // WiFi connect timeout per AP. Increase when connecting takes longer.
+    const uint32_t connectTimeoutMs = 5000;
+
+    void setup()
+    {
+      // Set in station mode
+      WiFi.mode(WIFI_STA);
+
+      // Register multi WiFi networks
+      wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
+      wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+      wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+    }
+
+    void loop()
+    {
+      // Maintain WiFi connection
+      if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+          ...
+      }
+    }
 
 BearSSL Client Secure and Server Secure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -227,8 +260,9 @@ This function returns following codes to describe what is going on with Wi-Fi co
 * 0 : ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
 * 1 : ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached 
 * 3 : ``WL_CONNECTED`` after successful connection is established 
-* 4 : ``WL_CONNECT_FAILED`` if password is incorrect 
-* 6 : ``WL_DISCONNECTED`` if module is not configured in station mode
+* 4 : ``WL_CONNECT_FAILED`` if connection failed 
+* 6 : ``WL_CONNECT_WRONG_PASSWORD`` if password is incorrect 
+* 7 : ``WL_DISCONNECTED`` if module is not configured in station mode
 
 It is a good practice to display and check information returned by functions. Application development and troubleshooting will be easier with that.
 

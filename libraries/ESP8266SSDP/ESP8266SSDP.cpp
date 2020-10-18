@@ -47,12 +47,10 @@ extern "C" {
 #include "include/UdpContext.h"
 //#define DEBUG_SSDP  Serial
 
-#define SSDP_INTERVAL     1200
 #define SSDP_PORT         1900
 #define SSDP_METHOD_SIZE  10
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
-#define SSDP_MULTICAST_TTL 2
 
 // ssdp ipv6 is FF05::C
 // lwip-v2's igmp_joingroup only supports IPv4
@@ -125,19 +123,8 @@ struct SSDPTimer {
   ETSTimer timer;
 };
 
-SSDPClass::SSDPClass() :
-  _server(0),
-  _timer(0),
-  _port(80),
-  _ttl(SSDP_MULTICAST_TTL),
-  _interval(SSDP_INTERVAL),
-  _respondToAddr(0,0,0,0),
-  _respondToPort(0),
-  _pending(false),
-  _st_is_uuid(false),
-  _delay(0),
-  _process_time(0),
-  _notify_time(0)
+SSDPClass::SSDPClass()
+:  _respondToAddr(0,0,0,0)
 {
   _uuid[0] = '\0';
   _modelNumber[0] = '\0';
