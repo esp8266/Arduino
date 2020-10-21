@@ -22,7 +22,7 @@ extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
 
 // Converts bit of a string into a uint32
-#define S(a,b,c,d) ( (((uint32_t)a) & 0xff) | (((uint32_t)b) << 8) | (((uint32_t)c) << 16) | (((uint32_t)d)<<24) )
+#define S(a,b,c,d) ( (((int32_t)a) & 0xff) | (((uint32_t)b) << 8) | (((uint32_t)c) << 16) | (((uint32_t)d)<<24) )
 
 int print_version(const uint32_t flash_addr)
 {
@@ -35,7 +35,7 @@ int print_version(const uint32_t flash_addr)
     uint32_t fmt[2];
     fmt[0] = S('v', '%', '0', '8');
     fmt[1] = S('x', '\n', 0, 0);
-    ets_printf((const char*) &fmt, ver);
+    ets_printf((const char*) fmt, ver);
     return 0;
 }
 
@@ -251,7 +251,7 @@ int main()
         uint32_t v[2];
         v[0] = S('c', 'm', 'p', ':');
         v[1] = 0;
-        ets_printf(const char *)&v);
+        ets_printf(const char *)v);
         if (res == 0) {
             ets_wdt_disable();
             res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
@@ -278,7 +278,7 @@ int main()
         uint32_t e[2];
         e[0] = S('e', ':', '0' + res, '\n' );
         e[1] = 0;
-        ets_printf((const char*)&e);
+        ets_printf((const char*)e);
     }
 
     if (res) {
