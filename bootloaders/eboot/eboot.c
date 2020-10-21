@@ -35,7 +35,7 @@ int print_version(const uint32_t flash_addr)
     uint32_t fmt[2];
     fmt[0] = S('v', '%', '0', '8');
     fmt[1] = S('x', '\n', 0, 0);
-    ets_printf((const char*) fmt, ver);
+    ets_printf((const char*) &fmt, ver);
     return 0;
 }
 
@@ -235,14 +235,14 @@ int main()
 
     if (cmd.action == ACTION_COPY_RAW) {
         uint32_t cp = S('c', 'p', ':', 0);
-        ets_printf((const char *)cp);
+        ets_printf((const char *)&cp);
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
         ets_wdt_enable();
 
         cp = S('0' + res, '\n', 0, 0 );
-        ets_printf((const char *)cp);
+        ets_printf((const char *)&cp);
 #if 0
 	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
 	//beginning of the image in the empty area, see #7458. Disabling for now. 
@@ -251,7 +251,7 @@ int main()
         uint32_t v[2];
         v[0] = S('c', 'm', 'p', ':');
         v[1] = 0;
-        ets_printf(const char *)v);
+        ets_printf(const char *)&v);
         if (res == 0) {
             ets_wdt_disable();
             res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
@@ -259,7 +259,7 @@ int main()
             }
 
         cp = S('0' + res, '\n', 0, 0 );
-        ets_printf((const char *)cp);
+        ets_printf((const char *)&cp);
 #endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
@@ -278,7 +278,7 @@ int main()
         uint32_t e[2];
         e[0] = S('e', ':', '0' + res, '\n' );
         e[1] = 0;
-        ets_printf((const char*)e);
+        ets_printf((const char*)&e);
     }
 
     if (res) {
