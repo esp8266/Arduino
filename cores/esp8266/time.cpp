@@ -225,6 +225,11 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
     bool from_sntp;
     if (tz == (struct timezone*)0xFeedC0de)
     {
+        // This special constant is used by lwip2/SNTP calling
+        // settimeofday(sntp-time, 0xfeedc0de), secretly using the
+        // obsolete-but-yet-still-there `tz` field.
+        // It allows to avoid duplicating this function and inform user
+        // about the source time change.
         tz = nullptr;
         from_sntp = true;
     }
