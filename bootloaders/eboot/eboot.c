@@ -22,7 +22,7 @@ extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
 
 // Converts bit of a string into a uint32
-#define S(a,b,c,d) ( (((int32_t)a) & 0xff) | (((uint32_t)b) << 8) | (((uint32_t)c) << 16) | (((uint32_t)d)<<24) )
+#define S(a,b,c,d) ( (((uint32_t)a) & 0xff) | (((uint32_t)b) << 8) | (((uint32_t)c) << 16) | (((uint32_t)d)<<24) )
 
 int print_version(const uint32_t flash_addr)
 {
