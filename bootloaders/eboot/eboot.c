@@ -237,14 +237,14 @@ int main()
 
     if (cmd.action == ACTION_COPY_RAW) {
         uint32_t cp = S('c', 'p', ':', 0);
-        ets_printf((const char *)cp);
+        ets_printf((const char *)&cp);
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
         ets_wdt_enable();
 
         cp = S('0' + res, '\n', 0, 0 );
-        ets_printf((const char *)cp);
+        ets_printf((const char *)&cp);
 #if 0
 	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
 	//beginning of the image in the empty area, see #7458. Disabling for now. 
@@ -261,7 +261,7 @@ int main()
             }
 
         cp = S('0' + res, '\n', 0, 0 );
-        ets_printf((const char *)cp);
+        ets_printf((const char *)&cp);
 #endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
