@@ -1564,8 +1564,8 @@ def all_boards ():
     print('')
 
     missingboards = []
-    boardssortedbyname = {k: v for k, v in sorted(boards.items(), key=lambda item: item[1]['name'])}
-    sortedrequiredfirst = requiredboards + [item for item in boardssortedbyname if item not in requiredboards]
+    boardlistsortedbydisplayedname = [ k for k in sorted(boardlist, key = lambda item: boards[item]['name']) ]
+    sortedrequiredfirst = requiredboards + [ item for item in boardlistsortedbydisplayedname if item not in requiredboards ]
     for id in sortedrequiredfirst:
         if id not in boards:
             missingboards += [ id ];
