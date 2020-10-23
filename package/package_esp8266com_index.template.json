@@ -24,10 +24,10 @@
                      "name": "Generic ESP8285 Module"
                   },
                   {
-                     "name": "ESPDuino (ESP-13 Module)"
+                     "name": "Adafruit Feather HUZZAH ESP8266"
                   },
                   {
-                     "name": "Adafruit Feather HUZZAH ESP8266"
+                     "name": "ESPDuino (ESP-13 Module)"
                   },
                   {
                      "name": "Invent One"
@@ -78,7 +78,7 @@
                      "name": "LOLIN(WEMOS) D1 mini Lite"
                   },
                   {
-                     "name": "WeMos D1 R1"
+                     "name": "LOLIN(WeMos) D1 R1"
                   },
                   {
                      "name": "ESPino (ESP-12 Module)"

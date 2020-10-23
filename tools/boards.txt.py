@@ -295,6 +295,23 @@ boards = collections.OrderedDict([
                   'Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.',
                   ],
     }),
+    ( 'huzzah', {
+        'name': 'Adafruit Feather HUZZAH ESP8266',
+        'opts': {
+            '.build.board': 'ESP8266_ESP12',
+            '.build.variant': 'adafruit',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Adafruit Feather HUZZAH ESP8266 will automatically recharge a connected battery when USB power is available.',
+                  '',
+                  'Product page: https://www.adafruit.com/product/2821'
+                  ],
+    }),
     ( 'espduino', {
         'name': 'ESPDuino (ESP-13 Module)',
         'opts': collections.OrderedDict([
@@ -316,23 +333,6 @@ boards = collections.OrderedDict([
             '4M',
             ],
         'desc': [ '*TODO*' ],
-    }),
-    ( 'huzzah', {
-        'name': 'Adafruit Feather HUZZAH ESP8266',
-        'opts': {
-            '.build.board': 'ESP8266_ESP12',
-            '.build.variant': 'adafruit',
-            },
-        'macro': [
-            'resetmethod_nodemcu',
-            'flashmode_qio',
-            'flashfreq_40',
-            '4M',
-            ],
-        'desc': [ 'The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Adafruit Feather HUZZAH ESP8266 will automatically recharge a connected battery when USB power is available.',
-                  '',
-                  'Product page: https://www.adafruit.com/product/2821'
-                  ],
     }),
     ( 'inventone', {
         'name': 'Invent One',
@@ -635,7 +635,7 @@ boards = collections.OrderedDict([
         ],
     }),
     ( 'd1', {
-        'name': 'WeMos D1 R1',
+        'name': 'LOLIN(WeMos) D1 R1',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
@@ -1564,7 +1564,9 @@ def all_boards ():
     print('')
 
     missingboards = []
-    for id in boardlist:
+    boardssortedbyname = {k: v for k, v in sorted(boards.items(), key=lambda item: item[1]['name'])}
+    sortedrequiredfirst = requiredboards + [item for item in boardssortedbyname if item not in requiredboards]
+    for id in sortedrequiredfirst:
         if id not in boards:
             missingboards += [ id ];
             continue
