@@ -518,8 +518,9 @@ wl_status_t ESP8266WiFiSTAClass::status() {
         case STATION_NO_AP_FOUND:
             return WL_NO_SSID_AVAIL;
         case STATION_CONNECT_FAIL:
-        case STATION_WRONG_PASSWORD:
             return WL_CONNECT_FAILED;
+        case STATION_WRONG_PASSWORD:
+            return WL_WRONG_PASSWORD;
         case STATION_IDLE:
             return WL_IDLE_STATUS;
         default:
@@ -579,7 +580,7 @@ String ESP8266WiFiSTAClass::BSSIDstr(void) {
  * Return the current network RSSI.
  * @return  RSSI value
  */
-int32_t ESP8266WiFiSTAClass::RSSI(void) {
+int8_t ESP8266WiFiSTAClass::RSSI(void) {
     return wifi_station_get_rssi();
 }
 

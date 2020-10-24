@@ -64,8 +64,9 @@ static time_t now;
 static uint32_t now_ms, now_us;
 
 static esp8266::polledTimeout::periodicMs showTimeNow(60000);
-static int time_machine_days = 0; // 0 = now
+static int time_machine_days = 0; // 0 = present
 static bool time_machine_running = false;
+static bool time_machine_run_once = false;
 
 // OPTIONAL: change SNTP startup delay
 // a weak function is already defined and returns 0 (RFC violation)
@@ -112,7 +113,7 @@ void showTime() {
   // time from boot
   Serial.print("clock:     ");
   Serial.print((uint32_t)tp.tv_sec);
-  Serial.print("s / ");
+  Serial.print("s + ");
   Serial.print((uint32_t)tp.tv_nsec);
   Serial.println("ns");
 
@@ -125,7 +126,7 @@ void showTime() {
   // EPOCH+tz+dst
   Serial.print("gtod:      ");
   Serial.print((uint32_t)tv.tv_sec);
-  Serial.print("s / ");
+  Serial.print("s + ");
   Serial.print((uint32_t)tv.tv_usec);
   Serial.println("us");
 
@@ -140,7 +141,7 @@ void showTime() {
   Serial.print("ctime:     ");
   Serial.print(ctime(&now));
 
-  // LwIP v2 is able to list more details about the currently configured SNTP servers
+  // lwIP v2 is able to list more details about the currently configured SNTP servers
   for (int i = 0; i < SNTP_MAX_SERVERS; i++) {
     IPAddress sntp = *sntp_getserver(i);
     const char* name = sntp_getservername(i);
@@ -151,7 +152,7 @@ void showTime() {
       } else {
         Serial.printf("%s ", sntp.toString().c_str());
       }
-      Serial.printf("IPv6: %s Reachability: %o\n",
+      Serial.printf("- IPv6: %s - Reachability: %o\n",
                     sntp.isV6() ? "Yes" : "No",
                     sntp_getreachability(i));
     }
@@ -159,40 +160,59 @@ void showTime() {
 
   Serial.println();
 
-  // subsecond synchronisation
-  gettimeofday(&tv, nullptr);
-  time_t sec = tv.tv_sec;
-  do {
+  // show subsecond synchronisation
+  timeval prevtv;
+  time_t prevtime = time(nullptr);
+  gettimeofday(&prevtv, nullptr);
+
+  while (true) {
     gettimeofday(&tv, nullptr);
-    Serial.printf("time(): %u   gettimeofday(): %u.%06u",
-                  (uint32_t)time(nullptr),
-                  (uint32_t)tv.tv_sec, (uint32_t)tv.tv_usec);
-    if (tv.tv_sec == sec) {
-      Serial.println("  second unchanged");
-    } else {
-      Serial.println("  <-- second changed");
+    if (tv.tv_sec != prevtv.tv_sec) {
+      Serial.printf("time(): %u   gettimeofday(): %u.%06u  seconds are unchanged\n",
+                    (uint32_t)prevtime,
+                    (uint32_t)prevtv.tv_sec, (uint32_t)prevtv.tv_usec);
+      Serial.printf("time(): %u   gettimeofday(): %u.%06u  <-- seconds have changed\n",
+                    (uint32_t)(prevtime = time(nullptr)),
+                    (uint32_t)tv.tv_sec, (uint32_t)tv.tv_usec);
+      break;
     }
+    prevtv = tv;
     delay(50);
-  } while (tv.tv_sec == sec);
+  }
 
   Serial.println();
 }
 
-void time_is_set_scheduled() {
-  // everything is allowed in this function
+void time_is_set(bool from_sntp /* <= this parameter is optional */) {
+  // in CONT stack, unlike ISRs,
+  // any function is allowed in this callback
 
   if (time_machine_days == 0) {
-    time_machine_running = !time_machine_running;
+    if (time_machine_running) {
+      time_machine_run_once = true;
+      time_machine_running = false;
+    } else {
+      time_machine_running = from_sntp && !time_machine_run_once;
+    }
+    if (time_machine_running) {
+      Serial.printf("\n-- \n-- Starting time machine demo to show libc's "
+                    "automatic DST handling\n-- \n");
+    }
   }
+
+  Serial.print("settimeofday(");
+  if (from_sntp) {
+    Serial.print("SNTP");
+  } else {
+    Serial.print("USER");
+  }
+  Serial.print(")");
 
   // time machine demo
   if (time_machine_running) {
-    if (time_machine_days == 0)
-      Serial.printf("---- settimeofday() has been called - possibly from SNTP\n"
-                    "     (starting time machine demo to show libc's automatic DST handling)\n\n");
     now = time(nullptr);
     const tm* tm = localtime(&now);
-    Serial.printf("future=%3ddays: DST=%s - ",
+    Serial.printf(": future=%3ddays: DST=%s - ",
                   time_machine_days,
                   tm->tm_isdst ? "true " : "false");
     Serial.print(ctime(&now));
@@ -207,49 +227,55 @@ void time_is_set_scheduled() {
     }
     settimeofday(&tv, nullptr);
   } else {
-    showTime();
+    Serial.println();
   }
 }
 
 void setup() {
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
+
   Serial.begin(115200);
-  Serial.println("\nStarting...\n");
+  Serial.println("\nStarting in 2secs...\n");
+  delay(2000);
+
+  // install callback - called when settimeofday is called (by SNTP or user)
+  // once enabled (by DHCP), SNTP is updated every hour by default
+  // ** optional boolean in callback function is true when triggerred by SNTP **
+  settimeofday_cb(time_is_set);
 
   // setup RTC time
   // it will be used until NTP server will send us real current time
+  Serial.println("Manually setting some time from some RTC:");
   time_t rtc = RTC_UTC_TEST;
   timeval tv = { rtc, 0 };
   settimeofday(&tv, nullptr);
-
-  // install callback - called when settimeofday is called (by SNTP or us)
-  // once enabled (by DHCP), SNTP is updated every hour
-  settimeofday_cb(time_is_set_scheduled);
 
   // NTP servers may be overriden by your DHCP server for a more local one
   // (see below)
 
   // ----> Here is the ONLY ONE LINE needed in your sketch
-
   configTime(MYTZ, "pool.ntp.org");
+  // <----
+  // Replace MYTZ by a value from TZ.h (search for this file in your filesystem).
 
-  //       Here is the ONLY ONE LINE needed in your sketch <----
-  // pick a value from TZ.h (search for this file in your filesystem) for MYTZ
-
-  // former configTime is still valid, here is the call for 7 hours to the west
+  // Former configTime is still valid, here is the call for 7 hours to the west
   // with an enabled 30mn DST
   //configTime(7 * 3600, 3600 / 2, "pool.ntp.org");
 
   // OPTIONAL: disable obtaining SNTP servers from DHCP
   //sntp_servermode_dhcp(0); // 0: disable obtaining SNTP servers from DHCP (enabled by default)
 
+  // Give now a chance to the settimeofday callback,
+  // because it is *always* deferred to the next yield()/loop()-call.
+  yield();
+
   // start network
-  WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
 
   // don't wait for network, observe time changing
   // when NTP timestamp is received
-  Serial.printf("Time is currently set by a constant:\n");
   showTime();
 }
 

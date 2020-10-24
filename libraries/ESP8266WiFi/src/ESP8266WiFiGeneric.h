@@ -74,7 +74,7 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
         WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
-        int32_t channel(void);
+        uint8_t channel(void);
 
         bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
 
