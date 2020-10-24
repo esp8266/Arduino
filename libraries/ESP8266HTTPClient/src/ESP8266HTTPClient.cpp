@@ -41,62 +41,12 @@ static int TO2HTTPC (Stream::toReport_e streamToError)
     return 0; // never reached, keep gcc quiet
 }
 
-class TransportTraits
-{
-public:
-    virtual ~TransportTraits()
-    {
-    }
-
-    virtual std::unique_ptr<WiFiClient> create()
-    {
-        return std::unique_ptr<WiFiClient>(new WiFiClient());
-    }
-
-    virtual bool verify(WiFiClient& client, const char* host)
-    {
-        (void)client;
-        (void)host;
-        return true;
-    }
-};
-
-
-class BearSSLTraits : public TransportTraits
-{
-public:
-    BearSSLTraits(const uint8_t fingerprint[20])
-    {
-        memcpy(_fingerprint, fingerprint, sizeof(_fingerprint));
-    }
-
-    std::unique_ptr<WiFiClient> create() override
-    {
-        BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure();
-        client->setFingerprint(_fingerprint);
-        return std::unique_ptr<WiFiClient>(client);
-    }
-
-    bool verify(WiFiClient& client, const char* host) override
-    {
-        // No-op.  BearSSL will not connect if the fingerprint doesn't match.
-        // So if you get to here you've already connected and it matched
-        (void) client;
-        (void) host;
-        return true;
-    }
-
-protected:
-    uint8_t _fingerprint[20];
-};
-
 /**
  * constructor
  */
 HTTPClient::HTTPClient()
     : _client(nullptr), _userAgent(F("ESP8266HTTPClient"))
 {
-    _tcpDeprecated.reset(nullptr);
 }
 
 /**
@@ -130,12 +80,6 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, const String& url) {
-    if(_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
     _client = &client;
 
     // check for : (http: or https:)
@@ -167,12 +111,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
  */
 bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, const String& uri, bool https)
 {
-    if(_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
     _client = &client;
 
      clear();
@@ -180,52 +118,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     _port = port;
     _uri = uri;
     _protocol = (https ? "https" : "http");
-    return true;
-}
-
-
-bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
-{
-    if(_client && !_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
-    if (!beginInternal(url, "https")) {
-        return false;
-    }
-    _transportTraits = TransportTraitsPtr(new (std::nothrow) BearSSLTraits(httpsFingerprint));
-    if(!_transportTraits) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] could not create transport traits\n");
-        return false;
-    }
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] BearSSL-httpsFingerprint:");
-    for (size_t i=0; i < 20; i++) {
-        DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
-    }
-    DEBUG_HTTPCLIENT("\n");
-    return true;
-}
-
-
-/**
- * parsing the url for all needed parameters
- * @param url String
- */
-bool HTTPClient::begin(String url)
-{
-    if(_client && !_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
-    if (!beginInternal(url, "http")) {
-        return false;
-    }
-    _transportTraits = TransportTraitsPtr(new TransportTraits());
     return true;
 }
 
@@ -291,47 +183,6 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
 }
 
 
-bool HTTPClient::begin(String host, uint16_t port, String uri)
-{
-    if(_client && !_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
-    clear();
-    _host = host;
-    _port = port;
-    _uri = uri;
-    _transportTraits = TransportTraitsPtr(new TransportTraits());
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
-    return true;
-}
-
-
-bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
-{
-    if(_client && !_tcpDeprecated) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
-        _canReuse = false;
-        end();
-    }
-
-    clear();
-    _host = host;
-    _port = port;
-    _uri = uri;
-
-    _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s BearSSL-httpsFingerprint:", host.c_str(), port, uri.c_str());
-    for (size_t i=0; i < 20; i++) {
-        DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
-    }
-    DEBUG_HTTPCLIENT("\n");
-    return true;
-}
-
-
 /**
  * end
  * called after the payload is handled
@@ -365,10 +216,6 @@ void HTTPClient::disconnect(bool preserveClient)
                 if (!preserveClient) {
                     _client = nullptr;
                 }
-            }
-            if(_tcpDeprecated) {
-                _transportTraits.reset(nullptr);
-                _tcpDeprecated.reset(nullptr);
             }
         }
     } else {
@@ -473,15 +320,6 @@ bool HTTPClient::setURL(const String& url)
     return beginInternal(url, nullptr);
 }
 
-/**
- * set true to follow redirects.
- * @param follow
- * @deprecated
- */
-void HTTPClient::setFollowRedirects(bool follow)
-{
-    _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
-}
 /**
  * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
  * @param follow
@@ -1013,15 +851,6 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-    if(!_client && _transportTraits) {
-        _tcpDeprecated = _transportTraits->create();
-        if(!_tcpDeprecated) {
-            DEBUG_HTTPCLIENT("[HTTP-Client] connect: could not create tcp\n");
-            return false;
-        }
-        _client = _tcpDeprecated.get();
-    }
-
     if(!_client) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
         return false;
@@ -1036,12 +865,9 @@ bool HTTPClient::connect(void)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-    if (_tcpDeprecated && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
-        _client->stop();
-        return false;
-    }
-
+#ifdef ESP8266
+    _client->setNoDelay(true);
+#endif
     return connected();
 }
 

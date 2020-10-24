@@ -53,12 +53,14 @@ class String {
         // if the initial value is null or invalid, or if memory allocation
         // fails, the string will be marked as invalid (i.e. "if (s)" will
         // be false).
-        String(const char *cstr = nullptr);
+        String() {
+            init();
+        }
+        String(const char *cstr);
         String(const String &str);
         String(const __FlashStringHelper *str);
-        String(String &&rval);
-        String(StringSumHelper &&rval);
-
+        String(String &&rval) noexcept;
+        String(StringSumHelper &&rval) noexcept;
         explicit String(char c);
         explicit String(unsigned char, unsigned char base = 10);
         explicit String(int, unsigned char base = 10);
@@ -67,7 +69,7 @@ class String {
         explicit String(unsigned long, unsigned char base = 10);
         explicit String(float, unsigned char decimalPlaces = 2);
         explicit String(double, unsigned char decimalPlaces = 2);
-        virtual ~String(void);
+        ~String(void);
 
         // memory management
         // return true on success, false on failure (in which case, the string
@@ -94,8 +96,8 @@ class String {
         String & operator =(const String &rhs);
         String & operator =(const char *cstr);
         String & operator = (const __FlashStringHelper *str);
-        String & operator =(String &&rval);
-        String & operator =(StringSumHelper &&rval);
+        String & operator =(String &&rval) noexcept;
+        String & operator =(StringSumHelper &&rval) noexcept;
 
         // concatenate (works w/ built-in types)
 
@@ -276,7 +278,7 @@ class String {
 
     protected:
         // Contains the string info when we're not in SSO mode
-        struct _ptr {
+        struct _ptr { 
             char *   buff;
             uint16_t cap;
             uint16_t len;
@@ -313,7 +315,7 @@ class String {
         // copy and move
         String & copy(const char *cstr, unsigned int length);
         String & copy(const __FlashStringHelper *pstr, unsigned int length);
-        void move(String &rhs);
+        void move(String &rhs) noexcept;
 };
 
 class StringSumHelper: public String {

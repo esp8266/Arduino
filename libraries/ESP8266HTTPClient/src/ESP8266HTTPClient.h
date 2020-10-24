@@ -161,14 +161,12 @@ public:
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
-    // Plain HTTP connection, unencrypted
-    bool begin(String url)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
-    // Use BearSSL for secure HTTPS connection
-    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
-    // deprecated, use the overload above instead
-    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+    // old API is now explicitely forbidden
+    bool begin(String url)  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, url)")));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, host, port, uri)")));
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
+    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
 
     void end(void);
 
@@ -181,7 +179,6 @@ public:
     void setTimeout(uint16_t timeout);
 
     // Redirections
-    void setFollowRedirects(bool follow) __attribute__ ((deprecated));
     void setFollowRedirects(followRedirects_t follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
 
@@ -235,9 +232,6 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
-
-    TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcpDeprecated;
     WiFiClient* _client;
 
     /// request handling

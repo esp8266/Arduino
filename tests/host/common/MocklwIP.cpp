@@ -1,6 +1,7 @@
 
 #include <AddrList.h>
-#include <lwip/netif.h>
+
+#include "MocklwIP.h"
 
 esp8266::AddressListImplementation::AddressList addrList;
 

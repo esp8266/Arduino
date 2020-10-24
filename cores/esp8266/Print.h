@@ -38,17 +38,15 @@ class __FlashStringHelper;
 
 class Print {
     private:
-        int write_error;
-        size_t printNumber(unsigned long, uint8_t);
-        size_t printFloat(double, uint8_t);
+        int write_error = 0;
+        template<typename T> size_t printNumber(T n, uint8_t base);
+        template<typename T, typename... P> inline size_t _println(T v, P... args);
     protected:
         void setWriteError(int err = 1) {
             write_error = err;
         }
     public:
-        Print() :
-                write_error(0) {
-        }
+        Print() {}
 
         int getWriteError() {
             return write_error;
@@ -74,6 +72,8 @@ class Print {
         inline size_t write(unsigned int t) { return write((uint8_t)t); }
         inline size_t write(long t) { return write((uint8_t)t); }
         inline size_t write(unsigned long t) { return write((uint8_t)t); }
+        inline size_t write(long long t) { return write((uint8_t)t); }
+        inline size_t write(unsigned long long t) { return write((uint8_t)t); }
         // Enable write(char) to fall through to write(uint8_t)
         inline size_t write(char c) { return write((uint8_t) c); }
         inline size_t write(int8_t c) { return write((uint8_t) c); }
@@ -89,6 +89,8 @@ class Print {
         size_t print(unsigned int, int = DEC);
         size_t print(long, int = DEC);
         size_t print(unsigned long, int = DEC);
+        size_t print(long long, int = DEC);
+        size_t print(unsigned long long, int = DEC);
         size_t print(double, int = 2);
         size_t print(const Printable&);
 
@@ -101,6 +103,8 @@ class Print {
         size_t println(unsigned int, int = DEC);
         size_t println(long, int = DEC);
         size_t println(unsigned long, int = DEC);
+        size_t println(long long, int = DEC);
+        size_t println(unsigned long long, int = DEC);
         size_t println(double, int = 2);
         size_t println(const Printable&);
         size_t println(void);
@@ -115,5 +119,7 @@ class Print {
         // (children can override to false (like String))
         virtual bool outputTimeoutPossible () { return true; }
 };
+
+template<> size_t Print::printNumber(double number, uint8_t digits);
 
 #endif

@@ -145,68 +145,6 @@ class WiFiClientSecure : public WiFiClient {
     // consume bytes after use (see peekBuffer)
     virtual void peekConsume (size_t consume) override;
 
-    ////////////////////////////////////////////////////
-    // AxTLS API deprecated warnings to help upgrading
-
-    #define AXTLS_DEPRECATED \
-      __attribute__((deprecated( \
-        "This is deprecated AxTLS API, " \
-        "check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99")))
-
-    bool setCACert(const uint8_t* pk, size_t size)      AXTLS_DEPRECATED;
-    bool setCertificate(const uint8_t* pk, size_t size) AXTLS_DEPRECATED;
-    bool setPrivateKey(const uint8_t* pk, size_t size)  AXTLS_DEPRECATED;
-
-    bool loadCACert(Stream& stream, size_t size)        AXTLS_DEPRECATED;
-    bool loadCertificate(Stream& stream, size_t size)   AXTLS_DEPRECATED;
-    bool loadPrivateKey(Stream& stream, size_t size)    AXTLS_DEPRECATED;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-
-    bool setCACert_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
-      return setCACert((const uint8_t *)pk, size);
-    }
-
-    bool setCertificate_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
-      return setCertificate((const uint8_t *)pk, size);
-    }
-
-    bool setPrivateKey_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
-      return setPrivateKey((const uint8_t *)pk, size);
-    }
-
-#pragma GCC diagnostic pop
-
-    template<typename TFile>
-    bool loadCertificate(TFile& file) {
-      return loadCertificate(file, file.size());
-    }
-
-    template<typename TFile>
-    bool loadPrivateKey(TFile& file) {
-      return loadPrivateKey(file, file.size());
-    }
-
-    template<typename TFile>
-    bool loadCACert(TFile& file) {
-      return loadCACert(file, file.size());
-    }
-
-    bool verify(const char* fingerprint, const char* domain_name) AXTLS_DEPRECATED {
-      (void)fingerprint;
-      (void)domain_name;
-      return connected();
-    }
-
-    bool verifyCertChain(const char* domain_name) AXTLS_DEPRECATED {
-      (void)domain_name;
-      return connected();
-    }
-
-    // AxTLS API deprecated section end
-    /////////////////////////////////////
-
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
 
@@ -232,14 +170,6 @@ class WiFiClientSecure : public WiFiClient {
     int _iobuf_out_size;
     bool _handshake_done;
     bool _oom_err;
-
-    // AXTLS compatibility shim elements:
-    // AXTLS managed memory for certs and keys, while BearSSL assumes
-    // the app manages these.  Use this local storage for holding the
-    // BearSSL created objects in a shared form.
-    std::shared_ptr<X509List>   _axtls_ta;
-    std::shared_ptr<X509List>   _axtls_chain;
-    std::shared_ptr<PrivateKey> _axtls_sk;
 
     // Optional storage space pointer for session parameters
     // Will be used on connect and updated on close
