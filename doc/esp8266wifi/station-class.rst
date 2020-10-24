@@ -250,8 +250,9 @@ Wait until module connects to the access point. This function is intended for mo
 Function returns one of the following connection statuses: 
 
 - ``WL_CONNECTED`` after successful connection is established 
-- ``WL_NO_SSID_AVAIL`` in case configured SSID cannot be reached 
-- ``WL_CONNECT_FAILED`` if password is incorrect 
+- ``WL_NO_SSID_AVAIL`` in case configured SSID cannot be reached
+- ``WL_CONNECT_FAILED`` if connection failed 
+- ``WL_CONNECT_WRONG_PASSWORD`` if password is incorrect 
 - ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
 - ``WL_DISCONNECTED`` if module is not configured in station mode
 - ``-1`` on timeout

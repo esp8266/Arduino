@@ -14,18 +14,23 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  *
+ * reworked for newlib and lwIP-v2:
+ * time source is SNTP/settimeofday()
+ * system time is micros64() / NONOS-SDK's system_get_time()
+ * synchronisation of the two through timeshift64
  */
 
 #include <stdlib.h>
 #include <../include/time.h> // See issue #6714
 #include <sys/time.h>
 #include <sys/reent.h>
-#include "sntp.h"
-#include "coredecls.h"
+#include <errno.h>
+
+#include <sntp.h> // nonos-sdk
+#include <coredecls.h>
+#include <Schedule.h>
 
 #include <Arduino.h> // configTime()
-
-#include "sntp-lwip2.h"
 
 extern "C" {
 
@@ -42,16 +47,11 @@ extern struct tm* sntp_localtime(const time_t *clock);
 extern uint64_t micros64();
 extern void sntp_set_daylight(int daylight);
 
-// time gap in seconds from 01.01.1900 (NTP time) to 01.01.1970 (UNIX time)
-#define DIFF1900TO1970 2208988800UL
-
-bool timeshift64_is_set = false;
 static uint64_t timeshift64 = 0;
 
 void tune_timeshift64 (uint64_t now_us)
 {
      timeshift64 = now_us - micros64();
-     timeshift64_is_set = true;
 }
 
 static void setServer(int id, const char* name_or_ip)
@@ -73,7 +73,8 @@ int clock_gettime(clockid_t unused, struct timespec *tp)
     return 0;
 }
 
-// backport Espressif api
+///////////////////////////////////////////
+// backport legacy nonos-sdk Espressif api
 
 bool sntp_set_timezone_in_seconds (int32_t timezone_sec)
 {
@@ -93,16 +94,20 @@ char* sntp_get_real_time(time_t t)
 
 uint32 sntp_get_current_timestamp()
 {
-    return sntp_real_timestamp;
+    return time(nullptr);
 }
+
+// backport legacy nonos-sdk Espressif api
+///////////////////////////////////////////
 
 time_t time(time_t * t)
 {
+    time_t currentTime_s = (micros64() + timeshift64) / 1000000ULL;
     if (t)
     {
-        *t = sntp_real_timestamp;
+        *t = currentTime_s;
     }
-    return sntp_real_timestamp;
+    return currentTime_s;
 }
 
 int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
@@ -111,8 +116,6 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     (void) tzp;
     if (tp)
     {
-        if (!timeshift64_is_set)
-            tune_timeshift64(sntp_real_timestamp * 1000000ULL);
         uint64_t currentTime_us = timeshift64 + micros64();
         tp->tv_sec = currentTime_us / 1000000ULL;
         tp->tv_usec = currentTime_us % 1000000ULL;
@@ -124,6 +127,8 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
 
 void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
+    sntp_stop();
+
     // There is no way to tell when DST starts or stop with this API
     // So DST is always integrated in TZ
     // The other API should be preferred
@@ -146,7 +151,7 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     newlib inspection and internal structure hacking
     (no sprintf, no sscanf, -7584 flash bytes):
 
-    ***/
+    *** hack starts here: ***/
 
     static char gmt[] = "GMT";
 
@@ -169,12 +174,14 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
         tzr->offset = -_timezone;
     }
 
+    /*** end of hack ***/
+
     // sntp servers
     setServer(0, server1);
     setServer(1, server2);
     setServer(2, server3);
 
-    /*** end of posix replacement ***/
+    sntp_init();
 }
 
 void setTZ(const char* tz){
@@ -197,3 +204,49 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     sntp_init();
 }
 
+static BoolCB _settimeofday_cb;
+
+void settimeofday_cb (const TrivialCB& cb)
+{
+    _settimeofday_cb = [cb](bool sntp) { (void)sntp; cb(); };
+}
+
+void settimeofday_cb (const BoolCB& cb)
+{
+    _settimeofday_cb = cb;
+}
+
+extern "C" {
+
+#include <lwip/apps/sntp.h>
+
+int settimeofday(const struct timeval* tv, const struct timezone* tz)
+{
+    bool from_sntp;
+    if (tz == (struct timezone*)0xFeedC0de)
+    {
+        // This special constant is used by lwip2/SNTP calling
+        // settimeofday(sntp-time, 0xfeedc0de), secretly using the
+        // obsolete-but-yet-still-there `tz` field.
+        // It allows to avoid duplicating this function and inform user
+        // about the source time change.
+        tz = nullptr;
+        from_sntp = true;
+    }
+    else
+        from_sntp = false;
+
+    if (tz || !tv)
+        // tz is obsolete (cf. man settimeofday)
+        return EINVAL;
+
+    // reset time subsystem
+    tune_timeshift64(tv->tv_sec * 1000000ULL + tv->tv_usec);
+
+    if (_settimeofday_cb)
+        schedule_recurrent_function_us([from_sntp](){ _settimeofday_cb(from_sntp); return false; }, 0);
+
+    return 0;
+}
+
+};

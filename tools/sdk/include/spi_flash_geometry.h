@@ -7,6 +7,7 @@
 
 #define FLASH_SECTOR_SIZE 0x1000
 #define FLASH_BLOCK_SIZE 0x10000
+#define FLASH_PAGE_SIZE 0x100
 #define APP_START_OFFSET 0x1000
 
 //pulled this define from spi_flash.h for reuse in the Arduino core without pulling in a bunch of other stuff
