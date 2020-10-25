@@ -2,12 +2,10 @@
 #define flash_hal_mock_h
 
 #include <stdint.h>
+#include <flash_hal.h>
 
-#define FLASH_HAL_OK          (0)
-#define FLASH_HAL_READ_ERROR  (-1)
-#define FLASH_HAL_WRITE_ERROR (-2)
-#define FLASH_HAL_ERASE_ERROR (-3)
-
+#undef FS_start
+#undef FS_end
 #define FS_start 0
 #define FS_end 0
 
