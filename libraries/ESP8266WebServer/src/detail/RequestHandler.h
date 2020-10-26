@@ -5,6 +5,8 @@
 #include <vector>
 #include <assert.h>
 
+namespace esp8266webserver {
+
 template<typename ServerType>
 class RequestHandler {
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
@@ -30,5 +32,7 @@ public:
         return pathArgs[i];
     }
 };
+
+} // namespace
 
 #endif //REQUESTHANDLER_H

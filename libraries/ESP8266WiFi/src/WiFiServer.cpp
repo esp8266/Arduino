@@ -44,18 +44,12 @@ extern "C" {
 WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 : _port(port)
 , _addr(addr)
-, _listen_pcb(nullptr)
-, _unclaimed(nullptr)
-, _discarded(nullptr)
 {
 }
 
 WiFiServer::WiFiServer(uint16_t port)
 : _port(port)
 , _addr(IP_ANY_TYPE)
-, _listen_pcb(nullptr)
-, _unclaimed(nullptr)
-, _discarded(nullptr)
 {
 }
 

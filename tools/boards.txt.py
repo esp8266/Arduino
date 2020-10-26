@@ -635,7 +635,7 @@ boards = collections.OrderedDict([
         ],
     }),
     ( 'd1', {
-        'name': 'WeMos D1 R1',
+        'name': 'LOLIN(WeMos) D1 R1',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
@@ -995,11 +995,8 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
-        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
-        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
-        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
+        ( '.menu.exception.disabled', 'Disabled (new aborts on oom)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
@@ -1567,7 +1564,9 @@ def all_boards ():
     print('')
 
     missingboards = []
-    for id in boardlist:
+    boardlistsortedbydisplayedname = [ k for k in sorted(boardlist, key = lambda item: boards[item]['name']) ]
+    sortedrequiredfirst = requiredboards + [ item for item in boardlistsortedbydisplayedname if item not in requiredboards ]
+    for id in sortedrequiredfirst:
         if id not in boards:
             missingboards += [ id ];
             continue
