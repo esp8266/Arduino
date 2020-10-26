@@ -20,7 +20,7 @@
 #include <stddef.h>
 #include <vector>
 #include <FS.h>
-#include <flash_hal_mock.h>
+#include <flash_hal.h>
 
 #define DEFAULT_SPIFFS_FILE_NAME "spiffs.bin"
 

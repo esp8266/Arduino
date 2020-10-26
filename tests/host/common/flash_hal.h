@@ -2,7 +2,7 @@
 #define flash_hal_mock_h
 
 #include <stdint.h>
-#include <flash_hal.h>
+#include <../../cores/esp8266/flash_hal.h>
 
 #undef FS_start
 #undef FS_end
