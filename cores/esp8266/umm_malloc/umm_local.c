@@ -201,13 +201,8 @@ void print_stats(int force) {
 #endif
 
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
-    /*
-      To use ets_strlen() and ets_strcpy() safely with PROGMEM, flash storage,
-      the PROGMEM address must be word (4 bytes) aligned. The destination
-      address for ets_memcpy must also be word-aligned.
-    */
-    char ram_buf[ets_strlen(fmt) + 1] __attribute__((aligned(4)));
-    ets_strcpy(ram_buf, fmt);
+    char ram_buf[strlen_P(fmt) + 1];
+    strcpy_P(ram_buf, fmt);
     va_list argPtr;
     va_start(argPtr, fmt);
     int result = ets_vprintf(ets_uart_putc1, ram_buf, argPtr);
