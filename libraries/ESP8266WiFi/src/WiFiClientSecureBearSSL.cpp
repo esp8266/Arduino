@@ -108,12 +108,7 @@ WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient() {
   stack_thunk_add_ref();
 }
 
-WiFiClientSecureCtx::WiFiClientSecureCtx(const WiFiClientSecure &rhs) : WiFiClient(rhs) {
-  *this = rhs;
-  stack_thunk_add_ref();
-}
-
-WiFiClientSecureCtx::~WiFiClientSecure() {
+WiFiClientSecureCtx::~WiFiClientSecureCtx() {
   if (_client) {
     _client->unref();
     _client = nullptr;

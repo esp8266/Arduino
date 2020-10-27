@@ -128,7 +128,7 @@ class X509List {
 class WiFiClientSecure;
 
 class Session {
-  friend class WiFiClientSecure;
+  friend class WiFiClientSecureCtx;
 
   public:
     Session() { memset(&_session, 0, sizeof(_session)); }

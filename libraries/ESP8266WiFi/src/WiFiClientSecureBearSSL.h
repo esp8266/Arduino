@@ -34,7 +34,6 @@ namespace BearSSL {
 class WiFiClientSecureCtx : public WiFiClient {
   public:
     WiFiClientSecureCtx();
-    WiFiClientSecureCtx(const WiFiClientSecureCtx &rhs);
     ~WiFiClientSecureCtx() override;
 
     WiFiClientSecureCtx& operator=(const WiFiClientSecureCtx&) = delete;
@@ -199,11 +198,14 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
-}; // class WiFIClientecureCtx
-
+}; // class WiFiClientSecureCtx
 
 
 class WiFiClientSecure : public WiFiClient {
+
+  // WiFiClient's "ClientContext* _client" is always nullptr in this class.
+  // Instead, all virtual functions call their counterpart in "WiFiClientecureCtx* _ctx"
+  //          which also derives from WiFiClient (this parent is the one which is eventually used)
 
   public:
 
@@ -292,17 +294,15 @@ class WiFiClientSecure : public WiFiClient {
     friend class WiFiServerSecure; // Server needs to access these constructors
     WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta):
-      _ctx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, client_CA_ta) {
+      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, client_CA_ta)) {
     }
 
     WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta):
-      _ctx(client, chain, sk, iobuf_in_size, iobuf_out_size, client_CA_ta) {
+      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, client_CA_ta)) {
     }
 
 }; // class WiFiClientSecure
-
-
 
 }; // namespace BearSSL
 
