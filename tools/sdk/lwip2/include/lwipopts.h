@@ -3574,7 +3574,7 @@ extern "C" {
 
 #define SNTP_SERVER_DNS 1                   // enable SNTP support DNS names through sntp_setservername / sntp_getservername
 
-#define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
+#define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, (struct timezone*)0xFeedC0de); } while (0)
 
 #define SNTP_SUPPRESS_DELAY_CHECK 1
 #define SNTP_UPDATE_DELAY_DEFAULT 3600000   // update delay defined by a default weak function
