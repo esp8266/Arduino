@@ -464,13 +464,8 @@ static void IRAM_MAYBE set__sys_stack_first(void) {
  */
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((weak));
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) {
-    /*
-     * To use ets_strlen() and ets_strcpy() safely with PROGMEM, flash storage,
-     * the PROGMEM address must be word (4 bytes) aligned. The destination
-     * address for ets_memcpy must also be word-aligned.
-     */
-    char ram_buf[ets_strlen(fmt) + 1] __attribute__((aligned(4)));
-    ets_strcpy(ram_buf, fmt);
+    char ram_buf[strlen_P(fmt) + 1];
+    strcpy_P(ram_buf, fmt);
     va_list argPtr;
     va_start(argPtr, fmt);
     int result = ets_vprintf(ets_uart_putc1, ram_buf, argPtr);
@@ -953,10 +948,18 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
 #endif
             /* Print context SYS */
             print_stack((uintptr_t)ctx_sys_ptr, (uintptr_t)ROM_STACK, PRINT_STACK::SYS);
-
             if (get_noextra4k_g_pcont()) {
                 /* Print separate ctx: cont stack */
+
+                /* Check if cont stack is yielding to SYS */
+                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_yield) {
+                    ctx_cont_ptr = (const uint32_t *)((uintptr_t)g_pcont->sp_yield - 8u);
+                }
                 print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
+            } else {
+                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_yield) {
+                    ETS_PRINTF("\nCont stack is yielding. Active stack starts at 0x%08X.\n", (uint32_t)g_pcont->sp_yield - 8u);
+                }
             }
 
             if (hwdt_info.cont_integrity) {
@@ -1043,14 +1046,24 @@ static void printSanityCheck() {
   ETS_PRINTF(    "g_rom_stack:             %p\n", g_rom_stack);
   ETS_PRINTF(    "g_rom_stack_A16_sz:      0x%08X\n\n", g_rom_stack_A16_sz);
 }
+#endif //DEBUG_ESP_HWDT_DEV_DEBUG
 
-static void ICACHE_RAM_ATTR __attribute__((noinline)) print_sanity_check_icache(void) __attribute__((used));
-void print_sanity_check_icache(void) {
+void hwdt_pre_sdk_init(void) __attribute__((weak));
+void hwdt_pre_sdk_init(void) {
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
+  printSanityCheck();
+#endif
+}
+
+static void ICACHE_RAM_ATTR __attribute__((noinline)) hwdt_pre_sdk_init_icache(void) __attribute__((used));
+void hwdt_pre_sdk_init_icache(void) {
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
 #ifdef DEBUG_ESP_HWDT_UART_SPEED
   const uint32_t uart_divisor = set_uart_speed(0, DEBUG_ESP_HWDT_UART_SPEED);
 #endif
-  printSanityCheck();
+
+  hwdt_pre_sdk_init();
+
 #ifdef DEBUG_ESP_HWDT_UART_SPEED
   if (uart_divisor) {
       adjust_uart_speed(uart_divisor);
@@ -1058,7 +1071,6 @@ void print_sanity_check_icache(void) {
 #endif
   Cache_Read_Disable();
 }
-#endif //DEBUG_ESP_HWDT_DEV_DEBUG
 
 
 #if 1
@@ -1129,9 +1141,7 @@ asm  (
     "moveqz   a2, a13, a2\n\t"
     "s32i.n   a2, a14, 0\n\t"
 
-#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
-    "call0    print_sanity_check_icache\n\t"
-#endif
+    "call0    hwdt_pre_sdk_init_icache\n\t"
 
     "movi     a2, 0x3FFFE000\n\t" // ROM BSS Area
     "movi     a3, 0x0b30\n\t"     // ROM BSS Size
