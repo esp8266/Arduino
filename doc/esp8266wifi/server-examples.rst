@@ -243,6 +243,6 @@ Conclusion
 
 The above example shows that a web server on ESP8266 can be set up in almost no time. Such server can easily stand up requests from much more powerful hardware and software like a PC with a web browser. Check out other classes like `ESP8266WebServer <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer>`__ that let you program more advanced applications.
 
-If you like to try another server example, check out `WiFiWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiWebServer/WiFiWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
+If you like to try another server example, check out `WiFiWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiManualWebServer/WiFiManualWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
 
 For the list of functions provided to implement and manage servers, please refer to the `Server Class <server-class.rst>`__ documentation.
