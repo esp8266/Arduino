@@ -177,7 +177,6 @@ class WiFiClientSecureCtx : public WiFiClient {
     unsigned _cert_issuer_key_type;
 
     // Methods for handling server.available() call which returns a client connection.
-    friend class WiFiClientSecure; // Server needs to access these constructors
     WiFiClientSecureCtx(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
     WiFiClientSecureCtx(ClientContext* client, const X509List *chain, const PrivateKey *sk,
