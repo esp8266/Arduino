@@ -34,6 +34,7 @@ namespace BearSSL {
 class WiFiClientSecureCtx : public WiFiClient {
   public:
     WiFiClientSecureCtx();
+    WiFiClientSecureCtx(const WiFiClientSecure &rhs) = delete;
     ~WiFiClientSecureCtx() override;
 
     WiFiClientSecureCtx& operator=(const WiFiClientSecureCtx&) = delete;
