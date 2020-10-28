@@ -362,8 +362,8 @@ links:
 - ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf
 - Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf
 
-WeMos D1 R1
------------
+LOLIN(WeMos) D1 R1
+------------------
 
 Product page: https://www.wemos.cc/
 
