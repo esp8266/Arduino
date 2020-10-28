@@ -268,6 +268,11 @@ public:
         close();
     }
 
+    int availableForWrite() override
+    {
+        return _opened ? _fd->availableForWrite() : 0;
+    }
+
     size_t write(const uint8_t *buf, size_t size) override
     {
         return _opened ? _fd->write(buf, size) : -1;

@@ -176,7 +176,7 @@ void Netdump::tcpDumpProcess(const Packet& np)
         bufferIndex += incl_len;
     }
 
-    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= bufferIndex)
+    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= (int)bufferIndex)
     {
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;
@@ -202,7 +202,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
     {
         setCallback(nullptr);
     }
-    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= bufferIndex)
+    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= (int)bufferIndex)
     {
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;
