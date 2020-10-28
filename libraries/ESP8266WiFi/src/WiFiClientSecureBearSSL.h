@@ -120,11 +120,6 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool setCiphers(const std::vector<uint16_t>& list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
-    // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
-    static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
-    static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
-    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
-
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
 
@@ -284,9 +279,9 @@ class WiFiClientSecure : public WiFiClient {
     bool setCiphersLessSecure() { return _ctx->setCiphersLessSecure(); } // Only use the limited set of RSA ciphers without EC
 
     // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
-    static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len) { return WiFiClientSecureCtx::probeMaxFragmentLength(ip, port, len); }
-    static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len) { return WiFiClientSecureCtx::probeMaxFragmentLength(hostname, port, len); }
-    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len) { return WiFiClientSecureCtx::probeMaxFragmentLength(host, port, len); }
+    static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
+    static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
+    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
   private:
     std::shared_ptr<WiFiClientSecureCtx> _ctx;
