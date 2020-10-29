@@ -27,8 +27,8 @@
 //
 //   Servo - Class for manipulating servo motors connected to Arduino pins.
 //
-//   attach(pin )  - Attaches a servo motor to an i/o pin.
-//   attach(pin, min, max  ) - Attaches to a pin setting min and max values in microseconds
+//   attach(pin)  - Attaches a servo motor to an i/o pin.
+//   attach(pin, min, max) - Attaches to a pin setting min and max values in microseconds
 //   default min is 1000, max is 2000
 //
 //   write()     - Sets the servo angle in degrees.  (invalid angle that is valid as pulse in microseconds is treated as microseconds)
@@ -44,8 +44,12 @@
 
 #include <Arduino.h>
 
-// the following are in us (microseconds)
-//
+// The following values are in us (microseconds).
+// Since the defaults can be overwritten in the new attach() member function,
+// they were modified from the Arduino AVR defaults to be in the safe range
+// of publically available specifications. While this implies that many 180°
+// servos do not operate the full 0° to 180° sweep using these, it also prevents
+// unsuspecting damage. For Arduino AVR, the same change is being discussed.
 #define DEFAULT_MIN_PULSE_WIDTH      1000 // uncalibrated default, the shortest duty cycle sent to a servo
 #define DEFAULT_MAX_PULSE_WIDTH      2000 // uncalibrated default, the longest duty cycle sent to a servo 
 #define DEFAULT_NEUTRAL_PULSE_WIDTH  1500 // default duty cycle when servo is attached
@@ -64,12 +68,13 @@ public:
     Servo();
     ~Servo();
     // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure.
+    // returns channel number or 0 if failure.
     uint8_t attach(int pin);
-    // attach the given pin to the next free channel, sets pinMode, min, and max values for writes.
+    // attach the given pin to the next free channel, sets pinMode, min, and max values for write().
     // returns channel number or 0 if failure.
     uint8_t attach(int pin, uint16_t min, uint16_t max);
-    // attach the given pin to the next free channel, sets pinMode, min, max values for writes,
-    // and sets the initial value, the same as write.
+    // attach the given pin to the next free channel, sets pinMode, min, and max values for write(),
+    // and sets the initial value, the same as write().
     // returns channel number or 0 if failure.
     uint8_t attach(int pin, uint16_t min, uint16_t max, int value);
     void detach();
