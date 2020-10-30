@@ -166,6 +166,7 @@ TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
 static time_t _my_time(void)
 {
     struct tm t;
+    bzero(&t, sizeof(t));
     t.tm_year = 120;
     t.tm_mon  = 9;
     t.tm_mday = 22;
