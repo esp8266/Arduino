@@ -205,12 +205,21 @@ public:
         return mktime(&tiempo);
     }
 
+    virtual void setTimeCallback(time_t (*cb)(void)) override {
+        extern time_t (*__sdfs_timeCallback)(void);
+        __sdfs_timeCallback = cb;
+    }
+
     // Because SdFat has a single, global setting for this we can only use a
-    // static member of our class to return the time/date.  However, since
-    // this is static, we can't see the time callback variable.  Punt for now,
-    // using time(NULL) as the best we can do.
+    // static member of our class to return the time/date.
     static void dateTimeCB(uint16_t *dosYear, uint16_t *dosTime) {
-        time_t now = time(nullptr);
+        time_t now;
+	extern time_t (*__sdfs_timeCallback)(void);
+        if (__sdfs_timeCallback) {
+            now = __sdfs_timeCallback();
+        } else {
+            now = time(nullptr);
+        }
         struct tm *tiempo = localtime(&now);
         *dosYear = ((tiempo->tm_year - 80) << 9) | ((tiempo->tm_mon + 1) << 5) | tiempo->tm_mday;
         *dosTime = (tiempo->tm_hour << 11) | (tiempo->tm_min << 5) | tiempo->tm_sec;
@@ -266,6 +275,11 @@ public:
     {
         flush();
         close();
+    }
+
+    int availableForWrite() override
+    {
+        return _opened ? _fd->availableForWrite() : 0;
     }
 
     size_t write(const uint8_t *buf, size_t size) override

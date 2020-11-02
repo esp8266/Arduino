@@ -60,6 +60,9 @@ static void printWiFiStatus(wl_status_t status)
         case WL_CONNECT_FAILED:
             DEBUG_WIFI_MULTI("[WIFIM] Connecting failed.\n");
             break;
+        case WL_WRONG_PASSWORD:
+            DEBUG_WIFI_MULTI("[WIFIM] Wrong password.\n");
+            break;
         default:
             DEBUG_WIFI_MULTI("[WIFIM] Connecting failed (%d).\n", status);
             break;

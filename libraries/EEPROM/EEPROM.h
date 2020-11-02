@@ -35,7 +35,7 @@ public:
   uint8_t read(int const address);
   void write(int const address, uint8_t const val);
   bool commit();
-  void end();
+  bool end();
 
   uint8_t * getDataPtr();
   uint8_t const * getConstDataPtr() const;
