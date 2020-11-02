@@ -357,6 +357,7 @@ uint8_t ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client
   return (uint8_t)res;
 }
 
+
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const String& boundary, uint32_t len){
   (void) len;
@@ -442,74 +443,64 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             if(_currentHandler && _currentHandler->canUpload(_currentUri))
               _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->status = UPLOAD_FILE_WRITE;
-            uint8_t argByte = _uploadReadByte(client);
-readfile:
-            while(argByte != 0x0D){
-              if (!client.connected()) return _parseFormUploadAborted();
-              _uploadWriteByte(argByte);
-              argByte = _uploadReadByte(client);
-            }
 
-            argByte = _uploadReadByte(client);
-            if (!client.connected()) return _parseFormUploadAborted();
-            if (argByte == 0x0A){
-              argByte = _uploadReadByte(client);
-              if (!client.connected()) return _parseFormUploadAborted();
-              if ((char)argByte != '-'){
-                //continue reading the file
-                _uploadWriteByte(0x0D);
-                _uploadWriteByte(0x0A);
-                goto readfile;
-              } else {
-                argByte = _uploadReadByte(client);
+            int bLen = boundary.length();
+            uint8_t boundBuf[2 + bLen + 1]; // "--" + boundary + null terminator
+            boundBuf[2 + bLen] = '\0';
+            uint8_t argByte;
+            bool first = true;
+            while (1) {
+                //attempt to fill up boundary buffer with length of boundary string
+                int i;
+                for (i = 0; i < 2 + bLen; i++) {
+                    if (!client.connected()) return _parseFormUploadAborted();
+                    argByte = _uploadReadByte(client);
+                    if (argByte == '\r')
+                        break;
+                    boundBuf[i] = argByte;
+                }
+                if ((strncmp((const char*)boundBuf, "--", 2) == 0) && (strcmp((const char*)(boundBuf + 2), boundary.c_str()) == 0))
+                    break;   //found the boundary, done parsing this file
+                if (first) first = false;   //only add newline characters after the first line
+                else {
+                    _uploadWriteByte('\r');
+                    _uploadWriteByte('\n');
+                }
+                // current line does not contain boundary, upload all bytes in boundary buffer
+                for (int j = 0; j < i; j++)
+                    _uploadWriteByte(boundBuf[j]);
+                // the initial pass (filling up the boundary buffer) did not reach the end of the line. Upload the rest of the line now
+                if (i >= 2 + bLen) {
+                    if (!client.connected()) return _parseFormUploadAborted();
+                    argByte = _uploadReadByte(client);
+                    while (argByte != '\r') {
+                        if (!client.connected()) return _parseFormUploadAborted();
+                        _uploadWriteByte(argByte);
+                        argByte = _uploadReadByte(client);
+                    }
+                }
                 if (!client.connected()) return _parseFormUploadAborted();
-                if ((char)argByte != '-'){
-                  //continue reading the file
-                  _uploadWriteByte(0x0D);
-                  _uploadWriteByte(0x0A);
-                  _uploadWriteByte((uint8_t)('-'));
-                  goto readfile;
-                }
-              }
-
-              uint8_t endBuf[boundary.length()];
-              client.readBytes(endBuf, boundary.length());
-
-              if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
-                if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
-                _currentUpload->totalSize += _currentUpload->currentSize;
-                _currentUpload->status = UPLOAD_FILE_END;
-                if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
-                DBGWS("End File: %s Type: %s Size: %d\n",
-                    _currentUpload->filename.c_str(),
-                    _currentUpload->type.c_str(),
-                    (int)_currentUpload->totalSize);
-                line = client.readStringUntil(0x0D);
-                client.readStringUntil(0x0A);
-                if (line == "--"){
-                  DBGWS("Done Parsing POST\n");
-                  break;
-                }
-                continue;
-              } else {
-                _uploadWriteByte(0x0D);
-                _uploadWriteByte(0x0A);
-                _uploadWriteByte((uint8_t)('-'));
-                _uploadWriteByte((uint8_t)('-'));
-                uint32_t i = 0;
-                while(i < boundary.length()){
-                  _uploadWriteByte(endBuf[i++]);
-                }
-                argByte = _uploadReadByte(client);
-                goto readfile;
-              }
-            } else {
-              _uploadWriteByte(0x0D);
-              goto readfile;
+                _uploadReadByte(client); // '\n'
             }
-            break;
+            //Found the boundary string, finish processing this file upload
+            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            _currentUpload->totalSize += _currentUpload->currentSize;
+            _currentUpload->status = UPLOAD_FILE_END;
+            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            DBGWS("End File: %s Type: %s Size: %d\n",
+                _currentUpload->filename.c_str(),
+                _currentUpload->type.c_str(),
+                (int)_currentUpload->totalSize);
+            if (!client.connected()) return _parseFormUploadAborted();
+            line = client.readStringUntil('\r');
+            client.readStringUntil('\n');
+            if (line == "--") {     // extra two dashes mean we reached the end of all form fields
+                DBGWS("Done Parsing POST\n");
+                break;
+            }
+            continue;
           }
         }
       }
