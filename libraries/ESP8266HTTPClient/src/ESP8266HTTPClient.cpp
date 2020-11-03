@@ -732,6 +732,12 @@ int HTTPClient::writeToStream(Stream * stream)
             if(ret < 0) {
                 return returnError(ret);
             }
+        } else if(len == -1 && _client->available() > 0) {
+            ret = writeToStreamDataBlock(stream, _client->available() > 0);
+
+            // have we an error?
+            if(ret < 0) {
+                return returnError(ret);
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
