@@ -25,18 +25,12 @@
 #include "core_esp8266_waveform.h"
 #include "user_interface.h"
 
-// Which pins have a tone running on them?
-static uint32_t _toneMap = 0;
-
-
 static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t duration) {
   if (_pin > 16) {
     return;
   }
 
-  if (!(_toneMap & 1UL << _pin)) {
-    pinMode(_pin, OUTPUT);
-  }
+  pinMode(_pin, OUTPUT);
 
   high = std::max(high, (uint32_t)microsecondsToClockCycles(25));  // new 20KHz maximum tone frequency,
   low = std::max(low, (uint32_t)microsecondsToClockCycles(25));   // (25us high + 25us low period = 20KHz)
@@ -44,9 +38,7 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t durat
   duration = microsecondsToClockCycles(duration * 1000UL);
   duration += high + low - 1;
   duration -= duration % (high + low);
-  if (startWaveformClockCycles(_pin, high, low, duration)) {
-    _toneMap |= 1UL << _pin;
-  }
+  startWaveformClockCycles(_pin, high, low, duration);
 }
 
 
@@ -88,6 +80,5 @@ void noTone(uint8_t _pin) {
     return;
   }
   stopWaveform(_pin);
-  _toneMap &= ~(1UL << _pin);
   digitalWrite(_pin, 0);
 }
