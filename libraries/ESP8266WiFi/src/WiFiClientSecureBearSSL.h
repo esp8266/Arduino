@@ -211,6 +211,7 @@ class WiFiClientSecure : public WiFiClient {
 
     WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
 
+    uint8_t status() override { return _ctx->status(); }
     int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }
     int connect(const String& host, uint16_t port) override { return _ctx->connect(host, port); }
     int connect(const char* name, uint16_t port) override { return _ctx->connect(name, port); }
