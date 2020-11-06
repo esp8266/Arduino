@@ -1,11 +1,10 @@
 {
-  "name": "FSTools",
-  "keywords": "SPIFFS LittleFS",
-  "description": "A library that manages convertion between SPIFFS and LITTLEFS as well as mounting partitions outside of sketch default.",
-  "homepage": "",
-  "author": "sticilface",
-  "version": "1.0.0",
-  "frameworks": "arduino",
-  "platforms": "esp8266"
-}
-
+   "name": "FSTools",
+   "keywords": "SPIFFS LittleFS",
+   "description": "A library that manages convertion between SPIFFS and LITTLEFS as well as mounting partitions outside of sketch default.",
+   "homepage": "",
+   "author": "sticilface",
+   "version": "1.0.0",
+   "frameworks": "arduino",
+   "platforms": "esp8266"
+ }

@@ -34,6 +34,7 @@ namespace FST {
 	 const layout layout_16m14m  (0x40400000, 0x411FA000, 0x100, 0x2000 );
 	 const layout layout_16m15m  (0x40300000, 0x411FA000, 0x100, 0x2000 );
 
+
 };
 
 FSTools::FSTools()
@@ -60,7 +61,7 @@ bool FSTools::attemptToMountFS(fs::FS & fs)
 }
 
 
-bool FSTools::mountAlternativeFS(  FST::FS_t type, const FST::layout layout, bool keepMounted )
+bool FSTools::mountAlternativeFS(  FST::FS_t type, const FST::layout & layout, bool keepMounted )
 {
 	FSConfig * pCfg{nullptr};
     LittleFSConfig littleFSCfg(false);
@@ -119,16 +120,16 @@ bool FSTools::moveFS(fs::FS & destinationFS)
 	}
 
 
-  	uint32_t startSector = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+  	uint32_t startSector = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1)); 
   	//uint32_t endSector = (uint32_t)&_FS_start - FST::lowestSPIFFSstartAddr;
-  	uint32_t lowestFSStart = 0x40300000; 
+  	uint32_t lowestFSStart = 0x40300000;
   	
-  	if (_layout) {
-  		lowestFSStart = _layout->startAddr; 
-  	}
+  	 if (_layout) {
+  	 	lowestFSStart = _layout->startAddr;  	
+  		//Serial.printf("**  _layout->startADDR = 0x%08x\n", _layout->startAddr ); 
+  	 }
   	
-  	uint32_t endSector = lowestFSStart - 0x40200000; 
-
+  	uint32_t endSector = lowestFSStart - 0x40200000;  
   	uint32_t tempFSsize = endSector - startSector;
 
   	//Serial.printf("TempFS:  start: %u, end: %u, size: %u, sketchSize = %u, _FS_start = %u\n", startSector, endSector, tempFSsize, ESP.getSketchSize(), (uint32_t)&_FS_start );  
@@ -183,7 +184,6 @@ void FSTools::fileListIterator(FS & fs, const char * dirName, FST::FileCb Cb )
 {
     Dir dir = fs.openDir(dirName);
     while (dir.next()) {
-      //const char * fileName = dir.fileName(); 
       if (dir.isFile()) {
         File f =  dir.openFile("r");
         if (Cb) {

@@ -75,7 +75,7 @@ public:
 	FSTools(); 
 	~FSTools(); 
 	bool attemptToMountFS(fs::FS & fs); 
-	bool mountAlternativeFS(  FST::FS_t type, const FST::layout layout, bool keepMounted = false ); 
+	bool mountAlternativeFS(  FST::FS_t type, const FST::layout & layout, bool keepMounted = false ); 
 	bool mounted(); 
 	bool moveFS(fs::FS & destinationFS); 
 	void reset(); 
