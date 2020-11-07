@@ -230,12 +230,10 @@ bool FSTools::_copyFS(FS & sourceFS, FS & destFS)
       fileListIterator(sourceFS, "/", [&count, &destFS](File & sourceFile){ 
         if (sourceFile) {
           File destFile = destFS.open(sourceFile.fullName(), "w");
-          bool copied = false;
           if (destFile) {
             destFile.setTimeout(5000);
             size_t written = destFile.write(sourceFile);
             if (written == sourceFile.size()) {
-              copied = true;
               count++;
             }            
           }
