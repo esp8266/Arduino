@@ -89,7 +89,7 @@ public:
       size_t doneLen = 0;
       size_t sentLen;
 
-      while (src.available() > sizeof(obuf)){
+      while (src.available() > (int)sizeof(obuf)){
         src.read(obuf, sizeof(obuf));
         sentLen = write(obuf, sizeof(obuf));
         doneLen = doneLen + sentLen;
