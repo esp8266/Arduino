@@ -88,7 +88,6 @@ public:
       uint8_t obuf[256];
       size_t doneLen = 0;
       size_t sentLen;
-      int i;
 
       while (src.available() > sizeof(obuf)){
         src.read(obuf, sizeof(obuf));
