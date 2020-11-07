@@ -2,20 +2,20 @@
 
         This sketch will convert SPIFFS partitions to a custom FS on ESP8266
 
-        Change the `TARGET_FS_LAYOUT` to the partition layout that you want target 
+        Change the `TARGET_FS_LAYOUT` to the partition layout that you want target
         ie  what you are trying to copy from.
 
-        This ksetch shows how to create a FS different to the one provided for by the sketch defaults. 
-        This is useful if you need to use an intermediate sketch to move the FS but need to maintain the 
-        sketch size limit of say 512kb. 
+        This ksetch shows how to create a FS different to the one provided for by the sketch defaults.
+        This is useful if you need to use an intermediate sketch to move the FS but need to maintain the
+        sketch size limit of say 512kb.
 
-        How it works:  It creates a LittleFS partition between the end of the sketch and the 
-        start of whatever filesystem you set as target.  This has IMPORTANT implications for the 
-        amount of data you can move!!!  eg a 4Mb flash module with a 3Mb SPIFFS partition only leaves 
-        about 450k for the temp file system, so if you have more data than that on your 3Mb SPIFFS it 
-        will fail.  
+        How it works:  It creates a LittleFS partition between the end of the sketch and the
+        start of whatever filesystem you set as target.  This has IMPORTANT implications for the
+        amount of data you can move!!!  eg a 4Mb flash module with a 3Mb SPIFFS partition only leaves
+        about 450k for the temp file system, so if you have more data than that on your 3Mb SPIFFS it
+        will fail.
 
- */
+*/
 
 
 
@@ -29,13 +29,13 @@
 
 #define TARGET_FS_LAYOUT FST::layout_4m3m
 
-const uint32_t startSector = FST::layout_4m1m.startAddr - 0x40200000; 
-const uint32_t tempFSsize  = FST::layout_4m1m.endAddr - FST::layout_4m1m.startAddr; 
+const uint32_t startSector = FST::layout_4m1m.startAddr - 0x40200000;
+const uint32_t tempFSsize  = FST::layout_4m1m.endAddr - FST::layout_4m1m.startAddr;
 
 fs::FS LittleFS_Different = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(startSector, tempFSsize, FS_PHYS_PAGE, FS_PHYS_BLOCK, 5)));
 
 
-FSTools fstools; 
+FSTools fstools;
 
 #ifndef STASSID
 #define STASSID "xxxx"
@@ -46,27 +46,25 @@ const char* ssid = STASSID;
 const char* password = STAPSK;
 
 
-bool migrateFS()
-{
-    if (!fstools.attemptToMountFS(LittleFS_Different)) { //  Attempts to mount LittleFS without autoformat... 
-    Serial.println(F("Default FS not found")); 
-    if (fstools.mountAlternativeFS( FST::SPIFFS  /* FST::LITTLEFS */ , TARGET_FS_LAYOUT , true )) { 
-       Serial.println(F("Alternative found")); 
-     if (fstools.moveFS(LittleFS_Different)) {
+bool migrateFS() {
+  if (!fstools.attemptToMountFS(LittleFS_Different)) { //  Attempts to mount LittleFS without autoformat...
+    Serial.println(F("Default FS not found"));
+    if (fstools.mountAlternativeFS(FST::SPIFFS  /* FST::LITTLEFS */, TARGET_FS_LAYOUT, true)) {
+      Serial.println(F("Alternative found"));
+      if (fstools.moveFS(LittleFS_Different)) {
         Serial.println(F("FileSystem Moved New FS contents:"));
         fstools.fileListIterator(LittleFS_Different, "/", [](File & f) {
-            Serial.printf_P(PSTR(" File: %-30s [%8uB]\n"), f.fullName(), f.size() );
+          Serial.printf_P(PSTR(" File: %-30s [%8uB]\n"), f.fullName(), f.size());
         });
-        return true; 
+        return true;
       }
     }
   }
-  return false; 
+  return false;
 }
 
 
-void initWiFiOTA()
-{
+void initWiFiOTA() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -114,20 +112,20 @@ void setup() {
   WiFi.persistent(false);
   WiFi.disconnect(true);
   Serial.begin(115200);
-  
-  Serial.println(); 
-  Serial.printf("SDK Version: %s\n", ESP.getSdkVersion() );
-  Serial.println("Core Version: " + ESP.getCoreVersion() );
-  Serial.println("Full Version: " + ESP.getFullVersion() );
+
+  Serial.println();
+  Serial.printf("SDK Version: %s\n", ESP.getSdkVersion());
+  Serial.println("Core Version: " + ESP.getCoreVersion());
+  Serial.println("Full Version: " + ESP.getFullVersion());
 
   Serial.printf("Sketch size: %u\n", ESP.getSketchSize());
   Serial.printf("Free size: %u\n", ESP.getFreeSketchSpace());
-  
+
   Serial.println("Booting");
 
-  migrateFS(); // MUST call this before calling your own begin(); 
+  migrateFS(); // MUST call this before calling your own begin();
 
-  initWiFiOTA(); 
+  initWiFiOTA();
 
   Serial.println("Ready");
   Serial.print("IP address: ");

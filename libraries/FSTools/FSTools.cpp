@@ -138,7 +138,7 @@ bool FSTools::moveFS(fs::FS & destinationFS)
       if (f) {
         sourceFileCount++;
         sourceByteTotal += f.size(); 
-        _dumpFileInfo(f); 
+        //_dumpFileInfo(f); 
     }
     });
 
@@ -207,12 +207,12 @@ uint32_t FSTools::_getSize(const FST::layout & layout)
 } 
 
 
-void FSTools::_dumpFileInfo(File & f)
-{
-  if (f) {
-    //Serial.printf_P(PSTR(" File: %-30s [%8uB]\n"), f.fullName(), f.size() );
-  }
-}
+// void FSTools::_dumpFileInfo(File & f)
+// {
+//   if (f) {
+//     Serial.printf_P(PSTR(" File: %-30s [%8uB]\n"), f.fullName(), f.size() );
+//   }
+// }
 
 bool FSTools::_copyFS(FS & sourceFS, FS & destFS)
 {

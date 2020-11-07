@@ -55,7 +55,6 @@ extern const layout layout_8m7m;
 extern const layout layout_16m14m;
 extern const layout layout_16m15m;
 
-
 typedef std::function<void(File & f)> FileCb; 
 
 
@@ -63,14 +62,8 @@ typedef std::function<void(File & f)> FileCb;
 
 
 
-//376884
-//376452
-
-
 class FSTools {
 public:
-
-
 
 	FSTools(); 
 	~FSTools(); 
@@ -84,7 +77,7 @@ public:
 private:
 	uint32_t _getStartAddr(const FST::layout & layout); 
 	uint32_t _getSize(const FST::layout & layout); 
-	void _dumpFileInfo(File & f); 
+//	void _dumpFileInfo(File & f); 
 	bool _copyFS(FS & sourceFS, FS & destFS);
 
 	std::unique_ptr<fs::FS> _pFS;
