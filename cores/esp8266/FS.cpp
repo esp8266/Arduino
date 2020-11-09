@@ -46,6 +46,14 @@ int File::available() {
     return _p->size() - _p->position();
 }
 
+int File::availableForWrite() {
+    if (!_p)
+        return false;
+
+    return _p->availableForWrite();
+}
+
+
 int File::read() {
     if (!_p)
         return -1;

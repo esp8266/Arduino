@@ -26,6 +26,7 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
+#include "base64.h"
 #include "detail/RequestHandlersImpl.h"
 #include <StreamDev.h>
 
@@ -99,21 +100,19 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
         authReq = "";
         return false;
       }
-      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
+      sprintf(toencode, "%s:%s", username, password);
+      String encoded = base64::encode((uint8_t *)toencode, toencodeLen, false);
+      if(!encoded){
         authReq = "";
         delete[] toencode;
         return false;
       }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
+      if(authReq.equalsConstantTime(encoded)) {
         authReq = "";
         delete[] toencode;
-        delete[] encoded;
         return true;
       }
       delete[] toencode;
-      delete[] encoded;
     } else if(authReq.startsWith(F("Digest"))) {
       String _realm    = _extractParam(authReq, F("realm=\""));
       String _H1 = credentialHash((String)username,_realm,(String)password);

@@ -1267,11 +1267,22 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
 int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
   int err = 0;
   const char *t = PSTR("OK");
+  const char *recv_fatal = "";
+  const char *send_fatal = "";
   if (_sc || _sc_svr) {
     err = br_ssl_engine_last_error(_eng);
   }
   if (_oom_err) {
     err = -1000;
+  } else {
+    if (err & BR_ERR_RECV_FATAL_ALERT) {
+      recv_fatal = PSTR("SSL received fatal alert - ");
+      err &= ~BR_ERR_RECV_FATAL_ALERT;
+    }
+    if (err & BR_ERR_SEND_FATAL_ALERT) {
+      send_fatal = PSTR("SSL sent fatal alert - ");
+      err &= ~BR_ERR_SEND_FATAL_ALERT;
+    }
   }
   switch (err) {
     case -1000: t = PSTR("Unable to allocate memory for SSL structures and buffers."); break;
@@ -1336,8 +1347,8 @@ int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
     default: t = PSTR("Unknown error code."); break;
   }
   if (dest) {
-    strncpy_P(dest, t, len);
-    dest[len - 1] = 0;
+    // snprintf is PSTR safe and guaranteed to 0-terminate
+    snprintf(dest, len, "%s%s%s", recv_fatal, send_fatal, t);
   }
   return err;
 }

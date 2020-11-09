@@ -173,10 +173,10 @@ void loop() {
 
   // determine maximum output size "fair TCP use"
   // client.availableForWrite() returns 0 when !client.connected()
-  size_t maxToTcp = 0;
+  int maxToTcp = 0;
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     if (serverClients[i]) {
-      size_t afw = serverClients[i].availableForWrite();
+      int afw = serverClients[i].availableForWrite();
       if (afw) {
         if (!maxToTcp) {
           maxToTcp = afw;
@@ -190,7 +190,7 @@ void loop() {
     }
 
   //check UART for data
-  size_t len = std::min((size_t)Serial.available(), maxToTcp);
+  size_t len = std::min(Serial.available(), maxToTcp);
   len = std::min(len, (size_t)STACK_PROTECTOR);
   if (len) {
     uint8_t sbuf[len];
