@@ -1,10 +1,10 @@
 /**
  *
  * @file ESP8266WiFiMulti.cpp
- * @date 16.05.2015
- * @author Markus Sattler
+ * @date 30.09.2020
+ * @author Markus Sattler, Erriez
  *
- * Copyright (c) 2015 Markus Sattler. All rights reserved.
+ * Copyright (c) 2015-2020 Markus Sattler. All rights reserved.
  * This file is part of the esp8266 core for Arduino environment.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,230 +23,419 @@
  *
  */
 
+#include "PolledTimeout.h"
 #include "ESP8266WiFiMulti.h"
 #include <limits.h>
 #include <string.h>
 
-ESP8266WiFiMulti::ESP8266WiFiMulti() {
+/**
+ * @brief Print WiFi status
+ * @details
+ *      Macro DEBUG_ESP_WIFI and DEBUG_ESP_PORT must be configured
+ * @param status
+ *      WiFi status
+ */
+static void printWiFiStatus(wl_status_t status)
+{
+#ifdef DEBUG_ESP_WIFI
+    IPAddress ip;
+    uint8_t *mac;
+
+    switch (status) {
+        case WL_CONNECTED:
+            ip = WiFi.localIP();
+            mac = WiFi.BSSID();
+
+            DEBUG_WIFI_MULTI("[WIFIM] Connected:\n");
+            DEBUG_WIFI_MULTI("[WIFIM]   SSID: %s\n", WiFi.SSID().c_str());
+            DEBUG_WIFI_MULTI("[WIFIM]   IP:   %d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
+            DEBUG_WIFI_MULTI("[WIFIM]   MAC:  %02X:%02X:%02X:%02X:%02X:%02X\n",
+                             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            DEBUG_WIFI_MULTI("[WIFIM]   CH:   %d\n", WiFi.channel());
+            DEBUG_WIFI_MULTI("[WIFIM]   RSSI: %d\n", WiFi.RSSI());
+            break;
+        case WL_NO_SSID_AVAIL:
+            DEBUG_WIFI_MULTI("[WIFIM] Connecting failed AP not found.\n");
+            break;
+        case WL_CONNECT_FAILED:
+            DEBUG_WIFI_MULTI("[WIFIM] Connecting failed.\n");
+            break;
+        case WL_WRONG_PASSWORD:
+            DEBUG_WIFI_MULTI("[WIFIM] Wrong password.\n");
+            break;
+        default:
+            DEBUG_WIFI_MULTI("[WIFIM] Connecting failed (%d).\n", status);
+            break;
+    }
+#else
+    // Suppress warning unused variable
+    (void)(status);
+#endif
 }
 
-ESP8266WiFiMulti::~ESP8266WiFiMulti() {
+/**
+ * @brief Wait for WiFi connect status change, protected with timeout
+ * @param connectTimeoutMs
+ *      WiFi connection timeout in ms
+ * @return
+ *      WiFi connection status
+ */
+static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
+{
+    wl_status_t status;
+
+    // Set WiFi connect timeout
+    using esp8266::polledTimeout::oneShotMs;
+    oneShotMs connectTimeout(connectTimeoutMs);
+
+    // Wait for WiFi status change or timeout
+    do {
+        // Refresh watchdog
+        delay(0);
+
+        // Get WiFi status
+        status = WiFi.status();
+
+        // Check status
+        if (status == WL_CONNECTED) {
+            // Connected, print WiFi status
+            printWiFiStatus(status);
+
+            // Return WiFi status
+            return status;
+        } else if (status == WL_CONNECT_FAILED) {
+            DEBUG_WIFI_MULTI("[WIFIM] Connect failed\n");
+
+            // Return WiFi connect failed
+            return WL_CONNECT_FAILED;
+        }
+    } while (!connectTimeout);
+
+    DEBUG_WIFI_MULTI("[WIFIM] Connect timeout\n");
+
+    return WL_CONNECT_FAILED;
+}
+
+/**
+ * @brief Constructor
+ */
+ESP8266WiFiMulti::ESP8266WiFiMulti() : _firstRun(true)
+{
+}
+
+/**
+ * @brief Destructor
+ */
+ESP8266WiFiMulti::~ESP8266WiFiMulti()
+{
+    // Cleanup memory
     APlistClean();
 }
 
-bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
+/**
+ * @brief Add Access Point
+ * @param ssid
+ *      WiFi SSID char array, max 32 characters + NULL character
+ * @param passphrase
+ *      WiFi password char array, max 63 characters + NULL character
+ * @retval true
+ *      Success
+ * @retval false
+ *      Failure
+ */
+bool ESP8266WiFiMulti::addAP(const char *ssid, const char *passphrase)
+{
     return APlistAdd(ssid, passphrase);
 }
 
-void ESP8266WiFiMulti::cleanAPlist(void) {
+/**
+ * @brief Remove all Access Points from list
+ */
+void ESP8266WiFiMulti::cleanAPlist(void)
+{
     APlistClean();
 }
 
-bool ESP8266WiFiMulti::existsAP(const char* ssid, const char *passphrase) {
+/**
+ * @brief Check if Access Point exists in list
+ * @param ssid
+ *      WiFi SSID
+ * @param passphrase
+ *      WiFi Password
+ * @retval true
+ *      Success
+ * @retval false
+ *      Failure
+ */
+bool ESP8266WiFiMulti::existsAP(const char *ssid, const char *passphrase)
+{
     return APlistExists(ssid, passphrase);
 }
 
-wl_status_t ESP8266WiFiMulti::run(void) {
+/**
+ * @brief Keep WiFi connected to Access Point with strongest WiFi signal (RSSI)
+ * @param connectTimeoutMs
+ *      Timeout in ms per WiFi connection (excluding fixed 5 seconds scan timeout)
+ * @return
+ *      WiFi status
+ */
+wl_status_t ESP8266WiFiMulti::run(uint32_t connectTimeoutMs)
+{
+    int8_t scanResult;
+    wl_status_t status;
 
-    wl_status_t status = WiFi.status();
-    if(status == WL_DISCONNECTED || status == WL_NO_SSID_AVAIL || status == WL_IDLE_STATUS || status == WL_CONNECT_FAILED) {
+    // Fast connect to previous WiFi on startup
+    if (_firstRun) {
+        _firstRun = false;
 
-        int8_t scanResult = WiFi.scanComplete();
+        // Check if previous WiFi connection saved
+        if (strlen(WiFi.SSID().c_str())) {
+            DEBUG_WIFI_MULTI("[WIFIM] Connecting saved WiFi\n");
 
-        if(scanResult == WIFI_SCAN_RUNNING) {
-            // scan is running, do nothing yet
-            status = WL_NO_SSID_AVAIL;
-            return status;
-        } 
+            // Connect to previous saved WiFi
+            WiFi.begin();
 
-        if(scanResult == 0) {
-            // scan done, no ssids found. Start another scan.
-            DEBUG_WIFI_MULTI("[WIFI] scan done\n");
-            DEBUG_WIFI_MULTI("[WIFI] no networks found\n");
-            WiFi.scanDelete();
-            DEBUG_WIFI_MULTI("\n\n");
-            delay(0);
-            WiFi.disconnect();
-            DEBUG_WIFI_MULTI("[WIFI] start scan\n");
-            // scan wifi async mode
-            WiFi.scanNetworks(true);
-            return status;
-        } 
-
-        if(scanResult > 0) {
-            // scan done, analyze
-            WifiAPEntry bestNetwork { NULL, NULL };
-            int bestNetworkDb = INT_MIN;
-            uint8 bestBSSID[6];
-            int32_t bestChannel;
-
-            DEBUG_WIFI_MULTI("[WIFI] scan done\n");
-            delay(0);
-
-            DEBUG_WIFI_MULTI("[WIFI] %d networks found\n", scanResult);
-            for(int8_t i = 0; i < scanResult; ++i) {
-
-                String ssid_scan;
-                int32_t rssi_scan;
-                uint8_t sec_scan;
-                uint8_t* BSSID_scan;
-                int32_t chan_scan;
-                bool hidden_scan;
-
-                WiFi.getNetworkInfo(i, ssid_scan, sec_scan, rssi_scan, BSSID_scan, chan_scan, hidden_scan);
-
-                bool known = false;
-                for(auto entry : APlist) {
-                    if(ssid_scan == entry.ssid) { // SSID match
-                        known = true;
-                        if(rssi_scan > bestNetworkDb) { // best network
-                            if(sec_scan == ENC_TYPE_NONE || entry.passphrase) { // check for passphrase if not open wlan
-                                bestNetworkDb = rssi_scan;
-                                bestChannel = chan_scan;
-                                bestNetwork = entry;
-                                memcpy((void*) &bestBSSID, (void*) BSSID_scan, sizeof(bestBSSID));
-                            }
-                        }
-                        break;
-                    }
-                }
-
-                if(known) {
-                    DEBUG_WIFI_MULTI(" ---> ");
-                } else {
-                    DEBUG_WIFI_MULTI("      ");
-                }
-
-                DEBUG_WIFI_MULTI(" %d: [%d][%02X:%02X:%02X:%02X:%02X:%02X] %s (%d) %c\n", i, chan_scan, BSSID_scan[0], BSSID_scan[1], BSSID_scan[2], BSSID_scan[3], BSSID_scan[4], BSSID_scan[5], ssid_scan.c_str(), rssi_scan, (sec_scan == ENC_TYPE_NONE) ? ' ' : '*');
-                delay(0);
-            }
-
-            // clean up ram
-            WiFi.scanDelete();
-
-            DEBUG_WIFI_MULTI("\n\n");
-            delay(0);
-
-            if(bestNetwork.ssid) {
-                DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channel: %d (%d)\n", bestBSSID[0], bestBSSID[1], bestBSSID[2], bestBSSID[3], bestBSSID[4], bestBSSID[5], bestNetwork.ssid, bestChannel, bestNetworkDb);
-
-                WiFi.begin(bestNetwork.ssid, bestNetwork.passphrase, bestChannel, bestBSSID);
-                status = WiFi.status();
-
-                static const uint32_t connectTimeout = 5000; //5s timeout
-                
-                auto startTime = millis();
-                // wait for connection, fail, or timeout
-                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeout) {
-                    delay(10);
-                    status = WiFi.status();
-                }
-                
-#ifdef DEBUG_ESP_WIFI
-                IPAddress ip;
-                uint8_t * mac;
-                switch(status) {
-                    case WL_CONNECTED:
-                        ip = WiFi.localIP();
-                        mac = WiFi.BSSID();
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting done.\n");
-                        DEBUG_WIFI_MULTI("[WIFI] SSID: %s\n", WiFi.SSID().c_str());
-                        DEBUG_WIFI_MULTI("[WIFI] IP: %d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
-                        DEBUG_WIFI_MULTI("[WIFI] MAC: %02X:%02X:%02X:%02X:%02X:%02X\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-                        DEBUG_WIFI_MULTI("[WIFI] Channel: %d\n", WiFi.channel());
-                        break;
-                    case WL_NO_SSID_AVAIL:
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting Failed AP not found.\n");
-                        break;
-                    case WL_CONNECT_FAILED:
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting Failed.\n");
-                        break;
-                    default:
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting Failed (%d).\n", status);
-                        break;
-                }
-#endif
-            } else {
-                DEBUG_WIFI_MULTI("[WIFI] no matching wifi found!\n");
-            }
-
-            return status;
+            // Wait for status change
+            status = waitWiFiConnect(connectTimeoutMs);
         }
-       
-       
-        // scan failed, or some other condition not handled above. Start another scan.
-        DEBUG_WIFI_MULTI("[WIFI] delete old wifi config...\n");
-        WiFi.disconnect();
-
-        DEBUG_WIFI_MULTI("[WIFI] start scan\n");
-        // scan wifi async mode
-        WiFi.scanNetworks(true);
     }
-    return status;
+
+    // Check connection state
+    status = WiFi.status();
+    if (status == WL_CONNECTED) {
+        // Already connected
+        return status;
+    }
+
+    // Start WiFi scan
+    scanResult = startScan();
+    if (scanResult < 0) {
+        // No WiFi scan results
+        return WL_NO_SSID_AVAIL;
+    }
+
+    // Try to connect to multiple WiFi's with strongest signal (RSSI)
+    return connectWiFiMulti(connectTimeoutMs);
+}
+
+/**
+ * @brief Start WiFi scan
+ * @retval >0
+ *      Number of detected WiFi SSID's
+ * @retval 0
+ *      No WiFi connections found
+ * @retval -2
+ *      WiFi scan failed
+ */
+int8_t ESP8266WiFiMulti::startScan()
+{
+    int8_t scanResult;
+
+    DEBUG_WIFI_MULTI("[WIFIM] Start scan\n");
+
+    // Clean previous scan
+    WiFi.scanDelete();
+
+    // Remove previous WiFi SSID/password
+    WiFi.disconnect();
+
+    // Start wifi scan in async mode
+    WiFi.scanNetworks(true);
+
+    // Set WiFi scan timeout
+    using esp8266::polledTimeout::oneShotMs;
+    oneShotMs scanTimeout(WIFI_SCAN_TIMEOUT_MS);
+
+    // Wait for WiFi scan change or timeout
+    do {
+        // Refresh watchdog
+        delay(0);
+
+        // Check scan timeout which may occur when scan does not report completion
+        if (scanTimeout) {
+            DEBUG_WIFI_MULTI("[WIFIM] Scan timeout\n");
+            return WIFI_SCAN_FAILED;
+        }
+
+        // Get scan result
+        scanResult = WiFi.scanComplete();
+    } while (scanResult < 0);
+
+    // Print WiFi scan result
+    printWiFiScan();
+
+    // Return (positive) number of detected WiFi networks
+    return scanResult;
+}
+
+/**
+ * @brief Connect to multiple WiFi's
+ * @param connectTimeoutMs
+ *      WiFi connect timeout in ms
+ * @return
+ *      WiFi conneciton status
+ */
+wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
+{
+    int8_t scanResult;
+    String ssid;
+    int32_t rssi;
+    uint8_t encType;
+    uint8_t *bssid;
+    int32_t channel;
+    bool hidden;
+
+    // Get scan results
+    scanResult = WiFi.scanComplete();
+
+    // Find known WiFi networks
+    uint8_t known[_APlist.size()];
+    uint8_t numNetworks = 0;
+    for (int8_t i = 0; i < scanResult; i++) {
+        // Get network information
+        WiFi.getNetworkInfo(i, ssid, encType, rssi, bssid, channel, hidden);
+
+        // Check if the WiFi network contains an entry in AP list
+        for (auto entry : _APlist) {
+            // Check SSID
+            if (ssid == entry.ssid) {
+                // Known network
+                known[numNetworks++] = i;
+            }
+        }
+    }
+
+    // Sort WiFi networks by RSSI
+    for (int i = 0; i < numNetworks; i++) {
+        for (int j = i + 1; j < numNetworks; j++) {
+            if (WiFi.RSSI(known[j]) > WiFi.RSSI(known[i])) {
+                int8_t tmp;
+
+                // Swap indices
+                tmp = known[i];
+                known[i] = known[j];
+                known[j] = tmp;
+            }
+        }
+    }
+
+    // Print sorted indices
+    DEBUG_WIFI_MULTI("[WIFIM] Sorted indices: ");
+    for (int8_t i = 0; i < numNetworks; i++) {
+        DEBUG_WIFI_MULTI("%d ", known[i]);
+    }
+    DEBUG_WIFI_MULTI("\n");
+
+    // Connect to known WiFi AP's sorted by RSSI
+    for (int8_t i = 0; i < numNetworks; i++) {
+        // Get network information
+        WiFi.getNetworkInfo(known[i], ssid, encType, rssi, bssid, channel, hidden);
+
+        for (auto entry : _APlist) {
+            // Check SSID
+            if (ssid == entry.ssid) {
+                DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid);
+
+                // Connect to WiFi
+                WiFi.begin(ssid, entry.passphrase, channel, bssid);
+
+                // Wait for status change
+                if (waitWiFiConnect(connectTimeoutMs) == WL_CONNECTED) {
+                    return WL_CONNECTED;
+                }
+            }
+        }
+    }
+
+    DEBUG_WIFI_MULTI("[WIFIM] Could not connect\n", ssid);
+
+    // Coult not connect to any WiFi network
+    return WL_CONNECT_FAILED;
 }
 
 // ##################################################################################
 
-bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
-
+/**
+ * @brief Add WiFi connection to internal AP list
+ * @param ssid
+ *      WiFi SSID
+ * @param passphrase
+ *      WiFi Password
+ * @retval true
+ *      Success
+ * @retval false
+ *      Failure
+ */
+bool ESP8266WiFiMulti::APlistAdd(const char *ssid, const char *passphrase)
+{
     WifiAPEntry newAP;
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
-        // fail SSID too long or missing!
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] no ssid or ssid too long\n");
+    if (!ssid || (*ssid == 0x00) || (strlen(ssid) > 32)) {
+        // Fail SSID too long or missing!
+        DEBUG_WIFI_MULTI("[WIFIM][APlistAdd] No ssid or ssid too long\n");
         return false;
     }
 
-    //for passphrase, max is 63 ascii + null. For psk, 64hex + null.
-    if(passphrase && strlen(passphrase) > 64) {
+    // For passphrase, max is 63 ascii + null. For psk, 64hex + null.
+    if (passphrase && (strlen(passphrase) > 64)) {
         // fail passphrase too long!
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] passphrase too long\n");
+        DEBUG_WIFI_MULTI("[WIFIM][APlistAdd] Passphrase too long\n");
         return false;
     }
 
-    if(APlistExists(ssid, passphrase)) {
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] SSID: %s already exists\n", ssid);
+    if (APlistExists(ssid, passphrase)) {
+        DEBUG_WIFI_MULTI("[WIFIM][APlistAdd] SSID: %s already exists\n", ssid);
         return true;
     }
 
     newAP.ssid = strdup(ssid);
 
-    if(!newAP.ssid) {
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] fail newAP.ssid == 0\n");
+    if (!newAP.ssid) {
+        DEBUG_WIFI_MULTI("[WIFIM][APlistAdd] Fail newAP.ssid == 0\n");
         return false;
     }
 
-    if(passphrase) {
+    if (passphrase) {
         newAP.passphrase = strdup(passphrase);
     } else {
         newAP.passphrase = strdup("");
     }
 
-    if(!newAP.passphrase) {
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] fail newAP.passphrase == 0\n");
+    if (!newAP.passphrase) {
+        DEBUG_WIFI_MULTI("[WIFIM][APlistAdd] Fail newAP.passphrase == 0\n");
         free(newAP.ssid);
         return false;
     }
 
-    APlist.push_back(newAP);
-    DEBUG_WIFI_MULTI("[WIFI][APlistAdd] add SSID: %s\n", newAP.ssid);
+    _APlist.push_back(newAP);
+    DEBUG_WIFI_MULTI("[WIFIM][APlistAdd] Add SSID: %s\n", newAP.ssid);
     return true;
 }
 
-bool ESP8266WiFiMulti::APlistExists(const char* ssid, const char *passphrase) {
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
-        // fail SSID too long or missing!
-        DEBUG_WIFI_MULTI("[WIFI][APlistExists] no ssid or ssid too long\n");
+/**
+ * @brief Check if AP exists in list
+ * @param ssid
+ *      WiFi SSID
+ * @param passphrase
+ *      WiFi Password
+ * @return
+ */
+bool ESP8266WiFiMulti::APlistExists(const char *ssid, const char *passphrase)
+{
+    if (!ssid || (*ssid == 0x00) || (strlen(ssid) > 32)) {
+        // Fail SSID too long or missing
+        DEBUG_WIFI_MULTI("[WIFIM][APlistExists] No ssid or ssid too long\n");
         return false;
     }
-    for(auto entry : APlist) {
-        if(!strcmp(entry.ssid, ssid)) {
-            if(!passphrase) {
-                if(!strcmp(entry.passphrase, "")) {
+
+    for (auto entry : _APlist) {
+        if (!strcmp(entry.ssid, ssid)) {
+            if (!passphrase) {
+                if (!strcmp(entry.passphrase, "")) {
                     return true;
                 }
             } else {
-                if(!strcmp(entry.passphrase, passphrase)) {
+                if (!strcmp(entry.passphrase, passphrase)) {
                     return true;
                 }
             }
@@ -255,15 +444,72 @@ bool ESP8266WiFiMulti::APlistExists(const char* ssid, const char *passphrase) {
     return false;
 }
 
-void ESP8266WiFiMulti::APlistClean(void) {
-    for(auto entry : APlist) {
-        if(entry.ssid) {
+/**
+ * @brief Remove all AP's from list
+ */
+void ESP8266WiFiMulti::APlistClean(void)
+{
+    // Remove all entries from APlist
+    for (auto entry : _APlist) {
+        if (entry.ssid) {
             free(entry.ssid);
         }
-        if(entry.passphrase) {
+        if (entry.passphrase) {
             free(entry.passphrase);
         }
     }
-    APlist.clear();
+
+    _APlist.clear();
 }
 
+/**
+ * @brief Print WiFi scan results
+ * @details
+ *      Macro DEBUG_ESP_WIFI and DEBUG_ESP_PORT must be configured
+ */
+void ESP8266WiFiMulti::printWiFiScan()
+{
+#ifdef DEBUG_ESP_WIFI
+    String ssid;
+    int32_t rssi;
+    uint8_t encryptionType;
+    uint8_t* bssid;
+    int32_t channel;
+    bool hidden;
+    int8_t scanResult;
+
+    scanResult = WiFi.scanComplete();
+
+    DEBUG_WIFI_MULTI("[WIFIM] %d networks found:\n", scanResult);
+
+    // Print unsorted scan results
+    for (int8_t i = 0; i < scanResult; i++) {
+        bool known = false;
+
+        WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
+
+        for(auto entry : _APlist) {
+            if(ssid == entry.ssid) {
+                // SSID match
+                known = true;
+            }
+        }
+
+        if (known) {
+            DEBUG_WIFI_MULTI(" --->");
+        } else {
+            DEBUG_WIFI_MULTI("     ");
+        }
+
+        DEBUG_WIFI_MULTI(" %d: [CH %02d] [%02X:%02X:%02X:%02X:%02X:%02X] %ddBm %c %s\n",
+                         i,
+                         channel,
+                         bssid[0], bssid[1], bssid[2],
+                         bssid[3], bssid[4], bssid[5],
+                         rssi,
+                         (encryptionType == ENC_TYPE_NONE) ? ' ' : '*',
+                         ssid.c_str());
+        delay(0);
+    }
+#endif
+}

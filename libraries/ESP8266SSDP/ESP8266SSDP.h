@@ -46,6 +46,9 @@ class UdpContext;
 #define SSDP_MODEL_VERSION_SIZE     32
 #define SSDP_MANUFACTURER_SIZE      64
 #define SSDP_MANUFACTURER_URL_SIZE  128
+#define SSDP_INTERVAL_SECONDS       1200
+#define SSDP_MULTICAST_TTL          2
+#define SSDP_HTTP_PORT              80
 
 typedef enum {
   NONE,
@@ -71,13 +74,13 @@ class SSDPClass{
     void setUUID(const String& uuid)	{ setUUID(uuid.c_str()); }
     void setUUID(const char *uuid);
 	
-	  void setName(const String& name) { setName(name.c_str()); }
+    void setName(const String& name) { setName(name.c_str()); }
     void setName(const char *name);
     void setURL(const String& url) { setURL(url.c_str()); }
     void setURL(const char *url);
     void setSchemaURL(const String& url) { setSchemaURL(url.c_str()); }
     void setSchemaURL(const char *url);
-	  void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
+    void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
     void setSerialNumber(const char *serialNumber);
     void setSerialNumber(const uint32_t serialNumber);
     void setModelName(const String& name) { setModelName(name.c_str()); }
@@ -92,6 +95,7 @@ class SSDPClass{
     void setManufacturerURL(const char *url);
     void setHTTPPort(uint16_t port);
     void setTTL(uint8_t ttl);
+    void setInterval(uint32_t interval);
 
   protected:
     void _send(ssdp_method_t method);
@@ -100,19 +104,20 @@ class SSDPClass{
     void _stopTimer();
     static void _onTimerStatic(SSDPClass* self);
 
-    UdpContext* _server;
-    SSDPTimer* _timer;
-    uint16_t _port;
-    uint8_t _ttl;
+    UdpContext* _server = nullptr;
+    SSDPTimer* _timer = nullptr;
+    uint16_t _port = SSDP_HTTP_PORT;
+    uint8_t _ttl = SSDP_MULTICAST_TTL;
+    uint32_t _interval = SSDP_INTERVAL_SECONDS;
 
     IPAddress _respondToAddr;
-    uint16_t  _respondToPort;
+    uint16_t  _respondToPort = 0;
 
-    bool _pending;
-    bool _st_is_uuid;
-    unsigned short _delay;
-    unsigned long _process_time;
-    unsigned long _notify_time;
+    bool _pending = false;
+    bool _st_is_uuid = false;
+    unsigned short _delay = 0;
+    unsigned long _process_time = 0;
+    unsigned long _notify_time = 0;
 
     char _schemaURL[SSDP_SCHEMA_URL_SIZE];
     char _uuid[SSDP_UUID_SIZE];

@@ -26,6 +26,9 @@
 
 
 namespace spiffs_test {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #define FSTYPE SPIFFS
 #define TESTPRE "SPIFFS - "
 #define TESTPAT "[fs]"
@@ -54,6 +57,7 @@ TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
     REQUIRE_FALSE(SPIFFS.setConfig(d));
     REQUIRE_FALSE(LittleFS.setConfig(l));
 }
+#pragma GCC diagnostic pop
 
 };
 
@@ -156,6 +160,37 @@ TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
     g.read(&u, 1);
     g.close();
     REQUIRE(u == 0);
+}
+
+// SDFS timestamp setter (#7682)
+static time_t _my_time(void)
+{
+    struct tm t;
+    bzero(&t, sizeof(t));
+    t.tm_year = 120;
+    t.tm_mon  = 9;
+    t.tm_mday = 22;
+    t.tm_hour = 12;
+    t.tm_min  = 13;
+    t.tm_sec  = 14;
+    return mktime(&t);
+}
+
+TEST_CASE("SDFS timeCallback")
+{
+    SDFS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(SDFS.begin());
+    REQUIRE(SD.begin(4));
+
+    SDFS.setTimeCallback(_my_time);
+    File f = SD.open("/file.txt", "w");
+    f.write("Had we but world enough, and time,");
+    f.close();
+    time_t expected = _my_time();
+    f = SD.open("/file.txt", "r");
+    REQUIRE(abs(f.getCreationTime() - expected) < 60);  // FAT has less precision in timestamp than time_t
+    REQUIRE(abs(f.getLastWrite() - expected) < 60);  // FAT has less precision in timestamp than time_t
+    f.close();
 }
 
 };

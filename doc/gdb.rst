@@ -100,7 +100,7 @@ Linux
 
 .. code:: bash
 
-    ~/.arduino15/packages/esp8266/hardware/xtensa-lx106-elf/bin/xtensa-lx106-elf-gdb
+    ~/.arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/2.5.0-4-b40a506/bin/xtensa-lx106-elf-gdb
 
 Windows (Using Board Manager version)
 

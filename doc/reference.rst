@@ -102,9 +102,19 @@ Analog output
 
 ``analogWrite(pin, value)`` enables software PWM on the given pin. PWM
 may be used on pins 0 to 16. Call ``analogWrite(pin, 0)`` to disable PWM
-on the pin. ``value`` may be in range from 0 to ``PWMRANGE``, which is
-equal to 1023 by default. PWM range may be changed by calling
-``analogWriteRange(new_range)``.
+on the pin.
+
+``value`` may be in range from 0 to 255 (which is the Arduino default).
+PWM range may be changed by calling ``analogWriteRange(new_range)`` or
+``analogWriteResolution(bits)``.  ``new_range`` may be from 15...65535
+or ``bits`` may be from 4...16.
+
+**NOTE:** The default ``analogWrite`` range was 1023 in releases before
+3.0, but this lead to incompatibility with external libraries which
+depended on the Arduino core default of 256.  Existing applications which
+rely on the prior 1023 value may add a call to ``analogWriteRange(1023)``
+to their ``setup()`` routine to return to their old behavior.  Applications
+which already were calling ``analogWriteRange`` need no change.
 
 PWM frequency is 1kHz by default. Call
 ``analogWriteFreq(new_frequency)`` to change the frequency. Valid values 
@@ -113,7 +123,7 @@ are from 100Hz up to 40000Hz.
 The ESP doesn't have hardware PWM, so the implementation is by software. 
 With one PWM output at 40KHz, the CPU is already rather loaded. The more 
 PWM outputs used, and the higher their frequency, the closer you get to 
-the CPU limits, and the less CPU cycles are available for sketch execution. 
+the CPU limits, and the fewer CPU cycles are available for sketch execution.
 
 Timing and delays
 -----------------
@@ -141,12 +151,31 @@ milliseconds is not recommended.
 Serial
 ------
 
-``Serial`` object works much the same way as on a regular Arduino. Apart
-from hardware FIFO (128 bytes for TX and RX) ``Serial`` has
-additional 256-byte TX and RX buffers. Both transmit and receive is
-interrupt-driven. Write and read functions only block the sketch
-execution when the respective FIFO/buffers are full/empty. Note that
-the length of additional 256-bit buffer can be customized.
+The ``Serial`` object works much the same way as on a regular Arduino. Apart
+from the hardware FIFO (128 bytes for TX and RX), ``Serial`` has an 
+additional customizable 256-byte RX buffer. The size of this software buffer can
+be changed by the user. It is suggested to use a bigger size at higher receive speeds.
+
+The ``::setRxBufferSize(size_t size)`` method changes the RX buffer size as needed. This 
+should be called before ``::begin()``. The size argument should be at least large enough
+to hold all data received before reading.
+
+For transmit-only operation, the 256-byte RX buffer can be switched off to save RAM by 
+passing mode SERIAL_TX_ONLY to Serial.begin(). Other modes are SERIAL_RX_ONLY and 
+SERIAL_FULL (the default).
+
+Receive is interrupt-driven, but transmit polls and busy-waits. Blocking behavior is as follows:
+The ``::write()`` call does not block if the number of bytes fits in the current space available
+in the TX FIFO. The call blocks if the TX FIFO is full and waits until there is room before 
+writing more bytes into it, until all bytes are written. In other words, when the call returns, 
+all bytes have been written to the TX FIFO, but that doesn't mean that all bytes have been sent 
+out through the serial line yet.
+The ``::read()`` call doesn't block, not even if there are no bytes available for reading.
+The ``::readBytes()`` call blocks until the number of bytes read complies with the number of 
+bytes required by the argument passed in.
+The ``::flush()`` call blocks waiting for the TX FIFO to be empty before returning. It is 
+recommended to call this to make sure all bytes have been sent before doing configuration changes 
+on the serial port (e.g. changing baudrate) or doing a board reset.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
@@ -170,14 +199,13 @@ instead, call ``Serial1.setDebugOutput(true)``.
 You also need to use ``Serial.setDebugOutput(true)`` to enable output
 from ``printf()`` function.
 
-The method ``Serial.setRxBufferSize(size_t size)`` allows to define the
-receiving buffer depth. The default value is 256.
-
 Both ``Serial`` and ``Serial1`` objects support 5, 6, 7, 8 data bits,
 odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the
 desired mode, call ``Serial.begin(baudrate, SERIAL_8N1)``,
 ``Serial.begin(baudrate, SERIAL_6E2)``, etc.
-
+Default configuration mode is SERIAL_8N1. Possibilities are SERIAL_[5678][NEO][12].
+Example: ``SERIAL_8N1`` means 8bits No parity 1 stop bit.
+ 
 A new method has been implemented on both ``Serial`` and ``Serial1`` to
 get current baud rate setting. To get the current baud rate, call
 ``Serial.baudRate()``, ``Serial1.baudRate()``. Return a ``int`` of
@@ -196,7 +224,7 @@ current speed. For example
 
 | ``Serial`` and ``Serial1`` objects are both instances of the
   ``HardwareSerial`` class.
-| I've done this also for official ESP8266 `Software
+| This is also done for official ESP8266 `Software
   Serial <libraries.rst#softwareserial>`__
   library, see this `pull
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
@@ -219,11 +247,16 @@ Progmem
 
 The Program memory features work much the same way as on a regular
 Arduino; placing read only data and strings in read only memory and
-freeing heap for your application. The important difference is that on
-the ESP8266 the literal strings are not pooled. This means that the same
-literal string defined inside a ``F("")`` and/or ``PSTR("")`` will take
-up space for each instance in the code. So you will need to manage the
+freeing heap for your application.
+
+In core versions prior to 2.7, the important difference is that on the
+ESP8266 the literal strings are not pooled.  This means that the same
+literal string defined inside a ``F("")`` and/or ``PSTR("")`` will take up
+space for each instance in the code.  So you will need to manage the
 duplicate strings yourself.
+
+Starting from v2.7, this is no longer true: duplicate literal strings within
+r/o memory are now handled.
 
 There is one additional helper macro to make it easier to pass
 ``const PROGMEM`` strings to methods that take a ``__FlashStringHelper``
@@ -290,36 +323,3 @@ C++
     This assures correct behavior, including handling of all subobjects, which guarantees stability.
 
   History: `#6269 <https://github.com/esp8266/Arduino/issues/6269>`__ `#6309 <https://github.com/esp8266/Arduino/pull/6309>`__ `#6312 <https://github.com/esp8266/Arduino/pull/6312>`__
-
-- New optional allocator ``arduino_new``
-
-  A new optional global allocator is introduced with a different semantic:
-
-  - never throws exceptions on oom
-
-  - never calls constructors on oom
-
-  - returns nullptr on oom
-
-  It is similar to arduino ``new`` semantic without side effects
-  (except when parent constructors, or member constructors use ``new``).
-
-  Syntax is slightly different, the following shows the different usages:
-
-  .. code:: cpp
-
-      // with new:
-
-      SomeClass* sc = new SomeClass(arg1, arg2, ...);
-      delete sc;
-
-      SomeClass* scs = new SomeClass[42];
-      delete [] scs;
-
-      // with arduino_new:
-
-      SomeClass* sc = arduino_new(SomeClass, arg1, arg2, ...);
-      delete sc;
-
-      SomeClass* scs = arduino_newarray(SomeClass, 42);
-      delete [] scs;

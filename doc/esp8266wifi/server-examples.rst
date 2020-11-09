@@ -204,7 +204,7 @@ Complete sketch is presented below.
 
         // close the connection:
         client.stop();
-        Serial.println("[Client disonnected]");
+        Serial.println("[Client disconnected]");
       }
     }
 
@@ -236,18 +236,13 @@ The page would be refreshed every 5 seconds. Each time this happens, you should 
     Host: 192.168.1.104
     DNT: 1
     Connection: Keep-Alive
-    [client disonnected]
-
-What Else?
-~~~~~~~~~~
-
-Looking on `client examples <client-examples.rst>`__ you will quickly find out the similarities in protocol to the server. The protocol starts with a header that contains information what communication will be about. It contains what content type is communicated or accepted like ``text/html``. It states whether connection will be kept alive or closed after submission of the header. It contains identification of the sender like ``User-Agent: Mozilla/5.0 (Windows NT 6.1)``, etc.
+    [client disconnected]
 
 Conclusion
 ~~~~~~~~~~
 
 The above example shows that a web server on ESP8266 can be set up in almost no time. Such server can easily stand up requests from much more powerful hardware and software like a PC with a web browser. Check out other classes like `ESP8266WebServer <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer>`__ that let you program more advanced applications.
 
-If you like to try another server example, check out `WiFiWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiWebServer/WiFiWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
+If you like to try another server example, check out `WiFiManualWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiManualWebServer/WiFiManualWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
 
 For the list of functions provided to implement and manage servers, please refer to the `Server Class <server-class.rst>`__ documentation.

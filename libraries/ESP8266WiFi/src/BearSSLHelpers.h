@@ -24,6 +24,7 @@
 #define _BEARSSLHELPERS_H
 
 #include <bearssl/bearssl.h>
+#include <StackThunk.h>
 #include <Updater.h>
 
 // Internal opaque structures, not needed by user applications
@@ -42,6 +43,8 @@ class PublicKey {
     PublicKey();
     PublicKey(const char *pemKey);
     PublicKey(const uint8_t *derKey, size_t derLen);
+    PublicKey(Stream& stream, size_t size);
+    PublicKey(Stream& stream) : PublicKey(stream, stream.available()) { };
     ~PublicKey();
 
     bool parse(const char *pemKey);
@@ -68,6 +71,8 @@ class PrivateKey {
     PrivateKey();
     PrivateKey(const char *pemKey);
     PrivateKey(const uint8_t *derKey, size_t derLen);
+    PrivateKey(Stream& stream, size_t size);
+    PrivateKey(Stream& stream) : PrivateKey(stream, stream.available()) { };
     ~PrivateKey();
 
     bool parse(const char *pemKey);
@@ -97,6 +102,8 @@ class X509List {
     X509List();
     X509List(const char *pemCert);
     X509List(const uint8_t *derCert, size_t derLen);
+    X509List(Stream& stream, size_t size);
+    X509List(Stream& stream) : X509List(stream, stream.available()) { };
     ~X509List();
 
     bool append(const char *pemCert);
@@ -157,7 +164,8 @@ class SigningVerifier : public UpdaterVerifyClass {
     virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) override;
 
   public:
-    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; }
+    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; stack_thunk_add_ref(); }
+    ~SigningVerifier() { stack_thunk_del_ref(); }
 
   private:
     PublicKey *_pubKey;

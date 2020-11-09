@@ -39,10 +39,6 @@ extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/dhcp.h"
-#include "lwip/init.h" // LWIP_VERSION_
-#if LWIP_IPV6
-#include "lwip/netif.h" // struct netif
-#endif
 }
 
 #include "debug.h"
@@ -89,7 +85,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
-    
+
     if(lhs.threshold.rssi != rhs.threshold.rssi) {
         return false;
     }
@@ -249,7 +245,6 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
  * @param dns2       Static DNS server 2
  */
 
-#if LWIP_VERSION_MAJOR != 1
 /*
   About the following call in the end of ESP8266WiFiSTAClass::config():
       netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
@@ -267,7 +262,6 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
 #undef netif_set_addr // need to call lwIP-v1.4 netif_set_addr()
 extern "C" struct netif* eagle_lwip_getif (int netif_index);
 extern "C" void netif_set_addr (struct netif* netif, ip4_addr_t* ip, ip4_addr_t* netmask, ip4_addr_t* gw);
-#endif
 
 bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress arg2, IPAddress arg3, IPAddress dns2) {
 
@@ -310,7 +304,7 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
     return false;
   }
 
-#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+#if !CORE_MOCK
   // get current->previous IP address
   // (check below)
   struct ip_info previp;
@@ -339,7 +333,7 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       dns_setserver(1, dns2);
   }
 
-#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+#if !CORE_MOCK
   // trigger address change by calling lwIP-v1.4 api
   // (see explanation above)
   // only when ip is already set by other mean (generally dhcp)
@@ -525,12 +519,7 @@ IPAddress ESP8266WiFiSTAClass::gatewayIP() {
  * @return IPAddress DNS Server IP
  */
 IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
-#if LWIP_VERSION_MAJOR == 1
-    ip_addr_t dns_ip = dns_getserver(dns_no);
-    return IPAddress(dns_ip.addr);
-#else
     return IPAddress(dns_getserver(dns_no));
-#endif
 }
 
 
@@ -605,11 +594,7 @@ bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
     for (netif* intf = netif_list; intf; intf = intf->next) {
 
         // unconditionally update all known interfaces
-#if LWIP_VERSION_MAJOR == 1
-        intf->hostname = (char*)wifi_station_get_hostname();
-#else
         intf->hostname = wifi_station_get_hostname();
-#endif
 
         if (netif_dhcp_data(intf) != nullptr) {
             // renew already started DHCP leases
@@ -639,8 +624,9 @@ wl_status_t ESP8266WiFiSTAClass::status() {
         case STATION_NO_AP_FOUND:
             return WL_NO_SSID_AVAIL;
         case STATION_CONNECT_FAIL:
-        case STATION_WRONG_PASSWORD:
             return WL_CONNECT_FAILED;
+        case STATION_WRONG_PASSWORD:
+            return WL_WRONG_PASSWORD;
         case STATION_IDLE:
             return WL_IDLE_STATUS;
         default:
@@ -700,7 +686,7 @@ String ESP8266WiFiSTAClass::BSSIDstr(void) {
  * Return the current network RSSI.
  * @return  RSSI value
  */
-int32_t ESP8266WiFiSTAClass::RSSI(void) {
+int8_t ESP8266WiFiSTAClass::RSSI(void) {
     return wifi_station_get_rssi();
 }
 

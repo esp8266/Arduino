@@ -57,6 +57,7 @@ public:
     // Print methods:
     size_t write(uint8_t) override;
     size_t write(const uint8_t *buf, size_t size) override;
+    int availableForWrite() override;
 
     // Stream methods:
     int available() override;
@@ -112,6 +113,7 @@ public:
     String readString() override;
 
     time_t getLastWrite();
+    time_t getCreationTime();
     void setTimeCallback(time_t (*cb)(void));
 
 protected:
@@ -120,7 +122,6 @@ protected:
     // Arduino SD class emulation
     std::shared_ptr<Dir> _fakeDir;
     FS                  *_baseFS;
-    time_t (*timeCallback)(void) = nullptr;
 };
 
 class Dir {
@@ -132,20 +133,19 @@ public:
     String fileName();
     size_t fileSize();
     time_t fileTime();
+    time_t fileCreationTime();
     bool isFile() const;
     bool isDirectory() const;
 
     bool next();
     bool rewind();
 
-    time_t getLastWrite();
     void setTimeCallback(time_t (*cb)(void));
 
 protected:
     DirImplPtr _impl;
     FS       *_baseFS;
     time_t (*timeCallback)(void) = nullptr;
-
 };
 
 // Backwards compatible, <4GB filesystem usage
@@ -267,7 +267,7 @@ using fs::SPIFFSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
-extern fs::FS SPIFFS;
+extern fs::FS SPIFFS __attribute__((deprecated("SPIFFS has been deprecated. Please consider moving to LittleFS or other filesystems.")));
 #endif
 
 #endif //FS_H

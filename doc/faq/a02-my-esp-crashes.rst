@@ -113,6 +113,10 @@ out in which line of application it is triggered. Please refer to `Check
 Where the Code Crashes <#check-where-the-code-crashes>`__ point below
 for a quick example how to do it.
 
+**NOTE:** When decoding exceptions be sure to include all lines between
+the ``---- CUT HERE ----`` marks in the output to allow the decoder to also
+provide the line of code that's actually causing the exception.
+
 Watchdog
 ^^^^^^^^
 
@@ -183,7 +187,7 @@ If you don't have any code for troubleshooting, use the example below:
       Serial.println();
       Serial.println("Let's provoke the s/w wdt firing...");
       //
-      // provoke an OOM, will be recorded as the last occured one
+      // provoke an OOM, will be recorded as the last occurred one
       char* out_of_memory_failure = (char*)malloc(1000000);
       //
       // wait for s/w wdt in infinite loop below
@@ -306,11 +310,11 @@ Memory, memory, memory
    * If you use std libs like std::vector, make sure to call its ::reserve() method before filling it. This allows allocating only once, which reduces mem fragmentation, and makes sure that there are no empty unused slots left over in the container at the end.
 
 Stack
-   The amount of stack in the ESP is tiny at only 4KB. For normal developement in large systems, it 
+   The amount of stack in the ESP is tiny at only 4KB. For normal development in large systems, it 
    is good practice to use and abuse the stack, because it is faster for allocation/deallocation, the scope of the object is well defined, and deallocation automatically happens in reverse order as allocation, which means no mem fragmentation. However, with the tiny amount of stack available in the ESP, that practice is not really viable, at least not for big objects.
    * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
    * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and be dynamically allocated (consider smart pointers).
-   * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamicaly allocated (consider smart pointers).
+   * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamically allocated (consider smart pointers).
 
 
 If at the Wall, Enter an Issue Report

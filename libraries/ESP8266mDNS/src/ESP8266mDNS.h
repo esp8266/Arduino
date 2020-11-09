@@ -10,7 +10,7 @@
     - Presenting a DNS-SD service to interested observers, eg. a http server by presenting _http._tcp service
     - Support for multi-level compressed names in input; in output only a very simple one-leven full-name compression is implemented
     - Probing host and service domains for uniqueness in the local network
-    - Tiebreaking while probing is supportet in a very minimalistic way (the 'higher' IP address wins the tiebreak)
+    - Tiebreaking while probing is supported in a very minimalistic way (the 'higher' IP address wins the tiebreak)
     - Announcing available services after successful probing
     - Using fixed service TXT items or
     - Using dynamic service TXT items for presented services (via callback)
@@ -42,15 +42,23 @@
 
 */
 
-#include "ESP8266mDNS_Legacy.h"
-#include "LEAmDNS.h"
+#ifndef __ESP8266MDNS_H
+#define __ESP8266MDNS_H
 
+enum class MDNSApiVersion { LEA, LEAv2 };
+
+#include "LEAmDNS.h"            // LEA
+#include "LEAmDNS2Host.h"       // LEAv2       - API updated
+
+// clsLEAMDNSHost replaces MDNSResponder in LEAv2
+using clsLEAMDNSHost = esp8266::experimental::clsLEAMDNSHost;
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 // Maps the implementation to use to the global namespace type
-//using MDNSResponder = Legacy_MDNSResponder::MDNSResponder; //legacy
-using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder; //new
+using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;                // LEA
+//using MDNSResponder = clsLEAMDNSHost;                                          // LEAv2
 
 extern MDNSResponder MDNS;
 #endif
 
+#endif // __ESP8266MDNS_H
