@@ -37,7 +37,7 @@
 
 class Stream: public Print {
     protected:
-        unsigned long _timeout;      // number of milliseconds to wait for the next char before aborting timed read
+        unsigned long _timeout = 1000;  // number of milliseconds to wait for the next char before aborting timed read
         unsigned long _startMillis;  // used for timeout measurement
         int timedRead();    // private method to read stream with timeout
         int timedPeek();    // private method to peek stream with timeout
@@ -47,11 +47,8 @@ class Stream: public Print {
         virtual int available() = 0;
         virtual int read() = 0;
         virtual int peek() = 0;
-        virtual void flush() = 0;
 
-        Stream() {
-            _timeout = 1000;
-        }
+        Stream() {}
 
 // parsing methods
 
@@ -102,7 +99,7 @@ class Stream: public Print {
         // returns the number of characters placed in the buffer (0 means no valid data found)
 
         // Arduino String functions to be added here
-        String readString();
+        virtual String readString();
         String readStringUntil(char terminator);
 
     protected:

@@ -41,6 +41,7 @@
 class UDP: public Stream {
 
     public:
+        virtual ~UDP() {};
         virtual uint8_t begin(uint16_t) =0;	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
         virtual void stop() =0;  // Finish with the UDP socket
 
@@ -82,7 +83,12 @@ class UDP: public Stream {
         // Return the port of the host who sent the current incoming packet
         virtual uint16_t remotePort() =0;
     protected:
+
         uint8_t* rawIPAddress(IPAddress& addr) {
+            return addr.raw_address();
+        }
+
+        const uint8_t* rawIPAddress(const IPAddress& addr) {
             return addr.raw_address();
         }
 };

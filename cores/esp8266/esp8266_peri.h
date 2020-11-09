@@ -21,7 +21,11 @@
 #ifndef ESP8266_PERI_H_INCLUDED
 #define ESP8266_PERI_H_INCLUDED
 
+// we expect mocking framework to provide these
+#ifndef CORE_MOCK
+
 #include "c_types.h"
+#include "esp8266_undocumented.h"
 
 #define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
 #define ESP8266_DREG(addr) *((volatile uint32_t *)(0x3FF00000+(addr)))
@@ -101,8 +105,8 @@
 #define GPF14  ESP8266_REG(0x80C)
 #define GPF15  ESP8266_REG(0x810)
 
-extern uint8_t esp8266_gpioToFn[16];
-#define GPF(p) ESP8266_REG(0x800 + esp8266_gpioToFn[(p & 0xF)])
+extern volatile uint32_t* const esp8266_gpioToFn[16];
+#define GPF(p) (*esp8266_gpioToFn[(p & 0xF)])
 
 //GPIO (0-15) PIN Function Bits
 #define GPFSOE 0 //Sleep OE
@@ -249,7 +253,7 @@ extern uint8_t esp8266_gpioToFn[16];
 #define UIFF	0 //RX FIFO Full
 
 //UART STATUS Registers Bits
-#define USTX    31 //TX PIN Level
+#define USTX    31 //TX PIN Level (Doesn't seem to work, always reads as 0 for both uarts. HW bug? Possible workaround: Enable loopback UxC0 |= 1<<UCLBE and read USRXD, see https://github.com/esp8266/Arduino/issues/7256 for discussion.)
 #define USRTS   30 //RTS PIN Level
 #define USDTR   39 //DTR PIN Level
 #define USTXC   16 //TX FIFO COUNT (8bit)
@@ -586,6 +590,10 @@ extern uint8_t esp8266_gpioToFn[16];
 #define SPIE2IHEN 0x3 //SPI_INT_HOLD_ENA
 #define SPIE2IHEN_S 0 //SPI_INT_HOLD_ENA_S
 
+//SPI PIN (SPIxP)
+#define SPIPCS2DIS (1 << 2)
+#define SPIPCS1DIS (1 << 1)
+#define SPIPCS0DIS (1 << 0)
 
 //SLC (DMA) Registers
 #define SLCC0     ESP8266_REG(0xB00) //SLC_CONF0
@@ -750,7 +758,7 @@ extern uint8_t esp8266_gpioToFn[16];
 #define i2c_bbpll_en_audio_clock_out_msb  7
 #define i2c_bbpll_en_audio_clock_out_lsb  7
 #define I2S_CLK_ENABLE()                  i2c_writeReg_Mask_def(i2c_bbpll, i2c_bbpll_en_audio_clock_out, 1)
-#define I2SBASEFREQ                       (12000000L)
+#define I2SBASEFREQ                       (160000000L)
 
 #define I2STXF  ESP8266_REG(0xe00) //I2STXFIFO (32bit)
 #define I2SRXF  ESP8266_REG(0xe04) //I2SRXFIFO (32bit)
@@ -841,5 +849,7 @@ extern uint8_t esp8266_gpioToFn[16];
  http://esp8266-re.foogod.com/wiki/Random_Number_Generator
 **/
 #define RANDOM_REG32  ESP8266_DREG(0x20E44)
+
+#endif // ifndef CORE_MOCK
 
 #endif

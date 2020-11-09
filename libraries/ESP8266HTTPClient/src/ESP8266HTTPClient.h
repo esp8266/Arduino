@@ -20,6 +20,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
+ * Modified by Jeroen Döll, June 2018
  */
 
 #ifndef ESP8266HTTPClient_H_
@@ -27,22 +28,23 @@
 
 #include <memory>
 #include <Arduino.h>
+
 #include <WiFiClient.h>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_HTTPCLIENT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_HTTPCLIENT(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ## __VA_ARGS__ )
 #endif
 #endif
 
 #ifndef DEBUG_HTTPCLIENT
-#define DEBUG_HTTPCLIENT(...)
+#define DEBUG_HTTPCLIENT(...) do { (void)0; } while (0)
 #endif
 
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
 
 /// HTTP client errors
-#define HTTPC_ERROR_CONNECTION_REFUSED  (-1)
+#define HTTPC_ERROR_CONNECTION_FAILED   (-1)
 #define HTTPC_ERROR_SEND_HEADER_FAILED  (-2)
 #define HTTPC_ERROR_SEND_PAYLOAD_FAILED (-3)
 #define HTTPC_ERROR_NOT_CONNECTED       (-4)
@@ -53,6 +55,8 @@
 #define HTTPC_ERROR_ENCODING            (-9)
 #define HTTPC_ERROR_STREAM_WRITE        (-10)
 #define HTTPC_ERROR_READ_TIMEOUT        (-11)
+
+constexpr int HTTPC_ERROR_CONNECTION_REFUSED __attribute__((deprecated)) = HTTPC_ERROR_CONNECTION_FAILED;
 
 /// size for the stream handling
 #define HTTP_TCP_BUFFER_SIZE (1460)
@@ -124,8 +128,27 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+/**
+ * redirection follow mode.
+ * + `HTTPC_DISABLE_FOLLOW_REDIRECTS` - no redirection will be followed.
+ * + `HTTPC_STRICT_FOLLOW_REDIRECTS` - strict RFC2616, only requests using
+ *      GET or HEAD methods will be redirected (using the same method),
+ *      since the RFC requires end-user confirmation in other cases.
+ * + `HTTPC_FORCE_FOLLOW_REDIRECTS` - all redirections will be followed,
+ *      regardless of a used method. New request will use the same method,
+ *      and they will include the same body data and the same headers.
+ *      In the sense of the RFC, it's just like every redirection is confirmed.
+ */
+typedef enum {
+    HTTPC_DISABLE_FOLLOW_REDIRECTS,
+    HTTPC_STRICT_FOLLOW_REDIRECTS,
+    HTTPC_FORCE_FOLLOW_REDIRECTS
+} followRedirects_t;
+
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
+
+class StreamString;
 
 class HTTPClient
 {
@@ -133,12 +156,19 @@ public:
     HTTPClient();
     ~HTTPClient();
 
-    bool begin(String url);
-    bool begin(String url, String httpsFingerprint);
-    bool begin(String host, uint16_t port, String uri = "/");
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
-    // deprecated, use the overload above instead
-    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+/*
+ * Since both begin() functions take a reference to client as a parameter, you need to 
+ * ensure the client object lives the entire time of the HTTPClient
+ */
+    bool begin(WiFiClient &client, const String& url);
+    bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
+
+    // old API is now explicitely forbidden
+    bool begin(String url)  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, url)")));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, host, port, uri)")));
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
+    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
 
     void end(void);
 
@@ -150,17 +180,24 @@ public:
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
 
+    // Redirections
+    void setFollowRedirects(followRedirects_t follow);
+    void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
+
+    bool setURL(const String& url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
     /// request handling
     int GET();
-    int POST(uint8_t * payload, size_t size);
-    int POST(String payload);
-    int PUT(uint8_t * payload, size_t size);
-    int PUT(String payload);
-    int sendRequest(const char * type, String payload);
-    int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-    int sendRequest(const char * type, Stream * stream, size_t size = 0);
+    int POST(const uint8_t* payload, size_t size);
+    int POST(const String& payload);
+    int PUT(const uint8_t* payload, size_t size);
+    int PUT(const String& payload);
+    int PATCH(const uint8_t* payload, size_t size);
+    int PATCH(const String& payload);
+    int sendRequest(const char* type, const String& payload);
+    int sendRequest(const char* type, const uint8_t* payload = NULL, size_t size = 0);
+    int sendRequest(const char* type, Stream * stream, size_t size = 0);
 
     void addHeader(const String& name, const String& value, bool first = false, bool replace = true);
 
@@ -174,12 +211,12 @@ public:
 
 
     int getSize(void);
+    const String& getLocation(void); // Location header from redirect if 3XX
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
     int writeToStream(Stream* stream);
-    String getString(void);
-
+    const String& getString(void);
     static String errorToString(int error);
 
 protected:
@@ -188,7 +225,8 @@ protected:
         String value;
     };
 
-    bool beginInternal(String url, const char* expectedProtocol);
+    bool beginInternal(const String& url, const char* expectedProtocol);
+    void disconnect(bool preserveClient = false);
     void clear();
     int returnError(int error);
     bool connect(void);
@@ -196,21 +234,19 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
-
-    TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcp;
+    WiFiClient* _client;
 
     /// request handling
     String _host;
     uint16_t _port = 0;
-    bool _reuse = false;
+    bool _reuse = true;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
     bool _useHTTP10 = false;
 
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent = "ESP8266HTTPClient";
+    String _userAgent;
     String _base64Authorization;
 
     /// Response handling
@@ -220,7 +256,11 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
+    followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
+    uint16_t _redirectLimit = 10;
+    String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    std::unique_ptr<StreamString> _payload;
 };
 
 

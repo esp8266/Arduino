@@ -3,14 +3,16 @@
 #include <ESP8266WebServer.h>
 
 const byte DNS_PORT = 53;
-IPAddress apIP(192, 168, 1, 1);
+IPAddress apIP(172, 217, 28, 1);
 DNSServer dnsServer;
 ESP8266WebServer webServer(80);
 
 String responseHTML = ""
-  "<!DOCTYPE html><html><head><title>CaptivePortal</title></head><body>"
-  "<h1>Hello World!</h1><p>This is a captive portal example. All requests will "
-  "be redirected here.</p></body></html>";
+                      "<!DOCTYPE html><html lang='en'><head>"
+                      "<meta name='viewport' content='width=device-width'>"
+                      "<title>CaptivePortal</title></head><body>"
+                      "<h1>Hello World!</h1><p>This is a captive portal example."
+                      " All requests will be redirected here.</p></body></html>";
 
 void setup() {
   WiFi.mode(WIFI_AP);

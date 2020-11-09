@@ -17,170 +17,180 @@
 #include <map>
 #include <FS.h>
 #include "../common/spiffs_mock.h"
+#include "../common/littlefs_mock.h"
+#include "../common/sdfs_mock.h"
 #include <spiffs/spiffs.h>
+#include <LittleFS.h>
+#include "../../../libraries/SDFS/src/SDFS.h"
+#include "../../../libraries/SD/src/SD.h"
 
-static void createFile (const char* name, const char* content)
+
+namespace spiffs_test {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+#define FSTYPE SPIFFS
+#define TESTPRE "SPIFFS - "
+#define TESTPAT "[fs]"
+#define TOOLONGFILENAME "/2345678901234567890123456789012"
+#define FS_MOCK_DECLARE SPIFFS_MOCK_DECLARE
+#define FS_MOCK_RESET SPIFFS_MOCK_RESET
+#undef FS_HAS_DIRS
+#include "test_fs.inc"
+#undef FSTYPE
+#undef TESTPRE
+#undef TESTPAT
+#undef TOOLONGFILENAME
+#undef FS_MOCK_DECLARE
+#undef FS_MOCK_RESET
+
+TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
 {
-    auto f = SPIFFS.open(name, "w");
-    REQUIRE(f);
-    if (content) {
-        f.print(content);
-    }
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
+    FSConfig f;
+    SPIFFSConfig s;
+    SDFSConfig d;
+    LittleFSConfig l;
+
+    REQUIRE_FALSE(SPIFFS.setConfig(f));
+    REQUIRE(SPIFFS.setConfig(s));
+    REQUIRE_FALSE(SPIFFS.setConfig(d));
+    REQUIRE_FALSE(LittleFS.setConfig(l));
+}
+#pragma GCC diagnostic pop
+
+};
+
+
+namespace littlefs_test {
+#define FSTYPE LittleFS
+#define TESTPRE "LittleFS - "
+#define TESTPAT "[lfs]"
+// LittleFS routines strip leading slashes before doing anything, so up to 31 char names are allowable
+#define TOOLONGFILENAME "/12345678901234567890123456789012"
+#define FS_MOCK_DECLARE LITTLEFS_MOCK_DECLARE
+#define FS_MOCK_RESET LITTLEFS_MOCK_RESET
+#define FS_HAS_DIRS
+#include "test_fs.inc"
+#undef FSTYPE
+#undef TESTPRE
+#undef TESTPAT
+#undef TOOLONGFILENAME
+#undef FS_MOCK_DECLARE
+#undef FS_MOCK_RESET
+
+TEST_CASE("LittleFS checks the config object passed in", "[fs]")
+{
+    LITTLEFS_MOCK_DECLARE(64, 8, 512, "");
+    FSConfig f;
+    SPIFFSConfig s;
+    SDFSConfig d;
+    LittleFSConfig l;
+
+    REQUIRE_FALSE(LittleFS.setConfig(f));
+    REQUIRE_FALSE(LittleFS.setConfig(s));
+    REQUIRE_FALSE(LittleFS.setConfig(d));
+    REQUIRE(LittleFS.setConfig(l));
 }
 
-static String readFile (const char* name)
+};
+
+namespace sdfs_test {
+#define FSTYPE SDFS
+#define TESTPRE "SDFS - "
+#define TESTPAT "[sdfs]"
+// SDFS supports long paths (MAXPATH)
+#define TOOLONGFILENAME "/" \
+	"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
+	"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
+	"12345678901234567890123456789012345678901234567890123456"
+#define FS_MOCK_DECLARE SDFS_MOCK_DECLARE
+#define FS_MOCK_RESET SDFS_MOCK_RESET
+#define FS_HAS_DIRS
+#include "test_fs.inc"
+#undef FSTYPE
+#undef TESTPRE
+#undef TESTPAT
+#undef TOOLONGFILENAME
+#undef FS_MOCK_DECLARE
+#undef FS_MOCK_RESET
+
+TEST_CASE("SDFS checks the config object passed in", "[fs]")
 {
-    auto f = SPIFFS.open(name, "r");
-    if (f) {
-        return f.readString();
-    }
-    return String();
+    SDFS_MOCK_DECLARE(64, 8, 512, "");
+    FSConfig f;
+    SPIFFSConfig s;
+    SDFSConfig d;
+    LittleFSConfig l;
+
+    REQUIRE_FALSE(SDFS.setConfig(f));
+    REQUIRE_FALSE(SDFS.setConfig(s));
+    REQUIRE(SDFS.setConfig(d));
+    REQUIRE_FALSE(SDFS.setConfig(l));
 }
 
-static std::set<String> listDir (const char* path)
+// Also a SD specific test to check that FILE_OPEN is really an append operation:
+
+TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
 {
-    std::set<String> result;
-    Dir dir = SPIFFS.openDir(path);
-    while (dir.next()) {
-        REQUIRE(result.find(dir.fileName()) == std::end(result));
-        result.insert(dir.fileName());
-    }
-    return result;
+    SDFS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(SDFS.begin());
+    REQUIRE(SD.begin(4));
+
+    File f = SD.open("/file.txt", FILE_WRITE);
+    f.write('a');
+    f.write(65);
+    f.write("bbcc");
+    f.write("theend", 6);
+    char block[3]={'x','y','z'};
+    f.write(block, 3);
+    uint32_t bigone = 0x40404040;
+    f.write((const uint8_t*)&bigone, 4);
+    f.close();
+    REQUIRE(readFile("/file.txt") == "aAbbcctheendxyz@@@@");
+    f = SD.open("/file.txt", FILE_WRITE);
+    f.write("append", 6);
+    f.close();
+    REQUIRE(readFile("/file.txt") == "aAbbcctheendxyz@@@@append");
+    File g = SD.open("/file2.txt", FILE_WRITE);
+    g.write(0);
+    g.close();
+    g = SD.open("/file2.txt", FILE_READ);
+    uint8_t u = 0x66;
+    g.read(&u, 1);
+    g.close();
+    REQUIRE(u == 0);
 }
 
-TEST_CASE("FS can begin","[fs]")
+// SDFS timestamp setter (#7682)
+static time_t _my_time(void)
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
+    struct tm t;
+    bzero(&t, sizeof(t));
+    t.tm_year = 120;
+    t.tm_mon  = 9;
+    t.tm_mday = 22;
+    t.tm_hour = 12;
+    t.tm_min  = 13;
+    t.tm_sec  = 14;
+    return mktime(&t);
 }
 
-TEST_CASE("FS can't begin with zero size","[fs]")
+TEST_CASE("SDFS timeCallback")
 {
-    SPIFFS_MOCK_DECLARE(0, 8, 512);
-    REQUIRE_FALSE(SPIFFS.begin());
+    SDFS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(SDFS.begin());
+    REQUIRE(SD.begin(4));
+
+    SDFS.setTimeCallback(_my_time);
+    File f = SD.open("/file.txt", "w");
+    f.write("Had we but world enough, and time,");
+    f.close();
+    time_t expected = _my_time();
+    f = SD.open("/file.txt", "r");
+    REQUIRE(abs(f.getCreationTime() - expected) < 60);  // FAT has less precision in timestamp than time_t
+    REQUIRE(abs(f.getLastWrite() - expected) < 60);  // FAT has less precision in timestamp than time_t
+    f.close();
 }
 
-TEST_CASE("Before begin is called, open will fail","[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE_FALSE(SPIFFS.open("/foo", "w"));
-}
-
-TEST_CASE("FS can create file","[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    createFile("/test", "");
-    REQUIRE(SPIFFS.exists("/test"));
-}
-
-TEST_CASE("Files can be written and appended to","[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    {
-        File f = SPIFFS.open("config1.txt", "w");
-        REQUIRE(f);
-        f.println("file 1");
-    }
-    {
-        File f = SPIFFS.open("config1.txt", "a");
-        REQUIRE(f);
-        f.println("file 1 again");
-    }
-    {
-        File f = SPIFFS.open("config1.txt", "r");
-        REQUIRE(f);
-        char buf[128];
-        size_t len = f.read((uint8_t*)buf, sizeof(buf));
-        buf[len] = 0;
-        REQUIRE(strcmp(buf, "file 1\r\nfile 1 again\r\n") == 0);
-    }
-}
-
-TEST_CASE("Files persist after reset", "[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    createFile("config1.txt", "file 1");
-
-    SPIFFS_MOCK_RESET();
-    REQUIRE(SPIFFS.begin());
-    REQUIRE(readFile("config1.txt") == "file 1");
-}
-
-
-TEST_CASE("Filesystem is empty after format", "[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.format());
-    REQUIRE(SPIFFS.begin());
-    createFile("/1", "first");
-    createFile("/2", "second");
-    REQUIRE(SPIFFS.format());
-    Dir root = SPIFFS.openDir("/");
-    size_t count = 0;
-    while (root.next()) {
-        ++count;
-    }
-    REQUIRE(count == 0);
-}
-
-TEST_CASE("Dir lists all files", "[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    createFile("/empty", "");
-    createFile("/not_empty", "some text");
-    createFile("/another", "more text");
-    createFile("/subdir/empty", "");
-    createFile("/subdir/not_empty", "text again");
-    auto files = listDir("/");
-    REQUIRE(files.size() == 5);
-    REQUIRE(files.find("/empty") != std::end(files));
-    REQUIRE(files.find("/not_empty") != std::end(files));
-    REQUIRE(files.find("/another") != std::end(files));
-    REQUIRE(files.find("/subdir/empty") != std::end(files));
-    REQUIRE(files.find("/subdir/not_empty") != std::end(files));
-}
-
-TEST_CASE("File names which are too long are rejected", "[fs]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    const char* emptyName = "";
-    const char* longName_31 = "/234567890123456789012345678901";
-    const char* longName_32 = "/2345678901234567890123456789012";
-    REQUIRE_FALSE(SPIFFS.open(emptyName, "w"));
-    REQUIRE_FALSE(SPIFFS.open(emptyName, "r"));
-    REQUIRE_FALSE(SPIFFS.exists(emptyName));
-    REQUIRE_FALSE(SPIFFS.open(longName_32, "w"));
-    REQUIRE_FALSE(SPIFFS.open(longName_32, "r"));
-    REQUIRE_FALSE(SPIFFS.exists(longName_32));
-    REQUIRE(SPIFFS.open(longName_31, "w"));
-    REQUIRE(SPIFFS.open(longName_31, "r"));
-    REQUIRE(SPIFFS.exists(longName_31));
-}
-
-TEST_CASE("#1685 Duplicate files", "[fs][bugreport]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    createFile("/config", "some text");
-    createFile("/data", "");
-    readFile("/config");
-    createFile("/data", "more text");
-    listDir("/");
-}
-
-TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
-{
-    SPIFFS_MOCK_DECLARE(64, 8, 512);
-    REQUIRE(SPIFFS.begin());
-    createFile("/file1", "some text");
-    createFile("/file2", "other text");
-    createFile("file3", "more text");
-    createFile("sorta-dir/file4", "\n");
-    auto files = listDir("");
-    REQUIRE(files.size() == 4);
-}
+};

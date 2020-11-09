@@ -17,6 +17,12 @@ extern "C" {
 
 #define NBNSQ_TYPE_NB (0x0020)
 #define NBNSQ_CLASS_IN (0x0001)
+#ifndef LWIP_PLATFORM_HTONS
+#define LWIP_PLATFORM_HTONS(_n)  ((u16_t)((((_n) & 0xff) << 8) | (((_n) >> 8) & 0xff)))
+#endif
+#ifndef LWIP_PLATFORM_HTONL
+#define LWIP_PLATFORM_HTONL(_n)  ((u32_t)( (((_n) & 0xff) << 24) | (((_n) & 0xff00) << 8) | (((_n) >> 8)  & 0xff00) | (((_n) >> 24) & 0xff) ))
+#endif
 
 // Definice struktury NBNS dotazu (alespon veci, ktere jsem vypozoroval):
 struct NBNSQUESTION {
@@ -140,7 +146,7 @@ bool ESP8266NetBIOS::begin(const char *name)
     }
 
     // presuneme jmeno zarizeni se soucasnou upravou na UPPER case
-    for (int i = 0; i < n; ++i) {
+    for (size_t  i = 0; i < n; ++i) {
         _name[i] = toupper(name[i]);
     }
     _name[n] = '\0';
@@ -148,11 +154,9 @@ bool ESP8266NetBIOS::begin(const char *name)
     if(_pcb != NULL) {
         return true;
     }
-    ip_addr_t addr;
-    addr.addr = INADDR_ANY;
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
-    err_t err = udp_bind(_pcb, &addr, NBNS_PORT);
+    err_t err = udp_bind(_pcb, (ip_addr_t*)INADDR_ANY, NBNS_PORT);
     if(err != ERR_OK) {
         end();
         return false;
@@ -168,14 +172,16 @@ void ESP8266NetBIOS::end()
     }
 }
 
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, u16_t port)
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port)
 {
+    (void)upcb;
+    (void)addr;
+    (void)port;
     while(pb != NULL) {
         uint8_t * data = (uint8_t*)((pb)->payload);
         size_t len = pb->len;
-        ip_hdr* iphdr = reinterpret_cast<ip_hdr*>(data - UDP_HLEN - IP_HLEN);
-        ip_addr_t saddr;
-        saddr.addr = iphdr->src.addr;
+        // check UdpContext.h
+        const ip_addr_t* saddr = &ip_data.current_iphdr_src;
 
         if (len >= sizeof(struct NBNSQUESTION)) {
             struct NBNSQUESTION * question = (struct NBNSQUESTION *)data;
@@ -212,7 +218,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, u16_t port)
                     if(pbt != NULL) {
                         uint8_t* dst = reinterpret_cast<uint8_t*>(pbt->payload);
                         memcpy(dst, (uint8_t *)&nbnsa, sizeof(nbnsa));
-                        udp_sendto(_pcb, pbt, &saddr, NBNS_PORT);
+                        udp_sendto(_pcb, pbt, saddr, NBNS_PORT);
                         pbuf_free(pbt);
                     }
                 } else if (0 == strcmp(name, "*")) {
@@ -242,7 +248,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, u16_t port)
                     if(pbt != NULL) {
                         uint8_t* dst = reinterpret_cast<uint8_t*>(pbt->payload);
                         memcpy(dst, (uint8_t *)&nbnsan, sizeof(nbnsan));
-                        udp_sendto(_pcb, pbt, &saddr, NBNS_PORT);
+                        udp_sendto(_pcb, pbt, saddr, NBNS_PORT);
                         pbuf_free(pbt);
                     }
                 }
@@ -256,7 +262,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, u16_t port)
     }
 }
 
-void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port)
+void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port)
 {
     reinterpret_cast<ESP8266NetBIOS*>(arg)->_recv(upcb, p, addr, port);
 }

@@ -42,7 +42,9 @@ class Client: public Stream {
         uint8_t* rawIPAddress(IPAddress& addr) {
             return addr.raw_address();
         }
-        ;
+        const uint8_t* rawIPAddress(const IPAddress& addr) {
+            return addr.raw_address();
+        }
 };
 
 #endif

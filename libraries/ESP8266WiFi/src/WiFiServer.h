@@ -31,41 +31,77 @@ extern "C" {
 #include "Server.h"
 #include "IPAddress.h"
 
+// lwIP-v2 backlog facility allows to keep memory safe by limiting the
+// maximum number of incoming *pending clients*.  Default number of possibly
+// simultaneously pending clients is defined in WiFiServer.cpp
+// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can overide it at runtime from
+// sketch:
+//      WiFiServer::begin(port, max-simultaneous-pending-clients);
+//
+// An "incoming pending" client is a new incoming TCP connection trying to
+// reach the TCP server.  It is "pending" until lwIP acknowledges it and
+// "accepted / no more pending" when user calls WiFiServer::available().
+//
+// Before the backlog feature or with lwIP-v1.4, there was no pending
+// connections: They were immediately accepted and filling RAM.
+//
+// Several pending clients can appear during the time when one client is
+// served by a long not-async service like ESP8266WebServer.  During that
+// time WiFiServer::available() cannot be called.
+//
+// Note: This *does not limit* the number of *simultaneously accepted
+//       clients*.  Such limit management is left to the user.
+//
+// Thus, when the maximum number of pending connections is reached, new
+// connections are delayed.
+// By "delayed", it is meant that WiFiServer(lwIP) will not answer to the
+// SYN packet until there is room for a new one: The TCP server on that port
+// will be mute.  The TCP client will regularly try to connect until success
+// or a timeout occurs (72s on windows).
+//
+// When user calls WiFiServer::available(), the tcp server stops muting and
+// answers to newcomers (until the "backlog" pending list is full again).
+
 class ClientContext;
 class WiFiClient;
 
 class WiFiServer : public Server {
-private:
+  // Secure server needs access to all the private entries here
+protected:
   uint16_t _port;
   IPAddress _addr;
-  tcp_pcb* _pcb;
+  tcp_pcb* _listen_pcb = nullptr;
 
-  ClientContext* _unclaimed;
-  ClientContext* _discarded;
-  bool _noDelay = false;
+  ClientContext* _unclaimed = nullptr;
+  ClientContext* _discarded = nullptr;
+  enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:
-  WiFiServer(IPAddress addr, uint16_t port);
+  WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();
+  void begin(uint16_t port);
+  void begin(uint16_t port, uint8_t backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   uint8_t status();
+  uint16_t port() const;
   void close();
   void stop();
 
   using Print::write;
+  using ClientType = WiFiClient;
 
 protected:
-  int8_t _accept(tcp_pcb* newpcb, int8_t err);
+  long _accept(tcp_pcb* newpcb, long err);
   void   _discard(ClientContext* client);
 
-  static int8_t _s_accept(void *arg, tcp_pcb* newpcb, int8_t err);
+  static long _s_accept(void *arg, tcp_pcb* newpcb, long err);
   static void _s_discard(void* server, ClientContext* ctx);
 };
 

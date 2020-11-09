@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+# released to public domain
+
+help()
+{
+	cat << eof
+
+usage: $1 <esp-open-sdk path>
+
+Compare include files against sdk's
+
+eof
+	exit 1
+}
+
+
+sdk="$1"
+me="$0"
+core=${me%/*}/../../../..
+
+[ -r "$sdk/lib/libnet80211.a" ] || help "$0"
+
+for f in $(cd "$sdk"; find include -type f); do
+	diff -bu "$sdk/$f" "$core/tools/sdk/$f" || true
+done | sed \
+	-e 's/^+#ifdef.*cplusplus//g' \
+	-e 's/^+extern "C"//g' \
+	-e 's/^+}$//g' \
+	-e 's/^+#endif//g' \
+	-e 's/^+[ \t]*$//g' \

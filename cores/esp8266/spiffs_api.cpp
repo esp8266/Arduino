@@ -25,6 +25,23 @@
 
 using namespace fs;
 
+
+// Deprecated functions, to be deleted in next release
+int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
+    return flash_hal_write(addr, size, src);
+}
+int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
+    return flash_hal_erase(addr, size);
+}
+int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
+    return flash_hal_read(addr, size, dst);
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+namespace spiffs_impl {
+
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
     if (!isSpiffsFilenameValid(path)) {
@@ -108,29 +125,33 @@ bool isSpiffsFilenameValid(const char* name)
     return len > 0 && len < SPIFFS_OBJ_NAME_LEN;
 }
 
+}; // namespace
+
 // these symbols should be defined in the linker script for each flash layout
+#ifndef CORE_MOCK
 #ifdef ARDUINO
-extern "C" uint32_t _SPIFFS_start;
-extern "C" uint32_t _SPIFFS_end;
-extern "C" uint32_t _SPIFFS_page;
-extern "C" uint32_t _SPIFFS_block;
-
-#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
-#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
-#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
-#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
-
 #ifndef SPIFFS_MAX_OPEN_FILES
 #define SPIFFS_MAX_OPEN_FILES 5
 #endif
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
-FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
-                             SPIFFS_PHYS_ADDR,
-                             SPIFFS_PHYS_SIZE,
-                             SPIFFS_PHYS_PAGE,
-                             SPIFFS_PHYS_BLOCK,
+FS SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(
+                             FS_PHYS_ADDR,
+                             FS_PHYS_SIZE,
+                             FS_PHYS_PAGE,
+                             FS_PHYS_BLOCK,
                              SPIFFS_MAX_OPEN_FILES)));
-#endif
+
+extern "C" void spiffs_request_end(void)
+{
+    // override default weak function
+    //ets_printf("debug: not weak spiffs end\n");
+    SPIFFS.end();
+}
+
+#pragma GCC diagnostic pop
+
+#endif // ARDUINO
+#endif // !CORE_MOCK
 
 #endif

@@ -18,6 +18,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <new> // std::nothrow
 #include "cbuf.h"
 #include "c_types.h"
 
@@ -39,11 +40,11 @@ size_t cbuf::resize(size_t newSize) {
 
 	// not lose any data
 	// if data can be lost use remove or flush before resize
-    if((newSize < bytes_available) || (newSize == _size)) {
+    if((newSize <= bytes_available) || (newSize == _size)) {
         return _size;
     }
 
-    char *newbuf = new char[newSize];
+    char *newbuf = new (std::nothrow) char[newSize];
     char *oldbuf = _buf;
 
     if(!newbuf) {

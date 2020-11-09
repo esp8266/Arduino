@@ -18,34 +18,66 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <debug.h>
 #include <Arduino.h>
 #include <cxxabi.h>
 
 using __cxxabiv1::__guard;
 
-void *operator new(size_t size)
-{
-    return malloc(size);
-}
-
-void *operator new[](size_t size)
-{
-    return malloc(size);
-}
-
-void operator delete(void * ptr)
-{
-    free(ptr);
-}
-
-void operator delete[](void * ptr)
-{
-    free(ptr);
-}
+// Debugging helper, last allocation which returned NULL
+extern void *umm_last_fail_alloc_addr;
+extern int umm_last_fail_alloc_size;
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
+
+
+#if !defined(__cpp_exceptions)
+
+// overwrite weak operators new/new[] definitions
+
+void* operator new(size_t size)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+
+void* operator new[](size_t size)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+
+void* operator new (size_t size, const std::nothrow_t&)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
+}
+
+void* operator new[] (size_t size, const std::nothrow_t&)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
+}
+
+#endif // !defined(__cpp_exceptions)
 
 void __cxa_pure_virtual(void)
 {
@@ -82,35 +114,6 @@ extern "C" void __cxa_guard_release(__guard* pg)
 extern "C" void __cxa_guard_abort(__guard* pg)
 {
     xt_wsr_ps(reinterpret_cast<guard_t*>(pg)->ps);
-}
-
-
-namespace std
-{
-void __throw_bad_function_call()
-{
-    panic();
-}
-
-void __throw_length_error(char const*)
-{
-    panic();
-}
-
-void __throw_bad_alloc()
-{
-    panic();
-}
-
-void __throw_logic_error(const char* str)
-{
-    panic();
-}
-
-void __throw_out_of_range(const char* str)
-{
-    panic();
-}
 }
 
 // TODO: rebuild windows toolchain to make this unnecessary:

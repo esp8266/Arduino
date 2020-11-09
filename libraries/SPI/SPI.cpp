@@ -22,6 +22,12 @@
 #include "SPI.h"
 #include "HardwareSerial.h"
 
+#define SPI_PINS_HSPI			0 // Normal HSPI mode (MISO = GPIO12, MOSI = GPIO13, SCLK = GPIO14);
+#define SPI_PINS_HSPI_OVERLAP	1 // HSPI Overllaped in spi0 pins (MISO = SD0, MOSI = SDD1, SCLK = CLK);
+
+#define SPI_OVERLAP_SS 0
+
+
 typedef union {
         uint32_t regValue;
         struct {
@@ -35,12 +41,43 @@ typedef union {
 
 SPIClass::SPIClass() {
     useHwCs = false;
+    pinSet = SPI_PINS_HSPI;
+}
+
+bool SPIClass::pins(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
+{
+    if (sck == 6 &&
+        miso == 7 &&
+        mosi == 8 &&
+        ss == 0) {
+        pinSet = SPI_PINS_HSPI_OVERLAP;
+    } else if (sck == 14 &&
+	           miso == 12 &&
+               mosi == 13) {
+        pinSet = SPI_PINS_HSPI;
+    } else {
+        return false;
+    }
+
+    return true;
 }
 
 void SPIClass::begin() {
-    pinMode(SCK, SPECIAL);  ///< GPIO14
-    pinMode(MISO, SPECIAL); ///< GPIO12
-    pinMode(MOSI, SPECIAL); ///< GPIO13
+    switch (pinSet) {
+    case SPI_PINS_HSPI_OVERLAP:
+        IOSWAP |= (1 << IOSWAP2CS);
+        //SPI0E3 |= 0x1; This is in the MP3_DECODER example, but makes the WD kick in here.
+        SPI1E3 |= 0x3;
+
+        setHwCs(true);
+        break;
+    case SPI_PINS_HSPI:
+    default:
+        pinMode(SCK, SPECIAL);  ///< GPIO14
+        pinMode(MISO, SPECIAL); ///< GPIO12
+        pinMode(MOSI, SPECIAL); ///< GPIO13
+        break;
+    }
 
     SPI1C = 0;
     setFrequency(1000000); ///< 1MHz
@@ -50,24 +87,55 @@ void SPIClass::begin() {
 }
 
 void SPIClass::end() {
-    pinMode(SCK, INPUT);
-    pinMode(MISO, INPUT);
-    pinMode(MOSI, INPUT);
-    if(useHwCs) {
-        pinMode(SS, INPUT);
+    switch (pinSet) {
+    case SPI_PINS_HSPI:
+        pinMode(SCK, INPUT);
+        pinMode(MISO, INPUT);
+        pinMode(MOSI, INPUT);
+        if (useHwCs) {
+            pinMode(SS, INPUT);
+        }
+        break;
+    case SPI_PINS_HSPI_OVERLAP:
+        IOSWAP &= ~(1 << IOSWAP2CS);
+        if (useHwCs) {
+            SPI1P |= SPIPCS1DIS | SPIPCS0DIS | SPIPCS2DIS;
+            pinMode(SPI_OVERLAP_SS, INPUT);
+        }
+        break;
     }
 }
 
 void SPIClass::setHwCs(bool use) {
-    if(use) {
-        pinMode(SS, SPECIAL); ///< GPIO15
-        SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
+    switch (pinSet) {
+    case SPI_PINS_HSPI:
+        if (use) {
+            pinMode(SS, SPECIAL); ///< GPIO15
+            SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
     } else {
-        if(useHwCs) {
-            pinMode(SS, INPUT);
+            if (useHwCs) {
+                pinMode(SS, INPUT);
             SPI1U &= ~(SPIUCSSETUP | SPIUCSHOLD);
+            }
         }
+        break;
+    case SPI_PINS_HSPI_OVERLAP:
+        if (use) {
+            pinMode(SPI_OVERLAP_SS, FUNCTION_1); // GPI0 to SPICS2 mode
+            SPI1P &= ~SPIPCS2DIS;
+            SPI1P |= SPIPCS1DIS | SPIPCS0DIS;
+            SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
+        }
+        else {
+            if (useHwCs) {
+                pinMode(SPI_OVERLAP_SS, INPUT);
+                SPI1P |= SPIPCS1DIS | SPIPCS0DIS | SPIPCS2DIS;
+                SPI1U &= ~(SPIUCSSETUP | SPIUCSHOLD);
+            }
+        }
+        break;
     }
+
     useHwCs = use;
 }
 
@@ -92,6 +160,11 @@ void SPIClass::setDataMode(uint8_t dataMode) {
 
     bool CPOL = (dataMode & 0x10); ///< CPOL (Clock Polarity)
     bool CPHA = (dataMode & 0x01); ///< CPHA (Clock Phase)
+
+    // https://github.com/esp8266/Arduino/issues/2416
+    // https://github.com/esp8266/Arduino/pull/2418
+    if(CPOL)          // Ensure same behavior as
+        CPHA ^= 1;    // SAM, AVR and Intel Boards
 
     if(CPHA) {
         SPI1U |= (SPIUSME);
@@ -130,6 +203,7 @@ void SPIClass::setFrequency(uint32_t freq) {
     static uint32_t lastSetRegister = 0;
 
     if(freq >= ESP8266_CLOCK) {
+        // magic number to set spi sysclock bit (see below.)
         setClockDivider(0x80000000);
         return;
     }
@@ -139,10 +213,10 @@ void SPIClass::setFrequency(uint32_t freq) {
         return;
     }
 
-    const spiClk_t minFreqReg = { 0x7FFFF000 };
+    const spiClk_t minFreqReg = { 0x7FFFF020 };
     uint32_t minFreq = ClkRegToFreq((spiClk_t*) &minFreqReg);
     if(freq < minFreq) {
-        // use minimum possible clock
+        // use minimum possible clock regardless
         setClockDivider(minFreqReg.regValue);
         lastSetRegister = SPI1CLK;
         lastSetFrequency = freq;
@@ -154,8 +228,14 @@ void SPIClass::setFrequency(uint32_t freq) {
     spiClk_t bestReg = { 0 };
     int32_t bestFreq = 0;
 
-    // find the best match
-    while(calN <= 0x3F) { // 0x3F max for N
+    // aka 0x3F, aka 63, max for regN:6
+    const uint8_t regNMax = (1 << 6) - 1;
+
+    // aka 0x1fff, aka 8191, max for regPre:13
+    const int32_t regPreMax = (1 << 13) - 1;
+
+    // find the best match for the next 63 iterations
+    while(calN <= regNMax) {
 
         spiClk_t reg = { 0 };
         int32_t calFreq;
@@ -166,8 +246,8 @@ void SPIClass::setFrequency(uint32_t freq) {
 
         while(calPreVari++ <= 1) { // test different variants for Pre (we calculate in int so we miss the decimals, testing is the easyest and fastest way)
             calPre = (((ESP8266_CLOCK / (reg.regN + 1)) / freq) - 1) + calPreVari;
-            if(calPre > 0x1FFF) {
-                reg.regPre = 0x1FFF; // 8191
+            if(calPre > regPreMax) {
+                reg.regPre = regPreMax;
             } else if(calPre <= 0) {
                 reg.regPre = 0;
             } else {
@@ -181,19 +261,21 @@ void SPIClass::setFrequency(uint32_t freq) {
             calFreq = ClkRegToFreq(&reg);
             //os_printf("-----[0x%08X][%d]\t EQU: %d\t Pre: %d\t N: %d\t H: %d\t L: %d = %d\n", reg.regValue, freq, reg.regEQU, reg.regPre, reg.regN, reg.regH, reg.regL, calFreq);
 
-            if(calFreq == (int32_t) freq) {
+            if(calFreq == static_cast<int32_t>(freq)) {
                 // accurate match use it!
                 memcpy(&bestReg, &reg, sizeof(bestReg));
                 break;
-            } else if(calFreq < (int32_t) freq) {
+            } else if(calFreq < static_cast<int32_t>(freq)) {
                 // never go over the requested frequency
-                if(abs(freq - calFreq) < abs(freq - bestFreq)) {
+                auto cal = std::abs(static_cast<int32_t>(freq) - calFreq);
+                auto best = std::abs(static_cast<int32_t>(freq) - bestFreq);
+                if(cal < best) {
                     bestFreq = calFreq;
                     memcpy(&bestReg, &reg, sizeof(bestReg));
                 }
             }
         }
-        if(calFreq == (int32_t) freq) {
+        if(calFreq == static_cast<int32_t>(freq)) {
             // accurate match use it!
             break;
         }
@@ -257,6 +339,25 @@ uint16_t SPIClass::transfer16(uint16_t data) {
     return out.val;
 }
 
+void SPIClass::transfer(void *buf, uint16_t count) {
+    uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
+
+    // cbuf may not be 32bits-aligned
+    for (; (((unsigned long)cbuf) & 3) && count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+
+    // cbuf is now aligned
+    // count may not be a multiple of 4
+    uint16_t count4 = count & ~3;
+    transferBytes(cbuf, cbuf, count4);
+
+    // finish the last <4 bytes
+    cbuf += count4;
+    count -= count4;
+    for (; count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+}
+
 void SPIClass::write(uint8_t data) {
 #ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
@@ -281,12 +382,11 @@ void SPIClass::write16(uint16_t data, bool msb) {
     if(msb) {
         // MSBFIRST Byte first
         SPI1W0 = (data >> 8) | (data << 8);
-        SPI1CMD |= SPIBUSY;
     } else {
         // LSBFIRST Byte first
         SPI1W0 = data;
-        SPI1CMD |= SPIBUSY;
     }
+    SPI1CMD |= SPIBUSY;
     while(SPI1CMD & SPIBUSY) {}
 }
 
@@ -307,13 +407,10 @@ void SPIClass::write32(uint32_t data, bool msb) {
         } data_;
         data_.l = data;
         // MSBFIRST Byte first
-        SPI1W0 = (data_.b[3] | (data_.b[2] << 8) | (data_.b[1] << 16) | (data_.b[0] << 24));
-        SPI1CMD |= SPIBUSY;
-    } else {
-        // LSBFIRST Byte first
-        SPI1W0 = data;
-        SPI1CMD |= SPIBUSY;
+        data = (data_.b[3] | (data_.b[2] << 8) | (data_.b[1] << 16) | (data_.b[0] << 24));
     }
+    SPI1W0 = data;
+    SPI1CMD |= SPIBUSY;
     while(SPI1CMD & SPIBUSY) {}
 }
 
@@ -324,7 +421,7 @@ void SPIClass::write32(uint32_t data, bool msb) {
  * @param data uint8_t *
  * @param size uint32_t
  */
-void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
+void SPIClass::writeBytes(const uint8_t * data, uint32_t size) {
 	uint32_t localSize;
     while(size) {
         if(size > 64)
@@ -338,13 +435,13 @@ void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
 	}
 }
 
-
-inline void SPIClass::writeBytes_(uint8_t * data, uint32_t size) {
+inline void SPIClass::writeBytes_(const uint8_t * data, uint32_t size) {
 #ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
 #endif
     // Set bits to transfer
     setDataBits(size * 8);
+
 
 	if(data) {
 		memcpy((uint8_t*)&SPI1W0, data, size);
@@ -363,14 +460,14 @@ inline void SPIClass::writeBytes_(uint8_t * data, uint32_t size) {
  * @param size uint8_t  max for size is 64Byte
  * @param repeat uint32_t
  */
-void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
+void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
 #ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
 #endif
     uint32_t buffer[16];
     uint8_t *bufferPtr=(uint8_t *)&buffer;
-    uint8_t *dataPtr = data;
+    const uint8_t *dataPtr = data;
     volatile uint32_t * fifoPtr = &SPI1W0;
     uint8_t r;
     uint32_t repeatRem;
@@ -438,11 +535,11 @@ void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
  * Note:
  *  in and out need to be aligned to 32 bit boundaries like this: char outBuffer[spiBufferSize] __attribute__ ((aligned (4)));
  *  if not you may get an Fatal exception (9)
- * @param out uint32_t *
- * @param in  uint32_t *
+ * @param out uint8_t *
+ * @param in  uint8_t *
  * @param size uint32_t
  */
-void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
+void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size) {
 	uint32_t localSize;
     while(size) {
         if(size > 64)
@@ -460,7 +557,6 @@ void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
 	}
 }
 
-
 inline void SPIClass::transferBytes_(uint8_t * out, uint8_t * in, uint32_t size) {
 #ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
@@ -475,16 +571,19 @@ inline void SPIClass::transferBytes_(uint8_t * out, uint8_t * in, uint32_t size)
 		// no out buffer specified, transmit dummy data
 		memset((uint8_t*)&SPI1W0, 0xFFFFFFFF, size);
 	}
+  
 	// Start SPI transfer
     SPI1CMD |= SPIBUSY;
+  
 	// and wait for transfer to complete
     while(SPI1CMD & SPIBUSY) {}
-	
+
 	// then return received data
 	if(in) {
 		memcpy((uint8_t*)in, (uint8_t*)&SPI1W0, size);
     }
 }
+
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPI)
 SPIClass SPI;

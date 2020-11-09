@@ -15,9 +15,14 @@ static unsigned setup_micros;
 
 void setup()
 {
-	setup_micros = micros();
+    setup_micros = micros();
     Serial.begin(115200);
     BS_RUN(Serial);
+}
+
+bool pretest()
+{
+    return true;
 }
 
 TEST_CASE("ADC_MODE override works", "[core]")
@@ -25,7 +30,7 @@ TEST_CASE("ADC_MODE override works", "[core]")
     auto vcc = ESP.getVcc();
     Serial.printf("VCC: %d\r\n", vcc);
     Serial.printf("A0: %d\r\n", analogRead(A0));
-    CHECK(vcc > 3000 && vcc < 3600);
+    CHECK(vcc > 2500 && vcc < 3600);
 }
 
 TEST_CASE("RF_PRE_INIT override works", "[core]")

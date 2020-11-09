@@ -15,54 +15,199 @@ ESP8266WiFi	KEYWORD3
 WiFi	KEYWORD1
 WiFiClient	KEYWORD1
 WiFiServer	KEYWORD1
+WiFiServerSecure	KEYWORD1
 WiFiUDP	KEYWORD1
 WiFiClientSecure	KEYWORD1
+ESP8266WiFiMulti	KEYWORD1
+BearSSL	KEYWORD1
+X509List	KEYWORD1
+PrivateKey	KEYWORD1
+PublicKey	KEYWORD1
+Session	KEYWORD1
+ESP8266WiFiGratuitous	KEYWORD1
+
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-status	KEYWORD2
+#ESP8266WiFiGenericClass
+onEvent	KEYWORD2
+onStationModeConnected	KEYWORD2
+onStationModeDisconnected	KEYWORD2
+onStationModeAuthModeChanged	KEYWORD2
+onStationModeGotIP	KEYWORD2
+onStationModeDHCPTimeout	KEYWORD2
+onSoftAPModeStationConnected	KEYWORD2
+onSoftAPModeStationDisconnected	KEYWORD2
+onWiFiModeChange	KEYWORD2
+channel	KEYWORD2
+setSleepMode	KEYWORD2
+getSleepMode	KEYWORD2
+setPhyMode	KEYWORD2
+getPhyMode	KEYWORD2
+setOutputPower	KEYWORD2
+persistent	KEYWORD2
 mode	KEYWORD2
+getMode	KEYWORD2
+enableSTA	KEYWORD2
+enableAP	KEYWORD2
+forceSleepBegin	KEYWORD2
+forceSleepWake	KEYWORD2
+
+#ESP8266WiFi
+printDiag	KEYWORD2
+
+#ESP8266WiFiAP
+softAP					KEYWORD2
+softAPIP				KEYWORD2
+softAPmacAddress	KEYWORD2
+softAPConfig			KEYWORD2
+softAPdisconnect		KEYWORD2
+softAPgetStationNum	KEYWORD2
+
+#ESP8266WiFiMulti
+addAP	KEYWORD2
+existsAP	KEYWORD2
+run	KEYWORD2
+
+#ESP8266WiFiScan
+scanNetworks	KEYWORD2
+scanNetworksAsync	KEYWORD2
+scanComplete	KEYWORD2
+scanDelete	KEYWORD2
+getNetworkInfo	KEYWORD2
+SSID	KEYWORD2
+encryptionType	KEYWORD2
+RSSI	KEYWORD2
+BSSID	KEYWORD2
+BSSIDstr	KEYWORD2
+channel	KEYWORD2
+isHidden	KEYWORD2
+
+#ESP8266WiFiSTA
+begin	KEYWORD2
+config	KEYWORD2
+reconnect	KEYWORD2
+disconnect	KEYWORD2
+isConnected	KEYWORD2
+setAutoConnect	KEYWORD2
+getAutoConnect	KEYWORD2
+setAutoReconnect	KEYWORD2
+waitForConnectResult	KEYWORD2
+localIP	KEYWORD2
+macAddress	KEYWORD2
+subnetMask	KEYWORD2
+gatewayIP	KEYWORD2
+dnsIP	KEYWORD2
+hostname	KEYWORD2
+status	KEYWORD2
+SSID	KEYWORD2
+psk	KEYWORD2
+BSSID	KEYWORD2
+BSSIDstr	KEYWORD2
+RSSI	KEYWORD2
+stationKeepAliveSetIntervalMs	KEYWORD2
+stationKeepAliveStop	KEYWORD2
+stationKeepAliveNow	KEYWORD2
+enableInsecureWEP	KEYWORD2
+getListenInterval	KEYWORD2
+isSleepLevelMax		KEYWORD2
+beginWPSConfig	KEYWORD2
+beginSmartConfig	KEYWORD2
+stopSmartConfig	KEYWORD2
+smartConfigDone	KEYWORD2
+
+#WiFiClient
+status	KEYWORD2
 connect	KEYWORD2
 write	KEYWORD2
+write_P	KEYWORD2
 available	KEYWORD2
-config	KEYWORD2
-setDNS	KEYWORD2
 read	KEYWORD2
+peek	KEYWORD2
+peekBytes	KEYWORD2
 flush	KEYWORD2
 stop	KEYWORD2
 connected	KEYWORD2
-begin	KEYWORD2
-beginMulticast	KEYWORD2
-disconnect	KEYWORD2
-macAddress	KEYWORD2
+bool	KEYWORD2
+remoteIP	KEYWORD2
+remotePort	KEYWORD2
 localIP	KEYWORD2
-subnetMask	KEYWORD2
-gatewayIP	KEYWORD2
-SSID	KEYWORD2
-psk	KEYWORD2
-BSSID		KEYWORD2
-RSSI	KEYWORD2
-encryptionType	KEYWORD2
+localPort	KEYWORD2
+getNoDelay	KEYWORD2
+setNoDelay	KEYWORD2
+setLocalPortStart	KEYWORD2
+stopAll	KEYWORD2
+stopAllExcept	KEYWORD2
+
+#WiFiClientSecure
+verify	KEYWORD2
+verifyCertChain	KEYWORD2
+setCertificate	KEYWORD2
+setPrivateKey	KEYWORD2
+setCACert	KEYWORD2
+setCertificate_P	KEYWORD2
+setPrivateKey_P	KEYWORD2
+setCACert_P	KEYWORD2
+loadCertificate	KEYWORD2
+loadPrivateKey	KEYWORD2
+loadCACert	KEYWORD2
+allowSelfSignedCerts	KEYWORD2
+
+#WiFiServer
+hasClient	KEYWORD2
+close	KEYWORD2
+
+#WiFiUdp
+beginMulticast	KEYWORD2
 beginPacket	KEYWORD2
 beginPacketMulticast	KEYWORD2
 endPacket	KEYWORD2
 parsePacket	KEYWORD2
-destinationIP	KEYWORD2
 remoteIP	KEYWORD2
 remotePort	KEYWORD2
-softAP	KEYWORD2
-softAPIP	KEYWORD2
-softAPmacAddress	KEYWORD2
-softAPConfig	KEYWORD2
-printDiag	KEYWORD2
-hostByName	KEYWORD2
-scanNetworks	KEYWORD2
+destinationIP	KEYWORD2
+localPort	KEYWORD2
+stopAll	KEYWORD2
+stopAllExcept	KEYWORD2
+
+#WiFiClientBearSSL
+setInsecure	KEYWORD2
+setKnownKey	KEYWORD2
+setFingerprint	KEYWORD2
+allowSelfSignedCerts	KEYWORD2
+setTrustAnchors	KEYWORD2
+setX509Time	KEYWORD2
+setClientRSACert	KEYWORD2
+setClientECCert	KEYWORD2
+setBufferSizes	KEYWORD2
+getLastSSLError	KEYWORD2
+setCertStore	KEYWORD2
+probeMaxFragmentLength	KEYWORD2
+getMFLNStatus	KEYWORD2
+
+#WiFiServerBearSSL
+setRSACert	KEYWORD2
+setECCert	KEYWORD2
+setClientTrustAnchor	KEYWORD2
+
+#CertStoreBearSSL
+initCertStore	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+WIFI_OFF	LITERAL1
 WIFI_AP	LITERAL1
 WIFI_STA	LITERAL1
 WIFI_AP_STA	LITERAL1
+WIFI_PHY_MODE_11B	LITERAL1
+WIFI_PHY_MODE_11G	LITERAL1
+WIFI_PHY_MODE_11N	LITERAL1
+WIFI_NONE_SLEEP	LITERAL1
+WIFI_LIGHT_SLEEP	LITERAL1
+WIFI_MODEM_SLEEP	LITERAL1
+WIFICLIENT_MAX_PACKET_SIZE	LITERAL1
+UDP_TX_PACKET_MAX_SIZE	LITERAL1
+DEBUG_ESP_WIFI	LITERAL1

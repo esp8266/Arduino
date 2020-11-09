@@ -1,33 +1,49 @@
 /*
- *  This sketch trys to Connect to the best AP based on a given list
- *
- */
+    This sketch shows how to use multiple WiFi networks.
 
-#include <ESP8266WiFi.h>
+    In this example, ESP8266 works in AP mode.
+    It demonstrates:
+    - Fast connect to previous WiFi network at startup
+    - Registering multiple networks (at least 1)
+    - Connect to WiFi with strongest signal (RSSI)
+    - Fall back to connect to next WiFi when a connection failed or lost
+
+    To enable debugging output, select in the Arduino iDE:
+    - Tools | Debug Port: Serial
+    - Tools | Debug Level: WiFi
+*/
+
 #include <ESP8266WiFiMulti.h>
 
 ESP8266WiFiMulti wifiMulti;
 
-void setup() {
-    Serial.begin(115200);
-    delay(10);
-	
-    wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
-    wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
-    wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+// WiFi connect timeout per AP. Increase when connecting takes longer.
+const uint32_t connectTimeoutMs = 5000;
 
-	Serial.println("Connecting Wifi...");
-    if(wifiMulti.run() == WL_CONNECTED) {
-        Serial.println("");
-        Serial.println("WiFi connected");
-        Serial.println("IP address: ");
-        Serial.println(WiFi.localIP());
-    }
+void setup() {
+  Serial.begin(115200);
+  Serial.println("\nESP8266 Multi WiFi example");
+
+  // Set WiFi to station mode
+  WiFi.mode(WIFI_STA);
+
+  // Register multi WiFi networks
+  wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
+  wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+  wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+  // More is possible
 }
 
 void loop() {
-    if(wifiMulti.run() != WL_CONNECTED) {
-        Serial.println("WiFi not connected!");
-        delay(1000);
-    }
+  // Maintain WiFi connection
+  if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+    Serial.print("WiFi connected: ");
+    Serial.print(WiFi.SSID());
+    Serial.print(" ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("WiFi not connected!");
+  }
+
+  delay(1000);
 }

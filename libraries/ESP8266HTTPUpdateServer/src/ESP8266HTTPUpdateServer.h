@@ -1,39 +1,61 @@
 #ifndef __HTTP_UPDATE_SERVER_H
 #define __HTTP_UPDATE_SERVER_H
 
-class ESP8266WebServer;
+#include <ESP8266WebServer.h>
 
-class ESP8266HTTPUpdateServer
+namespace esp8266httpupdateserver {
+using namespace esp8266webserver;
+
+template <typename ServerType>
+class ESP8266HTTPUpdateServerTemplate
 {
-  private:
-    bool _serial_output;
-    ESP8266WebServer *_server;
-    static const char *_serverIndex;
-    static const char *_failedResponse;
-    static const char *_successResponse;
-    char * _username;
-    char * _password;
-    bool _authenticated;
   public:
-    ESP8266HTTPUpdateServer(bool serial_debug=false);
+    ESP8266HTTPUpdateServerTemplate(bool serial_debug=false);
 
-    void setup(ESP8266WebServer *server)
+    void setup(ESP8266WebServerTemplate<ServerType> *server)
     {
-      setup(server, NULL, NULL);
+      setup(server, emptyString, emptyString);
     }
 
-    void setup(ESP8266WebServer *server, const char * path)
+    void setup(ESP8266WebServerTemplate<ServerType> *server, const String& path)
     {
-      setup(server, path, NULL, NULL);
+      setup(server, path, emptyString, emptyString);
     }
 
-    void setup(ESP8266WebServer *server, const char * username, const char * password)
+    void setup(ESP8266WebServerTemplate<ServerType> *server, const String& username, const String& password)
     {
       setup(server, "/update", username, password);
     }
 
-    void setup(ESP8266WebServer *server, const char * path, const char * username, const char * password);
+    void setup(ESP8266WebServerTemplate<ServerType> *server, const String& path, const String& username, const String& password);
+
+    void updateCredentials(const String& username, const String& password)
+    {
+      _username = username;
+      _password = password;
+    }
+
+  protected:
+    void _setUpdaterError();
+
+  private:
+    bool _serial_output;
+    ESP8266WebServerTemplate<ServerType> *_server;
+    String _username;
+    String _password;
+    bool _authenticated;
+    String _updaterError;
 };
 
+};
+
+#include "ESP8266HTTPUpdateServer-impl.h"
+
+
+using ESP8266HTTPUpdateServer = esp8266httpupdateserver::ESP8266HTTPUpdateServerTemplate<WiFiServer>;
+
+namespace BearSSL {
+using ESP8266HTTPUpdateServerSecure = esp8266httpupdateserver::ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
+};
 
 #endif

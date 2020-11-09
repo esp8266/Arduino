@@ -33,6 +33,8 @@ int Stream::timedRead() {
         c = read();
         if(c >= 0)
             return c;
+        if(_timeout == 0)
+            return -1;
         yield();
     } while(millis() - _startMillis < _timeout);
     return -1;     // -1 indicates timeout
@@ -46,6 +48,8 @@ int Stream::timedPeek() {
         c = peek();
         if(c >= 0)
             return c;
+        if(_timeout == 0)
+            return -1;
         yield();
     } while(millis() - _startMillis < _timeout);
     return -1;     // -1 indicates timeout
@@ -169,7 +173,7 @@ float Stream::parseFloat(char skipChar) {
     boolean isFraction = false;
     long value = 0;
     int c;
-    float fraction = 1.0;
+    float fraction = 1.0f;
 
     c = peekNextDigit();
     // ignore non numeric leading characters
@@ -186,7 +190,7 @@ float Stream::parseFloat(char skipChar) {
         else if(c >= '0' && c <= '9') {      // is c a digit?
             value = value * 10 + c - '0';
             if(isFraction)
-                fraction *= 0.1;
+                fraction *= 0.1f;
         }
         read();  // consume the character we got with peek
         c = timedPeek();
@@ -254,4 +258,3 @@ String Stream::readStringUntil(char terminator) {
     }
     return ret;
 }
-

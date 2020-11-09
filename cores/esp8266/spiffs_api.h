@@ -29,15 +29,37 @@
 #undef max
 #undef min
 #include "FSImpl.h"
-#include "spiffs/spiffs.h"
+extern "C" {
+    #include "spiffs/spiffs.h"
+    #include "spiffs/spiffs_nucleus.h"
+};
 #include "debug.h"
 #include "flash_utils.h"
+#include "flash_hal.h"
 
 using namespace fs;
 
-extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
-extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
-extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
+// The following are deprecated symbols and functions, to be removed at the next major release.
+// They are provided only for backwards compatibility and to give libs a chance to update.
+
+extern "C" uint32_t _SPIFFS_start __attribute__((deprecated));
+extern "C" uint32_t _SPIFFS_end __attribute__((deprecated));
+extern "C" uint32_t _SPIFFS_page __attribute__((deprecated));
+extern "C" uint32_t _SPIFFS_block __attribute__((deprecated));
+
+#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
+#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
+#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
+#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+
+extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) __attribute__((deprecated));
+extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) __attribute__((deprecated));
+extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) __attribute__((deprecated));
+
+
+
+
+namespace spiffs_impl {
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
 bool isSpiffsFilenameValid(const char* name);
@@ -49,13 +71,18 @@ class SPIFFSImpl : public FSImpl
 {
 public:
     SPIFFSImpl(uint32_t start, uint32_t size, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFds)
-        : _fs({0})
-    , _start(start)
+        : _start(start)
     , _size(size)
     , _pageSize(pageSize)
     , _blockSize(blockSize)
     , _maxOpenFds(maxOpenFds)
     {
+        memset(&_fs, 0, sizeof(_fs));
+    }
+
+    ~SPIFFSImpl()
+    {
+        end();
     }
 
     FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) override;
@@ -80,9 +107,9 @@ public:
         }
         return true;
     }
+
     bool info(FSInfo& info) override
     {
-        info.maxOpenFiles = _maxOpenFds;
         info.blockSize = _blockSize;
         info.pageSize = _pageSize;
         info.maxOpenFiles = _maxOpenFds;
@@ -95,6 +122,20 @@ public:
         }
         info.totalBytes = totalBytes;
         info.usedBytes = usedBytes;
+        return true;
+    }
+
+    virtual bool info64(FSInfo64& info64) {
+        FSInfo i;
+        if (!info(i)) {
+            return false;
+        }
+        info64.blockSize     = i.blockSize;
+        info64.pageSize      = i.pageSize;
+        info64.maxOpenFiles  = i.maxOpenFiles;
+        info64.maxPathLength = i.maxPathLength;
+        info64.totalBytes    = i.totalBytes;
+        info64.usedBytes     = i.usedBytes;
         return true;
     }
 
@@ -112,6 +153,27 @@ public:
         return true;
     }
 
+    bool mkdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
+    bool rmdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
+    bool setConfig(const FSConfig &cfg) override
+    {
+        if ((cfg._type != SPIFFSConfig::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
+            return false;
+        }
+        _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
+        return true;
+    }
+
     bool begin() override
     {
         if (SPIFFS_mounted(&_fs) != 0) {
@@ -124,12 +186,16 @@ public:
         if (_tryMount()) {
             return true;
         }
-        auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
-            return false;
+        if (_cfg._autoFormat) {
+            auto rc = SPIFFS_format(&_fs);
+            if (rc != SPIFFS_OK) {
+                DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+                return false;
+            }
+            return _tryMount();
         }
-        return _tryMount();
+
+        return false;
     }
 
     void end() override
@@ -138,6 +204,9 @@ public:
             return;
         }
         SPIFFS_unmount(&_fs);
+        _workBuf.reset(nullptr);
+        _fdsBuf.reset(nullptr);
+        _cacheBuf.reset(nullptr);
     }
 
     bool format() override
@@ -165,6 +234,16 @@ public:
         return true;
     }
 
+    bool gc() override
+    {
+        return SPIFFS_gc_quick( &_fs, 0 ) == SPIFFS_OK;
+    }
+
+    bool check() override
+    {
+        return SPIFFS_check(&_fs) == SPIFFS_OK;
+    }
+
 protected:
     friend class SPIFFSFileImpl;
     friend class SPIFFSDirImpl;
@@ -176,7 +255,8 @@ protected:
 
     bool _tryMount()
     {
-        spiffs_config config = {0};
+        spiffs_config config;
+        memset(&config, 0, sizeof(config));
 
         config.hal_read_f       = &spiffs_hal_read;
         config.hal_write_f      = &spiffs_hal_write;
@@ -219,7 +299,7 @@ protected:
         size_t cacheBufSize = SPIFFS_buffer_bytes_for_cache(&_fs, _maxOpenFds);
 
         if (!_workBuf) {
-            DEBUGV("SPIFFSImpl: allocating %d+%d+%d=%d bytes\r\n",
+            DEBUGV("SPIFFSImpl: allocating %zd+%zd+%zd=%zd bytes\r\n",
                    workBufSize, fdsBufSize, cacheBufSize,
                    workBufSize + fdsBufSize + cacheBufSize);
             _workBuf.reset(new uint8_t[workBufSize]);
@@ -242,12 +322,28 @@ protected:
     static void _check_cb(spiffs_check_type type, spiffs_check_report report,
                           uint32_t arg1, uint32_t arg2)
     {
+        (void) type;
+        (void) report;
+        (void) arg1;
+        (void) arg2;
+
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
     }
 
     spiffs _fs;
+
+    // Flash hal wrapper functions to get proper SPIFFS error codes
+    static int32_t spiffs_hal_write(uint32_t addr, uint32_t size, const uint8_t *src) {
+        return flash_hal_write(addr, size, src) == FLASH_HAL_OK ? SPIFFS_OK : SPIFFS_ERR_INTERNAL;
+    }
+    static int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
+        return flash_hal_erase(addr, size) == FLASH_HAL_OK ? SPIFFS_OK : SPIFFS_ERR_INTERNAL;
+    }
+    static int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
+        return flash_hal_read(addr, size, dst) == FLASH_HAL_OK ? SPIFFS_OK : SPIFFS_ERR_INTERNAL;
+    }
 
     uint32_t _start;
     uint32_t _size;
@@ -258,6 +354,8 @@ protected:
     std::unique_ptr<uint8_t[]> _workBuf;
     std::unique_ptr<uint8_t[]> _fdsBuf;
     std::unique_ptr<uint8_t[]> _cacheBuf;
+
+    SPIFFSConfig _cfg;
 };
 
 #define CHECKFD() while (_fd == 0) { panic(); }
@@ -268,9 +366,9 @@ public:
     SPIFFSFileImpl(SPIFFSImpl* fs, spiffs_file fd)
         : _fs(fs)
         , _fd(fd)
-        , _stat({0})
     , _written(false)
     {
+        memset(&_stat, 0, sizeof(_stat));
         _getStat();
     }
 
@@ -323,7 +421,7 @@ public:
         if (mode == SeekEnd) {
             offset = -offset;
         }
-        auto rc = SPIFFS_lseek(_fs->getFs(), _fd, pos, (int) mode);
+        auto rc = SPIFFS_lseek(_fs->getFs(), _fd, offset, (int) mode);
         if (rc < 0) {
             DEBUGV("SPIFFS_lseek rc=%d\r\n", rc);
             return false;
@@ -354,6 +452,29 @@ public:
         return _stat.size;
     }
 
+    bool truncate(uint32_t size) override
+    {
+        CHECKFD();
+        spiffs_fd *sfd;
+        if (spiffs_fd_get(_fs->getFs(), _fd, &sfd) == SPIFFS_OK) {
+            return SPIFFS_OK == spiffs_object_truncate(sfd, size, 0);
+        } else {
+          return false;
+        }
+    }
+
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _fd ? true : false;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     void close() override
     {
         CHECKFD();
@@ -369,6 +490,11 @@ public:
         return (const char*) _stat.name;
     }
 
+    const char* fullName() const override
+    {
+        return name(); // No dirs, they're the same on SPIFFS
+    }
+
 protected:
     void _getStat() const
     {
@@ -376,7 +502,7 @@ protected:
         auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
-            _stat = {0};
+            memset(&_stat, 0, sizeof(_stat));
         }
         _written = false;
     }
@@ -394,6 +520,7 @@ public:
         : _pattern(pattern)
         , _fs(fs)
         , _dir(dir)
+        , _dirHead(dir)
         , _valid(false)
     {
     }
@@ -437,6 +564,18 @@ public:
         return _dirent.size;
     }
 
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _valid;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     bool next() override
     {
         const int n = _pattern.length();
@@ -447,13 +586,22 @@ public:
         return _valid;
     }
 
+    bool rewind() override
+    {
+        _dir = _dirHead;
+        _valid = false;
+        return true;
+    }
+
 protected:
     String _pattern;
     SPIFFSImpl* _fs;
     spiffs_DIR  _dir;
+    spiffs_DIR  _dirHead; // The pointer to the start of this dir
     spiffs_dirent _dirent;
     bool _valid;
 };
 
+}; // namespace
 
-#endif//spiffs_api_h
+#endif //spiffs_api_h

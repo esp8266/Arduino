@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <flash_utils.h>
 #include <MD5Builder.h>
+#include <functional>
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
@@ -16,10 +17,11 @@
 #define UPDATE_ERROR_FLASH_CONFIG       (8)
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
-
+#define UPDATE_ERROR_BOOTSTRAP          (11)
+#define UPDATE_ERROR_SIGN               (12)
 
 #define U_FLASH   0
-#define U_SPIFFS  100
+#define U_FS      100
 #define U_AUTH    200
 
 #ifdef DEBUG_ESP_UPDATER
@@ -28,14 +30,39 @@
 #endif
 #endif
 
+// Abstract class to implement whatever signing hash desired
+class UpdaterHashClass {
+  public:
+    virtual void begin() = 0;
+    virtual void add(const void *data, uint32_t len) = 0;
+    virtual void end() = 0;
+    virtual int len() = 0;
+    virtual const void *hash() = 0;
+    virtual const unsigned char *oid() = 0;
+};
+
+// Abstract class to implement a signature verifier
+class UpdaterVerifyClass {
+  public:
+    virtual uint32_t length() = 0; // How many bytes of signature are expected
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
+};
+
 class UpdaterClass {
   public:
+    typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
+  
     UpdaterClass();
+    ~UpdaterClass();
+
+    /* Optionally add a cryptographic signature verification hash and method */
+    void installSignature(UpdaterHashClass *hash, UpdaterVerifyClass *verify) {  _hash = hash;  _verify = verify; }
+
     /*
       Call this to check the space needed for the update
       Will return false if there is not enough space
     */
-    bool begin(size_t size, int command = U_FLASH);
+    bool begin(size_t size, int command = U_FLASH, int ledPin = -1, uint8_t ledOn = LOW);
 
     /*
       Run Updater from asynchronous callbacs
@@ -61,18 +88,18 @@ class UpdaterClass {
       If all bytes are written
       this call will write the config to eboot
       and return true
-      If there is already an update running but is not finished and !evenIfRemainanig
+      If there is already an update running but is not finished and !evenIfRemaining
       or there is an error
       this will clear everything and return false
       the last error is available through getError()
-      evenIfRemaining is helpfull when you update without knowing the final size first
+      evenIfRemaining is helpful when you update without knowing the final size first
     */
     bool end(bool evenIfRemaining = false);
 
     /*
       Prints the last error to an output stream
     */
-    void printError(Stream &out);
+    void printError(Print &out);
 
     /*
       sets the expected MD5 for the firmware (hexString)
@@ -88,6 +115,11 @@ class UpdaterClass {
       populated the result with the md5 bytes of the sucessfully ended firmware
     */
     void md5(uint8_t * result){ return _md5.getBytes(result); }
+
+    /*
+      This callback will be called when Updater is receiving data
+    */
+    UpdaterClass& onProgress(THandlerFunction_Progress fn);
 
     //Helpers
     uint8_t getError(){ return _error; }
@@ -116,8 +148,8 @@ class UpdaterClass {
         if(_bufferLen + available > remaining()){
           available = remaining() - _bufferLen;
         }
-        if(_bufferLen + available > FLASH_SECTOR_SIZE) {
-          size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
+        if(_bufferLen + available > _bufferSize) {
+          size_t toBuff = _bufferSize - _bufferLen;
           data.read(_buffer + _bufferLen, toBuff);
           _bufferLen += toBuff;
           if(!_writeBuffer())
@@ -148,17 +180,29 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
-    bool _async;
-    uint8_t _error;
-    uint8_t *_buffer;
-    size_t _bufferLen;
-    size_t _size;
-    uint32_t _startAddress;
-    uint32_t _currentAddress;
-    uint32_t _command;
+    void _setError(int error);    
+
+    bool _async = false;
+    uint8_t _error = 0;
+    uint8_t *_buffer = nullptr;
+    size_t _bufferLen = 0; // amount of data written into _buffer
+    size_t _bufferSize = 0; // total size of _buffer
+    size_t _size = 0;
+    uint32_t _startAddress = 0;
+    uint32_t _currentAddress = 0;
+    uint32_t _command = U_FLASH;
 
     String _target_md5;
     MD5Builder _md5;
+
+    int _ledPin = -1;
+    uint8_t _ledOn;
+
+    // Optional signed binary verification
+    UpdaterHashClass *_hash = nullptr;
+    UpdaterVerifyClass *_verify = nullptr;
+    // Optional progress callback function
+    THandlerFunction_Progress _progress_callback = nullptr;
 };
 
 extern UpdaterClass Update;

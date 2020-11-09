@@ -9,9 +9,10 @@
 
 #include <ArduinoJson.h>
 #include "FS.h"
+#include <LittleFS.h>
 
 bool loadConfig() {
-  File configFile = SPIFFS.open("/config.json", "r");
+  File configFile = LittleFS.open("/config.json", "r");
   if (!configFile) {
     Serial.println("Failed to open config file");
     return false;
@@ -31,16 +32,15 @@ bool loadConfig() {
   // use configFile.readString instead.
   configFile.readBytes(buf.get(), size);
 
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.parseObject(buf.get());
-
-  if (!json.success()) {
+  StaticJsonDocument<200> doc;
+  auto error = deserializeJson(doc, buf.get());
+  if (error) {
     Serial.println("Failed to parse config file");
     return false;
   }
 
-  const char* serverName = json["serverName"];
-  const char* accessToken = json["accessToken"];
+  const char* serverName = doc["serverName"];
+  const char* accessToken = doc["accessToken"];
 
   // Real world application would store these values in some variables for
   // later use.
@@ -53,18 +53,17 @@ bool loadConfig() {
 }
 
 bool saveConfig() {
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& json = jsonBuffer.createObject();
-  json["serverName"] = "api.example.com";
-  json["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
+  StaticJsonDocument<200> doc;
+  doc["serverName"] = "api.example.com";
+  doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 
-  File configFile = SPIFFS.open("/config.json", "w");
+  File configFile = LittleFS.open("/config.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
   }
 
-  json.printTo(configFile);
+  serializeJson(doc, configFile);
   return true;
 }
 
@@ -74,7 +73,7 @@ void setup() {
   delay(1000);
   Serial.println("Mounting FS...");
 
-  if (!SPIFFS.begin()) {
+  if (!LittleFS.begin()) {
     Serial.println("Failed to mount file system");
     return;
   }
