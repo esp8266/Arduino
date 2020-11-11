@@ -28,9 +28,10 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc = 0xffffffff);
 
 #include <functional>
 
+using BoolCB = std::function<void(bool)>;
 using TrivialCB = std::function<void()>;
 
-void settimeofday_cb (TrivialCB&& cb);
+void settimeofday_cb (const BoolCB& cb);
 void settimeofday_cb (const TrivialCB& cb);
 
 #endif

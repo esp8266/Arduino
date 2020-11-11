@@ -35,17 +35,15 @@
 
 class Print {
     private:
-        int write_error;
+        int write_error = 0;
         template<typename T> size_t printNumber(T n, uint8_t base);
         template<typename T, typename... P> inline size_t _println(T v, P... args);
-protected:
+    protected:
         void setWriteError(int err = 1) {
             write_error = err;
         }
     public:
-        Print() :
-                write_error(0) {
-        }
+        Print() {}
 
         int getWriteError() {
             return write_error;
@@ -76,6 +74,10 @@ protected:
         // Enable write(char) to fall through to write(uint8_t)
         inline size_t write(char c) { return write((uint8_t) c); }
         inline size_t write(int8_t c) { return write((uint8_t) c); }
+
+        // default to zero, meaning "a single write may block"
+        // should be overriden by subclasses with buffering
+        virtual int availableForWrite() { return 0; }
 
         size_t printf(const char * format, ...)  __attribute__ ((format (printf, 2, 3)));
         size_t printf_P(PGM_P format, ...) __attribute__((format(printf, 2, 3)));

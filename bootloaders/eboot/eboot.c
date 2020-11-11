@@ -21,20 +21,20 @@ extern unsigned char _gzip_dict;
 extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
 
+// Converts bit of a string into a uint32
+#define S(a,b,c,d) ( (((uint32_t)a) & 0xff) | (((uint32_t)b) << 8) | (((uint32_t)c) << 16) | (((uint32_t)d)<<24) )
+
 int print_version(const uint32_t flash_addr)
 {
     uint32_t ver;
     if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
         return 1;
     }
-    char fmt[7];
-    fmt[0] = 'v';
-    fmt[1] = '%';
-    fmt[2] = '0';
-    fmt[3] = '8';
-    fmt[4] = 'x';
-    fmt[5] = '\n';
-    fmt[6] = 0;
+    // We don't have BSS and can't print from flash, so build up string
+    // 4 chars at a time.  Smaller code than byte-wise assignment.
+    uint32_t fmt[2];
+    fmt[0] = S('v', '%', '0', '8');
+    fmt[1] = S('x', '\n', 0, 0);
     ets_printf((const char*) fmt, ver);
     return 0;
 }
@@ -234,26 +234,32 @@ int main()
     }
 
     if (cmd.action == ACTION_COPY_RAW) {
-        ets_putc('c'); ets_putc('p'); ets_putc(':');
+        uint32_t cp = S('c', 'p', ':', 0);
+        ets_printf((const char *)&cp);
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
         ets_wdt_enable();
 
-        ets_putc('0'+res); ets_putc('\n');
+        cp = S('0' + res, '\n', 0, 0 );
+        ets_printf((const char *)&cp);
 #if 0
 	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
 	//beginning of the image in the empty area, see #7458. Disabling for now. 
         //TODO: replace the below verify with hash type, crc, or similar.
         // Verify the copy
-        ets_putc('c'); ets_putc('m'); ets_putc('p'); ets_putc(':');
+        uint32_t v[2];
+        v[0] = S('c', 'm', 'p', ':');
+        v[1] = 0;
+        ets_printf(const char *)v);
         if (res == 0) {
             ets_wdt_disable();
             res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
             ets_wdt_enable();
             }
 
-        ets_putc('0'+res); ets_putc('\n');
+        cp = S('0' + res, '\n', 0, 0 );
+        ets_printf((const char *)&cp);
 #endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
@@ -268,8 +274,11 @@ int main()
     if (cmd.action == ACTION_LOAD_APP) {
         ets_putc('l'); ets_putc('d'); ets_putc('\n');
         res = load_app_from_flash_raw(cmd.args[0]);
-        //we will get to this only on load fail
-        ets_putc('e'); ets_putc(':'); ets_putc('0'+res); ets_putc('\n');
+        // We will get to this only on load fail
+        uint32_t e[2];
+        e[0] = S('e', ':', '0' + res, '\n' );
+        e[1] = 0;
+        ets_printf((const char*)e);
     }
 
     if (res) {
