@@ -5,6 +5,7 @@
 #include <flash_utils.h>
 #include <MD5Builder.h>
 #include <functional>
+#include <erase_config.h>
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
@@ -205,8 +206,9 @@ class UpdaterClass {
     int _ledPin = -1;
     uint8_t _ledOn;
 
-    uint32_t _eraseConfigOption;
-
+#ifdef ERASE_CONFIG_H
+    uint32_t _eraseConfigOption = ERASE_CONFIG_BLANK_BIN;
+#endif
     // Optional signed binary verification
     UpdaterHashClass *_hash = nullptr;
     UpdaterVerifyClass *_verify = nullptr;

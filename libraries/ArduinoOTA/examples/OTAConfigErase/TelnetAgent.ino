@@ -89,7 +89,7 @@ void handleTelnetAgent(void) {
   len = std::min(len, (size_t)STACK_PROTECTOR);
   if (len) {
     uint8_t sbuf[len];
-    size_t serial_got = telnetOut.readBytes(sbuf, len);
+    int serial_got = telnetOut.readBytes(sbuf, len);
     // push UART data to all connected telnet clients
     for (int i = 0; i < MAX_SRV_CLIENTS; i++)
       // if client.availableForWrite() was 0 (congested)

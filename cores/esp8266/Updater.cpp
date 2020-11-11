@@ -1,7 +1,6 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
-#include <erase_config.h>
 #include "StackThunk.h"
 
 //#define DEBUG_UPDATER Serial
@@ -28,9 +27,6 @@ extern "C" uint32_t _FS_start;
 extern "C" uint32_t _FS_end;
 
 UpdaterClass::UpdaterClass()
-#ifdef ERASE_CONFIG_H
-, _eraseConfigOption(ERASE_CONFIG_BLANK_BIN)
-#endif
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
