@@ -327,6 +327,7 @@ extern "C" void preinit (void)
 {
     /* do nothing by default */
 }
+extern "C" void postmortem_init(void);
 
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -341,6 +342,10 @@ extern "C" void user_init(void) {
     experimental::initFlashQuirks(); // Chip specific flash init.
 
     cont_init(g_pcont);
+
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+    postmortem_init();
+#endif
 
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 

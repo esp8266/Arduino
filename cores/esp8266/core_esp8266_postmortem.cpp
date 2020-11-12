@@ -33,8 +33,31 @@
 #include "gdb_hooks.h"
 #include "StackThunk.h"
 #include "coredecls.h"
+#include "esp8266_undocumented.h"
+#include "core_esp8266_features.h"
 
 extern "C" {
+
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+extern void _DebugExceptionVector(void);
+extern void _KernelExceptionVector(void);
+extern void _DoubleExceptionVector(void);
+
+// Context structure used by Debug, Double, Kernel Exception and unhandled
+// exception stubs to build a stack frame with potentially useful addresses for
+// EXP Exception Decoder's use. Also used to save some special registers
+// that were overwritten by using the `ill` instruction.
+struct EXC_CONTEXT{
+    uint32_t ps;          // +0
+    uint32_t pad1;        // +4
+    uint32_t pad2;        // +8
+    uint32_t excsave2;    // +12
+    uint32_t exccause;    // +16
+    uint32_t epc1;        // +20
+    uint32_t a1;          // +24
+    uint32_t excsave1;    // +28, a0 at the time of the event
+};
+#endif
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
@@ -128,6 +151,67 @@ void __wrap_system_restart_local() {
 
     ets_install_putc1(&uart_write_char_d);
 
+    /*
+      Check for Exceptions mapped into User Exception.
+    */
+    if (rst_info.reason == REASON_EXCEPTION_RST && rst_info.exccause == 0) {
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+        if ((rst_info.epc1 - 11u) == (uint32_t)_DoubleExceptionVector) {
+            struct EXC_CONTEXT *exc_context;
+            asm volatile("rsr.excsave2 %0\n\t" : "=a" (exc_context) :: "memory");
+            // Use Special Register values from before the `ill` instruction.
+            // Note, for a double exception the exccause is that of the second exception.
+            // epc1 is still the address of the 1st exception, its cause is now unknown.
+            rst_info.exccause = exc_context->exccause;
+            rst_info.epc1 = exc_context->epc1;
+            // Double Exception
+            if (rst_info.depc) {
+                ets_printf_P(PSTR("\nDouble Exception"));
+                // The current "ESP Exception Decoder" does not process the value in depc
+                // Set a fake epc1 so the decoder identifies the line of the Double Exception
+                rst_info.epc1 = rst_info.depc;
+                // The "ESP Exception Decoder" is also helped by updating the
+                // context saved on the stack.
+                exc_context->epc1 = rst_info.depc;
+            }
+            // BP - Debug Exception
+            else if (rst_info.epc2) {
+                if (rst_info.epc2 == 0x4000dc4bu) {
+                    // Unhandled Exceptions land here. 'break 1, 1' in _xtos_unhandled_exception
+                    if (20u == exc_context->exccause) {
+                        // This could be the result from a jump or call; a call
+                        // is more likely. eg. calling a null callback function
+                        // For the call case, a0 is likely the return address.
+                        rst_info.epc1 = exc_context->excsave1;
+                    }
+                    ets_printf_P(PSTR("\nXTOS Unhandled exception - BP"));
+                }
+                else if (rst_info.epc2 == 0x4000dc3cu) {
+                    // Unhandled interrupts land here. 'break 1, 15' in _xtos_unhandled_interrupt
+                    ets_printf_P(PSTR("\nXTOS Unhandled interrupt - BP"));
+                    // Don't know what should be done here if anything.
+                }
+                else {
+                    ets_printf_P(PSTR("\nDebug Exception"));
+                    // The current Exception Decoder does not process the value in epc2
+                    // Set a fake epc1 so the Exception Decoder identifies the correct BP line
+                    rst_info.epc1 = rst_info.epc2;
+                }
+            }
+            // Kernel Exception
+            else {
+                ets_printf_P(PSTR("\nKernel Exception"));
+            }
+            ets_printf_P(PSTR(" - excsave1=0x%08x excsave2=0x%08x epc1=0x%08x\n"),
+                exc_context->excsave1, exc_context->excsave2, exc_context->epc1 );
+        }
+#endif
+        // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
+        // In that case, print the exception as (6) which is IntegerDivZero
+        if (rst_info.epc1 == 0x4000dce5u) {
+            rst_info.exccause = 6;
+        }
+    }
     cut_here();
 
     if (s_panic_line) {
@@ -144,11 +228,8 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nAbort called\n"));
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
-        // In that case, print the exception as (6) which is IntegerDivZero
-        bool div_zero = (rst_info.exccause == 0) && (rst_info.epc1 == 0x4000dce5);
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
-            div_zero ? 6 : rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
+            rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
@@ -157,7 +238,7 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nStack overflow detected.\n"));
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
             5 /* Alloca exception, closest thing to stack fault*/, s_stacksmash_addr, 0, 0, 0, 0);
-   }
+    }
     else {
         ets_printf_P(PSTR("\nGeneric Reset\n"));
     }
@@ -322,5 +403,199 @@ void __stack_chk_fail(void) {
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+/*
+        Handle breakpoints via postmortem when GDB is not running.
+
+    Objective: Add support for Debug, Kernel, and Double Exception reporting
+    with minimum impact on IRAM usage. Additionally, improve reporting of
+    Unhandled Exception causes for the disabled interrupt case.
+
+    Overview: In the absence of GDB, install a small breakpoint handler that
+    clears EXCM and executes an illegal instruction. This leverages the existing
+    exception handling code in the SDK for the `ill` instruction. At postmortem
+    processing, identify the event and report. This allows for alerting of
+    embedded breakpoints. In the stack trace, EPC1 is updated with the value of
+    EPC2. This helps "Exception Decoder" identify the line where the BP
+    occurred. By using the SDK's handling for `ill`, we get support for handling
+    the process of getting out of the Cache_Read_Disable state free, without
+    consuming IRAM.
+
+    For breakpoints (BP), the SDK's default behavior is to loop, waiting for an
+    interrupt >2 until the HWDT kicks in. The current "C++" compiler will embed
+    breakpoints when it detects a divide by zero at compile time. Are there
+    other situations where the compiler does this?
+
+    Expand technique to preserve more of the current context and to also report
+    Kernel and Double exceptions through postmortem. As well as enhanced
+    reporting for XTOS Unhandled Exceptions.
+
+    To avoid having to deal with literals and to minimize the use of IRAM, some
+    jumping around is done to use pockets of available IRAM in each vector
+    handler's allotted space. Regrettably, the relative jumps needed to ties
+    these pockets of memory together were computed by hand.
+
+    To assist the "ESP Exception Decoder", create a stack frame to store
+    various special registers for inspection. The expectation is that some of
+    these values may point to code. This can give insight into what was running
+    at the time of the crash.
+*/
+
+//
+//  Stage Exception Vector Stubs to be copied into respective vector address
+//  space in ICACHE/PROGMEM address space.
+//
+void postmortem_debug_exception_vector(void);
+asm(  // 16 bytes MAX, using 16
+    ".section     .text.postmortem_debug_exception_vector,\"ax\",@progbits\n\t"
+    ".align       4\n\t"
+    ".type        postmortem_debug_exception_vector, @function\n\t"
+    "\n"
+"postmortem_debug_exception_vector:\n\t"  // Copy destination _DebugExceptionVector
+    "wsr.excsave2 a0\n\t"
+    "j            . + 32\n\t"             // _KernelExceptionVector + 3
+
+    // continue here from _KernelExceptionVector
+"postmortem_debug_exception_vector_part2:\n\t"
+    "s32i         a0,     a1,     16\n\t"
+    "rsr.ps       a0\n\t"
+    "s32i         a0,     a1,     0\n\t"
+    "j            . + 86\n\t"             // finish with postmortem_double_exception_handler_part2
+    ".size postmortem_debug_exception_vector, .-postmortem_debug_exception_vector\n\t"
+);
+
+void postmortem_kernel_exception_handler(void);
+asm(  // 32 bytes MAX, using 31
+    ".section     .text.postmortem_kernel_exception_handler,\"ax\",@progbits\n\t"
+    ".align       4\n\t"
+    ".type        postmortem_kernel_exception_handler, @function\n\t"
+    "\n"
+"postmortem_kernel_exception_handler:\n\t" // Copy destination _KernelExceptionVector
+    "wsr.excsave1 a0\n\t"
+
+"postmortem_kernel_exception_handler_p3:\n\t"
+    "addi         a0,     a1,     -32\n\t"
+    "s32i         a1,     a0,     24\n\t"
+    "mov.n        a1,     a0\n\t"
+    "xsr.excsave2 a0\n\t"                 // stash pointer to stack data in excsave2
+    "s32i         a0,     a1,     12\n\t" // and save previous
+    "rsr.excsave1 a0\n\t"
+    "s32i         a0,     a1,     28\n\t"
+    "rsr.epc1     a0\n\t"
+    "s32i         a0,     a1,     20\n\t"
+    // save current exccause
+    "rsr.exccause a0\n\t"
+    "j            . - 54\n\t"   // continue at postmortem_debug_exception_vector_part2
+
+    ".size postmortem_kernel_exception_handler, .-postmortem_kernel_exception_handler\n\t"
+);
+
+void postmortem_double_exception_handler(void);
+asm(  // 16 byte MAX, using 14
+    ".section     .text.postmortem_double_exception_handler,\"ax\",@progbits\n\t"
+    ".align       4\n\t"
+    ".type        postmortem_double_exception_handler, @function\n\t"
+    "\n"
+"postmortem_double_exception_handler:\n\t" // Copy destination _DoubleExceptionVector
+    // Common code at _KernelExceptionVector, which is -64 bytes from
+    // _DoubleExceptionVector.
+    "j             .  - 64\n\t" // continue at _KernelExceptionVector
+
+    // finish here from _DebugExceptionVector part 2
+    // _DoubleExceptionVector part 2
+"postmortem_double_exception_handler_part2:\n\t"
+    // User mode, Clear EXCM, and block all interrupts
+    "movi.n       a0,    0x02F\n\t"
+    "wsr.ps       a0\n\t"
+    "rsync\n\t"
+    // Let _UserExceptionVector finish processing the exception as an
+    // exception(0). Adjust results at __wrap_system_restart_local so that `ESP
+    // Exception Decoder` reports the state before this `ill` instruction.
+    "ill\n\t"
+    ".size postmortem_double_exception_handler, .-postmortem_double_exception_handler\n\t"
+);
+
+/*
+  Of the Exception Cause table's 64 entries, most are set to
+  `_xtos_unhandled_exception`. And I assume most of these never occur; however,
+  at lesat one does exccause 20. This one occurs on a call to a NULL pointer. This
+  can happen when a function prototype is given the weak attribute but never
+  defined, or forgetting to test a call back function pointer for NULL before
+  calling, etc.
+
+  A problem with the `_xtos_unhandled_exception` function is that it handles the
+  event with a Debug Exception BP. If you don't have GDB running you see a HWDT
+  reset. If interrupts are at INTLEVEL 2 or higher (a BP instruction becomes a
+  NOP), you still see a HWDT reset regardless of running GDB.
+*/
+typedef void (* _xtos_handler)(void);
+static  _xtos_handler * const _xtos_exc_handler_table = (_xtos_handler *)0x3FFFC000u;
+#define ROM_xtos_unhandled_exception (reinterpret_cast<_xtos_handler>(0x4000dc44))
+
+void postmortem_xtos_unhandled_exception(void);
+asm(
+    ".section     .iram.text.postmortem_xtos_unhandled_exception,\"ax\",@progbits\n\t"
+    ".literal_position\n\t"
+    ".align       4\n\t"
+    ".type        postmortem_xtos_unhandled_exception, @function\n\t"
+    "\n"
+"postmortem_xtos_unhandled_exception:\n\t"
+    // Rewind Boot ROM User Exception prologue and continue to
+    // _KernelExceptionVector such that we look a Debug BP Exception sitting at
+    // 'break 1, 1' in the _xtos_unhandled_exception handler.
+    "movi         a2,     0x4000dc4bu\n\t"
+    "wsr.epc2     a2\n\t"
+    "l32i         a2,     a1,     20\n\t"
+    "l32i         a3,     a1,     24\n\t"
+    "addmi        a1,     a1,     0x100\n\t"
+    "j            _KernelExceptionVector\n\t"
+    ".size postmortem_xtos_unhandled_exception, .-postmortem_xtos_unhandled_exception\n\t"
+);
+
+
+static void replace_exception_handler_on_match(
+                uint32_t cause,
+                _xtos_handler match,
+                _xtos_handler replacement) {
+
+    _xtos_handler old_wrapper = _xtos_exc_handler_table[cause];
+    if (old_wrapper == match || NULL == match) {
+        _xtos_exc_handler_table[cause] = replacement;
+    }
+}
+
+static void install_unhandled_exception_handler(void) {
+    // Only replace Exception Table entries still using the orignal Boot ROM
+    // _xtos_unhandled_exception handler.
+    for (size_t i = 0; i < 64; i++) {
+        replace_exception_handler_on_match(
+            i,
+            ROM_xtos_unhandled_exception,
+            (_xtos_handler)postmortem_xtos_unhandled_exception);
+    }
+}
+
+void postmortem_init(void) {
+    if (!gdb_present()) {
+        // Install all three (interdependent) exception handler stubs.
+        // Length of copy must be rounded up to copy memory in aligned 4 byte
+        // increments to comply with IRAM memory access requirements.
+        uint32_t save_ps = xt_rsil(15);
+        ets_memcpy((void*)_DebugExceptionVector, (void*)postmortem_debug_exception_vector, 16);
+        ets_memcpy((void*)_KernelExceptionVector, (void*)postmortem_kernel_exception_handler, 32);
+        ets_memcpy((void*)_DoubleExceptionVector, (void*)postmortem_double_exception_handler, 16);
+        asm volatile(
+            "movi.n       a2,   0\n\t"
+            "wsr.epc2     a2\n\t"
+            "wsr.excsave2 a2\n\t"
+            "wsr.depc     a2\n\t"
+            ::: "a2"
+        );
+        install_unhandled_exception_handler();
+        xt_wsr_ps(save_ps);
+    }
+}
+
+#endif
 
 };
