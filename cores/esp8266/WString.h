@@ -237,6 +237,8 @@ class String {
         int indexOf(char ch, unsigned int fromIndex) const;
         int indexOf(const char *str) const;
         int indexOf(const char *str, unsigned int fromIndex) const;
+        int indexOf(const __FlashStringHelper *str) const;
+        int indexOf(const __FlashStringHelper *str, unsigned int fromIndex) const;
         int indexOf(const String &str) const;
         int indexOf(const String &str, unsigned int fromIndex) const;
         int lastIndexOf(char ch) const;
