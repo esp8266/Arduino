@@ -643,12 +643,7 @@ int String::indexOf(const String &s2) const {
 }
 
 int String::indexOf(const String &s2, unsigned int fromIndex) const {
-    if (fromIndex >= len())
-        return -1;
-    const char *found = strstr(buffer() + fromIndex, s2.buffer());
-    if (found == NULL)
-        return -1;
-    return found - buffer();
+    return indexOf(s2.c_str(), fromIndex);
 }
 
 int String::lastIndexOf(char theChar) const {
