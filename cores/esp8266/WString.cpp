@@ -622,12 +622,7 @@ int String::indexOf(const __FlashStringHelper *s2) const {
 }
 
 int String::indexOf(const __FlashStringHelper *s2, unsigned int fromIndex) const {
-    if (fromIndex >= len())
-        return -1;
-    const char *found = strstr_P(buffer() + fromIndex, (char *) s2);
-    if (found == NULL)
-        return -1;
-    return found - buffer();
+    return indexOf((char*) s2, fromIndex);
 }
 
 int String::indexOf(const char *s2) const {
@@ -637,7 +632,7 @@ int String::indexOf(const char *s2) const {
 int String::indexOf(const char *s2, unsigned int fromIndex) const {
     if (fromIndex >= len())
         return -1;
-    const char *found = strstr(buffer() + fromIndex, s2);
+    const char *found = strstr_P(buffer() + fromIndex, s2);
     if (found == NULL)
         return -1;
     return found - buffer();
