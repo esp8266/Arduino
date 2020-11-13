@@ -622,7 +622,7 @@ int String::indexOf(const __FlashStringHelper *s2) const {
 }
 
 int String::indexOf(const __FlashStringHelper *s2, unsigned int fromIndex) const {
-    return indexOf((char*) s2, fromIndex);
+    return indexOf((const char*) s2, fromIndex);
 }
 
 int String::indexOf(const char *s2) const {
