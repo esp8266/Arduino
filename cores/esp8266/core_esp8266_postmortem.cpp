@@ -160,7 +160,7 @@ void __wrap_system_restart_local() {
             struct EXC_CONTEXT *exc_context;
             asm volatile("rsr.excsave2 %0\n\t" : "=a" (exc_context) :: "memory");
             // Use Special Register values from before the `ill` instruction.
-            // Note, for a double exception the exccause is that of the second exception.
+            // Note, for a double exception, the exccause is that of the second exception.
             // epc1 is still the address of the 1st exception, its cause is now unknown.
             rst_info.exccause = exc_context->exccause;
             rst_info.epc1 = exc_context->epc1;
@@ -541,8 +541,8 @@ asm(
     "\n"
 "postmortem_xtos_unhandled_exception:\n\t"
     // Rewind Boot ROM User Exception prologue and continue to
-    // _KernelExceptionVector such that we look a Debug BP Exception sitting at
-    // 'break 1, 1' in the _xtos_unhandled_exception handler.
+    // _KernelExceptionVector such that we look like a Debug BP Exception
+    // sitting at 'break 1, 1' in the _xtos_unhandled_exception handler.
     "movi         a2,     0x4000dc4bu\n\t"
     "wsr.epc2     a2\n\t"
     "l32i         a2,     a1,     20\n\t"
