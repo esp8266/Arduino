@@ -628,7 +628,7 @@ int String::indexOf(const __FlashStringHelper *s2, unsigned int fromIndex) const
     if (found == NULL)
         return -1;
     return found - buffer();
-}}
+}
 
 int String::indexOf(const char *s2) const {
     return indexOf(s2, 0);
