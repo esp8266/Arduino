@@ -27,15 +27,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 uint32_t Servo::_servoMap = 0;
 
 // similiar to map but will have increased accuracy that provides a more
-// symetric api (call it and use result to reverse will provide the original value)
+// symmetrical api (call it and use result to reverse will provide the original value)
 int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 {
     const int rangeIn = maxIn - minIn;
     const int rangeOut = maxOut - minOut;
     const int deltaIn = value - minIn;
     // fixed point math constants to improve accurancy of divide and rounding
-    const int fixedHalfDecimal = 1;
-    const int fixedDecimal = fixedHalfDecimal * 2;
+    constexpr int fixedHalfDecimal = 1;
+    constexpr int fixedDecimal = fixedHalfDecimal * 2;
 
     return ((deltaIn * rangeOut * fixedDecimal) / (rangeIn) + fixedHalfDecimal) / fixedDecimal + minOut;
 }
@@ -46,9 +46,9 @@ int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 Servo::Servo()
 {
   _attached = false;
-  _valueUs = DEFAULT_PULSE_WIDTH;
-  _minUs = MIN_PULSE_WIDTH;
-  _maxUs = MAX_PULSE_WIDTH;
+  _valueUs = DEFAULT_NEUTRAL_PULSE_WIDTH;
+  _minUs = DEFAULT_MIN_PULSE_WIDTH;
+  _maxUs = DEFAULT_MAX_PULSE_WIDTH;
 }
 
 Servo::~Servo() {
@@ -58,10 +58,15 @@ Servo::~Servo() {
 
 uint8_t Servo::attach(int pin)
 {
-  return attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  return attach(pin, DEFAULT_MIN_PULSE_WIDTH, DEFAULT_MAX_PULSE_WIDTH);
 }
 
 uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
+{
+  return attach(pin, minUs, maxUs, _valueUs);
+}
+
+uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs, int value)
 {
   if (!_attached) {
     digitalWrite(pin, LOW);
@@ -76,7 +81,7 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
   _maxUs = max((uint16_t)250, min((uint16_t)3000, maxUs));
   _minUs = max((uint16_t)200, min(_maxUs, minUs));
 
-  write(_valueUs);
+  write(value);
 
   return pin;
 }
@@ -85,20 +90,20 @@ void Servo::detach()
 {
   if (_attached) {
     _servoMap &= ~(1 << _pin);
+    startWaveform(_pin, 0, REFRESH_INTERVAL, 1);
+    delay(REFRESH_INTERVAL / 1000); // long enough to complete active period under all circumstances.
     stopWaveform(_pin);
     _attached = false;
-    digitalWrite(_pin, LOW);
+    _valueUs = DEFAULT_NEUTRAL_PULSE_WIDTH;
   }
 }
 
 void Servo::write(int value)
 {
-  // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
-  if (value < _minUs) {
+  // treat any value less than 200 as angle in degrees (values equal or larger are handled as microseconds)
+  if (value < 200) {
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
-    // writeMicroseconds will contrain the calculated value for us
-    // for any user defined min and max, but we must use default min max
     value = improved_map(value, 0, 180, _minUs, _maxUs);
   }
   writeMicroseconds(value);
@@ -106,6 +111,7 @@ void Servo::write(int value)
 
 void Servo::writeMicroseconds(int value)
 {
+  value = constrain(value, _minUs, _maxUs);
   _valueUs = value;
   if (_attached) {
     _servoMap &= ~(1 << _pin);
@@ -117,8 +123,7 @@ void Servo::writeMicroseconds(int value)
 
 int Servo::read() // return the value as degrees
 {
-  // read returns the angle for an assumed 0-180, so we calculate using 
-  // the normal min/max constants and not user defined ones
+  // read returns the angle for an assumed 0-180
   return improved_map(readMicroseconds(), _minUs, _maxUs, 0, 180);
 }
 
