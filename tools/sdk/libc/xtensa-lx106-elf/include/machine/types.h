@@ -1,30 +1,13 @@
-#ifndef	_MACHTYPES_H_
-#define	_MACHTYPES_H_
-
 /*
- *  The following section is RTEMS specific and is needed to more
- *  closely match the types defined in the BSD machine/types.h.
- *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
+ * Newlib targets may provide an own version of this file in their machine
+ * directory to add custom user types for <sys/types.h>.
  */
-#if defined(__rtems__)
-#include <machine/_types.h>
+#ifndef _SYS_TYPES_H
+#error "must be included via <sys/types.h>"
+#endif /* !_SYS_TYPES_H */
+
+#if defined(__XMK__) && defined(___int64_t_defined)
+typedef	__uint64_t	u_quad_t;
+typedef	__int64_t	quad_t;
+typedef	quad_t *	qaddr_t;
 #endif
-
-#define	_CLOCK_T_	unsigned long		/* clock() */
-#define	_TIME_T_	long			/* time() */
-#define _CLOCKID_T_ 	unsigned long
-#define _TIMER_T_   	unsigned long
-
-#ifndef _HAVE_SYSTYPES
-typedef long int __off_t;
-typedef int __pid_t;
-#ifdef __GNUC__
-__extension__ typedef long long int __loff_t;
-#else
-typedef long int __loff_t;
-#endif
-#endif
-
-#endif	/* _MACHTYPES_H_ */
-
-

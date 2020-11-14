@@ -11,7 +11,7 @@ extern "C" {
 #define WUNTRACED 2
 
 /* A status looks like:
-      <2 bytes info> <2 bytes code>
+      <1 byte info> <1 byte code>
 
       <code> == 0, child has exited, info is the exit value
       <code> == 1..7e, child has exited, info is the signal number.

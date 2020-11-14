@@ -40,7 +40,7 @@
 #define unctrl(c)		__unctrl[(c) & 0xff]
 #define unctrllen(ch)		__unctrllen[(ch) & 0xff]
 
-extern __IMPORT _CONST char * _CONST __unctrl[256];	/* Control strings. */
-extern __IMPORT _CONST char __unctrllen[256];	/* Control strings length. */
+extern __IMPORT const char * const __unctrl[256];	/* Control strings. */
+extern __IMPORT const char __unctrllen[256];	/* Control strings length. */
 
 #endif /* _UNCTRL_H_ */

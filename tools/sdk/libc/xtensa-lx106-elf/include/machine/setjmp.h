@@ -2,7 +2,10 @@
 _BEGIN_STD_C
 
 #if defined(__or1k__) || defined(__or1knd__)
-#define _JBLEN 31 /* 32 GPRs - r0 */
+/*
+ * r1, r2, r9, r14, r16 .. r30, SR.
+ */
+#define _JBLEN 13
 #define _JBTYPE unsigned long
 #endif
 
@@ -92,6 +95,9 @@ _BEGIN_STD_C
 #  define _JBLEN (13 * 4)
 # elif defined(__unix__) || defined(__rtems__)
 #  define _JBLEN	9
+# elif defined(__iamcu__)
+/* Intel MCU jmp_buf only covers callee-saved registers. */
+#  define _JBLEN	6
 # else
 #  include "setjmp-dj.h"
 # endif
@@ -232,7 +238,7 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __moxie__
-#define _JBLEN 16
+#define _JBLEN 10
 #endif
 
 #ifdef __CRX__
@@ -250,12 +256,20 @@ _BEGIN_STD_C
 #define _JBLEN 10
 #endif
 
+#ifdef  __FT32__
+#define _JBLEN 27
+#endif
+
 #ifdef __iq2000__
 #define _JBLEN 32
 #endif
 
 #ifdef __mcore__
 #define _JBLEN 16
+#endif
+
+#ifdef __arc__
+#define _JBLEN 25 /* r13-r30,blink,lp_count,lp_start,lp_end,mlo,mhi,status32 */
 #endif
 
 #ifdef __MMIX__
@@ -314,6 +328,10 @@ _BEGIN_STD_C
 #define _JBLEN 18
 #endif
 
+#ifdef __ia64
+#define _JBLEN 64
+#endif
+
 #ifdef __lm32__
 #define _JBLEN 19
 #endif
@@ -361,8 +379,29 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned long
 #endif
 
+#ifdef __PRU__
+#define _JBLEN 48
+#define _JBTYPE unsigned int
+#endif
+
 #ifdef __RX__
 #define _JBLEN 0x44
+#endif
+
+#ifdef __VISIUM__
+/* All call-saved GP registers: r11-r19,r21,r22,r23.  */
+#define _JBLEN 12
+#endif
+
+#ifdef __riscv
+/* _JBTYPE using long long to make sure the alignment is align to 8 byte,
+   otherwise in rv32imafd, store/restore FPR may mis-align.  */
+#define _JBTYPE long long
+#ifdef __riscv_32e
+#define _JBLEN ((4*sizeof(long))/sizeof(long))
+#else
+#define _JBLEN ((14*sizeof(long) + 12*sizeof(double))/sizeof(long))
+#endif
 #endif
 
 #ifdef _JBLEN
@@ -375,7 +414,7 @@ typedef	int jmp_buf[_JBLEN];
 
 _END_STD_C
 
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if (defined(__CYGWIN__) || defined(__rtems__)) && __POSIX_VISIBLE
 #include <signal.h>
 
 #ifdef __cplusplus
@@ -401,6 +440,13 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #define __SIGMASK_FUNC pthread_sigmask
 #else
 #define __SIGMASK_FUNC sigprocmask
+#endif
+
+#ifdef __CYGWIN__
+/* Per POSIX, siglongjmp has to be implemented as function.  Cygwin
+   provides functions for both, siglongjmp and sigsetjmp since 2.2.0. */
+extern void siglongjmp (sigjmp_buf, int) __attribute__ ((__noreturn__));
+extern int sigsetjmp (sigjmp_buf, int);
 #endif
 
 #if defined(__GNUC__)
@@ -440,8 +486,8 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
    are equivalent to sigsetjmp/siglongjmp when not saving the signal mask.
    New applications should use sigsetjmp/siglongjmp instead. */
 #ifdef __CYGWIN__
-extern void _longjmp(jmp_buf, int);
-extern int _setjmp(jmp_buf);
+extern void _longjmp (jmp_buf, int) __attribute__ ((__noreturn__));
+extern int _setjmp (jmp_buf);
 #else
 #define _setjmp(env)		sigsetjmp ((env), 0)
 #define _longjmp(env, val)	siglongjmp ((env), (val))
@@ -450,4 +496,4 @@ extern int _setjmp(jmp_buf);
 #ifdef __cplusplus
 }
 #endif
-#endif /* __CYGWIN__ or __rtems__ */
+#endif /* (__CYGWIN__ or __rtems__) and __POSIX_VISIBLE */

@@ -79,7 +79,7 @@
 	 __tg_type3(__e1, __e2, __e3, long double _Complex) ||		\
 	 __tg_type3(__e1, __e2, __e3, __typeof__(_Complex_I)))
 
-#ifdef _LDBL_EQ_DBL
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 #define	__tg_impl_simple(x, y, z, fn, fnf, fnl, ...)			\
 	__builtin_choose_expr(__tg_type_corr(x, y, z, long double),	\
 	    fnl(__VA_ARGS__), __builtin_choose_expr(			\
@@ -161,9 +161,10 @@
 #define	lround(__x)		__tg_simple(__x, lround)
 #define	nearbyint(__x)		__tg_simple(__x, nearbyint)
 #define	nextafter(__x, __y)	__tg_simple2(__x, __y, nextafter)
-/* not yet implemented even for _LDBL_EQ_DBL platforms
+/* not yet implemented even for _LDBL_EQ_DBL platforms */
+#ifdef __CYGWIN__
 #define	nexttoward(__x, __y)	__tg_simplev(__x, nexttoward, __x, __y)
-*/
+#endif
 #define	remainder(__x, __y)	__tg_simple2(__x, __y, remainder)
 #define	remquo(__x, __y, __z)	__tg_impl_simple(__x, __x, __y, remquo, remquof,	\
 						 remquol, __x, __y, __z)

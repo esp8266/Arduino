@@ -19,8 +19,8 @@
 
 _BEGIN_STD_C
 
-void	 _EXFUN(__fpurge,(FILE *));
-int	 _EXFUN(__fsetlocking,(FILE *, int));
+void	 __fpurge (FILE *);
+int	 __fsetlocking (FILE *, int);
 
 /* TODO:
 
@@ -52,13 +52,13 @@ __fpending (FILE *__fp) { return __fp->_p - __fp->_bf._base; }
 
 #else
 
-size_t	 _EXFUN(__fbufsize,(FILE *));
-int	 _EXFUN(__freading,(FILE *));
-int	 _EXFUN(__fwriting,(FILE *));
-int	 _EXFUN(__freadable,(FILE *));
-int	 _EXFUN(__fwritable,(FILE *));
-int	 _EXFUN(__flbf,(FILE *));
-size_t	 _EXFUN(__fpending,(FILE *));
+size_t	 __fbufsize (FILE *);
+int	 __freading (FILE *);
+int	 __fwriting (FILE *);
+int	 __freadable (FILE *);
+int	 __fwritable (FILE *);
+int	 __flbf (FILE *);
+size_t	 __fpending (FILE *);
 
 #ifndef __cplusplus
 

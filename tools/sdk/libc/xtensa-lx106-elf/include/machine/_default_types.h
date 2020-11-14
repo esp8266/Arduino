@@ -3,6 +3,11 @@
  *
  * Simplified version of generic _default_types.h, ignores gcc
  * built-in standard types.
+ *
+ * Taken from esp-open-rtos project who obviously hit the same issue
+ * that I did (newlib wants int32_t to be long, not int, which breaks
+ * most printf/etc.)
+ *    https://github.com/SuperHouse/esp-open-rtos/
  */
 
 #ifndef _MACHINE__DEFAULT_TYPES_H
@@ -45,6 +50,9 @@ typedef __uint32_t __uint_least32_t;
 typedef __int64_t __int_least64_t;
 typedef __uint64_t __uint_least64_t;
 #define ___int_least64_t_defined
+
+typedef __int64_t __intmax_t;
+typedef __uint64_t __uintmax_t;
 
 typedef __INTPTR_TYPE__ __intptr_t;
 typedef __UINTPTR_TYPE__ __uintptr_t;

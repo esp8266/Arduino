@@ -10,6 +10,9 @@
 #include <machine/endian.h>
 #include <machine/param.h>
 
+#ifndef NBBY
+# define NBBY 8		/* number of bits in a byte */
+#endif
 #ifndef HZ
 # define HZ (60)
 #endif
@@ -24,5 +27,9 @@
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+
+#ifndef howmany
+#define    howmany(x, y)   (((x)+((y)-1))/(y))
+#endif
 
 #endif

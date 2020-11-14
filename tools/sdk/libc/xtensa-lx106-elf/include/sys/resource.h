@@ -11,7 +11,7 @@ struct rusage {
 	struct timeval ru_stime;	/* system time used */
 };
 
-int	_EXFUN(getrusage, (int, struct rusage*));
+int	getrusage (int, struct rusage*);
 
 #endif
 

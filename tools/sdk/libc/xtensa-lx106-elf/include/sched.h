@@ -90,6 +90,21 @@ int sched_yield( void );
 
 #endif /* _POSIX_THREADS or _POSIX_PRIORITY_SCHEDULING */
 
+#if __GNU_VISIBLE
+int sched_getcpu(void);
+
+/* The following functions should only be declared if the type
+   cpu_set_t is defined through indirect inclusion of sys/cpuset.h,
+   only available on some targets. */
+#ifdef _SYS_CPUSET_H_
+int sched_getaffinity (pid_t, size_t, cpu_set_t *);
+int sched_get_thread_affinity (void *, size_t, cpu_set_t *);
+int sched_setaffinity (pid_t, size_t, const cpu_set_t *);
+int sched_set_thread_affinity (void *, size_t, const cpu_set_t *);
+#endif /* _SYS_CPUSET_H_ */
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif

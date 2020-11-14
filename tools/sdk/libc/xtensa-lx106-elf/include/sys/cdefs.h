@@ -3,6 +3,8 @@
 /* Written 2000 by Werner Almesberger */
 
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -17,7 +19,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -69,7 +71,9 @@
 /*
  * Testing against Clang-specific extensions.
  */
-
+#ifndef	__has_attribute
+#define	__has_attribute(x)	0
+#endif
 #ifndef	__has_extension
 #define	__has_extension		__has_feature
 #endif
@@ -100,33 +104,33 @@
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
 
 #if __GNUC__ >= 3 || defined(__INTEL_COMPILER)
-#define __GNUCLIKE_ASM 3
-#define __GNUCLIKE_MATH_BUILTIN_CONSTANTS
+#define	__GNUCLIKE_ASM 3
+#define	__GNUCLIKE_MATH_BUILTIN_CONSTANTS
 #else
-#define __GNUCLIKE_ASM 2
+#define	__GNUCLIKE_ASM 2
 #endif
-#define __GNUCLIKE___TYPEOF 1
-#define __GNUCLIKE___OFFSETOF 1
-#define __GNUCLIKE___SECTION 1
+#define	__GNUCLIKE___TYPEOF 1
+#define	__GNUCLIKE___OFFSETOF 1
+#define	__GNUCLIKE___SECTION 1
 
 #ifndef __INTEL_COMPILER
-# define __GNUCLIKE_CTOR_SECTION_HANDLING 1
+#define	__GNUCLIKE_CTOR_SECTION_HANDLING 1
 #endif
 
-#define __GNUCLIKE_BUILTIN_CONSTANT_P 1
-# if defined(__INTEL_COMPILER) && defined(__cplusplus) \
-    && __INTEL_COMPILER < 800
-#  undef __GNUCLIKE_BUILTIN_CONSTANT_P
-# endif
+#define	__GNUCLIKE_BUILTIN_CONSTANT_P 1
+#if defined(__INTEL_COMPILER) && defined(__cplusplus) && \
+   __INTEL_COMPILER < 800
+#undef __GNUCLIKE_BUILTIN_CONSTANT_P
+#endif
 
-#if (__GNUC_MINOR__ > 95 || __GNUC__ >= 3) && !defined(__INTEL_COMPILER)
-# define __GNUCLIKE_BUILTIN_VARARGS 1
-# define __GNUCLIKE_BUILTIN_STDARG 1
-# define __GNUCLIKE_BUILTIN_VAALIST 1
+#if (__GNUC_MINOR__ > 95 || __GNUC__ >= 3)
+#define	__GNUCLIKE_BUILTIN_VARARGS 1
+#define	__GNUCLIKE_BUILTIN_STDARG 1
+#define	__GNUCLIKE_BUILTIN_VAALIST 1
 #endif
 
 #if defined(__GNUC__)
-# define __GNUC_VA_LIST_COMPATIBILITY 1
+#define	__GNUC_VA_LIST_COMPATIBILITY 1
 #endif
 
 /*
@@ -137,23 +141,23 @@
 #endif
 
 #ifndef __INTEL_COMPILER
-# define __GNUCLIKE_BUILTIN_NEXT_ARG 1
-# define __GNUCLIKE_MATH_BUILTIN_RELOPS
+#define	__GNUCLIKE_BUILTIN_NEXT_ARG 1
+#define	__GNUCLIKE_MATH_BUILTIN_RELOPS
 #endif
 
-#define __GNUCLIKE_BUILTIN_MEMCPY 1
+#define	__GNUCLIKE_BUILTIN_MEMCPY 1
 
 /* XXX: if __GNUC__ >= 2: not tested everywhere originally, where replaced */
-#define __CC_SUPPORTS_INLINE 1
-#define __CC_SUPPORTS___INLINE 1
-#define __CC_SUPPORTS___INLINE__ 1
+#define	__CC_SUPPORTS_INLINE 1
+#define	__CC_SUPPORTS___INLINE 1
+#define	__CC_SUPPORTS___INLINE__ 1
 
-#define __CC_SUPPORTS___FUNC__ 1
-#define __CC_SUPPORTS_WARNING 1
+#define	__CC_SUPPORTS___FUNC__ 1
+#define	__CC_SUPPORTS_WARNING 1
 
-#define __CC_SUPPORTS_VARADIC_XXX 1 /* see varargs.h */
+#define	__CC_SUPPORTS_VARADIC_XXX 1 /* see varargs.h */
 
-#define __CC_SUPPORTS_DYNAMIC_ARRAY_INIT 1
+#define	__CC_SUPPORTS_DYNAMIC_ARRAY_INIT 1
 
 #endif /* __GNUC__ || __INTEL_COMPILER */
 
@@ -223,14 +227,7 @@
  * for a given compiler, let the compile fail if it is told to use
  * a feature that we cannot live without.
  */
-#ifdef lint
-#define	__dead2
-#define	__pure2
-#define	__unused
-#define	__packed
-#define	__aligned(x)
-#define	__section(x)
-#else
+#define	__weak_symbol	__attribute__((__weak__))
 #if !__GNUC_PREREQ__(2, 5) && !defined(__INTEL_COMPILER)
 #define	__dead2
 #define	__pure2
@@ -242,7 +239,7 @@
 #define	__unused
 /* XXX Find out what to do for __packed, __aligned and __section */
 #endif
-#if __GNUC_PREREQ__(2, 7)
+#if __GNUC_PREREQ__(2, 7) || defined(__INTEL_COMPILER)
 #define	__dead2		__attribute__((__noreturn__))
 #define	__pure2		__attribute__((__const__))
 #define	__unused	__attribute__((__unused__))
@@ -251,15 +248,17 @@
 #define	__aligned(x)	__attribute__((__aligned__(x)))
 #define	__section(x)	__attribute__((__section__(x)))
 #endif
-#if defined(__INTEL_COMPILER)
-#define __dead2		__attribute__((__noreturn__))
-#define __pure2		__attribute__((__const__))
-#define __unused	__attribute__((__unused__))
-#define __used		__attribute__((__used__))
-#define __packed	__attribute__((__packed__))
-#define __aligned(x)	__attribute__((__aligned__(x)))
-#define __section(x)	__attribute__((__section__(x)))
+#if __GNUC_PREREQ__(4, 3) || __has_attribute(__alloc_size__)
+#define	__alloc_size(x)	__attribute__((__alloc_size__(x)))
+#define	__alloc_size2(n, x)	__attribute__((__alloc_size__(n, x)))
+#else
+#define	__alloc_size(x)
+#define	__alloc_size2(n, x)
 #endif
+#if __GNUC_PREREQ__(4, 9) || __has_attribute(__alloc_align__)
+#define	__alloc_align(x)	__attribute__((__alloc_align__(x)))
+#else
+#define	__alloc_align(x)
 #endif
 
 #if !__GNUC_PREREQ__(2, 95)
@@ -288,7 +287,8 @@
 #define	_Alignof(x)		__alignof(x)
 #endif
 
-#if !__has_extension(c_atomic) && !__has_extension(cxx_atomic)
+#if !defined(__cplusplus) && !__has_extension(c_atomic) && \
+    !__has_extension(cxx_atomic)
 /*
  * No native support for _Atomic(). Place object in structure to prevent
  * most forms of direct non-atomic access.
@@ -302,23 +302,28 @@
 #define	_Noreturn		__dead2
 #endif
 
-#if __GNUC_PREREQ__(4, 6) && !defined(__cplusplus)
-/*  Do nothing: _Static_assert() works as per C11 */
-#elif !__has_extension(c_static_assert)
+#if !__has_extension(c_static_assert)
 #if (defined(__cplusplus) && __cplusplus >= 201103L) || \
     __has_extension(cxx_static_assert)
 #define	_Static_assert(x, y)	static_assert(x, y)
+#elif __GNUC_PREREQ__(4,6) && !defined(__cplusplus)
+/* Nothing, gcc 4.6 and higher has _Static_assert built-in */
 #elif defined(__COUNTER__)
 #define	_Static_assert(x, y)	__Static_assert(x, __COUNTER__)
 #define	__Static_assert(x, y)	___Static_assert(x, y)
-#define	___Static_assert(x, y)	typedef char __assert_ ## y[(x) ? 1 : -1]
+#define	___Static_assert(x, y)	typedef char __assert_ ## y[(x) ? 1 : -1] \
+				__unused
 #else
 #define	_Static_assert(x, y)	struct __hack
 #endif
 #endif
 
 #if !__has_extension(c_thread_local)
-/* XXX: Change this to test against C++11 when clang in base supports it. */
+/*
+ * XXX: Some compilers (Clang 3.3, GCC 4.7) falsely announce C++11 mode
+ * without actually supporting the thread_local keyword. Don't check for
+ * the presence of C++11 when defining _Thread_local.
+ */
 #if /* (defined(__cplusplus) && __cplusplus >= 201103L) || */ \
     __has_extension(cxx_thread_local)
 #define	_Thread_local		thread_local
@@ -338,13 +343,29 @@
  * distinguish multiple cases.
  */
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
+    __has_extension(c_generic_selections)
 #define	__generic(expr, t, yes, no)					\
 	_Generic(expr, t: yes, default: no)
 #elif __GNUC_PREREQ__(3, 1) && !defined(__cplusplus)
 #define	__generic(expr, t, yes, no)					\
 	__builtin_choose_expr(						\
 	    __builtin_types_compatible_p(__typeof(expr), t), yes, no)
+#endif
+
+/*
+ * C99 Static array indices in function parameter declarations.  Syntax such as:
+ * void bar(int myArray[static 10]);
+ * is allowed in C99 but not in C++.  Define __min_size appropriately so
+ * headers using it can be compiled in either language.  Use like this:
+ * void bar(int myArray[__min_size(10)]);
+ */
+#if !defined(__cplusplus) && \
+    (defined(__clang__) || __GNUC_PREREQ__(4, 6)) && \
+    (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
+#define __min_size(x)	static (x)
+#else
+#define __min_size(x)	(x)
 #endif
 
 #if __GNUC_PREREQ__(2, 96)
@@ -356,7 +377,7 @@
 #endif
 
 #if __GNUC_PREREQ__(3, 1) || (defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 800)
-#define	__always_inline	__attribute__((__always_inline__))
+#define	__always_inline	__inline__ __attribute__((__always_inline__))
 #else
 #define	__always_inline
 #endif
@@ -368,21 +389,31 @@
 #endif
 
 #if __GNUC_PREREQ__(3, 3)
-#define __nonnull(x)	__attribute__((__nonnull__(x)))
+#define	__nonnull(x)	__attribute__((__nonnull__ x))
+#define	__nonnull_all	__attribute__((__nonnull__))
 #else
-#define __nonnull(x)
+#define	__nonnull(x)
+#define	__nonnull_all
 #endif
 
 #if __GNUC_PREREQ__(3, 4)
 #define	__fastcall	__attribute__((__fastcall__))
+#define	__result_use_check	__attribute__((__warn_unused_result__))
 #else
 #define	__fastcall
+#define	__result_use_check
 #endif
 
 #if __GNUC_PREREQ__(4, 1)
 #define	__returns_twice	__attribute__((__returns_twice__))
 #else
 #define	__returns_twice
+#endif
+
+#if __GNUC_PREREQ__(4, 6) || __has_builtin(__builtin_unreachable)
+#define	__unreachable()	__builtin_unreachable()
+#else
+#define	__unreachable()	((void)0)
 #endif
 
 /* XXX: should use `#if __STDC_VERSION__ < 199901'. */
@@ -397,7 +428,7 @@
  * software that is unaware of C99 keywords.
  */
 #if !(__GNUC__ == 2 && __GNUC_MINOR__ == 95)
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901 || defined(lint)
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901
 #define	__restrict
 #else
 #define	__restrict	restrict
@@ -433,19 +464,26 @@
  *	  larger code.
  */
 #if __GNUC_PREREQ__(2, 96)
-#define __predict_true(exp)     __builtin_expect((exp), 1)
-#define __predict_false(exp)    __builtin_expect((exp), 0)
+#define	__predict_true(exp)     __builtin_expect((exp), 1)
+#define	__predict_false(exp)    __builtin_expect((exp), 0)
 #else
-#define __predict_true(exp)     (exp)
-#define __predict_false(exp)    (exp)
+#define	__predict_true(exp)     (exp)
+#define	__predict_false(exp)    (exp)
 #endif
 
-#if __GNUC_PREREQ__(4, 2)
-#define	__hidden	__attribute__((__visibility__("hidden")))
+#if __GNUC_PREREQ__(4, 0)
+#define	__null_sentinel	__attribute__((__sentinel__))
 #define	__exported	__attribute__((__visibility__("default")))
+/* Only default visibility is supported on PE/COFF targets. */
+#ifndef __CYGWIN__
+#define	__hidden	__attribute__((__visibility__("hidden")))
 #else
 #define	__hidden
+#endif
+#else
+#define	__null_sentinel
 #define	__exported
+#define	__hidden
 #endif
 
 #define __offsetof(type, field)	offsetof(type, field)
@@ -460,7 +498,7 @@
  */
 #if __GNUC_PREREQ__(3, 1)
 #define	__containerof(x, s, m) ({					\
-	const volatile __typeof__(((s *)0)->m) *__x = (x);		\
+	const volatile __typeof(((s *)0)->m) *__x = (x);		\
 	__DEQUALIFY(s *, (const volatile char *)__x - __offsetof(s, m));\
 })
 #else
@@ -583,128 +621,96 @@
 #define	__DEQUALIFY(type, var)	((type)(__uintptr_t)(const volatile void *)(var))
 #endif
 
-/*-
- * The following definitions are an extension of the behavior originally
- * implemented in <sys/_posix.h>, but with a different level of granularity.
- * POSIX.1 requires that the macros we test be defined before any standard
- * header file is included.
- *
- * Here's a quick run-down of the versions:
- *  defined(_POSIX_SOURCE)		1003.1-1988
- *  _POSIX_C_SOURCE == 1		1003.1-1990
- *  _POSIX_C_SOURCE == 2		1003.2-1992 C Language Binding Option
- *  _POSIX_C_SOURCE == 199309		1003.1b-1993
- *  _POSIX_C_SOURCE == 199506		1003.1c-1995, 1003.1i-1995,
- *					and the omnibus ISO/IEC 9945-1: 1996
- *  _POSIX_C_SOURCE == 200112		1003.1-2001
- *  _POSIX_C_SOURCE == 200809		1003.1-2008
- *
- * In addition, the X/Open Portability Guide, which is now the Single UNIX
- * Specification, defines a feature-test macro which indicates the version of
- * that specification, and which subsumes _POSIX_C_SOURCE.
- *
- * Our macros begin with two underscores to avoid namespace screwage.
+/*
+ * Nullability qualifiers: currently only supported by Clang.
  */
-
-/* Deal with IEEE Std. 1003.1-1990, in which _POSIX_C_SOURCE == 1. */
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE == 1
-#undef _POSIX_C_SOURCE		/* Probably illegal, but beyond caring now. */
-#define	_POSIX_C_SOURCE		199009
-#endif
-
-/* Deal with IEEE Std. 1003.2-1992, in which _POSIX_C_SOURCE == 2. */
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE == 2
-#undef _POSIX_C_SOURCE
-#define	_POSIX_C_SOURCE		199209
-#endif
-
-/* Deal with various X/Open Portability Guides and Single UNIX Spec. */
-#ifdef _XOPEN_SOURCE
-#if _XOPEN_SOURCE - 0 >= 700
-#define	__XSI_VISIBLE		700
-#undef _POSIX_C_SOURCE
-#define	_POSIX_C_SOURCE		200809
-#elif _XOPEN_SOURCE - 0 >= 600
-#define	__XSI_VISIBLE		600
-#undef _POSIX_C_SOURCE
-#define	_POSIX_C_SOURCE		200112
-#elif _XOPEN_SOURCE - 0 >= 500
-#define	__XSI_VISIBLE		500
-#undef _POSIX_C_SOURCE
-#define	_POSIX_C_SOURCE		199506
-#endif
+#if !(defined(__clang__) && __has_feature(nullability))
+#define	_Nonnull
+#define	_Nullable
+#define	_Null_unspecified
+#define	__NULLABILITY_PRAGMA_PUSH
+#define	__NULLABILITY_PRAGMA_POP
+#else
+#define	__NULLABILITY_PRAGMA_PUSH _Pragma("clang diagnostic push")	\
+	_Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
+#define	__NULLABILITY_PRAGMA_POP _Pragma("clang diagnostic pop")
 #endif
 
 /*
- * Deal with all versions of POSIX.  The ordering relative to the tests above is
- * important.
- */
-#if defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
-#define	_POSIX_C_SOURCE		198808
-#endif
-#ifdef _POSIX_C_SOURCE
-#if _POSIX_C_SOURCE >= 200809
-#define	__POSIX_VISIBLE		200809
-#define	__ISO_C_VISIBLE		1999
-#elif _POSIX_C_SOURCE >= 200112
-#define	__POSIX_VISIBLE		200112
-#define	__ISO_C_VISIBLE		1999
-#elif _POSIX_C_SOURCE >= 199506
-#define	__POSIX_VISIBLE		199506
-#define	__ISO_C_VISIBLE		1990
-#elif _POSIX_C_SOURCE >= 199309
-#define	__POSIX_VISIBLE		199309
-#define	__ISO_C_VISIBLE		1990
-#elif _POSIX_C_SOURCE >= 199209
-#define	__POSIX_VISIBLE		199209
-#define	__ISO_C_VISIBLE		1990
-#elif _POSIX_C_SOURCE >= 199009
-#define	__POSIX_VISIBLE		199009
-#define	__ISO_C_VISIBLE		1990
-#else
-#define	__POSIX_VISIBLE		198808
-#define	__ISO_C_VISIBLE		0
-#endif /* _POSIX_C_SOURCE */
-#else
-/*-
- * Deal with _ANSI_SOURCE:
- * If it is defined, and no other compilation environment is explicitly
- * requested, then define our internal feature-test macros to zero.  This
- * makes no difference to the preprocessor (undefined symbols in preprocessing
- * expressions are defined to have value zero), but makes it more convenient for
- * a test program to print out the values.
+ * Type Safety Checking
  *
- * If a program mistakenly defines _ANSI_SOURCE and some other macro such as
- * _POSIX_C_SOURCE, we will assume that it wants the broader compilation
- * environment (and in fact we will never get here).
+ * Clang provides additional attributes to enable checking type safety
+ * properties that cannot be enforced by the C type system. 
  */
-#if defined(_ANSI_SOURCE)	/* Hide almost everything. */
-#define	__POSIX_VISIBLE		0
-#define	__XSI_VISIBLE		0
-#define	__BSD_VISIBLE		0
-#define	__ISO_C_VISIBLE		1990
-#elif defined(_C99_SOURCE)	/* Localism to specify strict C99 env. */
-#define	__POSIX_VISIBLE		0
-#define	__XSI_VISIBLE		0
-#define	__BSD_VISIBLE		0
-#define	__ISO_C_VISIBLE		1999
-#elif defined(_C11_SOURCE)	/* Localism to specify strict C11 env. */
-#define	__POSIX_VISIBLE		0
-#define	__XSI_VISIBLE		0
-#define	__BSD_VISIBLE		0
-#define	__ISO_C_VISIBLE		2011
-#elif defined(_GNU_SOURCE)	/* Everything and the kitchen sink. */
-#define	__POSIX_VISIBLE		200809
-#define	__XSI_VISIBLE		700
-#define	__BSD_VISIBLE		1
-#define	__ISO_C_VISIBLE		2011
-#define	__GNU_VISIBLE		1
-#else				/* Default: everything except __GNU_VISIBLE. */
-#define	__POSIX_VISIBLE		200809
-#define	__XSI_VISIBLE		700
-#define	__BSD_VISIBLE		1
-#define	__ISO_C_VISIBLE		2011
+
+#if __has_attribute(__argument_with_type_tag__) && \
+    __has_attribute(__type_tag_for_datatype__)
+#define	__arg_type_tag(arg_kind, arg_idx, type_tag_idx) \
+	    __attribute__((__argument_with_type_tag__(arg_kind, arg_idx, type_tag_idx)))
+#define	__datatype_type_tag(kind, type) \
+	    __attribute__((__type_tag_for_datatype__(kind, type)))
+#else
+#define	__arg_type_tag(arg_kind, arg_idx, type_tag_idx)
+#define	__datatype_type_tag(kind, type)
 #endif
+
+/*
+ * Lock annotations.
+ *
+ * Clang provides support for doing basic thread-safety tests at
+ * compile-time, by marking which locks will/should be held when
+ * entering/leaving a functions.
+ *
+ * Furthermore, it is also possible to annotate variables and structure
+ * members to enforce that they are only accessed when certain locks are
+ * held.
+ */
+
+#if __has_extension(c_thread_safety_attributes)
+#define	__lock_annotate(x)	__attribute__((x))
+#else
+#define	__lock_annotate(x)
 #endif
+
+/* Structure implements a lock. */
+/* FIXME: Use __lockable__, etc. to avoid colliding with user namespace macros,
+ * once clang is fixed: https://bugs.llvm.org/show_bug.cgi?id=34319 */
+#define	__lockable		__lock_annotate(lockable)
+
+/* Function acquires an exclusive or shared lock. */
+#define	__locks_exclusive(...) \
+	__lock_annotate(exclusive_lock_function(__VA_ARGS__))
+#define	__locks_shared(...) \
+	__lock_annotate(shared_lock_function(__VA_ARGS__))
+
+/* Function attempts to acquire an exclusive or shared lock. */
+#define	__trylocks_exclusive(...) \
+	__lock_annotate(exclusive_trylock_function(__VA_ARGS__))
+#define	__trylocks_shared(...) \
+	__lock_annotate(shared_trylock_function(__VA_ARGS__))
+
+/* Function releases a lock. */
+#define	__unlocks(...)		__lock_annotate(unlock_function(__VA_ARGS__))
+
+/* Function asserts that an exclusive or shared lock is held. */
+#define	__asserts_exclusive(...) \
+	__lock_annotate(assert_exclusive_lock(__VA_ARGS__))
+#define	__asserts_shared(...) \
+	__lock_annotate(assert_shared_lock(__VA_ARGS__))
+
+/* Function requires that an exclusive or shared lock is or is not held. */
+#define	__requires_exclusive(...) \
+	__lock_annotate(exclusive_locks_required(__VA_ARGS__))
+#define	__requires_shared(...) \
+	__lock_annotate(shared_locks_required(__VA_ARGS__))
+#define	__requires_unlocked(...) \
+	__lock_annotate(locks_excluded(__VA_ARGS__))
+
+/* Function should not be analyzed. */
+#define	__no_lock_analysis	__lock_annotate(no_thread_safety_analysis)
+
+/* Guard variables and structure members by lock. */
+#define	__guarded_by(x)		__lock_annotate(guarded_by(x))
+#define	__pt_guarded_by(x)	__lock_annotate(pt_guarded_by(x))
 
 #endif /* !_SYS_CDEFS_H_ */

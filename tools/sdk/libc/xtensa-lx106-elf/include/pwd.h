@@ -63,14 +63,14 @@ struct passwd {
 struct passwd	*getpwuid (uid_t);
 struct passwd	*getpwnam (const char *);
 
-#if __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
+#if __MISC_VISIBLE || __POSIX_VISIBLE
 int 		 getpwnam_r (const char *, struct passwd *,
 			char *, size_t , struct passwd **);
 int		 getpwuid_r (uid_t, struct passwd *, char *,
 			size_t, struct passwd **);
 #endif
 
-#if __XSI_VISIBLE >= 500
+#if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 struct passwd	*getpwent (void);
 void		 setpwent (void);
 void		 endpwent (void);

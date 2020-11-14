@@ -21,6 +21,8 @@
 #ifndef _SYS_SCHED_H_
 #define _SYS_SCHED_H_
 
+#include <sys/_timespec.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

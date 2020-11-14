@@ -7,19 +7,22 @@ extern "C" {
 #endif
 
 #include "_ansi.h"
+#include <sys/cdefs.h>
 #include <sys/features.h>
 #include <sys/types.h>
+#include <sys/_sigset.h>
+#include <sys/_timespec.h>
 
-/* #ifndef __STRICT_ANSI__*/
-
-/* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
-#ifndef __CYGWIN__
-typedef unsigned long sigset_t;
+#if !defined(_SIGSET_T_DECLARED)
+#define	_SIGSET_T_DECLARED
+typedef	__sigset_t	sigset_t;
 #endif
 
-#if defined(__rtems__)
+#if defined(__CYGWIN__)
+#include <cygwin/signal.h>
+#else
 
-#if defined(_POSIX_REALTIME_SIGNALS)
+#if defined(_POSIX_REALTIME_SIGNALS) || __POSIX_VISIBLE >= 199309
 
 /* sigev_notify values
    NOTE: P1003.1c/D10, p. 34 adds SIGEV_THREAD.  */
@@ -67,14 +70,16 @@ typedef struct {
   int          si_code;     /* Cause of the signal */
   union sigval si_value;    /* Signal value */
 } siginfo_t;
-#endif
+#endif /* defined(_POSIX_REALTIME_SIGNALS) || __POSIX_VISIBLE >= 199309 */
+
+#if defined(__rtems__)
 
 /*  3.3.8 Synchronously Accept a Signal, P1003.1b-1993, p. 76 */
 
 #define SA_NOCLDSTOP 0x1   /* Do not generate SIGCHLD when children stop */
 #define SA_SIGINFO   0x2   /* Invoke the signal catching function with */
                            /*   three arguments instead of one. */
-#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 #define SA_ONSTACK   0x4   /* Signal delivery will be on a separate stack. */
 #endif
 
@@ -107,7 +112,22 @@ struct sigaction {
 #define sa_sigaction  _signal_handlers._sigaction
 #endif
 
-#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+#else /* defined(__rtems__) */
+
+#define SA_NOCLDSTOP 1  /* only value supported now for sa_flags */
+
+typedef void (*_sig_func_ptr)(int);
+
+struct sigaction 
+{
+	_sig_func_ptr sa_handler;
+	sigset_t sa_mask;
+	int sa_flags;
+};
+#endif /* defined(__rtems__) */
+#endif /* defined(__CYGWIN__) */
+
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 /*
  * Minimum and default signal stack constants. Allow for target overrides
  * from <sys/features.h>.
@@ -125,6 +145,8 @@ struct sigaction {
 #define	SS_ONSTACK	0x1
 #define	SS_DISABLE	0x2
 
+#endif
+
 /*
  * Structure used in sigaltstack call.
  */
@@ -133,27 +155,42 @@ typedef struct sigaltstack {
   int       ss_flags; /* Flags.  */
   size_t    ss_size;  /* Stack size.  */
 } stack_t;
-#endif
 
-#elif defined(__CYGWIN__)
-#include <cygwin/signal.h>
-#else
-#define SA_NOCLDSTOP 1  /* only value supported now for sa_flags */
-
-typedef void (*_sig_func_ptr)(int);
-
-struct sigaction 
-{
-	_sig_func_ptr sa_handler;
-	sigset_t sa_mask;
-	int sa_flags;
-};
-#endif /* defined(__rtems__) */
-
+#if __POSIX_VISIBLE
 #define SIG_SETMASK 0	/* set mask with sigprocmask() */
 #define SIG_BLOCK 1	/* set of signals to block */
 #define SIG_UNBLOCK 2	/* set of signals to, well, unblock */
 
+int sigprocmask (int, const sigset_t *, sigset_t *);
+#endif
+
+#if __POSIX_VISIBLE >= 199506
+int pthread_sigmask (int, const sigset_t *, sigset_t *);
+#endif
+
+#ifdef _COMPILING_NEWLIB
+int _kill (pid_t, int);
+#endif /* _COMPILING_NEWLIB */
+
+#if __POSIX_VISIBLE
+int kill (pid_t, int);
+#endif
+
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4
+int killpg (pid_t, int);
+#endif
+#if __POSIX_VISIBLE
+int sigaction (int, const struct sigaction *, struct sigaction *);
+int sigaddset (sigset_t *, const int);
+int sigdelset (sigset_t *, const int);
+int sigismember (const sigset_t *, int);
+int sigfillset (sigset_t *);
+int sigemptyset (sigset_t *);
+int sigpending (sigset_t *);
+int sigsuspend (const sigset_t *);
+int sigwait (const sigset_t *, int *);
+
+#if !defined(__CYGWIN__) && !defined(__rtems__)
 /* These depend upon the type of sigset_t, which right now 
    is always a long.. They're in the POSIX namespace, but
    are not ANSI. */
@@ -162,73 +199,44 @@ struct sigaction
 #define sigemptyset(what)   (*(what) = 0, 0)
 #define sigfillset(what)    (*(what) = ~(0), 0)
 #define sigismember(what,sig) (((*(what)) & (1<<(sig))) != 0)
+#endif /* !__CYGWIN__ && !__rtems__ */
+#endif /* __POSIX_VISIBLE */
 
-int _EXFUN(sigprocmask, (int how, const sigset_t *set, sigset_t *oset));
-
-#if defined(_POSIX_THREADS)
-int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
+/* There are two common sigpause variants, both of which take an int argument.
+   If you request _XOPEN_SOURCE or _GNU_SOURCE, you get the System V version,
+   which removes the given signal from the process's signal mask; otherwise
+   you get the BSD version, which sets the process's signal mask to the given
+   value. */
+#if __XSI_VISIBLE && !defined(__INSIDE_CYGWIN__)
+# ifdef __GNUC__
+int sigpause (int) __asm__ (__ASMNAME ("__xpg_sigpause"));
+# else
+int __xpg_sigpause (int);
+#  define sigpause __xpg_sigpause
+# endif
+#elif __BSD_VISIBLE
+int sigpause (int);
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__)
-#undef sigaddset
-#undef sigdelset
-#undef sigemptyset
-#undef sigfillset
-#undef sigismember
-
-#ifdef _COMPILING_NEWLIB
-int _EXFUN(_kill, (pid_t, int));
-#endif /* _COMPILING_NEWLIB */
-#endif /* __CYGWIN__ || __rtems__ */
-#if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__)
-int _EXFUN(kill, (pid_t, int));
-#endif /* __CYGWIN__ || __rtems__ || __SPU__ */
-#if defined(__CYGWIN__) || defined(__rtems__)
-int _EXFUN(killpg, (pid_t, int));
-int _EXFUN(sigaction, (int, const struct sigaction *, struct sigaction *));
-int _EXFUN(sigaddset, (sigset_t *, const int));
-int _EXFUN(sigdelset, (sigset_t *, const int));
-int _EXFUN(sigismember, (const sigset_t *, int));
-int _EXFUN(sigfillset, (sigset_t *));
-int _EXFUN(sigemptyset, (sigset_t *));
-int _EXFUN(sigpending, (sigset_t *));
-int _EXFUN(sigsuspend, (const sigset_t *));
-int _EXFUN(sigpause, (int));
-
-#ifdef __rtems__
-#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
-int _EXFUN(sigaltstack, (const stack_t *__restrict, stack_t *__restrict));
-#endif
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
+int sigaltstack (const stack_t *__restrict, stack_t *__restrict);
 #endif
 
-#if defined(_POSIX_THREADS)
-#ifdef __CYGWIN__
-#  ifndef _CYGWIN_TYPES_H
-#    error You need the winsup sources or a cygwin installation to compile the cygwin version of newlib.
-#  endif
-#endif
-int _EXFUN(pthread_kill, (pthread_t thread, int sig));
+#if __POSIX_VISIBLE >= 199506
+int pthread_kill (pthread_t, int);
 #endif
 
-#if defined(_POSIX_REALTIME_SIGNALS)
+#if __POSIX_VISIBLE >= 199309
 
 /*  3.3.8 Synchronously Accept a Signal, P1003.1b-1993, p. 76
     NOTE: P1003.1c/D10, p. 39 adds sigwait().  */
 
-int _EXFUN(sigwaitinfo, (const sigset_t *set, siginfo_t *info));
-int _EXFUN(sigtimedwait,
-  (const sigset_t *set, siginfo_t *info, const struct timespec  *timeout)
-);
-int _EXFUN(sigwait, (const sigset_t *set, int *sig));
-
+int sigwaitinfo (const sigset_t *, siginfo_t *);
+int sigtimedwait (const sigset_t *, siginfo_t *, const struct timespec *);
 /*  3.3.9 Queue a Signal to a Process, P1003.1b-1993, p. 78 */
-int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
+int sigqueue (pid_t, int, const union sigval);
 
-#endif /* defined(_POSIX_REALTIME_SIGNALS) */
-
-#endif /* defined(__CYGWIN__) || defined(__rtems__) */
-
-/* #endif __STRICT_ANSI__ */
+#endif /* __POSIX_VISIBLE >= 199309 */
 
 #if defined(___AM29K__)
 /* These all need to be defined for ANSI C, but I don't think they are
@@ -347,6 +355,12 @@ int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 
 #ifdef __cplusplus
 }
+#endif
+
+#if defined(__CYGWIN__)
+#if __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
+#include <sys/ucontext.h>
+#endif
 #endif
 
 #ifndef _SIGNAL_H_

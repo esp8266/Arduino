@@ -5,6 +5,8 @@
 #ifndef _TAR_H
 #define _TAR_H
 
+#include <sys/features.h>
+
 /* General definitions */
 #define TMAGIC 		"ustar" /* ustar plus null byte. */
 #define TMAGLEN 	6 	/* Length of the above. */
@@ -25,7 +27,9 @@
 /* Mode field bit definitions (octal) */
 #define	TSUID		04000	/* Set UID on execution. */
 #define	TSGID		02000	/* Set GID on execution. */
+#if __XSI_VISIBLE || __POSIX_VISIBLE < 200112
 #define	TSVTX		01000	/* On directories, restricted deletion flag. */
+#endif
 #define	TUREAD		00400	/* Read by owner. */
 #define	TUWRITE		00200	/* Write by owner. */
 #define	TUEXEC		00100	/* Execute/search by owner. */

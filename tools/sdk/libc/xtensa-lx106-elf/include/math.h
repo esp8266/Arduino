@@ -3,33 +3,11 @@
 #define  _MATH_H_
 
 #include <sys/reent.h>
+#include <sys/cdefs.h>
 #include <machine/ieeefp.h>
 #include "_ansi.h"
 
 _BEGIN_STD_C
-
-/* __dmath, __fmath, and __ldmath are only here for backwards compatibility
- * in case any code used them.  They are no longer used by Newlib, itself,
- * other than legacy.  */
-union __dmath
-{
-  double d;
-  __ULong i[2];
-};
-
-union __fmath
-{
-  float f;
-  __ULong i[1];
-};
-
-#if defined(_HAVE_LONG_DOUBLE)
-union __ldmath
-{
-  long double ld;
-  __ULong i[4];
-};
-#endif
 
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
@@ -105,40 +83,57 @@ union __ldmath
 /* Reentrant ANSI C functions.  */
 
 #ifndef __math_68881
-extern double atan _PARAMS((double));
-extern double cos _PARAMS((double));
-extern double sin _PARAMS((double));
-extern double tan _PARAMS((double));
-extern double tanh _PARAMS((double));
-extern double frexp _PARAMS((double, int *));
-extern double modf _PARAMS((double, double *));
-extern double ceil _PARAMS((double));
-extern double fabs _PARAMS((double));
-extern double floor _PARAMS((double));
+extern double atan (double);
+extern double cos (double);
+extern double sin (double);
+extern double tan (double);
+extern double tanh (double);
+extern double frexp (double, int *);
+extern double modf (double, double *);
+extern double ceil (double);
+extern double fabs (double);
+extern double floor (double);
 #endif /* ! defined (__math_68881) */
 
 /* Non reentrant ANSI C functions.  */
 
 #ifndef _REENT_ONLY
 #ifndef __math_68881
-extern double acos _PARAMS((double));
-extern double asin _PARAMS((double));
-extern double atan2 _PARAMS((double, double));
-extern double cosh _PARAMS((double));
-extern double sinh _PARAMS((double));
-extern double exp _PARAMS((double));
-extern double ldexp _PARAMS((double, int));
-extern double log _PARAMS((double));
-extern double log10 _PARAMS((double));
-extern double pow _PARAMS((double, double));
-extern double sqrt _PARAMS((double));
-extern double fmod _PARAMS((double, double));
+extern double acos (double);
+extern double asin (double);
+extern double atan2 (double, double);
+extern double cosh (double);
+extern double sinh (double);
+extern double exp (double);
+extern double ldexp (double, int);
+extern double log (double);
+extern double log10 (double);
+extern double pow (double, double);
+extern double sqrt (double);
+extern double fmod (double, double);
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
 
-#if !defined(__STRICT_ANSI__) || defined(__cplusplus) || \
-  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#if __MISC_VISIBLE
+extern int finite (double);
+extern int finitef (float);
+extern int finitel (long double);
+extern int isinff (float);
+extern int isnanf (float);
+#ifdef __CYGWIN__ /* not implemented in newlib yet */
+extern int isinfl (long double);
+extern int isnanl (long double);
+#endif
+#if !defined(__cplusplus) || __cplusplus < 201103L
+extern int isinf (double);
+#endif
+#endif /* __MISC_VISIBLE */
+#if (__MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 600)) \
+  && (!defined(__cplusplus) || __cplusplus < 201103L)
+extern int isnan (double);
+#endif
 
+#if __ISO_C_VISIBLE >= 1999
 /* ISO C99 types and macros. */
 
 /* FIXME:  FLT_EVAL_METHOD should somehow be gotten from float.h (which is hard,
@@ -180,10 +175,10 @@ extern double fmod _PARAMS((double, double));
 #define FP_NORMAL      4
 
 #ifndef FP_ILOGB0
-# define FP_ILOGB0 (-INT_MAX)
+# define FP_ILOGB0 (-__INT_MAX__)
 #endif
 #ifndef FP_ILOGBNAN
-# define FP_ILOGBNAN INT_MAX
+# define FP_ILOGBNAN __INT_MAX__
 #endif
 
 #ifndef MATH_ERRNO
@@ -205,35 +200,70 @@ extern int __fpclassifyd (double x);
 extern int __signbitf (float x);
 extern int __signbitd (double x);
 
-#define fpclassify(__x) \
-	((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
-	__fpclassifyd(__x))
-
-#ifndef isfinite
-  #define isfinite(__y) \
-          (__extension__ ({int __cy = fpclassify(__y); \
-                           __cy != FP_INFINITE && __cy != FP_NAN;}))
-#endif
-
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
  *       supporting multiple floating point types.  Thus, they are
  *       now defined as macros.  Implementations of the old functions
  *       taking double arguments still exist for compatibility purposes
- *       (prototypes for them are in <ieeefp.h>).  */
-#ifndef isinf
-  #define isinf(y) (fpclassify(y) == FP_INFINITE)
+ *       (prototypes for them are earlier in this header).  */
+
+#if __GNUC_PREREQ (4, 4)
+  #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
+						 FP_NORMAL, FP_SUBNORMAL, \
+						 FP_ZERO, __x))
+  #ifndef isfinite
+    #define isfinite(__x)	(__builtin_isfinite (__x))
+  #endif
+  #ifndef isinf
+    #define isinf(__x) (__builtin_isinf_sign (__x))
+  #endif
+  #ifndef isnan
+    #define isnan(__x) (__builtin_isnan (__x))
+  #endif
+  #define isnormal(__x) (__builtin_isnormal (__x))
+#else
+  #define fpclassify(__x) \
+	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
+	  __fpclassifyd(__x))
+  #ifndef isfinite
+    #define isfinite(__y) \
+	    (__extension__ ({int __cy = fpclassify(__y); \
+			     __cy != FP_INFINITE && __cy != FP_NAN;}))
+  #endif
+  #ifndef isinf
+    #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
+  #endif
+  #ifndef isnan
+    #define isnan(__x) (fpclassify(__x) == FP_NAN)
+  #endif
+  #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
 #endif
 
-#ifndef isnan
-  #define isnan(y) (fpclassify(y) == FP_NAN)
+#if __GNUC_PREREQ (4, 0)
+  #if defined(_HAVE_LONG_DOUBLE)
+    #define signbit(__x) \
+	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) : \
+	     (sizeof(__x) == sizeof(double)) ? __builtin_signbit (__x) : \
+					       __builtin_signbitl(__x))
+  #else
+    #define signbit(__x) \
+	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) : \
+					       __builtin_signbit (__x))
+  #endif
+#else
+  #define signbit(__x) \
+	  ((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
+		  __signbitd(__x))
 #endif
 
-#define isnormal(y) (fpclassify(y) == FP_NORMAL)
-#define signbit(__x) \
-	((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
-		__signbitd(__x))
-
+#if __GNUC_PREREQ (2, 97)
+#define isgreater(__x,__y)	(__builtin_isgreater (__x, __y))
+#define isgreaterequal(__x,__y)	(__builtin_isgreaterequal (__x, __y))
+#define isless(__x,__y)		(__builtin_isless (__x, __y))
+#define islessequal(__x,__y)	(__builtin_islessequal (__x, __y))
+#define islessgreater(__x,__y)	(__builtin_islessgreater (__x, __y))
+#define isunordered(__x,__y)	(__builtin_isunordered (__x, __y))
+#else
 #define isgreater(x,y) \
           (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
                            !isunordered(__x,__y) && (__x > __y);}))
@@ -253,306 +283,294 @@ extern int __signbitd (double x);
 #define isunordered(a,b) \
           (__extension__ ({__typeof__(a) __a = (a); __typeof__(b) __b = (b); \
                            fpclassify(__a) == FP_NAN || fpclassify(__b) == FP_NAN;}))
+#endif
 
 /* Non ANSI double precision functions.  */
 
-extern double infinity _PARAMS((void));
-extern double nan _PARAMS((const char *));
-extern int finite _PARAMS((double));
-extern double copysign _PARAMS((double, double));
-extern double logb _PARAMS((double));
-extern int ilogb _PARAMS((double));
+extern double infinity (void);
+extern double nan (const char *);
+extern double copysign (double, double);
+extern double logb (double);
+extern int ilogb (double);
 
-extern double asinh _PARAMS((double));
-extern double cbrt _PARAMS((double));
-extern double nextafter _PARAMS((double, double));
-extern double rint _PARAMS((double));
-extern double scalbn _PARAMS((double, int));
+extern double asinh (double);
+extern double cbrt (double);
+extern double nextafter (double, double);
+extern double rint (double);
+extern double scalbn (double, int);
 
-extern double exp2 _PARAMS((double));
-extern double scalbln _PARAMS((double, long int));
-extern double tgamma _PARAMS((double));
-extern double nearbyint _PARAMS((double));
-extern long int lrint _PARAMS((double));
-extern long long int llrint _PARAMS((double));
-extern double round _PARAMS((double));
-extern long int lround _PARAMS((double));
-extern long long int llround _PARAMS((double));
-extern double trunc _PARAMS((double));
-extern double remquo _PARAMS((double, double, int *));
-extern double fdim _PARAMS((double, double));
-extern double fmax _PARAMS((double, double));
-extern double fmin _PARAMS((double, double));
-extern double fma _PARAMS((double, double, double));
+extern double exp2 (double);
+extern double scalbln (double, long int);
+extern double tgamma (double);
+extern double nearbyint (double);
+extern long int lrint (double);
+extern long long int llrint (double);
+extern double round (double);
+extern long int lround (double);
+extern long long int llround (double);
+extern double trunc (double);
+extern double remquo (double, double, int *);
+extern double fdim (double, double);
+extern double fmax (double, double);
+extern double fmin (double, double);
+extern double fma (double, double, double);
 
 #ifndef __math_68881
-extern double log1p _PARAMS((double));
-extern double expm1 _PARAMS((double));
+extern double log1p (double);
+extern double expm1 (double);
 #endif /* ! defined (__math_68881) */
 
 #ifndef _REENT_ONLY
-extern double acosh _PARAMS((double));
-extern double atanh _PARAMS((double));
-extern double remainder _PARAMS((double, double));
-extern double gamma _PARAMS((double));
-extern double lgamma _PARAMS((double));
-extern double erf _PARAMS((double));
-extern double erfc _PARAMS((double));
-extern double log2 _PARAMS((double));
+extern double acosh (double);
+extern double atanh (double);
+extern double remainder (double, double);
+extern double gamma (double);
+extern double lgamma (double);
+extern double erf (double);
+extern double erfc (double);
+extern double log2 (double);
 #if !defined(__cplusplus)
 #define log2(x) (log (x) / _M_LN2)
 #endif
 
 #ifndef __math_68881
-extern double hypot _PARAMS((double, double));
+extern double hypot (double, double);
 #endif
 
 #endif /* ! defined (_REENT_ONLY) */
 
 /* Single precision versions of ANSI functions.  */
 
-extern float atanf _PARAMS((float));
-extern float cosf _PARAMS((float));
-extern float sinf _PARAMS((float));
-extern float tanf _PARAMS((float));
-extern float tanhf _PARAMS((float));
-extern float frexpf _PARAMS((float, int *));
-extern float modff _PARAMS((float, float *));
-extern float ceilf _PARAMS((float));
-extern float fabsf _PARAMS((float));
-extern float floorf _PARAMS((float));
+extern float atanf (float);
+extern float cosf (float);
+extern float sinf (float);
+extern float tanf (float);
+extern float tanhf (float);
+extern float frexpf (float, int *);
+extern float modff (float, float *);
+extern float ceilf (float);
+extern float fabsf (float);
+extern float floorf (float);
 
 #ifndef _REENT_ONLY
-extern float acosf _PARAMS((float));
-extern float asinf _PARAMS((float));
-extern float atan2f _PARAMS((float, float));
-extern float coshf _PARAMS((float));
-extern float sinhf _PARAMS((float));
-extern float expf _PARAMS((float));
-extern float ldexpf _PARAMS((float, int));
-extern float logf _PARAMS((float));
-extern float log10f _PARAMS((float));
-extern float powf _PARAMS((float, float));
-extern float sqrtf _PARAMS((float));
-extern float fmodf _PARAMS((float, float));
+extern float acosf (float);
+extern float asinf (float);
+extern float atan2f (float, float);
+extern float coshf (float);
+extern float sinhf (float);
+extern float expf (float);
+extern float ldexpf (float, int);
+extern float logf (float);
+extern float log10f (float);
+extern float powf (float, float);
+extern float sqrtf (float);
+extern float fmodf (float, float);
 #endif /* ! defined (_REENT_ONLY) */
 
 /* Other single precision functions.  */
 
-extern float exp2f _PARAMS((float));
-extern float scalblnf _PARAMS((float, long int));
-extern float tgammaf _PARAMS((float));
-extern float nearbyintf _PARAMS((float));
-extern long int lrintf _PARAMS((float));
-extern long long int llrintf _PARAMS((float));
-extern float roundf _PARAMS((float));
-extern long int lroundf _PARAMS((float));
-extern long long int llroundf _PARAMS((float));
-extern float truncf _PARAMS((float));
-extern float remquof _PARAMS((float, float, int *));
-extern float fdimf _PARAMS((float, float));
-extern float fmaxf _PARAMS((float, float));
-extern float fminf _PARAMS((float, float));
-extern float fmaf _PARAMS((float, float, float));
+extern float exp2f (float);
+extern float scalblnf (float, long int);
+extern float tgammaf (float);
+extern float nearbyintf (float);
+extern long int lrintf (float);
+extern long long int llrintf (float);
+extern float roundf (float);
+extern long int lroundf (float);
+extern long long int llroundf (float);
+extern float truncf (float);
+extern float remquof (float, float, int *);
+extern float fdimf (float, float);
+extern float fmaxf (float, float);
+extern float fminf (float, float);
+extern float fmaf (float, float, float);
 
-extern float infinityf _PARAMS((void));
-extern float nanf _PARAMS((const char *));
-extern int finitef _PARAMS((float));
-extern float copysignf _PARAMS((float, float));
-extern float logbf _PARAMS((float));
-extern int ilogbf _PARAMS((float));
+extern float infinityf (void);
+extern float nanf (const char *);
+extern float copysignf (float, float);
+extern float logbf (float);
+extern int ilogbf (float);
 
-extern float asinhf _PARAMS((float));
-extern float cbrtf _PARAMS((float));
-extern float nextafterf _PARAMS((float, float));
-extern float rintf _PARAMS((float));
-extern float scalbnf _PARAMS((float, int));
-extern float log1pf _PARAMS((float));
-extern float expm1f _PARAMS((float));
+extern float asinhf (float);
+extern float cbrtf (float);
+extern float nextafterf (float, float);
+extern float rintf (float);
+extern float scalbnf (float, int);
+extern float log1pf (float);
+extern float expm1f (float);
 
 #ifndef _REENT_ONLY
-extern float acoshf _PARAMS((float));
-extern float atanhf _PARAMS((float));
-extern float remainderf _PARAMS((float, float));
-extern float gammaf _PARAMS((float));
-extern float lgammaf _PARAMS((float));
-extern float erff _PARAMS((float));
-extern float erfcf _PARAMS((float));
-extern float log2f _PARAMS((float));
-extern float hypotf _PARAMS((float, float));
+extern float acoshf (float);
+extern float atanhf (float);
+extern float remainderf (float, float);
+extern float gammaf (float);
+extern float lgammaf (float);
+extern float erff (float);
+extern float erfcf (float);
+extern float log2f (float);
+extern float hypotf (float, float);
 #endif /* ! defined (_REENT_ONLY) */
 
-/* On platforms where long double equals double.  */
-#ifdef _LDBL_EQ_DBL
+/* Newlib doesn't fully support long double math functions so far.
+   On platforms where long double equals double the long double functions
+   simply call the double functions.  On Cygwin the long double functions
+   are implemented independently from newlib to be able to use optimized
+   assembler functions despite using the Microsoft x86_64 ABI. */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 /* Reentrant ANSI C functions.  */
 #ifndef __math_68881
-extern long double atanl _PARAMS((long double));
-extern long double cosl _PARAMS((long double));
-extern long double sinl _PARAMS((long double));
-extern long double tanl _PARAMS((long double));
-extern long double tanhl _PARAMS((long double));
-extern long double frexpl _PARAMS((long double, int *));
-extern long double modfl _PARAMS((long double, long double *));
-extern long double ceill _PARAMS((long double));
-extern long double fabsl _PARAMS((long double));
-extern long double floorl _PARAMS((long double));
-extern long double log1pl _PARAMS((long double));
-extern long double expm1l _PARAMS((long double));
+extern long double atanl (long double);
+extern long double cosl (long double);
+extern long double sinl (long double);
+extern long double tanl (long double);
+extern long double tanhl (long double);
+extern long double frexpl (long double, int *);
+extern long double modfl (long double, long double *);
+extern long double ceill (long double);
+extern long double fabsl (long double);
+extern long double floorl (long double);
+extern long double log1pl (long double);
+extern long double expm1l (long double);
 #endif /* ! defined (__math_68881) */
 /* Non reentrant ANSI C functions.  */
 #ifndef _REENT_ONLY
 #ifndef __math_68881
-extern long double acosl _PARAMS((long double));
-extern long double asinl _PARAMS((long double));
-extern long double atan2l _PARAMS((long double, long double));
-extern long double coshl _PARAMS((long double));
-extern long double sinhl _PARAMS((long double));
-extern long double expl _PARAMS((long double));
-extern long double ldexpl _PARAMS((long double, int));
-extern long double logl _PARAMS((long double));
-extern long double log10l _PARAMS((long double));
-extern long double powl _PARAMS((long double, long double));
-extern long double sqrtl _PARAMS((long double));
-extern long double fmodl _PARAMS((long double, long double));
-extern long double hypotl _PARAMS((long double, long double));
+extern long double acosl (long double);
+extern long double asinl (long double);
+extern long double atan2l (long double, long double);
+extern long double coshl (long double);
+extern long double sinhl (long double);
+extern long double expl (long double);
+extern long double ldexpl (long double, int);
+extern long double logl (long double);
+extern long double log10l (long double);
+extern long double powl (long double, long double);
+extern long double sqrtl (long double);
+extern long double fmodl (long double, long double);
+extern long double hypotl (long double, long double);
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
-extern long double copysignl _PARAMS((long double, long double));
-extern long double nanl _PARAMS((const char *));
-extern int ilogbl _PARAMS((long double));
-extern long double asinhl _PARAMS((long double));
-extern long double cbrtl _PARAMS((long double));
-extern long double nextafterl _PARAMS((long double, long double));
-extern float nexttowardf _PARAMS((float, long double));
-extern double nexttoward _PARAMS((double, long double));
-extern long double nexttowardl _PARAMS((long double, long double));
-extern long double logbl _PARAMS((long double));
-extern long double log2l _PARAMS((long double));
-extern long double rintl _PARAMS((long double));
-extern long double scalbnl _PARAMS((long double, int));
-extern long double exp2l _PARAMS((long double));
-extern long double scalblnl _PARAMS((long double, long));
-extern long double tgammal _PARAMS((long double));
-extern long double nearbyintl _PARAMS((long double));
-extern long int lrintl _PARAMS((long double));
-extern long long int llrintl _PARAMS((long double));
-extern long double roundl _PARAMS((long double));
-extern long lroundl _PARAMS((long double));
-extern long long int llroundl _PARAMS((long double));
-extern long double truncl _PARAMS((long double));
-extern long double remquol _PARAMS((long double, long double, int *));
-extern long double fdiml _PARAMS((long double, long double));
-extern long double fmaxl _PARAMS((long double, long double));
-extern long double fminl _PARAMS((long double, long double));
-extern long double fmal _PARAMS((long double, long double, long double));
+extern long double copysignl (long double, long double);
+extern long double nanl (const char *);
+extern int ilogbl (long double);
+extern long double asinhl (long double);
+extern long double cbrtl (long double);
+extern long double nextafterl (long double, long double);
+extern float nexttowardf (float, long double);
+extern double nexttoward (double, long double);
+extern long double nexttowardl (long double, long double);
+extern long double logbl (long double);
+extern long double log2l (long double);
+extern long double rintl (long double);
+extern long double scalbnl (long double, int);
+extern long double exp2l (long double);
+extern long double scalblnl (long double, long);
+extern long double tgammal (long double);
+extern long double nearbyintl (long double);
+extern long int lrintl (long double);
+extern long long int llrintl (long double);
+extern long double roundl (long double);
+extern long lroundl (long double);
+extern long long int llroundl (long double);
+extern long double truncl (long double);
+extern long double remquol (long double, long double, int *);
+extern long double fdiml (long double, long double);
+extern long double fmaxl (long double, long double);
+extern long double fminl (long double, long double);
+extern long double fmal (long double, long double, long double);
 #ifndef _REENT_ONLY
-extern long double acoshl _PARAMS((long double));
-extern long double atanhl _PARAMS((long double));
-extern long double remainderl _PARAMS((long double, long double));
-extern long double lgammal _PARAMS((long double));
-extern long double erfl _PARAMS((long double));
-extern long double erfcl _PARAMS((long double));
+extern long double acoshl (long double);
+extern long double atanhl (long double);
+extern long double remainderl (long double, long double);
+extern long double lgammal (long double);
+extern long double erfl (long double);
+extern long double erfcl (long double);
 #endif /* ! defined (_REENT_ONLY) */
-#else /* !_LDBL_EQ_DBL */
+#else /* !_LDBL_EQ_DBL && !__CYGWIN__ */
+extern long double hypotl (long double, long double);
+extern long double sqrtl (long double);
 #ifdef __i386__
 /* Other long double precision functions.  */
-extern _LONG_DOUBLE rintl _PARAMS((_LONG_DOUBLE));
-extern long int lrintl _PARAMS((_LONG_DOUBLE));
-extern long long int llrintl _PARAMS((_LONG_DOUBLE));
+extern _LONG_DOUBLE rintl (_LONG_DOUBLE);
+extern long int lrintl (_LONG_DOUBLE);
+extern long long int llrintl (_LONG_DOUBLE);
 #endif /* __i386__ */
-#endif /* !_LDBL_EQ_DBL */
+#endif /* !_LDBL_EQ_DBL && !__CYGWIN__ */
 
-#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
+#endif /* __ISO_C_VISIBLE >= 1999 */
 
-#if !defined (__STRICT_ANSI__) || defined(__cplusplus)
+#if __MISC_VISIBLE
+extern double drem (double, double);
+extern float dremf (float, float);
+#ifdef __CYGWIN__
+extern float dreml (long double, long double);
+#endif /* __CYGWIN__ */
+extern double gamma_r (double, int *);
+extern double lgamma_r (double, int *);
+extern float gammaf_r (float, int *);
+extern float lgammaf_r (float, int *);
+#endif
 
-extern double drem _PARAMS((double, double));
-extern void sincos _PARAMS((double, double *, double *));
-extern double gamma_r _PARAMS((double, int *));
-extern double lgamma_r _PARAMS((double, int *));
+#if __MISC_VISIBLE || __XSI_VISIBLE
+extern double y0 (double);
+extern double y1 (double);
+extern double yn (int, double);
+extern double j0 (double);
+extern double j1 (double);
+extern double jn (int, double);
+#endif
 
-extern double y0 _PARAMS((double));
-extern double y1 _PARAMS((double));
-extern double yn _PARAMS((int, double));
-extern double j0 _PARAMS((double));
-extern double j1 _PARAMS((double));
-extern double jn _PARAMS((int, double));
-
-extern float dremf _PARAMS((float, float));
-extern void sincosf _PARAMS((float, float *, float *));
-extern float gammaf_r _PARAMS((float, int *));
-extern float lgammaf_r _PARAMS((float, int *));
-
-extern float y0f _PARAMS((float));
-extern float y1f _PARAMS((float));
-extern float ynf _PARAMS((int, float));
-extern float j0f _PARAMS((float));
-extern float j1f _PARAMS((float));
-extern float jnf _PARAMS((int, float));
+#if __MISC_VISIBLE || __XSI_VISIBLE >= 600
+extern float y0f (float);
+extern float y1f (float);
+extern float ynf (int, float);
+extern float j0f (float);
+extern float j1f (float);
+extern float jnf (int, float);
+#endif
 
 /* GNU extensions */
+#if __GNU_VISIBLE
+extern void sincos (double, double *, double *);
+extern void sincosf (float, float *, float *);
+#ifdef __CYGWIN__
+extern void sincosl (long double, long double *, long double *);
+#endif /* __CYGWIN__ */
 # ifndef exp10
-extern double exp10 _PARAMS((double));
+extern double exp10 (double);
 # endif
 # ifndef pow10
-extern double pow10 _PARAMS((double));
+extern double pow10 (double);
 # endif
 # ifndef exp10f
-extern float exp10f _PARAMS((float));
+extern float exp10f (float);
 # endif
 # ifndef pow10f
-extern float pow10f _PARAMS((float));
+extern float pow10f (float);
 # endif
+#ifdef __CYGWIN__
+# ifndef exp10l
+extern float exp10l (float);
+# endif
+# ifndef pow10l
+extern float pow10l (float);
+# endif
+#endif /* __CYGWIN__ */
+#endif /* __GNU_VISIBLE */
 
-#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) */
-
-#ifndef __STRICT_ANSI__
-
+#if __MISC_VISIBLE || __XSI_VISIBLE
 /* The gamma functions use a global variable, signgam.  */
 #ifndef _REENT_ONLY
 #define signgam (*__signgam())
-extern int *__signgam _PARAMS((void));
+extern int *__signgam (void);
 #endif /* ! defined (_REENT_ONLY) */
 
 #define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
-
-/* The exception structure passed to the matherr routine.  */
-/* We have a problem when using C++ since `exception' is a reserved
-   name in C++.  */
-#ifdef __cplusplus
-struct __exception
-#else
-struct exception
-#endif
-{
-  int type;
-  char *name;
-  double arg1;
-  double arg2;
-  double retval;
-  int err;
-};
-
-#ifdef __cplusplus
-extern int matherr _PARAMS((struct __exception *e));
-#else
-extern int matherr _PARAMS((struct exception *e));
-#endif
-
-/* Values for the type field of struct exception.  */
-
-#define DOMAIN 1
-#define SING 2
-#define OVERFLOW 3
-#define UNDERFLOW 4
-#define TLOSS 5
-#define PLOSS 6
-
-#endif /* ! defined (__STRICT_ANSI__) */
+#endif /* __MISC_VISIBLE || __XSI_VISIBLE */
 
 /* Useful constants.  */
 
-#if !defined(__STRICT_ANSI__) || ((_XOPEN_SOURCE - 0) >= 500)
+#if __BSD_VISIBLE || __XSI_VISIBLE
 
 #define MAXFLOAT	3.40282347e+38F
 
@@ -572,7 +590,7 @@ extern int matherr _PARAMS((struct exception *e));
 
 #endif
 
-#ifndef __STRICT_ANSI__
+#if __BSD_VISIBLE
 
 #define M_TWOPI         (M_PI * 2.0)
 #define M_3PI_4		2.3561944901923448370E0
@@ -589,8 +607,6 @@ extern int matherr _PARAMS((struct exception *e));
 enum __fdlibm_version
 {
   __fdlibm_ieee = -1,
-  __fdlibm_svid,
-  __fdlibm_xopen,
   __fdlibm_posix
 };
 
@@ -600,11 +616,9 @@ enum __fdlibm_version
 extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
 
 #define _IEEE_  __fdlibm_ieee
-#define _SVID_  __fdlibm_svid
-#define _XOPEN_ __fdlibm_xopen
 #define _POSIX_ __fdlibm_posix
 
-#endif /* ! defined (__STRICT_ANSI__) */
+#endif /* __BSD_VISIBLE */
 
 _END_STD_C
 

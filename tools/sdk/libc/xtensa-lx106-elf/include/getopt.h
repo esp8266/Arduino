@@ -129,7 +129,7 @@ extern "C"
 
   /* The GETOPT_DATA_INITIALIZER macro is used to initialize a statically-
      allocated variable of type struct getopt_data.  */
-  #define GETOPT_DATA_INITIALIZER	{0,0,0,0,0}
+  #define GETOPT_DATA_INITIALIZER	{0,0,0,0,0,0,0}
 
   /* These #defines are to make accessing the reentrant functions easier.  */
   #define getopt_r		__getopt_r
@@ -142,6 +142,7 @@ extern "C"
   {
     char *optarg;
     int optind, opterr, optopt, optwhere;
+    int permute_from, num_nonopts;
   } getopt_data;
 
 #endif /* __need_getopt_newlib */
@@ -153,31 +154,25 @@ extern "C"
   extern int optopt;
 
   /* function prototypes */
-  int _EXFUN (getopt,
-	      (int __argc, char *const __argv[], const char *__optstring));
+  int getopt (int __argc, char *const __argv[], const char *__optstring);
 
-  int _EXFUN (getopt_long,
-	      (int __argc, char *const __argv[], const char *__shortopts,
-	       const struct option * __longopts, int *__longind));
+  int getopt_long (int __argc, char *const __argv[], const char *__shortopts,
+	       const struct option * __longopts, int *__longind);
 
-  int _EXFUN (getopt_long_only,
-	      (int __argc, char *const __argv[], const char *__shortopts,
-	       const struct option * __longopts, int *__longind));
+  int getopt_long_only (int __argc, char *const __argv[], const char *__shortopts,
+	       const struct option * __longopts, int *__longind);
 
 #ifdef __need_getopt_newlib
-  int _EXFUN (__getopt_r,
-	      (int __argc, char *const __argv[], const char *__optstring,
-	       struct getopt_data * __data));
+  int __getopt_r (int __argc, char *const __argv[], const char *__optstring,
+	       struct getopt_data * __data);
 
-  int _EXFUN (__getopt_long_r,
-	      (int __argc, char *const __argv[], const char *__shortopts,
+  int __getopt_long_r (int __argc, char *const __argv[], const char *__shortopts,
 	       const struct option * __longopts, int *__longind,
-	       struct getopt_data * __data));
+	       struct getopt_data * __data);
 
-  int _EXFUN (__getopt_long_only_r,
-	      (int __argc, char *const __argv[], const char *__shortopts,
+  int __getopt_long_only_r (int __argc, char *const __argv[], const char *__shortopts,
 	       const struct option * __longopts, int *__longind,
-	       struct getopt_data * __data));
+	       struct getopt_data * __data);
 #endif /* __need_getopt_newlib */
 
 #ifdef __cplusplus

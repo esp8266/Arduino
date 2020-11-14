@@ -22,29 +22,29 @@
 extern "C" {
 #endif
 
-int 	 _EXFUN(memcmp_P,(const _PTR, const _PTR, size_t));
-_PTR	 _EXFUN(memmem_P, (const _PTR, size_t, const _PTR, size_t));
-_PTR 	 _EXFUN(memcpy_P,(_PTR __restrict, const _PTR __restrict, size_t));
-_PTR 	 _EXFUN(memmove_P,(_PTR __restrict, const _PTR __restrict, size_t));
-_PTR	 _EXFUN(memccpy_P,(_PTR __restrict, const _PTR __restrict, int, size_t));
-_PTR     _EXFUN(memchr_P,(const _PTR, int, size_t));
+int 	 memcmp_P(const void *, const void *, size_t);
+void *	 memmem_P(const void *, size_t, const void *, size_t);
+void * 	 memcpy_P(void * __restrict, const void * __restrict, size_t);
+void * 	 memmove_P(void * __restrict, const void * __restrict, size_t);
+void *	 memccpy_P(void * __restrict, const void * __restrict, int, size_t);
+void *   memchr_P(const void *, int, size_t);
 
-char 	*_EXFUN(strncpy_P,(char *__restrict, const char *__restrict, size_t));
+char 	*strncpy_P(char *__restrict, const char *__restrict, size_t);
 #define strcpy_P(dest, src)          strncpy_P((dest), (src), SIZE_IRRELEVANT)
 
-char 	*_EXFUN(strncat_P,(char *__restrict, const char *__restrict, size_t));
+char 	*strncat_P(char *__restrict, const char *__restrict, size_t);
 #define strcat_P(dest, src)          strncat_P((dest), (src), SIZE_IRRELEVANT)
 
-int	 _EXFUN(strncmp_P,(const char *, const char *, size_t));
+int	 strncmp_P(const char *, const char *, size_t);
 #define strcmp_P(str1, str2P)          strncmp_P((str1), (str2P), SIZE_IRRELEVANT)
 
-int	_EXFUN(strncasecmp_P,(const char *, const char *, size_t));
+int	 strncasecmp_P(const char *, const char *, size_t);
 #define strcasecmp_P(str1, str2P)          strncasecmp_P((str1), (str2P), SIZE_IRRELEVANT)
 
-size_t	 _EXFUN(strnlen_P,(const char *, size_t));
+size_t	 strnlen_P(const char *, size_t);
 #define strlen_P(strP)          strnlen_P((strP), SIZE_IRRELEVANT)
 
-char 	*_EXFUN(strstr_P,(const char *, const char *));
+char 	*strstr_P(const char *, const char *);
 
 #ifdef __cplusplus
 }

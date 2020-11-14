@@ -46,7 +46,6 @@ double EXFUN(fast_loge,(double));
 #define	log2(x)		fast_log2(x)
 #define	loge(x)		fast_loge(x)
 
-#ifdef _HAVE_STDC
 /* These functions are in assembler, they really do take floats. This
    can only be used with a real ANSI compiler */
 
@@ -94,7 +93,6 @@ float EXFUN(fast_logef,(float));
 #define	log10f(x)	fast_log10f(x)
 #define	log2f(x)	fast_log2f(x)
 #define	logef(x)	fast_logef(x)
-#endif
 /* Override the functions defined in math.h */
 #endif /* __sysvnecv70_target */
 
