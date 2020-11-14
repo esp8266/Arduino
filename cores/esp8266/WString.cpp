@@ -617,17 +617,33 @@ int String::indexOf(char ch, unsigned int fromIndex) const {
     return temp - buffer();
 }
 
+int String::indexOf(const __FlashStringHelper *s2) const {
+    return indexOf(s2, 0);
+}
+
+int String::indexOf(const __FlashStringHelper *s2, unsigned int fromIndex) const {
+    return indexOf((const char*) s2, fromIndex);
+}
+
+int String::indexOf(const char *s2) const {
+    return indexOf(s2, 0);
+}
+
+int String::indexOf(const char *s2, unsigned int fromIndex) const {
+    if (fromIndex >= len())
+        return -1;
+    const char *found = strstr_P(buffer() + fromIndex, s2);
+    if (found == NULL)
+        return -1;
+    return found - buffer();
+}
+
 int String::indexOf(const String &s2) const {
     return indexOf(s2, 0);
 }
 
 int String::indexOf(const String &s2, unsigned int fromIndex) const {
-    if (fromIndex >= len())
-        return -1;
-    const char *found = strstr(buffer() + fromIndex, s2.buffer());
-    if (found == NULL)
-        return -1;
-    return found - buffer();
+    return indexOf(s2.c_str(), fromIndex);
 }
 
 int String::lastIndexOf(char theChar) const {
