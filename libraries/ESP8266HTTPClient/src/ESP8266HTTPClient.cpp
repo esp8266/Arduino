@@ -727,12 +727,14 @@ int HTTPClient::writeToStream(Stream * stream)
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
         if(len > 0) {
             ret = writeToStreamDataBlock(stream, len);
+        } else if(len == -1 && _client->available() > 0) {
+			ret = writeToStreamDataBlock(stream, _client->available());
+		}
 
-            // have we an error?
-            if(ret < 0) {
-                return returnError(ret);
-            }
-        }
+		// have we an error?
+		if(ret < 0) {
+			return returnError(ret);
+		}
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
         while(1) {
