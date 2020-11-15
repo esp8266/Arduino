@@ -23,7 +23,7 @@ endif
 ifeq ($(CC),gcc)
 CFLAGS += -std=gnu11
 else
-CFLAGS += -std=c17
+CFLAGS += -std=gnu17
 endif
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
