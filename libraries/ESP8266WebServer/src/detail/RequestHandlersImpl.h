@@ -165,6 +165,51 @@ protected:
     size_t _baseUriLength;
 };
 
+template<typename ServerType>
+class StaticRequestETagHandler
+    :
+public StaticRequestHandler<ServerType> {
+
+    using SRH = StaticRequestHandler<ServerType>;
+
+    using SRH::SRH;
+
+    using WebServerType = ESP8266WebServerTemplate<ServerType>;
+
+    public:
+    bool handle(WebServerType& server, HTTPMethod requestMethod, const String & requestUri) override {
+        if (!SRH::canHandle(requestMethod, requestUri)){
+            return false;
+        }
+
+        if(server.header("If-None-Match") == SRH::_cache_header){
+            // Serial.println("Sending 304!!!");
+            server.send(304);
+            return true;
+        }
+
+
+        File f = SRH::_fs.open(SRH::_path, "r");
+
+        if (!f){
+            return false;
+        }
+
+        if (!f.isFile()) {
+            f.close();
+            return false;
+        }
+
+        if (SRH::_cache_header.length() != 0){
+            server.sendHeader("ETag", SRH::_cache_header);
+        }
+
+        server.streamFile(f, SRH::getContentType(SRH::_path), requestMethod);
+        return true;
+    }
+        
+};
+
 } // namespace
 
 #endif //REQUESTHANDLERSIMPL_H
