@@ -725,10 +725,8 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-        if(len > 0) {
+        if(len > 0 || len == -1) {
             ret = writeToStreamDataBlock(stream, len);
-        } else if(len == -1 && _client->available() > 0) {
-            ret = writeToStreamDataBlock(stream, _client->available());
         }
 
         // have we an error?
