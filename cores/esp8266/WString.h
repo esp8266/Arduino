@@ -324,15 +324,21 @@ class String {
 
     protected:
         void init(void) __attribute__((always_inline)) {
-            sso.buff[0]  = 0; // In the Xtensa ISA, in fact, 32-bit store insn ("S32I.N") is one-byte shorter than 8-bit one ("S8I").
-            sso.buff[1]  = 0; // Thanks to store-merging optimization, these 9 lines emit only 3 insns:
-            sso.buff[2]  = 0; //   "MOVI.N aX,0", "S32I.N aX,a2,0" and "S32I.N aX,a2,8" (6 bytes in total)
+            sso.buff[0] = 0;
+            sso.len     = 0;
+            sso.isHeap  = 0;
+            // Without the 6 statements shown below, GCC simply emits such as: "MOVI.N aX,0", "S8I aX,a2,0" and "S8I aX,a2,11" (8 bytes in total)
+            sso.buff[1]  = 0;
+            sso.buff[2]  = 0;
             sso.buff[3]  = 0;
-            sso.buff[8]  = 0; // Unfortunately, GCC seems not to re-evaluate the cost of inlining after the store-merging optimizer stage,
-            sso.buff[9]  = 0; // `always_inline` attribute is necessary in order to assure inlining.
+            sso.buff[8]  = 0;
+            sso.buff[9]  = 0;
             sso.buff[10] = 0;
-            sso.len      = 0;
-            sso.isHeap   = 0;
+            // With the above, thanks to store-merging, GCC can use the narrow form of 32-bit store insn ("S32I.N") and emits:
+            //   "MOVI.N aX,0", "S32I.N aX,a2,0" and "S32I.N aX,a2,8" (6 bytes in total)
+            // (Literature: Xtensa(R) Instruction Set Reference Manual, "S8I - Store 8-bit" [p.504] and "S32I.N - Narrow Store 32-bit" [p.512])
+            // Unfortunately, GCC seems not to re-evaluate the cost of inlining after the store-merging optimizer stage,
+            // `always_inline` attribute is necessary in order to keep inlining.
         }
         void invalidate(void);
         unsigned char changeBuffer(unsigned int maxStrLen);
