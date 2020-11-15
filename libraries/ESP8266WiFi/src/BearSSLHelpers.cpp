@@ -626,6 +626,17 @@ namespace brssl {
     return pk;
   }
 
+  static uint8_t *loadStream(Stream& stream, size_t size) {
+    uint8_t *dest = (uint8_t *)malloc(size);
+    if (!dest) {
+      return nullptr;  // OOM error
+    }
+    if (size != stream.readBytes(dest, size)) {
+      free(dest);  // Error during read
+      return nullptr;
+    }
+    return dest;
+  }
 };
 
 
@@ -646,6 +657,15 @@ PublicKey::PublicKey(const char *pemKey) {
 PublicKey::PublicKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
+}
+
+PublicKey::PublicKey(Stream &stream, size_t size) {
+  _key = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    parse(buff, size);
+    free(buff);
+  }
 }
 
 PublicKey::~PublicKey() {
@@ -709,6 +729,15 @@ PrivateKey::PrivateKey(const char *pemKey) {
 PrivateKey::PrivateKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
+}
+
+PrivateKey::PrivateKey(Stream &stream, size_t size) {
+  _key = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    parse(buff, size);
+    free(buff);
+  }
 }
 
 PrivateKey::~PrivateKey() {
@@ -779,6 +808,17 @@ X509List::X509List(const uint8_t *derCert, size_t derLen) {
   _cert = nullptr;
   _ta = nullptr;
   append(derCert, derLen);
+}
+
+X509List::X509List(Stream &stream, size_t size) {
+  _count = 0;
+  _cert = nullptr;
+  _ta = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    append(buff, size);
+    free(buff);
+  }
 }
 
 X509List::~X509List() {

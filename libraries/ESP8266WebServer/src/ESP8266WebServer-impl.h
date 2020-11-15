@@ -26,6 +26,7 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
+#include "base64.h"
 #include "detail/RequestHandlersImpl.h"
 
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
@@ -34,50 +35,17 @@ static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
+namespace esp8266webserver {
+
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _keepAlive(false)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _currentArgsHavePlain(0)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
-, _corsEnabled(false)
 {
 }
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 : _server(port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _currentArgsHavePlain(0)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
-, _corsEnabled(false)
 {
 }
 
@@ -131,21 +99,19 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
         authReq = "";
         return false;
       }
-      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
+      sprintf(toencode, "%s:%s", username, password);
+      String encoded = base64::encode((uint8_t *)toencode, toencodeLen, false);
+      if(!encoded){
         authReq = "";
         delete[] toencode;
         return false;
       }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
+      if(authReq.equalsConstantTime(encoded)) {
         authReq = "";
         delete[] toencode;
-        delete[] encoded;
         return true;
       }
       delete[] toencode;
-      delete[] encoded;
     } else if(authReq.startsWith(F("Digest"))) {
       String _realm    = _extractParam(authReq, F("realm=\""));
       String _H1 = credentialHash((String)username,_realm,(String)password);
@@ -864,3 +830,5 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
     }
     return String(r);
 }
+
+} // namespace

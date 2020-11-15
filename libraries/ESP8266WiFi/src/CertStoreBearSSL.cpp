@@ -21,7 +21,7 @@
 #include <memory>
 
 
-#ifdef DEBUG_ESP_SSL
+#if defined(DEBUG_ESP_SSL) && defined(DEBUG_ESP_PORT)
 #define DEBUG_BSSL(fmt, ...)  DEBUG_ESP_PORT.printf_P((PGM_P)PSTR( "BSSL:" fmt), ## __VA_ARGS__)
 #else
 #define DEBUG_BSSL(...)
@@ -80,7 +80,7 @@ CertStore::CertInfo CertStore::_preprocessCert(uint32_t length, uint32_t offset,
 
 // The certs.ar file is a UNIX ar format file, concatenating all the 
 // individual certificates into a single blob in a space-efficient way.
-int CertStore::initCertStore(FS &fs, const char *indexFileName, const char *dataFileName) {
+int CertStore::initCertStore(fs::FS &fs, const char *indexFileName, const char *dataFileName) {
   int count = 0;
   uint32_t offset = 0;
 
@@ -101,12 +101,12 @@ int CertStore::initCertStore(FS &fs, const char *indexFileName, const char *data
   memcpy_P(_indexName, indexFileName, strlen_P(indexFileName) + 1);
   memcpy_P(_dataName, dataFileName, strlen_P(dataFileName) + 1);
 
-  File index = _fs->open(_indexName, "w");
+  fs::File index = _fs->open(_indexName, "w");
   if (!index) {
     return 0;
   }
 
-  File data = _fs->open(_dataName, "r");
+  fs::File data = _fs->open(_dataName, "r");
   if (!data) {
     index.close();
     return 0;
@@ -179,7 +179,7 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
     return nullptr;
   }
 
-  File index = cs->_fs->open(cs->_indexName, "r");
+  fs::File index = cs->_fs->open(cs->_indexName, "r");
   if (!index) {
     return nullptr;
   }
@@ -191,12 +191,12 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
       if (!der) {
         return nullptr;
       }
-      File data = cs->_fs->open(cs->_dataName, "r");
+      fs::File data = cs->_fs->open(cs->_dataName, "r");
       if (!data) {
         free(der);
         return nullptr;
       }
-      if (!data.seek(ci.offset, SeekSet)) {
+      if (!data.seek(ci.offset, fs::SeekSet)) {
         data.close();
         free(der);
         return nullptr;

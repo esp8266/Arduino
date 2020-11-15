@@ -39,6 +39,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#include "MocklwIP.h"
 
 extern "C"
 {
@@ -138,6 +139,7 @@ extern "C"
 
         if (host_interface)
             mockverbose("host: looking for interface '%s':\n", host_interface);
+
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);

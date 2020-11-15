@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <debug.h>
 #include <Arduino.h>
 #include <cxxabi.h>
 

@@ -635,7 +635,7 @@ boards = collections.OrderedDict([
         ],
     }),
     ( 'd1', {
-        'name': 'WeMos D1 R1',
+        'name': 'LOLIN(WeMos) D1 R1',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
@@ -1564,7 +1564,9 @@ def all_boards ():
     print('')
 
     missingboards = []
-    for id in boardlist:
+    boardlistsortedbydisplayedname = [ k for k in sorted(boardlist, key = lambda item: boards[item]['name']) ]
+    sortedrequiredfirst = requiredboards + [ item for item in boardlistsortedbydisplayedname if item not in requiredboards ]
+    for id in sortedrequiredfirst:
         if id not in boards:
             missingboards += [ id ];
             continue

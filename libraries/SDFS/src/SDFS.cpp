@@ -37,6 +37,8 @@ FS SDFS = FS(FSImplPtr(new sdfs::SDFSImpl()));
 
 namespace sdfs {
 
+// Required to be global because SDFAT doesn't allow a this pointer in it's own time call
+time_t (*__sdfs_timeCallback)(void) = nullptr;
 
 FileImplPtr SDFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {

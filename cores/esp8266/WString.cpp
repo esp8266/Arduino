@@ -45,17 +45,15 @@ String::String(const __FlashStringHelper *pstr) {
     *this = pstr; // see operator =
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-String::String(String &&rval) {
+String::String(String &&rval) noexcept {
     init();
     move(rval);
 }
 
-String::String(StringSumHelper &&rval) {
+String::String(StringSumHelper &&rval) noexcept {
     init();
     move(rval);
 }
-#endif
 
 String::String(char c) {
     init();
@@ -223,36 +221,11 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
     return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-void String::move(String &rhs) {
-    if (buffer()) {
-        if (capacity() >= rhs.len()) {
-            memmove_P(wbuffer(), rhs.buffer(), rhs.length() + 1);
-            setLen(rhs.len());
-            rhs.invalidate();
-            return;
-        } else {
-            if (!isSSO()) {
-                free(wbuffer());
-                setBuffer(nullptr);
-            }
-        }
-    }
-    if (rhs.isSSO()) {
-        setSSO(true);
-        memmove_P(sso.buff, rhs.sso.buff, sizeof(sso.buff));
-    } else {
-        setSSO(false);
-        setBuffer(rhs.wbuffer());
-    }
-    setCapacity(rhs.capacity());
-    setLen(rhs.len());
-    rhs.setSSO(false);
-    rhs.setCapacity(0);
-    rhs.setLen(0);
-    rhs.setBuffer(nullptr);
+void String::move(String &rhs) noexcept {
+    invalidate();
+    sso = rhs.sso;
+    rhs.init();
 }
-#endif
 
 String & String::operator =(const String &rhs) {
     if (this == &rhs)
@@ -266,19 +239,17 @@ String & String::operator =(const String &rhs) {
     return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-String & String::operator =(String &&rval) {
+String & String::operator =(String &&rval) noexcept {
     if (this != &rval)
         move(rval);
     return *this;
 }
 
-String & String::operator =(StringSumHelper &&rval) {
+String & String::operator =(StringSumHelper &&rval) noexcept {
     if (this != &rval)
         move(rval);
     return *this;
 }
-#endif
 
 String & String::operator =(const char *cstr) {
     if (cstr)
@@ -646,17 +617,33 @@ int String::indexOf(char ch, unsigned int fromIndex) const {
     return temp - buffer();
 }
 
+int String::indexOf(const __FlashStringHelper *s2) const {
+    return indexOf(s2, 0);
+}
+
+int String::indexOf(const __FlashStringHelper *s2, unsigned int fromIndex) const {
+    return indexOf((const char*) s2, fromIndex);
+}
+
+int String::indexOf(const char *s2) const {
+    return indexOf(s2, 0);
+}
+
+int String::indexOf(const char *s2, unsigned int fromIndex) const {
+    if (fromIndex >= len())
+        return -1;
+    const char *found = strstr_P(buffer() + fromIndex, s2);
+    if (found == NULL)
+        return -1;
+    return found - buffer();
+}
+
 int String::indexOf(const String &s2) const {
     return indexOf(s2, 0);
 }
 
 int String::indexOf(const String &s2, unsigned int fromIndex) const {
-    if (fromIndex >= len())
-        return -1;
-    const char *found = strstr(buffer() + fromIndex, s2.buffer());
-    if (found == NULL)
-        return -1;
-    return found - buffer();
+    return indexOf(s2.c_str(), fromIndex);
 }
 
 int String::lastIndexOf(char theChar) const {

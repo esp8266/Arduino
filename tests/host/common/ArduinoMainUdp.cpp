@@ -29,11 +29,6 @@
  DEALINGS WITH THE SOFTWARE.
 */
 
-#include "lwip/opt.h"
-#include "lwip/udp.h"
-#include "lwip/inet.h"
-#include "lwip/igmp.h"
-#include "lwip/mem.h"
 #include <include/UdpContext.h>
 #include <poll.h>
 #include <map>

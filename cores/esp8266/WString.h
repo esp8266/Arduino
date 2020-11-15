@@ -53,13 +53,14 @@ class String {
         // if the initial value is null or invalid, or if memory allocation
         // fails, the string will be marked as invalid (i.e. "if (s)" will
         // be false).
-        String(const char *cstr = nullptr);
+        String() {
+            init();
+        }
+        String(const char *cstr);
         String(const String &str);
         String(const __FlashStringHelper *str);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-        String(String &&rval);
-        String(StringSumHelper &&rval);
-#endif
+        String(String &&rval) noexcept;
+        String(StringSumHelper &&rval) noexcept;
         explicit String(char c);
         explicit String(unsigned char, unsigned char base = 10);
         explicit String(int, unsigned char base = 10);
@@ -95,10 +96,8 @@ class String {
         String & operator =(const String &rhs);
         String & operator =(const char *cstr);
         String & operator = (const __FlashStringHelper *str);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-        String & operator =(String &&rval);
-        String & operator =(StringSumHelper &&rval);
-#endif
+        String & operator =(String &&rval) noexcept;
+        String & operator =(StringSumHelper &&rval) noexcept;
 
         // concatenate (works w/ built-in types)
 
@@ -236,6 +235,10 @@ class String {
         // search
         int indexOf(char ch) const;
         int indexOf(char ch, unsigned int fromIndex) const;
+        int indexOf(const char *str) const;
+        int indexOf(const char *str, unsigned int fromIndex) const;
+        int indexOf(const __FlashStringHelper *str) const;
+        int indexOf(const __FlashStringHelper *str, unsigned int fromIndex) const;
         int indexOf(const String &str) const;
         int indexOf(const String &str, unsigned int fromIndex) const;
         int lastIndexOf(char ch) const;
@@ -316,9 +319,7 @@ class String {
         // copy and move
         String & copy(const char *cstr, unsigned int length);
         String & copy(const __FlashStringHelper *pstr, unsigned int length);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-        void move(String &rhs);
-#endif
+        void move(String &rhs) noexcept;
 };
 
 class StringSumHelper: public String {

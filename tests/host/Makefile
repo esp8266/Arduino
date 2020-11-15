@@ -169,11 +169,12 @@ DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP
 endif
 
 FLAGS += $(DEBUG) -Wall $(OPTZ) -fno-common -g $(M32)
-FLAGS += -fstack-check -fstack-protector-all
+FLAGS += -fstack-protector-all
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
+FLAGS += -DF_CPU=80000000
 FLAGS += $(MKFLAGS)
 FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spurious warnings
 FLAGS += $(USERCFLAGS)
@@ -267,6 +268,7 @@ ARDUINO_LIBS := \
 		IPAddress.cpp \
 		Updater.cpp \
 		base64.cpp \
+		LwipIntfCB.cpp \
 	) \
 	$(addprefix ../../libraries/ESP8266WiFi/src/,\
 		ESP8266WiFi.cpp \
@@ -295,6 +297,12 @@ OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 		LEAmDNS_Structs.cpp \
 		LEAmDNS_Transfer.cpp \
 		ESP8266mDNS.cpp \
+		LEAmDNS2Host.cpp \
+		LEAmDNS2Host_Control.cpp \
+		LEAmDNS2Host_Debug.cpp \
+		LEAmDNS2Host_Structs.cpp \
+		LEAmDNS2Host_Transfer.cpp \
+		LEAmDNS2_Backbone.cpp \
 	) \
 	ArduinoOTA/ArduinoOTA.cpp \
 	DNSServer/src/DNSServer.cpp \
