@@ -53,7 +53,7 @@ class String {
         // if the initial value is null or invalid, or if memory allocation
         // fails, the string will be marked as invalid (i.e. "if (s)" will
         // be false).
-        String() {
+        String() __attribute__((always_inline)) { // See init()
             init();
         }
         String(const char *cstr);
@@ -323,10 +323,16 @@ class String {
         char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
 
     protected:
-        void init(void) {
-            sso.buff[0] = 0;
-            sso.len     = 0;
-            sso.isHeap  = 0;
+        void init(void) __attribute__((always_inline)) {
+            sso.buff[0]  = 0; // In the Xtensa ISA, in fact, 32-bit store insn ("S32I.N") is one-byte shorter than 8-bit one ("S8I").
+            sso.buff[1]  = 0; // Thanks to store-merging optimization, these 9 lines emit only 3 insns:
+            sso.buff[2]  = 0; //   "MOVI.N aX,0", "S32I.N aX,a2,0" and "S32I.N aX,a2,8" (6 bytes in total)
+            sso.buff[3]  = 0;
+            sso.buff[8]  = 0; // Unfortunately, GCC seems not to re-evaluate the cost of inlining after the store-merging optimizer stage,
+            sso.buff[9]  = 0; // `always_inline` attribute is necessary in order to assure inlining.
+            sso.buff[10] = 0;
+            sso.len      = 0;
+            sso.isHeap   = 0;
         }
         void invalidate(void);
         unsigned char changeBuffer(unsigned int maxStrLen);
