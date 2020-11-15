@@ -34,6 +34,7 @@ static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
+static const char ETAG_HEADER[] PROGMEM = "If-None-Match";
 
 namespace esp8266webserver {
 
@@ -618,6 +619,20 @@ void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys
   }
 }
 
+template<typename ServerType>
+void ESP8266WebServerETagTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+  WST::_headerKeysCount = headerKeysCount + 2;
+  if (WST::_currentHeaders){
+    delete[] WST::_currentHeaders;
+  }
+  WST::_currentHeaders = new typename WST::RequestArgument[WST::_headerKeysCount];
+  WST::_currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
+  WST::_currentHeaders[1].key = FPSTR(ETAG_HEADER);
+  for (int i = 2; i < WST::_headerKeysCount; i++){
+      WST::_currentHeaders[i].key = headerKeys[i-2];
+  }
+}
+
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::header(int i) const {
   if (i < _headerKeysCount)
@@ -829,6 +844,39 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
         break;
     }
     return String(r);
+}
+
+template<typename ServerType>
+void ESP8266WebServerETagTemplate<ServerType>::serveStaticETag(const char* uri, FS& fs, const char* path, const char* cache_header){
+  WST::_addRequestHandler(new StaticRequestETagHandler<ServerType>(fs, path, uri, cache_header));
+}
+
+template<typename ServerType>
+void ESP8266WebServerETagTemplate<ServerType>::serveStaticETag(const char* uri, FS& fs, const char * path) {
+
+  File toHash = fs.open(path, "r");
+
+  if(toHash){
+
+    MD5Builder calcMD5;
+    calcMD5.begin();
+
+    calcMD5.addStream(toHash, toHash.size());
+
+    toHash.close();
+
+    calcMD5.calculate();
+
+    uint8_t buff[16];
+
+    calcMD5.getBytes(buff);
+
+    const String etag = "\"" + base64::encode(buff, 16, false) + "\"";
+
+    serveStaticETag(uri, fs, path, etag.c_str());
+
+  }
+    
 }
 
 } // namespace
