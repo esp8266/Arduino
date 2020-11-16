@@ -304,10 +304,12 @@ protected:
 template<typename ServerType>
 class ESP8266WebServerETagTemplate : public ESP8266WebServerTemplate<ServerType>
 {
-  using WST = ESP8266WebServerTemplate<ServerType>;
+  // using WST = ESP8266WebServerTemplate<ServerType>;
 
-  using WST::WST;
+  // using WST::WST;
 
+  using ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate;
+  
   public:
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
   void serveStaticETag(const char* uri, FS& fs, const char* path, const char* cache_header);
