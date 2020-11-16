@@ -54,7 +54,7 @@ env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
     CFLAGS=[
-        "-std=c17",
+        "-std=gnu17",
         "-Wpointer-arith",
         "-Wno-implicit-function-declaration",
         "-Wl,-EL",
