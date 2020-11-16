@@ -38,19 +38,19 @@
 
 extern "C" {
 
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
-#define ALIGN_UP(a, s) ((decltype(a))((((uintptr_t)(a)) + (s-1)) & ~(s-1)))
-
-// Famous locations in Boot ROM
-constexpr uint32_t _xtos_unhandled_exception__bp_address = 0x4000DC4Bu;
-constexpr uint32_t _xtos_unhandled_interrupt__bp_address = 0x4000DC3Cu;
-
 /*
   The Boot ROM `__divsi3` function handles a divide by 0 by branching to the
   `ill` instruction at address 0x4000dce5. By looking for this address in epc1
   we can separate the divide by zero event from other `ill` instruction events.
 */
 constexpr uint32_t divide_by_0_exception = 0x4000dce5u;
+
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+#define ALIGN_UP(a, s) ((decltype(a))((((uintptr_t)(a)) + (s-1)) & ~(s-1)))
+
+// Famous locations in Boot ROM
+constexpr uint32_t _xtos_unhandled_exception__bp_address = 0x4000DC4Bu;
+constexpr uint32_t _xtos_unhandled_interrupt__bp_address = 0x4000DC3Cu;
 
 /*
   For exceptions that are directed to one of the general exception vectors
