@@ -24,7 +24,7 @@ values=$tz_tmpdir/values.txt
 
 wget -O $input $csv  || curl $csv > $input
 
-sed -e 's/^[^,]*,//g' -e 's,^,PSTR(,g' -e 's,$,),g' -e 's,<[^>]*>,UNK,g' < $input > $values
+sed -e 's/^[^,]*,//g' -e 's,^,PSTR(,g' -e 's,$,),g' < $input > $values
 sed -e 's/^\([^,]*\),.*/#define TZ_\1/g' -e 's,["],,g' < $input | tr '/\-+' '_mp' > $names
 
 (
