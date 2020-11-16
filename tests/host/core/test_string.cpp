@@ -245,6 +245,10 @@ TEST_CASE("String nulls", "[core][String]")
     REQUIRE(s.lastIndexOf("tacos") == -1);
     REQUIRE(s.lastIndexOf('t', 0) == -1);
     REQUIRE(s.lastIndexOf('t') == -1);
+    REQUIRE(s.indexOf(String("tacos"), 1) == -1);
+    REQUIRE(s.indexOf(String("tacos")) == -1);
+    REQUIRE(s.indexOf(F("tacos"), 1) == -1);
+    REQUIRE(s.indexOf(F("tacos")) == -1);
     REQUIRE(s.indexOf("tacos", 1) == -1);
     REQUIRE(s.indexOf("tacos") == -1);
     REQUIRE(s.indexOf('t', 1) == -1);

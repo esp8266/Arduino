@@ -59,7 +59,7 @@ extern "C" {
 
 #endif
 
-#ifdef DEBUG_ESP_SSL
+#if defined(DEBUG_ESP_SSL) && defined(DEBUG_ESP_PORT)
 #define DEBUG_BSSL(fmt, ...)  DEBUG_ESP_PORT.printf_P((PGM_P)PSTR( "BSSL:" fmt), ## __VA_ARGS__)
 #else
 #define DEBUG_BSSL(...)
@@ -97,7 +97,6 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
   _use_self_signed = false;
   _knownkey = nullptr;
   _ta = nullptr;
-  _axtls_ta = nullptr;
 }
 
 
@@ -106,8 +105,6 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
   _sk = nullptr;
-  _axtls_chain = nullptr;
-  _axtls_sk = nullptr;
   stack_thunk_add_ref();
 }
 
@@ -124,10 +121,6 @@ WiFiClientSecure::~WiFiClientSecure() {
   _cipher_list = nullptr; // std::shared will free if last reference
   _freeSSL();
   stack_thunk_del_ref();
-  // Clean up any dangling axtls compat structures, if needed
-  _axtls_ta = nullptr;
-  _axtls_chain = nullptr;
-  _axtls_sk = nullptr;
 }
 
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
@@ -671,7 +664,7 @@ extern "C" {
     if (!xc->done_cert) {
       br_sha1_update(&xc->sha1_cert, buf, len);
       br_x509_decoder_push(&xc->ctx, (const void*)buf, len);
-#ifdef DEBUG_ESP_SSL
+#if defined(DEBUG_ESP_SSL) && defined(DEBUG_ESP_PORT)
       DEBUG_BSSL("CERT: ");
       for (size_t i=0; i<len; i++) {
         DEBUG_ESP_PORT.printf_P(PSTR("%02x "), buf[i] & 0xff);
@@ -1261,11 +1254,22 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
 int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
   int err = 0;
   const char *t = PSTR("OK");
+  const char *recv_fatal = "";
+  const char *send_fatal = "";
   if (_sc || _sc_svr) {
     err = br_ssl_engine_last_error(_eng);
   }
   if (_oom_err) {
     err = -1000;
+  } else {
+    if (err & BR_ERR_RECV_FATAL_ALERT) {
+      recv_fatal = PSTR("SSL received fatal alert - ");
+      err &= ~BR_ERR_RECV_FATAL_ALERT;
+    }
+    if (err & BR_ERR_SEND_FATAL_ALERT) {
+      send_fatal = PSTR("SSL sent fatal alert - ");
+      err &= ~BR_ERR_SEND_FATAL_ALERT;
+    }
   }
   switch (err) {
     case -1000: t = PSTR("Unable to allocate memory for SSL structures and buffers."); break;
@@ -1330,8 +1334,8 @@ int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
     default: t = PSTR("Unknown error code."); break;
   }
   if (dest) {
-    strncpy_P(dest, t, len);
-    dest[len - 1] = 0;
+    // snprintf is PSTR safe and guaranteed to 0-terminate
+    snprintf(dest, len, "%s%s%s", recv_fatal, send_fatal, t);
   }
   return err;
 }
@@ -1574,81 +1578,6 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
     }
   }
   return _SendAbort(probe, supportsLen);
-}
-
-
-// AXTLS compatibility interfaces
-bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size) {
-  _axtls_ta = nullptr;
-  _axtls_ta = std::shared_ptr<X509List>(new X509List(pk, size));
-  _ta = _axtls_ta.get();
-  return _ta ? true : false;
-}
-
-bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size) {
-  _axtls_chain = nullptr;
-  _axtls_chain = std::shared_ptr<X509List>(new X509List(pk, size));
-  _chain = _axtls_chain.get();
-  return _chain ? true : false;
-}
-
-bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
-  _axtls_sk = nullptr;
-  _axtls_sk = std::shared_ptr<PrivateKey>(new PrivateKey(pk, size));
-  _sk = _axtls_sk.get();
-  return _sk ? true : false;
-
-}
-
-uint8_t *WiFiClientSecure::_streamLoad(Stream& stream, size_t size) {
-  uint8_t *dest = (uint8_t*)malloc(size);
-  if (!dest) {
-    return nullptr;
-  }
-  if (size != stream.readBytes(dest, size)) {
-    free(dest);
-    return nullptr;
-  }
-  return dest;
-}
-
-bool WiFiClientSecure::loadCACert(Stream& stream, size_t size) {
-  uint8_t *dest = _streamLoad(stream, size);
-  bool ret = false;
-  if (dest) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    ret = setCACert(dest, size);
-#pragma GCC diagnostic pop
-  }
-  free(dest);
-  return ret;
-}
-
-bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size) {
-  uint8_t *dest = _streamLoad(stream, size);
-  bool ret = false;
-  if (dest) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    ret = setCertificate(dest, size);
-#pragma GCC diagnostic pop
-  }
-  free(dest);
-  return ret;
-}
-
-bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
-  uint8_t *dest = _streamLoad(stream, size);
-  bool ret = false;
-  if (dest) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    ret = setPrivateKey(dest, size);
-#pragma GCC diagnostic pop
-  }
-  free(dest);
-  return ret;
 }
 
 };

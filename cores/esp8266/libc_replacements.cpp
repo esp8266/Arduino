@@ -127,6 +127,7 @@ void _exit(int status) {
     abort();
 }
 
+int atexit(void (*func)()) __attribute__((weak));
 int atexit(void (*func)()) {
     (void) func;
     return 0;
