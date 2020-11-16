@@ -343,11 +343,11 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
+    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
+
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
     postmortem_init();
 #endif
-
-    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,

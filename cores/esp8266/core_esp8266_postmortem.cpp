@@ -39,9 +39,78 @@
 extern "C" {
 
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+#define ALIGN_UP(a, s) ((decltype(a))((((uintptr_t)(a)) + (s-1)) & ~(s-1)))
+
+// Famous locations in Boot ROM
+constexpr uint32_t _xtos_unhandled_exception__bp_address = 0x4000DC4Bu;
+constexpr uint32_t _xtos_unhandled_interrupt__bp_address = 0x4000DC3Cu;
+
+/*
+  The Boot ROM `__divsi3` function handles a divide by 0 by branching to the
+  `ill` instruction at address 0x4000dce5. By looking for this address in epc1
+  we can separate the divide by zero event from other `ill` instruction events.
+*/
+constexpr uint32_t divide_by_0_exception = 0x4000dce5u;
+
+/*
+  For exceptions that are directed to one of the general exception vectors
+  (UserExceptionVector, KernelExceptionVector, or DoubleExceptionVector) there
+  are 64 possible causes. The exception cause register EXCCAUSE has the value.
+  The value is in the lower 6 bits (5 ... 0). Other bits in the register are
+  reserved and may need to be truncated before use.
+*/
+constexpr size_t max_num_exccause_values = 64u;
+
+/*
+  The Boot ROM sets up a table of dispatch handlers at 0x3FFFC000.
+  This table has an entry for each of the EXCCAUSE values, 0 through 63.
+
+  Entries that do not have a specific handler are set to
+  `_xtos_unhandled_exception`. This handler will execute a `break 1, 1`
+  (0x4000DC4Bu) before doing a `rfe` (return from exception).  Since the PC has
+  not been changed, the event that caused the 1st exception will likely keep
+  repeating until the HWDT kicks in.
+
+  This table is normally managed through calls to _xtos_set_exception_handler()
+*/
+using _xtos_handler = void (*)(void);
+constexpr uint32_t exception_dispatch_table = 0x3FFFC000u;
+static _xtos_handler * const _xtos_exc_handler_table = (_xtos_handler *)exception_dispatch_table;
+
+/*
+  Xtensa ® Instruction Set Architecture (ISA) Reference Manual, p90:
+  EXCCAUSE value 20, InstFetchProhibitedCause - An instruction fetch referenced
+  a page mapped with an attribute that does not  permit instruction fetch.
+*/
+constexpr uint32_t instFetchProhibitedCause = 20u;
+
 extern void _DebugExceptionVector(void);
 extern void _KernelExceptionVector(void);
 extern void _DoubleExceptionVector(void);
+
+void postmortem_debug_exception_vector(void);
+void postmortem_kernel_exception_handler(void);
+void postmortem_double_exception_handler(void);
+
+/*
+  I cannot find official documentation for the size and offset addresse for
+  the exception vectors. These values were inferred from one of the Boot ROM
+  listings out on the Internet.
+*/
+constexpr size_t max_debug_exc_vector_size = 16u;
+constexpr size_t max_kernel_exc_vector_size = 32u;
+constexpr size_t max_double_exc_vector_size = 16u;
+
+// These function entry points are for computation ONLY they are NOT aligned as functions
+extern void *postmortem_debug_exception_vector_last;
+extern void *postmortem_kernel_exception_handler_last;
+extern void *postmortem_double_exception_handler_last;
+extern void *postmortem_double_exception_handler_ill;
+
+// Calculate the location address of where the `ill` instruction that is
+// used/leveraged to flag exceptions: Debug, Kerne, and Double Exceptions.
+// See "Handle breakpoints via postmortem ..." below for more details.
+const uint32_t bp_ill_address = (uintptr_t)_DoubleExceptionVector + ((uintptr_t)&postmortem_double_exception_handler_ill - (uintptr_t)postmortem_double_exception_handler);
 
 // Context structure used by Debug, Double, Kernel Exception and unhandled
 // exception stubs to build a stack frame with potentially useful addresses for
@@ -57,6 +126,7 @@ struct EXC_CONTEXT{
     uint32_t a1;          // +24
     uint32_t excsave1;    // +28, a0 at the time of the event
 };
+
 #endif
 
 // These will be pointers to PROGMEM const strings
@@ -156,7 +226,7 @@ void __wrap_system_restart_local() {
     */
     if (rst_info.reason == REASON_EXCEPTION_RST && rst_info.exccause == 0) {
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
-        if ((rst_info.epc1 - 11u) == (uint32_t)_DoubleExceptionVector) {
+        if (rst_info.epc1 == bp_ill_address) {
             struct EXC_CONTEXT *exc_context;
             asm volatile("rsr.excsave2 %0\n\t" : "=a" (exc_context) :: "memory");
             // Use Special Register values from before the `ill` instruction.
@@ -176,9 +246,9 @@ void __wrap_system_restart_local() {
             }
             // BP - Debug Exception
             else if (rst_info.epc2) {
-                if (rst_info.epc2 == 0x4000dc4bu) {
+                if (rst_info.epc2 == _xtos_unhandled_exception__bp_address) {
                     // Unhandled Exceptions land here. 'break 1, 1' in _xtos_unhandled_exception
-                    if (20u == exc_context->exccause) {
+                    if (instFetchProhibitedCause == exc_context->exccause) {
                         // This could be the result from a jump or call; a call
                         // is more likely. eg. calling a null callback function
                         // For the call case, a0 is likely the return address.
@@ -186,7 +256,7 @@ void __wrap_system_restart_local() {
                     }
                     ets_printf_P(PSTR("\nXTOS Unhandled exception - BP"));
                 }
-                else if (rst_info.epc2 == 0x4000dc3cu) {
+                else if (rst_info.epc2 == _xtos_unhandled_interrupt__bp_address) {
                     // Unhandled interrupts land here. 'break 1, 15' in _xtos_unhandled_interrupt
                     ets_printf_P(PSTR("\nXTOS Unhandled interrupt - BP"));
                     // Don't know what should be done here if anything.
@@ -208,7 +278,7 @@ void __wrap_system_restart_local() {
 #endif
         // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
         // In that case, print the exception as (6) which is IntegerDivZero
-        if (rst_info.epc1 == 0x4000dce5u) {
+        if (rst_info.epc1 == divide_by_0_exception) {
             rst_info.exccause = 6;
         }
     }
@@ -445,7 +515,6 @@ void __stack_chk_fail(void) {
 //  Stage Exception Vector Stubs to be copied into respective vector address
 //  space in ICACHE/PROGMEM address space.
 //
-void postmortem_debug_exception_vector(void);
 asm(  // 16 bytes MAX, using 16
     ".section     .text.postmortem_debug_exception_vector,\"ax\",@progbits\n\t"
     ".align       4\n\t"
@@ -461,10 +530,10 @@ asm(  // 16 bytes MAX, using 16
     "rsr.ps       a0\n\t"
     "s32i         a0,     a1,     0\n\t"
     "j            . + 86\n\t"             // finish with postmortem_double_exception_handler_part2
+"postmortem_debug_exception_vector_last:\n\t"
     ".size postmortem_debug_exception_vector, .-postmortem_debug_exception_vector\n\t"
 );
 
-void postmortem_kernel_exception_handler(void);
 asm(  // 32 bytes MAX, using 31
     ".section     .text.postmortem_kernel_exception_handler,\"ax\",@progbits\n\t"
     ".align       4\n\t"
@@ -486,11 +555,10 @@ asm(  // 32 bytes MAX, using 31
     // save current exccause
     "rsr.exccause a0\n\t"
     "j            . - 54\n\t"   // continue at postmortem_debug_exception_vector_part2
-
+"postmortem_kernel_exception_handler_last:\n\t"
     ".size postmortem_kernel_exception_handler, .-postmortem_kernel_exception_handler\n\t"
 );
 
-void postmortem_double_exception_handler(void);
 asm(  // 16 byte MAX, using 14
     ".section     .text.postmortem_double_exception_handler,\"ax\",@progbits\n\t"
     ".align       4\n\t"
@@ -511,7 +579,9 @@ asm(  // 16 byte MAX, using 14
     // Let _UserExceptionVector finish processing the exception as an
     // exception(0). Adjust results at __wrap_system_restart_local so that `ESP
     // Exception Decoder` reports the state before this `ill` instruction.
+"postmortem_double_exception_handler_ill:\n\t"
     "ill\n\t"
+"postmortem_double_exception_handler_last:\n\t"
     ".size postmortem_double_exception_handler, .-postmortem_double_exception_handler\n\t"
 );
 
@@ -528,9 +598,6 @@ asm(  // 16 byte MAX, using 14
   reset. If interrupts are at INTLEVEL 2 or higher (a BP instruction becomes a
   NOP), you still see a HWDT reset regardless of running GDB.
 */
-typedef void (* _xtos_handler)(void);
-static  _xtos_handler * const _xtos_exc_handler_table = (_xtos_handler *)0x3FFFC000u;
-#define ROM_xtos_unhandled_exception (reinterpret_cast<_xtos_handler>(0x4000dc44))
 
 void postmortem_xtos_unhandled_exception(void);
 asm(
@@ -543,7 +610,7 @@ asm(
     // Rewind Boot ROM User Exception prologue and continue to
     // _KernelExceptionVector such that we look like a Debug BP Exception
     // sitting at 'break 1, 1' in the _xtos_unhandled_exception handler.
-    "movi         a2,     0x4000dc4bu\n\t"
+    "movi         a2,     0x4000dc4bu\n\t"  // _xtos_unhandled_exception__bp_address
     "wsr.epc2     a2\n\t"
     "l32i         a2,     a1,     20\n\t"
     "l32i         a3,     a1,     24\n\t"
@@ -564,10 +631,15 @@ static void replace_exception_handler_on_match(
     }
 }
 
+// While _xtos_unhandled_exception is in the linker .ld file, it may have been
+// overridden. We require the original Boot ROM function address to limit our
+// override to those old values in the table.
+const _xtos_handler ROM_xtos_unhandled_exception = (reinterpret_cast<_xtos_handler>(0x4000dc44));
+
 static void install_unhandled_exception_handler(void) {
     // Only replace Exception Table entries still using the orignal Boot ROM
     // _xtos_unhandled_exception handler.
-    for (size_t i = 0; i < 64; i++) {
+    for (size_t i = 0; i < max_num_exccause_values; i++) {
         replace_exception_handler_on_match(
             i,
             ROM_xtos_unhandled_exception,
@@ -580,19 +652,35 @@ void postmortem_init(void) {
         // Install all three (interdependent) exception handler stubs.
         // Length of copy must be rounded up to copy memory in aligned 4 byte
         // increments to comply with IRAM memory access requirements.
-        uint32_t save_ps = xt_rsil(15);
-        ets_memcpy((void*)_DebugExceptionVector, (void*)postmortem_debug_exception_vector, 16);
-        ets_memcpy((void*)_KernelExceptionVector, (void*)postmortem_kernel_exception_handler, 32);
-        ets_memcpy((void*)_DoubleExceptionVector, (void*)postmortem_double_exception_handler, 16);
-        asm volatile(
-            "movi.n       a2,   0\n\t"
-            "wsr.epc2     a2\n\t"
-            "wsr.excsave2 a2\n\t"
-            "wsr.depc     a2\n\t"
-            ::: "a2"
-        );
-        install_unhandled_exception_handler();
-        xt_wsr_ps(save_ps);
+        const size_t debug_vector_sz  = ALIGN_UP((uintptr_t)&postmortem_debug_exception_vector_last   - (uintptr_t)postmortem_debug_exception_vector, 4);
+        const size_t kernel_vector_sz = ALIGN_UP((uintptr_t)&postmortem_kernel_exception_handler_last - (uintptr_t)postmortem_kernel_exception_handler, 4);
+        const size_t double_vector_sz = ALIGN_UP((uintptr_t)&postmortem_double_exception_handler_last - (uintptr_t)postmortem_double_exception_handler, 4);
+#ifdef DEBUG_POSTMORTEM_EXCEPTION_VERIFY_SIZES
+        if (max_debug_exc_vector_size < debug_vector_sz ||
+            max_kernel_exc_vector_size < kernel_vector_sz ||
+            max_double_exc_vector_size < double_vector_sz)
+        {
+            ets_printf_P(PSTR("\npostmortem_init: Internal Error: exception vector size(s) too big\n"));
+            ets_printf_P(PSTR("  debug_vector_sz(%u), kernel_vector_sz(%u), double_vector_sz(%u)\n"),
+                debug_vector_sz, kernel_vector_sz, double_vector_sz);
+        } else
+#endif
+        {
+
+            uint32_t save_ps = xt_rsil(15);
+            ets_memcpy((void*)_DebugExceptionVector, (void*)postmortem_debug_exception_vector, debug_vector_sz);
+            ets_memcpy((void*)_KernelExceptionVector, (void*)postmortem_kernel_exception_handler, kernel_vector_sz);
+            ets_memcpy((void*)_DoubleExceptionVector, (void*)postmortem_double_exception_handler, double_vector_sz);
+            asm volatile(
+                "movi.n       a2,   0\n\t"
+                "wsr.epc2     a2\n\t"
+                "wsr.excsave2 a2\n\t"
+                "wsr.depc     a2\n\t"
+                ::: "a2"
+            );
+            install_unhandled_exception_handler();
+            xt_wsr_ps(save_ps);
+        }
     }
 }
 
