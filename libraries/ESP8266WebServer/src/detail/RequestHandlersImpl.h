@@ -172,41 +172,103 @@ public StaticRequestHandler<ServerType> {
 
     using SRH = StaticRequestHandler<ServerType>;
 
-    using SRH::SRH;
-
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
 
+    protected:
+    uint8_t _ETag_md5[16];
+   
+    void computeMD5(File toHash){
+        MD5Builder calcMD5;
+        calcMD5.begin();
+        calcMD5.addStream(toHash, toHash.size());
+        calcMD5.calculate();
+        calcMD5.getBytes(_ETag_md5);
+    }
+
+
     public:
+    StaticRequestETagHandler(FS& fs, const char* path, const char* uri, const char* cache_header)
+        :
+    StaticRequestHandler<ServerType>{fs, path, uri, cache_header}
+    {
+        File f = fs.open(path, "r");
+        if(f){
+            if(f.isFile())
+                computeMD5(f);
+            f.close();
+        }
+
+    }
+
     bool handle(WebServerType& server, HTTPMethod requestMethod, const String & requestUri) override {
         if (!SRH::canHandle(requestMethod, requestUri)){
             return false;
         }
 
-        if(server.header("If-None-Match") == SRH::_cache_header){
-            // Serial.println("Sending 304!!!");
+        const String etag = "\"" + base64::encode(_ETag_md5, 16, false) + "\"";
+
+        if(server.header("If-None-Match") == etag){
             server.send(304);
             return true;
         }
 
-
         File f = SRH::_fs.open(SRH::_path, "r");
 
-        if (!f){
+        if (!f)
             return false;
-        }
 
         if (!f.isFile()) {
             f.close();
             return false;
         }
 
-        if (SRH::_cache_header.length() != 0){
-            server.sendHeader("ETag", SRH::_cache_header);
-        }
+        if (SRH::_cache_header.length() != 0)
+            server.sendHeader("Cache-Control", SRH::_cache_header);
+
+        server.sendHeader("ETag", etag);
+
 
         server.streamFile(f, SRH::getContentType(SRH::_path), requestMethod);
         return true;
+
     }
+
+    // bool handle(WebServerType& server, HTTPMethod requestMethod, const String & requestUri) override {
+    //     if (!SRH::canHandle(requestMethod, requestUri)){
+    //         return false;
+    //     }
+
+    //     File f = SRH::_fs.open(SRH::_path, "r");
+
+    //     if (!f)
+    //         return false;
+
+    //     if (!f.isFile()) {
+    //         f.close();
+    //         return false;
+    //     }
+
+    //     if(last_edit == f.getLastWrite()){
+    //         //update chache
+    //     }
+
+    //     const String etag = "\"" + base64::encode(buff, 16, false) + "\"";
+
+    //     if(server.header("If-None-Match") == etag){
+    //         server.send(304);
+    //         return true;
+    //     }
+
+    //     if (_cache_header.length() != 0)
+    //         server.sendHeader("Cache-Control", SRH::_cache_header);
+
+    //     server.sendHeader("ETag", etag);
+
+
+    //     server.streamFile(f, SRH::getContentType(SRH::_path), requestMethod);
+    //     return true;
+
+    // }
         
 };
 
