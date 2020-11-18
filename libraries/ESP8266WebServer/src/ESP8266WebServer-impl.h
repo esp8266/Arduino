@@ -848,14 +848,19 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
 
 template<typename ServerType>
 void ESP8266WebServerETagTemplate<ServerType>::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header){
-  WST::_addRequestHandler(new StaticRequestETagHandler<ServerType>(fs, path, uri, cache_header));
+
+  bool is_file = false;
+
+  if (fs.exists(path)) {
+    File file = fs.open(path, "r");
+    is_file = file && file.isFile();
+    file.close();
+  }
+
+  if(is_file)
+    WST::_addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
+  else
+    WST::_addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
 }
-
-
-// template<typename ServerType>
-// void ESP8266WebServerETagTemplate<ServerType>::serveStatic(const char* uri, FS& fs, const char * path) {
-//   serveStatic(uri, fs, path, "");
-    
-// }
 
 } // namespace
