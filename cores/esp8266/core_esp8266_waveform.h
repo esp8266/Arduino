@@ -3,6 +3,7 @@
                      supporting outputs on all pins in parallel.
 
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
+  Copyright (c) 2020 Dirk O. Kaar.
 
   The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
@@ -19,7 +20,7 @@
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
-  Everywhere in the code where "cycles" is used, it means ESP.getCycleCount()
+  Everywhere in the code where "ccy" or "ccys" is used, it means ESP.getCycleCount()
   clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
   cycles (which may be 2 CPU clock cycles @ 160MHz).
 
@@ -48,13 +49,25 @@ extern "C" {
 #endif
 
 // Start or change a waveform of the specified high and low times on specific pin.
-// If runtimeUS > 0 then automatically stop it after that many usecs.
+// If runtimeUS > 0 then automatically stop it after that many usecs, relative to the next
+// full period.
+// If waveform is not yet started on pin, and on pin == alignPhase a waveform is running,
+// the new waveform is started at phaseOffsetUS phase offset, in microseconds, to that.
+// Setting autoPwm to true allows the wave generator to maintain PWM duty to idle cycle ratio
+// under load, for applications where frequency or duty cycle must not change, leave false.
 // Returns true or false on success or failure.
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
+int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS,
+  uint32_t runTimeUS = 0, int8_t alignPhase = -1, uint32_t phaseOffsetUS = 0, bool autoPwm = false);
 // Start or change a waveform of the specified high and low CPU clock cycles on specific pin.
-// If runtimeCycles > 0 then automatically stop it after that many CPU clock cycles.
+// If runtimeCycles > 0 then automatically stop it after that many CPU clock cycles, relative to the next
+// full period.
+// If waveform is not yet started on pin, and on pin == alignPhase a waveform is running,
+// the new waveform is started at phaseOffsetCcys phase offset, in CPU clock cycles, to that.
+// Setting autoPwm to true allows the wave generator to maintain PWM duty to idle cycle ratio
+// under load, for applications where frequency or duty cycle must not change, leave false.
 // Returns true or false on success or failure.
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles);
+int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys,
+  uint32_t runTimeCcys = 0, int8_t alignPhase = -1, uint32_t phaseOffsetCcys = 0, bool autoPwm = false);
 // Stop a waveform, if any, on the specified pin.
 // Returns true or false on success or failure.
 int stopWaveform(uint8_t pin);
