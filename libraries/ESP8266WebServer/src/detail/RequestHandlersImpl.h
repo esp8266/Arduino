@@ -72,7 +72,7 @@ public:
     , _path(path)
     , _cache_header(cache_header)
     {
-        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header == __null ? "" : cache_header);
+        DEBUGV("StaticRequestHandler: path=%s uri=%s, cache_header=%s\r\n", path, uri, cache_header == __null ? "" : cache_header);
     }
 
     bool validMethod(HTTPMethod requestMethod){
