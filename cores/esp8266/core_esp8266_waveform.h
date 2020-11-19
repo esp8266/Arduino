@@ -39,6 +39,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+#ifdef WAVEFORM_LOCKED_PHASE
+
 #include <Arduino.h>
 
 #ifndef __ESP8266_WAVEFORM_H
@@ -86,4 +88,6 @@ void setTimer1Callback(uint32_t (*fn)());
 }
 #endif
 
-#endif
+#endif // __ESP8266_WAVEFORM_H
+
+#endif // WAVEFORM_LOCKED_PHASE
