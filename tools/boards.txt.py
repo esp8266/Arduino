@@ -1467,6 +1467,18 @@ def led (name, default, ledList):
     return { name: led }
 
 ################################################################
+# Waveform flavour
+
+def waveform ():
+    return { 'waveform': collections.OrderedDict([
+                        ('.menu.waveform.phase', 'Locked Phase'),
+                        ('.menu.waveform.phase.build.waveform', '-DWAVEFORM_LOCKED_PHASE'),
+                        ('.menu.waveform.pwm', 'Locked PWM'),
+                        ('.menu.waveform.pwm.build.waveform', '-DWAVEFORM_LOCKED_PWM'),
+                    ])
+           }
+
+################################################################
 # sdk selection
 
 def sdk ():
@@ -1517,6 +1529,7 @@ def all_boards ():
     macros.update(led('led',    led_default, range(0,led_max+1)))
     macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
+    macros.update(waveform())
 
     if boardfilteropt or excludeboards:
         print('#')
@@ -1561,6 +1574,7 @@ def all_boards ():
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
+    print('menu.waveform=Waveform Flavour')
     print('')
 
     missingboards = []
@@ -1581,7 +1595,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'waveform' ]
         if 'macro' in board:
             macrolist += board['macro']
         macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
