@@ -26,21 +26,12 @@
 
 extern "C" {
 
-static uint32_t analogMap = 0;
 static int32_t analogScale = 255;  // Match upstream default, breaking change from 2.x.x
+
+#ifdef WAVEFORM_LOCKED_PHASE
+
+static uint32_t analogMap = 0;
 static uint16_t analogFreq = 1000;
-
-extern void __analogWriteRange(uint32_t range) {
-  if ((range >= 15) && (range <= 65535)) {
-    analogScale = range;
-  }
-}
-
-extern void __analogWriteResolution(int res) {
-  if ((res >= 4) && (res <= 16)) {
-    analogScale = (1 << res) - 1;
-  }
-}
 
 extern void __analogWriteFreq(uint32_t freq) {
   if (freq < 100) {
@@ -79,6 +70,24 @@ extern void __analogWrite(uint8_t pin, int val) {
   int phaseReference = __builtin_ffs(analogMap) - 1;
   if (startWaveformClockCycles(pin, high, low, 0, phaseReference, 0, true)) {
     analogMap |= (1 << pin);
+  }
+}
+
+#endif // WAVEFORM_LOCKED_PHASE
+
+#ifdef WAVEFORM_LOCKED_PWM
+
+#endif // WAVEFORM_LOCKED_PWM
+
+extern void __analogWriteRange(uint32_t range) {
+  if ((range >= 15) && (range <= 65535)) {
+    analogScale = range;
+  }
+}
+
+extern void __analogWriteResolution(int res) {
+  if ((res >= 4) && (res <= 16)) {
+    analogScale = (1 << res) - 1;
   }
 }
 

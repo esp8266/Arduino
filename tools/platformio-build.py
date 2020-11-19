@@ -238,6 +238,15 @@ else:
     )
 
 #
+# Waveform
+#
+if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM" in flatten_cppdefines:
+    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PWM", 1)])
+# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE (defaults)
+else:
+    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PHASE", 1)])
+
+#
 # VTables
 #
 
