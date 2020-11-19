@@ -255,7 +255,18 @@ void ESP8266WebServerTemplate<ServerType>::_addRequestHandler(RequestHandlerType
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
-    _addRequestHandler(new StaticRequestHandler<ServerType>(fs, path, uri, cache_header));
+  bool is_file = false;
+
+  if (fs.exists(path)) {
+    File file = fs.open(path, "r");
+    is_file = file && file.isFile();
+    file.close();
+  }
+
+  if(is_file)
+    _addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
+  else
+    _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
 }
 
 template <typename ServerType>
@@ -607,29 +618,18 @@ const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) c
   return emptyString;
 }
 
-template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount + 1;
-  if (_currentHeaders)
-     delete[]_currentHeaders;
-  _currentHeaders = new RequestArgument[_headerKeysCount];
-  _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
-  for (int i = 1; i < _headerKeysCount; i++){
-    _currentHeaders[i].key = headerKeys[i-1];
-  }
-}
 
 template<typename ServerType>
-void ESP8266WebServerETagTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  WST::_headerKeysCount = headerKeysCount + 2;
-  if (WST::_currentHeaders){
-    delete[] WST::_currentHeaders;
+void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+  _headerKeysCount = headerKeysCount + 2;
+  if (_currentHeaders){
+    delete[] _currentHeaders;
   }
-  WST::_currentHeaders = new typename WST::RequestArgument[WST::_headerKeysCount];
-  WST::_currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
-  WST::_currentHeaders[1].key = FPSTR(ETAG_HEADER);
-  for (int i = 2; i < WST::_headerKeysCount; i++){
-      WST::_currentHeaders[i].key = headerKeys[i-2];
+  _currentHeaders = new RequestArgument[_headerKeysCount];
+  _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
+  _currentHeaders[1].key = FPSTR(ETAG_HEADER);
+  for (int i = 2; i < _headerKeysCount; i++){
+      _currentHeaders[i].key = headerKeys[i-2];
   }
 }
 
@@ -844,39 +844,6 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
         break;
     }
     return String(r);
-}
-
-template<typename ServerType>
-void ESP8266WebServerETagTemplate<ServerType>::serveStaticETag(const char* uri, FS& fs, const char* path, const char* cache_header){
-  WST::_addRequestHandler(new StaticRequestETagHandler<ServerType>(fs, path, uri, cache_header));
-}
-
-template<typename ServerType>
-void ESP8266WebServerETagTemplate<ServerType>::serveStaticETag(const char* uri, FS& fs, const char * path) {
-
-  File toHash = fs.open(path, "r");
-
-  if(toHash){
-
-    MD5Builder calcMD5;
-    calcMD5.begin();
-
-    calcMD5.addStream(toHash, toHash.size());
-
-    toHash.close();
-
-    calcMD5.calculate();
-
-    uint8_t buff[16];
-
-    calcMD5.getBytes(buff);
-
-    const String etag = "\"" + base64::encode(buff, 16, false) + "\"";
-
-    serveStaticETag(uri, fs, path, etag.c_str());
-
-  }
-    
 }
 
 } // namespace

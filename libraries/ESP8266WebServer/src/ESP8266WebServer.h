@@ -300,20 +300,6 @@ protected:
   HookFunction     _hook;
 };
 
-
-template<typename ServerType>
-class ESP8266WebServerETagTemplate : public ESP8266WebServerTemplate<ServerType>
-{
-  using WST = ESP8266WebServerTemplate<ServerType>;
-
-  using WST::WST;
-
-  public:
-  void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
-  void serveStaticETag(const char* uri, FS& fs, const char* path, const char* cache_header);
-  void serveStaticETag(const char* uri, FS& fs, const char* path);
-};
-
 } // namespace
 
 #include "ESP8266WebServer-impl.h"
@@ -321,7 +307,5 @@ class ESP8266WebServerETagTemplate : public ESP8266WebServerTemplate<ServerType>
 
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
-
-using  ESP8266WebServerETag = esp8266webserver::ESP8266WebServerETagTemplate<WiFiServer>;
 
 #endif //ESP8266WEBSERVER_H
