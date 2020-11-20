@@ -95,7 +95,11 @@ void Servo::detach()
 {
   if (_attached) {
     _servoMap &= ~(1 << _pin);
+#ifdef WAVEFORM_LOCKED_PHASE
     startWaveform(_pin, 0, REFRESH_INTERVAL, 1);
+#else
+    startWaveform(_pin, 1, REFRESH_INTERVAL, REFRESH_INTERVAL);
+#endif
     delay(REFRESH_INTERVAL / 1000); // long enough to complete active period under all circumstances.
     stopWaveform(_pin);
     _attached = false;
