@@ -106,7 +106,7 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
-	if [ "$WINDOWS" == "1" ]; then
+        if [ "$WINDOWS" == "1" ]; then
             sketch=$(echo $sketch | sed 's/^\/c//')
             # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
             # http://www.mingw.org/wiki/Posix_path_conversion
