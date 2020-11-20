@@ -41,7 +41,7 @@
 
 #ifdef WAVEFORM_LOCKED_PHASE
 
-#include "core_esp8266_waveform.h"
+#include "core_esp8266_waveform_phase.h"
 #include <Arduino.h>
 #include "ets_sys.h"
 #include <atomic>
