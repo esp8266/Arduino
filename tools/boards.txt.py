@@ -1493,10 +1493,10 @@ def led (name, default, ledList):
 
 def waveform ():
     return { 'waveform': collections.OrderedDict([
+                        ('.menu.waveform.pwm', 'Locked PWM'),
+                        ('.menu.waveform.pwm.build.waveform', ''),
                         ('.menu.waveform.phase', 'Locked Phase'),
                         ('.menu.waveform.phase.build.waveform', '-DWAVEFORM_LOCKED_PHASE'),
-                        ('.menu.waveform.pwm', 'Locked PWM'),
-                        ('.menu.waveform.pwm.build.waveform', '-DWAVEFORM_LOCKED_PWM'),
                     ])
            }
 
