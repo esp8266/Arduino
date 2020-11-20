@@ -62,23 +62,7 @@ constexpr uint32_t _xtos_unhandled_interrupt__bp_address = 0x4000DC3Cu;
 constexpr size_t max_num_exccause_values = 64u;
 
 /*
-  The Boot ROM sets up a table of dispatch handlers at 0x3FFFC000.
-  This table has an entry for each of the EXCCAUSE values, 0 through 63.
-
-  Entries that do not have a specific handler are set to
-  `_xtos_unhandled_exception`. This handler will execute a `break 1, 1`
-  (0x4000DC4Bu) before doing a `rfe` (return from exception).  Since the PC has
-  not been changed, the event that caused the 1st exception will likely keep
-  repeating until the HWDT kicks in.
-
-  This table is normally managed through calls to _xtos_set_exception_handler()
-*/
-using _xtos_handler = void (*)(void);
-constexpr uint32_t exception_dispatch_table = 0x3FFFC000u;
-static _xtos_handler * const _xtos_exc_handler_table = (_xtos_handler *)exception_dispatch_table;
-
-/*
-  Xtensa ® Instruction Set Architecture (ISA) Reference Manual, p90:
+  Xtensa (R) Instruction Set Architecture (ISA) Reference Manual, p90:
   EXCCAUSE value 20, InstFetchProhibitedCause - An instruction fetch referenced
   a page mapped with an attribute that does not  permit instruction fetch.
 */

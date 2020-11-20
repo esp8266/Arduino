@@ -1,5 +1,8 @@
 // ROM and blob calls without official headers available
 
+#ifndef __ESP8266_UNDOCUMENTED_H
+#define __ESP8266_UNDOCUMENTED_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,6 +37,28 @@ extern int ets_uart_printf(const char *format, ...) __attribute__ ((format (prin
 
 extern void ets_delay_us(uint32_t us);
 
+/*
+  The Boot ROM sets up a table of dispatch handlers at 0x3FFFC000.
+  This table has an entry for each of the EXCCAUSE values, 0 through 63.
+
+  Entries that do not have a specific handler are set to
+  `_xtos_unhandled_exception`. This handler will execute a `break 1, 1`
+  (0x4000DC4Bu) before doing a `rfe` (return from exception).  Since the PC has
+  not been changed, the event that caused the 1st exception will likely keep
+  repeating until the HWDT kicks in.
+
+  This table is normally managed through calls to _xtos_set_exception_handler()
+*/
+
+/*
+ Added to eagle.rom.addr.v6.ld
+ PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
+*/
+using _xtos_handler = void (*)(void);
+extern _xtos_handler _xtos_exc_handler_table[];
+
 #ifdef __cplusplus
 };
+#endif
+
 #endif
