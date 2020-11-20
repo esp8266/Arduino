@@ -67,7 +67,7 @@ function build_sketches()
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
     local pwm_phase=""
-    [ $(( $build_rem % 2 )) -eq 0 ] && local pwm_phase="--waveform_phase"
+    [ $(( $build_rem % 2 )) -eq 0 ] && pwm_phase="--waveform_phase"
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
