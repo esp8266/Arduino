@@ -40,6 +40,8 @@
 
 #ifndef WAVEFORM_LOCKED_PHASE
 
+#pragma message "waveform: locked pwm flavour"
+
 #include <Arduino.h>
 #include "ets_sys.h"
 #include "core_esp8266_waveform_pwm.h"

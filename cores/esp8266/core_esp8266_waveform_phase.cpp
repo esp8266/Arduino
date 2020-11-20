@@ -41,6 +41,8 @@
 
 #ifdef WAVEFORM_LOCKED_PHASE
 
+#pragma message "waveform: locked phase flavour"
+
 #include "core_esp8266_waveform_phase.h"
 #include <Arduino.h>
 #include "ets_sys.h"
