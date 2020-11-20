@@ -240,9 +240,9 @@ else:
 #
 # Waveform
 #
-if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM" in flatten_cppdefines:
-    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PWM", 1)])
-# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE will be used by default
+if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
+    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PHASE", 1)])
+# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM will be used by default
 
 #
 # VTables
