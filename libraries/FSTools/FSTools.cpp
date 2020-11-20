@@ -245,6 +245,7 @@ bool FSTools::_copyFS(FS & sourceFS, FS & destFS)
             }
             destFile.close();
             sourceFile.close();
+            yield();
         }
     });
 
