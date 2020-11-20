@@ -51,10 +51,15 @@ extern void ets_delay_us(uint32_t us);
 */
 
 /*
- Added to eagle.rom.addr.v6.ld
- PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
+  Added to eagle.rom.addr.v6.ld
+  PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
 */
-using _xtos_handler = void (*)(void);
+#ifdef __cplusplus
+using _xtos_handler = void (*)();
+#else
+typedef void (*_xtos_handler)();
+#endif
+
 extern _xtos_handler _xtos_exc_handler_table[];
 
 #ifdef __cplusplus
