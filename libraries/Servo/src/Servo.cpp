@@ -98,7 +98,7 @@ void Servo::detach()
 #ifdef WAVEFORM_LOCKED_PHASE
     startWaveform(_pin, 0, REFRESH_INTERVAL, 1);
 #else
-    startWaveform(_pin, 1, REFRESH_INTERVAL, REFRESH_INTERVAL);
+    // TODO - timeHigh == 0 is illegal in _PWM code branch.  Do nothing for now.
 #endif
     delay(REFRESH_INTERVAL / 1000); // long enough to complete active period under all circumstances.
     stopWaveform(_pin);
