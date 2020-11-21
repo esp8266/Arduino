@@ -405,7 +405,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   int32_t callbackCcys = 0;
   if (waveform.timer1CB) {
-    callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()), isCPU2X);
+    callbackCcys = scaleCcys(waveform.timer1CB(), isCPU2X);
   }
   now = ESP.getCycleCount();
   int32_t nextEventCcys = waveform.nextEventCcy - now;

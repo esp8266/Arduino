@@ -62,7 +62,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
 int stopWaveform(uint8_t pin);
 
 // Add a callback function to be called on *EVERY* timer1 trigger.  The
-// callback returns the number of microseconds until the next desired call.
+// callback must return the number of CPU clock cycles until the next desired call.
 // However, since it is called every timer1 interrupt, it may be called
 // again before this period.  It should therefore use the ESP Cycle Counter
 // to determine whether or not to perform an operation.
