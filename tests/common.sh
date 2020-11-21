@@ -152,7 +152,7 @@ function install_ide()
     #local idever='nightly'
     #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
 
-    local idever='1.8.10'
+    local idever='1.8.13'
     local ideurl="https://downloads.arduino.cc/arduino-$idever"
 
     echo "using Arduino IDE distribution ${idever}"
