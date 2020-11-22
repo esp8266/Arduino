@@ -205,6 +205,20 @@ void __wrap_system_restart_local() {
 
     ets_install_putc1(&uart_write_char_d);
 
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_EXCEPTIONS)
+    if (!gdb_present()) {
+        // Clear breakpoint registers so ESP doesn't get a HWDT crash at reboot.
+        uint32_t tmp;  // Let the compiler select the optimum scratch register
+        asm volatile(
+            "movi.n           %0,   0\n\t"
+            "wsr.dbreakc0     %0\n\t"
+            "wsr.ibreakenable %0\n\t"
+            "wsr.icount       %0\n\t"
+            :"=r"(tmp) ::
+        );
+    }
+#endif
+
     /*
       Check for Exceptions mapped into User Exception.
     */
@@ -583,7 +597,7 @@ asm(  // 16 byte MAX, using 14
   NOP), you still see a HWDT reset regardless of running GDB.
 */
 
-void postmortem_xtos_unhandled_exception(void);
+void postmortem_xtos_unhandled_exception(...);
 asm(
     ".section     .iram.text.postmortem_xtos_unhandled_exception,\"ax\",@progbits\n\t"
     ".literal_position\n\t"
@@ -627,7 +641,7 @@ static void install_unhandled_exception_handler(void) {
         replace_exception_handler_on_match(
             i,
             ROM_xtos_unhandled_exception,
-            (_xtos_handler)postmortem_xtos_unhandled_exception);
+            postmortem_xtos_unhandled_exception);
     }
 }
 
@@ -650,17 +664,21 @@ void postmortem_init(void) {
         } else
 #endif
         {
-
             uint32_t save_ps = xt_rsil(15);
             ets_memcpy((void*)_DebugExceptionVector, (void*)postmortem_debug_exception_vector, debug_vector_sz);
             ets_memcpy((void*)_KernelExceptionVector, (void*)postmortem_kernel_exception_handler, kernel_vector_sz);
             ets_memcpy((void*)_DoubleExceptionVector, (void*)postmortem_double_exception_handler, double_vector_sz);
+            // A little asm optimization. No need to zero exccause, epc1 and
+            // excsave1 these will be quickly set on the 1st timer tick for the
+            // Soft WDT. Set the rest to zero.
+            uint32_t tmp;
             asm volatile(
-                "movi.n       a2,   0\n\t"
-                "wsr.epc2     a2\n\t"
-                "wsr.excsave2 a2\n\t"
-                "wsr.depc     a2\n\t"
-                ::: "a2"
+                "movi.n       %0,   0\n\t"
+                "wsr.epc2     %0\n\t"
+                "wsr.epc3     %0\n\t"
+                "wsr.excsave2 %0\n\t"
+                "wsr.depc     %0\n\t"
+                :"=r"(tmp) ::
             );
             install_unhandled_exception_handler();
             xt_wsr_ps(save_ps);
