@@ -73,11 +73,39 @@ extern void __analogWrite(uint8_t pin, int val) {
   }
 }
 
+#else // !WAVEFORM_LOCKED_PHASE
+
+extern void __analogWriteFreq(uint32_t freq) {
+  if (freq < 100) {
+    freq = 100;
+  } else if (freq > 60000) {
+    freq = 60000;
+  } else {
+    freq = freq;
+  }
+  _setPWMFreq(freq);
+}
+
+extern void __analogWrite(uint8_t pin, int val) {
+  if (pin > 16) {
+    return;
+  }
+
+  if (val < 0) {
+    val = 0;
+  } else if (val > analogScale) {
+    val = analogScale;
+  }
+
+  // Per the Arduino docs at https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
+  // val: the duty cycle: between 0 (always off) and 255 (always on).
+  // So if val = 0 we have digitalWrite(LOW), if we have val==range we have digitalWrite(HIGH)
+  pinMode(pin, OUTPUT);
+  _setPWM(pin, val, analogScale);
+}
+
 #endif // WAVEFORM_LOCKED_PHASE
 
-#ifdef WAVEFORM_LOCKED_PWM
-
-#endif // WAVEFORM_LOCKED_PWM
 
 extern void __analogWriteRange(uint32_t range) {
   if ((range >= 15) && (range <= 65535)) {

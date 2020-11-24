@@ -628,7 +628,7 @@ int HTTPClient::writeToStream(Stream * stream)
         // len >= 0: max:len, with timeout
         ret = _client->toSize(stream, len);
 
-        // have we an error?
+        // do we have an error?
         if(_client->getLastTo() != Stream::STREAMTO_SUCCESS) {
             return returnError(TO2HTTPC(_client->getLastTo()));
         }

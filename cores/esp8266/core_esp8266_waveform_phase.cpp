@@ -41,7 +41,7 @@
 
 #ifdef WAVEFORM_LOCKED_PHASE
 
-#include "core_esp8266_waveform.h"
+#include "core_esp8266_waveform_phase.h"
 #include <Arduino.h>
 #include "ets_sys.h"
 #include <atomic>
@@ -405,7 +405,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   int32_t callbackCcys = 0;
   if (waveform.timer1CB) {
-    callbackCcys = scaleCcys(microsecondsToClockCycles(waveform.timer1CB()), isCPU2X);
+    callbackCcys = scaleCcys(waveform.timer1CB(), isCPU2X);
   }
   now = ESP.getCycleCount();
   int32_t nextEventCcys = waveform.nextEventCcy - now;
