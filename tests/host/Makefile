@@ -269,6 +269,7 @@ ARDUINO_LIBS := \
 		Updater.cpp \
 		base64.cpp \
 		LwipIntfCB.cpp \
+		debug.cpp \
 	) \
 	$(addprefix ../../libraries/ESP8266WiFi/src/,\
 		ESP8266WiFi.cpp \
