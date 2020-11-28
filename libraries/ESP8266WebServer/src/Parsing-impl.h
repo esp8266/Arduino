@@ -444,45 +444,33 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
               _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->status = UPLOAD_FILE_WRITE;
 
-            int bLen = boundary.length();
-            uint8_t boundBuf[2 + bLen + 1]; // "--" + boundary + null terminator
-            boundBuf[2 + bLen] = '\0';
-            uint8_t argByte;
-            bool first = true;
-            while (1) {
-                //attempt to fill up boundary buffer with length of boundary string
-                int i;
-                for (i = 0; i < 2 + bLen; i++) {
-                    if (!client.connected()) return _parseFormUploadAborted();
-                    argByte = _uploadReadByte(client);
-                    if (argByte == '\r')
+            int fastBoundaryLen = 4 /* \r\n-- */ + boundary.length() + 1 /* \0 */;
+            char fastBoundary[ fastBoundaryLen ];
+            snprintf(fastBoundary, fastBoundaryLen, "\r\n--%s", boundary.c_str());
+            int boundaryPtr = 0;
+            while ( true ) {
+                if ( !client.connected() ) {
+                    // Unexpected disconnection, abort!
+                    return _parseFormUploadAborted();
+                }
+                char in = _uploadReadByte(client);
+                if (in == fastBoundary[ boundaryPtr ]) {
+                    // The input matched the current expected character, advance and possibly exit this file
+                    boundaryPtr++;
+                    if (boundaryPtr == fastBoundaryLen - 1) {
+                        // We read the whole boundary line, we're done here!
                         break;
-                    boundBuf[i] = argByte;
-                }
-                if ((strncmp((const char*)boundBuf, "--", 2) == 0) && (strcmp((const char*)(boundBuf + 2), boundary.c_str()) == 0))
-                    break;   //found the boundary, done parsing this file
-                if (first) first = false;   //only add newline characters after the first line
-                else {
-                    _uploadWriteByte('\r');
-                    _uploadWriteByte('\n');
-                }
-                // current line does not contain boundary, upload all bytes in boundary buffer
-                for (int j = 0; j < i; j++)
-                    _uploadWriteByte(boundBuf[j]);
-                // the initial pass (filling up the boundary buffer) did not reach the end of the line. Upload the rest of the line now
-                if (i >= 2 + bLen) {
-                    if (!client.connected()) return _parseFormUploadAborted();
-                    argByte = _uploadReadByte(client);
-                    while (argByte != '\r') {
-                        if (!client.connected()) return _parseFormUploadAborted();
-                        _uploadWriteByte(argByte);
-                        argByte = _uploadReadByte(client);
                     }
+                } else {
+                    // The char doesn't match what we want, so dump whatever matches we had, the read in char, and reset ptr to start
+                    for (int i = 0; i < boundaryPtr; i++) {
+                        _uploadWriteByte( fastBoundary[ i ] );
+                    }
+                    _uploadWriteByte( in );
+                    boundaryPtr = 0;
                 }
-                if (!client.connected()) return _parseFormUploadAborted();
-                _uploadReadByte(client); // '\n'
             }
-            //Found the boundary string, finish processing this file upload
+            // Found the boundary string, finish processing this file upload
             if (_currentHandler && _currentHandler->canUpload(_currentUri))
                 _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->totalSize += _currentUpload->currentSize;
