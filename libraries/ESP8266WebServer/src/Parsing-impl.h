@@ -347,14 +347,14 @@ void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
 }
 
 template <typename ServerType>
-uint8_t ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
+int ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
       yield();
     res = client.read();
   }
-  return (uint8_t)res;
+  return res;
 }
 
 
@@ -449,11 +449,12 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             snprintf(fastBoundary, fastBoundaryLen, "\r\n--%s", boundary.c_str());
             int boundaryPtr = 0;
             while ( true ) {
-                if ( !client.connected() ) {
-                    // Unexpected disconnection, abort!
+                int ret = _uploadReadByte(client);
+                if (ret < 0) {
+                    // Unexpected, we should have had data available per above
                     return _parseFormUploadAborted();
                 }
-                char in = _uploadReadByte(client);
+                char in = (char) ret;
                 if (in == fastBoundary[ boundaryPtr ]) {
                     // The input matched the current expected character, advance and possibly exit this file
                     boundaryPtr++;
