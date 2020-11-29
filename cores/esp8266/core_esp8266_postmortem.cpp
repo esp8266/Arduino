@@ -586,10 +586,10 @@ asm(  // 16 byte MAX, using 14
 /*
   Of the Exception Cause table's 64 entries, most are set to
   `_xtos_unhandled_exception`. And I assume most of these never occur; however,
-  at lesat one does exccause 20. This one occurs on a call to a NULL pointer. This
-  can happen when a function prototype is given the weak attribute but never
-  defined, or forgetting to test a call back function pointer for NULL before
-  calling, etc.
+  at lesat one does, exccause 20. This one occurs on a call to a NULL pointer.
+  This can happen when a function prototype is given the weak attribute but
+  never defined, or forgetting to test a call back function pointer for NULL
+  before calling, etc.
 
   A problem with the `_xtos_unhandled_exception` function is that it handles the
   event with a Debug Exception BP. If you don't have GDB running you see a HWDT
@@ -631,7 +631,7 @@ static void replace_exception_handler_on_match(
 
 // While _xtos_unhandled_exception is in the linker .ld file, it may have been
 // overridden. We require the original Boot ROM function address to limit our
-// override to those old values in the table.
+// override to the default values still in the table.
 const _xtos_handler ROM_xtos_unhandled_exception = (reinterpret_cast<_xtos_handler>(0x4000dc44));
 
 static void install_unhandled_exception_handler(void) {

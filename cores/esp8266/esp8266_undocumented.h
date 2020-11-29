@@ -7,6 +7,11 @@
 extern "C" {
 #endif
 
+#ifndef XCHAL_EXCCAUSE_NUM
+// from tools/xtensa-lx106-elf/include/xtensa/config/core.h:629:#define XCHAL_EXCCAUSE_NUM             64
+#define XCHAL_EXCCAUSE_NUM             64
+#endif
+
 // ROM
 
 extern void rom_i2c_writeReg_Mask(int, int, int, int, int, int);
@@ -42,30 +47,26 @@ extern void ets_delay_us(uint32_t us);
   has an entry for each of the EXCCAUSE values, 0 through 63. The exception
   handler at the `User Exception Vector` uses EXCCAUSE with the base address
   0x3FFFC000 to build a jump address to the respective cause handler. Of the
-  cause handle functions `_xtos_c_wrapper_handler` and `_xtos_unhandled_exception`
+  cause handle functions, `_xtos_c_wrapper_handler` and `_xtos_unhandled_exception`
   are of interest.
 
-  Entries that do not have a specific handler are set to
+  Exception handler entries that do not have a specific handler are set to
   `_xtos_unhandled_exception`. This handler will execute a `break 1, 1`
   (0x4000DC4Bu) before doing a `rfe` (return from exception).  Since the PC has
   not changed, the event that caused the 1st exception will likely keep
   repeating until the HWDT kicks in.
 
   These exception handling functions are in assembly, and do not conform to the
-  typical "C" function conventions. However, some form of prototype is needed to
-  reference these function addresses in "C" code. In
+  typical "C" function conventions. However, some form of prototype/typedef is
+  needed to reference these function addresses in "C" code. In
   `RTOS_SDK/components/esp8266/include/xtensa/xtruntime.h`, it uses a compounded
   definition that equates to `void (*)(...)` for .cpp modules to use. I have
-  noticed this creates sufficient confusion at compilation to get your attention
-  when used in the wrong place. I have copied that definition here.
+  copied that definition here.
 
-  Unfortunately RTOS_SDK and other ESP projects on the Internet also reuses
-  this loose definition, _xtos_handler, for a function table of "C" callable
-  functions, `_xtos_c_handler_table`. This issue falls into a different PR so I
-  will leave it for that PR where there is more context.
-//C TODO: Update this last paragraph when merged with related PR.
+  Added to eagle.rom.addr.v6.ld:
+    PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
 */
-
+#ifndef XTRUNTIME_H
 // This is copy/paste from RTOS_SDK/components/esp8266/include/xtensa/xtruntime.h
 #ifdef __cplusplus
 typedef void (_xtos_handler_func)(...);
@@ -74,11 +75,20 @@ typedef void (_xtos_handler_func)();
 #endif
 typedef _xtos_handler_func *_xtos_handler;
 
+extern _xtos_handler _xtos_exc_handler_table[XCHAL_EXCCAUSE_NUM];
+
 /*
-  Added to eagle.rom.addr.v6.ld
-  PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
+  Assembly-level handler, used in the _xtos_exc_handler_table[]. It is a wrapper
+  for calling registered "C" exception handlers.
 */
-extern _xtos_handler _xtos_exc_handler_table[];
+extern _xtos_handler_func _xtos_c_wrapper_handler;
+
+/*
+  Assembly-level handler, used in the _xtos_exc_handler_table[]. It is the
+  default handler, for exceptions without a registered handler.
+*/
+extern _xtos_handler_func _xtos_unhandled_exception;
+#endif
 
 #ifdef __cplusplus
 };
