@@ -1,8 +1,10 @@
-BINDIR := bin
+BINDIR := $(abspath bin)
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
-CORE_PATH := ../../cores/esp8266
-LIBRARIES_PATH := ../../libraries
+CORE_PATH := $(abspath ../../cores/esp8266)
+LIBRARIES_PATH := $(abspath ../../libraries)
+common = common
+HOST_COMMON_ABSPATH := $(abspath $(common))
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
@@ -67,29 +69,30 @@ endif
 
 $(shell mkdir -p $(BINDIR))
 
-CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
-	StreamString.cpp \
-	Stream.cpp \
-	WString.cpp \
-	Print.cpp \
-	FS.cpp \
-	spiffs_api.cpp \
-	MD5Builder.cpp \
-	../../libraries/LittleFS/src/LittleFS.cpp \
-	core_esp8266_noniso.cpp \
-	spiffs/spiffs_cache.cpp \
-	spiffs/spiffs_check.cpp \
-	spiffs/spiffs_gc.cpp \
-	spiffs/spiffs_hydrogen.cpp \
-	spiffs/spiffs_nucleus.cpp \
-	libb64/cencode.cpp \
-	libb64/cdecode.cpp \
-	Schedule.cpp \
-	HardwareSerial.cpp \
-	crc32.cpp \
-	Updater.cpp \
+CORE_CPP_FILES := \
+	$(addprefix $(abspath $(CORE_PATH))/,\
+		StreamString.cpp \
+		Stream.cpp \
+		WString.cpp \
+		Print.cpp \
+		FS.cpp \
+		spiffs_api.cpp \
+		MD5Builder.cpp \
+		../../libraries/LittleFS/src/LittleFS.cpp \
+		core_esp8266_noniso.cpp \
+		spiffs/spiffs_cache.cpp \
+		spiffs/spiffs_check.cpp \
+		spiffs/spiffs_gc.cpp \
+		spiffs/spiffs_hydrogen.cpp \
+		spiffs/spiffs_nucleus.cpp \
+		libb64/cencode.cpp \
+		libb64/cdecode.cpp \
+		Schedule.cpp \
+		HardwareSerial.cpp \
+		crc32.cpp \
+		Updater.cpp \
 	) \
-	$(addprefix $(LIBRARIES_PATH)/ESP8266SdFat/src/, \
+	$(addprefix $(abspath $(LIBRARIES_PATH)/ESP8266SdFat/src)/, \
 		FatLib/FatFile.cpp \
 		FatLib/FatFileLFN.cpp \
 		FatLib/FatFilePrint.cpp \
@@ -98,56 +101,63 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 		FatLib/FmtNumber.cpp \
 		FatLib/StdioStream.cpp \
 	) \
-	$(LIBRARIES_PATH)/SDFS/src/SDFS.cpp \
-	$(LIBRARIES_PATH)/SD/src/SD.cpp
+	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
+	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
 
-CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
-	../../libraries/LittleFS/src/lfs.c \
-	../../libraries/LittleFS/src/lfs_util.c \
-)
+CORE_C_FILES := \
+	$(addprefix $(abspath $(CORE_PATH))/,\
+		../../libraries/LittleFS/src/lfs.c \
+		../../libraries/LittleFS/src/lfs_util.c \
+	)
 
-MOCK_CPP_FILES_COMMON := $(addprefix common/,\
-	Arduino.cpp \
-	flash_hal_mock.cpp \
-	spiffs_mock.cpp \
-	littlefs_mock.cpp \
-	sdfs_mock.cpp \
-	WMath.cpp \
-	MockUART.cpp \
-	MockTools.cpp \
-	MocklwIP.cpp \
-	MockDigital.cpp \
-)
+MOCK_CPP_FILES_COMMON := \
+	$(addprefix $(abspath $(HOST_COMMON_ABSPATH))/,\
+		Arduino.cpp \
+		flash_hal_mock.cpp \
+		spiffs_mock.cpp \
+		littlefs_mock.cpp \
+		sdfs_mock.cpp \
+		WMath.cpp \
+		MockUART.cpp \
+		MockTools.cpp \
+		MocklwIP.cpp \
+		MockDigital.cpp \
+	)
 
-MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
-	ArduinoCatch.cpp \
-)
+MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) \
+	$(addprefix $(HOST_COMMON_ABSPATH)/,\
+		ArduinoCatch.cpp \
+	)
 
-MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
-	ArduinoMain.cpp \
-	ArduinoMainUdp.cpp \
-	ArduinoMainSpiffs.cpp \
-	ArduinoMainLittlefs.cpp \
-	user_interface.cpp \
-)
+MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) \
+	$(addprefix $(HOST_COMMON_ABSPATH)/,\
+		ArduinoMain.cpp \
+		ArduinoMainUdp.cpp \
+		ArduinoMainSpiffs.cpp \
+		ArduinoMainLittlefs.cpp \
+		user_interface.cpp \
+	)
 
-MOCK_C_FILES := $(addprefix common/,\
-	md5.c \
-	noniso.c \
-)
+MOCK_C_FILES := \
+	$(addprefix $(HOST_COMMON_ABSPATH)/,\
+		md5.c \
+		noniso.c \
+	)
 
-INC_PATHS += $(addprefix -I, \
-	. \
-	common \
-	$(CORE_PATH) \
-)
+INC_PATHS += \
+	$(addprefix -I, \
+		. \
+		$(common) \
+		$(CORE_PATH) \
+	)
 
-INC_PATHS += $(addprefix -I,\
-	$(shell echo ../../libraries/*/src) \
-	$(shell echo ../../libraries/*) \
-	../../tools/sdk/include \
-	../../tools/sdk/lwip2/include \
-)
+INC_PATHS += \
+	$(addprefix -I,\
+		$(shell echo ../../libraries/*/src) \
+		$(shell echo ../../libraries/*) \
+		../../tools/sdk/include \
+		../../tools/sdk/lwip2/include \
+	)
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
@@ -159,8 +169,8 @@ TEST_CPP_FILES := \
 	core/test_Updater.cpp
 
 PREINCLUDES := \
-	-include common/mock.h \
-	-include common/c_types.h \
+	-include $(common)/mock.h \
+	-include $(common)/c_types.h \
 
 ifneq ($(D),)
 OPTZ=-O0
@@ -242,22 +252,33 @@ build-info:				# show toolchain version
 	@echo "CXXFLAGS: " $(CXXFLAGS)
 	@echo "----------------------------------"
 
--include $(BINDIR)/.*.d
+include $(shell find $(BINDIR) -name "*.d" -print)
+
 .SUFFIXES:
 
 .PRECIOUS: %.c$(E32).o
+
+$(BINDIR)/%.c$(E32).o: %.c
+	@mkdir -p $(dir $@)
+	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
+
 %.c$(E32).o: %.c
-	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
+	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
 
 .PRECIOUS: %.cpp$(E32).o
-%.cpp$(E32).o: %.cpp
-	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
-$(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
+$(BINDIR)/%.cpp$(E32).o: %.cpp
+	@mkdir -p $(dir $@)
+	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
+
+%.cpp$(E32).o: %.cpp
+	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
+
+$(BINDIR)/core.a: $(C_OBJECTS:%=$(BINDIR)/%) $(CPP_OBJECTS_CORE:%=$(BINDIR)/%)
 	ar -rcu $@ $^
 	ranlib $@
 
-$(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
+$(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS:%=$(BINDIR)/%) $(BINDIR)/core.a
 	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@
 
 #################################################
@@ -310,7 +331,7 @@ OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
 )
 
-MOCK_ARDUINO_LIBS := $(addprefix common/,\
+MOCK_ARDUINO_LIBS := $(addprefix $(HOST_COMMON_ABSPATH)/,\
 	ClientContextSocket.cpp \
 	ClientContextTools.cpp \
 	MockWiFiServerSocket.cpp \
@@ -347,45 +368,35 @@ INC_PATHS += -I$(INODIR)/..
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o) $(USERCXXSOURCES:.cpp=.cpp$(E32).o)
 C_OBJECTS_CORE_EMU = $(USERCSOURCES:.c=.c$(E32).o)
 
-bin/fullcore$(E32).a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU) $(C_OBJECTS_CORE_EMU)
+FULLCORE_OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU) $(C_OBJECTS_CORE_EMU)
+FULLCORE_OBJECTS_ISOLATED = $(FULLCORE_OBJECTS:%.o=$(BINDIR)/%.o)
+
+bin/fullcore$(E32).a: $(FULLCORE_OBJECTS_ISOLATED)
 	$(VERBAR) ar -rcu $@ $^
 	$(VERBAR) ranlib $@
+
+ifeq ($(INO),)
+
+%:
+	make INO=$@.ino $(BINDIR)/$(abspath $@)
+
+else
 
 %: %.ino.cpp$(E32).o bin/fullcore$(E32).a
 	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore$(E32).a $(LIBSSL) -o $@
 	@echo "----> $@ <----"
 
-#################################################
-# are we in primary make call ?
-ifeq ($(INO),)
+endif
 
-%: %.ino
-	@# recursive 'make' with paths
-	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Wextra INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@) \
-	    USERCFLAGS="$(USERCFLAGS)" \
-	    USERCSOURCES="$(USERCSOURCES)" \
-	    USERCXXSOURCES="$(USERCXXSOURCES)" \
-	    USERLDFLAGS="$(USERLDFLAGS)"
-	test "$(R)" = noexec || $(BINDIR)/$(notdir $@)/$(notdir $@) $(R)
-	@# see below the new build rule with fixed output path outside from core location
-
-#####################
-# recursive call on ino target
-else
-
-$(BINDIR)/$(INO)/$(INO).ino.cpp:
-	@# arduino builder would come around here (.ino -> .ino.cpp)
-	@mkdir -p $(BINDIR)/$(INO); \
+$(BINDIR)/$(abspath $(INO)).cpp: $(INO)
+	@# arduino builder would come around here - .ino -> .ino.cpp
+	@mkdir -p $(dir $@); \
 	( \
-		echo "#include <$(INODIR)/$(INO).ino>"; \
-		for i in $(INODIR)/*.ino; do \
-			test "$$i" = $(INODIR)/$(INO).ino || echo "#include \"$$i\""; \
+		for i in $(dir $<)/*.ino; do \
+			echo "#include \"$$i\""; \
 		done; \
-	) > $(BINDIR)/$(INO)/$(INO).ino.cpp
+	) > $@
 	
-endif # recursive
-#####################
-
 #################################################
 
 .PHONY: list
