@@ -1,6 +1,3 @@
-BINDIR := $(abspath bin)
-LCOV_DIRECTORY := lcov
-OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := $(abspath ../../cores/esp8266)
 LIBRARIES_PATH := $(abspath ../../libraries)
 common = common
@@ -35,7 +32,7 @@ CXX ?= g++
 endif
 GCOV ?= gcov
 VALGRIND ?= valgrind
-LCOV ?= lcov
+LCOV ?= lcov --gcov-tool $(GCOV)
 GENHTML ?= genhtml
 
 ifeq ($(FORCE32),1)
@@ -45,15 +42,18 @@ $(warning Cannot compile in 32 bit mode (g++-multilib is missing?), switching to
 else
 N32 = 32
 M32 = -m32
-E32 = .32
 endif
 endif
 
 ifeq ($(N32),32)
 $(warning compiling in 32 bits mode)
+BINDIR := $(abspath bin32)
 else
 $(warning compiling in native mode)
+BINDIR := $(abspath bin)
 endif
+OUTPUT_BINARY := $(BINDIR)/host_tests
+LCOV_DIRECTORY := $(BINDIR)/lcov
 
 ifeq ($(V), 0)
 VERBC   = @echo "C   $@";
@@ -190,7 +190,7 @@ FLAGS += -Wimplicit-fallthrough=2 # allow "// fall through" comments to stop spu
 FLAGS += $(USERCFLAGS)
 CXXFLAGS += -fno-rtti $(FLAGS) -funsigned-char
 CFLAGS += $(FLAGS) -funsigned-char
-LDFLAGS += -coverage $(OPTZ) -g $(M32)
+LDFLAGS += $(OPTZ) -g $(M32)
 LDFLAGS += $(USERLDFLAGS)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
@@ -200,21 +200,24 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 C_SOURCE_FILES = $(MOCK_C_FILES) $(CORE_C_FILES)
 CPP_SOURCE_FILES = $(MOCK_CPP_FILES) $(CORE_CPP_FILES) $(TEST_CPP_FILES)
-C_OBJECTS = $(C_SOURCE_FILES:.c=.c$(E32).o)
+C_OBJECTS = $(C_SOURCE_FILES:.c=.c.o)
 
-CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp$(E32).o) $(CORE_CPP_FILES:.cpp=.cpp$(E32).o)
-CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp$(E32).o)
+CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp.o) $(CORE_CPP_FILES:.cpp=.cpp.o)
+CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp.o)
 
 CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
+.PHONY: all
 all: help
 
+.PHONY: CI
 CI:					# run CI
-	$(MAKE) -f $(MAKEFILE) MKFLAGS="-Werror -coverage" FORCE32=0 OPTZ=-O0 doCI
+	$(MAKE) -f $(MAKEFILE) MKFLAGS="-Werror --coverage" LDFLAGS="--coverage" FORCE32=0 OPTZ=-O0 doCI
 
+.PHONY: doCI
 doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)			# run host test for CI
@@ -233,13 +236,13 @@ clean-coverage:
 	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
 
 gcov: test				# run coverage for CI
-	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
+	( mkdir -p $(BINDIR)/gcov; cd $(BINDIR)/gcov; find . -name "*.gcno" -exec $(GCOV) -s ../.. -r -pb {} + )
 
 valgrind: $(OUTPUT_BINARY)
 	mkdir -p $(LCOV_DIRECTORY)
-	$(LCOV) --directory ../../cores/esp8266/ --zerocounters
-	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
-	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
+	$(LCOV) --directory $(BINDIR) --zerocounters
+	( cd $(LCOV_DIRECTORY); $(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY) )
+	$(LCOV) --directory $(BINDIR) --capture --output-file $(LCOV_DIRECTORY)/app.info
 	-$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 build-info:				# show toolchain version
@@ -256,22 +259,22 @@ include $(shell find $(BINDIR) -name "*.d" -print)
 
 .SUFFIXES:
 
-.PRECIOUS: %.c$(E32).o
+.PRECIOUS: %.c.o
 
-$(BINDIR)/%.c$(E32).o: %.c
+$(BINDIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
 
-%.c$(E32).o: %.c
+%.c.o: %.c
 	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
 
-.PRECIOUS: %.cpp$(E32).o
+.PRECIOUS: %.cpp.o
 
-$(BINDIR)/%.cpp$(E32).o: %.cpp
+$(BINDIR)/%.cpp.o: %.cpp
 	@mkdir -p $(dir $@)
 	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
 
-%.cpp$(E32).o: %.cpp
+%.cpp.o: %.cpp
 	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
 
 $(BINDIR)/core.a: $(C_OBJECTS:%=$(BINDIR)/%) $(CPP_OBJECTS_CORE:%=$(BINDIR)/%)
@@ -291,7 +294,7 @@ ARDUINO_LIBS := \
 		base64.cpp \
 		LwipIntfCB.cpp \
 	) \
-	$(addprefix ../../libraries/ESP8266WiFi/src/,\
+	$(addprefix $(abspath ../../libraries/ESP8266WiFi/src)/,\
 		ESP8266WiFi.cpp \
 		ESP8266WiFiAP.cpp \
 		ESP8266WiFiGeneric.cpp \
@@ -307,42 +310,44 @@ ARDUINO_LIBS := \
 		CertStoreBearSSL.cpp \
 	)
 
-OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
-	$(addprefix ESP8266WebServer/src/,\
-		detail/mimetable.cpp \
-	) \
-	$(addprefix ESP8266mDNS/src/,\
-		LEAmDNS.cpp \
-		LEAmDNS_Control.cpp \
-		LEAmDNS_Helpers.cpp \
-		LEAmDNS_Structs.cpp \
-		LEAmDNS_Transfer.cpp \
-		ESP8266mDNS.cpp \
-		LEAmDNS2Host.cpp \
-		LEAmDNS2Host_Control.cpp \
-		LEAmDNS2Host_Debug.cpp \
-		LEAmDNS2Host_Structs.cpp \
-		LEAmDNS2Host_Transfer.cpp \
-		LEAmDNS2_Backbone.cpp \
-	) \
-	ArduinoOTA/ArduinoOTA.cpp \
-	DNSServer/src/DNSServer.cpp \
-	ESP8266AVRISP/src/ESP8266AVRISP.cpp \
-	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-)
+OPT_ARDUINO_LIBS ?= \
+	$(addprefix $(abspath ../../libraries)/,\
+		$(addprefix ESP8266WebServer/src/,\
+			detail/mimetable.cpp \
+		) \
+		$(addprefix ESP8266mDNS/src/,\
+			LEAmDNS.cpp \
+			LEAmDNS_Control.cpp \
+			LEAmDNS_Helpers.cpp \
+			LEAmDNS_Structs.cpp \
+			LEAmDNS_Transfer.cpp \
+			ESP8266mDNS.cpp \
+			LEAmDNS2Host.cpp \
+			LEAmDNS2Host_Control.cpp \
+			LEAmDNS2Host_Debug.cpp \
+			LEAmDNS2Host_Structs.cpp \
+			LEAmDNS2Host_Transfer.cpp \
+			LEAmDNS2_Backbone.cpp \
+		) \
+		ArduinoOTA/ArduinoOTA.cpp \
+		DNSServer/src/DNSServer.cpp \
+		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
+		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+	)
 
-MOCK_ARDUINO_LIBS := $(addprefix $(HOST_COMMON_ABSPATH)/,\
-	ClientContextSocket.cpp \
-	ClientContextTools.cpp \
-	MockWiFiServerSocket.cpp \
-	MockWiFiServer.cpp \
-	UdpContextSocket.cpp \
-	HostWiring.cpp \
-	MockEsp.cpp \
-	MockEEPROM.cpp \
-	MockSPI.cpp \
-	strl.cpp \
-)
+MOCK_ARDUINO_LIBS := \
+    $(addprefix $(HOST_COMMON_ABSPATH)/,\
+		ClientContextSocket.cpp \
+		ClientContextTools.cpp \
+		MockWiFiServerSocket.cpp \
+		MockWiFiServer.cpp \
+		UdpContextSocket.cpp \
+		HostWiring.cpp \
+		MockEsp.cpp \
+		MockEEPROM.cpp \
+		MockSPI.cpp \
+		strl.cpp \
+	)
 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
@@ -365,13 +370,13 @@ USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd
 USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp $$d/src/libmad/*.c; do test -r $$ss && echo $$ss; done; done)
 INC_PATHS += $(USERLIBDIRS)
 INC_PATHS += -I$(INODIR)/..
-CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp$(E32).o) $(USERLIBSRCS:.cpp=.cpp$(E32).o) $(USERCXXSOURCES:.cpp=.cpp$(E32).o)
-C_OBJECTS_CORE_EMU = $(USERCSOURCES:.c=.c$(E32).o)
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o) $(USERCXXSOURCES:.cpp=.cpp.o)
+C_OBJECTS_CORE_EMU = $(USERCSOURCES:.c=.c.o)
 
 FULLCORE_OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU) $(C_OBJECTS_CORE_EMU)
 FULLCORE_OBJECTS_ISOLATED = $(FULLCORE_OBJECTS:%.o=$(BINDIR)/%.o)
 
-bin/fullcore$(E32).a: $(FULLCORE_OBJECTS_ISOLATED)
+$(BINDIR)/fullcore.a: $(FULLCORE_OBJECTS_ISOLATED)
 	$(VERBAR) ar -rcu $@ $^
 	$(VERBAR) ranlib $@
 
@@ -382,9 +387,11 @@ ifeq ($(INO),)
 
 else
 
-%: %.ino.cpp$(E32).o bin/fullcore$(E32).a
-	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore$(E32).a $(LIBSSL) -o $@
-	@echo "----> $@ <----"
+%: %.ino.cpp.o $(BINDIR)/fullcore.a
+	$(VERBLD) $(CXX) $(LDFLAGS) $< $(BINDIR)/fullcore.a $(LIBSSL) -o $@
+	ln -s $@ $(BINDIR)/
+	@echo "----> $(BINDIR)/ <----"
+	#if [ "$(R)" = run ]; then
 
 endif
 
