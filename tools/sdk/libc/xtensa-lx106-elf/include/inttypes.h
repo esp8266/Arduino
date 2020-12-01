@@ -320,7 +320,7 @@ struct _reent;
 extern "C" {
 #endif
 
-extern intmax_t  imaxabs(intmax_t);
+extern intmax_t  imaxabs(intmax_t j);
 extern imaxdiv_t imaxdiv(intmax_t numer, intmax_t denomer);
 extern intmax_t  strtoimax(const char *__restrict, char **__restrict, int);
 extern intmax_t  _strtoimax_r(struct _reent *, const char *__restrict, char **__restrict, int);

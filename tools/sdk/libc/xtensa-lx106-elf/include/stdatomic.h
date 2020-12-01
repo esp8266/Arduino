@@ -169,9 +169,12 @@ atomic_signal_fence(memory_order __order __unused)
 /* Atomics in kernelspace are always lock-free. */
 #define	atomic_is_lock_free(obj) \
 	((void)(obj), (_Bool)1)
-#elif defined(__CLANG_ATOMICS) || defined(__GNUC_ATOMICS)
+#elif defined(__CLANG_ATOMICS)
 #define	atomic_is_lock_free(obj) \
 	__atomic_is_lock_free(sizeof(*(obj)), obj)
+#elif defined(__GNUC_ATOMICS)
+#define	atomic_is_lock_free(obj) \
+	__atomic_is_lock_free(sizeof((obj)->__val), &(obj)->__val)
 #else
 #define	atomic_is_lock_free(obj) \
 	((void)(obj), sizeof((obj)->__val) <= sizeof(void *))
@@ -257,28 +260,28 @@ typedef _Atomic(uintmax_t)		atomic_uintmax_t;
 #elif defined(__GNUC_ATOMICS)
 #define	atomic_compare_exchange_strong_explicit(object, expected,	\
     desired, success, failure)						\
-	__atomic_compare_exchange_n(object, expected,			\
+	__atomic_compare_exchange_n(&(object)->__val, expected,		\
 	    desired, 0, success, failure)
 #define	atomic_compare_exchange_weak_explicit(object, expected,		\
     desired, success, failure)						\
-	__atomic_compare_exchange_n(object, expected,			\
+	__atomic_compare_exchange_n(&(object)->__val, expected,		\
 	    desired, 1, success, failure)
 #define	atomic_exchange_explicit(object, desired, order)		\
-	__atomic_exchange_n(object, desired, order)
+	__atomic_exchange_n(&(object)->__val, desired, order)
 #define	atomic_fetch_add_explicit(object, operand, order)		\
-	__atomic_fetch_add(object, operand, order)
+	__atomic_fetch_add(&(object)->__val, operand, order)
 #define	atomic_fetch_and_explicit(object, operand, order)		\
-	__atomic_fetch_and(object, operand, order)
+	__atomic_fetch_and(&(object)->__val, operand, order)
 #define	atomic_fetch_or_explicit(object, operand, order)		\
-	__atomic_fetch_or(object, operand, order)
+	__atomic_fetch_or(&(object)->__val, operand, order)
 #define	atomic_fetch_sub_explicit(object, operand, order)		\
-	__atomic_fetch_sub(object, operand, order)
+	__atomic_fetch_sub(&(object)->__val, operand, order)
 #define	atomic_fetch_xor_explicit(object, operand, order)		\
-	__atomic_fetch_xor(object, operand, order)
+	__atomic_fetch_xor(&(object)->__val, operand, order)
 #define	atomic_load_explicit(object, order)				\
-	__atomic_load_n(object, order)
+	__atomic_load_n(&(object)->__val, order)
 #define	atomic_store_explicit(object, desired, order)			\
-	__atomic_store_n(object, desired, order)
+	__atomic_store_n(&(object)->__val, desired, order)
 #else
 #define	__atomic_apply_stride(object, operand) \
 	(((__typeof__((object)->__val))0) + (operand))
@@ -373,6 +376,7 @@ __extension__ ({							\
 typedef struct {
 	atomic_bool	__flag;
 } atomic_flag;
+
 #define	ATOMIC_FLAG_INIT		{ ATOMIC_VAR_INIT(0) }
 
 static __inline _Bool

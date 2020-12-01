@@ -533,8 +533,7 @@ int	unlinkat (int, const char *, int);
  *  confstr values per IEEE Std 1003.1, 2004 Edition
  */
 
-/* Only defined on Cygwin and RTEMS for now. */
-#if defined (__CYGWIN__) || defined(__rtems__)
+#ifdef __CYGWIN__	/* Only defined on Cygwin for now. */
 #define _CS_PATH                               0
 #define _CS_POSIX_V7_ILP32_OFF32_CFLAGS        1
 #define _CS_POSIX_V6_ILP32_OFF32_CFLAGS       _CS_POSIX_V7_ILP32_OFF32_CFLAGS

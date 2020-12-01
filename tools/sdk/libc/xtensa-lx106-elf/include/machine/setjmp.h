@@ -404,17 +404,6 @@ _BEGIN_STD_C
 #endif
 #endif
 
-#ifdef __CSKYABIV2__
-#define _JBTYPE unsigned long
-#if defined(__CK801__)
-#define _JBLEN 7
-#elif defined(__CK802__)
-#define _JBLEN 10
-#else
-#define _JBLEN 18
-#endif
-#endif
-
 #ifdef _JBLEN
 #ifdef _JBTYPE
 typedef	_JBTYPE jmp_buf[_JBLEN];

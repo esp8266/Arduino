@@ -288,7 +288,7 @@
 #endif
 
 #if !defined(__cplusplus) && !__has_extension(c_atomic) && \
-	!__has_extension(cxx_atomic) && !__GNUC_PREREQ__(4, 7)
+    !__has_extension(cxx_atomic)
 /*
  * No native support for _Atomic(). Place object in structure to prevent
  * most forms of direct non-atomic access.
@@ -708,19 +708,6 @@
 
 /* Function should not be analyzed. */
 #define	__no_lock_analysis	__lock_annotate(no_thread_safety_analysis)
-
-/*
- * Function or variable should not be sanitized, i.e. by AddressSanitizer.
- * GCC has the nosanitize attribute, but as a function attribute only, and
- * warns on use as a variable attribute.
- */
-#if __has_attribute(no_sanitize) && defined(__clang__)
-#define __nosanitizeaddress	__attribute__((no_sanitize("address")))
-#define __nosanitizethread	__attribute__((no_sanitize("thread")))
-#else
-#define __nosanitizeaddress
-#define __nosanitizethread
-#endif
 
 /* Guard variables and structure members by lock. */
 #define	__guarded_by(x)		__lock_annotate(guarded_by(x))
