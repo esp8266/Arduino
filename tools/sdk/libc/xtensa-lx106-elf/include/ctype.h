@@ -123,7 +123,7 @@ __locale_ctype_ptr_l(locale_t _l)
 	return __locale_ctype_ptr();
 }
 #endif
-#define __ctype_lookup_l(__c,__l) ((__locale_ctype_ptr_l(__l)+sizeof(""[__c]))[(int)(__c)])
+#define __ctype_lookup_l(__c,__l) pgm_read_byte(&((__locale_ctype_ptr_l(__l)+sizeof(""[__c]))[(int)(__c)]))
 
 #define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L))
 #define	isupper_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_U)
