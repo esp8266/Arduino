@@ -24,9 +24,6 @@
 #include <../include/time.h> // See issue #6714
 #include <sys/time.h>
 #include <sys/reent.h>
-extern "C" {
-#include <sys/_tz_structs.h>
-};
 #include <errno.h>
 
 #include <sntp.h> // nonos-sdk
