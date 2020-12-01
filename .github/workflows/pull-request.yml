@@ -25,12 +25,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Cache Linux toolchain
-      id: cache-linux
-      uses: actions/cache@v2
-      with:
-        path: ./tools/dist
-        key: key-linux-toolchain
+#    - name: Cache Linux toolchain
+#      id: cache-linux
+#      uses: actions/cache@v2
+#      with:
+#        path: ./tools/dist
+#        key: key-linux-toolchain
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -57,12 +57,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Cache Linux toolchain
-      id: cache-linux
-      uses: actions/cache@v2
-      with:
-        path: ./tools/dist
-        key: key-linux-toolchain
+#    - name: Cache Linux toolchain
+#      id: cache-linux
+#      uses: actions/cache@v2
+#      with:
+#        path: ./tools/dist
+#        key: key-linux-toolchain
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -85,12 +85,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Cache Windows toolchain
-      id: cache-windows
-      uses: actions/cache@v2
-      with:
-        path: ./tools/dist
-        key: key-windows-toolchain
+#    - name: Cache Windows toolchain
+#      id: cache-windows
+#      uses: actions/cache@v2
+#      with:
+#        path: ./tools/dist
+#        key: key-windows-toolchain
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -117,12 +117,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Cache Mac toolchain
-      id: cache-mac
-      uses: actions/cache@v2
-      with:
-        path: ./tools/dist
-        key: key-mac-toolchain
+#    - name: Cache Mac toolchain
+#      id: cache-mac
+#      uses: actions/cache@v2
+#      with:
+#        path: ./tools/dist
+#        key: key-mac-toolchain
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -255,12 +255,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Cache Linux toolchain
-      id: cache-linux
-      uses: actions/cache@v2
-      with:
-        path: ./tools/dist
-        key: key-linux-toolchain
+#    - name: Cache Linux toolchain
+#      id: cache-linux
+#      uses: actions/cache@v2
+#      with:
+#        path: ./tools/dist
+#        key: key-linux-toolchain
     - name: Boards.txt diff
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
