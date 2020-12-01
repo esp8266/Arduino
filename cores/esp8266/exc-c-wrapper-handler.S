@@ -34,6 +34,79 @@
 // #endif
 
 #include "xtruntime-frames.h"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Verified that the ASM generated UEXC_xxx values match, the corresponding
+// values in `struct __exception_frame` used in the "C" code.
+//
+#include "esp8266_undocumented.h"
+.if (UEXC_pc != VERIFY_UEXC_pc)
+.err
+.endif
+.if (UEXC_ps != VERIFY_UEXC_ps)
+.err
+.endif
+.if (UEXC_sar != VERIFY_UEXC_sar)
+.err
+.endif
+.if (UEXC_vpri != VERIFY_UEXC_vpri)
+.err
+.endif
+.if (UEXC_a0 != VERIFY_UEXC_a0)
+.err
+.endif
+.if (UEXC_a2 != VERIFY_UEXC_a2)
+.err
+.endif
+.if (UEXC_a3 != VERIFY_UEXC_a3)
+.err
+.endif
+.if (UEXC_a4 != VERIFY_UEXC_a4)
+.err
+.endif
+.if (UEXC_a5 != VERIFY_UEXC_a5)
+.err
+.endif
+.if (UEXC_a6 != VERIFY_UEXC_a6)
+.err
+.endif
+.if (UEXC_a7 != VERIFY_UEXC_a7)
+.err
+.endif
+.if (UEXC_a8 != VERIFY_UEXC_a8)
+.err
+.endif
+.if (UEXC_a9 != VERIFY_UEXC_a9)
+.err
+.endif
+.if (UEXC_a10 != VERIFY_UEXC_a10)
+.err
+.endif
+.if (UEXC_a11 != VERIFY_UEXC_a11)
+.err
+.endif
+.if (UEXC_a12 != VERIFY_UEXC_a12)
+.err
+.endif
+.if (UEXC_a13 != VERIFY_UEXC_a13)
+.err
+.endif
+.if (UEXC_a14 != VERIFY_UEXC_a14)
+.err
+.endif
+.if (UEXC_a15 != VERIFY_UEXC_a15)
+.err
+.endif
+.if (UEXC_exccause != VERIFY_UEXC_exccause)
+.err
+.endif
+.if (UserFrameSize != VERIFY_UserFrameSize)
+.err
+.endif
+.if (UserFrameTotalSize != VERIFY_UserFrameTotalSize)
+.err
+.endif
+///////////////////////////////////////////////////////////////////////////////
 
 /*
  *  This is the general exception assembly-level handler that dispatches C handlers.

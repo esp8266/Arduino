@@ -22,6 +22,10 @@
 #include <assert.h>
 #include <esp8266_undocumented.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //C This turns on range checking. Is this the value you want to trigger it?
 #ifdef DEBUG_ESP_CORE
 #define DEBUG_ESP_MMU
@@ -47,8 +51,8 @@
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
 
 #if defined(DEV_DEBUG_PRINT)
-extern "C" void set_pll(void);
-extern "C" void dbg_set_pll(void);
+extern void set_pll(void);
+extern void dbg_set_pll(void);
 
 #define DBG_MMU_PRINTF(fmt, ...) \
 set_pll(); \
@@ -64,10 +68,6 @@ DBG_MMU_FLUSH(0)
 #define DBG_MMU_FLUSH(...) do {} while(false)
 #define DBG_MMU_PRINTF(...) do {} while(false)
 #endif    // defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 static inline __attribute__((always_inline))
 bool mmu_is_iram(const void *addr) {
@@ -197,12 +197,8 @@ int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
   return val;
 }
 
-#ifdef __cplusplus
-}
-#endif
-
 #if (MMU_IRAM_SIZE > 32*1024) && !defined(MMU_SEC_HEAP)
-extern "C" void _text_end(void);
+extern void _text_end(void);
 #define MMU_SEC_HEAP mmu_sec_heap()
 #define MMU_SEC_HEAP_SIZE mmu_sec_heap_size()
 
@@ -215,6 +211,10 @@ void *mmu_sec_heap(void) {
 static inline __attribute__((always_inline))
 size_t mmu_sec_heap_size(void) {
   return (size_t)0xC000UL - ((size_t)mmu_sec_heap() - 0x40100000UL);
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif
 

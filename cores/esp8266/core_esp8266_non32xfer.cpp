@@ -30,8 +30,9 @@
  */
 
 #include <Arduino.h>
-#include <core_esp8266_non32xfer.h>
+#define VERIFY_C_ASM_EXCEPTION_FRAME_STRUCTURE
 #include <esp8266_undocumented.h>
+#include <core_esp8266_non32xfer.h>
 #include <mmu_iram.h>
 #include <Schedule.h>
 #include <debug.h>
@@ -47,7 +48,7 @@ extern "C" {
 
 #define EXCCAUSE_LOAD_STORE_ERROR 3 /* Non 32-bit read/write error */
 
-static fn_exception_handler_t old_handler = NULL;
+static fn_c_exception_handler_t old_c_handler = NULL;
 
 static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, uint32_t cause)
 {
@@ -151,9 +152,9 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
     INTLEVEL != 0. I cannot create it any more. I thought I saw this as a
     problem; however, my test case shows no problem ?? Maybe I was confused.
    */
-  if (old_handler) { // if (0 == (ef->ps & 0x0F)) {
-    DBG_MMU_PRINTF("\ncalling previous load/store handler(%p)\n", old_handler);
-    old_handler(ef, cause);
+  if (old_c_handler) { // if (0 == (ef->ps & 0x0F)) {
+    DBG_MMU_PRINTF("\ncalling previous load/store handler(%p)\n", old_c_handler);
+    old_c_handler(ef, cause);
     return;
   }
 
@@ -188,7 +189,7 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
   ISR call. While malloc() will supply DRAM for all allocation from an ISR,
   we want free() to safely operate from an ISR to avoid a leak potential.
 
-  This alternative "C" Wrapper is only applied to this exception handler.
+  This replacement "C" Wrapper is only applied to this exception handler.
  */
 
 #define ROM_xtos_c_wrapper_handler (reinterpret_cast<_xtos_handler>(0x40000598))
@@ -201,11 +202,14 @@ static void IRAM_ATTR _set_exception_handler_wrapper(uint32_t cause) {
 }
 
 void IRAM_ATTR install_non32xfer_exception_handler(void) {
-  if (NULL == old_handler) {
-    old_handler =
+  if (NULL == old_c_handler) {
+    // Set the "C" exception handler the wrapper will call
+    old_c_handler =
     _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR,
       non32xfer_exception_handler);
 
+    // Set the replacement ASM based exception "C" wrapper function which will
+    // be calling `non32xfer_exception_handler`.
     _set_exception_handler_wrapper(EXCCAUSE_LOAD_STORE_ERROR);
   }
 }
