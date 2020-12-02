@@ -291,7 +291,7 @@ void setup() {
     uint8_t hfrag;
     ESP.getHeapStats(&hfree, &hmax, &hfrag);
     ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
-                    hfree, hmax, hfrag);
+               hfree, hmax, hfrag);
     if (free_iram > UMM_OVERHEAD_ADJUST) {
       void *all = malloc(free_iram - UMM_OVERHEAD_ADJUST);
       ETS_PRINTF("%p = malloc(%u)\n", all, free_iram);
