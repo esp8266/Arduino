@@ -8,6 +8,7 @@ V ?= 0
 R ?= noexec
 TERM ?= xterm
 DEFSYM_FS ?= -Wl,--defsym,_FS_start=0x40300000 -Wl,--defsym,_FS_end=0x411FA000 -Wl,--defsym,_FS_page=0x100 -Wl,--defsym,_FS_block=0x2000 -Wl,--defsym,_EEPROM_start=0x411fb000
+RANLIB ?= ranlib
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
@@ -225,16 +226,7 @@ test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
 clean:
-	make FORCE32=0 cleanarch; make FORCE32=1 cleanarch
-
-cleanarch: clean-objects clean-coverage	# clean everything
-	rm -rf $(BINDIR)
-
-clean-objects:
-	rm -rf $(C_OBJECTS) $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_CORE_EMU) $(CPP_OBJECTS_TESTS)
-
-clean-coverage:
-	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
+	rm -rf bin bin32
 
 gcov: test				# run coverage for CI
 	( mkdir -p $(BINDIR)/gcov; cd $(BINDIR)/gcov; find . -name "*.gcno" -exec $(GCOV) -s ../.. -r -pb {} + )
@@ -279,8 +271,8 @@ $(BINDIR)/%.cpp.o: %.cpp
 	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $@.d -c -o $@ $<
 
 $(BINDIR)/core.a: $(C_OBJECTS:%=$(BINDIR)/%) $(CPP_OBJECTS_CORE:%=$(BINDIR)/%)
-	ar -rcu $@ $^
-	ranlib $@
+	$(AR) rc $@ $^
+	$(RANLIB) $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS:%=$(BINDIR)/%) $(BINDIR)/core.a
 	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@
@@ -378,8 +370,8 @@ FULLCORE_OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU) $(C_OBJECTS_CORE_EMU)
 FULLCORE_OBJECTS_ISOLATED = $(FULLCORE_OBJECTS:%.o=$(BINDIR)/%.o)
 
 $(BINDIR)/fullcore.a: $(FULLCORE_OBJECTS_ISOLATED)
-	$(VERBAR) ar -rcu $@ $^
-	$(VERBAR) ranlib $@
+	$(VERBAR) $(AR) rc $@ $^
+	$(VERBAR) $(RANLIB) $@
 
 ifeq ($(INO),)
 
