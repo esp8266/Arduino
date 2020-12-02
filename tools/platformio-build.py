@@ -45,10 +45,15 @@ Builder.match_splitext = scons_patched_match_splitext
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
+board = env.BoardConfig()
+gzip_fw = board.get("build.gzip_fw", False)
+gzip_switch = []
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinoespressif8266")
 assert isdir(FRAMEWORK_DIR)
 
+if gzip_fw:
+    gzip_switch = ["--gzip", "PIO"]
 
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
@@ -146,7 +151,7 @@ env.Append(
                 "--path", '"%s"' % join(
                     platform.get_package_dir("toolchain-xtensa"), "bin"),
                 "--out", "$TARGET"
-            ]), "Building $TARGET"),
+            ] + gzip_switch), "Building $TARGET"),
             suffix=".bin"
         )
     )
@@ -241,9 +246,9 @@ else:
 #
 # Waveform
 #
-if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM" in flatten_cppdefines:
-    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PWM", 1)])
-# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE will be used by default
+if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
+    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PHASE", 1)])
+# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM will be used by default
 
 #
 # VTables
