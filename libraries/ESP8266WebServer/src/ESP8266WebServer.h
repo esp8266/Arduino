@@ -246,7 +246,7 @@ protected:
   bool _parseForm(ClientType& client, const String& boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
-  uint8_t _uploadReadByte(ClientType& client);
+  int _uploadReadByte(ClientType& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
 
@@ -307,6 +307,5 @@ protected:
 
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
-
 
 #endif //ESP8266WEBSERVER_H

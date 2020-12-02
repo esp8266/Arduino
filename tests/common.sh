@@ -66,6 +66,8 @@ function build_sketches()
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
+    local pwm_phase=""
+    [ $(( $build_rem % 2 )) -eq 0 ] && pwm_phase="--waveform_phase"
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
@@ -104,7 +106,7 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
-	if [ "$WINDOWS" == "1" ]; then
+        if [ "$WINDOWS" == "1" ]; then
             sketch=$(echo $sketch | sed 's/^\/c//')
             # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
             # http://www.mingw.org/wiki/Posix_path_conversion
@@ -112,8 +114,8 @@ function build_sketches()
             export MSYS2_ARG_CONV_EXC="*"
             export MSYS_NO_PATHCONV=1
         fi
-        echo "$build_cmd $sketch"
-        time ($build_cmd $sketch >build.log)
+        echo "$build_cmd $pwm_phase $sketch"
+        time ($build_cmd $pwm_phase $sketch >build.log)
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"

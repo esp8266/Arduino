@@ -725,7 +725,7 @@ int HTTPClient::writeToStream(Stream * stream)
     int ret = 0;
 
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
-        if(len > 0) {
+        if(len > 0 || len == -1) {
             ret = writeToStreamDataBlock(stream, len);
 
             // have we an error?
@@ -1183,6 +1183,12 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
         // not read more the buffer can handle
         if(readBytes > buff_size) {
             readBytes = buff_size;
+        }
+    
+        // len == -1 or len > what is available, read only what is available
+        int av = _client->available();
+        if (readBytes < 0 || readBytes > av) {
+            readBytes = av;
         }
 
         // read data
