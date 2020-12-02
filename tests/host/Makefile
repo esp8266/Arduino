@@ -227,7 +227,7 @@ test: $(OUTPUT_BINARY)			# run host test for CI
 
 .PHONY: clean
 clean: clean-objects
-	rm -rf $(LCOV)
+	rm -rf $(LCOV_DIRECTORY)
 
 .PHONY: clean-objects
 clean-objects:
