@@ -55,7 +55,7 @@ $(warning compiling in native mode)
 BINDIR := $(abspath bin)
 endif
 OUTPUT_BINARY := $(BINDIR)/host_tests
-LCOV_DIRECTORY := $(BINDIR)/lcov
+LCOV_DIRECTORY := $(BINDIR)/../lcov
 
 ifeq ($(V), 0)
 VERBC   = @echo "C   $@";
@@ -225,12 +225,19 @@ doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
-clean:
+.PHONY: clean
+clean: clean-objects
+	rm -rf $(LCOV)
+
+.PHONY: clean-objects
+clean-objects:
 	rm -rf bin bin32
 
+.PHONY: test
 gcov: test				# run coverage for CI
 	( mkdir -p $(BINDIR)/gcov; cd $(BINDIR)/gcov; find . -name "*.gcno" -exec $(GCOV) -s ../.. -r -pb {} + )
 
+.PHONY: valgrind
 valgrind: $(OUTPUT_BINARY)
 	mkdir -p $(LCOV_DIRECTORY)
 	$(LCOV) --directory $(BINDIR) --zerocounters
@@ -238,6 +245,7 @@ valgrind: $(OUTPUT_BINARY)
 	$(LCOV) --directory $(BINDIR) --capture --output-file $(LCOV_DIRECTORY)/app.info
 	-$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
+.PHONY: build-info
 build-info:				# show toolchain version
 	@echo "-------- build tools info --------"
 	@echo "CC: " $(CC)
