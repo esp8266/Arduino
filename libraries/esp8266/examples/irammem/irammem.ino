@@ -17,7 +17,7 @@
 uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
   }
   *res = sum;
@@ -27,7 +27,7 @@ uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
 uint32_t cyclesToWrite_nKx32(int n, unsigned int *x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += i;
     *(x++) = sum;
   }
@@ -37,7 +37,7 @@ uint32_t cyclesToWrite_nKx32(int n, unsigned int *x) {
 uint32_t cyclesToRead_nKx16(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
   }
   *res = sum;
@@ -47,7 +47,7 @@ uint32_t cyclesToRead_nKx16(int n, unsigned short *x, uint32_t *res) {
 uint32_t cyclesToWrite_nKx16(int n, unsigned short *x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += i;
     *(x++) = sum;
   }
@@ -57,7 +57,7 @@ uint32_t cyclesToWrite_nKx16(int n, unsigned short *x) {
 uint32_t cyclesToRead_nKx8(int n, unsigned char*x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
   }
   *res = sum;
@@ -67,7 +67,7 @@ uint32_t cyclesToRead_nKx8(int n, unsigned char*x, uint32_t *res) {
 uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += i;
     *(x++) = sum;
   }
@@ -79,7 +79,7 @@ uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
 uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += mmu_get_uint16(x++); //*(x++);
   }
   *res = sum;
@@ -89,7 +89,7 @@ uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
 uint32_t cyclesToWrite_nKx16_viaInline(int n, unsigned short *x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += i;
     // *(x++) = sum;
     mmu_set_uint16(x++, sum);
@@ -100,7 +100,7 @@ uint32_t cyclesToWrite_nKx16_viaInline(int n, unsigned short *x) {
 uint32_t cyclesToRead_nKx8_viaInline(int n, unsigned char*x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += mmu_get_uint8(x++); //*(x++);
   }
   *res = sum;
@@ -110,7 +110,7 @@ uint32_t cyclesToRead_nKx8_viaInline(int n, unsigned char*x, uint32_t *res) {
 uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char*x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n*1024; i++) {
+  for (int i = 0; i < n * 1024; i++) {
     sum += i;
     // *(x++) = sum;
     mmu_set_uint8(x++, sum);
@@ -123,34 +123,34 @@ void perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
   uint32_t t;
 
   t = cyclesToWrite_nKx16(nK, (uint16_t*)imem);
-  Serial.printf("IRAM Memory Write:         %6d cycles for %dK by 16, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("IRAM Memory Write:         %6d cycles for %dK by 16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx16(nK, (uint16_t*)imem, &res);
-  Serial.printf("IRAM Memory Read:          %6d cycles for %dK by 16, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("IRAM Memory Read:          %6d cycles for %dK by 16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx16_viaInline(nK, (uint16_t*)imem);
-  Serial.printf("IRAM Memory Write Inline:  %6d cycles for %dK by 16, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("IRAM Memory Write Inline:  %6d cycles for %dK by 16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx16_viaInline(nK, (uint16_t*)imem, &res);
-  Serial.printf("IRAM Memory Read Inline:   %6d cycles for %dK by 16, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("IRAM Memory Read Inline:   %6d cycles for %dK by 16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx16(nK, (uint16_t*)mem);
-  Serial.printf("DRAM Memory Write:         %6d cycles for %dK by 16, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("DRAM Memory Write:         %6d cycles for %dK by 16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx16(nK, (uint16_t*)mem, &res);
-  Serial.printf("DRAM Memory Read:          %6d cycles for %dK by 16, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("DRAM Memory Read:          %6d cycles for %dK by 16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx8(nK, (uint8_t*)imem);
-  Serial.printf("IRAM Memory Write:         %6d cycles for %dK by  8, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("IRAM Memory Write:         %6d cycles for %dK by  8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx8(nK, (uint8_t*)imem, &res);
-  Serial.printf("IRAM Memory Read:          %6d cycles for %dK by  8, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("IRAM Memory Read:          %6d cycles for %dK by  8, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx8_viaInline(nK, (uint8_t*)imem);
-  Serial.printf("IRAM Memory Write Inline:  %6d cycles for %dK by  8, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("IRAM Memory Write Inline:  %6d cycles for %dK by  8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx8_viaInline(nK, (uint8_t*)imem, &res);
-  Serial.printf("IRAM Memory Read Inline:   %6d cycles for %dK by  8, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("IRAM Memory Read Inline:   %6d cycles for %dK by  8, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx8(nK, (uint8_t*)mem);
-  Serial.printf("DRAM Memory Write:         %6d cycles for %dK by  8, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("DRAM Memory Write:         %6d cycles for %dK by  8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx8(nK, (uint8_t*)mem, &res);
-  Serial.printf("DRAM Memory Read:          %6d cycles for %dK by  8, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("DRAM Memory Read:          %6d cycles for %dK by  8, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 }
 
 void setup() {
@@ -159,7 +159,7 @@ void setup() {
   // Serial.begin(74880);
   Serial.begin(115200);
   delay(20);
-  Serial.printf_P(PSTR("\n\nSetup ...\n"));
+  Serial.printf_P(PSTR("\n\nSetup ...\r\n"));
 #ifndef UMM_HEAP_IRAM
   Serial.printf("\r\n"
                 "This example needs IRAM Heap support enabled.\r\n"
@@ -171,9 +171,9 @@ void setup() {
   // Compiling with Secondary Heap option does not change malloc to use the
   // IRAM region.  It will continue to use the builtin DRAM until we request
   // otherwise.
-  Serial.printf("DRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
   uint32_t *mem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
-  Serial.printf("DRAM buffer: Address %p, free %d\n", mem, ESP.getFreeHeap());
+  Serial.printf("DRAM buffer: Address %p, free %d\r\n", mem, ESP.getFreeHeap());
   if (!mem) {
     return;
   }
@@ -181,9 +181,9 @@ void setup() {
   // Now request from the IRAM heap
 #ifdef USE_SET_IRAM_HEAP
   ESP.setIramHeap();
-  Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   uint32_t *imem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
-  Serial.printf("IRAM buffer: Address %p, free %d\n", imem, ESP.getFreeHeap());
+  Serial.printf("IRAM buffer: Address %p, free %d\r\n", imem, ESP.getFreeHeap());
   // Make sure we go back to the DRAM heap for other allocations.  Don't forget to ESP.resetHeap()!
   ESP.resetHeap();
 #else
@@ -195,9 +195,9 @@ void setup() {
     // umm_set_heap_by_id(UMM_HEAP_IRAM);
     //  ...
     // umm_set_heap_by_id(_heap_id);
-    Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+    Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
     imem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
-    Serial.printf("IRAM buffer: Address %p, free %d\n", imem, ESP.getFreeHeap());
+    Serial.printf("IRAM buffer: Address %p, free %d\r\n", imem, ESP.getFreeHeap());
   }
 #endif
   if (!imem) {
@@ -209,14 +209,14 @@ void setup() {
   int nK = 1;
   Serial.println();
   t = cyclesToWrite_nKx32(nK, imem);
-  Serial.printf("IRAM Memory Write:         %6d cycles for %dK by 32, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("IRAM Memory Write:         %6d cycles for %dK by 32, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx32(nK, imem, &res);
-  Serial.printf("IRAM Memory Read:          %6d cycles for %dK by 32, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("IRAM Memory Read:          %6d cycles for %dK by 32, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx32(nK, mem);
-  Serial.printf("DRAM Memory Write:         %6d cycles for %dK by 32, %3d AVG cycles/transfer\n", t, nK, t/(nK*1024));
+  Serial.printf("DRAM Memory Write:         %6d cycles for %dK by 32, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx32(nK, mem, &res);
-  Serial.printf("DRAM Memory Read:          %6d cycles for %dK by 32, %3d AVG cycles/transfer (sum %08x)\n", t, nK, t/(nK*1024), res);
+  Serial.printf("DRAM Memory Read:          %6d cycles for %dK by 32, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
   Serial.println();
   perfTest_nK(1, mem, imem);
   Serial.println();
@@ -232,13 +232,13 @@ void setup() {
     s += ' ';
   }
   ESP.resetHeap();
-  Serial.printf("DRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
   ESP.setIramHeap();
-  Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   ESP.resetHeap();
-  Serial.printf("String: %s\n", s.c_str());
+  Serial.printf("String: %s\r\n", s.c_str());
   ESP.setIramHeap();
-  Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   ESP.resetHeap();
 #else
   {
@@ -251,15 +251,15 @@ void setup() {
     }
     {
       HeapSelectDram ephemeral;
-      Serial.printf("DRAM free: %6d\n", ESP.getFreeHeap());
+      Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
     }
     // Back to IRAM
-    Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
-    Serial.printf("String: %s\n", s.c_str());
+    Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
+    Serial.printf("String: %s\r\n", s.c_str());
   }
   {
     HeapSelectIram ephemeral;
-    Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+    Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   }
 #endif
 
@@ -270,38 +270,38 @@ void setup() {
   imem = NULL;
   mem = NULL;
 
-  Serial.printf("DRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
 #ifdef USE_SET_IRAM_HEAP
   ESP.setIramHeap();
-  Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+  Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   ESP.resetHeap();
 #else
   {
     HeapSelectIram ephemeral;
-    Serial.printf("IRAM free: %6d\n", ESP.getFreeHeap());
+    Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   }
 #endif
   {
-    ets_uart_printf("Try and allocate all of the heap in one chunk\n");
+    ETS_PRINTF("Try and allocate all of the heap in one chunk\n");
     HeapSelectIram ephemeral;
     size_t free_iram = ESP.getFreeHeap();
-    ets_uart_printf("IRAM free: %6d\n", free_iram);
+    ETS_PRINTF("IRAM free: %6d\n", free_iram);
     uint32_t hfree;
     uint16_t hmax;
     uint8_t hfrag;
     ESP.getHeapStats(&hfree, &hmax, &hfrag);
-    ets_uart_printf("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
+    ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
                     hfree, hmax, hfrag);
     if (free_iram > UMM_OVERHEAD_ADJUST) {
       void *all = malloc(free_iram - UMM_OVERHEAD_ADJUST);
-      ets_uart_printf("%p = malloc(%u)\n", all, free_iram);
+      ETS_PRINTF("%p = malloc(%u)\n", all, free_iram);
       umm_info(NULL, true);
 
       free_iram = ESP.getFreeHeap();
-      ets_uart_printf("IRAM free: %6d\n", free_iram);
+      ETS_PRINTF("IRAM free: %6d\n", free_iram);
 
       free(all);
-      ets_uart_printf("IRAM free: %6d\n", ESP.getFreeHeap());
+      ETS_PRINTF("IRAM free: %6d\n", ESP.getFreeHeap());
     }
   }
 }
@@ -325,7 +325,7 @@ void processKey(Print& out, int hotKey) {
         }
         {
           HeapSelectDram ephemeral;
-          Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
+          Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\r\n"), ESP.getFreeHeap());
         }
         break;
       }
@@ -362,48 +362,3 @@ void loop(void) {
     processKey(Serial, hotKey);
   }
 }
-
-
-  // t = cyclesToWrite_nKx8(4, (uint8_t*)imem);
-  // Serial.printf("IRAM Memory Write:         %6d cycles for 4K by  8\n", t);
-  // t = cyclesToWrite_nKx8_viaInline(4, (uint8_t*)imem);
-  // Serial.printf("IRAM Memory Write Inline:  %6d cycles for 4K by  8\n", t);
-  // t = cyclesToWrite_nKx8(4, (uint8_t*)mem);
-  // Serial.printf("DRAM Memory Write:         %6d cycles for 4K by  8\n", t);
-  //
-  // t = cyclesToRead_nKx8(4, (uint8_t*)imem, &res);
-  // Serial.printf("IRAM Memory Read:          %6d cycles for 4K by  8 (sum %08x)\n", t, res);
-  // t = cyclesToRead_nKx8_viaInline(4, (uint8_t*)imem, &res);
-  // Serial.printf("IRAM Memory Read Inline:   %6d cycles for 4K by  8 (sum %08x)\n", t, res);
-  // t = cyclesToRead_nKx8(4, (uint8_t*)mem, &res);
-  // Serial.printf("DRAM Memory Read:          %6d cycles for 4K by  8 (sum %08x)\n", t, res);
-  //
-  //
-  // nK = 1;
-  // t = cyclesToWrite_nKx16(nK, (uint16_t*)imem);
-  // Serial.printf("IRAM Memory Write:         %6d cycles for 1K by 16\n", t);
-  // t = cyclesToWrite_nKx16_viaInline(nK, (uint16_t*)imem);
-  // Serial.printf("IRAM Memory Write Inline:  %6d cycles for 1K by 16\n", t);
-  // t = cyclesToWrite_nKx16(nK, (uint16_t*)mem);
-  // Serial.printf("DRAM Memory Write:         %6d cycles for 1K by 16\n", t);
-  //
-  // t = cyclesToRead_nKx16(nK, (uint16_t*)imem, &res);
-  // Serial.printf("IRAM Memory Read:          %6d cycles for 1K by 16 (sum %08x)\n", t, res);
-  // t = cyclesToRead_nKx16_viaInline(nK, (uint16_t*)imem, &res);
-  // Serial.printf("IRAM Memory Read Inline:   %6d cycles for 1K by 16 (sum %08x)\n", t, res);
-  // t = cyclesToRead_nKx16(nK, (uint16_t*)mem, &res);
-  // Serial.printf("DRAM Memory Read:          %6d cycles for 1K by 16 (sum %08x)\n", t, res);
-  //
-  // t = cyclesToWrite_nKx8(nK, (uint8_t*)imem);
-  // Serial.printf("IRAM Memory Write:         %6d cycles for 1K by  8\n", t);
-  // t = cyclesToWrite_nKx8_viaInline(nK, (uint8_t*)imem);
-  // Serial.printf("IRAM Memory Write Inline:  %6d cycles for 1K by  8\n", t);
-  // t = cyclesToWrite_nKx8((uint8_t*)mem);
-  // Serial.printf("DRAM Memory Write:         %6d cycles for 1K by  8\n", t);
-  //
-  // t = cyclesToRead_nKx8(nK, (uint8_t*)imem, &res);
-  // Serial.printf("IRAM Memory Read:          %6d cycles for 1K by  8 (sum %08x)\n", t, res);
-  // t = cyclesToRead_nKx8_viaInline(nK, (uint8_t*)imem, &res);
-  // Serial.printf("IRAM Memory Read Inline:   %6d cycles for 1K by  8 (sum %08x)\n", t, res);
-  // t = cyclesToRead_nKx8(nK, (uint8_t*)mem, &res);
-  // Serial.printf("DRAM Memory Read:          %6d cycles for 1K by  8 (sum %08x)\n", t, res);
