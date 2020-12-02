@@ -6,6 +6,7 @@ FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
 R ?= noexec
+TERM ?= xterm
 DEFSYM_FS ?= -Wl,--defsym,_FS_start=0x40300000 -Wl,--defsym,_FS_end=0x411FA000 -Wl,--defsym,_FS_page=0x100 -Wl,--defsym,_FS_block=0x2000 -Wl,--defsym,_EEPROM_start=0x411fb000
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
@@ -387,11 +388,14 @@ ifeq ($(INO),)
 
 else
 
-%: %.ino.cpp.o $(BINDIR)/fullcore.a
+%: %.ino.cpp.o $(BINDIR)/fullcore.a FORCE
 	$(VERBLD) $(CXX) $(LDFLAGS) $< $(BINDIR)/fullcore.a $(LIBSSL) -o $@
-	ln -s $@ $(BINDIR)/
+	mkdir -p $(BINDIR)/$(lastword $(subst /, ,$@))
+	ln -sf $@ $(BINDIR)/$(lastword $(subst /, ,$@))
 	@echo "----> $(BINDIR)/ <----"
-	#if [ "$(R)" = run ]; then
+	@[ "$(R)" = noexec ] && echo '(not running it, use `make R="[<options>]" ...` for valgrind+gdb)' || $(dir $(MAKEFILE))/valgdb $@ $(R)
+
+FORCE:
 
 endif
 
