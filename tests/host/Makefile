@@ -62,11 +62,13 @@ VERBC   = @echo "C   $@";
 VERBCXX = @echo "C++ $@";
 VERBLD  = @echo "LD  $@";
 VERBAR  = @echo "AR  $@";
+VERBRANLIB = @echo "RANLIB $@";
 else
 VERBC   =
 VERBCXX =
 VERBLD  =
 VERBAR  =
+VERBRANLIB =
 endif
 
 $(shell mkdir -p $(BINDIR))
@@ -383,7 +385,7 @@ FULLCORE_OBJECTS_ISOLATED = $(FULLCORE_OBJECTS:%.o=$(BINDIR)/%.o)
 
 $(BINDIR)/fullcore.a: $(FULLCORE_OBJECTS_ISOLATED)
 	$(VERBAR) $(AR) rc $@ $^
-	$(VERBAR) $(RANLIB) $@
+	$(VERBRANLIB) $(RANLIB) $@
 
 ifeq ($(INO),)
 
