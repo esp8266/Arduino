@@ -45,10 +45,15 @@ Builder.match_splitext = scons_patched_match_splitext
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
+board = env.BoardConfig()
+gzip_fw = board.get("build.gzip_fw", False)
+gzip_switch = []
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinoespressif8266")
 assert isdir(FRAMEWORK_DIR)
 
+if gzip_fw:
+    gzip_switch = ["--gzip", "PIO"]
 
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
@@ -145,7 +150,7 @@ env.Append(
                 "--path", '"%s"' % join(
                     platform.get_package_dir("toolchain-xtensa"), "bin"),
                 "--out", "$TARGET"
-            ]), "Building $TARGET"),
+            ] + gzip_switch), "Building $TARGET"),
             suffix=".bin"
         )
     )

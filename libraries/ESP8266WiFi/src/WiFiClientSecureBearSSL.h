@@ -31,13 +31,13 @@
 
 namespace BearSSL {
 
-class WiFiClientSecure : public WiFiClient {
+class WiFiClientSecureCtx : public WiFiClient {
   public:
-    WiFiClientSecure();
-    WiFiClientSecure(const WiFiClientSecure &rhs);
-    ~WiFiClientSecure() override;
+    WiFiClientSecureCtx();
+    WiFiClientSecureCtx(const WiFiClientSecure &rhs) = delete;
+    ~WiFiClientSecureCtx() override;
 
-    WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+    WiFiClientSecureCtx& operator=(const WiFiClientSecureCtx&) = delete;
 
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
@@ -46,12 +46,6 @@ class WiFiClientSecure : public WiFiClient {
     uint8_t connected() override;
     size_t write(const uint8_t *buf, size_t size) override;
     size_t write_P(PGM_P buf, size_t size) override;
-    size_t write(const char *buf) {
-      return write((const uint8_t*)buf, strlen(buf));
-    }
-    size_t write_P(const char *buf) {
-      return write_P((PGM_P)buf, strlen_P(buf));
-    }
     size_t write(Stream& stream); // Note this is not virtual
     int read(uint8_t *buf, size_t size) override;
     int read(char *buf, size_t size) { return read((uint8_t*)buf, size); }
@@ -124,19 +118,14 @@ class WiFiClientSecure : public WiFiClient {
     // Select specific ciphers (i.e. optimize for speed over security)
     // These may be in PROGMEM or RAM, either will run properly
     bool setCiphers(const uint16_t *cipherAry, int cipherCount);
-    bool setCiphers(std::vector<uint16_t> list);
+    bool setCiphers(const std::vector<uint16_t>& list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
-
-    // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
-    static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
-    static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
-    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
     // peek buffer API is present
     virtual bool peekBufferAPI () const override { return true; }
 
     // return number of byte accessible by peekBuffer()
-    virtual size_t availableForPeek () override { return WiFiClientSecure::available(); }
+    virtual size_t availableForPeek () override { return WiFiClientSecureCtx::available(); }
 
     // return a pointer to available data buffer (size = availableForPeek())
     // semantic forbids any kind of read() before calling peekConsume()
@@ -202,10 +191,10 @@ class WiFiClientSecure : public WiFiClient {
     unsigned _cert_issuer_key_type;
 
     // Methods for handling server.available() call which returns a client connection.
-    friend class WiFiServerSecure; // Server needs to access these constructors
-    WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
+    friend class WiFiClientSecure; // access to private context constructors
+    WiFiClientSecureCtx(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
-    WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
+    WiFiClientSecureCtx(ClientContext* client, const X509List *chain, const PrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
 
     // RSA keyed server
@@ -219,8 +208,126 @@ class WiFiClientSecure : public WiFiClient {
     bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
-};
+}; // class WiFiClientSecureCtx
 
-};
+
+class WiFiClientSecure : public WiFiClient {
+
+  // WiFiClient's "ClientContext* _client" is always nullptr in this class.
+  // Instead, all virtual functions call their counterpart in "WiFiClientecureCtx* _ctx"
+  //          which also derives from WiFiClient (this parent is the one which is eventually used)
+
+  public:
+
+    WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { }
+    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { }
+    ~WiFiClientSecure() override { _ctx = nullptr; }
+
+    WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+
+    uint8_t status() override { return _ctx->status(); }
+    int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }
+    int connect(const String& host, uint16_t port) override { return _ctx->connect(host, port); }
+    int connect(const char* name, uint16_t port) override { return _ctx->connect(name, port); }
+
+    uint8_t connected() override { return _ctx->connected(); }
+    size_t write(const uint8_t *buf, size_t size) override { return _ctx->write(buf, size); }
+    size_t write_P(PGM_P buf, size_t size) override { return _ctx->write_P(buf, size); }
+    size_t write(const char *buf) { return write((const uint8_t*)buf, strlen(buf)); }
+    size_t write_P(const char *buf) { return write_P((PGM_P)buf, strlen_P(buf)); }
+    size_t write(Stream& stream) /* Note this is not virtual */ { return _ctx->write(stream); }
+    int read(uint8_t *buf, size_t size) override { return _ctx->read(buf, size); }
+    int available() override { return _ctx->available(); }
+    int read() override { return _ctx->read(); }
+    int peek() override { return _ctx->peek(); }
+    size_t peekBytes(uint8_t *buffer, size_t length) override { return _ctx->peekBytes(buffer, length); }
+    bool flush(unsigned int maxWaitMs) { return _ctx->flush(maxWaitMs); }
+    bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
+    void flush() override { (void)flush(0); }
+    void stop() override { (void)stop(0); }
+
+    // Allow sessions to be saved/restored automatically to a memory area
+    void setSession(Session *session) { _ctx->setSession(session); }
+
+    // Don't validate the chain, just accept whatever is given.  VERY INSECURE!
+    void setInsecure() { _ctx->setInsecure(); }
+
+    // Assume a given public key, don't validate or use cert info at all
+    void setKnownKey(const PublicKey *pk, unsigned usages = BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN) {
+      _ctx->setKnownKey(pk, usages);
+    }
+    // Only check SHA1 fingerprint of certificate
+    bool setFingerprint(const uint8_t fingerprint[20]) {
+      return _ctx->setFingerprint(fingerprint);
+    }
+    bool setFingerprint(const char *fpStr) { return _ctx->setFingerprint(fpStr); }
+    // Accept any certificate that's self-signed
+    void allowSelfSignedCerts() { _ctx->allowSelfSignedCerts(); }
+
+    // Install certificates of trusted CAs or specific site
+    void setTrustAnchors(const X509List *ta) { _ctx->setTrustAnchors(ta); }
+    // In cases when NTP is not used, app must set a time manually to check cert validity
+    void setX509Time(time_t now) { _ctx->setX509Time(now); }
+    // Install a client certificate for this connection, in case the server requires it (i.e. MQTT)
+    void setClientRSACert(const X509List *cert, const PrivateKey *sk) { _ctx->setClientRSACert(cert, sk); }
+    void setClientECCert(const X509List *cert, const PrivateKey *sk,
+                         unsigned allowed_usages, unsigned cert_issuer_key_type) {
+      _ctx->setClientECCert(cert, sk, allowed_usages, cert_issuer_key_type);
+    }
+
+    // Sets the requested buffer size for transmit and receive
+    void setBufferSizes(int recv, int xmit) { _ctx->setBufferSizes(recv, xmit); }
+
+    // Returns whether MFLN negotiation for the above buffer sizes succeeded (after connection)
+    int getMFLNStatus() { return _ctx->getMFLNStatus(); }
+
+    // Return an error code and possibly a text string in a passed-in buffer with last SSL failure
+    int getLastSSLError(char *dest = NULL, size_t len = 0) { return _ctx->getLastSSLError(dest, len); }
+
+    // Attach a preconfigured certificate store
+    void setCertStore(CertStore *certStore) { _ctx->setCertStore(certStore); }
+
+    // Select specific ciphers (i.e. optimize for speed over security)
+    // These may be in PROGMEM or RAM, either will run properly
+    bool setCiphers(const uint16_t *cipherAry, int cipherCount) { return _ctx->setCiphers(cipherAry, cipherCount); }
+    bool setCiphers(const std::vector<uint16_t> list) { return _ctx->setCiphers(list); }
+    bool setCiphersLessSecure() { return _ctx->setCiphersLessSecure(); } // Only use the limited set of RSA ciphers without EC
+
+    // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
+    static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
+    static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
+    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
+
+    // peek buffer API is present
+    virtual bool peekBufferAPI () const override { return true; }
+
+    // return number of byte accessible by peekBuffer()
+    virtual size_t availableForPeek () override { return _ctx->available(); }
+
+    // return a pointer to available data buffer (size = availableForPeek())
+    // semantic forbids any kind of read() before calling peekConsume()
+    virtual const char* peekBuffer () override { return _ctx->peekBuffer(); }
+
+    // consume bytes after use (see peekBuffer)
+    virtual void peekConsume (size_t consume) override { return _ctx->peekConsume(consume); }
+
+  private:
+    std::shared_ptr<WiFiClientSecureCtx> _ctx;
+
+    // Methods for handling server.available() call which returns a client connection.
+    friend class WiFiServerSecure; // Server needs to access these constructors
+    WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
+                      const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta):
+      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, client_CA_ta)) {
+    }
+
+    WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
+                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta):
+      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, client_CA_ta)) {
+    }
+
+}; // class WiFiClientSecure
+
+}; // namespace BearSSL
 
 #endif
