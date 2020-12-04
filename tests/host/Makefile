@@ -73,6 +73,7 @@ $(shell mkdir -p $(BINDIR))
 
 CORE_CPP_FILES := \
 	$(addprefix $(abspath $(CORE_PATH))/,\
+		debug.cpp \
 		StreamString.cpp \
 		Stream.cpp \
 		WString.cpp \
@@ -226,7 +227,10 @@ test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
 .PHONY: clean
-clean: clean-objects
+clean: clean-lcov clean-objects
+
+.PHONY: clean-lcov
+clean-lcov:
 	rm -rf $(LCOV_DIRECTORY)
 
 .PHONY: clean-objects
@@ -392,7 +396,7 @@ else
 	$(VERBLD) $(CXX) $(LDFLAGS) $< $(BINDIR)/fullcore.a $(LIBSSL) -o $@
 	mkdir -p $(BINDIR)/$(lastword $(subst /, ,$@))
 	ln -sf $@ $(BINDIR)/$(lastword $(subst /, ,$@))
-	@echo "----> $(BINDIR)/ <----"
+	@echo "----> $(BINDIR)/$(lastword $(subst /, ,$@))/$(lastword $(subst /, ,$@)) <----"
 	@[ "$(R)" = noexec ] && echo '(not running it, use `make R="[<options>]" ...` for valgrind+gdb)' || $(dir $(MAKEFILE))/valgdb $@ $(R)
 
 FORCE:
