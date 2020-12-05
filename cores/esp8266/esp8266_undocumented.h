@@ -145,14 +145,14 @@ _xtos_handler_func _xtos_unhandled_exception;
 
 
 #ifdef __cplusplus
-// These definitions that try to be more precise for .cpp module usage.
+// For these definitions, try to be more precise for .cpp module usage.
 
 /*
   A detailed typdef for the "C" callable functions found in
   `_xtos_c_handler_table[]` More details in `_xtos_set_exception_handler`
   comments below.
 */
-typedef void (*fn_c_exception_handler_t)(struct __exception_frame *ef, uint32_t cause);
+typedef void (*fn_c_exception_handler_t)(struct __exception_frame *ef, int cause);
 
 /*
   TMI maybe? However, it may be useful for a deep debugging session.
@@ -165,7 +165,7 @@ typedef void (*fn_c_exception_handler_t)(struct __exception_frame *ef, uint32_t 
   Note, if nesting handlers is desired this must be implemented in the new "C"
   exception handler(s) being registered.
 */
-extern void _xtos_p_none(struct __exception_frame *ef, uint32_t cause);
+extern void _xtos_p_none(struct __exception_frame *ef, int cause);
 
 /*
   TMI maybe?
@@ -185,7 +185,7 @@ extern fn_c_exception_handler_t _xtos_c_handler_table[XCHAL_EXCCAUSE_NUM];
   ROM API function `_xtos_set_exception_handler` registers a "C" callable
   exception handler for a specified general exception, (EXCCAUSE value). (source
   in xtensa/xtos/exc-sethandler.c)
-  * If `reason` (EXCCAUSE) is out of range, >=64, it returns NULL.
+  * If `cause`/reason (EXCCAUSE) is out of range, >=64, it returns NULL.
   * If the new exception handler is installed, it returns the previous handler.
   * If the previous handler was `_xtos_unhandled_exception`/`_xtos_p_none`, it
     returns NULL.
@@ -203,7 +203,7 @@ extern fn_c_exception_handler_t _xtos_c_handler_table[XCHAL_EXCCAUSE_NUM];
   To aid against future conflicts, keep these new defines limited to .cpp with
   `#ifdef __cplusplus`.
 */
-extern fn_c_exception_handler_t _xtos_set_exception_handler(uint32_t reason, fn_c_exception_handler_t fn);
+extern fn_c_exception_handler_t _xtos_set_exception_handler(int cause, fn_c_exception_handler_t fn);
 #endif
 
 #ifdef __cplusplus

@@ -50,7 +50,7 @@ extern "C" {
 
 static fn_c_exception_handler_t old_c_handler = NULL;
 
-static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, uint32_t cause)
+static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cause)
 {
   do {
     /*
@@ -194,14 +194,14 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
 
 #define ROM_xtos_c_wrapper_handler (reinterpret_cast<_xtos_handler>(0x40000598))
 
-static void IRAM_ATTR _set_exception_handler_wrapper(uint32_t cause) {
+static void _set_exception_handler_wrapper(int cause) {
   _xtos_handler old_wrapper = _xtos_exc_handler_table[cause];
   if (old_wrapper == ROM_xtos_c_wrapper_handler) {
     _xtos_exc_handler_table[cause] = _xtos_c_wrapper_handler;
   }
 }
 
-void IRAM_ATTR install_non32xfer_exception_handler(void) {
+void install_non32xfer_exception_handler(void) {
   if (NULL == old_c_handler) {
     // Set the "C" exception handler the wrapper will call
     old_c_handler =
