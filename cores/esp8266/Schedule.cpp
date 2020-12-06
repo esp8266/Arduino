@@ -102,6 +102,7 @@ bool schedule_function(const std::function<void(void)>& fn)
     return true;
 }
 
+IRAM_ATTR // (not only) called from ISR
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     uint32_t repeat_us, const std::function<bool(void)>& alarm)
 {
