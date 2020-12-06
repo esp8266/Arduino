@@ -71,7 +71,7 @@ extern "C" {
 
 namespace BearSSL {
 
-void WiFiClientSecure::_clear() {
+void WiFiClientSecureCtx::_clear() {
   // TLS handshake may take more than the 5 second default timeout
   _timeout = 15000;
 
@@ -95,7 +95,7 @@ void WiFiClientSecure::_clear() {
   _cipher_cnt = 0;
 }
 
-void WiFiClientSecure::_clearAuthenticationSettings() {
+void WiFiClientSecureCtx::_clearAuthenticationSettings() {
   _use_insecure = false;
   _use_fingerprint = false;
   _use_self_signed = false;
@@ -104,7 +104,7 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
 }
 
 
-WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
+WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -112,12 +112,7 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   stack_thunk_add_ref();
 }
 
-WiFiClientSecure::WiFiClientSecure(const WiFiClientSecure &rhs) : WiFiClient(rhs) {
-  *this = rhs;
-  stack_thunk_add_ref();
-}
-
-WiFiClientSecure::~WiFiClientSecure() {
+WiFiClientSecureCtx::~WiFiClientSecureCtx() {
   if (_client) {
     _client->unref();
     _client = nullptr;
@@ -127,7 +122,7 @@ WiFiClientSecure::~WiFiClientSecure() {
   stack_thunk_del_ref();
 }
 
-WiFiClientSecure::WiFiClientSecure(ClientContext* client,
+WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
                                      const X509List *chain, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
   _clear();
@@ -144,7 +139,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client,
   }
 }
 
-WiFiClientSecure::WiFiClientSecure(ClientContext *client,
+WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
                                      const X509List *chain,
                                      unsigned cert_issuer_key_type, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
@@ -162,12 +157,12 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
   }
 }
 
-void WiFiClientSecure::setClientRSACert(const X509List *chain, const PrivateKey *sk) {
+void WiFiClientSecureCtx::setClientRSACert(const X509List *chain, const PrivateKey *sk) {
   _chain = chain;
   _sk = sk;
 }
 
-void WiFiClientSecure::setClientECCert(const X509List *chain,
+void WiFiClientSecureCtx::setClientECCert(const X509List *chain,
                                         const PrivateKey *sk, unsigned allowed_usages, unsigned cert_issuer_key_type) {
   _chain = chain;
   _sk = sk;
@@ -175,7 +170,7 @@ void WiFiClientSecure::setClientECCert(const X509List *chain,
   _cert_issuer_key_type = cert_issuer_key_type;
 }
 
-void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
+void WiFiClientSecureCtx::setBufferSizes(int recv, int xmit) {
   // Following constants taken from bearssl/src/ssl/ssl_engine.c (not exported unfortunately)
   const int MAX_OUT_OVERHEAD = 85;
   const int MAX_IN_OVERHEAD = 325;
@@ -191,7 +186,7 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
+bool WiFiClientSecureCtx::stop(unsigned int maxWaitMs) {
   bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
   // Only if we've already connected, store session params and clear the connection options
   if (_handshake_done) {
@@ -203,19 +198,19 @@ bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
   return ret;
 }
 
-bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
+bool WiFiClientSecureCtx::flush(unsigned int maxWaitMs) {
   (void) _run_until(BR_SSL_SENDAPP);
   return WiFiClient::flush(maxWaitMs);
 }
 
-int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
+int WiFiClientSecureCtx::connect(IPAddress ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }
   return _connectSSL(nullptr);
 }
 
-int WiFiClientSecure::connect(const char* name, uint16_t port) {
+int WiFiClientSecureCtx::connect(const char* name, uint16_t port) {
   IPAddress remote_addr;
   if (!WiFi.hostByName(name, remote_addr)) {
     DEBUG_BSSL("connect: Name lookup failure\n");
@@ -228,11 +223,11 @@ int WiFiClientSecure::connect(const char* name, uint16_t port) {
   return _connectSSL(name);
 }
 
-int WiFiClientSecure::connect(const String& host, uint16_t port) {
+int WiFiClientSecureCtx::connect(const String& host, uint16_t port) {
   return connect(host.c_str(), port);
 }
 
-void WiFiClientSecure::_freeSSL() {
+void WiFiClientSecureCtx::_freeSSL() {
   // These are smart pointers and will free if refcnt==0
   _sc = nullptr;
   _sc_svr = nullptr;
@@ -249,18 +244,18 @@ void WiFiClientSecure::_freeSSL() {
   _timeout = 15000;
 }
 
-bool WiFiClientSecure::_clientConnected() {
+bool WiFiClientSecureCtx::_clientConnected() {
   return (_client && _client->state() == ESTABLISHED);
 }
 
-uint8_t WiFiClientSecure::connected() {
+uint8_t WiFiClientSecureCtx::connected() {
   if (available() || (_clientConnected() && _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED))) {
     return true;
   }
   return false;
 }
 
-size_t WiFiClientSecure::_write(const uint8_t *buf, size_t size, bool pmem) {
+size_t WiFiClientSecureCtx::_write(const uint8_t *buf, size_t size, bool pmem) {
   size_t sent_bytes = 0;
 
   if (!connected() || !size || !_handshake_done) {
@@ -301,16 +296,16 @@ size_t WiFiClientSecure::_write(const uint8_t *buf, size_t size, bool pmem) {
   return sent_bytes;
 }
 
-size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
+size_t WiFiClientSecureCtx::write(const uint8_t *buf, size_t size) {
   return _write(buf, size, false);
 }
 
-size_t WiFiClientSecure::write_P(PGM_P buf, size_t size) {
+size_t WiFiClientSecureCtx::write_P(PGM_P buf, size_t size) {
   return _write((const uint8_t *)buf, size, true);
 }
 
 // We have to manually read and send individual chunks.
-size_t WiFiClientSecure::write(Stream& stream) {
+size_t WiFiClientSecureCtx::write(Stream& stream) {
   size_t totalSent = 0;
   size_t countRead;
   size_t countSent;
@@ -333,7 +328,7 @@ size_t WiFiClientSecure::write(Stream& stream) {
   return totalSent;
 }
 
-int WiFiClientSecure::read(uint8_t *buf, size_t size) {
+int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
   if (!ctx_present() || !_handshake_done) {
     return -1;
   }
@@ -365,7 +360,7 @@ int WiFiClientSecure::read(uint8_t *buf, size_t size) {
   return 0; // If we're connected, no error but no read.
 }
 
-int WiFiClientSecure::read() {
+int WiFiClientSecureCtx::read() {
   uint8_t c;
   if (1 == read(&c, 1)) {
     return c;
@@ -374,7 +369,7 @@ int WiFiClientSecure::read() {
   return -1;
 }
 
-int WiFiClientSecure::available() {
+int WiFiClientSecureCtx::available() {
   if (_recvapp_buf) {
     return _recvapp_len;  // Anything from last call?
   }
@@ -395,7 +390,7 @@ int WiFiClientSecure::available() {
   return 0;
 }
 
-int WiFiClientSecure::peek() {
+int WiFiClientSecureCtx::peek() {
   if (!ctx_present() || !available()) {
     DEBUG_BSSL("peek: Not connected, none left available\n");
     return -1;
@@ -407,7 +402,7 @@ int WiFiClientSecure::peek() {
   return -1;
 }
 
-size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
+size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   size_t to_copy = 0;
   if (!ctx_present()) {
     DEBUG_BSSL("peekBytes: Not connected\n");
@@ -430,7 +425,7 @@ size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
    combination of both (the combination matches either). When a match is
    achieved, this function returns 0. On error, it returns -1.
 */
-int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
+int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
   if (!ctx_present()) {
     DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
@@ -554,7 +549,7 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
   return -1;
 }
 
-bool WiFiClientSecure::_wait_for_handshake() {
+bool WiFiClientSecureCtx::_wait_for_handshake() {
   _handshake_done = false;
   while (!_handshake_done && _clientConnected()) {
     int ret = _run_until(BR_SSL_SENDAPP);
@@ -579,7 +574,7 @@ static uint8_t htoi (unsigned char c)
 }
 
 // Set a fingerprint by parsing an ASCII string
-bool WiFiClientSecure::setFingerprint(const char *fpStr) {
+bool WiFiClientSecureCtx::setFingerprint(const char *fpStr) {
   int idx = 0;
   uint8_t c, d;
   uint8_t fp[20];
@@ -972,7 +967,7 @@ extern "C" {
 }
 
 // Set custom list of ciphers
-bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
+bool WiFiClientSecureCtx::setCiphers(const uint16_t *cipherAry, int cipherCount) {
   _cipher_list = nullptr;
   _cipher_list = std::shared_ptr<uint16_t>(new (std::nothrow) uint16_t[cipherCount], std::default_delete<uint16_t[]>());
   if (!_cipher_list.get()) {
@@ -984,16 +979,16 @@ bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
   return true;
 }
 
-bool WiFiClientSecure::setCiphersLessSecure() {
+bool WiFiClientSecureCtx::setCiphersLessSecure() {
   return setCiphers(faster_suites_P, sizeof(faster_suites_P)/sizeof(faster_suites_P[0]));
 }
 
-bool WiFiClientSecure::setCiphers(std::vector<uint16_t> list) {
+bool WiFiClientSecureCtx::setCiphers(const std::vector<uint16_t>& list) {
   return setCiphers(&list[0], list.size());
 }
 
 // Installs the appropriate X509 cert validation method for a client connection
-bool WiFiClientSecure::_installClientX509Validator() {
+bool WiFiClientSecureCtx::_installClientX509Validator() {
   if (_use_insecure || _use_fingerprint || _use_self_signed) {
     // Use common insecure x509 authenticator
     _x509_insecure = std::make_shared<struct br_x509_insecure_context>();
@@ -1050,7 +1045,7 @@ bool WiFiClientSecure::_installClientX509Validator() {
 
 // Called by connect() to do the actual SSL setup and handshake.
 // Returns if the SSL handshake succeeded.
-bool WiFiClientSecure::_connectSSL(const char* hostName) {
+bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
   DEBUG_BSSL("_connectSSL: start connection\n");
   _freeSSL();
   _oom_err = false;
@@ -1149,7 +1144,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
 // Slightly different X509 setup for servers who want to validate client
 // certificates, so factor it out as it's used in RSA and EC servers.
-bool WiFiClientSecure::_installServerX509Validator(const X509List *client_CA_ta) {
+bool WiFiClientSecureCtx::_installServerX509Validator(const X509List *client_CA_ta) {
   if (client_CA_ta) {
     _ta = client_CA_ta;
     // X509 minimal validator.  Checks dates, cert chain for trusted CA, etc.
@@ -1182,7 +1177,7 @@ bool WiFiClientSecure::_installServerX509Validator(const X509List *client_CA_ta)
 
 
 // Called by WiFiServerBearSSL when an RSA cert/key is specified.
-bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
+bool WiFiClientSecureCtx::_connectSSLServerRSA(const X509List *chain,
     const PrivateKey *sk,
     const X509List *client_CA_ta) {
   _freeSSL();
@@ -1225,7 +1220,7 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
 }
 
 // Called by WiFiServerBearSSL when an elliptic curve cert/key is specified.
-bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
+bool WiFiClientSecureCtx::_connectSSLServerEC(const X509List *chain,
     unsigned cert_issuer_key_type, const PrivateKey *sk,
     const X509List *client_CA_ta) {
 #ifndef BEARSSL_SSL_BASIC
@@ -1278,7 +1273,7 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
 
 // Returns an error ID and possibly a string (if dest != null) of the last
 // BearSSL reported error.
-int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
+int WiFiClientSecureCtx::getLastSSLError(char *dest, size_t len) {
   int err = 0;
   const char *t = PSTR("OK");
   const char *recv_fatal = "";
