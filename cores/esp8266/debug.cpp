@@ -20,6 +20,7 @@
 
 #include "Arduino.h"
 #include "debug.h"
+#include "osapi.h"
 
 #ifdef DEBUG_ESP_CORE
 void iamslow (const char* what)

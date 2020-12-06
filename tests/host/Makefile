@@ -62,11 +62,13 @@ VERBC   = @echo "C   $@";
 VERBCXX = @echo "C++ $@";
 VERBLD  = @echo "LD  $@";
 VERBAR  = @echo "AR  $@";
+VERBRANLIB = @echo "RANLIB $@";
 else
 VERBC   =
 VERBCXX =
 VERBLD  =
 VERBAR  =
+VERBRANLIB =
 endif
 
 $(shell mkdir -p $(BINDIR))
@@ -227,7 +229,10 @@ test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
 .PHONY: clean
-clean: clean-objects
+clean: clean-lcov clean-objects
+
+.PHONY: clean-lcov
+clean-lcov:
 	rm -rf $(LCOV_DIRECTORY)
 
 .PHONY: clean-objects
@@ -380,7 +385,7 @@ FULLCORE_OBJECTS_ISOLATED = $(FULLCORE_OBJECTS:%.o=$(BINDIR)/%.o)
 
 $(BINDIR)/fullcore.a: $(FULLCORE_OBJECTS_ISOLATED)
 	$(VERBAR) $(AR) rc $@ $^
-	$(VERBAR) $(RANLIB) $@
+	$(VERBRANLIB) $(RANLIB) $@
 
 ifeq ($(INO),)
 
@@ -393,7 +398,7 @@ else
 	$(VERBLD) $(CXX) $(LDFLAGS) $< $(BINDIR)/fullcore.a $(LIBSSL) -o $@
 	mkdir -p $(BINDIR)/$(lastword $(subst /, ,$@))
 	ln -sf $@ $(BINDIR)/$(lastword $(subst /, ,$@))
-	@echo "----> $(BINDIR)/ <----"
+	@echo "----> $(BINDIR)/$(lastword $(subst /, ,$@))/$(lastword $(subst /, ,$@)) <----"
 	@[ "$(R)" = noexec ] && echo '(not running it, use `make R="[<options>]" ...` for valgrind+gdb)' || $(dir $(MAKEFILE))/valgdb $@ $(R)
 
 FORCE:
