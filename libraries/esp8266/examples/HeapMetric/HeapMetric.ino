@@ -4,6 +4,7 @@
 
 #include <ESP8266WiFi.h>
 #include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 void stats(const char* what) {
   // we could use getFreeHeap() getMaxFreeBlockSize() and getHeapFragmentation()
@@ -109,6 +110,7 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_OFF);
 
+  Serial.printf("\r\nDemo Heap Metrics for DRAM\r\n");
   tryit(8000);
   tryit(4000);
   tryit(2000);
@@ -118,6 +120,21 @@ void setup() {
   tryit(100);
   tryit(50);
   tryit(15);
+#ifdef UMM_HEAP_IRAM
+  {
+    HeapSelectIram ephemeral;
+    Serial.printf("\r\nDemo Heap Metrics for IRAM\r\n");
+    tryit(8000);
+    tryit(4000);
+    tryit(2000);
+    tryit(1000);
+    tryit(500);
+    tryit(200);
+    tryit(100);
+    tryit(50);
+    tryit(15);
+  }
+#endif
 }
 
 void loop() {

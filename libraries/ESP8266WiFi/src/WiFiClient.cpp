@@ -195,7 +195,7 @@ bool WiFiClient::getSync() const
     return _client->getSync();
 }
 
-size_t WiFiClient::availableForWrite ()
+int WiFiClient::availableForWrite ()
 {
     return _client? _client->availableForWrite(): 0;
 }

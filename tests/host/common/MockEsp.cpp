@@ -247,3 +247,19 @@ uint32_t esp_get_cycle_count()
     gettimeofday(&t, NULL);
     return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
 }
+
+void EspClass::setDramHeap()
+{
+}
+
+void EspClass::setIramHeap()
+{
+}
+
+void EspClass::setExternalHeap()
+{
+}
+
+void EspClass::resetHeap()
+{
+}
