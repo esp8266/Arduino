@@ -37,17 +37,34 @@
 
 
 #if defined(UMM_POISON_CHECK_LITE)
-static bool check_poison_neighbors( uint16_t cur );
+static bool check_poison_neighbors( umm_heap_context_t *_context, uint16_t cur );
 #endif
 
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-void ICACHE_FLASH_ATTR print_stats(int force);
+void ICACHE_FLASH_ATTR umm_print_stats(int force);
 #endif
 
 
 
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define UMM_INFO_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+
+
+typedef struct umm_block_t umm_block;
+
+struct UMM_HEAP_CONTEXT {
+  umm_block *heap;
+  void *heap_end;
+#if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
+  UMM_STATISTICS stats;
+#endif
+#ifdef UMM_INFO
+  UMM_HEAP_INFO info;
+#endif
+  unsigned short int numblocks;
+  unsigned char id;
+};
+
 
 #endif

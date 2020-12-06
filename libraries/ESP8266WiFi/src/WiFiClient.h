@@ -52,7 +52,7 @@ public:
   WiFiClient(const WiFiClient&);
   WiFiClient& operator=(const WiFiClient&);
 
-  uint8_t status();
+  virtual uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;
   virtual int connect(const String& host, uint16_t port);

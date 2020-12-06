@@ -141,6 +141,31 @@ def add_crc(out):
     with open(out, "wb") as binfile:
         binfile.write(raw)
 
+def gzip_bin(mode, out):
+    import gzip
+
+    firmware_path = out
+    gzip_path = firmware_path + '.gz'
+    orig_path = firmware_path + '.orig'
+    if os.path.exists(gzip_path):
+        os.remove(gzip_path)
+    print('GZipping firmware ' + firmware_path)
+    with open(firmware_path, 'rb') as firmware_file, \
+            gzip.open(gzip_path, 'wb') as dest:
+        data = firmware_file.read()
+        dest.write(data)
+    orig_size = os.stat(firmware_path).st_size
+    gzip_size = os.stat(gzip_path).st_size
+    print("New FW size {:d} bytes vs old {:d} bytes".format(
+        gzip_size, orig_size))
+
+    if mode == "PIO":
+        if os.path.exists(orig_path):
+            os.remove(orig_path)
+        print('Moving original firmware to ' + orig_path)
+        os.rename(firmware_path, orig_path)
+        os.rename(gzip_path, firmware_path)
+
 def main():
     parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
     parser.add_argument('-e', '--eboot', action='store', required=True, help='Path to the Arduino eboot.elf bootloader')
@@ -150,6 +175,7 @@ def main():
     parser.add_argument('-s', '--flash_size', action='store', required=True, choices=['256K', '512K', '1M', '2M', '4M', '8M', '16M'], help='SPI flash size')
     parser.add_argument('-o', '--out', action='store', required=True, help='Output BIN filename')
     parser.add_argument('-p', '--path', action='store', required=True, help='Path to Xtensa toolchain binaries')
+    parser.add_argument('-g', '--gzip', choices=['PIO', 'Arduino'], help='PIO - generate gzipped BIN file, Arduino - generate BIN and BIN.gz')
 
     args = parser.parse_args()
 
@@ -174,6 +200,9 @@ def main():
 
     # Because the CRC includes both eboot and app, can only calculate it after the entire BIN generated
     add_crc(args.out)
+
+    if args.gzip:
+        gzip_bin(args.gzip, args.out)
 
     return 0
 
