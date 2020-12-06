@@ -23,10 +23,11 @@ import os
 import subprocess
 import sys
 
-def get_segment_hints():
+def get_segment_hints(iram):
     hints = {}
+    hints['ICACHE'] = '          - flash instruction cache'
     hints['IROM'] = '         - code in flash         (default or ICACHE_FLASH_ATTR)'
-    hints['IRAM'] = '  / 32768 - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)'
+    hints['IRAM'] = '  / ' + str(iram) + ' - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)'
     hints['DATA'] = ')         - initialized variables (global, static) in RAM/HEAP'
     hints['RODATA'] = ') / 81920 - constants             (global, static) in RAM/HEAP'
     hints['BSS'] = ')         - zeroed variables      (global, static) in RAM/HEAP'
@@ -34,6 +35,7 @@ def get_segment_hints():
 
 def get_segment_sizes(elf, path):
     sizes = {}
+    sizes['ICACHE'] = 0
     sizes['IROM'] = 0
     sizes['IRAM'] = 0
     sizes['DATA'] = 0
@@ -55,14 +57,28 @@ def get_segment_sizes(elf, path):
             sizes['BSS'] = sizes['BSS'] + int(words[1])
     return sizes
 
+def get_mmu_sizes(mmu, sizes):
+    iram = 0x8000
+    sizes['ICACHE'] = 0x8000
+    lines = mmu.split(' ')
+    for line in lines:
+        words = line.split('=')
+        if line.startswith('-DMMU_IRAM_SIZE'):
+            iram = int(words[1], 16)
+        elif line.startswith('-DMMU_ICACHE_SIZE'):
+            sizes['ICACHE'] = int(words[1], 16)
+    return [iram, sizes]
+
 def main():
     parser = argparse.ArgumentParser(description='Report the different segment sizes of a compiled ELF file')
     parser.add_argument('-e', '--elf', action='store', required=True, help='Path to the Arduino sketch ELF')
     parser.add_argument('-p', '--path', action='store', required=True, help='Path to Xtensa toolchain binaries')
+    parser.add_argument('-i', '--mmu', action='store', required=False, help='MMU build options')
 
     args = parser.parse_args()
     sizes = get_segment_sizes(args.elf, args.path)
-    hints = get_segment_hints()
+    [iram, sizes] = get_mmu_sizes(args.mmu, sizes)
+    hints = get_segment_hints(iram)
 
     sys.stderr.write("Executable segment sizes:" + os.linesep)
     for k in sizes.keys():

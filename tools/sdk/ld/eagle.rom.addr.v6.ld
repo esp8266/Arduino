@@ -80,7 +80,8 @@ PROVIDE ( _xtos_p_none = 0x4000dbf8 );
 PROVIDE ( _xtos_restore_intlevel = 0x4000056c );
 PROVIDE ( _xtos_return_from_exc = 0x4000dc54 );
 
-/* Added to support replacing the ROM _xtos_unhandled_exception */
+/* Added to support replacing ROM and SDK default exception handlers */
+PROVIDE ( _xtos_c_handler_table = 0x3fffc100 );
 PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
 
 PROVIDE ( _xtos_set_exception_handler = 0x40000454 );
