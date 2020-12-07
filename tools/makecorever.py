@@ -26,7 +26,7 @@ def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, stderr=DEVNULL)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL)
         return proc.stdout.readlines()[0].strip()
 
     try:
