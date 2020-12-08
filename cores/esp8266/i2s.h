@@ -21,6 +21,8 @@
 #ifndef I2S_h
 #define I2S_h
 
+#define I2S_HAS_BEGIN_RXTXDAC 1
+
 /*
 How does this work? Basically, to get sound, you need to:
 - Connect an I2S codec to the I2S pins on the ESP.
@@ -41,6 +43,7 @@ extern "C" {
 #endif
 
 void i2s_begin(); // Enable TX only, for compatibility
+bool i2s_rxtxdac_begin(bool enableRx, bool enableTx, bool txDAC); // Allow TX and/or RX, returns false on OOM error
 bool i2s_rxtx_begin(bool enableRx, bool enableTx); // Allow TX and/or RX, returns false on OOM error
 void i2s_end();
 void i2s_set_rate(uint32_t rate);//Sample Rate in Hz (ex 44100, 48000)
