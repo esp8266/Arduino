@@ -123,7 +123,7 @@ class EspClass {
         uint8_t getBootMode();
 
 #if defined(F_CPU) || defined(CORE_MOCK)
-        constexpr 
+        constexpr
 #endif
             inline uint8_t getCpuFreqMHz() const __attribute__((always_inline))
         {
@@ -215,7 +215,15 @@ class EspClass {
 #else
         uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
+        void enableVM();
+        void setDramHeap();
+        void setIramHeap();
+        void setExternalHeap();
+        void resetHeap();
     private:
+#ifdef UMM_HEAP_EXTERNAL
+        bool vmEnabled = false;
+#endif
         /**
          * @brief Replaces @a byteCount bytes of a 4 byte block on flash
          *
