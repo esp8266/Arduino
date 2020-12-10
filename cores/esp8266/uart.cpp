@@ -47,6 +47,7 @@
 #include "esp8266_peri.h"
 #include "user_interface.h"
 #include "uart_register.h"
+#include "coredecls.h"
 
 #define MODE2WIDTH(mode) (((mode%16)>>2)+5)
 #define MODE2STOP(mode) (((mode)>>5)+1)
@@ -505,8 +506,19 @@ uart_write(uart_t* uart, const char* buf, size_t size)
 
     size_t ret = size;
     const int uart_nr = uart->uart_nr;
-    while (size--)
-        uart_do_write_char(uart_nr, pgm_read_byte(buf++));
+	
+    if (can_yield() && 100*size/(uart->baud_rate/10) > 0) {
+        // it takes more than 0.01s to print this string => yielding between chars
+        // ( <=> (1000*size)/baud>0 <~> (size<<10)/baud > 0 )
+        while (size--) {
+            uart_do_write_char(uart_nr, pgm_read_byte(buf++));
+            yield();
+        }
+    } else {
+        while (size--) {
+            uart_do_write_char(uart_nr, pgm_read_byte(buf++));
+        }
+    }
 
     return ret;
 }
