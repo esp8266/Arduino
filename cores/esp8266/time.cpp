@@ -127,6 +127,8 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
 
 void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
+    sntp_stop();
+
     // There is no way to tell when DST starts or stop with this API
     // So DST is always integrated in TZ
     // The other API should be preferred
@@ -178,6 +180,8 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     setServer(0, server1);
     setServer(1, server2);
     setServer(2, server3);
+
+    sntp_init();
 }
 
 void setTZ(const char* tz){
@@ -200,14 +204,14 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     sntp_init();
 }
 
-static TrivialCB _settimeofday_cb;
-
-void settimeofday_cb (TrivialCB&& cb)
-{
-    _settimeofday_cb = std::move(cb);
-}
+static BoolCB _settimeofday_cb;
 
 void settimeofday_cb (const TrivialCB& cb)
+{
+    _settimeofday_cb = [cb](bool sntp) { (void)sntp; cb(); };
+}
+
+void settimeofday_cb (const BoolCB& cb)
 {
     _settimeofday_cb = cb;
 }
@@ -218,6 +222,20 @@ extern "C" {
 
 int settimeofday(const struct timeval* tv, const struct timezone* tz)
 {
+    bool from_sntp;
+    if (tz == (struct timezone*)0xFeedC0de)
+    {
+        // This special constant is used by lwip2/SNTP calling
+        // settimeofday(sntp-time, 0xfeedc0de), secretly using the
+        // obsolete-but-yet-still-there `tz` field.
+        // It allows to avoid duplicating this function and inform user
+        // about the source time change.
+        tz = nullptr;
+        from_sntp = true;
+    }
+    else
+        from_sntp = false;
+
     if (tz || !tv)
         // tz is obsolete (cf. man settimeofday)
         return EINVAL;
@@ -226,7 +244,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
     tune_timeshift64(tv->tv_sec * 1000000ULL + tv->tv_usec);
 
     if (_settimeofday_cb)
-        schedule_recurrent_function_us([](){ _settimeofday_cb(); return false; }, 0);
+        schedule_recurrent_function_us([from_sntp](){ _settimeofday_cb(from_sntp); return false; }, 0);
 
     return 0;
 }

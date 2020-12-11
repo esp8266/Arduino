@@ -43,6 +43,8 @@ class PublicKey {
     PublicKey();
     PublicKey(const char *pemKey);
     PublicKey(const uint8_t *derKey, size_t derLen);
+    PublicKey(Stream& stream, size_t size);
+    PublicKey(Stream& stream) : PublicKey(stream, stream.available()) { };
     ~PublicKey();
 
     bool parse(const char *pemKey);
@@ -69,6 +71,8 @@ class PrivateKey {
     PrivateKey();
     PrivateKey(const char *pemKey);
     PrivateKey(const uint8_t *derKey, size_t derLen);
+    PrivateKey(Stream& stream, size_t size);
+    PrivateKey(Stream& stream) : PrivateKey(stream, stream.available()) { };
     ~PrivateKey();
 
     bool parse(const char *pemKey);
@@ -98,6 +102,8 @@ class X509List {
     X509List();
     X509List(const char *pemCert);
     X509List(const uint8_t *derCert, size_t derLen);
+    X509List(Stream& stream, size_t size);
+    X509List(Stream& stream) : X509List(stream, stream.available()) { };
     ~X509List();
 
     bool append(const char *pemCert);
@@ -128,7 +134,7 @@ class X509List {
 class WiFiClientSecure;
 
 class Session {
-  friend class WiFiClientSecure;
+  friend class WiFiClientSecureCtx;
 
   public:
     Session() { memset(&_session, 0, sizeof(_session)); }
