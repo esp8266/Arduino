@@ -21,7 +21,7 @@
 #ifndef I2S_h
 #define I2S_h
 
-#define I2S_HAS_BEGIN_RXTXDAC 1
+#define I2S_HAS_BEGIN_RXTX_DRIVE_CLOCKS 1
 
 /*
 How does this work? Basically, to get sound, you need to:
