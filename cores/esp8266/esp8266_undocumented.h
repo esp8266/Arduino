@@ -121,12 +121,14 @@ struct __exception_frame
 */
 #ifndef XTRUNTIME_H
 // This is copy/paste from RTOS_SDK/components/esp8266/include/xtensa/xtruntime.h
+// With edits in the __cplusplus path to use `using` instead of `typedef`.
 #ifdef __cplusplus
-typedef void (_xtos_handler_func)(...);
+using _xtos_handler_func = void (...);
+using _xtos_handler = _xtos_handler_func *;
 #else
 typedef void (_xtos_handler_func)();
-#endif
 typedef _xtos_handler_func *_xtos_handler;
+#endif
 
 extern _xtos_handler _xtos_exc_handler_table[XCHAL_EXCCAUSE_NUM];
 
@@ -152,7 +154,7 @@ _xtos_handler_func _xtos_unhandled_exception;
   `_xtos_c_handler_table[]` More details in `_xtos_set_exception_handler`
   comments below.
 */
-typedef void (*fn_c_exception_handler_t)(struct __exception_frame *ef, int cause);
+using fn_c_exception_handler_t = void (*)(struct __exception_frame *ef, int cause);
 
 /*
   TMI maybe? However, it may be useful for a deep debugging session.
