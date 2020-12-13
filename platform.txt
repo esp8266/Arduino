@@ -102,7 +102,7 @@ recipe.hooks.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.t
 recipe.hooks.linking.prelink.1.pattern=mkdir -p "{build.path}/ld_h/"
 recipe.hooks.linking.prelink.1.pattern.windows=cmd /v:on /e:on /c "if not exist {build.path}\ld_h\ (mkdir {build.path}\ld_h\ )"
 recipe.hooks.linking.prelink.2.pattern=cp "{runtime.platform.path}/tools/sdk/ld/{build.flash_ld}" "{build.path}/ld_h/local.eagle.flash.ld.h"
-recipe.hooks.linking.prelink.2.pattern.windows=cmd /v:on /e:on /c "copy {runtime.platform.path}\tools\sdk\ld\{build.flash_ld}" "{build.path}\ld_h\local.eagle.flash.ld.h"
+recipe.hooks.linking.prelink.2.pattern.windows=cmd /v:on /e:on /c "copy {runtime.platform.path}\tools\sdk\ld\{build.flash_ld} {build.path}\ld_h\local.eagle.flash.ld.h"
 recipe.hooks.linking.prelink.3.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{build.path}/ld_h/local.eagle.flash.ld.h" -o "{build.path}/local.eagle.flash.ld"
 recipe.hooks.linking.prelink.4.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
 
