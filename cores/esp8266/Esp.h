@@ -215,10 +215,41 @@ class EspClass {
 #else
         uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
+        /**
+         * @brief Installs VM exception handler to support External memory (Experimental)
+         *
+         * @param none
+         * @return none
+         */
         void enableVM();
+        /**
+         * @brief Push current Heap selection and set Heap selection to DRAM.
+         *
+         * @param none
+         * @return none
+         */
         void setDramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to IRAM.
+         *
+         * @param none
+         * @return none
+         */
         void setIramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to External. (Experimental)
+         *
+         * @param none
+         * @return none
+         */
         void setExternalHeap();
+        /**
+         * @brief Restores Heap selection back to value present when
+         * setDramHeap, setIramHeap, or setExternalHeap was called.
+         *
+         * @param none
+         * @return none
+         */
         void resetHeap();
     private:
 #ifdef UMM_HEAP_EXTERNAL
