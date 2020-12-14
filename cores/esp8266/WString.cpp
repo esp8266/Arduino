@@ -24,6 +24,10 @@
 #include <Arduino.h>
 #include "WString.h"
 #include "stdlib_noniso.h"
+#include "umm_malloc/umm_malloc.h"
+#if defined(MMU_IRAM_HEAP)
+#include "umm_malloc/umm_heap_select.h"
+#endif
 
 /*********************************************/
 /*  Constructors                             */
@@ -157,7 +161,92 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         return 0;
     }
     uint16_t oldLen = len();
+
+#if defined(MMU_IRAM_HEAP)
+    /*
+      Heap selection control for the String Class
+
+      This feature has two parts IRAM/DRAM selection and Heap rollover.
+
+      Private global static variable `_preferredHeap` stores which Heap to use and
+      whether it is "exclusive" or "rollover".
+      `_preferredHeap` value is encoded as follows:
+       * Negative values are "exclusive" - only try one Heap.
+       * Positive values are "rollover" - rollover, try the other Heap on failure.
+       * The `_preferredHeap` value is a 1 based index and must be converted to 0 based.
+       * When `_preferredHeap` is 0 or is out of range, the current Heap setting is used.
+        ex. abs(_preferredHeap) >= (UMM_NUM_HEAPS + 1) when true would get you the current Heap.
+    */
+    char *newbuffer = NULL;
+    int preferredHeap = (int)getHeap();
+    if (0 == preferredHeap) {
+        newbuffer = (char *) realloc(isSSO() ? nullptr : wbuffer(), newSize);
+
+    } else {
+//? Which one do you prefer.
+#if 1
+//C With this, the Sketch used 280656 bytes
+//C This is a little smaller and does not use any of heap push/pop space.
+        size_t selectHeap = abs(preferredHeap) - 1;
+        size_t oldHeap = umm_get_current_heap_id();
+        if (nullptr == umm_set_heap_by_id(selectHeap)) {
+            // Use current umm_malloc Heap selection
+            selectHeap = oldHeap;
+        }
+        char *oldBuffer = isSSO() ? nullptr : wbuffer();
+        newbuffer = (char *) realloc(oldBuffer, newSize);
+
+        if (!newbuffer && 0 < preferredHeap) {
+            umm_set_heap_by_id((UMM_HEAP_IRAM == selectHeap) ? UMM_HEAP_DRAM : UMM_HEAP_IRAM);
+            newbuffer = (char *) malloc(newSize);
+            if (newbuffer && oldBuffer) {
+                // If we are here, the two buffers are on different Heaps, must copy.
+                // Also, need to be mindful that IRAM can be either source or
+                // destination and the need to keep the transfer as whole 32-bit words.
+                ets_memcpy(newbuffer, oldBuffer, (oldLen + 1u + 3u) & ~3u);
+                free(oldBuffer);
+            }
+        }
+        umm_set_heap_by_id(oldHeap);
+#else
+//C With this, the Sketch uses 280672 bytes
+//C This might be more readable. I am not a good judge on that point.
+        size_t selectHeap = abs(preferredHeap) - 1;
+        if (UMM_NUM_HEAPS <= selectHeap) {
+            // Use current umm_malloc Heap selection
+            selectHeap = umm_get_current_heap_id();
+        }
+        if (UMM_HEAP_IRAM == selectHeap) {
+            ESP.setIramHeap();
+        } else {
+            ESP.setDramHeap();
+        }
+        char *oldBuffer = isSSO() ? nullptr : wbuffer();
+        newbuffer = (char *) realloc(oldBuffer, newSize);
+        if (!newbuffer && 0 < preferredHeap) {
+            ESP.resetHeap();
+            if (UMM_HEAP_IRAM == selectHeap) {
+                ESP.setDramHeap();
+            } else {
+                ESP.setIramHeap();
+            }
+            newbuffer = (char *) malloc(newSize);
+            if (newbuffer && oldBuffer) {
+                // If we are here, the two buffers are on different Heaps, must copy.
+                // Also, need to be mindful that IRAM can be either source or
+                // destination and the need to keep the transfer as whole 32-bit words.
+                ets_memcpy(newbuffer, oldBuffer, (oldLen + 1u + 3u) & ~3u);
+                free(oldBuffer);
+            }
+        }
+        ESP.resetHeap();
+#endif
+    }
+
+#else
     char *newbuffer = (char *)realloc(isSSO() ? nullptr : wbuffer(), newSize);
+#endif
+
     if (newbuffer) {
         size_t oldSize = capacity() + 1; // include NULL.
         if (isSSO()) {
@@ -773,6 +862,20 @@ double String::toDouble(void) const {
         return atof(buffer());
     return 0.0;
 }
+
+
+#if defined(MMU_IRAM_HEAP)
+// Default Global setting for Heap selection control
+
+//C Which default should it be?
+
+// Assign legacy behavior as default
+String::Heap String::_preferredHeap __attribute__((weak)) = String::Heap::CurrentOnly;
+
+//? // To aid in maximizing available DRAM, default to use IRAM 1st then DRAM
+//? String::Heap String::_preferredHeap __attribute__((weak)) = String::Heap::IramDram;
+#endif
+
 
 // global empty string to allow returning const String& with nothing
 

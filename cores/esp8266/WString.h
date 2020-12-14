@@ -27,6 +27,10 @@
 #include <string.h>
 #include <ctype.h>
 #include <pgmspace.h>
+#include "umm_malloc/umm_malloc.h"
+#if defined(MMU_IRAM_HEAP)
+#include "umm_malloc/umm_heap_select.h"
+#endif
 
 // An inherited class for holding the result of a concatenation.  These
 // result objects are assumed to be writable by subsequent concatenations.
@@ -37,6 +41,8 @@ class StringSumHelper;
 class __FlashStringHelper;
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
+
+
 
 // The string class
 class String {
@@ -92,7 +98,59 @@ class String {
         bool isEmpty(void) const {
             return length() == 0;
         }
+#if defined(MMU_IRAM_HEAP)
+        /*
+          String Class - Heap Selection Control
 
+          These options are global for all String Class buffer allocations. The
+          options are defined in `enum Heap`.
+            * Allow OOM recovery (OOM rollover) by trying a different Heap on fail.
+              * `IramDram` - Try to allocate from IRAM 1ST, then roll over to DRAM on fail.
+              * `DramIram` - Try to allocate from DRAM 1ST, then roll over to IRAM on fail.
+            * No OOM recovery. Use only the Heap specified.
+              * `IramOnly` - Allocate only from the IRAM Heap.
+              * `DramOnly` - Allocate only from the DRAM Heap.
+            * Use the current umm_malloc Heap selection for new allocations.
+              * `CurrentOnly` - Allocate only from the current Heap selected.
+            * Use the current umm_malloc Heap selection for new allocations. On
+              alloc failure, try the other Heap.
+              * `Current` - Try to allocate from the current Heap selected,
+                            then roll over to the other Heap.
+
+          Specify your global selection for Heap control in your sketch file
+          somewhere before setup().
+
+          Example of legacy behavior using option `CurrentOnly`:
+          String::Heap String::_preferredHeap = String::Heap::CurrentOnly;
+
+          Example of maximizing available DRAM, by using IRAM 1st then DRAM:
+          String::Heap String::_preferredHeap = String::Heap::IramDram;
+
+          When a Heap rollover occurs, the OOM counter for the failing Heap will
+          increment. If both Heaps fail, both OOM counters are incremented.
+        */
+        enum Heap {
+            IramDram        =  (1 + UMM_HEAP_IRAM),
+            DramIram        =  (1 + UMM_HEAP_DRAM),
+            Current         =  (1 + UMM_NUM_HEAPS),
+            IramOnly        = -(1 + UMM_HEAP_IRAM),
+            DramOnly        = -(1 + UMM_HEAP_DRAM),
+            CurrentOnly     = 0
+        };
+        inline Heap getHeap() {
+            return _preferredHeap;
+        }
+#else
+        enum Heap {
+            IramDram        = 0,
+            DramIram        = 0,
+            Current         = 0,
+            IramOnly        = 0,
+            DramOnly        = 0,
+            CurrentOnly     = 0
+        };
+        inline Heap getHeap() { return 0; }
+#endif
         // creates a copy of the assigned value.  if the value is null or
         // invalid, or if the memory allocation fails, the string will be
         // marked as invalid ("if (s)" will be false).
@@ -304,6 +362,7 @@ class String {
             struct _ptr ptr;
             struct _sso sso;
         };
+
         // Accessor functions
         bool isSSO() const { return !sso.isHeap; }
         unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
@@ -321,6 +380,11 @@ class String {
         // Buffer accessor functions
         const char *buffer() const { return wbuffer(); }
         char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
+
+    private:
+#if defined(MMU_IRAM_HEAP)
+        static Heap _preferredHeap;
+#endif
 
     protected:
         void init(void) __attribute__((always_inline)) {

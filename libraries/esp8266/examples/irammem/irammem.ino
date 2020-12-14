@@ -7,12 +7,33 @@
 #include <umm_malloc/umm_malloc.h>
 #include <umm_malloc/umm_heap_select.h>
 
-// #define USE_SET_IRAM_HEAP
+// Uncomment this define to see demo of ESP class methods for changing HEap selection.
+// #define DEMO_ESP_SET_IRAM_HEAP
+
+// Examples of a few cases of IRAM allocation using the String Class with a large string.
+// Uncomment 1 of the 3 below
+#define DEMO_BIG_STRING_GLOBAL_STRING_HEAP
+// #define DEMO_BIG_STRING_ESP_SET_HEAP
+// #define DEMO_BIG_STRING_HEAP_SELECT
+
+#if defined(UMM_HEAP_IRAM) && defined(DEMO_BIG_STRING_GLOBAL_STRING_HEAP)
+  String::Heap String::_preferredHeap = String::Heap::IramDram;
+#endif
 
 
 #ifndef ETS_PRINTF
 #define ETS_PRINTF ets_uart_printf
 #endif
+
+void printFreeHeap() {
+  ESP.setDramHeap();
+  Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
+  ESP.resetHeap();
+  ESP.setIramHeap();
+  Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
+  ESP.resetHeap();
+}
+
 
 uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
@@ -179,7 +200,7 @@ void setup() {
   }
 
   // Now request from the IRAM heap
-#ifdef USE_SET_IRAM_HEAP
+#ifdef DEMO_ESP_SET_IRAM_HEAP
   ESP.setIramHeap();
   Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   uint32_t *imem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
@@ -223,7 +244,62 @@ void setup() {
   perfTest_nK(4, mem, imem);
   Serial.println();
 
-#ifdef USE_SET_IRAM_HEAP
+  // Note that free/realloc will use the heap specified when the pointer was created.
+  // No need to change heaps to delete an object, only to create it.
+  free(imem);
+  free(mem);
+  imem = NULL;
+  mem = NULL;
+  printFreeHeap();
+
+
+#ifdef DEMO_BIG_STRING_GLOBAL_STRING_HEAP
+  // Demonstate String library's Heap OOM roll over
+  Serial.printf("Consume most of the IRAM Heap so we can demo OOM Rollover.\r\n");
+  ESP.setIramHeap();
+  auto block_sz = ESP.getFreeHeap();
+  // Allocate most of IRAM leaving enough to hold one big string, but not two.
+  // The big string created by the for loop is 291 bytes long with null
+  // terminator. Add an extra 64 bytes to hold part of the next addition to the
+  // string.
+  // Because the String library will allocate 16+ extra bytes when it
+  // reallocates a string for future growth, you will see 48 bytes instead of 64
+  // bytes of free IRAM.
+  block_sz -= ((291 + 2 * UMM_OVERHEAD_ADJUST + 7) & ~7) + 64;
+  auto block = malloc(block_sz);
+  ESP.resetHeap();
+  ESP.setDramHeap();
+
+  {
+    printFreeHeap();
+    // Use Global String Heap Selection Control to make a big ole' String
+    String s = "";
+    for (int i = 0; i < 100; i++) {
+      s += i;
+      s += ' ';
+    }
+    Serial.printf("Create big String that just fits in IRAM\r\n");
+    printFreeHeap();
+    Serial.printf("String(*%p) len(%d): %s\r\n", s.c_str(), s.length(), s.c_str());
+    Serial.printf("Now let's make the string bigger so that OOM Rollover occurs.\r\n");
+    for (int i = 0; i < 100; i++) {
+      s += i;
+      s += ' ';
+    }
+    printFreeHeap();
+    Serial.printf("String(*%p) len(%d): %s\r\n", s.c_str(), s.length(), s.c_str());
+  }
+  ESP.resetHeap();
+  printFreeHeap();
+  Serial.printf("Now free remaining IRAM Heap allocations.\r\n");
+  if (block) {
+    free(block);
+  }
+  printFreeHeap();
+  Serial.println();
+
+
+#elif defined(DEMO_BIG_STRING_ESP_SET_HEAP)
   // Let's use IRAM heap to make a big ole' String
   ESP.setIramHeap();
   String s = "";
@@ -240,7 +316,9 @@ void setup() {
   ESP.setIramHeap();
   Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   ESP.resetHeap();
-#else
+
+
+#elif defined(DEMO_BIG_STRING_HEAP_SELECT)
   {
     // Let's use IRAM heap to make a big ole' String
     HeapSelectIram ephemeral;
@@ -263,15 +341,9 @@ void setup() {
   }
 #endif
 
-  // Note that free/realloc will use the heap specified when the pointer was created.
-  // No need to change heaps to delete an object, only to create it.
-  free(imem);
-  free(mem);
-  imem = NULL;
-  mem = NULL;
 
-  Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
-#ifdef USE_SET_IRAM_HEAP
+  Serial.printf("\r\nDRAM free: %6d\r\n", ESP.getFreeHeap());
+#ifdef DEMO_ESP_SET_IRAM_HEAP
   ESP.setIramHeap();
   Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   ESP.resetHeap();
@@ -281,8 +353,9 @@ void setup() {
     Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
   }
 #endif
+
   {
-    ETS_PRINTF("Try and allocate all of the heap in one chunk\n");
+    ETS_PRINTF("Try and allocate all of the IRAM heap in one chunk\n");
     HeapSelectIram ephemeral;
     size_t free_iram = ESP.getFreeHeap();
     ETS_PRINTF("IRAM free: %6d\n", free_iram);
