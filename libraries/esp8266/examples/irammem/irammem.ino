@@ -17,7 +17,7 @@
 // #define DEMO_BIG_STRING_HEAP_SELECT
 
 #if defined(UMM_HEAP_IRAM) && defined(DEMO_BIG_STRING_GLOBAL_STRING_HEAP)
-  String::Heap String::_preferredHeap = String::Heap::IramDram;
+String::Heap String::_preferredHeap = String::Heap::IramDram;
 #endif
 
 
