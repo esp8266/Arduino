@@ -984,15 +984,20 @@ void EspClass::enableVM()
 void EspClass::setExternalHeap()
 {
 #ifdef UMM_HEAP_EXTERNAL
-    if (vmEnabled)
-        umm_push_heap(UMM_HEAP_EXTERNAL);
+    if (vmEnabled) {
+        if (!umm_push_heap(UMM_HEAP_EXTERNAL)) {
+            panic();
+        }
+    }
 #endif
 }
 
 void EspClass::setIramHeap()
 {
 #ifdef UMM_HEAP_IRAM
-    umm_push_heap(UMM_HEAP_IRAM);
+    if (!umm_push_heap(UMM_HEAP_IRAM)) {
+        panic();
+    }
 #endif
 }
 
