@@ -28,6 +28,8 @@
 #include <ctype.h>
 #include <pgmspace.h>
 #if defined(MMU_IRAM_HEAP)
+// Host test will fail with this include and build path.
+// It reports an error at link time for a missing pvPortMalloc.
 #include "umm_malloc/umm_malloc.h"
 #endif
 
