@@ -865,12 +865,12 @@ double String::toDouble(void) const {
 
 
 #if defined(MMU_IRAM_HEAP)
-// Default Global setting for Heap selection control
+// Default setting for Heap selection control
 
 //C Which default should it be?
 
 // Assign legacy behavior as default
-String::Heap String::_preferredHeap __attribute__((weak)) = String::Heap::CurrentOnly;
+const String::Heap String::_preferredHeap __attribute__((weak)) = String::Heap::CurrentOnly;
 
 //? // To aid in maximizing available DRAM, default to use IRAM 1st then DRAM
 //? String::Heap String::_preferredHeap __attribute__((weak)) = String::Heap::IramDram;

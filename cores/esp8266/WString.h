@@ -102,8 +102,8 @@ class String {
         /*
           String Class - Heap Selection Control
 
-          These options are global for all String Class buffer allocations. The
-          options are defined in `enum Heap`.
+          Select one of these options to be used across all String class buffer
+          allocations.  The options are defined in `enum Heap`.
             * Allow OOM recovery (OOM rollover) by trying a different Heap on fail.
               * `IramDram` - Try to allocate from IRAM 1ST, then roll over to DRAM on fail.
               * `DramIram` - Try to allocate from DRAM 1ST, then roll over to IRAM on fail.
@@ -117,14 +117,15 @@ class String {
               * `Current` - Try to allocate from the current Heap selected,
                             then roll over to the other Heap.
 
-          Specify your global selection for Heap control in your sketch file
-          somewhere before setup().
+          Initialize the String class static member _preferredHeap with the
+          desired selection for Heap control in your main sketch file somewhere
+          before `setup();`.
 
           Example of legacy behavior using option `CurrentOnly`:
-          String::Heap String::_preferredHeap = String::Heap::CurrentOnly;
+          const String::Heap String::_preferredHeap = String::Heap::CurrentOnly;
 
           Example of maximizing available DRAM, by using IRAM 1st then DRAM:
-          String::Heap String::_preferredHeap = String::Heap::IramDram;
+          const String::Heap String::_preferredHeap = String::Heap::IramDram;
 
           When a Heap rollover occurs, the OOM counter for the failing Heap will
           increment. If both Heaps fail, both OOM counters are incremented.
@@ -383,7 +384,7 @@ class String {
 
     private:
 #if defined(MMU_IRAM_HEAP)
-        static Heap _preferredHeap;
+        static const Heap _preferredHeap;
 #endif
 
     protected:
