@@ -24,10 +24,6 @@
 #include <Arduino.h>
 #include "WString.h"
 #include "stdlib_noniso.h"
-#include "umm_malloc/umm_malloc.h"
-#if defined(MMU_IRAM_HEAP)
-#include "umm_malloc/umm_heap_select.h"
-#endif
 
 /*********************************************/
 /*  Constructors                             */
@@ -184,7 +180,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
 
     } else {
 //? Which one do you prefer.
-#if 1
+#if 0
 //C With this, the Sketch used 280656 bytes
 //C This is a little smaller and does not use any of heap push/pop space.
         size_t selectHeap = abs(preferredHeap) - 1;

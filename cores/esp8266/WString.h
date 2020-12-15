@@ -27,9 +27,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <pgmspace.h>
-#include "umm_malloc/umm_malloc.h"
 #if defined(MMU_IRAM_HEAP)
-#include "umm_malloc/umm_heap_select.h"
+#include "umm_malloc/umm_malloc.h"
 #endif
 
 // An inherited class for holding the result of a concatenation.  These
