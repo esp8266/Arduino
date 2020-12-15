@@ -1038,7 +1038,7 @@ void *umm_realloc( void *ptr, size_t size ) {
         } else {
             DBGLOG_DEBUG( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            STATS__OOM_UPDATE();
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
         }
         /* This is not accurate for OOM case; however, it will work for
          * stopping a call to free before return.
@@ -1117,7 +1117,7 @@ void *umm_realloc( void *ptr, size_t size ) {
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            STATS__OOM_UPDATE();
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
         }
         /* This is not accurate for OOM case; however, it will work for
          * stopping a call to free before return.
@@ -1142,7 +1142,7 @@ void *umm_realloc( void *ptr, size_t size ) {
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            STATS__OOM_UPDATE();
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
         }
         /* This is not accurate for OOM case; however, it will work for
          * stopping a call to free before return.
