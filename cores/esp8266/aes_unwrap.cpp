@@ -13,21 +13,34 @@
  *  the ROM's AES APIs to operate. These calls can overwrite some of the stack
  *  space. To resolve the problem, this module replaces `aes_unwrap`.
  *
- *  Final note, as far as I can tell, this is not a problem when using the extra
- *  4K heap option without debug HWDT. It is when combined with the HWDT Stack
- *  Dump that a problem shows. This combination pushes up the stacks to create a
- *  Boot ROM stack space. Then the problem shows.
+ *  Final note, so far, I have not seen a problem when using the extra 4K heap
+ *  option without the "debug HWDT". It is when combined with the HWDT Stack
+ *  Dump that a problem shows. This combination adds a Boot ROM stack, which
+ *  pushes up the SYS and CONT stacks into the AES Buffer space. Then the
+ *  problem shows.
+ *
+ *  While debugging with painted stack space, during WiFi Connect, Reconnect,
+ *  and about every hour, a block of memory 0x3FFFEA80 - 0x3FFFEB30 (176 bytes)
+ *  was zeroed by the Boot ROM function aes_decrypt_init. All other painted
+ *  memory in the area was untouched after starting WiFi.
  */
 
-#if (!defined(DEBUG_ESP_HWDT_NOEXTRA4K) && defined(DEBUG_ESP_HWDT)) || REPLACE_ROM_AES_UNWRAP
+#if (defined(DEBUG_ESP_HWDT_NOEXTRA4K) && !defined(DEBUG_ESP_HWDT)) || KEEP_ROM_AES_UNWRAP
+// Using the ROM version of aes_unwrap should be fine for the no extra 4K case
+// which is usually used in conjunction with WPS.
+
+#else
+// This is required for DEBUG_ESP_HWDT.
+// The need is unconfirmed for the extra 4K heap case.
 #include "umm_malloc/umm_malloc.h"
 
 extern "C" {
 
-// This function is in the Boot ROM
+// Uses this function from the Boot ROM
 void rijndaelKeySetupDec(u32 rk[], const u8 cipherKey[]);
 
 // This replaces the Boot ROM version just for this module
+// Uses a malloc-ed buffer instead of the static buffer in stack address space.
 static void *aes_decrypt_init(const u8 *key, size_t len) {
   if (16u != len) {
     return 0;
@@ -52,7 +65,7 @@ static void aes_decrypt_deinit(void *ctx) {
 }
 
 /*
- * The NONOS SDK has an override on this function. To replace the aes_wrap
+ * The NONOS SDK has an override on this function. To replace the aes_unwrap
  * without changing its behavior too much. We need access to the ROM version of
  * the AES APIs to make our aes_unwrap functionally equal to the current
  * environment except for the AES Buffer.
