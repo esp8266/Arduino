@@ -127,73 +127,66 @@ bool mmu_is_icache(const void *addr) {
 static inline __attribute__((always_inline))
 uint8_t mmu_get_uint8(const void *p8) {
   ASSERT_RANGE_TEST_READ(p8);
-  uint32_t val = (*(uint32_t *)((uintptr_t)p8 & ~0x3));
-  uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
-  val >>= pos;
-  return (uint8_t)val;
+  return *(uint32_t *)((uintptr_t)p8 & ~0x3) >> (uintptr_t)p8 * 8;
 }
 
 static inline __attribute__((always_inline))
 uint16_t mmu_get_uint16(const uint16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
-  uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
-  uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
-  val >>= pos;
-  return (uint16_t)val;
+  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> (uintptr_t)p16 * 8;
 }
 
 static inline __attribute__((always_inline))
 int16_t mmu_get_int16(const int16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
-  uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
-  uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
-  val >>= pos;
-  return (int16_t)val;
+  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> (uintptr_t)p16 * 8;
 }
 
 static inline __attribute__((always_inline))
 uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
   ASSERT_RANGE_TEST_WRITE(p8);
-  uint32_t pos = ((uintptr_t)p8 & 0x3) * 8;
-  uint32_t sval = val << pos;
-  uint32_t valmask =  0x0FF << pos;
-
   uint32_t *p32 = (uint32_t *)((uintptr_t)p8 & ~0x3);
   uint32_t ival = *p32;
-  ival &= (~valmask);
-  ival |= sval;
-  *p32 = ival;
+  uint32_t valmask, sval;
+
+  __asm__ ("ssa8b\t%2\n\t"
+           "src\t%0, %3, %3\n\t"
+           "src\t%1, %4, %4"
+           : "=&a"(valmask), "=a"(sval)
+           : "r"(p8), "r"(~0xFF), "r"(val), "r"(ival));
+  *p32 = ival & valmask | sval;
   return val;
 }
 
 static inline __attribute__((always_inline))
 uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
-  uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
-  uint32_t sval = val << pos;
-  uint32_t valmask =  0x0FFFF << pos;
-
   uint32_t *p32 = (uint32_t *)((uintptr_t)p16 & ~0x3);
   uint32_t ival = *p32;
-  ival &= (~valmask);
-  ival |= sval;
-  *p32 = ival;
+  uint32_t valmask, sval;
+
+  __asm__ ("ssa8b\t%2\n\t"
+           "src\t%0, %3, %3\n\t"
+           "src\t%1, %4, %4"
+           : "=&a"(valmask), "=a"(sval)
+           : "r"(p16), "r"(~0xFFFF), "r"(val), "r"(ival));
+  *p32 = ival & valmask | sval;
   return val;
 }
 
 static inline __attribute__((always_inline))
 int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
-  uint32_t sval = (uint16_t)val;
-  uint32_t pos = ((uintptr_t)p16 & 0x3) * 8;
-  sval <<= pos;
-  uint32_t valmask =  0x0FFFF << pos;
-
   uint32_t *p32 = (uint32_t *)((uintptr_t)p16 & ~0x3);
   uint32_t ival = *p32;
-  ival &= (~valmask);
-  ival |= sval;
-  *p32 = ival;
+  uint32_t valmask, sval;
+
+  __asm__ ("ssa8b\t%2\n\t"
+           "src\t%0, %3, %3\n\t"
+           "src\t%1, %4, %4"
+           : "=&a"(valmask), "=a"(sval)
+           : "r"(p16), "r"(~0xFFFF), "r"(val & 0xFFFF), "r"(ival));
+  *p32 = ival & valmask | sval;
   return val;
 }
 
