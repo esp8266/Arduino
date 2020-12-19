@@ -154,7 +154,7 @@ uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
            "src\t%1, %4, %4"
            : "=&a"(valmask), "=a"(sval)
            : "r"(p8), "r"(~0xFF), "r"(val), "r"(ival));
-  *p32 = ival & valmask | sval;
+  *p32 = (ival & valmask) | sval;
   return val;
 }
 
@@ -170,7 +170,7 @@ uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val) {
            "src\t%1, %4, %4"
            : "=&a"(valmask), "=a"(sval)
            : "r"(p16), "r"(~0xFFFF), "r"(val), "r"(ival));
-  *p32 = ival & valmask | sval;
+  *p32 = (ival & valmask) | sval;
   return val;
 }
 
@@ -186,7 +186,7 @@ int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
            "src\t%1, %4, %4"
            : "=&a"(valmask), "=a"(sval)
            : "r"(p16), "r"(~0xFFFF), "r"(val & 0xFFFF), "r"(ival));
-  *p32 = ival & valmask | sval;
+  *p32 = (ival & valmask) | sval;
   return val;
 }
 
