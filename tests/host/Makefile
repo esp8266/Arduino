@@ -102,6 +102,7 @@ CORE_CPP_FILES := \
 		FatLib/FatFileLFN.cpp \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
+		FatLib/FatFormatter.cpp \
 		FatLib/FatVolume.cpp \
 		FatLib/FatPartition.cpp \
 		common/FmtNumber.cpp \

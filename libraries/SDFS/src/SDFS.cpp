@@ -146,12 +146,16 @@ bool SDFSImpl::format() {
     if (_mounted) {
         return false;
     }
-    return false; // TODO - Update implementation!
-#if 0
-    SDFSFormatter formatter;
-    bool ret = formatter.format(&_fs, _cfg._csPin, _cfg._spiSettings);
+    sdfat::SdCardFactory cardFactory;
+    sdfat::SdCard* card = cardFactory.newCard(sdfat::SdSpiConfig(_cfg._csPin, DEDICATED_SPI, _cfg._spiSettings));
+    if (!card || card->errorCode()) {
+        return false;
+    }
+    sdfat::FatFormatter fatFormatter;
+    uint8_t *sectorBuffer = new uint8_t[512];
+    bool ret = fatFormatter.format(card, sectorBuffer, nullptr);
+    delete sectorBuffer;
     return ret;
-#endif
 }
 
 
