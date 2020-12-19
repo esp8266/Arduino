@@ -25,7 +25,6 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "SDFS.h"
-#include "SDFSFormatter.h"
 #include <FS.h>
 
 using namespace fs;
