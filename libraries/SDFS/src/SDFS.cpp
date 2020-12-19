@@ -65,13 +65,13 @@ FileImplPtr SDFSImpl::open(const char* path, OpenMode openMode, AccessMode acces
         }
         free(pathStr);
     }
-    sdfat::File fd = _fs.open(path, flags);
+    sdfat::File32 fd = _fs.open(path, flags);
     if (!fd) {
         DEBUGV("SDFSImpl::openFile: fd=%p path=`%s` openMode=%d accessMode=%d",
                &fd, path, openMode, accessMode);
         return FileImplPtr();
     }
-    auto sharedFd = std::make_shared<sdfat::File>(fd);
+    auto sharedFd = std::make_shared<sdfat::File32>(fd);
     return std::make_shared<SDFSFileImpl>(this, sharedFd, path);
 }
 
@@ -91,7 +91,7 @@ DirImplPtr SDFSImpl::openDir(const char* path)
     }
     // At this point we have a name of "/blah/blah/blah" or "blah" or ""
     // If that references a directory, just open it and we're done.
-    sdfat::File dirFile;
+    sdfat::File32 dirFile;
     const char *filter = "";
     if (!pathStr[0]) {
         // openDir("") === openDir("/")
@@ -136,7 +136,7 @@ DirImplPtr SDFSImpl::openDir(const char* path)
         DEBUGV("SDFSImpl::openDir: path=`%s`\n", path);
         return DirImplPtr();
     }
-    auto sharedDir = std::make_shared<sdfat::File>(dirFile);
+    auto sharedDir = std::make_shared<sdfat::File32>(dirFile);
     auto ret = std::make_shared<SDFSDirImpl>(filter, this, sharedDir, pathStr);
     free(pathStr);
     return ret;
@@ -146,9 +146,12 @@ bool SDFSImpl::format() {
     if (_mounted) {
         return false;
     }
+    return false; // TODO - Update implementation!
+#if 0
     SDFSFormatter formatter;
     bool ret = formatter.format(&_fs, _cfg._csPin, _cfg._spiSettings);
     return ret;
+#endif
 }
 
 

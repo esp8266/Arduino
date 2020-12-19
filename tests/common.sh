@@ -17,6 +17,7 @@ function skip_ino()
 /SoftwareSpi/
 /STM32Test/
 /extras/
+/ESP8266SdFat/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))

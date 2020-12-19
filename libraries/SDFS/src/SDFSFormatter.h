@@ -30,6 +30,7 @@
 namespace sdfs {
 
 class SDFSFormatter {
+#if 0
 private:
     // Taken from main FS object
     sdfat::Sd2Card *card;
@@ -397,6 +398,9 @@ public:
             return makeFat32();
         }
     }
+
+
+#endif
 }; // class SDFSFormatter
 
 }; // namespace sdfs
