@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <Arduino.h>
+#include "Arduino.h"
 #include "WString.h"
 #include "stdlib_noniso.h"
 
@@ -46,11 +46,6 @@ String::String(const __FlashStringHelper *pstr) {
 }
 
 String::String(String &&rval) noexcept {
-    init();
-    move(rval);
-}
-
-String::String(StringSumHelper &&rval) noexcept {
     init();
     move(rval);
 }
@@ -340,84 +335,70 @@ unsigned char String::concat(const __FlashStringHelper *str) {
 }
 
 /*********************************************/
-/*  Concatenate                              */
+/*  Insert                                   */
 /*********************************************/
 
-StringSumHelper &operator +(const StringSumHelper &lhs, const String &rhs) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(rhs.buffer(), rhs.len()))
-        a.invalidate();
-    return a;
+String& String::insert(size_t position, const String& other) {
+    if (position > length()) {
+        return *this;
+    }
+
+    auto total = length() + other.length();
+    if (!changeBuffer(total))
+        return *this;
+
+    auto left = length() - position;
+    setLen(total);
+
+    auto* start = wbuffer() + position;
+    memmove(start + other.length(), start, left);
+    memmove(start, other.c_str(), other.length());
+
+    return *this;
 }
 
-StringSumHelper &operator +(const StringSumHelper &lhs, const char *cstr) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!cstr || !a.concat(cstr, strlen(cstr)))
-        a.invalidate();
-    return a;
+// TODO: it is possible to reuse `other.wbuffer()` when it's capacity is larger than `this->wbuffer()`
+String& String::insert(size_t position, String&& other) {
+    return insert(position, other);
 }
 
-StringSumHelper &operator +(const StringSumHelper &lhs, char c) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(c))
-        a.invalidate();
-    return a;
+String operator +(const String& lhs, String&& rhs) {
+    String res;
+    auto total = lhs.length() + rhs.length();
+    if (rhs.capacity() >= total) {
+        rhs.insert(0, lhs);
+        res = std::move(rhs);
+        rhs.setLen(total);
+    } else {
+        res.reserve(total + 1);
+        res += lhs;
+        res += rhs;
+        rhs.invalidate();
+    }
+
+    return res;
 }
 
-StringSumHelper &operator +(const StringSumHelper &lhs, unsigned char num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
+String operator +(String&& lhs, String&& rhs) {
+    String res;
+    auto total = lhs.length() + rhs.length();
+    if (lhs.capacity() >= total) {
+        res = std::move(lhs);
+        res += rhs;
+        rhs.invalidate();
+    } else if (rhs.capacity() >= total) {
+        rhs.insert(0, lhs);
+        res = std::move(rhs);
+        res.setLen(total);
+    } else {
+        res.reserve(total);
+        res += lhs;
+        res += rhs;
+        lhs.invalidate();
+        rhs.invalidate();
+    }
 
-StringSumHelper &operator +(const StringSumHelper &lhs, int num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
-
-StringSumHelper &operator +(const StringSumHelper &lhs, unsigned int num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
-
-StringSumHelper &operator +(const StringSumHelper &lhs, long num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
-
-StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
-
-StringSumHelper &operator +(const StringSumHelper &lhs, float num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
-
-StringSumHelper &operator +(const StringSumHelper &lhs, double num) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(num))
-        a.invalidate();
-    return a;
-}
-
-StringSumHelper &operator +(const StringSumHelper &lhs, const __FlashStringHelper *rhs) {
-    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
-    if (!a.concat(rhs))
-        a.invalidate();
-    return a;
+    return res;
 }
 
 /*********************************************/
