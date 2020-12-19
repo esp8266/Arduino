@@ -108,8 +108,6 @@ CORE_CPP_FILES := \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
 		common/PrintBasic.cpp \
-		SdCard/SdSpiCard.cpp \
-		SpiDriver/SdSpiESP.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
