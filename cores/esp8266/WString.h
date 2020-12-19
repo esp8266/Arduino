@@ -100,6 +100,11 @@ class String {
         String &operator =(const char *cstr);
         String &operator =(const __FlashStringHelper *str);
         String &operator =(String &&rval) noexcept;
+        String &operator =(char c) {
+            char buffer[2] { c, '\0' };
+            *this = buffer;
+            return *this;
+        }
 
         // concatenate (works w/ built-in types)
 
