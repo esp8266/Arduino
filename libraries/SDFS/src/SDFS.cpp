@@ -153,7 +153,7 @@ bool SDFSImpl::format() {
     sdfat::FatFormatter fatFormatter;
     uint8_t *sectorBuffer = new uint8_t[512];
     bool ret = fatFormatter.format(card, sectorBuffer, nullptr);
-    delete sectorBuffer;
+    delete[] sectorBuffer;
     return ret;
 }
 
