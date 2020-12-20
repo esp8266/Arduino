@@ -25,7 +25,7 @@ const char* ssid = STASSID;
 const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure server(443);
-BearSSL::ServerSessions serverCache(500);
+BearSSL::ServerSessions serverCache(5);
 
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----

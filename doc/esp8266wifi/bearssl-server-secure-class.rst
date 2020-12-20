@@ -46,12 +46,12 @@ Here are the kind of performance improvements that you'll be able to see for TLS
 setCache(BearSSL::ServerSessions \*cache)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sets the cache for the server's sessions.  When choosing the size of the cache, remember that each client session takes 100 bytes.  If you setup a cache of 1000 bytes, you'll be able to store the sessions of the 10 most recent clients.  Needs to be called before `begin()`
+Sets the cache for the server's sessions.  When choosing the size of the cache, remember that each client session takes 100 bytes.  If you setup a cache for 10 sessions, it will take 1000 bytes.  Needs to be called before `begin()`
 
 When creating the cache, you can use any of the 2 available constructors:
 
-* `BearSSL::ServerSessions(uint8_t *store, uint32_t size)`: Creates a cache with the given buffer and size.
-* `BearSSL::ServerSessions(uint32_t size)`: Dynamically allocates a cache of the given size.
+* `BearSSL::ServerSessions(ServerSession *sessions, uint32_t size)`: Creates a cache with the given buffer and number of sessions.
+* `BearSSL::ServerSessions(uint32_t size)`: Dynamically allocates a cache for the given number of sessions.
 
 Requiring Client Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

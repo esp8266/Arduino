@@ -138,9 +138,7 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 
 #endif
 
-#define CACHE_SIZE 500 // Size of the cache for SSL sessions.
-                       // Each SSL session requires 100 bytes,
-                       // so 500 is enough for 5 sessions.
+#define CACHE_SIZE 5 // Number of sessions to cache.
 #define USE_CACHE // Enable SSL session caching.
                   // Caching SSL sessions shortens the length of the SSL handshake.
                   // You can see the performance improvement by looking at the
@@ -149,11 +147,11 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 
 #if defined(USE_CACHE) && defined(DYNAMIC_CACHE)
 // Dynamically allocated cache.
-BearSSL::ServerSessions serverCache(STORE, CACHE_SIZE);
+BearSSL::ServerSessions serverCache(CACHE_SIZE);
 #elif defined(USE_CACHE)
 // Statically allocated cache.
-uint8_t store[CACHE_SIZE];
-BearSSL::ServerSessions serverCache(CACHE_SIZE);
+ServerSession store[CACHE_SIZE];
+BearSSL::ServerSessions serverCache(store, CACHE_SIZE);
 #endif
 
 void setup() {

@@ -147,35 +147,39 @@ class Session {
     br_ssl_session_parameters _session;
 };
 
+// Represents a single server session.
+// Use with BearSSL::ServerSessions.
+typedef uint8_t ServerSession[100];
+
 // Cache for the TLS sessions of multiple clients.
 // Use with BearSSL::WiFiServerSecure::setCache
 class ServerSessions {
   friend class WiFiClientSecureCtx;
 
   public:
-    // Uses the given buffer of the given size to store the size and initializes it.
-    ServerSessions(uint8_t *store, uint32_t size) : ServerSessions(store, size, false) {}
+    // Uses the given buffer to cache the given number of sessions and initializes it.
+    ServerSessions(ServerSession *sessions, uint32_t size) : ServerSessions(sessions, size, false) {}
 
-    // Dynamically allocates a buffer of the given size to store the cache and initializes it.
+    // Dynamically allocates a cache for the given number of sessions and initializes it.
     // If the allocation of the buffer wasn't successfull, the value
     // returned by size() will be 0.
-    ServerSessions(uint32_t size) : ServerSessions(size > 0 ? new uint8_t[size] : nullptr, size, true) {}
+    ServerSessions(uint32_t size) : ServerSessions(size > 0 ? new ServerSession[size] : nullptr, size, true) {}
 
     ~ServerSessions();
 
-    // Returns the size of the store for the cache.
+    // Returns the number of sessions the cache can hold.
     uint32_t size() { return _size; }
 
   private:
-    ServerSessions(uint8_t *store, uint32_t size, bool isDynamic);
+    ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic);
 
     // Returns the cache's vtable or null if the cache has no capacity.
     const br_ssl_session_cache_class **getCache();
 
-    // Size of the store.
+    // Size of the store in sessions.
     uint32_t _size;
     // Store where the informations for the sessions are stored.
-    uint8_t *_store;
+    ServerSession *_store;
     // Whether the store is dynamically allocated.
     // If this is true, the store needs to be freed in the destructor.
     bool _isDynamic;

@@ -877,11 +877,11 @@ ServerSessions::~ServerSessions() {
     delete _store;
 }
 
-ServerSessions::ServerSessions(uint8_t *store, uint32_t size, bool isDynamic) :
-  _size(store != nullptr ? size : 0),
-  _store(store), _isDynamic(isDynamic) {
+ServerSessions::ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic) :
+  _size(sessions != nullptr ? size : 0),
+  _store(sessions), _isDynamic(isDynamic) {
     if (_size > 0)
-      br_ssl_session_cache_lru_init(&_cache, store, size);
+      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store, size * sizeof(ServerSession));
 }
 
 const br_ssl_session_cache_class **ServerSessions::getCache() {
