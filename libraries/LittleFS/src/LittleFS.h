@@ -424,7 +424,7 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
-            if (timeCallback && (_flags & LFS_O_WRONLY)) {
+            if (_timeCallback && (_flags & LFS_O_WRONLY)) {
                 // If the file opened with O_CREAT, write the creation time attribute
                 if (_creation) {
                     int rc = lfs_setattr(_fs->getFS(), _name.get(), 'c', (const void *)&_creation, sizeof(_creation));
@@ -433,7 +433,7 @@ public:
                     }
                 }
                 // Add metadata with last write time
-                time_t now = timeCallback();
+                time_t now = _timeCallback();
                 int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
                 if (rc < 0) {
                     DEBUGV("Unable to set last write time on '%s' to %d\n", _name.get(), now);
