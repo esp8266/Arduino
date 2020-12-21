@@ -8,16 +8,19 @@ function skip_ino()
     # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
     read -d '' skiplist << EOL || true
 /#attic/
-/AnalogBinLogger/
-/LowLatencyLogger/
-/LowLatencyLoggerADXL345/
-/LowLatencyLoggerMPU6050/
-/PrintBenchmark/
-/TeensySdioDemo/
+/AvrAdcLogger/
+/BackwardCompatibility/
+/examplesV1/
+/ExFatFormatter/
+/ExFatLogger/
+/ExFatUnicodeTest/
+/RtcTimestampTest/
 /SoftwareSpi/
 /STM32Test/
-/extras/
-/ESP8266SdFat/
+/TeensyRtcTimestamp/
+/TeensySdioDemo/
+/UserChipSelectFunction/
+/UserSPIDriver/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))
