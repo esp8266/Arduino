@@ -3139,7 +3139,7 @@
  *  u8_t *ptr = (u8_t*)pbuf_get_contiguous(p, buf, sizeof(buf), LWIP_MIN(option_len, sizeof(buf)), offset);
  */
 #ifdef __DOXYGEN__
-#define LWIP_HOOK_DHCP_PARSE_OPTION(netif, dhcp, state, msg, msg_type, option, len, pbuf, offset)
+//#define LWIP_HOOK_DHCP_PARSE_OPTION(netif, dhcp, state, msg, msg_type, option, len, pbuf, offset)
 #endif
 
 /**
@@ -3551,6 +3551,12 @@
 #error LWIP_FEATURES must be defined
 #endif
 
+#define PPPOS_SUPPORT       IP_NAPT         // because we don't have proxyarp yet
+#define PPP_SUPPORT         PPPOS_SUPPORT
+#define PPP_SERVER          1
+#define PPP_DEBUG           ULWIPDEBUG
+#define PRINTPKT_SUPPORT    ULWIPDEBUG
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -3559,6 +3565,24 @@ extern "C" {
  * TCP_RANDOM_PORT: randomize port instead of simply increasing
  */
 #define TCP_RANDOM_PORT 1
+
+/*
+   --------------------------------------------------
+   ------------------ DHCP options ------------------
+   --------------------------------------------------
+*/
+
+#define LWIP_HOOK_DHCP_PARSE_OPTION(netif, dhcp, state, msg, msg_type, option, len, pbuf, option_value_offset) \
+    lwip_hook_dhcp_parse_option(netif, dhcp, state, msg, msg_type, option, len, pbuf, option_value_offset)
+
+// search for LWIP_HOOK_DHCP_PARSE_OPTION above for an arguments explanation
+struct netif;
+struct dhcp;
+struct dhcp_msg;
+struct pbuf;
+extern void lwip_hook_dhcp_parse_option(struct netif *netif, struct dhcp *dhcp, int state, struct dhcp_msg *msg,
+                                        int msg_type, int option, int option_len, struct pbuf *pbuf,
+                                        int option_value_offset);
 
 /*
    --------------------------------------------------

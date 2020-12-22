@@ -299,6 +299,7 @@ ARDUINO_LIBS := \
 		IPAddress.cpp \
 		Updater.cpp \
 		base64.cpp \
+		LwipIntf.cpp \
 		LwipIntfCB.cpp \
 	) \
 	$(addprefix $(abspath ../../libraries/ESP8266WiFi/src)/,\

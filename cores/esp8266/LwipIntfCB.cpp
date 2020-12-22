@@ -8,14 +8,16 @@
 static int netifStatusChangeListLength = 0;
 LwipIntf::CBType netifStatusChangeList [NETIF_STATUS_CB_SIZE];
 
-extern "C" void netif_status_changed (struct netif* netif)
+extern "C" void netif_status_changed(struct netif* netif)
 {
     // override the default empty weak function
     for (int i = 0; i < netifStatusChangeListLength; i++)
+    {
         netifStatusChangeList[i](netif);
+    }
 }
 
-bool LwipIntf::stateChangeSysCB (LwipIntf::CBType&& cb)
+bool LwipIntf::stateChangeSysCB(LwipIntf::CBType&& cb)
 {
     if (netifStatusChangeListLength >= NETIF_STATUS_CB_SIZE)
     {
@@ -29,14 +31,14 @@ bool LwipIntf::stateChangeSysCB (LwipIntf::CBType&& cb)
     return true;
 }
 
-bool LwipIntf::stateUpCB (LwipIntf::CBType&& cb)
+bool LwipIntf::stateUpCB(LwipIntf::CBType&& cb)
 {
-    return stateChangeSysCB([cb](netif* nif)
+    return stateChangeSysCB([cb](netif * nif)
     {
         if (netif_is_up(nif))
             schedule_function([cb, nif]()
-            {
-                cb(nif);
-            });
+        {
+            cb(nif);
+        });
     });
 }

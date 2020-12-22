@@ -13,6 +13,9 @@ test -d libraries
 all="
 libraries/ESP8266mDNS
 libraries/Wire
+libraries/lwIP*
+cores/esp8266/Lwip*
+cores/esp8266/core_esp8266_si2c.cpp
 libraries/Netdump
 cores/esp8266/core_esp8266_si2c.cpp
 cores/esp8266/StreamString.h cores/esp8266/StreamDev.h cores/esp8266/StreamDev.cpp
