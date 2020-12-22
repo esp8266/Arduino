@@ -338,12 +338,12 @@ unsigned char String::concat(const __FlashStringHelper *str) {
 /*  Insert                                   */
 /*********************************************/
 
-String &String::insert(size_t position, const String& other) {
+String &String::insert(size_t position, const char *other, size_t other_length) {
     if (position > length()) {
         return *this;
     }
 
-    auto total = length() + other.length();
+    auto total = length() + other_length;
     if (!changeBuffer(total))
         return *this;
 
@@ -351,10 +351,28 @@ String &String::insert(size_t position, const String& other) {
     setLen(total);
 
     auto* start = wbuffer() + position;
-    memmove(start + other.length(), start, left);
-    memmove(start, other.c_str(), other.length());
+    memmove(start + other_length, start, left);
+    memmove_P(start, other, other_length);
 
     return *this;
+}
+
+String &String::insert(size_t position, const __FlashStringHelper* other) {
+    auto* p = reinterpret_cast<const char*>(other);
+    return insert(position, p, strlen_P(p));
+}
+
+String &String::insert(size_t position, char other) {
+    char tmp[2] { other, '\0' };
+    return insert(position, tmp, 1);
+}
+
+String &String::insert(size_t position, const char *other) {
+    return insert(position, other, strlen(other));
+}
+
+String &String::insert(size_t position, const String& other) {
+    return insert(position, other.c_str(), other.length());
 }
 
 String operator +(const String &lhs, String &&rhs) {

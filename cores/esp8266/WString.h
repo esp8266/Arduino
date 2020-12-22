@@ -314,8 +314,11 @@ class String {
 
         // concatenation is done via non-member functions
         // make sure we still have access to internal methods, since we optimize based on capacity of both sides and want to manipulate internal buffers directly
-        friend String operator +(const String& lhs, String&& rhs);
-        friend String operator +(String&& lhs, String&& rhs);
+        friend String operator +(const String &lhs, String &&rhs);
+        friend String operator +(String &&lhs, String &&rhs);
+        friend String operator +(char lhs, String &&rhs);
+        friend String operator +(const char *lhs, String &&rhs);
+        friend String operator +(const __FlashStringHelper *lhs, String &&rhs);
 
     protected:
         void init(void) __attribute__((always_inline)) {
@@ -338,14 +341,18 @@ class String {
         void invalidate(void);
         unsigned char changeBuffer(unsigned int maxStrLen);
 
-        // copy and move
+        // copy or insert at a specific position
         String &copy(const char *cstr, unsigned int length);
         String &copy(const __FlashStringHelper *pstr, unsigned int length);
-        void move(String &rhs) noexcept;
 
-        // insert at a specific position inside of the string
-        String& insert(size_t position, const String &);
-        String& insert(size_t position, String &&);
+        String &insert(size_t position, char);
+        String &insert(size_t position, const char *);
+        String &insert(size_t position, const __FlashStringHelper *);
+        String &insert(size_t position, const char *, size_t length);
+        String &insert(size_t position, const String &);
+
+        // rvalue helper
+        void move(String &rhs) noexcept;
 };
 
 // concatenation (note that it's done using non-method operators to handle both possible type refs)
@@ -367,6 +374,8 @@ String operator +(const String &lhs, String&& rhs);
 String operator +(String &&lhs, String &&rhs);
 
 // concat / += already handles the basic types, so just do that
+// TODO: could also do `operator+=` as a templated method
+// TODO: explicitly list concat overloads in the enable_if?
 
 template <typename T>
 inline std::enable_if_t<std::is_pod_v<T> && !std::is_same_v<std::decay<T>, String>, String>
@@ -381,6 +390,47 @@ inline std::enable_if_t<std::is_pod_v<T> && !std::is_same_v<std::decay<T>, Strin
 operator +(String &&lhs, T value) {
     lhs += value;
     return std::move(lhs);
+}
+
+// `String(char)` is explicit, but we used to have StringSumHelper silently allowing the following:
+// `String x; x = 'a' + String('b') + 'c';`
+// For comparison, `std::string(char)` does not exist. However, we are allowed to concatenate `char` like the example above
+
+inline String operator +(char lhs, const String &rhs) {
+    String res;
+    res.reserve(rhs.length() + 1);
+    res += lhs;
+    res += rhs;
+    return res;
+}
+
+inline String operator +(char lhs, String &&rhs) {
+    return std::move(rhs.insert(0, lhs));
+}
+
+// both `char*` and `__FlashStringHelper*` are implicitly converted into `String()`, calling the `operator+(const String& ...);`
+// however, here we:
+// - do an automatic `reserve(total length)` for the resulting string
+// - possibly do rhs.insert(0, ...), when &&rhs capacity could fit both
+
+inline String operator +(const char *lhs, const String &rhs) {
+    String res;
+    res.reserve(rhs.length() + strlen_P(lhs)); // TODO: just strlen, remove flashstringhelper optimization below?
+    res += lhs;
+    res += rhs;
+    return res;
+}
+
+inline String operator +(const char *lhs, String &&rhs) {
+    return std::move(rhs.insert(0, lhs));
+}
+
+inline String operator +(const __FlashStringHelper *lhs, const String &rhs) {
+    return reinterpret_cast<const char*>(lhs) + rhs;
+}
+
+inline String operator +(const __FlashStringHelper *lhs, String &&rhs) {
+    return std::move(rhs.insert(0, lhs));
 }
 
 extern const String emptyString;
