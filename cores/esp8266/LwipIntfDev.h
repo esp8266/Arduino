@@ -17,7 +17,7 @@
 
 #include "SPI.h"
 #include "Schedule.h"
-#include "lwIPIntf.h"
+#include "LwipIntf.h"
 #include "wl_definitions.h"
 
 #ifndef DEFAULT_MTU
