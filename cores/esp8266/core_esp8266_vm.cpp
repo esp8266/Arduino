@@ -60,7 +60,7 @@
  
 */
 
-
+#ifdef UMM_HEAP_EXTERNAL
 
 #include <Arduino.h>
 #include <esp8266_undocumented.h>
@@ -405,3 +405,5 @@ void install_vm_exception_handler()
 
 
 };
+
+#endif // ifdef(UMM_HEAP_EXTERNAL)
