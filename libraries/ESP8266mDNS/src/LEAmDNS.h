@@ -130,8 +130,9 @@ namespace MDNSImplementation
 #endif
 
 #define MDNS_IP4_SUPPORT
+#if LWIP_IPV6
 //#define MDNS_IP6_SUPPORT
-
+#endif
 
 #ifdef MDNS_IP4_SUPPORT
 #define MDNS_IP4_SIZE               4
