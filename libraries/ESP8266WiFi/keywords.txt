@@ -24,6 +24,8 @@ X509List	KEYWORD1
 PrivateKey	KEYWORD1
 PublicKey	KEYWORD1
 Session	KEYWORD1
+ServerSession	KEYWORD1
+ServerSessions	KEYWORD1
 ESP8266WiFiGratuitous	KEYWORD1
 
 
@@ -191,9 +193,13 @@ getMFLNStatus	KEYWORD2
 setRSACert	KEYWORD2
 setECCert	KEYWORD2
 setClientTrustAnchor	KEYWORD2
+setCache	KEYWORD2
 
 #CertStoreBearSSL
 initCertStore	KEYWORD2
+
+#ServerSessions
+size    KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
