@@ -82,7 +82,10 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
-  stopWaveform(pin);
+  stopWaveform(pin); // Disable any tone
+#ifndef WAVEFORM_LOCKED_PHASE
+  _stopPWM(pin);     // ...and any analogWrite
+#endif
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
@@ -130,8 +133,10 @@ typedef struct {
 static interrupt_handler_t interrupt_handlers[16] = { {0, 0, 0, 0}, };
 static uint32_t interrupt_reg = 0;
 
-void ICACHE_RAM_ATTR interrupt_handler(void*)
+void ICACHE_RAM_ATTR interrupt_handler(void *arg, void *frame)
 {
+  (void) arg;
+  (void) frame;
   uint32_t status = GPIE;
   GPIEC = status;//clear them interrupts
   uint32_t levels = GPI;
@@ -235,21 +240,23 @@ extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode)
     __attachInterruptFunctionalArg(pin, (voidFuncPtrArg)userFunc, 0, mode, false);
 }
 
+extern void __resetPins() {
+  for (int i = 0; i <= 16; ++i) {
+    if (!isFlashInterfacePin(i))
+        pinMode(i, INPUT);
+  }
+}
+
 extern void initPins() {
   //Disable UART interrupts
   system_set_os_print(0);
   U0IE = 0;
   U1IE = 0;
 
-  for (int i = 0; i <= 5; ++i) {
-    pinMode(i, INPUT);
-  }
-  // pins 6-11 are used for the SPI flash interface
-  for (int i = 12; i <= 16; ++i) {
-    pinMode(i, INPUT);
-  }
+  resetPins();
 }
 
+extern void resetPins() __attribute__ ((weak, alias("__resetPins")));
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));
 extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
 extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead"), nothrow));

@@ -25,8 +25,11 @@
 #include <Schedule.h>
 #include <AddrList.h>
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS_Priv.h"
-
+#include <LwipIntf.h> // LwipIntf::stateUpCB()
+#include <lwip/igmp.h>
+#include <lwip/prot/dns.h>
 
 namespace esp8266
 {
@@ -60,13 +63,7 @@ MDNSResponder::MDNSResponder(void)
         m_pUDPContext(0),
         m_pcHostname(0),
         m_pServiceQueries(0),
-        m_fnServiceTxtCallback(0),
-#ifdef ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
-        m_bPassivModeEnabled(true),
-#else
-        m_bPassivModeEnabled(false),
-#endif
-        m_netif(nullptr)
+        m_fnServiceTxtCallback(0)
 {
 }
 
@@ -92,117 +89,29 @@ MDNSResponder::~MDNSResponder(void)
     Finally the responder is (re)started
 
 */
-bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress, uint32_t p_u32TTL)
+bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& /*p_IPAddress*/, uint32_t /*p_u32TTL*/)
 {
-
-    (void)p_u32TTL; // ignored
     bool    bResult = false;
 
-    if (0 == m_pUDPContext)
+    if (_setHostname(p_pcHostname))
     {
-        if (_setHostname(p_pcHostname))
-        {
-
-            //// select interface
-
-            m_netif = nullptr;
-            IPAddress ipAddress = p_IPAddress;
-
-            if (!ipAddress.isSet())
-            {
-
-                IPAddress sta = WiFi.localIP();
-                IPAddress ap = WiFi.softAPIP();
-
-                if (!sta.isSet() && !ap.isSet())
-                {
-
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] internal interfaces (STA, AP) are not set (none was specified)\n")));
-                    return false;
-                }
-
-                if (ap.isSet())
-                {
-
-                    if (sta.isSet())
-                    {
-                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected over STA (none was specified)\n")));
-                    }
-                    else
-                    {
-                        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface AP selected\n")));
-                    }
-                    ipAddress = ap;
-
-                }
-                else
-                {
-
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] default interface STA selected (none was specified)\n")));
-                    ipAddress = sta;
-
-                }
-
-                // continue to ensure interface is UP
-            }
-
-            // check existence of this IP address in the interface list
-            bool found = false;
-            m_netif = nullptr;
-            for (auto a : addrList)
-                if (ipAddress == a.addr())
-                {
-                    if (a.ifUp())
-                    {
-                        found = true;
-                        m_netif = a.interface();
-                        break;
-                    }
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] found interface for IP '%s' but it is not UP\n"), ipAddress.toString().c_str()););
-                }
-            if (!found)
-            {
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] interface defined by IP '%s' not found\n"), ipAddress.toString().c_str()););
-                return false;
-            }
-
-            //// done selecting the interface
-
-            if (m_netif->num == STATION_IF)
-            {
-
-                m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP & pEvent)
-                {
-                    (void) pEvent;
-                    // Ensure that _restart() runs in USER context
-                    schedule_function([this]()
-                    {
-                        MDNSResponder::_restart();
-                    });
-                });
-
-                m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected & pEvent)
-                {
-                    (void) pEvent;
-                    // Ensure that _restart() runs in USER context
-                    schedule_function([this]()
-                    {
-                        MDNSResponder::_restart();
-                    });
-                });
-            }
-
-            bResult = _restart();
-        }
-        DEBUG_EX_ERR(if (!bResult)
-    {
-        DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ? : "-"));
-        });
+        bResult = _restart();
     }
-    else
+
+    LwipIntf::stateUpCB
+    (
+        [this](netif * intf)
     {
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls to begin (Ignored host domain: '%s')!\n"), (p_pcHostname ? : "-")););
+        (void)intf;
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] new Interface '%c%c' is UP! restarting\n"), intf->name[0], intf->name[1]));
+        _restart();
     }
+    );
+    DEBUG_EX_ERR(if (!bResult)
+{
+    DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ? : "-"));
+    });
+
     return bResult;
 }
 
@@ -215,18 +124,23 @@ bool MDNSResponder::begin(const char* p_pcHostname, const IPAddress& p_IPAddress
 */
 bool MDNSResponder::close(void)
 {
+    bool    bResult = false;
 
-    m_GotIPHandler.reset();			// reset WiFi event callbacks.
-    m_DisconnectedHandler.reset();
+    if (0 != m_pUDPContext)
+    {
+        _announce(false, true);
+        _resetProbeStatus(false);   // Stop probing
+        _releaseServiceQueries();
+        _releaseUDPContext();
+        _releaseHostname();
 
-    _announce(false, true);
-    _resetProbeStatus(false);   // Stop probing
-
-    _releaseServiceQueries();
-    _releaseUDPContext();
-    _releaseHostname();
-
-    return true;
+        bResult = true;
+    }
+    else
+    {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] close: Ignoring call to close!\n")););
+    }
+    return bResult;
 }
 
 /*
@@ -772,6 +686,12 @@ uint32_t MDNSResponder::queryService(const char* p_pcService,
                                      const char* p_pcProtocol,
                                      const uint16_t p_u16Timeout /*= MDNS_QUERYSERVICES_WAIT_TIME*/)
 {
+    if (0 == m_pUDPContext)
+    {
+        // safeguard against misuse
+        return 0;
+    }
+
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryService '%s.%s'\n"), p_pcService, p_pcProtocol););
 
     uint32_t    u32Result = 0;
@@ -1327,11 +1247,6 @@ bool MDNSResponder::notifyAPChange(void)
 */
 bool MDNSResponder::update(void)
 {
-
-    if (m_bPassivModeEnabled)
-    {
-        m_bPassivModeEnabled = false;
-    }
     return _process(true);
 }
 
@@ -1371,6 +1286,94 @@ MDNSResponder::hMDNSService MDNSResponder::enableArduino(uint16_t p_u16Port,
     }
     return hService;
 }
+
+/*
+
+    MULTICAST GROUPS
+
+*/
+
+/*
+    MDNSResponder::_joinMulticastGroups
+*/
+bool MDNSResponder::_joinMulticastGroups(void)
+{
+    bool    bResult = false;
+
+    // Join multicast group(s)
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+    {
+        if (netif_is_up(pNetIf))
+        {
+#ifdef MDNS_IP4_SUPPORT
+            ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
+            if (!(pNetIf->flags & NETIF_FLAG_IGMP))
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _createHost: Setting flag: flags & NETIF_FLAG_IGMP\n")););
+                pNetIf->flags |= NETIF_FLAG_IGMP;
+
+                if (ERR_OK != igmp_start(pNetIf))
+                {
+                    DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _createHost: igmp_start FAILED!\n")););
+                }
+            }
+
+            if ((ERR_OK == igmp_joingroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4))))
+            {
+                bResult = true;
+            }
+            else
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _createHost: igmp_joingroup_netif(" NETIFID_STR ": %s) FAILED!\n"),
+                                                   NETIFID_VAL(pNetIf), IPAddress(multicast_addr_V4).toString().c_str()););
+            }
+#endif
+
+#ifdef MDNS_IPV6_SUPPORT
+            ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
+            bResult = ((bResult) &&
+                       (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
+            DEBUG_EX_ERR_IF(!bResult, DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _createHost: mld6_joingroup_netif (" NETIFID_STR ") FAILED!\n"),
+                            NETIFID_VAL(pNetIf)));
+#endif
+        }
+    }
+    return bResult;
+}
+
+/*
+    clsLEAmDNS2_Host::_leaveMulticastGroups
+*/
+bool MDNSResponder::_leaveMulticastGroups()
+{
+    bool    bResult = false;
+
+    for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
+    {
+        if (netif_is_up(pNetIf))
+        {
+            bResult = true;
+
+            // Leave multicast group(s)
+#ifdef MDNS_IP4_SUPPORT
+            ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
+            if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
+            }
+#endif
+#ifdef MDNS_IPV6_SUPPORT
+            ip_addr_t   multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
+            if (ERR_OK != mld6_leavegroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6)/*&(multicast_addr_V6.u_addr.ip6)*/))
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
+            }
+#endif
+        }
+    }
+    return bResult;
+}
+
 
 
 } //namespace MDNSImplementation

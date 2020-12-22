@@ -7,7 +7,7 @@ ESP8266 is all about Wi-Fi. If you are eager to connect your new ESP8266 module 
 Introduction
 ------------
 
-The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP9266 SDK to `esp8266 /
+The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP8266 SDK to `esp8266 /
 Arduino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we would need to provide separate documentation on what is new and extra.
 
 This documentation will walk you through several classes, methods and properties of the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
@@ -78,7 +78,7 @@ The last line will then print out the IP address assigned to the ESP module by `
 
     Serial.println(WiFi.localIP());
 
-If you don't see the last line but just more and more dots ``.........``, then likely name or password to the Wi-Fi network is entered incorrectl in the sketchy. Verify the name and password by connecting from scratch to this Wi-Fi network with a PC or a mobile phone.
+If you don't see the last line but just more and more dots ``.........``, then likely name or password to the Wi-Fi network is entered incorrectly in the sketch. Verify the name and password by connecting from scratch to this Wi-Fi network with a PC or a mobile phone.
 
 *Note:* if connection is established, and then lost for some reason, ESP will automatically reconnect to the last used access point once it is again back on-line. This will be done automatically by Wi-Fi library, without any user intervention.
 
@@ -154,19 +154,41 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 .. figure:: pictures/esp8266-client.png
    :alt: ESP8266 operating as the Client
 
-Check out the separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
+Check out the separate section with `list of functions <client-class.rst>`__
 
-axTLS Client Secure - DEPRECATED
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+WiFi Multi
+~~~~~~~~~~
 
-The following section details axTLS, the older TLS library used by the project.  It is still supported, but additional fixes and documentation will generally not be undertaken.  See the following section for the updated TLS client object.
+`ESP8266WiFiMulti.h` can be used to connect to a WiFi network with strongest WiFi signal (RSSI). This requires registering one or more access points with SSID and password. It automatically switches to another WiFi network when the WiFi connection is lost.
 
-The axTLS Client Secure is an extension of `Client Class <#client>`__ where connection and data exchange with servers is done using a `secure protocol <https://en.wikipedia.org/wiki/Transport_Layer_Security>`__. It supports `TLS 1.1 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.1>`__. The `TLS 1.2 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2>`__ is not supported.
+Example:
 
-Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add; the flash memory size is usually not the issue. If you would like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, what server access has been tested, and how memory limitations have been overcome, read this fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
+.. code:: cpp
+    #include <ESP8266WiFiMulti.h>
 
-Check out the separate section with `examples <client-secure-examples.rst>`__ / `list of functions <client-secure-class.rst>`__
+    ESP8266WiFiMulti wifiMulti;
 
+    // WiFi connect timeout per AP. Increase when connecting takes longer.
+    const uint32_t connectTimeoutMs = 5000;
+
+    void setup()
+    {
+      // Set in station mode
+      WiFi.mode(WIFI_STA);
+
+      // Register multi WiFi networks
+      wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
+      wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+      wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+    }
+
+    void loop()
+    {
+      // Maintain WiFi connection
+      if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+          ...
+      }
+    }
 
 BearSSL Client Secure and Server Secure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,11 +198,14 @@ BearSSL Client Secure and Server Secure
 .. figure:: pictures/esp8266-client-secure.png
    :alt: ESP8266 operating as the Client Secure
 
-Secure clients and servers require siginificant amounts of additional memory and processing to enable their cryptographic algorithms.  In general, only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
+Secure clients and servers require significant amounts of additional memory and processing to enable their cryptographic algorithms.  In general, only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
 
 `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ contains more information on using and configuring TLS connections.
 
 `BearSSL::WiFiServerSecure <bearssl-server-secure-class.rst>`__ discusses the TLS server mode available.  Please read and understand the `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ first as the server uses most of the same concepts.
+
+Check out the separate section with `examples <client-secure-examples.rst>`__ .
+
 
 Server
 ~~~~~~
@@ -235,8 +260,9 @@ This function returns following codes to describe what is going on with Wi-Fi co
 * 0 : ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
 * 1 : ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached 
 * 3 : ``WL_CONNECTED`` after successful connection is established 
-* 4 : ``WL_CONNECT_FAILED`` if password is incorrect 
-* 6 : ``WL_DISCONNECTED`` if module is not configured in station mode
+* 4 : ``WL_CONNECT_FAILED`` if connection failed 
+* 6 : ``WL_CONNECT_WRONG_PASSWORD`` if password is incorrect 
+* 7 : ``WL_DISCONNECTED`` if module is not configured in station mode
 
 It is a good practice to display and check information returned by functions. Application development and troubleshooting will be easier with that.
 
@@ -317,11 +343,11 @@ The tool crawls through all header and source files collecting information from 
    :alt: Example of documentation for station begin method by Doxygen
 
 .. figure:: pictures/doxygen-example-station-hostname.png
-   :alt: Example of documentation for station hostname propert by Doxygen
+   :alt: Example of documentation for station hostname property by Doxygen
 
 If code is not annotated, you will still see the function prototype including types of arguments, and can use provided links to jump straight to the source code to check it out on your own. Doxygen provides really excellent navigation between members of library.
 
 .. figure:: pictures/doxygen-example-udp-begin.png
-   :alt: Example of documentation for UDP begin method (not annotaed in code)by Doxygen
+   :alt: Example of documentation for UDP begin method (not annotated in code)by Doxygen
 
 Several classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ are not annotated. When preparing this document, `Doxygen <https://www.doxygen.nl/>`__ has been tremendous help to quickly navigate through almost 30 files that make this library.

@@ -68,6 +68,14 @@ public:
         return (boolean)SDFS.exists(filepath.c_str());
     }
 
+    boolean rename(const char* filepathfrom, const char* filepathto) {
+        return (boolean)SDFS.rename(filepathfrom, filepathto);
+    }
+
+    boolean rename(const String &filepathfrom, const String &filepathto) {
+        return (boolean)rename(filepathfrom.c_str(), filepathto.c_str());
+    }
+
     boolean mkdir(const char *filepath) {
         return (boolean)SDFS.mkdir(filepath);
     }

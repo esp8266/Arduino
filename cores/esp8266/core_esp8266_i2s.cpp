@@ -64,6 +64,7 @@ typedef struct i2s_state {
   // Callback function should be defined as 'void ICACHE_RAM_ATTR function_name()',
   // and be placed in IRAM for faster execution. Avoid long computational tasks in this
   // function, use it to set flags and process later.
+  bool             driveClocks;
 } i2s_state_t;
 
 // RX = I2S receive (i.e. microphone), TX = I2S transmit (i.e. DAC)
@@ -464,14 +465,28 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
+  /*
+  Following this post: https://github.com/esp8266/Arduino/issues/2590
+  We should reset the transmitter while changing the configuration bits to avoid random distortion.
+  */
+ 
+  uint32_t i2sc_temp = I2SC;
+  i2sc_temp |= (I2STXR); // Hold transmitter in reset
+  I2SC = i2sc_temp;
+
   // trans master(active low), recv master(active_low), !bits mod(==16 bits/chanel), clear clock dividers
-  I2SC &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+  i2sc_temp &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
 
   // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
   // I2SMR = MSB recv/xmit first
   // I2SRMS, I2STMS = 1-bit delay from WS to MSB (I2S format)
   // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
-  I2SC |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+  i2sc_temp |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+
+  I2SC = i2sc_temp;
+  
+  i2sc_temp &= ~(I2STXR); // Release reset
+  I2SC = i2sc_temp;
 }
 
 float i2s_get_real_rate(){
@@ -479,6 +494,10 @@ float i2s_get_real_rate(){
 }
 
 bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
+  return i2s_rxtxdrive_begin(enableRx, enableTx, true, true);
+}
+
+bool i2s_rxtxdrive_begin(bool enableRx, bool enableTx, bool driveRxClocks, bool driveTxClocks) {
   if (tx || rx) {
     i2s_end(); // Stop and free any ongoing stuff
   }
@@ -489,9 +508,12 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
       // Nothing to clean up yet
       return false; // OOM Error!
     }
-    pinMode(I2SO_WS, FUNCTION_1);
+    tx->driveClocks = driveTxClocks;
     pinMode(I2SO_DATA, FUNCTION_1);
-    pinMode(I2SO_BCK, FUNCTION_1);
+    if (driveTxClocks) {
+      pinMode(I2SO_WS, FUNCTION_1);
+      pinMode(I2SO_BCK, FUNCTION_1);
+    }
   }
   if (enableRx) {
     rx = (i2s_state_t*)calloc(1, sizeof(*rx));
@@ -499,12 +521,15 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
       i2s_end(); // Clean up any TX or pin changes
       return false; // OOM error!
     }
-    pinMode(I2SI_WS, OUTPUT);
-    pinMode(I2SI_BCK, OUTPUT);
+    rx->driveClocks = driveRxClocks;
     pinMode(I2SI_DATA, INPUT);
+    if (driveRxClocks) {
+      pinMode(I2SI_WS, OUTPUT);
+      pinMode(I2SI_BCK, OUTPUT);
+      PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_I2SI_BCK);
+      PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
+    }
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_I2SI_DATA);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_I2SI_BCK);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
   }
 
   if (!i2s_slc_begin()) {
@@ -565,15 +590,19 @@ void i2s_end() {
 
   if (tx) {
     pinMode(I2SO_DATA, INPUT);
-    pinMode(I2SO_BCK, INPUT);
-    pinMode(I2SO_WS, INPUT);
+    if (tx->driveClocks) {
+      pinMode(I2SO_BCK, INPUT);
+      pinMode(I2SO_WS, INPUT);
+    }
     free(tx);
     tx = NULL;
   }
   if (rx) {
     pinMode(I2SI_DATA, INPUT);
-    pinMode(I2SI_BCK, INPUT);
-    pinMode(I2SI_WS, INPUT);
+    if (rx->driveClocks) {
+      pinMode(I2SI_BCK, INPUT);
+      pinMode(I2SI_WS, INPUT);
+    }
     free(rx);
     rx = NULL;
   }

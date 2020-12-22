@@ -55,28 +55,29 @@ def get_segment_size_addr(elf, segment, path):
     raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '"')
 
 def read_segment(elf, segment, path):
-    tmpfile, dumpfile = tempfile.mkstemp()
-    os.close(tmpfile)
-    p = subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, dumpfile], stdout=subprocess.PIPE)
-    binfile = open(dumpfile, "rb")
-    raw = binfile.read()
-    binfile.close()
+    fd, tmpfile = tempfile.mkstemp()
+    os.close(fd)
+    subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, tmpfile], stdout=subprocess.PIPE)
+    with open(tmpfile, "rb") as f:
+        raw = f.read()
+    os.remove(tmpfile)
+
     return raw
 
-def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, path):
-    entry = int(get_elf_entry( elf, path ))
-    header = [ 0xe9, len(segments), fmodeb[flash_mode], ffreqb[flash_freq] + 16 * fsizeb[flash_size],
+def write_bin(out, args, elf, segments, to_addr):
+    entry = int(get_elf_entry( elf, args.path ))
+    header = [ 0xe9, len(segments), fmodeb[args.flash_mode], ffreqb[args.flash_freq] + 16 * fsizeb[args.flash_size],
                entry & 255, (entry>>8) & 255, (entry>>16) & 255, (entry>>24) & 255 ]
     out.write(bytearray(header))
     total_size = 8
     checksum = 0xef
     for segment in segments:
-        [size, addr] = get_segment_size_addr(elf, segment, path)
+        [size, addr] = get_segment_size_addr(elf, segment, args.path)
         seghdr = [ addr & 255, (addr>>8) & 255, (addr>>16) & 255, (addr>>24) & 255,
                    size & 255, (size>>8) & 255, (size>>16) & 255, (size>>24) & 255]
         out.write(bytearray(seghdr));
         total_size += 8;
-        raw = read_segment(elf, segment, path)
+        raw = read_segment(elf, segment, args.path)
         if len(raw) != size:
             raise Exception('Segment size doesn\'t match read data for "' + segment + '" in "' + elf + '"')
         out.write(raw)
@@ -84,7 +85,7 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
         try:
             for data in raw:
                 checksum = checksum ^ ord(data)
-        except:
+        except Exception:
             for data in raw:
                 checksum = checksum ^ data
     total_size += 1
@@ -93,6 +94,8 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
         out.write(bytearray([0]))
     out.write(bytearray([checksum]))
     if to_addr != 0:
+        if total_size + 8 > to_addr:
+            raise Exception('Bin image of ' + elf + ' is too big, actual size ' + str(total_size  + 8) + ', target size ' + str(to_addr) + '.')
         while total_size < to_addr:
             out.write(bytearray([0xaa]))
             total_size += 1
@@ -138,6 +141,31 @@ def add_crc(out):
     with open(out, "wb") as binfile:
         binfile.write(raw)
 
+def gzip_bin(mode, out):
+    import gzip
+
+    firmware_path = out
+    gzip_path = firmware_path + '.gz'
+    orig_path = firmware_path + '.orig'
+    if os.path.exists(gzip_path):
+        os.remove(gzip_path)
+    print('GZipping firmware ' + firmware_path)
+    with open(firmware_path, 'rb') as firmware_file, \
+            gzip.open(gzip_path, 'wb') as dest:
+        data = firmware_file.read()
+        dest.write(data)
+    orig_size = os.stat(firmware_path).st_size
+    gzip_size = os.stat(gzip_path).st_size
+    print("New FW size {:d} bytes vs old {:d} bytes".format(
+        gzip_size, orig_size))
+
+    if mode == "PIO":
+        if os.path.exists(orig_path):
+            os.remove(orig_path)
+        print('Moving original firmware to ' + orig_path)
+        os.rename(firmware_path, orig_path)
+        os.rename(gzip_path, firmware_path)
+
 def main():
     parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
     parser.add_argument('-e', '--eboot', action='store', required=True, help='Path to the Arduino eboot.elf bootloader')
@@ -147,18 +175,34 @@ def main():
     parser.add_argument('-s', '--flash_size', action='store', required=True, choices=['256K', '512K', '1M', '2M', '4M', '8M', '16M'], help='SPI flash size')
     parser.add_argument('-o', '--out', action='store', required=True, help='Output BIN filename')
     parser.add_argument('-p', '--path', action='store', required=True, help='Path to Xtensa toolchain binaries')
+    parser.add_argument('-g', '--gzip', choices=['PIO', 'Arduino'], help='PIO - generate gzipped BIN file, Arduino - generate BIN and BIN.gz')
 
     args = parser.parse_args()
 
-    print('Creating BIN file "' + args.out + '" using "' + args.app + '"')
+    print('Creating BIN file "{out}" using "{eboot}" and "{app}"'.format(
+        out=args.out, eboot=args.eboot, app=args.app))
 
-    out = open(args.out, "wb")
-    write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-    write_bin(out, args.app, ['.irom0.text', '.text', '.text1', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-    out.close()
+    with open(args.out, "wb") as out:
+        def wrapper(**kwargs):
+            write_bin(out=out, args=args, **kwargs)
+
+        wrapper(
+            elf=args.eboot,
+            segments=[".text"],
+            to_addr=4096
+        )
+
+        wrapper(
+            elf=args.app,
+            segments=[".irom0.text", ".text", ".text1", ".data", ".rodata"],
+            to_addr=0
+        )
 
     # Because the CRC includes both eboot and app, can only calculate it after the entire BIN generated
     add_crc(args.out)
+
+    if args.gzip:
+        gzip_bin(args.gzip, args.out)
 
     return 0
 

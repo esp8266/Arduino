@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.6.3/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.7.4_a/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -28,15 +28,15 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install the current upstream Arduino IDE at the 1.8.7 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8.9 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
 - Start Arduino and open the Preferences window.
-- Enter ```https://arduino.esp8266.com/stable/package_esp8266com_index.json``` into the *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
+- Enter ```https://arduino.esp8266.com/stable/package_esp8266com_index.json``` into the *File>Preferences>Additional Boards Manager URLs* field of the Arduino IDE. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.6.3/](https://arduino-esp8266.readthedocs.io/en/2.6.3/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.7.4_a/](https://arduino-esp8266.readthedocs.io/en/2.7.4_a/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -48,19 +48,19 @@ Also known as latest git or master branch.
 
 ### Using PlatformIO
 
-[PlatformIO](https://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
+[PlatformIO](https://platformio.org?utm_source=arduino-esp8266) is an open source ecosystem for IoT
 development with a cross-platform build system, a library manager, and full support
 for Espressif (ESP8266) development. It works on the following popular host operating systems: macOS, Windows,
 Linux 32/64, and Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
-- [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
-- [PlatformIO Core](https://docs.platformio.org/en/latest/core.html?utm_source=github&utm_medium=arduino-esp8266) (command line tool)
-- [Advanced usage](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266) -
+- [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=arduino-esp8266)
+- [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=arduino-esp8266)
+- [PlatformIO Core](https://docs.platformio.org/en/latest/core.html?utm_source=arduino-esp8266) (command line tool)
+- [Advanced usage](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266) -
   custom settings, uploading to SPIFFS, Over-the-Air (OTA), staging version
-- [Integration with Cloud and Standalone IDEs](https://docs.platformio.org/en/latest/ide.html?utm_source=github&utm_medium=arduino-esp8266) -
+- [Integration with Cloud and Standalone IDEs](https://docs.platformio.org/en/latest/ide.html?utm_source=arduino-esp8266) -
   Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
-- [Project Examples](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266#examples)
+- [Project Examples](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266#examples)
 
 ### Building with make
 
@@ -73,7 +73,7 @@ Documentation for latest development version: https://arduino-esp8266.readthedoc
 
 ### Issues and support ###
 
-[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party library not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
+[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. Stackoverflow is also an alternative. If you need help, have a "How do I..." type question, have a problem with a 3rd party library not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
 
 If you find the forum useful, please consider supporting it with a donation. <br />
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
@@ -96,7 +96,7 @@ For minor fixes of code and documentation, please go ahead and submit a pull req
 
 Check out the list of issues that are easy to fix — [easy issues pending](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
-Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed by opening an issue first.
+Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed by opening an issue first. PRs with such changes require testing and approval.
 
 Feature branches with lots of small commits (especially titled "oops", "fix typo", "forgot to add file", etc.) should be squashed before opening a pull request. At the same time, please refrain from putting multiple unrelated changes into a single pull request.
 
@@ -108,7 +108,7 @@ ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
 Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), and is currently maintained by Angus Gratton (@projectgus) under GPL 2.0 license.
 
-Espressif SDK included in this build is under Espressif MIT License.
+[Espressif's NONOS SDK](https://github.com/espressif/ESP8266_NONOS_SDK) included in this build is under Espressif MIT License.
 
 ESP8266 core files are licensed under LGPL.
 
@@ -117,8 +117,6 @@ ESP8266 core files are licensed under LGPL.
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under the MIT license.
 
 [SoftwareSerial](https://github.com/plerup/espsoftwareserial) library and examples written by Peter Lerup. Distributed under LGPL 2.1.
-
-[axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).
 
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 
@@ -135,3 +133,5 @@ ESP8266 core files are licensed under LGPL.
 [SoftwareSerial repo](https://github.com/plerup/espsoftwareserial)
 
 [Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).
+
+[FTP Client/Server Library](https://github.com/dplasa/FTPClientServer) 

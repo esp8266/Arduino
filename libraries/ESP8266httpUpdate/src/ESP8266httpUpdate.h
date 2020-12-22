@@ -56,6 +56,7 @@ constexpr int HTTP_UE_SERVER_WRONG_HTTP_CODE    = (-104);
 constexpr int HTTP_UE_SERVER_FAULTY_MD5         = (-105);
 constexpr int HTTP_UE_BIN_VERIFY_HEADER_FAILED  = (-106);
 constexpr int HTTP_UE_BIN_FOR_WRONG_FLASH       = (-107);
+constexpr int HTTP_UE_SERVER_UNAUTHORIZED       = (-108);
 
 enum HTTPUpdateResult {
     HTTP_UPDATE_FAILED,
@@ -82,9 +83,27 @@ public:
         _rebootOnUpdate = reboot;
     }
 
-    void followRedirects(bool follow)
+    /**
+     * set true to follow redirects.
+     * @param follow
+     * @deprecated Please use `setFollowRedirects(followRedirects_t follow)`
+      */
+    void followRedirects(bool follow) __attribute__ ((deprecated))
+    {
+        _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
+    }
+    /**
+      * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+      * @param follow
+      */
+    void setFollowRedirects(followRedirects_t follow)
     {
         _followRedirects = follow;
+    }
+
+    void closeConnectionsOnUpdate(bool sever)
+    {
+        _closeConnectionsOnUpdate = sever;
     }
 
     void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
@@ -92,6 +111,9 @@ public:
         _ledPin = ledPin;
         _ledOn = ledOn;
     }
+
+    void setAuthorization(const String& user, const String& password);
+    void setAuthorization(const String& auth);
 
 #if HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use rebootOnUpdate and the next one instead
@@ -128,7 +150,10 @@ public:
     t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint) __attribute__((deprecated));
     t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20]) __attribute__((deprecated)); // BearSSL
 #endif
-    t_httpUpdate_return updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion = "");
+    t_httpUpdate_return updateFS(WiFiClient& client, const String& url, const String& currentVersion = "");
+    t_httpUpdate_return updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion = "") __attribute__((deprecated)) {
+        return updateFS(client, url, currentVersion);
+    };
 
     // Notification callbacks
     void onStart(HTTPUpdateStartCB cbOnStart)          { _cbStart = cbOnStart; }
@@ -146,15 +171,20 @@ protected:
     // Set the error and potentially use a CB to notify the application
     void _setLastError(int err) {
         _lastError = err;
-	if (_cbError) {
+        if (_cbError) {
             _cbError(err);
         }
     }
     int _lastError;
     bool _rebootOnUpdate = true;
+    bool _closeConnectionsOnUpdate = true;
+    String _user;
+    String _password;
+    String _auth;
+
 private:
     int _httpClientTimeout;
-    bool _followRedirects;
+    followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
 
     // Callbacks
     HTTPUpdateStartCB    _cbStart;
@@ -162,7 +192,7 @@ private:
     HTTPUpdateErrorCB    _cbError;
     HTTPUpdateProgressCB _cbProgress;
 
-    int _ledPin;
+    int _ledPin = -1;
     uint8_t _ledOn;
 };
 

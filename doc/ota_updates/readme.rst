@@ -44,9 +44,9 @@ Make your own risk analysis and, depending on the application, decide what libra
 Advanced Security - Signed Updates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  This uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level encryption to guarantee that only the holder of a cryptographic private key can generate code accepted by the OTA update mechanisms.
+While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  This uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level public-key encryption to guarantee that only the holder of a cryptographic private key can produce signed updates accepted by the OTA update mechanisms.
 
-Signed updates are updates whose compiled binaries are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone except the holder of the developer's private key, the hash will not match and the ESP8266 will reject the upload.
+Signed updates are updates whose compiled binaries are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash (also called a signature) to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone except the holder of the developer's private key, the signature will not match and the ESP8266 will reject the upload.
 
 Cryptographic signing only protects against tampering with binaries delivered via OTA.  If someone has physical access, they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not protect code inside the device: if a user has physical access they can read out your program.
 
@@ -57,11 +57,11 @@ Signed Binary Format
 
 The format of a signed binary is compatible with the standard binary format, and can be uploaded to a non-signed ESP8266 via serial or OTA without any conditions.  Note, however, that once an unsigned OTA app is overwritten by this signed version, further updates will require signing.
 
-As shown below, the signed hash is appended to the unsigned binary, followed by the total length of the signed hash (i.e., if the signed hash was 64 bytes, then this uint32 data segment will contain 64).  This format allows for extensibility (such as adding a CA-based validation scheme allowing multiple signing keys all based on a trust anchor). Pull requests are always welcome.
+As shown below, the signed hash is appended to the unsigned binary, followed by the total length of the signed hash (i.e., if the signed hash was 64 bytes, then this uint32 data segment will contain 64).  This format allows for extensibility (such as adding a CA-based validation scheme allowing multiple signing keys all based on a trust anchor). Pull requests are always welcome. (currently it uses SHA256 with RSASSA-PKCS1-V1_5-SIGN signature scheme from RSA PKCS #1 v1.5)
 
 .. code:: bash
 
-    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
+    NORMAL-BINARY <SIGNATURE> <uint32 LENGTH-OF-SIGNATURE>
 
 Signed Binary Prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -200,11 +200,11 @@ The following chapters provide more details and specific methods for OTA updates
 Arduino IDE
 -----------
 
-Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios: 
+Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios:
 
--  during firmware development as a quicker alternative to loading over a serial port, 
+-  during firmware development as a quicker alternative to loading over a serial port,
 
--  for updating a small number of modules, 
+-  for updating a small number of modules,
 
 -  only if modules are accessible on the same network as the computer with the Arduino IDE.
 
@@ -360,7 +360,7 @@ If this is the case, then most likely ESP module has not been reset after initia
 The most common causes of OTA failure are as follows:
 
 - not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA).
-- too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process-memory-view>`__.
+- too much memory declared for the filesystem so new sketch will not fit between existing sketch and the filesystem – see `Update process - memory view <#update-process-memory-view>`__.
 - too little memory declared in Arduino IDE for your selected board (i.e. less than physical size).
 - not resetting the ESP module after initial upload using serial port.
 
@@ -510,6 +510,11 @@ HTTP Server
 
 ``ESPhttpUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
 
+Note that by default this class closes all other connections except the one used by the update, this is because the update method blocks. This means that if there's another application receiving data then TCP packets will build up in the buffer leading to out of memory errors causing the OTA update to fail. There's also a limited number of receive buffers available and all may be used up by other applications.
+
+There are some cases where you know that you won't be receiving any data but would still like to send progress updates.
+It's possible to disable the default behaviour (and keep connections open) by calling closeConnectionsOnUpdate(false).
+
 Requirements
 ~~~~~~~~~~~~
 
@@ -566,15 +571,16 @@ Example header data:
 
 ::
 
-        [HTTP_USER_AGENT] => ESP8266-http-Update
-        [HTTP_X_ESP8266_STA_MAC] => 18:FE:AA:AA:AA:AA
-        [HTTP_X_ESP8266_AP_MAC] => 1A:FE:AA:AA:AA:AA
-        [HTTP_X_ESP8266_FREE_SPACE] => 671744
-        [HTTP_X_ESP8266_SKETCH_SIZE] => 373940
-        [HTTP_X_ESP8266_SKETCH_MD5] => a56f8ef78a0bebd812f62067daf1408a
-        [HTTP_X_ESP8266_CHIP_SIZE] => 4194304
-        [HTTP_X_ESP8266_SDK_VERSION] => 1.3.0
-        [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
+        [User-Agent] => ESP8266-http-Update
+        [x-ESP8266-STA-MAC] => 18:FE:AA:AA:AA:AA
+        [x-ESP8266-AP-MAC] => 1A:FE:AA:AA:AA:AA
+        [x-ESP8266-free-space] => 671744
+        [x-ESP8266-sketch-size] => 373940
+        [x-ESP8266-sketch-md5] => a56f8ef78a0bebd812f62067daf1408a
+        [x-ESP8266-chip-size] => 4194304
+        [x-ESP8266-sdk-version] => 1.3.0
+        [x-ESP8266-version] => DOOR-7-g14f53a19
+        [x-ESP8266-mode] => sketch
 
 With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address, as in the following example:
 
@@ -603,20 +609,20 @@ With this information the script now can check if an update is needed. It is als
         readfile($path);
     }
 
-    if(!check_header('HTTP_USER_AGENT', 'ESP8266-http-Update')) {
+    if(!check_header('User-Agent', 'ESP8266-http-Update')) {
         header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
         echo "only for ESP8266 updater!\n";
         exit();
     }
 
     if(
-        !check_header('HTTP_X_ESP8266_STA_MAC') ||
-        !check_header('HTTP_X_ESP8266_AP_MAC') ||
-        !check_header('HTTP_X_ESP8266_FREE_SPACE') ||
-        !check_header('HTTP_X_ESP8266_SKETCH_SIZE') ||
-        !check_header('HTTP_X_ESP8266_SKETCH_MD5') ||
-        !check_header('HTTP_X_ESP8266_CHIP_SIZE') ||
-        !check_header('HTTP_X_ESP8266_SDK_VERSION')
+        !check_header('x-ESP8266-STA-MAC') ||
+        !check_header('x-ESP8266-AP-MAC') ||
+        !check_header('x-ESP8266-free-space') ||
+        !check_header('x-ESP8266-sketch-size') ||
+        !check_header('x-ESP8266-sketch-md5') ||
+        !check_header('x-ESP8266-chip-size') ||
+        !check_header('x-ESP8266-sdk-version')
     ) {
         header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
         echo "only for ESP8266 updater! (header)\n";
@@ -628,17 +634,17 @@ With this information the script now can check if an update is needed. It is als
         "18:FE:AA:AA:AA:BB" => "TEMP-1.0.0"
     );
 
-    if(!isset($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']])) {
+    if(!isset($db[$_SERVER['x-ESP8266-STA-MAC']])) {
         header($_SERVER["SERVER_PROTOCOL"].' 500 ESP MAC not configured for updates', true, 500);
     }
 
-    $localBinary = "./bin/".$db[$_SERVER['HTTP_X_ESP8266_STA_MAC']].".bin";
+    $localBinary = "./bin/".$db[$_SERVER['x-ESP8266-STA-MAC']].".bin";
 
     // Check if version has been set and does not match, if not, check if
     // MD5 hash between local binary and ESP8266 binary do not match if not.
     // then no update has been found.
-    if((!check_header('HTTP_X_ESP8266_SDK_VERSION') && $db[$_SERVER['HTTP_X_ESP8266_STA_MAC']] != $_SERVER['HTTP_X_ESP8266_VERSION'])
-        || $_SERVER["HTTP_X_ESP8266_SKETCH_MD5"] != md5_file($localBinary)) {
+    if((!check_header('x-ESP8266-sdk-version') && $db[$_SERVER['x-ESP8266-STA-MAC']] != $_SERVER['x-ESP8266-version'])
+        || $_SERVER["x-ESP8266-sketch-md5"] != md5_file($localBinary)) {
         sendFile($localBinary);
     } else {
         header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
@@ -663,6 +669,8 @@ Updater class
 Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader (eboot) to load the new firmware on the next boot.
 
 **Note:** The bootloader command will be stored into the first 128 bytes of user RTC memory, then it will be retrieved by eboot on boot. That means that user data present there will be lost `(per discussion in #5330) <https://github.com/esp8266/Arduino/pull/5330#issuecomment-437803456>`__.
+
+**Note:** For uncompressed firmware images, the Updater will change the flash mode bits if they differ from the flash mode the device is currently running at. This ensures that the flash mode is not changed to an incompatible mode when the device is in a remote or hard to access area. Compressed images are not modified, thus changing the flash mode in this instance could result in damage to the ESP8266 and/or flash memory chip or your device no longer be accessible via OTA, and requiring re-flashing via a serial connection `(per discussion in #7307) <https://github.com/esp8266/Arduino/issues/7307#issuecomment-631523053>`__.
 
 Update process - memory view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

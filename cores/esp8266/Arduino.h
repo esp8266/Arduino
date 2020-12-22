@@ -37,13 +37,12 @@ extern "C" {
 #include "binary.h"
 #include "esp8266_peri.h"
 #include "twi.h"
+
 #include "core_esp8266_features.h"
 #include "core_esp8266_version.h"
 
 #define HIGH 0x1
 #define LOW  0x0
-
-#define PWMRANGE 1023
 
 //GPIO FUNCTIONS
 #define INPUT             0x00
@@ -127,20 +126,10 @@ void timer0_isr_init(void);
 void timer0_attachInterrupt(timercallback userFunc);
 void timer0_detachInterrupt(void);
 
-// undefine stdlib's abs if encountered
-#ifdef abs
-#undef abs
-#endif
-
-#define abs(x) ((x)>0?(x):-(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
-
-void ets_intr_lock();
-void ets_intr_unlock();
 
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
@@ -170,10 +159,11 @@ typedef uint16_t word;
 typedef bool boolean;
 typedef uint8_t byte;
 
+void ets_intr_lock();
+void ets_intr_unlock();
+
 void init(void);
 void initVariant(void);
-
-int atexit(void (*func)()) __attribute__((weak));
 
 void pinMode(uint8_t pin, uint8_t mode);
 void digitalWrite(uint8_t pin, uint8_t val);
@@ -182,13 +172,9 @@ int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(uint32_t freq);
+void analogWriteResolution(int res);
 void analogWriteRange(uint32_t range);
 
-unsigned long millis(void);
-unsigned long micros(void);
-uint64_t micros64(void);
-void delay(unsigned long);
-void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
 
@@ -204,6 +190,7 @@ void setup(void);
 void loop(void);
 
 void yield(void);
+
 void optimistic_yield(uint32_t interval_us);
 
 #define _PORT_GPIO16    1
@@ -223,33 +210,34 @@ void optimistic_yield(uint32_t interval_us);
 } // extern "C"
 #endif
 
+// undefine stdlib's definitions when encountered, provide abs that supports floating point for C code
+#ifndef __cplusplus
+#undef abs
+#define abs(x) ({ __typeof__(x) _x = (x); _x > 0 ? _x : -_x; })
+#undef round
+#define round(x) ({ __typeof__(x) _x = (x); _x >= 0 ? (long)(_x + 0.5) : (long)(_x - 0.5); })
+#endif // ifndef __cplusplus
 
-//for compatibility, below 4 lines to be removed in release 3.0.0
-#ifdef __cplusplus
-extern "C"
-#endif
-const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
-
-
-
+// from this point onward, we need to configure the c++ environment
 #ifdef __cplusplus
 
 #include <algorithm>
+#include <cstdlib>
 #include <cmath>
-#include <pgmspace.h>
 
-#include "WCharacter.h"
-#include "WString.h"
 
-#include "HardwareSerial.h"
-#include "Esp.h"
-#include "Updater.h"
-#include "debug.h"
+#include "mmu_iram.h"
+
 
 using std::min;
 using std::max;
+using std::round;
 using std::isinf;
 using std::isnan;
+
+// Use float-compatible stl abs() and round(), we don't use Arduino macros to avoid issues with the C++ libraries
+using std::abs;
+using std::round;
 
 #define _min(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a < _b? _a : _b; })
 #define _max(a,b) ({ decltype(a) _a = (a); decltype(b) _b = (b); _a > _b? _a : _b; })
@@ -275,14 +263,34 @@ long secureRandom(long);
 long secureRandom(long, long);
 long map(long, long, long, long, long);
 
+void setTZ(const char* tz);
+
 void configTime(int timezone, int daylightOffset_sec, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
 void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
+// esp32 api compatibility
+inline void configTzTime(const char* tz, const char* server1,
+    const char* server2 = nullptr, const char* server3 = nullptr)
+{
+    configTime(tz, server1, server2, server3);
+}
+
+// Everything we expect to be implicitly loaded for the sketch
+#include <pgmspace.h>
+
+#include "WCharacter.h"
+#include "WString.h"
+
+#include "HardwareSerial.h"
+#include "Esp.h"
+#include "Updater.h"
+
 #endif // __cplusplus
 
+#include "debug.h"
 #include "pins_arduino.h"
 
 #endif

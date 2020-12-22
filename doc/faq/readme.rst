@@ -55,7 +55,7 @@ How can I get some extra KBs in flash ?
 About WPS
 ~~~~~~~~~
 
-From release 2.4.2 and ahead, not using WPS will give an exra ~4.5KB in
+From release 2.4.2 and ahead, not using WPS will give an extra ~4.5KB in
 heap.
 
 In release 2.4.2 only, WPS is disabled by default and the board generator is
@@ -79,7 +79,7 @@ perform. It is not listed among libraries verified to work with ESP8266.
 
 `Read more <a03-library-does-not-work.rst>`__.
 
-In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M SPIFFS) or 4M (3M SPIFFS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
+In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M FS) or 4M (3M FS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The reason we cannot have more than 1MB of code in flash has to do with
@@ -90,7 +90,7 @@ total, but switching such "banks" on the fly is not easy and efficient,
 so we don't bother doing that. Besides, no one has so far complained
 about 1MB of code space being insufficient for practical purposes.
 
-The option to choose 3M or 1M SPIFFS is to optimize the upload time.
+The option to choose 3M or 1M filesystem is to optimize the upload time.
 Uploading 3MB takes a long time so sometimes you can just use 1MB. Other
 2MB of flash can still be used with ``ESP.flashRead`` and
 ``ESP.flashWrite`` APIs if necessary.
@@ -129,17 +129,14 @@ This is not needed anymore:
 PCBs in time-wait state are limited to 5 and removed when that number is
 exceeded.
 
-Ref.  `lwIP-v1.4 <https://github.com/esp8266/Arduino/commit/07f4d4c241df2c552899857f39a4295164f686f2#diff-f8258e71e25fb9985ca3799e3d8b88ecR399>`__,
-`lwIP-v2 <https://github.com/d-a-v/esp82xx-nonos-linklayer/commit/420960dfc0dbe07114f7364845836ac333bc84f7>`__
+Ref.  `<https://github.com/d-a-v/esp82xx-nonos-linklayer/commit/420960dfc0dbe07114f7364845836ac333bc84f7>`__
 
 For reference:
 
 Time-wait PCB state helps TCP not confusing two consecutive connections with the
 same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
-having duplicate packets lost in internet arriving later during the second. 
+having duplicate packets lost in internet arriving later during the second.
 Artificially clearing them is a workaround to help saving precious heap.
-
-The following lines are compatible with both lwIP versions:
 
 .. code:: cpp
 
@@ -147,7 +144,7 @@ The following lines are compatible with both lwIP versions:
     struct tcp_pcb;
     extern struct tcp_pcb* tcp_tw_pcbs;
     extern "C" void tcp_abort (struct tcp_pcb* pcb);
-    
+
     void tcpCleanup (void) {
       while (tcp_tw_pcbs)
         tcp_abort(tcp_tw_pcbs);
@@ -168,3 +165,15 @@ This script is also used to manage uncommon options that are currently not
 available in the IDE menu.
 
 `Read more <a05-board-generator.rst>`__.
+
+My WiFi won't reconnect after deep sleep using ``WAKE_RF_DISABLED``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you implement deep sleep using ``WAKE_RF_DISABLED``, this forces what
+appears to be a bare metal disabling of WiFi functionality, which is not
+restored using ``WiFi.forceSleepWake()`` or ``WiFi.mode(WIFI_STA)``. If you need
+to implement deep sleep with ``WAKE_RF_DISABLED`` and later connect to WiFi, you
+will need to implement an additional (short) deep sleep using
+``WAKE_RF_DEFAULT``.
+
+Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__

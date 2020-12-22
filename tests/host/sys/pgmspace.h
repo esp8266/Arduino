@@ -67,5 +67,6 @@ inline int vsnprintf_P(char *str, size_t size, const char *format, va_list ap) {
 #define snprintf_P snprintf
 #define sprintf_P sprintf
 #define strncmp_P strncmp
+#define strcat_P strcat
 
 #endif

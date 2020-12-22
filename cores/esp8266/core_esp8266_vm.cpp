@@ -290,9 +290,9 @@ static inline ICACHE_RAM_ATTR uint32_t spi_ramread(spi_regs *spi1, int addr, int
   }
 }
 
-static void (*__old_handler)(struct __exception_frame *ef, uint32_t cause);
+static void (*__old_handler)(struct __exception_frame *ef, int cause);
 
-static ICACHE_RAM_ATTR void loadstore_exception_handler(struct __exception_frame *ef, uint32_t cause)
+static ICACHE_RAM_ATTR void loadstore_exception_handler(struct __exception_frame *ef, int cause)
 {
   uint32_t epc1 = ef->epc;
   uint32_t excvaddr;
@@ -354,7 +354,7 @@ void install_vm_exception_handler()
   // out using the decoded ROM dump which points to 0x3fffc100 as the start of
   // the XTOS exception table (of C-callable functions)
   uint32_t old = *(uint32_t*)(0x3fffc100 + EXCCAUSE_LOAD_PROHIBITED * 4);
-  __old_handler = (void (*)(struct __exception_frame *ef, uint32_t cause))old;
+  __old_handler = (void (*)(struct __exception_frame *ef, int cause))old;
   _xtos_set_exception_handler(EXCCAUSE_LOAD_PROHIBITED, loadstore_exception_handler);
   _xtos_set_exception_handler(EXCCAUSE_STORE_PROHIBITED, loadstore_exception_handler);
 
@@ -400,7 +400,7 @@ void install_vm_exception_handler()
   }
 
   // Hook into memory manager
-  umm_init_vm( (void *)0x10000000, 0x20000);
+  umm_init_vm( (void *)0x10000000, UMM_HEAP_EXTERNAL * 1024);
 }
 
 

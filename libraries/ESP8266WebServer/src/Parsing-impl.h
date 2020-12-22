@@ -25,19 +25,14 @@
 #include "ESP8266WebServer.h"
 #include "detail/mimetable.h"
 
-//#define DEBUG_ESP_HTTP_SERVER
-#ifdef DEBUG_ESP_PORT
-#define DEBUG_OUTPUT DEBUG_ESP_PORT
-#else
-#define DEBUG_OUTPUT Serial
-#endif
-
 #ifndef WEBSERVER_MAX_POST_ARGS
 #define WEBSERVER_MAX_POST_ARGS 32
 #endif
 
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
+
+namespace esp8266webserver {
 
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
@@ -61,17 +56,14 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
 }
 
 template <typename ServerType>
-bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
+typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.print("request: ");
-    DEBUG_OUTPUT.println(req);
-#endif
+  DBGWS("request: %s\n", req.c_str());
   client.readStringUntil('\n');
   //reset header value
   for (int i = 0; i < _headerKeysCount; ++i) {
-    _currentHeaders[i].value =String();
+    _currentHeaders[i].value.clear();
    }
 
   // First line of HTTP request looks like "GET /path HTTP/1.1"
@@ -79,10 +71,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   int addr_start = req.indexOf(' ');
   int addr_end = req.indexOf(' ', addr_start + 1);
   if (addr_start == -1 || addr_end == -1) {
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("Invalid request");
-#endif
-    return false;
+    DBGWS("Invalid request\n");
+    return CLIENT_MUST_STOP;
   }
 
   String methodStr = req.substring(0, addr_start);
@@ -97,6 +87,13 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   }
   _currentUri = url;
   _chunked = false;
+
+  if (_hook)
+  {
+    auto whatNow = _hook(methodStr, url, &client, mime::getContentType);
+    if (whatNow != CLIENT_REQUEST_CAN_CONTINUE)
+        return whatNow;
+  }
 
   HTTPMethod method = HTTP_GET;
   if (methodStr == F("HEAD")) {
@@ -114,14 +111,11 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   }
   _currentMethod = method;
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("method: ");
-  DEBUG_OUTPUT.print(methodStr);
-  DEBUG_OUTPUT.print(" url: ");
-  DEBUG_OUTPUT.print(url);
-  DEBUG_OUTPUT.print(" search: ");
-  DEBUG_OUTPUT.println(searchStr);
-#endif
+  _keepAlive = _currentVersion > 0; // Keep the connection alive by default
+                                    // if the protocol version is greater than HTTP 1.0
+
+  DBGWS("method: %s url: %s search: %s keepAlive=: %d\n",
+      methodStr.c_str(), url.c_str(), searchStr.c_str(), _keepAlive);
 
   //attach handler
   RequestHandlerType* handler;
@@ -144,7 +138,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req.isEmpty()) break;//no moar headers
+      if (req.isEmpty()) break; //no more headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -154,12 +148,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
       headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
 
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print("headerName: ");
-      DEBUG_OUTPUT.println(headerName);
-      DEBUG_OUTPUT.print("headerValue: ");
-      DEBUG_OUTPUT.println(headerValue);
-      #endif
+      DBGWS("headerName: %s\nheaderValue: %s\n", headerName.c_str(), headerValue.c_str());
 
       if (headerName.equalsIgnoreCase(FPSTR(Content_Type))){
         using namespace mime;
@@ -177,6 +166,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
         contentLength = headerValue.toInt();
       } else if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
 
@@ -188,7 +179,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
            )
        )
     {
-        return false;
+        return CLIENT_MUST_STOP;
     }
 
     if (isEncoded) {
@@ -208,11 +199,12 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
         RequestArgument& arg = _currentArgs[_currentArgCount++];
         arg.key = F("plain");
         arg.value = plainBuf;
+        _currentArgsHavePlain = 1;
       }
     } else { // isForm is true
       // here: content is not yet read (plainBuf is still empty)
       if (!_parseForm(client, boundaryStr, contentLength)) {
-        return false;
+        return CLIENT_MUST_STOP;
       }
     }
   } else {
@@ -231,15 +223,12 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
       headerValue = req.substring(headerDiv + 2);
       _collectHeader(headerName.c_str(),headerValue.c_str());
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print(F("headerName: "));
-      DEBUG_OUTPUT.println(headerName);
-      DEBUG_OUTPUT.print(F("headerValue: "));
-      DEBUG_OUTPUT.println(headerValue);
-#endif
+      DBGWS("headerName: %s\nheaderValue: %s\n", headerName.c_str(), headerValue.c_str());
 
       if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
+      } else if (headerName.equalsIgnoreCase(F("Connection"))){
+        _keepAlive = headerValue.equalsIgnoreCase(F("keep-alive"));
       }
     }
     _parseArguments(searchStr);
@@ -247,19 +236,15 @@ bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   client.flush();
 
 #ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print(F("Request: "));
-  DEBUG_OUTPUT.println(url);
-  DEBUG_OUTPUT.print(F("Arguments: "));
-  DEBUG_OUTPUT.println(searchStr);
-
-  DEBUG_OUTPUT.println(F("final list of key/value pairs:"));
+  DBGWS("Request: %s\nArguments: %s\nfinal list of key/value pairs:\n",
+    url.c_str(), searchStr.c_str());
   for (int i = 0; i < _currentArgCount; i++)
-    DEBUG_OUTPUT.printf("  key:'%s' value:'%s'\r\n",
+    DBGWS("  key:'%s' value:'%s'\r\n",
       _currentArgs[i].key.c_str(),
       _currentArgs[i].value.c_str());
 #endif
 
-  return true;
+  return CLIENT_REQUEST_CAN_CONTINUE;
 }
 
 template <typename ServerType>
@@ -308,10 +293,7 @@ void ESP8266WebServerTemplate<ServerType>::_parseArguments(const String& data) {
 template <typename ServerType>
 int ESP8266WebServerTemplate<ServerType>::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("args: ");
-  DEBUG_OUTPUT.println(data);
-#endif
+  DBGWS("args: %s\n", data.c_str());
 
   size_t pos = 0;
   int arg_total = 0;
@@ -349,11 +331,7 @@ int ESP8266WebServerTemplate<ServerType>::_parseArgumentsPrivate(const String& d
       break;
   }
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("args count: ");
-  DEBUG_OUTPUT.println(arg_total);
-#endif
-
+  DBGWS("args count: %d\n", (int)arg_total);
   return arg_total;
 }
 
@@ -369,25 +347,21 @@ void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
 }
 
 template <typename ServerType>
-uint8_t ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
+int ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
       yield();
     res = client.read();
   }
-  return (uint8_t)res;
+  return res;
 }
+
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const String& boundary, uint32_t len){
   (void) len;
-#ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("Parse Form: Boundary: ");
-  DEBUG_OUTPUT.print(boundary);
-  DEBUG_OUTPUT.print(" Length: ");
-  DEBUG_OUTPUT.println(len);
-#endif
+  DBGWS("Parse Form: Boundary: '%s' Length: %d\n", boundary.c_str(), (int)len);
   String line;
   int retry = 0;
   do {
@@ -421,18 +395,12 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             argFilename = argName.substring(nameStart+2, argName.length() - 1);
             argName = argName.substring(0, argName.indexOf('"'));
             argIsFile = true;
-#ifdef DEBUG_ESP_HTTP_SERVER
-            DEBUG_OUTPUT.print("PostArg FileName: ");
-            DEBUG_OUTPUT.println(argFilename);
-#endif
+            DBGWS("PostArg FileName: %s\n", argFilename.c_str());
             //use GET to set the filename if uploading using blob
             if (argFilename == F("blob") && hasArg(FPSTR(filename)))
               argFilename = arg(FPSTR(filename));
           }
-#ifdef DEBUG_ESP_HTTP_SERVER
-          DEBUG_OUTPUT.print("PostArg Name: ");
-          DEBUG_OUTPUT.println(argName);
-#endif
+          DBGWS("PostArg Name: %s\n", argName.c_str());
           using namespace mime;
           argType = FPSTR(mimeTable[txt].mimeType);
           line = client.readStringUntil('\r');
@@ -443,10 +411,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             client.readStringUntil('\r');
             client.readStringUntil('\n');
           }
-#ifdef DEBUG_ESP_HTTP_SERVER
-          DEBUG_OUTPUT.print("PostArg Type: ");
-          DEBUG_OUTPUT.println(argType);
-#endif
+          DBGWS("PostArg Type: %s\n", argType.c_str());
           if (!argIsFile){
             while(1){
               line = client.readStringUntil('\r');
@@ -455,20 +420,14 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
               if (argValue.length() > 0) argValue += '\n';
               argValue += line;
             }
-#ifdef DEBUG_ESP_HTTP_SERVER
-            DEBUG_OUTPUT.print("PostArg Value: ");
-            DEBUG_OUTPUT.println(argValue);
-            DEBUG_OUTPUT.println();
-#endif
+            DBGWS("PostArg Value: %s\n\n", argValue.c_str());
 
             RequestArgument& arg = _postArgs[_postArgsLen++];
             arg.key = argName;
             arg.value = argValue;
 
             if (line == ("--"+boundary+"--")){
-#ifdef DEBUG_ESP_HTTP_SERVER
-              DEBUG_OUTPUT.println("Done Parsing POST");
-#endif
+              DBGWS("Done Parsing POST\n");
               break;
             }
           } else {
@@ -480,89 +439,57 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             _currentUpload->totalSize = 0;
             _currentUpload->currentSize = 0;
             _currentUpload->contentLength = len;
-#ifdef DEBUG_ESP_HTTP_SERVER
-            DEBUG_OUTPUT.print("Start File: ");
-            DEBUG_OUTPUT.print(_currentUpload->filename);
-            DEBUG_OUTPUT.print(" Type: ");
-            DEBUG_OUTPUT.println(_currentUpload->type);
-#endif
+            DBGWS("Start File: %s Type: %s\n", _currentUpload->filename.c_str(), _currentUpload->type.c_str());
             if(_currentHandler && _currentHandler->canUpload(_currentUri))
               _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->status = UPLOAD_FILE_WRITE;
-            uint8_t argByte = _uploadReadByte(client);
-readfile:
-            while(argByte != 0x0D){
-              if (!client.connected()) return _parseFormUploadAborted();
-              _uploadWriteByte(argByte);
-              argByte = _uploadReadByte(client);
-            }
 
-            argByte = _uploadReadByte(client);
+            int fastBoundaryLen = 4 /* \r\n-- */ + boundary.length() + 1 /* \0 */;
+            char fastBoundary[ fastBoundaryLen ];
+            snprintf(fastBoundary, fastBoundaryLen, "\r\n--%s", boundary.c_str());
+            int boundaryPtr = 0;
+            while ( true ) {
+                int ret = _uploadReadByte(client);
+                if (ret < 0) {
+                    // Unexpected, we should have had data available per above
+                    return _parseFormUploadAborted();
+                }
+                char in = (char) ret;
+                if (in == fastBoundary[ boundaryPtr ]) {
+                    // The input matched the current expected character, advance and possibly exit this file
+                    boundaryPtr++;
+                    if (boundaryPtr == fastBoundaryLen - 1) {
+                        // We read the whole boundary line, we're done here!
+                        break;
+                    }
+                } else {
+                    // The char doesn't match what we want, so dump whatever matches we had, the read in char, and reset ptr to start
+                    for (int i = 0; i < boundaryPtr; i++) {
+                        _uploadWriteByte( fastBoundary[ i ] );
+                    }
+                    _uploadWriteByte( in );
+                    boundaryPtr = 0;
+                }
+            }
+            // Found the boundary string, finish processing this file upload
+            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            _currentUpload->totalSize += _currentUpload->currentSize;
+            _currentUpload->status = UPLOAD_FILE_END;
+            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            DBGWS("End File: %s Type: %s Size: %d\n",
+                _currentUpload->filename.c_str(),
+                _currentUpload->type.c_str(),
+                (int)_currentUpload->totalSize);
             if (!client.connected()) return _parseFormUploadAborted();
-            if (argByte == 0x0A){
-              argByte = _uploadReadByte(client);
-              if (!client.connected()) return _parseFormUploadAborted();
-              if ((char)argByte != '-'){
-                //continue reading the file
-                _uploadWriteByte(0x0D);
-                _uploadWriteByte(0x0A);
-                goto readfile;
-              } else {
-                argByte = _uploadReadByte(client);
-                if (!client.connected()) return _parseFormUploadAborted();
-                if ((char)argByte != '-'){
-                  //continue reading the file
-                  _uploadWriteByte(0x0D);
-                  _uploadWriteByte(0x0A);
-                  _uploadWriteByte((uint8_t)('-'));
-                  goto readfile;
-                }
-              }
-
-              uint8_t endBuf[boundary.length()];
-              client.readBytes(endBuf, boundary.length());
-
-              if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
-                if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
-                _currentUpload->totalSize += _currentUpload->currentSize;
-                _currentUpload->status = UPLOAD_FILE_END;
-                if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
-#ifdef DEBUG_ESP_HTTP_SERVER
-                DEBUG_OUTPUT.print("End File: ");
-                DEBUG_OUTPUT.print(_currentUpload->filename);
-                DEBUG_OUTPUT.print(" Type: ");
-                DEBUG_OUTPUT.print(_currentUpload->type);
-                DEBUG_OUTPUT.print(" Size: ");
-                DEBUG_OUTPUT.println(_currentUpload->totalSize);
-#endif
-                line = client.readStringUntil(0x0D);
-                client.readStringUntil(0x0A);
-                if (line == "--"){
-#ifdef DEBUG_ESP_HTTP_SERVER
-                  DEBUG_OUTPUT.println("Done Parsing POST");
-#endif
-                  break;
-                }
-                continue;
-              } else {
-                _uploadWriteByte(0x0D);
-                _uploadWriteByte(0x0A);
-                _uploadWriteByte((uint8_t)('-'));
-                _uploadWriteByte((uint8_t)('-'));
-                uint32_t i = 0;
-                while(i < boundary.length()){
-                  _uploadWriteByte(endBuf[i++]);
-                }
-                argByte = _uploadReadByte(client);
-                goto readfile;
-              }
-            } else {
-              _uploadWriteByte(0x0D);
-              goto readfile;
+            line = client.readStringUntil('\r');
+            client.readStringUntil('\n');
+            if (line == "--") {     // extra two dashes mean we reached the end of all form fields
+                DBGWS("Done Parsing POST\n");
+                break;
             }
-            break;
+            continue;
           }
         }
       }
@@ -590,10 +517,7 @@ readfile:
     }
     return true;
   }
-#ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("Error: line: ");
-  DEBUG_OUTPUT.println(line);
-#endif
+  DBGWS("Error: line: %s\n", line.c_str());
   return false;
 }
 
@@ -636,3 +560,5 @@ bool ESP8266WebServerTemplate<ServerType>::_parseFormUploadAborted(){
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }
+
+} // namespace

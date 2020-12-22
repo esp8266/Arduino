@@ -124,7 +124,7 @@ Makefile in tests/device/ directory handles compiling, uploading, and executing 
 
 Here are some of the supported targets:
 
-- `virtualenv`: prepares Python virtual environment inside tests/device/libaries/BSTest/virtualenv/. This has to be run once on each computer where tests are to be run. This target will use `pip` to install several Python libraries required by the test runner (see tests/device/libaries/BSTest/requirements.txt).
+- `virtualenv`: prepares Python virtual environment inside tests/device/libraries/BSTest/virtualenv/. This has to be run once on each computer where tests are to be run. This target will use `pip` to install several Python libraries required by the test runner (see tests/device/libraries/BSTest/requirements.txt).
 
 - `test_xxx/test_xxx.ino`: compiles, uploads, and runs the tests defined in `test_xxx/test_xxx.ino` sketch. Some extra options are available, these can be passed as additional arguments to `make`:
     - `NO_BUILD=1`: don't compile the test.

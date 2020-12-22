@@ -26,10 +26,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cerrno>
 
 #include "flash_hal_mock.h"
 
 #define SPIFFS_FILE_NAME "spiffs.bin"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 FS SPIFFS(nullptr);
 
@@ -91,7 +95,7 @@ void SpiffsMock::load ()
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
-        if (!m_overwrite)
+        if (!m_overwrite && flen > 0)
         {
             fprintf(stderr, "SPIFFS: aborting at user request\n");
             exit(1);
@@ -126,3 +130,6 @@ void SpiffsMock::save ()
     if (::close(fs) == -1)
         fprintf(stderr, "SPIFFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
 }
+
+#pragma GCC diagnostic pop
+

@@ -26,9 +26,13 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "pgmspace.h"
+#include "debug.h"
 #include "StackThunk.h"
 #include <ets_sys.h>
-#include <Esp.h>
+#include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 extern "C" {
 
@@ -46,9 +50,19 @@ void stack_thunk_add_ref()
 {
   stack_thunk_refcnt++;
   if (stack_thunk_refcnt == 1) {
-    ESP.setInternalHeap();
+    DBG_MMU_PRINTF("\nStackThunk malloc(%u)\n", _stackSize * sizeof(uint32_t));
+    // The stack must be in DRAM, or an Soft WDT will follow. Not sure why,
+    // maybe too much time is consumed with the non32-bit exception handler.
+    // Also, interrupt handling on an IRAM stack would be very slow.
+    // Strings on the stack would be very slow to access as well.
+    HeapSelectDram ephemeral;
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
-    ESP.resetHeap();
+    DBG_MMU_PRINTF("StackThunk stack_thunk_ptr: %p\n", stack_thunk_ptr);
+    if (!stack_thunk_ptr) {
+        // This is a fatal error, stop the sketch
+        DEBUGV("Unable to allocate BearSSL stack\n");
+        abort();
+    }
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
     stack_thunk_repaint();
@@ -114,14 +128,14 @@ uint32_t stack_thunk_get_max_usage()
 /* Print the stack from the first used 16-byte chunk to the top, decodable by the exception decoder */
 void stack_thunk_dump_stack()
 {
-  uint32_t *pos = stack_thunk_top;
-  while (pos < stack_thunk_ptr) {
+  uint32_t *pos = stack_thunk_ptr;
+  while (pos < stack_thunk_top) {
     if ((pos[0] != _stackPaint) || (pos[1] != _stackPaint) || (pos[2] != _stackPaint) || (pos[3] != _stackPaint))
       break;
     pos += 4;
   }
   ets_printf(">>>stack>>>\n");
-  while (pos < stack_thunk_ptr) {
+  while (pos < stack_thunk_top) {
     ets_printf("%08x:  %08x %08x %08x %08x\n", (int32_t)pos, pos[0], pos[1], pos[2], pos[3]);
     pos += 4;
   }
