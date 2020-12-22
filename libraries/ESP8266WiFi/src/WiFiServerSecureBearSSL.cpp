@@ -79,13 +79,13 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   (void) status; // Unused
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
-      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
       return result;
     } else if (_sk && _sk->isEC()) {
-      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
