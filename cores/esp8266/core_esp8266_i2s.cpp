@@ -64,6 +64,7 @@ typedef struct i2s_state {
   // Callback function should be defined as 'void ICACHE_RAM_ATTR function_name()',
   // and be placed in IRAM for faster execution. Avoid long computational tasks in this
   // function, use it to set flags and process later.
+  bool             driveClocks;
 } i2s_state_t;
 
 // RX = I2S receive (i.e. microphone), TX = I2S transmit (i.e. DAC)
@@ -493,6 +494,10 @@ float i2s_get_real_rate(){
 }
 
 bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
+  return i2s_rxtxdrive_begin(enableRx, enableTx, true, true);
+}
+
+bool i2s_rxtxdrive_begin(bool enableRx, bool enableTx, bool driveRxClocks, bool driveTxClocks) {
   if (tx || rx) {
     i2s_end(); // Stop and free any ongoing stuff
   }
@@ -503,9 +508,12 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
       // Nothing to clean up yet
       return false; // OOM Error!
     }
-    pinMode(I2SO_WS, FUNCTION_1);
+    tx->driveClocks = driveTxClocks;
     pinMode(I2SO_DATA, FUNCTION_1);
-    pinMode(I2SO_BCK, FUNCTION_1);
+    if (driveTxClocks) {
+      pinMode(I2SO_WS, FUNCTION_1);
+      pinMode(I2SO_BCK, FUNCTION_1);
+    }
   }
   if (enableRx) {
     rx = (i2s_state_t*)calloc(1, sizeof(*rx));
@@ -513,12 +521,15 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
       i2s_end(); // Clean up any TX or pin changes
       return false; // OOM error!
     }
-    pinMode(I2SI_WS, OUTPUT);
-    pinMode(I2SI_BCK, OUTPUT);
+    rx->driveClocks = driveRxClocks;
     pinMode(I2SI_DATA, INPUT);
+    if (driveRxClocks) {
+      pinMode(I2SI_WS, OUTPUT);
+      pinMode(I2SI_BCK, OUTPUT);
+      PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_I2SI_BCK);
+      PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
+    }
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_I2SI_DATA);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_I2SI_BCK);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
   }
 
   if (!i2s_slc_begin()) {
@@ -579,15 +590,19 @@ void i2s_end() {
 
   if (tx) {
     pinMode(I2SO_DATA, INPUT);
-    pinMode(I2SO_BCK, INPUT);
-    pinMode(I2SO_WS, INPUT);
+    if (tx->driveClocks) {
+      pinMode(I2SO_BCK, INPUT);
+      pinMode(I2SO_WS, INPUT);
+    }
     free(tx);
     tx = NULL;
   }
   if (rx) {
     pinMode(I2SI_DATA, INPUT);
-    pinMode(I2SI_BCK, INPUT);
-    pinMode(I2SI_WS, INPUT);
+    if (rx->driveClocks) {
+      pinMode(I2SI_BCK, INPUT);
+      pinMode(I2SI_WS, INPUT);
+    }
     free(rx);
     rx = NULL;
   }
