@@ -412,6 +412,22 @@ String operator +(String&& lhs, String&& rhs) {
     return res;
 }
 
+String operator +(char lhs, const String &rhs) {
+    String res;
+    res.reserve(rhs.length() + 1);
+    res += lhs;
+    res += rhs;
+    return res;
+}
+
+String operator +(const char *lhs, const String &rhs) {
+    String res;
+    res.reserve(rhs.length() + strlen_P(lhs));
+    res += lhs;
+    res += rhs;
+    return res;
+}
+
 /*********************************************/
 /*  Comparison                               */
 /*********************************************/

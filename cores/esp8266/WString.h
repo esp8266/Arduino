@@ -396,13 +396,7 @@ operator +(String &&lhs, T value) {
 // `String x; x = 'a' + String('b') + 'c';`
 // For comparison, `std::string(char)` does not exist. However, we are allowed to concatenate `char` like the example above
 
-inline String operator +(char lhs, const String &rhs) {
-    String res;
-    res.reserve(rhs.length() + 1);
-    res += lhs;
-    res += rhs;
-    return res;
-}
+String operator +(char lhs, const String &rhs);
 
 inline String operator +(char lhs, String &&rhs) {
     return std::move(rhs.insert(0, lhs));
@@ -413,13 +407,7 @@ inline String operator +(char lhs, String &&rhs) {
 // - do an automatic `reserve(total length)` for the resulting string
 // - possibly do rhs.insert(0, ...), when &&rhs capacity could fit both
 
-inline String operator +(const char *lhs, const String &rhs) {
-    String res;
-    res.reserve(rhs.length() + strlen_P(lhs)); // TODO: just strlen, remove flashstringhelper optimization below?
-    res += lhs;
-    res += rhs;
-    return res;
-}
+String operator +(const char *lhs, const String &rhs);
 
 inline String operator +(const char *lhs, String &&rhs) {
     return std::move(rhs.insert(0, lhs));
