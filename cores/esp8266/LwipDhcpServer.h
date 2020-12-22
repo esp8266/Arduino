@@ -1,28 +1,28 @@
 /*
- lwIPDhcpServer.h - DHCP server
+    lwIPDhcpServer.h - DHCP server
 
- Copyright (c) 2016 Espressif. All rights reserved.
- Copyright (c) 2020 esp8266 arduino. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2016 Espressif. All rights reserved.
+    Copyright (c) 2020 esp8266 arduino. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// original sources (no license provided)
-// ESP8266_NONOS_SDK/third_party/lwip/app/dhcpserver.c
-// ESP8266_NONOS_SDK/third_party/include/lwip/app/dhcpserver.h
- */
+    // original sources (no license provided)
+    // ESP8266_NONOS_SDK/third_party/lwip/app/dhcpserver.c
+    // ESP8266_NONOS_SDK/third_party/include/lwip/app/dhcpserver.h
+*/
 
 // lwIPDhcpServer.{cc,h} encapsulate original nonos-sdk dhcp server
 // nearly as-is. This is an initial version to guaranty legacy behavior
@@ -37,14 +37,14 @@ class DhcpServer
 {
 public:
 
-    DhcpServer (netif* netif);
-    ~DhcpServer ();
+    DhcpServer(netif* netif);
+    ~DhcpServer();
 
-    void setDns (int num, const ipv4_addr_t* dns);
+    void setDns(int num, const ipv4_addr_t* dns);
 
-    bool begin (ip_info* info);
-    void end ();
-    bool isRunning ();
+    bool begin(ip_info* info);
+    void end();
+    bool isRunning();
 
     // this is the C interface encapsulated in a class
     // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
@@ -68,7 +68,8 @@ protected:
 
     // legacy C structure and API to eventually turn into C++
 
-    typedef struct _list_node {
+    typedef struct _list_node
+    {
         void *pnode;
         struct _list_node *pnext;
     } list_node;
@@ -85,10 +86,10 @@ protected:
     uint8_t parse_options(uint8_t *optptr, sint16_t len);
     sint16_t parse_msg(struct dhcps_msg *m, u16_t len);
     static void S_handle_dhcp(void *arg,
-        struct udp_pcb *pcb,
-        struct pbuf *p,
-        const ip_addr_t *addr,
-        uint16_t port);
+                              struct udp_pcb *pcb,
+                              struct pbuf *p,
+                              const ip_addr_t *addr,
+                              uint16_t port);
     void handle_dhcp(
         struct udp_pcb *pcb,
         struct pbuf *p,

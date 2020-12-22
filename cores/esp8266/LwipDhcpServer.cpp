@@ -1,28 +1,28 @@
 /*
- lwIPDhcpServer.c - DHCP server
+    lwIPDhcpServer.c - DHCP server
 
- Copyright (c) 2016 Espressif. All rights reserved.
- Copyright (c) 2020 esp8266 arduino. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2016 Espressif. All rights reserved.
+    Copyright (c) 2020 esp8266 arduino. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// original sources (no license provided)
-// ESP8266_NONOS_SDK/third_party/lwip/app/dhcpserver.c
-// ESP8266_NONOS_SDK/third_party/include/lwip/app/dhcpserver.h
- */
+    // original sources (no license provided)
+    // ESP8266_NONOS_SDK/third_party/lwip/app/dhcpserver.c
+    // ESP8266_NONOS_SDK/third_party/include/lwip/app/dhcpserver.h
+*/
 
 // lwIPDhcpServer.{cc,h} encapsulate original nonos-sdk dhcp server
 // nearly as-is. This is an initial version to guaranty legacy behavior
@@ -173,7 +173,7 @@ int fw_has_started_softap_dhcps = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-DhcpServer::DhcpServer (netif* netif): _netif(netif)
+DhcpServer::DhcpServer(netif* netif): _netif(netif)
 {
     pcb_dhcps = nullptr;
     dns_address.addr = 0;
@@ -200,7 +200,7 @@ DhcpServer::DhcpServer (netif* netif): _netif(netif)
 };
 
 // wifi_softap_set_station_info is missing in user_interface.h:
-extern "C" void wifi_softap_set_station_info (uint8_t* mac, struct ipv4_addr*);
+extern "C" void wifi_softap_set_station_info(uint8_t* mac, struct ipv4_addr*);
 
 void DhcpServer::dhcps_set_dns(int num, const ipv4_addr_t* dns)
 {
@@ -380,12 +380,12 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 {
     //struct ipv4_addr ipadd;
     //ipadd.addr = server_address.addr;
-    #define ipadd (_netif->ip_addr)
+#define ipadd (_netif->ip_addr)
 
     //struct ip_info if_ip;
     //bzero(&if_ip, sizeof(struct ip_info));
     //wifi_get_ip_info(SOFTAP_IF, &if_ip);
-    #define if_ip (*_netif)
+#define if_ip (*_netif)
 
     *optptr++ = DHCP_OPTION_SUBNET_MASK;
     *optptr++ = 4;
@@ -471,8 +471,8 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 
     return optptr;
 
-    #undef ipadd
-    #undef if_ip
+#undef ipadd
+#undef if_ip
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
@@ -858,20 +858,20 @@ sint16_t DhcpServer::parse_msg(struct dhcps_msg *m, u16_t len)
 ///////////////////////////////////////////////////////////////////////////////////
 
 void DhcpServer::S_handle_dhcp(void *arg,
-        struct udp_pcb *pcb,
-        struct pbuf *p,
-        const ip_addr_t *addr,
-        uint16_t port)
+                               struct udp_pcb *pcb,
+                               struct pbuf *p,
+                               const ip_addr_t *addr,
+                               uint16_t port)
 {
     DhcpServer* instance = reinterpret_cast<DhcpServer*>(arg);
     instance->handle_dhcp(pcb, p, addr, port);
 }
 
 void DhcpServer::handle_dhcp(
-        struct udp_pcb *pcb,
-        struct pbuf *p,
-        const ip_addr_t *addr,
-        uint16_t port)
+    struct udp_pcb *pcb,
+    struct pbuf *p,
+    const ip_addr_t *addr,
+    uint16_t port)
 {
     (void)pcb;
     (void)addr;
@@ -946,7 +946,9 @@ void DhcpServer::handle_dhcp(
 #endif
         send_ack(pmsg_dhcps);
         if (_netif->num == SOFTAP_IF)
+        {
             wifi_softap_set_station_info(pmsg_dhcps->chaddr, &client_address);
+        }
         break;
     case DHCPS_STATE_NAK://4
 #if DHCPS_DEBUG
@@ -1018,10 +1020,12 @@ void DhcpServer::init_dhcps_lease(uint32 ip)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
-bool DhcpServer::begin (struct ip_info *info)
+bool DhcpServer::begin(struct ip_info *info)
 {
     if (pcb_dhcps != nullptr)
+    {
         udp_remove(pcb_dhcps);
+    }
 
     pcb_dhcps = udp_new();
     if (pcb_dhcps == nullptr || info == nullptr)
@@ -1048,21 +1052,25 @@ bool DhcpServer::begin (struct ip_info *info)
 #endif
 
     if (_netif->num == SOFTAP_IF)
-        wifi_set_ip_info(SOFTAP_IF, info); // added for lwip-git, not sure whether useful
+    {
+        wifi_set_ip_info(SOFTAP_IF, info);    // added for lwip-git, not sure whether useful
+    }
     _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP; // added for lwip-git
 
     return true;
 }
 
-DhcpServer::~DhcpServer ()
+DhcpServer::~DhcpServer()
 {
     end();
 }
 
-void DhcpServer::end ()
+void DhcpServer::end()
 {
     if (!pcb_dhcps)
+    {
         return;
+    }
 
     udp_disconnect(pcb_dhcps);
     udp_remove(pcb_dhcps);
@@ -1084,7 +1092,9 @@ void DhcpServer::end ()
         dhcp_node = (struct dhcps_pool*)pback_node->pnode;
         //dhcps_client_leave(dhcp_node->mac,&dhcp_node->ip,true); // force to delete
         if (_netif->num == SOFTAP_IF)
+        {
             wifi_softap_set_station_info(dhcp_node->mac, &ip_zero);
+        }
         free(pback_node->pnode);
         pback_node->pnode = nullptr;
         free(pback_node);
@@ -1092,7 +1102,7 @@ void DhcpServer::end ()
     }
 }
 
-bool DhcpServer::isRunning ()
+bool DhcpServer::isRunning()
 {
     return !!_netif->state;
 }
@@ -1400,7 +1410,9 @@ void DhcpServer::dhcps_client_leave(u8 *bssid, struct ipv4_addr *ip, bool force)
                 struct ipv4_addr ip_zero;
                 memset(&ip_zero, 0x0, sizeof(ip_zero));
                 if (_netif->num == SOFTAP_IF)
+                {
                     wifi_softap_set_station_info(bssid, &ip_zero);
+                }
                 break;
             }
         }

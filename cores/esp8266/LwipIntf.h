@@ -13,7 +13,7 @@ public:
 
     using CBType = std::function <void(netif*)>;
 
-    static bool stateUpCB (LwipIntf::CBType&& cb);
+    static bool stateUpCB(LwipIntf::CBType&& cb);
 
     // reorder WiFi.config() parameters for a esp8266/official Arduino dual-compatibility API
     // args     | esp order  arduino order
@@ -25,16 +25,19 @@ public:
     //
     // result stored into gateway/netmask/dns1
     static
-    bool ipAddressReorder (const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
-                           IPAddress& gateway, IPAddress& netmask, IPAddress& dns1);
+    bool ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
+                          IPAddress& gateway, IPAddress& netmask, IPAddress& dns1);
 
     String hostname();
-    bool hostname(const String& aHostname) { return hostname(aHostname.c_str()); }
+    bool hostname(const String& aHostname)
+    {
+        return hostname(aHostname.c_str());
+    }
     bool hostname(const char* aHostname);
 
 protected:
 
-    static bool stateChangeSysCB (LwipIntf::CBType&& cb);
+    static bool stateChangeSysCB(LwipIntf::CBType&& cb);
 };
 
 #endif // _LWIPINTF_H
