@@ -17,6 +17,14 @@
 extern "C" {
 #endif
 
+
+#ifdef UMM_HEAP_EXTERNAL
+extern void  umm_init_vm( void *vmaddr, unsigned int vmsize );
+#endif
+#ifdef UMM_HEAP_IRAM
+extern void umm_init_iram(void);
+extern void umm_init_iram_ex( void *addr, unsigned int size, bool zero );
+#endif
 /* ------------------------------------------------------------------------ */
 
 extern void  umm_init( void );
@@ -26,6 +34,13 @@ extern void *umm_realloc( void *ptr, size_t size );
 extern void  umm_free( void *ptr );
 
 /* ------------------------------------------------------------------------ */
+
+extern umm_heap_context_t *umm_push_heap( size_t heap_number );
+extern umm_heap_context_t *umm_pop_heap( void );
+extern int umm_get_heap_stack_index( void );
+extern umm_heap_context_t *umm_set_heap_by_id( size_t which );
+extern size_t umm_get_current_heap_id( void );
+extern umm_heap_context_t *umm_get_current_heap( void );
 
 #ifdef __cplusplus
 }

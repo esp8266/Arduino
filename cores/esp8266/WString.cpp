@@ -32,7 +32,7 @@
 String::String(const char *cstr) {
     init();
     if (cstr)
-        copy(cstr, strlen(cstr));
+        copy(cstr, strlen_P(cstr));
 }
 
 String::String(const String &value) {
