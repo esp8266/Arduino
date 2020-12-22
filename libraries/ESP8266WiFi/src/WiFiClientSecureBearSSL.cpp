@@ -124,7 +124,8 @@ WiFiClientSecureCtx::~WiFiClientSecureCtx() {
 
 WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
                                      const X509List *chain, const PrivateKey *sk,
-                                     int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
+                                     int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
+                                     const X509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -132,7 +133,7 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
   _iobuf_out_size = iobuf_out_size;
   _client = client;
   _client->ref();
-  if (!_connectSSLServerRSA(chain, sk, client_CA_ta)) {
+  if (!_connectSSLServerRSA(chain, sk, cache, client_CA_ta)) {
     _client->unref();
     _client = nullptr;
     _clear();
@@ -142,7 +143,8 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
 WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
                                      const X509List *chain,
                                      unsigned cert_issuer_key_type, const PrivateKey *sk,
-                                     int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
+                                     int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
+                                     const X509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -150,7 +152,7 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
   _iobuf_out_size = iobuf_out_size;
   _client = client;
   _client->ref();
-  if (!_connectSSLServerEC(chain, cert_issuer_key_type, sk, client_CA_ta)) {
+  if (!_connectSSLServerEC(chain, cert_issuer_key_type, sk, cache, client_CA_ta)) {
     _client->unref();
     _client = nullptr;
     _clear();
@@ -1178,7 +1180,7 @@ bool WiFiClientSecureCtx::_installServerX509Validator(const X509List *client_CA_
 
 // Called by WiFiServerBearSSL when an RSA cert/key is specified.
 bool WiFiClientSecureCtx::_connectSSLServerRSA(const X509List *chain,
-    const PrivateKey *sk,
+    const PrivateKey *sk, ServerSessions *cache,
     const X509List *client_CA_ta) {
   _freeSSL();
   _oom_err = false;
@@ -1206,6 +1208,8 @@ bool WiFiClientSecureCtx::_connectSSLServerRSA(const X509List *chain,
                                sk ? sk->getRSA() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
                                br_rsa_private_get_default(), br_rsa_pkcs1_sign_get_default());
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+  if (cache != nullptr)
+    br_ssl_server_set_cache(_sc_svr.get(), cache->getCache());
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
     DEBUG_BSSL("_connectSSLServerRSA: Can't install serverX509check\n");
     return false;
@@ -1222,7 +1226,7 @@ bool WiFiClientSecureCtx::_connectSSLServerRSA(const X509List *chain,
 // Called by WiFiServerBearSSL when an elliptic curve cert/key is specified.
 bool WiFiClientSecureCtx::_connectSSLServerEC(const X509List *chain,
     unsigned cert_issuer_key_type, const PrivateKey *sk,
-    const X509List *client_CA_ta) {
+    ServerSessions *cache, const X509List *client_CA_ta) {
 #ifndef BEARSSL_SSL_BASIC
   _freeSSL();
   _oom_err = false;
@@ -1250,6 +1254,8 @@ bool WiFiClientSecureCtx::_connectSSLServerEC(const X509List *chain,
                                sk ? sk->getEC() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
                                cert_issuer_key_type, br_ssl_engine_get_ec(_eng), br_ecdsa_i15_sign_asn1);
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+  if (cache != nullptr)
+    br_ssl_server_set_cache(_sc_svr.get(), cache->getCache());
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
     DEBUG_BSSL("_connectSSLServerEC: Can't install serverX509check\n");
     return false;
