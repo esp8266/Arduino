@@ -45,8 +45,8 @@ public:
 
     // Filesystems *may* support a timestamp per-file, so allow the user to override with
     // their own callback for *this specific* file (as opposed to the FSImpl call of the
-    // same name.  The default implementation simply returns time(&null)
-    virtual void setTimeCallback(time_t (*cb)(void)) { timeCallback = cb; }
+    // same name.  The default implementation simply returns time(null)
+    virtual void setTimeCallback(time_t (*cb)(void)) { _timeCallback = cb; }
 
     // Return the last written time for a file.  Undefined when called on a writable file
     // as the FS is allowed to return either the time of the last write() operation or the
@@ -56,7 +56,7 @@ public:
     virtual time_t getCreationTime() { return 0; } // Default is to not support timestamps
 
 protected:
-    time_t (*timeCallback)(void) = nullptr;
+    time_t (*_timeCallback)(void) = nullptr;
 };
 
 enum OpenMode {
@@ -90,11 +90,11 @@ public:
 
     // Filesystems *may* support a timestamp per-file, so allow the user to override with
     // their own callback for *this specific* file (as opposed to the FSImpl call of the
-    // same name.  The default implementation simply returns time(&null)
-    virtual void setTimeCallback(time_t (*cb)(void)) { timeCallback = cb; }
+    // same name.  The default implementation simply returns time(null)
+    virtual void setTimeCallback(time_t (*cb)(void)) { _timeCallback = cb; }
 
 protected:
-    time_t (*timeCallback)(void) = nullptr;
+    time_t (*_timeCallback)(void) = nullptr;
 };
 
 class FSImpl {
@@ -118,11 +118,11 @@ public:
 
     // Filesystems *may* support a timestamp per-file, so allow the user to override with
     // their own callback for all files on this FS.  The default implementation simply
-    // returns the present time as reported by time(&null)
-    virtual void setTimeCallback(time_t (*cb)(void)) { timeCallback = cb; }
+    // returns the present time as reported by time(null)
+    virtual void setTimeCallback(time_t (*cb)(void)) { _timeCallback = cb; }
 
 protected:
-    time_t (*timeCallback)(void) = nullptr;
+    time_t (*_timeCallback)(void) = nullptr;
 };
 
 } // namespace fs

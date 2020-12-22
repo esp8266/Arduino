@@ -42,6 +42,11 @@ class WiFiServerSecure : public WiFiServer {
       _iobuf_out_size = xmit;
     }
 
+    // Sets the server's cache to the given one.
+    void setCache(ServerSessions *cache) {
+      _cache = cache;
+    }
+
     // Set the server's RSA key and x509 certificate (required, pick one).
     // Caller needs to preserve the chain and key throughout the life of the server.
     void setRSACert(const X509List *chain, const PrivateKey *sk);
@@ -69,6 +74,7 @@ class WiFiServerSecure : public WiFiServer {
     int _iobuf_in_size = BR_SSL_BUFSIZE_INPUT;
     int _iobuf_out_size = 837;
     const X509List *_client_CA_ta = nullptr;
+    ServerSessions *_cache = nullptr;
 
 };
 

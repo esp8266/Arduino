@@ -179,15 +179,18 @@ class WiFiClientSecureCtx : public WiFiClient {
     // Methods for handling server.available() call which returns a client connection.
     friend class WiFiClientSecure; // access to private context constructors
     WiFiClientSecureCtx(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
-                      const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
+                      const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
+                      const X509List *client_CA_ta);
     WiFiClientSecureCtx(ClientContext* client, const X509List *chain, const PrivateKey *sk,
-                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
+                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
+                      const X509List *client_CA_ta);
 
     // RSA keyed server
-    bool _connectSSLServerRSA(const X509List *chain, const PrivateKey *sk, const X509List *client_CA_ta);
+    bool _connectSSLServerRSA(const X509List *chain, const PrivateKey *sk,
+                              ServerSessions *cache, const X509List *client_CA_ta);
     // EC keyed server
     bool _connectSSLServerEC(const X509List *chain, unsigned cert_issuer_key_type, const PrivateKey *sk,
-                             const X509List *client_CA_ta);
+                             ServerSessions *cache, const X509List *client_CA_ta);
 
     // X.509 validators differ from server to client
     bool _installClientX509Validator(); // Set up X509 validator for a client conn.
@@ -290,13 +293,15 @@ class WiFiClientSecure : public WiFiClient {
     // Methods for handling server.available() call which returns a client connection.
     friend class WiFiServerSecure; // Server needs to access these constructors
     WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
-                      const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta):
-      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, client_CA_ta)) {
+                      const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
+                      const X509List *client_CA_ta):
+      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta)) {
     }
 
     WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
-                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta):
-      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, client_CA_ta)) {
+                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
+                      const X509List *client_CA_ta):
+      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta)) {
     }
 
 }; // class WiFiClientSecure
