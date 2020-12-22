@@ -338,7 +338,7 @@ unsigned char String::concat(const __FlashStringHelper *str) {
 /*  Insert                                   */
 /*********************************************/
 
-String& String::insert(size_t position, const String& other) {
+String &String::insert(size_t position, const String& other) {
     if (position > length()) {
         return *this;
     }
@@ -357,20 +357,14 @@ String& String::insert(size_t position, const String& other) {
     return *this;
 }
 
-// TODO: it is possible to reuse `other.wbuffer()` when it's capacity is larger than `this->wbuffer()`
-String& String::insert(size_t position, String&& other) {
-    return insert(position, other);
-}
-
-String operator +(const String& lhs, String&& rhs) {
+String operator +(const String &lhs, String &&rhs) {
     String res;
     auto total = lhs.length() + rhs.length();
-    if (rhs.capacity() >= total) {
+    if (rhs.capacity() > total) {
         rhs.insert(0, lhs);
         res = std::move(rhs);
-        rhs.setLen(total);
     } else {
-        res.reserve(total + 1);
+        res.reserve(total);
         res += lhs;
         res += rhs;
         rhs.invalidate();
@@ -382,14 +376,13 @@ String operator +(const String& lhs, String&& rhs) {
 String operator +(String&& lhs, String&& rhs) {
     String res;
     auto total = lhs.length() + rhs.length();
-    if (lhs.capacity() >= total) {
-        res = std::move(lhs);
-        res += rhs;
+    if (lhs.capacity() > total) {
+        lhs += rhs;
         rhs.invalidate();
-    } else if (rhs.capacity() >= total) {
+        res = std::move(lhs);
+    } else if (rhs.capacity() > total) {
         rhs.insert(0, lhs);
         res = std::move(rhs);
-        res.setLen(total);
     } else {
         res.reserve(total);
         res += lhs;

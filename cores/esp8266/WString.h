@@ -112,7 +112,6 @@ class String {
         // is left unchanged).  if the argument is null or invalid, the
         // concatenation is considered unsuccessful.
         unsigned char concat(const String &str);
-        unsigned char concat(String &&str);
         unsigned char concat(const char *cstr);
         unsigned char concat(char c);
         unsigned char concat(unsigned char c);
@@ -351,27 +350,27 @@ class String {
 
 // concatenation (note that it's done using non-method operators to handle both possible type refs)
 
-inline String operator +(const String& lhs, const String& rhs) {
+inline String operator +(const String &lhs, const String &rhs) {
     String res;
-    res.reserve(lhs.length() + rhs.length() + 1);
+    res.reserve(lhs.length() + rhs.length());
     res += lhs;
     res += rhs;
     return res;
 }
 
-inline String operator +(String&& lhs, const String& rhs) {
+inline String operator +(String &&lhs, const String &rhs) {
     lhs.concat(rhs);
     return std::move(lhs);
 }
 
-String operator +(const String& lhs, String&& rhs);
-String operator +(String&& lhs, String&& rhs);
+String operator +(const String &lhs, String&& rhs);
+String operator +(String &&lhs, String &&rhs);
 
 // concat / += already handles the basic types, so just do that
 
 template <typename T>
 inline std::enable_if_t<std::is_pod_v<T> && !std::is_same_v<std::decay<T>, String>, String>
-operator +(const String& lhs, T value) {
+operator +(const String &lhs, T value) {
     String res(lhs);
     res += value;
     return res;
@@ -379,7 +378,7 @@ operator +(const String& lhs, T value) {
 
 template <typename T>
 inline std::enable_if_t<std::is_pod_v<T> && !std::is_same_v<std::decay<T>, String>, String>
-operator +(String&& lhs, T value) {
+operator +(String &&lhs, T value) {
     lhs += value;
     return std::move(lhs);
 }
