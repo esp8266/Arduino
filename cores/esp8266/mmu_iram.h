@@ -127,19 +127,19 @@ bool mmu_is_icache(const void *addr) {
 static inline __attribute__((always_inline))
 uint8_t mmu_get_uint8(const void *p8) {
   ASSERT_RANGE_TEST_READ(p8);
-  return *(uint32_t *)((uintptr_t)p8 & ~0x3) >> (uintptr_t)p8 * 8;
+  return *(uint32_t *)((uintptr_t)p8 & ~0x3) >> ((uintptr_t)p8 * 8 & 31);
 }
 
 static inline __attribute__((always_inline))
 uint16_t mmu_get_uint16(const uint16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
-  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> (uintptr_t)p16 * 8;
+  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> ((uintptr_t)p16 * 8 & 31);
 }
 
 static inline __attribute__((always_inline))
 int16_t mmu_get_int16(const int16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
-  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> (uintptr_t)p16 * 8;
+  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> ((uintptr_t)p16 * 8 & 31);
 }
 
 static inline __attribute__((always_inline))
