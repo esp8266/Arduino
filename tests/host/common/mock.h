@@ -99,6 +99,7 @@ uint32_t esp_get_cycle_count();
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <osapi.h>
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 #define ets_vsnprintf vsnprintf

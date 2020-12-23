@@ -872,6 +872,22 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   return true;
 }
 
+ServerSessions::~ServerSessions() {
+  if (_isDynamic && _store != nullptr)
+    delete _store;
+}
+
+ServerSessions::ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic) :
+  _size(sessions != nullptr ? size : 0),
+  _store(sessions), _isDynamic(isDynamic) {
+    if (_size > 0)
+      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store, size * sizeof(ServerSession));
+}
+
+const br_ssl_session_cache_class **ServerSessions::getCache() {
+  return _size > 0 ? &_cache.vtable : nullptr;
+}
+
 // SHA256 hash for updater
 void HashSHA256::begin() {
   br_sha256_init( &_cc );
