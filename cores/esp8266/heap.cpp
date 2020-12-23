@@ -7,7 +7,7 @@
 #include "umm_malloc/umm_malloc.h"
 
 // Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
-#define FORCE_ALWAYS_INLINE
+#define FORCE_ALWAYS_INLINE_HEAP_SELECT
 #include "umm_malloc/umm_heap_select.h"
 
 #include <c_types.h>

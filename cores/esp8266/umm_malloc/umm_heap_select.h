@@ -9,7 +9,7 @@
 
 // Use FORCE_ALWAYS_INLINE to ensure HeapSelect... construtor/deconstructor
 // are placed in IRAM
-#ifdef FORCE_ALWAYS_INLINE
+#ifdef FORCE_ALWAYS_INLINE_HEAP_SELECT
 #define MAYBE_ALWAYS_INLINE ALWAYS_INLINE
 #else
 #define MAYBE_ALWAYS_INLINE
