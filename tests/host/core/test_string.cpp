@@ -561,6 +561,7 @@ TEST_CASE("String chaining", "[core][String]")
   }
 
   // make sure we can chain a combination of things to form a String
+  REQUIRE((String(chunks[0]) + String(chunks[1]) + String(chunks[2]) + String(chunks[3])) == all);
   REQUIRE((chunks[0] + String(chunks[1]) + F(chunks[2]) + chunks[3]) == all);
   REQUIRE((String(chunks[0]) + F(chunks[1]) + F(chunks[2]) + String(chunks[3])) == all);
   REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3])) == all);

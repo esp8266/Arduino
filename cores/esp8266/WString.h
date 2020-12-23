@@ -130,48 +130,9 @@ class String {
 
         // if there's not enough memory for the concatenated value, the string
         // will be left unchanged (but this isn't signalled in any way)
-        String &operator +=(const String &rhs) {
-            concat(rhs);
-            return *this;
-        }
-        String &operator +=(const char *cstr) {
-            concat(cstr);
-            return *this;
-        }
-        String &operator +=(const __FlashStringHelper *str) {
-            concat(str);
-            return *this;
-        }
-        String &operator +=(char c) {
-            concat(c);
-            return *this;
-        }
-        String &operator +=(unsigned char num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(int num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(unsigned int num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(long num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(unsigned long num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(float num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(double num) {
-            concat(num);
+        template <typename T>
+        String &operator +=(T &&rhs) {
+            concat(std::forward<T>(rhs));
             return *this;
         }
 
@@ -370,35 +331,31 @@ inline String operator +(const String &lhs, const String &rhs) {
 }
 
 inline String operator +(String &&lhs, const String &rhs) {
-    lhs.concat(rhs);
+    lhs += rhs;
     return std::move(lhs);
 }
 
 String operator +(const String &lhs, String&& rhs);
 String operator +(String &&lhs, String &&rhs);
 
-// concat / += already handles the basic types, so just do that
-// TODO: could also do `operator+=` as a templated method
-// TODO: explicitly list concat overloads in the enable_if?
-
 template <typename T>
-inline std::enable_if_t<std::is_pod_v<T> && !std::is_same_v<std::decay<T>, String>, String>
-operator +(const String &lhs, T value) {
+inline std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>, String>
+operator +(const String &lhs, T &&value) {
     String res(lhs);
-    res += value;
+    res += std::forward<T>(value);
     return res;
 }
 
 template <typename T>
-inline std::enable_if_t<std::is_pod_v<T> && !std::is_same_v<std::decay<T>, String>, String>
-operator +(String &&lhs, T value) {
-    lhs += value;
+inline std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>, String>
+operator +(String &&lhs, T &&value) {
+    lhs += std::forward<T>(value);
     return std::move(lhs);
 }
 
 // `String(char)` is explicit, but we used to have StringSumHelper silently allowing the following:
 // `String x; x = 'a' + String('b') + 'c';`
-// For comparison, `std::string(char)` does not exist. However, we are allowed to concatenate `char` like the example above
+// For comparison, `std::string(char)` does not exist. However, we are allowed to chain `char` as both lhs and rhs
 
 String operator +(char lhs, const String &rhs);
 
