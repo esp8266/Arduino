@@ -70,14 +70,14 @@ FileImplPtr LittleFSImpl::open(const char* path, OpenMode openMode, AccessMode a
     }
 
     time_t creation = 0;
-    if (timeCallback && (openMode & OM_CREATE)) {
+    if (_timeCallback && (openMode & OM_CREATE)) {
         // O_CREATE means we *may* make the file, but not if it already exists.
         // See if it exists, and only if not update the creation time
         int rc = lfs_file_open(&_lfs, fd.get(), path, LFS_O_RDONLY);
 	if (rc == 0) {
             lfs_file_close(&_lfs, fd.get()); // It exists, don't update create time
         } else {
-            creation = timeCallback();  // File didn't exist or otherwise, so we're going to create this time
+            creation = _timeCallback();  // File didn't exist or otherwise, so we're going to create this time
         }
     }
 
