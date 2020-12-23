@@ -57,9 +57,7 @@ static void *aes_decrypt_init(const u8 *key, size_t len) {
 static void aes_decrypt_deinit(void *ctx) {
   if (ctx) {
     ets_memset(ctx, 0, 16*11);
-    if ((uint32_t)ctx != 0x3FFFEA80ul) {
-      free(ctx);
-    }
+    free(ctx);
   }
   return;
 }
