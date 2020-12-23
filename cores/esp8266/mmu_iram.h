@@ -154,6 +154,13 @@ uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
            "src\t%1, %4, %4"
            : "=&a"(valmask), "=a"(sval)
            : "r"(p8), "r"(~0xFF), "r"(val), "r"(ival));
+/*
+ * `"r"(ival)` is used only for injecting dependency, in order to ensure
+ * `ival = *p32;` precedes the asm block. Without this, it may be placed
+ * between the asm block and `*p32 = (ival & valmask) | sval;`, thus will
+ * cause pipeline interlock stall of 1 cycle by loading from `*p32`.
+ * (see Xtensa(R) ISA Reference Manual, p.608)
+ */
   *p32 = (ival & valmask) | sval;
   return val;
 }
@@ -170,13 +177,7 @@ uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val) {
            "src\t%1, %4, %4"
            : "=&a"(valmask), "=a"(sval)
            : "r"(p16), "r"(~0xFFFF), "r"(val), "r"(ival));
-/*
- * `"r"(ival)` is used only for injecting dependency, in order to ensure
- * `ival = *p32;` precedes the asm block. Without this, it may be placed
- * between the asm block and `*p32 = (ival & valmask) | sval;`, thus will
- * cause pipeline interlock stall of 1 cycle by loading from `*p32`.
- * (see Xtensa(R) ISA Reference Manual, p.608)
- */
+// See above.
   *p32 = (ival & valmask) | sval;
   return val;
 }
