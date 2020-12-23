@@ -626,6 +626,17 @@ namespace brssl {
     return pk;
   }
 
+  static uint8_t *loadStream(Stream& stream, size_t size) {
+    uint8_t *dest = (uint8_t *)malloc(size);
+    if (!dest) {
+      return nullptr;  // OOM error
+    }
+    if (size != stream.readBytes(dest, size)) {
+      free(dest);  // Error during read
+      return nullptr;
+    }
+    return dest;
+  }
 };
 
 
@@ -646,6 +657,15 @@ PublicKey::PublicKey(const char *pemKey) {
 PublicKey::PublicKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
+}
+
+PublicKey::PublicKey(Stream &stream, size_t size) {
+  _key = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    parse(buff, size);
+    free(buff);
+  }
 }
 
 PublicKey::~PublicKey() {
@@ -709,6 +729,15 @@ PrivateKey::PrivateKey(const char *pemKey) {
 PrivateKey::PrivateKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
+}
+
+PrivateKey::PrivateKey(Stream &stream, size_t size) {
+  _key = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    parse(buff, size);
+    free(buff);
+  }
 }
 
 PrivateKey::~PrivateKey() {
@@ -781,6 +810,17 @@ X509List::X509List(const uint8_t *derCert, size_t derLen) {
   append(derCert, derLen);
 }
 
+X509List::X509List(Stream &stream, size_t size) {
+  _count = 0;
+  _cert = nullptr;
+  _ta = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    append(buff, size);
+    free(buff);
+  }
+}
+
 X509List::~X509List() {
   brssl::free_certificates(_cert, _count); // also frees cert
   for (size_t i = 0; i < _count; i++) {
@@ -830,6 +870,22 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   _count += numCerts;
 
   return true;
+}
+
+ServerSessions::~ServerSessions() {
+  if (_isDynamic && _store != nullptr)
+    delete _store;
+}
+
+ServerSessions::ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic) :
+  _size(sessions != nullptr ? size : 0),
+  _store(sessions), _isDynamic(isDynamic) {
+    if (_size > 0)
+      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store, size * sizeof(ServerSession));
+}
+
+const br_ssl_session_cache_class **ServerSessions::getCache() {
+  return _size > 0 ? &_cache.vtable : nullptr;
 }
 
 // SHA256 hash for updater

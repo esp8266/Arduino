@@ -202,6 +202,11 @@ bool UpdaterClass::end(bool evenIfRemaining){
     return false;
   }
 
+  // Updating w/o any data is an error we detect here
+  if (!progress()) {
+    _setError(UPDATE_ERROR_NO_DATA);
+  }
+
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("premature end: res:%u, pos:%zu/%zu\n"), getError(), progress(), _size);
@@ -554,6 +559,8 @@ void UpdaterClass::printError(Print &out){
     out.println(F("Bad Size Given"));
   } else if(_error == UPDATE_ERROR_STREAM){
     out.println(F("Stream Read Timeout"));
+  } else if(_error == UPDATE_ERROR_NO_DATA){
+    out.println(F("No data supplied"));
   } else if(_error == UPDATE_ERROR_MD5){
     out.printf_P(PSTR("MD5 Failed: expected:%s, calculated:%s\n"), _target_md5.c_str(), _md5.toString().c_str());
   } else if(_error == UPDATE_ERROR_SIGN){

@@ -28,7 +28,8 @@
 #include "ESP8266mDNS.h"
 #include "LEAmDNS_Priv.h"
 #include <LwipIntf.h> // LwipIntf::stateUpCB()
-#include "lwip/igmp.h"
+#include <lwip/igmp.h>
+#include <lwip/prot/dns.h>
 
 namespace esp8266
 {
@@ -1304,7 +1305,7 @@ bool MDNSResponder::_joinMulticastGroups(void)
     {
         if (netif_is_up(pNetIf))
         {
-#ifdef MDNS_IPV4_SUPPORT
+#ifdef MDNS_IP4_SUPPORT
             ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
             if (!(pNetIf->flags & NETIF_FLAG_IGMP))
             {
@@ -1354,7 +1355,7 @@ bool MDNSResponder::_leaveMulticastGroups()
             bResult = true;
 
             // Leave multicast group(s)
-#ifdef MDNS_IPV4_SUPPORT
+#ifdef MDNS_IP4_SUPPORT
             ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
             if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
             {

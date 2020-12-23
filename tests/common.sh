@@ -8,15 +8,19 @@ function skip_ino()
     # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
     read -d '' skiplist << EOL || true
 /#attic/
-/AnalogBinLogger/
-/LowLatencyLogger/
-/LowLatencyLoggerADXL345/
-/LowLatencyLoggerMPU6050/
-/PrintBenchmark/
-/TeensySdioDemo/
+/AvrAdcLogger/
+/BackwardCompatibility/
+/examplesV1/
+/ExFatFormatter/
+/ExFatLogger/
+/ExFatUnicodeTest/
+/RtcTimestampTest/
 /SoftwareSpi/
 /STM32Test/
-/extras/
+/TeensyRtcTimestamp/
+/TeensySdioDemo/
+/UserChipSelectFunction/
+/UserSPIDriver/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))
@@ -66,6 +70,8 @@ function build_sketches()
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
+    local pwm_phase=""
+    [ $(( $build_rem % 2 )) -eq 0 ] && pwm_phase="--waveform_phase"
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
@@ -104,7 +110,7 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
-	if [ "$WINDOWS" == "1" ]; then
+        if [ "$WINDOWS" == "1" ]; then
             sketch=$(echo $sketch | sed 's/^\/c//')
             # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
             # http://www.mingw.org/wiki/Posix_path_conversion
@@ -112,8 +118,8 @@ function build_sketches()
             export MSYS2_ARG_CONV_EXC="*"
             export MSYS_NO_PATHCONV=1
         fi
-        echo "$build_cmd $sketch"
-        time ($build_cmd $sketch >build.log)
+        echo "$build_cmd $pwm_phase $sketch"
+        time ($build_cmd $pwm_phase $sketch >build.log)
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"
@@ -158,9 +164,10 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
+    mkdir -p ${core_path}/tools/dist
     if [ "$WINDOWS" = "1" ]; then
-        test -r arduino-windows.zip || curl --output arduino-windows.zip -L "${ideurl}-windows.zip"
-        unzip -q arduino-windows.zip
+        test -r ${core_path}/tools/dist/arduino-windows.zip || curl --output ${core_path}/tools/dist/arduino-windows.zip -L "${ideurl}-windows.zip"
+        unzip -q ${core_path}/tools/dist/arduino-windows.zip
         mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
@@ -169,13 +176,13 @@ function install_ide()
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino-macos.zip || wget -q -O arduino-macos.zip "${ideurl}-macosx.zip"
-        unzip -q arduino-macos.zip
+        test -r ${core_path}/tools/dist/arduino-macos.zip || wget -q -O ${core_path}/tools/dist/arduino-macos.zip "${ideurl}-macosx.zip"
+        unzip -q ${core_path}/tools/dist/arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        test -r arduino-linux.tar.xz || wget -q -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
-        tar xf arduino-linux.tar.xz
+        test -r ${core_path}/tools/dist/arduino-linux.tar.xz || wget -q -O ${core_path}/tools/dist/arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        tar xf ${core_path}/tools/dist/arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi
     mv arduino-distrib $ide_path

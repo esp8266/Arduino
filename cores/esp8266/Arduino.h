@@ -228,6 +228,10 @@ void optimistic_yield(uint32_t interval_us);
 #include <cstdlib>
 #include <cmath>
 
+
+#include "mmu_iram.h"
+
+
 using std::min;
 using std::max;
 using std::round;

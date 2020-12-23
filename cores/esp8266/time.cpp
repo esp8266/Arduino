@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <../include/time.h> // See issue #6714
 #include <sys/time.h>
+extern "C" {
+    #include <sys/_tz_structs.h>
+};
 #include <sys/reent.h>
 #include <errno.h>
 
