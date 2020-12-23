@@ -556,11 +556,35 @@ public:
     }
 
     time_t fileTime() override {
-        return (time_t)_getAttr4('t');
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('t', 8, &t)) {
+            return t;
+        } else if (_getAttr('t', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
+            return 0;
+        }
     }
 
     time_t fileCreationTime() override {
-        return (time_t)_getAttr4('c');
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('c', 8, &t)) {
+            return t;
+        } else if (_getAttr('c', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
+            return 0;
+        }
     }
 
 
@@ -599,20 +623,17 @@ protected:
         return _dir.get();
     }
 
-    uint32_t _getAttr4(char attr) {
-        if (!_valid) {
-            return 0;
+    bool _getAttr(char attr, int len, void *dest) {
+        if (!_valid || !len || !dest) {
+            return false;
         }
         int nameLen = 3; // Slashes, terminator
         nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
         nameLen += strlen(_dirent.name);
         char tmpName[nameLen];
         snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
-        time_t ftime = 0;
-        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, (void *)&ftime, sizeof(ftime));
-        if (rc != sizeof(ftime))
-            ftime = 0; // Error, so clear read value
-        return ftime;
+        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, dest, len);
+        return (rc == len);
     }
 
     String                      _pattern;
