@@ -545,3 +545,41 @@ TEST_CASE("Replace and string expansion", "[core][String]")
     REQUIRE(l.length() == strlen(buff));
   }
 }
+
+TEST_CASE("String chaining", "[core][String]")
+{
+  const char* chunks[] {
+    "~12345",
+    "67890",
+    "qwertyuiopasdfghjkl",
+    "zxcvbnm"
+  };
+
+  String all;
+  for (auto* chunk : chunks) {
+      all += chunk;
+  }
+
+  // make sure we can chain a combination of things to form a String
+  REQUIRE((chunks[0] + String(chunks[1]) + F(chunks[2]) + chunks[3]) == all);
+  REQUIRE((String(chunks[0]) + F(chunks[1]) + F(chunks[2]) + String(chunks[3])) == all);
+  REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3])) == all);
+  REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + F(chunks[3])) == all);
+
+  // these are still invalid (and also cannot compile at all):
+  // - `F(...)` + `F(...)`
+  // - `F(...)` + `const char*`
+  // - `const char*` + `F(...)`
+  // we need `String()` as either rhs or lhs
+
+  // ensure chaining reuses the buffer
+  // (internal details...)
+  {
+    String tmp(chunks[3]);
+    tmp.reserve(2 * all.length());
+    auto* ptr = tmp.c_str();
+    String result("~1" + String(&chunks[0][0] + 2) + F(chunks[1]) + chunks[2] + std::move(tmp));
+    REQUIRE(result == all);
+    REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));
+  }
+}
