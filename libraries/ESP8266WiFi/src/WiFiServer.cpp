@@ -115,9 +115,10 @@ WiFiClient WiFiServer::available(byte* status) {
         WiFiClient result(_unclaimed);
 
         // pcb can be null when peer has already closed the connection
-        if (_unclaimed->getPCB())
+        if (_unclaimed->getPCB()) {
             // give permission to lwIP to accept one more peer
             tcp_backlog_accepted(_unclaimed->getPCB());
+        }
 
         _unclaimed = _unclaimed->next();
         result.setNoDelay(getNoDelay());
