@@ -394,19 +394,13 @@ String operator +(const String &lhs, String &&rhs) {
 String operator +(String&& lhs, String&& rhs) {
     String res;
     auto total = lhs.length() + rhs.length();
-    if (lhs.capacity() > total) {
-        lhs += rhs;
-        rhs.invalidate();
-        res = std::move(lhs);
-    } else if (rhs.capacity() > total) {
+    if (rhs.capacity() > total) {
         rhs.insert(0, lhs);
         res = std::move(rhs);
     } else {
-        res.reserve(total);
-        res += lhs;
-        res += rhs;
-        lhs.invalidate();
+        lhs += rhs;
         rhs.invalidate();
+        res = std::move(lhs);
     }
 
     return res;
