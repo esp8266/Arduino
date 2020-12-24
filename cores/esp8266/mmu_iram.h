@@ -127,19 +127,28 @@ bool mmu_is_icache(const void *addr) {
 static inline __attribute__((always_inline))
 uint8_t mmu_get_uint8(const void *p8) {
   ASSERT_RANGE_TEST_READ(p8);
-  return *(uint32_t *)((uintptr_t)p8 & ~0x3) >> ((uintptr_t)p8 * 8 & 31);
+  uint32_t val = (*(uint32_t *)((uintptr_t)p8 & ~0x3));
+  uint32_t pos = (uintptr_t)p8 * 8 & 31;
+  val >>= pos;
+  return (uint8_t)val;
 }
 
 static inline __attribute__((always_inline))
 uint16_t mmu_get_uint16(const uint16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
-  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> ((uintptr_t)p16 * 8 & 31);
+  uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
+  uint32_t pos = (uintptr_t)p8 * 8 & 31;
+  val >>= pos;
+  return (uint16_t)val;
 }
 
 static inline __attribute__((always_inline))
 int16_t mmu_get_int16(const int16_t *p16) {
   ASSERT_RANGE_TEST_READ(p16);
-  return *(uint32_t *)((uintptr_t)p16 & ~0x3) >> ((uintptr_t)p16 * 8 & 31);
+  uint32_t val = (*(uint32_t *)((uintptr_t)p16 & ~0x3));
+  uint32_t pos = (uintptr_t)p8 * 8 & 31;
+  val >>= pos;
+  return (int16_t)val;
 }
 
 static inline __attribute__((always_inline))
@@ -161,7 +170,9 @@ uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
  * cause pipeline interlock stall of 1 cycle by loading from `*p32`.
  * (see Xtensa(R) ISA Reference Manual, p.608)
  */
-  *p32 = (ival & valmask) | sval;
+  ival &= valmask;
+  ival |= sval;
+  *p32 = ival;
   return val;
 }
 
@@ -178,7 +189,9 @@ uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val) {
            : "=&a"(valmask), "=a"(sval)
            : "r"(p16), "r"(~0xFFFF), "r"(val), "r"(ival));
 // See above.
-  *p32 = (ival & valmask) | sval;
+  ival &= valmask;
+  ival |= sval;
+  *p32 = ival;
   return val;
 }
 
@@ -195,7 +208,9 @@ int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
            : "=&a"(valmask), "=a"(sval)
            : "r"(p16), "r"(~0xFFFF), "r"(val & 0xFFFF), "r"(ival));
 // See above.
-  *p32 = (ival & valmask) | sval;
+  ival &= valmask;
+  ival |= sval;
+  *p32 = ival;
   return val;
 }
 
