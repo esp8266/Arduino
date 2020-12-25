@@ -3676,6 +3676,16 @@ void tcp_kill_timewait (void);
 #define MEMP_NUM_TCP_PCB_TIME_WAIT       5
 #endif
 
+/*
+   --------------------------------------------------
+   ----------------- Alloc functions ----------------
+   --------------------------------------------------
+*/
+
+#define mem_clib_free(p)      vPortFree(p, NULL, -1)
+#define mem_clib_malloc(s)   pvPortMalloc(s, NULL, -1)
+#define mem_clib_calloc(n,s) pvPortZalloc(n*s, NULL, -1)
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
