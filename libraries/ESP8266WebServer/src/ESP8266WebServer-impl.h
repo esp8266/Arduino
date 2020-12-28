@@ -26,6 +26,7 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
+#include "base64.h"
 #include "detail/RequestHandlersImpl.h"
 
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
@@ -33,6 +34,7 @@ static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
+static const char ETAG_HEADER[] PROGMEM = "If-None-Match";
 
 namespace esp8266webserver {
 
@@ -98,21 +100,19 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
         authReq = "";
         return false;
       }
-      char *encoded = new (std::nothrow) char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
+      sprintf(toencode, "%s:%s", username, password);
+      String encoded = base64::encode((uint8_t *)toencode, toencodeLen, false);
+      if(!encoded){
         authReq = "";
         delete[] toencode;
         return false;
       }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
+      if(authReq.equalsConstantTime(encoded)) {
         authReq = "";
         delete[] toencode;
-        delete[] encoded;
         return true;
       }
       delete[] toencode;
-      delete[] encoded;
     } else if(authReq.startsWith(F("Digest"))) {
       String _realm    = _extractParam(authReq, F("realm=\""));
       String _H1 = credentialHash((String)username,_realm,(String)password);
@@ -255,7 +255,18 @@ void ESP8266WebServerTemplate<ServerType>::_addRequestHandler(RequestHandlerType
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
-    _addRequestHandler(new StaticRequestHandler<ServerType>(fs, path, uri, cache_header));
+  bool is_file = false;
+
+  if (fs.exists(path)) {
+    File file = fs.open(path, "r");
+    is_file = file && file.isFile();
+    file.close();
+  }
+
+  if(is_file)
+    _addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
+  else
+    _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
 }
 
 template <typename ServerType>
@@ -607,15 +618,18 @@ const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) c
   return emptyString;
 }
 
-template <typename ServerType>
+
+template<typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount + 1;
-  if (_currentHeaders)
-     delete[]_currentHeaders;
+  _headerKeysCount = headerKeysCount + 2;
+  if (_currentHeaders){
+    delete[] _currentHeaders;
+  }
   _currentHeaders = new RequestArgument[_headerKeysCount];
   _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
-  for (int i = 1; i < _headerKeysCount; i++){
-    _currentHeaders[i].key = headerKeys[i-1];
+  _currentHeaders[1].key = FPSTR(ETAG_HEADER);
+  for (int i = 2; i < _headerKeysCount; i++){
+      _currentHeaders[i].key = headerKeys[i-2];
   }
 }
 
