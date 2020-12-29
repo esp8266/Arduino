@@ -94,13 +94,12 @@ namespace MDNSImplementation
 #define DEBUG_EX_RX(A)      do { (void)0; } while (0)
 #endif
 
-
-/*  Replaced by 'lwip/prot/dns.h' definitions
+/*  already defined in lwIP ('lwip/prot/dns.h')
     #ifdef MDNS_IP4_SUPPORT
-    #define MDNS_MULTICAST_ADDR_IP4     (IPAddress(224, 0, 0, 251)) // ip_addr_t v4group = DNS_MQUERY_IPV4_GROUP_INIT
+    #define DNS_MQUERY_IPV4_GROUP_INIT     (IPAddress(224, 0, 0, 251))              // ip_addr_t v4group = DNS_MQUERY_IPV4_GROUP_INIT
     #endif
     #ifdef MDNS_IP6_SUPPORT
-    #define MDNS_MULTICAST_ADDR_IP6     (IPAddress("FF02::FB"))     // ip_addr_t v6group = DNS_MQUERY_IPV6_GROUP_INIT
+    #define DNS_MQUERY_IPV6_GROUP_INIT     IPADDR6_INIT_HOST(0xFF020000,0,0,0xFB)   // ip_addr_t v6group = DNS_MQUERY_IPV6_GROUP_INIT
     #endif*/
 //#define MDNS_MULTICAST_PORT               5353
 
