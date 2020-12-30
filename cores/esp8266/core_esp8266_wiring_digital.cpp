@@ -83,9 +83,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
   stopWaveform(pin); // Disable any tone
-#ifndef WAVEFORM_LOCKED_PHASE
   _stopPWM(pin);     // ...and any analogWrite
-#endif
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
