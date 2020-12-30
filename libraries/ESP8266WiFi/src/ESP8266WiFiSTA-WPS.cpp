@@ -74,7 +74,7 @@ bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
 
     _wps_config_pending = true;
     // will resume when wifi_wps_status_cb fires
-	esp_yield([]() { return _wps_config_pending; });
+    esp_yield([]() { return _wps_config_pending; });
 
     return true;
 }

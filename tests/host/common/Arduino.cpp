@@ -62,18 +62,18 @@ extern "C" void esp_delay (unsigned long ms)
     usleep(ms * 1000);
 }
 
-inline void esp_yield(const std::function<bool()>& blocked) {
+inline void esp_yield(const IsBlockedCB& blocked) {
     (void)blocked;
 }
 
-void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, const uint32_t intvl_ms)
+void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms)
 {
     (void)blocked;
     (void)intvl_ms;
     usleep(timeout_ms * 1000);
 }
 
-inline void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked)
+inline void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked)
 {
     (void)blocked;
     usleep(timeout_ms * 1000);

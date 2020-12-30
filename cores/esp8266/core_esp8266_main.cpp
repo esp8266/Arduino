@@ -24,6 +24,7 @@
 //#define CONT_STACKSIZE 4096
 #include <Arduino.h>
 #include "Schedule.h"
+#include "Delegate.h"
 extern "C" {
 #include "ets_sys.h"
 #include "os_type.h"
@@ -152,7 +153,9 @@ extern "C" void __esp_delay(unsigned long ms) {
 
 extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
 
-void esp_delay(const uint32_t timeout_ms, const std::function<bool()>& blocked, const uint32_t intvl_ms) {
+using IsBlockedCB = Delegate<bool, void*>;
+
+void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms) {
     const auto start = millis();
     decltype(millis()) expired;
     while ((expired = millis() - start) < timeout_ms && blocked()) {

@@ -242,7 +242,7 @@ void setup() {
   // install callback - called when settimeofday is called (by SNTP or user)
   // once enabled (by DHCP), SNTP is updated every hour by default
   // ** optional boolean in callback function is true when triggered by SNTP **
-  settimeofday_cb(time_is_set);
+  settimeofday_cb(static_cast<BoolCB>(time_is_set));
 
   // setup RTC time
   // it will be used until NTP server will send us real current time
