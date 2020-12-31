@@ -26,7 +26,7 @@
 #include <core_esp8266_waveform.h>
 #include <PolledTimeout.h>
 
-esp8266::polledTimeout::periodicFastUs halfPeriod(50000);
+esp8266::polledTimeout::periodicFastUs stepPeriod(50000);
 
 // the setup function runs only once at start
 void setup() {
@@ -52,14 +52,14 @@ void setup() {
     yield();
   }
 
-  halfPeriod.reset();
+  stepPeriod.reset();
 }
 
 
 void loop() {
   static int val = 0;
   static int delta = 100;
-  if (halfPeriod) {
+  if (stepPeriod) {
     val += delta;
     if (val < 0) {
       val = 100;
