@@ -346,24 +346,9 @@ bool _setPWM(int pin, uint32_t val, uint32_t range) {
   return _setPWM_bound(pin, val, range);
 }
 
-
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-
-extern int startWaveform_weak(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) __attribute__((weak));
-int startWaveform_weak(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS,
-                  int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
-  (void) alignPhase;
-  (void) phaseOffsetUS;
-  (void) autoPwm;
-  return startWaveformClockCycles(pin, microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
-}
-static int startWaveform_bound(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) __attribute__((weakref("startWaveform_weak")));
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
-  return startWaveform_bound(pin, timeHighUS, timeLowUS, runTimeUS, alignPhase, phaseOffsetUS, autoPwm);
-}
-
 extern int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm)  __attribute__((weak));
 int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles,
                              int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
@@ -417,6 +402,15 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t
 static int startWaveformClockCycles_bound(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) __attribute__((weakref("startWaveformClockCycles_weak")));
 int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
   return startWaveformClockCycles_bound(pin, timeHighCycles, timeLowCycles, runTimeCycles, alignPhase, phaseOffsetUS, autoPwm);
+}
+
+
+// This version falls-thru to the proper startWaveformClockCycles call and is invariant across waveform generators
+int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS,
+                  int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
+  return startWaveformClockCycles_bound(pin,
+    microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS),
+    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS), autoPwm);
 }
 
 // Set a callback.  Pass in NULL to stop it

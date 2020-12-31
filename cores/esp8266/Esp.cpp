@@ -30,7 +30,6 @@
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
 // #include "core_esp8266_vm.h"
-#include "core_esp8266_waveform.h"
 #include <pgmspace.h>
 
 extern "C" {

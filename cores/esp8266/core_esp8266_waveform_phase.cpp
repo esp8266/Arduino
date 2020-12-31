@@ -146,13 +146,6 @@ void setTimer1Callback_weak(uint32_t (*fn)()) {
 }
 
 int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCcys, uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys, bool autoPwm);
-int startWaveform_weak(uint8_t pin, uint32_t highUS, uint32_t lowUS,
-  uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
-  return startWaveformClockCycles(pin,
-    microsecondsToClockCycles(highUS), microsecondsToClockCycles(lowUS),
-    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS), autoPwm);
-}
-
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.

@@ -70,10 +70,9 @@ extern void __analogWrite(uint8_t pin, int val) {
   int phaseReference = __builtin_ffs(analogMap) - 1;
   if (_setPWM(pin, val, analogScale)) {
     analogMap |= (1 << pin);
-  } else  if (startWaveformClockCycles(pin, high, low, 0, phaseReference, 0, true)) {
+  } else if (startWaveformClockCycles(pin, high, low, 0, phaseReference, 0, true)) {
     analogMap |= (1 << pin);
   }
-  _setPWM(pin, val, analogScale);
 }
 
 extern void __analogWriteRange(uint32_t range) {
