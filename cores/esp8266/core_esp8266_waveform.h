@@ -86,7 +86,7 @@ void enablePhaseLockedWaveform(void);
 // under load, for applications where frequency or duty cycle must not change, leave false.
 // Returns true or false on success or failure.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS = 0,
-                  // Following parameters are ignores unless in PhaseLocked mode
+                  // Following parameters are ignored unless in PhaseLocked mode
                   int8_t alignPhase = -1, uint32_t phaseOffsetUS = 0, bool autoPwm = false);
 
 // Start or change a waveform of the specified high and low CPU clock cycles on specific pin.
@@ -98,7 +98,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 // under load, for applications where frequency or duty cycle must not change, leave false.
 // Returns true or false on success or failure.
 int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCcys, uint32_t timeLowCcys, uint32_t runTimeCcys = 0,
-                  // Following parameters are ignores unless in PhaseLocked mode
+                  // Following parameters are ignored unless in PhaseLocked mode
                   int8_t alignPhase = -1, uint32_t phaseOffsetCcys = 0, bool autoPwm = false);
 
 // Stop a waveform, if any, on the specified pin.
