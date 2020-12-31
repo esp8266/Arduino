@@ -123,7 +123,7 @@ class EspClass {
         uint8_t getBootMode();
 
 #if defined(F_CPU) || defined(CORE_MOCK)
-        constexpr 
+        constexpr
 #endif
             inline uint8_t getCpuFreqMHz() const __attribute__((always_inline))
         {
@@ -215,7 +215,46 @@ class EspClass {
 #else
         uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
+        /**
+         * @brief Installs VM exception handler to support External memory (Experimental)
+         *
+         * @param none
+         * @return none
+         */
+        void enableVM();
+        /**
+         * @brief Push current Heap selection and set Heap selection to DRAM.
+         *
+         * @param none
+         * @return none
+         */
+        void setDramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to IRAM.
+         *
+         * @param none
+         * @return none
+         */
+        void setIramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to External. (Experimental)
+         *
+         * @param none
+         * @return none
+         */
+        void setExternalHeap();
+        /**
+         * @brief Restores Heap selection back to value present when
+         * setDramHeap, setIramHeap, or setExternalHeap was called.
+         *
+         * @param none
+         * @return none
+         */
+        void resetHeap();
     private:
+#ifdef UMM_HEAP_EXTERNAL
+        bool vmEnabled = false;
+#endif
         /**
          * @brief Replaces @a byteCount bytes of a 4 byte block on flash
          *

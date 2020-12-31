@@ -71,8 +71,12 @@ getResetInfo	KEYWORD2
 getResetInfoPtr	KEYWORD2
 eraseConfig	KEYWORD2
 getCycleCount	KEYWORD2
+enableVM	KEYWORD2
+setExternalHeap	KEYWORD2
+setDramHeap	KEYWORD2
+setIramHeap	KEYWORD2
+resetHeap	KEYWORD2
 random->KEYWORD2
-
 setCtMinDataLength	KEYWORD2
 getCtMinDataLength	KEYWORD2
 setCtMaxDataLength	KEYWORD2
@@ -86,6 +90,7 @@ init	KEYWORD2
 produce	KEYWORD2
 encrypt	KEYWORD2
 decrypt	KEYWORD2
+
 
 #######################################
 # Constants (LITERAL1)
