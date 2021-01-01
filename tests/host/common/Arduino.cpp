@@ -57,6 +57,13 @@ extern "C" void esp_yield()
 {
 }
 
+extern "C" void esp_schedule ()
+{
+}
+
+extern "C" void esp_break ()
+{
+}
 
 extern "C" void __panic_func(const char* file, int line, const char* func) {
     (void)file;

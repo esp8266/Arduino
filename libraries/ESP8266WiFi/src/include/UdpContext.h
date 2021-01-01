@@ -411,7 +411,7 @@ public:
         err_t err;
         esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
         while (((err = trySend(addr, port, /* keep buffer on error */true)) != ERR_OK) && !timeout)
-            delay(0);
+            esp_break();
         if (err != ERR_OK)
             cancelBuffer(); // get rid of buffer kept on error after timeout
         return err == ERR_OK;

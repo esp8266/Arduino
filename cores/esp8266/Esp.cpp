@@ -115,8 +115,6 @@ void EspClass::wdtFeed(void)
     system_soft_wdt_feed();
 }
 
-extern "C" void esp_yield();
-
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));

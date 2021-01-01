@@ -25,6 +25,7 @@
 
 #include "PolledTimeout.h"
 #include "ESP8266WiFiMulti.h"
+#include <coredecls.h>
 #include <limits.h>
 #include <string.h>
 
@@ -91,7 +92,7 @@ static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
     // Wait for WiFi status change or timeout
     do {
         // Refresh watchdog
-        delay(0);
+        esp_break();
 
         // Get WiFi status
         status = WiFi.status();
@@ -249,7 +250,7 @@ int8_t ESP8266WiFiMulti::startScan()
     // Wait for WiFi scan change or timeout
     do {
         // Refresh watchdog
-        delay(0);
+        esp_break();
 
         // Check scan timeout which may occur when scan does not report completion
         if (scanTimeout) {
@@ -535,7 +536,7 @@ void ESP8266WiFiMulti::printWiFiScan()
                          rssi,
                          (encryptionType == ENC_TYPE_NONE) ? ' ' : '*',
                          ssid.c_str());
-        delay(0);
+        esp_break();
     }
 #endif
 }

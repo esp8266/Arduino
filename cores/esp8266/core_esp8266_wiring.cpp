@@ -24,12 +24,9 @@
 #include "osapi.h"
 #include "user_interface.h"
 #include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
-
-extern void ets_delay_us(uint32_t us);
-extern void esp_schedule();
-extern void esp_yield();
 
 static os_timer_t delay_timer;
 static os_timer_t micros_overflow_timer;

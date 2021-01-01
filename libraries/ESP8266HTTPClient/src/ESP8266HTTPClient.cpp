@@ -22,6 +22,7 @@
  *
  */
 #include <Arduino.h>
+#include <coredecls.h>
 
 #include "ESP8266HTTPClient.h"
 #include <ESP8266WiFi.h>
@@ -567,6 +568,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     if (transferred != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
+        esp_break();
         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
     }
 
@@ -709,7 +711,7 @@ int HTTPClient::writeToPrint(Print * print)
                 return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
 
-            delay(0);
+            esp_break();
         }
     } else {
         return returnError(HTTPC_ERROR_ENCODING);
@@ -1074,7 +1076,7 @@ int HTTPClient::handleHeaderResponse()
             if((millis() - lastDataTime) > _tcpTimeout) {
                 return HTTPC_ERROR_READ_TIMEOUT;
             }
-            delay(0);
+            esp_break();
         }
     }
 

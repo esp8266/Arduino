@@ -128,6 +128,15 @@ extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
+// Replacement for delay(0). In CONT, same as yield(). Whereas yield() panics
+// in SYS, esp_break() is safe to call and only schedules CONT. Use yield()
+// whereever only called from CONT, use esp_break() if code is called from SYS
+// or both CONT and SYS.
+extern "C" void esp_break() {
+    esp_schedule();
+    esp_yield();
+}
+
 extern "C" void __yield() {
     if (can_yield()) {
         esp_schedule();

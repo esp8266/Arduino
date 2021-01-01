@@ -49,10 +49,6 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
-
-
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -518,9 +514,9 @@ bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
     }
 
     wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
-    delay(0);
+    esp_break();
     wifi_fpm_open();
-    delay(0);
+    esp_break();
     auto ret = wifi_fpm_do_sleep(sleepUs);
     if (ret != 0)
     {
