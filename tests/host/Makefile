@@ -102,9 +102,13 @@ CORE_CPP_FILES := \
 		FatLib/FatFileLFN.cpp \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
+		FatLib/FatFormatter.cpp \
 		FatLib/FatVolume.cpp \
-		FatLib/FmtNumber.cpp \
-		FatLib/StdioStream.cpp \
+		FatLib/FatPartition.cpp \
+		common/FmtNumber.cpp \
+		common/FsStructs.cpp \
+		common/FsDateTime.cpp \
+		common/PrintBasic.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
