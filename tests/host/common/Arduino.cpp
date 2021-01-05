@@ -15,6 +15,7 @@
 
 #include <sys/time.h>
 #include "Arduino.h"
+#include "ArduinoMain.h"
 
 #include <unistd.h>
 
@@ -22,14 +23,14 @@ extern "C" unsigned long millis()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000) + (time.tv_usec / 1000);
+    return ((time.tv_sec - gtod0.tv_sec) * 1000) + ((time.tv_usec - gtod0.tv_usec) / 1000);
 }
 
 extern "C" unsigned long micros()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000000) + time.tv_usec;
+    return ((time.tv_sec - gtod0.tv_sec) * 1000000) + time.tv_usec - gtod0.tv_usec;
 }
 
 

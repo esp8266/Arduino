@@ -31,6 +31,7 @@
 
 #include <Arduino.h>
 #include <user_interface.h> // wifi_get_ip_info()
+#include <ArduinoMain.h>
 
 #include <signal.h>
 #include <unistd.h>
@@ -51,6 +52,7 @@ bool restore_tty = false;
 bool mockdebug = false;
 int mock_port_shifter = MOCK_PORT_SHIFTER;
 const char* fspath = nullptr;
+struct timeval gtod0;
 
 #define STDIN STDIN_FILENO
 
@@ -294,6 +296,8 @@ int main (int argc, char* const argv [])
 
 	// install exit handler in case Esp.restart() is called
 	atexit(cleanup);
+
+	gettimeofday(&gtod0, nullptr);
 
 	setup();
 	while (!user_exit)
