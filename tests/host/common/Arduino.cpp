@@ -20,11 +20,6 @@
 
 static struct timeval gtod0 = { 0, 0 };
 
-void mockInitMillisMicros ()
-{
-	gettimeofday(&gtod0, nullptr);
-}
-
 extern "C" unsigned long millis()
 {
     if (gtod0.tv_sec == 0)

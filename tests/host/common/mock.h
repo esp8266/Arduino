@@ -104,7 +104,6 @@ int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 #define ets_vsnprintf vsnprintf
 
-void mockInitMillisMicros ();
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern const char* host_interface; // cmdline parameter

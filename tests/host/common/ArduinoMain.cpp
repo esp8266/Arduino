@@ -295,8 +295,8 @@ int main (int argc, char* const argv [])
 	// install exit handler in case Esp.restart() is called
 	atexit(cleanup);
 
-	// now is millis() and micros() beginning
-	mockInitMillisMicros();
+	// first call to millis(): now is millis() and micros() beginning
+	millis();
 
 	setup();
 	while (!user_exit)
