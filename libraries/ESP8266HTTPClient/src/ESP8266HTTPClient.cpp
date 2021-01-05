@@ -1125,18 +1125,18 @@ int HTTPClient::handleHeaderResponse()
                     if(transferEncoding.equalsIgnoreCase(F("chunked"))) {
                         _transferEncoding = HTTPC_TE_CHUNKED;
                     } else {
-                        return (_returnCode = HTTPC_ERROR_ENCODING);
+                        _returnCode = HTTPC_ERROR_ENCODING;
+                        return _returnCode;
                     }
                 } else {
                     _transferEncoding = HTTPC_TE_IDENTITY;
                 }
 
-                if(_returnCode > 0) {
-                    return _returnCode;
-                } else {
+                if(_returnCode <= 0) {
                     DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Remote host is not an HTTP Server!");
-                    return (_returnCode = HTTPC_ERROR_NO_HTTP_SERVER);
+                    _returnCode = HTTPC_ERROR_NO_HTTP_SERVER;
                 }
+                return _returnCode;
             }
 
         } else {
