@@ -131,8 +131,8 @@ class String {
         // if there's not enough memory for the concatenated value, the string
         // will be left unchanged (but this isn't signalled in any way)
         template <typename T>
-        String &operator +=(T &&rhs) {
-            concat(std::forward<T>(rhs));
+        String &operator +=(const T &rhs) {
+            concat(rhs);
             return *this;
         }
 
@@ -335,21 +335,21 @@ inline String operator +(String &&lhs, const String &rhs) {
     return std::move(lhs);
 }
 
-String operator +(const String &lhs, String&& rhs);
+String operator +(const String &lhs, String &&rhs);
 String operator +(String &&lhs, String &&rhs);
 
-template <typename T>
-inline std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>, String>
-operator +(const String &lhs, T &&value) {
+template <typename T,
+    typename = std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>>>
+inline String operator +(const String &lhs, const T &value) {
     String res(lhs);
-    res += std::forward<T>(value);
+    res += value;
     return res;
 }
 
-template <typename T>
-inline std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>, String>
-operator +(String &&lhs, T &&value) {
-    lhs += std::forward<T>(value);
+template <typename T,
+    typename = std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>>>
+inline String operator +(String &&lhs, const T &value) {
+    lhs += value;
     return std::move(lhs);
 }
 
