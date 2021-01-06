@@ -105,7 +105,7 @@ class String {
         String &operator =(const __FlashStringHelper *str);
         String &operator =(String &&rval) noexcept;
         String &operator =(char c) {
-            char buf[2] { c, '\0' };
+            char buffer[2] { c, '\0' };
             *this = buffer;
             return *this;
         }
