@@ -339,18 +339,18 @@ unsigned char String::concat(const __FlashStringHelper *str) {
 /*********************************************/
 
 String &String::insert(size_t position, const char *other, size_t other_length) {
-    if (position > length()) {
+    if (position > length())
         return *this;
-    }
 
-    auto total = length() + other_length;
+    auto len = length();
+    auto total = len + other_length;
     if (!reserve(total))
         return *this;
 
-    auto left = length() - position;
+    auto left = len - position;
     setLen(total);
 
-    auto* start = wbuffer() + position;
+    auto *start = wbuffer() + position;
     memmove(start + other_length, start, left);
     memmove_P(start, other, other_length);
     wbuffer()[total] = '\0';
@@ -358,8 +358,8 @@ String &String::insert(size_t position, const char *other, size_t other_length) 
     return *this;
 }
 
-String &String::insert(size_t position, const __FlashStringHelper* other) {
-    auto* p = reinterpret_cast<const char*>(other);
+String &String::insert(size_t position, const __FlashStringHelper *other) {
+    auto *p = reinterpret_cast<const char*>(other);
     return insert(position, p, strlen_P(p));
 }
 
@@ -372,7 +372,7 @@ String &String::insert(size_t position, const char *other) {
     return insert(position, other, strlen(other));
 }
 
-String &String::insert(size_t position, const String& other) {
+String &String::insert(size_t position, const String &other) {
     return insert(position, other.c_str(), other.length());
 }
 
@@ -392,7 +392,7 @@ String operator +(const String &lhs, String &&rhs) {
     return res;
 }
 
-String operator +(String&& lhs, String&& rhs) {
+String operator +(String &&lhs, String &&rhs) {
     String res;
     auto total = lhs.length() + rhs.length();
     if ((total > lhs.capacity()) && (total < rhs.capacity())) {
@@ -417,7 +417,7 @@ String operator +(char lhs, const String &rhs) {
 
 String operator +(const char *lhs, const String &rhs) {
     String res;
-    res.reserve(rhs.length() + strlen_P(lhs));
+    res.reserve(strlen_P(lhs) + rhs.length());
     res += lhs;
     res += rhs;
     return res;
