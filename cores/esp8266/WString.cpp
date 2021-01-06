@@ -395,7 +395,7 @@ String operator +(const String &lhs, String &&rhs) {
 String operator +(String&& lhs, String&& rhs) {
     String res;
     auto total = lhs.length() + rhs.length();
-    if (rhs.capacity() > total) {
+    if ((total > lhs.capacity()) && (total < rhs.capacity())) {
         rhs.insert(0, lhs);
         res = std::move(rhs);
     } else {
