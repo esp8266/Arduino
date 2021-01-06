@@ -353,6 +353,7 @@ String &String::insert(size_t position, const char *other, size_t other_length) 
     auto* start = wbuffer() + position;
     memmove(start + other_length, start, left);
     memmove_P(start, other, other_length);
+    wbuffer()[total] = '\0';
 
     return *this;
 }
