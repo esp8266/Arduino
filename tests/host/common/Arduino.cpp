@@ -18,26 +18,24 @@
 
 #include <unistd.h>
 
-unsigned long millis0 = 0, micros0 = 0;
-
-extern "C" void init_milliscros ()
-{
-    millis0 = millis();
-    micros0 = micros();
-}
+static struct timeval gtod0 = { 0, 0 };
 
 extern "C" unsigned long millis()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000) + (time.tv_usec / 1000) - millis0;
+    if (gtod0.tv_sec == 0)
+        memcpy(&gtod0, &time, sizeof gtod0);
+    return ((time.tv_sec - gtod0.tv_sec) * 1000) + ((time.tv_usec - gtod0.tv_usec) / 1000);
 }
 
 extern "C" unsigned long micros()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000000) + time.tv_usec - micros0;
+    if (gtod0.tv_sec == 0)
+        memcpy(&gtod0, &time, sizeof gtod0);
+    return ((time.tv_sec - gtod0.tv_sec) * 1000000) + time.tv_usec - gtod0.tv_usec;
 }
 
 

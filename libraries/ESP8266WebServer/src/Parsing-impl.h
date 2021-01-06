@@ -453,8 +453,14 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                     for (int i = 0; i < boundaryPtr; i++) {
                         _uploadWriteByte( fastBoundary[ i ] );
                     }
-                    _uploadWriteByte( in );
-                    boundaryPtr = 0;
+                    if (in == fastBoundary[ 0 ]) {
+                       // This could be the start of the real end, mark it so and don't emit/skip it
+                       boundaryPtr = 1;
+                    } else {
+                      // Not the 1st char of our pattern, so emit and ignore
+                      _uploadWriteByte( in );
+                      boundaryPtr = 0;
+                    }
                 }
             }
             // Found the boundary string, finish processing this file upload

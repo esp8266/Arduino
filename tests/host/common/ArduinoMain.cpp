@@ -285,7 +285,6 @@ int main (int argc, char* const argv [])
 
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
-	init_milliscros();
 
 	if (!blocking_uart)
 	{
@@ -295,6 +294,9 @@ int main (int argc, char* const argv [])
 
 	// install exit handler in case Esp.restart() is called
 	atexit(cleanup);
+
+	// first call to millis(): now is millis() and micros() beginning
+	millis();
 
 	setup();
 	while (!user_exit)
