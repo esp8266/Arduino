@@ -189,6 +189,9 @@ _xtos_c_wrapper_handler:
         // Restore special registers
         l32i    a14,  a1, UEXC_sar
 
+        // load early - saves two cycles - @mhightower83
+        movi     a0, _xtos_return_from_exc
+
 // For compatibility with Arduino interrupt architecture, we keep interrupts 100%
 // disabled.
 //        /*
@@ -201,7 +204,6 @@ _xtos_c_wrapper_handler:
 //        rsil  a12, 1 // XCHAL_EXCM_LEVEL
         rsil  a12, 15  // All levels blocked.
         wsr   a14, SAR
-        movi   a0, _xtos_return_from_exc
         jx     a0
 
         /* FIXME: what about _GeneralException ? */
