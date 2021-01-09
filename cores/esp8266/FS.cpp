@@ -68,7 +68,7 @@ int File::read() {
 
 size_t File::read(uint8_t* buf, size_t size) {
     if (!_p)
-        return -1;
+        return 0;
 
     return _p->read(buf, size);
 }
