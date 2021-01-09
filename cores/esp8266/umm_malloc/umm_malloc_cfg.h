@@ -42,7 +42,11 @@ extern "C" {
 #undef UMM_HEAP_IRAM
 #endif
 
-// #define UMM_HEAP_EXTERNAL
+#if defined(MMU_EXTERNAL_HEAP)
+#define UMM_HEAP_EXTERNAL
+#else
+#undef UMM_HEAP_EXTERNAL
+#endif
 
 /*
  * Assign IDs to active Heaps and tally. DRAM is always active.

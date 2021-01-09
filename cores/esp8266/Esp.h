@@ -252,7 +252,7 @@ class EspClass {
          */
         void resetHeap();
     private:
-#ifdef UMM_HEAP_EXTERNAL
+#ifdef MMU_EXTERNAL_HEAP
         bool vmEnabled = false;
 #endif
         /**

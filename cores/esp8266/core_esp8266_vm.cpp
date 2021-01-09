@@ -60,7 +60,7 @@
  
 */
 
-#ifdef UMM_HEAP_EXTERNAL
+#ifdef MMU_EXTERNAL_HEAP
 
 #include <Arduino.h>
 #include <esp8266_undocumented.h>
@@ -129,7 +129,9 @@ constexpr uint8_t sck = 14;
 
 #define DECLARE_SPI1 spi_regs *spi1 = (spi_regs*)&SPI1CMD
 
-constexpr uint32_t spi_clkval = 0x00041001; // 5MHz = 0x001c1001   10 = 0x000c1001   20 = 0x00041001  30 = 0x00002001  40 = 0x00001001
+typedef enum { spi_5mhz = 0x001c1001, spi_10mhz = 0x000c1001, spi_20mhz = 0x00041001, spi_30mhz = 0x00002001, spi_40mhz = 0x00001001 } spi_clocking;
+
+constexpr uint32_t spi_clkval = spi_20mhz;
 
 typedef enum { sio = 0, dio = 1 } iotype;
 constexpr iotype hspi_mode = dio;
@@ -400,10 +402,10 @@ void install_vm_exception_handler()
   }
 
   // Hook into memory manager
-  umm_init_vm( (void *)0x10000000, UMM_HEAP_EXTERNAL * 1024);
+  umm_init_vm( (void *)0x10000000, MMU_EXTERNAL_HEAP * 1024);
 }
 
 
 };
 
-#endif // ifdef(UMM_HEAP_EXTERNAL)
+#endif

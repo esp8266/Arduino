@@ -1212,9 +1212,9 @@ macros = {
         ( '.menu.mmu.3216', '16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)' ),
         ( '.menu.mmu.3216.build.mmuflags', '-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000' ),
         ( '.menu.mmu.ext128k', '128K External 23LC1024' ),
-        ( '.menu.mmu.ext128k.build.mmuflags', '-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000' ),
+        ( '.menu.mmu.ext128k.build.mmuflags', '-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000' ),
         ( '.menu.mmu.ext1024k', '1M External 64 MBit PSRAM' ),
-        ( '.menu.mmu.ext1024k.build.mmuflags', '-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000' ),
+        ( '.menu.mmu.ext1024k.build.mmuflags', '-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000' ),
         ]),
 
     ######################## Non 32-bit load/store exception handler

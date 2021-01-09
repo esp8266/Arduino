@@ -79,9 +79,9 @@ generic.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 generic.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 generic.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 generic.menu.mmu.ext128k=128K External 23LC1024
-generic.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+generic.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 generic.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-generic.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+generic.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 generic.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 generic.menu.non32xfer.fast.build.non32xferflags=
 generic.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -568,9 +568,9 @@ esp8285.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 esp8285.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 esp8285.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 esp8285.menu.mmu.ext128k=128K External 23LC1024
-esp8285.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+esp8285.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp8285.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-esp8285.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+esp8285.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp8285.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 esp8285.menu.non32xfer.fast.build.non32xferflags=
 esp8285.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -927,9 +927,9 @@ gen4iod.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 gen4iod.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 gen4iod.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 gen4iod.menu.mmu.ext128k=128K External 23LC1024
-gen4iod.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+gen4iod.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 gen4iod.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-gen4iod.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+gen4iod.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 gen4iod.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 gen4iod.menu.non32xfer.fast.build.non32xferflags=
 gen4iod.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -1201,9 +1201,9 @@ huzzah.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x
 huzzah.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 huzzah.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 huzzah.menu.mmu.ext128k=128K External 23LC1024
-huzzah.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+huzzah.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 huzzah.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-huzzah.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+huzzah.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 huzzah.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 huzzah.menu.non32xfer.fast.build.non32xferflags=
 huzzah.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -1408,9 +1408,9 @@ wifi_slot.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE
 wifi_slot.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wifi_slot.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifi_slot.menu.mmu.ext128k=128K External 23LC1024
-wifi_slot.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifi_slot.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifi_slot.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-wifi_slot.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifi_slot.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifi_slot.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wifi_slot.menu.non32xfer.fast.build.non32xferflags=
 wifi_slot.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -1741,9 +1741,9 @@ arduino-esp8266.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACH
 arduino-esp8266.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 arduino-esp8266.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 arduino-esp8266.menu.mmu.ext128k=128K External 23LC1024
-arduino-esp8266.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+arduino-esp8266.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 arduino-esp8266.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-arduino-esp8266.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+arduino-esp8266.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 arduino-esp8266.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 arduino-esp8266.menu.non32xfer.fast.build.non32xferflags=
 arduino-esp8266.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -1949,9 +1949,9 @@ espmxdevkit.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SI
 espmxdevkit.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espmxdevkit.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espmxdevkit.menu.mmu.ext128k=128K External 23LC1024
-espmxdevkit.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espmxdevkit.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espmxdevkit.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espmxdevkit.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espmxdevkit.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espmxdevkit.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espmxdevkit.menu.non32xfer.fast.build.non32xferflags=
 espmxdevkit.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -2197,9 +2197,9 @@ oak.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x400
 oak.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 oak.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 oak.menu.mmu.ext128k=128K External 23LC1024
-oak.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+oak.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 oak.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-oak.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+oak.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 oak.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 oak.menu.non32xfer.fast.build.non32xferflags=
 oak.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -2413,9 +2413,9 @@ espduino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=
 espduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espduino.menu.mmu.ext128k=128K External 23LC1024
-espduino.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espduino.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espduino.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espduino.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espduino.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espduino.menu.non32xfer.fast.build.non32xferflags=
 espduino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -2619,9 +2619,9 @@ espectro.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=
 espectro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espectro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espectro.menu.mmu.ext128k=128K External 23LC1024
-espectro.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espectro.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espectro.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espectro.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espectro.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espectro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espectro.menu.non32xfer.fast.build.non32xferflags=
 espectro.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -2826,9 +2826,9 @@ espino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x
 espino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espino.menu.mmu.ext128k=128K External 23LC1024
-espino.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espino.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espino.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espino.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espino.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espino.menu.non32xfer.fast.build.non32xferflags=
 espino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -3036,9 +3036,9 @@ espresso_lite_v1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICAC
 espresso_lite_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espresso_lite_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espresso_lite_v1.menu.mmu.ext128k=128K External 23LC1024
-espresso_lite_v1.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espresso_lite_v1.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v1.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espresso_lite_v1.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espresso_lite_v1.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espresso_lite_v1.menu.non32xfer.fast.build.non32xferflags=
 espresso_lite_v1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -3246,9 +3246,9 @@ espresso_lite_v2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICAC
 espresso_lite_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espresso_lite_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espresso_lite_v2.menu.mmu.ext128k=128K External 23LC1024
-espresso_lite_v2.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espresso_lite_v2.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v2.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espresso_lite_v2.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espresso_lite_v2.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espresso_lite_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espresso_lite_v2.menu.non32xfer.fast.build.non32xferflags=
 espresso_lite_v2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -3466,9 +3466,9 @@ sonoff.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x
 sonoff.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 sonoff.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 sonoff.menu.mmu.ext128k=128K External 23LC1024
-sonoff.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+sonoff.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 sonoff.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-sonoff.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+sonoff.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 sonoff.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 sonoff.menu.non32xfer.fast.build.non32xferflags=
 sonoff.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -3713,9 +3713,9 @@ inventone.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE
 inventone.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 inventone.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 inventone.menu.mmu.ext128k=128K External 23LC1024
-inventone.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+inventone.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 inventone.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-inventone.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+inventone.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 inventone.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 inventone.menu.non32xfer.fast.build.non32xferflags=
 inventone.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -3920,9 +3920,9 @@ d1_mini.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 d1_mini.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1_mini.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini.menu.mmu.ext128k=128K External 23LC1024
-d1_mini.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-d1_mini.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1_mini.menu.non32xfer.fast.build.non32xferflags=
 d1_mini.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -4127,9 +4127,9 @@ d1_mini_lite.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_S
 d1_mini_lite.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1_mini_lite.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini_lite.menu.mmu.ext128k=128K External 23LC1024
-d1_mini_lite.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini_lite.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_lite.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-d1_mini_lite.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini_lite.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_lite.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1_mini_lite.menu.non32xfer.fast.build.non32xferflags=
 d1_mini_lite.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -4374,9 +4374,9 @@ d1_mini_pro.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SI
 d1_mini_pro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1_mini_pro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1_mini_pro.menu.mmu.ext128k=128K External 23LC1024
-d1_mini_pro.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini_pro.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_pro.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-d1_mini_pro.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini_pro.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1_mini_pro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1_mini_pro.menu.non32xfer.fast.build.non32xferflags=
 d1_mini_pro.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -4564,9 +4564,9 @@ d1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
 d1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 d1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 d1.menu.mmu.ext128k=128K External 23LC1024
-d1.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-d1.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 d1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 d1.menu.non32xfer.fast.build.non32xferflags=
 d1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -4771,9 +4771,9 @@ nodemcu.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 nodemcu.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 nodemcu.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 nodemcu.menu.mmu.ext128k=128K External 23LC1024
-nodemcu.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+nodemcu.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcu.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-nodemcu.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+nodemcu.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcu.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 nodemcu.menu.non32xfer.fast.build.non32xferflags=
 nodemcu.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -4978,9 +4978,9 @@ nodemcuv2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE
 nodemcuv2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 nodemcuv2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 nodemcuv2.menu.mmu.ext128k=128K External 23LC1024
-nodemcuv2.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+nodemcuv2.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcuv2.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-nodemcuv2.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+nodemcuv2.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 nodemcuv2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 nodemcuv2.menu.non32xfer.fast.build.non32xferflags=
 nodemcuv2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -5189,9 +5189,9 @@ modwifi.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 modwifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 modwifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 modwifi.menu.mmu.ext128k=128K External 23LC1024
-modwifi.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+modwifi.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 modwifi.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-modwifi.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+modwifi.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 modwifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 modwifi.menu.non32xfer.fast.build.non32xferflags=
 modwifi.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -5416,9 +5416,9 @@ phoenix_v1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZ
 phoenix_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 phoenix_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 phoenix_v1.menu.mmu.ext128k=128K External 23LC1024
-phoenix_v1.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+phoenix_v1.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v1.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-phoenix_v1.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+phoenix_v1.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 phoenix_v1.menu.non32xfer.fast.build.non32xferflags=
 phoenix_v1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -5626,9 +5626,9 @@ phoenix_v2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZ
 phoenix_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 phoenix_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 phoenix_v2.menu.mmu.ext128k=128K External 23LC1024
-phoenix_v2.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+phoenix_v2.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v2.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-phoenix_v2.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+phoenix_v2.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 phoenix_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 phoenix_v2.menu.non32xfer.fast.build.non32xferflags=
 phoenix_v2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -5836,9 +5836,9 @@ eduinowifi.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZ
 eduinowifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 eduinowifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 eduinowifi.menu.mmu.ext128k=128K External 23LC1024
-eduinowifi.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+eduinowifi.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 eduinowifi.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-eduinowifi.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+eduinowifi.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 eduinowifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 eduinowifi.menu.non32xfer.fast.build.non32xferflags=
 eduinowifi.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -6043,9 +6043,9 @@ wiolink.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 wiolink.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wiolink.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wiolink.menu.mmu.ext128k=128K External 23LC1024
-wiolink.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wiolink.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wiolink.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-wiolink.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wiolink.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wiolink.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wiolink.menu.non32xfer.fast.build.non32xferflags=
 wiolink.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -6250,9 +6250,9 @@ blynk.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4
 blynk.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 blynk.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 blynk.menu.mmu.ext128k=128K External 23LC1024
-blynk.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+blynk.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 blynk.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-blynk.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+blynk.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 blynk.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 blynk.menu.non32xfer.fast.build.non32xferflags=
 blynk.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -6457,9 +6457,9 @@ thing.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4
 thing.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 thing.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 thing.menu.mmu.ext128k=128K External 23LC1024
-thing.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+thing.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thing.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-thing.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+thing.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thing.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 thing.menu.non32xfer.fast.build.non32xferflags=
 thing.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -6664,9 +6664,9 @@ thingdev.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=
 thingdev.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 thingdev.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 thingdev.menu.mmu.ext128k=128K External 23LC1024
-thingdev.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+thingdev.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thingdev.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-thingdev.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+thingdev.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 thingdev.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 thingdev.menu.non32xfer.fast.build.non32xferflags=
 thingdev.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -6871,9 +6871,9 @@ esp210.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x
 esp210.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 esp210.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 esp210.menu.mmu.ext128k=128K External 23LC1024
-esp210.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+esp210.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp210.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-esp210.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+esp210.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 esp210.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 esp210.menu.non32xfer.fast.build.non32xferflags=
 esp210.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -7078,9 +7078,9 @@ espinotee.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE
 espinotee.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 espinotee.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 espinotee.menu.mmu.ext128k=128K External 23LC1024
-espinotee.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espinotee.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espinotee.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-espinotee.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espinotee.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 espinotee.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 espinotee.menu.non32xfer.fast.build.non32xferflags=
 espinotee.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -7285,9 +7285,9 @@ wifiduino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE
 wifiduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wifiduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifiduino.menu.mmu.ext128k=128K External 23LC1024
-wifiduino.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifiduino.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifiduino.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-wifiduino.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifiduino.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifiduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wifiduino.menu.non32xfer.fast.build.non32xferflags=
 wifiduino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -7509,9 +7509,9 @@ wifinfo.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0
 wifinfo.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 wifinfo.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 wifinfo.menu.mmu.ext128k=128K External 23LC1024
-wifinfo.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifinfo.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifinfo.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-wifinfo.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifinfo.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 wifinfo.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 wifinfo.menu.non32xfer.fast.build.non32xferflags=
 wifinfo.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
@@ -7763,9 +7763,9 @@ cw01.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x40
 cw01.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
 cw01.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
 cw01.menu.mmu.ext128k=128K External 23LC1024
-cw01.menu.mmu.ext128k.build.mmuflags=-DUMM_HEAP_EXTERNAL=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+cw01.menu.mmu.ext128k.build.mmuflags=-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 cw01.menu.mmu.ext1024k=1M External 64 MBit PSRAM
-cw01.menu.mmu.ext1024k.build.mmuflags=-DUMM_HEAP_EXTERNAL=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+cw01.menu.mmu.ext1024k.build.mmuflags=-DMMU_EXTERNAL_HEAP=1024 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
 cw01.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 cw01.menu.non32xfer.fast.build.non32xferflags=
 cw01.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
