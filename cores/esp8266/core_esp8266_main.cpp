@@ -24,7 +24,6 @@
 //#define CONT_STACKSIZE 4096
 #include <Arduino.h>
 #include "Schedule.h"
-#include "Delegate.h"
 extern "C" {
 #include "ets_sys.h"
 #include "os_type.h"
@@ -71,6 +70,7 @@ static uint32_t s_cycles_at_yield_start;
 #define ETS_INTR_LOCK_NEST_MAX 7
 static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
 static byte     ets_intr_lock_stack_ptr=0;
+
 
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
@@ -153,7 +153,7 @@ extern "C" void __esp_delay(unsigned long ms) {
 
 extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
 
-using IsBlockedCB = Delegate<bool(), void*>;
+using IsBlockedCB = std::function<bool()>;
 
 void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms) {
     const auto start = millis();
@@ -174,7 +174,7 @@ extern "C" void __yield() {
     }
 }
 
-extern "C" void yield() __attribute__ ((weak, alias("__yield")));
+extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
     const uint32_t intvl_cycles = interval_us *
@@ -204,6 +204,7 @@ extern "C" void IRAM_ATTR ets_intr_unlock() {
   else
      xt_rsil(0);
 }
+
 
 // Save / Restore the PS state across the rom ets_post call as the rom code
 // does not implement this correctly.

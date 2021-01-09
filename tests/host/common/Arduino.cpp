@@ -15,7 +15,7 @@
 
 #include <sys/time.h>
 #include "Arduino.h"
-#include <Delegate.h>
+#include <functional>
 
 #include <unistd.h>
 
@@ -63,7 +63,7 @@ extern "C" void esp_delay (unsigned long ms)
     usleep(ms * 1000);
 }
 
-using IsBlockedCB = Delegate<bool(), void*>;
+using IsBlockedCB = std::function<bool()>;
 
 inline void esp_suspend() {
     esp_yield();

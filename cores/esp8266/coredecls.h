@@ -28,16 +28,16 @@ uint32_t crc32 (const void* data, size_t length, uint32_t crc = 0xffffffff);
 #ifdef __cplusplus
 }
 
-#include <Delegate.h>
+#include <functional>
 
-using BoolCB = Delegate<void(bool), void*>;
-using TrivialCB = Delegate<void(), void*>;
+using BoolCB = std::function<void(bool)>;
+using TrivialCB = std::function<void()>;
 
 void settimeofday_cb (BoolCB&& cb);
 void settimeofday_cb (const BoolCB& cb);
 void settimeofday_cb (const TrivialCB& cb);
 
-using IsBlockedCB = Delegate<bool(), void*>;
+using IsBlockedCB = std::function<bool()>;
 
 inline void esp_suspend() {
     esp_yield();

@@ -434,7 +434,7 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
     //tasks to wait correctly.
     constexpr unsigned int timeoutValue = 1000; //1 second
     if(can_yield()) {
-        esp_delay(timeoutValue, { [](void* m) { return wifi_get_opmode() != *static_cast<WiFiMode_t*>(m); }, (void*)&m }, 5);
+        esp_delay(timeoutValue, [m]() { return wifi_get_opmode() != m; }, 5);
 
         //if at this point mode still hasn't been reached, give up
         if(wifi_get_opmode() != (uint8) m) {
