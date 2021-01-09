@@ -66,6 +66,7 @@
 #include <esp8266_undocumented.h>
 #include "esp8266_peri.h"
 #include "core_esp8266_vm.h"
+#include "core_esp8266_non32xfer.h"
 #include "umm_malloc/umm_malloc.h"
 
 
@@ -296,22 +297,11 @@ static void (*__old_handler)(struct __exception_frame *ef, int cause);
 
 static ICACHE_RAM_ATTR void loadstore_exception_handler(struct __exception_frame *ef, int cause)
 {
-  uint32_t epc1 = ef->epc;
   uint32_t excvaddr;
   uint32_t insn;
 
-  __asm (
-    "rsr   %0, EXCVADDR;"    // read out the faulting address
-    "movi  a4, ~3;"          // prepare a mask for the EPC
-    "and   a4, a4, %2;"      // apply mask for 32bit aligned base
-    "l32i  a5, a4, 0;"       // load part 1
-    "l32i  a6, a4, 4;"       // load part 2
-    "ssa8l %2;"              // set up shift register for src op
-    "src   %1, a6, a5;"      // right shift to get faulting instruction
-    :"=r"(excvaddr), "=r"(insn)
-    :"r"(epc1)
-    :"a4", "a5", "a6"
-  );
+  /* Extract instruction and faulting data address */
+  __EXCEPTION_HANDLER_PREAMBLE(ef, excvaddr, insn);
 
   // Check that we're really accessing VM and not some other illegal range
   if ((excvaddr >> 28) != 1) {
@@ -394,7 +384,7 @@ void install_vm_exception_handler()
   // Bring cache structures to baseline
   if (cache_ways > 0) {
     for (auto i = 0; i < cache_ways; i++) {
-      __vm_cache_line[i].addr = -1; // Invalid, bits set in lower region so will never hatch
+      __vm_cache_line[i].addr = -1; // Invalid, bits set in lower region so will never match
       __vm_cache_line[i].next = &__vm_cache_line[i+1];
     }
     __vm_cache = &__vm_cache_line[0];
