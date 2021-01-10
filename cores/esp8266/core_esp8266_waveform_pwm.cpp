@@ -40,6 +40,7 @@
 
 
 #include <Arduino.h>
+#include <coredecls.h>
 #include "ets_sys.h"
 #include "core_esp8266_waveform.h"
 #include "user_interface.h"
@@ -162,7 +163,7 @@ static IRAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
   forceTimerInterrupt();
   while (pwmState.pwmUpdate) {
     if (idle) {
-      yield();
+      esp_break();
     }
     MEMBARRIER();
   }
