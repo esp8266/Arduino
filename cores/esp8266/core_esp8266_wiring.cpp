@@ -24,12 +24,11 @@
 #include "osapi.h"
 #include "user_interface.h"
 #include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 
 extern void ets_delay_us(uint32_t us);
-extern void esp_schedule();
-extern void esp_yield();
 
 static os_timer_t delay_timer;
 static os_timer_t micros_overflow_timer;
@@ -40,7 +39,7 @@ static uint32_t micros_overflow_count = 0;
 
 void delay_end(void* arg) {
     (void) arg;
-    esp_schedule();
+    esp_request_for_cont();
 }
 
 void __delay(unsigned long ms) {
@@ -48,9 +47,9 @@ void __delay(unsigned long ms) {
         os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
         os_timer_arm(&delay_timer, ms, ONCE);
     } else {
-        esp_schedule();
+        esp_request_for_cont();
     }
-    esp_yield();
+    esp_suspend_from_cont();
     if(ms) {
         os_timer_disarm(&delay_timer);
     }

@@ -97,7 +97,7 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   }
 
   // Something weird, return a no-op object
-  optimistic_yield(1000);
+  yield();
   return WiFiClientSecure();
 }
 

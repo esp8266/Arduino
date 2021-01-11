@@ -26,9 +26,7 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
-extern "C" void esp_yield();
-extern "C" void esp_schedule();
-
+#include <coredecls.h>
 #include "DataSource.h"
 
 bool getDefaultPrivateGlobalSyncValue ();
@@ -448,7 +446,7 @@ protected:
         if (_connect_pending || _send_waiting) {
             _send_waiting = false;
             _connect_pending = false;
-            esp_schedule(); // break delay in connect or _write_from_source
+            esp_request_for_cont(); // interrupt delay in connect or _write_from_source
         }
     }
 
@@ -550,7 +548,7 @@ protected:
     {
         if (_send_waiting) {
             _send_waiting = false;
-            esp_schedule(); // break delay in _write_from_source
+            esp_request_for_cont(); // interrupt delay in _write_from_source
         }
     }
 
@@ -638,7 +636,7 @@ protected:
         assert(pcb == _pcb);
         if (_connect_pending) {
             _connect_pending = false;
-            esp_schedule(); // break delay in connect
+            esp_request_for_cont(); // interrupt delay in connect
         }
         return ERR_OK;
     }

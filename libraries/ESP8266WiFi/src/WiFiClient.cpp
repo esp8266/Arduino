@@ -249,7 +249,7 @@ int WiFiClient::available()
     int result = _client->getSize();
 
     if (!result) {
-        optimistic_yield(100);
+        yield();
     }
     return result;
 }

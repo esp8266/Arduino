@@ -304,7 +304,7 @@ static bool _i2s_write_sample(uint32_t sample, bool nb) {
         if (tx->slc_queue_len > 0) {
           break;
         } else {
-          optimistic_yield(10000);
+          yield();
         }
       }
     }
@@ -353,7 +353,7 @@ static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mo
                         if (tx->slc_queue_len > 0) {
                           break;
                         } else {
-                          optimistic_yield(10000);
+                          yield();
                         }
                     }
                 }
@@ -413,7 +413,7 @@ bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
         if (rx->slc_queue_len > 0){
           break;
         } else {
-          optimistic_yield(10000);
+          yield();
         }
       }
     }

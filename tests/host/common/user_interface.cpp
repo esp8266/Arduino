@@ -498,7 +498,7 @@ extern "C"
         (void)intr;
     }
 
-    void esp_schedule(void)
+    void esp_request_for_cont(void)
     {
     }
 

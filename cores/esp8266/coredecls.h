@@ -12,9 +12,14 @@ extern "C" {
 #include <stdint.h>
 #include <cont.h> // g_pcont declaration
 
-bool can_yield();
-void esp_yield();
-void esp_schedule();
+bool esp_is_in_cont();
+void esp_suspend_from_cont();
+void esp_request_for_cont();
+
+void esp_yield() __attribute__ ((deprecated("use esp_suspend_from_cont()")));
+void esp_schedule() __attribute__ ((deprecated("use esp_request_for_cont()")));
+bool can_yield() __attribute__ ((deprecated("esp_is_in_cont()")));
+
 void tune_timeshift64 (uint64_t now_us);
 void disable_extra4k_at_link_time (void) __attribute__((noinline));
 bool sntp_set_timezone_in_seconds(int32_t timezone);

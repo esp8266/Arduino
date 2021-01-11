@@ -72,7 +72,7 @@ int cont_get_free_stack(cont_t* cont);
 
 // Check if yield() may be called. Returns true if we are running inside
 // continuation stack
-bool cont_can_yield(cont_t* cont);
+bool __esp_is_in_cont(cont_t* cont);
 
 // Repaint the stack from the current SP to the end, to allow individual
 // routines' stack usages to be calculated by re-painting, checking current

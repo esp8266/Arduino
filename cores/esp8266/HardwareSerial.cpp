@@ -109,7 +109,7 @@ int HardwareSerial::available(void)
 {
     int result = static_cast<int>(uart_rx_available(_uart));
     if (!result) {
-        optimistic_yield(10000);
+        yield();
     }
     return result;
 }

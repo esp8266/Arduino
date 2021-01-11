@@ -48,9 +48,7 @@ extern "C" {
 #include "WiFiUdp.h"
 #include "debug.h"
 #include "include/WiFiState.h"
-
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
+#include <coredecls.h>
 
 
 // -----------------------------------------------------------------------------------------------------------------------
@@ -448,7 +446,7 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
     //Only wait if in CONT context. If this were called from SYS, it's up to the user to serialize
     //tasks to wait correctly.
     constexpr unsigned int timeoutValue = 1000; //1 second
-    if(can_yield()) {
+    if(esp_is_in_cont()) {
         using oneShot = esp8266::polledTimeout::oneShotFastMs;
         oneShot timeout(timeoutValue);
         while(wifi_get_opmode() != (uint8) m && !timeout)
@@ -716,7 +714,7 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
-    esp_schedule(); // break delay in hostByName
+    esp_request_for_cont(); // interrupt delay in hostByName
 }
 
 uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState* state)

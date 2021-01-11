@@ -104,42 +104,40 @@ extern "C" void __preloop_update_frequency() {
 
 extern "C" void preloop_update_frequency() __attribute__((weak, alias("__preloop_update_frequency")));
 
-extern "C" bool can_yield() {
-  return cont_can_yield(g_pcont);
+extern "C" bool esp_is_in_cont() {
+  return __esp_is_in_cont(g_pcont);
 }
 
-static inline void esp_yield_within_cont() __attribute__((always_inline));
-static void esp_yield_within_cont() {
+static inline void esp_suspend_from_cont_within_cont() __attribute__((always_inline));
+static void esp_suspend_from_cont_within_cont() {
         cont_yield(g_pcont);
         s_cycles_at_yield_start = ESP.getCycleCount();
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void __esp_yield() {
-    if (can_yield()) {
-        esp_yield_within_cont();
+extern "C" void esp_suspend_from_cont() {
+    if (esp_is_in_cont()) {
+        esp_suspend_from_cont_within_cont();
     }
 }
 
-extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
-
-extern "C" IRAM_ATTR void esp_schedule() {
+extern "C" IRAM_ATTR void esp_request_for_cont() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
-    if (can_yield()) {
-        esp_schedule();
-        esp_yield_within_cont();
+    if (esp_is_in_cont()) {
+        esp_request_for_cont();
+        esp_suspend_from_cont_within_cont();
     }
+#ifdef DEBUG_ESP_PORT
     else {
-        panic();
+        DEBUGV("yield() should not be called from SYS ctx\n");
     }
+#endif
 }
 
-extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
-
-extern "C" void optimistic_yield(uint32_t interval_us) {
+extern "C" void __optimistic_yield(uint32_t interval_us) {
     const uint32_t intvl_cycles = interval_us *
 #if defined(F_CPU)
         clockCyclesPerMicrosecond();
@@ -147,10 +145,16 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
         ESP.getCpuFreqMHz();
 #endif
     if ((ESP.getCycleCount() - s_cycles_at_yield_start) > intvl_cycles &&
-        can_yield())
+        esp_is_in_cont())
     {
-        yield();
+        __yield();
     }
+}
+
+extern "C" void optimistic_yield(uint32_t interval_us) __attribute__ ((alias("__optimistic_yield")));
+extern "C" void yield() {
+    // at least 1ms between two consecutive yields
+    __optimistic_yield(1000);
 }
 
 // Replace ets_intr_(un)lock with nestable versions
@@ -160,6 +164,10 @@ extern "C" void IRAM_ATTR ets_intr_lock() {
   else
      xt_rsil(3);
 }
+
+extern "C" void esp_yield() __attribute__ ((alias("esp_suspend_from_cont")));
+extern "C" void esp_schedule() __attribute__ ((alias("esp_request_for_cont")));
+extern "C" bool can_yield() __attribute__ ((alias("esp_is_in_cont")));
 
 extern "C" void IRAM_ATTR ets_intr_unlock() {
   if (ets_intr_lock_stack_ptr > 0)
@@ -201,7 +209,7 @@ static void loop_wrapper() {
     if (serialEventRun) {
         serialEventRun();
     }
-    esp_schedule();
+    esp_request_for_cont();
 }
 
 static void loop_task(os_event_t *events) {
@@ -260,7 +268,7 @@ void init_done() {
     gdb_init();
     std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
-    esp_schedule();
+    esp_request_for_cont();
     ESP.setDramHeap();
 }
 

@@ -191,7 +191,7 @@ void loop(void);
 
 void yield(void);
 
-void optimistic_yield(uint32_t interval_us);
+void optimistic_yield(uint32_t interval_us) __attribute__ ((deprecated("use yield()")));
 
 #define _PORT_GPIO16    1
 #define digitalPinToPort(pin)       (((pin)==16)?(_PORT_GPIO16):(0))

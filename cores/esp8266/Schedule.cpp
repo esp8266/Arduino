@@ -165,7 +165,7 @@ void run_scheduled_functions()
         {
             // because scheduled functions might last too long for watchdog etc,
             // this is yield() in cont stack:
-            esp_schedule();
+            esp_request_for_cont();
             cont_yield(g_pcont);
         }
     }
@@ -242,7 +242,7 @@ void run_scheduled_recurrent_functions()
         {
             // because scheduled functions might last too long for watchdog etc,
             // this is yield() in cont stack:
-            esp_schedule();
+            esp_request_for_cont();
             cont_yield(g_pcont);
         }
     } while (current && !done);

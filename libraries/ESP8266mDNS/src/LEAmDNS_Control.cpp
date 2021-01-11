@@ -702,7 +702,7 @@ bool MDNSResponder::_parseResponse(const MDNSResponder::stcMDNS_MsgHeader& p_Msg
                 for (uint16_t qd=0; ((bDumpResult) && (qd<p_MsgHeader.m_u16QDCount)); ++qd) {
                     stcMDNS_RRQuestion  questionRR;
                     bDumpResult = _readRRQuestion(questionRR);
-                    esp_yield();
+                    esp_suspend_from_cont();
                 }   // for questions
                 // Handle known answers
                 uint32_t    u32Answers = (p_MsgHeader.m_u16ANCount + p_MsgHeader.m_u16NSCount + p_MsgHeader.m_u16ARCount);
@@ -713,7 +713,7 @@ bool MDNSResponder::_parseResponse(const MDNSResponder::stcMDNS_MsgHeader& p_Msg
                         delete pRRAnswer;
                         pRRAnswer = 0;
                     }
-                    esp_yield();
+                    esp_suspend_from_cont();
                 }
             );*/
         m_pUDPContext->flush();

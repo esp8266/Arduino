@@ -23,12 +23,8 @@
 
 class UdpContext;
 
-extern "C" {
-void esp_yield();
-void esp_schedule();
 #include <assert.h>
-}
-
+#include <coredecls.h>
 #include <AddrList.h>
 #include <PolledTimeout.h>
 
@@ -177,7 +173,7 @@ public:
     }
 
     // warning: handler is called from tcp stack context
-    // esp_yield and non-reentrant functions which depend on it will fail
+    // esp_suspend_from_cont and non-reentrant functions which depend on it will fail
     void onRx(rxhandler_t handler) {
         _on_rx = handler;
     }
