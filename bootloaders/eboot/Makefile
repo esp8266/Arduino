@@ -23,7 +23,7 @@ INC += -I../../tools/sdk/include -I../../tools/sdk/uzlib/src
 
 CFLAGS += -std=gnu99
 
-CFLAGS += -Os -fcommon -g -Wall -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals -ffunction-sections -fdata-sections
+CFLAGS += -Os -fcommon -g -Wall -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals -ffunction-sections -fdata-sections -free -fipa-pta
 
 CFLAGS += $(INC)
 
