@@ -91,7 +91,8 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
     {
         packetBuffer = new (std::nothrow) char[tcpBufferSize];
 
-        if (!packetBuffer) {
+        if (!packetBuffer)
+        {
             return;
         }
     }
