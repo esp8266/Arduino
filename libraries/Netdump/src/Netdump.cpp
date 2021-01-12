@@ -90,6 +90,10 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
     if (!packetBuffer)
     {
         packetBuffer = new (std::nothrow) char[tcpBufferSize];
+
+        if (!packetBuffer) {
+            return;
+        }
     }
     bufferIndex = 0;
 
@@ -162,7 +166,7 @@ void Netdump::tcpDumpProcess(const Packet& np)
     }
     size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
 
-    if (packetBuffer && bufferIndex + 16 + incl_len < tcpBufferSize) // only add if enough space available
+    if (bufferIndex + 16 + incl_len < tcpBufferSize) // only add if enough space available
     {
         struct timeval tv;
         gettimeofday(&tv, nullptr);
