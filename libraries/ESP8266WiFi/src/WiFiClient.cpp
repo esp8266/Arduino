@@ -207,7 +207,7 @@ size_t WiFiClient::write(uint8_t b)
 
 size_t WiFiClient::write(const uint8_t *buf, size_t size)
 {
-    if (!_client || !size)
+    if (!buf || !_client || !size)
     {
         return 0;
     }

@@ -162,7 +162,7 @@ void Netdump::tcpDumpProcess(const Packet& np)
     }
     size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
 
-    if (bufferIndex + 16 + incl_len < tcpBufferSize) // only add if enough space available
+    if (packetBuffer && bufferIndex + 16 + incl_len < tcpBufferSize) // only add if enough space available
     {
         struct timeval tv;
         gettimeofday(&tv, nullptr);
