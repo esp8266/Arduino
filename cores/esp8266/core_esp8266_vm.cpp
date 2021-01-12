@@ -53,10 +53,8 @@
       MISO -> GPIO12
    (note these are GPIO numbers, not the Arduion Dxx ones.  Refer to your
     ESP8266 board schematic for the mapping of GPIO to pin.)
- * Higher density PSRAM (ESP-PSRAM64H/etc.) should work as well, but I'm
-   still waiting on my chips so haven't done any testing.  Biggest concern
-   is their command set and functionality in DIO mode.  If DIO mode isn't
-   supported, then a fallback to SIO or moving to QIO is a possibility.
+ * Higher density PSRAM (ESP-PSRAM64H/etc.) works as well, but may be too
+   large to effectively use with UMM
  
 */
 

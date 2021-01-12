@@ -64,8 +64,6 @@ void setup() {
   Serial.begin(115200);
   Serial.printf("\n");
 
-  ESP.enableVM(); // Start up the VM handler, set up the memory manager, etc.
-
   // Enabling VM does not change malloc to use the external region.  It will continue to
   // use the normal RAM until we request otherwise.
   uint32_t *mem = (uint32_t *)malloc(1024 * sizeof(uint32_t));
