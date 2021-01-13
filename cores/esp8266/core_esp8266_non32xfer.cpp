@@ -159,39 +159,12 @@ IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cau
 }
 
 /*
-  An issue, the Boot ROM "C" wrapper for exception handlers,
-  _xtos_c_wrapper_handler, turns interrupts back on. To address this issue we
-  use our replacement in file `exc-c-wrapper-handler.S`.
-
-  An overview, of an exception at entry: New interrupts are blocked by EXCM
-  being set. Once cleared, interrupts above the current INTLEVEL and exceptions
-  (w/o creating a DoubleException) can occur.
-
-  Using our replacement for _xtos_c_wrapper_handler, INTLEVEL is raised to 15
-  with EXCM cleared.
-
-  The original Boot ROM `_xtos_c_wrapper_handler` would set INTLEVEL to 1 with
-  EXCM cleared, saved registers, then do a `rsil 0`, and called the registered
-  "C" Exception handler with interrupts fully enabled! Our replacement keeps
-  INTLEVEL at 15. This is needed to support the Arduino model of interrupts
-  disabled while an ISR runs.
-
-  And we also need it for umm_malloc to work safely with an IRAM heap from an
-  ISR call. While malloc() will supply DRAM for all allocation from an ISR,
-  we want free() to safely operate from an ISR to avoid a leak potential.
-
-  This replacement "C" Wrapper is only applied to this exception handler.
+  To operate reliably, this module requires the new
+  `_xtos_set_exception_handler` from `exc-sethandler.cpp` and
+  `_xtos_c_wrapper_handler` from `exc-c-wrapper-handler.S`. See comment block in
+  `exc-sethandler.cpp` for details on issues with interrupts being enabled by
+  "C" wrapper.
  */
-
-#define ROM_xtos_c_wrapper_handler (reinterpret_cast<_xtos_handler>(0x40000598))
-
-static void _set_exception_handler_wrapper(int cause) {
-  _xtos_handler old_wrapper = _xtos_exc_handler_table[cause];
-  if (old_wrapper == ROM_xtos_c_wrapper_handler) {
-    _xtos_exc_handler_table[cause] = _xtos_c_wrapper_handler;
-  }
-}
-
 void install_non32xfer_exception_handler(void) __attribute__((weak));
 void install_non32xfer_exception_handler(void) {
   if (NULL == old_c_handler) {
@@ -199,10 +172,6 @@ void install_non32xfer_exception_handler(void) {
     old_c_handler =
     _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR,
       non32xfer_exception_handler);
-
-    // Set the replacement ASM based exception "C" wrapper function which will
-    // be calling `non32xfer_exception_handler`.
-    _set_exception_handler_wrapper(EXCCAUSE_LOAD_STORE_ERROR);
   }
 }
 
