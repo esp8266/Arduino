@@ -39,4 +39,16 @@ extern int __analogRead(uint8_t pin)
 
 extern int analogRead(uint8_t pin) __attribute__ ((weak, alias("__analogRead")));
 
+
+void __analogReference(uint8_t mode)
+{
+    // Only DEFAULT is supported on the ESP8266
+    if (mode != DEFAULT) {
+        DEBUGV("analogReference called with illegal mode");
+    }
+}
+
+
+extern void analogReference(uint8_t mode) __attribute__ ((weak, alias("__analogReference")));
+
 };

@@ -84,12 +84,17 @@ void Netdump::fileDump(File& outfile, const Filter nf)
         fileDumpProcess(outfile, ndp);
     }, nf);
 }
-void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
+bool Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 {
 
     if (!packetBuffer)
     {
         packetBuffer = new (std::nothrow) char[tcpBufferSize];
+
+        if (!packetBuffer)
+        {
+            return false;
+        }
     }
     bufferIndex = 0;
 
@@ -97,6 +102,7 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
     {
         tcpDumpLoop(tcpDumpServer, nf);
     });
+    return true;
 }
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
