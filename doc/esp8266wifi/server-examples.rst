@@ -39,17 +39,19 @@ Then let's write a short function ``prepareHtmlPage()``, that will return a ``St
 
     String prepareHtmlPage()
     {
-      String htmlPage = 
-         String("HTTP/1.1 200 OK\r\n") +
-                "Content-Type: text/html\r\n" +
-                "Connection: close\r\n" +  // the connection will be closed after completion of the response
-                "Refresh: 5\r\n" +  // refresh the page automatically every 5 sec
-                "\r\n" +
-                "<!DOCTYPE HTML>" +
-                "<html>" +
-                "Analog input:  " + String(analogRead(A0)) +
-                "</html>" +
-                "\r\n";
+      String htmlPage;
+      htmlPage.reserve(1024);               // prevent ram fragmentation
+      htmlPage = F("HTTP/1.1 200 OK\r\n"
+                   "Content-Type: text/html\r\n"
+                   "Connection: close\r\n"  // the connection will be closed after completion of the response
+                   "Refresh: 5\r\n"         // refresh the page automatically every 5 sec
+                   "\r\n"
+                   "<!DOCTYPE HTML>"
+                   "<html>"
+                   "Analog input:  ");
+      htmlPage += analogRead(A0);
+      htmlPage += F("</html>"
+                    "\r\n");
       return htmlPage;
     }
 
@@ -79,7 +81,7 @@ The content contains two basic `HTML <https://www.w3schools.com/html/>`__ tags, 
 
 .. code:: cpp
 
-    String(analogRead(A0))
+    analogRead(A0)
 
 The Page is Served
 ~~~~~~~~~~~~~~~~~~
@@ -90,7 +92,7 @@ Serving of this web page will be done in the ``loop()`` where server is waiting 
 
     void loop()
     {
-      WiFiClient client = server.available(); 
+      WiFiClient client = server.available();
       if (client)
       {
         // we have a new client sending some request
@@ -125,6 +127,18 @@ The whole process is concluded by stopping the connection with client:
 .. code:: cpp
 
     client.stop();
+
+But before that, we must not interrupt client's request:
+
+.. code:: cpp
+
+    while (client.available()) {
+      // but first, let client finish its request
+      // that's diplomatic compliance to protocols
+      // (and otherwise some clients may complain, like curl)
+      // (that is an example, prefer using a proper webserver library)
+      client.read();
+    }
 
 Put it Together
 ~~~~~~~~~~~~~~~
@@ -163,24 +177,26 @@ Complete sketch is presented below.
     // prepare a web page to be send to a client (web browser)
     String prepareHtmlPage()
     {
-      String htmlPage = 
-         String("HTTP/1.1 200 OK\r\n") +
-                "Content-Type: text/html\r\n" +
-                "Connection: close\r\n" +  // the connection will be closed after completion of the response
-                "Refresh: 5\r\n" +  // refresh the page automatically every 5 sec
-                "\r\n" +
-                "<!DOCTYPE HTML>" +
-                "<html>" +
-                "Analog input:  " + String(analogRead(A0)) +
-                "</html>" +
-                "\r\n";
+      String htmlPage;
+      htmlPage.reserve(1024);               // prevent ram fragmentation
+      htmlPage = F("HTTP/1.1 200 OK\r\n"
+                   "Content-Type: text/html\r\n"
+                   "Connection: close\r\n"  // the connection will be closed after completion of the response
+                   "Refresh: 5\r\n"         // refresh the page automatically every 5 sec
+                   "\r\n"
+                   "<!DOCTYPE HTML>"
+                   "<html>"
+                   "Analog input:  ");
+      htmlPage += analogRead(A0);
+      htmlPage += F("</html>"
+                    "\r\n");
       return htmlPage;
     }
 
 
     void loop()
     {
-      WiFiClient client = server.available(); 
+      WiFiClient client = server.available();
       // wait for a client (web browser) to connect
       if (client)
       {
@@ -200,11 +216,18 @@ Complete sketch is presented below.
             }
           }
         }
-        delay(1); // give the web browser time to receive the data
+
+        while (client.available()) {
+          // but first, let client finish its request
+          // that's diplomatic compliance to protocols
+          // (and otherwise some clients may complain, like curl)
+          // (that is an example, prefer using a proper webserver library)
+          client.read();
+        }
 
         // close the connection:
         client.stop();
-        Serial.println("[Client disonnected]");
+        Serial.println("[Client disconnected]");
       }
     }
 
@@ -236,18 +259,13 @@ The page would be refreshed every 5 seconds. Each time this happens, you should 
     Host: 192.168.1.104
     DNT: 1
     Connection: Keep-Alive
-    [client disonnected]
-
-What Else?
-~~~~~~~~~~
-
-Looking on `client examples <client-examples.rst>`__ you will quickly find out the similarities in protocol to the server. The protocol starts with a header that contains information what communication will be about. It contains what content type is communicated or accepted like ``text/html``. It states whether connection will be kept alive or closed after submission of the header. It contains identification of the sender like ``User-Agent: Mozilla/5.0 (Windows NT 6.1)``, etc.
+    [client disconnected]
 
 Conclusion
 ~~~~~~~~~~
 
 The above example shows that a web server on ESP8266 can be set up in almost no time. Such server can easily stand up requests from much more powerful hardware and software like a PC with a web browser. Check out other classes like `ESP8266WebServer <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer>`__ that let you program more advanced applications.
 
-If you like to try another server example, check out `WiFiWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiWebServer/WiFiWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
+If you like to try another server example, check out `WiFiManualWebServer.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiManualWebServer/WiFiManualWebServer.ino>`__, that provides functionality of toggling the GPIO pin on and off out of a web browser.
 
 For the list of functions provided to implement and manage servers, please refer to the `Server Class <server-class.rst>`__ documentation.

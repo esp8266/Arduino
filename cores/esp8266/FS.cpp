@@ -46,6 +46,14 @@ int File::available() {
     return _p->size() - _p->position();
 }
 
+int File::availableForWrite() {
+    if (!_p)
+        return false;
+
+    return _p->availableForWrite();
+}
+
+
 int File::read() {
     if (!_p)
         return -1;
@@ -60,7 +68,7 @@ int File::read() {
 
 size_t File::read(uint8_t* buf, size_t size) {
     if (!_p)
-        return -1;
+        return 0;
 
     return _p->read(buf, size);
 }
@@ -187,10 +195,18 @@ time_t File::getLastWrite() {
     return _p->getLastWrite();
 }
 
+time_t File::getCreationTime() {
+    if (!_p)
+        return 0;
+
+    return _p->getCreationTime();
+}
+
 void File::setTimeCallback(time_t (*cb)(void)) {
     if (!_p)
         return;
     _p->setTimeCallback(cb);
+    _timeCallback = cb;
 }
 
 File Dir::openFile(const char* mode) {
@@ -206,7 +222,7 @@ File Dir::openFile(const char* mode) {
     }
 
     File f(_impl->openFile(om, am), _baseFS);
-    f.setTimeCallback(timeCallback);
+    f.setTimeCallback(_timeCallback);
     return f;
 }
 
@@ -222,6 +238,12 @@ time_t Dir::fileTime() {
     if (!_impl)
         return 0;
     return _impl->fileTime();
+}
+
+time_t Dir::fileCreationTime() {
+    if (!_impl)
+        return 0;
+    return _impl->fileCreationTime();
 }
 
 size_t Dir::fileSize() {
@@ -262,17 +284,11 @@ bool Dir::rewind() {
     return _impl->rewind();
 }
 
-time_t Dir::getLastWrite() {
-    if (!_impl)
-        return 0;
-
-    return _impl->getLastWrite();
-}
-
 void Dir::setTimeCallback(time_t (*cb)(void)) {
     if (!_impl)
         return;
     _impl->setTimeCallback(cb);
+    _timeCallback = cb;
 }
 
 
@@ -289,6 +305,7 @@ bool FS::begin() {
         DEBUGV("#error: FS: no implementation");
         return false;
     }
+    _impl->setTimeCallback(_timeCallback);
     bool ret = _impl->begin();
     DEBUGV("%s\n", ret? "": "#error: FS could not start");
     return ret;
@@ -351,7 +368,7 @@ File FS::open(const char* path, const char* mode) {
         return File();
     }
     File f(_impl->open(path, om, am), this);
-    f.setTimeCallback(timeCallback);
+    f.setTimeCallback(_timeCallback);
     return f;
 }
 
@@ -372,7 +389,7 @@ Dir FS::openDir(const char* path) {
     }
     DirImplPtr p = _impl->openDir(path);
     Dir d(p, this);
-    d.setTimeCallback(timeCallback);
+    d.setTimeCallback(_timeCallback);
     return d;
 }
 
@@ -428,6 +445,7 @@ void FS::setTimeCallback(time_t (*cb)(void)) {
     if (!_impl)
         return;
     _impl->setTimeCallback(cb);
+    _timeCallback = cb;
 }
 
 

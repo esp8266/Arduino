@@ -31,7 +31,7 @@
 const IPAddress ESP8266WiFiMesh::emptyIP = IPAddress();
 const uint32_t ESP8266WiFiMesh::lwipVersion203Signature[3] {2,0,3};
 
-String ESP8266WiFiMesh::lastSSID = "";
+String ESP8266WiFiMesh::lastSSID;
 bool ESP8266WiFiMesh::staticIPActivated = false;
 
 // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
@@ -55,7 +55,7 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHand
 {
   storeLwipVersion();
   
-  updateNetworkNames(meshName, (nodeID != "" ? nodeID : uint64ToString(ESP.getChipId())));
+  updateNetworkNames(meshName, (!nodeID.isEmpty() ? nodeID : uint64ToString(ESP.getChipId())));
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
   setWiFiChannel(meshWiFiChannel);
@@ -67,9 +67,9 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHand
 
 void ESP8266WiFiMesh::updateNetworkNames(const String &newMeshName, const String &newNodeID)
 {
-  if(newMeshName != "")
+  if(!newMeshName.isEmpty())
     _meshName = newMeshName;
-  if(newNodeID != "")
+  if(!newNodeID.isEmpty())
     _nodeID = newNodeID;
 
   String newSSID = _meshName + _nodeID;
@@ -453,7 +453,7 @@ void ESP8266WiFiMesh::initiateConnectionToAP(const String &targetSSID, int targe
  */
 transmission_status_t ESP8266WiFiMesh::connectToNode(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
 {
-  if(staticIPActivated && lastSSID != "" && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
+  if(staticIPActivated && !lastSSID.isEmpty() && lastSSID != targetSSID) // So we only do this once per connection, in case there is a performance impact.
   {
     #ifdef ENABLE_STATIC_IP_OPTIMIZATION
     if(atLeastLwipVersion(lwipVersion203Signature))
@@ -562,12 +562,12 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
       WiFi.disconnect();
       yield();
 
-      String currentSSID = "";
+      String currentSSID;
       int currentWiFiChannel = NETWORK_INFO_DEFAULT_INT;
       uint8_t *currentBSSID = NULL;
 
       // If an SSID has been assigned, it is prioritized over an assigned networkIndex since the networkIndex is more likely to change.
-      if(currentNetwork.SSID != "")
+      if(!currentNetwork.SSID.isEmpty())
       {
         currentSSID = currentNetwork.SSID;
         currentWiFiChannel = currentNetwork.wifiChannel;

@@ -371,8 +371,9 @@ uart_get_rx_buffer_size(uart_t* uart)
 
 // The default ISR handler called when GDB is not enabled
 void ICACHE_RAM_ATTR
-uart_isr(void * arg)
+uart_isr(void * arg, void * frame)
 {
+    (void) frame;
     uart_t* uart = (uart_t*)arg;
     uint32_t usis = USIS(uart->uart_nr);
 
@@ -505,8 +506,10 @@ uart_write(uart_t* uart, const char* buf, size_t size)
 
     size_t ret = size;
     const int uart_nr = uart->uart_nr;
-    while (size--)
+    while (size--) {
         uart_do_write_char(uart_nr, pgm_read_byte(buf++));
+        optimistic_yield(10000UL);
+    }
 
     return ret;
 }

@@ -879,8 +879,6 @@ s32_t spiffs_page_delete(
     spiffs *fs,
     spiffs_page_ix pix) {
   s32_t res;
-  spiffs_page_header hdr;
-  hdr.flags = 0xff & ~(SPIFFS_PH_FLAG_DELET | SPIFFS_PH_FLAG_USED);
   // mark deleted entry in source object lookup
   spiffs_obj_id d_obj_id = SPIFFS_OBJ_ID_DELETED;
   res = _spiffs_wr(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_DELE,
@@ -893,12 +891,29 @@ s32_t spiffs_page_delete(
   fs->stats_p_deleted++;
   fs->stats_p_allocated--;
 
+#if SPIFFS_SECURE_ERASE
+  // Secure erase
+  unsigned char data[SPIFFS_CFG_LOG_PAGE_SZ(fs) - sizeof(spiffs_page_header)];
+  bzero(data, sizeof(data));
+  res = _spiffs_wr(fs,  SPIFFS_OP_T_OBJ_DA | SPIFFS_OP_C_DELE,
+      0,
+      SPIFFS_PAGE_TO_PADDR(fs, pix) + sizeof(spiffs_page_header), sizeof(data), data);
+  SPIFFS_CHECK_RES(res);
+#endif
+
   // mark deleted in source page
+  u8_t flags = 0xff;
+#if SPIFFS_NO_BLIND_WRITES
+  res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_DA | SPIFFS_OP_C_READ,
+      0, SPIFFS_PAGE_TO_PADDR(fs, pix) + offsetof(spiffs_page_header, flags),
+      sizeof(flags), &flags);
+  SPIFFS_CHECK_RES(res);
+#endif
+  flags &= ~(SPIFFS_PH_FLAG_DELET | SPIFFS_PH_FLAG_USED);
   res = _spiffs_wr(fs, SPIFFS_OP_T_OBJ_DA | SPIFFS_OP_C_DELE,
       0,
       SPIFFS_PAGE_TO_PADDR(fs, pix) + offsetof(spiffs_page_header, flags),
-      sizeof(u8_t),
-      (u8_t *)&hdr.flags);
+      sizeof(flags), &flags);
 
   return res;
 }
@@ -2027,7 +2042,7 @@ s32_t spiffs_object_read(
     // remaining data in page
     len_to_read = MIN(len_to_read, SPIFFS_DATA_PAGE_SIZE(fs) - (cur_offset % SPIFFS_DATA_PAGE_SIZE(fs)));
     // remaining data in file
-    len_to_read = MIN(len_to_read, fd->size);
+    len_to_read = MIN(len_to_read, fd->size - cur_offset);
     SPIFFS_DBG("read: offset:" _SPIPRIi " rd:" _SPIPRIi " data spix:" _SPIPRIsp " is data_pix:" _SPIPRIpg " addr:" _SPIPRIad "\n", cur_offset, len_to_read, data_spix, data_pix,
         (u32_t)(SPIFFS_PAGE_TO_PADDR(fs, data_pix) + sizeof(spiffs_page_header) + (cur_offset % SPIFFS_DATA_PAGE_SIZE(fs))));
     if (len_to_read <= 0) {

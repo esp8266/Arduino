@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cerrno>
 #include "flash_hal_mock.h"
 
 #define LITTLEFS_FILE_NAME "littlefs.bin"
@@ -95,7 +96,7 @@ void LittleFSMock::load ()
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "LittleFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
-        if (!m_overwrite)
+        if (!m_overwrite && flen > 0)
         {
             fprintf(stderr, "LittleFS: aborting at user request\n");
             exit(1);

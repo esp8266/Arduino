@@ -22,43 +22,8 @@
 #define ESP_H
 
 #include <Arduino.h>
-
-// Vendor IDs taken from Flashrom project
-// https://review.coreboot.org/cgit/flashrom.git/tree/flashchips.h?h=1.0.x
-typedef enum {
-    SPI_FLASH_VENDOR_ALLIANCE    = 0x52,    /* Alliance Semiconductor */
-    SPI_FLASH_VENDOR_AMD         = 0x01,    /* AMD */
-    SPI_FLASH_VENDOR_AMIC        = 0x37,    /* AMIC */
-    SPI_FLASH_VENDOR_ATMEL       = 0x1F,    /* Atmel (now used by Adesto) */
-    SPI_FLASH_VENDOR_BRIGHT      = 0xAD,    /* Bright Microelectronics */
-    SPI_FLASH_VENDOR_CATALYST    = 0x31,    /* Catalyst */
-    SPI_FLASH_VENDOR_EON         = 0x1C,    /* EON Silicon Devices, missing 0x7F prefix */
-    SPI_FLASH_VENDOR_ESMT        = 0x8C,    /* Elite Semiconductor Memory Technology (ESMT) / EFST Elite Flash Storage */
-    SPI_FLASH_VENDOR_EXCEL       = 0x4A,    /* ESI, missing 0x7F prefix */
-    SPI_FLASH_VENDOR_FIDELIX     = 0xF8,    /* Fidelix */
-    SPI_FLASH_VENDOR_FUJITSU     = 0x04,    /* Fujitsu */
-    SPI_FLASH_VENDOR_GIGADEVICE  = 0xC8,    /* GigaDevice */
-    SPI_FLASH_VENDOR_HYUNDAI     = 0xAD,    /* Hyundai */
-    SPI_FLASH_VENDOR_INTEL       = 0x89,    /* Intel */
-    SPI_FLASH_VENDOR_ISSI        = 0xD5,    /* ISSI Integrated Silicon Solutions, see also PMC. */
-    SPI_FLASH_VENDOR_MACRONIX    = 0xC2,    /* Macronix (MX) */
-    SPI_FLASH_VENDOR_NANTRONICS  = 0xD5,    /* Nantronics, missing prefix */
-    SPI_FLASH_VENDOR_PMC         = 0x9D,    /* PMC, missing 0x7F prefix */
-    SPI_FLASH_VENDOR_PUYA        = 0x85,    /* Puya semiconductor (shanghai) co. ltd */
-    SPI_FLASH_VENDOR_SANYO       = 0x62,    /* Sanyo */
-    SPI_FLASH_VENDOR_SHARP       = 0xB0,    /* Sharp */
-    SPI_FLASH_VENDOR_SPANSION    = 0x01,    /* Spansion, same ID as AMD */
-    SPI_FLASH_VENDOR_SST         = 0xBF,    /* SST */
-    SPI_FLASH_VENDOR_ST          = 0x20,    /* ST / SGS/Thomson / Numonyx (later acquired by Micron) */
-    SPI_FLASH_VENDOR_SYNCMOS_MVC = 0x40,    /* SyncMOS (SM) and Mosel Vitelic Corporation (MVC) */
-    SPI_FLASH_VENDOR_TENX        = 0x5E,    /* Tenx Technologies */
-    SPI_FLASH_VENDOR_TI          = 0x97,    /* Texas Instruments */
-    SPI_FLASH_VENDOR_TI_OLD      = 0x01,    /* TI chips from last century */
-    SPI_FLASH_VENDOR_WINBOND     = 0xDA,    /* Winbond */
-    SPI_FLASH_VENDOR_WINBOND_NEX = 0xEF,    /* Winbond (ex Nexcom) serial flashes */
-
-    SPI_FLASH_VENDOR_UNKNOWN     = 0xFF
-} SPI_FLASH_VENDOR_t;
+#include "core_esp8266_features.h"
+#include "spi_vendors.h"
 
 /**
  * AVR macros for WDT managment
@@ -157,7 +122,13 @@ class EspClass {
         uint8_t getBootVersion();
         uint8_t getBootMode();
 
-        uint8_t getCpuFreqMHz();
+#if defined(F_CPU) || defined(CORE_MOCK)
+        constexpr
+#endif
+            inline uint8_t getCpuFreqMHz() const __attribute__((always_inline))
+        {
+            return esp_get_cpu_freq_mhz();
+        }
 
         uint32_t getFlashChipId();
         uint8_t getFlashChipVendorId();
@@ -176,9 +147,51 @@ class EspClass {
 
         bool checkFlashConfig(bool needsEquals = false);
 
+        bool checkFlashCRC();
+
         bool flashEraseSector(uint32_t sector);
-        bool flashWrite(uint32_t offset, uint32_t *data, size_t size);
-        bool flashRead(uint32_t offset, uint32_t *data, size_t size);
+        /**
+         * @brief Write @a size bytes from @a data to flash at @a address
+         * This overload requires @a data and @a size to be always 4 byte aligned and
+         * @a address to be 4 byte aligned if the write crossess page boundary,
+         * but guarantees no overhead (except on PUYA flashes)
+         * @param address address on flash where write should start, 4 byte alignment is conditional
+         * @param data input buffer, must be 4-byte aligned
+         * @param size amount of data, must be a multiple of 4
+         * @return bool result of operation
+         * @retval true success
+         * @retval false failure to write to flash or incorrect alignment of params
+         */
+        bool flashWrite(uint32_t address, const uint32_t *data, size_t size);
+        /**
+         * @brief Write @a size bytes from @a data to flash at @a address
+         * This overload handles all misalignment cases
+         * @param address address on flash where write should start
+         * @param data input buffer, passing unaligned memory will cause significant stack usage
+         * @param size amount of data, passing not multiple of 4 will cause additional reads and writes
+         * @return bool result of operation
+         */
+        bool flashWrite(uint32_t address, const uint8_t *data, size_t size);
+        /**
+         * @brief Read @a size bytes to @a data to flash at @a address
+         * This overload requires @a data and @a size to be 4 byte aligned
+         * @param address address on flash where read should start
+         * @param data input buffer, must be 4-byte aligned
+         * @param size amount of data, must be a multiple of 4
+         * @return bool result of operation
+         * @retval true success
+         * @retval false failure to read from flash or incorrect alignment of params
+         */
+        bool flashRead(uint32_t address, uint32_t *data, size_t size);
+        /**
+         * @brief Read @a size bytes to @a data to flash at @a address
+         * This overload handles all misalignment cases
+         * @param address address on flash where read should start
+         * @param data input buffer, passing unaligned memory will cause significant stack usage
+         * @param size amount of data, passing not multiple of 4 will cause additional read
+         * @return bool result of operation
+         */
+        bool flashRead(uint32_t address, uint8_t *data, size_t size);
 
         uint32_t getSketchSize();
         String getSketchMD5();
@@ -191,20 +204,91 @@ class EspClass {
 
         bool eraseConfig();
 
-#ifndef CORE_MOCK
-        inline uint32_t getCycleCount() __attribute__((always_inline));
+        uint8_t *random(uint8_t *resultArray, const size_t outputSizeBytes) const;
+        uint32_t random() const;
+
+#if !defined(CORE_MOCK)
+        inline uint32_t getCycleCount() __attribute__((always_inline))
+        {
+            return esp_get_cycle_count();
+        }
 #else
         uint32_t getCycleCount();
-#endif
-};
-
-#ifndef CORE_MOCK
-uint32_t EspClass::getCycleCount()
-{
-    return esp_get_cycle_count();
-}
-
 #endif // !defined(CORE_MOCK)
+        /**
+         * @brief Installs VM exception handler to support External memory (Experimental)
+         *
+         * @param none
+         * @return none
+         */
+        void enableVM();
+        /**
+         * @brief Push current Heap selection and set Heap selection to DRAM.
+         *
+         * @param none
+         * @return none
+         */
+        void setDramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to IRAM.
+         *
+         * @param none
+         * @return none
+         */
+        void setIramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to External. (Experimental)
+         *
+         * @param none
+         * @return none
+         */
+        void setExternalHeap();
+        /**
+         * @brief Restores Heap selection back to value present when
+         * setDramHeap, setIramHeap, or setExternalHeap was called.
+         *
+         * @param none
+         * @return none
+         */
+        void resetHeap();
+    private:
+#ifdef UMM_HEAP_EXTERNAL
+        bool vmEnabled = false;
+#endif
+        /**
+         * @brief Replaces @a byteCount bytes of a 4 byte block on flash
+         *
+         * @param address flash address
+         * @param value buffer with data
+         * @param byteCount number of bytes to replace
+         * @return bool result of operation
+         * @retval true success
+         * @retval false failed to read/write or invalid args
+         */
+        bool flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_t byteCount);
+        /**
+         * @brief Write up to @a size bytes from @a data to flash at @a address
+         * This function takes case of unaligned memory acces by copying @a data to a temporary buffer,
+         * it also takes care of page boundary crossing see @a flashWritePageBreak as to why it's done.
+         * Less than @a size bytes may be written, due to 4 byte alignment requirement of spi_flash_write
+         * @param address address on flash where write should start
+         * @param data input buffer
+         * @param size amount of data
+         * @return size_t amount of data written, 0 on failure
+         */
+        size_t flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size);
+        /**
+         * @brief Splits up to 4 bytes into 4 byte blocks and writes them to flash
+         * We need this since spi_flash_write cannot handle writing over a page boundary with unaligned offset
+         * i.e. spi_flash_write(254, data, 4) will fail, also we cannot write less bytes as in
+         * spi_flash_write(254, data, 2) since it will be extended internally to 4 bytes and fail
+         * @param address start of write
+         * @param data data to be written
+         * @param size amount of data, must be < 4
+         * @return bool result of operation
+         */
+        bool flashWritePageBreak(uint32_t address, const uint8_t *data, size_t size);
+};
 
 extern EspClass ESP;
 

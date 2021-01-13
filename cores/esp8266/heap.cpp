@@ -5,6 +5,11 @@
 
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
+
+// Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
+#define FORCE_ALWAYS_INLINE_HEAP_SELECT
+#include "umm_malloc/umm_heap_select.h"
+
 #include <c_types.h>
 #include <sys/reent.h>
 #include <user_interface.h>
@@ -16,15 +21,17 @@ extern "C" {
 #define UMM_CALLOC(n,s)         umm_poison_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) umm_poison_realloc_fl(p,s,f,l)
 #define UMM_FREE_FL(p,f,l)      umm_poison_free_fl(p,f,l)
+#define STATIC_ALWAYS_INLINE
 
 #undef realloc
 #undef free
 
-#elif defined(DEBUG_ESP_OOM)
+#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK)
 #define UMM_MALLOC(s)           umm_malloc(s)
 #define UMM_CALLOC(n,s)         umm_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) umm_realloc(p,s)
 #define UMM_FREE_FL(p,f,l)      umm_free(p)
+#define STATIC_ALWAYS_INLINE
 
 #undef realloc
 #undef free
@@ -34,6 +41,10 @@ extern "C" {
 #define UMM_CALLOC(n,s)         calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) realloc(p,s)
 #define UMM_FREE_FL(p,f,l)      free(p)
+
+// STATIC_ALWAYS_INLINE only applys to the non-debug build path,
+// it must not be enabled on the debug build path.
+#define STATIC_ALWAYS_INLINE static ALWAYS_INLINE
 #endif
 
 
@@ -164,7 +175,7 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
         if (inISR && (uint32_t)file >= 0x40200000) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
-            char buf[ets_strlen(file)] __attribute__ ((aligned(4)));
+            char buf[ets_strlen(file) + 1] __attribute__((aligned(4)));
             ets_strcpy(buf, file);
             DEBUG_HEAP_PRINTF(buf);
         } else {
@@ -259,8 +270,8 @@ void ICACHE_RAM_ATTR free(void* p)
 }
 #endif
 
-
-void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* ICACHE_RAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
@@ -270,7 +281,8 @@ void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
     return ret;
 }
 
-void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* ICACHE_RAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
@@ -280,7 +292,8 @@ void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, 
     return ret;
 }
 
-void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* ICACHE_RAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     void* ret = UMM_REALLOC_FL(ptr, size, file, line);
@@ -290,7 +303,8 @@ void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, in
     return ret;
 }
 
-void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* ICACHE_RAM_ATTR heap_pvPortZalloc(size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
@@ -300,7 +314,8 @@ void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
     return ret;
 }
 
-void ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void ICACHE_RAM_ATTR heap_vPortFree(void *ptr, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     UMM_FREE_FL(ptr, file, line);
@@ -314,7 +329,47 @@ size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
 
 void system_show_malloc(void)
 {
-    umm_info(NULL, 1);
+    HeapSelectDram ephemeral;
+    umm_info(NULL, true);
+}
+
+/*
+  NONOS SDK and lwIP do not handle IRAM heap well. Since they also use portable
+  malloc calls pvPortMalloc, ... we can leverage that for this solution.
+  Force pvPortMalloc, ... APIs to serve DRAM only.
+*/
+void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortMalloc(size,  file, line);;
+}
+
+void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortCalloc(count, size,  file, line);
+}
+
+void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortRealloc(ptr, size,  file, line);
+}
+
+void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortZalloc(size,  file, line);
+}
+
+void ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line)
+{
+#if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
+    // This is only needed for debug checks to ensure they are performed in
+    // correct context. umm_malloc free internally determines the correct heap.
+    HeapSelectDram ephemeral;
+#endif
+    return heap_vPortFree(ptr,  file, line);
 }
 
 };

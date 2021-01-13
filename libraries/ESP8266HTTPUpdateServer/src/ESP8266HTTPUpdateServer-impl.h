@@ -21,12 +21,12 @@ static const char serverIndex[] PROGMEM =
      <body>
      <form method='POST' action='' enctype='multipart/form-data'>
          Firmware:<br>
-         <input type='file' accept='.bin' name='firmware'>
+         <input type='file' accept='.bin,.bin.gz' name='firmware'>
          <input type='submit' value='Update Firmware'>
      </form>
      <form method='POST' action='' enctype='multipart/form-data'>
          FileSystem:<br>
-         <input type='file' accept='.bin' name='filesystem'>
+         <input type='file' accept='.bin,.bin.gz' name='filesystem'>
          <input type='submit' value='Update FileSystem'>
      </form>
      </body>
@@ -93,7 +93,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
       HTTPUpload& upload = _server->upload();
 
       if(upload.status == UPLOAD_FILE_START){
-        _updaterError = String();
+        _updaterError.clear();
         if (_serial_output)
           Serial.setDebugOutput(true);
 

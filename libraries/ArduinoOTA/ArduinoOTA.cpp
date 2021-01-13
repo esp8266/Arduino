@@ -31,19 +31,6 @@ extern "C" {
 #endif
 
 ArduinoOTAClass::ArduinoOTAClass()
-: _port(0)
-, _udp_ota(0)
-, _initialized(false)
-, _rebootOnSuccess(true)
-, _useMDNS(true)
-, _state(OTA_IDLE)
-, _size(0)
-, _cmd(0)
-, _ota_port(0)
-, _start_callback(NULL)
-, _end_callback(NULL)
-, _error_callback(NULL)
-, _progress_callback(NULL)
 {
 }
 
@@ -168,7 +155,7 @@ int ArduinoOTAClass::parseInt(){
 }
 
 String ArduinoOTAClass::readStringUntil(char end){
-  String res = "";
+  String res;
   int value;
   while(true){
     value = _udp_ota->read();
@@ -328,9 +315,13 @@ void ArduinoOTAClass::_runUpdate() {
   }
 
   if (Update.end()) {
-    client.print("OK");
-    client.stop();
+    // Ensure last count packet has been sent out and not combined with the final OK
+    client.flush();
     delay(1000);
+    client.print("OK");
+    client.flush();
+    delay(1000);
+    client.stop();
 #ifdef OTA_DEBUG
     OTA_DEBUG.printf("Update Success\n");
 #endif

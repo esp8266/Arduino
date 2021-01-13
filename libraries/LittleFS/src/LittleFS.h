@@ -89,7 +89,7 @@ public:
     DirImplPtr openDir(const char *path) override;
 
     bool exists(const char* path) override {
-	if ( !_mounted || !path || !path[0] ) {
+        if (!_mounted || !path || !path[0]) {
             return false;
         }
         lfs_info info;
@@ -98,7 +98,7 @@ public:
     }
 
     bool rename(const char* pathFrom, const char* pathTo) override {
-	if (!_mounted || !pathFrom || !pathFrom[0] || !pathTo || !pathTo[0]) {
+        if (!_mounted || !pathFrom || !pathFrom[0] || !pathTo || !pathTo[0]) {
             return false;
         }
         int rc = lfs_rename(&_lfs, pathFrom, pathTo);
@@ -323,7 +323,7 @@ protected:
 class LittleFSFileImpl : public FileImpl
 {
 public:
-    LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd) : _fs(fs), _fd(fd), _opened(true) {
+    LittleFSFileImpl(LittleFSImpl* fs, const char *name, std::shared_ptr<lfs_file_t> fd, int flags, time_t creation) : _fs(fs), _fd(fd), _opened(true), _flags(flags), _creation(creation) {
         _name = std::shared_ptr<char>(new char[strlen(name) + 1], std::default_delete<char[]>());
         strcpy(_name.get(), name);
     }
@@ -377,9 +377,14 @@ public:
         if (mode == SeekEnd) {
             offset = -offset; // TODO - this seems like its plain wrong vs. POSIX
         }
+        auto lastPos = position();
         int rc = lfs_file_seek(_fs->getFS(), _getFD(), offset, (int)mode); // NB. SeekMode === LFS_SEEK_TYPES
         if (rc < 0) {
             DEBUGV("lfs_file_seek rc=%d\n", rc);
+            return false;
+        }
+        if (position() > size()) {
+            seek(lastPos, SeekSet); // Pretend the seek() never happened
             return false;
         }
         return true;
@@ -419,13 +424,20 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
-	    if (timeCallback) {
+            if (_timeCallback && (_flags & LFS_O_WRONLY)) {
+                // If the file opened with O_CREAT, write the creation time attribute
+                if (_creation) {
+                    int rc = lfs_setattr(_fs->getFS(), _name.get(), 'c', (const void *)&_creation, sizeof(_creation));
+                    if (rc < 0) {
+                        DEBUGV("Unable to set creation time on '%s' to %d\n", _name.get(), _creation);
+                    }
+                }
                 // Add metadata with last write time
-                time_t now = timeCallback();
+                time_t now = _timeCallback();
                 int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
                 if (rc < 0) {
-                    DEBUGV("Unable to set time on '%s' to %d\n", _name.get(), now);
-               }
+                    DEBUGV("Unable to set last write time on '%s' to %d\n", _name.get(), now);
+                }
             }
         }
     }
@@ -434,6 +446,16 @@ public:
         time_t ftime = 0;
         if (_opened && _fd) {
             int rc = lfs_getattr(_fs->getFS(), _name.get(), 't', (void *)&ftime, sizeof(ftime));
+            if (rc != sizeof(ftime))
+                ftime = 0; // Error, so clear read value
+        }
+        return ftime;
+    }
+
+    time_t getCreationTime() override {
+        time_t ftime = 0;
+        if (_opened && _fd) {
+            int rc = lfs_getattr(_fs->getFS(), _name.get(), 'c', (void *)&ftime, sizeof(ftime));
             if (rc != sizeof(ftime))
                 ftime = 0; // Error, so clear read value
         }
@@ -483,6 +505,8 @@ protected:
     std::shared_ptr<lfs_file_t>  _fd;
     std::shared_ptr<char>        _name;
     bool                         _opened;
+    int                          _flags;
+    time_t                       _creation;
 };
 
 class LittleFSDirImpl : public DirImpl
@@ -511,13 +535,9 @@ public:
         int nameLen = 3; // Slashes, terminator
         nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
         nameLen += strlen(_dirent.name);
-        char *tmpName = (char*)malloc(nameLen);
-        if (!tmpName) {
-            return FileImplPtr();
-        }
-	snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
+        char tmpName[nameLen];
+        snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
         auto ret = _fs->open((const char *)tmpName, openMode, accessMode);
-        free(tmpName);
         return ret;
     }
 
@@ -536,23 +556,35 @@ public:
     }
 
     time_t fileTime() override {
-        if (!_valid) {
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('t', 8, &t)) {
+            return t;
+        } else if (_getAttr('t', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
             return 0;
         }
-        int nameLen = 3; // Slashes, terminator
-        nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
-        nameLen += strlen(_dirent.name);
-        char *tmpName = (char*)malloc(nameLen);
-        if (!tmpName) {
+    }
+
+    time_t fileCreationTime() override {
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('c', 8, &t)) {
+            return t;
+        } else if (_getAttr('c', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
             return 0;
         }
-        snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
-        time_t ftime = 0;
-        int rc = lfs_getattr(_fs->getFS(), tmpName, 't', (void *)&ftime, sizeof(ftime));
-        if (rc != sizeof(ftime))
-            ftime = 0; // Error, so clear read value
-        free(tmpName);
-        return ftime;
     }
 
 
@@ -567,6 +599,10 @@ public:
     bool rewind() override {
         _valid = false;
         int rc = lfs_dir_rewind(_fs->getFS(), _getDir());
+        // Skip the . and .. entries
+        lfs_info dirent;
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
+        lfs_dir_read(_fs->getFS(), _getDir(), &dirent);
         return (rc == 0);
     }
 
@@ -585,6 +621,19 @@ public:
 protected:
     lfs_dir_t *_getDir() const {
         return _dir.get();
+    }
+
+    bool _getAttr(char attr, int len, void *dest) {
+        if (!_valid || !len || !dest) {
+            return false;
+        }
+        int nameLen = 3; // Slashes, terminator
+        nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
+        nameLen += strlen(_dirent.name);
+        char tmpName[nameLen];
+        snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
+        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, dest, len);
+        return (rc == len);
     }
 
     String                      _pattern;

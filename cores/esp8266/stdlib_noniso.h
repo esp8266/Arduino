@@ -44,6 +44,9 @@ char* dtostrf (double val, signed char width, unsigned char prec, char *s);
 
 void reverse(char* begin, char* end);
 
+const char* strrstr(const char*__restrict p_pcString,
+                    const char*__restrict p_pcPattern);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

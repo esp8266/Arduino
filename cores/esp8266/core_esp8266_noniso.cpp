@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+#include <limits>
 #include "stdlib_noniso.h"
 
 extern "C" {
@@ -77,10 +78,14 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     // Figure out how big our number really is
     double tenpow = 1.0;
     int digitcount = 1;
-    while (number >= 10.0 * tenpow) {
-        tenpow *= 10.0;
+    double nextpow;
+    while (number >= (nextpow = (10.0 * tenpow))) {
+        tenpow = nextpow;
         digitcount++;
     }
+
+    // minimal compensation for possible lack of precision (#7087 addition)
+    number *= 1 + std::numeric_limits<decltype(number)>::epsilon();
 
     number /= tenpow;
     fillme -= digitcount;
@@ -110,6 +115,38 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     // make sure the string is terminated
     *out = 0;
     return s;
+}
+
+/*
+    strrstr (static)
+
+    Backwards search for p_pcPattern in p_pcString
+    Based on: https://stackoverflow.com/a/1634398/2778898
+
+*/
+const char* strrstr(const char*__restrict p_pcString,
+                    const char*__restrict p_pcPattern)
+{
+    const char* pcResult = 0;
+
+    size_t      stStringLength = (p_pcString ? strlen(p_pcString) : 0);
+    size_t      stPatternLength = (p_pcPattern ? strlen(p_pcPattern) : 0);
+
+    if ((stStringLength) &&
+            (stPatternLength) &&
+            (stPatternLength <= stStringLength))
+    {
+        // Pattern is shorter or has the same length than the string
+        for (const char* s = (p_pcString + stStringLength - stPatternLength); s >= p_pcString; --s)
+        {
+            if (0 == strncmp(s, p_pcPattern, stPatternLength))
+            {
+                pcResult = s;
+                break;
+            }
+        }
+    }
+    return pcResult;
 }
 
 };

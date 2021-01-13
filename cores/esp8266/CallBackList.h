@@ -64,7 +64,7 @@ public:
 	}
 
     template<typename... Args>
-    void execute(Args... params) {
+    int execute(Args... params) {
         for(auto it = std::begin(callBackEventList); it != std::end(callBackEventList); ) {
         	CallBackHandler &handler = *it;
             if (handler->allowRemove() && handler.unique()) {
@@ -75,6 +75,7 @@ public:
                 ++it;
             }
         }
+        return callBackEventList.size();
     }
 };
 

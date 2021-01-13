@@ -234,6 +234,8 @@ namespace brssl {
     if (po) {
       free(po->name);
       free(po->data);
+      po->name = nullptr;
+      po->data = nullptr;
     }
   }
 
@@ -524,6 +526,10 @@ namespace brssl {
       case BR_KEYTYPE_EC:
         ek = br_skey_decoder_get_ec(dc.get());
         sk = (private_key*)malloc(sizeof * sk);
+        if (!sk)
+        {
+          return nullptr;
+        }
         sk->key_type = BR_KEYTYPE_EC;
         sk->key.ec.curve = ek->curve;
         sk->key.ec.x = (uint8_t*)malloc(ek->xlen);
@@ -624,6 +630,17 @@ namespace brssl {
     return pk;
   }
 
+  static uint8_t *loadStream(Stream& stream, size_t size) {
+    uint8_t *dest = (uint8_t *)malloc(size);
+    if (!dest) {
+      return nullptr;  // OOM error
+    }
+    if (size != stream.readBytes(dest, size)) {
+      free(dest);  // Error during read
+      return nullptr;
+    }
+    return dest;
+  }
 };
 
 
@@ -644,6 +661,15 @@ PublicKey::PublicKey(const char *pemKey) {
 PublicKey::PublicKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
+}
+
+PublicKey::PublicKey(Stream &stream, size_t size) {
+  _key = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    parse(buff, size);
+    free(buff);
+  }
 }
 
 PublicKey::~PublicKey() {
@@ -707,6 +733,15 @@ PrivateKey::PrivateKey(const char *pemKey) {
 PrivateKey::PrivateKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
+}
+
+PrivateKey::PrivateKey(Stream &stream, size_t size) {
+  _key = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    parse(buff, size);
+    free(buff);
+  }
 }
 
 PrivateKey::~PrivateKey() {
@@ -779,6 +814,17 @@ X509List::X509List(const uint8_t *derCert, size_t derLen) {
   append(derCert, derLen);
 }
 
+X509List::X509List(Stream &stream, size_t size) {
+  _count = 0;
+  _cert = nullptr;
+  _ta = nullptr;
+  auto buff = brssl::loadStream(stream, size);
+  if (buff) {
+    append(buff, size);
+    free(buff);
+  }
+}
+
 X509List::~X509List() {
   brssl::free_certificates(_cert, _count); // also frees cert
   for (size_t i = 0; i < _count; i++) {
@@ -830,6 +876,22 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   return true;
 }
 
+ServerSessions::~ServerSessions() {
+  if (_isDynamic && _store != nullptr)
+    delete _store;
+}
+
+ServerSessions::ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic) :
+  _size(sessions != nullptr ? size : 0),
+  _store(sessions), _isDynamic(isDynamic) {
+    if (_size > 0)
+      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store, size * sizeof(ServerSession));
+}
+
+const br_ssl_session_cache_class **ServerSessions::getCache() {
+  return _size > 0 ? &_cache.vtable : nullptr;
+}
+
 // SHA256 hash for updater
 void HashSHA256::begin() {
   br_sha256_init( &_cc );
@@ -870,9 +932,9 @@ uint32_t SigningVerifier::length()
   }
 }
 
-bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
-  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
-
+// We need to use the 2nd stack to do a verification, so do the thunk
+// directly inside the class function for ease of use.
+extern "C" bool SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (_pubKey->isRSA()) {
     bool ret;
     unsigned char vrf[hash->len()];
@@ -889,6 +951,20 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
     return vrfy(br_ec_get_default(), hash->hash(), hash->len(), _pubKey->getEC(), (const unsigned char *)signature, signatureLen);
   }
 };
+
+#if !CORE_MOCK
+make_stack_thunk(SigningVerifier_verify);
+extern "C" bool thunk_SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *hash, const void *signature, uint32_t signatureLen);
+#endif
+
+bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
+  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
+#if !CORE_MOCK
+    return thunk_SigningVerifier_verify(_pubKey, hash, signature, signatureLen);
+#else
+    return SigningVerifier_verify(_pubKey, hash, signature, signatureLen);
+#endif
+}
 
 #if !CORE_MOCK
 

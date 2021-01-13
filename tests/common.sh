@@ -8,15 +8,19 @@ function skip_ino()
     # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
     read -d '' skiplist << EOL || true
 /#attic/
-/AnalogBinLogger/
-/LowLatencyLogger/
-/LowLatencyLoggerADXL345/
-/LowLatencyLoggerMPU6050/
-/PrintBenchmark/
-/TeensySdioDemo/
+/AvrAdcLogger/
+/BackwardCompatibility/
+/examplesV1/
+/ExFatFormatter/
+/ExFatLogger/
+/ExFatUnicodeTest/
+/RtcTimestampTest/
 /SoftwareSpi/
 /STM32Test/
-/extras/
+/TeensyRtcTimestamp/
+/TeensySdioDemo/
+/UserChipSelectFunction/
+/UserSPIDriver/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))
@@ -34,17 +38,11 @@ function print_size_info()
     elf_name=$(basename $elf_file)
     sketch_name="${elf_name%.*}"
     # echo $sketch_name
+    xtensa-lx106-elf-size --format=sysv $elf_file | sed s/irom0.text/irom0text/g > size.txt
     declare -A segments
-    while read -a tokens; do
-        seg=${tokens[0]}
-        seg=${seg//./}
-        size=${tokens[1]}
-        addr=${tokens[2]}
-        if [ "$addr" -eq "$addr" -a "$addr" -ne "0" ] 2>/dev/null; then
-            segments[$seg]=$size
-        fi
-
-    done < <(xtensa-lx106-elf-size --format=sysv $elf_file | sed 's/\r//g' )
+    for seg in data rodata bss text irom0text; do
+        segments[$seg]=$(grep ^.$seg size.txt | awk '{sum += $2} END {print sum}')
+    done
 
     total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
     total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
@@ -64,7 +62,7 @@ function build_sketches()
     local build_rem=$5
     local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
+    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p ./$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
         # Paths to the arduino builder need to be / referenced, not our native ones
         build_cmd=$(echo $build_cmd --ide_path $arduino | sed 's/ \/c\// \//g' ) # replace '/c/' with '/'
@@ -72,6 +70,8 @@ function build_sketches()
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
+    local pwm_phase=""
+    [ $(( $build_rem % 2 )) -eq 0 ] && pwm_phase="--waveform_phase"
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
@@ -82,7 +82,8 @@ function build_sketches()
         if [ -e $cache_dir/core/*.a ]; then
             # We need to preserve the build.options.json file and replace the last .ino
             # with this sketch's ino file, or builder will throw everything away.
-	    sed -i "s,^.*sketchLocation.*$, \"sketchLocation\": \"$sketch\"\,,g" $build_dir/build.options.json
+            jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json > $build_dir/build.options.json.tmp
+            mv $build_dir/build.options.json.tmp $build_dir/build.options.json
             # Set the time of the cached core.a file to the future so the GIT header
             # we regen won't cause the builder to throw it out and rebuild from scratch.
             touch -d 'now + 1 day' $cache_dir/core/*.a
@@ -110,7 +111,7 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
-	if [ "$WINDOWS" == "1" ]; then
+        if [ "$WINDOWS" == "1" ]; then
             sketch=$(echo $sketch | sed 's/^\/c//')
             # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
             # http://www.mingw.org/wiki/Posix_path_conversion
@@ -118,8 +119,8 @@ function build_sketches()
             export MSYS2_ARG_CONV_EXC="*"
             export MSYS_NO_PATHCONV=1
         fi
-        echo "$build_cmd $sketch"
-        time ($build_cmd $sketch >build.log)
+        echo "$build_cmd $pwm_phase $sketch"
+        time ($build_cmd $pwm_phase $sketch >build.log)
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"
@@ -146,53 +147,43 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    { test -r ArduinoJson-v6.11.0.zip || wget -nv https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
+    { test -r ArduinoJson-v6.11.0.zip || curl --output ArduinoJson-v6.11.0.zip -L https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip; } && unzip -q ArduinoJson-v6.11.0.zip
 
     popd
 }
 
 function install_ide()
 {
-    #local idever='nightly'
-    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
+    local idever='nightly'
+    local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
 
-    local idever='1.8.10'
-    local ideurl="https://downloads.arduino.cc/arduino-$idever"
+    #local idever='1.8.10'
+    #local ideurl="https://downloads.arduino.cc/arduino-$idever"
 
     echo "using Arduino IDE distribution ${idever}"
 
     local ide_path=$1
     local core_path=$2
     local debug=$3
+    mkdir -p ${core_path}/tools/dist
     if [ "$WINDOWS" = "1" ]; then
-        # Acquire needed packages from Windows package manager
-        choco install --no-progress python3 >& pylog.txt
-	# Parse the python instrall dir from the output log.  Sorry, can't set it via choco on the free version
-	PYDIR=$(cat pylog.txt | grep "^Installed to:"  | cut -f2 -d"'" | sed 's/C:\\/\/c\//')
-	echo "Detected python3 install dir: $PYDIR"
-        export PATH="$PYDIR:$PATH"  # Ensure it's live from now on...
-        cp "$PYDIR/python.exe" "$PYDIR/python3.exe"
-        choco install --no-progress unzip
-        choco install --no-progress sed
-        #choco install --no-progress golang
-        test -r arduino-windows.zip || wget -nv -O arduino-windows.zip "${ideurl}-windows.zip"
-        unzip -q arduino-windows.zip
+        test -r ${core_path}/tools/dist/arduino-windows.zip || curl --output ${core_path}/tools/dist/arduino-windows.zip -L "${ideurl}-windows.zip"
+        unzip -q ${core_path}/tools/dist/arduino-windows.zip
         mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
-        wget https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
+        wget -q https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg
         sudo installer -pkg python-3.7.4-macosx10.9.pkg -target /
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino-macos.zip || wget -O arduino-macos.zip "${ideurl}-macosx.zip"
-        unzip -q arduino-macos.zip
+        test -r ${core_path}/tools/dist/arduino-macos.zip || wget -q -O ${core_path}/tools/dist/arduino-macos.zip "${ideurl}-macosx.zip"
+        unzip -q ${core_path}/tools/dist/arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        #test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-        test -r arduino-linux.tar.xz || wget -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
-        tar xf arduino-linux.tar.xz
+        test -r ${core_path}/tools/dist/arduino-linux.tar.xz || wget -q -O ${core_path}/tools/dist/arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        tar xf ${core_path}/tools/dist/arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi
     mv arduino-distrib $ide_path

@@ -1,6 +1,6 @@
 /*
  ESP8266WiFiGeneric.h - esp8266 Wifi support.
- Based on WiFi.h from Ardiono WiFi shield library.
+ Based on WiFi.h from Arduino WiFi shield library.
  Copyright (c) 2011-2014 Arduino.  All right reserved.
  Modified by Ivan Grokhotkov, December 2014
  Reworked by Markus Sattler, December 2015
@@ -42,6 +42,14 @@ typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
 typedef void (*WiFiEventCb)(WiFiEvent_t);
 
+enum class DNSResolveType: uint8_t
+{
+    DNS_AddrType_IPv4 = 0,	// LWIP_DNS_ADDRTYPE_IPV4 = 0
+    DNS_AddrType_IPv6,		// LWIP_DNS_ADDRTYPE_IPV6 = 1
+    DNS_AddrType_IPv4_IPv6,	// LWIP_DNS_ADDRTYPE_IPV4_IPV6 = 2
+    DNS_AddrType_IPv6_IPv4	// LWIP_DNS_ADDRTYPE_IPV6_IPV4 = 3
+};
+
 struct WiFiState;
 
 class ESP8266WiFiGenericClass {
@@ -66,7 +74,7 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
         WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
-        int32_t channel(void);
+        uint8_t channel(void);
 
         bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
 
@@ -113,6 +121,9 @@ class ESP8266WiFiGenericClass {
     public:
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
+#if LWIP_IPV4 && LWIP_IPV6
+        int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType);
+#endif
         bool getPersistent();
 
     protected:

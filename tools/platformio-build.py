@@ -45,16 +45,21 @@ Builder.match_splitext = scons_patched_match_splitext
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
+board = env.BoardConfig()
+gzip_fw = board.get("build.gzip_fw", False)
+gzip_switch = []
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinoespressif8266")
 assert isdir(FRAMEWORK_DIR)
 
+if gzip_fw:
+    gzip_switch = ["--gzip", "PIO"]
 
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
     CFLAGS=[
-        "-std=gnu99",
+        "-std=gnu17",
         "-Wpointer-arith",
         "-Wno-implicit-function-declaration",
         "-Wl,-EL",
@@ -76,7 +81,7 @@ env.Append(
 
     CXXFLAGS=[
         "-fno-rtti",
-        "-std=c++11"
+        "-std=gnu++17"
     ],
 
     LINKFLAGS=[
@@ -111,7 +116,8 @@ env.Append(
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
         join(FRAMEWORK_DIR, "tools", "sdk", "libc",
              "xtensa-lx106-elf", "include"),
-        join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core"))
+        join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core")),
+        join(platform.get_package_dir("toolchain-xtensa"), "include")
     ],
 
     LIBPATH=[
@@ -123,7 +129,7 @@ env.Append(
 
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
-        "wps", "bearssl", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
+        "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
         "stdc++", "m", "c", "gcc"
     ],
 
@@ -145,7 +151,7 @@ env.Append(
                 "--path", '"%s"' % join(
                     platform.get_package_dir("toolchain-xtensa"), "bin"),
                 "--out", "$TARGET"
-            ]), "Building $TARGET"),
+            ] + gzip_switch), "Building $TARGET"),
             suffix=".bin"
         )
     )
@@ -199,12 +205,7 @@ else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_c
 #
 # lwIP
 #
-if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
-    env.Append(
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
-        LIBS=["lwip_gcc"]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
+if "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
@@ -243,26 +244,53 @@ else:
     )
 
 #
+# Waveform
+#
+if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
+    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PHASE", 1)])
+# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM will be used by default
+
+#
 # VTables
 #
 
 current_vtables = None
+fp_in_irom = ""
 for d in flatten_cppdefines:
     if str(d).startswith("VTABLES_IN_"):
         current_vtables = d
+    if str(d) == "FP_IN_IROM":
+        fp_in_irom = "-DFP_IN_IROM"
 if not current_vtables:
     current_vtables = "VTABLES_IN_FLASH"
     env.Append(CPPDEFINES=[current_vtables])
 assert current_vtables
+
+current_mmu_iram_size = None
+for flag in env["CPPDEFINES"]:
+    try:
+        d, val = flag
+        if str(d).startswith("MMU_IRAM_SIZE"):
+            current_mmu_iram_size = "{}={}".format(d, val)
+    except ValueError:
+        continue
+if not current_mmu_iram_size:
+    current_mmu_iram_size = "MMU_IRAM_SIZE=0x8000"
+    env.Append(CPPDEFINES=[current_mmu_iram_size])
+assert current_mmu_iram_size
+
 
 # Build the eagle.app.v6.common.ld linker file
 app_ld = env.Command(
     join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
-        "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
+        "$CC -CC -E -P -D%s -D%s %s $SOURCE -o $TARGET" % (current_vtables, current_mmu_iram_size, fp_in_irom),
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
+
+if not env.BoardConfig().get("build.ldscript", ""):
+    env.Replace(LDSCRIPT_PATH=env.BoardConfig().get("build.arduino.ldscript", ""))
 
 #
 # Dynamic core_version.h for staging builds
