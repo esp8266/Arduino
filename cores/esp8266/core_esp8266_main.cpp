@@ -351,7 +351,9 @@ extern "C" void user_init(void) {
 
 #if defined(UMM_HEAP_EXTERNAL)
     install_vm_exception_handler();
-#elif defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
+#endif
+
+#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
     install_non32xfer_exception_handler();
 #endif
 

@@ -340,12 +340,7 @@ static ICACHE_RAM_ATTR void loadstore_exception_handler(struct __exception_frame
 
 void install_vm_exception_handler()
 {
-  // There is no way to get the current exception handler via an API, so pull it
-  // out using the decoded ROM dump which points to 0x3fffc100 as the start of
-  // the XTOS exception table (of C-callable functions)
-  uint32_t old = *(uint32_t*)(0x3fffc100 + EXCCAUSE_LOAD_PROHIBITED * 4);
-  __old_handler = (void (*)(struct __exception_frame *ef, int cause))old;
-  _xtos_set_exception_handler(EXCCAUSE_LOAD_PROHIBITED, loadstore_exception_handler);
+  __old_handler = _xtos_set_exception_handler(EXCCAUSE_LOAD_PROHIBITED, loadstore_exception_handler);
   _xtos_set_exception_handler(EXCCAUSE_STORE_PROHIBITED, loadstore_exception_handler);
 
   DECLARE_SPI1;
