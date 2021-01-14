@@ -97,8 +97,8 @@ bool MDNSResponder::_process(bool p_bUserContext)
 bool MDNSResponder::_restart(void)
 {
 
-    return ((_resetProbeStatus(true)) &&         // Stop and restart probing
-            (_allocUDPContext()));               // Restart UDP
+    return ((_resetProbeStatus(true/*restart*/)) &&  // Stop and restart probing
+            (_allocUDPContext()));                   // Restart UDP
 }
 
 /**
