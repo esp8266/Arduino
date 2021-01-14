@@ -82,7 +82,8 @@ function build_sketches()
         if [ -e $cache_dir/core/*.a ]; then
             # We need to preserve the build.options.json file and replace the last .ino
             # with this sketch's ino file, or builder will throw everything away.
-	    sed -i "s,^.*sketchLocation.*$, \"sketchLocation\": \"$sketch\"\,,g" $build_dir/build.options.json
+            jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json > $build_dir/build.options.json.tmp
+            mv $build_dir/build.options.json.tmp $build_dir/build.options.json
             # Set the time of the cached core.a file to the future so the GIT header
             # we regen won't cause the builder to throw it out and rebuild from scratch.
             touch -d 'now + 1 day' $cache_dir/core/*.a
@@ -153,20 +154,21 @@ function install_libraries()
 
 function install_ide()
 {
-    #local idever='nightly'
-    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
+    local idever='nightly'
+    local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
 
-    local idever='1.8.10'
-    local ideurl="https://downloads.arduino.cc/arduino-$idever"
+    #local idever='1.8.10'
+    #local ideurl="https://downloads.arduino.cc/arduino-$idever"
 
     echo "using Arduino IDE distribution ${idever}"
 
     local ide_path=$1
     local core_path=$2
     local debug=$3
+    mkdir -p ${core_path}/tools/dist
     if [ "$WINDOWS" = "1" ]; then
-        test -r arduino-windows.zip || curl --output arduino-windows.zip -L "${ideurl}-windows.zip"
-        unzip -q arduino-windows.zip
+        test -r ${core_path}/tools/dist/arduino-windows.zip || curl --output ${core_path}/tools/dist/arduino-windows.zip -L "${ideurl}-windows.zip"
+        unzip -q ${core_path}/tools/dist/arduino-windows.zip
         mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
@@ -175,13 +177,13 @@ function install_ide()
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino-macos.zip || wget -q -O arduino-macos.zip "${ideurl}-macosx.zip"
-        unzip -q arduino-macos.zip
+        test -r ${core_path}/tools/dist/arduino-macos.zip || wget -q -O ${core_path}/tools/dist/arduino-macos.zip "${ideurl}-macosx.zip"
+        unzip -q ${core_path}/tools/dist/arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        test -r arduino-linux.tar.xz || wget -q -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
-        tar xf arduino-linux.tar.xz
+        test -r ${core_path}/tools/dist/arduino-linux.tar.xz || wget -q -O ${core_path}/tools/dist/arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        tar xf ${core_path}/tools/dist/arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi
     mv arduino-distrib $ide_path

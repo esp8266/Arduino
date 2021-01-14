@@ -30,7 +30,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -62,7 +62,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -90,7 +90,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-windows-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -122,7 +122,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-mac-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -260,7 +260,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Boards.txt diff
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}

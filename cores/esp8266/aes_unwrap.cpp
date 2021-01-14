@@ -25,7 +25,7 @@
  *  memory in the area was untouched after starting WiFi.
  */
 
-#if (defined(DEBUG_ESP_HWDT_NOEXTRA4K) && !defined(DEBUG_ESP_HWDT)) || KEEP_ROM_AES_UNWRAP
+#if defined(KEEP_ROM_AES_UNWRAP)
 // Using the ROM version of aes_unwrap should be fine for the no extra 4K case
 // which is usually used in conjunction with WPS.
 
@@ -57,9 +57,7 @@ static void *aes_decrypt_init(const u8 *key, size_t len) {
 static void aes_decrypt_deinit(void *ctx) {
   if (ctx) {
     ets_memset(ctx, 0, 16*11);
-    if ((uint32_t)ctx != 0x3FFFEA80ul) {
-      free(ctx);
-    }
+    free(ctx);
   }
   return;
 }
