@@ -345,7 +345,7 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
     return -1;
   }
 
-  if (avail) {
+  if (avail && _recvapp_buf) {
     // Take data from the recvapp buffer
     int to_copy = _recvapp_len < size ? _recvapp_len : size;
     memcpy(buf, _recvapp_buf, to_copy);
@@ -406,6 +406,11 @@ int WiFiClientSecureCtx::peek() {
 
 size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   size_t to_copy = 0;
+  if (!buffer) {
+    DEBUG_BSSL("peekBytes: buffer is nullptr\n");
+    return 0;
+  }
+
   if (!ctx_present()) {
     DEBUG_BSSL("peekBytes: Not connected\n");
     return 0;
@@ -414,6 +419,12 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   _startMillis = millis();
   while ((available() < (int) length) && ((millis() - _startMillis) < 5000)) {
     yield();
+  }
+
+  if (!_recvapp_buf)
+  {
+    DEBUG_BSSL("peekBytes: _recvapp_buf is nullptr\n");
+    return 0;
   }
 
   to_copy = _recvapp_len < length ? _recvapp_len : length;
