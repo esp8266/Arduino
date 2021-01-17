@@ -80,7 +80,8 @@ function build_sketches()
         if [ -e $cache_dir/core/*.a ]; then
             # We need to preserve the build.options.json file and replace the last .ino
             # with this sketch's ino file, or builder will throw everything away.
-	    sed -i "s,^.*sketchLocation.*$, \"sketchLocation\": \"$sketch\"\,,g" $build_dir/build.options.json
+            jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json > $build_dir/build.options.json.tmp
+            mv $build_dir/build.options.json.tmp $build_dir/build.options.json
             # Set the time of the cached core.a file to the future so the GIT header
             # we regen won't cause the builder to throw it out and rebuild from scratch.
             touch -d 'now + 1 day' $cache_dir/core/*.a
@@ -151,11 +152,11 @@ function install_libraries()
 
 function install_ide()
 {
-    #local idever='nightly'
-    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
+    local idever='nightly'
+    local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
 
-    local idever='1.8.10'
-    local ideurl="https://downloads.arduino.cc/arduino-$idever"
+    #local idever='1.8.10'
+    #local ideurl="https://downloads.arduino.cc/arduino-$idever"
 
     echo "using Arduino IDE distribution ${idever}"
 

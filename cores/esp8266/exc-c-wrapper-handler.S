@@ -168,9 +168,12 @@ _xtos_c_wrapper_handler:
         rsync        // wait for WSR to PS to complete
         rsr     a12,  SAR
 
-// @mhightower83 - I think after the next instruction we have the potential of
-// loosing UEXC_excvaddr Which the earlier comment said we need to preserve for
-// the exception handler.
+// @mhightower83 - I think, after the next instruction, we have the potential of
+// losing UEXC_excvaddr. Which the earlier comment said we need to preserve for
+// the exception handler. We keep interrupts off when calling the "C" exception
+// handler. For the use cases that I am looking at, this is a must. If there are
+// future use cases that need interrupts enabled, those "C" exception handlers
+// can turn them on.
 //
 //        rsil    a13,  0
 
@@ -189,8 +192,11 @@ _xtos_c_wrapper_handler:
         // Restore special registers
         l32i    a14,  a1, UEXC_sar
 
-// For compatibility with Arduino interrupt architecture, we keep interrupts 100%
-// disabled.
+        // load early - saves two cycles - @mhightower83
+        movi     a0, _xtos_return_from_exc
+
+// @mhightower83 - For compatibility with Arduino interrupt architecture, we
+// keep interrupts 100% disabled.
 //        /*
 //         *  Disable interrupts while returning from the pseudo-CALL setup above,
 //         *  for the same reason they were disabled while doing the pseudo-CALL:
@@ -201,7 +207,6 @@ _xtos_c_wrapper_handler:
 //        rsil  a12, 1 // XCHAL_EXCM_LEVEL
         rsil  a12, 15  // All levels blocked.
         wsr   a14, SAR
-        movi   a0, _xtos_return_from_exc
         jx     a0
 
         /* FIXME: what about _GeneralException ? */
