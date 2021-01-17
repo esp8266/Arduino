@@ -406,11 +406,6 @@ int WiFiClientSecureCtx::peek() {
 
 size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   size_t to_copy = 0;
-  if (!buffer) {
-    DEBUG_BSSL("peekBytes: buffer is nullptr\n");
-    return 0;
-  }
-
   if (!ctx_present()) {
     DEBUG_BSSL("peekBytes: Not connected\n");
     return 0;
