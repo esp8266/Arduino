@@ -34,7 +34,7 @@ namespace BearSSL {
 class CertStore {
   public:
     CertStore() { };
-    ~CertStore();
+    virtual ~CertStore();
 
     // Set the file interface instances, do preprocessing
     int initCertStore(fs::FS &fs, const char *indexFileName, const char *dataFileName);
