@@ -40,7 +40,7 @@ class CertStore {
     int initCertStore(fs::FS &fs, const char *indexFileName, const char *dataFileName);
 
     // Installs the cert store into the X509 decoder (normally via static function callbacks)
-    void installCertStore(br_x509_minimal_context *ctx);
+    virtual void installCertStore(br_x509_minimal_context *ctx);
 
   protected:
     fs::FS *_fs = nullptr;
