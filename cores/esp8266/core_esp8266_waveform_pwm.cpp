@@ -38,12 +38,13 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef WAVEFORM_LOCKED_PHASE
 
 #include <Arduino.h>
 #include "ets_sys.h"
-#include "core_esp8266_waveform_pwm.h"
+#include "core_esp8266_waveform.h"
 #include "user_interface.h"
+
+
 extern "C" {
 
 // Maximum delay between IRQs
@@ -169,8 +170,10 @@ static ICACHE_RAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
 
 static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range);
 
+
 // Called when analogWriteFreq() changed to update the PWM total period
-void _setPWMFreq(uint32_t freq) {
+extern void _setPWMFreq_weak(uint32_t freq) __attribute__((weak)); 
+void _setPWMFreq_weak(uint32_t freq) {
   _pwmFreq = freq;
 
   // Convert frequency into clock cycles
@@ -204,6 +207,11 @@ void _setPWMFreq(uint32_t freq) {
     disableIdleTimer();
   }
 }
+static void _setPWMFreq_bound(uint32_t freq) __attribute__((weakref("_setPWMFreq_weak")));
+void _setPWMFreq(uint32_t freq) { 
+  _setPWMFreq_bound(freq);
+}
+
 
 // Helper routine to remove an entry from the state machine
 // and clean up any marked-off entries
@@ -228,7 +236,8 @@ static void _cleanAndRemovePWM(PWMState *p, int pin) {
 
 
 // Disable PWM on a specific pin (i.e. when a digitalWrite or analogWrite(0%/100%))
-ICACHE_RAM_ATTR bool _stopPWM(int pin) {
+extern bool _stopPWM_weak(uint8_t pin) __attribute__((weak));
+ICACHE_RAM_ATTR bool _stopPWM_weak(uint8_t pin) {
   if (!((1<<pin) & pwmState.mask)) {
     return false; // Pin not actually active
   }
@@ -249,6 +258,10 @@ ICACHE_RAM_ATTR bool _stopPWM(int pin) {
   // Possibly shut down the timer completely if we're done
   disableIdleTimer();
   return true;
+}
+static bool _stopPWM_bound(uint8_t pin) __attribute__((weakref("_stopPWM_weak")));
+bool _stopPWM(uint8_t pin) {
+  return _stopPWM_bound(pin);
 }
 
 static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range) {
@@ -297,7 +310,8 @@ static void _addPWMtoList(PWMState &p, int pin, uint32_t val, uint32_t range) {
 }
 
 // Called by analogWrite(1...99%) to set the PWM duty in clock cycles
-bool _setPWM(int pin, uint32_t val, uint32_t range) {
+extern bool _setPWM_weak(int pin, uint32_t val, uint32_t range) __attribute__((weak));
+bool _setPWM_weak(int pin, uint32_t val, uint32_t range) {
   stopWaveform(pin);
   PWMState p;  // Working copy
   p = pwmState;
@@ -327,15 +341,21 @@ bool _setPWM(int pin, uint32_t val, uint32_t range) {
 
   return true;
 }
+static bool _setPWM_bound(int pin, uint32_t val, uint32_t range) __attribute__((weakref("_setPWM_weak")));
+bool _setPWM(int pin, uint32_t val, uint32_t range) {
+  return _setPWM_bound(pin, val, range);
+}
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
-  return startWaveformClockCycles(pin, microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS), microsecondsToClockCycles(runTimeUS));
-}
+extern int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm)  __attribute__((weak));
+int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles,
+                             int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
+  (void) alignPhase;
+  (void) phaseOffsetUS;
+  (void) autoPwm;
 
-int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles) {
    if ((pin > 16) || isFlashInterfacePin(pin)) {
     return false;
   }
@@ -379,10 +399,23 @@ int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t time
 
   return true;
 }
+static int startWaveformClockCycles_bound(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) __attribute__((weakref("startWaveformClockCycles_weak")));
+int startWaveformClockCycles(uint8_t pin, uint32_t timeHighCycles, uint32_t timeLowCycles, uint32_t runTimeCycles, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
+  return startWaveformClockCycles_bound(pin, timeHighCycles, timeLowCycles, runTimeCycles, alignPhase, phaseOffsetUS, autoPwm);
+}
 
+
+// This version falls-thru to the proper startWaveformClockCycles call and is invariant across waveform generators
+int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS,
+                  int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
+  return startWaveformClockCycles_bound(pin,
+    microsecondsToClockCycles(timeHighUS), microsecondsToClockCycles(timeLowUS),
+    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS), autoPwm);
+}
 
 // Set a callback.  Pass in NULL to stop it
-void setTimer1Callback(uint32_t (*fn)()) {
+extern void setTimer1Callback_weak(uint32_t (*fn)()) __attribute__((weak));
+void setTimer1Callback_weak(uint32_t (*fn)()) {
   wvfState.timer1CB = fn;
   if (fn) {
     initTimer();
@@ -390,9 +423,14 @@ void setTimer1Callback(uint32_t (*fn)()) {
   }
   disableIdleTimer();
 }
+static void setTimer1Callback_bound(uint32_t (*fn)()) __attribute__((weakref("setTimer1Callback_weak")));
+void setTimer1Callback(uint32_t (*fn)()) {
+  setTimer1Callback_bound(fn);
+}
 
 // Stops a waveform on a pin
-int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
+extern int stopWaveform_weak(uint8_t pin) __attribute__((weak));
+ICACHE_RAM_ATTR int stopWaveform_weak(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
   if (!timerRunning) {
     return false;
@@ -414,6 +452,10 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   }
   disableIdleTimer();
   return true;
+}
+static int stopWaveform_bound(uint8_t pin) __attribute__((weakref("stopWaveform_weak")));
+ICACHE_RAM_ATTR int stopWaveform(uint8_t pin) {
+  return stopWaveform_bound(pin);
 }
 
 // Speed critical bits
@@ -622,5 +664,3 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 }
 
 };
-
-#endif
