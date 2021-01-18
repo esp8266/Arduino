@@ -345,7 +345,7 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
     return -1;
   }
 
-  if (avail && _recvapp_buf) {
+  if (avail) {
     // Take data from the recvapp buffer
     int to_copy = _recvapp_len < size ? _recvapp_len : size;
     memcpy(buf, _recvapp_buf, to_copy);
