@@ -140,7 +140,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     std::shared_ptr<unsigned char> _iobuf_out;
     time_t _now;
     const X509List *_ta;
-    CertStore *_certStore;
+    CertStoreBase *_certStore;
     int _iobuf_in_size;
     int _iobuf_out_size;
     bool _handshake_done;
