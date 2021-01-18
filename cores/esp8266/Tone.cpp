@@ -30,10 +30,8 @@ static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, uint32_t durat
     return;
   }
 
-#ifndef WAVEFORM_LOCKED_PHASE
   // Stop any analogWrites (PWM) because they are a different generator
   _stopPWM(_pin);
-#endif
   // If there's another Tone or startWaveform on this pin
   // it will be changed on-the-fly (no need to stop it)
 
