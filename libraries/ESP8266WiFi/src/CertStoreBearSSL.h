@@ -31,16 +31,24 @@
 
 namespace BearSSL {
 
-class CertStore {
+class CertStoreBase {
+  public:
+    virtual ~CertStore();
+
+    // Installs the cert store into the X509 decoder (normally via static function callbacks)
+    virtual void installCertStore(br_x509_minimal_context *ctx);
+};
+
+class CertStore: public CertStoreBase {
   public:
     CertStore() { };
-    virtual ~CertStore();
+    ~CertStore();
 
     // Set the file interface instances, do preprocessing
     int initCertStore(fs::FS &fs, const char *indexFileName, const char *dataFileName);
 
     // Installs the cert store into the X509 decoder (normally via static function callbacks)
-    virtual void installCertStore(br_x509_minimal_context *ctx);
+    void installCertStore(br_x509_minimal_context *ctx);
 
   protected:
     fs::FS *_fs = nullptr;

@@ -110,7 +110,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     int getLastSSLError(char *dest = NULL, size_t len = 0);
 
     // Attach a preconfigured certificate store
-    void setCertStore(CertStore *certStore) {
+    void setCertStore(CertStoreBase *certStore) {
       _certStore = certStore;
     }
 
@@ -274,7 +274,7 @@ class WiFiClientSecure : public WiFiClient {
     int getLastSSLError(char *dest = NULL, size_t len = 0) { return _ctx->getLastSSLError(dest, len); }
 
     // Attach a preconfigured certificate store
-    void setCertStore(CertStore *certStore) { _ctx->setCertStore(certStore); }
+    void setCertStore(CertStoreBase *certStore) { _ctx->setCertStore(certStore); }
 
     // Select specific ciphers (i.e. optimize for speed over security)
     // These may be in PROGMEM or RAM, either will run properly
