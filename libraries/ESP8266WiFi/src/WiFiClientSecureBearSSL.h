@@ -275,9 +275,6 @@ class WiFiClientSecure : public WiFiClient {
 
     // Attach a preconfigured certificate store
     void setCertStore(CertStoreBase *certStore) { _ctx->setCertStore(certStore); }
-    void setCertStore(CertStore *certStore) {
-      _ctx->setCertStore(static_cast<CertStoreBase*>(certStore));
-    }
 
     // Select specific ciphers (i.e. optimize for speed over security)
     // These may be in PROGMEM or RAM, either will run properly
