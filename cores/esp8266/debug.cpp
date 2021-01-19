@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "osapi.h"
 
+#if 0
 void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     const uint8_t* src = (const uint8_t*) mem;
     os_printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
@@ -35,3 +36,32 @@ void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     }
     os_printf("\n");
 }
+#else
+void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols)
+{
+    const char* src = (const char*)mem;
+    os_printf("\n[HEXDUMP] Address: %p len: 0x%X (%d)", src, len, len);
+    while (len > 0)
+    {
+        uint32_t linesize = cols > len? len: cols;
+        os_printf("\n[%p] 0x%04x: ", src, src - (const char*)mem);
+        for (uint32_t i = 0; i < linesize; i++)
+        {
+            os_printf("%02x ", *(src + i));
+        }
+        os_printf("  ");
+        for (uint32_t i = linesize; i < cols; i++)
+        {
+            os_printf("   ");
+        }
+        for (uint32_t i = 0; i < linesize; i++)
+        {
+            unsigned char c = *(src + i);
+            os_printf("%c", c >= 32 && c <= 127? c: '.');
+        }
+        src += linesize;
+        len -= linesize;
+    }
+    os_printf("\n");
+}
+#endif
