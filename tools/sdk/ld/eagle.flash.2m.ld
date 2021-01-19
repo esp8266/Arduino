@@ -1,10 +1,11 @@
 /* Flash Split for 2M chips */
 /* sketch @0x40200000 (~1019KB) (1044464B) */
-/* empty  @0x402FEFF0 (~1008KB) (1032208B) */
-/* spiffs @0x403FB000 (~0KB) (0B) */
-/* eeprom @0x403FB000 (4KB) */
-/* rfcal  @0x403FC000 (4KB) */
-/* wifi   @0x403FD000 (12KB) */
+/* empty    @0x402FEFF0 (~1020KB) (1044496B) */
+/* otacmds  @0x403FE000 (8KB) */
+/* spiffs   @0x403FB000 (~0KB) (0B) */
+/* eeprom   @0x403FB000 (4KB) */
+/* rfcal    @0x403FC000 (4KB) */
+/* wifi     @0x403FD000 (12KB) */
 
 MEMORY
 {
@@ -17,6 +18,8 @@ PROVIDE ( _FS_start = 0x403FB000 );
 PROVIDE ( _FS_end = 0x403FB000 );
 PROVIDE ( _FS_page = 0x0 );
 PROVIDE ( _FS_block = 0x0 );
+PROVIDE ( _BOOTLOADER_DATA = 0x403FE000 );
+PROVIDE ( _SKETCH_AREA_end = _BOOTLOADER_DATA );
 PROVIDE ( _EEPROM_start = 0x403fb000 );
 /* The following symbols are DEPRECATED and will be REMOVED in a future release */
 PROVIDE ( _SPIFFS_start = 0x403FB000 );

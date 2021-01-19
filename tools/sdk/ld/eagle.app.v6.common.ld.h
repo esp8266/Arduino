@@ -148,6 +148,8 @@ SECTIONS
   {
     _irom0_text_start = ABSOLUTE(.);
     *(.ver_number)
+    LONG(0x31305241)
+    LONG(_BOOTLOADER_DATA)
     *.c.o(.literal*, .text*)
     *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal*, EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
     *.cc.o(.literal*, .text*)

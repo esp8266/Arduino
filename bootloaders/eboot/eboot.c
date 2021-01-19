@@ -39,15 +39,69 @@ int print_version(const uint32_t flash_addr)
     return 0;
 }
 
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
+int print_flags(const uint32_t flash_addr)
+{
+    const char* __attribute__ ((aligned (4))) fmtt = "#%08x\n\0\0";
+    uint32_t ver, i;
+    uint32_t fmt[2];
+    eboot_flash_command_t cmd;
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
+    ver = commandAddress();
+    ets_putc('<');
+    ets_printf((const char*) fmt, ver);
+    ets_putc('\n');
+    for (i = 0; i < EBOOT_COMMAND_MAX_COUNT; i++) {
+        ets_putc('0' + i);
+        ets_putc(':');
+        readBootCommand(i, &cmd);
+        ets_printf((const char*) fmt, cmd.flags);
+    }
+    ets_putc('D');
+    ets_putc('o');
+    ets_putc('n');
+    ets_putc('e');
+    ets_putc('!');
+    ets_putc('\n');
+    return 0;
+}
+#else
+#define print_flags(X) {}
+#endif
+
+int find_app_start(const uint32_t flash_addr)
+{
+    image_header_t image_header;
+    uint32_t pos = flash_addr;
+    uint8_t count = 0;
+
+    do {
+        pos += APP_START_OFFSET;
+        if (SPIRead(pos, &image_header, sizeof(image_header))) {
+            return 0;
+        }
+        count += 1;
+    } while ((image_header.magic != 0xe9) && (count < 4));
+    return pos;
+}
+
 int load_app_from_flash_raw(const uint32_t flash_addr)
 {
     image_header_t image_header;
-    uint32_t pos = flash_addr + APP_START_OFFSET;
+    uint32_t pos = find_app_start(flash_addr);
+    const char* __attribute__ ((aligned (4))) fmtt = "l:%08x\n\0";
+    uint32_t ver, i;
+    uint32_t fmt[2];
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
 
-    if (SPIRead(pos, &image_header, sizeof(image_header))) {
+    ets_printf((const char*) fmt, pos);
+   if (SPIRead(pos, &image_header, sizeof(image_header))) {
         return 1;
     }
     pos += sizeof(image_header);
+    ets_printf((const char*) fmt, pos);
 
 
     for (uint32_t section_index = 0;
@@ -61,6 +115,15 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
         pos += sizeof(section_header);
 
         const uint32_t address = section_header.address;
+
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
+        ets_putc('f');
+        ets_printf((const char*) fmt, pos);
+        ets_putc('t');
+        ets_printf((const char*) fmt, address);
+        ets_putc('s');
+        ets_printf((const char*) fmt, section_header.size);
+#endif
 
         bool load = false;
 
@@ -83,8 +146,18 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
             continue;
         }
 
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
+        ets_putc('l');
+        ets_putc('o');
+#endif
+
         if (SPIRead(pos, (void*)address, section_header.size))
             return 3;
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
+        ets_putc('a');
+        ets_putc('d');
+        ets_putc('\n');
+#endif
 
         pos += section_header.size;
     }
@@ -123,6 +196,20 @@ int copy_raw(const uint32_t src_addr,
              const uint32_t size,
              const bool verify)
 {
+    const char* __attribute__ ((aligned (4))) fmtt = ":%08x\n\0\0";
+    uint32_t fmt[2];
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
+
+#if defined (EBOOT_ENABLE_SERIAL_DEBUG)
+    ets_putc('S');
+    ets_printf((const char*) fmt, src_addr);
+    ets_putc('D');
+    ets_printf((const char*) fmt, dst_addr);
+    ets_putc('B');
+    ets_printf((const char*) fmt, size);
+#endif
+
     // require regions to be aligned
     if ((src_addr & 0xfff) != 0 ||
         (dst_addr & 0xfff) != 0) {
@@ -223,6 +310,7 @@ int main()
     struct eboot_command cmd;
 
     print_version(0);
+    print_flags(0);
 
     if (eboot_command_read(&cmd) == 0) {
         // valid command was passed via RTC_MEM
@@ -264,6 +352,7 @@ int main()
         ets_printf((const char *)&cp);
 #endif	    
         if (res == 0) {
+            eboot_command_clear();
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
         }

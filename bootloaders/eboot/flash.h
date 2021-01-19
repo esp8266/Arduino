@@ -15,6 +15,8 @@
  */
 #include <spi_flash_geometry.h>
 
+#define APP_START_OFFSET 0x1000
+
 int SPIEraseBlock(uint32_t block);
 int SPIEraseSector(uint32_t sector);
 int SPIRead(uint32_t addr, void *dest, size_t size);

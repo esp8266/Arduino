@@ -1310,6 +1310,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
     eeprom_size_kb = 4
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
+    ota_commands_size_kb = 8
     fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
 
     # For legacy reasons (#6531), the EEPROM sector needs to be at the old
@@ -1318,7 +1319,7 @@ def flash_map (flashsize_kb, fs_kb = 0):
 
     rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
-        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
+        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb + ota_commands_size_kb)) * 1024 - reserved
         fs_start = fs_end - fs_kb * 1024
     else:
         max_upload_size = 1024 * 1024 - reserved
@@ -1331,8 +1332,9 @@ def flash_map (flashsize_kb, fs_kb = 0):
 
     # Adjust FS_end to be a multiple of the block size
     fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start;
+    ota_commands_addr = fs_start - (ota_commands_size_kb * 1024)
 
-    max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
+    max_ota_size = min(max_upload_size, ota_commands_addr / 2) # =(max_upload_size+empty_size)/2
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
     strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
     strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
@@ -1379,13 +1381,14 @@ def flash_map (flashsize_kb, fs_kb = 0):
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-        empty_size = fs_start - max_upload_size
+        empty_size = ota_commands_addr - max_upload_size
         if empty_size > 0:
-            print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
-        print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
-        print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
-        print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
+            print("/* empty    @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
+        print("/* otacmds  @0x%X (%dKB) */" % (spi + ota_commands_addr, ota_commands_size_kb))
+        print("/* spiffs   @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
+        print("/* eeprom   @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+        print("/* rfcal    @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
+        print("/* wifi     @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
         print("")
         print("MEMORY")
         print("{")
@@ -1396,10 +1399,17 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
+        # print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start))
+        # print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
+        # print("PROVIDE ( _FS_page = 0x%X );" % page)
+        # print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+
         print("PROVIDE ( _FS_start = 0x%08X );" % (0x40200000 + fs_start))
         print("PROVIDE ( _FS_end = 0x%08X );" % (0x40200000 + fs_end))
         print("PROVIDE ( _FS_page = 0x%X );" % page)
         print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+        print("PROVIDE ( _BOOTLOADER_DATA = 0x%08X );" % (0x40200000 + ota_commands_addr))
+        print("PROVIDE ( _SKETCH_AREA_end = _BOOTLOADER_DATA );")
         print("PROVIDE ( _EEPROM_start = 0x%08x );" % (0x40200000 + eeprom_start))
         # Re-add deprecated symbols pointing to the same address as the new standard ones
         print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
@@ -1409,6 +1419,8 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
+
+
 
         if ldgen:
             sys.stdout.close()
