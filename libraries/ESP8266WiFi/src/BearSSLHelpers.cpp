@@ -526,6 +526,10 @@ namespace brssl {
       case BR_KEYTYPE_EC:
         ek = br_skey_decoder_get_ec(dc.get());
         sk = (private_key*)malloc(sizeof * sk);
+        if (!sk)
+        {
+          return nullptr;
+        }
         sk->key_type = BR_KEYTYPE_EC;
         sk->key.ec.curve = ek->curve;
         sk->key.ec.x = (uint8_t*)malloc(ek->xlen);
