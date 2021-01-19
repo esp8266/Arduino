@@ -84,12 +84,17 @@ void Netdump::fileDump(File& outfile, const Filter nf)
         fileDumpProcess(outfile, ndp);
     }, nf);
 }
-void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
+bool Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 {
 
     if (!packetBuffer)
     {
         packetBuffer = new (std::nothrow) char[tcpBufferSize];
+
+        if (!packetBuffer)
+        {
+            return false;
+        }
     }
     bufferIndex = 0;
 
@@ -97,6 +102,7 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
     {
         tcpDumpLoop(tcpDumpServer, nf);
     });
+    return true;
 }
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
@@ -176,7 +182,7 @@ void Netdump::tcpDumpProcess(const Packet& np)
         bufferIndex += incl_len;
     }
 
-    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= bufferIndex)
+    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= (int)bufferIndex)
     {
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;
@@ -202,7 +208,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
     {
         setCallback(nullptr);
     }
-    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= bufferIndex)
+    if (bufferIndex && tcpDumpClient && tcpDumpClient.availableForWrite() >= (int)bufferIndex)
     {
         tcpDumpClient.write(packetBuffer, bufferIndex);
         bufferIndex = 0;

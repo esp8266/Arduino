@@ -52,7 +52,7 @@ public:
   WiFiClient(const WiFiClient&);
   WiFiClient& operator=(const WiFiClient&);
 
-  uint8_t status();
+  virtual uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;
   virtual int connect(const String& host, uint16_t port);
@@ -86,7 +86,7 @@ public:
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
-  size_t availableForWrite();
+  int availableForWrite() override;
 
   friend class WiFiServer;
 

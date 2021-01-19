@@ -19,6 +19,7 @@
 #include <stdbool.h>
 
 #include <pgmspace.h>
+#include <mmu_iram.h>
 #include "../debug.h"
 #include "../esp8266_undocumented.h"
 
@@ -31,6 +32,46 @@ extern "C" {
 #include <osapi.h>
 
 #include "c_types.h"
+
+/*
+ * Define active Heaps
+ */
+#if defined(MMU_IRAM_HEAP)
+#define UMM_HEAP_IRAM
+#else
+#undef UMM_HEAP_IRAM
+#endif
+
+// #define UMM_HEAP_EXTERNAL
+
+/*
+ * Assign IDs to active Heaps and tally. DRAM is always active.
+ */
+#define UMM_HEAP_DRAM 0
+#define UMM_HEAP_DRAM_DEFINED 1
+
+#ifdef UMM_HEAP_IRAM
+#undef UMM_HEAP_IRAM
+#define UMM_HEAP_IRAM_DEFINED 1
+#define UMM_HEAP_IRAM UMM_HEAP_DRAM_DEFINED
+#else
+#define UMM_HEAP_IRAM_DEFINED 0
+#endif
+
+#ifdef UMM_HEAP_EXTERNAL
+#undef UMM_HEAP_EXTERNAL
+#define UMM_HEAP_EXTERNAL_DEFINED 1
+#define UMM_HEAP_EXTERNAL (UMM_HEAP_DRAM_DEFINED + UMM_HEAP_IRAM_DEFINED)
+#else
+#define UMM_HEAP_EXTERNAL_DEFINED 0
+#endif
+
+#define UMM_NUM_HEAPS (UMM_HEAP_DRAM_DEFINED + UMM_HEAP_IRAM_DEFINED + UMM_HEAP_EXTERNAL_DEFINED)
+
+#if (UMM_NUM_HEAPS == 1)
+#else
+#define UMM_HEAP_STACK_DEPTH 32
+#endif
 
 /*
  * There are a number of defines you can set at compile time that affect how
@@ -134,8 +175,9 @@ extern char test_umm_heap[];
 #else
 /* Start addresses and the size of the heap */
 extern char _heap_start[];
+#define UMM_HEAP_END_ADDR          0x3FFFC000UL
 #define UMM_MALLOC_CFG_HEAP_ADDR   ((uint32_t)&_heap_start[0])
-#define UMM_MALLOC_CFG_HEAP_SIZE   ((size_t)(0x3fffc000 - UMM_MALLOC_CFG_HEAP_ADDR))
+#define UMM_MALLOC_CFG_HEAP_SIZE   ((size_t)(UMM_HEAP_END_ADDR - UMM_MALLOC_CFG_HEAP_ADDR))
 #endif
 
 /* A couple of macros to make packing structures less compiler dependent */
@@ -158,9 +200,9 @@ extern char _heap_start[];
 /* -------------------------------------------------------------------------- */
 
 #ifdef UMM_INLINE_METRICS
-  #define UMM_FRAGMENTATION_METRIC_INIT() umm_fragmentation_metric_init()
-  #define UMM_FRAGMENTATION_METRIC_ADD(c) umm_fragmentation_metric_add(c)
-  #define UMM_FRAGMENTATION_METRIC_REMOVE(c) umm_fragmentation_metric_remove(c)
+  #define UMM_FRAGMENTATION_METRIC_INIT() umm_fragmentation_metric_init(_context)
+  #define UMM_FRAGMENTATION_METRIC_ADD(c) umm_fragmentation_metric_add(_context, c)
+  #define UMM_FRAGMENTATION_METRIC_REMOVE(c) umm_fragmentation_metric_remove(_context, c)
   #ifndef UMM_INFO
   #define UMM_INFO
   #endif
@@ -194,14 +236,16 @@ extern char _heap_start[];
     unsigned int freeBlocksSquared;
 #ifdef UMM_INLINE_METRICS
     size_t oom_count;
-    #define UMM_OOM_COUNT ummHeapInfo.oom_count
-    #define UMM_FREE_BLOCKS ummHeapInfo.freeBlocks
+    #define UMM_OOM_COUNT info.oom_count
+    #define UMM_FREE_BLOCKS info.freeBlocks
 #endif
     unsigned int maxFreeContiguousBlocks;
   }
   UMM_HEAP_INFO;
 
-  extern UMM_HEAP_INFO ummHeapInfo;
+  // extern UMM_HEAP_INFO ummHeapInfo;
+struct UMM_HEAP_CONTEXT;
+typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
 
   extern ICACHE_FLASH_ATTR void *umm_info( void *ptr, bool force );
 #ifdef UMM_INLINE_METRICS
@@ -213,12 +257,19 @@ extern char _heap_start[];
   extern ICACHE_FLASH_ATTR size_t umm_max_block_size( void );
   extern ICACHE_FLASH_ATTR int umm_usage_metric( void );
   extern ICACHE_FLASH_ATTR int umm_fragmentation_metric( void );
+  extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core( umm_heap_context_t *_context );
+  extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core( umm_heap_context_t *_context );
+  extern ICACHE_FLASH_ATTR int umm_usage_metric_core( umm_heap_context_t *_context );
+  extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core( umm_heap_context_t *_context );
 #else
   #define umm_info(p,b)
   #define umm_free_heap_size() (0)
   #define umm_max_block_size() (0)
   #define umm_fragmentation_metric() (0)
   #define umm_usage_metric() (0)
+  #define umm_free_heap_size_core() (0)
+  #define umm_max_block_size_core() (0)
+  #define umm_fragmentation_metric_core() (0)
 #endif
 
 /*
@@ -263,8 +314,8 @@ typedef struct UMM_STATISTICS_t {
 // Otherwise it is defined here.
   size_t free_blocks;
   size_t oom_count;
-  #define UMM_OOM_COUNT ummStats.oom_count
-  #define UMM_FREE_BLOCKS ummStats.free_blocks
+  #define UMM_OOM_COUNT stats.oom_count
+  #define UMM_FREE_BLOCKS stats.free_blocks
 #endif
 #ifdef UMM_STATS_FULL
   size_t free_blocks_min;
@@ -280,21 +331,17 @@ typedef struct UMM_STATISTICS_t {
 #endif
 }
 UMM_STATISTICS;
-extern UMM_STATISTICS ummStats;
 
 #ifdef UMM_INLINE_METRICS
 #define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
 #else
-#define STATS__FREE_BLOCKS_UPDATE(s) ummStats.free_blocks += (s)
+#define STATS__FREE_BLOCKS_UPDATE(s) _context->stats.free_blocks += (s)
 #endif
 
-#define STATS__OOM_UPDATE() UMM_OOM_COUNT += 1
+#define STATS__OOM_UPDATE() _context->UMM_OOM_COUNT += 1
 
 extern size_t umm_free_heap_size_lw( void );
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_oom_count( void ) {
-  return UMM_OOM_COUNT;
-}
+extern size_t umm_get_oom_count( void );
 
 #else  // not UMM_STATS or UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
@@ -308,87 +355,53 @@ size_t ICACHE_FLASH_ATTR umm_block_size( void );
 #ifdef UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN() \
 do { \
-    if (UMM_FREE_BLOCKS < ummStats.free_blocks_min) \
-        ummStats.free_blocks_min = UMM_FREE_BLOCKS; \
+    if (_context->UMM_FREE_BLOCKS < _context->stats.free_blocks_min) \
+        _context->stats.free_blocks_min = _context->UMM_FREE_BLOCKS; \
 } while(false)
 
 #define STATS__FREE_BLOCKS_ISR_MIN() \
 do { \
-    if (UMM_FREE_BLOCKS < ummStats.free_blocks_isr_min) \
-        ummStats.free_blocks_isr_min = UMM_FREE_BLOCKS; \
+    if (_context->UMM_FREE_BLOCKS < _context->stats.free_blocks_isr_min) \
+        _context->stats.free_blocks_isr_min = _context->UMM_FREE_BLOCKS; \
 } while(false)
 
 #define STATS__ALLOC_REQUEST(tag, s)  \
 do { \
-    ummStats.tag##_count += 1; \
-    ummStats.last_alloc_size = s; \
-    if (ummStats.alloc_max_size < s) \
-        ummStats.alloc_max_size = s; \
+    _context->stats.tag##_count += 1; \
+    _context->stats.last_alloc_size = s; \
+    if (_context->stats.alloc_max_size < s) \
+        _context->stats.alloc_max_size = s; \
 } while(false)
 
 #define STATS__ZERO_ALLOC_REQUEST(tag, s)  \
 do { \
-    ummStats.tag##_zero_count += 1; \
+    _context->stats.tag##_zero_count += 1; \
 } while(false)
 
 #define STATS__NULL_FREE_REQUEST(tag)  \
 do { \
-    ummStats.tag##_null_count += 1; \
+    umm_heap_context_t *_context = umm_get_current_heap(); \
+    _context->stats.tag##_null_count += 1; \
 } while(false)
 
 #define STATS__FREE_REQUEST(tag)  \
 do { \
-    ummStats.tag##_count += 1; \
+    _context->stats.tag##_count += 1; \
 } while(false)
 
-static inline size_t ICACHE_FLASH_ATTR umm_free_heap_size_lw_min( void ) {
-  return (size_t)ummStats.free_blocks_min * umm_block_size();
-}
 
-static inline size_t ICACHE_FLASH_ATTR umm_free_heap_size_min_reset( void ) {
-  ummStats.free_blocks_min = UMM_FREE_BLOCKS;
-  return (size_t)ummStats.free_blocks_min * umm_block_size();
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_free_heap_size_min( void ) {
-  return ummStats.free_blocks_min * umm_block_size();
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_free_heap_size_isr_min( void ) {
-  return ummStats.free_blocks_isr_min * umm_block_size();
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_max_alloc_size( void ) {
-  return ummStats.alloc_max_size;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_last_alloc_size( void ) {
-  return ummStats.last_alloc_size;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_malloc_count( void ) {
-  return ummStats.id_malloc_count;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_malloc_zero_count( void ) {
-  return ummStats.id_malloc_zero_count;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_realloc_count( void ) {
-  return ummStats.id_realloc_count;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_realloc_zero_count( void ) {
-  return ummStats.id_realloc_zero_count;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_free_count( void ) {
-  return ummStats.id_free_count;
-}
-
-static inline size_t ICACHE_FLASH_ATTR umm_get_free_null_count( void ) {
-  return ummStats.id_free_null_count;
-}
+size_t umm_free_heap_size_lw_min( void );
+size_t umm_free_heap_size_min_reset( void );
+size_t umm_free_heap_size_min( void );
+size_t umm_free_heap_size_isr_min( void );
+size_t umm_get_max_alloc_size( void );
+size_t umm_get_last_alloc_size( void );
+size_t umm_get_malloc_count( void );
+size_t umm_get_malloc_zero_count( void );
+size_t umm_get_realloc_count( void );
+size_t umm_get_realloc_zero_count( void );
+size_t umm_get_free_count( void );
+size_t umm_get_free_null_count( void );
 
 #else // Not UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN()          (void)0
@@ -492,6 +505,7 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
         #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
         #define UMM_CRITICAL_ENTRY(tag)_critical_entry(&time_stats.tag, &_saved_ps_##tag)
         #define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
+        #define UMM_CRITICAL_WITHINISR(tag) (0 != (_saved_ps_##tag & 0x0F))
 
     #else  // ! UMM_CRITICAL_METRICS
         // This method preserves the intlevel on entry and restores the
@@ -499,6 +513,7 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
         #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
         #define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
         #define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
+        #define UMM_CRITICAL_WITHINISR(tag) (0 != (_saved_ps_##tag & 0x0F))
     #endif
 #endif
 
@@ -666,7 +681,7 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
    #  define POISON_CHECK() 1
    #  define POISON_CHECK_NEIGHBORS(c) \
      do {\
-       if(!check_poison_neighbors(c)) \
+       if(!check_poison_neighbors(_context, c)) \
          panic();\
      } while(false)
    #else
@@ -759,6 +774,9 @@ void  free_loc (void* p, const char* file, int line);
 #else // !defined(ESP_DEBUG_OOM)
 #endif
 
+
+
+
 #ifdef __cplusplus
 }
 #endif
@@ -774,28 +792,29 @@ extern "C" {
 // Arduino.h recall us to redefine them
 #include <pgmspace.h>
 // Reuse pvPort* calls, since they already support passing location information.
-void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line);
-void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line);
-void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
-void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line);
-void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
+// Specificly the debug version (heap_...) that does not force DRAM heap.
+void* ICACHE_RAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line);
+void* ICACHE_RAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line);
+void* ICACHE_RAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
+void* ICACHE_RAM_ATTR heap_pvPortZalloc(size_t size, const char* file, int line);
+void  ICACHE_RAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
 
-#define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortMalloc(s, mem_debug_file, __LINE__); })
-#define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortCalloc(n, s, mem_debug_file, __LINE__); })
-#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
+#define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortMalloc(s, mem_debug_file, __LINE__); })
+#define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortCalloc(n, s, mem_debug_file, __LINE__); })
+#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
 
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
+#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_vPortFree(p, mem_debug_file, __LINE__); })
 #else
 #define dbg_heap_free(p) free(p)
 #endif
 
 #elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #include <pgmspace.h>
-void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line);
-#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; pvPortRealloc(p, s, mem_debug_file, __LINE__); })
+void* ICACHE_RAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
+#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
 
-void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
+void  ICACHE_RAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
 //C - to be discussed
 /*
   Problem, I would like to report the file and line number with the umm poison
@@ -810,7 +829,7 @@ void  ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line);
   Create dbg_heap_free() as an alternative for free() when you need a little
   more help in debugging the more challenging problems.
 */
-#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; vPortFree(p, mem_debug_file, __LINE__); })
+#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_vPortFree(p, mem_debug_file, __LINE__); })
 
 #else
 #define dbg_heap_free(p) free(p)

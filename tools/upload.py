@@ -51,6 +51,7 @@ while len(sys.argv):
 cmdline = cmdline + ['write_flash']
 if len(write_option):
     cmdline = cmdline + [write_option]
+cmdline = cmdline + ['--flash_size', 'detect']
 cmdline = cmdline + [write_addr, binary]
 
 erase_file = ''

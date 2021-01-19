@@ -32,7 +32,7 @@
 
 class SDClass {
 public:
-    boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
+    boolean begin(uint8_t csPin, uint32_t cfg = SPI_HALF_SPEED) {
 	SDFS.setConfig(SDFSConfig(csPin, cfg));
         return (boolean)SDFS.begin();
     }
@@ -66,6 +66,14 @@ public:
 
     boolean exists(const String &filepath) {
         return (boolean)SDFS.exists(filepath.c_str());
+    }
+
+    boolean rename(const char* filepathfrom, const char* filepathto) {
+        return (boolean)SDFS.rename(filepathfrom, filepathto);
+    }
+
+    boolean rename(const String &filepathfrom, const String &filepathto) {
+        return (boolean)rename(filepathfrom.c_str(), filepathto.c_str());
     }
 
     boolean mkdir(const char *filepath) {
