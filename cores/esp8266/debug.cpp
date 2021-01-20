@@ -43,7 +43,7 @@ void hexdump(const void *mem, uint32_t len, uint8_t cols)
         for (uint32_t i = 0; i < linesize; i++)
         {
             unsigned char c = *(src + i);
-            os_printf("%c", c >= 32 && c <= 127 ? c : '.');
+            os_putc(isprint(c) ? c : '.');
         }
         src += linesize;
         len -= linesize;
