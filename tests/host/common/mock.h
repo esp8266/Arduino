@@ -103,6 +103,7 @@ extern "C" {
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 #define ets_vsnprintf vsnprintf
+inline void ets_putc (char c) { putchar(c); }
 
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
