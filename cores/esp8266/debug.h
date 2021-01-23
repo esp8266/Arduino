@@ -13,7 +13,7 @@
 #endif
 
 #ifdef __cplusplus
-void hexdump(const void *mem, uint32_t len, uint8_t cols = 16);
+extern "C" void hexdump(const void *mem, uint32_t len, uint8_t cols = 16);
 #else
 void hexdump(const void *mem, uint32_t len, uint8_t cols);
 #endif
