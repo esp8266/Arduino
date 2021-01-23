@@ -21,6 +21,9 @@
 #ifndef ESP8266_PERI_H_INCLUDED
 #define ESP8266_PERI_H_INCLUDED
 
+// we expect mocking framework to provide these
+#ifndef CORE_MOCK
+
 #include "c_types.h"
 #include "esp8266_undocumented.h"
 
@@ -846,5 +849,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
  http://esp8266-re.foogod.com/wiki/Random_Number_Generator
 **/
 #define RANDOM_REG32  ESP8266_DREG(0x20E44)
+
+#endif // ifndef CORE_MOCK
 
 #endif

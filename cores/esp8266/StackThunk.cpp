@@ -31,6 +31,8 @@
 #include "debug.h"
 #include "StackThunk.h"
 #include <ets_sys.h>
+#include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 extern "C" {
 
@@ -48,7 +50,14 @@ void stack_thunk_add_ref()
 {
   stack_thunk_refcnt++;
   if (stack_thunk_refcnt == 1) {
+    DBG_MMU_PRINTF("\nStackThunk malloc(%u)\n", _stackSize * sizeof(uint32_t));
+    // The stack must be in DRAM, or an Soft WDT will follow. Not sure why,
+    // maybe too much time is consumed with the non32-bit exception handler.
+    // Also, interrupt handling on an IRAM stack would be very slow.
+    // Strings on the stack would be very slow to access as well.
+    HeapSelectDram ephemeral;
     stack_thunk_ptr = (uint32_t *)malloc(_stackSize * sizeof(uint32_t));
+    DBG_MMU_PRINTF("StackThunk stack_thunk_ptr: %p\n", stack_thunk_ptr);
     if (!stack_thunk_ptr) {
         // This is a fatal error, stop the sketch
         DEBUGV("Unable to allocate BearSSL stack\n");

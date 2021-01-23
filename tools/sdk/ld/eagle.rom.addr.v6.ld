@@ -79,6 +79,11 @@ PROVIDE ( _xtos_l1int_handler = 0x4000048c );
 PROVIDE ( _xtos_p_none = 0x4000dbf8 );
 PROVIDE ( _xtos_restore_intlevel = 0x4000056c );
 PROVIDE ( _xtos_return_from_exc = 0x4000dc54 );
+
+/* Added to support replacing the ROM _xtos_c_wrapper_handler */
+PROVIDE ( _xtos_c_handler_table = 0x3fffc100 );
+PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
+
 PROVIDE ( _xtos_set_exception_handler = 0x40000454 );
 PROVIDE ( _xtos_set_interrupt_handler = 0x4000bd70 );
 PROVIDE ( _xtos_set_interrupt_handler_arg = 0x4000bd28 );

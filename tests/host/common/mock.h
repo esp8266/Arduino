@@ -30,6 +30,7 @@
 */
 
 #define CORE_MOCK 1
+#define MOCK "(mock) " // TODO: provide common logging API instead of adding this string everywhere?
 
 //
 
@@ -37,7 +38,6 @@
 #define ESP8266 1
 #define A0 0
 #define LED_BUILTIN 0
-#define F_CPU 80000000
 #define LWIP_OPEN_SRC
 #define TCP_MSS 536
 #define LWIP_FEATURES 1
@@ -54,27 +54,22 @@
 #define D7 7
 #define D8 8
 
-// include host's STL before any other include file
-// because core definition like max() is in the way
-
-#ifdef __cplusplus
-#include <vector>
-#endif
 #include <stddef.h>
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-//#include <stdlib_noniso.h>
+// TODO: #include <stdlib_noniso.h> ?
 char* itoa (int val, char *s, int radix);
 char* ltoa (long val, char *s, int radix);
-#ifdef __cplusplus
-}
-#endif
+
 
 size_t strlcat(char *dst, const char *src, size_t size);
 size_t strlcpy(char *dst, const char *src, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 // exotic typedefs used in the sdk
 
@@ -91,9 +86,6 @@ uint32_t esp_get_cycle_count();
 
 #include <Arduino.h>
 
-//
-
-#include <stdlib.h>
 #define RANDOM_REG32 ((uint32_t)random())
 
 // net tweak
@@ -107,9 +99,11 @@ uint32_t esp_get_cycle_count();
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <osapi.h>
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 #define ets_vsnprintf vsnprintf
+inline void ets_putc (char c) { putchar(c); }
 
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
