@@ -21,7 +21,7 @@ OBJDUMP := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-objdump
 
 INC += -I../../tools/sdk/include -I../../tools/sdk/uzlib/src
 
-CFLAGS += -std=gnu99
+CFLAGS += -std=gnu17
 
 CFLAGS += -Os -fcommon -g -Wall -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals -ffunction-sections -fdata-sections -free -fipa-pta
 
