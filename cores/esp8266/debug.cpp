@@ -23,7 +23,7 @@
 #include "osapi.h"
 
 #ifdef DEBUG_ESP_CORE
-void iamslow (const char* what)
+void iamslow(const char* what)
 {
     DEBUGV("%s should be overridden for better efficiency\r\n", what);
 }
