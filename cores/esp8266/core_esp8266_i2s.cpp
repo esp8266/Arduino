@@ -502,7 +502,7 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
 }
 
 float i2s_get_real_rate(){
-  return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
+  return (float)I2SBASEFREQ/(_i2s_bits * 2)/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
 bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
