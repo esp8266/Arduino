@@ -35,6 +35,9 @@ extern "C" {
 #include <core_version.h>
 #include "gdb_hooks.h"
 #include "flash_quirks.h"
+#include <umm_malloc/umm_malloc.h>
+#include <core_esp8266_non32xfer.h>
+
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -195,13 +198,18 @@ static void loop_wrapper() {
     }
     loop();
     loop_end();
+    if (serialEventRun) {
+        serialEventRun();
+    }
     esp_schedule();
 }
 
 static void loop_task(os_event_t *events) {
     (void) events;
     s_cycles_at_yield_start = ESP.getCycleCount();
+    ESP.resetHeap();
     cont_run(g_pcont, &loop_wrapper);
+    ESP.setDramHeap();
     if (cont_check(g_pcont) != 0) {
         panic();
     }
@@ -253,6 +261,7 @@ void init_done() {
     std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
     esp_schedule();
+    ESP.setDramHeap();
 }
 
 /* This is the entry point of the application.
@@ -311,11 +320,11 @@ extern "C" void app_entry_redefinable(void)
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
-
 static void app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
 
 extern "C" void app_entry (void)
 {
+    umm_init();
     return app_entry_custom();
 }
 
@@ -339,6 +348,12 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
+#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
+    install_non32xfer_exception_handler();
+#endif
+#if defined(MMU_IRAM_HEAP)
+    umm_init_iram();
+#endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,

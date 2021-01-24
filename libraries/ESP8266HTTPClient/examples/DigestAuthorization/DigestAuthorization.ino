@@ -47,7 +47,7 @@ String getCNonce(const int len) {
   return s;
 }
 
-String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri, unsigned int counter) {
+String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
   // extracting required parameters for RFC 2069 simpler Digest
   String realm = exractParam(authReq, "realm=\"", '"');
   String nonce = exractParam(authReq, "nonce=\"", '"');
@@ -64,7 +64,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   String h1 = md5.toString();
 
   md5.begin();
-  md5.add(String("GET:") + uri);
+  md5.add(method + ":" + uri);
   md5.calculate();
   String h2 = md5.toString();
 
@@ -81,6 +81,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
 }
 
 void setup() {
+  randomSeed(RANDOM_REG32);
   Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
@@ -118,7 +119,7 @@ void loop() {
     String authReq = http.header("WWW-Authenticate");
     Serial.println(authReq);
 
-    String authorization = getDigestAuth(authReq, String(username), String(password), String(uri), 1);
+    String authorization = getDigestAuth(authReq, String(username), String(password), "GET", String(uri), 1);
 
     http.end();
     http.begin(client, String(server) + String(uri));

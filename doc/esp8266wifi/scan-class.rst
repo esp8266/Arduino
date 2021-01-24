@@ -191,7 +191,7 @@ Return information if a network discovered during the scan is hidden or not.
 
     WiFi.isHidden(networkItem)
 
-Returned value if the ``bolean`` type, and ``true`` means that network is hidden. The ``networkItem`` is a zero based index of network discovered during scan.
+Returned value if the ``boolean`` type, and ``true`` means that network is hidden. The ``networkItem`` is a zero based index of network discovered during scan.
 
 getNetworkInfo
 ^^^^^^^^^^^^^^

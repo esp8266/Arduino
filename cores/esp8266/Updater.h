@@ -19,6 +19,7 @@
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
 #define UPDATE_ERROR_BOOTSTRAP          (11)
 #define UPDATE_ERROR_SIGN               (12)
+#define UPDATE_ERROR_NO_DATA            (13)
 
 #define U_FLASH   0
 #define U_FS      100
@@ -182,27 +183,27 @@ class UpdaterClass {
 
     void _setError(int error);    
 
-    bool _async;
-    uint8_t _error;
-    uint8_t *_buffer;
-    size_t _bufferLen; // amount of data written into _buffer
-    size_t _bufferSize; // total size of _buffer
-    size_t _size;
-    uint32_t _startAddress;
-    uint32_t _currentAddress;
-    uint32_t _command;
+    bool _async = false;
+    uint8_t _error = 0;
+    uint8_t *_buffer = nullptr;
+    size_t _bufferLen = 0; // amount of data written into _buffer
+    size_t _bufferSize = 0; // total size of _buffer
+    size_t _size = 0;
+    uint32_t _startAddress = 0;
+    uint32_t _currentAddress = 0;
+    uint32_t _command = U_FLASH;
 
     String _target_md5;
     MD5Builder _md5;
 
-    int _ledPin;
+    int _ledPin = -1;
     uint8_t _ledOn;
 
     // Optional signed binary verification
-    UpdaterHashClass *_hash;
-    UpdaterVerifyClass *_verify;
+    UpdaterHashClass *_hash = nullptr;
+    UpdaterVerifyClass *_verify = nullptr;
     // Optional progress callback function
-    THandlerFunction_Progress _progress_callback;
+    THandlerFunction_Progress _progress_callback = nullptr;
 };
 
 extern UpdaterClass Update;

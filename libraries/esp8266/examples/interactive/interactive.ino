@@ -42,7 +42,8 @@ void setup() {
     "WL_CONNECTED        = 3\n"
     "WL_CONNECT_FAILED   = 4\n"
     "WL_CONNECTION_LOST  = 5\n"
-    "WL_DISCONNECTED     = 6\n"
+    "WL_WRONG_PASSWORD   = 6\n"
+    "WL_DISCONNECTED     = 7\n"
   );
 }
 

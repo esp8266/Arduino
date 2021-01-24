@@ -156,8 +156,11 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nAbort called\n"));
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
+        // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
+        // In that case, print the exception as (6) which is IntegerDivZero
+        bool div_zero = (rst_info.exccause == 0) && (rst_info.epc1 == 0x4000dce5);
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
-            rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
+            div_zero ? 6 : rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
@@ -228,6 +231,12 @@ void __wrap_system_restart_local() {
     }
 
     cut_here();
+
+    if (s_unhandled_exception && umm_last_fail_alloc_addr) {
+        // now outside from the "cut-here" zone, print correctly the `new` caller address,
+        // idf-monitor.py will be able to decode this one and show exact location in sources
+        ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
+    }
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 

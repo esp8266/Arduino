@@ -150,7 +150,7 @@ public:
     {
         return readBytes((char*)buffer, size);
     }
-    int availableForWrite(void)
+    int availableForWrite(void) override
     {
         return static_cast<int>(uart_tx_free(_uart));
     }
@@ -206,5 +206,7 @@ protected:
 
 extern HardwareSerial Serial;
 extern HardwareSerial Serial1;
+
+extern void serialEventRun(void) __attribute__((weak));
 
 #endif

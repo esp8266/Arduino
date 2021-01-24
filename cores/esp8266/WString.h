@@ -53,14 +53,20 @@ class String {
         // if the initial value is null or invalid, or if memory allocation
         // fails, the string will be marked as invalid (i.e. "if (s)" will
         // be false).
-        String(const char *cstr = nullptr);
+        String() __attribute__((always_inline)) { // See init()
+            init();
+        }
+        String(const char *cstr);
         String(const String &str);
         String(const __FlashStringHelper *str);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-        String(String &&rval);
-        String(StringSumHelper &&rval);
-#endif
-        explicit String(char c);
+        String(String &&rval) noexcept;
+        String(StringSumHelper &&rval) noexcept;
+        explicit String(char c) {
+            sso.buff[0] = c;
+            sso.buff[1] = 0;
+            sso.len     = 1;
+            sso.isHeap  = 0;
+        }
         explicit String(unsigned char, unsigned char base = 10);
         explicit String(int, unsigned char base = 10);
         explicit String(unsigned int, unsigned char base = 10);
@@ -68,37 +74,35 @@ class String {
         explicit String(unsigned long, unsigned char base = 10);
         explicit String(float, unsigned char decimalPlaces = 2);
         explicit String(double, unsigned char decimalPlaces = 2);
-        ~String(void);
+        ~String() {
+            invalidate();
+        }
 
         // memory management
         // return true on success, false on failure (in which case, the string
         // is left unchanged).  reserve(0), if successful, will validate an
         // invalid string (i.e., "if (s)" will be true afterwards)
         unsigned char reserve(unsigned int size);
-        inline unsigned int length(void) const {
-            if(buffer()) {
-                return len();
-            } else {
-                return 0;
-            }
+        unsigned int length(void) const {
+            return buffer() ? len() : 0;
         }
-        inline void clear(void) {
+        void clear(void) {
             setLen(0);
         }
-        inline bool isEmpty(void) const {
+        bool isEmpty(void) const {
             return length() == 0;
         }
 
         // creates a copy of the assigned value.  if the value is null or
         // invalid, or if the memory allocation fails, the string will be
         // marked as invalid ("if (s)" will be false).
-        String & operator =(const String &rhs);
-        String & operator =(const char *cstr);
-        String & operator = (const __FlashStringHelper *str);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-        String & operator =(String &&rval);
-        String & operator =(StringSumHelper &&rval);
-#endif
+        String &operator =(const String &rhs);
+        String &operator =(const char *cstr);
+        String &operator =(const __FlashStringHelper *str);
+        String &operator =(String &&rval) noexcept;
+        String &operator =(StringSumHelper &&rval) noexcept {
+            return operator =((String &&)rval);
+        }
 
         // concatenate (works w/ built-in types)
 
@@ -115,67 +119,67 @@ class String {
         unsigned char concat(unsigned long num);
         unsigned char concat(float num);
         unsigned char concat(double num);
-        unsigned char concat(const __FlashStringHelper * str);
+        unsigned char concat(const __FlashStringHelper *str);
         unsigned char concat(const char *cstr, unsigned int length);
 
         // if there's not enough memory for the concatenated value, the string
         // will be left unchanged (but this isn't signalled in any way)
-        String & operator +=(const String &rhs) {
+        String &operator +=(const String &rhs) {
             concat(rhs);
-            return (*this);
+            return *this;
         }
-        String & operator +=(const char *cstr) {
+        String &operator +=(const char *cstr) {
             concat(cstr);
-            return (*this);
+            return *this;
         }
-        String & operator +=(char c) {
+        String &operator +=(char c) {
             concat(c);
-            return (*this);
+            return *this;
         }
-        String & operator +=(unsigned char num) {
+        String &operator +=(unsigned char num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator +=(int num) {
+        String &operator +=(int num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator +=(unsigned int num) {
+        String &operator +=(unsigned int num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator +=(long num) {
+        String &operator +=(long num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator +=(unsigned long num) {
+        String &operator +=(unsigned long num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator +=(float num) {
+        String &operator +=(float num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator +=(double num) {
+        String &operator +=(double num) {
             concat(num);
-            return (*this);
+            return *this;
         }
-        String & operator += (const __FlashStringHelper *str){
+        String &operator +=(const __FlashStringHelper *str) {
             concat(str);
-            return (*this);
+            return *this;
         }
 
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, const String &rhs);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, const char *cstr);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, char c);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned char num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, int num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned int num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, long num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned long num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, float num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, double num);
-        friend StringSumHelper & operator +(const StringSumHelper &lhs, const __FlashStringHelper *rhs);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, const String &rhs);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, const char *cstr);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, char c);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned char num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, int num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned int num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, long num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, float num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, double num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, const __FlashStringHelper *rhs);
 
         // comparison (only works w/ Strings and "strings")
         operator StringIfHelperType() const {
@@ -203,41 +207,45 @@ class String {
         unsigned char equalsIgnoreCase(const String &s) const;
         unsigned char equalsConstantTime(const String &s) const;
         unsigned char startsWith(const String &prefix) const;
-        unsigned char startsWith(const char * prefix) const {
+        unsigned char startsWith(const char *prefix) const {
             return this->startsWith(String(prefix));
         }
-        unsigned char startsWith(const __FlashStringHelper * prefix) const {
+        unsigned char startsWith(const __FlashStringHelper *prefix) const {
             return this->startsWith(String(prefix));
         }
         unsigned char startsWith(const String &prefix, unsigned int offset) const;
         unsigned char endsWith(const String &suffix) const;
-        unsigned char endsWith(const char * suffix) const {
+        unsigned char endsWith(const char *suffix) const {
             return this->endsWith(String(suffix));
         }
-        unsigned char endsWith(const __FlashStringHelper * suffix) const {
+        unsigned char endsWith(const __FlashStringHelper *suffix) const {
             return this->endsWith(String(suffix));
         }
 
         // character access
-        char charAt(unsigned int index) const;
+        char charAt(unsigned int index) const {
+            return operator [](index);
+        }
         void setCharAt(unsigned int index, char c);
         char operator [](unsigned int index) const;
-        char& operator [](unsigned int index);
+        char &operator [](unsigned int index);
         void getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index = 0) const;
         void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
             getBytes((unsigned char *) buf, bufsize, index);
         }
-        const char* c_str() const { return buffer(); }
-        char* begin() { return wbuffer(); }
-        char* end() { return wbuffer() + length(); }
-        const char* begin() const { return c_str(); }
-        const char* end() const { return c_str() + length(); }
+        const char *c_str() const { return buffer(); }
+        char *begin() { return wbuffer(); }
+        char *end() { return wbuffer() + length(); }
+        const char *begin() const { return c_str(); }
+        const char *end() const { return c_str() + length(); }
 
         // search
-        int indexOf(char ch) const;
-        int indexOf(char ch, unsigned int fromIndex) const;
-        int indexOf(const String &str) const;
-        int indexOf(const String &str, unsigned int fromIndex) const;
+        int indexOf(char ch, unsigned int fromIndex = 0) const;
+        int indexOf(const char *str, unsigned int fromIndex = 0) const;
+        int indexOf(const __FlashStringHelper *str, unsigned int fromIndex = 0) const {
+            return indexOf((const char*)str, fromIndex);
+        }
+        int indexOf(const String &str, unsigned int fromIndex = 0) const;
         int lastIndexOf(char ch) const;
         int lastIndexOf(char ch, unsigned int fromIndex) const;
         int lastIndexOf(const String &str) const;
@@ -245,29 +253,29 @@ class String {
         String substring(unsigned int beginIndex) const {
             return substring(beginIndex, len());
         }
-        ;
         String substring(unsigned int beginIndex, unsigned int endIndex) const;
 
         // modification
         void replace(char find, char replace);
-        void replace(const String& find, const String& replace);
-        void replace(const char * find, const String& replace) {
+        void replace(const String &find, const String &replace);
+        void replace(const char *find, const String &replace) {
             this->replace(String(find), replace);
         }
-        void replace(const __FlashStringHelper * find, const String& replace) {
+        void replace(const __FlashStringHelper *find, const String &replace) {
             this->replace(String(find), replace);
         }
-        void replace(const char * find, const char * replace) {
+        void replace(const char *find, const char *replace) {
             this->replace(String(find), String(replace));
         }
-        void replace(const __FlashStringHelper * find, const char * replace) {
+        void replace(const __FlashStringHelper *find, const char *replace) {
             this->replace(String(find), String(replace));
         }
-        void replace(const __FlashStringHelper * find, const __FlashStringHelper * replace) {
+        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
             this->replace(String(find), String(replace));
         }
-        void remove(unsigned int index);
-        void remove(unsigned int index, unsigned int count);
+        // Pass the biggest integer if the count is not specified.
+        // The remove method below will take care of truncating it at the end of the string.
+        void remove(unsigned int index, unsigned int count = (unsigned int)-1);
         void toLowerCase(void);
         void toUpperCase(void);
         void trim(void);
@@ -275,11 +283,11 @@ class String {
         // parsing/conversion
         long toInt(void) const;
         float toFloat(void) const;
-	double toDouble(void) const;
+        double toDouble(void) const;
 
     protected:
         // Contains the string info when we're not in SSO mode
-        struct _ptr { 
+        struct _ptr {
             char *   buff;
             uint16_t cap;
             uint16_t len;
@@ -288,8 +296,8 @@ class String {
         enum { SSOSIZE = sizeof(struct _ptr) + 4 - 1 }; // Characters to allocate space for SSO, must be 12 or more
         struct _sso {
             char     buff[SSOSIZE];
-            unsigned char len   : 7; // Ensure only one byte is allocated by GCC for the bitfields
-            unsigned char isSSO : 1;
+            unsigned char len    : 7; // Ensure only one byte is allocated by GCC for the bitfields
+            unsigned char isHeap : 1;
         } __attribute__((packed)); // Ensure that GCC doesn't expand the flag byte to a 32-bit word for alignment issues
         enum { CAPACITY_MAX = 65535 }; // If typeof(cap) changed from uint16_t, be sure to update this enum to the max value storable in the type
         union {
@@ -297,28 +305,48 @@ class String {
             struct _sso sso;
         };
         // Accessor functions
-        inline bool isSSO() const { return sso.isSSO; }
-        inline unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
-        inline unsigned int capacity() const { return isSSO() ? (unsigned int)SSOSIZE - 1 : ptr.cap; } // Size of max string not including terminal NUL
-        inline void setSSO(bool set) { sso.isSSO = set; }
-        inline void setLen(int len) { if (isSSO()) sso.len = len; else ptr.len = len; }
-        inline void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
-	inline void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
+        bool isSSO() const { return !sso.isHeap; }
+        unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
+        unsigned int capacity() const { return isSSO() ? (unsigned int)SSOSIZE - 1 : ptr.cap; } // Size of max string not including terminal NUL
+        void setSSO(bool set) { sso.isHeap = !set; }
+        void setLen(int len) {
+            if (isSSO()) {
+                setSSO(true); // Avoid emitting of bitwise EXTRACT-AND-OR ops (store-merging optimization)
+                sso.len = len;
+            } else
+                ptr.len = len;
+        }
+        void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
+        void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
         // Buffer accessor functions
-        inline const char *buffer() const { return (const char *)(isSSO() ? sso.buff : ptr.buff); }
-        inline char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
+        const char *buffer() const { return wbuffer(); }
+        char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
 
     protected:
-        void init(void);
+        void init(void) __attribute__((always_inline)) {
+            sso.buff[0] = 0;
+            sso.len     = 0;
+            sso.isHeap  = 0;
+            // Without the 6 statements shown below, GCC simply emits such as: "MOVI.N aX,0", "S8I aX,a2,0" and "S8I aX,a2,11" (8 bytes in total)
+            sso.buff[1]  = 0;
+            sso.buff[2]  = 0;
+            sso.buff[3]  = 0;
+            sso.buff[8]  = 0;
+            sso.buff[9]  = 0;
+            sso.buff[10] = 0;
+            // With the above, thanks to store-merging, GCC can use the narrow form of 32-bit store insn ("S32I.N") and emits:
+            //   "MOVI.N aX,0", "S32I.N aX,a2,0" and "S32I.N aX,a2,8" (6 bytes in total)
+            // (Literature: Xtensa(R) Instruction Set Reference Manual, "S8I - Store 8-bit" [p.504] and "S32I.N - Narrow Store 32-bit" [p.512])
+            // Unfortunately, GCC seems not to re-evaluate the cost of inlining after the store-merging optimizer stage,
+            // `always_inline` attribute is necessary in order to keep inlining.
+        }
         void invalidate(void);
         unsigned char changeBuffer(unsigned int maxStrLen);
 
         // copy and move
-        String & copy(const char *cstr, unsigned int length);
-        String & copy(const __FlashStringHelper *pstr, unsigned int length);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-        void move(String &rhs);
-#endif
+        String &copy(const char *cstr, unsigned int length);
+        String &copy(const __FlashStringHelper *pstr, unsigned int length);
+        void move(String &rhs) noexcept;
 };
 
 class StringSumHelper: public String {
@@ -352,6 +380,9 @@ class StringSumHelper: public String {
         }
         StringSumHelper(double num) :
                 String(num) {
+        }
+        StringSumHelper(const __FlashStringHelper *s) :
+                String(s) {
         }
 };
 

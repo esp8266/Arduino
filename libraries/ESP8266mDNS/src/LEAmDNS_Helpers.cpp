@@ -22,54 +22,12 @@
 
 */
 
-#include "lwip/igmp.h"
+#include <lwip/igmp.h>
+#include <stdlib_noniso.h> // strrstr()
 
+#include "ESP8266mDNS.h"
 #include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
-
-
-namespace
-{
-
-/*
-    strrstr (static)
-
-    Backwards search for p_pcPattern in p_pcString
-    Based on: https://stackoverflow.com/a/1634398/2778898
-
-*/
-const char* strrstr(const char*__restrict p_pcString, const char*__restrict p_pcPattern)
-{
-
-    const char* pcResult = 0;
-
-    size_t      stStringLength = (p_pcString ? strlen(p_pcString) : 0);
-    size_t      stPatternLength = (p_pcPattern ? strlen(p_pcPattern) : 0);
-
-    if ((stStringLength) &&
-            (stPatternLength) &&
-            (stPatternLength <= stStringLength))
-    {
-        // Pattern is shorter or has the same length tham the string
-
-        for (const char* s = (p_pcString + stStringLength - stPatternLength); s >= p_pcString; --s)
-        {
-            if (0 == strncmp(s, p_pcPattern, stPatternLength))
-            {
-                pcResult = s;
-                break;
-            }
-        }
-    }
-    return pcResult;
-}
-
-
-} // anonymous
-
-
-
-
 
 namespace esp8266
 {
@@ -210,31 +168,23 @@ bool MDNSResponder::_allocUDPContext(void)
 {
     DEBUG_EX_INFO(DEBUG_OUTPUT.println("[MDNSResponder] _allocUDPContext"););
 
-    bool    bResult = false;
-
     _releaseUDPContext();
+    _joinMulticastGroups();
 
-#ifdef MDNS_IP4_SUPPORT
-    ip_addr_t   multicast_addr = DNS_MQUERY_IPV4_GROUP_INIT;
-#endif
-#ifdef MDNS_IP6_SUPPORT
-    //TODO: set multicast address (lwip_joingroup() is IPv4 only at the time of writing)
-    multicast_addr.addr = DNS_MQUERY_IPV6_GROUP_INIT;
-#endif
-    if (ERR_OK == igmp_joingroup(ip_2_ip4(&m_netif->ip_addr), ip_2_ip4(&multicast_addr)))
+    m_pUDPContext = new UdpContext;
+    m_pUDPContext->ref();
+
+    if (m_pUDPContext->listen(IP4_ADDR_ANY, DNS_MQUERY_PORT))
     {
-        m_pUDPContext = new UdpContext;
-        m_pUDPContext->ref();
-
-        if (m_pUDPContext->listen(IP4_ADDR_ANY, DNS_MQUERY_PORT))
-        {
-            m_pUDPContext->setMulticastTTL(MDNS_MULTICAST_TTL);
-            m_pUDPContext->onRx(std::bind(&MDNSResponder::_callProcess, this));
-
-            bResult = m_pUDPContext->connect(&multicast_addr, DNS_MQUERY_PORT);
-        }
+        m_pUDPContext->setMulticastTTL(MDNS_MULTICAST_TTL);
+        m_pUDPContext->onRx(std::bind(&MDNSResponder::_callProcess, this));
     }
-    return bResult;
+    else
+    {
+        return false;
+    }
+
+    return true;
 }
 
 /*
@@ -247,6 +197,7 @@ bool MDNSResponder::_releaseUDPContext(void)
     {
         m_pUDPContext->unref();
         m_pUDPContext = 0;
+        _leaveMulticastGroups();
     }
     return true;
 }

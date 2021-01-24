@@ -53,7 +53,7 @@ namespace MDNSImplementation
 //#define ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
 
 // Enable/disable debug trace macros
-#ifdef DEBUG_ESP_MDNS_RESPONDER
+#if defined(DEBUG_ESP_PORT) && defined(DEBUG_ESP_MDNS_RESPONDER)
 #define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_ERR
 #define DEBUG_ESP_MDNS_TX
@@ -64,22 +64,22 @@ namespace MDNSImplementation
 #ifdef DEBUG_ESP_MDNS_INFO
 #define DEBUG_EX_INFO(A)    A
 #else
-#define DEBUG_EX_INFO(A)    do { (void)0; } while (0)
+#define DEBUG_EX_INFO(A)
 #endif
 #ifdef DEBUG_ESP_MDNS_ERR
 #define DEBUG_EX_ERR(A) A
 #else
-#define DEBUG_EX_ERR(A) do { (void)0; } while (0)
+#define DEBUG_EX_ERR(A)
 #endif
 #ifdef DEBUG_ESP_MDNS_TX
 #define DEBUG_EX_TX(A)  A
 #else
-#define DEBUG_EX_TX(A)  do { (void)0; } while (0)
+#define DEBUG_EX_TX(A)
 #endif
 #ifdef DEBUG_ESP_MDNS_RX
 #define DEBUG_EX_RX(A)  A
 #else
-#define DEBUG_EX_RX(A)  do { (void)0; } while (0)
+#define DEBUG_EX_RX(A)
 #endif
 
 #ifdef DEBUG_ESP_PORT
@@ -94,13 +94,12 @@ namespace MDNSImplementation
 #define DEBUG_EX_RX(A)      do { (void)0; } while (0)
 #endif
 
-
-/*  Replaced by 'lwip/prot/dns.h' definitions
+/*  already defined in lwIP ('lwip/prot/dns.h')
     #ifdef MDNS_IP4_SUPPORT
-    #define MDNS_MULTICAST_ADDR_IP4     (IPAddress(224, 0, 0, 251)) // ip_addr_t v4group = DNS_MQUERY_IPV4_GROUP_INIT
+    #define DNS_MQUERY_IPV4_GROUP_INIT     (IPAddress(224, 0, 0, 251))              // ip_addr_t v4group = DNS_MQUERY_IPV4_GROUP_INIT
     #endif
     #ifdef MDNS_IP6_SUPPORT
-    #define MDNS_MULTICAST_ADDR_IP6     (IPAddress("FF02::FB"))     // ip_addr_t v6group = DNS_MQUERY_IPV6_GROUP_INIT
+    #define DNS_MQUERY_IPV6_GROUP_INIT     IPADDR6_INIT_HOST(0xFF020000,0,0,0xFB)   // ip_addr_t v6group = DNS_MQUERY_IPV6_GROUP_INIT
     #endif*/
 //#define MDNS_MULTICAST_PORT               5353
 
