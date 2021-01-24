@@ -3550,7 +3550,7 @@ sonoff.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 inventone.name=Invent One
-inventone.build.board=ESP8266_GENERIC
+inventone.build.board=ESP8266_INVENT_ONE
 inventone.build.variant=inventone
 inventone.upload.tool=esptool
 inventone.upload.maximum_data_size=81920
@@ -7448,7 +7448,7 @@ wifinfo.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 cw01.name=XinaBox CW01
-cw01.build.board=ESP8266_GENERIC
+cw01.build.board=ESP8266_XINABOX_CW01
 cw01.build.variant=xinabox
 cw01.upload.tool=esptool
 cw01.upload.maximum_data_size=81920
