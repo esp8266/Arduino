@@ -53,7 +53,7 @@ public:
 
     void printDump(Print& out, Packet::PacketDetail ndd, const Filter nf = nullptr);
     void fileDump(File& outfile, const Filter nf = nullptr);
-    void tcpDump(WiFiServer &tcpDumpServer, const Filter nf = nullptr);
+    bool tcpDump(WiFiServer &tcpDumpServer, const Filter nf = nullptr);
 
 
 private:

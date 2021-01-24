@@ -111,7 +111,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     int getLastSSLError(char *dest = NULL, size_t len = 0);
 
     // Attach a preconfigured certificate store
-    void setCertStore(CertStore *certStore) {
+    void setCertStore(CertStoreBase *certStore) {
       _certStore = certStore;
     }
 
@@ -154,7 +154,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     std::shared_ptr<unsigned char> _iobuf_out;
     time_t _now;
     const X509List *_ta;
-    CertStore *_certStore;
+    CertStoreBase *_certStore;
     int _iobuf_in_size;
     int _iobuf_out_size;
     bool _handshake_done;
@@ -288,7 +288,7 @@ class WiFiClientSecure : public WiFiClient {
     int getLastSSLError(char *dest = NULL, size_t len = 0) { return _ctx->getLastSSLError(dest, len); }
 
     // Attach a preconfigured certificate store
-    void setCertStore(CertStore *certStore) { _ctx->setCertStore(certStore); }
+    void setCertStore(CertStoreBase *certStore) { _ctx->setCertStore(certStore); }
 
     // Select specific ciphers (i.e. optimize for speed over security)
     // These may be in PROGMEM or RAM, either will run properly

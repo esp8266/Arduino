@@ -75,7 +75,6 @@ env.Append(
         "-U__STRICT_ANSI__",
         "-ffunction-sections",
         "-fdata-sections",
-        "-fno-exceptions",
         "-Wall"
     ],
 
@@ -130,7 +129,7 @@ env.Append(
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
         "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
-        "stdc++", "m", "c", "gcc"
+        "m", "c", "gcc"
     ],
 
     LIBSOURCE_DIRS=[
@@ -249,6 +248,20 @@ else:
 if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
     env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PHASE", 1)])
 # PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM will be used by default
+
+#
+# Exceptions
+#
+if "PIO_FRAMEWORK_ARDUINO_ENABLE_EXCEPTIONS" in flatten_cppdefines:
+    env.Append(
+        CXXFLAGS=["-fexceptions"],
+        LIBS=["stdc++-exc"]
+    )
+else:
+    env.Append(
+        CXXFLAGS=["-fno-exceptions"],
+        LIBS=["stdc++"]
+    )
 
 #
 # VTables

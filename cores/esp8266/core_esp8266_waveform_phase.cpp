@@ -39,12 +39,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifdef WAVEFORM_LOCKED_PHASE
-
-#include "core_esp8266_waveform_phase.h"
+#include "core_esp8266_waveform.h"
 #include <Arduino.h>
+#include "debug.h"
 #include "ets_sys.h"
 #include <atomic>
+
+
+extern "C" void enablePhaseLockedWaveform (void)
+{
+   // Does nothing, added to app to enable linking these versions
+   // of the waveform functions instead of the default.
+   DEBUGV("Enabling phase locked waveform generator\n");
+}
+
+// No-op calls to override the PWM implementation
+extern "C" void _setPWMFreq_weak(uint32_t freq) { (void) freq; }
+extern "C" bool _stopPWM_weak(int pin) { (void) pin; return false; }
+extern "C" bool _setPWM_weak(int pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
+
 
 // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
 constexpr bool ISCPUFREQ160MHZ = clockCyclesPerMicrosecond() == 160;
@@ -122,7 +135,7 @@ static void ICACHE_RAM_ATTR deinitTimer() {
 extern "C" {
 
 // Set a callback.  Pass in NULL to stop it
-void setTimer1Callback(uint32_t (*fn)()) {
+void setTimer1Callback_weak(uint32_t (*fn)()) {
   waveform.timer1CB = fn;
   std::atomic_thread_fence(std::memory_order_acq_rel);
   if (!waveform.timer1Running && fn) {
@@ -132,17 +145,10 @@ void setTimer1Callback(uint32_t (*fn)()) {
   }
 }
 
-int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
-  uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
-  return startWaveformClockCycles(pin,
-    microsecondsToClockCycles(highUS), microsecondsToClockCycles(lowUS),
-    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS), autoPwm);
-}
-
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
+int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys, bool autoPwm) {
   uint32_t periodCcys = highCcys + lowCcys;
   if (periodCcys < MAXIRQTICKSCCYS) {
@@ -212,7 +218,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
 }
 
 // Stops a waveform on a pin
-int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
+ICACHE_RAM_ATTR int stopWaveform_weak(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
   if (!waveform.timer1Running) {
     return false;
@@ -436,5 +442,3 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Register access is fast and edge IRQ was configured before.
   T1L = nextEventCcys;
 }
-
-#endif // WAVEFORM_LOCKED_PHASE

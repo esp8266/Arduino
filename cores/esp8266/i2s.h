@@ -27,6 +27,7 @@
 How does this work? Basically, to get sound, you need to:
 - Connect an I2S codec to the I2S pins on the ESP.
 - Start up a thread that's going to do the sound output
+- Call i2s_set_bits() if you want to enable 24-bit mode
 - Call i2s_begin()
 - Call i2s_set_rate() with the sample rate you want.
 - Generate sound and call i2s_write_sample() with 32-bit samples.
@@ -41,6 +42,10 @@ speed.
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+bool i2s_set_bits(int bits); // Set bits per sample, only 16 or 24 supported.  Call before begin.
+// Note that in 24 bit mode each sample must be left-aligned (i.e. 0x00000000 .. 0xffffff00) as the
+// hardware shifts starting at bit 31, not bit 23.
 
 void i2s_begin(); // Enable TX only, for compatibility
 bool i2s_rxtx_begin(bool enableRx, bool enableTx); // Allow TX and/or RX, returns false on OOM error

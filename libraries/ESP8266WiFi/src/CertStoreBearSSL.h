@@ -31,7 +31,15 @@
 
 namespace BearSSL {
 
-class CertStore {
+class CertStoreBase {
+  public:
+    virtual ~CertStoreBase() {}
+
+    // Installs the cert store into the X509 decoder (normally via static function callbacks)
+    virtual void installCertStore(br_x509_minimal_context *ctx) = 0;
+};
+
+class CertStore: public CertStoreBase {
   public:
     CertStore() { };
     ~CertStore();
