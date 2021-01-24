@@ -50,9 +50,6 @@ size_t Stream::toFull(Print* to,
     // "neverExpires (default, impossible)" is translated to default timeout
     oneShotFastMs timedOut(timeoutMs >= oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
 
-    // yield about every 5ms (XXX SHOULD BE A SYSTEM-WIDE CONSTANT?)
-    periodicFastMs yieldNow(5);
-
     size_t written = 0;
 
     // len==-1 => maxLen=0 <=> until starvation
@@ -126,10 +123,7 @@ size_t Stream::toFull(Print* to,
                 break;
             }
 
-            if (yieldNow)
-            {
-                yield();
-            }
+            optimistic_yield(1000);
         }
 
     else if (readUntilChar >= 0)
@@ -187,10 +181,7 @@ size_t Stream::toFull(Print* to,
                 break;
             }
 
-            if (yieldNow)
-            {
-                yield();
-            }
+            optimistic_yield(1000);
         }
 
     else
@@ -256,10 +247,7 @@ size_t Stream::toFull(Print* to,
                 break;
             }
 
-            if (yieldNow)
-            {
-                yield();
-            }
+            optimistic_yield(1000);
         }
 
     if (getWriteError() == STREAMTO_SUCCESS && maxLen > 0)
