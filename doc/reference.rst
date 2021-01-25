@@ -375,9 +375,9 @@ Arduino API
 
 Stream extensions
 
-  Proposed Stream extensions are designed to be compatible with Arduino API,
-  and offer a additional methods to make transfers more efficients and easier
-  to use.
+  Stream extensions are designed to be compatible with Arduino API, and
+  offer additional methods to make transfers more efficient and easier to
+  use.
 
   The serial to network transfer above can be written like this:
 
@@ -400,7 +400,7 @@ Stream extensions
   - User facing API: ``Stream::to()``
 
     The goal of streams is to transfer data between producers and consumers,
-    like the telnet/serial example above.  Four methods are proposed, all of
+    like the telnet/serial example above.  Four methods are provided, all of
     them return the number of transmitted bytes:
 
     - ``Stream::toSize(dest, size [, timeout])``
@@ -435,14 +435,15 @@ Stream extensions
 
   - String, flash strings helpers
 
-    Two additional classes are proposed.
+    Two additional classes are provided.
 
     - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
 
-      A ``Stream::`` is made from ``const char*``, ``F("some words in
-      flash")`` or ``PROGMEM`` strings.  This class makes no copy, even with
-      data in flash.  For flash content, byte-by-byte transfers is a
-      consequence.  Other contents can be transfered at once when possible.
+      With this class, a ``Stream::`` can be made from ``const char*``,
+      ``F("some words in flash")`` or ``PROGMEM`` strings.  This class makes
+      no copy, even with data in flash.  For flash content, byte-by-byte
+      transfers is a consequence when "memcpy_P" cannot be used.  Other
+      contents can be transfered at once when possible.
 
       .. code:: cpp
 
@@ -512,4 +513,5 @@ Stream extensions
 
     - ``virtual ssize_t streamSize()``
 
-      -1 when stream size is unknown, depending on implementation (string size, file size..)
+      It returns -1 when stream size is unknown, depending on implementation
+      (string size, file size..).
