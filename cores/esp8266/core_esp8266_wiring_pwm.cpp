@@ -43,7 +43,11 @@ extern void __analogWriteFreq(uint32_t freq) {
   _setPWMFreq(freq);
 }
 
-extern void __analogWrite(uint8_t pin, int val, bool openDrain) {
+extern void __analogWrite(uint8_t pin, int val) {
+  __analogWriteMode(pin, val, false);
+}
+
+extern void __analogWriteMode(uint8_t pin, int val, bool openDrain) {
   if (pin > 16) {
     return;
   }
@@ -91,7 +95,8 @@ extern void __analogWriteResolution(int res) {
   }
 }
 
-extern void analogWrite(uint8_t pin, int val, bool openDrain) __attribute__((weak, alias("__analogWrite")));
+extern void analogWrite(uint8_t pin, int val) __attribute__((weak, alias("__analogWrite")));
+extern void analogWriteMode(uint8_t pin, int val, bool openDrain) __attribute__((weak, alias("__analogWriteMode")));
 extern void analogWriteFreq(uint32_t freq) __attribute__((weak, alias("__analogWriteFreq")));
 extern void analogWriteRange(uint32_t range) __attribute__((weak, alias("__analogWriteRange")));
 extern void analogWriteResolution(int res) __attribute__((weak, alias("__analogWriteResolution")));
