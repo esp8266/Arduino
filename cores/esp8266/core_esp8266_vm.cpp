@@ -54,7 +54,8 @@
    (note these are GPIO numbers, not the Arduion Dxx ones.  Refer to your
     ESP8266 board schematic for the mapping of GPIO to pin.)
  * Higher density PSRAM (ESP-PSRAM64H/etc.) works as well, but may be too
-   large to effectively use with UMM
+   large to effectively use with UMM.  Only 256K is available vial malloc,
+   but addresses above 256K do work and can be used for fixed buffers.
  
 */
 
@@ -129,11 +130,15 @@ constexpr uint8_t sck = 14;
 #define DECLARE_SPI1 spi_regs *spi1 = (spi_regs*)&SPI1CMD
 
 typedef enum { spi_5mhz = 0x001c1001, spi_10mhz = 0x000c1001, spi_20mhz = 0x00041001, spi_30mhz = 0x00002001, spi_40mhz = 0x00001001 } spi_clocking;
-
-constexpr uint32_t spi_clkval = spi_20mhz;
-
 typedef enum { sio = 0, dio = 1 } iotype;
-constexpr iotype hspi_mode = dio;
+
+#if MMU_EXTERNAL_HEAP > 128
+  constexpr uint32_t spi_clkval = spi_40mhz;
+  constexpr iotype hspi_mode = sio;
+#else
+  constexpr uint32_t spi_clkval = spi_20mhz;
+  constexpr iotype hspi_mode = dio;
+#endif
 
 constexpr int read_delay = (hspi_mode == dio) ? 4-1 : 0;
 
