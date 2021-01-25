@@ -372,7 +372,10 @@ const char* WiFiClientSecureCtx::peekBuffer ()
 // consume bytes after use (see peekBuffer)
 void WiFiClientSecureCtx::peekConsume (size_t consume)
 {
+    // according to WiFiClientSecureCtx::read:
     br_ssl_engine_recvapp_ack(_eng, consume);
+    _recvapp_buf = nullptr;
+    _recvapp_len = 0;
 }
 
 int WiFiClientSecureCtx::read() {
