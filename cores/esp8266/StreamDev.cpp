@@ -24,12 +24,11 @@
 #include <StreamDev.h>
 
 using esp8266::polledTimeout::oneShotFastMs;
-using esp8266::polledTimeout::periodicFastMs;
 
-size_t Stream::toFull(Print* to,
-                      const ssize_t len,
-                      const int readUntilChar,
-                      const oneShotFastMs::timeType timeoutMs)
+size_t Stream::sendGeneric(Print* to,
+                           const ssize_t len,
+                           const int readUntilChar,
+                           const oneShotFastMs::timeType timeoutMs)
 {
     setWriteError(STREAMTO_SUCCESS);
 
@@ -272,13 +271,13 @@ size_t Stream::toFull(Print* to,
 
 Stream& operator << (Stream& out, String& string)
 {
-    StreamPtr(string).toAll(out);
+    StreamPtr(string).sendAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, StreamString& stream)
 {
-    stream.toAll(out);
+    stream.sendAll(out);
     return out;
 }
 
@@ -289,30 +288,30 @@ Stream& operator << (Stream& out, Stream& stream)
         if (stream.inputTimeoutPossible())
         {
             // restrict with only what's buffered on input
-            stream.toNow(out);
+            stream.sendNow(out);
         }
         else
         {
             // take all what is in input
-            stream.toAll(out);
+            stream.sendAll(out);
         }
     }
     else
     {
-        stream.toSize(out, stream.streamSize());
+        stream.sendSize(out, stream.streamSize());
     }
     return out;
 }
 
 Stream& operator << (Stream& out, const char* text)
 {
-    StreamPtr(text).toAll(out);
+    StreamPtr(text).sendAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, const __FlashStringHelper* text)
 {
-    StreamPtr(text).toAll(out);
+    StreamPtr(text).sendAll(out);
     return out;
 }
 

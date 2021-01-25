@@ -447,7 +447,7 @@ Stream extensions
 
       .. code:: cpp
 
-        StreamPtr css(F("my long css data")); // no heap/stack allocation
+        StreamPtr css(F("my long css data")); // CSS data not copied to RAM
         server.toAll(css);
 
     - ``S2Stream::`` is designed to make a ``Stream::`` out of a ``String::`` without copy.

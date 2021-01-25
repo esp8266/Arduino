@@ -239,7 +239,7 @@ public:
     setContentLength(size);
     send(200, contentType, emptyString);
     if (requestMethod == HTTP_GET)
-        size = aStream.toSize(_currentClient, size);
+        size = aStream.sendSize(_currentClient, size);
     return size;
   }
 

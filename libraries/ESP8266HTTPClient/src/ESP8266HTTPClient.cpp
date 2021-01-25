@@ -28,7 +28,7 @@
 #include <StreamDev.h>
 #include <base64.h>
 
-static int TO2HTTPC (Stream::toReport_e streamToError)
+static int TO2HTTPC (Stream::sendReport_e streamToError)
 {
     switch (streamToError)
     {
@@ -443,7 +443,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         }
 
         // transfer all of it, with send-timeout
-        if (size && StreamPtr(payload, size).toAll(_client) != size)
+        if (size && StreamPtr(payload, size).sendAll(_client) != size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
 
         // handle Server Response (Header)
@@ -930,7 +930,7 @@ bool HTTPClient::sendHeader(const char * type)
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     // transfer all of it, with timeout
-    return StreamPtr(header).toAll(_client) == header.length();
+    return StreamPtr(header).sendAll(_client) == header.length();
 }
 
 /**

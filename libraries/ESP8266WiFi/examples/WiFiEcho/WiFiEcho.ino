@@ -122,13 +122,13 @@ void loop() {
   else if (t == 3) {
     // stream to print, possibly with only one copy
     if (sizes[s]) {
-      tot += client.toSize(&client, sizes[s]);
+      tot += client.sendSize(&client, sizes[s]);
     } else {
-      tot += client.toAll(&client);
+      tot += client.sendAll(&client);
     }
     cnt++;
 
-    switch (client.getLastTo()) {
+    switch (client.getLastSendReport()) {
       case Stream::STREAMTO_SUCCESS: break;
       case Stream::STREAMTO_TIMED_OUT: Serial.println("Stream::to: timeout"); break;
       case Stream::STREAMTO_READ_ERROR: Serial.println("Stream::to: read error"); break;

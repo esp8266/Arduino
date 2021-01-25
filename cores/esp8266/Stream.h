@@ -164,23 +164,23 @@ class Stream: public Print {
 
         // transfers already buffered / immediately available data (no timeout)
         // returns number of transfered bytes
-        size_t toNow (Print* to) { return toFull(to, -1, -1, oneShotMs::alwaysExpired); }
-        size_t toNow (Print& to) { return toNow(&to); }
+        size_t sendNow (Print* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
+        size_t sendNow (Print& to) { return sendNow(&to); }
 
         // transfers data until timeout
         // returns number of transfered bytes
-        size_t toAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, -1, timeoutMs); }
-        size_t toAll (Print& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toAll(&to, timeoutMs); }
+        size_t sendAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, -1, timeoutMs); }
+        size_t sendAll (Print& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
 
         // transfers data until a char is encountered (the char is swallowed but not transfered) with timeout
         // returns number of transfered bytes
-        size_t toUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, -1, readUntilChar, timeoutMs); }
-        size_t toUntil (Print& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toUntil(&to, readUntilChar, timeoutMs); }
+        size_t sendUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, readUntilChar, timeoutMs); }
+        size_t sendUntil (Print& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
 
         // transfers data until requested size or timeout
         // returns number of transfered bytes
-        size_t toSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toFull(to, maxLen, -1, timeoutMs); }
-        size_t toSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return toSize(&to, maxLen, timeoutMs); }
+        size_t sendSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, maxLen, -1, timeoutMs); }
+        size_t sendSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
 
         // remaining size (-1 by default = unknown)
         virtual ssize_t streamSize () { return -1; }
@@ -192,17 +192,17 @@ class Stream: public Print {
             STREAMTO_READ_ERROR,
             STREAMTO_WRITE_ERROR,
             STREAMTO_SHORT,
-        } toReport_e;
+        } sendReport_e;
 
-        toReport_e getLastTo () /*const*/ { return (toReport_e)getWriteError(); }
+        sendReport_e getLastSendReport () /*const*/ { return (sendReport_e)getWriteError(); }
 
         ////////////////////
 
     protected:
-        size_t toFull (Print* to,
-                       const ssize_t maxLen = -1,
-                       const int readUntilChar = -1,
-                       oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
+        size_t sendGeneric (Print* to,
+                            const ssize_t maxLen = -1,
+                            const int readUntilChar = -1,
+                            oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
 
         //////////////////// end of extensions
 

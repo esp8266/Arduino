@@ -38,7 +38,7 @@ template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
   S2Stream dataStream(data);
-  return client.toSize(dataStream, maxLength, timeout_ms) == maxLength;
+  return client.sendSize(dataStream, maxLength, timeout_ms) == maxLength;
 }
 
 template <typename ServerType>
