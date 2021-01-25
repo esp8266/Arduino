@@ -1,4 +1,6 @@
 
+// this example sketch in the public domain is also a host and device test
+
 #include <StreamDev.h>
 #include <StreamString.h>
 
@@ -23,7 +25,7 @@ void testProgmem() {
   auto inProgmem2 = F("I am too in progmem");
 
   int heap = (int)ESP.getFreeHeap();
-  auto stream1 = StreamPtr(inProgmem, sizeof(inProgmem) - 1, true);
+  auto stream1 = StreamPtr(inProgmem, sizeof(inProgmem) - 1);
   auto stream2 = StreamPtr(inProgmem2);
   Serial << stream1 << " - " << stream2 << "\n";
   heap -= (int)ESP.getFreeHeap();
@@ -42,10 +44,10 @@ void testStream() {
     // prefer the lighter StreamPtr(String) to make a read-only Stream out of a String
 
     result.clear();
-    StreamPtr(inputString).toAll(result);
-    StreamPtr(inputString).toAll(result);
-    StreamPtr(inputString).toAll(result);
-    check("StreamPtr.toAll(StreamString)", result.c_str(), "hellohellohello");
+    StreamPtr(inputString).sendAll(result);
+    StreamPtr(inputString).sendAll(result);
+    StreamPtr(inputString).sendAll(result);
+    check("StreamPtr.sendAll(StreamString)", result.c_str(), "hellohellohello");
   }
 
   {
@@ -66,9 +68,9 @@ void testStream() {
     S2Stream input(inputString);
     input.reset();
 
-    input.toAll(result);
-    input.toAll(result);
-    check("S2Stream.toAll(StreamString)", result.c_str(), "hello");
+    input.sendAll(result);
+    input.sendAll(result);
+    check("S2Stream.sendAll(StreamString)", result.c_str(), "hello");
     check("unmodified String given to S2Stream", inputString.c_str(), "hello");
   }
 
@@ -82,8 +84,8 @@ void testStream() {
     // stream position set to offset 2 (0 by default)
     input.reset(2);
 
-    input.toAll(result);
-    input.toAll(result);
+    input.sendAll(result);
+    input.sendAll(result);
     check("S2Stream.reset(2):", result.c_str(), "llo");
   }
 
@@ -96,9 +98,9 @@ void testStream() {
     // reading stream will consume the string
     input.setConsume(); // can be ommitted, this is the default
 
-    input.toSize(result, 1);
-    input.toSize(result, 2);
-    check("setConsume(): S2Stream().toSize(StreamString,3)", result.c_str(), "hel");
+    input.sendSize(result, 1);
+    input.sendSize(result, 2);
+    check("setConsume(): S2Stream().sendSize(StreamString,3)", result.c_str(), "hel");
     check("setConsume(): String given from S2Stream is swallowed", inputString.c_str(), "lo");
   }
 
