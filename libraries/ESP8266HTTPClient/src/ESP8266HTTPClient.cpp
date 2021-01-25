@@ -28,7 +28,7 @@
 #include <StreamDev.h>
 #include <base64.h>
 
-static int TO2HTTPC (Stream::sendReport_e streamToError)
+static int SSEND2HTTPC (Stream::sendReport_e streamToError)
 {
     switch (streamToError)
     {
@@ -544,7 +544,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     }
 
     // transfer all of it, with timeout
-    size_t transferred = stream->toSize(_client, size);
+    size_t transferred = stream->sendSize(_client, size);
     if (transferred != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
@@ -626,11 +626,11 @@ int HTTPClient::writeToStream(Stream * stream)
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
         // len < 0: transfer all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->toSize(stream, len);
+        ret = _client->sendSize(stream, len);
 
         // do we have an error?
-        if(_client->getLastTo() != Stream::STREAMTO_SUCCESS) {
-            return returnError(TO2HTTPC(_client->getLastTo()));
+        if(_client->getLastSendReport() != Stream::STREAMTO_SUCCESS) {
+            return returnError(SSEND2HTTPC(_client->getLastSendReport()));
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
@@ -654,10 +654,10 @@ int HTTPClient::writeToStream(Stream * stream)
             // data left?
             if(len > 0) {
                 // read len bytes with timeout
-                int r = _client->toSize(stream, len);
-                if (_client->getLastTo() != Stream::STREAMTO_SUCCESS)
+                int r = _client->sendSize(stream, len);
+                if (_client->getLastSendReport() != Stream::STREAMTO_SUCCESS)
                     // not all data transferred
-                    return returnError(TO2HTTPC(_client->getLastTo()));
+                    return returnError(SSEND2HTTPC(_client->getLastSendReport()));
                 ret += r;
             } else {
 
@@ -847,7 +847,7 @@ bool HTTPClient::connect(void)
 {
     if(_reuse && _canReuse && connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
-        _client->toNow(devnull); // clear _client's output (all of it, no timeout)
+        _client->sendNow(devnull); // clear _client's output (all of it, no timeout)
         return true;
     }
 
