@@ -147,7 +147,7 @@ public:
         return true;
     }
 
-    virtual size_t availableForPeek()
+    virtual size_t peekAvailable()
     {
         if (peekPointer < 0)
         {

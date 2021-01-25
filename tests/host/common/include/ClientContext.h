@@ -300,7 +300,7 @@ public:
         _sync = sync;
     }
 
-    // return a pointer to available data buffer (size = availableForPeek())
+    // return a pointer to available data buffer (size = peekAvailable())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer ()
     {
@@ -308,7 +308,7 @@ public:
     }
 
     // return number of byte accessible by peekBuffer()
-    size_t availableForPeek ()
+    size_t peekAvailable ()
     {
         ssize_t ret = mockPeekBytes(_sock, nullptr, 0, 0, _inbuf, _inbufsize);
         if (ret < 0)

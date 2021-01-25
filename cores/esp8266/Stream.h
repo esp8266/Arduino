@@ -124,9 +124,9 @@ class Stream: public Print {
         virtual bool peekBufferAPI () const { return false; }
 
         // returns number of byte accessible by peekBuffer()
-        virtual size_t availableForPeek () { return 0; }
+        virtual size_t peekAvailable () { return 0; }
 
-        // returns a pointer to available data buffer (size = availableForPeek())
+        // returns a pointer to available data buffer (size = peekAvailable())
         // semantic forbids any kind of ::read()
         //     - after calling peekBuffer()
         //     - and before calling peekConsume()

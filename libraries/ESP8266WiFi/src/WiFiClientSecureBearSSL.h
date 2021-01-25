@@ -125,9 +125,9 @@ class WiFiClientSecureCtx : public WiFiClient {
     virtual bool peekBufferAPI () const override { return true; }
 
     // return number of byte accessible by peekBuffer()
-    virtual size_t availableForPeek () override { return WiFiClientSecureCtx::available(); }
+    virtual size_t peekAvailable () override { return WiFiClientSecureCtx::available(); }
 
-    // return a pointer to available data buffer (size = availableForPeek())
+    // return a pointer to available data buffer (size = peekAvailable())
     // semantic forbids any kind of read() before calling peekConsume()
     virtual const char* peekBuffer () override;
 
@@ -305,9 +305,9 @@ class WiFiClientSecure : public WiFiClient {
     virtual bool peekBufferAPI () const override { return true; }
 
     // return number of byte accessible by peekBuffer()
-    virtual size_t availableForPeek () override { return _ctx->available(); }
+    virtual size_t peekAvailable () override { return _ctx->available(); }
 
-    // return a pointer to available data buffer (size = availableForPeek())
+    // return a pointer to available data buffer (size = peekAvailable())
     // semantic forbids any kind of read() before calling peekConsume()
     virtual const char* peekBuffer () override { return _ctx->peekBuffer(); }
 

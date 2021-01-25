@@ -61,7 +61,7 @@ size_t Stream::toFull(Print* to,
 
         while (!maxLen || written < maxLen)
         {
-            size_t avpk = availableForPeek();
+            size_t avpk = peekAvailable();
             if (avpk == 0 && !inputTimeoutPossible())
             {
                 // no more data to read, ever
@@ -133,7 +133,7 @@ size_t Stream::toFull(Print* to,
 
         while (!maxLen || written < maxLen)
         {
-            size_t avpk = availableForPeek();
+            size_t avpk = peekAvailable();
             if (avpk == 0 && !inputTimeoutPossible())
             {
                 // no more data to read, ever

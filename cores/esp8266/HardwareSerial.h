@@ -149,7 +149,7 @@ public:
     }
 
     // return number of byte accessible by peekBuffer()
-    size_t availableForPeek () override
+    size_t peekAvailable () override
     {
         return uart_peek_available(_uart);
     }

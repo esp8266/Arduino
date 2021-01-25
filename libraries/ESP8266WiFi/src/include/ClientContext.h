@@ -438,7 +438,7 @@ public:
         _sync = sync;
     }
 
-    // return a pointer to available data buffer (size = availableForPeek())
+    // return a pointer to available data buffer (size = peekAvailable())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer ()
     {
@@ -448,7 +448,7 @@ public:
     }
 
     // return number of byte accessible by peekBuffer()
-    size_t availableForPeek ()
+    size_t peekAvailable ()
     {
         if (!_rx_buf)
             return 0;
@@ -519,20 +519,20 @@ protected:
             return false;
         }
 
-        DEBUGV(":wr %d %d\r\n", _datasource->availableForPeek(), _written);
+        DEBUGV(":wr %d %d\r\n", _datasource->peekAvailable(), _written);
 
         bool has_written = false;
 
         while (_datasource) {
             if (state() == CLOSED)
                 return false;
-            size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->availableForPeek());
+            size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->peekAvailable());
             if (!next_chunk_size)
                 break;
             const char* buf = _datasource->peekBuffer();
 
             uint8_t flags = 0;
-            if (next_chunk_size < _datasource->availableForPeek())
+            if (next_chunk_size < _datasource->peekAvailable())
                 //   PUSH is meant for peer, telling to give data to user app as soon as received
                 //   PUSH "may be set" when sender has finished sending a "meaningful" data block
                 //   PUSH does not break Nagle
@@ -546,7 +546,7 @@ protected:
 
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
 
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->availableForPeek(), (int)err);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->peekAvailable(), (int)err);
 
             if (err == ERR_OK) {
                 _datasource->peekConsume(next_chunk_size);

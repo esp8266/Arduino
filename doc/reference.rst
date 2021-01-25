@@ -491,7 +491,7 @@ Stream extensions
 
     - ``virtual bool peekBufferAPI ()`` returns ``true`` when the API is present in the class
 
-    - ``virtual size_t availableForPeek ()`` returns the number of reachable bytes
+    - ``virtual size_t peekAvailable ()`` returns the number of reachable bytes
 
     - ``virtual const char* peekBuffer ()`` returns the pointer to these bytes
 

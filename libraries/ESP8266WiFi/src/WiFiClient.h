@@ -126,9 +126,9 @@ public:
   virtual bool peekBufferAPI () const override;
 
   // return number of byte accessible by peekBuffer()
-  virtual size_t availableForPeek () override;
+  virtual size_t peekAvailable () override;
 
-  // return a pointer to available data buffer (size = availableForPeek())
+  // return a pointer to available data buffer (size = peekAvailable())
   // semantic forbids any kind of read() before calling peekConsume()
   virtual const char* peekBuffer () override;
 

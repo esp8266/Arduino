@@ -110,7 +110,7 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 
 ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
-    // usersize==0: availableForPeek()
+    // usersize==0: peekAvailable()
 
 	if (usersize > CCBUFSIZE)
 		mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
@@ -133,7 +133,7 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 	    }
 
         if (usersize == 0 && ccinbufsize)
-            // availableForPeek
+            // peekAvailable
             return ccinbufsize;
 
 		if (usersize <= ccinbufsize)

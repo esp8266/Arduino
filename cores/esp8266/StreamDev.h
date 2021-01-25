@@ -174,7 +174,7 @@ public:
     // Stream
     virtual int available() override
     {
-        return availableForPeek();
+        return peekAvailable();
     }
 
     virtual int read() override
@@ -222,7 +222,7 @@ public:
         return !_in_flash;
     }
 
-    virtual size_t availableForPeek() override
+    virtual size_t peekAvailable() override
     {
         return _peekPointer < _size ? _size - _peekPointer : 0;
     }
