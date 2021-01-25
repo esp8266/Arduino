@@ -170,7 +170,7 @@ void digitalWrite(uint8_t pin, uint8_t val);
 int digitalRead(uint8_t pin);
 int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
-void analogWrite(uint8_t pin, int val);
+void analogWrite(uint8_t pin, int val, bool openDrain = false);
 void analogWriteFreq(uint32_t freq);
 void analogWriteResolution(int res);
 void analogWriteRange(uint32_t range);
