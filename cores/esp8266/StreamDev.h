@@ -22,6 +22,7 @@
 #ifndef __STREAMDEV_H
 #define __STREAMDEV_H
 
+#include <esp_priv.h>
 #include <StreamString.h>
 
 ///////////////////////////////////////////////
@@ -161,8 +162,8 @@ protected:
 
 public:
     StreamPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _byteAddressible(true) { }
-    StreamPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressible(buffer < 0x40000000) { }
-    StreamPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressible(buffer < 0x40000000) { }
+    StreamPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressible(__byteAddressible(buffer)) { }
+    StreamPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressible(__byteAddressible(buffer)) { }
     StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _byteAddressible(false) { }
     StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _byteAddressible(false) { }
 
