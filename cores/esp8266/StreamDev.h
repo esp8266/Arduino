@@ -156,15 +156,15 @@ class StreamPtr: public StreamNull
 protected:
     const char* _buffer;
     size_t _size;
-    bool _in_flash;
+    bool _byteAddressible;
     size_t _peekPointer = 0;
 
 public:
-    StreamPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _in_flash(false) { }
-    StreamPtr(const char* buffer, size_t size, bool in_flash = false): _buffer(buffer), _size(size), _in_flash(in_flash) { }
-    StreamPtr(const uint8_t* buffer, size_t size, bool in_flash = false): _buffer((const char*)buffer), _size(size), _in_flash(in_flash) { }
-    StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _in_flash(true) { }
-    StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _in_flash(true) { }
+    StreamPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _byteAddressible(true) { }
+    StreamPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressible(buffer < 0x4000000) { }
+    StreamPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressible(buffer < 0x4000000) { }
+    StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _byteAddressible(false) { }
+    StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _byteAddressible(false) { }
 
     void reset(int pointer = 0)
     {
@@ -194,14 +194,7 @@ public:
             return 0;
         }
         size_t cpylen = std::min(_size - _peekPointer, len);
-        if (_in_flash)
-        {
-            memcpy_P(buffer, _buffer + _peekPointer, cpylen);
-        }
-        else
-        {
-            memcpy(buffer, _buffer + _peekPointer, cpylen);
-        }
+        memcpy_P(buffer, _buffer + _peekPointer, cpylen); // whether byte adressible is true
         _peekPointer += cpylen;
         return cpylen;
     }
@@ -219,7 +212,7 @@ public:
     // peekBuffer
     virtual bool peekBufferAPI() const override
     {
-        return !_in_flash;
+        return _byteAddressible;
     }
 
     virtual size_t peekAvailable() override
