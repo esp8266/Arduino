@@ -44,7 +44,7 @@ extern void __analogWriteFreq(uint32_t freq) {
 }
 
 extern void __analogWrite(uint8_t pin, int val) {
-  __analogWriteMode(pin, val, false);
+  analogWriteMode(pin, val, false);
 }
 
 extern void __analogWriteMode(uint8_t pin, int val, bool openDrain) {
