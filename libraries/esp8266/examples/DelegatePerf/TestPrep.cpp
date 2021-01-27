@@ -23,6 +23,7 @@ extern void set_f5(const std::function<bool(int)>& f);
 
 extern void set_f6(const Delegate<bool(int)>&);
 extern void set_f7(const Delegate<bool(int)>&);
+
 extern void set_f8(const Delegate<bool(int)>&);
 
 extern void set_f9(const Delegate<bool(int), Foo*>& f);
@@ -43,6 +44,7 @@ void testPrep() {
 
     set_f6([o](int result) -> bool { return o->cb(result); });
     set_f7(std::bind(Foo::cbwObj, o.get(), std::placeholders::_1));
+
     set_f8([](int result) -> bool { return cbCPtr(result); });
 
     set_f9([o](int result) -> bool { return o->cb(result); });

@@ -31,10 +31,12 @@ std::function<bool(int)> f5;
 
 Delegate<bool(int)> f6;
 Delegate<bool(int)> f7;
+
 Delegate<bool(int)> f8;
 
 Delegate<bool(int), Foo*> f9;
 Delegate<bool(int), Foo*> f10;
+
 Delegate<bool(int), Foo*> f11;
 Delegate<bool(int), Foo*> f12;
 
@@ -48,6 +50,7 @@ void set_f5(const std::function<bool(int)>& _f) { f5 = _f; }
 
 void set_f6(const Delegate<bool(int)>& _f) { f6 = _f; }
 void set_f7(const Delegate<bool(int)>& _f) { f7 = _f; }
+
 void set_f8(const Delegate<bool(int)>& _f) { f8 = _f; }
 
 void set_f9(const Delegate<bool(int), Foo*>& _f) { f9 = _f; }
@@ -97,8 +100,9 @@ void loop()
             case F4: f4(42); break; // [o](int result) -> bool { return o->cb(result); }
             case F5: f5(42); break; // std::bind(Foo::cbwObj, o, std::placeholders::_1)
 
-            case F6: f6(42); break; // [o](int result) -> bool { return o->cb(result); }
-            case F7: f7(42); break; // std::bind(Foo::cbwObj, o, std::placeholders::_1)
+            case F6: f6(42); break; // [o](int result) -> bool { return o->cb(result); } <==== antipattern for Delegate, use f11 instead
+            case F7: f7(42); break; // std::bind(Foo::cbwObj, o, std::placeholders::_1) <==== antipattern for Delegate, use f11 instead
+
             case F8: f8(42); break; // [](int result) -> bool { return cbCPtr(result); }
 
             case F9: f9(42); break; // [o](int result) -> bool { return o->cb(result); } <==== antipattern for Delegate, use f11 instead
