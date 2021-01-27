@@ -421,10 +421,10 @@ namespace delegate
                 DelegatePImpl::fn = fn;
             }
 
-            template<typename F> DelegatePImpl(F fn)
+            template<typename F> DelegatePImpl(F functional)
             {
                 kind = FP;
-                DelegatePImpl::fn = std::forward<F>(fn);
+                fn = std::forward<F>(functional);
             }
 
             DelegatePImpl& operator=(const DelegatePImpl& del)
@@ -1683,7 +1683,7 @@ namespace delegate
                 static_cast<const detail::DelegatePImpl<A, R, P...>&>(del)) {}
 
             Delegate(Delegate&& del) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(
-                std::move(static_cast<detail::DelegatePImpl<A, R, P...>&&>(del))) {}
+                std::move(static_cast<detail::DelegatePImpl<A, R, P...>&>(del))) {}
 
             Delegate(FunAPtr fnA, const A& obj) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(fnA, obj) {}
 
@@ -1691,7 +1691,7 @@ namespace delegate
 
             Delegate(FunPtr fn) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(fn) {}
 
-            template<typename F> Delegate(F functional) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(functional) {}
+            template<typename F> Delegate(F functional) : detail::DelegatePImpl<A, R, P...>::DelegatePImpl(std::forward<F>(functional)) {}
 
             Delegate& operator=(const Delegate& del) {
                 detail::DelegatePImpl<A, R, P...>::operator=(del);
@@ -1764,13 +1764,13 @@ namespace delegate
                 static_cast<const detail::DelegatePImpl<A*, R, P...>&>(del)) {}
 
             Delegate(Delegate&& del) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(
-                std::move(static_cast<detail::DelegatePImpl<A*, R, P...>&&>(del))) {}
+                std::move(static_cast<detail::DelegatePImpl<A*, R, P...>&>(del))) {}
 
             Delegate(FunAPtr fnA, A* obj) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(fnA, obj) {}
 
             Delegate(FunPtr fn) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(fn) {}
 
-            template<typename F> Delegate(F functional) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(functional) {}
+            template<typename F> Delegate(F functional) : detail::DelegatePImpl<A*, R, P...>::DelegatePImpl(std::forward<F>(functional)) {}
 
             Delegate& operator=(const Delegate& del) {
                 detail::DelegatePImpl<A*, R, P...>::operator=(del);
@@ -1822,11 +1822,11 @@ namespace delegate
                 static_cast<const detail::DelegatePImpl<void, R, P...>&>(del)) {}
 
             Delegate(Delegate&& del) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(
-                std::move(static_cast<detail::DelegatePImpl<void, R, P...>&&>(del))) {}
+                std::move(static_cast<detail::DelegatePImpl<void, R, P...>&>(del))) {}
 
             Delegate(FunPtr fn) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(fn) {}
 
-            template<typename F> Delegate(F functional) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(functional) {}
+            template<typename F> Delegate(F functional) : detail::DelegatePImpl<void, R, P...>::DelegatePImpl(std::forward<F>(functional)) {}
 
             Delegate& operator=(const Delegate& del) {
                 detail::DelegatePImpl<void, R, P...>::operator=(del);
@@ -1879,7 +1879,7 @@ namespace delegate
                 static_cast<const detail::DelegateImpl<A, R>&>(del)) {}
 
             Delegate(Delegate&& del) : detail::DelegateImpl<A, R>::DelegateImpl(
-                std::move(static_cast<detail::DelegateImpl<A, R>&&>(del))) {}
+                std::move(static_cast<detail::DelegateImpl<A, R>&>(del))) {}
 
             Delegate(FunAPtr fnA, const A& obj) : detail::DelegateImpl<A, R>::DelegateImpl(fnA, obj) {}
 
@@ -1887,7 +1887,7 @@ namespace delegate
 
             Delegate(FunPtr fn) : detail::DelegateImpl<A, R>::DelegateImpl(fn) {}
 
-            template<typename F> Delegate(F functional) : detail::DelegateImpl<A, R>::DelegateImpl(functional) {}
+            template<typename F> Delegate(F functional) : detail::DelegateImpl<A, R>::DelegateImpl(std::forward<F>(functional)) {}
 
             Delegate& operator=(const Delegate& del) {
                 detail::DelegateImpl<A, R>::operator=(del);
@@ -1960,13 +1960,13 @@ namespace delegate
                 static_cast<const detail::DelegateImpl<A*, R>&>(del)) {}
 
             Delegate(Delegate&& del) : detail::DelegateImpl<A*, R>::DelegateImpl(
-                std::move(static_cast<detail::DelegateImpl<A*, R>&&>(del))) {}
+                std::move(static_cast<detail::DelegateImpl<A*, R>&>(del))) {}
 
             Delegate(FunAPtr fnA, A* obj) : detail::DelegateImpl<A*, R>::DelegateImpl(fnA, obj) {}
 
             Delegate(FunPtr fn) : detail::DelegateImpl<A*, R>::DelegateImpl(fn) {}
 
-            template<typename F> Delegate(F functional) : detail::DelegateImpl<A*, R>::DelegateImpl(functional) {}
+            template<typename F> Delegate(F functional) : detail::DelegateImpl<A*, R>::DelegateImpl(std::forward<F>(functional)) {}
 
             Delegate& operator=(const Delegate& del) {
                 detail::DelegateImpl<A*, R>::operator=(del);
@@ -2018,11 +2018,11 @@ namespace delegate
                 static_cast<const detail::DelegateImpl<void, R>&>(del)) {}
 
             Delegate(Delegate&& del) : detail::DelegateImpl<void, R>::DelegateImpl(
-                std::move(static_cast<detail::DelegateImpl<void, R>&&>(del))) {}
+                std::move(static_cast<detail::DelegateImpl<void, R>&>(del))) {}
 
             Delegate(FunPtr fn) : detail::DelegateImpl<void, R>::DelegateImpl(fn) {}
 
-            template<typename F> Delegate(F functional) : detail::DelegateImpl<void, R>::DelegateImpl(functional) {}
+            template<typename F> Delegate(F functional) : detail::DelegateImpl<void, R>::DelegateImpl(std::forward<F>(functional)) {}
 
             Delegate& operator=(const Delegate& del) {
                 detail::DelegateImpl<void, R>::operator=(del);
@@ -2059,7 +2059,7 @@ public:
         static_cast<const delegate::detail::Delegate<A, R, P...>&>(del)) {}
 
     Delegate(Delegate&& del) : delegate::detail::Delegate<A, R, P...>::Delegate(
-        std::move(static_cast<delegate::detail::Delegate<A, R, P...>&&>(del))) {}
+        std::move(static_cast<delegate::detail::Delegate<A, R, P...>&>(del))) {}
 
     Delegate(typename delegate::detail::Delegate<A, R, P...>::FunAPtr fnA, const A& obj) : delegate::detail::Delegate<A, R, P...>::Delegate(fnA, obj) {}
 
@@ -2067,7 +2067,7 @@ public:
 
     Delegate(typename delegate::detail::Delegate<A, R, P...>::FunPtr fn) : delegate::detail::Delegate<A, R, P...>::Delegate(fn) {}
 
-    template<typename F> Delegate(F functional) : delegate::detail::Delegate<A, R, P...>::Delegate(functional) {}
+    template<typename F> Delegate(F functional) : delegate::detail::Delegate<A, R, P...>::Delegate(std::forward<F>(functional)) {}
 
     Delegate& operator=(const Delegate& del) {
         delegate::detail::Delegate<A, R, P...>::operator=(del);
@@ -2089,6 +2089,7 @@ public:
         return *this;
     }
 };
+
 template<typename R, typename... P> class Delegate<R(P...)> : public delegate::detail::Delegate<void, R, P...>
 {
 public:
@@ -2100,11 +2101,11 @@ public:
         static_cast<const delegate::detail::Delegate<void, R, P...>&>(del)) {}
 
     Delegate(Delegate&& del) : delegate::detail::Delegate<void, R, P...>::Delegate(
-        std::move(static_cast<delegate::detail::Delegate<void, R, P...>&&>(del))) {}
+        std::move(static_cast<delegate::detail::Delegate<void, R, P...>&>(del))) {}
 
     Delegate(typename delegate::detail::Delegate<void, R, P...>::FunPtr fn) : delegate::detail::Delegate<void, R, P...>::Delegate(fn) {}
 
-    template<typename F> Delegate(F functional) : delegate::detail::Delegate<void, R, P...>::Delegate(functional) {}
+    template<typename F> Delegate(F functional) : delegate::detail::Delegate<void, R, P...>::Delegate(std::forward<F>(functional)) {}
 
     Delegate& operator=(const Delegate& del) {
         delegate::detail::Delegate<void, R, P...>::operator=(del);
