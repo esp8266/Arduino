@@ -42,53 +42,13 @@ PROVIDE(_memmap_cacheattr_reset = _memmap_cacheattr_wb_trapnull);
 SECTIONS
 {
 
-  .dport0.rodata : ALIGN(4)
+  .globals : ALIGN(4)
   {
-    _dport0_rodata_start = ABSOLUTE(.);
-    *(.dport0.rodata)
-    *(.dport.rodata)
-    _dport0_rodata_end = ABSOLUTE(.);
-  } >dport0_0_seg :dport0_0_phdr
-
-  .dport0.literal : ALIGN(4)
-  {
-    _dport0_literal_start = ABSOLUTE(.);
-    *(.dport0.literal)
-    *(.dport.literal)
-    _dport0_literal_end = ABSOLUTE(.);
-  } >dport0_0_seg :dport0_0_phdr
-
-  .dport0.data : ALIGN(4)
-  {
-    _dport0_data_start = ABSOLUTE(.);
-    *(.dport0.data)
-    *(.dport.data)
-    _dport0_data_end = ABSOLUTE(.);
-  } >dport0_0_seg :dport0_0_phdr
+    *(COMMON)  /* Global vars */
+  } >dram0_0_seg :dram0_0_bss_phdr
 
   .data : ALIGN(4)
   {
-    *(COMMON)  /* Global vars */
-    . = ALIGN(4);
-    _heap_start = ABSOLUTE(.);
-/*    _stack_sentry = ALIGN(0x8); */
-  } >dram0_0_seg :dram0_0_bss_phdr
-/* __stack = 0x3ffc8000; */
-
-  .text : ALIGN(4)
-  {
-    _stext = .;
-    _text_start = ABSOLUTE(.);
-    *(.entry.text)
-    *(.init.literal)
-    *(.init)
-    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
-    *(.fini.literal)
-    *(.fini)
-    *(.gnu.version)
-    _text_end = ABSOLUTE(.);
-    _etext = .;
-    . = ALIGN (8);
     _data_start = ABSOLUTE(.);
     *(.data)
     *(.data.*)
@@ -102,7 +62,10 @@ SECTIONS
     *(.gnu.linkonce.s2.*)
     *(.jcr)
     _data_end = ABSOLUTE(.);
-  . = ALIGN (8);
+  } >dram0_0_seg :dram0_0_bss_phdr
+
+  .rodata : ALIGN(4)
+  {
     _rodata_start = ABSOLUTE(.);
     *(.rodata)
     *(.rodata.*)
@@ -131,14 +94,11 @@ SECTIONS
     *(.xt_except_desc_end)
     *(.dynamic)
     *(.gnu.version_d)
-    . = ALIGN(4);   /* this table MUST be 4-byte aligned */
-    _bss_table_start = ABSOLUTE(.);
-    LONG(_bss_start)
-    LONG(_bss_end)
-    _bss_table_end = ABSOLUTE(.);
     _rodata_end = ABSOLUTE(.);
+  } >dram0_0_seg :dram0_0_bss_phdr
 
-    . = ALIGN (8);
+  .bss : ALIGN(4)
+  {
     _bss_start = ABSOLUTE(.);
     *(.dynsbss)
     *(.sbss)
@@ -152,8 +112,24 @@ SECTIONS
     *(.bss)
     *(.bss.*)
     *(.gnu.linkonce.b.*)
-    . = ALIGN (8);
     _bss_end = ABSOLUTE(.);
+  } >dram0_0_seg :dram0_0_bss_phdr
+
+
+  .text : ALIGN(4)
+  {
+    _stext = .;
+    _text_start = ABSOLUTE(.);
+    *(.entry.text)
+    *(.init.literal)
+    *(.init)
+    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+    *(.fini.literal)
+    *(.fini)
+    *(.gnu.version)
+    _text_end = ABSOLUTE(.);
+    _etext = .;
+    . = ALIGN (4); /* Ensure 32b alignment since this is written to IRAM */
     _free_space = 4096 - 17 - (. - _stext);
 /*
 The boot loader checksum must be before the CRC, which is written by elf2bin.py.

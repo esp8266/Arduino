@@ -188,7 +188,7 @@ def main():
 
         wrapper(
             elf=args.eboot,
-            segments=[".text"],
+            segments=[".text", ".rodata"],
             to_addr=4096
         )
 
