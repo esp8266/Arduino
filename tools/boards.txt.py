@@ -337,7 +337,7 @@ boards = collections.OrderedDict([
     ( 'inventone', {
         'name': 'Invent One',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_INVENT_ONE',
             '.build.variant': 'inventone',
             },
         'macro': [
@@ -354,7 +354,7 @@ boards = collections.OrderedDict([
     ( 'cw01', {
         'name': 'XinaBox CW01',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_XINABOX_CW01',
             '.build.variant': 'xinabox',
             },
         'macro': [
@@ -1489,18 +1489,6 @@ def led (name, default, ledList):
     return { name: led }
 
 ################################################################
-# Waveform flavour
-
-def waveform ():
-    return { 'waveform': collections.OrderedDict([
-                        ('.menu.waveform.pwm', 'Locked PWM'),
-                        ('.menu.waveform.pwm.build.waveform', ''),
-                        ('.menu.waveform.phase', 'Locked Phase'),
-                        ('.menu.waveform.phase.build.waveform', '-DWAVEFORM_LOCKED_PHASE'),
-                    ])
-           }
-
-################################################################
 # sdk selection
 
 def sdk ():
@@ -1551,7 +1539,6 @@ def all_boards ():
     macros.update(led('led',    led_default, range(0,led_max+1)))
     macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
-    macros.update(waveform())
 
     if boardfilteropt or excludeboards:
         print('#')
@@ -1596,7 +1583,6 @@ def all_boards ():
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
-    print('menu.waveform=Waveform Flavour')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
     print('')
@@ -1619,7 +1605,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'waveform', 'mmu_menu', 'non32xfer_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
