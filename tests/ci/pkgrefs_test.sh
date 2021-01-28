@@ -3,9 +3,9 @@
 set -ev
 
 fail=0
-for i in $(cat "$TRAVIS_BUILD_DIR/package/package_esp8266com_index.template.json" | jq '.packages[0]."tools" | .[] | .systems[] | "\(.url) \(.checksum)"' | sort -u); do
-    url=$(echo $i | cut -f2 -d\" | cut -f1 -d' ')
-    sha=$(echo $i | cut -f2 -d\" | cut -f2 -d' ' | cut -f2 -d:)
+for i in $(cat "$TRAVIS_BUILD_DIR/package/package_esp8266com_index.template.json" | jq '.packages[0]."tools" | .[] | .systems[] | "\(.url) \(.checksum)"' | sort -u | sed 's/ /@/'); do
+    url=$(echo $i | sed 's/@/ /' | cut -f2 -d\" | cut -f1 -d' ')
+    sha=$(echo $i | sed 's/@/ /' | cut -f2 -d\" | cut -f2 -d' ' | cut -f2 -d:)
     echo "INFO:  Checking $url"
     rm -f file.bin
     wget --quiet -O file.bin $url
