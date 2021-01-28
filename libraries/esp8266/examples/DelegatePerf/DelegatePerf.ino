@@ -4,8 +4,12 @@
 */
 
 #include "Foo.h"
+#ifndef NODELEGATE
 #include <Delegate.h>
 #include <MultiDelegate.h>
+#else
+#include <functional>
+#endif
 
 constexpr long unsigned MAXCNT = 100000UL;
 const String TESTCASE = "F";
@@ -23,12 +27,18 @@ Foo* o0;
 Fp0 f0;
 Foo* o1;
 Fp0 f1;
+#ifndef NODELEGATE
 Delegate<bool(int)> f2;
 Delegate<bool(int), Foo*> f3;
+#else
+std::function<bool(int)> f2;
+std::function<bool(int)> f3;
+#endif
 
 std::function<bool(int)> f4;
 std::function<bool(int)> f5;
 
+#ifndef NODELEGATE
 Delegate<bool(int)> f6;
 Delegate<bool(int)> f7;
 
@@ -39,6 +49,18 @@ Delegate<bool(int), Foo*> f10;
 
 Delegate<bool(int), Foo*> f11;
 Delegate<bool(int), Foo*> f12;
+#else
+std::function<bool(int)> f6;
+std::function<bool(int)> f7;
+
+std::function<bool(int)> f8;
+
+std::function<bool(int)> f9;
+std::function<bool(int)> f10;
+
+std::function<bool(int)> f11;
+std::function<bool(int)> f12;
+#endif
 
 void set_f0(Fp0 _f, Foo* _o) {
   f0 = _f;
@@ -62,6 +84,7 @@ void set_f5(const std::function<bool(int)>& _f) {
   f5 = _f;
 }
 
+#ifndef NODELEGATE
 void set_f6(const Delegate<bool(int)>& _f) {
   f6 = _f;
 }
@@ -86,6 +109,32 @@ void set_f11(const Delegate<bool(int), Foo*>& _f) {
 void set_f12(const Delegate<bool(int), Foo*>& _f) {
   f12 = _f;
 }
+#else
+void set_f6(const std::function<bool(int)>& _f) {
+  f6 = _f;
+}
+void set_f7(const std::function<bool(int)>& _f) {
+  f7 = _f;
+}
+
+void set_f8(const std::function<bool(int)>& _f) {
+  f8 = _f;
+}
+
+void set_f9(const std::function<bool(int)>& _f) {
+  f9 = _f;
+}
+void set_f10(const std::function<bool(int)>& _f) {
+  f10 = _f;
+}
+
+void set_f11(const std::function<bool(int)>& _f) {
+  f11 = _f;
+}
+void set_f12(const std::function<bool(int)>& _f) {
+  f12 = _f;
+}
+#endif
 
 extern void testPrep();
 
