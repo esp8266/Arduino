@@ -30,8 +30,8 @@ fmodeb = { 'dout': 3, 'dio': 2, 'qout': 1, 'qio': 0 }
 ffreqb = { '40': 0, '26': 1, '20': 2, '80': 15 }
 fsizeb = { '512K': 0, '256K': 1, '1M': 2, '2M': 3, '4M': 4, '8M': 8, '16M': 9 }
 
-crcsize_offset = 4088
-crcval_offset = 4092
+crcsize_offset = 4096 + 16
+crcval_offset =  4096 + 16 + 4
 
 def get_elf_entry(elf, path):
     p = subprocess.Popen([path + "/xtensa-lx106-elf-readelf", '-h', elf], stdout=subprocess.PIPE, universal_newlines=True )
