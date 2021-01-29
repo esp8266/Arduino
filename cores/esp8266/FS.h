@@ -85,7 +85,7 @@ public:
     bool isDirectory() const;
 
     // Arduino "class SD" methods for compatibility
-    //XXX use stream::to / check read(buf,size) result
+    //TODO use stream::send / check read(buf,size) result
     template<typename T> size_t write(T &src){
       uint8_t obuf[256];
       size_t doneLen = 0;
