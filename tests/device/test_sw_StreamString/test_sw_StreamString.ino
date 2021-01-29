@@ -19,7 +19,7 @@ void setup ()
     BS_RUN(Serial);
 }
 
-TEST_CASE("StreamSring tests", "[StreamString]")
+TEST_CASE("StreamString tests", "[StreamString]")
 {
     testStream();
 }
