@@ -107,11 +107,11 @@ class StreamZero: public StreamNull
 {
 protected:
 
-    char _x;
+    char _zero;
 
 public:
 
-    StreamZero(char x = 0): _x(x) { }
+    StreamZero(char zero = 0): _zero(zero) { }
 
     // Stream
     virtual int available() override
@@ -121,23 +121,23 @@ public:
 
     virtual int read() override
     {
-        return _x;
+        return _zero;
     }
 
     virtual int peek() override
     {
-        return _x;
+        return _zero;
     }
 
     virtual size_t readBytes(char* buffer, size_t len) override
     {
-        memset(buffer, _x, len);
+        memset(buffer, _zero, len);
         return len;
     }
 
     virtual int read(uint8_t* buffer, size_t len) override
     {
-        memset((char*)buffer, _x, len);
+        memset((char*)buffer, _zero, len);
         return len;
     }
 
