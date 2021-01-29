@@ -129,11 +129,11 @@ void loop() {
     cnt++;
 
     switch (client.getLastSendReport()) {
-      case Stream::STREAMTO_SUCCESS: break;
-      case Stream::STREAMTO_TIMED_OUT: Serial.println("Stream::to: timeout"); break;
-      case Stream::STREAMTO_READ_ERROR: Serial.println("Stream::to: read error"); break;
-      case Stream::STREAMTO_WRITE_ERROR: Serial.println("Stream::to: write error"); break;
-      case Stream::STREAMTO_SHORT: Serial.println("Stream::to: short transfer"); break;
+      case Stream::STREAMSEND_SUCCESS: break;
+      case Stream::STREAMSEND_TIMED_OUT: Serial.println("Stream::to: timeout"); break;
+      case Stream::STREAMSEND_READ_ERROR: Serial.println("Stream::to: read error"); break;
+      case Stream::STREAMSEND_WRITE_ERROR: Serial.println("Stream::to: write error"); break;
+      case Stream::STREAMSEND_SHORT: Serial.println("Stream::to: short transfer"); break;
     }
   }
 

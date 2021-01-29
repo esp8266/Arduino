@@ -30,7 +30,7 @@ size_t Stream::sendGeneric(Print* to,
                            const int readUntilChar,
                            const oneShotFastMs::timeType timeoutMs)
 {
-    setWriteError(STREAMTO_SUCCESS);
+    _sendReport = STREAMSEND_SUCCESS;
 
     if (len == 0)
     {
@@ -156,7 +156,7 @@ size_t Stream::sendGeneric(Print* to,
                 w = to->write(c);
                 if (w != 1)
                 {
-                    setWriteError(STREAMTO_WRITE_ERROR);
+                    _sendReport = STREAMSEND_WRITE_ERROR;
                     break;
                 }
                 written += 1;
@@ -216,14 +216,14 @@ size_t Stream::sendGeneric(Print* to,
                 ssize_t r = read(temp, w);
                 if (r < 0)
                 {
-                    setWriteError(STREAMTO_READ_ERROR);
+                    _sendReport = STREAMSEND_READ_ERROR;
                     break;
                 }
                 w = to->write(temp, r);
                 written += w;
                 if ((size_t)r != w)
                 {
-                    setWriteError(STREAMTO_WRITE_ERROR);
+                    _sendReport = STREAMSEND_WRITE_ERROR;
                     break;
                 }
                 if (maxLen && w)
@@ -249,11 +249,11 @@ size_t Stream::sendGeneric(Print* to,
             optimistic_yield(1000);
         }
 
-    if (getWriteError() == STREAMTO_SUCCESS && maxLen > 0)
+    if (getWriteError() == STREAMSEND_SUCCESS && maxLen > 0)
     {
         if (timeoutMs && timedOut)
         {
-            setWriteError(STREAMTO_TIMED_OUT);
+            _sendReport = STREAMSEND_TIMED_OUT;
         }
         else if ((ssize_t)written != len)
         {
@@ -263,7 +263,7 @@ size_t Stream::sendGeneric(Print* to,
             //
             // Mark it as an error because user usually wants to get what is
             // asked for.
-            setWriteError(STREAMTO_SHORT);
+            _sendReport = STREAMSEND_SHORT;
         }
     }
     return written;

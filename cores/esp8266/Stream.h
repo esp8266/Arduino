@@ -39,10 +39,13 @@
  */
 
 // Arduino `Client: public Stream` class defines `virtual int read(uint8_t *buf, size_t size) = 0;`
-// This function is now imported into `Stream::` for `Stream::to*()`.
+// This function is now imported into `Stream::` for `Stream::send*()`.
 // Other classes inheriting from `Stream::` and implementing `read(uint8_t *buf, size_t size)`
 // must consequently use `int` as return type, namely Hardware/SoftwareSerial, FileSystems...
 #define STREAM_READ_RETURNS_INT 1
+
+// Stream::send API is present
+#define STREAMSEND_API 1
 
 class Stream: public Print {
     protected:
@@ -158,7 +161,7 @@ class Stream: public Print {
         // - always stop before timeout when "no-more-input-possible-data"
         //   or "no-more-output-possible-data" condition is met
         // - always return number of transfered bytes
-        // When result is 0 or less than requested maxLen, this->getLastTo()
+        // When result is 0 or less than requested maxLen, Print::getLastSend()
         // contains an error reason.
 
         // transfers already buffered / immediately available data (no timeout)
@@ -186,14 +189,14 @@ class Stream: public Print {
 
         typedef enum
         {
-            STREAMTO_SUCCESS = 0,
-            STREAMTO_TIMED_OUT,
-            STREAMTO_READ_ERROR,
-            STREAMTO_WRITE_ERROR,
-            STREAMTO_SHORT,
+            STREAMSEND_SUCCESS = 0,
+            STREAMSEND_TIMED_OUT,
+            STREAMSEND_READ_ERROR,
+            STREAMSEND_WRITE_ERROR,
+            STREAMSEND_SHORT,
         } sendReport_e;
 
-        sendReport_e getLastSendReport () /*const*/ { return (sendReport_e)getWriteError(); }
+        sendReport_e getLastSendReport () const { return _sendReport; }
 
         ////////////////////
 
@@ -210,6 +213,8 @@ class Stream: public Print {
         // this allows format characters (typically commas) in values to be ignored
 
         float parseFloat(char skipChar);  // as parseFloat() but the given skipChar is ignored
+
+        sendReport_e _sendReport = STREAMSEND_SUCCESS;
 };
 
 #endif

@@ -32,11 +32,11 @@ static int SSEND2HTTPC (Stream::sendReport_e streamToError)
 {
     switch (streamToError)
     {
-    case Stream::STREAMTO_TIMED_OUT: return HTTPC_ERROR_READ_TIMEOUT;
-    case Stream::STREAMTO_READ_ERROR: return HTTPC_ERROR_NO_STREAM;
-    case Stream::STREAMTO_WRITE_ERROR: return HTTPC_ERROR_STREAM_WRITE;
-    case Stream::STREAMTO_SHORT: return HTTPC_ERROR_STREAM_WRITE;
-    case Stream::STREAMTO_SUCCESS: return 0;
+    case Stream::STREAMSEND_TIMED_OUT: return HTTPC_ERROR_READ_TIMEOUT;
+    case Stream::STREAMSEND_READ_ERROR: return HTTPC_ERROR_NO_STREAM;
+    case Stream::STREAMSEND_WRITE_ERROR: return HTTPC_ERROR_STREAM_WRITE;
+    case Stream::STREAMSEND_SHORT: return HTTPC_ERROR_STREAM_WRITE;
+    case Stream::STREAMSEND_SUCCESS: return 0;
     }
     return 0; // never reached, keep gcc quiet
 }
@@ -629,7 +629,7 @@ int HTTPClient::writeToStream(Stream * stream)
         ret = _client->sendSize(stream, len);
 
         // do we have an error?
-        if(_client->getLastSendReport() != Stream::STREAMTO_SUCCESS) {
+        if(_client->getLastSendReport() != Stream::STREAMSEND_SUCCESS) {
             return returnError(SSEND2HTTPC(_client->getLastSendReport()));
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
@@ -655,7 +655,7 @@ int HTTPClient::writeToStream(Stream * stream)
             if(len > 0) {
                 // read len bytes with timeout
                 int r = _client->sendSize(stream, len);
-                if (_client->getLastSendReport() != Stream::STREAMTO_SUCCESS)
+                if (_client->getLastSendReport() != Stream::STREAMSEND_SUCCESS)
                     // not all data transferred
                     return returnError(SSEND2HTTPC(_client->getLastSendReport()));
                 ret += r;
