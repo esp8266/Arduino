@@ -109,6 +109,9 @@ PWM range may be changed by calling ``analogWriteRange(new_range)`` or
 ``analogWriteResolution(bits)``.  ``new_range`` may be from 15...65535
 or ``bits`` may be from 4...16.
 
+The function ``analogWriteMode(pin, value, openDrain)`` allows to sets
+the pin mode to ``OUTPUT_OPEN_DRAIN`` instead of ``OUTPUT``.
+
 **NOTE:** The default ``analogWrite`` range was 1023 in releases before
 3.0, but this lead to incompatibility with external libraries which
 depended on the Arduino core default of 256.  Existing applications which

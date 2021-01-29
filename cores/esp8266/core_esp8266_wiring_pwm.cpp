@@ -44,6 +44,10 @@ extern void __analogWriteFreq(uint32_t freq) {
 }
 
 extern void __analogWrite(uint8_t pin, int val) {
+  analogWriteMode(pin, val, false);
+}
+
+extern void __analogWriteMode(uint8_t pin, int val, bool openDrain) {
   if (pin > 16) {
     return;
   }
@@ -62,7 +66,11 @@ extern void __analogWrite(uint8_t pin, int val) {
     analogMap &= ~(1 << pin);
   }
   else {
-    pinMode(pin, OUTPUT);
+    if(openDrain) {
+      pinMode(pin, OUTPUT_OPEN_DRAIN);
+    } else {
+      pinMode(pin, OUTPUT);
+    }
   }
   uint32_t high = (analogPeriod * val) / analogScale;
   uint32_t low = analogPeriod - high;
@@ -88,6 +96,7 @@ extern void __analogWriteResolution(int res) {
 }
 
 extern void analogWrite(uint8_t pin, int val) __attribute__((weak, alias("__analogWrite")));
+extern void analogWriteMode(uint8_t pin, int val, bool openDrain) __attribute__((weak, alias("__analogWriteMode")));
 extern void analogWriteFreq(uint32_t freq) __attribute__((weak, alias("__analogWriteFreq")));
 extern void analogWriteRange(uint32_t range) __attribute__((weak, alias("__analogWriteRange")));
 extern void analogWriteResolution(int res) __attribute__((weak, alias("__analogWriteResolution")));
