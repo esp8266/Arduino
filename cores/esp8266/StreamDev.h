@@ -157,15 +157,15 @@ class StreamPtr: public StreamNull
 protected:
     const char* _buffer;
     size_t _size;
-    bool _byteAddressible;
+    bool _byteAddressable;
     size_t _peekPointer = 0;
 
 public:
-    StreamPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _byteAddressible(true) { }
-    StreamPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressible(__byteAddressible(buffer)) { }
-    StreamPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressible(__byteAddressible(buffer)) { }
-    StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _byteAddressible(false) { }
-    StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _byteAddressible(false) { }
+    StreamPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _byteAddressable(true) { }
+    StreamPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressable(__byteAddressable(buffer)) { }
+    StreamPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressable(__byteAddressable(buffer)) { }
+    StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _byteAddressable(false) { }
+    StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _byteAddressable(false) { }
 
     void reset(int pointer = 0)
     {
@@ -213,7 +213,7 @@ public:
     // peekBuffer
     virtual bool peekBufferAPI() const override
     {
-        return _byteAddressible;
+        return _byteAddressable;
     }
 
     virtual size_t peekAvailable() override
