@@ -100,7 +100,6 @@ class Stream: public Print {
         }
         // terminates if length characters have been read or timeout (see setTimeout)
         // returns the number of characters placed in the buffer (0 means no valid data found)
-        // return data type: size_t
 
         size_t readBytesUntil(char terminator, char *buffer, size_t length); // as readBytes with terminator character
         size_t readBytesUntil(char terminator, uint8_t *buffer, size_t length) {
