@@ -341,7 +341,6 @@ namespace delegate
             }
 
         protected:
-            enum { FUNC, FP, FPA } kind;
             union {
                 FunctionType functional;
                 FunPtr fn;
@@ -350,6 +349,7 @@ namespace delegate
                     A obj;
                 };
             };
+            enum { FUNC, FP, FPA } kind;
         };
 #else
         template<typename A, typename R, typename... P>
@@ -551,12 +551,12 @@ namespace delegate
             }
 
         protected:
-            enum { FP, FPA } kind;
             union {
                 FunPtr fn;
                 FunAPtr fnA;
             };
             A obj;
+            enum { FP, FPA } kind;
         };
 #endif
 
@@ -758,11 +758,11 @@ namespace delegate
             }
 
         protected:
-            enum { FUNC, FP } kind;
             union {
                 FunctionType functional;
                 FunPtr fn;
             };
+            enum { FUNC, FP } kind;
         };
 #else
         template<typename R, typename... P>
@@ -1141,7 +1141,6 @@ namespace delegate
             }
 
         protected:
-            enum { FUNC, FP, FPA } kind;
             union {
                 FunctionType functional;
                 FunPtr fn;
@@ -1150,6 +1149,7 @@ namespace delegate
                     A obj;
                 };
             };
+            enum { FUNC, FP, FPA } kind;
         };
 #else
         template<typename A, typename R>
@@ -1350,12 +1350,12 @@ namespace delegate
             }
 
         protected:
-            enum { FP, FPA } kind;
             union {
                 FunPtr fn;
                 FunAPtr fnA;
             };
             A obj;
+            enum { FP, FPA } kind;
         };
 #endif
 
@@ -1557,11 +1557,11 @@ namespace delegate
             }
 
         protected:
-            enum { FUNC, FP } kind;
             union {
                 FunctionType functional;
                 FunPtr fn;
             };
+            enum { FUNC, FP } kind;
         };
 #else
         template<typename R>
