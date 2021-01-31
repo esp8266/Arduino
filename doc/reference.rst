@@ -504,12 +504,12 @@ Stream extensions
 
     - ``virtual void peekConsume (size_t consume)`` tells to discard that number of bytes
 
-    - ``virtual bool inputTimeoutPossible ()``
+    - ``virtual bool inputCanTimeout ()``
 
       A ``StringStream`` will return false. A closed network connection returns false.
       This function allows ``Stream::toAll()`` to return early.
 
-    - ``virtual bool outputTimeoutPossible ()``
+    - ``virtual bool outputCanTimeout ()``
 
       A closed network connection returns false.
       This function allows ``Stream::toAll()`` to return early.

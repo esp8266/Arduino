@@ -140,9 +140,9 @@ class Stream: public Print {
 
         // by default read timeout is possible (incoming data from network,serial..)
         // children can override to false (like String::)
-        virtual bool inputTimeoutPossible () { return true; }
+        virtual bool inputCanTimeout () { return true; }
 
-        // (outputTimeoutPossible() is defined in Print::)
+        // (outputCanTimeout() is defined in Print::)
 
         //////////////////// extensions: Streaming streams to streams
         // Stream::to*()
@@ -153,7 +153,7 @@ class Stream: public Print {
         // - for efficiency, Stream classes should implement peekAPI when
         //   possible
         // - for an efficient timeout management, Print/Stream classes
-        //   should implement {output,input}TimeoutPossible()
+        //   should implement {output,input}CanTimeout()
 
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
 

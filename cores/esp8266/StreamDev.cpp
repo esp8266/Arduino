@@ -44,7 +44,7 @@ size_t Stream::sendGeneric(Print* to,
     // - getTimeout() is for reading only
     // - there is no getOutputTimeout() api
     // So we use getTimeout() for both,
-    // (also when inputTimeoutPossible() is false)
+    // (also when inputCanTimeout() is false)
 
     // "neverExpires (default, impossible)" is translated to default timeout
     oneShotFastMs timedOut(timeoutMs >= oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
@@ -61,14 +61,14 @@ size_t Stream::sendGeneric(Print* to,
         while (!maxLen || written < maxLen)
         {
             size_t avpk = peekAvailable();
-            if (avpk == 0 && !inputTimeoutPossible())
+            if (avpk == 0 && !inputCanTimeout())
             {
                 // no more data to read, ever
                 break;
             }
 
             size_t w = to->availableForWrite();
-            if (w == 0 && !outputTimeoutPossible())
+            if (w == 0 && !outputCanTimeout())
             {
                 // no more data can be written, ever
                 break;
@@ -133,14 +133,14 @@ size_t Stream::sendGeneric(Print* to,
         while (!maxLen || written < maxLen)
         {
             size_t avpk = peekAvailable();
-            if (avpk == 0 && !inputTimeoutPossible())
+            if (avpk == 0 && !inputCanTimeout())
             {
                 // no more data to read, ever
                 break;
             }
 
             size_t w = to->availableForWrite();
-            if (w == 0 && !outputTimeoutPossible())
+            if (w == 0 && !outputCanTimeout())
             {
                 // no more data can be written, ever
                 break;
@@ -191,14 +191,14 @@ size_t Stream::sendGeneric(Print* to,
         while (!maxLen || written < maxLen)
         {
             size_t avr = available();
-            if (avr == 0 && !inputTimeoutPossible())
+            if (avr == 0 && !inputCanTimeout())
             {
                 // no more data to read, ever
                 break;
             }
 
             size_t w = to->availableForWrite();
-            if (w == 0 && !to->outputTimeoutPossible())
+            if (w == 0 && !to->outputCanTimeout())
                 // no more data can be written, ever
             {
                 break;
@@ -285,7 +285,7 @@ Stream& operator << (Stream& out, Stream& stream)
 {
     if (stream.streamRemaining() < 0)
     {
-        if (stream.inputTimeoutPossible())
+        if (stream.inputCanTimeout())
         {
             // restrict with only what's buffered on input
             stream.sendNow(out);

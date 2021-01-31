@@ -130,12 +130,12 @@ public:
         // nothing to do
     }
 
-    virtual bool inputTimeoutPossible() override
+    virtual bool inputCanTimeout() override
     {
         return false;
     }
 
-    virtual bool outputTimeoutPossible() override
+    virtual bool outputCanTimeout() override
     {
         return false;
     }

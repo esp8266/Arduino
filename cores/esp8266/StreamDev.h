@@ -80,12 +80,12 @@ public:
         return 0;
     }
 
-    virtual bool outputTimeoutPossible() override
+    virtual bool outputCanTimeout() override
     {
         return false;
     }
 
-    virtual bool inputTimeoutPossible() override
+    virtual bool inputCanTimeout() override
     {
         return false;
     }

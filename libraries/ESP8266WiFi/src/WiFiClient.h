@@ -135,8 +135,8 @@ public:
   // consume bytes after use (see peekBuffer)
   virtual void peekConsume (size_t consume) override;
 
-  virtual bool outputTimeoutPossible () override { return connected(); }
-  virtual bool inputTimeoutPossible () override { return connected(); }
+  virtual bool outputCanTimeout () override { return connected(); }
+  virtual bool inputCanTimeout () override { return connected(); }
 
 protected:
 
