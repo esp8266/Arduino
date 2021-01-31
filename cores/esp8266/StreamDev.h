@@ -159,7 +159,6 @@ protected:
     size_t _peekPointer = 0;
 
 public:
-    StreamPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _byteAddressable(true) { }
     StreamPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressable(__byteAddressable(buffer)) { }
     StreamPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressable(__byteAddressable(buffer)) { }
     StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _byteAddressable(false) { }
