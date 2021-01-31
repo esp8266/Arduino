@@ -493,7 +493,7 @@ Stream extensions
     implemented in ``HardwareSerial``, ``WiFiClient`` and
     ``WiFiClientSecure``.
 
-    - ``virtual bool peekBufferAPI ()`` returns ``true`` when the API is present in the class
+    - ``virtual bool hasPeekBufferAPI ()`` returns ``true`` when the API is present in the class
 
     - ``virtual size_t peekAvailable ()`` returns the number of reachable bytes
 

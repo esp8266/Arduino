@@ -417,7 +417,7 @@ uint8_t WiFiClient::getKeepAliveCount () const
     return _client->getKeepAliveCount();
 }
 
-bool WiFiClient::peekBufferAPI () const
+bool WiFiClient::hasPeekBufferAPI () const
 {
     return true;
 }

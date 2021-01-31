@@ -123,7 +123,7 @@ public:
   void setSync(bool sync);
 
   // peek buffer API is present
-  virtual bool peekBufferAPI () const override;
+  virtual bool hasPeekBufferAPI () const override;
 
   // return number of byte accessible by peekBuffer()
   virtual size_t peekAvailable () override;

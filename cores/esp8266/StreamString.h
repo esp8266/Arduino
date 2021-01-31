@@ -142,7 +142,7 @@ public:
 
     //// Stream's peekBufferAPI
 
-    virtual bool peekBufferAPI() const override
+    virtual bool hasPeekBufferAPI() const override
     {
         return true;
     }

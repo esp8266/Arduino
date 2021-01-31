@@ -209,7 +209,7 @@ public:
     }
 
     // peekBuffer
-    virtual bool peekBufferAPI() const override
+    virtual bool hasPeekBufferAPI() const override
     {
         return _byteAddressable;
     }

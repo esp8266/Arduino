@@ -54,7 +54,7 @@ size_t Stream::sendGeneric(Print* to,
     // len==-1 => maxLen=0 <=> until starvation
     size_t maxLen = std::max((ssize_t)0, len);
 
-    if (peekBufferAPI())
+    if (hasPeekBufferAPI())
 
         // peek-buffer API
 

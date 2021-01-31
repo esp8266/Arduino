@@ -122,7 +122,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
     // peek buffer API is present
-    virtual bool peekBufferAPI () const override { return true; }
+    virtual bool hasPeekBufferAPI () const override { return true; }
 
     // return number of byte accessible by peekBuffer()
     virtual size_t peekAvailable () override { return WiFiClientSecureCtx::available(); }
@@ -302,7 +302,7 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
     // peek buffer API is present
-    virtual bool peekBufferAPI () const override { return true; }
+    virtual bool hasPeekBufferAPI () const override { return true; }
 
     // return number of byte accessible by peekBuffer()
     virtual size_t peekAvailable () override { return _ctx->available(); }

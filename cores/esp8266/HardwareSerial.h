@@ -136,7 +136,7 @@ public:
         return uart_peek_char(_uart);
     }
 
-    virtual bool peekBufferAPI () const override
+    virtual bool hasPeekBufferAPI () const override
     {
         return true;
     }

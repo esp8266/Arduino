@@ -123,7 +123,7 @@ class Stream: public Print {
 
         // informs user and ::to*() on effective buffered peek API implementation
         // by default: not available
-        virtual bool peekBufferAPI () const { return false; }
+        virtual bool hasPeekBufferAPI () const { return false; }
 
         // returns number of byte accessible by peekBuffer()
         virtual size_t peekAvailable () { return 0; }
