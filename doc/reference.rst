@@ -514,7 +514,7 @@ Stream extensions
       A closed network connection returns false.
       This function allows ``Stream::toAll()`` to return early.
 
-    - ``virtual ssize_t streamSize()``
+    - ``virtual ssize_t streamRemaining()``
 
-      It returns -1 when stream size is unknown, depending on implementation
+      It returns -1 when stream remaining size is unknown, depending on implementation
       (string size, file size..).

@@ -283,7 +283,7 @@ Stream& operator << (Stream& out, StreamString& stream)
 
 Stream& operator << (Stream& out, Stream& stream)
 {
-    if (stream.streamSize() < 0)
+    if (stream.streamRemaining() < 0)
     {
         if (stream.inputTimeoutPossible())
         {
@@ -298,7 +298,7 @@ Stream& operator << (Stream& out, Stream& stream)
     }
     else
     {
-        stream.sendSize(out, stream.streamSize());
+        stream.sendSize(out, stream.streamRemaining());
     }
     return out;
 }

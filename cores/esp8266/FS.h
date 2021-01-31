@@ -74,7 +74,7 @@ public:
     }
     size_t position() const;
     size_t size() const;
-    virtual ssize_t streamSize() override { return size() - position(); }
+    virtual ssize_t streamRemaining() override { return (ssize_t)size() - (ssize_t)position(); }
     void close();
     operator bool() const;
     const char* name() const;

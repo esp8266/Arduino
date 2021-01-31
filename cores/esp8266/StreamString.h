@@ -183,7 +183,7 @@ public:
         }
     }
 
-    virtual ssize_t streamSize() override
+    virtual ssize_t streamRemaining() override
     {
         return peekPointer < 0 ? string->length() : string->length() - peekPointer;
     }

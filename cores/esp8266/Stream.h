@@ -185,7 +185,7 @@ class Stream: public Print {
         size_t sendSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
 
         // remaining size (-1 by default = unknown)
-        virtual ssize_t streamSize () { return -1; }
+        virtual ssize_t streamRemaining () { return -1; }
 
         typedef enum
         {

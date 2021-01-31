@@ -90,7 +90,7 @@ public:
         return false;
     }
 
-    virtual ssize_t streamSize() override
+    virtual ssize_t streamRemaining() override
     {
         return 0;
     }
@@ -139,7 +139,7 @@ public:
         return len;
     }
 
-    virtual ssize_t streamSize() override
+    virtual ssize_t streamRemaining() override
     {
         return 32767;
     }
@@ -203,7 +203,7 @@ public:
         return readBytes((char*)buffer, len);
     }
 
-    virtual ssize_t streamSize() override
+    virtual ssize_t streamRemaining() override
     {
         return _size;
     }
