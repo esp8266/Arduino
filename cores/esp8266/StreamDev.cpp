@@ -288,7 +288,7 @@ Stream& operator << (Stream& out, Stream& stream)
         if (stream.inputCanTimeout())
         {
             // restrict with only what's buffered on input
-            stream.sendNow(out);
+            stream.sendAvailable(out);
         }
         else
         {

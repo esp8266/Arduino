@@ -847,7 +847,7 @@ bool HTTPClient::connect(void)
 {
     if(_reuse && _canReuse && connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
-        _client->sendNow(devnull); // clear _client's output (all of it, no timeout)
+        _client->sendAvailable(devnull); // clear _client's output (all of it, no timeout)
         return true;
     }
 

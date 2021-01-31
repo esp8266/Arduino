@@ -386,44 +386,44 @@ Stream extensions
 
   .. code:: cpp
 
-    serverClient.toNow(Serial); // chunk by chunk
-    Serial.toNow(serverClient); // chunk by chunk
+    serverClient.sendAvailable(Serial); // chunk by chunk
+    Serial.sendAvailable(serverClient); // chunk by chunk
 
   An echo service can be written like this:
 
   .. code:: cpp
 
-    serverClient.toNow(serverClient); // tcp echo service
+    serverClient.sendAvailable(serverClient); // tcp echo service
 
-    Serial.toNow(Serial);             // serial software loopback
+    Serial.sendAvailable(Serial);             // serial software loopback
 
   Beside reducing coding time, these methods optimize transfers by avoiding
   buffer copies when possible.
 
-  - User facing API: ``Stream::to()``
+  - User facing API: ``Stream::send()``
 
     The goal of streams is to transfer data between producers and consumers,
     like the telnet/serial example above.  Four methods are provided, all of
     them return the number of transmitted bytes:
 
-    - ``Stream::toSize(dest, size [, timeout])``
+    - ``Stream::sendSize(dest, size [, timeout])``
 
       This method waits up to the given or default timeout to transfer
       ``size`` bytes to the the ``dest`` Stream.
 
-    - ``Stream::toUntil(dest, delim [, timeout])``
+    - ``Stream::sendUntil(dest, delim [, timeout])``
 
       This method waits up to the given or default timeout to transfer data
-      until the character ``delim`` is met.  The delimiter is read but not
-      transfered.
+      until the character ``delim`` is met.  
+      Note: The delimiter is read but not transfered (like ``readBytesUntil``)
 
-    - ``Stream::toNow(dest)``
+    - ``Stream::sendAvailable(dest)``
 
       This method transfers all already available data to the destination.
       There is no timeout and the returned value is 0 when there is nothing
       to transfer or no room in the destination.
 
-    - ``Stream::toAll(dest [, timeout])``
+    - ``Stream::sendAll(dest [, timeout])``
 
       This method waits up to the given or default timeout to transfer all
       available data.  It is useful when source is able to tell that no more
@@ -432,7 +432,7 @@ Stream extensions
 
       For example, a source String will not grow during the transfer, or a
       particular network connection supposed to send a fixed amount of data
-      before closing.  ``::toAll()`` will receive all bytes.  Timeout is
+      before closing.  ``::sendAll()`` will receive all bytes.  Timeout is
       useful when destination needs processing time (e.g.  network or serial
       input buffer full = please wait a bit).
 
@@ -451,7 +451,7 @@ Stream extensions
       .. code:: cpp
 
         StreamPtr css(F("my long css data")); // CSS data not copied to RAM
-        server.toAll(css);
+        server.sendAll(css);
 
     - ``S2Stream::`` is designed to make a ``Stream::`` out of a ``String::`` without copy.
 
@@ -459,32 +459,32 @@ Stream extensions
 
         String helloString("hello");
         S2Stream hello(helloString);
-        hello.reset(0);      // prevents ::read() to consume the string
+        hello.reset(0);        // prevents ::read() to consume the string
 
-        hello.toAll(Serial); // shows "hello"
-        hello.toAll(Serial); // shows nothing, content has already been read
-        hello.reset();       // reset content pointer
-        hello.toAll(Serial); // shows "hello"
-        hello.reset(3);      // reset content pointer to a specific position
-        hello.toAll(Serial); // shows "lo"
+        hello.sendAll(Serial); // shows "hello"
+        hello.sendAll(Serial); // shows nothing, content has already been read
+        hello.reset();         // reset content pointer
+        hello.sendAll(Serial); // shows "hello"
+        hello.reset(3);        // reset content pointer to a specific position
+        hello.sendAll(Serial); // shows "lo"
 
-        hello.setConsume();  // ::read() will consume, this is the default
+        hello.setConsume();    // ::read() will consume, this is the default
         Serial.println(helloString.length()); // shows 5
-        hello.toAll(Serial);                  // shows "hello"
+        hello.sendAll(Serial);                // shows "hello"
         Serial.println(helloString.length()); // shows 0, string is consumed
 
-      ``StreamString::``, derives from ``S2Stream``
+      ``StreamString::`` derives from ``S2Stream``
 
       .. code:: cpp
 
         StreamString contentStream;
-        client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+        client.sendSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
 
         // equivalent to:
 
         String content;
         S2Stream contentStream(content);
-        client.toSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
+        client.sendSize(contentStream, SOME_SIZE); // receives at most SOME_SIZE bytes
         // content has the data
 
   - Internal Stream API: ``peekBuffer``
@@ -507,12 +507,12 @@ Stream extensions
     - ``virtual bool inputCanTimeout ()``
 
       A ``StringStream`` will return false. A closed network connection returns false.
-      This function allows ``Stream::toAll()`` to return early.
+      This function allows ``Stream::sendAll()`` to return earlier.
 
     - ``virtual bool outputCanTimeout ()``
 
       A closed network connection returns false.
-      This function allows ``Stream::toAll()`` to return early.
+      This function allows ``Stream::sendAll()`` to return earlier.
 
     - ``virtual ssize_t streamRemaining()``
 
