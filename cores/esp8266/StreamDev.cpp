@@ -271,7 +271,7 @@ size_t Stream::sendGeneric(Print* to,
 
 Stream& operator << (Stream& out, String& string)
 {
-    StreamPtr(string).sendAll(out);
+    StreamConstPtr(string).sendAll(out);
     return out;
 }
 
@@ -305,13 +305,13 @@ Stream& operator << (Stream& out, Stream& stream)
 
 Stream& operator << (Stream& out, const char* text)
 {
-    StreamPtr(text).sendAll(out);
+    StreamConstPtr(text).sendAll(out);
     return out;
 }
 
 Stream& operator << (Stream& out, const __FlashStringHelper* text)
 {
-    StreamPtr(text).sendAll(out);
+    StreamConstPtr(text).sendAll(out);
     return out;
 }
 

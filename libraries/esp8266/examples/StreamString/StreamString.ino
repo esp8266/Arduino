@@ -25,8 +25,8 @@ void testStringPtrProgmem() {
   auto inProgmem2 = F("I am too in progmem");
 
   int heap = (int)ESP.getFreeHeap();
-  auto stream1 = StreamPtr(inProgmem, sizeof(inProgmem) - 1);
-  auto stream2 = StreamPtr(inProgmem2);
+  auto stream1 = StreamConstPtr(inProgmem, sizeof(inProgmem) - 1);
+  auto stream2 = StreamConstPtr(inProgmem2);
   Serial << stream1 << " - " << stream2 << "\n";
   heap -= (int)ESP.getFreeHeap();
   check("NO heap occupation while streaming progmem strings", String(heap).c_str(), "0");
@@ -52,16 +52,16 @@ void testStreamString() {
   result.resetPointer();
 
   {
-    // We use a a lighter StreamPtr(input) to make a read-only Stream out of
+    // We use a a lighter StreamConstPtr(input) to make a read-only Stream out of
     // a String that obviously should not be modified during the time the
-    // StreamPtr instance is used.  It is used as a source to be sent to
+    // StreamConstPtr instance is used.  It is used as a source to be sent to
     // 'result'.
 
     result.clear();
-    StreamPtr(inputString).sendAll(result);
-    StreamPtr(inputString).sendAll(result);
-    StreamPtr(inputString).sendAll(result);
-    check("StreamPtr.sendAll(StreamString)", result.c_str(), "hellohellohello");
+    StreamConstPtr(inputString).sendAll(result);
+    StreamConstPtr(inputString).sendAll(result);
+    StreamConstPtr(inputString).sendAll(result);
+    check("StreamConstPtr.sendAll(StreamString)", result.c_str(), "hellohellohello");
   }
 
   {

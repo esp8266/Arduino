@@ -375,7 +375,7 @@ public:
         if (!_pcb) {
             return 0;
         }
-        StreamPtr ptr(data, size);
+        StreamConstPtr ptr(data, size);
         return _write_from_source(&ptr);
     }
 
@@ -392,7 +392,7 @@ public:
         if (!_pcb) {
             return 0;
         }
-        StreamPtr ptr(buf, size);
+        StreamConstPtr ptr(buf, size);
         return _write_from_source(&ptr);
     }
 

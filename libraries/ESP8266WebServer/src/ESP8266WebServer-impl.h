@@ -458,7 +458,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
-  StreamPtr ref(content.c_str(), content.length());
+  StreamConstPtr ref(content.c_str(), content.length());
   sendContent(&ref);
 }
 
@@ -468,7 +468,7 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
   if (content_length == 0)
       content_length = std::max((ssize_t)0, stream->streamRemaining());
   _prepareHeader(header, code, content_type, content_length);
-  size_t sent = StreamPtr(header).sendAll(&_currentClient);
+  size_t sent = StreamConstPtr(header).sendAll(&_currentClient);
   if (sent != header.length())
       DBGWS("HTTPServer: error: sent %zd on %u bytes\n", sent, header.length());
   if (content_length)
@@ -477,13 +477,13 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_ty
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, PGM_P content) {
-  StreamPtr ref(content, strlen_P(content));
+  StreamConstPtr ref(content, strlen_P(content));
   return send(code, String(content_type).c_str(), &ref);
 }
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
-  StreamPtr ref(content, contentLength);
+  StreamConstPtr ref(content, contentLength);
   return send(code, String(content_type).c_str(), &ref);
 }
 
@@ -513,7 +513,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content) {
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::sendContent_P(PGM_P content, size_t size) {
-  StreamPtr ptr(content, size);
+  StreamConstPtr ptr(content, size);
   return sendContent(&ptr, size);
 }
 
