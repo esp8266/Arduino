@@ -196,7 +196,7 @@ class Stream: public Print {
             STREAMSEND_SHORT,
         } sendReport_e;
 
-        sendReport_e getLastSendReport () const { return _sendReport; }
+        sendReport_e getLastSendResult () const { return _sendResult; }
 
         ////////////////////
 
@@ -214,7 +214,7 @@ class Stream: public Print {
 
         float parseFloat(char skipChar);  // as parseFloat() but the given skipChar is ignored
 
-        sendReport_e _sendReport = STREAMSEND_SUCCESS;
+        sendReport_e _sendResult = STREAMSEND_SUCCESS;
 };
 
 #endif

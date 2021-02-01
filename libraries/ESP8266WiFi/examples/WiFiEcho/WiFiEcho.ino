@@ -128,7 +128,7 @@ void loop() {
     }
     cnt++;
 
-    switch (client.getLastSendReport()) {
+    switch (client.getLastSendResult()) {
       case Stream::STREAMSEND_SUCCESS: break;
       case Stream::STREAMSEND_TIMED_OUT: Serial.println("Stream::to: timeout"); break;
       case Stream::STREAMSEND_READ_ERROR: Serial.println("Stream::to: read error"); break;
