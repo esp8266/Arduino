@@ -37,19 +37,19 @@ void testStreamString() {
   StreamString result;
 
   // By default, reading a S2Stream(String) or a StreamString will consume the String.
-  // It can be disabled by calling ::reset(), (not default)
+  // It can be disabled by calling ::resetPointer(), (not default)
   // and reenabled by calling ::setConsume(). (default)
   //
   // In default consume mode, reading a byte or a block will remove it from
   // the String.  Operations are O(n²).
   //
   // In non-default non-consume mode, it will just move a pointer.  That one
-  // can be ::reset(pos) anytime.  See the example below.
+  // can be ::resetPointer(pos) anytime.  See the example below.
 
 
   // The String included in 'result' will not be modified by read:
   // (this is not the default)
-  result.reset();
+  result.resetPointer();
 
   {
     // We use a a lighter StreamPtr(input) to make a read-only Stream out of
@@ -75,13 +75,13 @@ void testStreamString() {
 
   {
     // Now inputString is made into a Stream using S2Stream,
-    // and set in non-consume mode (using ::reset()).
+    // and set in non-consume mode (using ::resetPointer()).
 
     // Then, after that input is read once, it won't be anymore readable
     // until the pointer is reset.
 
     S2Stream input(inputString);
-    input.reset();
+    input.resetPointer();
 
     result.clear();
     input.sendAll(result);
@@ -96,11 +96,11 @@ void testStreamString() {
     result.clear();
     S2Stream input(inputString);
     // stream position set to offset 2 (0 by default)
-    input.reset(2);
+    input.resetPointer(2);
 
     input.sendAll(result);
     input.sendAll(result);
-    check("S2Stream.reset(2):", result.c_str(), "llo");
+    check("S2Stream.resetPointer(2):", result.c_str(), "llo");
   }
 
   {

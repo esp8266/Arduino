@@ -197,8 +197,8 @@ public:
 
     // Reading this stream will mark the string as read without consuming
     // (not enabled by default)
-    // Calling reset() resets the read state and allows rereading.
-    void reset(int pointer = 0)
+    // Calling resetPointer() resets the read state and allows rereading.
+    void resetPointer(int pointer = 0)
     {
         peekPointer = pointer;
     }

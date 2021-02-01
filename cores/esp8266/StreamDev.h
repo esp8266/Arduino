@@ -165,7 +165,7 @@ public:
     StreamPtr(const __FlashStringHelper* buffer, size_t size): _buffer(reinterpret_cast<const char*>(buffer)), _size(size), _byteAddressable(false) { }
     StreamPtr(const __FlashStringHelper* text): _buffer(reinterpret_cast<const char*>(text)), _size(strlen_P((PGM_P)text)), _byteAddressable(false) { }
 
-    void reset(int pointer = 0)
+    void resetPointer(int pointer = 0)
     {
         _peekPointer = pointer;
     }
