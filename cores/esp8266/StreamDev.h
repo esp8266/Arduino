@@ -20,6 +20,7 @@
 #ifndef __STREAMDEV_H
 #define __STREAMDEV_H
 
+#include <limits>
 #include <esp_priv.h>
 #include <StreamString.h>
 
@@ -47,7 +48,7 @@ public:
 
     virtual int availableForWrite() override
     {
-        return 32767;
+        return std::numeric_limits<int16_t>::max();
     }
 
     // Stream
@@ -114,7 +115,7 @@ public:
     // Stream
     virtual int available() override
     {
-        return 32767;
+        return std::numeric_limits<int16_t>::max();
     }
 
     virtual int read() override
@@ -141,7 +142,7 @@ public:
 
     virtual ssize_t streamRemaining() override
     {
-        return 32767;
+        return std::numeric_limits<int16_t>::max();
     }
 };
 

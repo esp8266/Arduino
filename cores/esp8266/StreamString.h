@@ -23,6 +23,7 @@
 #ifndef __STREAMSTRING_H
 #define __STREAMSTRING_H
 
+#include <limits>
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
@@ -50,7 +51,7 @@ public:
 
     virtual int availableForWrite() override
     {
-        return 32767;
+        return std::numeric_limits<int16_t>::max();
     }
 
     virtual int read() override
