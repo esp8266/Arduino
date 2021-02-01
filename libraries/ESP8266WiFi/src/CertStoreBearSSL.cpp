@@ -201,7 +201,7 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
         free(der);
         return nullptr;
       }
-      if (data.read((uint8_t *)der, ci.length) != (int)ci.length) {
+      if (data.read(der, ci.length) != (int)ci.length) {
         free(der);
         return nullptr;
       }
