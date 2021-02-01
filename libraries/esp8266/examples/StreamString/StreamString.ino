@@ -20,7 +20,7 @@ void checksketch(const char* what, const char* res1, const char* res2) {
 #define check(what, res1, res2) checksketch(what, res1, res2)
 #endif
 
-void testProgmem() {
+void testStringPtrProgmem() {
   static const char inProgmem [] PROGMEM = "I am in progmem";
   auto inProgmem2 = F("I am too in progmem");
 
@@ -32,16 +32,30 @@ void testProgmem() {
   check("NO heap occupation while streaming progmem strings", String(heap).c_str(), "0");
 }
 
-void testStream() {
+void testStreamString() {
   String inputString = "hello";
   StreamString result;
 
-  // string will not be modified by read:
+  // By default, reading a S2Stream(String) or a StreamString will consume the String.
+  // It can be disabled by calling ::reset(), (not default)
+  // and reenabled by calling ::setConsume(). (default)
+  //
+  // In default consume mode, reading a byte or a block will remove it from
+  // the String.  Operations are O(n²).
+  //
+  // In non-default non-consume mode, it will just move a pointer.  That one
+  // can be ::reset(pos) anytime.  See the example below.
+
+
+  // The String included in 'result' will not be modified by read:
+  // (this is not the default)
   result.reset();
 
   {
-    // use StreamString or S2Stream(String) to make a r/w Stream out of a String,
-    // prefer the lighter StreamPtr(String) to make a read-only Stream out of a String
+    // We use a a lighter StreamPtr(input) to make a read-only Stream out of
+    // a String that obviously should not be modified during the time the
+    // StreamPtr instance is used.  It is used as a source to be sent to
+    // 'result'.
 
     result.clear();
     StreamPtr(inputString).sendAll(result);
@@ -60,14 +74,16 @@ void testStream() {
   }
 
   {
-    // inputString made into a Stream, in reset mode
-    // after input is loaded once, there's nothing to get from the stream
-    // but the String is left untouched
+    // Now inputString is made into a Stream using S2Stream,
+    // and set in non-consume mode (using ::reset()).
 
-    result.clear();
+    // Then, after that input is read once, it won't be anymore readable
+    // until the pointer is reset.
+
     S2Stream input(inputString);
     input.reset();
 
+    result.clear();
     input.sendAll(result);
     input.sendAll(result);
     check("S2Stream.sendAll(StreamString)", result.c_str(), "hello");
@@ -75,9 +91,7 @@ void testStream() {
   }
 
   {
-    // inputString made into a Stream, with an offset
-    // after input is loaded once, there's nothing to get from the stream
-    // but the String is left untouched
+    // Same as above, with an offset
 
     result.clear();
     S2Stream input(inputString);
@@ -104,6 +118,7 @@ void testStream() {
     check("setConsume(): String given from S2Stream is swallowed", inputString.c_str(), "lo");
   }
 
+  // Streaming with common String constructors
   {
     StreamString cons(inputString);
     check("StreamString(String)", cons.c_str(), inputString.c_str());
@@ -133,35 +148,12 @@ void testStream() {
     check("StreamString(float)", cons.c_str(), "23.20");
   }
 
-  {
-    StreamString result("abc");
-    result = inputString;
-    check("StreamString = String", inputString.c_str(), result.c_str());
-
-    StreamString ss2 = "abc";
-    result = ss2;
-    check("StreamString = StreamString", result.c_str(), ss2.c_str());
-
-    result = "abc";
-    check("StreamString = char*", result.c_str(), "abc");
-
-    result = F("abc");
-    check("StreamString = F()", result.c_str(), "abc");
-
-    result = 23;
-    check("StreamString = int", result.c_str(), "23");
-
-    result = 'a';
-    check("StreamString = char", result.c_str(), "a");
-
-    result = 23.2;
-    check("StreamString = float", result.c_str(), "23.20");
-  }
-
 #if !CORE_MOCK
 
-  testProgmem();
+  // A progmem won't use Heap when StringPtr is used
+  testStringPtrProgmem();
 
+  // .. but it does when S2Stream or StreamString is used
   {
     int heap = (int)ESP.getFreeHeap();
     auto stream = StreamString(F("I am in progmem"));
@@ -175,7 +167,8 @@ void testStream() {
     }
   }
 
-  testProgmem();
+  // (check again to be sure)
+  testStringPtrProgmem();
 
 #endif
 }
@@ -186,7 +179,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  testStream();
+  testStreamString();
 
   Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n",
                 (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
