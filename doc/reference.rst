@@ -373,7 +373,8 @@ Arduino API
   len)`` method, which is similar to ``readBytes(buffer, len)`` without
   timeout: the returned value can be less than the requested size, so special
   care must be taken with this function, introduced in the Arduino
-  ``Client::`` class.  This function has also been introduced in other classes
+  ``Client::`` class (cf. AVR reference implementation).
+  This function has also been introduced in other classes
   not derivating from ``Client::``, e.g.  ``HardwareSerial::``.
 
 Stream extensions
