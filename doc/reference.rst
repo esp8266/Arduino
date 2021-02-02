@@ -375,7 +375,7 @@ Arduino API
   care must be taken with this function, introduced in the Arduino
   ``Client::`` class (cf. AVR reference implementation).
   This function has also been introduced in other classes
-  not derivating from ``Client::``, e.g.  ``HardwareSerial::``.
+  that don't derive from ``Client::``, e.g.  ``HardwareSerial::``.
 
 Stream extensions
 
