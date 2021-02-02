@@ -358,7 +358,7 @@ Arduino API
     }
 
   One will notice that in the network to serial direction, data are transfered
-  byte by byte while data are available.  On the other direction, a temporary
+  byte by byte while data are available.  In the other direction, a temporary
   buffer is created on stack, filled with available serial data, then
   transfered to network.
 
