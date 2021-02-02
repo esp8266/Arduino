@@ -28,7 +28,7 @@
 #include <StreamDev.h>
 #include <base64.h>
 
-static int SSEND2HTTPC (Stream::sendReport_e streamToError)
+static int StreamReportToHttpClientReport (Stream::sendReport_e streamToError)
 {
     switch (streamToError)
     {
@@ -630,7 +630,7 @@ int HTTPClient::writeToStream(Stream * stream)
 
         // do we have an error?
         if(_client->getLastSendResult() != Stream::STREAMSEND_SUCCESS) {
-            return returnError(SSEND2HTTPC(_client->getLastSendResult()));
+            return returnError(StreamReportToHttpClientReport(_client->getLastSendResult()));
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
@@ -657,7 +657,7 @@ int HTTPClient::writeToStream(Stream * stream)
                 int r = _client->sendSize(stream, len);
                 if (_client->getLastSendResult() != Stream::STREAMSEND_SUCCESS)
                     // not all data transferred
-                    return returnError(SSEND2HTTPC(_client->getLastSendResult()));
+                    return returnError(StreamReportToHttpClientReport(_client->getLastSendResult()));
                 ret += r;
             } else {
 
