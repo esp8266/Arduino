@@ -428,8 +428,8 @@ Stream extensions
 
       This method waits up to the given or default timeout to transfer all
       available data.  It is useful when source is able to tell that no more
-      data will be available for this call, or when destination is able to
-      tell that it will no more be able to receive.
+      data will be available for this call, or when destination can tell
+      that it will no be able to receive anymore.
 
       For example, a source String will not grow during the transfer, or a
       particular network connection supposed to send a fixed amount of data
