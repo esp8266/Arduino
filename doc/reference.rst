@@ -360,7 +360,7 @@ Arduino API
   One will notice that in the network to serial direction, data are transfered
   byte by byte while data are available.  In the other direction, a temporary
   buffer is created on stack, filled with available serial data, then
-  transfered to network.
+  transferred to network.
 
   The ``readBytes(buffer, length)`` method includes a timeout to ensure that
   all required bytes are received.  The ``write(buffer, length)`` (inherited
@@ -415,7 +415,7 @@ Stream extensions
 
       This method waits up to the given or default timeout to transfer data
       until the character ``delim`` is met.  
-      Note: The delimiter is read but not transfered (like ``readBytesUntil``)
+      Note: The delimiter is read but not transferred (like ``readBytesUntil``)
 
     - ``Stream::sendAvailable(dest)``
 
@@ -446,7 +446,7 @@ Stream extensions
       ``F("some words in flash")`` or ``PROGMEM`` strings.  This class makes
       no copy, even with data in flash.  For flash content, byte-by-byte
       transfers is a consequence when "memcpy_P" cannot be used.  Other
-      contents can be transfered at once when possible.
+      contents can be transferred at once when possible.
 
       .. code:: cpp
 
