@@ -45,10 +45,14 @@ size_t Stream::sendGeneric(Print* to,
     // (also when inputCanTimeout() is false)
 
     if (hasPeekBufferAPI())
+    {
         return SendGenericPeekBuffer(to, len, readUntilChar, timeoutMs);
+    }
 
     if (readUntilChar >= 0)
+    {
         return SendGenericRegularUntil(to, len, readUntilChar, timeoutMs);
+    }
 
     return SendGenericRegular(to, len, timeoutMs);
 }
