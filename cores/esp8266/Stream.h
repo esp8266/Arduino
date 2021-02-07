@@ -144,6 +144,7 @@ class Stream: public Print {
 
         // (outputCanTimeout() is defined in Print::)
 
+    ////////////////////////
         //////////////////// extensions: Streaming streams to streams
         // Stream::to*()
         //
@@ -187,18 +188,16 @@ class Stream: public Print {
         // remaining size (-1 by default = unknown)
         virtual ssize_t streamRemaining () { return -1; }
 
-        typedef enum
+        enum class Report
         {
-            STREAMSEND_SUCCESS = 0,
-            STREAMSEND_TIMED_OUT,
-            STREAMSEND_READ_ERROR,
-            STREAMSEND_WRITE_ERROR,
-            STREAMSEND_SHORT,
-        } sendReport_e;
+            Success = 0,
+            TimedOut,
+            ReadError,
+            WriteError,
+            ShortOperation,
+        };
 
-        sendReport_e getLastSendResult () const { return _sendResult; }
-
-        ////////////////////
+        Report getLastSendReport () const { return _sendReport; }
 
     protected:
         size_t sendGeneric (Print* to,
@@ -206,15 +205,19 @@ class Stream: public Print {
                             const int readUntilChar = -1,
                             oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
 
-        //////////////////// end of extensions
+        void setReport (Report report) { _sendReport = report; }
+
+    private:
+
+        Report _sendReport = Report::Success;
+
+    //////////////////// end of extensions
 
     protected:
         long parseInt(char skipChar); // as parseInt() but the given skipChar is ignored
         // this allows format characters (typically commas) in values to be ignored
 
         float parseFloat(char skipChar);  // as parseFloat() but the given skipChar is ignored
-
-        sendReport_e _sendResult = STREAMSEND_SUCCESS;
 };
 
 #endif

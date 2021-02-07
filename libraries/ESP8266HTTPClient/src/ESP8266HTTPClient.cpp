@@ -28,15 +28,15 @@
 #include <StreamDev.h>
 #include <base64.h>
 
-static int StreamReportToHttpClientReport (Stream::sendReport_e streamToError)
+static int StreamReportToHttpClientReport (Stream::Report streamSendError)
 {
-    switch (streamToError)
+    switch (streamSendError)
     {
-    case Stream::STREAMSEND_TIMED_OUT: return HTTPC_ERROR_READ_TIMEOUT;
-    case Stream::STREAMSEND_READ_ERROR: return HTTPC_ERROR_NO_STREAM;
-    case Stream::STREAMSEND_WRITE_ERROR: return HTTPC_ERROR_STREAM_WRITE;
-    case Stream::STREAMSEND_SHORT: return HTTPC_ERROR_STREAM_WRITE;
-    case Stream::STREAMSEND_SUCCESS: return 0;
+    case Stream::Report::TimedOut: return HTTPC_ERROR_READ_TIMEOUT;
+    case Stream::Report::ReadError: return HTTPC_ERROR_NO_STREAM;
+    case Stream::Report::WriteError: return HTTPC_ERROR_STREAM_WRITE;
+    case Stream::Report::ShortOperation: return HTTPC_ERROR_STREAM_WRITE;
+    case Stream::Report::Success: return 0;
     }
     return 0; // never reached, keep gcc quiet
 }
@@ -629,8 +629,8 @@ int HTTPClient::writeToStream(Stream * stream)
         ret = _client->sendSize(stream, len);
 
         // do we have an error?
-        if(_client->getLastSendResult() != Stream::STREAMSEND_SUCCESS) {
-            return returnError(StreamReportToHttpClientReport(_client->getLastSendResult()));
+        if(_client->getLastSendReport() != Stream::Report::Success) {
+            return returnError(StreamReportToHttpClientReport(_client->getLastSendReport()));
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
@@ -655,9 +655,9 @@ int HTTPClient::writeToStream(Stream * stream)
             if(len > 0) {
                 // read len bytes with timeout
                 int r = _client->sendSize(stream, len);
-                if (_client->getLastSendResult() != Stream::STREAMSEND_SUCCESS)
+                if (_client->getLastSendReport() != Stream::Report::Success)
                     // not all data transferred
-                    return returnError(StreamReportToHttpClientReport(_client->getLastSendResult()));
+                    return returnError(StreamReportToHttpClientReport(_client->getLastSendReport()));
                 ret += r;
             } else {
 
