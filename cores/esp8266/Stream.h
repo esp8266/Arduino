@@ -146,9 +146,9 @@ class Stream: public Print {
 
     ////////////////////////
         //////////////////// extensions: Streaming streams to streams
-        // Stream::to*()
+        // Stream::send*()
         //
-        // Stream::to*() uses 1-copy transfers when peekBuffer API is
+        // Stream::send*() uses 1-copy transfers when peekBuffer API is
         // available, or makes a regular transfer through a temporary buffer.
         //
         // - for efficiency, Stream classes should implement peekAPI when
@@ -158,7 +158,7 @@ class Stream: public Print {
 
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
 
-        // ::to*() methods:
+        // ::send*() methods:
         // - always stop before timeout when "no-more-input-possible-data"
         //   or "no-more-output-possible-data" condition is met
         // - always return number of transfered bytes
@@ -201,9 +201,13 @@ class Stream: public Print {
 
     protected:
         size_t sendGeneric (Print* to,
-                            const ssize_t maxLen = -1,
+                            const ssize_t len = -1,
                             const int readUntilChar = -1,
                             oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
+
+        size_t SendGenericPeekBuffer(Print* to, const ssize_t len, const int readUntilChar, const oneShotMs::timeType timeoutMs);
+        size_t SendGenericRegularUntil(Print* to, const ssize_t len, const int readUntilChar, const oneShotMs::timeType timeoutMs);
+        size_t SendGenericRegular(Print* to, const ssize_t len, const oneShotMs::timeType timeoutMs);
 
         void setReport (Report report) { _sendReport = report; }
 

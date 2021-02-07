@@ -23,12 +23,10 @@
 #include <Arduino.h>
 #include <StreamDev.h>
 
-using esp8266::polledTimeout::oneShotFastMs;
-
 size_t Stream::sendGeneric(Print* to,
                            const ssize_t len,
                            const int readUntilChar,
-                           const oneShotFastMs::timeType timeoutMs)
+                           const esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
 {
     setReport(Report::Success);
 
@@ -46,208 +44,90 @@ size_t Stream::sendGeneric(Print* to,
     // So we use getTimeout() for both,
     // (also when inputCanTimeout() is false)
 
-    // "neverExpires (default, impossible)" is translated to default timeout
-    oneShotFastMs timedOut(timeoutMs >= oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
+    if (hasPeekBufferAPI())
+        return SendGenericPeekBuffer(to, len, readUntilChar, timeoutMs);
 
+    if (readUntilChar >= 0)
+        return SendGenericRegularUntil(to, len, readUntilChar, timeoutMs);
+
+    return SendGenericRegular(to, len, timeoutMs);
+}
+
+
+size_t Stream::SendGenericPeekBuffer(Print* to, const ssize_t len, const int readUntilChar, const esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+{
+    // "neverExpires (default, impossible)" is translated to default timeout
+    esp8266::polledTimeout::oneShotFastMs timedOut(timeoutMs >= esp8266::polledTimeout::oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
+    // len==-1 => maxLen=0 <=> until starvation
+    const size_t maxLen = std::max((ssize_t)0, len);
     size_t written = 0;
 
-    // len==-1 => maxLen=0 <=> until starvation
-    size_t maxLen = std::max((ssize_t)0, len);
-
-    if (hasPeekBufferAPI())
-
-        // peek-buffer API
-
-        while (!maxLen || written < maxLen)
+    while (!maxLen || written < maxLen)
+    {
+        size_t avpk = peekAvailable();
+        if (avpk == 0 && !inputCanTimeout())
         {
-            size_t avpk = peekAvailable();
-            if (avpk == 0 && !inputCanTimeout())
-            {
-                // no more data to read, ever
-                break;
-            }
-
-            size_t w = to->availableForWrite();
-            if (w == 0 && !outputCanTimeout())
-            {
-                // no more data can be written, ever
-                break;
-            }
-
-            w = std::min(w, avpk);
-            if (maxLen)
-            {
-                w = std::min(w, maxLen - written);
-            }
-            if (w)
-            {
-                const char* directbuf = peekBuffer();
-                bool foundChar = false;
-                if (readUntilChar >= 0)
-                {
-                    const char* last = (const char*)memchr(directbuf, readUntilChar, w);
-                    if (last)
-                    {
-                        w = std::min((size_t)(last - directbuf), w);
-                        foundChar = true;
-                    }
-                }
-                if (w && ((w = to->write(directbuf, w))))
-                {
-                    peekConsume(w);
-                    written += w;
-                    if (maxLen)
-                    {
-                        timedOut.reset();
-                    }
-                }
-                if (foundChar)
-                {
-                    peekConsume(1);
-                    break;
-                }
-            }
-
-            if (!w && !maxLen && readUntilChar < 0)
-            {
-                // nothing has been transferred and no specific condition is requested
-                break;
-            }
-
-            if (timedOut)
-            {
-                // either (maxLen>0) nothing has been transferred for too long
-                // or readUntilChar >= 0 but char is not encountered for too long
-                // or (maxLen=0) too much time has been spent here
-                break;
-            }
-
-            optimistic_yield(1000);
+            // no more data to read, ever
+            break;
         }
 
-    else if (readUntilChar >= 0)
-
-        // regular Stream API
-        // no other choice than reading byte by byte
-
-        while (!maxLen || written < maxLen)
+        size_t w = to->availableForWrite();
+        if (w == 0 && !outputCanTimeout())
         {
-            size_t avpk = peekAvailable();
-            if (avpk == 0 && !inputCanTimeout())
-            {
-                // no more data to read, ever
-                break;
-            }
+            // no more data can be written, ever
+            break;
+        }
 
-            size_t w = to->availableForWrite();
-            if (w == 0 && !outputCanTimeout())
+        w = std::min(w, avpk);
+        if (maxLen)
+        {
+            w = std::min(w, maxLen - written);
+        }
+        if (w)
+        {
+            const char* directbuf = peekBuffer();
+            bool foundChar = false;
+            if (readUntilChar >= 0)
             {
-                // no more data can be written, ever
-                break;
+                const char* last = (const char*)memchr(directbuf, readUntilChar, w);
+                if (last)
+                {
+                    w = std::min((size_t)(last - directbuf), w);
+                    foundChar = true;
+                }
             }
-
-            int c = read();
-            if (c != -1)
+            if (w && ((w = to->write(directbuf, w))))
             {
-                if (c == readUntilChar)
-                {
-                    break;
-                }
-                w = to->write(c);
-                if (w != 1)
-                {
-                    setReport(Report::WriteError);
-                    break;
-                }
-                written += 1;
+                peekConsume(w);
+                written += w;
                 if (maxLen)
                 {
                     timedOut.reset();
                 }
             }
-
-            if (!w && !maxLen && readUntilChar < 0)
+            if (foundChar)
             {
-                // nothing has been transferred and no specific condition is requested
+                peekConsume(1);
                 break;
             }
-
-            if (timedOut)
-            {
-                // either (maxLen>0) nothing has been transferred for too long
-                // or readUntilChar >= 0 but char is not encountered for too long
-                // or (maxLen=0) too much time has been spent here
-                break;
-            }
-
-            optimistic_yield(1000);
         }
 
-    else
-
-        // regular Stream API
-        // use an intermediary buffer
-
-        while (!maxLen || written < maxLen)
+        if (!w && !maxLen && readUntilChar < 0)
         {
-            size_t avr = available();
-            if (avr == 0 && !inputCanTimeout())
-            {
-                // no more data to read, ever
-                break;
-            }
-
-            size_t w = to->availableForWrite();
-            if (w == 0 && !to->outputCanTimeout())
-                // no more data can be written, ever
-            {
-                break;
-            }
-
-            w = std::min(w, avr);
-            if (maxLen)
-            {
-                w = std::min(w, maxLen - written);
-            }
-            w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
-            if (w)
-            {
-                char temp[w];
-                ssize_t r = read(temp, w);
-                if (r < 0)
-                {
-                    setReport(Report::ReadError);
-                    break;
-                }
-                w = to->write(temp, r);
-                written += w;
-                if ((size_t)r != w)
-                {
-                    setReport(Report::WriteError);
-                    break;
-                }
-                if (maxLen && w)
-                {
-                    timedOut.reset();
-                }
-            }
-
-            if (!w && !maxLen && readUntilChar < 0)
-            {
-                // nothing has been transferred and no specific condition is requested
-                break;
-            }
-
-            if (timedOut)
-            {
-                // either (maxLen>0) nothing has been transferred for too long
-                // or readUntilChar >= 0 but char is not encountered for too long
-                // or (maxLen=0) too much time has been spent here
-                break;
-            }
-
-            optimistic_yield(1000);
+            // nothing has been transferred and no specific condition is requested
+            break;
         }
+
+        if (timedOut)
+        {
+            // either (maxLen>0) nothing has been transferred for too long
+            // or readUntilChar >= 0 but char is not encountered for too long
+            // or (maxLen=0) too much time has been spent here
+            break;
+        }
+
+        optimistic_yield(1000);
+    }
 
     if (getLastSendReport() == Report::Success && maxLen > 0)
     {
@@ -266,6 +146,185 @@ size_t Stream::sendGeneric(Print* to,
             setReport(Report::ShortOperation);
         }
     }
+
+    return written;
+}
+
+size_t Stream::SendGenericRegularUntil(Print* to, const ssize_t len, const int readUntilChar, const esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+{
+    // regular Stream API
+    // no other choice than reading byte by byte
+
+    // "neverExpires (default, impossible)" is translated to default timeout
+    esp8266::polledTimeout::oneShotFastMs timedOut(timeoutMs >= esp8266::polledTimeout::oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
+    // len==-1 => maxLen=0 <=> until starvation
+    const size_t maxLen = std::max((ssize_t)0, len);
+    size_t written = 0;
+
+    while (!maxLen || written < maxLen)
+    {
+        size_t avpk = peekAvailable();
+        if (avpk == 0 && !inputCanTimeout())
+        {
+            // no more data to read, ever
+            break;
+        }
+
+        size_t w = to->availableForWrite();
+        if (w == 0 && !outputCanTimeout())
+        {
+            // no more data can be written, ever
+            break;
+        }
+
+        int c = read();
+        if (c != -1)
+        {
+            if (c == readUntilChar)
+            {
+                break;
+            }
+            w = to->write(c);
+            if (w != 1)
+            {
+                setReport(Report::WriteError);
+                break;
+            }
+            written += 1;
+            if (maxLen)
+            {
+                timedOut.reset();
+            }
+        }
+
+        if (!w && !maxLen && readUntilChar < 0)
+        {
+            // nothing has been transferred and no specific condition is requested
+            break;
+        }
+
+        if (timedOut)
+        {
+            // either (maxLen>0) nothing has been transferred for too long
+            // or readUntilChar >= 0 but char is not encountered for too long
+            // or (maxLen=0) too much time has been spent here
+            break;
+        }
+
+        optimistic_yield(1000);
+    }
+
+    if (getLastSendReport() == Report::Success && maxLen > 0)
+    {
+        if (timeoutMs && timedOut)
+        {
+            setReport(Report::TimedOut);
+        }
+        else if ((ssize_t)written != len)
+        {
+            // This is happening when source cannot timeout (ex: a String)
+            // but has not enough data, or a dest has closed or cannot
+            // timeout but is too small (String, buffer...)
+            //
+            // Mark it as an error because user usually wants to get what is
+            // asked for.
+            setReport(Report::ShortOperation);
+        }
+    }
+
+    return written;
+}
+
+size_t Stream::SendGenericRegular(Print* to, const ssize_t len, const esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+{
+    // regular Stream API
+    // use an intermediary buffer
+
+    // "neverExpires (default, impossible)" is translated to default timeout
+    esp8266::polledTimeout::oneShotFastMs timedOut(timeoutMs >= esp8266::polledTimeout::oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
+    // len==-1 => maxLen=0 <=> until starvation
+    const size_t maxLen = std::max((ssize_t)0, len);
+    size_t written = 0;
+
+    while (!maxLen || written < maxLen)
+    {
+        size_t avr = available();
+        if (avr == 0 && !inputCanTimeout())
+        {
+            // no more data to read, ever
+            break;
+        }
+
+        size_t w = to->availableForWrite();
+        if (w == 0 && !to->outputCanTimeout())
+            // no more data can be written, ever
+        {
+            break;
+        }
+
+        w = std::min(w, avr);
+        if (maxLen)
+        {
+            w = std::min(w, maxLen - written);
+        }
+        w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
+        if (w)
+        {
+            char temp[w];
+            ssize_t r = read(temp, w);
+            if (r < 0)
+            {
+                setReport(Report::ReadError);
+                break;
+            }
+            w = to->write(temp, r);
+            written += w;
+            if ((size_t)r != w)
+            {
+                setReport(Report::WriteError);
+                break;
+            }
+            if (maxLen && w)
+            {
+                timedOut.reset();
+            }
+        }
+
+        if (!w && !maxLen)
+        {
+            // nothing has been transferred and no specific condition is requested
+            break;
+        }
+
+        if (timedOut)
+        {
+            // either (maxLen>0) nothing has been transferred for too long
+            // or readUntilChar >= 0 but char is not encountered for too long
+            // or (maxLen=0) too much time has been spent here
+            break;
+        }
+
+        optimistic_yield(1000);
+    }
+
+    if (getLastSendReport() == Report::Success && maxLen > 0)
+    {
+        if (timeoutMs && timedOut)
+        {
+            setReport(Report::TimedOut);
+        }
+        else if ((ssize_t)written != len)
+        {
+            // This is happening when source cannot timeout (ex: a String)
+            // but has not enough data, or a dest has closed or cannot
+            // timeout but is too small (String, buffer...)
+            //
+            // Mark it as an error because user usually wants to get what is
+            // asked for.
+            setReport(Report::ShortOperation);
+        }
+    }
+
     return written;
 }
 
