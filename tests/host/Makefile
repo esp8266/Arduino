@@ -76,7 +76,7 @@ $(shell mkdir -p $(BINDIR))
 CORE_CPP_FILES := \
 	$(addprefix $(abspath $(CORE_PATH))/,\
 		debug.cpp \
-		StreamDev.cpp \
+		StreamSend.cpp \
 		Stream.cpp \
 		WString.cpp \
 		Print.cpp \

@@ -1,5 +1,5 @@
 /*
-    StreamDev.cpp - 1-copy transfer function
+    StreamDev.cpp - 1-copy transfer related methods
     Copyright (c) 2019 David Gauchard.  All right reserved.
 
     This library is free software; you can redistribute it and/or
