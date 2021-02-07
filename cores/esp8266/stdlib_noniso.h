@@ -1,9 +1,9 @@
-/* 
+/*
   stdlib_noniso.h - nonstandard (but usefull) conversion functions
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -36,7 +36,7 @@ char* itoa (int val, char *s, int radix);
 
 char* ltoa (long val, char *s, int radix);
 
-char* lltoa (long long val, char* str, int slen, unsigned long long radix);
+char* lltoa (long long val, char* str, int slen, long long radix);
 
 char* utoa (unsigned int val, char *s, int radix);
 
@@ -55,15 +55,20 @@ const char* strrstr(const char*__restrict p_pcString,
 
 } // extern "C"
 
-// https://gcc.gnu.org/legacy-ml/gcc/2016-02/msg00001.html
 extern "C++" {
+
+#pragma GCC push_options
+#pragma GCC optimize("Os") // Os better than O3 or Ofast
+
+// RFC PR43721 https://gcc.gnu.org/legacy-ml/gcc/2016-02/msg00001.html
+// templatized gcc's https://github.com/gcc-mirror/gcc/blob/master/libgcc/udivmodhi4.c
 template <typename T>
 T udivmod(T num, T den, T& mod)
 {
     T bit = 1;
     T res = 0;
 
-    while (den < num && bit && !(den & (((T)1) << (sizeof(T)*8 - 1))))
+    while (den < num && bit && !(den & (((T)1) << ((sizeof(T) * 8) - 1))))
     {
         den <<= 1;
         bit <<= 1;
@@ -82,6 +87,8 @@ T udivmod(T num, T den, T& mod)
     return res;
 } // udivmod
 } // "C++"
+
+#pragma GCC pop_options
 
 #endif // __cplusplus
 #endif // STDLIB_NONISO_H
