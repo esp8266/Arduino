@@ -22,8 +22,6 @@
 #ifndef STDLIB_NONISO_H
 #define STDLIB_NONISO_H
 
-#include <stdint.h>
-
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -38,13 +36,13 @@ char* itoa (int val, char *s, int radix);
 
 char* ltoa (long val, char *s, int radix);
 
-char* lltoa (long long val, char* str, size_t slen, uint_fast8_t radix);
+char* lltoa (long long val, char* str, int slen, unsigned long long radix);
 
 char* utoa (unsigned int val, char *s, int radix);
 
 char* ultoa (unsigned long val, char *s, int radix);
 
-char* ulltoa (unsigned long long val, char* str, size_t slen, uint_fast8_t radix);
+char* ulltoa (unsigned long long val, char* str, int slen, unsigned long long radix);
 
 char* dtostrf (double val, signed char width, unsigned char prec, char *s);
 
@@ -54,8 +52,36 @@ const char* strrstr(const char*__restrict p_pcString,
                     const char*__restrict p_pcPattern);
 
 #ifdef __cplusplus
+
 } // extern "C"
-#endif
 
+// https://gcc.gnu.org/legacy-ml/gcc/2016-02/msg00001.html
+extern "C++" {
+template <typename T>
+T udivmod(T num, T den, T& mod)
+{
+    T bit = 1;
+    T res = 0;
 
-#endif
+    while (den < num && bit && !(den & (((T)1) << (sizeof(T)*8 - 1))))
+    {
+        den <<= 1;
+        bit <<= 1;
+    }
+    while (bit)
+    {
+        if (num >= den)
+        {
+            num -= den;
+            res |= bit;
+        }
+        bit >>= 1;
+        den >>= 1;
+    }
+    mod = num;
+    return res;
+} // udivmod
+} // "C++"
+
+#endif // __cplusplus
+#endif // STDLIB_NONISO_H

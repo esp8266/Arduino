@@ -2,20 +2,28 @@
 #include "stdlib_noniso.h"
 
 // fill backwards
-char* ulltoa(unsigned long long val, char* str, size_t slen, uint_fast8_t radix)
+char* ulltoa(unsigned long long val, char* str, int slen, unsigned long long radix)
 {
     str += --slen;
     *str = 0;
     do
     {
-        auto n = val % radix;
+#if 1
+        // using div and mod in a single call
+        // String(ULLMAX_LONG, 10) => 354us
+        unsigned long long mod;
+        val = udivmod(val, radix, mod);
+#else
+        // String(ULLMAX_LONG, 10) => 374us
+        auto mod = val % radix;
         val /= radix;
-        *--str = n + ((n > 9) ? ('a' - 10) : '0');
+#endif
+        *--str = mod + ((mod > 9) ? ('a' - 10) : '0');
     } while (--slen && val);
     return val? nullptr: str;
 }
 
-char* lltoa (long long val, char* str, size_t slen, uint_fast8_t radix)
+char* lltoa (long long val, char* str, int slen, long long radix)
 {
     bool neg;
     if (val < 0)
