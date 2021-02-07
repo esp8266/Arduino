@@ -22,6 +22,8 @@
 #ifndef STDLIB_NONISO_H
 #define STDLIB_NONISO_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -36,10 +38,14 @@ char* itoa (int val, char *s, int radix);
 
 char* ltoa (long val, char *s, int radix);
 
+char* lltoa (long long val, char* str, size_t slen, uint_fast8_t radix);
+
 char* utoa (unsigned int val, char *s, int radix);
 
 char* ultoa (unsigned long val, char *s, int radix);
- 
+
+char* ulltoa (unsigned long long val, char* str, size_t slen, uint_fast8_t radix);
+
 char* dtostrf (double val, signed char width, unsigned char prec, char *s);
 
 void reverse(char* begin, char* end);

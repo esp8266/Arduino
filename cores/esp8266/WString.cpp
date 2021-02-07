@@ -98,6 +98,32 @@ String::String(unsigned long value, unsigned char base) {
     *this = buf;
 }
 
+String::String(long long value) {
+    init();
+    char buf[2 + 8 * sizeof(long long)];
+    sprintf(buf, "%lld", value);
+    *this = buf;
+}
+
+String::String(long long value, unsigned char base) {
+    init();
+    char buf[2 + 8 * sizeof(long long)];
+    *this = lltoa(value, buf, sizeof(buf), base);
+}
+
+String::String(unsigned long long value) {
+    init();
+    char buf[1 + 8 * sizeof(unsigned long long)];
+    sprintf(buf, "%llu", value);
+    *this = buf;
+}
+
+String::String(unsigned long long value, unsigned char base) {
+    init();
+    char buf[1 + 8 * sizeof(unsigned long long)];
+    *this = ulltoa(value, buf, sizeof(buf), base);
+}
+
 String::String(float value, unsigned char decimalPlaces) {
     init();
     char buf[33];
@@ -311,6 +337,16 @@ unsigned char String::concat(unsigned long num) {
     char buf[1 + 3 * sizeof(unsigned long)];
     ultoa(num, buf, 10);
     return concat(buf, strlen(buf));
+}
+
+unsigned char String::concat(long long num) {
+    char buf[2 + 3 * sizeof(long long)];
+    return concat(buf, sprintf(buf, "%lld", num));
+}
+
+unsigned char String::concat(unsigned long long num) {
+    char buf[1 + 3 * sizeof(unsigned long long)];
+    return concat(buf, sprintf(buf, "%llu", num));
 }
 
 unsigned char String::concat(float num) {
