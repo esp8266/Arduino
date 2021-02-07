@@ -29,16 +29,8 @@ char* ulltoa(unsigned long long val, char* str, int slen, unsigned long long rad
     *str = 0;
     do
     {
-#if 1
-        // using div and mod in a single call
-        // String(ULLMAX_LONG, 10) => 354us
-        unsigned long long mod;
-        val = udivmod(val, radix, mod);
-#else
-        // String(ULLMAX_LONG, 10) => 374us
         auto mod = val % radix;
         val /= radix;
-#endif
         *--str = mod + ((mod > 9) ? ('a' - 10) : '0');
     } while (--slen && val);
     return val? nullptr: str;

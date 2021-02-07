@@ -52,43 +52,8 @@ const char* strrstr(const char*__restrict p_pcString,
                     const char*__restrict p_pcPattern);
 
 #ifdef __cplusplus
-
 } // extern "C"
+#endif
 
-extern "C++" {
 
-#pragma GCC push_options
-#pragma GCC optimize("Os") // Os better than O3 or Ofast
-
-// RFC PR43721 https://gcc.gnu.org/legacy-ml/gcc/2016-02/msg00001.html
-// templatized gcc's https://github.com/gcc-mirror/gcc/blob/master/libgcc/udivmodhi4.c
-template <typename T>
-T udivmod(T num, T den, T& mod)
-{
-    T bit = 1;
-    T res = 0;
-
-    while (den < num && bit && !(den & (((T)1) << ((sizeof(T) * 8) - 1))))
-    {
-        den <<= 1;
-        bit <<= 1;
-    }
-    while (bit)
-    {
-        if (num >= den)
-        {
-            num -= den;
-            res |= bit;
-        }
-        bit >>= 1;
-        den >>= 1;
-    }
-    mod = num;
-    return res;
-} // udivmod
-} // "C++"
-
-#pragma GCC pop_options
-
-#endif // __cplusplus
-#endif // STDLIB_NONISO_H
+#endif
