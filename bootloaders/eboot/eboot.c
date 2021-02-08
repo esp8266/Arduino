@@ -14,15 +14,11 @@
 #include "eboot_command.h"
 #include <uzlib.h>
 
-extern unsigned char _gzip_dict;
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
 extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
-
-// Converts bit of a string into a uint32
-#define S(a,b,c,d) ( (((uint32_t)a) & 0xff) | (((uint32_t)b) << 8) | (((uint32_t)c) << 16) | (((uint32_t)d)<<24) )
 
 int print_version(const uint32_t flash_addr)
 {
@@ -30,12 +26,7 @@ int print_version(const uint32_t flash_addr)
     if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
         return 1;
     }
-    // We don't have BSS and can't print from flash, so build up string
-    // 4 chars at a time.  Smaller code than byte-wise assignment.
-    uint32_t fmt[2];
-    fmt[0] = S('v', '%', '0', '8');
-    fmt[1] = S('x', '\n', 0, 0);
-    ets_printf((const char*) fmt, ver);
+    ets_printf("v%08x\n", ver);
     return 0;
 }
 
@@ -222,6 +213,16 @@ int main()
     bool clear_cmd = false;
     struct eboot_command cmd;
 
+// BSS init commented out for now to save space.  If any static variables set
+// to 0 are used, need to uncomment it or else the BSS will not be cleared and
+// the static vars will power on with random values.
+#if 0
+    // Clear BSS ourselves, we don't have handy C runtime
+    extern char _bss_start;
+    extern char _bss_end;
+    ets_bzero(&_bss_start, &_bss_end - &_bss_start);
+#endif
+
     print_version(0);
 
     if (eboot_command_read(&cmd) == 0) {
@@ -236,32 +237,26 @@ int main()
     }
 
     if (cmd.action == ACTION_COPY_RAW) {
-        uint32_t cp = S('c', 'p', ':', 0);
-        ets_printf((const char *)&cp);
+        ets_printf("cp:");
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
         ets_wdt_enable();
 
-        cp = S('0' + res, '\n', 0, 0 );
-        ets_printf((const char *)&cp);
+        ets_printf("%d\n", res);
 #if 0
 	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
 	//beginning of the image in the empty area, see #7458. Disabling for now. 
         //TODO: replace the below verify with hash type, crc, or similar.
         // Verify the copy
-        uint32_t v[2];
-        v[0] = S('c', 'm', 'p', ':');
-        v[1] = 0;
-        ets_printf(const char *)v);
+        ets_printf("cmp:");
         if (res == 0) {
             ets_wdt_disable();
             res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
             ets_wdt_enable();
             }
 
-        cp = S('0' + res, '\n', 0, 0 );
-        ets_printf((const char *)&cp);
+        ets_printf("%d\n", res);
 #endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
@@ -274,13 +269,10 @@ int main()
     }
 
     if (cmd.action == ACTION_LOAD_APP) {
-        ets_putc('l'); ets_putc('d'); ets_putc('\n');
+        ets_printf("ld\n");
         res = load_app_from_flash_raw(cmd.args[0]);
         // We will get to this only on load fail
-        uint32_t e[2];
-        e[0] = S('e', ':', '0' + res, '\n' );
-        e[1] = 0;
-        ets_printf((const char*)e);
+        ets_printf("e:%d\n", res);
     }
 
     if (res) {
