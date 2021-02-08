@@ -102,7 +102,7 @@ jobs:
       run: |
         # Windows has python3 already installed, but it's called "python".
         # Copy python.exe to the proper name so scripts "just work".
-        copy (get-command python).source (get-command python).source.Replace("python.exe", "python3.exe")
+        try { Get-Command python3 } catch { copy (get-command python).source (get-command python).source.Replace("python.exe", "python3.exe") }
         bash ./tests/build.sh
 
 
