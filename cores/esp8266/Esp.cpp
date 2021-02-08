@@ -444,22 +444,24 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     return false;
 }
 
+// These are defined in the linker script, and filled in by the elf2bin.py util
+extern "C" uint32_t __crc_len;
+extern "C" uint32_t __crc_val;
+
 bool EspClass::checkFlashCRC() {
-    // The CRC and total length are placed in extra space at the end of the 4K chunk
-    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
-    // we'll need to adjust this.
-    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
-    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4092)); // Start of PROGMEM plus 4K-4
+    // Dummy CRC fill
     uint32_t z[2];
     z[0] = z[1] = 0;
 
+    uint32_t firstPart = (uintptr_t)&__crc_len - 0x40200000; // How many bytes to check before the 1st CRC val
+
     // Start the checksum
-    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
+    uint32_t crc = crc32((const void*)0x40200000, firstPart, 0xffffffff);
     // Pretend the 2 words of crc/len are zero to be idempotent
     crc = crc32(z, 8, crc);
     // Finish the CRC calculation over the rest of flash
-    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
-    return crc == flashcrc;
+    crc = crc32((const void*)(0x40200000 + firstPart + 8), __crc_len - (firstPart + 8), crc);
+    return crc == __crc_val;
 }
 
 

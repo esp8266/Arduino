@@ -147,6 +147,13 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
+
+    /* Stuff the CRC in well known symbols at a well known location */
+    __crc_len = ABSOLUTE(.);
+    LONG(0x00000000);
+    __crc_val = ABSOLUTE(.);
+    LONG(0x00000000);
+
     *(.ver_number)
     *.c.o(.literal*, .text*)
     *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal*, EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
