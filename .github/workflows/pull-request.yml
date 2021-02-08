@@ -268,3 +268,4 @@ jobs:
       run: |
           bash ./tests/ci/build_boards.sh
           bash ./tests/ci/eboot_test.sh
+          bash ./tests/ci/pkgrefs_test.sh
