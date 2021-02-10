@@ -19,11 +19,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 #include "stdlib_noniso.h"
 
 // fill backwards
-char* ulltoa(unsigned long long val, char* str, int slen, unsigned long long radix)
+char* ulltoa(unsigned long long val, char* str, int slen, unsigned int radix)
 {
     str += --slen;
     *str = 0;
@@ -36,14 +35,9 @@ char* ulltoa(unsigned long long val, char* str, int slen, unsigned long long rad
     return val? nullptr: str;
 }
 
-char* lltoa (long long val, char* str, int slen, long long radix)
+char* lltoa (long long val, char* str, int slen, unsigned int radix)
 {
     bool neg;
-    if (radix < 0)
-    {
-        radix = -radix;
-        val = -val;
-    }
     if (val < 0)
     {
         val = -val;

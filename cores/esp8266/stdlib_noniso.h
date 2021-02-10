@@ -36,13 +36,13 @@ char* itoa (int val, char *s, int radix);
 
 char* ltoa (long val, char *s, int radix);
 
-char* lltoa (long long val, char* str, int slen, long long radix);
+char* lltoa (long long val, char* str, int slen, unsigned int radix);
 
 char* utoa (unsigned int val, char *s, int radix);
 
 char* ultoa (unsigned long val, char *s, int radix);
 
-char* ulltoa (unsigned long long val, char* str, int slen, unsigned long long radix);
+char* ulltoa (unsigned long long val, char* str, int slen, unsigned int radix);
 
 char* dtostrf (double val, signed char width, unsigned char prec, char *s);
 
