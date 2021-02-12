@@ -54,7 +54,7 @@ char* lltoa (long long val, char* str, int slen, unsigned int radix)
     char* ret = ulltoa(val, str, slen, radix);
     if (neg)
     {
-        if (ret == str)
+        if (ret == str || ret == nullptr)
             return nullptr;
         *--ret = '-';
     }
