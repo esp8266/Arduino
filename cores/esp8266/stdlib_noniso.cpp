@@ -21,7 +21,10 @@
 
 #include "stdlib_noniso.h"
 
-// fill backwards
+// ulltoa() is slower than std::to_char() (1.6 times)
+// but is smaller by ~800B/flash and ~250B/rodata
+
+// ulltoa fills str backwards and can return a pointer different from str
 char* ulltoa(unsigned long long val, char* str, int slen, unsigned int radix)
 {
     str += --slen;
@@ -35,6 +38,7 @@ char* ulltoa(unsigned long long val, char* str, int slen, unsigned int radix)
     return val? nullptr: str;
 }
 
+// lltoa fills str backwards and can return a pointer different from str
 char* lltoa (long long val, char* str, int slen, unsigned int radix)
 {
     bool neg;

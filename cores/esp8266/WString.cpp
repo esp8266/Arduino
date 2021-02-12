@@ -112,11 +112,6 @@ String::String(unsigned long long value) {
     *this = buf;
 }
 
-#if 1
-// slower version (374us vs charconv:230us)
-// -880 flash bytes (vs charconv)
-// -256 rodata bytes (vs charconv)
-
 String::String(long long value, unsigned char base) {
     init();
     char buf[2 + 8 * sizeof(long long)];
@@ -128,28 +123,6 @@ String::String(unsigned long long value, unsigned char base) {
     char buf[1 + 8 * sizeof(unsigned long long)];
     *this = ulltoa(value, buf, sizeof(buf), base);
 }
-
-#else
-// faster version (230us vs lltoa:374us)
-// +880 flash bytes (vs lltoa)
-// +256 rodata bytes (vs lltoa)
-
-#include <charconv>
-String::String(long long value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(long long)];
-    std::to_chars(buf, buf + sizeof(buf) - 1, value, base);
-    *this = buf;
-}
-
-String::String(unsigned long long value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
-    std::to_chars(buf, buf + sizeof(buf) - 1, value, base);
-    *this = buf;
-}
-
-#endif
 
 String::String(float value, unsigned char decimalPlaces) {
     init();
