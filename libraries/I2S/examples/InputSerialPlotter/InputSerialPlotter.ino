@@ -1,11 +1,11 @@
 /*
- This example reads audio data from an Invensense's ICS43432 I2S microphone
- breakout board, and prints out the samples to the Serial console. The
- Serial Plotter built into the Arduino IDE can be used to plot the audio
- data (Tools -> Serial Plotter)
- created 17 November 2016
- by Sandeep Mistry
- */
+  This example reads audio data from an Invensense's ICS43432 I2S microphone
+  breakout board, and prints out the samples to the Serial console. The
+  Serial Plotter built into the Arduino IDE can be used to plot the audio
+  data (Tools -> Serial Plotter)
+  created 17 November 2016
+  by Sandeep Mistry
+*/
 
 #include <I2S.h>
 

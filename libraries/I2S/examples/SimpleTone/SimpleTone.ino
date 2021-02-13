@@ -1,12 +1,12 @@
 /*
- This example generates a square wave based tone at a specified frequency
- and sample rate. Then outputs the data using the I2S interface to a
- MAX08357 I2S Amp Breakout board.
+  This example generates a square wave based tone at a specified frequency
+  and sample rate. Then outputs the data using the I2S interface to a
+  MAX08357 I2S Amp Breakout board.
 
- created 17 November 2016
- by Sandeep Mistry
- modified for ESP8266 by Earle F. Philhower, III <earlephilhower@yahoo.com>
- */
+  created 17 November 2016
+  by Sandeep Mistry
+  modified for ESP8266 by Earle F. Philhower, III <earlephilhower@yahoo.com>
+*/
 
 #include <I2S.h>
 
