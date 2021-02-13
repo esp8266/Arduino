@@ -1126,7 +1126,7 @@ gen4iod.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 huzzah.name=Adafruit Feather HUZZAH ESP8266
-huzzah.build.board=ESP8266_ESP12
+huzzah.build.board=ESP8266_ADAFRUIT_HUZZAH
 huzzah.build.variant=adafruit
 huzzah.upload.tool=esptool
 huzzah.upload.maximum_data_size=81920
@@ -2695,7 +2695,7 @@ espectro.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espino.name=ESPino (ESP-12 Module)
-espino.build.board=ESP8266_ESP12
+espino.build.board=ESP8266_ESPINO_ESP12
 espino.build.variant=espino
 espino.upload.tool=esptool
 espino.upload.maximum_data_size=81920
@@ -4568,7 +4568,7 @@ d1.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
-nodemcu.build.board=ESP8266_NODEMCU
+nodemcu.build.board=ESP8266_NODEMCU_ESP12
 nodemcu.build.variant=nodemcu
 nodemcu.upload.tool=esptool
 nodemcu.upload.maximum_data_size=81920
@@ -4767,7 +4767,7 @@ nodemcu.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
-nodemcuv2.build.board=ESP8266_NODEMCU
+nodemcuv2.build.board=ESP8266_NODEMCU_ESP12E
 nodemcuv2.build.variant=nodemcu
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.maximum_data_size=81920
@@ -6787,7 +6787,7 @@ esp210.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
-espinotee.build.board=ESP8266_ESP13
+espinotee.build.board=ESP8266_ESPINO_ESP13
 espinotee.build.variant=espinotee
 espinotee.upload.tool=esptool
 espinotee.upload.maximum_data_size=81920
