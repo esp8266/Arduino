@@ -76,7 +76,7 @@ size_t Stream::SendGenericPeekBuffer(Print* to, const ssize_t len, const int rea
         }
 
         size_t w = to->availableForWrite();
-        if (w == 0 && !outputCanTimeout())
+        if (w == 0 && !to->outputCanTimeout())
         {
             // no more data can be written, ever
             break;
@@ -175,7 +175,7 @@ size_t Stream::SendGenericRegularUntil(Print* to, const ssize_t len, const int r
         }
 
         size_t w = to->availableForWrite();
-        if (w == 0 && !outputCanTimeout())
+        if (w == 0 && !to->outputCanTimeout())
         {
             // no more data can be written, ever
             break;
