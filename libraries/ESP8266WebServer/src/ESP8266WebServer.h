@@ -179,10 +179,7 @@ public:
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
 
   void sendContent(Stream* content, ssize_t content_length = 0);
-  template <typename T>
-  void sendContent(T& content, ssize_t content_length = 0) {
-    sendContent(&content, content_length);
-  }
+  void sendContent(Stream& content, ssize_t content_length = 0) { sendContent(&content, content_length); }
 
   bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
     if (_currentVersion == 0)
