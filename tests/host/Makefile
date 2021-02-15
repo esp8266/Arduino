@@ -80,6 +80,7 @@ CORE_CPP_FILES := \
 		Stream.cpp \
 		WString.cpp \
 		Print.cpp \
+		stdlib_noniso.cpp \
 		FS.cpp \
 		spiffs_api.cpp \
 		MD5Builder.cpp \

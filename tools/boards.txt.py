@@ -320,7 +320,7 @@ boards = collections.OrderedDict([
     ( 'huzzah', {
         'name': 'Adafruit Feather HUZZAH ESP8266',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ADAFRUIT_HUZZAH',
             '.build.variant': 'adafruit',
             },
         'macro': [
@@ -428,7 +428,7 @@ boards = collections.OrderedDict([
     ( 'nodemcu', {
         'name': 'NodeMCU 0.9 (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -462,7 +462,7 @@ boards = collections.OrderedDict([
     ( 'nodemcuv2', {
         'name': 'NodeMCU 1.0 (ESP-12E Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12E',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -652,7 +652,7 @@ boards = collections.OrderedDict([
     ( 'espino', {
         'name': 'ESPino (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ESPINO_ESP12',
             '.build.variant': 'espino',
             },
         'macro': [
@@ -671,7 +671,7 @@ boards = collections.OrderedDict([
     ( 'espinotee', {
         'name': 'ThaiEasyElec\'s ESPino',
         'opts': {
-            '.build.board': 'ESP8266_ESP13',
+            '.build.board': 'ESP8266_ESPINO_ESP13',
             '.build.variant': 'espinotee',
             },
         'macro': [

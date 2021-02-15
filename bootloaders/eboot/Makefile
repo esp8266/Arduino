@@ -40,17 +40,17 @@ APP_FW  := eboot.bin
 
 all: $(APP_OUT)
 
-tinflate.o: $(UZLIB_PATH)/tinflate.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_conf.h
+tinflate.o: $(UZLIB_PATH)/tinflate.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_conf.h Makefile
 	$(CC) $(CFLAGS) -c -o tinflate.o $(UZLIB_PATH)/tinflate.c
 
-tinfgzip.o: $(UZLIB_PATH)/tinfgzip.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_conf.h
+tinfgzip.o: $(UZLIB_PATH)/tinfgzip.c $(UZLIB_PATH)/uzlib.h $(UZLIB_PATH)/uzlib_conf.h Makefile
 	$(CC) $(CFLAGS) -c -o tinfgzip.o $(UZLIB_PATH)/tinfgzip.c
 
-$(APP_AR): $(TARGET_OBJ_PATHS) tinflate.o tinfgzip.o
+$(APP_AR): $(TARGET_OBJ_PATHS) tinflate.o tinfgzip.o Makefile
 	$(AR) cru $@ $^
 
 $(APP_OUT): $(APP_AR) eboot.ld | Makefile
-	$(LD) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group -Wl,--whole-archive $(APP_AR) -Wl,--end-group -o $@
+	$(LD) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group -Wl,--sort-common $(APP_AR) -Wl,--end-group -o $@
 
 clean:
 	rm -f *.o
