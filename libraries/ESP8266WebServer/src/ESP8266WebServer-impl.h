@@ -497,7 +497,10 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content, ssize_t 
     _currentClient.printf("%zx\r\n", content_length);
   }
   size_t sent = content->sendSize(&_currentClient, content_length);
-  (void)sent; //XXXFIXME if (sent != content_length) print-error-on-console-and-return-false
+  if (sent != content_length)
+  {
+    DBGWS("HTTPServer: error: short send after timeout (%u<%d)\n", sent, content_length);
+  }
   if(_chunked) {
     _currentClient.printf_P(PSTR("\r\n"));
     if (content_length == 0) {
