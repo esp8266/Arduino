@@ -18,9 +18,6 @@
                "archiveFileName": "",
                "boards": [
                   {
-                     "name": "Lifely Agrumino Lemon v4 (WT8266-S1 Module)"
-                  },
-                  {
                      "name": "Generic ESP8266 Module"
                   },
                   {

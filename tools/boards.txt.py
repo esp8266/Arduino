@@ -62,6 +62,47 @@ speeds = collections.OrderedDict([
 # boards list
 
 boards = collections.OrderedDict([
+    ( 'agruminolemon', {
+        'name': 'Lifely Agrumino Lemon v4 (WT8266-S1 Module)',
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'ESP8266_AGRUMINO_LEMON_V4' ),
+            ( '.build.variant', 'agruminolemonv4' ),
+            ( '.menu.ESPModule.ESP8266WTS1', ' WT8266-S1 (2M/0K FS)' ),
+            ( '.menu.ESPModule.ESP8266WTS1.build.flash_size', '2M' ),
+            ( '.menu.ESPModule.ESP8266WTS1.build.flash_size_bytes', '0x200000' ),
+            ( '.menu.ESPModule.ESP8266WTS1.build.flash_ld', 'eagle.flash.2m.ld' ),
+            ( '.menu.ESPModule.ESP8266WTS1.build.spiffs_pagesize', '256' ),
+            ( '.menu.ESPModule.ESP8266WTS1.upload.maximum_size', '1044464' ),
+            ( '.menu.ESPModule.ESP8266WTS1.build.rfcal_addr', '0x1FC000' ),
+            ]),
+        'macro': [
+            'resetmethod_menu',
+            'resetmethod_menu_extra',
+            'crystalfreq_menu',
+            'flashfreq_menu',
+            'flashmode_dio',
+            'lwip',
+            'flash_erase_menu',
+            'exception_menu',
+            'vtable_menu',
+            'cpufreq_menu',
+            '2M',
+            'led',
+            'sdk',
+            ],
+        'desc': [ 'Procuct page https://www.lifely.cc',
+                  '',
+                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1  core WiFi 2,4Ghz with 2MB of Flash.',
+                  '',
+                  'Power',
+                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector  in the back board Max 6 Vin',
+                  '',
+                  'Libraries and examples',
+                  'Download the libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
+                  '',
+                  'Full pinout and PDF for setup `here https://www.lifely.cc  our libraries is OpenSource',
+                  ],
+    }),    
     ( 'generic', {
         'name': 'Generic ESP8266 Module',
         'opts': {
