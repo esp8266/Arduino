@@ -228,6 +228,19 @@ public:
         return true;
     }
 
+    time_t getCreationTime() override {
+        time_t t;
+        uint32_t t32b;
+
+        if (lfs_getattr(&_lfs, "/", 'c', &t, 8) == 8) {
+            return t;
+        } else if (lfs_getattr(&_lfs, "/", 'c', &t32b, 4) == 4) {
+            return (time_t)t32b;
+        } else {
+            return 0;
+        }
+    }
+
 
 protected:
     friend class LittleFSFileImpl;
