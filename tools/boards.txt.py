@@ -296,7 +296,7 @@ boards = collections.OrderedDict([
                   ],
     }),
     ( 'agruminolemon', {
-        'name': 'Lifely Agrumino Lemon v4 (WT8266-S1 Module)',
+        'name': 'Lifely Agrumino Lemon v4',
         'opts': collections.OrderedDict([
             ( '.build.board', 'ESP8266_AGRUMINO_LEMON_V4' ),
             ( '.build.variant', 'agruminolemonv4' ),
@@ -305,19 +305,16 @@ boards = collections.OrderedDict([
             'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
-            '2M0',
+            '2M',
             ],
         'desc': [ 'Procuct page https://www.lifely.cc',
                   '',
-                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1  core WiFi 2,4Ghz with 2MB of Flash.',
-                  '',
+                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.',
                   'Power',
-                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector  in the back board Max 6 Vin',
-                  '',
+                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin',
                   'Libraries and examples',
                   'Download the libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
-                  '',
-                  'Full pinout and PDF for setup `here https://www.lifely.cc  our libraries is OpenSource',
+                  'Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource',
                   ],
     }),
     ( 'espduino', {
@@ -1461,8 +1458,6 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     256 ))
     f1m.update( flash_map(    1024,     512 ))
     f1m.update( flash_map(    1024))
-
-    f2m0.update(flash_map(  2*1024))
 
     f2m.update( flash_map(  2*1024,      64 ))
     f2m.update( flash_map(  2*1024,     128 ))
