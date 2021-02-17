@@ -221,6 +221,26 @@ public:
             return false;
         }
 
+        if(_timeCallback && _tryMount()) {
+            // Mounting is required to set attributes
+
+            time_t t = _timeCallback();
+            rc = lfs_setattr(&_lfs, "/", 'c', &t, 8);
+            if (rc != 0) {
+                DEBUGV("lfs_format, lfs_setattr 'c': rc=%d\n", rc);
+                return false;
+            }
+
+            rc = lfs_setattr(&_lfs, "/", 't', &t, 8);
+            if (rc != 0) {
+                DEBUGV("lfs_format, lfs_setattr 't': rc=%d\n", rc);
+                return false;
+            }
+            
+            lfs_unmount(&_lfs);
+            _mounted = false;
+        }
+
         if (wasMounted) {
             return _tryMount();
         }
