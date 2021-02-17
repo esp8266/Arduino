@@ -1,21 +1,6 @@
 Boards
 ======
 
-Lifely Agrumino Lemon v4 (WT8266-S1 Module)
--------------------------------------------
-
-Procuct page https://www.lifely.cc
-
-This Board "Lifely Agrumino Lemon" is based with WT8266-S1  core WiFi 2,4Ghz with 2MB of Flash.
-
-Power
-Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector  in the back board Max 6 Vin
-
-Libraries and examples
-Download the libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/
-
-Full pinout and PDF for setup `here https://www.lifely.cc  our libraries is OpenSource
-
 Generic ESP8266 Module
 ----------------------
 
@@ -221,6 +206,21 @@ Generic ESP8285 Module
 ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.
 
 Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
+
+Lifely Agrumino Lemon v4 (WT8266-S1 Module)
+-------------------------------------------
+
+Procuct page https://www.lifely.cc
+
+This Board "Lifely Agrumino Lemon" is based with WT8266-S1  core WiFi 2,4Ghz with 2MB of Flash.
+
+Power
+Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector  in the back board Max 6 Vin
+
+Libraries and examples
+Download the libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/
+
+Full pinout and PDF for setup `here https://www.lifely.cc  our libraries is OpenSource
 
 ESPDuino (ESP-13 Module)
 ------------------------
