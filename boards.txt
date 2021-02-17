@@ -4617,71 +4617,10 @@ agruminolemon.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
 agruminolemon.menu.non32xfer.fast.build.non32xferflags=
 agruminolemon.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
 agruminolemon.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
-agruminolemon.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
-agruminolemon.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
-agruminolemon.menu.ResetMethod.ck=no dtr (aka ck)
-agruminolemon.menu.ResetMethod.ck.upload.resetmethod=--before no_reset --after soft_reset
-agruminolemon.menu.ResetMethod.nodtr_nosync=no dtr, no_sync
-agruminolemon.menu.ResetMethod.nodtr_nosync.upload.resetmethod=--before no_reset_no_sync --after soft_reset
-agruminolemon.menu.CrystalFreq.26=26 MHz
-agruminolemon.menu.CrystalFreq.40=40 MHz
-agruminolemon.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-agruminolemon.menu.FlashFreq.40=40MHz
-agruminolemon.menu.FlashFreq.40.build.flash_freq=40
-agruminolemon.menu.FlashFreq.80=80MHz
-agruminolemon.menu.FlashFreq.80.build.flash_freq=80
-agruminolemon.menu.FlashFreq.20=20MHz
-agruminolemon.menu.FlashFreq.20.build.flash_freq=20
-agruminolemon.menu.FlashFreq.26=26MHz
-agruminolemon.menu.FlashFreq.26.build.flash_freq=26
+agruminolemon.upload.resetmethod=--before default_reset --after hard_reset
 agruminolemon.build.flash_mode=dio
 agruminolemon.build.flash_flags=-DFLASHMODE_DIO
-agruminolemon.menu.ip.lm2f=v2 Lower Memory
-agruminolemon.menu.ip.lm2f.build.lwip_include=lwip2/include
-agruminolemon.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
-agruminolemon.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
-agruminolemon.menu.ip.hb2f=v2 Higher Bandwidth
-agruminolemon.menu.ip.hb2f.build.lwip_include=lwip2/include
-agruminolemon.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
-agruminolemon.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
-agruminolemon.menu.ip.lm2n=v2 Lower Memory (no features)
-agruminolemon.menu.ip.lm2n.build.lwip_include=lwip2/include
-agruminolemon.menu.ip.lm2n.build.lwip_lib=-llwip2-536
-agruminolemon.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
-agruminolemon.menu.ip.hb2n=v2 Higher Bandwidth (no features)
-agruminolemon.menu.ip.hb2n.build.lwip_include=lwip2/include
-agruminolemon.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
-agruminolemon.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
-agruminolemon.menu.ip.lm6f=v2 IPv6 Lower Memory
-agruminolemon.menu.ip.lm6f.build.lwip_include=lwip2/include
-agruminolemon.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
-agruminolemon.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-agruminolemon.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
-agruminolemon.menu.ip.hb6f.build.lwip_include=lwip2/include
-agruminolemon.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
-agruminolemon.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
-agruminolemon.menu.wipe.none=Only Sketch
-agruminolemon.menu.wipe.none.upload.erase_cmd=
-agruminolemon.menu.wipe.sdk=Sketch + WiFi Settings
-agruminolemon.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
-agruminolemon.menu.wipe.all=All Flash Contents
-agruminolemon.menu.wipe.all.upload.erase_cmd=erase_flash
-agruminolemon.menu.exception.disabled=Disabled (new aborts on oom)
-agruminolemon.menu.exception.disabled.build.exception_flags=-fno-exceptions
-agruminolemon.menu.exception.disabled.build.stdcpp_lib=-lstdc++
-agruminolemon.menu.exception.enabled=Enabled
-agruminolemon.menu.exception.enabled.build.exception_flags=-fexceptions
-agruminolemon.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
-agruminolemon.menu.vt.flash=Flash
-agruminolemon.menu.vt.flash.build.vtable_flags=-DVTABLES_IN_FLASH
-agruminolemon.menu.vt.heap=Heap
-agruminolemon.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
-agruminolemon.menu.vt.iram=IRAM
-agruminolemon.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
-agruminolemon.menu.xtal.80=80 MHz
-agruminolemon.menu.xtal.80.build.f_cpu=80000000L
-agruminolemon.menu.xtal.160=160 MHz
-agruminolemon.menu.xtal.160.build.f_cpu=160000000L
+agruminolemon.build.flash_freq=40
 agruminolemon.menu.eesz.2M64=2MB (FS:64KB OTA:~992KB)
 agruminolemon.menu.eesz.2M64.build.flash_size=2M
 agruminolemon.menu.eesz.2M64.build.flash_size_bytes=0x200000
@@ -4739,52 +4678,6 @@ agruminolemon.menu.eesz.2M.build.flash_ld=eagle.flash.2m.ld
 agruminolemon.menu.eesz.2M.build.spiffs_pagesize=256
 agruminolemon.menu.eesz.2M.upload.maximum_size=1044464
 agruminolemon.menu.eesz.2M.build.rfcal_addr=0x1FC000
-agruminolemon.menu.led.2=2
-agruminolemon.menu.led.2.build.led=-DLED_BUILTIN=2
-agruminolemon.menu.led.0=0
-agruminolemon.menu.led.0.build.led=-DLED_BUILTIN=0
-agruminolemon.menu.led.1=1
-agruminolemon.menu.led.1.build.led=-DLED_BUILTIN=1
-agruminolemon.menu.led.3=3
-agruminolemon.menu.led.3.build.led=-DLED_BUILTIN=3
-agruminolemon.menu.led.4=4
-agruminolemon.menu.led.4.build.led=-DLED_BUILTIN=4
-agruminolemon.menu.led.5=5
-agruminolemon.menu.led.5.build.led=-DLED_BUILTIN=5
-agruminolemon.menu.led.6=6
-agruminolemon.menu.led.6.build.led=-DLED_BUILTIN=6
-agruminolemon.menu.led.7=7
-agruminolemon.menu.led.7.build.led=-DLED_BUILTIN=7
-agruminolemon.menu.led.8=8
-agruminolemon.menu.led.8.build.led=-DLED_BUILTIN=8
-agruminolemon.menu.led.9=9
-agruminolemon.menu.led.9.build.led=-DLED_BUILTIN=9
-agruminolemon.menu.led.10=10
-agruminolemon.menu.led.10.build.led=-DLED_BUILTIN=10
-agruminolemon.menu.led.11=11
-agruminolemon.menu.led.11.build.led=-DLED_BUILTIN=11
-agruminolemon.menu.led.12=12
-agruminolemon.menu.led.12.build.led=-DLED_BUILTIN=12
-agruminolemon.menu.led.13=13
-agruminolemon.menu.led.13.build.led=-DLED_BUILTIN=13
-agruminolemon.menu.led.14=14
-agruminolemon.menu.led.14.build.led=-DLED_BUILTIN=14
-agruminolemon.menu.led.15=15
-agruminolemon.menu.led.15.build.led=-DLED_BUILTIN=15
-agruminolemon.menu.led.16=16
-agruminolemon.menu.led.16.build.led=-DLED_BUILTIN=16
-agruminolemon.menu.sdk.nonosdk_190703=nonos-sdk 2.2.1+100 (190703)
-agruminolemon.menu.sdk.nonosdk_190703.build.sdk=NONOSDK22x_190703
-agruminolemon.menu.sdk.nonosdk_191122=nonos-sdk 2.2.1+119 (191122)
-agruminolemon.menu.sdk.nonosdk_191122.build.sdk=NONOSDK22x_191122
-agruminolemon.menu.sdk.nonosdk_191105=nonos-sdk 2.2.1+113 (191105)
-agruminolemon.menu.sdk.nonosdk_191105.build.sdk=NONOSDK22x_191105
-agruminolemon.menu.sdk.nonosdk_191024=nonos-sdk 2.2.1+111 (191024)
-agruminolemon.menu.sdk.nonosdk_191024.build.sdk=NONOSDK22x_191024
-agruminolemon.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
-agruminolemon.menu.sdk.nonosdk221.build.sdk=NONOSDK221
-agruminolemon.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (180626 known issues)
-agruminolemon.menu.sdk.nonosdk3v0.build.sdk=NONOSDK3V0
 agruminolemon.menu.ip.lm2f=v2 Lower Memory
 agruminolemon.menu.ip.lm2f.build.lwip_include=lwip2/include
 agruminolemon.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
