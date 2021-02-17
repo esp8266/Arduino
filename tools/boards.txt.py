@@ -305,7 +305,7 @@ boards = collections.OrderedDict([
             'resetmethod_nodemcu',
             'flashmode_dio',
             'flashfreq_40',
-            '2M',
+            '2M0',
             ],
         'desc': [ 'Procuct page https://www.lifely.cc',
                   '',
@@ -1445,6 +1445,7 @@ def all_flash_map ():
 
     f512 = collections.OrderedDict([])
     f1m  = collections.OrderedDict([])
+    f2m0 = collections.OrderedDict([])
     f2m  = collections.OrderedDict([])
     f4m  = collections.OrderedDict([])
     f8m  = collections.OrderedDict([])
@@ -1460,6 +1461,8 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     256 ))
     f1m.update( flash_map(    1024,     512 ))
     f1m.update( flash_map(    1024))
+
+    f2m0.update(flash_map(  2*1024))
 
     f2m.update( flash_map(  2*1024,      64 ))
     f2m.update( flash_map(  2*1024,     128 ))
@@ -1490,6 +1493,7 @@ def all_flash_map ():
     return {
         '512K': f512,
           '1M':  f1m,
+          '2M0': f2m0,
           '2M':  f2m,
           '4M':  f4m,
           '8M':  f8m,
