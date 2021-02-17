@@ -23,6 +23,8 @@ menu.stacksmash=Stack Protection
 menu.wipe=Erase Flash
 menu.sdk=Espressif FW
 menu.ssl=SSL Support
+menu.mmu=MMU
+menu.non32xfer=Non-32-Bit Access
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -63,6 +65,18 @@ generic.menu.ssl.all=All SSL ciphers (most compatible)
 generic.menu.ssl.all.build.sslflags=
 generic.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 generic.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+generic.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+generic.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+generic.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+generic.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+generic.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+generic.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+generic.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+generic.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+generic.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+generic.menu.non32xfer.fast.build.non32xferflags=
+generic.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+generic.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 generic.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 generic.menu.ResetMethod.ck=no dtr (aka ck)
@@ -532,6 +546,18 @@ esp8285.menu.ssl.all=All SSL ciphers (most compatible)
 esp8285.menu.ssl.all.build.sslflags=
 esp8285.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 esp8285.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+esp8285.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+esp8285.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+esp8285.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+esp8285.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+esp8285.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+esp8285.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+esp8285.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+esp8285.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+esp8285.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+esp8285.menu.non32xfer.fast.build.non32xferflags=
+esp8285.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+esp8285.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 esp8285.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 esp8285.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 esp8285.menu.ResetMethod.ck=no dtr (aka ck)
@@ -871,6 +897,18 @@ gen4iod.menu.ssl.all=All SSL ciphers (most compatible)
 gen4iod.menu.ssl.all.build.sslflags=
 gen4iod.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 gen4iod.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+gen4iod.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+gen4iod.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+gen4iod.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+gen4iod.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+gen4iod.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+gen4iod.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+gen4iod.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+gen4iod.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+gen4iod.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+gen4iod.menu.non32xfer.fast.build.non32xferflags=
+gen4iod.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+gen4iod.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 gen4iod.upload.resetmethod=--before default_reset --after hard_reset
 gen4iod.menu.FlashMode.dout=DOUT (compatible)
 gen4iod.menu.FlashMode.dout.build.flash_mode=dout
@@ -1088,7 +1126,7 @@ gen4iod.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 huzzah.name=Adafruit Feather HUZZAH ESP8266
-huzzah.build.board=ESP8266_ESP12
+huzzah.build.board=ESP8266_ADAFRUIT_HUZZAH
 huzzah.build.variant=adafruit
 huzzah.upload.tool=esptool
 huzzah.upload.maximum_data_size=81920
@@ -1125,6 +1163,18 @@ huzzah.menu.ssl.all=All SSL ciphers (most compatible)
 huzzah.menu.ssl.all.build.sslflags=
 huzzah.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 huzzah.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+huzzah.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+huzzah.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+huzzah.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+huzzah.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+huzzah.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+huzzah.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+huzzah.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+huzzah.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+huzzah.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+huzzah.menu.non32xfer.fast.build.non32xferflags=
+huzzah.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+huzzah.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 huzzah.upload.resetmethod=--before default_reset --after hard_reset
 huzzah.build.flash_mode=qio
 huzzah.build.flash_flags=-DFLASHMODE_QIO
@@ -1312,6 +1362,18 @@ wifi_slot.menu.ssl.all=All SSL ciphers (most compatible)
 wifi_slot.menu.ssl.all.build.sslflags=
 wifi_slot.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wifi_slot.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+wifi_slot.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+wifi_slot.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifi_slot.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+wifi_slot.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+wifi_slot.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+wifi_slot.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+wifi_slot.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+wifi_slot.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wifi_slot.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wifi_slot.menu.non32xfer.fast.build.non32xferflags=
+wifi_slot.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wifi_slot.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wifi_slot.upload.resetmethod=--before default_reset --after hard_reset
 wifi_slot.menu.FlashFreq.40=40MHz
 wifi_slot.menu.FlashFreq.40.build.flash_freq=40
@@ -1625,6 +1687,18 @@ arduino-esp8266.menu.ssl.all=All SSL ciphers (most compatible)
 arduino-esp8266.menu.ssl.all.build.sslflags=
 arduino-esp8266.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 arduino-esp8266.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+arduino-esp8266.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+arduino-esp8266.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+arduino-esp8266.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+arduino-esp8266.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+arduino-esp8266.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+arduino-esp8266.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+arduino-esp8266.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+arduino-esp8266.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+arduino-esp8266.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+arduino-esp8266.menu.non32xfer.fast.build.non32xferflags=
+arduino-esp8266.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+arduino-esp8266.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 arduino-esp8266.upload.resetmethod=--before no_reset --after soft_reset
 arduino-esp8266.build.flash_mode=qio
 arduino-esp8266.build.flash_flags=-DFLASHMODE_QIO
@@ -1813,6 +1887,18 @@ espmxdevkit.menu.ssl.all=All SSL ciphers (most compatible)
 espmxdevkit.menu.ssl.all.build.sslflags=
 espmxdevkit.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espmxdevkit.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espmxdevkit.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espmxdevkit.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espmxdevkit.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espmxdevkit.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espmxdevkit.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espmxdevkit.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espmxdevkit.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espmxdevkit.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espmxdevkit.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espmxdevkit.menu.non32xfer.fast.build.non32xferflags=
+espmxdevkit.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espmxdevkit.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espmxdevkit.upload.resetmethod=--before default_reset --after hard_reset
 espmxdevkit.build.flash_mode=dout
 espmxdevkit.build.flash_flags=-DFLASHMODE_DOUT
@@ -2041,6 +2127,18 @@ oak.menu.ssl.all=All SSL ciphers (most compatible)
 oak.menu.ssl.all.build.sslflags=
 oak.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 oak.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+oak.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+oak.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+oak.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+oak.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+oak.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+oak.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+oak.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+oak.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+oak.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+oak.menu.non32xfer.fast.build.non32xferflags=
+oak.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+oak.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 oak.upload.resetmethod=--before no_reset --after soft_reset
 oak.build.flash_mode=dio
 oak.build.flash_flags=-DFLASHMODE_DIO
@@ -2237,6 +2335,18 @@ espduino.menu.ssl.all=All SSL ciphers (most compatible)
 espduino.menu.ssl.all.build.sslflags=
 espduino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espduino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espduino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espduino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espduino.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espduino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espduino.menu.non32xfer.fast.build.non32xferflags=
+espduino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espduino.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espduino.build.flash_mode=dio
 espduino.build.flash_flags=-DFLASHMODE_DIO
 espduino.build.flash_freq=40
@@ -2423,6 +2533,18 @@ espectro.menu.ssl.all=All SSL ciphers (most compatible)
 espectro.menu.ssl.all.build.sslflags=
 espectro.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espectro.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espectro.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espectro.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espectro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espectro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espectro.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espectro.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espectro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espectro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espectro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espectro.menu.non32xfer.fast.build.non32xferflags=
+espectro.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espectro.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espectro.upload.resetmethod=--before default_reset --after hard_reset
 espectro.build.flash_mode=dio
 espectro.build.flash_flags=-DFLASHMODE_DIO
@@ -2573,7 +2695,7 @@ espectro.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espino.name=ESPino (ESP-12 Module)
-espino.build.board=ESP8266_ESP12
+espino.build.board=ESP8266_ESPINO_ESP12
 espino.build.variant=espino
 espino.upload.tool=esptool
 espino.upload.maximum_data_size=81920
@@ -2610,6 +2732,18 @@ espino.menu.ssl.all=All SSL ciphers (most compatible)
 espino.menu.ssl.all.build.sslflags=
 espino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espino.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espino.menu.non32xfer.fast.build.non32xferflags=
+espino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espino.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espino.menu.ResetMethod.nodemcu=dtr (aka nodemcu)
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 espino.menu.ResetMethod.ck=no dtr (aka ck)
@@ -2800,6 +2934,18 @@ espresso_lite_v1.menu.ssl.all=All SSL ciphers (most compatible)
 espresso_lite_v1.menu.ssl.all.build.sslflags=
 espresso_lite_v1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espresso_lite_v1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espresso_lite_v1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espresso_lite_v1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espresso_lite_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espresso_lite_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espresso_lite_v1.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espresso_lite_v1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espresso_lite_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espresso_lite_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espresso_lite_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espresso_lite_v1.menu.non32xfer.fast.build.non32xferflags=
+espresso_lite_v1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espresso_lite_v1.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espresso_lite_v1.build.flash_mode=dio
 espresso_lite_v1.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v1.build.flash_freq=40
@@ -2990,6 +3136,18 @@ espresso_lite_v2.menu.ssl.all=All SSL ciphers (most compatible)
 espresso_lite_v2.menu.ssl.all.build.sslflags=
 espresso_lite_v2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espresso_lite_v2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espresso_lite_v2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espresso_lite_v2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espresso_lite_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espresso_lite_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espresso_lite_v2.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espresso_lite_v2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espresso_lite_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espresso_lite_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espresso_lite_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espresso_lite_v2.menu.non32xfer.fast.build.non32xferflags=
+espresso_lite_v2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espresso_lite_v2.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espresso_lite_v2.build.flash_mode=dio
 espresso_lite_v2.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v2.build.flash_freq=40
@@ -3190,6 +3348,18 @@ sonoff.menu.ssl.all=All SSL ciphers (most compatible)
 sonoff.menu.ssl.all.build.sslflags=
 sonoff.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 sonoff.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+sonoff.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+sonoff.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+sonoff.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+sonoff.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+sonoff.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+sonoff.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+sonoff.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+sonoff.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+sonoff.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+sonoff.menu.non32xfer.fast.build.non32xferflags=
+sonoff.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+sonoff.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 sonoff.upload.resetmethod=--before no_reset --after soft_reset
 sonoff.build.flash_mode=dout
 sonoff.build.flash_flags=-DFLASHMODE_DOUT
@@ -3380,7 +3550,7 @@ sonoff.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 inventone.name=Invent One
-inventone.build.board=ESP8266_GENERIC
+inventone.build.board=ESP8266_INVENT_ONE
 inventone.build.variant=inventone
 inventone.upload.tool=esptool
 inventone.upload.maximum_data_size=81920
@@ -3417,6 +3587,18 @@ inventone.menu.ssl.all=All SSL ciphers (most compatible)
 inventone.menu.ssl.all.build.sslflags=
 inventone.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 inventone.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+inventone.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+inventone.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+inventone.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+inventone.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+inventone.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+inventone.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+inventone.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+inventone.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+inventone.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+inventone.menu.non32xfer.fast.build.non32xferflags=
+inventone.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+inventone.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 inventone.upload.resetmethod=--before default_reset --after hard_reset
 inventone.build.flash_mode=dio
 inventone.build.flash_flags=-DFLASHMODE_DIO
@@ -3604,6 +3786,18 @@ d1_mini.menu.ssl.all=All SSL ciphers (most compatible)
 d1_mini.menu.ssl.all.build.sslflags=
 d1_mini.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1_mini.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+d1_mini.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+d1_mini.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+d1_mini.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+d1_mini.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+d1_mini.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+d1_mini.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+d1_mini.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1_mini.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1_mini.menu.non32xfer.fast.build.non32xferflags=
+d1_mini.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1_mini.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1_mini.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini.build.flash_mode=dio
 d1_mini.build.flash_flags=-DFLASHMODE_DIO
@@ -3791,6 +3985,18 @@ d1_mini_lite.menu.ssl.all=All SSL ciphers (most compatible)
 d1_mini_lite.menu.ssl.all.build.sslflags=
 d1_mini_lite.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1_mini_lite.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+d1_mini_lite.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+d1_mini_lite.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini_lite.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+d1_mini_lite.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+d1_mini_lite.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+d1_mini_lite.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+d1_mini_lite.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+d1_mini_lite.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1_mini_lite.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1_mini_lite.menu.non32xfer.fast.build.non32xferflags=
+d1_mini_lite.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1_mini_lite.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1_mini_lite.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini_lite.build.flash_mode=dout
 d1_mini_lite.build.flash_flags=-DFLASHMODE_DOUT
@@ -4018,6 +4224,18 @@ d1_mini_pro.menu.ssl.all=All SSL ciphers (most compatible)
 d1_mini_pro.menu.ssl.all.build.sslflags=
 d1_mini_pro.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1_mini_pro.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+d1_mini_pro.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+d1_mini_pro.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1_mini_pro.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+d1_mini_pro.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+d1_mini_pro.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+d1_mini_pro.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+d1_mini_pro.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+d1_mini_pro.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1_mini_pro.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1_mini_pro.menu.non32xfer.fast.build.non32xferflags=
+d1_mini_pro.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1_mini_pro.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1_mini_pro.upload.resetmethod=--before default_reset --after hard_reset
 d1_mini_pro.build.flash_mode=dio
 d1_mini_pro.build.flash_flags=-DFLASHMODE_DIO
@@ -4188,6 +4406,18 @@ d1.menu.ssl.all=All SSL ciphers (most compatible)
 d1.menu.ssl.all.build.sslflags=
 d1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 d1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+d1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+d1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+d1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+d1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+d1.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+d1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+d1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+d1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+d1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+d1.menu.non32xfer.fast.build.non32xferflags=
+d1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+d1.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 d1.upload.resetmethod=--before default_reset --after hard_reset
 d1.build.flash_mode=dio
 d1.build.flash_flags=-DFLASHMODE_DIO
@@ -4659,7 +4889,7 @@ agruminolemon.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
-nodemcu.build.board=ESP8266_NODEMCU
+nodemcu.build.board=ESP8266_NODEMCU_ESP12
 nodemcu.build.variant=nodemcu
 nodemcu.upload.tool=esptool
 nodemcu.upload.maximum_data_size=81920
@@ -4696,6 +4926,18 @@ nodemcu.menu.ssl.all=All SSL ciphers (most compatible)
 nodemcu.menu.ssl.all.build.sslflags=
 nodemcu.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 nodemcu.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+nodemcu.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+nodemcu.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+nodemcu.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+nodemcu.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+nodemcu.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+nodemcu.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+nodemcu.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+nodemcu.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+nodemcu.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+nodemcu.menu.non32xfer.fast.build.non32xferflags=
+nodemcu.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+nodemcu.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 nodemcu.upload.resetmethod=--before default_reset --after hard_reset
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_flags=-DFLASHMODE_QIO
@@ -4846,7 +5088,7 @@ nodemcu.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
-nodemcuv2.build.board=ESP8266_NODEMCU
+nodemcuv2.build.board=ESP8266_NODEMCU_ESP12E
 nodemcuv2.build.variant=nodemcu
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.maximum_data_size=81920
@@ -4883,6 +5125,18 @@ nodemcuv2.menu.ssl.all=All SSL ciphers (most compatible)
 nodemcuv2.menu.ssl.all.build.sslflags=
 nodemcuv2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 nodemcuv2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+nodemcuv2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+nodemcuv2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+nodemcuv2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+nodemcuv2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+nodemcuv2.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+nodemcuv2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+nodemcuv2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+nodemcuv2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+nodemcuv2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+nodemcuv2.menu.non32xfer.fast.build.non32xferflags=
+nodemcuv2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+nodemcuv2.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 nodemcuv2.upload.resetmethod=--before default_reset --after hard_reset
 nodemcuv2.build.flash_mode=dio
 nodemcuv2.build.flash_flags=-DFLASHMODE_DIO
@@ -5074,6 +5328,18 @@ modwifi.menu.ssl.all=All SSL ciphers (most compatible)
 modwifi.menu.ssl.all.build.sslflags=
 modwifi.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 modwifi.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+modwifi.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+modwifi.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+modwifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+modwifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+modwifi.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+modwifi.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+modwifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+modwifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+modwifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+modwifi.menu.non32xfer.fast.build.non32xferflags=
+modwifi.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+modwifi.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 modwifi.upload.resetmethod=--before no_reset --after soft_reset
 modwifi.build.flash_mode=qio
 modwifi.build.flash_flags=-DFLASHMODE_QIO
@@ -5281,6 +5547,18 @@ phoenix_v1.menu.ssl.all=All SSL ciphers (most compatible)
 phoenix_v1.menu.ssl.all.build.sslflags=
 phoenix_v1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 phoenix_v1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+phoenix_v1.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+phoenix_v1.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+phoenix_v1.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+phoenix_v1.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+phoenix_v1.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+phoenix_v1.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+phoenix_v1.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+phoenix_v1.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+phoenix_v1.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+phoenix_v1.menu.non32xfer.fast.build.non32xferflags=
+phoenix_v1.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+phoenix_v1.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 phoenix_v1.build.flash_mode=dio
 phoenix_v1.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v1.build.flash_freq=40
@@ -5471,6 +5749,18 @@ phoenix_v2.menu.ssl.all=All SSL ciphers (most compatible)
 phoenix_v2.menu.ssl.all.build.sslflags=
 phoenix_v2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 phoenix_v2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+phoenix_v2.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+phoenix_v2.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+phoenix_v2.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+phoenix_v2.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+phoenix_v2.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+phoenix_v2.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+phoenix_v2.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+phoenix_v2.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+phoenix_v2.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+phoenix_v2.menu.non32xfer.fast.build.non32xferflags=
+phoenix_v2.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+phoenix_v2.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 phoenix_v2.build.flash_mode=dio
 phoenix_v2.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v2.build.flash_freq=40
@@ -5661,6 +5951,18 @@ eduinowifi.menu.ssl.all=All SSL ciphers (most compatible)
 eduinowifi.menu.ssl.all.build.sslflags=
 eduinowifi.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 eduinowifi.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+eduinowifi.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+eduinowifi.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+eduinowifi.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+eduinowifi.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+eduinowifi.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+eduinowifi.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+eduinowifi.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+eduinowifi.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+eduinowifi.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+eduinowifi.menu.non32xfer.fast.build.non32xferflags=
+eduinowifi.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+eduinowifi.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 eduinowifi.upload.resetmethod=--before default_reset --after hard_reset
 eduinowifi.build.flash_mode=dio
 eduinowifi.build.flash_flags=-DFLASHMODE_DIO
@@ -5848,6 +6150,18 @@ wiolink.menu.ssl.all=All SSL ciphers (most compatible)
 wiolink.menu.ssl.all.build.sslflags=
 wiolink.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wiolink.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+wiolink.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+wiolink.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wiolink.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+wiolink.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+wiolink.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+wiolink.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+wiolink.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+wiolink.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wiolink.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wiolink.menu.non32xfer.fast.build.non32xferflags=
+wiolink.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wiolink.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wiolink.upload.resetmethod=--before default_reset --after hard_reset
 wiolink.build.flash_mode=qio
 wiolink.build.flash_flags=-DFLASHMODE_QIO
@@ -6035,6 +6349,18 @@ blynk.menu.ssl.all=All SSL ciphers (most compatible)
 blynk.menu.ssl.all.build.sslflags=
 blynk.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 blynk.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+blynk.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+blynk.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+blynk.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+blynk.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+blynk.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+blynk.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+blynk.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+blynk.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+blynk.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+blynk.menu.non32xfer.fast.build.non32xferflags=
+blynk.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+blynk.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 blynk.upload.resetmethod=--before default_reset --after hard_reset
 blynk.build.flash_mode=qio
 blynk.build.flash_flags=-DFLASHMODE_QIO
@@ -6222,6 +6548,18 @@ thing.menu.ssl.all=All SSL ciphers (most compatible)
 thing.menu.ssl.all.build.sslflags=
 thing.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 thing.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+thing.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+thing.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+thing.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+thing.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+thing.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+thing.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+thing.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+thing.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+thing.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+thing.menu.non32xfer.fast.build.non32xferflags=
+thing.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+thing.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 thing.upload.resetmethod=--before no_reset --after soft_reset
 thing.build.flash_mode=qio
 thing.build.flash_flags=-DFLASHMODE_QIO
@@ -6409,6 +6747,18 @@ thingdev.menu.ssl.all=All SSL ciphers (most compatible)
 thingdev.menu.ssl.all.build.sslflags=
 thingdev.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 thingdev.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+thingdev.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+thingdev.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+thingdev.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+thingdev.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+thingdev.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+thingdev.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+thingdev.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+thingdev.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+thingdev.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+thingdev.menu.non32xfer.fast.build.non32xferflags=
+thingdev.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+thingdev.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 thingdev.upload.resetmethod=--before default_reset --after hard_reset
 thingdev.build.flash_mode=dio
 thingdev.build.flash_flags=-DFLASHMODE_DIO
@@ -6596,6 +6946,18 @@ esp210.menu.ssl.all=All SSL ciphers (most compatible)
 esp210.menu.ssl.all.build.sslflags=
 esp210.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 esp210.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+esp210.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+esp210.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+esp210.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+esp210.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+esp210.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+esp210.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+esp210.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+esp210.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+esp210.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+esp210.menu.non32xfer.fast.build.non32xferflags=
+esp210.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+esp210.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 esp210.upload.resetmethod=--before no_reset --after soft_reset
 esp210.build.flash_mode=qio
 esp210.build.flash_flags=-DFLASHMODE_QIO
@@ -6746,7 +7108,7 @@ esp210.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
-espinotee.build.board=ESP8266_ESP13
+espinotee.build.board=ESP8266_ESPINO_ESP13
 espinotee.build.variant=espinotee
 espinotee.upload.tool=esptool
 espinotee.upload.maximum_data_size=81920
@@ -6783,6 +7145,18 @@ espinotee.menu.ssl.all=All SSL ciphers (most compatible)
 espinotee.menu.ssl.all.build.sslflags=
 espinotee.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 espinotee.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espinotee.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+espinotee.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+espinotee.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+espinotee.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+espinotee.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+espinotee.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+espinotee.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+espinotee.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+espinotee.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+espinotee.menu.non32xfer.fast.build.non32xferflags=
+espinotee.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+espinotee.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 espinotee.upload.resetmethod=--before default_reset --after hard_reset
 espinotee.build.flash_mode=qio
 espinotee.build.flash_flags=-DFLASHMODE_QIO
@@ -6970,6 +7344,18 @@ wifiduino.menu.ssl.all=All SSL ciphers (most compatible)
 wifiduino.menu.ssl.all.build.sslflags=
 wifiduino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wifiduino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+wifiduino.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+wifiduino.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifiduino.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+wifiduino.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+wifiduino.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+wifiduino.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+wifiduino.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+wifiduino.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wifiduino.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wifiduino.menu.non32xfer.fast.build.non32xferflags=
+wifiduino.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wifiduino.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wifiduino.upload.resetmethod=--before default_reset --after hard_reset
 wifiduino.build.flash_mode=dio
 wifiduino.build.flash_flags=-DFLASHMODE_DIO
@@ -7174,6 +7560,18 @@ wifinfo.menu.ssl.all=All SSL ciphers (most compatible)
 wifinfo.menu.ssl.all.build.sslflags=
 wifinfo.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 wifinfo.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+wifinfo.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+wifinfo.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+wifinfo.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+wifinfo.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+wifinfo.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+wifinfo.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+wifinfo.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+wifinfo.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+wifinfo.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+wifinfo.menu.non32xfer.fast.build.non32xferflags=
+wifinfo.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+wifinfo.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 wifinfo.upload.resetmethod=--before default_reset --after hard_reset
 wifinfo.build.flash_mode=qio
 wifinfo.build.flash_flags=-DFLASHMODE_QIO
@@ -7371,7 +7769,7 @@ wifinfo.menu.baud.3000000.upload.speed=3000000
 
 ##############################################################
 cw01.name=XinaBox CW01
-cw01.build.board=ESP8266_GENERIC
+cw01.build.board=ESP8266_XINABOX_CW01
 cw01.build.variant=xinabox
 cw01.upload.tool=esptool
 cw01.upload.maximum_data_size=81920
@@ -7408,6 +7806,18 @@ cw01.menu.ssl.all=All SSL ciphers (most compatible)
 cw01.menu.ssl.all.build.sslflags=
 cw01.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
 cw01.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+cw01.menu.mmu.3232=32KB cache + 32KB IRAM (balanced)
+cw01.menu.mmu.3232.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000
+cw01.menu.mmu.4816=16KB cache + 48KB IRAM (IRAM)
+cw01.menu.mmu.4816.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000
+cw01.menu.mmu.4816H=16KB cache + 48KB IRAM and 2nd Heap (shared)
+cw01.menu.mmu.4816H.build.mmuflags=-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP
+cw01.menu.mmu.3216=16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)
+cw01.menu.mmu.3216.build.mmuflags=-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000
+cw01.menu.non32xfer.fast=Use pgm_read macros for IRAM/PROGMEM
+cw01.menu.non32xfer.fast.build.non32xferflags=
+cw01.menu.non32xfer.safe=Byte/Word access to IRAM/PROGMEM (very slow)
+cw01.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 cw01.upload.resetmethod=--before default_reset --after hard_reset
 cw01.menu.CrystalFreq.26=26 MHz
 cw01.menu.CrystalFreq.40=40 MHz

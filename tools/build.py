@@ -69,6 +69,8 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
             'ResetMethod=nodemcu'.format(**vars(args))
     if args.debug_port and args.debug_level:
         fqbn += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
+    if args.waveform_phase:
+        fqbn += ',waveform=phase'
     cmd += [fqbn]
     cmd += ['-built-in-libraries', ide_path + '/libraries']
     cmd += ['-ide-version=10607']
@@ -115,6 +117,8 @@ def parse_args():
                         type=int, choices=[40, 80])
     parser.add_argument('--debug_port', help='Debug port',
                         choices=['Serial', 'Serial1'])
+    parser.add_argument('--waveform_phase', action='store_true',
+                        help='Select waveform locked on phase')
     parser.add_argument('--debug_level', help='Debug level')
     parser.add_argument('--build_cache', help='Build directory to cache core.a', default='')
     parser.add_argument('sketch_path', help='Sketch file path')

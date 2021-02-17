@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <LwipDhcpServer.h>
 
 /* Set these to your desired credentials. */
 const char *ssid = "ESPap";
@@ -75,8 +76,8 @@ void setup() {
      ...
      any client not listed will use next IP address available from the range (here 192.168.0.102 and more)
   */
-  wifi_softap_add_dhcps_lease(mac_CAM);  // always 192.168.0.100
-  wifi_softap_add_dhcps_lease(mac_PC);   // always 192.168.0.101
+  dhcpSoftAP.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
+  dhcpSoftAP.add_dhcps_lease(mac_PC);   // always 192.168.0.101
   /* Start Access Point. You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");

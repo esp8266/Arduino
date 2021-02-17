@@ -63,6 +63,7 @@ typedef uint32_t sys_prot_t;
 #define SYS_ARCH_DECL_PROTECT(lev) sys_prot_t lev
 #define SYS_ARCH_PROTECT(lev) lev = lwip_xt_rsil(15)
 #define SYS_ARCH_UNPROTECT(lev) lwip_xt_wsr_ps(lev)
+#define sys_jiffies() (0) // only used for increased randomness in PPP
 
 #define LWIP_NO_CTYPE_H 1
 
