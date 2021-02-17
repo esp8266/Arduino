@@ -31,6 +31,7 @@
 #include "umm_malloc/umm_malloc.h"
 // #include "core_esp8266_vm.h"
 #include <pgmspace.h>
+#include "reboot_uart_dwnld.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -201,6 +202,15 @@ void EspClass::restart(void)
 {
     system_restart();
     esp_yield();
+}
+
+[[noreturn]] void EspClass::rebootIntoUartDownloadMode()
+{
+	wdtDisable();
+	/* disable hardware watchdog */
+	CLEAR_PERI_REG_MASK(PERIPHS_HW_WDT, 0x1);
+
+	esp8266RebootIntoUartDownloadMode();
 }
 
 uint16_t EspClass::getVcc(void)
