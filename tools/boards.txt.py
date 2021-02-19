@@ -313,7 +313,7 @@ boards = collections.OrderedDict([
                   'Power',
                   'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin',
                   'Libraries and examples',
-                  'Download the libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
+                  'Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
                   'Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource',
                   ],
     }),
@@ -1442,7 +1442,6 @@ def all_flash_map ():
 
     f512 = collections.OrderedDict([])
     f1m  = collections.OrderedDict([])
-    f2m0 = collections.OrderedDict([])
     f2m  = collections.OrderedDict([])
     f4m  = collections.OrderedDict([])
     f8m  = collections.OrderedDict([])
@@ -1488,7 +1487,6 @@ def all_flash_map ():
     return {
         '512K': f512,
           '1M':  f1m,
-          '2M0': f2m0,
           '2M':  f2m,
           '4M':  f4m,
           '8M':  f8m,
