@@ -131,6 +131,7 @@ bool MDNSResponder::close(void)
         _announce(false, true);
         _resetProbeStatus(false);   // Stop probing
         _releaseServiceQueries();
+        _releaseServices();
         _releaseUDPContext();
         _releaseHostname();
 

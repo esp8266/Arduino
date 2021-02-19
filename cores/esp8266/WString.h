@@ -72,6 +72,10 @@ class String {
         explicit String(unsigned int, unsigned char base = 10);
         explicit String(long, unsigned char base = 10);
         explicit String(unsigned long, unsigned char base = 10);
+        explicit String(long long /* base 10 */);
+        explicit String(long long, unsigned char base);
+        explicit String(unsigned long long /* base 10 */);
+        explicit String(unsigned long long, unsigned char base);
         explicit String(float, unsigned char decimalPlaces = 2);
         explicit String(double, unsigned char decimalPlaces = 2);
         ~String() {
@@ -117,6 +121,8 @@ class String {
         unsigned char concat(unsigned int num);
         unsigned char concat(long num);
         unsigned char concat(unsigned long num);
+        unsigned char concat(long long num);
+        unsigned char concat(unsigned long long num);
         unsigned char concat(float num);
         unsigned char concat(double num);
         unsigned char concat(const __FlashStringHelper *str);
@@ -156,6 +162,14 @@ class String {
             concat(num);
             return *this;
         }
+        String &operator +=(long long num) {
+            concat(num);
+            return *this;
+        }
+        String &operator +=(unsigned long long num) {
+            concat(num);
+            return *this;
+        }
         String &operator +=(float num) {
             concat(num);
             return *this;
@@ -177,6 +191,8 @@ class String {
         friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned int num);
         friend StringSumHelper &operator +(const StringSumHelper &lhs, long num);
         friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, long long num);
+        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long long num);
         friend StringSumHelper &operator +(const StringSumHelper &lhs, float num);
         friend StringSumHelper &operator +(const StringSumHelper &lhs, double num);
         friend StringSumHelper &operator +(const StringSumHelper &lhs, const __FlashStringHelper *rhs);
@@ -373,6 +389,12 @@ class StringSumHelper: public String {
                 String(num) {
         }
         StringSumHelper(unsigned long num) :
+                String(num) {
+        }
+        StringSumHelper(long long num) :
+                String(num) {
+        }
+        StringSumHelper(unsigned long long num) :
                 String(num) {
         }
         StringSumHelper(float num) :
