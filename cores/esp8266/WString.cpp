@@ -435,6 +435,20 @@ StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long num) {
     return a;
 }
 
+StringSumHelper &operator +(const StringSumHelper &lhs, long long num) {
+    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
+    if (!a.concat(num))
+        a.invalidate();
+    return a;
+}
+
+StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long long num) {
+    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
+    if (!a.concat(num))
+        a.invalidate();
+    return a;
+}
+
 StringSumHelper &operator +(const StringSumHelper &lhs, float num) {
     StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
     if (!a.concat(num))
