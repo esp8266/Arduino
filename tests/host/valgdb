@@ -1,0 +1,3 @@
+valgrind --vgdb=full --vgdb-error=0 "$@" & pid=$!
+echo "======== TUI:  ^p='^'  ^n='v'  ^f='>'  ^b='<' ========"
+xterm -e "gdb -ex \"target remote | vgdb --pid=$pid\" -ex \"tui enable\" -ex cont $1; kill -9 $pid"

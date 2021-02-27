@@ -30,7 +30,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -62,7 +62,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -90,7 +90,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-windows-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -102,7 +102,7 @@ jobs:
       run: |
         # Windows has python3 already installed, but it's called "python".
         # Copy python.exe to the proper name so scripts "just work".
-        copy (get-command python).source (get-command python).source.Replace("python.exe", "python3.exe")
+        try { Get-Command python3 } catch { copy (get-command python).source (get-command python).source.Replace("python.exe", "python3.exe") }
         bash ./tests/build.sh
 
 
@@ -122,7 +122,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-mac-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -154,7 +154,8 @@ jobs:
         mod: 42 # Picked at random to give 4-5 builds and exit.
         rem: 13
       run: |
-        sudo apt-get install python3-pip python3-setuptools
+        sudo apt update
+        sudo apt install python3-pip python3-setuptools
         PATH=/home/runner/.local/bin:$PATH bash ./tests/platformio.sh
 
 
@@ -174,7 +175,8 @@ jobs:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         TRAVIS_TAG: ${{ github.ref }}
       run: |
-        sudo apt-get install valgrind lcov
+        sudo apt update
+        sudo apt install valgrind lcov
         bash ./tests/ci/host_test.sh
 
 
@@ -194,7 +196,8 @@ jobs:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         TRAVIS_TAG: ${{ github.ref }}
       run: |
-        sudo apt-get install python3-pip python3-setuptools
+        sudo apt update
+        sudo apt install python3-pip python3-setuptools
         # GitHub CI installs pip3 and setuptools outside the path.
         # Update the path to include them and run.
         PATH=/home/runner/.local/bin:$PATH pip3 install --user -r doc/requirements.txt
@@ -217,7 +220,8 @@ jobs:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         TRAVIS_TAG: ${{ github.ref }}
       run: |
-          sudo apt-get install astyle
+          sudo apt update
+          sudo apt install astyle
           bash ./tests/ci/style_check.sh
 
 
@@ -251,9 +255,17 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+    - name: Cache Linux toolchain
+      id: cache-linux
+      uses: actions/cache@v2
+      with:
+        path: ./tools/dist
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Boards.txt diff
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         TRAVIS_TAG: ${{ github.ref }}
       run: |
           bash ./tests/ci/build_boards.sh
+          bash ./tests/ci/eboot_test.sh
+          bash ./tests/ci/pkgrefs_test.sh

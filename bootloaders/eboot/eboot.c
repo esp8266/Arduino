@@ -14,7 +14,6 @@
 #include "eboot_command.h"
 #include <uzlib.h>
 
-extern unsigned char _gzip_dict;
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
@@ -27,15 +26,7 @@ int print_version(const uint32_t flash_addr)
     if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
         return 1;
     }
-    char fmt[7];
-    fmt[0] = 'v';
-    fmt[1] = '%';
-    fmt[2] = '0';
-    fmt[3] = '8';
-    fmt[4] = 'x';
-    fmt[5] = '\n';
-    fmt[6] = 0;
-    ets_printf((const char*) fmt, ver);
+    ets_printf("v%08x\n", ver);
     return 0;
 }
 
@@ -68,7 +59,9 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
             load = true;
         }
 
-        if (address >= 0x40100000 && address < 0x40108000) {
+        // The final IRAM size, once boot has completed, can be either 32K or 48K.
+        // Allow for the higher in range testing.
+        if (address >= 0x40100000 && address < 0x4010C000) {
             load = true;
         }
 
@@ -159,11 +152,6 @@ int copy_raw(const uint32_t src_addr,
 	gzip = true;
     }
     while (left > 0) {
-        if (!verify) {
-           if (SPIEraseSector(daddr/buffer_size)) {
-               return 2;
-           }
-        }
         if (!gzip) {
             if (SPIRead(saddr, buffer, buffer_size)) {
                 return 3;
@@ -190,8 +178,25 @@ int copy_raw(const uint32_t src_addr,
                 return 9;
             }
         } else {
-            if (SPIWrite(daddr, buffer, buffer_size)) {
-                return 4;
+            // Special treatment for address 0 (bootloader).  Only erase and
+            // rewrite if the data is different (i.e. very rarely).
+            bool skip = false;
+            if (daddr == 0) {
+                if (SPIRead(daddr, buffer2, buffer_size)) {
+                    return 4;
+                }
+                if (!memcmp(buffer2, buffer, buffer_size)) {
+                    ets_putc('B'); // Note we skipped the bootloader in output
+                    skip = true;   // And skip erase/write
+                }
+            }
+            if (!skip) {
+                if (SPIEraseSector(daddr/buffer_size)) {
+                   return 2;
+                }
+                if (SPIWrite(daddr, buffer, buffer_size)) {
+                    return 4;
+                }
             }
         }
         saddr += buffer_size;
@@ -208,6 +213,16 @@ int main()
     bool clear_cmd = false;
     struct eboot_command cmd;
 
+// BSS init commented out for now to save space.  If any static variables set
+// to 0 are used, need to uncomment it or else the BSS will not be cleared and
+// the static vars will power on with random values.
+#if 0
+    // Clear BSS ourselves, we don't have handy C runtime
+    extern char _bss_start;
+    extern char _bss_end;
+    ets_bzero(&_bss_start, &_bss_end - &_bss_start);
+#endif
+
     print_version(0);
 
     if (eboot_command_read(&cmd) == 0) {
@@ -222,26 +237,26 @@ int main()
     }
 
     if (cmd.action == ACTION_COPY_RAW) {
-        ets_putc('c'); ets_putc('p'); ets_putc(':');
+        ets_printf("cp:");
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
         ets_wdt_enable();
 
-        ets_putc('0'+res); ets_putc('\n');
+        ets_printf("%d\n", res);
 #if 0
 	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
 	//beginning of the image in the empty area, see #7458. Disabling for now. 
         //TODO: replace the below verify with hash type, crc, or similar.
         // Verify the copy
-        ets_putc('c'); ets_putc('m'); ets_putc('p'); ets_putc(':');
+        ets_printf("cmp:");
         if (res == 0) {
             ets_wdt_disable();
             res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], true);
             ets_wdt_enable();
             }
 
-        ets_putc('0'+res); ets_putc('\n');
+        ets_printf("%d\n", res);
 #endif	    
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
@@ -254,10 +269,10 @@ int main()
     }
 
     if (cmd.action == ACTION_LOAD_APP) {
-        ets_putc('l'); ets_putc('d'); ets_putc('\n');
+        ets_printf("ld\n");
         res = load_app_from_flash_raw(cmd.args[0]);
-        //we will get to this only on load fail
-        ets_putc('e'); ets_putc(':'); ets_putc('0'+res); ets_putc('\n');
+        // We will get to this only on load fail
+        ets_printf("e:%d\n", res);
     }
 
     if (res) {

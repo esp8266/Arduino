@@ -32,6 +32,8 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
+namespace esp8266webserver {
+
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
@@ -345,15 +347,16 @@ void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
 }
 
 template <typename ServerType>
-uint8_t ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
+int ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
       yield();
     res = client.read();
   }
-  return (uint8_t)res;
+  return res;
 }
+
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const String& boundary, uint32_t len){
@@ -440,74 +443,59 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             if(_currentHandler && _currentHandler->canUpload(_currentUri))
               _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->status = UPLOAD_FILE_WRITE;
-            uint8_t argByte = _uploadReadByte(client);
-readfile:
-            while(argByte != 0x0D){
-              if (!client.connected()) return _parseFormUploadAborted();
-              _uploadWriteByte(argByte);
-              argByte = _uploadReadByte(client);
-            }
 
-            argByte = _uploadReadByte(client);
+            int fastBoundaryLen = 4 /* \r\n-- */ + boundary.length() + 1 /* \0 */;
+            char fastBoundary[ fastBoundaryLen ];
+            snprintf(fastBoundary, fastBoundaryLen, "\r\n--%s", boundary.c_str());
+            int boundaryPtr = 0;
+            while ( true ) {
+                int ret = _uploadReadByte(client);
+                if (ret < 0) {
+                    // Unexpected, we should have had data available per above
+                    return _parseFormUploadAborted();
+                }
+                char in = (char) ret;
+                if (in == fastBoundary[ boundaryPtr ]) {
+                    // The input matched the current expected character, advance and possibly exit this file
+                    boundaryPtr++;
+                    if (boundaryPtr == fastBoundaryLen - 1) {
+                        // We read the whole boundary line, we're done here!
+                        break;
+                    }
+                } else {
+                    // The char doesn't match what we want, so dump whatever matches we had, the read in char, and reset ptr to start
+                    for (int i = 0; i < boundaryPtr; i++) {
+                        _uploadWriteByte( fastBoundary[ i ] );
+                    }
+                    if (in == fastBoundary[ 0 ]) {
+                       // This could be the start of the real end, mark it so and don't emit/skip it
+                       boundaryPtr = 1;
+                    } else {
+                      // Not the 1st char of our pattern, so emit and ignore
+                      _uploadWriteByte( in );
+                      boundaryPtr = 0;
+                    }
+                }
+            }
+            // Found the boundary string, finish processing this file upload
+            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            _currentUpload->totalSize += _currentUpload->currentSize;
+            _currentUpload->status = UPLOAD_FILE_END;
+            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            DBGWS("End File: %s Type: %s Size: %d\n",
+                _currentUpload->filename.c_str(),
+                _currentUpload->type.c_str(),
+                (int)_currentUpload->totalSize);
             if (!client.connected()) return _parseFormUploadAborted();
-            if (argByte == 0x0A){
-              argByte = _uploadReadByte(client);
-              if (!client.connected()) return _parseFormUploadAborted();
-              if ((char)argByte != '-'){
-                //continue reading the file
-                _uploadWriteByte(0x0D);
-                _uploadWriteByte(0x0A);
-                goto readfile;
-              } else {
-                argByte = _uploadReadByte(client);
-                if (!client.connected()) return _parseFormUploadAborted();
-                if ((char)argByte != '-'){
-                  //continue reading the file
-                  _uploadWriteByte(0x0D);
-                  _uploadWriteByte(0x0A);
-                  _uploadWriteByte((uint8_t)('-'));
-                  goto readfile;
-                }
-              }
-
-              uint8_t endBuf[boundary.length()];
-              client.readBytes(endBuf, boundary.length());
-
-              if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
-                if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
-                _currentUpload->totalSize += _currentUpload->currentSize;
-                _currentUpload->status = UPLOAD_FILE_END;
-                if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
-                DBGWS("End File: %s Type: %s Size: %d\n",
-                    _currentUpload->filename.c_str(),
-                    _currentUpload->type.c_str(),
-                    (int)_currentUpload->totalSize);
-                line = client.readStringUntil(0x0D);
-                client.readStringUntil(0x0A);
-                if (line == "--"){
-                  DBGWS("Done Parsing POST\n");
-                  break;
-                }
-                continue;
-              } else {
-                _uploadWriteByte(0x0D);
-                _uploadWriteByte(0x0A);
-                _uploadWriteByte((uint8_t)('-'));
-                _uploadWriteByte((uint8_t)('-'));
-                uint32_t i = 0;
-                while(i < boundary.length()){
-                  _uploadWriteByte(endBuf[i++]);
-                }
-                argByte = _uploadReadByte(client);
-                goto readfile;
-              }
-            } else {
-              _uploadWriteByte(0x0D);
-              goto readfile;
+            line = client.readStringUntil('\r');
+            client.readStringUntil('\n');
+            if (line == "--") {     // extra two dashes mean we reached the end of all form fields
+                DBGWS("Done Parsing POST\n");
+                break;
             }
-            break;
+            continue;
           }
         }
       }
@@ -578,3 +566,5 @@ bool ESP8266WebServerTemplate<ServerType>::_parseFormUploadAborted(){
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }
+
+} // namespace

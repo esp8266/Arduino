@@ -1,6 +1,6 @@
 /*
  ESP8266WiFiGeneric.h - esp8266 Wifi support.
- Based on WiFi.h from Ardiono WiFi shield library.
+ Based on WiFi.h from Arduino WiFi shield library.
  Copyright (c) 2011-2014 Arduino.  All right reserved.
  Modified by Ivan Grokhotkov, December 2014
  Reworked by Markus Sattler, December 2015
@@ -74,7 +74,7 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
         WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
-        int32_t channel(void);
+        uint8_t channel(void);
 
         bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
 

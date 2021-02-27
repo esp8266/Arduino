@@ -19,6 +19,19 @@
 #include <limits.h>
 #include <StreamString.h>
 
+TEST_CASE("String::move", "[core][String]")
+{
+    const char buffer[] = "this string goes over the sso limit";
+
+    String target;
+    String source(buffer);
+
+    target = std::move(source);
+    REQUIRE(source.c_str() != nullptr);
+    REQUIRE(!source.length());
+    REQUIRE(target == buffer);
+}
+
 TEST_CASE("String::trim", "[core][String]")
 {
     String str;
@@ -119,6 +132,16 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.01");
     str += (double)1.01;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01");
+    str += LLONG_MIN;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808");
+    str += String(LLONG_MIN, 10);
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808");
+    str += LLONG_MAX;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-92233720368547758089223372036854775807");
+    str += ULLONG_MAX;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808922337203685477580718446744073709551615");
+    str += String(ULLONG_MAX, 16);
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808922337203685477580718446744073709551615ffffffffffffffff");
     str = "clean";
     REQUIRE(str.concat(str) == true);
     REQUIRE(str == "cleanclean");
@@ -232,6 +255,10 @@ TEST_CASE("String nulls", "[core][String]")
     REQUIRE(s.lastIndexOf("tacos") == -1);
     REQUIRE(s.lastIndexOf('t', 0) == -1);
     REQUIRE(s.lastIndexOf('t') == -1);
+    REQUIRE(s.indexOf(String("tacos"), 1) == -1);
+    REQUIRE(s.indexOf(String("tacos")) == -1);
+    REQUIRE(s.indexOf(F("tacos"), 1) == -1);
+    REQUIRE(s.indexOf(F("tacos")) == -1);
     REQUIRE(s.indexOf("tacos", 1) == -1);
     REQUIRE(s.indexOf("tacos") == -1);
     REQUIRE(s.indexOf('t', 1) == -1);

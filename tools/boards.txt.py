@@ -288,10 +288,33 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '1M', '2M',
             'led',
+            'sdk',
             ],
         'desc': [ 'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.',
                   '',
                   'Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.',
+                  ],
+    }),
+    ( 'agruminolemon', {
+        'name': 'Lifely Agrumino Lemon v4',
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'ESP8266_AGRUMINO_LEMON_V4' ),
+            ( '.build.variant', 'agruminolemonv4' ),
+            ]),
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '2M',
+            ],
+        'desc': [ 'Procuct page https://www.lifely.cc',
+                  '',
+                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.',
+                  'Power',
+                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin',
+                  'Libraries and examples',
+                  'Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
+                  'Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource',
                   ],
     }),
     ( 'espduino', {
@@ -319,7 +342,7 @@ boards = collections.OrderedDict([
     ( 'huzzah', {
         'name': 'Adafruit Feather HUZZAH ESP8266',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ADAFRUIT_HUZZAH',
             '.build.variant': 'adafruit',
             },
         'macro': [
@@ -336,7 +359,7 @@ boards = collections.OrderedDict([
     ( 'inventone', {
         'name': 'Invent One',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_INVENT_ONE',
             '.build.variant': 'inventone',
             },
         'macro': [
@@ -353,7 +376,7 @@ boards = collections.OrderedDict([
     ( 'cw01', {
         'name': 'XinaBox CW01',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_XINABOX_CW01',
             '.build.variant': 'xinabox',
             },
         'macro': [
@@ -427,7 +450,7 @@ boards = collections.OrderedDict([
     ( 'nodemcu', {
         'name': 'NodeMCU 0.9 (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -461,7 +484,7 @@ boards = collections.OrderedDict([
     ( 'nodemcuv2', {
         'name': 'NodeMCU 1.0 (ESP-12E Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12E',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -634,7 +657,7 @@ boards = collections.OrderedDict([
         ],
     }),
     ( 'd1', {
-        'name': 'WeMos D1 R1',
+        'name': 'LOLIN(WeMos) D1 R1',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
@@ -651,7 +674,7 @@ boards = collections.OrderedDict([
     ( 'espino', {
         'name': 'ESPino (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ESPINO_ESP12',
             '.build.variant': 'espino',
             },
         'macro': [
@@ -670,7 +693,7 @@ boards = collections.OrderedDict([
     ( 'espinotee', {
         'name': 'ThaiEasyElec\'s ESPino',
         'opts': {
-            '.build.board': 'ESP8266_ESP13',
+            '.build.board': 'ESP8266_ESPINO_ESP13',
             '.build.variant': 'espinotee',
             },
         'macro': [
@@ -907,23 +930,23 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'desc': [
-            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, '
+            'ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, ' +
             'and Sonoff S20',
             '',
-            'These are not development boards. The development process is '
-            'inconvenient with these devices. When flashing firmware you will '
+            'These are not development boards. The development process is ' +
+            'inconvenient with these devices. When flashing firmware you will ' +
             'need a Serial Adapter to connect it to your computer.',
             '',
-            ' | Most of these devices, during normal operation, are connected to '
-            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these '
-            'devices when connected to *wall power*. **ALWAYS** have them '
-            'disconnected from *wall power* when connecting them to your '
+            ' | Most of these devices, during normal operation, are connected to ' +
+            '*wall power (AKA Mains Electricity)*. **NEVER** try to flash these ' +
+            'devices when connected to *wall power*. **ALWAYS** have them ' +
+            'disconnected from *wall power* when connecting them to your ' +
             'computer. Your life may depend on it!',
             '',
-            'When flashing you will need to hold down the push button connected '
-            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB '
-            'Serial Adapters may supply enough power to handle flashing; '
-            'however, it many may not supply enough power to handle the '
+            'When flashing you will need to hold down the push button connected ' +
+            'to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB ' +
+            'Serial Adapters may supply enough power to handle flashing; ' +
+            'however, it many may not supply enough power to handle the ' +
             'activities when the device reboots.',
             '',
             'More product details at the bottom of https://www.itead.cc/wiki/Product/'
@@ -943,20 +966,19 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'desc': [
-            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module '
-            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) '
-            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. '
-            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 '
-            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. '
+            'DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module ' +
+            '(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) ' +
+            'using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. ' +
+            'The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 ' +
+            'and is active low to turn on. It uses a CH340C, USB to Serial converter chip. ',
             '',
-            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) '
-            'is a multi-chip package which contains ESP8266 and 1MB flash. ',
-            '',
+            'ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) ' +
+            'is a multi-chip package which contains ESP8266 and 1MB flash. '
         ],
 
     })
 	])
-    
+
 
 ################################################################
 
@@ -995,11 +1017,8 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.legacy', 'Legacy (new can return nullptr)' ),
-        ( '.menu.exception.legacy.build.exception_flags', '-fno-exceptions' ),
-        ( '.menu.exception.legacy.build.stdcpp_lib', '-lstdc++' ),
-        ( '.menu.exception.disabled', 'Disabled (new can abort)' ),
-        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions -DNEW_OOM_ABORT' ),
+        ( '.menu.exception.disabled', 'Disabled (new aborts on oom)' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
         ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.enabled', 'Enabled' ),
         ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
@@ -1203,6 +1222,27 @@ macros = {
         ( '.menu.ssl.basic.build.sslflags', '-DBEARSSL_SSL_BASIC'),
         ]),
 
+    ####################### mmu
+
+    'mmu_menu': collections.OrderedDict([
+        ( '.menu.mmu.3232', '32KB cache + 32KB IRAM (balanced)' ),
+        ( '.menu.mmu.3232.build.mmuflags', '-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000'),
+        ( '.menu.mmu.4816', '16KB cache + 48KB IRAM (IRAM)' ),
+        ( '.menu.mmu.4816.build.mmuflags', '-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000' ),
+        ( '.menu.mmu.4816H', '16KB cache + 48KB IRAM and 2nd Heap (shared)' ),
+        ( '.menu.mmu.4816H.build.mmuflags', '-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP' ),
+        ( '.menu.mmu.3216', '16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)' ),
+        ( '.menu.mmu.3216.build.mmuflags', '-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000' ),
+        ]),
+
+    ######################## Non 32-bit load/store exception handler
+
+    'non32xfer_menu': collections.OrderedDict([
+        ('.menu.non32xfer.fast', 'Use pgm_read macros for IRAM/PROGMEM' ),
+        ('.menu.non32xfer.fast.build.non32xferflags', ''),
+        ('.menu.non32xfer.safe', 'Byte/Word access to IRAM/PROGMEM (very slow)' ),
+        ('.menu.non32xfer.safe.build.non32xferflags', '-DNON32XFER_HANDLER'),
+        ])
     }
 
 ################################################################
@@ -1373,7 +1413,8 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("{")
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        print("  iram1_0_seg :                         org = 0x40100000, len = 0x8000")
+        # Moved to ld/eagle.app.v6.common.ld.h as a 2nd MEMORY command.
+        # print("  iram1_0_seg :                         org = 0x40100000, len = MMU_IRAM_SIZE")
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
@@ -1564,10 +1605,14 @@ def all_boards ():
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
+    print('menu.mmu=MMU')
+    print('menu.non32xfer=Non-32-Bit Access')
     print('')
 
     missingboards = []
-    for id in boardlist:
+    boardlistsortedbydisplayedname = [ k for k in sorted(boardlist, key = lambda item: boards[item]['name']) ]
+    sortedrequiredfirst = requiredboards + [ item for item in boardlistsortedbydisplayedname if item not in requiredboards ]
+    for id in sortedrequiredfirst:
         if id not in boards:
             missingboards += [ id ];
             continue
@@ -1582,7 +1627,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
