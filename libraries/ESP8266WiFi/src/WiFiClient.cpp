@@ -304,7 +304,7 @@ bool WiFiClient::flush(unsigned int maxWaitMs)
 
     if (maxWaitMs == 0)
         maxWaitMs = WIFICLIENT_MAX_FLUSH_WAIT_MS;
-    return _client->wait_until_sent(maxWaitMs);
+    return _client->wait_until_acked(maxWaitMs);
 }
 
 bool WiFiClient::stop(unsigned int maxWaitMs)
