@@ -93,7 +93,7 @@ void proxyEspSync() {
   }
 
   // Assume RX FIFO data is garbled and flush all RX data.
-  while(0 <= Serial.read()) {}  // Clear FIFO
+  while (0 <= Serial.read()) {} // Clear FIFO
 }
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,12 +118,12 @@ void setup() {
   Serial.begin(115200);
 
   Serial.println(F(
-    "\r\n\r\n"
-    "Boot UART Download Demo - initialization started.\r\n"
-    "\r\n"
-    "For a quick test to see the UART Download work,\r\n"
-    "stop your serial terminal APP and run:\r\n"
-    "  esptool.py --chip esp8266 --before no_reset --after soft_reset flash_id\r\n"));
+                   "\r\n\r\n"
+                   "Boot UART Download Demo - initialization started.\r\n"
+                   "\r\n"
+                   "For a quick test to see the UART Download work,\r\n"
+                   "stop your serial terminal APP and run:\r\n"
+                   "  esptool.py --chip esp8266 --before no_reset --after soft_reset flash_id\r\n"));
 
   // ...
 }
