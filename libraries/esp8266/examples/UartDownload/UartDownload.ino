@@ -38,8 +38,8 @@
 // If your needs require it, you can add logic to loop() for setting and
 // clearing uartDownloadEnable. For example, you could add a push button to a
 // GPIO pin and monitor for a 5-second press. Then, set uartDownloadEnable to
-// true. In addition to that, you could also set a time-to-live for that state
-// and clear it after it elapses.
+// true. In addition to that, you could also define a time-to-live for that
+// state and clear it after it elapses.
 //
 // Change this to false if you do not want ESP_SYNC monitor always on.
 bool uartDownloadEnable = true;
@@ -66,17 +66,14 @@ const char syncPkt[] PROGMEM =
 constexpr size_t syncPktSz = sizeof(syncPkt) - 1; // Don't compare zero terminator char
 
 //
-//  Use the discovery of an ESP_SYNC packet, to trigger calling UART Download Mode.
+//  Use the discovery of an ESP_SYNC packet, to trigger calling UART Download
+//  Mode. At entry we expect the Serial FIFO to start with the byte following
+//  the slipFrameMarker.
 //
 void proxyEspSync() {
-
-  if (!uartDownloadEnable ||
-      0 >= Serial.available() ||
-      slipFrameMarker != Serial.peek()) {
+  if (!uartDownloadEnable) {
     return;
   }
-
-  Serial.read();      // Skip (start) Frame marker
 
   byte buf[pktBufSz];
 
@@ -94,6 +91,9 @@ void proxyEspSync() {
 
   // Assume RX FIFO data is garbled and flush all RX data.
   while (0 <= Serial.read()) {} // Clear FIFO
+
+  // If your Serial requirements need a specific timeout value, you would
+  // restore those here.
 }
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,12 +134,18 @@ void cmdLoop(Stream& oStream) {
   }
 
   switch (oStream.read()) {
+    case slipFrameMarker:
+      proxyEspSync();
+      break;
+
     case 'e':
       oStream.println(F("Enable monitor for detecting ESP_SYNC from esptool.py"));
       uartDownloadEnable = true;
       break;
 
     case 'D':
+      // This option would be prone to false triggering. It is here for DEMO
+      // purposes and debugging.
       oStream.println(F("Boot into UART download mode ..."));
       oStream.flush();
       ESP.rebootIntoUartDownloadMode();
@@ -172,8 +178,6 @@ void cmdLoop(Stream& oStream) {
 
 
 void loop() {
-
-  proxyEspSync();
 
   cmdLoop(Serial);
 
