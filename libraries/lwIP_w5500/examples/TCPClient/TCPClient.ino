@@ -9,7 +9,6 @@
 //or #include <ENC28J60lwIP.h>
 
 #include <WiFiClient.h> // WiFiClient (-> TCPClient)
-#include <ESP8266WiFi.h> // ESP8266WiFiClass::preinitWiFiOff()
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
@@ -18,12 +17,6 @@ using TCPClient = WiFiClient;
 
 #define CSPIN 16 // wemos/lolin/nodemcu D0
 Wiznet5500lwIP eth(CSPIN);
-
-void preinit() {
-  // (no C++ in function)
-  // disable wifi
-  ESP8266WiFiClass::preinitWiFiOff();
-}
 
 void setup() {
   Serial.begin(115200);
