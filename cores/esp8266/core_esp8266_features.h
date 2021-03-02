@@ -31,6 +31,7 @@
 #define CORE_HAS_UMM
 
 #define WIFI_HAS_EVENT_CALLBACK
+#define WIFI_IS_OFF_AT_BOOT
 
 #include <stdlib.h> // malloc()
 #include <stddef.h> // size_t
