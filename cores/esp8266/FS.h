@@ -235,6 +235,8 @@ public:
     bool gc();
     bool check();
 
+    time_t getCreationTime();
+
     void setTimeCallback(time_t (*cb)(void));
 
     friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
