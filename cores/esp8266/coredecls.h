@@ -18,7 +18,6 @@ void esp_schedule();
 void tune_timeshift64 (uint64_t now_us);
 void disable_extra4k_at_link_time (void) __attribute__((noinline));
 bool sntp_set_timezone_in_seconds(int32_t timezone);
-void enableWiFiAtBootTime (void) __attribute__((noinline));
 void __disableWiFiAtBootTime (void) __attribute__((noinline));
 void __real_system_restart_local() __attribute__((noreturn));
 
