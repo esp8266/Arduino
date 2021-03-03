@@ -128,16 +128,8 @@ void setup() {
   // ...
 }
 
-void cmdLoop(Stream& oStream) {
-  if (0 >= oStream.available()) {
-    return;
-  }
-
-  switch (oStream.read()) {
-    case slipFrameMarker:
-      proxyEspSync();
-      break;
-
+void cmdLoop(Print& oStream, int key) {
+  switch (key) {
     case 'e':
       oStream.println(F("Enable monitor for detecting ESP_SYNC from esptool.py"));
       uartDownloadEnable = true;
@@ -179,7 +171,20 @@ void cmdLoop(Stream& oStream) {
 
 void loop() {
 
-  cmdLoop(Serial);
+  // In this example, we can have Serial data from a user keystroke for our
+  // command loop or the esptool trying to SYNC up for flashing.  If the
+  // character matches the Slip Frame Marker (the 1st byte of the SYNC packet),
+  // we intercept it and call our ESP_SYNC proxy to complete the verification
+  // and reboot into the UART Downloader. Otherwise, process the keystroke as
+  // normal.
+  if (0 < Serial.available()) {
+    int keyPress = Serial.read();
+    if (slipFrameMarker == keyPress) {
+      proxyEspSync();
+    } else {
+      cmdLoop(Serial, keyPress);
+    }
+  }
 
   // ...
 }
