@@ -33,7 +33,7 @@ I2SClass::I2SClass(bool enableTransmit, bool enableRecv, bool driveClocks) {
   _writtenHalf = false;
 }
 
-int I2SClass::begin(int mode, long sampleRate, int bitsPerSample) {
+int I2SClass::begin(i2s_mode_t mode, long sampleRate, int bitsPerSample) {
   if ( _running || (mode != I2S_PHILIPS_MODE) || ( (bitsPerSample != 16) && (bitsPerSample != 24) ) ) {
     return 0;
   }
@@ -83,20 +83,22 @@ void I2SClass::flush() {
 
 int I2SClass::read() {
   if (!_running) return -1;
+  // Always just read from the peeked value to simplify operation
+  if (!_havePeeked) {
+    peek();
+  }
   if (_havePeeked) {
     if (_bps == 16) {
       _havePeeked--;
       int ret = _peekedData;
       _peekedData >>= 16;
       return ret;
-    } else {
+    } else /* _bps == 24 */ {
       _havePeeked = 0;
       return _peekedData;
     }
   }
-  // Avoid code duplication by just peeking and calling read() again
-  peek();
-  return read();
+  return 0;
 }
 
 int I2SClass::peek() {
@@ -203,7 +205,7 @@ size_t I2SClass::write(const void *buffer, size_t size) {
 }
 
 
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LITTLEFS)
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_I2S)
 I2SClass I2S;
 #endif
 

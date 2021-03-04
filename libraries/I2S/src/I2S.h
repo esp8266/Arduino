@@ -36,7 +36,7 @@ public:
   I2SClass(bool enableTransmit = true, bool enableRecv = false, bool driveClocks = true);
 
   // Only 16 and 24 bps are allowed by the hardware
-  int begin(int mode, long sampleRate, int bitsPerSample);
+  int begin(i2s_mode_t mode, long sampleRate, int bitsPerSample);
   void end();
 
   // from Stream
@@ -78,7 +78,7 @@ private:
   bool _writtenHalf;
 };
 
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LITTLEFS)
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_I2S)
 extern I2SClass I2S;
 #endif
 
