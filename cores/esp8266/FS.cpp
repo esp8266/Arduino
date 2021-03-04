@@ -441,6 +441,13 @@ bool FS::rename(const String& pathFrom, const String& pathTo) {
     return rename(pathFrom.c_str(), pathTo.c_str());
 }
 
+time_t FS::getCreationTime() {
+    if (!_impl) {
+        return 0;
+    }
+    return _impl->getCreationTime();
+}
+
 void FS::setTimeCallback(time_t (*cb)(void)) {
     if (!_impl)
         return;
