@@ -178,6 +178,15 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     }
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
+#ifdef DEBUG_ESP_OOM
+    if (!isSSO() && maxStrLen > length())
+    {
+        // warn when badly re-allocating
+        DEBUGV("[String realloc %d->%d ('%.10s ... %.10s')]\n",
+            len(), maxStrLen, c_str(),
+            len() > 10? c_str() + std::max((int)len() - 10, 10): "");
+    }
+#endif
     // Make sure we can fit newsize in the buffer
     if (newSize > CAPACITY_MAX) {
         return 0;
