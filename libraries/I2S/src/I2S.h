@@ -33,9 +33,11 @@ class I2SClass : public Stream
 {
 public:
   // By default only transmit and drive the clock pins
-  I2SClass(bool enableTransmit = true, bool enableRecv = false, bool driveClocks = true);
+  I2SClass(bool enableTransmit = true, bool enableRecv = false,
+           bool driveClocks = true);
 
-  // Only 16 and 24 bps are allowed by the hardware
+  // Only 16 and 24 bitsPerSample are allowed by the hardware
+  // 24-bit is MSB-aligned, with 0x00 in the lowest byte of each element.
   int begin(i2s_mode_t mode, long sampleRate, int bitsPerSample);
   void end();
 
@@ -45,15 +47,22 @@ public:
   virtual int peek();
   virtual void flush();
 
-  // from Print
+  // from Print (see notes on write() below)
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buffer, size_t size);
-
   virtual int availableForWrite();
 
+  // Read up to size samples from the I2S device.  Non-blocking, will read
+  // from 0...size samples and return the count read.  Be sure your app handles
+  // the partial read case (i.e. yield()ing and trying to read more).
   int read(void* buffer, size_t size);
 
+  // Write a single sample to the I2S device.  Blocking until write succeeds
   size_t write(int32_t);
+  // Write up to size samples to the I2S device.  Non-blocking, will write
+  // from 0...size samples and return that count.  Be sure your app handles
+  // partial writes (i.e. by yield()ing and then retrying to write the
+  // remaining data.
   size_t write(const void *buffer, size_t size);
 
   // Note that these callback are called from **INTERRUPT CONTEXT** and hence
