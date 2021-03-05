@@ -43,11 +43,11 @@ public:
 
   // from Stream
   virtual int available();
-  virtual int read();
-  virtual int peek();
+  virtual int read(); // Blocking, will wait for incoming data
+  virtual int peek(); // Blocking, will wait for incoming data   
   virtual void flush();
 
-  // from Print (see notes on write() below)
+  // from Print (see notes on write() methods below)
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buffer, size_t size);
   virtual int availableForWrite();
