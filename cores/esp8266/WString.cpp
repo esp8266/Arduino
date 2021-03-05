@@ -25,6 +25,12 @@
 #include "WString.h"
 #include "stdlib_noniso.h"
 
+#define OOM_STRING_BORDER_DISPLAY           10
+#define OOM_STRING_THRESHOLD_REALLOC_WARN  128
+
+#define __STRHELPER(x) #x
+#define STR(x) __STRHELPER(x) // stringifier
+
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
@@ -179,12 +185,11 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
 #ifdef DEBUG_ESP_OOM
-    if (!isSSO() && maxStrLen > length())
-    {
+    if (!isSSO() && maxStrLen >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
         // warn when badly re-allocating
-        DEBUGV("[String realloc %d->%d ('%.10s ... %.10s')]\n",
+        DEBUGV("[offending String op %d->%d ('%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s')]\n",
             len(), maxStrLen, c_str(),
-            len() > 10? c_str() + std::max((int)len() - 10, 10): "");
+            len() > OOM_STRING_BORDER_DISPLAY? c_str() + std::max((int)len() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
     }
 #endif
     // Make sure we can fit newsize in the buffer
