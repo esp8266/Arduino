@@ -26,7 +26,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Peek at Serial Receive for ESP_SYNC slip packet from esptool.py
+// Check Serial Receive for ESP_SYNC slip packet from esptool.py
 //
 // If you are already using Serial input for command input, the character '\xC0'
 // is not available. We must reserve its use for the SLIP Frame Marker. I am not
@@ -49,7 +49,7 @@ bool uartDownloadEnable = true;
 constexpr size_t pktBufSz = 64;
 
 // Enough time to receive 115 bytes at 115200bps.
-// More than enough to receive an ESP_SYNC packet.
+// More than enough to finish receiving an ESP_SYNC packet.
 constexpr size_t kSyncTimeoutMs = 10;
 
 // The SLIP Frame end character, which is also used to start a frame.
@@ -57,8 +57,8 @@ constexpr char slipFrameMarker = '\xC0';
 
 // General packet format:
 //   <0xC0><cmd><payload length><32 bit cksum><payload data ...><0xC0>
-// Slip packet for ESP_SYNC, minus the frame markers ('\xC0').
-// Captured from esptool using the `--trace` option.
+// Slip packet for ESP_SYNC, minus the frame markers ('\xC0') captured from
+// esptool using the `--trace` option.
 const char syncPkt[] PROGMEM =
   "\x00\x08\x24\x00\x00\x00\x00\x00\x07\x07\x12\x20"
   "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
