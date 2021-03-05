@@ -185,7 +185,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
 #ifdef DEBUG_ESP_OOM
-    if (!isSSO() && maxStrLen >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
+    if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
         // warn when badly re-allocating
         DEBUGV("[offending String op %d->%d ('%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s')]\n",
             len(), maxStrLen, c_str(),
