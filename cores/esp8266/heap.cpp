@@ -194,8 +194,8 @@ void ICACHE_RAM_ATTR print_oom_size(size_t size)
     }
 }
 
-#define OOM_CHECK__PRINT_OOM(p, s) if (!p) print_oom_size(s)
-#define OOM_CHECK__PRINT_LOC(p, s, f, l) if (!p) print_loc(s, f, l)
+#define OOM_CHECK__PRINT_OOM(p, s) if ((s) && !(p)) print_oom_size(s)
+#define OOM_CHECK__PRINT_LOC(p, s, f, l) if ((s) && !(p)) print_loc(s, f, l)
 
 #else  // ! DEBUG_ESP_OOM
 
