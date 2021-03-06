@@ -33,7 +33,7 @@ public:
     // NOTE: The default behaviour of backend (lib64)
     // is to add a newline every 72 (encoded) characters output.
     // This may 'break' longer uris and json variables
-    static String encode(const uint8_t * data, size_t length, bool doNewLine);
+    static String encode(const uint8_t * data, size_t length, bool doNewLines);
     static inline String encode(const String& text, bool doNewLines)
     {
         return encode( (const uint8_t *) text.c_str(), text.length(), doNewLines );
