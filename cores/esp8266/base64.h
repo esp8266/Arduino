@@ -46,7 +46,7 @@ public:
         return encode(data, length, false);
     }
 
-    static inline String inline encode(const String& text)
+    static inline String encode(const String& text)
     {
         return encode(test, false);
     }
