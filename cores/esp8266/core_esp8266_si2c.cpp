@@ -57,17 +57,12 @@ static inline __attribute__((always_inline)) bool SCL_READ(const int twi_scl)
     return (GPI & (1 << twi_scl)) != 0;
 }
 
-
 // Implement as a class to reduce code size by allowing access to many global variables with a single base pointer
-class Twi
+// Derived from TwiMaster which can be instantied multiple times
+class TwiMasterOrSlave : public TwiMaster
 {
 private:
-    unsigned int preferred_si2c_clock = 100000;
-    uint32_t twi_dcount = 18;
-    unsigned char twi_sda = 0;
-    unsigned char twi_scl = 0;
     unsigned char twi_addr = 0;
-    uint32_t twi_clockStretchLimit = 0;
 
     // These are int-wide, even though they could all fit in a byte, to reduce code size and avoid any potential
     // issues about RmW on packed bytes.  The int-wide variations of asm instructions are smaller than the equivalent
@@ -110,42 +105,15 @@ private:
 
     // Allow not linking in the slave code if there is no call to setAddress
     bool _slaveEnabled = false;
-
+    
     // Internal use functions
-    void ICACHE_RAM_ATTR busywait(unsigned int v);
-    bool write_start(void);
-    bool write_stop(void);
-    bool write_bit(bool bit);
-    bool read_bit(void);
-    bool write_byte(unsigned char byte);
-    unsigned char read_byte(bool nack);
     void ICACHE_RAM_ATTR onTwipEvent(uint8_t status);
 
-    // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
-    inline void WAIT_CLOCK_STRETCH()
-    {
-        esp8266::polledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
-        esp8266::polledTimeout::periodicFastUs yieldTimeout(5000);
-        while (!timeout && !SCL_READ(twi_scl)) // outer loop is stretch duration up to stretch limit
-        {
-            if (yieldTimeout)   // inner loop yields every 5ms
-            {
-                yield();
-            }
-        }
-    }
-
-    // Generate a clock "valley" (at the end of a segment, just before a repeated start)
-    void twi_scl_valley(void);
-
 public:
-    void setClock(unsigned int freq);
-    void setClockStretchLimit(uint32_t limit);
+    // custom version
     void init(unsigned char sda, unsigned char scl);
+
     void setAddress(uint8_t address);
-    unsigned char writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
-    unsigned char readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop);
-    uint8_t status();
     uint8_t transmit(const uint8_t* data, uint8_t length);
     void attachSlaveRxEvent(void (*function)(uint8_t*, size_t));
     void attachSlaveTxEvent(void (*function)(void));
@@ -154,13 +122,26 @@ public:
     void enableSlave();
 };
 
-static Twi twi;
+static TwiMasterOrSlave twi;
 
 #ifndef FCPU80
 #define FCPU80 80000000L
 #endif
 
-void Twi::setClock(unsigned int freq)
+inline void TwiMaster::WAIT_CLOCK_STRETCH()
+{
+    esp8266::polledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
+    esp8266::polledTimeout::periodicFastUs yieldTimeout(5000);
+    while (!timeout && !SCL_READ(twi_scl)) // outer loop is stretch duration up to stretch limit
+    {
+        if (yieldTimeout)   // inner loop yields every 5ms
+        {
+            yield();
+        }
+    }
+}
+
+void TwiMaster::setClock(unsigned int freq)
 {
     if (freq < 1000)  // minimum freq 1000Hz to minimize slave timeouts and WDT resets
     {
@@ -190,14 +171,24 @@ void Twi::setClock(unsigned int freq)
 #endif
 }
 
-void Twi::setClockStretchLimit(uint32_t limit)
+void TwiMaster::setClockStretchLimit(uint32_t limit)
 {
     twi_clockStretchLimit = limit;
 }
 
 
 
-void Twi::init(unsigned char sda, unsigned char scl)
+void TwiMaster::init(unsigned char sda, unsigned char scl)
+{
+    twi_sda = sda;
+    twi_scl = scl;
+    pinMode(twi_sda, INPUT_PULLUP);
+    pinMode(twi_scl, INPUT_PULLUP);
+    twi_setClock(preferred_si2c_clock);
+    twi_setClockStretchLimit(150000L); // default value is 150 mS
+}
+
+void TwiMasterOrSlave::init(unsigned char sda, unsigned char scl)
 {
     // set timer function
     ets_timer_setfn(&timer, onTimer, NULL);
@@ -213,13 +204,13 @@ void Twi::init(unsigned char sda, unsigned char scl)
     twi_setClockStretchLimit(150000L); // default value is 150 mS
 }
 
-void Twi::setAddress(uint8_t address)
+void TwiMasterOrSlave::setAddress(uint8_t address)
 {
     // set twi slave address (skip over R/W bit)
     twi_addr = address << 1;
 }
 
-void Twi::enableSlave()
+void TwiMasterOrSlave::enableSlave()
 {
     if (!_slaveEnabled)
     {
@@ -229,16 +220,16 @@ void Twi::enableSlave()
     }
 }
 
-void ICACHE_RAM_ATTR Twi::busywait(unsigned int v)
+void ICACHE_RAM_ATTR TwiMaster::busywait(unsigned int v)
 {
     unsigned int i;
     for (i = 0; i < v; i++)  // loop time is 5 machine cycles: 31.25ns @ 160MHz, 62.5ns @ 80MHz
     {
-        __asm__ __volatile__("nop"); // minimum element to keep GCC from optimizing this function out.
+        asm("nop"); // minimum element to keep GCC from optimizing this function out.
     }
 }
 
-bool Twi::write_start(void)
+bool TwiMaster::write_start(void)
 {
     SCL_HIGH(twi_scl);
     SDA_HIGH(twi_sda);
@@ -252,7 +243,7 @@ bool Twi::write_start(void)
     return true;
 }
 
-bool Twi::write_stop(void)
+bool TwiMaster::write_stop(void)
 {
     SCL_LOW(twi_scl);
     SDA_LOW(twi_sda);
@@ -265,7 +256,7 @@ bool Twi::write_stop(void)
     return true;
 }
 
-bool Twi::write_bit(bool bit)
+bool TwiMaster::write_bit(bool bit)
 {
     SCL_LOW(twi_scl);
     if (bit)
@@ -283,7 +274,7 @@ bool Twi::write_bit(bool bit)
     return true;
 }
 
-bool Twi::read_bit(void)
+bool TwiMaster::read_bit(void)
 {
     SCL_LOW(twi_scl);
     SDA_HIGH(twi_sda);
@@ -295,7 +286,7 @@ bool Twi::read_bit(void)
     return bit;
 }
 
-bool Twi::write_byte(unsigned char byte)
+bool TwiMaster::write_byte(unsigned char byte)
 {
     unsigned char bit;
     for (bit = 0; bit < 8; bit++)
@@ -306,7 +297,7 @@ bool Twi::write_byte(unsigned char byte)
     return !read_bit();//NACK/ACK
 }
 
-unsigned char Twi::read_byte(bool nack)
+unsigned char TwiMaster::read_byte(bool nack)
 {
     unsigned char byte = 0;
     unsigned char bit;
@@ -318,7 +309,7 @@ unsigned char Twi::read_byte(bool nack)
     return byte;
 }
 
-unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop)
+unsigned char TwiMaster::writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop)
 {
     unsigned int i;
     if (!write_start())
@@ -363,7 +354,7 @@ unsigned char Twi::writeTo(unsigned char address, unsigned char * buf, unsigned 
     return 0;
 }
 
-unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop)
+unsigned char TwiMaster::readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop)
 {
     unsigned int i;
     if (!write_start())
@@ -402,7 +393,7 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     return 0;
 }
 
-void Twi::twi_scl_valley(void)
+void TwiMaster::twi_scl_valley(void)
 {
     SCL_LOW(twi_scl);
     busywait(twi_dcount);
@@ -410,7 +401,7 @@ void Twi::twi_scl_valley(void)
     WAIT_CLOCK_STRETCH();
 }
 
-uint8_t Twi::status()
+uint8_t TwiMaster::status()
 {
     WAIT_CLOCK_STRETCH();  // wait for a slow slave to finish
     if (!SCL_READ(twi_scl))
@@ -435,7 +426,7 @@ uint8_t Twi::status()
     return I2C_OK;
 }
 
-uint8_t Twi::transmit(const uint8_t* data, uint8_t length)
+uint8_t TwiMasterOrSlave::transmit(const uint8_t* data, uint8_t length)
 {
     uint8_t i;
 
@@ -461,12 +452,12 @@ uint8_t Twi::transmit(const uint8_t* data, uint8_t length)
     return 0;
 }
 
-void Twi::attachSlaveRxEvent(void (*function)(uint8_t*, size_t))
+void TwiMasterOrSlave::attachSlaveRxEvent(void (*function)(uint8_t*, size_t))
 {
     twi_onSlaveReceive = function;
 }
 
-void Twi::attachSlaveTxEvent(void (*function)(void))
+void TwiMasterOrSlave::attachSlaveTxEvent(void (*function)(void))
 {
     twi_onSlaveTransmit = function;
 }
@@ -474,7 +465,7 @@ void Twi::attachSlaveTxEvent(void (*function)(void))
 // DO NOT INLINE, inlining reply() in combination with compiler optimizations causes function breakup into
 // parts and the ICACHE_RAM_ATTR isn't propagated correctly to all parts, which of course causes crashes.
 // TODO: test with gcc 9.x and if it still fails, disable optimization with -fdisable-ipa-fnsplit
-void ICACHE_RAM_ATTR Twi::reply(uint8_t ack)
+void ICACHE_RAM_ATTR TwiMasterOrSlave::reply(uint8_t ack)
 {
     // transmit master read ready signal, with or without ack
     if (ack)
@@ -492,7 +483,7 @@ void ICACHE_RAM_ATTR Twi::reply(uint8_t ack)
 }
 
 
-void ICACHE_RAM_ATTR Twi::releaseBus(void)
+void ICACHE_RAM_ATTR TwiMasterOrSlave::releaseBus(void)
 {
     // release bus
     //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
@@ -505,7 +496,7 @@ void ICACHE_RAM_ATTR Twi::releaseBus(void)
 }
 
 
-void ICACHE_RAM_ATTR Twi::onTwipEvent(uint8_t status)
+void ICACHE_RAM_ATTR TwiMasterOrSlave::onTwipEvent(uint8_t status)
 {
     twip_status = status;
     switch (status)
@@ -612,7 +603,7 @@ void ICACHE_RAM_ATTR Twi::onTwipEvent(uint8_t status)
     }
 }
 
-void ICACHE_RAM_ATTR Twi::onTimer(void *unused)
+void ICACHE_RAM_ATTR TwiMasterOrSlave::onTimer(void *unused)
 {
     (void)unused;
     twi.releaseBus();
@@ -621,7 +612,7 @@ void ICACHE_RAM_ATTR Twi::onTimer(void *unused)
     twi.twip_state = TWIP_BUS_ERR;
 }
 
-void Twi::eventTask(ETSEvent *e)
+void TwiMasterOrSlave::eventTask(ETSEvent *e)
 {
 
     if (e == NULL)
@@ -662,7 +653,7 @@ void Twi::eventTask(ETSEvent *e)
 // Shorthand for if the state is any of the or'd bitmask x
 #define IFSTATE(x) if (twip_state_mask & (x))
 
-void ICACHE_RAM_ATTR Twi::onSclChange(void)
+void ICACHE_RAM_ATTR TwiMasterOrSlave::onSclChange(void)
 {
     unsigned int sda;
     unsigned int scl;
@@ -860,7 +851,7 @@ void ICACHE_RAM_ATTR Twi::onSclChange(void)
     }
 }
 
-void ICACHE_RAM_ATTR Twi::onSdaChange(void)
+void ICACHE_RAM_ATTR TwiMasterOrSlave::onSdaChange(void)
 {
     unsigned int sda;
     unsigned int scl;
