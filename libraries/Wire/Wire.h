@@ -26,36 +26,31 @@
 
 #include <inttypes.h>
 #include "Stream.h"
-
-
-
-#define BUFFER_LENGTH 128
+#include <memory>
+#include <twi.h>
 
 class TwoWire : public Stream
 {
 private:
-    static uint8_t rxBuffer[];
-    static uint8_t rxBufferIndex;
-    static uint8_t rxBufferLength;
+    TwiMaster twi;
+    
+    uint8_t rxBufferSize;
+    std::unique_ptr<uint8_t[]> rxBuffer;
+    uint8_t rxBufferIndex;
+    uint8_t rxBufferLength;
 
-    static uint8_t txAddress;
-    static uint8_t txBuffer[];
-    static uint8_t txBufferIndex;
-    static uint8_t txBufferLength;
+    uint8_t txAddress;
+    uint8_t txBufferSize; 
+    std::unique_ptr<uint8_t[]> txBuffer;
+    uint8_t txBufferIndex;
+    uint8_t txBufferLength;
 
-    static uint8_t transmitting;
-    static void (*user_onRequest)(void);
-    static void (*user_onReceive)(size_t);
-    static void onRequestService(void);
-    static void onReceiveService(uint8_t*, size_t);
+    uint8_t transmitting;
 public:
-    TwoWire();
+    TwoWire(uint8_t rxBufferSize = 128, uint8_t txBufferSize = 128);
     void begin(int sda, int scl);
-    void begin(int sda, int scl, uint8_t address);
     void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
     void begin();
-    void begin(uint8_t);
-    void begin(int);
     void setClock(uint32_t);
     void setClockStretchLimit(uint32_t);
     void beginTransmission(uint8_t);
@@ -76,9 +71,6 @@ public:
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive(void (*)(int));      // arduino api
-    void onReceive(void (*)(size_t));   // legacy esp8266 backward compatibility
-    void onRequest(void (*)(void));
 
     using Print::write;
 };

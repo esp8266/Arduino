@@ -38,71 +38,36 @@ extern "C" {
 #error Wire library is not supported on this board
 #endif
 
-// Initialize Class Variables //////////////////////////////////////////////////
-
-uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];
-uint8_t TwoWire::rxBufferIndex = 0;
-uint8_t TwoWire::rxBufferLength = 0;
-
-uint8_t TwoWire::txAddress = 0;
-uint8_t TwoWire::txBuffer[BUFFER_LENGTH];
-uint8_t TwoWire::txBufferIndex = 0;
-uint8_t TwoWire::txBufferLength = 0;
-
-uint8_t TwoWire::transmitting = 0;
-void (*TwoWire::user_onRequest)(void);
-void (*TwoWire::user_onReceive)(size_t);
-
-static int default_sda_pin = SDA;
-static int default_scl_pin = SCL;
-
 // Constructors ////////////////////////////////////////////////////////////////
 
-TwoWire::TwoWire() {}
+TwoWire::TwoWire(uint8_t rxBufferSize, uint8_t txBufferSize) :
+    rxBuffer{new uint8_t[rxBufferSize]}, 
+    txBuffer{new uint8_t[txBufferSize]} 
+{
+    this->txBufferSize = txBufferSize;
+    this->rxBufferSize = rxBufferSize;
+}
 
 // Public Methods //////////////////////////////////////////////////////////////
 
 void TwoWire::begin(int sda, int scl)
 {
-    default_sda_pin = sda;
-    default_scl_pin = scl;
-    twi_init(sda, scl);
-    flush();
-}
-
-void TwoWire::begin(int sda, int scl, uint8_t address)
-{
-    default_sda_pin = sda;
-    default_scl_pin = scl;
-    twi_setAddress(address);
-    twi_init(sda, scl);
-    twi_attachSlaveTxEvent(onRequestService);
-    twi_attachSlaveRxEvent(onReceiveService);
+    twi.init(sda, scl);
     flush();
 }
 
 void TwoWire::pins(int sda, int scl)
 {
-    default_sda_pin = sda;
-    default_scl_pin = scl;
 }
 
 void TwoWire::begin(void)
 {
-    begin(default_sda_pin, default_scl_pin);
-}
-
-void TwoWire::begin(uint8_t address)
-{
-    twi_setAddress(address);
-    twi_attachSlaveTxEvent(onRequestService);
-    twi_attachSlaveRxEvent(onReceiveService);
-    begin();
+    begin(SDA, SCL);
 }
 
 uint8_t TwoWire::status()
 {
-    return twi_status();
+    return twi.status();
 }
 
 void TwoWire::begin(int address)
@@ -112,21 +77,21 @@ void TwoWire::begin(int address)
 
 void TwoWire::setClock(uint32_t frequency)
 {
-    twi_setClock(frequency);
+    twi.setClock(frequency);
 }
 
 void TwoWire::setClockStretchLimit(uint32_t limit)
 {
-    twi_setClockStretchLimit(limit);
+    twi.setClockStretchLimit(limit);
 }
 
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop)
 {
-    if (size > BUFFER_LENGTH)
+    if (size > rxBufferSize)
     {
-        size = BUFFER_LENGTH;
+        size = rxBufferSize;
     }
-    size_t read = (twi_readFrom(address, rxBuffer, size, sendStop) == 0) ? size : 0;
+    size_t read = (twi.readFrom(address, rxBuffer.get(), size, sendStop) == 0) ? size : 0;
     rxBufferIndex = 0;
     rxBufferLength = read;
     return read;
@@ -167,7 +132,7 @@ void TwoWire::beginTransmission(int address)
 
 uint8_t TwoWire::endTransmission(uint8_t sendStop)
 {
-    int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, sendStop);
+    int8_t ret = twi.writeTo(txAddress, txBuffer.get(), txBufferLength, sendStop);
     txBufferIndex = 0;
     txBufferLength = 0;
     transmitting = 0;
@@ -183,7 +148,7 @@ size_t TwoWire::write(uint8_t data)
 {
     if (transmitting)
     {
-        if (txBufferLength >= BUFFER_LENGTH)
+        if (txBufferLength >= txBufferSize)
         {
             setWriteError();
             return 0;
@@ -194,7 +159,8 @@ size_t TwoWire::write(uint8_t data)
     }
     else
     {
-        twi_transmit(&data, 1);
+        setWriteError();
+        return 0;
     }
     return 1;
 }
@@ -213,7 +179,8 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity)
     }
     else
     {
-        twi_transmit(data, quantity);
+        setWriteError();
+        return 0;
     }
     return quantity;
 }
@@ -259,72 +226,6 @@ void TwoWire::flush(void)
     rxBufferLength = 0;
     txBufferIndex = 0;
     txBufferLength = 0;
-}
-
-void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
-{
-    // don't bother if user hasn't registered a callback
-    if (!user_onReceive)
-    {
-        return;
-    }
-    // // don't bother if rx buffer is in use by a master requestFrom() op
-    // // i know this drops data, but it allows for slight stupidity
-    // // meaning, they may not have read all the master requestFrom() data yet
-    // if(rxBufferIndex < rxBufferLength){
-    //   return;
-    // }
-
-    // copy twi rx buffer into local read buffer
-    // this enables new reads to happen in parallel
-    for (uint8_t i = 0; i < numBytes; ++i)
-    {
-        rxBuffer[i] = inBytes[i];
-    }
-
-    // set rx iterator vars
-    rxBufferIndex = 0;
-    rxBufferLength = numBytes;
-
-    // alert user program
-    user_onReceive(numBytes);
-}
-
-void TwoWire::onRequestService(void)
-{
-    // don't bother if user hasn't registered a callback
-    if (!user_onRequest)
-    {
-        return;
-    }
-
-    // reset tx buffer iterator vars
-    // !!! this will kill any pending pre-master sendTo() activity
-    txBufferIndex = 0;
-    txBufferLength = 0;
-
-    // alert user program
-    user_onRequest();
-}
-
-void TwoWire::onReceive(void (*function)(int))
-{
-    // arduino api compatibility fixer:
-    // really hope size parameter will not exceed 2^31 :)
-    static_assert(sizeof(int) == sizeof(size_t), "something is wrong in Arduino kingdom");
-    user_onReceive = reinterpret_cast<void(*)(size_t)>(function);
-}
-
-void TwoWire::onReceive(void (*function)(size_t))
-{
-    user_onReceive = function;
-    twi_enableSlaveMode();
-}
-
-void TwoWire::onRequest(void (*function)(void))
-{
-    user_onRequest = function;
-    twi_enableSlaveMode();
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
