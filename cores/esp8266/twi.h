@@ -97,6 +97,8 @@ public:
     uint8_t status();
 };
 
+extern TwiMaster& twiMasterSingleton;
+
 #endif
 
 #endif

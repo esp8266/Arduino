@@ -123,6 +123,7 @@ public:
 };
 
 static TwiMasterOrSlave twi;
+TwiMaster& twiMasterSingleton = twi;
 
 #ifndef FCPU80
 #define FCPU80 80000000L
