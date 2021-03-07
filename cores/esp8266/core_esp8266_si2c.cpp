@@ -88,8 +88,9 @@ private:
     uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
     volatile int twi_rxBufferIndex = 0;
 
-    void (*twi_onSlaveTransmit)(void);
-    void (*twi_onSlaveReceive)(uint8_t*, size_t);
+    void* twi_SlaveTargetObject;
+    void (*twi_onSlaveTransmit)(void*);
+    void (*twi_onSlaveReceive)(uint8_t*, size_t, void*);
 
     // ETS queue/timer interfaces
     enum { EVENTTASK_QUEUE_SIZE = 1, EVENTTASK_QUEUE_PRIO = 2 };
@@ -103,9 +104,9 @@ private:
     static void eventTask(ETSEvent *e);
     static void ICACHE_RAM_ATTR onTimer(void *unused);
 
-    // Allow not linking in the slave code if there is no call to setAddress
+    // Allow not linking in the slave code if there is no call to enableSlave
     bool _slaveEnabled = false;
-    
+
     // Internal use functions
     void ICACHE_RAM_ATTR onTwipEvent(uint8_t status);
 
@@ -115,11 +116,11 @@ public:
 
     void setAddress(uint8_t address);
     uint8_t transmit(const uint8_t* data, uint8_t length);
-    void attachSlaveRxEvent(void (*function)(uint8_t*, size_t));
-    void attachSlaveTxEvent(void (*function)(void));
+    void attachSlaveRxEvent(void (*function)(uint8_t*, size_t, void*));
+    void attachSlaveTxEvent(void (*function)(void*));
     void ICACHE_RAM_ATTR reply(uint8_t ack);
     void ICACHE_RAM_ATTR releaseBus(void);
-    void enableSlave();
+    void enableSlave(void* targetObject);
 };
 
 static TwiMasterOrSlave twi;
@@ -211,10 +212,11 @@ void TwiMasterOrSlave::setAddress(uint8_t address)
     twi_addr = address << 1;
 }
 
-void TwiMasterOrSlave::enableSlave()
+void TwiMasterOrSlave::enableSlave(void* targetObject)
 {
     if (!_slaveEnabled)
     {
+        twi_SlaveTargetObject = targetObject;
         attachInterrupt(twi_scl, onSclChange, CHANGE);
         attachInterrupt(twi_sda, onSdaChange, CHANGE);
         _slaveEnabled = true;
@@ -453,12 +455,12 @@ uint8_t TwiMasterOrSlave::transmit(const uint8_t* data, uint8_t length)
     return 0;
 }
 
-void TwiMasterOrSlave::attachSlaveRxEvent(void (*function)(uint8_t*, size_t))
+void TwiMasterOrSlave::attachSlaveRxEvent(void (*function)(uint8_t*, size_t, void*))
 {
     twi_onSlaveReceive = function;
 }
 
-void TwiMasterOrSlave::attachSlaveTxEvent(void (*function)(void))
+void TwiMasterOrSlave::attachSlaveTxEvent(void (*function)(void*))
 {
     twi_onSlaveTransmit = function;
 }
@@ -624,7 +626,7 @@ void TwiMasterOrSlave::eventTask(ETSEvent *e)
     switch (e->sig)
     {
     case TWI_SIG_TX:
-        twi.twi_onSlaveTransmit();
+        twi.twi_onSlaveTransmit(twi.twi_SlaveTargetObject);
 
         // if they didn't change buffer & length, initialize it
         if (twi.twi_txBufferLength == 0)
@@ -641,7 +643,7 @@ void TwiMasterOrSlave::eventTask(ETSEvent *e)
     case TWI_SIG_RX:
         // ack future responses and leave slave receiver state
         twi.releaseBus();
-        twi.twi_onSlaveReceive(twi.twi_rxBuffer, e->par);
+        twi.twi_onSlaveReceive(twi.twi_rxBuffer, e->par, twi.twi_SlaveTargetObject);
         break;
     }
 }
@@ -990,15 +992,16 @@ extern "C" {
         return twi.transmit(buf, len);
     }
 
-    void twi_attachSlaveRxEvent(void (*cb)(uint8_t*, size_t))
+    void twi_attachSlaveRxEventWithTarget(void (*cb)(uint8_t*, size_t, void*))
     {
         twi.attachSlaveRxEvent(cb);
     }
 
-    void twi_attachSlaveTxEvent(void (*cb)(void))
+    void twi_attachSlaveTxEventWithTarget(void (*cb)(void*))
     {
         twi.attachSlaveTxEvent(cb);
     }
+
 
     void twi_reply(uint8_t r)
     {
@@ -1010,9 +1013,9 @@ extern "C" {
         twi.releaseBus();
     }
 
-    void twi_enableSlaveMode(void)
+    void twi_enableSlaveModeWithTarget(void* targetObject)
     {
-        twi.enableSlave();
+        twi.enableSlave(targetObject);
     }
 
 };

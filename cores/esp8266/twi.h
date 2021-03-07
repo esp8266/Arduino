@@ -48,13 +48,32 @@ uint8_t twi_status();
 
 uint8_t twi_transmit(const uint8_t*, uint8_t);
 
-void twi_attachSlaveRxEvent(void (*)(uint8_t*, size_t));
-void twi_attachSlaveTxEvent(void (*)(void));
+void twi_attachSlaveRxEventWithTarget(void (*)(uint8_t*, size_t, void*));
+void twi_attachSlaveTxEventWithTarget(void (*)(void*));
 void twi_reply(uint8_t);
 //void twi_stop(void);
 void twi_releaseBus(void);
 
-void twi_enableSlaveMode(void);
+void twi_enableSlaveModeWithTarget(void* targetObject);
+
+inline void twi_attachSlaveRxEvent(void (*cb)(uint8_t*, size_t))
+{   // force cast to the previous version of the callback
+    // the ESP8266 convention should be fine with that:
+    // http://naberius.de/2015/05/14/esp8266-gpio-output-performance/
+    // https://boredpentester.com/reversing-esp8266-firmware-part-5/
+    twi_attachSlaveRxEventWithTarget((void (*)(uint8_t*, size_t, void*))(void*)cb);
+}
+inline void twi_attachSlaveTxEvent(void (*cb)(void))
+{   // force cast to the previous version of the callback
+    // the ESP8266 convention should be fine with that:
+    // http://naberius.de/2015/05/14/esp8266-gpio-output-performance/
+    // https://boredpentester.com/reversing-esp8266-firmware-part-5/
+    twi_attachSlaveTxEventWithTarget((void (*)(void*))(void*)cb);
+}
+inline void twi_enableSlaveMode(void)
+{
+    twi_enableSlaveModeWithTarget(NULL);
+}
 
 #ifdef __cplusplus
 }
