@@ -295,6 +295,28 @@ boards = collections.OrderedDict([
                   'Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.',
                   ],
     }),
+    ( 'agruminolemon', {
+        'name': 'Lifely Agrumino Lemon v4',
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'ESP8266_AGRUMINO_LEMON_V4' ),
+            ( '.build.variant', 'agruminolemonv4' ),
+            ]),
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '2M',
+            ],
+        'desc': [ 'Procuct page https://www.lifely.cc',
+                  '',
+                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.',
+                  'Power',
+                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin',
+                  'Libraries and examples',
+                  'Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
+                  'Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource',
+                  ],
+    }),
     ( 'espduino', {
         'name': 'ESPDuino (ESP-13 Module)',
         'opts': collections.OrderedDict([
@@ -320,7 +342,7 @@ boards = collections.OrderedDict([
     ( 'huzzah', {
         'name': 'Adafruit Feather HUZZAH ESP8266',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ADAFRUIT_HUZZAH',
             '.build.variant': 'adafruit',
             },
         'macro': [
@@ -337,7 +359,7 @@ boards = collections.OrderedDict([
     ( 'inventone', {
         'name': 'Invent One',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_INVENT_ONE',
             '.build.variant': 'inventone',
             },
         'macro': [
@@ -354,7 +376,7 @@ boards = collections.OrderedDict([
     ( 'cw01', {
         'name': 'XinaBox CW01',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_XINABOX_CW01',
             '.build.variant': 'xinabox',
             },
         'macro': [
@@ -428,7 +450,7 @@ boards = collections.OrderedDict([
     ( 'nodemcu', {
         'name': 'NodeMCU 0.9 (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -462,7 +484,7 @@ boards = collections.OrderedDict([
     ( 'nodemcuv2', {
         'name': 'NodeMCU 1.0 (ESP-12E Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12E',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -652,7 +674,7 @@ boards = collections.OrderedDict([
     ( 'espino', {
         'name': 'ESPino (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ESPINO_ESP12',
             '.build.variant': 'espino',
             },
         'macro': [
@@ -671,7 +693,7 @@ boards = collections.OrderedDict([
     ( 'espinotee', {
         'name': 'ThaiEasyElec\'s ESPino',
         'opts': {
-            '.build.board': 'ESP8266_ESP13',
+            '.build.board': 'ESP8266_ESPINO_ESP13',
             '.build.variant': 'espinotee',
             },
         'macro': [
@@ -956,7 +978,7 @@ boards = collections.OrderedDict([
 
     })
 	])
-    
+
 
 ################################################################
 
@@ -1200,6 +1222,27 @@ macros = {
         ( '.menu.ssl.basic.build.sslflags', '-DBEARSSL_SSL_BASIC'),
         ]),
 
+    ####################### mmu
+
+    'mmu_menu': collections.OrderedDict([
+        ( '.menu.mmu.3232', '32KB cache + 32KB IRAM (balanced)' ),
+        ( '.menu.mmu.3232.build.mmuflags', '-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000'),
+        ( '.menu.mmu.4816', '16KB cache + 48KB IRAM (IRAM)' ),
+        ( '.menu.mmu.4816.build.mmuflags', '-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000' ),
+        ( '.menu.mmu.4816H', '16KB cache + 48KB IRAM and 2nd Heap (shared)' ),
+        ( '.menu.mmu.4816H.build.mmuflags', '-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP' ),
+        ( '.menu.mmu.3216', '16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)' ),
+        ( '.menu.mmu.3216.build.mmuflags', '-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000' ),
+        ]),
+
+    ######################## Non 32-bit load/store exception handler
+
+    'non32xfer_menu': collections.OrderedDict([
+        ('.menu.non32xfer.fast', 'Use pgm_read macros for IRAM/PROGMEM' ),
+        ('.menu.non32xfer.fast.build.non32xferflags', ''),
+        ('.menu.non32xfer.safe', 'Byte/Word access to IRAM/PROGMEM (very slow)' ),
+        ('.menu.non32xfer.safe.build.non32xferflags', '-DNON32XFER_HANDLER'),
+        ])
     }
 
 ################################################################
@@ -1370,7 +1413,8 @@ def flash_map (flashsize_kb, fs_kb = 0):
         print("{")
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        print("  iram1_0_seg :                         org = 0x40100000, len = 0x8000")
+        # Moved to ld/eagle.app.v6.common.ld.h as a 2nd MEMORY command.
+        # print("  iram1_0_seg :                         org = 0x40100000, len = MMU_IRAM_SIZE")
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
@@ -1467,18 +1511,6 @@ def led (name, default, ledList):
     return { name: led }
 
 ################################################################
-# Waveform flavour
-
-def waveform ():
-    return { 'waveform': collections.OrderedDict([
-                        ('.menu.waveform.pwm', 'Locked PWM'),
-                        ('.menu.waveform.pwm.build.waveform', ''),
-                        ('.menu.waveform.phase', 'Locked Phase'),
-                        ('.menu.waveform.phase.build.waveform', '-DWAVEFORM_LOCKED_PHASE'),
-                    ])
-           }
-
-################################################################
 # sdk selection
 
 def sdk ():
@@ -1529,7 +1561,6 @@ def all_boards ():
     macros.update(led('led',    led_default, range(0,led_max+1)))
     macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
-    macros.update(waveform())
 
     if boardfilteropt or excludeboards:
         print('#')
@@ -1574,7 +1605,8 @@ def all_boards ():
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
-    print('menu.waveform=Waveform Flavour')
+    print('menu.mmu=MMU')
+    print('menu.non32xfer=Non-32-Bit Access')
     print('')
 
     missingboards = []
@@ -1595,7 +1627,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'waveform' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]

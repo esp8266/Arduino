@@ -171,6 +171,7 @@ int digitalRead(uint8_t pin);
 int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t pin, int val);
+void analogWriteMode(uint8_t pin, int val, bool openDrain);
 void analogWriteFreq(uint32_t freq);
 void analogWriteResolution(int res);
 void analogWriteRange(uint32_t range);
@@ -224,6 +225,10 @@ void optimistic_yield(uint32_t interval_us);
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
+
+
+#include "mmu_iram.h"
+
 
 using std::min;
 using std::max;

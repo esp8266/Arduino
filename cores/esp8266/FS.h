@@ -117,6 +117,7 @@ public:
 
 protected:
     FileImplPtr _p;
+    time_t (*_timeCallback)(void) = nullptr;
 
     // Arduino SD class emulation
     std::shared_ptr<Dir> _fakeDir;
@@ -144,7 +145,7 @@ public:
 protected:
     DirImplPtr _impl;
     FS       *_baseFS;
-    time_t (*timeCallback)(void) = nullptr;
+    time_t (*_timeCallback)(void) = nullptr;
 };
 
 // Backwards compatible, <4GB filesystem usage
@@ -197,7 +198,7 @@ public:
 class FS
 {
 public:
-    FS(FSImplPtr impl) : _impl(impl) { timeCallback = _defaultTimeCB; }
+    FS(FSImplPtr impl) : _impl(impl) { _timeCallback = _defaultTimeCB; }
 
     bool setConfig(const FSConfig &cfg);
 
@@ -233,13 +234,15 @@ public:
     bool gc();
     bool check();
 
+    time_t getCreationTime();
+
     void setTimeCallback(time_t (*cb)(void));
 
     friend class ::SDClass; // More of a frenemy, but SD needs internal implementation to get private FAT bits
 protected:
     FSImplPtr _impl;
     FSImplPtr getImpl() { return _impl; }
-    time_t (*timeCallback)(void);
+    time_t (*_timeCallback)(void) = nullptr;
     static time_t _defaultTimeCB(void) { return time(NULL); }
 };
 

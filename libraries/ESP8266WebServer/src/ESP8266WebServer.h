@@ -308,5 +308,4 @@ protected:
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
 
-
 #endif //ESP8266WEBSERVER_H
