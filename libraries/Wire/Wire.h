@@ -157,5 +157,17 @@ public:
 extern TwoWire Wire;
 #endif
 
+#ifndef TwoWire_h_IMPLEMENTATION
+
+#ifdef TWOWIRE_MASTER_ONLY
+#undef TwoWireMaster
+using TwoWireMaster = TwoWire;
+#else
+#undef TwoWireMasterOrSlave
+using TwoWireMasterOrSlave = TwoWire;
 #endif
+
+#endif // TwoWire_h_IMPLEMENTATION
+
+#endif // TwoWire_h
 

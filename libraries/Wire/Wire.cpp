@@ -29,6 +29,7 @@ extern "C" {
 }
 
 #include "twi.h"
+#define TwoWire_h_IMPLEMENTATION
 #include "Wire.h"
 
 
@@ -41,16 +42,18 @@ extern "C" {
 // Private Methods /////////////////////////////////////////////////////////////
 // Constructors ////////////////////////////////////////////////////////////////
 
-TwoWireBase::TwoWireBase(uint8_t rxBufferSize, uint8_t txBufferSize) :
-    twiMaster{new TwiMaster},
-    rxBufferSize{rxBufferSize},
-    rxBuffer{new uint8_t[rxBufferSize]},
-    txBufferSize{txBufferSize},
-    txBuffer{new uint8_t[txBufferSize]}
+TwoWireBase::TwoWireBase(uint8_t rxBufferSize, uint8_t txBufferSize)
+    :
+    twiMaster(new TwiMaster),
+    rxBufferSize(rxBufferSize),
+    rxBuffer(new uint8_t[rxBufferSize]),
+    txBufferSize(txBufferSize),
+    txBuffer(new uint8_t[txBufferSize])
 {
 }
 
-TwoWireBase::TwoWireBase(TwiMaster* twiPtr, uint8_t rxBufferSize, uint8_t txBufferSize, uint8_t* rxBuffer, uint8_t* txBuffer) :
+TwoWireBase::TwoWireBase(TwiMaster* twiPtr, uint8_t rxBufferSize, uint8_t txBufferSize, uint8_t* rxBuffer, uint8_t* txBuffer)
+    :
     twiMaster{twiPtr},
     rxBufferSize{rxBufferSize},
     rxBuffer{rxBuffer},
