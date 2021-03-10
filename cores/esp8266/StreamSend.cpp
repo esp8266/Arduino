@@ -271,7 +271,7 @@ size_t Stream::SendGenericRegular(Print* to, const ssize_t len, const esp8266::p
         {
             w = std::min(w, maxLen - written);
         }
-        w = std::min(w, (decltype(w))64); //XXX FIXME 64 is a constant
+        w = std::min(w, (decltype(w))temporaryStackBufferSize);
         if (w)
         {
             char temp[w];

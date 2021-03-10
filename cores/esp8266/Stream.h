@@ -157,6 +157,7 @@ class Stream: public Print {
         //   should implement {output,input}CanTimeout()
 
         using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
+        constexpr int temporaryStackBufferSize = 64;
 
         // ::send*() methods:
         // - always stop before timeout when "no-more-input-possible-data"
