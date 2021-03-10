@@ -47,10 +47,11 @@ void setup() {
 
   MDNS.begin("echo23");
 
-  Serial.print("Ready! Use 'telnet/nc ");
-  Serial.print(WiFi.localIP());
-  Serial.printf(" %d' to try echo, use a bandwidth meter and try typing 1, 2 or 3 on console during transfer\n", port);
-  Serial.printf("Use 'python3 echo-client.py' to measure bandwidth and compare algorithms\n");
+  Serial.printf("Ready!\n"
+                "- Use 'telnet/nc echo23.local %d' to try echo\n\n"
+                "- Use 'python3 echo-client.py' bandwidth meter to compare transfer APIs\n\n"
+                "  and try typing 1, 1, 1, 2, 2, 2, 3, 3, 3 on console during transfers\n\n",
+                port);
 }
 
 
@@ -83,9 +84,9 @@ void loop() {
   if (Serial.available()) {
     s = (s + 1) % (sizeof(sizes) / sizeof(sizes[0]));
     switch (Serial.read()) {
-      case '1': if (t != 1) s = 0; t = 1; Serial.println("byte-by-byte"); break;
-      case '2': if (t != 2) s = 1; t = 2; Serial.printf("through buffer\n"); break;
-      case '3': if (t != 3) s = 0; t = 3; Serial.printf("direct access\n"); break;
+      case '1': if (t != 1) s = 0; t = 1; Serial.println("byte-by-byte (watch then press 2 or 3)"); break;
+      case '2': if (t != 2) s = 1; t = 2; Serial.printf("through buffer (watch then press 2 again, or 1 or 3)\n"); break;
+      case '3': if (t != 3) s = 0; t = 3; Serial.printf("direct access (watch then press 3 again, or 1 or 2)\n"); break;
     }
     tot = cnt = 0;
     ESP.resetFreeContStack();

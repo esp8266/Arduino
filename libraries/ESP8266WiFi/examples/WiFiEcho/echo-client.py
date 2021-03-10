@@ -11,16 +11,16 @@ print('message len=', bufsize)
 global recv
 recv = 0
 
-async def tcp_echo_open (ip, port, loop):
-    return await asyncio.open_connection(ip, port, loop=loop)
+async def tcp_echo_open (ip, port):
+    return await asyncio.open_connection(ip, port)
 
-async def tcp_echo_sender(message, writer, loop):
+async def tcp_echo_sender(message, writer):
     print('Writer started')
     while True:
         writer.write(message)
         await writer.drain()
 
-async def tcp_echo_receiver(message, reader, loop):
+async def tcp_echo_receiver(message, reader):
     global recv
     print('Reader started')
     while True:
@@ -31,7 +31,7 @@ async def tcp_echo_receiver(message, reader, loop):
         if data != message:
             print('error')
 
-async def tcp_stat(loop):
+async def tcp_stat():
     global recv
     dur = 0
     loopsec = 2
@@ -42,8 +42,8 @@ async def tcp_stat(loop):
         print('BW=', (recv - last) * 2 * 8 / 1024 / loopsec, 'Kibits/s avg=', recv * 2 * 8 / 1024 / dur)
 
 loop = asyncio.get_event_loop()
-reader, writer = loop.run_until_complete(tcp_echo_open('echo23.local', 23, loop))
-loop.create_task(tcp_echo_receiver(message, reader, loop))
-loop.create_task(tcp_echo_sender(message, writer, loop))
-loop.create_task(tcp_stat(loop))
+reader, writer = loop.run_until_complete(tcp_echo_open('echo23.local', 23))
+loop.create_task(tcp_echo_receiver(message, reader))
+loop.create_task(tcp_echo_sender(message, writer))
+loop.create_task(tcp_stat())
 loop.run_forever()
