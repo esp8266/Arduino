@@ -167,8 +167,8 @@ size_t Stream::SendGenericRegularUntil(Print* to, const ssize_t len, const int r
 
     while (!maxLen || written < maxLen)
     {
-        size_t avpk = peekAvailable();
-        if (avpk == 0 && !inputCanTimeout())
+        size_t avr = available();
+        if (avr == 0 && !inputCanTimeout())
         {
             // no more data to read, ever
             break;
