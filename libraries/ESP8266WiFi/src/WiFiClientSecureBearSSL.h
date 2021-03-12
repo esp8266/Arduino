@@ -120,6 +120,10 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool setCiphers(const std::vector<uint16_t>& list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
+    // Limit the TLS versions BearSSL will connect with.  Default is
+    // BR_TLS10...BR_TLS12
+    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12);
+
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
 
@@ -160,6 +164,10 @@ class WiFiClientSecureCtx : public WiFiClient {
     // Custom cipher list pointer or NULL if default
     std::shared_ptr<uint16_t> _cipher_list;
     uint8_t _cipher_cnt;
+
+    // TLS ciphers allowed
+    uint32_t _tls_min;
+    uint32_t _tls_max;
 
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
