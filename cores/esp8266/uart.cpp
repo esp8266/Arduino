@@ -250,10 +250,12 @@ size_t uart_peek_available (uart_t* uart)
 
     ETS_UART_INTR_DISABLE();
     uart_rx_copy_fifo_to_buffer_unsafe(uart);
+    auto rpos = uart->rx_buffer->rpos;
+    auto wpos = uart->rx_buffer->wpos;
     ETS_UART_INTR_ENABLE();
-    if(uart->rx_buffer->wpos < uart->rx_buffer->rpos)
-        return uart->rx_buffer->size - uart->rx_buffer->rpos;
-    return uart->rx_buffer->wpos - uart->rx_buffer->rpos;
+    if(wpos < rpos)
+        return uart->rx_buffer->size - rpos;
+    return wpos - rpos;
 }
 
 // return a pointer to available data buffer (size = available())
