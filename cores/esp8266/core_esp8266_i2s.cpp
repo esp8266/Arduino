@@ -24,7 +24,7 @@
 #include "osapi.h"
 #include "ets_sys.h"
 #include "i2s_reg.h"
-#include "i2s.h"
+#include "core_esp8266_i2s.h"
 
 extern "C" {
 
@@ -194,11 +194,11 @@ static void ICACHE_RAM_ATTR i2s_slc_isr(void) {
 }
 
 void i2s_set_callback(void (*callback) (void)) {
-  tx->callback = callback;
+  if (tx) tx->callback = callback;
 }
 
 void i2s_rx_set_callback(void (*callback) (void)) {
-  rx->callback = callback;
+  if (rx) rx->callback = callback;
 }
 
 static bool _alloc_channel(i2s_state_t *ch) {
@@ -343,7 +343,7 @@ bool i2s_write_lr(int16_t left, int16_t right){
 
 // writes a buffer of frames into the DMA memory, returns the amount of frames written
 // A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
-static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mono, bool nb) {
+static uint16_t _i2s_write_buffer(const int16_t *frames, uint16_t frame_count, bool mono, bool nb) {
     uint16_t frames_written=0;
 
     while(frame_count>0) {
@@ -401,13 +401,13 @@ static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mo
     return frames_written;
 }
 
-uint16_t i2s_write_buffer_mono_nb(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, true); }
+uint16_t i2s_write_buffer_mono_nb(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, true); }
 
-uint16_t i2s_write_buffer_mono(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, false); }
+uint16_t i2s_write_buffer_mono(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, false); }
 
-uint16_t i2s_write_buffer_nb(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, true); }
+uint16_t i2s_write_buffer_nb(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, true); }
 
-uint16_t i2s_write_buffer(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, false); }
+uint16_t i2s_write_buffer(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, false); }
 
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   if (!rx) {
