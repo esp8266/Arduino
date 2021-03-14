@@ -1,8 +1,8 @@
 Libraries
 =========
 
-WiFi(ESP8266WiFi library)
--------------------------
+WiFi (ESP8266WiFi library)
+--------------------------
 
 ESP8266WiFi library has been developed basing on ESP8266 SDK, using naming convention and overall functionality philosophy of the `Arduino WiFi Shield library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP8266 SDK to this library outgrew the APIs of WiFi Shield library and it became apparent that we need to provide separate documentation on what is new and extra.
 

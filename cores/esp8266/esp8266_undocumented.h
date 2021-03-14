@@ -6,6 +6,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <stdint.h>
+#include <eagle_soc.h>
+#include <spi_flash.h>
+
+#define PERIPHS_DPORT_18		(PERIPHS_DPORT_BASEADDR + 0x018)
+#define PERIPHS_DPORT_ICACHE_ENABLE	(PERIPHS_DPORT_BASEADDR + 0x024)
+/* When enabled 16K IRAM starting at 0x4010C000 is unmapped */
+#define ICACHE_ENABLE_FIRST_16K		BIT3
+/* When enabled 16K IRAM starting at 0x40108000 is unmapped */
+#define ICACHE_ENABLE_SECOND_16K	BIT4
+#define PERIPHS_HW_WDT			(0x60000900)
+#define PERIPHS_I2C_48			(0x60000a00 + 0x348)
+
+
+extern void (*user_start_fptr)();
 
 #ifndef XCHAL_EXCCAUSE_NUM
 // from tools/xtensa-lx106-elf/include/xtensa/config/core.h:629:#define XCHAL_EXCCAUSE_NUM  		64
@@ -18,6 +33,12 @@ extern void rom_i2c_writeReg_Mask(int, int, int, int, int, int);
 extern int rom_i2c_readReg_Mask(int, int, int, int, int);
 
 extern int uart_baudrate_detect(int, int);
+
+/* SDK/Flash contains also an implementation of this function
+ * but for reboot into UART download mode the version from ROM
+ * has to be used because flash is not accessible.
+ */
+extern void rom_uart_div_modify(uint8 uart_no, uint32 DivLatchValue);
 
 /*
 ROM function, uart_buff_switch(), is used to switch printing between UART0 and
@@ -39,6 +60,10 @@ extern void uart_buff_switch(uint8_t);
  controlled by uart_buff_switch().
  */
 extern int ets_uart_printf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+
+extern void user_uart_wait_tx_fifo_empty(uint32_t ch, uint32_t arg2);
+extern void uartAttach();
+extern void Uart_Init(uint32_t uart_no);
 
 extern void ets_delay_us(uint32_t us);
 
@@ -207,6 +232,16 @@ extern fn_c_exception_handler_t _xtos_c_handler_table[XCHAL_EXCCAUSE_NUM];
 */
 extern fn_c_exception_handler_t _xtos_set_exception_handler(int cause, fn_c_exception_handler_t fn);
 #endif
+
+extern uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
+extern void Cache_Read_Disable();
+extern int32_t system_func1(uint32_t);
+extern void clockgate_watchdog(uint32_t);
+extern void pm_open_rf();
+extern void ets_install_uart_printf(uint32_t uart_no);
+extern void UartDwnLdProc(uint8_t* ram_addr, uint32_t size, void (**user_start_ptr)());
+extern int boot_from_flash();
+extern void ets_run() __attribute__((noreturn));
 
 #ifdef __cplusplus
 };
