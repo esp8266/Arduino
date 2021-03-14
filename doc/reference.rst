@@ -9,13 +9,13 @@ and have several limitations:
 
 * Interrupt callback functions must be in IRAM, because the flash may be
   in the middle of other operations when they occur.  Do this by adding
-  the ``ICACHE_RAM_ATTR`` attribute on the function definition.  If this
+  the ``IRAM_ATTR`` attribute on the function definition.  If this
   attribute is not present, the sketch will crash when it attempts to
   ``attachInterrupt`` with an error message.  
 
 .. code:: cpp
 
-    ICACHE_RAM_ATTR void gpio_change_handler(void *data) {...
+    IRAM_ATTR void gpio_change_handler(void *data) {...
 
 * Interrupts must not call ``delay()`` or ``yield()``, or call any routines
   which internally use ``delay()`` or ``yield()`` either.
@@ -69,7 +69,7 @@ Pin interrupts are supported through ``attachInterrupt``,
 ``detachInterrupt`` functions. Interrupts may be attached to any GPIO
 pin, except GPIO16. Standard Arduino interrupt types are supported:
 ``CHANGE``, ``RISING``, ``FALLING``. ISRs need to have
-``ICACHE_RAM_ATTR`` before the function definition.
+``IRAM_ATTR`` before the function definition.
 
 Analog input
 ------------

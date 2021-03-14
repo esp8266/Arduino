@@ -112,7 +112,7 @@ int stopWaveform(uint8_t pin);
 // to determine whether or not to perform an operation.
 // Pass in NULL to disable the callback and, if no other waveforms being
 // generated, stop the timer as well.
-// Make sure the CB function has the ICACHE_RAM_ATTR decorator.
+// Make sure the CB function has the IRAM_ATTR decorator.
 void setTimer1Callback(uint32_t (*fn)());
 
 
