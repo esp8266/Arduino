@@ -1140,16 +1140,9 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
         // logic below is subject for improvement
         // - is wrong
         // - limited to /24 address plans
-#if 1
-        softap_ip = ip_2_ip4(&_netif->ip_addr)->addr;
-#else
-        struct ip_info info;
-        bzero(&info, sizeof(struct ip_info));
-        wifi_get_ip_info(SOFTAP_IF, &info);
-        softap_ip = htonl(info.ip.addr);
+        softap_ip = htonl(ip_2_ip4(&_netif->ip_addr)->addr);
         start_ip = htonl(please->start_ip.addr);
         end_ip = htonl(please->end_ip.addr);
-#endif
         /*config ip information can't contain local ip*/
         if ((start_ip <= softap_ip) && (softap_ip <= end_ip))
         {
