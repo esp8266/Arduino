@@ -109,7 +109,7 @@ void view_accsum ( const char *desc, uint16_t *acc, uint16_t *itrm )
 //---------------------------------------------------------------------------
 // FOR BENCHTEST
 // Original millis() function
-unsigned long ICACHE_RAM_ATTR millis_orig ( void )
+unsigned long IRAM_ATTR millis_orig ( void )
 {
   // Get usec system time, usec overflow conter
   uint32_t  m = system_get_time();
@@ -123,7 +123,7 @@ unsigned long ICACHE_RAM_ATTR millis_orig ( void )
 // FOR DEBUG
 // Corrected millis(), 64-bit arithmetic gold standard
 // truncated to 32-bits by return
-unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
+unsigned long IRAM_ATTR millis_corr_DEBUG( void )
 {
   // Get usec system time, usec overflow conter
   uint32_t  m = system_get_timeA();   // DEBUG
@@ -135,7 +135,7 @@ unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
 
 //---------------------------------------------------------------------------
 // FOR BENCHMARK
-unsigned long ICACHE_RAM_ATTR millis_corr ( void )
+unsigned long IRAM_ATTR millis_corr ( void )
 {
   // Get usec system time, usec overflow conter
   uint32_t  m = system_get_time();
@@ -229,7 +229,7 @@ unsigned long ICACHE_RAM_ATTR millis_corr ( void )
 //
 //   Reference function: corrected millis(), 64-bit arithmetic,
 //                       truncated to 32-bits by return
-//   unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
+//   unsigned long IRAM_ATTR millis_corr_DEBUG( void )
 //   {
 //     // Get usec system time, usec overflow conter
 //     ......
@@ -246,7 +246,7 @@ unsigned long ICACHE_RAM_ATTR millis_corr ( void )
 #define  MAGIC_1E3_wLO  0x4bc6a7f0    // LS part
 #define  MAGIC_1E3_wHI  0x00418937    // MS part, magic multiplier
 
-unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
+unsigned long IRAM_ATTR millis_test_DEBUG ( void )
 {
   union {
     uint64_t  q;     // Accumulator, 64-bit, little endian
@@ -300,7 +300,7 @@ unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
 
 //---------------------------------------------------------------------------
 // FOR BENCHTEST
-unsigned long ICACHE_RAM_ATTR millis_test ( void )
+unsigned long IRAM_ATTR millis_test ( void )
 {
   union {
     uint64_t  q;     // Accumulator, 64-bit, little endian
