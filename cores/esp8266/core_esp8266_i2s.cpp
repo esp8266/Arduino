@@ -61,7 +61,7 @@ typedef struct i2s_state {
   uint32_t *       curr_slc_buf; // Current buffer for writing
   uint32_t         curr_slc_buf_pos; // Position in the current buffer
   void             (*callback) (void);
-  // Callback function should be defined as 'void ICACHE_RAM_ATTR function_name()',
+  // Callback function should be defined as 'void IRAM_ATTR function_name()',
   // and be placed in IRAM for faster execution. Avoid long computational tasks in this
   // function, use it to set flags and process later.
   bool             driveClocks;
@@ -139,7 +139,7 @@ uint16_t i2s_rx_available(){
 }
 
 // Pop the top off of the queue and return it
-static uint32_t * ICACHE_RAM_ATTR i2s_slc_queue_next_item(i2s_state_t *ch) {
+static uint32_t * IRAM_ATTR i2s_slc_queue_next_item(i2s_state_t *ch) {
   uint8_t i;
   uint32_t *item = ch->slc_queue[0];
   ch->slc_queue_len--;
@@ -150,7 +150,7 @@ static uint32_t * ICACHE_RAM_ATTR i2s_slc_queue_next_item(i2s_state_t *ch) {
 }
 
 // Append an item to the end of the queue from receive
-static void ICACHE_RAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t *item) {
+static void IRAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t *item) {
   // Shift everything up, except for the one corresponding to this item
   for (int i=0, dest=0; i < ch->slc_queue_len; i++) {
     if (ch->slc_queue[i] != item) {
@@ -164,7 +164,7 @@ static void ICACHE_RAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t 
   }
 }
 
-static void ICACHE_RAM_ATTR i2s_slc_isr(void) {
+static void IRAM_ATTR i2s_slc_isr(void) {
   ETS_SLC_INTR_DISABLE();
   uint32_t slc_intr_status = SLCIS;
   SLCIC = 0xFFFFFFFF;
