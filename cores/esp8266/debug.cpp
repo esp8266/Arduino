@@ -30,7 +30,7 @@ void hexdump(const void *mem, uint32_t len, uint8_t cols)
     while (len > 0)
     {
         uint32_t linesize = cols > len ? len : cols;
-        os_printf("\n[%p] 0x%04x: ", src, src - (const char*)mem);
+        os_printf("\n[%p] 0x%04x: ", src, (int)(src - (const char*)mem));
         for (uint32_t i = 0; i < linesize; i++)
         {
             os_printf("%02x ", *(src + i));

@@ -1,4 +1,5 @@
 #include <BSTest.h>
+#include <cmath>
 BS_ENV_DECLARE();
 
 
@@ -28,6 +29,13 @@ TEST_CASE("#612 fmod and sqrt work", "[newlib]")
 {
 	CHECK(fabs(fmod(2.0, 1.5) - 0.5) < 1e-6);
 	CHECK(fabs(fmod(-10, -3) - (-1.0)) < 1e-5);
+}
+
+
+TEST_CASE("#7845 std::remainder works", "[newlib]")
+{
+        CHECK(fabs(std::remainder((double)10.123456, (double)5.0) - (double)0.123456) < 1e-5);
+        CHECK(fabs(std::remainder((float)15.123456, (float)5.0) - (float)0.123456) < 1e-5);
 }
 
 void loop()

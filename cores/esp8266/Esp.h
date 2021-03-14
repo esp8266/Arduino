@@ -103,6 +103,12 @@ class EspClass {
 
         void reset();
         void restart();
+	/**
+	 * @brief When calling this method the ESP8266 reboots into the UART download mode without
+	 * the need of any external wiring. This is the same mode which can also be entered by
+	 * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
+	 */
+        [[noreturn]] void rebootIntoUartDownloadMode();
 
         uint16_t getVcc();
         uint32_t getChipId();
