@@ -248,19 +248,6 @@ bool IRAM_ATTR is_cpu_freq_cal(void) {
     return true;
 }
 
-/*
-   Here we use uart_div_modify in the Boot ROM. Note the Boot ROM version does
-   not do any input validation.
-
-   The SDK has an overide on uart_div_modify. We cannot use its replacement. It
-   is not in IRAM and reauires SDK initialization.
- */
-#ifndef ROM_uart_div_modify
-#define ROM_uart_div_modify         0x400039d8U
-#endif
-typedef void (*fp_uart_div_modify_t)(uint32_t uart_no, uint32 DivLatchValue);
-#define real_uart_div_modify ((fp_uart_div_modify_t)ROM_uart_div_modify)
-
 void IRAM_ATTR erase_config__fix_divider(void) {
     /*
        When reset cause is not power-on or EXT_RST the CPU crystal calibration
@@ -272,7 +259,14 @@ void IRAM_ATTR erase_config__fix_divider(void) {
     if (is_cpu_freq_cal()) {
         divider = UART_CLK_FREQ / 74880;
     }
-    real_uart_div_modify(0, divider);
+    /*
+      Here we use uart_div_modify in the Boot ROM. Note the Boot ROM version does
+      not do any input validation.
+
+      The SDK has an overide on uart_div_modify. We cannot use its replacement. It
+      is not in IRAM and reauires SDK initialization.
+     */
+    rom_uart_div_modify(0, divider);
     ERASE_CFG__ETS_DELAY_US(150);
 }
 
