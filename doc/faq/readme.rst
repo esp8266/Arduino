@@ -55,7 +55,7 @@ How can I get some extra KBs in flash ?
 About WPS
 ~~~~~~~~~
 
-From release 2.4.2 and ahead, not using WPS will give an exra ~4.5KB in
+From release 2.4.2 and ahead, not using WPS will give an extra ~4.5KB in
 heap.
 
 In release 2.4.2 only, WPS is disabled by default and the board generator is
@@ -129,8 +129,7 @@ This is not needed anymore:
 PCBs in time-wait state are limited to 5 and removed when that number is
 exceeded.
 
-Ref.  `lwIP-v1.4 <https://github.com/esp8266/Arduino/commit/07f4d4c241df2c552899857f39a4295164f686f2#diff-f8258e71e25fb9985ca3799e3d8b88ecR399>`__,
-`lwIP-v2 <https://github.com/d-a-v/esp82xx-nonos-linklayer/commit/420960dfc0dbe07114f7364845836ac333bc84f7>`__
+Ref.  `<https://github.com/d-a-v/esp82xx-nonos-linklayer/commit/420960dfc0dbe07114f7364845836ac333bc84f7>`__
 
 For reference:
 
@@ -138,8 +137,6 @@ Time-wait PCB state helps TCP not confusing two consecutive connections with the
 same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
 having duplicate packets lost in internet arriving later during the second.
 Artificially clearing them is a workaround to help saving precious heap.
-
-The following lines are compatible with both lwIP versions:
 
 .. code:: cpp
 

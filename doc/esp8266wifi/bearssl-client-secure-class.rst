@@ -120,14 +120,14 @@ BearSSL::WiFiClientSecure Class
 Validating X509 Certificates (Am I talking to the server I think I'm talking to?)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be told how to verify the identity of the other machine.  **By default BearSSL will not validate any connections and will refuse to connect to any server.**  This is a significant difference from the earlier `axTLS::WiFiClientSecure` in that the deprecated axTLS client would connect to any server and would only attempt to validate the identity of the remote server if asked to, after connection.
+Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be told how to verify the identity of the other machine.  **By default BearSSL will not validate any connections and will refuse to connect to any server.**
 
 There are multiple modes to tell BearSSL how to verify the identity of the remote server.  See the `BearSSL_Validation` example for real uses of the following methods:
 
 setInsecure()
 ^^^^^^^^^^^^^
 
-Don't verify any X509 certificates.  There is no guarantee that the server connected to is the one you think it is in this case, but this call will mimic the behavior of the deprecated axTLS code.
+Don't verify any X509 certificates.  There is no guarantee that the server connected to is the one you think it is in this case.
 
 setKnownKey(const BearSSL::PublicKey \*pk)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -139,7 +139,7 @@ setFingerprint(const uint8_t fp[20]) / setFingerprint(const char \*fpStr)
 
 Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
 
-This fingerprint is calcuated on the raw X509 certificate served by the server.  In very rare cases, these certificates have certain encodings which should be normalized before taking a fingerprint (but in order to preserve memory BearSSL does not do this normalization since it would need RAM for an entire copy of the cert), and the fingerprint BearSSL calculates will not match the fingerprint OpenSSL calculates.  In this case, you can enable SSL debugging and get a dump of BearSSL's calculated fingerprint and use that one in your code, or use full certificate validation.  See the `original issue and debug here <https://github.com/esp8266/Arduino/issues/6209>`__.
+This fingerprint is calculated on the raw X509 certificate served by the server.  In very rare cases, these certificates have certain encodings which should be normalized before taking a fingerprint (but in order to preserve memory BearSSL does not do this normalization since it would need RAM for an entire copy of the cert), and the fingerprint BearSSL calculates will not match the fingerprint OpenSSL calculates.  In this case, you can enable SSL debugging and get a dump of BearSSL's calculated fingerprint and use that one in your code, or use full certificate validation.  See the `original issue and debug here <https://github.com/esp8266/Arduino/issues/6209>`__.
 
 setTrustAnchors(BearSSL::X509List \*ta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -198,7 +198,7 @@ If you are connecting to a server repeatedly in a fixed time period (usually 30 
 Errors
 ~~~~~~
 
-BearSSL can fail in many more unique and interesting ways then the deprecated axTLS.  Use these calls to get more information when something fails.  
+BearSSL can fail in many more unique and interesting ways.  Use these calls to get more information when something fails.  
 
 getLastSSLError(char \*dest = NULL, size_t len = 0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -218,4 +218,4 @@ Takes an array (in PROGMEM is valid) or a std::vector of 16-bit BearSSL cipher i
 setCiphersLessSecure()
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Helper function which essentially limits BearSSL to ciphers that were supported by the deprecated axTLS.  These may be less secure than the ones BearSSL would natively choose, but they may be helpful and faster if your server depended on specific axTLS crypto options.
+Helper function which essentially limits BearSSL to less secure ciphers than it would natively choose, but they may be helpful and faster if your server depended on specific crypto options.

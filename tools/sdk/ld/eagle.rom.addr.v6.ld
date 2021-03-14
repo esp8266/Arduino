@@ -79,6 +79,11 @@ PROVIDE ( _xtos_l1int_handler = 0x4000048c );
 PROVIDE ( _xtos_p_none = 0x4000dbf8 );
 PROVIDE ( _xtos_restore_intlevel = 0x4000056c );
 PROVIDE ( _xtos_return_from_exc = 0x4000dc54 );
+
+/* Added to support replacing the ROM _xtos_c_wrapper_handler */
+PROVIDE ( _xtos_c_handler_table = 0x3fffc100 );
+PROVIDE ( _xtos_exc_handler_table = 0x3fffc000 );
+
 PROVIDE ( _xtos_set_exception_handler = 0x40000454 );
 PROVIDE ( _xtos_set_interrupt_handler = 0x4000bd70 );
 PROVIDE ( _xtos_set_interrupt_handler_arg = 0x4000bd28 );
@@ -94,6 +99,7 @@ PROVIDE ( aes_decrypt_init = 0x40008ea4 );
 PROVIDE ( aes_unwrap = 0x40009410 );
 PROVIDE ( base64_decode = 0x40009648 );
 PROVIDE ( base64_encode = 0x400094fc );
+PROVIDE ( boot_from_flash = 0x40001308 );
 PROVIDE ( bzero = 0x4000de84 );
 PROVIDE ( cmd_parse = 0x40000814 );
 PROVIDE ( conv_str_decimal = 0x40000b24 );
@@ -273,6 +279,7 @@ PROVIDE ( rom_stop_tx_tone = 0x4000698c );
 PROVIDE ( rom_tx_mac_disable = 0x40006a98 );
 PROVIDE ( rom_tx_mac_enable = 0x40006ad4 );
 PROVIDE ( rom_txtone_linear_pwr = 0x40006a1c );
+PROVIDE ( rom_uart_div_modify = 0x400039d8 );
 PROVIDE ( rom_write_rfpll_sdm = 0x400078dc );
 PROVIDE ( roundup2 = 0x400031b4 );
 PROVIDE ( rtc_enter_sleep = 0x40002870 );
@@ -348,5 +355,6 @@ PROVIDE ( Te0 = 0x3fffccf0 );
 PROVIDE ( Td0 = 0x3fffd100 );
 PROVIDE ( Td4s = 0x3fffd500);
 PROVIDE ( rcons = 0x3fffd0f0);
+PROVIDE ( user_start_fptr = 0x3fffdcd0 );
 PROVIDE ( UartDev = 0x3fffde10 );
 PROVIDE ( flashchip = 0x3fffc714);

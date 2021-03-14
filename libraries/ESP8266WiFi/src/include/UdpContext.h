@@ -26,11 +26,11 @@ class UdpContext;
 extern "C" {
 void esp_yield();
 void esp_schedule();
-#include "lwip/init.h" // LWIP_VERSION_
 #include <assert.h>
 }
 
 #include <AddrList.h>
+#include <PolledTimeout.h>
 
 #define PBUF_ALIGNER_ADJUST 4
 #define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
@@ -92,24 +92,6 @@ public:
         }
     }
 
-#if LWIP_VERSION_MAJOR == 1
-
-    bool connect(IPAddress addr, uint16_t port)
-    {
-        _pcb->remote_ip = addr;
-        _pcb->remote_port = port;
-        return true;
-    }
-
-    bool listen(IPAddress addr, uint16_t port)
-    {
-        udp_recv(_pcb, &_s_recv, (void *) this);
-        err_t err = udp_bind(_pcb, addr, port);
-        return err == ERR_OK;
-    }
-
-#else // lwIP-v2
-
     bool connect(const IPAddress& addr, uint16_t port)
     {
         _pcb->remote_ip = addr;
@@ -129,8 +111,6 @@ public:
         err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
-
-#endif // lwIP-v2
 
     void disconnect()
     {
@@ -166,11 +146,7 @@ public:
 
     void setMulticastInterface(const IPAddress& addr)
     {
-#if LWIP_VERSION_MAJOR == 1
-        udp_set_multicast_netif_addr(_pcb, (ip_addr_t)addr);
-#else
         udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
-#endif
     }
 
 #endif // !LWIP_IPV6
@@ -180,11 +156,7 @@ public:
      */
     void setMulticastInterface(netif* p_pNetIf)
     {
-#if LWIP_VERSION_MAJOR == 1
-        udp_set_multicast_netif_addr(_pcb, (p_pNetIf ? p_pNetIf->ip_addr : ip_addr_any));
-#else
         udp_set_multicast_netif_index(_pcb, (p_pNetIf ? netif_get_index(p_pNetIf) : NETIF_NO_INDEX));
-#endif
     }
 
     /*
@@ -262,7 +234,7 @@ public:
         return _currentAddr.input_netif;
     }
 
-    CONST IPAddress& getRemoteAddress() CONST
+    const IPAddress& getRemoteAddress() const
     {
         return _currentAddr.srcaddr;
     }
@@ -419,14 +391,39 @@ public:
         return size;
     }
 
-    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
+    void cancelBuffer ()
+    {
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
+        _tx_buf_head = 0;
+        _tx_buf_cur = 0;
+        _tx_buf_offset = 0;
+    }
+
+    bool send(const ip_addr_t* addr = 0, uint16_t port = 0)
+    {
+        return trySend(addr, port, /* don't keep buffer */false) == ERR_OK;
+    }
+
+    bool sendTimeout(const ip_addr_t* addr, uint16_t port,
+                     esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+    {
+        err_t err;
+        esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
+        while (((err = trySend(addr, port, /* keep buffer on error */true)) != ERR_OK) && !timeout)
+            delay(0);
+        if (err != ERR_OK)
+            cancelBuffer(); // get rid of buffer kept on error after timeout
+        return err == ERR_OK;
+    }
+
+private:
+
+    err_t trySend(const ip_addr_t* addr, uint16_t port, bool keepBufferOnError)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
-        if(!tx_copy){
-            DEBUGV("failed pbuf_alloc");
-        }
-        else{
+        if (tx_copy) {
             uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
             for (pbuf* p = _tx_buf_head; p; p = p->next) {
                 size_t will_copy = (data_size < p->len) ? data_size : p->len;
@@ -435,38 +432,32 @@ public:
                 data_size -= will_copy;
             }
         }
-        if (_tx_buf_head)
-            pbuf_free(_tx_buf_head);
-        _tx_buf_head = 0;
-        _tx_buf_cur = 0;
-        _tx_buf_offset = 0;
-        if(!tx_copy){
-            return false;
-        }
 
+        if (!keepBufferOnError)
+            cancelBuffer();
+
+        if (!tx_copy){
+            DEBUGV("failed pbuf_alloc");
+            return ERR_MEM;
+        }
 
         if (!addr) {
             addr = &_pcb->remote_ip;
             port = _pcb->remote_port;
         }
-#ifdef LWIP_MAYBE_XCC
-        uint16_t old_ttl = _pcb->ttl;
-        if (ip_addr_ismulticast(addr)) {
-            _pcb->ttl = _mcast_ttl;
-        }
-#endif
+
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
             DEBUGV(":ust rc=%d\r\n", (int) err);
         }
-#ifdef LWIP_MAYBE_XCC
-        _pcb->ttl = old_ttl;
-#endif
-        pbuf_free(tx_copy);
-        return err == ERR_OK;
-    }
 
-private:
+        pbuf_free(tx_copy);
+
+        if (err == ERR_OK)
+            cancelBuffer(); // no error: get rid of buffer
+
+        return err;
+    }
 
     size_t _processSize (const pbuf* pb)
     {
@@ -537,14 +528,6 @@ private:
             }
         }
 
-#if LWIP_VERSION_MAJOR == 1
-    #define TEMPDSTADDR (&current_iphdr_dest)
-    #define TEMPINPUTNETIF (current_netif)
-#else
-    #define TEMPDSTADDR (ip_current_dest_addr())
-    #define TEMPINPUTNETIF (ip_current_input_netif())
-#endif
-
         // chain this helper pbuf first
         if (_rx_buf)
         {
@@ -570,7 +553,7 @@ private:
                 return;
             }
             // construct in place
-            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport, TEMPINPUTNETIF);
+            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, ip_current_dest_addr(), srcport, ip_current_input_netif());
             pb_helper->flags = PBUF_HELPER_FLAG; // mark helper pbuf
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
@@ -582,9 +565,9 @@ private:
         else
         {
             _currentAddr.srcaddr = srcaddr;
-            _currentAddr.dstaddr = TEMPDSTADDR;
+            _currentAddr.dstaddr = ip_current_dest_addr();
             _currentAddr.srcport = srcport;
-            _currentAddr.input_netif = TEMPINPUTNETIF;
+            _currentAddr.input_netif = ip_current_input_netif();
 
             DEBUGV(":urn %d\r\n", pb->tot_len);
             _first_buf_taken = false;
@@ -597,101 +580,14 @@ private:
             _on_rx();
         }
 
-    #undef TEMPDSTADDR
-    #undef TEMPINPUTNETIF
-
     }
 
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            CONST ip_addr_t *srcaddr, u16_t srcport)
+            const ip_addr_t *srcaddr, u16_t srcport)
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, srcaddr, srcport);
     }
-
-#if LWIP_VERSION_MAJOR == 1
-    /*
-     * Code in this conditional block is copied/backported verbatim from
-     * LwIP 2.1.2 to provide pbuf_get_contiguous.
-     */
-
-    static const struct pbuf *
-    pbuf_skip_const(const struct pbuf *in, u16_t in_offset, u16_t *out_offset)
-    {
-      u16_t offset_left = in_offset;
-      const struct pbuf *pbuf_it = in;
-
-      /* get the correct pbuf */
-      while ((pbuf_it != NULL) && (pbuf_it->len <= offset_left)) {
-        offset_left = (u16_t)(offset_left - pbuf_it->len);
-        pbuf_it = pbuf_it->next;
-      }
-      if (out_offset != NULL) {
-        *out_offset = offset_left;
-      }
-      return pbuf_it;
-    }
-
-    u16_t
-    pbuf_copy_partial(const struct pbuf *buf, void *dataptr, u16_t len, u16_t offset)
-    {
-      const struct pbuf *p;
-      u16_t left = 0;
-      u16_t buf_copy_len;
-      u16_t copied_total = 0;
-
-      LWIP_ERROR("pbuf_copy_partial: invalid buf", (buf != NULL), return 0;);
-      LWIP_ERROR("pbuf_copy_partial: invalid dataptr", (dataptr != NULL), return 0;);
-
-      /* Note some systems use byte copy if dataptr or one of the pbuf payload pointers are unaligned. */
-      for (p = buf; len != 0 && p != NULL; p = p->next) {
-        if ((offset != 0) && (offset >= p->len)) {
-          /* don't copy from this buffer -> on to the next */
-          offset = (u16_t)(offset - p->len);
-        } else {
-          /* copy from this buffer. maybe only partially. */
-          buf_copy_len = (u16_t)(p->len - offset);
-          if (buf_copy_len > len) {
-            buf_copy_len = len;
-          }
-          /* copy the necessary parts of the buffer */
-          MEMCPY(&((char *)dataptr)[left], &((char *)p->payload)[offset], buf_copy_len);
-          copied_total = (u16_t)(copied_total + buf_copy_len);
-          left = (u16_t)(left + buf_copy_len);
-          len = (u16_t)(len - buf_copy_len);
-          offset = 0;
-        }
-      }
-      return copied_total;
-    }
-
-    void *
-    pbuf_get_contiguous(const struct pbuf *p, void *buffer, size_t bufsize, u16_t len, u16_t offset)
-    {
-      const struct pbuf *q;
-      u16_t out_offset;
-
-      LWIP_ERROR("pbuf_get_contiguous: invalid buf", (p != NULL), return NULL;);
-      LWIP_ERROR("pbuf_get_contiguous: invalid dataptr", (buffer != NULL), return NULL;);
-      LWIP_ERROR("pbuf_get_contiguous: invalid dataptr", (bufsize >= len), return NULL;);
-
-      q = pbuf_skip_const(p, offset, &out_offset);
-      if (q != NULL) {
-        if (q->len >= (out_offset + len)) {
-          /* all data in this pbuf, return zero-copy */
-          return (u8_t *)q->payload + out_offset;
-        }
-        /* need to copy */
-        if (pbuf_copy_partial(q, buffer, len, out_offset) != len) {
-          /* copying failed: pbuf is too short */
-          return NULL;
-        }
-        return buffer;
-      }
-      /* pbuf is too short (offset does not fit in) */
-      return NULL;
-    }
-#endif
 
 private:
     udp_pcb* _pcb;

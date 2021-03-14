@@ -26,28 +26,18 @@
 
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
+#include <lwip/ip4_addr.h>
 
-#if LWIP_VERSION_MAJOR == 1
-// compatibility macros to make lwIP-v1 compiling lwIP-v2 API
-#define LWIP_IPV6_NUM_ADDRESSES 0
-#define ip_2_ip4(x) (x)
-#define ipv4_addr ip_addr
-#define ipv4_addr_t ip_addr_t
-#define IP_IS_V4_VAL(x) (1)
-#define IP_SET_TYPE_VAL(x,y) do { (void)0; } while (0)
-#define IP_ANY_TYPE (&ip_addr_any)
-#define IP4_ADDR_ANY IPADDR_ANY
-#define IP4_ADDR_ANY4 IP_ADDR_ANY
-#define IPADDR4_INIT(x) { x }
-#define CONST /* nothing: lwIP-v1 does not use const */
-#define ip4_addr_netcmp ip_addr_netcmp
-#define netif_dhcp_data(netif) ((netif)->dhcp)
-#else // lwIP-v2+
-#define CONST const
 #if !LWIP_IPV6
 struct ip_addr: ipv4_addr { };
 #endif // !LWIP_IPV6
-#endif // lwIP-v2+
+
+// to display a netif id with printf:
+#define NETIFID_STR        "%c%c%u"
+#define NETIFID_VAL(netif) \
+        ((netif)? (netif)->name[0]: '-'),     \
+        ((netif)? (netif)->name[1]: '-'),     \
+        ((netif)? netif_get_index(netif): 42)
 
 // A class to make it easier to handle and pass around IP addresses
 // IPv6 update:
@@ -142,6 +132,8 @@ class IPAddress: public Printable {
         virtual size_t printTo(Print& p) const;
         String toString() const;
 
+        void clear();
+
         /*
                 check if input string(arg) is a valid IPV4 address or not.
                 return true on valid.
@@ -220,7 +212,7 @@ class IPAddress: public Printable {
 
 };
 
-extern CONST IPAddress INADDR_ANY;
+extern const IPAddress INADDR_ANY;
 extern const IPAddress INADDR_NONE;
 
 #endif

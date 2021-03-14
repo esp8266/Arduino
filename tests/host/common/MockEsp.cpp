@@ -108,6 +108,11 @@ uint32_t EspClass::getFreeHeap()
 	return 30000;
 }
 
+uint16_t EspClass::getMaxFreeBlockSize()
+{
+	return 20000;
+}
+
 String EspClass::getResetReason()
 {
   return "Power on";
@@ -154,7 +159,15 @@ FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 	return FM_DOUT;
 }
 
-bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size)
+bool EspClass::flashWrite(uint32_t offset, const uint32_t *data, size_t size)
+{
+	(void)offset;
+	(void)data;
+	(void)size;
+	return true;
+}
+
+bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size)
 {
 	(void)offset;
 	(void)data;
@@ -163,6 +176,14 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size)
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size)
+{
+	(void)offset;
+	(void)data;
+	(void)size;
+	return true;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint8_t *data, size_t size)
 {
 	(void)offset;
 	(void)data;
@@ -203,7 +224,7 @@ uint32_t EspClass::getFlashChipSize(void)
 
 String EspClass::getFullVersion ()
 {
-	return "host-emulation";
+	return "emulation-on-host";
 }
 
 uint32_t EspClass::getFreeContStack()
@@ -217,7 +238,28 @@ void EspClass::resetFreeContStack()
 
 uint32_t EspClass::getCycleCount()
 {
+    return esp_get_cycle_count();
+}
+
+uint32_t esp_get_cycle_count()
+{
     timeval t;
     gettimeofday(&t, NULL);
     return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
+}
+
+void EspClass::setDramHeap()
+{
+}
+
+void EspClass::setIramHeap()
+{
+}
+
+void EspClass::setExternalHeap()
+{
+}
+
+void EspClass::resetHeap()
+{
 }

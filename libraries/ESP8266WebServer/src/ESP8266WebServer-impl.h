@@ -20,68 +20,33 @@
   Modified 8 May 2015 by Hristo Gochkov (proper post and file upload handling)
 */
 
-
 #include <Arduino.h>
 #include <libb64/cencode.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
+#include "base64.h"
 #include "detail/RequestHandlersImpl.h"
-
-//#define DEBUG_ESP_HTTP_SERVER
-#ifdef DEBUG_ESP_PORT
-#define DEBUG_OUTPUT DEBUG_ESP_PORT
-#else
-#define DEBUG_OUTPUT Serial
-#endif
 
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
 static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
+static const char ETAG_HEADER[] PROGMEM = "If-None-Match";
 
+namespace esp8266webserver {
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
 {
 }
 
 template <typename ServerType>
 ESP8266WebServerTemplate<ServerType>::ESP8266WebServerTemplate(int port)
 : _server(port)
-, _currentMethod(HTTP_ANY)
-, _currentVersion(0)
-, _currentStatus(HC_NONE)
-, _statusChange(0)
-, _currentHandler(nullptr)
-, _firstHandler(nullptr)
-, _lastHandler(nullptr)
-, _currentArgCount(0)
-, _currentArgs(nullptr)
-, _postArgsLen(0)
-, _postArgs(nullptr)
-, _headerKeysCount(0)
-, _currentHeaders(nullptr)
-, _contentLength(0)
-, _chunked(false)
 {
 }
 
@@ -98,6 +63,10 @@ ESP8266WebServerTemplate<ServerType>::~ESP8266WebServerTemplate() {
   }
 }
 
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::enableCORS(bool enable) {
+  _corsEnabled = enable;
+}
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::begin() {
   close();
@@ -126,26 +95,24 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen + 1];
+      char *toencode = new (std::nothrow) char[toencodeLen + 1];
       if(toencode == NULL){
         authReq = "";
         return false;
       }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
+      sprintf(toencode, "%s:%s", username, password);
+      String encoded = base64::encode((uint8_t *)toencode, toencodeLen, false);
+      if(!encoded){
         authReq = "";
         delete[] toencode;
         return false;
       }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
+      if(authReq.equalsConstantTime(encoded)) {
         authReq = "";
         delete[] toencode;
-        delete[] encoded;
         return true;
       }
       delete[] toencode;
-      delete[] encoded;
     } else if(authReq.startsWith(F("Digest"))) {
       String _realm    = _extractParam(authReq, F("realm=\""));
       String _H1 = credentialHash((String)username,_realm,(String)password);
@@ -163,9 +130,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
     String authReq = header(FPSTR(AUTHORIZATION_HEADER));
     if(authReq.startsWith(F("Digest"))) {
       authReq = authReq.substring(7);
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println(authReq);
-      #endif
+      DBGWS("%s\n", authReq.c_str());
       String _username = _extractParam(authReq,F("username=\""));
       if(!_username.length() || _username != String(username)) {
         authReq = "";
@@ -192,9 +157,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
         _nc = _extractParam(authReq, F("nc="), ',');
         _cnonce = _extractParam(authReq, F("cnonce=\""));
       }
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + H1);
-      #endif
+      DBGWS("Hash of user:realm:pass=%s\n", H1.c_str());
       MD5Builder md5;
       md5.begin();
       if(_currentMethod == HTTP_GET){
@@ -210,9 +173,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
       }
       md5.calculate();
       String _H2 = md5.toString();
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
-      #endif
+      DBGWS("Hash of GET:uri=%s\n", _H2.c_str());
       md5.begin();
       if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
         md5.add(H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
@@ -221,9 +182,7 @@ bool ESP8266WebServerTemplate<ServerType>::authenticateDigest(const String& user
       }
       md5.calculate();
       String _responsecheck = md5.toString();
-      #ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
-      #endif
+      DBGWS("The Proper response=%s\n", _responsecheck.c_str());
       if(_response == _responsecheck){
         authReq = "";
         return true;
@@ -296,7 +255,18 @@ void ESP8266WebServerTemplate<ServerType>::_addRequestHandler(RequestHandlerType
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
-    _addRequestHandler(new StaticRequestHandler<ServerType>(fs, path, uri, cache_header));
+  bool is_file = false;
+
+  if (fs.exists(path)) {
+    File file = fs.open(path, "r");
+    is_file = file && file.isFile();
+    file.close();
+  }
+
+  if(is_file)
+    _addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
+  else
+    _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
 }
 
 template <typename ServerType>
@@ -307,9 +277,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
       return;
     }
 
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("New client");
-#endif
+    DBGWS("New client\n");
 
     _currentClient = client;
     _currentStatus = HC_WAIT_READ;
@@ -319,7 +287,18 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool keepCurrentClient = false;
   bool callYield = false;
 
+  DBGWS("http-server loop: conn=%d avail=%d status=%s\n",
+    _currentClient.connected(), _currentClient.available(),
+    _currentStatus==HC_NONE?"none":
+    _currentStatus==HC_WAIT_READ?"wait-read":
+    _currentStatus==HC_WAIT_CLOSE?"wait-close":
+    "??");
+
   if (_currentClient.connected() || _currentClient.available()) {
+    if (_currentClient.available() && _keepAlive) {
+      _currentStatus = HC_WAIT_READ;
+    }
+
     switch (_currentStatus) {
     case HC_NONE:
       // No-op to avoid C++ compiler warning
@@ -327,34 +306,57 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
     case HC_WAIT_READ:
       // Wait for data from client to become available
       if (_currentClient.available()) {
-        if (_parseRequest(_currentClient)) {
+        switch (_parseRequest(_currentClient))
+        {
+        case CLIENT_REQUEST_CAN_CONTINUE:
           _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
           _contentLength = CONTENT_LENGTH_NOT_SET;
           _handleRequest();
-
-          if (_currentClient.connected()) {
+          /* fallthrough */
+        case CLIENT_REQUEST_IS_HANDLED:
+          if (_currentClient.connected() || _currentClient.available()) {
             _currentStatus = HC_WAIT_CLOSE;
             _statusChange = millis();
             keepCurrentClient = true;
           }
-        }
-      } else { // !_currentClient.available()
+          else
+            DBGWS("webserver: peer has closed after served\n");
+          break;
+        case CLIENT_MUST_STOP:
+          DBGWS("Close client\n");
+          _currentClient.stop();
+          break;
+        case CLIENT_IS_GIVEN:
+          // client must not be stopped but must not be handled here anymore
+          // (example: tcp connection given to websocket)
+          DBGWS("Give client\n");
+          break;
+        } // switch _parseRequest()
+      } else {
+        // !_currentClient.available(): waiting for more data
         if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
           keepCurrentClient = true;
         }
+        else
+          DBGWS("webserver: closing after read timeout\n");
         callYield = true;
       }
       break;
     case HC_WAIT_CLOSE:
       // Wait for client to close the connection
-      if (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT) {
+      if (!_server.hasClient() && (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT)) {
         keepCurrentClient = true;
         callYield = true;
+        if (_currentClient.available())
+            // continue serving current client
+            _currentStatus = HC_WAIT_READ;
       }
-    }
+      break;
+    } // switch _currentStatus
   }
 
   if (!keepCurrentClient) {
+    DBGWS("Drop client\n");
     _currentClient = ClientType();
     _currentStatus = HC_NONE;
     _currentUpload.reset();
@@ -421,7 +423,17 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
       sendHeader(String(F("Accept-Ranges")),String(F("none")));
       sendHeader(String(F("Transfer-Encoding")),String(F("chunked")));
     }
-    sendHeader(String(F("Connection")), String(F("close")));
+    if (_corsEnabled) {
+      sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
+    }
+
+    if (_keepAlive && _server.hasClient()) { // Disable keep alive if another client is waiting.
+      _keepAlive = false;
+    }
+    sendHeader(String(F("Connection")), String(_keepAlive ? F("keep-alive") : F("close")));
+    if (_keepAlive) {
+      sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
+    }
 
     response += _responseHeaders;
     response += "\r\n";
@@ -557,7 +569,7 @@ const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) cons
     if ( _postArgs[j].key == name )
       return _postArgs[j].value;
   }
-  for (int i = 0; i < _currentArgCount; ++i) {
+  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
@@ -566,14 +578,14 @@ const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) cons
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(int i) const {
-  if (i >= 0 && i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
     return _currentArgs[i].value;
   return emptyString;
 }
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::argName(int i) const {
-  if (i >= 0 && i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount + _currentArgsHavePlain)
     return _currentArgs[i].key;
   return emptyString;
 }
@@ -589,7 +601,7 @@ bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
     if (_postArgs[j].key == name)
       return true;
   }
-  for (int i = 0; i < _currentArgCount; ++i) {
+  for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if (_currentArgs[i].key == name)
       return true;
   }
@@ -606,15 +618,18 @@ const String& ESP8266WebServerTemplate<ServerType>::header(const String& name) c
   return emptyString;
 }
 
-template <typename ServerType>
+
+template<typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount + 1;
-  if (_currentHeaders)
-     delete[]_currentHeaders;
+  _headerKeysCount = headerKeysCount + 2;
+  if (_currentHeaders){
+    delete[] _currentHeaders;
+  }
   _currentHeaders = new RequestArgument[_headerKeysCount];
   _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
-  for (int i = 1; i < _headerKeysCount; i++){
-    _currentHeaders[i].key = headerKeys[i-1];
+  _currentHeaders[1].key = FPSTR(ETAG_HEADER);
+  for (int i = 2; i < _headerKeysCount; i++){
+      _currentHeaders[i].key = headerKeys[i-2];
   }
 }
 
@@ -665,17 +680,13 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
   bool handled = false;
   if (!_currentHandler){
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.println("request handler not found");
-#endif
+    DBGWS("request handler not found\n");
   }
   else {
     handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
-#ifdef DEBUG_ESP_HTTP_SERVER
     if (!handled) {
-      DEBUG_OUTPUT.println("request handler failed to handle request");
+      DBGWS("request handler failed to handle request\n");
     }
-#endif
   }
   if (!handled && _notFoundHandler) {
     _notFoundHandler();
@@ -834,3 +845,5 @@ String ESP8266WebServerTemplate<ServerType>::responseCodeToString(const int code
     }
     return String(r);
 }
+
+} // namespace

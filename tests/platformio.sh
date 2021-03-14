@@ -6,9 +6,13 @@ source "$TRAVIS_BUILD_DIR"/tests/common.sh
 
 function install_platformio()
 {
-    pip3 install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    pip3 install -U platformio
     platformio platform install "https://github.com/platformio/platform-espressif8266.git"
-    python -c "import json; import os; fp=open(os.path.expanduser('~/.platformio/platforms/espressif8266/platform.json'), 'r+'); data=json.load(fp); data['packages']['framework-arduinoespressif8266']['version'] = '*'; fp.seek(0); fp.truncate(); json.dump(data, fp); fp.close()"
+    # Overwrite toolchain with this PR's toolset.  Probably better way to do this
+    ( cd $TRAVIS_BUILD_DIR/tools && python3 get.py -q )
+    mv $TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf ~/.platformio/packages/toolchain-xtensa-latest
+    mv ~/.platformio/packages/toolchain-xtensa/package.json ~/.platformio/packages/toolchain-xtensa/.piopm ~/.platformio/packages/toolchain-xtensa-latest/
+    python -c "import json; import os; fp=open(os.path.expanduser('~/.platformio/platforms/espressif8266/platform.json'), 'r+'); data=json.load(fp); data['packages']['framework-arduinoespressif8266']['version'] = '*'; del data['packages']['framework-arduinoespressif8266']['owner'];fp.seek(0); fp.truncate(); json.dump(data, fp); fp.close()"
     ln -sf $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
     # - esp8266/examples/ConfigFile
@@ -33,7 +37,7 @@ function build_sketches_with_platformio()
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
         if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
-            echo "Skipping $sketch, beacause it is not the main sketch file";
+            echo "Skipping $sketch, because it is not the main sketch file";
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then

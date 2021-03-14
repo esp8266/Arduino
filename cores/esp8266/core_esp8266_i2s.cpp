@@ -24,7 +24,7 @@
 #include "osapi.h"
 #include "ets_sys.h"
 #include "i2s_reg.h"
-#include "i2s.h"
+#include "core_esp8266_i2s.h"
 
 extern "C" {
 
@@ -64,6 +64,7 @@ typedef struct i2s_state {
   // Callback function should be defined as 'void ICACHE_RAM_ATTR function_name()',
   // and be placed in IRAM for faster execution. Avoid long computational tasks in this
   // function, use it to set flags and process later.
+  bool             driveClocks;
 } i2s_state_t;
 
 // RX = I2S receive (i.e. microphone), TX = I2S transmit (i.e. DAC)
@@ -72,6 +73,7 @@ static i2s_state_t *tx = NULL;
 
 // Last I2S sample rate requested
 static uint32_t _i2s_sample_rate;
+static int _i2s_bits = 16;
 
 // IOs used for I2S. Not defined in i2s.h, unfortunately.
 // Note these are internal GPIO numbers and not pins on an
@@ -82,6 +84,14 @@ static uint32_t _i2s_sample_rate;
 #define I2SI_DATA 12
 #define I2SI_BCK  13
 #define I2SI_WS   14
+
+bool i2s_set_bits(int bits) {
+  if (tx || rx || (bits != 16 && bits != 24)) {
+    return false;
+  }
+  _i2s_bits = bits;
+  return true;
+}
 
 static bool _i2s_is_full(const i2s_state_t *ch) {
   if (!ch) {
@@ -184,11 +194,11 @@ static void ICACHE_RAM_ATTR i2s_slc_isr(void) {
 }
 
 void i2s_set_callback(void (*callback) (void)) {
-  tx->callback = callback;
+  if (tx) tx->callback = callback;
 }
 
 void i2s_rx_set_callback(void (*callback) (void)) {
-  rx->callback = callback;
+  if (rx) rx->callback = callback;
 }
 
 static bool _alloc_channel(i2s_state_t *ch) {
@@ -333,7 +343,7 @@ bool i2s_write_lr(int16_t left, int16_t right){
 
 // writes a buffer of frames into the DMA memory, returns the amount of frames written
 // A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
-static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mono, bool nb) {
+static uint16_t _i2s_write_buffer(const int16_t *frames, uint16_t frame_count, bool mono, bool nb) {
     uint16_t frames_written=0;
 
     while(frame_count>0) {
@@ -391,13 +401,13 @@ static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mo
     return frames_written;
 }
 
-uint16_t i2s_write_buffer_mono_nb(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, true); }
+uint16_t i2s_write_buffer_mono_nb(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, true); }
 
-uint16_t i2s_write_buffer_mono(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, false); }
+uint16_t i2s_write_buffer_mono(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, false); }
 
-uint16_t i2s_write_buffer_nb(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, true); }
+uint16_t i2s_write_buffer_nb(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, true); }
 
-uint16_t i2s_write_buffer(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, false); }
+uint16_t i2s_write_buffer(const int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, false); }
 
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   if (!rx) {
@@ -440,7 +450,7 @@ void i2s_set_rate(uint32_t rate) { //Rate in HZ
   }
   _i2s_sample_rate = rate;
 
-  uint32_t scaled_base_freq = I2SBASEFREQ/32;
+  uint32_t scaled_base_freq = I2SBASEFREQ / (_i2s_bits * 2);
   float delta_best = scaled_base_freq;
 
   uint8_t sbd_div_best=1;
@@ -482,6 +492,9 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
   i2sc_temp |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
 
+  // Adjust the shift count for 16/24b output
+  i2sc_temp |= (_i2s_bits == 24 ? 8 : 0) << I2SBM;
+
   I2SC = i2sc_temp;
   
   i2sc_temp &= ~(I2STXR); // Release reset
@@ -489,10 +502,14 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
 }
 
 float i2s_get_real_rate(){
-  return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
+  return (float)I2SBASEFREQ/(_i2s_bits * 2)/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
 bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
+  return i2s_rxtxdrive_begin(enableRx, enableTx, true, true);
+}
+
+bool i2s_rxtxdrive_begin(bool enableRx, bool enableTx, bool driveRxClocks, bool driveTxClocks) {
   if (tx || rx) {
     i2s_end(); // Stop and free any ongoing stuff
   }
@@ -503,9 +520,12 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
       // Nothing to clean up yet
       return false; // OOM Error!
     }
-    pinMode(I2SO_WS, FUNCTION_1);
+    tx->driveClocks = driveTxClocks;
     pinMode(I2SO_DATA, FUNCTION_1);
-    pinMode(I2SO_BCK, FUNCTION_1);
+    if (driveTxClocks) {
+      pinMode(I2SO_WS, FUNCTION_1);
+      pinMode(I2SO_BCK, FUNCTION_1);
+    }
   }
   if (enableRx) {
     rx = (i2s_state_t*)calloc(1, sizeof(*rx));
@@ -513,12 +533,15 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
       i2s_end(); // Clean up any TX or pin changes
       return false; // OOM error!
     }
-    pinMode(I2SI_WS, OUTPUT);
-    pinMode(I2SI_BCK, OUTPUT);
+    rx->driveClocks = driveRxClocks;
     pinMode(I2SI_DATA, INPUT);
+    if (driveRxClocks) {
+      pinMode(I2SI_WS, OUTPUT);
+      pinMode(I2SI_BCK, OUTPUT);
+      PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_I2SI_BCK);
+      PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
+    }
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_I2SI_DATA);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_I2SI_BCK);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_I2SI_WS);
   }
 
   if (!i2s_slc_begin()) {
@@ -538,6 +561,9 @@ bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
   
   // I2STXFMM, I2SRXFMM=0 => 16-bit, dual channel data shifted in/out
   I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); // Set RX/TX FIFO_MOD=0 and disable DMA (FIFO only)
+  if (_i2s_bits == 24) {
+    I2SFC |= (2 << I2STXFM) | (2 << I2SRXFM);
+  }
   I2SFC |= I2SDE; // Enable DMA
 
   // I2STXCMM, I2SRXCMM=0 => Dual channel mode
@@ -579,15 +605,19 @@ void i2s_end() {
 
   if (tx) {
     pinMode(I2SO_DATA, INPUT);
-    pinMode(I2SO_BCK, INPUT);
-    pinMode(I2SO_WS, INPUT);
+    if (tx->driveClocks) {
+      pinMode(I2SO_BCK, INPUT);
+      pinMode(I2SO_WS, INPUT);
+    }
     free(tx);
     tx = NULL;
   }
   if (rx) {
     pinMode(I2SI_DATA, INPUT);
-    pinMode(I2SI_BCK, INPUT);
-    pinMode(I2SI_WS, INPUT);
+    if (rx->driveClocks) {
+      pinMode(I2SI_BCK, INPUT);
+      pinMode(I2SI_WS, INPUT);
+    }
     free(rx);
     rx = NULL;
   }

@@ -82,7 +82,8 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
-  stopWaveform(pin);
+  stopWaveform(pin); // Disable any Tone or startWaveform on this pin
+  _stopPWM(pin);     // and any analogWrites (PWM)
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
@@ -130,8 +131,10 @@ typedef struct {
 static interrupt_handler_t interrupt_handlers[16] = { {0, 0, 0, 0}, };
 static uint32_t interrupt_reg = 0;
 
-void ICACHE_RAM_ATTR interrupt_handler(void*)
+void ICACHE_RAM_ATTR interrupt_handler(void *arg, void *frame)
 {
+  (void) arg;
+  (void) frame;
   uint32_t status = GPIE;
   GPIEC = status;//clear them interrupts
   uint32_t levels = GPI;

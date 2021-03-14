@@ -69,7 +69,7 @@ static bool check_poison( const void *ptr, size_t poison_size,
  * blocks.
  */
 static bool check_poison_block( umm_block *pblock ) {
-  int ok = true;
+  bool ok = true;
 
   if (pblock->header.used.next & UMM_FREELIST_MASK) {
     DBGLOG_ERROR( "check_poison_block is called for free block 0x%lx\n", (unsigned long)pblock);
@@ -137,8 +137,13 @@ static void *get_unpoisoned( void *vptr ) {
 
     ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
 
+    umm_heap_context_t *_context = umm_get_ptr_context( vptr );
+    if (NULL == _context) {
+      panic();
+      return NULL;
+    }
     /* Figure out which block we're in. Note the use of truncated division... */
-    c = (ptr - (uintptr_t)(&(umm_heap[0])))/sizeof(umm_block);
+    c = (ptr - (uintptr_t)(&(_context->heap[0])))/sizeof(umm_block);
 
     check_poison_block(&UMM_BLOCK(c));
   }
@@ -214,11 +219,10 @@ bool umm_poison_check(void) {
   bool ok = true;
   uint16_t cur;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  UMM_INIT_HEAP;
 
   UMM_CRITICAL_ENTRY(id_poison);
+  umm_heap_context_t *_context = umm_get_current_heap();
 
   /* Now iterate through the blocks list */
   cur = UMM_NBLOCK(0) & UMM_BLOCKNO_MASK;

@@ -207,6 +207,18 @@ ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_dat
 
 Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
 
+Lifely Agrumino Lemon v4
+------------------------
+
+Procuct page https://www.lifely.cc
+
+This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.
+Power
+Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin
+Libraries and examples
+Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/
+Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource
+
 ESPDuino (ESP-13 Module)
 ------------------------
 
@@ -362,8 +374,8 @@ links:
 - ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf
 - Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf
 
-WeMos D1 R1
------------
+LOLIN(WeMos) D1 R1
+------------------
 
 Product page: https://www.wemos.cc/
 
@@ -413,7 +425,7 @@ Datasheet and associated downloads can be found on the 4D Systems product page.
 
 The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.
 
-- Product page: http://www.4dsystems.com.au/product/gen4-IoD
+- Product page: https://4dsystems.com.au/products/iot-display-modules
 
 Digistump Oak
 -------------
@@ -476,6 +488,6 @@ DOIT ESP-Mx DevKit (ESP8285)
 ----------------------------
 
 DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module (`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 and is active low to turn on. It uses a CH340C, USB to Serial converter chip. 
-ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. 
 
+ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. 
 
