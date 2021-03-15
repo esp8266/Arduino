@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #elif defined(ESP32)
 #include <esp_attr.h>
 #else
-#define ICACHE_RAM_ATTR
 #define IRAM_ATTR
 #endif
 
