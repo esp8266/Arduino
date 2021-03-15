@@ -287,7 +287,7 @@ public:
         return _opened ? _fd->write(buf, size) : -1;
     }
 
-    size_t read(uint8_t* buf, size_t size) override
+    int read(uint8_t* buf, size_t size) override
     {
         return _opened ? _fd->read(buf, size) : -1;
     }

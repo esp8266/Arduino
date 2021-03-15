@@ -26,7 +26,7 @@
    same stub can be used for gdb_present. */
 extern "C" {
 
-static bool ICACHE_RAM_ATTR __gdb_no_op()
+static bool IRAM_ATTR __gdb_no_op()
 {
     return false;
 }

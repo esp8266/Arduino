@@ -11,6 +11,7 @@ def setup_echo_server(e):
     global stop_client_thread
     global client_thread
     def echo_client_thread():
+        time.sleep(1) # let some time for mDNS to start
         server_address = socket.gethostbyname('esp8266-wfs-test.local')
         count = 0
         while count < 5 and not stop_client_thread:

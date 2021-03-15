@@ -48,6 +48,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     size_t write_P(PGM_P buf, size_t size) override;
     size_t write(Stream& stream); // Note this is not virtual
     int read(uint8_t *buf, size_t size) override;
+    int read(char *buf, size_t size) { return read((uint8_t*)buf, size); }
     int available() override;
     int read() override;
     int peek() override;
@@ -123,6 +124,19 @@ class WiFiClientSecureCtx : public WiFiClient {
     // Limit the TLS versions BearSSL will connect with.  Default is
     // BR_TLS10...BR_TLS12
     bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12);
+
+    // peek buffer API is present
+    virtual bool hasPeekBufferAPI () const override { return true; }
+
+    // return number of byte accessible by peekBuffer()
+    virtual size_t peekAvailable () override { return WiFiClientSecureCtx::available(); }
+
+    // return a pointer to available data buffer (size = peekAvailable())
+    // semantic forbids any kind of read() before calling peekConsume()
+    virtual const char* peekBuffer () override;
+
+    // consume bytes after use (see peekBuffer)
+    virtual void peekConsume (size_t consume) override;
 
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
@@ -294,6 +308,19 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
+
+    // peek buffer API is present
+    virtual bool hasPeekBufferAPI () const override { return true; }
+
+    // return number of byte accessible by peekBuffer()
+    virtual size_t peekAvailable () override { return _ctx->available(); }
+
+    // return a pointer to available data buffer (size = peekAvailable())
+    // semantic forbids any kind of read() before calling peekConsume()
+    virtual const char* peekBuffer () override { return _ctx->peekBuffer(); }
+
+    // consume bytes after use (see peekBuffer)
+    virtual void peekConsume (size_t consume) override { return _ctx->peekConsume(consume); }
 
   private:
     std::shared_ptr<WiFiClientSecureCtx> _ctx;
