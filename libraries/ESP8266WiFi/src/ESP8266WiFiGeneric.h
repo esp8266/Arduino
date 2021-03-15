@@ -77,6 +77,39 @@ class ESP8266WiFiGenericClass {
         uint8_t channel(void);
 
         bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
+        /**
+         * Set modem sleep mode (ESP32 compatibility)
+         * @param enable true to enable
+         * @return true if succeeded
+         */
+        bool setSleep(bool enable)
+        {
+            if (enable)
+            {
+                return setSleepMode(WIFI_MODEM_SLEEP);
+            }
+            else
+            {
+                return setSleepMode(WIFI_NONE_SLEEP);
+            }
+        }
+        /**
+         * Set sleep mode (ESP32 compatibility)
+         * @param mode wifi_ps_type_t
+         * @return true if succeeded
+         */
+        bool setSleep(wifi_ps_type_t mode)
+        {
+            return setSleepMode((WiFiSleepType_t)mode);
+        }
+        /**
+         * Get current sleep state (ESP32 compatibility)
+         * @return true if modem sleep is enabled
+         */
+        bool getSleep()
+        {
+            return getSleepMode() == WIFI_MODEM_SLEEP;
+        }
 
         WiFiSleepType_t getSleepMode();
         uint8_t getListenInterval ();

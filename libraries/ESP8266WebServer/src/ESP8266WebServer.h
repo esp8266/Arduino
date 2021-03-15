@@ -138,6 +138,8 @@ public:
   int args() const;                        // get arguments count
   bool hasArg(const String& name) const;   // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
+  template<typename... Args>
+  void collectHeaders(const Args&... args); // set the request headers to collect (variadic template version)
   const String& header(const String& name) const; // get request header value by name
   const String& header(int i) const;       // get request header value by number
   const String& headerName(int i) const;   // get request header name by number
@@ -149,7 +151,7 @@ public:
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
-  void send(int code, const char* content_type = NULL, const String& content = String(""));
+  void send(int code, const char* content_type = NULL, const String& content = emptyString);
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
   void send(int code, const char *content_type, const char *content) {
@@ -164,13 +166,22 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
+  void send(int code, const char* content_type, Stream* stream, size_t content_length = 0);
+  void send(int code, const char* content_type, Stream& stream, size_t content_length = 0);
+
   void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
+  void sendContent(String& content) {
+    sendContent((const String&)content);
+  }
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
+
+  void sendContent(Stream* content, ssize_t content_length = 0);
+  void sendContent(Stream& content, ssize_t content_length = 0) { sendContent(&content, content_length); }
 
   bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
     if (_currentVersion == 0)
@@ -218,6 +229,30 @@ public:
       contentLength = _currentClient.write(file);
     }
     return contentLength;
+  }
+
+  // Implement GET and HEAD requests for stream
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t stream(T &aStream, const String& contentType, HTTPMethod requestMethod, ssize_t size) {
+    setContentLength(size);
+    send(200, contentType, emptyString);
+    if (requestMethod == HTTP_GET)
+        size = aStream.sendSize(_currentClient, size);
+    return size;
+  }
+
+  // Implement GET and HEAD requests for stream
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t stream(T& aStream, const String& contentType, HTTPMethod requestMethod = HTTP_GET) {
+    ssize_t size = aStream.size();
+    if (size < 0)
+    {
+        send(500, F("text/html"), F("input stream: undetermined size"));
+        return 0;
+    }
+    return stream(aStream, contentType, requestMethod, size);
   }
 
   static String responseCodeToString(const int code);
