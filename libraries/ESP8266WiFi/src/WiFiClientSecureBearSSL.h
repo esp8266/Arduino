@@ -304,6 +304,10 @@ class WiFiClientSecure : public WiFiClient {
     bool setCiphers(const std::vector<uint16_t> list) { return _ctx->setCiphers(list); }
     bool setCiphersLessSecure() { return _ctx->setCiphersLessSecure(); } // Only use the limited set of RSA ciphers without EC
 
+    // Limit the TLS versions BearSSL will connect with.  Default is
+    // BR_TLS10...BR_TLS12. Allowed values are: BR_TLS10, BR_TLS11, BR_TLS12
+    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12) { return _ctx->setSSLVersion(min, max); };    
+    
     // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
