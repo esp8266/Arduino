@@ -247,8 +247,8 @@ Interrupt Service Routines
    cache may kick in for that code. However, the cache currently can't be used 
    during hardware interrupts. That means that, if you use a hardware ISR, such as 
    attachInterrupt(gpio, myISR, CHANGE) for a GPIO change, the ISR must have the 
-   ICACHE_RAM_ATTR attribute declared. Not only that, but the entire function tree 
-   called from the ISR must also have the ICACHE_RAM_ATTR declared.
+   IRAM_ATTR attribute declared. Not only that, but the entire function tree 
+   called from the ISR must also have the IRAM_ATTR declared.
    Be aware that every function that has this attribute reduces available memory.
 
    In addition, it is not possible to execute delay() or yield() from an ISR, 

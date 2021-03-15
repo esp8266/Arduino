@@ -111,6 +111,10 @@ class Print {
         size_t println(void);
 
         virtual void flush() { /* Empty implementation for backward compatibility */ }
+
+        // by default write timeout is possible (outgoing data from network,serial..)
+        // (children can override to false (like String))
+        virtual bool outputCanTimeout () { return true; }
 };
 
 template<> size_t Print::printNumber(double number, uint8_t digits);
