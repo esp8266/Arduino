@@ -954,13 +954,13 @@ uart_write_char_delay(const int uart_nr, char c)
 
 }
 
-static void ICACHE_RAM_ATTR
+static void IRAM_ATTR
 uart0_write_char(char c)
 {
     uart_write_char_delay(0, c);
 }
 
-static void ICACHE_RAM_ATTR
+static void IRAM_ATTR
 uart1_write_char(char c)
 {
     uart_write_char_delay(1, c);
