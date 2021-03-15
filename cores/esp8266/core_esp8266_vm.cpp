@@ -181,7 +181,7 @@ static void spi_init(spi_regs *spi1)
 // So using the command portion of the cycle will not work.  Comcatenate the address
 // and command into a single 32-bit chunk "address" which will be sent across both bits.
 
-inline ICACHE_RAM_ATTR void spi_writetransaction(spi_regs *spi1, int addr, int addr_bits, int dummy_bits, int data_bits, iotype dual)
+inline IRAM_ATTR void spi_writetransaction(spi_regs *spi1, int addr, int addr_bits, int dummy_bits, int data_bits, iotype dual)
 {
   // Ensure no writes are still ongoing
   while (spi1->spi_cmd & SPIBUSY) { /* busywait */ }
@@ -198,7 +198,7 @@ inline ICACHE_RAM_ATTR void spi_writetransaction(spi_regs *spi1, int addr, int a
   }
 }
 
-inline ICACHE_RAM_ATTR uint32_t spi_readtransaction(spi_regs *spi1, int addr, int addr_bits, int dummy_bits, int data_bits, iotype dual)
+inline IRAM_ATTR uint32_t spi_readtransaction(spi_regs *spi1, int addr, int addr_bits, int dummy_bits, int data_bits, iotype dual)
 {
   // Ensure no writes are still ongoing
   while (spi1->spi_cmd & SPIBUSY) { /* busywait */ }
@@ -214,7 +214,7 @@ inline ICACHE_RAM_ATTR uint32_t spi_readtransaction(spi_regs *spi1, int addr, in
   return spi1->spi_w[0];
 }
 
-static inline ICACHE_RAM_ATTR void cache_flushrefill(spi_regs *spi1, int addr)
+static inline IRAM_ATTR void cache_flushrefill(spi_regs *spi1, int addr)
 {
   addr &= addrmask;
   struct cache_line *way = __vm_cache;
@@ -263,7 +263,7 @@ static inline ICACHE_RAM_ATTR void cache_flushrefill(spi_regs *spi1, int addr)
   last->addr = addr;
 }
 
-static inline ICACHE_RAM_ATTR void spi_ramwrite(spi_regs *spi1, int addr, int data_bits, uint32_t val)
+static inline IRAM_ATTR void spi_ramwrite(spi_regs *spi1, int addr, int data_bits, uint32_t val)
 {
   if (cache_ways == 0) {
     spi1->spi_w[0] = val;
@@ -280,7 +280,7 @@ static inline ICACHE_RAM_ATTR void spi_ramwrite(spi_regs *spi1, int addr, int da
   }
 }
 
-static inline ICACHE_RAM_ATTR uint32_t spi_ramread(spi_regs *spi1, int addr, int data_bits)
+static inline IRAM_ATTR uint32_t spi_ramread(spi_regs *spi1, int addr, int data_bits)
 {
   if (cache_ways == 0) {
     spi1->spi_w[0] = 0;
@@ -298,7 +298,7 @@ static inline ICACHE_RAM_ATTR uint32_t spi_ramread(spi_regs *spi1, int addr, int
 
 static void (*__old_handler)(struct __exception_frame *ef, int cause);
 
-static ICACHE_RAM_ATTR void loadstore_exception_handler(struct __exception_frame *ef, int cause)
+static IRAM_ATTR void loadstore_exception_handler(struct __exception_frame *ef, int cause)
 {
   uint32_t excvaddr;
   uint32_t insn;
