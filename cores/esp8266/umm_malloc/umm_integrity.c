@@ -33,13 +33,14 @@ bool umm_integrity_check(void) {
   uint16_t prev;
   uint16_t cur;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  UMM_INIT_HEAP;
 
   /* Iterate through all free blocks */
   prev = 0;
   UMM_CRITICAL_ENTRY(id_integrity);
+
+  umm_heap_context_t *_context = umm_get_current_heap();
+
   while(1) {
     cur = UMM_NFREE(prev);
 

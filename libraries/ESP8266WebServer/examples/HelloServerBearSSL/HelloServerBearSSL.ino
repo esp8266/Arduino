@@ -13,6 +13,8 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
+#include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -23,6 +25,7 @@ const char* ssid = STASSID;
 const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure server(443);
+BearSSL::ServerSessions serverCache(5);
 
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
@@ -130,6 +133,9 @@ void setup(void){
 
   server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
 
+  // Cache SSL sessions to accelerate the TLS handshake.
+  server.getServer().setCache(&serverCache);
+
   server.on("/", handleRoot);
 
   server.on("/inline", [](){
@@ -142,7 +148,68 @@ void setup(void){
   Serial.println("HTTPS server started");
 }
 
+extern "C" void stack_thunk_dump_stack();
+
+void processKey(Print& out, int hotKey) {
+  switch (hotKey) {
+    case 'd': {
+        HeapSelectDram ephemeral;
+        umm_info(NULL, true);
+        break;
+      }
+    case 'i': {
+        HeapSelectIram ephemeral;
+        umm_info(NULL, true);
+        break;
+      }
+    case 'h': {
+        {
+          HeapSelectIram ephemeral;
+          Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
+        }
+        {
+          HeapSelectDram ephemeral;
+          Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
+        }
+        break;
+      }
+    case 'P':
+      out.println(F("Calling stack_thunk_dump_stack();"));
+      stack_thunk_dump_stack();
+      break;
+    case 'R':
+      out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
+      ESP.restart();
+      break;
+    case '\r':
+      out.println();
+    case '\n':
+      break;
+    case '?':
+      out.println();
+      out.println(F("Press a key + <enter>"));
+      out.println(F("  h    - Free Heap Report;"));
+      out.println(F("  i    - iRAM umm_info(null, true);"));
+      out.println(F("  d    - dRAM umm_info(null, true);"));
+      out.println(F("  p    - call stack_thunk_dump_stack();"));
+      out.println(F("  R    - Restart, ESP.restart();"));
+      out.println(F("  ?    - Print Help"));
+      out.println();
+      break;
+    default:
+      out.printf_P(PSTR("\"%c\" - Not an option?  / ? - help"), hotKey);
+      out.println();
+      processKey(out, '?');
+      break;
+  }
+}
+
+
 void loop(void){
   server.handleClient();
   MDNS.update();
+  if (Serial.available() > 0) {
+    int hotKey = Serial.read();
+    processKey(Serial, hotKey);
+  }
 }

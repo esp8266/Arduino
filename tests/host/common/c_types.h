@@ -94,16 +94,16 @@ typedef enum {
 #define __ICACHE_STRINGIZE_NX(A) #A
 #define __ICACHE_STRINGIZE(A) __ICACHE_STRINGIZE_NX(A)
 #define ICACHE_FLASH_ATTR   __attribute__((section("\".irom0.text." __FILE__ "." __ICACHE_STRINGIZE(__LINE__) "." __ICACHE_STRINGIZE(__COUNTER__) "\"")))
-#define ICACHE_RAM_ATTR     __attribute__((section("\".iram.text." __FILE__ "." __ICACHE_STRINGIZE(__LINE__) "." __ICACHE_STRINGIZE(__COUNTER__) "\"")))
+#define IRAM_ATTR     __attribute__((section("\".iram.text." __FILE__ "." __ICACHE_STRINGIZE(__LINE__) "." __ICACHE_STRINGIZE(__COUNTER__) "\"")))
 #define ICACHE_RODATA_ATTR  __attribute__((section("\".irom.text." __FILE__ "." __ICACHE_STRINGIZE(__LINE__) "." __ICACHE_STRINGIZE(__COUNTER__) "\"")))
 #else
 #define ICACHE_FLASH_ATTR
-#define ICACHE_RAM_ATTR
+#define IRAM_ATTR
 #define ICACHE_RODATA_ATTR
 #endif /* ICACHE_FLASH */
 
 // counterpart https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp8266-compat.h
-#define IRAM_ATTR ICACHE_RAM_ATTR
+#define ICACHE_RAM_ATTR IRAM_ATTR
 
 #define STORE_ATTR __attribute__((aligned(4)))
 

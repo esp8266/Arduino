@@ -53,7 +53,7 @@ public:
 
     void printDump(Print& out, Packet::PacketDetail ndd, const Filter nf = nullptr);
     void fileDump(File& outfile, const Filter nf = nullptr);
-    void tcpDump(WiFiServer &tcpDumpServer, const Filter nf = nullptr);
+    bool tcpDump(WiFiServer &tcpDumpServer, const Filter nf = nullptr);
 
 
 private:
@@ -75,7 +75,7 @@ private:
 
     WiFiClient tcpDumpClient;
     char* packetBuffer = nullptr;
-    size_t bufferIndex = 0;
+    int bufferIndex = 0;
 
     static constexpr int tcpBufferSize = 2048;
     static constexpr int maxPcapLength = 1024;

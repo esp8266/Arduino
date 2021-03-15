@@ -103,6 +103,12 @@ class EspClass {
 
         void reset();
         void restart();
+	/**
+	 * @brief When calling this method the ESP8266 reboots into the UART download mode without
+	 * the need of any external wiring. This is the same mode which can also be entered by
+	 * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
+	 */
+        [[noreturn]] void rebootIntoUartDownloadMode();
 
         uint16_t getVcc();
         uint32_t getChipId();
@@ -123,7 +129,7 @@ class EspClass {
         uint8_t getBootMode();
 
 #if defined(F_CPU) || defined(CORE_MOCK)
-        constexpr 
+        constexpr
 #endif
             inline uint8_t getCpuFreqMHz() const __attribute__((always_inline))
         {
@@ -215,6 +221,35 @@ class EspClass {
 #else
         uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
+        /**
+         * @brief Push current Heap selection and set Heap selection to DRAM.
+         *
+         * @param none
+         * @return none
+         */
+        void setDramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to IRAM.
+         *
+         * @param none
+         * @return none
+         */
+        void setIramHeap();
+        /**
+         * @brief Push current Heap selection and set Heap selection to External. (Experimental)
+         *
+         * @param none
+         * @return none
+         */
+        void setExternalHeap();
+        /**
+         * @brief Restores Heap selection back to value present when
+         * setDramHeap, setIramHeap, or setExternalHeap was called.
+         *
+         * @param none
+         * @return none
+         */
+        void resetHeap();
     private:
         /**
          * @brief Replaces @a byteCount bytes of a 4 byte block on flash

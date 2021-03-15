@@ -13,7 +13,7 @@
 #endif
 
 #ifdef __cplusplus
-void hexdump(const void *mem, uint32_t len, uint8_t cols = 16);
+extern "C" void hexdump(const void *mem, uint32_t len, uint8_t cols = 16);
 #else
 void hexdump(const void *mem, uint32_t len, uint8_t cols);
 #endif
@@ -25,6 +25,20 @@ extern "C" {
 void __unhandled_exception(const char *str) __attribute__((noreturn));
 void __panic_func(const char* file, int line, const char* func) __attribute__((noreturn));
 #define panic() __panic_func(PSTR(__FILE__), __LINE__, __func__)
+
+#ifdef DEBUG_ESP_CORE
+extern void __iamslow(const char* what);
+#define IAMSLOW() \
+    do { \
+        static bool once = false; \
+        if (!once) { \
+            once = true; \
+            __iamslow((PGM_P)FPSTR(__FUNCTION__)); \
+        } \
+    } while (0)
+#else
+#define IAMSLOW() do { (void)0; } while (0)
+#endif
 
 #ifdef __cplusplus
 }

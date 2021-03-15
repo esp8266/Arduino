@@ -28,7 +28,9 @@
 #include "cont.h"
 
 #include "coredecls.h"
+#include "umm_malloc/umm_malloc.h"
 #include <pgmspace.h>
+#include "reboot_uart_dwnld.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -199,6 +201,15 @@ void EspClass::restart(void)
 {
     system_restart();
     esp_yield();
+}
+
+[[noreturn]] void EspClass::rebootIntoUartDownloadMode()
+{
+	wdtDisable();
+	/* disable hardware watchdog */
+	CLEAR_PERI_REG_MASK(PERIPHS_HW_WDT, 0x1);
+
+	esp8266RebootIntoUartDownloadMode();
 }
 
 uint16_t EspClass::getVcc(void)
@@ -442,22 +453,24 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     return false;
 }
 
+// These are defined in the linker script, and filled in by the elf2bin.py util
+extern "C" uint32_t __crc_len;
+extern "C" uint32_t __crc_val;
+
 bool EspClass::checkFlashCRC() {
-    // The CRC and total length are placed in extra space at the end of the 4K chunk
-    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
-    // we'll need to adjust this.
-    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
-    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4092)); // Start of PROGMEM plus 4K-4
+    // Dummy CRC fill
     uint32_t z[2];
     z[0] = z[1] = 0;
 
+    uint32_t firstPart = (uintptr_t)&__crc_len - 0x40200000; // How many bytes to check before the 1st CRC val
+
     // Start the checksum
-    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
+    uint32_t crc = crc32((const void*)0x40200000, firstPart, 0xffffffff);
     // Pretend the 2 words of crc/len are zero to be idempotent
     crc = crc32(z, 8, crc);
     // Finish the CRC calculation over the rest of flash
-    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
-    return crc == flashcrc;
+    crc = crc32((const void*)(0x40200000 + firstPart + 8), __crc_len - (firstPart + 8), crc);
+    return crc == __crc_val;
 }
 
 
@@ -516,45 +529,45 @@ uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) co
 {
   /**
    * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
-   * 
+   *
    * "When used correctly, every 32-bit value the system reads from the RNG_DATA_REG register of the random number generator is a true random number.
    * These true random numbers are generated based on the noise in the Wi-Fi/BT RF system.
    * When Wi-Fi and BT are disabled, the random number generator will give out pseudo-random numbers.
-   * 
+   *
    * When Wi-Fi or BT is enabled, the random number generator is fed two bits of entropy every APB clock cycle (normally 80 MHz).
    * Thus, for the maximum amount of entropy, it is advisable to read the random register at a maximum rate of 5 MHz.
    * A data sample of 2 GB, read from the random number generator with Wi-Fi enabled and the random register read at 5 MHz,
    * has been tested using the Dieharder Random Number Testsuite (version 3.31.1).
    * The sample passed all tests."
-   * 
+   *
    * Since ESP32 is the sequal to ESP8266 it is unlikely that the ESP8266 is able to generate random numbers more quickly than 5 MHz when run at a 80 MHz frequency.
    * A maximum random number frequency of 0.5 MHz is used here to leave some margin for possibly inferior components in the ESP8266.
    * It should be noted that the ESP8266 has no Bluetooth functionality, so turning the WiFi off is likely to cause RANDOM_REG32 to use pseudo-random numbers.
-   * 
-   * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available. 
+   *
+   * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available.
    * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during number generation.
    * Thus only delayMicroseconds() is used below.
-   */ 
+   */
 
   constexpr uint8_t cooldownMicros = 2;
   static uint32_t lastCalledMicros = micros() - cooldownMicros;
 
   uint32_t randomNumber = 0;
-  
+
   for(size_t byteIndex = 0; byteIndex < outputSizeBytes; ++byteIndex)
   {
     if(byteIndex % 4 == 0)
     {
       // Old random number has been used up (random number could be exactly 0, so we can't check for that)
-              
+
       uint32_t timeSinceLastCall = micros() - lastCalledMicros;
       if(timeSinceLastCall < cooldownMicros)
         delayMicroseconds(cooldownMicros - timeSinceLastCall);
-      
+
       randomNumber = RANDOM_REG32;
       lastCalledMicros = micros();
     }
-    
+
     resultArray[byteIndex] = randomNumber;
     randomNumber >>= 8;
   }
@@ -968,4 +981,48 @@ String EspClass::getSketchMD5()
     md5.calculate();
     result = md5.toString();
     return result;
+}
+
+void EspClass::setExternalHeap()
+{
+#ifdef UMM_HEAP_EXTERNAL
+    if (!umm_push_heap(UMM_HEAP_EXTERNAL)) {
+        panic();
+    }
+#endif
+}
+
+void EspClass::setIramHeap()
+{
+#ifdef UMM_HEAP_IRAM
+    if (!umm_push_heap(UMM_HEAP_IRAM)) {
+        panic();
+    }
+#endif
+}
+
+void EspClass::setDramHeap()
+{
+#if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
+    if (!umm_push_heap(UMM_HEAP_DRAM)) {
+        panic();
+    }
+#elif defined(UMM_HEAP_IRAM)
+    if (!umm_push_heap(UMM_HEAP_DRAM)) {
+        panic();
+    }
+#endif
+}
+
+void EspClass::resetHeap()
+{
+#if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
+    if (!umm_pop_heap()) {
+        panic();
+    }
+#elif defined(UMM_HEAP_IRAM)
+    if (!umm_pop_heap()) {
+        panic();
+    }
+#endif
 }

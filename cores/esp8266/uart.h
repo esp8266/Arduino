@@ -147,6 +147,16 @@ int uart_get_debug();
 void uart_start_detect_baudrate(int uart_nr);
 int uart_detect_baudrate(int uart_nr);
 
+// return number of byte accessible by peekBuffer()
+size_t uart_peek_available (uart_t* uart);
+
+// return a pointer to available data buffer (size = available())
+// semantic forbids any kind of read() before calling peekConsume()
+const char* uart_peek_buffer (uart_t* uart);
+
+// consume bytes after use (see peekBuffer)
+void uart_peek_consume (uart_t* uart, size_t consume);
+
 uint8_t uart_get_bit_length(const int uart_nr);
 
 #if defined (__cplusplus)
