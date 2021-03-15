@@ -48,6 +48,13 @@ typedef enum WiFiSleepType
     WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP = 1, WIFI_MODEM_SLEEP = 2
 } WiFiSleepType_t;
 
+// ESP32 compatibility
+typedef enum wifi_ps_type
+{
+    WIFI_PS_NONE = WIFI_NONE_SLEEP,
+    WIFI_PS_MIN_MODEM = WIFI_MODEM_SLEEP,
+    WIFI_PS_MAX_MODEM = WIFI_LIGHT_SLEEP,
+} wifi_ps_type_t;
 
 typedef enum WiFiEvent 
 {
