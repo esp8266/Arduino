@@ -27,7 +27,7 @@ class WiFiClient;
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-#include <include/DataSource.h>
+#include <assert.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -298,6 +298,33 @@ public:
     {
         mockverbose("TODO ClientContext::setSync()\n");
         _sync = sync;
+    }
+
+    // return a pointer to available data buffer (size = peekAvailable())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer ()
+    {
+        return _inbuf;
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t peekAvailable ()
+    {
+        ssize_t ret = mockPeekBytes(_sock, nullptr, 0, 0, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return _inbufsize;
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume)
+    {
+        assert(consume <= _inbufsize);
+        memmove(_inbuf, _inbuf + consume, _inbufsize - consume);
+        _inbufsize -= consume;
     }
 
 private:

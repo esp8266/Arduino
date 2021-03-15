@@ -42,7 +42,11 @@ extern "C" {
 #undef UMM_HEAP_IRAM
 #endif
 
-// #define UMM_HEAP_EXTERNAL
+#if defined(MMU_EXTERNAL_HEAP)
+#define UMM_HEAP_EXTERNAL
+#else
+#undef UMM_HEAP_EXTERNAL
+#endif
 
 /*
  * Assign IDs to active Heaps and tally. DRAM is always active.
@@ -793,11 +797,11 @@ extern "C" {
 #include <pgmspace.h>
 // Reuse pvPort* calls, since they already support passing location information.
 // Specificly the debug version (heap_...) that does not force DRAM heap.
-void* ICACHE_RAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line);
-void* ICACHE_RAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line);
-void* ICACHE_RAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
-void* ICACHE_RAM_ATTR heap_pvPortZalloc(size_t size, const char* file, int line);
-void  ICACHE_RAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
+void* IRAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line);
+void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line);
+void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
+void* IRAM_ATTR heap_pvPortZalloc(size_t size, const char* file, int line);
+void  IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
 
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortCalloc(n, s, mem_debug_file, __LINE__); })
@@ -811,10 +815,10 @@ void  ICACHE_RAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
 
 #elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #include <pgmspace.h>
-void* ICACHE_RAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
+void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
 
-void  ICACHE_RAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
+void  IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
 //C - to be discussed
 /*
   Problem, I would like to report the file and line number with the umm poison

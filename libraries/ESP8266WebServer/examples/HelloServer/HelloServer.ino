@@ -115,9 +115,9 @@ void setup(void) {
       // swallow the exact amount matching the full request+content,
       // hence the tcp connection cannot be handled anymore by the
       // webserver.
-#ifdef STREAMTO_API
+#ifdef STREAMSEND_API
       // we are lucky
-      client->toWithTimeout(Serial, 500);
+      client->sendAll(Serial, 500);
 #else
       auto last = millis();
       while ((millis() - last) < 500) {
