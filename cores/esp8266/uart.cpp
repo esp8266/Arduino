@@ -115,7 +115,7 @@ struct uart_
 
 
 // called by ISR
-inline size_t ICACHE_RAM_ATTR
+inline size_t IRAM_ATTR
 uart_rx_fifo_available(const int uart_nr)
 {
     return (USS(uart_nr) >> USRXC) & 0xFF;
@@ -144,7 +144,7 @@ uart_rx_available_unsafe(uart_t* uart)
 
 // Copy all the rx fifo bytes that fit into the rx buffer
 // called by ISR
-inline void ICACHE_RAM_ATTR
+inline void IRAM_ATTR
 uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart)
 {
     struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
@@ -324,7 +324,7 @@ uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 // instead of the uart_isr...uart_rx_copy_fifo_to_buffer_unsafe()
 // Since we've already read the bytes from the FIFO, can't use that
 // function directly and need to implement it bytewise here
-static void ICACHE_RAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
+static void IRAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
 {
     uart_t* uart = (uart_t*)arg;
     if(uart == NULL || !uart->rx_enabled) {
@@ -405,7 +405,7 @@ uart_get_rx_buffer_size(uart_t* uart)
 }
 
 // The default ISR handler called when GDB is not enabled
-void ICACHE_RAM_ATTR
+void IRAM_ATTR
 uart_isr(void * arg, void * frame)
 {
     (void) frame;

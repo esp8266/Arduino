@@ -115,6 +115,7 @@ public:
     virtual bool rmdir(const char* path) = 0;
     virtual bool gc() { return true; } // May not be implemented in all file systems.
     virtual bool check() { return true; } // May not be implemented in all file systems.
+    virtual time_t getCreationTime() { return 0; } // May not be implemented in all file systems.
 
     // Filesystems *may* support a timestamp per-file, so allow the user to override with
     // their own callback for all files on this FS.  The default implementation simply

@@ -25,6 +25,12 @@
 #include "WString.h"
 #include "stdlib_noniso.h"
 
+#define OOM_STRING_BORDER_DISPLAY           10
+#define OOM_STRING_THRESHOLD_REALLOC_WARN  128
+
+#define __STRHELPER(x) #x
+#define STR(x) __STRHELPER(x) // stringifier
+
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
@@ -178,6 +184,14 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     }
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
+#ifdef DEBUG_ESP_OOM
+    if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
+        // warn when badly re-allocating
+        DEBUGV("[offending String op %d->%d ('%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s')]\n",
+            len(), maxStrLen, c_str(),
+            len() > OOM_STRING_BORDER_DISPLAY? c_str() + std::max((int)len() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
+    }
+#endif
     // Make sure we can fit newsize in the buffer
     if (newSize > CAPACITY_MAX) {
         return 0;
@@ -429,6 +443,20 @@ StringSumHelper &operator +(const StringSumHelper &lhs, long num) {
 }
 
 StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long num) {
+    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
+    if (!a.concat(num))
+        a.invalidate();
+    return a;
+}
+
+StringSumHelper &operator +(const StringSumHelper &lhs, long long num) {
+    StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
+    if (!a.concat(num))
+        a.invalidate();
+    return a;
+}
+
+StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long long num) {
     StringSumHelper &a = const_cast<StringSumHelper &>(lhs);
     if (!a.concat(num))
         a.invalidate();

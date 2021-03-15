@@ -295,6 +295,28 @@ boards = collections.OrderedDict([
                   'Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.',
                   ],
     }),
+    ( 'agruminolemon', {
+        'name': 'Lifely Agrumino Lemon v4',
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'ESP8266_AGRUMINO_LEMON_V4' ),
+            ( '.build.variant', 'agruminolemonv4' ),
+            ]),
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '2M',
+            ],
+        'desc': [ 'Procuct page https://www.lifely.cc',
+                  '',
+                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.',
+                  'Power',
+                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin',
+                  'Libraries and examples',
+                  'Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
+                  'Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource',
+                  ],
+    }),
     ( 'espduino', {
         'name': 'ESPDuino (ESP-13 Module)',
         'opts': collections.OrderedDict([
