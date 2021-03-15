@@ -1,9 +1,5 @@
 #include <FunctionalInterrupt.h>
 
-#ifndef IRAM_ATTR
-#define IRAM_ATTR ICACHE_RAM_ATTR
-#endif
-
 #if defined(ESP32)
 #define BUTTON1 16
 #define BUTTON2 17

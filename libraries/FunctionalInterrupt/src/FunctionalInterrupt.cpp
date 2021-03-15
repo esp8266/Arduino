@@ -16,7 +16,7 @@ namespace
         InterruptInfo interruptInfo;
     };
 
-    void ICACHE_RAM_ATTR interruptScheduleFunctional(const InterruptScheduleFunctionalArg& arg)
+    void IRAM_ATTR interruptScheduleFunctional(const InterruptScheduleFunctionalArg& arg)
     {
         ScheduleLambdaArg lambdaArg{ arg.scheduledIntRoutine, { arg.pin } };
         lambdaArg.interruptInfo.value = digitalRead(arg.pin);
