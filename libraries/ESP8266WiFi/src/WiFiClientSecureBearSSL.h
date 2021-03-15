@@ -121,6 +121,10 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool setCiphers(const std::vector<uint16_t>& list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
+    // Limit the TLS versions BearSSL will connect with.  Default is
+    // BR_TLS10...BR_TLS12
+    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12);
+
     // peek buffer API is present
     virtual bool hasPeekBufferAPI () const override { return true; }
 
@@ -175,6 +179,10 @@ class WiFiClientSecureCtx : public WiFiClient {
     std::shared_ptr<uint16_t> _cipher_list;
     uint8_t _cipher_cnt;
 
+    // TLS ciphers allowed
+    uint32_t _tls_min;
+    uint32_t _tls_max;
+
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
 
@@ -194,10 +202,10 @@ class WiFiClientSecureCtx : public WiFiClient {
     friend class WiFiClientSecure; // access to private context constructors
     WiFiClientSecureCtx(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                      const X509List *client_CA_ta);
+                      const X509List *client_CA_ta, int tls_min, int tls_max);
     WiFiClientSecureCtx(ClientContext* client, const X509List *chain, const PrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                      const X509List *client_CA_ta);
+                      const X509List *client_CA_ta, int tls_min, int tls_max);
 
     // RSA keyed server
     bool _connectSSLServerRSA(const X509List *chain, const PrivateKey *sk,
@@ -321,14 +329,14 @@ class WiFiClientSecure : public WiFiClient {
     friend class WiFiServerSecure; // Server needs to access these constructors
     WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                      const X509List *client_CA_ta):
-      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta)) {
+                      const X509List *client_CA_ta, int tls_min, int tls_max):
+      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
     }
 
     WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                      const X509List *client_CA_ta):
-      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta)) {
+                      const X509List *client_CA_ta, int tls_min, int tls_max):
+      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
     }
 
 }; // class WiFiClientSecure
