@@ -31,6 +31,7 @@
 #define CORE_HAS_UMM
 
 #define WIFI_HAS_EVENT_CALLBACK
+#define WIFI_IS_OFF_AT_BOOT
 
 #include <stdlib.h> // malloc()
 #include <stddef.h> // size_t
@@ -103,6 +104,8 @@ unsigned long micros(void);
 uint64_t micros64(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
+
+void enableWiFiAtBootTime (void) __attribute__((noinline));
 
 #if defined(F_CPU) || defined(CORE_MOCK)
 #ifdef __cplusplus

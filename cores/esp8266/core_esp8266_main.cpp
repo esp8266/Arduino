@@ -332,7 +332,18 @@ extern "C" void app_entry (void)
 extern "C" void preinit (void) __attribute__((weak));
 extern "C" void preinit (void)
 {
-    /* do nothing by default */
+    /* does nothing, kept for backward compatibility */
+}
+
+extern "C" void __disableWiFiAtBootTime (void) __attribute__((weak));
+extern "C" void __disableWiFiAtBootTime (void)
+{
+    // Starting from arduino core v3: wifi is disabled at boot time
+    // WiFi.begin() or WiFi.softAP() will wake WiFi up
+    wifi_set_opmode_current(0/*WIFI_OFF*/);
+    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+    wifi_fpm_open();
+    wifi_fpm_do_sleep(0xFFFFFFF);
 }
 
 extern "C" void user_init(void) {
@@ -360,7 +371,8 @@ extern "C" void user_init(void) {
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
-    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
+    preinit(); // deprecated
+    __disableWiFiAtBootTime(); // default weak function disables WiFi
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,
