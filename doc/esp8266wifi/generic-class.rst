@@ -44,9 +44,7 @@ persistent
     WiFi.persistent(persistent)
 
 Starting from version 3 of this core, **persistence is disabled by default
-and WiFi does not anymore automatically fires up at boot**.
-
-(see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
+and WiFi does not anymore automatically fires up at boot** (see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
 
 Previously, SDK was automatically starting WiFi at boot.  This was probably
 intended for the Espressif AT FW which is interactive and preserves WiFi
@@ -55,8 +53,8 @@ Arduino API because sketches start with ``WiFi.begin()`` or
 ``WiFi.softAP()``.
 
 This change is harmless with standard sketches: Calls to ``WiFi.mode()`` do
-enable radio as usual.  It also smooths current spikes at boot and also
-decreases DHCP stress.
+enable radio as usual.  It also smooths current spikes at boot and decreases
+DHCP stress.
 
 Legacy behavior can be restored by calling ``enableWiFiAtBoot()`` from
 anywhere in the code (it is a weak void function intended to play with the

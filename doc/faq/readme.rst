@@ -178,7 +178,7 @@ will need to implement an additional (short) deep sleep using
 
 Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__
 
-My WiFi was previously automatically connected wight after booting
+My WiFi was previously automatically connected right after booting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This was WiFi persistence.  Starting from version 3 of this core, WiFi is
