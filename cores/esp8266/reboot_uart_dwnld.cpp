@@ -52,7 +52,7 @@ static inline void __wsr_vecbase(uint32_t vector_base) {
 	asm volatile("wsr.vecbase %0" :: "r" (vector_base));
 }
 
-[[noreturn]] void ICACHE_RAM_ATTR esp8266UartDownloadMode()
+[[noreturn]] void IRAM_ATTR esp8266UartDownloadMode()
 {
 	/* reverse engineered from system_restart_core() */
 	/* Before disabling instruction cache and restoring instruction RAM to a

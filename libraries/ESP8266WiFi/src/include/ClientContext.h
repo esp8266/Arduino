@@ -29,7 +29,8 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-#include "DataSource.h"
+#include <assert.h>
+#include <StreamDev.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -374,7 +375,8 @@ public:
         if (!_pcb) {
             return 0;
         }
-        return _write_from_source(new BufferDataSource(data, size));
+        StreamConstPtr ptr(data, size);
+        return _write_from_source(&ptr);
     }
 
     size_t write(Stream& stream)
@@ -382,7 +384,7 @@ public:
         if (!_pcb) {
             return 0;
         }
-        return _write_from_source(new BufferedStreamDataSource<Stream>(stream, stream.available()));
+        return _write_from_source(&stream);
     }
 
     size_t write_P(PGM_P buf, size_t size)
@@ -390,8 +392,8 @@ public:
         if (!_pcb) {
             return 0;
         }
-        ProgmemStream stream(buf, size);
-        return _write_from_source(new BufferedStreamDataSource<ProgmemStream>(stream, size));
+        StreamConstPtr ptr(buf, size);
+        return _write_from_source(&ptr);
     }
 
     void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
@@ -436,6 +438,29 @@ public:
         _sync = sync;
     }
 
+    // return a pointer to available data buffer (size = peekAvailable())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer ()
+    {
+        if (!_rx_buf)
+            return nullptr;
+        return (const char*)_rx_buf->payload + _rx_buf_offset;
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t peekAvailable ()
+    {
+        if (!_rx_buf)
+            return 0;
+        return _rx_buf->len - _rx_buf_offset;
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume)
+    {
+        _consume(consume);
+    }
+
 protected:
 
     bool _is_timeout()
@@ -452,7 +477,7 @@ protected:
         }
     }
 
-    size_t _write_from_source(DataSource* ds)
+    size_t _write_from_source(Stream* ds)
     {
         assert(_datasource == nullptr);
         assert(!_send_waiting);
@@ -468,7 +493,6 @@ protected:
                 if (_is_timeout()) {
                     DEBUGV(":wtmo\r\n");
                 }
-                delete _datasource;
                 _datasource = nullptr;
                 break;
             }
@@ -495,20 +519,20 @@ protected:
             return false;
         }
 
-        DEBUGV(":wr %d %d\r\n", _datasource->available(), _written);
+        DEBUGV(":wr %d %d\r\n", _datasource->peekAvailable(), _written);
 
         bool has_written = false;
 
         while (_datasource) {
             if (state() == CLOSED)
                 return false;
-            size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->available());
+            size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->peekAvailable());
             if (!next_chunk_size)
                 break;
-            const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
+            const char* buf = _datasource->peekBuffer();
 
             uint8_t flags = 0;
-            if (next_chunk_size < _datasource->available())
+            if (next_chunk_size < _datasource->peekAvailable())
                 //   PUSH is meant for peer, telling to give data to user app as soon as received
                 //   PUSH "may be set" when sender has finished sending a "meaningful" data block
                 //   PUSH does not break Nagle
@@ -522,15 +546,15 @@ protected:
 
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
 
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->peekAvailable(), (int)err);
 
             if (err == ERR_OK) {
-                _datasource->release_buffer(buf, next_chunk_size);
+                _datasource->peekConsume(next_chunk_size);
                 _written += next_chunk_size;
                 has_written = true;
             } else {
-		// ERR_MEM(-1) is a valid error meaning
-		// "come back later". It leaves state() opened
+                // ERR_MEM(-1) is a valid error meaning
+                // "come back later". It leaves state() opened
                 break;
             }
         }
@@ -565,8 +589,6 @@ protected:
 
     void _consume(size_t size)
     {
-        if(_pcb)
-            tcp_recved(_pcb, size);
         ptrdiff_t left = _rx_buf->len - _rx_buf_offset - size;
         if(left > 0) {
             _rx_buf_offset += size;
@@ -583,6 +605,8 @@ protected:
             pbuf_ref(_rx_buf);
             pbuf_free(head);
         }
+        if(_pcb)
+            tcp_recved(_pcb, size);
     }
 
     err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
@@ -683,7 +707,7 @@ private:
     discard_cb_t _discard_cb;
     void* _discard_cb_arg;
 
-    DataSource* _datasource = nullptr;
+    Stream* _datasource = nullptr;
     size_t _written = 0;
     uint32_t _timeout_ms = 5000;
     uint32_t _op_start_time = 0;

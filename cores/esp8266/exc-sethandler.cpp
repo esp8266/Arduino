@@ -40,7 +40,7 @@
  *
 */
 
-#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP) || defined(NEW_EXC_C_WRAPPER)
+#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP) || defined(NEW_EXC_C_WRAPPER) || defined(MMU_EXTERNAL_HEAP)
 
 /*
  * The original module source code came from:

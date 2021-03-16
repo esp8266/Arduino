@@ -65,6 +65,15 @@ String LwipIntf::hostname(void)
 }
 
 /**
+    Get ESP8266 station DHCP hostname
+    @return hostname
+*/
+const char* LwipIntf::getHostname(void)
+{
+    return wifi_station_get_hostname();
+}
+
+/**
     Set ESP8266 station DHCP hostname
     @param aHostname max length:24
     @return ok
