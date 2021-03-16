@@ -185,4 +185,4 @@ This was WiFi persistence.  Starting from version 3 of this core, WiFi is
 indeed off at boot and is powered on only when starting to be used with the
 regular API.
 
-Read more at :ref:`wifiOffAtBoot <../esp8266wifi/generic-class>`.
+Read more at `wifiOffAtBoot <../esp8266wifi/generic-class.rst#persistent>`__.

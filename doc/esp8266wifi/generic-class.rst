@@ -35,7 +35,6 @@ A detailed explanation of ``WiFiEventHandler`` can be found in the section with 
 Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available in the examples folder of the ESP8266WiFi library.
 
 
-.. _wifiOffAtBoot:
 persistent
 ~~~~~~~~~~
 
@@ -61,6 +60,7 @@ anywhere in the code (it is a weak void function intended to play with the
 linker).
 
 .. code:: cpp
+
     void setup () {
     #ifdef WIFI_IS_OFF_AT_BOOT
         enableWiFiAtBoot(); // can be called from anywhere with the same effect
