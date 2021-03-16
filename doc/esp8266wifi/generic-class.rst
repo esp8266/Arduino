@@ -35,6 +35,7 @@ A detailed explanation of ``WiFiEventHandler`` can be found in the section with 
 Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available in the examples folder of the ESP8266WiFi library.
 
 
+.. _wifiOffAtBoot:
 persistent
 ~~~~~~~~~~
 
@@ -42,6 +43,32 @@ persistent
 
     WiFi.persistent(persistent)
 
+Starting from version 3 of this core, **persistence is disabled by default
+and WiFi does not anymore automatically fires up at boot**.
+
+(see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
+
+Previously, SDK was automatically starting WiFi at boot.  This was probably
+intended for the Espressif AT FW which is interactive and preserves state
+accross reboots.  This behavior is generally irrelevant with the Arduino
+API because sketches start with WiFi.begin() or softAP...
+
+This change is harmless with standard sketches: Calls to
+WiFi.mode()+WiFi.begin/WiFi.softAP(...) do enable radio as usual.  It also
+smooths current spikes at boot and also decrease DHCP stress.
+
+Legacy behavior can be restored by calling `enableWiFiAtBoot()` anywhere in
+the code (this is a weak void function intended to play with the linker).
+
+.. code:: cpp
+    void setup () {
+    #ifdef WIFI_IS_OFF_AT_BOOT
+        enableWiFiAtBoot(); // can be called from anywhere with the same effect
+    #endif
+        ....
+    }
+
+When legacy behavior is restored thanks to this call,
 ESP8266 is able to reconnect to the last used WiFi network or establishes the same Access Point upon power up or reset.
 By default, these settings are written to specific sectors of flash memory every time they are changed in ``WiFi.begin(ssid, passphrase)`` or ``WiFi.softAP(ssid, passphrase, channel)``, and when ``WiFi.disconnect`` or ``WiFi.softAPdisconnect`` is invoked.
 Frequently calling these functions could cause wear on the flash memory (see issue `#1054 <https://github.com/esp8266/Arduino/issues/1054>`__).

@@ -177,3 +177,9 @@ will need to implement an additional (short) deep sleep using
 ``WAKE_RF_DEFAULT``.
 
 Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__
+
+My WiFi was previously automatically connected wight after booting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This was WiFi persistence.  WiFi is now indeed off at boot and is powered on
+only when using the regular API.  Read more at :ref:`wifiOffAtBoot`.
