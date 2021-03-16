@@ -269,7 +269,7 @@ protected:
   }
 
   IRAM_ATTR // fast
-  bool expiredOneShot()
+  bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
     if (!canWait()) return true;
@@ -284,7 +284,7 @@ protected:
   timeType _timeout;
   timeType _start;
   bool _neverExpires;
-  bool _oneShotExpired;
+  mutable bool _oneShotExpired;
 };
 
 // legacy type names, deprecated (unit is milliseconds)
