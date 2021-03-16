@@ -61,7 +61,7 @@ public:
    * Get the time since the ExpiringTimeTracker instance creation or the last reset(), whichever is more recent.
    */
   uint32_t elapsedTime() const;
-  bool expired();
+  bool expired() const;
   void reset();
   void reset(const uint32_t newDuration);
   void reset(const calculatorType newDurationCalculator);
