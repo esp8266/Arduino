@@ -83,7 +83,7 @@ struct WiFiEventHandlerOpaque
 
 static std::list<WiFiEventHandler> sCbEventList;
 
-bool ESP8266WiFiGenericClass::_persistent = true;
+bool ESP8266WiFiGenericClass::_persistent = false;
 WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
 ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()
