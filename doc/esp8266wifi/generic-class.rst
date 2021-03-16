@@ -49,16 +49,18 @@ and WiFi does not anymore automatically fires up at boot**.
 (see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
 
 Previously, SDK was automatically starting WiFi at boot.  This was probably
-intended for the Espressif AT FW which is interactive and preserves state
-accross reboots.  This behavior is generally irrelevant with the Arduino
-API because sketches start with WiFi.begin() or softAP...
+intended for the Espressif AT FW which is interactive and preserves WiFi
+state accross reboots.  This behavior is generally irrelevant with the
+Arduino API because sketches start with ``WiFi.begin()`` or
+``WiFi.softAP()``.
 
-This change is harmless with standard sketches: Calls to
-WiFi.mode()+WiFi.begin/WiFi.softAP(...) do enable radio as usual.  It also
-smooths current spikes at boot and also decrease DHCP stress.
+This change is harmless with standard sketches: Calls to ``WiFi.mode()`` do
+enable radio as usual.  It also smooths current spikes at boot and also
+decreases DHCP stress.
 
-Legacy behavior can be restored by calling `enableWiFiAtBoot()` anywhere in
-the code (this is a weak void function intended to play with the linker).
+Legacy behavior can be restored by calling ``enableWiFiAtBoot()`` from
+anywhere in the code (it is a weak void function intended to play with the
+linker).
 
 .. code:: cpp
     void setup () {
