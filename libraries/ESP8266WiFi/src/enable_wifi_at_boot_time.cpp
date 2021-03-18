@@ -4,6 +4,8 @@
 
 #include "coredecls.h"
 
+#include <ESP8266WiFi.h>
+
 extern "C" void enableWiFiAtBootTime()
 {
     /*
@@ -16,5 +18,11 @@ extern "C" void enableWiFiAtBootTime()
 extern "C" void __disableWiFiAtBootTime()
 {
     // overrides the default __disableWiFiAtBootTime:
-    // Does nothing: WiFi is enabled by default in nonos-sdk
+    // Does (almost) nothing: WiFi is enabled by default in nonos-sdk
+
+    // ... but restores legacy WiFi credentials persistence to true at boot time
+    // (can be still overriden by user before setting up WiFi, like before)
+
+    // (note: c++ ctors not called yet at this point)
+    ESP8266WiFiClass::persistent(true);
 }
