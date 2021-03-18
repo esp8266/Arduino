@@ -55,7 +55,7 @@ This change is harmless with standard sketches: Calls to ``WiFi.mode()`` do
 enable radio as usual.  It also smooths current spikes at boot and decreases
 DHCP stress.
 
-Legacy behavior can be restored by calling ``enableWiFiAtBoot()`` from
+Legacy behavior can be restored by calling ``enableWiFiAtBootTime()`` from
 anywhere in the code (it is a weak void function intended to play with the
 linker).
 
@@ -63,7 +63,7 @@ linker).
 
     void setup () {
     #ifdef WIFI_IS_OFF_AT_BOOT
-        enableWiFiAtBoot(); // can be called from anywhere with the same effect
+        enableWiFiAtBootTime(); // can be called from anywhere with the same effect
     #endif
         ....
     }
