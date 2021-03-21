@@ -93,6 +93,32 @@ String::String(unsigned long value, unsigned char base) {
     *this = buf;
 }
 
+String::String(long long value) {
+    init();
+    char buf[2 + 8 * sizeof(long long)];
+    sprintf(buf, "%lld", value);
+    *this = buf;
+}
+
+String::String(unsigned long long value) {
+    init();
+    char buf[1 + 8 * sizeof(unsigned long long)];
+    sprintf(buf, "%llu", value);
+    *this = buf;
+}
+
+String::String(long long value, unsigned char base) {
+    init();
+    char buf[2 + 8 * sizeof(long long)];
+    *this = lltoa(value, buf, sizeof(buf), base);
+}
+
+String::String(unsigned long long value, unsigned char base) {
+    init();
+    char buf[1 + 8 * sizeof(unsigned long long)];
+    *this = ulltoa(value, buf, sizeof(buf), base);
+}
+
 String::String(float value, unsigned char decimalPlaces) {
     init();
     char buf[33];
@@ -147,6 +173,14 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     }
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
+#ifdef DEBUG_ESP_OOM
+    if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
+        // warn when badly re-allocating
+        DEBUGV("[offending String op %d->%d ('%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s')]\n",
+            len(), maxStrLen, c_str(),
+            len() > OOM_STRING_BORDER_DISPLAY? c_str() + std::max((int)len() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
+    }
+#endif
     // Make sure we can fit newsize in the buffer
     if (newSize > CAPACITY_MAX) {
         return 0;
@@ -306,6 +340,16 @@ unsigned char String::concat(unsigned long num) {
     char buf[1 + 3 * sizeof(unsigned long)];
     ultoa(num, buf, 10);
     return concat(buf, strlen(buf));
+}
+
+unsigned char String::concat(long long num) {
+    char buf[2 + 3 * sizeof(long long)];
+    return concat(buf, sprintf(buf, "%lld", num));
+}
+
+unsigned char String::concat(unsigned long long num) {
+    char buf[1 + 3 * sizeof(unsigned long long)];
+    return concat(buf, sprintf(buf, "%llu", num));
 }
 
 unsigned char String::concat(float num) {

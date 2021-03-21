@@ -32,7 +32,7 @@ For the SoftAP interface, when the interface is brought up, any servers should b
 
 A detailed explanation of ``WiFiEventHandler`` can be found in the section with `examples :arrow\_right: <generic-examples.rst>`__ dedicated specifically to the Generic Class..
 
-Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available inside examples folder of the ESP8266WiFi library.
+Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available in the examples folder of the ESP8266WiFi library.
 
 
 persistent
@@ -42,30 +42,56 @@ persistent
 
     WiFi.persistent(persistent)
 
-ESP8266 is able to reconnect to the last used Wi-Fi network or establishes the same Access Point upon power up or reset.
+ESP8266 is able to reconnect to the last used WiFi network or establishes the same Access Point upon power up or reset.
 By default, these settings are written to specific sectors of flash memory every time they are changed in ``WiFi.begin(ssid, passphrase)`` or ``WiFi.softAP(ssid, passphrase, channel)``, and when ``WiFi.disconnect`` or ``WiFi.softAPdisconnect`` is invoked.
 Frequently calling these functions could cause wear on the flash memory (see issue `#1054 <https://github.com/esp8266/Arduino/issues/1054>`__).
 
-Once ``WiFi.persistent(false)`` is called, ``WiFi.begin``, ``WiFi.disconnect``, ``WiFi.softAP``, or ``WiFi.softAPdisconnect`` only changes the current in-memory Wi-Fi settings, and does not affect the Wi-Fi settings stored in flash memory.
+Once ``WiFi.persistent(false)`` is called, ``WiFi.begin``, ``WiFi.disconnect``, ``WiFi.softAP``, or ``WiFi.softAPdisconnect`` only changes the current in-memory WiFi settings, and does not affect the WiFi settings stored in flash memory.
 
 mode
 ~~~~
 
+Regular WiFi modes
+__________________
+
 .. code:: cpp
 
-    WiFi.mode(m)
+    bool mode(WiFiMode_t m)
 
--  ``WiFi.mode(m)``: set mode to ``WIFI_AP``, ``WIFI_STA``,
-   ``WIFI_AP_STA`` or ``WIFI_OFF``
+Switches to one of the regular WiFi modes, where ``m`` is one of:
+
+-  ``WIFI_OFF``: turn WiFi off.
+-  ``WIFI_STA``: switch to `Station (STA) <readme.rst#station>`__ mode.
+-  ``WIFI_AP``: switch to `Access Point (AP) <readme.rst#soft-access-point>`__ mode.
+-  ``WIFI_AP_STA``: enable both Station (STA) and Access Point (AP) mode.
+
+Pseudo-modes
+____________
+
+.. code:: cpp
+
+    bool mode(WiFiMode_t m, WiFiState* state)
+
+Used with the following pseudo-modes, where ``m`` is one of:
+
+-  ``WIFI_SHUTDOWN``: Fills in the provided ``WiFiState`` structure, switches to ``WIFI_OFF`` mode and puts WiFi into forced sleep, preserving energy.
+-  ``WIFI_RESUME``: Turns WiFi on and tries to re-establish the WiFi connection stored in the ``WiFiState`` structure.
+
+These modes are used in low-power scenarios, e.g. where ESP.deepSleep is used between actions to preserve battery power.
+
+It is the user's responsibility to preserve the WiFiState between ``WIFI_SHUTDOWN`` and ``WIFI_RESUME``, e.g. by storing it
+in RTC user data and/or flash memory.
+
+There is an example sketch `WiFiShutdown.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiShutdown/WiFiShutdown.ino>`__ available in the examples folder of the ESP8266WiFi library.
 
 getMode
 ~~~~~~~
 
 .. code:: cpp
 
-    WiFiMode_t WiFi.getMode()
+    WiFiMode_t getMode()
 
--  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes above)
+Gets the current WiFi mode (one out of four regular modes above).
 
 WiFi power management, DTIM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -76,6 +76,10 @@ class String {
         explicit String(unsigned int, unsigned char base = 10);
         explicit String(long, unsigned char base = 10);
         explicit String(unsigned long, unsigned char base = 10);
+        explicit String(long long /* base 10 */);
+        explicit String(long long, unsigned char base);
+        explicit String(unsigned long long /* base 10 */);
+        explicit String(unsigned long long, unsigned char base);
         explicit String(float, unsigned char decimalPlaces = 2);
         explicit String(double, unsigned char decimalPlaces = 2);
         ~String() {
@@ -123,6 +127,8 @@ class String {
         unsigned char concat(unsigned int num);
         unsigned char concat(long num);
         unsigned char concat(unsigned long num);
+        unsigned char concat(long long num);
+        unsigned char concat(unsigned long long num);
         unsigned char concat(float num);
         unsigned char concat(double num);
         unsigned char concat(const __FlashStringHelper *str);
