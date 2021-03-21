@@ -25,6 +25,12 @@
 #include "WString.h"
 #include "stdlib_noniso.h"
 
+#define OOM_STRING_BORDER_DISPLAY           10
+#define OOM_STRING_THRESHOLD_REALLOC_WARN  128
+
+#define __STRHELPER(x) #x
+#define STR(x) __STRHELPER(x) // stringifier
+
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
