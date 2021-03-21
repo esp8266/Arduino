@@ -236,7 +236,6 @@ public:
     StreamString(const String& string): String(string), S2Stream(this) { }
     StreamString(const __FlashStringHelper *str): String(str), S2Stream(this) { }
     StreamString(String&& string): String(string), S2Stream(this) { }
-    StreamString(StringSumHelper&& sum): String(sum), S2Stream(this) { }
 
     explicit StreamString(char c): String(c), S2Stream(this) { }
     explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), S2Stream(this) { }
@@ -276,13 +275,6 @@ public:
     }
 
     StreamString& operator= (String&& rval)
-    {
-        String::operator=(rval);
-        resetpp();
-        return *this;
-    }
-
-    StreamString& operator= (StringSumHelper&& rval)
     {
         String::operator=(rval);
         resetpp();
