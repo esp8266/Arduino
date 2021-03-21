@@ -34,6 +34,12 @@ public:
         return hostname(aHostname.c_str());
     }
     bool hostname(const char* aHostname);
+    // ESP32 API compatibility
+    bool setHostname(const char* aHostName)
+    {
+        return hostname(aHostName);
+    }
+    const char* getHostname();
 
 protected:
 
