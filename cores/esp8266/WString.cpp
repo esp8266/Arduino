@@ -150,11 +150,8 @@ void String::invalidate(void) {
 bool String::reserve(unsigned int size) {
     if (buffer() && capacity() >= size)
         return true;
-    if (changeBuffer(size)) {
-        if (len() == 0)
-            wbuffer()[0] = 0;
+    if (changeBuffer(size))
         return true;
-    }
     return false;
 }
 
@@ -163,17 +160,17 @@ bool String::changeBuffer(unsigned int maxStrLen) {
     if (maxStrLen < sizeof(sso.buff) - 1) {
         if (isSSO() || !buffer()) {
             // Already using SSO, nothing to do
-            uint16_t oldLen = len();
+            unsigned int oldLen = len();
             setSSO(true);
             setLen(oldLen);
         } else { // if bufptr && !isSSO()
             // Using bufptr, need to shrink into sso.buff
             const char *temp = buffer();
-            uint16_t oldLen = len();
+            unsigned int oldLen = len();
             setSSO(true);
-            setLen(oldLen);
             memcpy(wbuffer(), temp, maxStrLen);
             free((void *)temp);
+            setLen(oldLen);
         }
         return true;
     }
@@ -191,7 +188,7 @@ bool String::changeBuffer(unsigned int maxStrLen) {
     if (newSize > CAPACITY_MAX) {
         return false;
     }
-    uint16_t oldLen = len();
+    unsigned int oldLen = len();
     char *newbuffer = (char *)realloc(isSSO() ? nullptr : wbuffer(), newSize);
     if (newbuffer) {
         size_t oldSize = capacity() + 1; // include NULL.
@@ -220,8 +217,8 @@ String &String::copy(const char *cstr, unsigned int length) {
         invalidate();
         return *this;
     }
+    memmove_P(wbuffer(), cstr, length);
     setLen(length);
-    memmove_P(wbuffer(), cstr, length + 1);
     return *this;
 }
 
@@ -230,8 +227,8 @@ String &String::copy(const __FlashStringHelper *pstr, unsigned int length) {
         invalidate();
         return *this;
     }
+    memcpy_P(wbuffer(), (PGM_P)pstr, length); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
     setLen(length);
-    memcpy_P(wbuffer(), (PGM_P)pstr, length + 1); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
     return *this;
 }
 
@@ -282,15 +279,15 @@ bool String::concat(const String &s) {
     // realloc'ing the buffer and moving s.buffer in the method called
     if (&s == this) {
         unsigned int newlen = 2 * len();
-        if (!s.buffer())
+        if (!buffer())
             return false;
-        if (s.len() == 0)
+        if (len() == 0)
             return true;
         if (!reserve(newlen))
             return false;
-        memmove_P(wbuffer() + len(), buffer(), len());
+        char *writeTo = wbuffer();
+        memmove_P(writeTo + len(), writeTo, len());
         setLen(newlen);
-        wbuffer()[newlen] = 0;
         return true;
     } else {
         return concat(s.buffer(), s.len());
@@ -305,9 +302,8 @@ bool String::concat(const char *cstr, unsigned int length) {
         return true;
     if (!reserve(newlen))
         return false;
-    memmove_P(wbuffer() + len(), cstr, length + 1);
+    memmove_P(wbuffer() + len(), cstr, length);
     setLen(newlen);
-    wbuffer()[newlen] = 0;
     return true;
 }
 
@@ -371,15 +367,14 @@ bool String::concat(double num) {
 }
 
 bool String::concat(const __FlashStringHelper *str) {
+    unsigned int length = strlen_P((PGM_P)str), newlen = len() + length;
     if (!str)
         return false;
-    int length = strlen_P((PGM_P)str);
     if (length == 0)
         return true;
-    unsigned int newlen = len() + length;
     if (!reserve(newlen))
         return false;
-    memcpy_P(wbuffer() + len(), (PGM_P)str, length + 1);
+    memcpy_P(wbuffer() + len(), (PGM_P)str, length);
     setLen(newlen);
     return true;
 }
@@ -398,12 +393,10 @@ String &String::insert(size_t position, const char *other, size_t other_length) 
         return *this;
 
     auto left = len - position;
-    setLen(total);
-
     auto *start = wbuffer() + position;
     memmove(start + other_length, start, left);
     memmove_P(start, other, other_length);
-    wbuffer()[total] = '\0';
+    setLen(total);
 
     return *this;
 }
@@ -414,8 +407,7 @@ String &String::insert(size_t position, const __FlashStringHelper *other) {
 }
 
 String &String::insert(size_t position, char other) {
-    char tmp[2] { other, '\0' };
-    return insert(position, tmp, 1);
+    return insert(position, &other, 1);
 }
 
 String &String::insert(size_t position, const char *other) {
@@ -565,6 +557,14 @@ bool String::startsWith(const String &s2) const {
     return startsWith(s2, 0);
 }
 
+bool String::startsWith(const char *prefix) const {
+    return this->startsWith(String(prefix));
+}
+
+bool String::startsWith(const __FlashStringHelper *prefix) const {
+    return this->startsWith(String(prefix));
+}
+
 bool String::startsWith(const String &s2, unsigned int offset) const {
     if (offset > (unsigned)(len() - s2.len()) || !buffer() || !s2.buffer())
         return false;
@@ -575,6 +575,14 @@ bool String::endsWith(const String &s2) const {
     if (len() < s2.len() || !buffer() || !s2.buffer())
         return false;
     return strcmp(&buffer()[len() - s2.len()], s2.buffer()) == 0;
+}
+
+bool String::endsWith(const char *suffix) const {
+    return this->endsWith(String(suffix));
+}
+
+bool String::endsWith(const __FlashStringHelper *suffix) const {
+    return this->endsWith(String(suffix));
 }
 
 /*********************************************/
@@ -684,16 +692,12 @@ String String::substring(unsigned int left, unsigned int right) const {
         right = left;
         left = temp;
     }
-    String out;
-    if (left >= len())
-        return out;
+    if (left > len())
+        left = len();
     if (right > len())
         right = len();
-    char *writeTo = wbuffer();
-    char tempchar = writeTo[right]; // save the replaced character
-    writeTo[right] = '\0';
-    out = writeTo + left; // pointer arithmetic
-    writeTo[right] = tempchar; // restore character
+    String out;
+    out.concat(buffer() + left, right - left);
     return out;
 }
 
@@ -702,41 +706,41 @@ String String::substring(unsigned int left, unsigned int right) const {
 /*********************************************/
 
 void String::replace(char find, char replace) {
-    if (!buffer())
-        return;
-    for (char *p = wbuffer(); *p; p++) {
-        if (*p == find)
-            *p = replace;
+    for (auto &c : *this) {
+        if (c == find)
+            c = replace;
     }
 }
 
 void String::replace(const String &find, const String &replace) {
-    if (len() == 0 || find.len() == 0)
+    unsigned int find_len = find.len(), replace_len = replace.len();
+    const char *find_buffer = find.buffer(), *replace_buffer = replace.buffer();
+    if (len() == 0 || find_len == 0)
         return;
-    int diff = replace.len() - find.len();
+    int diff = replace_len - find_len;
     char *readFrom = wbuffer();
     char *foundAt;
     if (diff == 0) {
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            memmove_P(foundAt, replace.buffer(), replace.len());
-            readFrom = foundAt + replace.len();
+        while ((foundAt = strstr(readFrom, find_buffer)) != NULL) {
+            memmove_P(foundAt, replace_buffer, replace_len);
+            readFrom = foundAt + replace_len;
         }
     } else if (diff < 0) {
         char *writeTo = wbuffer();
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
+        while ((foundAt = strstr(readFrom, find_buffer)) != NULL) {
             unsigned int n = foundAt - readFrom;
             memmove_P(writeTo, readFrom, n);
             writeTo += n;
-            memmove_P(writeTo, replace.buffer(), replace.len());
-            writeTo += replace.len();
-            readFrom = foundAt + find.len();
+            memmove_P(writeTo, replace_buffer, replace_len);
+            writeTo += replace_len;
+            readFrom = foundAt + find_len;
             setLen(len() + diff);
         }
         memmove_P(writeTo, readFrom, strlen(readFrom) + 1);
     } else {
         unsigned int size = len(); // compute size needed for result
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            readFrom = foundAt + find.len();
+        while ((foundAt = strstr(readFrom, find_buffer)) != NULL) {
+            readFrom = foundAt + find_len;
             size += diff;
         }
         if (size == len())
@@ -745,64 +749,75 @@ void String::replace(const String &find, const String &replace) {
             return; // XXX: tell user!
         int index = len() - 1;
         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
-            readFrom = wbuffer() + index + find.len();
+            readFrom = wbuffer() + index + find_len;
             memmove_P(readFrom + diff, readFrom, len() - (readFrom - buffer()));
             int newLen = len() + diff;
-            memmove_P(wbuffer() + index, replace.buffer(), replace.len());
+            memmove_P(wbuffer() + index, replace_buffer, replace_len);
             setLen(newLen);
-            wbuffer()[newLen] = 0;
             index--;
         }
     }
 }
 
+void String::replace(const char *find, const String &replace) {
+    this->replace(String(find), replace);
+}
+
+void String::replace(const __FlashStringHelper *find, const String &replace) {
+    this->replace(String(find), replace);
+}
+
+void String::replace(const char *find, const char *replace) {
+    this->replace(String(find), String(replace));
+}
+
+void String::replace(const __FlashStringHelper *find, const char *replace) {
+    this->replace(String(find), String(replace));
+}
+
+void String::replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
+    this->replace(String(find), String(replace));
+}
+
 void String::remove(unsigned int index, unsigned int count) {
-    if (index >= len()) {
-        return;
-    }
-    if (count <= 0) {
+    if (count == 0 || index >= len()) {
         return;
     }
     if (count > len() - index) {
         count = len() - index;
     }
-    char *writeTo = wbuffer() + index;
     unsigned int newlen = len() - count;
+    char *writeTo = wbuffer();
+    memmove_P(writeTo + index, writeTo + index + count, newlen - index);
     setLen(newlen);
-    memmove_P(writeTo, wbuffer() + index + count, newlen - index);
-    wbuffer()[newlen] = 0;
 }
 
 void String::toLowerCase(void) {
-    if (!buffer())
-        return;
-    for (char *p = wbuffer(); *p; p++) {
-        *p = tolower(*p);
+    for (auto &c : *this) {
+        c = tolower(c);
     }
 }
 
 void String::toUpperCase(void) {
-    if (!buffer())
-        return;
-    for (char *p = wbuffer(); *p; p++) {
-        *p = toupper(*p);
+    for (auto &c : *this) {
+        c = toupper(c);
     }
 }
 
 void String::trim(void) {
-    if (!buffer() || len() == 0)
+    char *writeTo = wbuffer();
+    if (!writeTo || len() == 0)
         return;
-    char *begin = wbuffer();
+    char *begin = writeTo;
     while (isspace(*begin))
         begin++;
-    char *end = wbuffer() + len() - 1;
+    char *end = writeTo + len() - 1;
     while (isspace(*end) && end >= begin)
         end--;
     unsigned int newlen = end + 1 - begin;
+    if (begin > writeTo)
+        memmove_P(writeTo, begin, newlen);
     setLen(newlen);
-    if (begin > buffer())
-        memmove_P(wbuffer(), begin, newlen);
-    wbuffer()[newlen] = 0;
 }
 
 /*********************************************/

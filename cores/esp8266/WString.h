@@ -84,7 +84,7 @@ class String {
         // is left unchanged).  reserve(0), if successful, will validate an
         // invalid string (i.e., "if (s)" will be true afterwards)
         bool reserve(unsigned int size);
-        unsigned int length(void) const {
+        unsigned int length(void) const __attribute__((flatten)) {
             return buffer() ? len() : 0;
         }
         void clear(void) {
@@ -161,37 +161,29 @@ class String {
         bool equalsIgnoreCase(const String &s) const;
         unsigned char equalsConstantTime(const String &s) const;
         bool startsWith(const String &prefix) const;
-        bool startsWith(const char *prefix) const {
-            return this->startsWith(String(prefix));
-        }
-        bool startsWith(const __FlashStringHelper *prefix) const {
-            return this->startsWith(String(prefix));
-        }
+        bool startsWith(const char *prefix) const;
+        bool startsWith(const __FlashStringHelper *prefix) const;
         bool startsWith(const String &prefix, unsigned int offset) const;
         bool endsWith(const String &suffix) const;
-        bool endsWith(const char *suffix) const {
-            return this->endsWith(String(suffix));
-        }
-        bool endsWith(const __FlashStringHelper *suffix) const {
-            return this->endsWith(String(suffix));
-        }
+        bool endsWith(const char *suffix) const;
+        bool endsWith(const __FlashStringHelper *suffix) const;
 
         // character access
         char charAt(unsigned int index) const {
             return operator [](index);
         }
-        void setCharAt(unsigned int index, char c);
-        char operator [](unsigned int index) const;
-        char &operator [](unsigned int index);
+        void setCharAt(unsigned int index, char c) __attribute__((flatten));
+        char operator [](unsigned int index) const __attribute__((flatten));
+        char &operator [](unsigned int index) __attribute__((flatten));
         void getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index = 0) const;
         void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
-            getBytes((unsigned char *) buf, bufsize, index);
+            getBytes((unsigned char *)buf, bufsize, index);
         }
         const char *c_str() const { return buffer(); }
         char *begin() { return wbuffer(); }
-        char *end() { return wbuffer() + length(); }
+        char *end() __attribute__((flatten)) { return wbuffer() + length(); }
         const char *begin() const { return c_str(); }
-        const char *end() const { return c_str() + length(); }
+        const char *end() const __attribute__((flatten)) { return c_str() + length(); }
 
         // search
         int indexOf(char ch, unsigned int fromIndex = 0) const;
@@ -210,23 +202,13 @@ class String {
         String substring(unsigned int beginIndex, unsigned int endIndex) const;
 
         // modification
-        void replace(char find, char replace);
+        void replace(char find, char replace) __attribute__((flatten));
         void replace(const String &find, const String &replace);
-        void replace(const char *find, const String &replace) {
-            this->replace(String(find), replace);
-        }
-        void replace(const __FlashStringHelper *find, const String &replace) {
-            this->replace(String(find), replace);
-        }
-        void replace(const char *find, const char *replace) {
-            this->replace(String(find), String(replace));
-        }
-        void replace(const __FlashStringHelper *find, const char *replace) {
-            this->replace(String(find), String(replace));
-        }
-        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
-            this->replace(String(find), String(replace));
-        }
+        void replace(const char *find, const String &replace);
+        void replace(const __FlashStringHelper *find, const String &replace);
+        void replace(const char *find, const char *replace);
+        void replace(const __FlashStringHelper *find, const char *replace);
+        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace);
         // Pass the biggest integer if the count is not specified.
         // The remove method below will take care of truncating it at the end of the string.
         void remove(unsigned int index, unsigned int count = (unsigned int)-1);
@@ -267,8 +249,11 @@ class String {
             if (isSSO()) {
                 setSSO(true); // Avoid emitting of bitwise EXTRACT-AND-OR ops (store-merging optimization)
                 sso.len = len;
-            } else
+                sso.buff[len] = 0;
+            } else {
                 ptr.len = len;
+                ptr.buff[len] = 0;
+            }
         }
         void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
         void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
