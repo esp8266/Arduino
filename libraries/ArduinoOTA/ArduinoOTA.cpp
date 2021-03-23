@@ -122,7 +122,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
   
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
   if(_useMDNS) {
-    MDNS.begin(_hostname.c_str());
+    if (!MDNS.isRunning()) MDNS.begin(_hostname.c_str());
 
     if (_password.length()) {
       MDNS.enableArduino(_port, true);
