@@ -179,12 +179,16 @@ public:
 
     virtual int read() override
     {
-        return _peekPointer < _size ? _buffer[_peekPointer++] : -1;
+        //if (_byteAddressable)
+        //    return _peekPointer < _size ? _buffer[_peekPointer++] : -1;
+        return _peekPointer < _size ? pgm_read_byte(&_buffer[_peekPointer++]) : -1;
     }
 
     virtual int peek() override
     {
-        return _peekPointer < _size ? _buffer[_peekPointer] : -1;
+        //if (_byteAddressable)
+        //    return _peekPointer < _size ? _buffer[_peekPointer] : -1;
+        return _peekPointer < _size ? pgm_read_byte(&_buffer[_peekPointer]) : -1;
     }
 
     virtual size_t readBytes(char* buffer, size_t len) override
