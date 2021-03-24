@@ -179,15 +179,13 @@ public:
 
     virtual int read() override
     {
-        //if (_byteAddressable)
-        //    return _peekPointer < _size ? _buffer[_peekPointer++] : -1;
+        // valid with dram, iram and flash
         return _peekPointer < _size ? pgm_read_byte(&_buffer[_peekPointer++]) : -1;
     }
 
     virtual int peek() override
     {
-        //if (_byteAddressable)
-        //    return _peekPointer < _size ? _buffer[_peekPointer] : -1;
+        // valid with dram, iram and flash
         return _peekPointer < _size ? pgm_read_byte(&_buffer[_peekPointer]) : -1;
     }
 
