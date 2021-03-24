@@ -249,6 +249,7 @@ class WiFiClientSecure : public WiFiClient {
     size_t write(Stream& stream) /* Note this is not virtual */ { return _ctx->write(stream); }
     int read(uint8_t *buf, size_t size) override { return _ctx->read(buf, size); }
     int available() override { return _ctx->available(); }
+    int availableForWrite() override { return _ctx->availableForWrite(); }
     int read() override { return _ctx->read(); }
     int peek() override { return _ctx->peek(); }
     size_t peekBytes(uint8_t *buffer, size_t length) override { return _ctx->peekBytes(buffer, length); }
