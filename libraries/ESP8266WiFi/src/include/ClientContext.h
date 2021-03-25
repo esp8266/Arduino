@@ -136,6 +136,10 @@ public:
             ip6_addr_assign_zone(ip_2_ip6(addr), IP6_UNKNOWN, netif_default);
         }
 #endif
+        /*
+         * Based on documentation lwIP, tcp_connect returns immediately with ERR_OK.
+         * If not, there's nothing we can do more
+         */
         err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
         if (err != ERR_OK) {
             return 0;
@@ -143,16 +147,24 @@ public:
         _connect_pending = true;
         _op_start_time = millis();
         for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-               // will resume on timeout or when _connected or _notify_error fires
+            // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
+            delay(1);
+            // will resume on timeout or when _connected or _notify_error fires
         }
         _connect_pending = false;
+        /*
+         * Based on documentation lwIP, if there's an error during initial connection
+         * the _pcb is deallocated
+         */
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
             return 0;
         }
-        if (state() != ESTABLISHED) {
+        /*
+         * _timeout may be very low or even 0, so, in case connection has not been established yet
+         * we don't have to abort the connection. Instead we have to wait for the connection.
+         */
+        if (state() == CLOSED) {
             DEBUGV(":ctmo\r\n");
             abort();
             return 0;
