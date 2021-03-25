@@ -149,8 +149,6 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     _port = port; // Saved for keepConnecting()
     _state = WFC_CONNECTING;
     if (_client) {
-        _client->unref();
-        _client = nullptr;
         stop(); // stop handles client unref
     }
 
@@ -167,8 +165,6 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     _client->setTimeout(_timeout);
     int res = _client->connect(ip, port);
     if (res == 0) {
-        _client->unref();
-        _client = nullptr;
         return 0;
     }
 
@@ -328,6 +324,8 @@ bool WiFiClient::stop(unsigned int maxWaitMs)
     bool ret = flush(maxWaitMs); // virtual, may be ssl's
     if (_client->close() != ERR_OK)
         ret = false;
+    _client->unref();
+    _client = nullptr;
     _state = WFC_DISCONNECTED;
     return ret;
 }
