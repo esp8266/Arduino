@@ -58,6 +58,8 @@ class WiFiClientSecureCtx : public WiFiClient {
     void flush() override { (void)flush(0); }
     void stop() override { (void)stop(0); }
 
+    int availableForWrite() override;
+
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _session = session; }
 

@@ -263,6 +263,27 @@ uint8_t WiFiClientSecureCtx::connected() {
   return false;
 }
 
+int WiFiClientSecureCtx::availableForWrite () {
+  // code taken from ::_write()
+  if (!connected() || !_handshake_done) {
+    return 0;
+  }
+  // Get BearSSL to a state where we can send
+  if (_run_until(BR_SSL_SENDAPP) < 0) {
+    return 0;
+  }
+  if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
+    size_t sendapp_len;
+    (void)br_ssl_engine_sendapp_buf(_eng, &sendapp_len);
+    // We want to call br_ssl_engine_sendapp_ack(0) but 0 is forbidden (bssl doc).
+    // After checking br_ssl_engine_sendapp_buf() src code,
+    // it seems that it is OK to not call ack when the buffer is left untouched.
+    //forbidden: br_ssl_engine_sendapp_ack(_eng, 0);
+    return (int)sendapp_len;
+  }
+  return 0;
+}
+
 size_t WiFiClientSecureCtx::_write(const uint8_t *buf, size_t size, bool pmem) {
   size_t sent_bytes = 0;
 
