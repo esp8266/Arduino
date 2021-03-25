@@ -211,23 +211,30 @@ bool WiFiClientSecureCtx::flush(unsigned int maxWaitMs) {
 }
 
 int WiFiClientSecureCtx::connect(IPAddress ip, uint16_t port) {
+  if (!_has_name) {
+    _host.clear();
+  }
   if (!WiFiClient::connect(ip, port)) {
-    return 0;
-  }
-  return _connectSSL(nullptr);
-}
-
-int WiFiClientSecureCtx::connect(const char* name, uint16_t port) {
-  IPAddress remote_addr;
-  if (!WiFi.hostByName(name, remote_addr)) {
-    DEBUG_BSSL("connect: Name lookup failure\n");
-    return 0;
-  }
-  if (!WiFiClient::connect(remote_addr, port)) {
+    _calculateState();
     DEBUG_BSSL("connect: Unable to connect TCP socket\n");
     return 0;
   }
-  return _connectSSL(name);
+  if (!_has_name) {
+    _connectSSL(nullptr);
+  }
+  return connected();
+}
+
+int WiFiClientSecureCtx::connect(const char* name, uint16_t port) {
+  _has_name = true;
+  if (!WiFiClient::connect(name, port)) {
+    _calculateState(); // CONNECTING or DISCONNECTED?
+    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
+    return 0;
+  }
+  _has_name = false;
+  _connectSSL(_host.c_str());
+  return connected();
 }
 
 int WiFiClientSecureCtx::connect(const String& host, uint16_t port) {
@@ -257,6 +264,8 @@ bool WiFiClientSecureCtx::_clientConnected() {
 uint8_t WiFiClientSecureCtx::connected() {
   if (available()) {
     return true;
+  } else {
+    return _calculateState() == WFC_CONNECTED;
   }
 }
 
