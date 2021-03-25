@@ -253,14 +253,48 @@ void WiFiClientSecureCtx::_freeSSL() {
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
-  return (_client && _client->state() == ESTABLISHED);
+  return WiFiClient::connected();
 }
 
 uint8_t WiFiClientSecureCtx::connected() {
-  if (available() || (_clientConnected() && _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED))) {
+  if (available()) {
     return true;
   }
-  return false;
+}
+
+uint8_t WiFiClientSecureCtx::connecting() {
+  return _calculateState() == WFC_CONNECTING;
+}
+
+uint8_t WiFiClientSecureCtx::disconnected() {
+  return _calculateState() == WFC_DISCONNECTED;
+}
+
+// Calculate the current state in base of WiFiClient state
+uint8_t WiFiClientSecureCtx::_calculateState() {
+  uint8_t clientState = WiFiClient::_calculateState();
+  if (clientState == WFC_DISCONNECTED) {
+    _state = WFC_DISCONNECTED;
+  } else if (clientState == WFC_CONNECTING) {
+    _state = WFC_CONNECTING;
+  } else if (clientState == WFC_CONNECTED) {
+    if (_ssl_connected()) {
+      _state = WFC_CONNECTED;
+    } else {
+      _state = WFC_CONNECTING;
+    }
+  }
+  return _state;
+}
+
+// Continue to connecting in case of async connection
+bool WiFiClientSecureCtx::keepConnecting() {
+  WiFiClient::keepConnecting();
+  uint8_t clientState = WiFiClient::_calculateState();
+  if (clientState == WFC_CONNECTED && !_ssl_connected()) {
+    _connectSSL(_host.isEmpty() ? nullptr : _host.c_str());
+  }
+  return _calculateState() == WFC_CONNECTED;
 }
 
 int WiFiClientSecureCtx::availableForWrite () {
@@ -608,6 +642,10 @@ bool WiFiClientSecureCtx::_wait_for_handshake() {
     optimistic_yield(1000);
   }
   return _handshake_done;
+}
+
+bool WiFiClientSecureCtx::_ssl_connected() {
+  return _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED);
 }
 
 static uint8_t htoi (unsigned char c)

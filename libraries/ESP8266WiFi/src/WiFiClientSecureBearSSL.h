@@ -42,8 +42,11 @@ class WiFiClientSecureCtx : public WiFiClient {
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
+    bool keepConnecting() override;
 
     uint8_t connected() override;
+    uint8_t connecting() override;
+    uint8_t disconnected() override;
     size_t write(const uint8_t *buf, size_t size) override;
     size_t write_P(PGM_P buf, size_t size) override;
     size_t write(Stream& stream); // Note this is not virtual
@@ -142,6 +145,7 @@ class WiFiClientSecureCtx : public WiFiClient {
 
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
+    uint8_t _calculateState();
 
   private:
     void _clear();
@@ -165,6 +169,9 @@ class WiFiClientSecureCtx : public WiFiClient {
     int _iobuf_out_size;
     bool _handshake_done;
     bool _oom_err;
+
+    bool _has_name = false;
+    uint8_t _state;
 
     // Optional storage space pointer for session parameters
     // Will be used on connect and updated on close
@@ -193,6 +200,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     int _run_until(unsigned target, bool blocking = true);
     size_t _write(const uint8_t *buf, size_t size, bool pmem);
     bool _wait_for_handshake(); // Sets and return the _handshake_done after connecting
+    bool _ssl_connected(); // SSL layer connected?
 
     // Optional client certificate
     const X509List *_chain;
@@ -242,8 +250,11 @@ class WiFiClientSecure : public WiFiClient {
     int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }
     int connect(const String& host, uint16_t port) override { return _ctx->connect(host, port); }
     int connect(const char* name, uint16_t port) override { return _ctx->connect(name, port); }
+    bool keepConnecting() override { return _ctx->keepConnecting(); };
 
     uint8_t connected() override { return _ctx->connected(); }
+    uint8_t connecting() override { return _ctx->connecting(); }
+    uint8_t disconnected() override { return _ctx->disconnected(); }
     size_t write(const uint8_t *buf, size_t size) override { return _ctx->write(buf, size); }
     size_t write_P(PGM_P buf, size_t size) override { return _ctx->write_P(buf, size); }
     size_t write(const char *buf) { return write((const uint8_t*)buf, strlen(buf)); }
