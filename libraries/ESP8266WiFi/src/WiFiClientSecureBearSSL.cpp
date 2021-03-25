@@ -73,7 +73,6 @@ namespace BearSSL {
 
 void WiFiClientSecureCtx::_clear() {
   // TLS handshake may take more than the 5 second default timeout
-  _timeout = 15000;
 
   _sc = nullptr;
   _sc_svr = nullptr;
@@ -249,7 +248,6 @@ void WiFiClientSecureCtx::_freeSSL() {
   _recvapp_len = 0;
   // This connection is toast
   _handshake_done = false;
-  _timeout = 15000;
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
@@ -510,7 +508,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
     return -1;
   }
 
-  esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
+  esp8266::polledTimeout::oneShotMs loopTimeout(15000);
 
   for (int no_work = 0; blocking || no_work < 2;) {
     optimistic_yield(100);
@@ -1230,9 +1228,6 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
   _x509_minimal = nullptr;
   _x509_insecure = nullptr;
   _x509_knownkey = nullptr;
-
-  // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
-  if (ret) _timeout = 5000;
 
   return ret;
 }
