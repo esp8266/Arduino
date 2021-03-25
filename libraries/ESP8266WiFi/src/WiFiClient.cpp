@@ -135,6 +135,7 @@ int WiFiClient::connect(const char* host, uint16_t port)
     if (!WiFi.hostByName(_host.c_str(), _ip, _timeout)) { // If successful, _ip has been set
         return 0;
     }
+    connect(_ip, _port);
     return _calculateState() == WFC_CONNECTED;
 }
 
