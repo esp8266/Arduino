@@ -259,6 +259,8 @@ class WiFiClientSecure : public WiFiClient {
     bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
     void flush() override { (void)flush(0); }
     void stop() override { (void)stop(0); }
+    unsigned long getTimeout() { return _ctx->getTimeout(); }
+    void setTimeout(unsigned long timeout) { _ctx->setTimeout(timeout); }
 
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _ctx->setSession(session); }
