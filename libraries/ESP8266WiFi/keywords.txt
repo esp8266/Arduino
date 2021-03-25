@@ -132,6 +132,9 @@ peekBytes	KEYWORD2
 flush	KEYWORD2
 stop	KEYWORD2
 connected	KEYWORD2
+connecting  KEYWORD2
+keepConnecting  KEYWORD2
+disconnected    KEYWORD2
 bool	KEYWORD2
 remoteIP	KEYWORD2
 remotePort	KEYWORD2
