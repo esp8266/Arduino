@@ -80,6 +80,7 @@ WiFiClient::WiFiClient()
 {
     _timeout = 5000;
     WiFiClient::_add(this);
+    _state = WFC_DISCONNECTED;
 }
 
 WiFiClient::WiFiClient(ClientContext* client)
@@ -88,6 +89,7 @@ WiFiClient::WiFiClient(ClientContext* client)
     _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
+    _state = WFC_DISCONNECTED;
 
     setSync(defaultSync);
     setNoDelay(defaultNoDelay);
@@ -105,6 +107,7 @@ WiFiClient::WiFiClient(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
+    _state = other._state;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -117,6 +120,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
+    _state = other._state;
     if (_client)
         _client->ref();
     return *this;
@@ -128,6 +132,7 @@ int WiFiClient::connect(const char* host, uint16_t port)
     if (WiFi.hostByName(host, remote_addr, _timeout))
     {
         return connect(remote_addr, port);
+    _state = WFC_DNS_ENQUEUED;
     }
     return 0;
 }
@@ -139,6 +144,7 @@ int WiFiClient::connect(const String& host, uint16_t port)
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
+    _state = WFC_CONNECTING;
     if (_client) {
         stop();
         _client->unref();
@@ -319,6 +325,7 @@ bool WiFiClient::stop(unsigned int maxWaitMs)
     bool ret = flush(maxWaitMs); // virtual, may be ssl's
     if (_client->close() != ERR_OK)
         ret = false;
+    _state = WFC_DISCONNECTED;
     return ret;
 }
 

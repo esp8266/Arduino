@@ -42,6 +42,13 @@
 class ClientContext;
 class WiFiServer;
 
+enum state_e_2 {
+  WFC_DISCONNECTED = 0,
+  WFC_DNS_ENQUEUED = 1,
+  WFC_CONNECTING = 2,
+  WFC_CONNECTED = 3
+};
+
 class WiFiClient : public Client, public SList<WiFiClient> {
 protected:
   WiFiClient(ClientContext* client);
@@ -148,6 +155,7 @@ protected:
 
   ClientContext* _client;
   static uint16_t _localPort;
+  uint8_t _state;
 };
 
 #endif
