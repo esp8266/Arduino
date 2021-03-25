@@ -76,7 +76,7 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
 WiFiClient::WiFiClient()
-: _client(0)
+: _client(nullptr)
 {
     _timeout = 5000;
     WiFiClient::_add(this);
@@ -129,11 +129,11 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 
 int WiFiClient::connect(const char* host, uint16_t port)
 {
-    IPAddress remote_addr;
-    if (WiFi.hostByName(host, remote_addr, _timeout))
-    {
-        return connect(remote_addr, port);
+    _host = host; // Saved for keepConnecting()
+    _port = port; // Saved for keepConnecting()
     _state = WFC_DNS_ENQUEUED;
+    if (!WiFi.hostByName(_host.c_str(), _ip, _timeout)) { // If successful, _ip has been set
+        return 0;
     }
     return _calculateState() == WFC_CONNECTED;
 }
@@ -145,11 +145,13 @@ int WiFiClient::connect(const String& host, uint16_t port)
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
+    _ip = ip; // Saved for keepConnecting()
+    _port = port; // Saved for keepConnecting()
     _state = WFC_CONNECTING;
     if (_client) {
-        stop();
         _client->unref();
         _client = nullptr;
+        stop(); // stop handles client unref
     }
 
     tcp_pcb* pcb = tcp_new();

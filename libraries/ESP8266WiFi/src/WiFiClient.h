@@ -161,6 +161,9 @@ protected:
   ClientContext* _client;
   static uint16_t _localPort;
   uint8_t _state;
+  String _host;
+  IPAddress _ip;
+  uint16_t _port;
 };
 
 #endif
