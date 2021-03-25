@@ -50,7 +50,7 @@ The first parameter of this function is required, remaining four are optional.
 
 Meaning of all parameters is as follows:
 
-- ``ssid`` - character string containing network SSID (max. 31 characters) 
+- ``ssid`` - character string containing network SSID (max. 32 characters) 
 - ``password`` - optional character string with a password. For WPA2-PSK network it should be at least 8 character long. If not specified, the access point will be open for anybody to connect, (max. 63 characters). 
 - ``channel`` - optional parameter to set Wi-Fi channel, from 1 to 13. Default channel = 1. 
 - ``hidden`` - optional parameter, if set to ``true`` will hide SSID. 

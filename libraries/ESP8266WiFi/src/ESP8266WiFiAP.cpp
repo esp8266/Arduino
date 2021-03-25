@@ -54,10 +54,13 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
  * @return equal
  */
 static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0) {
+    if(lhs.ssid_len != rhs.ssid_len) {
         return false;
     }
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0) {
+    if(memcmp(lhs.ssid, rhs.ssid, lhs.ssid_len) != 0) {
+        return false;
+    }
+    if(strncmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password), sizeof(softap_config::password)) != 0) {
         return false;
     }
     if(lhs.channel != rhs.channel) {
@@ -85,7 +88,7 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
 
 /**
  * Set up an access point
- * @param ssid              Pointer to the SSID (max 31 char).
+ * @param ssid              Pointer to the SSID (max 32 char).
  * @param passphrase        For WPA2 min 8 char, for open use NULL (max 63 char).
  * @param channel           WiFi channel number, 1 - 13.
  * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
@@ -99,13 +102,15 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         return false;
     }
 
-    if(!ssid || strlen(ssid) == 0 || strlen(ssid) > 31) {
+    size_t ssid_len = strlen(ssid);
+    if(!ssid || ssid_len == 0 || ssid_len > 32) {
         // fail SSID too long or missing!
         DEBUG_WIFI("[AP] SSID too long or missing!\n");
         return false;
     }
 
-    if(passphrase && strlen(passphrase) > 0 && (strlen(passphrase) > 63 || strlen(passphrase) < 8)) {
+    size_t pass_len = strlen(passphrase);
+    if(passphrase && pass_len > 0 && (pass_len > 63 || pass_len < 8)) {
         // fail passphrase to long or short!
         DEBUG_WIFI("[AP] fail passphrase too long or short!\n");
         return false;
@@ -114,20 +119,24 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     bool ret = true;
 
     struct softap_config conf;
-    strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
-    conf.channel = channel;
-    conf.ssid_len = strlen(ssid);
-    conf.ssid_hidden = ssid_hidden;
-    conf.max_connection = max_connection;
-    conf.beacon_interval = 100;
+    memcpy(reinterpret_cast<char*>(conf.ssid), ssid, ssid_len);
+    if (ssid_len < 32) {
+        conf.ssid[ssid_len] = '\0';
+    }
+    conf.ssid_len = ssid_len;
 
-    if(!passphrase || strlen(passphrase) == 0) {
+    if(!passphrase || pass_len == 0) {
         conf.authmode = AUTH_OPEN;
         *conf.password = 0;
     } else {
         conf.authmode = AUTH_WPA2_PSK;
         strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     }
+
+    conf.channel = channel;
+    conf.ssid_hidden = ssid_hidden;
+    conf.max_connection = max_connection;
+    conf.beacon_interval = 100;
 
     struct softap_config conf_compare;
     if(WiFi._persistent){
@@ -358,25 +367,19 @@ String ESP8266WiFiAPClass::softAPmacAddress(void) {
 String ESP8266WiFiAPClass::softAPSSID() const {
     struct softap_config config;
     wifi_softap_get_config(&config);
-    char* name = reinterpret_cast<char*>(config.ssid);
-    char ssid[sizeof(config.ssid) + 1];
-    memcpy(ssid, name, sizeof(config.ssid));
-    ssid[sizeof(config.ssid)] = '\0';
-
-    return String(ssid);
+    String ssid;
+    ssid.concat(reinterpret_cast<const char*>(config.ssid), config.ssid_len);
+    return ssid;
 }
 
 /**
- * Get the configured(Not-In-Flash) softAP PSK or PASSWORD.
- * @return String psk.
+ * Get the configured(Not-In-Flash) softAP PASSWORD.
+ * @return String password.
  */
 String ESP8266WiFiAPClass::softAPPSK() const {
     struct softap_config config;
     wifi_softap_get_config(&config);
     char* pass = reinterpret_cast<char*>(config.password);
-    char psk[sizeof(config.password) + 1];
-    memcpy(psk, pass, sizeof(config.password));
-    psk[sizeof(config.password)] = '\0';
-
-    return String(psk);
+    pass[sizeof(config.password) - 1] = '\0'; // it is impossible to set PSK through the Arduino API because we only support WPA2
+    return pass;
 }
