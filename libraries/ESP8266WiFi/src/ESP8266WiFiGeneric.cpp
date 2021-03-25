@@ -614,7 +614,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     ip_addr_t addr;
-    aResult = static_cast<uint32_t>(INADDR_NONE);
+    aResult.clear();
 
     if(aResult.fromString(aHostname)) {
         // Host name is a IP address use it!
@@ -641,7 +641,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         }
     }
 
-    if(err != 0) {
+    if (err == ERR_INPROGRESS) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s search in progress!\n", aHostname);
+    } else if(err != 0) {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
     } else {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
@@ -655,7 +657,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 {
     ip_addr_t addr;
     err_t err;
-    aResult = static_cast<uint32_t>(INADDR_NONE);
+    aResult.clear();
 
     if(aResult.fromString(aHostname)) {
         // Host name is a IP address use it!
@@ -691,7 +693,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         }
     }
 
-    if(err != 0) {
+    if (err == ERR_INPROGRESS) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s search in progress!\n", aHostname);
+    } else if(err != 0) {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
     } else {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
