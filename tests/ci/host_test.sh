@@ -10,6 +10,7 @@ cd $TRAVIS_BUILD_DIR/tests/host
 make -j2 FORCE32=0 ssl
 for i in ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient \
 	../../libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation \
+	../../libraries/ESP8266WiFi/examples/ConnectNoTimeout/ConnectNoTimeout \
 	../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer \
 	../../libraries/SD/examples/Files/Files \
 	../../libraries/LittleFS/examples/LittleFS_Timestamp/LittleFS_Timestamp \
