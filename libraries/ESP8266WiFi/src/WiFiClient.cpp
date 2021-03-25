@@ -90,6 +90,7 @@ WiFiClient::WiFiClient(ClientContext* client)
     _client->ref();
     WiFiClient::_add(this);
     _state = WFC_DISCONNECTED;
+    _calculateState();
 
     setSync(defaultSync);
     setNoDelay(defaultNoDelay);
@@ -134,7 +135,7 @@ int WiFiClient::connect(const char* host, uint16_t port)
         return connect(remote_addr, port);
     _state = WFC_DNS_ENQUEUED;
     }
-    return 0;
+    return _calculateState() == WFC_CONNECTED;
 }
 
 int WiFiClient::connect(const String& host, uint16_t port)
@@ -172,7 +173,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     setSync(defaultSync);
     setNoDelay(defaultNoDelay);
 
-    return 1;
+    return _calculateState() == WFC_CONNECTED;
 }
 
 void WiFiClient::setNoDelay(bool nodelay) {
@@ -331,17 +332,53 @@ bool WiFiClient::stop(unsigned int maxWaitMs)
 
 uint8_t WiFiClient::connected()
 {
-    if (!_client || _client->state() == CLOSED)
-        return 0;
+    return _calculateState() == WFC_CONNECTED || available();
+}
 
-    return _client->state() == ESTABLISHED || available();
+uint8_t WiFiClient::connecting()
+{
+    _calculateState();
+    return _state == WFC_DNS_ENQUEUED || _state == WFC_CONNECTING;
+}
+
+uint8_t WiFiClient::disconnected() {
+    return _calculateState() == WFC_DISCONNECTED;
+}
+
+// Calculate state based on class members
+uint8_t WiFiClient::_calculateState() {
+    // If _client then _state must be >= CONNECTING
+    if (!_client) {
+        // Connection lost or not yet initialized
+        // _state must be WFC_DISCONNECTED or WFC_DNS_ENQUEUED
+        if (_state == WFC_CONNECTING || _state == WFC_CONNECTED) {
+            _state = WFC_DISCONNECTED;
+        }
+    } else if (_client->state() == CLOSED || _client->state() > ESTABLISHED) { // CLOSED or CLOSING
+        stop();
+    } else if (_client->state() < ESTABLISHED) {
+        _state = WFC_CONNECTING;
+    } else if (_client->state() == ESTABLISHED) {
+        _state = WFC_CONNECTED;
+    }
+    return _state;
+}
+
+bool WiFiClient::keepConnecting() {
+    if (_state == WFC_DNS_ENQUEUED) {
+        if (!_ip.isSet()) { // Ip not found yet. Ask again
+            WiFi.hostByName(_host.c_str(), _ip, _timeout);
+        }
+        if (_ip.isSet()) { // Ip found from DNS, start connection
+            connect(_ip, _port);
+        }
+    }
+    return _calculateState() == WFC_CONNECTED;
 }
 
 uint8_t WiFiClient::status()
 {
-    if (!_client)
-        return CLOSED;
-    return _client->state();
+    return _calculateState();
 }
 
 WiFiClient::operator bool()

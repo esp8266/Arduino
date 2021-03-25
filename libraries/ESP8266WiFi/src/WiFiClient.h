@@ -63,6 +63,7 @@ public:
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;
   virtual int connect(const String& host, uint16_t port);
+  virtual bool keepConnecting();
   virtual size_t write(uint8_t) override;
   virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);
@@ -86,6 +87,8 @@ public:
   bool flush(unsigned int maxWaitMs);
   bool stop(unsigned int maxWaitMs);
   virtual uint8_t connected() override;
+  virtual uint8_t connecting();
+  virtual uint8_t disconnected();
   virtual operator bool() override;
 
   IPAddress remoteIP();
@@ -152,6 +155,8 @@ protected:
 
   int8_t _connected(void* tpcb, int8_t err);
   void _err(int8_t err);
+
+  uint8_t _calculateState();
 
   ClientContext* _client;
   static uint16_t _localPort;
