@@ -156,6 +156,7 @@ loadCertificate	KEYWORD2
 loadPrivateKey	KEYWORD2
 loadCACert	KEYWORD2
 allowSelfSignedCerts	KEYWORD2
+setSSLVersion	KEYWORD2
 
 #WiFiServer
 hasClient	KEYWORD2
