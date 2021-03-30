@@ -7,6 +7,7 @@
     - Registering multiple networks (at least 1)
     - Connect to WiFi with strongest signal (RSSI)
     - Fall back to connect to next WiFi when a connection failed or lost
+    - Fall back to connect to hidden SSID's which are not reported by WiFi scan
 
     To enable debugging output, select in the Arduino iDE:
     - Tools | Debug Port: Serial
@@ -21,6 +22,9 @@ ESP8266WiFiMulti wifiMulti;
 const uint32_t connectTimeoutMs = 5000;
 
 void setup() {
+  // Don't save WiFi configuration in flash - optional
+  WiFi.persistent(false);
+
   Serial.begin(115200);
   Serial.println("\nESP8266 Multi WiFi example");
 

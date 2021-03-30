@@ -103,6 +103,12 @@ class EspClass {
 
         void reset();
         void restart();
+	/**
+	 * @brief When calling this method the ESP8266 reboots into the UART download mode without
+	 * the need of any external wiring. This is the same mode which can also be entered by
+	 * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
+	 */
+        [[noreturn]] void rebootIntoUartDownloadMode();
 
         uint16_t getVcc();
         uint32_t getChipId();
@@ -216,13 +222,6 @@ class EspClass {
         uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
         /**
-         * @brief Installs VM exception handler to support External memory (Experimental)
-         *
-         * @param none
-         * @return none
-         */
-        void enableVM();
-        /**
          * @brief Push current Heap selection and set Heap selection to DRAM.
          *
          * @param none
@@ -252,9 +251,6 @@ class EspClass {
          */
         void resetHeap();
     private:
-#ifdef UMM_HEAP_EXTERNAL
-        bool vmEnabled = false;
-#endif
         /**
          * @brief Replaces @a byteCount bytes of a 4 byte block on flash
          *

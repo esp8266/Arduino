@@ -502,6 +502,18 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
 }
 
 /**
+ * Get the broadcast ip address.
+ * @return IPAddress Bradcast IP
+ */
+IPAddress ESP8266WiFiSTAClass::broadcastIP()
+{
+    struct ip_info ip;
+    wifi_get_ip_info(STATION_IF, &ip);
+
+    return IPAddress(ip.ip.addr | ~(ip.netmask.addr));
+}
+
+/**
  * Return Connection status.
  * @return one of the value defined in wl_status_t
  *

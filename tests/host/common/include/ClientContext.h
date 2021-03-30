@@ -24,7 +24,7 @@
 class ClientContext;
 class WiFiClient;
 
-#include <include/DataSource.h>
+#include <assert.h>
 #include <coredecls.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
@@ -209,7 +209,7 @@ public:
         mockverbose("TODO: ClientContext::discard_received()\n");
     }
 
-    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
+    bool wait_until_acked(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         (void)max_wait_ms;
         return true;
@@ -296,6 +296,33 @@ public:
     {
         mockverbose("TODO ClientContext::setSync()\n");
         _sync = sync;
+    }
+
+    // return a pointer to available data buffer (size = peekAvailable())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer ()
+    {
+        return _inbuf;
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t peekAvailable ()
+    {
+        ssize_t ret = mockPeekBytes(_sock, nullptr, 0, 0, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return _inbufsize;
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume)
+    {
+        assert(consume <= _inbufsize);
+        memmove(_inbuf, _inbuf + consume, _inbufsize - consume);
+        _inbufsize -= consume;
     }
 
 private:

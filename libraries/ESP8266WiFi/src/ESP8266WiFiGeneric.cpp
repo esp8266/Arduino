@@ -103,7 +103,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeConnected(std::function<v
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_CONNECTED, [f](System_Event_t* e) {
         auto& src = e->event_info.connected;
         WiFiEventStationModeConnected dst;
-        dst.ssid = String(reinterpret_cast<char*>(src.ssid));
+        dst.ssid.concat(reinterpret_cast<char*>(src.ssid), src.ssid_len);
         memcpy(dst.bssid, src.bssid, 6);
         dst.channel = src.channel;
         f(dst);
@@ -117,7 +117,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDisconnected(std::functio
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DISCONNECTED, [f](System_Event_t* e){
         auto& src = e->event_info.disconnected;
         WiFiEventStationModeDisconnected dst;
-        dst.ssid = String(reinterpret_cast<char*>(src.ssid));
+        dst.ssid.concat(reinterpret_cast<char*>(src.ssid), src.ssid_len);
         memcpy(dst.bssid, src.bssid, 6);
         dst.reason = static_cast<WiFiDisconnectReason>(src.reason);
         f(dst);
@@ -824,11 +824,10 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
                 }
             }
         }
-        // state->state.fwconfig.bssid is not real bssid (it's what user may have provided when bssid_set==1)
         auto beginResult = WiFi.begin((const char*)state->state.fwconfig.ssid,
                        (const char*)state->state.fwconfig.password,
                        state->state.channel,
-                       nullptr/*(const uint8_t*)state->state.fwconfig.bssid*/,  // <- try with gw's mac address?
+                       state->state.fwconfig.bssid,
                        true);
         if (beginResult == WL_CONNECT_FAILED)
         {

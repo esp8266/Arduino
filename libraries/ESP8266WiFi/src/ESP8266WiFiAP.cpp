@@ -224,6 +224,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     }
 
     struct dhcps_lease dhcp_lease;
+    dhcp_lease.enable = true;
     IPAddress ip = local_ip;
     ip[3] += 99;
     dhcp_lease.start_ip.addr = ip.v4();
@@ -264,8 +265,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
             DEBUG_WIFI("[APConfig] IP config Invalid?!\n");
             ret = false;
         } else if(local_ip.v4() != info.ip.addr) {
-            ip = info.ip.addr;
-            DEBUG_WIFI("[APConfig] IP config not set correct?! new IP: %s\n", ip.toString().c_str());
+            DEBUG_WIFI("[APConfig] IP config not set correct?! new IP: %s\n", IPAddress(info.ip.addr).toString().c_str());
             ret = false;
         }
     } else {

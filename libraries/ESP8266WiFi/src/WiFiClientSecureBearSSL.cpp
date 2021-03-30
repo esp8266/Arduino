@@ -93,6 +93,8 @@ void WiFiClientSecureCtx::_clear() {
   _session = nullptr;
   _cipher_list = nullptr;
   _cipher_cnt = 0;
+  _tls_min = BR_TLS10;
+  _tls_max = BR_TLS12;
 }
 
 void WiFiClientSecureCtx::_clearAuthenticationSettings() {
@@ -125,7 +127,7 @@ WiFiClientSecureCtx::~WiFiClientSecureCtx() {
 WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
                                      const X509List *chain, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -133,6 +135,8 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
   _iobuf_out_size = iobuf_out_size;
   _client = client;
   _client->ref();
+  _tls_min = tls_min;
+  _tls_max = tls_max;
   if (!_connectSSLServerRSA(chain, sk, cache, client_CA_ta)) {
     _client->unref();
     _client = nullptr;
@@ -144,7 +148,7 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
                                      const X509List *chain,
                                      unsigned cert_issuer_key_type, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -152,6 +156,8 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
   _iobuf_out_size = iobuf_out_size;
   _client = client;
   _client->ref();
+  _tls_min = tls_min;
+  _tls_max = tls_max;
   if (!_connectSSLServerEC(chain, cert_issuer_key_type, sk, cache, client_CA_ta)) {
     _client->unref();
     _client = nullptr;
@@ -257,6 +263,27 @@ uint8_t WiFiClientSecureCtx::connected() {
   return false;
 }
 
+int WiFiClientSecureCtx::availableForWrite () {
+  // code taken from ::_write()
+  if (!connected() || !_handshake_done) {
+    return 0;
+  }
+  // Get BearSSL to a state where we can send
+  if (_run_until(BR_SSL_SENDAPP) < 0) {
+    return 0;
+  }
+  if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
+    size_t sendapp_len;
+    (void)br_ssl_engine_sendapp_buf(_eng, &sendapp_len);
+    // We want to call br_ssl_engine_sendapp_ack(0) but 0 is forbidden (bssl doc).
+    // After checking br_ssl_engine_sendapp_buf() src code,
+    // it seems that it is OK to not call ack when the buffer is left untouched.
+    //forbidden: br_ssl_engine_sendapp_ack(_eng, 0);
+    return (int)sendapp_len;
+  }
+  return 0;
+}
+
 size_t WiFiClientSecureCtx::_write(const uint8_t *buf, size_t size, bool pmem) {
   size_t sent_bytes = 0;
 
@@ -360,6 +387,22 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
     return -1;
   }
   return 0; // If we're connected, no error but no read.
+}
+
+// return a pointer to available data buffer (size = peekAvailable())
+// semantic forbids any kind of read() before calling peekConsume()
+const char* WiFiClientSecureCtx::peekBuffer ()
+{
+    return (const char*)_recvapp_buf;
+}
+
+// consume bytes after use (see peekBuffer)
+void WiFiClientSecureCtx::peekConsume (size_t consume)
+{
+    // according to WiFiClientSecureCtx::read:
+    br_ssl_engine_recvapp_ack(_eng, consume);
+    _recvapp_buf = nullptr;
+    _recvapp_len = 0;
 }
 
 int WiFiClientSecureCtx::read() {
@@ -989,6 +1032,17 @@ bool WiFiClientSecureCtx::setCiphers(const std::vector<uint16_t>& list) {
   return setCiphers(&list[0], list.size());
 }
 
+bool WiFiClientSecureCtx::setSSLVersion(uint32_t min, uint32_t max) {
+  if ( ((min != BR_TLS10) && (min != BR_TLS11) && (min != BR_TLS12)) ||
+       ((max != BR_TLS10) && (max != BR_TLS11) && (max != BR_TLS12)) ||
+       (max < min) ) {
+    return false; // Invalid options
+  }
+  _tls_min = min;
+  _tls_max = max;
+  return true;
+}
+
 // Installs the appropriate X509 cert validation method for a client connection
 bool WiFiClientSecureCtx::_installClientX509Validator() {
   if (_use_insecure || _use_fingerprint || _use_self_signed) {
@@ -1094,6 +1148,7 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
     return false;
   }
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+  br_ssl_engine_set_versions(_eng, _tls_min, _tls_max);
 
   // Apply any client certificates, if supplied.
   if (_sk && _sk->isRSA()) {
@@ -1208,6 +1263,7 @@ bool WiFiClientSecureCtx::_connectSSLServerRSA(const X509List *chain,
                                sk ? sk->getRSA() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
                                br_rsa_private_get_default(), br_rsa_pkcs1_sign_get_default());
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+  br_ssl_engine_set_versions(_eng, _tls_min, _tls_max);
   if (cache != nullptr)
     br_ssl_server_set_cache(_sc_svr.get(), cache->getCache());
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
@@ -1254,6 +1310,7 @@ bool WiFiClientSecureCtx::_connectSSLServerEC(const X509List *chain,
                                sk ? sk->getEC() : nullptr, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN,
                                cert_issuer_key_type, br_ssl_engine_get_ec(_eng), br_ecdsa_i15_sign_asn1);
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+  br_ssl_engine_set_versions(_eng, _tls_min, _tls_max);
   if (cache != nullptr)
     br_ssl_server_set_cache(_sc_svr.get(), cache->getCache());
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
