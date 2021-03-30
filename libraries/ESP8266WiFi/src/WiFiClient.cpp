@@ -212,7 +212,8 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    return _client->write(buf, size);
+    StreamConstPtr ptr(buf, size);
+    return _client->write(ptr);
 }
 
 size_t WiFiClient::write(Stream& stream, size_t unused)
@@ -227,8 +228,12 @@ size_t WiFiClient::write(Stream& stream)
     {
         return 0;
     }
-    _client->setTimeout(_timeout);
-    return _client->write(stream);
+    if (stream.hasPeekBufferAPI())
+    {
+        _client->setTimeout(_timeout);
+        return _client->write(stream);
+    }
+    return stream.sendAvailable(this);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -238,7 +243,8 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    return _client->write_P(buf, size);
+    StreamConstPtr nopeek(buf, size);
+    return nopeek.sendAll(this);
 }
 
 int WiFiClient::available()
