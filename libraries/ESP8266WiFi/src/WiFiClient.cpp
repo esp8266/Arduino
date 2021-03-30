@@ -40,6 +40,7 @@ extern "C"
 #include "lwip/netif.h"
 #include <include/ClientContext.h>
 #include "c_types.h"
+#include <StreamDev.h>
 
 uint16_t WiFiClient::_localPort = 0;
 
