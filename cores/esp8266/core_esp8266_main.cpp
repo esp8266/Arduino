@@ -152,7 +152,7 @@ extern "C" void __optimistic_yield(uint32_t interval_us) {
     }
 }
 
-extern "C" void optimistic_yield(uint32_t interval_us) __attribute__ ((alias("__optimistic_yield")));
+extern "C" void optimistic_yield(uint32_t interval_us) __attribute__ ((alias("yield")));
 extern "C" void yield() {
     // at least 1ms between two consecutive yields
     __optimistic_yield(1000);
