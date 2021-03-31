@@ -487,7 +487,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
   esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
 
   for (int no_work = 0; blocking || no_work < 2;) {
-    optimistic_yield(100);
+    optimistic_yield(1000);
 
     if (loopTimeout) {
       DEBUG_BSSL("_run_until: Timeout\n");
