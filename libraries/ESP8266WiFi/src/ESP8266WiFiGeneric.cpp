@@ -418,18 +418,18 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
         DEBUG_WIFI("core: state is useless without SHUTDOWN or RESUME\n");
     }
 
-    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
-        // wifi starts asleep by default
-        wifi_fpm_do_wakeup();
-        wifi_fpm_close();
-    }
-
     if(_persistent){
         if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
             return true;
         }
     } else if(wifi_get_opmode() == (uint8) m){
         return true;
+    }
+
+    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        // wifi starts asleep by default
+        wifi_fpm_do_wakeup();
+        wifi_fpm_close();
     }
 
     bool ret = false;
