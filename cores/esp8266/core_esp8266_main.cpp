@@ -371,7 +371,7 @@ extern "C" void user_init(void) {
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
-    preinit(); // deprecated
+    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi
 
     ets_task(loop_task,
