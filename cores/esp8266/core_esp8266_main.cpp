@@ -39,7 +39,11 @@ extern "C" {
 #include <core_esp8266_non32xfer.h>
 #include "core_esp8266_vm.h"
 
-constexpr auto DelayBetweenRealYield_MS = 1000;
+/*
+    iaμs = 1000000 / (bwMiBitsps / 8 * 1024 * 1024 / packet-size-bytes)
+    => 1114 μs, 1460 bytes, 10Mibits/s
+*/
+constexpr auto DelayBetweenRealYield_usec = 1000;
 
 
 #define LOOP_TASK_PRIORITY 1
@@ -156,12 +160,12 @@ extern "C" void __optimistic_yield(uint32_t interval_us) {
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
     (void)interval_us;
-    __optimistic_yield(DelayBetweenRealYield_MS);
+    __optimistic_yield(DelayBetweenRealYield_usec);
 }
 
 extern "C" void yield() {
     // at least 1ms between two consecutive yields
-    __optimistic_yield(DelayBetweenRealYield_MS);
+    __optimistic_yield(DelayBetweenRealYield_usec);
 }
 
 // Replace ets_intr_(un)lock with nestable versions
