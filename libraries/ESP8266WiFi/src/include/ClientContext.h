@@ -315,7 +315,7 @@ public:
         _rx_buf_offset = 0;
     }
 
-    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
+    bool wait_until_acked(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
         // option 1 done
@@ -352,6 +352,8 @@ public:
             delay(0); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
+                // peer has closed or all bytes are sent and acked
+                // ((TCP_SND_BUF-sndbuf) is the amount of un-acked bytes)
                 break;
             }
         }
@@ -508,7 +510,7 @@ protected:
         } while(true);
 
         if (_sync)
-            wait_until_sent();
+            wait_until_acked();
 
         return _written;
     }

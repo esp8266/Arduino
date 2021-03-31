@@ -211,7 +211,7 @@ public:
         mockverbose("TODO: ClientContext::discard_received()\n");
     }
 
-    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
+    bool wait_until_acked(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         (void)max_wait_ms;
         return true;
