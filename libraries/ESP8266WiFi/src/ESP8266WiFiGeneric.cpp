@@ -426,7 +426,7 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
         return true;
     }
 
-    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+    if (m != WIFI_OFF && wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
         // wifi starts asleep by default
         wifi_fpm_do_wakeup();
         wifi_fpm_close();
