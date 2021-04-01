@@ -385,7 +385,7 @@ String ESP8266WiFiAPClass::softAPPSK() const {
 
     char* ptr = reinterpret_cast<char*>(config.password);
     String psk;
-    psk.concat(ptr, strnlen(ptr, sizeof(config.password));
+    psk.concat(ptr, strnlen(ptr, sizeof(config.password)));
 
     return psk;
 }
