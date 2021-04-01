@@ -89,12 +89,12 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
 /**
  * Set up an access point
  * @param ssid              Pointer to the SSID (max 32 char).
- * @param passphrase        For WPA2 min 8 char, for open use NULL (max 63 char).
+ * @param psk               For WPA2 min 8 char max 64 char, for open use "" or NULL.
  * @param channel           WiFi channel number, 1 - 13.
  * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
  * @param max_connection    Max simultaneous connected clients, 0 - 8. https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832
  */
-bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden, int max_connection) {
+bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection) {
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
@@ -103,16 +103,14 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     }
 
     size_t ssid_len = strlen(ssid);
-    if(!ssid || ssid_len == 0 || ssid_len > 32) {
-        // fail SSID too long or missing!
-        DEBUG_WIFI("[AP] SSID too long or missing!\n");
+    if(ssid_len == 0 || ssid_len > 32) {
+        DEBUG_WIFI("[AP] SSID length %u, too long or missing!\n", ssid_len);
         return false;
     }
 
-    size_t pass_len = strlen(passphrase);
-    if(passphrase && pass_len > 0 && (pass_len > 63 || pass_len < 8)) {
-        // fail passphrase to long or short!
-        DEBUG_WIFI("[AP] fail passphrase too long or short!\n");
+    size_t psk_len = strlen(psk);
+    if(psk_len > 0 && (psk_len > 64 || psk_len < 8)) {
+        DEBUG_WIFI("[AP] fail psk length %u, too long or short!\n", psk_len);
         return false;
     }
 
@@ -121,16 +119,19 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     struct softap_config conf;
     memcpy(reinterpret_cast<char*>(conf.ssid), ssid, ssid_len);
     if (ssid_len < 32) {
-        conf.ssid[ssid_len] = '\0';
+        conf.ssid[ssid_len] = 0;
     }
     conf.ssid_len = ssid_len;
 
-    if(!passphrase || pass_len == 0) {
-        conf.authmode = AUTH_OPEN;
-        *conf.password = 0;
-    } else {
+    if(psk_len) {
         conf.authmode = AUTH_WPA2_PSK;
-        strcpy(reinterpret_cast<char*>(conf.password), passphrase);
+        memcpy(reinterpret_cast<char*>(conf.password), psk, psk_len);
+        if (psk_len < 63) {
+            conf.password[psk_len] = 0;
+        }
+    } else {
+        conf.authmode = AUTH_OPEN;
+        conf.password[0] = 0;
     }
 
     conf.channel = channel;
@@ -190,8 +191,8 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     return ret;
 }
 
-bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& passphrase, int channel, int ssid_hidden, int max_connection) {
-    return softAP(ssid.c_str(), passphrase.c_str(), channel, ssid_hidden, max_connection);
+bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection) {
+    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection);
 }
 
 /**
@@ -367,19 +368,24 @@ String ESP8266WiFiAPClass::softAPmacAddress(void) {
 String ESP8266WiFiAPClass::softAPSSID() const {
     struct softap_config config;
     wifi_softap_get_config(&config);
+
     String ssid;
     ssid.concat(reinterpret_cast<const char*>(config.ssid), config.ssid_len);
+
     return ssid;
 }
 
 /**
- * Get the configured(Not-In-Flash) softAP PASSWORD.
- * @return String password.
+ * Get the configured(Not-In-Flash) softAP PSK.
+ * @return String psk.
  */
 String ESP8266WiFiAPClass::softAPPSK() const {
     struct softap_config config;
     wifi_softap_get_config(&config);
-    char* pass = reinterpret_cast<char*>(config.password);
-    pass[sizeof(config.password) - 1] = '\0'; // it is impossible to set PSK through the Arduino API because we only support WPA2
-    return pass;
+
+    char* ptr = reinterpret_cast<char*>(config.password);
+    String psk;
+    psk.concat(ptr, strnlen(ptr, sizeof(config.password));
+
+    return psk;
 }
