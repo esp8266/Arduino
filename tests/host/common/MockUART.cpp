@@ -407,26 +407,29 @@ uart_uninit(uart_t* uart)
 	free(uart);
 }
 
-void
+bool
 uart_swap(uart_t* uart, int tx_pin)
 {
 	(void) uart;
 	(void) tx_pin;
+	return true;
 }
 
-void
+bool
 uart_set_tx(uart_t* uart, int tx_pin)
 {
 	(void) uart;
 	(void) tx_pin;
+	return true;
 }
 
-void
+bool
 uart_set_pins(uart_t* uart, int tx, int rx)
 {
 	(void) uart;
 	(void) tx;
 	(void) rx;
+	return true;
 }
 
 bool
