@@ -19,12 +19,12 @@ class ExampleClass {
     int _pin, _duration;
     Ticker _myTicker;
 
-    void classBlink() {
+    IRAM_ATTR void classBlink() {
       digitalWrite(_pin, !digitalRead(_pin));
     }
 };
 
-void staticBlink() {
+IRAM_ATTR void staticBlink() {
   digitalWrite(LED2, !digitalRead(LED2));
 }
 
@@ -32,7 +32,7 @@ void scheduledBlink() {
   digitalWrite(LED3, !digitalRead(LED2));
 }
 
-void parameterBlink(int p) {
+IRAM_ATTR void parameterBlink(int p) {
   digitalWrite(p, !digitalRead(p));
 }
 
@@ -55,7 +55,7 @@ void setup() {
   parameterTicker.attach_ms(100, std::bind(parameterBlink, LED4));
 
   pinMode(LED5, OUTPUT);
-  lambdaTicker.attach_ms(100, []() {
+  lambdaTicker.attach_ms_scheduled_accurate(100, []() {
     digitalWrite(LED5, !digitalRead(LED5));
   });
 }

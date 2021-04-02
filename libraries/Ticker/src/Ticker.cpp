@@ -63,7 +63,7 @@ bool Ticker::active() const
     return _timer;
 }
 
-void Ticker::_static_callback(void* arg)
+IRAM_ATTR void Ticker::_static_callback(void* arg)
 {
     Ticker* _this = reinterpret_cast<Ticker*>(arg);
     if (_this && _this->_callback_function)

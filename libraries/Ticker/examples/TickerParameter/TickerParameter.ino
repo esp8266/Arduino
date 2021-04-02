@@ -17,19 +17,19 @@ Ticker tickerSetLow;
 Ticker tickerSetHigh;
 Ticker tickerSetChar;
 
-void setPinLow() {
+IRAM_ATTR void setPinLow() {
   digitalWrite(LED_BUILTIN, 0);
 }
 
-void setPinHigh() {
+IRAM_ATTR void setPinHigh() {
   digitalWrite(LED_BUILTIN, 1);
 }
 
-void setPin(int state) {
+IRAM_ATTR void setPin(int state) {
   digitalWrite(LED_BUILTIN, state);
 }
 
-void setPinChar(char state) {
+IRAM_ATTR void setPinChar(char state) {
   digitalWrite(LED_BUILTIN, state);
 }
 
