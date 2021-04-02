@@ -402,7 +402,7 @@ bool ESP8266WiFiGenericClass::getPersistent(){
  * @param m WiFiMode_t
  */
 bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
-    if (m & ~(WIFI_STA | WIFI_AP))
+    if (m & ~(WIFI_STA | WIFI_AP)) {
         // any other bits than legacy disallowed
         return false;
     }
