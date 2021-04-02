@@ -401,21 +401,10 @@ bool ESP8266WiFiGenericClass::getPersistent(){
  * set new mode
  * @param m WiFiMode_t
  */
-bool ESP8266WiFiGenericClass::mode(WiFiMode_t m, WiFiState* state) {
-    if (m == WIFI_SHUTDOWN) {
-        return shutdown(0, state);
-    }
-    else if (m == WIFI_RESUME) {
-        return resumeFromShutdown(state);
-    }
-    else if (m & ~(WIFI_STA | WIFI_AP))
+bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
+    if (m & ~(WIFI_STA | WIFI_AP))
         // any other bits than legacy disallowed
         return false;
-
-    // m is now WIFI_STA, WIFI_AP or WIFI_AP_STA
-    if (state)
-    {
-        DEBUG_WIFI("core: state is useless without SHUTDOWN or RESUME\n");
     }
 
     if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
@@ -729,7 +718,7 @@ bool ESP8266WiFiGenericClass::shutdownValidCRC (const WiFiState* state)
     return state && (crc32(&state->state, sizeof(state->state)) == state->crc);
 }
 
-bool ESP8266WiFiGenericClass::shutdown (uint32 sleepUs, WiFiState* state)
+bool ESP8266WiFiGenericClass::shutdown (uint32_t sleepUs, WiFiState* state)
 {
     bool persistent = _persistent;
     WiFiMode_t before_off_mode = getMode();

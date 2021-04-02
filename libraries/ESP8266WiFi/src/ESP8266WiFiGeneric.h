@@ -122,30 +122,32 @@ class ESP8266WiFiGenericClass {
 
         void persistent(bool persistent);
 
-        bool mode(WiFiMode_t, WiFiState* state = nullptr);
+        bool mode(WiFiMode_t);
         WiFiMode_t getMode();
 
         bool enableSTA(bool enable);
         bool enableAP(bool enable);
 
-        bool forceSleepBegin(uint32 sleepUs = 0);
+        bool forceSleepBegin(uint32_t sleepUs = 0);
         bool forceSleepWake();
 
-        static uint32_t shutdownCRC (const WiFiState* state);
+        // wrappers around mode() and forceSleepBegin/Wake
+        // - sleepUs is WiFi.forceSleepBegin() parameter, 0 means forever
+        // - saveState is the user's state to hold configuration on restore
+        bool shutdown(uint32_t sleepUs = 0, WiFiState* stateSave = nullptr);
+        bool resumeFromShutdown(WiFiState* savedState = nullptr);
+
         static bool shutdownValidCRC (const WiFiState* state);
+
         static void preinitWiFiOff (); //meant to be called in user-defined preinit()
 
     protected:
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
 
-        static void _eventCallback(void *event);
+        static uint32_t shutdownCRC (const WiFiState* state);
 
-        // called by WiFi.mode(SHUTDOWN/RESTORE, state)
-        // - sleepUs is WiFi.forceSleepBegin() parameter, 0 = forever
-        // - saveState is the user's state to hold configuration on restore
-        bool shutdown (uint32 sleepUs = 0, WiFiState* stateSave = nullptr);
-        bool resumeFromShutdown (WiFiState* savedState = nullptr);
+        static void _eventCallback(void *event);
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------
