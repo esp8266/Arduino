@@ -89,8 +89,6 @@ OTAEraseConfig. It also gathers some WiFi signal/connection statistics.
 extern "C" {
 #include "user_interface.h"
 
-#undef IRAM_ATTR
-#define IRAM_ATTR __attribute__((noinline)) ICACHE_RAM_ATTR
 #if   (ERASE_CONFIG_METHOD == 1)
 void __real_system_restart_local();
 #define IRAM_MAYBE
@@ -112,13 +110,14 @@ void enable_erase_config_at_link_time(void) {
 extern "C" void Cache_Read_Enable_2(void);
 extern "C" void Cache_Read_Disable_2(void);
 
-/* The compiler will inline into erase_config and lose ICACHE_RAM_ATTR unless
-   __attribute__((noinline)) is added. IRAM_ATTR is modified to include noinline */
-static int IRAM_ATTR erase_config__erase_sector(const uint32_t sector) {
+_NOINLINE_STATIC    // Stop static inlining which would have discard IRAM_ATTR
+int IRAM_ATTR erase_config__erase_sector(const uint32_t sector) {
     /*
-       Toggle Flash execution off and on, around ROM flash function calls.
-       The SDK APIs would have normally handled this operation; however,
-       it is too early for it to take calls.
+       Toggle Flash execution off and on, around ROM flash function calls. The
+       SDK APIs system calls would have normally handled this operation;
+       however, it is too early for it to take calls. Note, the functions
+       Cache_Read_Disable_2 and Cache_Read_Enable_2 are from the SDK; however,
+       they need no prior initialization to work.
      */
     int rc;
     Cache_Read_Disable_2();
@@ -274,7 +273,7 @@ void IRAM_ATTR erase_config__fix_divider(void) {
   Something to see when we are in the SDK initialization.
 */
 extern "C" void IRAM_ATTR _Z22__run_user_rf_pre_initv(void) {
-    real_uart_div_modify(0, UART_CLK_FREQ / 115200);
+    rom_uart_div_modify(0, UART_CLK_FREQ / 115200);
     ERASE_CFG__ETS_DELAY_US(150);
     ERASE_CFG__ETS_PRINTF("\n__run_user_rf_pre_init()\n");
     ERASE_CFG__ETS_FLUSH(0);
@@ -401,8 +400,7 @@ void print_flashchip() {
 #define PRINT_FLASHCHIP() do{}while(false)
 #endif
 
-/* Cannot be made static, compiler will inline into erase_config_method3 and use
-   more IRAM. */
+_NOINLINE_STATIC    // Keep code in Flash to save IRAM
 void set_flashchip_and_check_erase_config(void) {
     /*
        We patch and restore chip_size here. It should be noted that the ROM APIs
