@@ -60,6 +60,10 @@ class WiFiServerSecure : public WiFiServer {
       _client_CA_ta = client_CA_ta;
     }
 
+    // Limit the TLS versions BearSSL will connect with.  Default is
+    // BR_TLS10...BR_TLS12
+    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12);
+
     // If awaiting connection available and authenticated (i.e. client cert), return it.
     WiFiClientSecure available(uint8_t* status = NULL);
 
@@ -76,6 +80,9 @@ class WiFiServerSecure : public WiFiServer {
     const X509List *_client_CA_ta = nullptr;
     ServerSessions *_cache = nullptr;
 
+    // TLS ciphers allowed
+    uint32_t _tls_min = BR_TLS10;
+    uint32_t _tls_max = BR_TLS12;
 };
 
 };

@@ -222,13 +222,6 @@ class EspClass {
         uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
         /**
-         * @brief Installs VM exception handler to support External memory (Experimental)
-         *
-         * @param none
-         * @return none
-         */
-        void enableVM();
-        /**
          * @brief Push current Heap selection and set Heap selection to DRAM.
          *
          * @param none
@@ -258,9 +251,6 @@ class EspClass {
          */
         void resetHeap();
     private:
-#ifdef UMM_HEAP_EXTERNAL
-        bool vmEnabled = false;
-#endif
         /**
          * @brief Replaces @a byteCount bytes of a 4 byte block on flash
          *

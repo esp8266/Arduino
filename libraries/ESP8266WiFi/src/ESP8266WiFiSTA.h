@@ -70,6 +70,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         IPAddress gatewayIP();
         IPAddress dnsIP(uint8_t dns_no = 0);
 
+        IPAddress broadcastIP();
         // STA WiFi info
         wl_status_t status();
         String SSID() const;
