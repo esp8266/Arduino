@@ -154,7 +154,6 @@ forceSleepBegin
 .. code:: cpp
 
     bool  forceSleepBegin (uint32_t sleepUs=0)
-    bool  forceSleepWake ()
 
 Saves the currently set WiFi mode and starts forced modem sleep for the specified time (us)
 
