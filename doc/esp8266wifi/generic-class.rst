@@ -164,7 +164,7 @@ forceSleepWake
 
     bool  forceSleepWake ()
 
-Called after `forceSleepBegin()`. Restores the previous WiFi mode. Attemtps reconnection when STA was active.
+Called after `forceSleepBegin()`. Restores the previous WiFi mode and attempts reconnection when STA was active.
 
 shutdown and resumeFromShutdown
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -174,10 +174,10 @@ shutdown and resumeFromShutdown
     bool  shutdown (uint32_t sleepUs, WiFiState* state)
     bool  resumeFromShutdown (WiFiState* state)
 
-Stores the STA interface IP configuration in the specified state struct and calls ``forceSleepBegin(sleepUs)``.
+Stores the STA interface IP configuration in the specified ``state`` struct and calls ``forceSleepBegin(sleepUs)``.
 Restores STA interface configuration from the ``state`` and calls ``forceSleepWake()``.
 
-These method is intended to be used in low-power scenarios, e.g. where ESP.deepSleep is used between actions to preserve battery power. It is the user's responsibility to preserve the WiFiState between ``shutdown()`` and ``resumeFromShutdown()`` by storing it in the RTC user data and/or flash memory.
+These methods are intended to be used in low-power scenarios, e.g. where ESP.deepSleep is used between actions to preserve battery power. It is the user's responsibility to preserve the WiFiState between ``shutdown()`` and ``resumeFromShutdown()`` by storing it in the RTC user data and/or flash memory.
 
 See `WiFiShutdown.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiShutdown/WiFiShutdown.ino>`__ for an example of usage.
 
