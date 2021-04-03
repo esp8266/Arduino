@@ -18,7 +18,7 @@ class Button {
   public:
     Button(uint8_t reqPin) : PIN(reqPin) {
       pinMode(PIN, INPUT_PULLUP);
-      attachInterrupt(PIN, { buttonIsr_static, this }, FALLING);
+      attachInterrupt(PIN, std::bind(buttonIsr_static, this), FALLING);
     };
     ~Button() {
       detachInterrupt(PIN);

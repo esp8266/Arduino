@@ -129,7 +129,7 @@ extern "C" {
             {
             }
             uint8_t mode;
-            Delegate<void(), void*> userFunc;
+            std::function<void()> userFunc;
         };
 
         static interrupt_handler_t interrupt_handlers[16];
@@ -147,7 +147,7 @@ extern "C" {
             }
         }
 
-        void set_interrupt_handlers(uint8_t pin, Delegate<void(), void*>&& userFunc, uint8_t mode)
+        void set_interrupt_handlers(uint8_t pin, std::function<void()>&& userFunc, uint8_t mode)
         {
             interrupt_handler_t& handler = interrupt_handlers[pin];
             handler.userFunc = std::move(userFunc);
@@ -171,7 +171,7 @@ extern "C" {
     extern void __attachInterruptArg(uint8_t pin, voidFuncPtrArg const userFunc, void* const arg, int mode)
     {
         isr_iram_assertion(userFunc);
-        attachInterrupt(pin, { userFunc, arg }, mode);
+        attachInterrupt(pin, std::bind(userFunc, arg), mode);
     }
 
     extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode)
@@ -224,9 +224,9 @@ extern "C" {
 
 };
 
-extern void attachInterrupt(uint8_t pin, Delegate<void(), void*> userFunc, int mode)
+extern void attachInterrupt(uint8_t pin, std::function<void()> userFunc, int mode)
 {
-    // isr_iram_assertion cannot inspect std::function objects; Delegate hides if its a std::function or C-style ptr
+    // isr_iram_assertion cannot inspect std::function objects
     if (pin < 16)
     {
         ETS_GPIO_INTR_DISABLE();

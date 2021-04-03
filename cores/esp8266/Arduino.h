@@ -229,7 +229,6 @@ void optimistic_yield(uint32_t interval_us);
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
-#include "Delegate.h"
 
 
 #include "mmu_iram.h"
@@ -276,7 +275,7 @@ void setTZ(const char* tz);
 void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
-void attachInterrupt(uint8_t pin, Delegate<void(), void*> userFunc, int mode);
+void attachInterrupt(uint8_t pin, std::function<void()> userFunc, int mode);
 
 // configures with approximated TZ value. part of the old api, prefer configTime with TZ variable
 void configTime(int timezone, int daylightOffset_sec, const char* server1,

@@ -8,11 +8,11 @@ namespace
     struct InterruptScheduleFunctionalArg
     {
         uint8_t pin;
-        Delegate<void(const InterruptInfo&), void*> scheduledIntRoutine;
+        std::function<void(const InterruptInfo&)> scheduledIntRoutine;
     };
     struct ScheduleLambdaArg
     {
-        Delegate<void(const InterruptInfo&), void*> scheduledIntRoutine;
+        std::function<void(const InterruptInfo&)> scheduledIntRoutine;
         InterruptInfo interruptInfo;
     };
 
@@ -26,7 +26,7 @@ namespace
 
 }
 
-void attachScheduledInterrupt(uint8_t pin, const Delegate<void(const InterruptInfo&), void*>& scheduledIntRoutine, int mode)
+void attachScheduledInterrupt(uint8_t pin, const std::function<void(const InterruptInfo&)>& scheduledIntRoutine, int mode)
 {
     if (scheduledIntRoutine)
     {
