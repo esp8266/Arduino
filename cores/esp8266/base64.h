@@ -33,10 +33,22 @@ public:
     // NOTE: The default behaviour of backend (lib64)
     // is to add a newline every 72 (encoded) characters output.
     // This may 'break' longer uris and json variables
-    static String encode(const uint8_t * data, size_t length, bool doNewLines = true);
-    static String inline encode(const String& text, bool doNewLines = true)
+    static String encode(const uint8_t * data, size_t length, bool doNewLines);
+    static inline String encode(const String& text, bool doNewLines)
     {
         return encode( (const uint8_t *) text.c_str(), text.length(), doNewLines );
+    }
+
+    // esp32 compat:
+
+    static inline String encode(const uint8_t * data, size_t length)
+    {
+        return encode(data, length, false);
+    }
+
+    static inline String encode(const String& text)
+    {
+        return encode(text, false);
     }
 private:
 };

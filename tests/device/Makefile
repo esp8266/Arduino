@@ -64,7 +64,7 @@ $(TEST_LIST):
 	$(SILENT)mkdir -p $(LOCAL_BUILD_DIR)
 ifeq ("$(MOCK)", "1")
 	@echo Compiling $(notdir $@)
-	(cd ../host; make ULIBDIRS=../device/libraries/BSTest ../device/$(@:%.ino=%))
+	(cd ../host; make D=$(V) ULIBDIRS=../device/libraries/BSTest ../device/$(@:%.ino=%))
 	$(SILENT)source $(BS_DIR)/virtualenv/bin/activate && \
 		$(PYTHON) $(BS_DIR)/runner.py \
 			$(RUNNER_DEBUG_FLAG) \

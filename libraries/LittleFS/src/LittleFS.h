@@ -221,11 +221,44 @@ public:
             return false;
         }
 
+        if(_timeCallback && _tryMount()) {
+            // Mounting is required to set attributes
+
+            time_t t = _timeCallback();
+            rc = lfs_setattr(&_lfs, "/", 'c', &t, 8);
+            if (rc != 0) {
+                DEBUGV("lfs_format, lfs_setattr 'c': rc=%d\n", rc);
+                return false;
+            }
+
+            rc = lfs_setattr(&_lfs, "/", 't', &t, 8);
+            if (rc != 0) {
+                DEBUGV("lfs_format, lfs_setattr 't': rc=%d\n", rc);
+                return false;
+            }
+            
+            lfs_unmount(&_lfs);
+            _mounted = false;
+        }
+
         if (wasMounted) {
             return _tryMount();
         }
 
         return true;
+    }
+
+    time_t getCreationTime() override {
+        time_t t;
+        uint32_t t32b;
+
+        if (lfs_getattr(&_lfs, "/", 'c', &t, 8) == 8) {
+            return t;
+        } else if (lfs_getattr(&_lfs, "/", 'c', &t32b, 4) == 4) {
+            return (time_t)t32b;
+        } else {
+            return 0;
+        }
     }
 
 
@@ -346,7 +379,7 @@ public:
         return result;
     }
 
-    size_t read(uint8_t* buf, size_t size) override {
+    int read(uint8_t* buf, size_t size) override {
         if (!_opened || !_fd | !buf) {
             return 0;
         }
@@ -424,7 +457,7 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
-            if (timeCallback && (_flags & LFS_O_WRONLY)) {
+            if (_timeCallback && (_flags & LFS_O_WRONLY)) {
                 // If the file opened with O_CREAT, write the creation time attribute
                 if (_creation) {
                     int rc = lfs_setattr(_fs->getFS(), _name.get(), 'c', (const void *)&_creation, sizeof(_creation));
@@ -433,7 +466,7 @@ public:
                     }
                 }
                 // Add metadata with last write time
-                time_t now = timeCallback();
+                time_t now = _timeCallback();
                 int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
                 if (rc < 0) {
                     DEBUGV("Unable to set last write time on '%s' to %d\n", _name.get(), now);
@@ -556,11 +589,35 @@ public:
     }
 
     time_t fileTime() override {
-        return (time_t)_getAttr4('t');
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('t', 8, &t)) {
+            return t;
+        } else if (_getAttr('t', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
+            return 0;
+        }
     }
 
     time_t fileCreationTime() override {
-        return (time_t)_getAttr4('c');
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('c', 8, &t)) {
+            return t;
+        } else if (_getAttr('c', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
+            return 0;
+        }
     }
 
 
@@ -599,20 +656,17 @@ protected:
         return _dir.get();
     }
 
-    uint32_t _getAttr4(char attr) {
-        if (!_valid) {
-            return 0;
+    bool _getAttr(char attr, int len, void *dest) {
+        if (!_valid || !len || !dest) {
+            return false;
         }
         int nameLen = 3; // Slashes, terminator
         nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
         nameLen += strlen(_dirent.name);
         char tmpName[nameLen];
         snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
-        time_t ftime = 0;
-        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, (void *)&ftime, sizeof(ftime));
-        if (rc != sizeof(ftime))
-            ftime = 0; // Error, so clear read value
-        return ftime;
+        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, dest, len);
+        return (rc == len);
     }
 
     String                      _pattern;

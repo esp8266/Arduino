@@ -81,11 +81,9 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
   }
 }
 
-extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
-  stopWaveform(pin); // Disable any tone
-#ifndef WAVEFORM_LOCKED_PHASE
-  _stopPWM(pin);     // ...and any analogWrite
-#endif
+extern void IRAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
+  stopWaveform(pin); // Disable any Tone or startWaveform on this pin
+  _stopPWM(pin);     // and any analogWrites (PWM)
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
@@ -95,7 +93,7 @@ extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
   }
 }
 
-extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
+extern int IRAM_ATTR __digitalRead(uint8_t pin) {
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
@@ -133,7 +131,7 @@ typedef struct {
 static interrupt_handler_t interrupt_handlers[16] = { {0, 0, 0, 0}, };
 static uint32_t interrupt_reg = 0;
 
-void ICACHE_RAM_ATTR interrupt_handler(void *arg, void *frame)
+void IRAM_ATTR interrupt_handler(void *arg, void *frame)
 {
   (void) arg;
   (void) frame;
@@ -220,7 +218,7 @@ extern void __attachInterruptArg(uint8_t pin, voidFuncPtrArg userFunc, void* arg
     __attachInterruptFunctionalArg(pin, userFunc, arg, mode, false);
 }
 
-extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
+extern void IRAM_ATTR __detachInterrupt(uint8_t pin) {
     if (pin < 16)
     {
         ETS_GPIO_INTR_DISABLE();

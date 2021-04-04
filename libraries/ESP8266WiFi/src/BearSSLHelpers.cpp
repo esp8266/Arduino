@@ -526,6 +526,10 @@ namespace brssl {
       case BR_KEYTYPE_EC:
         ek = br_skey_decoder_get_ec(dc.get());
         sk = (private_key*)malloc(sizeof * sk);
+        if (!sk)
+        {
+          return nullptr;
+        }
         sk->key_type = BR_KEYTYPE_EC;
         sk->key.ec.curve = ek->curve;
         sk->key.ec.x = (uint8_t*)malloc(ek->xlen);
@@ -870,6 +874,22 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   _count += numCerts;
 
   return true;
+}
+
+ServerSessions::~ServerSessions() {
+  if (_isDynamic && _store != nullptr)
+    delete _store;
+}
+
+ServerSessions::ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic) :
+  _size(sessions != nullptr ? size : 0),
+  _store(sessions), _isDynamic(isDynamic) {
+    if (_size > 0)
+      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store, size * sizeof(ServerSession));
+}
+
+const br_ssl_session_cache_class **ServerSessions::getCache() {
+  return _size > 0 ? &_cache.vtable : nullptr;
 }
 
 // SHA256 hash for updater

@@ -59,18 +59,18 @@ compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
-compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.waveform} {build.mmuflags} {build.non32xferflags}
+compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -free -fipa-pta -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}
 
 compiler.S.cmd=xtensa-lx106-elf-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp -MMD -mlongcalls "-I{runtime.tools.xtensa-lx106-elf-gcc.path}/include/"
 
-compiler.c.elf.flags=  -g {compiler.warning_flags} -Os -nostdlib -Wl,--no-check-sections -u app_entry {build.float} -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/lib/{build.sdk}" "-L{build.path}" "-L{compiler.libc.path}/lib" "-Tlocal.eagle.flash.ld" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,spi_flash_read
+compiler.c.elf.flags=-g {compiler.warning_flags} -Os -nostdlib -Wl,--no-check-sections -u app_entry {build.float} -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/lib/{build.sdk}" "-L{build.path}" "-L{compiler.libc.path}/lib" "-Tlocal.eagle.flash.ld" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,spi_flash_read
 
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lhal -lphy -lpp -lnet80211 {build.lwip_lib} -lwpa -lcrypto -lmain -lwps -lbearssl -lespnow -lsmartconfig -lairkiss -lwpa2 {build.stdcpp_lib} -lm -lc -lgcc
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c {compiler.warning_flags} {build.stacksmash_flags} -Os -g -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.waveform} {build.mmuflags} {build.non32xferflags}
+compiler.cpp.flags=-c {compiler.warning_flags} {build.stacksmash_flags} -Os -g -free -fipa-pta -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}
 
 compiler.as.cmd=xtensa-lx106-elf-as
 
@@ -119,7 +119,7 @@ recipe.S.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.fla
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group  "-L{build.path}"
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group "-L{build.path}"
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=

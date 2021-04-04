@@ -18,18 +18,24 @@
 
 #include <unistd.h>
 
+static struct timeval gtod0 = { 0, 0 };
+
 extern "C" unsigned long millis()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000) + (time.tv_usec / 1000);
+    if (gtod0.tv_sec == 0)
+        memcpy(&gtod0, &time, sizeof gtod0);
+    return ((time.tv_sec - gtod0.tv_sec) * 1000) + ((time.tv_usec - gtod0.tv_usec) / 1000);
 }
 
 extern "C" unsigned long micros()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000000) + time.tv_usec;
+    if (gtod0.tv_sec == 0)
+        memcpy(&gtod0, &time, sizeof gtod0);
+    return ((time.tv_sec - gtod0.tv_sec) * 1000000) + time.tv_usec - gtod0.tv_usec;
 }
 
 
@@ -74,4 +80,3 @@ cont_t* g_pcont = NULL;
 extern "C" void cont_yield(cont_t*)
 {
 }
-

@@ -37,22 +37,8 @@ namespace esp8266webserver {
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
-  if (!data.reserve(maxLength + 1))
-    return false;
-  data[0] = 0;  // data.clear()??
-  while (data.length() < maxLength) {
-    int tries = timeout_ms;
-    size_t avail;
-    while (!(avail = client.available()) && tries--)
-      delay(1);
-    if (!avail)
-      break;
-    if (data.length() + avail > maxLength)
-      avail = maxLength - data.length();
-    while (avail--)
-      data += (char)client.read();
-  }
-  return data.length() == maxLength;
+  S2Stream dataStream(data);
+  return client.sendSize(dataStream, maxLength, timeout_ms) == maxLength;
 }
 
 template <typename ServerType>
@@ -467,8 +453,14 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                     for (int i = 0; i < boundaryPtr; i++) {
                         _uploadWriteByte( fastBoundary[ i ] );
                     }
-                    _uploadWriteByte( in );
-                    boundaryPtr = 0;
+                    if (in == fastBoundary[ 0 ]) {
+                       // This could be the start of the real end, mark it so and don't emit/skip it
+                       boundaryPtr = 1;
+                    } else {
+                      // Not the 1st char of our pattern, so emit and ignore
+                      _uploadWriteByte( in );
+                      boundaryPtr = 0;
+                    }
                 }
             }
             // Found the boundary string, finish processing this file upload

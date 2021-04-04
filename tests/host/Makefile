@@ -76,10 +76,11 @@ $(shell mkdir -p $(BINDIR))
 CORE_CPP_FILES := \
 	$(addprefix $(abspath $(CORE_PATH))/,\
 		debug.cpp \
-		StreamString.cpp \
+		StreamSend.cpp \
 		Stream.cpp \
 		WString.cpp \
 		Print.cpp \
+		stdlib_noniso.cpp \
 		FS.cpp \
 		spiffs_api.cpp \
 		MD5Builder.cpp \
@@ -102,9 +103,13 @@ CORE_CPP_FILES := \
 		FatLib/FatFileLFN.cpp \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
+		FatLib/FatFormatter.cpp \
 		FatLib/FatVolume.cpp \
-		FatLib/FmtNumber.cpp \
-		FatLib/StdioStream.cpp \
+		FatLib/FatPartition.cpp \
+		common/FmtNumber.cpp \
+		common/FsStructs.cpp \
+		common/FsDateTime.cpp \
+		common/PrintBasic.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
@@ -299,7 +304,9 @@ ARDUINO_LIBS := \
 		IPAddress.cpp \
 		Updater.cpp \
 		base64.cpp \
+		LwipIntf.cpp \
 		LwipIntfCB.cpp \
+		debug.cpp \
 	) \
 	$(addprefix $(abspath ../../libraries/ESP8266WiFi/src)/,\
 		ESP8266WiFi.cpp \
@@ -329,12 +336,6 @@ OPT_ARDUINO_LIBS ?= \
 			LEAmDNS_Structs.cpp \
 			LEAmDNS_Transfer.cpp \
 			ESP8266mDNS.cpp \
-			LEAmDNS2Host.cpp \
-			LEAmDNS2Host_Control.cpp \
-			LEAmDNS2Host_Debug.cpp \
-			LEAmDNS2Host_Structs.cpp \
-			LEAmDNS2Host_Transfer.cpp \
-			LEAmDNS2_Backbone.cpp \
 		) \
 		ArduinoOTA/ArduinoOTA.cpp \
 		DNSServer/src/DNSServer.cpp \
