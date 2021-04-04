@@ -29,7 +29,6 @@
 
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
-// #include "core_esp8266_vm.h"
 #include <pgmspace.h>
 #include "reboot_uart_dwnld.h"
 
@@ -984,22 +983,11 @@ String EspClass::getSketchMD5()
     return result;
 }
 
-void EspClass::enableVM()
-{
-#ifdef UMM_HEAP_EXTERNAL
-    if (!vmEnabled)
-        install_vm_exception_handler();
-    vmEnabled = true;
-#endif
-}
-
 void EspClass::setExternalHeap()
 {
 #ifdef UMM_HEAP_EXTERNAL
-    if (vmEnabled) {
-        if (!umm_push_heap(UMM_HEAP_EXTERNAL)) {
-            panic();
-        }
+    if (!umm_push_heap(UMM_HEAP_EXTERNAL)) {
+        panic();
     }
 #endif
 }
@@ -1016,10 +1004,8 @@ void EspClass::setIramHeap()
 void EspClass::setDramHeap()
 {
 #if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
-    if (vmEnabled) {
-        if (!umm_push_heap(UMM_HEAP_DRAM)) {
-            panic();
-        }
+    if (!umm_push_heap(UMM_HEAP_DRAM)) {
+        panic();
     }
 #elif defined(UMM_HEAP_IRAM)
     if (!umm_push_heap(UMM_HEAP_DRAM)) {
@@ -1031,10 +1017,8 @@ void EspClass::setDramHeap()
 void EspClass::resetHeap()
 {
 #if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
-    if (vmEnabled) {
-        if (!umm_pop_heap()) {
-            panic();
-        }
+    if (!umm_pop_heap()) {
+        panic();
     }
 #elif defined(UMM_HEAP_IRAM)
     if (!umm_pop_heap()) {
