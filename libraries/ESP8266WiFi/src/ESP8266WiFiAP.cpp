@@ -118,7 +118,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
 
     struct softap_config conf;
     memcpy(reinterpret_cast<char*>(conf.ssid), ssid, ssid_len);
-    if (ssid_len < 32) {
+    if (ssid_len < sizeof(conf.ssid)) {
         conf.ssid[ssid_len] = 0;
     }
     conf.ssid_len = ssid_len;
@@ -126,7 +126,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
     if(psk_len) {
         conf.authmode = AUTH_WPA2_PSK;
         memcpy(reinterpret_cast<char*>(conf.password), psk, psk_len);
-        if (psk_len < 63) {
+        if (psk_len < sizeof(conf.password)) {
             conf.password[psk_len] = 0;
         }
     } else {
