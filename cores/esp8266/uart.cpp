@@ -830,18 +830,11 @@ uart_set_tx(uart_t* uart, int tx_pin)
             {
                 return true;
             }
-            else if (tx_pin == 2)
+            else if (tx_pin == 1 || tx_pin == 2)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = tx_pin;
-                pinMode(uart->tx_pin, FUNCTION_4);
-                return true;
-            }
-            else if (tx_pin != 2)
-            {
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 1;
-                pinMode(uart->tx_pin, SPECIAL);
+                pinMode(uart->tx_pin, tx_pin == 1 ? SPECIAL : FUNCTION_4);
                 return true;
             }
         }
