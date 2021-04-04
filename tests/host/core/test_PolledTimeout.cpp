@@ -212,8 +212,9 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout]")
 {
-  using YieldOrSkipPolicy = PolledTimeout::YieldPolicy::YieldOrSkip;
-  using oneShotMsYield = PolledTimeout::TimeoutTemplate<false, YieldOrSkipPolicy>;
+  using YieldOrSkipPolicy = YieldPolicy::YieldOrSkip;
+  using TimeMillisPolicy = TimePolicy::TimeMillis;
+  using oneShotMsYield = PolledTimeout::TimeoutTemplate<false, YieldOrSkipPolicy, TimeMillisPolicy>;
   using timeType = oneShotMsYield::timeType;
   timeType before, after, delta;
 
