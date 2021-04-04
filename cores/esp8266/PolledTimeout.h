@@ -74,7 +74,7 @@ namespace PolledTimeout
 
 
 /* A 1-shot timeout that auto-yields when in CONT can be built as follows:
- * using oneShotYieldMs = PolledTimeout::timeoutTemplate<false, PolledTimeout::YieldPolicy::YieldOrSkip>;
+ * using oneShotYieldMs = PolledTimeout::TimeoutTemplate<false, PolledTimeout::YieldPolicy::YieldOrSkip>;
  *
  * Other policies can be implemented by the user, e.g.: simple yield that panics in SYS, and the polledTimeout types built as needed as shown above, without modifying this file.
  */

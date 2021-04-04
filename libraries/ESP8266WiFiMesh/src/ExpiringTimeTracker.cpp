@@ -25,14 +25,14 @@
 #include "ExpiringTimeTracker.h"
 
 ExpiringTimeTracker::ExpiringTimeTracker(const uint32_t duration, const uint32_t creationTimeMs) :
-  timeoutTemplate(0)
+  TimeoutTemplate(0)
 { 
   setDuration(duration);
   _start = creationTimeMs;
 }
 
 ExpiringTimeTracker::ExpiringTimeTracker(const calculatorType durationCalculator, const uint32_t creationTimeMs) :
-  timeoutTemplate(0)
+  TimeoutTemplate(0)
 { 
   setDuration(durationCalculator);
   _start = creationTimeMs;
@@ -103,7 +103,7 @@ bool ExpiringTimeTracker::expired() const
 
 void ExpiringTimeTracker::reset()
 {
-  timeoutTemplate::reset();
+  TimeoutTemplate::reset();
 }
 
 void ExpiringTimeTracker::reset(const uint32_t newDuration)
