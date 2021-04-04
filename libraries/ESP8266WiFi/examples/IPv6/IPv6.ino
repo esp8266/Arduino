@@ -35,7 +35,7 @@
 
 WiFiServer statusServer(TCP_PORT);
 WiFiUDP udp;
-esp8266::polledTimeout::periodicMs showStatusOnSerialNow(STATUSDELAY_MS);
+PolledTimeout::periodicMs showStatusOnSerialNow(STATUSDELAY_MS);
 
 void fqdn(Print& out, const String& fqdn) {
   out.print(F("resolving "));

@@ -124,8 +124,8 @@ private:
     // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
     inline void WAIT_CLOCK_STRETCH()
     {
-        esp8266::polledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
-        esp8266::polledTimeout::periodicFastUs yieldTimeout(5000);
+        PolledTimeout::oneShotFastUs timeout(twi_clockStretchLimit);
+        PolledTimeout::periodicFastUs yieldTimeout(5000);
         while (!timeout && !SCL_READ(twi_scl)) // outer loop is stretch duration up to stretch limit
         {
             if (yieldTimeout)   // inner loop yields every 5ms

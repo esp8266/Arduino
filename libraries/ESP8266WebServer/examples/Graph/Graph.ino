@@ -265,7 +265,7 @@ unsigned int defaultMask() {
 
 int rgbMode = 1; // 0=off - 1=auto - 2=manual
 int rgbValue = 0;
-esp8266::polledTimeout::periodicMs timeToChange(1000);
+PolledTimeout::periodicMs timeToChange(1000);
 bool modeChangeRequested = false;
 
 void loop(void) {

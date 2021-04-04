@@ -955,7 +955,7 @@ protected:
     {
         enuProbingStatus                  m_ProbingStatus;
         uint8_t                           m_u8SentCount;  // Used for probes and announcements
-        esp8266::polledTimeout::oneShotMs m_Timeout;      // Used for probes and announcements
+        PolledTimeout::oneShotMs m_Timeout;      // Used for probes and announcements
         //clsMDNSTimeFlag                   m_TimeFlag;     // Used for probes and announcements
         bool                              m_bConflict;
         bool                              m_bTiebreakNeeded;
@@ -1027,7 +1027,7 @@ protected:
                 const timeoutLevel_t    TIMEOUTLEVEL_FINAL      = 100;
 
                 uint32_t                          m_u32TTL;
-                esp8266::polledTimeout::oneShotMs m_TTLTimeout;
+                PolledTimeout::oneShotMs m_TTLTimeout;
                 timeoutLevel_t                    m_timeoutLevel;
 
                 stcTTL(void);
@@ -1132,7 +1132,7 @@ protected:
         MDNSServiceQueryCallbackFunc      m_fnCallback;
         bool                              m_bLegacyQuery;
         uint8_t                           m_u8SentCount;
-        esp8266::polledTimeout::oneShotMs m_ResendTimeout;
+        PolledTimeout::oneShotMs m_ResendTimeout;
         bool                              m_bAwaitingAnswers;
         stcAnswer*                        m_pAnswers;
 

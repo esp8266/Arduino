@@ -1689,7 +1689,7 @@ bool MDNSResponder::_checkServiceQueryCache(void)
                 ++pServiceQuery->m_u8SentCount;
                 pServiceQuery->m_ResendTimeout.reset((MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount)
                                                      ? (MDNS_DYNAMIC_QUERY_RESEND_DELAY * (pServiceQuery->m_u8SentCount - 1))
-                                                     : esp8266::polledTimeout::oneShotMs::neverExpires);
+                                                     : PolledTimeout::oneShotMs::neverExpires);
             }
             DEBUG_EX_INFO(
                 DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: %s to resend service query!"), (bResult ? "Succeeded" : "FAILED"));

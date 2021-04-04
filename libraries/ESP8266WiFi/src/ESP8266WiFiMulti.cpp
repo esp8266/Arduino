@@ -85,7 +85,7 @@ static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
     wl_status_t status;
 
     // Set WiFi connect timeout
-    using esp8266::polledTimeout::oneShotMs;
+    using PolledTimeout::oneShotMs;
     oneShotMs connectTimeout(connectTimeoutMs);
 
     // Wait for WiFi status change or timeout
@@ -243,7 +243,7 @@ int8_t ESP8266WiFiMulti::startScan()
     WiFi.scanNetworks(true);
 
     // Set WiFi scan timeout
-    using esp8266::polledTimeout::oneShotMs;
+    using PolledTimeout::oneShotMs;
     oneShotMs scanTimeout(WIFI_SCAN_TIMEOUT_MS);
 
     // Wait for WiFi scan change or timeout

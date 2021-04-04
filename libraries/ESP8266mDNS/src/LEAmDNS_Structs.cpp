@@ -1293,7 +1293,7 @@ bool MDNSResponder::stcMDNS_RRAnswerGeneric::clear(void)
 MDNSResponder::stcProbeInformation::stcProbeInformation(void)
     :   m_ProbingStatus(ProbingStatus_WaitingForData),
         m_u8SentCount(0),
-        m_Timeout(esp8266::polledTimeout::oneShotMs::neverExpires),
+        m_Timeout(PolledTimeout::oneShotMs::neverExpires),
         m_bConflict(false),
         m_bTiebreakNeeded(false),
         m_fnHostProbeResultCallback(0),
@@ -1578,7 +1578,7 @@ bool MDNSResponder::stcMDNSService::releaseProtocol(void)
 */
 MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(void)
     :   m_u32TTL(0),
-        m_TTLTimeout(esp8266::polledTimeout::oneShotMs::neverExpires),
+        m_TTLTimeout(PolledTimeout::oneShotMs::neverExpires),
         m_timeoutLevel(TIMEOUTLEVEL_UNSET)
 {
 
@@ -1666,7 +1666,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel(vo
 unsigned long MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout(void) const
 {
 
-    uint32_t    u32Timeout = esp8266::polledTimeout::oneShotMs::neverExpires;
+    uint32_t    u32Timeout = PolledTimeout::oneShotMs::neverExpires;
 
     if (TIMEOUTLEVEL_BASE == m_timeoutLevel)            // 80%
     {
@@ -2144,7 +2144,7 @@ MDNSResponder::stcMDNSServiceQuery::stcMDNSServiceQuery(void)
         m_fnCallback(0),
         m_bLegacyQuery(false),
         m_u8SentCount(0),
-        m_ResendTimeout(esp8266::polledTimeout::oneShotMs::neverExpires),
+        m_ResendTimeout(PolledTimeout::oneShotMs::neverExpires),
         m_bAwaitingAnswers(true),
         m_pAnswers(0)
 {

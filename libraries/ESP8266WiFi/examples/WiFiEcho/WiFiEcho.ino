@@ -21,8 +21,8 @@ WiFiClient client;
 
 constexpr size_t sizes [] = { 0, 512, 384, 256, 128, 64, 16, 8, 4 };
 constexpr uint32_t breathMs = 200;
-esp8266::polledTimeout::oneShotFastMs enoughMs(breathMs);
-esp8266::polledTimeout::periodicFastMs test(2000);
+PolledTimeout::oneShotFastMs enoughMs(breathMs);
+PolledTimeout::periodicFastMs test(2000);
 int t = 1; // test (1, 2 or 3, see below)
 int s = 0; // sizes[] index
 

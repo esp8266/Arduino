@@ -431,7 +431,7 @@ int8_t ESP8266WiFiSTAClass::waitForConnectResult(unsigned long timeoutLength) {
     if((wifi_get_opmode() & 1) == 0) {
         return WL_DISCONNECTED;
     }
-    using esp8266::polledTimeout::oneShot;
+    using PolledTimeout::oneShot;
     oneShot timeout(timeoutLength); // number of milliseconds to wait before returning timeout error
     while(!timeout) {
         yield();

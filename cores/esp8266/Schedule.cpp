@@ -40,9 +40,9 @@ struct recurrent_fn_t
 {
     recurrent_fn_t* mNext = nullptr;
     mRecFuncT mFunc;
-    esp8266::polledTimeout::periodicFastUs callNow;
+    PolledTimeout::periodicFastUs callNow;
     std::function<bool(void)> alarm = nullptr;
-    recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
+    recurrent_fn_t(PolledTimeout::periodicFastUs interval) : callNow(interval) { }
 };
 
 static recurrent_fn_t* rFirst = nullptr;
@@ -135,7 +135,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
 void run_scheduled_functions()
 {
-    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
+    PolledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
     // prevent scheduling of new functions during this run
     auto stop = sLast;
@@ -173,7 +173,7 @@ void run_scheduled_functions()
 
 void run_scheduled_recurrent_functions()
 {
-    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
+    PolledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
 
     // Note to the reader:
     // There is no exposed API to remove a scheduled function:

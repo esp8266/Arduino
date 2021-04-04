@@ -140,7 +140,7 @@ unsigned long HardwareSerial::testBaudrate()
 
 unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
-    esp8266::polledTimeout::oneShotFastMs timeOut(timeoutMillis);
+    PolledTimeout::oneShotFastMs timeOut(timeoutMillis);
     unsigned long detectedBaudrate = 0;
     while (!timeOut) {
         if ((detectedBaudrate = testBaudrate())) {
@@ -158,7 +158,7 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
 
     while (got < size)
     {
-        esp8266::polledTimeout::oneShotFastMs timeOut(_timeout);
+        PolledTimeout::oneShotFastMs timeOut(_timeout);
         size_t avail;
         while ((avail = available()) == 0 && !timeOut);
         if (avail == 0)

@@ -63,7 +63,7 @@ static timespec tp;
 static time_t now;
 static uint32_t now_ms, now_us;
 
-static esp8266::polledTimeout::periodicMs showTimeNow(60000);
+static PolledTimeout::periodicMs showTimeNow(60000);
 static int time_machine_days = 0; // 0 = present
 static bool time_machine_running = false;
 static bool time_machine_run_once = false;
