@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 import argparse
@@ -12,10 +12,43 @@ def parse_args():
     parser.add_argument('-m', '--mode', help='Mode (header, sign)')
     parser.add_argument('-b', '--bin', help='Unsigned binary')
     parser.add_argument('-o', '--out', help='Output file');
+    parser.add_argument('-l', '--legacy', help='Legacy output file');
     parser.add_argument('-p', '--publickey', help='Public key file');
     parser.add_argument('-s', '--privatekey', help='Private(secret) key file');
     return parser.parse_args()
 
+def sign_and_write(data, priv_key, out_file):
+    """Signs the data (bytes) with the private key (file path)."""
+    """Save the signed firmware to out_file (file path)."""
+
+    signcmd = [ 'openssl', 'dgst', '-sha256', '-sign', priv_key ]
+    proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    signout, signerr = proc.communicate(input=data)
+    if proc.returncode:
+        sys.stderr.write("OpenSSL returned an error signing the binary: " + str(proc.returncode) + "\nSTDERR: " + str(signerr))
+    else:
+        with open(out_file, "wb") as out:
+            out.write(data)
+            out.write(signout)
+            out.write(b'\x00\x01\x00\x00')
+            sys.stderr.write("Signed binary: " + out_file + "\n")
+
+def sign_and_write_legacy(data, priv_key, out_file):
+    """Signs the data (bytes) with the private key (file path)."""
+    """Save the signed firmware to out_file (file path)."""
+
+    sha256 = hashlib.sha256(data)
+    signcmd = [ 'openssl', 'rsautl', '-sign', '-inkey', priv_key ]
+    proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    signout, signerr = proc.communicate(input=sha256.digest())
+    if proc.returncode:
+        sys.stderr.write("OpenSSL returned an error legacy signing the binary: " + str(proc.returncode) + "\nSTDERR: " + str(signerr))
+    else:
+        with open(out_file, "wb") as out:
+            out.write(data)
+            out.write(signout)
+            out.write(b'\x00\x01\x00\x00')
+            sys.stderr.write("Legacy signed binary: " + out_file + "\n")
 
 def main():
     args = parse_args()
@@ -41,28 +74,28 @@ def main():
         outdir = os.path.dirname(args.out)
         if not os.path.exists(outdir):
             os.makedirs(outdir)
+        try:
+            with open(args.out, "r") as inp:
+                old_val = inp.read()
+                if old_val == val:
+                    return
+        except Exception:
+            pass
         with open(args.out, "w") as f:
             f.write(val)
         return 0
     elif args.mode == "sign":
-        val = ""
         if not os.path.isfile(args.privatekey):
             return
         try:
             with open(args.bin, "rb") as b:
                 bin = b.read()
-                sha256 = hashlib.sha256(bin)
-                signcmd = [ 'openssl', 'rsautl', '-sign', '-inkey', args.privatekey ]
-                proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-                signout, signerr = proc.communicate(input=sha256.digest())
-                if proc.returncode:
-                    sys.stderr.write("OpenSSL returned an error signing the binary: " + str(proc.returncode) + "\nSTDERR: " + str(signerr))
-                else:
-                    with open(args.out, "wb") as out:
-                        out.write(bin)
-                        out.write(signout)
-                        out.write(b'\x00\x01\x00\x00')
-                        sys.stderr.write("Signed binary: " + args.out + "\n")
+
+                sign_and_write(bin, args.privatekey, args.out)
+
+                if args.legacy:
+                    sign_and_write_legacy(bin, args.privatekey, args.legacy)
+
         except Exception as e:
             sys.stderr.write(str(e))
             sys.stderr.write("Not signing the generated binary\n")

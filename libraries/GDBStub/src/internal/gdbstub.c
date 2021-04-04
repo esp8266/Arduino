@@ -67,7 +67,6 @@ OS-less SDK defines. Defines some headers for things that aren't in the include 
 the xthal stack frame struct.
 */
 #include "osapi.h"
-#include "user_interface.h"
 
 void _xtos_set_exception_handler(int cause, void (exhandler)(struct XTensa_exception_frame_s *frame));
 
@@ -446,7 +445,7 @@ static inline int gdbHandleCommand() {
 					writeByte(i, gdbGetHexVal(&data, 8));
 				}
 				//Make sure caches are up-to-date. Procedure according to Xtensa ISA document, ISYNC inst desc.
-				asm volatile("ISYNC\nISYNC\n");
+				__asm__ __volatile__ ("ISYNC\nISYNC\n");
 				gdbSendPacketOK();
 			} else {
 				//Trying to do a software breakpoint on a flash proc, perhaps?
@@ -900,7 +899,7 @@ void ATTR_GDBINIT gdbstub_set_uart_isr_callback(void (*func)(void*, uint8_t), vo
 
 
 //gdbstub initialization routine.
-void ATTR_GDBINIT gdbstub_init() {
+void gdbstub_init() {
 #if GDBSTUB_REDIRECT_CONSOLE_OUTPUT
 	os_install_putc1(gdbstub_semihost_putchar1);
 #endif
@@ -923,4 +922,4 @@ bool ATTR_GDBEXTERNFN gdb_present() {
 }
 
 void ATTR_GDBFN gdb_do_break() { gdbstub_do_break(); }
-void ATTR_GDBINIT gdb_init() __attribute__((alias("gdbstub_init")));
+void gdb_init() __attribute__((alias("gdbstub_init")));

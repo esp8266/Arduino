@@ -20,7 +20,7 @@ BearSSL doesn't perform memory allocations at runtime, but it does require alloc
 . A per-application secondary stack
 . A per-connection TLS receive/transmit buffer plus overhead
 
-The per-application secondary stack is approximately 5.6KB in size and is used for temporary variables during BearSSL processing.  Only one stack is required, and it will be allocated whenever any `BearSSL::WiFiClientSecure` or `BearSSL::WiFiServerSecure` are instantiated.  So, in the case of a global client or server, the memory will be allocated before `setup()` is called.
+The per-application secondary stack is approximately 6KB in size and is used for temporary variables during BearSSL processing.  Only one stack is required, and it will be allocated whenever any `BearSSL::WiFiClientSecure` or `BearSSL::WiFiServerSecure` are instantiated.  So, in the case of a global client or server, the memory will be allocated before `setup()` is called.
 
 The per-connection buffers are approximately 22KB in size, but in certain circumstances it can be reduced dramatically by using MFLN or limiting message sizes.  See the `MLFN section <#mfln-or-maximum-fragment-length-negotiation-saving-ram>`__ below for more information.
 
@@ -102,14 +102,14 @@ The web browser you're using to read this document keeps a list of 100s of certi
 
 In many cases your application will know the specific CA it needs to validate web or MQTT servers against (often just a single, self-signing CA private to your institution).  Simply load your private CA in a `BearSSL::X509List` and use that as your trust anchor.
 
-However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to SPIFFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
+However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to LittleFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
 
-See the `BearSSL_CertStore` example for full details as the `BearSSL::CertStore` requires the creation of a cookie-cutter object for filesystem access (because the SD and SPIFFS filesystems are presently incompatible with each other).  At a high level in your `setup()` you will call `BearSSL::initCertStore()` on a global object, and then pass this global certificate store to `client.setCertStore(&gCA)` before every connection attempt to enable it as a validation option.
+See the `BearSSL_CertStore` example for full details.
 
 Supported Crypto
 ~~~~~~~~~~~~~~~~
 
-Please see the `BearSSL website <htps://bearssl.org>`__ for detailed cryptographic information.  In general, TLS 1.2, TLS 1.1, and TLS 1.0 are supported with RSA and Elliptic Curve keys and a very rich set of hashing and symmetric encryption codes.  Please note that Elliptic Curve (EC) key operations take a significant amount of time.
+Please see the `BearSSL website <https://bearssl.org>`__ for detailed cryptographic information.  In general, TLS 1.2, TLS 1.1, and TLS 1.0 are supported with RSA and Elliptic Curve keys and a very rich set of hashing and symmetric encryption codes.  Please note that Elliptic Curve (EC) key operations take a significant amount of time.
 
 
 BearSSL::WiFiClientSecure Class
@@ -120,14 +120,14 @@ BearSSL::WiFiClientSecure Class
 Validating X509 Certificates (Am I talking to the server I think I'm talking to?)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be told how to verify the identity of the other machine.  **By default BearSSL will not validate any connections and will refuse to connect to any server.**  This is a significant difference from the earlier `axTLS::WiFiClientSecure` in that the deprecated axTLS client would connect to any server and would only attempt to validate the identity of the remote server if asked to, after connection.
+Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be told how to verify the identity of the other machine.  **By default BearSSL will not validate any connections and will refuse to connect to any server.**
 
 There are multiple modes to tell BearSSL how to verify the identity of the remote server.  See the `BearSSL_Validation` example for real uses of the following methods:
 
 setInsecure()
 ^^^^^^^^^^^^^
 
-Don't verify any X509 certificates.  There is no guarantee that the server connected to is the one you think it is in this case, but this call will mimic the behavior of the deprecated axTLS code.
+Don't verify any X509 certificates.  There is no guarantee that the server connected to is the one you think it is in this case.
 
 setKnownKey(const BearSSL::PublicKey \*pk)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -138,6 +138,8 @@ setFingerprint(const uint8_t fp[20]) / setFingerprint(const char \*fpStr)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
+
+This fingerprint is calculated on the raw X509 certificate served by the server.  In very rare cases, these certificates have certain encodings which should be normalized before taking a fingerprint (but in order to preserve memory BearSSL does not do this normalization since it would need RAM for an entire copy of the cert), and the fingerprint BearSSL calculates will not match the fingerprint OpenSSL calculates.  In this case, you can enable SSL debugging and get a dump of BearSSL's calculated fingerprint and use that one in your code, or use full certificate validation.  See the `original issue and debug here <https://github.com/esp8266/Arduino/issues/6209>`__.
 
 setTrustAnchors(BearSSL::X509List \*ta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -196,7 +198,7 @@ If you are connecting to a server repeatedly in a fixed time period (usually 30 
 Errors
 ~~~~~~
 
-BearSSL can fail in many more unique and interesting ways then the deprecated axTLS.  Use these calls to get more information when something fails.  
+BearSSL can fail in many more unique and interesting ways.  Use these calls to get more information when something fails.  
 
 getLastSSLError(char \*dest = NULL, size_t len = 0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -216,4 +218,14 @@ Takes an array (in PROGMEM is valid) or a std::vector of 16-bit BearSSL cipher i
 setCiphersLessSecure()
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Helper function which essentially limits BearSSL to ciphers that were supported by the deprecated axTLS.  These may be less secure than the ones BearSSL would natively choose, but they may be helpful and faster if your server depended on specific axTLS crypto options.
+Helper function which essentially limits BearSSL to less secure ciphers than it would natively choose, but they may be helpful and faster if your server depended on specific crypto options.
+
+Limiting TLS(SSL) Versions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, BearSSL will connect with TLS 1.0, TLS 1.1, or TLS 1.2 protocols (depending on the request of the remote side).  If you want to limit to a subset, use the following call:
+
+setSSLVersion(uint32_t min, uint32_t max)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Valid values for min and max are `BR_TLS10`, `BR_TLS11`, `BR_TLS12`.  Min and max may be set to the same value if only a single TLS version is desired.

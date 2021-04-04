@@ -7,6 +7,9 @@
 [submodule "libraries/SoftwareSerial"]
 	path = libraries/SoftwareSerial
 	url = https://github.com/plerup/espsoftwareserial.git
+[submodule "libraries/LittleFS/lib/littlefs"]
+	path = libraries/LittleFS/lib/littlefs
+	url = https://github.com/ARMmbed/littlefs.git
 [submodule "libraries/ESP8266SdFat"]
 	path = libraries/ESP8266SdFat
 	url = https://github.com/earlephilhower/ESP8266SdFat.git
@@ -16,3 +19,9 @@
 [submodule "tools/esptool"]
 	path = tools/esptool
 	url = https://github.com/espressif/esptool.git
+[submodule "libraries/Ethernet"]
+	path = libraries/Ethernet
+	url = https://github.com/arduino-libraries/Ethernet.git
+[submodule "tools/sdk/uzlib"]
+	path = tools/sdk/uzlib
+	url = https://github.com/pfalcon/uzlib.git

@@ -107,10 +107,9 @@ AVRISPState_t ESP8266AVRISP::serve() {
         case AVRISP_STATE_IDLE:
             // should not be called when idle, error?
             break;
-        case AVRISP_STATE_PENDING: {
+        case AVRISP_STATE_PENDING:
             _state = AVRISP_STATE_ACTIVE;
-        // fallthrough
-        }
+            // falls through
         case AVRISP_STATE_ACTIVE: {
             while (_client.available()) {
                 avrisp();
@@ -360,8 +359,12 @@ uint8_t ESP8266AVRISP::flash_read(uint8_t hilo, int addr) {
                            0);
 }
 
-void ESP8266AVRISP::flash_read_page(int length) {
+bool ESP8266AVRISP::flash_read_page(int length) {
     uint8_t *data = (uint8_t *) malloc(length + 1);
+    if (!data)
+    {
+        return false;
+    }
     for (int x = 0; x < length; x += 2) {
         *(data + x) = flash_read(LOW, here);
         *(data + x + 1) = flash_read(HIGH, here);
@@ -370,12 +373,16 @@ void ESP8266AVRISP::flash_read_page(int length) {
     *(data + length) = Resp_STK_OK;
     _client.write((const uint8_t *)data, (size_t)(length + 1));
     free(data);
-    return;
+    return true;
 }
 
-void ESP8266AVRISP::eeprom_read_page(int length) {
+bool ESP8266AVRISP::eeprom_read_page(int length) {
     // here again we have a word address
     uint8_t *data = (uint8_t *) malloc(length + 1);
+    if (!data)
+    {
+        return false;
+    }
     int start = here * 2;
     for (int x = 0; x < length; x++) {
         int addr = start + x;
@@ -385,7 +392,7 @@ void ESP8266AVRISP::eeprom_read_page(int length) {
     *(data + length) = Resp_STK_OK;
     _client.write((const uint8_t *)data, (size_t)(length + 1));
     free(data);
-    return;
+    return true;
 }
 
 void ESP8266AVRISP::read_page() {

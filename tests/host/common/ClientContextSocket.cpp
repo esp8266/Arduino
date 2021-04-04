@@ -89,7 +89,8 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 	if (ret == 0)
 	{
 		// connection closed
-		return -1;
+		// nothing is read
+		return 0;
 	}
 
 	if (ret == -1)
@@ -97,16 +98,20 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 		if (errno != EAGAIN)
 		{
 			fprintf(stderr, MOCK "ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n", sock, maxread, strerror(errno));
+            // error
 			return -1;
 		}
 		ret = 0;
 	}
+
 	ccinbufsize += ret;
 	return ret;
 }
 
 ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
+    // usersize==0: peekAvailable()
+
 	if (usersize > CCBUFSIZE)
 		mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
@@ -114,7 +119,7 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 	size_t retsize = 0;
 	do
 	{
-		if (usersize <= ccinbufsize)
+		if (usersize && usersize <= ccinbufsize)
 		{
 			// data already buffered
 			retsize = usersize;
@@ -123,7 +128,14 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 		
 		// check incoming data data
 		if (mockFillInBuf(sock, ccinbuf, ccinbufsize) < 0)
+		{
 			return -1;
+	    }
+
+        if (usersize == 0 && ccinbufsize)
+            // peekAvailable
+            return ccinbufsize;
+
 		if (usersize <= ccinbufsize)
 		{
 			// data just received
@@ -136,7 +148,11 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 		p.events = POLLIN;
 	} while (poll(&p, 1, timeout_ms) == 1);
 	
-	memcpy(dst, ccinbuf, retsize);
+    if (dst)
+    {
+        memcpy(dst, ccinbuf, retsize);
+    }
+
 	return retsize;
 }
 
@@ -153,32 +169,38 @@ ssize_t mockRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbu
 	
 ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 {
-	struct pollfd p;
-	p.fd = sock;
-	p.events = POLLOUT;
-	int ret = poll(&p, 1, timeout_ms);
-	if (ret == -1)
+	size_t sent = 0;
+	while (sent < size)
 	{
-		fprintf(stderr, MOCK "ClientContext::write: poll(%d): %s\n", sock, strerror(errno));
-		return 0;
-	}
-	if (ret)
-	{
-#ifndef MSG_NOSIGNAL
-		ret = ::write(sock, data, size);
-#else
-		ret = ::send(sock, data, size, MSG_NOSIGNAL);
-#endif
+
+		struct pollfd p;
+		p.fd = sock;
+		p.events = POLLOUT;
+		int ret = poll(&p, 1, timeout_ms);
 		if (ret == -1)
 		{
 			fprintf(stderr, MOCK "ClientContext::write(%d): %s\n", sock, strerror(errno));
 			return -1;
 		}
-		if (ret != (int)size)
+		if (ret)
 		{
-			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %zd) (FIXME poll loop TODO)\n", ret, size);
-			exit(EXIT_FAILURE);
+#ifndef MSG_NOSIGNAL
+			ret = ::write(sock, data + sent, size - sent);
+#else
+			ret = ::send(sock, data + sent, size - sent, MSG_NOSIGNAL);
+#endif
+			if (ret == -1)
+			{
+				fprintf(stderr, MOCK "ClientContext::write/send(%d): %s\n", sock, strerror(errno));
+				return -1;
+			}
+			sent += ret;
+			if (sent < size)
+				fprintf(stderr, MOCK "ClientContext::write: sent %d bytes (%zd / %zd)\n", ret, sent, size);
 		}
 	}
-	return ret;
+#ifdef DEBUG_ESP_WIFI
+    mockverbose(MOCK "ClientContext::write: total sent %zd bytes\n", sent);
+#endif
+	return sent;
 }

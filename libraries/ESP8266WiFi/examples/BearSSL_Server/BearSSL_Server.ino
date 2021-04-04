@@ -48,6 +48,10 @@ const char *pass = STAPSK;
 // The HTTPS server
 BearSSL::WiFiServerSecure server(443);
 
+//#define USE_EC // Enable Elliptic Curve signed cert
+
+#ifndef USE_EC
+
 // The server's private key which must be kept secret
 const char server_private_key[] PROGMEM = R"EOF(
 -----BEGIN PRIVATE KEY-----
@@ -104,6 +108,52 @@ UsQIIGpPVh1plR1vYNndDeBpRJSFkoJTkgAIrlFzSMwNebU0pg==
 -----END CERTIFICATE-----
 )EOF";
 
+#else
+const char server_cert[] PROGMEM = R"EOF(
+-----BEGIN CERTIFICATE-----
+MIIB0zCCAXqgAwIBAgIJALANi2eTiGD/MAoGCCqGSM49BAMCMEUxCzAJBgNVBAYT
+AkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRn
+aXRzIFB0eSBMdGQwHhcNMTkwNjExMjIyOTU2WhcNMjAwNjEwMjIyOTU2WjBFMQsw
+CQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50ZXJu
+ZXQgV2lkZ2l0cyBQdHkgTHRkMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExIkZ
+w7zjk6TGcScff1PAehuEGmKZTf8VfnkjyJH0IbBgZibZ+qwYGBEnkz4KpKv7TkHo
+W+j7F5EMcLcSrUIpy6NTMFEwHQYDVR0OBBYEFI6A0f+g0HyxUT6xrbVmRU79urbj
+MB8GA1UdIwQYMBaAFI6A0f+g0HyxUT6xrbVmRU79urbjMA8GA1UdEwEB/wQFMAMB
+Af8wCgYIKoZIzj0EAwIDRwAwRAIgWvy7ofQTGZMNqxUfe4gjtkU+C9AkQtaOMW2U
+5xFFSvcCICvcGrQpoi7tRTq8xsXFmr8MYWgQTpVAtj6opXMQct/l
+-----END CERTIFICATE-----
+)EOF";
+
+// The server's private key which must be kept secret
+const char server_private_key[] PROGMEM = R"EOF(
+-----BEGIN EC PARAMETERS-----
+BggqhkjOPQMBBw==
+-----END EC PARAMETERS-----
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIKyLR9/NT7ZdWM+2rklehveuk+jyIHJ+P8ZUQ392HOYvoAoGCCqGSM49
+AwEHoUQDQgAExIkZw7zjk6TGcScff1PAehuEGmKZTf8VfnkjyJH0IbBgZibZ+qwY
+GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
+-----END EC PRIVATE KEY-----
+)EOF";
+
+#endif
+
+#define CACHE_SIZE 5 // Number of sessions to cache.
+#define USE_CACHE // Enable SSL session caching.
+                  // Caching SSL sessions shortens the length of the SSL handshake.
+                  // You can see the performance improvement by looking at the
+                  // Network tab of the developper tools of your browser.
+//#define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
+
+#if defined(USE_CACHE) && defined(DYNAMIC_CACHE)
+// Dynamically allocated cache.
+BearSSL::ServerSessions serverCache(CACHE_SIZE);
+#elif defined(USE_CACHE)
+// Statically allocated cache.
+ServerSession store[CACHE_SIZE];
+BearSSL::ServerSessions serverCache(store, CACHE_SIZE);
+#endif
+
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -128,7 +178,16 @@ void setup() {
   // Attach the server private cert/key combo
   BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
   BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
+#ifndef USE_EC
   server.setRSACert(serverCertList, serverPrivKey);
+#else
+  server.setECCert(serverCertList, BR_KEYTYPE_KEYX|BR_KEYTYPE_SIGN, serverPrivKey);
+#endif
+
+  // Set the server's cache
+#if defined(USE_CACHE)
+  server.setCache(&serverCache);
+#endif
 
   // Actually start accepting connections
   server.begin();
@@ -147,11 +206,12 @@ static const char *HTTP_RES =
         "</html>\r\n";
 
 void loop() {
+  static int cnt;
   BearSSL::WiFiClientSecure incoming = server.available();
   if (!incoming) {
     return;
   }
-  Serial.println("Incoming connection...\n");
+  Serial.printf("Incoming connection...%d\n",cnt++);
   
   // Ugly way to wait for \r\n (i.e. end of HTTP request which we don't actually parse here)
   uint32_t timeout=millis() + 1000;

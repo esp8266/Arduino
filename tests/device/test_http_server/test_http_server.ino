@@ -16,6 +16,11 @@ void setup()
 {
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+    BS_RUN(Serial);
+}
+
+bool pretest()
+{
     WiFi.persistent(false);
     WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
@@ -24,7 +29,7 @@ void setup()
     MDNS.begin("etd");
     server.onNotFound([](){ server.send(404); });
     server.begin();
-    BS_RUN(Serial);
+    return true;
 }
 
 void handle_request()
@@ -50,7 +55,10 @@ TEST_CASE("HTTP GET Parameters", "[HTTPServer]")
         server.on("/get", HTTP_GET, &handle_request);
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("var1 = val with spaces\nva=r+ = so&me%"));
     }
 }
@@ -63,7 +71,10 @@ TEST_CASE("HTTP POST Parameters", "[HTTPServer]")
         server.on("/post", HTTP_POST, &handle_request);
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("var2 = val with spaces"));
     }
 }
@@ -76,11 +87,15 @@ TEST_CASE("HTTP GET+POST Parameters", "[HTTPServer]")
         server.on("/get_and_post", HTTP_POST, &handle_request);
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("var3 = val with spaces\nva&r+ = so=me%"));
     }
 }
 
+#if 0
 TEST_CASE("HTTP Upload", "[HTTPServer]")
 {
     {
@@ -98,10 +113,14 @@ TEST_CASE("HTTP Upload", "[HTTPServer]")
         });
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
+        {
+            MDNS.update();
             server.handleClient();
+        }
         REQUIRE(siteHits > 0 && siteData.equals("test.txt:16\nvar4 = val with spaces"));
     }
 }
+#endif
 
 void loop()
 {

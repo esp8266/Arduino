@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Generate the core_version.h header per-build
 #
@@ -26,18 +26,28 @@ def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL)
         return proc.stdout.readlines()[0].strip()
 
     try:
         git_ver = git("rev-parse", "--short=8", "HEAD")
         git_desc = git("describe", "--tags")
-    except:
+    except Exception:
+        pass
+
+    text = "#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver)
+    text += "#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc)
+
+    try:
+        with open(path, "r") as inp:
+            old_text = inp.read()
+        if old_text == text:
+            return
+    except Exception:
         pass
 
     with open(path, "w") as out:
-        out.write("#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver))
-        out.write("#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc))
+        out.write(text)
 
 
 if __name__ == "__main__":
@@ -63,7 +73,7 @@ if __name__ == "__main__":
     include_dir = os.path.join(args.build_path, args.include_dir)
     try:
         os.makedirs(include_dir)
-    except:
+    except Exception:
         pass
 
     generate(

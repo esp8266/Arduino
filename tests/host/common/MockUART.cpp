@@ -29,6 +29,8 @@
  */
 
 #include <unistd.h> // write
+#include <sys/time.h> // gettimeofday
+#include <time.h> // localtime
 
 #include "Arduino.h"
 #include "uart.h"
@@ -36,6 +38,8 @@
 //#define UART_DISCARD_NEWEST
 
 extern "C" {
+
+bool blocking_uart = true; // system default
 
 static int s_uart_debug_nr = UART1;
 
@@ -59,13 +63,38 @@ struct uart_
 	struct uart_rx_buffer_ * rx_buffer;
 };
 
+bool serial_timestamp = false;
+
 // write one byte to the emulated UART
 static void
 uart_do_write_char(const int uart_nr, char c)
 {
+	static bool w = false;
+
 	if (uart_nr >= UART0 && uart_nr <= UART1)
-		if (1 != write(uart_nr + 1, &c, 1))
-			fprintf(stderr, "Unable to write character to emulated UART stream: %d\n", c);
+	{
+		if (serial_timestamp && (c == '\n' || c == '\r'))
+		{
+			if (w)
+			{
+				FILE* out = uart_nr == UART0? stdout: stderr;
+				timeval tv;
+				gettimeofday(&tv, nullptr);
+				const tm* tm = localtime(&tv.tv_sec);
+				fprintf(out, "\r\n%d:%02d:%02d.%06d: ", tm->tm_hour, tm->tm_min, tm->tm_sec, (int)tv.tv_usec);
+				fflush(out);
+				w = false;
+			}
+		}
+		else
+		{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+			write(uart_nr + 1, &c, 1);
+#pragma GCC diagnostic pop
+			w = true;
+		}
+	}
 }
 
 // write a new byte into the RX FIFO buffer
@@ -166,6 +195,13 @@ uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 	if(uart == NULL || !uart->rx_enabled)
 		return 0;
 
+    if (!blocking_uart)
+    {
+        char c;
+        if (read(0, &c, 1) == 1)
+            uart_new_data(0, c);
+    }
+
 	size_t ret = 0;
 	while (ret < usersize && uart_rx_available_unsafe(uart->rx_buffer))
 	{
@@ -255,6 +291,7 @@ uart_tx_free(uart_t* uart)
 void
 uart_wait_tx_empty(uart_t* uart)
 {
+	(void) uart;
 }
 
 void
@@ -288,9 +325,21 @@ uart_get_baudrate(uart_t* uart)
 	return uart->baud_rate;
 }
 
-uart_t*
-uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uint8_t
+uart_get_bit_length(const int uart_nr)
 {
+	uint8_t width = ((uart_nr % 16) >> 2) + 5;
+	uint8_t parity = (uart_nr >> 5) + 1;
+	uint8_t stop = uart_nr % 4;
+	return (width + parity + stop + 1);
+}
+
+uart_t*
+uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
+{
+	(void) config;
+	(void) tx_pin;
+	(void) invert;
 	uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
 	if(uart == NULL)
 		return NULL;
@@ -358,19 +407,29 @@ uart_uninit(uart_t* uart)
 	free(uart);
 }
 
-void
+bool
 uart_swap(uart_t* uart, int tx_pin)
 {
+	(void) uart;
+	(void) tx_pin;
+	return true;
 }
 
-void
+bool
 uart_set_tx(uart_t* uart, int tx_pin)
 {
+	(void) uart;
+	(void) tx_pin;
+	return true;
 }
 
-void
+bool
 uart_set_pins(uart_t* uart, int tx, int rx)
 {
+	(void) uart;
+	(void) tx;
+	(void) rx;
+	return true;
 }
 
 bool
@@ -405,6 +464,7 @@ uart_has_overrun(uart_t* uart)
 bool
 uart_has_rx_error(uart_t* uart)
 {
+	(void) uart;
 	return false;
 }
 
@@ -423,12 +483,20 @@ uart_get_debug()
 void
 uart_start_detect_baudrate(int uart_nr)
 {
+	(void) uart_nr;
 }
 
 int
 uart_detect_baudrate(int uart_nr)
 {
+	(void) uart_nr;
 	return 115200;
 }
 
 };
+
+
+size_t uart_peek_available (uart_t* uart) { return 0; }
+const char* uart_peek_buffer (uart_t* uart) { return nullptr; }
+void uart_peek_consume (uart_t* uart, size_t consume) { (void)uart; (void)consume; }
+

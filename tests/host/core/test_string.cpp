@@ -19,6 +19,19 @@
 #include <limits.h>
 #include <StreamString.h>
 
+TEST_CASE("String::move", "[core][String]")
+{
+    const char buffer[] = "this string goes over the sso limit";
+
+    String target;
+    String source(buffer);
+
+    target = std::move(source);
+    REQUIRE(source.c_str() != nullptr);
+    REQUIRE(!source.length());
+    REQUIRE(target == buffer);
+}
+
 TEST_CASE("String::trim", "[core][String]")
 {
     String str;
@@ -119,6 +132,16 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.01");
     str += (double)1.01;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01");
+    str += LLONG_MIN;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808");
+    str += String(LLONG_MIN, 10);
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808");
+    str += LLONG_MAX;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-92233720368547758089223372036854775807");
+    str += ULLONG_MAX;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808922337203685477580718446744073709551615");
+    str += String(ULLONG_MAX, 16);
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808922337203685477580718446744073709551615ffffffffffffffff");
     str = "clean";
     REQUIRE(str.concat(str) == true);
     REQUIRE(str == "cleanclean");
@@ -131,6 +154,22 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "-100");
     str = String((long)-100, 10);
     REQUIRE(str == "-100");
+    // Non-zero-terminated array concatenation
+    const char buff[] = "abcdefg";
+    String n;
+    n = "1234567890"; // Make it a SSO string, fill with non-0 data
+    n = "1"; // Overwrite [1] with 0, but leave old junk in SSO space still
+    n.concat(buff, 3);
+    REQUIRE(n == "1abc"); // Ensure the trailing 0 is always present even w/this funky concat
+    for (int i=0; i<20; i++)
+        n.concat(buff, 1); // Add 20 'a's to go from SSO to normal string
+    REQUIRE(n == "1abcaaaaaaaaaaaaaaaaaaaa");
+    n = "";
+    for (int i=0; i<=5; i++)
+        n.concat(buff, i);
+    REQUIRE(n == "aababcabcdabcde");
+    n.concat(buff, 0); // And check no add'n
+    REQUIRE(n == "aababcabcdabcde");
 }
 
 TEST_CASE("String comparison", "[core][String]")
@@ -216,6 +255,10 @@ TEST_CASE("String nulls", "[core][String]")
     REQUIRE(s.lastIndexOf("tacos") == -1);
     REQUIRE(s.lastIndexOf('t', 0) == -1);
     REQUIRE(s.lastIndexOf('t') == -1);
+    REQUIRE(s.indexOf(String("tacos"), 1) == -1);
+    REQUIRE(s.indexOf(String("tacos")) == -1);
+    REQUIRE(s.indexOf(F("tacos"), 1) == -1);
+    REQUIRE(s.indexOf(F("tacos")) == -1);
     REQUIRE(s.indexOf("tacos", 1) == -1);
     REQUIRE(s.indexOf("tacos") == -1);
     REQUIRE(s.indexOf('t', 1) == -1);
@@ -320,11 +363,11 @@ TEST_CASE("String SSO works", "[core][String]")
   REQUIRE(s.c_str() == savesso);
   REQUIRE(s == "0123456789");
   REQUIRE(s.length() == 10);
-  s += "a";
-  REQUIRE(s.c_str() == savesso);
-  REQUIRE(s == "0123456789a");
-  REQUIRE(s.length() == 11);
   if (sizeof(savesso) == 4) {
+    s += "a";
+    REQUIRE(s.c_str() != savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "b";
     REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789ab");
@@ -334,12 +377,16 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s == "0123456789abc");
     REQUIRE(s.length() == 13);
   } else {
+  s += "a";
+    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s == "0123456789a");
+    REQUIRE(s.length() == 11);
     s += "bcde";
     REQUIRE(s.c_str() == savesso);
     REQUIRE(s == "0123456789abcde");
     REQUIRE(s.length() == 15);
     s += "fghi";
-    REQUIRE(s.c_str() == savesso);
+    REQUIRE(s.c_str() != savesso);
     REQUIRE(s == "0123456789abcdefghi");
     REQUIRE(s.length() == 19);
     s += "j";
@@ -360,7 +407,7 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s.length() == 23);
     s += "nopq";
     REQUIRE(s.c_str() != savesso);
-      REQUIRE(s == "0123456789abcdefghijklmnopq");
+    REQUIRE(s == "0123456789abcdefghijklmnopq");
     REQUIRE(s.length() == 27);
     s += "rstu";
     REQUIRE(s.c_str() != savesso);
@@ -451,4 +498,99 @@ TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
     s.print(String("message"));
     s.print('\"');
     REQUIRE(s == "{\"message\"");
+}
+
+TEST_CASE("Strings with NULs", "[core][String]")
+{
+  // The following should never be done in a real app! This is only to inject 0s in the middle of a string.
+  // Fits in SSO...
+  String str("01234567");
+  REQUIRE(str.length() == 8);
+  char *ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  String str2;
+  str2 = str;
+  REQUIRE(str2.length() == 8);
+  // Needs a buffer pointer
+  str = "0123456789012345678901234567890123456789";
+  ptr = (char *)str.c_str();
+  ptr[3] = 0;
+  str2 = str;
+  REQUIRE(str2.length() == 40);
+  String str3("a");
+  ptr = (char *)str3.c_str();
+  *ptr = 0;
+  REQUIRE(str3.length() == 1);
+  str3 += str3;
+  REQUIRE(str3.length() == 2);
+  str3 += str3;
+  REQUIRE(str3.length() == 4);
+  str3 += str3;
+  REQUIRE(str3.length() == 8);
+  str3 += str3;
+  REQUIRE(str3.length() == 16);
+  str3 += str3;
+  REQUIRE(str3.length() == 32);
+  str3 += str3;
+  REQUIRE(str3.length() == 64);
+  static char zeros[64] = {0};
+  const char *p = str3.c_str();
+  REQUIRE(!memcmp(p, zeros, 64));
+}
+
+TEST_CASE("Replace and string expansion", "[core][String]")
+{
+  String s, l;
+  // Make these large enough to span SSO and non SSO
+  String whole = "#123456789012345678901234567890";
+  const char *res = "abcde123456789012345678901234567890";
+  for (size_t i=1; i < whole.length(); i++) {
+    s = whole.substring(0, i);
+    l = s;
+    l.replace("#", "abcde");
+    char buff[64];
+    strcpy(buff, res);
+    buff[5 + i-1] = 0;
+    REQUIRE(!strcmp(l.c_str(), buff));
+    REQUIRE(l.length() == strlen(buff));
+  }
+}
+
+TEST_CASE("String chaining", "[core][String]")
+{
+  const char* chunks[] {
+    "~12345",
+    "67890",
+    "qwertyuiopasdfghjkl",
+    "zxcvbnm"
+  };
+
+  String all;
+  for (auto* chunk : chunks) {
+      all += chunk;
+  }
+
+  // make sure we can chain a combination of things to form a String
+  REQUIRE((String(chunks[0]) + String(chunks[1]) + String(chunks[2]) + String(chunks[3])) == all);
+  REQUIRE((chunks[0] + String(chunks[1]) + F(chunks[2]) + chunks[3]) == all);
+  REQUIRE((String(chunks[0]) + F(chunks[1]) + F(chunks[2]) + String(chunks[3])) == all);
+  REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3])) == all);
+  REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + F(chunks[3])) == all);
+
+  // these are still invalid (and also cannot compile at all):
+  // - `F(...)` + `F(...)`
+  // - `F(...)` + `const char*`
+  // - `const char*` + `F(...)`
+  // we need `String()` as either rhs or lhs
+
+  // ensure chaining reuses the buffer
+  // (internal details...)
+  {
+    String tmp(chunks[3]);
+    tmp.reserve(2 * all.length());
+    auto* ptr = tmp.c_str();
+    String result("~1" + String(&chunks[0][0] + 2) + F(chunks[1]) + chunks[2] + std::move(tmp));
+    REQUIRE(result == all);
+    REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));
+  }
 }

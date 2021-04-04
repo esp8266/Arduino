@@ -19,7 +19,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <ESP8266WebServer.h>
 #include <WiFiClientSecure.h>
 
-//#include "ESP8266WebServerSecureAxTLS.h"
-#include "ESP8266WebServerSecureBearSSL.h"
+namespace BearSSL {
+  using ESP8266WebServerSecure = esp8266webserver::ESP8266WebServerTemplate<WiFiServerSecure>;
+};

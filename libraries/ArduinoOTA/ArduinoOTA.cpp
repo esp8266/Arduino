@@ -31,19 +31,6 @@ extern "C" {
 #endif
 
 ArduinoOTAClass::ArduinoOTAClass()
-: _port(0)
-, _udp_ota(0)
-, _initialized(false)
-, _rebootOnSuccess(true)
-, _useMDNS(true)
-, _state(OTA_IDLE)
-, _size(0)
-, _cmd(0)
-, _ota_port(0)
-, _start_callback(NULL)
-, _end_callback(NULL)
-, _error_callback(NULL)
-, _progress_callback(NULL)
 {
 }
 
@@ -168,7 +155,7 @@ int ArduinoOTAClass::parseInt(){
 }
 
 String ArduinoOTAClass::readStringUntil(char end){
-  String res = "";
+  String res;
   int value;
   while(true){
     value = _udp_ota->read();
@@ -186,7 +173,7 @@ void ArduinoOTAClass::_onRx(){
 
   if (_state == OTA_IDLE) {
     int cmd = parseInt();
-    if (cmd != U_FLASH && cmd != U_SPIFFS)
+    if (cmd != U_FLASH && cmd != U_FS)
       return;
     _ota_ip = _udp_ota->getRemoteAddress();
     _cmd  = cmd;
@@ -231,7 +218,7 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    String challenge = _password + ":" + String(_nonce) + ":" + cnonce;
+    String challenge = _password + ':' + String(_nonce) + ':' + cnonce;
     MD5Builder _challengemd5;
     _challengemd5.begin();
     _challengemd5.add(challenge);
@@ -303,7 +290,7 @@ void ArduinoOTAClass::_runUpdate() {
   client.setNoDelay(true);
 
   uint32_t written, total = 0;
-  while (!Update.isFinished() && client.connected()) {
+  while (!Update.isFinished() && (client.connected() || client.available())) {
     int waited = 1000;
     while (!client.available() && waited--)
       delay(1);
@@ -328,9 +315,13 @@ void ArduinoOTAClass::_runUpdate() {
   }
 
   if (Update.end()) {
+    // Ensure last count packet has been sent out and not combined with the final OK
+    client.flush();
+    delay(1000);
     client.print("OK");
+    client.flush();
+    delay(1000);
     client.stop();
-    delay(10);
 #ifdef OTA_DEBUG
     OTA_DEBUG.printf("Update Success\n");
 #endif

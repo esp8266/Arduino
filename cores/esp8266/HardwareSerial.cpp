@@ -32,14 +32,22 @@
 #include "HardwareSerial.h"
 #include "Esp.h"
 
+
+// SerialEvent functions are weak, so when the user doesn't define them,
+// the linker just sets their address to 0 (which is checked below).
+// The Serialx_available is just a wrapper around Serialx.available(),
+// but we can refer to it weakly so we don't pull in the entire
+// HardwareSerial instance if the user doesn't also refer to it.
+void serialEvent() __attribute__((weak));
+
 HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr), _rx_size(256)
 {}
 
-void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
+void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin, bool invert)
 {
     end();
-    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
+    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size, invert);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
     if (static_cast<void*>(this) == static_cast<void*>(&DEBUG_ESP_PORT))
     {
@@ -58,6 +66,15 @@ void HardwareSerial::end()
 
     uart_uninit(_uart);
     _uart = NULL;
+}
+
+void HardwareSerial::updateBaudRate(unsigned long baud)
+{
+    if(!_uart) {
+        return;
+    }
+
+    uart_set_baudrate(_uart, baud);
 }
 
 size_t HardwareSerial::setRxBufferSize(size_t size){
@@ -99,14 +116,16 @@ int HardwareSerial::available(void)
 
 void HardwareSerial::flush()
 {
+    uint8_t bit_length = 0;
     if(!_uart || !uart_tx_enabled(_uart)) {
         return;
     }
 
+    bit_length = uart_get_bit_length(_uart_nr); // data width, parity and stop
     uart_wait_tx_empty(_uart);
     //Workaround for a bug in serial not actually being finished yet
     //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
-    delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
+    delayMicroseconds(bit_length * 1000000 / uart_get_baudrate(_uart) + 1);
 }
 
 void HardwareSerial::startDetectBaudrate()
@@ -121,15 +140,15 @@ unsigned long HardwareSerial::testBaudrate()
 
 unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
-    time_t startMillis = millis();
-    unsigned long detectedBaudrate;
-    while ((time_t) millis() - startMillis < timeoutMillis) {
+    esp8266::polledTimeout::oneShotFastMs timeOut(timeoutMillis);
+    unsigned long detectedBaudrate = 0;
+    while (!timeOut) {
         if ((detectedBaudrate = testBaudrate())) {
           break;
         }
         yield();
         delay(100);
-    }    
+    }
     return detectedBaudrate;
 }
 
@@ -151,6 +170,14 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 HardwareSerial Serial(UART0);
+
+// Executed at end of loop() processing when > 0 bytes available in the Serial port
+void serialEventRun(void)
+{
+  if (serialEvent && Serial.available()) {
+    serialEvent();
+  }
+}
 #endif
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
 HardwareSerial Serial1(UART1);

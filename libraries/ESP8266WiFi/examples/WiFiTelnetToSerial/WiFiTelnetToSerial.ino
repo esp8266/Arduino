@@ -87,6 +87,7 @@ void setup() {
   // use SoftwareSerial on regular RX(3)/TX(1) for logging
   logger = new SoftwareSerial(3, 1);
   logger->begin(BAUD_LOGGER);
+  logger->enableIntTx(false);
   logger->println("\n\nUsing SoftwareSerial for logging");
 #else
   logger->begin(BAUD_LOGGER);
@@ -172,10 +173,10 @@ void loop() {
 
   // determine maximum output size "fair TCP use"
   // client.availableForWrite() returns 0 when !client.connected()
-  size_t maxToTcp = 0;
+  int maxToTcp = 0;
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     if (serverClients[i]) {
-      size_t afw = serverClients[i].availableForWrite();
+      int afw = serverClients[i].availableForWrite();
       if (afw) {
         if (!maxToTcp) {
           maxToTcp = afw;
@@ -189,11 +190,11 @@ void loop() {
     }
 
   //check UART for data
-  size_t len = std::min((size_t)Serial.available(), maxToTcp);
+  size_t len = std::min(Serial.available(), maxToTcp);
   len = std::min(len, (size_t)STACK_PROTECTOR);
   if (len) {
     uint8_t sbuf[len];
-    size_t serial_got = Serial.readBytes(sbuf, len);
+    int serial_got = Serial.readBytes(sbuf, len);
     // push UART data to all connected telnet clients
     for (int i = 0; i < MAX_SRV_CLIENTS; i++)
       // if client.availableForWrite() was 0 (congested)

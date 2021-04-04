@@ -1251,8 +1251,8 @@ static inline void
 br_ssl_engine_set_versions(br_ssl_engine_context *cc,
 	unsigned version_min, unsigned version_max)
 {
-	cc->version_min = version_min;
-	cc->version_max = version_max;
+	cc->version_min = (uint16_t)version_min;
+	cc->version_max = (uint16_t)version_max;
 }
 
 /**
@@ -1325,7 +1325,7 @@ br_ssl_engine_set_protocol_names(br_ssl_engine_context *ctx,
 	const char **names, size_t num)
 {
 	ctx->protocol_names = names;
-	ctx->protocol_names_num = num;
+	ctx->protocol_names_num = (uint16_t)num;
 }
 
 /**
@@ -2114,7 +2114,7 @@ void br_ssl_engine_sendapp_ack(br_ssl_engine_context *cc, size_t len);
 /**
  * \brief Get buffer for received application data.
  *
- * If the engine has received application data from the peer, hen this
+ * If the engine has received application data from the peer, then this
  * call returns a pointer to the buffer from where such data shall be
  * read, and its length is written in `*len`. Otherwise, `*len` is set
  * to 0 and `NULL` is returned.

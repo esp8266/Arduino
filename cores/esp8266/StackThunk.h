@@ -41,6 +41,7 @@ extern uint32_t stack_thunk_get_stack_bot();
 extern uint32_t stack_thunk_get_cont_sp();
 extern uint32_t stack_thunk_get_max_usage();
 extern void stack_thunk_dump_stack();
+extern void stack_thunk_fatal_overflow();
 
 // Globals required for thunking operation
 extern uint32_t *stack_thunk_ptr;
@@ -50,9 +51,10 @@ extern uint32_t stack_thunk_refcnt;
 
 // Thunking macro
 #define make_stack_thunk(fcnToThunk) \
-__asm("\n\
+__asm__ ("\n\
 .text\n\
 .literal_position\n\
+.literal .LC_STACK_VALUE"#fcnToThunk", 0xdeadbeef\n\
 \n\
 .text\n\
 .global thunk_"#fcnToThunk"\n\
@@ -67,6 +69,14 @@ thunk_"#fcnToThunk":\n\
   movi a15, stack_thunk_top   /* Load A1(SP) with thunk stack */\n\
   l32i.n a1, a15, 0\n\
   call0 "#fcnToThunk"      /* Do the call */\n\
+  /* Check the stack canary wasn't overwritten */\n\
+  movi a15, stack_thunk_ptr\n\
+  l32i.n a15, a15, 0    /* A15 now has the pointer to stack end*/ \n\
+  l32i.n a15, a15, 0    /* A15 now has contents of last stack entry */\n\
+  l32r a0, .LC_STACK_VALUE"#fcnToThunk" /* A0 now has the check value */\n\
+  beq a0, a15, .L1"#fcnToThunk"\n\
+  call0 stack_thunk_fatal_overflow\n\
+.L1"#fcnToThunk":\n\
   movi a15, stack_thunk_save  /* Restore A1(SP) */\n\
   l32i.n a1, a15, 0\n\
   l32i.n a15, a1, 8     /* Restore the saved registers */\n\

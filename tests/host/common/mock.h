@@ -30,25 +30,46 @@
 */
 
 #define CORE_MOCK 1
+#define MOCK "(mock) " // TODO: provide common logging API instead of adding this string everywhere?
 
-// include host's STL before any other include file
-// because core definition like max() is in the way
+//
 
-#ifdef __cplusplus
-#include <vector>
-#endif
+#define ARDUINO 267
+#define ESP8266 1
+#define A0 0
+#define LED_BUILTIN 0
+#define LWIP_OPEN_SRC
+#define TCP_MSS 536
+#define LWIP_FEATURES 1
 
+//
+
+#define D0 0
+#define D1 1
+#define D2 3
+#define D3 3
+#define D4 4
+#define D5 5
+#define D6 6
+#define D7 7
+#define D8 8
+
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-//#include <stdlib_noniso.h>
+// TODO: #include <stdlib_noniso.h> ?
 char* itoa (int val, char *s, int radix);
 char* ltoa (long val, char *s, int radix);
+
+
+size_t strlcat(char *dst, const char *src, size_t size);
+size_t strlcpy(char *dst, const char *src, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
-
 
 // exotic typedefs used in the sdk
 
@@ -58,11 +79,13 @@ typedef uint32_t uint32;
 
 //
 
+#include <c_types.h>
+#include <core_esp8266_features.h>
+
+uint32_t esp_get_cycle_count();
+
 #include <Arduino.h>
 
-//
-
-#include <stdlib.h>
 #define RANDOM_REG32 ((uint32_t)random())
 
 // net tweak
@@ -76,14 +99,19 @@ typedef uint32_t uint32;
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <osapi.h>
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
+#define ets_vsnprintf vsnprintf
+inline void ets_putc (char c) { putchar(c); }
 
 int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern const char* host_interface; // cmdline parameter
-
+extern bool serial_timestamp;
 extern int mock_port_shifter;
+extern bool blocking_uart;
+extern uint32_t global_source_address; // 0 = INADDR_ANY by default
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
@@ -131,35 +159,12 @@ void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize);
 class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
 
-class InterruptLock { };
-
 //
 
 void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
 void mock_stop_spiffs ();
-
-//
-
-#define ARDUINO 267
-#define ESP8266 1
-#define A0 0
-#define LED_BUILTIN 0
-#define F_CPU 80000000
-#define LWIP_OPEN_SRC
-#define TCP_MSS 536
-#define LWIP_FEATURES 1
-
-//
-
-#define D0 0
-#define D1 1
-#define D2 3
-#define D3 3
-#define D4 4
-#define D5 5
-#define D6 6
-#define D7 7
-#define D8 8
+void mock_start_littlefs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_stop_littlefs ();
 
 //
 

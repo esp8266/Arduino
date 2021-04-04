@@ -42,12 +42,15 @@
 #define MOCK_PORT_SHIFTER 9000
 
 bool user_exit = false;
+bool run_once = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
+size_t littlefs_kb = 1024;
 bool ignore_sigint = false;
 bool restore_tty = false;
 bool mockdebug = false;
 int mock_port_shifter = MOCK_PORT_SHIFTER;
+const char* fspath = nullptr;
 
 #define STDIN STDIN_FILENO
 
@@ -119,37 +122,67 @@ void help (const char* argv0, int exitcode)
 	printf(
 		"%s - compiled with esp8266/arduino emulator\n"
 		"options:\n"
-		"	-h\n"
-		"	-i <interface> - use this interface for IP address\n"
-		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
-		"	-s             - port shifter (default: %d, when root: 0)\n"
-		"	-c             - ignore CTRL-C (send it via Serial)\n"
-		"	-f             - no throttle (possibly 100%%CPU)\n"
-		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
-		"	-S             - spiffs size in KBytes (default: %zd)\n"
-		"	-v             - mock verbose\n"
-		"                  (negative value will force mismatched size)\n"
-		, argv0, MOCK_PORT_SHIFTER, spiffs_kb);
+		"\t-h\n"
+		"\tnetwork:\n"
+		"\t-i <interface> - use this interface for IP address\n"
+		"\t-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+		"\t-s             - port shifter (default: %d, when root: 0)\n"
+        "\tterminal:\n"
+		"\t-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
+		"\t-T             - show timestamp on output\n"
+		"\tFS:\n"
+		"\t-P             - path for fs-persistent files (default: %s-)\n"
+		"\t-S             - spiffs size in KBytes (default: %zd)\n"
+		"\t-L             - littlefs size in KBytes (default: %zd)\n"
+		"\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
+        "\tgeneral:\n"
+		"\t-c             - ignore CTRL-C (send it via Serial)\n"
+		"\t-f             - no throttle (possibly 100%%CPU)\n"
+		"\t-1             - run loop once then exit (for host testing)\n"
+		"\t-v             - verbose\n"
+		, argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
 	exit(exitcode);
 }
 
 static struct option options[] =
 {
-	{ "help",		no_argument,		NULL, 'h' },
-	{ "fast",		no_argument,		NULL, 'f' },
-	{ "local",		no_argument,		NULL, 'l' },
-	{ "sigint",		no_argument,		NULL, 'c' },
-	{ "blockinguart",	no_argument,		NULL, 'b' },
-	{ "verbose",		no_argument,		NULL, 'v' },
-	{ "interface",		required_argument,	NULL, 'i' },
-	{ "spiffskb",		required_argument,	NULL, 'S' },
-	{ "portshifter",	required_argument,	NULL, 's' },
+	{ "help",           no_argument,        NULL, 'h' },
+	{ "fast",           no_argument,        NULL, 'f' },
+	{ "local",          no_argument,        NULL, 'l' },
+	{ "sigint",         no_argument,        NULL, 'c' },
+	{ "blockinguart",   no_argument,        NULL, 'b' },
+	{ "verbose",        no_argument,        NULL, 'v' },
+	{ "timestamp",      no_argument,        NULL, 'T' },
+	{ "interface",      required_argument,  NULL, 'i' },
+	{ "fspath",         required_argument,  NULL, 'P' },
+	{ "spiffskb",       required_argument,  NULL, 'S' },
+	{ "littlefskb",     required_argument,  NULL, 'L' },
+	{ "portshifter",    required_argument,  NULL, 's' },
+	{ "once",           no_argument,        NULL, '1' },
 };
 
 void cleanup ()
 {
 	mock_stop_spiffs();
+	mock_stop_littlefs();
 	mock_stop_uart();
+}
+
+void make_fs_filename (String& name, const char* fspath, const char* argv0)
+{
+	name.clear();
+	if (fspath)
+	{
+		int lastSlash = -1;
+		for (int i = 0; argv0[i]; i++)
+			if (argv0[i] == '/')
+				lastSlash = i;
+		name = fspath;
+		name += '/';
+		name += &argv0[lastSlash + 1];
+	}
+	else
+		name = argv0;
 }
 
 void control_c (int sig)
@@ -168,9 +201,10 @@ void control_c (int sig)
 int main (int argc, char* const argv [])
 {
 	bool fast = false;
-	bool blocking_uart = false;
+	blocking_uart = false; // global
 
 	signal(SIGINT, control_c);
+	signal(SIGTERM, control_c);
 	if (geteuid() == 0)
 		mock_port_shifter = 0;
 	else
@@ -178,7 +212,7 @@ int main (int argc, char* const argv [])
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfbvi:S:s:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -204,11 +238,23 @@ int main (int argc, char* const argv [])
 		case 'S':
 			spiffs_kb = atoi(optarg);
 			break;
+		case 'L':
+			littlefs_kb = atoi(optarg);
+			break;
+		case 'P':
+			fspath = optarg;
+			break;
 		case 'b':
 			blocking_uart = true;
 			break;
 		case 'v':
 			mockdebug = true;
+			break;
+		case 'T':
+			serial_timestamp = true;
+			break;
+		case '1':
+			run_once = true;
 			break;
 		default:
 			help(argv[0], EXIT_FAILURE);
@@ -219,11 +265,22 @@ int main (int argc, char* const argv [])
 
 	if (spiffs_kb)
 	{
-		String name = argv[0];
+		String name;
+		make_fs_filename(name, fspath, argv[0]);
 		name += "-spiffs";
 		name += String(spiffs_kb > 0? spiffs_kb: -spiffs_kb, DEC);
 		name += "KB";
 		mock_start_spiffs(name, spiffs_kb);
+	}
+
+	if (littlefs_kb)
+	{
+		String name;
+		make_fs_filename(name, fspath, argv[0]);
+		name += "-littlefs";
+		name += String(littlefs_kb > 0? littlefs_kb: -littlefs_kb, DEC);
+		name += "KB";
+		mock_start_littlefs(name, littlefs_kb);
 	}
 
 	// setup global global_ipv4_netfmt
@@ -238,6 +295,9 @@ int main (int argc, char* const argv [])
 	// install exit handler in case Esp.restart() is called
 	atexit(cleanup);
 
+	// first call to millis(): now is millis() and micros() beginning
+	millis();
+
 	setup();
 	while (!user_exit)
 	{
@@ -249,6 +309,9 @@ int main (int argc, char* const argv [])
 			usleep(1000); // not 100% cpu, ~1000 loops per second
 		loop();
 		check_incoming_udp();
+
+		if (run_once)
+			user_exit = true;
 	}
 	cleanup();
 

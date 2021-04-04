@@ -32,10 +32,9 @@
 #include "pgmspace.h"
 #include "gdb_hooks.h"
 #include "StackThunk.h"
+#include "coredecls.h"
 
 extern "C" {
-
-extern void __real_system_restart_local();
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
@@ -46,15 +45,29 @@ static const char* s_panic_what = 0;
 static bool s_abort_called = false;
 static const char* s_unhandled_exception = NULL;
 
+static uint32_t s_stacksmash_addr = 0;
+
 void abort() __attribute__((noreturn));
 static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
 
+// using numbers different from "REASON_" in user_interface.h (=0..6)
+enum rst_reason_sw
+{
+    REASON_USER_STACK_SMASH = 253,
+    REASON_USER_SWEXCEPTION_RST = 254
+};
+static int s_user_reset_reason = REASON_DEFAULT_RST;
+
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern void *umm_last_fail_alloc_addr;
 extern int umm_last_fail_alloc_size;
+#if defined(DEBUG_ESP_OOM)
+extern const char *umm_last_fail_alloc_file;
+extern int umm_last_fail_alloc_line;
+#endif
 
 static void raise_exception() __attribute__((noreturn));
 
@@ -78,35 +91,44 @@ static void ets_printf_P(const char *str, ...) {
     vsnprintf(destStr, sizeof(destStr), str, argPtr);
     va_end(argPtr);
     while (*c) {
-        ets_putc(*(c++));
+        ets_uart_putc1(*(c++));
     }
+}
+
+static void cut_here() {
+    ets_putc('\n');
+    for (auto i = 0; i < 15; i++ ) {
+        ets_putc('-');
+    }
+    ets_printf_P(PSTR(" CUT HERE FOR EXCEPTION DECODER "));
+    for (auto i = 0; i < 15; i++ ) {
+        ets_putc('-');
+    }
+    ets_putc('\n');
 }
 
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
 
-    if (gdb_present()) {
-        /* When GDBStub is present, exceptions are handled by GDBStub,
-           but Soft WDT will still call this function.
-           Trigger an exception to break into GDB.
-           TODO: check why gdb_do_break() or asm("break.n 0") do not
-           break into GDB here. */
-        raise_exception();
-    }
-
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
-    system_rtc_mem_read(0, &rst_info, sizeof(rst_info));
-    if (rst_info.reason != REASON_SOFT_WDT_RST &&
-        rst_info.reason != REASON_EXCEPTION_RST &&
-        rst_info.reason != REASON_WDT_RST)
+    if (s_user_reset_reason == REASON_DEFAULT_RST)
     {
-        return;
+        system_rtc_mem_read(0, &rst_info, sizeof(rst_info));
+        if (rst_info.reason != REASON_SOFT_WDT_RST &&
+            rst_info.reason != REASON_EXCEPTION_RST &&
+            rst_info.reason != REASON_WDT_RST)
+        {
+            rst_info.reason = REASON_DEFAULT_RST;
+        }
     }
+    else
+        rst_info.reason = s_user_reset_reason;
 
-    // TODO:  ets_install_putc1 definition is wrong in ets_sys.h, need cast
-    ets_install_putc1((void *)&uart_write_char_d);
+    ets_install_putc1(&uart_write_char_d);
+
+    cut_here();
 
     if (s_panic_line) {
         ets_printf_P(PSTR("\nPanic %S:%d %S"), s_panic_file, s_panic_line, s_panic_func);
@@ -122,11 +144,22 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nAbort called\n"));
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
+        // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
+        // In that case, print the exception as (6) which is IntegerDivZero
+        bool div_zero = (rst_info.exccause == 0) && (rst_info.epc1 == 0x4000dce5);
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
-            rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
+            div_zero ? 6 : rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
+    }
+    else if (rst_info.reason == REASON_USER_STACK_SMASH) {
+        ets_printf_P(PSTR("\nStack overflow detected.\n"));
+        ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
+            5 /* Alloca exception, closest thing to stack fault*/, s_stacksmash_addr, 0, 0, 0, 0);
+   }
+    else {
+        ets_printf_P(PSTR("\nGeneric Reset\n"));
     }
 
     uint32_t cont_stack_start = (uint32_t) &(g_pcont->stack);
@@ -138,10 +171,10 @@ void __wrap_system_restart_local() {
     // (determined empirically, might break)
     uint32_t offset = 0;
     if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        offset = 0x1b0;
+        offset = 0x1a0;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        offset = 0x1a0;
+        offset = 0x190;
     }
     else if (rst_info.reason == REASON_WDT_RST) {
         offset = 0x10;
@@ -176,7 +209,21 @@ void __wrap_system_restart_local() {
 
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (umm_last_fail_alloc_addr) {
-      ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+#if defined(DEBUG_ESP_OOM)
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)@%S:%d\n"),
+            (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size,
+            umm_last_fail_alloc_file, umm_last_fail_alloc_line);
+#else
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+#endif
+    }
+
+    cut_here();
+
+    if (s_unhandled_exception && umm_last_fail_alloc_addr) {
+        // now outside from the "cut-here" zone, print correctly the `new` caller address,
+        // idf-monitor.py will be able to decode this one and show exact location in sources
+        ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
     }
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
@@ -222,7 +269,13 @@ static void uart1_write_char_d(char c) {
 }
 
 static void raise_exception() {
-    __asm__ __volatile__ ("syscall");
+    if (gdb_present())
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+
+    s_user_reset_reason = REASON_USER_SWEXCEPTION_RST;
+    ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
+    __wrap_system_restart_local();
+
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
@@ -253,5 +306,21 @@ void __panic_func(const char* file, int line, const char* func) {
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
+
+uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
+void __stack_chk_fail(void) {
+    s_user_reset_reason = REASON_USER_STACK_SMASH;
+    ets_printf_P(PSTR("\nPANIC: Stack overrun"));
+
+    s_stacksmash_addr = (uint32_t)__builtin_return_address(0);
+
+    if (gdb_present())
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+
+    __wrap_system_restart_local();
+
+    while (1); // never reached, needed to satisfy "noreturn" attribute
+}
+
 
 };

@@ -30,8 +30,8 @@ const char *softAP_password = APPSK;
 const char *myHostname = "esp8266";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
-char ssid[32] = "";
-char password[32] = "";
+char ssid[33] = "";
+char password[65] = "";
 
 // DNS server
 const byte DNS_PORT = 53;
@@ -41,7 +41,7 @@ DNSServer dnsServer;
 ESP8266WebServer server(80);
 
 /* Soft AP network parameters */
-IPAddress apIP(192, 168, 4, 1);
+IPAddress apIP(172, 217, 28, 1);
 IPAddress netMsk(255, 255, 255, 0);
 
 
@@ -56,7 +56,7 @@ unsigned int status = WL_IDLE_STATUS;
 
 void setup() {
   delay(1000);
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println();
   Serial.println("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
@@ -140,4 +140,3 @@ void loop() {
   //HTTP
   server.handleClient();
 }
-

@@ -31,8 +31,9 @@ extern "C" {
 
 static volatile timercallback timer1_user_cb = NULL;
 
-void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
+void IRAM_ATTR timer1_isr_handler(void *para, void *frame) {
     (void) para;
+    (void) frame;
     if ((T1C & ((1 << TCAR) | (1 << TCIT))) == 0) TEIE &= ~TEIE1;//edge int disable
     T1I = 0;
     if (timer1_user_cb) {
@@ -44,32 +45,32 @@ void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
     }
 }
 
-void ICACHE_RAM_ATTR timer1_isr_init(){
+void IRAM_ATTR timer1_isr_init(){
     ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
 
-void timer1_attachInterrupt(timercallback userFunc) {
+void IRAM_ATTR timer1_attachInterrupt(timercallback userFunc) {
     timer1_user_cb = userFunc;
     ETS_FRC1_INTR_ENABLE();
 }
 
-void ICACHE_RAM_ATTR timer1_detachInterrupt() {
+void IRAM_ATTR timer1_detachInterrupt() {
     timer1_user_cb = 0;
     TEIE &= ~TEIE1;//edge int disable
     ETS_FRC1_INTR_DISABLE();
 }
 
-void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
+void IRAM_ATTR timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
     T1C = (1 << TCTE) | ((divider & 3) << TCPD) | ((int_type & 1) << TCIT) | ((reload & 1) << TCAR);
     T1I = 0;
 }
 
-void ICACHE_RAM_ATTR timer1_write(uint32_t ticks){
+void IRAM_ATTR timer1_write(uint32_t ticks){
     T1L = ((ticks)& 0x7FFFFF);
     if ((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
 }
 
-void ICACHE_RAM_ATTR timer1_disable(){
+void IRAM_ATTR timer1_disable(){
     T1C = 0;
     T1I = 0;
 }
@@ -79,8 +80,9 @@ void ICACHE_RAM_ATTR timer1_disable(){
 
 static volatile timercallback timer0_user_cb = NULL;
 
-void ICACHE_RAM_ATTR timer0_isr_handler(void* para){
+void IRAM_ATTR timer0_isr_handler(void *para, void *frame) {
     (void) para;
+    (void) frame;
     if (timer0_user_cb) {
         // to make ISR compatible to Arduino AVR model where interrupts are disabled
         // we disable them before we call the client ISR
@@ -90,16 +92,16 @@ void ICACHE_RAM_ATTR timer0_isr_handler(void* para){
     }
 }
 
-void timer0_isr_init(){
+void IRAM_ATTR timer0_isr_init(){
     ETS_CCOMPARE0_INTR_ATTACH(timer0_isr_handler, NULL);
 }
 
-void timer0_attachInterrupt(timercallback userFunc) {
+void IRAM_ATTR timer0_attachInterrupt(timercallback userFunc) {
     timer0_user_cb = userFunc;
     ETS_CCOMPARE0_ENABLE();
 }
 
-void ICACHE_RAM_ATTR timer0_detachInterrupt() {
+void IRAM_ATTR timer0_detachInterrupt() {
     timer0_user_cb = NULL;
     ETS_CCOMPARE0_DISABLE();
 }

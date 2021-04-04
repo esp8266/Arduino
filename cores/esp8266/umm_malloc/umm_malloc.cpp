@@ -1,7 +1,8 @@
 /* ----------------------------------------------------------------------------
  * umm_malloc.c - a memory allocator for embedded systems (microcontrollers)
  *
- * See copyright notice in LICENSE.TXT
+ * See LICENSE for copyright notice
+ * See README.md for acknowledgements and description of internals
  * ----------------------------------------------------------------------------
  *
  * R.Hempel 2007-09-22 - Original
@@ -18,594 +19,76 @@
  *                        not worth the grief.
  * D.Frank 2014-04-02  - Fixed heap configuration when UMM_TEST_MAIN is NOT set,
  *                        added user-dependent configuration file umm_malloc_cfg.h
- * ----------------------------------------------------------------------------
- *
- *  Note: when upgrading this file with upstream code, replace all %i with %d in
- *        printf format strings. ets_printf doesn't handle %i.
- *
- * ----------------------------------------------------------------------------
- *
- * This is a memory management library specifically designed to work with the
- * ARM7 embedded processor, but it should work on many other 32 bit processors,
- * as well as 16 and 8 bit devices.
- *
- * ACKNOWLEDGEMENTS
- *
- * Joerg Wunsch and the avr-libc provided the first malloc() implementation
- * that I examined in detail.
- *
- * http: *www.nongnu.org/avr-libc
- *
- * Doug Lea's paper on malloc() was another excellent reference and provides
- * a lot of detail on advanced memory management techniques such as binning.
- *
- * http: *g.oswego.edu/dl/html/malloc.html
- *
- * Bill Dittman provided excellent suggestions, including macros to support
- * using these functions in critical sections, and for optimizing realloc()
- * further by checking to see if the previous block was free and could be
- * used for the new block size. This can help to reduce heap fragmentation
- * significantly.
- *
- * Yaniv Ankin suggested that a way to dump the current heap condition
- * might be useful. I combined this with an idea from plarroy to also
- * allow checking a free pointer to make sure it's valid.
- *
- * ----------------------------------------------------------------------------
- *
- * The memory manager assumes the following things:
- *
- * 1. The standard POSIX compliant malloc/realloc/free semantics are used
- * 2. All memory used by the manager is allocated at link time, it is aligned
- *    on a 32 bit boundary, it is contiguous, and its extent (start and end
- *    address) is filled in by the linker.
- * 3. All memory used by the manager is initialized to 0 as part of the
- *    runtime startup routine. No other initialization is required.
- *
- * The fastest linked list implementations use doubly linked lists so that
- * its possible to insert and delete blocks in constant time. This memory
- * manager keeps track of both free and used blocks in a doubly linked list.
- *
- * Most memory managers use some kind of list structure made up of pointers
- * to keep track of used - and sometimes free - blocks of memory. In an
- * embedded system, this can get pretty expensive as each pointer can use
- * up to 32 bits.
- *
- * In most embedded systems there is no need for managing large blocks
- * of memory dynamically, so a full 32 bit pointer based data structure
- * for the free and used block lists is wasteful. A block of memory on
- * the free list would use 16 bytes just for the pointers!
- *
- * This memory management library sees the malloc heap as an array of blocks,
- * and uses block numbers to keep track of locations. The block numbers are
- * 15 bits - which allows for up to 32767 blocks of memory. The high order
- * bit marks a block as being either free or in use, which will be explained
- * later.
- *
- * The result is that a block of memory on the free list uses just 8 bytes
- * instead of 16.
- *
- * In fact, we go even one step futher when we realize that the free block
- * index values are available to store data when the block is allocated.
- *
- * The overhead of an allocated block is therefore just 4 bytes.
- *
- * Each memory block holds 8 bytes, and there are up to 32767 blocks
- * available, for about 256K of heap space. If that's not enough, you
- * can always add more data bytes to the body of the memory block
- * at the expense of free block size overhead.
- *
- * There are a lot of little features and optimizations in this memory
- * management system that makes it especially suited to small embedded, but
- * the best way to appreciate them is to review the data structures and
- * algorithms used, so let's get started.
- *
- * ----------------------------------------------------------------------------
- *
- * We have a general notation for a block that we'll use to describe the
- * different scenarios that our memory allocation algorithm must deal with:
- *
- *    +----+----+----+----+
- * c  |* n |  p | nf | pf |
- *    +----+----+----+----+
- *
- * Where - c  is the index of this block
- *         *  is the indicator for a free block
- *         n  is the index of the next block in the heap
- *         p  is the index of the previous block in the heap
- *         nf is the index of the next block in the free list
- *         pf is the index of the previous block in the free list
- *
- * The fact that we have forward and backward links in the block descriptors
- * means that malloc() and free() operations can be very fast. It's easy
- * to either allocate the whole free item to a new block or to allocate part
- * of the free item and leave the rest on the free list without traversing
- * the list from front to back first.
- *
- * The entire block of memory used by the heap is assumed to be initialized
- * to 0. The very first block in the heap is special - it't the head of the
- * free block list. It is never assimilated with a free block (more on this
- * later).
- *
- * Once a block has been allocated to the application, it looks like this:
- *
- *    +----+----+----+----+
- *  c |  n |  p |   ...   |
- *    +----+----+----+----+
- *
- * Where - c  is the index of this block
- *         n  is the index of the next block in the heap
- *         p  is the index of the previous block in the heap
- *
- * Note that the free list information is gone, because it's now being used to
- * store actual data for the application. It would have been nice to store
- * the next and previous free list indexes as well, but that would be a waste
- * of space. If we had even 500 items in use, that would be 2,000 bytes for
- * free list information. We simply can't afford to waste that much.
- *
- * The address of the ... area is what is returned to the application
- * for data storage.
- *
- * The following sections describe the scenarios encountered during the
- * operation of the library. There are two additional notation conventions:
- *
- * ?? inside a pointer block means that the data is irrelevant. We don't care
- *    about it because we don't read or modify it in the scenario being
- *    described.
- *
- * ... between memory blocks indicates zero or more additional blocks are
- *     allocated for use by the upper block.
- *
- * And while we're talking about "upper" and "lower" blocks, we should make
- * a comment about adresses. In the diagrams, a block higher up in the
- * picture is at a lower address. And the blocks grow downwards their
- * block index increases as does their physical address.
- *
- * Finally, there's one very important characteristic of the individual
- * blocks that make up the heap - there can never be two consecutive free
- * memory blocks, but there can be consecutive used memory blocks.
- *
- * The reason is that we always want to have a short free list of the
- * largest possible block sizes. By always assimilating a newly freed block
- * with adjacent free blocks, we maximize the size of each free memory area.
- *
- *---------------------------------------------------------------------------
- *
- * Operation of malloc right after system startup
- *
- * As part of the system startup code, all of the heap has been cleared.
- *
- * During the very first malloc operation, we start traversing the free list
- * starting at index 0. The index of the next free block is 0, which means
- * we're at the end of the list!
- *
- * At this point, the malloc has a special test that checks if the current
- * block index is 0, which it is. This special case initializes the free
- * list to point at block index 1.
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- * 0  |  0 |  0 |  0 |  0 |           0  |  1 |  0 |  1 |  0 |
- *    +----+----+----+----+              +----+----+----+----+
- *                                       +----+----+----+----+
- *                                    1  |  0 |  0 |  0 |  0 |
- *                                       +----+----+----+----+
- *
- * The heap is now ready to complete the first malloc operation.
- *
- * ----------------------------------------------------------------------------
- *
- * Operation of malloc when we have reached the end of the free list and
- * there is no block large enough to accommodate the request.
- *
- * This happens at the very first malloc operation, or any time the free
- * list is traversed and no free block large enough for the request is
- * found.
- *
- * The current block pointer will be at the end of the free list, and we
- * know we're at the end of the list because the nf index is 0, like this:
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- * pf |*?? | ?? | cf | ?? |           pf |*?? | ?? | lf | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- *  p | cf | ?? |   ...   |            p | cf | ?? |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- * cf |  0 |  p |  0 | pf |            c | lf |  p |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *                                       +----+----+----+----+
- *                                    lf |  0 | cf |  0 | pf |
- *                                       +----+----+----+----+
- *
- * As we walk the free list looking for a block of size b or larger, we get
- * to cf, which is the last item in the free list. We know this because the
- * next index is 0.
- *
- * So we're going to turn cf into the new block of memory, and then create
- * a new block that represents the last free entry (lf) and adjust the prev
- * index of lf to point at the  block we just created. We also need to adjust
- * the next index of the new block (c) to point to the last free block.
- *
- * Note that the next free index of the pf block must point to the new lf
- * because cf is no longer a free block!
- *
- * ----------------------------------------------------------------------------
- *
- * Operation of malloc when we have found a block (cf) that will fit the
- * current request of b units exactly.
- *
- * This one is pretty easy, just clear the free list bit in the current
- * block and unhook it from the free list.
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- * pf |*?? | ?? | cf | ?? |           pf |*?? | ?? | nf | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- *  p | cf | ?? |   ...   |            p | cf | ?? |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+  Clear the free
- * cf |* n |  p | nf | pf |           cf |  n |  p |   ..    |  list bit here
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- *  n | ?? | cf |   ...   |            n | ?? | cf |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * nf |*?? | ?? | ?? | cf |           nf | ?? | ?? | ?? | pf |
- *    +----+----+----+----+              +----+----+----+----+
- *
- * Unhooking from the free list is accomplished by adjusting the next and
- * prev free list index values in the pf and nf blocks.
- *
- * ----------------------------------------------------------------------------
- *
- * Operation of malloc when we have found a block that will fit the current
- * request of b units with some left over.
- *
- * We'll allocate the new block at the END of the current free block so we
- * don't have to change ANY free list pointers.
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- * pf |*?? | ?? | cf | ?? |           pf |*?? | ?? | cf | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- *  p | cf | ?? |   ...   |            p | cf | ?? |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- * cf |* n |  p | nf | pf |           cf |* c |  p | nf | pf |
- *    +----+----+----+----+              +----+----+----+----+
- *                                       +----+----+----+----+ This is the new
- *                                     c |  n | cf |   ..    | block at cf+b
- *                                       +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- *  n | ?? | cf |   ...   |            n | ?? |  c |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * nf |*?? | ?? | ?? | cf |           nf | ?? | ?? | ?? | pf |
- *    +----+----+----+----+              +----+----+----+----+
- *
- * This one is prety easy too, except we don't need to mess with the
- * free list indexes at all becasue we'll allocate the new block at the
- * end of the current free block. We do, however have to adjust the
- * indexes in cf, c, and n.
- *
- * ----------------------------------------------------------------------------
- *
- * That covers the initialization and all possible malloc scenarios, so now
- * we need to cover the free operation possibilities...
- *
- * The operation of free depends on the position of the current block being
- * freed relative to free list items immediately above or below it. The code
- * works like this:
- *
- * if next block is free
- *   assimilate with next block already on free list
- * if prev block is free
- *   assimilate with prev block already on free list
- * else
- *   put current block at head of free list
- *
- * ----------------------------------------------------------------------------
- *
- * Step 1 of the free operation checks if the next block is free, and if it
- * is then insert this block into the free list and assimilate the next block
- * with this one.
- *
- * Note that c is the block we are freeing up, cf is the free block that
- * follows it.
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- * pf |*?? | ?? | cf | ?? |           pf |*?? | ?? | nf | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- *  p |  c | ?? |   ...   |            p |  c | ?? |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+ This block is
- *  c | cf |  p |   ...   |            c | nn |  p |   ...   | disconnected
- *    +----+----+----+----+              +----+----+----+----+ from free list,
- *    +----+----+----+----+                                    assimilated with
- * cf |*nn |  c | nf | pf |                                    the next, and
- *    +----+----+----+----+                                    ready for step 2
- *    +----+----+----+----+              +----+----+----+----+
- * nn | ?? | cf | ?? | ?? |           nn | ?? |  c |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * nf |*?? | ?? | ?? | cf |           nf |*?? | ?? | ?? | pf |
- *    +----+----+----+----+              +----+----+----+----+
- *
- * Take special note that the newly assimilated block (c) is completely
- * disconnected from the free list, and it does not have its free list
- * bit set. This is important as we move on to step 2 of the procedure...
- *
- * ----------------------------------------------------------------------------
- *
- * Step 2 of the free operation checks if the prev block is free, and if it
- * is then assimilate it with this block.
- *
- * Note that c is the block we are freeing up, pf is the free block that
- * precedes it.
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+ This block has
- * pf |* c | ?? | nf | ?? |           pf |* n | ?? | nf | ?? | assimilated the
- *    +----+----+----+----+              +----+----+----+----+ current block
- *    +----+----+----+----+
- *  c |  n | pf |   ...   |
- *    +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- *  n | ?? |  c |   ...   |            n | ?? | pf | ?? | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * nf |*?? | ?? | ?? | pf |           nf |*?? | ?? | ?? | pf |
- *    +----+----+----+----+              +----+----+----+----+
- *
- * Nothing magic here, except that when we're done, the current block (c)
- * is gone since it's been absorbed into the previous free block. Note that
- * the previous step guarantees that the next block (n) is not free.
- *
- * ----------------------------------------------------------------------------
- *
- * Step 3 of the free operation only runs if the previous block is not free.
- * it just inserts the current block to the head of the free list.
- *
- * Remember, 0 is always the first block in the memory heap, and it's always
- * head of the free list!
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- *  0 | ?? | ?? | nf |  0 |            0 | ?? | ?? |  c |  0 |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- *  p |  c | ?? |   ...   |            p |  c | ?? |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- *  c |  n |  p |   ..    |            c |* n |  p | nf |  0 |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- *  n | ?? |  c |   ...   |            n | ?? |  c |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * nf |*?? | ?? | ?? |  0 |           nf |*?? | ?? | ?? |  c |
- *    +----+----+----+----+              +----+----+----+----+
- *
- * Again, nothing spectacular here, we're simply adjusting a few pointers
- * to make the most recently freed block the first item in the free list.
- *
- * That's because finding the previous free block would mean a reverse
- * traversal of blocks until we found a free one, and it's just easier to
- * put it at the head of the list. No traversal is needed.
- *
- * ----------------------------------------------------------------------------
- *
- * Finally, we can cover realloc, which has the following basic operation.
- *
- * The first thing we do is assimilate up with the next free block of
- * memory if possible. This step might help if we're resizing to a bigger
- * block of memory. It also helps if we're downsizing and creating a new
- * free block with the leftover memory.
- *
- * First we check to see if the next block is free, and we assimilate it
- * to this block if it is. If the previous block is also free, and if
- * combining it with the current block would satisfy the request, then we
- * assimilate with that block and move the current data down to the new
- * location.
- *
- * Assimilating with the previous free block and moving the data works
- * like this:
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- * pf |*?? | ?? | cf | ?? |           pf |*?? | ?? | nf | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * cf |* c | ?? | nf | pf |            c |  n | ?? |   ...   | The data gets
- *    +----+----+----+----+              +----+----+----+----+ moved from c to
- *    +----+----+----+----+                                    the new data area
- *  c |  n | cf |   ...   |                                    in cf, then c is
- *    +----+----+----+----+                                    adjusted to cf
- *    +----+----+----+----+              +----+----+----+----+
- *  n | ?? |  c |   ...   |            n | ?? |  c | ?? | ?? |
- *    +----+----+----+----+              +----+----+----+----+
- *             ...                                ...
- *    +----+----+----+----+              +----+----+----+----+
- * nf |*?? | ?? | ?? | cf |           nf |*?? | ?? | ?? | pf |
- *    +----+----+----+----+              +----+----+----+----+
- *
- *
- * Once we're done that, there are three scenarios to consider:
- *
- * 1. The current block size is exactly the right size, so no more work is
- *    needed.
- *
- * 2. The current block is bigger than the new required size, so carve off
- *    the excess and add it to the free list.
- *
- * 3. The current block is still smaller than the required size, so malloc
- *    a new block of the correct size and copy the current data into the new
- *    block before freeing the current block.
- *
- * The only one of these scenarios that involves an operation that has not
- * yet been described is the second one, and it's shown below:
- *
- *    BEFORE                             AFTER
- *
- *    +----+----+----+----+              +----+----+----+----+
- *  p |  c | ?? |   ...   |            p |  c | ?? |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *    +----+----+----+----+              +----+----+----+----+
- *  c |  n |  p |   ...   |            c |  s |  p |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *                                       +----+----+----+----+ This is the
- *                                     s |  n |  c |   ..    | new block at
- *                                       +----+----+----+----+ c+blocks
- *    +----+----+----+----+              +----+----+----+----+
- *  n | ?? |  c |   ...   |            n | ?? |  s |   ...   |
- *    +----+----+----+----+              +----+----+----+----+
- *
- * Then we call free() with the adress of the data portion of the new
- * block (s) which adds it to the free list.
- *
+ * R.Hempel 2016-12-04 - Add support for Unity test framework
+ *                     - Reorganize source files to avoid redundant content
+ *                     - Move integrity and poison checking to separate file
+ * R.Hempel 2017-12-29 - Fix bug in realloc when requesting a new block that
+ *                        results in OOM error - see Issue 11
+ * R.Hempel 2019-09-07 - Separate the malloc() and free() functionality into
+ *                        wrappers that use critical section protection macros
+ *                        and static core functions that assume they are
+ *                        running in a protected con text. Thanks @devyte
+ * R.Hempel 2020-01-07 - Add support for Fragmentation metric - See Issue 14
+ * R.Hempel 2020-01-12 - Use explicitly sized values from stdint.h - See Issue 15
+ * R.Hempel 2020-01-20 - Move metric functions back to umm_info - See Issue 29
+ * R.Hempel 2020-02-01 - Macro functions are uppercased - See Issue 34
  * ----------------------------------------------------------------------------
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <pgmspace.h>
-
-#include "umm_malloc.h"
-
-#include "umm_malloc_cfg.h"   /* user-dependent */
+/*
+ * This include is nothing but comments about thoughts and observations made
+ * while updating the Arduino ESP8266 Core, with the new upstream umm_malloc.
+ * It is added here as an include so that it does not get lost and to avoid
+ * cluttering up the code with a huge block comment.
+ */
+ #include "Notes.h"
+/*
+ * Added for using with Arduino ESP8266 and handling renameing to umm_malloc.cpp
+ */
+#define BUILD_UMM_MALLOC_C
 
 extern "C" {
 
-// From UMM, the last caller of a malloc/realloc/calloc which failed:
-extern void *umm_last_fail_alloc_addr;
-extern int umm_last_fail_alloc_size;
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
 
-#ifndef UMM_FIRST_FIT
-#  ifndef UMM_BEST_FIT
-#    define UMM_BEST_FIT
-#  endif
+#include "umm_malloc_cfg.h"   /* user-dependent */
+#include "umm_malloc.h"
+
+/* Use the default DBGLOG_LEVEL and DBGLOG_FUNCTION */
+
+#ifndef DBGLOG_LEVEL
+#define DBGLOG_LEVEL 0
 #endif
 
-#ifndef DBG_LOG_LEVEL
-#  undef  DBG_LOG_LEVEL
-#  define DBG_LOG_LEVEL 0
-#else
-#  undef  DBG_LOG_LEVEL
-#  define DBG_LOG_LEVEL DBG_LOG_LEVEL
-#endif
+// Save 104 bytes by calling umm_init() early once from app_entry()
+// Some minor UMM_CRITICAL_METRICS counts will be lost through CRT0 init.
+// #define UMM_INIT_HEAP if (!umm_heap) { umm_init(); }
+#define UMM_INIT_HEAP (void)0
 
-// Macro to place constant strings into PROGMEM and print them properly
-#define printf(fmt, ...)  do { static const char fstr[] PROGMEM = fmt; char rstr[sizeof(fmt)]; for (size_t i=0; i<sizeof(rstr); i++) rstr[i] = fstr[i]; printf(rstr, ##__VA_ARGS__); } while (0)
+#include "dbglog/dbglog.h"
 
-/* -- dbglog {{{ */
+//C This change is new in upstream umm_malloc.I think this would have created a
+//C breaking change. Keeping the old #define method in umm_malloc_cfg.h.
+//C I don't see a simple way of making it work. We would have to run code before
+//C the SDK has run to set a value for uint32_t UMM_MALLOC_CFG_HEAP_SIZE.
+//C On the other hand, a manual call to umm_init() before anything else has had a
+//C chance to run would mean that all those calls testing to see if the heap has
+//C been initialized at every umm_malloc API could be removed.
+//C
+//C before starting the NON OS SDK
+//C extern void *UMM_MALLOC_CFG_HEAP_ADDR;
+//C extern uint32_t UMM_MALLOC_CFG_HEAP_SIZE;
 
-/* ----------------------------------------------------------------------------
- *            A set of macros that cleans up code that needs to produce debug
- *            or log information.
- *
- * See copyright notice in LICENSE.TXT
- * ----------------------------------------------------------------------------
- *
- * There are macros to handle the following decreasing levels of detail:
- *
- * 6 = TRACE
- * 5 = DEBUG
- * 4 = CRITICAL
- * 3 = ERROR
- * 2 = WARNING
- * 1 = INFO
- * 0 = FORCE - The printf is always compiled in and is called only when
- *              the first parameter to the macro is non-0
- *
- * ----------------------------------------------------------------------------
- *
- * The following #define should be set up before this file is included so
- * that we can be sure that the correct macros are defined.
- *
- * #define DBG_LOG_LEVEL x
- * ----------------------------------------------------------------------------
- */
-
-#undef DBG_LOG_TRACE
-#undef DBG_LOG_DEBUG
-#undef DBG_LOG_CRITICAL
-#undef DBG_LOG_ERROR
-#undef DBG_LOG_WARNING
-#undef DBG_LOG_INFO
-#undef DBG_LOG_FORCE
-
-/* ------------------------------------------------------------------------- */
-
-#if DBG_LOG_LEVEL >= 6
-#  define DBG_LOG_TRACE( format, ... ) printf( format, ## __VA_ARGS__ )
-#else
-#  define DBG_LOG_TRACE( format, ... )
-#endif
-
-#if DBG_LOG_LEVEL >= 5
-#  define DBG_LOG_DEBUG( format, ... ) printf( format, ## __VA_ARGS__ )
-#else
-#  define DBG_LOG_DEBUG( format, ... )
-#endif
-
-#if DBG_LOG_LEVEL >= 4
-#  define DBG_LOG_CRITICAL( format, ... ) printf( format, ## __VA_ARGS__ )
-#else
-#  define DBG_LOG_CRITICAL( format, ... )
-#endif
-
-#if DBG_LOG_LEVEL >= 3
-#  define DBG_LOG_ERROR( format, ... ) printf( format, ## __VA_ARGS__ )
-#else
-#  define DBG_LOG_ERROR( format, ... )
-#endif
-
-#if DBG_LOG_LEVEL >= 2
-#  define DBG_LOG_WARNING( format, ... ) printf( format, ## __VA_ARGS__ )
-#else
-#  define DBG_LOG_WARNING( format, ... )
-#endif
-
-#if DBG_LOG_LEVEL >= 1
-#  define DBG_LOG_INFO( format, ... ) printf( format, ## __VA_ARGS__ )
-#else
-#  define DBG_LOG_INFO( format, ... )
-#endif
-
-#define DBG_LOG_FORCE( force, format, ... ) {if(force) {printf( format, ## __VA_ARGS__  );}}
-
-/* }}} */
+#include "umm_local.h"      // target-dependent supplemental
 
 /* ------------------------------------------------------------------------- */
 
 UMM_H_ATTPACKPRE typedef struct umm_ptr_t {
-  unsigned short int next;
-  unsigned short int prev;
+  uint16_t next;
+  uint16_t prev;
 } UMM_H_ATTPACKSUF umm_ptr;
 
 
@@ -615,504 +98,175 @@ UMM_H_ATTPACKPRE typedef struct umm_block_t {
   } header;
   union {
     umm_ptr free;
-    unsigned char data[4];
+    uint8_t data[4];
   } body;
 } UMM_H_ATTPACKSUF umm_block;
 
-#define UMM_FREELIST_MASK (0x8000)
-#define UMM_BLOCKNO_MASK  (0x7FFF)
+#define UMM_FREELIST_MASK ((uint16_t)(0x8000))
+#define UMM_BLOCKNO_MASK  ((uint16_t)(0x7FFF))
 
 /* ------------------------------------------------------------------------- */
+umm_heap_context_t heap_context[UMM_NUM_HEAPS] __attribute__((section(".noinit")));
+// void *umm_heap = NULL;
 
-#ifdef UMM_REDEFINE_MEM_FUNCTIONS
-#  define umm_free    free
-#  define umm_malloc  malloc
-#  define umm_calloc  calloc
-#  define umm_realloc realloc
+/* A stack allowing push/popping of heaps for library use */
+#if (UMM_NUM_HEAPS == 1)
+
+#else
+static size_t umm_heap_cur = UMM_HEAP_DRAM;
+static int umm_heap_stack_ptr = 0;
+static unsigned char umm_heap_stack[UMM_HEAP_STACK_DEPTH];
+#endif
+/* ------------------------------------------------------------------------ */
+/*
+ * Methods to get heap id or context
+ *
+ */
+
+#if (UMM_NUM_HEAPS == 1)
+size_t umm_get_current_heap_id(void) {
+  return 0;
+}
+
+umm_heap_context_t *umm_get_current_heap(void) {
+  return &heap_context[0];
+}
+
+static umm_heap_context_t *umm_get_heap_by_id( size_t which ) {
+  (void)which;
+  return &heap_context[0];
+}
+
+umm_heap_context_t *umm_set_heap_by_id( size_t which ) {
+  (void)which;
+  return &heap_context[0];
+}
+
+#else
+size_t umm_get_current_heap_id(void) {
+  return umm_heap_cur;
+}
+
+umm_heap_context_t *umm_get_current_heap(void) {
+  return &heap_context[umm_heap_cur];
+}
+
+static umm_heap_context_t *umm_get_heap_by_id( size_t which ) {
+  if (which < UMM_NUM_HEAPS) {
+    return &heap_context[which];
+  }
+  return NULL;
+}
+
+umm_heap_context_t *umm_set_heap_by_id( size_t which ) {
+  umm_heap_context_t *_context = umm_get_heap_by_id(which);
+  if (_context && _context->heap) {
+    umm_heap_cur = which;
+    return _context;
+  }
+  return NULL;
+}
 #endif
 
-umm_block *umm_heap = NULL;
-unsigned short int umm_numblocks = 0;
+#if (UMM_NUM_HEAPS == 1)
+umm_heap_context_t *umm_push_heap( size_t which ) {
+  (void)which;
+  return &heap_context[0];
+}
 
-#define UMM_NUMBLOCKS (umm_numblocks)
+umm_heap_context_t *umm_pop_heap( void ) {
+  return &heap_context[0];
+}
+
+int umm_get_heap_stack_index( void ) {
+  return 0;
+}
+#else
+/* ------------------------------------------------------------------------ */
+
+umm_heap_context_t *umm_push_heap( size_t which ) {
+  if (umm_heap_stack_ptr < UMM_HEAP_STACK_DEPTH) {
+    umm_heap_stack[umm_heap_stack_ptr++] = umm_heap_cur;
+    return umm_set_heap_by_id( which );
+  }
+  return NULL;
+}
 
 /* ------------------------------------------------------------------------ */
 
-#define UMM_BLOCK(b)  (umm_heap[b])
+umm_heap_context_t *umm_pop_heap( void ) {
+  if (umm_heap_stack_ptr > 0 ) {
+    return umm_set_heap_by_id(umm_heap_stack[--umm_heap_stack_ptr]);
+  }
+  return NULL;
+}
+
+// Intended for diagnosic use
+int umm_get_heap_stack_index( void ) {
+  return umm_heap_stack_ptr;
+}
+#endif
+/* ------------------------------------------------------------------------ */
+/*
+ * Returns the correct heap context for a given pointer.  Useful for
+ * realloc or free since you may not be in the right heap to handle it.
+ *
+ */
+static bool test_ptr_context( size_t which, void *ptr ) {
+  return
+    heap_context[which].heap &&
+    ptr >= (void *)heap_context[which].heap &&
+    ptr <          heap_context[which].heap_end;
+}
+
+static umm_heap_context_t *umm_get_ptr_context(void *ptr) {
+  for (size_t i = 0; i < UMM_NUM_HEAPS; i++) {
+    if (test_ptr_context( i, ptr ) ) {
+      return umm_get_heap_by_id( i );
+    }
+  }
+
+  panic();
+  return NULL;
+}
+
+#define UMM_NUMBLOCKS (_context->numblocks)
+#define UMM_BLOCK_LAST (UMM_NUMBLOCKS - 1)
+
+/* -------------------------------------------------------------------------
+ * These macros evaluate to the address of the block and data respectively
+ */
+
+#define UMM_BLOCK(b)  (_context->heap[b])
+#define UMM_DATA(b)   (UMM_BLOCK(b).body.data)
+
+/* -------------------------------------------------------------------------
+ * These macros evaluate to the index of the block - NOT the address!!!
+ */
+
+/* ------------------------------------------------------------------------ */
 
 #define UMM_NBLOCK(b) (UMM_BLOCK(b).header.used.next)
 #define UMM_PBLOCK(b) (UMM_BLOCK(b).header.used.prev)
 #define UMM_NFREE(b)  (UMM_BLOCK(b).body.free.next)
 #define UMM_PFREE(b)  (UMM_BLOCK(b).body.free.prev)
-#define UMM_DATA(b)   (UMM_BLOCK(b).body.data)
 
-/* integrity check (UMM_INTEGRITY_CHECK) {{{ */
-#if defined(UMM_INTEGRITY_CHECK)
-/*
- * Perform integrity check of the whole heap data. Returns 1 in case of
- * success, 0 otherwise.
- *
- * First of all, iterate through all free blocks, and check that all backlinks
- * match (i.e. if block X has next free block Y, then the block Y should have
- * previous free block set to X).
- *
- * Additionally, we check that each free block is correctly marked with
- * `UMM_FREELIST_MASK` on the `next` pointer: during iteration through free
- * list, we mark each free block by the same flag `UMM_FREELIST_MASK`, but
- * on `prev` pointer. We'll check and unmark it later.
- *
- * Then, we iterate through all blocks in the heap, and similarly check that
- * all backlinks match (i.e. if block X has next block Y, then the block Y
- * should have previous block set to X).
- *
- * But before checking each backlink, we check that the `next` and `prev`
- * pointers are both marked with `UMM_FREELIST_MASK`, or both unmarked.
- * This way, we ensure that the free flag is in sync with the free pointers
- * chain.
- */
-static int integrity_check(void) {
-  int ok = 1;
-  unsigned short int prev;
-  unsigned short int cur;
-
-  if (umm_heap == NULL) {
-    umm_init();
-  }
-
-  /* Iterate through all free blocks */
-  prev = 0;
-  while(1) {
-    cur = UMM_NFREE(prev);
-
-    /* Check that next free block number is valid */
-    if (cur >= UMM_NUMBLOCKS) {
-      printf("heap integrity broken: too large next free num: %d "
-          "(in block %d, addr 0x%lx)\n", cur, prev,
-          (unsigned long)&UMM_NBLOCK(prev));
-      ok = 0;
-      goto clean;
-    }
-    if (cur == 0) {
-      /* No more free blocks */
-      break;
-    }
-
-    /* Check if prev free block number matches */
-    if (UMM_PFREE(cur) != prev) {
-      printf("heap integrity broken: free links don't match: "
-          "%d -> %d, but %d -> %d\n",
-          prev, cur, cur, UMM_PFREE(cur));
-      ok = 0;
-      goto clean;
-    }
-
-    UMM_PBLOCK(cur) |= UMM_FREELIST_MASK;
-
-    prev = cur;
-  }
-
-  /* Iterate through all blocks */
-  prev = 0;
-  while(1) {
-    cur = UMM_NBLOCK(prev) & UMM_BLOCKNO_MASK;
-
-    /* Check that next block number is valid */
-    if (cur >= UMM_NUMBLOCKS) {
-      printf("heap integrity broken: too large next block num: %d "
-          "(in block %d, addr 0x%lx)\n", cur, prev,
-          (unsigned long)&UMM_NBLOCK(prev));
-      ok = 0;
-      goto clean;
-    }
-    if (cur == 0) {
-      /* No more blocks */
-      break;
-    }
-
-    /* make sure the free mark is appropriate, and unmark it */
-    if ((UMM_NBLOCK(cur) & UMM_FREELIST_MASK)
-        != (UMM_PBLOCK(cur) & UMM_FREELIST_MASK))
-    {
-      printf("heap integrity broken: mask wrong at addr 0x%lx: n=0x%x, p=0x%x\n",
-          (unsigned long)&UMM_NBLOCK(cur),
-          (UMM_NBLOCK(cur) & UMM_FREELIST_MASK),
-          (UMM_PBLOCK(cur) & UMM_FREELIST_MASK)
-          );
-      ok = 0;
-      goto clean;
-    }
-
-    /* unmark */
-    UMM_PBLOCK(cur) &= UMM_BLOCKNO_MASK;
-
-    /* Check if prev block number matches */
-    if (UMM_PBLOCK(cur) != prev) {
-      printf("heap integrity broken: block links don't match: "
-          "%d -> %d, but %d -> %d\n",
-          prev, cur, cur, UMM_PBLOCK(cur));
-      ok = 0;
-      goto clean;
-    }
-
-    prev = cur;
-  }
-
-clean:
-  if (!ok){
-    UMM_HEAP_CORRUPTION_CB();
-  }
-  return ok;
-}
-
-#define INTEGRITY_CHECK() integrity_check()
-#else
-/*
- * Integrity check is disabled, so just define stub macro
- */
-#define INTEGRITY_CHECK() 1
-#endif
-/* }}} */
-
-/* poisoning (UMM_POISON) {{{ */
-#if defined(UMM_POISON)
-#define POISON_BYTE (0xa5)
-
-/*
- * Yields a size of the poison for the block of size `s`.
- * If `s` is 0, returns 0.
- */
-#define POISON_SIZE(s) (                                \
-    (s) ?                                             \
-    (UMM_POISON_SIZE_BEFORE + UMM_POISON_SIZE_AFTER + \
-     sizeof(UMM_POISONED_BLOCK_LEN_TYPE)              \
-    ) : 0                                             \
-    )
-
-/*
- * Print memory contents starting from given `ptr`
- */
-static void dump_mem ( const unsigned char *ptr, size_t len ) {
-  while (len--) {
-    printf(" 0x%.2x", (unsigned int)(*ptr++));
-  }
-}
-
-/*
- * Put poison data at given `ptr` and `poison_size`
- */
-static void put_poison( unsigned char *ptr, size_t poison_size ) {
-  memset(ptr, POISON_BYTE, poison_size);
-}
-
-/*
- * Check poison data at given `ptr` and `poison_size`. `where` is a pointer to
- * a string, either "before" or "after", meaning, before or after the block.
- *
- * If poison is there, returns 1.
- * Otherwise, prints the appropriate message, and returns 0.
- */
-static int check_poison( const unsigned char *ptr, size_t poison_size,
-    const char *where) {
-  size_t i;
-  int ok = 1;
-
-  for (i = 0; i < poison_size; i++) {
-    if (ptr[i] != POISON_BYTE) {
-      ok = 0;
-      break;
-    }
-  }
-
-  if (!ok) {
-    printf("there is no poison %s the block. "
-        "Expected poison address: 0x%lx, actual data:",
-        where, (unsigned long)ptr);
-    dump_mem(ptr, poison_size);
-    printf("\n");
-  }
-
-  return ok;
-}
-
-/*
- * Check if a block is properly poisoned. Must be called only for non-free
- * blocks.
- */
-static int check_poison_block( umm_block *pblock ) {
-  int ok = 1;
-
-  if (pblock->header.used.next & UMM_FREELIST_MASK) {
-    printf("check_poison_block is called for free block 0x%lx\n",
-        (unsigned long)pblock);
-  } else {
-    /* the block is used; let's check poison */
-    unsigned char *pc = (unsigned char *)pblock->body.data;
-    unsigned char *pc_cur;
-
-    pc_cur = pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE);
-    if (!check_poison(pc_cur, UMM_POISON_SIZE_BEFORE, "before")) {
-      printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
-      UMM_HEAP_CORRUPTION_CB();
-      ok = 0;
-      goto clean;
-    }
-
-    pc_cur = pc + *((UMM_POISONED_BLOCK_LEN_TYPE *)pc) - UMM_POISON_SIZE_AFTER;
-    if (!check_poison(pc_cur, UMM_POISON_SIZE_AFTER, "after")) {
-	  printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
-      UMM_HEAP_CORRUPTION_CB();
-      ok = 0;
-      goto clean;
-    }
-  }
-
-clean:
-  return ok;
-}
-
-/*
- * Iterates through all blocks in the heap, and checks poison for all used
- * blocks.
- */
-static int check_poison_all_blocks(void) {
-  int ok = 1;
-  unsigned short int blockNo = 0;
-
-  if (umm_heap == NULL) {
-    umm_init();
-  }
-
-  /* Now iterate through the blocks list */
-  blockNo = UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK;
-
-  while( UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK ) {
-    if ( !(UMM_NBLOCK(blockNo) & UMM_FREELIST_MASK) ) {
-      /* This is a used block (not free), so, check its poison */
-      ok = check_poison_block(&UMM_BLOCK(blockNo));
-      if (!ok){
-        break;
-      }
-    }
-
-    blockNo = UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK;
-  }
-
-  return ok;
-}
-
-/*
- * Takes a pointer returned by actual allocator function (`_umm_malloc` or
- * `_umm_realloc`), puts appropriate poison, and returns adjusted pointer that
- * should be returned to the user.
- *
- * `size_w_poison` is a size of the whole block, including a poison.
- */
-static void *get_poisoned( void *vptr, size_t size_w_poison ) {
-  unsigned char *ptr = (unsigned char *)vptr;
-  if (size_w_poison != 0 && ptr != NULL) {
-
-    /* Put exact length of the user's chunk of memory */
-    memcpy(ptr, &size_w_poison, sizeof(UMM_POISONED_BLOCK_LEN_TYPE));
-
-    /* Poison beginning and the end of the allocated chunk */
-    put_poison(ptr + sizeof(UMM_POISONED_BLOCK_LEN_TYPE),
-        UMM_POISON_SIZE_BEFORE);
-    put_poison(ptr + size_w_poison - UMM_POISON_SIZE_AFTER,
-        UMM_POISON_SIZE_AFTER);
-
-    /* Return pointer at the first non-poisoned byte */
-    return ptr + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
-  } else {
-    return ptr;
-  }
-}
-
-/*
- * Takes "poisoned" pointer (i.e. pointer returned from `get_poisoned()`),
- * and checks that the poison of this particular block is still there.
- *
- * Returns unpoisoned pointer, i.e. actual pointer to the allocated memory.
- */
-static void *get_unpoisoned( void *vptr ) {
-  unsigned char *ptr = (unsigned char *)vptr;
-  if (ptr != NULL) {
-    unsigned short int c;
-
-    ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
-
-    /* Figure out which block we're in. Note the use of truncated division... */
-    c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
-
-    check_poison_block(&UMM_BLOCK(c));
-  }
-
-  return ptr;
-}
-
-#define CHECK_POISON_ALL_BLOCKS() check_poison_all_blocks()
-#define GET_POISONED(ptr, size)   get_poisoned(ptr, size)
-#define GET_UNPOISONED(ptr)       get_unpoisoned(ptr)
-
-#else
-/*
- * Integrity check is disabled, so just define stub macros
- */
-#define POISON_SIZE(s)            0
-#define CHECK_POISON_ALL_BLOCKS() 1
-#define GET_POISONED(ptr, size)   (ptr)
-#define GET_UNPOISONED(ptr)       (ptr)
-#endif
-/* }}} */
-
-/* ----------------------------------------------------------------------------
- * One of the coolest things about this little library is that it's VERY
- * easy to get debug information about the memory heap by simply iterating
- * through all of the memory blocks.
- *
- * As you go through all the blocks, you can check to see if it's a free
- * block by looking at the high order bit of the next block index. You can
- * also see how big the block is by subtracting the next block index from
- * the current block number.
- *
- * The umm_info function does all of that and makes the results available
- * in the ummHeapInfo structure.
- * ----------------------------------------------------------------------------
+/* -------------------------------------------------------------------------
+ * There are additional files that may be included here - normally it's
+ * not a good idea to include .c files but in this case it keeps the
+ * main umm_malloc file clear and prevents issues with exposing internal
+ * data structures to other programs.
+ * -------------------------------------------------------------------------
  */
 
-UMM_HEAP_INFO ummHeapInfo;
-
-void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
-
-  unsigned short int blockNo = 0;
-
-  if (umm_heap == NULL) {
-      umm_init();
-  }
-
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
-
-  /*
-   * Clear out all of the entries in the ummHeapInfo structure before doing
-   * any calculations..
-   */
-  memset( &ummHeapInfo, 0, sizeof( ummHeapInfo ) );
-
-  DBG_LOG_FORCE( force, "\n\nDumping the umm_heap...\n" );
-
-  DBG_LOG_FORCE( force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5d|NF %5d|PF %5d|\n",
-      (unsigned long)(&UMM_BLOCK(blockNo)),
-      blockNo,
-      UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
-      UMM_PBLOCK(blockNo),
-      (UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK )-blockNo,
-      UMM_NFREE(blockNo),
-      UMM_PFREE(blockNo) );
-
-  /*
-   * Now loop through the block lists, and keep track of the number and size
-   * of used and free blocks. The terminating condition is an nb pointer with
-   * a value of zero...
-   */
-
-  blockNo = UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK;
-
-  while( UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK ) {
-    size_t curBlocks = (UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK )-blockNo;
-
-    ++ummHeapInfo.totalEntries;
-    ummHeapInfo.totalBlocks += curBlocks;
-
-    /* Is this a free block? */
-
-    if( UMM_NBLOCK(blockNo) & UMM_FREELIST_MASK ) {
-      ++ummHeapInfo.freeEntries;
-      ummHeapInfo.freeBlocks += curBlocks;
-      ummHeapInfo.freeSize2 += (unsigned int)curBlocks
-                             * (unsigned int)sizeof(umm_block)
-                             * (unsigned int)curBlocks
-                             * (unsigned int)sizeof(umm_block);
-
-      if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks) {
-        ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
-      }
-
-      DBG_LOG_FORCE( force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5u|NF %5d|PF %5d|\n",
-          (unsigned long)(&UMM_BLOCK(blockNo)),
-          blockNo,
-          UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
-          UMM_PBLOCK(blockNo),
-          (unsigned int)curBlocks,
-          UMM_NFREE(blockNo),
-          UMM_PFREE(blockNo) );
-
-      /* Does this block address match the ptr we may be trying to free? */
-
-      if( ptr == &UMM_BLOCK(blockNo) ) {
-
-        /* Release the critical section... */
-        UMM_CRITICAL_EXIT();
-
-        return( ptr );
-      }
-    } else {
-      ++ummHeapInfo.usedEntries;
-      ummHeapInfo.usedBlocks += curBlocks;
-
-      DBG_LOG_FORCE( force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5u|\n",
-          (unsigned long)(&UMM_BLOCK(blockNo)),
-          blockNo,
-          UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
-          UMM_PBLOCK(blockNo),
-          (unsigned int)curBlocks );
-    }
-
-    blockNo = UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK;
-  }
-
-  /*
-   * Update the accounting totals with information from the last block, the
-   * rest must be free!
-   */
-
-  {
-    size_t curBlocks = UMM_NUMBLOCKS-blockNo;
-    ummHeapInfo.freeBlocks  += curBlocks;
-    ummHeapInfo.totalBlocks += curBlocks;
-
-    if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks) {
-      ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
-    }
-  }
-
-  DBG_LOG_FORCE( force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5d|NF %5d|PF %5d|\n",
-      (unsigned long)(&UMM_BLOCK(blockNo)),
-      blockNo,
-      UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
-      UMM_PBLOCK(blockNo),
-      UMM_NUMBLOCKS-blockNo,
-      UMM_NFREE(blockNo),
-      UMM_PFREE(blockNo) );
-
-  DBG_LOG_FORCE( force, "Total Entries %5d    Used Entries %5d    Free Entries %5d\n",
-      ummHeapInfo.totalEntries,
-      ummHeapInfo.usedEntries,
-      ummHeapInfo.freeEntries );
-
-  DBG_LOG_FORCE( force, "Total Blocks  %5d    Used Blocks  %5d    Free Blocks  %5d\n",
-      ummHeapInfo.totalBlocks,
-      ummHeapInfo.usedBlocks,
-      ummHeapInfo.freeBlocks  );
-
-  /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
-
-  return( NULL );
-}
+#include "umm_integrity.c"
+#include "umm_poison.c"
+#include "umm_info.c"
+#include "umm_local.c"      // target-dependent supplemental features
 
 /* ------------------------------------------------------------------------ */
 
-static unsigned short int umm_blocks( size_t size ) {
+static uint16_t umm_blocks( size_t size ) {
 
   /*
    * The calculation of the block size is not too difficult, but there are
@@ -1137,31 +291,30 @@ static unsigned short int umm_blocks( size_t size ) {
 }
 
 /* ------------------------------------------------------------------------ */
-
 /*
  * Split the block `c` into two blocks: `c` and `c + blocks`.
  *
- * - `cur_freemask` should be `0` if `c` used, or `UMM_FREELIST_MASK`
- *   otherwise.
  * - `new_freemask` should be `0` if `c + blocks` used, or `UMM_FREELIST_MASK`
  *   otherwise.
  *
  * Note that free pointers are NOT modified by this function.
  */
-static void umm_make_new_block( unsigned short int c,
-    unsigned short int blocks,
-    unsigned short int cur_freemask, unsigned short int new_freemask ) {
+static void umm_split_block(
+    umm_heap_context_t *_context,
+    uint16_t c,
+    uint16_t blocks,
+    uint16_t new_freemask ) {
 
   UMM_NBLOCK(c+blocks) = (UMM_NBLOCK(c) & UMM_BLOCKNO_MASK) | new_freemask;
   UMM_PBLOCK(c+blocks) = c;
 
   UMM_PBLOCK(UMM_NBLOCK(c) & UMM_BLOCKNO_MASK) = (c+blocks);
-  UMM_NBLOCK(c)                                = (c+blocks) | cur_freemask;
+  UMM_NBLOCK(c)                                = (c+blocks);
 }
 
 /* ------------------------------------------------------------------------ */
 
-static void umm_disconnect_from_free_list( unsigned short int c ) {
+static void umm_disconnect_from_free_list( umm_heap_context_t *_context, uint16_t c ) {
   /* Disconnect this block from the FREE list */
 
   UMM_NFREE(UMM_PFREE(c)) = UMM_NFREE(c);
@@ -1172,21 +325,28 @@ static void umm_disconnect_from_free_list( unsigned short int c ) {
   UMM_NBLOCK(c) &= (~UMM_FREELIST_MASK);
 }
 
-/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------
+ * The umm_assimilate_up() function does not assume that UMM_NBLOCK(c)
+ * has the UMM_FREELIST_MASK bit set. It only assimilates up if the
+ * next block is free.
+ */
 
-static void umm_assimilate_up( unsigned short int c ) {
+static void umm_assimilate_up( umm_heap_context_t *_context, uint16_t c ) {
 
   if( UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_FREELIST_MASK ) {
+
+    UMM_FRAGMENTATION_METRIC_REMOVE( UMM_NBLOCK(c) );
+
     /*
      * The next block is a free block, so assimilate up and remove it from
      * the free list
      */
 
-    DBG_LOG_DEBUG( "Assimilate up to next block, which is FREE\n" );
+    DBGLOG_DEBUG( "Assimilate up to next block, which is FREE\n" );
 
     /* Disconnect the next block from the FREE list */
 
-    umm_disconnect_from_free_list( UMM_NBLOCK(c) );
+    umm_disconnect_from_free_list( _context, UMM_NBLOCK(c) );
 
     /* Assimilate the next block with this one */
 
@@ -1195,88 +355,173 @@ static void umm_assimilate_up( unsigned short int c ) {
   }
 }
 
-/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------
+ * The umm_assimilate_down() function assumes that UMM_NBLOCK(c) does NOT
+ * have the UMM_FREELIST_MASK bit set. In other words, try to assimilate
+ * up before assimilating down.
+ */
 
-static unsigned short int umm_assimilate_down( unsigned short int c, unsigned short int freemask ) {
+static uint16_t umm_assimilate_down( umm_heap_context_t *_context, uint16_t c, uint16_t freemask ) {
+
+  // We are going to assimilate down to the previous block because
+  // it was free, so remove it from the fragmentation metric
+
+  UMM_FRAGMENTATION_METRIC_REMOVE(UMM_PBLOCK(c));
 
   UMM_NBLOCK(UMM_PBLOCK(c)) = UMM_NBLOCK(c) | freemask;
   UMM_PBLOCK(UMM_NBLOCK(c)) = UMM_PBLOCK(c);
+
+  if (freemask) {
+      // We are going to free the entire assimilated block
+      // so add it to the fragmentation metric. A good
+      // compiler will optimize away the empty if statement
+      // when UMM_INFO is not defined, so don't worry about
+      // guarding it.
+
+      UMM_FRAGMENTATION_METRIC_ADD(UMM_PBLOCK(c));
+  }
 
   return( UMM_PBLOCK(c) );
 }
 
 /* ------------------------------------------------------------------------- */
-/* This function called only one time during OS startup after flash is */
-/* enabled.  No need to keep it in IRAM. */
-void ICACHE_FLASH_ATTR umm_init( void ) {
-  /* init heap pointer and size, and memset it to 0 */
-  umm_heap = (umm_block *)UMM_MALLOC_CFG__HEAP_ADDR;
-  umm_numblocks = (UMM_MALLOC_CFG__HEAP_SIZE / sizeof(umm_block));
-  memset(umm_heap, 0x00, UMM_MALLOC_CFG__HEAP_SIZE);
 
+static void umm_init_stage_2( umm_heap_context_t *_context ) {
   /* setup initial blank heap structure */
-  {
-    /* index of the 0th `umm_block` */
-    const unsigned short int block_0th = 0;
-    /* index of the 1st `umm_block` */
-    const unsigned short int block_1th = 1;
-    /* index of the latest `umm_block` */
-    const unsigned short int block_last = UMM_NUMBLOCKS - 1;
+    UMM_FRAGMENTATION_METRIC_INIT();
 
-    /* setup the 0th `umm_block`, which just points to the 1st */
-    UMM_NBLOCK(block_0th) = block_1th;
-    UMM_NFREE(block_0th)  = block_1th;
+    /* init stats.free_blocks */
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+#if defined(UMM_STATS_FULL)
+    _context->stats.free_blocks_min =
+    _context->stats.free_blocks_isr_min  = UMM_NUMBLOCKS - 2;
+#endif
+#ifndef UMM_INLINE_METRICS
+    _context->stats.free_blocks = UMM_NUMBLOCKS - 2;
+#endif
+#endif
+
+    /* Set up umm_block[0], which just points to umm_block[1] */
+    UMM_NBLOCK(0) = 1;
+    UMM_NFREE(0)  = 1;
+    UMM_PFREE(0)  = 1;
 
     /*
      * Now, we need to set the whole heap space as a huge free block. We should
-     * not touch the 0th `umm_block`, since it's special: the 0th `umm_block`
-     * is the head of the free block list. It's a part of the heap invariant.
+     * not touch umm_block[0], since it's special: umm_block[0] is the head of
+     * the free block list. It's a part of the heap invariant.
      *
      * See the detailed explanation at the beginning of the file.
-     */
-
-    /*
-     * 1th `umm_block` has pointers:
      *
-     * - next `umm_block`: the latest one
-     * - prev `umm_block`: the 0th
+     * umm_block[1] has pointers:
+     *
+     * - next `umm_block`: the last one umm_block[n]
+     * - prev `umm_block`: umm_block[0]
      *
      * Plus, it's a free `umm_block`, so we need to apply `UMM_FREELIST_MASK`
      *
-     * And it's the last free block, so the next free block is 0.
+     * And it's the last free block, so the next free block is 0 which marks
+     * the end of the list. The previous block and free block pointer are 0
+     * too, there is no need to initialize these values due to the init code
+     * that memsets the entire umm_ space to 0.
      */
-    UMM_NBLOCK(block_1th) = block_last | UMM_FREELIST_MASK;
-    UMM_NFREE(block_1th)  = 0;
-    UMM_PBLOCK(block_1th) = block_0th;
-    UMM_PFREE(block_1th)  = block_0th;
+    UMM_NBLOCK(1) = UMM_BLOCK_LAST | UMM_FREELIST_MASK;
 
     /*
-     * latest `umm_block` has pointers:
+     * Last umm_block[n] has the next block index at 0, meaning it's
+     * the end of the list, and the previous block is umm_block[1].
      *
-     * - next `umm_block`: 0 (meaning, there are no more `umm_blocks`)
-     * - prev `umm_block`: the 1st
-     *
-     * It's not a free block, so we don't touch NFREE / PFREE at all.
+     * The last block is a special block and can never be part of the
+     * free list, so its pointers are left at 0 too.
      */
-    UMM_NBLOCK(block_last) = 0;
-    UMM_PBLOCK(block_last) = block_1th;
-  }
+
+    UMM_PBLOCK(UMM_BLOCK_LAST) = 1;
 }
 
-/* ------------------------------------------------------------------------ */
 
-static void _umm_free( void *ptr ) {
-
-  unsigned short int c;
-
-  /* If we're being asked to free a NULL pointer, well that's just silly! */
-
-  if( (void *)0 == ptr ) {
-    DBG_LOG_DEBUG( "free a null pointer -> do nothing\n" );
-
+void umm_init_common( size_t id, void *start_addr, size_t size, bool zero ) {
+  /* Preserve internal setup */
+  umm_heap_context_t *_context = umm_get_heap_by_id(id);
+  if (NULL == start_addr || NULL == _context || _context->heap) {
     return;
   }
 
+  /* init heap pointer and size, and memset it to 0 */
+  _context->id        = id;
+  _context->heap      = (umm_block *)start_addr;
+  _context->heap_end  = (void *)((uintptr_t)start_addr + size);
+  _context->numblocks = (size / sizeof(umm_block));
+
+  // An option for blocking the zeroing of extra heaps allows for performing
+  // post-crash discovery.
+  if (zero) {
+  	memset(_context->heap, 0x00, size);
+#if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
+    memset(&_context->stats, 0x00, sizeof(_context->stats));
+#endif
+
+    /* Set up internal data structures */
+    umm_init_stage_2(_context);
+  }
+}
+
+void umm_init( void ) {
+  // if (umm_heap) {
+  //   return;
+  // }
+  for (size_t i = 0; i < UMM_NUM_HEAPS; i++) {
+    heap_context[i].heap = NULL;
+  }
+  memset(&heap_context[0], 0, sizeof(heap_context));
+  umm_init_common( UMM_HEAP_DRAM, (void *)UMM_MALLOC_CFG_HEAP_ADDR, UMM_MALLOC_CFG_HEAP_SIZE, true );
+  // umm_heap = (void *)&heap_context;
+}
+
+#ifdef UMM_HEAP_IRAM
+void umm_init_iram_ex( void *addr, unsigned int size, bool zero ) {
+  /* We need the main, internal heap set up first */
+  UMM_INIT_HEAP;
+
+  umm_init_common(UMM_HEAP_IRAM, addr, size, zero);
+}
+
+void _text_end(void);
+void umm_init_iram(void) __attribute__((weak));
+
+/*
+  By using a weak link, it is possible to reduce the IRAM heap size with a
+  user-supplied init function. This would allow the creation of a block of IRAM
+  dedicated to a sketch and possibly used/preserved across reboots.
+ */
+void umm_init_iram(void) {
+  umm_init_iram_ex(mmu_sec_heap(), mmu_sec_heap_size(), true);
+}
+#endif	// #ifdef UMM_HEAP_IRAM
+
+#ifdef UMM_HEAP_EXTERNAL
+void umm_init_vm( void *vmaddr, unsigned int vmsize ) {
+  /* We need the main, internal (DRAM) heap set up first */
+  UMM_INIT_HEAP;
+
+  umm_init_common(UMM_HEAP_EXTERNAL, vmaddr, vmsize, true);
+}
+#endif
+
+/* ------------------------------------------------------------------------
+ * Must be called only from within critical sections guarded by
+ * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ */
+
+static void umm_free_core( umm_heap_context_t *_context, void *ptr ) {
+
+  uint16_t c;
+
+  if (NULL == _context) {
+    panic();
+    return;
+  }
+
+  STATS__FREE_REQUEST(id_free);
   /*
    * FIXME: At some point it might be a good idea to add a check to make sure
    *        that the pointer we're being asked to free up is actually within
@@ -1286,33 +531,34 @@ static void _umm_free( void *ptr ) {
    *        on the free list!
    */
 
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
-
   /* Figure out which block we're in. Note the use of truncated division... */
 
-  c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
+  c = (((uintptr_t)ptr)-(uintptr_t)(&(_context->heap[0])))/sizeof(umm_block);
 
-  DBG_LOG_DEBUG( "Freeing block %6d\n", c );
+  DBGLOG_DEBUG( "Freeing block %6d\n", c );
+
+  /* Update stats Free Block count */
+  STATS__FREE_BLOCKS_UPDATE(UMM_NBLOCK(c) - c);
 
   /* Now let's assimilate this block with the next one if possible. */
 
-  umm_assimilate_up( c );
+  umm_assimilate_up( _context, c );
 
   /* Then assimilate with the previous block if possible */
 
   if( UMM_NBLOCK(UMM_PBLOCK(c)) & UMM_FREELIST_MASK ) {
 
-    DBG_LOG_DEBUG( "Assimilate down to next block, which is FREE\n" );
+    DBGLOG_DEBUG( "Assimilate down to previous block, which is FREE\n" );
 
-    c = umm_assimilate_down(c, UMM_FREELIST_MASK);
+    c = umm_assimilate_down(_context, c, UMM_FREELIST_MASK);
   } else {
     /*
      * The previous block is not a free block, so add this one to the head
      * of the free list
      */
+    UMM_FRAGMENTATION_METRIC_ADD(c);
 
-    DBG_LOG_DEBUG( "Just add to head of free list\n" );
+    DBGLOG_DEBUG( "Just add to head of free list\n" );
 
     UMM_PFREE(UMM_NFREE(0)) = c;
     UMM_NFREE(c)            = UMM_NFREE(0);
@@ -1321,64 +567,54 @@ static void _umm_free( void *ptr ) {
 
     UMM_NBLOCK(c)          |= UMM_FREELIST_MASK;
   }
-
-#if 0
-  /*
-   * The following is experimental code that checks to see if the block we just
-   * freed can be assimilated with the very last block - it's pretty convoluted in
-   * terms of block index manipulation, and has absolutely no effect on heap
-   * fragmentation. I'm not sure that it's worth including but I've left it
-   * here for posterity.
-   */
-
-  if( 0 == UMM_NBLOCK(UMM_NBLOCK(c) & UMM_BLOCKNO_MASK ) ) {
-
-    if( UMM_PBLOCK(UMM_NBLOCK(c) & UMM_BLOCKNO_MASK) != UMM_PFREE(UMM_NBLOCK(c) & UMM_BLOCKNO_MASK) ) {
-      UMM_NFREE(UMM_PFREE(UMM_NBLOCK(c) & UMM_BLOCKNO_MASK)) = c;
-      UMM_NFREE(UMM_PFREE(c))                                = UMM_NFREE(c);
-      UMM_PFREE(UMM_NFREE(c))                                = UMM_PFREE(c);
-      UMM_PFREE(c)                                           = UMM_PFREE(UMM_NBLOCK(c) & UMM_BLOCKNO_MASK);
-    }
-
-    UMM_NFREE(c)  = 0;
-    UMM_NBLOCK(c) = 0;
-  }
-#endif
-
-  /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
 }
 
 /* ------------------------------------------------------------------------ */
 
-static void *_umm_malloc( size_t size ) {
-  unsigned short int blocks;
-  unsigned short int blockSize = 0;
+void umm_free( void *ptr ) {
+  UMM_CRITICAL_DECL(id_free);
 
-  unsigned short int bestSize;
-  unsigned short int bestBlock;
+  UMM_INIT_HEAP;
 
-  unsigned short int cf;
+  /* If we're being asked to free a NULL pointer, well that's just silly! */
 
-  if (umm_heap == NULL) {
-    umm_init();
+  if( (void *)0 == ptr ) {
+    DBGLOG_DEBUG( "free a null pointer -> do nothing\n" );
+    STATS__NULL_FREE_REQUEST(id_free);
+
+    return;
   }
 
-  /*
-   * the very first thing we do is figure out if we're being asked to allocate
-   * a size of 0 - and if we are we'll simply return a null pointer. if not
-   * then reduce the size by 1 byte so that the subsequent calculations on
-   * the number of blocks to allocate are easier...
-   */
+  /* Free the memory withing a protected critical section */
 
-  if( 0 == size ) {
-    DBG_LOG_DEBUG( "malloc a block of 0 bytes -> do nothing\n" );
+  UMM_CRITICAL_ENTRY(id_free);
 
-    return( (void *)NULL );
+  /* Need to be in the heap in which this block lives */
+  umm_free_core( umm_get_ptr_context( ptr ), ptr );
+
+  UMM_CRITICAL_EXIT(id_free);
+}
+
+/* ------------------------------------------------------------------------
+ * Must be called only from within critical sections guarded by
+ * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ */
+
+static void *umm_malloc_core( umm_heap_context_t *_context, size_t size ) {
+  uint16_t blocks;
+  uint16_t blockSize = 0;
+
+  uint16_t bestSize;
+  uint16_t bestBlock;
+
+  uint16_t cf;
+
+  STATS__ALLOC_REQUEST(id_malloc, size);
+
+  if (NULL == _context) {
+    panic();
+    return NULL;
   }
-
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
 
   blocks = umm_blocks( size );
 
@@ -1398,17 +634,19 @@ static void *_umm_malloc( size_t size ) {
   while( cf ) {
     blockSize = (UMM_NBLOCK(cf) & UMM_BLOCKNO_MASK) - cf;
 
-    DBG_LOG_TRACE( "Looking at block %6d size %6d\n", cf, blockSize );
+    DBGLOG_TRACE( "Looking at block %6d size %6d\n", cf, blockSize );
 
-#if defined UMM_FIRST_FIT
-    /* This is the first block that fits! */
-    if( (blockSize >= blocks) )
-      break;
-#elif defined UMM_BEST_FIT
+#if defined UMM_BEST_FIT
     if( (blockSize >= blocks) && (blockSize < bestSize) ) {
       bestBlock = cf;
       bestSize  = blockSize;
     }
+#elif defined UMM_FIRST_FIT
+    /* This is the first block that fits! */
+    if( (blockSize >= blocks) )
+      break;
+#else
+#  error "No UMM_*_FIT is defined - check umm_malloc_cfg.h"
 #endif
 
     cf = UMM_NFREE(cf);
@@ -1419,7 +657,12 @@ static void *_umm_malloc( size_t size ) {
     blockSize = bestSize;
   }
 
+  POISON_CHECK_NEIGHBORS(cf);
+
   if( UMM_NBLOCK(cf) & UMM_BLOCKNO_MASK && blockSize >= blocks ) {
+
+    UMM_FRAGMENTATION_METRIC_REMOVE(cf);
+
     /*
      * This is an existing block in the memory heap, we just need to split off
      * what we need, unlink it from the free list and mark it as in use, and
@@ -1429,26 +672,27 @@ static void *_umm_malloc( size_t size ) {
 
     if( blockSize == blocks ) {
       /* It's an exact fit and we don't neet to split off a block. */
-      DBG_LOG_DEBUG( "Allocating %6d blocks starting at %6d - exact\n", blocks, cf );
+      DBGLOG_DEBUG( "Allocating %6d blocks starting at %6d - exact\n", blocks, cf );
 
       /* Disconnect this block from the FREE list */
 
-      umm_disconnect_from_free_list( cf );
+      umm_disconnect_from_free_list( _context, cf );
 
     } else {
+
       /* It's not an exact fit and we need to split off a block. */
-      DBG_LOG_DEBUG( "Allocating %6d blocks starting at %6d - existing\n", blocks, cf );
+      DBGLOG_DEBUG( "Allocating %6d blocks starting at %6d - existing\n", blocks, cf );
 
       /*
        * split current free block `cf` into two blocks. The first one will be
        * returned to user, so it's not free, and the second one will be free.
        */
-      umm_make_new_block( cf, blocks,
-          0/*`cf` is not free*/,
-          UMM_FREELIST_MASK/*new block is free*/);
+      umm_split_block( _context, cf, blocks, UMM_FREELIST_MASK /*new block is free*/ );
+
+      UMM_FRAGMENTATION_METRIC_ADD(UMM_NBLOCK(cf));
 
       /*
-       * `umm_make_new_block()` does not update the free pointers (it affects
+       * `umm_split_block()` does not update the free pointers (it affects
        * only free flags), but effectively we've just moved beginning of the
        * free block from `cf` to `cf + blocks`. So we have to adjust pointers
        * to and from adjacent free blocks.
@@ -1462,37 +706,138 @@ static void *_umm_malloc( size_t size ) {
       UMM_PFREE( UMM_NFREE(cf) ) = cf + blocks;
       UMM_NFREE( cf + blocks ) = UMM_NFREE(cf);
     }
+
+    STATS__FREE_BLOCKS_UPDATE( -blocks );
+    STATS__FREE_BLOCKS_MIN();
   } else {
     /* Out of memory */
+    STATS__OOM_UPDATE();
 
-    DBG_LOG_DEBUG(  "Can't allocate %5d blocks\n", blocks );
-
-    /* Release the critical section... */
-    UMM_CRITICAL_EXIT();
+    DBGLOG_DEBUG(  "Can't allocate %5d blocks\n", blocks );
 
     return( (void *)NULL );
   }
-
-  /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
 
   return( (void *)&UMM_DATA(cf) );
 }
 
 /* ------------------------------------------------------------------------ */
 
-static void *_umm_realloc( void *ptr, size_t size ) {
+void *umm_malloc( size_t size ) {
+  UMM_CRITICAL_DECL(id_malloc);
 
-  unsigned short int blocks;
-  unsigned short int blockSize;
+  void *ptr = NULL;
 
-  unsigned short int c;
+  UMM_INIT_HEAP;
+
+  /*
+   * "Is it safe"
+   *
+   * Is it safe to call from an ISR? Is there a point during a malloc that a
+   * an interrupt and subsequent call to malloc result in undesired results?
+   *
+   * Heap selection in managed by the functions umm_push_heap, umm_pop_heap,
+   * umm_get_current_heap_id, and umm_set_heap_by_id. These functions are
+   * responsible for getting/setting the module static variable umm_heap_cur.
+   * The umm_heap_cur variable is an index that is used to select the current
+   * heap context. Depending on the situation this selection can be overriddened.
+   *
+   * All variables for a specific Heap are in a single structure. `heap_context`
+   * is an array of these structures. Each heap API function uses a function
+   * local variable `_context` to hold a pointer to the selected heap structure.
+   * This local pointer is referenced for all the "selected heap" operations.
+   * Coupled with critical sections around global data should allow the API
+   * functions to be reentrant.
+   *
+   * Using the `_context` name throughout made it easy to incorporate the
+   * context into existing macros.
+   *
+   * For allocating APIs `umm_heap_cur` is used to index and select a value for
+   * `_context`. If an allocation is made from an ISR, this value is ignored and
+   * the heap context for DRAM is loaded. For APIs that require operating on an
+   * existing allcation such as realloc and free, the heap context selected is
+   * done by matching the allocation's address with that of one of the heap
+   * address ranges.
+   *
+   * I think we are safe with multiple heaps when the non32-bit exception
+   * handler is used, as long as interrupts don't get enabled. There was a
+   * window in the Boot ROM "C" Exception Wrapper that would enable interrupts
+   * when running our non32-exception handler; however, that should be resolved
+   * by our replacement wrapper. For more information on exception handling
+   * issues for IRAM see comments above `_set_exception_handler_wrapper()` in
+   * `core_esp8266_non32xfer.cpp`.
+   *
+   * ISRs should not try and change heaps. umm_malloc will ignore the change.
+   * All should be fine as long as the caller puts the heap back the way it was.
+   * On return, everything must be the same. The foreground thread will continue
+   * with the same information that was there before the interrupt. All malloc()
+   * requests made from an ISR are fulfilled with DRAM.
+   *
+   * For umm_malloc, heap selection involves changing a single variable that is
+   * on the calling context stack. From the umm_mallac side, that variable is
+   * used to load a context pointer by index, heap ID. While an umm_malloc API
+   * function is running, all heap related variables are in the context variable
+   * pointer, registers, or the current stack as the request is processed. With
+   * a single variable to reference for heap selection, I think it is unlikely
+   * that umm_malloc can be called, with things in an unusable transition state.
+   */
+
+  umm_heap_context_t *_context = umm_get_current_heap();
+
+  /*
+   * the very first thing we do is figure out if we're being asked to allocate
+   * a size of 0 - and if we are we'll simply return a null pointer. if not
+   * then reduce the size by 1 byte so that the subsequent calculations on
+   * the number of blocks to allocate are easier...
+   */
+
+  if( 0 == size ) {
+    DBGLOG_DEBUG( "malloc a block of 0 bytes -> do nothing\n" );
+    STATS__ZERO_ALLOC_REQUEST(id_malloc, size);
+
+    return( ptr );
+  }
+
+  /* Allocate the memory withing a protected critical section */
+
+  UMM_CRITICAL_ENTRY(id_malloc);
+
+  /*
+   * We handle the realloc of an existing IRAM allocation from an ISR with IRAM,
+   * while a new malloc from an ISR will always supply DRAM. That said, realloc
+   * from an ISR is not generally safe without special locking mechanisms and is
+   * not formally supported.
+   *
+   * Additionally, to avoid extending the IRQs disabled period, it is best to
+   * use DRAM for an ISR. Each 16-bit access to IRAM that umm_malloc has to make
+   * requires a pass through the exception handling logic.
+   */
+  if (UMM_CRITICAL_WITHINISR(id_malloc)) {
+    _context = umm_get_heap_by_id(UMM_HEAP_DRAM);
+  }
+
+  ptr = umm_malloc_core( _context, size );
+
+  UMM_CRITICAL_EXIT(id_malloc);
+
+  return( ptr );
+}
+
+/* ------------------------------------------------------------------------ */
+
+void *umm_realloc( void *ptr, size_t size ) {
+  UMM_CRITICAL_DECL(id_realloc);
+
+  uint16_t blocks;
+  uint16_t blockSize;
+  uint16_t prevBlockSize = 0;
+  uint16_t nextBlockSize = 0;
+
+  uint16_t c;
 
   size_t curSize;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  UMM_INIT_HEAP;
 
   /*
    * This code looks after the case of a NULL value for ptr. The ANSI C
@@ -1503,9 +848,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
    */
 
   if( ((void *)NULL == ptr) ) {
-    DBG_LOG_DEBUG( "realloc the NULL pointer - call malloc()\n" );
+    DBGLOG_DEBUG( "realloc the NULL pointer - call malloc()\n" );
 
-    return( _umm_malloc(size) );
+    return( umm_malloc(size) );
   }
 
   /*
@@ -1514,16 +859,23 @@ static void *_umm_realloc( void *ptr, size_t size ) {
    * we should operate the same as free.
    */
 
-  if( 0 == size ) {
-    DBG_LOG_DEBUG( "realloc to 0 size, just free the block\n" );
+  /* Need to be in the heap in which this block lives */
+  umm_heap_context_t *_context = umm_get_ptr_context( ptr );
+  if (NULL == _context) {
+    panic();
+    return NULL;
+  }
 
-    _umm_free( ptr );
+  if( 0 == size ) {
+    DBGLOG_DEBUG( "realloc to 0 size, just free the block\n" );
+    STATS__ZERO_ALLOC_REQUEST(id_realloc, size);
+
+    umm_free( ptr );
 
     return( (void *)NULL );
   }
 
-  /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
+  STATS__ALLOC_REQUEST(id_realloc, size);
 
   /*
    * Otherwise we need to actually do a reallocation. A naiive approach
@@ -1538,9 +890,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
   /* Figure out which block we're in. Note the use of truncated division... */
 
-  c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
+  c = (((uintptr_t)ptr)-(uintptr_t)(&(_context->heap[0])))/sizeof(umm_block);
 
-  /* Figure out how big this block is... */
+  /* Figure out how big this block is ... the free bit is not set :-) */
 
   blockSize = (UMM_NBLOCK(c) - c);
 
@@ -1548,237 +900,287 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
   curSize   = (blockSize*sizeof(umm_block))-(sizeof(((umm_block *)0)->header));
 
-  /*
-   * Ok, now that we're here, we know the block number of the original chunk
-   * of memory, and we know how much new memory we want, and we know the original
-   * block size...
-   */
+  /* Protect the critical section... */
+  UMM_CRITICAL_ENTRY(id_realloc);
 
-  if( blockSize == blocks ) {
-    /* This space intentionally left blank - return the original pointer! */
-
-    DBG_LOG_DEBUG( "realloc the same size block - %d, do nothing\n", blocks );
-
-    /* Release the critical section... */
-    UMM_CRITICAL_EXIT();
-
-    return( ptr );
-  }
-
-  /*
-   * Now we have a block size that could be bigger or smaller. Either
-   * way, try to assimilate up to the next block before doing anything...
+  /* Now figure out if the previous and/or next blocks are free as well as
+   * their sizes - this will help us to minimize special code later when we
+   * decide if it's possible to use the adjacent blocks.
    *
-   * If it's still too small, we have to free it anyways and it will save the
-   * assimilation step later in free :-)
+   * We set prevBlockSize and nextBlockSize to non-zero values ONLY if they
+   * are free!
    */
 
-  umm_assimilate_up( c );
-
-  /*
-   * Now check if it might help to assimilate down, but don't actually
-   * do the downward assimilation unless the resulting block will hold the
-   * new request! If this block of code runs, then the new block will
-   * either fit the request exactly, or be larger than the request.
-   */
-
-  if( (UMM_NBLOCK(UMM_PBLOCK(c)) & UMM_FREELIST_MASK) &&
-      (blocks <= (UMM_NBLOCK(c)-UMM_PBLOCK(c)))    ) {
-
-    /* Check if the resulting block would be big enough... */
-
-    DBG_LOG_DEBUG( "realloc() could assimilate down %d blocks - fits!\n\r", c-UMM_PBLOCK(c) );
-
-    /* Disconnect the previous block from the FREE list */
-
-    umm_disconnect_from_free_list( UMM_PBLOCK(c) );
-
-    /*
-     * Connect the previous block to the next block ... and then
-     * realign the current block pointer
-     */
-
-    c = umm_assimilate_down(c, 0);
-
-    /*
-     * Move the bytes down to the new block we just created, but be sure to move
-     * only the original bytes.
-     */
-
-    memmove( (void *)&UMM_DATA(c), ptr, curSize );
-
-    /* And don't forget to adjust the pointer to the new block location! */
-
-    ptr    = (void *)&UMM_DATA(c);
+  if ((UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_FREELIST_MASK)) {
+      nextBlockSize = (UMM_NBLOCK(UMM_NBLOCK(c)) & UMM_BLOCKNO_MASK) - UMM_NBLOCK(c);
   }
 
-  /* Now calculate the block size again...and we'll have three cases */
+  if ((UMM_NBLOCK(UMM_PBLOCK(c)) & UMM_FREELIST_MASK)) {
+      prevBlockSize = (c - UMM_PBLOCK(c));
+  }
 
-  blockSize = (UMM_NBLOCK(c) - c);
+  DBGLOG_DEBUG( "realloc blocks %d blockSize %d nextBlockSize %d prevBlockSize %d\n", blocks, blockSize, nextBlockSize, prevBlockSize );
 
-  if( blockSize == blocks ) {
-    /* This space intentionally left blank - return the original pointer! */
+//C With each upstream update this section should be reevaluated.
+/*C
+ *
+ * The `#if defined(UMM_REALLOC_MINIMIZE_COPY)` section tracks the content of
+ * the upstream with some local macros added. Back when I made my 1st update to
+ * umm_malloc PR, I found the upstream had been refactored and removed the
+ * defragmenting properties that were originally present. It took some looking
+ * to see the logic, it didn't have any comments to make it stand out.
+ *
+ * I added the `#elif defined(UMM_REALLOC_DEFRAG)` to recreate and preserve the
+ * defragmenting functionality that was lost. This is the default build option
+ * we have set in `umm_malloc_cfg.h`. I have not done any structured testing to
+ * confirm; however, I think this to be the best option when considering the
+ * amount of reallocates that can occur with the Strings library.
+ */
+#if defined(UMM_REALLOC_MINIMIZE_COPY)
+  /*
+   * Ok, now that we're here we know how many blocks we want and the current
+   * blockSize. The prevBlockSize and nextBlockSize are set and we can figure
+   * out the best strategy for the new allocation as follows:
+   *
+   * 1. If the new block is the same size or smaller than the current block do
+   *    nothing.
+   * 2. If the next block is free and adding it to the current block gives us
+   *    EXACTLY enough memory, assimilate the next block. This avoids unwanted
+   *    fragmentation of free memory.
+   *
+   * The following cases may be better handled with memory copies to reduce
+   * fragmentation
+   *
+   * 3. If the previous block is NOT free and the next block is free and
+   *    adding it to the current block gives us enough memory, assimilate
+   *    the next block. This may introduce a bit of fragmentation.
+   * 4. If the prev block is free and adding it to the current block gives us
+   *    enough memory, remove the previous block from the free list, assimilate
+   *    it, copy to the new block.
+   * 5. If the prev and next blocks are free and adding them to the current
+   *    block gives us enough memory, assimilate the next block, remove the
+   *    previous block from the free list, assimilate it, copy to the new block.
+   * 6. Otherwise try to allocate an entirely new block of memory. If the
+   *    allocation works free the old block and return the new pointer. If
+   *    the allocation fails, return NULL and leave the old block intact.
+   *
+   * TODO: Add some conditional code to optimise for less fragmentation
+   *       by simply allocating new memory if we need to copy anyways.
+   *
+   * All that's left to do is decide if the fit was exact or not. If the fit
+   * was not exact, then split the memory block so that we use only the requested
+   * number of blocks and add what's left to the free list.
+   */
 
-    DBG_LOG_DEBUG( "realloc the same size block - %d, do nothing\n", blocks );
+    //  Case 1 - block is same size or smaller
+    if (blockSize >= blocks) {
+        DBGLOG_DEBUG( "realloc the same or smaller size block - %i, do nothing\n", blocks );
+        /* This space intentionally left blank */
 
-  } else if (blockSize > blocks ) {
-    /*
-     * New block is smaller than the old block, so just make a new block
-     * at the end of this one and put it up on the free list...
+    //  Case 2 - block + next block fits EXACTLY
+    } else if ((blockSize + nextBlockSize) == blocks) {
+        DBGLOG_DEBUG( "exact realloc using next block - %i\n", blocks );
+        umm_assimilate_up( c );
+        STATS__FREE_BLOCKS_UPDATE( - nextBlockSize );
+        blockSize += nextBlockSize;
+
+    //  Case 3 - prev block NOT free and block + next block fits
+    } else if ((0 == prevBlockSize) && (blockSize + nextBlockSize) >= blocks) {
+        DBGLOG_DEBUG( "realloc using next block - %i\n", blocks );
+        umm_assimilate_up( _context, c );
+        STATS__FREE_BLOCKS_UPDATE( - nextBlockSize );
+        blockSize += nextBlockSize;
+
+    //  Case 4 - prev block + block fits
+    } else if ((prevBlockSize + blockSize) >= blocks) {
+        DBGLOG_DEBUG( "realloc using prev block - %i\n", blocks );
+        umm_disconnect_from_free_list( _context, UMM_PBLOCK(c) );
+        c = umm_assimilate_down(_context, c, 0);
+        STATS__FREE_BLOCKS_UPDATE( - prevBlockSize );
+        STATS__FREE_BLOCKS_ISR_MIN();
+        blockSize += prevBlockSize;
+        UMM_CRITICAL_SUSPEND(id_realloc);
+        memmove( (void *)&UMM_DATA(c), ptr, curSize );
+        ptr = (void *)&UMM_DATA(c);
+        UMM_CRITICAL_RESUME(id_realloc);
+    //  Case 5 - prev block + block + next block fits
+    } else if ((prevBlockSize + blockSize + nextBlockSize) >= blocks) {
+        DBGLOG_DEBUG( "realloc using prev and next block - %d\n", blocks );
+        umm_assimilate_up( _context, c );
+        umm_disconnect_from_free_list( _context, UMM_PBLOCK(c) );
+        c = umm_assimilate_down(_context, c, 0);
+        STATS__FREE_BLOCKS_UPDATE( - prevBlockSize - nextBlockSize );
+#ifdef UMM_LIGHTWEIGHT_CPU
+        if ((prevBlockSize + blockSize + nextBlockSize) > blocks) {
+            umm_split_block( _context, c, blocks, 0 );
+            umm_free_core( _context, (void *)&UMM_DATA(c+blocks) );
+        }
+        STATS__FREE_BLOCKS_ISR_MIN();
+        blockSize = blocks;
+#else
+        blockSize += (prevBlockSize + nextBlockSize);
+#endif
+        UMM_CRITICAL_SUSPEND(id_realloc);
+        memmove( (void *)&UMM_DATA(c), ptr, curSize );
+        ptr = (void *)&UMM_DATA(c);
+        UMM_CRITICAL_RESUME(id_realloc);
+
+    //  Case 6 - default is we need to realloc a new block
+    } else {
+        DBGLOG_DEBUG( "realloc a completely new block %i\n", blocks );
+        void *oldptr = ptr;
+        if( (ptr = umm_malloc_core( _context, size )) ) {
+            DBGLOG_DEBUG( "realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks );
+            UMM_CRITICAL_SUSPEND(id_realloc);
+            memcpy( ptr, oldptr, curSize );
+            UMM_CRITICAL_RESUME(id_realloc);
+            umm_free_core( _context, oldptr );
+        } else {
+            DBGLOG_DEBUG( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
+            /* This space intentionally left blnk */
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
+        }
+        /* This is not accurate for OOM case; however, it will work for
+         * stopping a call to free before return.
+         */
+        blockSize = blocks;
+    }
+#elif defined(UMM_REALLOC_DEFRAG)
+  /*
+   * Ok, now that we're here we know how many blocks we want and the current
+   * blockSize. The prevBlockSize and nextBlockSize are set and we can figure
+   * out the best strategy for the new allocation. The following strategy is
+   * focused on defragging the heap:
+   *
+   * 1. If the prev is free and adding it to the current, or current and next
+   *    block, gives us enough memory, proceed. Note, that next block may not
+   *    be available.
+   *    a. Remove the previous block from the free list, assimilate it.
+   *    b. If this new block gives enough memory, copy to the new block.
+   *       Note, this includes the case of same size or smaller block.
+   *    c. Else assimilate the next block, copy to the new block.
+   * 2. If the new block is the same size or smaller than the current block do
+   *    nothing.
+   * 3. If the next block is free and adding it to the current block gives us
+   *    enough memory, assimilate the next block.
+   * 4. Otherwise try to allocate an entirely new block of memory. If the
+   *    allocation works free the old block and return the new pointer. If
+   *    the allocation fails, return NULL and leave the old block intact.
+   *
+   * All that's left to do is decide if the fit was exact or not. If the fit
+   * was not exact, then split the memory block so that we use only the
+   * requested number of blocks and add what's left to the free list.
+   */
+   if (prevBlockSize && (prevBlockSize + blockSize + nextBlockSize) >= blocks) { // 1
+        umm_disconnect_from_free_list( _context, UMM_PBLOCK(c) );
+        c = umm_assimilate_down( _context, c, 0 );
+        STATS__FREE_BLOCKS_UPDATE( - prevBlockSize );
+        blockSize += prevBlockSize;
+        if (blockSize >= blocks) {
+            DBGLOG_DEBUG( "realloc using prev block - %d\n", blocks );
+            STATS__FREE_BLOCKS_ISR_MIN();
+        } else {
+            DBGLOG_DEBUG( "realloc using prev and next block - %d\n", blocks );
+            umm_assimilate_up( _context, c );
+            STATS__FREE_BLOCKS_UPDATE( - nextBlockSize );
+            blockSize += nextBlockSize;
+#ifdef UMM_LIGHTWEIGHT_CPU
+            if (blockSize > blocks) {
+                umm_split_block( _context, c, blocks, 0 );
+                umm_free_core( _context, (void *)&UMM_DATA(c+blocks) );
+            }
+            STATS__FREE_BLOCKS_ISR_MIN();
+            blockSize = blocks;
+#endif
+        }
+        UMM_CRITICAL_SUSPEND(id_realloc);
+        memmove( (void *)&UMM_DATA(c), ptr, curSize );
+        ptr = (void *)&UMM_DATA(c);
+        UMM_CRITICAL_RESUME(id_realloc);
+    } else if (blockSize >= blocks) { // 2
+        DBGLOG_DEBUG( "realloc the same or smaller size block - %d, do nothing\n", blocks );
+        /* This space intentionally left blank */
+    } else if ((blockSize + nextBlockSize) >= blocks) { // 3
+        DBGLOG_DEBUG( "realloc using next block - %d\n", blocks );
+        umm_assimilate_up( _context, c );
+        STATS__FREE_BLOCKS_UPDATE( - nextBlockSize );
+        blockSize += nextBlockSize;
+    } else { // 4
+        DBGLOG_DEBUG( "realloc a completely new block %d\n", blocks );
+        void *oldptr = ptr;
+        if( (ptr = umm_malloc_core( _context, size )) ) {
+            DBGLOG_DEBUG( "realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks );
+            UMM_CRITICAL_SUSPEND(id_realloc);
+            memcpy( ptr, oldptr, curSize );
+            UMM_CRITICAL_RESUME(id_realloc);
+            umm_free_core( _context, oldptr);
+        } else {
+            DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
+            /* This space intentionally left blnk */
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
+        }
+        /* This is not accurate for OOM case; however, it will work for
+         * stopping a call to free before return.
+         */
+        blockSize = blocks;
+    }
+#else
+#warning "Neither UMM_REALLOC_DEFRAG nor UMM_REALLOC_MINIMIZE_COPY is defined - check umm_malloc_cfg.h"
+    /* An always copy option just for performance/fragmentation comparison */
+    if (blockSize >= blocks) {
+        DBGLOG_DEBUG( "realloc the same or smaller size block - %d, do nothing\n", blocks );
+        /* This space intentionally left blank */
+    } else {
+        DBGLOG_DEBUG( "realloc a completely new block %d\n", blocks );
+        void *oldptr = ptr;
+        if( (ptr = umm_malloc_core( _context, size )) ) {
+            DBGLOG_DEBUG( "realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks );
+            UMM_CRITICAL_SUSPEND(id_realloc);
+            memcpy( ptr, oldptr, curSize );
+            UMM_CRITICAL_RESUME(id_realloc);
+            umm_free_core( _context, oldptr );
+        } else {
+            DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
+            /* This space intentionally left blnk */
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
+        }
+        /* This is not accurate for OOM case; however, it will work for
+         * stopping a call to free before return.
+         */
+        blockSize = blocks;
+    }
+#endif
+    /* Now all we need to do is figure out if the block fit exactly or if we
+     * need to split and free ...
      */
 
-    DBG_LOG_DEBUG( "realloc %d to a smaller block %d, shrink and free the leftover bits\n", blockSize, blocks );
-
-    umm_make_new_block( c, blocks, 0, 0 );
-    _umm_free( (void *)&UMM_DATA(c+blocks) );
-  } else {
-    /* New block is bigger than the old block... */
-
-    void *oldptr = ptr;
-
-    DBG_LOG_DEBUG( "realloc %d to a bigger block %d, make new, copy, and free the old\n", blockSize, blocks );
-
-    /*
-     * Now _umm_malloc() a new/ one, copy the old data to the new block, and
-     * free up the old block, but only if the malloc was sucessful!
-     */
-
-    if( (ptr = _umm_malloc( size )) ) {
-      memcpy( ptr, oldptr, curSize );
-      _umm_free( oldptr );
+    if (blockSize > blocks ) {
+        DBGLOG_DEBUG( "split and free %d blocks from %d\n", blocks, blockSize );
+        umm_split_block( _context, c, blocks, 0 );
+        umm_free_core( _context, (void *)&UMM_DATA(c+blocks) );
     }
 
-  }
+    STATS__FREE_BLOCKS_MIN();
 
-  /* Release the critical section... */
-  UMM_CRITICAL_EXIT();
+    /* Release the critical section... */
+    UMM_CRITICAL_EXIT(id_realloc);
 
-  return( ptr );
-}
-
-/* ------------------------------------------------------------------------ */
-
-void *umm_malloc( size_t size ) {
-  void *ret;
-
-  /* check poison of each blocks, if poisoning is enabled */
-  if (!CHECK_POISON_ALL_BLOCKS()) {
-    return NULL;
-  }
-
-  /* check full integrity of the heap, if this check is enabled */
-  if (!INTEGRITY_CHECK()) {
-    return NULL;
-  }
-
-  size += POISON_SIZE(size);
-
-  ret = _umm_malloc( size );
-  if (0 != size && 0 == ret) {
-    umm_last_fail_alloc_addr = __builtin_return_address(0);
-    umm_last_fail_alloc_size = size;
-  }
-
-  ret = GET_POISONED(ret, size);
-
-  return ret;
+    return( ptr );
 }
 
 /* ------------------------------------------------------------------------ */
 
 void *umm_calloc( size_t num, size_t item_size ) {
   void *ret;
-  size_t size = item_size * num;
 
-  /* check poison of each blocks, if poisoning is enabled */
-  if (!CHECK_POISON_ALL_BLOCKS()) {
-    return NULL;
-  }
+  ret = umm_malloc((size_t)(item_size * num));
 
-  /* check full integrity of the heap, if this check is enabled */
-  if (!INTEGRITY_CHECK()) {
-    return NULL;
-  }
-
-  size += POISON_SIZE(size);
-  ret = _umm_malloc(size);
-  if (ret) {
-    memset(ret, 0x00, size);
-  }
-  if (0 != size && 0 == ret) {
-    umm_last_fail_alloc_addr = __builtin_return_address(0);
-    umm_last_fail_alloc_size = size;
-  }
-
-  ret = GET_POISONED(ret, size);
+  if (ret)
+      memset(ret, 0x00, (size_t)(item_size * num));
 
   return ret;
 }
 
 /* ------------------------------------------------------------------------ */
-
-void *umm_realloc( void *ptr, size_t size ) {
-  void *ret;
-
-  ptr = GET_UNPOISONED(ptr);
-
-  /* check poison of each blocks, if poisoning is enabled */
-  if (!CHECK_POISON_ALL_BLOCKS()) {
-    return NULL;
-  }
-
-  /* check full integrity of the heap, if this check is enabled */
-  if (!INTEGRITY_CHECK()) {
-    return NULL;
-  }
-
-  size += POISON_SIZE(size);
-  ret = _umm_realloc( ptr, size );
-  if (0 != size && 0 == ret) {
-    umm_last_fail_alloc_addr = __builtin_return_address(0);
-    umm_last_fail_alloc_size = size;
-  }
-
-  ret = GET_POISONED(ret, size);
-
-  return ret;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void umm_free( void *ptr ) {
-
-  ptr = GET_UNPOISONED(ptr);
-
-  /* check poison of each blocks, if poisoning is enabled */
-  if (!CHECK_POISON_ALL_BLOCKS()) {
-    return;
-  }
-
-  /* check full integrity of the heap, if this check is enabled */
-  if (!INTEGRITY_CHECK()) {
-    return;
-  }
-
-  _umm_free( ptr );
-}
-
-/* ------------------------------------------------------------------------ */
-
-size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
-  umm_info(NULL, 0);
-  return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
-}
-
-size_t ICACHE_FLASH_ATTR umm_max_block_size( void ) {
-  umm_info(NULL, 0);
-  return ummHeapInfo.maxFreeContiguousBlocks * sizeof(umm_block);
-}
-
-size_t ICACHE_FLASH_ATTR umm_block_size( void ) {
-  return sizeof(umm_block);
-}
 
 };
-
-/* ------------------------------------------------------------------------ */

@@ -52,7 +52,7 @@ public:
   WiFiClient(const WiFiClient&);
   WiFiClient& operator=(const WiFiClient&);
 
-  uint8_t status();
+  virtual uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;
   virtual int connect(const String& host, uint16_t port);
@@ -66,7 +66,9 @@ public:
 
   virtual int available() override;
   virtual int read() override;
-  virtual int read(uint8_t *buf, size_t size) override;
+  virtual int read(uint8_t* buf, size_t size) override;
+  int read(char* buf, size_t size);
+
   virtual int peek() override;
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
   size_t peekBytes(char *buffer, size_t length) {
@@ -86,7 +88,7 @@ public:
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
-  size_t availableForWrite();
+  int availableForWrite() override;
 
   friend class WiFiServer;
 
@@ -119,6 +121,22 @@ public:
   static bool getDefaultSync ();
   bool getSync() const;
   void setSync(bool sync);
+
+  // peek buffer API is present
+  virtual bool hasPeekBufferAPI () const override;
+
+  // return number of byte accessible by peekBuffer()
+  virtual size_t peekAvailable () override;
+
+  // return a pointer to available data buffer (size = peekAvailable())
+  // semantic forbids any kind of read() before calling peekConsume()
+  virtual const char* peekBuffer () override;
+
+  // consume bytes after use (see peekBuffer)
+  virtual void peekConsume (size_t consume) override;
+
+  virtual bool outputCanTimeout () override { return connected(); }
+  virtual bool inputCanTimeout () override { return connected(); }
 
 protected:
 

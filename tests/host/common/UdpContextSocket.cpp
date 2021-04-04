@@ -76,7 +76,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 
 	// Filling server information
 	servaddr.sin_family = AF_INET;
-	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
+	(void) dstaddr;
+	//servaddr.sin_addr.s_addr = htonl(global_source_address);
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port = htons(mockport);
 
@@ -89,6 +90,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	else
 		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
+	if (!mcast)
+		mcast = inet_addr("224.0.0.1"); // all hosts group
 	if (mcast)
 	{
 		// https://web.cs.wpi.edu/~claypool/courses/4514-B99/samples/multicast.c
@@ -96,9 +99,10 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 
 		struct ip_mreq mreq;
 		mreq.imr_multiaddr.s_addr = mcast;
-		//mreq.imr_interface.s_addr = global_ipv4_netfmt?: htonl(INADDR_ANY);
+		//mreq.imr_interface.s_addr = htonl(global_source_address);
 		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-		if (global_ipv4_netfmt)
+
+		if (host_interface)
 		{
 #if __APPLE__
 			int idx = if_nametoindex(host_interface);
@@ -116,6 +120,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 			fprintf(stderr, MOCK "can't join multicast group addr %08x\n", (int)mcast);
 			return false;
 		}
+		else
+			mockverbose("joined multicast group addr %08lx\n", (long)ntohl(mcast));
 	}
 
 	return true;
@@ -153,6 +159,8 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
+	(void) sock;
+	(void) timeout_ms;  
 	if (usersize > CCBUFSIZE)
 		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
@@ -184,6 +192,7 @@ size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccin
 
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port)
 {
+	(void) timeout_ms;
 	// Filling server information
 	struct sockaddr_in peer;
 	peer.sin_family = AF_INET;

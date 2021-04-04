@@ -56,8 +56,6 @@ WiFiServerSecure::WiFiServerSecure(const WiFiServerSecure &rhs) : WiFiServer(rhs
 
 WiFiServerSecure::~WiFiServerSecure() {
   stack_thunk_del_ref();
-  _axtls_chain = nullptr;
-  _axtls_sk = nullptr;
 }
 
 // Specify a RSA-signed certificate and key for the server.  Only copies the pointer, the
@@ -81,13 +79,13 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   (void) status; // Unused
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
-      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta, _tls_min, _tls_max);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
       return result;
     } else if (_sk && _sk->isEC()) {
-      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta, _tls_min, _tls_max);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
@@ -103,18 +101,15 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   return WiFiClientSecure();
 }
 
-
-void WiFiServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
-  _axtls_chain = nullptr;
-  _axtls_sk = nullptr;
-  _axtls_chain = std::shared_ptr<X509List>(new X509List(cert, certLen));
-  _axtls_sk = std::shared_ptr<PrivateKey>(new PrivateKey(key, keyLen));
-  setRSACert(_axtls_chain.get(), _axtls_sk.get());
+bool WiFiServerSecure::setSSLVersion(uint32_t min, uint32_t max) {
+  if ( ((min != BR_TLS10) && (min != BR_TLS11) && (min != BR_TLS12)) ||
+       ((max != BR_TLS10) && (max != BR_TLS11) && (max != BR_TLS12)) ||
+       (max < min) ) {
+    return false; // Invalid options
+  }
+  _tls_min = min;
+  _tls_max = max;
+  return true;
 }
-
-void WiFiServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
-  setServerKeyAndCert(key, keyLen, cert, certLen);
-}
-
 
 };

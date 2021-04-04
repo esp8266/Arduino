@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <debug.h>
 #include <Arduino.h>
 #include <cxxabi.h>
 
@@ -30,6 +29,55 @@ extern int umm_last_fail_alloc_size;
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
+
+
+#if !defined(__cpp_exceptions)
+
+// overwrite weak operators new/new[] definitions
+
+void* operator new(size_t size)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+
+void* operator new[](size_t size)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+
+void* operator new (size_t size, const std::nothrow_t&)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
+}
+
+void* operator new[] (size_t size, const std::nothrow_t&)
+{
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
+}
+
+#endif // !defined(__cpp_exceptions)
 
 void __cxa_pure_virtual(void)
 {

@@ -27,9 +27,9 @@
 //
 //   Servo - Class for manipulating servo motors connected to Arduino pins.
 //
-//   attach(pin )  - Attaches a servo motor to an i/o pin.
-//   attach(pin, min, max  ) - Attaches to a pin setting min and max values in microseconds
-//   default min is 544, max is 2400
+//   attach(pin)  - Attaches a servo motor to an i/o pin.
+//   attach(pin, min, max) - Attaches to a pin setting min and max values in microseconds
+//   default min is 1000, max is 2000
 //
 //   write()     - Sets the servo angle in degrees.  (invalid angle that is valid as pulse in microseconds is treated as microseconds)
 //   writeMicroseconds() - Sets the servo pulse width in microseconds
@@ -44,12 +44,17 @@
 
 #include <Arduino.h>
 
-// the following are in us (microseconds)
-//
-#define MIN_PULSE_WIDTH       544     // the shortest pulse sent to a servo  
-#define MAX_PULSE_WIDTH      2400     // the longest pulse sent to a servo 
-#define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
-#define REFRESH_INTERVAL    20000     // minumim time to refresh servos in microseconds 
+// The following values are in us (microseconds).
+// Since the defaults can be overwritten in the new attach() member function,
+// they were modified from the Arduino AVR defaults to be in the safe range
+// of publically available specifications. While this implies that many 180°
+// servos do not operate the full 0° to 180° sweep using these, it also prevents
+// unsuspecting damage. For Arduino AVR, the same change is being discussed.
+#define DEFAULT_MIN_PULSE_WIDTH      1000 // uncalibrated default, the shortest duty cycle sent to a servo
+#define DEFAULT_MAX_PULSE_WIDTH      2000 // uncalibrated default, the longest duty cycle sent to a servo 
+#define DEFAULT_NEUTRAL_PULSE_WIDTH  1500 // default duty cycle when servo is attached
+#define REFRESH_INTERVAL            20000 // classic default period to refresh servos in microseconds 
+#define MAX_SERVOS                      9 // D0-D8
 
 #if !defined(ESP8266)
 
@@ -62,8 +67,16 @@ class Servo
 public:
     Servo();
     ~Servo();
-    uint8_t attach(int pin);           // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
-    uint8_t attach(int pin, uint16_t min, uint16_t max); // as above but also sets min and max values for writes. 
+    // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure.
+    // returns channel number or 0 if failure.
+    uint8_t attach(int pin);
+    // attach the given pin to the next free channel, sets pinMode, min, and max values for write().
+    // returns channel number or 0 if failure.
+    uint8_t attach(int pin, uint16_t min, uint16_t max);
+    // attach the given pin to the next free channel, sets pinMode, min, and max values for write(),
+    // and sets the initial value, the same as write().
+    // returns channel number or 0 if failure.
+    uint8_t attach(int pin, uint16_t min, uint16_t max, int value);
     void detach();
     void write(int value);             // if value is < 200 its treated as an angle, otherwise as pulse width in microseconds 
     void writeMicroseconds(int value); // Write pulse width in microseconds 
@@ -71,6 +84,7 @@ public:
     int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
     bool attached();                   // return true if this servo is attached, otherwise false 
 private:
+    static uint32_t _servoMap;
     bool     _attached;
     uint8_t  _pin;
     uint16_t _minUs;                   

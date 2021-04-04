@@ -8,12 +8,43 @@ pwd
 test -d cores/esp8266
 test -d libraries
 
-# in a near future, restyle-all.sh will be renamed to restyle.sh
-# and will be checked against CI
+# should be: all="cores/esp8266 libraries"
+
+all="
+libraries/ESP8266mDNS
+libraries/Wire
+libraries/lwIP*
+cores/esp8266/Lwip*
+cores/esp8266/debug*
+cores/esp8266/core_esp8266_si2c.cpp
+cores/esp8266/StreamString.*
+cores/esp8266/StreamSend.*
+libraries/Netdump
+"
+
+# core
+
+for d in $all; do
+    if [ -d "$d" ]; then
+        echo "-------- directory $d:"
+        for e in c cpp h; do
+            find $d -name "*.$e" -exec \
+                astyle \
+                    --suffix=none \
+                    --options=${org}/astyle_core.conf {} \;
+        done
+    else
+        echo "-------- file $d:"
+        astyle --suffix=none --options=${org}/astyle_core.conf "$d"
+    fi
+done
+
+# examples
 
 for d in libraries; do
-	find $d -name "*.ino" -exec \
-	    astyle \
-	        --suffix=none \
-                --options=${org}/astyle_examples.conf {} \;
+    echo "-------- examples in $d:"
+    find $d -name "*.ino" -exec \
+        astyle \
+            --suffix=none \
+            --options=${org}/astyle_examples.conf {} \;
 done

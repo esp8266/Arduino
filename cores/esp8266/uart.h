@@ -113,12 +113,12 @@ extern "C" {
 struct uart_;
 typedef struct uart_ uart_t;
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size);
+uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert);
 void uart_uninit(uart_t* uart);
 
-void uart_swap(uart_t* uart, int tx_pin);
-void uart_set_tx(uart_t* uart, int tx_pin);
-void uart_set_pins(uart_t* uart, int tx, int rx);
+bool uart_swap(uart_t* uart, int tx_pin);
+bool uart_set_tx(uart_t* uart, int tx_pin);
+bool uart_set_pins(uart_t* uart, int tx, int rx);
 bool uart_tx_enabled(uart_t* uart);
 bool uart_rx_enabled(uart_t* uart);
 
@@ -147,6 +147,17 @@ int uart_get_debug();
 void uart_start_detect_baudrate(int uart_nr);
 int uart_detect_baudrate(int uart_nr);
 
+// return number of byte accessible by peekBuffer()
+size_t uart_peek_available (uart_t* uart);
+
+// return a pointer to available data buffer (size = available())
+// semantic forbids any kind of read() before calling peekConsume()
+const char* uart_peek_buffer (uart_t* uart);
+
+// consume bytes after use (see peekBuffer)
+void uart_peek_consume (uart_t* uart, size_t consume);
+
+uint8_t uart_get_bit_length(const int uart_nr);
 
 #if defined (__cplusplus)
 } // extern "C"

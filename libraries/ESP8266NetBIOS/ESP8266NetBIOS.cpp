@@ -156,7 +156,7 @@ bool ESP8266NetBIOS::begin(const char *name)
     }
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
-    err_t err = udp_bind(_pcb, INADDR_ANY, NBNS_PORT);
+    err_t err = udp_bind(_pcb, (ip_addr_t*)INADDR_ANY, NBNS_PORT);
     if(err != ERR_OK) {
         end();
         return false;
@@ -172,7 +172,7 @@ void ESP8266NetBIOS::end()
     }
 }
 
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint16_t port)
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port)
 {
     (void)upcb;
     (void)addr;
@@ -180,13 +180,8 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
     while(pb != NULL) {
         uint8_t * data = (uint8_t*)((pb)->payload);
         size_t len = pb->len;
-#if LWIP_VERSION_MAJOR == 1
-        // check UdpContext.h
-        ip_addr_t* saddr = &current_iphdr_src;
-#else
         // check UdpContext.h
         const ip_addr_t* saddr = &ip_data.current_iphdr_src;
-#endif
 
         if (len >= sizeof(struct NBNSQUESTION)) {
             struct NBNSQUESTION * question = (struct NBNSQUESTION *)data;
@@ -267,7 +262,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
     }
 }
 
-void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, CONST ip_addr_t *addr, uint16_t port)
+void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port)
 {
     reinterpret_cast<ESP8266NetBIOS*>(arg)->_recv(upcb, p, addr, port);
 }

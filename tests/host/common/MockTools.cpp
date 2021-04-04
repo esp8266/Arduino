@@ -41,6 +41,7 @@ uint32_t lwip_ntohl (uint32_t netlong)   { return ntohl(netlong);   }
 uint16_t lwip_ntohs (uint16_t netshort)  { return ntohs(netshort);  }
 
 char* ets_strcpy (char* d, const char* s) { return strcpy(d, s); }
+char* ets_strncpy (char* d, const char* s, size_t n) { return strncpy(d, s, n); }
 size_t ets_strlen (const char* s) { return strlen(s); }
 
 int ets_printf (const char* fmt, ...)
@@ -50,16 +51,6 @@ int ets_printf (const char* fmt, ...)
 	int len = vprintf(fmt, ap);
 	va_end(ap);
 	return len;
-}
-
-extern "C" void configTime(long timezone, int daylightOffset_sec,
-                           const char* server1, const char* server2, const char* server3)
-{
-	(void)server1;
-	(void)server2;
-	(void)server3;
-
-	mockverbose("configTime: TODO (tz=%ldH offset=%dS) (time will be host's)\n", timezone, daylightOffset_sec);
 }
 
 void stack_thunk_add_ref() { }
@@ -77,3 +68,13 @@ void stack_thunk_dump_stack() { }
 #define make_stack_thunk(fcnToThunk)
 
 };
+
+void configTime(int timezone, int daylightOffset_sec,
+                           const char* server1, const char* server2, const char* server3)
+{
+	(void)server1;
+	(void)server2;
+	(void)server3;
+
+	mockverbose("configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", timezone, daylightOffset_sec);
+}

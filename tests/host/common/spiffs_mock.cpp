@@ -26,15 +26,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cerrno>
 
-extern "C"
-{
-    static uint32_t s_phys_addr = 0;
-    uint32_t s_phys_size = 0;
-    uint32_t s_phys_page = 0;
-    uint32_t s_phys_block = 0;
-    uint8_t* s_phys_data = nullptr;
-}
+#include "flash_hal_mock.h"
+
+#define SPIFFS_FILE_NAME "spiffs.bin"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 FS SPIFFS(nullptr);
 
@@ -57,7 +56,7 @@ SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const S
 
 void SpiffsMock::reset()
 {
-    SPIFFS = FS(FSImplPtr(new SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
+    SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
     load();
 }
 
@@ -96,7 +95,7 @@ void SpiffsMock::load ()
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
-        if (!m_overwrite)
+        if (!m_overwrite && flen > 0)
         {
             fprintf(stderr, "SPIFFS: aborting at user request\n");
             exit(1);
@@ -132,25 +131,5 @@ void SpiffsMock::save ()
         fprintf(stderr, "SPIFFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
 }
 
-int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
-    memcpy(dst, s_phys_data + addr, size);
-    return SPIFFS_OK;
-}
+#pragma GCC diagnostic pop
 
-int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
-    memcpy(s_phys_data + addr, src, size);
-    return SPIFFS_OK;
-}
-
-int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
-    if ((size & (FLASH_SECTOR_SIZE - 1)) != 0 ||
-        (addr & (FLASH_SECTOR_SIZE - 1)) != 0) {
-        abort();
-    }
-    const uint32_t sector = addr / FLASH_SECTOR_SIZE;
-    const uint32_t sectorCount = size / FLASH_SECTOR_SIZE;
-    for (uint32_t i = 0; i < sectorCount; ++i) {
-        memset(s_phys_data + (sector + i) * FLASH_SECTOR_SIZE, 0xff, FLASH_SECTOR_SIZE);
-    }
-    return SPIFFS_OK;
-}
