@@ -261,7 +261,7 @@ protected:
     timeType current = TimePolicyT::time();
     if(checkExpired(current))
     {
-      unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
+      timeType n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
       _start += n  * _timeout;
       return true;
     }
