@@ -175,7 +175,7 @@ public:
 
   bool canWait () const
   {
-    return _timeout != 0 && (PeriodicT || !_oneShotExpired);
+    return _timeout != 0;
   }
 
   // Resets, will trigger after this new timeout.
@@ -184,7 +184,7 @@ public:
   {
     reset();
     _timeout = TimePolicyT::toTimeTypeUnit(newUserTimeout);
-    _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
+    _neverExpires = newUserTimeout > timeMax();
   }
 
   // Resets, will trigger after the timeout previously set.
@@ -192,7 +192,6 @@ public:
   void reset()
   {
     _start = TimePolicyT::time();
-    if (!PeriodicT) _oneShotExpired = false;
   }
 
   // Resets to just expired so that on next poll the check will immediately trigger for the user,
@@ -216,7 +215,6 @@ public:
   {
     _timeout = 1; // because canWait() has precedence
     _neverExpires = true;
-    if (!PeriodicT) _oneShotExpired = false;
   }
 
   void stop()
@@ -251,8 +249,8 @@ private:
   bool checkExpired(const timeType internalUnit) const
   {
     // canWait() is not checked here
-    // returns "oneshot has expired", otherwise returns "can expire" and "time has expired"
-    return !_neverExpires && ((!PeriodicT && _oneShotExpired) || ((internalUnit - _start) >= _timeout));
+    // returns "can expire" and "time has expired"
+    return (!_neverExpires) && ((internalUnit - _start) >= _timeout);
   }
 
 protected:
@@ -277,19 +275,12 @@ protected:
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
-    if (!canWait()) return true;
-    if (checkExpired(TimePolicyT::time()))
-    {
-      if (!PeriodicT) _oneShotExpired = true;
-      return true;
-    }
-    return false;
+    return !canWait() || checkExpired(TimePolicyT::time());
   }
 
   timeType _timeout;
   timeType _start;
   bool _neverExpires;
-  mutable bool _oneShotExpired;
 };
 
 // legacy type names, deprecated (unit is milliseconds)
