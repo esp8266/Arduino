@@ -83,7 +83,7 @@ class UpdaterClass {
       Should be equal to the remaining bytes when called
       Usable for slow streams like Serial
     */
-    size_t writeStream(Stream &data);
+    size_t writeStream(Stream &data, uint16_t streamTimeout = 60000);
 
     /*
       If all bytes are written
