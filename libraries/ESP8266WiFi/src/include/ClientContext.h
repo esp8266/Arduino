@@ -131,6 +131,9 @@ public:
 
     int connect(ip_addr_t* addr, uint16_t port)
     {
+        // note: not using `const ip_addr_t* addr` because
+        // - `ip6_addr_assign_zone()` below modifies `*addr`
+        // - caller's parameter `WiFiClient::connect` is a local copy
 #if LWIP_IPV6
         // Set zone so that link local addresses use the default interface
         if (IP_IS_V6(addr) && ip6_addr_lacks_zone(ip_2_ip6(addr), IP6_UNKNOWN)) {
