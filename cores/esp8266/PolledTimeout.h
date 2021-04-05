@@ -176,7 +176,7 @@ public:
 
   bool canWait () const
   {
-    return _timeout != 0 && !_oneShotExpired;
+    return !(_timeout == 0 || _oneShotExpired);
   }
 
   // Resets, will trigger after this new timeout.
