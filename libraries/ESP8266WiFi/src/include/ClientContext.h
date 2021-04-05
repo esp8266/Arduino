@@ -129,7 +129,7 @@ public:
         }
     }
 
-    int connect(ip_addr_t* addr, uint16_t port)
+    int connect(const ip_addr_t* addr, uint16_t port)
     {
 #if LWIP_IPV6
         // Set zone so that link local addresses use the default interface
