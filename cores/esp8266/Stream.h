@@ -168,7 +168,7 @@ class Stream: public Print {
 
         // transfers already buffered / immediately available data (no timeout)
         // returns number of transfered bytes
-        size_t sendAvailable (Print* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
+        size_t sendAvailable (Print* to) { return sendGeneric(to, -1, -1, 0); }
         size_t sendAvailable (Print& to) { return sendAvailable(&to); }
 
         // transfers data until timeout
