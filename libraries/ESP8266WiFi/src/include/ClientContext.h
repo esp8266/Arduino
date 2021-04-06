@@ -31,6 +31,7 @@ extern "C" void esp_schedule();
 
 #include <assert.h>
 #include <StreamDev.h>
+#include <esp_priv.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -130,6 +131,9 @@ public:
 
     int connect(ip_addr_t* addr, uint16_t port)
     {
+        // note: not using `const ip_addr_t* addr` because
+        // - `ip6_addr_assign_zone()` below modifies `*addr`
+        // - caller's parameter `WiFiClient::connect` is a local copy
 #if LWIP_IPV6
         // Set zone so that link local addresses use the default interface
         if (IP_IS_V6(addr) && ip6_addr_lacks_zone(ip_2_ip6(addr), IP6_UNKNOWN)) {
@@ -315,7 +319,7 @@ public:
         _rx_buf_offset = 0;
     }
 
-    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
+    bool wait_until_acked(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
         // option 1 done
@@ -352,6 +356,8 @@ public:
             delay(0); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
+                // peer has closed or all bytes are sent and acked
+                // ((TCP_SND_BUF-sndbuf) is the amount of un-acked bytes)
                 break;
             }
         }
@@ -370,30 +376,13 @@ public:
         return _pcb->state;
     }
 
-    size_t write(const uint8_t* data, size_t size)
-    {
-        if (!_pcb) {
-            return 0;
-        }
-        StreamConstPtr ptr(data, size);
-        return _write_from_source(&ptr);
-    }
-
     size_t write(Stream& stream)
     {
         if (!_pcb) {
             return 0;
         }
+        assert(stream.hasPeekBufferAPI());
         return _write_from_source(&stream);
-    }
-
-    size_t write_P(PGM_P buf, size_t size)
-    {
-        if (!_pcb) {
-            return 0;
-        }
-        StreamConstPtr ptr(buf, size);
-        return _write_from_source(&ptr);
     }
 
     void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
@@ -502,13 +491,12 @@ protected:
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
                // will resume on timeout or when _write_some_from_cb or _notify_error fires
-
             }
             _send_waiting = false;
         } while(true);
 
         if (_sync)
-            wait_until_sent();
+            wait_until_acked();
 
         return _written;
     }

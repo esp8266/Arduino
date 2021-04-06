@@ -441,7 +441,7 @@ Stream extensions
 
     Two additional classes are provided.
 
-    - ``StreamPtr::`` is designed to hold a constant buffer (in ram or flash).
+    - ``StreamConstPtr::`` is designed to hold a constant buffer (in ram or flash).
 
       With this class, a ``Stream::`` can be made from ``const char*``,
       ``F("some words in flash")`` or ``PROGMEM`` strings.  This class makes
@@ -451,7 +451,7 @@ Stream extensions
 
       .. code:: cpp
 
-        StreamPtr css(F("my long css data")); // CSS data not copied to RAM
+        StreamConstPtr css(F("my long css data")); // CSS data not copied to RAM
         server.sendAll(css);
 
     - ``S2Stream::`` is designed to make a ``Stream::`` out of a ``String::`` without copy.
