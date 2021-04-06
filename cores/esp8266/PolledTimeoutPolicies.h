@@ -25,6 +25,7 @@
 
 #include <PolledTimeoutTemplate.h>
 
+#include <core_esp8266_features.h>
 
 namespace YieldPolicy
 {

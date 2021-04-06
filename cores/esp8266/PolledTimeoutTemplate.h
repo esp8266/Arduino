@@ -27,7 +27,6 @@
 #include <limits>                  // std::numeric_limits
 #include <type_traits>             // std::is_unsigned
 
-#include <core_esp8266_features.h>
 
 namespace TimePolicy
 {
@@ -103,31 +102,61 @@ namespace PolledTimeout
     static constexpr timeType neverExpires    = std::numeric_limits<timeType>::max();
     static constexpr timeType rangeCompensate = TimePolicyT::rangeCompensate; //debug
 
+    //Constructor
     TimeoutTemplate(const timeType userTimeout)
     {
       reset(userTimeout);
     }
 
+    //Checks if the timeout has elapsed
     IRAM_ATTR // fast
     bool expired()
     {
-      YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
-      if(PeriodicT)           //in case of false: gets optimized away
-        return expiredRetrigger();
-      return expiredOneShot();
+      const bool hasExpired = PeriodicT ? expiredRetrigger() : expiredOneShot();
+      if (!hasExpired) //in case of DoNothing: gets optimized away
+        YieldPolicyT::execute();
+      return hasExpired;    
     }
-
+ 
+    //Convenience shorthand for expired()
     IRAM_ATTR // fast
     operator bool()
     {
       return expired();
     }
   
+    //Returns time since creation or last reset
+    IRAM_ATTR
+    timeType elapsed() const
+    {
+      if(_neverExpires)
+        return TimePolicyT::toUserUnit(0);
+
+      return TimePolicyT::time() - _start;
+    }
+    
+    //Returns time until next expiration
+    IRAM_ATTR // fast
+    timeType remaining() const
+    {
+      if (_neverExpires)
+        return timeMax();
+
+      timeType current = TimePolicyT::time();
+
+      if (checkExpired(current))
+        return TimePolicyT::toUserUnit(0);
+
+      return TimePolicyT::toUserUnit(_timeout - (current - _start));
+    }
+
+    //Checks if the timeout can expire or not (if false, expired() will always return false)
     bool canExpire () const
     {
       return !_neverExpires;
     }
   
+    //Checks if the timeout is always expired or not (if false, expired() will always return true)
     bool canWait () const
     {
       return _timeout != alwaysExpired;
@@ -166,17 +195,32 @@ namespace PolledTimeout
       _start -= _timeout;
     }
   
+    //Resets to a state that can never expire
     void resetToNeverExpires ()
     {
       _timeout = alwaysExpired + 1; // because canWait() has precedence
       _neverExpires = true;
     }
   
+    //Getter for the timeout value
     timeType getTimeout() const
     {
       return TimePolicyT::toUserUnit(_timeout);
     }
 
+    //Getter for the time value of the last reset
+    timeType getStart() const
+    {
+      return _start;
+    }
+
+    //Convenience method for the current time value
+    timeType time() const
+    {
+      return TimePolicyT::time();
+    }
+
+    //Returns the max valid time value that the time policy allows
     static constexpr timeType timeMax()
     {
       return TimePolicyT::timeMax;
