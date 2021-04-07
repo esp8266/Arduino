@@ -256,7 +256,7 @@ int WiFiClient::available()
     int result = _client->getSize();
 
     if (!result) {
-        yield();
+        minimal_yield();
     }
     return result;
 }

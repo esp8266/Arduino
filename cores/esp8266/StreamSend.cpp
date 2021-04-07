@@ -130,7 +130,7 @@ size_t Stream::SendGenericPeekBuffer(Print* to, const ssize_t len, const int rea
             break;
         }
 
-        yield();
+        minimal_yield();
     }
 
     if (getLastSendReport() == Report::Success && maxLen > 0)
@@ -215,7 +215,7 @@ size_t Stream::SendGenericRegularUntil(Print* to, const ssize_t len, const int r
             break;
         }
 
-        yield();
+        minimal_yield();
     }
 
     if (getLastSendReport() == Report::Success && maxLen > 0)
@@ -308,7 +308,7 @@ size_t Stream::SendGenericRegular(Print* to, const ssize_t len, const esp8266::p
             break;
         }
 
-        yield();
+        minimal_yield();
     }
 
     if (getLastSendReport() == Report::Success && maxLen > 0)

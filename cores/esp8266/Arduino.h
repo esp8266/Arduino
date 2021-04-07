@@ -191,8 +191,8 @@ void setup(void);
 void loop(void);
 
 void yield(void);
-
-void optimistic_yield(uint32_t interval_us);
+void minimal_yield();
+void optimistic_yield(uint32_t interval_us); // parameter ignored, is minimal_yield()
 
 #define _PORT_GPIO16    1
 #define digitalPinToPort(pin)       (((pin)==16)?(_PORT_GPIO16):(0))

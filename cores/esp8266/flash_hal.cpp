@@ -30,7 +30,7 @@ extern "C" {
 }
 
 int32_t flash_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
-    yield();
+    minimal_yield();
 
     // We use flashRead overload that handles proper alignment
     if (ESP.flashRead(addr, dst, size)) {
@@ -41,7 +41,7 @@ int32_t flash_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
 }
 
 int32_t flash_hal_write(uint32_t addr, uint32_t size, const uint8_t *src) {
-    yield();
+    minimal_yield();
 
     // We use flashWrite overload that handles proper alignment
     if (ESP.flashWrite(addr, src, size)) {
@@ -60,7 +60,7 @@ int32_t flash_hal_erase(uint32_t addr, uint32_t size) {
     const uint32_t sector = addr / SPI_FLASH_SEC_SIZE;
     const uint32_t sectorCount = size / SPI_FLASH_SEC_SIZE;
     for (uint32_t i = 0; i < sectorCount; ++i) {
-        yield();
+        minimal_yield();
         if (!ESP.flashEraseSector(sector + i)) {
             DEBUGV("_spif_erase addr=%x size=%d i=%d\r\n", addr, size, i);
             return FLASH_HAL_ERASE_ERROR;

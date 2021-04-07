@@ -294,7 +294,7 @@ size_t WiFiClientSecureCtx::_write(const uint8_t *buf, size_t size, bool pmem) {
   do {
     // Ensure we yield if we need multiple fragments to avoid WDT
     if (sent_bytes) {
-      yield();
+      minimal_yield();
     }
 
     // Get BearSSL to a state where we can send
@@ -479,7 +479,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
   esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
 
   for (int no_work = 0; blocking || no_work < 2;) {
-    yield();
+    minimal_yield();
 
     if (loopTimeout) {
       DEBUG_BSSL("_run_until: Timeout\n");
@@ -605,7 +605,7 @@ bool WiFiClientSecureCtx::_wait_for_handshake() {
     if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
       _handshake_done = true;
     }
-    yield();
+    minimal_yield();
   }
   return _handshake_done;
 }

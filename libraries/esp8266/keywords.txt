@@ -27,6 +27,8 @@ ChaCha20Poly1305	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
+optimistic_yield	KEYWORD2
+minimal_yield	KEYWORD2
 wdtEnable	KEYWORD2
 wdtDisable	KEYWORD2
 wdtFeed	KEYWORD2

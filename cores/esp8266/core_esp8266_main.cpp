@@ -144,6 +144,8 @@ extern "C" void __yield() {
 #endif
 }
 
+extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
+
 extern "C" void __optimistic_yield(uint32_t interval_us) {
     const uint32_t intvl_cycles = interval_us *
 #if defined(F_CPU)
@@ -158,13 +160,12 @@ extern "C" void __optimistic_yield(uint32_t interval_us) {
     }
 }
 
-extern "C" void optimistic_yield(uint32_t interval_us) {
-    (void)interval_us;
+extern "C" void minimal_yield() {
     __optimistic_yield(DelayBetweenRealYield_usec);
 }
 
-extern "C" void yield() {
-    // at least 1ms between two consecutive yields
+extern "C" void optimistic_yield(uint32_t interval_us) {
+    (void)interval_us;
     __optimistic_yield(DelayBetweenRealYield_usec);
 }
 

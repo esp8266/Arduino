@@ -118,7 +118,7 @@ int WiFiUDP::available() {
     if (!result) {
         // yielding here will not make more data "available",
         // but it will prevent the system from going into WDT reset
-        yield();
+        minimal_yield();
     }
 
     return result;
@@ -195,7 +195,7 @@ int WiFiUDP::parsePacket()
         return 0;
 
     if (!_ctx->next()) {
-        yield();
+        minimal_yield();
         return 0;
     }
 

@@ -126,7 +126,7 @@ WiFiClient WiFiServer::available(byte* status) {
         return result;
     }
 
-    yield();
+    minimal_yield();
     return WiFiClient();
 }
 
