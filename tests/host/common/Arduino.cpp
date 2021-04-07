@@ -48,6 +48,10 @@ extern "C" bool esp_is_in_cont()
     return true;
 }
 
+extern "C" void minimal_yield ()
+{
+}
+
 extern "C" void optimistic_yield (uint32_t interval_us)
 {
     (void)interval_us;
