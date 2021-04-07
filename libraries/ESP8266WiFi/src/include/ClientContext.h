@@ -31,6 +31,7 @@ extern "C" void esp_schedule();
 
 #include <assert.h>
 #include <StreamDev.h>
+#include <esp_priv.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -130,6 +131,9 @@ public:
 
     int connect(ip_addr_t* addr, uint16_t port)
     {
+        // note: not using `const ip_addr_t* addr` because
+        // - `ip6_addr_assign_zone()` below modifies `*addr`
+        // - caller's parameter `WiFiClient::connect` is a local copy
 #if LWIP_IPV6
         // Set zone so that link local addresses use the default interface
         if (IP_IS_V6(addr) && ip6_addr_lacks_zone(ip_2_ip6(addr), IP6_UNKNOWN)) {
@@ -372,30 +376,13 @@ public:
         return _pcb->state;
     }
 
-    size_t write(const uint8_t* data, size_t size)
-    {
-        if (!_pcb) {
-            return 0;
-        }
-        StreamConstPtr ptr(data, size);
-        return _write_from_source(&ptr);
-    }
-
     size_t write(Stream& stream)
     {
         if (!_pcb) {
             return 0;
         }
+        assert(stream.hasPeekBufferAPI());
         return _write_from_source(&stream);
-    }
-
-    size_t write_P(PGM_P buf, size_t size)
-    {
-        if (!_pcb) {
-            return 0;
-        }
-        StreamConstPtr ptr(buf, size);
-        return _write_from_source(&ptr);
     }
 
     void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
@@ -504,7 +491,6 @@ protected:
                // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
                delay(1);
                // will resume on timeout or when _write_some_from_cb or _notify_error fires
-
             }
             _send_waiting = false;
         } while(true);
