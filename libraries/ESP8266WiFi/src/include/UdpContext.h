@@ -24,7 +24,7 @@
 class UdpContext;
 
 extern "C" {
-void esp_yield();
+void esp_suspend();
 void esp_schedule();
 #include <assert.h>
 }
@@ -177,7 +177,7 @@ public:
     }
 
     // warning: handler is called from tcp stack context
-    // esp_yield and non-reentrant functions which depend on it will fail
+    // esp_suspend and non-reentrant functions which depend on it will fail
     void onRx(rxhandler_t handler) {
         _on_rx = handler;
     }
@@ -411,7 +411,7 @@ public:
         err_t err;
         esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
         while (((err = trySend(addr, port, /* keep buffer on error */true)) != ERR_OK) && !timeout)
-            esp_break();
+            esp_yield();
         if (err != ERR_OK)
             cancelBuffer(); // get rid of buffer kept on error after timeout
         return err == ERR_OK;

@@ -47,7 +47,7 @@ void __delay(unsigned long ms) {
     } else {
         esp_schedule();
     }
-    esp_yield();
+    esp_suspend();
     if(ms) {
         os_timer_disarm(&delay_timer);
     }

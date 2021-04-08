@@ -163,7 +163,7 @@ static IRAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
   forceTimerInterrupt();
   while (pwmState.pwmUpdate) {
     if (idle) {
-      esp_break();
+      esp_yield();
     }
     MEMBARRIER();
   }

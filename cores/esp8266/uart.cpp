@@ -567,7 +567,7 @@ uart_wait_tx_empty(uart_t* uart)
         return;
 
     while(uart_tx_fifo_available(uart->uart_nr) > 0)
-        esp_break();
+        esp_yield();
 
 }
 
@@ -948,7 +948,7 @@ inline __attribute__((always_inline)) void
 uart_write_char_delay(const int uart_nr, char c)
 {
     while(uart_tx_fifo_full(uart_nr))
-        esp_break();
+        esp_yield();
 
     USF(uart_nr) = c;
 

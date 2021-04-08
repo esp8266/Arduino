@@ -46,7 +46,7 @@ struct DoNothing
 
 struct YieldOrSkip
 {
-  static void execute() {esp_break();}
+  static void execute() {esp_yield();}
 };
 
 template <unsigned long delayMs>

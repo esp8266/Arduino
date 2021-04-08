@@ -53,15 +53,15 @@ extern "C" void optimistic_yield (uint32_t interval_us)
     (void)interval_us;
 }
 
+extern "C" void esp_suspend()
+{
+}
+
+extern "C" void esp_schedule()
+{
+}
+
 extern "C" void esp_yield()
-{
-}
-
-extern "C" void esp_schedule ()
-{
-}
-
-extern "C" void esp_break ()
 {
 }
 
@@ -84,6 +84,6 @@ extern "C" void delayMicroseconds(unsigned int us)
 
 #include "cont.h"
 cont_t* g_pcont = NULL;
-extern "C" void cont_yield(cont_t*)
+extern "C" void cont_suspend(cont_t*)
 {
 }

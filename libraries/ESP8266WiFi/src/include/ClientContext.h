@@ -351,7 +351,7 @@ public:
                 last_sent = millis();
             }
 
-            esp_break(); // from sys or os context
+            esp_yield(); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 // peer has closed or all bytes are sent and acked

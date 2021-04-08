@@ -70,7 +70,7 @@ bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
         return false;
     }
 
-    esp_yield();
+    esp_suspend();
     // will resume when wifi_wps_status_cb fires
 
     return true;

@@ -514,9 +514,9 @@ bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
     }
 
     wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
-    esp_break();
+    esp_yield();
     wifi_fpm_open();
-    esp_break();
+    esp_yield();
     auto ret = wifi_fpm_do_sleep(sleepUs);
     if (ret != 0)
     {

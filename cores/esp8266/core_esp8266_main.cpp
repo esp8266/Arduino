@@ -62,7 +62,7 @@ cont_t* g_pcont __attribute__((section(".noinit")));
 static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 
 /* Used to implement optimistic_yield */
-static uint32_t s_cycles_at_yield_start;
+static uint32_t s_cycles_at_resume;
 
 /* For ets_intr_lock_nest / ets_intr_unlock_nest
  * Max nesting seen by SDK so far is 2.
@@ -106,41 +106,41 @@ extern "C" void __preloop_update_frequency() {
 extern "C" void preloop_update_frequency() __attribute__((weak, alias("__preloop_update_frequency")));
 
 extern "C" bool can_yield() {
-  return cont_can_yield(g_pcont);
+  return cont_can_suspend(g_pcont);
 }
 
-static inline void esp_yield_within_cont() __attribute__((always_inline));
-static void esp_yield_within_cont() {
-        cont_yield(g_pcont);
-        s_cycles_at_yield_start = ESP.getCycleCount();
+static inline void esp_suspend_within_cont() __attribute__((always_inline));
+static void esp_suspend_within_cont() {
+        cont_suspend(g_pcont);
+        s_cycles_at_resume = ESP.getCycleCount();
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void __esp_yield() {
-    if (can_yield()) {
-        esp_yield_within_cont();
+extern "C" void __esp_suspend() {
+    if (cont_can_suspend(g_pcont)) {
+        esp_suspend_within_cont();
     }
 }
 
-extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
+extern "C" void esp_suspend() __attribute__ ((weak, alias("__esp_suspend")));
 
 extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 // Replacement for delay(0). In CONT, same as yield(). Whereas yield() panics
-// in SYS, esp_break() is safe to call and only schedules CONT. Use yield()
-// whereever only called from CONT, use esp_break() if code is called from SYS
+// in SYS, esp_yield() is safe to call and only schedules CONT. Use yield()
+// whereever only called from CONT, use esp_yield() if code is called from SYS
 // or both CONT and SYS.
-extern "C" void esp_break() {
+extern "C" void esp_yield() {
     esp_schedule();
-    esp_yield();
+    esp_suspend();
 }
 
 extern "C" void __yield() {
-    if (can_yield()) {
+    if (cont_can_suspend(g_pcont)) {
         esp_schedule();
-        esp_yield_within_cont();
+        esp_suspend_within_cont();
     }
     else {
         panic();
@@ -156,7 +156,7 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 #else
         ESP.getCpuFreqMHz();
 #endif
-    if ((ESP.getCycleCount() - s_cycles_at_yield_start) > intvl_cycles &&
+    if ((ESP.getCycleCount() - s_cycles_at_resume) > intvl_cycles &&
         can_yield())
     {
         yield();
@@ -216,7 +216,7 @@ static void loop_wrapper() {
 
 static void loop_task(os_event_t *events) {
     (void) events;
-    s_cycles_at_yield_start = ESP.getCycleCount();
+    s_cycles_at_resume = ESP.getCycleCount();
     ESP.resetHeap();
     cont_run(g_pcont, &loop_wrapper);
     ESP.setDramHeap();
