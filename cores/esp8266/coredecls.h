@@ -2,6 +2,8 @@
 #ifndef __COREDECLS_H
 #define __COREDECLS_H
 
+#define HAVE_ESP_SUSPEND 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
