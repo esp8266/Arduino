@@ -35,6 +35,7 @@ extern "C" {
 #include <core_version.h>
 #include "gdb_hooks.h"
 #include "flash_quirks.h"
+#include "hwdt_app_entry.h"
 #include <umm_malloc/umm_malloc.h>
 #include <core_esp8266_non32xfer.h>
 #include "core_esp8266_vm.h"
@@ -44,7 +45,6 @@ extern "C" {
     => 1114 μs, 1460 bytes, 10Mibits/s
 */
 constexpr auto DelayBetweenRealYield_usec = 1000;
-
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -368,10 +368,14 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
+#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NOEXTRA4K)
+    debug_hwdt_init();
+#endif
+
 #if defined(UMM_HEAP_EXTERNAL)
     install_vm_exception_handler();
 #endif
-
+  
 #if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
     install_non32xfer_exception_handler();
 #endif
