@@ -194,7 +194,7 @@ int WiFiUDP::parsePacket()
         return 0;
 
     if (!_ctx->next()) {
-        optimistic_yield(10000);
+        optimistic_yield(1000);
         return 0;
     }
 
