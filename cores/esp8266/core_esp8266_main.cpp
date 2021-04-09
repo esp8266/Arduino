@@ -80,6 +80,10 @@ const char* core_release =
 #else
     NULL;
 #endif
+
+static os_timer_t delay_timer;
+#define ONCE 0
+#define REPEAT 1
 } // extern "C"
 
 void initVariant() __attribute__((weak));
@@ -135,6 +139,38 @@ extern "C" IRAM_ATTR void esp_schedule() {
 extern "C" void esp_yield() {
     esp_schedule();
     esp_suspend();
+}
+
+void delay_end(void* arg) {
+    (void)arg;
+    esp_schedule();
+}
+
+extern "C" void __esp_delay(unsigned long ms) {
+    if (ms) {
+        os_timer_setfn(&delay_timer, (os_timer_func_t*)&delay_end, 0);
+        os_timer_arm(&delay_timer, ms, ONCE);
+    }
+    else {
+        esp_schedule();
+    }
+    esp_suspend();
+    if (ms) {
+        os_timer_disarm(&delay_timer);
+    }
+}
+
+extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
+
+using IsBlockedCB = std::function<bool()>;
+
+void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms) {
+    const auto start = millis();
+    decltype(millis()) expired;
+    while ((expired = millis() - start) < timeout_ms && blocked()) {
+        auto remaining = timeout_ms - expired;
+        esp_delay(remaining <= intvl_ms ? remaining : intvl_ms);
+    }
 }
 
 extern "C" void __yield() {
@@ -224,8 +260,8 @@ static void loop_task(os_event_t *events) {
         panic();
     }
 }
-extern "C" {
 
+extern "C" {
 struct object { long placeholder[ 10 ]; };
 void __register_frame_info (const void *begin, struct object *ob);
 extern char __eh_frame[];
@@ -262,7 +298,6 @@ static void  __unhandled_exception_cpp()
     }
 #endif
 }
-
 }
 
 void init_done() {

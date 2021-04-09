@@ -434,10 +434,9 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
     //tasks to wait correctly.
     constexpr unsigned int timeoutValue = 1000; //1 second
     if(can_yield()) {
-        using oneShot = esp8266::polledTimeout::oneShotFastMs;
-        oneShot timeout(timeoutValue);
-        while(wifi_get_opmode() != (uint8) m && !timeout)
-            delay(5);
+        // The final argument, intvl_ms, to esp_delay influences how frequently
+        // the scheduled recurrent functions (Schedule.h) are probed.
+        esp_delay(timeoutValue, [m]() { return wifi_get_opmode() != m; }, 5);
 
         //if at this point mode still hasn't been reached, give up
         if(wifi_get_opmode() != (uint8) m) {
@@ -617,7 +616,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        delay(timeout_ms);
+        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
         // will resume on timeout or when wifi_dns_found_callback fires
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
@@ -667,8 +666,8 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        delay(timeout_ms);
         // will resume on timeout or when wifi_dns_found_callback fires
+        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult.isSet()) {
@@ -701,7 +700,8 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
-    esp_schedule(); // break delay in hostByName
+    _dns_lookup_pending = false; // resume hostByName
+    esp_schedule();
 }
 
 uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState& state)
