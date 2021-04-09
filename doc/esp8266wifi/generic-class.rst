@@ -43,7 +43,7 @@ persistent
     WiFi.persistent(persistent)
 
 Starting from version 3 of this core, **persistence is disabled by default
-and WiFi does not anymore automatically fires up at boot** (see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
+and WiFi does not start automatically at boot** (see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
 
 Previously, SDK was automatically starting WiFi at boot.  This was probably
 intended for the Espressif AT FW which is interactive and preserves WiFi
