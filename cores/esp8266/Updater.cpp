@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
+#include <PolledTimeout.h>
 #include "StackThunk.h"
 
 //#define DEBUG_UPDATER Serial
@@ -479,7 +480,7 @@ bool UpdaterClass::_verifyEnd() {
     return false;
 }
 
-size_t UpdaterClass::writeStream(Stream &data) {
+size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
     size_t written = 0;
     size_t toRead = 0;
     if(hasError() || !isRunning())
@@ -492,6 +493,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
         _reset();
         return 0;
     }
+    esp8266::polledTimeout::oneShotMs timeOut(streamTimeout);
     if (_progress_callback) {
         _progress_callback(0, _size);
     }
@@ -509,13 +511,15 @@ size_t UpdaterClass::writeStream(Stream &data) {
         }
         toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
-            delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
-            if(toRead == 0) { //Timeout
-                _currentAddress = (_startAddress + _size);
-                _setError(UPDATE_ERROR_STREAM);
-                return written;
-            }
+          if (timeOut) {
+            _currentAddress = (_startAddress + _size);
+            _setError(UPDATE_ERROR_STREAM);
+            _reset();
+            return written;
+          }
+          delay(100);
+        } else {
+          timeOut.reset();
         }
         if(_ledPin != -1) {
             digitalWrite(_ledPin, !_ledOn); // Switch LED off

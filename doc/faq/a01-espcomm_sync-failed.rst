@@ -41,9 +41,8 @@ following three things right: 1. Module is provided with enough power,
 2. GPIO0, GPIO15 and CH\_PD are connected using pull up / pull down
 resistors, 3. Module is put into boot loader mode.
 
-For specific details please refer to section on `Generic ESP8266
-modules <../boards.rst#generic-esp8266-modules>`__. Example modules
-without USB to serial converter on board are shown below.
+For specific details please refer to section on `Generic ESP8266 module <../boards.rst#generic-esp8266-module>`__.
+Example modules without USB to serial converter on board are shown below.
 
 .. figure:: pictures/a01-example-boards-without-usb.png
    :alt: Example ESP8266 modules without USB to serial converter

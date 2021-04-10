@@ -23,20 +23,25 @@
 #define String_class_h
 #ifdef __cplusplus
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include <pgmspace.h>
 
-// An inherited class for holding the result of a concatenation.  These
-// result objects are assumed to be writable by subsequent concatenations.
-class StringSumHelper;
+#include <cstdlib>
+#include <cstdint>
+#include <cstring>
+#include <cctype>
+
+#include <utility>
+#include <type_traits>
 
 // an abstract class used as a means to proide a unique pointer type
 // but really has no body
 class __FlashStringHelper;
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
+
+// support libraries that expect this name to be available
+// replace with `using StringSumHelper = String;` in case something wants this constructible
+class StringSumHelper;
 
 // The string class
 class String {
@@ -60,7 +65,6 @@ class String {
         String(const String &str);
         String(const __FlashStringHelper *str);
         String(String &&rval) noexcept;
-        String(StringSumHelper &&rval) noexcept;
         explicit String(char c) {
             sso.buff[0] = c;
             sso.buff[1] = 0;
@@ -104,8 +108,10 @@ class String {
         String &operator =(const char *cstr);
         String &operator =(const __FlashStringHelper *str);
         String &operator =(String &&rval) noexcept;
-        String &operator =(StringSumHelper &&rval) noexcept {
-            return operator =((String &&)rval);
+        String &operator =(char c) {
+            char buffer[2] { c, '\0' };
+            *this = buffer;
+            return *this;
         }
 
         // concatenate (works w/ built-in types)
@@ -130,72 +136,11 @@ class String {
 
         // if there's not enough memory for the concatenated value, the string
         // will be left unchanged (but this isn't signalled in any way)
-        String &operator +=(const String &rhs) {
+        template <typename T>
+        String &operator +=(const T &rhs) {
             concat(rhs);
             return *this;
         }
-        String &operator +=(const char *cstr) {
-            concat(cstr);
-            return *this;
-        }
-        String &operator +=(char c) {
-            concat(c);
-            return *this;
-        }
-        String &operator +=(unsigned char num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(int num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(unsigned int num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(long num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(unsigned long num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(long long num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(unsigned long long num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(float num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(double num) {
-            concat(num);
-            return *this;
-        }
-        String &operator +=(const __FlashStringHelper *str) {
-            concat(str);
-            return *this;
-        }
-
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, const String &rhs);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, const char *cstr);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, char c);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned char num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, int num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned int num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, long num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, long long num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, unsigned long long num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, float num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, double num);
-        friend StringSumHelper &operator +(const StringSumHelper &lhs, const __FlashStringHelper *rhs);
 
         // comparison (only works w/ Strings and "strings")
         operator StringIfHelperType() const {
@@ -338,6 +283,14 @@ class String {
         const char *buffer() const { return wbuffer(); }
         char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
 
+        // concatenation is done via non-member functions
+        // make sure we still have access to internal methods, since we optimize based on capacity of both sides and want to manipulate internal buffers directly
+        friend String operator +(const String &lhs, String &&rhs);
+        friend String operator +(String &&lhs, String &&rhs);
+        friend String operator +(char lhs, String &&rhs);
+        friend String operator +(const char *lhs, String &&rhs);
+        friend String operator +(const __FlashStringHelper *lhs, String &&rhs);
+
     protected:
         void init(void) __attribute__((always_inline)) {
             sso.buff[0] = 0;
@@ -359,54 +312,81 @@ class String {
         void invalidate(void);
         unsigned char changeBuffer(unsigned int maxStrLen);
 
-        // copy and move
+        // copy or insert at a specific position
         String &copy(const char *cstr, unsigned int length);
         String &copy(const __FlashStringHelper *pstr, unsigned int length);
+
+        String &insert(size_t position, char);
+        String &insert(size_t position, const char *);
+        String &insert(size_t position, const __FlashStringHelper *);
+        String &insert(size_t position, const char *, size_t length);
+        String &insert(size_t position, const String &);
+
+        // rvalue helper
         void move(String &rhs) noexcept;
 };
 
-class StringSumHelper: public String {
-    public:
-        StringSumHelper(const String &s) :
-                String(s) {
-        }
-        StringSumHelper(const char *p) :
-                String(p) {
-        }
-        StringSumHelper(char c) :
-                String(c) {
-        }
-        StringSumHelper(unsigned char num) :
-                String(num) {
-        }
-        StringSumHelper(int num) :
-                String(num) {
-        }
-        StringSumHelper(unsigned int num) :
-                String(num) {
-        }
-        StringSumHelper(long num) :
-                String(num) {
-        }
-        StringSumHelper(unsigned long num) :
-                String(num) {
-        }
-        StringSumHelper(long long num) :
-                String(num) {
-        }
-        StringSumHelper(unsigned long long num) :
-                String(num) {
-        }
-        StringSumHelper(float num) :
-                String(num) {
-        }
-        StringSumHelper(double num) :
-                String(num) {
-        }
-        StringSumHelper(const __FlashStringHelper *s) :
-                String(s) {
-        }
-};
+// concatenation (note that it's done using non-method operators to handle both possible type refs)
+
+inline String operator +(const String &lhs, const String &rhs) {
+    String res;
+    res.reserve(lhs.length() + rhs.length());
+    res += lhs;
+    res += rhs;
+    return res;
+}
+
+inline String operator +(String &&lhs, const String &rhs) {
+    lhs += rhs;
+    return std::move(lhs);
+}
+
+String operator +(const String &lhs, String &&rhs);
+String operator +(String &&lhs, String &&rhs);
+
+template <typename T,
+    typename = std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>>>
+inline String operator +(const String &lhs, const T &value) {
+    String res(lhs);
+    res += value;
+    return res;
+}
+
+template <typename T,
+    typename = std::enable_if_t<!std::is_same_v<String, std::decay_t<T>>>>
+inline String operator +(String &&lhs, const T &value) {
+    lhs += value;
+    return std::move(lhs);
+}
+
+// `String(char)` is explicit, but we used to have StringSumHelper silently allowing the following:
+// `String x; x = 'a' + String('b') + 'c';`
+// For comparison, `std::string(char)` does not exist. However, we are allowed to chain `char` as both lhs and rhs
+
+String operator +(char lhs, const String &rhs);
+
+inline String operator +(char lhs, String &&rhs) {
+    return std::move(rhs.insert(0, lhs));
+}
+
+// both `char*` and `__FlashStringHelper*` are implicitly converted into `String()`, calling the `operator+(const String& ...);`
+// however, here we:
+// - do an automatic `reserve(total length)` for the resulting string
+// - possibly do rhs.insert(0, ...), when &&rhs capacity could fit both
+
+String operator +(const char *lhs, const String &rhs);
+
+inline String operator +(const char *lhs, String &&rhs) {
+    return std::move(rhs.insert(0, lhs));
+}
+
+inline String operator +(const __FlashStringHelper *lhs, const String &rhs) {
+    return reinterpret_cast<const char*>(lhs) + rhs;
+}
+
+inline String operator +(const __FlashStringHelper *lhs, String &&rhs) {
+    return std::move(rhs.insert(0, lhs));
+}
 
 extern const String emptyString;
 
