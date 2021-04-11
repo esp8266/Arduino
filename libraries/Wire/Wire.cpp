@@ -227,7 +227,7 @@ int TwoWire::available(void)
     {
         // yielding here will not make more data "available",
         // but it will prevent the system from going into WDT reset
-        optimistic_yield(10000UL);
+        optimistic_yield(100UL);
     }
 
     return result;
