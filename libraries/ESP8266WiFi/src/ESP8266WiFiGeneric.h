@@ -128,23 +128,24 @@ class ESP8266WiFiGenericClass {
         bool enableSTA(bool enable);
         bool enableAP(bool enable);
 
-        bool forceSleepBegin(uint32_t sleepUs = 0);
+        bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
 
         // wrappers around mode() and forceSleepBegin/Wake
         // - sleepUs is WiFi.forceSleepBegin() parameter, 0 means forever
         // - saveState is the user's state to hold configuration on restore
-        bool shutdown(uint32_t sleepUs = 0, WiFiState* stateSave = nullptr);
-        bool resumeFromShutdown(WiFiState* savedState = nullptr);
+        bool shutdown(WiFiState& stateSave);
+        bool shutdown(WiFiState& stateSave, uint32 sleepUs);
+        bool resumeFromShutdown(WiFiState& savedState);
 
-        static bool shutdownValidCRC (const WiFiState* state);
+        static bool shutdownValidCRC (const WiFiState& state);
         static void preinitWiFiOff () __attribute__((deprecated("WiFi is off by default at boot, use enableWiFiAtBoot() for legacy behavior")));
 
     protected:
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
 
-        static uint32_t shutdownCRC (const WiFiState* state);
+        static uint32_t shutdownCRC (const WiFiState& state);
 
         static void _eventCallback(void *event);
 

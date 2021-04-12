@@ -180,7 +180,7 @@ forceSleepBegin
 
 .. code:: cpp
 
-    bool  forceSleepBegin (uint32_t sleepUs=0)
+    bool  forceSleepBegin (uint32 sleepUs=0)
 
 Saves the currently set WiFi mode and starts forced modem sleep for the specified time (us)
 
@@ -198,8 +198,10 @@ shutdown and resumeFromShutdown
 
 .. code:: cpp
 
-    bool  shutdown (uint32_t sleepUs, WiFiState* state)
-    bool  resumeFromShutdown (WiFiState* state)
+    bool  shutdown (WiFiState& state)
+    bool  shutdown (WiFiState& state, uint32 sleepUs)
+    bool  resumeFromShutdown (WiFiState& state)
+    bool  shutdownValidCRC (const WiFiState& state)
 
 Stores the STA interface IP configuration in the specified ``state`` struct and calls ``forceSleepBegin(sleepUs)``.
 Restores STA interface configuration from the ``state`` and calls ``forceSleepWake()``.

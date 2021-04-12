@@ -708,37 +708,37 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
     esp_schedule(); // break delay in hostByName
 }
 
-uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState* state)
+uint32_t ESP8266WiFiGenericClass::shutdownCRC (const WiFiState& state)
 {
-    return state? crc32(&state->state, sizeof(state->state)): 0;
+    return crc32(&state.state, sizeof(state.state));
 }
 
-bool ESP8266WiFiGenericClass::shutdownValidCRC (const WiFiState* state)
+bool ESP8266WiFiGenericClass::shutdownValidCRC (const WiFiState& state)
 {
-    return state && (crc32(&state->state, sizeof(state->state)) == state->crc);
+    return crc32(&state.state, sizeof(state.state)) == state.crc;
 }
 
-bool ESP8266WiFiGenericClass::shutdown (uint32_t sleepUs, WiFiState* state)
+bool ESP8266WiFiGenericClass::shutdown (WiFiState& state, uint32 sleepUs)
 {
     bool persistent = _persistent;
     WiFiMode_t before_off_mode = getMode();
 
-    if ((before_off_mode & WIFI_STA) && state)
+    if (before_off_mode & WIFI_STA)
     {
-        bool ret = wifi_get_ip_info(STATION_IF, &state->state.ip);
+        bool ret = wifi_get_ip_info(STATION_IF, &state.state.ip);
         if (!ret)
         {
             DEBUG_WIFI("core: error with wifi_get_ip_info(STATION_IF)\n");
             return false;
         }
-        memset(state->state.fwconfig.bssid, 0xff, 6);
-        ret = wifi_station_get_config(&state->state.fwconfig);
+        memset(state.state.fwconfig.bssid, 0xff, 6);
+        ret = wifi_station_get_config(&state.state.fwconfig);
         if (!ret)
         {
             DEBUG_WIFI("core: error with wifi_station_get_config\n");
             return false;
         }
-        state->state.channel = wifi_get_channel();
+        state.state.channel = wifi_get_channel();
     }
 
     // disable persistence in FW so in case of power failure
@@ -755,57 +755,63 @@ bool ESP8266WiFiGenericClass::shutdown (uint32_t sleepUs, WiFiState* state)
     }
 
     // WiFi is now in force-sleep mode
+    // finish filling state and process crc
 
-    if (state)
+    state.state.persistent = persistent;
+    state.state.mode = before_off_mode;
+
+    uint8_t i = 0;
+    for (auto& ntp: state.state.ntp)
     {
-        // finish filling state and process crc
-
-        state->state.persistent = persistent;
-        state->state.mode = before_off_mode;
-        uint8_t i = 0;
-        for (auto& ntp: state->state.ntp)
-        {
-            ntp = *sntp_getserver(i++);
-        }
-        i = 0;
-        for (auto& dns: state->state.dns)
-            dns = WiFi.dnsIP(i++);
-        state->crc = shutdownCRC(state);
-        DEBUG_WIFI("core: state is saved\n");
+        ntp = *sntp_getserver(i++);
     }
+    i = 0;
+
+    for (auto& dns: state.state.dns)
+    {
+        dns = WiFi.dnsIP(i++);
+    }
+
+    state.crc = shutdownCRC(state);
+    DEBUG_WIFI("core: state is saved\n");
+
     return true;
 }
 
-bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
+bool ESP8266WiFiGenericClass::shutdown (WiFiState& state) {
+    return shutdown(state, 0);
+}
+
+bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState& state)
 {
     if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
         wifi_fpm_do_wakeup();
         wifi_fpm_close();
     }
 
-    if (!state || shutdownCRC(state) != state->crc)
+    if (shutdownCRC(state) != state.crc)
     {
-        DEBUG_WIFI("core: resume: no state or bad crc\n");
+        DEBUG_WIFI("core: resume: bad crc\n");
         return false;
     }
 
-    persistent(state->state.persistent);
+    persistent(state.state.persistent);
 
-    if (!mode(state->state.mode))
+    if (!mode(state.state.mode))
     {
-        DEBUG_WIFI("core: resume: can't set wifi mode to %d\n", state->state.mode);
+        DEBUG_WIFI("core: resume: can't set wifi mode to %d\n", state.state.mode);
         return false;
     }
 
-    if (state->state.mode & WIFI_STA)
+    if (state.state.mode & WIFI_STA)
     {
-        IPAddress local(state->state.ip.ip);
+        IPAddress local(state.state.ip.ip);
         if (local)
         {
             DEBUG_WIFI("core: resume: static address '%s'\n", local.toString().c_str());
-            WiFi.config(state->state.ip.ip, state->state.ip.gw, state->state.ip.netmask, state->state.dns[0], state->state.dns[1]);
+            WiFi.config(state.state.ip.ip, state.state.ip.gw, state.state.ip.netmask, state.state.dns[0], state.state.dns[1]);
             uint8_t i = 0;
-            for (const auto& ntp: state->state.ntp)
+            for (const auto& ntp: state.state.ntp)
             {
                 IPAddress ip(ntp);
                 if (ip.isSet())
@@ -815,10 +821,12 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
                 }
             }
         }
-        auto beginResult = WiFi.begin((const char*)state->state.fwconfig.ssid,
-                       (const char*)state->state.fwconfig.password,
-                       state->state.channel,
-                       state->state.fwconfig.bssid,
+
+        // TODO: this is invalid with 32byte SSID and 64byte password
+        auto beginResult = WiFi.begin((const char*)state.state.fwconfig.ssid,
+                       (const char*)state.state.fwconfig.password,
+                       state.state.channel,
+                       state.state.fwconfig.bssid,
                        true);
         if (beginResult == WL_CONNECT_FAILED)
         {
@@ -832,14 +840,14 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
         }
     }
 
-    if (state->state.mode & WIFI_AP)
+    if (state.state.mode & WIFI_AP)
     {
         DEBUG_WIFI("core: resume AP mode TODO\n");
         return false;
     }
 
     // success, invalidate saved state
-    state->crc++;
+    state.crc++;
 
     return true;
 }

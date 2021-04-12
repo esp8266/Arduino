@@ -39,7 +39,7 @@ void setup() {
   ESP.rtcUserMemoryRead(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t *>(&state), sizeof(state));
   unsigned long start = millis();
 
-  if (!WiFi.resumeFromShutdown(&state)
+  if (!WiFi.resumeFromShutdown(state)
       || (WiFi.waitForConnectResult(10000) != WL_CONNECTED)) {
     Serial.println("Cannot resume WiFi connection, connecting via begin...");
     WiFi.persistent(false);
@@ -63,7 +63,7 @@ void setup() {
   // Here you can do whatever you need to do that needs a WiFi connection.
   // ---
 
-  WiFi.shutdown(0, &state);
+  WiFi.shutdown(state);
   ESP.rtcUserMemoryWrite(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t *>(&state), sizeof(state));
 
   // ---
