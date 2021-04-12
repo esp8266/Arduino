@@ -42,6 +42,33 @@ persistent
 
     WiFi.persistent(persistent)
 
+Starting from version 3 of this core, **persistence is disabled by default
+and WiFi does not start automatically at boot** (see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
+
+Previously, SDK was automatically starting WiFi at boot.  This was probably
+intended for the Espressif AT FW which is interactive and preserves WiFi
+state accross reboots.  This behavior is generally irrelevant with the
+Arduino API because sketches start with ``WiFi.begin()`` or
+``WiFi.softAP()``.
+
+This change is harmless with standard sketches: Calls to ``WiFi.mode()`` do
+enable radio as usual.  It also smooths current spikes at boot and decreases
+DHCP stress.
+
+Legacy behavior can be restored by calling ``enableWiFiAtBootTime()`` from
+anywhere in the code (it is a weak void function intended to play with the
+linker).
+
+.. code:: cpp
+
+    void setup () {
+    #ifdef WIFI_IS_OFF_AT_BOOT
+        enableWiFiAtBootTime(); // can be called from anywhere with the same effect
+    #endif
+        ....
+    }
+
+When legacy behavior is restored thanks to this call,
 ESP8266 is able to reconnect to the last used WiFi network or establishes the same Access Point upon power up or reset.
 By default, these settings are written to specific sectors of flash memory every time they are changed in ``WiFi.begin(ssid, passphrase)`` or ``WiFi.softAP(ssid, passphrase, channel)``, and when ``WiFi.disconnect`` or ``WiFi.softAPdisconnect`` is invoked.
 Frequently calling these functions could cause wear on the flash memory (see issue `#1054 <https://github.com/esp8266/Arduino/issues/1054>`__).

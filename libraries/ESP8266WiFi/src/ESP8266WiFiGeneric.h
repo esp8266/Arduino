@@ -120,7 +120,7 @@ class ESP8266WiFiGenericClass {
 
         void setOutputPower(float dBm);
 
-        void persistent(bool persistent);
+        static void persistent(bool persistent);
 
         bool mode(WiFiMode_t);
         WiFiMode_t getMode();
@@ -138,8 +138,7 @@ class ESP8266WiFiGenericClass {
         bool resumeFromShutdown(WiFiState* savedState = nullptr);
 
         static bool shutdownValidCRC (const WiFiState* state);
-
-        static void preinitWiFiOff (); //meant to be called in user-defined preinit()
+        static void preinitWiFiOff () __attribute__((deprecated("WiFi is off by default at boot, use enableWiFiAtBoot() for legacy behavior")));
 
     protected:
         static bool _persistent;

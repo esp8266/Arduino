@@ -24,11 +24,6 @@ WiFiState state;
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-void preinit(void) {
-  // Make sure, wifi stays off after boot.
-  ESP8266WiFiClass::preinitWiFiOff();
-}
-
 void setup() {
   Serial.begin(74880);
   //Serial.setDebugOutput(true);  // If you need debug output

@@ -87,7 +87,7 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getHeapFragmentation()`` returns the fragmentation metric (0% is clean, more than ~50% is not harmless)
 
-``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()``able block will be smaller due to memory manager overheads.
+``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()`` -able block will be smaller due to memory manager overheads.
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 

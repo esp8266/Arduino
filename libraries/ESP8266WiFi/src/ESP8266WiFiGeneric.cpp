@@ -83,7 +83,7 @@ struct WiFiEventHandlerOpaque
 
 static std::list<WiFiEventHandler> sCbEventList;
 
-bool ESP8266WiFiGenericClass::_persistent = true;
+bool ESP8266WiFiGenericClass::_persistent = false;
 WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
 ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()
@@ -407,18 +407,18 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
         return false;
     }
 
-    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
-        // wifi may have been put asleep by ESP8266WiFiGenericClass::preinitWiFiOff
-        wifi_fpm_do_wakeup();
-        wifi_fpm_close();
-    }
-
     if(_persistent){
         if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
             return true;
         }
     } else if(wifi_get_opmode() == (uint8) m){
         return true;
+    }
+
+    if (m != WIFI_OFF && wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        // wifi starts asleep by default
+        wifi_fpm_do_wakeup();
+        wifi_fpm_close();
     }
 
     bool ret = false;
@@ -844,25 +844,7 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState* state)
     return true;
 }
 
-//meant to be called from user-defined ::preinit()
 void ESP8266WiFiGenericClass::preinitWiFiOff () {
-  // https://github.com/esp8266/Arduino/issues/2111#issuecomment-224251391
-  // WiFi.persistent(false);
-  // WiFi.mode(WIFI_OFF);
-  // WiFi.forceSleepBegin();
-
-  //WiFi.mode(WIFI_OFF) equivalent:
-  // datasheet:
-  // Set Wi-Fi working mode to Station mode, SoftAP
-  // or Station + SoftAP, and do not update flash
-  // (not persistent)
-  wifi_set_opmode_current(WIFI_OFF);
-
-  //WiFi.forceSleepBegin(/*default*/0) equivalent:
-  // sleep forever until wifi_fpm_do_wakeup() is called
-  wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
-  wifi_fpm_open();
-  wifi_fpm_do_sleep(0xFFFFFFF);
-
-  // use WiFi.forceSleepWake() to wake WiFi up
+    // It was meant to be called from user-defined ::preinit()
+    // It is now deprecated by enableWiFiAtBootTime() and __disableWiFiAtBootTime()
 }
