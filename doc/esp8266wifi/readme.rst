@@ -164,6 +164,7 @@ WiFi Multi
 Example:
 
 .. code:: cpp
+
     #include <ESP8266WiFiMulti.h>
 
     ESP8266WiFiMulti wifiMulti;
