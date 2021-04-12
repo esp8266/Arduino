@@ -822,9 +822,20 @@ bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState& state)
             }
         }
 
-        // TODO: this is invalid with 32byte SSID and 64byte password
-        auto beginResult = WiFi.begin((const char*)state.state.fwconfig.ssid,
-                       (const char*)state.state.fwconfig.password,
+        String ssid;
+        {
+            const char* ptr = reinterpret_cast<const char*>(state.state.fwconfig.ssid);
+            ssid.concat(ptr, strnlen(ptr, sizeof(station_config::ssid)));
+        }
+
+        String pass;
+        {
+            const char* ptr = reinterpret_cast<const char*>(state.state.fwconfig.password);
+            pass.concat(ptr, strnlen(ptr, sizeof(station_config::password)));
+        }
+
+        auto beginResult = WiFi.begin(ssid.c_str(),
+                       pass.c_str(),
                        state.state.channel,
                        state.state.fwconfig.bssid,
                        true);
