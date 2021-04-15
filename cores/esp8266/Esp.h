@@ -100,6 +100,16 @@ class EspClass {
         /// If any forced sleep mode was effective before forcedLightSleepBegin, it must be explicitly re-entered.
         static void forcedLightSleepEnd(bool cancel = false);
 
+        /// If parameter on == false, the prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before autoModemSleep,
+        ///  it would have to be restored explicitly.
+        void autoModemSleep(bool on = true);
+
+        /// If parameter on == false, the prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before autoLightSleep,
+        ///  it would have to be restored explicitly.
+        void autoLightSleep(bool on = true);
+
         static bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         static bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
 
