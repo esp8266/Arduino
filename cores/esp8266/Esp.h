@@ -95,6 +95,11 @@ class EspClass {
         static void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
         static uint64_t deepSleepMax();
 
+        static bool forcedLightSleepBegin(uint32_t duration_us = 0, void (*wakeupCb)() = nullptr);
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before forcedLightSleepBegin, it must be explicitly re-entered.
+        static void forcedLightSleepEnd(bool cancel = false);
+
         static bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         static bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
 

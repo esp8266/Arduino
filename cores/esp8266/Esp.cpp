@@ -138,6 +138,53 @@ uint64_t EspClass::deepSleepMax()
 
 }
 
+extern os_timer_t* timer_list;
+namespace {
+    sleep_type_t saved_sleep_type;
+    os_timer_t* saved_timer_list;
+    fpm_wakeup_cb saved_wakeupCb;
+}
+
+bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
+{
+    // Setting duration to 0xFFFFFFF, it disconnects the RTC timer
+    if (!duration_us || duration_us > 0xFFFFFFF) {
+        duration_us = 0xFFFFFFF;
+    }
+    wifi_fpm_close();
+    saved_sleep_type = wifi_fpm_get_sleep_type();
+    wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+    wifi_fpm_open();
+    saved_wakeupCb = wakeupCb;
+    wifi_fpm_set_wakeup_cb([]() {
+        if (saved_wakeupCb) saved_wakeupCb();
+        esp_schedule();
+        });
+    {
+        esp8266::InterruptLock lock;
+        saved_timer_list = timer_list;
+        timer_list = nullptr;
+    }
+    return wifi_fpm_do_sleep(duration_us) == 0;
+}
+
+void EspClass::forcedLightSleepEnd(bool cancel)
+{
+    if (!cancel) {
+#ifdef HAVE_ESP_SUSPEND
+        esp_suspend();
+#else
+        esp_yield();  // it goes to sleep from SYS context and waits for an interrupt
+#endif
+    }
+    {
+        esp8266::InterruptLock lock;
+        timer_list = saved_timer_list;
+    }
+    wifi_fpm_close();
+    wifi_fpm_set_sleep_type(saved_sleep_type);
+}
+
 /*
 Layout of RTC Memory is as follows:
 Ref: Espressif doc 2C-ESP8266_Non_OS_SDK_API_Reference, section 3.3.23 (system_rtc_mem_write)
