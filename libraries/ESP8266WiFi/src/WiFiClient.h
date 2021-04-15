@@ -59,10 +59,7 @@ public:
   virtual size_t write(uint8_t) override;
   virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);
-  size_t write(Stream& stream);
-
-  // This one is deprecated, use write(Stream& instead)
-  size_t write(Stream& stream, size_t unitSize) __attribute__ ((deprecated));
+  size_t write(Stream& stream) [[ deprecated("use stream.sendHow(client...)") ]];
 
   virtual int available() override;
   virtual int read() override;
