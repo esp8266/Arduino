@@ -93,6 +93,34 @@ void eboot_command_write(struct eboot_command* cmd)
 
 EspClass ESP;
 
+bool EspClass::forcedModemSleep(bool on, uint32_t duration_us, void (*wakeupCb)())
+{
+    (void)on;
+    (void)duration_us;
+    (void)wakeupCb;
+    return true;
+}
+
+bool EspClass::forcedLightSleepBegin(uint32_t duration_us, void (*wakeupCb)())
+{
+    (void)duration_us;
+    (void)wakeupCb;
+    return true;
+}
+
+void EspClass::forcedLightSleepEnd(bool cancel)
+{
+    (void)cancel;
+}
+
+void EspClass::autoModemSleep(bool on) {
+    (void)on;
+}
+
+void EspClass::autoLightSleep(bool on) {
+    (void)on;
+}
+
 void EspClass::restart()
 {
     mockverbose("Esp.restart(): exiting\n");
