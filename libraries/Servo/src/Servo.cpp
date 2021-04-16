@@ -90,7 +90,6 @@ void Servo::detach()
 {
   if (_attached) {
     _servoMap &= ~(1 << _pin);
-    // TODO - timeHigh == 0 is illegal in _PWM code branch. And now what?
     startWaveform(_pin, 0, REFRESH_INTERVAL, 1);
     delay(REFRESH_INTERVAL / 1000); // long enough to complete active period under all circumstances.
     stopWaveform(_pin);
