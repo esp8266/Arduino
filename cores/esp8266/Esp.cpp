@@ -35,14 +35,14 @@
 extern "C" {
 #include "user_interface.h"
 
-    extern struct rst_info resetInfo;
+extern struct rst_info resetInfo;
 }
 
 
 //#define DEBUG_SERIAL Serial
 
 #ifndef PUYA_SUPPORT
-#define PUYA_SUPPORT 1
+  #define PUYA_SUPPORT 1
 #endif
 
 /**
@@ -93,14 +93,14 @@ EspClass ESP;
 
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
-    (void)timeout_ms;
+    (void) timeout_ms;
     /// This API can only be called if software watchdog is stopped
     system_soft_wdt_restart();
 }
 
 void EspClass::wdtEnable(WDTO_t timeout_ms)
 {
-    wdtEnable((uint32_t)timeout_ms);
+    wdtEnable((uint32_t) timeout_ms);
 }
 
 void EspClass::wdtDisable(void)
@@ -133,16 +133,57 @@ void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
 //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
 uint64_t EspClass::deepSleepMax()
 {
-    //cali*(2^31-1)/(2^12)
-    return (uint64_t)system_rtc_clock_cali_proc() * (0x80000000 - 1) / (0x1000);
+  //cali*(2^31-1)/(2^12)
+  return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
 
 }
 
 extern os_timer_t* timer_list;
 namespace {
-    sleep_type_t saved_sleep_type;
-    os_timer_t* saved_timer_list;
-    fpm_wakeup_cb saved_wakeupCb;
+    sleep_type_t saved_sleep_type = NONE_SLEEP_T;
+    os_timer_t* saved_timer_list = nullptr;
+    fpm_wakeup_cb saved_wakeupCb = nullptr;
+}
+
+bool EspClass::forcedModemSleep(bool on, uint32_t duration_us, fpm_wakeup_cb wakeupCb)
+{
+    if (!on)
+    {
+        const sleep_type_t sleepType = wifi_fpm_get_sleep_type();
+        if (sleepType != NONE_SLEEP_T) {
+            if (sleepType == MODEM_SLEEP_T) wifi_fpm_do_wakeup();
+            wifi_fpm_close();
+        }
+        wifi_fpm_set_sleep_type(saved_sleep_type);
+        saved_sleep_type = NONE_SLEEP_T;
+        return true;
+    }
+
+    // Setting duration to 0xFFFFFFF, it disconnects the RTC timer
+    if (!duration_us || duration_us > 0xFFFFFFF) {
+        duration_us = 0xFFFFFFF;
+    }
+    wifi_fpm_close();
+    saved_sleep_type = wifi_fpm_get_sleep_type();
+    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+    wifi_fpm_open();
+    saved_wakeupCb = nullptr;
+    if (wakeupCb) wifi_fpm_set_wakeup_cb(wakeupCb);
+    auto ret_do_sleep = wifi_fpm_do_sleep(duration_us);
+    if (ret_do_sleep != 0)
+    {
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.printf("core: error %d with wifi_fpm_do_sleep: (-1=sleep status error, -2=force sleep not enabled)\n", ret_do_sleep);
+#endif
+        return false;
+    }
+    // SDK turns on forced modem sleep in idle task
+#ifdef HAVE_ESP_SUSPEND
+    esp_delay(10);
+#else
+    delay(10);
+#endif
+    return true;
 }
 
 bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
@@ -157,7 +198,10 @@ bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupC
     wifi_fpm_open();
     saved_wakeupCb = wakeupCb;
     wifi_fpm_set_wakeup_cb([]() {
-        if (saved_wakeupCb) saved_wakeupCb();
+        if (saved_wakeupCb) {
+            saved_wakeupCb();
+            saved_wakeupCb = nullptr;
+        }
         esp_schedule();
         });
     {
@@ -183,6 +227,7 @@ void EspClass::forcedLightSleepEnd(bool cancel)
     }
     wifi_fpm_close();
     wifi_fpm_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
 }
 
 void EspClass::autoModemSleep(bool on) {
@@ -191,6 +236,7 @@ void EspClass::autoModemSleep(bool on) {
         saved_sleep_type = wifi_fpm_get_sleep_type();
     }
     wifi_fpm_set_sleep_type(on ? MODEM_SLEEP_T : saved_sleep_type);
+    if (!on) saved_sleep_type = NONE_SLEEP_T;
 }
 
 void EspClass::autoLightSleep(bool on) {
@@ -199,6 +245,7 @@ void EspClass::autoLightSleep(bool on) {
         saved_sleep_type = wifi_fpm_get_sleep_type();
     }
     wifi_fpm_set_sleep_type(on ? LIGHT_SLEEP_T : saved_sleep_type);
+    if (!on) saved_sleep_type = NONE_SLEEP_T;
 }
 
 /*
@@ -209,9 +256,9 @@ Ref: Espressif doc 2C-ESP8266_Non_OS_SDK_API_Reference, section 3.3.23 (system_r
 
 SDK function signature:
 bool	system_rtc_mem_read	(
-                uint32	des_addr,
-                void	*	src_addr,
-                uint32	save_size
+				uint32	des_addr,
+				void	*	src_addr,
+				uint32	save_size
 )
 
 The system data section can't be used by the user, so:
@@ -235,7 +282,7 @@ Ref:
 - Arduino/bootloaders/eboot/eboot_command.h RTC_MEM definition
 */
 
-bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t* data, size_t size)
+bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 {
     if (offset * 4 + size > 512 || size == 0) {
         return false;
@@ -244,7 +291,7 @@ bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t* data, size_t size)
     }
 }
 
-bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t* data, size_t size)
+bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
 {
     if (offset * 4 + size > 512 || size == 0) {
         return false;
@@ -266,11 +313,11 @@ void EspClass::restart(void)
 
 [[noreturn]] void EspClass::rebootIntoUartDownloadMode()
 {
-    wdtDisable();
-    /* disable hardware watchdog */
-    CLEAR_PERI_REG_MASK(PERIPHS_HW_WDT, 0x1);
+	wdtDisable();
+	/* disable hardware watchdog */
+	CLEAR_PERI_REG_MASK(PERIPHS_HW_WDT, 0x1);
 
-    esp8266RebootIntoUartDownloadMode();
+	esp8266RebootIntoUartDownloadMode();
 }
 
 uint16_t EspClass::getVcc(void)
@@ -320,7 +367,7 @@ String EspClass::getCoreVersion()
     return String(buf);
 }
 
-const char* EspClass::getSdkVersion(void)
+const char * EspClass::getSdkVersion(void)
 {
     return system_get_sdk_version();
 }
@@ -360,9 +407,9 @@ uint32_t EspClass::getFlashChipSize(void)
     return getFlashChipRealSize();
 #else
     uint32_t data;
-    uint8_t* bytes = (uint8_t*)&data;
+    uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
-    if (spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
+    if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
     }
     return 0;
@@ -372,9 +419,9 @@ uint32_t EspClass::getFlashChipSize(void)
 uint32_t EspClass::getFlashChipSpeed(void)
 {
     uint32_t data;
-    uint8_t* bytes = (uint8_t*)&data;
+    uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
-    if (spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
+    if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
         return magicFlashChipSpeed(bytes[3] & 0x0F);
     }
     return 0;
@@ -384,9 +431,9 @@ FlashMode_t EspClass::getFlashChipMode(void)
 {
     FlashMode_t mode = FM_UNKNOWN;
     uint32_t data;
-    uint8_t* bytes = (uint8_t*)&data;
+    uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
-    if (spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
+    if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
         mode = magicFlashChipMode(bytes[2]);
     }
     return mode;
@@ -394,45 +441,45 @@ FlashMode_t EspClass::getFlashChipMode(void)
 
 #if !FLASH_MAP_SUPPORT
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
-    switch (byte & 0x0F) {
-    case 0x0: // 4 Mbit (512KB)
-        return (512_kB);
-    case 0x1: // 2 MBit (256KB)
-        return (256_kB);
-    case 0x2: // 8 MBit (1MB)
-        return (1_MB);
-    case 0x3: // 16 MBit (2MB)
-        return (2_MB);
-    case 0x4: // 32 MBit (4MB)
-        return (4_MB);
-    case 0x8: // 64 MBit (8MB)
-        return (8_MB);
-    case 0x9: // 128 MBit (16MB)
-        return (16_MB);
-    default: // fail?
-        return 0;
+    switch(byte & 0x0F) {
+        case 0x0: // 4 Mbit (512KB)
+            return (512_kB);
+        case 0x1: // 2 MBit (256KB)
+            return (256_kB);
+        case 0x2: // 8 MBit (1MB)
+            return (1_MB);
+        case 0x3: // 16 MBit (2MB)
+            return (2_MB);
+        case 0x4: // 32 MBit (4MB)
+            return (4_MB);
+        case 0x8: // 64 MBit (8MB)
+            return (8_MB);
+        case 0x9: // 128 MBit (16MB)
+            return (16_MB);
+        default: // fail?
+            return 0;
     }
 }
 #endif
 
 uint32_t EspClass::magicFlashChipSpeed(uint8_t byte) {
-    switch (byte & 0x0F) {
-    case 0x0: // 40 MHz
-        return (40_MHz);
-    case 0x1: // 26 MHz
-        return (26_MHz);
-    case 0x2: // 20 MHz
-        return (20_MHz);
-    case 0xf: // 80 MHz
-        return (80_MHz);
-    default: // fail?
-        return 0;
+    switch(byte & 0x0F) {
+        case 0x0: // 40 MHz
+            return (40_MHz);
+        case 0x1: // 26 MHz
+            return (26_MHz);
+        case 0x2: // 20 MHz
+            return (20_MHz);
+        case 0xf: // 80 MHz
+            return (80_MHz);
+        default: // fail?
+            return 0;
     }
 }
 
 FlashMode_t EspClass::magicFlashChipMode(uint8_t byte) {
-    FlashMode_t mode = (FlashMode_t)byte;
-    if (mode > FM_DOUT) {
+    FlashMode_t mode = (FlashMode_t) byte;
+    if(mode > FM_DOUT) {
         mode = FM_UNKNOWN;
     }
     return mode;
@@ -453,54 +500,54 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
      * 40 - ? may be Speed ?                        //todo: find docu to this
      * C8 - manufacturer ID
      */
-    switch (chipId) {
+    switch(chipId) {
 
         // GigaDevice
-    case 0x1740C8: // GD25Q64B
-        return (8_MB);
-    case 0x1640C8: // GD25Q32B
-        return (4_MB);
-    case 0x1540C8: // GD25Q16B
-        return (2_MB);
-    case 0x1440C8: // GD25Q80
-        return (1_MB);
-    case 0x1340C8: // GD25Q40
-        return (512_kB);
-    case 0x1240C8: // GD25Q20
-        return (256_kB);
-    case 0x1140C8: // GD25Q10
-        return (128_kB);
-    case 0x1040C8: // GD25Q12
-        return (64_kB);
+        case 0x1740C8: // GD25Q64B
+            return (8_MB);
+        case 0x1640C8: // GD25Q32B
+            return (4_MB);
+        case 0x1540C8: // GD25Q16B
+            return (2_MB);
+        case 0x1440C8: // GD25Q80
+            return (1_MB);
+        case 0x1340C8: // GD25Q40
+            return (512_kB);
+        case 0x1240C8: // GD25Q20
+            return (256_kB);
+        case 0x1140C8: // GD25Q10
+            return (128_kB);
+        case 0x1040C8: // GD25Q12
+            return (64_kB);
 
         // Winbond
-    case 0x1840EF: // W25Q128
-        return (16_MB);
-    case 0x1640EF: // W25Q32
-        return (4_MB);
-    case 0x1540EF: // W25Q16
-        return (2_MB);
-    case 0x1440EF: // W25Q80
-        return (1_MB);
-    case 0x1340EF: // W25Q40
-        return (512_kB);
+        case 0x1840EF: // W25Q128
+            return (16_MB);
+        case 0x1640EF: // W25Q32
+            return (4_MB);
+        case 0x1540EF: // W25Q16
+            return (2_MB);
+        case 0x1440EF: // W25Q80
+            return (1_MB);
+        case 0x1340EF: // W25Q40
+            return (512_kB);
 
         // BergMicro
-    case 0x1640E0: // BG25Q32
-        return (4_MB);
-    case 0x1540E0: // BG25Q16
-        return (2_MB);
-    case 0x1440E0: // BG25Q80
-        return (1_MB);
-    case 0x1340E0: // BG25Q40
-        return (512_kB);
+        case 0x1640E0: // BG25Q32
+            return (4_MB);
+        case 0x1540E0: // BG25Q16
+            return (2_MB);
+        case 0x1440E0: // BG25Q80
+            return (1_MB);
+        case 0x1340E0: // BG25Q40
+            return (512_kB);
 
         // XMC - Wuhan Xinxin Semiconductor Manufacturing Corp
-    case 0x164020: // XM25QH32B
-        return (4_MB);
+        case 0x164020: // XM25QH32B
+            return (4_MB);
 
-    default:
-        return 0;
+        default:
+            return 0;
     }
 }
 
@@ -510,12 +557,12 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
  * @return ok or not
  */
 bool EspClass::checkFlashConfig(bool needsEquals) {
-    if (needsEquals) {
-        if (getFlashChipRealSize() == getFlashChipSize()) {
+    if(needsEquals) {
+        if(getFlashChipRealSize() == getFlashChipSize()) {
             return true;
         }
     } else {
-        if (getFlashChipRealSize() >= getFlashChipSize()) {
+        if(getFlashChipRealSize() >= getFlashChipSize()) {
             return true;
         }
     }
@@ -546,22 +593,22 @@ bool EspClass::checkFlashCRC() {
 String EspClass::getResetReason(void) {
     const __FlashStringHelper* buff;
 
-    switch (resetInfo.reason) {
+    switch(resetInfo.reason) {
         // normal startup by power on
-    case REASON_DEFAULT_RST:      buff = F("Power On"); break;
+        case REASON_DEFAULT_RST:      buff = F("Power On"); break;
         // hardware watch dog reset
-    case REASON_WDT_RST:          buff = F("Hardware Watchdog"); break;
+        case REASON_WDT_RST:          buff = F("Hardware Watchdog"); break;
         // exception reset, GPIO status won’t change
-    case REASON_EXCEPTION_RST:    buff = F("Exception"); break;
+        case REASON_EXCEPTION_RST:    buff = F("Exception"); break;
         // software watch dog reset, GPIO status won’t change
-    case REASON_SOFT_WDT_RST:     buff = F("Software Watchdog"); break;
+        case REASON_SOFT_WDT_RST:     buff = F("Software Watchdog"); break;
         // software restart ,system_restart , GPIO status won’t change
-    case REASON_SOFT_RESTART:     buff = F("Software/System restart"); break;
+        case REASON_SOFT_RESTART:     buff = F("Software/System restart"); break;
         // wake up from deep-sleep
-    case REASON_DEEP_SLEEP_AWAKE: buff = F("Deep-Sleep Wake"); break;
+        case REASON_DEEP_SLEEP_AWAKE: buff = F("Deep-Sleep Wake"); break;
         // // external system reset
-    case REASON_EXT_SYS_RST:      buff = F("External System"); break;
-    default:                      buff = F("Unknown"); break;
+        case REASON_EXT_SYS_RST:      buff = F("External System"); break;
+        default:                      buff = F("Unknown"); break;
     }
     return String(buff);
 }
@@ -577,7 +624,7 @@ String EspClass::getResetInfo(void) {
     return getResetReason();
 }
 
-struct rst_info* EspClass::getResetInfoPtr(void) {
+struct rst_info * EspClass::getResetInfoPtr(void) {
     return &resetInfo;
 }
 
@@ -594,61 +641,61 @@ bool EspClass::eraseConfig(void) {
     return true;
 }
 
-uint8_t *EspClass::random(uint8_t* resultArray, const size_t outputSizeBytes)
+uint8_t* EspClass::random(uint8_t* resultArray, const size_t outputSizeBytes)
 {
-    /**
-     * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
-     *
-     * "When used correctly, every 32-bit value the system reads from the RNG_DATA_REG register of the random number generator is a true random number.
-     * These true random numbers are generated based on the noise in the Wi-Fi/BT RF system.
-     * When Wi-Fi and BT are disabled, the random number generator will give out pseudo-random numbers.
-     *
-     * When Wi-Fi or BT is enabled, the random number generator is fed two bits of entropy every APB clock cycle (normally 80 MHz).
-     * Thus, for the maximum amount of entropy, it is advisable to read the random register at a maximum rate of 5 MHz.
-     * A data sample of 2 GB, read from the random number generator with Wi-Fi enabled and the random register read at 5 MHz,
-     * has been tested using the Dieharder Random Number Testsuite (version 3.31.1).
-     * The sample passed all tests."
-     *
-     * Since ESP32 is the sequal to ESP8266 it is unlikely that the ESP8266 is able to generate random numbers more quickly than 5 MHz when run at a 80 MHz frequency.
-     * A maximum random number frequency of 0.5 MHz is used here to leave some margin for possibly inferior components in the ESP8266.
-     * It should be noted that the ESP8266 has no Bluetooth functionality, so turning the WiFi off is likely to cause RANDOM_REG32 to use pseudo-random numbers.
-     *
-     * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available.
-     * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during number generation.
-     * Thus only delayMicroseconds() is used below.
-     */
+  /**
+   * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
+   *
+   * "When used correctly, every 32-bit value the system reads from the RNG_DATA_REG register of the random number generator is a true random number.
+   * These true random numbers are generated based on the noise in the Wi-Fi/BT RF system.
+   * When Wi-Fi and BT are disabled, the random number generator will give out pseudo-random numbers.
+   *
+   * When Wi-Fi or BT is enabled, the random number generator is fed two bits of entropy every APB clock cycle (normally 80 MHz).
+   * Thus, for the maximum amount of entropy, it is advisable to read the random register at a maximum rate of 5 MHz.
+   * A data sample of 2 GB, read from the random number generator with Wi-Fi enabled and the random register read at 5 MHz,
+   * has been tested using the Dieharder Random Number Testsuite (version 3.31.1).
+   * The sample passed all tests."
+   *
+   * Since ESP32 is the sequal to ESP8266 it is unlikely that the ESP8266 is able to generate random numbers more quickly than 5 MHz when run at a 80 MHz frequency.
+   * A maximum random number frequency of 0.5 MHz is used here to leave some margin for possibly inferior components in the ESP8266.
+   * It should be noted that the ESP8266 has no Bluetooth functionality, so turning the WiFi off is likely to cause RANDOM_REG32 to use pseudo-random numbers.
+   *
+   * It is possible that yield() must be called on the ESP8266 to properly feed the hardware random number generator new bits, since there is only one processor core available.
+   * However, no feeding requirements are mentioned in the ESP32 documentation, and using yield() could possibly cause extended delays during number generation.
+   * Thus only delayMicroseconds() is used below.
+   */
 
-    constexpr uint8_t cooldownMicros = 2;
-    static uint32_t lastCalledMicros = micros() - cooldownMicros;
+  constexpr uint8_t cooldownMicros = 2;
+  static uint32_t lastCalledMicros = micros() - cooldownMicros;
 
-    uint32_t randomNumber = 0;
+  uint32_t randomNumber = 0;
 
-    for (size_t byteIndex = 0; byteIndex < outputSizeBytes; ++byteIndex)
+  for(size_t byteIndex = 0; byteIndex < outputSizeBytes; ++byteIndex)
+  {
+    if(byteIndex % 4 == 0)
     {
-        if (byteIndex % 4 == 0)
-        {
-            // Old random number has been used up (random number could be exactly 0, so we can't check for that)
+      // Old random number has been used up (random number could be exactly 0, so we can't check for that)
 
-            uint32_t timeSinceLastCall = micros() - lastCalledMicros;
-            if (timeSinceLastCall < cooldownMicros)
-                delayMicroseconds(cooldownMicros - timeSinceLastCall);
+      uint32_t timeSinceLastCall = micros() - lastCalledMicros;
+      if(timeSinceLastCall < cooldownMicros)
+        delayMicroseconds(cooldownMicros - timeSinceLastCall);
 
-            randomNumber = RANDOM_REG32;
-            lastCalledMicros = micros();
-        }
-
-        resultArray[byteIndex] = randomNumber;
-        randomNumber >>= 8;
+      randomNumber = RANDOM_REG32;
+      lastCalledMicros = micros();
     }
 
-    return resultArray;
+    resultArray[byteIndex] = randomNumber;
+    randomNumber >>= 8;
+  }
+
+  return resultArray;
 }
 
 uint32_t EspClass::random()
 {
-    union { uint32_t b32; uint8_t b8[4]; } result;
-    random(result.b8, 4);
-    return result.b32;
+  union { uint32_t b32; uint8_t b8[4]; } result;
+  random(result.b8, 4);
+  return result.b32;
 }
 
 uint32_t EspClass::getSketchSize() {
@@ -658,7 +705,7 @@ uint32_t EspClass::getSketchSize() {
 
     image_header_t image_header;
     uint32_t pos = APP_START_OFFSET;
-    if (spi_flash_read(pos, (uint32_t*)&image_header, sizeof(image_header)) != SPI_FLASH_RESULT_OK) {
+    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)) != SPI_FLASH_RESULT_OK) {
         return 0;
     }
     pos += sizeof(image_header);
@@ -669,8 +716,8 @@ uint32_t EspClass::getSketchSize() {
         section_index < image_header.num_segments;
         ++section_index)
     {
-        section_header_t section_header = { 0, 0 };
-        if (spi_flash_read(pos, (uint32_t*)&section_header, sizeof(section_header)) != SPI_FLASH_RESULT_OK) {
+        section_header_t section_header = {0, 0};
+        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)) != SPI_FLASH_RESULT_OK) {
             return 0;
         }
         pos += sizeof(section_header);
@@ -697,37 +744,37 @@ uint32_t EspClass::getFreeSketchSpace() {
 }
 
 bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool restartOnSuccess) {
-    if (!Update.begin(size)) {
+  if(!Update.begin(size)){
 #ifdef DEBUG_SERIAL
-        DEBUG_SERIAL.print("Update ");
-        Update.printError(DEBUG_SERIAL);
+    DEBUG_SERIAL.print("Update ");
+    Update.printError(DEBUG_SERIAL);
 #endif
-        if (restartOnFail) ESP.restart();
-        return false;
-}
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
 
-    if (Update.writeStream(in) != size) {
+  if(Update.writeStream(in) != size){
 #ifdef DEBUG_SERIAL
-        DEBUG_SERIAL.print("Update ");
-        Update.printError(DEBUG_SERIAL);
+    DEBUG_SERIAL.print("Update ");
+    Update.printError(DEBUG_SERIAL);
 #endif
-        if (restartOnFail) ESP.restart();
-        return false;
-    }
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
 
-    if (!Update.end()) {
+  if(!Update.end()){
 #ifdef DEBUG_SERIAL
-        DEBUG_SERIAL.print("Update ");
-        Update.printError(DEBUG_SERIAL);
+    DEBUG_SERIAL.print("Update ");
+    Update.printError(DEBUG_SERIAL);
 #endif
-        if (restartOnFail) ESP.restart();
-        return false;
-    }
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("Update SUCCESS");
 #endif
-    if (restartOnSuccess) ESP.restart();
+    if(restartOnSuccess) ESP.restart();
     return true;
 }
 
@@ -778,18 +825,18 @@ static SpiFlashOpResult spi_flash_write_page_break(uint32_t offset, uint32_t *da
 #if PUYA_SUPPORT
 // Special wrapper for spi_flash_write *only for PUYA flash chips*
 // Already handles paging, could be used as a `spi_flash_write_page_break` replacement
-static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t* data, size_t size) {
+static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
     if (data == nullptr) {
-        return SPI_FLASH_RESULT_ERR;
+      return SPI_FLASH_RESULT_ERR;
     }
     if (size % 4 != 0) {
-        return SPI_FLASH_RESULT_ERR;
+      return SPI_FLASH_RESULT_ERR;
     }
     // PUYA flash chips need to read existing data, update in memory and write modified data again.
-    static uint32_t* flash_write_puya_buf = nullptr;
+    static uint32_t *flash_write_puya_buf = nullptr;
 
     if (flash_write_puya_buf == nullptr) {
-        flash_write_puya_buf = (uint32_t*)malloc(FLASH_PAGE_SIZE);
+        flash_write_puya_buf = (uint32_t*) malloc(FLASH_PAGE_SIZE);
         // No need to ever free this, since the flash chip will never change at runtime.
         if (flash_write_puya_buf == nullptr) {
             // Memory could not be allocated.
