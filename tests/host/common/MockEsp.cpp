@@ -93,12 +93,15 @@ void eboot_command_write(struct eboot_command* cmd)
 
 EspClass ESP;
 
-bool EspClass::forcedModemSleep(bool on, uint32_t duration_us, void (*wakeupCb)())
+bool EspClass::forcedModemSleep(uint32_t duration_us, void (*wakeupCb)())
 {
-    (void)on;
     (void)duration_us;
     (void)wakeupCb;
     return true;
+}
+
+void EspClass::forcedModemSleepOff()
+{
 }
 
 bool EspClass::forcedLightSleepBegin(uint32_t duration_us, void (*wakeupCb)())
@@ -113,13 +116,15 @@ void EspClass::forcedLightSleepEnd(bool cancel)
     (void)cancel;
 }
 
-void EspClass::autoModemSleep(bool on) {
-    (void)on;
+void EspClass::autoModemSleep() {
 }
 
-void EspClass::autoLightSleep(bool on) {
-    (void)on;
+void EspClass::autoLightSleep() {
 }
+
+void EspClass::autoSleepOff() {
+}
+
 
 void EspClass::restart()
 {

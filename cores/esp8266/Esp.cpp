@@ -145,20 +145,8 @@ namespace {
     fpm_wakeup_cb saved_wakeupCb = nullptr;
 }
 
-bool EspClass::forcedModemSleep(bool on, uint32_t duration_us, fpm_wakeup_cb wakeupCb)
+bool EspClass::forcedModemSleep(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
 {
-    if (!on)
-    {
-        const sleep_type_t sleepType = wifi_fpm_get_sleep_type();
-        if (sleepType != NONE_SLEEP_T) {
-            if (sleepType == MODEM_SLEEP_T) wifi_fpm_do_wakeup();
-            wifi_fpm_close();
-        }
-        wifi_fpm_set_sleep_type(saved_sleep_type);
-        saved_sleep_type = NONE_SLEEP_T;
-        return true;
-    }
-
     // Setting duration to 0xFFFFFFF, it disconnects the RTC timer
     if (!duration_us || duration_us > 0xFFFFFFF) {
         duration_us = 0xFFFFFFF;
@@ -184,6 +172,16 @@ bool EspClass::forcedModemSleep(bool on, uint32_t duration_us, fpm_wakeup_cb wak
     delay(10);
 #endif
     return true;
+}
+
+void EspClass::forcedModemSleepOff()
+{
+    const sleep_type_t sleepType = wifi_fpm_get_sleep_type();
+    if (sleepType != NONE_SLEEP_T) {
+        if (sleepType == MODEM_SLEEP_T) wifi_fpm_do_wakeup();
+        wifi_fpm_close();
+    }
+    autoSleepOff();
 }
 
 bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
@@ -230,22 +228,21 @@ void EspClass::forcedLightSleepEnd(bool cancel)
     saved_sleep_type = NONE_SLEEP_T;
 }
 
-void EspClass::autoModemSleep(bool on) {
-    if (on) {
-        wifi_fpm_close();
-        saved_sleep_type = wifi_fpm_get_sleep_type();
-    }
-    wifi_fpm_set_sleep_type(on ? MODEM_SLEEP_T : saved_sleep_type);
-    if (!on) saved_sleep_type = NONE_SLEEP_T;
+void EspClass::autoModemSleep() {
+    wifi_fpm_close();
+    saved_sleep_type = wifi_fpm_get_sleep_type();
+    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
 }
 
-void EspClass::autoLightSleep(bool on) {
-    if (on) {
-        wifi_fpm_close();
-        saved_sleep_type = wifi_fpm_get_sleep_type();
-    }
-    wifi_fpm_set_sleep_type(on ? LIGHT_SLEEP_T : saved_sleep_type);
-    if (!on) saved_sleep_type = NONE_SLEEP_T;
+void EspClass::autoLightSleep() {
+    wifi_fpm_close();
+    saved_sleep_type = wifi_fpm_get_sleep_type();
+    wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+}
+
+void EspClass::autoSleepOff() {
+    wifi_fpm_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
 }
 
 /*

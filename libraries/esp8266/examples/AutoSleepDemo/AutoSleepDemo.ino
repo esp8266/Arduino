@@ -19,8 +19,7 @@ void loop() {
 
   delay(10000); // this enters the idle task with auto light sleep
 
-  ESP.autoLightSleep(false);
-  // ESP.autoModemSleep(false);
+  ESP.autoSleepOff();
   Serial.println("left auto sleep section");
   Serial.flush();
 }
