@@ -18,8 +18,11 @@ void IRAM_ATTR wakeupPinIsrWE() {
   attachInterrupt(WAKE_UP_PIN, wakeupPinIsr, FALLING);
 }
 
-//void wakeupCallback() {
-//}
+void wakeupCallback() {
+  schedule_function([]() {
+    Serial.println("wakeup callback was performed");
+  });
+}
 
 void setup() {
   Serial.begin(74880);
@@ -35,7 +38,7 @@ using oneShotYieldMs = esp8266::polledTimeout::timeoutTemplate<false, esp8266::p
 oneShotYieldMs gotoSleep(2000);
 
 void loop() {
-  if (gotoSleep && ESP.forcedLightSleepBegin(10000000/*, wakeupCallback*/)) {
+  if (gotoSleep && ESP.forcedLightSleepBegin(10 * 1000 * 1000, wakeupCallback)) {
     // No new timers, no delay(), between forcedLightSleepBegin() and forcedLightSleepEnd().
     // Only ONLOW_WE or ONHIGH_WE interrupts work, no edge, that's an SDK or CPU limitation.
     // If the GPIO is in wakeup state while attaching the interrupt, it cannot trigger a wakeup,
