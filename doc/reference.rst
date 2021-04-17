@@ -74,12 +74,17 @@ pin, except GPIO16. Standard Arduino interrupt types are supported:
 Analog input
 ------------
 
+**NOTE:**
+Calling ``analogRead()`` too frequently causes WiFi to stop working.  When
+WiFi is under operation, ``analogRead()`` result may be cached for at least
+5ms between effective calls.
+
 ESP8266 has a single ADC channel available to users. It may be used
 either to read voltage at ADC pin, or to read module supply voltage
 (VCC).
 
 To read external voltage applied to ADC pin, use ``analogRead(A0)``.
-Input voltage range of bare ESP8266 is 0 — 1.0V, however some many 
+Input voltage range of bare ESP8266 is 0 — 1.0V, however some
 boards may implement voltage dividers. To be on the safe side, <1.0V 
 can be tested. If e.g. 0.5V delivers values around ~512, then maximum 
 voltage is very likely to be 1.0V and 3.3V may harm the ESP8266. 
