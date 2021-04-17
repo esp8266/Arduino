@@ -27,6 +27,7 @@
 #include "ets_sys.h"
 #include "spi_flash.h"
 #include "user_interface.h"
+#include "coredecls.h"
 
 extern "C" {
 
@@ -288,21 +289,10 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     /*[114] =*/ 1
 };
 
-
-// These functions will be overridden from C++ code.
-// Unfortunately, we can't use extern "C" because Arduino preprocessor
-// doesn't generate forward declarations for extern "C" functions correctly,
-// so we use mangled names here.
-#define __get_adc_mode _Z14__get_adc_modev
-#define __get_rf_mode _Z13__get_rf_modev
-#define __get_rf_powerup_mode _Z21__get_rf_powerup_modev
-#define __run_user_rf_pre_init _Z22__run_user_rf_pre_initv
-
 static bool spoof_init_data = false;
 
 extern int __real_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
 extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
-extern int __get_adc_mode();
 
 /*
   Verified that the wide filtering of all 128 byte flash reads during
