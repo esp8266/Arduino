@@ -168,9 +168,9 @@ bool EspClass::forcedModemSleep(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
     }
     // SDK turns on forced modem sleep in idle task
 #ifdef HAVE_ESP_SUSPEND
-    esp_delay(10);
+    esp_delay(1);
 #else
-    delay(10);
+    delay(1);
 #endif
     return true;
 }
@@ -216,10 +216,11 @@ bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupC
 void EspClass::forcedLightSleepEnd(bool cancel)
 {
     if (!cancel) {
+        // SDK turns on forced light sleep in idle task
 #ifdef HAVE_ESP_SUSPEND
         esp_suspend();
 #else
-        esp_yield();  // it goes to sleep from SYS context and waits for an interrupt
+        esp_yield();
 #endif
     }
     {
