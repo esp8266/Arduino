@@ -61,7 +61,7 @@ linker).
 
 .. code:: cpp
 
-    #include <ESP8266WiFi.h>    // necessary to avoid a linker error
+    #include <ESP8266WiFi.h>
 
     void setup () {
     #ifdef WIFI_IS_OFF_AT_BOOT

@@ -105,8 +105,6 @@ uint64_t micros64(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 
-void enableWiFiAtBootTime (void) __attribute__((noinline));
-
 #if defined(F_CPU) || defined(CORE_MOCK)
 #ifdef __cplusplus
 constexpr
