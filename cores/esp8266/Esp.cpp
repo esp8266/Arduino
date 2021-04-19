@@ -186,6 +186,42 @@ void EspClass::forcedModemSleepOff()
     saved_sleep_type = NONE_SLEEP_T;
 }
 
+#ifdef DEBUG_SERIAL
+namespace {
+    void walk_timer_list() {
+        os_timer_t* timer_root;
+        {
+            esp8266::InterruptLock lock;
+            auto src = timer_list;
+            auto dest = src ? new os_timer_t : nullptr;
+            timer_root = dest;
+            while (dest) {
+                *dest = *src;
+                src = src->timer_next;
+                dest->timer_next = src ? new os_timer_t(*timer_list) : nullptr;
+                dest = dest->timer_next;
+            }
+        }
+        DEBUG_SERIAL.printf("=============\n");
+        for (os_timer_t* timer_node = timer_root; nullptr != timer_node; timer_node = timer_node->timer_next) {
+            DEBUG_SERIAL.printf("timer_address = %p\n", timer_node);
+            DEBUG_SERIAL.printf("timer_expire  = %u\n", timer_node->timer_expire);
+            DEBUG_SERIAL.printf("timer_period  = %u\n", timer_node->timer_period);
+            DEBUG_SERIAL.printf("timer_func    = %p\n", timer_node->timer_func);
+            DEBUG_SERIAL.printf("timer_next    = %p\n", timer_node->timer_next);
+            if (timer_node->timer_next) DEBUG_SERIAL.printf("=============\n");
+        }
+        DEBUG_SERIAL.printf("=============\n");
+        DEBUG_SERIAL.flush();
+        while (timer_root) {
+            auto next = timer_root->timer_next;
+            delete timer_root;
+            timer_root = next;
+        }
+    }
+}
+#endif
+
 bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
 {
     // Setting duration to 0xFFFFFFF, it disconnects the RTC timer
@@ -205,6 +241,9 @@ bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupC
         }
         esp_schedule();
         });
+#ifdef DEBUG_SERIAL
+    walk_timer_list();
+#endif
     {
         esp8266::InterruptLock lock;
         saved_timer_list = timer_list;
@@ -223,6 +262,9 @@ void EspClass::forcedLightSleepEnd(bool cancel)
         esp_yield();
 #endif
     }
+#ifdef DEBUG_SERIAL
+    walk_timer_list();
+#endif
     {
         esp8266::InterruptLock lock;
         timer_list = saved_timer_list;
