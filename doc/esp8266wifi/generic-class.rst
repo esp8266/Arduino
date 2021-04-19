@@ -61,6 +61,8 @@ linker).
 
 .. code:: cpp
 
+    #include <ESP8266WiFi.h>
+
     void setup () {
     #ifdef WIFI_IS_OFF_AT_BOOT
         enableWiFiAtBootTime(); // can be called from anywhere with the same effect
