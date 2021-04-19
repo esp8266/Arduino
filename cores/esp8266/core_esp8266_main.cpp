@@ -185,6 +185,9 @@ extern "C" void __yield() {
 
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
+// In CONT, actually performs yield() only once the given time interval
+// has elapsed since the last time yield() occured. Whereas yield() panics
+// in SYS, optimistic_yield() additionally is safe to call and does nothing.
 extern "C" void optimistic_yield(uint32_t interval_us) {
     const uint32_t intvl_cycles = interval_us *
 #if defined(F_CPU)
