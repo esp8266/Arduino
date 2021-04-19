@@ -143,7 +143,7 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
         if ((detectedBaudrate = testBaudrate())) {
           break;
         }
-        delay(100);
+        esp_delay(100);
     }
     return detectedBaudrate;
 }
