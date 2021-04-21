@@ -213,8 +213,7 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    StreamConstPtr ptr(buf, size);
-    return _client->write(ptr);
+    return _client->write((const char*)buf, size);
 }
 
 size_t WiFiClient::write(Stream& stream)
@@ -225,7 +224,7 @@ size_t WiFiClient::write(Stream& stream)
     {
         return 0;
     }
-    // core up to 2.7.4 was equivalent to this from within ClientContext
+    // core up to 2.7.4 was equivalent to this
     return stream.sendAll(this);
 }
 
