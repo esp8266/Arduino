@@ -30,7 +30,6 @@ extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
 #include <assert.h>
-#include <StreamDev.h>
 #include <esp_priv.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
