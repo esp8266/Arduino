@@ -5,16 +5,20 @@
 // you can use any GPIO for WAKE_UP_PIN except for D0/GPIO16 as it doesn't support interrupts
 
 void IRAM_ATTR wakeupPinIsr() {
+  // For edge-triggered IRQ.
   schedule_function([]() {
     Serial.println("GPIO went from HI to LO");
   });
 }
 
 void IRAM_ATTR wakeupPinIsrWE() {
+  // Wakeup IRQs are level-triggered only.
   schedule_function([]() {
     Serial.println("GPIO wakeup IRQ");
   });
   wakeupPinIsr();
+  // return to falling edge IRQ, otherwise level-triggered IRQ
+  // keeps triggering this ISR back-to-back, consuming nearly all CPU time.
   attachInterrupt(WAKE_UP_PIN, wakeupPinIsr, FALLING);
 }
 
@@ -41,8 +45,8 @@ void loop() {
   if (gotoSleep && ESP.forcedLightSleepBegin(10 * 1000 * 1000, wakeupCallback)) {
     // No new timers, no delay(), between forcedLightSleepBegin() and forcedLightSleepEnd().
     // Only ONLOW_WE or ONHIGH_WE interrupts work, no edge, that's an SDK or CPU limitation.
-    // If the GPIO is in wakeup state while attaching the interrupt, it cannot trigger a wakeup,
-    // but any sleep duration will be honored.
+    // If the GPIO is in the state that will cause a wakeup on attaching the interrupt,
+    // it cannot trigger a wakeup later, but any sleep duration will be honored.
     bool wakeupPinIsHigh = digitalRead(WAKE_UP_PIN);
     // the GPIO might still bounce to LOW between both digital reads, disabling wakeup
     if (wakeupPinIsHigh) {
