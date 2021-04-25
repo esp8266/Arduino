@@ -126,5 +126,7 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);
   server.handleClient();
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(1);
+  // in order to see relevant durations when the CPU is auto light sleeping
+  // in this example, regardless of the added latency for web requests:
+  delay(300);
 }
