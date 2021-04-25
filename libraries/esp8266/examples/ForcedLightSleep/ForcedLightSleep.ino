@@ -33,14 +33,13 @@ void IRAM_ATTR wakeupPinIsr() {
 }
 
 void IRAM_ATTR wakeupPinIsrWE() {
-  // Wakeup IRQs are level-triggered only.
+  // Wakeup IRQs are available as level-triggered only.
+  detachInterrupt(WAKE_UP_PIN);
   schedule_function([]() {
     Serial.println("GPIO wakeup IRQ");
   });
   wakeupPinIsr();
-  // return to falling edge IRQ, otherwise level-triggered IRQ
-  // keeps triggering this ISR back-to-back, consuming nearly all CPU time.
-  attachInterrupt(WAKE_UP_PIN, wakeupPinIsr, FALLING);
+  // reattach falling edge IRQ in loop
 }
 
 void wakeupCallback() {
@@ -83,5 +82,7 @@ void loop() {
     if (wakeupPinIsHigh) {
       gotoSleep.reset();
     }
+    // restore falling edge IRQ
+    attachInterrupt(WAKE_UP_PIN, wakeupPinIsr, FALLING);
   }
 }
