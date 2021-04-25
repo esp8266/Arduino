@@ -101,11 +101,6 @@ void setup() {
 
   server.on("/sleep", []() {
     ESP.autoLightSleep();
-    wifi_fpm_set_wakeup_cb([]() {
-      schedule_function([]() {
-        Serial.println("auto light sleep wakeup CB");
-      });
-    });
     server.send(200, "text/plain", "auto light sleep on");
   });
 
