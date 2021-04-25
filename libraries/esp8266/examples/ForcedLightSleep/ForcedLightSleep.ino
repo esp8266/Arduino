@@ -47,6 +47,9 @@ void wakeupCallback() {
   schedule_function([]() {
     Serial.println("wakeup callback was performed");
   });
+  // return to falling edge IRQ, otherwise level-triggered IRQ with wakeup
+  // would get called unexpectedly while awake.
+  attachInterrupt(WAKE_UP_PIN, wakeupPinIsr, FALLING);
 }
 
 void setup() {
