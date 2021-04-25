@@ -62,7 +62,7 @@ void handleNotFound() {
 }
 
 void setup() {
-  Serial.begin(74800);
+  Serial.begin(74880);
   while (!Serial);
   delay(100);
   Serial.println();
