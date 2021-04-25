@@ -27,6 +27,7 @@
 
 void IRAM_ATTR wakeupPinIsr() {
   // For edge-triggered IRQ.
+  detachInterrupt(WAKE_UP_PIN);
   schedule_function([]() {
     Serial.println("GPIO went from HI to LO");
   });
@@ -71,14 +72,19 @@ void loop() {
     // If the GPIO is in the state that will cause a wakeup on attaching the interrupt,
     // it cannot trigger a wakeup later, but any sleep duration will be honored.
     bool wakeupPinIsHigh = digitalRead(WAKE_UP_PIN);
-    // the GPIO might still bounce to LOW between both digital reads, disabling wakeup
+    delayMicroseconds(5000);
+    wakeupPinIsHigh &= digitalRead(WAKE_UP_PIN);
+    delayMicroseconds(5000);
+    wakeupPinIsHigh &= digitalRead(WAKE_UP_PIN);
+    // the GPIO might still bounce to LOW after this but before sleep is full engaged,
+    // disabling wakeup after all
     if (wakeupPinIsHigh) {
       attachInterrupt(WAKE_UP_PIN, wakeupPinIsrWE, ONLOW_WE);
     }
-    wakeupPinIsHigh &= digitalRead(WAKE_UP_PIN);
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED off so they know the CPU isn't running
     ESP.forcedLightSleepEnd(!wakeupPinIsHigh);
     digitalWrite(LED_BUILTIN, LOW);  // turn on the LED
+    // retry immediately if the GPIO was found not ready for entering sleep
     if (wakeupPinIsHigh) {
       gotoSleep.reset();
     }
