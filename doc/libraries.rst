@@ -77,6 +77,20 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.deepSleepInstant(microseconds, mode)`` works similarly to ``ESP.deepSleep`` but  sleeps instantly without waiting for WiFi to shutdown.
 
+``ESP.forcedModemSleep(microseconds, callback)`` immediately puts the chip into forced ``MODEM_SLEEP``. A microseconds duration after which the sleep mode returns to the automatic sleep mode that was effective before this call can be given, a value of 0 or 0xFFFFFFF turns off that timeout. The optional callback function will be invoked when the forced modem sleep ends.
+
+``ESP.forcedModemSleepOff()`` immediately returns the chip to the automatic sleep mode in effect before the preceeding call to ``ESP.forcedModemSleep``.
+
+``ESP.forcedLightSleepBegin(microseconds, callback)`` works in tandem with ``ESP.forcedLightSleepEnd(cancel)`` to put the chip into forced ``LIGHT_SLEEP``. A microseconds duration after which the sleep mode returns to the automatic sleep mode that was effective before this call can be given, a value of 0 or 0xFFFFFFF turns off that timeout. The optional callback function will be invoked when the forced light sleep ends. Forced light sleep halts the CPU, in addition to the timeout, it can be awakened via GPIO input. Between the calls to ``ESP.forcedLightSleepBegin`` and ``ESP.forcedLightSleepEnd`` any GPIOs to use for wakeup can be set up.
+
+``ESP.forcedLightSleepEnd(cancel)`` causes the chip to enter the forced light sleep mode that was set up as described for ``ESP.forcedLightSleepBegin``. The optional cancel argument, if true, prevents the sleep mode transition from occuring and returns to the automatic sleep mode that was effective before ``ESP.forcedLightSleepBegin``.
+
+``ESP.autoModemSleep()`` immediately puts the chip into automatic ``MODEM_SLEEP``.
+
+``ESP.autoLightSleep()`` immediately puts the chip into automatic ``LIGHT_SLEEP``.
+
+``ESP.autoSleepOff()`` returns the chip to the automatic sleep mode that was effective before the preceding call to either ``ESP.autoModemSleep`` or ``ESP.autoLightSleep``.
+
 ``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. ``offset`` is measured in blocks of 4 bytes and can range from 0 to 127 blocks (total size of RTC memory is 512 bytes). ``data`` should be 4-byte aligned. The stored data can be retained between deep sleep cycles, but might be lost after power cycling the chip. Data stored in the first 32 blocks will be lost after performing an OTA update, because they are used by the Core internals.
 
 ``ESP.restart()`` restarts the CPU.
