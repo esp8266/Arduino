@@ -71,7 +71,7 @@ An ESP8266 port of SoftwareSerial library done by Peter Lerup (@plerup) supports
 ESP-specific APIs
 -----------------
 
-Some ESP-specific APIs related to deep sleep, RTC and flash memories are available in the ``ESP`` object.
+Some ESP-specific APIs related to the deep, modem, and light sleep modes, RTC and flash memory are available in the ``ESP`` object.
 
 ``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds. If you implement deep sleep with ``WAKE_RF_DISABLED`` and require WiFi functionality on wake up, you will need to implement an additional ``WAKE_RF_DEFAULT`` before WiFi functionality is available.
 
