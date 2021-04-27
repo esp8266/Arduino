@@ -91,8 +91,8 @@ class EspClass {
         static void wdtDisable();
         static void wdtFeed();
 
-        static void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
-        static void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        static void deepSleep(uint64_t time_us);
+        static void deepSleepInstant(uint64_t time_us);
         static uint64_t deepSleepMax();
 
         static bool forcedModemSleep(uint32_t duration_us = 0, void (*wakeupCb)() = nullptr);
