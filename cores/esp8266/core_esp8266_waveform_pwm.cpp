@@ -435,6 +435,9 @@ IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
   if (!timerRunning) {
     return false;
   }
+
+  _stopPWM(pin); // Make sure there's no PWM live here
+
   // If user sends in a pin >16 but <32, this will always point to a 0 bit
   // If they send >=32, then the shift will result in 0 and it will also return false
   uint32_t mask = 1<<pin;
