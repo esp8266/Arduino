@@ -226,7 +226,7 @@ public:
     size_t contentLength = 0;
     _streamFileCore(file.size(), file.name(), contentType);
     if (requestMethod == HTTP_GET) {
-      contentLength = _currentClient.write(file);
+      contentLength = file.sendAll(_currentClient);
     }
     return contentLength;
   }
