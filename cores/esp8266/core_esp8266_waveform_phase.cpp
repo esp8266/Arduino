@@ -55,8 +55,8 @@ extern "C" void enablePhaseLockedWaveform (void)
 
 // No-op calls to override the PWM implementation
 extern "C" void _setPWMFreq_weak(uint32_t freq) { (void) freq; }
-extern "C" IRAM_ATTR bool _stopPWM_weak(int pin) { (void) pin; return false; }
-extern "C" bool _setPWM_weak(int pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
+extern "C" IRAM_ATTR bool _stopPWM_weak(uint8_t pin) { (void) pin; return false; }
+extern "C" bool _setPWM_weak(uint8_t pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
 
 
 // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
@@ -116,6 +116,7 @@ static IRAM_ATTR void timer1Interrupt();
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
 
+static void initTimer() __attribute__((noinline));
 static void initTimer() {
   timer1_disable();
   ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
