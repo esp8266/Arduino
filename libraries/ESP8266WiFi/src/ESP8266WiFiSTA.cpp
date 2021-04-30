@@ -673,19 +673,14 @@ void ESP8266WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result) {
     sc_status status = (sc_status) st;
     if(status == SC_STATUS_LINK) {
         station_config* sta_conf = reinterpret_cast<station_config*>(result);
+        if(WiFi._persistent) {
+            wifi_station_set_config(sta_conf);
+        } else {
+            wifi_station_set_config_current(sta_conf);
+        }
         if(_smartConfigUserCallback) {
-            if(WiFi._persistent) {
-                wifi_station_set_config(sta_conf);
-            } else {
-                wifi_station_set_config_current(sta_conf);
-            }
             _smartConfigUserCallback(status, sta_conf);
         } else {
-            if(WiFi._persistent) {
-                wifi_station_set_config(sta_conf);
-            } else {
-                wifi_station_set_config_current(sta_conf);
-            }
             wifi_station_disconnect();
             wifi_station_connect();
         }
