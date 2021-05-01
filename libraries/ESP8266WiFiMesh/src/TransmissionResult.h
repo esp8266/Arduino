@@ -23,11 +23,36 @@
  * THE SOFTWARE.
  */
 
+
+
+
+
+
+
+/********************************************************************************************
+* NOTE!
+*
+* This class is deprecated and will be removed in core version 3.0.0.
+* If you are still using this class, please consider migrating to the new API shown in 
+* the EspnowNetworkInfo.h or TcpIpNetworkInfo.h source files.
+*
+* TODO: delete this file.
+********************************************************************************************/
+
+
+
+
+
+
+
+
+
 #ifndef __TRANSMISSIONRESULT_H__
 #define __TRANSMISSIONRESULT_H__
 
 #include <ESP8266WiFi.h>
 #include "NetworkInfo.h"
+#include "TransmissionOutcome.h"
 
 typedef enum 
 {
@@ -45,11 +70,11 @@ public:
   /**
    * @param autofill Automatically fill in the rest of the network info using newNetworkIndex and the WiFi scan results.
    */
-  TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill = true);
+  TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill = true) __attribute__((deprecated));
 
-  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], transmission_status_t newTransmissionStatus);
+  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], transmission_status_t newTransmissionStatus) __attribute__((deprecated));
 
-  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex, transmission_status_t newTransmissionStatus);
+  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex, transmission_status_t newTransmissionStatus) __attribute__((deprecated));
 
   TransmissionResult(const NetworkInfo& origin, transmission_status_t newTransmissionStatus);
 };

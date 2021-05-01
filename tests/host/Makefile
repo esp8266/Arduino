@@ -76,10 +76,11 @@ $(shell mkdir -p $(BINDIR))
 CORE_CPP_FILES := \
 	$(addprefix $(abspath $(CORE_PATH))/,\
 		debug.cpp \
-		StreamString.cpp \
+		StreamSend.cpp \
 		Stream.cpp \
 		WString.cpp \
 		Print.cpp \
+		stdlib_noniso.cpp \
 		FS.cpp \
 		spiffs_api.cpp \
 		MD5Builder.cpp \

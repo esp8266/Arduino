@@ -1,8 +1,8 @@
 Libraries
 =========
 
-WiFi(ESP8266WiFi library)
--------------------------
+WiFi (ESP8266WiFi library)
+--------------------------
 
 ESP8266WiFi library has been developed basing on ESP8266 SDK, using naming convention and overall functionality philosophy of the `Arduino WiFi Shield library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP8266 SDK to this library outgrew the APIs of WiFi Shield library and it became apparent that we need to provide separate documentation on what is new and extra.
 
@@ -87,7 +87,7 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getHeapFragmentation()`` returns the fragmentation metric (0% is clean, more than ~50% is not harmless)
 
-``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()``able block will be smaller due to memory manager overheads.
+``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()`` -able block will be smaller due to memory manager overheads.
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 

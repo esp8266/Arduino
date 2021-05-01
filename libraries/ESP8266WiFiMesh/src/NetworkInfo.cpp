@@ -22,6 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+
+
+
+
+
+
+/********************************************************************************************
+* NOTE!
+*
+* This class is deprecated and will be removed in core version 3.0.0.
+* If you are still using this class, please consider migrating to the new API shown in 
+* the EspnowNetworkInfo.h or TcpIpNetworkInfo.h source files.
+*
+* TODO: delete this file.
+********************************************************************************************/
+
+
+
+
+
+
+
 
 #include "NetworkInfo.h"
 
@@ -74,4 +97,3 @@ NetworkInfo & NetworkInfo::operator=(const NetworkInfo &other)
   networkIndex = other.networkIndex;
   return *this;
 }
-

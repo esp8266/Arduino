@@ -59,14 +59,13 @@ public:
   virtual size_t write(uint8_t) override;
   virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);
-  size_t write(Stream& stream);
-
-  // This one is deprecated, use write(Stream& instead)
-  size_t write(Stream& stream, size_t unitSize) __attribute__ ((deprecated));
+  size_t write(Stream& stream) [[ deprecated("use stream.sendHow(client...)") ]];
 
   virtual int available() override;
   virtual int read() override;
-  virtual int read(uint8_t *buf, size_t size) override;
+  virtual int read(uint8_t* buf, size_t size) override;
+  int read(char* buf, size_t size);
+
   virtual int peek() override;
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
   size_t peekBytes(char *buffer, size_t length) {
@@ -119,6 +118,22 @@ public:
   static bool getDefaultSync ();
   bool getSync() const;
   void setSync(bool sync);
+
+  // peek buffer API is present
+  virtual bool hasPeekBufferAPI () const override;
+
+  // return number of byte accessible by peekBuffer()
+  virtual size_t peekAvailable () override;
+
+  // return a pointer to available data buffer (size = peekAvailable())
+  // semantic forbids any kind of read() before calling peekConsume()
+  virtual const char* peekBuffer () override;
+
+  // consume bytes after use (see peekBuffer)
+  virtual void peekConsume (size_t consume) override;
+
+  virtual bool outputCanTimeout () override { return connected(); }
+  virtual bool inputCanTimeout () override { return connected(); }
 
 protected:
 

@@ -28,7 +28,7 @@
 
 #include <memory>
 #include <Arduino.h>
-
+#include <StreamString.h>
 #include <WiFiClient.h>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
@@ -147,8 +147,6 @@ typedef enum {
 
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
-
-class StreamString;
 
 class HTTPClient
 {
