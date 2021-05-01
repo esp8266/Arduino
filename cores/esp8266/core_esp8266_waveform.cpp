@@ -563,11 +563,9 @@ static IRAM_ATTR void timer1Interrupt() {
           else {
             do {
               // Drop the pin at this edge
-              if (pwmState.mask & (1 << pwmState.pin[pwmState.idx])) {
-                GPOC = 1 << pwmState.pin[pwmState.idx];
-                if (pwmState.pin[pwmState.idx] == 16) {
-                  GP16O = 0;
-                }
+              GPOC = 1 << pwmState.pin[pwmState.idx];
+              if (pwmState.pin[pwmState.idx] == 16) {
+                GP16O = 0;
               }
               pwmState.idx++;
               // Any other pins at this same PWM value will have delta==0, drop them too.
