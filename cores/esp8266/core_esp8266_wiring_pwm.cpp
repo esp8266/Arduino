@@ -83,9 +83,18 @@ extern void __analogWriteMode(uint8_t pin, int val, bool openDrain) {
   // val: the duty cycle: between 0 (always off) and 255 (always on).
   // So if val = 0 we have digitalWrite(LOW), if we have val==range we have digitalWrite(HIGH)
   if (_setPWM(pin, val, analogScale)) {
-    analogMap |= (1 << pin);
-  } else if (startWaveformClockCycles(pin, high, low, 0, phaseReference, 0, true)) {
-    analogMap |= (1 << pin);
+    if (val > 0 && val < analogScale) analogMap |= (1 << pin);
+  } else {
+    const bool detach = (val == 0 || val == analogScale);
+    // To go steady LOW or HIGH, let the waveform run into next duty cycle, if any. Then stop.
+    if (startWaveformClockCycles(pin, high, low, static_cast<uint32_t>(detach), phaseReference, 0, true)) {
+      if (detach) {
+        delay((1000 + analogFreq) / analogFreq);
+        stopWaveform(pin);
+      } else {
+        analogMap |= (1 << pin);
+      }
+    }
   }
 }
 
