@@ -128,7 +128,7 @@ static IRAM_ATTR void forceTimerInterrupt() {
 constexpr int maxPWMs = 8;
 
 // PWM machine state
-typedef struct PWMState {
+struct PWMState {
   uint32_t mask; // Bitmask of active pins
   uint32_t cnt;  // How many entries
   uint32_t idx;  // Where the state machine is along the list
@@ -136,12 +136,11 @@ typedef struct PWMState {
   uint32_t delta[maxPWMs + 1];
   uint32_t nextServiceCycle;  // Clock cycle for next step
   struct PWMState *pwmUpdate; // Set by main code, cleared by ISR
-} PWMState;
+};
 
 static PWMState pwmState;
 static uint32_t _pwmFreq = 1000;
 static uint32_t _pwmPeriod = microsecondsToClockCycles(1000000UL) / _pwmFreq;
-
 
 // If there are no more scheduled activities, shut down Timer 1.
 // Otherwise, do nothing.
@@ -158,6 +157,7 @@ static IRAM_ATTR void disableIdleTimer() {
 // Wait for mailbox to be emptied (either busy or delay() as needed)
 static IRAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
   p->pwmUpdate = nullptr;
+  MEMBARRIER();
   pwmState.pwmUpdate = p;
   MEMBARRIER();
   forceTimerInterrupt();
@@ -242,8 +242,7 @@ IRAM_ATTR bool _stopPWM_weak(uint8_t pin) {
     return false; // Pin not actually active
   }
 
-  PWMState p;  // The working copy since we can't edit the one in use
-  p = pwmState;
+  PWMState p = pwmState; // The working copy since we can't edit the one in use
 
   // In _stopPWM we just clear the mask but keep everything else
   // untouched to save IRAM.  The main startPWM will handle cleanup.
@@ -264,7 +263,7 @@ IRAM_ATTR bool _stopPWM(uint8_t pin) {
   return _stopPWM_bound(pin);
 }
 
-static void _addPWMtoList(PWMState &p, uint8_t pin, uint32_t val, uint32_t range) {
+static void _addPWMtoList(PWMState& p, uint8_t pin, uint32_t val, uint32_t range) {
   // Stash the val and range so we can re-evaluate the fraction
   // should the user change PWM frequency.  This allows us to
   // give as great a precision as possible.  We know by construction
@@ -278,7 +277,8 @@ static void _addPWMtoList(PWMState &p, uint8_t pin, uint32_t val, uint32_t range
   // Clip to sane values in the case we go from OK to not-OK when adjusting frequencies
   if (cc == 0) {
     cc = 1;
-  } else if (cc >= _pwmPeriod) {
+  }
+  else if (cc >= _pwmPeriod) {
     cc = _pwmPeriod - 1;
   }
 
@@ -286,9 +286,10 @@ static void _addPWMtoList(PWMState &p, uint8_t pin, uint32_t val, uint32_t range
     // Starting up from scratch, special case 1st element and PWM period
     p.pin[0] = pin;
     p.delta[0] = cc;
-   // Final pin is never used: p.pin[1] = 0xff;
+    // Final pin is never used: p.pin[1] = 0xff;
     p.delta[1] = _pwmPeriod - cc;
-  } else {
+  }
+  else {
     uint32_t ttl = 0;
     uint32_t i;
     // Skip along until we're at the spot to insert
@@ -532,39 +533,39 @@ static IRAM_ATTR void timer1Interrupt() {
 
       // PWM state machine implementation
       if (pwmState.cnt) {
-        int32_t cyclesToGo;
+        int32_t pwmCyclesToGo;
         do {
-            cyclesToGo = pwmState.nextServiceCycle - GetCycleCountIRQ();
-            if (cyclesToGo < 0) {
+            pwmCyclesToGo = pwmState.nextServiceCycle - GetCycleCountIRQ();
+            if (pwmCyclesToGo <= 0) {
                 if (pwmState.idx == pwmState.cnt) { // Start of pulses, possibly copy new
                   if (pwmState.pwmUpdate) {
                     // Do the memory copy from temp to global and clear mailbox
-                    pwmState = *(PWMState*)pwmState.pwmUpdate;
+                    pwmState = *pwmState.pwmUpdate;
                   }
                   GPOS = pwmState.mask; // Set all active pins high
                   if (pwmState.mask & (1<<16)) {
                     GP16O = 1;
                   }
                   pwmState.idx = 0;
-                } else {
+                }
+                else {
                   do {
                     // Drop the pin at this edge
-                    if (pwmState.mask & (1<<pwmState.pin[pwmState.idx])) {
-                      GPOC = 1<<pwmState.pin[pwmState.idx];
-                      if (pwmState.pin[pwmState.idx] == 16) {
-                        GP16O = 0;
-                      }
+                    GPOC = 1<<pwmState.pin[pwmState.idx];
+                    if (pwmState.pin[pwmState.idx] == 16) {
+                      GP16O = 0;
                     }
                     pwmState.idx++;
                     // Any other pins at this same PWM value will have delta==0, drop them too.
                   } while (pwmState.delta[pwmState.idx] == 0);
                 }
                 // Preserve duty cycle over PWM period by using now+xxx instead of += delta
-                cyclesToGo = adjust(pwmState.delta[pwmState.idx]);
-                pwmState.nextServiceCycle = GetCycleCountIRQ() + cyclesToGo;
+                pwmCyclesToGo = adjust(pwmState.delta[pwmState.idx]);
+                pwmState.nextServiceCycle = GetCycleCountIRQ() + pwmCyclesToGo;
             }
             nextEventCycle = earliest(nextEventCycle, pwmState.nextServiceCycle);
-        } while (pwmState.cnt && (cyclesToGo < 100));
+            // PWM can starve the generic waveform generator if pwmCyclesToGo remains below 100
+        } while (pwmState.cnt && pwmCyclesToGo < 100);
       }
 
       for (auto i = wvfState.startPin; i <= wvfState.endPin; i++) {
