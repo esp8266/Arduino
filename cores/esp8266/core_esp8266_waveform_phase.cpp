@@ -309,7 +309,7 @@ static IRAM_ATTR void timer1Interrupt() {
   uint32_t now = ESP.getCycleCount();
   uint32_t isrNextEventCcy = now;
   while (busyPins) {
-    if (static_cast<int32_t>(isrNextEventCcy - now) > IRQLATENCYCCYS) {
+    if (static_cast<int32_t>(isrNextEventCcy - now) > IRQLATENCYCCYS + DELTAIRQCCYS) {
       waveform.nextEventCcy = isrNextEventCcy;
       break;
     }
