@@ -41,7 +41,6 @@
 
 #include "core_esp8266_waveform.h"
 #include <Arduino.h>
-#include "debug.h"
 #include "ets_sys.h"
 #include <atomic>
 
@@ -150,7 +149,7 @@ static __attribute__((noinline)) void initTimer() {
   timer1_write(IRQLATENCYCCYS); // Cause an interrupt post-haste
 }
 
-static void IRAM_ATTR deinitIdleTimer() {
+static IRAM_ATTR void deinitIdleTimer() {
   if (!waveform.timer1Running || waveform.enabled || waveform.timer1CB || pwmState.cnt) {
     return;
   }
@@ -174,8 +173,9 @@ extern "C" {
 // Wait for mailbox to be emptied (either busy or delay() as needed)
 static IRAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
   p->pwmUpdate = nullptr;
-  pwmState.pwmUpdate = p;
   std::atomic_thread_fence(std::memory_order_release);
+  pwmState.pwmUpdate = p;
+  std::atomic_thread_fence(std::memory_order_acq_rel);
   if (idle) {
     forceTimerTrigger();
   }
