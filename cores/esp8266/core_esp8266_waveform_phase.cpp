@@ -195,10 +195,7 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCc
     if (!waveform.timer1Running) {
       initTimer();
     }
-    else if (T1V > IRQLATENCYCCYS) {
-      // Must not interfere if Timer is due shortly
-      timer1_write(IRQLATENCYCCYS);
-    }
+    // The ISR pulls updates on next PWM interval
   }
   else {
     wave.mode = WaveformMode::INFINITE; // turn off possible expiry to make update atomic from NMI
