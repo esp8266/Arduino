@@ -2,8 +2,8 @@
   esp8266_waveform - General purpose waveform generation and control,
                      supporting outputs on all pins in parallel.
 
-  -- Default, PWM locked version --
-  Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
+  Copyright (c) 2018-2020 Earle F. Philhower, III.  All rights reserved.
+  Copyright (c) 2020-2021 Dirk O. Kaar.
 
   The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
@@ -20,33 +20,9 @@
 
   This replaces older tone(), analogWrite(), and the Servo classes.
 
-  Everywhere in the code where "cycles" is used, it means ESP.getCycleCount()
+  Everywhere in the code where "cycles", "ccy" or "ccys" is used, it means ESP.getCycleCount()
   clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
   cycles (which may be 2 CPU clock cycles @ 160MHz).
-  ----------
-
-  -- Phase locked version --
-  Copyright (c) 2020 Dirk O. Kaar.
-
-  The core idea is to have a programmable waveform generator with a unique
-  high and low period (defined in microseconds or CPU clock cycles).  TIMER1 is
-  set to 1-shot mode and is always loaded with the time until the next edge
-  of any live waveforms.
-
-  Up to one waveform generator per pin supported.
-
-  Each waveform generator is synchronized to the ESP clock cycle counter, not the
-  timer.  This allows for removing interrupt jitter and delay as the counter
-  always increments once per 80MHz clock.  Changes to a waveform are
-  contiguous and only take effect on the next waveform transition,
-  allowing for smooth transitions.
-
-  This replaces older tone(), analogWrite(), and the Servo classes.
-
-  Everywhere in the code where "ccy" or "ccys" is used, it means ESP.getCycleCount()
-  clock cycle count, or an interval measured in CPU clock cycles, but not TIMER1
-  cycles (which may be 2 CPU clock cycles @ 160MHz).
-  ----------
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
