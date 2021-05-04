@@ -72,11 +72,6 @@
 extern "C" {
 #endif
 
-// Call this function in your setup() to cause the phase locked version of the generator to
-// be linked in automatically.  Otherwise, the default PWM locked version will be used.
-void enablePhaseLockedWaveform(void);
-
-
 // Start or change a waveform of the specified high and low times on specific pin.
 // If runtimeUS > 0 then automatically stop it after that many usecs, relative to the next
 // full period.

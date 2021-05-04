@@ -356,7 +356,7 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t
   (void) phaseOffsetUS;
   (void) autoPwm;
 
-   if ((pin > 16) || isFlashInterfacePin(pin)) {
+   if ((pin > 16) || isFlashInterfacePin(pin) || (timeHighCycles == 0)) {
     return false;
   }
   Waveform *wave = &wvfState.waveform[pin];
