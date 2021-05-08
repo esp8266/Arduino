@@ -11,29 +11,15 @@
 #include <WiFiClient.h>
 #include "smartconfig.h"
 
-void decryptSmartConfigPassword(char * buffer, const char* encString){
-  // currently returning same string
-  // but we can throw in simple aes encryption. 
-  memcpy(buffer,encString, strlen(encString));
+void decryptSmartConfigPasswordTrivial(char * decrypted, const char* encString){
+  // No encryption. Password is sent as plan text
+  // If password is encrypted with AES(CBC/ECB). Decrypt here
+  // Note: The format of encrypted string and choice of encryption algoright is upto the user.
+  // It has to be chosen with constraint that maxium length of encrypted string should not be above 64. 
+    
+  strcpy(decrypted, encString);
 }
 
-void smartConfigCallback(uint32_t st, void *result) {
-  station_config *sta_conf = reinterpret_cast<station_config *>(result);
-  char recievedPassword[65] = "";
-  memcpy(recievedPassword, sta_conf->password, 64);
-
-  struct station_config conf;
-  memcpy(&conf, sta_conf, sizeof(conf));
-
-  // Decrypt password. 
-  char passwordBuffer[64] = "";
-  decryptSmartConfigPassword(passwordBuffer,(const char *)recievedPassword);
-  memcpy(conf.password, passwordBuffer, 64);
-
-  wifi_station_set_config_current(&conf);
-  wifi_station_disconnect();
-  wifi_station_connect();
-}
 
 void setup() {
   delay(1000);
@@ -47,7 +33,10 @@ void setup() {
   WiFi.mode(WIFI_STA);
   delay(1000);
 
-  if(!WiFi.beginSmartConfig(reinterpret_cast<sc_callback_t>(&smartConfigCallback))) { 
+  // If sending encrypted password. Pass an optional decrypt password function
+  WiFi.setSmartConfigDecryptFn(decryptSmartConfigPasswordTrivial);
+
+  if(!WiFi.beginSmartConfig() { 
     Serial.println("Could not begin smart config");
     return;
   }

@@ -97,7 +97,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
 
         bool beginWPSConfig(void);
         bool beginSmartConfig();
-        bool beginSmartConfig(sc_callback_t userCallback);
+        void setSmartConfigDecryptFn(sc_pass_decrypt_fn_t scDecryptFn);
         bool stopSmartConfig();
         bool smartConfigDone();
 
@@ -107,8 +107,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         static bool _smartConfigDone;
 
         static void _smartConfigCallback(uint32_t status, void* result);
-        static sc_callback_t _smartConfigUserCallback;
-
+        static sc_pass_decrypt_fn_t _scDecryptFn;
 };
 
 

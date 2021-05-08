@@ -156,5 +156,6 @@ struct WiFiEventSoftAPModeProbeRequestReceived
     uint8 mac[6];
 };
 
+typedef void (*sc_pass_decrypt_fn_t)(char* decrypted, const char* encString);
 
 #endif /* ESP8266WIFITYPE_H_ */
