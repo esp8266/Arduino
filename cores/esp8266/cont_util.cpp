@@ -42,7 +42,7 @@ void cont_init(cont_t* cont) {
     }
 }
 
-int ICACHE_RAM_ATTR cont_check(cont_t* cont) {
+int IRAM_ATTR cont_check(cont_t* cont) {
     if(cont->stack_guard1 != CONT_STACKGUARD || cont->stack_guard2 != CONT_STACKGUARD) return 1;
 
     return 0;
@@ -62,7 +62,7 @@ int cont_get_free_stack(cont_t* cont) {
     return freeWords * 4;
 }
 
-bool ICACHE_RAM_ATTR cont_can_yield(cont_t* cont) {
+bool IRAM_ATTR cont_can_yield(cont_t* cont) {
     return !ETS_INTR_WITHINISR() &&
            cont->pc_ret != 0 && cont->pc_yield == 0;
 }

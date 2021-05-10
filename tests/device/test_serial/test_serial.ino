@@ -33,12 +33,6 @@ static uint64_t in_total = 0, in_prev = 0;
 static uint64_t start_ms, last_ms;
 static uint64_t timeout;
 
-void preinit() {
-  // (no C++ in function)
-  // disable wifi
-  ESP8266WiFiClass::preinitWiFiOff();
-}
-
 void setup()
 {
   Serial.begin(SSBAUD);

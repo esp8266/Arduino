@@ -35,9 +35,10 @@ extern "C" {
 #include <core_version.h>
 #include "gdb_hooks.h"
 #include "flash_quirks.h"
+#include "hwdt_app_entry.h"
 #include <umm_malloc/umm_malloc.h>
 #include <core_esp8266_non32xfer.h>
-
+#include "core_esp8266_vm.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -331,7 +332,18 @@ extern "C" void app_entry (void)
 extern "C" void preinit (void) __attribute__((weak));
 extern "C" void preinit (void)
 {
-    /* do nothing by default */
+    /* does nothing, kept for backward compatibility */
+}
+
+extern "C" void __disableWiFiAtBootTime (void) __attribute__((weak));
+extern "C" void __disableWiFiAtBootTime (void)
+{
+    // Starting from arduino core v3: wifi is disabled at boot time
+    // WiFi.begin() or WiFi.softAP() will wake WiFi up
+    wifi_set_opmode_current(0/*WIFI_OFF*/);
+    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+    wifi_fpm_open();
+    wifi_fpm_do_sleep(0xFFFFFFF);
 }
 
 extern "C" void user_init(void) {
@@ -348,13 +360,23 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
+#if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NOEXTRA4K)
+    debug_hwdt_init();
+#endif
+
+#if defined(UMM_HEAP_EXTERNAL)
+    install_vm_exception_handler();
+#endif
+  
 #if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
     install_non32xfer_exception_handler();
 #endif
+
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
+    __disableWiFiAtBootTime(); // default weak function disables WiFi
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,

@@ -474,8 +474,8 @@ Performs the same operation as ``info`` but allows for reporting greater than
 4GB for filesystem size/used/etc.  Should be used with the SD and SDFS
 filesystems since most SD cards today are greater than 4GB in size.
 
-setTimeCallback(time_t (*cb)(void))
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setTimeCallback(time_t (\*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
@@ -574,8 +574,8 @@ rewind
 
 Resets the internal pointer to the start of the directory.
 
-setTimeCallback(time_t (*cb)(void))
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setTimeCallback(time_t (\*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sets the time callback for any files accessed from this Dir object via openNextFile.
 Note that the SD and SDFS filesystems only support a filesystem-wide callback and
@@ -693,7 +693,7 @@ Close the file. No other operations should be performed on *File* object
 after ``close`` function was called.
 
 openNextFile  (compatibiity method, not recommended for new code)
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
@@ -705,7 +705,7 @@ Opens the next file in the directory pointed to by the File.  Only valid
 when ``File.isDirectory() == true``.
 
 rewindDirectory  (compatibiity method, not recommended for new code)
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
@@ -718,8 +718,8 @@ rewindDirectory  (compatibiity method, not recommended for new code)
 Resets the ``openNextFile`` pointer to the top of the directory.  Only
 valid when ``File.isDirectory() == true``.
 
-setTimeCallback(time_t (*cb)(void))
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setTimeCallback(time_t (\*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sets the time callback for this specific file.  Note that the SD and
 SDFS filesystems only support a filesystem-wide callback and calls to
