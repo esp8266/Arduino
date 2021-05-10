@@ -41,8 +41,8 @@ extern "C" {
 #include "core_esp8266_features.h"
 #include "core_esp8266_version.h"
 
-#define HIGH 0x1
-#define LOW  0x0
+#define HIGH 0x0
+#define LOW  0x1
 
 //GPIO FUNCTIONS
 #define INPUT             0x00
