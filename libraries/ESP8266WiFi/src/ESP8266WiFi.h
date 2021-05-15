@@ -53,6 +53,7 @@ extern "C" {
 #define DEBUG_WIFI(...) do { (void)0; } while (0)
 #endif
 
+extern "C" void enableWiFiAtBootTime (void) __attribute__((noinline));
 
 class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTAClass, public ESP8266WiFiScanClass, public ESP8266WiFiAPClass {
     public:

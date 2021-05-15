@@ -20,7 +20,7 @@ BearSSL doesn't perform memory allocations at runtime, but it does require alloc
 . A per-application secondary stack
 . A per-connection TLS receive/transmit buffer plus overhead
 
-The per-application secondary stack is approximately 5.6KB in size and is used for temporary variables during BearSSL processing.  Only one stack is required, and it will be allocated whenever any `BearSSL::WiFiClientSecure` or `BearSSL::WiFiServerSecure` are instantiated.  So, in the case of a global client or server, the memory will be allocated before `setup()` is called.
+The per-application secondary stack is approximately 6KB in size and is used for temporary variables during BearSSL processing.  Only one stack is required, and it will be allocated whenever any `BearSSL::WiFiClientSecure` or `BearSSL::WiFiServerSecure` are instantiated.  So, in the case of a global client or server, the memory will be allocated before `setup()` is called.
 
 The per-connection buffers are approximately 22KB in size, but in certain circumstances it can be reduced dramatically by using MFLN or limiting message sizes.  See the `MLFN section <#mfln-or-maximum-fragment-length-negotiation-saving-ram>`__ below for more information.
 
@@ -219,3 +219,13 @@ setCiphersLessSecure()
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Helper function which essentially limits BearSSL to less secure ciphers than it would natively choose, but they may be helpful and faster if your server depended on specific crypto options.
+
+Limiting TLS(SSL) Versions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, BearSSL will connect with TLS 1.0, TLS 1.1, or TLS 1.2 protocols (depending on the request of the remote side).  If you want to limit to a subset, use the following call:
+
+setSSLVersion(uint32_t min, uint32_t max)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Valid values for min and max are `BR_TLS10`, `BR_TLS11`, `BR_TLS12`.  Min and max may be set to the same value if only a single TLS version is desired.
