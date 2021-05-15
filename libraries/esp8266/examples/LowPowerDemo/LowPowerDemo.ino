@@ -195,7 +195,7 @@ void runTest2() {
 
 void runTest3() {
   Serial.println(F("\n3rd test - Forced Modem Sleep"));
-  WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // shut the modem down and save the WiFi state for faster reconnection
+  WiFi.shutdown(nv->wss);  // shut the modem down and save the WiFi state for faster reconnection
   //  WiFi.forceSleepBegin(delay_in_uS);  // alternate method of Forced Modem Sleep for an optional timed shutdown,
   // with WiFi.forceSleepBegin(0xFFFFFFF); the modem sleeps until you wake it, with values <= 0xFFFFFFE it's timed
   //  delay(10);  // it doesn't always go to sleep unless you delay(10); yield() wasn't reliable
@@ -290,7 +290,7 @@ void runTest7() {
   delay(50);  // debounce time for the switch, pushbutton released
   waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
   digitalWrite(LED, LOW);  // turn the LED on, at least briefly
-  //WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep,
+  //WiFi.shutdown(nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep,
   // and no extended RFCAL as it goes into Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   printMillis();  // show time difference across sleep
@@ -308,7 +308,7 @@ void runTest8() {
   readVoltage();  // read internal VCC
   Serial.println(F("press the switch to continue"));
   waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-  //WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep,
+  //WiFi.shutdown(nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep,
   // and no extended RFCAL as it goes into Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
@@ -322,7 +322,7 @@ void runTest9() {
   readVoltage();  // read internal VCC
   Serial.println(F("press the switch to continue"));
   waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-  WiFi.mode(WIFI_SHUTDOWN, &nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep
+  WiFi.shutdown(nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
   testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
@@ -335,7 +335,7 @@ void runTest10() {
   readVoltage();  // read internal VCC
   Serial.println(F("press the switch to continue"));
   waitPushbutton(false, blinkDelay);  // set true if you want to see Automatic Modem Sleep
-  //WiFi.mode(WIFI_SHUTDOWN);  // Forced Modem Sleep for a more Instant Deep Sleep
+  //WiFi.forceSleepBegin();  // Forced Modem Sleep for a more Instant Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
   testPoint_HIGH;  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
@@ -397,15 +397,15 @@ void updateRTCcrc() {  // updates the reset count CRC
 void initWiFi() {
   digitalWrite(LED, LOW);  // give a visual indication that we're alive but busy with WiFi
   uint32_t wifiBegin = millis();  // how long does it take to connect
-  if ((crc32((uint8_t*) &nv->rtcData.rstCount + 1, sizeof(nv->wss)) && !WiFi.shutdownValidCRC(&nv->wss))) {
+  if ((crc32((uint8_t*) &nv->rtcData.rstCount + 1, sizeof(nv->wss)) && !WiFi.shutdownValidCRC(nv->wss))) {
     // if good copy of wss, overwrite invalid (primary) copy
     memcpy((uint32_t*) &nv->wss, (uint32_t*) &nv->rtcData.rstCount + 1, sizeof(nv->wss));
   }
-  if (WiFi.shutdownValidCRC(&nv->wss)) {  // if we have a valid WiFi saved state
+  if (WiFi.shutdownValidCRC(nv->wss)) {  // if we have a valid WiFi saved state
     memcpy((uint32_t*) &nv->rtcData.rstCount + 1, (uint32_t*) &nv->wss, sizeof(nv->wss)); // save a copy of it
     Serial.println(F("resuming WiFi"));
   }
-  if (!(WiFi.mode(WIFI_RESUME, &nv->wss))) {  // couldn't resume, or no valid saved WiFi state yet
+  if (!(WiFi.resumeFromShutdown(nv->wss))) {  // couldn't resume, or no valid saved WiFi state yet
     /* Explicitly set the ESP8266 as a WiFi-client (STAtion mode), otherwise by default it
       would try to act as both a client and an access-point and could cause network issues
       with other WiFi devices on your network. */
