@@ -1312,6 +1312,7 @@ bool WiFiClientSecureCtx::_connectSSLServerEC(const X509List *chain,
   (void) chain;
   (void) cert_issuer_key_type;
   (void) sk;
+  (void) cache;
   (void) client_CA_ta;
   DEBUG_BSSL("_connectSSLServerEC: Attempting to use EC cert in minimal cipher mode (no EC)\n");
   return false;
