@@ -213,28 +213,19 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    StreamConstPtr ptr(buf, size);
-    return _client->write(ptr);
-}
-
-size_t WiFiClient::write(Stream& stream, size_t unused)
-{
-    (void) unused;
-    return WiFiClient::write(stream);
+    return _client->write((const char*)buf, size);
 }
 
 size_t WiFiClient::write(Stream& stream)
 {
+    // (this method is deprecated)
+
     if (!_client || !stream.available())
     {
         return 0;
     }
-    if (stream.hasPeekBufferAPI())
-    {
-        _client->setTimeout(_timeout);
-        return _client->write(stream);
-    }
-    return stream.sendAvailable(this);
+    // core up to 2.7.4 was equivalent to this
+    return stream.sendAll(this);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
