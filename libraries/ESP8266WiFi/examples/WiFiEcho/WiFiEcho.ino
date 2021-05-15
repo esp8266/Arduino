@@ -84,9 +84,10 @@ void loop() {
   if (Serial.available()) {
     s = (s + 1) % (sizeof(sizes) / sizeof(sizes[0]));
     switch (Serial.read()) {
-      case '1': if (t != 1) s = 0; t = 1; Serial.println("byte-by-byte (watch then press 2 or 3)"); break;
-      case '2': if (t != 2) s = 1; t = 2; Serial.printf("through buffer (watch then press 2 again, or 1 or 3)\n"); break;
-      case '3': if (t != 3) s = 0; t = 3; Serial.printf("direct access (watch then press 3 again, or 1 or 2)\n"); break;
+      case '1': if (t != 1) s = 0; t = 1; Serial.println("byte-by-byte (watch then press 2, 3 or 4)"); break;
+      case '2': if (t != 2) s = 1; t = 2; Serial.printf("through buffer (watch then press 2 again, or 1, 3 or 4)\n"); break;
+      case '3': if (t != 3) s = 0; t = 3; Serial.printf("direct access (sendAvailable - watch then press 3 again, or 1, 2 or 4)\n"); break;
+      case '4':                    t = 4; Serial.printf("direct access (sendAll - close peer to stop, then press 1, 2 or 3 before restarting peer)\n"); break;
     }
     tot = cnt = 0;
     ESP.resetFreeContStack();
@@ -125,8 +126,22 @@ void loop() {
     if (sizes[s]) {
       tot += client.sendSize(&client, sizes[s]);
     } else {
-      tot += client.sendAll(&client);
+      tot += client.sendAvailable(&client);
     }
+    cnt++;
+
+    switch (client.getLastSendReport()) {
+      case Stream::Report::Success: break;
+      case Stream::Report::TimedOut: Serial.println("Stream::send: timeout"); break;
+      case Stream::Report::ReadError: Serial.println("Stream::send: read error"); break;
+      case Stream::Report::WriteError: Serial.println("Stream::send: write error"); break;
+      case Stream::Report::ShortOperation: Serial.println("Stream::send: short transfer"); break;
+    }
+  }
+
+  else if (t == 4) {
+    // stream to print, possibly with only one copy
+    tot += client.sendAll(&client); // this one might not exit until peer close
     cnt++;
 
     switch (client.getLastSendReport()) {
