@@ -40,6 +40,7 @@ extern "C"
 #include "lwip/netif.h"
 #include <include/ClientContext.h>
 #include "c_types.h"
+#include <StreamDev.h>
 
 uint16_t WiFiClient::_localPort = 0;
 
@@ -212,23 +213,19 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    return _client->write(buf, size);
-}
-
-size_t WiFiClient::write(Stream& stream, size_t unused)
-{
-    (void) unused;
-    return WiFiClient::write(stream);
+    return _client->write((const char*)buf, size);
 }
 
 size_t WiFiClient::write(Stream& stream)
 {
+    // (this method is deprecated)
+
     if (!_client || !stream.available())
     {
         return 0;
     }
-    _client->setTimeout(_timeout);
-    return _client->write(stream);
+    // core up to 2.7.4 was equivalent to this
+    return stream.sendAll(this);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -238,7 +235,8 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    return _client->write_P(buf, size);
+    StreamConstPtr nopeek(buf, size);
+    return nopeek.sendAll(this);
 }
 
 int WiFiClient::available()

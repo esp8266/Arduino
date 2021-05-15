@@ -603,6 +603,25 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
+    ( 'd1_mini_clone', {
+        'name': 'LOLIN(WEMOS) D1 mini (clone)',
+        'opts': {
+            '.build.board': 'ESP8266_WEMOS_D1MINI',
+            '.build.variant': 'd1_mini',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_menu',
+            'flashfreq_menu',
+            '4M',
+            ],
+        'serial': '921',
+        'desc': [ 'Clone variant of the LOLIN(WEMOS) D1 mini board,',
+                  'with enabled flash-mode menu, DOUT selected by default.',
+                  '',
+                  'Product page of the preferred official board: https://www.wemos.cc/',
+                  ],
+    }),
     ( 'd1_mini_pro', {
         'name': 'LOLIN(WEMOS) D1 mini Pro',
         'opts': {
@@ -1271,20 +1290,30 @@ def combn (lst):
         all += comb(i + 1, lst)
     return all
 
-def comb1 (lst):
+def comb1 (lst, lstplusone):
     all = []
     for i in range(0, len(lst)):
         all += [ [ lst[i] ] ]
-    all += [ lst ]
+    if len(lstplusone):
+        for i in range(0, len(lstplusone)):
+            all += [ [ lstplusone[i] ] ]
+        all += [ lst ]
+        for i in range(0, len(lstplusone)):
+            all += [ lst + [ lstplusone[i] ] ]
+    else:
+        all += [ lst ]
     return all
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
     listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
+    listplusone = [ 'HWDT', 'HWDT_NOEXTRA4K' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
-    options += comb1(listnocomb)
+    options += comb1(listnocomb, listplusone)
     options += [ listcomb + listnocomb ]
+    for i in range(0, len(listplusone)):
+        options += [ listcomb + listnocomb + [ listplusone[i] ] ]
     options += [ listsingle ]
     debugmenu = collections.OrderedDict([
             ( '.menu.dbg.Disabled', 'Disabled' ),

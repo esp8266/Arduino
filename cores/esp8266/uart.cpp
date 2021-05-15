@@ -760,11 +760,11 @@ uart_uninit(uart_t* uart)
     free(uart);
 }
 
-void
+bool
 uart_swap(uart_t* uart, int tx_pin)
 {
     if(uart == NULL)
-        return;
+        return false;
 
     switch(uart->uart_nr)
     {
@@ -775,19 +775,17 @@ uart_swap(uart_t* uart, int tx_pin)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 15;
+                pinMode(uart->tx_pin, FUNCTION_4);
             }
             if(uart->rx_enabled) //RX
             {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 13;
+                pinMode(uart->rx_pin, FUNCTION_4);
             }
-            if(uart->tx_enabled)
-                pinMode(uart->tx_pin, FUNCTION_4);    //TX
-
-            if(uart->rx_enabled)
-                pinMode(uart->rx_pin, FUNCTION_4);    //RX
 
             IOSWAP |= (1 << IOSWAPU0);
+            return true;
         }
         else
         {
@@ -795,19 +793,17 @@ uart_swap(uart_t* uart, int tx_pin)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = (tx_pin == 2)?2:1;
+                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);
             }
             if(uart->rx_enabled) //RX
             {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 3;
+                pinMode(3, SPECIAL);
             }
-            if(uart->tx_enabled)
-                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);    //TX
-
-            if(uart->rx_enabled)
-                pinMode(3, SPECIAL);    //RX
 
             IOSWAP &= ~(1 << IOSWAPU0);
+            return true;
         }
         break;
     case UART1:
@@ -816,30 +812,30 @@ uart_swap(uart_t* uart, int tx_pin)
     default:
         break;
     }
+    return false;
 }
 
-void
+bool
 uart_set_tx(uart_t* uart, int tx_pin)
 {
     if(uart == NULL)
-        return;
+        return false;
 
     switch(uart->uart_nr)
     {
     case UART0:
         if(uart->tx_enabled)
         {
-            if (uart->tx_pin == 1 && tx_pin == 2)
+            if (uart->tx_pin == tx_pin)
             {
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
+                return true;
             }
-            else if (uart->tx_pin == 2 && tx_pin != 2)
+            else if (tx_pin == 1 || tx_pin == 2)
             {
                 pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 1;
-                pinMode(uart->tx_pin, SPECIAL);
+                uart->tx_pin = tx_pin;
+                pinMode(uart->tx_pin, tx_pin == 1 ? SPECIAL : FUNCTION_4);
+                return true;
             }
         }
 
@@ -850,33 +846,54 @@ uart_set_tx(uart_t* uart, int tx_pin)
     default:
         break;
     }
+    return false;
 }
 
-void
+bool
 uart_set_pins(uart_t* uart, int tx, int rx)
 {
     if(uart == NULL)
-        return;
+        return false;
 
-    if(uart->uart_nr == UART0) // Only UART0 allows pin changes
+    if(uart->uart_nr != UART0) // Only UART0 allows pin changes
+        return false;
+
+    if(uart->tx_enabled && uart->tx_pin != tx)
     {
-        if(uart->tx_enabled && uart->tx_pin != tx)
+        if( rx == 13 && tx == 15)
         {
-            if( rx == 13 && tx == 15)
+            if (!uart_swap(uart, 15))
+                return false;
+        }
+        else if (rx == 3 && (tx == 1 || tx == 2))
+        {
+            if (uart->rx_pin != rx)
             {
-                uart_swap(uart, 15);
+                if (!uart_swap(uart, tx))
+                    return false;
             }
-            else if (rx == 3 && (tx == 1 || tx == 2))
+            else
             {
-                if (uart->rx_pin != rx)
-                    uart_swap(uart, tx);
-                else
-                    uart_set_tx(uart, tx);
+                if (!uart_set_tx(uart, tx))
+                    return false;
             }
         }
-        if(uart->rx_enabled && uart->rx_pin != rx && rx == 13 && tx == 15)
-            uart_swap(uart, 15);
+        else
+            return false;
     }
+
+    if (uart->rx_enabled && uart->rx_pin != rx)
+    {
+        if (rx == 13 && tx == 15)
+        {
+            if (!uart_swap(uart, 15))
+                return false;
+        }
+        else
+            return false;
+    }
+
+    return true;
 }
 
 
