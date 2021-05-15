@@ -333,28 +333,12 @@ size_t WiFiClientSecureCtx::write_P(PGM_P buf, size_t size) {
   return _write((const uint8_t *)buf, size, true);
 }
 
-// We have to manually read and send individual chunks.
 size_t WiFiClientSecureCtx::write(Stream& stream) {
-  size_t totalSent = 0;
-  size_t countRead;
-  size_t countSent;
-
   if (!connected() || !_handshake_done) {
     DEBUG_BSSL("write: Connect/handshake not completed yet\n");
     return 0;
   }
-
-  do {
-    uint8_t temp[256]; // Temporary chunk size same as ClientContext
-    countSent = 0;
-    countRead = stream.readBytes(temp, sizeof(temp));
-    if (countRead) {
-      countSent = _write((const uint8_t*)temp, countRead, true);
-      totalSent += countSent;
-    }
-    yield(); // Feed the WDT
-  } while ((countSent == countRead) && (countSent > 0));
-  return totalSent;
+  return stream.sendAll(this);
 }
 
 int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
