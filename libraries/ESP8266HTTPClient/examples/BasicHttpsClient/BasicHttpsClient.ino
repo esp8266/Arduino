@@ -44,6 +44,8 @@ void loop() {
     std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
 
     client->setFingerprint(fingerprint);
+    // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+    // client->setInsecure();
 
     HTTPClient https;
 
