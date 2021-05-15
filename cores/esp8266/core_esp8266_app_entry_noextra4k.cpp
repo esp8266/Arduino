@@ -28,7 +28,7 @@ extern "C" void call_user_start();
 static cont_t g_cont __attribute__ ((aligned (16)));
 
 #if defined(DEBUG_ESP_HWDT_NOEXTRA4K) || defined(DEBUG_ESP_HWDT)
-extern "C" cont_t * ICACHE_RAM_ATTR get_noextra4k_g_pcont(void)
+extern "C" cont_t * IRAM_ATTR get_noextra4k_g_pcont(void)
 {
     return &g_cont;
 }

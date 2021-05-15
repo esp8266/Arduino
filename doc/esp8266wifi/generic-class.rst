@@ -61,6 +61,8 @@ linker).
 
 .. code:: cpp
 
+    #include <ESP8266WiFi.h>
+
     void setup () {
     #ifdef WIFI_IS_OFF_AT_BOOT
         enableWiFiAtBootTime(); // can be called from anywhere with the same effect
@@ -78,9 +80,6 @@ Once ``WiFi.persistent(false)`` is called, ``WiFi.begin``, ``WiFi.disconnect``, 
 mode
 ~~~~
 
-Regular WiFi modes
-__________________
-
 .. code:: cpp
 
     bool mode(WiFiMode_t m)
@@ -91,25 +90,6 @@ Switches to one of the regular WiFi modes, where ``m`` is one of:
 -  ``WIFI_STA``: switch to `Station (STA) <readme.rst#station>`__ mode.
 -  ``WIFI_AP``: switch to `Access Point (AP) <readme.rst#soft-access-point>`__ mode.
 -  ``WIFI_AP_STA``: enable both Station (STA) and Access Point (AP) mode.
-
-Pseudo-modes
-____________
-
-.. code:: cpp
-
-    bool mode(WiFiMode_t m, WiFiState* state)
-
-Used with the following pseudo-modes, where ``m`` is one of:
-
--  ``WIFI_SHUTDOWN``: Fills in the provided ``WiFiState`` structure, switches to ``WIFI_OFF`` mode and puts WiFi into forced sleep, preserving energy.
--  ``WIFI_RESUME``: Turns WiFi on and tries to re-establish the WiFi connection stored in the ``WiFiState`` structure.
-
-These modes are used in low-power scenarios, e.g. where ESP.deepSleep is used between actions to preserve battery power.
-
-It is the user's responsibility to preserve the WiFiState between ``WIFI_SHUTDOWN`` and ``WIFI_RESUME``, e.g. by storing it
-in RTC user data and/or flash memory.
-
-There is an example sketch `WiFiShutdown.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiShutdown/WiFiShutdown.ino>`__ available in the examples folder of the ESP8266WiFi library.
 
 getMode
 ~~~~~~~
@@ -197,6 +177,41 @@ getPhyMode
 
 Gets the WiFi radio phy mode that is currently set.
 
+forceSleepBegin
+~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  forceSleepBegin (uint32 sleepUs=0)
+
+Saves the currently set WiFi mode and starts forced modem sleep for the specified time (us)
+
+forceSleepWake
+~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  forceSleepWake ()
+
+Called after `forceSleepBegin()`. Restores the previous WiFi mode and attempts reconnection when STA was active.
+
+shutdown and resumeFromShutdown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  shutdown (WiFiState& state)
+    bool  shutdown (WiFiState& state, uint32 sleepUs)
+    bool  resumeFromShutdown (WiFiState& state)
+    bool  shutdownValidCRC (const WiFiState& state)
+
+Stores the STA interface IP configuration in the specified ``state`` struct and calls ``forceSleepBegin(sleepUs)``.
+Restores STA interface configuration from the ``state`` and calls ``forceSleepWake()``.
+
+These methods are intended to be used in low-power scenarios, e.g. where ESP.deepSleep is used between actions to preserve battery power. It is the user's responsibility to preserve the WiFiState between ``shutdown()`` and ``resumeFromShutdown()`` by storing it in the RTC user data and/or flash memory.
+
+See `WiFiShutdown.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiShutdown/WiFiShutdown.ino>`__ for an example of usage.
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -206,8 +221,6 @@ Other Function Calls
     WiFiSleepType_t  getSleepMode ()
     bool  enableSTA (bool enable)
     bool  enableAP (bool enable)
-    bool  forceSleepBegin (uint32 sleepUs=0)
-    bool  forceSleepWake ()
     int  hostByName (const char *aHostname, IPAddress &aResult)
 
     appeared with SDK pre-V3:
