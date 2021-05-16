@@ -26,13 +26,20 @@ extern "C" {
 
 extern uint32_t xthal_get_ccount();
 
-#define WAIT_FOR_PIN_STATE(state) \
-    while (digitalRead(pin) != (state)) { \
-        if (xthal_get_ccount() - start_cycle_count > timeout_cycles) { \
-            return 0; \
-        } \
-        optimistic_yield(1000); \
+namespace {
+    inline __attribute__((always_inline)) bool waitForPinState(
+        const uint8_t pin, const uint8_t state,
+        const uint32_t timeout_cycles, const uint32_t start_cycle_count)
+    {
+        while (digitalRead(pin) != state) {
+            if (xthal_get_ccount() - start_cycle_count > timeout_cycles) {
+                return false;
+            }
+            optimistic_yield(1000);
+        }
+        return true;
     }
+}
 
 // max timeout is 27 seconds at 160MHz clock and 54 seconds at 80MHz clock
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
@@ -43,10 +50,16 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
     }
     const uint32_t timeout_cycles = microsecondsToClockCycles(timeout);
     const uint32_t start_cycle_count = xthal_get_ccount();
-    WAIT_FOR_PIN_STATE(!state);
-    WAIT_FOR_PIN_STATE(state);
+    if (!waitForPinState(pin, !state, timeout_cycles, start_cycle_count)) {
+        return 0;
+    }
+    if (!waitForPinState(pin, state, timeout_cycles, start_cycle_count)) {
+        return 0;
+    }
     const uint32_t pulse_start_cycle_count = xthal_get_ccount();
-    WAIT_FOR_PIN_STATE(!state);
+    if (!waitForPinState(pin, !state, timeout_cycles, start_cycle_count)) {
+        return 0;
+    }
     return clockCyclesToMicroseconds(xthal_get_ccount() - pulse_start_cycle_count);
 }
 
