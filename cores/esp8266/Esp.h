@@ -114,6 +114,12 @@ class EspClass {
         ///  it would have to be restored explicitly.
         static void autoSleepOff();
 
+        static void neverSleep();
+        /// Any prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before neverSleep,
+        ///  it would have to be restored explicitly.
+        static void neverSleepOff();
+
         static bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         static bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
 

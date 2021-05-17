@@ -125,6 +125,12 @@ void EspClass::autoLightSleep() {
 void EspClass::autoSleepOff() {
 }
 
+void EspClass::neverSleep() {
+}
+
+void EspClass::neverSleepOff() {
+}
+
 
 void EspClass::restart()
 {

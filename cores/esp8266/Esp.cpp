@@ -300,6 +300,24 @@ void EspClass::autoSleepOff() {
     saved_sleep_type = NONE_SLEEP_T;
 }
 
+void EspClass::neverSleep() {
+    const auto active_sleep_type = wifi_get_sleep_type();
+    if (NONE_SLEEP_T == active_sleep_type) {
+        return;
+    }
+    wifi_fpm_close();
+    saved_sleep_type = active_sleep_type;
+    wifi_set_sleep_type(NONE_SLEEP_T);
+}
+
+void EspClass::neverSleepOff() {
+    if (NONE_SLEEP_T == saved_sleep_type) {
+        return;
+    }
+    wifi_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
+}
+
 /*
 Layout of RTC Memory is as follows:
 Ref: Espressif doc 2C-ESP8266_Non_OS_SDK_API_Reference, section 3.3.23 (system_rtc_mem_write)

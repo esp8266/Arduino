@@ -91,6 +91,10 @@ Some ESP-specific APIs related to the deep, modem, and light sleep modes, RTC an
 
 ``ESP.autoSleepOff()`` returns the chip to the automatic sleep mode that was effective before the preceding call to either ``ESP.autoModemSleep`` or ``ESP.autoLightSleep``.
 
+``ESP.neverSleep()`` immediately puts the chip into ``NONE_SLEEP`` mode.
+
+``ESP.neverSleepOff()`` returns the chip to any automatic sleep mode that was effective before the preceding call to ``ESP.neverSleep``.
+
 ``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. ``offset`` is measured in blocks of 4 bytes and can range from 0 to 127 blocks (total size of RTC memory is 512 bytes). ``data`` should be 4-byte aligned. The stored data can be retained between deep sleep cycles, but might be lost after power cycling the chip. Data stored in the first 32 blocks will be lost after performing an OTA update, because they are used by the Core internals.
 
 ``ESP.restart()`` restarts the CPU.

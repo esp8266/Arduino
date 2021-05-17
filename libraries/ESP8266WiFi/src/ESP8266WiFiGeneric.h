@@ -85,21 +85,11 @@ class ESP8266WiFiGenericClass {
 
         bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
         /**
-         * Set modem sleep mode (ESP32 compatibility)
+         * Set ESP866 to never sleep or return to previous mode (ESP32 compatibility)
          * @param enable true to enable
          * @return true if succeeded
          */
-        bool setSleep(bool enable)
-        {
-            if (enable)
-            {
-                return setSleepMode(WIFI_MODEM_SLEEP);
-            }
-            else
-            {
-                return setSleepMode(WIFI_NONE_SLEEP);
-            }
-        }
+        bool setSleep(bool enable);
         /**
          * Set sleep mode (ESP32 compatibility)
          * @param mode wifi_ps_type_t
