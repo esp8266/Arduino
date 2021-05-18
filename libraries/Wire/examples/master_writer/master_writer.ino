@@ -24,7 +24,7 @@ void setup() {
 byte x = 0;
 
 void loop() {
-  using periodic = esp8266::polledTimeout::periodicMs;
+  using periodic = PolledTimeout::periodicMs;
   static periodic nextPing(1000);
 
   if (nextPing) {

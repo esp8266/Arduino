@@ -28,7 +28,7 @@
 #include <Arduino.h>
 #include <PolledTimeout.h>
 
-class ExpiringTimeTracker : private esp8266::polledTimeout::oneShotMs {
+class ExpiringTimeTracker : private PolledTimeout::oneShotMs {
   
 public:
 

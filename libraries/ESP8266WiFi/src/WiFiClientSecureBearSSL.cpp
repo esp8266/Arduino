@@ -460,7 +460,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
     return -1;
   }
 
-  esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
+  PolledTimeout::oneShotMs loopTimeout(_timeout);
 
   for (int no_work = 0; blocking || no_work < 2;) {
     optimistic_yield(100);

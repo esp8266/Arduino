@@ -438,7 +438,7 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
     //tasks to wait correctly.
     constexpr unsigned int timeoutValue = 1000; //1 second
     if(can_yield()) {
-        using oneShot = esp8266::polledTimeout::oneShotFastMs;
+        using oneShot = PolledTimeout::oneShotFastMs;
         oneShot timeout(timeoutValue);
         while(wifi_get_opmode() != (uint8) m && !timeout)
             delay(5);

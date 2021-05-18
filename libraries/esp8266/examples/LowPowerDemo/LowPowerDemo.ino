@@ -99,9 +99,9 @@ static nv_s* nv = (nv_s*)RTC_USER_MEM; // user RTC RAM area
 uint32_t resetCount = 0;  // keeps track of the number of Deep Sleep tests / resets
 
 const uint32_t blinkDelay = 100; // fast blink rate for the LED when waiting for the user
-esp8266::polledTimeout::periodicMs blinkLED(blinkDelay);  // LED blink delay without delay()
-esp8266::polledTimeout::oneShotMs altDelay(blinkDelay);  // tight loop to simulate user code
-esp8266::polledTimeout::oneShotMs wifiTimeout(timeout);  // 30 second timeout on WiFi connection
+PolledTimeout::periodicMs blinkLED(blinkDelay);  // LED blink delay without delay()
+PolledTimeout::oneShotMs altDelay(blinkDelay);  // tight loop to simulate user code
+PolledTimeout::oneShotMs wifiTimeout(timeout);  // 30 second timeout on WiFi connection
 // use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 void wakeupCallback() {  // unlike ISRs, you can do a print() from a callback function

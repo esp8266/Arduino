@@ -18,7 +18,7 @@ const char *pass = STAPSK;
 void fetch(BearSSL::WiFiClientSecure *client) {
   client->write("GET / HTTP/1.0\r\nHost: tls.mbed.org\r\nUser-Agent: ESP8266\r\n\r\n");
   client->flush();
-  using oneShot = esp8266::polledTimeout::oneShot;
+  using oneShot = PolledTimeout::oneShot;
   oneShot timeout(5000);
   do {
     char tmp[32];

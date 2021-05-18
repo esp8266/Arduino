@@ -237,10 +237,10 @@ public:
     }
 
     bool sendTimeout(ip_addr_t* addr, uint16_t port,
-                     esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+                     PolledTimeout::oneShotFastMs::timeType timeoutMs)
     {
         err_t err;
-        esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
+        PolledTimeout::oneShotFastMs timeout(timeoutMs);
         while (((err = trySend(addr, port)) != ERR_OK) && !timeout)
             delay(0);
         if (err != ERR_OK)

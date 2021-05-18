@@ -490,7 +490,7 @@ size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
         _reset();
         return 0;
     }
-    esp8266::polledTimeout::oneShotMs timeOut(streamTimeout);
+    PolledTimeout::oneShotMs timeOut(streamTimeout);
     if (_progress_callback) {
         _progress_callback(0, _size);
     }

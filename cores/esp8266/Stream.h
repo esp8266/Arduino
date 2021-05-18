@@ -156,7 +156,7 @@ class Stream: public Print {
         // - for an efficient timeout management, Print/Stream classes
         //   should implement {output,input}CanTimeout()
 
-        using oneShotMs = esp8266::polledTimeout::oneShotFastMs;
+        using oneShotMs = PolledTimeout::oneShotFastMs;
         static constexpr int temporaryStackBufferSize = 64;
 
         // ::send*() methods:

@@ -15,7 +15,7 @@ fuzzycomp(argT a, argT b)
 
 TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::oneShotFastNs;
+  using PolledTimeout::oneShotFastNs;
   using timeType = oneShotFastNs::timeType;
   timeType before, after, delta;
 
@@ -49,7 +49,7 @@ TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
 
 TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::oneShotFastUs;
+  using PolledTimeout::oneShotFastUs;
   using timeType = oneShotFastUs::timeType;
   timeType before, after, delta;
 
@@ -83,7 +83,7 @@ TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
 
 TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::oneShotMs;
+  using PolledTimeout::oneShotMs;
   using timeType = oneShotMs::timeType;
   timeType before, after, delta;
 
@@ -117,7 +117,7 @@ TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::oneShotMs;
+  using PolledTimeout::oneShotMs;
   using timeType = oneShotMs::timeType;
   timeType before, after, delta;
 
@@ -151,7 +151,7 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
 
 TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::periodicMs;
+  using PolledTimeout::periodicMs;
   using timeType = periodicMs::timeType;
   timeType before, after, delta;
 
@@ -183,7 +183,7 @@ TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
 
 TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::periodicMs;
+  using PolledTimeout::periodicMs;
   using timeType = periodicMs::timeType;
   timeType before, after, delta;
 
@@ -212,8 +212,9 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout]")
 {
-  using YieldOrSkipPolicy = esp8266::polledTimeout::YieldPolicy::YieldOrSkip;
-  using oneShotMsYield = esp8266::polledTimeout::timeoutTemplate<false, YieldOrSkipPolicy>;
+  using YieldOrSkipPolicy = YieldPolicy::YieldOrSkip;
+  using TimeMillisPolicy = TimePolicy::TimeMillis;
+  using oneShotMsYield = PolledTimeout::TimeoutTemplate<false, YieldOrSkipPolicy, TimeMillisPolicy>;
   using timeType = oneShotMsYield::timeType;
   timeType before, after, delta;
 
