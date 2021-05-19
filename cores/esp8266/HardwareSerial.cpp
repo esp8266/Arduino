@@ -146,7 +146,6 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
         if ((detectedBaudrate = testBaudrate())) {
           break;
         }
-        yield();
         delay(100);
     }
     return detectedBaudrate;
