@@ -213,6 +213,7 @@ public:
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
+	int writeToPrint(Print* print);
     int writeToStream(Stream* stream);
     const String& getString(void);
     static String errorToString(int error);
