@@ -269,3 +269,21 @@ jobs:
           bash ./tests/ci/build_boards.sh
           bash ./tests/ci/eboot_test.sh
           bash ./tests/ci/pkgrefs_test.sh
+
+
+# Validate orthography
+  code-spell:
+    name: Check spelling
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Run codespell
+      uses: codespell-project/actions-codespell@master
+      with:
+        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial
+        ignore_words_list: ESP8266,esp8266,esp
