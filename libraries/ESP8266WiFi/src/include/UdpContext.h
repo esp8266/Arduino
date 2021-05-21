@@ -270,7 +270,7 @@ public:
         // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
         // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
         //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...
-        // _rx_buf is currently adsressing a data pbuf,
+        // _rx_buf is currently adressing a data pbuf,
         // in this function it is going to be discarded.
 
         auto deleteme = _rx_buf;
