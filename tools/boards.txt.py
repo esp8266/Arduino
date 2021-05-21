@@ -1705,7 +1705,7 @@ def package ():
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
-    # To get consistent indent/formatting read the JSON and write it out programattically
+    # To get consistent indent/formatting read the JSON and write it out programmatically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
             filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)

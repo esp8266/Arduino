@@ -7,7 +7,7 @@
 #define ALWAYS_INLINE inline __attribute__ ((always_inline))
 #endif
 
-// Use FORCE_ALWAYS_INLINE to ensure HeapSelect... construtor/deconstructor
+// Use FORCE_ALWAYS_INLINE to ensure HeapSelect... constructor/deconstructor
 // are placed in IRAM
 #ifdef FORCE_ALWAYS_INLINE_HEAP_SELECT
 #define MAYBE_ALWAYS_INLINE ALWAYS_INLINE

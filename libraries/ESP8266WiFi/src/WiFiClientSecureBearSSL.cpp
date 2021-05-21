@@ -963,7 +963,7 @@ extern "C" {
     uint16_t suites[cipher_cnt];
     memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
     br_ssl_client_zero(cc);
-    br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegociation, as we free the Private Key after handshake
+    br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegotiation, as we free the Private Key after handshake
     br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
     br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
     br_ssl_client_set_default_rsapub(cc);
@@ -989,7 +989,7 @@ extern "C" {
     uint16_t suites[cipher_cnt];
     memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
     br_ssl_server_zero(cc);
-    br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegociation, as we free the Private Key after handshake
+    br_ssl_engine_add_flags(&cc->eng, BR_OPT_NO_RENEGOTIATION);  // forbid SSL renegotiation, as we free the Private Key after handshake
     br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
     br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
 #ifndef BEARSSL_SSL_BASIC

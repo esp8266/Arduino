@@ -555,7 +555,7 @@ void setup(void) {
   DBG_OUTPUT_PORT.println(fsOK ? F("Filesystem initialized.") : F("Filesystem init failed!"));
 
 #ifdef USE_SPIFFS
-  // Debug: dump on console contents of filesytem with no filter and check filenames validity
+  // Debug: dump on console contents of filesystem with no filter and check filenames validity
   Dir dir = fileSystem->openDir("");
   DBG_OUTPUT_PORT.println(F("List of files at root of filesystem:"));
   while (dir.next()) {
