@@ -139,7 +139,7 @@ void SPIClass::setHwCs(bool use) {
     useHwCs = use;
 }
 
-void SPIClass::beginTransaction(SPISettings settings) {
+void SPIClass::beginTransaction(const SPISettings& settings) {
     while(SPI1CMD & SPIBUSY) {}
     setFrequency(settings._clock);
     setBitOrder(settings._bitOrder);
