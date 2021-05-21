@@ -132,7 +132,7 @@ public:
 
     int peek(void) override
     {
-        // return -1 when data is unvailable (arduino api)
+        // return -1 when data is unavailable (arduino api)
         return uart_peek_char(_uart);
     }
 
@@ -162,7 +162,7 @@ public:
 
     int read(void) override
     {
-        // return -1 when data is unvailable (arduino api)
+        // return -1 when data is unavailable (arduino api)
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout

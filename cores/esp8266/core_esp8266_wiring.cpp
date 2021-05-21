@@ -69,8 +69,8 @@ void micros_overflow_tick(void* arg) {
 //---------------------------------------------------------------------------
 // millis() 'magic multiplier' approximation
 //
-// This function corrects the cumlative (296us / usec overflow) drift
-// seen in the orignal 'millis()' function.
+// This function corrects the cumulative (296us / usec overflow) drift
+// seen in the original 'millis()' function.
 //
 // Input:
 //    'm' - 32-bit usec counter,           0 <= m <= 0xFFFFFFFF

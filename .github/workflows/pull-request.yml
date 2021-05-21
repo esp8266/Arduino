@@ -285,5 +285,5 @@ jobs:
     - name: Run codespell
       uses: codespell-project/actions-codespell@master
       with:
-        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial
-        ignore_words_list: ESP8266,esp8266,esp
+        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial,./tools/sdk,./tools/esptool,./libraries/SoftwareSerial
+        ignore_words_list: ESP8266,esp8266,esp,dout,DOUT

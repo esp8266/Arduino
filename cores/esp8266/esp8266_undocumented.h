@@ -185,7 +185,7 @@ typedef void (*fn_c_exception_handler_t)(struct __exception_frame *ef, int cause
   _xtos_c_handler_table[]. It is present when an exception handler has not been
   registered. It simply consist of a single instruction, `ret`.
   It is also internally used by `_xtos_set_exception_handler(cause, NULL)` to
-  reset a "C" exception handler back to the unhandled state. The coresponding
+  reset a "C" exception handler back to the unhandled state. The corresponding
   `_xtos_exc_handler_table` entry will be set to `_xtos_unhandled_exception`.
   Note, if nesting handlers is desired this must be implemented in the new "C"
   exception handler(s) being registered.

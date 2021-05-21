@@ -6,13 +6,13 @@ Generic ESP8266 Module
 
 These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.
 
-Usually these modules have no bootstapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.
+Usually these modules have no bootstrapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.
 
 In order to use these modules, make sure to observe the following:
 
 -  **Provide sufficient power to the module.** For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required. Using the power available from USB to Serial adapter is not recommended, these adapters typically do not supply enough current to run ESP8266 reliably in every situation. An external supply or regulator alongwith filtering capacitors is preferred.
 
--  **Connect bootstapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.
+-  **Connect bootstrapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.
 
 -  **Put ESP8266 into bootloader mode** before uploading code.
 
