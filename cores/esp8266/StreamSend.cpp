@@ -104,22 +104,13 @@ size_t Stream::SendGenericPeekBuffer(Print* to, const ssize_t len, const int rea
             {
                 peekConsume(w);
                 written += w;
-                if (maxLen)
-                {
-                    timedOut.reset();
-                }
+                timedOut.reset(); // something has been written
             }
             if (foundChar)
             {
                 peekConsume(1);
                 break;
             }
-        }
-
-        if (!w && !maxLen && readUntilChar < 0)
-        {
-            // nothing has been transferred and no specific condition is requested
-            break;
         }
 
         if (timedOut)
@@ -195,16 +186,7 @@ size_t Stream::SendGenericRegularUntil(Print* to, const ssize_t len, const int r
                 break;
             }
             written += 1;
-            if (maxLen)
-            {
-                timedOut.reset();
-            }
-        }
-
-        if (!w && !maxLen && readUntilChar < 0)
-        {
-            // nothing has been transferred and no specific condition is requested
-            break;
+            timedOut.reset(); // something has been written
         }
 
         if (timedOut)
@@ -288,16 +270,7 @@ size_t Stream::SendGenericRegular(Print* to, const ssize_t len, const esp8266::p
                 setReport(Report::WriteError);
                 break;
             }
-            if (maxLen && w)
-            {
-                timedOut.reset();
-            }
-        }
-
-        if (!w && !maxLen)
-        {
-            // nothing has been transferred and no specific condition is requested
-            break;
+            timedOut.reset(); // something has been written
         }
 
         if (timedOut)

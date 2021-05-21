@@ -87,75 +87,75 @@ typedef enum {
 class EspClass {
     public:
         // TODO: figure out how to set WDT timeout
-        void wdtEnable(uint32_t timeout_ms = 0);
+        static void wdtEnable(uint32_t timeout_ms = 0);
         // note: setting the timeout value is not implemented at the moment
-        void wdtEnable(WDTO_t timeout_ms = WDTO_0MS);
+        static void wdtEnable(WDTO_t timeout_ms = WDTO_0MS);
 
-        void wdtDisable();
-        void wdtFeed();
+        static void wdtDisable();
+        static void wdtFeed();
 
-        void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
-        void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
-        uint64_t deepSleepMax();
+        static void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        static void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        static uint64_t deepSleepMax();
 
-        bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
-        bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
+        static bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
+        static bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
 
-        void reset();
-        void restart();
+        static void reset();
+        static void restart();
 	/**
 	 * @brief When calling this method the ESP8266 reboots into the UART download mode without
 	 * the need of any external wiring. This is the same mode which can also be entered by
 	 * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
 	 */
-        [[noreturn]] void rebootIntoUartDownloadMode();
+        [[noreturn]] static void rebootIntoUartDownloadMode();
 
-        uint16_t getVcc();
-        uint32_t getChipId();
+        static uint16_t getVcc();
+        static uint32_t getChipId();
 
-        uint32_t getFreeHeap();
-        uint16_t getMaxFreeBlockSize();
-        uint8_t getHeapFragmentation(); // in %
-        void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
+        static uint32_t getFreeHeap();
+        static uint16_t getMaxFreeBlockSize();
+        static uint8_t getHeapFragmentation(); // in %
+        static void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
 
-        uint32_t getFreeContStack();
-        void resetFreeContStack();
+        static uint32_t getFreeContStack();
+        static void resetFreeContStack();
 
-        const char * getSdkVersion();
-        String getCoreVersion();
-        String getFullVersion();
+        static const char * getSdkVersion();
+        static String getCoreVersion();
+        static String getFullVersion();
 
-        uint8_t getBootVersion();
-        uint8_t getBootMode();
+        static uint8_t getBootVersion();
+        static uint8_t getBootMode();
 
 #if defined(F_CPU) || defined(CORE_MOCK)
         constexpr
 #endif
-            inline uint8_t getCpuFreqMHz() const __attribute__((always_inline))
+            static inline uint8_t getCpuFreqMHz() __attribute__((always_inline))
         {
             return esp_get_cpu_freq_mhz();
         }
 
-        uint32_t getFlashChipId();
-        uint8_t getFlashChipVendorId();
+        static uint32_t getFlashChipId();
+        static uint8_t getFlashChipVendorId();
 
         //gets the actual chip size based on the flash id
-        uint32_t getFlashChipRealSize();
+        static uint32_t getFlashChipRealSize();
         //gets the size of the flash as set by the compiler
-        uint32_t getFlashChipSize();
-        uint32_t getFlashChipSpeed();
-        FlashMode_t getFlashChipMode();
-        uint32_t getFlashChipSizeByChipId();
+        static uint32_t getFlashChipSize();
+        static uint32_t getFlashChipSpeed();
+        static FlashMode_t getFlashChipMode();
+        static uint32_t getFlashChipSizeByChipId();
 
-        uint32_t magicFlashChipSize(uint8_t byte);
-        uint32_t magicFlashChipSpeed(uint8_t byte);
-        FlashMode_t magicFlashChipMode(uint8_t byte);
+        static uint32_t magicFlashChipSize(uint8_t byte);
+        static uint32_t magicFlashChipSpeed(uint8_t byte);
+        static FlashMode_t magicFlashChipMode(uint8_t byte);
 
-        bool checkFlashConfig(bool needsEquals = false);
+        static bool checkFlashConfig(bool needsEquals = false);
 
-        bool checkFlashCRC();
+        static bool checkFlashCRC();
 
-        bool flashEraseSector(uint32_t sector);
+        static bool flashEraseSector(uint32_t sector);
         /**
          * @brief Write @a size bytes from @a data to flash at @a address
          * This overload requires @a data and @a size to be always 4 byte aligned and
@@ -168,7 +168,7 @@ class EspClass {
          * @retval true success
          * @retval false failure to write to flash or incorrect alignment of params
          */
-        bool flashWrite(uint32_t address, const uint32_t *data, size_t size);
+        static bool flashWrite(uint32_t address, const uint32_t *data, size_t size);
         /**
          * @brief Write @a size bytes from @a data to flash at @a address
          * This overload handles all misalignment cases
@@ -177,7 +177,7 @@ class EspClass {
          * @param size amount of data, passing not multiple of 4 will cause additional reads and writes
          * @return bool result of operation
          */
-        bool flashWrite(uint32_t address, const uint8_t *data, size_t size);
+        static bool flashWrite(uint32_t address, const uint8_t *data, size_t size);
         /**
          * @brief Read @a size bytes to @a data to flash at @a address
          * This overload requires @a data and @a size to be 4 byte aligned
@@ -188,7 +188,7 @@ class EspClass {
          * @retval true success
          * @retval false failure to read from flash or incorrect alignment of params
          */
-        bool flashRead(uint32_t address, uint32_t *data, size_t size);
+        static bool flashRead(uint32_t address, uint32_t *data, size_t size);
         /**
          * @brief Read @a size bytes to @a data to flash at @a address
          * This overload handles all misalignment cases
@@ -197,29 +197,29 @@ class EspClass {
          * @param size amount of data, passing not multiple of 4 will cause additional read
          * @return bool result of operation
          */
-        bool flashRead(uint32_t address, uint8_t *data, size_t size);
+        static bool flashRead(uint32_t address, uint8_t *data, size_t size);
 
-        uint32_t getSketchSize();
-        String getSketchMD5();
-        uint32_t getFreeSketchSpace();
-        bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
+        static uint32_t getSketchSize();
+        static String getSketchMD5();
+        static uint32_t getFreeSketchSpace();
+        static bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
 
-        String getResetReason();
-        String getResetInfo();
-        struct rst_info * getResetInfoPtr();
+        static String getResetReason();
+        static String getResetInfo();
+        static struct rst_info * getResetInfoPtr();
 
-        bool eraseConfig();
+        static bool eraseConfig();
 
-        uint8_t *random(uint8_t *resultArray, const size_t outputSizeBytes) const;
-        uint32_t random() const;
+        static uint8_t *random(uint8_t *resultArray, const size_t outputSizeBytes);
+        static uint32_t random();
 
 #if !defined(CORE_MOCK)
-        inline uint32_t getCycleCount() __attribute__((always_inline))
+        static inline uint32_t getCycleCount() __attribute__((always_inline))
         {
             return esp_get_cycle_count();
         }
 #else
-        uint32_t getCycleCount();
+        static uint32_t getCycleCount();
 #endif // !defined(CORE_MOCK)
         /**
          * @brief Push current Heap selection and set Heap selection to DRAM.
@@ -227,21 +227,21 @@ class EspClass {
          * @param none
          * @return none
          */
-        void setDramHeap();
+        static void setDramHeap();
         /**
          * @brief Push current Heap selection and set Heap selection to IRAM.
          *
          * @param none
          * @return none
          */
-        void setIramHeap();
+        static void setIramHeap();
         /**
          * @brief Push current Heap selection and set Heap selection to External. (Experimental)
          *
          * @param none
          * @return none
          */
-        void setExternalHeap();
+        static void setExternalHeap();
         /**
          * @brief Restores Heap selection back to value present when
          * setDramHeap, setIramHeap, or setExternalHeap was called.
@@ -249,7 +249,7 @@ class EspClass {
          * @param none
          * @return none
          */
-        void resetHeap();
+        static void resetHeap();
     private:
         /**
          * @brief Replaces @a byteCount bytes of a 4 byte block on flash
@@ -261,7 +261,7 @@ class EspClass {
          * @retval true success
          * @retval false failed to read/write or invalid args
          */
-        bool flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_t byteCount);
+        static bool flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_t byteCount);
         /**
          * @brief Write up to @a size bytes from @a data to flash at @a address
          * This function takes case of unaligned memory access by copying @a data to a temporary buffer,
@@ -272,7 +272,7 @@ class EspClass {
          * @param size amount of data
          * @return size_t amount of data written, 0 on failure
          */
-        size_t flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size);
+        static size_t flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size);
         /**
          * @brief Splits up to 4 bytes into 4 byte blocks and writes them to flash
          * We need this since spi_flash_write cannot handle writing over a page boundary with unaligned offset
@@ -283,7 +283,7 @@ class EspClass {
          * @param size amount of data, must be < 4
          * @return bool result of operation
          */
-        bool flashWritePageBreak(uint32_t address, const uint8_t *data, size_t size);
+        static bool flashWritePageBreak(uint32_t address, const uint8_t *data, size_t size);
 };
 
 extern EspClass ESP;

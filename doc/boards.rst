@@ -344,6 +344,14 @@ LOLIN(WEMOS) D1 R2 & mini
 
 Product page: https://www.wemos.cc/
 
+LOLIN(WEMOS) D1 mini (clone)
+----------------------------
+
+Clone variant of the LOLIN(WEMOS) D1 mini board,
+with enabled flash-mode menu, DOUT selected by default.
+
+Product page of the preferred official board: https://www.wemos.cc/
+
 LOLIN(WEMOS) D1 mini Pro
 ------------------------
 

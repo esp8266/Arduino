@@ -300,7 +300,7 @@ extern uint32_t stack_thunk_get_stack_bot() __attribute__((weak, alias("__zero_r
 #ifdef USE_IRAM
 #undef USE_IRAM
 #define USE_IRAM 1
-#define IRAM_MAYBE ICACHE_RAM_ATTR
+#define IRAM_MAYBE IRAM_ATTR
 
 #else
 #undef USE_IRAM
@@ -441,8 +441,8 @@ extern "C" {
 
 extern cont_t * get_noextra4k_g_pcont(void);
 
-cont_t * ICACHE_RAM_ATTR get_noextra4k_g_pcont(void) __attribute__((weak));
-cont_t * ICACHE_RAM_ATTR get_noextra4k_g_pcont(void) {
+cont_t * IRAM_ATTR get_noextra4k_g_pcont(void) __attribute__((weak));
+cont_t * IRAM_ATTR get_noextra4k_g_pcont(void) {
     return NULL;
 }
 
@@ -1027,7 +1027,7 @@ extern "C" void Cache_Read_Disable(void);
 extern "C" void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 
 #ifndef USE_IRAM
-static void ICACHE_RAM_ATTR __attribute__((noinline)) handle_hwdt_icache() __attribute__((used));
+static void IRAM_ATTR __attribute__((noinline)) handle_hwdt_icache() __attribute__((used));
 void handle_hwdt_icache() {
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
   handle_hwdt();
@@ -1055,7 +1055,7 @@ void hwdt_pre_sdk_init(void) {
 #endif
 }
 
-static void ICACHE_RAM_ATTR __attribute__((noinline)) hwdt_pre_sdk_init_icache(void) __attribute__((used));
+static void IRAM_ATTR __attribute__((noinline)) hwdt_pre_sdk_init_icache(void) __attribute__((used));
 void hwdt_pre_sdk_init_icache(void) {
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
 #ifdef DEBUG_ESP_HWDT_UART_SPEED
@@ -1154,7 +1154,7 @@ asm  (
 );
 
 #else
-void ICACHE_RAM_ATTR app_entry_start(void) {
+void IRAM_ATTR app_entry_start(void) {
 
 #ifdef USE_IRAM
     handle_hwdt();
@@ -1191,7 +1191,7 @@ void ICACHE_RAM_ATTR app_entry_start(void) {
     __builtin_unreachable();
 }
 
-void ICACHE_RAM_ATTR app_entry_redefinable(void) {
+void IRAM_ATTR app_entry_redefinable(void) {
     /*
      * There are 4 sections of code that share the stack starting near
      * 0x40000000.
