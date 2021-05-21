@@ -279,11 +279,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
     - name: Run codespell
       uses: codespell-project/actions-codespell@master
       with:
-        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial,./tools/sdk,./tools/esptool,./libraries/SoftwareSerial,./libraries/Ethernet
-        ignore_words_list: ESP8266,esp8266,esp,dout,DOUT,ser,alph,ans,nd,AlOg,Yau,TE,FLE,ths
+        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial,./tools/sdk,./tools/esptool,./libraries/SoftwareSerial,./libraries/Ethernet,./github/workflows,./libraries/ESP8266HTTPUpdateServer/examples/SecureBearSSLUpdater/SecureBearSSLUpdater.ino,./libraries/esp8266/examples/RTCUserMemory/RTCUserMemory.ino,./libraries/esp8266/examples/StreamString/StreamString.ino,./libraries/ESP8266WiFi/examples/BearSSL_Server/,./libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation.ino,./libraries/ESP8266WiFi/examples/BearSSL_Sessions/BearSSL_Sessions.ino,./libraries/ESP8266WebServer/examples/HelloServerBearSSL/HelloServerBearSSL.ino,./libraries/ESP8266WebServer/examples/HttpHashCredAuth/HttpHashCredAuth.ino,./cores/esp8266/spiffs,./tests/device/test_libc/libm_string.c
+        ignore_words_list: ESP8266,esp8266,esp,dout,DOUT,ser,ans
