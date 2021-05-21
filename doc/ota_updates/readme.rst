@@ -530,7 +530,8 @@ Simple updater downloads the file every time the function is called.
 
 .. code:: cpp
 
-    ESPhttpUpdate.update("192.168.0.2", 80, "/arduino.bin");
+    WiFiClient client;
+    ESPhttpUpdate.update(client, "192.168.0.2", 80, "/arduino.bin");
 
 Advanced updater
 ^^^^^^^^^^^^^^^^
@@ -541,7 +542,8 @@ The server-side script can respond as follows: - response code 200, and send the
 
 .. code:: cpp
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update("192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
+    WiFiClient client;
+    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
     switch(ret) {
         case HTTP_UPDATE_FAILED:
             Serial.println("[update] Update failed.");
@@ -553,6 +555,11 @@ The server-side script can respond as follows: - response code 200, and send the
             Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
             break;
     }
+
+TLS updater
+^^^^^^^^^^^
+
+Please read and try the examples provided with the library.
 
 Server request handling
 ~~~~~~~~~~~~~~~~~~~~~~~
