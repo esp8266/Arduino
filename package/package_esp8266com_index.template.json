@@ -139,6 +139,11 @@
                   },
                   {
                      "packager": "esp8266",
+                     "version": "3.0.0-newlib4.0.0-gnu23-48f7b08",
+                     "name": "mklittlefs"
+                  },
+                  {
+                     "packager": "esp8266",
                      "version": "3.7.2-post1",
                      "name": "python3"
                   }
