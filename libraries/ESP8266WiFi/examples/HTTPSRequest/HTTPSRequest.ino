@@ -123,7 +123,7 @@ void setup() {
   }
   String line = client.readStringUntil('\n');
   if (line.startsWith("{\"state\":\"success\"")) {
-    Serial.println("esp8266/Arduino CI successfull!");
+    Serial.println("esp8266/Arduino CI successful!");
   } else {
     Serial.println("esp8266/Arduino CI has failed");
   }
