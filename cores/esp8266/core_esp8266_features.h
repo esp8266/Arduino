@@ -105,8 +105,6 @@ uint64_t micros64(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 
-void enableWiFiAtBootTime (void) __attribute__((noinline));
-
 #if defined(F_CPU) || defined(CORE_MOCK)
 #ifdef __cplusplus
 constexpr
@@ -124,6 +122,9 @@ inline int esp_get_cpu_freq_mhz()
 }
 #endif
 
+// Call this function in your setup() to cause the phase locked version of the generator to
+// be linked in automatically.  Otherwise, the default PWM locked version will be used.
+void enablePhaseLockedWaveform(void);
 
 #ifdef __cplusplus
 }
