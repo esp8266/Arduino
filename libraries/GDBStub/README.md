@@ -30,9 +30,9 @@ in Git.
  * Modify your Makefile. You'll need to include the gdbstub sources: if your Makefile is structured like the
 ones in the Espressif examples, you can add `gdbstub` to the `SUBDIRS` define and `gdbstub/libgdbstub.a` to the
 `COMPONENTS_eagle.app.v6` define. Also, you probably want to add `-ggdb` to your compiler flags (`TARGET_LDFLAGS`)
-and, if you are debugging, change any optimation flags (-Os, -O2 etc) into `-Og`. Finally, make sure your Makefile
+and, if you are debugging, change any optimization flags (-Os, -O2 etc) into `-Og`. Finally, make sure your Makefile
 also compiles .S files.
- * Configure gdbstub by editting `gdbstub-cfg.h`. There are a bunch of options you can tweak: FreeRTOS or bare SDK,
+ * Configure gdbstub by editing `gdbstub-cfg.h`. There are a bunch of options you can tweak: FreeRTOS or bare SDK,
 private exception/breakpoint stack, console redirection to GDB, wait till debugger attachment etc. You can also
 configure the options by including the proper -Dwhatever gcc flags in your Makefiles.
  * In your user_main.c, add an `#include <../gdbstub/gdbstub.h>` and call `gdbstub_init();` somewhere in user_main.

@@ -241,7 +241,7 @@ void setup() {
 
   // install callback - called when settimeofday is called (by SNTP or user)
   // once enabled (by DHCP), SNTP is updated every hour by default
-  // ** optional boolean in callback function is true when triggerred by SNTP **
+  // ** optional boolean in callback function is true when triggered by SNTP **
   settimeofday_cb(time_is_set);
 
   // setup RTC time
@@ -251,7 +251,7 @@ void setup() {
   timeval tv = { rtc, 0 };
   settimeofday(&tv, nullptr);
 
-  // NTP servers may be overriden by your DHCP server for a more local one
+  // NTP servers may be overridden by your DHCP server for a more local one
   // (see below)
 
   // ----> Here is the ONLY ONE LINE needed in your sketch

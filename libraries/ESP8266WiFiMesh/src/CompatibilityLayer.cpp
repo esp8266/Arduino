@@ -84,7 +84,7 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient &currClient, int maxWait)
  * and pass that to the user-supplied handler.
  *
  * @message The string to send to the node.
- * @returns: True if the exchange was a succes, false otherwise.
+ * @returns: True if the exchange was a success, false otherwise.
  * 
  */
 // DEPRECATED!

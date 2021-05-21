@@ -56,7 +56,7 @@ _SPICommand(volatile uint32_t spiIfNum,
   if (spiIfNum>1)
      return SPI_RESULT_ERR;
 
-  // force SPI register access via base+offest. 
+  // force SPI register access via base+offset. 
   // Prevents loading individual address constants from flash.
   uint32_t *spibase = (uint32_t*)(spiIfNum ? &(SPI1CMD) : &(SPI0CMD));
   #define SPIREG(reg) (*((volatile uint32_t *)(spibase+(&(reg) - &(SPI0CMD)))))
@@ -141,7 +141,7 @@ _SPICommand(volatile uint32_t spiIfNum,
  *		data has been sent.
  *
  *  Note: This code has only been tested with SPI bus 0, but should work
- *        equally well with other busses. The ESP8266 has bus 0 and 1,
+ *        equally well with other buses. The ESP8266 has bus 0 and 1,
  *        newer chips may have more one day.
  */
 SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits) {

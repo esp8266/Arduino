@@ -149,7 +149,7 @@ void loop() {
 
   //check TCP clients for data
 #if 1
-  // Incredibly, this code is faster than the bufferred one below - #4620 is needed
+  // Incredibly, this code is faster than the buffered one below - #4620 is needed
   // loopback/3000000baud average 348KB/s
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     while (serverClients[i].available() && Serial.availableForWrite() > 0) {

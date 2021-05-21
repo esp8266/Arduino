@@ -195,7 +195,7 @@ DhcpServer::DhcpServer(netif* netif): _netif(netif)
             { 0 }           // gateway 0.0.0.0
         };
         begin(&ip);
-        fw_has_started_softap_dhcps = 2; // not 1, ending intial boot sequence
+        fw_has_started_softap_dhcps = 2; // not 1, ending initial boot sequence
     }
 };
 
@@ -454,10 +454,10 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
     *optptr++ = 1;
     *optptr++ = 0x00;
 
-#if 0 // vendor specific unititialized (??)
+#if 0 // vendor specific uninitialized (??)
     *optptr++ = 43; // vendor specific
     *optptr++ = 6;
-    // unitialized ?
+    // uninitialized ?
 #endif
 
 #if 0 // already set (DHCP_OPTION_SUBNET_MASK==1) (??)

@@ -254,7 +254,7 @@ unsigned long IRAM_ATTR millis_test_DEBUG ( void )
   } acc;
   acc.a[1] = 0;      // Zero high-acc
   
-  uint64_t  prd;     // Interm product
+  uint64_t  prd;     // Interim product
   
   // Get usec system time, usec overflow counter
   uint32_t  m = system_get_timeA();

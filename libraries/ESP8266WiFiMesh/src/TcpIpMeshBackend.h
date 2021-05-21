@@ -70,7 +70,7 @@ public:
   * This vector is unique for each mesh backend, but NetworkInfo elements can be directly transferred between the vectors as long as both SSID and BSSID are present.
   * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
   * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
-  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  * Note that old network indices often are invalidated whenever a new WiFi network scan occurs.
   *
   * Since the connectionQueue() is iterated over during transmissions, always use constConnectionQueue() from callbacks other than NetworkFilter.
   */
@@ -86,7 +86,7 @@ public:
   * This vector is unique for each mesh backend.
   * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
   * Connection attempts are indexed in the same order they were attempted.
-  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  * Note that old network indices often are invalidated whenever a new WiFi network scan occurs.
   */
   static std::vector<TransmissionOutcome> & latestTransmissionOutcomes();
 

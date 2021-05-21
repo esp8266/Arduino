@@ -273,7 +273,7 @@ int8_t ESP8266WiFiMulti::startScan()
  * @param connectTimeoutMs
  *      WiFi connect timeout in ms
  * @return
- *      WiFi conneciton status
+ *      WiFi connection status
  */
 wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
 {
