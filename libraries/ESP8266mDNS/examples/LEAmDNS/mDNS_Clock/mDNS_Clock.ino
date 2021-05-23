@@ -3,7 +3,7 @@
 
   This example demonstrates two features of the LEA MDNSResponder:
   1. The host and service domain negotiation process that ensures
-     the uniqueness of the finally choosen host and service domain name.
+     the uniqueness of the finally chosen host and service domain name.
   2. The dynamic MDNS service TXT feature
 
   A 'clock' service in announced via the MDNS responder and the current
@@ -11,7 +11,7 @@
   The time value is updated every second!
 
   The ESP is initially announced to clients as 'esp8266.local', if this host domain
-  is already used in the local network, another host domain is negociated. Keep an
+  is already used in the local network, another host domain is negotiated. Keep an
   eye to the serial output to learn the final host domain for the clock service.
   The service itself is is announced as 'host domain'._espclk._tcp.local.
   As the service uses port 80, a very simple HTTP server is installed also to deliver
@@ -57,7 +57,7 @@
 const char*                   ssid                    = STASSID;
 const char*                   password                = STAPSK;
 
-char*                         pcHostDomain            = 0;        // Negociated host domain
+char*                         pcHostDomain            = 0;        // Negotiated host domain
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
@@ -90,7 +90,7 @@ void setClock(void) {
   configTime((TIMEZONE_OFFSET * 3600), (DST_OFFSET * 3600), "pool.ntp.org", "time.nist.gov", "time.windows.com");
 
   Serial.print("Waiting for NTP time sync: ");
-  time_t now = time(nullptr);   // Secs since 01.01.1970 (when uninitalized starts with (8 * 3600 = 28800)
+  time_t now = time(nullptr);   // Secs since 01.01.1970 (when uninitialized starts with (8 * 3600 = 28800)
   while (now < 8 * 3600 * 2) {  // Wait for realistic value
     delay(500);
     Serial.print(".");

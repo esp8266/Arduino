@@ -289,7 +289,7 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 };
 
 
-// These functions will be overriden from C++ code.
+// These functions will be overridden from C++ code.
 // Unfortunately, we can't use extern "C" because Arduino preprocessor
 // doesn't generate forward declarations for extern "C" functions correctly,
 // so we use mangled names here.

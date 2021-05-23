@@ -321,7 +321,7 @@ bool HTTPClient::setURL(const String& url)
 }
 
 /**
- * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+ * set redirect follow mode. See `followRedirects_t` enum for available modes.
  * @param follow
  */
 void HTTPClient::setFollowRedirects(followRedirects_t follow)
@@ -481,7 +481,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
                             // no redirection
                             break;
                         }
-                        // redirect using the same request method and payload, diffrent URL
+                        // redirect using the same request method and payload, different URL
                         redirect = true;
                     }
                     break;
@@ -703,7 +703,7 @@ const String& HTTPClient::getString(void)
     _payload.reset(new StreamString());
 
     if(_size > 0) {
-        // try to reserve needed memmory
+        // try to reserve needed memory
         if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
             return *_payload;

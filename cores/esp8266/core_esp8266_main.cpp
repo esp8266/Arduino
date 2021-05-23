@@ -290,7 +290,7 @@ void init_done() {
    know if other features are using this, or if this memory is going to be
    used in future SDK releases.
 
-   WPS beeing flawed by its poor security, or not beeing used by lots of
+   WPS being flawed by its poor security, or not being used by lots of
    users, it has been decided that we are still going to use that memory for
    user's stack and disable the use of WPS.
 

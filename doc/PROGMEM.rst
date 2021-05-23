@@ -5,7 +5,7 @@ Intro
 -----
 
 PROGMEM is a Arduino AVR feature that has been ported to ESP8266 to 
-ensure compatability with existing Arduino libraries, as well as, saving 
+ensure compatibility with existing Arduino libraries, as well as, saving 
 RAM. On the esp8266 declaring a string such as ``const char * xyz = 
 "this is a string"`` will place this string in RAM, not flash.  It is 
 possible to place a String into flash, and then load it into RAM when
@@ -283,7 +283,7 @@ generate as they are basically ``const char *``. On the other hand
 conversions from, very useful when overloading functions, and doing
 implicit type conversions. It is worth adding that if you wish to store
 an ``int``, ``float`` or pointer these can be stored and read back
-directly as they are 4 bytes in size and therefor will be always
+directly as they are 4 bytes in size and therefore will be always
 aligned!
 
 Hope this helps.

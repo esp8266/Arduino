@@ -162,27 +162,27 @@ class Stream: public Print {
         // ::send*() methods:
         // - always stop before timeout when "no-more-input-possible-data"
         //   or "no-more-output-possible-data" condition is met
-        // - always return number of transfered bytes
+        // - always return number of transferred bytes
         // When result is 0 or less than requested maxLen, Print::getLastSend()
         // contains an error reason.
 
         // transfers already buffered / immediately available data (no timeout)
-        // returns number of transfered bytes
+        // returns number of transferred bytes
         size_t sendAvailable (Print* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
         size_t sendAvailable (Print& to) { return sendAvailable(&to); }
 
         // transfers data until timeout
-        // returns number of transfered bytes
+        // returns number of transferred bytes
         size_t sendAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, -1, timeoutMs); }
         size_t sendAll (Print& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
 
-        // transfers data until a char is encountered (the char is swallowed but not transfered) with timeout
-        // returns number of transfered bytes
+        // transfers data until a char is encountered (the char is swallowed but not transferred) with timeout
+        // returns number of transferred bytes
         size_t sendUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, readUntilChar, timeoutMs); }
         size_t sendUntil (Print& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
 
         // transfers data until requested size or timeout
-        // returns number of transfered bytes
+        // returns number of transferred bytes
         size_t sendSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, maxLen, -1, timeoutMs); }
         size_t sendSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
 

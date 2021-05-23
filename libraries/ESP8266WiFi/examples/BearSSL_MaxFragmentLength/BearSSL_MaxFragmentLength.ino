@@ -73,7 +73,7 @@ int fetchMaxFragmentLength() {
   // returns true then you can use the ::setBufferSizes(rx, tx) to shrink
   // the needed BearSSL memory while staying within protocol limits.
   //
-  // If MFLN is not supported, you may still be able to mimimize the buffer
+  // If MFLN is not supported, you may still be able to minimize the buffer
   // sizes assuming you can ensure the server never transmits fragments larger
   // than the size (i.e. by using HTTP GET RANGE methods, etc.).
 

@@ -695,7 +695,7 @@ s32_t SPIFFS_tell(spiffs *fs, spiffs_file fh);
  * in this callback will mess things up for sure - do not do this.
  * This can be used to track where files are and move around during garbage
  * collection, which in turn can be used to build location tables in ram.
- * Used in conjuction with SPIFFS_open_by_page this may improve performance
+ * Used in conjunction with SPIFFS_open_by_page this may improve performance
  * when opening a lot of files.
  * Must be invoked after mount.
  *
@@ -710,7 +710,7 @@ s32_t SPIFFS_set_file_callback_func(spiffs *fs, spiffs_file_callback cb_func);
  * Maps the first level index lookup to a given memory map.
  * This will make reading big files faster, as the memory map will be used for
  * looking up data pages instead of searching for the indices on the physical
- * medium. When mapping, all affected indicies are found and the information is
+ * medium. When mapping, all affected indices are found and the information is
  * copied to the array.
  * Whole file or only parts of it may be mapped. The index map will cover file
  * contents from argument offset until and including arguments (offset+len).

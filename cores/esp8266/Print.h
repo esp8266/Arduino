@@ -76,7 +76,7 @@ class Print {
         inline size_t write(int8_t c) { return write((uint8_t) c); }
 
         // default to zero, meaning "a single write may block"
-        // should be overriden by subclasses with buffering
+        // should be overridden by subclasses with buffering
         virtual int availableForWrite() { return 0; }
 
         size_t printf(const char * format, ...)  __attribute__ ((format (printf, 2, 3)));

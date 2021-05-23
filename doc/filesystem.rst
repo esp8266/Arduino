@@ -127,7 +127,7 @@ when updgrading core versions.
 SPIFFS file system limitations
 ------------------------------
 
-The SPIFFS implementation for ESP8266 had to accomodate the
+The SPIFFS implementation for ESP8266 had to accommodate the
 constraints of the chip, among which its limited RAM.
 `SPIFFS <https://github.com/pellepl/spiffs>`__ was selected because it
 is designed for small systems, but that comes at the cost of some

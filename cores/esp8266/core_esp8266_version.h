@@ -1,4 +1,3 @@
-
 /*
  core_esp8266_version.h - parse "git describe" at compile time
  Copyright (c) 2018 david gauchard. All rights reserved.
@@ -159,7 +158,7 @@ int coreVersionSubRevision ()
 }
 
 /*
- * unique revision indentifier (never decreases)
+ * unique revision identifier (never decreases)
  */
 constexpr
 int coreVersionNumeric ()

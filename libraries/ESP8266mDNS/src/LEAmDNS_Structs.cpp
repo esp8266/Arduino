@@ -283,12 +283,12 @@ size_t MDNSResponder::stcMDNSServiceTxt::length(void) const
     A TXT item can be looke up by its 'key' member.
     Export as ';'-separated byte array is supported.
     Export as 'length byte coded' byte array is supported.
-    Comparision ((all A TXT items in B and equal) AND (all B TXT items in A and equal)) is supported.
+    Comparison ((all A TXT items in B and equal) AND (all B TXT items in A and equal)) is supported.
 
 */
 
 /*
-    MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts contructor
+    MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts constructor
 */
 MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts(void)
     :   m_pTxts(0)
@@ -387,7 +387,7 @@ bool MDNSResponder::stcMDNSServiceTxts::remove(stcMDNSServiceTxt* p_pTxt)
             delete p_pTxt;
             bResult = true;
         }
-        else if (m_pTxts == p_pTxt)     // No predecesor, but first item
+        else if (m_pTxts == p_pTxt)     // No predecessor, but first item
         {
             m_pTxts = p_pTxt->m_pNext;
             delete p_pTxt;
@@ -646,7 +646,7 @@ bool MDNSResponder::stcMDNSServiceTxts::operator!=(const stcMDNSServiceTxts& p_O
 /**
     MDNSResponder::stcMDNS_MsgHeader
 
-    A MDNS message haeder.
+    A MDNS message header.
 
 */
 
@@ -1328,7 +1328,7 @@ bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/
     and the flag m_bAutoName is set. If the hostname changes, all 'auto-
     named' services are renamed also.
     m_u8Replymask is used while preparing a response to a MDNS query. It is
-    resetted in '_sendMDNSMessage' afterwards.
+    reset in '_sendMDNSMessage' afterwards.
 */
 
 /*
@@ -1504,7 +1504,7 @@ bool MDNSResponder::stcMDNSService::releaseProtocol(void)
     - an IP4 address
     (- an IP6 address)
     - a MDNS TXTs
-    The existance of a component is flaged in 'm_u32ContentFlags'.
+    The existence of a component is flagged in 'm_u32ContentFlags'.
     For every answer component a TTL value is maintained.
     Answer objects can be connected to a linked list.
 
@@ -1899,7 +1899,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::removeIP4Address(MDNSRespond
             delete p_pIP4Address;
             bResult = true;
         }
-        else if (m_pIP4Addresses == p_pIP4Address)     // No predecesor, but first item
+        else if (m_pIP4Addresses == p_pIP4Address)     // No predecessor, but first item
         {
             m_pIP4Addresses = p_pIP4Address->m_pNext;
             delete p_pIP4Address;
@@ -2036,7 +2036,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::removeIP6Address(MDNSRespond
             delete p_pIP6Address;
             bResult = true;
         }
-        else if (m_pIP6Addresses == p_pIP6Address)     // No predecesor, but first item
+        else if (m_pIP6Addresses == p_pIP6Address)     // No predecessor, but first item
         {
             m_pIP6Addresses = p_pIP6Address->m_pNext;
             delete p_pIP6Address;
@@ -2123,7 +2123,7 @@ MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stc
     MDNSResponder::stcMDNSServiceQuery
 
     A service query object.
-    A static query is flaged via 'm_bLegacyQuery'; while the function 'queryService'
+    A static query is flagged via 'm_bLegacyQuery'; while the function 'queryService'
     is waiting for answers, the internal flag 'm_bAwaitingAnswers' is set. When the
     timeout is reached, the flag is removed. These two flags are only used for static
     service queries.
@@ -2282,7 +2282,7 @@ bool MDNSResponder::stcMDNSServiceQuery::removeAnswer(MDNSResponder::stcMDNSServ
             delete p_pAnswer;
             bResult = true;
         }
-        else if (m_pAnswers == p_pAnswer)   // No predecesor, but first item
+        else if (m_pAnswers == p_pAnswer)   // No predecessor, but first item
         {
             m_pAnswers = p_pAnswer->m_pNext;
             delete p_pAnswer;

@@ -13,7 +13,7 @@
  * to set the trace level #define DBGLOG_LEVEL x
  *
  * To update which of the DBGLOG macros are compiled in, you must redefine the
- * DBGLOG_LEVEL macro and the inlcude the dbglog.h file again, like this:
+ * DBGLOG_LEVEL macro and the include the dbglog.h file again, like this:
  *
  * #undef  DBGLOG_LEVEL
  * #define DBGLOG_LEVEL 6

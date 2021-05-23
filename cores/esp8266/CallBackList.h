@@ -1,9 +1,8 @@
 #ifndef __CALLBACKLIST_H__
 #define __CALLBACKLIST_H__
 
-
 /*
- CallBackList, An implemention for handling callback execution
+ CallBackList, An implementation for handling callback execution
 
  Copyright (c) 2019 Herman Reintke. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.

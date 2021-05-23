@@ -44,8 +44,8 @@ Usage
 
 5. Check the Serial Output
 
-Informations
-------------
+Information
+-----------
 
 It work with every sketch that enables the Serial interface that is
 selected as debug port.

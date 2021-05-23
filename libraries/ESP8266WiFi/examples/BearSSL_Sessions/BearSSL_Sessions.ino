@@ -135,7 +135,7 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
 
   BearSSL::Session session;
   client.setSession(&session);
-  Serial.printf("Connecting with an unitialized session...");
+  Serial.printf("Connecting with an uninitialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
   fetchURL(&client, host, port, path);

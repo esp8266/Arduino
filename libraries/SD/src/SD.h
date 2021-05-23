@@ -183,7 +183,7 @@ private:
 };
 
 
-// Expose FatStructs.h helpers for MSDOS date/time for use with dateTimeCallback
+// Expose FatStructs.h helpers for MS-DOS date/time for use with dateTimeCallback
 static inline uint16_t FAT_DATE(uint16_t year, uint8_t month, uint8_t day) {
   return (year - 1980) << 9 | month << 5 | day;
 }

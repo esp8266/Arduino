@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-// these auto classes wrap up xt_rsil so your code can be simplier, but can only be
+// these auto classes wrap up xt_rsil so your code can be simpler, but can only be
 // used in an ino or cpp files. 
 
 // InterruptLock is used when you want to completely disable interrupts

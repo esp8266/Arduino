@@ -44,7 +44,7 @@ public:
   // initialize, start listening on specified port. 
   // Returns 1 if successful, 0 if there are no sockets available to use
   uint8_t begin(uint16_t port) override;
-  // Finish with the UDP connetion
+  // Finish with the UDP connection
   void stop() override;
   // join a multicast group and listen on the given port
   uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port);
@@ -58,7 +58,7 @@ public:
   // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
   int beginPacket(const char *host, uint16_t port) override;
   // Start building up a packet to send to the multicast address
-  // multicastAddress - muticast address to send to
+  // multicastAddress - multicast address to send to
   // interfaceAddress - the local IP address of the interface that should be used
   //                    use WiFi.localIP() or WiFi.softAPIP() depending on the interface you need
   // ttl              - multicast packet TTL (default is 1)

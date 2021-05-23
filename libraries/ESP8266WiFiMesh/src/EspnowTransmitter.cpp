@@ -317,7 +317,7 @@ TransmissionStatusType EspnowTransmitter::espnowSendToNodeUnsynchronized(const S
       transmission[transmissionsRemainingIndex] = (char)transmissionsRemaining;
     }
 
-    // Fills indicies in range [transmissionMacIndex, transmissionMacIndex + 5] (6 bytes) with the MAC address of the WiFi AP interface.
+    // Fills indices in range [transmissionMacIndex, transmissionMacIndex + 5] (6 bytes) with the MAC address of the WiFi AP interface.
     // We always transmit from the station interface (due to using ESP_NOW_ROLE_CONTROLLER), so this makes it possible to always know both interface MAC addresses of a node that sends a transmission.
     WiFi.softAPmacAddress(transmission + transmissionMacIndex);
 
@@ -391,7 +391,7 @@ TransmissionStatusType EspnowTransmitter::espnowSendToNodeUnsynchronized(const S
       return TransmissionStatusType::TRANSMISSION_FAILED;
     }
 
-    --transmissionsRemaining; // This is used when transfering multi-transmission messages.
+    --transmissionsRemaining; // This is used when transferring multi-transmission messages.
     
   } while(transmissionsRemaining >= 0);
 

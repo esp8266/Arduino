@@ -186,7 +186,7 @@ public:
     // this helper is ready to be used when debugging UDP
     void printChain (const pbuf* pb, const char* msg, size_t n) const
     {
-        // printf the pb pbuf chain, bufferred and all at once
+        // printf the pb pbuf chain, buffered and all at once
         char buf[128];
         int l = snprintf(buf, sizeof(buf), "UDP: %s %u: ", msg, n);
         while (pb)
@@ -266,7 +266,7 @@ public:
             return true;
         }
 
-        // We have interleaved informations on addresses within received pbuf chain:
+        // We have interleaved information on addresses within received pbuf chain:
         // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
         // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
         //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...

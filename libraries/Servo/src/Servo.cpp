@@ -26,14 +26,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 uint32_t Servo::_servoMap = 0;
 
-// similiar to map but will have increased accuracy that provides a more
+// similar to map but will have increased accuracy that provides a more
 // symmetrical api (call it and use result to reverse will provide the original value)
 int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 {
     const int rangeIn = maxIn - minIn;
     const int rangeOut = maxOut - minOut;
     const int deltaIn = value - minIn;
-    // fixed point math constants to improve accurancy of divide and rounding
+    // fixed point math constants to improve accuracy of divide and rounding
     constexpr int fixedHalfDecimal = 1;
     constexpr int fixedDecimal = fixedHalfDecimal * 2;
 
