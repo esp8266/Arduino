@@ -266,13 +266,6 @@ else:
 
 
 #
-# Waveform
-#
-if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
-    env.Append(CPPDEFINES=[("WAVEFORM_LOCKED_PHASE", 1)])
-# PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PWM will be used by default
-
-#
 # Exceptions
 #
 if "PIO_FRAMEWORK_ARDUINO_ENABLE_EXCEPTIONS" in flatten_cppdefines:
