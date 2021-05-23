@@ -60,13 +60,15 @@ std::function<void(int)> ESP8266WiFiScanClass::_onComplete;
 
 /**
  * Start scan WiFi networks available
- * @param async         run in async mode
- * @param show_hidden   show hidden networks
- * @param channel       scan only this channel (0 for all channels)
- * @param ssid*         scan for only this ssid (NULL for all ssid's)
+ * @param async            run in async mode
+ * @param show_hidden      show hidden networks
+ * @param passive          scan type passive or active
+ * @param max_ms_per_chan  scan time per channel
+ * @param channel          scan only this channel (0 for all channels)
+ * @param ssid*            scan for only this ssid (NULL for all ssid's)
  * @return Number of discovered networks
  */
-int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 channel, uint8* ssid) {
+int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, bool passive, uint32_t max_ms_per_chan, uint8_t channel, uint8* ssid) {
     if(ESP8266WiFiScanClass::_scanStarted) {
         return WIFI_SCAN_RUNNING;
     }
@@ -87,6 +89,14 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
     config.ssid = ssid;
     config.channel = channel;
     config.show_hidden = show_hidden;
+    if(passive){
+        config.scan_type = WIFI_SCAN_TYPE_PASSIVE;
+        config.scan_time.passive = max_ms_per_chan;
+    } else {
+        config.scan_type = WIFI_SCAN_TYPE_ACTIVE;
+        config.scan_time.active.min = 100;
+        config.scan_time.active.max = max_ms_per_chan;
+    }
     if(wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiScanClass::_scanDone))) {
         ESP8266WiFiScanClass::_scanComplete = false;
         ESP8266WiFiScanClass::_scanStarted = true;
