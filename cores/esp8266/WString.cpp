@@ -201,8 +201,8 @@ bool String::changeBuffer(unsigned int maxStrLen) {
         }
         setSSO(false);
         setCapacity(newSize - 1);
-        setLen(oldLen); // Needed in case of SSO where len() never existed
         setBuffer(newbuffer);
+        setLen(oldLen); // Needed in case of SSO where len() never existed
         return true;
     }
     return false;
