@@ -3,7 +3,7 @@
 
   This example demonstrates two features of the LEA MDNSResponder:
   1. The host and service domain negotiation process that ensures
-     the uniqueness of the finally choosen host and service domain name.
+     the uniqueness of the finally chosen host and service domain name.
   2. The dynamic MDNS service lookup/query feature.
 
   A list of 'HTTP' services in the local network is created and kept up to date.
@@ -11,7 +11,7 @@
   and announced as a service.
 
   The ESP itself is initially announced to clients as 'esp8266.local', if this host domain
-  is already used in the local network, another host domain is negociated. Keep an
+  is already used in the local network, another host domain is negotiated. Keep an
   eye to the serial output to learn the final host domain for the HTTP service.
   The service itself is is announced as 'host domain'._http._tcp.local.
   The HTTP server delivers a short greeting and the current  list of other 'HTTP' services (not updated).
@@ -49,7 +49,7 @@
 const char*                                    ssid                    = STASSID;
 const char*                                    password                = STAPSK;
 
-char*                                          pcHostDomain            = 0;        // Negociated host domain
+char*                                          pcHostDomain            = 0;        // Negotiated host domain
 bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::hMDNSService                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
 MDNSResponder::hMDNSServiceQuery               hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder

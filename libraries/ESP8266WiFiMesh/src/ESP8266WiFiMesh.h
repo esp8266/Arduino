@@ -182,7 +182,7 @@ public:
   * A vector that contains the NetworkInfo for each WiFi network to connect to. 
   * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
   * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
-  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  * Note that old network indices often are invalidated whenever a new WiFi network scan occurs.
   */
   static std::vector<NetworkInfo> connectionQueue;
 
@@ -190,7 +190,7 @@ public:
   * A vector with the TransmissionResult for each AP to which a transmission was attempted during the latest attemptTransmission call.
   * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
   * Connection attempts are indexed in the same order they were attempted.
-  * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
+  * Note that old network indices often are invalidated whenever a new WiFi network scan occurs.
   */
   static std::vector<TransmissionResult> latestTransmissionOutcomes;
 

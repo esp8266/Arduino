@@ -6,7 +6,7 @@
 
 #if defined(UMM_CRITICAL_METRICS)
 /*
- * umm_malloc performance measurments for critical sections
+ * umm_malloc performance measurements for critical sections
  */
 UMM_TIME_STATS time_stats = {
     {0xFFFFFFFF, 0U, 0U, 0U},

@@ -19,7 +19,7 @@ WiFiClient+WiFiServer/ClientContext and WifiUdp/UdpContext using socket
 posix API.  Further work will optionally propose native lwIP library
 instead.
 
-Serial UART0 and UART1 are emulated via stdin/stdout/stderr.  Therefor
+Serial UART0 and UART1 are emulated via stdin/stdout/stderr.  Therefore
 stdin is connected to UART0(RX) and stdout is connected to UART0(TX).
 UART1(TX) writes to stderr.  Reading from stdin happens in non-blocking
 raw mode, that means each character is directly injected into the UART

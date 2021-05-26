@@ -19,10 +19,10 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
  This implementation is based on the original implementation of the ROM.
- It was shortend to reduce the memory usage. The complete version and the
+ It was shortened to reduce the memory usage. The complete version and the
  development history can be found in:
  https://github.com/twischer/Arduino/tree/reboot_uart_download_full
- This might be usefull in case of issues.
+ This might be useful in case of issues.
  */
 #include "reboot_uart_dwnld.h"
 #include <stdnoreturn.h>

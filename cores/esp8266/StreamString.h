@@ -230,7 +230,7 @@ public:
     StreamString(StreamString&& bro): String(bro), S2Stream(this) { }
     StreamString(const StreamString& bro): String(bro), S2Stream(this) { }
 
-    // duplicate String contructors and operator=:
+    // duplicate String constructors and operator=:
 
     StreamString(const char* text = nullptr): String(text), S2Stream(this) { }
     StreamString(const String& string): String(string), S2Stream(this) { }

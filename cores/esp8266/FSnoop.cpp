@@ -15,7 +15,7 @@ void close_all_fs(void)
 }
 
 // default weak definitions
-// they are overriden in their respective real implementation
+// they are overridden in their respective real implementation
 // hint: https://github.com/esp8266/Arduino/pull/6699#issuecomment-549085382
 
 void littlefs_request_end(void) __attribute__((weak));

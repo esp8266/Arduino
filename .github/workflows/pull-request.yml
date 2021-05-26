@@ -269,3 +269,18 @@ jobs:
           bash ./tests/ci/build_boards.sh
           bash ./tests/ci/eboot_test.sh
           bash ./tests/ci/pkgrefs_test.sh
+
+
+# Validate orthography
+  code-spell:
+    name: Check spelling
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Run codespell
+      uses: codespell-project/actions-codespell@master
+      with:
+        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial,./tools/sdk,./tools/esptool,./libraries/SoftwareSerial,./libraries/Ethernet,./github/workflows,./libraries/ESP8266HTTPUpdateServer/examples/SecureBearSSLUpdater/SecureBearSSLUpdater.ino,./libraries/esp8266/examples/RTCUserMemory/RTCUserMemory.ino,./libraries/esp8266/examples/StreamString/StreamString.ino,./libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation.ino,./libraries/ESP8266WiFi/examples/BearSSL_Sessions/BearSSL_Sessions.ino,./libraries/ESP8266WebServer/examples/HelloServerBearSSL/HelloServerBearSSL.ino,./libraries/ESP8266WebServer/examples/HttpHashCredAuth/HttpHashCredAuth.ino,./cores/esp8266/spiffs,./tests/device/test_libc/libm_string.c, ./libraries/Netdump/examples/Netdump/Netdump.ino,./libraries/ESP8266WiFi/examples/BearSSL_Server,./cores/esp8266/LwipIntfDev.h
+        ignore_words_list: ESP8266,esp8266,esp,dout,DOUT,ser,ans

@@ -188,7 +188,7 @@ TEST_CASE(TESTPRE "peek() returns -1 on EOF", TESTPAT)
     f.close();
 }
 
-TEST_CASE(TESTPRE "seek() pase EOF returns error (#7323)", TESTPAT)
+TEST_CASE(TESTPRE "seek() past EOF returns error (#7323)", TESTPAT)
 {
     FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
