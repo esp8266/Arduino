@@ -122,6 +122,7 @@ static void initTimer() {
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
   timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
   waveform.timer1Running = true;
+  waveform.nextEventCcy = ESP.getCycleCount() + IRQLATENCYCCYS;
   timer1_write(IRQLATENCYCCYS); // Cause an interrupt post-haste
 }
 
@@ -229,6 +230,7 @@ IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
     std::atomic_thread_fence(std::memory_order_release);
     // Must not interfere if Timer is due shortly
     if (T1V > IRQLATENCYCCYS) {
+      waveform.nextEventCcy = ESP.getCycleCount() + IRQLATENCYCCYS;
       timer1_write(IRQLATENCYCCYS);
     }
     while (waveform.toDisableBits) {
