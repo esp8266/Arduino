@@ -217,50 +217,50 @@
                      "host": "aarch64-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/aarch64-linux-gnu.xtensa-lx106-elf-48f7b08.210531.tar.gz",
                      "archiveFileName": "aarch64-linux-gnu.xtensa-lx106-elf-48f7b08.210531.tar.gz",
-                     "checksum": "SHA-256:75191fdf967a4bd02d9c569f0507641ad851e7674e15c2c322f7749a07ceea00",
-                     "size": "71017221"
+                     "checksum": "SHA-256:324bae5f10454bb5ae9006af648414b1cfdcf8198289c37e7cd2626dc5a04553",
+                     "size": "71016558"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/arm-linux-gnueabihf.xtensa-lx106-elf-48f7b08.210531.tar.gz",
                      "archiveFileName": "arm-linux-gnueabihf.xtensa-lx106-elf-48f7b08.210531.tar.gz",
-                     "checksum": "SHA-256:2d461d67a84d5bb4f7a7d3c9b6f095d633ef5d19b45ddfb08e3b2bd0973881c4",
-                     "size": "67110523"
+                     "checksum": "SHA-256:b9a1ba16546e727ad645edee998735c476020775b4591cecba5ef00cc3a86c41",
+                     "size": "67109096"
                   },
                   {
                      "host": "i686-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/i686-linux-gnu.xtensa-lx106-elf-48f7b08.210531.tar.gz",
                      "archiveFileName": "i686-linux-gnu.xtensa-lx106-elf-48f7b08.210531.tar.gz",
-                     "checksum": "SHA-256:8d39dc3d5ede41c875bb7e43360629961e14f633f7941f8f7e7375d3a4afa358",
-                     "size": "74206113"
+                     "checksum": "SHA-256:b7adb6bc83428a9458aa87f03d480dac9eb35fb5be672590d9b0cbc451728060",
+                     "size": "74203875"
                   },
                   {
                      "host": "i686-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/i686-w64-mingw32.xtensa-lx106-elf-48f7b08.210531.zip",
                      "archiveFileName": "i686-w64-mingw32.xtensa-lx106-elf-48f7b08.210531.zip",
-                     "checksum": "SHA-256:6e5eeb246d054e7eac9e1bf0740b2637ec9823c0342057ed11c8f9ff52a20ca1",
-                     "size": "71438369"
+                     "checksum": "SHA-256:d58e0f0929fe8944d382566bf693b5e7afa3b3b9858b52103aa6c9d5c0c18c64",
+                     "size": "71437453"
                   },
                   {
                      "host": "x86_64-apple-darwin",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-apple-darwin14.xtensa-lx106-elf-48f7b08.210531.tar.gz",
                      "archiveFileName": "x86_64-apple-darwin14.xtensa-lx106-elf-48f7b08.210531.tar.gz",
-                     "checksum": "SHA-256:0099cdeee8b928d36f4ee69b3452d93c78cc7aa4117faf60de6f1bd4ad6e5a43",
-                     "size": "75620899"
+                     "checksum": "SHA-256:f2525d8e48bdf587cff8cd3f254dc7336318d6fc868feb234e9433a87240624e",
+                     "size": "75621943"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-linux-gnu.xtensa-lx106-elf-48f7b08.210531.tar.gz",
                      "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-48f7b08.210531.tar.gz",
-                     "checksum": "SHA-256:39a62c0eff6038b6ae9baf1154b8ac0fffeb2ec0c440672d3b1f005c91249d2f",
-                     "size": "74722849"
+                     "checksum": "SHA-256:ee43b44255a51afe7490c984bd1aec444a445ffe7e23bbb68e50fc13e74ad058",
+                     "size": "74724674"
                   },
                   {
                      "host": "x86_64-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-w64-mingw32.xtensa-lx106-elf-48f7b08.210531.zip",
                      "archiveFileName": "x86_64-w64-mingw32.xtensa-lx106-elf-48f7b08.210531.zip",
-                     "checksum": "SHA-256:db298c08aeafd5f9b6c8cda7df58f3cc2af2ab8c0f288b0acb8d844884f408d8",
-                     "size": "75411219"
+                     "checksum": "SHA-256:1c1031c5f3717c6cc865cd257d63d51889c2a5feb45b7c61c4a2988c0e70e8eb",
+                     "size": "75410527"
                   }
                ]
             },
@@ -272,49 +272,49 @@
                      "host": "aarch64-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/aarch64-linux-gnu.mkspiffs-7fefeac.210531.tar.gz",
                      "archiveFileName": "aarch64-linux-gnu.mkspiffs-7fefeac.210531.tar.gz",
-                     "checksum": "SHA-256:36b853907c9cd816577a1e84336da5b95b4736b22b717db0c910b94e464189f5",
-                     "size": "51257"
+                     "checksum": "SHA-256:16c5a6669fcbafb4a8c6e580ce5270c618ac8e62f3e655b1397f3032e6124e72",
+                     "size": "51255"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/arm-linux-gnueabihf.mkspiffs-7fefeac.210531.tar.gz",
                      "archiveFileName": "arm-linux-gnueabihf.mkspiffs-7fefeac.210531.tar.gz",
-                     "checksum": "SHA-256:752c630d3b55db60e63dd10138e469d91cefedbf9d046dde090cfa5b0f364f99",
-                     "size": "44273"
+                     "checksum": "SHA-256:c3bfda6b7cb6d7e45051cd7f1a484d439c7ab0aff39f031c7f4fa52f56b36cc7",
+                     "size": "44272"
                   },
                   {
                      "host": "i686-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/i686-linux-gnu.mkspiffs-7fefeac.210531.tar.gz",
                      "archiveFileName": "i686-linux-gnu.mkspiffs-7fefeac.210531.tar.gz",
-                     "checksum": "SHA-256:4dba62137f9ff701cdda303ec361d6b45eee32e5ea135695c2b8aeeea514366a",
-                     "size": "54518"
+                     "checksum": "SHA-256:dcb6329763d6b44f4d12d04ab15820c6fe597475088bc4746a0ca2373c590699",
+                     "size": "54516"
                   },
                   {
                      "host": "i686-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/i686-w64-mingw32.mkspiffs-7fefeac.210531.zip",
                      "archiveFileName": "i686-w64-mingw32.mkspiffs-7fefeac.210531.zip",
-                     "checksum": "SHA-256:479bc24bf49c987daa38adf2b868d7d207a5522be1dfaa5f13d5eb388efeb7fe",
+                     "checksum": "SHA-256:fb7d10ff053a06e6eb5457e88b79b20a2f91b466d199641e88ffd4d9f8d4aa41",
                      "size": "338192"
                   },
                   {
                      "host": "x86_64-apple-darwin",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-apple-darwin14.mkspiffs-7fefeac.210531.tar.gz",
                      "archiveFileName": "x86_64-apple-darwin14.mkspiffs-7fefeac.210531.tar.gz",
-                     "checksum": "SHA-256:85189de8908fe5c3c5137237dc4a943266e6d8b41715e73599c3b091cfd03878",
-                     "size": "368765"
+                     "checksum": "SHA-256:be27175f467c0c8ab9607c2f6ac24cf0fd55f23b7e1dc3afc3d131b6d2328ec9",
+                     "size": "368769"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-linux-gnu.mkspiffs-7fefeac.210531.tar.gz",
                      "archiveFileName": "x86_64-linux-gnu.mkspiffs-7fefeac.210531.tar.gz",
-                     "checksum": "SHA-256:9343acdfa91f88e138d6b996c6c523ae429d8d1cb46cea8fdb3e1de66e3c25a8",
-                     "size": "52647"
+                     "checksum": "SHA-256:cab8477389cec6a2662cfdd5b0a1d44dd6bb78d69881ab67fd677e9055d246cc",
+                     "size": "52645"
                   },
                   {
                      "host": "x86_64-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-w64-mingw32.mkspiffs-7fefeac.210531.zip",
                      "archiveFileName": "x86_64-w64-mingw32.mkspiffs-7fefeac.210531.zip",
-                     "checksum": "SHA-256:ae8ed1c9ee64b3dabecd24099cc3679cb9b3992befea2c3757aa198378726f72",
+                     "checksum": "SHA-256:eba0181f9244d296aa60f1484b468d1256fc421a85b7e21069b52f37372a2f47",
                      "size": "350354"
                   }
                ]
@@ -327,49 +327,49 @@
                      "host": "aarch64-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/aarch64-linux-gnu.mklittlefs-943d2f7.210531.tar.gz",
                      "archiveFileName": "aarch64-linux-gnu.mklittlefs-943d2f7.210531.tar.gz",
-                     "checksum": "SHA-256:de49351aadc07bce1e16d874013ec8476cabf41effbc8b756bd0ec6438036453",
-                     "size": "44970"
+                     "checksum": "SHA-256:7c04b183f74afa395dbe1300458166e8ae3116a0c1797574678c46b263036601",
+                     "size": "44968"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/arm-linux-gnueabihf.mklittlefs-943d2f7.210531.tar.gz",
                      "archiveFileName": "arm-linux-gnueabihf.mklittlefs-943d2f7.210531.tar.gz",
-                     "checksum": "SHA-256:9d4faa0b48762b1da72b6c03016a7b2b35fb20f8ff8be206375fe9dc5095f983",
-                     "size": "37468"
+                     "checksum": "SHA-256:caf3e702f1e2a63e07bee78ca9649a829584a68eb9ee6d253cbe0775fd39d80b",
+                     "size": "37467"
                   },
                   {
                      "host": "i686-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/i686-linux-gnu.mklittlefs-943d2f7.210531.tar.gz",
                      "archiveFileName": "i686-linux-gnu.mklittlefs-943d2f7.210531.tar.gz",
-                     "checksum": "SHA-256:3d91056d4b569ba252c9adb2bbe8a7767335cc91d947739ece53acd28cbada3d",
-                     "size": "48413"
+                     "checksum": "SHA-256:0a76694f61ec1c3e7e9335bb7de85ba5ceed8f988fd3ef980cb9ab487460a8c6",
+                     "size": "48409"
                   },
                   {
                      "host": "i686-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/i686-w64-mingw32.mklittlefs-943d2f7.210531.zip",
                      "archiveFileName": "i686-w64-mingw32.mklittlefs-943d2f7.210531.zip",
-                     "checksum": "SHA-256:553b0d0dafdb1eb43a2b340b854f451ab25a546e11be1ed9babc390138ec1fba",
+                     "checksum": "SHA-256:b45009498fd27d33c758cae4d70b46f35ff63ba0a577ab45ab8ec9a17657a499",
                      "size": "332965"
                   },
                   {
                      "host": "x86_64-apple-darwin",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-apple-darwin14.mklittlefs-943d2f7.210531.tar.gz",
                      "archiveFileName": "x86_64-apple-darwin14.mklittlefs-943d2f7.210531.tar.gz",
-                     "checksum": "SHA-256:3aa39e39676cb4f51126c167c4c9d00cf61d2dd08fe57e4381ead6bc00690c69",
+                     "checksum": "SHA-256:27faab2499ce2a8dfad0b5055f7748766768330675a192d253b3b9673cbc0444",
                      "size": "362753"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-linux-gnu.mklittlefs-943d2f7.210531.tar.gz",
                      "archiveFileName": "x86_64-linux-gnu.mklittlefs-943d2f7.210531.tar.gz",
-                     "checksum": "SHA-256:7cad4287f1f168efcdf2ff8425b458e6267d5da57b3e753258fb5f959004fd74",
-                     "size": "47057"
+                     "checksum": "SHA-256:05f366f3199a43790f883e1b86cb7414a7d84e17612cf1321dd0a862d86ccc7e",
+                     "size": "47058"
                   },
                   {
                      "host": "x86_64-mingw32",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.0.1-bf1/x86_64-w64-mingw32.mklittlefs-943d2f7.210531.zip",
                      "archiveFileName": "x86_64-w64-mingw32.mklittlefs-943d2f7.210531.zip",
-                     "checksum": "SHA-256:8c93b5e1e3f3a99b37ef6dc2aef1fcacb511e525cc6227f45b00d2f86be5d19d",
+                     "checksum": "SHA-256:e62cd44aa7b17da6928eae56b310d31f684365b4060ae3ac225d26b048563446",
                      "size": "345411"
                   }
                ]
