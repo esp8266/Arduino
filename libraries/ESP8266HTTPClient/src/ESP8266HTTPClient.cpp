@@ -60,6 +60,12 @@ HTTPClient::~HTTPClient()
     if(_currentHeaders) {
         delete[] _currentHeaders;
     }
+    if (_uri) {
+        delete _uri;
+    }
+    if (_proxyUri) {
+        delete _proxyUri;
+    }
 }
 
 void HTTPClient::clear()
@@ -82,21 +88,13 @@ void HTTPClient::clear()
 bool HTTPClient::begin(WiFiClient &client, const String& url) {
     _client = &client;
 
-    // check for : (http: or https:)
-    int index = url.indexOf(':');
-    if(index < 0) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
+    _uri = parseURI(url);
+    if(_uri == nullptr) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse url '%s'\n", url.c_str());
         return false;
     }
 
-    String protocol = url.substring(0, index);
-    if(protocol != "http" && protocol != "https") {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
-        return false;
-    }
-
-    _port = (protocol == "https" ? 443 : 80);
-    return beginInternal(url, protocol.c_str());
+    return true;
 }
 
 
@@ -114,74 +112,14 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     _client = &client;
 
      clear();
-    _host = host;
-    _port = port;
-    _uri = uri;
-    _protocol = (https ? "https" : "http");
+    _uri = new URI{
+        .host = host,
+        .port = port,
+        .protocol = (https ? "https" : "http"),
+        .path = uri,
+    };
     return true;
 }
-
-
-bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol)
-{
-    String url(__url);
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-    clear();
-
-    // check for : (http: or https:
-    int index = url.indexOf(':');
-    if(index < 0) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
-        return false;
-    }
-
-    _protocol = url.substring(0, index);
-    url.remove(0, (index + 3)); // remove http:// or https://
-
-    if (_protocol == "http") {
-        // set default port for 'http'
-        _port = 80;
-    } else if (_protocol == "https") {
-        // set default port for 'https'
-        _port = 443;
-    } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unsupported protocol: %s\n", _protocol.c_str());
-        return false;
-    }
-
-    index = url.indexOf('/');
-    String host = url.substring(0, index);
-    url.remove(0, index); // remove host part
-
-    // get Authorization
-    index = host.indexOf('@');
-    if(index >= 0) {
-        // auth info
-        String auth = host.substring(0, index);
-        host.remove(0, index + 1); // remove auth part including @
-        _base64Authorization = base64::encode(auth, false /* doNewLines */);
-    }
-
-    // get port
-    index = host.indexOf(':');
-    if(index >= 0) {
-        _host = host.substring(0, index); // hostname
-        host.remove(0, (index + 1)); // remove hostname + :
-        _port = host.toInt(); // get port
-    } else {
-        _host = host;
-    }
-    _uri = url;
-
-    if ( expectedProtocol != nullptr && _protocol != expectedProtocol) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
-        return false;
-    }
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s\n", _host.c_str(), _port, _uri.c_str());
-    return true;
-}
-
 
 /**
  * end
@@ -269,7 +207,7 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
         String auth = user;
         auth += ':';
         auth += password;
-        _base64Authorization = base64::encode(auth, false /* doNewLines */);
+        _uri->base64Authorization = base64::encode(auth, false /* doNewLines */);
     }
 }
 
@@ -280,8 +218,8 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
 void HTTPClient::setAuthorization(const char * auth)
 {
     if(auth) {
-        _base64Authorization = auth;
-        _base64Authorization.replace(String('\n'), emptyString);
+        _uri->base64Authorization = auth;
+        _uri->base64Authorization.replace(String('\n'), emptyString);
     }
 }
 
@@ -305,19 +243,26 @@ bool HTTPClient::setURL(const String& url)
 {
     // if the new location is only a path then only update the URI
     if (url && url[0] == '/') {
-        _uri = url;
+        _uri->path = url;
         clear();
         return true;
     }
 
-    if (!url.startsWith(_protocol + ':')) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
+    if (!url.startsWith(_uri->protocol + ":")) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _uri->protocol.c_str(), url.c_str());
         return false;
     }
     // disconnect but preserve _client (clear _canReuse so disconnect will close the connection)
     _canReuse = false;
     disconnect(true);
-    return beginInternal(url, nullptr);
+
+    _uri = parseURI(url);
+    if(_uri == nullptr) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][setURL] failed to parse url '%s'\n", url.c_str());
+        return false;
+    }
+    
+    return true;
 }
 
 /**
@@ -761,7 +706,7 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
     if (!name.equalsIgnoreCase(F("Connection")) &&
         !name.equalsIgnoreCase(F("User-Agent")) &&
         !name.equalsIgnoreCase(F("Host")) &&
-        !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())) {
+        !(name.equalsIgnoreCase(F("Authorization")) && _uri->base64Authorization.length())) {
 
         String headerLine;
         headerLine.reserve(name.length() + value.length() + 4);
@@ -858,12 +803,12 @@ bool HTTPClient::connect(void)
 
     _client->setTimeout(_tcpTimeout);
 
-    String host = _host;
-    uint16_t port = _port;
+    String host = _uri->host;
+    uint16_t port = _uri->port;
     if (_useProxy)
     {
-        host = _proxyHost;
-        port = _proxyPort;
+        host = _proxyUri->host;
+        port = _proxyUri->port;
         DEBUG_HTTPCLIENT("[HTTP-Client] using proxy %s:%u\n", host.c_str(), port);
     }
 
@@ -880,48 +825,82 @@ bool HTTPClient::connect(void)
     return connected();
 }
 
-bool HTTPClient::setProxyHost(const String &proxyUrl)
-{
-    String url(proxyUrl);
+HTTPClient::URI* HTTPClient::parseURI(const String& __url){
+    String url(__url);
+    URI* uri = new URI{};
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][proxy] url: %s\n", url.c_str());
-
-    // check for : (http: or https:
+    // check for : (http: or https:)
     int index = url.indexOf(':');
-    if (index < 0) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][proxy] failed to parse protocol\n");
-        return false;
+    if(index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][parseURI] failed to parse protocol\n");
+        return nullptr;
     }
 
-    _proxyProtocol = url.substring(0, index);
+    String protocol = url.substring(0, index);
+    if(protocol != "http" && protocol != "https") {
+        DEBUG_HTTPCLIENT("[HTTP-Client][parseURI] unknown protocol '%s'\n", protocol.c_str());
+        return nullptr;
+    }
+
+    uri->port = (protocol == "https" ? 443 : 80);
+    // check for : (http: or https:
+    index = url.indexOf(':');
+    if(index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][parseURI] failed to parse protocol\n");
+        return nullptr;
+    }
+
+    uri->protocol = url.substring(0, index);
     url.remove(0, (index + 3)); // remove http:// or https://
 
-    if (_proxyProtocol == "http") {
+    if (uri->protocol == "http") {
         // set default port for 'http'
-        _port = 80;
-    } else if (_proxyProtocol == "https") {
+        uri->port = 80;
+    } else if (uri->protocol == "https") {
         // set default port for 'https'
-        _port = 443;
+        uri->port = 443;
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][proxy] unsupported protocol: %s\n", _proxyProtocol.c_str());
-        return false;
+        DEBUG_HTTPCLIENT("[HTTP-Client][parseURI] unsupported protocol: %s\n", uri->protocol.c_str());
+        return nullptr;
     }
 
     index = url.indexOf('/');
     String host = url.substring(0, index);
     url.remove(0, index); // remove host part
 
-    // get port
-    index = host.indexOf(':');
-    if (index >= 0) {
-        _proxyHost = host.substring(0, index); // hostname
-        host.remove(0, (index + 1));           // remove hostname + :
-        _proxyPort = host.toInt();             // get port
-    } else {
-        _proxyHost = host;
+    // get Authorization
+    index = host.indexOf('@');
+    if(index >= 0) {
+        // auth info
+        String auth = host.substring(0, index);
+        host.remove(0, index + 1); // remove auth part including @
+        uri->base64Authorization = base64::encode(auth, false /* doNewLines */);
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][proxy] host: %s port: %d\n", _proxyHost.c_str(), _proxyPort);
+    // get port
+    index = host.indexOf(':');
+    if(index >= 0) {
+        uri->host = host.substring(0, index); // hostname
+        host.remove(0, (index + 1)); // remove hostname + :
+        uri->port = host.toInt(); // get port
+    } else {
+        uri->host = host;
+    }
+    uri->path = url;
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][parseURI] host: %s port: %d url: %s\n", uri->host.c_str(), uri->port, uri->path.c_str());
+    return uri;
+}
+
+bool HTTPClient::setProxyHost(const String &proxyUrl)
+{
+    _proxyUri = parseURI(proxyUrl);
+    if (_proxyUri == nullptr) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][proxy] failed to parse uri\n");
+        return false;
+    }
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][proxy] host: %s port: %d\n", _proxyUri->host.c_str(), _proxyUri->port);
     _useProxy = true;
     return true;
 }
@@ -939,22 +918,22 @@ bool HTTPClient::sendHeader(const char * type)
 
     String header;
     // 128: Arbitrarily chosen to have enough buffer space for avoiding internal reallocations
-    header.reserve(_headers.length() + _uri.length() +
-            _base64Authorization.length() + _host.length() + _userAgent.length() + 128);
+    header.reserve(_headers.length() + _uri->path.length() +
+            _uri->base64Authorization.length() + _uri->host.length() + _userAgent.length() + 128);
     header += type;
     header += ' ';
 
     String target;
     if (_useProxy) {
         // If using proxy, use full uri in request line (http://foo:123/bar)
-        target = _protocol + F("://") + _host;
-        if (_port != 80 && _port != 443) {
+        target = _uri->protocol + F("://") + _uri->host;
+        if (_uri->port != 80 && _uri->port != 443) {
             target += ':';
-            target += String(_port);
+            target += String(_uri->port);
         }
-        target += _uri.length() ? _uri : F("/");
-    } else if (_uri.length()) {
-        target = _uri;
+        target += _uri->path.length() ? _uri->path : F("/");
+    } else if (_uri->path.length()) {
+        target = _uri->path;
     } else {
         target = F("/");
     }
@@ -969,11 +948,11 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     header += F("\r\nHost: ");
-    header += _host;
-    if (_port != 80 && _port != 443)
+    header += _uri->host;
+    if (_uri->port != 80 && _uri->port != 443)
     {
         header += ':';
-        header += String(_port);
+        header += String(_uri->port);
     }
     header += F("\r\nUser-Agent: ");
     header += _userAgent;
@@ -982,9 +961,9 @@ bool HTTPClient::sendHeader(const char * type)
         header += F("\r\nAccept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
     }
 
-    if (_base64Authorization.length()) {
+    if (_uri->base64Authorization.length()) {
         header += F("\r\nAuthorization: Basic ");
-        header += _base64Authorization;
+        header += _uri->base64Authorization;
     }
 
     header += F("\r\nConnection: ");

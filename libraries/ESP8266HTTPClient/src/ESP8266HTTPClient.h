@@ -31,6 +31,10 @@
 #include <StreamString.h>
 #include <WiFiClient.h>
 
+
+#define DEBUG_ESP_HTTP_CLIENT 1
+#define DEBUG_ESP_PORT Serial
+
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_HTTPCLIENT(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ## __VA_ARGS__ )
@@ -224,6 +228,14 @@ protected:
         String value;
     };
 
+    struct URI {
+        String host;
+        uint16_t port = 0;
+        String protocol;
+        String path;
+        String base64Authorization;
+    };
+
     bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
@@ -232,26 +244,21 @@ protected:
     bool sendHeader(const char * type);
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
+    static URI* parseURI(const String& url);
 
     WiFiClient* _client;
 
     /// request handling
-    String _host;
-    uint16_t _port = 0;
+    URI* _uri = nullptr;
     bool _reuse = true;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
     bool _useHTTP10 = false;
 
-    String _uri;
-    String _protocol;
     String _headers;
     String _userAgent;
-    String _base64Authorization;
-
+    
     bool _useProxy = false;
-    String _proxyHost;
-    String _proxyProtocol;
-    uint16_t _proxyPort = 0;
+    URI* _proxyUri = nullptr;
 
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;
