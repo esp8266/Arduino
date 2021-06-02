@@ -23,6 +23,8 @@
  $Id$
  */
 
+#include "Arduino.h"
+
 extern "C" {
 #include <stdlib.h>
 }
