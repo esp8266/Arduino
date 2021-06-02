@@ -858,17 +858,72 @@ bool HTTPClient::connect(void)
 
     _client->setTimeout(_tcpTimeout);
 
-    if(!_client->connect(_host.c_str(), _port)) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
+    String host = _host;
+    uint16_t port = _port;
+    if (_useProxy)
+    {
+        host = _proxyHost;
+        port = _proxyPort;
+        DEBUG_HTTPCLIENT("[HTTP-Client] using proxy %s:%u\n", host.c_str(), port);
+    }
+
+    if(!_client->connect(host.c_str(), port)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", host.c_str(), port);
         return false;
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", host.c_str(), port);
 
 #ifdef ESP8266
     _client->setNoDelay(true);
 #endif
     return connected();
+}
+
+bool HTTPClient::setProxyHost(const String &proxyUrl)
+{
+    String url(proxyUrl);
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][proxy] url: %s\n", url.c_str());
+
+    // check for : (http: or https:
+    int index = url.indexOf(':');
+    if (index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][proxy] failed to parse protocol\n");
+        return false;
+    }
+
+    _proxyProtocol = url.substring(0, index);
+    url.remove(0, (index + 3)); // remove http:// or https://
+
+    if (_proxyProtocol == "http") {
+        // set default port for 'http'
+        _port = 80;
+    } else if (_proxyProtocol == "https") {
+        // set default port for 'https'
+        _port = 443;
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][proxy] unsupported protocol: %s\n", _proxyProtocol.c_str());
+        return false;
+    }
+
+    index = url.indexOf('/');
+    String host = url.substring(0, index);
+    url.remove(0, index); // remove host part
+
+    // get port
+    index = host.indexOf(':');
+    if (index >= 0) {
+        _proxyHost = host.substring(0, index); // hostname
+        host.remove(0, (index + 1));           // remove hostname + :
+        _proxyPort = host.toInt();             // get port
+    } else {
+        _proxyHost = host;
+    }
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][proxy] host: %s port: %d\n", _proxyHost.c_str(), _proxyPort);
+    _useProxy = true;
+    return true;
 }
 
 /**
@@ -888,11 +943,23 @@ bool HTTPClient::sendHeader(const char * type)
             _base64Authorization.length() + _host.length() + _userAgent.length() + 128);
     header += type;
     header += ' ';
-    if (_uri.length()) {
-        header += _uri;
+
+    String target;
+    if (_useProxy) {
+        // If using proxy, use full uri in request line (http://foo:123/bar)
+        target = _protocol + F("://") + _host;
+        if (_port != 80 && _port != 443) {
+            target += ':';
+            target += String(_port);
+        }
+        target += _uri.length() ? _uri : F("/");
+    } else if (_uri.length()) {
+        target = _uri;
     } else {
-        header += '/';
+        target = F("/");
     }
+
+    header += target;
     header += F(" HTTP/1.");
 
     if(_useHTTP10) {

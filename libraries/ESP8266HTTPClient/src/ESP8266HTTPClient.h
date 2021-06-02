@@ -177,6 +177,7 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
+    bool setProxyHost(const String &proxyUrl);
 
     // Redirections
     void setFollowRedirects(followRedirects_t follow);
@@ -246,6 +247,11 @@ protected:
     String _headers;
     String _userAgent;
     String _base64Authorization;
+
+    bool _useProxy = false;
+    String _proxyHost;
+    String _proxyProtocol;
+    uint16_t _proxyPort = 0;
 
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;
