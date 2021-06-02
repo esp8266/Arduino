@@ -12,6 +12,7 @@ version=3.0.1-dev
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
 runtime.tools.python3.path={runtime.platform.path}/tools/python3
 
+runtime.tools.prebuild={runtime.platform.path}/tools/prebuild.py
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
 runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
@@ -89,11 +90,8 @@ build.extra_flags=-DESP8266
 build.opt.name=build_opt.h
 build.opt.path={build.path}/sketch/{build.opt.name}
 
-# extras.path={build.core.path}/extras
-extras.path={runtime.platform.path}/tools/extras
-
-# Create empty {build.opt} if not exists in the output sketch dir and force include of SrcWrapper library
-recipe.hooks.prebuild.1.pattern="{extras.path}/prebuild.sh" "{build.path}" "{build.source.path}"
+# Create empty {build.opt} if it does not exist in the output sketch dir
+recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.prebuild}" "{build.path}" "{build.source.path}"
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=
