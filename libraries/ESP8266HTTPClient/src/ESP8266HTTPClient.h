@@ -31,10 +31,6 @@
 #include <StreamString.h>
 #include <WiFiClient.h>
 
-
-#define DEBUG_ESP_HTTP_CLIENT 1
-#define DEBUG_ESP_PORT Serial
-
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_HTTPCLIENT(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ## __VA_ARGS__ )
@@ -257,7 +253,6 @@ protected:
     String _headers;
     String _userAgent;
     
-    bool _useProxy = false;
     URI* _proxyUri = nullptr;
 
     /// Response handling

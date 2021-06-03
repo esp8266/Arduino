@@ -805,8 +805,7 @@ bool HTTPClient::connect(void)
 
     String host = _uri->host;
     uint16_t port = _uri->port;
-    if (_useProxy)
-    {
+    if (_proxyUri != nullptr) {
         host = _proxyUri->host;
         port = _proxyUri->port;
         DEBUG_HTTPCLIENT("[HTTP-Client] using proxy %s:%u\n", host.c_str(), port);
@@ -901,7 +900,6 @@ bool HTTPClient::setProxyHost(const String &proxyUrl)
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client][proxy] host: %s port: %d\n", _proxyUri->host.c_str(), _proxyUri->port);
-    _useProxy = true;
     return true;
 }
 
@@ -924,9 +922,13 @@ bool HTTPClient::sendHeader(const char * type)
     header += ' ';
 
     String target;
-    if (_useProxy) {
+    if (_proxyUri != nullptr) {
+        target.reserve(_uri->protocol.length() + _uri->path.length() +_uri->host.length() + 8);
         // If using proxy, use full uri in request line (http://foo:123/bar)
-        target = _uri->protocol + F("://") + _uri->host;
+        target += _uri->protocol;
+        target += F("://");
+        target += _uri->host;
+
         if (_uri->port != 80 && _uri->port != 443) {
             target += ':';
             target += String(_uri->port);
