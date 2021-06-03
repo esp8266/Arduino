@@ -803,20 +803,20 @@ bool HTTPClient::connect(void)
 
     _client->setTimeout(_tcpTimeout);
 
-    String host = _uri->host;
+    String* host = &_uri->host;
     uint16_t port = _uri->port;
     if (_proxyUri != nullptr) {
-        host = _proxyUri->host;
+        host = &_proxyUri->host;
         port = _proxyUri->port;
-        DEBUG_HTTPCLIENT("[HTTP-Client] using proxy %s:%u\n", host.c_str(), port);
+        DEBUG_HTTPCLIENT("[HTTP-Client] using proxy %s:%u\n", host->c_str(), port);
     }
 
-    if(!_client->connect(host.c_str(), port)) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", host.c_str(), port);
+    if(!_client->connect(host->c_str(), port)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", host->c_str(), port);
         return false;
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", host.c_str(), port);
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", host->c_str(), port);
 
 #ifdef ESP8266
     _client->setNoDelay(true);
