@@ -152,6 +152,41 @@ Artificially clearing them is a workaround to help saving precious heap.
 
 Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__
 
+Use custom defines from build options file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A file named ``build_opt.h`` next to the ``sketch.ino`` file enables the user
+to specify custom definitons in a central and organized location.
+
+The following code is a slightly modified Blink example sketch. It opens the
+possibility to define the ``WAIT_TIME`` between the LED state changes. If no
+``build_opt.h`` file is placed next to the sketch file, the default value will
+be set as 1000ms in this example.
+
+.. code:: cpp
+
+    #ifndef WAIT_TIME
+    #define WAIT_TIME   1000             // use 1000ms if not defined different
+    #endif
+
+    void setup() {
+      // initialize digital pin LED_BUILTIN as an output.
+      pinMode(LED_BUILTIN, OUTPUT);
+    }
+
+    void loop() {
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(WAIT_TIME);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(WAIT_TIME);
+    }
+
+Place the following content in a file named ``build_opt.h`` at the same
+location as the ``sketch.ino`` file to define the ``WAIT_TIME`` to 500ms.
+
+.. code:: cpp
+
+    -DWAIT_TIME=500
 
 Why is there a board generator and what about it ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
