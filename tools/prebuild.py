@@ -44,7 +44,6 @@ def create_build_options_file(source_path, build_path, build_opt_name="build_opt
     """
     build_opt_source_path = os.path.join(source_path, build_opt_name)
     build_opt_build_path = os.path.join(build_path, "sketch", build_opt_name)
-    build_opt_ctime = get_creation_time(build_opt_build_path)
 
     if not os.path.exists(build_opt_source_path):
         # create empty file
@@ -54,11 +53,13 @@ def create_build_options_file(source_path, build_path, build_opt_name="build_opt
         # modification time to avoid rebuilding libraries
         sketch_path = get_full_sketch_path(source_path)
         sketch_mtime = get_modification_time(sketch_path)
+        build_opt_ctime = get_creation_time(build_opt_build_path)
         os.utime(build_opt_build_path, (build_opt_ctime, sketch_mtime))
     else:
         # set build option file modification time to the same time as the users
         # build option file modification time to reflect changes which require
         # a recompilation
+        build_opt_ctime = get_creation_time(build_opt_build_path)
         build_opt_mtime = get_modification_time(build_opt_source_path)
         os.utime(build_opt_build_path, (build_opt_ctime, build_opt_mtime))
 
