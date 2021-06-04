@@ -188,6 +188,9 @@ location as the ``sketch.ino`` file to define the ``WAIT_TIME`` to 500ms.
 
     -DWAIT_TIME=500
 
+``core.s`` files are not automatically rebuilt when changes are made to the
+``build_opt.h`` file.
+
 Why is there a board generator and what about it ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
