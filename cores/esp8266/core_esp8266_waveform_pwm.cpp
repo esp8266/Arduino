@@ -160,7 +160,9 @@ static IRAM_ATTR void _notifyPWM(PWMState *p, bool idle) {
   MEMBARRIER();
   pwmState.pwmUpdate = p;
   MEMBARRIER();
-  forceTimerInterrupt();
+  if (idle) {
+    forceTimerInterrupt();
+  }
   while (pwmState.pwmUpdate) {
     if (idle) {
       esp_yield();
@@ -313,7 +315,10 @@ static void _addPWMtoList(PWMState& p, uint8_t pin, uint32_t val, uint32_t range
 // Called by analogWrite(1...99%) to set the PWM duty in clock cycles
 extern bool _setPWM_weak(uint8_t pin, uint32_t val, uint32_t range) __attribute__((weak));
 bool _setPWM_weak(uint8_t pin, uint32_t val, uint32_t range) {
-  stopWaveform(pin);
+  const uint32_t mask = 1<<pin;
+  if (wvfState.waveformEnabled & mask) {
+    stopWaveform(pin);
+  }
   PWMState p;  // Working copy
   p = pwmState;
   // Get rid of any entries for this pin
@@ -368,7 +373,7 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t
 
   _stopPWM(pin); // Make sure there's no PWM live here
 
-  uint32_t mask = 1<<pin;
+  const uint32_t mask = 1<<pin;
   MEMBARRIER();
   if (wvfState.waveformEnabled & mask) {
     // Make sure no waveform changes are waiting to be applied
@@ -441,7 +446,7 @@ IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
 
   // If user sends in a pin >16 but <32, this will always point to a 0 bit
   // If they send >=32, then the shift will result in 0 and it will also return false
-  uint32_t mask = 1<<pin;
+  const uint32_t mask = 1<<pin;
   if (wvfState.waveformEnabled & mask) {
     wvfState.waveformToDisable = mask;
     // Cancel any pending updates for this waveform, too.
@@ -569,7 +574,7 @@ static IRAM_ATTR void timer1Interrupt() {
       }
 
       for (auto i = wvfState.startPin; i <= wvfState.endPin; i++) {
-        uint32_t mask = 1<<i;
+        const uint32_t mask = 1<<i;
 
         // If it's not on, ignore!
         if (!(wvfState.waveformEnabled & mask)) {
