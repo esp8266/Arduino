@@ -273,6 +273,13 @@ String &String::operator =(const __FlashStringHelper *pstr) {
     return *this;
 }
 
+String &String::operator =(char c) {
+    char buffer[2] { c, '\0' };
+    *this = buffer;
+    return *this;
+}
+
+
 /*********************************************/
 /*  concat                                   */
 /*********************************************/
@@ -500,6 +507,10 @@ bool String::equals(const char *cstr) const {
     return strcmp(buffer(), cstr) == 0;
 }
 
+bool String::equals(const __FlashStringHelper *s) const {
+    return equals(String(s));
+}
+
 bool String::operator<(const String &rhs) const {
     return compareTo(rhs) < 0;
 }
@@ -530,6 +541,10 @@ bool String::equalsIgnoreCase(const String &s2) const {
             return false;
     }
     return true;
+}
+
+bool String::equalsIgnoreCase(const __FlashStringHelper *s) const {
+    return equalsIgnoreCase(String(s));
 }
 
 unsigned char String::equalsConstantTime(const String &s2) const {
@@ -565,10 +580,21 @@ bool String::startsWith(const String &s2) const {
     return startsWith(s2, 0);
 }
 
+bool String::startsWith(const char *prefix) const {
+    return this->startsWith(String(prefix));
+}
+bool String::startsWith(const __FlashStringHelper *prefix) const {
+    return this->startsWith(String(prefix));
+}
+
 bool String::startsWith(const String &s2, unsigned int offset) const {
     if (offset > (unsigned)(len() - s2.len()) || !buffer() || !s2.buffer())
         return false;
     return strncmp(&buffer()[offset], s2.buffer(), s2.len()) == 0;
+}
+
+bool String::startsWith(const __FlashStringHelper *prefix, unsigned int offset) const {
+    return startsWith(String(prefix), offset);
 }
 
 bool String::endsWith(const String &s2) const {
@@ -576,6 +602,14 @@ bool String::endsWith(const String &s2) const {
         return false;
     return strcmp(&buffer()[len() - s2.len()], s2.buffer()) == 0;
 }
+
+bool String::endsWith(const char *suffix) const {
+    return this->endsWith(String(suffix));
+}
+bool String::endsWith(const __FlashStringHelper *suffix) const {
+    return this->endsWith(String(suffix));
+}
+
 
 /*********************************************/
 /*  Character Access                         */
@@ -678,6 +712,15 @@ int String::lastIndexOf(const String &s2, unsigned int fromIndex) const {
     return found;
 }
 
+int String::lastIndexOf(const __FlashStringHelper *str) const {
+    return lastIndexOf(String(str));
+}
+
+int String::lastIndexOf(const __FlashStringHelper *str, unsigned int fromIndex) const {
+    return lastIndexOf(String(str), fromIndex);
+}
+
+
 String String::substring(unsigned int left, unsigned int right) const {
     if (left > right) {
         unsigned int temp = right;
@@ -755,6 +798,24 @@ void String::replace(const String &find, const String &replace) {
         }
     }
 }
+
+
+void String::replace(const char *find, const String &replace) {
+    this->replace(String(find), replace);
+}
+void String::replace(const __FlashStringHelper *find, const String &replace) {
+    this->replace(String(find), replace);
+}
+void String::replace(const char *find, const char *replace) {
+    this->replace(String(find), String(replace));
+}
+void String::replace(const __FlashStringHelper *find, const char *replace) {
+    this->replace(String(find), String(replace));
+}
+void String::replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
+    this->replace(String(find), String(replace));
+}
+
 
 void String::remove(unsigned int index, unsigned int count) {
     if (index >= len()) {
