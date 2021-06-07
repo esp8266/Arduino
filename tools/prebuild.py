@@ -74,10 +74,9 @@ def get_full_sketch_path(source_path):
     :returns:   The full sketch path including the '.ino' extension.
     :rtype:     str
     """
-    dir_name = os.path.dirname(source_path)
-    base_name = os.path.basename(dir_name)
+    base_name = os.path.basename(source_path)
 
-    sketch_path = os.path.join(dir_name, base_name + '.ino')
+    sketch_path = os.path.join(source_path, base_name + '.ino')
 
     return sketch_path
 
