@@ -117,6 +117,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
         .port = port,
         .protocol = (https ? "https" : "http"),
         .path = uri,
+        .base64Authorization = String(),
     };
     return true;
 }
