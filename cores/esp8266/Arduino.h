@@ -217,7 +217,7 @@ void optimistic_yield(uint32_t interval_us);
 // undefine stdlib's definitions when encountered, provide abs that supports floating point for C code
 #ifndef __cplusplus
 #undef abs
-#define abs(x) ({ __typeof__(x) _x = (x); _x > 0 ? _x : -_x; })
+#define abs(x) ({ __typeof__(x) _x = (x); _x >= 0 ? _x : -_x; })
 #undef round
 #define round(x) ({ __typeof__(x) _x = (x); _x >= 0 ? (long)(_x + 0.5) : (long)(_x - 0.5); })
 #endif // ifndef __cplusplus
