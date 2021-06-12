@@ -76,7 +76,7 @@ Here is a rough overview of the effective release process. See the section below
     * Prepare release notes in Markdown format.
 
     * For changes that are breaking, duplicate those changes and put the duplicate lines into a separate group called Breaking Changes. That group should go at the top of the Changelog. The original lines for the breaking changes should be marked by appending "(Breaking change)" to the line. Example:
-   
+
     ```
     Breaking Changes
     ================
@@ -141,7 +141,7 @@ The following points assume work in a direct clone of the repository, and not in
 8. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds,
 
 
-9. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases. 
+9. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases.
 
 10. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
@@ -167,41 +167,39 @@ The following points assume work in a direct clone of the repository, and not in
 --------------COPY BELOW THIS LINE--------------
 [Reference](https://github.com/esp8266/Arduino/tree/master/package#creating-a-release-for-maintainers) for details.
 
-- [ ] 1. Open a new issue to track activities. 
+- [ ] 1. Make sure that no issues or PRs are assigned to the milestone to be released.
 
-- [ ] 2. Make sure that no issues or PRs are assigned to the milestone to be released.
+- [ ] 2. Open a new issue to track activities.
 
 - [ ] 3. Assemble release notes.
 
-- [ ] 4. Make a PR with the following, [wait for Travis CI](https://travis-ci.org/github/esp8266/Arduino/builds/), and merge.
+- [ ] 4. Make a PR with the following, [wait for CI](https://github.com/esp8266/Arduino/pull/8034/checks), and merge.
 
    * [platform.txt](https://github.com/esp8266/Arduino/blob/master/platform.txt)
    * [package.json](https://github.com/esp8266/Arduino/blob/master/package.json)
-   * [cores/esp8266/TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h)
+   * [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h) (<= `cd tools; ./TZupdate.sh`)
 
-- [ ] 5. Wait until the release notes have been checked by other maintainers
+- [ ] 5. Wait until the release notes have been checked by other maintainers (can be changed afterwards anyway)
 
-- [ ] 6. Navigate to [Travis CI options](https://travis-ci.org/esp8266/Arduino/settings), enable ´Build pushed branches´ (before tagging in next step)
+- [ ] 6. Tag the latest commit on the master branch, then push it to esp8266/Arduino
+      add: `git tag -a -m "Release 3.0.0" 3.0.0; git push origin 3.0.0`
+      remove: `git tag -d X.Y.Z; git push --delete origin X.Y.Z`
 
-- [ ] 7. Tag the latest commit on the master branch, then push it to esp8266/Arduino
+- [ ] 7. Wait for CI build for the tag to pass (in `Actions` menu)
 
-- [ ] 8. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds,
+- [ ] 8. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases.
 
-- [ ] 9. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases. 
+- [ ] 9. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
-- [ ] 10. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+- [ ] 10. Check that the package index downloaded from https://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
-- [ ] 11. Check that the package index downloaded from https://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
+- [ ] 11. Navigate to [release list in Github](https://github.com/esp8266/Arduino/releases), press "Edit" button to edit release description, paste release notes, and publish it.
 
-- [ ] 12. Return to the [Travis CI options](https://travis-ci.org/esp8266/Arduino/settings) and disable `Build pushed branches`.
+- [ ] 12. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version (the milestone should be empty per point 1 above)
 
-- [ ] 13. Navigate to [release list in Github](https://github.com/esp8266/Arduino/releases), press "Edit" button to edit release description, paste release notes, and publish it.
+- [ ] 13. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home here https://readthedocs.org/ (account must have been added to project as maintainer) and trigger it manually.
 
-- [ ] 14. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version (the milestone should be empty per point 2 above)
-
-- [ ] 15. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home here https://readthedocs.org/ (account must have been added to project as maintainer) and trigger it manually.
-
-- [ ] 16. Create a commit to the master branch, updating:
+- [ ] 14. Create a commit to the master branch, updating:
 
     * The version in platform.txt and package.json files. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `3.1.0-dev`.
     * In main README.md go to "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
