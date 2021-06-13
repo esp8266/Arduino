@@ -20,23 +20,38 @@
 import argparse
 import os
 import subprocess
+import re
 
 
-def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
+def generate(path, platform_path, git_ver="ffffffff", platform_version="unspecified"):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL)
         return proc.stdout.readlines()[0].strip()
 
+    git_desc = platform_version;
     try:
         git_ver = git("rev-parse", "--short=8", "HEAD")
         git_desc = git("describe", "--tags")
     except Exception:
         pass
 
-    text = "#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver)
-    text += "#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc)
+    text = "#define ARDUINO_ESP8266_GIT_VER   0x{}\n".format(git_ver)
+    text += "#define ARDUINO_ESP8266_GIT_DESC  {}\n".format(git_desc)
+    text += "#define ARDUINO_ESP8266_GIT_DESC2 {}\n\n".format(re.sub("[-\.]", "_", git_desc))
+
+    version = re.split("\.", platform_version)
+    # major: if present, skip "unix-" in "unix-3"
+    text += "#define ARDUINO_ESP8266_MAJOR     {}\n".format(re.split("-", version[0])[-1])
+    text += "#define ARDUINO_ESP8266_MINOR     {}\n".format(version[1])
+    # revision can be ".x" or ".x-dev"
+    revision = re.split("-", version[2])
+    text += "#define ARDUINO_ESP8266_REVISION  {}\n\n".format(revision[0])
+    if len(revision) > 1:
+        text += "#define ARDUINO_ESP8266_DEV       1 // developpment version\n"
+    else:
+        text += "#define ARDUINO_ESP8266_RELEASE   1 // release version\n"
 
     try:
         with open(path, "r") as inp:
@@ -79,5 +94,5 @@ if __name__ == "__main__":
     generate(
         os.path.join(include_dir, "core_version.h"),
         args.platform_path,
-        git_desc=args.version,
+        platform_version=args.version,
     )
