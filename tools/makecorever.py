@@ -39,19 +39,21 @@ def generate(path, platform_path, git_ver="ffffffff", platform_version="unspecif
 
     text = "#define ARDUINO_ESP8266_GIT_VER   0x{}\n".format(git_ver)
     text += "#define ARDUINO_ESP8266_GIT_DESC  {}\n".format(git_desc)
-    text += "#define ARDUINO_ESP8266_GIT_DESC2 {}\n\n".format(re.sub("[-\.]", "_", git_desc))
+    text += "\n"
 
     version = re.split("\.", platform_version)
     # major: if present, skip "unix-" in "unix-3"
     text += "#define ARDUINO_ESP8266_MAJOR     {}\n".format(re.split("-", version[0])[-1])
     text += "#define ARDUINO_ESP8266_MINOR     {}\n".format(version[1])
-    # revision can be ".x" or ".x-dev"
+    # revision can be ".n" or ".n-dev"
     revision = re.split("-", version[2])
-    text += "#define ARDUINO_ESP8266_REVISION  {}\n\n".format(revision[0])
+    text += "#define ARDUINO_ESP8266_REVISION  {}\n".format(revision[0])
+    text += "\n"
     if len(revision) > 1:
         text += "#define ARDUINO_ESP8266_DEV       1 // developpment version\n"
-    else:
-        text += "#define ARDUINO_ESP8266_RELEASE   1 // release version\n"
+
+    text += "#define ARDUINO_ESP8266_RELEASE   {}\n".format(git_desc)
+    text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(re.sub("[-\.]", "_", git_desc))
 
     try:
         with open(path, "r") as inp:
