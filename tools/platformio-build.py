@@ -115,8 +115,6 @@ env.Append(
 
     CPPPATH=[
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "libc",
-             "xtensa-lx106-elf", "include"),
         join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core")),
         join(platform.get_package_dir("toolchain-xtensa"), "include")
     ],
@@ -124,8 +122,7 @@ env.Append(
     LIBPATH=[
         join("$BUILD_DIR", "ld"),  # eagle.app.v6.common.ld
         join(FRAMEWORK_DIR, "tools", "sdk", "lib"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "ld"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "libc", "xtensa-lx106-elf", "lib")
+        join(FRAMEWORK_DIR, "tools", "sdk", "ld")
     ],
 
     LIBS=[
