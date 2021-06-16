@@ -51,6 +51,7 @@ def generate(path, platform_path, version="unspecified", release = False):
         pass
 
     text += "#define ARDUINO_ESP8266_GIT_DESC  {}\n".format(git_desc)
+    text += "#define ARDUINO_ESP8266_VERSION   {}\n".format(version)
     text += "\n"
 
     version_split = version.split(".")
@@ -62,7 +63,7 @@ def generate(path, platform_path, version="unspecified", release = False):
     text += "#define ARDUINO_ESP8266_REVISION  {}\n".format(revision[0])
     text += "\n"
 
-    # release or dev
+    # release or dev ?
     if release:
         text += "#define ARDUINO_ESP8266_RELEASE   \"{}\"\n".format(git_desc)
         text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(git_desc.replace("-","_").replace(".","_"))
