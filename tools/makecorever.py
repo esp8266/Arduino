@@ -22,21 +22,52 @@ import os
 import subprocess
 
 
-def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
+def generate(path, platform_path, version="unspecified", release = False):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, stderr=subprocess.DEVNULL)
         return proc.stdout.readlines()[0].strip()
 
+    text = ""
+
     try:
-        git_ver = git("rev-parse", "--short=8", "HEAD")
+        text = "#define ARDUINO_ESP8266_GIT_VER   0x{}\n".format(git("rev-parse", "--short=8", "HEAD"))
+    except Exception:
+        pass
+
+    # version is
+    # - using Arduino-CLI:
+    #   - blah-5.6.7     (official release, coming from platform.txt)
+    #   - blah-5.6.7-dev (intermediate / unofficial / testing release)
+    # - using git:
+    #   - 5.6.7            (from release script, official release)
+    #   - 5.6.7-42-g00d1e5 (from release script, test release)
+    git_desc = version
+    try:
+        # in any case, get a better version when git is around
         git_desc = git("describe", "--tags")
     except Exception:
         pass
 
-    text = "#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver)
-    text += "#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc)
+    text += "#define ARDUINO_ESP8266_GIT_DESC  {}\n".format(git_desc)
+    text += "\n"
+
+    version_split = version.split(".")
+    # major: if present, skip "unix-" in "unix-3"
+    text += "#define ARDUINO_ESP8266_MAJOR     {}\n".format(version_split[0].split("-")[-1])
+    text += "#define ARDUINO_ESP8266_MINOR     {}\n".format(version_split[1])
+    # revision can be ".n" or ".n-dev" or ".n-42-g00d1e5"
+    revision = version_split[2].split("-")
+    text += "#define ARDUINO_ESP8266_REVISION  {}\n".format(revision[0])
+    text += "\n"
+
+    # release or dev
+    if release:
+        text += "#define ARDUINO_ESP8266_RELEASE   \"{}\"\n".format(git_desc)
+        text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(git_desc.replace("-","_").replace(".","_"))
+    else:
+        text += "#define ARDUINO_ESP8266_DEV       1 // developpment version\n"
 
     try:
         with open(path, "r") as inp:
@@ -67,6 +98,7 @@ if __name__ == "__main__":
         "-v", "--version", action="store", required=True, help="version variable"
     )
     parser.add_argument("-i", "--include_dir", default="core")
+    parser.add_argument("-r", "--release", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -79,5 +111,6 @@ if __name__ == "__main__":
     generate(
         os.path.join(include_dir, "core_version.h"),
         args.platform_path,
-        git_desc=args.version,
+        version=args.version,
+        release=args.release
     )
