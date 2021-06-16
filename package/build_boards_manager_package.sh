@@ -27,7 +27,7 @@ else
         echo "release-log-2: ver=${ver} plain_ver=${plain_ver} visiblever=${visiblever}"
     fi
     visiblever=${ver}
-    plainver=${ver}
+    plain_ver=${ver}
     echo "release-log-3: ver=${ver} plain_ver=${plain_ver} visiblever=${visiblever}"
 
     # Match 0.0.* as special-case early-access builds
