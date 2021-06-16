@@ -20,10 +20,9 @@
 import argparse
 import os
 import subprocess
-import re
 
 
-def generate(path, platform_path, git_ver="ffffffff", platform_version="unspecified"):
+def generate(path, platform_path, git_ver="ffffffff", platform_version="unspecified", release = False):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)
@@ -41,19 +40,20 @@ def generate(path, platform_path, git_ver="ffffffff", platform_version="unspecif
     text += "#define ARDUINO_ESP8266_GIT_DESC  {}\n".format(git_desc)
     text += "\n"
 
-    version = re.split("\.", platform_version)
+    version = platform_version.split(".")
     # major: if present, skip "unix-" in "unix-3"
-    text += "#define ARDUINO_ESP8266_MAJOR     {}\n".format(re.split("-", version[0])[-1])
+    text += "#define ARDUINO_ESP8266_MAJOR     {}\n".format(version[0].split("-")[-1])
     text += "#define ARDUINO_ESP8266_MINOR     {}\n".format(version[1])
     # revision can be ".n" or ".n-dev"
-    revision = re.split("-", version[2])
+    revision = version[2].split("-")
     text += "#define ARDUINO_ESP8266_REVISION  {}\n".format(revision[0])
     text += "\n"
-    if len(revision) > 1:
-        text += "#define ARDUINO_ESP8266_DEV       1 // developpment version\n"
-    else:
+    if release:
         text += "#define ARDUINO_ESP8266_RELEASE   \"{}\"\n".format(git_desc)
-        text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(re.sub("[-\.]", "_", git_desc))
+        #text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(re.sub("[-\.]", "_", git_desc))
+        text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(git_desc.replace("-","_").replace(".","_"))
+    else:
+        text += "#define ARDUINO_ESP8266_DEV       1 // developpment version\n"
 
     try:
         with open(path, "r") as inp:
@@ -84,6 +84,7 @@ if __name__ == "__main__":
         "-v", "--version", action="store", required=True, help="version variable"
     )
     parser.add_argument("-i", "--include_dir", default="core")
+    parser.add_argument("-r", "--release", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -97,4 +98,5 @@ if __name__ == "__main__":
         os.path.join(include_dir, "core_version.h"),
         args.platform_path,
         platform_version=args.version,
+        release=args.release
     )
