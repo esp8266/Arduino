@@ -31,10 +31,12 @@ def generate(path, platform_path, version="unspecified", release = False):
 
     text = ""
 
+    git_ver = "00000000"
     try:
-        text = "#define ARDUINO_ESP8266_GIT_VER   0x{}\n".format(git("rev-parse", "--short=8", "HEAD"))
+        git_ver = git("rev-parse", "--short=8", "HEAD")
     except Exception:
         pass
+    text = "#define ARDUINO_ESP8266_GIT_VER   0x{}\n".format(git_ver)
 
     # version is
     # - using Arduino-CLI:
