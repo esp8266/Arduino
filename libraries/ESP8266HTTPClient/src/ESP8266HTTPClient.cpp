@@ -90,7 +90,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     String protocol = url.substring(0, index);
-    protocol.toLower();
+    protocol.toLowerCase();
     if(protocol != "http" && protocol != "https") {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
         return false;
@@ -138,7 +138,7 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
     }
 
     _protocol = url.substring(0, index);
-    _protocol.toLower();
+    _protocol.toLowerCase();
     url.remove(0, (index + 3)); // remove http:// or https://
 
     if (_protocol == "http") {
