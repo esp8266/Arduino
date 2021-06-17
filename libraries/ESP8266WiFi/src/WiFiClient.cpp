@@ -77,14 +77,14 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
 WiFiClient::WiFiClient()
-: _client(0), _owner(0)
+: _client(0), _owned(0)
 {
     _timeout = 5000;
     WiFiClient::_add(this);
 }
 
 WiFiClient::WiFiClient(ClientContext* client)
-: _client(client), _owner(0)
+: _client(client), _owned(0)
 {
     _timeout = 5000;
     _client->ref();
@@ -106,7 +106,7 @@ WiFiClient::WiFiClient(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
-    _owner = other._owner;
+    _owned = other._owned;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -119,7 +119,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
-    _owner = other._owner;
+    _owned = other._owned;
     if (_client)
         _client->ref();
     return *this;
@@ -384,18 +384,18 @@ void WiFiClient::stopAll()
 
 void WiFiClient::stopAllExcept(WiFiClient* except)
 {
-    // Stop all will look at the highest-level wrapper connections only
-    // Find the "except" top-level connection
-    while (except->_owner) {
-         except = except->_owner;
+    // Stop all will look at the lowest-level wrapper connections only
+    while (except->_owned) {
+         except = except->_owned;
     }
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        // Find the top-level owner of the current list entry
-        while (it->_owner) {
-            it = it->_owner;
+        WiFiClient* conn = it;
+        // Find the lowest-level owner of the current list entry
+        while (conn->_owned) {
+            conn = conn->_owned;
         }
-        if (it != except) {
-            it->stop();
+        if (conn != except) {
+            conn->stop();
         }
     }
 }
