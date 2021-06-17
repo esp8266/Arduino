@@ -144,6 +144,7 @@ protected:
   void _err(int8_t err);
 
   ClientContext* _client;
+  WiFiClient* _owner;
   static uint16_t _localPort;
 };
 

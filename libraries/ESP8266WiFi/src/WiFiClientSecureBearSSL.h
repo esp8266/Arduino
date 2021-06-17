@@ -232,8 +232,8 @@ class WiFiClientSecure : public WiFiClient {
 
   public:
 
-    WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { }
-    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { }
+    WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { _ctx->_owner = this; }
+    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { if (_ctx) _ctx->_owner = this; }
     ~WiFiClientSecure() override { _ctx = nullptr; }
 
     WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
