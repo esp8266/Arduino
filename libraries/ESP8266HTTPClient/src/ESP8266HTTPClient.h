@@ -177,6 +177,7 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
+    bool setProxyHost(const String &proxyUrl);
 
     // Redirections
     void setFollowRedirects(followRedirects_t follow);
@@ -223,6 +224,14 @@ protected:
         String value;
     };
 
+    struct URI {
+        String host;
+        uint16_t port = 0;
+        String protocol;
+        String path;
+        String base64Authorization;
+    };
+
     bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
@@ -231,21 +240,20 @@ protected:
     bool sendHeader(const char * type);
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
+    static URI* parseURI(const String& url);
 
     WiFiClient* _client;
 
     /// request handling
-    String _host;
-    uint16_t _port = 0;
+    URI* _uri = nullptr;
     bool _reuse = true;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
     bool _useHTTP10 = false;
 
-    String _uri;
-    String _protocol;
     String _headers;
     String _userAgent;
-    String _base64Authorization;
+    
+    URI* _proxyUri = nullptr;
 
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;
