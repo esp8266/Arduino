@@ -25,6 +25,16 @@
 #include "WString.h"
 #include "stdlib_noniso.h"
 
+#ifdef _MSC_VER
+#include <misc_string.h>
+#else
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <pgmspace.h>
+#include "KFCBaseLibrary/include/misc_string.h"
+#endif
+
 #define OOM_STRING_BORDER_DISPLAY           10
 #define OOM_STRING_THRESHOLD_REALLOC_WARN  128
 
@@ -182,7 +192,7 @@ bool String::changeBuffer(unsigned int maxStrLen) {
 #ifdef DEBUG_ESP_OOM
     if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
         // warn when badly re-allocating
-        DEBUGV("[String] Reallocating large String(%d -> %d bytes) '%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s'\n",
+        DEBUGV("[offending String op %d->%d ('%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s')]\n",
             len(), maxStrLen, c_str(),
             len() > OOM_STRING_BORDER_DISPLAY? c_str() + std::max((int)len() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
     }
@@ -488,17 +498,17 @@ int String::compareTo(const String &s) const {
     return strcmp(buffer(), s.buffer());
 }
 
-bool String::equals(const String &s2) const {
-    return (len() == s2.len() && compareTo(s2) == 0);
-}
+// bool String::equals(const String &s2) const {
+//     return (len() == s2.len() && compareTo(s2) == 0);
+// }
 
-bool String::equals(const char *cstr) const {
-    if (len() == 0)
-        return (cstr == NULL || *cstr == 0);
-    if (cstr == NULL)
-        return buffer()[0] == 0;
-    return strcmp(buffer(), cstr) == 0;
-}
+// bool String::equals(const char *cstr) const {
+//     if (len() == 0)
+//         return (cstr == NULL || *cstr == 0);
+//     if (cstr == NULL)
+//         return buffer()[0] == 0;
+//     return strcmp(buffer(), cstr) == 0;
+// }
 
 bool String::operator<(const String &rhs) const {
     return compareTo(rhs) < 0;
@@ -516,21 +526,21 @@ bool String::operator>=(const String &rhs) const {
     return compareTo(rhs) >= 0;
 }
 
-bool String::equalsIgnoreCase(const String &s2) const {
-    if (this == &s2)
-        return true;
-    if (len() != s2.len())
-        return false;
-    if (len() == 0)
-        return true;
-    const char *p1 = buffer();
-    const char *p2 = s2.buffer();
-    while (*p1) {
-        if (tolower(*p1++) != tolower(*p2++))
-            return false;
-    }
-    return true;
-}
+// bool String::equalsIgnoreCase(const String &s2) const {
+//     if (this == &s2)
+//         return true;
+//     if (len() != s2.len())
+//         return false;
+//     if (len() == 0)
+//         return true;
+//     const char *p1 = buffer();
+//     const char *p2 = s2.buffer();
+//     while (*p1) {
+//         if (tolower(*p1++) != tolower(*p2++))
+//             return false;
+//     }
+//     return true;
+// }
 
 unsigned char String::equalsConstantTime(const String &s2) const {
     // To avoid possible time-based attacks present function
@@ -559,23 +569,23 @@ unsigned char String::equalsConstantTime(const String &s2) const {
     return (equalcond & diffcond); //bitwise AND
 }
 
-bool String::startsWith(const String &s2) const {
-    if (len() < s2.len())
-        return false;
-    return startsWith(s2, 0);
-}
+// bool String::startsWith(const String &s2) const {
+//     if (len() < s2.len())
+//         return false;
+//     return startsWith(s2, 0);
+// }
 
-bool String::startsWith(const String &s2, unsigned int offset) const {
-    if (offset > (unsigned)(len() - s2.len()) || !buffer() || !s2.buffer())
-        return false;
-    return strncmp(&buffer()[offset], s2.buffer(), s2.len()) == 0;
-}
+// bool String::startsWith(const String &s2, unsigned int offset) const {
+//     if (offset > (unsigned)(len() - s2.len()) || !buffer() || !s2.buffer())
+//         return false;
+//     return strncmp(&buffer()[offset], s2.buffer(), s2.len()) == 0;
+// }
 
-bool String::endsWith(const String &s2) const {
-    if (len() < s2.len() || !buffer() || !s2.buffer())
-        return false;
-    return strcmp(&buffer()[len() - s2.len()], s2.buffer()) == 0;
-}
+// bool String::endsWith(const String &s2) const {
+//     if (len() < s2.len() || !buffer() || !s2.buffer())
+//         return false;
+//     return strcmp(&buffer()[len() - s2.len()], s2.buffer()) == 0;
+// }
 
 /*********************************************/
 /*  Character Access                         */
@@ -619,6 +629,65 @@ void String::getBytes(unsigned char *buf, unsigned int bufsize, unsigned int ind
 /*  Search                                   */
 /*********************************************/
 
+// int String::indexOf(char ch, unsigned int fromIndex) const {
+//     if (fromIndex >= len())
+//         return -1;
+//     const char *temp = strchr(buffer() + fromIndex, ch);
+//     if (temp == NULL)
+//         return -1;
+//     return temp - buffer();
+// }
+
+// int String::indexOf(const char *s2, unsigned int fromIndex) const {
+//     if (fromIndex >= len())
+//         return -1;
+//     const char *found = strstr_P(buffer() + fromIndex, s2);
+//     if (found == NULL)
+//         return -1;
+//     return found - buffer();
+// }
+
+// int String::indexOf(const String &s2, unsigned int fromIndex) const {
+//     return indexOf(s2.c_str(), fromIndex);
+// }
+
+// int String::lastIndexOf(char ch) const {
+//     return lastIndexOf(ch, len() - 1);
+// }
+
+// int String::lastIndexOf(char ch, unsigned int fromIndex) const {
+//     if (fromIndex >= len())
+//         return -1;
+//     char *writeTo = wbuffer();
+//     char tempchar = writeTo[fromIndex + 1]; // save the replaced character
+//     writeTo[fromIndex + 1] = '\0';
+//     char *temp = strrchr(writeTo, ch);
+//     writeTo[fromIndex + 1] = tempchar; // restore character
+//     if (temp == NULL)
+//         return -1;
+//     return temp - writeTo;
+// }
+
+// int String::lastIndexOf(const String &s2) const {
+//     return lastIndexOf(s2, len() - s2.len());
+// }
+
+// int String::lastIndexOf(const String &s2, unsigned int fromIndex) const {
+//     if (s2.len() == 0 || len() == 0 || s2.len() > len())
+//         return -1;
+//     if (fromIndex >= len())
+//         fromIndex = len() - 1;
+//     int found = -1;
+//     for (const char *p = buffer(); p <= buffer() + fromIndex; p++) {
+//         p = strstr(p, s2.buffer());
+//         if (!p)
+//             break;
+//         if ((unsigned int)(p - buffer()) <= fromIndex)
+//             found = p - buffer();
+//     }
+//     return found;
+// }
+
 int String::indexOf(char ch, unsigned int fromIndex) const {
     if (fromIndex >= len())
         return -1;
@@ -628,55 +697,19 @@ int String::indexOf(char ch, unsigned int fromIndex) const {
     return temp - buffer();
 }
 
-int String::indexOf(const char *s2, unsigned int fromIndex) const {
+int String::indexOf(const String &s2) const {
+    return indexOf(s2, 0);
+}
+
+int String::indexOf(const String &s2, unsigned int fromIndex) const {
     if (fromIndex >= len())
         return -1;
-    const char *found = strstr_P(buffer() + fromIndex, s2);
+    const char *found = strstr(buffer() + fromIndex, s2.buffer());
     if (found == NULL)
         return -1;
     return found - buffer();
 }
 
-int String::indexOf(const String &s2, unsigned int fromIndex) const {
-    return indexOf(s2.c_str(), fromIndex);
-}
-
-int String::lastIndexOf(char ch) const {
-    return lastIndexOf(ch, len() - 1);
-}
-
-int String::lastIndexOf(char ch, unsigned int fromIndex) const {
-    if (fromIndex >= len())
-        return -1;
-    char *writeTo = wbuffer();
-    char tempchar = writeTo[fromIndex + 1]; // save the replaced character
-    writeTo[fromIndex + 1] = '\0';
-    char *temp = strrchr(writeTo, ch);
-    writeTo[fromIndex + 1] = tempchar; // restore character
-    if (temp == NULL)
-        return -1;
-    return temp - writeTo;
-}
-
-int String::lastIndexOf(const String &s2) const {
-    return lastIndexOf(s2, len() - s2.len());
-}
-
-int String::lastIndexOf(const String &s2, unsigned int fromIndex) const {
-    if (s2.len() == 0 || len() == 0 || s2.len() > len())
-        return -1;
-    if (fromIndex >= len())
-        fromIndex = len() - 1;
-    int found = -1;
-    for (const char *p = buffer(); p <= buffer() + fromIndex; p++) {
-        p = strstr(p, s2.buffer());
-        if (!p)
-            break;
-        if ((unsigned int)(p - buffer()) <= fromIndex)
-            found = p - buffer();
-    }
-    return found;
-}
 
 String String::substring(unsigned int left, unsigned int right) const {
     if (left > right) {
@@ -697,64 +730,126 @@ String String::substring(unsigned int left, unsigned int right) const {
     return out;
 }
 
+
+
 /*********************************************/
 /*  Modification                             */
 /*********************************************/
 
-void String::replace(char find, char replace) {
+//TODO check if there has been any changes in 3.0.0
+//void String::replace(const String &find, const String &replace) {
+
+// void String::replace(const String &find, const String &replace) {
+//     if (len() == 0 || find.len() == 0)
+//         return;
+//     int diff = replace.len() - find.len();
+//     char *readFrom = wbuffer();
+//     char *foundAt;
+//     if (diff == 0) {
+//         while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
+//             memmove_P(foundAt, replace.buffer(), replace.len());
+//             readFrom = foundAt + replace.len();
+//         }
+//     } else if (diff < 0) {
+//         char *writeTo = wbuffer();
+//         while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
+//             unsigned int n = foundAt - readFrom;
+//             memmove_P(writeTo, readFrom, n);
+//             writeTo += n;
+//             memmove_P(writeTo, replace.buffer(), replace.len());
+//             writeTo += replace.len();
+//             readFrom = foundAt + find.len();
+//             setLen(len() + diff);
+//         }
+//         memmove_P(writeTo, readFrom, strlen(readFrom) + 1);
+//     } else {
+//         unsigned int size = len(); // compute size needed for result
+//         while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
+//             readFrom = foundAt + find.len();
+//             size += diff;
+//         }
+//         if (size == len())
+//             return;
+//         if (size > capacity() && !changeBuffer(size))
+//             return; // XXX: tell user!
+//         int index = len() - 1;
+//         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
+//             readFrom = wbuffer() + index + find.len();
+//             memmove_P(readFrom + diff, readFrom, len() - (readFrom - buffer()));
+//             int newLen = len() + diff;
+//             memmove_P(wbuffer() + index, replace.buffer(), replace.len());
+//             setLen(newLen);
+//             wbuffer()[newLen] = 0;
+//             index--;
+//         }
+//     }
+// }
+
+bool String::replace(char find, char replace)
+{
     if (!buffer())
-        return;
+        return true;
     for (char *p = wbuffer(); *p; p++) {
-        if (*p == find)
+        if (*p == find) {
             *p = replace;
+        }
     }
+    return true;
 }
 
-void String::replace(const String &find, const String &replace) {
-    if (len() == 0 || find.len() == 0)
-        return;
-    int diff = replace.len() - find.len();
+bool String::_replace(PGM_P find, size_t findLen, PGM_P replace, size_t replaceLen)
+{
+    if (length() == 0 || findLen == 0 || !find) {
+        return false;
+    }
+    int diff = replaceLen - findLen;
     char *readFrom = wbuffer();
     char *foundAt;
     if (diff == 0) {
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            memmove_P(foundAt, replace.buffer(), replace.len());
-            readFrom = foundAt + replace.len();
+        while ((foundAt = strstr_P(readFrom, find)) != nullptr) {
+            memmove_P(foundAt, replace, replaceLen);
+            readFrom = foundAt + replaceLen;
         }
-    } else if (diff < 0) {
+    }
+    else if (diff < 0) {
         char *writeTo = wbuffer();
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
+        while ((foundAt = strstr_P(readFrom, find)) != nullptr) {
             unsigned int n = foundAt - readFrom;
-            memmove_P(writeTo, readFrom, n);
+            memmove(writeTo, readFrom, n);
             writeTo += n;
-            memmove_P(writeTo, replace.buffer(), replace.len());
-            writeTo += replace.len();
-            readFrom = foundAt + find.len();
+            memmove_P(writeTo, replace, replaceLen);
+            writeTo += replaceLen;
+            readFrom = foundAt + findLen;
             setLen(len() + diff);
         }
-        memmove_P(writeTo, readFrom, strlen(readFrom) + 1);
-    } else {
+        memmove(writeTo, readFrom, strlen(readFrom) + 1);
+    }
+    else {
         unsigned int size = len(); // compute size needed for result
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            readFrom = foundAt + find.len();
+        while ((foundAt = strstr_P(readFrom, find)) != nullptr) {
+            readFrom = foundAt + findLen;
             size += diff;
         }
-        if (size == len())
-            return;
-        if (size > capacity() && !changeBuffer(size))
-            return; // XXX: tell user!
+        if (size == len()) {
+            return true;
+        }
+        if (size > capacity() && !changeBuffer(size)) {
+            return false;
+        }
         int index = len() - 1;
         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
-            readFrom = wbuffer() + index + find.len();
-            memmove_P(readFrom + diff, readFrom, len() - (readFrom - buffer()));
+            readFrom = wbuffer() + index + findLen;
+            memmove(readFrom + diff, readFrom, len() - (readFrom - buffer()));
             int newLen = len() + diff;
-            memmove_P(wbuffer() + index, replace.buffer(), replace.len());
+            memmove_P(wbuffer() + index, replace, replaceLen);
             setLen(newLen);
             wbuffer()[newLen] = 0;
             index--;
         }
     }
+    return true;
 }
+
 
 void String::remove(unsigned int index, unsigned int count) {
     if (index >= len()) {
@@ -773,36 +868,78 @@ void String::remove(unsigned int index, unsigned int count) {
     wbuffer()[newlen] = 0;
 }
 
-void String::toLowerCase(void) {
+String &String::toLowerCase(void) {
     if (!buffer())
-        return;
+        return *this;
     for (char *p = wbuffer(); *p; p++) {
         *p = tolower(*p);
     }
+    return *this;
 }
 
-void String::toUpperCase(void) {
+String &String::toUpperCase(void) {
     if (!buffer())
-        return;
+        return *this;
     for (char *p = wbuffer(); *p; p++) {
         *p = toupper(*p);
     }
+    return *this;
 }
 
-void String::trim(void) {
-    if (!buffer() || len() == 0)
-        return;
+// new trim functions
+
+String &String::_trim(TrimType type)
+{
+    auto len = length();
+    if (len == 0) {
+        return *this;
+    }
     char *begin = wbuffer();
-    while (isspace(*begin))
-        begin++;
-    char *end = wbuffer() + len() - 1;
-    while (isspace(*end) && end >= begin)
-        end--;
+    if (static_cast<uint8_t>(type) & static_cast<uint8_t>(TrimType::LEFT)) {
+        while (isspace(*begin)) {
+            begin++;
+        }
+    }
+    char *end = wbuffer() + len - 1;
+    if (static_cast<uint8_t>(type) & static_cast<uint8_t>(TrimType::RIGHT)) {
+        while (isspace(*end) && end >= begin) {
+            end--;
+        }
+    }
     unsigned int newlen = end + 1 - begin;
+    if (begin > buffer()) {
+        memmove(wbuffer(), begin, newlen);
+    }
     setLen(newlen);
-    if (begin > buffer())
-        memmove_P(wbuffer(), begin, newlen);
     wbuffer()[newlen] = 0;
+    return *this;
+}
+
+String &String::_trim(TrimType type, PGM_P characters, size_t charLen)
+{
+    auto len = length();
+    if (!len || !characters || !charLen) {
+        return *this;
+    }
+    charLen++; // use memchr instead of strchr to avoid additional NUL byte check
+    if (static_cast<uint8_t>(type) & static_cast<uint8_t>(TrimType::RIGHT)) {
+        while (len && memchr_P(characters, buffer()[len - 1], charLen)) {
+            len--;
+        }
+        setLen(len);
+    }
+
+    if (static_cast<uint8_t>(type) & static_cast<uint8_t>(TrimType::LEFT)) {
+        size_t remove = 0;
+        while (memchr_P(characters, buffer()[remove], charLen)) {
+            remove++;
+        }
+        this->remove(0, remove); // remove adds NUL byte
+    }
+    else {
+        wbuffer()[len] = 0;
+    }
+    return *this;
 }
 
 /*********************************************/

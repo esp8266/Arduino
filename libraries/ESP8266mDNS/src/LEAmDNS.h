@@ -8,7 +8,7 @@
     Essentially, this is an rewrite of the original EPS8266 Multicast DNS code (ESP8266mDNS).
     The target of this rewrite was to keep the existing interface as stable as possible while
     adding and extending the supported set of mDNS features.
-    A lot of the additions were basically taken from Erik Ekman's lwIP mdns app code.
+    A lot of the additions were basicly taken from Erik Ekman's lwIP mdns app code.
 
     Supported mDNS features (in some cases somewhat limited):
     - Presenting a DNS-SD service to interested observers, eg. a http server by presenting _http._tcp service
@@ -52,7 +52,7 @@
     Static:
       Call 'uint32_t u32AnswerCount = MDNS.queryService("http", "tcp");'
       Iterate answers by: 'for (uint32_t u=0; u<u32AnswerCount; ++u) { const char* pHostname = MDNS.answerHostname(u); }'
-      You should call MDNS.removeQuery() sometimes later (when the answers are not needed anymore)
+      You should call MDNS.removeQuery() sometimes later (when the answers are nott needed anymore)
 
     Dynamic:
       Install a dynamic query by calling 'DNSResponder::hMDNSServiceQuery hServiceQuery = MDNS.installServiceQuery("http", "tcp", serviceQueryCallback, &userData);'
@@ -195,7 +195,7 @@ public:
 
     // Finish MDNS processing
     bool close(void);
-    // for esp32 compatibility
+    // for esp32 compatability
     bool end(void);
     // Change hostname (probing is restarted)
     bool setHostname(const char* p_pcHostname);
@@ -241,7 +241,7 @@ public:
     {
         setHostname(p_pcHostname);
     }
-    // for esp32 compatibility
+    // for esp32 compatibilty
     void setInstanceName(const String& s_pcHostname)
     {
         setInstanceName(s_pcHostname.c_str());
@@ -1180,7 +1180,7 @@ protected:
         uint8_t                 m_u8HostReplyMask;          // Flags for reply components/answers
         bool                    m_bLegacyQuery;             // Flag: Legacy query
         bool                    m_bResponse;                // Flag: Response to a query
-        bool                    m_bAuthorative;             // Flag: Authoritative (owner) response
+        bool                    m_bAuthorative;             // Flag: Authorative (owner) response
         bool                    m_bCacheFlush;              // Flag: Clients should flush their caches
         bool                    m_bUnicast;                 // Flag: Unicast response
         bool                    m_bUnannounce;              // Flag: Unannounce service
@@ -1438,6 +1438,7 @@ protected:
                                       const char* p_pcValue,
                                       bool p_bTemp);
 
+public:
     stcMDNSServiceTxt* _answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
                                        const uint32_t p_u32AnswerIndex);
 

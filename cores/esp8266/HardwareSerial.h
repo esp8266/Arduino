@@ -132,7 +132,7 @@ public:
 
     int peek(void) override
     {
-        // return -1 when data is unavailable (arduino api)
+        // return -1 when data is unvailable (arduino api)
         return uart_peek_char(_uart);
     }
 
@@ -162,7 +162,7 @@ public:
 
     int read(void) override
     {
-        // return -1 when data is unavailable (arduino api)
+        // return -1 when data is unvailable (arduino api)
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
@@ -233,7 +233,11 @@ protected:
     size_t _rx_size;
 };
 
+#ifdef HAVE_KFC_FIRMWARE_VERSION
+extern Stream &Serial;
+#else
 extern HardwareSerial Serial;
+#endif
 extern HardwareSerial Serial1;
 
 extern void serialEventRun(void) __attribute__((weak));
