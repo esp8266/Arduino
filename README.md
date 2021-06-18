@@ -1,6 +1,10 @@
 Arduino core for ESP8266 WiFi chip
 ===========================================
 
+# Modifications
+
+- Optimized WString class and additional functionality
+
 # Quick links
 
 - [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/3.0.0/)
@@ -21,8 +25,8 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
 - [Issues and support](#issues-and-support)
-- [Contributing](#contributing)  
-- [License and credits](#license-and-credits)   
+- [Contributing](#contributing)
+- [License and credits](#license-and-credits)
 
 ### Installing with Boards Manager
 
@@ -134,4 +138,4 @@ ESP8266 core files are licensed under LGPL.
 
 [Serial Monitor Arduino IDE plugin](https://github.com/mytrain/arduino-esp8266-serial-plugin) Original discussion [here](https://github.com/esp8266/Arduino/issues/1360), quick download [there](http://mytrain.fr/cms//images/mytrain/private/ESP8266SM.v3.zip).
 
-[FTP Client/Server Library](https://github.com/dplasa/FTPClientServer) 
+[FTP Client/Server Library](https://github.com/dplasa/FTPClientServer)
