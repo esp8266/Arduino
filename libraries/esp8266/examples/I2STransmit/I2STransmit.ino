@@ -10,7 +10,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-#include <i2s.h>
+#include <I2S.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
