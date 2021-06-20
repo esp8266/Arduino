@@ -11,6 +11,7 @@
 #include <lwip/netif.h>
 #include <lwip/etharp.h>
 #include <lwip/dhcp.h>
+#include <lwip/dns.h>
 #include <lwip/apps/sntp.h>
 
 #include <user_interface.h>	// wifi_get_macaddr()
@@ -40,7 +41,7 @@ public:
         memset(&_netif, 0, sizeof(_netif));
     }
 
-    boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, const IPAddress& dns2);
+    boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
 
     // default mac-address is inferred from esp8266's STA interface
     boolean begin(const uint8_t *macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
@@ -116,6 +117,17 @@ boolean LwipIntfDev<RawDev>::config(const IPAddress& localIP, const IPAddress& g
     ip4_addr_set_u32(ip_2_ip4(&_netif.gw), realGateway.v4());
     ip4_addr_set_u32(ip_2_ip4(&_netif.netmask), realNetmask.v4());
 
+    if (realDns1.isSet())
+    {
+        // Set DNS1-Server
+        dns_setserver(0, realDns1);
+    }
+
+    if (dns2.isSet())
+    {
+        // Set DNS2-Server
+        dns_setserver(1, dns2);
+    }
     return true;
 }
 
