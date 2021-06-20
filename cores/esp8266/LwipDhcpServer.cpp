@@ -383,7 +383,7 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
 #define ipadd (_netif->ip_addr)
 
     //struct ip_info if_ip;
-    //bzero(&if_ip, sizeof(struct ip_info));
+    //memset(&if_ip, 0, sizeof(struct ip_info));
     //wifi_get_ip_info(SOFTAP_IF, &if_ip);
 #define if_ip (*_netif)
 
@@ -1008,7 +1008,7 @@ void DhcpServer::init_dhcps_lease(uint32 ip)
             local_ip ++;
         }
 
-        bzero(&dhcps_lease, sizeof(dhcps_lease));
+        memset(&dhcps_lease, 0, sizeof(dhcps_lease));
         dhcps_lease.start_ip.addr = softap_ip | local_ip;
         dhcps_lease.end_ip.addr = softap_ip | (local_ip + DHCPS_MAX_LEASE - 1);
         dhcps_lease.start_ip.addr = htonl(dhcps_lease.start_ip.addr);
@@ -1162,7 +1162,7 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
             return false;
         }
 
-        bzero(&dhcps_lease, sizeof(dhcps_lease));
+        memset(&dhcps_lease, 0, sizeof(dhcps_lease));
         //      dhcps_lease.start_ip.addr = start_ip;
         //      dhcps_lease.end_ip.addr = end_ip;
         dhcps_lease.start_ip.addr = please->start_ip.addr;
@@ -1206,7 +1206,7 @@ bool DhcpServer::get_dhcps_lease(struct dhcps_lease *please)
     }
     else
     {
-        //      bzero(please, sizeof(dhcps_lease));
+        //      memset(please, 0, sizeof(dhcps_lease));
         //      if (!isRunning()){
         //          please->start_ip.addr = htonl(dhcps_lease.start_ip.addr);
         //          please->end_ip.addr = htonl(dhcps_lease.end_ip.addr);
@@ -1214,7 +1214,7 @@ bool DhcpServer::get_dhcps_lease(struct dhcps_lease *please)
     }
 
     //  if (isRunning()){
-    //      bzero(please, sizeof(dhcps_lease));
+    //      memset(please, 0, sizeof(dhcps_lease));
     //      please->start_ip.addr = dhcps_lease.start_ip.addr;
     //      please->end_ip.addr = dhcps_lease.end_ip.addr;
     //  }

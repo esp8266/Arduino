@@ -73,6 +73,8 @@ env.Append(
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
+        "-D_XOPEN_SOURCE=700",
+        "-D_DEFAULT_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
