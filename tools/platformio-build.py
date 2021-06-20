@@ -73,6 +73,7 @@ env.Append(
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
+        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
