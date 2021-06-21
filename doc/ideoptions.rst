@@ -153,7 +153,7 @@ Only lwIP-v2 is available on cores v3+.
 
   -  No AutoIP (not getting 169.254.x.x on DHCP request when there is no DHCP answer),
 
-  -  No SACK-OUT (= No TCP ``out``put ``s``elective ``ack``nowledgements):
+  -  No SACK-OUT (= no Selective ACKnowledgements for OUTput):
 
      no better stability with long distance TCP transfers,
 
