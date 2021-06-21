@@ -72,7 +72,7 @@ version).  WPS is always available, and not using it will give an extra
 ~4.5KB compared to releases until 2.4.1 included.
 
 This Arduino library doesn't work on ESP. How do I make it work?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You would like to use this Arduino library with ESP8266 and it does not
 perform. It is not listed among libraries verified to work with ESP8266.
@@ -80,7 +80,7 @@ perform. It is not listed among libraries verified to work with ESP8266.
 `Read more <a03-library-does-not-work.rst>`__.
 
 In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M FS) or 4M (3M FS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The reason we cannot have more than 1MB of code in flash has to do with
 a hardware limitation. Flash cache hardware on the ESP8266 only allows
@@ -153,7 +153,7 @@ Artificially clearing them is a workaround to help saving precious heap.
 Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__
 
 Use custom defines from build options file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A file named ``build_opt.h`` next to the ``sketch.ino`` file enables the user
 to specify custom definitons in a central and organized location.

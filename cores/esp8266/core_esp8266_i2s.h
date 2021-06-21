@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef I2S_h
-#define I2S_h
+#ifndef CORE_ESP8266_I2S_H
+#define CORE_ESP8266_I2S_H
 
 #define I2S_HAS_BEGIN_RXTX_DRIVE_CLOCKS 1
 
