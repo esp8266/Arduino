@@ -42,7 +42,7 @@ Crystal Frequency
 
 This is the on-board crystal frequency (26 or 40Mhz).  Default is 26MHz. 
 But the chip was designed with 40MHz.  That explains the default strange
-74880 baud rate at boot, which is 115200*26/40 (115200 being what everybody
+74880 baud rate at boot, which is 115200\*26/40 (115200 being what everybody
 uses by default nowadays).
 
 Flash Size
@@ -67,7 +67,7 @@ the first one of each size is the default and suitable for many cases.
 
 Example: ``4MB (FS:2MB OTA:~1019KB)``:
 
-- 4MB is the flash chip size (= 4 MBytes, sometimes oddly noted 16Mbits)
+- 4MB is the flash chip size (= 4 MBytes, sometimes oddly noted 32Mbits)
 - ``OTA:~1019KB`` (around 1MB) is used for Over The Air flashing (note that this one can be ``gzip``-ped)
 - ``FS:2MB`` means that 2MBytes are used for an internal filesystem (LittleFS).
 
