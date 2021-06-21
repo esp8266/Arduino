@@ -8,6 +8,9 @@ There are a number of specific options for esp8266 in the Arduino IDE Tools
 menu.  Not all of them are available for every board.  If one is needed and
 not visible, please try using the generic esp8266 or esp8285 board.
 
+In every menu entry, the first option is the default one and is suitable for
+most users.
+
 Specific option list
 --------------------
 
@@ -25,7 +28,7 @@ Upload Speed
 ~~~~~~~~~~~~
 
 The is the serial speed setup for flashing the ESP.  It is not related with
-the serial speed programmed from inside the sketch, is enabled.  Default
+the serial speed programmed from inside the sketch, if enabled.  Default
 values are legacy.  The highest speed option (around 1Mbaud) should always
 work.  Defaults can be updated using the <boards>.txt builder.
 
@@ -37,44 +40,46 @@ Any ESP82xx can run at 80 or 160MHz.
 Crystal Frequency
 ~~~~~~~~~~~~~~~~~
 
-This is the on-board crytal frequency (26 or 40Mhz).  Default is 26.  But
-the chip was designed with 40MHz.  That explains the strange 74880 default
-serial baud rate at boot, which is 115200*26/40 (115200 being what everybody
+This is the on-board crystal frequency (26 or 40Mhz).  Default is 26MHz. 
+But the chip was designed with 40MHz.  That explains the default strange
+74880 baud rate at boot, which is 115200*26/40 (115200 being what everybody
 uses by default nowadays).
 
 Flash Size
 ~~~~~~~~~~
 
-With the Arduino core, ESP82xx can use 1MB at most to store the main sketch.
+With the Arduino core, ESP82xx can use at most 1MB to store the main sketch
+in flash memory.
 
-ESP8285 have a 1MB internal flash capacity.  ESP8266 are shipped with an
+ESP8285 has 1MB internal flash capacity.  ESP8266 is always shipped with an
 external flash chip that is most often 1MB(esp01, esp01s, lots of
 appliances), 4MB (DIY boards like wemos/lolin D1 mini or nodemcu) or 16MB
-(lolin D1 mini pro).  But configuration with 2MB 8MB also exist.  This core
+(lolin D1 mini pro).  But configurations with 2MB 8MB also exist.  This core
 is also able to use older 512KB chips that are today not much used and
 officially deprecated by Espressif.
 
-Flash space is divided into 3 main zones.
-The first is the user program space, 1MB at most.
-The second is enough space for the OTA ability.
-The third, the remaining space, can be used for a filesystem (LittleFS).
+Flash space is divided into 3 main zones.  The first is the user program
+space, 1MB at most.  The second is enough space for the OTA ability.  The
+third, the remaining space, can be used to hold a filesystem (LittleFS).
 
-The list propose many different configurations.  In the generic board list,
-the first one of each size is the default and most commonly used.
+This list propose many different configurations.  In the generic board list,
+the first one of each size is the default and suitable for many cases.
 
-Example: ``4MB (FS:2MB OTA:~1019KB)``
-- 4MB is the flash chip size (= 4 MBytes oddly noted 16Mbits sometimes but not here)
-- ``OTA:~1019KB`` (around 1MB) is used for Over The Air flashing (note that this one can be ``gzip``-ped
+Example: ``4MB (FS:2MB OTA:~1019KB)``:
+
+- 4MB is the flash chip size (= 4 MBytes, sometimes oddly noted 16Mbits)
+- ``OTA:~1019KB`` (around 1MB) is used for Over The Air flashing (note that this one can be ``gzip``-ped)
 - ``FS:2MB`` means that 2MBytes are used for an internal filesystem (LittleFS).
 
 Flash Mode
 ~~~~~~~~~~
 
-There are four options.  The most compatible and slowest is ``DOUT``. The
-fasted is `QIO``.  Every esp8266 is able to use any of these modes, but
+There are four options.  The most compatible and slowest is ``DOUT``.  The
+fasted is ``QIO``.  ESP8266 mcu is able to use any of these modes, but
 depending on the flash chips capabilities and how it is connected to the
-esp8266, the fastest mode may not be valid.  Note that esp8285 requires the
-``DOUT`` mode.
+esp8266, the fastest mode may not be working.  Note that ESP8285 requires
+the ``DOUT`` mode.
+
 Here is some more insights about that on `esp32 forums<https://www.esp32.com/viewtopic.php?t=1250#p5523>`__.
 
 Reset Method
@@ -82,31 +87,32 @@ Reset Method
 
 On some boards (commonly NodeMCU, Lolin/Wemos) an electronic trick allows to
 use the UART DTR line to reset the esp8266 *and* put it in flash mode.  This
-is the default ``dtr/nodemcu`` option and allows an extra easy way of
-flashing.  When not available, the ``no dtr`` option can be used in
-conjunction with a flash button on the board (or by driving the ESP GPIO to
-boot in flash mode at poweron).
+is the default ``dtr/nodemcu`` option.  It provides an extra-easy way of
+flashing from serial port.  When not available, the ``no dtr`` option can be
+used in conjunction with a flash button on the board (or by driving the ESP
+dedicated GPIOs to boot in flash mode at power-on).
 
 Debug Port
 ~~~~~~~~~~
 
 There are three options:
+
 - disabled
 - Serial
 - Serial1
 
-When on ``Serial`` or ``Serial1`` option (see <reference.rst#serial>),
+When on ``Serial`` or ``Serial1`` option (see `reference<reference.rst#serial>`__),
 messages are sent at 74880 bauds at boot time then baud rate is changed to
-user configuration is sketch.  These messages are generated by the internal
+user configuration in sketch.  These messages are generated by the internal
 bootloader.  After boots messages are coming either from the firmware or the
 arduino core.
 
 Debug Level
 ~~~~~~~~~~~
 
-There are a number of option.  The first ``None`` explains itself.  The last
-``NoAssert - NDEBUG`` is even quieter than the first (some internal guards
-are skipped).
+There are a number of options.  The first (``None``) is explained by itself. 
+The last ``NoAssert - NDEBUG`` is even quieter than the first (some internal
+guards are skipped to save more flash).
 
 The other ones may be used when asked by a maintainer or if you are a
 developper trying to debug some issues.
@@ -124,25 +130,27 @@ Only lwIP-v2 is available on core v3+.
 
 - ``v2 Lower Memory``
   This is lwIP-v2 with MSS=536 bytes.  MSS is `Maximum Segment Size`, used
-  for TCP only and different from MTU which is always 1480 in our case.
-  Using such value for MSS is 99.9% compatible with TCP peers, allows to
-  store less data in RAM, and is consequently slower when transmitting
-  larges segments of data using TCP.
+  for TCP only and different from MTU which is always 1480 in our case. 
+  Using such value for MSS is 99.9% compatible with any TCP peers, allows to
+  store less data in RAM, and is consequently slower when transmitting large
+  segments of data using TCP because of a larger overhead and latency due to
+  smaller payload and larger number of packets.
 
 - ``v2 Higher Bandwidth``
 
-  When streaming data, prefer this option.  It uses more memory (MSS=1460)
-  so it allows faster tranfers thanks to a lower overhead between data
-  segments.
+  When streaming large amount of data, prefer this option.  It uses more
+  memory (MSS=1460) so it allows faster transfers thanks to a smaller number
+  of packets providing lower overhead and higher bandwidth.
 
 - ``... (no features)``
   Disabled features to get more flash space and RAM for users are:
-  - No IP Forwarding (=> no NAT)
-  - No IP Fragmentation an reassembly
-  - No AutoIP (not getting 169.254.x.x on DHCP request without DHCP server)
-  - No SACK-OUT (= No TCP output selective acknowledgements):
-    no better stability with long distance TCP transfers
-  - No listen backlog (no protection against DOS attacks for TCP server)
+
+   -  No IP Forwarding (=> no NAT)
+   -  No IP Fragmentation an reassembly
+   -  No AutoIP (not getting 169.254.x.x on DHCP request without DHCP server)
+   -  | No SACK-OUT (= No TCP output selective acknowledgements):
+        no better stability with long distance TCP transfers
+   -  No listen backlog (no protection against DOS attacks for TCP server)
 
 - ``IPv6 ...``
   With these options, IPv6 is enabled, with features.  It uses about 20-30KB
@@ -155,26 +163,26 @@ Only lwIP-v2 is available on core v3+.
   space (both in RAM).
 
 - ``C++ Exceptions``
-  - C++ exceptions are disabled by default.  Consequently the ``new``
-    operator will cause a general failure and a reboot when memory is full.
-    Note that the ``malloc`` function always returns ``nullptr`` when memory
-    is full.
-  - Enabled: on this arduino core platform, exceptions are possible but they
-    are quite ram and flash consuming. Worth for teaching though.
+   -  | C++ exceptions are disabled by default.  Consequently the ``new``
+        operator will cause a general failure and a reboot when memory is full.
+      | Note that the C-``malloc`` function always returns ``nullptr`` when
+        memory is full.
+   -  Enabled: on this arduino core platform, exceptions are possible.  Note
+      that they are quite ram and flash consuming.
 
 - ``Stack protection``
-  - Disabled by default
-  - When Enabled, the compiler generated extra code to check for stack
-    overflows.  When this happens, an exception is raised with a message and
-    the ESP reboots.
+   -  This is disabled by default
+   -  When Enabled, the compiler generated extra code to check for stack
+      overflows.  When this happens, an exception is raised with a message and
+      the ESP reboots.
 
 - ``Erase Flash``
-  - ``Only sketch``: When WiFi is enabled at boot and persistent WiFi
-    credentials are enabled, these data are preserved across flashings.
-    Filesystem is preserved.
-  - ``Sketch + WiFi settings``: persistent WiFi settings are not
-    preserved accross flashings. Filesystem is preserved.
-  - ``All Flash``: WiFi settings and Filesystems are erased.
+   -  ``Only sketch``: When WiFi is enabled at boot and persistent WiFi
+      credentials are enabled, these data are preserved across flashings.
+      Filesystem is preserved.
+   -  ``Sketch + WiFi settings``: persistent WiFi settings are not
+      preserved accross flashings. Filesystem is preserved.
+   -  ``All Flash``: WiFi settings and Filesystems are erased.
 
 - ``Espressif Firmware``
   There are a number of available espressif firmwares.  The first / default
@@ -185,18 +193,18 @@ Only lwIP-v2 is available on core v3+.
 - ``SSL Support``
   The first and default choice (``All SSL ciphers``) is good.  The second
   options enables only the main ciphers and has to be used to lower flash
-  usage.
+  occupation.
 
 - ``MMU`` (Memory Management Unit)
-  Head to its `specific documentation<mmu>`__.  Note that there is an option
+  Head to its `specific documentation<mmu.rst>`__.  Note that there is an option
   providing an additional 16KB of IRAM to your application which can be used
   with ``new`` and ``malloc``.
 
 - ``Non-32-Bit Access``
-  On esp82xx architecture, DRAM can be accessed by by byte, but not
-  read-only flash space (``PROGMEM`` variables) and IRAM.
-  By default they can only be safely accessed in a compatible way using
-  special macros ``pgm_read_()``
+  On esp82xx architecture, DRAM can be accessed byte by byte, but read-only
+  flash space (``PROGMEM`` variables) and IRAM cannot.  By default they can
+  only be safely accessed in a compatible way using special macros
+  ``pgm_read_some()``
 
   With the non-default option ``Byte/Word access``, an exception manager
   allows to transparently use them as if they were byte-accessible.  As a
