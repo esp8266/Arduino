@@ -147,17 +147,17 @@ Only lwIP-v2 is available on core v3+.
 
   Disabled features to get more flash space and RAM for users are:
 
-   -  No IP Forwarding (=> no NAT)
+  -  No IP Forwarding (=> no NAT)
 
-   -  No IP Fragmentation an reassembly
+  -  No IP Fragmentation an reassembly
 
-   -  No AutoIP (not getting 169.254.x.x on DHCP request without DHCP server)
+  -  No AutoIP (not getting 169.254.x.x on DHCP request without DHCP server)
 
-   -  No SACK-OUT (= No TCP output selective acknowledgements):
+  -  No SACK-OUT (= No TCP output selective acknowledgements):
 
-      no better stability with long distance TCP transfers
+     no better stability with long distance TCP transfers
 
-   -  No listen backlog (no protection against DOS attacks for TCP server)
+  -  No listen backlog (no protection against DOS attacks for TCP server)
 
 - ``IPv6 ...``
 
@@ -173,33 +173,33 @@ Only lwIP-v2 is available on core v3+.
 
 - ``C++ Exceptions``
 
-   -   C++ exceptions are disabled by default.  Consequently the ``new``
-       operator will cause a general failure and a reboot when memory is full.
+  -   C++ exceptions are disabled by default.  Consequently the ``new``
+      operator will cause a general failure and a reboot when memory is full.
 
-       Note that the C-``malloc`` function always returns ``nullptr`` when
-       memory is full.
+      Note that the C-``malloc`` function always returns ``nullptr`` when
+      memory is full.
 
-   -  Enabled: on this arduino core platform, exceptions are possible.  Note
-      that they are quite ram and flash consuming.
+  -  Enabled: on this arduino core platform, exceptions are possible.  Note
+     that they are quite ram and flash consuming.
 
 - ``Stack protection``
 
-   -  This is disabled by default
+  -  This is disabled by default
 
-   -  When Enabled, the compiler generated extra code to check for stack
-      overflows.  When this happens, an exception is raised with a message and
-      the ESP reboots.
+  -  When Enabled, the compiler generated extra code to check for stack
+     overflows.  When this happens, an exception is raised with a message and
+     the ESP reboots.
 
 - ``Erase Flash``
 
-   -  ``Only sketch``: When WiFi is enabled at boot and persistent WiFi
-      credentials are enabled, these data are preserved across flashings.
-      Filesystem is preserved.
+  -  ``Only sketch``: When WiFi is enabled at boot and persistent WiFi
+     credentials are enabled, these data are preserved across flashings.
+     Filesystem is preserved.
 
-   -  ``Sketch + WiFi settings``: persistent WiFi settings are not
-      preserved accross flashings. Filesystem is preserved.
+  -  ``Sketch + WiFi settings``: persistent WiFi settings are not
+     preserved accross flashings. Filesystem is preserved.
 
-   -  ``All Flash``: WiFi settings and Filesystems are erased.
+  -  ``All Flash``: WiFi settings and Filesystems are erased.
 
 - ``Espressif Firmware``
 
