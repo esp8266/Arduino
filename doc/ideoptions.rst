@@ -129,6 +129,7 @@ compromise.  Note that cores v2.x were or could be using the lwIP-v1 stack.
 Only lwIP-v2 is available on core v3+.
 
 - ``v2 Lower Memory``
+
   This is lwIP-v2 with MSS=536 bytes.  MSS is `Maximum Segment Size`, used
   for TCP only and different from MTU which is always 1480 in our case. 
   Using such value for MSS is 99.9% compatible with any TCP peers, allows to
@@ -143,8 +144,8 @@ Only lwIP-v2 is available on core v3+.
   of packets providing lower overhead and higher bandwidth.
 
 - ``... (no features)``
-  Disabled features to get more flash space and RAM for users are:
 
+  Disabled features to get more flash space and RAM for users are:
    -  No IP Forwarding (=> no NAT)
    -  No IP Fragmentation an reassembly
    -  No AutoIP (not getting 169.254.x.x on DHCP request without DHCP server)
@@ -153,16 +154,19 @@ Only lwIP-v2 is available on core v3+.
    -  No listen backlog (no protection against DOS attacks for TCP server)
 
 - ``IPv6 ...``
+
   With these options, IPv6 is enabled, with features.  It uses about 20-30KB
   of supplementary flash space.
 
 - ``VTable location``
+
   This is the mechanism used in C++ to support dynamic dispatch of virtual
   methods.  By default these tables are stored in flash to save precious RAM
   bytes, but in very specific cases they can be stored in Heap space, or IRAM
   space (both in RAM).
 
 - ``C++ Exceptions``
+
    -  | C++ exceptions are disabled by default.  Consequently the ``new``
         operator will cause a general failure and a reboot when memory is full.
       | Note that the C-``malloc`` function always returns ``nullptr`` when
@@ -171,12 +175,14 @@ Only lwIP-v2 is available on core v3+.
       that they are quite ram and flash consuming.
 
 - ``Stack protection``
+
    -  This is disabled by default
    -  When Enabled, the compiler generated extra code to check for stack
       overflows.  When this happens, an exception is raised with a message and
       the ESP reboots.
 
 - ``Erase Flash``
+
    -  ``Only sketch``: When WiFi is enabled at boot and persistent WiFi
       credentials are enabled, these data are preserved across flashings.
       Filesystem is preserved.
@@ -185,22 +191,26 @@ Only lwIP-v2 is available on core v3+.
    -  ``All Flash``: WiFi settings and Filesystems are erased.
 
 - ``Espressif Firmware``
+
   There are a number of available espressif firmwares.  The first / default
   choice is fine.  Only try with others after reading on the issue tracker
   that something has to be tried with them.  Note that Espressif obsoleted
   all of them at the time of writing.
 
 - ``SSL Support``
+
   The first and default choice (``All SSL ciphers``) is good.  The second
   options enables only the main ciphers and has to be used to lower flash
   occupation.
 
 - ``MMU`` (Memory Management Unit)
+
   Head to its `specific documentation<mmu.rst>`__.  Note that there is an option
   providing an additional 16KB of IRAM to your application which can be used
   with ``new`` and ``malloc``.
 
 - ``Non-32-Bit Access``
+
   On esp82xx architecture, DRAM can be accessed byte by byte, but read-only
   flash space (``PROGMEM`` variables) and IRAM cannot.  By default they can
   only be safely accessed in a compatible way using special macros
