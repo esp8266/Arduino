@@ -6,6 +6,7 @@
 
 menu.BoardModel=Model
 menu.ESPModule=Module
+menu.UploadTool=Upload Tool
 menu.led=Builtin Led
 menu.baud=Upload Speed
 menu.xtal=CPU Frequency
