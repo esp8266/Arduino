@@ -153,8 +153,9 @@ Only lwIP-v2 is available on core v3+.
 
    -  No AutoIP (not getting 169.254.x.x on DHCP request without DHCP server)
 
-   -    No SACK-OUT (= No TCP output selective acknowledgements):
-      | no better stability with long distance TCP transfers
+   -  No SACK-OUT (= No TCP output selective acknowledgements):
+
+      no better stability with long distance TCP transfers
 
    -  No listen backlog (no protection against DOS attacks for TCP server)
 
@@ -172,10 +173,11 @@ Only lwIP-v2 is available on core v3+.
 
 - ``C++ Exceptions``
 
-   -    C++ exceptions are disabled by default.  Consequently the ``new``
-      | operator will cause a general failure and a reboot when memory is full.
-      | Note that the C-``malloc`` function always returns ``nullptr`` when
-      | memory is full.
+   -   C++ exceptions are disabled by default.  Consequently the ``new``
+       operator will cause a general failure and a reboot when memory is full.
+
+       Note that the C-``malloc`` function always returns ``nullptr`` when
+       memory is full.
 
    -  Enabled: on this arduino core platform, exceptions are possible.  Note
       that they are quite ram and flash consuming.
