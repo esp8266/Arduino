@@ -1634,7 +1634,7 @@ def all_boards ():
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
-    print('menu.exception=Exceptions')
+    print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
