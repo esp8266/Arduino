@@ -84,9 +84,6 @@ jobs:
   build-windows:
     name: Windows
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -253,6 +250,9 @@ jobs:
   mock-check:
     name: Mock trivial test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
