@@ -90,6 +90,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     String protocol = url.substring(0, index);
+    protocol.toLowerCase();
     if(protocol != "http" && protocol != "https") {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
         return false;
@@ -137,6 +138,7 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
     }
 
     _protocol = url.substring(0, index);
+    _protocol.toLowerCase();
     url.remove(0, (index + 3)); // remove http:// or https://
 
     if (_protocol == "http") {
@@ -321,7 +323,7 @@ bool HTTPClient::setURL(const String& url)
 }
 
 /**
- * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+ * set redirect follow mode. See `followRedirects_t` enum for available modes.
  * @param follow
  */
 void HTTPClient::setFollowRedirects(followRedirects_t follow)
@@ -481,7 +483,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
                             // no redirection
                             break;
                         }
-                        // redirect using the same request method and payload, diffrent URL
+                        // redirect using the same request method and payload, different URL
                         redirect = true;
                     }
                     break;
@@ -703,7 +705,7 @@ const String& HTTPClient::getString(void)
     _payload.reset(new StreamString());
 
     if(_size > 0) {
-        // try to reserve needed memmory
+        // try to reserve needed memory
         if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
             return *_payload;

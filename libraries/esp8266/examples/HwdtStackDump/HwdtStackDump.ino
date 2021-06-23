@@ -43,7 +43,7 @@ void setup(void) {
   // more of the SYS stack.
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println(F("A WiFi connection attmpt has been started."));
+  Serial.println(F("A WiFi connection attempt has been started."));
   Serial.println();
 
   // #define DEMO_NOEXTRA4K

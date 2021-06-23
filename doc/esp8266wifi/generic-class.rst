@@ -47,7 +47,7 @@ and WiFi does not start automatically at boot** (see PR `#7902 <https://github.c
 
 Previously, SDK was automatically starting WiFi at boot.  This was probably
 intended for the Espressif AT FW which is interactive and preserves WiFi
-state accross reboots.  This behavior is generally irrelevant with the
+state across reboots.  This behavior is generally irrelevant with the
 Arduino API because sketches start with ``WiFi.begin()`` or
 ``WiFi.softAP()``.
 

@@ -376,7 +376,7 @@ extern hwdt_info_t hwdt_info;
 #undef hwdt_info_
 #undef hwdt_info
 #undef HWDT_VERIFY_HWDT_INFO
-static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and include verison of hwdt_info_t do not match.");
+static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and include version of hwdt_info_t do not match.");
 #endif
 
 
@@ -411,7 +411,7 @@ static_assert(sizeof(hwdt_info_t) == sizeof(LOCAL_HWDT_INFO_T), "Local and inclu
 #define CONT_STACK_A16_SZ  (MK_ALIGN16_SZ(sizeof(cont_t)))
 /*
  * For WPS support, cont stack comes out of the user's heap address space.
- * The the NONOS-SDK stack address is initialized before tbe reserved ROM stack
+ * The NONOS-SDK stack address is initialized before the reserved ROM stack
  * space. In this configuration there is no extra 4K in the heap.
  * Memory map: 0x3FFE8000, ..., (CONT_STACK), ..., (SYS), (ROM_STACK), 0x4000000
  *
@@ -764,8 +764,8 @@ void adjust_uart_speed(uint32_t uart_divisor) {
      * stablilize, and let the remote receiver come to an idle state before
      * continuing.
      *
-     * Load a Rubout character for the final charcter shifting out to stop
-     * the last charcter from getting crunched during the speed change.
+     * Load a Rubout character for the final character shifting out to stop
+     * the last character from getting crunched during the speed change.
      *
      * The thinking is if the speed changes while shifting out, as long as the
      * start bit gets out before the change. The change will not be noticed

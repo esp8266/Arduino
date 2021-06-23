@@ -483,7 +483,7 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   i2sc_temp |= (I2STXR); // Hold transmitter in reset
   I2SC = i2sc_temp;
 
-  // trans master(active low), recv master(active_low), !bits mod(==16 bits/chanel), clear clock dividers
+  // trans master(active low), recv master(active_low), !bits mod(==16 bits/channel), clear clock dividers
   i2sc_temp &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
 
   // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)

@@ -161,7 +161,7 @@ public:
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
-    // old API is now explicitely forbidden
+    // old API is now explicitly forbidden
     bool begin(String url)  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, url)")));
     bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, host, port, uri)")));
     bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));

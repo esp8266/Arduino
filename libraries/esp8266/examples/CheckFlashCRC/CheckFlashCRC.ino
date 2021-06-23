@@ -8,7 +8,7 @@
 extern "C" {
 #include "spi_flash.h"
 }
-// Artificially create a space in PROGMEM that fills multipe sectors so
+// Artificially create a space in PROGMEM that fills multiple sectors so
 // we can corrupt one without crashing the system
 const int corruptme[SPI_FLASH_SEC_SIZE * 4] PROGMEM = { 0 };
 

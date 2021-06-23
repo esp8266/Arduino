@@ -110,7 +110,7 @@ protected:
         @param buffer a pointer to a buffer to write the frame to
         @param framesize readFrameSize()'s result
         @return the length of the received frame
-               or 0 if a problem occured
+               or 0 if a problem occurred
     */
     uint16_t readFrameData(uint8_t *frame, uint16_t framesize);
 
@@ -356,7 +356,7 @@ private:
         MR_WOL = 0x20,    ///< Wake on LAN
         MR_PB = 0x10,     ///< Ping block
         MR_PPPOE = 0x08,  ///< Enable PPPoE
-        MR_FARP = 0x02,   ///< Enable UDP_FORCE_ARP CHECHK
+        MR_FARP = 0x02,   ///< Enable UDP_FORCE_ARP CHECK
     };
 
     /* Interrupt Register values */

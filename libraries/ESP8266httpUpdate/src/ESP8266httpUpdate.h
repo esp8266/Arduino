@@ -89,7 +89,7 @@ public:
         _followRedirects = follow ? HTTPC_STRICT_FOLLOW_REDIRECTS : HTTPC_DISABLE_FOLLOW_REDIRECTS;
     }
     /**
-      * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+      * set redirect follow mode. See `followRedirects_t` enum for available modes.
       * @param follow
       */
     void setFollowRedirects(followRedirects_t follow)
