@@ -28,8 +28,8 @@ jobs:
     - name: Set GIT tag name
       run: |
         # Sets an environment variable used in the next steps
-        TRAVIS_TAG=$(git describe --exact-match --tags)"
-        echo "TRAVIS_TAG=${TRAVIS_TAG}" >> $GITHUB_ENV
+        TRAVIS_TAG="$(git describe --exact-match --tags)"
+        echo "TRAVIS_TAG=\"${TRAVIS_TAG}\"" >> $GITHUB_ENV
     - name: Build package JSON
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
