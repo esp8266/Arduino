@@ -62,6 +62,7 @@ env.Append(
         "-std=gnu17",
         "-Wpointer-arith",
         "-Wno-implicit-function-declaration",
+        "-Werror=return-type",
         "-Wl,-EL",
         "-fno-inline-functions",
         "-nostdlib"
