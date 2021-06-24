@@ -3,15 +3,9 @@ tools/dist/
 tools/xtensa-lx106-elf/
 tools/mkspiffs/
 tools/mklittlefs/
-tools/python/
 tools/python3/
 package/versions/
 exclude.txt
-tools/sdk/lib/liblwip_src.a
-tools/sdk/lwip/src/build
-tools/sdk/lwip/src/liblwip_src.a
-tools/sdk/ld/backup
-tools/sdk/ld/eagle.app.v6.common.ld
 
 tests/hosts/lcov/
 
