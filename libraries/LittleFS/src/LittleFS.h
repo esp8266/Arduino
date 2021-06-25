@@ -183,7 +183,7 @@ public:
     }
 
     bool begin() override {
-        if (_size <= 0) {
+        if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("LittleFS size is <= zero");
             return false;
         }
@@ -205,7 +205,7 @@ public:
     }
 
     bool format() override {
-        if (_size == 0) {
+        if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("lfs size is zero\n");
             return false;
         }
