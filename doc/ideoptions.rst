@@ -1,5 +1,5 @@
-Arduino IDE: esp8266 specificities in Tools menu
-================================================
+esp8266 configuration
+=====================
 
 Overview
 --------
@@ -11,8 +11,16 @@ not visible, please try using the generic esp8266 or esp8285 board.
 In every menu entry, the first option is the default one and is suitable for
 most users (except for flash size in the generic ESP8266 board).
 
-Specific option list
---------------------
+Note about PlatformIO
+---------------------
+
+`PlatformIO specific documentation
+<https://docs.platformio.org/en/latest/platforms/espressif8266.html#espressif-8266>`__
+is also available.  Note that this link is available here for reference and
+is not maintained by the esp8266 Arduino core platform team.
+
+Arduino IDE Tools Menu
+----------------------
 
 Board
 ~~~~~
