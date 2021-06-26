@@ -46,7 +46,7 @@ jobs:
     - name: Set GIT tag name
       run: |
         TRAVIS_TAG="$(git describe --exact-match --tags)"
-        echo "TRAVIS_TAG=\"${TRAVIS_TAG}\"" >> $GITHUB_ENV
+        echo "TRAVIS_TAG=${TRAVIS_TAG}" >> $GITHUB_ENV
     - name: Deploy updated JSON
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
