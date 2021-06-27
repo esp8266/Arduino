@@ -851,7 +851,7 @@ bool HTTPClient::connect(void)
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
 
 #if defined(NO_GLOBAL_INSTANCES)
-        static StreamNull devnull;
+        StreamNull devnull;
 #endif
         _client->sendAvailable(devnull); // clear _client's output (all of it, no timeout)
         return true;
