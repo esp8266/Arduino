@@ -813,7 +813,7 @@ String HTTPClient::header(const char* name)
 String HTTPClient::header(const __FlashStringHelper* name)
 {
     for(size_t i = 0; i < _headerKeysCount; ++i) {
-        if(strcmp_P(_currentHeaders[i].key, name) == 0) {
+        if(strcmp_P(_currentHeaders[i].key, (PGM_P)name) == 0) {
             return _currentHeaders[i].value;
         }
     }
