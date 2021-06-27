@@ -810,6 +810,16 @@ String HTTPClient::header(const char* name)
     return String();
 }
 
+String HTTPClient::header(const __FlashStringHelper* name)
+{
+    for(size_t i = 0; i < _headerKeysCount; ++i) {
+        if(strcmp_P(_currentHeaders[i].key, name) == 0) {
+            return _currentHeaders[i].value;
+        }
+    }
+    return String();
+}
+
 String HTTPClient::header(size_t i)
 {
     if(i < _headerKeysCount) {
