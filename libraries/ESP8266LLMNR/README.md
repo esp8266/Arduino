@@ -25,7 +25,7 @@ Usage
    file.
 2. Include the ESP8266LLMNR library in the sketch.
 3. Call the LLMNR.begin() method in the sketch's setup() function, and provide
-   the hostname to advertize. This should not include any ".local" prefix.
+   the hostname to advertise. This should not include any ".local" prefix.
 4. If ESP8266 AP mode is enabled, disabled, or the WiFi or AP configuration is
    changed, call LLMNR.notify_ap_change() after the change is made.
 
@@ -70,7 +70,7 @@ ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
 Version 1.1
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
-MDNS-SD Suport 2015 Hristo Gochkov
+MDNS-SD Support 2015 Hristo Gochkov
 Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -36,7 +36,7 @@ Sets an elliptic curve certificate and key for the server.  Needs to be called b
 Client sessions (Resuming connections fast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The TLS handshake process takes a long time because of all the back and forth between the client and the server.  You can shorten it by caching the clients' sessions which will skip a few steps in the TLS handshake.  In order for this to work, your client also needs to cache the session. `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst#sessions-resuming-connections-fast>`__ can do that as well as modern web browers.
+The TLS handshake process takes a long time because of all the back and forth between the client and the server.  You can shorten it by caching the clients' sessions which will skip a few steps in the TLS handshake.  In order for this to work, your client also needs to cache the session. `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst#sessions-resuming-connections-fast>`__ can do that as well as modern web browsers.
 
 Here are the kind of performance improvements that you'll be able to see for TLS handshakes with an ESP8266 with it's clock set at 160MHz on a network with fairly low latency:
 

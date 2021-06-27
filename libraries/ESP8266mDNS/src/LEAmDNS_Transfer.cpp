@@ -154,7 +154,7 @@ bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParamet
     MDNSResponder::_prepareMDNSMessage
 
     The MDNS message is composed in a two-step process.
-    In the first loop 'only' the header informations (mainly number of answers) are collected,
+    In the first loop 'only' the header information (mainly number of answers) are collected,
     while in the seconds loop, the header and all queries and answers are written to the UDP
     output buffer.
 
@@ -214,7 +214,7 @@ bool MDNSResponder::_prepareMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_r
             DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _prepareMDNSMessage: _writeMDNSQuestion FAILED!\n")););
         }
 
-        // Answers and authorative answers
+        // Answers and authoritative answers
 #ifdef MDNS_IP4_SUPPORT
         if ((bResult) &&
                 (p_rSendParameter.m_u8HostReplyMask & ContentFlag_A))
@@ -397,7 +397,7 @@ bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_Quer
         // It seems, that some mDNS implementations don't support 'unicast response' questions...
         sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (/*0x8000 |*/ DNS_RRCLASS_IN);   // /*Unicast &*/ INternet
 
-        // TODO: Add knwon answer to the query
+        // TODO: Add known answer to the query
         (void)p_pKnownAnswers;
 
         bResult = _sendMDNSMessage(sendParameter);
@@ -655,13 +655,13 @@ bool MDNSResponder::_readRRAnswerTXT(MDNSResponder::stcMDNS_RRAnswerTXT& p_rRRAn
                     }
 
                     if ((bResult) &&
-                            (pTxt))     // Everythings fine so far
+                            (pTxt))     // Everything is fine so far
                     {
                         // Link TXT item to answer TXTs
                         pTxt->m_pNext = p_rRRAnswerTXT.m_Txts.m_pTxts;
                         p_rRRAnswerTXT.m_Txts.m_pTxts = pTxt;
                     }
-                    else            // At least no TXT (migth be OK, if length was 0) OR an error
+                    else            // At least no TXT (might be OK, if length was 0) OR an error
                     {
                         if (!bResult)
                         {
@@ -1226,9 +1226,9 @@ bool MDNSResponder::_readMDNSMsgHeader(MDNSResponder::stcMDNS_MsgHeader& p_rMsgH
             (_udpRead16(p_rMsgHeader.m_u16ARCount)))
     {
 
-        p_rMsgHeader.m_1bQR     = (u8B1 & 0x80);    // Query/Responde flag
+        p_rMsgHeader.m_1bQR     = (u8B1 & 0x80);    // Query/Respond flag
         p_rMsgHeader.m_4bOpcode = (u8B1 & 0x78);    // Operation code (0: Standard query, others ignored)
-        p_rMsgHeader.m_1bAA     = (u8B1 & 0x04);    // Authorative answer
+        p_rMsgHeader.m_1bAA     = (u8B1 & 0x04);    // Authoritative answer
         p_rMsgHeader.m_1bTC     = (u8B1 & 0x02);    // Truncation flag
         p_rMsgHeader.m_1bRD     = (u8B1 & 0x01);    // Recursion desired
 
@@ -1430,7 +1430,7 @@ bool MDNSResponder::_writeMDNSServiceDomain(const MDNSResponder::stcMDNSService&
                        // Found cached domain -> mark as compressed domain
                        ? ((MDNS_DOMAIN_COMPRESS_MARK > ((u16CachedDomainOffset >> 8) & ~MDNS_DOMAIN_COMPRESS_MARK)) && // Valid offset
                           ((!p_bPrependRDLength) ||
-                           (_write16(2, p_rSendParameter))) &&                                     // Lenght of 'Cxxx'
+                           (_write16(2, p_rSendParameter))) &&                                     // Length of 'Cxxx'
                           (_write8(((u16CachedDomainOffset >> 8) | MDNS_DOMAIN_COMPRESS_MARK), p_rSendParameter)) &&   // Compression mark (and offset)
                           (_write8((uint8_t)(u16CachedDomainOffset & 0xFF), p_rSendParameter)))
                        // No cached domain -> add this domain to cache and write full domain name

@@ -19,10 +19,10 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
  This implementation is based on the original implementation of the ROM.
- It was shortend to reduce the memory usage. The complete version and the
+ It was shortened to reduce the memory usage. The complete version and the
  development history can be found in:
  https://github.com/twischer/Arduino/tree/reboot_uart_download_full
- This might be usefull in case of issues.
+ This might be useful in case of issues.
  */
 #include "reboot_uart_dwnld.h"
 #include <stdnoreturn.h>
@@ -52,7 +52,7 @@ static inline void __wsr_vecbase(uint32_t vector_base) {
 	asm volatile("wsr.vecbase %0" :: "r" (vector_base));
 }
 
-[[noreturn]] void ICACHE_RAM_ATTR esp8266UartDownloadMode()
+[[noreturn]] void IRAM_ATTR esp8266UartDownloadMode()
 {
 	/* reverse engineered from system_restart_core() */
 	/* Before disabling instruction cache and restoring instruction RAM to a

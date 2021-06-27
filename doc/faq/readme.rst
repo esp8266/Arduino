@@ -178,6 +178,15 @@ will need to implement an additional (short) deep sleep using
 
 Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__
 
+My WiFi was previously automatically connected right after booting, but isn't anymore
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This was WiFi persistence.  Starting from version 3 of this core, WiFi is
+indeed off at boot and is powered on only when starting to be used with the
+regular API.
+
+Read more at `former WiFi persistent mode <../esp8266wifi/generic-class.rst#persistent>`__.
+
 How to resolve "undefined reference to `flashinit'" error ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

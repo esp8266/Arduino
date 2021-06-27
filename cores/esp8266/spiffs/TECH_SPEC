@@ -113,7 +113,7 @@ Choosing the page size for the system involves many factors:
  - How fast must spiffs be
  - Other things impossible to find out
  
-So, chosing the Optimal Page Size (tm) seems tricky, to say the least. Don't 
+So, choosing the Optimal Page Size (tm) seems tricky, to say the least. Don't 
 fret - there is no optimal page size. This varies from how the target will use
 spiffs. Use the golden rule:
 

@@ -171,7 +171,7 @@ void handleStatus() {
 
 /*
    Return the list of files in the directory specified by the "dir" query string parameter.
-   Also demonstrates the use of chuncked responses.
+   Also demonstrates the use of chunked responses.
 */
 void handleFileList() {
   if (!fsOK) {
@@ -479,7 +479,7 @@ void handleFileUpload() {
 
 
 /*
-   The "Not Found" handler catches all URI not explicitely declared in code
+   The "Not Found" handler catches all URI not explicitly declared in code
    First try to find and return the requested file from the filesystem,
    and if it fails, return a 404 page with debug information
 */
@@ -555,7 +555,7 @@ void setup(void) {
   DBG_OUTPUT_PORT.println(fsOK ? F("Filesystem initialized.") : F("Filesystem init failed!"));
 
 #ifdef USE_SPIFFS
-  // Debug: dump on console contents of filessytem with no filter and check filenames validity
+  // Debug: dump on console contents of filesystem with no filter and check filenames validity
   Dir dir = fileSystem->openDir("");
   DBG_OUTPUT_PORT.println(F("List of files at root of filesystem:"));
   while (dir.next()) {

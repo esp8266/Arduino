@@ -22,6 +22,9 @@ kinds of creative coding, interactive objects, spaces or physical experiences.
 https://arduino.cc/en/Reference/HomePage
 """
 
+# For SCons documentation, see:
+# https://scons.org/doc/latest
+
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py
 
 from os.path import isdir, join
@@ -58,6 +61,7 @@ if gzip_fw:
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
+    # General options that are passed to the C compiler (C only; not C++)
     CFLAGS=[
         "-std=gnu17",
         "-Wpointer-arith",
@@ -67,22 +71,29 @@ env.Append(
         "-nostdlib"
     ],
 
+    # General options that are passed to the C and C++ compilers
     CCFLAGS=[
         "-Os",  # optimize for size
         "-mlongcalls",
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
+        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
-        "-Wall"
+        "-Wall",
+        "-Werror=return-type",
+        "-free",
+        "-fipa-pta"
     ],
 
+    # General options that are passed to the C++ compiler
     CXXFLAGS=[
         "-fno-rtti",
         "-std=gnu++17"
     ],
 
+    # General user options passed to the linker
     LINKFLAGS=[
         "-Os",
         "-nostdlib",
@@ -101,6 +112,9 @@ env.Append(
         "-u", "_UserExceptionVector"
     ],
 
+    # A platform independent specification of C preprocessor definitions as either:
+    # - -DFLAG as "FLAG"
+    # - -DFLAG=VALUE as ("FLAG", "VALUE")
     CPPDEFINES=[
         ("F_CPU", "$BOARD_F_CPU"),
         "__ets__",
@@ -111,21 +125,21 @@ env.Append(
         "LWIP_OPEN_SRC"
     ],
 
+    # The list of directories that the C preprocessor will search for include directories
     CPPPATH=[
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "libc",
-             "xtensa-lx106-elf", "include"),
         join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core")),
         join(platform.get_package_dir("toolchain-xtensa"), "include")
     ],
 
+    # The list of directories that will be searched for libraries
     LIBPATH=[
         join("$BUILD_DIR", "ld"),  # eagle.app.v6.common.ld
         join(FRAMEWORK_DIR, "tools", "sdk", "lib"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "ld"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "libc", "xtensa-lx106-elf", "lib")
+        join(FRAMEWORK_DIR, "tools", "sdk", "ld")
     ],
 
+    # A list of one or more libraries that will be linked with any executable programs created by this environment
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
         "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
@@ -279,18 +293,67 @@ if not current_vtables:
     env.Append(CPPDEFINES=[current_vtables])
 assert current_vtables
 
-current_mmu_iram_size = None
-for flag in env["CPPDEFINES"]:
-    try:
-        d, val = flag
-        if str(d).startswith("MMU_IRAM_SIZE"):
-            current_mmu_iram_size = "{}={}".format(d, val)
-    except ValueError:
-        continue
-if not current_mmu_iram_size:
-    current_mmu_iram_size = "MMU_IRAM_SIZE=0x8000"
-    env.Append(CPPDEFINES=[current_mmu_iram_size])
-assert current_mmu_iram_size
+#
+# MMU
+#
+
+mmu_flags = []
+required_flags = ("MMU_IRAM_SIZE", "MMU_ICACHE_SIZE")
+if "PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48" in flatten_cppdefines:
+    mmu_flags = [("MMU_IRAM_SIZE", "0xC000"), ("MMU_ICACHE_SIZE", "0x4000")]
+elif "PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED" in flatten_cppdefines:
+    mmu_flags = [
+        ("MMU_IRAM_SIZE", "0xC000"),
+        ("MMU_ICACHE_SIZE", "0x4000"),
+        "MMU_IRAM_HEAP",
+    ]
+elif "PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM32_SECHEAP_NOTSHARED" in flatten_cppdefines:
+    mmu_flags = [
+        ("MMU_IRAM_SIZE", "0x8000"),
+        ("MMU_ICACHE_SIZE", "0x4000"),
+        ("MMU_SEC_HEAP_SIZE", "0x4000"),
+        ("MMU_SEC_HEAP", "0x40108000"),
+    ]
+elif "PIO_FRAMEWORK_ARDUINO_MMU_EXTERNAL_128K" in flatten_cppdefines:
+    mmu_flags = [
+        ("MMU_IRAM_SIZE", "0x8000"),
+        ("MMU_ICACHE_SIZE", "0x8000"),
+        ("MMU_EXTERNAL_HEAP", "128"),
+    ]
+elif "PIO_FRAMEWORK_ARDUINO_MMU_EXTERNAL_1024K" in flatten_cppdefines:
+    mmu_flags = [
+        ("MMU_IRAM_SIZE", "0x8000"),
+        ("MMU_ICACHE_SIZE", "0x8000"),
+        ("MMU_EXTERNAL_HEAP", "256"),
+    ]
+elif "PIO_FRAMEWORK_ARDUINO_MMU_CUSTOM" in flatten_cppdefines:
+    if not all(d in flatten_cppdefines for d in required_flags):
+        print(
+            "Error: Missing custom MMU configuration flags (%s)!"
+            % ", ".join(required_flags)
+        )
+        env.Exit(1)
+
+    for flag in env["CPPDEFINES"]:
+        define = flag
+        if isinstance(flag, (tuple, list)):
+            define, _ = flag
+        if define.startswith("MMU_"):
+            mmu_flags.append(flag)
+# PIO_FRAMEWORK_ARDUINO_MMU_CACHE32_IRAM32 (default)
+else:
+    mmu_flags = [
+        ("MMU_IRAM_SIZE", board.get("build.mmu_iram_size", "0x8000")),
+        ("MMU_ICACHE_SIZE", board.get("build.mmu_icache_size", "0x8000"))]
+    if any(f in flatten_cppdefines for f in required_flags):
+        print(
+            "Warning! Detected custom MMU flags. Please use the "
+            "`-D PIO_FRAMEWORK_ARDUINO_MMU_CUSTOM` option to disable "
+            "the default configuration."
+        )
+
+assert mmu_flags
+env.Append(CPPDEFINES=mmu_flags)
 
 
 # Build the eagle.app.v6.common.ld linker file
@@ -298,8 +361,21 @@ app_ld = env.Command(
     join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
-        "$CC -CC -E -P -D%s -D%s %s $SOURCE -o $TARGET" % (current_vtables, current_mmu_iram_size, fp_in_irom),
-        "Generating LD script $TARGET"))
+        "$CC -CC -E -P -D%s %s %s $SOURCE -o $TARGET"
+        % (
+            current_vtables,
+            # String representation of MMU flags
+            " ".join(
+                [
+                    "-D%s=%s" % f if isinstance(f, (tuple, list)) else "-D" + f
+                    for f in mmu_flags
+                ]
+            ),
+            fp_in_irom,
+        ),
+        "Generating LD script $TARGET",
+    ),
+)
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
 
 if not env.BoardConfig().get("build.ldscript", ""):
@@ -308,6 +384,7 @@ if not env.BoardConfig().get("build.ldscript", ""):
 #
 # Dynamic core_version.h for staging builds
 #
+
 
 def platform_txt_version(default):
     with open(join(FRAMEWORK_DIR, "platform.txt"), "r") as platform_txt:
@@ -321,6 +398,7 @@ def platform_txt_version(default):
                 return v.strip()
 
     return default
+
 
 if isdir(join(FRAMEWORK_DIR, ".git")):
     cmd = '"$PYTHONEXE" "{script}" -b "$BUILD_DIR" -p "{framework_dir}" -v {version}'

@@ -40,6 +40,7 @@ extern "C"
 #include "lwip/netif.h"
 #include <include/ClientContext.h>
 #include "c_types.h"
+#include <StreamDev.h>
 
 uint16_t WiFiClient::_localPort = 0;
 
@@ -76,14 +77,14 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
 WiFiClient::WiFiClient()
-: _client(0)
+: _client(0), _owned(0)
 {
     _timeout = 5000;
     WiFiClient::_add(this);
 }
 
 WiFiClient::WiFiClient(ClientContext* client)
-: _client(client)
+: _client(client), _owned(0)
 {
     _timeout = 5000;
     _client->ref();
@@ -105,6 +106,7 @@ WiFiClient::WiFiClient(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
+    _owned = other._owned;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -117,6 +119,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
+    _owned = other._owned;
     if (_client)
         _client->ref();
     return *this;
@@ -212,23 +215,19 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    return _client->write(buf, size);
-}
-
-size_t WiFiClient::write(Stream& stream, size_t unused)
-{
-    (void) unused;
-    return WiFiClient::write(stream);
+    return _client->write((const char*)buf, size);
 }
 
 size_t WiFiClient::write(Stream& stream)
 {
+    // (this method is deprecated)
+
     if (!_client || !stream.available())
     {
         return 0;
     }
-    _client->setTimeout(_timeout);
-    return _client->write(stream);
+    // core up to 2.7.4 was equivalent to this
+    return stream.sendAll(this);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -238,13 +237,14 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
         return 0;
     }
     _client->setTimeout(_timeout);
-    return _client->write_P(buf, size);
+    StreamConstPtr nopeek(buf, size);
+    return nopeek.sendAll(this);
 }
 
 int WiFiClient::available()
 {
     if (!_client)
-        return false;
+        return 0;
 
     int result = _client->getSize();
 
@@ -262,10 +262,14 @@ int WiFiClient::read()
     return _client->read();
 }
 
-
 int WiFiClient::read(uint8_t* buf, size_t size)
 {
-    return (int) _client->read(reinterpret_cast<char*>(buf), size);
+    return (int)_client->read((char*)buf, size);
+}
+
+int WiFiClient::read(char* buf, size_t size)
+{
+    return (int)_client->read(buf, size);
 }
 
 int WiFiClient::peek()
@@ -304,7 +308,7 @@ bool WiFiClient::flush(unsigned int maxWaitMs)
 
     if (maxWaitMs == 0)
         maxWaitMs = WIFICLIENT_MAX_FLUSH_WAIT_MS;
-    return _client->wait_until_sent(maxWaitMs);
+    return _client->wait_until_acked(maxWaitMs);
 }
 
 bool WiFiClient::stop(unsigned int maxWaitMs)
@@ -380,9 +384,18 @@ void WiFiClient::stopAll()
 
 void WiFiClient::stopAllExcept(WiFiClient* except)
 {
+    // Stop all will look at the lowest-level wrapper connections only
+    while (except->_owned) {
+         except = except->_owned;
+    }
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        if (it != except) {
-            it->stop();
+        WiFiClient* conn = it;
+        // Find the lowest-level owner of the current list entry
+        while (conn->_owned) {
+            conn = conn->_owned;
+        }
+        if (conn != except) {
+            conn->stop();
         }
     }
 }
@@ -411,4 +424,29 @@ uint16_t WiFiClient::getKeepAliveInterval () const
 uint8_t WiFiClient::getKeepAliveCount () const
 {
     return _client->getKeepAliveCount();
+}
+
+bool WiFiClient::hasPeekBufferAPI () const
+{
+    return true;
+}
+
+// return a pointer to available data buffer (size = peekAvailable())
+// semantic forbids any kind of read() before calling peekConsume()
+const char* WiFiClient::peekBuffer ()
+{
+    return _client? _client->peekBuffer(): nullptr;
+}
+
+// return number of byte accessible by peekBuffer()
+size_t WiFiClient::peekAvailable ()
+{
+    return _client? _client->peekAvailable(): 0;
+}
+
+// consume bytes after use (see peekBuffer)
+void WiFiClient::peekConsume (size_t consume)
+{
+    if (_client)
+        _client->peekConsume(consume);
 }
