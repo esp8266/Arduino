@@ -187,7 +187,7 @@ regular API.
 
 Read more at `former WiFi persistent mode <../esp8266wifi/generic-class.rst#persistent>`__.
 
-How to resolve "undefined reference to `flashinit'" error ?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+How to resolve "undefined reference to ``flashinit`'" error ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Please read 'filesystem' > 'flash layout' documentation entry
+Please read `flash layout <../filesystem.rst>`__ documentation entry.
