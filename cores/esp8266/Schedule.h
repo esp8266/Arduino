@@ -19,7 +19,7 @@
 #ifndef ESP_SCHEDULE_H
 #define ESP_SCHEDULE_H
 
-#include <functional>
+#include <Delegate.h>
 #include <stdint.h>
 
 #define SCHEDULED_FN_MAX_COUNT 32
@@ -55,7 +55,7 @@
 // * Run the lambda only once next time.
 // * A scheduled function can schedule a function.
 
-bool schedule_function (const std::function<void(void)>& fn);
+bool schedule_function (const Delegate<void(), void*>& fn);
 
 // Run all scheduled functions.
 // Use this function if your are not using `loop`,
@@ -80,8 +80,8 @@ void run_scheduled_functions();
 // * If alarm is used, anytime during scheduling when it returns true,
 //   any remaining delay from repeat_us is disregarded, and fn is executed.
 
-bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm = nullptr);
+bool schedule_recurrent_function_us(const Delegate<bool(), void*>& fn,
+    uint32_t repeat_us, const Delegate<bool(), void*>& alarm = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)

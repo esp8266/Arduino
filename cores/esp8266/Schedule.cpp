@@ -19,233 +19,83 @@
 #include <assert.h>
 
 #include "Schedule.h"
+#include "MultiDelegate.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
 #include "coredecls.h"
 
-typedef std::function<void(void)> mSchedFuncT;
-struct scheduled_fn_t
-{
-    scheduled_fn_t* mNext = nullptr;
-    mSchedFuncT mFunc;
-};
+using mSchedFuncT = Delegate<void(), void*>;
+// queue specialization: cache erased nodes, call each once next round. 
+MultiDelegate<mSchedFuncT, true> schedFuncs;
 
-static scheduled_fn_t* sFirst = nullptr;
-static scheduled_fn_t* sLast = nullptr;
-static scheduled_fn_t* sUnused = nullptr;
-static int sCount = 0;
-
-typedef std::function<bool(void)> mRecFuncT;
-struct recurrent_fn_t
+class mRecFuncT : public Delegate<bool(), void*>
 {
-    recurrent_fn_t* mNext = nullptr;
-    mRecFuncT mFunc;
+public:
+    using base_type = Delegate<bool(), void*>;
+    mRecFuncT() : callNow(esp8266::polledTimeout::periodicFastUs::neverExpires) {}
+    mRecFuncT(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
+    using base_type::operator=;
     esp8266::polledTimeout::periodicFastUs callNow;
-    std::function<bool(void)> alarm = nullptr;
-    recurrent_fn_t(esp8266::polledTimeout::periodicFastUs interval) : callNow(interval) { }
+    Delegate<bool(), void*> alarm = nullptr;
+    // return true to keep, false to erase.
+    bool IRAM_ATTR operator()()
+    {
+        const bool wakeup = alarm && alarm();
+        bool callNow = this->callNow;
+        return !(wakeup || callNow) || base_type::operator()();
+    }
 };
+// non-queue specialization: heap new/delete, use explicit erase. 
+MultiDelegate<mRecFuncT> recFuncs;
 
-static recurrent_fn_t* rFirst = nullptr;
-static recurrent_fn_t* rLast = nullptr;
-
-// Returns a pointer to an unused sched_fn_t,
-// or if none are available allocates a new one,
-// or nullptr if limit is reached
-IRAM_ATTR // called from ISR
-static scheduled_fn_t* get_fn_unsafe()
+IRAM_ATTR // (not only) called from ISR
+bool schedule_function(const Delegate<void(), void*>& fn)
 {
-    scheduled_fn_t* result = nullptr;
-    // try to get an item from unused items list
-    if (sUnused)
-    {
-        result = sUnused;
-        sUnused = sUnused->mNext;
-    }
-    // if no unused items, and count not too high, allocate a new one
-    else if (sCount < SCHEDULED_FN_MAX_COUNT)
-    {
-        result = new (std::nothrow) scheduled_fn_t;
-        if (result)
-            ++sCount;
-    }
-    return result;
-}
-
-static void recycle_fn_unsafe(scheduled_fn_t* fn)
-{
-    fn->mFunc = nullptr; // special overload in c++ std lib
-    fn->mNext = sUnused;
-    sUnused = fn;
+    return schedFuncs.add(fn);
 }
 
 IRAM_ATTR // (not only) called from ISR
-bool schedule_function(const std::function<void(void)>& fn)
+bool schedule_recurrent_function_us(const Delegate<bool(), void*>& fn,
+    uint32_t repeat_us, const Delegate<bool(), void*>& alarm)
 {
-    if (!fn)
-        return false;
-
-    esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-    scheduled_fn_t* item = get_fn_unsafe();
-    if (!item)
-        return false;
-
-    item->mFunc = fn;
-    item->mNext = nullptr;
-
-    if (sFirst)
-        sLast->mNext = item;
-    else
-        sFirst = item;
-    sLast = item;
-
-    return true;
-}
-
-IRAM_ATTR // (not only) called from ISR
-bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm)
-{
-    assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
+    assert(repeat_us < decltype(mRecFuncT::callNow)::neverExpires); //~26800000us (26.8s)
 
     if (!fn)
         return false;
 
-    recurrent_fn_t* item = new (std::nothrow) recurrent_fn_t(repeat_us);
-    if (!item)
-        return false;
+    mRecFuncT func(repeat_us);
+    func = fn;
+    func.alarm = alarm;
 
-    item->mFunc = fn;
-    item->alarm = alarm;
-
-    esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-    if (rLast)
-    {
-        rLast->mNext = item;
-    }
-    else
-    {
-        rFirst = item;
-    }
-    rLast = item;
-
-    return true;
+    return recFuncs.add(std::move(func));
 }
 
 void run_scheduled_functions()
 {
-    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
-
-    // prevent scheduling of new functions during this run
-    auto stop = sLast;
-    bool done = false;
-    while (sFirst && !done)
-    {
-        done = sFirst == stop;
-
-        sFirst->mFunc();
-
-        {
-            // remove function from stack
-            esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-            auto to_recycle = sFirst;
-
-            // removing rLast
-            if (sLast == sFirst)
-                sLast = nullptr;
-
-            sFirst = sFirst->mNext;
-
-            recycle_fn_unsafe(to_recycle);
-        }
-
-        if (yieldNow)
-        {
-            // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack:
-            esp_schedule();
-            cont_yield(g_pcont);
-        }
-    }
+    schedFuncs();
 }
 
 void run_scheduled_recurrent_functions()
 {
-    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
-
-    // Note to the reader:
-    // There is no exposed API to remove a scheduled function:
-    // Scheduled functions are removed only from this function, and
-    // its purpose is that it is never called from an interrupt
-    // (always on cont stack).
-
-    auto current = rFirst;
-    if (!current)
+    auto it = recFuncs.begin();
+    if (!it)
         return;
 
-    static bool fence = false;
-    {
-        // fence is like a mutex but as we are never called from ISR,
-        // locking is useless here. Leaving comment for reference.
-        //esp8266::InterruptLock lockAllInterruptsInThisScope;
+    static std::atomic<bool> fence(false);
+    // prevent recursive calls
+    if (fence.load()) return;
+    fence.store(true);
 
-        if (fence)
-            // prevent recursive calls from yield()
-            // (even if they are not allowed)
-            return;
-        fence = true;
-    }
-
-    recurrent_fn_t* prev = nullptr;
-    // prevent scheduling of new functions during this run
-    auto stop = rLast;
-
-    bool done;
+    auto end = recFuncs.end();
     do
     {
-        done = current == stop;
-        const bool wakeup = current->alarm && current->alarm();
-        bool callNow = current->callNow;
-
-        if ((wakeup || callNow) && !current->mFunc())
-        {
-            // remove function from stack
-            esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-            auto to_ditch = current;
-
-            // removing rLast
-            if (rLast == current)
-                rLast = prev;
-
-            current = current->mNext;
-            if (prev)
-            {
-                prev->mNext = current;
-            }
-            else
-            {
-                rFirst = current;
-            }
-
-            delete(to_ditch);
-        }
+        if ((*it)())
+            ++it;
         else
-        {
-            prev = current;
-            current = current->mNext;
-        }
+            it = recFuncs.erase(it);
+        // running callbacks might last too long for watchdog etc.
+        optimistic_yield(10000);
+    } while (it != end);
 
-        if (yieldNow)
-        {
-            // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack:
-            esp_schedule();
-            cont_yield(g_pcont);
-        }
-    } while (current && !done);
-
-    fence = false;
+    fence.store(false);
 }
