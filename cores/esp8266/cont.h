@@ -35,8 +35,8 @@ typedef struct cont_ {
         void (*pc_ret)(void);
         unsigned* sp_ret;
 
-        void (*pc_yield)(void);
-        unsigned* sp_yield;
+        void (*pc_suspend)(void);
+        unsigned* sp_suspend;
 
         unsigned* stack_end;
         unsigned unused1;
@@ -55,12 +55,12 @@ extern cont_t* g_pcont;
 void cont_init(cont_t*);
 
 // Run function pfn in a separate stack, or continue execution
-// at the point where cont_yield was called
+// at the point where cont_suspend was called
 void cont_run(cont_t*, void (*pfn)(void));
 
 // Return to the point where cont_run was called, saving the
 // execution state (registers and stack)
-void cont_yield(cont_t*);
+void cont_suspend(cont_t*);
 
 // Check guard bytes around the stack. Return 0 in case everything is ok,
 // return 1 if guard bytes were overwritten.
@@ -70,9 +70,9 @@ int cont_check(cont_t* cont);
 // and thus weren't used by the user code. i.e. that stack space is free. (high water mark)
 int cont_get_free_stack(cont_t* cont);
 
-// Check if yield() may be called. Returns true if we are running inside
+// Check if cont_suspend() may be called. Returns true if we are running inside
 // continuation stack
-bool cont_can_yield(cont_t* cont);
+bool cont_can_suspend(cont_t* cont);
 
 // Repaint the stack from the current SP to the end, to allow individual
 // routines' stack usages to be calculated by re-painting, checking current

@@ -952,13 +952,13 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
                 /* Print separate ctx: cont stack */
 
                 /* Check if cont stack is yielding to SYS */
-                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_yield) {
-                    ctx_cont_ptr = (const uint32_t *)((uintptr_t)g_pcont->sp_yield - 8u);
+                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_suspend) {
+                    ctx_cont_ptr = (const uint32_t *)((uintptr_t)g_pcont->sp_suspend - 8u);
                 }
                 print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
             } else {
-                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_yield) {
-                    ETS_PRINTF("\nCont stack is yielding. Active stack starts at 0x%08X.\n", (uint32_t)g_pcont->sp_yield - 8u);
+                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_suspend) {
+                    ETS_PRINTF("\nCont stack is yielding. Active stack starts at 0x%08X.\n", (uint32_t)g_pcont->sp_suspend - 8u);
                 }
             }
 

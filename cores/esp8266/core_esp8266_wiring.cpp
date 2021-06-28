@@ -23,37 +23,18 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #include "user_interface.h"
-#include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 
-extern void ets_delay_us(uint32_t us);
-extern void esp_schedule();
-extern void esp_yield();
-
-static os_timer_t delay_timer;
 static os_timer_t micros_overflow_timer;
 static uint32_t micros_at_last_overflow_tick = 0;
 static uint32_t micros_overflow_count = 0;
 #define ONCE 0
 #define REPEAT 1
 
-void delay_end(void* arg) {
-    (void) arg;
-    esp_schedule();
-}
-
 void __delay(unsigned long ms) {
-    if(ms) {
-        os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
-        os_timer_arm(&delay_timer, ms, ONCE);
-    } else {
-        esp_schedule();
-    }
-    esp_yield();
-    if(ms) {
-        os_timer_disarm(&delay_timer);
-    }
+    esp_delay(ms);
 }
 
 void delay(unsigned long ms) __attribute__ ((weak, alias("__delay"))); 

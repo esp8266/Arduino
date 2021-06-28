@@ -115,20 +115,18 @@ void EspClass::wdtFeed(void)
     system_soft_wdt_feed();
 }
 
-extern "C" void esp_yield();
-
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep_instant(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
@@ -200,7 +198,7 @@ void EspClass::reset(void)
 void EspClass::restart(void)
 {
     system_restart();
-    esp_yield();
+    esp_suspend();
 }
 
 [[noreturn]] void EspClass::rebootIntoUartDownloadMode()

@@ -135,8 +135,6 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
 void run_scheduled_functions()
 {
-    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
-
     // prevent scheduling of new functions during this run
     auto stop = sLast;
     bool done = false;
@@ -161,13 +159,10 @@ void run_scheduled_functions()
             recycle_fn_unsafe(to_recycle);
         }
 
-        if (yieldNow)
-        {
-            // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack:
-            esp_schedule();
-            cont_yield(g_pcont);
-        }
+        // scheduled functions might last too long for watchdog etc.
+        // yield() is allowed in scheduled functions, therefore
+        // recursion into run_scheduled_recurrent_functions() is permitted
+        optimistic_yield(100000);
     }
 }
 
@@ -241,9 +236,10 @@ void run_scheduled_recurrent_functions()
         if (yieldNow)
         {
             // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack:
+            // this is yield() in cont stack, but need to call cont_suspend directly
+            // to prevent recursion into run_scheduled_recurrent_functions()
             esp_schedule();
-            cont_yield(g_pcont);
+            cont_suspend(g_pcont);
         }
     } while (current && !done);
 

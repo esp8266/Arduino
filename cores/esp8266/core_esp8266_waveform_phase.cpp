@@ -211,7 +211,7 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCc
   }
   std::atomic_thread_fence(std::memory_order_acq_rel);
   while (waveform.toSetBits) {
-    delay(0); // Wait for waveform to update
+    yield(); // Wait for waveform to update
     std::atomic_thread_fence(std::memory_order_acquire);
   }
   return true;
