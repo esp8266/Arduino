@@ -23,7 +23,7 @@ HTTPClient https;
 
 
 void setup() {
-  
+
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -31,13 +31,13 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(WIFI_SSID, WIFI_PWD);
-  
+
   Serial.println("[WIFI] Connecting to WiFi ...");
   while (WiFiMulti.run() != WL_CONNECTED) {
     Serial.print('.');
     delay(1000);
   }
-  
+
   Serial.println();
   Serial.print("[WIFI] Connected with IP : ");
   Serial.println(WiFi.localIP());
@@ -49,10 +49,10 @@ void setup() {
 
 
 void loop() {
-  
+
   if ((WiFiMulti.run() == WL_CONNECTED)) {
     Serial.println("[HTTPS] begin...");
-    
+
     std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
     client->setInsecure();                  // Ignore SSL certificate
     //client->setFingerprint(fingerprint);  //Use SSL
@@ -71,17 +71,16 @@ void loop() {
           Serial.println("[HTTPS] POST... SUCCESS!");
           Serial.println(payload);
         }
-        
-      // Error (response code is negative)
+
+        // Error (response code is negative)
       } else {
         Serial.printf("[HTTPS] POST... failed, error: %s\n", https.errorToString(httpCode).c_str());
       }
       https.end();
 
-    // Unable to reach the server
+      // Unable to reach the server
     } else {
       Serial.println("[HTTPS] Unable to connect");
     }
   }
-
 }
